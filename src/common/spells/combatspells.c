@@ -753,27 +753,12 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
 	unit *mage = fi->unit;
 	attrib *a;
 	int force = (int)(get_force(power, 3)/2);
-	const race *rc = NULL;
-	int num;
 	unit *u;
+  const char * races[3] = { "shadowbat", "nightmare", "vampunicorn" };
+  const race *rc = rc_find(races[rand()%3]);
 
 	unused(sp);
 
-	switch(rand()%3) {
-	case 0:
-		rc  = new_race[RC_SHADOWBAT];
-		num = 5000+dice_rand("3d5000");
-		break;
-	case 1:
-		rc = new_race[RC_NIGHTMARE];
-		num = 500+dice_rand("3d500");
-		break;
-	case 2:
-		rc = new_race[RC_VAMPUNICORN];
-		num = 500+dice_rand("3d500");
-		break;
-	}
-	
 	u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);
 	u->status = ST_FIGHT;
 

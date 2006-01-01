@@ -34,7 +34,7 @@
 
 static int
 use_phoenixcompass(struct unit * u, const struct item_type * itype,
-                  int amount, struct order * ord)
+                   int amount, struct order * ord)
 {
   region      *r;
   unit        *closest_phoenix = NULL;
@@ -43,12 +43,18 @@ use_phoenixcompass(struct unit * u, const struct item_type * itype,
   direction_t  direction;
   unit        *u2;
   direction_t  closest_neighbour_direction = 0;
+  static race * rc_phoenix = NULL;
+  
+  if (rc_phoenix==NULL) {
+    rc_phoenix = rc_find("phoenix");
+    if (rc_phoenix==NULL) return 0;
+  }
 
   /* find the closest phoenix. */
 
   for(r=regions; r; r=r->next) {
     for(u2=r->units; u2; u2=u2->next) {
-      if(u2->race == new_race[RC_PHOENIX]) {
+      if (u2->race == rc_phoenix) {
         if(closest_phoenix == NULL) {
           closest_phoenix = u2;
           closest_phoenix_distance = distance(u->region, closest_phoenix->region);

@@ -542,13 +542,12 @@ race_compat(void)
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
     "special", "spell", "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
-    "wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph",
-    "unicorn", "direwolf", "ghost", "imp", "dreamcat", "fairy", "owl",
-    "hellcat", "tiger", "dolphin", "giantturtle", "kraken", "seaserpent",
+    "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, "seaserpent",
     "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
     "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
-    "clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn",
-    "phoenix"
+    "clone"
   };
   int i;
 

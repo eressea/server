@@ -59,6 +59,7 @@
 
 /** external variables **/
 race * races;
+race_list * familiarraces;
 
 void 
 racelist_clear(struct race_list **rl)
@@ -131,6 +132,9 @@ rc_find(const char * name)
 		}
 	}
 	while (rc && !strcmp(rname, rc->_name[0])==0) rc = rc->next;
+  if (rc->init_familiar!=NULL) {
+    racelist_insert(&familiarraces, rc);
+  }
 	return rc;
 }
 

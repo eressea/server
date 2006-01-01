@@ -102,6 +102,7 @@ typedef struct race_list {
 extern void racelist_clear(struct race_list **rl);
 extern void racelist_insert(struct race_list **rl, const struct race *r);
 
+extern struct race_list * familiarraces;
 extern struct race * races;
 
 extern struct race * rc_find(const char *);

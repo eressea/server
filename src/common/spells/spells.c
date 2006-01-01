@@ -516,20 +516,26 @@ static const race *
 select_familiar(const race * magerace, magic_t magiegebiet)
 {
   const race * retval = NULL;
-	int rnd = rand()%100;
-	assert(magerace->familiars[0]);
+  int rnd = rand()%100;
 
-  do {
-  	if (rnd < 3) {
-      /* RC_KRAKEN muß letzter Vertraute sein */
-      int rc = RC_LYNX + rand()%(RC_KRAKEN+1-RC_LYNX);
-      retval = new_race[rc];
-  	} else if (rnd < 80) {
-	  	retval = magerace->familiars[0];
-	  }
-	  retval = magerace->familiars[magiegebiet];
+  assert(magerace->familiars[0]);
+  if (rnd < 3) {
+    unsigned int maxlen = listlen(familiarraces);
+    if (maxlen>0) {
+      race_list * rclist = familiarraces;
+      int index = rand()%maxlen;
+      while (index-->0) {
+        rclist = rclist->next;
+      }
+      retval = rclist->data;
+    }
+  } else if (rnd < 70) {
+	  retval = magerace->familiars[0];
+  } else {
+    retval = magerace->familiars[magiegebiet];
   }
-  while (retval->init_familiar==NULL);
+  
+  assert (retval!=NULL && retval->init_familiar!=NULL);
   return retval;
 }
 
