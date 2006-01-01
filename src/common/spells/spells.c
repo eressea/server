@@ -59,6 +59,7 @@ extern void ct_register(const struct curse_type * ct);
 #include <util/base36.h>
 #include <util/message.h>
 #include <util/event.h>
+#include <util/functions.h>
 #include <util/rand.h>
 #include <util/variant.h>
 #include <util/goodies.h>
