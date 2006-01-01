@@ -1170,12 +1170,12 @@ readunit(FILE * F)
 			mage->spellpoints = ri(F);
 			mage->spchange = ri(F);
 			while ((i = ri(F)) != -1) {
-				mage->combatspells[csp].sp = find_spellbyid((spellid_t)i);
+				mage->combatspells[csp].sp = find_spellbyid(mage->magietyp, (spellid_t)i);
 				mage->combatspells[csp].level = ri(F);
 				csp++;
 			}
 			while ((i = ri(F)) != -1) {
-				add_spell(mage, find_spellbyid((spellid_t)i));
+				add_spell(mage, find_spellbyid(mage->magietyp, (spellid_t)i));
 			}
 			mage->spellcount = 0;
 			a = a_add(&u->attribs, a_new(&at_mage));

@@ -270,9 +270,6 @@ boolean is_familiar(const struct unit *u);
 spell *get_spellfromtoken(struct unit *u, const char *s, const struct locale * lang);
 	/*	versucht einen Spruch über den Namen zu identifizieren, gibt
 	 *	ansonsten NULL zurück */
-spell *find_spellbyid(spellid_t i);
-/*	versucht einen Spruch über seine Id zu identifizieren, gibt
-*	ansonsten NULL zurück */
 int get_combatspelllevel(const struct unit *u, int nr);
 	/*  versucht, eine eingestellte maximale Kampfzauberstufe
 	 *  zurückzugeben. 0 = Maximum, -1 u ist kein Magier. */

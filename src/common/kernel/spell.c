@@ -165,7 +165,7 @@ get_spellfromtoken(unit *u, const char *name, const struct locale * lang)
 }
 
 spell *
-find_spellbyid(spellid_t id)
+find_spellbyid(magic_t mtype, spellid_t id)
 {
   spell_list * slist;
 
@@ -181,8 +181,12 @@ find_spellbyid(spellid_t id)
   }
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
-    int hashid = hashstring(sp->sname);
-    if (hashid == id) return sp;
+    unsigned int hashid = hashstring(sp->sname);
+    if (hashid==id) {
+      if (sp->magietyp==mtype || mtype==M_GRAU) {
+        return sp;
+      }
+    }
   }  
 
   log_warning(("cannot find spell by id: %u\n", id));

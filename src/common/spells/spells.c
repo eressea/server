@@ -7088,7 +7088,7 @@ sp_becomewyrm(castorder *co)
   }
 
   u->race = new_race[RC_WYRM];
-  add_spell(get_mage(u), find_spellbyid(SPL_WYRMODEM));
+  add_spell(get_mage(u), find_spellbyid(M_GRAU, SPL_WYRMODEM));
 
   ADDMSG(&u->faction->msgs, msg_message("becomewyrm", "u", u));
 

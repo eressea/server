@@ -44,6 +44,7 @@ extern "C" {
   extern void init_spells(void);
   extern void register_spell(struct spell * sp);
   extern struct spell * find_spell(magic_t mtype, const char * name);
+  extern struct spell * find_spellbyid(magic_t mtype, spellid_t i);
 
 #ifdef __cplusplus
 }

@@ -211,7 +211,9 @@ read_mage(attrib * a, FILE * F)
     if (global.data_version<SPELLNAME_VERSION) {
       int spid;
       fscanf (F, "%d %d", &spid, &mage->combatspells[i].level);
-      if (spid>=0) mage->combatspells[i].sp = find_spellbyid((spellid_t)spid);
+      if (spid>=0) {
+        mage->combatspells[i].sp = find_spellbyid(mage->magietyp, (spellid_t)spid);
+      }
     } else {
       fscanf (F, "%s %d", spname, &mage->combatspells[i].level);
       if (strcmp("none", spname)!=0) {
@@ -226,7 +228,7 @@ read_mage(attrib * a, FILE * F)
     if (global.data_version<SPELLNAME_VERSION) {
       fscanf (F, "%d", &i);
       if (i < 0) break;
-      sp = find_spellbyid((spellid_t)i);
+      sp = find_spellbyid(mage->magietyp, (spellid_t)i);
     } else {
       fscanf(F, "%s", spname);
       if (strcmp(spname, "end")==0) break;
@@ -367,7 +369,7 @@ read_seenspell(attrib * a, FILE * f)
   fscanf(f, "%s", buf);
   i = atoi(buf);
   if (i!=0) {
-    sp = find_spellbyid((spellid_t)i);
+    sp = find_spellbyid(M_GRAU, (spellid_t)i);
   } else {
     int mtype;
     fscanf(f, "%d", &mtype);
@@ -410,9 +412,9 @@ updatespelllist(unit * u)
   boolean ismonster = u->faction->no==MONSTER_FACTION;
 
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
-  sp = find_spellbyid(SPL_BECOMEWYRM);
+  sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
-    add_spell(mage, find_spellbyid(SPL_BECOMEWYRM));
+    add_spell(mage, find_spellbyid(M_GRAU, SPL_BECOMEWYRM));
   }
 
   /* Transformierte Wyrm-Magier bekommen Drachenodem */
@@ -421,17 +423,17 @@ updatespelllist(unit * u)
     switch (urc) {
       /* keine breaks! Wyrme sollen alle drei Zauber können.*/
     case RC_WYRM:
-      sp = find_spellbyid(SPL_WYRMODEM);
+      sp = find_spellbyid(M_GRAU, SPL_WYRMODEM);
       if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
         add_spell(mage, sp);
       }
     case RC_DRAGON:
-      sp = find_spellbyid(SPL_DRAGONODEM);
+      sp = find_spellbyid(M_GRAU, SPL_DRAGONODEM);
       if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
         add_spell(mage, sp);
       }
     case RC_FIREDRAGON:
-      sp = find_spellbyid(SPL_FIREDRAGONODEM);
+      sp = find_spellbyid(M_GRAU, SPL_FIREDRAGONODEM);
       if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
         add_spell(mage, sp);
       }

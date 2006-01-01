@@ -268,55 +268,6 @@ attrib_type at_roadfix = {
 	ATF_UNIQUE
 };
 
-/* ************************************************************ */
-/* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
-/* GANZ WICHTIG! FÜGT AUCH NEUE ZAUBER IN DIE LISTE DER BEKANNTEN EIN */
-/* ************************************************************ */
-static void
-show_newspells(void)
-{
-  region *r;
-  /* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
-  * terminieren */
-
-  spellid_t newspellids[] = {
-    SPL_NOSPELL
-  };
-
-  /* die id's der neuen oder veränderten Sprüche werden in newspellids[]
-  * abgelegt */
-
-  for(r=regions; r; r=r->next) {
-    unit *u;
-    for(u=r->units;u;u=u->next) {
-      sc_mage *m = get_mage(u);
-      if (u->faction->no == MONSTER_FACTION) continue;
-      if (m != NULL) {
-        int i;
-
-        if (m->magietyp == M_GRAU) continue;
-
-        for (i = 0; newspellids[i] != SPL_NOSPELL; i++) {
-          spell *sp = find_spellbyid(newspellids[i]);
-
-          if (!sp) continue;
-
-          if (m->magietyp == sp->magietyp || has_spell(u, sp)) {
-            attrib * a = a_find(u->faction->attribs, &at_reportspell);
-            while (a && a->data.v != sp) a = a->nexttype;
-            if (!a) {
-              /* spell is not being shown yet. if seen before, remove to show again */
-              a = a_find(u->faction->attribs, &at_seenspell);
-              while (a && a->data.v != sp) a = a->nexttype;
-              if (a) a_remove(&u->faction->attribs, a);
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 extern plane * arena;
 
 static void
@@ -1086,7 +1037,6 @@ korrektur(void)
   
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
    * Beschreibungen geändert haben */
-  show_newspells();
   fix_age();
   
   /* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
