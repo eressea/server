@@ -38,9 +38,7 @@ extern "C" {
   /* ------------------------------------------------------------- */
 
   extern struct attrib_type at_unitdissolve;
-#ifdef WDW_PYRAMIDSPELL
   extern struct attrib_type at_wdwpyramid;
-#endif
 
   extern struct spell_list * spells;
   extern void init_spells(void);
