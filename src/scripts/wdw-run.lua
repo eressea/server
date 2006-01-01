@@ -12,6 +12,7 @@ function process(orders)
 
   -- set up the sphinx
   -- init_sphinxhints()
+  update_phoenix()
   sphinx_handler()
   sphinx_weekly()
 
@@ -57,6 +58,7 @@ scripts = {
   "extensions.lua",
   "write_emails.lua",
   "wdw/sphinx.lua",
+  "wdw/phoenix.lua",
   "wdw/standings.lua"
 }
 

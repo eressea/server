@@ -307,39 +307,6 @@ oldfamiliars(unit * u)
 }
 
 static item *
-dragon_drops(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	switch (old_race(rc)) {
-	case RC_FIREDRAGON:
-		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size));
-		break;
-	case RC_DRAGON:
-		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size * 4));
-		i_add(&itm, i_new(olditemtype[I_DRAGONHEAD], size));
-		break;
-	case RC_WYRM:
-		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size * 10));
-		i_add(&itm, i_new(olditemtype[I_DRAGONHEAD], size));
-		break;
-	case RC_SEASERPENT:
-		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size * 6));
-		i_add(&itm, i_new(olditemtype[I_SEASERPENTHEAD], size));
-		break;
-	}
-	return itm;
-}
-
-static item *
-phoenix_drops(const struct race *rc, int size)
-{
-  const item_type * it_phoenixfeather = it_find("phoenixfeather");
-	item *itm = NULL;
-	if (it_phoenixfeather!=NULL) i_add(&itm, i_new(it_phoenixfeather, size));
-	return itm;
-}
-
-static item *
 default_spoil(const struct race * rc, int size)
 {
   item * itm = NULL;
@@ -461,8 +428,6 @@ register_races(void)
 	/* function itemdrop
 	 * to generate battle spoils
 	 * race->itemdrop() */
-	register_function((pf_generic)dragon_drops, "dragondrops");
-	register_function((pf_generic)phoenix_drops, "phoenixdrops");
   register_function((pf_generic)default_spoil, "defaultdrops");
 
 	sprintf(zBuffer, "%s/races.xml", resourcepath());

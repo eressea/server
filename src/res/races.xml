@@ -658,7 +658,6 @@
   </race>
   <race name="catdragon" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="500000" weight="20000" capacity="10000" speed="1.000000" hp="20" damage="2d40" unarmedattack="0" unarmeddefense="0" defensemodifier="50" fly="yes" walk="yes" teach="no" shapeshift="yes" giveitem="yes" giveperson="yes" getitem="yes">
     <ai splitsize="1"/>
-    <function name="itemdrop" value="dragondrops"/>
     <attack type="4" damage="2d40"/>
     <attack type="4" damage="2d40"/>
     <attack type="4" damage="2d40"/>
@@ -673,7 +672,6 @@
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
-    <function name="itemdrop" value="dragondrops"/>
     <skill name="magic" modifier="12"/>
     <skill name="tactics" modifier="12"/>
     <skill name="perception" modifier="10"/>
@@ -687,7 +685,6 @@
     <function name="name" value="namedragon"/>
     <function name="age" value="agedragon"/>
     <function name="move" value="movedragon"/>
-    <function name="itemdrop" value="dragondrops"/>
     <skill name="magic" modifier="8"/>
     <skill name="tactics" modifier="8"/>
     <skill name="perception" modifier="5"/>
@@ -701,7 +698,6 @@
     <function name="name" value="namedragon"/>
     <function name="age" value="agefiredragon"/>
     <function name="move" value="movedragon"/>
-    <function name="itemdrop" value="dragondrops"/>
     <skill name="magic" modifier="4"/>
     <skill name="tactics" modifier="4"/>
     <skill name="stealth" modifier="2"/>
@@ -1127,7 +1123,6 @@
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="moveswimming"/>
-    <function name="itemdrop" value="dragondrops"/>
     <skill name="tactics" modifier="4"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
@@ -1288,7 +1283,6 @@
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
-    <function name="itemdrop" value="dragondrops"/>
     <skill name="tactics" modifier="20"/>
     <skill name="perception" modifier="20"/>
     <attack type="4" damage="5d30"/>
@@ -1321,98 +1315,11 @@
     <attack type="3" damage="1d4"/>
     <attack type="2" damage="2d60"/>
   </race>
-  <race name="phoenix" magres="0.900000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="50000" capacity="30000" speed="2.000000" hp="500" ac="6" damage="1d20" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
-    <ai splitsize="2" learn="yes"/>
-    <function name="itemdrop" value="phoenixdrops"/>
-    <skill name="magic" modifier="16"/>
-    <skill name="tactics" modifier="8"/>
-    <skill name="perception" modifier="20"/>
-    <attack type="4" damage="1d12"/>
-    <attack type="4" damage="1d10"/>
-    <attack type="4" damage="1d10"/>
-    <attack type="6" spell="immolation"/>
-  </race>
-  <race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
-    <ai splitsize="1" killpeasants="yes" learn="yes"/>
-    <skill name="magic" modifier="12"/>
-    <skill name="tactics" modifier="12"/>
-    <skill name="perception" modifier="10"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="6" spell="powerful_dragonbreath"/>
-    <attack type="6" spell="aura_of_fear"/>
-  </race>
-  <race name="littlescarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="25" ac="1" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" giveitem="yes" getitem="yes">
-    <ai splitsize="5000"/>
-    <attack type="4" damage="2d6"/>
-    <attack type="4" damage="1d4"/>
-    <attack type="4" damage="1d4"/>
-  </race>
-  <race name="greenscarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="25" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
-    <ai splitsize="50"/>
-    <skill name="magic" modifier="4"/>
-    <skill name="tactics" modifier="4"/>
-    <skill name="stealth" modifier="2"/>
-    <skill name="perception" modifier="2"/>
-    <attack type="4" damage="2d6"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="6" spell="acidrain"/>
-  </race>
-  <race name="bluescarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
-    <ai splitsize="50"/>
-    <skill name="magic" modifier="4"/>
-    <skill name="tactics" modifier="4"/>
-    <skill name="stealth" modifier="2"/>
-    <skill name="perception" modifier="2"/>
-    <attack type="4" damage="2d6"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="6" spell="coldfront"/>
-  </race>
-  <race name="redscarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="25" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
-    <ai splitsize="50"/>
-    <skill name="magic" modifier="4"/>
-    <skill name="tactics" modifier="4"/>
-    <skill name="stealth" modifier="2"/>
-    <skill name="perception" modifier="2"/>
-    <attack type="4" damage="2d6"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="6" spell="firestorm"/>
-  </race>
-  <race name="undeadpharaoh" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" cannotmove="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
-    <ai splitsize="1" killpeasants="yes" learn="yes"/>
-    <skill name="tactics" modifier="20"/>
-    <skill name="perception" modifier="20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="6" spell="drain_skills"/>
-    <attack type="6" spell="aura_of_fear"/>
-    <precombatspell spell="shadowcall"/>
-  </race>
-  <race name="mummy" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" teach="no" noheal="yes" undead="yes" equipment="yes" nogive="yes">
-    <ai splitsize="10000" moverandom="yes"/>
-    <skill name="melee" modifier="1"/>
-    <skill name="polearm" modifier="1"/>
-    <skill name="tactics" modifier="1"/>
-    <skill name="stamina" modifier="1"/>
-    <skill name="unarmed" modifier="1"/>
-    <attack type="4" damage="2d8"/>
-    <attack type="3" damage="1d5"/>
-    <attack type="3" damage="1d5"/>
-    <attack type="2" damage="1d30"/>
-    <attack type="2" damage="1d30"/>
-  </race>
 <!--
   <race name="skeletal_wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
-    <function name="itemdrop" value="dragondrops"/>
     <skill name="magic" modifier="12"/>
     <skill name="tactics" modifier="12"/>
     <skill name="perception" modifier="10"/>

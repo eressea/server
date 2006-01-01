@@ -57,7 +57,7 @@ region_getterrain(const region& r) {
 static const char *
 region_getname(const region& r) {
   if (r.land) return r.land->name;
-  return r.terrain->_name;
+  return NULL;
 }
 
 static void

@@ -23,7 +23,6 @@
     <param name="database.gameid" value="3"></param>
     <param name="hunger.long" value="0"></param>
     <param name="study.expensivemigrants" value="1"/>
-    <param name="report.mailit" value="/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"/>
     <param name="alliance.restricted" value="fight guard stealth money"/>
     <param name="alliance.auto" value="fight"/>
     <param name="alliance.transferquit" value="true"/>

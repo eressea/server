@@ -331,5 +331,24 @@
     <item name="rustychainmail" amount="1"/>
   </set>
 
+  <set name="dragon_spoils">
+    <item name="dragonblood" amount="4"/>
+    <item name="dragonhead" amount="1"/>
+  </set>
+
+  <set name="youngdragon_spoils">
+    <item name="dragonblood" amount="1"/>
+  </set>
+
+  <set name="wyrm_spoils">
+    <item name="dragonblood" amount="10"/>
+    <item name="dragonhead" amount="1"/>
+  </set>
+
+  <set name="seaserpent_spoils">
+    <item name="dragonblood" amount="6"/>
+    <item name="dragonhead" amount="1"/>
+  </set>
+
 </equipment>
 

@@ -544,17 +544,17 @@ race_compat(void)
   /* required for old_race, do not change order! */
   const char * oldracenames[MAXRACES] = {
     "dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect",
-      "halfling", "cat", "aquarian", "uruk", "snotling", "undead", "illusion",
-      "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-      "special", "spell", "irongolem", "stonegolem", "shadowdemon",
-      "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
-      "wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph",
-      "unicorn", "direwolf", "ghost", "imp", "dreamcat", "fairy", "owl",
-      "hellcat", "tiger", "dolphin", "giantturtle", "kraken", "seaserpent",
-      "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
-      "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
-      "clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn",
-      "phoenix"
+    "halfling", "cat", "aquarian", "uruk", "snotling", "undead", "illusion",
+    "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
+    "special", "spell", "irongolem", "stonegolem", "shadowdemon",
+    "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
+    "wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph",
+    "unicorn", "direwolf", "ghost", "imp", "dreamcat", "fairy", "owl",
+    "hellcat", "tiger", "dolphin", "giantturtle", "kraken", "seaserpent",
+    "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
+    "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
+    "clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn",
+    "phoenix"
   };
   int i;
 

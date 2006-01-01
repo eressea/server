@@ -21,7 +21,6 @@ Code cleanup:
 
 Larger Features:
 - eressea (b/g)zip reports?
-- mailit-format ändern?
 - NO_RUNNING
 - ZERSTÖRE - Man sollte alle Materialien zurückkriegen können:
 
@@ -46,20 +45,13 @@ Old Terrain still needed:
 - monster.c, ent movement
 - economy.c, insekten
 
-mailit-format ändern?
-
-  [11:01] <Enno`> am besten wäre, wenn mailit nur die optionen, nicht das ganze script enthielte
-  [11:01] <Enno`> und ein skript dann mailit als input nähme
-  [11:02] <Enno`> also nur enno@eressea.upb.de pka3 BZIP2 nr cr zv
-
 unterschiede in vin3 + wdw per config statt defines?
 
   #define NEWATSROI 1
   #define ATSBONUS 2
   #define ROIBONUS 4
 
-  #define WDW_PHOENIX
-  #define WDW_PYRAMIDSPE
+  #define WDW_PYRAMIDSPELL
 
   #define ARENA_MODULE
   #define WORMHOLE_MODULE

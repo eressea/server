@@ -21,6 +21,7 @@
 #include "build.h"
 #include "building.h"
 #include "curse.h"
+#include "equipment.h"
 #include "faction.h"
 #include "goodies.h"
 #include "group.h"
@@ -827,10 +828,18 @@ remove_troop(troop dt)
 
 	rmtroop(dt);
 	if (!df->alive && du->race->itemdrop) {
+    char eqname[64];
+    const struct equipment * eq;
 		item * drops = du->race->itemdrop(du->race, du->number-df->run.number);
+
 		if (drops != NULL){
 			i_merge(&du->items, &drops);
 		}
+    sprintf(eqname, "%s_spoils", du->race->_name[0]);
+    eq = get_equipment(eqname);
+    if (eq!=NULL) {
+      equip_items(&du->items, eq);
+    }
 	}
 }
 

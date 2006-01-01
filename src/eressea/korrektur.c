@@ -876,60 +876,6 @@ fix_road_borders(void)
   }
 }
 
-#ifdef WDW_PHOENIX
-static region *
-random_land_region(void)
-{
-	region *r;
-	int c = 0;
-
-	/* count the available regions */
-	for(r=regions; r; r=r->next) {
-		if (r->land && rplane(r)==NULL) ++c;
-	}
-
-	/* choose one */
-	c = rand()%c;
-
-	/* this is a bit obfuscated, but should be correct */
-	for(r=regions; c > 0; r=r->next) {
-		if (r->land && rplane(r)==NULL) --c;
-	}
-
-	return(r);
-}
-
-static void
-check_phoenix(void)
-{
-	const race * phoenix_race = rc_find("phoenix");
-	unit * phoenix;
-	region * r;
-	faction *f;
-
-	/* check if there is a phoenix in the world */
-	for(f=factions; f; f=f->next) {
-		unit *u;
-
-		for(u=f->units; u; u=u->nextF) {
-			if(u->race == phoenix_race) {
-				return;
-			}
-		}
-  }
-
-  f = findfaction(MONSTER_FACTION);
-  if (f==NULL) return;
-
-	/* it is not, so we create it */
-	r = random_land_region();
-	phoenix = createunit(r, f, 1, phoenix_race);
-	phoenix->name = strdup("Der Phönix");
-
-	/* TODO: generate an appropriate region message */
-}
-#endif
-
 static void
 fix_dissolve(unit * u, int value, char mode)
 {
@@ -1146,10 +1092,6 @@ korrektur(void)
   /* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
   create_teleport_plane();
   
-#ifdef WDW_PHOENIX
-	check_phoenix();
-#endif
-
 	if (global.data_version<TYPES_VERSION) fix_icastles();
 #ifdef FUZZY_BASE36
 	enable_fuzzy = true;

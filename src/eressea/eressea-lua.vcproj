@@ -213,9 +213,6 @@
 			Name="Text Files"
 			Filter="">
 			<File
-				RelativePath="..\commit.txt">
-			</File>
-			<File
 				RelativePath="..\header.txt">
 			</File>
 			<File
@@ -370,6 +367,9 @@
 		<Filter
 			Name="XML files"
 			Filter="">
+			<File
+				RelativePath="..\res\de\strings.xml">
+			</File>
 			<File
 				RelativePath="..\res\terrains.xml">
 			</File>

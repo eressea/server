@@ -65,7 +65,6 @@
     <param name="magic.power" value="0.5"/>
     <param name="resource.factor" value="0.25"/>
     <param name="study.expensivemigrants" value="1"/>
-    <param name="report.mailit" value="/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"/>
     <param name="alliance.skilllimit" value="15"/>
     <param name="alliance.restricted" value="fight guard stealth money"/>
     <param name="alliance.auto" value="fight"/>
@@ -94,5 +93,11 @@
       <item weight="0"/>
     </resource>
   </resources>
+
+  <equipment>
+    <set name="phoenix_spoils">
+      <item name="phoenixfeather" amount="1"/>
+    </set>
+  </equipment>
 
 </eressea>

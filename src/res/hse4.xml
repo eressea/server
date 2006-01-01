@@ -71,7 +71,6 @@
     <param name="database.gameid" value="6"/>
     <param name="globalreport" value="world"/>
     <param name="rules.check_overload" value="1"/>
-    <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
   <xi:include href="eressea/de/strings.xml"/>
   <xi:include href="eressea/en/strings.xml"/>
