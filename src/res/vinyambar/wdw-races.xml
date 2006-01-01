@@ -174,7 +174,7 @@
     <attack type="4" damage="1d10"/>
     <attack type="6" spell="immolation"/>
   </race>
-  <race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
+  <race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" giveitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <skill name="magic" modifier="12"/>
     <skill name="tactics" modifier="12"/>
