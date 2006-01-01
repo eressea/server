@@ -552,14 +552,19 @@ race_compat(void)
   int i;
 
   for (i=0;i!=MAXRACES;++i) {
-    race * rc = rc_find(oldracenames[i]);
-    if (rc) {
-      new_race[i] = rc;
-      if (rc == new_race[RC_TROLL]) {
-        a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
-      }
+    const char * rcname = oldracenames[i];
+    if (rcname==NULL) {
+      new_race[i] = NULL;
     } else {
-      log_warning(("could not find old race %s\n", oldracenames[i]));
+      race * rc = rc_find(oldracenames[i]);
+      if (rc) {
+        new_race[i] = rc;
+        if (rc == new_race[RC_TROLL]) {
+          a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
+        }
+      } else {
+        log_warning(("could not find old race %s\n", oldracenames[i]));
+      }
     }
   }
 }

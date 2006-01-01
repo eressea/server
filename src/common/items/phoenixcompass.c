@@ -17,6 +17,7 @@
 
 /* kernel includes */
 #include <kernel/item.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
