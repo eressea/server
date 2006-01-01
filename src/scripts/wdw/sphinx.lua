@@ -63,6 +63,31 @@ function sphinx_handler()
         send_hint(u2, u)
       end
     end  
+    tokens = {}
+    for token in string.gfind(str, "%a+") do
+      table.insert(tokens, token)
+    end
+    -- index starts with 1 in lua
+    if table.getn(tokens) == 2 and string.lower(tokens[1]) == "antwort" then
+      if string.lower(tokens[2]) == "insekt" then
+        -- Botschaft in alle Regionen
+        local m = message("msg_event")
+        m:set_string("string", "Das Rätsel der Sphinx ist gelöst! Die Sphinx wird sich eine neue Heimat und ein neues Rätsel suchen.")
+        for r in regions() do
+          m:send_region(r)
+        end
+        -- Region terraformen
+        terraform(u2.region.x, u.region.y, "plain")
+        u2.region.set_resource(u2.region, "tree", 721)
+        u2.region.set_resource(u2.region, "peasant", 2312)
+        u2.add_item(u2, "trappedairelemental", 5)
+        -- Neues Raetsel fuer beide Sphinxe!
+        -- Sphinx neu platzieren
+        -- Hint-Attribute von allen Allianzen loeschen
+      else
+
+      end
+    end
   end
   
   local f = get_faction(atoi36("ycx9"))

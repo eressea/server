@@ -44,4 +44,16 @@
     <item weight="0"/>
   </resource>
 
+  <resource name="trappedairelemental">
+    <item weight="0">
+      <function name="use" value="use_trappedairelemental"/>
+    </item>
+  </resource>
+  
+  <resource name="phoenixcompass">
+    <item weight="0">
+      <function name="use" value="use_phoenixcompass"/>
+    </item>
+  </resource>
+
 </resources>

@@ -11,6 +11,7 @@ SOURCES =
  artrewards.c
  demonseye.c
  itemtypes.c
+ phoenixcompass.c
  seed.c
  weapons.c
  xerewards.c

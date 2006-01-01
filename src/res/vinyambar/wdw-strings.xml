@@ -134,4 +134,20 @@
       <text locale="de">Pyramide des Thoth</text>
       <text locale="en">pyramid of Thoth</text>
     </string>
+  <string name="trappedairelemental">
+    <text locale="de">Gefangener Windgeist</text>
+    <text locale="en">trapped air elemental</text>
+  </string>
+  <string name="trappedairelemental_p">
+    <text locale="de">Gefangene Windgeister</text>
+    <text locale="en">trapped air elementals</text>
+  </string>
+  <string name="phoenixcompass">
+    <text locale="de">Phoenixkompass</text>
+    <text locale="en">phoenixcompass</text>
+  </string>
+  <string name="phoenixcompass_p">
+    <text locale="de">Phoenixkompasse</text>
+    <text locale="en">phoenix compasses</text>
+  </string>
 </strings>
