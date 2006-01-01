@@ -1264,7 +1264,6 @@ parse_spells(xmlDocPtr doc)
         }
       }
       xmlXPathFreeObject(result);
-      sp->id = 0; 
       register_spell(sp);
     }
   }
