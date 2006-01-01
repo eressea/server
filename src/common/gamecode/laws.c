@@ -2481,7 +2481,7 @@ reshow(unit * u, struct order * ord, const char * s, param_t p)
       sp = get_spellfromtoken(u, s, u->faction->locale);
       if (sp!=NULL && has_spell(u, sp)) {
         attrib *a = a_find(u->faction->attribs, &at_seenspell);
-        while (a!=NULL && a->data.i!=(int)sp->id) a = a->nexttype;
+        while (a!=NULL && a->data.v!=sp) a = a->nexttype;
         if (a!=NULL) a_remove(&u->faction->attribs, a);
         break;
       }

@@ -1,139 +1,157 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <strings>
 
-    <string name="magicskillboost">
-      <text locale="de">Schriftrolle</text>
-      <text locale="en">scroll</text>
+  <namespace name="spellinfo">
+    <string name="wdwpyramid_draig">
+      <text locale="de">Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine Region für den Pyramidenbau geeignet ist.</text>
     </string>
-    <string name="magicskillboost_p">
-      <text locale="de">Schriftrollen</text>
-      <text locale="en">scrolls</text>
+    <string name="wdwpyramid_cerrdor">
+      <text locale="de">Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine Region für den Pyramidenbau geeignet ist.</text>
     </string>
+    <string name="wdwpyramid_gwyrrd">
+      <text locale="de">Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine Region für den Pyramidenbau geeignet ist.</text>
+    </string>
+    <string name="wdwpyramid_tybied">
+      <text locale="de">Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine Region für den Pyramidenbau geeignet ist.</text>
+    </string>
+    <string name="wdwpyramid_illaun">
+      <text locale="de">Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine Region für den Pyramidenbau geeignet ist.</text>
+    </string>
+  </namespace>
 
-    <string name="gem">
-      <text locale="de">Edelstein</text>
-      <text locale="en">gem</text>
-    </string>
-    <string name="gem_p">
-      <text locale="de">Edelsteine</text>
-      <text locale="en">gems</text>
-    </string>
+  <string name="magicskillboost">
+    <text locale="de">Schriftrolle</text>
+    <text locale="en">scroll</text>
+  </string>
+  <string name="magicskillboost_p">
+    <text locale="de">Schriftrollen</text>
+    <text locale="en">scrolls</text>
+  </string>
 
-    <string name="opal">
-      <text locale="de">Opal</text>
-      <text locale="en">opal</text>
-    </string>
-    <string name="opal_p">
-      <text locale="de">Opale</text>
-      <text locale="en">opals</text>
-    </string>
+  <string name="gem">
+    <text locale="de">Edelstein</text>
+    <text locale="en">gem</text>
+  </string>
+  <string name="gem_p">
+    <text locale="de">Edelsteine</text>
+    <text locale="en">gems</text>
+  </string>
 
-    <string name="diamond">
-      <text locale="de">Diamant</text>
-      <text locale="en">diamond</text>
-    </string>
-    <string name="diamond_p">
-      <text locale="de">Diamanten</text>
-      <text locale="en">diamonds</text>
-    </string>
+  <string name="opal">
+    <text locale="de">Opal</text>
+    <text locale="en">opal</text>
+  </string>
+  <string name="opal_p">
+    <text locale="de">Opale</text>
+    <text locale="en">opals</text>
+  </string>
 
-    <string name="zaphire">
-      <text locale="de">Saphir</text>
-      <text locale="en">zaphire</text>
-    </string>
-    <string name="zaphire_p">
-      <text locale="de">Saphire</text>
-      <text locale="en">zaphires</text>
-    </string>
+  <string name="diamond">
+    <text locale="de">Diamant</text>
+    <text locale="en">diamond</text>
+  </string>
+  <string name="diamond_p">
+    <text locale="de">Diamanten</text>
+    <text locale="en">diamonds</text>
+  </string>
 
-    <string name="topaz">
-      <text locale="de">Topas</text>
-      <text locale="en">topaz</text>
-    </string>
-    <string name="topaz_p">
-      <text locale="de">Topase</text>
-      <text locale="en">topazes</text>
-    </string>
+  <string name="zaphire">
+    <text locale="de">Saphir</text>
+    <text locale="en">zaphire</text>
+  </string>
+  <string name="zaphire_p">
+    <text locale="de">Saphire</text>
+    <text locale="en">zaphires</text>
+  </string>
 
-    <string name="beryl">
-      <text locale="de">Beryll</text>
-      <text locale="en">beryl</text>
-    </string>
-    <string name="beryl_p">
-      <text locale="de">Berylle</text>
-      <text locale="en">beryls</text>
-    </string>
+  <string name="topaz">
+    <text locale="de">Topas</text>
+    <text locale="en">topaz</text>
+  </string>
+  <string name="topaz_p">
+    <text locale="de">Topase</text>
+    <text locale="en">topazes</text>
+  </string>
 
-    <string name="agate">
-      <text locale="de">Achat</text>
-      <text locale="en">agate</text>
-    </string>
-    <string name="agate_p">
-      <text locale="de">Achate</text>
-      <text locale="en">agates</text>
-    </string>
+  <string name="beryl">
+    <text locale="de">Beryll</text>
+    <text locale="en">beryl</text>
+  </string>
+  <string name="beryl_p">
+    <text locale="de">Berylle</text>
+    <text locale="en">beryls</text>
+  </string>
 
-    <string name="garnet">
-      <text locale="de">Granat</text>
-      <text locale="en">garnet</text>
-    </string>
-    <string name="garnet_p">
-      <text locale="de">Granate</text>
-      <text locale="en">garnets</text>
-    </string>
+  <string name="agate">
+    <text locale="de">Achat</text>
+    <text locale="en">agate</text>
+  </string>
+  <string name="agate_p">
+    <text locale="de">Achate</text>
+    <text locale="en">agates</text>
+  </string>
 
-    <string name="emerald">
-      <text locale="de">Smaragd</text>
-      <text locale="en">emerald</text>
-    </string>
-    <string name="emerald_p">
-      <text locale="de">Smaragde</text>
-      <text locale="en">emeralds</text>
-    </string>
-    <string name="pyramid0">
-      <text locale="de">Pyramide des Hapi</text>
-      <text locale="en">pyramid of Hapi</text>
-    </string>
-    <string name="pyramid1">
-      <text locale="de">Pyramide der Tayet</text>
-      <text locale="en">pyramid of Tayet</text>
-    </string>
-    <string name="pyramid2">
-      <text locale="de">Pyramide der Tefnut</text>
-      <text locale="en">pyramid of Tefnut</text>
-    </string>
-    <string name="pyramid3">
-      <text locale="de">Pyramide des Shu</text>
-      <text locale="en">pyramid of Shu</text>
-    </string>
-    <string name="pyramid4">
-      <text locale="de">Pyramide der Nuit</text>
-      <text locale="en">pyramid of Nuit</text>
-    </string>
-    <string name="pyramid5">
-      <text locale="de">Pyramide der Bastet</text>
-      <text locale="en">pyramid of Bastet</text>
-    </string>
-    <string name="pyramid6">
-      <text locale="de">Pyramide des Horus</text>
-      <text locale="en">pyramid of Horus </text>
-    </string>
-    <string name="pyramid7">
-      <text locale="de">Pyramide der Maat</text>
-      <text locale="en">pyramid of Maat</text>
-    </string>
-    <string name="pyramid8">
-      <text locale="de">Pyramide des Osiris</text>
-      <text locale="en">pyramid of Osiris</text>
-    </string>
-    <string name="pyramid9">
-      <text locale="de">Pyramide des Set</text>
-      <text locale="en">pyramid of Set</text>
-    </string>
-    <string name="pyramid10">
-      <text locale="de">Pyramide des Thoth</text>
-      <text locale="en">pyramid of Thoth</text>
-    </string>
+  <string name="garnet">
+    <text locale="de">Granat</text>
+    <text locale="en">garnet</text>
+  </string>
+  <string name="garnet_p">
+    <text locale="de">Granate</text>
+    <text locale="en">garnets</text>
+  </string>
+
+  <string name="emerald">
+    <text locale="de">Smaragd</text>
+    <text locale="en">emerald</text>
+  </string>
+  <string name="emerald_p">
+    <text locale="de">Smaragde</text>
+    <text locale="en">emeralds</text>
+  </string>
+  <string name="pyramid0">
+    <text locale="de">Pyramide des Hapi</text>
+    <text locale="en">pyramid of Hapi</text>
+  </string>
+  <string name="pyramid1">
+    <text locale="de">Pyramide der Tayet</text>
+    <text locale="en">pyramid of Tayet</text>
+  </string>
+  <string name="pyramid2">
+    <text locale="de">Pyramide der Tefnut</text>
+    <text locale="en">pyramid of Tefnut</text>
+  </string>
+  <string name="pyramid3">
+    <text locale="de">Pyramide des Shu</text>
+    <text locale="en">pyramid of Shu</text>
+  </string>
+  <string name="pyramid4">
+    <text locale="de">Pyramide der Nuit</text>
+    <text locale="en">pyramid of Nuit</text>
+  </string>
+  <string name="pyramid5">
+    <text locale="de">Pyramide der Bastet</text>
+    <text locale="en">pyramid of Bastet</text>
+  </string>
+  <string name="pyramid6">
+    <text locale="de">Pyramide des Horus</text>
+    <text locale="en">pyramid of Horus </text>
+  </string>
+  <string name="pyramid7">
+    <text locale="de">Pyramide der Maat</text>
+    <text locale="en">pyramid of Maat</text>
+  </string>
+  <string name="pyramid8">
+    <text locale="de">Pyramide des Osiris</text>
+    <text locale="en">pyramid of Osiris</text>
+  </string>
+  <string name="pyramid9">
+    <text locale="de">Pyramide des Set</text>
+    <text locale="en">pyramid of Set</text>
+  </string>
+  <string name="pyramid10">
+    <text locale="de">Pyramide des Thoth</text>
+    <text locale="en">pyramid of Thoth</text>
+  </string>
   <string name="trappedairelemental">
     <text locale="de">Gefangener Windgeist</text>
     <text locale="en">trapped air elemental</text>

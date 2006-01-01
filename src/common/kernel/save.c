@@ -1623,7 +1623,7 @@ readfaction(FILE * F)
       spell * sp = slist->data;
 
       if (sp->magietyp==f->magiegebiet && sp->level<=sk) {
-        a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
+        a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
       }
     }
   }

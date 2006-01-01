@@ -93,11 +93,9 @@ attrib_type at_unitdissolve = {
 	"unitdissolve", NULL, NULL, NULL, a_writedefault, a_readdefault
 };
 
-#ifdef WDW_PYRAMIDSPELL
 attrib_type at_wdwpyramid = {
 	"wdwpyramid", NULL, NULL, NULL, a_writedefault, a_readdefault
 };
-#endif
 
 /* ----------------------------------------------------------------------- */
 
@@ -7096,7 +7094,6 @@ sp_becomewyrm(castorder *co)
   return co->level;
 }
 
-#ifdef WDW_PYRAMIDSPELL
 /* ------------------------------------------------------------- */
 /* Name:       WDW-Pyramidenfindezauber
  * Stufe:      unterschiedlich
@@ -7144,7 +7141,6 @@ sp_wdwpyramid(castorder *co)
 
 	return cast_level;
 }
-#endif
 
 /* ------------------------------------------------------------- */
 /* Name:       Alltagszauber, hat je nach Gebiet anderen Namen
@@ -9501,79 +9497,6 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_immolation, NULL
   },
-  #ifdef WDW_PYRAMIDSPELL
-  {
-    SPL_WDWPYRAMID_TRAUM, "wdwpyramid_illaun",
-    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
-    M_TRAUM, (0), 5, 4,
-    {
-      { "aura", 2, SPC_FIX },
-      { "h2", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_wdwpyramid, NULL
-  },
-  {
-    SPL_WDWPYRAMID_ASTRAL, "wdwpyramid_tybied",
-    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
-    M_ASTRAL, (0), 5, 3,
-    {
-      { "aura", 4, SPC_FIX },
-      { "p6", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_wdwpyramid, NULL
-  },
-
-  {
-    SPL_WDWPYRAMID_DRUIDE, "wdwpyramid_gwyrrd",
-    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
-    M_DRUIDE, (0), 5, 5,
-    {
-      { "aura", 3, SPC_FIX },
-      { "mallorn", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_wdwpyramid, NULL
-  },
-  {
-    SPL_WDWPYRAMID_BARDE, "wdwpyramid_cerrdor",
-    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
-    M_BARDE, (0), 5, 4,
-    {
-      { "aura", 2, SPC_FIX },
-      { "h14", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_wdwpyramid, NULL
-  },
-  {
-    SPL_WDWPYRAMID_CHAOS, "wdwpyramid_draig",
-    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
-    M_CHAOS, (0), 5, 5,
-    {
-      { "aura", 1, SPC_FIX },
-      { "permaura", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_wdwpyramid, NULL
-  },
-  #endif
   /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
   {
     SPL_NOSPELL, "no spell", NULL, NULL, NULL, 0, 0, 0, 0,
@@ -9660,9 +9583,8 @@ init_spells(void)
   }
   at_register(&at_cursewall);
   at_register(&at_unitdissolve);
-#ifdef WDW_PYRAMIDSPELL
   at_register(&at_wdwpyramid);
-#endif
+  register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
   register_bordertype(&bt_firewall);
   register_bordertype(&bt_wisps);
   register_bordertype(&bt_chaosgate);

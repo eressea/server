@@ -357,17 +357,45 @@ create_mage(unit * u, magic_t mtyp)
  * Spruch zu seiner List-of-known-spells hinzugefügt werden.
  */
 
+
+static int
+read_seenspell(attrib * a, FILE * f)
+{
+  int i;
+  spell * sp = NULL;
+
+  fscanf(f, "%s", buf);
+  i = atoi(buf);
+  if (i!=0) {
+    sp = find_spellbyid((spellid_t)i);
+  } else {
+    int mtype;
+    fscanf(f, "%d", &mtype);
+    sp = find_spell((magic_t)mtype, buf);
+  }
+  a->data.v = sp;
+  return AT_READ_OK;
+}
+
+static void
+write_seenspell(const attrib * a, FILE * f)
+{
+  const spell * sp = (const spell*)a->data.v;
+  fprintf(f, "%s %d ", sp->sname, sp->magietyp);
+}
+
 attrib_type at_seenspell = {
-	"seenspell", NULL, NULL, NULL, DEFAULT_WRITE, DEFAULT_READ
+	"seenspell", NULL, NULL, NULL, write_seenspell, read_seenspell
 };
 
 static boolean
-already_seen(const faction * f, spellid_t id)
+already_seen(const faction * f, const spell * sp)
 {
 	attrib *a;
 
-	for (a = a_find(f->attribs, &at_seenspell); a; a=a->nexttype)
-		if (a->data.i==(int)id) return true;
+  for (a = a_find(f->attribs, &at_seenspell); a; a=a->nexttype) {
+		if (a->data.v==sp) return true;
+  }
 	return false;
 }
 
@@ -424,9 +452,9 @@ updatespelllist(unit * u)
         faction * f = u->faction;
 
         if (!know) add_spell(mage, sp);
-        if (!ismonster && !already_seen(u->faction, sp->id)) {
-          a_add(&f->attribs, a_new(&at_reportspell))->data.i = sp->id;
-          a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
+        if (!ismonster && !already_seen(u->faction, sp)) {
+          a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
+          a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
         }
       }
     }

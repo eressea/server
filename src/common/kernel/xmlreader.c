@@ -1201,6 +1201,7 @@ parse_spells(xmlDocPtr doc)
       xmlFree(property);
 
       /* level, rank and flags */
+      sp->id = xml_ivalue(node, "index", 0);
       sp->level = xml_ivalue(node, "level", -1);
       sp->rank = (char)xml_ivalue(node, "rank", -1);
       if (xml_bvalue(node, "ship", false)) sp->sptyp |= ONSHIPCAST;

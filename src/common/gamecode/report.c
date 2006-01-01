@@ -376,11 +376,10 @@ rparagraph(FILE *F, const char *s, int indent, char mark)
 }
 
 static void
-report_spell(FILE * F, spellid_t id, const struct locale * lang)
+report_spell(FILE * F, 	spell *sp, const struct locale * lang)
 {
 	int k, itemanz, costtyp;
 	int dh = 0;
-	spell *sp = find_spellbyid(id);
   char * bufp;
 
 	rnl(F);
@@ -1824,7 +1823,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 	if (i != '!' && i != '?' && i != '.')
 		scat(", ");
 
-  if(b->type == bt_find("pyramid")) {
+  if (b->type == bt_find("pyramid")) {
     unit * owner = buildingowner(r, b);
     scat("Größenstufe ");
     icat(wdw_pyramid_level(b));
@@ -2095,7 +2094,8 @@ report_plaintext(const char * filename, report_context * ctx)
 		rnl(F);
 		centre(F, LOC(f->locale, "section_newspells"), true);
 		while (a) {
-			report_spell(F, (spellid_t)a->data.i, f->locale);
+      spell *sp = (spell *)a->data.v;
+			report_spell(F, sp, f->locale);
 			a = a->nexttype;
 		}
 	}

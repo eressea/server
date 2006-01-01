@@ -18,6 +18,7 @@ Code cleanup:
 - kick init_oldherbs out (good for terrain)
 - allocators aus economy nach XML
 - reporting units: http://eressea.upb.de/mantis/view.php?id=781
+- wdw pyramid spell could be written in lua (replace attrib with a flag)
 
 Larger Features:
 - eressea (b/g)zip reports?
@@ -50,8 +51,6 @@ unterschiede in vin3 + wdw per config statt defines?
   #define NEWATSROI 1
   #define ATSBONUS 2
   #define ROIBONUS 4
-
-  #define WDW_PYRAMIDSPELL
 
   #define ARENA_MODULE
   #define WORMHOLE_MODULE

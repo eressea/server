@@ -1179,7 +1179,7 @@ report_computer(const char * filename, report_context * ctx)
 	cr_find_address(F, f, ctx->addresses);
 	a = a_find(f->attribs, &at_reportspell);
 	while (a) {
-    spell *sp = find_spellbyid((spellid_t)a->data.i);
+    spell *sp = (spell *)a->data.v;
 		cr_reportspell(F, sp, f->locale);
 		a = a->nexttype;
 	}
