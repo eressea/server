@@ -52,7 +52,11 @@ namespace eressea {
         }
       }
     }
+#ifdef LUABIND_OLD
     return object(L); // nil
+#else
+    return object(); // nil
+#endif
   }
 
   static void set_object(attrib **attribs, const char * name, object_type type, variant val) {
