@@ -179,6 +179,11 @@ find_spellbyid(spellid_t id)
     spell* sp = slist->data;
     if (sp->id == id) return sp;
   }
+  for (slist=spells;slist!=NULL;slist=slist->next) {
+    spell* sp = slist->data;
+    int hashid = hashstring(sp->sname);
+    if (hashid == id) return sp;
+  }  
 
   log_warning(("cannot find spell by id: %u\n", id));
   return NULL;
