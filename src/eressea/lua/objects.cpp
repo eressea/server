@@ -52,7 +52,7 @@ namespace eressea {
         }
       }
     }
-#ifdef LUABIND_OLD
+#if LUABIND_BETA<7 || (LUABIND_BETA==7 && LUABIND_DEVEL<2)
     return object(L); // nil
 #else
     return object(); // nil

@@ -25,7 +25,7 @@
 #include <luabind/iterator_policy.hpp>
 #include <luabind/out_value_policy.hpp>
 #include <luabind/copy_policy.hpp>
-#ifdef HAVE_LUABIND_B7
+#if LUABIND_BETA >= 7
 # include <luabind/operator.hpp>
 #endif
 

@@ -192,7 +192,7 @@ lua_changeresource(unit * u, const struct resource_type * rtype, int delta)
 bool
 is_function(struct lua_State * luaState, const char * fname)
 {
-#ifndef LUABIND_OLD
+#if LUABIND_BETA>7 || (LUABIND_BETA==7 && LUABIND_DEVEL>=2)
   object g = globals(luaState);
   object fun = g[fname];
   if (fun.is_valid()) {

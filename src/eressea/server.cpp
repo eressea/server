@@ -458,7 +458,7 @@ usage(const char * prog, const char * arg)
 static void
 setLuaString(lua_State * luaState, const char * name, const char * value)
 {
-#ifdef LUABIND_OLD
+#if LUABIND_BETA<7 || (LUABIND_BETA==7 && LUABIND_DEVEL<2)
   luabind::object g = luabind::get_globals(luaState);
 #else
   luabind::object g = luabind::globals(luaState);
@@ -469,7 +469,7 @@ setLuaString(lua_State * luaState, const char * name, const char * value)
 static void
 setLuaNumber(lua_State * luaState, const char * name, double value)
 {
-#ifdef LUABIND_OLD
+#if LUABIND_BETA<7 || (LUABIND_BETA==7 && LUABIND_DEVEL<2)
   luabind::object g = luabind::get_globals(luaState);
 #else
   luabind::object g = luabind::globals(luaState);
