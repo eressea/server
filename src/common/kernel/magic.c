@@ -375,6 +375,10 @@ read_seenspell(attrib * a, FILE * f)
     fscanf(f, "%d", &mtype);
     sp = find_spell((magic_t)mtype, buf);
   }
+  if (sp==NULL) {
+    log_error(("could not find seenspell '%s'\n", buf));
+    return AT_READ_FAIL;
+  }
   a->data.v = sp;
   return AT_READ_OK;
 }
@@ -393,12 +397,12 @@ attrib_type at_seenspell = {
 static boolean
 already_seen(const faction * f, const spell * sp)
 {
-	attrib *a;
+  attrib *a;
 
   for (a = a_find(f->attribs, &at_seenspell); a; a=a->nexttype) {
-		if (a->data.v==sp) return true;
+    if (a->data.v==sp) return true;
   }
-	return false;
+  return false;
 }
 
 void

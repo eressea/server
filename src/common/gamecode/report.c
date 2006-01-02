@@ -2845,11 +2845,14 @@ report_summary(summary * s, summary * o, boolean full)
 		fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
 	}
 
-	for (i = 0; i < MAXRACES; i++) if (s->factionrace[i] && playerrace(new_race[i])
-			&& i != RC_TEMPLATE && i != RC_CLONE) {
-		fprintf(F, "%14svölker: %s\n",
-		LOC(default_locale, rc_name(new_race[i], 3)), pcomp(s->factionrace[i], o->factionrace[i]));
-	}
+  for (i = 0; i < MAXRACES; i++) {
+    const race * rc = new_race[i];
+    if (s->factionrace[i] && rc && playerrace(rc) 
+        && i != RC_TEMPLATE && i != RC_CLONE) {
+      fprintf(F, "%14svölker: %s\n", LOC(default_locale, rc_name(rc, 3)), 
+              pcomp(s->factionrace[i], o->factionrace[i]));
+    }
+  }
 
 	if(full) {
 		fprintf(F, "\n");
@@ -2867,19 +2870,25 @@ report_summary(summary * s, summary * o, boolean full)
 		}
 	}
 
-	fprintf(F, "\n");
-	if (full) {
-		for (i = 0; i < MAXRACES; i++) if (s->poprace[i]) {
-			fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(new_race[i], 1)),
-				rcomp(s->poprace[i],o->poprace[i]));
-		}
-	} else {
-		for (i = 0; i < MAXRACES; i++) if (s->poprace[i] && playerrace(new_race[i])
-				&& i != RC_TEMPLATE && i != RC_CLONE) {
-			fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(new_race[i], 1)),
-				rcomp(s->poprace[i],o->poprace[i]));
-		}
-	}
+  fprintf(F, "\n");
+  if (full) {
+    for (i = 0; i < MAXRACES; i++) {
+      const race * rc = new_race[i];
+      if (s->poprace[i]) {
+        fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+                rcomp(s->poprace[i], o->poprace[i]));
+      }
+    }
+  } else {
+    for (i = 0; i < MAXRACES; i++) {
+      const race * rc = new_race[i];
+      if (s->poprace[i] && playerrace(rc)
+          && i != RC_TEMPLATE && i != RC_CLONE) {
+        fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+                rcomp(s->poprace[i], o->poprace[i]));
+      }
+    }
+  }
 
 	if (full) {
 		fprintf(F, "\nWaffen:               %s\n", pcomp(s->waffen,o->waffen));

@@ -154,7 +154,7 @@ addplayer(region *r, faction * f)
     race_t urc;
     do {
       urc = (race_t)(rand() % MAXRACES);
-    } while (urc == RC_DAEMON || !playerrace(new_race[urc]));
+    } while (new_race[urc]==NULL || urc == RC_DAEMON || !playerrace(new_race[urc]));
     u->irace = new_race[urc];
   }
 
