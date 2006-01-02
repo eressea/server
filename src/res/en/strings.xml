@@ -188,9 +188,6 @@
   <string name="highland_trail">
     <text locale="en">the highlands of %s</text>
   </string>
-  <string name="iceberg_trail">
-    <text locale="en">an %s</text>
-  </string>
   <string name="maelstrom_trail">
     <text locale="en">a %s</text>
   </string>
