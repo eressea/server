@@ -360,9 +360,8 @@ void
 mistake(const unit * u, struct order * ord, const char *comment, int mtype)
 {
   if (u->faction->no != MONSTER_FACTION) {
-    char * cmt = strdup(comment);
     ADDMSG(&u->faction->msgs, msg_message("mistake",
-      "command error unit region", ord, cmt, u, u->region));
+      "command error unit region", ord, comment, u, u->region));
   }
 }
 
