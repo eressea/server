@@ -1102,12 +1102,14 @@ readunit(FILE * F)
         if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
           *orderp = ord;
           orderp = &ord->next;
+          ord = NULL;
         } else if (p==MAXPERSISTENT) {
           log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
         }
       } else if (n==MAXORDERS) {
         log_error(("%s had %d or more orders\n", unitname(u), MAXORDERS));
       }
+      if (ord!=NULL) free_order(ord);
     }
 		freadstr(F, buf, sizeof(buf));
 	}

@@ -1522,8 +1522,8 @@ split_allocations(region * r)
 					msg_message("produce_lowskill", "unit region resource",
 					al->unit, al->unit->region, rtype));
 			} else {
-				add_message(&al->unit->faction->msgs,
-					msg_message("produce", "unit region amount wanted resource",
+				ADDMSG(&al->unit->faction->msgs, msg_message("produce", 
+          "unit region amount wanted resource",
 					al->unit, al->unit->region, al->get, al->want, rtype));
 			}
 			*p_al=al->next;
