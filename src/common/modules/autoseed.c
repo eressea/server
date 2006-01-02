@@ -647,7 +647,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         }
         else nfp = &nf->next;
       }
-      *players = nextf;
+      *players = nextf->next;
       free_newfaction(nextf);
 
       ++psize;
