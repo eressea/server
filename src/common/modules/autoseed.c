@@ -471,6 +471,13 @@ island_size(region * r)
   return size;
 }
 
+void
+free_newfaction(newfaction * nf)
+{
+  free(nf->email);
+  free(nf->password);
+  free(nf);
+}
 /** create new island with up to nsize players
  * returns the number of players placed on the new island.
  */
@@ -631,15 +638,18 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       }
 
       /* remove duplicate email addresses */
-      nfp = players;
+      nfp = &nextf->next;
       while (*nfp) {
         newfaction * nf = *nfp;
         if (strcmp(nextf->email, nf->email)==0) {
           *nfp = nf->next;
-          if (nextf!=nf) free(nf);
+          free_newfaction(nf);
         }
         else nfp = &nf->next;
       }
+      *players = nextf;
+      free_newfaction(nextf);
+
       ++psize;
       --nsize;
       --isize;

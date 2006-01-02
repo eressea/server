@@ -1199,6 +1199,7 @@ stripunit(unit * u)
 {
 	free(u->name);
 	free(u->display);
+  free_order(u->thisorder);
 	free_orders(&u->orders);
 	if(u->skills) free(u->skills);
 	while (u->items) {

@@ -550,7 +550,7 @@ drachen_name(const unit *u)
 	if (anzahl > 1) {
 		sprintf(name, "Die %sn von %s", t+4, rname(u->region, NULL));
 	} else {
-		char *n = malloc(32*sizeof(char));
+		char n[32];
 
 		strcpy(n, silbe1[rand() % SIL1]);
 		strcat(n, silbe2[rand() % SIL2]);

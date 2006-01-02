@@ -395,6 +395,7 @@ game_done(void)
   while (planes) {
     plane * pl = planes;
     planes = planes->next;
+    free(pl->name);
     free(pl);
   }
 

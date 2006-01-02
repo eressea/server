@@ -996,7 +996,6 @@ extern void parse(keyword_t kword, int (*dofun)(struct unit *, struct order *), 
 void verify_data(void);
 
 void stripfaction(struct faction * f);
-void stripunit(struct unit * u);
 void freestrlist(strlist * s);
 
 int change_hitpoints(struct unit *u, int value);

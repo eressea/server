@@ -3435,7 +3435,8 @@ new_units (void)
           init_tokens(makeord);
           skip_token();
           if (getparam(u->faction->locale) == P_TEMP) {
-            char * name;
+            const char * token;
+            char * name = NULL;
             int g, alias;
             order ** newordersp;
 
@@ -3462,8 +3463,10 @@ new_units (void)
             }
             alias = getid();
 
-            name = strdup(getstrtoken());
-            if (name && strlen(name)==0) name = NULL;
+            token = getstrtoken();
+            if (token && strlen(token)>0) {
+              name = strdup(token);
+            }
             u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
             if (name!=NULL) free(name);
             fset(u2, UFL_ISNEW);
@@ -3807,8 +3810,8 @@ age_factions(void)
   for (f = factions; f; f = f->next) {
     ++f->age;
     if (f->age < NewbieImmunity()) {
-      add_message(&f->msgs, new_message(f,
-        "newbieimmunity%i:turns", NewbieImmunity() - f->age));
+      ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns", 
+        NewbieImmunity() - f->age));
     }
   }
 }

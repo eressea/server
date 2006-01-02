@@ -30,7 +30,6 @@ int getoption(void);
 int wanderoff(struct region * r, int p);
 void demographics(void);
 void last_orders(void);
-void stripunit(struct unit * u);
 void find_address(void);
 void update_guards(void);
 
