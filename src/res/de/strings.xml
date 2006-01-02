@@ -569,9 +569,11 @@
   </string>
   <string name="iceberg_trail">
     <text locale="de">der Eisberg von %s</text>
+    <text locale="en">the glacier of %s</text>
   </string>
   <string name="iceberg_sleep_trail">
     <text locale="de">der Gletscher von %s</text>
+    <text locale="en">the glacier of %s</text>
   </string>
   <string name="thickfog_trail">
     <text locale="de">%s</text>
