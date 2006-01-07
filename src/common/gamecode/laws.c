@@ -544,19 +544,21 @@ peasants(region * r)
   }
 
   for (n = peasants; n; n--) {
-    int i;
+    int chances = 1;
 
-    if (glueck >= 0) {    /* Sonst keine Vermehrung */
+    if (glueck>0) {
+      --glueck;
+      chances += PEASANTLUCK;
+    }
+
+    while (chances--) {
       if (rand() % 10000 < PEASANTGROWTH) {
-        if (peasants/(float)maxp < 0.9 || rand() % 100 < PEASANTFORCE) {
+        /* First chance always goes through. Next ones only with 75% chance if
+         * peasants have reached 90% of maxpopulation */
+        if (chances==0 || peasants/(float)maxp < 0.9 || chance(PEASANTFORCE)) {
           ++peasants;
         }
       }
-      --glueck;
-    }
-
-    for (i=0; i!=PEASANTLUCK; i++) {
-      if (rand() % 10000 < PEASANTGROWTH) ++peasants;
     }
   }
 
