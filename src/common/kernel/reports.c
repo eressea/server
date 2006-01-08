@@ -1694,6 +1694,29 @@ var_free_order(variant x)
   free_order(x.v);
 }
 
+static variant
+var_copy_items(variant x)
+{
+  item * isrc, * idst = NULL, ** iptr = &idst;
+
+  for (isrc = (item*)x.v; isrc!=NULL; isrc=isrc->next) {
+    item * itm = malloc(sizeof(item));
+    itm->number = isrc->number;
+    itm->type = isrc->type;
+    *iptr = itm;
+    iptr = &itm->next;
+  }
+  *iptr = NULL;
+  x.v = idst;
+  return x;
+}
+
+static void
+var_free_items(variant x)
+{
+  i_freeall((item**)&x.v);
+}
+
 void
 reports_init(void)
 {
@@ -1712,6 +1735,7 @@ reports_init(void)
   register_argtype("int", NULL, NULL, VAR_INT);
   register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
   register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
+  register_argtype("items", var_free_items, var_copy_items, VAR_VOIDPTR);
 
   /* register alternative visibility functions */
   register_function((pf_generic)view_neighbours, "view_neighbours");

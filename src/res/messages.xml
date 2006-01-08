@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <messages>
+  <message name="nr_claims" section="nr">
+    <type>
+      <arg name="items" type="items"/>
+    </type>
+    <text locale="de">"Einheiten können die folgenden Gegenstände beanspruchen: $items($items)"</text>
+    <text locale="en">"Units can claim the following items: $items($items)"</text>
+  </message>
   <message name="sighting" section="events">
     <type>
       <arg name="region" type="region"/>

@@ -1989,28 +1989,18 @@ report_plaintext(const char * filename, report_context * ctx)
   {
     int maxh = maxheroes(f);
     if (maxh) {
-      m = msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
-      nr_render(m, f->locale, buf, sizeof(buf), f);
-      msg_release(m);
+      message * msg = msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
+      nr_render(msg, f->locale, buf, sizeof(buf), f);
+      msg_release(msg);
       centre(F, buf, true);
     }
   }
 #endif
 
   if (f->items!=NULL) {
-    item * iclaim = f->items;
-    char * edit = buf;
-    strcpy(edit, LOC(f->locale, "claimable"));
-    edit += strlen(edit);
-    while (iclaim!=NULL) {
-      sprintf(edit, "%d %s", iclaim->number, 
-        LOC(f->locale, resourcename(iclaim->type->rtype, (iclaim->number!=1)?NMF_PLURAL:0)));
-      iclaim = iclaim->next;
-      if (iclaim!=NULL) {
-        strcat(edit, ", ");
-      }
-      edit += strlen(edit);
-    }
+    message * msg = msg_message("nr_claims", "items", f->items);
+    nr_render(msg, f->locale, buf, sizeof(buf), f);
+    msg_release(msg);
     rnl(F);
     centre(F, buf, true);
   }
@@ -3169,15 +3159,43 @@ eval_race(struct opstack ** stack, const void * userdata)
 static void
 eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
 {
-	const faction * report = (const faction*)userdata;
-	const struct order * ord = (const struct order *)opop(stack).v;
-	static char buf[256];
+  const faction * report = (const faction*)userdata;
+  const struct order * ord = (const struct order *)opop(stack).v;
+  static char buf[256];
   size_t len;
   variant var;
 
   write_order(ord, report->locale, buf, sizeof(buf));
   len = strlen(buf);
   var.v = strcpy(balloc(len+1), buf);
+  opush(stack, var);
+}
+
+static void
+eval_items(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+  const faction * report = (const faction*)userdata;
+  const struct item * itm = (const struct item *)opop(stack).v;
+  static char buf[256];
+  size_t len = sizeof(buf);
+  variant var;
+
+  char * edit = buf;
+  while (itm!=NULL && len > 4) {
+    const char * rname = resourcename(itm->type->rtype, (itm->number!=1)?NMF_PLURAL:0);
+    int written = snprintf(edit, len, "%d %s", itm->number, LOC(report->locale, rname));
+    len -= written;
+    edit += written;
+
+    itm = itm->next;
+    if (itm!=NULL && len>2) {
+      strcat(edit, ", ");
+      edit += 2;
+      len -= 2;
+    }
+  }
+  *edit = 0;
+  var.v = strcpy(balloc(edit-buf+1), buf);
   opush(stack, var);
 }
 
@@ -3241,6 +3259,7 @@ report_init(void)
 	add_function("int36", &eval_int36);
 	add_function("trail", &eval_trail);
   add_function("spell", &eval_spell);
+  add_function("items", &eval_items);
 
   register_reporttype("nr", &report_plaintext, 1<<O_REPORT);
   register_reporttype("txt", &report_template, 1<<O_ZUGVORLAGE);
