@@ -2004,7 +2004,7 @@ report_plaintext(const char * filename, report_context * ctx)
     edit += strlen(edit);
     while (iclaim!=NULL) {
       sprintf(edit, "%d %s", iclaim->number, 
-        LOC(f->locale, resourcename(iclaim->type->rtype, iclaim->number)));
+        LOC(f->locale, resourcename(iclaim->type->rtype, (iclaim->number!=1)?NMF_PLURAL:0)));
       iclaim = iclaim->next;
       if (iclaim!=NULL) {
         strcat(edit, ", ");
