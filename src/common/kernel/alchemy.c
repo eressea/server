@@ -81,8 +81,8 @@ herbsearch(region * r, unit * u, int max)
 		ADDMSG(&u->faction->msgs, msg_message("herbfound", 
       "unit region amount herb", u, r, herbsfound, whichherb->rtype));
 	} else {
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"researchherb_none%u:unit%r:region", u, u->region));
+    ADDMSG(&u->faction->msgs, msg_message("researchherb_none",
+      "unit region", u, u->region));
 	}
 }
 
@@ -114,8 +114,8 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 		}
 	  if (r->land==0) holz=0;
 		rsettrees(r, 1, rtrees(r, 1) + holz);
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"growtree_effect%u:mage%i:amount", u, holz));
+    ADDMSG(&u->faction->msgs, msg_message("growtree_effect", 
+      "mage amount", u, holz));
 	} else if (ptype==oldpotiontype[P_HEAL]) {
 		return EUNUSABLE;
 	} else if (ptype==oldpotiontype[P_HEILWASSER]) {

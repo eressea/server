@@ -334,8 +334,8 @@ buy_special(unit *u, struct order * ord, fspecial_t special)
 	if (a2) {
 		if(a2->data.sa[1] < fspecials[special].maxlevel) {
 			a2->data.sa[1]++;
-			add_message(&f->msgs, new_message(f,
-				"new_fspecial_level%S:special%d:level", special, a2->data.sa[1]));
+      ADDMSG(&f->msgs, msg_message("new_fspecial_level", 
+        "special level", special, a2->data.sa[1]));
 		} else {
 			cmistake(u, ord, 251, MSG_EVENT);
 			return;
@@ -344,7 +344,7 @@ buy_special(unit *u, struct order * ord, fspecial_t special)
 		a2 = a_add(&f->attribs, a_new(&at_faction_special));
 		a2->data.sa[0] = (short)special;
 		a2->data.sa[1] = 1;
-		add_message(&f->msgs, new_message(f, "new_fspecial%S:special", special));
+		ADDMSG(&f->msgs, msg_message("new_fspecial", "special", special));
 	}
 }
 
@@ -458,8 +458,7 @@ prayer_cmd(unit * u, struct order * ord)
 
   u->faction->karma -= karma_cost;
 
-  add_message(&u->faction->msgs, new_message(u->faction,
-    "pray_success%u:unit",u));
+  ADDMSG(&u->faction->msgs, msg_message("pray_success", "unit", u));
 
   switch (p) {
   case P_AURA:

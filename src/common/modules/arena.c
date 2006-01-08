@@ -194,7 +194,7 @@ age_hurting(attrib * a) {
 		if (u->building==b) {
 			if (u->faction->magiegebiet==M_CHAOS) {
 				active ++;
-				add_message(&b->region->msgs, new_message(NULL, "praytoigjarjuk%u:unit", u));
+				ADDMSG(&b->region->msgs, msg_message("praytoigjarjuk", "unit", u));
 			}
 		}
 	}
@@ -202,7 +202,7 @@ age_hurting(attrib * a) {
 		int i;
 		if (u->faction->magiegebiet!=M_CHAOS) {
 			for (i=0;i!=active;++i) u->hp = (u->hp+1) / 2; /* make them suffer, but not die */
-			add_message(&b->region->msgs, new_message(NULL, "cryinpain%u:unit", u));
+			ADDMSG(&b->region->msgs, msg_message("cryinpain", "unit", u));
 		}
 	}
 	return 1;

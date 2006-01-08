@@ -700,16 +700,15 @@ drown(region *r)
 			if (amphibian_level) {
 				int dead = damage_unit(u, "5d1", false, false);
 				if (dead) {
-					ADDMSG(&u->faction->msgs, new_message(u->faction,
-						"drown_amphibian_dead%d:amount%u:unit%r:region",dead, u, r));
+          ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_dead", 
+            "amount unit region", dead, u, r));
 				} else {
-					ADDMSG(&u->faction->msgs, new_message(u->faction,
-						"drown_amphibian_nodead%u:unit%r:region",u, r));
+          ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_nodead", 
+            "unit region",u, r));
 				}
       } else if (!(canswim(u) || canfly(u))) {
 				scale_number(u, 0);
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"drown%u:unit%r:region", u, r));
+        ADDMSG(&u->faction->msgs, msg_message("drown", "unit region", u, r));
 			}
 			if (*up==u) up=&u->next;
 		}
@@ -779,17 +778,17 @@ volcano_outbreak(region *r)
 		unit * u = *up;
 		int dead = damage_unit(u, "4d10", true, false);
 		if (dead) {
-			ADDMSG(&u->faction->msgs, new_message(u->faction,
-				"volcano_dead%u:unit%r:region%i:dead", u, r, dead));
+      ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
+        "unit region dead", u, r, dead));
 		}
 		if (!fval(u->faction, FL_DH)) {
 			fset(u->faction, FL_DH);
 			if (rn) {
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"volcanooutbreak%r:regionv%r:regionn", r, rn));
-			} else {
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"volcanooutbreaknn%r:region", r));
+        ADDMSG(&u->faction->msgs, msg_message("volcanooutbreak", 
+          "regionv regionn", r, rn));
+      } else {
+        ADDMSG(&u->faction->msgs, msg_message("volcanooutbreaknn", 
+          "region", r));
 			}
 		}
 		if (u==*up) up=&u->next;
@@ -818,12 +817,12 @@ volcano_outbreak(region *r)
 			unit * u = *up;
 			int dead = damage_unit(u, "3d10", true, false);
 			if (dead) {
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"volcano_dead%u:unit%r:region%i:dead", u, rn, dead));
+        ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
+          "unit region dead", u, rn, dead));
 			}
 			if (!fval(u->faction, FL_DH)) {
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"volcano_dead%u:unit%r:region%i:dead", u, r, dead));
+        ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
+          "unit region dead", u, r, dead));
 				fset(u->faction, FL_DH);
 			}
 			if (u==*up) up=&u->next;
@@ -895,8 +894,8 @@ move_iceberg(region *r)
 			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
 				fset(u->faction, FL_DH);
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"iceberg_drift%r:region%d:dir", r, dir));
+				ADDMSG(&u->faction->msgs, msg_message("iceberg_drift", 
+          "region dir", r, dir));
 			}
 
 			x = r->x;
@@ -948,12 +947,14 @@ move_iceberg(region *r)
 				if (fval(sh, FL_DH)) {
 					u = captain(sh, r);
 					if (sh->damage>=sh->size * DAMAGE_SCALE) {
-						if (u) ADDMSG(&u->faction->msgs, new_message(u->faction,
-							"overrun_by_iceberg_des%h:ship", sh));
+            if (u!=NULL) {
+              ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg_des", 
+                "ship", sh));
+            }
 						destroy_ship(sh);
-					} else {
-						if (u) ADDMSG(&u->faction->msgs, new_message(u->faction,
-							"overrun_by_iceberg%h:ship", sh));
+          } else if (u!=NULL) {
+            ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg", 
+              "ship", sh));
 					}
 				}
 				sh = shn;
@@ -968,8 +969,7 @@ move_iceberg(region *r)
 			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
 				fset(u->faction, FL_DH);
-				ADDMSG(&u->faction->msgs, new_message(u->faction,
-					"iceberg_land%r:region", r));
+        ADDMSG(&u->faction->msgs, msg_message("iceberg_land", "region", r));
 			}
 		}
 	}

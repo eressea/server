@@ -1818,12 +1818,11 @@ expandbuying(region * r, request * buyorders)
 		attrib * a = a_find(u->attribs, &at_luxuries);
 		item * itm;
 		if (a==NULL) continue;
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"buy%u:unit%i:money", u, u->n));
+		ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
 		for (itm=(item*)a->data.v; itm; itm=itm->next) {
 			if (itm->number) {
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"buyamount%u:unit%i:amount%X:resource", u, itm->number, itm->type->rtype));
+				ADDMSG(&u->faction->msgs, msg_message("buyamount",
+          "unit amount resource", u, itm->number, itm->type->rtype));
 			}
 		}
 		a_remove(&u->attribs, a);
@@ -2477,8 +2476,8 @@ breedtrees(region *r, unit *u, int raw)
 	produceexp(u, SK_HERBALISM, u->number);
 	use_pooled(u, rtype, GET_DEFAULT, n);
 
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, rtype));
+  ADDMSG(&u->faction->msgs, msg_message("plant", 
+    "unit region amount herb", u, r, planted, rtype));
 }
 
 static void
@@ -2562,8 +2561,8 @@ breedhorses(region *r, unit *u)
 		produceexp(u, SK_HORSE_TRAINING, u->number);
 	}
 
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"raised%u:unit%i:amount", u, gezuechtet));
+  ADDMSG(&u->faction->msgs, msg_message("raised", 
+    "unit amount", u, gezuechtet));
 }
 
 static void
@@ -2648,16 +2647,16 @@ research_cmd(unit *u, struct order * ord)
     const item_type *itype = rherbtype(r);
 
     if (itype != NULL) {
-      add_message(&u->faction->msgs, new_message(u->faction,
-        "researchherb%u:unit%r:region%s:amount%X:herb", u, r,
-        rough_amount(rherbs(r), 100), itype->rtype));
+      ADDMSG(&u->faction->msgs, msg_message("researchherb", 
+        "unit region amount herb", 
+        u, r, rough_amount(rherbs(r), 100), itype->rtype));
     } else {
-      add_message(&u->faction->msgs, new_message(u->faction,
-        "researchherb_none%u:unit%r:region", u, r));
+      ADDMSG(&u->faction->msgs, msg_message("researchherb_none", 
+        "unit region", u, r));
     }
   } else {
-    add_message(&u->faction->msgs, new_message(u->faction,
-      "researchherb_none%u:unit%r:region", u, r));
+    ADDMSG(&u->faction->msgs, msg_message("researchherb_none",
+      "unit region", u, r));
   }
 }
 
@@ -2741,31 +2740,23 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 	if (n == 0) {
 		/* Wahrnehmung == Tarnung */
 		if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"stealfail%u:unit%u:target", u, u2));
-			add_message(&u2->faction->msgs, new_message(u2->faction,
-				"stealdetect%u:unit", u2));
-			return;
+      ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
+      ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
+      return;
 		} else {
-			add_message(&u2->faction->msgs, new_message(u2->faction,
-				"thiefdiscover%u:unit%u:target", u, u2));
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"stealfatal%u:unit%u:target", u, u2));
-			n = 1;
+      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
+      ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u, u2));
+      n = 1;
 			goblin = true;
 		}
 	} else if (n < 0) {
 		/* Wahrnehmung > Tarnung */
 		if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"stealfatal%u:unit%u:target", u, u2));
-
-			add_message(&u2->faction->msgs, new_message(u2->faction,
-				"thiefdiscover%u:unit%u:target", u, u2));
-			return;
+      ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u, u2));
+      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
+      return;
 		} else {	/* Goblin-Spezialdiebstahl, Meldung an Beklauten */
-			add_message(&u2->faction->msgs, new_message(u2->faction,
-				"thiefdiscover%u:unit%u:target", u, u2));
+      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
 			n = 1;
 			goblin = true;
 		}

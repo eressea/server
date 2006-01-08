@@ -23,6 +23,7 @@
 
 /* libc includes */
 #include <stdlib.h>
+#include <assert.h>
 
 #define ILLUSIONMAX  6
 
@@ -31,12 +32,11 @@ age_illusion(unit *u)
 {
 	if (u->faction->race!=new_race[RC_ILLUSION]) {
 		if (u->age == ILLUSIONMAX) {
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"warnillusiondissolve%u:unit", u));
+			ADDMSG(&u->faction->msgs, msg_message("warnillusiondissolve", 
+        "unit", u));
 		} else if (u->age > ILLUSIONMAX) {
 			set_number(u, 0);
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"illusiondissolve%u:unit", u));
+			ADDMSG(&u->faction->msgs, msg_message("illusiondissolve", "unit", u));
 		}
 	}
 }

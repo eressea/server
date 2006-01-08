@@ -69,8 +69,8 @@ lucky_silver(const unit *u)
 	
 	i_change(&((unit *)u)->items, i_silver, max);
 	
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"lucky_item%u:unit%X:item%d:amount", u, i_silver->rtype, max));
+  ADDMSG(&u->faction->msgs, msg_message("lucky_item",
+    "unit item amount", u, i_silver->rtype, max));
 }
 
 typedef struct luckyitem {
@@ -115,9 +115,8 @@ lucky_item(const unit *u)
 		amount = 5 + rand()%10 +rand()%10;
 
 	i_change(&((unit *)u)->items, itype, amount);
-
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"lucky_item%u:unit%X:item%d:amount", u, itype->rtype, amount));
+  ADDMSG(&u->faction->msgs, msg_message("lucky_item", 
+    "unit item amount", u, itype->rtype, amount));
 }
 
 static void
@@ -147,9 +146,8 @@ lucky_magic_item(const unit *u)
 	amount = 1 + rand()%luck;
 
 	i_change(&((unit *)u)->items, itype, amount);
-
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"lucky_item%u:unit%X:item%d:amount", u, itype->rtype, amount));
+	ADDMSG(&u->faction->msgs, msg_message("lucky_item", 
+    "unit item amount", u, itype->rtype, amount));
 #endif
 }
 

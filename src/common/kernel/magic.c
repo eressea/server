@@ -1634,9 +1634,9 @@ verify_targets(castorder *co)
 						spobj->data.i = b->no;
 						spobj->flag = TARGET_RESISTS;
 						resists++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellbuildingresists%u:unit%r:region%s:command%d:id",
-							mage, mage->region, co->order, spobj->data.i));
+            ADDMSG(&mage->faction->msgs, msg_message("spellbuildingresists",
+              "unit region command id", 
+              mage, mage->region, co->order, spobj->data.i));
 						break;
 					}
 					success++;
@@ -1702,9 +1702,8 @@ verify_targets(castorder *co)
 			if ((sp->sptyp & TESTRESISTANCE)) {
 				if (target_resists_magic(mage, target_r, TYP_REGION, 0)) {
 					/* Fehlermeldung */
-					add_message(&mage->faction->msgs, new_message(mage->faction,
-						"spellregionresists%u:unit%r:region%s:command",
-						mage, mage->region, co->order));
+          ADDMSG(&mage->faction->msgs, msg_message("spellregionresists", 
+            "unit region command", mage, mage->region, co->order));
 					spobj->flag = TARGET_RESISTS;
 					resists++;
 				} else {

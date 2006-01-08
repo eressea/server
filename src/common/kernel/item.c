@@ -638,8 +638,8 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 		unused(ord);
 	}
   use_pooled(u, oldresourcetype[R_TACTICCRYSTAL], GET_DEFAULT, amount);
-	add_message(&u->faction->msgs,
-			new_message(u->faction, "use_tacticcrystal%u:unit%r:region", u, r));
+  ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal", 
+    "unit region", u, r));
 	return;
 }
 

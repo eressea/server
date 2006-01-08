@@ -1525,11 +1525,11 @@ name_cmd(unit * u, struct order * ord)
       uo = buildingowner(r, b);
       if (uo) {
         if (cansee(uo->faction, r, u, 0)) {
-          add_message(&uo->faction->msgs, new_message(uo->faction,
-            "renamed_building_seen%b:building%u:renamer%r:region", b, u, r));
+          ADDMSG(&uo->faction->msgs, msg_message("renamed_building_seen", 
+            "building renamer region", b, u, r));
         } else {
-          add_message(&uo->faction->msgs, new_message(uo->faction,
-            "renamed_building_notseen%b:building%r:region", b, r));
+          ADDMSG(&uo->faction->msgs, msg_message("renamed_building_notseen", 
+            "building region", b, r));
         }
       }
       s = &b->name;
@@ -1629,11 +1629,11 @@ name_cmd(unit * u, struct order * ord)
       uo = shipowner(sh);
       if (uo) {
         if (cansee(uo->faction, r, u, 0)) {
-          add_message(&uo->faction->msgs, new_message(uo->faction,
-            "renamed_ship_seen%h:ship%u:renamer%r:region", sh, u, r));
+          ADDMSG(&uo->faction->msgs, msg_message("renamed_ship_seen", 
+            "ship renamer region", sh, u, r));
         } else {
-          add_message(&uo->faction->msgs, new_message(uo->faction,
-            "renamed_ship_notseen%h:ship%r:region", sh, r));
+          ADDMSG(&uo->faction->msgs, msg_message("renamed_ship_notseen", 
+            "ship region", sh, r));
         }
       }
       s = &sh->name;
@@ -1667,11 +1667,11 @@ name_cmd(unit * u, struct order * ord)
         }
       }
       if (cansee(u2->faction, r, u, 0)) {
-        add_message(&u2->faction->msgs, new_message(u2->faction,
-          "renamed_seen%u:renamer%u:renamed%r:region", u, u2, r));
+        ADDMSG(&u2->faction->msgs, msg_message("renamed_seen", 
+          "renamer renamed region", u, u2, r));
       } else {
-        add_message(&u2->faction->msgs, new_message(u2->faction,
-          "renamed_notseen%u:renamed%r:region", u2, r));
+        ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen", 
+          "renamed region", u2, r));
       }
       s = &u2->name;
     } else {

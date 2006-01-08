@@ -50,8 +50,7 @@ use_skillpotion(struct unit * u, const struct item_type * itype, int amount, str
 			++sv;
 		}
 	}
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"skillpotion_use%u:unit", u));
+  ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));
 
 	res_changeitem(u, itype->rtype, -amount);
 	return 0;
@@ -72,8 +71,7 @@ use_manacrystal(struct unit * u, const struct item_type * itype, int amount, str
 		change_spellpoints(u, sp);
 	}
 
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"manacrystal_use%u:unit%i:aura", u, sp));
+  ADDMSG(&u->faction->msgs, msg_message("manacrystal_use", "unit aura", u, sp));
 
 	res_changeitem(u, itype->rtype, -amount);
 	return 0;

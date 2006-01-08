@@ -108,9 +108,9 @@ spy_cmd(unit * u, struct order * ord)
   observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
     + (eff_skill(target, SK_OBSERVATION, r) * 0.02);
 
-  if (chance(observechance)){
-    add_message(&target->faction->msgs, new_message(target->faction,
-      "spydetect%u:spy%u:target", observe>0?u:NULL, target));
+  if (chance(observechance)) {
+    ADDMSG(&target->faction->msgs, msg_message("spydetect", 
+      "spy target", observe>0?u:NULL, target));
   }
   return 0;
 }

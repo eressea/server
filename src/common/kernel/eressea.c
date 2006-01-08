@@ -2760,8 +2760,8 @@ hunger(int number, unit * u)
 	if (dead) {
 		/* Gestorbene aus der Einheit nehmen,
 		 * Sie bekommen keine Beerdingung. */
-		ADDMSG(&u->faction->msgs, new_message(u->faction,
-			"starvation%u:unit%r:region%i:dead%i:live", u, r, dead, u->number-dead));
+    ADDMSG(&u->faction->msgs, msg_message("starvation", 
+      "unit region dead live", u, r, dead, u->number-dead));
 
 		scale_number(u, u->number - dead);
 		deathcounts(r, dead);
@@ -2772,8 +2772,8 @@ hunger(int number, unit * u)
 		/* Meldung nur, wenn noch keine für Tote generiert. */
 		if (dead == 0) {
 			/* Durch unzureichende Ernährung wird %s geschwächt */
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"malnourish%u:unit%r:region", u, r));
+      ADDMSG(&u->faction->msgs, msg_message("malnourish", 
+        "unit region", u, r));
 		}
 	}
 	return (dead || hpsub);
