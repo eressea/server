@@ -6,7 +6,9 @@ function use_seashell(u, amount)
     local msg = message("msg_event")
     msg:set_string("string", tostring(u) .. " erzählt den Bewohnern von " .. r.name .. " von Muschelplateau, das seine Partei vor " .. turns .. " Wochen besucht hat." )
     msg:send_region(u.region)
+    return 0
   end
+  return -4
 end
 
 function update_embassies()

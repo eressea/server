@@ -1,7 +1,7 @@
-function usepotion_message(u, type)
+function usepotion_message(u, potion)
   msg = message("usepotion")
   msg:set_unit("unit", u)
-  msg:set_resource("potion", type)
+  msg:set_resource("potion", potion)
   return msg
 end
 
@@ -11,6 +11,8 @@ function use_stardust(u, amount)
   u.region:set_resource("peasant", p)
   local msg = usepotion_message(u, "stardust")
   msg:send_region(u.region)
+  u:add_item("stardust", -amount)
+  return 0
 end
 
 function xmas2005()

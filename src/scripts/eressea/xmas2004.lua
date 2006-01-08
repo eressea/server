@@ -4,7 +4,9 @@ function use_snomwan(u, amount)
     u.race = "snowman"
     u.number = amount
     u:add_item("snowman", -amount)
+    return 0
   end
+  return -4
 end
 
 function xmas2004()
