@@ -31,6 +31,12 @@ typedef struct item {
 	struct item * next;
 } item;
 
+typedef struct resource {
+  const struct resource_type * type;
+  int number;
+  struct resource * next;
+} resource;
+
 /* bitfield values for resource_type::flags */
 #define RTF_NONE     0
 #define RTF_ITEM     (1<<0) /* this resource is an item */

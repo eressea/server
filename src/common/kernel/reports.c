@@ -1697,24 +1697,30 @@ var_free_order(variant x)
 static variant
 var_copy_items(variant x)
 {
-  item * isrc, * idst = NULL, ** iptr = &idst;
+  item * isrc;
+  resource * rdst = NULL, ** rptr = &rdst;
 
   for (isrc = (item*)x.v; isrc!=NULL; isrc=isrc->next) {
-    item * itm = malloc(sizeof(item));
-    itm->number = isrc->number;
-    itm->type = isrc->type;
-    *iptr = itm;
-    iptr = &itm->next;
+    resource * res = malloc(sizeof(resource));
+    res->number = isrc->number;
+    res->type = isrc->type->rtype;
+    *rptr = res;
+    rptr = &res->next;
   }
-  *iptr = NULL;
-  x.v = idst;
+  *rptr = NULL;
+  x.v = rdst;
   return x;
 }
 
 static void
-var_free_items(variant x)
+var_free_resources(variant x)
 {
-  i_freeall((item**)&x.v);
+  resource ** rsrc = (resource**)&x.v;
+  while (*rsrc) {
+    resource * res = *rsrc;
+    *rsrc = res->next;
+    free(res);
+  }
 }
 
 void
@@ -1735,7 +1741,8 @@ reports_init(void)
   register_argtype("int", NULL, NULL, VAR_INT);
   register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
   register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
-  register_argtype("items", var_free_items, var_copy_items, VAR_VOIDPTR);
+  register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
+  register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
 
   /* register alternative visibility functions */
   register_function((pf_generic)view_neighbours, "view_neighbours");

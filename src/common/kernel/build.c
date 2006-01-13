@@ -882,18 +882,17 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   case ENOMATERIALS: {
     /* something missing from the list of materials */
     const construction * cons = btype->construction;
-    char * ch = buf;
+    resource * reslist = NULL;
     assert(cons);
-    for (c=0;cons->materials[c].number; c++) {
-      int n;
-      if (c!=0) strcat(ch++, ",");
-      n = cons->materials[c].number / cons->reqsize;
-      sprintf(ch, " %d %s", n?n:1,
-        LOC(lang, resourcename(cons->materials[c].rtype, cons->materials[c].number!=1)));
-      ch = ch+strlen(ch);
+    for (c=0;cons->materials[c].number; ++c) {
+      resource * res = malloc(sizeof(resource));
+      res->number = cons->materials[c].number / cons->reqsize;
+      res->type = cons->materials[c].rtype;
+      res->next = reslist;
+      reslist = res->next;
     }
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "build_required",
-      "required", buf));
+      "required", reslist));
     return;
   }
   case ELOWSKILL:

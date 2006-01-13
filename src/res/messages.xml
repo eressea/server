@@ -4,8 +4,8 @@
     <type>
       <arg name="items" type="items"/>
     </type>
-    <text locale="de">"Einheiten können die folgenden Gegenstände beanspruchen: $items($items)"</text>
-    <text locale="en">"Units can claim the following items: $items($items)"</text>
+    <text locale="de">"Einheiten können die folgenden Gegenstände beanspruchen: $resources($items)"</text>
+    <text locale="en">"Units can claim the following items: $resources($items)"</text>
   </message>
   <message name="sighting" section="events">
     <type>
