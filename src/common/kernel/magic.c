@@ -921,60 +921,60 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 boolean
 cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 {
-	int k;
-	int itemanz;
+  int k;
+  int itemanz;
   resource * reslist = NULL;
 
-	if (knowsspell(u->region, u, sp) == false) {
-		/* Diesen Zauber kennt die Einheit nicht */
-		cmistake(u, ord, 173, MSG_MAGIC);
-		return false;
-	}
-	/* reicht die Stufe aus? */
-	if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
-		/* die Einheit ist nicht erfahren genug für diesen Zauber */
-		cmistake(u, ord, 169, MSG_MAGIC);
-		return false;
-	}
-
-	for (k = 0; sp->components[k].type; ++k) {
-		if (sp->components[k].amount > 0) {
-			const resource_type * rtype = sp->components[k].type;
-
-			/* Die Kosten für Aura sind auch von der Zahl der bereits
-			 * gezauberten Sprüche abhängig */
-			if (rtype == r_aura) {
-				itemanz = spellcost(u, sp) * range;
-			} else {
-				itemanz = sp->components[k].amount * range;
-			}
-
-			/* sind die Kosten stufenabhängig, so muss itemanz noch mit dem
-			 * level multipliziert werden */
-			switch(sp->components[k].cost) {
-				case SPC_LEVEL:
-				case SPC_LINEAR:
-					itemanz *= level;
-					break;
-				case SPC_FIX:
-				default:
-					break;
-			}
-
-			if (get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
+  if (knowsspell(u->region, u, sp) == false) {
+    /* Diesen Zauber kennt die Einheit nicht */
+    cmistake(u, ord, 173, MSG_MAGIC);
+    return false;
+  }
+  /* reicht die Stufe aus? */
+  if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
+    /* die Einheit ist nicht erfahren genug für diesen Zauber */
+    cmistake(u, ord, 169, MSG_MAGIC);
+    return false;
+  }
+  
+  for (k = 0; sp->components[k].type; ++k) {
+    if (sp->components[k].amount > 0) {
+      const resource_type * rtype = sp->components[k].type;
+      
+      /* Die Kosten für Aura sind auch von der Zahl der bereits
+       * gezauberten Sprüche abhängig */
+      if (rtype == r_aura) {
+        itemanz = spellcost(u, sp) * range;
+      } else {
+        itemanz = sp->components[k].amount * range;
+      }
+      
+      /* sind die Kosten stufenabhängig, so muss itemanz noch mit dem
+       * level multipliziert werden */
+      switch(sp->components[k].cost) {
+      case SPC_LEVEL:
+      case SPC_LINEAR:
+        itemanz *= level;
+        break;
+      case SPC_FIX:
+      default:
+        break;
+      }
+      
+      if (get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
         resource * res = malloc(sizeof(resource));
         res->number = itemanz;
         res->type = rtype;
         res->next = reslist;
         reslist = res->next;
-			}
-		}
-	}
-	if (reslist!=NULL) {
+      }
+    }
+  }
+  if (reslist!=NULL) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list", "list", reslist));
-	}
-
-	return b;
+    return false;
+  }
+  return true;
 }
 
 /* ------------------------------------------------------------- */
