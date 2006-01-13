@@ -923,7 +923,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 {
 	int k;
 	int itemanz;
-	boolean b = true;
+  resource * reslist = NULL;
 
 	if (knowsspell(u->region, u, sp) == false) {
 		/* Diesen Zauber kennt die Einheit nicht */
@@ -962,22 +962,16 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 			}
 
 			if (get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
-				if (b == false) {
-					/* es fehlte schon eine andere Komponente, wir basteln die
-					 * Meldung weiter zusammen */
-					scat(", ");
-        } else {
-          b = false;
-          buf[0] = 0;
-        }
-				icat(itemanz);
-        scat(" ");
-        scat(LOC(u->faction->locale, resourcename(rtype, (itemanz!=1)?NMF_PLURAL:0)));
+        resource * res = malloc(sizeof(resource));
+        res->number = itemanz;
+        res->type = rtype;
+        res->next = reslist;
+        reslist = res->next;
 			}
 		}
 	}
-	if (!b) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list", "list", buf));
+	if (reslist!=NULL) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list", "list", reslist));
 	}
 
 	return b;

@@ -381,11 +381,11 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="required" type="items"/>
+      <arg name="required" type="resources"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $items($required)."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - for this, the unit needs $items($required)."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - for this, the unit needs $items($required)."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $resources($required)."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - for this, the unit needs $resources($required)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - for this, the unit needs $resources($required)."</text>
   </message>
   <message name="travelthru_trail" section="events">
     <type>
@@ -1434,10 +1434,10 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="list" type="string"/>
+      <arg name="list" type="resources"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch ${list}."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Casting this spell requires an additional ${list}."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch $resources($list)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Casting this spell requires an additional $resources($list)."</text>
   </message>
   <message name="missing_components" section="magic">
     <type>
@@ -1445,7 +1445,7 @@
       <arg name="level" type="int"/>
       <arg name="spell" type="spell"/>
     </type>
-    <text locale="de">"$unit($unit) hat nur genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern."</text>
+    <text locale="de">"$unit($unit) hat nicht genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern."</text>
     <text locale="en">"$unit($unit) has insufficient components to cast $spell($spell) on level $int($level)."</text>
   </message>
   <message name="patzer" section="magic">
