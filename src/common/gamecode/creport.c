@@ -387,7 +387,7 @@ cr_order(variant var, char * buffer, const void * userdata)
     char * wp = buffer;
     char * cmd = getcommand(ord);
     const char * rp = cmd;
-    
+
     *wp++ = '\"';
     while (*rp) {
       switch (*rp) {
@@ -400,10 +400,28 @@ cr_order(variant var, char * buffer, const void * userdata)
     }
     *wp++ = '\"';
     *wp++ = 0;
-    
+
     free(cmd);
   }
   else strcpy(buffer, "\"\"");
+  return 0;
+}
+
+static int
+cr_resources(variant var, char * buffer, const void * userdata)
+{
+  resource * rlist = (resource*)var.v;
+  char * wp = buffer;
+  if (rlist!=NULL) {
+    wp += sprintf(wp, "%d %s", rlist->number, 
+      resourcename(rlist->type, rlist->number!=1));
+    for (;;) {
+      rlist = rlist->next;
+      if (rlist==NULL) break;
+      wp += sprintf(wp, ", %d %s", rlist->number, 
+        resourcename(rlist->type, rlist->number!=1));
+    }
+  }
   return 0;
 }
 
@@ -1483,6 +1501,7 @@ creport_init(void)
   tsf_register("race", &cr_race);
   tsf_register("direction", &cr_int);
   tsf_register("alliance", &cr_alliance);
+  tsf_register("resources", &cr_resources);
 
   register_reporttype("cr", &report_computer, 1<<O_COMPUTER);
 }
