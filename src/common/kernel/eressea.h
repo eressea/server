@@ -839,13 +839,14 @@ typedef struct strlist {
 } strlist;
 
 #define FL_DH             (1<<18) /* ehemals f->dh, u->dh, r->dh, etc... */
+#define FL_MARK           (1<<23) /* für markierende algorithmen, die das 
+                                   * hinterher auch wieder löschen müssen! 
+                                   * (FL_DH muss man vorher initialisieren, 
+                                   * FL_MARK hinterher löschen) */
 
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)
 #define MAX_CONTAINER_NR (36*36*36*36-1)
-
-#define FL_MARK           (1<<23) /* für markierende algorithmen, die das hinterher auch wieder
-																		 löschen müssen! (Ist dafür nicht eigentlich FL_DH gedacht?) */
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))

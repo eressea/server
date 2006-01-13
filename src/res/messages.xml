@@ -381,11 +381,11 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="required" type="string"/>
+      <arg name="required" type="items"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit${required}."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' -$required is required to build this."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' -$required is required to build this."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $items($required)."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - for this, the unit needs $items($required)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - for this, the unit needs $items($required)."</text>
   </message>
   <message name="travelthru_trail" section="events">
     <type>

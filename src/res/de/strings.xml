@@ -6778,12 +6778,6 @@
     </string>
   </namespace>
 
-  <string name="claimable">
-    <text locale="de">Einheiten können die folgenden Gegenstände beanspruchen:
-    </text>
-    <text locale="en">Units can claim the following items: </text>
-  </string>
-
   <string name="santa2004">
     <text locale="de">'Ho ho ho!' Ein dicker Gnom fliegt auf einem von
     8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner

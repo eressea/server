@@ -71,6 +71,7 @@
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
 #include <attributes/synonym.h>
+#include <attributes/variable.h>
 
 /* util includes */
 #include <util/base36.h>
@@ -1021,49 +1022,69 @@ EnhancedQuit(void)
 }
 
 static int
-quit(unit * u, struct order * ord)
+quit_cmd(unit * u, struct order * ord)
 {
+  faction * f = u->faction;
   const char * passwd;
+
   init_tokens(ord);
   skip_token(); /* skip keyword */
 
   passwd = getstrtoken();
-  if (checkpasswd(u->faction, passwd, false)) {
+  if (checkpasswd(f, passwd, false)) {
     if (EnhancedQuit()) {
-      int f2_id = getid();
-
-      if (f2_id > 0) {
+      const char * token = getstrtoken();
+      int f2_id = atoi36(token);
+      if (f2_id>0) {
         faction *f2 = findfaction(f2_id);
-        faction * f = u->faction;
 
         if(f2 == NULL) {
           cmistake(u, ord, 66, MSG_EVENT);
-        } else if(f == f2) {
-          cmistake(u, ord, 8, MSG_EVENT);
+          return 0;
         } else if (!u->faction->alliance || u->faction->alliance != f2->alliance) {
           cmistake(u, ord, 315, MSG_EVENT);
+          return 0;
         } else if(!alliedfaction(NULL, f, f2, HELP_MONEY)) {
           cmistake(u, ord, 316, MSG_EVENT);
+          return 0;
         } else {
-          transfer_faction(f,f2);
-          destroyfaction(f);
+          set_variable(&f->attribs, "quit", token);
         }
-      } else {
-        destroyfaction(u->faction);
       }
     }
-    destroyfaction(u->faction);
-    return -1;
+    fset(f, FFL_QUIT);
   } else {
     cmistake(u, ord, 86, MSG_EVENT);
     log_warning(("STIRB mit falschem Passwort für Partei %s: %s\n",
-      factionid(u->faction), passwd));
+      factionid(f), passwd));
   }
   return 0;
 }
 
 static void
-parse_quit(void)
+quit(void)
+{
+  faction ** fptr = &factions;
+  while (*fptr) {
+    faction * f = *fptr;
+    if (f->flags & FFL_QUIT) {
+      if (EnhancedQuit()) {
+        const char * token = get_variable(f->attribs, "quit");
+        int f2_id = atoi36(token);
+        faction *f2 = findfaction(f2_id);
+
+        assert(f2_id>0);
+        assert(f2!=NULL);
+        transfer_faction(f, f2);
+      }
+      destroyfaction(f);
+    }
+    if (*fptr==f) fptr=&f->next;
+  }
+}
+
+static void
+parse_restart(void)
 {
   region *r;
   faction *f;
@@ -1075,19 +1096,16 @@ parse_quit(void)
     unit * u, * un;
     for (u = r->units; u;) {
       order * ord;
+
       un = u->next;
-      for (ord = u->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
-          case K_QUIT:
-            if (quit(u, ord)!=0) ord = NULL;
-            break;
-          case K_RESTART:
-            if (u->number > 0) {
-              if (restart_cmd(u, ord)!=0) ord = NULL;
+      for (ord = u->orders; ord!=NULL; ord = ord->next) {
+        if (get_keyword(ord) == K_RESTART) {
+          if (u->number > 0) {
+            if (restart_cmd(u, ord)!=0) {
+              break;
             }
-            break;
+          }
         }
-    if (ord==NULL) break;
       }
       u = un;
     }
@@ -2718,43 +2736,46 @@ instant_orders(void)
       freset(u, UFL_MOVED);
       for (ord = u->orders; ord; ord = ord->next) {
         switch (get_keyword(ord)) {
+        case K_QUIT:
+          quit_cmd(u, ord);
+          break;
         case K_URSPRUNG:
-          if (origin_cmd(u, ord)!=0) ord=NULL;
+          origin_cmd(u, ord);
           break;
         case K_ALLY:
-          if (ally_cmd(u, ord)!=0) ord = NULL;
+          ally_cmd(u, ord);
           break;
         case K_PREFIX:
-          if (prefix_cmd(u, ord)!=0) ord = NULL;
+          prefix_cmd(u, ord);
           break;
         case K_SYNONYM:
-          if (synonym_cmd(u, ord)!=0) ord = NULL;
+          synonym_cmd(u, ord);
           break;
         case K_SETSTEALTH:
-          if (setstealth_cmd(u, ord)!=0) ord = NULL;
+          setstealth_cmd(u, ord);
           break;
         case K_WEREWOLF:
-          if (setwere_cmd(u, ord)!=0) ord = NULL;
+          setwere_cmd(u, ord);
           break;
         case K_STATUS:
           /* KAEMPFE [ NICHT | AGGRESSIV | DEFENSIV | HINTEN | FLIEHE ] */
-          if (status_cmd(u, ord)!=0) ord = NULL;
+          status_cmd(u, ord);
           break;
         case K_COMBAT:
           /* KAMPFZAUBER [[STUFE n] "<Spruchname>"] [NICHT] */
-          if (combatspell_cmd(u, ord)!=0) ord = NULL;
+          combatspell_cmd(u, ord);
           break;
         case K_DISPLAY:
-          if (display_cmd(u, ord)!=0) ord = NULL;
+          display_cmd(u, ord);
           break;
         case K_NAME:
-          if (name_cmd(u, ord)!=0) ord = NULL;
+          name_cmd(u, ord);
           break;
         case K_GUARD:
-          if (guard_off_cmd(u, ord)!=0) ord = NULL;
+          guard_off_cmd(u, ord);
           break;
         case K_RESHOW:
-          if (reshow_cmd(u, ord)!=0) ord = NULL;
+          reshow_cmd(u, ord);
           break;
         }
       }
@@ -3966,8 +3987,9 @@ processorders (void)
   puts(" - Gebäudeunterhalt (1. Versuch)");
   maintain_buildings(false);
 
-  puts(" - Sterben");
-  parse_quit();
+  puts(" - Sterben, Neustart");
+  quit();
+  parse_restart();
 
   puts(" - Zaubern");
   magic();

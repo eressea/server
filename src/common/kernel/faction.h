@@ -33,9 +33,12 @@ typedef struct shortpwd {
 #endif
 
 /* faction flags */
-#define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
-#define FFL_NOAID         (1<<21) /* Hilfsflag Kampf */
 #define FFL_RESTART       (1<<2)
+#define FFL_QUIT          (1<<3)
+/* #define FL_DH             (1<<18) */
+#define FFL_NOAID         (1<<21) /* Hilfsflag Kampf */
+/* #define FL_MARK           (1<<23) */
+#define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
 #define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
 #define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */
 #define FFL_NOTIMEOUT     (1<<29) /* ignore MaxAge() */
