@@ -87,7 +87,7 @@ _log_warn(const char * format, ...)
   va_end(marker);
   if (logfile!=stderr) {
     if (flags & LOG_CPWARNING) {
-      fputs("\bWARNING: ", stderr);
+      fputs("WARNING: ", stderr);
       va_start(marker, format);
       vfprintf(stderr, format, marker);
       va_end(marker);
@@ -111,7 +111,7 @@ _log_error(const char * format, ...)
   va_end(marker);
   if (logfile!=stderr) {
     if (flags & LOG_CPERROR) {
-      fputs("\bERROR: ", stderr);
+      fputs("ERROR: ", stderr);
       va_start(marker, format);
       vfprintf(stderr, format, marker);
       va_end(marker);
@@ -133,7 +133,7 @@ _log_info(unsigned int flag, const char * format, ...)
   va_end(marker);
   if (logfile!=stderr) {
     if (flags & flag) {
-      fprintf(stderr, "\bINFO[%u]: ", flag);
+      fprintf(stderr, "INFO[%u]: ", flag);
       va_start(marker, format);
       vfprintf(stderr, format, marker);
       va_end(marker);
