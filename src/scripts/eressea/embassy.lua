@@ -1,10 +1,11 @@
 function use_seashell(u, amount)
 -- Muschelplateau...
+  local r = get_region(165,30)
   local visit = u.faction.objects:get("embassy_muschel")
-  if visit~=nil then
+  if visit~=nil and u.region~= r then
     local turns = get_turn() - visit
     local msg = message("msg_event")
-    msg:set_string("string", tostring(u) .. " erzählt den Bewohnern von " .. r.name .. " von Muschelplateau, das seine Partei vor " .. turns .. " Wochen besucht hat." )
+    msg:set_string("string", u.name .. "(" .. itoa36(u.id) .. ") erzählt den Bewohnern von " .. u.region.name .. " von Muschelplateau, das die Partei " .. u.faction.name .. " vor " .. turns .. " Wochen besucht hat." )
     msg:send_region(u.region)
     return 0
   end
