@@ -368,6 +368,18 @@
 			Name="XML files"
 			Filter="">
 			<File
+				RelativePath="..\res\buildings.xml">
+			</File>
+			<File
+				RelativePath="..\res\messages.xml">
+			</File>
+			<File
+				RelativePath="..\res\races.xml">
+			</File>
+			<File
+				RelativePath="..\res\resources.xml">
+			</File>
+			<File
 				RelativePath="..\res\de\strings.xml">
 			</File>
 			<File

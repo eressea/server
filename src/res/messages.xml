@@ -5291,7 +5291,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann diese Runde keinen langen Befehl mehr ausführen."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren langen Befehle ausführen."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is exhausted from battle."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is exhausted from battle."</text>
   </message>

@@ -2395,8 +2395,7 @@ aftermath(battle * b)
   cv_foreach(s, b->sides) {
     int snumber = 0;
     fighter *df;
-    boolean relevant = false; /* Kampf relevant für dieses Heer? */
-    boolean active_army = false; /* anyone in this army done much? */
+    boolean relevant = false; /* Kampf relevant für diese Partei? */
     if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
       relevant = true;
     }
@@ -2407,17 +2406,20 @@ aftermath(battle * b)
       int dead = du->number - df->alive - df->run.number;
       int sum_hp = 0;
       int n;
-      boolean involved = relevant && df->action_counter >= du->number;
-      snumber += du->number;
 
-      if (involved) {
-        ship * sh = du->ship?du->ship:leftship(du);
-        if (sh) fset(sh, SF_DAMAGED);
-        fset(du, UFL_LONGACTION);
+      snumber += du->number;
+      if (relevant) {
+        fset(du, UFL_MOVED); /* unit cannot move this round */
+        if (df->action_counter >= du->number) {
+          ship * sh = du->ship?du->ship:leftship(du);
+          if (sh) fset(sh, SF_DAMAGED);
+          fset(du, UFL_LONGACTION);
+        }
       }
       for (n = 0; n != df->alive; ++n) {
-        if (df->person[n].hp > 0)
+        if (df->person[n].hp > 0) {
           sum_hp += df->person[n].hp;
+        }
       }
 
       if (df->alive == du->number) {
@@ -2432,7 +2434,7 @@ aftermath(battle * b)
           /* Zuerst dürfen die Feinde plündern, die mitgenommenen Items
           * stehen in fig->run.items. Dann werden die Fliehenden auf
           * die leere (tote) alte Einheit gemapt */
-          if (fval(df,FIG_NOLOOT)){
+          if (fval(df, FIG_NOLOOT)){
             merge_fleeloot(df, du);
           } else {
             loot_items(df);

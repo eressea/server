@@ -2409,13 +2409,18 @@ movement(void)
         switch (kword) {
         case K_ROUTE:
         case K_MOVE:
-          if (attacked(u)) {
+          /* after moving, the unit has no thisorder. this prevents
+           * it from moving twice (or getting error messages twice).
+           * UFL_MOVED is set in combat if the unit is not allowed
+           * to move because it was involved in a battle.
+           */
+          if (fval(u, UFL_LONGACTION) || fval(u, UFL_MOVED)) {
             cmistake(u, u->thisorder, 52, MSG_MOVE);
             set_order(&u->thisorder, NULL);
           } else if (!can_move(u)) {
             cmistake(u, u->thisorder, 55, MSG_MOVE);
             set_order(&u->thisorder, NULL);
-          } else {
+          } else if (!fval(u, UFL_MOVED)) {
             if (ships) {
               if (u->ship && fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
