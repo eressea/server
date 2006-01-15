@@ -101,6 +101,8 @@
 
 /* stdc++ includes */
 #include <stdexcept>
+#include <string>
+#include <sstream>
 
 /* libc includes */
 #include <cstdio>
@@ -601,20 +603,7 @@ read_args(int argc, char **argv, lua_State * luaState)
   return 0;
 }
 
-#ifdef BETA_CODE
-extern int xml_writeitems(const char * filename);
-extern int xml_writeships(void);
-extern int xml_writebuildings(void);
-#endif
-
-typedef struct lostdata {
-  int x, y;
-  int prevunit;
-  int building;
-  int ship;
-} lostdata;
-
-static void
+static int
 my_lua_error(lua_State * L)
 {
   const char* error = lua_tostring(L, -1);
@@ -622,6 +611,7 @@ my_lua_error(lua_State * L)
   log_error(("A LUA error occured: %s\n", error));
   lua_pop(L, 1);
   std::terminate();
+  return 1;
 }
 
 int
@@ -668,6 +658,7 @@ main(int argc, char *argv[])
     else strcpy(buf, luafile);
 #ifdef LUABIND_NO_EXCEPTIONS
     luabind::set_error_callback(my_lua_error);
+    luabind::set_pcall_callback(my_lua_error);
 #else
     try {
 #endif

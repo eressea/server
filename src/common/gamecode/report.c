@@ -2909,9 +2909,9 @@ report_summary(summary * s, summary * o, boolean full)
 	}
 
 	for (f = factions; f; f = f->next) {
-		if (f->age <= 1 && turn - f->lastorders <= 1) {
-			newplayers++;
-		} else if (f->no != MONSTER_FACTION) {
+		if (fval(f, FFL_ISNEW)) {
+			++newplayers;
+    } else if (f->no != MONSTER_FACTION) {
       int nmr = turn-f->lastorders;
       if (nmr<0 || nmr>NMRTimeout()) {
         log_error(("faction %s has %d NMRS\n", factionid(f), nmr));

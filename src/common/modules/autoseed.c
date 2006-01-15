@@ -629,6 +629,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                                   nextf->lang, nextf->subscription));
       f = u->faction;
+      fset(f, FFL_ISNEW);
 			f->alliance = nextf->allies;
 			log_printf("New faction (%s), %s at %s\n", itoa36(f->no),
 								 f->email, regionname(r, NULL));

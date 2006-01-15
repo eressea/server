@@ -33,6 +33,7 @@ typedef struct shortpwd {
 #endif
 
 /* faction flags */
+#define FFL_ISNEW         (1<<1)
 #define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
 /* #define FL_DH             (1<<18) */

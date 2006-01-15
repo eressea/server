@@ -484,19 +484,6 @@ read_args(int argc, char **argv)
 	return 0;
 }
 
-#ifdef BETA_CODE
-extern int xml_writeitems(const char * filename);
-extern int xml_writeships(void);
-extern int xml_writebuildings(void);
-#endif
-
-typedef struct lostdata {
-	int x, y;
-	int prevunit;
-	int building;
-	int ship;
-} lostdata;
-
 void
 confirm_newbies(void)
 {
@@ -574,12 +561,6 @@ main(int argc, char *argv[])
 
 	kernel_init();
 	game_init();
-#if defined(BETA_CODE)
-	/* xml_writeships(); */
-	/* xml_writebuildings(); */
-	xml_writeitems("items.xml");
-	return 0;
-#endif
 
   sprintf(zText, "%d", turn);
   i = readgame(zText, false);
