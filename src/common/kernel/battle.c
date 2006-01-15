@@ -2413,17 +2413,6 @@ aftermath(battle * b)
       if (involved) {
         ship * sh = du->ship?du->ship:leftship(du);
         if (sh) fset(sh, SF_DAMAGED);
-      }
-      if (active_army || involved) {
-        if (!active_army) {
-          /* make sur to stop everyone else in this army */
-          fighter * fig;
-          cv_foreach(fig, s->fighters) {
-            if (fig==df) break;
-            fset(fig->unit, UFL_LONGACTION);
-          } cv_next(fig);
-          active_army = true;
-        }
         fset(du, UFL_LONGACTION);
       }
       for (n = 0; n != df->alive; ++n) {
