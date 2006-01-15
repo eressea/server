@@ -227,7 +227,7 @@
   <resource name="catapult">
     <item weight="4000">
       <construction skill="cartmaking" minskill="1" reqsize="1">
-        <requirement type="log" quantity="5"/>
+        <requirement type="log" quantity="10"/>
       </construction>
       <weapon bash="true" missile="true" skill="catapult" offmod="0" defmod="0" reload="5">
         <damage type="rider" value="3d10+5"/>
