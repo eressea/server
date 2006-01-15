@@ -114,6 +114,7 @@ make_new_unit(region * r)
 		y = 4;
 		wmove(win, y, 4);
 		for (i = 0; i < MAXRACES; i++) {
+      if(new_race[i] == NULL) continue;
 			sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 			q += strlen(buf);
 			if (q > SX - 20) {
@@ -125,29 +126,32 @@ make_new_unit(region * r)
 		}
 		q = map_input(win, 2, 3, "Rasse", 0, MAXRACES-1, old_race(f->race));
 
-		u = createunit(r, f, anz, new_race[q]);
-		if (p==0)
-			u->age = (short)map_input(win, 2, 4, "Alter", 1, 99, 1);
-		else
-			u->age = 0;
-		for (; y > 3; y--) {
-			wmove(win, y, 4);
-			wclrtoeol(win);
-			wrefresh(win);
-			wmove(win, y, win->_maxx);
-			waddch(win, '|');
-			wrefresh(win);
-		}
-
-		buf[0] = 0;
-		strcpy(buf, my_input(win, 2, 4, "Name: ", NULL));
-		if (buf[0])
-			set_string(&u->name, buf);
-		if (!strlen(u->name))
-			set_string(&u->name, buf);
-		set_money(u, map_input(win, 2, 5, "Silber", 0, 999999, anz * 10));
-	} else
-		u = NULL;
+    if(new_race[q] != NULL) {
+		  u = createunit(r, f, anz, new_race[q]);
+  		if (p==0)
+  			u->age = (short)map_input(win, 2, 4, "Alter", 1, 99, 1);
+  		else
+  			u->age = 0;
+  		for (; y > 3; y--) {
+  			wmove(win, y, 4);
+  			wclrtoeol(win);
+  			wrefresh(win);
+  			wmove(win, y, win->_maxx);
+  			waddch(win, '|');
+  			wrefresh(win);
+  		}
+  
+  		buf[0] = 0;
+  		strcpy(buf, my_input(win, 2, 4, "Name: ", NULL));
+  		if (buf[0])
+  			set_string(&u->name, buf);
+  		if (!strlen(u->name))
+  			set_string(&u->name, buf);
+  		set_money(u, map_input(win, 2, 5, "Silber", 0, 999999, anz * 10));
+  	} else
+  		u = NULL;
+  } else 
+    u = NULL;
 
 	delwin(win);
 	return u;

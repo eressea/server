@@ -20,6 +20,10 @@ end
 
 function sphinx_handler()
 
+  local function send_nohint(u, usphinx)
+    usphinx:add_order("botschaft einheit " .. itoa36(u.id) .. " \"Lass mich noch etwas ueber ein neues Raetsel nachdenken!\"")
+  end
+
   local function send_gotHint(u, usphinx)
     usphinx:add_order("botschaft einheit " .. itoa36(u.id) .. " \"Du hast diese Woche bereits einen Hinweis erhalten!\"")
   end
@@ -54,40 +58,8 @@ function sphinx_handler()
   end
 
   local function msg_handler(u, evt)
-    str = evt:get_string(0)
     u2 = evt:get_unit(1)
-    if string.lower(str) == "hinweis" then
-      if u2.faction:get_variable("sphinxGotHint"..itoa36(u.id)) ~= nil then
-        send_gotHint(u2)
-      else
-        send_hint(u2, u)
-      end
-    end  
-    tokens = {}
-    for token in string.gfind(str, "%a+") do
-      table.insert(tokens, token)
-    end
-    -- index starts with 1 in lua
-    if table.getn(tokens) == 2 and string.lower(tokens[1]) == "antwort" then
-      if string.lower(tokens[2]) == "insekt" then
-        -- Botschaft in alle Regionen
-        local m = message("msg_event")
-        m:set_string("string", "Das Rätsel der Sphinx ist gelöst! Die Sphinx wird sich eine neue Heimat und ein neues Rätsel suchen.")
-        for r in regions() do
-          m:send_region(r)
-        end
-        -- Region terraformen
-        terraform(u2.region.x, u.region.y, "plain")
-        u2.region.set_resource(u2.region, "tree", 721)
-        u2.region.set_resource(u2.region, "peasant", 2312)
-        u2.add_item(u2, "trappedairelemental", 5)
-        -- Neues Raetsel fuer beide Sphinxe!
-        -- Sphinx neu platzieren
-        -- Hint-Attribute von allen Allianzen loeschen
-      else
-
-      end
-    end
+    send_nohint(u2, u)
   end
   
   local f = get_faction(atoi36("ycx9"))
@@ -104,24 +76,24 @@ function sphinx_handler()
 end
 
 function sphinx_weekly()
-  local f = get_faction(atoi36("ycx9"))
-  local u = get_unit(atoi36("si7z"))
-  if u ~= nil and u.faction == f then
-    u.region:add_notice("Eine Botschaft von Sphinx (si7z): Mit einer Botschaft \"Hinweis\" gebe ich euch einen Hinweis, mit einer Botschaft \"Antwort <Eure Antwort>\" könnt ihr mir eure Antwort mitteilen. Doch Vorsicht, falsche Antworten werde ich bestrafen!")
-    u.region:add_notice("Eine Botschaft von Sphinx (si7z): Fünf Krieger kamen auf ihren Schiffen in die Ebene der Helden, wollten um die Ehre ringen. Jedes Schiff trug ein anderes Segel, auf dem das Wappen des Kriegers prankte. Ein jeder trug seine liebste Waffe und das Signum seines Volkes und doch war keiner gleich.")
-    u.region:add_notice("Eine Botschaft von Sphinx (si7z): Wer hat den Schneeball?")
-  end
+  -- local f = get_faction(atoi36("ycx9"))
+  -- local u = get_unit(atoi36("si7z"))
+  -- if u ~= nil and u.faction == f then
+  --   u.region:add_notice("Eine Botschaft von Sphinx (si7z): Mit einer Botschaft \"Hinweis\" gebe ich euch einen Hinweis, mit einer Botschaft \"Antwort <Eure Antwort>\" könnt ihr mir eure Antwort mitteilen. Doch Vorsicht, falsche Antworten werde ich bestrafen!")
+  --   u.region:add_notice("Eine Botschaft von Sphinx (si7z): Fünf Krieger kamen auf ihren Schiffen in die Ebene der Helden, wollten um die Ehre ringen. Jedes Schiff trug ein anderes Segel, auf dem das Wappen des Kriegers prankte. Ein jeder trug seine liebste Waffe und das Signum seines Volkes und doch war keiner gleich.")
+  --   u.region:add_notice("Eine Botschaft von Sphinx (si7z): Wer hat den Schneeball?")
+  -- end
   
-  local u = get_unit(atoi36("qcph"))
-  if u ~= nil and u.faction == f then
-    u.region:add_notice("Eine Botschaft von Sphinx (qcph): Mit einer Botschaft \"Hinweis\" gebe ich euch einen Hinweis, mit einer Botschaft \"Antwort <Eure Antwort>\" könnt ihr mir eure Antwort mitteilen. Doch Vorsicht, falsche Antworten werde ich bestrafen!")
-    u.region:add_notice("Eine Botschaft von Sphinx (qcph): Fünf Krieger  kamen auf ihren Schiffen in die Ebene der Helden, wollten um die Ehre ringen. Jedes Schiff trug ein anderes Segel, auf dem das Wappen des Kriegers prankte. Ein jeder trug seine liebste Waffe und das Signum seines Volkes und doch war keiner gleich.")
-  u.region:add_notice("Eine Botschaft von Sphinx (qcph): Wer hat den Schneeball?")
-  end
+  -- local u = get_unit(atoi36("qcph"))
+  -- if u ~= nil and u.faction == f then
+  --   u.region:add_notice("Eine Botschaft von Sphinx (qcph): Mit einer Botschaft \"Hinweis\" gebe ich euch einen Hinweis, mit einer Botschaft \"Antwort <Eure Antwort>\" könnt ihr mir eure Antwort mitteilen. Doch Vorsicht, falsche Antworten werde ich bestrafen!")
+  --   u.region:add_notice("Eine Botschaft von Sphinx (qcph): Fünf Krieger  kamen auf ihren Schiffen in die Ebene der Helden, wollten um die Ehre ringen. Jedes Schiff trug ein anderes Segel, auf dem das Wappen des Kriegers prankte. Ein jeder trug seine liebste Waffe und das Signum seines Volkes und doch war keiner gleich.")
+  -- u.region:add_notice("Eine Botschaft von Sphinx (qcph): Wer hat den Schneeball?")
+  -- end
 
-  for faction in factions() do
-    faction:delete_variable("sphinxGotHintsi7z");
-    faction:delete_variable("sphinx2GotHintqcph");
-  end
+  -- for faction in factions() do
+  --   faction:delete_variable("sphinxGotHintsi7z");
+  --   faction:delete_variable("sphinx2GotHintqcph");
+  -- end
 
 end
