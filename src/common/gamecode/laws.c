@@ -2298,7 +2298,7 @@ display_race(faction *f, unit *u, const race * rc)
   size -= rsize;
   bufp += rsize;
 
-  key = mkname("raceinfo", name);
+  key = mkname("raceinfo", rc->_name[0]);
   info = locale_string(f->locale, key);
   if (info==key || strcmp(info, key)==0) {
     info = locale_string(f->locale, mkname("raceinfo", "no_info"));
