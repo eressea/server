@@ -579,12 +579,15 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 
 	/* calculate cargo */
 	if (u && (u->faction == f || omniscient(f))) {
-    int n = 0, p = 0;
+    int n = 0, p = 0, c = shipcapacity(sh);
     getshipweight(sh, &n, &p);
-    n = (n+99) / 100; /* 1 Silber = 1 GE */
 
+    fprintf(F, "%d;cargo\n", n);
+    fprintf(F, "%d;capacity\n", c);
+
+    n = (n+99) / 100; /* 1 Silber = 1 GE */
 		fprintf(F, "%d;Ladung\n", n);
-		fprintf(F, "%d;MaxLadung\n", shipcapacity(sh) / 100);
+		fprintf(F, "%d;MaxLadung\n", c / 100);
 	}
 	/* shore */
 	w = NODIRECTION;
@@ -730,6 +733,7 @@ cr_output_unit(FILE * F, const region * r,
       fprintf(F, "%d;alias\n", -i);
     i = get_money(u);
     fprintf(F, "%d;Kampfstatus\n", u->status);
+    fprintf(F, "%d;weight\n", weight(u));
     if (fval(u, UFL_NOAID)) {
       fputs("1;unaided\n", F);
     }
