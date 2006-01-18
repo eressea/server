@@ -8,19 +8,67 @@
    -->
 
   <namespace name="iteminfo">
+    <string name="aoh">
+      <text locale="de">
+        Diese Amulett ist ein hervorragender Fokus für alle Heilzauber. Ein
+        mit diesem Fokus gewirkter Heilzauber wird mit größerer
+        Warscheinlichkeit Erfolgreich sein und doppelt so viele Leute heilen
+        können.
+      </text>
+    </string>
+    <string name="unicorn">
+      <text locale="de">
+        Dieses mystische Wesen lebt bevorzugt in den tiefsten Wäldern und
+        vermag sich hervorragend vor den Augen anderer zu verbergen. Nur
+        selten schließt sich ein Einhorn einem Magier an, jedoch wenn das
+        geschieht ist es ein mächtiger Verbündeter, der auch über eigene Magie
+        verfügt.
+      </text>
+    </string>
+    <string name="elvenhorse">
+      <text locale="de">
+        Ein Elfenpferd wird sich nur den wenigsten jemals anschließen. Hat es
+        jedoch seine Scheu überwunden ist es ein sehr wertvoller Gefährte. Ein
+        Elfenpferd ist schneller als ein Pferd. Zudem hilft es seinem Reiter
+        im Kampf und unterstützt ihn mit seiner Magie. Es sind schwarze
+        Elfenpferde bekannt, die sich sogar Orks angeschlossen haben.
+      </text>
+    </string>
+    <string name="runesword">
+      <text locale="de">
+        Die rötlich glühende Klinge dieser furchterregenden magischen Waffe
+        ist mit dunklen Runen bedeckt. Nur die erfahrendsten Schwertkämpfer
+        vermögen ihre Kraft zu zähmen, doch in ihrer Hand vermag dem
+        Runenschwert nichts zu widerstehen - selbst magische Rüstungen
+        durchdringt es ohne Schwierigkeiten - und den Geist des Kämpfers füllt
+        es mit unterschütterlicher Zuversicht.
+      </text>
+    </string>
+    <string name="dreameye">
+      <text locale="en">
+        This enchanted dragon-eye has to be eaten by the leader of your forces
+        on the eve before battle. During the night he gains insight into the
+        dreams of the enemy leaders and may potentially glean a decisive
+        advantage.
+      </text>
+      <text locale="de">
+        Dieses verzauberte Drachenauge muß vor dem Abend einer Schlacht vom
+        Heerführer verzehrt werden. Während der Nacht wird er dann Einblick in
+        die Träume der feindlichen Heerführer erhalten und so möglicherweise
+        einen entscheidenden Vorteil im kommenden Gefecht erlangen.
+      </text>
+    </string>
     <string name="trollbelt">
       <text locale="en">
         This artifact grants its wearer the strength of a cavetroll. He will
-        be
-        able to carry fifty times as much as normal and also in combat his
+        be able to carry fifty times as much as normal and also in combat his
         enhanced strength and tough troll skin will serve him well.
       </text>
       <text locale="de">
         Dieses magische Artefakt verleiht seinem Träger die Stärke eines
         ausgewachsenen Höhlentrolls. Seine Tragkraft erhöht sich auf das
-        50fache
-        und auch im Kampf werden sich die erhöhte Kraft und die trollisch zähe
-        Haut positiv auswirken.
+        50fache und auch im Kampf werden sich die erhöhte Kraft und die
+        trollisch zähe Haut positiv auswirken.
       </text>
     </string>
     <string name="antimagic">
@@ -28,8 +76,7 @@
         It may look like just another quartz, but your magician will tell you
         tha great power emenates from these crystals. Using it at the begining
         of a week will release a strong negative energy that attacks all
-        spells
-        cast in the region during that week.
+        spells cast in the region during that week.
       </text>
       <text locale="de">
         Für den ungeübten Betrachter mag der Antimagiekristall wie ein
@@ -61,23 +108,6 @@
       <text locale="de">
         Kräuter, die in diesem Beutelchen aufbewahrt werden, sind erheblich
         besser konserviert.
-      </text>
-    </string>
-    <string name="apple">
-      <text locale="en">
-        A tasty fruit.
-      </text>
-      <text locale="de">
-        Frucht aus der Gattung Malus (ca. 25 Arten), gehört zur Familie der
-        Rosengewächse. Die am häufigsten kultivierte Baumfrucht. Der Apfel
-        gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten
-        und
-        das umgebende Gewebe fleischig und eßbar werden. Die Apfelblüte der
-        meisten Varianten erfordert Kreuzbestäubung zur Befruchtung. Form und
-        Größe des Apfels bei der Ernte variieren abhängig von kulturellen und
-        umweltbedingten Einflüssen in Größe, Form, Farbe und Geschmack, sind
-        jedoch nichtsdestotrotz üblicherweise rund, zwischen 50 und 100mm im
-        Durchmesser und weisen röt- oder gelbliche Farbtöne auf.
       </text>
     </string>
     <string name="magicbag">
@@ -199,26 +229,6 @@
       Dieses magische Szepter, ein Geschenk Igjarjuks, sorgt für große
       Verwirrung und Gedächtnisverlust. Syntax: BENUTZE "Szepter der
       Tränen"
-      </text>
-    </string>
-    <string name="nut">
-      <text locale="de">
-      Nuß, im umgangssprachlichen Sinne alle trockenen, hartschaligen
-      Früchte oder Samen, die eine Schale besitzen, die sich leicht
-      vom inneren, eßbaren Kern entfernen läßt. In der botanischen
-      Terminologie beschränkt sich die Bezeichnung Nuß auf eine
-      einsamige Frucht, die aus einem Fruchtknoten (Ovarium)
-      entstanden ist, dessen äußere Wände sich verholzt haben und der
-      sich nicht öffnet, um seinen Samen zu entlassen. Solche echten
-      Nüsse können eßbar, aber auch ungenießbar sein. Bekannte
-      Beispiele sind Eicheln, Bucheckern, Kastanien und Haselnüsse.
-      Beispiele für Früchte oder Samen, die vom Volksmund fälschlich
-      als Nüsse bezeichnet werden, sind Mandeln und Walnüsse: Im
-      botanischen Sinne sind dies Steinfrüchte, denen die fleischige
-      äußere Schale entfernt wurde.  Andere Beispiele für unechte
-      Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie
-      Roßkastanien und Paranüsse, bei denen es sich um von Kapseln
-      umhüllte Samen handelt.
       </text>
     </string>
     <string name="speedsail">
@@ -494,9 +504,6 @@
   <string name="firewall">
     <text locale="de">Feuerwand</text>
   </string>
-  <string name="grassland">
-    <text locale="de">Steppe</text>
-  </string>
   <string name="volcano">
     <text locale="de">Vulkan</text>
   </string>
@@ -557,9 +564,6 @@
   </string>
   <string name="firewall_trail">
     <text locale="de">eine %s</text>
-  </string>
-  <string name="grassland_trail">
-    <text locale="de">die Steppe von %s</text>
   </string>
   <string name="volcano_trail">
     <text locale="de">der Vulkan von %s</text>
@@ -1151,12 +1155,6 @@
   <string name="firesword_p">
     <text locale="de">Flammenschwerter</text>
   </string>
-  <string name="shieldstone">
-    <text locale="de">Schildstein</text>
-  </string>
-  <string name="shieldstone_p">
-    <text locale="de">Schildsteine</text>
-  </string>
   <string name="greatsword">
     <text locale="de">Bihänder</text>
   </string>
@@ -1290,18 +1288,6 @@
   </string>
   <string name="amulet_p">
     <text locale="de">Amulette</text>
-  </string>
-  <string name="ao_daemon">
-    <text locale="de">Auge des Dämon</text>
-  </string>
-  <string name="ao_daemon_p">
-    <text locale="de">Augen des Dämon</text>
-  </string>
-  <string name="griphonwing">
-    <text locale="de">Schwinge des Greifen</text>
-  </string>
-  <string name="griphonwing_p">
-    <text locale="de">Schwingen des Greifen</text>
   </string>
   <string name="ao_chastity">
     <text locale="de">Amulett der Keuschheit</text>
@@ -4490,8 +4476,10 @@
   <namespace name="spellinfo">
     <string name="create_chastitybelt">
       <text locale="de">Dieses Amulett in Gestalt einer orkischen Matrone
-      unterdrückt den Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig.
-      Ein Ork  mit Amulett der Keuschheit wird sich nicht mehr vermehren.</text>
+      unterdrückt den Fortpflanzungstrieb eines einzelnen Orks sehr
+      zuverlässig.
+      Ein Ork  mit Amulett der Keuschheit wird sich nicht mehr vermehren.</
+      text>
     </string>
     <string name="break_curse">
       <text locale="de">Dieser Zauber ermöglicht dem Magier, gezielt eine
@@ -4501,8 +4489,10 @@
       enchantment from a unit, ship, bulding or region. </text>
     </string>
     <string name="eternal_walls">
-      <text locale="de">Mit dieser Formel bindet der Magier auf ewig die Kräfte
-      der Erde in die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude
+      <text locale="de">Mit dieser Formel bindet der Magier auf ewig die
+      Kräfte
+      der Erde in die Mauern des Gebäudes. Ein solchermaßen verzaubertes
+      Gebäude
       ist  gegen den Zahn der Zeit geschützt und benötigt keinen Unterhalt
       mehr.</text>
       <text locale="en">With this spell, the magician binds the power of the
@@ -4514,39 +4504,46 @@
       kann mit Hilfe dieses Zaubers andere Einheiten zu sich holen. Der Magier
       kann  (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist
       der  Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu
-      zaubern,  kann er andere Einheiten auch gegen ihren Willen auf die andere
+      zaubern,  kann er andere Einheiten auch gegen ihren Willen auf die
+      andere
       Ebene  zwingen.</text>
-      <text locale="en">A magician in the astral plane can summon units from the
+      <text locale="en">A magician in the astral plane can summon units from
+      the
       material world. The magician can bring (level-3)*15 GE through the
       temporary portal. If he is experienced enough to cast the spell at at
       least level 13, he can even summon units against their will. </text>
     </string>
     <string name="fetch_astral">
       <text locale="de">Ein Magier, welcher sich in der materiellen Welt
-      befindet, kann er mit Hilfe dieses Zaubers Einheiten aus der angrenzenden
+      befindet, kann er mit Hilfe dieses Zaubers Einheiten aus der
+      angrenzenden
       Astralwelt herbeiholen. Ist der Magier erfahren genug, den Zauber auf
       Stufen von 13 oder mehr zu zaubern, kann er andere Einheiten auch gegen
       ihren Willen in die materielle  Welt zwingen.</text>
       <text locale="en">A magician in the material world can summon units from
-      the adjacent part of the astral plane. If he is experienced enough to cast
+      the adjacent part of the astral plane. If he is experienced enough to
+      cast
       the spell at at least level 13, he can even summon units against their
       will. </text>
     </string>
     <string name="steal_aura">
       <text locale="de">Mit Hilfe dieses Zaubers kann der Magier einem anderen
-      Magier seine Aura gegen dessen Willen entziehen und sich selber zuführen.
+      Magier seine Aura gegen dessen Willen entziehen und sich selber
+      zuführen.
       </text>
       <text locale="en">Aided by this spell, a magician can steal another
       magician's aura against his will.</text>
     </string>
     <string name="airship">
-      <text locale="de">Diese magischen Runen bringen ein Boot oder Langboot für
+      <text locale="de">Diese magischen Runen bringen ein Boot oder Langboot
+      für
       eine Woche zum fliegen. Damit kann dann auch Land überquert werden. Die
       Zuladung  von Langbooten ist unter der Einwirkung dieses Zaubers auf 100
       Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle
       Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.
       </text>
-      <text locale="en">These magic runes allow a boat or longboat to fly for a
+      <text locale="en">These magic runes allow a boat or longboat to fly for
+      a
       week. The boat can only carry 100 weight units. The enchanted ink's
       components include a windbag and a snowcrystal petal.</text>
     </string>
@@ -4560,14 +4557,18 @@
       are briefly unable to attack.</text>
     </string>
     <string name="antimagiczone">
-      <text locale="de">Mit diesem Zauber kann der Magier eine Zone der astralen
-      Schwächung erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses
-      Zone wird bestrebt sein, wieder in den Gleichgewichtszustand  zu gelangen.
+      <text locale="de">Mit diesem Zauber kann der Magier eine Zone der
+      astralen
+      Schwächung erzeugen, ein lokales Ungleichgewicht im Astralen Feld.
+      Dieses
+      Zone wird bestrebt sein, wieder in den Gleichgewichtszustand  zu
+      gelangen.
       Dazu wird sie jedem in dieser Region gesprochenen  Zauber einen Teil
       seiner Stärke entziehen, die schwächeren gar  ganz absorbieren.</text>
       <text locale="en">This spell allows a magician to create a local
       instability in the astral field. This zone needs to return to its
-      equilibrium, soaking up part of the power of all spells cast in the region
+      equilibrium, soaking up part of the power of all spells cast in the
+      region
       - or even all of some of the weaker ones. </text>
     </string>
     <string name="destroy_magic">
@@ -4578,21 +4579,28 @@
       building or region.</text>
     </string>
     <string name="resist_magic">
-      <text locale="de">Dieser Zauber verstärkt die natürliche Widerstandskraft
-      gegen Magie. Eine so geschützte Einheit ist auch gegen Kampfmagie weniger
-      empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen zu
+      <text locale="de">Dieser Zauber verstärkt die natürliche
+      Widerstandskraft
+      gegen Magie. Eine so geschützte Einheit ist auch gegen Kampfmagie
+      weniger
+      empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen
+      zu
       schützen.</text>
-      <text locale="en">This spell enhances natural magic resistence. Protected
-      units are less vulnerable to battle magic. The spell protects 5 people per
+      <text locale="en">This spell enhances natural magic resistence.
+      Protected
+      units are less vulnerable to battle magic. The spell protects 5 people
+      per
       level.</text>
     </string>
     <string name="enterastral">
-      <text locale="de">Alte arkane Formeln ermöglichen es dem Magier, sich und
+      <text locale="de">Alte arkane Formeln ermöglichen es dem Magier, sich
+      und
       andere in die astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE
       durch das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren
       genug, den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere
       Einheiten auch gegen ihren Willen auf die andere Ebene zwingen. </text>
-      <text locale="en">Ancient arcane formulae permit the magician to transport
+      <text locale="en">Ancient arcane formulae permit the magician to
+      transport
       himself or other units into the astral plane. The magician can transport
       (level-3) * 15 GE through the transient portal. If the magician is
       experienced enough to cast level 11 spells, he can also transport units
@@ -4602,13 +4610,16 @@
       <text locale="de">Der Magier konzentriert sich auf die Struktur der
       Realität und kann so die astrale Ebene verlassen. Er kann insgesamt
       (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der
-      Magier erfahren genug, den Zauber auf Stufen von 11 oder mehr zu zaubern,
+      Magier erfahren genug, den Zauber auf Stufen von 11 oder mehr zu
+      zaubern,
       kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene
       zwingen.</text>
       <text locale="en">By concentrating on the structure of reality, the
-      magician can breach it and thus briefly make a gateway to leave the astral
+      magician can breach it and thus briefly make a gateway to leave the
+      astral
       plane. He can transport up to (level-3)*15 GE through the portal. If the
-      magician is able to cast at at least level 11, he can even transport other
+      magician is able to cast at at least level 11, he can even transport
+      other
       units against their will.</text>
     </string>
     <string name="analyze_magic">
@@ -5153,23 +5164,29 @@
     <string name="create_runesword">
       <text locale="de">Mit diesem Spruch erzeugt man ein Runenschwert. Die
       Klinge des schwarzen  Schwertes ist mit alten, magischen Runen verziert,
-      und ein seltsames  Eigenleben erfüllt die warme Klinge. Um es zu benutzen,
-      muss man  ein Schwertkämpfer von beachtlichem Talent (7) sein.  Der Träger
+      und ein seltsames  Eigenleben erfüllt die warme Klinge. Um es zu
+      benutzen,
+      muss man  ein Schwertkämpfer von beachtlichem Talent (7) sein.  Der
+      Träger
       des Runenschwertes erhält einen Talentbonus von +4 im Kampf und wird so
       gut wie immun gegen alle Formen von Magie.</text>
-      <text locale="en">This spell creates a magical sword. It requires a skill
+      <text locale="en">This spell creates a magical sword. It requires a
+      skill
       of at least 7, but adds +4 to the combat skill of its' owner as well as
       making them almost immune against magical attacks.</text>
     </string>
     <string name="create_bagofholding">
-      <text locale="de">Dieser Beutel umschließt eine kleine Dimensionsfalte, in
+      <text locale="de">Dieser Beutel umschließt eine kleine Dimensionsfalte,
+      in
       der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass
       sie auf das Traggewicht angerechnet werden.  Pferde und andere Lebewesen
       sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem
       Beutel transportiert werden. Auch ist es nicht möglich, einen
-      Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt 1
+      Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt
+      1
       GE.</text>
-      <text locale="en">This bag encloses a dimensional rift in which up to 200
+      <text locale="en">This bag encloses a dimensional rift in which up to
+      200
       units of weight can be carries. Horses and other large objects cannot be
       put into the bag. The bag itself has a weight of 1.</text>
     </string>
@@ -5178,7 +5195,8 @@
       Ein Ring der Macht erhöht die Stärke jedes Zaubers, den sein Träger
       zaubert, als wäre der Magier eine Stufe besser.
       </text>
-      <text locale="en">A ring of power adds +1 to the power of each spell cast
+      <text locale="en">A ring of power adds +1 to the power of each spell
+      cast
       by its' wearer.</text>
     </string>
     <string name="create_aots">
@@ -5202,11 +5220,13 @@
       <text locale="de">Mit Hilfe dieses Zauber entzieht der Magier einem
       Quarzkristall all seine magischen Energien. Der Kristall wird dann, wenn
       er zu feinem Staub zermahlen und verteilt wird, die beim Zaubern
-      freigesetzten magischen Energien aufsaugen und alle Zauber, welche in der
+      freigesetzten magischen Energien aufsaugen und alle Zauber, welche in
+      der
       betreffenden Woche in der Region gezaubert werden fehlschlagen lassen.
       </text>
       <text locale="en">This spell creates a portable crystal of antimagic
-      which can be used by anybody to reduce or even eliminate the power of all
+      which can be used by anybody to reduce or even eliminate the power of
+      all
       spells cast in the region during the same week.
       </text>
     </string>
@@ -5221,7 +5241,8 @@
       berüchtigt). Handwerker können somit das zehnfache produzieren,
       und bei einigen anderen Tätigkeiten könnte dies ebenfalls von Nutzen
       sein.</text>
-      <text locale="en">The famous bard Mirim was known for exceptionally limber
+      <text locale="en">The famous bard Mirim was known for exceptionally
+      limber
       play of the harp. Her spell, which is easy to ban into a little silver
       ring, increases the wearer's dexterity by a factor of ten, which is siad
       to be useful to both craftsmen and shady natures.</text>
@@ -6843,6 +6864,12 @@
   </string>
 
 </strings>
+
+
+
+
+
+
 
 
 

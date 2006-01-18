@@ -10,11 +10,203 @@
       <text locale="en">snowmen</text>
     </string>
   </namespace>
+  <namespace name="shipinfo">
+    <!-- ship info is not implemented! -->
+    <string name="no_info">
+      <text locale="de">
+        Keine Informationen über diesen Schiffstyp verfügbar.
+      </text>
+      <text locale="en">
+        No Information available for this type of ship.
+      </text>
+    </string>
+    <string name="balloon">
+      <text locale="de">
+        Der Sumpfgasballon besteht aus einem großen Weidenkorb, welcher Platz
+        für maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer
+        großen, mit Sumpfgas gefüllten Wyrmblase. Bei guten Winden kann sich
+        der Ballon zwei Regionen pro Woche fortbewegen. Das Führen eines
+        Ballons ist nicht einfach, und der Kapitän muss mindestens ein
+        Segeltalent von 6 besitzen. Diese neue Entwicklung auf Eressea wird
+        ausschließlich für den Xontormia-Expreß hergestellt und die Baupläne
+        sind streng geheim. So ist es auch bisher noch niemandem gelungen, ein
+        Exemplar nachzubauen.
+      </text>
+    </string>
+  </namespace>
+  <namespace name="raceinfo">
+    <string name="no_info">
+      <text locale="de">Keine Informationen über diese Rasse verfügbar.</text>
+      <text locale="en">No Information available for this race.</text>
+    </string>
+    <string name="eagle">
+      <text locale="de">
+        Der Adler ist ein ausgezeichneter Späher, fliegend überquert er sogar
+        kurze Meerengen, doch ist er hoch oben am Himmel auch sehr exponiert,
+        was ihn beim Rasten zu einem leichten Ziel macht (Schaden: 2d3,
+        Angriff 6, Verteidigung 2, 15 Trefferpunkte).
+      </text>
+    </string>
+    <string name="lynx">
+      <text locale="de">
+        Der Luchs ist bekannt für seine Geschicklichkeit im Verbergen und
+        Beobachten. Mit ein wenig Geduld kann er zu einem hervorragenden
+        Späher ausgebildet werden. Im Kampf verteidigt er sich mit seinen
+        scharfen Krallen und weiß seine Gewandheit zu nutzen (Schaden: 2d3,
+        Angriff 4, Verteidigung 5, 20 Trefferpunkte).
+      </text>
+    </string>
+    <string name="direwolf">
+      <text locale="de">
+        Diese großen Wölfe sind nicht alle so wild und böse wie in den
+        Legenden berichtet, und einige von ihnen schließen sich auch guten
+        Magiern bereitwillig an und sind ihnen dann treue Gefährten. (3
+        Angriffe, Schaden: 2d6, 1d4, 1d4, Angriff 6, Verteidigung 3, 25
+        Trefferpunkte).
+      </text>
+    </string>
+    <string name="tunnelworm">
+      <text locale="de">
+        Diese aus den Tiefen Eresseas stammende gigantische Geschöpf ist dem
+        Leben im Untergrund hervorragend angepasst. Blind, taub und nicht
+        besonders intelligent, aber mit seinen gewaltigen Kräften kann es
+        ganze Berge versetzen oder Wälder roden. (Schaden: 3d20, Angriff 6,
+        Verteidigung 1, Rüstung 6, 300 Trefferpunkte).
+      </text>
+    </string>
+  </namesapce>
   <namespace name="iteminfo">
+    <string name="no_info">
+      <text locale="de">Keine Informationen.</text>
+      <text locale="en">No Information available.</text>
+    </string>
+    <string name="griphonwing">
+      <text locale="de">
+        Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die
+        'Ebene der Herausforderung' seit Urzeiten als verschollen, ja man
+        zweifelte seine Existenz an. Die Sage überliefert, das derjenige, der
+        sie auf der Spitze des Turmes seiner Gesinnung benutzt, als einziger
+        die 'Ebene der Herausforderungen' verlassen kann.
+      </text>
+    </string>
+    <string name="ao_daemon">
+      <text locale="de">
+        So wisse denn, dass das Auge des Drachen den Weg zur Herausforderung
+        aufzeigt. Doch die Überlieferung sagt, das nur der Unschuldige und
+        Ungewappnete es benutzen kann. Sie sagt auch, daß er einen Beutel mit
+        einem Betrag von bis zu zweitausend Silber mit sich führen soll,
+        jedoch nicht mehr als einem Fünftel der Stärke seines Volkes
+        entsprechend - dem Torwächter zum Geschenke als Beweis seiner
+        asketischen Gesinnung. Die 5 scheidet ganz aus.
+      </text>
+    </string>
+    <string name="cookie">
+      <text locale="de">
+        Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e
+      </text>
+    </string>
+    <string name="eyeofdragon">
+      <text locale="de">
+        So wisse denn, dass das Auge des Drachen den Weg zur Herausforderung
+        aufzeigt. Doch die Überlieferung sagt, das nur der Unschuldige und
+        Ungewappnete es benutzen kann. Sie sagt auch, daß er einen Beutel mit
+        einem Betrag von bis zu zweitausend Silber mit sich führen soll,
+        jedoch nicht mehr als einem Fünftel der Stärke seines Volkes
+        entsprechend - dem Torwächter zum Geschenke als Beweis seiner
+        asketischen Gesinnung. Die 5 scheidet ganz aus.
+      </text>
+    </string>
+    <string name="almond">
+      <text locale="de">
+        (Prunus dulcis) [...] Die Nüsse existieren in zwei Varianten, süß und
+        bitter. Süße Mandeln sind der bekannte eßbare Typ, der in Form von
+        Nüssen gegessen, beim Kochen verwandt oder zu Mandelöl und Mandelmehl
+        verarbeitet wird.
+      </text>
+    </string>
+    <string name="apple">
+      <text locale="en">
+        A tasty fruit.
+      </text>
+      <text locale="de">
+        Frucht aus der Gattung Malus (ca. 25 Arten), gehört zur Familie der
+        Rosengewächse. Die am häufigsten kultivierte Baumfrucht. Der Apfel
+        gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten
+        und
+        das umgebende Gewebe fleischig und eßbar werden. Die Apfelblüte der
+        meisten Varianten erfordert Kreuzbestäubung zur Befruchtung. Form und
+        Größe des Apfels bei der Ernte variieren abhängig von kulturellen und
+        umweltbedingten Einflüssen in Größe, Form, Farbe und Geschmack, sind
+        jedoch nichtsdestotrotz üblicherweise rund, zwischen 50 und 100mm im
+        Durchmesser und weisen röt- oder gelbliche Farbtöne auf.
+      </text>
+    </string>
+    <string name="nut">
+      <text locale="de">
+        Nuß, im umgangssprachlichen Sinne alle trockenen, hartschaligen
+        Früchte oder Samen, die eine Schale besitzen, die sich leicht
+        vom inneren, eßbaren Kern entfernen läßt. In der botanischen
+        Terminologie beschränkt sich die Bezeichnung Nuß auf eine
+        einsamige Frucht, die aus einem Fruchtknoten (Ovarium)
+        entstanden ist, dessen äußere Wände sich verholzt haben und der
+        sich nicht öffnet, um seinen Samen zu entlassen. Solche echten
+        Nüsse können eßbar, aber auch ungenießbar sein. Bekannte
+        Beispiele sind Eicheln, Bucheckern, Kastanien und Haselnüsse.
+        Beispiele für Früchte oder Samen, die vom Volksmund fälschlich
+        als Nüsse bezeichnet werden, sind Mandeln und Walnüsse: Im
+        botanischen Sinne sind dies Steinfrüchte, denen die fleischige
+        äußere Schale entfernt wurde.  Andere Beispiele für unechte
+        Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie
+        Roßkastanien und Paranüsse, bei denen es sich um von Kapseln
+        umhüllte Samen handelt.
+      </text>
+    </string>
+    <string name="jadee_ring">
+      <text locale="de">
+        Zwerge schufen diesen wunderschönen Ring aus Weissgold und Platin. Die
+        Oberfläche ist so glatt, dass man nur bei genauem Hinsehen entdeckt,
+        dass hier eigentlich zwei Metalle ineinander verarbeitet worden sind.
+        In der Innenseite des Rings ist eine Gravur zu lesen: "Wildente, 3.
+        Woche Eiswind Jahr 8".
+      </text>
+    </string>
+    <string name="jadee_dress">
+      <text locale="de">
+        Dieses Brautkleid ist mit Abstand das schönste, was je jemand
+        irgendwie irgendwo gesehen hat. Auch wenn nur Wildente und Jadee das
+        finden müssten, wird jeder Bewohner Eresseas dies neidlos bestätigen.
+        Das sehr stilvolle Kleid lässt die zarten Schultern seiner Trägerin
+        frei und liegt am Oberkörper eng an. Dies betont atemberaubend die
+        zarten Kurven der Braut. Der Rock fällt leicht ausgestellt den ganzen
+        langen Weg an den Beinen herunter Richtung Boden, wo er sich in einer
+        sehr stilvollen Schleppe ergiesst.
+      </text>
+    </string>
+    <string name="wente_ring">
+      <text locale="de">
+        Dieser Ring ist ein wahres Meisterwerk. Obwohl er sehr gross ist
+        (weil auch sein Träger sehr gross ist), wirkt er filigran. Weissgold
+        und Platin verschmelzen in diesem Ring zu einer Einheit, die die
+        Schönheit der einzelnen Elemente nur noch unterstreich. In der
+        Innenseite des Rings ist eine Gravur zu lesen: 'Jadee, 3. Woche
+        Eiswind Jahr 8'.
+      </text>
+    </string>
+    <string name="wente_dress">
+      <text locale="de">
+        Hach! Sieht der Mann beeindruckend aus in diesem Frack! Und so
+        ordentlich! Und so ernst! Und so beeindruckend! Es fällt ein
+        wenig schwer, sich auf den Bräutigam zu konzentrieren, weil das
+        Brautkleid noch daneben strahlt, aber der Anzug des Bräutigams ist
+        auf jeden Fall so, wie er sein soll und sieht toll aus und sehr
+        geschmackvoll.
+      </text>
+    </string>
     <string name="snowman">
       <text locale="en">
         Orange nose, black hat, frosty character. A snowman.
-        He'll make a fine guard if you use him in a cold place. (USE 1 snowman)
+        He'll make a fine guard if you use him in a cold place. (USE 1
+        snowman)
       </text>
       <text locale="de">
         Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann. Er gibt
@@ -64,10 +256,15 @@
   </string>
 
   <string name="newbie_info_2">
-    <text locale="de">Die ersten beiden Züge mußt du abgeben, sonst wird deine Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.</text>
+    <text locale="de">Die ersten beiden Züge mußt du abgeben, sonst wird deine
+    Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.</text>
   </string>
   <string name="newbie_info_3">
-    <text locale="de">Mit der ersten Auswertung bekommst du einen Computerreport, den du mit vielen der Tools auf http://eressea-pbem.de/download.html benutzen kannst. Wenn du ihn weiterhin bekommen willst, gib einer deiner Einheiten den Befehl OPTION COMPUTER.</text>
+    <text locale="de">Mit der ersten Auswertung bekommst du einen
+    Computerreport, den du mit vielen der Tools auf
+    http://eressea-pbem.de/download.html benutzen kannst. Wenn du ihn
+    weiterhin bekommen willst, gib einer deiner Einheiten den Befehl OPTION
+    COMPUTER.</text>
   </string>
   <string name="defaultorder">
     <text locale="de">ARBEITE</text>
@@ -196,4 +393,39 @@
   </string>
   <!-- art rewards end -->
 
+  <!-- igjarjuk queste begin -->
+  <string name="ao_daemon">
+    <text locale="de">Auge des Dämon</text>
+    <text locale="en">eye of the demon</text>
+    <text locale="fr">oeil du démon</text>
+  </string>
+  <string name="ao_daemon_p">
+    <text locale="de">Augen des Dämon</text>
+    <text locale="en">eyes of the demon</text>
+    <text locale="fr">oeil du démon</text>
+  </string>
+  <string name="griphonwing">
+    <text locale="de">Schwinge des Greifen</text>
+    <text locale="en">wing of the gryphon</text>
+    <text locale="fr">aile du griffon</text>
+  </string>
+  <string name="griphonwing_p">
+    <text locale="de">Schwingen des Greifen</text>
+    <text locale="en">wings of the gryphon</text>
+    <text locale="fr">ailes du griffon</text>
+  </string>
+  <!-- igjarjuk queste end -->
+
 </strings>
+
+
+
+
+
+
+
+
+
+
+
+

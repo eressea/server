@@ -2228,14 +2228,9 @@ set_passw(void)
 static boolean
 display_item(faction *f, unit *u, const item_type * itype)
 {
-  FILE *fp;
-  char t[NAMESIZE + 1];
-  char filename[MAX_PATH];
   const char *name;
   const char *info;
   const char *key;
-  char * bufp = buf;
-  size_t size = sizeof(buf), rsize;
 
   if (u!=NULL) {
     int i = i_get(u->items, itype);
@@ -2255,38 +2250,10 @@ display_item(faction *f, unit *u, const item_type * itype)
   info = locale_string(f->locale, key);
 
   if (info==key || strcmp(info, key)==0) {
-    sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
-    fp = fopen(filename, "r");
-    if (!fp) {
-      name = locale_string(f->locale, resourcename(itype->rtype, 0));
-      sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
-      fp = fopen(filename, "r");
-    }
-    if (!fp) {
-      name = resourcename(itype->rtype, 0);
-      sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), name);
-      fp = fopen(filename, "r");
-    }
-    if (fp!=NULL) {
-      buf[0]='\0';
-      while (fgets(t, NAMESIZE, fp) != NULL) {
-        size_t len = strlen(t);
-        if (len>0 && t[len - 1] == '\n') {
-          t[len - 1] = 0;
-        }
-        rsize = strlcpy(bufp, t, size);
-        if (rsize>size) rsize = size-1;
-        size -= rsize;
-        bufp += rsize;
-      }
-      fclose(fp);
-      info = buf;
-    } else {
-      info = "Keine Informationen.";
-    }
+    info = locale_string(f->locale, mkname("iteminfo", "no_info"));
   }
   ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
-    itype->weight, itype->rtype, strdup(info)));
+    itype->weight, itype->rtype, info));
 
   return true;
 }
@@ -2317,10 +2284,7 @@ display_potion(faction *f, unit *u, const potion_type * ptype)
 static boolean
 display_race(faction *f, unit *u, const race * rc)
 {
-  FILE *fp;
-  char t[NAMESIZE + 1];
-  char filename[256];
-  const char *name;
+  const char *name, *info, *key;
   int a, at_count;
   char buf2[2048];
   char * bufp = buf;
@@ -2334,20 +2298,16 @@ display_race(faction *f, unit *u, const race * rc)
   size -= rsize;
   bufp += rsize;
 
-  sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), LOC(default_locale, name));
-  fp = fopen(filename, "r");
-  if(fp) {
-    while (fgets(t, NAMESIZE, fp) != NULL) {
-      if (t[strlen(t) - 1] == '\n') {
-        t[strlen(t) - 1] = 0;
-      }
-      rsize = strlcpy(bufp, t, size);
-      if (rsize>size) rsize = size-1;
-      size -= rsize;
-      bufp += rsize;
-    }
-    fclose(fp);
+  key = mkname("raceinfo", name);
+  info = locale_string(f->locale, key);
+  if (info==key || strcmp(info, key)==0) {
+    info = locale_string(f->locale, mkname("raceinfo", "no_info"));
   }
+
+  rsize = strlcpy(bufp, info, size);
+  if (rsize>size) rsize = size-1;
+  size -= rsize;
+  bufp += rsize;
 
   /* hp_p : Trefferpunkte */
   sprintf(buf2, " %d Trefferpunkte", rc->hitpoints);

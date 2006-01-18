@@ -115,9 +115,6 @@
   <string name="iceberg_sleep">
     <text locale="en">glacier</text>
   </string>
-  <string name="grassland">
-    <text locale="en">steppe</text>
-  </string>
   <string name="hall1">
     <text locale="en">hallway</text>
   </string>
@@ -175,9 +172,6 @@
   </string>
   <string name="glacier_trail">
     <text locale="en">the glacier of %s</text>
-  </string>
-  <string name="grassland_trail">
-    <text locale="en">the steppe of %s</text>
   </string>
   <string name="hall1_trail">
     <text locale="en">the %s</text>
@@ -441,12 +435,6 @@
   <string name="ao_chastity_p">
     <text locale="en">amulets of chastity</text>
   </string>
-  <string name="ao_daemon">
-    <text locale="en">eye of the demon</text>
-  </string>
-  <string name="ao_daemon_p">
-    <text locale="en">eye of the demon</text>
-  </string>
   <string name="aoc">
     <text locale="en">amulet of the kitten</text>
   </string>
@@ -593,12 +581,6 @@
   </string>
   <string name="greatsword_p">
     <text locale="en">claymores</text>
-  </string>
-  <string name="griphonwing">
-    <text locale="en">wing of the gryphon</text>
-  </string>
-  <string name="griphonwing_p">
-    <text locale="en">wings of the gryphon</text>
   </string>
   <string name="halberd">
     <text locale="en">halberd</text>
@@ -815,12 +797,6 @@
   </string>
   <string name="shield_p">
     <text locale="en">shields</text>
-  </string>
-  <string name="shieldstone">
-    <text locale="en">shieldstone</text>
-  </string>
-  <string name="shieldstone_p">
-    <text locale="en">shieldstones</text>
   </string>
   <string name="soc">
     <text locale="en">sack of holding</text>

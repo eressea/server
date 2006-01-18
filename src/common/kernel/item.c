@@ -12,9 +12,6 @@
  * prior permission by the authors of Eressea.
  */
 
-/* Neue items in common/items/ anlegen!
- */
-
 #include <config.h>
 #include "eressea.h"
 #include "item.h"

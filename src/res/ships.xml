@@ -40,13 +40,10 @@
     <coast terrain="highland"/>
     <coast terrain="mountain"/>
     <coast terrain="glacier"/>
-    <coast terrain="grassland"/>
     <coast terrain="volcano"/>
     <coast terrain="activevolcano"/>
     <coast terrain="iceberg_sleep"/>
     <coast terrain="iceberg"/>
-    <construction skill="shipcraft" minskill="100" maxsize="5" reqsize="1">
-    </construction>
   </ship>
 
   <ship name="boat" range="2" storm="1.00" damage="1.00" cabins="500" cargo="5000" cptskill="1" minskill="1" sumskill="2" opensea="yes">
@@ -57,7 +54,6 @@
     <coast terrain="highland"/>
     <coast terrain="mountain"/>
     <coast terrain="glacier"/>
-    <coast terrain="grassland"/>
     <coast terrain="volcano"/>
     <coast terrain="activevolcano"/>
     <coast terrain="iceberg_sleep"/>

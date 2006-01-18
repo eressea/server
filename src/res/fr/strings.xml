@@ -135,9 +135,6 @@
   <string name="glacier">
     <text locale="fr">glacier</text>
   </string>
-  <string name="grassland">
-    <text locale="fr">prairie</text>
-  </string>
   <string name="hall1">
     <text locale="fr">vestibule</text>
   </string>
@@ -195,9 +192,6 @@
   </string>
   <string name="glacier_trail">
     <text locale="fr">le glacier de %s</text>
-  </string>
-  <string name="grassland_trail">
-    <text locale="fr">la prairie de %s</text>
   </string>
   <string name="hall1_trail">
     <text locale="fr">le %s</text>
@@ -464,12 +458,6 @@
   <string name="ao_chastity_p">
     <text locale="fr">amulettes de chasteté</text>
   </string>
-  <string name="ao_daemon">
-    <text locale="fr">oeil du démon</text>
-  </string>
-  <string name="ao_daemon_p">
-    <text locale="fr">oeil du démon</text>
-  </string>
   <string name="aoc">
     <text locale="fr">amulette du chaton</text>
   </string>
@@ -616,12 +604,6 @@
   </string>
   <string name="greatsword_p">
     <text locale="fr">claymores</text>
-  </string>
-  <string name="griphonwing">
-    <text locale="fr">aile du griffon</text>
-  </string>
-  <string name="griphonwing_p">
-    <text locale="fr">ailes du griffon</text>
   </string>
   <string name="halberd">
     <text locale="fr">halebarde</text>
@@ -838,12 +820,6 @@
   </string>
   <string name="shield_p">
     <text locale="fr">boucliers</text>
-  </string>
-  <string name="shieldstone">
-    <text locale="fr">pierre de protection</text>
-  </string>
-  <string name="shieldstone_p">
-    <text locale="fr">pierres de protection</text>
   </string>
   <string name="soc">
     <text locale="fr">sac de contenance</text>
