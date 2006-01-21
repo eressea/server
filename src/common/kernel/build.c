@@ -889,7 +889,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       res->number = cons->materials[c].number / cons->reqsize;
       res->type = cons->materials[c].rtype;
       res->next = reslist;
-      reslist = res->next;
+      reslist = res;
     }
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "build_required",
       "required", reslist));

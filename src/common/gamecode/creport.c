@@ -413,7 +413,7 @@ cr_resources(variant var, char * buffer, const void * userdata)
   resource * rlist = (resource*)var.v;
   char * wp = buffer;
   if (rlist!=NULL) {
-    wp += sprintf(wp, "%d %s", rlist->number, 
+    wp += sprintf(wp, "\"%d %s", rlist->number, 
       resourcename(rlist->type, rlist->number!=1));
     for (;;) {
       rlist = rlist->next;
@@ -421,6 +421,7 @@ cr_resources(variant var, char * buffer, const void * userdata)
       wp += sprintf(wp, ", %d %s", rlist->number, 
         resourcename(rlist->type, rlist->number!=1));
     }
+    strcat(wp, "\"");
   }
   return 0;
 }
