@@ -148,13 +148,12 @@ report_xml(const char * filename, report_context * ctx)
   xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
   xmlNodePtr xmlReport = xmlNewNode(NULL, BAD_CAST "report");
   const faction_list * address;
-  region * r = firstregion(ctx->f), * rend = lastregion(ctx->f);
+  region * r = ctx->first, * rend = ctx->last;
 
   for (address=ctx->addresses;address;address=address->next) {
     xmlAddChild(xmlReport, report_faction(ctx, address->data));
   }
 
-  get_seen_interval(ctx->seen, &r, &rend);
   for (;r!=rend;r=r->next) {
     seen_region * sr = find_seen(ctx->seen, r);
     if (sr!=NULL) xmlAddChild(xmlReport, report_region(ctx, sr));

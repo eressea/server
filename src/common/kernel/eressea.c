@@ -2117,28 +2117,17 @@ lastregion (faction * f)
 
   /* it is safe to start in the region of the first unit. */
   f->last = u->region;
-#ifdef ENUM_REGIONS
   /* if regions have indices, we can skip ahead: */
   for (u=u->nextF; u!=NULL; u=u->nextF) {
     r = u->region;
     if (r->index > f->last->index) f->last = r;
   }
-#endif
+
   /* we continue from the best region and look for travelthru etc. */
 	for (r = f->last->next; r; r = r->next) {
 		plane * p = rplane(r);
 		attrib *ru;
 
-#ifndef ENUM_REGIONS
-    /* for index-regions we don't need this, we already did it earlier */
-    for (u = r->units; u; u = u->next) {
-			if (u->faction == f) {
-				f->last = r;
-				break;
-			}
-		}
-    if (f->last == r) continue;
-#endif
     /* search the region for travelthru-attributes: */
     if (fval(r, RF_TRAVELUNIT)) {
       for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
@@ -2171,34 +2160,6 @@ firstregion (faction * f)
   if (f->units==NULL) return NULL;
   if (r!=NULL) return r;
 
-#ifndef ENUM_REGIONS
-	for (r = regions; r; r = r->next) {
-		attrib *ru;
-		unit *u;
-		plane * p = rplane(r);
-		for (u = r->units; u; u = u->next) {
-			if (u->faction == f) {
-				return f->first = r;
-			}
-		}
-		if (f->first == r->next)
-			continue;
-    if (fval(r, RF_TRAVELUNIT)) {
-  		for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-	  		u = (unit*)ru->data.v;
-		  	if (u->faction == f) {
-			  	return f->first = r;
-  			}
-      }
-		}
-		if (check_leuchtturm(r, f)) {
-			return f->first = r;
-		}
-		if (p && is_watcher(p, f)) {
-			return f->first = r;
-		}
-	}
-#endif
 	return f->first = regions;
 #else
   return regions;

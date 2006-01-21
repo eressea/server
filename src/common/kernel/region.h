@@ -25,11 +25,6 @@ extern "C" {
    a hash-access each time a neighbour is needed */
 #define FAST_CONNECT
 
-/* ENUM_REGIONS: regions have an ascending number, to improve the speed of 
-   determining the interval in which a faction has its units. See the 
-   implementations of firstregion and lastregion */
-#define ENUM_REGIONS
-
 #define RF_CHAOTIC     (1<<0)
 #define RF_MALLORN     (1<<1)
 #define RF_BLOCKED     (1<<2)
@@ -91,6 +86,10 @@ typedef struct region {
   struct unit *units;
   struct ship *ships;
   struct building *buildings;
+  unsigned int index;
+  /* an ascending number, to improve the speed of determining the interval in 
+     which a faction has its units. See the implementations of firstregion 
+     and lastregion */
   short x, y;
   struct plane *planep;
   char *display;
@@ -112,9 +111,6 @@ typedef struct region {
 #endif
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS];
-#endif
-#ifdef ENUM_REGIONS
-  unsigned int index;
 #endif
 } region;
 
@@ -138,13 +134,8 @@ typedef struct {
   direction_t dir;
 } moveblock;
 
-#ifdef ENUM_REGIONS
-# define reg_hashkey(r) (r->index)
-# define coor_hashkey(x, y) (abs(x + 0x100 * y))
-#else
-# define reg_hashkey(r) (abs((r)->x + 0x100 * (r)->y))
-# define coor_hashkey(x, y) (abs(x + 0x100 * y))
-#endif
+#define reg_hashkey(r) (r->index)
+#define coor_hashkey(x, y) (abs(x + 0x100 * y))
 
 int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;

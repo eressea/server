@@ -1105,25 +1105,25 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 	return x;
 }
 
-faction_list *
-get_addresses(faction * f, struct seen_region * seehash[])
+static void
+get_addresses(report_context * ctx)
 {
 /* "TODO: travelthru" */
-  region *r, *last = lastregion(f);
+  region *r;
   const faction * lastf = NULL;
   faction_list * flist = calloc(1, sizeof(faction_list));
-  flist->data = f;
+  flist->data = ctx->f;
 
-  for (r=firstregion(f);r!=last;r=r->next) {
+  for (r=ctx->first;r!=ctx->last;r=r->next) {
     const unit * u = r->units;
-    const seen_region * sr = find_seen(seehash, r);
+    const seen_region * sr = find_seen(ctx->seen, r);
 
     if (sr==NULL) continue;
     while (u!=NULL) {
-			faction * sf = visible_faction(f, u);
-			boolean ballied = sf && sf!=f && sf!=lastf
-				&& !fval(u, UFL_PARTEITARNUNG) && cansee(f, r, u, 0);
-			if (ballied || ALLIED(f, sf)) {
+			faction * sf = visible_faction(ctx->f, u);
+			boolean ballied = sf && sf!=ctx->f && sf!=lastf
+				&& !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, 0);
+			if (ballied || ALLIED(ctx->f, sf)) {
 				faction_list ** fnew = &flist;
 				while (*fnew && (*fnew)->data->no < sf->no) {
 					fnew =&(*fnew)->next;
@@ -1140,10 +1140,10 @@ get_addresses(faction * f, struct seen_region * seehash[])
 		}
 	}
 
-  if (f->alliance != NULL) {
+  if (ctx->f->alliance != NULL) {
 		faction *f2;
 		for(f2 = factions; f2; f2 = f2->next) {
-			if(f2->alliance != NULL && f2->alliance == f->alliance) {
+			if(f2->alliance != NULL && f2->alliance == ctx->f->alliance) {
 				faction_list ** fnew = &flist;
 				while (*fnew && (*fnew)->data->no < f2->no) {
 					fnew =&(*fnew)->next;
@@ -1157,7 +1157,7 @@ get_addresses(faction * f, struct seen_region * seehash[])
 			}
 		}
 	}
-  return flist;
+  ctx->addresses = flist;
 }
 
 #define MAXSEEHASH 10007
@@ -1206,42 +1206,24 @@ find_seen(struct seen_region * seehash[], const region * r)
 	return NULL;
 }
 
-void
-get_seen_interval(struct seen_region ** seen, region ** first, region ** last)
+static void
+get_seen_interval(report_context * ctx)
 {
   /* this is required to find the neighbour regions of the ones we are in,
    * which may well be outside of [firstregion, lastregion) */
-#ifdef ENUM_REGIONS
   int i;
   for (i=0;i!=MAXSEEHASH;++i) {
-    seen_region * sr = seen[i];
+    seen_region * sr = ctx->seen[i];
     while (sr!=NULL) {
-      if (*first==NULL || sr->r->index<(*first)->index) {
-        *first = sr->r;
+      if (ctx->first==NULL || sr->r->index<ctx->first->index) {
+        ctx->first = sr->r;
       }
-      if (*last!=NULL && sr->r->index>=(*last)->index) {
-        *last = sr->r->next;
+      if (ctx->last!=NULL && sr->r->index>=ctx->last->index) {
+        ctx->last = sr->r->next;
       }
       sr = sr->nextHash;
     }
   }
-#else
-  region * r = regions;
-  while (r!=first) {
-    if (find_seen(seen, r)!=NULL) {
-      *first = r;
-      break;
-    }
-    r = r->next;
-  }
-  r = *last;
-  while (r!=NULL) {
-    if (find_seen(seen, r)!=NULL) {
-      *last = r->next;
-    }
-    r = r->next;
-  }
-#endif
 }
 
 boolean
@@ -1498,16 +1480,18 @@ int
 write_reports(faction * f, time_t ltime)
 {
   boolean gotit = false;
-  struct seen_region ** seen = prepare_report(f);
-  faction_list * addresses = get_addresses(f, seen);
   report_type * rtype = report_types;
   struct report_context ctx;
 
   ctx.f = f;
-  ctx.addresses = addresses;
   ctx.report_time	= time(NULL);
-  ctx.seen = seen;
+  ctx.seen = prepare_report(f);
+  ctx.first = firstregion(f);
+  ctx.last = lastregion(f);
+  ctx.addresses = NULL;
   ctx.userdata = NULL;
+  get_seen_interval(&ctx);
+  get_addresses(&ctx);
 
   printf("Reports für %s: ", factionname(f));
   fflush(stdout);
@@ -1529,8 +1513,8 @@ write_reports(faction * f, time_t ltime)
     log_warning(("No report for faction %s!\n", factionid(f)));
   }
 
-  freelist(addresses);
-  seen_done(seen);
+  freelist(ctx.addresses);
+  seen_done(ctx.seen);
   return 0;
 }
 

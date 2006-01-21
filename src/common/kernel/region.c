@@ -718,9 +718,8 @@ rsettrees(const region *r, int ageclass, int value)
 
 static region *last;
 
-#ifdef ENUM_REGIONS
 static unsigned int max_index = 0;
-#endif
+
 region *
 new_region(short x, short y)
 {
@@ -744,10 +743,8 @@ new_region(short x, short y)
 	else
 		addlist(&regions, r);
 	last = r;
-#ifdef ENUM_REGIONS
   assert(r->next==NULL);
   r->index = ++max_index;
-#endif
 	return r;
 }
 

@@ -84,15 +84,15 @@ extern boolean add_seen(struct seen_region * seehash[], struct region * r, unsig
 extern struct seen_region ** seen_init(void);
 extern void seen_done(struct seen_region * seehash[]);
 extern void free_seen(void);
-extern void get_seen_interval(struct seen_region ** seen, struct region ** first, struct region ** last);
 extern const char * visibility[];
 
 typedef struct report_context {
 	struct faction * f;
 	struct faction_list * addresses;
 	struct seen_region ** seen;
-	time_t report_time;
+  struct region * first, * last;
 	void * userdata;
+  time_t report_time;
 } report_context;
 
 typedef int (*report_fun)(const char * filename, report_context * ctx);
@@ -106,7 +106,6 @@ extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u,
 #endif
 
 extern const char * reportpath(void);
-extern struct faction_list * get_addresses(struct faction * f, struct seen_region * seehash[]);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 
 extern void reports_init(void);

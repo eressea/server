@@ -1085,7 +1085,6 @@ report_computer(const char * filename, report_context * ctx)
   ship *sh;
   unit *u;
   const char * mailto = locale_string(f->locale, "mailto");
-  region * first = firstregion(f), * last = lastregion(f);
   const attrib * a;
 #ifdef SCORE_MODULE
   int score = 0, avgscore = 0;
@@ -1097,7 +1096,6 @@ report_computer(const char * filename, report_context * ctx)
   }
 
   /* must call this to get all the neighbour regions */
-  get_seen_interval(ctx->seen, &first, &last);
   /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
   /* initialisations, header and lists */
 
@@ -1234,7 +1232,7 @@ report_computer(const char * filename, report_context * ctx)
 	}
 
   /* traverse all regions */
-  for (r=first;r!=last;r=r->next) {
+  for (r=ctx->first;r!=ctx->last;r=r->next) {
     int modifier = 0;
     const char * tname;
     const seen_region * sd = find_seen(ctx->seen, r);

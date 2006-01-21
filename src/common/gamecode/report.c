@@ -1902,7 +1902,6 @@ report_plaintext(const char * filename, report_context * ctx)
 	attrib *a;
 	message * m;
 	unsigned char op;
-  region * last = lastregion(f);
   int ix = Pow(O_STATISTICS);
 	int wants_stats = (f->options & ix);
   FILE * F = fopen(filename, "wt");
@@ -2074,10 +2073,8 @@ report_plaintext(const char * filename, report_context * ctx)
 		rnl(F);
 		centre(F, buf, true);
 	}
-	/* Der Report soll später einmal durch einen Makroprozessor laufen.
-	 * (enno) was? wer hat das geschrieben?
-	 * Momentan ist das wegen der der Mailverschickmimik schwierig. */
-	rp_messages(F, f->msgs, f, 0, true, true);
+
+  rp_messages(F, f->msgs, f, 0, true, true);
 	rp_battles(F, f);
 	a = a_find(f->attribs, &at_reportspell);
 	if (a) {
@@ -2137,7 +2134,7 @@ report_plaintext(const char * filename, report_context * ctx)
 
 	anyunits = 0;
 
-  for (r=firstregion(f);r!=last;r=r->next) {
+  for (r=ctx->first;r!=ctx->last;r=r->next) {
 		boolean unit_in_region = false;
 		boolean durchgezogen_in_region = false;
 		int turm_sieht_region = false;
