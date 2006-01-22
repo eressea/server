@@ -41,7 +41,6 @@ SOURCES =
  spell.c
  teleport.c
  terrain.c
- ugroup.c
  unit.c
  xmlreader.c
  ;

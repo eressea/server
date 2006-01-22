@@ -101,9 +101,6 @@ extern void register_reporttype(const char * extension, report_fun write, int fl
 extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
 extern void report_building(FILE *F, const struct region * r, const struct building * b, const struct faction * f, int mode);
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode);
-#ifdef USE_UGROUPS
-extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u, int indent, int mode);
-#endif
 
 extern const char * reportpath(void);
 extern const char * trailinto(const struct region * r, const struct locale * lang);

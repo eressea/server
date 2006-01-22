@@ -180,7 +180,6 @@ struct building_type;
 
 #define MIN_VERSION CURSETYPE_VERSION
 #define REGIONOWNERS_VERSION 400
-#define UGROUPS_VERSION 500 /* nicht aktivieren, nicht fertig */
 
 #ifdef ENEMIES
 # define RELEASE_VERSION ENEMIES_VERSION
@@ -436,10 +435,6 @@ enum {
   K_SETJIHAD,
   K_GM,          /* perform GM commands */
   K_INFO,        /* set player-info */
-#ifdef USE_UGROUPS
-  K_JOINUGROUP,
-  K_LEAVEUGROUP,
-#endif
   K_PREFIX,
   K_SYNONYM,
   K_PLANT,

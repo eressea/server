@@ -31,7 +31,6 @@ SOURCES =
  reduceproduction.c
  synonym.c
  targetregion.c
- ugroup.c
  viewrange.c
  variable.c
  ;

@@ -63,9 +63,6 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h> /* for volcanoes in emigration (needs a flag) */
 #include <kernel/unit.h>
-#ifdef USE_UGROUPS
-#  include <kernel/ugroup.h>
-#endif
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -4011,11 +4008,6 @@ processorders (void)
 #ifdef KARMA_MODULE
   puts(" - Jihads setzen");
   karma();
-#endif
-
-#ifdef USE_UGROUPS
-  puts(" - Verbände bilden");
-  ugroups();
 #endif
 
   puts(" - Einheiten Sortieren");

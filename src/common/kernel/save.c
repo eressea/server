@@ -48,11 +48,6 @@
 #include "terrainid.h" /* only for conversion code */
 #include "unit.h"
 
-#ifdef USE_UGROUPS
-#include "ugroup.h"
-#include <attributes/ugroup.h>
-#endif
-
 /* attributes includes */
 #include <attributes/key.h>
 
@@ -783,39 +778,6 @@ read_laen(struct region * r, int laen)
 }
 #endif
 
-#ifdef USE_UGROUPS
-void
-read_ugroups(FILE *file)
-{
-	int i;
-	faction *f;
-	ugroup *ug;
-	int fno, ugid, ugmem;
-
-	while(1) {
-		fno = ri(file);
-		if(fno == -1) break;
-		f = findfaction(fno);
-		while(1) {
-			ugid  = ri(file);
-			if(ugid == -1) break;
-			ugmem = ri(file);
-			ug = malloc(sizeof(ugroup));
-			ug->id = ugid;
-			ug->members = ugmem;
-			ug->unit_array = malloc(ug->members * sizeof(unit *));
-			for(i=0; i<ugmem; i++) {
-				unit *u = findunitg(ri36(file), NULL);
-				ug->unit_array[i] = u;
-				a_add(&u->attribs, a_new(&at_ugroup))->data.i = ugid;
-			}
-			ug->next = f->ugroups;
-			f->ugroups = ug;
-		}
-	}
-}
-#endif
-
 static void
 read_alliances(FILE * F)
 {
@@ -889,29 +851,6 @@ write_items(FILE *F, item *ilist)
 	}
 	fputs("end ", F);
 }
-
-#ifdef USE_UGROUPS
-void
-write_ugroups(FILE *file)
-{
-	faction *f;
-	ugroup *ug;
-	int i;
-
-	for(f=factions; f; f=f->next) if(f->ugroups) {
-		wi(file, f->no);
-		for(ug = f->ugroups; ug; ug=ug->next) {
-			wi(file, ug->id);
-			wi(file, ug->members);
-			for(i=0; i<ug->members; i++) {
-				wi36(file, ug->unit_array[i]->no);
-			}
-		}
-		fputs("-1\n", file);
-	}
-	fputs("-1\n", file);
-}
-#endif
 
 #ifdef USE_PLAYERS
 static void
@@ -1954,9 +1893,6 @@ readgame(const char * filename, int backup)
   printf("\n");
   if (!dirtyload) {
     read_borders(F);
-#ifdef USE_UGROUPS
-    if (global.data_version >= UGROUPS_VERSION) read_ugroups(F);
-#endif
   }
 
   fclose(F);
@@ -2162,10 +2098,6 @@ writegame(const char *filename, char quiet)
   wnl(F);
   write_borders(F);
   wnl(F);
-#if RELEASE_VERSION >= UGROUPS_VERSION
-  write_ugroups(F);
-  wnl(F);
-#endif
   fclose(F);
   printf("\nOk.\n");
   return 0;

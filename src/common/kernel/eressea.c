@@ -395,10 +395,6 @@ const char *keywords[MAXKEYWORDS] =
 	"JIHAD",
 	"GM",
 	"INFO",
-#ifdef USE_UGROUPS
-	"JOINVERBAND",
-	"LEAVEVERBAND",
-#endif
 	"PRAEFIX",
 	"SYNONYM",
 	"PFLANZEN",

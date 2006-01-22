@@ -65,9 +65,6 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/alliance.h>
-#ifdef USE_UGROUPS
-#  include <ugroup.h>
-#endif
 
 /* util includes */
 #include <util/bsdstring.h>
@@ -694,21 +691,8 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 	char marker;
 	int dh;
 	boolean isbattle = (boolean)(mode == see_battle);
-#ifdef USE_UGROUPS
-	ugroup *ug = findugroup(u);
-#endif
 	if(u->race == new_race[RC_SPELL]) return;
 
-#ifdef USE_UGROUPS
-	if(u->faction != f && (isbattle || ug)) {
-		if(is_ugroupleader(u, ug)) {
-			rnl(F);
-			dh = bufunit_ugroupleader(f, u, indent, mode);
-		} else {
-			return;
-		}
-	} else
-#endif
 	{
 		rnl(F);
 		dh = bufunit(f, u, indent, mode);
@@ -734,14 +718,6 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 	rparagraph(F, buf, indent, marker);
 
 	if(!isbattle){
-#ifdef USE_UGROUPS
-		if(ug) {
-			int i;
-			for(i=0; i<ug->members; i++) {
-				print_curses(F, f, ug->unit_array[i], TYP_UNIT, indent);
-			}
-		} else
-#endif /* USE_UGROUPS */
 		print_curses(F, f, u, TYP_UNIT, indent);
 	}
 

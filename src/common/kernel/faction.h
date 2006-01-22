@@ -77,9 +77,6 @@ typedef struct faction {
 	int options;
 	int no_units;
 	int karma;
-#ifdef USE_UGROUPS
-	struct ugroup *ugroups;
-#endif
 #ifdef MSG_LEVELS
   struct msglevel * msglevels;
 	struct warning * warnings;

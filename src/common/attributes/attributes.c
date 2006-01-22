@@ -34,9 +34,6 @@
 #include "synonym.h"
 #include "targetregion.h"
 #include "variable.h"
-#ifdef USE_UGROUPS
-# include "ugroup.h"
-#endif
 #ifdef AT_OPTION
 # include "option.h"
 #endif
@@ -81,9 +78,6 @@ init_attributes(void)
 	init_moved();
 #ifdef AT_OPTION
 	init_option();
-#endif
-#ifdef USE_UGROUPS
-	init_ugroup();
 #endif
 	init_variable();
 #ifdef WDW_PYRAMID

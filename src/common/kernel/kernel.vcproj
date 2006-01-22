@@ -293,9 +293,6 @@
 				RelativePath=".\terrain.h">
 			</File>
 			<File
-				RelativePath=".\ugroup.h">
-			</File>
-			<File
 				RelativePath=".\unit.h">
 			</File>
 		</Filter>
@@ -403,9 +400,6 @@
 		</File>
 		<File
 			RelativePath=".\terrainid.h">
-		</File>
-		<File
-			RelativePath=".\ugroup.c">
 		</File>
 		<File
 			RelativePath=".\unit.c">
