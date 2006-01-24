@@ -335,10 +335,10 @@ ri36(FILE * F)
 }
 
 #define MAXLINE 4096*16
+static char lbuf[MAXLINE];
 static char *
 getbuf(FILE * F)
 {
-	char lbuf[MAXLINE];
 	boolean cont = false;
 	boolean quote = false;
 	boolean comment = false;

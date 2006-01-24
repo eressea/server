@@ -95,10 +95,9 @@ get_keyword(const order * ord)
   return ORD_KEYWORD(ord);
 }
 
-char *
-getcommand(const order * ord)
+static char *
+get_command(const order * ord, char * sbuffer, size_t bufsize)
 {
-  char sbuffer[DISPLAYSIZE*2];
   char * str = sbuffer;
   const char * text = ORD_STRING(ord);
 #ifdef SHORT_STRINGS
@@ -109,7 +108,7 @@ getcommand(const order * ord)
 #ifdef SHORT_STRINGS
   if (kwd!=NOKEYWORD) {
     const struct locale * lang = ORD_LOCALE(ord);
-    size_t size = sizeof(sbuffer)-(str-sbuffer);
+    size_t size = bufsize-(str-sbuffer);
     if (text) --size;
     str += strlcpy(str, LOC(lang, keywords[kwd]), size);
     if (text) {
@@ -121,7 +120,14 @@ getcommand(const order * ord)
   if (text) {
     str += strlcpy(str, text, sizeof(sbuffer)-(str-sbuffer));
   }
-  return strdup(sbuffer);
+  return sbuffer;
+}
+
+char *
+getcommand(const order * ord)
+{
+  char sbuffer[DISPLAYSIZE*2];
+  return strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
 void 
@@ -461,9 +467,7 @@ write_order(const order * ord, const struct locale * lang, char * buffer, size_t
     if (kwd==NOKEYWORD) {
       buffer[0]=0;
     } else {
-      char * s = getcommand(ord);
-      strncpy(buffer, s, size);
-      free(s);
+      get_command(ord, buffer, size);
     }
   }
   return buffer;
