@@ -36,6 +36,21 @@ typedef struct tref {
 #define LEAF 1 /* leaf node for a word. always matches */
 #define SHARED 2 /* at least two words share the node */
 
+#if NODEHASHSIZE == 7
+/* lookup table, making c % 7 faster for chars. is this sick or what? */
+static int divc7[256] = { 
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
+  0,1,2,3 };
+#endif
+
 void
 addtoken(tnode * root, const char* str, variant id)
 {
@@ -60,7 +75,11 @@ addtoken(tnode * root, const char* str, variant id)
 		int index, i = 0;
 		char c = *str;
 		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
-		index = ((unsigned char)c) % NODEHASHSIZE;
+#if NODEHASHSIZE == 7
+		index = divc7[(unsigned char)c];
+#else
+    index = ((unsigned char)c) % NODEHASHSIZE;
+#endif
 		next = root->next[index];
 		if (!(root->flags & LEAF)) root->id = id;
 		while (next && next->c != c) next = next->nexthash;
@@ -114,7 +133,11 @@ findtoken(const tnode * tk, const char * str, variant* result)
 
 /*		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c); */
 
-		index = ((unsigned char)c) % NODEHASHSIZE;
+#if NODEHASHSIZE == 7
+    index = divc7[(unsigned char)c];
+#else
+    index = ((unsigned char)c) % NODEHASHSIZE;
+#endif
 		ref = tk->next[index];
 		while (ref && ref->c!=c) ref = ref->nexthash;
 		++str;
