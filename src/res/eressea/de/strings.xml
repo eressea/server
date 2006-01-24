@@ -34,47 +34,6 @@
       </text>
     </string>
   </namespace>
-  <namespace name="raceinfo">
-    <string name="no_info">
-      <text locale="de">Keine Informationen über diese Rasse verfügbar.</text>
-      <text locale="en">No Information available for this race.</text>
-    </string>
-    <string name="eagle">
-      <text locale="de">
-        Der Adler ist ein ausgezeichneter Späher, fliegend überquert er sogar
-        kurze Meerengen, doch ist er hoch oben am Himmel auch sehr exponiert,
-        was ihn beim Rasten zu einem leichten Ziel macht (Schaden: 2d3,
-        Angriff 6, Verteidigung 2, 15 Trefferpunkte).
-      </text>
-    </string>
-    <string name="lynx">
-      <text locale="de">
-        Der Luchs ist bekannt für seine Geschicklichkeit im Verbergen und
-        Beobachten. Mit ein wenig Geduld kann er zu einem hervorragenden
-        Späher ausgebildet werden. Im Kampf verteidigt er sich mit seinen
-        scharfen Krallen und weiß seine Gewandheit zu nutzen (Schaden: 2d3,
-        Angriff 4, Verteidigung 5, 20 Trefferpunkte).
-      </text>
-    </string>
-    <string name="direwolf">
-      <text locale="de">
-        Diese großen Wölfe sind nicht alle so wild und böse wie in den
-        Legenden berichtet, und einige von ihnen schließen sich auch guten
-        Magiern bereitwillig an und sind ihnen dann treue Gefährten. (3
-        Angriffe, Schaden: 2d6, 1d4, 1d4, Angriff 6, Verteidigung 3, 25
-        Trefferpunkte).
-      </text>
-    </string>
-    <string name="tunnelworm">
-      <text locale="de">
-        Diese aus den Tiefen Eresseas stammende gigantische Geschöpf ist dem
-        Leben im Untergrund hervorragend angepasst. Blind, taub und nicht
-        besonders intelligent, aber mit seinen gewaltigen Kräften kann es
-        ganze Berge versetzen oder Wälder roden. (Schaden: 3d20, Angriff 6,
-        Verteidigung 1, Rüstung 6, 300 Trefferpunkte).
-      </text>
-    </string>
-  </namespace>
   <namespace name="iteminfo">
     <string name="no_info">
       <text locale="de">Keine Informationen.</text>
