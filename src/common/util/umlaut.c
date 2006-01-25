@@ -36,21 +36,6 @@ typedef struct tref {
 #define LEAF 1 /* leaf node for a word. always matches */
 #define SHARED 2 /* at least two words share the node */
 
-#if NODEHASHSIZE == 7
-/* lookup table, making c % 7 faster for chars. is this sick or what? */
-static int divc7[256] = { 
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,0,1,2,3,4,5,6,
-  0,1,2,3 };
-#endif
-
 void
 addtoken(tnode * root, const char* str, variant id)
 {
@@ -73,10 +58,10 @@ addtoken(tnode * root, const char* str, variant id)
 	} else {
 		tref * next;
 		int index, i = 0;
-		char c = *str;
+		register char c = *str;
 		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
-#if NODEHASHSIZE == 7
-		index = divc7[(unsigned char)c];
+#if NODEHASHSIZE == 8
+		index = c & 7;
 #else
     index = ((unsigned char)c) % NODEHASHSIZE;
 #endif
@@ -95,7 +80,11 @@ addtoken(tnode * root, const char* str, variant id)
 			root->next[index] = ref;
 			
 			if (u!=c) {
-				index = ((unsigned char)u) % NODEHASHSIZE;
+#if NODEHASHSIZE == 8
+        index = u & 7;
+#else
+        index = ((unsigned char)u) % NODEHASHSIZE;
+#endif
 				ref = malloc(sizeof(tref));
 				ref->c = u;
 				ref->node = node;
@@ -123,18 +112,15 @@ addtoken(tnode * root, const char* str, variant id)
 int
 findtoken(const tnode * tk, const char * str, variant* result)
 {
-	if (!str) return E_TOK_NOMATCH;
-	if (*str == 0) return E_TOK_NOMATCH;
+	if (!str || *str==0) return E_TOK_NOMATCH;
 
-	while (*str) {
+	do {
 		int index;
 		const tref * ref;
 		char c = *str;
 
-/*		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c); */
-
-#if NODEHASHSIZE == 7
-    index = divc7[(unsigned char)c];
+#if NODEHASHSIZE == 8
+    index = c & 7;
 #else
     index = ((unsigned char)c) % NODEHASHSIZE;
 #endif
@@ -143,7 +129,7 @@ findtoken(const tnode * tk, const char * str, variant* result)
 		++str;
 		if (!ref) return E_TOK_NOMATCH;
 		tk = ref->node;
-	}
+	} while (*str);
 	if (tk) {
 		*result = tk->id;
 		return E_TOK_SUCCESS;

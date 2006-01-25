@@ -23,7 +23,7 @@ extern "C" {
 
 #define E_TOK_NOMATCH (-1)
 #define E_TOK_SUCCESS 0
-#define NODEHASHSIZE 7
+#define NODEHASHSIZE 8
 struct tref;
 
 typedef struct tnode {
