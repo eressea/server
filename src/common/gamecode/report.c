@@ -225,7 +225,7 @@ rpsnr(FILE * F, const char * s, int offset)
 	if (*(x - 1) && indent && *x == ' ') indent += 2;
 	if (!indent) indent = offset;
 	x = s;
-	memset(inset, 32, indent * sizeof(char));
+	memset(inset, ' ', indent * sizeof(char));
 	inset[indent] = 0;
 	while (s <= x+len) {
 		size_t line = min(len-(s-x), REPORTWIDTH - indent*ui);
@@ -349,27 +349,39 @@ centre(FILE * F, const char *s, boolean breaking)
 static void
 rparagraph(FILE *F, const char *s, int indent, char mark)
 {
-	static char mbuf[BUFSIZE+1];
-	/* static size_t bsize = 0; */
-	size_t size;
-	char inset[REPORTWIDTH];
+	static const char * spaces = "                                ";
+  size_t length = REPORTWIDTH - indent;
+  const char * end = s;
 
-	if (indent) {
-		memset(inset, ' ', indent);
-		inset[indent]=0;
-		if (mark)
-			inset[indent - 2] = mark;
-	} else {
-		assert(mark == 0);
-		inset[0] = 0;
-	}
-	inset[indent]=0;
-	size = strlen(s)+indent+1;
-	if (size==1) return;
-	strcpy(mbuf, inset);
-	strncpy(mbuf+indent, s, BUFSIZE-indent);
-	*(mbuf+size-1)=0;
-	rps(F, mbuf);
+  while (*s) {
+    const char * last_space = s;
+
+    if (mark && indent>=2) {
+      fwrite(spaces, sizeof(char), indent-2, F);
+      fputc(mark, F);
+      fputc(' ', F);
+      mark = 0;
+    } else {
+      fwrite(spaces, sizeof(char), indent, F);
+    }
+    while (*end && end!=s+length) {
+      if (*end==' ') {
+        last_space = end;
+      }
+      ++end;
+    }
+    if (last_space==s) {
+      /* there was no space in this line. clip it */
+      last_space = end;
+    }
+    fwrite(s, sizeof(char), last_space-s, F);
+    s = last_space;
+    while (*s==' ') {
+      ++s;
+    }
+    if (s>end) end = s;
+    fputc('\n', F);
+  }
 }
 
 static void
@@ -1700,9 +1712,12 @@ guards(FILE * F, const region * r, const faction * see)
 static void
 rpline(FILE * F)
 {
-	rpc(F, ' ', 1);
-	rpc(F, '-', REPORTWIDTH);
-	rnl(F);
+  static char line[REPORTWIDTH+1];
+  if (line[0]!='-') {
+    memset(line, '-', sizeof(line));
+    line[REPORTWIDTH] = '\n';
+  }
+  fwrite(line, sizeof(char), sizeof(line), F);
 }
 
 static void

@@ -39,6 +39,7 @@
 #include <util/functions.h>
 #include <util/goodies.h>
 #include <util/message.h>
+#include <util/umlaut.h>
 
 /* libc includes */
 #include <assert.h>

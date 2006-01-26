@@ -98,7 +98,6 @@ struct building_type;
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/umlaut.h>
 #include <util/variant.h>
 #include <util/vmap.h>
 #include <util/vset.h>
@@ -1066,12 +1065,6 @@ extern void guard(struct unit * u, unsigned int mask);
 	/* Einheit setzt "BEWACHE", rassenspezifzisch.
 	 * 'mask' kann einzelne flags zusätzlich und-maskieren.
 	 */
-
-typedef struct local_names {
-	struct local_names * next;
-	const struct locale * lang;
-	struct tnode names;
-} local_names;
 
 extern boolean hunger(int number, struct unit * u);
 extern int lifestyle(const struct unit*);

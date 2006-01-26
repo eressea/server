@@ -24,10 +24,11 @@
 #include "skill.h"
 
 /* util includes */
-#include <base36.h>
-#include <event.h>
-#include <xml.h>
-#include <language.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/language.h>
+#include <util/umlaut.h>
+#include <util/xml.h>
 
 /* libc includes */
 #include <stdlib.h>

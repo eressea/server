@@ -35,6 +35,12 @@ typedef struct tnode {
 int findtoken(const struct tnode * tk, const char * str, variant* result);
 void addtoken(struct tnode * root, const char* str, variant id);
 
+typedef struct local_names {
+  struct local_names * next;
+  const struct locale * lang;
+  struct tnode names;
+} local_names;
+
 #ifdef __cplusplus
 }
 #endif

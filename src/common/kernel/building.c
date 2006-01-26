@@ -27,11 +27,12 @@
 #include "save.h"
 
 /* util includes */
-#include <base36.h>
-#include <functions.h>
-#include <resolve.h>
-#include <event.h>
-#include <language.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/functions.h>
+#include <util/language.h>
+#include <util/resolve.h>
+#include <util/umlaut.h>
 
 /* libc includes */
 #include <assert.h>
