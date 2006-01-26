@@ -370,6 +370,7 @@ rparagraph(FILE *F, const char *s, int indent, char mark)
       }
       ++end;
     }
+    if (*end==0) last_space = end;
     if (last_space==s) {
       /* there was no space in this line. clip it */
       last_space = end;
@@ -807,29 +808,33 @@ rp_battles(FILE * F, faction * f)
   }
 }
 
-char *
-f_regionid(const region * r, const faction * f)
+size_t
+f_regionid(const region * r, const faction * f, char * buffer, size_t size)
 {
-	static int i = 0;
-	static char bufs[4][NAMESIZE + 20];
-	char * buf = bufs[(++i)%4];
-	plane       *pl = NULL;
+	plane * pl = NULL;
 
-	if (!r)
-		strcpy(buf, "(Chaos)");
-	else {
+  if (!r) {
+		strncpy(buffer, "(Chaos)", size);
+  } else {
 		pl = getplane(r);
-		if(pl && fval(pl,PFL_NOCOORDS)) {
-      strncpy(buf, rname(r, f->locale), NAMESIZE);
-      buf[NAMESIZE]=0;
-		} else {
-      strncpy(buf, rname(r, f->locale), NAMESIZE);
-      buf[NAMESIZE]=0;
-			sprintf(buf+strlen(buf), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
+    strncpy(buffer, rname(r, f->locale), size);
+    buffer[size-1]=0;
+		if (pl==NULL || !fval(pl, PFL_NOCOORDS)) {
+			sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
 		}
 	}
+  return strlen(buffer);
+}
 
-	return buf;
+static char *
+f_regionid_s(const region * r, const faction * f)
+{
+  static int i = 0;
+  static char bufs[4][NAMESIZE + 20];
+  char * buf = bufs[(++i)%4];
+
+  f_regionid(r, f, buf, NAMESIZE + 20);
+  return buf;
 }
 
 static void
@@ -932,7 +937,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int 
 	const struct locale * lang = (const struct locale*)opop(stack).v;
 	const struct region * r = (const struct region*)opop(stack).v;
 	const char * trail = trailinto(r, lang);
-	const char * rn = f_regionid(r, f);
+	const char * rn = f_regionid_s(r, f);
   variant var;
   char * x = var.v = balloc(strlen(trail)+strlen(rn));
 	sprintf(x, trail, rn);
@@ -990,7 +995,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		}
 	}
 
-	bufp += strxcpy(bufp, f_regionid(r, f));
+	bufp += f_regionid(r, f, bufp, sizeof(buf)-(bufp-buf));
 
 	if (partial == 1) {
 		bufp += strxcpy(bufp, " (durchgereist)");
@@ -1138,7 +1143,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 					bufp += strxcpy(bufp, LOC(f->locale, directions[d]));
 					strcpy(bufp++, " ");
 					bufp += sprintf(bufp, trailinto(r2, f->locale),
-							f_regionid(r2, f));
+							f_regionid_s(r2, f));
 				}
 				else {
 					strcpy(bufp++, " ");
@@ -1172,14 +1177,18 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		region_list *rl2;
 
 		if (rl) {
-			strcpy(buf, "Schemen der Regionen ");
+      /* TODO: Avoid buffer overflows */
+      char * c = buf;
+			c += strxcpy(c, "Schemen der Regionen ");
 			rl2 = rl;
-			while(rl2) {
-				scat(f_regionid(rl2->data, f));
+			while (rl2) {
+        c += f_regionid(rl2->data, f, c, sizeof(buf)-(c-buf));
 				rl2 = rl2->next;
-				if(rl2) scat(", ");
+        if (rl2) {
+          c += strxcpy(c, ", ");
+        }
 			}
-			scat(" sind erkennbar.");
+			strcpy(c, " sind erkennbar.");
 			free_regionlist(rl);
 			/* Schreibe Paragraphen */
 			rnl(F);

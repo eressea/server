@@ -57,9 +57,6 @@ extern struct summary * make_summary(void);
 
 int hat_in_region(item_t itm, struct region * r, struct faction * f);
 
-
-char *f_regionid(const struct region *r, const struct faction *f);
-
 /* für fast_region und neuen CR: */
 
 enum {
