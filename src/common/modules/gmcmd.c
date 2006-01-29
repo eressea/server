@@ -591,7 +591,7 @@ init_gmcmd(void)
 void
 gmcommands(void)
 {
-	region ** rp = &regions;
+  region ** rp = &regions;
   while (*rp) {
     region * r = *rp;
     unit **up = &r->units;

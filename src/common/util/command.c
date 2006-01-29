@@ -15,6 +15,7 @@
 
 #include "umlaut.h"
 #include "language.h"
+#include "log.h"
 
 /* libc includes */
 #include <assert.h>
@@ -65,38 +66,42 @@ add_command(struct tnode * keys, struct tnode * tnext,
 	addtoken(keys, str, var);
 }
 
-static void
+static int
 do_command_i(const struct tnode * keys, void * u, const char * str, struct order * ord)
 {
-	size_t i;
-	char zText[16];
-	const char * c;
+  size_t i;
+  char zText[16];
+  const char * c;
   variant var;
 
-	while (isspace(*str)) ++str;
-	c = str;
-	while (isalnum(*c)) ++c;
-	i = min(16, c-str);
-	strncpy(zText, str, i);
-	zText[i]=0;
-	if (findtoken(keys, zText, &var)==E_TOK_SUCCESS) {
+  while (isspace(*str)) ++str;
+  c = str;
+  while (isalnum(*c)) ++c;
+  i = min(16, c-str);
+  strncpy(zText, str, i);
+  zText[i]=0;
+  if (findtoken(keys, zText, &var)==E_TOK_SUCCESS) {
     command * cmd = (command *)var.v;
-		if (cmd->nodes) {
-			assert(!cmd->fun);
-			do_command_i(cmd->nodes, u, ++c, ord);
-			return;
-		}
-		assert(cmd->fun);
-		cmd->fun(cmd->nodes, ++c, u, ord);
-	}
+    if (cmd->nodes && *c) {
+      assert(!cmd->fun);
+      return do_command_i(cmd->nodes, u, ++c, ord);
+    } else if (cmd->fun) {
+      cmd->fun(cmd->nodes, ++c, u, ord);
+      return E_TOK_SUCCESS;
+    }
+  }
+  return E_TOK_NOMATCH;
 }
 
 extern char * getcommand(struct order * ord);
+extern char * unitname(struct unit * u);
 
 void
 do_command(const struct tnode * keys, void * u, struct order * ord)
 {
   char * cmd = getcommand(ord);
-  do_command_i(keys, u, cmd, ord);
+  if (do_command_i(keys, u, cmd, ord)!=E_TOK_SUCCESS) {
+    log_warning(("%s failed GM command '%s'\n", unitname(u), cmd));
+  }
   free(cmd);
 }

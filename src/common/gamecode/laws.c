@@ -2758,7 +2758,6 @@ update_guards(void)
 static int
 guard_on_cmd(unit * u, struct order * ord)
 {
-  if (fval(u, UFL_MOVED)) return 0;
   assert(get_keyword(ord)==K_GUARD);
 
   init_tokens(ord);

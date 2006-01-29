@@ -119,7 +119,7 @@ reduce_weight(unit * u)
 static boolean
 is_waiting(const unit * u)
 {
-	if (fval(u, UFL_ISNEW|UFL_MOVED)) return true;
+  if (fval(u, UFL_ISNEW|UFL_MOVED)) return true;
   return false;
 }
 
