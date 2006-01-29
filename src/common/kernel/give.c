@@ -66,11 +66,11 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
   }
   else if (!u2 || u2->faction!=u->faction) {
     assert(rtype);
-    add_message(&u->faction->msgs,
+    ADDMSG(&u->faction->msgs,
       msg_message("give", "unit target resource amount",
       u, u2?ucansee(u->faction, u2, u_unknown()):u_peasants(), rtype, n));
     if (u2) {
-      add_message(&u2->faction->msgs,
+      ADDMSG(&u2->faction->msgs,
         msg_message("give", "unit target resource amount",
         ucansee(u2->faction, u, u_unknown()), u2, rtype, n));
     }

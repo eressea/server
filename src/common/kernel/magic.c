@@ -187,7 +187,7 @@ extern int dice(int count, int value);
 
 static void
 init_mage(attrib * a) {
-	a->data.v = calloc(sizeof(sc_mage), 1);
+  a->data.v = calloc(sizeof(sc_mage), 1);
 }
 
 static void
@@ -336,15 +336,12 @@ create_mage(unit * u, magic_t mtyp)
   sc_mage *mage;
   attrib *a;
 
+#ifndef NDEBUG
   a = a_find(u->attribs, &at_mage);
-  if (a==NULL) {
-    a = a_add(&u->attribs, a_new(&at_mage));
-    mage = calloc(1, sizeof(sc_mage));
-    a->data.v = mage;
-  } else {
-    mage = a->data.v;
-    memset(mage, 0, sizeof(sc_mage));
-  }
+  assert(a==NULL);
+#endif
+  a = a_add(&u->attribs, a_new(&at_mage));
+  mage = a->data.v;
 
   mage->magietyp = mtyp;
   createspelllist(u, mtyp);
@@ -966,7 +963,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         res->number = itemanz;
         res->type = rtype;
         res->next = reslist;
-        reslist = res->next;
+        reslist = res;
       }
     }
   }

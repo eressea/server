@@ -28,7 +28,6 @@
 #include <kernel/reports.h>
 #include <kernel/save.h>
 #include <kernel/skill.h>
-#include <kernel/study.h>
 #include <kernel/unit.h>
 
 /* util includes */

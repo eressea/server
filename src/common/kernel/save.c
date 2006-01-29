@@ -977,13 +977,18 @@ readunit(FILE * F)
     
     rs(F, buf);
     space = strchr(buf, ' ');
-    while (space!=NULL) {
-      strcpy(space, space+1);
-      space=strchr(space, ' ');
+    if (space!=NULL) {
+      char * inc = space+1;
+      char * outc = space;
+      do {
+        while (*inc==' ') ++inc;
+        while (*inc) {
+          *outc++ = *inc++;
+          if (*inc==' ') break;
+        }
+      } while (*inc);
+      *outc = 0;
     }
-/*    if (strcmp(buf, "giant turtle")==0) strcpy(buf, "giantturtle");
-    if (strcmp(buf, "young dragon")==0) strcpy(buf, "youngdragon");
-    if (strcmp(buf, "young dragon")==0) strcpy(buf, "youngdragon"); */
     u->race = rc_find(buf);
     assert(u->race);
     rs(F, buf);

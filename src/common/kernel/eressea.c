@@ -693,9 +693,10 @@ stripfaction (faction * f)
   /* TODO: inhalt auch löschen */
   if (f->msgs) free_messagelist(f->msgs);
   while (f->battles) {
-    struct bmsg * b = f->battles;
-    f->battles = b->next;
-    if (b->msgs) free_messagelist(b->msgs);
+    struct bmsg * bm = f->battles;
+    f->battles = bm->next;
+    if (bm->msgs) free_messagelist(bm->msgs);
+    free(bm);
   }
 
   freelist(f->allies);

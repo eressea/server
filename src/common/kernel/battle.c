@@ -3183,7 +3183,8 @@ make_battle(region * r)
 static void
 free_side(side * si)
 {
-	cv_kill(&si->fighters);
+  cv_kill(&si->fighters);
+  cv_kill(&si->leader.fighters);
 }
 
 static void
@@ -3205,40 +3206,41 @@ free_fighter(fighter * fig)
 static void
 free_battle(battle * b)
 {
-	side *side;
-	fighter *fighter;
-	meffect *meffect;
-	int max_fac_no = 0;
-
-	if (bdebug) {
-		fclose(bdebug);
-	}
-
-	while (b->factions) {
+  side *side;
+  fighter *fighter;
+  meffect *meffect;
+  int max_fac_no = 0;
+  
+  if (bdebug) {
+    fclose(bdebug);
+  }
+  
+  while (b->factions) {
     bfaction * bf = b->factions;
-		faction * f = bf->faction;
+    faction * f = bf->faction;
     b->factions = bf->next;
-		max_fac_no = max(max_fac_no, f->no);
+    max_fac_no = max(max_fac_no, f->no);
     free(bf);
-	}
-
-	cv_foreach(side, b->sides) {
-		free_side(side);
-		free(side);
-	}
-	cv_next(side);
-	cv_kill(&b->sides);
-	cv_foreach(fighter, b->fighters) {
-		free_fighter(fighter);
-		free(fighter);
-	}
-	cv_next(fighter);
-	cv_kill(&b->fighters);
-	cv_foreach(meffect, b->meffects) {
-		free(meffect);
-	}
-	cv_next(meffect);
-	cv_kill(&b->meffects);
+  }
+  
+  cv_foreach(side, b->sides) {
+    free_side(side);
+    free(side);
+  }
+  cv_next(side);
+  cv_kill(&b->sides);
+  cv_kill(&b->leaders);
+  cv_foreach(fighter, b->fighters) {
+    free_fighter(fighter);
+    free(fighter);
+  }
+  cv_next(fighter);
+  cv_kill(&b->fighters);
+  cv_foreach(meffect, b->meffects) {
+    free(meffect);
+  }
+  cv_next(meffect);
+  cv_kill(&b->meffects);
 }
 
 static int *

@@ -164,27 +164,27 @@ message *
 msg_message(const char * name, const char* sig, ...)
 	/* msg_message("oops_error", "unit region command", u, r, cmd) */
 {
-	va_list marker;
-	const message_type * mtype = mt_find(name);
-	char paramname[64];
-	const char *ic = sig;
-	variant args[16];
-	memset(args, 0, sizeof(args));
-
-	if (!mtype) {
-		log_warning(("trying to create message of unknown type \"%s\"\n", name));
-		return NULL;
-	}
-
-	va_start(marker, sig);
-	while (*ic && !isalnum(*ic)) ic++;
-	while (*ic) {
-		char * oc = paramname;
+  va_list marker;
+  const message_type * mtype = mt_find(name);
+  char paramname[64];
+  const char *ic = sig;
+  variant args[16];
+  memset(args, 0, sizeof(args));
+  
+  if (!mtype) {
+    log_warning(("trying to create message of unknown type \"%s\"\n", name));
+    return NULL;
+  }
+  
+  va_start(marker, sig);
+  while (*ic && !isalnum(*ic)) ic++;
+  while (*ic) {
+    char * oc = paramname;
     int i;
-
+    
     while (isalnum(*ic)) *oc++ = *ic++;
-		*oc = '\0';
-
+    *oc = '\0';
+    
     for (i=0;i!=mtype->nparameters;++i) {
       if (!strcmp(paramname, mtype->pnames[i])) break;
     }

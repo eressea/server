@@ -134,7 +134,7 @@ distribute_items(unit * u)
 
   if (u->items==NULL) return;
 
-  for (au=r->units;au;au=au->next) if (au->faction!=f) {
+  for (au=r->units;au;au=au->next) if (au->faction!=f && au->number>0) {
     if (alliedunit(u, au->faction, HELP_MONEY) && alliedunit(au, f, HELP_GIVE)) {
       struct friend * nf, ** fr = &friends;
 
@@ -153,9 +153,9 @@ distribute_items(unit * u)
     }
   }
 
-  if (friends && number) {
-    struct friend * nf = friends;
-    while (nf) {
+  if (friends) {
+    while (friends) {
+      struct friend * nf = friends;
       unit * u2 = nf->unit;
       item * itm = u->items;
       while (itm!=NULL) {
@@ -170,9 +170,8 @@ distribute_items(unit * u)
         itm = itn;
       }
       number -= nf->number;
-      nf = nf->next;
-      free(friends);
-      friends = nf;
+      friends = nf->next;
+      free(nf);
     }
     friends = NULL;
   }
@@ -1197,18 +1196,18 @@ invisible(const unit *target, const unit * viewer)
 void
 stripunit(unit * u)
 {
-	free(u->name);
-	free(u->display);
+  free(u->name);
+  free(u->display);
   free_order(u->thisorder);
-	free_orders(&u->orders);
-	if(u->skills) free(u->skills);
-	while (u->items) {
-		item * it = u->items->next;
-		u->items->next = NULL;
-		i_free(u->items);
-		u->items = it;
-	}
-	while (u->attribs) a_remove (&u->attribs, u->attribs);
+  free_orders(&u->orders);
+  if(u->skills) free(u->skills);
+  while (u->items) {
+    item * it = u->items->next;
+    u->items->next = NULL;
+    i_free(u->items);
+    u->items = it;
+  }
+  while (u->attribs) a_remove (&u->attribs, u->attribs);
   while (u->reservations) {
     struct reservation *res = u->reservations;
     u->reservations = res->next;

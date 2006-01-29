@@ -499,7 +499,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 	if (recruitcost) {
 		pl = getplane(r);
 		if (pl && fval(pl, PFL_NORECRUITS)) {
-			add_message(&u->faction->msgs,
+			ADDMSG(&u->faction->msgs,
 				msg_feedback(u, ord, "error_pflnorecruit", ""));
 			return;
 		}
@@ -943,9 +943,8 @@ maintain(building * b, boolean first)
 			assert(cost==0);
 		}
 	} else {
-		message * msg = add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_message("maintenancefail", "unit building", u, b));
-		msg_release(msg);
 		return false;
 	}
 	return true;
@@ -1214,7 +1213,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 				&& !alliedunit(u2, u->faction, HELP_GUARD)
 				&& armedmen(u2)
 				) {
-					add_message(&u->faction->msgs,
+					ADDMSG(&u->faction->msgs,
 						msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
 					return;
 				}
@@ -1233,7 +1232,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 				&& u2->number
 				&& !alliedunit(u2, u->faction, HELP_GUARD))
 			{
-				add_message(&u->faction->msgs,
+				ADDMSG(&u->faction->msgs,
 					msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
 				return;
 			}
@@ -1518,7 +1517,7 @@ split_allocations(region * r)
 			}
 			if (al->want==INT_MAX) al->want = al->get;
 			if (fval(al, AFL_LOWSKILL)) {
-				add_message(&al->unit->faction->msgs,
+				ADDMSG(&al->unit->faction->msgs,
 					msg_message("produce_lowskill", "unit region resource",
 					al->unit, al->unit->region, rtype));
 			} else {
@@ -1924,7 +1923,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
 		}
 	}
 	if (r_demand(r, ltype)) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, ord, "luxury_notsold", ""));
 		return;
 	}
@@ -2158,7 +2157,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
 	/* Belagerte Einheiten können nichts verkaufen. */
 
 	if (besieged(u)) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, ord, "error60", ""));
 		return false;
 	}
@@ -2327,21 +2326,21 @@ plant(region *r, unit *u, int raw)
 	skill = eff_skill(u, SK_HERBALISM, r);
 	itype = rherbtype(r);
 	if (skill < 6) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "plant_skills",
 			"skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
 		return;
 	}
 	/* Wasser des Lebens prüfen */
 	if (get_pooled(u, rt_water, GET_DEFAULT) == 0) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
 		return;
 	}
 	n = get_pooled(u, itype->rtype, GET_DEFAULT);
 	/* Kräuter prüfen */
 	if (n==0) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "resource_missing", "missing",
 			itype->rtype));
 		return;
@@ -2383,13 +2382,13 @@ planttrees(region *r, unit *u, int raw)
 	/* Skill prüfen */
 	skill = eff_skill(u, SK_HERBALISM, r);
 	if (skill < 6) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "plant_skills",
 			"skill minskill product", SK_HERBALISM, 6, rtype, 1));
 		return;
 	}
 	if (fval(r, RF_MALLORN) && skill < 7 ) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "plant_skills",
 			"skill minskill product", SK_HERBALISM, 7, rtype, 1));
 		return;
@@ -2398,7 +2397,7 @@ planttrees(region *r, unit *u, int raw)
 	n = get_pooled(u, rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
 		return;
 	}
@@ -2457,7 +2456,7 @@ breedtrees(region *r, unit *u, int raw)
 	n = get_pooled(u, rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
 		return;
 	}
@@ -2718,7 +2717,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 	}
 
 	if (u2->faction->age < NewbieImmunity()) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, ord, "newbie_immunity_error",
 			"turns", NewbieImmunity()));
 		return;
@@ -2731,7 +2730,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 
 	assert(u->region==u2->region);
 	if (!can_contact(r, u, u2)) {
-		add_message(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
+		ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
 		return;
 	}
 
@@ -3025,7 +3024,7 @@ tax_cmd(unit * u, struct order * ord, request ** taxorders)
 
 	u2 = is_guarded(r, u, GUARD_TAX);
 	if (u2) {
-		add_message(&u->faction->msgs,
+		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, ord, "region_guarded", "guard", u2));
 		return;
 	}
@@ -3135,7 +3134,7 @@ produce(void)
         case K_WORK:
           if (playerrace(u->race)) work(u, u->thisorder);
           else if (playerrace(u->faction->race)) {
-            add_message(&u->faction->msgs,
+            ADDMSG(&u->faction->msgs,
               msg_feedback(u, u->thisorder, "race_cantwork", "race", u->race));
           }
           break;

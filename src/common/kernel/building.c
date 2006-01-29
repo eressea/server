@@ -481,7 +481,7 @@ new_building(const struct building_type * btype, region * r, const struct locale
 void
 destroy_building(building * b)
 {
-	unit *u;
+  unit *u;
   direction_t d;
   static const struct building_type * bt_caravan, * bt_dam, * bt_tunnel;
   boolean init = false;
@@ -493,15 +493,15 @@ destroy_building(building * b)
     bt_tunnel = bt_find("tunnel");
   }
 
-	if (!bfindhash(b->no)) return;
-	for (u=b->region->units; u; u=u->next) {
-		if (u->building == b) leave(b->region, u);
-	}
-
-	b->size = 0;
-	update_lighthouse(b);
-	bunhash(b);
-
+  if (!bfindhash(b->no)) return;
+  for (u=b->region->units; u; u=u->next) {
+    if (u->building == b) leave(b->region, u);
+  }
+  
+  b->size = 0;
+  update_lighthouse(b);
+  bunhash(b);
+  
   /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
    * gebaute Straße zur Hälfte vernichtet */
   if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
@@ -511,12 +511,9 @@ destroy_building(building * b)
     }
   }
 
-#if 0	/* TODO: Memoryleak. Aber ohne klappt das Rendern nicht! */
-	removelist(&b->region->buildings, b);
-#endif
-	/* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
-	choplist(&b->region->buildings, b);
-	handle_event(&b->attribs, "destroy", b);
+  /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
+  choplist(&b->region->buildings, b);
+  handle_event(&b->attribs, "destroy", b);
 }
 
 extern attrib_type at_icastle;
