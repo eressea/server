@@ -542,9 +542,7 @@ learn(void)
             /* Vertraute zählen nicht zu den Magiern einer Partei,
             * können aber nur Graue Magie lernen */
             mtyp = M_GRAU;
-            if (!has_skill(u, SK_MAGIC) || !is_mage(u)) {
-              create_mage(u, mtyp);
-            }
+            if (!is_mage(u)) create_mage(u, mtyp);
           } else if (!has_skill(u, SK_MAGIC)) {
             /* Die Einheit ist noch kein Magier */
             if (count_skill(u->faction, SK_MAGIC) + u->number >
@@ -580,7 +578,7 @@ learn(void)
                 u->faction->magiegebiet = mtyp;
               }
             }
-            create_mage(u, mtyp);
+            if (!is_mage(u)) create_mage(u, mtyp);
           } else {
             /* ist schon ein Magier und kein Vertrauter */
             if(u->faction->magiegebiet == 0){

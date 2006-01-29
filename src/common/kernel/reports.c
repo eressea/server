@@ -1391,7 +1391,8 @@ write_script(FILE * F, const faction * f)
   fputc('\n', F);
 }
 
-#if 0
+#undef GLOBAL_REPORT
+#ifdef GLOBAL_REPORT
 static void
 global_report(const char * filename)
 {
@@ -1451,7 +1452,7 @@ reports(void)
   if (mailit) fclose(mailit);
   free_seen();
   str = get_param(global.parameters, "globalreport"); 
-#if 0
+#ifdef GLOBAL_REPORT
   if (str!=NULL) {
     sprintf(buf, "%s/%s.%u.cr", reportpath(), str, turn);
     global_report(buf);
