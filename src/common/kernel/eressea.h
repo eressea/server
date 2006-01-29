@@ -34,9 +34,6 @@ extern "C" {
  */
 #include <settings.h>
 
-/* Features currently in development (change makefile please): */
-/* #define MSG_LEVELS -- msg-levels active */
-
 /* basic types used in the eressea "kernel" */
 #ifdef __TINYC__
 #define order_t short

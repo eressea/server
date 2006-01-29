@@ -1467,9 +1467,6 @@ readfaction(FILE * F)
     f = (faction *) calloc(1, sizeof(faction));
     f->no = i;
   } else {
-#ifdef MSG_LEVELS
-    f->warnings = NULL; /* mem leak */
-#endif
     f->allies = NULL; /* mem leak */
     while (f->attribs) a_remove(&f->attribs, f->attribs);
   }
@@ -1536,16 +1533,12 @@ readfaction(FILE * F)
   if (global.data_version>=CLAIM_VERSION) {
     read_items(F, &f->items);
   }
-#ifdef MSG_LEVELS
-  read_msglevels(&f->warnings, F);
-#else
   for (;;) {
     int level;
     fscanf(F, "%s", buf);
     if (strcmp("end", buf)==0) break;
     fscanf(F, "%d ", &level);
   } 
-#endif
   planes = ri(F);
   while(--planes >= 0) {
     int id = ri(F);
@@ -1632,11 +1625,7 @@ writefaction(FILE * F, const faction * f)
   write_items(F, f->items);
   wnl(F);
 #endif
-#ifdef MSG_LEVELS
-	write_msglevels(f->warnings, F);
-#else
         fputs("end ", F);
-#endif
         wnl(F);
 	wi(F, listlen(f->ursprung));
 	for(ur = f->ursprung;ur;ur=ur->next) {

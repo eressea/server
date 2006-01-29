@@ -2025,12 +2025,6 @@ report_option(unit * u, const char * sec, struct order * ord)
     return;
   }
   s = getstrtoken();
-#ifdef MSG_LEVELS
-        if (s[0])
-    set_msglevel(&u->faction->warnings, mc->name, atoi(s));
-  else
-    set_msglevel(&u->faction->warnings, mc->name, -1);
-#endif
 }
 
 static int

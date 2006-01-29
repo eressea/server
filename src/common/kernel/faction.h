@@ -77,10 +77,6 @@ typedef struct faction {
 	int options;
 	int no_units;
 	int karma;
-#ifdef MSG_LEVELS
-  struct msglevel * msglevels;
-	struct warning * warnings;
-#endif
 	struct ally *allies;
 	struct group *groups;
 	boolean alive; /* enno: sollte ein flag werden */

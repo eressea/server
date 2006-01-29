@@ -38,7 +38,6 @@ extern boolean kann_finden(struct faction * f1, struct faction * f2);
 extern struct unit * can_find(struct faction *, struct faction *);
 
 /* funktionen zum schreiben eines reports */
-extern int read_datenames(const char *filename);
 void sparagraph(struct strlist ** SP, const char *s, int indent, char mark);
 void lparagraph(struct strlist ** SP, char *s, int indent, char mark);
 const char *hp_status(const struct unit * u);

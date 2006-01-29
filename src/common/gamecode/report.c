@@ -109,75 +109,6 @@ strxcpy(char * dst, const char * src) {
   return s;
 }
 
-int
-read_datenames(const char *filename)
-{
-	FILE *namesFP;
-	char line[256];
-	int  i;
-  size_t l;
-
-	if( (namesFP=fopen(filename,"r")) == NULL) {
-		log_error(("Kann Datei '%s' nicht öffnen, Abbruch\n", filename));
-		return -1;
-	}
-
-	fgets(line,255,namesFP);
-	l = strlen(line)-1;
-	if(line[l] == '\n') line[l] = 0;
-	agename = strdup(mkname("calendar", line));
-
-	fgets(line,255,namesFP);
-	seasons = strtol(line, NULL, 10);
-	seasonnames = malloc(sizeof(char *) * seasons);
-
-	for (i=0;i<seasons;i++) {
-		fgets(line,255,namesFP);
-		l = strlen(line)-1;
-		if(line[l] == '\n') line[l] = 0;
-		seasonnames[i] = strdup(mkname("calendar", line));
-	}
-
-	fgets(line,255,namesFP);
-	weeks_per_month = strtol(line, NULL, 10);
-	weeknames = malloc(sizeof(char *) * weeks_per_month);
-	weeknames2 = malloc(sizeof(char *) * weeks_per_month);
-
-	for(i=0;i<weeks_per_month;i++) {
-		char * np;
-
-		fgets(line,255,namesFP);
-		l = strlen(line)-1;
-		if(line[l] == '\n') line[l] = 0;
-
-		np = strtok(line,":");
-		weeknames[i] = strdup(mkname("calendar", np));
-		np = strtok(NULL,":");
-		weeknames2[i] = strdup(mkname("calendar", np));
-	}
-
-	fgets(line,255,namesFP);
-	months_per_year  = strtol(line, NULL, 10);
-	monthnames = malloc(sizeof(char *) * months_per_year);
-	month_season = malloc(sizeof(int) * months_per_year);
-	storms = malloc(sizeof(int) * months_per_year);
-
-	for(i=0;i<months_per_year;i++) {
-		char * np;
-		fgets(line,255,namesFP);
-		l = strlen(line)-1;
-		if(line[l] == '\n') line[l] = 0;
-
-		np = strtok(line,":");
-		monthnames[i] = strdup(mkname("calendar", np));
-		month_season[i] = atoi(strtok(NULL,":"));
-		storms[i] = atoi(strtok(NULL,":"));
-	}
-
-	fclose(namesFP);
-	return 0;
-}
-
 static char *
 gamedate_season(const struct locale * lang)
 {
@@ -211,53 +142,6 @@ gamedate2(const struct locale * lang)
   return buf;
 }
 
-static void
-rpsnr(FILE * F, const char * s, int offset)
-{
-	char inset[REPORTWIDTH];
-	const char *l, *x = s;
-	char ui=0;
-	size_t indent = 0, len;
-
-	len = strlen(s);
-	while (*x++ == ' ');
-	indent = x - s - 1;
-	if (*(x - 1) && indent && *x == ' ') indent += 2;
-	if (!indent) indent = offset;
-	x = s;
-	memset(inset, ' ', indent * sizeof(char));
-	inset[indent] = 0;
-	while (s <= x+len) {
-		size_t line = min(len-(s-x), REPORTWIDTH - indent*ui);
-		char   * br = strchr(s, '\n');
-		l = s + line;
-
-		if(br && br < l) {
-			l = br;
-		} else {
-			if (*l) {
-				while (*l!=' ' && l!=s) --l;
-				/* wenn nicht gefunden, harte breaks: */
-				if (s == l) l = s + REPORTWIDTH - indent;
-			}
-		}
-		if (*s) {
-#if INDENT
-			putc(' ', F);
-#endif
-			if (s!=x) {
-				fputs(inset, F);
-			}
-			fwrite(s, sizeof(char), l-s, F);
-			putc('\n', F);
-		}
-		s = l+1; ui=1;
-	}
-}
-
-int outi;
-char outbuf[4096];
-
 void
 rpc(FILE * F, char c, size_t num)
 {
@@ -270,56 +154,7 @@ rpc(FILE * F, char c, size_t num)
 void
 rnl(FILE * F)
 {
-	int i;
-	int rc, vc;
-
-	i = outi;
-	assert(i < 4096);
-	while (i && isspace((int)outbuf[i - 1]))
-		i--;
-	outbuf[i] = 0;
-
-	i = 0;
-	rc = 0;
-	vc = 0;
-
-	while (outbuf[i]) {
-		switch (outbuf[i]) {
-		case ' ':
-			vc++;
-			break;
-
-		case '\t':
-			vc = (vc & ~7) + 8;
-			break;
-
-		default:
-			/* ER: Tabs in Reports sind Mist. Die versauen die *
-			 * Anzeige von Einheiten in Burgen und Schiffen. while
-			 * (rc / 8 != vc / 8) { if ((rc & 7) == 7) putc(' ',
-			 * F); else putc('\t', F); rc = (rc & ~7) + 8; } */
-			while (rc != vc) {
-				putc(' ', F);
-				rc++;
-			}
-
-			putc(outbuf[i], F);
-			rc++;
-			vc++;
-		}
-
-		i++;
-		assert(i < 4096);
-	}
-
-	putc('\n', F);
-	outi = 0;
-}
-
-static void
-rps(FILE * F, const char * src)
-{
-	rpsnr(F, src, 0);
+	fputc('\n', F);
 }
 
 static void
@@ -347,40 +182,56 @@ centre(FILE * F, const char *s, boolean breaking)
 }
 
 static void
-rparagraph(FILE *F, const char *s, int indent, char mark)
+rparagraph(FILE *F, const char *str, int indent, int hanging_indent, char mark)
 {
   static const char * spaces = "                                ";
-  size_t length = REPORTWIDTH - indent;
-  const char * end = s;
+  size_t length = REPORTWIDTH;
+  const char * end, * begin;
 
-  while (*s) {
-    const char * last_space = s;
+  /* find out if there's a mark + indent already encoded in the string. */
+  if (!mark) {
+    const char * x = str;
+    while (*x == ' ') ++x;
+    indent += x - str;
+    if (x[0] && indent && x[1]==' ') {
+      indent += 2;
+      mark = x[0];
+      str = x + 2;
+      hanging_indent -= 2;
+    }
+  }
+  begin = end = str;
+
+  while (*begin) {
+    const char * last_space = begin;
 
     if (mark && indent>=2) {
       fwrite(spaces, sizeof(char), indent-2, F);
       fputc(mark, F);
       fputc(' ', F);
       mark = 0;
-    } else {
+    } else if (begin==str) {
       fwrite(spaces, sizeof(char), indent, F);
+    } else {
+      fwrite(spaces, sizeof(char), indent+ hanging_indent, F);
     }
-    while (*end && end!=s+length) {
+    while (*end && end!=begin+length-indent) {
       if (*end==' ') {
         last_space = end;
       }
       ++end;
     }
     if (*end==0) last_space = end;
-    if (last_space==s) {
+    if (last_space==begin) {
       /* there was no space in this line. clip it */
       last_space = end;
     }
-    fwrite(s, sizeof(char), last_space-s, F);
-    s = last_space;
-    while (*s==' ') {
-      ++s;
+    fwrite(begin, sizeof(char), last_space-begin, F);
+    begin = last_space;
+    while (*begin==' ') {
+      ++begin;
     }
-    if (s>end) end = s;
+    if (begin>end) begin = end;
     fputc('\n', F);
   }
 }
@@ -395,13 +246,12 @@ report_spell(FILE * F, 	spell *sp, const struct locale * lang)
 	rnl(F);
 	centre(F, spell_name(sp, lang), true);
 	rnl(F);
-	strcpy(buf,"Beschreibung:");
-	rps(F, buf);
-	rparagraph(F, spell_info(sp, lang), 0, 0);
-	rnl(F);
+  rparagraph(F, LOC(lang, "nr_spell_description"), 0, 0, 0);
+	rparagraph(F, spell_info(sp, lang), 2, 0, 0);
 
-
-	bufp = strcpy(buf, "Art: ");
+  bufp = buf;
+	bufp += strxcpy(bufp, LOC(lang, "nr_spell_type"));
+  *bufp++ = ' ';
 	if (sp->sptyp & PRECOMBATSPELL) {
 		bufp += strxcpy(bufp, "Präkampfzauber");
 	} else if (sp->sptyp & COMBATSPELL) {
@@ -411,10 +261,15 @@ report_spell(FILE * F, 	spell *sp, const struct locale * lang)
 	} else {
 		bufp += strxcpy(bufp, "Normaler Zauber");
 	}
-	rps(F, buf);
+	rparagraph(F, buf, 0, 0, 0);
 
-	strcpy(buf, "Komponenten:");
-	rps(F, buf);
+  sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sp->level);
+  rparagraph(F, buf, 0, 0, 0);
+
+  sprintf(buf, "%s %d", LOC(lang, "nr_spell_rank"), sp->rank);
+  rparagraph(F, buf, 0, 0, 0);
+
+  rparagraph(F, LOC(lang, "nr_spell_components"), 0, 0, 0);
 	for (k = 0; sp->components[k].type; ++k) {
 		const resource_type * rtype = sp->components[k].type;
 		itemanz = sp->components[k].amount;
@@ -429,68 +284,58 @@ report_spell(FILE * F, 	spell *sp, const struct locale * lang)
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
           itemanz *= sp->level;
         }
-        sprintf(buf, "  %d %s", itemanz, LOC(lang, resourcename(rtype, itemanz!=1)));
+        sprintf(buf, "%d %s", itemanz, LOC(lang, resourcename(rtype, itemanz!=1)));
       }
-			rps(F, buf);
+			rparagraph(F, buf, 2, 2, '-');
 		}
 	}
 
-	bufp = buf + strxcpy(buf, "Modifikationen: ");
+	bufp = buf + strxcpy(buf, LOC(lang, "nr_spell_modifiers"));
 	if (sp->sptyp & FARCASTING) {
-		bufp += strxcpy(bufp, "Fernzauber");
+		bufp += strxcpy(bufp, " Fernzauber");
 		dh = 1;
 	}
 	if (sp->sptyp & OCEANCASTABLE) {
-		if (dh == 1){
-			bufp += strxcpy(bufp, ", ");
+		if (dh == 1) {
+			bufp += strxcpy(bufp, ",");
 		}
-		bufp += strxcpy(bufp, "Seezauber");
+		bufp += strxcpy(bufp, " Seezauber");
 		dh = 1;
 	}
 	if (sp->sptyp & ONSHIPCAST) {
 		if (dh == 1){
-			bufp += strxcpy(bufp, ", ");
+			bufp += strxcpy(bufp, ",");
 		}
-		bufp += strxcpy(bufp, "Schiffszauber");
+		bufp += strxcpy(bufp, " Schiffszauber");
 		dh = 1;
 	}
 	if (sp->sptyp & NOTFAMILIARCAST) {
 		if (dh == 1){
 			bufp += strxcpy(bufp, ", k");
 		} else {
-			bufp += strxcpy(bufp, "K");
+			bufp += strxcpy(bufp, " K");
 		}
 		bufp += strxcpy(bufp, "ann nicht vom Vertrauten gezaubert werden");
 		dh = 1;
 	}
-	if(dh == 0) bufp += strxcpy(bufp, "Keine");
+	if (dh == 0) bufp += strxcpy(bufp, " Keine");
+	rparagraph(F, buf, 0, 0, 0);
 
-	rps(F, buf);
-
-	sprintf(buf, "Stufe: %d", sp->level);
-	rps(F, buf);
-
-	sprintf(buf, "Rang: %d", sp->rank);
-	rps(F, buf);
-	rnl(F);
-
-  strcpy(buf, "Syntax: ");
-	rps(F, buf);
-
+	rparagraph(F, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
   if (!sp->syntax) {
 		if (sp->sptyp & ISCOMBATSPELL) {
-			bufp = buf + strxcpy(buf, "KAMPFZAUBER ");
+			bufp = buf + strxcpy(buf, LOC(lang, keywords[K_COMBAT]));
 		} else {
-			bufp = buf + strxcpy(buf, "ZAUBERE ");
+			bufp = buf + strxcpy(buf, LOC(lang, keywords[K_CAST]));
 		}
 		/* Reihenfolge beachten: Erst REGION, dann STUFE! */
 		if (sp->sptyp & FARCASTING) {
-			bufp += strxcpy(bufp, "[REGION x y] ");
+      bufp += snprintf(bufp, sizeof(buf)-(bufp-buf), " [%s x y]", LOC(lang, parameters[P_REGION]));
 		}
 		if (sp->sptyp & SPELLLEVEL) {
-			bufp += strxcpy(bufp, "[STUFE n] ");
+      bufp += snprintf(bufp, sizeof(buf)-(bufp-buf), " [%s n]", LOC(lang, parameters[P_LEVEL]));
 		}
-		bufp += strxcpy(bufp, "\"");
+		bufp += strxcpy(bufp, " \"");
 		bufp += strxcpy(bufp, spell_name(sp, lang));
 		bufp += strxcpy(bufp, "\" ");
 		if (sp->sptyp & ONETARGET){
@@ -510,11 +355,11 @@ report_spell(FILE * F, 	spell *sp, const struct locale * lang)
 				bufp += strxcpy(bufp, "<Gebäude-Nr> [<Gebäude-Nr> ...]");
 			}
 		}
+    rparagraph(F, buf, 2, 0, 0);
 	} else {
-		bufp = buf + strxcpy(buf, sp->syntax);
+    rparagraph(F, sp->syntax, 2, 0, 0);
 	}
-	rps(F, buf);
-	rnl(F);
+  rnl(F);
 }
 
 void
@@ -661,7 +506,7 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 			}
 			if (dh == 1) {
 				rnl(F);
-				rparagraph(F, buf, indent, 0);
+				rparagraph(F, buf, indent, 2, 0);
 			}
 		} else if (a->type==&at_effect && self) {
 			effect_data * data = (effect_data *)a->data.v;
@@ -671,7 +516,7 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 					(data->value==1 ? "" : "en"),
 					LOC(default_locale, resourcename(data->type->itype->rtype, 0)));
 			rnl(F);
-			rparagraph(F, buf, indent, 0);
+			rparagraph(F, buf, indent, 2, 0);
 		}
 	}
 }
@@ -728,7 +573,7 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		}
 	}
 
-	rparagraph(F, buf, indent, marker);
+	rparagraph(F, buf, indent, 0, marker);
 
 	if(!isbattle){
 		print_curses(F, f, u, TYP_UNIT, indent);
@@ -737,7 +582,7 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 }
 
 static void
-rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean centered, boolean categorized)
+rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean categorized)
 {
 	messageclass * category;
 	if (!msgs) return;
@@ -745,43 +590,23 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 		int k = 0;
 		struct mlist * m = msgs->begin;
 		while (m) {
-#ifdef MSG_LEVELS
-			if (!debug && get_msglevel(viewer->warnings, viewer->msglevels, m->type) < m->level) continue;
-#endif
 			/* messagetype * mt = m->type; */
-			if (strcmp(nr_section(m->msg), category->name)==0)
-			{
-				char lbuf[8192], *bufp = lbuf;
-        size_t rsize, size = sizeof(lbuf);
+			if (strcmp(nr_section(m->msg), category->name)==0) {
+				char lbuf[8192];
 
 				if (!k && categorized) {
-					const char * name;
+					const char * category_title;
 					char cat_identifier[24];
 
+          rnl(F);
 					sprintf(cat_identifier, "section_%s", category->name);
-					name = LOC(viewer->locale, cat_identifier);
-					k = 1;
+					category_title = LOC(viewer->locale, cat_identifier);
+					centre(F, category_title, true);
 					rnl(F);
-					if (centered) centre(F, name, true);
-					else {
-						if (indent>0) strcpy(lbuf, "          ");
-						strcpy(lbuf+indent, name);
-						rpsnr(F, lbuf, 2);
-					}
-					rnl(F);
+          k = 1;
 				}
-				if (indent>0) {
-					rsize = strlcpy(lbuf, "          ", indent);
-          if (rsize>size) rsize = size-1;
-          size -= rsize;
-          bufp += rsize;
-        }
-        rsize = nr_render(m->msg, viewer->locale, bufp, size, viewer);
-        if (rsize>size) rsize = size-1;
-        size -= rsize;
-        bufp += rsize;
-
-        rpsnr(F, lbuf, 2);
+        nr_render(m->msg, viewer->locale, lbuf, sizeof(lbuf), viewer);
+        rparagraph(F, lbuf, indent, 2, 0);
 			}
 			m = m->next;
 		}
@@ -802,7 +627,7 @@ rp_battles(FILE * F, faction * f)
       rnl(F);
       centre(F, buf, true);
       rnl(F);
-      rp_messages(F, bm->msgs, f, 0, true, false);
+      rp_messages(F, bm->msgs, f, 0, false);
       bm = bm->next;
     }
   }
@@ -884,7 +709,7 @@ prices(FILE * F, const region * r, const faction * f)
 		}
 	}
 	/* Schreibe Paragraphen */
-	rparagraph(F, buf, 0, 0);
+	rparagraph(F, buf, 0, 0, 0);
 
 }
 
@@ -1171,7 +996,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		bufp += strxcpy(bufp, " Große Verwirrung befällt alle Reisenden in dieser Region.");
 	}
   rnl(F);
-  rparagraph(F, buf, 0, 0);
+  rparagraph(F, buf, 0, 0, 0);
 
 	if (partial==0 && rplane(r) == get_astralplane() &&
 			!is_cursed(r->attribs, C_ASTRALBLOCK, 0))	{
@@ -1195,7 +1020,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 			free_regionlist(rl);
 			/* Schreibe Paragraphen */
 			rnl(F);
-			rparagraph(F, buf, 0, 0);
+			rparagraph(F, buf, 0, 0, 0);
 		}
 	}
 
@@ -1208,7 +1033,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	a = a_find(r->attribs, &at_reduceproduction);
 	if(a) {
 		sprintf(buf, "Die Region ist verwüstet, der Boden karg.");
-		rparagraph(F, buf, 0, 0);
+		rparagraph(F, buf, 0, 0, 0);
 	}
 
 	if (edges) rnl(F);
@@ -1230,7 +1055,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		bufp += strxcpy(bufp, e->name);
 		if (!e->transparent) bufp += strxcpy(bufp, " die Sicht.");
 		else strcpy(bufp++, ".");
-		rparagraph(F, buf, 0, 0);
+		rparagraph(F, buf, 0, 0, 0);
 	}
 	if (edges) {
 		while (edges) {
@@ -1266,26 +1091,26 @@ statistics(FILE * F, const region * r, const faction * f)
   m = msg_message("nr_stat_header", "region", r);
   nr_render(m, f->locale, buf, sizeof(buf), f);
   msg_release(m);
-  rparagraph(F, buf, 0, 0);
+  rparagraph(F, buf, 0, 0, 0);
   rnl(F);
 
   /* Region */
   if (fval(r->terrain, LAND_REGION) && rmoney(r)) {
     m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
     nr_render(m, f->locale, buf, sizeof(buf), f);
-    rparagraph(F, buf, 2, 0);
+    rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
   }
   if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
     m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
     nr_render(m, f->locale, buf, sizeof(buf), f);
-    rparagraph(F, buf, 2, 0);
+    rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
   }
   if (p) {
     m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
     nr_render(m, f->locale, buf, sizeof(buf), f);
-    rparagraph(F, buf, 2, 0);
+    rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
     
     if (!TradeDisabled()) {
@@ -1297,7 +1122,7 @@ statistics(FILE * F, const region * r, const faction * f)
                         p / TRADE_FRACTION);
       }
       nr_render(m, f->locale, buf, sizeof(buf), f);
-      rparagraph(F, buf, 2, 0);
+      rparagraph(F, buf, 2, 2, 0);
       msg_release(m);
     }
   }
@@ -1305,14 +1130,14 @@ statistics(FILE * F, const region * r, const faction * f)
 
   m = msg_message("nr_stat_people", "max", number);
   nr_render(m, f->locale, buf, sizeof(buf), f);
-  rparagraph(F, buf, 2, 0);
+  rparagraph(F, buf, 2, 2, 0);
   msg_release(m);
   
   for (itm = items; itm; itm=itm->next) {
     sprintf(buf, "%s: %d", 
             LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)),
             itm->number);
-    rparagraph(F, buf, 2, 0);
+    rparagraph(F, buf, 2, 2, 0);
   }
   while (items) i_free(i_remove(&items, items));
 }
@@ -1373,10 +1198,10 @@ durchreisende(FILE * F, const region * r, const faction * f)
 
 	if (maxtravel == 1) {
 		scat(" hat die Region durchquert.");
-		rparagraph(F, buf, 0, 0);
+		rparagraph(F, buf, 0, 0, 0);
 	} else {
 		scat(" haben die Region durchquert.");
-		rparagraph(F, buf, 0, 0);
+		rparagraph(F, buf, 0, 0, 0);
 	}
 }
 
@@ -1622,7 +1447,7 @@ allies(FILE * F, const faction * f)
 		}
 		show_allies(f, f->allies);
 		scat(".");
-		rparagraph(F, buf, 0, 0);
+		rparagraph(F, buf, 0, 0, 0);
 		rnl(F);
 	}
 
@@ -1635,7 +1460,7 @@ allies(FILE * F, const faction * f)
 			}
 			show_allies(f, g->allies);
 			scat(".");
-			rparagraph(F, buf, 0, 0);
+			rparagraph(F, buf, 0, 0, 0);
 			rnl(F);
 		}
 		g = g->next;
@@ -1658,7 +1483,7 @@ enemies(FILE * F, const faction * f)
         scat(".");
       }
     }
-		rparagraph(F, buf, 0, 0);
+		rparagraph(F, buf, 0, 0, 0);
 		rnl(F);
   }
 }
@@ -1718,7 +1543,7 @@ guards(FILE * F, const region * r, const faction * see)
   }
   scat(" bewacht.");
   rnl(F);
-  rparagraph(F, buf, 0, 0);
+  rparagraph(F, buf, 0, 0, 0);
 }
 
 static void
@@ -1744,7 +1569,7 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
 		const faction * f = flist->data;
 		if (f->no!=MONSTER_FACTION) {
 			sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
-			rparagraph(F, buf, 4, (char)(ALLIED(uf, f)?'+':'*'));
+			rparagraph(F, buf, 4, 0, (char)(ALLIED(uf, f)?'+':'*'));
 #ifdef SHORTPWDS
       if (f->shortpwds) {
         shortpwd * spwd = f->shortpwds;
@@ -1873,7 +1698,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 
 #endif
 
-	rparagraph(F, buf, 2, 0);
+	rparagraph(F, buf, 2, 2, 0);
 
 	if (mode<see_lighthouse) return;
 
@@ -2077,7 +1902,7 @@ report_plaintext(const char * filename, report_context * ctx)
 		centre(F, buf, true);
 	}
 
-  rp_messages(F, f->msgs, f, 0, true, true);
+  rp_messages(F, f->msgs, f, 0, true);
 	rp_battles(F, f);
 	a = a_find(f->attribs, &at_reportspell);
 	if (a) {
@@ -2195,8 +2020,8 @@ report_plaintext(const char * filename, report_context * ctx)
 
 		if (unit_in_region || durchgezogen_in_region) {
 			message_list * mlist = r_getmessages(r, f);
-			rp_messages(F, r->msgs, f, 0, true, true);
-			if (mlist) rp_messages(F, mlist, f, 0, true, true);
+			rp_messages(F, r->msgs, f, 0, true);
+			if (mlist) rp_messages(F, mlist, f, 0, true);
 		}
 		/* Burgen und ihre Einheiten */
 
@@ -2279,7 +2104,7 @@ report_plaintext(const char * filename, report_context * ctx)
       if (ch != '!' && ch != '?' && ch != '.')
         scat(".");
 
-      rparagraph(F, buf, 2, 0);
+      rparagraph(F, buf, 2, 2, 0);
 
       print_curses(F,f,sh,TYP_SHIP,4);
 
@@ -2302,7 +2127,7 @@ report_plaintext(const char * filename, report_context * ctx)
   if (f->no != MONSTER_FACTION) {
     if (!anyunits) {
       rnl(F);
-      rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 0);
+      rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
     } else {
       list_address(F, f, ctx->addresses);
     }

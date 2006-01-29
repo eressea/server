@@ -345,6 +345,35 @@
     <text locale="fr">beaucoup de </text>
   </string>
 
+  <string name="nr_spell_description">
+    <text locale="de">Beschreibung:</text>
+    <text locale="en">Description:</text>
+  </string>
+  <string name="nr_spell_type">
+    <text locale="de">Art:</text>
+    <text locale="en">Type:</text>
+  </string>
+  <string name="nr_spell_components">
+    <text locale="de">Komponenten:</text>
+    <text locale="en">Components:</text>
+  </string>
+  <string name="nr_spell_modifiers">
+    <text locale="de">Modifikationen:</text>
+    <text locale="en">Modifications:</text>
+  </string>
+  <string name="nr_spell_level">
+    <text locale="de">Stufe:</text>
+    <text locale="en">Level:</text>
+  </string>
+  <string name="nr_spell_rank">
+    <text locale="de">Rang:</text>
+    <text locale="en">Rank:</text>
+  </string>
+  <string name="nr_spell_syntax">
+    <text locale="de">Syntax:</text>
+    <text locale="en">Syntax:</text>
+  </string>
+
   <string name="nr_trade_intro">
     <text locale="de">Geboten wird für</text>
     <text locale="en">Traders can sell</text>
