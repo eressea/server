@@ -113,12 +113,11 @@ get_command(const order * ord, char * sbuffer, size_t bufsize)
     str += strlcpy(str, LOC(lang, keywords[kwd]), size);
     if (text) {
       *str++ = ' ';
-      *str = 0;
     }
   }
 #endif
   if (text) {
-    str += strlcpy(str, text, sizeof(sbuffer)-(str-sbuffer));
+    str += strlcpy(str, text, bufsize-(str-sbuffer));
   }
   return sbuffer;
 }
