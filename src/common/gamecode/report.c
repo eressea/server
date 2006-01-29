@@ -215,7 +215,7 @@ rparagraph(FILE *F, const char *str, int indent, int hanging_indent, char mark)
     } else {
       fwrite(spaces, sizeof(char), indent+ hanging_indent, F);
     }
-    while (*end && end!=begin+length-indent) {
+    while (*end && end<=begin+length-indent) {
       if (*end==' ') {
         last_space = end;
       }
@@ -1698,7 +1698,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 
 #endif
 
-	rparagraph(F, buf, 2, 2, 0);
+	rparagraph(F, buf, 2, 0, 0);
 
 	if (mode<see_lighthouse) return;
 
@@ -2104,7 +2104,7 @@ report_plaintext(const char * filename, report_context * ctx)
       if (ch != '!' && ch != '?' && ch != '.')
         scat(".");
 
-      rparagraph(F, buf, 2, 2, 0);
+      rparagraph(F, buf, 2, 0, 0);
 
       print_curses(F,f,sh,TYP_SHIP,4);
 
