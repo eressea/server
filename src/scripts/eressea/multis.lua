@@ -1,13 +1,14 @@
 local function kill_multis()
-  local multis = {}
+  local multis = { ["ms04"]="Wird wegen Parteiuebernahme geloescht" }
   for k, v in multis do
-    local f = get_faction(atoi36(v))
+    local f = get_faction(atoi36(k))
     if f~=nil then
       print("- marking " .. tostring(f) .. " as a multi-player.")
       f.email="doppelspieler@eressea.de"
       f.password=""
+      f.info=v
     else
-      print("- could not find faction " .. v)
+      print("- could not find faction " .. k)
     end
   end
 end
