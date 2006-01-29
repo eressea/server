@@ -77,4 +77,12 @@
       <text locale="en">ERESSEA ORDERS</text>
     </string>
   </strings>
+
+  <string name="defaultorder">
+    <text locale="de">ARBEITE</text>
+  </string>
+  <string name="defaultorder">
+    <text locale="en">WORK</text>
+  </string>
+
 </eressea>

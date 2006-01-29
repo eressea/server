@@ -264,7 +264,7 @@ teach(unit * u, struct order * ord)
     teaching -= i * 30;
     change_effect(u, oldpotiontype[P_FOOL], -i);
     j = teaching / 30;
-    add_message(&u->faction->msgs, msg_message("teachdumb",
+    ADDMSG(&u->faction->msgs, msg_message("teachdumb",
       "teacher amount", u, j));
   }
   if (teaching == 0) return;
@@ -385,7 +385,7 @@ teach(unit * u, struct order * ord)
       strcat(zOrder, unitid(u2));
 
       if (get_keyword(u2->thisorder) != K_STUDY) {
-        add_message(&u->faction->msgs,
+        ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "teach_nolearn", "student", u2));
         continue;
       }
@@ -398,14 +398,14 @@ teach(unit * u, struct order * ord)
       parser_popstate();
 
       if (sk == NOSKILL) {
-        add_message(&u->faction->msgs,
+        ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "teach_nolearn", "student", u2));
         continue;
       }
 
       /* u is teacher, u2 is student */
       if (eff_skill_study(u2, sk, r) > eff_skill_study(u, sk, r)-TEACHDIFFERENCE) {
-        add_message(&u->faction->msgs,
+        ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "teach_asgood", "student", u2));
         continue;
       }
@@ -632,7 +632,7 @@ learn(void)
         }
         if (money>0) {
           use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, money);
-          add_message(&u->faction->msgs, msg_message("studycost",
+          ADDMSG(&u->faction->msgs, msg_message("studycost",
             "unit region cost skill", u, u->region, money, sk));
         }
 
@@ -700,9 +700,9 @@ learn(void)
             while (teach->teachers[index] && index!=MAXTEACHERS) {
               unit * teacher = teach->teachers[index++];
               if (teacher->faction != u->faction) {
-                add_message(&u->faction->msgs, msg_message("teach_student",
+                ADDMSG(&u->faction->msgs, msg_message("teach_student",
                   "teacher student skill", teacher, u, sk));
-                add_message(&teacher->faction->msgs, msg_message("teach_teacher",
+                ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
                   "teacher student skill level", teacher, u, sk,
                   effskill(u, sk)));
               }

@@ -6,6 +6,6 @@
   		<text locale="en">With the first two turns, you will get a computer report (CR). It can be used with many of the tools on http://eressea-pbem.de/download.html. If you want to continue getting it after the second turn, please make one of your units give the order OPTION COMPUTER.</text>
 	</string>
 	<string name="defaultorder">
-		<text locale="en">WORK</text>
+		<text locale="en">WORKWORK</text>
 	</string>
 </strings>
