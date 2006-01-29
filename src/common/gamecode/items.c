@@ -2,6 +2,8 @@
 #include <kernel/eressea.h>
 #include "items.h"
 
+#include "study.h"
+
 #include <kernel/curse.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -16,7 +18,6 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
-#include <kernel/study.h>
 #include <kernel/unit.h>
 
 #include <items/demonseye.h>

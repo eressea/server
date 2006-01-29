@@ -32,6 +32,7 @@
 /* gamecode includes */
 #include <gamecode/economy.h>
 #include <gamecode/monster.h>
+#include <gamecode/study.h>
 
 /* kernel includes */
 #include <kernel/alchemy.h>
@@ -55,7 +56,6 @@
 #include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/spellid.h>
-#include <kernel/study.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
