@@ -349,7 +349,7 @@ centre(FILE * F, const char *s, boolean breaking)
 static void
 rparagraph(FILE *F, const char *s, int indent, char mark)
 {
-	static const char * spaces = "                                ";
+  static const char * spaces = "                                ";
   size_t length = REPORTWIDTH - indent;
   const char * end = s;
 
@@ -388,8 +388,8 @@ rparagraph(FILE *F, const char *s, int indent, char mark)
 static void
 report_spell(FILE * F, 	spell *sp, const struct locale * lang)
 {
-	int k, itemanz, costtyp;
-	int dh = 0;
+  int k, itemanz, costtyp;
+  int dh = 0;
   char * bufp;
 
 	rnl(F);
@@ -947,164 +947,167 @@ eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int 
 static void
 describe(FILE * F, const region * r, int partial, faction * f)
 {
-	int n;
-	boolean dh;
-	direction_t d;
-	int trees;
-	int ytrees;
-	attrib *a;
-	const char *tname;
-	struct edge {
-		struct edge * next;
-		char * name;
-		boolean transparent;
-		boolean block;
-		boolean exist[MAXDIRECTIONS];
-		direction_t lastd;
-	} * edges = NULL, * e;
-	boolean see[MAXDIRECTIONS];
+  int n;
+  boolean dh;
+  direction_t d;
+  int trees;
+  int ytrees;
+  attrib *a;
+  const char *tname;
+  struct edge {
+    struct edge * next;
+    char * name;
+    boolean transparent;
+    boolean block;
+    boolean exist[MAXDIRECTIONS];
+    direction_t lastd;
+  } * edges = NULL, * e;
+  boolean see[MAXDIRECTIONS];
   char * bufp = buf;
-
-	for (d = 0; d != MAXDIRECTIONS; d++) {
+  
+  for (d = 0; d != MAXDIRECTIONS; d++) {
     /* Nachbarregionen, die gesehen werden, ermitteln */
-		region *r2 = rconnect(r, d);
-		border *b;
-		see[d] = true;
-		if (!r2) continue;
-		for (b=get_borders(r, r2);b;) {
-			struct edge * e = edges;
-			boolean transparent = b->type->transparent(b, f);
-			const char * name = b->type->name(b, r, f, GF_DETAILED|GF_ARTICLE);
-
-			if (!transparent) see[d] = false;
-			if (!see_border(b, f, r)) {
-				b = b->next;
-				continue;
-			}
-			while (e && (e->transparent != transparent || strcmp(name,e->name))) e = e->next;
-			if (!e) {
-				e = calloc(sizeof(struct edge), 1);
-				e->name = strdup(name);
-				e->transparent = transparent;
-				e->next = edges;
-				edges = e;
-			}
-			e->lastd=d;
-			e->exist[d] = true;
-			b = b->next;
-		}
-	}
-
-	bufp += f_regionid(r, f, bufp, sizeof(buf)-(bufp-buf));
-
-	if (partial == 1) {
-		bufp += strxcpy(bufp, " (durchgereist)");
-	}
-	else if (partial == 3) {
-		bufp += strxcpy(bufp, " (benachbart)");
-	}
-	else if (partial == 2) {
-		bufp += strxcpy(bufp, " (vom Turm erblickt)");
-	}
-	/* Terrain */
-
-	bufp += strxcpy(bufp, ", ");
-	if(is_cursed(r->attribs,C_MAELSTROM, 0))
-		tname = "maelstrom";
-	else {
-		tname = terrain_name(r);
-	}
-	bufp += strxcpy(bufp, LOC(f->locale, tname));
-
-	/* Bäume */
-
-	trees  = rtrees(r,2);
-	ytrees = rtrees(r,1);
-	if (production(r)) {
-		if (trees > 0 || ytrees > 0) {
+    region *r2 = rconnect(r, d);
+    border *b;
+    see[d] = true;
+    if (!r2) continue;
+    for (b=get_borders(r, r2);b;) {
+      struct edge * e = edges;
+      boolean transparent = b->type->transparent(b, f);
+      const char * name = b->type->name(b, r, f, GF_DETAILED|GF_ARTICLE);
+      
+      if (!transparent) see[d] = false;
+      if (!see_border(b, f, r)) {
+        b = b->next;
+        continue;
+      }
+      while (e && (e->transparent != transparent || strcmp(name,e->name))) e = e->next;
+      if (!e) {
+        e = calloc(sizeof(struct edge), 1);
+        e->name = strdup(name);
+        e->transparent = transparent;
+        e->next = edges;
+        edges = e;
+      }
+      e->lastd=d;
+      e->exist[d] = true;
+      b = b->next;
+    }
+  }
+  
+  bufp += f_regionid(r, f, bufp, sizeof(buf)-(bufp-buf));
+  
+  if (partial == 1) {
+    bufp += strxcpy(bufp, " (durchgereist)");
+  }
+  else if (partial == 3) {
+    bufp += strxcpy(bufp, " (benachbart)");
+  }
+  else if (partial == 2) {
+    bufp += strxcpy(bufp, " (vom Turm erblickt)");
+  }
+  /* Terrain */
+  
+  bufp += strxcpy(bufp, ", ");
+  if (is_cursed(r->attribs,C_MAELSTROM, 0)) {
+    tname = "maelstrom";
+  } else {
+    tname = terrain_name(r);
+  }
+  bufp += strxcpy(bufp, LOC(f->locale, tname));
+  
+  /* Bäume */
+  
+  trees  = rtrees(r,2);
+  ytrees = rtrees(r,1);
+  if (production(r)) {
+    if (trees > 0 || ytrees > 0) {
       bufp += sprintf(bufp, ", %d/%d ", trees, ytrees);
-			if (fval(r, RF_MALLORN)) {
-				if (trees == 1)
-					bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree"));
-				else
-					bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree_p"));
-			}
-			else if (trees == 1)
-				bufp += strxcpy(bufp, LOC(f->locale, "nr_tree"));
-			else
-				bufp += strxcpy(bufp, LOC(f->locale, "nr_tree_p"));
-		}
-	}
+      if (fval(r, RF_MALLORN)) {
+        if (trees == 1) {
+          bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree"));
+        } else {
+          bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree_p"));
+        }
+      }
+      else if (trees == 1) {
+        bufp += strxcpy(bufp, LOC(f->locale, "nr_tree"));
+      } else {
+        bufp += strxcpy(bufp, LOC(f->locale, "nr_tree_p"));
+      }
+    }
+  }
 
-	/* iron & stone */
-	if (partial == 0 && f != (faction *) NULL) {
-		struct rawmaterial * res;
-		for (res=r->resources;res;res=res->next) {
-			int level = -1;
-			int visible = -1;
-			int maxskill = 0;
-			const item_type * itype = resource2item(res->type->rtype);
-			if (res->type->visible==NULL) {
-				visible = res->amount;
-				level = res->level + itype->construction->minskill - 1;
-			} else {
-				const unit * u;
-				for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
-					if (u->faction == f) {
-						int s = eff_skill(u, itype->construction->skill, r);
-						if (s>maxskill) {
-							if (s>=itype->construction->minskill) {
-								level = res->level + itype->construction->minskill - 1;
-							}
-							maxskill = s;
-							visible = res->type->visible(res, maxskill);
-						}
-					}
-				}
-			}
-			if (level>=0 && visible >= 0) {
-				bufp += snprintf(bufp, sizeof(buf)-(bufp-buf), ", %d %s/%d", 
-          visible, LOC(f->locale, res->type->name), 
-          res->level + itype->construction->minskill - 1);
-			}
-		}
-	}
+  /* iron & stone */
+  if (partial == 0 && f != (faction *) NULL) {
+    struct rawmaterial * res;
+    for (res=r->resources;res;res=res->next) {
+      int level = -1;
+      int visible = -1;
+      int maxskill = 0;
+      const item_type * itype = resource2item(res->type->rtype);
+      if (res->type->visible==NULL) {
+        visible = res->amount;
+        level = res->level + itype->construction->minskill - 1;
+      } else {
+        const unit * u;
+        for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
+          if (u->faction == f) {
+            int s = eff_skill(u, itype->construction->skill, r);
+            if (s>maxskill) {
+              if (s>=itype->construction->minskill) {
+                level = res->level + itype->construction->minskill - 1;
+              }
+              maxskill = s;
+              visible = res->type->visible(res, maxskill);
+            }
+          }
+        }
+      }
+      if (level>=0 && visible >= 0) {
+        bufp += snprintf(bufp, sizeof(buf)-(bufp-buf), ", %d %s/%d", 
+                         visible, LOC(f->locale, res->type->name), 
+                         res->level + itype->construction->minskill - 1);
+      }
+    }
+  }
 
-	/* peasants & silver */
-	if (rpeasants(r)) {
+  /* peasants & silver */
+  if (rpeasants(r)) {
     int n = rpeasants(r);
-		bufp += sprintf(bufp, ", %d", n);
-
-		if(fval(r, RF_ORCIFIED)) {
-			strcpy(bufp++, " ");
-			bufp += strxcpy(bufp, LOC(f->locale, n==1?"rc_orc":"rc_orc_p"));
-		} else {
-			strcpy(bufp++, " ");
-			bufp += strxcpy(bufp, LOC(f->locale, n==1?"peasant":"peasant_p"));
-		}
-
-		if (rmoney(r) && partial == 0) {
-			bufp += sprintf(bufp, ", %d ", rmoney(r));
-			bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)));
-		}
-	}
-	/* Pferde */
-
-	if (rhorses(r)) {
-		bufp += sprintf(bufp, ", %d ", rhorses(r));
-		bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
-	}
-	strcpy(bufp++, ".");
-
-	if (r->display && r->display[0]) {
-		strcpy(bufp++, " ");
-		bufp += strxcpy(bufp, r->display);
-
-		n = r->display[strlen(r->display) - 1];
-		if (n != '!' && n != '?' && n != '.')
-			strcpy(bufp++, ".");
-	}
-
+    bufp += sprintf(bufp, ", %d", n);
+    
+    if(fval(r, RF_ORCIFIED)) {
+      strcpy(bufp++, " ");
+      bufp += strxcpy(bufp, LOC(f->locale, n==1?"rc_orc":"rc_orc_p"));
+    } else {
+      strcpy(bufp++, " ");
+      bufp += strxcpy(bufp, LOC(f->locale, n==1?"peasant":"peasant_p"));
+    }
+    
+    if (rmoney(r) && partial == 0) {
+      bufp += sprintf(bufp, ", %d ", rmoney(r));
+      bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)));
+    }
+  }
+  /* Pferde */
+  
+  if (rhorses(r)) {
+    bufp += sprintf(bufp, ", %d ", rhorses(r));
+    bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
+  }
+  strcpy(bufp++, ".");
+  
+  if (r->display && r->display[0]) {
+    strcpy(bufp++, " ");
+    bufp += strxcpy(bufp, r->display);
+    
+    n = r->display[strlen(r->display) - 1];
+    if (n != '!' && n != '?' && n != '.') {
+      strcpy(bufp++, ".");
+    }
+  }
+  
   {
     const faction * owner = region_owner(r);
     if (owner!=NULL) {
@@ -1113,7 +1116,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
       strcpy(bufp++, ".");
     }
   }
-
+  
   if (!is_cursed(r->attribs, C_REGCONF, 0)) {
 		attrib *a_do = a_find(r->attribs, &at_overrideroads);
 		if(a_do) {
@@ -1242,76 +1245,76 @@ describe(FILE * F, const region * r, int partial, faction * f)
 static void
 statistics(FILE * F, const region * r, const faction * f)
 {
-    const unit *u;
-    int number, p;
-    message * m;
-    item *itm, *items = NULL;
-    p = rpeasants(r);
-    number = 0;
-    
-    /* zählen */
-    for (u = r->units; u; u = u->next)
-	if (u->faction == f && u->race != new_race[RC_SPELL]) {
-	    for (itm=u->items;itm;itm=itm->next) {
-		i_change(&items, itm->type, itm->number);
-	    }
-	    number += u->number;
-	}
-    
-    /* Ausgabe */
-    rnl(F);
-    m = msg_message("nr_stat_header", "region", r);
-    nr_render(m, f->locale, buf, sizeof(buf), f);
-    rps(F, buf);
-    msg_release(m);
-    rnl(F);
-
-    /* Region */
-    if (fval(r->terrain, LAND_REGION) && rmoney(r)) {
-      m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
-      nr_render(m, f->locale, buf, sizeof(buf), f);
-      rps(F, buf);
-      msg_release(m);
-    }
-    if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
-      m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
-      nr_render(m, f->locale, buf, sizeof(buf), f);
-      rps(F, buf);
-      msg_release(m);
-    }
-    if (p) {
-      m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
-      nr_render(m, f->locale, buf, sizeof(buf), f);
-      rps(F, buf);
-      msg_release(m);
-      
-      if (!TradeDisabled()) {
-	if (buildingtype_exists(r, bt_find("caravan"))) {
-	  m = msg_message("nr_stat_luxuries", "max", 
-			  (p * 2) / TRADE_FRACTION);
-	} else {
-	  m = msg_message("nr_stat_luxuries", "max", 
-			  p / TRADE_FRACTION);
-	}
-	nr_render(m, f->locale, buf, sizeof(buf), f);
-	rps(F, buf);
-	msg_release(m);
+  const unit *u;
+  int number, p;
+  message * m;
+  item *itm, *items = NULL;
+  p = rpeasants(r);
+  number = 0;
+  
+  /* zählen */
+  for (u = r->units; u; u = u->next) {
+    if (u->faction == f && u->race != new_race[RC_SPELL]) {
+      for (itm=u->items;itm;itm=itm->next) {
+        i_change(&items, itm->type, itm->number);
       }
+      number += u->number;
     }
-    /* Info über Einheiten */
+  }
+  /* Ausgabe */
+  rnl(F);
+  m = msg_message("nr_stat_header", "region", r);
+  nr_render(m, f->locale, buf, sizeof(buf), f);
+  msg_release(m);
+  rparagraph(F, buf, 0, 0);
+  rnl(F);
 
-    m = msg_message("nr_stat_people", "max", number);
+  /* Region */
+  if (fval(r->terrain, LAND_REGION) && rmoney(r)) {
+    m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
     nr_render(m, f->locale, buf, sizeof(buf), f);
-    rps(F, buf);
+    rparagraph(F, buf, 2, 0);
     msg_release(m);
-
-    for (itm = items; itm; itm=itm->next) {
-      sprintf(buf, "%s: %d", 
-	      LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)),
-	      itm->number);
-      rps(F, buf);
+  }
+  if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
+    m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
+    nr_render(m, f->locale, buf, sizeof(buf), f);
+    rparagraph(F, buf, 2, 0);
+    msg_release(m);
+  }
+  if (p) {
+    m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
+    nr_render(m, f->locale, buf, sizeof(buf), f);
+    rparagraph(F, buf, 2, 0);
+    msg_release(m);
+    
+    if (!TradeDisabled()) {
+      if (buildingtype_exists(r, bt_find("caravan"))) {
+        m = msg_message("nr_stat_luxuries", "max", 
+                        (p * 2) / TRADE_FRACTION);
+      } else {
+        m = msg_message("nr_stat_luxuries", "max", 
+                        p / TRADE_FRACTION);
+      }
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      rparagraph(F, buf, 2, 0);
+      msg_release(m);
     }
-    while (items) i_free(i_remove(&items, items));
+  }
+  /* Info über Einheiten */
+
+  m = msg_message("nr_stat_people", "max", number);
+  nr_render(m, f->locale, buf, sizeof(buf), f);
+  rparagraph(F, buf, 2, 0);
+  msg_release(m);
+  
+  for (itm = items; itm; itm=itm->next) {
+    sprintf(buf, "%s: %d", 
+            LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)),
+            itm->number);
+    rparagraph(F, buf, 2, 0);
+  }
+  while (items) i_free(i_remove(&items, items));
 }
 
 static void
@@ -2135,40 +2138,40 @@ report_plaintext(const char * filename, report_context * ctx)
 	anyunits = 0;
 
   for (r=ctx->first;r!=ctx->last;r=r->next) {
-		boolean unit_in_region = false;
-		boolean durchgezogen_in_region = false;
-		int turm_sieht_region = false;
+    boolean unit_in_region = false;
+    boolean durchgezogen_in_region = false;
+    int turm_sieht_region = false;
     seen_region * sd = find_seen(ctx->seen, r);
     if (sd==NULL) continue;
-
-		switch (sd->mode) {
-		case see_lighthouse:
-			turm_sieht_region = true;
-			break;
-		case see_far:
-			break;
-		case see_travel:
-			durchgezogen_in_region = true;
-			break;
-		case see_unit:
-			unit_in_region = true;
-			anyunits = true;
-			break;
-		default:
-			continue;
-		}
-		r = sd->r;
-		/* Beschreibung */
-
-		if (unit_in_region) {
-			describe(F, r, 0, f);
-			if (!TradeDisabled() && !fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
-				rnl(F);
-				prices(F, r, f);
-			}
-			guards(F, r, f);
-			durchreisende(F, r, f);
-		}
+    
+    switch (sd->mode) {
+    case see_lighthouse:
+      turm_sieht_region = true;
+      break;
+    case see_far:
+      break;
+    case see_travel:
+      durchgezogen_in_region = true;
+      break;
+    case see_unit:
+      unit_in_region = true;
+      anyunits = true;
+      break;
+    default:
+      continue;
+    }
+    r = sd->r;
+    /* Beschreibung */
+    
+    if (unit_in_region) {
+      describe(F, r, 0, f);
+      if (!TradeDisabled() && !fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
+        rnl(F);
+        prices(F, r, f);
+      }
+      guards(F, r, f);
+      durchreisende(F, r, f);
+    }
     else {
       if (sd->mode==see_far) {
 			  describe(F, r, 3, f);

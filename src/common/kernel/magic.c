@@ -336,10 +336,11 @@ create_mage(unit * u, magic_t mtyp)
   sc_mage *mage;
   attrib *a;
 
-#ifndef NDEBUG
   a = a_find(u->attribs, &at_mage);
-  assert(a==NULL);
-#endif
+  if (a!=NULL) {
+    mage = a->data.v;
+    assert(mage->spells==NULL && mage->magietyp == mtyp);
+  }
   a = a_add(&u->attribs, a_new(&at_mage));
   mage = a->data.v;
 

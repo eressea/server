@@ -464,9 +464,9 @@
     <type>
       <arg name="max" type="int"/>
     </type>
-    <text locale="de">"Rekruten: max. $int($max) Bauern."</text>
-    <text locale="en">"Recruits: $int($max) peasants."</text>
-    <text locale="fr">"Recruits: $int($max) peasants."</text>
+    <text locale="de">"Rekruten: max. $int($max) Bauern"</text>
+    <text locale="en">"Recruits: $int($max) peasants"</text>
+    <text locale="fr">"Recruits: $int($max) peasants"</text>
   </message>
   <message name="nr_score" section="nr">
     <type>
