@@ -209,6 +209,18 @@ faction_get_passw(const faction& f)
 }
 
 void
+faction_set_banner(faction& f, const char * banner)
+{
+  set_string(&f.banner, banner);
+}
+
+const char *
+faction_get_banner(const faction& f)
+{
+  return f.banner;
+}
+
+void
 faction_set_email(faction& f, const char * email)
 {
   set_string(&f.email, email);
@@ -279,7 +291,6 @@ bind_faction(lua_State * L)
     .def("set_variable", &faction_set_variable)
     .def("get_variable", &faction_get_variable)
     .def("delete_variable", &faction_delete_variable)
-    .def_readonly("info", &faction::banner)
     .def_readonly("name", &faction::name)
     .def_readonly("id", &faction::no)
     .def_readwrite("age", &faction::age)
@@ -296,6 +307,7 @@ bind_faction(lua_State * L)
 
     .def("add_notice", &faction_addnotice)
     .property("password", &faction_get_passw, &faction_set_passw)
+    .property("info", &faction_get_banner, &faction_set_banner)
     .property("email", &faction_get_email, &faction_set_email)
     .property("locale", &faction_getlocale, &faction_setlocale)
     .property("units", &faction_units, return_stl_iterator)
