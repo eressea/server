@@ -1009,7 +1009,9 @@ korrektur(void)
   do_once("asfi", &fix_astral_firewalls);
   frame_regions();
 #ifdef GLOBAL_WARMING
-  global_warming();
+  if (current_season == SEASON_SUMMER) {
+    global_warming();
+  }
 #endif
 	fix_astralplane();
 	fix_firewalls();
