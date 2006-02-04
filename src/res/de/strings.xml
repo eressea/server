@@ -316,7 +316,7 @@
 
   <string name="Tresen">
     <text locale="de">Tresen</text>
-    <text locale="en">counter </text>
+    <text locale="en">counter</text>
   </string>
 
   <string name="wenige">
@@ -1476,10 +1476,10 @@
     <text locale="de">Rostige Kettenhemden</text>
   </string>
   <string name="soc">
-    <text locale="de">Magischer Kräuterbeutel</text>
+    <text locale="de">Beutel des negativen Gewichts</text>
   </string>
   <string name="soc_p">
-    <text locale="de">Magische Kräuterbeutel</text>
+    <text locale="de">Beutel des negativen Gewichts</text>
   </string>
   <string name="ror">
     <text locale="de">Ring der Regeneration</text>
@@ -4698,7 +4698,7 @@
       benötigt er ein wenig Glück für eine gelungene Analyse.
       </text>
       <text locale="en">
-      With this spell the mage can try to identify the
+      With this spell the magician can try to identify the
       enchantments of
       a single object. He will get an impression of the
       operation of all
@@ -4738,7 +4738,7 @@
       scholar of Tybied. His potions and tinctures may help when nothing
       else does. If the cryptic formula under the wooden shoes of the
       unfaithful husband really helped? - well, the peasant, who isn't
-      capable of reading, will never know. At least it helped the mage...
+      capable of reading, will never know. At least it helped the magician...
       to fill his purse. In one week he can earn 50 silver per level that
       way.
       </text>
@@ -4777,7 +4777,7 @@
       ziehen.</text>
       <text locale="en">This little melody calms even the
       wildest orc to a gentle and serene creature who will not
-      even think about putting the singer to harm. The mage
+      even think about putting the singer to harm. The magician
       may travel to a neighboring region without being
       harassed by annoying troublemakers.</text>
     </string>
@@ -4916,7 +4916,7 @@
       <text locale="en">The persons of the bewitched unit
       starts to babble without control about what it is said,
       speaking about their talents, the objects they carry or
-      wear and if the unit is a mage, he or she will even list
+      wear and if the unit is a magician, he or she will even list
       the spells they know. Unfortunately, this spell does not
       influence the memory of the subjects and afterwards, the
       enchanted will realize that they probably talked too
@@ -4951,7 +4951,7 @@
       appreciated among the peasants. Especially at the
       markets, their services are demanded frequently. Some of
       them also use their talents to sell an animal at a
-      higher price. A mage can earn 50 silver pieces per level
+      higher price. A magician can earn 50 silver pieces per level
       in this way.</text>
     </string>
     <string name="stonegolem">
@@ -4971,7 +4971,7 @@
       stone and humidify it with a vial of Water Of Life until
       the potion has been soaked up completely. Then focus
       your power on the forming aura of life and shape a
-      container for the unbound forces'. The more power a mage
+      container for the unbound forces'. The more power a magician
       invests, the more golems can be created before the aura
       dissipates. Every week, there is a 10 percent chance
       that the golem will crumble to dust. If you command a
@@ -4987,7 +4987,7 @@
       SCHWERT/BIHÄNDER oder MACHE
       SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 4
       Eisenbarren verbaut und der Golem löst sich auf. </text>
-      <text locale="en">The more power a mage invests, the
+      <text locale="en">The more power a magician invests, the
       more golems can be created before the aura dissipates.
       Each golem has a 15% chance per week to turn to dust. If
       you command a golem to 'MAKE SWORD/MAKE CLAYMORE' or
@@ -5022,7 +5022,7 @@
         magic rain will let rust any ore. Iron weapons and
         armor will get rusty. The exact number of
         items affected by the rain depends on the
-        ammount of power invested by the mage. Up to ten
+        ammount of power invested by the magician. Up to ten
         weapons can be destroyed per level - a Ring Of
         Power increases the effect like an additional
         level.
@@ -5960,9 +5960,9 @@
         ungewöhnliches Exemplar einer Gattung begegnen,
         welches sich dem Magier anschließen wird.
       </text>
-      <text locale="en">Once, during his travels, the seasoned
-        mage will meet an extraordinary creature of its
-        species that will join him.
+      <text locale="en">During their travel, seasoned
+        magicians will occasionally befriend an extraordinary 
+        creature of an unusual species that will join them.
       </text>
     </string>
     <string name="chaossuction">
@@ -6215,7 +6215,7 @@
       eine bestimmte Richtung zu bewegen.
       </text>
       <text locale="en">
-      The mage creates a magic fog in every forrest and ocean region in a
+      The magician creates a magic fog in every forrest and ocean region in a
       perimeter of some regions. The fog lasts some weeks and persons
       passing this fog have a chance to get lost,  moving to a certain
       direction is difficult.
@@ -6232,13 +6232,13 @@
       der Magier einen kleinen Teil seiner Aura für immer.
       </text>
       <text locale="en">
-      The mage spawns a little monster, a nightmare. The nightmare slowly
+      The magician spawns a little monster, a nightmare. The nightmare slowly
       approaches its victim (which may be at an arbitrary place in eressea, it
-      is not needed for the mage or his party  to see the victim). As soon as
+      is not needed for the magician or his party  to see the victim). As soon as
       the victim is reached the nightmare starts to torment it  without mercy,
-      only a powerfull counter spell or the death of the casting mage can
+      only a powerfull counter spell or the death of the casting magician can
       redeem
-      the victim. When spawning the nightmare the mage loses a small amount of
+      the victim. When spawning the nightmare the magician loses a small amount of
       his aura forever.
       </text>
     </string>
@@ -6278,7 +6278,7 @@
       Unsichtbarkeit
       erschaffen. Die Späre macht ihren Träger sowie neunundneunzig weitere
       Personen in derselben Einheit unsichtbar.</text>
-      <text locale="en">Using this spell the mage can create a Sphere of
+      <text locale="en">Using this spell the magician can create a Sphere of
       Invisibility. This artefact hides the person bearing it and one hundred
       persons in the same unit.</text>
     </string>
@@ -6340,7 +6340,7 @@
       Exemplar einer Gattung begegnen, welches sich dem Magier
       anschließen wird. </text>
       <text locale="en">Once during his travels, the seasoned
-      mage will meet an extraordinary creature of its species
+      magician will meet an extraordinary creature of its species
       that will join him. </text>
     </string>
     <string name="mindblast">
