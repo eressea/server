@@ -91,62 +91,62 @@ locale_getstring(const locale * lang, const char * key)
 const char *
 locale_string(const locale * lang, const char * key)
 {
-	if (key==NULL) return NULL;
-	else {
-		unsigned int hkey = hashstring(key);
-		unsigned int id = hkey % SMAXHASH;
-		struct locale_str * find;
+  if (key==NULL) return NULL;
+  else {
+    unsigned int hkey = hashstring(key);
+    unsigned int id = hkey % SMAXHASH;
+    struct locale_str * find;
     
-		if (key == NULL || *key==0) return NULL;
-		if (lang == NULL) return key;
-		find = lang->strings[id];
-		while (find) {
-			if (find->hashkey == hkey && !strcmp(key, find->key)) break;
-			find = find->nexthash;
-		}
-		if (!find) {
-			const char * s = key;
-			log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
-			if (lang!=default_locale) {
-				s = locale_string(default_locale, key);
-			}
-			if (s_logfile) {
+    if (key == NULL || *key==0) return NULL;
+    if (lang == NULL) return key;
+    find = lang->strings[id];
+    while (find) {
+      if (find->hashkey == hkey && !strcmp(key, find->key)) break;
+      find = find->nexthash;
+    }
+    if (!find) {
+      const char * s = key;
+      log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
+      if (lang!=default_locale) {
+        s = locale_string(default_locale, key);
+      }
+      if (s_logfile) {
         s_debug = s_debug?s_debug:fopen(s_logfile, "w+");
         if (s_debug) {
           fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
           fflush(s_debug);
           locale_setstring((struct locale*)lang, key, s);
         }
-			}
-			return s;
-		}
-		return find->str;
-	}
+      }
+      return s;
+    }
+    return find->str;
+  }
 }
 
 void
 locale_setstring(locale * lang, const char * key, const char * value)
 {
-	int nval = atoi(key);
-	unsigned int hkey = nval?nval:hashstring(key);
-	unsigned int id = hkey % SMAXHASH;
-	struct locale_str * find;
-
-	if (lang==NULL) lang=default_locale;
-	find = lang->strings[id];
-	while (find) {
-		if (find->hashkey==hkey && !strcmp(key, find->key)) break;
-		find=find->nexthash;
-	}
-	if (!find) {
-		find = calloc(1, sizeof(struct locale_str));
-		find->nexthash = lang->strings[id];
-		lang->strings[id] = find;
-		find->hashkey = hkey;
-		find->key = strdup(key);
-		find->str = strdup(value);
-	}
-	else {
+  int nval = atoi(key);
+  unsigned int hkey = nval?nval:hashstring(key);
+  unsigned int id = hkey % SMAXHASH;
+  struct locale_str * find;
+  
+  if (lang==NULL) lang=default_locale;
+  find = lang->strings[id];
+  while (find) {
+    if (find->hashkey==hkey && !strcmp(key, find->key)) break;
+    find=find->nexthash;
+  }
+  if (!find) {
+    find = calloc(1, sizeof(struct locale_str));
+    find->nexthash = lang->strings[id];
+    lang->strings[id] = find;
+    find->hashkey = hkey;
+    find->key = strdup(key);
+    find->str = strdup(value);
+  }
+  else {
     if (strcmp(find->str, value)!=0) {
       log_error(("Duplicate key %s for '%s' and '%s'\n", key, value, find->str));
     }

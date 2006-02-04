@@ -321,28 +321,28 @@
 
   <string name="wenige">
     <text locale="de">wenige</text>
-    <text locale="en">few </text>
+    <text locale="en">few</text>
   </string>
 
   <string name="viele">
     <text locale="de">viele</text>
-    <text locale="en">many </text>
+    <text locale="en">many</text>
   </string>
 
   <string name="relativ viele">
     <text locale="de">relativ viele</text>
-    <text locale="en">rather many </text>
+    <text locale="en">rather many</text>
   </string>
 
   <string name="sehr wenige">
     <text locale="de">sehr wenige</text>
-    <text locale="en">very few </text>
+    <text locale="en">very few</text>
   </string>
 
   <string name="sehr viele">
     <text locale="de">sehr viele</text>
-    <text locale="en">a great many </text>
-    <text locale="fr">beaucoup de </text>
+    <text locale="en">a great many</text>
+    <text locale="fr">beaucoup de</text>
   </string>
 
   <string name="nr_spell_description">

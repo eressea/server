@@ -60,13 +60,11 @@ intlist_find(int *i_p, int fi)
 unsigned int
 hashstring(const char* s)
 {
-	unsigned int key = 0;
-	size_t i = strlen(s);
-
-	while (i>0) {
-		key = (s[--i] + key*37);
-	}
-	return key % 0x7FFFFFFF;
+  unsigned int key = 0;
+  while (*s) {
+    key = key*37 + *s++;
+  }
+  return key % 0x7FFFFFFF;
 }
 
 const char *

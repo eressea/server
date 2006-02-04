@@ -93,6 +93,8 @@ do_command_i(const struct tnode * keys, void * u, const char * str, struct order
   return E_TOK_NOMATCH;
 }
 
+struct unit;
+struct order;
 extern char * getcommand(struct order * ord);
 extern char * unitname(struct unit * u);
 
