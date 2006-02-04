@@ -75,7 +75,7 @@ const char *
 locale_getstring(const locale * lang, const char * key)
 {
 	unsigned int hkey = hashstring(key);
-	unsigned int id = hkey % SMAXHASH;
+	unsigned int id = hkey & (SMAXHASH-1);
 	const struct locale_str * find;
 
 	assert(lang);
@@ -94,7 +94,7 @@ locale_string(const locale * lang, const char * key)
   if (key==NULL) return NULL;
   else {
     unsigned int hkey = hashstring(key);
-    unsigned int id = hkey % SMAXHASH;
+    unsigned int id = hkey & (SMAXHASH-1);
     struct locale_str * find;
     
     if (key == NULL || *key==0) return NULL;
@@ -129,16 +129,23 @@ locale_setstring(locale * lang, const char * key, const char * value)
 {
   int nval = atoi(key);
   unsigned int hkey = nval?nval:hashstring(key);
-  unsigned int id = hkey % SMAXHASH;
+  unsigned int id = hkey & (SMAXHASH-1);
   struct locale_str * find;
-  
+  static int maxs = 0, totals = 0;
+  int si=0;
   if (lang==NULL) lang=default_locale;
   find = lang->strings[id];
   while (find) {
+    ++si;
     if (find->hashkey==hkey && !strcmp(key, find->key)) break;
     find=find->nexthash;
   }
   if (!find) {
+    ++totals;
+    if (si>=maxs) {
+      maxs=si+1;
+      printf("max hash conflicts: %d/%d\n", maxs, totals);
+    }
     find = calloc(1, sizeof(struct locale_str));
     find->nexthash = lang->strings[id];
     lang->strings[id] = find;

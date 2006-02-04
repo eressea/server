@@ -5,8 +5,7 @@
  * feel that you need to include it, it's a sure sign that you're trying to
  * do something BAD. */
 
-#define SMAXHASH 512
-
+#define SMAXHASH 2048
 typedef struct locale_str {
   unsigned int hashkey;
   struct locale_str * nexthash;
