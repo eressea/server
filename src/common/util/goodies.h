@@ -21,9 +21,14 @@ extern "C" {
 extern int *intlist_init(void);
 extern int *intlist_add(int *i_p, int i);
 extern int *intlist_find(int *i_p, int i);
-extern unsigned int hashstring(const char* s);
 
+#ifdef HAVE_INLINE
+# include "strings.c"
+#else
+extern unsigned int hashstring(const char* s);
 extern const char *escape_string(const char * str, char * buffer, unsigned int len);
+#endif
+
 extern boolean locale_check(void);
 
 extern int set_email(char** pemail, const char *newmail);

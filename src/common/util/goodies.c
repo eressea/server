@@ -57,38 +57,6 @@ intlist_find(int *i_p, int fi)
 	return NULL;
 }
 
-unsigned int
-hashstring(const char* s)
-{
-  unsigned int key = 0;
-  while (*s) {
-    key = key*37 + *s++;
-  }
-  return key % 0x7FFFFFFF;
-}
-
-const char *
-escape_string(const char * str, char * buffer, unsigned int len)
-{
-	static char s_buffer[4096];
-	const char * p = str;
-	char * o;
-	if (buffer==NULL) {
-		buffer = s_buffer;
-		len = sizeof(s_buffer);
-	}
-	o = buffer;
-	do {
-		switch (*p) {
-		case '\"':
-		case '\\':
-			(*o++) = '\\';
-		}
-		(*o++) = (*p);
-	} while (*p++);
-	return buffer;
-}
-
 char *
 set_string (char **s, const char *neu)
 {

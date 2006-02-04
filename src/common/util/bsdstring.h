@@ -1,10 +1,6 @@
 #ifndef UTIL_BSDSTRING_H
 #define UTIL_BSDSTRING_H
 
-#ifndef NDEBUG
-# undef HAVE_INLINE
-#endif
-
 #if !defined(HAVE_STRLCPY)
 # ifdef HAVE_INLINE
 #  include "bsdstring.c"
