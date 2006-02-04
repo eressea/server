@@ -39,6 +39,7 @@
 #include <kernel/alliance.h>
 #include <kernel/border.h>
 #include <kernel/building.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
@@ -1009,7 +1010,7 @@ korrektur(void)
   do_once("asfi", &fix_astral_firewalls);
   frame_regions();
 #ifdef GLOBAL_WARMING
-  if (current_season == SEASON_SUMMER) {
+  if (get_gamedate(turn, NULL)->season == SEASON_SUMMER) {
     global_warming();
   }
 #endif
