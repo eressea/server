@@ -28,7 +28,7 @@ typedef struct gamedate {
   int week;
 } gamedate;
 
-extern gamedate * get_gamedate(int turn, gamedate * gd);
+extern const gamedate * get_gamedate(int turn, gamedate * gd);
 extern void calendar_cleanup(void);
 
 #ifdef __cplusplus

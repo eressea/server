@@ -24,7 +24,7 @@
 				AdditionalIncludeDirectories="../.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="4"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="2"

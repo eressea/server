@@ -13,7 +13,7 @@ int  *month_season = NULL;
 char *agename = NULL;
 int  seasons = 0;
 
-gamedate *
+const gamedate *
 get_gamedate(int turn, gamedate * gd)
 {
   static gamedate staticdate;

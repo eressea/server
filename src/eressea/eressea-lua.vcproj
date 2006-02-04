@@ -27,7 +27,7 @@
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="4"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="FALSE"
 				UsePrecompiledHeader="2"
