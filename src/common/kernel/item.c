@@ -760,11 +760,6 @@ static t_item itemdata[MAXITEMS] = {
     {"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
       IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
   },
-  {			/* I_TOADSLIME 73 */
-    {"Tiegel mit Krötenschleim", "Tiegel mit Krötenschleim",
-      "", ""},
-      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-  },
   { /* I_BAG_OF_HOLDING */
     {"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
       IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
@@ -883,6 +878,7 @@ static translate_t translation[] = {
 	{ "Drachenblut", "dragonblood", "dragonblood_p", "dragonblood", "dragonblood_p" },
 	{ "Feenstiefel", "fairyboot", "fairyboot_p", "fairyboot", "fairyboot_p" },
 	{ "Gürtel der Trollstärke", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
+  { "Tiegel mit Krötenschleim", "toadslime", "toadslime_p", "toadslime", "toadslime_p" },
 	{ "Mallorn", "mallorn", "mallorn_p", "mallorn", "mallorn_p" },
 	{ "Wagen", "cart", "cart_p", "cart", "cart_p" },
 	{ "Plattenpanzer", "plate", "plate_p", "plate", "plate_p" },

@@ -1318,7 +1318,12 @@ do_fumble(castorder *co)
       * trigger and that's added to the triggerlit of the mage gone toad.
       */
       trigger * trestore = trigger_changerace(u, u->race, u->irace);
-      if (rand()%10>2) t_add(&trestore, trigger_giveitem(u, olditemtype[I_TOADSLIME], 1));
+      if (chance(0.7)) {
+        const item_type * it_toadslime = it_find("toadslime");
+        if (it_toadslime!=NULL) {
+          t_add(&trestore, trigger_giveitem(u, it_toadslime, 1));
+        }
+      }
       add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
     }
     u->race = new_race[RC_TOAD];

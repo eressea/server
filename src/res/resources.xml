@@ -636,4 +636,8 @@
     </item>
   </resource>
 
+  <resource name="toadslime" appearance="vial">
+    <item weight="100" score="0"/>
+  </resource>
+
 </resources>
