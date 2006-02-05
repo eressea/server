@@ -2163,11 +2163,11 @@
   </message>
   <message name="renamed_faction_seen" section="events">
     <type>
-      <arg name="renamer" type="unit"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Die Partei bekommt von $unit($renamer) in $region($region) einen Spitznamen."</text>
-    <text locale="en">"Your faction received a nickname from $unit($renamer)."</text>
+    <text locale="de">"Die Partei bekommt von $unit($unit) in $region($region) einen Spitznamen."</text>
+    <text locale="en">"Your faction received a nickname from $unit($unit)."</text>
   </message>
   <message name="renamed_building_notseen" section="events">
     <type>
