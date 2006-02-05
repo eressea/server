@@ -1478,7 +1478,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
 		for (co = cll[spellrank]; co; co = co->next) {
-			fighter * fig = (fighter*)co->magician;
+			fighter * fig = co->magician.fig;
 			const spell * sp = co->sp;
 			int level = co->level;
 			double power = co->force;

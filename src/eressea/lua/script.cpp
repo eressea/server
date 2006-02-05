@@ -90,11 +90,17 @@ static int
 lua_callspell(castorder *co)
 {
   const char * fname = co->sp->sname;
-  unit * mage = (unit*)co->magician;
+  unit * mage = co->familiar?co->familiar:co->magician.u;
   int retval = -1;
+  const char * hashpos = strchr(fname, '#');
+  char fbuf[64];
 
-  if (co->familiar) {
-    mage = co->familiar;
+  if (hashpos!=NULL) {
+    ptrdiff_t len = hashpos - fname;
+    assert(len<sizeof(buf));
+    strncpy(fbuf, fname, len);
+    fbuf[len] = '\0';
+    fname = fbuf;
   }
 
   lua_State * L = (lua_State *)global.vm_state;

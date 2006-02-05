@@ -90,7 +90,7 @@ function create_bagofholding(r, mage, level, force)
 end
 
 -- TODO:
-function earnsilver(r, mage, level, force)
+function earn_silver(r, mage, level, force)
   local money = r:get_resource("money")
   local wanted = 50 * force
   local amount = wanted
@@ -100,11 +100,12 @@ function earnsilver(r, mage, level, force)
   r:set_resource("money", money - amount)
   mage:add_item("money", amount)
 
-  msg = message("income")
+  local msg = message("income")
   msg:set_unit("unit", mage)
   msg:set_region("region", r)
   msg:set_int("mode", 6)
   msg:set_int("wanted", wanted)
   msg:set_int("amount", amount)
   msg:send_faction(mage.faction)
+  return level
 end

@@ -13,6 +13,7 @@ without prior permission by the authors of Eressea.
 #include "log.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
@@ -75,25 +76,52 @@ log_close(void)
   logfile = 0;
 }
 
+static int
+check_dupe(const char * format, const char * type) 
+{
+  static const char * last_type;
+  static char last_message[32];
+  static int dupes = 0;
+  if (strncmp(last_message, format, sizeof(last_message))==0) {
+    ++dupes;
+    return 1;
+  }
+  if (dupes) {
+    fprintf(logfile, "%s: last error repeated %d times\n", last_type, dupes+1);
+    if (logfile!=stderr) {
+      if (flags & LOG_CPERROR) {
+        fprintf(stderr, "%s: last error repeated %d times\n", last_type, dupes+1);
+      }
+    }
+    dupes = 0;
+  }
+  strncpy(last_message, format, sizeof(last_message));
+  last_type = type;
+  return 0;
+}
+
 void 
 _log_warn(const char * format, ...)
 {
-  va_list marker;
   fflush(stdout);
   if (!logfile) logfile = stderr;
-  fputs("WARNING: ", logfile);
-  va_start(marker, format);
-  vfprintf(logfile, format, marker);
-  va_end(marker);
-  if (logfile!=stderr) {
-    if (flags & LOG_CPWARNING) {
-      fputs("WARNING: ", stderr);
-      va_start(marker, format);
-      vfprintf(stderr, format, marker);
-      va_end(marker);
-    }
-    if (flags & LOG_FLUSH) {
-      log_flush();
+
+  if (!check_dupe(format, "WARNING")) {
+    va_list marker;
+    fputs("WARNING: ", logfile);
+    va_start(marker, format);
+    vfprintf(logfile, format, marker);
+    va_end(marker);
+    if (logfile!=stderr) {
+      if (flags & LOG_CPWARNING) {
+        fputs("WARNING: ", stderr);
+        va_start(marker, format);
+        vfprintf(stderr, format, marker);
+        va_end(marker);
+      }
+      if (flags & LOG_FLUSH) {
+        log_flush();
+      }
     }
   }
 }
@@ -101,22 +129,24 @@ _log_warn(const char * format, ...)
 void 
 _log_error(const char * format, ...)
 {
-  va_list marker;
   fflush(stdout);
   if (!logfile) logfile = stderr;
 
-  fputs("ERROR: ", logfile);
-  va_start(marker, format);
-  vfprintf(logfile, format, marker);
-  va_end(marker);
-  if (logfile!=stderr) {
-    if (flags & LOG_CPERROR) {
-      fputs("ERROR: ", stderr);
-      va_start(marker, format);
-      vfprintf(stderr, format, marker);
-      va_end(marker);
+  if (!check_dupe(format, "ERROR")) {
+    va_list marker;
+    fputs("ERROR: ", logfile);
+    va_start(marker, format);
+    vfprintf(logfile, format, marker);
+    va_end(marker);
+    if (logfile!=stderr) {
+      if (flags & LOG_CPERROR) {
+        fputs("ERROR: ", stderr);
+        va_start(marker, format);
+        vfprintf(stderr, format, marker);
+        va_end(marker);
+      }
+      log_flush();
     }
-    log_flush();
   }
 }
 

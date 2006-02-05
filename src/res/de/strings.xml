@@ -2299,6 +2299,10 @@
   <string name="REPORT">
     <text locale="de">REPORT</text>
   </string>
+  <string name="XML">
+    <text locale="de">XML</text>
+    <text locale="en">XML</text>
+  </string>
   <string name="URSPRUNG">
     <text locale="de">URSPRUNG</text>
   </string>
@@ -4057,7 +4061,7 @@
       <text locale="de">Schutz vor Magie</text>
       <text locale="en">Protection from Magic</text>
     </string>
-    <string name="miracle_doctor">
+    <string name="earn_silver#tybied">
       <text locale="de">Wunderdoktor</text>
       <text locale="en">Miracle Doctor</text>
     </string>
@@ -4121,7 +4125,7 @@
       <text locale="de">Regentanz</text>
       <text locale="en">Rain Dance</text>
     </string>
-    <string name="jugglery">
+    <string name="earn_silver#cerddor">
       <text locale="de">Gaukeleien</text>
       <text locale="en">Jugglery</text>
     </string>
@@ -4129,7 +4133,7 @@
       <text locale="de">Friedenslied</text>
       <text locale="en">Appeasing Song</text>
     </string>
-    <string name="gwyrrdearnsilver">
+    <string name="earn_silver#gwyrrd">
       <text locale="de">Viehheilung</text>
       <text locale="en">Cattle Healing</text>
     </string>
@@ -4305,7 +4309,7 @@
       <text locale="de">Verwünschung</text>
       <text locale="en">Hex</text>
     </string>
-    <string name="draigearnsilver">
+    <string name="earn_silver#draig">
       <text locale="de">Kleine Flüche</text>
       <text locale="en">Minor Curses</text>
     </string>
@@ -4423,7 +4427,7 @@
       <text locale="de">Traumsenden</text>
       <text locale="en">Dream</text>
     </string>
-    <string name="illaunearnsilver">
+    <string name="earn_silver#illaun">
       <text locale="de">Wahrsagen</text>
       <text locale="en">Divination</text>
     </string>
@@ -4722,7 +4726,7 @@
       spies.
       </text>
     </string>
-    <string name="miracle_doctor">
+    <string name="earn_silver#tybied">
       <text locale="de">
       Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
       gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen
@@ -4922,7 +4926,7 @@
       enchanted will realize that they probably talked too
       much.</text>
     </string>
-    <string name="jugglery">
+    <string name="earn_silver#cerddor">
       <text locale="de">Cerddormagier sind _die_ Gaukler unter
       den Magiern, sie lieben es das Volk zu unterhalten und
       im Mittelpunkt zu stehen. Schon Anfänger lernen die
@@ -4939,7 +4943,7 @@
       the end of the week, the bard will have earned 50 silver
       per level. </text>
     </string>
-    <string name="gwyrrdearnsilver">
+    <string name="earn_silver#gwyrrd">
       <text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
       der Viehzucht und Heilung sind bei den Bauern sehr
       begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr
@@ -5533,7 +5537,7 @@
          subject to a harmless curse.
       </text>
     </string>
-    <string name="draigearnsilver">
+    <string name="earn_silver#draig">
       <text locale="de">In den dunkleren Gassen gibt es sie,
         die Flüche und Verhexungen auf Bestellung. Aber
         auch Gegenzauber hat der Jünger des Draigs
@@ -5990,7 +5994,7 @@
         cible du sort.
       </text>
     </string>
-    <string name="illaunearnsilver">
+    <string name="earn_silver#illaun">
       <text locale="fr">Personne n'interprète aussi bien les
         rêves que les mages d'Illaun. Ils sont également
         versés dans l'utilisation des objets utilisés

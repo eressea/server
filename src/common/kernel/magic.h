@@ -124,7 +124,10 @@ typedef struct sc_mage {
 
 typedef struct castorder {
   struct castorder *next;
-  void *magician;        /* Magier (kann vom Typ struct unit oder fighter sein) */
+  union {
+    struct unit * u;
+    struct fighter * fig;
+  } magician; /* Magier (kann vom Typ struct unit oder fighter sein) */
   struct unit *familiar; /* Vertrauter, gesetzt, wenn der Spruch durch
                          den Vertrauten gezaubert wird */
   const struct spell *sp; /* Spruch */

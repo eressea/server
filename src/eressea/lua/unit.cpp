@@ -192,7 +192,7 @@ unit_castspell(unit& u, const char * name)
       co->familiar = NULL;
       co->force = sp->level;
       co->level = sp->level;
-      co->magician = &u;
+      co->magician.u = &u;
       co->order = NULL;
       co->par = NULL;
       co->rt = u.region;

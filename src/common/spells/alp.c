@@ -91,7 +91,7 @@ sp_summon_alp(struct castorder *co)
 {
 	unit *alp, *opfer;
 	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
+	unit *mage = co->magician.u;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
 

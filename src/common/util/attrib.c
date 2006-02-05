@@ -247,18 +247,16 @@ a_age(attrib ** p)
 	return (*p!=NULL);
 }
 
-void
+int
 a_read(FILE * f, attrib ** attribs)
 {
-	int key;
+	int key, retval = AT_READ_OK;
 	char zText[128];
 	strcpy(zText, "unknown");
 
 	key = -1;
 	fscanf(f, "%s", zText);
-	if (!strcmp(zText, "end")) return;
-/*	{	fgets(zText, sizeof(zText), f); ENNO: was ist das?  "always ends with \n" ? */
-/*		key=-1; }*/
+	if (strcmp(zText, "end")==0) return retval;
 	else key = __at_hashkey(zText);
 
 	while(key!=-1) {
@@ -275,6 +273,7 @@ a_read(FILE * f, attrib ** attribs)
 				a_add(attribs, na);
 				break;
 			case AT_READ_FAIL:
+        retval = AT_READ_FAIL;
 				a_free(na);
 				break;
 			default:
@@ -289,6 +288,7 @@ a_read(FILE * f, attrib ** attribs)
 		if (!strcmp(zText, "end")) break;
 		key = __at_hashkey(zText);
 	}
+  return retval;
 }
 
 void

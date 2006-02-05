@@ -155,6 +155,7 @@ extern "C" {
 static char * orders = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
+static boolean g_ignore_errors = false;
 static boolean opt_reportonly = false;
 static const char * luafile = "default.lua";
 static const char * script_path = "scripts";
@@ -446,6 +447,7 @@ usage(const char * prog, const char * arg)
     "-R               : erstellt nur die Reports neu\n"
     "--lomem          : keine Messages (RAM sparen)\n"
     "--nobattle       : keine Kämpfe\n"
+    "--ignore-errors  : ignore errors in scripts (please don\'t)\n"
     "--nomonsters     : keine monster KI\n"
     "--nodebug        : keine Logfiles für Kämpfe\n"
     "--noreports      : absolut keine Reporte schreiben\n"
@@ -497,6 +499,7 @@ read_args(int argc, char **argv, lua_State * luaState)
         nocr = true;
       }
       else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
+      else if (strcmp(argv[i]+2, "ignore-errors")==0) g_ignore_errors = true;
       else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
       else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
       else if (strcmp(argv[i]+2, "nosh")==0) nosh = true;
@@ -610,7 +613,7 @@ my_lua_error(lua_State * L)
 
   log_error(("A LUA error occured: %s\n", error));
   lua_pop(L, 1);
-  std::terminate();
+  if (!g_ignore_errors) std::terminate();
   return 1;
 }
 

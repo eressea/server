@@ -1110,9 +1110,9 @@ readunit(FILE * F)
 		if (i != -1){
 			attrib * a;
 			int csp = 0;
-
 			sc_mage * mage = calloc(1, sizeof(sc_mage));
-			mage->magietyp = (magic_t) i;
+
+      mage->magietyp = (magic_t) i;
 			mage->spellpoints = ri(F);
 			mage->spchange = ri(F);
 			while ((i = ri(F)) != -1) {
@@ -1878,10 +1878,16 @@ readgame(const char * filename, int backup)
 
     while (--p >= 0) {
       unit * u = readunit(F);
+      sc_mage * mage;
       assert(u->region==NULL);
       u->region = r;
       addlist2(up,u);
       update_interval(u->faction, u->region);
+      mage = get_mage(u);
+      if (mage && mage->spellcount<0) {
+        mage->spellcount = 0;
+        updatespelllist(u);
+      }
     }
   }
   printf("\n");

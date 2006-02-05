@@ -202,6 +202,7 @@ static int
 read_mage(attrib * a, FILE * F)
 {
   int i, mtype;
+  boolean update = false;
   sc_mage * mage = (sc_mage*)a->data.v;
   char spname[64];
 
@@ -234,7 +235,11 @@ read_mage(attrib * a, FILE * F)
       if (strcmp(spname, "end")==0) break;
       sp = find_spell(mage->magietyp, spname);
     }
-    if (sp==NULL) continue;
+    if (sp==NULL) {
+      /* flag upstream to show that updatespellist() is necessary (hackish) */
+      mage->spellcount = -1;
+      continue;
+    }
     add_spell(mage, sp);
   }
   return AT_READ_OK;
@@ -373,7 +378,7 @@ read_seenspell(attrib * a, FILE * f)
     sp = find_spell((magic_t)mtype, buf);
   }
   if (sp==NULL) {
-    log_error(("could not find seenspell '%s'\n", buf));
+    /* log_error(("could not find seenspell '%s'\n", buf)); */
     return AT_READ_FAIL;
   }
   a->data.v = sp;
@@ -1275,7 +1280,7 @@ fumble(region * r, unit * u, const spell * sp, int cast_grade)
 static void
 patzer(castorder *co)
 {
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
 
   cmistake(mage, co->order, 180, MSG_MAGIC);
 
@@ -1290,7 +1295,7 @@ do_fumble(castorder *co)
 {
   curse * c;
   region * r = co->rt;
-  unit * u = (unit*)co->magician;
+  unit * u = co->magician.u;
   const spell *sp = co->sp;
   int level = co->level;
   int duration;
@@ -1558,7 +1563,7 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj, order * 
 static int
 verify_targets(castorder *co)
 {
-	unit *mage = (unit *)co->magician;
+	unit *mage = co->magician.u;
 	const spell *sp = co->sp;
 	region *target_r = co->rt;
 	spellparameter *sa = co->par;
@@ -2009,7 +2014,7 @@ new_castorder(void *u, unit *u2, const spell *sp, region *r, int lev,
 	castorder *corder;
 
 	corder = calloc(1, sizeof(castorder));
-	corder->magician = u;
+	corder->magician.u = u;
 	corder->familiar = u2;
 	corder->sp = sp;
 	corder->level = lev;
@@ -2680,7 +2685,7 @@ magic(void)
       order * ord = co->order;
       int verify, cast_level = co->level;
       boolean fumbled = false;
-      unit * u = (unit *)co->magician;
+      unit * u = co->magician.u;
       const spell *sp = co->sp;
       region * target_r = co->rt;
 

@@ -1211,6 +1211,7 @@ parse_spells(xmlDocPtr doc)
       if (xml_bvalue(node, "ship", false)) sp->sptyp |= ONSHIPCAST;
       if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
       if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
+      if (xml_bvalue(node, "variable", false)) sp->sptyp |= SPELLLEVEL;
 
       if (gamecode_enabled) {
         /* reading eressea/spells/spell/function */

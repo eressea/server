@@ -569,7 +569,7 @@ sp_summon_familiar(castorder *co)
   unit *familiar;
   region *r = co->rt;
   region *target_region = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   const race * rc;
   skill_t sk;
@@ -672,7 +672,7 @@ sp_summon_familiar(castorder *co)
 static int
 sp_destroy_magic(castorder *co)
 {
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -763,7 +763,7 @@ static int
 sp_transferaura(castorder *co)
 {
   int aura, gain, multi = 2;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   unit * u;
@@ -831,7 +831,7 @@ static int
 sp_goodwinds(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   int duration = cast_level+1;
@@ -886,7 +886,7 @@ static int
 sp_magicstreet(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
 
   if (!fval(r->terrain, LAND_REGION)) {
     cmistake(mage, co->order, 186, MSG_MAGIC);
@@ -927,7 +927,7 @@ static int
 sp_summonent(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   unit *u;
@@ -982,7 +982,7 @@ sp_blessstonecircle(castorder *co)
 {
   building *b;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *p = co->par;
 
@@ -1029,7 +1029,7 @@ static int
 sp_maelstrom(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   curse * c;
   double power = co->force;
@@ -1077,7 +1077,7 @@ sp_mallorn(castorder *co)
 {
   region *r = co->rt;
   int cast_level = co->level;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
 
   if (!fval(r->terrain, LAND_REGION)) {
     cmistake(mage, co->order, 290, MSG_MAGIC);
@@ -1122,7 +1122,7 @@ static int
 sp_blessedharvest(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   int duration = (int)power+1;
@@ -1162,7 +1162,7 @@ sp_hain(castorder *co)
 {
   int trees;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
 
@@ -1207,7 +1207,7 @@ sp_mallornhain(castorder *co)
 {
   int trees;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
 
@@ -1241,7 +1241,7 @@ patzer_ents(castorder *co)
   int ents;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   /* int cast_level = co->level; */
   double force = co->force;
 
@@ -1306,7 +1306,7 @@ sp_rosthauch(castorder *co)
   int n;
   int success = 0;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   int force = (int)co->force;
   spellparameter *pa = co->par;
@@ -1401,7 +1401,7 @@ sp_kaelteschutz(castorder *co)
   int n, i = 0;
   int men;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = max(cast_level, (int)force) + 1;
@@ -1462,7 +1462,7 @@ static int
 sp_sparkle(castorder *co)
 {
   unit *u;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   int duration = cast_level+1;
@@ -1522,7 +1522,7 @@ sp_create_irongolem(castorder *co)
   unit *u2;
   attrib *a;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int number = lovar(force*8*RESOURCE_QUANTITY);
@@ -1585,7 +1585,7 @@ sp_create_stonegolem(castorder *co)
   unit *u2;
   attrib *a;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   int number = lovar(co->force*5*RESOURCE_QUANTITY);
   if (number<1) number = 1;
@@ -1649,7 +1649,7 @@ sp_great_drought(castorder *co)
   unit *u;
   boolean terraform = false;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = 2;
@@ -1781,7 +1781,7 @@ static int
 sp_treewalkenter(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   double power = co->force;
   int cast_level = co->level;
@@ -1874,7 +1874,7 @@ sp_treewalkexit(castorder *co)
   int n;
   int erfolg = 0;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   double power = co->force;
   spellparameter *pa = co->par;
   int cast_level = co->level;
@@ -1996,7 +1996,7 @@ static int
 sp_holyground(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   curse * c;
@@ -2032,7 +2032,7 @@ sp_homestone(castorder *co)
   unit *u;
   curse * c;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   variant effect;
@@ -2095,7 +2095,7 @@ sp_drought(castorder *co)
   curse *c;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   int duration = (int)power+1;
@@ -2163,7 +2163,7 @@ sp_fog_of_confusion(castorder *co)
 {
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   double range;
@@ -2237,7 +2237,7 @@ sp_ironkeeper(castorder *co)
 {
   unit *keeper;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   if (rterrain(r) != T_MOUNTAIN && rterrain(r) != T_GLACIER) {
@@ -2290,7 +2290,7 @@ sp_stormwinds(castorder *co)
   unit *u;
   int erfolg = 0;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   double power = co->force;
   spellparameter *pa = co->par;
   int n, force = (int)power;
@@ -2373,7 +2373,7 @@ sp_earthquake(castorder *co)
   building *burg;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   for (burg = r->buildings; burg; burg = burg->next){
@@ -2430,7 +2430,7 @@ patzer_peasantmob(castorder *co)
   unit *u;
   attrib *a;
   region *r;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
 
   if (mage->region->land){
     r = mage->region;
@@ -2499,7 +2499,7 @@ sp_forest_fire(castorder *co)
   region *nr;
   direction_t i;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double probability;
   double percentage = (rand() % 8 + 1) * 0.1;  /* 10 - 80% */
@@ -2594,7 +2594,7 @@ sp_fumblecurse(castorder *co)
   unit *target;
   int rx, sx;
   int duration;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   variant effect;
@@ -2628,7 +2628,7 @@ sp_fumblecurse(castorder *co)
 void
 patzer_fumblecurse(castorder *co)
 {
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (cast_level/2)+1;
@@ -2669,7 +2669,7 @@ static int
 sp_summondragon(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   unit *u;
   int cast_level = co->level;
   double power = co->force;
@@ -2954,7 +2954,7 @@ sp_firewall(castorder *co)
   wall_data * fd;
   attrib * a;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -3066,7 +3066,7 @@ sp_wisps(castorder *co)
   region * r2;
   direction_t dir;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -3116,7 +3116,7 @@ sp_wisps(castorder *co)
 static int
 sp_unholypower(castorder *co)
 {
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   int i;
@@ -3326,7 +3326,7 @@ static int
 sp_deathcloud(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
 
   attrib *a = a_find(r->attribs, &at_deathcloud);
 
@@ -3343,7 +3343,7 @@ sp_deathcloud(castorder *co)
 void
 patzer_deathcloud(castorder *co)
 {
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int hp = (mage->hp - 2);
 
   change_hitpoints(mage, -rand()%hp);
@@ -3369,7 +3369,7 @@ static int
 sp_plague(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   plagues(r, true);
@@ -3399,7 +3399,7 @@ static int
 sp_summonshadow(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   unit *u;
@@ -3442,7 +3442,7 @@ sp_summonshadowlords(castorder *co)
 {
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
 
@@ -3476,7 +3476,7 @@ sp_chaossuction(castorder *co)
   region *rt;
   faction *f;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   if (getplane(r)!=get_normalplane()) {
@@ -3547,7 +3547,7 @@ static int
 sp_magicboost(castorder *co)
 {
   curse * c;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   variant effect;
@@ -3608,7 +3608,7 @@ sp_magicboost(castorder *co)
 static int
 sp_bloodsacrifice(castorder *co)
 {
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   int aura;
   int skill = eff_skill(mage, SK_MAGIC, mage->region);
@@ -3666,7 +3666,7 @@ sp_summonundead(castorder *co)
   int undead;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   int force = (int)(co->force*10);
   const race * race = new_race[RC_SKELETON];
@@ -3731,7 +3731,7 @@ sp_auraleak(castorder *co)
   double lost;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   lost = min(0.95, cast_level * 0.05);
@@ -3786,7 +3786,7 @@ sp_babbler(castorder *co)
 {
   unit *target;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
 
@@ -3841,7 +3841,7 @@ sp_analysesong_obj(castorder *co)
 {
   int obj;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -3891,7 +3891,7 @@ static int
 sp_analysesong_unit(castorder *co)
 {
   unit *u;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -3941,7 +3941,7 @@ sp_charmingsong(castorder *co)
   unit *target;
   int duration;
   skill_t i;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -4027,7 +4027,7 @@ sp_song_resistmagic(castorder *co)
 {
   variant mr_bonus;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
@@ -4059,7 +4059,7 @@ sp_song_susceptmagic(castorder *co)
 {
   variant mr_malus;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
@@ -4091,7 +4091,7 @@ sp_rallypeasantmob(castorder *co)
   unit *u, *un;
   int erfolg = 0;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   /* TODO
@@ -4160,7 +4160,7 @@ sp_raisepeasantmob(castorder *co)
   int n;
   variant anteil;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
@@ -4225,7 +4225,7 @@ sp_migranten(castorder *co)
   order * ord;
   int kontaktiert = 0;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   const spell *sp = co->sp;
@@ -4332,7 +4332,7 @@ sp_song_of_peace(castorder *co)
 {
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = 2 + lovar(force/2);
@@ -4373,7 +4373,7 @@ sp_generous(castorder *co)
 {
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
@@ -4424,7 +4424,7 @@ sp_recruit(castorder *co)
   unit *u;
   region *r = co->rt;
   int n, maxp = rpeasants(r);
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   faction *f = mage->faction;
@@ -4477,7 +4477,7 @@ sp_bigrecruit(castorder *co)
   unit *u;
   region *r = co->rt;
   int n, maxp = rpeasants(r);
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   faction *f = mage->faction;
@@ -4530,7 +4530,7 @@ sp_pump(castorder *co)
   region *rt;
   boolean see = false;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
   const spell *sp = co->sp;
@@ -4600,7 +4600,7 @@ sp_seduce(castorder *co)
   int loot;
   item **itmp;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
   const spell *sp = co->sp;
@@ -4682,7 +4682,7 @@ sp_calm_monster(castorder *co)
   curse * c;
   unit *target;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
   double force = co->force;
@@ -4737,7 +4737,7 @@ sp_headache(castorder *co)
   int i;
   unit *target;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
 
@@ -4795,7 +4795,7 @@ sp_raisepeasants(castorder *co)
   unit *u, *u2;
   attrib *a;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
 
@@ -4847,7 +4847,7 @@ sp_depression(castorder *co)
 {
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
@@ -4885,7 +4885,7 @@ static int
 sp_dragonsong(castorder *co)
 {
   region *r = co->rt; /* Zauberregion */
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   unit *u;
   int cast_level = co->level;
   double power = co->force;
@@ -4939,7 +4939,7 @@ static int
 sp_songofAttraction(castorder *co)
 {
   region *r = co->rt; /* Zauberregion */
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   /* double power = co->force; */
 
@@ -4971,7 +4971,7 @@ int
 sp_puttorest(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int dead = deathcount(r);
   int laid_to_rest = dice((int)(co->force * 2), 100);
   message * seen = msg_message("puttorest", "mage", mage);
@@ -5005,7 +5005,7 @@ sp_icastle(castorder *co)
   const building_type * type;
   attrib *a;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -5069,7 +5069,7 @@ sp_illusionary_shapeshift(castorder *co)
   unit *u;
   const race * rc;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -5129,7 +5129,7 @@ int
 sp_readmind(castorder *co)
 {
   unit *target;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
 
@@ -5171,7 +5171,7 @@ int
 sp_analyseregionsdream(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   magicanalyse_region(r, mage, cast_level);
@@ -5195,7 +5195,7 @@ int
 sp_analysedream(castorder *co)
 {
   unit *u;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
 
@@ -5229,7 +5229,7 @@ int
 sp_baddreams(castorder *co)
 {
   int duration;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   region *r = co->rt;
@@ -5272,7 +5272,7 @@ sp_gooddreams(castorder *co)
   int    duration;
   curse * c;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   variant effect;
@@ -5310,7 +5310,7 @@ sp_clonecopy(castorder *co)
   unit *clone;
   region *r = co->rt;
   region *target_region = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   if (get_clone(mage) != NULL ) {
@@ -5337,7 +5337,7 @@ sp_dreamreading(castorder *co)
 {
   unit *u,*u2;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   double power = co->force;
@@ -5385,7 +5385,7 @@ int
 sp_sweetdreams(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -5432,7 +5432,7 @@ int
 sp_disturbingdreams(castorder *co)
 {
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   int duration = 1 + (int)(power/6);
@@ -5456,7 +5456,7 @@ sp_dream_of_confusion(castorder *co)
   unit *u;
   region_list *rl,*rl2;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   double range = (power-14)/2-1;
@@ -5522,7 +5522,7 @@ int
 sp_analysemagic(castorder *co)
 {
   int obj;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
 
@@ -5572,7 +5572,7 @@ int
 sp_itemcloak(castorder *co)
 {
   unit *target;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   int duration = (int)power+1;
@@ -5613,7 +5613,7 @@ sp_resist_magic_bonus(castorder *co)
   int n, m, opfer;
   variant resistbonus;
   int duration = 6;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -5676,7 +5676,7 @@ sp_enterastral(castorder *co)
   int remaining_cap;
   int n, w;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -5791,7 +5791,7 @@ sp_pullastral(castorder *co)
   int remaining_cap;
   int n, w;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -5918,7 +5918,7 @@ sp_leaveastral(castorder *co)
   int remaining_cap;
   int n, w;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -6033,7 +6033,7 @@ int
 sp_fetchastral(castorder *co)
 {
   int n;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   double power = co->force;
@@ -6143,7 +6143,7 @@ sp_showastral(castorder *co)
   int c = 0;
   region_list *rl, *rl2;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
 
@@ -6232,7 +6232,7 @@ sp_viewreality(castorder *co)
   region_list *rl, *rl2;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
 
   if(getplaneid(r) != 1) {
@@ -6273,7 +6273,7 @@ sp_disruptastral(castorder *co)
   region *rt;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   int duration = (int)(power/3)+1;
@@ -6379,7 +6379,7 @@ sp_eternizewall(castorder *co)
   curse * c;
   building *b;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -6440,7 +6440,7 @@ sp_permtransfer(castorder *co)
   int aura;
   unit *tu;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   const spell *sp = co->sp;
@@ -6490,7 +6490,7 @@ sp_movecastle(castorder *co)
   region *target_region;
   unit *u, *unext;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   const spell *sp = co->sp;
@@ -6584,7 +6584,7 @@ sp_flying_ship(castorder *co)
   ship *sh;
   unit *u;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -6649,7 +6649,7 @@ sp_stealaura(castorder *co)
 {
   int taura;
   unit *u;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
@@ -6720,7 +6720,7 @@ sp_antimagiczone(castorder *co)
   double power;
   variant effect;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
@@ -6779,7 +6779,7 @@ static int
 sp_magicrunes(castorder *co)
 {
   int duration;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -6840,7 +6840,7 @@ sp_speed2(castorder *co)
 {
   int n, maxmen, used = 0, dur, men;
   unit *u;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -6901,7 +6901,7 @@ sp_q_antimagie(castorder *co)
   curse * c = NULL;
   int succ;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -6983,7 +6983,7 @@ sp_destroy_curse(castorder *co)
   int obj;
   curse * c;
   region *r = co->rt;
-  unit *mage = (unit *)co->magician;
+  unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
@@ -7072,7 +7072,7 @@ sp_destroy_curse(castorder *co)
 int
 sp_becomewyrm(castorder *co)
 {
-  unit *u = (unit *)co->magician;
+  unit *u = co->magician.u;
   int wyrms_already_created = 0;
   int wyrms_allowed;
   attrib *a;
@@ -7115,7 +7115,7 @@ static int
 sp_wdwpyramid(castorder *co)
 {
   region  *r          = co->rt;
-  unit    *mage       = (unit *)co->magician;
+  unit    *mage       = co->magician.u;
   int     cast_level  = co->level;
 
   if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
@@ -7147,32 +7147,6 @@ sp_wdwpyramid(castorder *co)
   }
 
   return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Name:       Alltagszauber, hat je nach Gebiet anderen Namen
- * Stufe:      1
- * Gebiet:     alle
- * Wirkung:    der Magier verdient $50 pro Spruchstufe
- * Kosten:     1 SP pro Stufe
- */
-#include "../gamecode/economy.h"
-/* TODO: das ist scheisse, aber spells gehören eh nicht in den kernel */
-int
-sp_earn_silver(castorder *co)
-{
-  unit *mage = (unit *)co->magician;
-  double force = co->force;
-  region *r = co->rt;
-  int wanted = (int)(force * 50);
-  int earned = min(rmoney(r), wanted);
-
-  rsetmoney(r, rmoney(r) - earned);
-  change_money(mage, earned);
-  /* TODO klären: ist das Silber damit schon reserviert? */
-
-  add_income(mage, IC_MAGIC, wanted, earned);
-  return co->level;
 }
 
 typedef struct spelldata {
@@ -7210,21 +7184,6 @@ static spelldata spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_blessedharvest, NULL
-  },
-  {
-    SPL_GWYRRD_EARN_SILVER, "gwyrrdearnsilver", NULL,
-    NULL, NULL,
-    M_DRUIDE,
-    (SPELLLEVEL|ONSHIPCAST),
-    5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_earn_silver, NULL
   },
   {
     SPL_STONEGOLEM, "stonegolem", NULL, NULL, NULL,
@@ -7704,20 +7663,6 @@ static spelldata spelldaten[] =
     (spell_f)sp_sparkle, NULL
   },
   {
-    SPL_DRAIG_EARN_SILVER, "draigearnsilver", NULL,
-    NULL,
-    NULL,
-    M_CHAOS, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_earn_silver, NULL
-  },
-  {
     SPL_FIREBALL, "fireball", NULL, NULL, NULL,
     M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 2,
     {
@@ -8026,20 +7971,6 @@ static spelldata spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_sparkle, NULL
-  },
-  {
-    SPL_ILLAUN_EARN_SILVER, "illaunearnsilver", NULL,
-    NULL,
-    NULL,
-    M_TRAUM, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_earn_silver, NULL
   },
   {
     SPL_SHADOWKNIGHTS, "shadowknights", NULL, NULL, NULL,
@@ -8372,18 +8303,6 @@ static spelldata spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_denyattack, NULL
-  },
-  {
-    SPL_CERDDOR_EARN_SILVER, "jugglery", NULL, NULL, NULL,
-    M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_earn_silver, NULL
   },
   {
     SPL_HEALINGSONG, "song_of_healing", NULL, NULL, NULL,
@@ -8925,18 +8844,6 @@ static spelldata spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_itemcloak, NULL
-  },
-  {
-    SPL_TYBIED_EARN_SILVER, "miracle_doctor", NULL, NULL, NULL,
-    M_ASTRAL, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_earn_silver, NULL
   },
   {
     SPL_TYBIED_FUMBLESHIELD, "tybiedfumbleshield", NULL, NULL, NULL,

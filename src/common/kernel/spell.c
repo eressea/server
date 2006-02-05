@@ -57,7 +57,7 @@ register_spell(spell * sp)
   spelllist_add(&spells, sp);
 }
 
-/** versucht einen Spruch über gebiet + bame zu identifizieren.
+/** versucht einen Spruch über gebiet + name zu identifizieren.
  * gibt ansonsten NULL zurück */
 spell * 
 find_spell(magic_t mtype, const char * name)

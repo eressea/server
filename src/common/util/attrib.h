@@ -74,7 +74,7 @@ extern attrib * a_new(const attrib_type * at);
 extern void a_free(attrib * a);
 
 extern int a_age(attrib ** attribs);
-extern void a_read(FILE * f, attrib ** attribs);
+extern int a_read(FILE * f, attrib ** attribs);
 extern void a_write(FILE * f, const attrib * attribs);
 
 #define DEFAULT_AGE NULL

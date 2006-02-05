@@ -53,8 +53,6 @@ extern int lastturn(void);
 
 extern void read_items(FILE *f, struct item **it);
 extern void write_items(FILE *f, struct item *it);
-extern void a_read(FILE * f, struct attrib ** attribs);
-extern void a_write(FILE * f, const struct attrib * attribs);
 
 extern const char * datapath(void);
 

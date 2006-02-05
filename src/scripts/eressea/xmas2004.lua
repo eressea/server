@@ -1,4 +1,4 @@
-function use_snomwan(u, amount)
+function use_snowman(u, amount)
   if u.region.terrain == "glacier" then
     local man = add_unit(u.faction, u.region)
     u.race = "snowman"

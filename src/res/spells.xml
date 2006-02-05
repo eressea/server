@@ -8,6 +8,11 @@
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
+  <spell name="earn_silver#draig" type="draig" ship="true" variable="true" rank="5" level="1" index="159">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+
   <spell name="create_aots" type="draig" ship="true" rank="5" level="6" index="125">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
@@ -37,6 +42,11 @@
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
+  <spell name="earn_silver#gwyrrd" type="gwyrrd" ship="true" variable="true" rank="5" level="1" index="159">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+
   <spell name="create_aots" type="gwyrrd" ship="true" rank="5" level="6" index="124">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
@@ -57,6 +67,11 @@
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="earn_silver#illaun" type="illaun" ship="true" variable="true" rank="5" level="1" index="159">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
   </spell>
 
   <spell name="create_aots" type="illaun" ship="true" rank="5" level="6" index="126">
@@ -87,6 +102,11 @@
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
+  <spell name="earn_silver#cerddor" type="cerddor" ship="true" variable="true" rank="5" level="1" index="159">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+
   <spell name="create_aots" type="cerddor" ship="true" rank="5" level="6" index="127">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
@@ -107,6 +127,11 @@
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="earn_silver#tybied" type="tybied" ship="true" variable="true" rank="5" level="1" index="159">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="1" cost="level"/>
   </spell>
 
   <spell name="create_aots" type="tybied" ship="true" rank="5" level="6" index="128">
