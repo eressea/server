@@ -1907,6 +1907,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
   order * deford = default_order(f->locale);
 
   assert(urace);
+  assert(deford);
   assert(f->alive);
   u_setfaction(u, f);
   set_order(&u->thisorder, NULL);
