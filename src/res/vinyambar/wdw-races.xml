@@ -137,9 +137,10 @@
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
   </race>
-  <race name="anubis" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" shapeshift="yes">
+
+  <race name="anubis" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="2.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes" shapeshift="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
-    <function name="move" value="movedragon"/>
+    <skill name="magic" modifier="16"/>
     <skill name="tactics" modifier="20"/>
     <skill name="perception" modifier="20"/>
     <attack type="4" damage="5d30"/>
@@ -150,9 +151,9 @@
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
   </race>
-  <race name="apophis" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" shapeshift="yes">
+  <race name="apophis" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="2.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes" shapeshift="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
-    <function name="move" value="movedragon"/>
+    <skill name="magic" modifier="16"/>
     <skill name="tactics" modifier="20"/>
     <skill name="perception" modifier="20"/>
     <attack type="4" damage="5d30"/>
@@ -162,6 +163,35 @@
     <attack type="6" spell="drain_skills"/>
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
+  </race>
+  <race name="liongod" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="2.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes" shapeshift="yes">
+    <ai splitsize="1" learn="yes"/>
+    <skill name="magic" modifier="16"/>
+    <skill name="tactics" modifier="20"/>
+    <skill name="perception" modifier="20"/>
+    <skill name="stealth" modifier="20"/>
+    <attack type="4" damage="5d30"/>
+    <attack type="4" damage="3d20"/>
+    <attack type="4" damage="3d20"/>
+    <attack type="4" damage="5d30"/>
+    <attack type="6" spell="drain_skills"/>
+    <attack type="6" spell="aura_of_fear"/>
+    <precombatspell spell="bloodthirst"/>
+    <precombatspell spell="heroic_song"/>
+  </race>
+  <race name="bastet" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="2.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes" shapeshift="yes">
+    <ai splitsize="1" learn="yes"/>
+    <skill name="magic" modifier="16"/>
+    <skill name="tactics" modifier="20"/>
+    <skill name="perception" modifier="20"/>
+    <skill name="stealth" modifier="20"/>
+    <attack type="4" damage="5d30"/>
+    <attack type="4" damage="3d20"/>
+    <attack type="4" damage="3d20"/>
+    <attack type="4" damage="5d30"/>
+    <attack type="6" spell="drain_skills"/>
+    <attack type="6" spell="aura_of_fear"/>
+    <precombatspell spell="heroic_song"/>
   </race>
 
   <race name="phoenix" magres="0.900000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="50000" capacity="30000" speed="2.000000" hp="500" ac="6" damage="1d20" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
