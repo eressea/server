@@ -2698,7 +2698,7 @@ magic(void)
         * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
         if (spl_costtyp(sp) != SPC_FIX) {
           ADDMSG(&u->faction->msgs, msg_message("missing_components", 
-            "unit spell level", u, sp, co->level));
+            "unit spell level", u, sp, cast_level));
         }
       }
 
