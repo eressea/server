@@ -119,7 +119,7 @@
       <resource name="mallorn" amount="5" cost="fixed"/>
     </spell>
 
-    <spell name="wdwpyramid_cerrdor" type="cerrdor" rank="5" level="4" index="187">
+    <spell name="wdwpyramid_cerrdor" type="cerddor" rank="5" level="4" index="187">
       <function name="cast" value="wdwpyramid"/>
       <resource name="aura" amount="2" cost="fixed"/>
       <resource name="h14" amount="1" cost="fixed"/>
