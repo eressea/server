@@ -182,7 +182,7 @@ centre(FILE * F, const char *s, boolean breaking)
 }
 
 static void
-rparagraph(FILE *F, const char *str, int indent, int hanging_indent, char mark)
+rparagraph(FILE *F, const char *str, ptrdiff_t indent, int hanging_indent, char mark)
 {
   static const char * spaces = "                                ";
   size_t length = REPORTWIDTH;

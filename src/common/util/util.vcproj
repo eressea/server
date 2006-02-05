@@ -128,7 +128,7 @@
 				AdditionalIncludeDirectories="../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="4"
 				BufferSecurityCheck="TRUE"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"

@@ -338,11 +338,9 @@ create_mage(unit * u, magic_t mtyp)
 
   a = a_find(u->attribs, &at_mage);
   if (a!=NULL) {
-    mage = a->data.v;
-    assert(mage->spells==NULL && mage->magietyp == mtyp);
-  } else {
-    a = a_add(&u->attribs, a_new(&at_mage));
+    a_remove(&u->attribs, a);
   }
+  a = a_add(&u->attribs, a_new(&at_mage));
   mage = a->data.v;
 
   mage->magietyp = mtyp;

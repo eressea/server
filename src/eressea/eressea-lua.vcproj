@@ -155,7 +155,7 @@
 				PreprocessorDefinitions="_CONSOLE,WIN32"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="4"
 				BufferSecurityCheck="TRUE"
 				DisableLanguageExtensions="FALSE"
 				UsePrecompiledHeader="0"
@@ -175,11 +175,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabindd.lib lua50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib iconv.lib"
 				OutputFile=".\Debug/eressea-lua.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				IgnoreDefaultLibraryNames="libc.lib, libcmt.lib, msvcrt.lib, libcmtd.lib, msvcrtd.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/eressea-lua.pdb"
 				SubSystem="1"/>

@@ -152,7 +152,7 @@
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="_CONSOLE,WIN32"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="4"
 				BufferSecurityCheck="TRUE"
 				DisableLanguageExtensions="FALSE"
 				UsePrecompiledHeader="0"
