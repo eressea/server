@@ -1688,6 +1688,10 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
       }
 
       scat(".");
+
+      scat(" Erforderlicher Talentwert: ");
+      icat(b->type->construction->minskill);
+      scat(".");
     }
   }
 
