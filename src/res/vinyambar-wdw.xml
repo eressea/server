@@ -101,25 +101,25 @@
   </equipment>
 
   <spells>
-    <spell name="wdwpyramid_illaun" type="draig" rank="5" level="4" index="184">
+    <spell name="wdwpyramid_illaun" type="illaun" rank="5" level="4" index="184">
       <function name="cast" value="wdwpyramid"/>
       <resource name="aura" amount="2" cost="fixed"/>
       <resource name="h2" amount="1" cost="fixed"/>
     </spell>
 
-    <spell name="wdwpyramid_tybied" type="draig" rank="5" level="3" index="185">
+    <spell name="wdwpyramid_tybied" type="tybied" rank="5" level="3" index="185">
       <function name="cast" value="wdwpyramid"/>
       <resource name="aura" amount="4" cost="fixed"/>
       <resource name="p6" amount="1" cost="fixed"/>
     </spell>
 
-    <spell name="wdwpyramid_gwyrrd" type="draig" rank="5" level="5" index="186">
+    <spell name="wdwpyramid_gwyrrd" type="gwyrrd" rank="5" level="5" index="186">
       <function name="cast" value="wdwpyramid"/>
       <resource name="aura" amount="3" cost="fixed"/>
       <resource name="mallorn" amount="5" cost="fixed"/>
     </spell>
 
-    <spell name="wdwpyramid_cerrdor" type="draig" rank="5" level="4" index="187">
+    <spell name="wdwpyramid_cerrdor" type="cerrdor" rank="5" level="4" index="187">
       <function name="cast" value="wdwpyramid"/>
       <resource name="aura" amount="2" cost="fixed"/>
       <resource name="h14" amount="1" cost="fixed"/>
