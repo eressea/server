@@ -495,6 +495,9 @@
   </string>
 
   <!--Schiffstypen -->
+  <string name="flyingcarpet_a">
+    <text locale="de">ein fliegender Teppich</text>
+  </string>
   <string name="balloon_a">
     <text locale="de">ein Ballon</text>
   </string>
@@ -514,6 +517,9 @@
     <text locale="de">eine Trireme</text>
   </string>
 
+  <string name="flyingcarpet">
+    <text locale="de">fliegender Teppich</text>
+  </string>
   <string name="balloon">
     <text locale="de">Ballon</text>
   </string>
