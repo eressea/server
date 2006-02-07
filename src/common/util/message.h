@@ -29,6 +29,7 @@ typedef struct arg_type {
 } arg_type;
 
 typedef struct message_type {
+  unsigned int key;
 	const char * name;
 	int nparameters;
 	const char ** pnames;
@@ -56,7 +57,7 @@ extern struct message * msg_addref(struct message * msg);
 extern const char * mt_name(const struct message_type* mtype);
 
 /** message_type registry (optional): **/
-extern const struct message_type * mt_register(const struct message_type *);
+extern const struct message_type * mt_register(struct message_type *);
 extern const struct message_type * mt_find(const char *);
 
 extern void register_argtype(const char * name, void(*free_arg)(variant), variant (*copy_arg)(variant), variant_type);

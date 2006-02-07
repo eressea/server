@@ -454,7 +454,7 @@ report_crtypes(FILE * F, const struct locale* lang)
 		for (kmt=mtypehash[i];kmt;kmt=kmt->nexthash) {
 			const struct nrmessage_type * nrt = nrt_find(lang, kmt->mtype);
 			if (nrt) {
-				unsigned int hash = hashstring(mt_name(kmt->mtype));
+				unsigned int hash = kmt->mtype->key;
         fprintf(F, "MESSAGETYPE %d\n", hash);
         fputc('\"', F);
 				fputs(escape_string(nrt_string(nrt), NULL, 0), F);
@@ -478,7 +478,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 		char crbuffer[1024*32]; /* gross, wegen spionage-messages :-( */
 		boolean printed = false;
 		const struct message_type * mtype = m->msg->type;
-		unsigned int hash = hashstring(mtype->name);
+		unsigned int hash = mtype->key;
 #ifdef RENDER_CRMESSAGES
 		char nrbuffer[1024*32];
 		nrbuffer[0] = '\0';

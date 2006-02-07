@@ -174,18 +174,32 @@ mt_find(const char * name)
   return found;
 }
 
+static unsigned int
+mt_id(const message_type * mtype)
+{
+  unsigned int key = 0;
+  size_t i = strlen(mtype->name);
+
+  while (i>0) {
+    key = (mtype->name[--i] + key*37);
+  }
+  return key % 0x7FFFFFFF;
+}
+
 
 const message_type *
-mt_register(const message_type * type)
+mt_register(message_type * type)
 {
   unsigned int hash = hashstring(type->name) % MT_MAXHASH;
   messagetype_list * mtl = messagetypes[hash];
+
   while (mtl && mtl->data!=type) mtl=mtl->next;
   if (mtl==NULL) {
     mtl = (messagetype_list*)malloc(sizeof(messagetype_list));
     mtl->data = type;
     mtl->next = messagetypes[hash];
     messagetypes[hash] = mtl;
+    type->key = mt_id(type);
   }
   return type;
 }
