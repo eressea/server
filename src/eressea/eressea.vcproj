@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libxml2.lib iconv.lib"
+				AdditionalDependencies="libxml2.lib"
 				OutputFile=".\Release/eressea.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -108,7 +108,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libxml2.lib iconv.lib"
+				AdditionalDependencies="libxml2.lib"
 				OutputFile=".\Profile/eressea.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -172,7 +172,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libxml2.lib iconv.lib"
+				AdditionalDependencies="libxml2.lib"
 				OutputFile=".\Debug/eressea.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -234,7 +234,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:AMD64"
-				AdditionalDependencies="libxml2.lib iconv.lib"
+				AdditionalDependencies="libxml2.lib"
 				OutputFile=".\Release/eressea.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

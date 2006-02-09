@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
-				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib"
 				OutputFile=".\Release/eressea-lua.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -108,7 +108,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib"
 				OutputFile=".\Profile/eressea-lua.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -175,7 +175,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib"
 				OutputFile=".\Debug/eressea-lua.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -238,7 +238,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:AMD64 /FIXED:NO"
-				AdditionalDependencies="luabind.lib lua50.lib lualib50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib"
 				OutputFile=".\Release/eressea-lua.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -301,7 +301,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabindd.lib lua50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="luabindd.lib lua50.lib libxml2.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				IgnoreDefaultLibraryNames="libc.lib, libcmt.lib, msvcrt.lib, libcmtd.lib, msvcrtd.lib"

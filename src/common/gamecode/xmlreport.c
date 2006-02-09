@@ -81,24 +81,17 @@
 
 #define L10N(x) x
 
-#ifdef USE_ICONV
-static iconv_t utf8;
-#endif
-
 static xmlChar*
 xml_s(const char * str)
 {
-  static char buffer[1024];
+  static xmlChar buffer[1024];
   const char * inbuf = str;
-  char * outbuf = buffer;
-  size_t inbytes = strlen(str)+1;
-  size_t outbytes = sizeof(buffer);
-#ifdef USE_ICONV
-  iconv(utf8, (char**)&inbuf, &inbytes, (char**)&outbuf, &outbytes);
-#else
-  isolat1ToUTF8(outbuf, &outbytes, inbuf, &inbytes);
-#endif
-  return (xmlChar*)buffer;
+  xmlChar * outbuf = buffer;
+  int inbytes = (int)strlen(str)+1;
+  int outbytes = (int)sizeof(buffer);
+
+  isolat1ToUTF8(outbuf, &outbytes, BAD_CAST inbuf, &inbytes);
+  return buffer;
 }
 
 static xmlChar*

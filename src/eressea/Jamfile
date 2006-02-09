@@ -37,12 +37,10 @@ LinkLibraries $(SERVER) :
 LinkLibraries $(LUASERVER) :
  gamecode kernel items modules attributes spells races triggers util ;
 
-iconv $(SERVER) ;
 libxml2 $(SERVER) ;
 LINKLIBS on $(SERVER) += -L$(LUABIND_ROOT)/lib -lm ;
 
 luabind $(LUASERVER) ;
-iconv $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
 LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
 

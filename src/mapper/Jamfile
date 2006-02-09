@@ -31,6 +31,5 @@ LinkLibraries mapper :
  triggers
  util ;
 
-iconv mapper ;
 libxml2 mapper ;
 LINKLIBS on mapper += -L$(LUABIND_ROOT)/lib -lm -lncurses ;
