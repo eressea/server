@@ -26,9 +26,10 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+#include <float.h>
 #include <ctype.h>
 
-#define drand() (((double)rand())/(double)RAND_MAX)
+#define drand() ((rand()%RAND_MAX)/(double)RAND_MAX)
 #define M_PIl   3.1415926535897932384626433832795029L  /* pi */
 
 static double nv_next;
@@ -39,37 +40,17 @@ static char valid_next = 0;
 double
 normalvariate(double mu, double sigma)
 {
-  double x2pi, g2rad, z;
-  double t1, t2;
-  double fac=1;
-  static double mu_alt, sigma_alt;
-
-  if(mu < 10) {
-    fac=0.01;
-    mu*=100;
-    sigma*=100;
+  static double NV_MAGICCONST = 1.7155277699214135;
+  double z;
+  for (;;) {
+    double u1 = drand();
+    double u2 = 1.0 - drand();
+    z = NV_MAGICCONST*(u1-0.5)/u2;
+    if (z*z/4.0 <= -log(u2)) {
+      break;
+    }
   }
-
-  if(mu_alt!=mu || sigma_alt!= sigma)
-    valid_next=0;
-
-  mu_alt=mu;
-  sigma_alt=sigma;
-
-  if (valid_next == 0) {
-    x2pi = drand() * 2.0L * M_PIl;
-    t1   = drand();
-    t1   = 1.0 - t1;
-    t2   = log(t1);
-    g2rad = sqrt(-2.0 * t2);
-    z = cos(x2pi) * g2rad;
-    nv_next = sin(x2pi) * g2rad;
-    valid_next = 1;
-  } else {
-    z = nv_next;
-    valid_next = 0;
-  }
-  return (fac*(mu + z*sigma)); /* mu thorin */
+  return mu+z*sigma;
 }
 
 int

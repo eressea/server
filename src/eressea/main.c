@@ -271,7 +271,10 @@ processturn(char *filename)
   }
 	score();
 	update_guards();
-	if (!noreports) reports();
+        if (!noreports) {
+          init_reports();
+          reports();
+        }
 	free_units();
 	puts(" - Beseitige leere Parteien");
 	remove_empty_factions(true);

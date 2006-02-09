@@ -535,8 +535,7 @@ select_familiar(const race * magerace, magic_t magiegebiet)
     retval = magerace->familiars[magiegebiet];
   }
 
-  assert (retval!=NULL);
-  if (retval->init_familiar!=NULL) {
+  if (retval!=NULL && retval->init_familiar!=NULL) {
     return NULL;
   }
   return retval;

@@ -148,10 +148,10 @@ register_bordertype(border_type * type)
 border_type *
 find_bordertype(const char * name)
 {
-	border_type * bt = bordertypes;
+  border_type * bt = bordertypes;
 
-	while (bt && strcmp(bt->__name, name)) bt = bt->next;
-	return bt;
+  while (bt && strcmp(bt->__name, name)) bt = bt->next;
+  return bt;
 }
 
 void
@@ -176,7 +176,6 @@ b_read(border * b, FILE *f)
 void
 b_write(const border * b, FILE *f)
 {
-	assert(sizeof(int)==sizeof(b->data));
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:

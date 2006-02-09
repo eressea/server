@@ -1436,8 +1436,13 @@ randomevents(void)
 				int n = itm->number;
 				double k = n*rot_chance/100.0;
 				if (fval(itm->type, ITF_HERB)) {
-					n = (int)(min(n, normalvariate(k, k/4)));
-					i_change(itmp, itm->type, -n);
+                                  double nv = normalvariate(k, k/4);
+                                  int inv = (int)nv;
+                                  int delta = min(n, inv);
+                                  if (inv<0) {
+                                    nv = normalvariate(k, k/4);
+                                  }
+                                  i_change(itmp, itm->type, -delta);
 				}
 				if (itm==*itmp) itmp=&itm->next;
 			}
