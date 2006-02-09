@@ -1403,50 +1403,50 @@ report_failed_spell(battle * b, unit * mage, const spell * sp)
 void
 do_combatmagic(battle *b, combatmagic_t was)
 {
-	void **fi;
-	region *r = b->region;
-	castorder *co;
-	castorder *cll[MAX_SPELLRANK];
-	int level;
-	int spellrank;
-	int sl;
+  void **fi;
+  region *r = b->region;
+  castorder *co;
+  castorder *cll[MAX_SPELLRANK];
+  int level;
+  int spellrank;
+  int sl;
 
-	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-		cll[spellrank] = (castorder*)NULL;
-	}
+  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
+    cll[spellrank] = (castorder*)NULL;
+  }
 
-	for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-		fighter * fig = *fi;
-		unit * mage = fig->unit;
+  for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
+    fighter * fig = *fi;
+    unit * mage = fig->unit;
 
-		if (fig->alive <= 0) continue; /* fighter kann im Kampf getötet worden sein */
+    if (fig->alive <= 0) continue; /* fighter kann im Kampf getötet worden sein */
 
-		level = eff_skill(mage, SK_MAGIC, r);
-		if (level > 0) {
+    level = eff_skill(mage, SK_MAGIC, r);
+    if (level > 0) {
       double power;
       const spell *sp;
-			const struct locale * lang = mage->faction->locale;
-			char cmd[128];
+      const struct locale * lang = mage->faction->locale;
+      char cmd[128];
       order * ord;
 
-			switch(was) {
-			case DO_PRECOMBATSPELL:
-				sp = get_combatspell(mage, 0);
-				sl = get_combatspelllevel(mage, 0);
-				break;
-			case DO_POSTCOMBATSPELL:
-				sp = get_combatspell(mage, 2);
-				sl = get_combatspelllevel(mage, 2);
-				break;
-			default:
-				/* Fehler! */
-				return;
-			}
-			if (sp == NULL)
-				continue;
+      switch(was) {
+        case DO_PRECOMBATSPELL:
+          sp = get_combatspell(mage, 0);
+          sl = get_combatspelllevel(mage, 0);
+          break;
+        case DO_POSTCOMBATSPELL:
+          sp = get_combatspell(mage, 2);
+          sl = get_combatspelllevel(mage, 2);
+          break;
+        default:
+          /* Fehler! */
+          return;
+      }
+      if (sp == NULL)
+        continue;
 
-			snprintf(cmd, 128, "%s \"%s\"",
-				LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
+      snprintf(cmd, 128, "%s \"%s\"",
+        LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
 
       ord = parse_order(cmd, lang);
       if (cancast(mage, sp, 1, 1, ord) == false) {
@@ -1454,44 +1454,47 @@ do_combatmagic(battle *b, combatmagic_t was)
         continue;
       }
 
-			level = eff_spelllevel(mage, sp, level, 1);
-			if (sl > 0) level = min(sl, level);
-			if (level < 0) {
+      level = eff_spelllevel(mage, sp, level, 1);
+      if (sl > 0) level = min(sl, level);
+      if (level < 0) {
         report_failed_spell(b, mage, sp);
         free_order(ord);
         continue;
-			}
+      }
 
       power = spellpower(r, mage, sp, level, ord);
       free_order(ord);
-			if (power <= 0) {	/* Effekt von Antimagie */
+      if (power <= 0) {	/* Effekt von Antimagie */
         report_failed_spell(b, mage, sp);
         pay_spell(mage, sp, level, 1);
-			} else if (fumble(r, mage, sp, sp->level) == true) {
+      } else if (fumble(r, mage, sp, sp->level) == true) {
         report_failed_spell(b, mage, sp);
         pay_spell(mage, sp, level, 1);
       } else {
         co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
         add_castorder(&cll[(int)(sp->rank)], co);
       }
-		}
-	}
-	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-		for (co = cll[spellrank]; co; co = co->next) {
-			fighter * fig = co->magician.fig;
-			const spell * sp = co->sp;
-			int level = co->level;
-			double power = co->force;
-
-			level = ((cspell_f)sp->sp_function)(fig, level, power, sp);
-			if (level > 0) {
-				pay_spell(fig->unit, sp, level, 1);
-			}
-		}
-	}
-	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-		free_castorders(cll[spellrank]);
-	}
+    }
+  }
+  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
+    for (co = cll[spellrank]; co; co = co->next) {
+      fighter * fig = co->magician.fig;
+      const spell * sp = co->sp;
+      int level = co->level;
+      double power = co->force;
+      if (sp->sp_function==NULL) {
+        log_error(("spell '%s' has no function.\n", sp->sname));
+      } else {
+        level = ((cspell_f)sp->sp_function)(fig, level, power, sp);
+        if (level > 0) {
+          pay_spell(fig->unit, sp, level, 1);
+        }
+      }
+    }
+  }
+  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
+    free_castorders(cll[spellrank]);
+  }
 }
 
 
@@ -1561,10 +1564,14 @@ do_combatspell(troop at, int row)
     return;
   }
 
-  level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
-  if (level > 0) {
-    pay_spell(mage, sp, level, 1);
-    at.fighter->action_counter++;
+  if (sp->sp_function==NULL) {
+    log_error(("spell '%s' has no function.\n", sp->sname));
+  } else {
+    level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
+    if (level > 0) {
+      pay_spell(mage, sp, level, 1);
+      at.fighter->action_counter++;
+    }
   }
 }
 
@@ -1577,14 +1584,18 @@ do_combatspell(troop at, int row)
 static void
 do_extra_spell(troop at, const att *a)
 {
-	const spell *sp = a->data.sp;
-	fighter *fi = at.fighter;
-	unit *au = fi->unit;
-	int power;
+  const spell *sp = a->data.sp;
+  fighter *fi = at.fighter;
+  unit *au = fi->unit;
+  int power;
 
-	/* nur bei Monstern können mehrere 'Magier' in einer Einheit sein */
-	power = sp->level * au->number;
-	((cspell_f)sp->sp_function)(fi, sp->level, power, sp);
+  /* nur bei Monstern können mehrere 'Magier' in einer Einheit sein */
+  power = sp->level * au->number;
+  if (sp->sp_function==NULL) {
+    log_error(("spell '%s' has no function.\n", sp->sname));
+  } else {
+    ((cspell_f)sp->sp_function)(fi, sp->level, power, sp);
+  }
 }
 
 static int

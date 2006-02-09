@@ -197,7 +197,12 @@ unit_castspell(unit& u, const char * name)
       co->par = NULL;
       co->rt = u.region;
       co->sp = sp;
-      sp->sp_function(co);
+      if (sp->sp_function==NULL) {
+        log_error(("spell '%s' has no function.\n", sp->sname));
+        co->level = 0;
+      } else {
+        sp->sp_function(co);
+      }
       free(co);
     }
     slist=slist->next;

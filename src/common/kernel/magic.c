@@ -202,7 +202,6 @@ static int
 read_mage(attrib * a, FILE * F)
 {
   int i, mtype;
-  boolean update = false;
   sc_mage * mage = (sc_mage*)a->data.v;
   char spname[64];
 
@@ -1355,7 +1354,11 @@ do_fumble(castorder *co)
   case 5:
   case 6:
     /* Spruch gelingt, aber alle Magiepunkte weg */
-    ((nspell_f)sp->sp_function)(co);
+    if (sp->sp_function==NULL) {
+      log_error(("spell '%s' has no function.\n", sp->sname));
+    } else {
+      ((nspell_f)sp->sp_function)(co);
+    }
     set_spellpoints(u, 0);
     ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
       u, r, sp));
@@ -1366,7 +1369,11 @@ do_fumble(castorder *co)
   case 9:
   default:
     /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-    ((nspell_f)sp->sp_function)(co);
+    if (sp->sp_function==NULL) {
+      log_error(("spell '%s' has no function.\n", sp->sname));
+    } else {
+      ((nspell_f)sp->sp_function)(co);
+    }
     ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
       u, r, sp));
     countspells(u, 3);
@@ -2758,7 +2765,12 @@ magic(void)
         /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
         fumbled = true;
       } else if (co->force>0) {
-        co->level = ((nspell_f)sp->sp_function)(co);
+        if (sp->sp_function==NULL) {
+          log_error(("spell '%s' has no function.\n", sp->sname));
+          co->level = 0;
+        } else {
+          co->level = ((nspell_f)sp->sp_function)(co);
+        }
         if (co->level <= 0) {
           /* Kosten nur für real benötige Stufe berechnen */
           continue;
