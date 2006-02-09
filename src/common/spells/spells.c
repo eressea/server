@@ -535,7 +535,7 @@ select_familiar(const race * magerace, magic_t magiegebiet)
     retval = magerace->familiars[magiegebiet];
   }
 
-  assert (retval!=NULL && retval->init_familiar!=NULL);
+  assert (retval==NULL || retval->init_familiar!=NULL);
   return retval;
 }
 
@@ -580,6 +580,11 @@ sp_summon_familiar(castorder *co)
     return 0;
   }
   rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
+  if (rc==NULL) {
+    log_error(("could not find suitable familiar for %s.\n", 
+      mage->faction->race->_name[0]));
+    return 0;
+  }
 
   if (fval(rc, RCF_SWIM) && !fval(rc, RCF_WALK)) {
     int coasts = is_coastregion(r);
