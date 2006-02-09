@@ -556,7 +556,12 @@ static void
 make_familiar(unit *familiar, unit *mage)
 {
   /* skills and spells: */
-  familiar->race->init_familiar(familiar);
+  if (familiar->race->init_familiar!=NULL) {
+    familiar->race->init_familiar(familiar);
+  } else {
+    log_error(("could not perform initialization for familiar %s.\n", 
+      familiar->faction->race->_name[0]));
+  }
 
   /* triggers: */
   create_newfamiliar(mage, familiar);
