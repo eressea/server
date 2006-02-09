@@ -207,6 +207,131 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
+		<Configuration
+			Name="Release64|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
+				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				DisableLanguageExtensions="FALSE"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\Release/eressea-lua.pch"
+				AssemblerListingLocation=".\Release/"
+				ObjectFile=".\Release/"
+				ProgramDataBaseFileName=".\Release/"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:AMD64 /FIXED:NO"
+				AdditionalDependencies="luabind.lib lua50.lib lualib50.lib libxml2.lib iconv.lib"
+				OutputFile=".\Release/eressea-lua.exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile=".\Release/eressea-lua.pdb"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\Release/eressea-lua.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1031"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Debug64|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				ImproveFloatingPointConsistency="FALSE"
+				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
+				PreprocessorDefinitions="_CONSOLE,WIN32"
+				StringPooling="TRUE"
+				BasicRuntimeChecks="0"
+				BufferSecurityCheck="FALSE"
+				DisableLanguageExtensions="FALSE"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderThrough="stdafx.h"
+				PrecompiledHeaderFile=".\Debug/eressea-lua.pch"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4505"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="luabindd.lib lua50.lib libxml2.lib iconv.lib"
+				LinkIncremental="2"
+				SuppressStartupBanner="TRUE"
+				IgnoreDefaultLibraryNames="libc.lib, libcmt.lib, msvcrt.lib, libcmtd.lib, msvcrtd.lib"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile=".\Debug/eressea-lua.pdb"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\Debug/eressea-lua.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1031"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -250,6 +375,18 @@
 						Name="VCCLCompilerTool"
 						DisableLanguageExtensions="FALSE"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\lua\eressea.cpp">
@@ -273,6 +410,18 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug64|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						DisableLanguageExtensions="FALSE"/>
@@ -313,6 +462,18 @@
 						Name="VCCLCompilerTool"
 						DisableLanguageExtensions="FALSE"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\lua\script.cpp">
@@ -340,6 +501,18 @@
 						Name="VCCLCompilerTool"
 						DisableLanguageExtensions="FALSE"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\lua\spell.cpp">
@@ -360,6 +533,18 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release64|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug64|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						DisableLanguageExtensions="FALSE"/>
@@ -392,6 +577,18 @@
 					Name="VCCLCompilerTool"
 					DisableLanguageExtensions="TRUE"/>
 			</FileConfiguration>
+			<FileConfiguration
+				Name="Release64|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="FALSE"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug64|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="TRUE"/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\korrektur.h">
@@ -400,6 +597,12 @@
 			RelativePath=".\server.cpp">
 			<FileConfiguration
 				Name="Debug|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="FALSE"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug64|Win32">
 				<Tool
 					Name="VCCLCompilerTool"
 					DisableLanguageExtensions="FALSE"/>

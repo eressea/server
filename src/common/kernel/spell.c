@@ -38,8 +38,8 @@
 #include <util/umlaut.h>
 
  /* Bitte die Sprüche nach Gebieten und Stufe ordnen, denn in derselben
-	* Reihenfolge wie in Spelldaten tauchen sie auch im Report auf
-	*/
+  * Reihenfolge wie in Spelldaten tauchen sie auch im Report auf
+  */
 
 spell_list * spells = NULL;
 

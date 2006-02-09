@@ -183,7 +183,7 @@ a_new(const attrib_type * at) {
 int
 a_readdefault(attrib * a, FILE * f)
 {
-	assert(sizeof(int)==sizeof(a->data));
+/*	assert(sizeof(int)==sizeof(a->data)); */
 	fscanf(f, "%d", &a->data.i);
 	return AT_READ_OK;
 }

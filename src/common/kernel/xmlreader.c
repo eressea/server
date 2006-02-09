@@ -37,7 +37,10 @@ without prior permission by the authors of Eressea.
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+#include <libxml/encoding.h>
+#ifdef USE_ICONV
 #include <iconv.h>
+#endif
 
 /* libc includes */
 #include <assert.h>
@@ -81,12 +84,13 @@ xml_spell(xmlNode * node, const char * name)
 static const char *
 xml_to_locale(const xmlChar * xmlStr)
 {
-  static iconv_t context = (iconv_t)-1;
   static char zText[1024];
   char * inbuf = (char*)xmlStr;
   char * outbuf = zText;
   size_t inbytes = strlen((const char*)xmlStr)+1;
   size_t outbytes = sizeof(zText);
+#ifdef USE_ICONV
+  static iconv_t context = (iconv_t)-1;
 
   if (context==(iconv_t)-1) {
     context = iconv_open("", "UTF-8");
@@ -94,6 +98,12 @@ xml_to_locale(const xmlChar * xmlStr)
   assert(context!=(iconv_t)-1);
 
   iconv(context, &inbuf, &inbytes, &outbuf, &outbytes);
+#else
+  size_t insize = inbytes;
+  if (UTF8Toisolat1(outbuf, &outbytes, inbuf, &inbytes)>=0) {
+    inbytes -= insize;
+  }
+#endif
   if (inbytes!=0) {
     log_error(("string is too long: %d chars remain in %s.\n", inbytes, (const char*)xmlStr));
   }

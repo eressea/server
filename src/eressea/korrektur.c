@@ -255,20 +255,6 @@ no_teurefremde(boolean convert)
   }
 }
 
-attrib_type at_roadfix = {
-	"roadfix",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-#if RELEASE_VERSION<DISABLE_ROADFIX
-	DEFAULT_WRITE,
-#else
-	NULL, /* disable writing them so they will disappear */
-#endif
-	DEFAULT_READ,
-	ATF_UNIQUE
-};
-
 extern plane * arena;
 
 static void

@@ -67,7 +67,10 @@
 
 /* libxml2 includes */
 #include <libxml/tree.h>
+#include <libxml/encoding.h>
+#ifdef USE_ICONV
 #include <iconv.h>
+#endif
 
 /* libc includes */
 #include <assert.h>
@@ -78,7 +81,9 @@
 
 #define L10N(x) x
 
+#ifdef USE_ICONV
 static iconv_t utf8;
+#endif
 
 static xmlChar*
 xml_s(const char * str)
@@ -88,7 +93,11 @@ xml_s(const char * str)
   char * outbuf = buffer;
   size_t inbytes = strlen(str)+1;
   size_t outbytes = sizeof(buffer);
+#ifdef USE_ICONV
   iconv(utf8, (char**)&inbuf, &inbytes, (char**)&outbuf, &outbytes);
+#else
+  isolat1ToUTF8(outbuf, &outbytes, inbuf, &inbytes);
+#endif
   return (xmlChar*)buffer;
 }
 
@@ -170,12 +179,16 @@ void
 xmlreport_init(void)
 {
   register_reporttype("xml", &report_xml, 1<<O_XML);
+#ifdef USE_ICONV
   utf8 = iconv_open("UTF-8", "");
+#endif
 }
 
 void
 xmlreport_cleanup(void)
 {
+#ifdef USE_ICONV
   iconv_close(utf8);
+#endif
 }
 

@@ -54,12 +54,12 @@
 #endif
 
 /* gamecode includes */
-#include <gamecode/creport.h>
-#include <gamecode/xmlreport.h>
-#include <gamecode/report.h>
 #include <gamecode/economy.h>
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
+#include <gamecode/creport.h>
+#include <gamecode/report.h>
+#include <gamecode/xmlreport.h>
 
 /* kernel includes */
 #include <kernel/border.h>
@@ -236,6 +236,7 @@ game_init(void)
   register_itemtypes();
   register_xmlreader();
   enable_xml_gamecode();
+
   init_data(xmlfile);
 
   init_locales();

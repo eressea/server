@@ -15,7 +15,6 @@ without prior permission by the authors of Eressea.
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <libxml/tree.h>
   extern void register_xmlreader(void);
   extern void enable_xml_gamecode(void);
 #ifdef __cplusplus

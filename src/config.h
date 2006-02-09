@@ -138,7 +138,6 @@ typedef struct stat stat_type;
 #ifdef _MSC_VER
 # define R_OK 4
 # define HAVE__MKDIR_WITHOUT_PERMISSION
-
 # define HAVE_INLINE
 # define INLINE_FUNCTION __inline
 

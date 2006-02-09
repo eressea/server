@@ -82,7 +82,7 @@ faction_getlocale(const faction& f)
 void
 faction_setlocale(faction& f, const char * name)
 {
-	f.locale = find_locale(name);
+  f.locale = find_locale(name);
 }
 
 static std::ostream& 

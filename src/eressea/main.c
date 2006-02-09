@@ -57,8 +57,9 @@
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
-#include <gamecode/report.h>
 #include <gamecode/creport.h>
+#include <gamecode/report.h>
+#include <gamecode/xmlreport.h>
 
 /* kernel includes */
 #include <kernel/xmlreader.h>
@@ -147,25 +148,28 @@ struct settings global = {
 static void
 game_init(void)
 {
-	init_triggers();
-	init_xmas();
-	report_init();
-	creport_init();
+  init_triggers();
+  init_xmas();
 
-	debug_language("locales.log");
-	register_races();
-	register_resources();
-	register_buildings();
-	register_ships();
+  reports_init();
+  report_init();
+  creport_init();
+  xmlreport_init();
+
+  debug_language("locales.log");
+  register_races();
+  register_resources();
+  register_buildings();
+  register_ships();
   register_itemfunctions();
-	register_spells();
+  register_spells();
 #ifdef DUNGEON_MODULE
-	register_dungeon();
+  register_dungeon();
 #endif
 
+  register_itemtypes();
   register_xmlreader();
   enable_xml_gamecode();
-  init_spells();
   init_data(xmlfile);
 
   init_locales();
@@ -173,33 +177,31 @@ game_init(void)
   init_races();
   init_itemtypes();
   init_races();
-	init_economy();
-#if NEW_RESOURCEGROWTH
-	init_rawmaterials();
-#endif
+  init_economy();
+  init_rawmaterials();
 
-	init_gmcmd();
+  init_gmcmd();
 #ifdef INFOCMD_MODULE
-	init_info();
+  init_info();
 #endif
 
 #ifdef MUSEUM_MODULE
-	register_museum();
+  register_museum();
 #endif
 #ifdef ARENA_MODULE
-	register_arena();
+  register_arena();
 #endif
 #ifdef WORMHOLE_MODULE
   register_wormholes();
 #endif
 #ifdef REMOVE_THIS
-	render_init();
-	{
-		FILE * F = fopen("messagetypes.txt", "w");
-		debug_messagetypes(F);
-		fclose(F);
-		abort();
-	}
+  render_init();
+  {
+    FILE * F = fopen("messagetypes.txt", "w");
+    debug_messagetypes(F);
+    fclose(F);
+    abort();
+  }
 #endif
 }
 
