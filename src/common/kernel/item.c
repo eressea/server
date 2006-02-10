@@ -1035,39 +1035,14 @@ static const char *potiontext[MAXPOTIONS] =
 	/* Stufe 1: */
   NULL,
   NULL,
-
-	"Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen "
-	"wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem "
-	"Elfenlieb erwärmt, so daß man gerade noch den Finger reinhalten "
-	"kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. "
-	"Der Extrakt reicht für 10 Holzstämme.",
+  NULL,
 
 	/* Stufe 2: */
-	"Man lasse einen Würzigen Wagemut drei Stunden lang in einem "
-	"Liter Wasser köcheln."
-	"Dann gebe man eine geriebene Alraune dazu und bestreue "
-	"das ganze mit bei Vollmond geerntetem Spaltwachs. Nun lasse man den "
-	"Sud drei Tage an einem dunklen und warmen Ort ziehen und seie dann die "
-	"Flüssigkeit ab. Dieser Schaffenstrunk erhöht die Kraft und Ausdauer von "
-	"zehn Männern, so daß sie doppelt soviel schaffen können wie sonst.",
+	NULL,
+	NULL,
+  NULL,
 
-	"Ist man nach einem einem harten Kampf schwer verwundet, ist es ratsam, "
-	"etwas Wundsalbe parat zu haben. Streicht man diese magische Paste auf "
-	"die Wunden, schließen sich diese augenblicklich. Für die Herstellung "
-	"benötigt der Alchemist nebst einem Blauen "
-	"Baumringel einen Würzigen Wagemut und einen Weißen Wüterich. Eine solche Portion "
-	"heilt bis zu 400 Lebenspunkte.",
-
-	"Zu den gefährlichsten und geheimsten Wissen der Alchemisten zählt die "
-	"Kenntnis um diesen Trank. Den finstersten Höllen entrissen, ermöglicht "
-	"die Kenntnis dieser Formel die Herstellung eines Elixiers, welches "
-	"Dämonen als Nahrung dient. Von normalen Lebewesen eingenommen, führt "
-	"es zu schnellem Tod und ewigen Nichtleben. Die Herstellung benötigt "
-	"nebst Fjordwuchs, etwas Höhlenglimm und einem Blauen Baumringel auch einen Bauern aus der Region, "
-	"welcher in einem tagelangen blutigen Ritual getötet wird. Ein Fläschchen "
-	"des Tranks kann den Hunger von 100 Dämonen für eine Woche stillen.",
-
-	/* Stufe 3: */
+  /* Stufe 3: */
 	"Für das Gehirnschmalz verrühre man den Saft eines Wasserfinders mit "
 	"recht viel geriebenem Windbeutel und ein wenig Gurgelkraut. Dies lasse "
 	"man kurz aufwallen. Wenn die Flüssigkeit nur noch handwarm ist, gebe "
