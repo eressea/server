@@ -237,7 +237,7 @@ addmenulist(menulist ** SP, const char *s, int *val)
 
 static int peasants, money, trees, horses, iron, laen, chaotisch;
 
-static int ytrees, seeds;
+static int saplings, seeds;
 
 static int ironlevel, laenlevel, stone, stonelevel;
 
@@ -248,7 +248,7 @@ get_region(region *r) {
 	peasants  = rpeasants(r);
 	money     = rmoney(r);
 	trees     = rtrees(r,2);
-	ytrees    = rtrees(r,1);
+	saplings    = rtrees(r,1);
 	seeds     = rtrees(r,0);
 	horses    = rhorses(r);
 	iron = -1;
@@ -280,7 +280,7 @@ put_region(region *r) {
 	rsetpeasants(r, peasants);
 	rsetmoney(r,money);
 	rsettrees(r,2,trees);
-	rsettrees(r,1,ytrees);
+	rsettrees(r,1,saplings);
 	rsettrees(r,0,seeds);
 	rsethorses(r, horses);
 
@@ -315,11 +315,11 @@ create_region_menu(menulist ** menu, region * r)
 	addmenulist(menu, "Silver", &money);
 	if (fval(r, RF_MALLORN)) {
 		addmenulist(menu, "Mallorntrees", &trees);
-		addmenulist(menu, "Mallornsprouts", &ytrees);
+		addmenulist(menu, "Mallornsaplings", &saplings);
 		addmenulist(menu, "Mallornseeds", &seeds);
 	} else {
 		addmenulist(menu, "Trees", &trees);
-		addmenulist(menu, "Sprouts", &ytrees);
+		addmenulist(menu, "Saplings", &saplings);
 		addmenulist(menu, "Seeds", &seeds);
 	}
 	addmenulist(menu, "Horses", &horses);

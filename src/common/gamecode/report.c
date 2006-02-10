@@ -776,7 +776,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
   boolean dh;
   direction_t d;
   int trees;
-  int ytrees;
+  int saplings;
   attrib *a;
   const char *tname;
   struct edge {
@@ -844,10 +844,10 @@ describe(FILE * F, const region * r, int partial, faction * f)
   /* Bäume */
   
   trees  = rtrees(r,2);
-  ytrees = rtrees(r,1);
+  saplings = rtrees(r,1);
   if (production(r)) {
-    if (trees > 0 || ytrees > 0) {
-      bufp += sprintf(bufp, ", %d/%d ", trees, ytrees);
+    if (trees > 0 || saplings > 0) {
+      bufp += sprintf(bufp, ", %d/%d ", trees, saplings);
       if (fval(r, RF_MALLORN)) {
         if (trees == 1) {
           bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree"));

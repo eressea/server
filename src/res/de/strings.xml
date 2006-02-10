@@ -6613,14 +6613,14 @@
     <text locale="en">laen</text>
   </string>
 
-  <string name="rm_youngtrees">
+  <string name="rm_sapling">
     <text locale="de">Schößlinge</text>
-    <text locale="en">young trees</text>
+    <text locale="en">saplings</text>
   </string>
 
-  <string name="rm_youngmallorn">
+  <string name="rm_mallornsapling">
     <text locale="de">Mallornschößlinge</text>
-    <text locale="en">young mallorn</text>
+    <text locale="en">mallorn saplings</text>
   </string>
 
   <string name="rm_trees">

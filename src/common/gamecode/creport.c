@@ -1281,18 +1281,18 @@ report_computer(const char * filename, report_context * ctx)
 #endif
 			if (fval(r->terrain, LAND_REGION)) {
 				int trees = rtrees(r, 2);
-				int ytrees = rtrees(r, 1);
+				int saplings = rtrees(r, 1);
 # ifdef RESOURCECOMPAT
 				if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
-				if (ytrees > 0) fprintf(F, "%d;Schoesslinge\n", ytrees);
-				if (fval(r, RF_MALLORN) && (trees > 0 || ytrees > 0))
+				if (saplings > 0) fprintf(F, "%d;Schoesslinge\n", saplings);
+				if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
 					fprintf(F, "1;Mallorn\n");
 # endif
 				if (!fval(r, RF_MALLORN)) {
-					if (ytrees) pos = report_resource(pos, "rm_youngtrees", f->locale, ytrees, -1);
+					if (saplings) pos = report_resource(pos, "rm_sapling", f->locale, saplings, -1);
 					if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
 				} else {
-					if (ytrees) pos = report_resource(pos, "rm_youngmallorn", f->locale, ytrees, -1);
+					if (saplings) pos = report_resource(pos, "rm_mallornsapling", f->locale, saplings, -1);
 					if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
 				}
 				fprintf(F, "%d;Bauern\n", rpeasants(r));
