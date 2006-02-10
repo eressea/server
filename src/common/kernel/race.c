@@ -59,7 +59,24 @@
 
 /** external variables **/
 race * races;
-race_list * familiarraces;
+
+race_list * 
+get_familiarraces(void)
+{
+  static int init = 0;
+  static race_list * familiarraces;
+
+  if (!init) {
+    race * rc = races;
+    for (;rc!=NULL;rc=rc->next) {
+      if (rc->init_familiar!=NULL) {
+        racelist_insert(&familiarraces, rc);
+      }
+    }
+    init = false;
+  }
+  return familiarraces;
+}
 
 void 
 racelist_clear(struct race_list **rl)
@@ -110,9 +127,6 @@ race *
 rc_add(race * rc)
 {
   rc->next = races;
-  if (rc->init_familiar!=NULL) {
-    racelist_insert(&familiarraces, rc);
-  }
   return races = rc;
 }
 

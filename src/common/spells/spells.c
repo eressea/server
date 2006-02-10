@@ -521,6 +521,7 @@ select_familiar(const race * magerace, magic_t magiegebiet)
 
   assert(magerace->familiars[0]);
   if (rnd < 3) {
+    race_list * familiarraces = get_familiarraces();
     unsigned int maxlen = listlen(familiarraces);
     if (maxlen>0) {
       race_list * rclist = familiarraces;
