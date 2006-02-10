@@ -42,6 +42,7 @@ extern void ct_register(const struct curse_type * ct);
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
@@ -91,11 +92,11 @@ extern void ct_register(const struct curse_type * ct);
 static variant zero_effect = { 0 };
 
 attrib_type at_unitdissolve = {
-  "unitdissolve", NULL, NULL, NULL, a_writedefault, a_readdefault
+  "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
 attrib_type at_wdwpyramid = {
-  "wdwpyramid", NULL, NULL, NULL, a_writedefault, a_readdefault
+  "wdwpyramid", NULL, NULL, NULL, a_writevoid, a_readvoid
 };
 
 /* ----------------------------------------------------------------------- */

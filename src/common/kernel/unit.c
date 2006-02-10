@@ -34,6 +34,7 @@
 #include "plane.h"
 #include "race.h"
 #include "region.h"
+#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
@@ -42,10 +43,10 @@
 
 /* util includes */
 #include <util/base36.h>
-#include <event.h>
-#include <goodies.h>
-#include <resolve.h>
-#include <variant.h>
+#include <util/event.h>
+#include <util/goodies.h>
+#include <util/resolve.h>
+#include <util/variant.h>
 
 /* libc includes */
 #include <assert.h>
@@ -546,7 +547,7 @@ read_unit_reference(unit ** up, FILE * F)
 }
 
 attrib_type at_stealth = {
-	"stealth", NULL, NULL, NULL, DEFAULT_WRITE, DEFAULT_READ
+	"stealth", NULL, NULL, NULL, a_writeint, a_readint
 };
 
 void

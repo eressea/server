@@ -2105,3 +2105,104 @@ writegame(const char *filename, char quiet)
   printf("\nOk.\n");
   return 0;
 }
+
+int
+a_readint(attrib * a, FILE * f)
+{
+  /*	assert(sizeof(int)==sizeof(a->data)); */
+  fscanf(f, "%d", &a->data.i);
+  return AT_READ_OK;
+}
+
+void
+a_writeint(const attrib * a, FILE * f)
+{
+  fprintf(f, "%d ", a->data.i);
+}
+
+int
+a_readshorts(attrib * a, FILE * f)
+{
+  if (global.data_version<ATTRIBREAD_VERSION) {
+    return a_readint(a, f);
+  }
+  fscanf(f, "%hd %hd", &a->data.sa[0], &a->data.sa[1]);
+  return AT_READ_OK;
+}
+
+void
+a_writeshorts(const attrib * a, FILE * f)
+{
+  fprintf(f, "%hd %hd ", a->data.sa[0], a->data.sa[1]);
+}
+
+int
+a_readchars(attrib * a, FILE * f)
+{
+  if (global.data_version<ATTRIBREAD_VERSION) {
+    return a_readint(a, f);
+  }
+  fscanf(f, "%c %c %c %c", 
+    &a->data.ca[0], &a->data.ca[1], &a->data.ca[2], &a->data.ca[3]);
+  return AT_READ_OK;
+}
+
+void
+a_writechars(const attrib * a, FILE * f)
+{
+  fprintf(f, "%c %c %c %c ", 
+    a->data.ca[0], a->data.ca[1], a->data.ca[2], a->data.ca[3]);
+}
+
+int
+a_readvoid(attrib * a, FILE * f)
+{
+  if (global.data_version<ATTRIBREAD_VERSION) {
+    return a_readint(a, f);
+  }
+  return AT_READ_OK;
+}
+
+void
+a_writevoid(const attrib * a, FILE * f)
+{
+}
+
+static char *
+read_quoted(FILE * f, char *c, size_t size)
+{
+  char * s = c;
+  do {
+    *s = (char) fgetc(f);
+  } while (*s!='"');
+
+  for (;;) {
+    *s = (char) fgetc(f);
+    if (*s=='"') break;
+    if (s<c+size) ++s;
+  }
+  *s = 0;
+  return c;
+}
+
+int
+a_readstring(attrib * a, FILE * f)
+{
+  char zText[4096];
+  read_quoted(f, zText, sizeof(zText));
+  a->data.v = strdup(zText);
+  return AT_READ_OK;
+}
+
+void
+a_writestring(const attrib * a, FILE * f)
+{
+  assert(a->data.v);
+  fprintf(f, "\"%s\" ", (char*)a->data.v);
+}
+
+void
+a_finalizestring(attrib * a)
+{
+  free(a->data.v);
+}

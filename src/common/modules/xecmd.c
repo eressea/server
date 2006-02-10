@@ -26,6 +26,7 @@
 #include <kernel/message.h>
 #include <kernel/order.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
@@ -39,8 +40,8 @@ attrib_type at_xontormiaexpress = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 

@@ -15,6 +15,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "overrideroads.h"
+#include <kernel/save.h>
 
 attrib_type at_overrideroads = { 
   "roads_override", NULL, NULL, NULL, &a_writestring, &a_readstring

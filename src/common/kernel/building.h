@@ -142,7 +142,6 @@ extern struct building *findbuilding(int n);
 
 extern struct unit * buildingowner(const struct region * r, const struct building * b);
 
-extern attrib_type at_nodestroy;
 extern attrib_type at_building_action;
 
 #ifdef WDW_PYRAMID

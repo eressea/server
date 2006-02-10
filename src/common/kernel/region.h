@@ -151,7 +151,6 @@ extern attrib_type at_chaoscount;
 extern attrib_type at_woodcount;
 extern attrib_type at_deathcount;
 extern attrib_type at_travelunit;
-extern attrib_type at_road;
 extern attrib_type at_laen;
 
 void initrhash(void);

@@ -103,14 +103,6 @@ attrib_type at_building_action = {
   lc_write, lc_read
 };
 
-attrib_type at_nodestroy = {
-	"nodestroy",
-	NULL, NULL, NULL,
-	a_writedefault, 
-	a_readdefault,
-	ATF_UNIQUE
-};
-
 building_typelist *buildingtypes;
 
 const building_type *

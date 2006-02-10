@@ -1224,191 +1224,191 @@ randomevents(void)
 					if (rand() % 100 < prob) {
 						++increase;
 					}
-				}
-				if (increase) {
-					if (u->race == new_race[RC_ORC]) {
-						int i;
-						struct orcskills {
-							skill_t skill;
-							int level;
-						} skills [] = { 
-							{ SK_MELEE, 1 }, { SK_SPEAR, 1 }, { SK_TACTICS, 0 }, 
-							{ SK_LONGBOW, 0 }, { SK_CROSSBOW, 0 }, { SK_CATAPULT, 0 }, 
-							{ SK_AUSDAUER, 0 }, { NOSKILL, 0 }
-						};
-						for (i=0;skills[i].skill!=NOSKILL;++i) {
-							int k = get_level(u, skills[i].skill);
-							change_skill(u, skills[i].skill, increase * max(k, s));
-						}
-					}
+        }
+        if (increase) {
+          if (u->race == new_race[RC_ORC]) {
+            int i;
+            struct orcskills {
+              skill_t skill;
+              int level;
+            } skills [] = { 
+              { SK_MELEE, 1 }, { SK_SPEAR, 1 }, { SK_TACTICS, 0 }, 
+              { SK_LONGBOW, 0 }, { SK_CROSSBOW, 0 }, { SK_CATAPULT, 0 }, 
+              { SK_AUSDAUER, 0 }, { NOSKILL, 0 }
+            };
+            for (i=0;skills[i].skill!=NOSKILL;++i) {
+              int k = get_level(u, skills[i].skill);
+              change_skill(u, skills[i].skill, increase * max(k, s));
+            }
+          }
 
-					set_number(u, u->number + increase);
+          set_number(u, u->number + increase);
 
-					u->hp += unit_max_hp(u) * increase;
-					ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
-						"unit amount race", u, increase, u->race));
-				}
-			}
-		}
-	}
+          u->hp += unit_max_hp(u) * increase;
+          ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
+            "unit amount race", u, increase, u->race));
+        }
+          }
+    }
+  }
 #endif
 
-	for (r = regions; r; r = r->next) {
+  for (r = regions; r; r = r->next) {
 #if !RACE_ADJUSTMENTS
-	/* Elfen generieren Wald */
-		if (r->land && !fval(r, RF_MALLORN)) {
-			int trees = rtrees(r, 2);
-			int maxgen = (production(r) * MAXPEASANTS_PER_AREA)/8;
-			for (u = r->units; u && maxgen > 0; u = u->next) {
-				if (u->race == new_race[RC_ELF]) {
-					for (n = u->number; n && maxgen > 0; n--) {
-						if (rand() % 1000 < 15) {	/* 1.5% Chance */
-							trees++;
-						}
-						maxgen--;
-					}
-				}
-			}
-			rsettrees(r, 2, trees);
-		} /* !RACE_ADJUSTMENTS */
+    /* Elfen generieren Wald */
+    if (r->land && !fval(r, RF_MALLORN)) {
+      int trees = rtrees(r, 2);
+      int maxgen = (production(r) * MAXPEASANTS_PER_AREA)/8;
+      for (u = r->units; u && maxgen > 0; u = u->next) {
+        if (u->race == new_race[RC_ELF]) {
+          for (n = u->number; n && maxgen > 0; n--) {
+            if (rand() % 1000 < 15) {	/* 1.5% Chance */
+              trees++;
+            }
+            maxgen--;
+          }
+        }
+      }
+      rsettrees(r, 2, trees);
+    } /* !RACE_ADJUSTMENTS */
 #endif
 
-	}
+  }
 
-	/* Orkifizierte Regionen mutieren und mutieren zurück */
+  /* Orkifizierte Regionen mutieren und mutieren zurück */
 
-	for (r = regions; r; r = r->next) {
-		if (fval(r, RF_ORCIFIED)) {
-			direction_t dir;
-			double probability = 0.0;
-			for (dir = 0; dir < MAXDIRECTIONS; dir++) {
-				region *rc = rconnect(r, dir);
-				if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED)) probability += 0.02;
-			}
-			if (chance(probability)) {
-				ADDMSG(&r->msgs, msg_message("deorcified", "region", r));
-				freset(r, RF_ORCIFIED);
-			}
-		} else {
-			attrib *a = a_find(r->attribs, &at_orcification);
-			if (a!=NULL) {
-				double probability = 0.0;
-				if (rpeasants(r) <= 0) continue;
-				probability = a->data.i/(double)rpeasants(r);
-				if (chance(probability)) {
-					fset(r, RF_ORCIFIED);
-					a_remove(&r->attribs, a);
-					ADDMSG(&r->msgs, msg_message("orcified", "region", r));
-				} else {
-					a->data.i -= max(10,a->data.i/10);
-					if (a->data.i <= 0) a_remove(&r->attribs, a);
-				}
-			}
-		}
-	}
+  for (r = regions; r; r = r->next) {
+    if (fval(r, RF_ORCIFIED)) {
+      direction_t dir;
+      double probability = 0.0;
+      for (dir = 0; dir < MAXDIRECTIONS; dir++) {
+        region *rc = rconnect(r, dir);
+        if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED)) probability += 0.02;
+      }
+      if (chance(probability)) {
+        ADDMSG(&r->msgs, msg_message("deorcified", "region", r));
+        freset(r, RF_ORCIFIED);
+      }
+    } else {
+      attrib *a = a_find(r->attribs, &at_orcification);
+      if (a!=NULL) {
+        double probability = 0.0;
+        if (rpeasants(r) <= 0) continue;
+        probability = a->data.i/(double)rpeasants(r);
+        if (chance(probability)) {
+          fset(r, RF_ORCIFIED);
+          a_remove(&r->attribs, a);
+          ADDMSG(&r->msgs, msg_message("orcified", "region", r));
+        } else {
+          a->data.i -= max(10,a->data.i/10);
+          if (a->data.i <= 0) a_remove(&r->attribs, a);
+        }
+      }
+    }
+  }
 
-	/* Vulkane qualmen, brechen aus ... */
-	for (r = regions; r; r = r->next) {
-		if (rterrain(r)==T_VOLCANO_SMOKING && a_find(r->attribs, &at_reduceproduction)) {
-			ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-			rsetterrain(r, T_VOLCANO);
-		} else switch(rterrain(r)) {
-		case T_VOLCANO:
-			if (rand()%100 < 4) {
-				ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
-				rsetterrain(r, T_VOLCANO_SMOKING);
-			}
-			break;
-		case T_VOLCANO_SMOKING:
-			if (rand()%100 < 12) {
-				ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-				rsetterrain(r, T_VOLCANO);
-			} else if (rand()%100 < 8) {
-				volcano_outbreak(r);
-			}
-			break;
-		}
-	}
+  /* Vulkane qualmen, brechen aus ... */
+  for (r = regions; r; r = r->next) {
+    if (rterrain(r)==T_VOLCANO_SMOKING && a_find(r->attribs, &at_reduceproduction)) {
+      ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
+      rsetterrain(r, T_VOLCANO);
+    } else switch(rterrain(r)) {
+    case T_VOLCANO:
+      if (rand()%100 < 4) {
+        ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
+        rsetterrain(r, T_VOLCANO_SMOKING);
+      }
+      break;
+    case T_VOLCANO_SMOKING:
+      if (rand()%100 < 12) {
+        ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
+        rsetterrain(r, T_VOLCANO);
+      } else if (rand()%100 < 8) {
+        volcano_outbreak(r);
+      }
+      break;
+    }
+  }
 
-	/* Monumente zerfallen, Schiffe verfaulen */
+  /* Monumente zerfallen, Schiffe verfaulen */
 
-	for (r = regions; r; r = r->next) {
-		for (b = rbuildings(r); b; b = b2) {
-			b2 = b->next;
-			if (fval(b->type, BTF_DECAY) && !buildingowner(r, b)) {
-				b->size -= max(1, (b->size * 20) / 100);
-				if (b->size == 0) {
-					destroy_building(b);
-				}
-			}
-		}
-	}
+  for (r = regions; r; r = r->next) {
+    for (b = rbuildings(r); b; b = b2) {
+      b2 = b->next;
+      if (fval(b->type, BTF_DECAY) && !buildingowner(r, b)) {
+        b->size -= max(1, (b->size * 20) / 100);
+        if (b->size == 0) {
+          destroy_building(b);
+        }
+      }
+    }
+  }
 
   /* monster-einheiten desertieren */
-	for (r = regions; r; r=r->next) {
-		for (u=r->units; u; u=u->next) {
-			if (u->faction->no != MONSTER_FACTION
-					&& (u->race->flags & RCF_DESERT)) {
-				if (fval(u, UFL_ISNEW)) continue;
-				if (rand()%100 < 5) {
-					ADDMSG(&u->faction->msgs, msg_message("desertion",
-						"unit region", u, r));
-					u_setfaction(u, findfaction(MONSTER_FACTION));
-				}
-			}
-		}
-	}
+  for (r = regions; r; r=r->next) {
+    for (u=r->units; u; u=u->next) {
+      if (u->faction->no != MONSTER_FACTION
+        && (u->race->flags & RCF_DESERT)) {
+          if (fval(u, UFL_ISNEW)) continue;
+          if (rand()%100 < 5) {
+            ADDMSG(&u->faction->msgs, msg_message("desertion",
+              "unit region", u, r));
+            u_setfaction(u, findfaction(MONSTER_FACTION));
+          }
+        }
+    }
+  }
 
   /* lycanthropen werden werwölfe */
-	for (f = factions; f; f=f->next) {
-		int level = fspecial(f, FS_LYCANTROPE);
-		if(level > 0) {
-			for(u = f->units; u; u=u->nextF) {
-				if(rand()%100 < 2*level) {
-					ADDMSG(&u->faction->msgs, msg_message("becomewere",
-						"unit region", u, u->region));
-					fset(u, UFL_WERE);
-				}
-			}
-		}
-	}
+  for (f = factions; f; f=f->next) {
+    int level = fspecial(f, FS_LYCANTROPE);
+    if(level > 0) {
+      for(u = f->units; u; u=u->nextF) {
+        if(rand()%100 < 2*level) {
+          ADDMSG(&u->faction->msgs, msg_message("becomewere",
+            "unit region", u, u->region));
+          fset(u, UFL_WERE);
+        }
+      }
+    }
+  }
 
-	/* Frühling, die Bäume schlagen aus. */
+  /* Frühling, die Bäume schlagen aus. */
 
-	for (r = regions; r; r = r->next) {
-		if (fval(r, RF_CHAOTIC) ||(r->x >= -13  && r->x <= -6  && r->y >= 50 && r->y <= 57)) {
-			if (woodcount(r) >= 40 && rand()%100 < 33) {
-				int trees = rtrees(r,2);
-				int treemen = rand()%(max(50,trees)/3);
-				struct message * msg;
+  for (r = regions; r; r = r->next) {
+    if (fval(r, RF_CHAOTIC) ||(r->x >= -13  && r->x <= -6  && r->y >= 50 && r->y <= 57)) {
+      if (woodcount(r) >= 40 && rand()%100 < 33) {
+        int trees = rtrees(r,2);
+        int treemen = rand()%(max(50,trees)/3);
+        struct message * msg;
 
-				treemen = max(25, treemen);
-				woodcounts(r, -40);
-				trees = max(0, trees-treemen);
-				rsettrees(r, 2, trees);
-				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
+        treemen = max(25, treemen);
+        woodcounts(r, -40);
+        trees = max(0, trees-treemen);
+        rsettrees(r, 2, trees);
+        u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
         fset(u, UFL_ISNEW|UFL_MOVED);
 
-				set_level(u, SK_OBSERVATION, 2);
-				if (u->number == 1)
-					set_string(&u->name, "Ein wütender Ent");
-				else
-					set_string(&u->name, "Wütende Ents");
+        set_level(u, SK_OBSERVATION, 2);
+        if (u->number == 1)
+          set_string(&u->name, "Ein wütender Ent");
+        else
+          set_string(&u->name, "Wütende Ents");
 
-				log_printf("%d Ents in %s.\n", u->number, regionname(r, NULL));
+        log_printf("%d Ents in %s.\n", u->number, regionname(r, NULL));
 
-				msg = msg_message("entrise", "region", r);
-				add_message(&r->msgs, msg);
-				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
-				for (u=r->units;u;u=u->next) {
-					if (fval(u->faction, FL_DH)) continue;
-					fset(u->faction, FL_DH);
-					add_message(&u->faction->msgs, msg);
-				}
-				msg_release(msg);
-			}
-		}
-	}
+        msg = msg_message("entrise", "region", r);
+        add_message(&r->msgs, msg);
+        for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+        for (u=r->units;u;u=u->next) {
+          if (fval(u->faction, FL_DH)) continue;
+          fset(u->faction, FL_DH);
+          add_message(&u->faction->msgs, msg);
+        }
+        msg_release(msg);
+      }
+    }
+  }
 
 	/* Chaos */
 
@@ -1435,15 +1435,12 @@ randomevents(void)
 				item * itm = *itmp;
 				int n = itm->number;
 				double k = n*rot_chance/100.0;
-				if (fval(itm->type, ITF_HERB)) {
-                                  double nv = normalvariate(k, k/4);
-                                  int inv = (int)nv;
-                                  int delta = min(n, inv);
-                                  if (inv<0) {
-                                    nv = normalvariate(k, k/4);
-                                  }
-                                  i_change(itmp, itm->type, -delta);
-				}
+        if (fval(itm->type, ITF_HERB)) {
+          double nv = normalvariate(k, k/4);
+          int inv = (int)nv;
+          int delta = min(n, inv);
+          i_change(itmp, itm->type, -delta);
+        }
 				if (itm==*itmp) itmp=&itm->next;
 			}
 	  }

@@ -14,8 +14,8 @@
 
 #include <config.h>
 #include "reduceproduction.h"
-
-#include <attrib.h>
+#include <kernel/save.h>
+#include <util/attrib.h>
 
 static int
 age_reduceproduction(attrib *a)
@@ -31,8 +31,8 @@ attrib_type at_reduceproduction = {
 	NULL,
 	NULL,
 	age_reduceproduction,
-	a_writedefault,
-	a_readdefault,
+	a_writeshorts,
+	a_readshorts,
 	ATF_UNIQUE
 };
 

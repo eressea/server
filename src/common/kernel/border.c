@@ -16,9 +16,10 @@
 #include "eressea.h"
 #include "border.h"
 
-#include "unit.h"
-#include "terrain.h"
 #include "region.h"
+#include "save.h"
+#include "terrain.h"
+#include "unit.h"
 
 /* libc includes */
 #include <assert.h>
@@ -219,8 +220,8 @@ attrib_type at_countdown = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	a_agecountdown,
-	DEFAULT_WRITE,
-	DEFAULT_READ
+	a_writeint,
+	a_readint
 };
 
 void

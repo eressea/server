@@ -38,6 +38,7 @@
 #include "race.h"
 #include "region.h"
 #include "render.h"
+#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
@@ -45,8 +46,9 @@
 #include "unit.h"
 
 /* util includes */
-#include <util/goodies.h>
+#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/goodies.h>
 #include <util/language.h>
 #include <util/rand.h>
 
@@ -76,8 +78,8 @@ static attrib_type at_traveldir = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,					/* Weil normales Aging an ungünstiger Stelle */
-	DEFAULT_WRITE,
-	DEFAULT_READ
+	a_writechars,
+	a_readchars
 };
 
 typedef struct follower {
@@ -170,8 +172,8 @@ attrib_type at_speedup = {
   "speedup",
   NULL, NULL,
   age_speedup,
-  a_writedefault,
-  a_readdefault
+  a_writeint,
+  a_readint
 };
 
 /* ------------------------------------------------------------- */

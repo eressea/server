@@ -15,6 +15,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "raceprefix.h"
+#include <kernel/save.h>
 
 #include <util/attrib.h>
 

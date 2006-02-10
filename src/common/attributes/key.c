@@ -15,15 +15,16 @@
 #include <config.h>
 #include "key.h"
 
-#include <attrib.h>
+#include <kernel/save.h>
+#include <util/attrib.h>
 
 attrib_type at_key = {
 	"key",
 	NULL,
 	NULL,
 	NULL,
-	a_writedefault,
-	a_readdefault,
+	a_writeint,
+	a_readint,
 };
 
 attrib * 

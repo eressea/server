@@ -15,14 +15,15 @@
 #include <config.h>
 #include "orcification.h"
 
-#include <attrib.h>
+#include <kernel/save.h>
+#include <util/attrib.h>
 
 /*
  * simple attributes that do not yet have their own file 
  */
 
 attrib_type at_orcification = {
-	"orcification", NULL, NULL, NULL, a_writedefault, a_readdefault, ATF_UNIQUE
+	"orcification", NULL, NULL, NULL, a_writeint, a_readint, ATF_UNIQUE
 };
 
 attrib *

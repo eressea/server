@@ -2089,17 +2089,11 @@ attack(battle *b, troop ta, const att *a, int numattack)
 			ta.fighter->action_counter++;
 		}
 		if (td.fighter->unit->ship) {
-			if(a_find(td.fighter->unit->ship->attribs, &at_nodestroy) == NULL) {
-				td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
-			}
+			td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
 		} else if (td.fighter->unit->building) {
-			if(a_find(td.fighter->unit->building->attribs, &at_nodestroy) == NULL) {
-				damage_building(b, td.fighter->unit->building,
-													dice_rand(a->data.dice));
-			}
-		}
-	}
-
+			damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
+    }
+  }
 }
 
 void

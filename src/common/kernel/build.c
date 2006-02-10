@@ -383,10 +383,6 @@ destroy_cmd(unit * u, struct order * ord)
 
   if (u->building) {
     building *b = u->building;
-    if (a_find(b->attribs, &at_nodestroy)) {
-      cmistake(u, ord, 14, MSG_EVENT);
-      return 0;
-    }
 
     if(n >= b->size) {
       /* destroy completly */
@@ -407,10 +403,6 @@ destroy_cmd(unit * u, struct order * ord)
     }
   } else if (u->ship) {
     sh = u->ship;
-    if (a_find(sh->attribs, &at_nodestroy)) {
-      cmistake(u, ord, 14, MSG_EVENT);
-      return 0;
-    }
 
     if (fval(r->terrain, SEA_REGION)) {
       cmistake(u, ord, 14, MSG_EVENT);

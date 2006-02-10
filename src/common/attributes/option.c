@@ -16,15 +16,16 @@
 #include "eressea.h"
 #include "option.h"
 
-#include <attrib.h>
+#include <kernel/save.h>
+#include <util/attrib.h>
 
 attrib_type at_option_news = {
 	"option_news",
 	NULL,
 	NULL,
 	NULL,
-	a_writedefault,
-	a_readdefault,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 

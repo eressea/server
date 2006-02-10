@@ -50,7 +50,7 @@
 #define PFL_MUSEUM PFL_NOMONSTERS | PFL_NOCOORDS | PFL_NORECRUITS | PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED
 
 attrib_type at_museumexit = {
-	"museumexit", NULL, NULL, NULL, a_writedefault, a_readdefault
+	"museumexit", NULL, NULL, NULL, a_writeshorts, a_readshorts
 };
 
 static void
@@ -90,7 +90,7 @@ attrib_type at_museumgivebackcookie = {
 };
 
 attrib_type at_warden = {
-	"itemwarden", NULL, NULL, NULL, a_writedefault, a_readdefault
+	"itemwarden", NULL, NULL, NULL, a_writeint, a_readint
 };
 
 static void

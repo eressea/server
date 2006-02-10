@@ -15,11 +15,13 @@
 #include <config.h>
 #include "targetregion.h"
 
-#include <eressea.h>
-#include <region.h>
+#include <kernel/eressea.h>
+#include <kernel/region.h>
+#include <kernel/save.h>
 
-#include <attrib.h>
-#include <resolve.h>
+
+#include <util/attrib.h>
+#include <util/resolve.h>
 
 static void
 write_targetregion(const attrib * a, FILE * F)
@@ -31,7 +33,7 @@ static int
 read_targetregion(attrib * a, FILE * F)
 {
 	if (global.data_version < BASE36IDS_VERSION) {
-		a_readdefault(a, F);
+		a_readint(a, F);
 		a->data.v = findregion(a->data.sa[0], a->data.sa[1]);
 	} else {
 		return read_region_reference((region**)&a->data.v, F);

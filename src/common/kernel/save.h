@@ -71,6 +71,18 @@ extern struct faction * readfaction(FILE * stream);
 
 extern void fwriteorder(FILE * F, const struct order * ord, const struct locale * lang);
 
+extern int a_readint(struct attrib * a, FILE * F);
+extern void a_writeint(const struct attrib * a, FILE * F);
+extern int a_readshorts(struct attrib * a, FILE * F);
+extern void a_writeshorts(const struct attrib * a, FILE * F);
+extern int a_readchars(struct attrib * a, FILE * F);
+extern void a_writechars(const struct attrib * a, FILE * F);
+extern int a_readvoid(struct attrib * a, FILE * F);
+extern void a_writevoid(const struct attrib * a, FILE * F);
+extern int a_readstring(struct attrib * a, FILE * F);
+extern void a_writestring(const struct attrib * a, FILE * F);
+extern void a_finalizestring(struct attrib * a);
+
 #ifdef __cplusplus
 }
 #endif

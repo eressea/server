@@ -483,8 +483,8 @@ static attrib_type at_maxmagicians = {
 	init_maxmagicians,
 	NULL,
 	NULL,
-	a_writedefault,
-	a_readdefault,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
@@ -500,8 +500,8 @@ static attrib_type at_npcfaction = {
 	init_npcfaction,
 	NULL,
 	NULL,
-	a_writedefault,
-	a_readdefault,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
@@ -2398,8 +2398,8 @@ attrib_type at_germs = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	a_writeshorts,
+	a_readshorts,
 	ATF_UNIQUE
 };
 
@@ -2411,8 +2411,8 @@ attrib_type at_guard = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
@@ -3108,7 +3108,6 @@ attrib_init(void)
 	at_register(&at_deathcount);
 	at_register(&at_chaoscount);
 	at_register(&at_woodcount);
-	at_register(&at_road);
 
 	/* neue UNIT-Attribute */
 	at_register(&at_siege);
@@ -3140,7 +3139,6 @@ attrib_init(void)
 	at_register(&at_xontormiaexpress); /* required for old datafiles */
 #endif
   at_register(&at_speedup);
-  at_register(&at_nodestroy);
   at_register(&at_building_action);
 }
 

@@ -181,59 +181,6 @@ a_new(const attrib_type * at) {
 }
 
 int
-a_readdefault(attrib * a, FILE * f)
-{
-/*	assert(sizeof(int)==sizeof(a->data)); */
-	fscanf(f, "%d", &a->data.i);
-	return AT_READ_OK;
-}
-
-void
-a_writedefault(const attrib * a, FILE * f)
-{
-	fprintf(f, "%d ", a->data.i);
-}
-
-static char *
-read_quoted(FILE * f, char *c, size_t size)
-{
-	char * s = c;
-	do {
-		*s = (char) fgetc(f);
-	} while (*s!='"');
-
-	for (;;) {
-		*s = (char) fgetc(f);
-		if (*s=='"') break;
-		if (s<c+size) ++s;
-	}
-	*s = 0;
-	return c;
-}
-
-int
-a_readstring(attrib * a, FILE * f)
-{
-	char zText[4096];
-	read_quoted(f, zText, sizeof(zText));
-	a->data.v = strdup(zText);
-	return AT_READ_OK;
-}
-
-void
-a_writestring(const attrib * a, FILE * f)
-{
-	assert(a->data.v);
-	fprintf(f, "\"%s\" ", (char*)a->data.v);
-}
-
-void
-a_finalizestring(attrib * a)
-{
-	free(a->data.v);
-}
-
-int
 a_age(attrib ** p)
 {
 	attrib ** ap = p;

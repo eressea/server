@@ -16,7 +16,8 @@
 #include <eressea.h>
 #include "racename.h"
 
-#include <attrib.h>
+#include <kernel/save.h>
+#include <util/attrib.h>
 
 /* libc includes */
 #include <stdlib.h>

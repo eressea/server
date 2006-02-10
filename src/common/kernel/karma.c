@@ -19,6 +19,7 @@
 
 /* kernel includes */
 #include "unit.h"
+#include "save.h"
 #include "race.h"
 #include "region.h"
 #include "item.h"
@@ -39,7 +40,7 @@
 #include <stdlib.h>
 
 attrib_type at_faction_special = {
-	"faction_special", NULL, NULL, NULL, a_writedefault, a_readdefault
+	"faction_special", NULL, NULL, NULL, a_writeshorts, a_readshorts
 };
 
 int
@@ -48,7 +49,7 @@ age_prayer_timeout(attrib *a) {
 }
 
 attrib_type at_prayer_timeout = {
-	"prayer_timeout", NULL, NULL, age_prayer_timeout, a_writedefault, a_readdefault
+	"prayer_timeout", NULL, NULL, age_prayer_timeout, a_writeshorts, a_readshorts
 };
 
 attrib_type at_prayer_effect = {
@@ -56,15 +57,15 @@ attrib_type at_prayer_effect = {
 };
 
 attrib_type at_wyrm = {
-	"wyrm", NULL, NULL, NULL, a_writedefault, a_readdefault
+	"wyrm", NULL, NULL, NULL, a_writeint, a_readint
 };
 
 attrib_type at_fshidden = {
-	"fshidden", NULL, NULL, NULL, a_writedefault, a_readdefault
+	"fshidden", NULL, NULL, NULL, a_writeint, a_readint
 };
 
 attrib_type at_jihad = {
-	"jihad", NULL, NULL, NULL, a_writedefault, a_readdefault
+	"jihad", NULL, NULL, NULL, a_writeshorts, a_readshorts
 };
 
 struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {

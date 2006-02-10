@@ -20,6 +20,7 @@
 #include <kernel/region.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
+#include <kernel/save.h>
 #include <kernel/skill.h>
 #include <kernel/curse.h>
 #include <kernel/message.h>
@@ -49,8 +50,8 @@ static attrib_type at_peaceimmune = {
   "peaceimmune",
     NULL, NULL,
     age_peaceimmune,
-    a_writedefault,
-    a_readdefault
+    a_writeint,
+    a_readint
 };
 
 static int

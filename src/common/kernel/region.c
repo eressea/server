@@ -34,6 +34,7 @@
 #include "plane.h"
 #include "region.h"
 #include "resources.h"
+#include "save.h"
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
@@ -481,8 +482,8 @@ attrib_type at_chaoscount = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
@@ -494,8 +495,8 @@ attrib_type at_deathcount = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
@@ -507,8 +508,8 @@ attrib_type at_woodcount = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
@@ -557,22 +558,6 @@ rlaen(const region * r)
 	if (!a) return -1;
 	return a->data.i;
 }
-
-/***************/
-/*   at_road   */
-/***************/
-attrib_type at_road = {
-	"road", 
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-#if RELEASE_VERSION<NEWROAD_VERSION
-	DEFAULT_WRITE,
-#else
-	NULL,
-#endif
-	DEFAULT_READ
-};
 
 void
 rsetroad(region * r, direction_t d, short val)

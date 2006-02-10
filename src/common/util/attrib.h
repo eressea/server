@@ -55,13 +55,6 @@ typedef struct attrib_type {
 	unsigned int hashkey;
 } attrib_type;
 
-extern int a_readdefault(attrib * a, FILE * f);
-extern void a_writedefault(const attrib * a, FILE * f);
-
-extern int a_readstring(attrib * a, FILE * f);
-extern void a_writestring(const attrib * a, FILE * f);
-extern void a_finalizestring(attrib * a);
-
 extern void at_register(attrib_type * at);
 
 extern attrib * a_select(attrib * a, const void * data, boolean(*compare)(const attrib *, const void *));
@@ -74,14 +67,12 @@ extern attrib * a_new(const attrib_type * at);
 extern void a_free(attrib * a);
 
 extern int a_age(attrib ** attribs);
-extern int a_read(FILE * f, attrib ** attribs);
-extern void a_write(FILE * f, const attrib * attribs);
+extern int a_read(FILE * F, attrib ** attribs);
+extern void a_write(FILE * F, const attrib * attribs);
 
 #define DEFAULT_AGE NULL
 #define DEFAULT_INIT NULL
 #define DEFAULT_FINALIZE NULL
-#define DEFAULT_WRITE a_writedefault
-#define DEFAULT_READ a_readdefault
 #define NO_WRITE NULL
 #define NO_READ NULL
 
