@@ -276,6 +276,9 @@
 			Name="Header"
 			Filter="*.h">
 			<File
+				RelativePath=".\alliance.h">
+			</File>
+			<File
 				RelativePath=".\attributes.h">
 			</File>
 			<File
@@ -345,6 +348,9 @@
 				RelativePath=".\viewrange.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\alliance.c">
+		</File>
 		<File
 			RelativePath=".\attributes.c">
 		</File>

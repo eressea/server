@@ -13,15 +13,16 @@
 #include "eressea.h"
 #include "alliance.h"
 
-#include <attrib.h>
+#include <kernel/save.h>
+#include <util/attrib.h>
 
 attrib_type at_alliance = {
 	"alliance",
 	NULL,
 	NULL,
 	NULL,
-	a_writedefault,
-	a_readdefault,
+	a_writeint,
+	a_readint,
 	ATF_UNIQUE
 };
 
