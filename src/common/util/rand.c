@@ -32,9 +32,6 @@
 #define drand() ((rand()%RAND_MAX)/(double)RAND_MAX)
 #define M_PIl   3.1415926535897932384626433832795029L  /* pi */
 
-static double nv_next;
-static char valid_next = 0;
-
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
 * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung. */
 double

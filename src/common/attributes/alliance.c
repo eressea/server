@@ -10,7 +10,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <eressea.h>
 #include "alliance.h"
 
 #include <kernel/save.h>

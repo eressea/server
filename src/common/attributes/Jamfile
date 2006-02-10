@@ -8,7 +8,6 @@ SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
 
 SOURCES =
- aggressive.c
  alliance.c
  attributes.c
  fleechance.c

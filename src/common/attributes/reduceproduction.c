@@ -13,6 +13,7 @@
  */
 
 #include <config.h>
+#include <eressea.h>
 #include "reduceproduction.h"
 #include <kernel/save.h>
 #include <util/attrib.h>
