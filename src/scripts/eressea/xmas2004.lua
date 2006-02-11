@@ -10,7 +10,6 @@ function use_snowman(u, amount)
 end
 
 function xmas2004()
-  print(get_gamename())
   if get_gamename() == "Eressea" then
     if not get_flag("xm04") then
       print("Es weihnachtet sehr (2004)")

@@ -1396,9 +1396,7 @@ parse_races(xmlDocPtr doc)
     rc->recruitcost = xml_ivalue(node, "recruitcost", 0);
     rc->maintenance = xml_ivalue(node, "maintenance", 0);
     rc->weight = xml_ivalue(node, "weight", 0);
-#ifdef RACE_CAPACITY
     rc->capacity = xml_ivalue(node, "capacity", 540);
-#endif
     rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
     rc->hitpoints = xml_ivalue(node, "hp", 0);
     rc->armor = (char)xml_ivalue(node, "ac", 0);

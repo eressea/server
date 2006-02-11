@@ -120,23 +120,6 @@ typedef struct island {
 	int age;
 } island;
 
-static int
-days2level(int days)
-{
-	int l = 0;
-	while (level_days(l)<=days) ++l;
-	return l-1;
-}
-
-static void
-change_level(unit * u, skill_t sk, int bylevel)
-{
-	skill * sv = get_skill(u, sk);
-	assert(bylevel>0);
-	if (sv==0) sv = add_skill(u, sk);
-	sk_set(sv, sv->level+bylevel);
-}
-
 newfaction *
 select_newfaction(const struct race * rc)
 {

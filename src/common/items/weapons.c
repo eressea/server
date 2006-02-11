@@ -30,20 +30,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static weapon_mod wm_spear[] = {
-	{ 1, WMF_SKILL|WMF_RIDING|WMF_AGAINST_ANYONE|WMF_OFFENSIVE },
-	{ 1, WMF_SKILL|WMF_WALKING|WMF_AGAINST_RIDING|WMF_DEFENSIVE },
-	{ 0, 0 }
-};
-
-static weapon_mod wm_lance[] = {
-	{ 1, WMF_SKILL|WMF_RIDING|WMF_AGAINST_ANYONE|WMF_OFFENSIVE },
-	{ 0, 0 }
-};
-
 enum {
-	WP_NONE,
-	WP_MAX
+  WP_NONE,
+  WP_MAX
 };
 
 /* damage types */
@@ -54,20 +43,20 @@ enum {
 #define ARMORPIERCING (1<<3)
 
 typedef struct weapondata {
-	double magres;
-	const char *damfoot;
-	const char *damhorse;
-	item_t item;
-	skill_t skill;
-	char attmod;
-	char defmod;
-	boolean rear;
-	boolean is_magic;
-	struct reload {
-		int type;
-		char time;
-	} reload;
-	char damage_type;
+  double magres;
+  const char *damfoot;
+  const char *damhorse;
+  item_t item;
+  skill_t skill;
+  char attmod;
+  char defmod;
+  boolean rear;
+  boolean is_magic;
+  struct reload {
+    int type;
+    char time;
+  } reload;
+  char damage_type;
 } weapondata;
 
 static weapondata weapontable[WP_MAX + 1] =

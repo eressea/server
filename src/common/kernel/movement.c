@@ -236,12 +236,12 @@ get_transporters(const item * itm, int * p_animals, int *p_acap, int * p_vehicle
     const item_type * itype = itm->type;
     if (itype->capacity>0) {
       if (itype->flags & ITF_ANIMAL) {
-        ++animals;
+        animals += itm->number;
         if (acap==0) acap = itype->capacity;
         assert(acap==itype->capacity || !"animals with different capacity not supported");
       }
       if (itype->flags & ITF_VEHICLE) {
-        ++vehicles;
+        vehicles += itm->number;
         if (vcap==0) vcap = itype->capacity;
         assert(vcap==itype->capacity || !"vehicles with different capacity not supported");
       }
