@@ -2139,19 +2139,25 @@ a_writeshorts(const attrib * a, FILE * f)
 int
 a_readchars(attrib * a, FILE * f)
 {
+  int i;
   if (global.data_version<ATTRIBREAD_VERSION) {
     return a_readint(a, f);
   }
-  fscanf(f, "%c %c %c %c", 
-    &a->data.ca[0], &a->data.ca[1], &a->data.ca[2], &a->data.ca[3]);
+  for (i=0;i!=4;++i) {
+    int c;
+    fscanf("%d", &c);
+    a->data.ca[i] = (char)c;
+  }
   return AT_READ_OK;
 }
 
 void
 a_writechars(const attrib * a, FILE * f)
 {
-  fprintf(f, "%c %c %c %c ", 
-    a->data.ca[0], a->data.ca[1], a->data.ca[2], a->data.ca[3]);
+  for (i=0;i!=4;++i) {
+    int c = a->data.ca[i];
+    fprintf("%d ", &c);
+  }
 }
 
 int
