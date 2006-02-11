@@ -60,16 +60,10 @@ typedef struct building_type {
 	struct attrib * attribs;
 } building_type;
 
-extern const building_type * bt_find(const char* name);
+extern building_type * bt_find(const char* name);
 extern void register_buildings(void);
 extern void bt_register(building_type * type);
 
-typedef struct building_typelist {
-	struct building_typelist * next;
-	const building_type * type;
-} building_typelist;
-
-extern struct building_typelist *buildingtypes;
 /* buildingt => building_type
  * Name => locale_string(name)
  * MaxGroesse => levels
@@ -128,8 +122,6 @@ int buildingcapacity(const struct building * b);
 void destroy_building(struct building * b);
 
 const struct building_type * findbuildingtype(const char * name, const struct locale * lang);
-
-extern struct building_type * bt_make(const char * name, int flags, int capacity, int maxcapacity, int maxsize);
 
 #include "build.h"
 #define NOBUILDING NULL

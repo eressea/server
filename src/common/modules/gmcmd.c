@@ -706,10 +706,10 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
 
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
-	for (i=0;i<=I_WAGON;++i) {
+	for (i=0;i<=I_HORSE;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
-	for (i=I_LAENSWORD;i!=I_DRACHENBLUT;++i) {
+	for (i=I_LAEN;i!=I_DRACHENBLUT;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
 
@@ -771,10 +771,10 @@ gm_addfaction(const char * email, plane * p, region * r)
 
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
-	for (i=0;i<=I_WAGON;++i) {
+	for (i=0;i<=I_HORSE;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
-	for (i=I_LAENSWORD;i!=I_DRACHENBLUT;++i) {
+	for (i=I_LAEN;i!=I_DRACHENBLUT;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
 

@@ -242,6 +242,17 @@
     <skill name="herbalism" level="d2"/>
   </set>
 
+  <set name="random_villagers">
+    <item name="money" amount="d80+19"/>
+    <skill name="cartmaking" level="d2-1"/>
+    <skill name="mining" level="d2-1"/>
+    <skill name="quarrying" level="d2-1"/>
+    <skill name="forestry" level="d2-1"/>
+    <item name="horse" amount="2"/>
+    <item name="wagon" amount="d2-1"/>
+    <item name="money" amount="d30+10"/>
+  </set>
+
   <set name="random_plain">
     <item name="money" amount="d80+19"/>
     <subset>

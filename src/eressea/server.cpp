@@ -245,7 +245,6 @@ game_init(void)
   init_attributes();
   init_races();
   init_itemtypes();
-  init_economy();
   init_rawmaterials();
 
   init_gmcmd();

@@ -3107,7 +3107,6 @@ attrib_init(void)
 	at_register(&at_moveblock);
 	at_register(&at_deathcount);
 	at_register(&at_chaoscount);
-	at_register(&at_woodcount);
 
 	/* neue UNIT-Attribute */
 	at_register(&at_siege);

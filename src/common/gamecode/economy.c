@@ -484,11 +484,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 	}
 
   if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
-#if RACE_ADJUSTMENTS
     if (rc != new_race[RC_URUK])
-#else
-    if (rc != new_race[RC_ORC])
-#endif
     {
       cmistake(u, ord, 238, MSG_EVENT);
       return;
@@ -1164,6 +1160,20 @@ typedef struct allocation_list {
 
 static allocation_list * allocations;
 
+static boolean
+can_guard(const unit * guard, const unit * u)
+{
+  if (fval(guard, UFL_ISNEW)) return false;
+  if (guard->number<=0 || !cansee(guard->faction, guard->region, u, 0)) return false;
+  if (besieged(guard) || !armedmen(guard)) return false;
+
+  return !alliedunit(guard, u->faction, HELP_GUARD);
+}
+
+enum {
+  AFL_DONE = 1<<0,
+  AFL_LOWSKILL = 1<<1
+};
 
 static void
 allocate_resource(unit * u, const resource_type * rtype, int want)
@@ -1174,22 +1184,25 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	int dm = 0;
 	allocation_list * alist;
 	allocation * al;
-	unit *u2;
-	int amount, skill;
+  attrib * a = a_find(rtype->attribs, &at_resourcelimit);
+  resource_limit * rdata = (resource_limit*)a->data.v;
+  int amount, skill;
 
 	/* momentan kann man keine ressourcen abbauen, wenn man dafür
 	* Materialverbrauch hat: */
 	assert(itype!=NULL && (itype->construction==NULL || itype->construction->materials==NULL));
+  assert(rdata!=NULL);
 
-	if (itype == olditemtype[I_WOOD] && fval(r, RF_MALLORN)) {
-		cmistake(u, u->thisorder, 92, MSG_PRODUCE);
-		return;
-	}
-	if (itype == olditemtype[I_MALLORN] && !fval(r, RF_MALLORN)) {
-		cmistake(u, u->thisorder, 91, MSG_PRODUCE);
-		return;
-	}
-	if (itype == olditemtype[I_LAEN]) {
+  if (rdata->limit!=NULL) {
+    int avail = rdata->limit(r, rtype);
+    if (avail<=0) {
+      cmistake(u, u->thisorder, 121, MSG_PRODUCE);
+      return;
+    }
+
+  }
+
+  if (itype == olditemtype[I_LAEN]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype != bt_find("mine")) {
@@ -1202,21 +1215,15 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 		cmistake(u, u->thisorder, 60, MSG_PRODUCE);
 		return;
 	}
-	/* Elfen können Holzfällen durch Bewachen verhindern, wenn sie
-	die Holzfäller sehen. */
-	if (itype == olditemtype[I_WOOD] || itype == olditemtype[I_MALLORN]) {
+
+  if (rdata->guard!=0) {
+    unit * u2;
 		for (u2 = r->units; u2; u2 = u2->next) {
-			if (getguard(u2) & GUARD_TREES
-				&& u2->number
-				&& cansee(u2->faction,r,u,0)
-				&& !besieged(u2)
-				&& !alliedunit(u2, u->faction, HELP_GUARD)
-				&& armedmen(u2)
-				) {
-					ADDMSG(&u->faction->msgs,
-						msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
-					return;
-				}
+			if ((getguard(u2) & rdata->guard) && can_guard(u2, u)) {
+        ADDMSG(&u->faction->msgs,
+          msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
+        return;
+      }
 		}
 	}
 
@@ -1224,8 +1231,8 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	* Als magische Wesen 'sehen' Bergwächter alles und werden durch
 	* Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
 	*/
-	if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN])
-	{
+	if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN]) {
+    unit * u2;
 		for (u2 = r->units; u2; u2 = u2->next ) {
 			if (getguard(u) & GUARD_MINING
 				&& !fval(u2, UFL_ISNEW)
@@ -1256,16 +1263,22 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	} else {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (itype == olditemtype[I_IRON] && btype == bt_find("mine")) {
+
+    if (rdata->modifiers) {
+      resource_mod * mod = rdata->modifiers;
+      for (;mod->flags!=0;++mod) {
+        if (mod->flags & RMF_SKILL) {
+          if (mod->btype==NULL || mod->btype==btype) {
+            if (mod->race==NULL || mod->race==u->race) {
+              skill += mod->value.i;
+            }
+          }
+        }
+      }
+    } else if (itype == olditemtype[I_IRON] && btype == bt_find("mine")) {
 			++skill;
 		}
 		else if (itype == olditemtype[I_STONE] && btype == bt_find("quarry")) {
-			++skill;
-		}
-		else if (itype == olditemtype[I_WOOD] && btype == bt_find("sawmill")) {
-			++skill;
-		}
-		else if (itype == olditemtype[I_MALLORN] && btype == bt_find("sawmill")) {
 			++skill;
 		}
 	}
@@ -1303,193 +1316,168 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	al->next = alist->data;
 	al->unit = u;
 	alist->data = al;
-	if (itype==olditemtype[I_IRON]) {
+
+  if (rdata->modifiers) {
+    struct building * b = inside_building(u);
+    const struct building_type * btype = b?b->type:NULL;
+
+    resource_mod * mod = rdata->modifiers;
+    for (;mod->flags!=0;++mod) {
+      if (mod->flags & RMF_SKILL) {
+        if (mod->btype==NULL || mod->btype==btype) {
+          if (mod->race==NULL || mod->race==u->race) {
+            al->save *= mod->value.f;
+          }
+        }
+      }
+    }
+  } else if (itype==olditemtype[I_IRON]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype==bt_find("mine"))
 			al->save *= 0.5;
 		if (u->race == new_race[RC_DWARF]) {
-#if RACE_ADJUSTMENTS
 			al->save *= 0.75;
-#else
-			al->save *= 0.5;
-#endif
 		}
 	} else if (itype==olditemtype[I_STONE]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype==bt_find("quarry"))
 			al->save = al->save*0.5;
-#if RACE_ADJUSTMENTS
 		if (u->race == new_race[RC_TROLL])
 			al->save = al->save*0.75;
-#endif
-	} else if (itype==olditemtype[I_MALLORN]) {
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-		if (btype==bt_find("sawmill"))
-			al->save *= 0.5;
-	} else if (itype==olditemtype[I_WOOD]) {
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-		if (btype==bt_find("sawmill"))
-			al->save *= 0.5;
 	}
 }
-
-typedef struct allocator {
-	const struct resource_type * type;
-	void (*allocate)(const struct allocator *, region *, allocation *);
-
-	struct allocator * next;
-} allocator;
-
-static struct allocator * allocators;
-
-static const allocator *
-get_allocator(const struct resource_type * type)
-{
-	const struct allocator * alloc = allocators;
-	while (alloc && alloc->type!=type) alloc = alloc->next;
-	return alloc;
-}
-
-static allocator *
-make_allocator(const struct resource_type * type, void (*allocate)(const struct allocator *, region *, allocation *))
-{
-	allocator * alloc = (allocator *)malloc(sizeof(allocator));
-	alloc->type = type;
-	alloc->allocate = allocate;
-	return alloc;
-}
-
-static void
-add_allocator(allocator * alloc)
-{
-	alloc->next = allocators;
-	allocators = alloc;
-}
-
-enum {
-	AFL_DONE = 1<<0,
-	AFL_LOWSKILL = 1<<1
-};
 
 static int
 required(int want, double save)
 {
-	int norders = (int)(want * save);
-	if (norders < want*save) ++norders;
-	return norders;
+  int norders = (int)(want * save);
+  if (norders < want*save) ++norders;
+  return norders;
 }
 
 static void
-leveled_allocation(const allocator * self, region * r, allocation * alist)
+leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
-	const resource_type * rtype = self->type;
-	const item_type * itype = resource2item(rtype);
-	rawmaterial * rm = rm_get(r, rtype);
-	int need;
-	boolean first = true;
+  const item_type * itype = resource2item(rtype);
+  rawmaterial * rm = rm_get(r, rtype);
+  int need;
+  boolean first = true;
 
-	if (rm!=NULL) {
-		do {
-			int avail = rm->amount;
-			int norders = 0;
-			allocation * al;
+  if (rm!=NULL) {
+    do {
+      int avail = rm->amount;
+      int norders = 0;
+      allocation * al;
 
-			if(avail <= 0) {
-				for (al=alist;al;al=al->next) {
-					al->get = 0;
-				}
-				break;
-			}
+      if(avail <= 0) {
+        for (al=alist;al;al=al->next) {
+          al->get = 0;
+        }
+        break;
+      }
 
-			assert(avail>0);
+      assert(avail>0);
 
-			for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
-				int req = required(al->want-al->get, al->save);
-				assert(al->get<=al->want && al->get >= 0);
-				if (eff_skill(al->unit, itype->construction->skill, r)
-					>= rm->level+itype->construction->minskill-1) {
-						if (req) {
-							norders += req;
-						} else {
-							fset(al, AFL_DONE);
-						}
-					} else {
-						fset(al, AFL_DONE);
-						if (first) fset(al, AFL_LOWSKILL);
-					}
-			}
-			need = norders;
+      for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
+        int req = required(al->want-al->get, al->save);
+        assert(al->get<=al->want && al->get >= 0);
+        if (eff_skill(al->unit, itype->construction->skill, r)
+          >= rm->level+itype->construction->minskill-1) {
+            if (req) {
+              norders += req;
+            } else {
+              fset(al, AFL_DONE);
+            }
+          } else {
+            fset(al, AFL_DONE);
+            if (first) fset(al, AFL_LOWSKILL);
+          }
+      }
+      need = norders;
 
-			avail = min(avail, norders);
-			if (need>0) {
-				int use = 0;
-				for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
-					if (avail > 0) {
-						int want = required(al->want-al->get, al->save);
-						int x = avail*want/norders;
-						/* Wenn Rest, dann würfeln, ob ich was bekomme: */
-						if (rand() % norders < (avail*want) % norders)
-							++x;
-						avail -= x;
-						use += x;
-						norders -= want;
-						need -= x;
-						al->get = min(al->want, al->get+(int)(x/al->save));
-					}
-				}
-				if (use) {
-					assert(use<=rm->amount);
-					rm->type->use(rm, r, use);
-				}
-				assert(avail==0 || norders==0);
-			}
-			first = false;
-		} while (need>0);
-	}
+      avail = min(avail, norders);
+      if (need>0) {
+        int use = 0;
+        for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
+          if (avail > 0) {
+            int want = required(al->want-al->get, al->save);
+            int x = avail*want/norders;
+            /* Wenn Rest, dann würfeln, ob ich was bekomme: */
+            if (rand() % norders < (avail*want) % norders)
+              ++x;
+            avail -= x;
+            use += x;
+            norders -= want;
+            need -= x;
+            al->get = min(al->want, al->get+(int)(x/al->save));
+          }
+        }
+        if (use) {
+          assert(use<=rm->amount);
+          rm->type->use(rm, r, use);
+        }
+        assert(avail==0 || norders==0);
+      }
+      first = false;
+    } while (need>0);
+  }
 }
 
 static void
-attrib_allocation(const allocator * self, region * r, allocation * alist)
+attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
-	allocation * al;
-	const resource_type * rtype = self->type;
-	int avail = 0;
-	int norders = 0;
-	attrib * a = a_find(rtype->attribs, &at_resourcelimit);
-	resource_limit * rdata = (resource_limit*)a->data.v;
+  allocation * al;
+  int norders = 0;
+  attrib * a = a_find(rtype->attribs, &at_resourcelimit);
+  resource_limit * rdata = (resource_limit*)a->data.v;
+  int avail = rdata->value;
 
-	for (al=alist;al;al=al->next) {
-		norders += required(al->want, al->save);
-	}
+  for (al=alist;al;al=al->next) {
+    norders += required(al->want, al->save);
+  }
 
-	if (rdata->limit) {
-		avail = rdata->limit(r, rtype);
-		if (avail < 0) avail = 0;
-	}
-	else avail = rdata->value;
+  if (rdata->limit) {
+    avail = rdata->limit(r, rtype);
+    if (avail < 0) avail = 0;
+  }
 
-	avail = min(avail, norders);
-	for (al=alist;al;al=al->next) {
-		if (avail > 0) {
-			int want = required(al->want, al->save);
-			int x = avail*want/norders;
-			/* Wenn Rest, dann würfeln, ob ich was bekomme: */
-			if (rand() % norders < (avail*want) % norders)
-				++x;
-			avail -= x;
-			norders -= want;
-			al->get = min(al->want, (int)(x/al->save));
-			if (rdata->use) {
-				int use = required(al->get, al->save);
-				if (use) rdata->use(r, rtype, use);
-			}
-		}
-	}
-	assert(avail==0 || norders==0);
+  avail = min(avail, norders);
+  for (al=alist;al;al=al->next) {
+    if (avail > 0) {
+      int want = required(al->want, al->save);
+      int x = avail*want/norders;
+      /* Wenn Rest, dann würfeln, ob ich was bekomme: */
+      if (rand() % norders < (avail*want) % norders)
+        ++x;
+      avail -= x;
+      norders -= want;
+      al->get = min(al->want, (int)(x/al->save));
+      if (rdata->produce) {
+        int use = required(al->get, al->save);
+        if (use) rdata->produce(r, rtype, use);
+      }
+    }
+  }
+  assert(avail==0 || norders==0);
+}
+
+typedef void (*allocate_function)(const resource_type *, struct region *, struct allocation *);
+
+static allocate_function
+get_allocator(const struct resource_type * rtype)
+{
+  attrib * a = a_find(rtype->attribs, &at_resourcelimit);
+
+  if (a!=NULL) {
+    resource_limit * rdata = (resource_limit*)a->data.v;
+    if (rdata->value>0 || rdata->limit!=NULL) {
+      return attrib_allocation;
+    }
+    return leveled_allocation;
+  }
+  return NULL;
 }
 
 static void
@@ -1500,12 +1488,12 @@ split_allocations(region * r)
 	while (*p_alist) {
 		allocation_list * alist = *p_alist;
 		const resource_type * rtype = alist->type;
-		const allocator * alloc = get_allocator(rtype);
+		allocate_function alloc = get_allocator(rtype);
 		const item_type * itype = resource2item(rtype);
 		allocation ** p_al = &alist->data;
 
 		freset(r, RF_DH);
-		alloc->allocate(alloc, r, alist->data);
+		alloc(rtype, r, alist->data);
 
 		while (*p_al) {
 			allocation * al = *p_al;
@@ -3200,17 +3188,4 @@ produce(void)
     assert(rpeasants(r) >= 0);
 
   }
-}
-
-void
-init_economy(void)
-{
-  add_allocator(make_allocator(item2resource(olditemtype[I_HORSE]), attrib_allocation));
-  add_allocator(make_allocator(item2resource(olditemtype[I_WOOD]), attrib_allocation));
-  add_allocator(make_allocator(item2resource(olditemtype[I_MALLORN]), attrib_allocation));
-  add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), leveled_allocation));
-  add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), leveled_allocation));
-  add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), leveled_allocation));
-  add_allocator(make_allocator(rt_seed, attrib_allocation));
-  add_allocator(make_allocator(rt_mallornseed, attrib_allocation));
 }

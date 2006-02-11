@@ -298,24 +298,10 @@ get_unit(region * r, unit * u)
 	newunit = createunit(r, u->faction, rand() % 20 + 3, u->faction->race);
   fset(newunit, UFL_ISNEW|UFL_MOVED);
 	set_string(&newunit->name, "Dorfbewohner");
-	set_money(newunit, (rand() % 26 + 10) * newunit->number);
-	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
-	switch (rand() % 4) {
-	case 0:
-		set_level(newunit, SK_MINING, 1);
-		break;
-	case 1:
-		set_level(newunit, SK_LUMBERJACK, 1);
-		break;
-	case 2:
-		set_level(newunit, SK_CARTMAKER, 1);
-		break;
-	case 3:
-		set_level(newunit, SK_QUARRYING, 1);
-		break;
-	}
-	set_item(newunit, I_WAGON, rand() % 2);
-	set_item(newunit, I_HORSE, min(get_item(newunit, I_WAGON) * 2, rand() % 5));
+  if (fval(u, UFL_PARTEITARNUNG)) {
+    fset(newunit, UFL_PARTEITARNUNG);
+  }
+  equip_unit(newunit, get_equipment("random_villagers"));
 }
 
 static void
@@ -1204,77 +1190,6 @@ randomevents(void)
   orc_growth();
   demon_skillchanges();
 
-#if RACE_ADJUSTMENTS == 0
-	/* Orks vermehren sich */
-
-	for (r = regions; r; r = r->next) {
-
-		plane * p = rplane(r);
-		/* there is a flag for planes without orc growth: */
-		if (p && (p->flags & PFL_NOORCGROWTH)) continue;
-		for (u = r->units; u; u = u->next) {
-			if ( (u->race == new_race[RC_ORC])
-					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
-				int n;
-				int increase = 0;
-				int num  = u->number;
-				int prob = 5;
-
-				for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
-					if (rand() % 100 < prob) {
-						++increase;
-					}
-        }
-        if (increase) {
-          if (u->race == new_race[RC_ORC]) {
-            int i;
-            struct orcskills {
-              skill_t skill;
-              int level;
-            } skills [] = { 
-              { SK_MELEE, 1 }, { SK_SPEAR, 1 }, { SK_TACTICS, 0 }, 
-              { SK_LONGBOW, 0 }, { SK_CROSSBOW, 0 }, { SK_CATAPULT, 0 }, 
-              { SK_AUSDAUER, 0 }, { NOSKILL, 0 }
-            };
-            for (i=0;skills[i].skill!=NOSKILL;++i) {
-              int k = get_level(u, skills[i].skill);
-              change_skill(u, skills[i].skill, increase * max(k, s));
-            }
-          }
-
-          set_number(u, u->number + increase);
-
-          u->hp += unit_max_hp(u) * increase;
-          ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
-            "unit amount race", u, increase, u->race));
-        }
-          }
-    }
-  }
-#endif
-
-  for (r = regions; r; r = r->next) {
-#if !RACE_ADJUSTMENTS
-    /* Elfen generieren Wald */
-    if (r->land && !fval(r, RF_MALLORN)) {
-      int trees = rtrees(r, 2);
-      int maxgen = (production(r) * MAXPEASANTS_PER_AREA)/8;
-      for (u = r->units; u && maxgen > 0; u = u->next) {
-        if (u->race == new_race[RC_ELF]) {
-          for (n = u->number; n && maxgen > 0; n--) {
-            if (rand() % 1000 < 15) {	/* 1.5% Chance */
-              trees++;
-            }
-            maxgen--;
-          }
-        }
-      }
-      rsettrees(r, 2, trees);
-    } /* !RACE_ADJUSTMENTS */
-#endif
-
-  }
-
   /* Orkifizierte Regionen mutieren und mutieren zurück */
 
   for (r = regions; r; r = r->next) {
@@ -1373,45 +1288,7 @@ randomevents(void)
     }
   }
 
-  /* Frühling, die Bäume schlagen aus. */
-
-  for (r = regions; r; r = r->next) {
-    if (fval(r, RF_CHAOTIC) ||(r->x >= -13  && r->x <= -6  && r->y >= 50 && r->y <= 57)) {
-      if (woodcount(r) >= 40 && rand()%100 < 33) {
-        int trees = rtrees(r,2);
-        int treemen = rand()%(max(50,trees)/3);
-        struct message * msg;
-
-        treemen = max(25, treemen);
-        woodcounts(r, -40);
-        trees = max(0, trees-treemen);
-        rsettrees(r, 2, trees);
-        u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
-        fset(u, UFL_ISNEW|UFL_MOVED);
-
-        set_level(u, SK_OBSERVATION, 2);
-        if (u->number == 1)
-          set_string(&u->name, "Ein wütender Ent");
-        else
-          set_string(&u->name, "Wütende Ents");
-
-        log_printf("%d Ents in %s.\n", u->number, regionname(r, NULL));
-
-        msg = msg_message("entrise", "region", r);
-        add_message(&r->msgs, msg);
-        for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
-        for (u=r->units;u;u=u->next) {
-          if (fval(u->faction, FL_DH)) continue;
-          fset(u->faction, FL_DH);
-          add_message(&u->faction->msgs, msg);
-        }
-        msg_release(msg);
-      }
-    }
-  }
-
 	/* Chaos */
-
 	for (r = regions; r; r = r->next) {
 		int i;
 		if (fval(r, RF_CHAOTIC)) {

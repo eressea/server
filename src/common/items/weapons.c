@@ -42,9 +42,6 @@ static weapon_mod wm_lance[] = {
 };
 
 enum {
-	WP_EOGSWORD,
-	WP_SPEAR,
-	WP_LANCE,
 	WP_NONE,
 	WP_MAX
 };
@@ -77,15 +74,10 @@ static weapondata weapontable[WP_MAX + 1] =
 /* MagRes, Schaden/Fuﬂ, Schaden/Pferd, Item, Skill, OffMod, DefMod,
  * missile, is_magic */
 {
-	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_MELEE, 1, 1, false, false, { 0, 0}, CUT },
-	/* Speer */
-	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { 0, 0}, PIERCE },
-	/* Lanze */
-	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { 0, 0}, PIERCE },
 	/* Unbewaffnet */
-	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_MELEE, 0, 0, false, false, { 0, 0}, BASH },
+	{0.00, "1d5+0", "1d6+0", MAX_ITEMS, SK_MELEE, 0, 0, false, false, { 0, 0}, BASH },
 	/* Dummy */
-	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_MELEE, 0, 0, false, false, { 0, 0}, 0 }
+	{0.00, "0d0+0", "0d0+0", MAX_ITEMS, SK_MELEE, 0, 0, false, false, { 0, 0}, 0 }
 };
 
 weapon_type * oldweapontype[WP_MAX];
@@ -210,22 +202,13 @@ static void
 init_oldweapons(void)
 {
 	int w;
-	for (w=0;w!=WP_MAX && weapontable[w].item!=I_WOOD;++w) {
+	for (w=0;w!=WP_MAX && weapontable[w].item!=MAX_ITEMS;++w) {
 		const char * damage[2];
 		item_type * itype = olditemtype[weapontable[w].item];
 		int minskill = 1, wflags = WTF_NONE;
     int m;
 		weapon_mod * modifiers = NULL;
 		boolean (*attack)(const troop *, const struct weapon_type *, int *, int) = NULL;
-
-		switch (w) {
-		case WP_LANCE:
-			modifiers = wm_lance;
-			break;
-		case WP_SPEAR:
-			modifiers = wm_spear;
-			break;
-		}
 
 		assert(itype!=NULL || !"item not initialized");
 

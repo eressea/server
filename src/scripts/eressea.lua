@@ -31,7 +31,8 @@ function run_scripts()
     "eressea/ponnuki.lua",
     "eressea/xmas2004.lua",
     "eressea/xmas2005.lua",
-    "eressea/embassy.lua"
+    "eressea/embassy.lua",
+    "eressea/ents.lua"
   }
   for index in scripts do
     loadscript(scripts[index])
@@ -66,6 +67,7 @@ function process(orders)
   spawn_dragons()
   spawn_undead()
   spawn_braineaters(0.25)
+  spawn_ents()
 
   plan_monsters()
   process_orders()

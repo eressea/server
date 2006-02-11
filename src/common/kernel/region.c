@@ -136,13 +136,6 @@ chaoscount(const region * r) {
 	return a->data.i;
 }
 
-int
-woodcount(const region * r) {
-	attrib * a = a_find(r->attribs, &at_woodcount);
-	if (!a) return 0;
-	return a->data.i;
-}
-
 void
 deathcounts (region * r, int fallen) {
 	attrib * a;
@@ -165,19 +158,6 @@ chaoscounts(region * r, int fallen) {
 
 	a = a_find(r->attribs, &at_chaoscount);
 	if (!a) a = a_add(&r->attribs, a_new(&at_chaoscount));
-	a->data.i += fallen;
-
-	if (a->data.i<=0) a_remove(&r->attribs, a);
-}
-
-void
-woodcounts(region * r, int fallen) {
-	attrib * a;
-
-	if (fallen==0) return;
-
-	a = a_find(r->attribs, &at_woodcount);
-	if (!a) a = a_add(&r->attribs, a_new(&at_woodcount));
 	a->data.i += fallen;
 
 	if (a->data.i<=0) a_remove(&r->attribs, a);
@@ -508,7 +488,7 @@ attrib_type at_woodcount = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	a_writeint,
+	NO_WRITE,
 	a_readint,
 	ATF_UNIQUE
 };

@@ -487,7 +487,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
   short x = 0, y = 0;
   region * r = NULL;
   region_list * rlist = NULL;
-  int rsize, tsize = 0;
+  int rsize = 0, tsize = 0;
   int isize = REGIONS_PER_FACTION; /* target size for the island */
   int psize = 0; /* players on this island */
   const terrain_type * volcano_terrain = get_terrain("volcano");
@@ -567,14 +567,15 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       assert(virgin_region(rconnect(rmin, dmin)));
       x = rmin->x + delta_x[dmin];
       y = rmin->y + delta_y[dmin];
+      r = new_region(x, y);
+      terraform(r, T_OCEAN); /* we change the terrain later */
     }
-    r = new_region(x, y);
-    terraform(r, T_OCEAN); /* we change the terrain later */
   }
-
-  add_regionlist(&rlist, r);
-  fset(r, FL_MARK);
-  rsize = 1;
+  if (r!=NULL) {
+    add_regionlist(&rlist, r);
+    fset(r, FL_MARK);
+    rsize = 1;
+  }
 
   while (rsize && (nsize || isize>=REGIONS_PER_FACTION)) {
     int i = rand() % rsize;

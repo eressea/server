@@ -164,11 +164,9 @@ extern struct attrib *create_special_direction(struct region *r, struct region *
                                                int duration, const char *desc, 
                                                const char *keyword);
 
-int woodcount(const struct region * r);
 int deathcount(const struct region * r);
 int chaoscount(const struct region * r);
 
-void woodcounts(struct region * r, int delta);
 void deathcounts(struct region * r, int delta);
 void chaoscounts(struct region * r, int delta);
 

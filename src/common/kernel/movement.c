@@ -208,18 +208,7 @@ entrance_allowed(const struct unit * u, const struct region * r)
 int
 personcapacity(const unit *u)
 {
-#ifdef RACE_CAPACITY
 	int cap = u->race->weight+u->race->capacity;
-#else
-	int cap = u->race->weight+540;
-
-	if (u->race == new_race[RC_TROLL])
-		cap += 540;
-#if RACE_ADJUSTMENTS
-	else if (u->race == new_race[RC_GOBLIN])
-		cap -= 100;
-#endif
-#endif
 	
 	if (fspecial(u->faction, FS_QUICK))
 		cap -= 200;
@@ -237,75 +226,101 @@ eff_weight(const unit *u)
 	return weight(u);
 }
 
+static void
+get_transporters(const item * itm, int * p_animals, int *p_acap, int * p_vehicles, int * p_vcap)
+{
+  int vehicles = 0, vcap = 0;
+  int animals = 0, acap = 0;
+
+  for (;itm!=NULL;itm=itm->next) {
+    const item_type * itype = itm->type;
+    if (itype->capacity>0) {
+      if (itype->flags & ITF_ANIMAL) {
+        ++animals;
+        if (acap==0) acap = itype->capacity;
+        assert(acap==itype->capacity || !"animals with different capacity not supported");
+      }
+      if (itype->flags & ITF_VEHICLE) {
+        ++vehicles;
+        if (vcap==0) vcap = itype->capacity;
+        assert(vcap==itype->capacity || !"vehicles with different capacity not supported");
+      }
+    }
+  }
+  *p_vehicles = vehicles;
+  *p_animals = animals;
+  *p_vcap = vcap;
+  *p_acap = acap;
+}
+
 static int
 ridingcapacity(unit * u)
 {
-	int n;
-	int wagen, pferde;
+	int vehicles = 0, vcap = 0;
+  int animals = 0, acap = 0;
 
-	n = 0;
+  get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
-	/* Man trägt sein eigenes Gewicht plus seine Kapazität! Die Menschen
-	 * tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
-	 * von zwei Pferden gezogen wird */
+  /* Man trägt sein eigenes Gewicht plus seine Kapazität! Die Menschen
+   * tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
+   * von zwei Pferden gezogen wird */
 
-  pferde = get_item(u, I_HORSE) + get_item(u, I_UNICORN);
-  pferde = min(pferde, effskill(u, SK_RIDING) * u->number * 2);
-	if (fval(u->race, RCF_HORSE)) pferde += u->number;
+  animals = min(animals, effskill(u, SK_RIDING) * u->number * 2);
+	if (fval(u->race, RCF_HORSE)) animals += u->number;
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
-	wagen = min(pferde / HORSESNEEDED, get_item(u, I_WAGON));
+	vehicles = min(animals / HORSESNEEDED, vehicles);
 
-	n = wagen * WAGONCAPACITY + pferde * HORSECAPACITY;
-	return n;
+	return vehicles * vcap + animals * acap;
 }
 
 int
 walkingcapacity(const struct unit * u)
 {
-	int n, tmp, personen, pferde_fuer_wagen;
-	int wagen, wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
-	/* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
+	int n, tmp, people, pferde_fuer_wagen;
+	int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
+  int vehicles = 0, vcap = 0;
+  int animals = 0, acap = 0;
+
+  get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
+
+  /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
 	 * die Leute tragen */
 
-	int pferde = get_item(u, I_HORSE) + get_item(u, I_UNICORN);
+  pferde_fuer_wagen = min(animals, effskill(u, SK_RIDING) * u->number * 4);
 	if (fval(u->race, RCF_HORSE)) {
-		pferde += u->number;
-		personen = 0;
+		animals += u->number;
+		people = 0;
 	} else {
-		personen = u->number;
+		people = u->number;
 	}
-	wagen = get_item(u, I_WAGON);
-
-	pferde_fuer_wagen = min(pferde, effskill(u, SK_RIDING) * u->number * 4);
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
+	wagen_mit_pferden = min(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
-	wagen_mit_pferden = min(wagen, pferde_fuer_wagen / HORSESNEEDED);
-
-	n = wagen_mit_pferden * WAGONCAPACITY;
+	n = wagen_mit_pferden * vcap;
 
 	if (u->race == new_race[RC_TROLL]) {
 		/* 4 Trolle ziehen einen Wagen. */
 		/* Unbesetzte Wagen feststellen */
-		wagen_ohne_pferde = wagen - wagen_mit_pferden;
+		wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
 		/* Genug Trolle, um die Restwagen zu ziehen? */
 		wagen_mit_trollen = min(u->number / 4, wagen_ohne_pferde);
 
 		/* Wagenkapazität hinzuzählen */
-		n += wagen_mit_trollen * WAGONCAPACITY;
+		n += wagen_mit_trollen * vcap;
 		wagen_ohne_pferde -= wagen_mit_trollen;
 	}
 
-	n += pferde * HORSECAPACITY;
-	n += personen * personcapacity(u);
+	n += animals * acap;
+	n += people * personcapacity(u);
 	/* Goliathwasser */
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
-	n += min(personen, tmp) * (HORSECAPACITY - personcapacity(u));
+	n += min(people, tmp) * (acap - personcapacity(u));
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
-	n += min(personen, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
+	n += min(people, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
 
 	return n;
 }
@@ -320,16 +335,16 @@ enum {
 static int
 canwalk(unit * u)
 {
-	int wagen, maxwagen;
-	int pferde, maxpferde;
+	int maxwagen, maxpferde;
+  int vehicles = 0, vcap = 0;
+  int animals = 0, acap = 0;
 
-	/* workaround: monsters are too stupid to drop items, therefore they have
+  /* workaround: monsters are too stupid to drop items, therefore they have
 	 * infinite carrying capacity */
 
-	if (u->faction->no == 0) return E_CANWALK_OK;
+	if (u->faction->no == MONSTER_FACTION) return E_CANWALK_OK;
 
-	wagen = get_item(u, I_WAGON);
-	pferde = get_item(u, I_HORSE) + get_item(u, I_UNICORN);
+  get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
 	maxwagen = effskill(u, SK_RIDING) * u->number * 2;
 	if (u->race == new_race[RC_TROLL]) {
@@ -337,7 +352,7 @@ canwalk(unit * u)
 	}
 	maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
 
-	if (pferde > maxpferde)
+	if (animals > maxpferde)
 		return E_CANWALK_TOOMANYHORSES;
 
 	if (walkingcapacity(u) - eff_weight(u) >= 0)
@@ -348,7 +363,7 @@ canwalk(unit * u)
 	 * die Einheit nicht zum Ziehen benutzt, also nicht mehr Wagen gezogen
 	 * als erlaubt. */
 
-	if (wagen > maxwagen)
+	if (vehicles > maxwagen)
 		return E_CANWALK_TOOMANYCARTS;
 	/* Es muß nicht zwingend an den Wagen liegen, aber egal... (man
 	 * könnte z.B. auch 8 Eisen abladen, damit ein weiterer Wagen als

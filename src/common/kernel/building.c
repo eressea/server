@@ -103,9 +103,14 @@ attrib_type at_building_action = {
   lc_write, lc_read
 };
 
-building_typelist *buildingtypes;
+typedef struct building_typelist {
+  struct building_typelist * next;
+  building_type * type;
+} building_typelist;
 
-const building_type *
+static building_typelist *buildingtypes;
+
+building_type *
 bt_find(const char* name)
 {
 	const struct building_typelist * btl = buildingtypes;
@@ -380,20 +385,6 @@ register_buildings(void)
 #ifdef WDW_PYRAMID
 	register_function((pf_generic)pyramid_name, "pyramid_name");
 #endif
-}
-
-building_type *
-bt_make(const char * name, int flags, int capacity, int maxcapacity, int maxsize)
-{
-	building_type * btype = calloc(sizeof(building_type), 1);
-	btype->_name = name;
-	btype->flags = flags | BTF_DYNAMIC;
-	btype->capacity = capacity;
-	btype->maxcapacity = maxcapacity;
-	btype->maxsize = maxsize;
-
-	bt_register(btype);
-	return btype;
 }
 
 void *

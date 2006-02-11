@@ -182,7 +182,10 @@ lua_autoseed(const char * filename, bool new_island)
     int n = listlen(players);
     int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
     k = n / k;
-    autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
+    n = autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
+    if (n==0) {
+      break;
+    }
   }
 }
 

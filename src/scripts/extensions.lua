@@ -28,3 +28,49 @@ function hp_changeresource(u, delta)
   u.hp = hp
   return hp
 end
+
+function log_limit(r)
+  if r:get_flag(1) then -- RF_MALLORN
+    return 0
+  end
+  return r:get_resource("tree") + r:get_resource("sapling")
+end
+
+function log_produce(r, n)
+  local trees = r:get_resource("tree")
+  if trees>=n then
+    r:set_resource("tree", trees-n)
+  else
+    r:set_resource("tree", 0)
+    n = n - trees
+    trees = r:get_resource("sapling")
+    if trees>=n then
+      r:set_resource("sapling", trees-n)
+    else
+      r:set_resource("sapling", 0)
+    end
+  end
+end
+
+function mallorn_limit(r)
+  if not r:get_flag(1) then -- RF_MALLORN
+    return 0
+  end
+  return r:get_resource("tree") + r:get_resource("sapling")
+end
+
+function mallorn_produce(r, n)
+  local trees = r:get_resource("tree")
+  if trees>=n then
+    r:set_resource("tree", trees-n)
+  else
+    r:set_resource("tree", 0)
+    n = n - trees
+    trees = r:get_resource("sapling")
+    if trees>=n then
+      r:set_resource("sapling", trees-n)
+    else
+      r:set_resource("sapling", 0)
+    end
+  end
+end

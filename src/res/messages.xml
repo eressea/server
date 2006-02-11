@@ -4635,6 +4635,16 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You can breed horses only in a stable."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You can breed horses only in a stable."</text>
   </message>
+  <message name="error121" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas gibt es hier nicht."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - That resource does not exist in this region."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - That resource does not exist in this region."</text>
+  </message>
   <message name="error120" section="errors">
     <type>
       <arg name="unit" type="unit"/>

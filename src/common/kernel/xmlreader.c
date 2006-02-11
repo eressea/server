@@ -243,36 +243,41 @@ parse_buildings(xmlDocPtr doc)
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
       xmlChar * property;
-      building_type * bt = calloc(sizeof(building_type), 1);
+      building_type * btype;
       xmlXPathObjectPtr result;
       int k;
 
       property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
-      bt->_name = strdup((const char *)property);
+      btype = bt_find((const char*)property);
+      if (btype==NULL) {
+        btype = calloc(sizeof(building_type), 1);
+        btype->_name = strdup((const char *)property);
+        bt_register(btype);
+      }
       xmlFree(property);
 
-      bt->capacity = xml_ivalue(node, "capacity", -1);
-      bt->maxcapacity = xml_ivalue(node, "maxcapacity", -1);
-      bt->maxsize = xml_ivalue(node, "maxsize", -1);
+      btype->capacity = xml_ivalue(node, "capacity", -1);
+      btype->maxcapacity = xml_ivalue(node, "maxcapacity", -1);
+      btype->maxsize = xml_ivalue(node, "maxsize", -1);
 
-      bt->magres = xml_ivalue(node, "magres", 0);
-      bt->magresbonus = xml_ivalue(node, "magresbonus", 0);
-      bt->fumblebonus = xml_ivalue(node, "fumblebonus", 0);
-      bt->auraregen = xml_fvalue(node, "auraregen", 1.0);
+      btype->magres = xml_ivalue(node, "magres", 0);
+      btype->magresbonus = xml_ivalue(node, "magresbonus", 0);
+      btype->fumblebonus = xml_ivalue(node, "fumblebonus", 0);
+      btype->auraregen = xml_fvalue(node, "auraregen", 1.0);
 
-      if (xml_bvalue(node, "nodestroy", false)) bt->flags |= BTF_INDESTRUCTIBLE;
-      if (xml_bvalue(node, "oneperturn", false)) bt->flags |= BTF_ONEPERTURN;
-      if (xml_bvalue(node, "nobuild", false)) bt->flags |= BTF_NOBUILD;
-      if (xml_bvalue(node, "unique", false)) bt->flags |= BTF_UNIQUE;
-      if (xml_bvalue(node, "decay", false)) bt->flags |= BTF_DECAY;
-      if (xml_bvalue(node, "magic", false)) bt->flags |= BTF_MAGIC;
-      if (xml_bvalue(node, "protection", false)) bt->flags |= BTF_PROTECTION;
+      if (xml_bvalue(node, "nodestroy", false)) btype->flags |= BTF_INDESTRUCTIBLE;
+      if (xml_bvalue(node, "oneperturn", false)) btype->flags |= BTF_ONEPERTURN;
+      if (xml_bvalue(node, "nobuild", false)) btype->flags |= BTF_NOBUILD;
+      if (xml_bvalue(node, "unique", false)) btype->flags |= BTF_UNIQUE;
+      if (xml_bvalue(node, "decay", false)) btype->flags |= BTF_DECAY;
+      if (xml_bvalue(node, "magic", false)) btype->flags |= BTF_MAGIC;
+      if (xml_bvalue(node, "protection", false)) btype->flags |= BTF_PROTECTION;
 
       /* reading eressea/buildings/building/construction */
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-      xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &bt->construction);
+      xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &btype->construction);
       xmlXPathFreeObject(result);
 
       if (gamecode_enabled) {
@@ -286,18 +291,18 @@ parse_buildings(xmlDocPtr doc)
 
           if (fun==NULL) {
             log_error(("unknown function name '%s' for building %s\n",
-              (const char*)property, bt->_name));
+              (const char*)property, btype->_name));
             xmlFree(property);
             continue;
           }
           assert(property!=NULL);
           if (strcmp((const char*)property, "name")==0) {
-            bt->name = (const char * (*)(int size))fun;
+            btype->name = (const char * (*)(int size))fun;
           } else if (strcmp((const char*)property, "init")==0) {
-            bt->init = (void (*)(struct building_type*))fun;
+            btype->init = (void (*)(struct building_type*))fun;
           } else {
             log_error(("unknown function type '%s' for building %s\n",
-              (const char*)property, bt->_name));
+              (const char*)property, btype->_name));
           }
           xmlFree(property);
         }
@@ -310,10 +315,10 @@ parse_buildings(xmlDocPtr doc)
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         maintenance * mt;
 
-        if (bt->maintenance==NULL) {
-          bt->maintenance = calloc(sizeof(struct maintenance), result->nodesetval->nodeNr+1);
+        if (btype->maintenance==NULL) {
+          btype->maintenance = calloc(sizeof(struct maintenance), result->nodesetval->nodeNr+1);
         }
-        mt = bt->maintenance + k;
+        mt = btype->maintenance + k;
         mt->number = xml_ivalue(node, "amount", 0);
 
         property = xmlGetProp(node, BAD_CAST "type");
@@ -328,8 +333,8 @@ parse_buildings(xmlDocPtr doc)
       }
       xmlXPathFreeObject(result);
 
-      /* finally, register the new building type */
-      bt_register(bt);
+      /* finally, initialize the new building type */
+      if (btype->init) btype->init(btype);
     }
   }
   xmlXPathFreeObject(buildings);
@@ -652,7 +657,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   xpath->node = node;
   result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
   assert(wtype->modifiers==NULL);
-  wtype->modifiers = calloc(sizeof(weapon_mod), result->nodesetval->nodeNr+1);
+  wtype->modifiers = calloc(result->nodesetval->nodeNr+1, sizeof(weapon_mod));
   for (k=0;k!=result->nodesetval->nodeNr;++k) {
     xmlNodePtr node = result->nodesetval->nodeTab[k];
     xmlXPathObjectPtr races;
@@ -740,6 +745,7 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   if (xml_bvalue(node, "herb", false)) flags |= ITF_HERB;
   if (xml_bvalue(node, "big", false)) flags |= ITF_BIG;
   if (xml_bvalue(node, "animal", false)) flags |= ITF_ANIMAL;
+  if (xml_bvalue(node, "vehicle", false)) flags |= ITF_VEHICLE;
   itype = new_itemtype(rtype, flags, weight, capacity);
 #ifdef SCORE_MODULE
   itype->score = xml_ivalue(node, "score", 0);
@@ -917,41 +923,120 @@ parse_resources(xmlDocPtr doc)
       xmlXPathFreeObject(result);
     }
 
+    /* reading eressea/resources/resource/resourcelimit */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "resourcelimit", xpath);
+    assert(result->nodesetval->nodeNr<=1);
+    if (result->nodesetval->nodeNr!=0) {
+      resource_limit * rdata;
+      attrib * a = a_find(rtype->attribs, &at_resourcelimit);
+      xmlNodePtr limit = result->nodesetval->nodeTab[0];
+
+      if (a==NULL) a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+      rdata = (resource_limit*)a->data.v;
+      rtype->flags |= RTF_LIMITED;
+      xpath->node = limit;
+      xmlXPathFreeObject(result);
+
+      result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
+      if (result->nodesetval!=NULL) {
+        rdata->modifiers = calloc(result->nodesetval->nodeNr+1, sizeof(resource_mod));
+        for (k=0;k!=result->nodesetval->nodeNr;++k) {
+          xmlNodePtr node = result->nodesetval->nodeTab[k];
+          building_type * btype = NULL;
+          const race * rc = NULL;
+
+          property = xmlGetProp(node, BAD_CAST "race");
+          if (property!=NULL) {
+            rc = rc_find((const char*)property);
+            if (rc==NULL) rc = rc_add(rc_new((const char*)property));
+            xmlFree(property);
+          }
+          rdata->modifiers[k].race = rc;
+
+          property = xmlGetProp(node, BAD_CAST "building");
+          if (property!=NULL) {
+            btype = bt_find((const char*)property);
+            if (btype==NULL) {
+              btype = calloc(sizeof(building_type), 1);
+              btype->_name = strdup((const char *)property);
+              bt_register(btype);
+            }
+            xmlFree(property);
+          }
+          rdata->modifiers[k].btype = btype;
+
+          property = xmlGetProp(node, BAD_CAST "type");
+          assert(property!=NULL);
+          if (strcmp((const char *)property, "skill")) {
+            rdata->modifiers[k].value.i = xml_ivalue(node, "value", 0);
+            rdata->modifiers[k].flags |= RMF_SKILL;
+          } else if (strcmp((const char *)property, "material")) {
+            rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
+            rdata->modifiers[k].flags |= RMF_SAVEMATERIAL;
+          } else if (strcmp((const char *)property, "resource")) {
+            rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
+            rdata->modifiers[k].flags |= RMF_SAVERESOURCE;
+          } else {
+            log_error(("unknown type '%s' for resourcelimit-modifier '%s'\n",
+              (const char*)property, rtype->_name[0]));
+          }
+          xmlFree(property);
+        }
+      }
+      xmlXPathFreeObject(result);
+
+      result = xmlXPathEvalExpression(BAD_CAST "guard", xpath);
+      if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        xmlChar * flag = xmlGetProp(node, BAD_CAST "flag");
+        
+        if (flag!=NULL) {
+          if (strcmp((char*)flag, "logging")==0) {
+            rdata->guard |= GUARD_TREES;
+          } else if (strcmp((char*)flag, "mining")==0) {
+            rdata->guard |= GUARD_MINING;
+          }
+          xmlFree(flag);
+        }
+      }
+      xmlXPathFreeObject(result);
+
+      /* reading eressea/resources/resource/resourcelimit/function */
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        pf_generic fun;
+
+        property = xmlGetProp(node, BAD_CAST "value");
+        assert(property!=NULL);
+        fun = get_function((const char*)property);
+        if (fun==NULL) {
+          log_error(("unknown limit '%s' for resource %s\n",
+            (const char*)property, rtype->_name[0]));
+          xmlFree(property);
+          continue;
+        }
+        xmlFree(property);
+
+        property = xmlGetProp(node, BAD_CAST "name");
+        assert(property!=NULL);
+        if (strcmp((const char*)property, "produce")==0) {
+          rdata->produce = (rlimit_produce)fun;
+        } else if (strcmp((const char*)property, "limit")==0) {
+          rdata->limit = (rlimit_limit)fun;
+        } else {
+          log_error(("unknown limit '%s' for resource %s\n",
+            (const char*)property, rtype->_name[0]));
+        }
+        xmlFree(property);
+      }
+    }
+    xmlXPathFreeObject(result);
+
     /* reading eressea/resources/resource/resourcelimit/function */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
-    if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      attrib * a = a_find(rtype->attribs, &at_resourcelimit);
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      pf_generic fun;
-
-      property = xmlGetProp(node, BAD_CAST "value");
-      assert(property!=NULL);
-      fun = get_function((const char*)property);
-      if (fun==NULL) {
-        log_error(("unknown limit '%s' for resource %s\n",
-          (const char*)property, rtype->_name[0]));
-        xmlFree(property);
-        continue;
-      }
-      xmlFree(property);
-
-      if (a==NULL) a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "use")==0) {
-        resource_limit * rdata = (resource_limit*)a->data.v;
-        rdata->use = (rlimit_use)fun;
-      } else if (strcmp((const char*)property, "limit")==0) {
-        resource_limit * rdata = (resource_limit*)a->data.v;
-        rdata->limit = (rlimit_limit)fun;
-      } else {
-        log_error(("unknown limit '%s' for resource %s\n",
-          (const char*)property, rtype->_name[0]));
-      }
-      xmlFree(property);
-    }
     xmlXPathFreeObject(result);
 
     /* reading eressea/resources/resource/item */
@@ -1312,7 +1397,7 @@ parse_races(xmlDocPtr doc)
     rc->maintenance = xml_ivalue(node, "maintenance", 0);
     rc->weight = xml_ivalue(node, "weight", 0);
 #ifdef RACE_CAPACITY
-    rc->capacity = xml_ivalue(node, "capacity", 0);
+    rc->capacity = xml_ivalue(node, "capacity", 540);
 #endif
     rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
     rc->hitpoints = xml_ivalue(node, "hp", 0);

@@ -155,11 +155,9 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     return;
   } else if (u == u2) {
     error = 10;
-#if RACE_ADJUSTMENTS
   } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
     /* Snotlings können nicht an Bauern übergeben werden. */
     error = 307;
-#endif
 #ifdef HEROES
   } else if (u2 && u2->number>0 && fval(u, UFL_HERO)!=fval(u2, UFL_HERO)) {
     error = 75;

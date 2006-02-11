@@ -76,13 +76,25 @@ extern const char* resourcename(const resource_type * rtype, int flags);
 extern const resource_type * findresourcetype(const char * name, const struct locale * lang);
 
 /* resource-limits for regions */
+#define RMF_SKILL         0x01 /* int, bonus on resource production skill */
+#define RMF_SAVEMATERIAL  0x02 /* float, multiplier on resource usage */
+#define RMF_SAVERESOURCE  0x03 /* int, bonus on resource production skill */
+typedef struct resource_mod {
+  variant value;
+  const struct building_type * btype;
+  const struct race * race;
+  unsigned int flags;
+} resource_mod;
+
 extern struct attrib_type at_resourcelimit;
 typedef int (*rlimit_limit)(const struct region * r, const struct resource_type * rtype);
-typedef void (*rlimit_use)(struct region * r, const struct resource_type * rtype, int n);
+typedef void (*rlimit_produce)(struct region * r, const struct resource_type * rtype, int n);
 typedef struct resource_limit {
 	rlimit_limit limit;
-	rlimit_use use;
+	rlimit_produce produce;
+  unsigned int guard; /* how to guard against theft */
 	int value;
+  resource_mod * modifiers;
 } resource_limit;
 
 
@@ -93,6 +105,7 @@ typedef struct resource_limit {
 #define ITF_NOTLOST          0x0020 /* special object (quests), cannot be lost through death etc. */
 #define ITF_BIG              0x0040 /* big item, e.g. does not fit in a bag of holding */
 #define ITF_ANIMAL           0x0080 /* an animal */
+#define ITF_VEHICLE          0x0100 /* a vehicle, drawn by two animals */
 
 /* error codes for item_type::use */
 #define ECUSTOM   -1;
@@ -240,27 +253,10 @@ extern resource_type * r_permaura;
 extern resource_type * r_unit;
 extern resource_type * r_hp;
 
-typedef struct t_item {
-	const char *name[4];
-	/* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
-	 * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
-	item_t typ;
-	skill_t skill;
-	int minskill;
-	int material[6];
-	int gewicht;
-	int preis;
-	unsigned int flags;
-	void (*benutze_funktion) (struct region *, struct unit *, int amount, struct order *);
-} t_item;
-
 enum {
 	I_IRON,						/* 0 */
-	I_WOOD,
 	I_STONE,
 	I_HORSE,
-	I_WAGON,
-	I_SPEAR,
 	/* alte Artefakte */
 	I_AMULET_OF_HEALING,
 	I_AMULET_OF_TRUE_SEEING,
@@ -268,10 +264,7 @@ enum {
 	I_RING_OF_POWER,
 	I_DRAGONHEAD,
 	I_CHASTITY_BELT, /* bleibt */
-	I_LAENSWORD,
 	I_LAEN,
-	I_LANCE,
-	I_MALLORN,
 	I_DRACHENBLUT,
 	I_FEENSTIEFEL,
 	I_BIRTHDAYAMULET,
@@ -293,11 +286,8 @@ enum {
 enum {
 	/* ITEMS: */
 	R_IRON,
-	R_WOOD,
 	R_STONE,
 	R_HORSE,
-	R_WAGON,
-	R_SPEAR,
   /**/
 	R_AMULET_OF_HEALING,
 	R_AMULET_OF_TRUE_SEEING,
@@ -305,10 +295,7 @@ enum {
 	R_RING_OF_POWER,
 	R_DRAGONHEAD,
 	R_CHASTITY_BELT,
-	R_EOGSWORD,
 	R_EOG,
-	R_LANCE,
-	R_MALLORN,
 	R_DRACHENBLUT,
 	R_FEENSTIEFEL,
 	R_BIRTHDAYAMULET,

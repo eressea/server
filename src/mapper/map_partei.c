@@ -137,31 +137,6 @@ change_level(unit * u, skill_t sk, int bylevel)
 	sk_set(sv, sv->level+bylevel);
 }
 
-static void
-give_latestart_bonus(region *r, unit *u, int b)
-{
-	int bsk = days2level(b*30);
-	change_level(u, SK_OBSERVATION, bsk);
-	change_money(u, 200*b);
-
-	{
-		unit *u2 = createunit(r, u->faction, 1, u->race);
-		change_level(u2, SK_TACTICS, bsk);
-		u2->irace = u->irace;
-/*		fset(u2, UFL_PARTEITARNUNG); */
-	}
-
-	{
-		unit *u2 = createunit(r, u->faction, 2*b, u->race);
-		change_level(u2, SK_SPEAR, 3);
-		change_level(u2, SK_TAXING, 3);
-		i_change(&u2->items, olditemtype[I_SPEAR], u2->number);
-		u2->irace = u->irace;
-/*		fset(u2, UFL_PARTEITARNUNG); */
-	}
-}
-
-
 newfaction *
 select_newfaction(const struct race * rc)
 {
@@ -317,8 +292,6 @@ NeuePartei(region * r)
 	modified = 1;
 	u = addplayer(r, addfaction(email, passwd, frace, lang, subscription));
 	++numnewbies;
-
-	if(late) give_latestart_bonus(r, u, late);
 
 	sprintf(buf, "newuser %s", email);
 	system(buf);

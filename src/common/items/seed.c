@@ -56,7 +56,7 @@ init_seed(void)
     a = a_add(&rt_seed->attribs, a_new(&at_resourcelimit));
     rdata = (resource_limit*)a->data.v;
     rdata->limit = limit_seeds;
-    rdata->use = produce_seeds;
+    rdata->produce = produce_seeds;
   }
 }
 
@@ -94,6 +94,6 @@ init_mallornseed(void)
     a = a_add(&rt_mallornseed->attribs, a_new(&at_resourcelimit));
     rdata = (resource_limit*)a->data.v;
     rdata->limit = limit_mallornseeds;
-    rdata->use = produce_mallornseeds;
+    rdata->produce = produce_mallornseeds;
   }
 }

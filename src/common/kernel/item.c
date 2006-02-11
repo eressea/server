@@ -641,147 +641,126 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 	return;
 }
 
+typedef struct t_item {
+  const char *name[4];
+  /* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
+  * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
+  item_t typ;
+  skill_t skill;
+  int minskill;
+  int gewicht;
+  int preis;
+  unsigned int flags;
+  void (*benutze_funktion) (struct region *, struct unit *, int amount, struct order *);
+} t_item;
+
 static t_item itemdata[MAXITEMS] = {
 	/* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
 	 * benutze_funktion; */
 	{			/* I_IRON */
 		{"Eisen", "Eisen", "Eisen", "Eisen"},
-		IS_RESOURCE, SK_MINING, 1, {0, 0, 0, 0, 0, 0}, 500, 0, FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_WOOD */
-		{"Holz", "Holz", "Holz", "Holz"},
-		IS_RESOURCE, SK_LUMBERJACK, 1, {0, 0, 0, 0, 0, 0}, 500, 0, FL_ITEM_NOTLOST, NULL
+		IS_RESOURCE, SK_MINING, 1, 500, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_STONE */
 		{"Stein", "Steine", "Stein", "Steine"},
-		IS_RESOURCE, SK_QUARRYING, 1, {0, 0, 0, 0, 0, 0}, 6000, 0, FL_ITEM_NOTLOST, NULL
+		IS_RESOURCE, SK_QUARRYING, 1, 6000, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_HORSE */
 		{"Pferd", "Pferde", "Pferd", "Pferde"},
-		IS_RESOURCE, SK_HORSE_TRAINING, 1, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_MOUNT | FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
-	},
-	{			/* I_WAGON */
-		{"Wagen", "Wagen", "Wagen", "Wagen"},
-		IS_PRODUCT, SK_CARTMAKER, 1, {0, 5, 0, 0, 0, 0}, 4000, 0, FL_ITEM_NOTINBAG, NULL
-	},
-	{			/* I_SPEAR */
-		{"Speer", "Speere", "Speer", "Speere"},
-		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
+		IS_RESOURCE, SK_HORSE_TRAINING, 1, 5000, 0, FL_ITEM_MOUNT | FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
 	},
 	{			/* I_AMULET_OF_HEALING */
 		{"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_AMULET_OF_TRUE_SEEING 22 */
 		{"Amulett des wahren Sehens", "Amulette des wahren Sehens", "Amulett",
 		"Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_RING_OF_INVISIBILITY 24 */
 		{"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_RING_OF_POWER 25 */
 		{"Ring der Macht", "Ringe der Macht", "", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_DRAGONHEAD 33 */
 		{"Drachenkopf", "Drachenköpfe", "Drachenkopf", "Drachenköpfe"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 500, 0, 0, NULL
 	},
 	{			/* I_CHASTITY_BELT 34 */
 		{"Amulett der Keuschheit", "Amulette der Keuschheit",
 			"Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_LAENSWORD 38 */
-		{"Laenschwert", "Laenschwerter", "Laenschwert", "Laenschwerter"},
-		IS_PRODUCT, SK_WEAPONSMITH, 8, {0, 0, 0, 0, 1, 0}, 100, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_LAEN 41 */
 		{"Laen", "Laen", "Laen", "Laen"},
-		IS_RESOURCE, SK_MINING, 7, {0, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
-	},
-	{			/* I_LANCE 44 */
-		{"Lanze", "Lanzen", "Lanze", "Lanzen"},
-		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 2, 0, 0, 0, 0}, 200, 0, 0, NULL
-	},
-	{			/* I_MALLORN 45 */
-		{"Mallorn", "Mallorn", "Mallorn", "Mallorn"},
-		IS_RESOURCE, SK_LUMBERJACK, 2, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
+		IS_RESOURCE, SK_MINING, 7, 200, 0, 0, NULL
 	},
 	{			/* I_DRACHENBLUT 59 */
 		{"Drachenblut", "Drachenblut", "Drachenblut", "Drachenblut"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
 	},
 	{			/* I_FEENSTIEFEL 60 */
 		{"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_BIRTHDAYAMULET 69 */
 		{"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, &use_birthdayamulet
+		IS_MAGIC, NOSKILL, 0, 100, 0, 0, &use_birthdayamulet
 	},
 	{			/* I_PEGASUS 60 */
 		{"Pegasus", "Pegasi", "Pegasus", "Pegasi" },
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
+		IS_MAGIC, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_UNICORN 61 */
 		{"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
+		IS_MAGIC, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_DOLPHIN 62 */
 		{"Delphin", "Delphine", "Delphin", "Delphine"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
+		IS_MAGIC, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_RING_OF_NIMBLEFINGER 64 */
 		{"Ring der flinken Finger", "Ringe der flinken Finger", "", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_TROLLBELT 65 */
 		{"Gürtel der Trollstärke", "Gürtel der Trollstärke", "", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
 	},
 	{			/* I_PRESSCARD 67 */
 		{"Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß",
 		 "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, FL_ITEM_CURSED, NULL
+		IS_MAGIC, NOSKILL, 0, 0, 0, FL_ITEM_CURSED, NULL
 	},
 	{			/* I_AURAKULUM 69 */
 		{"Aurafocus", "Aurafocuse", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
 	},
 	{			/* I_SEASERPENTHEAD 70 */
 		{"Seeschlangenkopf", "Seeschlangenköpfe",
 			"Seeschlangenkopf", "Seeschlangenköpfe"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
+		IS_MAGIC, NOSKILL, 0, 500, 0, 0, NULL
 	},
   {			/* I_SPHERE_OF_INVISIBILITY */
     {"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
-      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+      IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
   },
   { /* I_BAG_OF_HOLDING */
     {"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
-      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
+      IS_MAGIC, NOSKILL, 0, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
   },
   { /* I_SACK_OF_CONSERVATION */
     {"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""},
-      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+      IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
   },
 	{			/* I_TACTICCRYSTAL 71 */
-		{"Traumauge", "Traumaugen",
-			"", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, &use_tacticcrystal
+		{"Traumauge", "Traumaugen", "", ""},
+		IS_MAGIC, NOSKILL, 0, 100, 0, 0, &use_tacticcrystal
 	},
-};
-
-const item_t matresource[] = {
-	I_IRON,
-	I_WOOD,
-	I_STONE,
-	-1,
-	I_LAEN,
-	I_MALLORN
 };
 
 #include "movement.h"
@@ -794,27 +773,11 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 	return -118;
 }
 
-typedef int material_t;
-enum {	/* Vorsicht! Reihenfolge der ersten 3 muß wie I_IRON ... sein! */
-	M_EISEN,
-	M_HOLZ,
-	M_STEIN,
-	M_SILBER,
-	M_EOG,
-	M_MALLORN,
-	M_MAX_MAT,
-	NOMATERIAL = (material_t) - 1
-};
-
 static int
-limit_oldtypes(const region * r, const resource_type * rtype)
+limit_oldresource(const region * r, const resource_type * rtype)
 		/* TODO: split into seperate functions. really much nicer. */
 {
-	if (rtype==oldresourcetype[R_WOOD]) {
-		return rtrees(r,2) + rtrees(r,1);
-	} else if (rtype==oldresourcetype[R_MALLORN]) {
-		return rtrees(r,2) + rtrees(r,1);
-	} else if (rtype==oldresourcetype[R_HORSE]) {
+	if (rtype==oldresourcetype[R_HORSE]) {
 		return rhorses(r);
 	} else {
 		assert(!"das kann man nicht produzieren!");
@@ -824,35 +787,15 @@ limit_oldtypes(const region * r, const resource_type * rtype)
 
 
 static void
-use_oldresource(region * r, const resource_type * rtype, int norders)
+produce_oldresource(region * r, const resource_type * rtype, int norders)
 		/* TODO: split into seperate functions. really much nicer. */
 {
 	assert(norders>0);
-	if (rtype==oldresourcetype[R_WOOD] || rtype==oldresourcetype[R_MALLORN]) {
-		int avail_grownup = rtrees(r,2);
-		int avail_young   = rtrees(r,1);
-		int wcount;
-
-		assert(norders <= avail_grownup + avail_young);
-
-		if(norders <= avail_grownup) {
-			rsettrees(r, 2, avail_grownup-norders);
-			wcount = norders;
-		} else {
-			rsettrees(r, 2, 0);
-			rsettrees(r, 1, avail_young-(norders-avail_grownup));
-			wcount = norders * 3;
-		}
-		if(rtype==oldresourcetype[R_MALLORN]) {
-			woodcounts(r, wcount);
-		} else {
-			woodcounts(r, wcount*2);
-		}
-	} else if (rtype==oldresourcetype[R_HORSE]) {
+	if (rtype==oldresourcetype[R_HORSE]) {
 		int avail = rhorses(r);
 		assert(norders <= avail);
 		rsethorses(r, avail-norders);
-	} else if (rtype!=oldresourcetype[R_STONE]) {
+	} else {
 		assert(!"unknown resource");
 	}
 }
@@ -961,9 +904,6 @@ init_olditems(void)
       itype->capacity = HORSECAPACITY;
       itype->give = give_horses;
       break;
-    case I_WAGON:
-      itype->capacity = WAGONCAPACITY;
-      break;
     case I_BAG_OF_HOLDING:
       itype->capacity = BAGCAPACITY;
       break;
@@ -985,8 +925,11 @@ init_olditems(void)
       a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
       {
         resource_limit * rdata = (resource_limit*)a->data.v;
-        rdata->limit = limit_oldtypes;
-        rdata->use = use_oldresource;
+        if (i==I_HORSE) {
+          rdata->limit = limit_oldresource;
+          rdata->produce = produce_oldresource;
+        }
+        if (i==I_LAEN || i==I_IRON) rdata->guard |= GUARD_MINING;
       }
       break;
     }
@@ -998,35 +941,21 @@ init_olditems(void)
   }
 
   for (i=0; i!=MAXITEMS; ++i) {
-    construction * con = calloc(sizeof(construction), 1);
-    item_type * itype = olditemtype[i];
-    int m, n;
+    if (itemdata[i].skill!=NOSKILL) {
+      construction * con = calloc(sizeof(construction), 1);
+      item_type * itype = olditemtype[i];
 
-    con->minskill = itemdata[i].minskill;
-    if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
-      /* at least 4 levels on which you can mine laen */
-      con->minskill = SkillCap(SK_QUARRYING)-3;
-    }
-    con->skill = itemdata[i].skill;
-    con->maxsize = -1;
-    con->reqsize = 1;
-    con->improvement = NULL;
-    for (m=0, n=0;m!=M_MAX_MAT;++m)
-      if (itemdata[i].material[m]>0) ++n;
-    if (n>0) {
-      con->materials = calloc(sizeof(requirement), n+1);
-      for (m=0, n=0;m!=M_MAX_MAT;++m) {
-        if (itemdata[i].material[m]>0) {
-          assert(oldresourcetype[matresource[m]]);
-          con->materials[n].rtype = oldresourcetype[matresource[m]];
-          con->materials[n].number = itemdata[i].material[m];
-          con->materials[n].recycle = 0.0;
-          ++n;
-        }
+      con->minskill = itemdata[i].minskill;
+      if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
+        /* at least 4 levels on which you can mine laen */
+        con->minskill = SkillCap(SK_QUARRYING)-3;
       }
+      con->skill = itemdata[i].skill;
+      con->maxsize = -1;
+      con->reqsize = 1;
+      con->improvement = NULL;
+      itype->construction = con;
     }
-
-    itype->construction = con;
   }
 }
 
@@ -1303,18 +1232,11 @@ item_score(item_t i)
 {
   switch (i) {
     case I_IRON:
-    case I_WOOD:
     case I_STONE:
     case I_HORSE:
       return 10;
-    case I_MALLORN:
-      return 30;
     case I_LAEN:
       return 100;
-    case I_WAGON:
-      return 60;
-    case I_LAENSWORD:
-      return 400;
     case I_AMULET_OF_HEALING:
     case I_AMULET_OF_TRUE_SEEING:
     case I_RING_OF_INVISIBILITY:
@@ -1541,9 +1463,6 @@ register_resources(void)
   register_function((pf_generic)res_changehp, "changehp");
   register_function((pf_generic)res_changeaura, "changeaura");
 
-  register_function((pf_generic)limit_oldtypes, "limit_oldtypes");
-
-  register_function((pf_generic)use_oldresource, "useoldresource");
   register_function((pf_generic)use_olditem, "useolditem");
   register_function((pf_generic)use_potion, "usepotion");
   register_function((pf_generic)use_tacticcrystal, "usetacticcrystal");

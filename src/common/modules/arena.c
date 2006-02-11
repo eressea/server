@@ -235,13 +235,14 @@ make_temple(region * r)
 {
 	const building_type * btype = bt_find("temple");
 	building * b;
-	if (btype==NULL)
-		btype = bt_make("temple", BTF_UNIQUE | BTF_NOBUILD | BTF_INDESTRUCTIBLE, -1, 2, 50);
-	else {
-		b = r->buildings;
-		while (b!=NULL && b->type!=btype) b = b->next;
-		if (b!=NULL) return; /* gibt schon einen */
-	}
+  if (btype==NULL) {
+    log_error(("could not find buildingtype 'temple'\n"));
+    return;
+  }
+
+  b = r->buildings;
+	while (b!=NULL && b->type!=btype) b = b->next;
+	if (b!=NULL) return; /* gibt schon einen */
 
 	b = new_building(btype, r, NULL);
 	b->size = btype->maxsize;
