@@ -146,9 +146,9 @@ region_setresource(region& r, const char * type, int value)
     if (rtype==rt_find("peasant")) return rsetpeasants(&r, value);
   } else {
     if (strcmp(type, "seed")==0) {
-      return rsettrees(&r, 0, value);
+      rsettrees(&r, 0, value);
     } else if (strcmp(type, "sapling")==0) {
-      return rsettrees(&r, 1, value);
+      rsettrees(&r, 1, value);
     } else if (strcmp(type, "tree")==0) {
       rsettrees(&r, 2, value);
     } else if (strcmp(type, "grave")==0) {
