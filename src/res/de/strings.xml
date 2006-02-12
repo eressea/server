@@ -13,39 +13,34 @@
       <text locale="en">No Information available for this race.</text>
     </string>
     <string name="unicorn">
-      <text locale="de">
-        Dieses mystische Wesen lebt bevorzugt in den tiefsten Wäldern und
+      <text locale="de">Dieses mystische Wesen lebt bevorzugt in den tiefsten Wäldern und
         vermag sich hervorragend vor den Augen anderer zu verbergen. Nur
         selten schließt sich ein Einhorn einem Magier an, jedoch wenn das
         geschieht ist es ein mächtiger Verbündeter, der auch über eigene Magie
         verfügt.</text>
     </string>
     <string name="eagle">
-      <text locale="de">
-        Der Adler ist ein ausgezeichneter Späher, fliegend überquert er sogar
+      <text locale="de">Der Adler ist ein ausgezeichneter Späher, fliegend überquert er sogar
         kurze Meerengen, doch ist er hoch oben am Himmel auch sehr exponiert,
         was ihn beim Rasten zu einem leichten Ziel macht (Schaden: 2d3,
         Angriff 6, Verteidigung 2, 15 Trefferpunkte).</text>
     </string>
     <string name="lynx">
-      <text locale="de">
-        Der Luchs ist bekannt für seine Geschicklichkeit im Verbergen und
+      <text locale="de">Der Luchs ist bekannt für seine Geschicklichkeit im Verbergen und
         Beobachten. Mit ein wenig Geduld kann er zu einem hervorragenden
         Späher ausgebildet werden. Im Kampf verteidigt er sich mit seinen
         scharfen Krallen und weiß seine Gewandheit zu nutzen (Schaden: 2d3,
         Angriff 4, Verteidigung 5, 20 Trefferpunkte).</text>
     </string>
     <string name="direwolf">
-      <text locale="de">
-        Diese großen Wölfe sind nicht alle so wild und böse wie in den
+      <text locale="de">Diese großen Wölfe sind nicht alle so wild und böse wie in den
         Legenden berichtet, und einige von ihnen schließen sich auch guten
         Magiern bereitwillig an und sind ihnen dann treue Gefährten. (3
         Angriffe, Schaden: 2d6, 1d4, 1d4, Angriff 6, Verteidigung 3, 25
         Trefferpunkte).</text>
     </string>
     <string name="tunnelworm">
-      <text locale="de">
-        Diese aus den Tiefen Eresseas stammende gigantische Geschöpf ist dem
+      <text locale="de">Diese aus den Tiefen Eresseas stammende gigantische Geschöpf ist dem
         Leben im Untergrund hervorragend angepasst. Blind, taub und nicht
         besonders intelligent, aber mit seinen gewaltigen Kräften kann es
         ganze Berge versetzen oder Wälder roden. (Schaden: 3d20, Angriff 6,
@@ -54,23 +49,20 @@
   </namespace>
   <namespace name="iteminfo">
     <string name="aoh">
-      <text locale="de">
-        Diese Amulett ist ein hervorragender Fokus für alle Heilzauber. Ein
+      <text locale="de">Diese Amulett ist ein hervorragender Fokus für alle Heilzauber. Ein
         mit diesem Fokus gewirkter Heilzauber wird mit größerer
         Warscheinlichkeit Erfolgreich sein und doppelt so viele Leute heilen
         können.</text>
     </string>
     <string name="elvenhorse">
-      <text locale="de">
-        Ein Elfenpferd wird sich nur den wenigsten jemals anschließen. Hat es
+      <text locale="de">Ein Elfenpferd wird sich nur den wenigsten jemals anschließen. Hat es
         jedoch seine Scheu überwunden ist es ein sehr wertvoller Gefährte. Ein
         Elfenpferd ist schneller als ein Pferd. Zudem hilft es seinem Reiter
         im Kampf und unterstützt ihn mit seiner Magie. Es sind schwarze
         Elfenpferde bekannt, die sich sogar Orks angeschlossen haben.</text>
     </string>
     <string name="runesword">
-      <text locale="de">
-        Die rötlich glühende Klinge dieser furchterregenden magischen Waffe
+      <text locale="de">Die rötlich glühende Klinge dieser furchterregenden magischen Waffe
         ist mit dunklen Runen bedeckt. Nur die erfahrendsten Schwertkämpfer
         vermögen ihre Kraft zu zähmen, doch in ihrer Hand vermag dem
         Runenschwert nichts zu widerstehen - selbst magische Rüstungen
@@ -78,36 +70,30 @@
         es mit unterschütterlicher Zuversicht.</text>
     </string>
     <string name="dreameye">
-      <text locale="en">
-        This enchanted dragon-eye has to be eaten by the leader of your forces
+      <text locale="en">This enchanted dragon-eye has to be eaten by the leader of your forces
         on the eve before battle. During the night he gains insight into the
         dreams of the enemy leaders and may potentially glean a decisive
         advantage.</text>
-      <text locale="de">
-        Dieses verzauberte Drachenauge muß vor dem Abend einer Schlacht vom
+      <text locale="de">Dieses verzauberte Drachenauge muß vor dem Abend einer Schlacht vom
         Heerführer verzehrt werden. Während der Nacht wird er dann Einblick in
         die Träume der feindlichen Heerführer erhalten und so möglicherweise
         einen entscheidenden Vorteil im kommenden Gefecht erlangen.</text>
     </string>
     <string name="trollbelt">
-      <text locale="en">
-        This artifact grants its wearer the strength of a cavetroll. He will
+      <text locale="en">This artifact grants its wearer the strength of a cavetroll. He will
         be able to carry fifty times as much as normal and also in combat his
         enhanced strength and tough troll skin will serve him well.</text>
-      <text locale="de">
-        Dieses magische Artefakt verleiht seinem Träger die Stärke eines
+      <text locale="de">Dieses magische Artefakt verleiht seinem Träger die Stärke eines
         ausgewachsenen Höhlentrolls. Seine Tragkraft erhöht sich auf das
         50fache und auch im Kampf werden sich die erhöhte Kraft und die
         trollisch zähe Haut positiv auswirken.</text>
     </string>
     <string name="antimagic">
-      <text locale="en">
-        It may look like just another quartz, but your magician will tell you
+      <text locale="en">It may look like just another quartz, but your magician will tell you
         tha great power emenates from these crystals. Using it at the begining
         of a week will release a strong negative energy that attacks all
         spells cast in the region during that week.</text>
-      <text locale="de">
-        Für den ungeübten Betrachter mag der Antimagiekristall wie ein
+      <text locale="de">Für den ungeübten Betrachter mag der Antimagiekristall wie ein
         gewöhnlicher Quarzkristall ausschauen, doch ein Magier spürt, das ihm
         ganz besondere Kräfte innewohnen. Durch spezielle Rituale antimagisch
         aufgeladen wird der Kristall, wenn er zu feinem Staub zermahlen und
@@ -116,29 +102,23 @@
         Region gezaubert werden fehlschlagen lassen.</text>
     </string>
     <string name="rop">
-      <text locale="en">
-        A ring of power increases a magician's power. The level of all the
+      <text locale="en">A ring of power increases a magician's power. The level of all the
         spells
         he casts will be increased by one without increasing their costs.</text>
-      <text locale="de">
-        Ein Ring der Macht verstärkt die Kraft des Magiers. Jeder Zauber wird,
+      <text locale="de">Ein Ring der Macht verstärkt die Kraft des Magiers. Jeder Zauber wird,
         ohne das sich die Kosten erhöhen, so gezaubert als hätte der Magier
         eine Stufe mehr.</text>
     </string>
     <string name="magicherbbag">
-      <text locale="en">
-        Herbs stored in this bag will be much better preserved.</text>
-      <text locale="de">
-        Kräuter, die in diesem Beutelchen aufbewahrt werden, sind erheblich
+      <text locale="en">Herbs stored in this bag will be much better preserved.</text>
+      <text locale="de">Kräuter, die in diesem Beutelchen aufbewahrt werden, sind erheblich
         besser konserviert.</text>
     </string>
     <string name="magicbag">
-      <text locale="en">
-        This bag encloses a dimensional fold, which can store up to 200
+      <text locale="en">This bag encloses a dimensional fold, which can store up to 200
         stones of weight without any extra burden on the bearer. Large items
         such as horses or carts cannot be placed inside.</text>
-      <text locale="de">
-        Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis
+      <text locale="de">Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis
         zu 200 Gewichtseinheiten transportiert werden können, ohne dass
         sie auf das Traggewicht angerechnet werden.  Pferde und andere
         Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können
@@ -147,23 +127,19 @@
         selber wiegt 1 GE.</text>
     </string>
     <string name="fairyboot">
-      <text locale="en">
-        These leather boots are embroidere with unicorn hair and allow
+      <text locale="en">These leather boots are embroidere with unicorn hair and allow
         their wearer to walk at twice his normal speed.</text>
-      <text locale="de">
-        Diese aus Leder gefertigten und mit Einhornfell verzierten Stiefel
+      <text locale="de">Diese aus Leder gefertigten und mit Einhornfell verzierten Stiefel
         ermöglichen es ihrem Träger, sich mit der doppelten Geschwindigkeit
         fortzubewegen, wenn er zu Fuß reist.</text>
     </string>
     <string name="firesword">
-      <text locale="en">
-        The flaming sword gives its bearer an attack of 3d6+10 plus
+      <text locale="en">The flaming sword gives its bearer an attack of 3d6+10 plus
         an additional fireball causing 2d6 damage to 1-10 victims.
         Using a flaming sword requires a minimum skill of 7. It grants an
         additional +1 to your skill and your resistance to magic will be
         increased.</text>
-      <text locale="de">
-        Ein Flammenschwert gibt dem Träger, der kein Magier sein muß,
+      <text locale="de">Ein Flammenschwert gibt dem Träger, der kein Magier sein muß,
         zusätzlich zu seinem normalen Angriff (3d6+10) einen kleinen
         Feuerballangriff, der bei 1-10 Opfern 2d6 magischen Schaden
         verursacht. Um ein Flammenschwert führen zu können, muss man
@@ -172,25 +148,21 @@
         erhöht die Magieresistenz seines Trägers wie ein Laenschwert.</text>
     </string>
     <string name="roqf">
-      <text locale="en">
-        The magic in this ring makes the fingers ten times more nimble. a
+      <text locale="en">The magic in this ring makes the fingers ten times more nimble. a
         craftsman can produce ten times his normal quota, and other abilities
         might also be improved.</text>
-      <text locale="de">
-        Der Zauber in diesem Ring bewirkt eine um das zehnfache verbesserte
+      <text locale="de">Der Zauber in diesem Ring bewirkt eine um das zehnfache verbesserte
         Geschicklichkeit und Gewandheit der Finger. Handwerker können somit
         das zehnfache produzieren, und bei einigen anderen Tätigkeiten könnte
         dies ebenfalls von Nutzen sein.</text>
     </string>
     <string name="roi">
-      <text locale="en">
-      This magical artifact has been used since ancient times by Elves to
+      <text locale="en">This magical artifact has been used since ancient times by Elves to
       conceal themselves from their enemies. Other races have also learned
       the value of these rings after encountering Elves - after all the ring
       makes its wearer invisible to normal eyes, and only magical methods
       enable the wearer to be discovered.</text>
-      <text locale="de">
-      Dieses magische Artefakt wurde seit Urzeiten von den Elfen benutzt,
+      <text locale="de">Dieses magische Artefakt wurde seit Urzeiten von den Elfen benutzt,
       auf der Jagd oder um sich vor Feinden zu verbergen. Doch auch andere
       Rassen haben nach der Begegnung mit den Elfenvölkern den Wert des Rings
       schnell schätzen gelernt - schließlich macht er den Träger für jedes
@@ -198,22 +170,19 @@
       Verborgene noch zu entdecken.</text>
     </string>
     <string name="aots">
-      <text locale="de">
-      Das Amulett erlaubt es dem Träger, alle Einheiten, die durch einen
+      <text locale="de">Das Amulett erlaubt es dem Träger, alle Einheiten, die durch einen
       Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten allerdings,
       die sich mit ihrem Tarnungs-Talent verstecken, bleiben weiterhin
       unentdeckt. Die Herstellung des Amulettes kostet 3000 Silber.</text>
     </string>
     <string name="toadslime">
-      <text locale="de">
-      Dieser Tiegel enthält die seltenste alchemistische Substanz
+      <text locale="de">Dieser Tiegel enthält die seltenste alchemistische Substanz
       Eresseas, den Krötenschleim. Angeblich soll der Krötenschleim eine
       aussergewöhnlich hohe magische Absorbtionskraft besitzen und deswegen
       in obskuren magischen Ritualen Verwendung finden.</text>
     </string>
     <string name="toad">
-      <text locale="de">
-      Die Kröte ist eine der seltensten Rassen Eresseas. Man munkelt,
+      <text locale="de">Die Kröte ist eine der seltensten Rassen Eresseas. Man munkelt,
       sie würde nur auf magische Weise entstehen. In einer uralten
       Abhandlung über Magie aus der Bibliothek der Akademie von Xontormia
       wird die Theorie aufgestellt, das die Kröte die ins morphische Feld
@@ -227,17 +196,14 @@
       verstecken kann.</text>
     </string>
     <string name="wand_of_tears">
-      <text locale="de">
-      Dieses magische Szepter, ein Geschenk Igjarjuks, sorgt für große
+      <text locale="de">Dieses magische Szepter, ein Geschenk Igjarjuks, sorgt für große
       Verwirrung und Gedächtnisverlust. Syntax: BENUTZE "Szepter der
       Tränen"</text>
     </string>
     <string name="speedsail">
-      <text locale="de">
-      Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
+      <text locale="de">Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
       sich dessen Reichweite kurzfristig um 50 Regionen.</text>
-      <text locale="en">
-      A unit setting this sail on a ship temporarily increases the
+      <text locale="en">A unit setting this sail on a ship temporarily increases the
       ship's range by 50 regions.</text>
     </string>
     <string name="mistletoe">
@@ -4718,8 +4684,7 @@
       units against their will.</text>
     </string>
     <string name="analyze_magic">
-      <text locale="de">
-      Mit diesem Spruch kann der Magier versuchen, die
+      <text locale="de">Mit diesem Spruch kann der Magier versuchen, die
       Verzauberungen
       eines einzelnen angegebenen Objekts zu erkennen. Von
       allen Sprüchen,
@@ -4728,8 +4693,7 @@
       Eindruck ihres Wirkens erhalten können. Bei stärkeren
       Sprüchen
       benötigt er ein wenig Glück für eine gelungene Analyse.</text>
-      <text locale="en">
-      With this spell the magician can try to identify the
+      <text locale="en">With this spell the magician can try to identify the
       enchantments of
       a single object. He will get an impression of the
       operation of all
@@ -4738,21 +4702,18 @@
       spells he will need some luck for a successful analysis.</text>
     </string>
     <string name="concealing_aura">
-      <text locale="de">
-      Dieser Zauber wird die gesamte Ausrüstung der
+      <text locale="de">Dieser Zauber wird die gesamte Ausrüstung der
       Zieleinheit für
       einige Zeit vor den Blicken anderer verschleiern. Der
       Zauber
       schützt nicht vor Dieben und Spionen.</text>
-      <text locale="en">
-      This spell will hide the whole equipment of a target
+      <text locale="en">This spell will hide the whole equipment of a target
       unit from the
       looks of others. It will not protect against thieves or
       spies.</text>
     </string>
     <string name="earn_silver#tybied">
-      <text locale="de">
-      Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
+      <text locale="de">Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
       gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen
       alles, was man sonst nicht bekommen kann. Ob nun die kryptische
       Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen
@@ -4760,8 +4721,7 @@
       Dem Magier hilft es auf jeden Fall... beim Füllen seines
       Geldbeutels.  50 Silber pro Stufe lassen sich so in einer Woche
       verdienen.</text>
-      <text locale="en">
-      If the local alchemist could not help you, you should visit a
+      <text locale="en">If the local alchemist could not help you, you should visit a
       scholar of Tybied. His potions and tinctures may help when nothing
       else does. If the cryptic formula under the wooden shoes of the
       unfaithful husband really helped? - well, the peasant, who isn't
@@ -4770,23 +4730,19 @@
       way.</text>
     </string>
     <string name="tybiedfumbleshield">
-      <text locale="de">
-         Dieser Zauber legt ein antimagisches Feld um die Magier der Feinde
+      <text locale="de">Dieser Zauber legt ein antimagisches Feld um die Magier der Feinde
          und behindert ihre Zauber erheblich. Nur wenige werden die Kraft
          besitzen, das Feld zu durchdringen und ihren Truppen in der Schlacht
          zu helfen.</text>
-      <text locale="en">
-        This spell creates an antimagic field around the mages of the enemies
+      <text locale="en">This spell creates an antimagic field around the mages of the enemies
         and considerably hinders their spells. Only few will have the power to
         break through the field and be able to help their troops in battle.</text>
     </string>
     <string name="keeploot">
-      <text locale="de">
-        Dieser Zauber verhindert, dass ein Teil der sonst im Kampf zerstörten
+      <text locale="de">Dieser Zauber verhindert, dass ein Teil der sonst im Kampf zerstörten
         Gegenstände beschädigt wird. Die Verluste reduzieren sich um 5% pro
         Stufe des Zaubers bis zu einem Minimum von 25%.</text>
-      <text locale="en">
-        This spell prevents damage to a portion of the items that would
+      <text locale="en">This spell prevents damage to a portion of the items that would
         otherwise be lost in battle. The loss of items is reduced by 5% for
         every level of the spell, up to a minimum of 25%.</text>
     </string>
@@ -6078,29 +6034,25 @@
         longer be unknown.</text>
     </string>
     <string name="dream_of_confusion">
-      <text locale="de">
-      Der Magier erzeugt in allen Wald- und Ozeanregionen im Umkreis von
+      <text locale="de">Der Magier erzeugt in allen Wald- und Ozeanregionen im Umkreis von
       einigen Regionen einen magischen Schleier, der einige Wochen bestehen
       bleibt. Personen innerhalb des Schleiers verlieren
       leicht die Orientierung und haben große Schwierigkeiten, sich in
       eine bestimmte Richtung zu bewegen.</text>
-      <text locale="en">
-      The magician creates a magic fog in every forrest and ocean region in a
+      <text locale="en">The magician creates a magic fog in every forrest and ocean region in a
       perimeter of some regions. The fog lasts some weeks and persons
       passing this fog have a chance to get lost,  moving to a certain
       direction is difficult.</text>
     </string>
     <string name="summon_alp">
-      <text locale="de">
-      Der Magier beschwört ein kleines Monster, einen Alp.  Dieses bewegt sich
+      <text locale="de">Der Magier beschwört ein kleines Monster, einen Alp.  Dieses bewegt sich
       langsam auf sein Opfer zu (das sich an einem beliebigen Ort an der Welt
       befinden kann, der Magier oder seine Partei braucht es nicht zu sehen).
       Sobald das Opfer erreicht ist, wird es gnadenlos gequält, und nur durch
       einen starken Gegenzauber oder den Tod des beschwörenden Magiers kann
       das Opfer wieder Frieden finden. Bei der Beschwörung des Alps verliert
       der Magier einen kleinen Teil seiner Aura für immer.</text>
-      <text locale="en">
-      The magician spawns a little monster, a nightmare. The nightmare slowly
+      <text locale="en">The magician spawns a little monster, a nightmare. The nightmare slowly
       approaches its victim (which may be at an arbitrary place in eressea, it
       is not needed for the magician or his party  to see the victim). As soon
       as
@@ -6112,8 +6064,7 @@
       his aura forever.</text>
     </string>
     <string name="create_dreameye">
-      <text locale="de">
-      Ein mit diesem Zauber belegtes Drachenauge, welches zum Abendmahle
+      <text locale="de">Ein mit diesem Zauber belegtes Drachenauge, welches zum Abendmahle
       verzehrt wird, erlaubt es dem Benutzer, in die Träume einer anderen
       Person einzudringen und diese zu lesen. Lange Zeit wurde eine solche
       Fähigkeit für nutzlos erachtet, bis die ehemalige waldelfische
@@ -6122,8 +6073,7 @@
       Kämpfen oft unruhig und verraten im Traum ihre Pläne. Dies kann dem
       Anwender einen großen Vorteil im kommenden Kampf geben. Aber Vorsicht:
       Die Interpretation von Träumen ist eine schwierige Angelegenheit.</text>
-      <text locale="en">
-      An enchanted eye of a dragon gives the person who eats it for supper the
+      <text locale="en">An enchanted eye of a dragon gives the person who eats it for supper the
       power to see
       other people's dreams. For a long time this abillity was counted as
       beeing
