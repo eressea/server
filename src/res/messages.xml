@@ -6600,4 +6600,14 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The needle points $direction($dir)."</text>
   </message>
 
+  <message name="disrupt_astral" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) wird aus der astralen Ebene nach $region($region) geschleudert."</text>
+    <text locale="en">"$unit($unit) is sent from the astral plain to $region($region)."</text>
+    <text locale="fr">"$unit($unit) is sent from the astral plain to $region($region)."</text>
+  </message>
+
 </messages>

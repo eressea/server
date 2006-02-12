@@ -519,6 +519,7 @@
 
   <string name="flyingcarpet">
     <text locale="de">fliegender Teppich</text>
+    <text locale="en">flying carpet</text>
   </string>
   <string name="balloon">
     <text locale="de">Ballon</text>

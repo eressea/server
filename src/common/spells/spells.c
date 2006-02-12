@@ -6349,11 +6349,13 @@ sp_disruptastral(castorder *co)
           while (c--!=0) trl2 = trl2->next;
           tr = trl2->data;
 
-          if(!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
+          if (!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
+            message * msg = msg_message("disrupt_astral", "unit region", u, tr);
+            add_message(&u->faction->msgs, msg);
+            add_message(&tr->msgs, msg);
+            msg_release(msg);
+
             move_unit(u, tr, NULL);
-            sprintf(buf, "%s wird aus der astralen Ebene nach %s geschleudert.",
-              unitname(u), regionname(tr, u->faction));
-            addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
           }
         }
       }
