@@ -13,16 +13,12 @@
   <namespace name="shipinfo">
     <!-- ship info is not implemented! -->
     <string name="no_info">
-      <text locale="de">
-        Keine Informationen über diesen Schiffstyp verfügbar.
-      </text>
-      <text locale="en">
-        No Information available for this type of ship.
-      </text>
+      <text locale="de">Keine Informationen über diesen Schiffstyp verfügbar.</text>
+      <text locale="en">No Information available for this type of ship.</text>
     </string>
     <string name="balloon">
-      <text locale="de">
-        Der Sumpfgasballon besteht aus einem großen Weidenkorb, welcher Platz
+      <text locale="de">Der Sumpfgasballon besteht aus einem großen 
+        Weidenkorb, welcher Platz
         für maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer
         großen, mit Sumpfgas gefüllten Wyrmblase. Bei guten Winden kann sich
         der Ballon zwei Regionen pro Woche fortbewegen. Das Führen eines
@@ -30,8 +26,7 @@
         Segeltalent von 6 besitzen. Diese neue Entwicklung auf Eressea wird
         ausschließlich für den Xontormia-Expreß hergestellt und die Baupläne
         sind streng geheim. So ist es auch bisher noch niemandem gelungen, ein
-        Exemplar nachzubauen.
-      </text>
+        Exemplar nachzubauen.</text>
     </string>
   </namespace>
   <namespace name="iteminfo">
@@ -40,51 +35,39 @@
       <text locale="en">No Information available.</text>
     </string>
     <string name="griphonwing">
-      <text locale="de">
-        Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die
+      <text locale="de">Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die
         'Ebene der Herausforderung' seit Urzeiten als verschollen, ja man
         zweifelte seine Existenz an. Die Sage überliefert, das derjenige, der
         sie auf der Spitze des Turmes seiner Gesinnung benutzt, als einziger
-        die 'Ebene der Herausforderungen' verlassen kann.
-      </text>
+        die 'Ebene der Herausforderungen' verlassen kann.</text>
     </string>
     <string name="ao_daemon">
-      <text locale="de">
-        Glückwunsch, mein Kind. Du bist im Besitz des mächtigsten
+      <text locale="de">Glückwunsch, mein Kind. Du bist im Besitz des mächtigsten
         Artefaktes Eresseas. Ein Fluch, sagt man, liege auf ihm, denn
-        niemand hat es bisher lange sein Eigen genannt...
-      </text>
+        niemand hat es bisher lange sein Eigen genannt...</text>
     </string>
     <string name="cookie">
-      <text locale="de">
-        Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e
-      </text>
+      <text locale="de">Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e</text>
     </string>
     <string name="eyeofdragon">
-      <text locale="de">
-        So wisse denn, dass das Auge des Drachen den Weg zur Herausforderung
+      <text locale="de">So wisse denn, dass das Auge des Drachen den Weg zur Herausforderung
         aufzeigt. Doch die Überlieferung sagt, das nur der Unschuldige und
         Ungewappnete es benutzen kann. Sie sagt auch, daß er einen Beutel mit
         einem Betrag von bis zu zweitausend Silber mit sich führen soll,
         jedoch nicht mehr als einem Fünftel der Stärke seines Volkes
         entsprechend - dem Torwächter zum Geschenke als Beweis seiner
-        asketischen Gesinnung. Die 5 scheidet ganz aus.
-      </text>
+        asketischen Gesinnung. Die 5 scheidet ganz aus.</text>
     </string>
     <string name="almond">
-      <text locale="de">
-        (Prunus dulcis) [...] Die Nüsse existieren in zwei Varianten, süß und
+      <text locale="de">(Prunus dulcis) [...] Die Nüsse existieren in zwei Varianten, süß und
         bitter. Süße Mandeln sind der bekannte eßbare Typ, der in Form von
         Nüssen gegessen, beim Kochen verwandt oder zu Mandelöl und Mandelmehl
-        verarbeitet wird.
-      </text>
+        verarbeitet wird.</text>
     </string>
     <string name="apple">
-      <text locale="en">
-        A tasty fruit.
-      </text>
-      <text locale="de">
-        Frucht aus der Gattung Malus (ca. 25 Arten), gehört zur Familie der
+      <text locale="en">A tasty fruit.</text>
+      <text locale="de">Frucht aus der Gattung Malus (ca. 25 Arten), gehört
+        zur Familie der
         Rosengewächse. Die am häufigsten kultivierte Baumfrucht. Der Apfel
         gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten
         und
@@ -93,12 +76,11 @@
         Größe des Apfels bei der Ernte variieren abhängig von kulturellen und
         umweltbedingten Einflüssen in Größe, Form, Farbe und Geschmack, sind
         jedoch nichtsdestotrotz üblicherweise rund, zwischen 50 und 100mm im
-        Durchmesser und weisen röt- oder gelbliche Farbtöne auf.
-      </text>
+        Durchmesser und weisen röt- oder gelbliche Farbtöne auf.</text>
     </string>
     <string name="nut">
-      <text locale="de">
-        Nuß, im umgangssprachlichen Sinne alle trockenen, hartschaligen
+      <text locale="de">Nuß, im umgangssprachlichen Sinne alle trockenen,
+        hartschaligen
         Früchte oder Samen, die eine Schale besitzen, die sich leicht
         vom inneren, eßbaren Kern entfernen läßt. In der botanischen
         Terminologie beschränkt sich die Bezeichnung Nuß auf eine
@@ -113,92 +95,67 @@
         äußere Schale entfernt wurde.  Andere Beispiele für unechte
         Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie
         Roßkastanien und Paranüsse, bei denen es sich um von Kapseln
-        umhüllte Samen handelt.
-      </text>
+        umhüllte Samen handelt.</text>
     </string>
     <string name="jadee_ring">
-      <text locale="de">
-        Zwerge schufen diesen wunderschönen Ring aus Weissgold und Platin. Die
+      <text locale="de">Zwerge schufen diesen wunderschönen Ring aus Weissgold und Platin. Die
         Oberfläche ist so glatt, dass man nur bei genauem Hinsehen entdeckt,
         dass hier eigentlich zwei Metalle ineinander verarbeitet worden sind.
         In der Innenseite des Rings ist eine Gravur zu lesen: "Wildente, 3.
-        Woche Eiswind Jahr 8".
-      </text>
+        Woche Eiswind Jahr 8".</text>
     </string>
     <string name="jadee_dress">
-      <text locale="de">
-        Dieses Brautkleid ist mit Abstand das schönste, was je jemand
+      <text locale="de">Dieses Brautkleid ist mit Abstand das schönste, was je jemand
         irgendwie irgendwo gesehen hat. Auch wenn nur Wildente und Jadee das
         finden müssten, wird jeder Bewohner Eresseas dies neidlos bestätigen.
         Das sehr stilvolle Kleid lässt die zarten Schultern seiner Trägerin
         frei und liegt am Oberkörper eng an. Dies betont atemberaubend die
         zarten Kurven der Braut. Der Rock fällt leicht ausgestellt den ganzen
         langen Weg an den Beinen herunter Richtung Boden, wo er sich in einer
-        sehr stilvollen Schleppe ergiesst.
-      </text>
+        sehr stilvollen Schleppe ergiesst.</text>
     </string>
     <string name="wente_ring">
-      <text locale="de">
-        Dieser Ring ist ein wahres Meisterwerk. Obwohl er sehr gross ist
+      <text locale="de">Dieser Ring ist ein wahres Meisterwerk. Obwohl er sehr gross ist
         (weil auch sein Träger sehr gross ist), wirkt er filigran. Weissgold
         und Platin verschmelzen in diesem Ring zu einer Einheit, die die
         Schönheit der einzelnen Elemente nur noch unterstreich. In der
         Innenseite des Rings ist eine Gravur zu lesen: 'Jadee, 3. Woche
-        Eiswind Jahr 8'.
-      </text>
+        Eiswind Jahr 8'.</text>
     </string>
     <string name="wente_dress">
-      <text locale="de">
-        Hach! Sieht der Mann beeindruckend aus in diesem Frack! Und so
+      <text locale="de">Hach! Sieht der Mann beeindruckend aus in diesem Frack! Und so
         ordentlich! Und so ernst! Und so beeindruckend! Es fällt ein
         wenig schwer, sich auf den Bräutigam zu konzentrieren, weil das
         Brautkleid noch daneben strahlt, aber der Anzug des Bräutigams ist
         auf jeden Fall so, wie er sein soll und sieht toll aus und sehr
-        geschmackvoll.
-      </text>
+        geschmackvoll.</text>
     </string>
     <string name="snowman">
-      <text locale="en">
-        Orange nose, black hat, frosty character. A snowman.
+      <text locale="en">Orange nose, black hat, frosty character. A snowman.
         He'll make a fine guard if you use him in a cold place. (USE 1
-        snowman)
-      </text>
-      <text locale="de">
-        Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann. Er gibt
+        snowman)</text>
+      <text locale="de">Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann. Er gibt
         einen prima Wachmann ab, wenn er in einem Gletscher belebt wird
-        (BENUTZE 1 Schneemann).
-      </text>
+        (BENUTZE 1 Schneemann).</text>
     </string>
     <string name="snowball">
-      <text locale="en">
-        These items stay frozen all year round. There seem to be bits of
-        ice in them - in the right hands, these might put an eye out!
-      </text>
-      <text locale="de">
-        Ein Schneeball. Es scheinen kleine Eissplitter darin zu sein. In
-        den richtigen Händen können sie sicher weh tun.
-      </text>
+      <text locale="en">These items stay frozen all year round. There seem to be bits of
+        ice in them - in the right hands, these might put an eye out!</text>
+      <text locale="de">Ein Schneeball. Es scheinen kleine Eissplitter darin zu sein. In
+        den richtigen Händen können sie sicher weh tun.</text>
     </string>
     <string name="seashell">
-      <text locale="en">
-         This badge pronounces its wearer an official visitor to the
-         region of Muschelplateau.
-      </text>
-      <text locale="de">
-        Dieses Abzeichen identifiziert die Partei seines Trägers offiziell
-        als einen Besucher der Botschafterregion 'Muschelplateau'.
-      </text>
+      <text locale="en">This badge pronounces its wearer an official visitor to the
+         region of Muschelplateau.</text>
+      <text locale="de">Dieses Abzeichen identifiziert die Partei seines Trägers offiziell
+        als einen Besucher der Botschafterregion 'Muschelplateau'.</text>
     </string>
     <string name="stardust">
-      <text locale="de">
-         Dieser magische Staub ist aus einem im Winter vom Himmel gefallenen
+      <text locale="de">Dieser magische Staub ist aus einem im Winter vom Himmel gefallenen
          Stern gewonnen worden, und ihm werden aphrodisiakische Eigenschaften
-         nachgesagt.
-      </text>
-      <text locale="en">
-        This vial of dust, made from the remains of a star that fell from
-        the sky one cold winter night, is said to have aphrodisiacal powers.
-      </text>
+         nachgesagt.</text>
+      <text locale="en">This vial of dust, made from the remains of a star that fell from
+        the sky one cold winter night, is said to have aphrodisiacal powers.</text>
     </string>
   </namespace>
   <string name="seashell">
