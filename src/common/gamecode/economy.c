@@ -1323,7 +1323,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 
     resource_mod * mod = rdata->modifiers;
     for (;mod->flags!=0;++mod) {
-      if (mod->flags & RMF_SKILL) {
+      if (mod->flags & RMF_SAVEMATERIAL) {
         if (mod->btype==NULL || mod->btype==btype) {
           if (mod->race==NULL || mod->race==u->race) {
             al->save *= mod->value.f;

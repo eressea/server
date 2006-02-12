@@ -968,13 +968,13 @@ parse_resources(xmlDocPtr doc)
 
           property = xmlGetProp(node, BAD_CAST "type");
           assert(property!=NULL);
-          if (strcmp((const char *)property, "skill")) {
+          if (strcmp((const char *)property, "skill")==0) {
             rdata->modifiers[k].value.i = xml_ivalue(node, "value", 0);
             rdata->modifiers[k].flags |= RMF_SKILL;
-          } else if (strcmp((const char *)property, "material")) {
+          } else if (strcmp((const char *)property, "material")==0) {
             rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
             rdata->modifiers[k].flags |= RMF_SAVEMATERIAL;
-          } else if (strcmp((const char *)property, "resource")) {
+          } else if (strcmp((const char *)property, "resource")==0) {
             rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
             rdata->modifiers[k].flags |= RMF_SAVERESOURCE;
           } else {
