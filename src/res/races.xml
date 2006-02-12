@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <races>
-  <race name="kraken" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="2.000000" hp="300" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" coastal="yes" swim="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="kraken" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="2.000000" hp="300" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" coastal="yes" swim="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="oldfamiliars"/>
     <skill name="perception" modifier="1"/>
@@ -63,7 +63,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="2d50"/>
   </race>
-  <race name="dolphin" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="2.000000" hp="24" damage="1d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="5" coastal="yes" swim="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="dolphin" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="2.000000" hp="24" damage="1d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="5" coastal="yes" swim="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="oldfamiliars"/>
     <skill name="alchemy" modifier="-99"/>
@@ -91,7 +91,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="1d6"/>
   </race>
-  <race name="tiger" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="30" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="tiger" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="30" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="alchemy" modifier="-99"/>
@@ -121,7 +121,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
   </race>
-  <race name="hellcat" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="40" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" giveitem="yes" getitem="yes" resistpierce="yes">
+  <race name="hellcat" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="40" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" giveitem="yes" getitem="yes" resistpierce="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="perception" modifier="1"/>
@@ -151,7 +151,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
   </race>
-  <race name="owl" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="9" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="4" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="owl" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="9" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="4" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="espionage" modifier="1"/>
@@ -182,7 +182,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="1d4"/>
   </race>
-  <race name="fairy" magres="0.800000" maxaura="1.000000" regaura="1.500000" recruitcost="50" weight="200" capacity="100" speed="1.000000" hp="6" damage="1d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="14" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
+  <race name="fairy" magres="0.800000" maxaura="1.000000" regaura="1.500000" recruitcost="50" weight="200" capacity="540" speed="1.000000" hp="6" damage="1d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="14" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="stealth" modifier="5"/>
@@ -217,7 +217,7 @@
     <attack type="4" damage="1d3"/>
     <attack type="4" damage="1d3"/>
   </race>
-  <race name="dreamcat" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="10" damage="1d5" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="6" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" invinciblenonmagic="yes">
+  <race name="dreamcat" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="10" damage="1d5" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="6" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" invinciblenonmagic="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="magic" modifier="1"/>
@@ -248,7 +248,7 @@
     <attack type="4" damage="1d5"/>
     <attack type="4" damage="1d5"/>
   </race>
-  <race name="imp" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="10" ac="1" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="4" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
+  <race name="imp" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="10" ac="1" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="4" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="alchemy" modifier="-99"/>
@@ -281,7 +281,7 @@
     <attack type="1" damage="1d4"/>
     <attack type="6" spell="fiery_dragonbreath"/>
   </race>
-  <race name="ghost" magres="0.800000" maxaura="0.500000" regaura="0.100000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes" invinciblenonmagic="yes">
+  <race name="ghost" magres="0.800000" maxaura="0.500000" regaura="0.100000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes" invinciblenonmagic="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="alchemy" modifier="-99"/>
@@ -312,7 +312,7 @@
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="wolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="wolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="oldfamiliars"/>
     <skill name="alchemy" modifier="-99"/>
@@ -435,7 +435,7 @@
     <attack type="4" damage="2d4"/>
     <attack type="6" spell="fiery_dragonbreath"/>
   </race>
-  <race name="rat" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="100" capacity="50" speed="1.000000" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="rat" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="100" capacity="540" speed="1.000000" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="espionage" modifier="5"/>
@@ -467,7 +467,7 @@
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
   </race>
-  <race name="eagle" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.500000" hp="15" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="2" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="eagle" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.500000" hp="15" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="2" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="alchemy" modifier="-99"/>
@@ -530,7 +530,7 @@
     <attack type="4" damage="3d20"/>
     <attack type="8" damage="1d10"/>
   </race>
-  <race name="lynx" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" giveitem="yes" getitem="yes">
+  <race name="lynx" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="99999"/>
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="alchemy" modifier="-99"/>
@@ -561,7 +561,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="2d3"/>
   </race>
-  <race name="direwolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="20" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveperson="yes">
+  <race name="direwolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="20" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveperson="yes">
     <function name="initfamiliar" value="lua_initfamiliar"/>
     <ai splitsize="5000"/>
     <attack type="4" damage="2d4"/>
@@ -570,13 +570,13 @@
     <ai splitsize="10000"/>
     <attack type="1" damage="1d6"/>
   </race>
-  <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="50" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
+  <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="540" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
   </race>
-  <race name="toad" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="100" capacity="50" speed="1.000000" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" cannotmove="yes" playerrace="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
+  <race name="toad" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="100" capacity="540" speed="1.000000" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" cannotmove="yes" playerrace="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
     <ai splitsize="1" learn="yes"/>
     <skill name="alchemy" modifier="-10"/>
     <skill name="crossbow" modifier="-10"/>
@@ -616,14 +616,14 @@
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>
-  <race name="shadowmaster" nolearn="yes" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="500" capacity="200" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes" nogive="yes">
+  <race name="shadowmaster" nolearn="yes" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes" nogive="yes">
     <ai splitsize="50" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="nameshadow"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
   </race>
-  <race name="shadowdemon" nolearn="yes" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="500" capacity="200" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes" nogive="yes">
+  <race name="shadowdemon" nolearn="yes" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="500" capacity="540" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes" nogive="yes">
     <ai splitsize="1000" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="nameshadow"/>
     <attack type="4" damage="2d3"/>
@@ -964,7 +964,7 @@
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="0d0"/>
   </race>
-  <race name="template" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="0" capacity="0" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
+  <race name="template" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="0" capacity="1000" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <attack type="1" damage="1d4"/>
   </race>
@@ -1293,7 +1293,7 @@
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
   </race>
-  <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="500" capacity="200" speed="1.000000" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
+  <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="500" capacity="540" speed="1.000000" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
     <attack type="4" damage="1d6"/>
     <attack type="3" damage="1d1"/>
