@@ -1,9 +1,9 @@
 function use_snowman(u, amount)
   if u.region.terrain == "glacier" then
     local man = add_unit(u.faction, u.region)
-    u.race = "snowman"
-    u.number = amount
-    u:add_item("snowman", -amount)
+    man.race = "snowman"
+    man.number = amount
+    man:add_item("snowman", -amount)
     return 0
   end
   return -4
