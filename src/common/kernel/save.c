@@ -2145,7 +2145,7 @@ a_readchars(attrib * a, FILE * f)
   }
   for (i=0;i!=4;++i) {
     int c;
-    fscanf("%d", &c);
+    fscanf(f, "%d", &c);
     a->data.ca[i] = (char)c;
   }
   return AT_READ_OK;
@@ -2154,9 +2154,10 @@ a_readchars(attrib * a, FILE * f)
 void
 a_writechars(const attrib * a, FILE * f)
 {
+  int i;
   for (i=0;i!=4;++i) {
     int c = a->data.ca[i];
-    fprintf("%d ", &c);
+    fprintf(f, "%d ", c);
   }
 }
 
