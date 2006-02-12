@@ -1309,9 +1309,9 @@ readregion(FILE * F, short x, short y)
 				if (strcmp(buf, "end")==0) break;
 				res = calloc(sizeof(rawmaterial), 1);
 				res->type = rmt_find(buf);
-                                if (res->type==NULL) {
-                                  log_error(("invalid resourcetype %s in data.\n", buf));
-                                }
+        if (res->type==NULL) {
+          log_error(("invalid resourcetype %s in data.\n", buf));
+        }
 				assert(res->type!=NULL);
 				res->level = ri(F);
 				res->amount = ri(F);

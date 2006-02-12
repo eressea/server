@@ -307,7 +307,7 @@ overload(const char * name, const object& f)
 {
   if (strcmp(name, "wage")==0) {
     global.functions.wage = &lua_wage;
-    interface.wage = new object(f);;
+    interface.wage = new object(f);
   } else if (strcmp(name, "maintenance")==0) {
     global.functions.maintenance = &lua_maintenance;
     interface.maintenance = new object(f);;

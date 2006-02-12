@@ -326,34 +326,6 @@ fix_otherfaction(void)
   if (count) log_warning(("%u units had otherfaction=own faction.\n", count));
 }
 
-extern attrib * make_atgmcreate(const struct item_type * itype);
-extern attrib * make_atpermissions(void);
-extern struct attrib_type at_permissions;
-extern struct attrib_type at_gmcreate;
-
-
-static void
-update_gms(void)
-{
-	faction * f;
-	for (f=factions;f;f=f->next) {
-		attrib * permissions = a_find(f->attribs, &at_permissions);
-		if (permissions) {
-			const char * keys[] = { "gmgate", "gmmsgr", "gmkill", "gmmsgu", NULL };
-			int k;
-			item_t i;
-			for (k=0;keys[k];++k) {
-				add_key((attrib**)&permissions->data.v, atoi36(keys[k]));
-			}
-			for (i=I_LAEN;i!=I_DRACHENBLUT;++i) {
-				attrib * a = a_find((attrib*)permissions->data.v, &at_gmcreate);
-				while (a && a->data.v!=(void*)olditemtype[i]) a=a->nexttype;
-				if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(olditemtype[i]));
-			}
-		}
-	}
-}
-
 static int
 fix_demands(void)
 {
@@ -1003,7 +975,6 @@ korrektur(void)
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
-	update_gms();
 	verify_owners(false);
 	/* fix_herbtypes(); */
 	/* In Vin 3+ können Parteien komplett übergeben werden. */

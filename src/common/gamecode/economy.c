@@ -2917,7 +2917,7 @@ expandwork(region * r)
 }
 
 static void
-work(unit * u, order * ord)
+work_cmd(unit * u, order * ord)
 {
   region * r = u->region;
 	request *o;
@@ -3120,7 +3120,7 @@ produce(void)
           break;
 
         case K_WORK:
-          if (playerrace(u->race)) work(u, u->thisorder);
+          if (playerrace(u->race)) work_cmd(u, u->thisorder);
           else if (playerrace(u->faction->race)) {
             ADDMSG(&u->faction->msgs,
               msg_feedback(u, u->thisorder, "race_cantwork", "race", u->race));
