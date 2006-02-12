@@ -2155,6 +2155,7 @@ void
 a_writechars(const attrib * a, FILE * f)
 {
   int i;
+  
   for (i=0;i!=4;++i) {
     int c = a->data.ca[i];
     fprintf(f, "%d ", c);
