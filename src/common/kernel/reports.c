@@ -968,7 +968,7 @@ get_addresses(report_context * ctx)
   ctx->addresses = flist;
 }
 
-#define MAXSEEHASH 10007
+#define MAXSEEHASH 0x3000
 seen_region * reuse;
 
 seen_region **
@@ -1005,13 +1005,13 @@ free_seen(void)
 seen_region *
 find_seen(struct seen_region * seehash[], const region * r)
 {
-  unsigned int index = reg_hashkey(r) % MAXSEEHASH;
+  unsigned int index = reg_hashkey(r) & (MAXSEEHASH-1);
   seen_region * find = seehash[index];
-	while (find) {
-		if (find->r==r) return find;
-		find=find->nextHash;
-	}
-	return NULL;
+  while (find) {
+    if (find->r==r) return find;
+    find=find->nextHash;
+  }
+  return NULL;
 }
 
 static void
@@ -1037,21 +1037,21 @@ get_seen_interval(report_context * ctx)
 boolean
 add_seen(struct seen_region * seehash[], struct region * r, unsigned char mode, boolean dis)
 {
-	seen_region * find = find_seen(seehash, r);
-	if (find==NULL) {
-		unsigned int index = reg_hashkey(r) % MAXSEEHASH;
-		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
-		find = reuse;
-		reuse = reuse->nextHash;
-		find->nextHash = seehash[index];
-		seehash[index] = find;
-		find->r = r;
-	} else if (find->mode >= mode) {
-		return false;
-	}
-	find->mode = mode;
-	find->disbelieves |= dis;
-	return true;
+  seen_region * find = find_seen(seehash, r);
+  if (find==NULL) {
+    unsigned int index = reg_hashkey(r) & (MAXSEEHASH-1);
+    if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
+    find = reuse;
+    reuse = reuse->nextHash;
+    find->nextHash = seehash[index];
+    seehash[index] = find;
+    find->r = r;
+  } else if (find->mode >= mode) {
+    return false;
+  }
+  find->mode = mode;
+  find->disbelieves |= dis;
+  return true;
 }
 
 typedef struct report_type {
