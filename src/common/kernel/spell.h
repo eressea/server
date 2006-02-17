@@ -28,7 +28,6 @@ extern "C" {
 
   /* Prototypen */
 
-  void do_shock(struct unit *u, const char *reason);
   int use_item_power(struct region * r, struct unit * u);
   int use_item_regeneration(struct region * r, struct unit * u);
   void showspells(struct region *r, struct unit *u);

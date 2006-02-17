@@ -108,45 +108,6 @@ report_failure(unit * mage, struct order * ord) {
 }
 
 /* ------------------------------------------------------------- */
-/* do_shock - Schockt die Einheit, z.B. bei Verlust eines */
-/* Vertrauten.               */
-/* ------------------------------------------------------------- */
-
-void
-do_shock(unit *u, const char *reason)
-{
-  int i;
-  if(u->number == 0) return;
-
-  /* HP - Verlust */
-  u->hp = (unit_max_hp(u) * u->number)/10;
-  u->hp = max(1, u->hp);
-  /* Aura - Verlust */
-  if(is_mage(u)) {
-    set_spellpoints(u, max_spellpoints(u->region,u)/10);
-  }
-
-  /* Evt. Talenttageverlust */
-  for (i=0;i!=u->skill_size;++i) if (rand()%5==0) {
-    skill * sv = u->skills+i;
-    int weeks = (sv->level * sv->level - sv->level) / 2;
-    int change = (weeks+9) / 10;
-    reduce_skill(u, sv, change);
-  }
-
-  /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
-   * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine
-   * saubere Implementation nachdenken. */
-
-  if(!strcmp(reason, "trigger")) {
-    remove_familiar(u);
-  }
-
-  ADDMSG(&u->faction->msgs, msg_message("shock",
-    "mage reason", u, strdup(reason)));
-}
-
-/* ------------------------------------------------------------- */
 /* Spruchanalyse - Ausgabe von curse->info und curse->name       */
 /* ------------------------------------------------------------- */
 
