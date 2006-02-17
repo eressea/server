@@ -53,6 +53,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifdef KARMA_MODULE
+
 #define STANDARD_LUCK 0
 
 static void
@@ -182,4 +184,4 @@ check_luck(void)
 			lucky_event(f);
 	}
 }
-
+#endif /* KARMA_MODULE */

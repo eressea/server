@@ -1124,6 +1124,7 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
 	}
 	skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
+#ifdef KARMA_MODULE
 	if (fspecial(u->faction, FS_TELEPATHY)) {
 		switch(sk) {
 		case SK_ALCHEMY:
@@ -1137,6 +1138,7 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
 			skill -= 2;
 		}
 	}
+#endif
 
 #ifdef HUNGER_REDUCES_SKILL
 	if (fval(u, UFL_HUNGER)) {

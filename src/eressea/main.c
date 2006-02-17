@@ -310,7 +310,6 @@ game_done(void)
 	faction *f, *f2;
 	ship *s, *s2;
 
-	free(used_faction_ids);
 	for (r = regions; r; r = r2) {
 		for (u = r->units; u; u = u2) {
 			u2 = u->next;

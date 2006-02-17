@@ -1528,7 +1528,14 @@ readfaction(FILE * F)
   convertunique(f);
 #endif
   f->magiegebiet = (magic_t)ri(F);
+
+#ifdef KARMA_MODULE
   f->karma = ri(F);
+#else
+  /* ignore karma */
+  ri(F);
+#endif /* KARMA_MODULE */
+
   f->flags = ri(F);
   freset(f, FFL_OVERRIDE);
 
@@ -1620,7 +1627,12 @@ writefaction(FILE * F, const faction * f)
 	ws(F, f->race->_name[0]);
 	wnl(F);
 	wi(F, f->magiegebiet);
+#ifdef KARMA_MODULE
 	wi(F, f->karma);
+#else
+  wi(F, 0);
+#endif /* KARMA_MODULE */
+
 	wi(F, f->flags);
 	a_write(F, f->attribs);
 	wnl(F);
@@ -1663,7 +1675,7 @@ readgame(const char * filename, int backup)
   faction *f, **fp;
   region *r;
   building *b, **bp;
-  ship *sh, **shp;
+  ship **shp;
   unit *u;
   FILE * F;
   int rmax = maxregions;
@@ -1752,18 +1764,18 @@ readgame(const char * filename, int backup)
 
   while (--n >= 0) {
     faction * f = readfaction(F);
-    addlist2(fp, f);
+
+    *fp = f;
+    fp = &f->next;
     fhash(f);
   }
   *fp = 0;
 
   /* Benutzte Faction-Ids */
 
-  no_used_faction_ids = ri(F);
-  /* used_faction_ids = gc_add(malloc(no_used_faction_ids*sizeof(int))); */
-  used_faction_ids = malloc(no_used_faction_ids*sizeof(int));
-  for(i=0; i < no_used_faction_ids; i++) {
-    used_faction_ids[i] = ri(F);
+  i = ri(F);
+  while (i--) {
+    ri(F); /* used faction ids. ignore. */
   }
 
   /* Regionen */
@@ -1795,7 +1807,7 @@ readgame(const char * filename, int backup)
       if (dirtyload) break;
       skip = true;
     }
-    if ((n%1024)==0) {	/* das spart extrem Zeit */
+    if ((n & 0x3FF) == 0) {	/* das spart extrem Zeit */
       printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
       printf("* %d,%d    \r", x, y);
     }
@@ -1818,6 +1830,8 @@ readgame(const char * filename, int backup)
 
       b = (building *) calloc(1, sizeof(building));
       b->no = rid(F);
+      *bp = b;
+      bp = &b->next;
       bhash(b);
       rds(F, &b->name);
       if (lomem) rds(F, 0);
@@ -1837,7 +1851,6 @@ readgame(const char * filename, int backup)
       }
       b->region = r;
       a_read(F, &b->attribs);
-      addlist2(bp, b);
     }
     /* Schiffe */
 
@@ -1845,10 +1858,11 @@ readgame(const char * filename, int backup)
     shp = &r->ships;
 
     while (--p >= 0) {
-      sh = (ship *) calloc(1, sizeof(ship));
-
+      ship * sh = (ship *) calloc(1, sizeof(ship));
       sh->region = r;
       sh->no = rid(F);
+      *shp = sh;
+      shp = &sh->next;
       shash(sh);
       rds(F, &sh->name);
       if (lomem) rds(F, 0);
@@ -1868,8 +1882,6 @@ readgame(const char * filename, int backup)
 
       sh->coast = (direction_t)ri(F);
       a_read(F, &sh->attribs);
-
-      addlist2(shp, sh);
     }
 
     *shp = 0;
@@ -1882,9 +1894,12 @@ readgame(const char * filename, int backup)
     while (--p >= 0) {
       unit * u = readunit(F);
       sc_mage * mage;
+
       assert(u->region==NULL);
       u->region = r;
-      addlist2(up,u);
+      *up = u;
+      up = &u->next;
+
       update_interval(u->faction, u->region);
       mage = get_mage(u);
       if (mage && mage->spellcount<0) {
@@ -1943,7 +1958,7 @@ int
 writegame(const char *filename, char quiet)
 {
   char *base;
-  int i,n;
+  int n;
   faction *f;
   region *r;
   building *b;
@@ -2035,14 +2050,7 @@ writegame(const char *filename, char quiet)
     writefaction(F, f);
   }
 
-  wi(F, no_used_faction_ids);
-  wnl(F);
-
-  for(i=0; i<no_used_faction_ids; i++) {
-    wi(F, used_faction_ids[i]);
-    wnl(F);
-  }
-
+  wi(F, 0); /* used faction ids. old stuff */
   wnl(F);
 
   /* Write regions */

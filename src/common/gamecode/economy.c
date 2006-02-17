@@ -226,7 +226,9 @@ add_recruits(unit * u, int number, int wanted)
   assert(number<=wanted);
   if (number > 0) {
     unit * unew;
+#ifdef KARMA_MODULE
     int i = fspecial(u->faction, FS_MILITIA);
+#endif /* KARMA_MODULE */
 
     if (u->number==0) {
       set_number(u, number);
@@ -244,6 +246,7 @@ add_recruits(unit * u, int number, int wanted)
       change_level(unew, SK_RIDING, 1);
     }
 
+#ifdef KARMA_MODULE
     if (i > 0) {
       if (unew->race->bonus[SK_SPEAR] >= 0)
         change_level(unew, SK_SPEAR, i);
@@ -258,6 +261,7 @@ add_recruits(unit * u, int number, int wanted)
       if (unew->race->bonus[SK_AUSDAUER] >= 0)
         change_level(unew, SK_AUSDAUER, i);
     }
+#endif /* KARMA_MODULE */
     if (unew!=u) {
       transfermen(unew, u, unew->number);
       destroy_unit(unew);

@@ -356,8 +356,6 @@ game_done(void)
   * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
   * wird (temporäre Hilsstrukturen) */
 
-  free(used_faction_ids);
-
   while (regions) {
     region *r = regions;
     regions = r->next;

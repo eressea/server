@@ -68,6 +68,7 @@ attrib_type at_jihad = {
 	"jihad", NULL, NULL, NULL, a_writeshorts, a_readshorts
 };
 
+#ifdef KARMA_MODULE
 struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 	{
 		"Regeneration",
@@ -352,13 +353,11 @@ buy_special(unit *u, struct order * ord, fspecial_t special)
 int
 fspecial(const faction *f, fspecial_t special)
 {
-#ifdef KARMA_MODULE
   attrib *a;
 
-  for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+  for (a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
     if(a->data.sa[0] == special) return a->data.sa[1];
   }
-#endif
   return 0;
 }
 
@@ -604,3 +603,4 @@ karma(void)
   parse(K_SETJIHAD, jihad_cmd, false);
   parse(K_SACRIFICE, sacrifice_cmd, true);
 }
+#endif

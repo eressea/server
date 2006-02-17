@@ -203,7 +203,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   const char *pzTmp;
   building * b;
   boolean isbattle = (boolean)(mode == see_battle);
-  int telepath_see = fspecial(f, FS_TELEPATHY);
+  int telepath_see = 0;
   attrib *a_fshidden = NULL;
   item * itm;
   item * show;
@@ -222,8 +222,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
   }
 
-  if (fspecial(u->faction, FS_HIDDEN))
+#ifdef KARMA_MODULE
+  if (fspecial(u->faction, FS_HIDDEN)) {
     a_fshidden = a_find(u->attribs, &at_fshidden);
+  }
+  telepath_see = fspecial(f, FS_TELEPATHY);
+#endif /* KARMA_MODULE */
 
   rsize = strlcpy(bufp, unitname(u), size);
   if (rsize>size) rsize = size-1;

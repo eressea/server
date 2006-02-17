@@ -676,8 +676,11 @@ drown(region *r)
 		unit ** up = up=&r->units;
 		while (*up) {
 			unit *u = *up;
-			int amphibian_level = fspecial(u->faction, FS_AMPHIBIAN);
-
+#ifdef KARMA_MODULE
+      int amphibian_level = fspecial(u->faction, FS_AMPHIBIAN);
+#else
+      int amphibian_level = 0;
+#endif
 			if (u->ship || u->race == new_race[RC_SPELL]) {
 				up=&u->next;
 				continue;
@@ -1180,7 +1183,9 @@ icebergs(void)
 void
 randomevents(void)
 {
+#ifdef KARMA_MODULE
 	faction *f;
+#endif /* KARMA_MODULE */
 	region *r;
 	building *b, *b2;
 	unit *u;
@@ -1274,10 +1279,11 @@ randomevents(void)
     }
   }
 
+#ifdef KARMA_MODULE
   /* lycanthropen werden werwölfe */
   for (f = factions; f; f=f->next) {
     int level = fspecial(f, FS_LYCANTROPE);
-    if(level > 0) {
+    if (level > 0) {
       for(u = f->units; u; u=u->nextF) {
         if(rand()%100 < 2*level) {
           ADDMSG(&u->faction->msgs, msg_message("becomewere",
@@ -1287,6 +1293,7 @@ randomevents(void)
       }
     }
   }
+#endif
 
 	/* Chaos */
 	for (r = regions; r; r = r->next) {
@@ -1324,8 +1331,9 @@ randomevents(void)
 	}
 #endif
 
-
 	dissolve_units();
 	check_split();
+#ifdef KARMA_MODULE
 	check_luck();
+#endif /* KARMA_MODULE */
 }

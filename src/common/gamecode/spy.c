@@ -118,6 +118,7 @@ spy_cmd(unit * u, struct order * ord)
 int
 setwere_cmd(unit *u, struct order * ord)
 {
+#ifdef KARMA_MODULE
   int level = fspecial(u->faction, FS_LYCANTROPE);
   const char *s;
 
@@ -148,7 +149,7 @@ setwere_cmd(unit *u, struct order * ord)
     }
 
   }
-
+#endif /* KARMA_MODULE */
   return 0;
 }
 
@@ -158,7 +159,6 @@ setstealth_cmd(unit * u, struct order * ord)
   const char *s;
   char level;
   const race * trace;
-  attrib *a;
 
   init_tokens(ord);
   skip_token();
@@ -264,23 +264,26 @@ setstealth_cmd(unit * u, struct order * ord)
     /* TARNE ALLES (was nicht so alles geht?) */
     u_seteffstealth(u, -1);
     break;
+#ifdef KARMA_MODULE
   case P_NUMBER:
     /* TARNE ANZAHL [NICHT] */
-    if(!fspecial(u->faction, FS_HIDDEN)) {
+    if (!fspecial(u->faction, FS_HIDDEN)) {
       cmistake(u, ord, 277, MSG_EVENT);
       return 0;
     }
     s = getstrtoken();
     if (findparam(s, u->faction->locale) == P_NOT) {
-      a = a_find(u->attribs, &at_fshidden);
-      if(a) a->data.ca[0] = 0;
-      if(a->data.i == 0) a_remove(&u->attribs, a);
+      attrib * a = a_find(u->attribs, &at_fshidden);
+      if (a==NULL) a->data.ca[0] = 0;
+      if (a->data.i == 0) a_remove(&u->attribs, a);
     } else {
-      a = a_find(u->attribs, &at_fshidden);
-      if(!a) a = a_add(&u->attribs, a_new(&at_fshidden));
+      attrib * a = a_find(u->attribs, &at_fshidden);
+      if (a!=NULL) a = a_add(&u->attribs, a_new(&at_fshidden));
       a->data.ca[0] = 1;
     }
     break;
+#endif /* KARMA_MODULE */
+#ifdef KARMA_MODULE
   case P_ITEMS:
     /* TARNE GEGENSTÄNDE [NICHT] */
     if(!fspecial(u->faction, FS_HIDDEN)) {
@@ -288,15 +291,16 @@ setstealth_cmd(unit * u, struct order * ord)
       return 0;
     }
     if (findparam(s, u->faction->locale) == P_NOT) {
-      a = a_find(u->attribs, &at_fshidden);
-      if(a) a->data.ca[1] = 0;
-      if(a->data.i == 0) a_remove(&u->attribs, a);
+      attrib * a = a_find(u->attribs, &at_fshidden);
+      if (a!=NULL) a->data.ca[1] = 0;
+      if (a->data.i == 0) a_remove(&u->attribs, a);
     } else {
-      a = a_find(u->attribs, &at_fshidden);
-      if(!a) a = a_add(&u->attribs, a_new(&at_fshidden));
+      attrib * a = a_find(u->attribs, &at_fshidden);
+      if (a==NULL) a = a_add(&u->attribs, a_new(&at_fshidden));
       a->data.ca[1] = 1;
     }
     break;
+#endif /* KARMA_MODULE */
   case P_NOT:
     u_seteffstealth(u, -1);
     break;

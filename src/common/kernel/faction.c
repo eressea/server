@@ -87,7 +87,7 @@ unused_faction_id(void)
 {
   int id = rand()%MAX_FACTION_ID;
 
-  while(!faction_id_is_unused(id)) {
+  while (!faction_id_is_unused(id)) {
     id++; if(id == MAX_FACTION_ID) id = 0;
   }
 
@@ -128,7 +128,6 @@ addfaction(const char *email, const char * password,
   f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS) | Pow(O_ADRESSEN) | Pow(O_STATISTICS);
 
   f->no = unused_faction_id();
-  register_faction_id(f->no);
   addlist(&factions, f);
   fhash(f);
 

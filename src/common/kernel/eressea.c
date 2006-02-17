@@ -530,7 +530,9 @@ max_skill(faction * f, skill_t sk)
 			m = MAXMAGICIANS;
 		}
 		if (f->race == new_race[RC_ELF]) m += 1;
+#ifdef KARMA_MODULE
 		m += fspecial(f, FS_MAGOCRACY) * 2;
+#endif /* KARMA_MODULE */
 		break;
 	case SK_ALCHEMY:
 		m = MAXALCHEMISTS;
@@ -1166,38 +1168,42 @@ static attrib_type at_lighthouse = {
 void
 update_lighthouse(building * lh)
 {
-	region * r = lh->region;
-	short d = (short)log10(lh->size) + 1;
-	short x, y;
   static boolean init_lighthouse = false;
 	static const struct building_type * bt_lighthouse = 0;
 
   if (!init_lighthouse) {
     bt_lighthouse = bt_find("lighthouse");
+    if (bt_lighthouse==NULL) return;
     init_lighthouse = true;
   }
 
-	if (bt_lighthouse==NULL || lh->type!=bt_lighthouse) return;
+  if (lh->type==bt_lighthouse) {
+    region * r = lh->region;
+    short d = (short)log10(lh->size) + 1;
+    short x;
 
-	for (x=-d;x<=d;++x) {
-		for (y=-d;y<=d;++y) {
-			attrib * a;
-			region * r2 = findregion(x+r->x, y+r->y);
-      if (r2==NULL) continue;
-			if (!fval(r2->terrain, SEA_REGION)) continue;
-			if (distance(r, r2) > d) continue;
-			a = a_find(r2->attribs, &at_lighthouse);
-			while (a) {
-				building * b = (building*)a->data.v;
-				if (b==lh) break;
-				a=a->nexttype;
-			}
-			if (!a) {
-				a = a_add(&r2->attribs, a_new(&at_lighthouse));
-				a->data.v = (void*)lh;
-			}
-		}
-	}
+    for (x=-d;x<=d;++x) {
+      short y;
+      for (y=-d;y<=d;++y) {
+        attrib * a;
+        region * r2 = findregion(x+r->x, y+r->y);
+        if (r2==NULL) continue;
+        if (!fval(r2->terrain, SEA_REGION)) continue;
+        if (distance(r, r2) > d) continue;
+        a = a_find(r2->attribs, &at_lighthouse);
+        while (a) {
+          building * b = (building*)a->data.v;
+          if (b==lh) break;
+          a=a->nexttype;
+        }
+        if (!a) {
+          a = a_add(&r2->attribs, a_new(&at_lighthouse));
+          a->data.v = (void*)lh;
+        }
+      }
+    }
+  }
+
 }
 
 int
@@ -2549,38 +2555,17 @@ remove_empty_units(void)
 	}
 }
 
-int *used_faction_ids = NULL;
-int no_used_faction_ids = 0;
-
-static int
-_cmp_int(const void *i1, const void *i2)
-{
-	if(i2==NULL)
-		return(*(int*)i1);
-	return (*(int*)i1 - *(int *)i2);
-}
-
-void
-register_faction_id(int id)
-{
-	no_used_faction_ids++;
-	used_faction_ids = realloc(used_faction_ids, no_used_faction_ids*sizeof(int));
-	used_faction_ids[no_used_faction_ids-1] = id;
-	if(no_used_faction_ids > 1)
-		qsort(used_faction_ids, (size_t)no_used_faction_ids, sizeof(int), _cmp_int);
-}
-
 boolean
 faction_id_is_unused(int id)
 {
-  return findfaction(id)==NULL;
+  return findfaction(id)==NULL && id!=MONSTER_FACTION;
 }
 
 int
 weight(const unit * u)
 {
 	int w, n = 0, in_bag = 0;
-	int faerie_level;
+	int faerie_level = 0;
 
 	item * itm;
 	for (itm=u->items;itm;itm=itm->next) {
@@ -2590,7 +2575,10 @@ weight(const unit * u)
 			in_bag += w;
 	}
 
-	faerie_level = fspecial(u->faction, FS_FAERIE);
+#ifdef KARMA_MODULE
+  faerie_level = fspecial(u->faction, FS_FAERIE);
+#endif /* KARMA_MODULE */
+
 	if (faerie_level) {
 		n += (u->number * u->race->weight)/(1+faerie_level);
 	} else {
@@ -2604,18 +2592,6 @@ weight(const unit * u)
 
 	return n;
 }
-
-void
-init_used_faction_ids(void)
-{
-	faction *f;
-
-	no_used_faction_ids = 0;
-	for(f = factions; f; f = f->next) {
-		register_faction_id(f->no);
-	}
-}
-
 
 void
 make_undead_unit(unit * u)
@@ -2683,14 +2659,15 @@ lifestyle(const unit * u)
 	if(u->region->planep && fval(u->region->planep, PFL_NOFEED))
 		return 0;
 
+#ifdef KARMA_MODULE
 	if(fspecial(u->faction, FS_REGENERATION))
 		need += 1;
 	if(fspecial(u->faction, FS_ADMINISTRATOR))
 		need += 1;
 	if(fspecial(u->faction, FS_WYRM) && u->race == new_race[RC_WYRM])
 		need *= 500;
-
-	return need;
+#endif /* KARMA_MODULE */
+  return need;
 }
 
 boolean
@@ -2812,9 +2789,11 @@ default_wage(const region *r, const faction * f, const race * rc)
       index = 1;
     }
     wage = wagetable[esize][index];
+#ifdef KARMA_MODULE
     if (fspecial(f, FS_URBAN)) {
       wage += wagetable[esize][3];
     }
+#endif /* KARMA_MODULE */
   } else {
     if (fval(r->terrain, SEA_REGION)) {
       wage = 11;
@@ -3121,10 +3100,15 @@ attrib_init(void)
 	at_register(&at_icastle);
 	at_register(&at_guard);
 	at_register(&at_group);
-	at_register(&at_faction_special);
+
+#ifdef KARMA_MODULE
+  at_register(&at_faction_special);
 	at_register(&at_prayer_timeout);
 	at_register(&at_wyrm);
-	at_register(&at_building_generic_type);
+  at_register(&at_jihad);
+#endif /* KARMA_MODULE */
+
+  at_register(&at_building_generic_type);
 	at_register(&at_maxmagicians);
 	at_register(&at_npcfaction);
 
@@ -3136,7 +3120,6 @@ attrib_init(void)
 	register_bordertype(&bt_road);
 	register_bordertype(&bt_questportal);
 
-	at_register(&at_jihad);
 	at_register(&at_germs);
 	at_register(&at_laen); /* required for old datafiles */
 #ifdef XECMD_MODULE

@@ -447,7 +447,6 @@ learn(void)
   int p;
   magic_t mtyp;
   int l;
-  int warrior_skill;
   int studycost;
 
   /* lernen nach lehren */
@@ -645,18 +644,20 @@ learn(void)
           change_effect(u, oldpotiontype[P_FOOL], -l);
         }
 
-        warrior_skill = fspecial(u->faction, FS_WARRIOR);
-        if(warrior_skill > 0) {
-          if(sk == SK_CROSSBOW || sk == SK_LONGBOW
+#ifdef KARMA_MODULE
+        l = fspecial(u->faction, FS_WARRIOR);
+        if (l > 0) {
+          if (sk == SK_CROSSBOW || sk == SK_LONGBOW
             || sk == SK_CATAPULT || sk == SK_MELEE || sk == SK_SPEAR
             || sk == SK_AUSDAUER || sk == SK_WEAPONLESS)
           {
-            teach->value += u->number * (5+warrior_skill*5);
+            teach->value += u->number * 5 * (l+1);
           } else {
-            teach->value -= u->number * (5+warrior_skill*5);
+            teach->value -= u->number * 5 * (l+1);
             teach->value = max(0, teach->value);
           }
         }
+#endif /* KARMA_MODULE */
 
         if (p != studycost) {
           /* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */

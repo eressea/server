@@ -629,8 +629,10 @@ cr_output_unit(FILE * F, const region * r,
 
 	assert(u);
 
-	if(fspecial(u->faction, FS_HIDDEN))
+#ifdef KARMA_MODULE
+	if (fspecial(u->faction, FS_HIDDEN))
 		a_fshidden = a_find(u->attribs, &at_fshidden);
+#endif /* KARMA_MODULE */
 
 	fprintf(F, "EINHEIT %d\n", u->no);
 	fprintf(F, "\"%s\";Name\n", u->name);

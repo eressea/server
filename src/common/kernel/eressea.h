@@ -848,9 +848,6 @@ extern int turn;
 extern int quiet;
 
 /* parteinummern */
-extern int *used_faction_ids;
-extern int no_used_faction_ids;
-extern void register_faction_id(int id);
 extern boolean faction_id_is_unused(int);
 
 /* leuchtturm */

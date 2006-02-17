@@ -76,7 +76,6 @@ typedef struct faction {
   int num_total;        /* Anzahl Personen mit Monstern */
 	int options;
 	int no_units;
-	int karma;
 	struct ally *allies;
 	struct group *groups;
 	boolean alive; /* enno: sollte ein flag werden */
@@ -84,6 +83,9 @@ typedef struct faction {
 	int money;
 #ifdef SCORE_MODULE
   int score;
+#endif
+#ifdef KARMA_MODULE
+  int karma;
 #endif
 	struct alliance * alliance;
 #ifdef VICTORY_DELAY

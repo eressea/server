@@ -418,9 +418,12 @@ updatespelllist(unit * u)
 
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
   sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);
+
+#ifdef KARMA_MODULE
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
     add_spell(mage, find_spellbyid(M_GRAU, SPL_BECOMEWYRM));
   }
+#endif /* KARMA_MODULE */
 
   /* Transformierte Wyrm-Magier bekommen Drachenodem */
   if (dragonrace(u->race)) {
@@ -1147,33 +1150,34 @@ magic_resistance(unit *target)
 boolean
 target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 {
-	double probability = 0.0;
+  double probability = 0.0;
 
-	if (magician == NULL) return true;
-	if (obj == NULL) return true;
+  if (magician == NULL) return true;
+  if (obj == NULL) return true;
 
-	switch(objtyp) {
-		case TYP_UNIT:
-			{
-				int at, pa = 0;
-				skill * sv;
+  switch(objtyp) {
+    case TYP_UNIT:
+      {
+        int at, pa = 0;
+        skill * sv;
         unit * u = (unit*)obj;
 
-				if (fspecial(u->faction, FS_MAGICIMMUNE)) return true;
+#ifdef KARMA_MODULE
+        if (fspecial(u->faction, FS_MAGICIMMUNE)) return true;
+#endif /* KARMA_MODULE */
+        at = effskill(magician, SK_MAGIC);
 
-				at = effskill(magician, SK_MAGIC);
+        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+          int sk = effskill(u, sv->id);
+          if (pa < sk) pa = sk;
+        }
 
-				for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-					int sk = effskill(u, sv->id);
-					if (pa < sk) pa = sk;
-				}
+        /* Contest */
+        probability = 0.05 * (10 + pa - at);
 
-				/* Contest */
-				probability = 0.05 * (10 + pa - at);
-
-				probability += magic_resistance((unit *)obj);
-				break;
-			}
+        probability += magic_resistance((unit *)obj);
+        break;
+      }
 
 		case TYP_REGION:
 			/* Bonus durch Zauber */
@@ -1396,9 +1400,11 @@ regeneration(unit * u)
 	double potenz = 1.5;
 	double divisor = 2.0;
 
+#ifdef KARMA_MODULE
 	if (fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
+#endif /* KARMA_MODULE */
 
-	sk = effskill(u, SK_MAGIC);
+  sk = effskill(u, SK_MAGIC);
 	/* Rassenbonus/-malus */
 	d = (int)(pow(sk, potenz) * u->race->regaura / divisor);
 	d++;

@@ -207,9 +207,11 @@ unit_max_hp(const unit * u)
 	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
 	h += (int) (h * p + 0.5);
 
-	if(fspecial(u->faction, FS_UNDEAD)) {
+#ifdef KARMA_MODULE
+	if (fspecial(u->faction, FS_UNDEAD)) {
 		h *= 2;
 	}
+#endif /* KARMA_MODULE */
 
 	/* der healing curse verändert die maximalen hp */
 	if (heal_ct) {

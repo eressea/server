@@ -2705,9 +2705,11 @@ instant_orders(void)
         case K_SETSTEALTH:
           setstealth_cmd(u, ord);
           break;
+#ifdef KARMA_MODULE
         case K_WEREWOLF:
           setwere_cmd(u, ord);
           break;
+#endif /* KARMA_MODULE */
         case K_STATUS:
           /* KAEMPFE [ NICHT | AGGRESSIV | DEFENSIV | HINTEN | FLIEHE ] */
           status_cmd(u, ord);
@@ -2875,7 +2877,6 @@ renumber_factions(void)
     funhash(f);
     f->no = rp->want;
     fhash(f);
-    register_faction_id(rp->want);
     fset(f, FF_NEWID);
   }
   while (renum) {
@@ -3351,18 +3352,23 @@ static int
 maxunits(const faction *f)
 {
   if (global.unitsperalliance == true) {
-    faction *f2;
     float mult = 1.0;
 
+#ifdef KARMA_MODULE
+    faction *f2;
     for (f2 = factions; f2; f2 = f2->next) {
       if (f2->alliance == f->alliance) {
         mult += 0.4f * fspecial(f2, FS_ADMINISTRATOR);
       }
     }
+#endif /* KARMA_MODULE */
     return (int) (global.maxunits * mult);
   }
-
+#ifdef KARMA_MODULE
   return (int) (global.maxunits * (1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
+#else
+  return global.maxunits;
+#endif /* KARMA_MODULE */
 }
 
 static boolean
@@ -3654,16 +3660,19 @@ monthly_healing(void)
 
       if (u->race->flags & RCF_NOHEAL) continue;
       if (fval(u, UFL_HUNGER)) continue;
-      if (fspecial(u->faction, FS_UNDEAD)) continue;
 
       if (fval(r->terrain, SEA_REGION) && u->ship==NULL && !(canswim(u) || canfly(u))) {
         continue;
       }
 
+#ifdef KARMA_MODULE
+      if (fspecial(u->faction, FS_UNDEAD)) continue;
+
       if(fspecial(u->faction, FS_REGENERATION)) {
         u->hp = umhp;
         continue;
       }
+#endif /* KARMA_MODULE */
 
       p *= heal_factor(u->race);
       if (u->hp < umhp) {

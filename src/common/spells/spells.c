@@ -7046,14 +7046,15 @@ sp_destroy_curse(castorder *co)
 int
 sp_becomewyrm(castorder *co)
 {
+#ifdef KARMA_MODULE
   unit *u = co->magician.u;
   int wyrms_already_created = 0;
-  int wyrms_allowed;
+  int wyrms_allowed = 0;
   attrib *a;
 
   wyrms_allowed = fspecial(u->faction, FS_WYRM);
   a = a_find(u->faction->attribs, &at_wyrm);
-  if(a) wyrms_already_created = a->data.i;
+  if (a) wyrms_already_created = a->data.i;
 
   if(wyrms_already_created >= wyrms_allowed) {
     cmistake(u, co->order, 262, MSG_MAGIC);
@@ -7073,6 +7074,9 @@ sp_becomewyrm(castorder *co)
   ADDMSG(&u->faction->msgs, msg_message("becomewyrm", "u", u));
 
   return co->level;
+#else
+  return 0;
+#endif /* KARMA_MODULE */
 }
 
 /* ------------------------------------------------------------- */

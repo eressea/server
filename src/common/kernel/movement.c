@@ -210,8 +210,10 @@ personcapacity(const unit *u)
 {
 	int cap = u->race->weight+u->race->capacity;
 	
+#ifdef KARMA_MODULE
 	if (fspecial(u->faction, FS_QUICK))
 		cap -= 200;
+#endif /* KARMA_MODULE */
 
 	return cap;
 }
@@ -391,8 +393,9 @@ canswim(unit *u)
 	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
-	if(fspecial(u->faction, FS_AMPHIBIAN)) return true;
-
+#ifdef KARMA_MODULE
+	if (fspecial(u->faction, FS_AMPHIBIAN)) return true;
+#endif /* KARMA_MODULE */
 	if (u->race->flags & RCF_FLY) return true;
 
 	if (u->race->flags & RCF_SWIM) return true;
@@ -1259,8 +1262,10 @@ movement_speed(unit * u)
 
   default:
     mp = BP_WALKING;
+#ifdef KARMA_MODULE
     /* faction special */
     if (fspecial(u->faction, FS_QUICK)) mp = BP_RIDING;
+#endif /* KARMA_MODULE */
 
     /* Siebenmeilentee */
     if (!fval(u->region->terrain, SEA_REGION) && get_effect(u, oldpotiontype[P_FAST]) >= u->number) {

@@ -16,8 +16,6 @@
 extern "C" {
 #endif
 
-struct faction;
-
 typedef enum {
 	FS_REGENERATION,
 	FS_URBAN,
@@ -44,18 +42,18 @@ typedef enum {
 	MAXFACTIONSPECIALS
 } fspecial_t;
 
+#ifdef KARMA_MODULE
 typedef enum {
 	PR_AID,
 	PR_MERCY,
 	MAXPRAYEREFFECTS
 } prayereffect_t;
 
-typedef struct fspecialdata fspecialdata;
-struct fspecialdata {
+typedef struct fspecialdata {
 	const char  *name;
 	const char  *description;
 	const short maxlevel;
-};
+} fspecialdata;
 
 extern struct attrib_type at_faction_special;
 extern struct attrib_type at_prayer_timeout;
@@ -67,7 +65,6 @@ extern struct attrib_type at_jihad;
 extern struct fspecialdata fspecials[];
 
 extern int fspecial(const struct faction *f, fspecial_t special);
-#ifdef KARMA_MODULE
 extern void karma(void);
 extern int jihad(struct faction *, const struct race *);
 extern void jihad_attacks(void);

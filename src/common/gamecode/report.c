@@ -1759,12 +1759,13 @@ report_plaintext(const char * filename, report_context * ctx)
 		centre(F, alliancename(f->alliance), true);
 	}
 
+#ifdef KARMA_MODULE
 	buf[0] = 0;
 	dh = 0;
 	for (a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
     char buf2[80];
 		dh++;
-		if(fspecials[a->data.sa[0]].maxlevel != 100) {
+		if (fspecials[a->data.sa[0]].maxlevel != 100) {
 			sprintf(buf2, "%s (%d)", fspecials[a->data.sa[0]].name, a->data.sa[1]);
 		} else {
 			sprintf(buf2, "%s", fspecials[a->data.sa[0]].name);
@@ -1773,13 +1774,14 @@ report_plaintext(const char * filename, report_context * ctx)
 		strcat(buf, buf2);
 	}
 	if(dh > 0) centre(F, buf, true);
-	dh = 0;
 
 	if (f->karma > 0) {
 		sprintf(buf, "Deine Partei hat %d Karma.", f->karma);
 		centre(F, buf, true);
 	}
+#endif
 
+  dh = 0;
 	if (f->age <= 2) {
 		if (f->age <= 1) {
 			ADDMSG(&f->msgs, msg_message("changepasswd",
