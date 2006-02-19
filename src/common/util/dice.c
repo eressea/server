@@ -18,6 +18,7 @@
  */
 
 #include <config.h>
+#include "rng.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -33,10 +34,10 @@ dice(int count, int value)
   if (value<=0) return 0; /* (enno) %0 geht nicht. echt wahr. */
   if (count >= 0)
     for (c = count; c > 0; c--)
-      d += rand() % value + 1;
+      d += rng_int() % value + 1;
   else
     for (c = count; c < 0; c++)
-      d -= rand() % value + 1;
+      d -= rng_int() % value + 1;
 
   return d;
 }
@@ -58,7 +59,7 @@ term_eval(const char **sptr)
       else if (state==2) { /* dDk */
         int i;
         if (k == 0) k = 6; /* 3d == 3d6 */
-        for (i=0;i!=d;++i) m += (1 + rand() % k)*multi;
+        for (i=0;i!=d;++i) m += (1 + rng_int() % k)*multi;
       }
       else assert(!"dice_rand: illegal token");
       if (*c=='*') {

@@ -192,7 +192,7 @@ siege_cmd(unit * u, order * ord)
   region * r = u->region;
   unit *u2;
   building *b;
-  int d;
+  int d, pooled;
   int bewaffnete, katapultiere = 0;
   static boolean init = false;
   static const curse_type * magicwalls_ct;
@@ -222,8 +222,10 @@ siege_cmd(unit * u, order * ord)
   }
   /* schaden durch katapulte */
 
-  d = min(u->number, i_get(u->items, it_catapult));
-  d = min(get_pooled(u, it_catapultammo->rtype, GET_DEFAULT), d);
+  d = i_get(u->items, it_catapult);
+  d = min(u->number, d);
+  pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
+  d = min(pooled, d);
   if (eff_skill(u, SK_CATAPULT, r) >= 1) {
     katapultiere = d;
     d *= eff_skill(u, SK_CATAPULT, r);
@@ -501,13 +503,10 @@ build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   }
-  if (!get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT) && u->race != new_race[RC_STONEGOLEM]) {
-    cmistake(u, u->thisorder, 151, MSG_PRODUCE);
-    return;
-  }
-
+  
   /* left kann man noch bauen */
   left = r->terrain->max_road - rroad(r, d);
+
   /* hoffentlich ist r->road <= r->terrain->max_road, n also >= 0 */
   if (left <= 0) {
     sprintf(buf, "In %s gibt es keine Brücken und Straßen "
@@ -516,14 +515,18 @@ build_road(region * r, unit * u, int size, direction_t d)
     return;
   }
 
+  if (size>0) left = min(size, left);
   /* baumaximum anhand der rohstoffe */
   if (u->race == new_race[RC_STONEGOLEM]){
     n = u->number * GOLEM_STONE;
   } else {
-    n = get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT);
+    n = get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, left);
+    if (n==0) {
+      cmistake(u, u->thisorder, 151, MSG_PRODUCE);
+      return;
+    }
   }
   left = min(n, left);
-  if (size>0) left = min(size, left);
 
   /* n = maximum by skill. try to maximize it */
   n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
@@ -710,13 +713,13 @@ build(unit * u, const construction * ctype, int completed, int want)
 
     if (type->materials) for (c=0;n>0 && type->materials[c].number;c++) {
       const struct resource_type * rtype = type->materials[c].rtype;
-      int need;
-      int have = get_pooled(u, rtype, GET_DEFAULT);
-      int prebuilt;
-      int canuse = have;
+      int need, prebuilt;
+      int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+
       if (inside_building(u)) {
         canuse = matmod(u->building->type->attribs, u, rtype, canuse);
       }
+
       if (canuse<0) return canuse; /* pass errors to caller */
       canuse = matmod(type->attribs, u, rtype, canuse);
       if (type->reqsize>1) {
@@ -771,7 +774,7 @@ maxbuild(const unit * u, const construction * cons)
   int maximum = INT_MAX;
   for (c=0;cons->materials[c].number;c++) {
     const resource_type * rtype = cons->materials[c].rtype;
-    int have = get_pooled(u, rtype, GET_DEFAULT);
+    int have = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
     int need = required(1, cons->reqsize, cons->materials[c].number);
     if (have<need) {
       cmistake(u, u->thisorder, 88, MSG_PRODUCE);

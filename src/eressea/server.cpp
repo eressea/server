@@ -87,6 +87,7 @@
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/sql.h>
 #ifdef MSPACES
 # include <util/dl/malloc.h>
@@ -106,7 +107,6 @@
 
 /* libc includes */
 #include <cstdio>
-#include <cstdlib>
 #include <cctype>
 #include <cstring>
 #include <ctime>
@@ -332,8 +332,8 @@ lua_done(lua_State * luaState)
 int
 process_orders()
 {
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
 
 #ifdef SHORTPWDS
   readshortpwds("passwords");

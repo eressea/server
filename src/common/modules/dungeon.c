@@ -106,7 +106,7 @@ make_dungeon(const dungeon * data)
 	add_regionlist(&rlist, center);
 	rnext = r = center;
 	while (size>0 && iterations--) {
-		int d, o = rand() % 3;
+		int d, o = rng_int() % 3;
 		for (d=0;d!=3;++d) {
 			int index = (d+o) % 3;
 			region * rn = findregion(r->x+nb[n][index][0], r->y+nb[n][index][1]);
@@ -115,7 +115,7 @@ make_dungeon(const dungeon * data)
 				if (rn->terrain==terrain_hell) {
           rnext = rn;
         } else if (fval(rn->terrain, SEA_REGION)) {
-					if (rand() % 100 < data->connect*100) {
+					if (rng_int() % 100 < data->connect*100) {
 						terraform_region(rn, terrain_hell);
 						--size;
 						rnext = rn;
@@ -143,11 +143,11 @@ make_dungeon(const dungeon * data)
 		monster * m = data->monsters;
 		region * r = iregion->data;
 		while (m) {
-			if ((rand() % 100) < (m->chance * 100)) {
+			if ((rng_int() % 100) < (m->chance * 100)) {
 				/* TODO: check maxunits. */
 				treasure * loot = m->treasures;
 				struct itemtype_list * weapon = m->weapons;
-				int size = 1 + (rand() % m->avgsize) + (rand() % m->avgsize);
+				int size = 1 + (rng_int() % m->avgsize) + (rng_int() % m->avgsize);
 				unit * u = createunit(r, fmonsters, size, m->race);
 				while (weapon) {
 					i_change(&u->items, weapon->type, size);

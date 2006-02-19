@@ -40,6 +40,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/umlaut.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -628,9 +629,9 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
 	/* GM faction */
 	a_add(&f->attribs, make_key(atoi36("quest")));
 	f->banner = strdup("Questenpartei");
-	f->passw = strdup(itoa36(rand()));
-	f->override = strdup(itoa36(rand()));
-	f->override = strdup(itoa36(rand()));
+	f->passw = strdup(itoa36(rng_int()));
+	f->override = strdup(itoa36(rng_int()));
+	f->override = strdup(itoa36(rng_int()));
   if (set_email(&f->email, email)!=0) {
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
@@ -655,8 +656,8 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
 
 	/* GM playfield */
 	do {
-		minx = (short)((rand() % (2*EXTENSION)) - EXTENSION);
-		miny = (short)((rand() % (2*EXTENSION)) - EXTENSION);
+		minx = (short)((rng_int() % (2*EXTENSION)) - EXTENSION);
+		miny = (short)((rng_int() % (2*EXTENSION)) - EXTENSION);
 		for (x=0;!invalid && x<=radius*2;++x) {
       short y;
 			for (y=0;!invalid && y<=radius*2;++y) {
@@ -667,7 +668,7 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
 	} while (invalid);
 	maxx = minx+2*radius; cx = minx+radius;
 	maxy = miny+2*radius; cy = miny+radius;
-	p = create_new_plane(rand(), name, minx, maxx, miny, maxy, flags);
+	p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
 	center = new_region(cx, cy);
 	for (x=0;x<=2*radius;++x) {
 		short y;
@@ -735,7 +736,7 @@ gm_addfaction(const char * email, plane * p, region * r)
 	/* GM faction */
 	add_key(&f->attribs, atoi36("quest"));
 	f->banner = strdup("Questenpartei");
-	f->passw = strdup(itoa36(rand()));
+	f->passw = strdup(itoa36(rng_int()));
   if (set_email(&f->email, email)!=0) {
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
@@ -798,8 +799,8 @@ gm_addplane(short radius, unsigned int flags, const char * name)
 
 	/* GM playfield */
 	do {
-		minx = (short)(rand() % (2*EXTENSION)) - EXTENSION;
-		miny = (short)(rand() % (2*EXTENSION)) - EXTENSION;
+		minx = (short)(rng_int() % (2*EXTENSION)) - EXTENSION;
+		miny = (short)(rng_int() % (2*EXTENSION)) - EXTENSION;
 		for (x=0;!invalid && x<=radius*2;++x) {
       short y;
 			for (y=0;!invalid && y<=radius*2;++y) {
@@ -810,7 +811,7 @@ gm_addplane(short radius, unsigned int flags, const char * name)
 	} while (invalid);
 	maxx = minx+2*radius; cx = minx+radius;
 	maxy = miny+2*radius; cy = miny+radius;
-	p = create_new_plane(rand(), name, minx, maxx, miny, maxy, flags);
+	p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
 	center = new_region(cx, cy);
 	for (x=0;x<=2*radius;++x) {
 		short y;

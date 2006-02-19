@@ -31,6 +31,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
+#include <util/rng.h>
 #include <util/variant.h>
 
 #include <attributes/otherfaction.h>
@@ -48,7 +49,7 @@ random_unit_in_faction(const faction *f)
 
   for(u = f->units; u; u=u->next) c++;
 
-  u_nr = rand()%c;
+  u_nr = rng_int()%c;
   c = 0;
 
   for(u = f->units; u; u=u->next)
@@ -85,7 +86,7 @@ resolve_faction(variant id) {
 static int
 unused_faction_id(void)
 {
-  int id = rand()%MAX_FACTION_ID;
+  int id = rng_int()%MAX_FACTION_ID;
 
   while (!faction_id_is_unused(id)) {
     id++; if(id == MAX_FACTION_ID) id = 0;
@@ -111,10 +112,10 @@ addfaction(const char *email, const char * password,
   if (password) {
     set_string(&f->passw, password);
   } else {
-    for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
+    for (i = 0; i < 6; i++) buf[i] = (char) (97 + rng_int() % 26); buf[i] = 0;
     set_string(&f->passw, buf);
   }
-  for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
+  for (i = 0; i < 6; i++) buf[i] = (char) (97 + rng_int() % 26); buf[i] = 0;
   set_string(&f->override, buf);
 
   f->lastorders = turn;
@@ -152,7 +153,7 @@ addplayer(region *r, faction * f)
   if (f->race == new_race[RC_DAEMON]) {
     race_t urc;
     do {
-      urc = (race_t)(rand() % MAXRACES);
+      urc = (race_t)(rng_int() % MAXRACES);
     } while (new_race[urc]==NULL || urc == RC_DAEMON || !playerrace(new_race[urc]));
     u->irace = new_race[urc];
   }

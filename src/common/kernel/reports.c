@@ -913,62 +913,67 @@ spy_message(int spy, unit *u, unit *target)
 const struct unit *
 ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 {
-	if (cansee(f, u->region, u, 0)) return u;
-	return x;
+  if (cansee(f, u->region, u, 0)) return u;
+  return x;
 }
 
 static void
 get_addresses(report_context * ctx)
 {
 /* "TODO: travelthru" */
+  seen_region * sr = NULL;
   region *r;
   const faction * lastf = NULL;
   faction_list * flist = calloc(1, sizeof(faction_list));
+  
   flist->data = ctx->f;
 
-  for (r=ctx->first;r!=ctx->last;r=r->next) {
+  for (r=ctx->first;sr==NULL && r!=ctx->last;r=r->next) {
+    sr = find_seen(ctx->seen, r);
+  }
+  
+  for (;sr!=NULL;sr=sr->next) {
+    const region * r = sr->r;
     const unit * u = r->units;
-    const seen_region * sr = find_seen(ctx->seen, r);
-
-    if (sr==NULL) continue;
+    
     while (u!=NULL) {
-			faction * sf = visible_faction(ctx->f, u);
-			boolean ballied = sf && sf!=ctx->f && sf!=lastf
-				&& !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, 0);
-			if (ballied || ALLIED(ctx->f, sf)) {
-				faction_list ** fnew = &flist;
-				while (*fnew && (*fnew)->data->no < sf->no) {
-					fnew =&(*fnew)->next;
-				}
-				if ((*fnew==NULL) || (*fnew)->data!=sf) {
-					faction_list * finsert = malloc(sizeof(faction_list));
-					finsert->next = *fnew;
-					*fnew = finsert;
-					finsert->data = sf;
-				}
-				lastf = sf;
-			}
-			u = u->next;
-		}
-	}
-
+      faction * sf = visible_faction(ctx->f, u);
+      boolean ballied = sf && sf!=ctx->f && sf!=lastf
+          && !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, 0);
+      if (ballied || ALLIED(ctx->f, sf)) {
+        faction_list ** fnew = &flist;
+        while (*fnew && (*fnew)->data->no < sf->no) {
+          fnew =&(*fnew)->next;
+        }
+        if ((*fnew==NULL) || (*fnew)->data!=sf) {
+          faction_list * finsert = malloc(sizeof(faction_list));
+          finsert->next = *fnew;
+          *fnew = finsert;
+          finsert->data = sf;
+        }
+        lastf = sf;
+      }
+      u = u->next;
+    }
+  }
+  
   if (ctx->f->alliance != NULL) {
-		faction *f2;
-		for(f2 = factions; f2; f2 = f2->next) {
-			if(f2->alliance != NULL && f2->alliance == ctx->f->alliance) {
-				faction_list ** fnew = &flist;
-				while (*fnew && (*fnew)->data->no < f2->no) {
-					fnew =&(*fnew)->next;
-				}
-				if ((*fnew==NULL) || (*fnew)->data!=f2) {
-					faction_list * finsert = malloc(sizeof(faction_list));
-					finsert->next = *fnew;
-					*fnew = finsert;
-					finsert->data = f2;
-				}
-			}
-		}
-	}
+    faction *f2;
+    for(f2 = factions; f2; f2 = f2->next) {
+      if(f2->alliance != NULL && f2->alliance == ctx->f->alliance) {
+        faction_list ** fnew = &flist;
+        while (*fnew && (*fnew)->data->no < f2->no) {
+          fnew =&(*fnew)->next;
+        }
+        if ((*fnew==NULL) || (*fnew)->data!=f2) {
+          faction_list * finsert = malloc(sizeof(faction_list));
+          finsert->next = *fnew;
+          *fnew = finsert;
+          finsert->data = f2;
+        }
+      }
+    }
+  }
   ctx->addresses = flist;
 }
 
@@ -1006,6 +1011,30 @@ free_seen(void)
   }
 }
 
+void
+link_seen(seen_region * seehash[], const region * first, const region * last)
+{
+  const region * r = first;
+  seen_region * sr = NULL;
+
+  if (first==last) return;
+
+  do {
+    sr = find_seen(seehash, r);
+    r = r->next;
+  } while (sr==NULL && r!=last);
+
+  while (r!=last) {
+    seen_region * sn = find_seen(seehash, r);
+    if (sn!=NULL) {
+      sr->next = sn;
+      sr = sn;
+    }
+    r = r->next;
+  }
+  sr->next = 0;
+}
+
 seen_region *
 find_seen(struct seen_region * seehash[], const region * r)
 {
@@ -1036,6 +1065,7 @@ get_seen_interval(report_context * ctx)
       sr = sr->nextHash;
     }
   }
+  link_seen(ctx->seen, ctx->first, ctx->last);
 }
 
 boolean
@@ -1059,10 +1089,10 @@ add_seen(struct seen_region * seehash[], struct region * r, unsigned char mode, 
 }
 
 typedef struct report_type {
-	struct report_type * next;
-	report_fun write;
-	const char * extension;
-	int flag;
+  struct report_type * next;
+  report_fun write;
+  const char * extension;
+  int flag;
 } report_type;
 
 static report_type * report_types;

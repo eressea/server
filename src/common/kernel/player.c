@@ -13,10 +13,10 @@
 #include <config.h>
 #include "player.h"
 
-#include <goodies.h>
+#include <util/goodies.h>
+#include <util/rng.h>
 
 #include <string.h>
-#include <stdlib.h>
 #include <limits.h>
 
 #define PMAXHASH 1021
@@ -33,7 +33,7 @@ make_player(const struct faction * f)
 	player * p = calloc(sizeof(player), 1);
 	unsigned int hash;
 	
-	for (p->id = rand();;p->id++) {
+	for (p->id = rng_int();;p->id++) {
 		/* if there is a hashing conflict, resolve it */
 		player * pi = get_player(p->id);
 		if (pi) p->id++;

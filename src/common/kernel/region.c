@@ -40,7 +40,8 @@
 #include "unit.h"
 
 /* util includes */
-#include <resolve.h>
+#include <util/resolve.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -48,7 +49,6 @@
 #include <limits.h>
 #include <rand.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 extern int dice_rand(const char *s);
@@ -777,21 +777,21 @@ makename(void)
 	nv = strlen(vokal);
 	ns = strlen(start);
 
-	for (s = rand() % 3 + 2; s > 0; s--) {
+	for (s = rng_int() % 3 + 2; s > 0; s--) {
 		if (x > 0) {
-			k = rand() % (int)nk;
+			k = rng_int() % (int)nk;
 			name[p] = kons[k];
 			p++;
 		} else {
-			k = rand() % (int)ns;
+			k = rng_int() % (int)ns;
 			name[p] = start[k];
 			p++;
 		}
-		v = rand() % (int)nv;
+		v = rng_int() % (int)nv;
 		name[p] = vokal[v];
 		p++;
-		if (rand() % 3 == 2 || s == 1) {
-			e = rand() % (int)ne;
+		if (rng_int() % 3 == 2 || s == 1) {
+			e = rng_int() % (int)ne;
 			name[p] = end[e];
 			p++;
 			x = 1;
@@ -815,7 +815,7 @@ setluxuries(region * r, const luxury_type * sale)
 	for (ltype=luxurytypes; ltype; ltype=ltype->next) {
 		struct demand * dmd = calloc(sizeof(struct demand), 1);
 		dmd->type = ltype;
-		if (ltype!=sale) dmd->value = 1 + rand() % 5;
+		if (ltype!=sale) dmd->value = 1 + rng_int() % 5;
 		dmd->next = r->land->demands;
 		r->land->demands = dmd;
 	}
@@ -917,12 +917,12 @@ terraform_region(region * r, const terrain_type * terrain)
 		if (!nb) {
 			int i = get_maxluxuries();
       if (i>0) {
-        i = rand() % i;
+        i = rng_int() % i;
         ltype = luxurytypes;
         while (i--) ltype=ltype->next; 
       }
 		} else {
-			int i = rand() % mnr;
+			int i = rng_int() % mnr;
 			struct surround * srd = nb;
 			while (i>srd->value) {
 				i-=srd->value;
@@ -947,19 +947,19 @@ terraform_region(region * r, const terrain_type * terrain)
     if (r->terrain->herbs) {
 			int len=0;
 			while (r->terrain->herbs[len]) ++len;
-			if (len) itype = r->terrain->herbs[rand()%len];
+			if (len) itype = r->terrain->herbs[rng_int()%len];
 		}
 		if (itype!=NULL) {
 			rsetherbtype(r, itype);
-			rsetherbs(r, (short)(50+rand()%31));
+			rsetherbs(r, (short)(50+rng_int()%31));
 		}
 		else {
 			rsetherbtype(r, NULL);
 		}
     if (oldterrain==NULL || !fval(oldterrain, LAND_REGION)) {
-      if (rand() % 100 < 3) fset(r, RF_MALLORN);
+      if (rng_int() % 100 < 3) fset(r, RF_MALLORN);
       else freset(r, RF_MALLORN);
-      if (rand() % 100 < ENCCHANCE) {
+      if (rng_int() % 100 < ENCCHANCE) {
         fset(r, RF_ENCOUNTER);
       }
     }
@@ -967,14 +967,14 @@ terraform_region(region * r, const terrain_type * terrain)
 
   if (oldterrain==NULL || terrain->size!=oldterrain->size) {
     if (terrain==newterrain(T_PLAIN)) {
-      rsethorses(r, rand() % (terrain->size / 50));
-      if(rand()%100 < 40) {
-        rsettrees(r, 2, terrain->size * (30+rand()%40)/1000);
+      rsethorses(r, rng_int() % (terrain->size / 50));
+      if(rng_int()%100 < 40) {
+        rsettrees(r, 2, terrain->size * (30+rng_int()%40)/1000);
         rsettrees(r, 1, rtrees(r, 2)/4);
         rsettrees(r, 0, rtrees(r, 2)/2);
       }
     } else if (chance(0.2)) {
-      rsettrees(r, 2, terrain->size * (30 + rand() % 40) / 1000);
+      rsettrees(r, 2, terrain->size * (30 + rng_int() % 40) / 1000);
       rsettrees(r, 1, rtrees(r, 2)/4);
       rsettrees(r, 0, rtrees(r, 2)/2);
     }
@@ -983,7 +983,7 @@ terraform_region(region * r, const terrain_type * terrain)
 		  int peasants;
 		  peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
 		  rsetpeasants(r, max(100, peasants));
-		  rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL)+1) + rand() % 5));
+		  rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL)+1) + rng_int() % 5));
     }
 	}
 }

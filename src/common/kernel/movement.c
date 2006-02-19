@@ -51,12 +51,12 @@
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/rand.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 /* attributes includes */
@@ -479,7 +479,7 @@ do_maelstrom(region *r, unit *u)
 {
   int damage;
 
-  damage = rand()%150 - eff_skill(u, SK_SAILING, r)*5;
+  damage = rng_int()%150 - eff_skill(u, SK_SAILING, r)*5;
 
   if(damage <= 0) {
     ADDMSG(&u->faction->msgs, msg_message("entermaelstrom", 
@@ -721,7 +721,7 @@ drifting_ships(region * r)
 
       /* Auswahl einer Richtung: Zuerst auf Land, dann
       * zufällig. Falls unmögliches Resultat: vergiß es. */
-      d_offset = rand() % MAXDIRECTIONS;
+      d_offset = rng_int() % MAXDIRECTIONS;
       for (d = 0; d != MAXDIRECTIONS; ++d) {
         region * rn = rconnect(r, (direction_t)((d + d_offset) % MAXDIRECTIONS));
         if (rn!=NULL && fval(rn->terrain, SAIL_INTO) && ship_allowed(sh, rn)) {
@@ -1107,7 +1107,7 @@ regain_orientation(region * r)
     cap = shipowner(sh);
     if (cap==NULL) continue;
 
-    if (!fval(r->terrain, SEA_REGION) || rand() % 10 >= storms[thismonth]) {
+    if (!fval(r->terrain, SEA_REGION) || rng_int() % 10 >= storms[thismonth]) {
       remove_curse(&sh->attribs, c);
       ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
       continue;
@@ -1132,7 +1132,7 @@ next_region(unit * u, region * current, region * next)
   if (is_disoriented(u)) {
     direction_t d = reldirection(current, next);
     if (d<MAXDIRECTIONS) {
-      d = (direction_t)(((d+MAXDIRECTIONS-1)+rand()%3)%MAXDIRECTIONS);
+      d = (direction_t)(((d+MAXDIRECTIONS-1)+rng_int()%3)%MAXDIRECTIONS);
       next = rconnect(current, d);
     }
   }
@@ -1634,11 +1634,11 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
       stormchance = stormyness / shipspeed(sh, u);
       if (check_leuchtturm(next_point, NULL)) stormchance /= 3;
 
-      if (rand()%10000 < stormchance && fval(current_point->terrain, SEA_REGION)) {
+      if (rng_int()%10000 < stormchance && fval(current_point->terrain, SEA_REGION)) {
         if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
           region * rnext = NULL;
           boolean storm = true;
-          int d_offset = rand() % MAXDIRECTIONS;
+          int d_offset = rng_int() % MAXDIRECTIONS;
           direction_t d;
           /* Sturm nur, wenn nächste Region Hochsee ist. */
           for (d=0;d!=MAXDIRECTIONS;++d) {
@@ -2144,7 +2144,7 @@ piracy_cmd(unit *u, struct order * ord)
             if (alliedunit(u, f, HELP_FIGHT)) continue;
             if (il == 0 || intlist_find(il, cap->faction->no)) {
               ++aff[dir].value;
-              if (rand() % aff[dir].value == 0) {
+              if (rng_int() % aff[dir].value == 0) {
                 aff[dir].target = f;
               }
             }
@@ -2157,7 +2157,7 @@ piracy_cmd(unit *u, struct order * ord)
 		}
 
 		if (saff != 0) {
-			saff = rand() % saff;
+			saff = rng_int() % saff;
 			for (dir=0; dir!=MAXDIRECTIONS; ++dir) {
 				if (saff!=aff[dir].value) break;
 				saff -= aff[dir].value;

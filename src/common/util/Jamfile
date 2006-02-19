@@ -37,6 +37,8 @@ SOURCES =
  xml.c
  ;
 
+SOURCES += mt19937ar.c  ;
+
 if $(MSPACES) {
  SOURCES += <dl>malloc.c ;
 }

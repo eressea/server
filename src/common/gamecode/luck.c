@@ -43,7 +43,8 @@
 #include <karma.h>
 
 /* util includes */
-#include <rand.h>
+#include <util/rand.h>
+#include <util/rng.h>
 #include <util/message.h>
 
 /* libc includes */
@@ -51,7 +52,6 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
-#include <stdlib.h>
 
 #ifdef KARMA_MODULE
 
@@ -64,7 +64,7 @@ lucky_silver(const unit *u)
 	int luck = fspecial(u->faction, FS_LUCKY);
 
 	do {
-		r = 1 + rand()%(10000*(luck+STANDARD_LUCK));
+		r = 1 + rng_int()%(10000*(luck+STANDARD_LUCK));
 		if(r > max) max = r;
 		i++;
 	} while(i <= luck);
@@ -101,10 +101,10 @@ lucky_item(const unit *u)
 		}
 	}
 	/* weight is unused */
-	r = rand()%nitems;
+	r = rng_int()%nitems;
 
 	do {
-		r = rand()%nitems;
+		r = rng_int()%nitems;
 		if(r > max) max = r;
 		i++;
 	} while(i <= luck);
@@ -112,9 +112,9 @@ lucky_item(const unit *u)
 	itype = it_find(it_list[r].name);
 
 	if(luck)
-		amount = 10 + rand()%(luck*40) + rand()%(luck*40);
+		amount = 10 + rng_int()%(luck*40) + rng_int()%(luck*40);
 	else 
-		amount = 5 + rand()%10 +rand()%10;
+		amount = 5 + rng_int()%10 +rng_int()%10;
 
 	i_change(&((unit *)u)->items, itype, amount);
   ADDMSG(&u->faction->msgs, msg_message("lucky_item", 
@@ -144,8 +144,8 @@ lucky_magic_item(const unit *u)
 		olditemtype[I_SACK_OF_CONSERVATION],
 	};
 
-	itype = it_list[rand()%n_items];
-	amount = 1 + rand()%luck;
+	itype = it_list[rng_int()%n_items];
+	amount = 1 + rng_int()%luck;
 
 	i_change(&((unit *)u)->items, itype, amount);
 	ADDMSG(&u->faction->msgs, msg_message("lucky_item", 
@@ -161,7 +161,7 @@ lucky_event(const faction *f)
 
 	if(!u) return;
 
-	switch(rand()%3) {
+	switch(rng_int()%3) {
 	case 0:
 		lucky_silver(u);
 		break;
@@ -180,7 +180,7 @@ check_luck(void)
 	faction *f;
 
   for(f=factions; f; f=f->next) {
-    if(rand()%100 < STANDARD_LUCK+fspecial(f, FS_LUCKY)*8)
+    if(rng_int()%100 < STANDARD_LUCK+fspecial(f, FS_LUCKY)*8)
 			lucky_event(f);
 	}
 }

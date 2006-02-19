@@ -59,17 +59,18 @@ int hat_in_region(item_t itm, struct region * r, struct faction * f);
 /* für fast_region und neuen CR: */
 
 enum {
-	see_none,
-	see_neighbour,
-	see_lighthouse,
-	see_travel,
-	see_far,
-	see_unit,
-	see_battle
+  see_none,
+  see_neighbour,
+  see_lighthouse,
+  see_travel,
+  see_far,
+  see_unit,
+  see_battle
 };
 
 typedef struct seen_region {
   struct seen_region * nextHash;
+  struct seen_region * next;
   struct region *r;
   unsigned char mode;
   boolean disbelieves;
@@ -80,14 +81,15 @@ extern boolean add_seen(struct seen_region * seehash[], struct region * r, unsig
 extern struct seen_region ** seen_init(void);
 extern void seen_done(struct seen_region * seehash[]);
 extern void free_seen(void);
+extern void link_seen(seen_region * seehash[], const struct region * first, const struct region * last);
 extern const char * visibility[];
 
 typedef struct report_context {
-	struct faction * f;
-	struct faction_list * addresses;
-	struct seen_region ** seen;
+  struct faction * f;
+  struct faction_list * addresses;
+  struct seen_region ** seen;
   struct region * first, * last;
-	void * userdata;
+  void * userdata;
   time_t report_time;
 } report_context;
 

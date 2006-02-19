@@ -42,12 +42,12 @@ create_weather(region *r, weather_t type)
 	w->center[0] = r->x;
 	w->center[1] = r->y;
 	w->type      = type;
-	w->move[0]   = (rand()%3) - 1;
-	w->move[1]   = (rand()%3) - 1;
+	w->move[0]   = (rng_int()%3) - 1;
+	w->move[1]   = (rng_int()%3) - 1;
 
 	switch(type) {
 	case WEATHER_STORM:
-		w->radius = rand()%2+1;
+		w->radius = rng_int()%2+1;
 		break;
 	case WEATHER_HURRICANE:
 		w->radius = 1;
@@ -128,7 +128,7 @@ move_weather(void)
 		w->center[0] = w->center[0] + w->move[0];
 		w->center[1] = w->center[1] + w->move[1];
 		r = findregion(w->center[0], w->center[1]);
-		if(!r || rand()%100 < 5) {
+		if(!r || rng_int()%100 < 5) {
 			removelist(&weathers, w);
 		}
 		w = wnext;

@@ -18,6 +18,10 @@ if ! $(HAVE_LUA) {
   HAVE_LUA = 1 ;
 }
 
+if ! $(CPU) {
+  CPU = pentium2 ;
+}
+
 if $(DISTCC_HOSTS) {
   DISTCC = 1 ;
 }
@@ -40,6 +44,13 @@ if $(DMALLOC) {
   CCFLAGS += -DUSE_DMALLOC ;
   C++FLAGS += -DUSE_DMALLOC ;
   LINKFLAGS += -ldmalloc ;
+}
+
+if $(COVERAGE) = 1 {
+  Echo Compiling with gcov info ;
+  CCFLAGS += -fprofile-arcs -ftest-coverage ;
+  C++FLAGS += -fprofile-arcs -ftest-coverage ;
+  LINKFLAGS += -fprofile-arcs -ftest-coverage ;
 }
 
 if $(PROFILE) = 1 {
@@ -125,8 +136,8 @@ rule TargetDirectory
             SubDirC++Flags -ggdb -O0 ;
         }
         else {
-            SubDirCcFlags -DNDEBUG -O2 ;
-            SubDirC++Flags -DNDEBUG -O2 ;
+            SubDirCcFlags -DNDEBUG -O3 -mtune=$(CPU) ;
+            SubDirC++Flags -DNDEBUG -O3 -mtune=$(CPU) ;
         }
 }
 
@@ -136,19 +147,21 @@ if ! $(DEBUG) {
 }
 
 if $(WITHOUT_LUA) {
-	 ECHO Compiling without LUA ;
+   ECHO Compiling without LUA ;
 }
 
+if $(DEBUG) = 0 {
+  TARGET_PREFIX = Release ;
+}
+else {
+  TARGET_PREFIX = Debug ;
+}
 if $(PROFILE) = 1 {
    TARGET_PREFIX = Profile ;
 }
-else {
-  if $(DEBUG) = 0 {
-    TARGET_PREFIX = Release ;
-  }
-  else {
-    TARGET_PREFIX = Debug ;
-  }
+if $(COVERAGE) = 1 {
+   TARGET_PREFIX = Coverage ;
 }
+
 
 

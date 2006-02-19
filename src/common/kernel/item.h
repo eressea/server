@@ -53,22 +53,22 @@ typedef int (*rtype_uchange)(struct unit * user, const struct resource_type * rt
 typedef int (*rtype_uget)(const struct unit * user, const struct resource_type * rtype);
 typedef char * (*rtype_name)(const struct resource_type * rtype, int flags);
 typedef struct resource_type {
-	/* --- constants --- */
-	char * _name[2]; /* wie es heißt */
-	char * _appearance[2]; /* wie es für andere aussieht */
-	unsigned int flags;
-	/* --- functions --- */
-	rtype_uchange uchange;
-	rtype_uget uget;
-	rtype_name name;
-	/* --- pointers --- */
-	struct attrib * attribs;
-	struct resource_type * next;
-	unsigned int hashkey;
-	struct item_type * itype;
-	struct potion_type * ptype;
-	struct luxury_type * ltype;
-	struct weapon_type * wtype;
+  /* --- constants --- */
+  char * _name[2]; /* wie es heißt */
+  char * _appearance[2]; /* wie es für andere aussieht */
+  unsigned int flags;
+  /* --- functions --- */
+  rtype_uchange uchange;
+  rtype_uget uget;
+  rtype_name name;
+  /* --- pointers --- */
+  struct attrib * attribs;
+  struct resource_type * next;
+  unsigned int hashkey;
+  struct item_type * itype;
+  struct potion_type * ptype;
+  struct luxury_type * ltype;
+  struct weapon_type * wtype;
   struct armor_type * atype;
 } resource_type;
 extern resource_type * resourcetypes;
@@ -90,10 +90,10 @@ extern struct attrib_type at_resourcelimit;
 typedef int (*rlimit_limit)(const struct region * r, const struct resource_type * rtype);
 typedef void (*rlimit_produce)(struct region * r, const struct resource_type * rtype, int n);
 typedef struct resource_limit {
-	rlimit_limit limit;
-	rlimit_produce produce;
+  rlimit_limit limit;
+  rlimit_produce produce;
   unsigned int guard; /* how to guard against theft */
-	int value;
+  int value;
   resource_mod * modifiers;
 } resource_limit;
 

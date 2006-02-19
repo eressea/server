@@ -35,6 +35,7 @@
 #include <util/language.h>
 #include <util/base36.h>
 #include <util/rand.h>
+#include <util/rng.h>
 
 #include <cstring>
 #include <ctime>
@@ -154,8 +155,8 @@ lua_planmonsters(void)
   faction * f = findfaction(MONSTER_FACTION);
 
   if (f==NULL) return;
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
   plan_monsters();
   for (u=f->units;u;u=u->nextF) {
     call_script(u);

@@ -43,8 +43,9 @@
 #include "unit.h"
 
 /* util includes */
-#include <attrib.h>
-#include <functions.h>
+#include <util/attrib.h>
+#include <util/functions.h>
+#include <util/rng.h>
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
@@ -260,7 +261,7 @@ give_starting_equipment(struct unit *u)
     }
     break;
   case RC_CENTAUR:
-    rsethorses(r, 250+rand()%51+rand()%51);
+    rsethorses(r, 250+rng_int()%51+rng_int()%51);
     break;
   }
   u->hp = unit_max_hp(u);
@@ -331,7 +332,7 @@ default_spoil(const struct race * rc, int size)
 {
   item * itm = NULL;
 
-  if (rand()%100 < RACESPOILCHANCE) {
+  if (rng_int()%100 < RACESPOILCHANCE) {
     char spoilname[32];
     const item_type * itype;
 

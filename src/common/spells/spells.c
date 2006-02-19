@@ -65,13 +65,13 @@ extern void ct_register(const struct curse_type * ct);
 #include <util/variant.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
@@ -134,7 +134,7 @@ magicanalyse_region(region *r, unit *mage, double force)
     /* ist der curse schwächer als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
-    mon = c->duration + (rand()%10) - 5;
+    mon = c->duration + (rng_int()%10) - 5;
     mon = max(1, mon);
     found = true;
 
@@ -176,7 +176,7 @@ magicanalyse_unit(unit *u, unit *mage, double force)
     /* ist der curse schwächer als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
-    mon = c->duration + (rand()%10) - 5;
+    mon = c->duration + (rng_int()%10) - 5;
     mon = max(1,mon);
 
     if (chance(probability)) { /* Analyse geglückt */
@@ -218,7 +218,7 @@ magicanalyse_building(building *b, unit *mage, double force)
     /* ist der curse schwächer als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
-    mon = c->duration + (rand()%10) - 5;
+    mon = c->duration + (rng_int()%10) - 5;
     mon = max(1,mon);
 
     if (chance(probability)) { /* Analyse geglückt */
@@ -260,7 +260,7 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
     /* ist der curse schwächer als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
-    mon = c->duration + (rand()%10) - 5;
+    mon = c->duration + (rng_int()%10) - 5;
     mon = max(1,mon);
 
     if (chance(probability)) { /* Analyse geglückt */
@@ -478,7 +478,7 @@ static const race *
 select_familiar(const race * magerace, magic_t magiegebiet)
 {
   const race * retval = NULL;
-  int rnd = rand()%100;
+  int rnd = rng_int()%100;
 
   assert(magerace->familiars[0]);
   if (rnd < 3) {
@@ -486,7 +486,7 @@ select_familiar(const race * magerace, magic_t magiegebiet)
     unsigned int maxlen = listlen(familiarraces);
     if (maxlen>0) {
       race_list * rclist = familiarraces;
-      int index = rand()%maxlen;
+      int index = rng_int()%maxlen;
       while (index-->0) {
         rclist = rclist->next;
       }
@@ -562,7 +562,7 @@ sp_summon_familiar(castorder *co)
     }
 
     /* In welcher benachbarten Ozeanregion soll der Familiar erscheinen? */
-    coasts = rand()%coasts;
+    coasts = rng_int()%coasts;
     dh = -1;
     for(d=0; d<MAXDIRECTIONS; d++) {
       region * rn = rconnect(r,d);
@@ -1294,7 +1294,7 @@ sp_rosthauch(castorder *co)
 #endif
   }
 
-  force = rand()%((int)(force * 10)) + force;
+  force = rng_int()%((int)(force * 10)) + force;
 
   /* fuer jede Einheit */
   for (n = 0; n < pa->length; n++) {
@@ -1448,7 +1448,7 @@ sp_sparkle(castorder *co)
   if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
   u = pa->param[0]->data.u;
-  effect.i = rand();
+  effect.i = rng_int();
   create_curse(mage, &u->attribs, ct_find("sparkle"), cast_level,
       duration, effect, u->number);
 
@@ -1645,7 +1645,7 @@ sp_great_drought(castorder *co)
   create_curse(mage, &r->attribs, ct_find("drought"), force, duration, effect, 0);
 
   /* terraforming */
-  if (rand() % 100 < 25){
+  if (rng_int() % 100 < 25){
     terraform = true;
 
     switch(rterrain(r)) {
@@ -1665,7 +1665,7 @@ sp_great_drought(castorder *co)
         break;
 */
       case T_GLACIER:
-        if (rand() % 100 < 50){
+        if (rng_int() % 100 < 50){
           rsetterrain(r, T_SWAMP);
           destroy_all_roads(r);
         } else {   /* Ozean */
@@ -2414,7 +2414,7 @@ patzer_peasantmob(castorder *co)
     faction * f = findfaction(MONSTER_FACTION);
     const struct locale * lang = f->locale;
 
-    anteil += rand() % 4;
+    anteil += rng_int() % 4;
     n = rpeasants(r) * anteil / 10;
     rsetpeasants(r, rpeasants(r) - n);
     assert(rpeasants(r) >= 0);
@@ -2474,7 +2474,7 @@ sp_forest_fire(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double probability;
-  double percentage = (rand() % 8 + 1) * 0.1;  /* 10 - 80% */
+  double percentage = (rng_int() % 8 + 1) * 0.1;  /* 10 - 80% */
 
   int vernichtet_schoesslinge = (int)(rtrees(r, 1) * percentage);
   int destroyed = (int)(rtrees(r, 2) * percentage);
@@ -2578,7 +2578,7 @@ sp_fumblecurse(castorder *co)
 
   target = pa->param[0]->data.u;
 
-  rx = rand()%3;
+  rx = rng_int()%3;
   sx = cast_level - effskill(target, SK_MAGIC);
   duration = max(sx, rx) + 1;
 
@@ -2660,8 +2660,8 @@ sp_summondragon(castorder *co)
   }
 
   for(time = 1; time < 7; time++){
-    if (rand()%100 < 25){
-      switch(rand()%3){
+    if (rng_int()%100 < 25){
+      switch(rng_int()%3){
       case 0:
         race = new_race[RC_WYRM];
         number = 1;
@@ -3007,7 +3007,7 @@ wisps_move(const border * b, struct unit * u, struct region * from, struct regio
     /* pick left and right region: */
     region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
     region * rr = rconnect(from, (direction_t)((reldir+1)%MAXDIRECTIONS));
-    int j = rand() % 3;
+    int j = rng_int() % 3;
     if (j==1 && rl && fval(rl->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rl;
     if (j==2 && rr && fval(rr->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rr;
   }
@@ -3318,7 +3318,7 @@ patzer_deathcloud(castorder *co)
   unit *mage = co->magician.u;
   int hp = (mage->hp - 2);
 
-  change_hitpoints(mage, -rand()%hp);
+  change_hitpoints(mage, -rng_int()%hp);
 
   ADDMSG(&mage->faction->msgs, msg_message(
     "magic_fumble", "unit region command",
@@ -3953,7 +3953,7 @@ sp_charmingsong(castorder *co)
     return 0;
   }
 
-  duration = 3 + rand()%(int)force;
+  duration = 3 + rng_int()%(int)force;
   {
     trigger * trestore = trigger_changefaction(target, target->faction);
     /* läuft die Dauer ab, setze Partei zurück */
@@ -4137,7 +4137,7 @@ sp_raisepeasantmob(castorder *co)
   double force = co->force;
   int duration = (int)force+1;
 
-  anteil.i = 6 + (rand()%4);
+  anteil.i = 6 + (rng_int()%4);
 
   n = rpeasants(r) * anteil.i / 10;
   n = max(0, n);
@@ -4609,7 +4609,7 @@ sp_seduce(castorder *co)
     item * itm = *itmp;
     loot = itm->number/2;
     if (itm->number % 2) {
-      loot += rand() % 2;
+      loot += rng_int() % 2;
     }
     if (loot > 0) {
       loot = (int)min(loot, force * 5);
@@ -4730,7 +4730,7 @@ sp_headache(castorder *co)
   }
   if (smax!=NULL) {
     /* wirkt auf maximal 10 Personen */
-    int change = min(10, target->number) * (rand()%2+1) / target->number;
+    int change = min(10, target->number) * (rng_int()%2+1) / target->number;
     reduce_skill(target, smax, change);
   }
   set_order(&target->thisorder, NULL);
@@ -4991,9 +4991,9 @@ sp_icastle(castorder *co)
 
   /* Größe festlegen. */
   if (type == bt_find("illusion")) {
-    b->size = (rand()%(int)((power*power)+1)*10);
+    b->size = (rng_int()%(int)((power*power)+1)*10);
   } else if (type->maxsize == -1) {
-    b->size = ((rand()%(int)(power))+1)*5;
+    b->size = ((rng_int()%(int)(power))+1)*5;
   } else {
     b->size = type->maxsize;
   }
@@ -5005,7 +5005,7 @@ sp_icastle(castorder *co)
   data = (icastle_data*)a->data.v;
   data->type = type;
   data->building = b;
-  data->time = 2+(rand()%(int)(power)+1)*(rand()%(int)(power)+1);
+  data->time = 2+(rng_int()%(int)(power)+1)*(rng_int()%(int)(power)+1);
 
   if(mage->region == r) {
     leave(r, mage);
@@ -5211,7 +5211,7 @@ sp_baddreams(castorder *co)
   /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
    * also duration+2 */
   duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
-  duration = 2 + rand()%duration;
+  duration = 2 + rng_int()%duration;
 
   /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
   effect.i = -1;
@@ -5252,7 +5252,7 @@ sp_gooddreams(castorder *co)
   /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
    * also duration+2 */
   duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
-  duration = 2 + rand()%duration;
+  duration = 2 + rng_int()%duration;
   effect.i = 1;
   c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
   curse_setflag(c, CURSE_ISNEW);
@@ -6304,7 +6304,7 @@ sp_disruptastral(castorder *co)
         if (u->race != new_race[RC_SPELL]) {
           region_list *trl2 = trl;
           region *tr;
-          int c = rand() % inhab_regions;
+          int c = rng_int() % inhab_regions;
 
           /* Zufällige Zielregion suchen */
           while (c--!=0) trl2 = trl2->next;
@@ -6507,7 +6507,7 @@ sp_movecastle(castorder *co)
   bunhash(b);
   translist(&r->buildings, &target_region->buildings, b);
   b->region = target_region;
-  b->size -= b->size/(10-rand()%6);
+  b->size -= b->size/(10-rng_int()%6);
   bhash(b);
 
   for(u=r->units;u;) {
@@ -6642,7 +6642,7 @@ sp_stealaura(castorder *co)
     return 0;
   }
 
-  taura = (get_mage(u)->spellpoints*(rand()%(int)(3*power)+1))/100;
+  taura = (get_mage(u)->spellpoints*(rng_int()%(int)(3*power)+1))/100;
 
   if(taura > 0) {
     get_mage(u)->spellpoints -= taura;
@@ -6725,7 +6725,7 @@ sp_antimagiczone(castorder *co)
  *
  * Wirkung:
  *   Gibt Gebäuden einen Bonus auf Magieresistenz von +20%. Der Zauber
- *   dauert 3+rand()%Level Wochen an, also im Extremfall bis zu 2 Jahre
+ *   dauert 3+rng_int()%Level Wochen an, also im Extremfall bis zu 2 Jahre
  *   bei Stufe 20
  *
  *   Es können mehrere Zauber übereinander gelegt werden, der Effekt
@@ -6734,7 +6734,7 @@ sp_antimagiczone(castorder *co)
  * oder:
  *
  *   Gibt Schiffen einen Bonus auf Magieresistenz von +20%. Der Zauber
- *   dauert 3+rand()%Level Wochen an, also im Extremfall bis zu 2 Jahre
+ *   dauert 3+rng_int()%Level Wochen an, also im Extremfall bis zu 2 Jahre
  *   bei Stufe 20
  *
  *   Es können mehrere Zauber übereinander gelegt werden, der Effekt
@@ -6759,7 +6759,7 @@ sp_magicrunes(castorder *co)
   spellparameter *pa = co->par;
   variant effect;
 
-  duration = 3 + rand()%cast_level;
+  duration = 3 + rng_int()%cast_level;
   effect.i = 20;
 
   switch(pa->param[0]->typ){
@@ -7116,7 +7116,7 @@ sp_wdwpyramid(castorder *co)
 
     assert(mindist >= 1);
 
-    minshowdist = mindist - rand()%5;
+    minshowdist = mindist - rng_int()%5;
     maxshowdist = minshowdist + 4;
 
     ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_notfound",

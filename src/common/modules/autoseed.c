@@ -27,8 +27,8 @@
 
 /* util includes */
 #include <util/base36.h>
-#include <util/sql.h>
 #include <util/goodies.h>
+#include <util/rng.h>
 #include <util/sql.h>
 
 /* libc includes */
@@ -51,7 +51,7 @@ random_terrain(boolean distribution)
     }
   }
 
-  n = rand() % (distribution?ndistribution:nterrains);
+  n = rng_int() % (distribution?ndistribution:nterrains);
   for (terrain=terrains();terrain;terrain=terrain->next) {
     n -= distribution?terrain->distribution:1;
     if (n<0) break;
@@ -152,7 +152,7 @@ fix_demand(region *r)
     for (i=maxlux;i!=2;++i) {
       int j;
       do {
-        int k = rand() % maxluxuries;
+        int k = rng_int() % maxluxuries;
         mlux[i] = ltypes[k];
         for (j=0;j!=i;++j) {
           if (mlux[j]==mlux[i]) break;
@@ -166,7 +166,7 @@ fix_demand(region *r)
     if (!fval(r, RF_CHAOTIC)) {
       log_warning(("fixing demand in %s\n", regionname(r, NULL)));
     }
-    sale = mlux[rand() % maxlux];
+    sale = mlux[rng_int() % maxlux];
     if (sale) setluxuries(r, sale);
   }
   while (rlist) {
@@ -200,8 +200,8 @@ read_newfactions(const char * filename)
     sscanf(buf, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance);
     if (email[0]=='\0') break;
     if (password[0]=='\0') {
-      strcpy(password, itoa36(rand()));
-      strcat(password, itoa36(rand()));
+      strcpy(password, itoa36(rng_int()));
+      strcat(password, itoa36(rng_int()));
     }
     for (f=factions;f;f=f->next) {
       if (strcmp(f->email, email)==0 && f->subscription && f->age<MINAGE_MULTI) break;
@@ -578,7 +578,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
   }
 
   while (rsize && (nsize || isize>=REGIONS_PER_FACTION)) {
-    int i = rand() % rsize;
+    int i = rng_int() % rsize;
     region_list ** rnext = &rlist;
     region_list * rfind;
     direction_t d;
@@ -602,9 +602,9 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         ++rsize;
       }
     }
-    if (volcano_terrain!=NULL && (rand() % VOLCANO_CHANCE == 0)) {
+    if (volcano_terrain!=NULL && (rng_int() % VOLCANO_CHANCE == 0)) {
       terraform_region(r, volcano_terrain);
-    } else if (nsize && (rand() % isize == 0 || rsize==0)) {
+    } else if (nsize && (rng_int() % isize == 0 || rsize==0)) {
       newfaction ** nfp, * nextf = *players;
       faction * f;
       unit * u;
@@ -692,7 +692,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
           if (rn==NULL) {
             const struct terrain_type * terrain = newterrain(T_OCEAN);
             rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
-            if (rand() % SPECIALCHANCE < special) {
+            if (rng_int() % SPECIALCHANCE < special) {
               terrain = random_terrain(true);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
             } else {
@@ -700,9 +700,9 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
             }
 						terraform_region(rn, terrain);
             /* the new region has an extra 15% chance to have laen */
-            if (rand() % 100 < 15) rsetlaen(r, 5 + rand() % 5);
+            if (rng_int() % 100 < 15) rsetlaen(r, 5 + rng_int() % 5);
             /* the new region has an extra 20% chance to have mallorn */
-            if (rand() % 100 < 20) fset(r, RF_MALLORN);
+            if (rng_int() % 100 < 20) fset(r, RF_MALLORN);
             add_regionlist(rend, rn);
           }
         }

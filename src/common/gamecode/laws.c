@@ -77,8 +77,10 @@
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/sql.h>
 #include <util/message.h>
+#include <util/rng.h>
 
 #include <modules/xecmd.h>
 
@@ -91,13 +93,27 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 
 #include <attributes/otherfaction.h>
+
+/* chance that a peasant dies of starvation: */
+#define PEASANT_STARVATION_CHANCE 0.9F
+/* Pferdevermehrung */
+#define HORSEGROWTH 4
+/* Wanderungschance pro Pferd */
+#define HORSEMOVE   3
+/* Vermehrungschance pro Baum */
+#define FORESTGROWTH 10000 /* In Millionstel */
+
+/** Ausbreitung und Vermehrung */
+#define MAXDEMAND      25
+#define DMRISE         0.1F /* weekly chance that demand goes up */
+#define DMRISEHAFEN    0.2F /* weekly chance that demand goes up with harbor */
+
 
 /* - external symbols ------------------------------------------ */
 extern int dropouts[2];
@@ -526,38 +542,43 @@ calculate_emigration(region *r)
 static void
 peasants(region * r)
 {
-  int glueck = 0;
   int peasants = rpeasants(r);
   int money = rmoney(r);
   int maxp = production(r) * MAXPEASANTS_PER_AREA;
   int n, satiated;
   int dead = 0;
-  attrib * a = a_find(r->attribs, &at_peasantluck);
 
   /* Bis zu 1000 Bauern können Zwillinge bekommen oder 1000 Bauern
    * wollen nicht! */
 
-  if (a!=NULL) {
-    glueck = a->data.i * 1000;
-  }
+  if (peasants>0) {
+    int glueck = 0;
+    int births = (int)(0.5F + peasants * 0.0001F * PEASANTGROWTH);
+    attrib * a = a_find(r->attribs, &at_peasantluck);
 
-  for (n = peasants; n; n--) {
-    int chances = 1;
-
-    if (glueck>0) {
-      --glueck;
-      chances += PEASANTLUCK;
+    if (a!=NULL) {
+      glueck = a->data.i * 1000;
     }
 
-    while (chances--) {
-      if (rand() % 10000 < PEASANTGROWTH) {
-        /* First chance always goes through. Next ones only with 75% chance if
-         * peasants have reached 90% of maxpopulation */
-        if (chances==0 || peasants/(float)maxp < 0.9 || chance(PEASANTFORCE)) {
-          ++peasants;
+    for (n = peasants; n; --n) {
+      int chances = 0;
+
+      if (glueck>0) {
+        --glueck;
+        chances += PEASANTLUCK;
+      }
+
+      while (chances--) {
+        if (rng_int() % 10000 < PEASANTGROWTH) {
+          /* Only raise with 75% chance if peasants have
+           * reached 90% of maxpopulation */
+          if (peasants/(float)maxp < 0.9 || chance(PEASANTFORCE)) {
+            ++births;
+          }
         }
       }
     }
+    peasants += births;
   }
 
   /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
@@ -571,9 +592,8 @@ peasants(region * r)
 
   /* Es verhungert maximal die unterernährten Bevölkerung. */
 
-  for (n = min((peasants - satiated), rpeasants(r)); n; n--) {
-    if (rand() % 100 > STARVATION_SURVIVAL) ++dead;
-  }
+  n = min(peasants - satiated, rpeasants(r));
+    dead += (int)(n * PEASANT_STARVATION_CHANCE);
 
   if (dead > 0) {
     message * msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
@@ -656,19 +676,21 @@ horses(region * r)
   maxhorses = maxworkingpeasants(r)/10;
   maxhorses = max(0, maxhorses);
   horses = rhorses(r);
-  if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
-    rsethorses(r, (int)(horses*0.9));
-  } else if (maxhorses > 0) {
-    int i;
-    int growth = (int)((RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses-horses))/maxhorses);
+  if (horses > 0) {
+    if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+      rsethorses(r, (int)(horses*0.9F));
+    } else if (maxhorses) {
+      int i;
+      double growth = (RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses-horses))/maxhorses;
 
-    if(a_find(r->attribs, &at_horseluck)) growth *= 2;
-    /* printf("Horses: <%d> %d -> ", growth, horses); */
-    for(i = 0; i < horses; i++) {
-      if(rand()%10000 < growth) horses++;
+      if (growth>0) {
+        if (a_find(r->attribs, &at_horseluck)) growth *= 2;
+        /* printf("Horses: <%d> %d -> ", growth, horses); */
+        i = (int)(0.5F + (horses * 0.0001F) * growth);
+        /* printf("%d\n", horses); */
+        rsethorses(r, horses + i);
+      }
     }
-    /* printf("%d\n", horses); */
-    rsethorses(r, horses);
   }
 
   /* Pferde wandern in Nachbarregionen.
@@ -743,7 +765,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
       return;
     }
 
-    if(production(r) <= 0) return;
+    if (production(r) <= 0) return;
 
     /* Grundchance 1.0% */
     seedchance = (int)(FORESTGROWTH * RESOURCE_QUANTITY);
@@ -752,8 +774,8 @@ trees(region * r, const int current_season, const int last_weeks_season)
     grownup_trees = rtrees(r, 2);
     seeds = 0;
 
-    for(i=0;i<grownup_trees;i++) {
-      if(rand()%1000000 < seedchance) seeds++;
+    if (grownup_trees>0) {
+      seeds += (int)(seedchance*0.000001F*grownup_trees);
     }
     rsettrees(r, 0, rtrees(r, 0) + seeds);
 
@@ -773,7 +795,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
         sprout = 0;
         seedchance = (1000 * maxworkingpeasants(r2)) / r2->terrain->size;
         for(i=0; i<seeds/MAXDIRECTIONS; i++) {
-          if(rand()%10000 < seedchance) sprout++;
+          if(rng_int()%10000 < seedchance) sprout++;
         }
         rsettrees(r2, 0, rtrees(r2, 0) + sprout);
       }
@@ -804,7 +826,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
     sprout = 0;
 
     for(i=0;i<seeds;i++) {
-      if(rand()%10000 < growth) sprout++;
+      if(rng_int()%10000 < growth) sprout++;
     }
     /* aus dem Samenpool dieses Jahres abziehen */
     a->data.sa[0] = (short)(seeds - sprout);
@@ -823,7 +845,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
     grownup_trees = 0;
 
     for(i=0;i<sprout;i++) {
-      if(rand()%10000 < growth) grownup_trees++;
+      if(rng_int()%10000 < growth) grownup_trees++;
     }
     /* aus dem Sprößlingepool dieses Jahres abziehen */
     a->data.sa[1] = (short)(sprout - grownup_trees);
@@ -841,7 +863,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
       || current_season == SEASON_AUTUMN)
   {
     for(i = rherbs(r); i > 0; i--) {
-      if (rand()%100 < (100-rherbs(r))) rsetherbs(r, (short)(rherbs(r)+1));
+      if (rng_int()%100 < (100-rherbs(r))) rsetherbs(r, (short)(rherbs(r)+1));
     }
   }
 }
@@ -868,9 +890,9 @@ demographics(void)
       struct demand * dmd;
       if (r->land) for (dmd=r->land->demands;dmd;dmd=dmd->next) {
         if (dmd->value>0 && dmd->value < MAXDEMAND) {
-          int rise = DMRISE;
+          float rise = DMRISE;
           if (buildingtype_exists(r, bt_find("harbour"))) rise = DMRISEHAFEN;
-          if (rand() % 100 < rise) dmd->value++;
+          if (rng_double()<rise) ++dmd->value;
         }
       }
       /* Seuchen erst nachdem die Bauern sich vermehrt haben
@@ -921,7 +943,7 @@ modify(int i)
   c = i * 2 / 3;
 
   if (c >= 1) {
-    return (c + rand() % c);
+    return (c + rng_int() % c);
   } else {
     return (i);
   }
@@ -1118,7 +1140,7 @@ parse_restart(void)
     }
     if (fval(f, FFL_OVERRIDE)) {
       free(f->override);
-      f->override = strdup(itoa36(rand()));
+      f->override = strdup(itoa36(rng_int()));
       freset(f, FFL_OVERRIDE);
     }
     if (turn!=f->lastorders) {
@@ -2075,7 +2097,7 @@ password_cmd(unit * u, struct order * ord)
   s = getstrtoken();
 
   if (!s || !*s) {
-    for(i=0; i<6; i++) pbuf[i] = (char)(97 + rand() % 26);
+    for(i=0; i<6; i++) pbuf[i] = (char)(97 + rng_int() % 26);
     pbuf[6] = 0;
   } else {
     boolean pwok = true;
@@ -2090,7 +2112,7 @@ password_cmd(unit * u, struct order * ord)
     }
     if (pwok == false) {
       cmistake(u, ord, 283, MSG_EVENT);
-      for(i=0; i<6; i++) pbuf[i] = (char)(97 + rand() % 26);
+      for(i=0; i<6; i++) pbuf[i] = (char)(97 + rng_int() % 26);
       pbuf[6] = 0;
     }
   }
@@ -2485,8 +2507,8 @@ promotion_cmd(unit * u, struct order * ord)
       u->race));
     return 0;
   }
-  money = get_pooled(u, i_silver->rtype, GET_ALL);
   people = count_all(u->faction) * u->number;
+  money = get_pooled(u, i_silver->rtype, GET_ALL, people);
 
   if (people>money) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_cost", "cost have",
@@ -3589,7 +3611,7 @@ use_item(unit * u, const item_type * itype, int amount, struct order * ord)
   int i;
   int target = read_unitid(u->faction, u->region);
 
-  i = get_pooled(u, itype->rtype, GET_DEFAULT);
+  i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
 
   if (amount>i) {
     amount = i;
@@ -3921,8 +3943,8 @@ processorders (void)
 
   puts(" - Attackieren");
   if (nobattle == false) do_battle();
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
 
   puts(" - Belagern");
   do_siege();
@@ -3936,8 +3958,8 @@ processorders (void)
   puts(" - Folge auf Einheiten ersetzen");
   follow_unit();
 
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
 
   puts(" - Zerstören, Geben, Rekrutieren, Vergessen");
   economics();
@@ -3980,8 +4002,8 @@ processorders (void)
   puts(" - Zufallsbegegnungen");
   encounters();
 
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
 
   puts(" - Monster fressen und vertreiben Bauern");
   monsters_kill_peasants();

@@ -26,11 +26,11 @@
 /* util includes */
 #include <util/functions.h>
 #include <util/rand.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
 #include <string.h>
-#include <stdlib.h>
 #include <limits.h>
 
 static int
@@ -98,7 +98,7 @@ use_phoenixcompass(struct unit * u, const struct item_type * itype,
       if(dist < closest_neighbour_distance) {
         closest_neighbour_direction = direction;
         closest_neighbour_distance = dist;
-      } else if(dist == closest_neighbour_distance && rand()%100 < 50) {
+      } else if(dist == closest_neighbour_distance && rng_int()%100 < 50) {
         /* there can never be more than two neighbours with the same
          * distance (except when you are standing in the same region
          * as the phoenix, but that case has already been handled).

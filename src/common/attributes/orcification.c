@@ -13,6 +13,7 @@
  */
 
 #include <config.h>
+#include <eressea.h>
 #include "orcification.h"
 
 #include <kernel/save.h>

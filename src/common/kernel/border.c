@@ -21,10 +21,11 @@
 #include "terrain.h"
 #include "unit.h"
 
+#include <util/rng.h>
+
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <string.h>
 
 extern boolean incomplete_data;
@@ -549,7 +550,7 @@ read_borders(FILE * f)
     }
 
     if (to==from) {
-      direction_t dir = (direction_t) (rand() % MAXDIRECTIONS);
+      direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
       region * r = rconnect(from, dir);
       log_error(("[read_borders] invalid %s in %s\n", type->__name, 
 				 regionname(from, NULL)));

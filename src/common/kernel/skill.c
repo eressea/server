@@ -35,6 +35,7 @@
 
 #include <util/attrib.h>
 #include <util/goodies.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -302,7 +303,7 @@ skill_weeks(int level)
 	int coins = 2*level;
 	int heads = 1;
 	while (coins--) {
-		heads += rand() % 2;
+		heads += rng_int() % 2;
 	}
 	return heads;
 }

@@ -21,6 +21,7 @@
 #include "terrain.h"
 
 #include <util/rand.h>
+#include <util/rng.h>
 
 #include <stdlib.h>
 #include <assert.h>
@@ -97,7 +98,7 @@ static void
 terraform_default(struct rawmaterial * res, const region * r)
 {
 #define SHIFT 70
-	double modifier = 1.0 + ((rand() % (SHIFT*2+1)) - SHIFT) * ((rand() % (SHIFT*2+1)) - SHIFT) / 10000.0;
+	double modifier = 1.0 + ((rng_int() % (SHIFT*2+1)) - SHIFT) * ((rng_int() % (SHIFT*2+1)) - SHIFT) / 10000.0;
 	res->amount = (int)(res->amount*modifier); /* random adjustment, +/- 91% */
 	if (res->amount<1) res->amount=1;
 	unused(r);
@@ -108,7 +109,7 @@ static void
 resource_random_change(int *pvalue, boolean used)
 {
 	int split = 5;
-	int rnd = rand()%100;
+	int rnd = rng_int()%100;
 
 	if (pvalue==0 || rnd %10 >= 10) return;
 	if (used) split = 4;
@@ -147,7 +148,7 @@ use_default(rawmaterial *res, const region * r, int amount)
   assert(res->amount>0 && amount>=0 && amount <= res->amount);
   res->amount-=amount;
   while (res->amount==0) {
-    double modifier = 1.0 + ((rand() % (SHIFT*2+1)) - SHIFT) * ((rand() % (SHIFT*2+1)) - SHIFT) / 10000.0;
+    double modifier = 1.0 + ((rng_int() % (SHIFT*2+1)) - SHIFT) * ((rng_int() % (SHIFT*2+1)) - SHIFT) / 10000.0;
     int i;
 
     for (i=0;r->terrain->production[i].type;++i) {

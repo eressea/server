@@ -56,6 +56,7 @@
 #include <util/bsdstring.h>
 #include <util/cvector.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/log.h>
 
 /* libc includes */
@@ -63,7 +64,6 @@
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -73,7 +73,7 @@ static FILE *bdebug;
 #undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
 #define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
-#define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rand() % INITIAL */
+#define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rng_int() % INITIAL */
 #define CATAPULT_STRUCTURAL_DAMAGE
 
 #define BASE_CHANCE    70 /* 70% Basis-Überlebenschance */
@@ -143,7 +143,7 @@ fleeregion(const unit * u)
 
 	if (!c)
 		return NULL;
-	return neighbours[rand() % c];
+	return neighbours[rng_int() % c];
 }
 
 static char *
@@ -331,7 +331,7 @@ select_corpse(battle * b, fighter * af)
 	}
 	cv_next(side);
 
-	di = rand() % maxcasualties;
+	di = rng_int() % maxcasualties;
 	cv_foreach(df, b->fighters) {
 		/* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
 		 * werden! */
@@ -522,7 +522,7 @@ contest(int skilldiff, const armor_type * ar, const armor_type * sh)
 	vw = (int)(100 - ((100 - vw) * mod));
 
 	do {
-		p = rand() % 100;
+		p = rng_int() % 100;
 		vw -= p;
 	}
 	while (vw >= 0 && p >= 90);
@@ -849,7 +849,7 @@ remove_troop(troop dt)
 void
 drain_exp(struct unit *u, int n)
 {
-	skill_t sk = (skill_t)(rand() % MAXSKILLS);
+	skill_t sk = (skill_t)(rng_int() % MAXSKILLS);
 	skill_t ssk;
 
 	ssk = sk;
@@ -870,7 +870,7 @@ drain_exp(struct unit *u, int n)
 				reduce_skill(u, sv, 1);
 				n-=30;
 			} else {
-				if (rand()%(30*u->number)<n) reduce_skill(u, sv, 1);
+				if (rng_int()%(30*u->number)<n) reduce_skill(u, sv, 1);
 				n = 0;
 			}
 		}
@@ -1192,7 +1192,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     const item_type * itype = (*pitm)->type;
     if (!itype->flags & ITF_CURSED && dt.index < (*pitm)->number) {
       /* 25% Grundchance, das ein Item kaputtgeht. */
-      if (rand() % 4 < 1) i_change(pitm, itype, -1);
+      if (rng_int() % 4 < 1) i_change(pitm, itype, -1);
     }
   }
   remove_troop(dt);
@@ -1269,7 +1269,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
   /* Niemand ist in der angegebenen Entfernung? */
   if (enemies<=0) return no_troop;
 
-  enemies = rand() % enemies;
+  enemies = rng_int() % enemies;
   for (si=0;as->enemies[si];++si) {
     side *ds = as->enemies[si];
     void ** fi;
@@ -1556,7 +1556,7 @@ do_combatspell(troop at, int row)
   }
 
   /* Antimagie die Fehlschlag erhöht */
-  if (rand()%100 < fumblechance) {
+  if (rng_int()%100 < fumblechance) {
     report_failed_spell(b, mage, sp);
     pay_spell(mage, sp, level, 1);
     free_order(ord);
@@ -1735,7 +1735,7 @@ attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 
 	if (wp == NULL) {
 		sprintf(smallbuf, "%s %s %s",
-			a_unit, noweap_string[rand()%4], d_unit);
+			a_unit, noweap_string[rng_int()%4], d_unit);
 		return smallbuf;
 	}
 
@@ -1779,12 +1779,12 @@ hits(troop at, troop dt, weapon * awp)
 			af->person[at.index].flags &= ~FL_STUNNED;
 		return 0;
 	}
-	if ((af->person[at.index].flags & FL_TIRED && rand()%100 < 50)
+	if ((af->person[at.index].flags & FL_TIRED && rng_int()%100 < 50)
 			|| (af->person[at.index].flags & FL_SLEEPING))
 		return 0;
 	if (awp && fval(awp->type, WTF_MISSILE)
 			&& af->side->battle->reelarrow == true
-			&& rand()%100 < 50)
+			&& rng_int()%100 < 50)
 	{
 		return 0;
 	}
@@ -2053,7 +2053,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
 		if (hits(ta, td, NULL)) {
 			int c = dice_rand(a->data.dice);
 			while(c > 0) {
-				if (rand()%2) {
+				if (rng_int()%2) {
 					td.fighter->person[td.index].attack -= 1;
 				} else {
 					td.fighter->person[td.index].defence -= 1;
@@ -2263,7 +2263,7 @@ loot_items(fighter * corpse)
           if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) maxrow = LAST_ROW;
           itm->number -= loot;
 
-          if (maxrow == LAST_ROW || rand() % 100 < lootchance) {
+          if (maxrow == LAST_ROW || rng_int() % 100 < lootchance) {
             fighter *fig = select_enemy(b, corpse, FIGHT_ROW, maxrow, false).fighter;
             if (fig) {
               item * l = fig->loot;
@@ -2382,7 +2382,7 @@ aftermath(battle * b)
     /* Regeneration durch PR_MERCY */
     if (dead>0 && pr_mercy) {
       for (i = 0; i != dead; ++i) {
-        if (rand()%100 < pr_mercy) {
+        if (rng_int()%100 < pr_mercy) {
           ++df->alive;
           ++df->side->alive;
           ++df->side->battle->alive;
@@ -3089,7 +3089,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 			int rnd;
 
 			do {
-				rnd = rand()%100;
+				rnd = rng_int()%100;
 				if (rnd >= 40 && rnd <= 69)
 					p_bonus += 1;
 				else if (rnd <= 89)

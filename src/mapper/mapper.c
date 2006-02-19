@@ -60,13 +60,13 @@
 /* util includes */
 #include <util/base36.h>
 #include <util/goodies.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <ctype.h>
 #include <limits.h>
 #include <locale.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -693,14 +693,14 @@ modify_block(void)
 					rsetname(r, name);
 					break;
 				case 'p':
-					rsetpeasants(r, (production(r)*3+rand()%(production(r)*3))/div);
-					rsetmoney(r, (production(r)*10+rand()%(production(r)*10))/div);
+					rsetpeasants(r, (production(r)*3+rng_int()%(production(r)*3))/div);
+					rsetmoney(r, (production(r)*10+rng_int()%(production(r)*10))/div);
 					break;
 				case 'h':
-					rsethorses(r, rand()%(production(r) / 10));
+					rsethorses(r, rng_int()%(production(r) / 10));
 					break;
 				case 's':
-					rsetmoney(r, production(r)*10+rand()%(production(r)*10));
+					rsetmoney(r, production(r)*10+rng_int()%(production(r)*10));
 					break;
 				case 'r':
 					for (res=r->resources;res;res=res->next) {
@@ -1528,7 +1528,7 @@ makemonsters(void)
 	f->subscription = 0;
 	f->name=strdup("Monster");
 	f->passw=strdup("abc123");
-	f->override = strdup(itoa36(rand()));
+	f->override = strdup(itoa36(rng_int()));
 	return f;
 }
 
@@ -1701,7 +1701,7 @@ main(int argc, char *argv[])
 	make_xref();
 #endif
 	setminmax();
-	srand(time((time_t *) NULL));
+	rng_init(time((time_t *) NULL));
 
 	if (autoseeding) {
 		runautoseed();

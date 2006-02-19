@@ -194,7 +194,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
       int j = study_cost(student, sk);
       j = max(50, j * 2);
       /* kann Einheit das zahlen? */
-      if (get_pooled(student, oldresourcetype[R_SILVER], GET_DEFAULT) >= j) {
+      if (get_pooled(student, oldresourcetype[R_SILVER], GET_DEFAULT, j) >= j) {
         /* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
         teach->value += (n / 30) * 10; /* learning erhöhen */
         /* Lehrer zusätzlich +1 Tag pro Schüler. */
@@ -605,8 +605,9 @@ learn(void)
             }
         }
         if (studycost) {
-          money = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT);
-          money = min(money, studycost * u->number);
+          int cost = studycost * u->number;
+          money = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, cost);
+          money = min(money, cost);
         }
         if (money < studycost * u->number) {
           studycost = p;	/* Ohne Univertreurung */

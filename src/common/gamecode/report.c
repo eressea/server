@@ -68,12 +68,13 @@
 
 /* util includes */
 #include <util/bsdstring.h>
-#include <goodies.h>
-#include <base36.h>
-#include <nrmessage.h>
-#include <translation.h>
+#include <util/goodies.h>
+#include <util/base36.h>
+#include <util/nrmessage.h>
+#include <util/translation.h>
 #include <util/message.h>
-#include <log.h>
+#include <util/rng.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <assert.h>
@@ -1234,8 +1235,9 @@ report_template(const char * filename, report_context * ctx)
   faction * f = ctx->f;
   region *r;
   plane *pl;
-  region *last = lastregion(f);
   FILE * F = fopen(filename, "wt");
+  seen_region * sr = NULL;
+
   if (F==NULL) {
     perror(filename);
     return -1;
@@ -1260,11 +1262,18 @@ report_template(const char * filename, report_context * ctx)
   rps_nowrap(F, buf);
   rnl(F);
 
-  for (r = firstregion(f); r != last; r = r->next) {
+  for (r=ctx->first; sr==NULL && r!=ctx->last; r=r->next) {
+    sr = find_seen(ctx->seen, r);
+  }
+  
+  for (;sr!=NULL;sr=sr->next) {
+    region * r = sr->r;
     unit *u;
-
     int dh = 0;
-    for (u = r->units; u; u = u->next)
+    
+    if (sr->mode<see_unit) continue;
+
+    for (u = r->units; u; u = u->next) {
       if (u->faction == f && u->race != new_race[RC_SPELL]) {
         order * ord;
         if (!dh) {
@@ -1349,6 +1358,7 @@ report_template(const char * filename, report_context * ctx)
         }
 #endif
       }
+    }
   }
   rps_nowrap(F, "");
   rnl(F);
@@ -1721,22 +1731,24 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 int
 report_plaintext(const char * filename, report_context * ctx)
 {
-	int flag = 0;
-	char ch;
-	int dh;
-	int anyunits;
-	const struct region *r;
+  int flag = 0;
+  char ch;
+  int dh;
+  int anyunits;
+  const struct region *r;
   faction * f = ctx->f;
-	building *b;
-	ship *sh;
-	unit *u;
+  building *b;
+  ship *sh;
+  unit *u;
   char pzTime[64];
-	attrib *a;
-	message * m;
-	unsigned char op;
+  attrib *a;
+  message * m;
+  unsigned char op;
   int ix = Pow(O_STATISTICS);
-	int wants_stats = (f->options & ix);
+  int wants_stats = (f->options & ix);
   FILE * F = fopen(filename, "wt");
+  seen_region * sr = NULL;
+
   if (F==NULL) {
     perror(filename);
     return -1;
@@ -1952,30 +1964,32 @@ report_plaintext(const char * filename, report_context * ctx)
         const char * potiontext = mkname("potion", pname);
         description = LOC(f->locale, potiontext);
       }
-		  centre(F, description, true);
+      centre(F, description, true);
     }
 	}
-	rnl(F);
-	centre(F, LOC(f->locale, "nr_alliances"), false);
-	rnl(F);
-
+  rnl(F);
+  centre(F, LOC(f->locale, "nr_alliances"), false);
+  rnl(F);
+  
 #ifdef ENEMIES
   enemies(F, f);
 #endif
-	allies(F, f);
+  allies(F, f);
+  
+  rpline(F);
+  
+  anyunits = 0;
 
-	rpline(F);
-
-	anyunits = 0;
-
-  for (r=ctx->first;r!=ctx->last;r=r->next) {
+  for (r=ctx->first;sr==NULL && r!=ctx->last;r=r->next) {
+    sr = find_seen(ctx->seen, r);
+  }
+  for (;sr!=NULL;sr=sr->next) {
+    region * r = sr->r;
     boolean unit_in_region = false;
     boolean durchgezogen_in_region = false;
     int turm_sieht_region = false;
-    seen_region * sd = find_seen(ctx->seen, r);
-    if (sd==NULL) continue;
     
-    switch (sd->mode) {
+    switch (sr->mode) {
     case see_lighthouse:
       turm_sieht_region = true;
       break;
@@ -1991,7 +2005,6 @@ report_plaintext(const char * filename, report_context * ctx)
     default:
       continue;
     }
-    r = sd->r;
     /* Beschreibung */
     
     if (unit_in_region) {
@@ -2004,68 +2017,68 @@ report_plaintext(const char * filename, report_context * ctx)
       durchreisende(F, r, f);
     }
     else {
-      if (sd->mode==see_far) {
-			  describe(F, r, 3, f);
-			  guards(F, r, f);
-			  durchreisende(F, r, f);
-		  }
-		  else if (turm_sieht_region) {
-			  describe(F, r, 2, f);
-			  durchreisende(F, r, f);
-		  } else {
-			  describe(F, r, 1, f);
-			  durchreisende(F, r, f);
-		  }
+      if (sr->mode==see_far) {
+        describe(F, r, 3, f);
+        guards(F, r, f);
+        durchreisende(F, r, f);
+      }
+      else if (turm_sieht_region) {
+        describe(F, r, 2, f);
+        durchreisende(F, r, f);
+      } else {
+        describe(F, r, 1, f);
+        durchreisende(F, r, f);
+      }
     }
-		/* Statistik */
+    /* Statistik */
+    
+    if (wants_stats && unit_in_region == 1)
+        statistics(F, r, f);
+    
+    /* Nachrichten an REGION in der Region */
+    
+    if (unit_in_region || durchgezogen_in_region) {
+      message_list * mlist = r_getmessages(r, f);
+      rp_messages(F, r->msgs, f, 0, true);
+      if (mlist) rp_messages(F, mlist, f, 0, true);
+    }
+    /* Burgen und ihre Einheiten */
+    
+    for (b = rbuildings(r); b; b = b->next) {
+      rnl(F);
+      report_building(F, r, b, f, sr->mode);
+    }
+    
+    /* Restliche Einheiten */
+    
+    if (sr->mode>=see_lighthouse) {
+      for (u = r->units; u; u = u->next) {
+        if (!u->building && !u->ship) {
+          if ((u->faction == f) ||
+              (unit_in_region && cansee(f, r, u, 0)) ||
+              (durchgezogen_in_region && cansee(f, r, u, -1)) ||
+              (sr->mode==see_far && cansee(f, r, u, -2)) ||
+              (turm_sieht_region && cansee(f, r, u, -2)))
+          {
+            if (dh == 0 && !(rbuildings(r) || r->ships)) {
+              dh = 1;
+              /* rnl(F); */
+            }
+            rpunit(F, f, u, 4, sr->mode);
+          }
+        }
+      }
+    }
+    
+    /* Schiffe und ihre Einheiten */
 
-		if (wants_stats && unit_in_region == 1)
-			statistics(F, r, f);
-
-		/* Nachrichten an REGION in der Region */
-
-		if (unit_in_region || durchgezogen_in_region) {
-			message_list * mlist = r_getmessages(r, f);
-			rp_messages(F, r->msgs, f, 0, true);
-			if (mlist) rp_messages(F, mlist, f, 0, true);
-		}
-		/* Burgen und ihre Einheiten */
-
-		for (b = rbuildings(r); b; b = b->next) {
-			rnl(F);
-			report_building(F, r, b, f, sd->mode);
-		}
-
-		/* Restliche Einheiten */
-
-		if (sd->mode>=see_lighthouse) {
-			for (u = r->units; u; u = u->next) {
-				if (!u->building && !u->ship) {
-					if ((u->faction == f) ||
-					    (unit_in_region && cansee(f, r, u, 0)) ||
-					    (durchgezogen_in_region && cansee(f, r, u, -1)) ||
-					    (sd->mode==see_far && cansee(f, r, u, -2)) ||
-					    (turm_sieht_region && cansee(f, r, u, -2)))
-					{
-						if (dh == 0 && !(rbuildings(r) || r->ships)) {
-							dh = 1;
-							/* rnl(F); */
-						}
-						rpunit(F, f, u, 4, sd->mode);
-					}
-				}
-			}
-		}
-
-		/* Schiffe und ihre Einheiten */
-
-		for (sh = r->ships; sh; sh = sh->next) {
-			faction *of = NULL;
-
-			rnl(F);
-
-			/* Gewicht feststellen */
-
+    for (sh = r->ships; sh; sh = sh->next) {
+      faction *of = NULL;
+      
+      rnl(F);
+      
+      /* Gewicht feststellen */
+      
       for (u = r->units; u; u = u->next) {
         if (u->ship == sh && fval(u, UFL_OWNER)) {
           of = u->faction;
@@ -2076,7 +2089,7 @@ report_plaintext(const char * filename, report_context * ctx)
         int n = 0, p = 0;
         getshipweight(sh, &n, &p);
         n = (n+99) / 100; /* 1 Silber = 1 GE */
-
+        
         sprintf(buf, "%s, %s, (%d/%d)", shipname(sh), 
           LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
       } else {
@@ -2116,13 +2129,13 @@ report_plaintext(const char * filename, report_context * ctx)
 
       for (u = r->units; u; u = u->next) {
         if (u->ship == sh && fval(u, UFL_OWNER)) {
-          rpunit(F, f, u, 6, sd->mode);
+          rpunit(F, f, u, 6, sr->mode);
           break;
         }
       }
       for (u = r->units; u; u = u->next) {
         if (u->ship == sh && !fval(u, UFL_OWNER)) {
-          rpunit(F, f, u, 6, sd->mode);
+          rpunit(F, f, u, 6, sr->mode);
         }
       }
     }
@@ -2490,7 +2503,7 @@ writemonument(void)
 	fprintf(F, "\n--- newcomer ---\n\n");
 
 	if(count > 7) {
-		ra = rand()%(count-7);
+		ra = rng_int()%(count-7);
 		j = 0;
 		for (r = regions; r; r = r->next) {
 			for (b = r->buildings; b; b = b->next) {

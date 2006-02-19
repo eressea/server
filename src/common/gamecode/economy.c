@@ -58,11 +58,11 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/message.h>
+#include <util/rng.h>
 
 /* libs includes */
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
@@ -116,7 +116,7 @@ scramble(void *data, int n, size_t width)
   char temp[64];
   assert(width<=sizeof(temp));
   for (j=0;j!=n;++j) {
-    int k = rand() % n;
+    int k = rng_int() % n;
 	if (k==j) continue;
     memcpy(temp, (char*)data+j*width, width);
     memcpy((char*)data+j*width, (char*)data+k*width, width);
@@ -325,7 +325,7 @@ do_recruiting(recruitment * recruits, int available)
 
       if (want>0) {
         int get = mintotal;
-        if (want>mintotal && rest<n && (rand() % n) < rest) {
+        if (want>mintotal && rest<n && (rng_int() % n) < rest) {
           --rest;
           ++get;
         }
@@ -349,7 +349,7 @@ do_recruiting(recruitment * recruits, int available)
 
       number = min(req->qty, get / multi);
       if (rc->recruitcost) {
-        int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) / rc->recruitcost;
+        int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, number*rc->recruitcost) / rc->recruitcost;
         number = min(number, afford);
         use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, rc->recruitcost*number);
       }
@@ -494,60 +494,63 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
       return;
     }
   }
-
-	recruitcost = rc->recruitcost;
-	if (recruitcost) {
-		pl = getplane(r);
-		if (pl && fval(pl, PFL_NORECRUITS)) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "error_pflnorecruit", ""));
-			return;
-		}
-
-		if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) < recruitcost) {
+  
+  recruitcost = rc->recruitcost;
+  if (recruitcost) {
+    pl = getplane(r);
+    if (pl && fval(pl, PFL_NORECRUITS)) {
+      ADDMSG(&u->faction->msgs,
+             msg_feedback(u, ord, "error_pflnorecruit", ""));
+      return;
+    }
+    
+    if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost) < recruitcost) {
       cmistake(u, ord, 142, MSG_EVENT);
-			return;
-		}
-	}
-	if (!playerrace(u->race) || idle(u->faction)) {
-		cmistake(u, ord, 139, MSG_EVENT);
-		return;
-	}
-	/* snotlinge sollten hiermit bereits abgefangen werden, die
-	* parteirasse ist uruk oder ork*/
-	if (u->race != rc) {
-		if (u->number != 0) {
-			cmistake(u, ord, 139, MSG_EVENT);
-			return;
-		}
-		else u->race = rc;
-	}
-
-	if (has_skill(u, SK_MAGIC)) {
-		/* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
-		* grundsätzlich nur alleine! */
-		cmistake(u, ord, 158, MSG_EVENT);
-		return;
-	}
-	if (has_skill(u, SK_ALCHEMY)
-		&& count_skill(u->faction, SK_ALCHEMY) + n >
-		max_skill(u->faction, SK_ALCHEMY))
-	{
-		cmistake(u, ord, 156, MSG_EVENT);
-		return;
-	}
-	if (recruitcost) n = min(n, get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) / recruitcost);
-
-	u->wants = n;
-
-	if (!n) {
-		cmistake(u, ord, 142, MSG_EVENT);
-		return;
-	}
-	o = (request *) calloc(1, sizeof(request));
-	o->qty = n;
-	o->unit = u;
-	addlist(recruitorders, o);
+      return;
+    }
+  }
+  if (!playerrace(u->race) || idle(u->faction)) {
+    cmistake(u, ord, 139, MSG_EVENT);
+    return;
+  }
+  /* snotlinge sollten hiermit bereits abgefangen werden, die
+   * parteirasse ist uruk oder ork*/
+  if (u->race != rc) {
+    if (u->number != 0) {
+      cmistake(u, ord, 139, MSG_EVENT);
+      return;
+    }
+    else u->race = rc;
+  }
+  
+  if (has_skill(u, SK_MAGIC)) {
+    /* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
+     * grundsätzlich nur alleine! */
+    cmistake(u, ord, 158, MSG_EVENT);
+    return;
+  }
+  if (has_skill(u, SK_ALCHEMY)
+      && count_skill(u->faction, SK_ALCHEMY) + n >
+      max_skill(u->faction, SK_ALCHEMY))
+  {
+    cmistake(u, ord, 156, MSG_EVENT);
+    return;
+  }
+  if (recruitcost>0) {
+    int pooled = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost * n);
+    n = min(n, pooled / recruitcost);
+  }
+  
+  u->wants = n;
+  
+  if (!n) {
+    cmistake(u, ord, 142, MSG_EVENT);
+    return;
+  }
+  o = (request *) calloc(1, sizeof(request));
+  o->qty = n;
+  o->unit = u;
+  addlist(recruitorders, o);
 }
 /* ------------------------------------------------------------- */
 
@@ -871,43 +874,43 @@ maintain(building * b, boolean first)
 		fset(b, BLD_WORKING);
 		return true;
 	}
-	u = buildingowner(r, b);
-	if (u==NULL) return false;
-	for (c=0;b->type->maintenance[c].number;++c) {
-		const maintenance * m = b->type->maintenance+c;
-		int need = m->number;
-
-		if (fval(m, MTF_VARIABLE)) need = need * b->size;
-		if (u) {
-			/* first ist im ersten versuch true, im zweiten aber false! Das
-			* bedeutet, das in der Runde in die Region geschafften Resourcen
-			* nicht genutzt werden können, weil die reserviert sind! */
-			if (!first) need -= get_pooled(u, m->rtype, GET_ALL);
-			else need -= get_pooled(u, m->rtype, GET_DEFAULT);
-			if (!first && need > 0) {
-				unit * ua;
-				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
-				fset(u->faction, FL_DH); /* hat schon */
-				for (ua=r->units;ua;ua=ua->next) {
-					if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
-						need -= get_pooled(ua, m->rtype, GET_ALL);
-						fset(ua->faction, FL_DH);
-						if (need<=0) break;
-					}
-				}
-			}
-			if (need > 0) {
-				if (!fval(m, MTF_VITAL)) work = false;
-				else {
-					paid = false;
-					break;
-				}
-			}
-		}
-	}
-	if (paid && c>0) {
-		/* TODO: wieviel von was wurde bezahlt */
-		if (first) {
+  u = buildingowner(r, b);
+  if (u==NULL) return false;
+  for (c=0;b->type->maintenance[c].number;++c) {
+    const maintenance * m = b->type->maintenance+c;
+    int need = m->number;
+    
+    if (fval(m, MTF_VARIABLE)) need = need * b->size;
+    if (u) {
+      /* first ist im ersten versuch true, im zweiten aber false! Das
+       * bedeutet, das in der Runde in die Region geschafften Resourcen
+       * nicht genutzt werden können, weil die reserviert sind! */
+      if (!first) need -= get_pooled(u, m->rtype, GET_ALL, need);
+      else need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
+      if (!first && need > 0) {
+        unit * ua;
+        for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
+        fset(u->faction, FL_DH); /* hat schon */
+        for (ua=r->units;ua;ua=ua->next) {
+          if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
+            need -= get_pooled(ua, m->rtype, GET_ALL, need);
+            fset(ua->faction, FL_DH);
+            if (need<=0) break;
+          }
+        }
+      }
+      if (need > 0) {
+        if (!fval(m, MTF_VITAL)) work = false;
+        else {
+          paid = false;
+          break;
+        }
+      }
+    }
+  }
+  if (paid && c>0) {
+    /* TODO: wieviel von was wurde bezahlt */
+    if (first) {
 			ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
 		} else {
 			ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
@@ -968,7 +971,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 			leave(r,u);
 			n = u->number;
 			for (i = 0; i < n; i++) {
-				if (rand() % 100 >= EINSTURZUEBERLEBEN) {
+				if (rng_int() % 100 >= EINSTURZUEBERLEBEN) {
 					++loss;
 				}
 			}
@@ -1002,7 +1005,7 @@ maintain_buildings(boolean crash)
 
       /* the second time, send a message */
       if (crash) {
-        if (!maintained && (rand() % 100 < EINSTURZCHANCE)) {
+        if (!maintained && (rng_int() % 100 < EINSTURZCHANCE)) {
   				gebaeude_stuerzt_ein(r, b);
 	  			continue;
         } else if (!fval(b, BLD_WORKING)) {
@@ -1409,7 +1412,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
             int want = required(al->want-al->get, al->save);
             int x = avail*want/norders;
             /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-            if (rand() % norders < (avail*want) % norders)
+            if (rng_int() % norders < (avail*want) % norders)
               ++x;
             avail -= x;
             use += x;
@@ -1453,7 +1456,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
       int want = required(al->want, al->save);
       int x = avail*want/norders;
       /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-      if (rand() % norders < (avail*want) % norders)
+      if (rng_int() % norders < (avail*want) % norders)
         ++x;
       avail -= x;
       norders -= want;
@@ -1757,32 +1760,32 @@ expandbuying(region * r, request * buyorders)
 
 	max_products = rpeasants(r) / TRADE_FRACTION;
 
-	/* Kauf - auch so programmiert, daß er leicht erweiterbar auf mehrere
-	* Güter pro Monat ist. j sind die Befehle, i der Index des
-	* gehandelten Produktes. */
+  /* Kauf - auch so programmiert, daß er leicht erweiterbar auf mehrere
+   * Güter pro Monat ist. j sind die Befehle, i der Index des
+   * gehandelten Produktes. */
   if (max_products>0) {
-	expandorders(r, buyorders);
-	if (!norders) return;
-
-	for (j = 0; j != norders; j++) {
-		int price, multi;
-		ltype = oa[j].type.ltype;
-		trade = trades;
-		while (trade->type!=ltype) ++trade;
-		multi = trade->multi;
-		if (trade->number + 1 > max_products) ++multi;
-		price = ltype->price * multi;
-
-		if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT) >= price) {
-			unit * u = oa[j].unit;
-
-			/* litems zählt die Güter, die verkauft wurden, u->n das Geld, das
-			* verdient wurde. Dies muß gemacht werden, weil der Preis ständig sinkt,
-			* man sich also das verdiente Geld und die verkauften Produkte separat
-			* merken muß. */
-			attrib * a = a_find(u->attribs, &at_luxuries);
-			if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
-			i_change((item**)&a->data.v, ltype->itype, 1);
+    expandorders(r, buyorders);
+    if (!norders) return;
+    
+    for (j = 0; j != norders; j++) {
+      int price, multi;
+      ltype = oa[j].type.ltype;
+      trade = trades;
+      while (trade->type!=ltype) ++trade;
+      multi = trade->multi;
+      if (trade->number + 1 > max_products) ++multi;
+      price = ltype->price * multi;
+      
+      if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT, price) >= price) {
+        unit * u = oa[j].unit;
+        
+        /* litems zählt die Güter, die verkauft wurden, u->n das Geld, das
+         * verdient wurde. Dies muß gemacht werden, weil der Preis ständig sinkt,
+         * man sich also das verdiente Geld und die verkauften Produkte separat
+         * merken muß. */
+        attrib * a = a_find(u->attribs, &at_luxuries);
+        if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
+        i_change((item**)&a->data.v, ltype->itype, 1);
 			i_change(&oa[j].unit->items, ltype->itype, 1);
 			use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
 			if (u->n < 0)
@@ -2113,13 +2116,13 @@ static boolean
 sell(unit * u, request ** sellorders, struct order * ord)
 {
   boolean unlimited = true;
-	const item_type * itype;
-	const luxury_type * ltype=NULL;
-	int n;
+  const item_type * itype;
+  const luxury_type * ltype=NULL;
+  int n;
   region * r = u->region;
-	const char *s;
-
-	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+  const char *s;
+  
+  if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
 		cmistake(u, ord, 69, MSG_INCOME);
 		return false;
 	}
@@ -2165,13 +2168,13 @@ sell(unit * u, request ** sellorders, struct order * ord)
     building * b;
     static const struct building_type * bt_castle;
     if (!bt_castle) bt_castle = bt_find("castle");
-    for (b=r->buildings;b;b=b->next) {
-      if (b->type==bt_castle && b->size>=2) break;
+          for (b=r->buildings;b;b=b->next) {
+            if (b->type==bt_castle && b->size>=2) break;
     }
-		if (b==NULL) {
-			cmistake(u, ord, 119, MSG_COMMERCE);
-			return false;
-		}
+          if (b==NULL) {
+            cmistake(u, ord, 119, MSG_COMMERCE);
+            return false;
+          }
 	}
 
 	/* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */
@@ -2189,27 +2192,27 @@ sell(unit * u, request ** sellorders, struct order * ord)
 		cmistake(u, ord, 126, MSG_COMMERCE);
 		return false;
 	}
-	else {
-		attrib * a;
+  else {
+    attrib * a;
     request *o;
-		int k, available;
+    int k, available;
+    
+    if (!r_demand(r, ltype)) {
+      cmistake(u, ord, 263, MSG_COMMERCE);
+      return false;
+    }
+    available = get_pooled(u, itype->rtype, GET_DEFAULT, INT_MAX);
 
-		if (!r_demand(r, ltype)) {
-			cmistake(u, ord, 263, MSG_COMMERCE);
-			return false;
-		}
-		available = get_pooled(u, itype->rtype, GET_DEFAULT);
-
-		/* Wenn andere Einheiten das selbe verkaufen, muß ihr Zeug abgezogen
-		* werden damit es nicht zweimal verkauft wird: */
-		for (o=*sellorders;o;o=o->next) {
-			if (o->type.ltype==ltype && o->unit->faction == u->faction) {
-				int fpool = o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE);
-				available -= max(0, fpool);
-			}
-		}
-
-		n = min(n, available);
+    /* Wenn andere Einheiten das selbe verkaufen, muß ihr Zeug abgezogen
+     * werden damit es nicht zweimal verkauft wird: */
+    for (o=*sellorders;o;o=o->next) {
+      if (o->type.ltype==ltype && o->unit->faction == u->faction) {
+        int fpool = o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
+        available -= max(0, fpool);
+      }
+    }
+    
+    n = min(n, available);
 
 		if (n <= 0) {
 			cmistake(u, ord, 264, MSG_COMMERCE);
@@ -2262,212 +2265,212 @@ expandstealing(region * r, request * stealorders)
 	* u ist die beklaute unit. oa.unit ist die klauende unit.
 	*/
 
-	for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
-		unit *u = findunitg(oa[i].no, r);
-		int n = 0;
-		if (u && u->region==r) n = get_pooled(u, r_silver, GET_ALL);
+  for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
+    unit *u = findunitg(oa[i].no, r);
+    int n = 0;
+    if (u && u->region==r) {
+      n = get_pooled(u, r_silver, GET_ALL, INT_MAX);
+    }
 #ifndef GOBLINKILL
-		if (oa[i].type.goblin) { /* Goblin-Spezialklau */
-			int uct = 0;
-			unit *u2;
-			assert(effskill(oa[i].unit, SK_STEALTH)>=4 || !"this goblin\'s talent is too low");
+    if (oa[i].type.goblin) { /* Goblin-Spezialklau */
+      int uct = 0;
+      unit *u2;
+      assert(effskill(oa[i].unit, SK_STEALTH)>=4 || !"this goblin\'s talent is too low");
       for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == u->faction) {
           uct += maintenance_cost(u2);
         }
       }
-			n -= uct * 2;
-		}
+      n -= uct * 2;
+    }
 #endif
-		if (n>10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
-			/* In Questen nur reduziertes Klauen */
-			n = 10;
-		}
-		if (n > 0) {
-			n = min(n, oa[i].unit->wants);
-			use_pooled(u, r_silver, GET_ALL, n);
-			oa[i].unit->n = n;
-			change_money(oa[i].unit, n);
-			ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
-		}
-		add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
+    if (n>10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
+      /* In Questen nur reduziertes Klauen */
+      n = 10;
+    }
+    if (n > 0) {
+      n = min(n, oa[i].unit->wants);
+      use_pooled(u, r_silver, GET_ALL, n);
+      oa[i].unit->n = n;
+      change_money(oa[i].unit, n);
+      ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
+    }
+    add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
     fset(oa[i].unit, UFL_LONGACTION);
-	}
-	free(oa);
+  }
+  free(oa);
 }
 
 /* ------------------------------------------------------------- */
 static void
 plant(region *r, unit *u, int raw)
 {
-	int n, i, skill, planted = 0;
+  int n, i, skill, planted = 0;
   const item_type * itype;
   static const resource_type * rt_water = NULL;
   if (rt_water==NULL) rt_water = rt_find("p2");
-
+  
   assert(rt_water!=NULL);
-	if (!fval(r->terrain, LAND_REGION)) {
-		return;
-	}
-	if (rherbtype(r) == NULL) {
-		cmistake(u, u->thisorder, 108, MSG_PRODUCE);
-		return;
-	}
-
-	/* Skill prüfen */
-	skill = eff_skill(u, SK_HERBALISM, r);
-	itype = rherbtype(r);
-	if (skill < 6) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "plant_skills",
+  if (!fval(r->terrain, LAND_REGION)) {
+    return;
+  }
+  if (rherbtype(r) == NULL) {
+    cmistake(u, u->thisorder, 108, MSG_PRODUCE);
+    return;
+  }
+  
+  /* Skill prüfen */
+  skill = eff_skill(u, SK_HERBALISM, r);
+  itype = rherbtype(r);
+  if (skill < 6) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "plant_skills",
 			"skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
-		return;
-	}
-	/* Wasser des Lebens prüfen */
-	if (get_pooled(u, rt_water, GET_DEFAULT) == 0) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
-		return;
-	}
-	n = get_pooled(u, itype->rtype, GET_DEFAULT);
-	/* Kräuter prüfen */
-	if (n==0) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing",
+    return;
+  }
+  /* Wasser des Lebens prüfen */
+  if (get_pooled(u, rt_water, GET_DEFAULT, 1) == 0) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
+    return;
+  }
+  n = get_pooled(u, itype->rtype, GET_DEFAULT, skill*u->number);
+  /* Kräuter prüfen */
+  if (n==0) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "resource_missing", "missing",
 			itype->rtype));
-		return;
-	}
+    return;
+  }
 
-	n = min(skill*u->number, n);
-	n = min(raw, n);
-	/* Für jedes Kraut Talent*10% Erfolgschance. */
-	for(i = n; i>0; i--) {
-		if (rand()%10 < skill) planted++;
-	}
-	produceexp(u, SK_HERBALISM, u->number);
-
-	/* Alles ok. Abziehen. */
-	use_pooled(u, rt_water, GET_DEFAULT, 1);
-	use_pooled(u, itype->rtype, GET_DEFAULT, n);
-	rsetherbs(r, rherbs(r)+planted);
-	ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb", 
-    u, r, planted, itype->rtype));
+  n = min(skill*u->number, n);
+  n = min(raw, n);
+  /* Für jedes Kraut Talent*10% Erfolgschance. */
+  for(i = n; i>0; i--) {
+    if (rng_int()%10 < skill) planted++;
+  }
+  produceexp(u, SK_HERBALISM, u->number);
+  
+  /* Alles ok. Abziehen. */
+  use_pooled(u, rt_water, GET_DEFAULT, 1);
+  use_pooled(u, itype->rtype, GET_DEFAULT, n);
+  rsetherbs(r, rherbs(r)+planted);
+  ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb", 
+                                        u, r, planted, itype->rtype));
 }
 
 static void
 planttrees(region *r, unit *u, int raw)
 {
-	int n, i, skill, planted = 0;
-	const resource_type * rtype;
-
-	if (!fval(r->terrain, LAND_REGION)) {
-		return;
-	}
-
-	/* Mallornbäume kann man nur in Mallornregionen züchten */
-	if (fval(r, RF_MALLORN)) {
-		rtype = rt_mallornseed;
-	} else {
-		rtype = rt_seed;
-	}
-
-	/* Skill prüfen */
-	skill = eff_skill(u, SK_HERBALISM, r);
-	if (skill < 6) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "plant_skills",
+  int n, i, skill, planted = 0;
+  const resource_type * rtype;
+  
+  if (!fval(r->terrain, LAND_REGION)) {
+    return;
+  }
+  
+  /* Mallornbäume kann man nur in Mallornregionen züchten */
+  if (fval(r, RF_MALLORN)) {
+    rtype = rt_mallornseed;
+  } else {
+    rtype = rt_seed;
+  }
+  
+  /* Skill prüfen */
+  skill = eff_skill(u, SK_HERBALISM, r);
+  if (skill < 6) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "plant_skills",
 			"skill minskill product", SK_HERBALISM, 6, rtype, 1));
-		return;
-	}
-	if (fval(r, RF_MALLORN) && skill < 7 ) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "plant_skills",
+    return;
+  }
+  if (fval(r, RF_MALLORN) && skill < 7 ) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "plant_skills",
 			"skill minskill product", SK_HERBALISM, 7, rtype, 1));
-		return;
-	}
-
-	n = get_pooled(u, rtype, GET_DEFAULT);
-	/* Samen prüfen */
-	if (n==0) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
-		return;
-	}
-
-	/* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-	n = min(raw, n);
-	n = min(skill*u->number, n);
-
-	/* Für jeden Samen Talent*10% Erfolgschance. */
-	for(i = n; i>0; i--) {
-		if (rand()%10 < skill) planted++;
-	}
-	rsettrees(r, 0, rtrees(r, 0)+planted);
-
-	/* Alles ok. Abziehen. */
-	produceexp(u, SK_HERBALISM, u->number);
-	use_pooled(u, rtype, GET_DEFAULT, n);
-
-	ADDMSG(&u->faction->msgs, msg_message("plant",
-		"unit region amount herb", u, r, planted, rtype));
+    return;
+  }
+  
+  /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
+  raw = min(raw, skill*u->number);
+  n = get_pooled(u, rtype, GET_DEFAULT, raw);
+  if (n==0) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
+    return;
+  }
+  n = min(raw, n);
+  
+  /* Für jeden Samen Talent*10% Erfolgschance. */
+  for(i = n; i>0; i--) {
+    if (rng_int()%10 < skill) planted++;
+  }
+  rsettrees(r, 0, rtrees(r, 0)+planted);
+  
+  /* Alles ok. Abziehen. */
+  produceexp(u, SK_HERBALISM, u->number);
+  use_pooled(u, rtype, GET_DEFAULT, n);
+  
+  ADDMSG(&u->faction->msgs, msg_message("plant",
+                                        "unit region amount herb", u, r, planted, rtype));
 }
 
 /* züchte bäume */
 static void
 breedtrees(region *r, unit *u, int raw)
 {
-	int n, i, skill, planted = 0;
-	const resource_type * rtype;
-	static int current_season = -1;
+  int n, i, skill, planted = 0;
+  const resource_type * rtype;
+  static int current_season = -1;
   
   if (current_season<0) current_season = get_gamedate(turn, NULL)->season;
-
-	/* Bäume züchten geht nur im Frühling */
-	if (current_season != SEASON_SPRING){
-		planttrees(r, u, raw);
-		return;
-	}
-
-	if (!fval(r->terrain, LAND_REGION)) {
-		return;
-	}
-
-	/* Mallornbäume kann man nur in Mallornregionen züchten */
-	if (fval(r, RF_MALLORN)) {
-		rtype = rt_mallornseed;
-	} else {
-		rtype = rt_seed;
-	}
-
-	/* Skill prüfen */
-	skill = eff_skill(u, SK_HERBALISM, r);
-	if (skill < 12) {
-		planttrees(r, u, raw);
-		return;
-	}
-	n = get_pooled(u, rtype, GET_DEFAULT);
-	/* Samen prüfen */
-	if (n==0) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
-		return;
-	}
-
-	/* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-	n = min(raw, n);
-	n = min(skill*u->number, n);
-
-	/* Für jeden Samen Talent*5% Erfolgschance. */
-	for(i = n; i>0; i--) {
-		if (rand()%100 < skill*5) planted++;
-	}
-	rsettrees(r, 1, rtrees(r, 1)+planted);
-
-	/* Alles ok. Abziehen. */
-	produceexp(u, SK_HERBALISM, u->number);
-	use_pooled(u, rtype, GET_DEFAULT, n);
-
-  ADDMSG(&u->faction->msgs, msg_message("plant", 
+  
+  /* Bäume züchten geht nur im Frühling */
+  if (current_season != SEASON_SPRING){
+    planttrees(r, u, raw);
+    return;
+  }
+  
+  if (!fval(r->terrain, LAND_REGION)) {
+    return;
+  }
+  
+  /* Mallornbäume kann man nur in Mallornregionen züchten */
+  if (fval(r, RF_MALLORN)) {
+    rtype = rt_mallornseed;
+  } else {
+    rtype = rt_seed;
+  }
+  
+  /* Skill prüfen */
+  skill = eff_skill(u, SK_HERBALISM, r);
+  if (skill < 12) {
+    planttrees(r, u, raw);
+    return;
+  }
+  
+  /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
+  raw = min(skill*u->number, raw);
+  n = get_pooled(u, rtype, GET_DEFAULT, raw);
+  /* Samen prüfen */
+  if (n==0) {
+    ADDMSG(&u->faction->msgs,
+           msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
+    return;
+  }
+  n = min(raw, n);
+  
+  /* Für jeden Samen Talent*5% Erfolgschance. */
+  for(i = n; i>0; i--) {
+    if (rng_int()%100 < skill*5) planted++;
+  }
+  rsettrees(r, 1, rtrees(r, 1)+planted);
+  
+  /* Alles ok. Abziehen. */
+  produceexp(u, SK_HERBALISM, u->number);
+  use_pooled(u, rtype, GET_DEFAULT, n);
+  
+  ADDMSG(&u->faction->msgs, msg_message("plant",
     "unit region amount herb", u, r, planted, rtype));
 }
 
@@ -2475,11 +2478,11 @@ static void
 plant_cmd(unit *u, struct order * ord)
 {
   region * r = u->region;
-	int m;
-	const char *s;
-	param_t p;
-	const resource_type * rtype = NULL;
-
+  int m;
+  const char *s;
+  param_t p;
+  const resource_type * rtype = NULL;
+  
   if (r->land==NULL) {
     /* TODO: error message here */
     return;
@@ -2488,39 +2491,38 @@ plant_cmd(unit *u, struct order * ord)
   /* pflanze [<anzahl>] <parameter> */
   init_tokens(ord);
   skip_token();
-	s = getstrtoken();
-	m = atoi(s);
-	sprintf(buf, "%d", m);
-	if (!strcmp(buf, s)) {
-		/* first came a want-paramter */
-		s = getstrtoken();
-	} else {
-		m = INT_MAX;
-	}
-
-	if (!s[0]) {
-		p = P_ANY;
-	} else {
-		p = findparam(s, u->faction->locale);
-		rtype = findresourcetype(s, u->faction->locale);
-	}
-
-	if (p==P_HERBS){
-		plant(r, u, m);
-		return;
-	}
-	else if (p==P_TREES){
-		breedtrees(r, u, m);
-		return;
-	}
-	else if (rtype!=NULL){
-		if (rtype==rt_mallornseed || rtype==rt_seed) {
-			breedtrees(r, u, m);
-			return;
-		}
-	}
+  s = getstrtoken();
+  m = atoi(s);
+  sprintf(buf, "%d", m);
+  if (!strcmp(buf, s)) {
+    /* first came a want-paramter */
+    s = getstrtoken();
+  } else {
+    m = INT_MAX;
+  }
+  
+  if (!s[0]) {
+    p = P_ANY;
+  } else {
+    p = findparam(s, u->faction->locale);
+    rtype = findresourcetype(s, u->faction->locale);
+  }
+  
+  if (p==P_HERBS){
+    plant(r, u, m);
+    return;
+  }
+  else if (p==P_TREES){
+    breedtrees(r, u, m);
+    return;
+  }
+  else if (rtype!=NULL){
+    if (rtype==rt_mallornseed || rtype==rt_seed) {
+      breedtrees(r, u, m);
+      return;
+    }
+  }
 }
-
 
 /* züchte pferde */
 static void
@@ -2542,7 +2544,7 @@ breedhorses(region *r, unit *u)
 	n = min(u->number * eff_skill(u, SK_HORSE_TRAINING, r), get_item(u, I_HORSE));
 
 	for (c = 0; c < n; c++) {
-		if (rand() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
+		if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
 			i_change(&u->items, olditemtype[I_HORSE], 1);
 			gezuechtet++;
 		}
@@ -2882,7 +2884,7 @@ expandwork(region * r)
 		if (m>=working) workers = u->number;
 		else {
 			workers = u->number * m / working;
-			if (rand() % working < (u->number * m) % working) workers++;
+			if (rng_int() % working < (u->number * m) % working) workers++;
 		}
 
 		assert(workers>=0);

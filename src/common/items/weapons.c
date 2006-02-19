@@ -24,7 +24,8 @@
 #include <pool.h>
 
 /* util includes */
-#include <functions.h>
+#include <util/functions.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -82,7 +83,7 @@ attack_firesword(const troop * at, const struct weapon_type * wtype, int *casual
 	int enemies = 0;
 	int killed = 0;
 	const char *damage = "2d8";
-	int force  = 1+rand()%10;
+	int force  = 1+rng_int()%10;
 
 	if (row==FIGHT_ROW) {
 		enemies = count_enemies(fi->side->battle, fi->side, minrow, maxrow, true);
@@ -140,7 +141,7 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 	assert(af->person[at->index].reload==0);
 
   if (it_catapultammo!=NULL) {
-    if (get_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK) <= 0) {
+    if (get_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1) <= 0) {
       /* No ammo. Use other weapon if available. */
       return true;
     }
@@ -174,9 +175,9 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 		if (hits(*at, dt, wp)) {
 			d += terminate(dt, *at, AT_STANDARD, wp->type->damage[0], true);
 #ifdef CATAPULT_STRUCTURAL_DAMAGE
-			if (dt.fighter->unit->building && rand()%100 < 5) {
+			if (dt.fighter->unit->building && rng_int()%100 < 5) {
 				damage_building(b, dt.fighter->unit->building, 1);
-			} else if (dt.fighter->unit->ship && rand()%100 < 5) {
+			} else if (dt.fighter->unit->ship && rng_int()%100 < 5) {
 				dt.fighter->unit->ship->damage+=DAMAGE_SCALE;
 			}
 #endif

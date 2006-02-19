@@ -55,8 +55,9 @@
 #include <attributes/racename.h>
 
 /* util includes */
-#include <rand.h>
+#include <util/rand.h>
 #include <util/message.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -93,7 +94,7 @@ dissolve_units(void)
 				} else {
 					n = 0;
 					for (i=0;i<u->number;i++) {
-						if (rand()%100 < a->data.ca[1]) n++;
+						if (rng_int()%100 < a->data.ca[1]) n++;
 					}
 				}
 
@@ -180,7 +181,7 @@ find_manual(region * r, unit * u)
   sprintf(buf, "%s stolper%c bei der Erforschung der Region über ",
           unitname(u), "nt"[u->number == 1]);
   
-  switch (rand() % 4) {
+  switch (rng_int() % 4) {
   case 0:
     scat("die Ruine eines alten Tempels");
     break;
@@ -203,7 +204,7 @@ find_manual(region * r, unit * u)
   }
   scat(" sie auf das zerfledderte Exemplar eines alten Buches, betitelt ");
   
-  switch (rand() % 36) {
+  switch (rng_int() % 36) {
   case 0:
     scat("\'Magie der Elemente\'");
     skill = SK_MAGIC;
@@ -295,7 +296,7 @@ get_unit(region * r, unit * u)
 
 	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
-	newunit = createunit(r, u->faction, rand() % 20 + 3, u->faction->race);
+	newunit = createunit(r, u->faction, rng_int() % 20 + 3, u->faction->race);
   fset(newunit, UFL_ISNEW|UFL_MOVED);
 	set_string(&newunit->name, "Dorfbewohner");
   if (fval(u, UFL_PARTEITARNUNG)) {
@@ -313,9 +314,9 @@ get_allies(region * r, unit * u)
 
 	case T_PLAIN:
 		if (!r_isforest(r)) {
-			if (get_money(u) / u->number < 100 + rand() % 200)
+			if (get_money(u) / u->number < 100 + rng_int() % 200)
 				return;
-			newunit = createunit(r, u->faction, rand() % 8 + 2, u->faction->race);
+			newunit = createunit(r, u->faction, rng_int() % 8 + 2, u->faction->race);
 			set_string(&newunit->name, "Söldner");
       equip_unit(newunit, get_equipment("random_plain"));
 			break;
@@ -325,7 +326,7 @@ get_allies(region * r, unit * u)
 				&& eff_skill(u, SK_MAGIC, r) < 2) {
 				return;
 			}
-			newunit = createunit(r, u->faction, rand() % 6 + 2, u->faction->race);
+			newunit = createunit(r, u->faction, rng_int() % 6 + 2, u->faction->race);
 			set_string(&newunit->name, "Waldbewohner");
       equip_unit(newunit, get_equipment("random_forest"));
 		}
@@ -335,7 +336,7 @@ get_allies(region * r, unit * u)
 		if (eff_skill(u, SK_OBSERVATION, r) <= 3) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rand() % 6 + 2, u->faction->race);
+		newunit = createunit(r, u->faction, rng_int() % 6 + 2, u->faction->race);
 		set_string(&newunit->name, "Sumpfbewohner");
     equip_unit(newunit, get_equipment("random_swamp"));
 		break;
@@ -344,7 +345,7 @@ get_allies(region * r, unit * u)
 		if (eff_skill(u, SK_RIDING, r) <= 2) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rand() % 12 + 2, u->faction->race);
+		newunit = createunit(r, u->faction, rng_int() % 12 + 2, u->faction->race);
 		set_string(&newunit->name, "Berber");
     equip_unit(newunit, get_equipment("random_desert"));
 		break;
@@ -353,7 +354,7 @@ get_allies(region * r, unit * u)
 		if (eff_skill(u, SK_MELEE, r) <= 1) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rand() % 8 + 2, u->faction->race);
+		newunit = createunit(r, u->faction, rng_int() % 8 + 2, u->faction->race);
 		set_string(&newunit->name, "Hochlandbarbaren");
     equip_unit(newunit, get_equipment("random_highland"));
 		break;
@@ -363,7 +364,7 @@ get_allies(region * r, unit * u)
 			|| eff_skill(u, SK_TRADE, r) <= 2) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rand() % 6 + 2, u->faction->race);
+		newunit = createunit(r, u->faction, rng_int() % 6 + 2, u->faction->race);
 		set_string(&newunit->name, "Bergbewohner");
     equip_unit(newunit, get_equipment("random_mountain"));
 
@@ -374,7 +375,7 @@ get_allies(region * r, unit * u)
 			|| eff_skill(u, SK_TRADE, r) <= 1) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rand() % 4 + 2, u->faction->race);
+		newunit = createunit(r, u->faction, rng_int() % 4 + 2, u->faction->race);
 		set_string(&newunit->name, "Eisleute");
     equip_unit(newunit, get_equipment("random_glacier"));
 
@@ -403,8 +404,8 @@ encounter(region * r, unit * u)
 {
 	if (!fval(r, RF_ENCOUNTER)) return;
 	freset(r, RF_ENCOUNTER);
-	if (rand() % 100>=ENCCHANCE) return;
-	switch (rand() % 3) {
+	if (rng_int() % 100>=ENCCHANCE) return;
+	switch (rng_int() % 3) {
 	case 0:
 		find_manual(r, u);
 		break;
@@ -434,7 +435,7 @@ encounters(void)
 			}
 
 			if (c > 0) {
-				n = rand() % c;
+				n = rng_int() % c;
 				u = r->units;
 
 				for (i = u->number; i < n; i += u->number) {
@@ -468,7 +469,7 @@ chaosterrain(void)
       }
     }
   }
-  return types[rand() % numtypes];
+  return types[rng_int() % numtypes];
 }
 
 void
@@ -477,8 +478,8 @@ chaos(region * r)
 	unit *u = NULL, *u2;
 	building *b, *b2;
 
-	if (rand() % 100 < 8) {
-		switch (rand() % 3) {
+	if (rng_int() % 100 < 8) {
+		switch (rng_int() % 3) {
 		case 0:				/* Untote */
 			if (!fval(r->terrain, SEA_REGION)) {
 				u = random_unit(r);
@@ -494,10 +495,10 @@ chaos(region * r)
 		case 1:				/* Drachen */
 			if (random_unit(r)) {
 				int mfac = 0;
-				switch (rand() % 3) {
+				switch (rng_int() % 3) {
 				case 0:
 					mfac = 100;
-					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 8 + 1, new_race[RC_FIREDRAGON]);
+					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 8 + 1, new_race[RC_FIREDRAGON]);
 					if (u->number == 1) {
 						set_string(&u->name, "Feuerdrache");
 					} else {
@@ -506,7 +507,7 @@ chaos(region * r)
 					break;
 				case 1:
 					mfac = 500;
-					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 4 + 1, new_race[RC_DRAGON]);
+					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 4 + 1, new_race[RC_DRAGON]);
 					if (u->number == 1) {
 						set_string(&u->name, "Drache");
 					} else {
@@ -515,7 +516,7 @@ chaos(region * r)
 					break;
 				case 2:
 					mfac = 1000;
-					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 2 + 1, new_race[RC_WYRM]);
+					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 2 + 1, new_race[RC_WYRM]);
 					if (u->number == 1) {
 						set_string(&u->name, "Wyrm");
 					} else {
@@ -523,7 +524,7 @@ chaos(region * r)
 					}
 					break;
 				}
-				if (mfac) set_money(u, u->number * (rand() % mfac));
+				if (mfac) set_money(u, u->number * (rng_int() % mfac));
         fset(u, UFL_ISNEW|UFL_MOVED);
 			}
 		case 2:	/* Terrainveränderung */
@@ -719,7 +720,7 @@ rrandneighbour(region *r)
 	}
 	/* Zufällig eine auswählen */
 
-	rr = rand() % c;
+	rr = rng_int() % c;
 
 	/* Durchzählen */
 
@@ -759,7 +760,7 @@ volcano_outbreak(region *r)
 	/* Produktion vierteln ... */
 	a->data.sa[0] = 25;
 	/* Für 6-17 Runden */
-	a->data.sa[1] = (short)(a->data.sa[1] + 6 + rand()%12);
+	a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
 
 	/* Personen bekommen 4W10 Punkte Schaden. */
 
@@ -799,7 +800,7 @@ volcano_outbreak(region *r)
 		/* Produktion vierteln ... */
 		a->data.sa[0] = 25;
 		/* Für 6-17 Runden */
-		a->data.sa[1] = (short)(a->data.sa[1] + 6 + rand()%12);
+		a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
 
 		/* Personen bekommen 3W10 Punkte Schaden. */
 		for (up=&rn->units; *up;) {
@@ -860,11 +861,11 @@ move_iceberg(region *r)
 
 	a = a_find(r->attribs, &at_iceberg);
 	if (!a) {
-		dir = (direction_t)(rand()%MAXDIRECTIONS);
+		dir = (direction_t)(rng_int()%MAXDIRECTIONS);
 		a = a_add(&r->attribs, make_iceberg(dir));
 	} else {
-		if (rand()%100 < 20) {
-			dir = (direction_t)(rand()%MAXDIRECTIONS);
+		if (rng_int()%100 < 20) {
+			dir = (direction_t)(rng_int()%MAXDIRECTIONS);
 			a->data.i = dir;
 		} else {
 			dir = (direction_t)a->data.i;
@@ -949,7 +950,7 @@ move_iceberg(region *r)
 				sh = shn;
 			}
 
-		} else if (rand()%100 < 20) {	/* Eisberg bleibt als Gletscher liegen */
+		} else if (rng_int()%100 < 20) {	/* Eisberg bleibt als Gletscher liegen */
 			unit *u;
 
 			rsetterrain(r, T_GLACIER);
@@ -971,7 +972,7 @@ move_icebergs(void)
 
   for (r=regions; r; r=r->next) {
     if (rterrain(r) == T_ICEBERG && !fval(r, RF_DH)) {
-      int select = rand() % 10;
+      int select = rng_int() % 10;
       if (select < 4) {
         /* 4% chance */
   			fset(r, RF_DH);
@@ -1036,7 +1037,7 @@ godcurse(void)
       for(u=r->units; u; u=u->next) {
         skill * sv = u->skills;
         while (sv!=u->skills+u->skill_size) {
-          int weeks = 1+rand()%3;
+          int weeks = 1+rng_int()%3;
           reduce_skill(u, sv, weeks);
           ++sv;
         }
@@ -1117,7 +1118,7 @@ orc_growth(void)
         int prob = curse_geteffect(c);
 
         for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
-          if (rand() % 100 < prob) {
+          if (rng_int() % 100 < prob) {
             ++increase;
           }
         }
@@ -1146,9 +1147,9 @@ demon_skillchanges(void)
       if (u->race == new_race[RC_DAEMON]) {
         skill * sv = u->skills;
         while (sv!=u->skills+u->skill_size) {
-          if (sv->level>0 && rand() % 100 < 25) {
-            int weeks = 1+rand()%3;
-            if (rand() % 100 < 40) {
+          if (sv->level>0 && rng_int() % 100 < 25) {
+            int weeks = 1+rng_int()%3;
+            if (rng_int() % 100 < 40) {
               reduce_skill(u, sv, weeks);
             } else {
               while (weeks--) learn_skill(u, sv->id, 1.0);
@@ -1234,16 +1235,16 @@ randomevents(void)
       rsetterrain(r, T_VOLCANO);
     } else switch(rterrain(r)) {
     case T_VOLCANO:
-      if (rand()%100 < 4) {
+      if (rng_int()%100 < 4) {
         ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
         rsetterrain(r, T_VOLCANO_SMOKING);
       }
       break;
     case T_VOLCANO_SMOKING:
-      if (rand()%100 < 12) {
+      if (rng_int()%100 < 12) {
         ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
         rsetterrain(r, T_VOLCANO);
-      } else if (rand()%100 < 8) {
+      } else if (rng_int()%100 < 8) {
         volcano_outbreak(r);
       }
       break;
@@ -1270,7 +1271,7 @@ randomevents(void)
       if (u->faction->no != MONSTER_FACTION
         && (u->race->flags & RCF_DESERT)) {
           if (fval(u, UFL_ISNEW)) continue;
-          if (rand()%100 < 5) {
+          if (rng_int()%100 < 5) {
             ADDMSG(&u->faction->msgs, msg_message("desertion",
               "unit region", u, r));
             u_setfaction(u, findfaction(MONSTER_FACTION));
@@ -1285,7 +1286,7 @@ randomevents(void)
     int level = fspecial(f, FS_LYCANTROPE);
     if (level > 0) {
       for(u = f->units; u; u=u->nextF) {
-        if(rand()%100 < 2*level) {
+        if(rng_int()%100 < 2*level) {
           ADDMSG(&u->faction->msgs, msg_message("becomewere",
             "unit region", u, u->region));
           fset(u, UFL_WERE);
@@ -1303,7 +1304,7 @@ randomevents(void)
 		}
 		i = chaoscount(r);
 		if (!i) continue;
-		chaoscounts(r, -(int) (i * ((double) (rand() % 10)) / 100.0));
+		chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
 	}
 
 #ifdef HERBS_ROT

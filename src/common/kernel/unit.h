@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 struct skill;
-
+struct item;
 #define UFL_DEBUG         (1<<0)
 #define UFL_ISNEW         (1<<1)	/* 2 */
 #define UFL_LONGACTION    (1<<2)	/* 4 */

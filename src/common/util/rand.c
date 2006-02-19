@@ -21,15 +21,14 @@
 
 #include <config.h>
 #include "rand.h"
+#include "rng.h"
 
-#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
 
-#define drand() ((rand()%RAND_MAX)/(double)RAND_MAX)
 #define M_PIl   3.1415926535897932384626433832795029L  /* pi */
 
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
@@ -40,8 +39,8 @@ normalvariate(double mu, double sigma)
   static double NV_MAGICCONST = 1.7155277699214135;
   double z;
   for (;;) {
-    double u1 = drand();
-    double u2 = 1.0 - drand();
+    double u1 = rng_double();
+    double u2 = 1.0 - rng_double();
     z = NV_MAGICCONST*(u1-0.5)/u2;
     if (z*z/4.0 <= -log(u2)) {
       break;
@@ -57,7 +56,7 @@ ntimespprob(int n, double p, double mod)
   int i;
 
   for(i=0; i<n && p>0; i++) {
-    if(drand() < p) {
+    if(rng_double() < p) {
       count++;
       p += mod;
     }
@@ -69,6 +68,6 @@ boolean
 chance(double x)
 {
   if (x>=1.0) return true;
-  return (boolean) (rand() % RAND_MAX < RAND_MAX * x);
+  return rng_double() < x;
 }
 

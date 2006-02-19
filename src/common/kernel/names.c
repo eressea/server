@@ -40,6 +40,7 @@
 /* util includes */
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/rng.h>
 
 /* Untote */
 
@@ -119,10 +120,10 @@ untoten_name(const unit * u)
 
 	/* nur 50% aller Namen haben "Vor-Teil" */
 	u=u;
-	uv = rand() % (UNTOT_VOR * 2);
+	uv = rng_int() % (UNTOT_VOR * 2);
 
-	uu = rand() % UNTOT;
-	un = rand() % (UNTOT_NACH * (uv >= UNTOT_VOR ? 1 : 2));
+	uu = rng_int() % UNTOT;
+	un = rng_int() % (UNTOT_NACH * (uv >= UNTOT_VOR ? 1 : 2));
 	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
 
 	if (uv < UNTOT_VOR) {
@@ -206,9 +207,9 @@ skeleton_name(const unit * u)
 	u=u;
 
 	/* nur 20% aller Namen haben "Vor-Teil" */
-	uv = rand() % (SKEL_VOR * 5);
-	uu = rand() % SKEL;
-	un = rand() % (SKEL_NACH * (uv >= SKEL_VOR ? 1 : 2));
+	uv = rng_int() % (SKEL_VOR * 5);
+	uu = rng_int() % SKEL;
+	un = rng_int() % (SKEL_NACH * (uv >= SKEL_VOR ? 1 : 2));
 
 	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
 
@@ -289,9 +290,9 @@ zombie_name(const unit * u)
 	u=u;
 
 	/* nur 20% aller Namen haben "Vor-Teil" */
-	uv = rand() % (ZOM_VOR * 5);
-	uu = rand() % ZOM;
-	un = rand() % (ZOM_NACH * (uv >= ZOM_VOR ? 1 : 2));
+	uv = rng_int() % (ZOM_VOR * 5);
+	uu = rng_int() % ZOM;
+	un = rng_int() % (ZOM_NACH * (uv >= ZOM_VOR ? 1 : 2));
 
 	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
 
@@ -374,9 +375,9 @@ ghoul_name(const unit * u)
 	u=u;
 
 	/* nur 20% aller Namen haben "Vor-Teil" */
-	uv = rand() % (GHOUL_VOR * 5);
-	uu = rand() % GHOUL;
-	un = rand() % (GHOUL_NACH * (uv >= GHOUL_VOR ? 1 : 4));
+	uv = rng_int() % (GHOUL_VOR * 5);
+	uu = rng_int() % GHOUL;
+	un = rng_int() % (GHOUL_NACH * (uv >= GHOUL_VOR ? 1 : 4));
 
 	/* nur 25% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
 
@@ -521,7 +522,7 @@ const char *
 drachen_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
-	int rnd = rand() % DTITEL;
+	int rnd = rng_int() % DTITEL;
 	const char *t = dtitel[0][rnd];
 	int anzahl = 1;
 
@@ -552,10 +553,10 @@ drachen_name(const unit *u)
 	} else {
 		char n[32];
 
-		strcpy(n, silbe1[rand() % SIL1]);
-		strcat(n, silbe2[rand() % SIL2]);
-		strcat(n, silbe3[rand() % SIL3]);
-		if (rand() % 5 > 2) {
+		strcpy(n, silbe1[rng_int() % SIL1]);
+		strcat(n, silbe2[rng_int() % SIL2]);
+		strcat(n, silbe3[rng_int() % SIL3]);
+		if (rng_int() % 5 > 2) {
 			sprintf(name, "%s, %s", n, t);	/* "Name, der Titel" */
 		} else {
 			strcpy(name, t);	/* "Der Titel Name" */
@@ -563,7 +564,7 @@ drachen_name(const unit *u)
 			strcat(name, " ");
 			strcat(name, n);
 		}
-		if (u && (rand() % 3 == 0)) {
+		if (u && (rng_int() % 3 == 0)) {
 			strcat(name, " von ");
 			strcat(name, rname(u->region, NULL));
 		}
@@ -630,15 +631,15 @@ dracoid_name(const unit *u)
 	u=u;
 	/* Wieviele Mittelteile? */
 
-	mid_syllabels = rand()%4;
+	mid_syllabels = rng_int()%4;
 
-	strcpy(name, drac_pre[rand()%DRAC_PRE]);
+	strcpy(name, drac_pre[rng_int()%DRAC_PRE]);
 	while(mid_syllabels > 0) {
 		mid_syllabels--;
-		if(rand()%10 < 4) strcat(name,"'");
-		strcat(name, drac_mid[rand()%DRAC_MID]);
+		if(rng_int()%10 < 4) strcat(name,"'");
+		strcat(name, drac_mid[rng_int()%DRAC_MID]);
 	}
-	strcat(name, drac_suf[rand()%DRAC_SUF]);
+	strcat(name, drac_suf[rng_int()%DRAC_SUF]);
 	return name;
 }
 

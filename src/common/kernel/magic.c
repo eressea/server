@@ -54,6 +54,7 @@
 #include <util/attrib.h>
 #include <util/resolve.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/base36.h>
 #include <util/event.h>
 
@@ -803,42 +804,40 @@ spl_costtyp(const spell * sp)
 int
 eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
 {
-	int k;
-	int maxlevel;
-	int needplevel;
-	int costtyp = SPC_FIX;
-
-	for (k = 0; sp->components[k].type; k++) {
-		if (cast_level == 0)
-			return 0;
-
-		if (sp->components[k].amount > 0) {
-			/* Die Kosten für Aura sind auch von der Zahl der bereits
-			 * gezauberten Sprüche abhängig */
-			if (sp->components[k].type == r_aura) {
-				needplevel = spellcost(u, sp) * range;
-			} else {
-				needplevel = sp->components[k].amount * range;
-			}
-			maxlevel = get_pooled(u, sp->components[k].type, GET_DEFAULT)/needplevel;
-
-			/* sind die Kosten fix, so muss die Komponente nur einmal vorhanden
-			 * sein und der cast_level ändert sich nicht */
-			if (sp->components[k].cost == SPC_FIX) {
-				if (maxlevel < 1) cast_level = 0;
-			/* ansonsten wird das Minimum aus maximal möglicher Stufe und der
-			 * gewünschten gebildet */
-			} else if (sp->components[k].cost == SPC_LEVEL) {
-				costtyp = SPC_LEVEL;
-				cast_level = min(cast_level, maxlevel);
-			/* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
-			 * sein, ansonsten schlägt der Spruch fehl */
-			} else if (sp->components[k].cost == SPC_LINEAR) {
-				costtyp = SPC_LINEAR;
-				if (maxlevel < cast_level) cast_level = 0;
-			}
-		}
-	}
+  int k, maxlevel, needplevel;
+  int costtyp = SPC_FIX;
+  
+  for (k = 0; sp->components[k].type; k++) {
+    if (cast_level == 0)
+        return 0;
+    
+    if (sp->components[k].amount > 0) {
+      /* Die Kosten für Aura sind auch von der Zahl der bereits
+       * gezauberten Sprüche abhängig */
+      if (sp->components[k].type == r_aura) {
+        needplevel = spellcost(u, sp) * range;
+      } else {
+        needplevel = sp->components[k].amount * range;
+      }
+      maxlevel = get_pooled(u, sp->components[k].type, GET_DEFAULT, needplevel*cast_level)/needplevel;
+      
+      /* sind die Kosten fix, so muss die Komponente nur einmal vorhanden
+       * sein und der cast_level ändert sich nicht */
+      if (sp->components[k].cost == SPC_FIX) {
+        if (maxlevel < 1) cast_level = 0;
+        /* ansonsten wird das Minimum aus maximal möglicher Stufe und der
+         * gewünschten gebildet */
+      } else if (sp->components[k].cost == SPC_LEVEL) {
+        costtyp = SPC_LEVEL;
+        cast_level = min(cast_level, maxlevel);
+        /* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
+         * sein, ansonsten schlägt der Spruch fehl */
+      } else if (sp->components[k].cost == SPC_LINEAR) {
+        costtyp = SPC_LINEAR;
+        if (maxlevel < cast_level) cast_level = 0;
+      }
+    }
+  }
 	/* Ein Spruch mit Fixkosten wird immer mit der Stufe des Spruchs und
 	 * nicht auf der Stufe des Magiers gezaubert */
 	if (costtyp == SPC_FIX) {
@@ -965,7 +964,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         break;
       }
       
-      if (get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
+      if (get_pooled(u, rtype, GET_DEFAULT, itemanz) < itemanz) {
         resource * res = malloc(sizeof(resource));
         res->number = itemanz;
         res->type = rtype;
@@ -1263,7 +1262,7 @@ fumble(region * r, unit * u, const spell * sp, int cast_grade)
 #endif
 		return false;
 	}
-	rnd = rand()%100;
+	rnd = rng_int()%100;
 
 #ifdef PATZERDEBUG
 	printf("%s: Zauber Stufe %d, Talent %d, Patzerchance %d, rand: %d\n",
@@ -1306,7 +1305,7 @@ do_fumble(castorder *co)
 
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
     u, r, sp));
-  switch (rand() % 10) {
+  switch (rng_int() % 10) {
   case 0:
     /* wenn vorhanden spezieller Patzer, ansonsten nix */
     if (sp->patzer) sp->patzer(co);
@@ -1315,7 +1314,7 @@ do_fumble(castorder *co)
 
   case 1:
     /* Kröte */
-    duration = rand()%level/2;
+    duration = rng_int()%level/2;
     if (duration<2) duration = 2;
     {
       /* one or two things will happen: the toad changes her race back,
@@ -1340,7 +1339,7 @@ do_fumble(castorder *co)
 
   case 2:
     /* temporärer Stufenverlust */
-    duration = max(rand()%level/2, 2);
+    duration = max(rng_int()%level/2, 2);
     effect.i = -(level/2);
     c = create_curse(u, &u->attribs, ct_find("skil"), level, duration,
       effect, 1);
@@ -1413,7 +1412,7 @@ regeneration(unit * u)
 	/* TODO (noch gibs keine)*/
 
 	/* Würfeln */
-	aura = (rand() % d + rand() % d)/2 + 1;
+	aura = (rng_int() % d + rng_int() % d)/2 + 1;
 
 	aura = (int)(aura * MagicRegeneration());
 

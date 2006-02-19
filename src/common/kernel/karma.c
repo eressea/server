@@ -32,8 +32,9 @@
 #include "message.h"
 
 /* util includes */
-#include <attrib.h>
-#include <base36.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <math.h>
@@ -561,7 +562,7 @@ jihad_attacks(void)
 
 	for(f=factions; f; f=f->next) if(fspecial(f, FS_JIHAD)) {
     region * last = lastregion(f);
-		for (r=firstregion(f); r != last; r = r->next) if (rand()%1000 <= 1) {
+		for (r=firstregion(f); r != last; r = r->next) if (rng_int()%1000 <= 1) {
 			boolean doit = false;
 
 			for(u=r->units; u; u=u->next) if(jihad(f, u->race)) {

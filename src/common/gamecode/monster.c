@@ -57,14 +57,14 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <attrib.h>
-#include <base36.h>
-#include <event.h>
-#include <rand.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/rand.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
@@ -283,7 +283,7 @@ random_neighbour(region * r, unit *u)
 
 	/* Zufällig eine auswählen */
 
-	rr = rand() % c;
+	rr = rng_int() % c;
 
 	/* Durchzählen */
 
@@ -327,7 +327,7 @@ treeman_neighbour(region * r)
 	}
 	/* Zufällig eine auswählen */
 
-	rr = rand() % c;
+	rr = rng_int() % c;
 
 	/* Durchzählen */
 
@@ -382,7 +382,7 @@ monster_move(region * r, unit * u)
 
 /* Wir machen das mal autoconf-style: */
 #ifndef HAVE_DRAND48
-#define drand48() (((double)rand()) / RAND_MAX)
+#define drand48() (((double)rng_int()) / RAND_MAX)
 #endif
 
 static int
@@ -552,7 +552,7 @@ random_unit(const region * r)
 	if (c == 0) {
 		return NULL;
 	}
-	n = rand() % c;
+	n = rng_int() % c;
 	c = 0;
 	u = r->units;
 
@@ -588,19 +588,19 @@ eaten_by_monster(unit * u)
 
 	switch (old_race(u->race)) {
 	case RC_FIREDRAGON:
-		n = rand()%80 * u->number;
+		n = rng_int()%80 * u->number;
 		horse = get_item(u, I_HORSE);
 		break;
 	case RC_DRAGON:
-		n = rand()%200 * u->number;
+		n = rng_int()%200 * u->number;
 		horse = get_item(u, I_HORSE);
 		break;
 	case RC_WYRM:
-		n = rand()%500 * u->number;
+		n = rng_int()%500 * u->number;
 		horse = get_item(u, I_HORSE);
 		break;
 	default:
-		n = rand()%(u->number/20+1);
+		n = rng_int()%(u->number/20+1);
 	}
 
 	if (n > 0) {
@@ -626,7 +626,7 @@ absorbed_by_monster(unit * u)
 
 	switch (old_race(u->race)) {
 	default:
-		n = rand()%(u->number/20+1);
+		n = rng_int()%(u->number/20+1);
 	}
 
 	if(n > 0) {
@@ -660,7 +660,7 @@ scareaway(region * r, int anzahl)
 	p = rpeasants(r);
 	assert(p >= 0 && anzahl >= 0);
 	for (n = min(p, anzahl); n; n--) {
-		direction_t dir = (direction_t)(rand() % MAXDIRECTIONS);
+		direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
 		region * rc = rconnect(r, dir);
 
 		if (rc && fval(rc->terrain, LAND_REGION)) {
@@ -681,16 +681,16 @@ scared_by_monster(unit * u)
 
 	switch (old_race(u->race)) {
 	case RC_FIREDRAGON:
-		n = rand()%160 * u->number;
+		n = rng_int()%160 * u->number;
 		break;
 	case RC_DRAGON:
-		n = rand()%400 * u->number;
+		n = rng_int()%400 * u->number;
 		break;
 	case RC_WYRM:
-		n = rand()%1000 * u->number;
+		n = rng_int()%1000 * u->number;
 		break;
 	default:
-		n = rand()%(u->number/4+1);
+		n = rng_int()%(u->number/4+1);
 	}
 
 	if(n > 0) {
@@ -709,7 +709,7 @@ scared_by_monster(unit * u)
 static const char *
 random_growl(void)
 {
-	switch(rand()%5) {
+	switch(rng_int()%5) {
 	case 0:
 		return "Groammm";
 	case 1:
@@ -743,7 +743,7 @@ monster_learn(unit *u)
   
   if(c == 0) return NULL;
   
-  n = rand()%c + 1;
+  n = rng_int()%c + 1;
   c = 0;
   
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
@@ -884,7 +884,7 @@ plan_dragon(unit * u)
       long_order = make_movement_order(u, tr, 1, allowed_dragon);
       break;
     }
-    if (rand()%100 < 15) {
+    if (rng_int()%100 < 15) {
       /* do a growl */
       if (rname(tr, u->faction->locale)) {
         sprintf(buf,
@@ -904,8 +904,8 @@ plan_dragon(unit * u)
     else if (u->race != new_race[RC_FIREDRAGON]) {
       /* neue dracoiden! */
       if (r->land && !fval(r->terrain, FORBIDDEN_REGION)) {
-        int ra = 20 + rand() % 100;
-        if (get_money(u) > ra * 50 + 100 && rand() % 100 < 50) {
+        int ra = 20 + rng_int() % 100;
+        if (get_money(u) > ra * 50 + 100 && rng_int() % 100 < 50) {
           recruit_dracoids(u, ra);
         }
       }
@@ -985,7 +985,7 @@ plan_monsters(void)
             a_remove(&u->attribs, ta);
           }
         } else if (u->race->flags & RCF_MOVERANDOM) {
-          if (rand()%100<MOVECHANCE || check_overpopulated(u)) {
+          if (rng_int()%100<MOVECHANCE || check_overpopulated(u)) {
             long_order = monster_move(r, u);
           }
         }
@@ -1053,7 +1053,7 @@ nrand(int start, int sub)
   int res = 0;
 
   do {
-    if (rand() % 100 < start)
+    if (rng_int() % 100 < start)
       res++;
     start -= sub;
   } while (start > 0);
@@ -1071,7 +1071,7 @@ spawn_dragons(void)
     unit * u;
     message * msg;
 
-    if (fval(r->terrain, SEA_REGION) && rand()%10000 < 1) {
+    if (fval(r->terrain, SEA_REGION) && rng_int()%10000 < 1) {
       u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
       fset(u, UFL_ISNEW|UFL_MOVED);
       set_level(u, SK_MAGIC, 4);
@@ -1081,7 +1081,7 @@ spawn_dragons(void)
       set_string(&u->name, "Seeschlange");
     }
 
-    if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rand() % 10000 < (5 + 100 * chaosfactor(r))) 
+    if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) 
     {
       if (chance(0.80)) {
         u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
@@ -1090,9 +1090,9 @@ spawn_dragons(void)
       }
       fset(u, UFL_ISNEW|UFL_MOVED);
 
-      set_money(u, u->number * (rand() % 500 + 100));
+      set_money(u, u->number * (rng_int() % 500 + 100));
       set_level(u, SK_MAGIC, 4);
-      set_level(u, SK_OBSERVATION, 1+rand()%3);
+      set_level(u, SK_OBSERVATION, 1+rng_int()%3);
       set_level(u, SK_STEALTH, 1);
       set_level(u, SK_AUSDAUER, 1);
       log_printf("%d %s in %s.\n", u->number,
@@ -1132,19 +1132,19 @@ spawn_undead(void)
     if(is_cursed(r->attribs, C_HOLYGROUND, 0)) continue;
 
     /* Chance 0.1% * chaosfactor */
-    if (r->land && unburied > r->land->peasants / 20 && rand() % 10000 < (100 + 100 * chaosfactor(r))) {
+    if (r->land && unburied > r->land->peasants / 20 && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
       unit * u;
       /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
       * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
       * dann erst auferstehen. */
-      int undead = unburied / (rand() % 2 + 1);
+      int undead = unburied / (rng_int() % 2 + 1);
       const race * rc = NULL;
       int i;
       if (r->age<100) undead = undead * r->age / 100; /* newbie-regionen kriegen weniger ab */
 
       if (!undead || r->age < 20) continue;
 
-      switch(rand()%3) {
+      switch(rng_int()%3) {
       case 0:
         rc = new_race[RC_SKELETON]; break;
       case 1:
@@ -1155,7 +1155,7 @@ spawn_undead(void)
 
       u = createunit(r, findfaction(MONSTER_FACTION), undead, rc);
       fset(u, UFL_ISNEW|UFL_MOVED);
-      if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rand()%10 < 4) {
+      if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rng_int()%10 < 4) {
         equip_unit(u, get_equipment("rising_undead"));
       }
 

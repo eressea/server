@@ -18,7 +18,8 @@ extern "C" {
 
 struct player;
 struct alliance;
-
+struct item;
+  
 /* SMART_INTERVALS: define to speed up finding the interval of regions that a 
    faction is in. defining this speeds up the turn by 30-40% */
 #define SMART_INTERVALS

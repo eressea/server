@@ -33,10 +33,10 @@
 #include <resources.h>
 
 /* util includes */
-#include <base36.h>
+#include <util/base36.h>
+#include <util/rng.h>
 
 /* libc includes */
-#include <stdlib.h>
 #include <string.h>
 
 typedef struct menulist {
@@ -77,7 +77,7 @@ static char maxseeds[MAXCLIMATES][8] =
 static terrain_t
 terrain_create(int climate)
 {
-	int i = rand() % MAXSEEDSIZE;
+	int i = rng_int() % MAXSEEDSIZE;
 	terrain_t terrain = T_OCEAN;
 
 	while (i > maxseeds[climate][terrain])
@@ -151,7 +151,7 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 		}
 	}
 	for (k = 0; k != size; ++k) {
-		int c = (int) fringe.data[rand() % fringe.size];
+		int c = (int) fringe.data[rng_int() % fringe.size];
 		direction_t d;
 
 		x = (short)(c >> 16);
@@ -176,9 +176,9 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 		const luxury_type *ltype, *p1 = NULL, *p2=NULL;
     int maxlux = get_maxluxuries();
     if (maxlux>0) {
-      i1 = (item_t)(rand() % maxlux);
+      i1 = (item_t)(rng_int() % maxlux);
       do {
-        i2 = (item_t)(rand() % maxlux);
+        i2 = (item_t)(rng_int() % maxlux);
       }
       while (i2 == i1);
     }
@@ -190,7 +190,7 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 		}
 		for (x = 0; x != BLOCKSIZE; x++) {
 			for (y = 0; y != BLOCKSIZE; y++) {
-				const luxury_type * sale = (rand()%2)?p1:p2;
+				const luxury_type * sale = (rng_int()%2)?p1:p2;
 				r = findregion(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
 				if (r && !fval(r->terrain, SEA_REGION)) continue;
 				if (r==NULL) r = new_region(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
@@ -1026,15 +1026,15 @@ static terrain_t
 choose_terrain(terrain_t t) {
 	int q;
 
-	if (rand()%100 < 50) return t;
-	if (rand()%100 < 10) return T_OCEAN;
+	if (rng_int()%100 < 50) return t;
+	if (rng_int()%100 < 10) return T_OCEAN;
 
-	q = rand()%100;
+	q = rng_int()%100;
 
 	switch (t) {
 		case T_OCEAN:
-			if(rand()%100 < 60) return T_OCEAN;
-			switch(rand()%6) {
+			if(rng_int()%100 < 60) return T_OCEAN;
+			switch(rng_int()%6) {
 			case 0:
 				return T_SWAMP;
 			case 1:
@@ -1142,7 +1142,7 @@ shift(void)
 
 	if(t_queue_len == 0) return NULL;
 
-	p = rand()%t_queue_len;
+	p = rng_int()%t_queue_len;
 	r = t_queue[p];
 
 	memmove(&t_queue[p], &t_queue[p+1], (10000-p)*sizeof(region *));
@@ -1160,11 +1160,11 @@ settg(region *r)
 	if (tradegood==NULL) tradegood = luxurytypes;
 
 	for (ltype=luxurytypes; ltype; ltype=ltype->next) {
-		if (ltype!=tradegood) r_setdemand(r, ltype, 1 + rand() % 5);
+		if (ltype!=tradegood) r_setdemand(r, ltype, 1 + rng_int() % 5);
 	}
 	r_setdemand(r, tradegood, 0);
-	if (g>0 && (rand()%10)<2) {
-		int t = rand() % g;
+	if (g>0 && (rng_int()%10)<2) {
+		int t = rng_int() % g;
 
 		for (tradegood = luxurytypes;t;--t) {
 			tradegood = tradegood->next;
@@ -1178,7 +1178,7 @@ Create_Island(region *r, int * n, const terrain_type * terrain, int x, int y) {
 	if (!r) return false;
 	if (*n == 0) return true;
 
-	if((t == T_MOUNTAIN || t == T_GLACIER) && rand()%100 < 5) {
+	if((t == T_MOUNTAIN || t == T_GLACIER) && rng_int()%100 < 5) {
 		terraform(r,T_VOLCANO);
 	} else {
 		terraform_region(r, terrain);
@@ -1203,7 +1203,7 @@ create_island(region *r, int n, const struct terrain_type * terrain)
 	tradegood = NULL;
 	terraform_region(r, terrain);
 	if(r->land) settg(r);
-	r->msgs = (void *)(rand()%6);
+	r->msgs = (void *)(rng_int()%6);
 
 	push(r);
 	for(d=0; d<MAXDIRECTIONS; d++) {

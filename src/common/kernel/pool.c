@@ -166,7 +166,7 @@ new_set_resvalue(unit * u, const resource_type * rtype, int value)
 }
 
 int
-get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
+get_pooled(const unit * u, const resource_type * rtype, unsigned int mode, int count)
 {
   const faction * f = u->faction;
   unit *v;
@@ -186,7 +186,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
     else if (mode & GET_SLACK) use = slack;
   }
   if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK|GET_RESERVE)) {
-    for (v = r->units; v; v = v->next) if (u!=v) {
+    for (v = r->units; v && use<count; v = v->next) if (u!=v) {
       int mask;
 
       if (u==v) continue;
@@ -202,7 +202,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
       }
       else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
       else continue;
-      use += get_pooled(v, rtype, mask);
+      use += get_pooled(v, rtype, mask, count-use);
     }
   }
   return use;
@@ -241,7 +241,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
   }
 
   if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK|GET_RESERVE)) {
-    for (v = r->units; v; v = v->next) if (u!=v) {
+    for (v = r->units; use>0 && v!=NULL; v = v->next) if (u!=v) {
       int mask;
       if (urace(v)->ec_flags & NOGIVE) continue;
       if (v->faction == f) {

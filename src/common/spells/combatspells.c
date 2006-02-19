@@ -31,12 +31,12 @@
 #include <kernel/skill.h>
 
 /* util includes */
-#include <rand.h>
-#include <base36.h>
+#include <util/base36.h>
+#include <util/rand.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
-#include <stdlib.h>
 
 #define EFFECT_HEALING_SPELL     5
 
@@ -426,7 +426,7 @@ select_ally_in_row(fighter * af, int minrow, int maxrow)
 
 	if (!allies)
 		return dt;
-	allies = rand() % allies;
+	allies = rng_int() % allies;
 
 	cv_foreach(df, b->fighters) {
 		side *ds = df->side;
@@ -501,7 +501,7 @@ random_skill(unit *u)
 	if(n == 0)
 		return NOSKILL;
 
-	n = rand()%n;
+	n = rng_int()%n;
 
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
 		if (sv->level>0) {
@@ -548,7 +548,7 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
       sk = random_skill(du);
       if (sk != NOSKILL) {
         skill * sv = get_skill(du, sk);
-        int n = 1 + rand() % 3;
+        int n = 1 + rng_int() % 3;
         /* Skill abziehen */
         reduce_skill(du, sv, n);
       } else {
@@ -755,7 +755,7 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
 	int force = (int)(get_force(power, 3)/2);
 	unit *u;
   const char * races[3] = { "shadowbat", "nightmare", "vampunicorn" };
-  const race *rc = rc_find(races[rand()%3]);
+  const race *rc = rc_find(races[rng_int()%3]);
 
 	unused(sp);
 
@@ -928,7 +928,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
       if (df->unit->race->battle_flags & BF_NOBLOCK) {
         df->side->nonblockers[row] -= df->alive;
       }
-      row = FIRST_ROW + (rand()%(LAST_ROW-FIRST_ROW));
+      row = FIRST_ROW + (rng_int()%(LAST_ROW-FIRST_ROW));
       switch (row) {
         case FIGHT_ROW:
           df->status = ST_FIGHT;

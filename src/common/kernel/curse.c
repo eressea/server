@@ -38,13 +38,13 @@
 #include <util/resolve.h>
 #include <util/base36.h>
 #include <util/rand.h>
+#include <util/rng.h>
 #include <util/goodies.h>
 #include <util/variant.h>
 
 /* libc includes */
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <limits.h>
 #include <assert.h>
 #include <math.h>
@@ -584,7 +584,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 			int i;
 			int u_number = u->number;
 			for (i=0;i<n+1 && u_number>0;i++){
-				if (rand()%u_number < cursedmen){
+				if (rng_int()%u_number < cursedmen){
 					++men;
 					--cursedmen;
 					dogive = true;

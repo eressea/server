@@ -19,12 +19,13 @@
  * permission from the authors.
  */
 
+#include <config.h>
+#include "cvector.h"
+#include "rng.h"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
-#include <config.h>
-#include "cvector.h"
-#include "memory.h"
 
 void
 cv_init(cvector * cv)
@@ -114,7 +115,7 @@ __cv_scramble(void *v1, size_t n, size_t width)
 		v = (void *) realloc(v, s);
 	}
 	for (i = 0; i != n; i++) {
-		*(long *) addptr(v, i * (width + 4)) = rand();
+		*(long *) addptr(v, i * (width + 4)) = rng_int();
 		memcpy(addptr(v, i * (width + 4) + 4), addptr(v1, i * width), width);
 	}
 

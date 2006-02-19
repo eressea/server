@@ -17,16 +17,19 @@
 #include "zombies.h"
 
 /* kernel includes */
-#include <unit.h>
-#include <faction.h>
-#include <region.h>
+#include <kernel/unit.h>
+#include <kernel/faction.h>
+#include <kernel/region.h>
+
+/* util iclude */
+#include <util/rng.h>
 
 /* libc includes */
 #include <stdlib.h>
 
 #define UNDEAD_MIN                  90	/* mind. zahl vor weg gehen */
 #define UNDEAD_BREAKUP              25	/* chance dafuer */
-#define UNDEAD_BREAKUP_FRACTION     (25+rand()%70)	/* anteil der weg geht */
+#define UNDEAD_BREAKUP_FRACTION     (25+rng_int()%70)	/* anteil der weg geht */
 
 #define age_chance(a,b,p) (max(0,a-b)*p)
 
@@ -45,14 +48,14 @@ age_undead(unit *u)
 			for (m=0;m!=100;++m) {
 				int d = k/(100-m);
 				k-=d;
-				if (rand() % 100 < UNDEAD_REPRODUCTION)
+				if (rng_int() % 100 < UNDEAD_REPRODUCTION)
 					n+=d;
 			}
 			assert(k==0);
 		} else
 #endif
 		for (m = u->number; m; m--)
-			if (rand() % 100 < UNDEAD_REPRODUCTION)
+			if (rng_int() % 100 < UNDEAD_REPRODUCTION)
 				n++;
 		set_number(u, u->number + n);
 		u->hp += n * unit_max_hp(u);
@@ -65,13 +68,13 @@ age_undead(unit *u)
 	 * absplitten, anstatt sich zu vermehren. monster
 	 * untote vermehren sich nur noch */
 
-	if (u->number > UNDEAD_MIN && u->faction->no != MONSTER_FACTION && rand() % 100 < UNDEAD_BREAKUP) {
+	if (u->number > UNDEAD_MIN && u->faction->no != MONSTER_FACTION && rng_int() % 100 < UNDEAD_BREAKUP) {
 		int m;
 		unit *u2;
 
 		n = 0;
 		for (m = u->number; m; m--)
-			if (rand() % 100 < UNDEAD_BREAKUP_FRACTION)
+			if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION)
 				n++;
 		u2 = create_unit(r, findfaction(MONSTER_FACTION), 0, new_race[RC_UNDEAD], 0, NULL, u);
     make_undead_unit(u2);
@@ -82,7 +85,7 @@ age_undead(unit *u)
 void
 age_skeleton(unit *u)
 {
-	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
+	if (u->faction->no == 0 && rng_int()%100 < age_chance(u->age, 27, 1)) {
 		int n = max(1,u->number/2);
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_SKELETON_LORD];
@@ -95,7 +98,7 @@ age_skeleton(unit *u)
 void
 age_zombie(unit *u)
 {
-	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
+	if (u->faction->no == 0 && rng_int()%100 < age_chance(u->age, 27, 1)) {
 		int n = max(1,u->number/2);
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_ZOMBIE_LORD];
@@ -108,7 +111,7 @@ age_zombie(unit *u)
 void
 age_ghoul(unit *u)
 {
-	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
+	if (u->faction->no == 0 && rng_int()%100 < age_chance(u->age, 27, 1)) {
 		int n = max(1,u->number/2);
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_GHOUL_LORD];

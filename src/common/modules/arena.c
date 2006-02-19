@@ -46,11 +46,12 @@
 #include <kernel/unit.h>
 
 /* util include */
-#include <base36.h>
-#include <resolve.h>
-#include <functions.h>
-#include <event.h>
-#include <goodies.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/functions.h>
+#include <util/goodies.h>
+#include <util/resolve.h>
+#include <util/rng.h>
 
 /* libc include */
 #include <assert.h>
@@ -110,22 +111,22 @@ enter_fail(unit * u) {
 static int
 enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 {
-	skill_t sk;
-	region * r = u->region;
-	unit * u2;
-	int fee = u->faction->score / 5;
-	unused(ord);
-	unused(amount);
-	unused(itype);
-	if (fee>2000) fee = 2000;
-	if (getplane(r)==arena) return -1;
-	if (u->number!=1 && enter_fail(u)) return -1;
-	if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) < fee && enter_fail(u)) return -1;
-	for (sk=0;sk!=MAXSKILLS;++sk) {
-		if (get_level(u, sk)>1 && enter_fail(u)) return -1;
-	}
-	for (u2=r->units;u2;u2=u2->next) if (u2->faction==u->faction) break;
-
+  skill_t sk;
+  region * r = u->region;
+  unit * u2;
+  int fee = u->faction->score / 5;
+  unused(ord);
+  unused(amount);
+  unused(itype);
+  if (fee>2000) fee = 2000;
+  if (getplane(r)==arena) return -1;
+  if (u->number!=1 && enter_fail(u)) return -1;
+  if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee) < fee && enter_fail(u)) return -1;
+  for (sk=0;sk!=MAXSKILLS;++sk) {
+    if (get_level(u, sk)>1 && enter_fail(u)) return -1;
+  }
+  for (u2=r->units;u2;u2=u2->next) if (u2->faction==u->faction) break;
+  
   assert(!"not implemented");
 /*
 	for (res=0;res!=MAXRESOURCES;++res) if (res!=R_SILVER && res!=R_ARENA_GATE && (is_item(res) || is_herb(res) || is_potion(res))) {
@@ -139,18 +140,18 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 		}
 	}
 */
-	if (get_money(u) > fee) {
-		if (u2) change_money(u2, get_money(u) - fee);
-		else if (enter_fail(u)) return -1;
-	}
-	sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionname(u->region, u->faction), unitname(u));
-	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
-	use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE, 1);
+  if (get_money(u) > fee) {
+    if (u2) change_money(u2, get_money(u) - fee);
+    else if (enter_fail(u)) return -1;
+  }
+  sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionname(u->region, u->faction), unitname(u));
+  addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+  use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE, 1);
   use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee);
   set_money(u, 109);
-	fset(u, UFL_PARTEITARNUNG);
-	move_unit(u, start_region[rand() % 6], NULL);
-	return 0;
+  fset(u, UFL_PARTEITARNUNG);
+  move_unit(u, start_region[rng_int() % 6], NULL);
+  return 0;
 }
 
 /***
@@ -169,7 +170,7 @@ use_wand_of_tears(unit * user, const struct item_type * itype, int amount, order
 				int i;
 
 				for (i=0;i!=u->skill_size;++i) {
-					if (rand()%3) reduce_skill(u, u->skills+i, 1);
+					if (rng_int()%3) reduce_skill(u, u->skills+i, 1);
 				}
 				ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
 					"unit", u));
@@ -301,8 +302,8 @@ guardian_faction(plane * pl, int id)
 	if (!f) {
 		f = calloc(1, sizeof(faction));
 		f->banner = strdup("Sie dienen dem großen Wyrm");
-		f->passw = strdup(itoa36(rand()));
-		f->override = strdup(itoa36(rand()));
+		f->passw = strdup(itoa36(rng_int()));
+		f->override = strdup(itoa36(rng_int()));
     set_email(&f->email, "igjarjuk@eressea.de");
 		f->name = strdup("Igjarjuks Kundschafter");
 		f->race = new_race[RC_ILLUSION];

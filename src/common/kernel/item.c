@@ -40,6 +40,7 @@
 #include <util/goodies.h>
 #include <util/message.h>
 #include <util/umlaut.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -315,20 +316,21 @@ new_potiontype(item_type * itype,
 void
 rt_register(resource_type * rtype)
 {
-	resource_type ** prtype = &resourcetypes;
-
-	if (!rtype->hashkey)
-		rtype->hashkey = hashstring(rtype->_name[0]);
-	while (*prtype && *prtype!=rtype) prtype=&(*prtype)->next;
-	if (*prtype == NULL) {
-		*prtype = rtype;
-	}
+  resource_type ** prtype = &resourcetypes;
+  
+  if (!rtype->hashkey) {
+    rtype->hashkey = hashstring(rtype->_name[0]);
+  }
+  while (*prtype && *prtype!=rtype) prtype=&(*prtype)->next;
+  if (*prtype == NULL) {
+    *prtype = rtype;
+  }
 }
 
 const resource_type *
 item2resource(const item_type * itype)
 {
-	return itype->rtype;
+  return itype->rtype;
 }
 
 const item_type *
@@ -339,18 +341,18 @@ resource2item(const resource_type * rtype)
 
 const weapon_type *
 resource2weapon(const resource_type * rtype) {
-	return rtype->wtype;
+  return rtype->wtype;
 }
 
 const luxury_type *
 resource2luxury(const resource_type * rtype)
 {
 #ifdef AT_LTYPE
-	attrib * a = a_find(rtype->attribs, &at_ltype);
-	if (a) return (const luxury_type *)a->data.v;
-	return NULL;
+  attrib * a = a_find(rtype->attribs, &at_ltype);
+  if (a) return (const luxury_type *)a->data.v;
+  return NULL;
 #else
-	return rtype->ltype;
+  return rtype->ltype;
 #endif
 }
 
@@ -358,25 +360,25 @@ const potion_type *
 resource2potion(const resource_type * rtype)
 {
 #ifdef AT_PTYPE
-	attrib * a = a_find(rtype->attribs, &at_ptype);
-	if (a) return (const potion_type *)a->data.v;
-	return NULL;
+  attrib * a = a_find(rtype->attribs, &at_ptype);
+  if (a) return (const potion_type *)a->data.v;
+  return NULL;
 #else
-	return rtype->ptype;
+  return rtype->ptype;
 #endif
 }
 
 resource_type *
 rt_find(const char * name)
 {
-	unsigned int hash = hashstring(name);
-	resource_type * rtype;
+  unsigned int hash = hashstring(name);
+  resource_type * rtype;
 
   for (rtype=resourcetypes; rtype; rtype=rtype->next) {
     if (rtype->hashkey==hash && !strcmp(rtype->_name[0], name)) break;
   }
 
-	return rtype;
+  return rtype;
 }
 
 static const char * it_aliases[][2] = { 
@@ -401,57 +403,57 @@ it_alias(const char * zname)
 item_type *
 it_find(const char * zname)
 {
-	const char * name = it_alias(zname);
-	unsigned int hash = hashstring(name);
-	item_type * itype;
+  const char * name = it_alias(zname);
+  unsigned int hash = hashstring(name);
+  item_type * itype;
   unsigned int key = hash % IMAXHASH;
-
+  
   for (itype=itemtypes[key]; itype; itype=itype->next) {
     if (itype->rtype->hashkey==hash && strcmp(itype->rtype->_name[0], name) == 0) {
       break;
     }
-	}
+  }
   if (itype==NULL) {
     for (itype=itemtypes[key]; itype; itype=itype->next) {
       if (strcmp(itype->rtype->_name[1], name) == 0) break;
     }
   }
-	return itype;
+  return itype;
 }
 
 item **
 i_find(item ** i, const item_type * it)
 {
-	while (*i && (*i)->type!=it) i = &(*i)->next;
-	return i;
+  while (*i && (*i)->type!=it) i = &(*i)->next;
+  return i;
 }
 
 
 int
 i_get(const item * i, const item_type * it)
 {
-	i = *i_find((item**)&i, it);
-	if (i) return i->number;
-	return 0;
+  i = *i_find((item**)&i, it);
+  if (i) return i->number;
+  return 0;
 }
 
 item *
 i_add(item ** pi, item * i)
 {
-	assert(i && i->type && !i->next);
-	while (*pi) {
-		int d = strcmp((*pi)->type->rtype->_name[0], i->type->rtype->_name[0]);
-		if (d>=0) break;
-		pi = &(*pi)->next;
-	}
-	if (*pi && (*pi)->type==i->type) {
-		(*pi)->number += i->number;
-		i_free(i);
-	} else {
-		i->next = *pi;
-		*pi = i;
-	}
-	return *pi;
+  assert(i && i->type && !i->next);
+  while (*pi) {
+    int d = strcmp((*pi)->type->rtype->_name[0], i->type->rtype->_name[0]);
+    if (d>=0) break;
+    pi = &(*pi)->next;
+  }
+  if (*pi && (*pi)->type==i->type) {
+    (*pi)->number += i->number;
+    i_free(i);
+  } else {
+    i->next = *pi;
+    *pi = i;
+  }
+  return *pi;
 }
 
 void
@@ -629,7 +631,7 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 		curse * c;
     variant effect;
 
-    effect.i = rand()%6 - 1;
+    effect.i = rng_int()%6 - 1;
     c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
 			duration, effect, u->number);
 		c->data.i = SK_TACTICS;
@@ -1125,7 +1127,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
     change_effect(u, itype->rtype->ptype, 100*amount);
 	} else {
     trigger * trestore = trigger_changerace(u, u->race, u->irace);
-    int duration = 2 + rand() % 8;
+    int duration = 2 + rng_int() % 8;
 
     add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
     u->irace = u->race = new_race[RC_TOAD];
@@ -1142,25 +1144,25 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
 static int
 use_mistletoe(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
-	int mtoes = get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
+  int mtoes = get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
 
-	if (user->number>mtoes) {
-		ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-			"unit item region command", user, itype->rtype, user->region, ord));
-		return -1;
-	}
-	use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
-	a_add(&user->attribs, make_fleechance((float)1.0));
-		ADDMSG(&user->faction->msgs, msg_message("use_item",
-			"unit item", user, itype->rtype));
-	
-	return 0;
+  if (user->number>mtoes) {
+    ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
+                                             "unit item region command", user, itype->rtype, user->region, ord));
+    return -1;
+  }
+  use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
+  a_add(&user->attribs, make_fleechance((float)1.0));
+  ADDMSG(&user->faction->msgs, 
+         msg_message("use_item", "unit item", user, itype->rtype));
+  
+  return 0;
 }
 
 static int
 use_magicboost(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
-  int mtoes = get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
+  int mtoes = get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
   faction * f = user->faction;
   if (user->number>mtoes) {
     ADDMSG(&user->faction->msgs, msg_message("use_singleperson",

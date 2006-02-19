@@ -20,8 +20,8 @@
 #include <region.h>
 #include <unit.h>
 
-/* libc includes */
-#include <stdlib.h>
+/* util includes */
+#include <util/rng.h>
 
 #define age_chance(a,b,p) (max(0,a-b)*p)
 
@@ -31,7 +31,7 @@
 void
 age_firedragon(unit *u)
 {
-	if (rand()%100 < age_chance(u->age, DRAGONAGE, 1)) {
+	if (rng_int()%100 < age_chance(u->age, DRAGONAGE, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_DRAGON];
 		u->irace = new_race[RC_DRAGON];
@@ -43,7 +43,7 @@ age_firedragon(unit *u)
 void
 age_dragon(unit *u)
 {
-	if (rand()%100 < age_chance(u->age, WYRMAGE, 1)) {
+	if (rng_int()%100 < age_chance(u->age, WYRMAGE, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_WYRM];
 		u->irace = new_race[RC_WYRM];

@@ -26,6 +26,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -159,7 +160,7 @@ create_wormholes(void)
    * select a list of regions. we'll sort them by age later.
    */
   while (r!=NULL) {
-    int next = rand() % (2*WORMHOLE_CHANCE);
+    int next = rng_int() % (2*WORMHOLE_CHANCE);
     while (r!=NULL && (next!=0 || !good_region(r))) {
       if (good_region(r)) {
         --next;

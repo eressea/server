@@ -46,12 +46,12 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
+#include <util/rng.h>
 #include <util/variant.h>
 
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -227,7 +227,7 @@ destroy_unit(unit * u)
 	 * Items haben, sonst Memory-Leak. */
 	
 	clone = has_clone(u);
-	if (clone && rand()%100 < 90) {
+	if (clone && rng_int()%100 < 90) {
 		attrib *a;
 		int i;
 
@@ -955,7 +955,7 @@ boolean
 learn_skill(unit * u, skill_t sk, double chance)
 {
 	skill * sv = u->skills;
-	if (chance < 1.0 && rand()%10000>=chance*10000) return false;
+	if (chance < 1.0 && rng_int()%10000>=chance*10000) return false;
 	while (sv != u->skills + u->skill_size) {
 		assert (sv->weeks>0);
 		if (sv->id == sk) {

@@ -83,16 +83,16 @@
 #include <kernel/item.h>
 
 /* util includes */
-#include <rand.h>
+#include <util/rand.h>
+#include <util/rng.h>
 #include <util/xml.h>
 #include <util/goodies.h>
-#include <log.h>
-#include <sql.h>
-#include <base36.h>
+#include <util/log.h>
+#include <util/sql.h>
+#include <util/base36.h>
 
 /* libc includes */
 #include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
@@ -244,8 +244,8 @@ processturn(char *filename)
   newfaction * players;
 	int i;
 
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
 
 #ifdef SHORTPWDS
   readshortpwds("passwords");
@@ -254,8 +254,8 @@ processturn(char *filename)
 	turn++;
 	if ((i=readorders(filename))!=0) return i;
   if (!nomonsters) {
-    if (turn == 0) srand((int)time(0));
-    else srand(turn);
+    if (turn == 0) rng_init((int)time(0));
+    else rng_init(turn);
     puts(" - Monster KI...");
     plan_monsters();
   }
@@ -604,8 +604,8 @@ main(int argc, char *argv[])
 		return crwritemap("world.cr"); 
 	}
 
-  if (turn == 0) srand((int)time(0));
-  else srand(turn);
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
 
 
 	if ((i = processturn(orders))!=0) {

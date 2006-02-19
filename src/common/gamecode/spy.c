@@ -47,6 +47,7 @@
 /* util includes */
 #include <util/vset.h>
 #include <util/rand.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -134,7 +135,7 @@ setwere_cmd(unit *u, struct order * ord)
   if (s == NULL || *s == '\0') {
     if(fval(u, UFL_WERE)) {
       cmistake(u, ord, 309, MSG_EVENT);
-    } else if(rand()%100 < 35+(level-1)*20) { /* 35, 55, 75, 95% */
+    } else if(rng_int()%100 < 35+(level-1)*20) { /* 35, 55, 75, 95% */
       fset(u, UFL_WERE);
     } else {
       cmistake(u, ord, 311, MSG_EVENT);
@@ -142,7 +143,7 @@ setwere_cmd(unit *u, struct order * ord)
   } else if (findparam(s, u->faction->locale) == P_NOT) {
     if(fval(u, UFL_WERE)) {
       cmistake(u, ord, 310, MSG_EVENT);
-    } else if(rand()%100 < 90-level*20) {	/* 70, 50, 30, 10% */
+    } else if(rng_int()%100 < 90-level*20) {	/* 70, 50, 30, 10% */
       freset(u, UFL_WERE);
     } else {
       cmistake(u, ord, 311, MSG_EVENT);

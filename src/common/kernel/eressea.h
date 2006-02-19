@@ -223,27 +223,12 @@ extern void read_laen(struct region * r, int laen);
 
 #define DISALLOW_ATTACK_AND_WORK
 
-/** Ausbreitung und Vermehrung */
-
-#define MAXDEMAND      25
-#define DMRISE         10
-#define DMRISEHAFEN    20
-
 /* Vermehrung trotz 90% Auslastung */
 #define PEASANTFORCE   0.75
 
 #define PEASANTSWANDER_WEIGHT 5
 #define PEASANTSGREED_WEIGHT  5
 
-#define STARVATION_SURVIVAL  10
-
-/* Pferdevermehrung */
-#define HORSEGROWTH 4
-/* Wanderungschance pro Pferd */
-#define HORSEMOVE   3
-
-/* Vermehrungschance pro Baum */
-#define FORESTGROWTH 10000					/* In Millionstel */
 #define TREESIZE     (MAXPEASANTS_PER_AREA-2)
 
 /* Eisen in Bergregionen bei Erschaffung */
@@ -273,9 +258,9 @@ extern void read_laen(struct region * r, int laen);
 
 /** Plagues **/
 /* Seuchenwahrscheinlichkeit (siehe plagues()) */
-#define SEUCHE         10
+#define SEUCHE         0.1F
 /* % Betroffene */
-#define SEUCHENOPFER   20
+#define SEUCHENOPFER   0.2F
 extern void plagues(struct region * r, boolean ismagic);
 
 /** Healing **/

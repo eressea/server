@@ -143,7 +143,7 @@ create_random_name(race_t race)
 	switch (race)
 	{
 	case RC_DWARF:
-		strcpy(name, dwarf_syllable1[rand()%(sizeof(dwarf_syllable1) / sizeof(char*))]);
+		strcpy(name, dwarf_syllable1[rng_int()%(sizeof(dwarf_syllable1) / sizeof(char*))]);
 		strcat(name, dwarf_syllable2[rand()%(sizeof(dwarf_syllable2) / sizeof(char*))]);
 		strcat(name, dwarf_syllable3[rand()%(sizeof(dwarf_syllable3) / sizeof(char*))]);
 		break;

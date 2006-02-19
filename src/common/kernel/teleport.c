@@ -33,11 +33,11 @@
 #include "plane.h"
 
 /* util includes */
-#include <log.h>
+#include <util/log.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
-#include <stdlib.h>
 
 #define TE_CENTER_X 1000
 #define TE_CENTER_Y 1000
@@ -142,7 +142,7 @@ spawn_braineaters(float chance)
 {
   region *r;
   faction *f0 = findfaction(MONSTER_FACTION);
-  int next = rand() % (int)(chance*100);
+  int next = rng_int() % (int)(chance*100);
   
   if (f0==NULL) return;
 
@@ -151,13 +151,13 @@ spawn_braineaters(float chance)
 
     /* Neues Monster ? */
     if (next-- == 0) {
-      unit *u = createunit(r, f0, 1+rand()%10+rand()%10, new_race[RC_HIRNTOETER]);
+      unit *u = createunit(r, f0, 1+rng_int()%10+rng_int()%10, new_race[RC_HIRNTOETER]);
 
       set_string(&u->name, "Hirntöter");
       set_string(&u->display, "Wabernde grüne Schwaden treiben durch den Nebel und verdichten sich zu einer unheimlichen Kreatur, die nur aus einem langen Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.");
       set_level(u, SK_STEALTH, 1);
       set_level(u, SK_OBSERVATION, 1);
-      next = rand() % (int)(chance*100);
+      next = rng_int() % (int)(chance*100);
     }
   }
 }

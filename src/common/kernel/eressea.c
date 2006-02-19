@@ -64,6 +64,7 @@
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/log.h>
+#include <util/rng.h>
 #include <util/sql.h>
 #include <util/translation.h>
 #include <util/umlaut.h>
@@ -75,7 +76,6 @@
 
 /* libc includes */
 #include <stdio.h>
-#include <stdlib.h>
 #include <message.h>
 #include <string.h>
 #include <ctype.h>
@@ -766,7 +766,7 @@ distribute(int old, int new_value, int n)
 
 	t = (n / old) * new_value;
 	for (i = (n % old); i; i--)
-		if (rand() % old < new_value)
+		if (rng_int() % old < new_value)
 			t++;
 
 	return t;
@@ -881,7 +881,7 @@ scale_number (unit * u, int n)
     full = u->hp/u->number; /* wieviel kriegt jede person mindestens */
     u->hp = full * n + (u->hp-full*u->number) * n / u->number;
     assert(u->hp>=0);
-    if ((rand() % u->number) < remain)
+    if ((rng_int() % u->number) < remain)
       ++u->hp;	/* Nachkommastellen */
   } else {
     remain = 0;
@@ -894,7 +894,7 @@ scale_number (unit * u, int n)
       remain = data->value - snew / n * u->number;
       snew += remain * n / u->number;
       remain = (remain * n) % u->number;
-      if ((rand() % u->number) < remain)
+      if ((rng_int() % u->number) < remain)
         ++snew;	/* Nachkommastellen */
     }
     data->value = snew;
@@ -1850,7 +1850,7 @@ newunitid(void)
 {
 	int random_unit_no;
 	int start_random_no;
-	random_unit_no = 1 + (rand() % MAX_UNIT_NR);
+	random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
 	start_random_no = random_unit_no;
 
 	while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
@@ -1874,7 +1874,7 @@ newcontainerid(void)
 	int random_no;
 	int start_random_no;
 
-	random_no = 1 + (rand() % MAX_CONTAINER_NR);
+	random_no = 1 + (rng_int() % MAX_CONTAINER_NR);
 	start_random_no = random_no;
 
 	while (findship(random_no) || findbuilding(random_no)) {
@@ -2678,7 +2678,7 @@ hunger(int number, unit * u)
 	int hp = u->hp / u->number;
 
 	while (number--) {
-		int dam = u->race==new_race[RC_HALFLING]?15+rand()%14:(13+rand()%12);
+		int dam = u->race==new_race[RC_HALFLING]?15+rng_int()%14:(13+rng_int()%12);
 		if (dam >= hp) {
 			++dead;
 		} else {
@@ -2711,40 +2711,36 @@ hunger(int number, unit * u)
 void
 plagues(region * r, boolean ismagic)
 {
-	double prob;
-	int peasants;
-	int i;
-	int gestorben;
-	/* Vermeidung von DivByZero */
-	double mwp = max(maxworkingpeasants(r), 1);
+  int peasants;
+  int i;
+  int dead = 0;
 
-	/* Seuchenwahrscheinlichkeit in % */
+  /* Seuchenwahrscheinlichkeit in % */
 
-	prob = pow((double) rpeasants(r) /
-	  (mwp * (((double)wage(r, NULL, NULL)) / 10.0) * 1.3), 4.0)
-		* (double) SEUCHE;
+  if (!ismagic) {
+    double mwp = max(maxworkingpeasants(r), 1);
+    double prob = pow(rpeasants(r) / (mwp * wage(r, NULL, NULL) * 0.13), 4.0)
+        * SEUCHE;
+    
+    if (rng_double() >= prob) return;
+  }
 
-	if (rand() % 100 >= (int)prob && !ismagic) return;
+  peasants = rpeasants(r);
+  dead = (int)(0.5F + SEUCHENOPFER * peasants);
+  for (i = dead; i != 0; i--) {
+    if (rng_int() % 100 < HEILCHANCE && rmoney(r) >= HEILKOSTEN) {
+      rsetmoney(r, rmoney(r) - HEILKOSTEN);
+    } else {
+      --dead;
+    }
+  }
 
-	peasants = rpeasants(r);
-	for (i = peasants; i != 0; i--) {
-		if (rand() % 100 < SEUCHENOPFER) {
-			if (rand() % 100 < HEILCHANCE && rmoney(r) >= HEILKOSTEN) {
-				rsetmoney(r, rmoney(r) - HEILKOSTEN);
-			} else {
-				peasants--;
-			}
-		}
-	}
-
-	gestorben = rpeasants(r) - peasants;
-
-	if (gestorben > 0) {
-		message * msg = add_message(&r->msgs, msg_message("pest", "dead", gestorben));
-		msg_release(msg);
-		deathcounts(r, gestorben);
-	}
-	rsetpeasants(r, peasants);
+  if (dead > 0) {
+    message * msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
+    msg_release(msg);
+    deathcounts(r, dead);
+    rsetpeasants(r, peasants - dead);
+  }
 }
 
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
@@ -3053,7 +3049,7 @@ lovar(double xpct_x2)
 {
   int n = (int)(xpct_x2 * 500)+1;
   if (n==0) return 0;
-	return (rand() % n + rand() % n)/1000;
+	return (rng_int() % n + rng_int() % n)/1000;
 }
 
 boolean
@@ -3139,9 +3135,9 @@ kernel_init(void)
 
 	if (!turn) turn = lastturn();
 	if (turn == 0)
-		srand((int)time(0));
+		rng_init((int)time(0));
 	else
-		srand(turn);
+		rng_init(turn);
 	if (sqlpatch) {
 		sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
 		sql_init(zBuffer);

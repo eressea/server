@@ -52,14 +52,15 @@
 #include <attributes/key.h>
 
 /* util includes */
-#include <attrib.h>
-#include <base36.h>
-#include <event.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/event.h>
 #include <util/goodies.h>
-#include <resolve.h>
-#include <sql.h>
-#include <rand.h>
-#include <umlaut.h>
+#include <util/resolve.h>
+#include <util/sql.h>
+#include <util/rand.h>
+#include <util/rng.h>
+#include <util/umlaut.h>
 
 /* libc includes */
 #include <string.h>
@@ -1505,7 +1506,7 @@ readfaction(FILE * F)
   if (global.data_version >= OVERRIDE_VERSION) {
     rds(F, &f->override);
   } else {
-    f->override = strdup(itoa36(rand()));
+    f->override = strdup(itoa36(rng_int()));
   }
 
   if (global.data_version < LOCALE_VERSION) {
