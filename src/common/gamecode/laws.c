@@ -4051,7 +4051,6 @@ processorders (void)
 
   puts(" - Neue Nummern");
   renumber();
-
   for (r = regions;r;r=r->next) reorder_owners(r);
 
   puts(" - Attribute altern");

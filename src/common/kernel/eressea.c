@@ -2947,92 +2947,92 @@ add_income(unit * u, int type, int want, int qty)
 void
 reorder_owners(region * r)
 {
-	unit ** up=&r->units, ** useek;
-	building * b=NULL;
-	ship * sh=NULL;
+  unit ** up=&r->units, ** useek;
+  building * b=NULL;
+  ship * sh=NULL;
 #ifndef NDEBUG
-	size_t len = listlen(r->units);
+  size_t len = listlen(r->units);
 #endif
-	for (b = r->buildings;b;b=b->next) {
-		unit ** ubegin = up;
-		unit ** uend = up;
+  for (b = r->buildings;b;b=b->next) {
+    unit ** ubegin = up;
+    unit ** uend = up;
+    
+    useek = up;
+    while (*useek) {
+      unit * u = *useek;
+      if (u->building==b) {
+        unit ** insert;
+        if (fval(u, UFL_OWNER)) {
+          unit * nu = *ubegin;
+          insert = ubegin;
+          if (nu!=u && nu->building==u->building && fval(nu, UFL_OWNER)) {
+            log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", buildingname(nu->building)));
+            freset(nu, UFL_OWNER);
+          }
+        }
+        else insert = uend;
+        if (insert != useek) {
+          *useek = u->next; /* raus aus der liste */
+          u->next = *insert;
+          *insert = u;
+        }
+        if (insert==uend) uend=&u->next;
+      }
+      if (*useek==u) useek = &u->next;
+    }
+    up = uend;
+  }
 
-		useek = up;
-		while (*useek) {
-			unit * u = *useek;
-			if (u->building==b) {
-				unit ** insert;
-				if (fval(u, UFL_OWNER)) {
-					unit * nu = *ubegin;
-					insert=ubegin;
-					if (nu!=u && nu->building==u->building && fval(nu, UFL_OWNER)) {
-						log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", buildingname(nu->building)));
-						freset(nu, UFL_OWNER);
-					}
-				}
-				else insert = uend;
-				if (insert!=useek) {
-					*useek = u->next; /* raus aus der liste */
-					u->next = *insert;
-					*insert = u;
-				}
-				if (insert==uend) uend=&u->next;
-			}
-			if (*useek==u) useek = &u->next;
-		}
-		up = uend;
-	}
-
-	useek=up;
-	while (*useek) {
-		unit * u = *useek;
-		assert(!u->building);
-		if (u->ship==NULL) {
-			if (fval(u, UFL_OWNER)) {
-				log_warning(("[reorder_owners] Einheit %s war Besitzer von nichts.\n", unitname(u)));
-				freset(u, UFL_OWNER);
-			}
-			if (useek!=up) {
-				*useek = u->next; /* raus aus der liste */
-				u->next = *up;
-				*up = u;
-			}
-			up = &u->next;
-		}
-		if (*useek==u) useek = &u->next;
-	}
-
-	for (sh = r->ships;sh;sh=sh->next) {
-		unit ** ubegin = up;
-		unit ** uend = up;
-
-		useek = up;
-		while (*useek) {
-			unit * u = *useek;
-			if (u->ship==sh) {
-				unit ** insert;
-				if (fval(u, UFL_OWNER)) {
-					unit * nu = *ubegin;
-					insert = ubegin;
-					if (nu!=u && nu->ship==u->ship && fval(nu, UFL_OWNER)) {
-						log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", shipname(nu->ship)));
-						freset(nu, UFL_OWNER);
-					}
-				}
-				else insert = uend;
-				if (insert!=useek) {
-					*useek = u->next; /* raus aus der liste */
-					u->next = *insert;
-					*insert = u;
-				}
-				if (insert==uend) uend=&u->next;
-			}
-			if (*useek==u) useek = &u->next;
-		}
-		up = uend;
-	}
+  useek=up;
+  while (*useek) {
+    unit * u = *useek;
+    assert(!u->building);
+    if (u->ship==NULL) {
+      if (fval(u, UFL_OWNER)) {
+        log_warning(("[reorder_owners] Einheit %s war Besitzer von nichts.\n", unitname(u)));
+        freset(u, UFL_OWNER);
+      }
+      if (useek!=up) {
+        *useek = u->next; /* raus aus der liste */
+        u->next = *up;
+        *up = u;
+      }
+      up = &u->next;
+    }
+    if (*useek==u) useek = &u->next;
+  }
+  
+  for (sh = r->ships;sh;sh=sh->next) {
+    unit ** ubegin = up;
+    unit ** uend = up;
+    
+    useek = up;
+    while (*useek) {
+      unit * u = *useek;
+      if (u->ship==sh) {
+        unit ** insert;
+        if (fval(u, UFL_OWNER)) {
+          unit * nu = *ubegin;
+          insert = ubegin;
+          if (nu!=u && nu->ship==u->ship && fval(nu, UFL_OWNER)) {
+            log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", shipname(nu->ship)));
+            freset(nu, UFL_OWNER);
+          }
+        }
+        else insert = uend;
+        if (insert!=useek) {
+          *useek = u->next; /* raus aus der liste */
+          u->next = *insert;
+          *insert = u;
+        }
+        if (insert==uend) uend=&u->next;
+      }
+      if (*useek==u) useek = &u->next;
+    }
+    up = uend;
+  }
 #ifndef NDEBUG
-	assert(len==listlen(r->units));
+  assert(len==listlen(r->units));
 #endif
 }
 

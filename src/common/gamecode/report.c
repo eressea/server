@@ -244,26 +244,26 @@ report_spell(FILE * F, 	spell *sp, const struct locale * lang)
   int dh = 0;
   char * bufp;
 
-	rnl(F);
-	centre(F, spell_name(sp, lang), true);
-	rnl(F);
+  rnl(F);
+  centre(F, spell_name(sp, lang), true);
+  rnl(F);
   rparagraph(F, LOC(lang, "nr_spell_description"), 0, 0, 0);
-	rparagraph(F, spell_info(sp, lang), 2, 0, 0);
+  rparagraph(F, spell_info(sp, lang), 2, 0, 0);
 
   bufp = buf;
-	bufp += strxcpy(bufp, LOC(lang, "nr_spell_type"));
+  bufp += strxcpy(bufp, LOC(lang, "nr_spell_type"));
   *bufp++ = ' ';
-	if (sp->sptyp & PRECOMBATSPELL) {
-		bufp += strxcpy(bufp, "Präkampfzauber");
-	} else if (sp->sptyp & COMBATSPELL) {
-		bufp += strxcpy(bufp, "Kampfzauber");
-	} else if (sp->sptyp & POSTCOMBATSPELL) {
-		bufp += strxcpy(bufp, "Postkampfzauber");
-	} else {
-		bufp += strxcpy(bufp, "Normaler Zauber");
-	}
-	rparagraph(F, buf, 0, 0, 0);
-
+  if (sp->sptyp & PRECOMBATSPELL) {
+    bufp += strxcpy(bufp, "Präkampfzauber");
+  } else if (sp->sptyp & COMBATSPELL) {
+    bufp += strxcpy(bufp, "Kampfzauber");
+  } else if (sp->sptyp & POSTCOMBATSPELL) {
+    bufp += strxcpy(bufp, "Postkampfzauber");
+  } else {
+    bufp += strxcpy(bufp, "Normaler Zauber");
+  }
+  rparagraph(F, buf, 0, 0, 0);
+  
   sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sp->level);
   rparagraph(F, buf, 0, 0, 0);
 
@@ -546,40 +546,40 @@ rps_nowrap(FILE * F, const char *s)
 static void
 rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 {
-	attrib *a_otherfaction;
-	char marker;
-	int dh;
-	boolean isbattle = (boolean)(mode == see_battle);
-	if(u->race == new_race[RC_SPELL]) return;
+  attrib *a_otherfaction;
+  char marker;
+  int dh;
+  boolean isbattle = (boolean)(mode == see_battle);
+ 
+  if (u->race == new_race[RC_SPELL]) return;
 
-	{
-		rnl(F);
-		dh = bufunit(f, u, indent, mode);
-	}
+  {
+    rnl(F);
+    dh = bufunit(f, u, indent, mode);
+  }
 
-	a_otherfaction = a_find(u->attribs, &at_otherfaction);
+  a_otherfaction = a_find(u->attribs, &at_otherfaction);
 
-	if(u->faction == f) {
-		marker = '*';
-	} else {
-		if(a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
-				&& !fval(u, UFL_PARTEITARNUNG)) {
-			marker = '!';
-		} else {
-			if(dh && !fval(u, UFL_PARTEITARNUNG)) {
-				marker = '+';
-			} else {
-				marker = '-';
-			}
-		}
-	}
+  if (u->faction == f) {
+    marker = '*';
+  } else {
+    if (a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
+        && !fval(u, UFL_PARTEITARNUNG)) {
+      marker = '!';
+    } else {
+      if (dh && !fval(u, UFL_PARTEITARNUNG)) {
+        marker = '+';
+      } else {
+        marker = '-';
+      }
+    }
+  }
 
-	rparagraph(F, buf, indent, 0, marker);
+  rparagraph(F, buf, indent, 0, marker);
 
-	if(!isbattle){
-		print_curses(F, f, u, TYP_UNIT, indent);
-	}
-
+  if (!isbattle) {
+    print_curses(F, f, u, TYP_UNIT, indent);
+  }
 }
 
 static void
@@ -1603,18 +1603,18 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
 void
 report_building(FILE *F, const region * r, const building * b, const faction * f, int mode)
 {
-	int i;
-	unit *u;
+  int i;
+  unit *u;
   const char * bname;
-	const struct locale * lang = NULL;
-	const building_type * type = b->type;
+  const struct locale * lang = NULL;
+  const building_type * type = b->type;
   static const struct building_type * bt_illusion;
 
   if (!bt_illusion) bt_illusion = bt_find("illusion");
-	if (f) lang = f->locale;
-
+  if (f) lang = f->locale;
+  
   sprintf(buf, "%s, %s %d, ", buildingname(b), LOC(f->locale, "nr_size"),
-    b->size);
+          b->size);
 
   if (b->type==bt_illusion) {
     attrib * a = a_find(b->attribs, &at_icastle);
@@ -1635,32 +1635,33 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
     }
   }
 
-	if (b->size < type->maxsize) {
-		scat(" (im Bau)");
-	}
+  if (b->size < type->maxsize) {
+    scat(" (im Bau)");
+  }
 
-	if (b->besieged > 0 && mode>=see_lighthouse) {
-		scat(", belagert von ");
-		icat(b->besieged);
-		scat(" Personen ");
-		if (b->besieged >= b->size * SIEGEFACTOR) {
-			scat("(abgeschnitten)");
-		} else {
-			scat("(unvollständig belagert)");
-		}
-	}
-	i = 0;
-	if (b->display && b->display[0]) {
-		scat("; ");
-		scat(b->display);
-		i = b->display[strlen(b->display) - 1];
-	}
-
+  if (b->besieged > 0 && mode>=see_lighthouse) {
+    scat(", belagert von ");
+    icat(b->besieged);
+    scat(" Personen ");
+    if (b->besieged >= b->size * SIEGEFACTOR) {
+      scat("(abgeschnitten)");
+    } else {
+      scat("(unvollständig belagert)");
+    }
+  }
+  i = 0;
+  if (b->display && b->display[0]) {
+    scat("; ");
+    scat(b->display);
+    i = b->display[strlen(b->display) - 1];
+  }
+  
 #ifdef WDW_PYRAMID
-
-	if (i != '!' && i != '?' && i != '.')
-		scat(", ");
-
+  
+  if (i != '!' && i != '?' && i != '.') {
+    scat(", ");
+  }
+  
   if (b->type == bt_find("pyramid")) {
     unit * owner = buildingowner(r, b);
     scat("Größenstufe ");
@@ -1707,25 +1708,28 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 
 #else
 
-	if (i != '!' && i != '?' && i != '.')
-		scat(".");
+  if (i != '!' && i != '?' && i != '.')
+      scat(".");
 
 #endif
 
-	rparagraph(F, buf, 2, 0, 0);
+  rparagraph(F, buf, 2, 0, 0);
 
-	if (mode<see_lighthouse) return;
+  if (mode<see_lighthouse) return;
 
-	print_curses(F, f, b, TYP_BUILDING, 4);
+  print_curses(F, f, b, TYP_BUILDING, 4);
 
-	for (u = r->units; u; u = u->next)
-		if (u->building == b && fval(u, UFL_OWNER)) {
-			rpunit(F, f, u, 6, mode);
-			break;
-		}
-	for (u = r->units; u; u = u->next)
-		if (u->building == b && !fval(u, UFL_OWNER))
-			rpunit(F, f, u, 6, mode);
+  for (u = r->units; u; u = u->next) {
+    if (u->building == b) {
+      assert(fval(u, UFL_OWNER) || !"you must call reorder_owners() first!");
+      rpunit(F, f, u, 6, mode);
+      u = u->next;
+      break;
+    }
+  }
+  for (;u!=NULL && u->building==b;u=u->next) {
+    rpunit(F, f, u, 6, mode);
+  }
 }
 
 int

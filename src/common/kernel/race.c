@@ -276,45 +276,43 @@ r_insectstalled(const region * r)
 const char *
 rc_name(const race * rc, int n)
 {
-	return mkname("race", rc->_name[n]);
+  return mkname("race", rc->_name[n]);
 }
 
 const char *
 raceprefix(const unit *u)
 {
-	const attrib * asource = u->faction->attribs;
+  const attrib * asource = u->faction->attribs;
 
   if (fval(u, UFL_GROUP)) {
     const attrib * agroup = agroup = a_findc(u->attribs, &at_group);
-  	if (agroup!=NULL) asource = ((const group *)(agroup->data.v))->attribs;
+    if (agroup!=NULL) asource = ((const group *)(agroup->data.v))->attribs;
   }
-	return get_prefix(asource);
+  return get_prefix(asource);
 }
 
 const char *
 racename(const struct locale *loc, const unit *u, const race * rc)
 {
-	const char * prefix = raceprefix(u);
-	attrib * asyn = a_find(u->faction->attribs, &at_synonym);
+  const char * prefix = raceprefix(u);
+  attrib * asyn = a_find(u->faction->attribs, &at_synonym);
 
-	if (prefix!=NULL) {
-		static char lbuf[80];
-		char * s = lbuf;
-		strcpy(lbuf, locale_string(loc, mkname("prefix", prefix)));
-		s += strlen(lbuf);
-		if (asyn!=NULL) {
-			strcpy(s, locale_string(loc,
-				((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
-		} else {
-			strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
-		}
-		s[0] = (char)tolower(s[0]);
-		return lbuf;
-	} else if (asyn!=NULL) {
-		return(locale_string(loc,
-			((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
-	}
-	return LOC(loc, rc_name(rc, u->number != 1));
+  if (prefix!=NULL) {
+    static char lbuf[80];
+    char * s = lbuf;
+    strcpy(lbuf, locale_string(loc, mkname("prefix", prefix)));
+    s += strlen(lbuf);
+    if (asyn!=NULL) {
+      strcpy(s, LOC(loc, ((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
+    } else {
+      strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
+    }
+    s[0] = (char)tolower(s[0]);
+    return lbuf;
+  } else if (asyn!=NULL) {
+    return(LOC(loc, ((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
+  }
+  return LOC(loc, rc_name(rc, u->number != 1));
 }
 
 static void
