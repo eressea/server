@@ -165,15 +165,14 @@ get_triggers(struct attrib * ap, const char * eventname)
 {
 	handler_info * td = NULL;
 	attrib * a = a_find(ap, &at_eventhandler);
-	while (a!=NULL) {
+	while (a!=NULL && a->type==&at_eventhandler) {
 		td = (handler_info *)a->data.v;
-		if (!strcmp(td->event, eventname)) {
-			break;
+		if (strcmp(td->event, eventname)==0) {
+			return &td->triggers;
 		}
-		a = a->nexttype;
+		a = a->next;
 	}
-	if (!a) return NULL;
-	return &td->triggers;
+	return NULL;
 }
 
 void
@@ -183,14 +182,14 @@ add_trigger(struct attrib ** ap, const char * eventname, struct trigger * t)
 	handler_info * td = NULL;
 	attrib * a = a_find(*ap, &at_eventhandler);
 	assert(t->next==NULL);
-	while (a!=NULL) {
+	while (a!=NULL && a->type==&at_eventhandler) {
 		td = (handler_info *)a->data.v;
 		if (!strcmp(td->event, eventname)) {
 			break;
 		}
-		a = a->nexttype;
+		a = a->next;
 	}
-	if (!a) {
+	if (a==NULL || a->type!=&at_eventhandler) {
 		a = a_add(ap, a_new(&at_eventhandler));
 		td = (handler_info *)a->data.v;
 		td->event = strdup(eventname);
@@ -207,14 +206,14 @@ handle_event(attrib ** attribs, const char * eventname, void * data)
 		if ((*attribs)->type==&at_eventhandler) break;
 		attribs = &(*attribs)->next;
 	}
-	while (*attribs) {
+	while (*attribs && (*attribs)->type==&at_eventhandler) {
 		handler_info * tl = (handler_info*)(*attribs)->data.v;
-		if (!strcmp(tl->event, eventname)) break;
-		attribs = &(*attribs)->nexttype;
-	}
-	if (*attribs) {
-		handler_info * tl = (handler_info*)(*attribs)->data.v;
-		handle_triggers(&tl->triggers, data);
+    if (!strcmp(tl->event, eventname)) {
+      handler_info * tl = (handler_info*)(*attribs)->data.v;
+      handle_triggers(&tl->triggers, data);
+      break;
+    }
+		attribs = &(*attribs)->next;
 	}
 }
 

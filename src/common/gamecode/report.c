@@ -982,7 +982,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				}
 			}
 			/* Spezielle Richtungen */
-			for (a = a_find(r->attribs, &at_direction);a;a = a->nexttype) {
+			for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
 				spec_direction * d = (spec_direction *)(a->data.v);
 				strcpy(bufp++, " ");
 				bufp += strxcpy(bufp, d->desc);
@@ -1155,7 +1155,7 @@ durchreisende(FILE * F, const region * r, const faction * f)
 	/* Wieviele sind aufzulisten? Für die Grammatik. */
 
   if (fval(r, RF_TRAVELUNIT)) {
-    for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+    for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type!=&at_travelunit; ru = ru->next) {
       unit * u = (unit*)ru->data.v;
       if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
         if (u->ship && !fval(u, UFL_OWNER))
@@ -1173,7 +1173,7 @@ durchreisende(FILE * F, const region * r, const faction * f)
 	buf[0] = 0;
 	rnl(F);
 
-	for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+	for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
 		unit * u = (unit*)ru->data.v;
 		if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
 			if (u->ship && !fval(u, UFL_OWNER))
@@ -1778,7 +1778,7 @@ report_plaintext(const char * filename, report_context * ctx)
 #ifdef KARMA_MODULE
 	buf[0] = 0;
 	dh = 0;
-	for (a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+	for (a=a_find(f->attribs, &at_faction_special); a && a->type==&at_faction_special; a=a->next) {
     char buf2[80];
 		dh++;
 		if (fspecials[a->data.sa[0]].maxlevel != 100) {
@@ -1930,15 +1930,15 @@ report_plaintext(const char * filename, report_context * ctx)
 	if (a) {
 		rnl(F);
 		centre(F, LOC(f->locale, "section_newspells"), true);
-		while (a) {
+		while (a && a->type==&at_reportspell) {
       spell *sp = (spell *)a->data.v;
 			report_spell(F, sp, f->locale);
-			a = a->nexttype;
+			a = a->next;
 		}
 	}
 
 	ch = 0;
-	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
+	for (a=a_find(f->attribs, &at_showitem);a && a->type==&at_showitem;a=a->next) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
 		const char * description = NULL;
 		requirement * m;

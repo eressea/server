@@ -607,9 +607,9 @@ shipspeed (const ship * sh, const unit * u)
   }
 
   a = a_find(sh->attribs, &at_speedup);
-  while (a != NULL) {
+  while (a != NULL && a->type==&at_speedup) {
     k += a->data.sa[0];
-    a = a->nexttype;
+    a = a->next;
   }
  
   c = get_curse(sh->attribs, ct_find("shipspeedup"));
@@ -887,7 +887,7 @@ scale_number (unit * u, int n)
     remain = 0;
     u->hp = 0;
   }
-  for (a = a_find(u->attribs, &at_effect);a;a=a->nexttype) {
+  for (a = a_find(u->attribs, &at_effect);a && a->type==&at_effect;a=a->next) {
     effect_data * data = (effect_data *)a->data.v;
     int snew = data->value / u->number * n;
     if (n) {
@@ -1191,10 +1191,10 @@ update_lighthouse(building * lh)
         if (!fval(r2->terrain, SEA_REGION)) continue;
         if (distance(r, r2) > d) continue;
         a = a_find(r2->attribs, &at_lighthouse);
-        while (a) {
+        while (a && a->type==&at_lighthouse) {
           building * b = (building*)a->data.v;
           if (b==lh) break;
-          a=a->nexttype;
+          a = a->next;
         }
         if (!a) {
           a = a_add(&r2->attribs, a_new(&at_lighthouse));
@@ -2022,7 +2022,7 @@ get_lighthouses(const region * r)
 
   if (!fval(r->terrain, SEA_REGION)) return NULL;
 
-  for (a = a_find(r->attribs, &at_lighthouse);a;a=a->nexttype) {
+  for (a = a_find(r->attribs, &at_lighthouse);a && a->type==&at_lighthouse;a=a->next) {
     building *b = (building *)a->data.v;
     region *r2 = b->region;
 
@@ -2081,7 +2081,7 @@ check_leuchtturm(region * r, faction * f)
 
 	if (!fval(r->terrain, SEA_REGION)) return false;
 
-	for (a = a_find(r->attribs, &at_lighthouse);a;a=a->nexttype) {
+	for (a = a_find(r->attribs, &at_lighthouse);a && a->type==&at_lighthouse;a=a->next) {
 		building *b = (building *)a->data.v;
 		region *r2 = b->region;
 
@@ -2130,16 +2130,17 @@ lastregion (faction * f)
   /* we continue from the best region and look for travelthru etc. */
 	for (r = f->last->next; r; r = r->next) {
 		plane * p = rplane(r);
-		attrib *ru;
 
     /* search the region for travelthru-attributes: */
     if (fval(r, RF_TRAVELUNIT)) {
-      for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+      attrib * ru = a_find(r->attribs, &at_travelunit); 
+      while (ru && ru->type==&at_travelunit) {
         u = (unit*)ru->data.v;
         if (u->faction == f) {
           f->last = r;
           break;
         }
+        ru = ru->next;
       }
     }
     if (f->last == r) continue;
@@ -2844,7 +2845,7 @@ findspecialdirection(const region *r, const char *token)
   spec_direction *d;
 
   if (strlen(token)==0) return NULL;
-  for (a = a_find(r->attribs, &at_direction);a;a=a->nexttype) {
+  for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
     d = (spec_direction *)(a->data.v);
 
     if (d->active && strncasecmp(d->keyword, token, strlen(token)) == 0) {

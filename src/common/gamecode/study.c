@@ -668,7 +668,7 @@ learn(void)
           teach->value += u->number * 10;
         }
 
-        if (is_cursed(r->attribs,C_BADLEARN,0)) {
+        if (is_cursed(r->attribs, C_BADLEARN,0)) {
           teach->value -= u->number * 10;
         }
 
@@ -724,8 +724,8 @@ learn(void)
             for (ptype=potiontypes; ptype; ptype=ptype->next) {
               if (skill == ptype->level * 2) {
                 attrib * a = a_find(f->attribs, &at_showitem);
-                while (a && a->data.v != ptype) a=a->nexttype;
-                if (!a) {
+                while (a && a->type==&at_showitem && a->data.v != ptype) a=a->next;
+                if (a==NULL || a->type!=&at_showitem) {
                   a = a_add(&f->attribs, a_new(&at_showitem));
                   a->data.v = (void*) ptype->itype;
                 }

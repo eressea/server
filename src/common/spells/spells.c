@@ -2816,18 +2816,18 @@ resolve_buddy(variant data)
       curse * c = (curse*)a->data.v;
       wallcurse * wc = (wallcurse*)c->data.v;
       if (wc->wall->id==br->id) break;
-      a = a->nexttype;
+      a = a->next;
     }
-    if (!a) {
+    if (!a || a->type!=&at_cursewall) {
       a = a_find(b->to->attribs, &at_cursewall);
-      while (a && a->data.v!=br->self) {
+      while (a && a->type==&at_cursewall && a->data.v!=br->self) {
         curse * c = (curse*)a->data.v;
         wallcurse * wc = (wallcurse*)c->data.v;
         if (wc->wall->id==br->id) break;
-        a = a->nexttype;
+        a = a->next;
       }
     }
-    if (a) {
+    if (a && a->type==&at_cursewall) {
       curse * c = (curse*)a->data.v;
       free(br);
       return c;
@@ -6271,7 +6271,7 @@ sp_disruptastral(castorder *co)
   rl = all_in_range(rt, (short)(power/5), NULL);
 
   for (rl2=rl; rl2!=NULL; rl2=rl2->next) {
-    attrib *a, *a2;
+    attrib *a;
     variant effect;
     region * r2 = rl2->data;
     spec_direction *sd;
@@ -6290,8 +6290,8 @@ sp_disruptastral(castorder *co)
     /* Nicht-Permanente Tore zerstören */
     a = a_find(r->attribs, &at_direction);
 
-    while (a!=NULL) {
-      a2 = a->nexttype;
+    while (a!=NULL && a->type==&at_direction) {
+      attrib * a2 = a->next;
       sd = (spec_direction *)(a->data.v);
       if (sd->duration != -1) a_remove(&r->attribs, a);
       a = a2;

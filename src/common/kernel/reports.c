@@ -1292,7 +1292,7 @@ prepare_report(faction * f)
     }
 
     if (mode<see_travel && fval(r, RF_TRAVELUNIT)) {
-      for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+      for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
         unit * u = (unit*)ru->data.v;
         if (u->faction == f) {
           mode = see_travel;

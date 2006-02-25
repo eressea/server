@@ -539,10 +539,10 @@ leave_trail(ship * sh, region * from, region_list *route)
       traveldir * td = NULL;
       attrib * a = a_find(r->attribs, &at_shiptrail);
 
-      while (a!=NULL) {
+      while (a!=NULL && a->type==&at_shiptrail) {
         td = (traveldir *)a->data.v;
         if (td->no == sh->no) break;
-        a = a->nexttype;
+        a = a->next;
       }
 
       if (a == NULL) {
@@ -2112,7 +2112,7 @@ piracy_cmd(unit *u, struct order * ord)
     }
   }
 
-	for (a = a_find(r->attribs, &at_piracy_direction); a; a=a->nexttype) {
+	for (a = a_find(r->attribs, &at_piracy_direction); a && a->type==&at_piracy_direction; a=a->next) {
     piracy_data * data = a->data.v;
 		const faction * p = data->pirate;
     const faction * t = data->target;
@@ -2196,15 +2196,13 @@ age_traveldir(region *r)
 {
 	attrib *a = a_find(r->attribs, &at_traveldir);
 
-	while(a) {
+	while(a && a->type==&at_traveldir) {
+    attrib *an = a->next;
 		a->data.ca[3]--;
 		if(a->data.ca[3] <= 0) {
-			attrib *an = a->nexttype;
 			a_remove(&r->attribs, a);
-			a = an;
-		} else {
-			a = a->nexttype;
 		}
+    a = an;
 	}
 }
 
@@ -2213,10 +2211,10 @@ hunted_dir(attrib *at, int id)
 {
   attrib *a = a_find(at, &at_shiptrail);
 
-  while (a!=NULL) {
+  while (a!=NULL && a->type==&at_shiptrail) {
     traveldir *t = (traveldir *)(a->data.v);
     if (t->no == id) return t->dir;
-    a = a->nexttype;
+    a = a->next;
   }
 
   return NODIRECTION;

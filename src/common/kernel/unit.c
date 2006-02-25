@@ -481,8 +481,8 @@ void
 usetcontact(unit * u, const unit * u2)
 {
 	attrib * a = a_find(u->attribs, &at_contact);
-	while (a && a->data.v!=u2) a = a->nexttype;
-	if (a) return;
+	while (a && a->type==&at_contact && a->data.v!=u2) a = a->next;
+	if (a && a->type==&at_contact) return;
 	a_add(&u->attribs, a_new(&at_contact))->data.v = (void*)u2;
 }
 
@@ -494,7 +494,7 @@ ucontact(const unit * u, const unit * u2)
   if (u->faction==u2->faction) return true;
 
 	/* Explizites KONTAKTIERE */
-	for (ru = a_find(u->attribs, &at_contact); ru; ru = ru->nexttype)
+  for (ru = a_find(u->attribs, &at_contact); ru && ru->type==&at_contact; ru = ru->next)
 		if (((unit*)ru->data.v) == u2)
 			return true;
 
@@ -828,10 +828,10 @@ transfermen(unit * u, unit * u2, int n)
 			}
 		}
 		a = a_find(u->attribs, &at_effect);
-		while (a) {
+		while (a && a->type==&at_effect) {
 			effect_data * olde = (effect_data*)a->data.v;
 			if (olde->value) change_effect(u2, olde->type, olde->value);
-			a = a->nexttype;
+			a = a->next;
 		}
 		if (fval(u, UFL_LONGACTION)) fset(u2, UFL_LONGACTION);
 		if (u->attribs) {
@@ -845,8 +845,8 @@ transfermen(unit * u, unit * u2, int n)
 		u2->hp += hp;
 		/* TODO: Das ist schnarchlahm! und gehört ncht hierhin */
 		a = a_find(u2->attribs, &at_effect);
-		while (a) {
-			attrib * an = a->nexttype;
+		while (a && a->type==&at_effect) {
+			attrib * an = a->next;
 			effect_data * olde = (effect_data*)a->data.v;
 			int e = get_effect(u, olde->type);
 			if (e!=0) change_effect(u2, olde->type, -e);

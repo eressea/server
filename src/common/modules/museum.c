@@ -142,12 +142,12 @@ warden_add_give(unit *src, unit *u, const item_type *itype, int n)
 	attrib *a;
 
 	/* has the giver a cookie corresponding to the warden */
-	for(a = a_find(src->attribs, &at_museumgivebackcookie); a; a=a->nexttype) {
+	for(a = a_find(src->attribs, &at_museumgivebackcookie); a && a->type==&at_museumgivebackcookie; a=a->next) {
 		if(((museumgivebackcookie *)(a->data.v))->warden_no == u->no) break;
 	}
 
 	/* if not give it one */
-	if(!a) {
+	if (a==NULL || a->type!=&at_museumgivebackcookie) {
 		a = a_add(&src->attribs, a_new(&at_museumgivebackcookie));
 		gbc = (museumgivebackcookie *)a->data.v;
 		gbc->warden_no = u->no;
@@ -159,15 +159,15 @@ warden_add_give(unit *src, unit *u, const item_type *itype, int n)
 	}
 
 	/* now we search for the warden's corresponding item list */
-	for(a = a_find(u->attribs, &at_museumgiveback); a; a=a->nexttype) {
+	for (a = a_find(u->attribs, &at_museumgiveback); a && a->type==&at_museumgiveback; a=a->next) {
 		gb = (museumgiveback *)a->data.v;
-		if(gb->cookie == gbc->cookie) {
+		if (gb->cookie == gbc->cookie) {
 			break;
 		}
 	}
 
 	/* if there's none, give it one */
-	if(!gb) {
+	if (!gb) {
 		a = a_add(&u->attribs, a_new(&at_museumgiveback));
 		gb = (museumgiveback *)a->data.v;
 		gb->cookie = gbc->cookie;
@@ -309,10 +309,10 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, order *
 	a_remove(&u->attribs, a);
 
 	if(a) {
-		for(a = a_find(warden->attribs, &at_museumgiveback); a; a = a->nexttype) {
+		for(a = a_find(warden->attribs, &at_museumgiveback); a && a->type==&at_museumgiveback; a = a->next) {
 			if(((museumgiveback *)(a->data.v))->cookie == unit_cookie) break;
 		}
-		if(a) {
+		if (a && a->type==&at_museumgiveback) {
 			museumgiveback *gb = (museumgiveback *)(a->data.v);
 			item *it;
 

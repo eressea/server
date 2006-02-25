@@ -2474,7 +2474,7 @@ reshow(unit * u, struct order * ord, const char * s, param_t p)
       sp = get_spellfromtoken(u, s, u->faction->locale);
       if (sp!=NULL && has_spell(u, sp)) {
         attrib *a = a_find(u->faction->attribs, &at_seenspell);
-        while (a!=NULL && a->data.v!=sp) a = a->nexttype;
+        while (a!=NULL && a->type==&at_seenspell && a->data.v!=sp) a = a->next;
         if (a!=NULL) a_remove(&u->faction->attribs, a);
         break;
       }
@@ -2688,16 +2688,16 @@ instant_orders(void)
   for (f = factions; f; f = f->next) {
     attrib *a;
     a = a_find(f->attribs, &at_showitem);
-    while(a!=NULL) {
+    while (a!=NULL && a->type==&at_showitem) {
       const item_type * itype = (const item_type *)a->data.v;
       const potion_type * ptype = resource2potion(itype->rtype);
+      attrib * an = a->next;
       if (ptype!=NULL) {
-        attrib * n = a->nexttype;
         /* potions werden separat behandelt */
         display_item(f, NULL, (const item_type *)a->data.v);
         a_remove(&f->attribs, a);
-        a = n;
-      } else a = a->nexttype;
+      }
+      a = an;
     }
   }
 

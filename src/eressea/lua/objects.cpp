@@ -24,7 +24,7 @@ namespace eressea {
   objects::get(const char * name) {
     lua_State * L = (lua_State *)global.vm_state;
     attrib * a = a_find(*mAttribPtr, &at_object);
-    for (;a;a=a->nexttype) {
+    for (;a && a->type==&at_object;a=a->next) {
       if (strcmp(object_name(a), name)==0) {
         variant val;
         object_type type;
@@ -61,14 +61,13 @@ namespace eressea {
 
   static void set_object(attrib **attribs, const char * name, object_type type, variant val) {
     attrib * a = a_find(*attribs, &at_object);
-    for (;a;a=a->nexttype) {
-      if (strcmp(object_name(a), name)==0) break;
+    for (;a && a->type==&at_object;a=a->next) {
+      if (strcmp(object_name(a), name)==0) {
+        object_set(a, type, val);
+        return;
+      }
     }
-    if (a==NULL) {
-      a = a_add(attribs, object_create(name, type, val));
-    } else {
-      object_set(a, type, val);
-    }
+    a = a_add(attribs, object_create(name, type, val));
   }
 
   template<> void

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
+#include <memory.h>
 
 void
 cv_init(cvector * cv)

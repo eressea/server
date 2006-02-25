@@ -154,7 +154,7 @@ make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special, double multi
 int
 skillmod(const attrib * a, const unit * u, const region * r, skill_t sk, int value, int flags)
 {
-	for (a = a_find((attrib*)a, &at_skillmod); a; a=a->nexttype) {
+	for (a = a_find((attrib*)a, &at_skillmod); a && a->type==&at_skillmod; a=a->next) {
 		skillmod_data * smd = (skillmod_data *)a->data.v;
 		if (smd->skill!=NOSKILL && smd->skill!=sk) continue;
 		if (flags!=SMF_ALWAYS && (smd->flags & flags) == 0) continue;

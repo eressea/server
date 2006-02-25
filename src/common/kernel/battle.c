@@ -2355,12 +2355,13 @@ aftermath(battle * b)
     int dead = du->number - df->alive - df->run.number;
     int pr_mercy = 0;
 #ifdef KARMA_MODULE
-    const attrib *a;
+    const attrib *a= a_find(du->attribs, &at_prayer_effect); 
 
-    for (a = a_find(du->attribs, &at_prayer_effect); a; a = a->nexttype) {
+    while (a && a->type==&at_prayer_effect) {
       if (a->data.sa[0] == PR_MERCY) {
         pr_mercy = a->data.sa[1];
       }
+      a = a->next;
     }
 #endif /* KARMA_MODULE */
 
@@ -2914,8 +2915,8 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
 
 #ifdef KARMA_MODULE
-  for (a = a_find(u->attribs, &at_prayer_effect); a; a = a->nexttype) {
-		if (a->data.sa[0] == PR_AID) {
+  for (a = a_find(u->attribs, &at_prayer_effect); a && a->type==&at_prayer_effect; a = a->next) {
+    if (a->data.sa[0] == PR_AID) {
 			pr_aid = true;
 			break;
 		}

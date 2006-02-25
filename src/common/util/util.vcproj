@@ -442,6 +442,9 @@
 			RelativePath=".\message.c">
 		</File>
 		<File
+			RelativePath=".\mt19937ar.c">
+		</File>
+		<File
 			RelativePath=".\nrmessage.c">
 		</File>
 		<File

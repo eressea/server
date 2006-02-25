@@ -934,10 +934,10 @@ fix_chaosgates(void)
   for (r = regions; r; r=r->next) {
     const attrib *a = a_findc(r->attribs, &at_direction);
 
-    while (a!=NULL) {
+    while (a!=NULL && a->type==&at_direction) {
       spec_direction * sd = (spec_direction *)a->data.v;
       region * r2 = findregion(sd->x, sd->y);
-	  if (r2!=NULL) {
+      if (r2!=NULL) {
         border * b = get_borders(r, r2);
         while (b) {
           if (b->type==&bt_chaosgate) break;
@@ -947,7 +947,7 @@ fix_chaosgates(void)
           b = new_border(&bt_chaosgate, r, r2);
         }
       }
-      a = a->nexttype;
+      a = a->next;
     }
   }
   return 0;

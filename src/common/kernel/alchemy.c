@@ -200,7 +200,7 @@ int
 get_effect(const unit * u, const potion_type * effect)
 {
 	const attrib * a;
-	for (a=a_find(u->attribs, &at_effect); a!=NULL; a=a->nexttype) {
+	for (a=a_find(u->attribs, &at_effect); a!=NULL && a->type==&at_effect; a=a->next) {
 		const effect_data * data = (const effect_data *)a->data.v;
 		if (data->type==effect) return data->value;
 	}
@@ -210,27 +210,27 @@ get_effect(const unit * u, const potion_type * effect)
 int
 change_effect (unit * u, const potion_type * effect, int delta)
 {
-	attrib ** ap = &u->attribs, * a;
+	attrib * a = a_find(u->attribs, &at_effect);
 	effect_data * data = NULL;
 
 	assert(delta!=0);
-	while (*ap && (*ap)->type!=&at_effect) ap=&(*ap)->next;
-	a = *ap;
-	while (a) {
+	while (a && a->type==&at_effect) {
 		data = (effect_data *)a->data.v;
-		if (data->type==effect) break;
-		a=a->nexttype;
+    if (data->type==effect) {
+      if (data->value+delta==0) {
+        a_remove(&u->attribs, a);
+        return 0;
+      } else {
+        data->value += delta;
+        return data->value;
+      }
+    }
+		a = a->next;
 	}
-	if (a!=NULL && data->value+delta==0) {
-		a_remove(&u->attribs, a);
-		return 0;
-	} else if (a!=NULL) {
-		data->value += delta;
-	} else {
-		attrib * an = a_add(ap, a_new(&at_effect));
-		data = (effect_data*)an->data.v;
-		data->type = effect;
-		data->value = delta;
-	}
+
+  a = a_add(&u->attribs, a_new(&at_effect));
+  data = (effect_data*)a->data.v;
+  data->type = effect;
+  data->value = delta;
 	return data->value;
 }

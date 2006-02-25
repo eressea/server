@@ -154,7 +154,7 @@ gm_create(const tnode * tnext, const char * str, void * data, struct order * ord
 		} else {
 			attrib * a = a_find(permissions, &at_gmcreate);
 
-			while (a && a->data.v!=(void*)itype) a=a->nexttype;
+			while (a && a->type==&at_gmcreate && a->data.v!=(void*)itype) a=a->next;
 			if (a) i_change(&u->items, itype, i);
 			else mistake(u, ord, "Diesen Gegenstand darf deine Partei nicht machen.", 0);
 		}

@@ -318,7 +318,7 @@ buy_special(unit *u, struct order * ord, fspecial_t special)
 
 	/* Kosten berechnen */
 
-	for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+	for(a=a_find(f->attribs, &at_faction_special); a && a->type==&at_faction_special; a=a->next) {
 		count += a->data.sa[1];
 		if(a->data.sa[0] == special) a2 = a;
 	}
@@ -356,7 +356,7 @@ fspecial(const faction *f, fspecial_t special)
 {
   attrib *a;
 
-  for (a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+  for (a=a_find(f->attribs, &at_faction_special); a && a->type==&at_faction_special; a=a->next) {
     if(a->data.sa[0] == special) return a->data.sa[1];
   }
   return 0;
@@ -498,7 +498,7 @@ jihad_cmd(unit * u, struct order * ord)
   attrib *a;
   const char *s;
 
-  for (a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
+  for (a = a_find(f->attribs, &at_jihad); a && a->type==&at_jihad; a = a->next) {
     has += a->data.sa[1];
   }
 
@@ -524,7 +524,7 @@ jihad_cmd(unit * u, struct order * ord)
     return 0;
   }
 
-  for (a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
+  for (a = a_find(f->attribs, &at_jihad); a && a->type==&at_jihad; a = a->next) {
     if (a->data.sa[0] == jrt) break;
   }
 
@@ -546,7 +546,7 @@ jihad(faction *f, const race * rc)
 	attrib *a;
 	race_t jrt = old_race(rc);
 
-	for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
+	for(a = a_find(f->attribs, &at_jihad); a && a->type==&at_jihad; a = a->next) {
 		if(a->data.sa[0] == jrt) return a->data.sa[1];
 	}
 	return 0;

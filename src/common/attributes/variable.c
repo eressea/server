@@ -69,16 +69,14 @@ attrib_type at_variable = {
 const char *
 get_variable(attrib *a, const char *key)
 {
-	attrib *ap;
+	attrib *ap = a_find(a, &at_variable);;
 
-	for(ap = a_find(a, &at_variable); ap; ap=ap->nexttype) {
-		if(strcmp(key, ((variable *)ap->data.v)->key) == 0) {
-			break;
+	while (ap && ap->type==&at_variable) {
+    variable * var = (variable *)ap->data.v;
+		if (strcmp(key, var->key) == 0) {
+      return var->value;
 		}
-	}
-
-	if(ap) {
-		return ((variable *)ap->data.v)->value;
+    ap = ap->next;
 	}
 
 	return NULL;
@@ -87,42 +85,41 @@ get_variable(attrib *a, const char *key)
 void
 set_variable(attrib **app, const char *key, const char *value)
 {
-	attrib *ap;
+	attrib *ap = a_find(*app, &at_variable);
 
 	assert(value);
 
-	for(ap = a_find(*app, &at_variable); ap; ap=ap->nexttype) {
-		if(strcmp(key, ((variable *)ap->data.v)->key) == 0) {
-			break;
+	while (ap && ap->type==&at_variable) {
+    variable * var = (variable *)ap->data.v;
+		if (strcmp(key, var->key) == 0) {
+      free(var->value);
+      var->value = strdup(value);
+      return;
 		}
+    ap = ap->next;
 	}
 
-	if(ap) {
-		free(((variable *)ap->data.v)->value);
-		((variable *)ap->data.v)->value = strdup(value);
-	} else {
-		ap = a_add(app, a_new(&at_variable));
-		((variable *)ap->data.v)->key = strdup(key);
-		((variable *)ap->data.v)->value = strdup(value);
-	}
+	ap = a_add(app, a_new(&at_variable));
+	((variable *)ap->data.v)->key = strdup(key);
+	((variable *)ap->data.v)->value = strdup(value);
 }
 
 void
 delete_variable(attrib **app, const char *key)
 {
-	attrib *ap;
+	attrib *ap = a_find(*app, &at_variable);
 
-	for(ap = a_find(*app, &at_variable); ap; ap=ap->nexttype) {
-		if(strcmp(key, ((variable *)ap->data.v)->key) == 0) {
-			break;
+	while (ap && ap->type==&at_variable) {
+    variable * var = (variable *)ap->data.v;
+		if (strcmp(key, var->key) == 0) {
+      free(var->key);
+      free(var->value);
+      a_remove(app, ap);
+      break;
 		}
+    ap = ap->next;
 	}
 
-	if(ap) {
-		free(((variable *)ap->data.v)->key);
-		free(((variable *)ap->data.v)->value);
-		a_remove(app, ap);
-	}
 }
 
 void

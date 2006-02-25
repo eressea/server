@@ -1202,12 +1202,12 @@ report_computer(const char * filename, report_context * ctx)
 
 	cr_find_address(F, f, ctx->addresses);
 	a = a_find(f->attribs, &at_reportspell);
-	while (a) {
+	while (a && a->type==&at_reportspell) {
     spell *sp = (spell *)a->data.v;
 		cr_reportspell(F, sp, f->locale);
-		a = a->nexttype;
+		a = a->next;
 	}
-	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
+	for (a=a_find(f->attribs, &at_showitem);a && a->type==&at_showitem;a=a->next) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
 		requirement * m;
 		const char * ch, * description = NULL;
@@ -1396,7 +1396,7 @@ report_computer(const char * filename, report_context * ctx)
         boolean seeunits = false, seeships = false;
         const attrib * ru;
         /* show units pulled through region */
-        for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+        for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
           unit * u = (unit*)ru->data.v;
           if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
             if (!u->ship || !fval(u, UFL_OWNER)) continue;
@@ -1405,7 +1405,7 @@ report_computer(const char * filename, report_context * ctx)
             fprintf(F, "\"%s\"\n", shipname(u->ship));
           }
         }
-        for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+        for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
           unit * u = (unit*)ru->data.v;
           if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
             if (u->ship) continue;

@@ -401,7 +401,7 @@ already_seen(const faction * f, const spell * sp)
 {
   attrib *a;
 
-  for (a = a_find(f->attribs, &at_seenspell); a; a=a->nexttype) {
+  for (a = a_find(f->attribs, &at_seenspell); a && a->type==&at_seenspell; a=a->next) {
     if (a->data.v==sp) return true;
   }
   return false;
@@ -1101,7 +1101,7 @@ magic_resistance(unit *target)
 
   /* Auswirkungen von Zaubern auf der Region */
   a = a_find(target->region->attribs, &at_curse);
-  while (a) {
+  while (a && a->type==&at_curse) {
     curse *c = (curse*)a->data.v;
     unit *mage = c->magician;
 
@@ -1114,12 +1114,13 @@ magic_resistance(unit *target)
       }
       else if (c->type == ct_find("badmagicresistancezone")) {
         if (alliedunit(mage, target->faction, HELP_GUARD)) {
-          a = a->nexttype;
+          /* TODO: hier sollte doch sicher was passieren? */
+          a = a->next;
           continue;
         }
       }
     }
-    a = a->nexttype;
+    a = a->next;
   }
   /* Bonus durch Artefakte */
   /* TODO (noch gibs keine)*/
@@ -2116,10 +2117,10 @@ set_familiar(unit * mage, unit * familiar)
 {
 	/* if the skill modifier for the mage does not yet exist, add it */
 	attrib * a = a_find(mage->attribs, &at_skillmod);
-	while (a) {
+	while (a && a->type==&at_skillmod) {
 		skillmod_data * smd = (skillmod_data *)a->data.v;
 		if (smd->special==sm_familiar) break;
-		a = a->nexttype;
+		a = a->next;
 	}
 	if (a==NULL) {
 		attrib * an = a_add(&mage->attribs, a_new(&at_skillmod));
@@ -2151,8 +2152,8 @@ remove_familiar(unit *mage)
 
 	a_remove(&mage->attribs, a);
   a = a_find(mage->attribs, &at_skillmod);
-  while (a) {
-		an = a->nexttype;
+  while (a && a->type==&at_skillmod) {
+		an = a->next;
 		smd = (skillmod_data *)a->data.v;
 	  if (smd->special==sm_familiar) a_remove(&mage->attribs, a);
 		a = an;
@@ -2164,10 +2165,10 @@ create_newfamiliar(unit * mage, unit * familiar)
 {
 	/* if the skill modifier for the mage does not yet exist, add it */
 	attrib * a = a_find(mage->attribs, &at_skillmod);
-	while (a) {
+	while (a && a->type==&at_skillmod) {
 		skillmod_data * smd = (skillmod_data *)a->data.v;
 		if (smd->special==sm_familiar) break;
-		a = a->nexttype;
+		a = a->next;
 	}
 	if (a==NULL) {
 		attrib * an = a_add(&mage->attribs, a_new(&at_skillmod));

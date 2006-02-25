@@ -593,7 +593,7 @@ required(int size, int msize, int maxneed)
 static int
 matmod(const attrib * a, const unit * u, const resource_type * material, int value)
 {
-  for (a=a_find((attrib*)a, &at_matmod);a;a=a->nexttype) {
+  for (a=a_find((attrib*)a, &at_matmod);a && a->type==&at_matmod;a=a->next) {
     mm_fun fun = (mm_fun)a->data.f;
     value = fun(u, material, value);
     if (value<0) return value; /* pass errors to caller */
@@ -1110,15 +1110,16 @@ void
 remove_contacts(void)
 {
   region *r;
-  unit *u;
-  attrib *a;
 
   for (r = regions; r; r = r->next) {
+    unit *u;
+
     for (u = r->units; u; u = u->next) {
-      a = (attrib *)a_find(u->attribs, &at_contact);
-      while(a != NULL) {
+      attrib * a = (attrib *)a_find(u->attribs, &at_contact);
+
+      while (a!=NULL &&a->type==&at_contact) {
         attrib * ar = a;
-        a = a->nexttype;
+        a = a->next;
         a_remove(&u->attribs, ar);
       }
     }

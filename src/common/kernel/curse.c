@@ -352,7 +352,7 @@ remove_allcurse(attrib **ap, const void * data, boolean(*compare)(const attrib *
 {
 	attrib * a = a_select(*ap, data, compare);
 	while (a) {
-		attrib * next = a->nexttype;
+		attrib * next = a->next;
 		a_remove(ap, a);
 		a = a_select(next, data, compare);
 	}
@@ -618,10 +618,10 @@ transfer_curse(unit * u, unit * u2, int n)
 	attrib * a;
 
 	a = a_find(u->attribs, &at_curse);
-	while (a) {
+	while (a && a->type==&at_curse) {
 		curse *c = (curse*)a->data.v;
 		do_transfer_curse(c, u, u2, n);
-		a = a->nexttype;
+		a = a->next;
 	}
 }
 

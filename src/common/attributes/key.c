@@ -48,7 +48,9 @@ attrib *
 find_key(attrib * alist, int key)
 {
 	attrib * a = a_find(alist, &at_key);
-	while (a && a->data.i != key) a = a->nexttype;
+  while (a && a->type==&at_key && a->data.i != key) {
+    a = a->next;
+  }
 	return a;
 }
 

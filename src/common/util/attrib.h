@@ -34,7 +34,7 @@ typedef struct attrib {
 	} data;
 	/* internal data, do not modify: */
 	struct attrib * next; /* next attribute in the list */
-	struct attrib * nexttype; /* next attribute of same type */
+	struct attrib * nexttype; /* skip to attribute of a different type */
 } attrib;
 
 #define ATF_UNIQUE   (1<<0) /* only one per attribute-list */

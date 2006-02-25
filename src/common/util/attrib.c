@@ -88,91 +88,142 @@ a_select(attrib * a, const void * data, boolean(*compare)(const attrib *, const 
 attrib *
 a_find(attrib * a, const attrib_type * at)
 {
-	while (a && a->type!=at) a = a->next;
+	while (a && a->type!=at) a = a->nexttype;
 	return a;
 }
 
 const attrib *
 a_findc(const attrib * a, const attrib_type * at)
 {
-	while (a && a->type!=at) a = a->next;
+	while (a && a->type!=at) a = a->nexttype;
 	return a;
+}
+
+static attrib *
+a_insert(attrib * head, attrib * a)
+{
+  attrib ** pa=&head->next;
+
+  assert(!(a->type->flags & ATF_UNIQUE));
+  assert(head && head->type==a->type);
+
+  while (*pa && (*pa)->type==a->type) {
+    pa = &(*pa)->next;
+  }
+  a->next = *pa;
+  return *pa = a;
 }
 
 attrib *
 a_add(attrib ** pa, attrib * a) 
 {
-	attrib ** find = pa;
+	attrib * first = *pa;
 	assert(a->next==NULL && a->nexttype==NULL);
-	while (*find && (*find)->type!=a->type) find = &(*find)->next;
-	if (a->type->flags & ATF_PRESERVE) {
-		while (*find) find = &(*find)->nexttype;
-	}
-	if (a->type->flags & ATF_UNIQUE && *find) {
-		if ((*find)->type == a->type) {
-			log_error(("duplicate attribute: %s\n", a->type->name));
-			return a;
-		}
-	}
-	if (*find) {
-		attrib ** last = find;
-		while (*last) last = &(*last)->nexttype;
-		*last = a;
-		while (*find && (*find)->type==a->type) find = &(*find)->next;
-	}
-	a->next = *find;
-	*find = a;
-	return a;
+
+  if (first==NULL) return *pa = a;
+  if (first->type==a->type) {
+    return a_insert(first, a);
+  }
+  for (;;) {
+    attrib * next = first->nexttype;
+    if (next==NULL) {
+      /* the type is not in the list, append it behind the last type */
+      attrib ** insert = &first->next;
+      first->nexttype = a;
+      while (*insert) insert = &(*insert)->next;
+      *insert = a;
+      break;
+    }
+    if (next->type==a->type) {
+      return a_insert(next, a);
+    }
+    first = next;
+  }
+  return a;
 }
 
 void
-a_free(attrib * a) {
+a_free(attrib * a)
+{
 	const attrib_type * at = a->type;
 	if (at->finalize) at->finalize(a);
 	free(a);
 }
 
 static int
-a_unlink(attrib ** p, attrib * a) {
-	attrib ** pa = p;
-	while (*pa && *pa!=a) pa = &(*pa)->next;
-	if (*pa) {
-		attrib ** pnt;
-		for (pnt=p;*pnt;pnt=&(*pnt)->next)
-			if ((*pnt)->nexttype == a) {
-				(*pnt)->nexttype = a->nexttype;
-				break;
-			}
-		*pa = (*pa)->next;
-		return 1;
-	}
-	return 0;
+a_unlink(attrib ** pa, attrib * a)
+{
+  attrib ** pnexttype = pa;
+  attrib ** pnext = NULL;
+
+  while (*pnexttype) {
+    attrib * next = *pnexttype;
+    if (next->type==a->type) break;
+    pnexttype = &next->nexttype;
+    pnext = &next->next;
+  }
+  if (*pnexttype && (*pnexttype)->type==a->type) {
+    if (*pnexttype==a) {
+      *pnexttype = a->next;
+      if (a->next!=a->nexttype) {
+        a->next->nexttype = a->nexttype;
+      }
+      if (pnext==NULL) return 1;
+      while (*pnext && (*pnext)->type!=a->type) pnext = &(*pnext)->next;
+    } else {
+      pnext = &(*pnexttype)->next;
+    }
+    while (*pnext && (*pnext)->type==a->type) {
+      if (*pnext==a) {
+        *pnext = a->next;
+        return 1;
+      }
+      pnext = &(*pnext)->next;
+    }
+  }
+  return 0;
 }
 
 int
-a_remove(attrib ** p, attrib * a) {
+a_remove(attrib ** pa, attrib * a)
+{
 	int ok;
-	ok = a_unlink(p, a);
-	if( ok ) a_free(a);
+	ok = a_unlink(pa, a);
+	if (ok) a_free(a);
 	return ok;
 }
 
 void
-a_removeall(attrib **p, const attrib_type * at)
+a_removeall(attrib **pa, const attrib_type * at)
 {
-	attrib *find = *p, *findnext;
-	if (find && find->type != at){
-		find = a_find(find, at);
-	}
-	while(find && find->type == at) {
-		findnext = find->next;
-		a_remove(p, find);
-		find = findnext;
-	}
+  attrib ** pnexttype = pa;
+  attrib ** pnext = NULL;
+
+  while (*pnexttype) {
+    attrib * next = *pnexttype;
+    if (next->type==at) break;
+    pnexttype = &next->nexttype;
+    pnext = &next->next;
+  }
+  if (*pnexttype && (*pnexttype)->type==at) {
+    attrib * a = *pnexttype;
+
+    *pnexttype = a->nexttype;
+    if (pnext) {
+      while (*pnext && (*pnext)->type!=at) pnext = &(*pnext)->next;
+      *pnext = a->nexttype;
+    }
+    while (a && a->type==at) {
+      attrib * ra = a;
+      a = a->next;
+      a_free(ra);
+    }
+  }
 }
 
 attrib *
-a_new(const attrib_type * at) {
+a_new(const attrib_type * at)
+{
 	attrib * a = (attrib*)calloc(1, sizeof(attrib));
   assert(at!=NULL);
 	a->type = at;
@@ -189,7 +240,7 @@ a_age(attrib ** p)
 	while(*ap) {
 		attrib * a = *ap;
 		if (a->type->age && a->type->age(a)==0) a_remove(p, a);
-		else ap=&a->next;
+		else ap = &a->next;
 	}
 	return (*p!=NULL);
 }
@@ -248,8 +299,10 @@ a_write(FILE * f, const attrib * attribs)
 			assert(na->type->hashkey || !"attribute not registered");
 			fprintf(f, "%s ", na->type->name);
 			na->type->write(na, f);
-		}
-		na = na->next;
+      na = na->next;
+    } else {
+      na = na->nexttype;
+    }
 	}
 	fprintf(f, "end ");
 }
