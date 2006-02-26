@@ -31,6 +31,7 @@
 #include <util/rng.h>
 
 /* libc includes */
+#include <assert.h>
 #include <string.h>
 
 static equipment * equipment_sets;
@@ -118,26 +119,34 @@ equip_unit(struct unit * u, const struct equipment * eq)
   if (eq) {
     skill_t sk;
     itemdata * idata;
-    sc_mage * m = get_mage(u);
-    if (m!=NULL) {
-      spell_list * sp = eq->spells;
-      while (sp) {
-        add_spell(m, sp->data);
-        sp = sp->next;
-      }
-    }
+    spell_list * sp = eq->spells;
+
     for (sk=0;sk!=MAXSKILLS;++sk) {
       if (eq->skills[sk]!=NULL) {
         int i = dice_rand(eq->skills[sk]);
         if (i>0) set_level(u, sk, i);
       }
     }
+
+    if (sp!=NULL) {
+      sc_mage * m = get_mage(u);
+      if (m==NULL) {
+        assert(!"trying to equip spells on a non-mage!");
+      } else {
+        while (sp) {
+          add_spell(m, sp->data);
+          sp = sp->next;
+        }
+      }
+    }
+
     for (idata=eq->items;idata!=NULL;idata=idata->next) {
       int i = u->number * dice_rand(idata->value);
       if (i>0) {
         i_add(&u->items, i_new(idata->itype, i));
       }
     }
+
     if (eq->subsets) {
       int i;
       for (i=0;eq->subsets[i].sets;++i) {
