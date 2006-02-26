@@ -834,7 +834,7 @@ fix_familiars(void)
   for (r=regions;r;r=r->next) {
     unit * u;
     for (u=r->units;u;u=u->next) if (u->faction->no!=MONSTER_FACTION) {
-      if (u->race->init_familiar && u->race->maintenance==0) {
+      if (u->race->init_familiar) {
         /* this is a familiar */
         unit * mage = get_familiar_mage(u);
         equipment * eq;
@@ -842,12 +842,12 @@ fix_familiars(void)
 
         if (mage==0) {
           log_error(("%s is a %s familiar with no mage for faction %s\n",
-										 unitid(u), racename(lang, u, u->race), 
-										 factionid(u->faction)));
+                     unitid(u), racename(lang, u, u->race),
+                     factionid(u->faction)));
         } else if (!is_mage(mage)) {
           log_error(("%s is a %s familiar, but %s is not a mage for faction %s\n",
-										 unitid(u), racename(lang, u, u->race), unitid(mage), 
-										 factionid(u->faction)));
+                     unitid(u), racename(lang, u, u->race), unitid(mage), 
+                     factionid(u->faction)));
         }
         if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
           log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
@@ -855,7 +855,7 @@ fix_familiars(void)
           create_mage(u, M_GRAU);
         }
 
-        snprintf(fname, sizeof(fname), "initfamiliar_%s", u->race->_name[0]);
+        snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
         eq = get_equipment(fname);
         if (eq) {
           spell_list * sp = eq->spells;
@@ -864,13 +864,14 @@ fix_familiars(void)
             sc_mage * m = get_mage(u);
             if (m==NULL) {
               log_error(("%s is a %s-familiar with spells, but did not have a mage-attribute\n",
-                unitid(u), racename(lang, u, u->race)));
+                         unitid(u), racename(lang, u, u->race)));
               create_mage(u, M_GRAU);
-            } else {
-              while (sp) {
+            }
+            while (sp) {
+              if (!has_spell(u, sp->data)) {
                 add_spell(m, sp->data);
-                sp = sp->next;
               }
+              sp = sp->next;
             }
           }
         }
