@@ -319,7 +319,11 @@ walkingcapacity(const struct unit * u)
 	n += people * personcapacity(u);
 	/* Goliathwasser */
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
-	n += min(people, tmp) * (acap - personcapacity(u));
+  if (tmp>0) {
+    int horsecap = olditemtype[I_HORSE]->capacity;
+    if (tmp>people) tmp = people;
+  	n += tmp * (horsecap - personcapacity(u));
+  }
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
 	n += min(people, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
