@@ -268,8 +268,8 @@ ct_find(const char *c)
  */
 
 typedef struct cid {
-	int id;
-	int id2;
+  int id;
+  int id2;
 } twoids;
 
 boolean
@@ -324,10 +324,21 @@ get_cursex(attrib *ap, const curse_type * ctype, variant data, boolean(*compare)
 curse *
 get_curse(attrib *ap, const curse_type * ctype)
 {
-	attrib * a = a_select(ap, ctype, cmp_cursetype);
+  attrib * a = ap;
+  while (a) {
+    if (a->type->flags & ATF_CURSE) {
+      const attrib_type * at = a->type;
+      while (a && a->type==at) {
+        curse* c = (curse *)a->data.v;
+        if (c->type==ctype) return c;
+        a = a->next;
+      }
+    } else {
+      a = a->nexttype;
+    }
+  }
 
-	if (!a) return NULL;
-	return (curse*)a->data.v;
+  return NULL;
 }
 
 /* ------------------------------------------------------------- */
