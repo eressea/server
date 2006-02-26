@@ -40,6 +40,7 @@
 #include <kernel/border.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
@@ -836,6 +837,9 @@ fix_familiars(void)
       if (u->race->init_familiar && u->race->maintenance==0) {
         /* this is a familiar */
         unit * mage = get_familiar_mage(u);
+        equipment * eq;
+        char fname[64];
+
         if (mage==0) {
           log_error(("%s is a %s familiar with no mage for faction %s\n",
 										 unitid(u), racename(lang, u, u->race), 
@@ -846,7 +850,29 @@ fix_familiars(void)
 										 factionid(u->faction)));
         }
         if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
+          log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
+            unitid(u)));
           create_mage(u, M_GRAU);
+        }
+
+        snprintf(fname, sizeof(fname), "initfamiliar_%s", u->race->_name[0]);
+        eq = get_equipment(fname);
+        if (eq) {
+          spell_list * sp = eq->spells;
+
+          if (sp!=NULL) {
+            sc_mage * m = get_mage(u);
+            if (m==NULL) {
+              log_error(("%s is a %s-familiar with spells, but did not have a mage-attribute\n",
+                unitid(u), racename(lang, u, u->race)));
+              create_mage(u, M_GRAU);
+            } else {
+              while (sp) {
+                add_spell(m, sp->data);
+                sp = sp->next;
+              }
+            }
+          }
         }
       }
     }
