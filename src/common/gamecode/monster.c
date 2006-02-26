@@ -353,6 +353,7 @@ monster_move(region * r, unit * u)
 {
   direction_t d = NODIRECTION;
 
+  if (is_waiting(u)) return NULL;
   switch(old_race(u->race)) {
     case RC_FIREDRAGON:
     case RC_DRAGON:
@@ -452,13 +453,14 @@ static order *
 make_movement_order(unit * u, const region * target, int moves, boolean (*allowed)(const region *, const region *))
 {
 	region * r = u->region;
-	region ** plan = path_find(r, target, DRAGON_RANGE*5, allowed);
+	region ** plan;
 	int position = 0;
 	char * c;
 
-	if (plan==NULL) {
-		return NULL;
-	}
+  if (is_waiting(u)) return NULL;
+
+  plan = path_find(r, target, DRAGON_RANGE*5, allowed);
+	if (plan==NULL) return NULL;
 
 	strcpy(buf, locale_string(u->faction->locale, keywords[K_MOVE]));
 	c = buf + strlen(buf);
