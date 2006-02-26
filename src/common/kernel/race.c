@@ -157,7 +157,7 @@ rc_find(const char * name)
 boolean
 allowed_dragon(const region * src, const region * target)
 {
-	if (fval(src, ARCTIC_REGION) && fval(target, SEA_REGION)) return false;
+	if (fval(src->terrain, ARCTIC_REGION) && fval(target->terrain, SEA_REGION)) return false;
 	return allowed_fly(src, target);
 }
 
@@ -270,7 +270,7 @@ give_starting_equipment(struct unit *u)
 boolean
 r_insectstalled(const region * r)
 {
-	return fval(r, ARCTIC_REGION);
+	return fval(r->terrain, ARCTIC_REGION);
 }
 
 const char *
