@@ -3,7 +3,7 @@ function use_snowman(u, amount)
     local man = add_unit(u.faction, u.region)
     man.race = "snowman"
     man.number = amount
-    man:add_item("snowman", -amount)
+    u:add_item("snowman", -amount)
     return 0
   end
   return -4
