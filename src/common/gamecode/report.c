@@ -1146,63 +1146,61 @@ statistics(FILE * F, const region * r, const faction * f)
 static void
 durchreisende(FILE * F, const region * r, const faction * f)
 {
-	attrib *ru;
-	int maxtravel;
-	int counter;
-
-	maxtravel = counter = 0;
-
-	/* Wieviele sind aufzulisten? Für die Grammatik. */
-
   if (fval(r, RF_TRAVELUNIT)) {
-    for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type!=&at_travelunit; ru = ru->next) {
-      unit * u = (unit*)ru->data.v;
-      if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
-        if (u->ship && !fval(u, UFL_OWNER))
-          continue;
-        maxtravel++;
+    attrib *abegin = a_find(r->attribs, &at_travelunit), *a;
+    int counter = 0, maxtravel = 0;
+    char * str = buf;
+
+    /* Wieviele sind aufzulisten? Für die Grammatik. */
+    for (a = abegin; a && a->type==&at_travelunit; a = a->next) {
+      unit * u = (unit*)a->data.v;
+
+      if (r!=u->region && (u->ship==NULL || fval(u, UFL_OWNER))) {
+        if (cansee_durchgezogen(f, r, u, 0)) {
+          ++maxtravel;
+        }
       }
     }
 
-    if (!maxtravel)
+    if (maxtravel==0) {
       return;
-  } else return;
+    }
+    
+    /* Auflisten. */
+    *str = '\0';
+    rnl(F);
+    
+    for (a = abegin; a && a->type==&at_travelunit; a = a->next) {
+      unit * u = (unit*)a->data.v;
 
-	/* Auflisten. */
-
-	buf[0] = 0;
-	rnl(F);
-
-	for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
-		unit * u = (unit*)ru->data.v;
-		if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
-			if (u->ship && !fval(u, UFL_OWNER))
-				continue;
-			counter++;
-			if (u->ship != (ship *) NULL) {
-				if (counter == 1) {
-					scat("Die ");
-				} else {
-					scat("die ");
-				}
-				scat(shipname(u->ship));
-			} else {
-				scat(unitname(u));
-			}
-			if (counter + 1 < maxtravel) {
-				scat(", ");
-			} else if (counter + 1 == maxtravel) {
-				scat(" und ");
-			}
-		}
-	}
-
-	if (maxtravel == 1) {
-		scat(" hat die Region durchquert.");
-		rparagraph(F, buf, 0, 0, 0);
-	} else {
-		scat(" haben die Region durchquert.");
-		rparagraph(F, buf, 0, 0, 0);
+      if (r!=u->region && (u->ship==NULL || fval(u, UFL_OWNER))) {
+        if (cansee_durchgezogen(f, r, u, 0)) {
+          ++counter;
+          if (u->ship != NULL) {
+            if (counter == 1) {
+              str += strxcpy(str, "Die ");
+            } else {
+              str += strxcpy(str, "die ");
+            }
+            str += strxcpy(str, shipname(u->ship));
+          } else {
+            str += strxcpy(str, unitname(u));
+          }
+          if (counter + 1 < maxtravel) {
+            str += strxcpy(str, ", ");
+          } else if (counter + 1 == maxtravel) {
+            str += strxcpy(str, "und ");
+          }
+        }
+      }
+    }
+    if (maxtravel == 1) {
+      str += strxcpy(str, " hat die Region durchquert.");
+      rparagraph(F, buf, 0, 0, 0);
+    } else {
+      str += strxcpy(str, " haben die Region durchquert.");
+      rparagraph(F, buf, 0, 0, 0);
+    }
 	}
 }
 
