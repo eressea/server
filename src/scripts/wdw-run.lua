@@ -46,7 +46,7 @@ function process(orders)
     return -1
   end
 end
-	
+        
 --
 -- main body of script
 --
@@ -56,6 +56,7 @@ print("- Running wdw-run.lua")
 scripts = {
   "spells.lua",
   "extensions.lua",
+  "familiars.lua",
   "write_emails.lua",
   "wdw/sphinx.lua",
   "wdw/phoenix.lua",

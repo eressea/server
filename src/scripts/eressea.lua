@@ -25,6 +25,7 @@ function run_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
+    "familiars.lua",
     "write_emails.lua",
     "eressea/eternath.lua",
     "eressea/wedding-jadee.lua", 
@@ -93,12 +94,6 @@ function process(orders)
     return -1
   end
 end
-
--- demo: how to add a special familiars-constructor
-function initfamiliar_lynx(u)
-  print("a lynx is born ;-)")
-end
-
 
 --
 -- main body of script
