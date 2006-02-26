@@ -3384,7 +3384,7 @@ join_allies(battle * b)
   size_t size = cv_size(&b->sides);
   for (u=r->units;u;u=u->next)
     /* Was ist mit Schiffen? */
-    if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION) && u->number > 0)
+    if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION|UFL_ISNEW) && u->number > 0)
     {
       size_t si;
       faction * f = u->faction;
