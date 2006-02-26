@@ -1067,6 +1067,8 @@ att_modification(const unit *u, skill_t sk)
 	int result = 0;
 	static boolean init = false;
 	static const curse_type * skillmod_ct, * gbdream_ct, * worse_ct;
+  curse * c;
+
 	if (!init) { 
 		init = true; 
 		skillmod_ct = ct_find("skillmod"); 
@@ -1074,33 +1076,41 @@ att_modification(const unit *u, skill_t sk)
     worse_ct = ct_find("worse");
 	}
 
-	result += curse_geteffect(get_curse(u->attribs, worse_ct));
+  c = get_curse(u->attribs, worse_ct);
+	if (c!=NULL) result += curse_geteffect(c);
 	if (skillmod_ct) {
-    curse * c;
-    variant var;
-    var.i = sk;
-		c = get_cursex(u->attribs, skillmod_ct, var, cmp_cursedata_int);
-		result += curse_geteffect(c);
+    attrib * a = a_find(u->attribs, &at_curse);
+    while (a && a->type==&at_curse) {
+      curse * c = (curse *)a->data.v;
+      if (c->type==skillmod_ct && c->data.i==sk) {
+        result += curse_geteffect(c);
+        break;
+      }
+      a = a->next;
+    }
 	}
 
 	/* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
 	 * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
 	 * durchsuchen und aufaddieren müssen */
-	a = a_select(u->region->attribs, gbdream_ct, cmp_cursetype);
-	while (a) {
+	a = a_find(u->region->attribs, &at_curse);
+	while (a && a->type==&at_curse) {
 		curse * c = (curse*)a->data.v;
-		int mod = curse_geteffect(c);
-		unit * mage = c->magician;
-		/* wir suchen jeweils den größten Bonus und den größten Malus */
-		if (mod>0 && (mage==NULL || alliedunit(mage, u->faction, HELP_GUARD))) 
-		{
-			if (mod > bonus ) bonus = mod;
-		} else if (mod < 0 && 
-			(mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)))
-		{
-			if (mod < malus ) malus = mod;
-		}
-		a = a_select(a->next, gbdream_ct, cmp_cursetype);
+    if (c->type==gbdream_ct) {
+      int mod = curse_geteffect(c);
+      unit * mage = c->magician;
+      /* wir suchen jeweils den größten Bonus und den größten Malus */
+      if (mod>bonus) {
+        if (mage==NULL || alliedunit(mage, u->faction, HELP_GUARD)) {
+          bonus = mod;
+        }
+      } else if (mod < malus) {
+        if (mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)) {
+          malus = mod;
+        }
+      }
+    }
+		a = a->next;
 	}
 	result = result + bonus + malus;
 

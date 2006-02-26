@@ -4066,10 +4066,6 @@ sp_rallypeasantmob(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
 
-  /* TODO
-  remove_allcurse(&r->attribs, C_RIOT, 0);
-  */
-
   for (u = r->units; u; u = un){
     un = u->next;
     if (u->faction->no == MONSTER_FACTION && u->race == new_race[RC_PEASANT]){

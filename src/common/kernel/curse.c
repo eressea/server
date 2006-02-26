@@ -267,29 +267,6 @@ ct_find(const char *c)
  * einen pointer auf die struct zurück.
  */
 
-typedef struct cid {
-  int id;
-  int id2;
-} twoids;
-
-boolean
-cmp_curseeffect_vptr(const curse * c, variant var)
-{
-	return (c->effect.v==var.v);
-}
-
-boolean
-cmp_curseeffect_int(const curse * c, variant var)
-{
-  return (c->effect.i==var.i);
-}
-
-boolean
-cmp_cursedata_int(const curse * c, variant data)
-{
-	return (c->data.i==data.i);
-}
-
 boolean
 cmp_curse(const attrib * a, const void * data) {
 	const curse * c = (const curse*)data;
@@ -324,7 +301,7 @@ get_cursex(attrib *ap, const curse_type * ctype, variant data, boolean(*compare)
 curse *
 get_curse(attrib *ap, const curse_type * ctype)
 {
-  attrib * a = ap;
+	attrib * a = ap;
   while (a) {
     if (a->type->flags & ATF_CURSE) {
       const attrib_type * at = a->type;
@@ -337,7 +314,6 @@ get_curse(attrib *ap, const curse_type * ctype)
       a = a->nexttype;
     }
   }
-
   return NULL;
 }
 
@@ -356,17 +332,6 @@ remove_curse(attrib **ap, const curse *c)
 {
 	attrib *a = a_select(*ap, c, cmp_curse);
 	if (a) a_remove(ap, a);
-}
-
-void
-remove_allcurse(attrib **ap, const void * data, boolean(*compare)(const attrib *, const void *))
-{
-	attrib * a = a_select(*ap, data, compare);
-	while (a) {
-		attrib * next = a->next;
-		a_remove(ap, a);
-		a = a_select(next, data, compare);
-	}
 }
 
 /* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie

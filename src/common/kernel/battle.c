@@ -3628,9 +3628,19 @@ init_battle(region * r, battle **bp)
             /* Fehler: "Die Einheit ist mit uns alliert" */
 
             if (calm_ct) {
-              variant var;
-              var.i = u2->faction->subscription;
-              if (curse_active(get_cursex(u->attribs, calm_ct, var, cmp_curseeffect_int))) {
+              attrib * a = a_find(u->attribs, &at_curse);
+              boolean calm = false;
+              while (a && a->type==&at_curse) {
+                curse * c = (curse *)a->data.v;
+                if (c->type==calm_ct && c->effect.i==u2->faction->subscription) {
+                  if (curse_active(c)) {
+                    calm = true;
+                    break;
+                  }
+                }
+                a = a->next;
+              }
+              if (calm) {
                 cmistake(u, ord, 47, MSG_BATTLE);
                 continue;
               }

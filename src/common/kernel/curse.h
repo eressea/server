@@ -311,9 +311,6 @@ extern int curse_age(struct attrib * a);
 
 extern boolean cmp_curse(const attrib * a, const void * data);
 extern boolean cmp_cursetype(const attrib * a, const void * data);
-extern boolean cmp_curseeffect_vptr(const curse * c, variant data);
-extern boolean cmp_curseeffect_int(const curse * c, variant data);
-extern boolean cmp_cursedata_int(const curse * c, variant data);
 
 extern void * resolve_curse(variant data);
 extern boolean is_cursed_with(attrib *ap, curse *c);

@@ -40,6 +40,7 @@ extern "C" {
 #define RF_MIGRATION   (1<<10)
 #define RF_UNUSED_1    (1<<11)
 #define RF_ORCIFIED    (1<<12)
+#define RF_CURSED      (1<<13)
 
 #define RF_COMBATDEBUG (1<<14)
 
