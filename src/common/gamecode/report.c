@@ -2618,7 +2618,7 @@ writeturn(void)
 	sprintf(zText, "%s/turn", basepath());
 	f = cfopen(zText, "w");
 	if (!f) return;
-	fprintf(f,"%d",turn);
+	fprintf(f, "%d\n", turn);
 	fclose(f);
 }
 

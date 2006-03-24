@@ -718,6 +718,7 @@ create_backup(char *file)
   char bfile[MAX_PATH];
   int c = 1;
 
+  if (access(file, R_OK) == 0) return;
   do {
     sprintf(bfile, "%s.backup%d", file, c);
     c++;
@@ -1956,7 +1957,7 @@ readgame(const char * filename, int backup)
 }
 
 int
-writegame(const char *filename, char quiet)
+writegame(const char *filename, int quiet)
 {
   char *base;
   int n;

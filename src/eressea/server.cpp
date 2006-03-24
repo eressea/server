@@ -251,16 +251,6 @@ game_init(void)
 #ifdef INFOCMD_MODULE
   init_info();
 #endif
-
-#ifdef REMOVE_THIS
-  render_init();
-  {
-    FILE * F = fopen("messagetypes.txt", "w");
-    debug_messagetypes(F);
-    fclose(F);
-    abort();
-  }
-#endif
 }
 
 #ifdef SHORTPWDS
@@ -434,6 +424,7 @@ usage(const char * prog, const char * arg)
     "-x n             : Lädt nur die ersten n regionen\n"
     "-f x y           : Lädt nur die regionen ab (x,y)\n"
     "-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
+    "-q               : be less verbose\n"
     "-d datadir       : gibt das datenverzeichnis an\n"
     "-b basedir       : gibt das basisverzeichnis an\n"
     "-r resdir        : gibt das resourceverzeichnis an\n"

@@ -34,6 +34,7 @@ extern "C" {
 #define LOG_CPWARNING  (1<<1)
 #define LOG_CPERROR    (1<<2)
 
+  extern int log_flags;
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,12 @@
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 #include <lua50/lua.h>
 #include <lua50/lauxlib.h>
 #include <lua50/lualib.h>
+
+#ifdef __cplusplus
 }
 
 #ifndef LUABIND_BETA
@@ -13,4 +18,6 @@ extern "C" {
 #  define LUABIND_BETA 7
 #  define LUABIND_DEVEL 2
 # endif
+#endif
+
 #endif

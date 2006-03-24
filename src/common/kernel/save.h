@@ -37,7 +37,7 @@ FILE * cfopen(const char *filename, const char *mode);
 int readorders(const char *);
 int creategame(void);
 extern int readgame(const char * filename, int backup);
-int writegame(const char *filename, char quiet);
+int writegame(const char *filename, int quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);
 
@@ -82,6 +82,8 @@ extern void a_writevoid(const struct attrib * a, FILE * F);
 extern int a_readstring(struct attrib * a, FILE * F);
 extern void a_writestring(const struct attrib * a, FILE * F);
 extern void a_finalizestring(struct attrib * a);
+
+extern void create_backup(char *file);
 
 #ifdef __cplusplus
 }

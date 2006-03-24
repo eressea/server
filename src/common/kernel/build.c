@@ -1131,6 +1131,11 @@ leave_cmd(unit * u, struct order * ord)
 {
   region * r = u->region;
 
+  if (fval(u, UFL_ENTER)) {
+    /* if we just entered this round, then we don't leave again */
+    return 0;
+  }
+
   if (fval(r->terrain, SEA_REGION) && u->ship) {
     if(!fval(u->race, RCF_SWIM)) {
       cmistake(u, ord, 11, MSG_MOVE);
@@ -1244,12 +1249,6 @@ do_misc(boolean lasttry)
               if(lasttry) cmistake(u, ord, 6, MSG_MOVE);
               break;
             }
-            /* Gebäude auf dem Ozean sollte man betreten dürfen
-            if(rterrain(r) == T_OCEAN) {
-              if (lasttry) cmistake(u, ord, 297, MSG_MOVE);
-              break;
-            }
-            */
             if (!mayenter(r, u, b)) {
               if(lasttry) {
                 sprintf(buf, "Der Eintritt in %s wurde verwehrt",
@@ -1277,11 +1276,13 @@ do_misc(boolean lasttry)
             if (buildingowner(r, b) == 0) {
               fset(u, UFL_OWNER);
             }
+            fset(u, UFL_ENTER);
             break;
 
           case P_SHIP:
             sh = getship(r);
             entership(u, sh, ord, lasttry);
+            fset(u, UFL_ENTER);
             break;
 
           default:

@@ -45,6 +45,7 @@ struct item;
 #define UFL_SIEGE         (1<<12) /* speedup: belagert eine burg, siehe attribut */
 #define UFL_TARGET        (1<<13) /* speedup: hat ein target, siehe attribut */
 #define UFL_WERE          (1<<14)
+#define UFL_ENTER         (1<<15) /* unit has entered a ship/building and will not leave it */
 
 /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
@@ -210,7 +211,6 @@ extern struct building * inside_building(const struct unit * u);
 extern void free_units(void);
 extern struct faction * dfindhash(int no);
 extern void u_setfaction(struct unit * u, struct faction * f);
-/* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 extern void set_number(struct unit * u, int count);
 
 extern boolean learn_skill(struct unit * u, skill_t sk, double chance);

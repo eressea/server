@@ -70,9 +70,6 @@
 #include <string.h>
 #include <time.h>
 
-extern char *reportdir;
-extern char *datadir;
-extern char *basedir;
 extern int maxregions;
 extern boolean dirtyload;
 char datafile[256];
@@ -1667,12 +1664,14 @@ main(int argc, char *argv[])
 #endif
 /*	register_dungeon(); */
 
+  register_itemtypes();
   register_xmlreader();
   init_data(xmlfile);
 
   init_locales();
   init_attributes();
-
+  init_races();
+  init_itemtypes();
 	init_rawmaterials();
 
 	init_gmcmd();

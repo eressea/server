@@ -7,10 +7,15 @@ SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
 SubDirHdrs $(SUBDIR)/.. ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
+SubDirC++Flags -DHAVE_LUA ;
+
 SubDirHdrs $(XMLHDRS) ;
 
 LUASERVER = eressea-lua ;
 SERVER = eressea ;
+GMTOOL = gmtool ;
 
 SERVER_SOURCES = main.c korrektur.c ;
 LUASERVER_SOURCES =
@@ -32,25 +37,33 @@ LUASERVER_SOURCES =
  console.c
  ;
 
+GMTOOL_SOURCES =
+ <curses>listbox.c
+ gmtool.c
+ editing.c
+ ;
+
+# the curses-based GM tool
+Main $(GMTOOL) : $(GMTOOL_SOURCES) ;
+LinkLibraries $(GMTOOL) :
+ kernel modules items attributes spells races triggers util ;
+libxml2 $(GMTOOL) ;
+LINKLIBS on $(GMTOOL) += -L$(LUABIND_ROOT)/lib -lm -lncurses ;
+
+# old eressea server. use only for testing.
 LinkLibraries $(SERVER) :
  gamecode kernel items modules attributes spells races triggers util ;
-LinkLibraries $(LUASERVER) :
- gamecode kernel items modules attributes spells races triggers util ;
-
 libxml2 $(SERVER) ;
 LINKLIBS on $(SERVER) += -L$(LUABIND_ROOT)/lib -lm ;
+Main $(SERVER) : $(SERVER_SOURCES) ;
 
+# eressea-server with lua scripting
+LinkLibraries $(LUASERVER) :
+ gamecode kernel items modules attributes spells races triggers util ;
 luabind $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
 LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
+UsingLua ;
+UsingLuabind ;
+Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
 
-if ! $(WITHOUT_LUA) {
- SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
- SubDirC++Flags -DHAVE_LUA ;
- UsingLua ;
- UsingLuabind ;
-
- Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
-}
-
-Main $(SERVER) : $(SERVER_SOURCES) ;

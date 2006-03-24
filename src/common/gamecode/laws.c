@@ -2787,7 +2787,9 @@ guard_on_cmd(unit * u, struct order * ord)
   if (fval(u->region->terrain, SEA_REGION)) {
     cmistake(u, ord, 2, MSG_EVENT);
   } else {
-    if (fval(u, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
+    if (fval(u, UFL_MOVED)) {
+      cmistake(u, ord, 187, MSG_EVENT);
+    } else  if (fval(u->race, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
       cmistake(u, ord, 95, MSG_EVENT);
     } else {
       /* Monster der Monsterpartei dürfen immer bewachen */

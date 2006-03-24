@@ -19,7 +19,7 @@ without prior permission by the authors of Eressea.
 #include <time.h>
 
 /* TODO: set from external function */
-static int flags = LOG_FLUSH|LOG_CPERROR|LOG_CPWARNING;
+int log_flags = LOG_FLUSH|LOG_CPERROR|LOG_CPWARNING;
 static FILE * logfile;
 
 void 
@@ -44,7 +44,7 @@ log_printf(const char * format, ...)
   va_start(marker, format);
   vfprintf(logfile, format, marker);
   va_end(marker);
-  if (flags & LOG_FLUSH) {
+  if (log_flags & LOG_FLUSH) {
     log_flush();
   }
 }
@@ -89,7 +89,7 @@ check_dupe(const char * format, const char * type)
   if (dupes) {
     fprintf(logfile, "%s: last error repeated %d times\n", last_type, dupes+1);
     if (logfile!=stderr) {
-      if (flags & LOG_CPERROR) {
+      if (log_flags & LOG_CPERROR) {
         fprintf(stderr, "%s: last error repeated %d times\n", last_type, dupes+1);
       }
     }
@@ -113,13 +113,13 @@ _log_warn(const char * format, ...)
     vfprintf(logfile, format, marker);
     va_end(marker);
     if (logfile!=stderr) {
-      if (flags & LOG_CPWARNING) {
+      if (log_flags & LOG_CPWARNING) {
         fputs("WARNING: ", stderr);
         va_start(marker, format);
         vfprintf(stderr, format, marker);
         va_end(marker);
       }
-      if (flags & LOG_FLUSH) {
+      if (log_flags & LOG_FLUSH) {
         log_flush();
       }
     }
@@ -139,7 +139,7 @@ _log_error(const char * format, ...)
     vfprintf(logfile, format, marker);
     va_end(marker);
     if (logfile!=stderr) {
-      if (flags & LOG_CPERROR) {
+      if (log_flags & LOG_CPERROR) {
         fputs("ERROR: ", stderr);
         va_start(marker, format);
         vfprintf(stderr, format, marker);
@@ -162,13 +162,13 @@ _log_info(unsigned int flag, const char * format, ...)
   vfprintf(logfile, format, marker);
   va_end(marker);
   if (logfile!=stderr) {
-    if (flags & flag) {
+    if (log_flags & flag) {
       fprintf(stderr, "INFO[%u]: ", flag);
       va_start(marker, format);
       vfprintf(stderr, format, marker);
       va_end(marker);
     }
-    if (flags & LOG_FLUSH) {
+    if (log_flags & LOG_FLUSH) {
       log_flush();
     }
   }

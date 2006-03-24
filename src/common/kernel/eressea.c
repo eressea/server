@@ -2433,8 +2433,8 @@ setguard(unit * u, unsigned int flags)
   }
   if (flags == GUARD_NONE) {
     freset(u, UFL_GUARD);
-	if (a) a_remove(&u->attribs, a);
-	return;
+    if (a) a_remove(&u->attribs, a);
+    return;
   }
   fset(u, UFL_GUARD);
   if (!a) a = a_add(&u->attribs, a_new(&at_guard));

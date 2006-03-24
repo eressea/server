@@ -934,7 +934,7 @@ u_setfaction(unit * u, faction * f)
 	}
 }
 
-/* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
+/* vorsicht Sprüche können u->number == RS_FARVISION haben! */
 void
 set_number(unit * u, int count)
 {
