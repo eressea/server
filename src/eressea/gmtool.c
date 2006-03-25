@@ -1103,7 +1103,7 @@ run_mapper(void)
     }
     for (wnd=wnd_last;wnd!=NULL;wnd=wnd->prev) {
       if (wnd->update && wnd->paint) {
-        if (wnd->update & 2) wclear(wnd->handle);
+        // if (wnd->update & 2) wclear(wnd->handle);
         if (wnd->update & 1) {
           wnd->paint(wnd, &st);
         }
@@ -1111,7 +1111,10 @@ run_mapper(void)
       }
     }
     draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 1);
-    for (wnd=wnd_first;wnd!=NULL;wnd=wnd->next) wrefresh(wnd->handle);
+    for (wnd=wnd_first;wnd!=NULL;wnd=wnd->next) {
+      wnoutrefresh(wnd->handle);
+    }
+    doupdate();
     draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 0);
 
     handlekeys(&st);
