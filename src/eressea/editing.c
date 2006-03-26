@@ -13,6 +13,28 @@
 #include "editing.h"
 
 #include <kernel/region.h>
+#include <modules/autoseed.h>
+#include <util/rng.h>
+
+#define ISLANDSIZE 20
+#define TURNS_PER_ISLAND 4
+void
+seed_players(const char * filename, boolean new_island)
+{
+  newfaction * players = read_newfactions(filename);
+  if (players!=NULL) {
+    rng_init(players->subscription);
+    while (players) {
+      int n = listlen(players);
+      int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+      k = n / k;
+      n = autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
+      if (n==0) {
+        break;
+      }
+    }
+  }
+}
 
 void
 make_block(short x, short y, short radius, const struct terrain_type * terrain)

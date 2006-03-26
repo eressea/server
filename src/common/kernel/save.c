@@ -466,10 +466,10 @@ unitorders(FILE * F, struct faction * f)
   if (u && u->faction == f) {
     order ** ordp;
 
-		if (!quiet) {
-			printf(",_%4s_", itoa36(u->no));
-			fflush(stdout);
-		}
+    if (quiet==0) {
+      printf(",_%4s_", itoa36(u->no));
+      fflush(stdout);
+    }
 
     if (!fval(u, UFL_ORDERS)) {
       /* alle wiederholbaren, langen befehle werden gesichert: */
@@ -533,32 +533,32 @@ unitorders(FILE * F, struct faction * f)
 static faction *
 factionorders(void)
 {
-	char b[16];
-	char * fid = strnzcpy(b, getstrtoken(), 15);
-	const char * pass = getstrtoken();
-	faction *f;
-
-	f = findfaction(atoi36(fid));
-
-	if (f!=NULL) {
-		/* Kontrolliere, ob das Passwort richtig eingegeben wurde. Es
-		 * muß in "Gänsefüßchen" stehen!! */
-
-		/* War vorher in main.c:getgarbage() */
-		if (!quiet) {
-			printf(" %4s;", factionid(f));
-			fflush(stdout);
-		}
-
-		if (checkpasswd(f, pass, true) == false) {
-		  log_warning(("Invalid password for faction %s\n", fid));
+  char b[16];
+  char * fid = strnzcpy(b, getstrtoken(), 15);
+  const char * pass = getstrtoken();
+  faction *f;
+  
+  f = findfaction(atoi36(fid));
+  
+  if (f!=NULL) {
+    /* Kontrolliere, ob das Passwort richtig eingegeben wurde. Es
+     * muß in "Gänsefüßchen" stehen!! */
+    
+    /* War vorher in main.c:getgarbage() */
+    if (quiet==0) {
+      printf(" %4s;", factionid(f));
+      fflush(stdout);
+    }
+    
+    if (checkpasswd(f, pass, true) == false) {
+      log_warning(("Invalid password for faction %s\n", fid));
       ADDMSG(&f->msgs, msg_message("msg_errors", "string",
-        "Das Passwort wurde falsch eingegeben"));
-			return 0;
-		}
-		/* Die Partei hat sich zumindest gemeldet, so daß sie noch
-		 * nicht als untätig gilt */
-
+                                   "Das Passwort wurde falsch eingegeben"));
+      return 0;
+    }
+    /* Die Partei hat sich zumindest gemeldet, so daß sie noch
+     * nicht als untätig gilt */
+    
 		/* TODO: +1 ist ein Workaround, weil turn erst in process_orders
 		 * incrementiert wird. */
 		f->lastorders = global.data_turn+1;
@@ -1495,7 +1495,7 @@ readfaction(FILE * F)
   if (strlen(f->banner)>=DISPLAYSIZE) f->banner[DISPLAYSIZE] = 0;
 #endif
 
-  if (!quiet) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
+  if (quiet==0) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
 
   rds(F, &email);
   if (set_email(&f->email, email)!=0) {
@@ -1758,7 +1758,7 @@ readgame(const char * filename, int backup)
     read_alliances(F);
   }
   n = ri(F);
-  printf(" - Einzulesende Parteien: %d\n", n);
+  if (quiet<2) printf(" - Einzulesende Parteien: %d\n", n);
   fp = &factions;
   while (*fp) fp=&(*fp)->next;
 
@@ -1784,7 +1784,7 @@ readgame(const char * filename, int backup)
 
   n = ri(F);
   if (rmax<0) rmax = n;
-  printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
+  if (quiet<2) printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
   if (loadplane || dirtyload || firstx || firsty || maxregions>=0) {
     incomplete_data = true;
   }
@@ -1809,7 +1809,7 @@ readgame(const char * filename, int backup)
       if (dirtyload) break;
       skip = true;
     }
-    if ((n & 0x3FF) == 0) {	/* das spart extrem Zeit */
+    if (quiet<2 && (n & 0x3FF) == 0) {	/* das spart extrem Zeit */
       printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
       printf("* %d,%d    \r", x, y);
     }
@@ -1910,7 +1910,7 @@ readgame(const char * filename, int backup)
       }
     }
   }
-  printf("\n");
+  if (quiet<2) printf("\n");
   if (!dirtyload) {
     read_borders(F);
   }
@@ -1918,10 +1918,10 @@ readgame(const char * filename, int backup)
   fclose(F);
 
   /* Unaufgeloeste Zeiger initialisieren */
-  printf("\n - Referenzen initialisieren...\n");
+  if (quiet<2) printf("\n - Referenzen initialisieren...\n");
   resolve();
 
-  printf("\n - Leere Gruppen löschen...\n");
+  if (quiet<2) printf("\n - Leere Gruppen löschen...\n");
   for (f=factions; f; f=f->next) {
     group ** gp = &f->groups;
     while (*gp) {
@@ -1938,7 +1938,7 @@ readgame(const char * filename, int backup)
     building * b;
     for (b=r->buildings;b;b=b->next) update_lighthouse(b);
   }
-  printf(" - Regionen initialisieren & verbinden...\n");
+  if (quiet < 2) printf(" - Regionen initialisieren & verbinden...\n");
   for (f = factions; f; f = f->next) {
     for (u = f->units; u; u = u->nextF) {
       if (u->number>0) {
@@ -2047,7 +2047,7 @@ writegame(const char *filename, int quiet)
   wi(F, n);
   wnl(F);
 
-  printf(" - Schreibe %d Parteien...\n",n);
+  if (quiet < 2) printf(" - Schreibe %d Parteien...\n",n);
   for (f = factions; f; f = f->next) {
     writefaction(F, f);
   }
@@ -2060,11 +2060,11 @@ writegame(const char *filename, int quiet)
   n=listlen(regions);
   wi(F, n);
   wnl(F);
-  printf(" - Schreibe Regionen: %d  \r", n);
+  if (quiet<2) printf(" - Schreibe Regionen: %d  \r", n);
 
   for (r = regions; r; r = r->next, --n) {
     /* plus leerzeile */
-    if ((n%1024)==0) {	/* das spart extrem Zeit */
+    if (quiet<2 && (n%1024)==0) {	/* das spart extrem Zeit */
       printf(" - Schreibe Regionen: %d  \r", n);
       fflush(stdout);
     }
@@ -2112,7 +2112,7 @@ writegame(const char *filename, int quiet)
   write_borders(F);
   wnl(F);
   fclose(F);
-  printf("\nOk.\n");
+  if (quiet<2) printf("\nOk.\n");
   return 0;
 }
 

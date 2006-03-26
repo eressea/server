@@ -17,7 +17,6 @@
 #include "editing.h"
 #include "curses/listbox.h"
 
-#include <modules/autoseed.h>
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
 #ifdef MUSEUM_MODULE
@@ -99,7 +98,7 @@ read_args(int argc, char **argv)
 {
   int i;
  
-  quiet = 1;
+  quiet = 0xFF; /* no printing whatsoever */
   turn = first_turn;
 
   for (i=1;i!=argc;++i) {
@@ -227,9 +226,12 @@ init_curses(void)
   if (has_colors() || force_color) {
     short bcol = COLOR_BLACK;
     start_color();
+#ifdef WIN32    
+    /* looks crap on putty with TERM=linux */
     if (can_change_color()) {
       init_color(COLOR_YELLOW, 1000, 1000, 0);
     }
+#endif 
     init_pair(COLOR_BLACK, COLOR_BLACK, bcol);
     init_pair(COLOR_GREEN, COLOR_GREEN, bcol);
     init_pair(COLOR_GREEN, COLOR_GREEN, bcol);
@@ -248,12 +250,12 @@ init_curses(void)
   }
 
   keypad(stdscr, TRUE);  /* enable keyboard mapping */
+  meta(stdscr, TRUE);
   nonl();         /* tell curses not to do NL->CR/NL on output */
   cbreak();       /* take input chars one at a time, no wait for \n */
   noecho();       /* don't echo input */
   scrollok(stdscr, FALSE);
   refresh();
-/*  wclear(stdscr); */
 }
 
 static map_region *
@@ -680,6 +682,7 @@ handlekey(state * st, int c)
   region *r;
   boolean invert = false;
   char sbuffer[80];
+  static char kbuffer[80];
 
   switch(c) {
   case FAST_RIGHT:
@@ -951,6 +954,11 @@ handlekey(state * st, int c)
     if (tagged_region(st->selected, cursor)) untag_region(st->selected, cursor);
     else tag_region(st->selected, cursor);
     break;
+  case 'A':
+    sprintf(sbuffer, "%s/newfactions", basepath());
+    seed_players(sbuffer, false);
+    st->wnd_map->update |= 1;
+    break;
   case '/':
     statusline(st->wnd_status->handle, "find-");
     doupdate();
@@ -1033,8 +1041,13 @@ handlekey(state * st, int c)
       }
     }
     if (wnd==NULL) {
-      sprintf(sbuffer, "getch: 0x%x", c);
-      statusline(st->wnd_status->handle, sbuffer);
+      if (kbuffer[0]==0) {
+        strcpy(kbuffer, "getch:");
+      }
+      sprintf(sbuffer, " 0x%x", c);
+      strncat(kbuffer, sbuffer, sizeof(kbuffer));
+      statusline(st->wnd_status->handle, kbuffer);
+      if (strlen(kbuffer)>70) kbuffer[0]=0;
     }
     break;
   }

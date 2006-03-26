@@ -88,11 +88,11 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
   for (;;) {
     int input;
     if (update) {
-      /* wclear(wn); */
       for (s=top;s!=NULL && top->index+height!=s->index;s=s->next) {
         i = s->index-top->index;
         wmove(wn, i + 1, 4);
         waddnstr(wn, s->str, -1);
+        wclrtoeol(wn);
       }
       wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
       mvwprintw(wn, 0, 2, "[ %s ]", title);
@@ -103,7 +103,7 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
     wmove(wn, i + 1, 2);
     waddstr(wn, "->");
     wmove(wn, i + 1, 4);
-    waddnstr(wn, current->str, width);
+    waddnstr(wn, current->str, -1);
     wattroff(wn, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
 
     wrefresh(wn);
@@ -116,6 +116,29 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
     waddnstr(wn, current->str, width);
 
     switch (input) {
+    case KEY_NPAGE:
+      for (i=0;i!=height/2;++i) {
+        if (current->next) {
+          current = current->next;
+          if (current->index-height>=top->index) {
+            top=current;
+            update = true;
+          }
+        }
+      }
+      break;
+    case KEY_PPAGE:
+      for (i=0;i!=height/2;++i) {
+        if (current->prev) {
+          if (current==top) {
+            top = sel;
+            while (top->index+height<current->index) top=top->next;
+            update = true;
+          }
+          current = current->prev;
+        }
+      }
+      break;
     case KEY_DOWN:
       if (current->next) {
         current = current->next;
@@ -158,6 +181,10 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
           s = s->next;
           if (s==NULL) s = top;
         }
+      }
+      if (current->index-height>=top->index) {
+        top=current;
+        update = true;
       }
     }
   }
