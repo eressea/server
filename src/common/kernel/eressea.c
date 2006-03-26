@@ -381,7 +381,6 @@ const char *keywords[MAXKEYWORDS] =
 	"ZERSTOEREN",
 	"ZUECHTEN",
 	"DEFAULT",
-	"REPORT",
 	"URSPRUNG",
 	"EMAIL",
 	"MEINUNG",

@@ -403,7 +403,6 @@ enum {
   K_DESTROY,
   K_BREED,
   K_DEFAULT,
-  K_REPORT,
   K_URSPRUNG,
   K_EMAIL,
   K_VOTE,

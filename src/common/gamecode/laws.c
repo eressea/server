@@ -2034,21 +2034,6 @@ mail_cmd(unit * u, struct order * ord)
 }
 /* ------------------------------------------------------------- */
 
-static void
-report_option(unit * u, const char * sec, struct order * ord)
-{
-  const messageclass * mc;
-  const char *s;
-
-  mc = mc_find(sec);
-
-  if (mc == NULL) {
-    cmistake(u, ord, 135, MSG_EVENT);
-    return;
-  }
-  s = getstrtoken();
-}
-
 static int
 banner_cmd(unit * u, struct order * ord)
 {
@@ -2120,28 +2105,6 @@ password_cmd(unit * u, struct order * ord)
   fset(u->faction, FFL_OVERRIDE);
   ADDMSG(&u->faction->msgs, msg_message("changepasswd",
     "value", u->faction->passw));
-  return 0;
-}
-
-static int
-report_cmd(unit * u, struct order * ord)
-{
-  const char * s;
-  int i;
-
-  init_tokens(ord);
-  skip_token();
-  s = getstrtoken();
-
-  i = atoi(s);
-  sprintf(buf, "%d", i);
-  if (!strcmp(buf, s)) {
-    /* int level;
-    level = geti();
-    not implemented yet. set individual levels for f->msglevels */
-  } else {
-    report_option(u, s, ord);
-  }
   return 0;
 }
 
@@ -2223,10 +2186,6 @@ set_passw(void)
 
         case K_PASSWORD:
           if (password_cmd(u, ord)!=0) ord = NULL;
-          break;
-
-        case K_REPORT:
-          if (report_cmd(u, ord)!=0) ord = NULL;
           break;
 
         case K_SEND:

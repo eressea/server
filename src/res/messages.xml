@@ -611,7 +611,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) do not give things away."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) do not give things away."</text>
   </message>
-  <message name="regionmessage" section="events">
+  <message name="regionmessage" section="mail">
     <type>
       <arg name="sender" type="unit"/>
       <arg name="region" type="region"/>
@@ -620,7 +620,7 @@
     <text locale="de">"Eine Botschaft von $unit($sender) aus $region($region): '$string'"</text>
     <text locale="en">"A message by $unit($sender) from $region($region): '$string'"</text>
   </message>
-  <message name="unitmessage" section="events">
+  <message name="unitmessage" section="mail">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>

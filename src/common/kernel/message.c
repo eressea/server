@@ -58,37 +58,6 @@ typedef struct msg_setting {
 #include "region.h"
 #include "eressea.h"
 
-messageclass * msgclasses;
-
-const messageclass *
-mc_find(const char * name)
-{
-	messageclass ** mcp = &msgclasses;
-	if (name==NULL) return NULL;
-	for (;*mcp;mcp=&(*mcp)->next) {
-		messageclass * mc = *mcp;
-		if (!strcmp(mc->name, name)) break;
-	}
-	return *mcp;
-}
-
-const messageclass *
-mc_add(const char * name)
-{
-	messageclass ** mcp = &msgclasses;
-	if (name==NULL) return NULL;
-	for (;*mcp;mcp=&(*mcp)->next) {
-		messageclass * mc = *mcp;
-		if (!strcmp(mc->name, name)) break;
-	}
-	if (!*mcp) {
-		messageclass * mc = calloc(sizeof(messageclass), 1);
-		mc->name = strdup(name);
-		*mcp = mc;
-	}
-	return *mcp;
-}
-
 static void
 arg_set(variant args[], const message_type * mtype, const char * buffer, variant v)
 {

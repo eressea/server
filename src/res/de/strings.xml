@@ -674,7 +674,10 @@
 
   <!--Meldungssektionen -->
   <string name="section_events">
-    <text locale="de">Meldungen und Ereignisse</text>
+    <text locale="de">Ereignisse</text>
+  </string>
+  <string name="section_mail">
+    <text locale="de">Botschaften</text>
   </string>
   <string name="section_errors">
     <text locale="de">Warnungen und Fehler</text>

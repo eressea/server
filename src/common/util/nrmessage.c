@@ -6,9 +6,9 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
- 
+
 */
 
 #include <config.h>
@@ -31,101 +31,138 @@
 #define NRT_MAXHASH 1021
 static nrmessage_type * messagetypes[NRT_MAXHASH];
 
-const char * 
+const char *
 nrt_string(const struct nrmessage_type *type)
 {
-	return type->string;
+  return type->string;
 }
 
-nrmessage_type * 
+nrmessage_type *
 nrt_find(const struct locale * lang, const struct message_type * mtype)
 {
-	nrmessage_type * found = NULL;
-	unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
-	nrmessage_type * type = messagetypes[hash];
-	while (type) {
-		if (type->mtype==mtype) {
-			if (found==NULL) found = type;
-			else if (type->lang==NULL) found = type;
-			if (lang==type->lang) {
-				found = type;
-				break;
-			}
-		}
-		type = type->next;
-	}
+  nrmessage_type * found = NULL;
+  unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
+  nrmessage_type * type = messagetypes[hash];
+  while (type) {
+    if (type->mtype==mtype) {
+      if (found==NULL) found = type;
+      else if (type->lang==NULL) found = type;
+      if (lang==type->lang) {
+        found = type;
+        break;
+      }
+    }
+    type = type->next;
+  }
   if (lang && found->lang!=lang) {
     log_warning(("could not find nr-type %s for locale %s, substituting with %s\n",
       mtype->name, locale_name(lang), locale_name(found->lang)));
   }
-	return found;
+  return found;
 }
 
-void 
+nrsection * sections;
+
+const nrsection *
+section_find(const char * name)
+{
+  nrsection ** mcp = &sections;
+  if (name==NULL) return NULL;
+  for (;*mcp;mcp=&(*mcp)->next) {
+    nrsection * mc = *mcp;
+    if (!strcmp(mc->name, name)) break;
+  }
+  return *mcp;
+}
+
+const nrsection *
+section_add(const char * name)
+{
+  nrsection ** mcp = &sections;
+  if (name==NULL) return NULL;
+  for (;*mcp;mcp=&(*mcp)->next) {
+    nrsection * mc = *mcp;
+    if (!strcmp(mc->name, name)) break;
+  }
+  if (!*mcp) {
+    nrsection * mc = calloc(sizeof(nrsection), 1);
+    mc->name = strdup(name);
+    *mcp = mc;
+  }
+  return *mcp;
+}
+
+void
 nrt_register(const struct message_type * mtype, const struct locale * lang, const char * string, int level, const char * section)
 {
-	unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
-	nrmessage_type * nrt = messagetypes[hash];
-	while (nrt && (nrt->lang!=lang || nrt->mtype!=mtype)) {
-		nrt = nrt->next;
-	}
-	if (!nrt) {
-		int i;
-		char zNames[256];
-		char * c = zNames;
-		nrt = malloc(sizeof(nrmessage_type));
-		nrt->lang = lang;
-		nrt->mtype = mtype;
-		nrt->next = messagetypes[hash];
-		nrt->level=level;
-		if (section) nrt->section = strdup(section);
-		else nrt->section = NULL;
-		messagetypes[hash] = nrt;
-		assert(string && *string);
-		nrt->string = strdup(string);
+  unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
+  nrmessage_type * nrt = messagetypes[hash];
+  while (nrt && (nrt->lang!=lang || nrt->mtype!=mtype)) {
+    nrt = nrt->next;
+  }
+  if (!nrt) {
+    int i;
+    char zNames[256];
+    char * c = zNames;
+    nrt = malloc(sizeof(nrmessage_type));
+    nrt->lang = lang;
+    nrt->mtype = mtype;
+    nrt->next = messagetypes[hash];
+    nrt->level=level;
+    if (section) {
+      const nrsection * s = section_find(section);
+      if (s==NULL) {
+        s = section_add(section);
+      }
+      nrt->section = s->name;
+    }
+    else nrt->section = NULL;
+    messagetypes[hash] = nrt;
+    assert(string && *string);
+    nrt->string = strdup(string);
                 *c = '\0';
-		for (i=0;i!=mtype->nparameters;++i) {
-			if (i!=0) *c++ = ' ';
-			c+= strlen(strcpy(c, mtype->pnames[i]));
-		}
-		nrt->vars = strdup(zNames);
-		/* TODO: really necessary to strdup them all? here? better to extend the caller? hash? */
-	}
+    for (i=0;i!=mtype->nparameters;++i) {
+      if (i!=0) *c++ = ' ';
+      c+= strlen(strcpy(c, mtype->pnames[i]));
+    }
+    nrt->vars = strdup(zNames);
+    /* TODO: really necessary to strdup them all? here? better to extend the caller? hash? */
+  }
 }
 
 size_t
 nr_render(const struct message * msg, const struct locale * lang, char * buffer, size_t size, const void * userdata)
 {
-	struct nrmessage_type * nrt = nrt_find(lang, msg->type);
+  struct nrmessage_type * nrt = nrt_find(lang, msg->type);
 
-	if (nrt) {
-		const char * m = translate(nrt->string, userdata, nrt->vars, msg->parameters);
-		if (m) {
-			return strlcpy(buffer, m, size);
-		} else {
-			log_error(("Couldn't render message %s\n", nrt->mtype->name));
-		}
-	}
+  if (nrt) {
+    const char * m = translate(nrt->string, userdata, nrt->vars, msg->parameters);
+    if (m) {
+      return strlcpy(buffer, m, size);
+    } else {
+      log_error(("Couldn't render message %s\n", nrt->mtype->name));
+    }
+  }
   if (size>0 && buffer) buffer[0] = 0;
-	return 0;
+  return 0;
 }
 
-int 
+int
 nr_level(const struct message *msg)
 {
-	nrmessage_type * nrt = nrt_find(NULL, msg->type);
-	return nrt->level;
+  nrmessage_type * nrt = nrt_find(NULL, msg->type);
+  return nrt->level;
 }
 
-const char * 
+const char *
 nr_section(const struct message *msg)
 {
-	nrmessage_type * nrt = nrt_find(default_locale, msg->type);
-	return nrt->section;
+  nrmessage_type * nrt = nrt_find(default_locale, msg->type);
+  return nrt->section;
 }
 
-const char * 
+const char *
 nrt_section(const nrmessage_type * nrt)
 {
-	return nrt->section;
+  return nrt->section;
 }

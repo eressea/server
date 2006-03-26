@@ -257,8 +257,11 @@
     <text locale="en">an unknown unit</text>
   </string>
 
+  <string name="section_mail">
+    <text locale="en">Dispatches</text>
+  </string>
   <string name="section_events">
-    <text locale="en">Messages and Events</text>
+    <text locale="en">Events</text>
   </string>
   <string name="section_errors">
     <text locale="en">Warnings and Errors</text>

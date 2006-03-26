@@ -1758,7 +1758,6 @@ parse_messages(xmlDocPtr doc)
 
     section = xmlGetProp(node, BAD_CAST "section");
     if (section==NULL) section = BAD_CAST default_section;
-    mc_add((const char*)section);
 
     /* strings */
     xpath->node = node;

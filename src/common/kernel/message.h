@@ -21,7 +21,6 @@ extern "C" {
 #include <util/message.h>
 
 struct message;
-struct messageclass;
 struct faction;
 struct msglevel;
 
@@ -36,11 +35,6 @@ typedef struct message_list {
 
 extern void free_messagelist(message_list * msgs);
 
-typedef struct messageclass {
-  struct messageclass * next;
-  const char * name;
-} messageclass;
-
 typedef struct msglevel {
 	/* used to set specialized msg-levels */
 	struct msglevel *next;
@@ -52,11 +46,6 @@ extern struct message * msg_message(const char * name, const char* sig, ...);
 extern struct message * msg_feedback(const struct unit *, struct order *cmd,
                                   const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
-
-/* message sections */
-extern struct messageclass * msgclasses;
-extern const struct messageclass * mc_add(const char * name);
-extern const struct messageclass * mc_find(const char * name);
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 

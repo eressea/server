@@ -585,24 +585,24 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 static void
 rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean categorized)
 {
-	messageclass * category;
+	nrsection * section;
 	if (!msgs) return;
-	for (category=msgclasses; category; category=category->next) {
+	for (section = sections; section; section=section->next) {
 		int k = 0;
 		struct mlist * m = msgs->begin;
 		while (m) {
 			/* messagetype * mt = m->type; */
-			if (strcmp(nr_section(m->msg), category->name)==0) {
+			if (strcmp(nr_section(m->msg), section->name)==0) {
 				char lbuf[8192];
 
 				if (!k && categorized) {
-					const char * category_title;
+					const char * section_title;
 					char cat_identifier[24];
 
           rnl(F);
-					sprintf(cat_identifier, "section_%s", category->name);
-					category_title = LOC(viewer->locale, cat_identifier);
-					centre(F, category_title, true);
+					sprintf(cat_identifier, "section_%s", section->name);
+					section_title = LOC(viewer->locale, cat_identifier);
+					centre(F, section_title, true);
 					rnl(F);
           k = 1;
 				}
