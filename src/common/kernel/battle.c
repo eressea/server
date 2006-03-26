@@ -96,7 +96,7 @@ boolean nobattledebug = false;
 /* globals */
 static int obs_count = 0;
 
-#define TACTICS_MALUS
+#define TACTICS_MALUS 1
 #undef  MAGIC_TURNS
 
 #define MINSPELLRANGE 1
@@ -3075,11 +3075,12 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	/* Schauen, wie gut wir in Taktik sind. */
 	if (t > 0 && u->race == new_race[RC_INSECT])
 		t -= 1 - (int) log10(fig->side->size[SUM_ROW]);
-	if (t > 0 && get_unitrow(fig) == FIGHT_ROW)
+	if (t > 0 && statusrow(fig->status) == FIGHT_ROW)
 		t += 1;
 #ifdef TACTICS_MALUS
-	if (t > 0 && get_unitrow(fig) > BEHIND_ROW)
-		t -= 1;
+  if (t > 0 && statusrow(fig->status) > BEHIND_ROW) {
+    t -= TACTICS_MALUS;
+  }
 #endif
 #ifdef TACTICS_RANDOM
 	if (t > 0) {

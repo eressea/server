@@ -847,7 +847,7 @@ handlekey(state * st, int c)
     /* !! intentional fall-through !! */
   case 'T':
     statusline(st->wnd_status->handle, "untag-"+(invert?0:2));
-    doupdate(); // st->wnd_status->handle
+    doupdate();
     findmode = getch();
     if (findmode=='n') { /* none */
       int i;
