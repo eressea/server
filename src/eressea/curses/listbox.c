@@ -88,7 +88,7 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
   for (;;) {
     int input;
     if (update) {
-      wclear(wn);
+      /* wclear(wn); */
       for (s=top;s!=NULL && top->index+height!=s->index;s=s->next) {
         i = s->index-top->index;
         wmove(wn, i + 1, 4);

@@ -252,7 +252,8 @@ init_curses(void)
   cbreak();       /* take input chars one at a time, no wait for \n */
   noecho();       /* don't echo input */
   scrollok(stdscr, FALSE);
-  wclear(stdscr);
+  refresh();
+/*  wclear(stdscr); */
 }
 
 static map_region *
@@ -454,6 +455,7 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c, i
     mvwaddch(win, yp, xp+1, ' ' | attr | COLOR_PAIR(COLOR_WHITE));
   }
   wmove(win, yp, xp);
+  wnoutrefresh(win);
 }
 
 
@@ -564,7 +566,7 @@ statusline(WINDOW * win, const char * str)
 {
   mvwaddstr(win, 0, 0, (char*)str);
   wclrtoeol(win);
-  wrefresh(win);
+  wnoutrefresh(win);
 }
 
 static void
@@ -597,8 +599,34 @@ terraform_selection(selection * selected, const terrain_type *terrain)
   }
 }
 
-const terrain_type *
-select_terrain(const terrain_type * default_terrain)
+static faction *
+select_faction(state * st)
+{
+  list_selection *prev, *ilist = NULL, **iinsert;
+  list_selection *selected = NULL;
+  faction * f = factions;
+
+  if (!f) return NULL;
+  iinsert = &ilist;
+  prev = ilist;
+
+  while (f) {
+    char buffer[32];
+    sprintf(buffer, "%.4s %.26s", itoa36(f->no), f->name);
+    insert_selection(iinsert, NULL, buffer, (void*)f);
+    f = f->next;
+  }
+  selected = do_selection(ilist, "Select Faction", NULL, NULL);
+  st->wnd_info->update |= 1;
+  st->wnd_map->update |= 1;
+  st->wnd_status->update |= 1;
+
+  if (selected==NULL) return NULL;
+  return (faction*)selected->data;
+}
+
+static const terrain_type *
+select_terrain(state * st, const terrain_type * default_terrain)
 {
   list_selection *prev, *ilist = NULL, **iinsert;
   list_selection *selected = NULL;
@@ -613,6 +641,10 @@ select_terrain(const terrain_type * default_terrain)
     terrain = terrain->next;
   }
   selected = do_selection(ilist, "Terrain", NULL, NULL);
+  st->wnd_info->update |= 1;
+  st->wnd_map->update |= 1;
+  st->wnd_status->update |= 1;
+  
   if (selected==NULL) return NULL;
   return (const terrain_type*)selected->data;
 }
@@ -639,10 +671,9 @@ region2coord(const region * r, coordinate * c)
 #endif
 
 static void
-handlekeys(state * st)
+handlekey(state * st, int c)
 {
   window * wnd;
-  int c = getch();
   coordinate * cursor = &st->cursor;
   static char locate[80];
   static int findmode = 0;
@@ -706,7 +737,7 @@ handlekeys(state * st)
     }
     break;
   case 'B':
-    make_block((short)st->cursor.x, (short)st->cursor.y, 6, select_terrain(NULL));
+    make_block((short)st->cursor.x, (short)st->cursor.y, 6, select_terrain(st, NULL));
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
@@ -772,7 +803,7 @@ handlekeys(state * st)
     }
     break;
   case 't':
-    terraform_at(&st->cursor, select_terrain(NULL));
+    terraform_at(&st->cursor, select_terrain(st, NULL));
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
@@ -780,6 +811,7 @@ handlekeys(state * st)
     break;
   case 'I':
     statusline(st->wnd_status->handle, "info-");
+    doupdate();
     do {
       c = getch();
       switch (c) {
@@ -815,6 +847,7 @@ handlekeys(state * st)
     /* !! intentional fall-through !! */
   case 'T':
     statusline(st->wnd_status->handle, "untag-"+(invert?0:2));
+    doupdate(); // st->wnd_status->handle
     findmode = getch();
     if (findmode=='n') { /* none */
       int i;
@@ -875,7 +908,7 @@ handlekeys(state * st)
     else if (findmode=='t') {
       const struct terrain_type * terrain;
       statusline(st->wnd_status->handle, "untag-terrain: "+(invert?0:2));
-      terrain = select_terrain(NULL);
+      terrain = select_terrain(st, NULL);
       if (terrain!=NULL) {
         sprintf(sbuffer, "%stag-terrain: %s", invert?"un":"", terrain->_name);
         statusline(st->wnd_status->handle, sbuffer);
@@ -898,9 +931,10 @@ handlekeys(state * st)
     break;
   case ';':
     statusline(st->wnd_status->handle, "tag-");
+    doupdate();
     switch (getch()) {
     case 't':
-      terraform_selection(st->selected, select_terrain(NULL));
+      terraform_selection(st->selected, select_terrain(st, NULL));
       st->modified = 1;
       st->wnd_info->update |= 1;
       st->wnd_status->update |= 1;
@@ -919,6 +953,7 @@ handlekeys(state * st)
     break;
   case '/':
     statusline(st->wnd_status->handle, "find-");
+    doupdate();
     findmode = getch();
     if (findmode=='r') {
       askstring(st->wnd_status->handle, "find-region:", locate, sizeof(locate));
@@ -926,6 +961,14 @@ handlekeys(state * st)
       askstring(st->wnd_status->handle, "find-unit:", locate, sizeof(locate));
     } else if (findmode=='f') {
       askstring(st->wnd_status->handle, "find-faction:", locate, sizeof(locate));
+    } else if (findmode=='F') {
+      faction * f = select_faction(st);
+      if (f!=NULL) {
+        strcpy(locate, itoa36(f->no));
+        findmode='f';
+      } else {
+        break;
+      }
     } else {
       statusline(st->wnd_status->handle, "unknown command.");
       beep();
@@ -943,6 +986,8 @@ handlekeys(state * st)
       region * first = (mr->r && mr->r->next)?mr->r->next:regions;
 
       if (findmode=='f') {
+        sprintf(sbuffer, "find-faction: %s", locate);
+        statusline(st->wnd_status->handle, sbuffer);
         f = findfaction(atoi36(locate));
         if (f==NULL) {
           statusline(st->wnd_status->handle, "faction not found.");
@@ -976,8 +1021,6 @@ handlekeys(state * st)
     }
     if (r!=NULL) {
       region2coord(r, &st->cursor);
-      st->wnd_info->update |= 1;
-      st->wnd_status->update |= 1;
     }
     break;
   case 'Q':
@@ -1067,6 +1110,7 @@ run_mapper(void)
   coor2point(&st.display.topleft, &tl);
 
   while (!g_quit) {
+    int c;
     point p;
     window * wnd;
     view * vi = &st.display;
@@ -1103,21 +1147,21 @@ run_mapper(void)
     }
     for (wnd=wnd_last;wnd!=NULL;wnd=wnd->prev) {
       if (wnd->update && wnd->paint) {
-        // if (wnd->update & 2) wclear(wnd->handle);
         if (wnd->update & 1) {
           wnd->paint(wnd, &st);
+          wnoutrefresh(wnd->handle);
+        }
+        if (wnd->update & 2) {
+          touchwin(wnd->handle);
         }
         wnd->update = 0;
       }
     }
     draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 1);
-    for (wnd=wnd_first;wnd!=NULL;wnd=wnd->next) {
-      wnoutrefresh(wnd->handle);
-    }
     doupdate();
+    c = getch();
     draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 0);
-
-    handlekeys(&st);
+    handlekey(&st, c);
   }
   curs_set(1);
   endwin();
