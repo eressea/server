@@ -678,7 +678,7 @@ learn(void)
         of all units in the region, to be able to make it cumulative with
         with an academy */
 
-        if (buildingtype_exists(r, bt_find("artacademy"))) {
+        if (sk == SK_ENTERTAINMENT && buildingtype_exists(r, bt_find("artacademy"))) {
           days *= 2;
         }
 
