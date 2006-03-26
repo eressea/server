@@ -997,7 +997,6 @@ const char *strcheck(const char *s, size_t maxlen);
 #define strcheck(s, ml) (s)
 #endif
 
-#define attacked(u) (fval(u, UFL_LONGACTION))
 boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
 

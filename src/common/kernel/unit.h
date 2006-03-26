@@ -39,8 +39,7 @@ struct item;
 #define UFL_WARMTH        (1<<6)	/* 64 */
 #define UFL_HERO          (1<<7)
 #define UFL_MOVED         (1<<8)
-#define UFL_FOLLOWING     (1<<9)
-#define UFL_FOLLOWED      (1<<10)
+#define UFL_NOTMOVING     (1<<9)  /* Die Einheit kann sich wg. langen Kampfes nicht bewegen */
 #define UFL_HUNGER        (1<<11) /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
 #define UFL_SIEGE         (1<<12) /* speedup: belagert eine burg, siehe attribut */
 #define UFL_TARGET        (1<<13) /* speedup: hat ein target, siehe attribut */
@@ -50,8 +49,9 @@ struct item;
 /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
 #define UFL_DH            (1<<18) /* same as FL_DH */
-
 #define UFL_STORM         (1<<19) /* Kapitän war in einem Sturm */
+#define UFL_FOLLOWING     (1<<20)
+#define UFL_FOLLOWED      (1<<21)
 
 #define UFL_NOAID         (1<<22) /* Einheit hat Noaid-Status */
 #define UFL_MARK          (1<<23) /* same as FL_MARK */

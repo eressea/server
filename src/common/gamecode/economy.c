@@ -3076,7 +3076,7 @@ produce(void)
         !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
         continue;
 
-      if (attacked(u) && u->thisorder==NULL) {
+      if (fval(u, UFL_LONGACTION) && u->thisorder==NULL) {
         cmistake(u, u->thisorder, 52, MSG_PRODUCE);
         continue;
       }

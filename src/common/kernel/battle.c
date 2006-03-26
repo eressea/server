@@ -2428,7 +2428,7 @@ aftermath(battle * b)
 
       snumber += du->number;
       if (relevant) {
-        fset(du, UFL_MOVED); /* unit cannot move this round */
+        fset(du, UFL_NOTMOVING); /* unit cannot move this round */
         if (df->action_counter >= du->number) {
           ship * sh = du->ship?du->ship:leftship(du);
           if (sh) fset(sh, SF_DAMAGED);

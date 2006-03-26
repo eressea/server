@@ -2665,7 +2665,7 @@ instant_orders(void)
     unit * u;
     for (u = r->units; u; u = u->next) {
       order * ord;
-      freset(u, UFL_MOVED);
+      freset(u, UFL_MOVED); /* reset, because it was saved in the datafile (monsters!) */
       for (ord = u->orders; ord; ord = ord->next) {
         switch (get_keyword(ord)) {
         case K_QUIT:
@@ -2748,7 +2748,7 @@ guard_on_cmd(unit * u, struct order * ord)
   } else {
     if (fval(u, UFL_MOVED)) {
       cmistake(u, ord, 187, MSG_EVENT);
-    } else  if (fval(u->race, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
+    } else if (fval(u->race, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
       cmistake(u, ord, 95, MSG_EVENT);
     } else {
       /* Monster der Monsterpartei dürfen immer bewachen */

@@ -2238,12 +2238,12 @@ hunt(unit *u)
     cmistake(u, u->thisorder, 144, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
-  } else if(!fval(u, UFL_OWNER)) {
+  } else if (!fval(u, UFL_OWNER)) {
     cmistake(u, u->thisorder, 146, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
-  } else if(attacked(u)) {
-    cmistake(u, u->thisorder, 52, MSG_MOVE);
+  } else if (fval(u, UFL_NOTMOVING)) {
+    cmistake(u, u->thisorder, 187, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!can_move(u)) {
@@ -2329,7 +2329,7 @@ move_hunters(void)
     while (*up!=NULL) {
       unit * u = *up;
 
-      if (!fval(u, UFL_MOVED)) {
+      if (!fval(u, UFL_MOVED|UFL_NOTMOVING)) {
         order * ord;
 
         for (ord=u->orders;ord;ord=ord->next) {
@@ -2435,16 +2435,16 @@ movement(void)
         case K_MOVE:
           /* after moving, the unit has no thisorder. this prevents
            * it from moving twice (or getting error messages twice).
-           * UFL_MOVED is set in combat if the unit is not allowed
+           * UFL_NOTMOVING is set in combat if the unit is not allowed
            * to move because it was involved in a battle.
            */
-          if (fval(u, UFL_LONGACTION) || fval(u, UFL_MOVED)) {
-            cmistake(u, u->thisorder, 52, MSG_MOVE);
+          if (fval(u, UFL_LONGACTION|UFL_MOVED|UFL_NOTMOVING)) {
+            cmistake(u, u->thisorder, 187, MSG_MOVE);
             set_order(&u->thisorder, NULL);
           } else if (!can_move(u)) {
             cmistake(u, u->thisorder, 55, MSG_MOVE);
             set_order(&u->thisorder, NULL);
-          } else if (!fval(u, UFL_MOVED)) {
+          } else if (!fval(u, UFL_MOVED|UFL_NOTMOVING)) {
             if (ships) {
               if (u->ship && fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
@@ -2530,7 +2530,7 @@ follow_unit(void)
         }
       }
 
-      if (a && !fval(u, UFL_MOVED)) {
+      if (a && !fval(u, UFL_MOVED|UFL_NOTMOVING)) {
         unit * u2 = a->data.v;
         boolean follow = false;
 

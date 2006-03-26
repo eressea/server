@@ -97,7 +97,7 @@ write_summary()
   }
   return -1;
 }
- 
+
 
 extern int process_orders(void);
 
@@ -163,7 +163,7 @@ lua_planmonsters(void)
   }
 }
 
-static void 
+static void
 race_setscript(const char * rcname, const luabind::object& f)
 {
   race * rc = rc_find(rcname);
@@ -175,17 +175,20 @@ race_setscript(const char * rcname, const luabind::object& f)
 
 #define ISLANDSIZE 20
 #define TURNS_PER_ISLAND 4
-static void 
+static void
 lua_autoseed(const char * filename, bool new_island)
 {
   newfaction * players = read_newfactions(filename);
-  while (players) {
-    int n = listlen(players);
-    int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
-    k = n / k;
-    n = autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
-    if (n==0) {
-      break;
+  if (players!=NULL) {
+    rng_init(players->subscription);
+    while (players) {
+      int n = listlen(players);
+      int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+      k = n / k;
+      n = autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
+      if (n==0) {
+        break;
+      }
     }
   }
 }

@@ -473,7 +473,7 @@ learn(void)
           && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
           continue;
         }
-        if (attacked(u)) {
+        if (fval(u, UFL_LONGACTION)) {
           cmistake(u, u->thisorder, 52, MSG_PRODUCE);
           continue;
         }
@@ -769,7 +769,7 @@ teaching(void)
 
 			switch (get_keyword(u->thisorder)) {
 			case K_TEACH:
-				if (attacked(u)){
+				if (fval(u, UFL_LONGACTION)) {
 					cmistake(u, u->thisorder, 52, MSG_PRODUCE);
 					continue;
 				} else {
