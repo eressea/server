@@ -4,7 +4,6 @@
 C++ = g++ ;
 CC = gcc ;
 LINK = gcc ;
-
 # ECHO $(JAMUNAME) ;
 
 # LINKFLAGS += -rdynamic ;
@@ -132,12 +131,14 @@ rule TargetDirectory
         LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(path) ;
         SOURCE_GRIST = $(path) ;
         if $(DEBUG) = 1 {
-            SubDirCcFlags -ggdb -O0 ;
-            SubDirC++Flags -ggdb -O0 ;
+            SubDirCcFlags -ggdb ;
+            SubDirC++Flags -ggdb ;
+            OPTIM = -O0 ;
         }
         else {
-            SubDirCcFlags -DNDEBUG -O3 -mtune=$(CPU) ;
-            SubDirC++Flags -DNDEBUG -O3 -mtune=$(CPU) ;
+            SubDirCcFlags -DNDEBUG -mtune=$(CPU) ;
+            SubDirC++Flags -DNDEBUG -mtune=$(CPU) ;
+            OPTIM = -O3 ;
         }
 }
 
