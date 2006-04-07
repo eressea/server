@@ -69,7 +69,7 @@
 
 #define dbgprintf(a) fprintf a;
 static FILE *bdebug;
-
+#undef COUNT_DF
 #undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
 #define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
@@ -1577,6 +1577,7 @@ do_combatspell(troop at, int row)
     if (level > 0) {
       pay_spell(mage, sp, level, 1);
       at.fighter->action_counter++;
+      at.fighter->side->bf->lastturn = b->turn;
     }
   }
 }
@@ -1981,6 +1982,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
 					if (!standard_attack && af->person[ta.index].last_action < b->turn) {
 						af->person[ta.index].last_action = b->turn;
 						af->action_counter++;
+            af->side->bf->lastturn = b->turn;
 					}
 				}
 				if (standard_attack) {
@@ -1995,14 +1997,17 @@ attack(battle *b, troop ta, const att *a, int numattack)
 						else return;
 					}
 					if (!td.fighter) return;
-
+#ifdef COUNT_DF
 					if (td.fighter->person[td.index].last_action < b->turn) {
 						td.fighter->person[td.index].last_action = b->turn;
 						td.fighter->action_counter++;
+            td.fighter->side->bf->lastturn = b->turn;
 					}
+#endif
 					if (ta.fighter->person[ta.index].last_action < b->turn) {
 						ta.fighter->person[ta.index].last_action = b->turn;
 						ta.fighter->action_counter++;
+            ta.fighter->side->bf->lastturn = b->turn;
 					}
           reload = true;
 					if (hits(ta, td, wp)) {
@@ -2027,13 +2032,17 @@ attack(battle *b, troop ta, const att *a, int numattack)
 	case AT_NATURAL:
 		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
+#ifdef COUNT_DF
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
 			td.fighter->action_counter++;
+      td.fighter->side->bf->lastturn = b->turn;
 		}
+#endif
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
 			ta.fighter->action_counter++;
+      ta.fighter->side->bf->lastturn = b->turn;
 		}
 		if (hits(ta, td, NULL)) {
 			terminate(td, ta, a->type, a->data.dice, false);
@@ -2042,13 +2051,17 @@ attack(battle *b, troop ta, const att *a, int numattack)
 	case AT_DRAIN_ST:
 		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
+#ifdef COUNT_DF
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
 			td.fighter->action_counter++;
+      td.fighter->side->bf->lastturn = b->turn;
 		}
+#endif
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
 			ta.fighter->action_counter++;
+      ta.fighter->side->bf->lastturn = b->turn;
 		}
 		if (hits(ta, td, NULL)) {
 			int c = dice_rand(a->data.dice);
@@ -2065,13 +2078,17 @@ attack(battle *b, troop ta, const att *a, int numattack)
 	case AT_DRAIN_EXP:
 		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
+#ifdef COUNT_DF
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
 			td.fighter->action_counter++;
+      td.fighter->side->bf->lastturn = b->turn;
 		}
+#endif
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
 			ta.fighter->action_counter++;
+      ta.fighter->side->bf->lastturn = b->turn;
 		}
 		if (hits(ta, td, NULL)) {
 			drain_exp(td.fighter->unit, dice_rand(a->data.dice));
@@ -2080,13 +2097,17 @@ attack(battle *b, troop ta, const att *a, int numattack)
 	case AT_DAZZLE:
 		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
+#ifdef COUNT_DF
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
 			td.fighter->action_counter++;
+      td.fighter->side->bf->lastturn = b->turn;
 		}
+#endif
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
 			ta.fighter->action_counter++;
+      ta.fighter->side->bf->lastturn = b->turn;
 		}
 		if (hits(ta, td, NULL)) {
 			dazzle(b, &td);
@@ -2098,6 +2119,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
 			ta.fighter->action_counter++;
+      ta.fighter->side->bf->lastturn = b->turn;
 		}
 		if (td.fighter->unit->ship) {
 			td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
@@ -3290,13 +3312,12 @@ battle_report(battle * b)
 
 	cv_foreach(s, b->sides) {
 		cv_foreach(s2, b->sides) {
-			if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2))
-			{
+			if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
 				cont = true;
-				s->bf->lastturn = b->turn;
-				s2->bf->lastturn = b->turn;
+        break;
 			}
 		} cv_next(s2);
+    if (cont) break;
 	} cv_next(s);
 
 	printf(" %d", b->turn);
