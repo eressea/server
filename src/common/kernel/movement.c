@@ -2225,7 +2225,7 @@ hunted_dir(attrib *at, int id)
 }
 
 static int
-hunt(unit *u)
+hunt(unit *u, order * ord)
 {
   region *rc = u->region;
   int moves, id;
@@ -2235,19 +2235,19 @@ hunt(unit *u)
   if (fval(u, UFL_LONGACTION)) {
     return 0;
   } else if (u->ship == NULL) {
-    cmistake(u, u->thisorder, 144, MSG_MOVE);
+    cmistake(u, ord, 144, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!fval(u, UFL_OWNER)) {
-    cmistake(u, u->thisorder, 146, MSG_MOVE);
+    cmistake(u, ord, 146, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (fval(u, UFL_NOTMOVING)) {
-    cmistake(u, u->thisorder, 187, MSG_MOVE);
+    cmistake(u, ord, 187, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!can_move(u)) {
-    cmistake(u, u->thisorder, 55, MSG_MOVE);
+    cmistake(u, ord, 55, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
@@ -2255,7 +2255,7 @@ hunt(unit *u)
   id = getshipid();
 
   if (id <= 0) {
-    cmistake(u,  u->thisorder, 20, MSG_MOVE);
+    cmistake(u,  ord, 20, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
@@ -2265,7 +2265,7 @@ hunt(unit *u)
   if (dir == NODIRECTION) {
     ship * sh = findship(id);
     if (sh == NULL || sh->region!=rc) {
-      cmistake(u, u->thisorder, 20, MSG_MOVE);
+      cmistake(u, ord, 20, MSG_MOVE);
     }
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
@@ -2356,7 +2356,7 @@ move_hunters(void)
               break;
             }
 
-            if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u)) {
+            if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u, ord)) {
               up = &r->units;
               break;
             }
