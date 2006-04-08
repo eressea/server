@@ -942,10 +942,10 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="region" type="region"/>
+      <arg name="target" type="region"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ruft Drachen nach $region($region)"</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) calls dragons to $region($region)"</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ruft Drachen nach $region($target)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) calls dragons to $region($rtarget)."</text>
   </message>
   <message name="magiccreate_effect" section="magic">
     <type>
