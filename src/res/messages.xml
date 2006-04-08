@@ -4034,9 +4034,9 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann den Befehl in dieser Runde nicht ausführen, da sie sich bewegt hat oder in einen Kampf verwickelt war."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has either moved or been in combat."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has either moved or been in combat."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann den Befehl in dieser Runde nicht ausführen, da sie sich bewegt hat."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has moved."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has moved."</text>
   </message>
   <message name="error184" section="errors">
     <type>
