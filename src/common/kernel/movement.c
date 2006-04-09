@@ -994,19 +994,18 @@ init_transportation(void)
 
       for (ord = u->orders; ord; ord = ord->next) {
         if (get_keyword(ord) == K_TRANSPORT) {
-          unit * ut;
-
           init_tokens(ord);
           skip_token();
-          ut = getunit(r, u->faction);
-          if (ut == NULL) continue;
+          for (;;) {
+            unit * ut = getunit(r, u->faction);
 
-          if (get_keyword(ut->thisorder) == K_DRIVE && can_move(u) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
-            init_tokens(ut->thisorder);
-            skip_token();
-            if (getunit(r, ut->faction) == u) {
-              w += weight(ut);
-              break;
+            if (ut == NULL) break;
+            if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+              init_tokens(ut->thisorder);
+              skip_token();
+              if (getunit(r, ut->faction) == u) {
+                w += weight(ut);
+              }
             }
           }
         }
