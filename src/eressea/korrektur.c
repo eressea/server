@@ -845,6 +845,7 @@ check_mages(void)
       }
     }
   }
+  return 0;
 }
 
 static int
@@ -867,12 +868,12 @@ fix_familiars(void)
             log_error(("%s was a %s familiar with no mage for faction %s\n",
                       unitid(u), racename(lang, u, u->race),
                       factionid(u->faction)));
-            a_remove(&u->attribs, a);
+            remove_familiar(u);
           } else if (!is_mage(mage)) {
             log_error(("%s was a %s familiar, but %s is not a mage for faction %s\n",
                       unitid(u), racename(lang, u, u->race), unitid(mage),
                       factionid(u->faction)));
-            a_remove(&u->attribs, a);
+            remove_familiar(u);
           } else if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
             log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
               unitid(u)));
