@@ -42,7 +42,9 @@ extern "C" {
 #define RF_ORCIFIED    (1<<12)
 #define RF_CURSED      (1<<13)
 
+  /* debug flags */
 #define RF_COMBATDEBUG (1<<14)
+#define RF_MAPPER_HIGHLIGHT (1<<14) /* only used by mapper, not stored */
 
 #define RF_DH          (1<<18)
 

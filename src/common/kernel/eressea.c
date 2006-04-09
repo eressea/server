@@ -508,6 +508,8 @@ int
 max_magicians(const faction * f)
 {
   int m = MAXMAGICIANS;
+  attrib * a;
+  
   if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
     m = a->data.i;
   }
@@ -515,12 +517,12 @@ max_magicians(const faction * f)
 #ifdef KARMA_MODULE
   m += fspecial(f, FS_MAGOCRACY) * 2;
 #endif /* KARMA_MODULE */
+  return m;
 }
 
 int
 max_skill(faction * f, skill_t sk)
 {
-  attrib *a;
   int     m = INT_MAX;
 
   if (allied_skilllimit(f, sk)) {

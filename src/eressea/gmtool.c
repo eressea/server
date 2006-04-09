@@ -221,10 +221,12 @@ game_done(void)
 static void
 init_curses(void)
 {
+  int fg, bg;
   initscr();
 
   if (has_colors() || force_color) {
     short bcol = COLOR_BLACK;
+    short hcol = COLOR_MAGENTA;
     start_color();
 #ifdef WIN32    
     /* looks crap on putty with TERM=linux */
@@ -232,17 +234,12 @@ init_curses(void)
       init_color(COLOR_YELLOW, 1000, 1000, 0);
     }
 #endif 
-    init_pair(COLOR_BLACK, COLOR_BLACK, bcol);
-    init_pair(COLOR_GREEN, COLOR_GREEN, bcol);
-    init_pair(COLOR_GREEN, COLOR_GREEN, bcol);
-    init_pair(COLOR_RED, COLOR_RED, bcol);
-    init_pair(COLOR_CYAN, COLOR_CYAN, bcol);
-    init_pair(COLOR_WHITE, COLOR_WHITE, bcol);
-    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, bcol);
-    init_pair(COLOR_BLUE, COLOR_BLUE, bcol);
-    init_pair(COLOR_YELLOW, COLOR_YELLOW, bcol);
-    init_pair(COLOR_YELLOW, COLOR_YELLOW, bcol);
-    init_pair(COLOR_WHITE, COLOR_WHITE, bcol);
+
+    for (fg=0;fg!=8;++fg) {
+      for (bg=0;bg!=2;++bg) {
+        init_pair(fg+8*bg, fg, bg?hcol:bcol);
+      }
+    }
 
     attrset(COLOR_PAIR(COLOR_BLACK));
     bkgd(' ' | COLOR_PAIR(COLOR_BLACK));
@@ -351,38 +348,39 @@ tagged_region(selection * s, const coordinate * c)
 }
 
 static int
-mr_tile(const map_region * mr)
+mr_tile(const map_region * mr, int highlight)
 {
+  int hl = 8 * highlight;
   if (mr!=NULL && mr->r!=NULL) {
     const region * r = mr->r;
     switch (r->terrain->_name[0]) {
     case 'o' : 
-      return '.' | COLOR_PAIR(COLOR_CYAN);
+      return '.' | COLOR_PAIR(hl + COLOR_CYAN);
     case 'd' : 
-      return 'D' | COLOR_PAIR(COLOR_YELLOW) | A_BOLD;
+      return 'D' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
     case 't' : 
-      return '%' | COLOR_PAIR(COLOR_YELLOW) | A_BOLD;
+      return '%' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
     case 'f' : 
       if (r->terrain->_name[1]=='o') { /* fog */
-        return '.' | COLOR_PAIR(COLOR_YELLOW) | A_NORMAL;
+        return '.' | COLOR_PAIR(hl + COLOR_YELLOW) | A_NORMAL;
       } else if (r->terrain->_name[1]=='i') { /* firewall */
-        return '%' | COLOR_PAIR(COLOR_RED) | A_BOLD;
+        return '%' | COLOR_PAIR(hl + COLOR_RED) | A_BOLD;
       }
     case 'h' :
-      return 'H' | COLOR_PAIR(COLOR_YELLOW) | A_NORMAL;
+      return 'H' | COLOR_PAIR(hl + COLOR_YELLOW) | A_NORMAL;
     case 'm' :
-      return '^' | COLOR_PAIR(COLOR_WHITE) | A_NORMAL;
+      return '^' | COLOR_PAIR(hl + COLOR_WHITE) | A_NORMAL;
     case 'p' : 
-      if (r_isforest(r)) return '#' | COLOR_PAIR(COLOR_GREEN) | A_NORMAL;
-      return '+' | COLOR_PAIR(COLOR_GREEN) | A_BOLD;
+      if (r_isforest(r)) return '#' | COLOR_PAIR(hl + COLOR_GREEN) | A_NORMAL;
+      return '+' | COLOR_PAIR(hl + COLOR_GREEN) | A_BOLD;
     case 'g' :
-      return '*' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
+      return '*' | COLOR_PAIR(hl + COLOR_WHITE) | A_BOLD;
     case 's' :
-      return 'S' | COLOR_PAIR(COLOR_MAGENTA) | A_NORMAL;
+      return 'S' | COLOR_PAIR(hl + COLOR_MAGENTA) | A_NORMAL;
     }
-    return r->terrain->_name[0] | COLOR_PAIR(COLOR_RED);
+    return r->terrain->_name[0] | COLOR_PAIR(hl + COLOR_RED);
   }
-  return ' ' | COLOR_PAIR(COLOR_WHITE);
+  return ' ' | COLOR_PAIR(hl + COLOR_WHITE);
 }
 
 static void
@@ -399,6 +397,7 @@ paint_map(window * wnd, const state * st)
     int yp = (lines - y - 1) * THEIGHT;
     for (x = 0; x!=cols; ++x) {
       int attr = 0;
+      int hl = 0;
       int xp = x * TWIDTH + (y & 1) * TWIDTH/2;
       map_region * mr = mr_get(&st->display, x, y);
 
@@ -406,7 +405,8 @@ paint_map(window * wnd, const state * st)
         attr |= A_REVERSE;
       }
       if (mr) {
-        mvwaddch(win, yp, xp, mr_tile(mr) | attr);
+        if (mr->r && mr->r->flags & RF_MAPPER_HIGHLIGHT) hl = 1;
+        mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
       }
     }
   }
@@ -444,7 +444,7 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c, i
   xp = cx * TWIDTH + (cy & 1) * TWIDTH/2;
   if (s && tagged_region(s, &mr->coord)) attr = A_REVERSE;
   if (mr->r) {
-    mvwaddch(win, yp, xp, mr_tile(mr) | attr);
+    mvwaddch(win, yp, xp, mr_tile(mr, 0) | attr);
   }
   else mvwaddch(win, yp, xp, ' ' | attr | COLOR_PAIR(COLOR_YELLOW));
   if (show) {
@@ -672,6 +672,129 @@ region2coord(const region * r, coordinate * c)
 #define FAST_RIGHT KEY_SRIGHT
 #endif
 
+enum { MODE_HIGHLIGHT = 0x0, MODE_SELECT = 0x1, MODE_INVERT = 0x2 };
+
+static void
+select_regions(state * st, int selectmode)
+{
+  char sbuffer[80];
+  int findmode;
+  const char * statustext[] = {
+    "mark-", "select-", "unmark-", "deselect-"
+  };
+  const char * status = statustext[selectmode];
+  statusline(st->wnd_status->handle, status);
+  doupdate();
+  findmode = getch();
+  if (findmode=='n') { /* none */
+    int i;
+    sprintf(sbuffer, "%snone", status);
+    statusline(st->wnd_status->handle, sbuffer);
+    for (i=0;i!=MAXTHASH;++i) {
+      tag ** tp = &st->selected->tags[i];
+      while (*tp) {
+        tag * t = *tp;
+        *tp = t->nexthash;
+        free(t);
+      }
+    }
+  }
+  else if (findmode=='u') {
+    region * r;
+    sprintf(sbuffer, "%sunits", status);
+    statusline(st->wnd_status->handle, sbuffer);
+    for (r=regions;r;r=r->next) {
+      if (r->units) {
+        coordinate coord;
+        if (selectmode&MODE_SELECT) {
+          if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
+          else tag_region(st->selected, region2coord(r, &coord));
+        } else {
+          if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
+          else r->flags |= RF_MAPPER_HIGHLIGHT;
+        }
+      }
+    }
+  } 
+  else if (findmode=='s') {
+    region * r;
+    sprintf(sbuffer, "%sships", status);
+    statusline(st->wnd_status->handle, sbuffer);
+    for (r=regions;r;r=r->next) {
+      if (r->ships) {
+        coordinate coord;
+        if (selectmode&MODE_SELECT) {
+          if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
+          else tag_region(st->selected, region2coord(r, &coord));
+        } else {
+          if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
+          else r->flags |= RF_MAPPER_HIGHLIGHT;
+        }
+      }
+    }
+  } 
+  else if (findmode=='f') {
+    char fbuffer[12];
+    sprintf(sbuffer, "%sfaction:", status);
+    askstring(st->wnd_status->handle, sbuffer, fbuffer, 12);
+    if (fbuffer[0]) {
+      faction * f = findfaction(atoi36(fbuffer));
+      
+      if (f!=NULL) {
+        unit * u;
+        coordinate coord;
+        
+        sprintf(sbuffer, "%sfaction: %s", status, itoa36(f->no));
+        statusline(st->wnd_status->handle, sbuffer);
+        for (u=f->units;u;u=u->nextF) {
+          region * r = u->region;
+          if (selectmode&MODE_SELECT) {
+            if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
+            else tag_region(st->selected, region2coord(r, &coord));
+          } else {
+            if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
+            else r->flags |= RF_MAPPER_HIGHLIGHT;
+          }
+        }
+      } else {
+        statusline(st->wnd_status->handle, "faction not found.");
+        beep();
+        return;
+      }
+    }
+  }
+  else if (findmode=='t') {
+    const struct terrain_type * terrain;
+    sprintf(sbuffer, "%sterrain: ", status);
+    statusline(st->wnd_status->handle, sbuffer);
+    terrain = select_terrain(st, NULL);
+    if (terrain!=NULL) {
+      region * r;
+      sprintf(sbuffer, "%sterrain: %s", status, terrain->_name);
+      statusline(st->wnd_status->handle, sbuffer);
+      for (r=regions;r;r=r->next) {
+        if (r->terrain==terrain) {
+          coordinate coord;
+          if (selectmode&MODE_SELECT) {
+            if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
+            else tag_region(st->selected, region2coord(r, &coord));
+          } else {
+            if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
+            else r->flags |= RF_MAPPER_HIGHLIGHT;
+          }
+        }
+      }
+    }
+  } else {
+    statusline(st->wnd_status->handle, "unknown command.");
+    beep();
+    return;
+  }
+  st->wnd_info->update |= 3;
+  st->wnd_status->update |= 3;
+  st->wnd_map->update |= 3;
+}
+
 static void
 handlekey(state * st, int c)
 {
@@ -680,7 +803,6 @@ handlekey(state * st, int c)
   static char locate[80];
   static int findmode = 0;
   region *r;
-  boolean invert = false;
   char sbuffer[80];
   static char kbuffer[80];
 
@@ -805,7 +927,7 @@ handlekey(state * st, int c)
       }
     }
     break;
-  case 't':
+  case 0x14: /* C-t */
     terraform_at(&st->cursor, select_terrain(st, NULL));
     st->modified = 1;
     st->wnd_info->update |= 1;
@@ -845,92 +967,17 @@ handlekey(state * st, int c)
       }
     } while (c==0);
     break;
-  case 'U':
-    invert = true;
-    /* !! intentional fall-through !! */
+  case 'H':
+    select_regions(st, MODE_INVERT|MODE_HIGHLIGHT);
+    break;
   case 'T':
-    statusline(st->wnd_status->handle, "untag-"+(invert?0:2));
-    doupdate();
-    findmode = getch();
-    if (findmode=='n') { /* none */
-      int i;
-      statusline(st->wnd_status->handle, "tag-none");
-      for (i=0;i!=MAXTHASH;++i) {
-        tag ** tp = &st->selected->tags[i];
-        while (*tp) {
-          tag * t = *tp;
-          *tp = t->nexthash;
-          free(t);
-        }
-      }
-    }
-    else if (findmode=='u') {
-      sprintf(sbuffer, "%stag-units", invert?"un":"");
-      statusline(st->wnd_status->handle, sbuffer);
-      for (r=regions;r;r=r->next) {
-        if (r->units) {
-          coordinate coord;
-          if (invert) untag_region(st->selected, region2coord(r, &coord));
-          else tag_region(st->selected, region2coord(r, &coord));
-        }
-      }
-    } 
-    else if (findmode=='s') {
-      sprintf(sbuffer, "%stag-ships", invert?"un":"");
-      statusline(st->wnd_status->handle, sbuffer);
-      for (r=regions;r;r=r->next) {
-        if (r->ships) {
-          coordinate coord;
-          if (invert) untag_region(st->selected, region2coord(r, &coord));
-          else tag_region(st->selected, region2coord(r, &coord));
-        }
-      }
-    } 
-    else if (findmode=='f') {
-      askstring(st->wnd_status->handle, "untag-faction:"+(invert?0:2), sbuffer, 12);
-      if (sbuffer[0]) {
-        faction * f = findfaction(atoi36(sbuffer));
-
-        if (f!=NULL) {
-          unit * u;
-          coordinate coord;
-
-          sprintf(sbuffer, "%stag-terrain: %s", invert?"un":"", itoa36(f->no));
-          statusline(st->wnd_status->handle, sbuffer);
-          for (u=f->units;u;u=u->nextF) {
-            if (invert) untag_region(st->selected, region2coord(u->region, &coord));
-            else tag_region(st->selected, region2coord(u->region, &coord));
-          }
-        } else {
-          statusline(st->wnd_status->handle, "faction not found.");
-          beep();
-          break;
-        }
-      }
-    }
-    else if (findmode=='t') {
-      const struct terrain_type * terrain;
-      statusline(st->wnd_status->handle, "untag-terrain: "+(invert?0:2));
-      terrain = select_terrain(st, NULL);
-      if (terrain!=NULL) {
-        sprintf(sbuffer, "%stag-terrain: %s", invert?"un":"", terrain->_name);
-        statusline(st->wnd_status->handle, sbuffer);
-        for (r=regions;r;r=r->next) {
-          if (r->terrain==terrain) {
-            coordinate coord;
-            if (invert) untag_region(st->selected, region2coord(r, &coord));
-            else tag_region(st->selected, region2coord(r, &coord));
-          }
-        }
-      }
-    } else {
-      statusline(st->wnd_status->handle, "unknown command.");
-      beep();
-      break;
-    }
-    st->wnd_info->update |= 3;
-    st->wnd_status->update |= 3;
-    st->wnd_map->update |= 3;
+    select_regions(st, MODE_INVERT|MODE_SELECT);
+    break;
+  case 'h':
+    select_regions(st, MODE_HIGHLIGHT);
+    break;
+  case 't':
+    select_regions(st, MODE_SELECT);
     break;
   case ';':
     statusline(st->wnd_status->handle, "tag-");
