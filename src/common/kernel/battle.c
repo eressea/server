@@ -827,20 +827,22 @@ remove_troop(troop dt)
 	unit * du = df->unit;
 
 	rmtroop(dt);
-	if (!df->alive && du->race->itemdrop) {
+	if (!df->alive) {
     char eqname[64];
     const struct equipment * eq;
-		item * drops = du->race->itemdrop(du->race, du->number-df->run.number);
+    if (du->race->itemdrop) {
+      item * drops = du->race->itemdrop(du->race, du->number-df->run.number);
 
-		if (drops != NULL){
-			i_merge(&du->items, &drops);
-		}
+      if (drops != NULL){
+        i_merge(&du->items, &drops);
+      }
+    }
     sprintf(eqname, "%s_spoils", du->race->_name[0]);
     eq = get_equipment(eqname);
     if (eq!=NULL) {
       equip_items(&du->items, eq);
     }
-	}
+  }
 }
 
 /** reduces the target's exp by an equivalent of n points learning
