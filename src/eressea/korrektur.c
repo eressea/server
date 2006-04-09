@@ -827,6 +827,27 @@ check_dissolve(void)
 }
 
 static int
+check_mages(void)
+{
+  faction * f;
+  for (f=factions;f!=NULL;f=f->next) {
+    if (f->no!=MONSTER_FACTION) {
+      unit * u;
+      int mages = 0;
+      int maxmages = max_skill(f, SK_MAGIC);
+
+      for (u = f->units;u!=NULL;u=u->nextF) {
+        if (is_mage(u) && !is_familiar(u)) ++mages;
+      }
+      if (mages>maxmages) {
+        log_error(("faction %s has %d of max %d magicians.\n",
+          factionid(u->faction), mages, maxmages));
+      }
+    }
+  }
+}
+
+static int
 fix_familiars(void)
 {
   const struct locale * lang = find_locale("en");
@@ -843,15 +864,16 @@ fix_familiars(void)
           char fname[64];
 
           if (mage==0) {
-            log_error(("%s is a %s familiar with no mage for faction %s\n",
+            log_error(("%s was a %s familiar with no mage for faction %s\n",
                       unitid(u), racename(lang, u, u->race),
                       factionid(u->faction)));
+            a_remove(&u->attribs, a);
           } else if (!is_mage(mage)) {
-            log_error(("%s is a %s familiar, but %s is not a mage for faction %s\n",
+            log_error(("%s was a %s familiar, but %s is not a mage for faction %s\n",
                       unitid(u), racename(lang, u, u->race), unitid(mage),
                       factionid(u->faction)));
-          }
-          if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
+            a_remove(&u->attribs, a);
+          } else if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
             log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
               unitid(u)));
             create_mage(u, M_GRAU);
@@ -1022,6 +1044,7 @@ korrektur(void)
   fix_demands();
   fix_otherfaction();
   fix_familiars();
+  check_mages();
   do_once("tfrs", &fix_resources);
   /* trade_orders(); */
 

@@ -2150,7 +2150,9 @@ remove_familiar(unit *mage)
 	attrib *an;
 	skillmod_data *smd;
 
-	a_remove(&mage->attribs, a);
+  if (a!=NULL) {
+    a_remove(&mage->attribs, a);
+  }
   a = a_find(mage->attribs, &at_skillmod);
   while (a && a->type==&at_skillmod) {
 		an = a->next;
