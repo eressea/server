@@ -288,6 +288,9 @@
 			RelativePath=".\illusion.c">
 		</File>
 		<File
+			RelativePath="..\modules\museum.c">
+		</File>
+		<File
 			RelativePath=".\zombies.c">
 		</File>
 	</Files>

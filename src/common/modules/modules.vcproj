@@ -318,9 +318,6 @@
 			RelativePath=".\infocmd.c">
 		</File>
 		<File
-			RelativePath=".\museum.c">
-		</File>
-		<File
 			RelativePath=".\score.c">
 		</File>
 		<File

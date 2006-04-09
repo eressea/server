@@ -1539,7 +1539,6 @@ readfaction(FILE * F)
 #endif /* KARMA_MODULE */
 
   f->flags = ri(F);
-  freset(f, FFL_OVERRIDE);
 
   a_read(F, &f->attribs);
   if (global.data_version>=CLAIM_VERSION) {
@@ -1635,15 +1634,15 @@ writefaction(FILE * F, const faction * f)
   wi(F, 0);
 #endif /* KARMA_MODULE */
 
-	wi(F, f->flags);
+	wi(F, f->flags&FFL_SAVEMASK);
 	a_write(F, f->attribs);
 	wnl(F);
 #if RELEASE_VERSION>=CLAIM_VERSION
   write_items(F, f->items);
   wnl(F);
 #endif
-        fputs("end ", F);
-        wnl(F);
+  fputs("end ", F);
+  wnl(F);
 	wi(F, listlen(f->ursprung));
 	for(ur = f->ursprung;ur;ur=ur->next) {
 		wi(F, ur->id);

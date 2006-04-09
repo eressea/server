@@ -2703,7 +2703,7 @@ sp_summondragon(castorder *co)
   }
 
   ADDMSG(&mage->faction->msgs, msg_message(
-        "summondragon", "unit region command region",
+        "summondragon", "unit region command target",
         mage, mage->region, co->order, co->rt));
 
   free_regionlist(rl);
@@ -4882,7 +4882,7 @@ sp_dragonsong(castorder *co)
   }
 
   ADDMSG(&mage->faction->msgs, msg_message(
-        "summondragon", "unit region command region",
+        "summondragon", "unit region command target",
         mage, mage->region, co->order, co->rt));
 
   free_regionlist(rl);

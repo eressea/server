@@ -46,6 +46,8 @@ typedef struct shortpwd {
 #define FFL_NOTIMEOUT     (1<<29) /* ignore MaxAge() */
 #define FFL_GM            (1<<30) /* eine Partei mit Sonderrechten */
 
+#define FFL_SAVEMASK (FFL_GM|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
+
 typedef struct faction {
 	struct faction *next;
 	struct faction *nexthash;
