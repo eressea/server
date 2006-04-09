@@ -87,11 +87,8 @@ check_dupe(const char * format, const char * type)
     return 1;
   }
   if (dupes) {
-    fprintf(logfile, "%s: last error repeated %d times\n", last_type, dupes+1);
-    if (logfile!=stderr) {
-      if (log_flags & LOG_CPERROR) {
-        fprintf(stderr, "%s: last error repeated %d times\n", last_type, dupes+1);
-      }
+    if (log_flags & LOG_CPERROR) {
+      fprintf(stderr, "%s: last message repeated %d times\n", last_type, dupes+1);
     }
     dupes = 0;
   }
@@ -103,25 +100,27 @@ check_dupe(const char * format, const char * type)
 void 
 _log_warn(const char * format, ...)
 {
+  int dupe = check_dupe(format, "WARNING");
+
   fflush(stdout);
   if (!logfile) logfile = stderr;
-
-  if (!check_dupe(format, "WARNING")) {
+  if (logfile!=stderr) {
     va_list marker;
     fputs("WARNING: ", logfile);
     va_start(marker, format);
     vfprintf(logfile, format, marker);
     va_end(marker);
-    if (logfile!=stderr) {
-      if (log_flags & LOG_CPWARNING) {
-        fputs("WARNING: ", stderr);
-        va_start(marker, format);
-        vfprintf(stderr, format, marker);
-        va_end(marker);
-      }
-      if (log_flags & LOG_FLUSH) {
-        log_flush();
-      }
+  }
+  if (!dupe) {
+    if (log_flags & LOG_CPWARNING) {
+      va_list marker;
+      fputs("WARNING: ", stderr);
+      va_start(marker, format);
+      vfprintf(stderr, format, marker);
+      va_end(marker);
+    }
+    if (log_flags & LOG_FLUSH) {
+      log_flush();
     }
   }
 }
@@ -129,17 +128,21 @@ _log_warn(const char * format, ...)
 void 
 _log_error(const char * format, ...)
 {
+  int dupe = check_dupe(format, "ERROR");
   fflush(stdout);
   if (!logfile) logfile = stderr;
 
-  if (!check_dupe(format, "ERROR")) {
+  if (logfile!=stderr) {
     va_list marker;
     fputs("ERROR: ", logfile);
     va_start(marker, format);
     vfprintf(logfile, format, marker);
     va_end(marker);
+  }
+  if (!dupe) {
     if (logfile!=stderr) {
       if (log_flags & LOG_CPERROR) {
+        va_list marker;
         fputs("ERROR: ", stderr);
         va_start(marker, format);
         vfprintf(stderr, format, marker);
