@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -93,91 +93,91 @@ extern int incomplete_data;
 static int
 curse_emptiness(void)
 {
-	const curse_type * ct = ct_find("godcursezone");
-	region * r;
-	for (r=regions;r!=NULL;r=r->next) {
-		unit * u = r->units;
-		if (r->land==NULL) continue;
-		if (fval(r, RF_CHAOTIC)) continue;
-		if (rterrain(r)==T_GLACIER) continue;
-		if (r->age<=200) continue;
-		if (get_curse(r->attribs, ct)) continue;
-		while (u && u->faction->no==MONSTER_FACTION) u=u->next;
-		if (u==NULL) fset(r, FL_MARK);
-	}
-	for (r=regions;r!=NULL;r=r->next) {
-		if (fval(r, FL_MARK)) {
-			direction_t d;
-			for (d=0;d!=MAXDIRECTIONS;++d) {
-				region * rn = rconnect(r,d);
-				if (rn==NULL) continue;
-				if (fval(rn, FL_MARK) || get_curse(rn->attribs, ct)) {
-					break;
-				}
-			}
-			if (d!=MAXDIRECTIONS) {
+  const curse_type * ct = ct_find("godcursezone");
+  region * r;
+  for (r=regions;r!=NULL;r=r->next) {
+    unit * u = r->units;
+    if (r->land==NULL) continue;
+    if (fval(r, RF_CHAOTIC)) continue;
+    if (rterrain(r)==T_GLACIER) continue;
+    if (r->age<=200) continue;
+    if (get_curse(r->attribs, ct)) continue;
+    while (u && u->faction->no==MONSTER_FACTION) u=u->next;
+    if (u==NULL) fset(r, FL_MARK);
+  }
+  for (r=regions;r!=NULL;r=r->next) {
+    if (fval(r, FL_MARK)) {
+      direction_t d;
+      for (d=0;d!=MAXDIRECTIONS;++d) {
+        region * rn = rconnect(r,d);
+        if (rn==NULL) continue;
+        if (fval(rn, FL_MARK) || get_curse(rn->attribs, ct)) {
+          break;
+        }
+      }
+      if (d!=MAXDIRECTIONS) {
         variant effect;
-				curse * c;
+        curse * c;
         effect.i = 0;
         c = create_curse(NULL, &r->attribs, ct, 100, 100, effect, 0);
-				curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
-			}
-			freset(r, FL_MARK);
-		}
-	}
-	return 0;
+        curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
+      }
+      freset(r, FL_MARK);
+    }
+  }
+  return 0;
 }
 
 void
 french_testers(void)
 {
-	faction * f = factions;
-	const struct locale * french = find_locale("fr");
-	while (f!=NULL) {
-		if (f->locale==french) fset(f, FFL_NOTIMEOUT);
-		f = f->next;
-	}
+  faction * f = factions;
+  const struct locale * french = find_locale("fr");
+  while (f!=NULL) {
+    if (f->locale==french) fset(f, FFL_NOTIMEOUT);
+    f = f->next;
+  }
 }
 
 static void
 verify_owners(boolean bOnce)
 {
-	region * r;
+  region * r;
 
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		boolean bFail = false;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    boolean bFail = false;
 
-		for (u=r->units;u;u=u->next) {
-			if (u->building) {
-				unit * bo = buildingowner(r, u->building);
-				if (!fval(bo, UFL_OWNER)) {
-					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), buildingname(u->building)));
-					bFail = true;
-					if (bOnce) break;
-				}
-				if (bo!=u && fval(u, UFL_OWNER)) {
-					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber UFL_OWNER.\n", unitname(u), buildingname(u->building)));
-					bFail = true;
-					if (bOnce) break;
-				}
-			}
-			if (u->ship) {
-				unit * bo = shipowner(u->ship);
-				if (!fval(bo, UFL_OWNER)) {
-					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), shipname(u->ship)));
-					bFail = true;
-					if (bOnce) break;
-				}
-				if (bo!=u && fval(u, UFL_OWNER)) {
-					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber UFL_OWNER.\n", unitname(u), shipname(u->ship)));
-					bFail = true;
-					if (bOnce) break;
-				}
-			}
-		}
-		if (bFail) reorder_owners(r);
-	}
+    for (u=r->units;u;u=u->next) {
+      if (u->building) {
+        unit * bo = buildingowner(r, u->building);
+        if (!fval(bo, UFL_OWNER)) {
+          log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), buildingname(u->building)));
+          bFail = true;
+          if (bOnce) break;
+        }
+        if (bo!=u && fval(u, UFL_OWNER)) {
+          log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber UFL_OWNER.\n", unitname(u), buildingname(u->building)));
+          bFail = true;
+          if (bOnce) break;
+        }
+      }
+      if (u->ship) {
+        unit * bo = shipowner(u->ship);
+        if (!fval(bo, UFL_OWNER)) {
+          log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), shipname(u->ship)));
+          bFail = true;
+          if (bOnce) break;
+        }
+        if (bo!=u && fval(u, UFL_OWNER)) {
+          log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber UFL_OWNER.\n", unitname(u), shipname(u->ship)));
+          bFail = true;
+          if (bOnce) break;
+        }
+      }
+    }
+    if (bFail) reorder_owners(r);
+  }
 }
 
 /* make sure that this is done only once! */
@@ -194,37 +194,37 @@ do_once(const char * magic, int (*fptr)(void))
 int
 warn_items(void)
 {
-	boolean found = 0;
-	region * r;
-	const item_type * it_money = it_find("money");
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		for (u=r->units;u;u=u->next) {
-			item * itm;
-			for (itm=u->items;itm;itm=itm->next) {
-				if (itm->number>100000 && itm->type!=it_money) {
-					found = 1;
-					log_error(("Einheit %s hat %u %s\n",
-						unitid(u), itm->number,
-						resourcename(itm->type->rtype, 0)));
-				}
-			}
-		}
-	}
-	return found;
+  boolean found = 0;
+  region * r;
+  const item_type * it_money = it_find("money");
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    for (u=r->units;u;u=u->next) {
+      item * itm;
+      for (itm=u->items;itm;itm=itm->next) {
+        if (itm->number>100000 && itm->type!=it_money) {
+          found = 1;
+          log_error(("Einheit %s hat %u %s\n",
+            unitid(u), itm->number,
+            resourcename(itm->type->rtype, 0)));
+        }
+      }
+    }
+  }
+  return found;
 }
 
 static boolean
 kor_teure_talente(unit *u)
 {
-	if(effskill(u, SK_TACTICS) >= 1 ||
-		 effskill(u, SK_MAGIC) >= 1 ||
-		 effskill(u, SK_ALCHEMY) >= 1 ||
-		 effskill(u, SK_HERBALISM) >= 1 ||
-		 effskill(u, SK_SPY) >= 1) {
-				return true;
-	}
-	return false;
+  if(effskill(u, SK_TACTICS) >= 1 ||
+     effskill(u, SK_MAGIC) >= 1 ||
+     effskill(u, SK_ALCHEMY) >= 1 ||
+     effskill(u, SK_HERBALISM) >= 1 ||
+     effskill(u, SK_SPY) >= 1) {
+        return true;
+  }
+  return false;
 }
 
 static void
@@ -240,7 +240,7 @@ no_teurefremde(boolean convert)
       if (u->faction->no != MONSTER_FACTION && playerrace(u->faction->race)
         && is_migrant(u) && kor_teure_talente(u))
       {
-        if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) 
+        if (slave_ct && curse_active(get_curse(u->attribs, slave_ct)))
           continue;
         log_warning(("Teurer Migrant: %s, Partei %s\n",
           unitname(u), factionname(u->faction)));
@@ -261,17 +261,17 @@ extern plane * arena;
 static void
 fix_age(void)
 {
-	faction * f;
-	const race * oldorc = rc_find("orc");
-	const race * uruk = rc_find("uruk");
-	for (f=factions;f;f=f->next) {
-		if (f->no!=MONSTER_FACTION && playerrace(f->race)) continue;
-		if (f->race==oldorc) f->race= uruk;
-		else if (f->age!=turn) {
-			log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
-			f->age = turn;
-		}
-	}
+  faction * f;
+  const race * oldorc = rc_find("orc");
+  const race * uruk = rc_find("uruk");
+  for (f=factions;f;f=f->next) {
+    if (f->no!=MONSTER_FACTION && playerrace(f->race)) continue;
+    if (f->race==oldorc) f->race= uruk;
+    else if (f->age!=turn) {
+      log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
+      f->age = turn;
+    }
+  }
 }
 
 
@@ -315,13 +315,13 @@ fix_otherfaction(void)
     unit * u;
     for (u=r->units;u;u=u->next) {
       attrib * a = a_find(u->attribs, &at_otherfaction);
-			if (a!=NULL) {
-				faction * f = (faction*)a->data.v;
-				if (f==u->faction) {
-					a_remove(&u->attribs, a);
-					++count;
-				}
-			}
+      if (a!=NULL) {
+        faction * f = (faction*)a->data.v;
+        if (f==u->faction) {
+          a_remove(&u->attribs, a);
+          ++count;
+        }
+      }
     }
   }
   if (count) log_warning(("%u units had otherfaction=own faction.\n", count));
@@ -344,24 +344,24 @@ fix_demands(void)
 static void
 fix_allies(void)
 {
-	faction * f;
-	for (f=factions;f;f=f->next) {
-		group * g;
-		for (g=f->groups;g;g=g->next) {
-			ally ** ap=&g->allies;
-			while (*ap) {
-				ally * an, * a = *ap;
-				for (an = a->next;an;an=an->next) {
-					if (a->faction==an->faction) {
-						*ap = a->next;
-						free(a);
-						break;
-					}
-				}
-				if (an==NULL) ap = &(*ap)->next;
-			}
-		}
-	}
+  faction * f;
+  for (f=factions;f;f=f->next) {
+    group * g;
+    for (g=f->groups;g;g=g->next) {
+      ally ** ap=&g->allies;
+      while (*ap) {
+        ally * an, * a = *ap;
+        for (an = a->next;an;an=an->next) {
+          if (a->faction==an->faction) {
+            *ap = a->next;
+            free(a);
+            break;
+          }
+        }
+        if (an==NULL) ap = &(*ap)->next;
+      }
+    }
+  }
 }
 
 #ifdef FUZZY_BASE36
@@ -371,40 +371,40 @@ extern boolean enable_fuzzy;
 static void
 fix_icastles(void)
 {
-	region * r;
-	for (r=regions; r; r=r->next) {
-		building * b;
-		for (b=r->buildings; b; b=b->next) {
-			attrib * a;
-			const building_type * btype = bt_find("castle");
-			icastle_data * data;
-			a = a_find(b->attribs, &at_icastle);
-			if (b->type!=bt_find("illusion") && !a) continue;
+  region * r;
+  for (r=regions; r; r=r->next) {
+    building * b;
+    for (b=r->buildings; b; b=b->next) {
+      attrib * a;
+      const building_type * btype = bt_find("castle");
+      icastle_data * data;
+      a = a_find(b->attribs, &at_icastle);
+      if (b->type!=bt_find("illusion") && !a) continue;
 
-			if (!a) {
-				/* attribut hat gefehle */
-				a = a_add(&b->attribs, a_new(&at_icastle));
-			}
-			if (b->type!=bt_find("illusion")) {
-				/* gebäudetyp war falsch */
-				btype = b->type;
-				b->type = bt_find("illusion");
-			}
-			data = (icastle_data*)a->data.v;
-			if (data->time<=0) {
-				/* zeit war kaputt oder abgelaufen */
-				data->time = 1;
-			}
-			if (!data->type) {
-				/* typ muss gesetzt werden, weil er nicht geladen wurde */
-				data->type = btype;
-			}
-			if (data->building!=b) {
-				/* rückwärtszeiger auf das gebäude reparieren */
-				data->building=b;
-			}
-		}
-	}
+      if (!a) {
+        /* attribut hat gefehle */
+        a = a_add(&b->attribs, a_new(&at_icastle));
+      }
+      if (b->type!=bt_find("illusion")) {
+        /* gebäudetyp war falsch */
+        btype = b->type;
+        b->type = bt_find("illusion");
+      }
+      data = (icastle_data*)a->data.v;
+      if (data->time<=0) {
+        /* zeit war kaputt oder abgelaufen */
+        data->time = 1;
+      }
+      if (!data->type) {
+        /* typ muss gesetzt werden, weil er nicht geladen wurde */
+        data->type = btype;
+      }
+      if (data->building!=b) {
+        /* rückwärtszeiger auf das gebäude reparieren */
+        data->building=b;
+      }
+    }
+  }
 }
 
 #include <triggers/timeout.h>
@@ -416,34 +416,34 @@ fix_icastles(void)
 #include <triggers/giveitem.h>
 
 typedef struct handler_info {
-	char * event;
-	trigger * triggers;
+  char * event;
+  trigger * triggers;
 } handler_info;
 
 
 typedef struct timeout_data {
-	trigger * triggers;
-	int timer;
-	variant trigger_data;
+  trigger * triggers;
+  int timer;
+  variant trigger_data;
 } timeout_data;
 
 trigger *
 get_timeout(trigger * td, trigger * tfind)
 {
-	trigger * t = td;
-	while (t) {
-		if (t->type==&tt_timeout) {
-			timeout_data * tdata = (timeout_data *)t->data.v;
-			trigger * tr = tdata->triggers;
-			while (tr) {
-				if (tr==tfind) break;
-				tr=tr->next;
-			}
-			if (tr==tfind) break;
-		}
-		t=t->next;
-	}
-	return t;
+  trigger * t = td;
+  while (t) {
+    if (t->type==&tt_timeout) {
+      timeout_data * tdata = (timeout_data *)t->data.v;
+      trigger * tr = tdata->triggers;
+      while (tr) {
+        if (tr==tfind) break;
+        tr=tr->next;
+      }
+      if (tr==tfind) break;
+    }
+    t=t->next;
+  }
+  return t;
 }
 
 #include <triggers/shock.h>
@@ -462,70 +462,70 @@ init_resourcefix(void)
 int
 growing_trees(void)
 {
-	region *r;
+  region *r;
 
-	for(r=regions; r; r=r->next) {
-		if(rtrees(r, 2)) {
-			rsettrees(r, 1, rtrees(r, 2)/4);
-			rsettrees(r, 0, rtrees(r, 2)/2);
-		}
-	}
-	return 0;
+  for(r=regions; r; r=r->next) {
+    if(rtrees(r, 2)) {
+      rsettrees(r, 1, rtrees(r, 2)/4);
+      rsettrees(r, 0, rtrees(r, 2)/2);
+    }
+  }
+  return 0;
 }
 
 #include <triggers/gate.h>
 #include <triggers/unguard.h>
 typedef struct gate_data {
-	struct building * gate;
-	struct region * target;
+  struct building * gate;
+  struct region * target;
 } gate_data;
 
 static void
 fix_gates(void)
 {
-	region * r;
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		building * b;
-		for (u=r->units;u;u=u->next) {
-			trigger ** triggers = get_triggers(u->attribs, "timer");
-			if (triggers) {
-				trigger * t = *triggers;
-				while (t && t->type!= &tt_gate) t=t->next;
-				if (t!=NULL) {
-					gate_data * gd = (gate_data*)t->data.v;
-					struct building * b = gd->gate;
-					struct region * rtarget = gd->target;
-					if (r!=b->region) {
-						add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
-						add_trigger(&b->attribs, "create", trigger_unguard(b));
-						fset(b, BLD_UNGUARDED);
-					}
-				}
-				remove_triggers(&u->attribs, "timer", &tt_gate);
-				remove_triggers(&u->attribs, "create", &tt_unguard);
-			}
-		}
-		for (b=r->buildings;b;b=b->next) {
-			trigger ** triggers = get_triggers(b->attribs, "timer");
-			if (triggers) {
-				trigger * t = *triggers;
-				while (t && t->type!= &tt_gate) t=t->next;
-				if (t!=NULL) {
-					gate_data * gd = (gate_data*)t->data.v;
-					struct building * b = gd->gate;
-					struct region * rtarget = gd->target;
-					remove_triggers(&b->attribs, "timer", &tt_gate);
-					remove_triggers(&b->attribs, "create", &tt_unguard);
-					if (r!=b->region) {
-						add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
-						add_trigger(&b->attribs, "create", trigger_unguard(b));
-						fset(b, BLD_UNGUARDED);
-					}
-				}
-			}
-		}
-	}
+  region * r;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    building * b;
+    for (u=r->units;u;u=u->next) {
+      trigger ** triggers = get_triggers(u->attribs, "timer");
+      if (triggers) {
+        trigger * t = *triggers;
+        while (t && t->type!= &tt_gate) t=t->next;
+        if (t!=NULL) {
+          gate_data * gd = (gate_data*)t->data.v;
+          struct building * b = gd->gate;
+          struct region * rtarget = gd->target;
+          if (r!=b->region) {
+            add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
+            add_trigger(&b->attribs, "create", trigger_unguard(b));
+            fset(b, BLD_UNGUARDED);
+          }
+        }
+        remove_triggers(&u->attribs, "timer", &tt_gate);
+        remove_triggers(&u->attribs, "create", &tt_unguard);
+      }
+    }
+    for (b=r->buildings;b;b=b->next) {
+      trigger ** triggers = get_triggers(b->attribs, "timer");
+      if (triggers) {
+        trigger * t = *triggers;
+        while (t && t->type!= &tt_gate) t=t->next;
+        if (t!=NULL) {
+          gate_data * gd = (gate_data*)t->data.v;
+          struct building * b = gd->gate;
+          struct region * rtarget = gd->target;
+          remove_triggers(&b->attribs, "timer", &tt_gate);
+          remove_triggers(&b->attribs, "create", &tt_unguard);
+          if (r!=b->region) {
+            add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
+            add_trigger(&b->attribs, "create", trigger_unguard(b));
+            fset(b, BLD_UNGUARDED);
+          }
+        }
+      }
+    }
+  }
 }
 
 static int
@@ -710,7 +710,7 @@ fix_astralplane(void)
       unit * u;
       for (u=r->units;u;u=u->next) {
         if (u->faction->no!=MONSTER_FACTION) {
-          log_error(("Einheit %s in %u, %u steckt im Nebel fest.\n", 
+          log_error(("Einheit %s in %u, %u steckt im Nebel fest.\n",
             unitname(u), r->x, r->y));
         }
       }
@@ -723,23 +723,23 @@ fix_astralplane(void)
 static int
 warn_password(void)
 {
-	faction * f = factions;
-	while (f) {
-		boolean pwok = true;
-		const char * c = f->passw;
-		while (*c) {
-			if (!isalnum((unsigned char)*c)) pwok = false;
-			c++;
-		}
-		if (pwok == false) {
-			ADDMSG(&f->msgs, msg_message("msg_errors", "string",
-				"Dein Passwort enthält Zeichen, die bei der Nachsendung "
-				"von Reports Probleme bereiten können. Bitte wähle ein neues "
-				"Passwort, bevorzugt nur aus Buchstaben und Zahlen bestehend."));
-		}
-		f = f->next;
-	}
-	return 0;
+  faction * f = factions;
+  while (f) {
+    boolean pwok = true;
+    const char * c = f->passw;
+    while (*c) {
+      if (!isalnum((unsigned char)*c)) pwok = false;
+      c++;
+    }
+    if (pwok == false) {
+      ADDMSG(&f->msgs, msg_message("msg_errors", "string",
+        "Dein Passwort enthält Zeichen, die bei der Nachsendung "
+        "von Reports Probleme bereiten können. Bitte wähle ein neues "
+        "Passwort, bevorzugt nur aus Buchstaben und Zahlen bestehend."));
+    }
+    f = f->next;
+  }
+  return 0;
 }
 
 extern border *borders[];
@@ -772,7 +772,7 @@ fix_road_borders(void)
 
           if (r1->land == NULL || r2->land == NULL
             || r1->terrain->max_road<=0
-            || r2->terrain->max_road<=0) 
+            || r2->terrain->max_road<=0)
           {
             deleted[i++] = b;
           }
@@ -809,11 +809,11 @@ check_dissolve(void)
       if (u->race==new_race[RC_STONEGOLEM]) {
         fix_dissolve(u, STONEGOLEM_CRUMBLE, 0);
         continue;
-      } 
+      }
       if (u->race==new_race[RC_IRONGOLEM]) {
         fix_dissolve(u, IRONGOLEM_CRUMBLE, 0);
         continue;
-      } 
+      }
       if (u->race==new_race[RC_PEASANT]) {
         fix_dissolve(u, 15, 1);
         continue;
@@ -826,52 +826,55 @@ check_dissolve(void)
   }
 }
 
-static int 
+static int
 fix_familiars(void)
 {
-	const struct locale * lang = find_locale("en");
+  const struct locale * lang = find_locale("en");
   region * r;
   for (r=regions;r;r=r->next) {
     unit * u;
-    for (u=r->units;u;u=u->next) if (u->faction->no!=MONSTER_FACTION) {
-      if (u->race->init_familiar) {
-        /* this is a familiar */
-        unit * mage = get_familiar_mage(u);
-        equipment * eq;
-        char fname[64];
+    for (u=r->units;u;u=u->next) {
+      if (u->faction->no!=MONSTER_FACTION && u->race->init_familiar) {
+        attrib * a = a_find(u->attribs, &at_familiar);
+        if (a!=NULL) {
+          /* this is a familiar */
+          unit * mage = get_familiar_mage(u);
+          equipment * eq;
+          char fname[64];
 
-        if (mage==0) {
-          log_error(("%s is a %s familiar with no mage for faction %s\n",
-                     unitid(u), racename(lang, u, u->race),
-                     factionid(u->faction)));
-        } else if (!is_mage(mage)) {
-          log_error(("%s is a %s familiar, but %s is not a mage for faction %s\n",
-                     unitid(u), racename(lang, u, u->race), unitid(mage), 
-                     factionid(u->faction)));
-        }
-        if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
-          log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
-            unitid(u)));
-          create_mage(u, M_GRAU);
-        }
+          if (mage==0) {
+            log_error(("%s is a %s familiar with no mage for faction %s\n",
+                      unitid(u), racename(lang, u, u->race),
+                      factionid(u->faction)));
+          } else if (!is_mage(mage)) {
+            log_error(("%s is a %s familiar, but %s is not a mage for faction %s\n",
+                      unitid(u), racename(lang, u, u->race), unitid(mage),
+                      factionid(u->faction)));
+          }
+          if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
+            log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
+              unitid(u)));
+            create_mage(u, M_GRAU);
+          }
 
-        snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
-        eq = get_equipment(fname);
-        if (eq) {
-          spell_list * sp = eq->spells;
+          snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
+          eq = get_equipment(fname);
+          if (eq) {
+            spell_list * sp = eq->spells;
 
-          if (sp!=NULL) {
-            sc_mage * m = get_mage(u);
-            if (m==NULL) {
-              log_error(("%s is a %s-familiar with spells, but did not have a mage-attribute\n",
-                         unitid(u), racename(lang, u, u->race)));
-              create_mage(u, M_GRAU);
-            }
-            while (sp) {
-              if (!has_spell(u, sp->data)) {
-                add_spell(m, sp->data);
+            if (sp!=NULL) {
+              sc_mage * m = get_mage(u);
+              if (m==NULL) {
+                log_error(("%s is a %s-familiar with spells, but did not have a mage-attribute\n",
+                          unitid(u), racename(lang, u, u->race)));
+                create_mage(u, M_GRAU);
               }
-              sp = sp->next;
+              while (sp) {
+                if (!has_spell(u, sp->data)) {
+                  add_spell(m, sp->data);
+                }
+                sp = sp->next;
+              }
             }
           }
         }
@@ -881,7 +884,7 @@ fix_familiars(void)
   return 0;
 }
 
-static int 
+static int
 fix_resources(void)
 {
   int retval = 0;
@@ -942,7 +945,7 @@ fix_attribflags(void)
   return 0;
 }
 
-static int 
+static int
 fix_astral_firewalls(void)
 {
   region * r;
@@ -954,7 +957,7 @@ fix_astral_firewalls(void)
   return 0;
 }
 
-static int 
+static int
 fix_chaosgates(void)
 {
   region * r;
@@ -999,12 +1002,12 @@ korrektur(void)
     global_warming();
   }
 #endif
-	fix_astralplane();
-	fix_firewalls();
-	fix_gates();
-	verify_owners(false);
-	/* fix_herbtypes(); */
-	/* In Vin 3+ können Parteien komplett übergeben werden. */
+  fix_astralplane();
+  fix_firewalls();
+  fix_gates();
+  verify_owners(false);
+  /* fix_herbtypes(); */
+  /* In Vin 3+ können Parteien komplett übergeben werden. */
   if (!ExpensiveMigrants()) {
     no_teurefremde(true);
   }
@@ -1021,16 +1024,16 @@ korrektur(void)
   fix_familiars();
   do_once("tfrs", &fix_resources);
   /* trade_orders(); */
-  
+
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
    * Beschreibungen geändert haben */
   fix_age();
-  
+
   /* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
   create_teleport_plane();
-  
-	if (global.data_version<TYPES_VERSION) fix_icastles();
+
+  if (global.data_version<TYPES_VERSION) fix_icastles();
 #ifdef FUZZY_BASE36
-	enable_fuzzy = true;
+  enable_fuzzy = true;
 #endif
 }
