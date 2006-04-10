@@ -44,7 +44,9 @@ extern "C" {
     struct bfaction * next;
     struct side * sides;
     struct faction *faction;
+#ifndef SIMPLE_COMBAT
     int lastturn; /* last time this struct faction was involved in combat */
+#endif
     boolean attacker;
   } bfaction;
 
@@ -174,7 +176,9 @@ extern "C" {
       struct item * items; /* items they take */
 #endif
     } run;
+#ifndef SIMPLE_COMBAT
     int action_counter;	/* number of active actions the struct unit did in the fight */
+#endif
 #ifdef SHOW_KILLS
     int kills;
     int hits;

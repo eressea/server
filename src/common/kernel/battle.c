@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -119,60 +119,60 @@ const troop no_troop = {0, 0};
 region *
 fleeregion(const unit * u)
 {
-	region *r = u->region;
-	region *neighbours[MAXDIRECTIONS];
-	int c = 0;
-	direction_t i;
+  region *r = u->region;
+  region *neighbours[MAXDIRECTIONS];
+  int c = 0;
+  direction_t i;
 
-	if (u->ship && !fval(r->terrain, SEA_REGION))
-		return NULL;
+  if (u->ship && !fval(r->terrain, SEA_REGION))
+    return NULL;
 
-	if (u->ship &&
-			!(u->race->flags & RCF_SWIM) &&
-			!(u->race->flags & RCF_FLY)) {
-		return NULL;
-	}
+  if (u->ship &&
+      !(u->race->flags & RCF_SWIM) &&
+      !(u->race->flags & RCF_FLY)) {
+    return NULL;
+  }
 
-	for (i = 0; i != MAXDIRECTIONS; ++i) {
-		region * r2 = rconnect(r, i);
-		if (r2) {
-			if (can_survive(u,r2) && !move_blocked(u, r, r2))
-				neighbours[c++] = r2;
-		}
-	}
+  for (i = 0; i != MAXDIRECTIONS; ++i) {
+    region * r2 = rconnect(r, i);
+    if (r2) {
+      if (can_survive(u,r2) && !move_blocked(u, r, r2))
+        neighbours[c++] = r2;
+    }
+  }
 
-	if (!c)
-		return NULL;
-	return neighbours[rng_int() % c];
+  if (!c)
+    return NULL;
+  return neighbours[rng_int() % c];
 }
 
 static char *
 sidename(side * s, boolean truename)
 {
 #define SIDENAMEBUFLEN 256
-	static char sidename_buf[SIDENAMEBUFLEN];
+  static char sidename_buf[SIDENAMEBUFLEN];
 
-	if(s->stealthfaction && truename == false) {
-		snprintf(sidename_buf, SIDENAMEBUFLEN,
-			"%s", factionname(s->stealthfaction));
-	} else {
-		snprintf(sidename_buf, SIDENAMEBUFLEN,
-			"%s", factionname(s->bf->faction));
-	}
-	return sidename_buf;
+  if(s->stealthfaction && truename == false) {
+    snprintf(sidename_buf, SIDENAMEBUFLEN,
+      "%s", factionname(s->stealthfaction));
+  } else {
+    snprintf(sidename_buf, SIDENAMEBUFLEN,
+      "%s", factionname(s->bf->faction));
+  }
+  return sidename_buf;
 }
 
 static const char *
 sideabkz(side *s, boolean truename)
 {
-	static char sideabkz_buf[4];
+  static char sideabkz_buf[4];
 
-	if(s->stealthfaction && truename == false) {
-		snprintf(sideabkz_buf, 4, "%s", abkz(s->stealthfaction->name, 3));
-	} else {
-		snprintf(sideabkz_buf, 4, "%s", abkz(s->bf->faction->name, 3));
-	}
-	return sideabkz_buf;
+  if(s->stealthfaction && truename == false) {
+    snprintf(sideabkz_buf, 4, "%s", abkz(s->stealthfaction->name, 3));
+  } else {
+    snprintf(sideabkz_buf, 4, "%s", abkz(s->bf->faction->name, 3));
+  }
+  return sideabkz_buf;
 }
 
 void
@@ -192,26 +192,26 @@ message_faction(battle * b, faction * f, struct message * m)
 int
 armedmen(const unit * u)
 {
-	item * itm;
-	int n = 0;
-	if (!(urace(u)->flags & RCF_NOWEAPONS)) {
-		if ((urace(u)->ec_flags & CANGUARD) || effskill(u, SK_WEAPONLESS)>=1) {
-			/* kann ohne waffen bewachen: fuer drachen */
-			n = u->number;
-		} else {
-			/* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
-			 * Personen minimiert */
-			for (itm=u->items;itm;itm=itm->next) {
-				const weapon_type * wtype = resource2weapon(itm->type->rtype);
-				if (wtype==NULL) continue;
-				if (effskill(u, wtype->skill) >= 1) n += itm->number;
-				/* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
-				if (n>u->number) break;
-			}
-			n = min(n, u->number);
-		}
-	}
-	return n;
+  item * itm;
+  int n = 0;
+  if (!(urace(u)->flags & RCF_NOWEAPONS)) {
+    if ((urace(u)->ec_flags & CANGUARD) || effskill(u, SK_WEAPONLESS)>=1) {
+      /* kann ohne waffen bewachen: fuer drachen */
+      n = u->number;
+    } else {
+      /* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
+       * Personen minimiert */
+      for (itm=u->items;itm;itm=itm->next) {
+        const weapon_type * wtype = resource2weapon(itm->type->rtype);
+        if (wtype==NULL) continue;
+        if (effskill(u, wtype->skill) >= 1) n += itm->number;
+        /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
+        if (n>u->number) break;
+      }
+      n = min(n, u->number);
+    }
+  }
+  return n;
 }
 
 static void
@@ -221,9 +221,9 @@ battledebug(const char *s)
   puts(s);
   putc('\n');
 #endif
-	if (bdebug) {
-		dbgprintf((bdebug, "%s\n", s));
-	}
+  if (bdebug) {
+    dbgprintf((bdebug, "%s\n", s));
+  }
 }
 
 void
@@ -253,21 +253,21 @@ battlerecord(battle * b, const char *s)
 void
 battlemsg(battle * b, unit * u, const char * s)
 {
-	bfaction * bf;
-	struct message * m;
-	plane * p = rplane(b->region);
-	watcher * w;
+  bfaction * bf;
+  struct message * m;
+  plane * p = rplane(b->region);
+  watcher * w;
 
-	sprintf(buf, "%s %s", unitname(u), s);
-	m = msg_message("msg_battle", "string", buf);
-	for (bf=b->factions;bf;bf=bf->next) {
-		message_faction(b, bf->faction, m);
-	}
-	if (p) for (w=p->watchers;w;w=w->next) {
-		for (bf = b->factions;bf;bf=bf->next) if (bf->faction==w->faction) break;
-		if (bf==NULL) message_faction(b, w->faction, m);
-	}
-	msg_release(m);
+  sprintf(buf, "%s %s", unitname(u), s);
+  m = msg_message("msg_battle", "string", buf);
+  for (bf=b->factions;bf;bf=bf->next) {
+    message_faction(b, bf->faction, m);
+  }
+  if (p) for (w=p->watchers;w;w=w->next) {
+    for (bf = b->factions;bf;bf=bf->next) if (bf->faction==w->faction) break;
+    if (bf==NULL) message_faction(b, w->faction, m);
+  }
+  msg_release(m);
 }
 
 static void
@@ -300,60 +300,60 @@ set_enemy(side * as, side * ds, boolean attacking)
 static int
 allysfm(const side * s, const faction * f, int mode)
 {
-	if (s->bf->faction==f) return mode;
+  if (s->bf->faction==f) return mode;
   if (s->group) {
     return alliedgroup(s->battle->plane, s->bf->faction, f, s->group->allies, mode);
   }
-	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
+  return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
 }
 
 static int
 allysf(const side * s, const faction * f)
 {
-	return allysfm(s, f, HELP_FIGHT);
+  return allysfm(s, f, HELP_FIGHT);
 }
 
 fighter *
 select_corpse(battle * b, fighter * af)
 /* Wählt eine Leiche aus, der af hilft. casualties ist die Anzahl der
  * Toten auf allen Seiten (im Array). Wenn af == NULL, wird die
- * Parteizugehörigkeit ignoriert, und irgendeine Leiche genommen. 
+ * Parteizugehörigkeit ignoriert, und irgendeine Leiche genommen.
  *
  * Untote werden nicht ausgewählt (casualties, not dead) */
 {
-	int di, maxcasualties = 0;
-	fighter *df;
-	side *side;
+  int di, maxcasualties = 0;
+  fighter *df;
+  side *side;
 
-	cv_foreach(side, b->sides) {
-		if (!af || (!enemy(af->side, side) && allysf(af->side, side->bf->faction)))
-			maxcasualties += side->casualties;
-	}
-	cv_next(side);
+  cv_foreach(side, b->sides) {
+    if (!af || (!enemy(af->side, side) && allysf(af->side, side->bf->faction)))
+      maxcasualties += side->casualties;
+  }
+  cv_next(side);
 
-	di = rng_int() % maxcasualties;
-	cv_foreach(df, b->fighters) {
-		/* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
-		 * werden! */
-		int dead = df->unit->number - (df->alive + df->run.number);
-		if (!playerrace(df->unit->race)) continue;
+  di = rng_int() % maxcasualties;
+  cv_foreach(df, b->fighters) {
+    /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
+     * werden! */
+    int dead = df->unit->number - (df->alive + df->run.number);
+    if (!playerrace(df->unit->race)) continue;
 
-		if (af && !helping(af->side, df->side))
-			continue;
-		if (di < dead) {
-			return df;
-		}
-		di -= dead;
-	}
-	cv_next(df);
-	return NULL;
+    if (af && !helping(af->side, df->side))
+      continue;
+    if (di < dead) {
+      return df;
+    }
+    di -= dead;
+  }
+  cv_next(df);
+  return NULL;
 }
 
 boolean
 helping(side * as, side * ds)
 {
-	if (as->bf->faction==ds->bf->faction) return true;
-	return (boolean)(!enemy(as, ds) && allysf(as, ds->bf->faction));
+  if (as->bf->faction==ds->bf->faction) return true;
+  return (boolean)(!enemy(as, ds) && allysf(as, ds->bf->faction));
 }
 
 
@@ -363,57 +363,57 @@ helping(side * as, side * ds)
 int
 countallies(side * as)
 {
-	battle *b = as->battle;
-	side *s;
-	int count = 0;
+  battle *b = as->battle;
+  side *s;
+  int count = 0;
 
-	cv_foreach(s, b->sides) {
-		if (!helping(as, s)) continue;
-		count += s->size[SUM_ROW];
-	}
-	cv_next(s);
-	return count;
+  cv_foreach(s, b->sides) {
+    if (!helping(as, s)) continue;
+    count += s->size[SUM_ROW];
+  }
+  cv_next(s);
+  return count;
 }
 
 int
 statusrow(int status)
 {
-	switch (status) {
-	case ST_AGGRO:
-	case ST_FIGHT:
-		return FIGHT_ROW;
-	case ST_BEHIND:
-	case ST_CHICKEN:
-		return BEHIND_ROW;
-	case ST_AVOID:
-		return AVOID_ROW;
-	case ST_FLEE:
-		return FLEE_ROW;
-	default:
-		assert(!"unknown combatrow");
-	}
-	return FIGHT_ROW;
+  switch (status) {
+  case ST_AGGRO:
+  case ST_FIGHT:
+    return FIGHT_ROW;
+  case ST_BEHIND:
+  case ST_CHICKEN:
+    return BEHIND_ROW;
+  case ST_AVOID:
+    return AVOID_ROW;
+  case ST_FLEE:
+    return FLEE_ROW;
+  default:
+    assert(!"unknown combatrow");
+  }
+  return FIGHT_ROW;
 }
 
 static double
 hpflee(int status)
-	/* if hp drop below this percentage, run away */
+  /* if hp drop below this percentage, run away */
 {
-	switch (status) {
-	case ST_AGGRO:
-		return 0.0;
-	case ST_FIGHT:
-	case ST_BEHIND:
-		return 0.2;
-	case ST_CHICKEN:
-	case ST_AVOID:
-		return 0.9;
-	case ST_FLEE:
-		return 1.0;
-	default:
-		assert(!"unknown combatrow");
-	}
-	return 0.0;
+  switch (status) {
+  case ST_AGGRO:
+    return 0.0;
+  case ST_FIGHT:
+  case ST_BEHIND:
+    return 0.2;
+  case ST_CHICKEN:
+  case ST_AVOID:
+    return 0.9;
+  case ST_FLEE:
+    return 1.0;
+  default:
+    assert(!"unknown combatrow");
+  }
+  return 0.0;
 }
 
 int
@@ -479,11 +479,11 @@ get_unitrow(const fighter * af)
 static int
 sort_fighterrow(fighter ** elem1, fighter ** elem2)
 {
-	int a, b;
+  int a, b;
 
-	a = get_unitrow(*elem1);
-	b = get_unitrow(*elem2);
-	return (a < b) ? -1 : ((a == b) ? 0 : 1);
+  a = get_unitrow(*elem1);
+  b = get_unitrow(*elem2);
+  return (a < b) ? -1 : ((a == b) ? 0 : 1);
 }
 
 static void
@@ -512,138 +512,138 @@ reportcasualties(battle * b, fighter * fig, int dead)
 static int
 contest(int skilldiff, const armor_type * ar, const armor_type * sh)
 {
-	int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
-	double mod = 1.0;
+  int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
+  double mod = 1.0;
 
-	if (ar != NULL)
-		mod *= (1 + ar->penalty);
-	if (sh != NULL)
-		mod *= (1 + sh->penalty);
-	vw = (int)(100 - ((100 - vw) * mod));
+  if (ar != NULL)
+    mod *= (1 + ar->penalty);
+  if (sh != NULL)
+    mod *= (1 + sh->penalty);
+  vw = (int)(100 - ((100 - vw) * mod));
 
-	do {
-		p = rng_int() % 100;
-		vw -= p;
-	}
-	while (vw >= 0 && p >= 90);
-	return (vw <= 0);
+  do {
+    p = rng_int() % 100;
+    vw -= p;
+  }
+  while (vw >= 0 && p >= 90);
+  return (vw <= 0);
 }
 
 static boolean
 riding(const troop t) {
-	if (t.fighter->building!=NULL) return false;
-	if (t.fighter->horses + t.fighter->elvenhorses > t.index) return true;
-	return false;
+  if (t.fighter->building!=NULL) return false;
+  if (t.fighter->horses + t.fighter->elvenhorses > t.index) return true;
+  return false;
 }
 
 static weapon *
 preferred_weapon(const troop t, boolean attacking)
 {
-	weapon * missile = t.fighter->person[t.index].missile;
-	weapon * melee = t.fighter->person[t.index].melee;
-	if (attacking) {
-		if (melee==NULL || (missile && missile->attackskill>melee->attackskill)) {
-			return missile;
-		}
-	} else {
-		if (melee==NULL || (missile && missile->defenseskill>melee->defenseskill)) {
-			return missile;
-		}
-	}
-	return melee;
+  weapon * missile = t.fighter->person[t.index].missile;
+  weapon * melee = t.fighter->person[t.index].melee;
+  if (attacking) {
+    if (melee==NULL || (missile && missile->attackskill>melee->attackskill)) {
+      return missile;
+    }
+  } else {
+    if (melee==NULL || (missile && missile->defenseskill>melee->defenseskill)) {
+      return missile;
+    }
+  }
+  return melee;
 }
 
 static weapon *
 select_weapon(const troop t, boolean attacking, boolean ismissile)
-	/* select the primary weapon for this trooper */
+  /* select the primary weapon for this trooper */
 {
-	if (attacking) {
-		if (ismissile) {
-			/* from the back rows, have to use your missile weapon */
-			return t.fighter->person[t.index].missile;
-		}
-	} else {
-		if (!ismissile) {
-			/* have to use your melee weapon if it's melee */
-			return t.fighter->person[t.index].melee;
-		}
-	}
-	return preferred_weapon(t, attacking);
+  if (attacking) {
+    if (ismissile) {
+      /* from the back rows, have to use your missile weapon */
+      return t.fighter->person[t.index].missile;
+    }
+  } else {
+    if (!ismissile) {
+      /* have to use your melee weapon if it's melee */
+      return t.fighter->person[t.index].melee;
+    }
+  }
+  return preferred_weapon(t, attacking);
 }
 
 static int
 weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
-	/* the 'pure' skill when using this weapon to attack or defend.
-	 * only undiscriminate modifiers (not affected by troops or enemies)
-	 * are taken into account, e.g. no horses, magic, etc. */
+  /* the 'pure' skill when using this weapon to attack or defend.
+   * only undiscriminate modifiers (not affected by troops or enemies)
+   * are taken into account, e.g. no horses, magic, etc. */
 {
-	int skill;
+  int skill;
 
-	if (wtype==NULL) {
-		skill = effskill(u, SK_WEAPONLESS);
-		if (skill<=0) {
-			/* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-			if(u->race == new_race[RC_URUK]) {
-				int sword = effskill(u, SK_MELEE);
-				int spear = effskill(u, SK_SPEAR);
-				skill = max(sword, spear) - 3;
-				if (attacking) {
-					skill = max(skill, u->race->at_default);
-				} else {
-					skill = max(skill, u->race->df_default);
-				}
-			} else {
-				if (attacking) {
-					skill = u->race->at_default;
-				} else {
-					skill = u->race->df_default;
-				}
-			}
-		} else {
-			/* der rassen-defaultwert kann höher sein als der Talentwert von
-			 * waffenloser kampf */
-			if (attacking) {
-				if (skill < u->race->at_default) skill = u->race->at_default;
-			} else {
-				if (skill < u->race->df_default) skill = u->race->df_default;
-			}
-		}
-		if (attacking) {
-			skill += u->race->at_bonus;
-		} else {
-			skill += u->race->df_bonus;
-		}
-	} else {
-		/* changed: if we own a weapon, we have at least a skill of 0 */
-		skill = effskill(u, wtype->skill);
-		if (skill < wtype->minskill) skill = 0;
-		if (skill > 0) {
-			if(attacking) {
-				skill += u->race->at_bonus;
-			} else {
-				skill += u->race->df_bonus;
-			}
-		}
-		if (attacking) {
-			skill += wtype->offmod;
-		} else {
-			skill += wtype->defmod;
-		}
-	}
+  if (wtype==NULL) {
+    skill = effskill(u, SK_WEAPONLESS);
+    if (skill<=0) {
+      /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
+      if(u->race == new_race[RC_URUK]) {
+        int sword = effskill(u, SK_MELEE);
+        int spear = effskill(u, SK_SPEAR);
+        skill = max(sword, spear) - 3;
+        if (attacking) {
+          skill = max(skill, u->race->at_default);
+        } else {
+          skill = max(skill, u->race->df_default);
+        }
+      } else {
+        if (attacking) {
+          skill = u->race->at_default;
+        } else {
+          skill = u->race->df_default;
+        }
+      }
+    } else {
+      /* der rassen-defaultwert kann höher sein als der Talentwert von
+       * waffenloser kampf */
+      if (attacking) {
+        if (skill < u->race->at_default) skill = u->race->at_default;
+      } else {
+        if (skill < u->race->df_default) skill = u->race->df_default;
+      }
+    }
+    if (attacking) {
+      skill += u->race->at_bonus;
+    } else {
+      skill += u->race->df_bonus;
+    }
+  } else {
+    /* changed: if we own a weapon, we have at least a skill of 0 */
+    skill = effskill(u, wtype->skill);
+    if (skill < wtype->minskill) skill = 0;
+    if (skill > 0) {
+      if(attacking) {
+        skill += u->race->at_bonus;
+      } else {
+        skill += u->race->df_bonus;
+      }
+    }
+    if (attacking) {
+      skill += wtype->offmod;
+    } else {
+      skill += wtype->defmod;
+    }
+  }
 
-	return skill;
+  return skill;
 }
 
 static int
 weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boolean missile)
-	/* effektiver Waffenskill während des Kampfes */
+  /* effektiver Waffenskill während des Kampfes */
 {
-	/* In dieser Runde alle die Modifier berechnen, die fig durch die
-	 * Waffen bekommt. */
-	fighter * tf = t.fighter;
-	unit * tu = t.fighter->unit;
-	int skill;
-	const weapon_type * wtype = w?w->type:NULL;
+  /* In dieser Runde alle die Modifier berechnen, die fig durch die
+   * Waffen bekommt. */
+  fighter * tf = t.fighter;
+  unit * tu = t.fighter->unit;
+  int skill;
+  const weapon_type * wtype = w?w->type:NULL;
 
   if (wtype==NULL) {
     /* Ohne Waffe: Waffenlose Angriffe */
@@ -678,57 +678,57 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
         }
       }
     }
-	}
+  }
 
-	/* Burgenbonus, Pferdebonus */
-	if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
-		skill += 2;
-		if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
-	}
+  /* Burgenbonus, Pferdebonus */
+  if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
+    skill += 2;
+    if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
+  }
 
-	if (t.index<tf->elvenhorses) {
-		/* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist
-		 * eleganter, und vor allem einfacher, sonst muß man noch ein
-		 * WMF_ELVENHORSE einbauen. */
-		skill += 2;
-	}
+  if (t.index<tf->elvenhorses) {
+    /* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist
+     * eleganter, und vor allem einfacher, sonst muß man noch ein
+     * WMF_ELVENHORSE einbauen. */
+    skill += 2;
+  }
 
-	if (skill>0 && !attacking && missile) {
-		/*
-		 * Wenn ich verteidige, und nicht direkt meinem Feind gegenüberstehe,
-		 * halbiert sich mein Skill: (z.B. gegen Fernkämpfer. Nahkämpfer
-		 * können mich eh nicht treffen)
-		 */
-		skill /= 2;
-	}
-	return skill;
+  if (skill>0 && !attacking && missile) {
+    /*
+     * Wenn ich verteidige, und nicht direkt meinem Feind gegenüberstehe,
+     * halbiert sich mein Skill: (z.B. gegen Fernkämpfer. Nahkämpfer
+     * können mich eh nicht treffen)
+     */
+    skill /= 2;
+  }
+  return skill;
 }
 
 static const armor_type *
 select_armor(troop t, boolean shield)
 {
   unit * u = t.fighter->unit;
-	const armor * a = t.fighter->armors;
-	int geschuetzt = 0;
+  const armor * a = t.fighter->armors;
+  int geschuetzt = 0;
 
-	/* Drachen benutzen keine Rüstungen */
-	if (!(u->race->battle_flags & BF_EQUIPMENT))
-		return NULL;
+  /* Drachen benutzen keine Rüstungen */
+  if (!(u->race->battle_flags & BF_EQUIPMENT))
+    return NULL;
 
-	/* ... und Werwölfe auch nicht */
-	if (fval(u, UFL_WERE)) {
-		return NULL;
-	}
+  /* ... und Werwölfe auch nicht */
+  if (fval(u, UFL_WERE)) {
+    return NULL;
+  }
 
-	for (;a;a=a->next) {
-		if (a->atype->flags & ATF_SHIELD) {
-			geschuetzt += a->count;
-			if (geschuetzt > t.index)	/* unser Kandidat wird geschuetzt */
-				return a->atype;
-		}
-	}
+  for (;a;a=a->next) {
+    if (a->atype->flags & ATF_SHIELD) {
+      geschuetzt += a->count;
+      if (geschuetzt > t.index) /* unser Kandidat wird geschuetzt */
+        return a->atype;
+    }
+  }
 
-	return NULL;
+  return NULL;
 }
 
 
@@ -740,37 +740,37 @@ select_armor(troop t, boolean shield)
 int
 select_magicarmor(troop t)
 {
-	unit *u = t.fighter->unit;
-	int geschuetzt = 0;
-	int ma = 0;
+  unit *u = t.fighter->unit;
+  int geschuetzt = 0;
+  int ma = 0;
 
-	geschuetzt = min(get_item(u, I_TROLLBELT), u->number);
+  geschuetzt = min(get_item(u, I_TROLLBELT), u->number);
 
-	if (geschuetzt > t.index)	/* unser Kandidat wird geschuetzt */
-		ma += 1;
+  if (geschuetzt > t.index) /* unser Kandidat wird geschuetzt */
+    ma += 1;
 
-	return ma;
+  return ma;
 }
 
 /* Sind side ds und Magier des meffect verbündet, dann return 1*/
 boolean
 meffect_protection(battle * b, meffect * s, side * ds)
 {
-	if (!s->magician->alive) return false;
-	if (s->duration <= 0) return false;
-	if (enemy(s->magician->side, ds)) return false;
-	if (allysf(s->magician->side, ds->bf->faction)) return true;
-	return false;
+  if (!s->magician->alive) return false;
+  if (s->duration <= 0) return false;
+  if (enemy(s->magician->side, ds)) return false;
+  if (allysf(s->magician->side, ds->bf->faction)) return true;
+  return false;
 }
 
 /* Sind side as und Magier des meffect verfeindet, dann return 1*/
 boolean
 meffect_blocked(battle *b, meffect *s, side *as)
 {
-	if (!s->magician->alive) return false;
-	if (s->duration <= 0) return false;
-	if (enemy(s->magician->side, as)) return true;
-	return false;
+  if (!s->magician->alive) return false;
+  if (s->duration <= 0) return false;
+  if (enemy(s->magician->side, as)) return true;
+  return false;
 }
 
 /* rmfighter wird schon im PRAECOMBAT gebraucht, da gibt es noch keine
@@ -807,12 +807,12 @@ rmfighter(fighter *df, int i)
 void
 rmtroop(troop dt)
 {
-	fighter *df = dt.fighter;
+  fighter *df = dt.fighter;
 
-	/* troop ist immer eine einzele Person */
-	rmfighter(df, 1);
+  /* troop ist immer eine einzele Person */
+  rmfighter(df, 1);
 
-	assert(dt.index >= 0 && dt.index < df->unit->number);
+  assert(dt.index >= 0 && dt.index < df->unit->number);
   df->person[dt.index] = df->person[df->alive - df->removed];
   if (df->removed) {
     df->person[df->alive - df->removed] = df->person[df->alive];
@@ -823,11 +823,11 @@ rmtroop(troop dt)
 void
 remove_troop(troop dt)
 {
-	fighter * df = dt.fighter;
-	unit * du = df->unit;
+  fighter * df = dt.fighter;
+  unit * du = df->unit;
 
-	rmtroop(dt);
-	if (!df->alive) {
+  rmtroop(dt);
+  if (!df->alive) {
     char eqname[64];
     const struct equipment * eq;
     if (du->race->itemdrop) {
@@ -851,47 +851,47 @@ remove_troop(troop dt)
 void
 drain_exp(struct unit *u, int n)
 {
-	skill_t sk = (skill_t)(rng_int() % MAXSKILLS);
-	skill_t ssk;
+  skill_t sk = (skill_t)(rng_int() % MAXSKILLS);
+  skill_t ssk;
 
-	ssk = sk;
+  ssk = sk;
 
-	while (get_level(u, sk)==0) {
-		sk++;
-		if (sk == MAXSKILLS)
-			sk = 0;
-		if (sk == ssk) {
-			sk = NOSKILL;
-			break;
-		}
-	}
-	if (sk != NOSKILL) {
-		skill * sv = get_skill(u, sk);
-		while (n>0) {
-			if (n>=30*u->number) {
-				reduce_skill(u, sv, 1);
-				n-=30;
-			} else {
-				if (rng_int()%(30*u->number)<n) reduce_skill(u, sv, 1);
-				n = 0;
-			}
-		}
-	}
+  while (get_level(u, sk)==0) {
+    sk++;
+    if (sk == MAXSKILLS)
+      sk = 0;
+    if (sk == ssk) {
+      sk = NOSKILL;
+      break;
+    }
+  }
+  if (sk != NOSKILL) {
+    skill * sv = get_skill(u, sk);
+    while (n>0) {
+      if (n>=30*u->number) {
+        reduce_skill(u, sv, 1);
+        n-=30;
+      } else {
+        if (rng_int()%(30*u->number)<n) reduce_skill(u, sv, 1);
+        n = 0;
+      }
+    }
+  }
 }
 
 const char *
 rel_dam(int dam, int hp)
 {
-	double q = (double)dam/(double)hp;
+  double q = (double)dam/(double)hp;
 
-	if (q > 0.75) {
-		return "eine klaffende Wunde";
-	} else if (q > 0.5) {
-		return "eine schwere Wunde";
-	} else if (q > 0.25) {
-		return "eine Wunde";
-	}
-	return "eine kleine Wunde";
+  if (q > 0.75) {
+    return "eine klaffende Wunde";
+  } else if (q > 0.5) {
+    return "eine schwere Wunde";
+  } else if (q > 0.25) {
+    return "eine Wunde";
+  }
+  return "eine kleine Wunde";
 }
 
 boolean
@@ -1113,7 +1113,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   assert(dt.index<du->number);
   df->person[dt.index].hp -= rda;
 
-  if (df->person[dt.index].hp > 0) {	/* Hat überlebt */
+  if (df->person[dt.index].hp > 0) {  /* Hat überlebt */
     battledebug(debugbuf);
     if (au->race == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
@@ -1170,7 +1170,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     if (b->small) {
       strcat(smallbuf, ", doch ein Heiltrank bringt Rettung");
       battlerecord(b, smallbuf);
-    } else 
+    } else
 #endif
     {
       message * m = msg_message("battle::potionsave", "unit", du);
@@ -1296,7 +1296,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
 
       if (dr < minrow || dr > maxrow) continue;
       if (df->alive - df->removed > enemies) {
-		troop dt;
+    troop dt;
         dt.index = enemies;
         dt.fighter = df;
         return dt;
@@ -1370,7 +1370,7 @@ cvector *
 fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
 {
   fighter *fig;
-  cvector	*fightervp;
+  cvector *fightervp;
   int row;
 
   fightervp = malloc(sizeof(cvector));
@@ -1472,7 +1472,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 
       power = spellpower(r, mage, sp, level, ord);
       free_order(ord);
-      if (power <= 0) {	/* Effekt von Antimagie */
+      if (power <= 0) { /* Effekt von Antimagie */
         report_failed_spell(b, mage, sp);
         pay_spell(mage, sp, level, 1);
       } else if (fumble(r, mage, sp, sp->level) == true) {
@@ -1566,7 +1566,7 @@ do_combatspell(troop at, int row)
   }
   power = spellpower(r, mage, sp, level, ord);
   free_order(ord);
-  if (power <= 0) {	/* Effekt von Antimagie */
+  if (power <= 0) { /* Effekt von Antimagie */
     report_failed_spell(b, mage, sp);
     pay_spell(mage, sp, level, 1);
     return;
@@ -1578,8 +1578,10 @@ do_combatspell(troop at, int row)
     level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
     if (level > 0) {
       pay_spell(mage, sp, level, 1);
+#ifndef SIMPLE_COMBAT
       at.fighter->action_counter++;
       at.fighter->side->bf->lastturn = b->turn;
+#endif
     }
   }
 }
@@ -1610,149 +1612,149 @@ do_extra_spell(troop at, const att *a)
 static int
 skilldiff(troop at, troop dt, int dist)
 {
-	fighter *af = at.fighter, *df = dt.fighter;
-	unit *au = af->unit, *du = df->unit;
-	int is_protected = 0, skdiff = 0, sk;
-	weapon * awp = select_weapon(at, true, dist>1);
-	weapon * dwp = select_weapon(dt, false, dist>1);
+  fighter *af = at.fighter, *df = dt.fighter;
+  unit *au = af->unit, *du = df->unit;
+  int is_protected = 0, skdiff = 0, sk;
+  weapon * awp = select_weapon(at, true, dist>1);
+  weapon * dwp = select_weapon(dt, false, dist>1);
 
-	if (df->person[dt.index].flags & FL_SLEEPING)
-		skdiff += 2;
+  if (df->person[dt.index].flags & FL_SLEEPING)
+    skdiff += 2;
 
-	/* Effekte durch Rassen */
-	if (awp!=NULL && au->race == new_race[RC_HALFLING] && dragonrace(du->race)) {
-		skdiff += 5;
-	}
+  /* Effekte durch Rassen */
+  if (awp!=NULL && au->race == new_race[RC_HALFLING] && dragonrace(du->race)) {
+    skdiff += 5;
+  }
 
 #ifdef KARMA_MODULE
   /* Werwolf */
   if(fval(au, UFL_WERE)) {
-		skdiff += fspecial(au->faction, FS_LYCANTROPE);
-	}
+    skdiff += fspecial(au->faction, FS_LYCANTROPE);
+  }
 #endif /* KARMA_MODULE */
 
-	if (au->race == new_race[RC_GOBLIN] &&
-	    af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * 10)
-		skdiff += 1;
+  if (au->race == new_race[RC_GOBLIN] &&
+      af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * 10)
+    skdiff += 1;
 
 #ifdef KARMA_MODULE
-	/* TODO this should be a skillmod */
-	skdiff += jihad(au->faction, du->race);
+  /* TODO this should be a skillmod */
+  skdiff += jihad(au->faction, du->race);
 #endif
-	skdiff += af->person[at.index].attack;
-	skdiff -= df->person[dt.index].defence;
+  skdiff += af->person[at.index].attack;
+  skdiff -= df->person[dt.index].defence;
 
-	if (df->building) {
-		boolean init = false;
-		static const curse_type * strongwall_ct, * magicwalls_ct;
-		if (!init) {
-			strongwall_ct = ct_find("strongwall");
-			magicwalls_ct = ct_find("magicwalls");
-			init=true;
-		}
-		if (df->building->type->flags & BTF_PROTECTION) {
+  if (df->building) {
+    boolean init = false;
+    static const curse_type * strongwall_ct, * magicwalls_ct;
+    if (!init) {
+      strongwall_ct = ct_find("strongwall");
+      magicwalls_ct = ct_find("magicwalls");
+      init=true;
+    }
+    if (df->building->type->flags & BTF_PROTECTION) {
       int beff = buildingeffsize(df->building, false)-1;
       /* -1 because the tradepost has no protection value */
 
 #ifdef KARMA_MODULE
       if (fspecial(au->faction, FS_SAPPER)) {
-				/* Halbe Schutzwirkung, aufgerundet */
-				beff = (beff+1)/2;
-			}
+        /* Halbe Schutzwirkung, aufgerundet */
+        beff = (beff+1)/2;
+      }
 #endif /* KARMA_MODULE */
       skdiff -= beff;
-			is_protected = 2;
-		}
-		if (strongwall_ct) {
-			curse * c = get_curse(df->building->attribs, strongwall_ct);
-			if (curse_active(c)) {
-				/* wirkt auf alle Gebäude */
-				skdiff -= curse_geteffect(c);
-				is_protected = 2;
-			}
-		}
-		if (magicwalls_ct && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
-			/* Verdoppelt Burgenbonus */
-			skdiff -= buildingeffsize(df->building, false);
-		}
-	}
-	/* Goblin-Verteidigung
-	 * ist direkt in der Rassentabelle als df_default
-	*/
+      is_protected = 2;
+    }
+    if (strongwall_ct) {
+      curse * c = get_curse(df->building->attribs, strongwall_ct);
+      if (curse_active(c)) {
+        /* wirkt auf alle Gebäude */
+        skdiff -= curse_geteffect(c);
+        is_protected = 2;
+      }
+    }
+    if (magicwalls_ct && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
+      /* Verdoppelt Burgenbonus */
+      skdiff -= buildingeffsize(df->building, false);
+    }
+  }
+  /* Goblin-Verteidigung
+   * ist direkt in der Rassentabelle als df_default
+  */
 
-	/* Effekte der Waffen */
-	skdiff += weapon_effskill(at, dt, awp, true, dist>1);
-	if (awp && fval(awp->type, WTF_MISSILE)) {
-		skdiff -= is_protected;
-		if (awp->type->modifiers) {
-			int w;
-			for (w=0;awp->type->modifiers[w].value!=0;++w) {
-				if (awp->type->modifiers[w].flags & WMF_MISSILE_TARGET) {
+  /* Effekte der Waffen */
+  skdiff += weapon_effskill(at, dt, awp, true, dist>1);
+  if (awp && fval(awp->type, WTF_MISSILE)) {
+    skdiff -= is_protected;
+    if (awp->type->modifiers) {
+      int w;
+      for (w=0;awp->type->modifiers[w].value!=0;++w) {
+        if (awp->type->modifiers[w].flags & WMF_MISSILE_TARGET) {
                                   /* skill decreases by targeting difficulty (bow -2, catapult -4) */
-					skdiff -= awp->type->modifiers[w].value;
-					break;
-				}
-			}
-		}
-	}
-	sk = weapon_effskill(dt, at, dwp, false, dist>1);
-	skdiff -= sk;
-	return skdiff;
+          skdiff -= awp->type->modifiers[w].value;
+          break;
+        }
+      }
+    }
+  }
+  sk = weapon_effskill(dt, at, dwp, false, dist>1);
+  skdiff -= sk;
+  return skdiff;
 }
 
 static int
 setreload(troop at)
 {
-	fighter * af = at.fighter;
-	const weapon_type * wtype = af->person[at.index].missile->type;
-	if (wtype->reload == 0) return 0;
-	return af->person[at.index].reload = wtype->reload;
+  fighter * af = at.fighter;
+  const weapon_type * wtype = af->person[at.index].missile->type;
+  if (wtype->reload == 0) return 0;
+  return af->person[at.index].reload = wtype->reload;
 }
 
 int
 getreload(troop at)
 {
-	return at.fighter->person[at.index].reload;
+  return at.fighter->person[at.index].reload;
 }
 
 #ifdef SMALL_BATTLE_MESSAGES
 static char *
 attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 {
-	static char smallbuf[512];
-	char a_unit[NAMESIZE+8], d_unit[NAMESIZE+8];
+  static char smallbuf[512];
+  char a_unit[NAMESIZE+8], d_unit[NAMESIZE+8];
         const char *noweap_string[4] = {"schlägt nach",
           "tritt nach",
           "beißt nach",
           "kratzt nach"};
 
-	if (at.fighter->unit->number > 1)
-		sprintf(a_unit, "%s/%d", unitname(at.fighter->unit), at.index);
-	else
-		sprintf(a_unit, "%s", unitname(at.fighter->unit));
+  if (at.fighter->unit->number > 1)
+    sprintf(a_unit, "%s/%d", unitname(at.fighter->unit), at.index);
+  else
+    sprintf(a_unit, "%s", unitname(at.fighter->unit));
 
-	if (dt.fighter->unit->number > 1)
-		sprintf(d_unit, "%s/%d", unitname(dt.fighter->unit), dt.index);
-	else
-		sprintf(d_unit, "%s", unitname(dt.fighter->unit));
+  if (dt.fighter->unit->number > 1)
+    sprintf(d_unit, "%s/%d", unitname(dt.fighter->unit), dt.index);
+  else
+    sprintf(d_unit, "%s", unitname(dt.fighter->unit));
 
-	if (wp == NULL) {
-		sprintf(smallbuf, "%s %s %s",
-			a_unit, noweap_string[rng_int()%4], d_unit);
-		return smallbuf;
-	}
+  if (wp == NULL) {
+    sprintf(smallbuf, "%s %s %s",
+      a_unit, noweap_string[rng_int()%4], d_unit);
+    return smallbuf;
+  }
 
-	if (dist > 1 || wp->type->missile) {
-		sprintf(smallbuf, "%s schießt mit %s auf %s",
-			a_unit,
-			locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
-	} else {
-		sprintf(smallbuf, "%s schlägt mit %s nach %s",
-			a_unit,
-			locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
-	}
+  if (dist > 1 || wp->type->missile) {
+    sprintf(smallbuf, "%s schießt mit %s auf %s",
+      a_unit,
+      locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
+  } else {
+    sprintf(smallbuf, "%s schlägt mit %s nach %s",
+      a_unit,
+      locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
+  }
 
-	return smallbuf;
+  return smallbuf;
 }
 #endif
 
@@ -1761,77 +1763,77 @@ hits(troop at, troop dt, weapon * awp)
 {
 #ifdef SMALL_BATTLE_MESSAGES
   char * smallbuf = NULL;
-	battle * b = at.fighter->side->battle;
+  battle * b = at.fighter->side->battle;
 #endif
-	fighter *af = at.fighter, *df = dt.fighter;
-	unit *au = af->unit, *du = df->unit;
-	char debugbuf[512];
+  fighter *af = at.fighter, *df = dt.fighter;
+  unit *au = af->unit, *du = df->unit;
+  char debugbuf[512];
   const armor_type * armor, * shield;
-	int skdiff = 0;
-	int dist = get_unitrow(af) + get_unitrow(df) - 1;
-	weapon * dwp = select_weapon(dt, false, dist>1);
+  int skdiff = 0;
+  int dist = get_unitrow(af) + get_unitrow(df) - 1;
+  weapon * dwp = select_weapon(dt, false, dist>1);
 
-	if (!df->alive) return 0;
-	if (getreload(at)) return 0;
-	if (dist>1 && (awp == NULL || !fval(awp->type, WTF_MISSILE))) return 0;
+  if (!df->alive) return 0;
+  if (getreload(at)) return 0;
+  if (dist>1 && (awp == NULL || !fval(awp->type, WTF_MISSILE))) return 0;
 
   /* mark this person as hit. */
   df->person[dt.index].flags |= FL_HIT;
 
-	if (af->person[at.index].flags & FL_STUNNED) {
-			af->person[at.index].flags &= ~FL_STUNNED;
-		return 0;
-	}
-	if ((af->person[at.index].flags & FL_TIRED && rng_int()%100 < 50)
-			|| (af->person[at.index].flags & FL_SLEEPING))
-		return 0;
-	if (awp && fval(awp->type, WTF_MISSILE)
-			&& af->side->battle->reelarrow == true
-			&& rng_int()%100 < 50)
-	{
-		return 0;
-	}
+  if (af->person[at.index].flags & FL_STUNNED) {
+      af->person[at.index].flags &= ~FL_STUNNED;
+    return 0;
+  }
+  if ((af->person[at.index].flags & FL_TIRED && rng_int()%100 < 50)
+      || (af->person[at.index].flags & FL_SLEEPING))
+    return 0;
+  if (awp && fval(awp->type, WTF_MISSILE)
+      && af->side->battle->reelarrow == true
+      && rng_int()%100 < 50)
+  {
+    return 0;
+  }
 
-	skdiff = skilldiff(at, dt, dist);
+  skdiff = skilldiff(at, dt, dist);
 
-	/* Verteidiger bekommt eine Rüstung */
-	armor = select_armor(dt, true);
-	shield = select_armor(dt, false);
-	sprintf(debugbuf, "%.4s/%d [%6s/%d] attackiert %.4s/%d [%6s/%d] mit %d dist %d",
-			unitid(au), at.index,
-			(awp != NULL) ?
-				locale_string(default_locale, resourcename(awp->type->itype->rtype, 0)) : "unbewaffnet",
-			weapon_effskill(at, dt, awp, true, dist>1),
-			unitid(du), dt.index,
-			(dwp != NULL) ?
-				locale_string(default_locale, resourcename(dwp->type->itype->rtype, 0)) : "unbewaffnet",
-			weapon_effskill(dt, at, dwp, false, dist>1),
-			skdiff, dist);
+  /* Verteidiger bekommt eine Rüstung */
+  armor = select_armor(dt, true);
+  shield = select_armor(dt, false);
+  sprintf(debugbuf, "%.4s/%d [%6s/%d] attackiert %.4s/%d [%6s/%d] mit %d dist %d",
+      unitid(au), at.index,
+      (awp != NULL) ?
+        locale_string(default_locale, resourcename(awp->type->itype->rtype, 0)) : "unbewaffnet",
+      weapon_effskill(at, dt, awp, true, dist>1),
+      unitid(du), dt.index,
+      (dwp != NULL) ?
+        locale_string(default_locale, resourcename(dwp->type->itype->rtype, 0)) : "unbewaffnet",
+      weapon_effskill(dt, at, dwp, false, dist>1),
+      skdiff, dist);
 #ifdef SMALL_BATTLE_MESSAGES
-	if (b->small) {
-		smallbuf = attack_message(at, dt, awp, dist);
-	}
+  if (b->small) {
+    smallbuf = attack_message(at, dt, awp, dist);
+  }
 #endif
-	if (contest(skdiff, armor, shield)) {
-		strcat(debugbuf, " und trifft.");
-		battledebug(debugbuf);
+  if (contest(skdiff, armor, shield)) {
+    strcat(debugbuf, " und trifft.");
+    battledebug(debugbuf);
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			strcat(smallbuf, " und trifft.");
-			battlerecord(b,smallbuf);
-		}
+    if (b->small) {
+      strcat(smallbuf, " und trifft.");
+      battlerecord(b,smallbuf);
+    }
 #endif
-		return 1;
-	}
-	strcat(debugbuf, ".");
-	battledebug(debugbuf);
+    return 1;
+  }
+  strcat(debugbuf, ".");
+  battledebug(debugbuf);
 #ifdef SMALL_BATTLE_MESSAGES
-	if (b->small) {
-		strcat(smallbuf, ".");
-		battlerecord(b,smallbuf);
-	}
+  if (b->small) {
+    strcat(smallbuf, ".");
+    battlerecord(b,smallbuf);
+  }
 #endif
-	return 0;
+  return 0;
 }
 
 void
@@ -1841,51 +1843,51 @@ dazzle(battle *b, troop *td)
   char smallbuf[512];
 #endif
 
-	/* Nicht kumulativ ! */
-	if(td->fighter->person[td->index].flags & FL_DAZZLED) return;
+  /* Nicht kumulativ ! */
+  if(td->fighter->person[td->index].flags & FL_DAZZLED) return;
 
 #ifdef TODO_RUNESWORD
-	if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
+  if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			strcpy(smallbuf, "Das Runenschwert glüht kurz auf.");
-			battlerecord(b,smallbuf);
-		}
+    if (b->small) {
+      strcpy(smallbuf, "Das Runenschwert glüht kurz auf.");
+      battlerecord(b,smallbuf);
+    }
 #endif
-		return;
-	}
+    return;
+  }
 #endif
-	if (td->fighter->person[td->index].flags & FL_COURAGE) {
+  if (td->fighter->person[td->index].flags & FL_COURAGE) {
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
-				"schnell wieder.", unitname(td->fighter->unit), td->index);
-			battlerecord(b,smallbuf);
-		}
+    if (b->small) {
+      sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
+        "schnell wieder.", unitname(td->fighter->unit), td->index);
+      battlerecord(b,smallbuf);
+    }
 #endif
                 return;
-	}
+  }
 
-	if (td->fighter->person[td->index].flags & FL_DAZZLED) {
+  if (td->fighter->person[td->index].flags & FL_DAZZLED) {
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
-				"schnell wieder.", unitname(td->fighter->unit), td->index);
-			battlerecord(b,smallbuf);
-		}
+    if (b->small) {
+      sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
+        "schnell wieder.", unitname(td->fighter->unit), td->index);
+      battlerecord(b,smallbuf);
+    }
 #endif
-		return;
-	}
+    return;
+  }
 
 #ifdef SMALL_BATTLE_MESSAGES
-	if (b->small) {
-		sprintf(smallbuf, "%s/%d fühlt sich, als würde Kraft entzogen.",
-			unitname(td->fighter->unit), td->index);
-		battlerecord(b,smallbuf);
-	}
+  if (b->small) {
+    sprintf(smallbuf, "%s/%d fühlt sich, als würde Kraft entzogen.",
+      unitname(td->fighter->unit), td->index);
+    battlerecord(b,smallbuf);
+  }
 #endif
-	td->fighter->person[td->index].flags |= FL_DAZZLED;
-	td->fighter->person[td->index].defence--;
+  td->fighter->person[td->index].flags |= FL_DAZZLED;
+  td->fighter->person[td->index].defence--;
 }
 
 /* TODO: Gebäude/Schiffe sollten auch zerstörbar sein. Schwierig im Kampf,
@@ -1894,32 +1896,32 @@ dazzle(battle *b, troop *td)
 void
 damage_building(battle *b, building *bldg, int damage_abs)
 {
-	bldg->size = max(1, bldg->size-damage_abs);
+  bldg->size = max(1, bldg->size-damage_abs);
 
-	/* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
+  /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
 
-	if (bldg->type->flags & BTF_PROTECTION) {
-		fighter *fi;
+  if (bldg->type->flags & BTF_PROTECTION) {
+    fighter *fi;
 
-		bldg->sizeleft = bldg->size;
+    bldg->sizeleft = bldg->size;
 
-		cv_foreach(fi, b->fighters) {
-			if (fi->building == bldg) {
-				if (bldg->sizeleft >= fi->unit->number) {
-					fi->building = bldg;
-					bldg->sizeleft -= fi->unit->number;
-				} else {
-					fi->building = NULL;
-				}
-			}
-		} cv_next(fi);
-	}
+    cv_foreach(fi, b->fighters) {
+      if (fi->building == bldg) {
+        if (bldg->sizeleft >= fi->unit->number) {
+          fi->building = bldg;
+          bldg->sizeleft -= fi->unit->number;
+        } else {
+          fi->building = NULL;
+        }
+      }
+    } cv_next(fi);
+  }
 }
 
 static int
 attacks_per_round(troop t)
 {
-	return t.fighter->person[t.index].speed;
+  return t.fighter->person[t.index].speed;
 }
 
 
@@ -1948,13 +1950,13 @@ make_heroes(battle * b)
 static void
 attack(battle *b, troop ta, const att *a, int numattack)
 {
-	fighter *af = ta.fighter;
-	troop td;
-	unit *au = af->unit;
-	int row = get_unitrow(af);
-	int offset = row - FIGHT_ROW;
+  fighter *af = ta.fighter;
+  troop td;
+  unit *au = af->unit;
+  int row = get_unitrow(af);
+  int offset = row - FIGHT_ROW;
 
-	switch(a->type) {
+  switch(a->type) {
   case AT_COMBATSPELL:
     if (numattack==0 && af->magic > 0) {
       /* Magier versuchen immer erstmal zu zaubern, erst wenn das
@@ -1963,170 +1965,194 @@ attack(battle *b, troop ta, const att *a, int numattack)
       do_combatspell(ta, row);
     }
     break;
-	case AT_STANDARD:		/* Waffen, mag. Gegenstände, Kampfzauber */
+  case AT_STANDARD:   /* Waffen, mag. Gegenstände, Kampfzauber */
     if (numattack > 0 || af->magic <= 0) {
-			weapon * wp = ta.fighter->person[ta.index].missile;
-			if (row==FIGHT_ROW) wp = preferred_weapon(ta, true);
-			/* Sonderbehandlungen */
+      weapon * wp = ta.fighter->person[ta.index].missile;
+      if (row==FIGHT_ROW) wp = preferred_weapon(ta, true);
+      /* Sonderbehandlungen */
 
-			if (getreload(ta)) {
-				ta.fighter->person[ta.index].reload--;
-			} else {
-				boolean standard_attack = true;
+      if (getreload(ta)) {
+        ta.fighter->person[ta.index].reload--;
+      } else {
+        boolean standard_attack = true;
         boolean reload = false;
         /* spezialattacken der waffe nur, wenn erste attacke in der runde.
          * sonst helden mit feuerschwertern zu mächtig */
-				if (numattack==0 && wp && wp->type->attack) {
-					int dead = 0;
-					standard_attack = wp->type->attack(&ta, wp->type, &dead, row);
+        if (numattack==0 && wp && wp->type->attack) {
+          int dead = 0;
+          standard_attack = wp->type->attack(&ta, wp->type, &dead, row);
           if (!standard_attack) reload = true;
-					af->catmsg += dead;
-					if (!standard_attack && af->person[ta.index].last_action < b->turn) {
-						af->person[ta.index].last_action = b->turn;
-						af->action_counter++;
+          af->catmsg += dead;
+          if (!standard_attack && af->person[ta.index].last_action < b->turn) {
+            af->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+            af->action_counter++;
             af->side->bf->lastturn = b->turn;
-					}
-				}
-				if (standard_attack) {
-					boolean missile = false;
-					if (wp && fval(wp->type, WTF_MISSILE)) missile=true;
-					if (missile) {
-						if (row<=BEHIND_ROW) td = select_opponent(b, ta, missile_range[0], missile_range[1]);
-						else return;
-					}
-					else {
-						if (row<=FIGHT_ROW) td = select_opponent(b, ta, melee_range[0], melee_range[1]);
-						else return;
-					}
-					if (!td.fighter) return;
+#endif
+          }
+        }
+        if (standard_attack) {
+          boolean missile = false;
+          if (wp && fval(wp->type, WTF_MISSILE)) missile=true;
+          if (missile) {
+            if (row<=BEHIND_ROW) td = select_opponent(b, ta, missile_range[0], missile_range[1]);
+            else return;
+          }
+          else {
+            if (row<=FIGHT_ROW) td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+            else return;
+          }
+          if (!td.fighter) return;
 #ifdef COUNT_DF
-					if (td.fighter->person[td.index].last_action < b->turn) {
-						td.fighter->person[td.index].last_action = b->turn;
-						td.fighter->action_counter++;
+          if (td.fighter->person[td.index].last_action < b->turn) {
+            td.fighter->person[td.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+            td.fighter->action_counter++;
             td.fighter->side->bf->lastturn = b->turn;
-					}
 #endif
-					if (ta.fighter->person[ta.index].last_action < b->turn) {
-						ta.fighter->person[ta.index].last_action = b->turn;
-						ta.fighter->action_counter++;
+          }
+#endif
+          if (ta.fighter->person[ta.index].last_action < b->turn) {
+            ta.fighter->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+            ta.fighter->action_counter++;
             ta.fighter->side->bf->lastturn = b->turn;
-					}
+#endif
+          }
           reload = true;
-					if (hits(ta, td, wp)) {
-						const char * d;
-						if (wp == NULL) d = au->race->def_damage;
-						else if (riding(ta)) d = wp->type->damage[1];
-						else d = wp->type->damage[0];
-						terminate(td, ta, a->type, d, missile);
-					}
-				}
-				if (reload && wp && wp->type->reload && !getreload(ta)) {
-					int i = setreload(ta);
-					sprintf(buf, " Nachladen gesetzt: %d", i);
-					battledebug(buf);
-				}
-			}
-		}
-		break;
-	case AT_SPELL:	/* Extra-Sprüche. Kampfzauber in AT_COMBATSPELL! */
-		do_extra_spell(ta, a);
-		break;
-	case AT_NATURAL:
-		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
-		if (!td.fighter) return;
+          if (hits(ta, td, wp)) {
+            const char * d;
+            if (wp == NULL) d = au->race->def_damage;
+            else if (riding(ta)) d = wp->type->damage[1];
+            else d = wp->type->damage[0];
+            terminate(td, ta, a->type, d, missile);
+          }
+        }
+        if (reload && wp && wp->type->reload && !getreload(ta)) {
+          int i = setreload(ta);
+          sprintf(buf, " Nachladen gesetzt: %d", i);
+          battledebug(buf);
+        }
+      }
+    }
+    break;
+  case AT_SPELL:  /* Extra-Sprüche. Kampfzauber in AT_COMBATSPELL! */
+    do_extra_spell(ta, a);
+    break;
+  case AT_NATURAL:
+    td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
+    if (!td.fighter) return;
 #ifdef COUNT_DF
-		if(td.fighter->person[td.index].last_action < b->turn) {
-			td.fighter->person[td.index].last_action = b->turn;
-			td.fighter->action_counter++;
+    if(td.fighter->person[td.index].last_action < b->turn) {
+      td.fighter->person[td.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      td.fighter->action_counter++;
       td.fighter->side->bf->lastturn = b->turn;
-		}
 #endif
-		if(ta.fighter->person[ta.index].last_action < b->turn) {
-			ta.fighter->person[ta.index].last_action = b->turn;
-			ta.fighter->action_counter++;
+    }
+#endif
+    if(ta.fighter->person[ta.index].last_action < b->turn) {
+      ta.fighter->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      ta.fighter->action_counter++;
       ta.fighter->side->bf->lastturn = b->turn;
-		}
-		if (hits(ta, td, NULL)) {
-			terminate(td, ta, a->type, a->data.dice, false);
-		}
-		break;
-	case AT_DRAIN_ST:
-		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
-		if (!td.fighter) return;
+#endif
+    }
+    if (hits(ta, td, NULL)) {
+      terminate(td, ta, a->type, a->data.dice, false);
+    }
+    break;
+  case AT_DRAIN_ST:
+    td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
+    if (!td.fighter) return;
 #ifdef COUNT_DF
-		if(td.fighter->person[td.index].last_action < b->turn) {
-			td.fighter->person[td.index].last_action = b->turn;
-			td.fighter->action_counter++;
+    if(td.fighter->person[td.index].last_action < b->turn) {
+      td.fighter->person[td.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      td.fighter->action_counter++;
       td.fighter->side->bf->lastturn = b->turn;
-		}
 #endif
-		if(ta.fighter->person[ta.index].last_action < b->turn) {
-			ta.fighter->person[ta.index].last_action = b->turn;
-			ta.fighter->action_counter++;
+    }
+#endif
+    if(ta.fighter->person[ta.index].last_action < b->turn) {
+      ta.fighter->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      ta.fighter->action_counter++;
       ta.fighter->side->bf->lastturn = b->turn;
-		}
-		if (hits(ta, td, NULL)) {
-			int c = dice_rand(a->data.dice);
-			while(c > 0) {
-				if (rng_int()%2) {
-					td.fighter->person[td.index].attack -= 1;
-				} else {
-					td.fighter->person[td.index].defence -= 1;
-				}
-				c--;
-			}
-		}
-		break;
-	case AT_DRAIN_EXP:
-		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
-		if (!td.fighter) return;
+#endif
+    }
+    if (hits(ta, td, NULL)) {
+      int c = dice_rand(a->data.dice);
+      while(c > 0) {
+        if (rng_int()%2) {
+          td.fighter->person[td.index].attack -= 1;
+        } else {
+          td.fighter->person[td.index].defence -= 1;
+        }
+        c--;
+      }
+    }
+    break;
+  case AT_DRAIN_EXP:
+    td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
+    if (!td.fighter) return;
 #ifdef COUNT_DF
-		if(td.fighter->person[td.index].last_action < b->turn) {
-			td.fighter->person[td.index].last_action = b->turn;
-			td.fighter->action_counter++;
+    if(td.fighter->person[td.index].last_action < b->turn) {
+      td.fighter->person[td.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      td.fighter->action_counter++;
       td.fighter->side->bf->lastturn = b->turn;
-		}
 #endif
-		if(ta.fighter->person[ta.index].last_action < b->turn) {
-			ta.fighter->person[ta.index].last_action = b->turn;
-			ta.fighter->action_counter++;
+    }
+#endif
+    if(ta.fighter->person[ta.index].last_action < b->turn) {
+      ta.fighter->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      ta.fighter->action_counter++;
       ta.fighter->side->bf->lastturn = b->turn;
-		}
-		if (hits(ta, td, NULL)) {
-			drain_exp(td.fighter->unit, dice_rand(a->data.dice));
-		}
-		break;
-	case AT_DAZZLE:
-		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
-		if (!td.fighter) return;
+#endif
+    }
+    if (hits(ta, td, NULL)) {
+      drain_exp(td.fighter->unit, dice_rand(a->data.dice));
+    }
+    break;
+  case AT_DAZZLE:
+    td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
+    if (!td.fighter) return;
 #ifdef COUNT_DF
-		if(td.fighter->person[td.index].last_action < b->turn) {
-			td.fighter->person[td.index].last_action = b->turn;
-			td.fighter->action_counter++;
+    if(td.fighter->person[td.index].last_action < b->turn) {
+      td.fighter->person[td.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      td.fighter->action_counter++;
       td.fighter->side->bf->lastturn = b->turn;
-		}
 #endif
-		if(ta.fighter->person[ta.index].last_action < b->turn) {
-			ta.fighter->person[ta.index].last_action = b->turn;
-			ta.fighter->action_counter++;
+    }
+#endif
+    if(ta.fighter->person[ta.index].last_action < b->turn) {
+      ta.fighter->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      ta.fighter->action_counter++;
       ta.fighter->side->bf->lastturn = b->turn;
-		}
-		if (hits(ta, td, NULL)) {
-			dazzle(b, &td);
-		}
-		break;
-	case AT_STRUCTURAL:
-		td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
-		if (!td.fighter) return;
-		if(ta.fighter->person[ta.index].last_action < b->turn) {
-			ta.fighter->person[ta.index].last_action = b->turn;
-			ta.fighter->action_counter++;
+#endif
+    }
+    if (hits(ta, td, NULL)) {
+      dazzle(b, &td);
+    }
+    break;
+  case AT_STRUCTURAL:
+    td = select_opponent(b, ta, melee_range[0]-offset, melee_range[1]-offset);
+    if (!td.fighter) return;
+    if(ta.fighter->person[ta.index].last_action < b->turn) {
+      ta.fighter->person[ta.index].last_action = b->turn;
+#ifndef SIMPLE_COMBAT
+      ta.fighter->action_counter++;
       ta.fighter->side->bf->lastturn = b->turn;
-		}
-		if (td.fighter->unit->ship) {
-			td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
-		} else if (td.fighter->unit->building) {
-			damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
+#endif
+    }
+    if (td.fighter->unit->ship) {
+      td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
+    } else if (td.fighter->unit->building) {
+      damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
     }
   }
 }
@@ -2160,7 +2186,7 @@ do_attack(fighter * af)
       int a;
       for (a=0; a!=10 && au->race->attack[a].type!=AT_NONE; ++a) {
         if (apr>0) {
-          /* Wenn die Waffe nachladen muss, oder es sich nicht um einen 
+          /* Wenn die Waffe nachladen muss, oder es sich nicht um einen
           * Waffen-Angriff handelt, dann gilt der Speed nicht. */
           if (au->race->attack[a].type!=AT_STANDARD) continue;
           else {
@@ -2185,82 +2211,82 @@ do_attack(fighter * af)
 void
 do_regenerate(fighter *af)
 {
-	troop ta;
-	unit *au = af->unit;
+  troop ta;
+  unit *au = af->unit;
 
-	ta.fighter = af;
-	ta.index = af->fighting;
+  ta.fighter = af;
+  ta.index = af->fighting;
 
-	while(ta.index--) {
-		af->person[ta.index].hp += effskill(au, SK_AUSDAUER);
-		af->person[ta.index].hp =	min(unit_max_hp(au), af->person[ta.index].hp);
-	}
+  while(ta.index--) {
+    af->person[ta.index].hp += effskill(au, SK_AUSDAUER);
+    af->person[ta.index].hp = min(unit_max_hp(au), af->person[ta.index].hp);
+  }
 }
 
 static void
 add_tactics(tactics * ta, fighter * fig, int value)
 {
-	if (value == 0 || value < ta->value)
-		return;
-	if (value > ta->value)
-		cv_kill(&ta->fighters);
-	cv_pushback(&ta->fighters, fig);
-	cv_pushback(&fig->side->battle->leaders, fig);
-	ta->value = value;
+  if (value == 0 || value < ta->value)
+    return;
+  if (value > ta->value)
+    cv_kill(&ta->fighters);
+  cv_pushback(&ta->fighters, fig);
+  cv_pushback(&fig->side->battle->leaders, fig);
+  ta->value = value;
 }
 
 double
 fleechance(unit * u)
 {
-	double c = 0.20;			/* Fluchtwahrscheinlichkeit in % */
-	region * r = u->region;
-	attrib * a = a_find(u->attribs, &at_fleechance);
-	/* Einheit u versucht, dem Getümmel zu entkommen */
+  double c = 0.20;      /* Fluchtwahrscheinlichkeit in % */
+  region * r = u->region;
+  attrib * a = a_find(u->attribs, &at_fleechance);
+  /* Einheit u versucht, dem Getümmel zu entkommen */
 
-	c += (eff_skill(u, SK_STEALTH, r) * 0.05);
+  c += (eff_skill(u, SK_STEALTH, r) * 0.05);
 
-	if (get_item(u, I_UNICORN) >= u->number && eff_skill(u, SK_RIDING, r) >= 5)
-		c += 0.30;
-	else if (get_item(u, I_HORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 1)
-		c += 0.10;
+  if (get_item(u, I_UNICORN) >= u->number && eff_skill(u, SK_RIDING, r) >= 5)
+    c += 0.30;
+  else if (get_item(u, I_HORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 1)
+    c += 0.10;
 
-	if (u->race == new_race[RC_HALFLING]) {
-		c += 0.20;
-		c = min(c, 0.90);
-	} else {
-		c = min(c, 0.75);
-	}
+  if (u->race == new_race[RC_HALFLING]) {
+    c += 0.20;
+    c = min(c, 0.90);
+  } else {
+    c = min(c, 0.75);
+  }
 
-	if (a!=NULL) c += a->data.flt;
+  if (a!=NULL) c += a->data.flt;
 
-	return c;
+  return c;
 }
 
 int nextside = 0;
 side *
 make_side(battle * b, const faction * f, const group * g, boolean stealth, const faction *stealthfaction)
 {
-	side *s1 = calloc(sizeof(struct side), 1);
-	bfaction * bf;
+  side *s1 = calloc(sizeof(struct side), 1);
+  bfaction * bf;
 
-	s1->battle = b;
-	s1->group = g;
-	s1->stealth = stealth;
-	s1->stealthfaction = stealthfaction;
-	cv_pushback(&b->sides, s1);
-	for (bf = b->factions;bf;bf=bf->next) {
-		faction * f2 = bf->faction;
+  s1->battle = b;
+  s1->group = g;
+  s1->stealth = stealth;
+  s1->stealthfaction = stealthfaction;
+  cv_pushback(&b->sides, s1);
+  for (bf = b->factions;bf;bf=bf->next) {
+    faction * f2 = bf->faction;
 
-		if (f2 == f) {
-			s1->bf = bf;
-			s1->index = nextside++;
-			s1->nextF = bf->sides;
-			bf->sides = s1;
-			break;
-		}
-	}
-	assert(bf);
-	return s1;
+    if (f2 == f) {
+      s1->bf = bf;
+      s1->index = nextside++;
+      s1->nextF = bf->sides;
+      bf->sides = s1;
+      break;
+    }
+  }
+  assert(bf);
+  return s1;
 }
 
 void
@@ -2276,7 +2302,7 @@ loot_items(fighter * corpse)
     if (itm->number) {
       for (i = 10; i != 0; --i) {
         int loot = itm->number / i;
-        /* Looten tun hier immer nur die Gegner. Das ist als Ausgleich für die 
+        /* Looten tun hier immer nur die Gegner. Das ist als Ausgleich für die
         * neue Loot-regel (nur ganz tote Einheiten) fair.
         * zusätzlich looten auch geflohene, aber nach anderen Regeln.
         */
@@ -2312,26 +2338,26 @@ loot_items(fighter * corpse)
 static void
 loot_fleeing(fighter* fig, unit* runner)
 {
-	/* TODO: Vernünftig fixen */
-	runner->items = NULL;
-	assert(runner->items == NULL);
-	runner->items = fig->run.items;
-	fig->run.items = NULL;
+  /* TODO: Vernünftig fixen */
+  runner->items = NULL;
+  assert(runner->items == NULL);
+  runner->items = fig->run.items;
+  fig->run.items = NULL;
 }
 
 static void
 merge_fleeloot(fighter* fig, unit* u)
 {
-	i_merge(&u->items, &fig->run.items);
+  i_merge(&u->items, &fig->run.items);
 }
 #endif
 
 static boolean
 seematrix(const faction * f, const side * s)
 {
-	if (f==s->bf->faction) return true;
-	if (s->stealth) return false;
-	return true;
+  if (f==s->bf->faction) return true;
+  if (s->stealth) return false;
+  return true;
 }
 
 static double
@@ -2379,7 +2405,7 @@ aftermath(battle * b)
     int dead = du->number - df->alive - df->run.number;
     int pr_mercy = 0;
 #ifdef KARMA_MODULE
-    const attrib *a= a_find(du->attribs, &at_prayer_effect); 
+    const attrib *a= a_find(du->attribs, &at_prayer_effect);
 
     while (a && a->type==&at_prayer_effect) {
       if (a->data.sa[0] == PR_MERCY) {
@@ -2438,10 +2464,12 @@ aftermath(battle * b)
   cv_foreach(s, b->sides) {
     int snumber = 0;
     fighter *df;
+#ifndef SIMPLE_COMBAT
     boolean relevant = false; /* Kampf relevant für diese Partei? */
     if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
       relevant = true;
     }
+#endif
     s->flee = 0;
 
     cv_foreach(df, s->fighters) {
@@ -2451,6 +2479,12 @@ aftermath(battle * b)
       int n;
 
       snumber += du->number;
+#ifdef SIMPLE_COMBAT
+      if (battle_was_relevant) {
+        ship * sh = du->ship?du->ship:leftship(du);
+        if (sh) fset(sh, SF_DAMAGED);
+      }
+#else
       if (relevant) {
         fset(du, UFL_NOTMOVING); /* unit cannot move this round */
         if (df->action_counter >= du->number) {
@@ -2459,6 +2493,7 @@ aftermath(battle * b)
           fset(du, UFL_LONGACTION);
         }
       }
+#endif
       for (n = 0; n != df->alive; ++n) {
         if (df->person[n].hp > 0) {
           sum_hp += df->person[n].hp;
@@ -2560,11 +2595,11 @@ aftermath(battle * b)
   battle_effects(b, dead_players);
 
   cv_foreach(s, b->sides) {
-    message * seen = msg_message("battle::army_report", 
-      "index abbrev dead flown survived", 
+    message * seen = msg_message("battle::army_report",
+      "index abbrev dead flown survived",
       s->index, sideabkz(s, false), s->dead, s->flee, s->alive);
-    message * unseen = msg_message("battle::army_report", 
-      "index abbrev dead flown survived", 
+    message * unseen = msg_message("battle::army_report",
+      "index abbrev dead flown survived",
       s->index, "-?-", s->dead, s->flee, s->alive);
 
     for (bf=b->factions;bf;bf=bf->next) {
@@ -2631,22 +2666,22 @@ aftermath(battle * b)
 static void
 battle_punit(unit * u, battle * b)
 {
-	bfaction * bf;
-	strlist *S, *x;
+  bfaction * bf;
+  strlist *S, *x;
 
-	for (bf = b->factions;bf;bf=bf->next) {
-		faction *f = bf->faction;
+  for (bf = b->factions;bf;bf=bf->next) {
+    faction *f = bf->faction;
 
-		S = 0;
-		spunit(&S, f, u, 4, see_battle);
-		for (x = S; x; x = x->next) {
-			fbattlerecord(b, f, x->s);
-			if (u->faction == f)
-				battledebug(x->s);
-		}
-		if (S)
-			freestrlist(S);
-	}
+    S = 0;
+    spunit(&S, f, u, 4, see_battle);
+    for (x = S; x; x = x->next) {
+      fbattlerecord(b, f, x->s);
+      if (u->faction == f)
+        battledebug(x->s);
+    }
+    if (S)
+      freestrlist(S);
+  }
 }
 
 static void
@@ -2745,7 +2780,7 @@ print_stats(battle * b)
       cv_foreach(s2, b->sides) {
         if (enemy(s2, side)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          rsize = slprintf(bufp, size, "%s %s %d(%s)",  
+          rsize = slprintf(bufp, size, "%s %s %d(%s)",
             komma++ ? "," : header, loc_army, s2->index, abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
@@ -2823,35 +2858,35 @@ print_stats(battle * b)
 static int
 weapon_weight(const weapon * w, boolean missile)
 {
-	if (missile == i2b(fval(w->type, WTF_MISSILE))) {
-		return w->attackskill + w->defenseskill;
-	}
-	return 0;
+  if (missile == i2b(fval(w->type, WTF_MISSILE))) {
+    return w->attackskill + w->defenseskill;
+  }
+  return 0;
 }
 
 fighter *
 make_fighter(battle * b, unit * u, side * s1, boolean attack)
 {
 #define WMAX 16
-	weapon weapons[WMAX];
-	int owp[WMAX];
-	int dwp[WMAX];
-	int w = 0;
-	region *r = b->region;
-	item * itm;
-	fighter *fig = NULL;
-	int i, t = eff_skill(u, SK_TACTICS, r);
-	side *s2;
-	int h;
-	int berserk;
-	int strongmen;
-	int speeded = 0, speed = 1;
-	boolean pr_aid = false;
-	boolean stealth = (boolean)((fval(u, UFL_PARTEITARNUNG)!=0)?true:false);
-	int rest;
-	const group * g = NULL;
-	const attrib *a = a_find(u->attribs, &at_otherfaction);
-	const faction *stealthfaction = a?get_otherfaction(a):NULL;
+  weapon weapons[WMAX];
+  int owp[WMAX];
+  int dwp[WMAX];
+  int w = 0;
+  region *r = b->region;
+  item * itm;
+  fighter *fig = NULL;
+  int i, t = eff_skill(u, SK_TACTICS, r);
+  side *s2;
+  int h;
+  int berserk;
+  int strongmen;
+  int speeded = 0, speed = 1;
+  boolean pr_aid = false;
+  boolean stealth = (boolean)((fval(u, UFL_PARTEITARNUNG)!=0)?true:false);
+  int rest;
+  const group * g = NULL;
+  const attrib *a = a_find(u->attribs, &at_otherfaction);
+  const faction *stealthfaction = a?get_otherfaction(a):NULL;
   static const struct item_type * it_demonseye;
   static boolean init = false;
 
@@ -2865,9 +2900,9 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     if (agroup!=NULL) g = (const group*)agroup->data.v;
   }
 
-	/* Illusionen und Zauber kaempfen nicht */
-	if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))
-		return NULL;
+  /* Illusionen und Zauber kaempfen nicht */
+  if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))
+    return NULL;
 
   if (s1==NULL) {
     cv_foreach(s2, b->sides) {
@@ -2887,179 +2922,179 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
     * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
   }
-	fig = calloc(1, sizeof(struct fighter));
+  fig = calloc(1, sizeof(struct fighter));
 
-	cv_pushback(&s1->fighters, fig);
-	cv_pushback(&b->fighters, fig);
+  cv_pushback(&s1->fighters, fig);
+  cv_pushback(&b->fighters, fig);
 
-	fig->unit = u;
-	/* In einer Burg muß man a) nicht Angreifer sein, und b) drin sein, und
-	 * c) noch Platz finden. d) menschlich sein */
-	if (attack) fset(fig, FIG_ATTACKED);
-	if ((!attack) &&
-	    u->building &&
-	    u->building->sizeleft >= u->number &&
-	    playerrace(u->race)) {
-		fig->building = u->building;
-		fig->building->sizeleft -= u->number;
-	}
-	fig->status = u->status;
-	fig->side = s1;
-	fig->alive = u->number;
-	fig->side->alive += u->number;
-	fig->side->battle->alive += u->number;
-	fig->catmsg = -1;
+  fig->unit = u;
+  /* In einer Burg muß man a) nicht Angreifer sein, und b) drin sein, und
+   * c) noch Platz finden. d) menschlich sein */
+  if (attack) fset(fig, FIG_ATTACKED);
+  if ((!attack) &&
+      u->building &&
+      u->building->sizeleft >= u->number &&
+      playerrace(u->race)) {
+    fig->building = u->building;
+    fig->building->sizeleft -= u->number;
+  }
+  fig->status = u->status;
+  fig->side = s1;
+  fig->alive = u->number;
+  fig->side->alive += u->number;
+  fig->side->battle->alive += u->number;
+  fig->catmsg = -1;
 
-	/* Freigeben nicht vergessen! */
-	fig->person = calloc(fig->alive, sizeof(struct person));
+  /* Freigeben nicht vergessen! */
+  fig->person = calloc(fig->alive, sizeof(struct person));
 
-	h = u->hp / u->number;
-	assert(h);
-	rest = u->hp % u->number;
+  h = u->hp / u->number;
+  assert(h);
+  rest = u->hp % u->number;
 
-	/* Effekte von Sprüchen */
+  /* Effekte von Sprüchen */
 
-	{
-		static const curse_type * speed_ct;
-		speed_ct = ct_find("speed");
-		if (speed_ct) {
-			curse *c = get_curse(u->attribs, speed_ct);
-			if (c) {
-				speeded = get_cursedmen(u, c);
-				speed   = curse_geteffect(c);
-			}
-		}
-	}
+  {
+    static const curse_type * speed_ct;
+    speed_ct = ct_find("speed");
+    if (speed_ct) {
+      curse *c = get_curse(u->attribs, speed_ct);
+      if (c) {
+        speeded = get_cursedmen(u, c);
+        speed   = curse_geteffect(c);
+      }
+    }
+  }
 
-	/* Effekte von Alchemie */
-	berserk = get_effect(u, oldpotiontype[P_BERSERK]);
+  /* Effekte von Alchemie */
+  berserk = get_effect(u, oldpotiontype[P_BERSERK]);
   /* change_effect wird in ageing gemacht */
 
-	/* Effekte von Artefakten */
-	strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
+  /* Effekte von Artefakten */
+  strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
 
 #ifdef KARMA_MODULE
   for (a = a_find(u->attribs, &at_prayer_effect); a && a->type==&at_prayer_effect; a = a->next) {
     if (a->data.sa[0] == PR_AID) {
-			pr_aid = true;
-			break;
-		}
-	}
+      pr_aid = true;
+      break;
+    }
+  }
 #endif /* KARMA_MODULE */
 
-	/* Hitpoints, Attack- und Defence-Boni für alle Personen */
-	for (i = 0; i < fig->alive; i++) {
-		assert(i < fig->unit->number);
-		fig->person[i].hp = h;
-		if (i < rest)
-			fig->person[i].hp++;
+  /* Hitpoints, Attack- und Defence-Boni für alle Personen */
+  for (i = 0; i < fig->alive; i++) {
+    assert(i < fig->unit->number);
+    fig->person[i].hp = h;
+    if (i < rest)
+      fig->person[i].hp++;
 
-		if (i < speeded)
-			fig->person[i].speed = speed;
-		else
-			fig->person[i].speed = 1;
+    if (i < speeded)
+      fig->person[i].speed = speed;
+    else
+      fig->person[i].speed = 1;
 
-		if (i < berserk) {
-			fig->person[i].attack++;
-		}
-		/* Leute mit einem Aid-Prayer bekommen +1 auf fast alles. */
-		if (pr_aid) {
-			fig->person[i].attack++;
-			fig->person[i].defence++;
-			fig->person[i].damage++;
-			fig->person[i].damage_rear++;
+    if (i < berserk) {
+      fig->person[i].attack++;
+    }
+    /* Leute mit einem Aid-Prayer bekommen +1 auf fast alles. */
+    if (pr_aid) {
+      fig->person[i].attack++;
+      fig->person[i].defence++;
+      fig->person[i].damage++;
+      fig->person[i].damage_rear++;
         fig->person[i].flags |= FL_COURAGE;
-		}
-		/* Leute mit Kraftzauber machen +2 Schaden im Nahkampf. */
-		if (i < strongmen) {
-			fig->person[i].damage += 2;
-		}
-	}
+    }
+    /* Leute mit Kraftzauber machen +2 Schaden im Nahkampf. */
+    if (i < strongmen) {
+      fig->person[i].damage += 2;
+    }
+  }
 
-	/* Für alle Waffengattungne wird bestimmt, wie viele der Personen mit
-	 * ihr kämpfen könnten, und was ihr Wert darin ist. */
-	if (u->race->battle_flags & BF_EQUIPMENT) {
-		int oi=0, di=0;
-		for (itm=u->items;itm;itm=itm->next) {
-			const weapon_type * wtype = resource2weapon(itm->type->rtype);
-			if (wtype==NULL || itm->number==0) continue;
-			weapons[w].attackskill = weapon_skill(wtype, u, true);
-			weapons[w].defenseskill = weapon_skill(wtype, u, false);
-			weapons[w].type = wtype;
-			weapons[w].used = 0;
-			weapons[w].count = itm->number;
-			++w;
-		}
-		fig->weapons = calloc(sizeof(weapon), w+1);
-		memcpy(fig->weapons, weapons, w*sizeof(weapon));
+  /* Für alle Waffengattungne wird bestimmt, wie viele der Personen mit
+   * ihr kämpfen könnten, und was ihr Wert darin ist. */
+  if (u->race->battle_flags & BF_EQUIPMENT) {
+    int oi=0, di=0;
+    for (itm=u->items;itm;itm=itm->next) {
+      const weapon_type * wtype = resource2weapon(itm->type->rtype);
+      if (wtype==NULL || itm->number==0) continue;
+      weapons[w].attackskill = weapon_skill(wtype, u, true);
+      weapons[w].defenseskill = weapon_skill(wtype, u, false);
+      weapons[w].type = wtype;
+      weapons[w].used = 0;
+      weapons[w].count = itm->number;
+      ++w;
+    }
+    fig->weapons = calloc(sizeof(weapon), w+1);
+    memcpy(fig->weapons, weapons, w*sizeof(weapon));
 
-		for (i=0; i!=w; ++i) {
-			int j, o=0, d=0;
-			for (j=0; j!=i; ++j) {
-				if (weapon_weight(fig->weapons+j, true)>=weapon_weight(fig->weapons+i, true)) ++d;
-				if (weapon_weight(fig->weapons+j, false)>=weapon_weight(fig->weapons+i, false)) ++o;
-			}
-			for (j=i+1; j!=w; ++j) {
-				if (weapon_weight(fig->weapons+j, true)>weapon_weight(fig->weapons+i, true)) ++d;
-				if (weapon_weight(fig->weapons+j, false)>weapon_weight(fig->weapons+i, false)) ++o;
-			}
-			owp[o] = i;
-			dwp[d] = i;
-		}
-		/* jetzt enthalten owp und dwp eine absteigend schlechter werdende Liste der Waffen
-		 * oi and di are the current index to the sorted owp/dwp arrays
-		 * owp, dwp contain indices to the figther::weapons array */
+    for (i=0; i!=w; ++i) {
+      int j, o=0, d=0;
+      for (j=0; j!=i; ++j) {
+        if (weapon_weight(fig->weapons+j, true)>=weapon_weight(fig->weapons+i, true)) ++d;
+        if (weapon_weight(fig->weapons+j, false)>=weapon_weight(fig->weapons+i, false)) ++o;
+      }
+      for (j=i+1; j!=w; ++j) {
+        if (weapon_weight(fig->weapons+j, true)>weapon_weight(fig->weapons+i, true)) ++d;
+        if (weapon_weight(fig->weapons+j, false)>weapon_weight(fig->weapons+i, false)) ++o;
+      }
+      owp[o] = i;
+      dwp[d] = i;
+    }
+    /* jetzt enthalten owp und dwp eine absteigend schlechter werdende Liste der Waffen
+     * oi and di are the current index to the sorted owp/dwp arrays
+     * owp, dwp contain indices to the figther::weapons array */
 
-		/* hand out melee weapons: */
-		for (i=0; i!=fig->alive; ++i) {
-			int wpless = weapon_skill(NULL, u, true);
-			while (oi!=w && (fig->weapons[owp[oi]].used==fig->weapons[owp[oi]].count || fval(fig->weapons[owp[oi]].type, WTF_MISSILE))) {
-				++oi;
-			}
-			if (oi==w) break; /* no more weapons available */
-			if (weapon_weight(fig->weapons+owp[oi], false)<=wpless) {
-				continue; /* we fight better with bare hands */
-			}
-			fig->person[i].melee = &fig->weapons[owp[oi]];
-			++fig->weapons[owp[oi]].used;
-		}
-		/* hand out missile weapons (from back to front, in case of mixed troops). */
-		for (di=0, i=fig->alive; i--!=0;) {
-			while (di!=w && (fig->weapons[dwp[di]].used==fig->weapons[dwp[di]].count || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
-				++di;
-			}
-			if (di==w) break; /* no more weapons available */
-			if (weapon_weight(fig->weapons+dwp[di], true)>0) {
-				fig->person[i].missile = &fig->weapons[dwp[di]];
-				++fig->weapons[dwp[di]].used;
-			}
-		}
-	}
+    /* hand out melee weapons: */
+    for (i=0; i!=fig->alive; ++i) {
+      int wpless = weapon_skill(NULL, u, true);
+      while (oi!=w && (fig->weapons[owp[oi]].used==fig->weapons[owp[oi]].count || fval(fig->weapons[owp[oi]].type, WTF_MISSILE))) {
+        ++oi;
+      }
+      if (oi==w) break; /* no more weapons available */
+      if (weapon_weight(fig->weapons+owp[oi], false)<=wpless) {
+        continue; /* we fight better with bare hands */
+      }
+      fig->person[i].melee = &fig->weapons[owp[oi]];
+      ++fig->weapons[owp[oi]].used;
+    }
+    /* hand out missile weapons (from back to front, in case of mixed troops). */
+    for (di=0, i=fig->alive; i--!=0;) {
+      while (di!=w && (fig->weapons[dwp[di]].used==fig->weapons[dwp[di]].count || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
+        ++di;
+      }
+      if (di==w) break; /* no more weapons available */
+      if (weapon_weight(fig->weapons+dwp[di], true)>0) {
+        fig->person[i].missile = &fig->weapons[dwp[di]];
+        ++fig->weapons[dwp[di]].used;
+      }
+    }
+  }
 
-	if (it_demonseye && i_get(u->items, it_demonseye)) {
-		char lbuf[80];
-		const char * s = LOC(default_locale, rc_name(u->race, 3));
-		char * c = lbuf;
-		while (*s) *c++ = (char)toupper(*s++);
-	 	*c = 0;
-		fig->person[0].hp = unit_max_hp(u) * 3;
-		slprintf(buf, sizeof(buf), "Eine Stimme ertönt über dem Schlachtfeld. 'DIESES %sKIND IST MEIN. IHR SOLLT ES NICHT HABEN.'. Eine leuchtende Aura umgibt %s", lbuf, unitname(u));
-		battlerecord(b, buf);
-	}
+  if (it_demonseye && i_get(u->items, it_demonseye)) {
+    char lbuf[80];
+    const char * s = LOC(default_locale, rc_name(u->race, 3));
+    char * c = lbuf;
+    while (*s) *c++ = (char)toupper(*s++);
+    *c = 0;
+    fig->person[0].hp = unit_max_hp(u) * 3;
+    slprintf(buf, sizeof(buf), "Eine Stimme ertönt über dem Schlachtfeld. 'DIESES %sKIND IST MEIN. IHR SOLLT ES NICHT HABEN.'. Eine leuchtende Aura umgibt %s", lbuf, unitname(u));
+    battlerecord(b, buf);
+  }
 
-	s1->size[statusrow(fig->status)] += u->number;
-	s1->size[SUM_ROW] += u->number;
-	if (u->race->battle_flags & BF_NOBLOCK) {
-		s1->nonblockers[statusrow(fig->status)] += u->number;
-	}
+  s1->size[statusrow(fig->status)] += u->number;
+  s1->size[SUM_ROW] += u->number;
+  if (u->race->battle_flags & BF_NOBLOCK) {
+    s1->nonblockers[statusrow(fig->status)] += u->number;
+  }
 
-	if (fig->unit->race->flags & RCF_HORSE) {
-		fig->horses = fig->unit->number;
-		fig->elvenhorses = 0;
-	} else {
-		fig->horses = get_item(u, I_HORSE);
-		fig->elvenhorses = get_item(u, I_UNICORN);
-	}
+  if (fig->unit->race->flags & RCF_HORSE) {
+    fig->horses = fig->unit->number;
+    fig->elvenhorses = 0;
+  } else {
+    fig->horses = get_item(u, I_HORSE);
+    fig->elvenhorses = get_item(u, I_UNICORN);
+  }
 
   if (u->race->battle_flags & BF_EQUIPMENT) {
     for (itm=u->items; itm; itm=itm->next) {
@@ -3077,153 +3112,153 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   }
 
 
-	/* Jetzt muß noch geschaut werden, wo die Einheit die jeweils besten
-	 * Werte hat, das kommt aber erst irgendwo später. Ich entscheide
-	 * wärend des Kampfes, welche ich nehme, je nach Gegner. Deswegen auch
-	 * keine addierten boni. */
+  /* Jetzt muß noch geschaut werden, wo die Einheit die jeweils besten
+   * Werte hat, das kommt aber erst irgendwo später. Ich entscheide
+   * wärend des Kampfes, welche ich nehme, je nach Gegner. Deswegen auch
+   * keine addierten boni. */
 
-	/* Zuerst mal die Spezialbehandlung gewisser Sonderfälle. */
-	fig->magic = eff_skill(u, SK_MAGIC, r);
+  /* Zuerst mal die Spezialbehandlung gewisser Sonderfälle. */
+  fig->magic = eff_skill(u, SK_MAGIC, r);
 
-	if (fig->horses) {
-		if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r) 
+  if (fig->horses) {
+    if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
       || eff_skill(u, SK_RIDING, r) < 2 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
-			fig->horses = 0;
-	}
+      fig->horses = 0;
+  }
 
-	if (fig->elvenhorses) {
-		if (eff_skill(u, SK_RIDING, r) < 5 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
-			fig->elvenhorses = 0;
-	}
+  if (fig->elvenhorses) {
+    if (eff_skill(u, SK_RIDING, r) < 5 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
+      fig->elvenhorses = 0;
+  }
 
-	/* Schauen, wie gut wir in Taktik sind. */
-	if (t > 0 && u->race == new_race[RC_INSECT])
-		t -= 1 - (int) log10(fig->side->size[SUM_ROW]);
-	if (t > 0 && statusrow(fig->status) == FIGHT_ROW)
-		t += 1;
+  /* Schauen, wie gut wir in Taktik sind. */
+  if (t > 0 && u->race == new_race[RC_INSECT])
+    t -= 1 - (int) log10(fig->side->size[SUM_ROW]);
+  if (t > 0 && statusrow(fig->status) == FIGHT_ROW)
+    t += 1;
 #ifdef TACTICS_MALUS
   if (t > 0 && statusrow(fig->status) > BEHIND_ROW) {
     t -= TACTICS_MALUS;
   }
 #endif
 #ifdef TACTICS_RANDOM
-	if (t > 0) {
-		int bonus = 0;
+  if (t > 0) {
+    int bonus = 0;
 
-		for (i = 0; i < fig->alive; i++) {
-			int p_bonus = 0;
-			int rnd;
+    for (i = 0; i < fig->alive; i++) {
+      int p_bonus = 0;
+      int rnd;
 
-			do {
-				rnd = rng_int()%100;
-				if (rnd >= 40 && rnd <= 69)
-					p_bonus += 1;
-				else if (rnd <= 89)
-					p_bonus += 2;
-				else
-					p_bonus += 3;
-			} while(rnd >= 97);
-			bonus = max(p_bonus, bonus);
-		}
-		t += bonus;
-	}
+      do {
+        rnd = rng_int()%100;
+        if (rnd >= 40 && rnd <= 69)
+          p_bonus += 1;
+        else if (rnd <= 89)
+          p_bonus += 2;
+        else
+          p_bonus += 3;
+      } while(rnd >= 97);
+      bonus = max(p_bonus, bonus);
+    }
+    t += bonus;
+  }
 #endif
-	add_tactics(&fig->side->leader, fig, t);
-	return fig;
+  add_tactics(&fig->side->leader, fig, t);
+  return fig;
 }
 
 
 static fighter *
 join_battle(battle * b, unit * u, boolean attack)
 {
-	fighter *c = NULL;
-	fighter *fig;
+  fighter *c = NULL;
+  fighter *fig;
   attrib * a = a_find(u->attribs, &at_fleechance);
-  
+
   if (a!=NULL) return NULL;
-  
-	cv_foreach(fig, b->fighters) {
-		if (fig->unit == u) {
-			c = fig;
-			if (attack) fset(fig, FIG_ATTACKED);
-			break;
-		}
-	}
-	cv_next(fig);
-	if (!c) c = make_fighter(b, u, NULL, attack);
-	return c;
+
+  cv_foreach(fig, b->fighters) {
+    if (fig->unit == u) {
+      c = fig;
+      if (attack) fset(fig, FIG_ATTACKED);
+      break;
+    }
+  }
+  cv_next(fig);
+  if (!c) c = make_fighter(b, u, NULL, attack);
+  return c;
 }
 static const char *
 simplename(region * r)
 {
-	int i;
-	static char name[17];
-	const char * cp = rname(r, NULL);
-	for (i=0;*cp && i!=16;++i, ++cp) {
-		int c = *(unsigned char*)cp;
-		while (c && !isalpha(c) && !isspace(c)) {
-			++cp;
-			c = *(unsigned char*)cp;
-		}
-		if (isspace(c)) name[i] = '_';
-		else name[i] = *cp;
-		if (c==0) break;
-	}
-	name[i]=0;
-	return name;
+  int i;
+  static char name[17];
+  const char * cp = rname(r, NULL);
+  for (i=0;*cp && i!=16;++i, ++cp) {
+    int c = *(unsigned char*)cp;
+    while (c && !isalpha(c) && !isspace(c)) {
+      ++cp;
+      c = *(unsigned char*)cp;
+    }
+    if (isspace(c)) name[i] = '_';
+    else name[i] = *cp;
+    if (c==0) break;
+  }
+  name[i]=0;
+  return name;
 }
 
 static battle *
 make_battle(region * r)
 {
-	battle *b = calloc(1, sizeof(struct battle));
-	unit *u;
-	faction *lastf = NULL;
-	bfaction * bf;
-	static int max_fac_no = 0; /* need this only once */
+  battle *b = calloc(1, sizeof(struct battle));
+  unit *u;
+  faction *lastf = NULL;
+  bfaction * bf;
+  static int max_fac_no = 0; /* need this only once */
 
-	if (!nobattledebug) {
-		char zText[MAX_PATH];
-		char zFilename[MAX_PATH];
-		sprintf(zText, "%s/battles", basepath());
-		makedir(zText, 0700);
-		sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
-		bdebug = fopen(zFilename, "w");
-		if (!bdebug) log_error(("battles können nicht debugged werden\n"));
-		else {
-			dbgprintf((bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL)));
-		}
-		obs_count++;
-	}
-	nextside = 0;
+  if (!nobattledebug) {
+    char zText[MAX_PATH];
+    char zFilename[MAX_PATH];
+    sprintf(zText, "%s/battles", basepath());
+    makedir(zText, 0700);
+    sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
+    bdebug = fopen(zFilename, "w");
+    if (!bdebug) log_error(("battles können nicht debugged werden\n"));
+    else {
+      dbgprintf((bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL)));
+    }
+    obs_count++;
+  }
+  nextside = 0;
 
-	/* cv_init(&b->sides); */
-	b->region = r;
-	b->plane = getplane(r);
-	/* Finde alle Parteien, die den Kampf beobachten können: */
-	list_foreach(unit, r->units, u)
-		if (u->number > 0) {
-		if (lastf != u->faction) {	/* Speed optimiert, aufeinanderfolgende
-								 * * gleiche nicht getestet */
-			lastf = u->faction;
-			for (bf=b->factions;bf;bf=bf->next)
-				if (bf->faction==lastf) break;
-			if (!bf) {
-				bf = calloc(sizeof(bfaction), 1);
-				++b->nfactions;
-				bf->faction = lastf;
-				bf->next = b->factions;
-				b->factions = bf;
-			}
-		}
-	}
-	list_next(u);
+  /* cv_init(&b->sides); */
+  b->region = r;
+  b->plane = getplane(r);
+  /* Finde alle Parteien, die den Kampf beobachten können: */
+  list_foreach(unit, r->units, u)
+    if (u->number > 0) {
+    if (lastf != u->faction) {  /* Speed optimiert, aufeinanderfolgende
+                 * * gleiche nicht getestet */
+      lastf = u->faction;
+      for (bf=b->factions;bf;bf=bf->next)
+        if (bf->faction==lastf) break;
+      if (!bf) {
+        bf = calloc(sizeof(bfaction), 1);
+        ++b->nfactions;
+        bf->faction = lastf;
+        bf->next = b->factions;
+        b->factions = bf;
+      }
+    }
+  }
+  list_next(u);
 
-	for (bf=b->factions;bf;bf=bf->next) {
-		faction * f = bf->faction;
-		max_fac_no = max(max_fac_no, f->no);
-	}
-	return b;
+  for (bf=b->factions;bf;bf=bf->next) {
+    faction * f = bf->faction;
+    max_fac_no = max(max_fac_no, f->no);
+  }
+  return b;
 }
 
 static void
@@ -3246,7 +3281,7 @@ free_fighter(fighter * fig)
   }
   free(fig->person);
   free(fig->weapons);
-  
+
 }
 
 static void
@@ -3256,11 +3291,11 @@ free_battle(battle * b)
   fighter *fighter;
   meffect *meffect;
   int max_fac_no = 0;
-  
+
   if (bdebug) {
     fclose(bdebug);
   }
-  
+
   while (b->factions) {
     bfaction * bf = b->factions;
     faction * f = bf->faction;
@@ -3268,7 +3303,7 @@ free_battle(battle * b)
     max_fac_no = max(max_fac_no, f->no);
     free(bf);
   }
-  
+
   cv_foreach(side, b->sides) {
     free_side(side);
     free(side);
@@ -3292,37 +3327,37 @@ free_battle(battle * b)
 static int *
 get_alive(battle * b, side * s, faction * vf, boolean see)
 {
-	static int alive[NUMROWS];
-	fighter *f;
-	memset(alive, 0, NUMROWS * sizeof(int));
-	cv_foreach(f, s->fighters) {
-		if (f->alive && seematrix(vf, s)==see)
-			alive[get_unitrow(f)] += f->alive;
-	} cv_next(f);
-	return alive;
+  static int alive[NUMROWS];
+  fighter *f;
+  memset(alive, 0, NUMROWS * sizeof(int));
+  cv_foreach(f, s->fighters) {
+    if (f->alive && seematrix(vf, s)==see)
+      alive[get_unitrow(f)] += f->alive;
+  } cv_next(f);
+  return alive;
 }
 
 static int
 battle_report(battle * b)
 {
-	side *s, *s2;
-	boolean cont = false;
-	boolean komma;
-	bfaction *bf;
+  side *s, *s2;
+  boolean cont = false;
+  boolean komma;
+  bfaction *bf;
 
-	buf[0] = 0;
+  buf[0] = 0;
 
-	cv_foreach(s, b->sides) {
-		cv_foreach(s2, b->sides) {
-			if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
-				cont = true;
+  cv_foreach(s, b->sides) {
+    cv_foreach(s2, b->sides) {
+      if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
+        cont = true;
         break;
-			}
-		} cv_next(s2);
+      }
+    } cv_next(s2);
     if (cont) break;
-	} cv_next(s);
+  } cv_next(s);
 
-	printf(" %d", b->turn);
+  printf(" %d", b->turn);
   fflush(stdout);
 
   for (bf=b->factions;bf;bf=bf->next) {
@@ -3341,10 +3376,10 @@ battle_report(battle * b)
     komma   = false;
     cv_foreach(s, b->sides) {
       if (s->alive) {
-				int r, k = 0, * alive = get_alive(b, s, fac, seematrix(fac, s));
-				int l = FIGHT_ROW;
-				const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
-				const char * loc_army = LOC(fac->locale, "battle_army");
+        int r, k = 0, * alive = get_alive(b, s, fac, seematrix(fac, s));
+        int l = FIGHT_ROW;
+        const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
+        const char * loc_army = LOC(fac->locale, "battle_army");
         char buffer[32];
 
         if (komma) {
@@ -3353,7 +3388,7 @@ battle_report(battle * b)
           size -= rsize;
           bufp += rsize;
         }
-        snprintf(buffer, sizeof(buffer), "%s %2d(%s): ", 
+        snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
           loc_army, s->index, abbrev);
         buffer[sizeof(buffer)-1] = 0;
 
@@ -3362,8 +3397,8 @@ battle_report(battle * b)
         size -= rsize;
         bufp += rsize;
 
-				for (r=FIGHT_ROW;r!=NUMROWS;++r) {
-					if (alive[r]) {
+        for (r=FIGHT_ROW;r!=NUMROWS;++r) {
+          if (alive[r]) {
             if (l!=FIGHT_ROW) {
               rsize = strlcpy(bufp, "+", size);
               if (rsize>size) rsize = size-1;
@@ -3384,16 +3419,16 @@ battle_report(battle * b)
             bufp += rsize;
 
             k = 0;
-						l = r+1;
-					} else ++k;
-				}
+            l = r+1;
+          } else ++k;
+        }
 
         komma = true;
-			}
-		} cv_next(s);
-		fbattlerecord(b, fac, buf);
-	}
-	return cont;
+      }
+    } cv_next(s);
+    fbattlerecord(b, fac, buf);
+  }
+  return cont;
 }
 
 static void
@@ -3470,67 +3505,67 @@ join_allies(battle * b)
 static void
 flee(const troop dt)
 {
-	fighter * fig = dt.fighter;
+  fighter * fig = dt.fighter;
 #ifndef NO_RUNNING
-	unit * u = fig->unit;
-	int carry = personcapacity(u) - u->race->weight;
-	int money;
-	item ** ip = &u->items;
+  unit * u = fig->unit;
+  int carry = personcapacity(u) - u->race->weight;
+  int money;
+  item ** ip = &u->items;
 
-	while (*ip) {
-		item * itm = *ip;
-		const item_type * itype = itm->type;
-		int keep = 0;
+  while (*ip) {
+    item * itm = *ip;
+    const item_type * itype = itm->type;
+    int keep = 0;
 
-		if (fval(itype, ITF_ANIMAL)) {
-			/* Regeländerung: Man muß das Tier nicht reiten können,
-			 * um es vom Schlachtfeld mitzunehmen, ist ja nur
-			 * eine Region weit. * */
-			keep = min(1, itm->number);
-			/* da ist das weight des tiers mit drin */
-			carry += itype->capacity - itype->weight;
-		} else if (itm->type->weight <= 0) {
-			/* if it doesn't weigh anything, it won't slow us down */
-			keep = itm->number;
-		}
-		/* jeder troop nimmt seinen eigenen Teil der Sachen mit */
-		if (keep>0){
-			if (itm->number==keep) {
-				i_add(&fig->run.items, i_remove(ip, itm));
-			} else {
-				item *run_itm = i_new(itype, keep);
-				i_add(&fig->run.items, run_itm);
-				i_change(ip, itype, -keep);
-			}
-		}
-		if (*ip==itm) ip = &itm->next;
-	}
+    if (fval(itype, ITF_ANIMAL)) {
+      /* Regeländerung: Man muß das Tier nicht reiten können,
+       * um es vom Schlachtfeld mitzunehmen, ist ja nur
+       * eine Region weit. * */
+      keep = min(1, itm->number);
+      /* da ist das weight des tiers mit drin */
+      carry += itype->capacity - itype->weight;
+    } else if (itm->type->weight <= 0) {
+      /* if it doesn't weigh anything, it won't slow us down */
+      keep = itm->number;
+    }
+    /* jeder troop nimmt seinen eigenen Teil der Sachen mit */
+    if (keep>0){
+      if (itm->number==keep) {
+        i_add(&fig->run.items, i_remove(ip, itm));
+      } else {
+        item *run_itm = i_new(itype, keep);
+        i_add(&fig->run.items, run_itm);
+        i_change(ip, itype, -keep);
+      }
+    }
+    if (*ip==itm) ip = &itm->next;
+  }
 
-	/* we will take money with us */
-	money = get_money(u);
-	/* nur ganzgeflohene/resttote Einheiten verlassen die Region */
-	if (money > carry) money = carry;
-	if (money > 0) {
-		i_change(&u->items, i_silver, -money);
-		i_change(&fig->run.items, i_silver, +money);
-	}
+  /* we will take money with us */
+  money = get_money(u);
+  /* nur ganzgeflohene/resttote Einheiten verlassen die Region */
+  if (money > carry) money = carry;
+  if (money > 0) {
+    i_change(&u->items, i_silver, -money);
+    i_change(&fig->run.items, i_silver, +money);
+  }
 #endif
 
-	fig->run.hp += fig->person[dt.index].hp;
-	++fig->run.number;
+  fig->run.hp += fig->person[dt.index].hp;
+  ++fig->run.number;
 
-	remove_troop(dt);
+  remove_troop(dt);
 }
 
 #ifdef DELAYED_OFFENSE
 static boolean
 guarded_by(region * r, faction * f)
 {
-	unit * u;
-	for (u=r->units;u;u=u->next) {
-		if (u->faction == f && getguard(u)) return true;
-	}
-	return false;
+  unit * u;
+  for (u=r->units;u;u=u->next) {
+    if (u->faction == f && getguard(u)) return true;
+  }
+  return false;
 }
 #endif
 
@@ -3546,7 +3581,7 @@ init_battle(region * r, battle **bp)
     if (fval(u, UFL_LONGACTION)) continue;
     if (u->number > 0) {
       order * ord;
-      
+
       for (ord=u->orders;ord;ord=ord->next) {
         static boolean init = false;
         static const curse_type * peace_ct, * slave_ct, * calm_ct;
@@ -3670,7 +3705,9 @@ init_battle(region * r, battle **bp)
               }
             }
             /* Ende Fehlerbehandlung */
-
+#ifdef SIMPLE_COMBAT
+            fset(u, UFL_LONGACTION);
+#endif
             if (b==NULL) {
               unit * utmp;
               for (utmp=r->units; utmp!=NULL; utmp=utmp->next) {
@@ -3897,7 +3934,7 @@ do_battle(void)
                 break;
               default:
                 if ((fig->person[dt.index].flags & FL_HIT) == 0) continue;
-                if (b->turn<=1) continue; 
+                if (b->turn<=1) continue;
                 if (fig->person[dt.index].hp <= runhp) break;
                 if (fig->person[dt.index].flags & FL_PANICED) {
                   if ((fig->person[dt.index].flags & FL_COURAGE)==0) break;
