@@ -453,6 +453,7 @@ get_unitrow(const fighter * af)
   return result;
 }
 
+#if 0
 static int
 sort_fighterrow(fighter ** elem1, fighter ** elem2)
 {
@@ -462,6 +463,7 @@ sort_fighterrow(fighter ** elem1, fighter ** elem2)
   b = get_unitrow(*elem2);
   return (a < b) ? -1 : ((a == b) ? 0 : 1);
 }
+#endif
 
 static void
 reportcasualties(battle * b, fighter * fig, int dead)
