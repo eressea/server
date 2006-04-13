@@ -116,6 +116,12 @@ static int melee_range[2] = {FIGHT_ROW, FIGHT_ROW};
 
 const troop no_troop = {0, 0};
 
+static int
+army_index(side * s)
+{
+  return s->battle->nsides - s->index - 1;
+}
+
 region *
 fleeregion(const unit * u)
 {
@@ -2249,6 +2255,7 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
       s1->index = nextside++;
       s1->nextF = bf->sides;
       bf->sides = s1;
+      ++b->nsides;
       break;
     }
   }
@@ -2555,10 +2562,10 @@ aftermath(battle * b)
   for (s=b->sides;s;s=s->next) {
     message * seen = msg_message("battle::army_report",
       "index abbrev dead flown survived",
-      s->index, sideabkz(s, false), s->dead, s->flee, s->alive);
+      army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
     message * unseen = msg_message("battle::army_report",
       "index abbrev dead flown survived",
-      s->index, "-?-", s->dead, s->flee, s->alive);
+      army_index(s), "-?-", s->dead, s->flee, s->alive);
 
     for (bf=b->factions;bf;bf=bf->next) {
       faction * f = bf->faction;
@@ -2735,7 +2742,7 @@ print_stats(battle * b)
 
       fbattlerecord(b, f, " ");
 
-      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, s->index,
+      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, army_index(s),
         seematrix(f, s) ? sidename(s, false) : LOC(f->locale, "unknown_faction"));
       fbattlerecord(b, f, buf);
 
@@ -2748,7 +2755,7 @@ print_stats(battle * b)
         if (enemy(s2, s)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)",
-            komma++ ? "," : header, loc_army, s2->index, abbrev);
+            komma++ ? "," : header, loc_army, army_index(s2), abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
           bufp += rsize;
@@ -2765,7 +2772,7 @@ print_stats(battle * b)
         if (s->enemy[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)", komma++ ? "," : header, loc_army,
-            s2->index, abbrev);
+            army_index(s2), abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
           bufp += rsize;
@@ -3369,7 +3376,7 @@ battle_report(battle * b)
           bufp += rsize;
         }
         snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
-          loc_army, s->index, abbrev);
+          loc_army, army_index(s), abbrev);
         buffer[sizeof(buffer)-1] = 0;
 
         rsize = strlcpy(bufp, buffer, size);
@@ -3770,7 +3777,7 @@ battle_stats(FILE * F, battle * b)
       }
     }
 
-    fprintf(F, "##STATS## Heer %u - %s:\n", s->index, factionname(s->bf->faction));
+    fprintf(F, "##STATS## Heer %u - %s:\n", army_index(s), factionname(s->bf->faction));
     for (stat=stats;stat!=NULL;stat=stat->next) {
       fprintf(F, "%s %u : %u\n", stat->wtype?stat->wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
     }

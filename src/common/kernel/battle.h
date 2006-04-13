@@ -62,6 +62,7 @@ extern "C" {
     struct fighter ** fighters;
 #endif
     struct side * sides;
+    int nsides;
     cvector meffects;
     int		max_tactics;
     int		turn;
