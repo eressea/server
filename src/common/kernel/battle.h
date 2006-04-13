@@ -19,8 +19,6 @@ extern "C" {
 
 #define SHOW_KILLS
 #undef SMALL_BATTLE_MESSAGES
-#undef FIXED_OPPONENTS
-#undef NO_RUNNING  
 
   /** more defines **/
 #define FS_ENEMY 1
@@ -29,6 +27,7 @@ extern "C" {
   /***** Verteidigungslinien.
   * Eressea hat 4 Verteidigungslinien. 1 ist vorn, 5. enthält Summen 
   */
+
 #define NUMROWS 5
 #define SUM_ROW 0
 #define FIGHT_ROW 1
@@ -37,6 +36,7 @@ extern "C" {
 #define FLEE_ROW 4
 #define LAST_ROW (NUMROWS-1)
 #define FIRST_ROW FIGHT_ROW
+#define MAXSIDES 256 /* if there are ever more than this, we're fucked. */
 
   struct message;
 
@@ -50,21 +50,24 @@ extern "C" {
     boolean attacker;
   } bfaction;
 
+
   typedef struct battle {
     cvector leaders;
     struct region *region;
     struct plane  *plane;
     bfaction * factions;
     int nfactions;
-    cvector fighters;
-    cvector sides;
+    int nfighters;
+#if 0
+    struct fighter ** fighters;
+#endif
+    struct side * sides;
     cvector meffects;
     int		max_tactics;
     int		turn;
     boolean has_tactics_turn;
     int     keeploot;
     boolean reelarrow;
-    int     dh;
     int     alive;
 #ifdef SMALL_BATTLE_MESSAGES
     boolean small;
@@ -76,17 +79,22 @@ extern "C" {
     int value;
   } tactics;
 
+#define SIDE_STEALTH   1<<0
+#ifdef SIMPLE_COMBAT
+#define SIDE_ATTACKER  1<<1
+#endif
   typedef struct side {
-    struct tactics leader;				/* der beste Taktiker des Heeres */
+    struct side * next; /* nächstes Heer in der Schlacht */
     struct side * nextF; /* nächstes Heer der gleichen Partei */
     struct battle * battle;
     struct bfaction * bf; /* Die Partei, die hier kämpft */
     const struct group * group;
+    struct tactics leader;				/* der beste Taktiker des Heeres */
 # define E_ENEMY 1
 # define E_ATTACKING 2
-    int enemy[128];
+    unsigned char enemy[128];
     struct side * enemies[128];
-    cvector fighters;	/* vector der Einheiten dieser Fraktion */
+    struct fighter * fighters;
     int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
     int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */
     int nonblockers[NUMROWS]; /* Anzahl nichtblockierender Kämpfer, z.B. Schattenritter. */
@@ -96,8 +104,7 @@ extern "C" {
     int dead;
     int casualties; /* those dead that were real people, not undead! */
     int healed;
-    boolean dh;
-    boolean stealth;	/* Die Einheiten sind getarnt */
+    unsigned int flags;
     const struct faction *stealthfaction;
   } side;
 
@@ -117,10 +124,6 @@ extern "C" {
 #define FL_STUNNED	32	/* eine Runde keinen Angriff */
 #define FL_HIT    	64	/* the person at attacked */
 
-  /*** fighter::flags ***/
-#define FIG_ATTACKED   1
-#define FIG_NOLOOT     2
-
   typedef struct troop {
     struct fighter *fighter;
     int index;
@@ -132,7 +135,11 @@ extern "C" {
     int count;
   } armor;
 
+  /*** fighter::flags ***/
+#define FIG_ATTACKER   1<<0
+#define FIG_NOLOOT     1<<1
   typedef struct fighter {
+    struct fighter * next;
     struct side *side;
     struct unit *unit;                /* Die Einheit, die hier kämpft */
     struct building *building;        /* Gebäude, in dem die Einheit evtl. steht */
@@ -163,18 +170,13 @@ extern "C" {
       int last_action : 4;     /* In welcher Runde haben wir zuletzt etwas getan */
       struct weapon * missile; /* missile weapon */
       struct weapon * melee;   /* melee weapon */
-#ifdef FIXED_OPPONENTS
-      struct troop opponent;   /* default opponent */
-#endif
     } * person;
-    int flags;
+    unsigned int flags;
     struct {
       int number;  /* number of people who have flown */
       int hp;      /* accumulated hp of fleeing people */
-#ifndef NO_RUNNING
       struct region *region;  /* destination of fleeing people */
       struct item * items; /* items they take */
-#endif
     } run;
 #ifndef SIMPLE_COMBAT
     int action_counter;	/* number of active actions the struct unit did in the fight */
@@ -208,7 +210,7 @@ extern "C" {
   extern void do_battle(void);
 
   /* for combar spells and special attacks */
-  extern troop select_enemy(struct battle * b, struct fighter * af, int minrow, int maxrow, boolean advance);
+  extern troop select_enemy(struct fighter * af, int minrow, int maxrow, boolean advance);
   extern int count_enemies(struct battle * b, struct side * as, int minrow, int maxrow, boolean advance);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
   extern void battlemsg(battle * b, struct unit * u, const char * s);
@@ -218,7 +220,7 @@ extern "C" {
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
   extern struct cvector * fighters(struct battle *b, struct fighter *af, int minrow, int maxrow, int mask);
-  extern int countallies(struct side * as);
+  extern int count_allies(struct side * as, int minrow, int maxrow, boolean advance);
   extern int get_unitrow(const struct fighter * af);
   extern boolean helping(struct side * as, struct side * ds);
   extern void rmfighter(fighter *df, int i);
@@ -228,6 +230,7 @@ extern "C" {
   extern int statusrow(int status);
   extern void drain_exp(struct unit *u, int d);
   extern void rmtroop(troop dt);
+  extern boolean is_attacker(const fighter * fig);
 
 #ifdef __cplusplus
 }

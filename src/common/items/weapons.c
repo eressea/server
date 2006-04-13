@@ -106,7 +106,7 @@ attack_firesword(const troop * at, const struct weapon_type * wtype, int *casual
 	}
 
 	do {
-		dt = select_enemy(fi->side->battle, fi, minrow, maxrow, true);
+		dt = select_enemy(fi, minrow, maxrow, true);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, *at, AT_SPELL, damage, 1);
@@ -167,7 +167,7 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 
 	while (--n >= 0) {
 		/* Select defender */
-		dt = select_enemy(b, af, minrow, maxrow, true);
+		dt = select_enemy(af, minrow, maxrow, true);
 		if (!dt.fighter)
 			break;
 

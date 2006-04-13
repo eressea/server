@@ -323,29 +323,30 @@ select_corpse(battle * b, fighter * af)
 {
   int di, maxcasualties = 0;
   fighter *df;
-  side *side;
+  side *s;
 
-  cv_foreach(side, b->sides) {
-    if (!af || (!enemy(af->side, side) && allysf(af->side, side->bf->faction)))
-      maxcasualties += side->casualties;
-  }
-  cv_next(side);
-
-  di = rng_int() % maxcasualties;
-  cv_foreach(df, b->fighters) {
-    /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
-     * werden! */
-    int dead = df->unit->number - (df->alive + df->run.number);
-    if (!playerrace(df->unit->race)) continue;
-
-    if (af && !helping(af->side, df->side))
-      continue;
-    if (di < dead) {
-      return df;
+  for (s=b->sides;s;s=s->next) {
+    if (af==NULL || (!enemy(af->side, s) && allysf(af->side, s->bf->faction))) {
+      maxcasualties += s->casualties;
     }
-    di -= dead;
   }
-  cv_next(df);
+  di = rng_int() % maxcasualties;
+  for (s=b->sides;s;s=s->next) {
+    for (df=s->fighters;df;df=df->next) {
+      /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
+      * werden! */
+      int dead = df->unit->number - (df->alive + df->run.number);
+      if (!playerrace(df->unit->race)) continue;
+
+      if (af && !helping(af->side, df->side))
+        continue;
+      if (di < dead) {
+        return df;
+      }
+      di -= dead;
+    }
+  }
+
   return NULL;
 }
 
@@ -354,25 +355,6 @@ helping(side * as, side * ds)
 {
   if (as->bf->faction==ds->bf->faction) return true;
   return (boolean)(!enemy(as, ds) && allysf(as, ds->bf->faction));
-}
-
-
-/* return the number of live allies warning: this function only considers
- * troops that are still alive, not those that are still fighting although
- * dead. */
-int
-countallies(side * as)
-{
-  battle *b = as->battle;
-  side *s;
-  int count = 0;
-
-  cv_foreach(s, b->sides) {
-    if (!helping(as, s)) continue;
-    count += s->size[SUM_ROW];
-  }
-  cv_next(s);
-  return count;
 }
 
 int
@@ -419,26 +401,15 @@ hpflee(int status)
 int
 get_unitrow(const fighter * af)
 {
-  static boolean * counted = NULL;
-  static size_t csize = 0;
-
-  battle * b = af->side->battle;
+  boolean counted[MAXSIDES];
   int enemyfront = 0;
   int line, result;
   int retreat = 0;
   int size[NUMROWS];
   int row = statusrow(af->status);
   int front = 0;
-  size_t bsize;
 
-  bsize = cv_size(&b->sides);
-
-  if (csize<bsize) {
-    if (counted) free(counted);
-    csize=bsize;
-    counted = calloc(sizeof(boolean), bsize);
-  }
-  else memset(counted, 0, bsize*sizeof(boolean));
+  memset(counted, 0, sizeof(counted));
   memset(size, 0, sizeof(size));
   for (line=FIRST_ROW;line!=NUMROWS;++line) {
     int si;
@@ -491,19 +462,12 @@ reportcasualties(battle * b, fighter * fig, int dead)
 {
   struct message * m;
   if (fig->alive == fig->unit->number) return;
-#ifndef NO_RUNNING
   if (fig->run.region == NULL) {
     fig->run.region = fleeregion(fig->unit);
     if (fig->run.region == NULL) fig->run.region = b->region;
   }
-#endif
-#ifdef NO_RUNNING
-  m = msg_message("casualties", "unit runto run alive fallen",
-    fig->unit, NULL, fig->run.number, fig->alive, dead);
-#else
   m = msg_message("casualties", "unit runto run alive fallen",
     fig->unit, fig->run.region, fig->run.number, fig->alive, dead);
-#endif
   message_all(b, m);
   msg_release(m);
 }
@@ -1205,7 +1169,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 static int
 count_side(const side * s, int minrow, int maxrow, boolean advance)
 {
-  void **fi;
+  fighter * fig;
   int people = 0;
   int unitrow[NUMROWS];
   int i;
@@ -1214,8 +1178,7 @@ count_side(const side * s, int minrow, int maxrow, boolean advance)
     for (i=0;i!=NUMROWS;++i) unitrow[i] = -1;
   }
 
-  for (fi = s->fighters.begin; fi != s->fighters.end; ++fi) {
-    const fighter *fig = *fi;
+  for (fig = s->fighters; fig; fig = fig->next) {
     int row;
 
     if (fig->alive - fig->removed <= 0) continue;
@@ -1233,28 +1196,45 @@ count_side(const side * s, int minrow, int maxrow, boolean advance)
   return people;
 }
 
+/* return the number of live allies warning: this function only considers
+* troops that are still alive, not those that are still fighting although
+* dead. */
+int
+count_allies(side * as, int minrow, int maxrow, boolean advance)
+{
+  battle *b = as->battle;
+  side *s;
+  int count = 0;
+
+  for (s=b->sides;s;s=s->next) {
+    if (!helping(as, s)) continue;
+    count += count_side(s, minrow, maxrow, advance);
+  }
+  return count;
+}
+
 /* new implementation of count_enemies ignores mask, since it was never used */
 int
 count_enemies(battle * b, side * as, int minrow, int maxrow, boolean advance)
 {
   int i = 0;
-  void **si;
+  side * s;
 
   if (maxrow<FIRST_ROW) return 0;
 
-  for (si = b->sides.begin; si != b->sides.end; ++si) {
-    side *side = *si;
-    if (as==NULL || enemy(side, as)) {
-      i += count_side(side, minrow, maxrow, advance);
+  for (s = b->sides; s; s = s->next) {
+    if (as==NULL || enemy(s, as)) {
+      i += count_side(s, minrow, maxrow, advance);
     }
   }
   return i;
 }
 
 troop
-select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
+select_enemy(fighter * af, int minrow, int maxrow, boolean advance)
 {
   side *as = af->side;
+  battle * b = as->battle;
   int si;
   int enemies;
 
@@ -1274,7 +1254,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
   enemies = rng_int() % enemies;
   for (si=0;as->enemies[si];++si) {
     side *ds = as->enemies[si];
-    void ** fi;
+    fighter * df;
     int unitrow[NUMROWS];
 
     if (advance) {
@@ -1282,8 +1262,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
       for (ui=0;ui!=NUMROWS;++ui) unitrow[ui] = -1;
     }
 
-    for (fi=ds->fighters.begin;fi!=ds->fighters.end;++fi) {
-      fighter * df = *fi;
+    for (df=ds->fighters; df ; df = df->next) {
       int dr;
 
       dr = statusrow(df->status);
@@ -1296,7 +1275,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
 
       if (dr < minrow || dr > maxrow) continue;
       if (df->alive - df->removed > enemies) {
-    troop dt;
+        troop dt;
         dt.index = enemies;
         dt.fighter = df;
         return dt;
@@ -1322,30 +1301,8 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
   }
   minrow = max(minrow, FIGHT_ROW);
 
-#ifdef FIXED_OPPONENTS
-  dt = af->person[at.index].opponent;
-  if (dt.fighter!=NULL && dt.index<dt.fighter->alive-dt.fighter->removed) {
-    fighter * df = dt.fighter;
-    int row = get_unitrow(df);
-    if (row>=minrow && row<=maxrow) {
-      troop ot = df->person[dt.index].opponent;
-      if (ot.fighter==NULL || ot.index>=ot.fighter->alive-ot.fighter->removed) {
-        df->person[dt.index].opponent = at;
-      }
-      return dt;
-    }
-  }
-#endif
-  dt = select_enemy(b, at.fighter, minrow, maxrow, true);
-#ifdef FIXED_OPPONENTS
-  if (dt.fighter!=NULL) {
-    fighter * df = dt.fighter;
-    troop ot = df->person[dt.index].opponent;
-    if (ot.fighter==NULL || ot.index>=ot.fighter->alive-ot.fighter->removed) {
-      df->person[dt.index].opponent = at;
-    }
-  }
-#endif
+  dt = select_enemy(at.fighter, minrow, maxrow, true);
+
   return dt;
 }
 
@@ -1369,17 +1326,17 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
 cvector *
 fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
 {
-  fighter *fig;
-  cvector *fightervp;
-  int row;
+  side * s;
+  cvector *fightervp = malloc(sizeof(cvector));
 
-  fightervp = malloc(sizeof(cvector));
   cv_init(fightervp);
 
-  cv_foreach(fig, b->fighters) {
-    row = get_unitrow(fig);
-    if (row >= minrow && row <= maxrow) {
-      switch (mask) {
+  for (s = b->sides; s; s = s->next) {
+    fighter *fig;
+    for (fig = s->fighters; fig; fig = fig->next) {
+      int row = get_unitrow(fig);
+      if (row >= minrow && row <= maxrow) {
+        switch (mask) {
         case FS_ENEMY:
           if (enemy(fig->side, af->side)) cv_pushback(fightervp, fig);
           break;
@@ -1392,10 +1349,10 @@ fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
           break;
         default:
           assert(0 || !"Ungültiger Allianzstatus in fighters()");
+        }
       }
-
     }
-  } cv_next(fig);
+  }
 
   return fightervp;
 }
@@ -1411,7 +1368,7 @@ report_failed_spell(battle * b, unit * mage, const spell * sp)
 void
 do_combatmagic(battle *b, combatmagic_t was)
 {
-  void **fi;
+  side * s;
   region *r = b->region;
   castorder *co;
   castorder *cll[MAX_SPELLRANK];
@@ -1423,21 +1380,22 @@ do_combatmagic(battle *b, combatmagic_t was)
     cll[spellrank] = (castorder*)NULL;
   }
 
-  for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-    fighter * fig = *fi;
-    unit * mage = fig->unit;
+  for (s = b->sides; s; s = s->next) {
+    fighter * fig;
+    for (fig = s->fighters; fig; fig = fig->next) {
+      unit * mage = fig->unit;
 
-    if (fig->alive <= 0) continue; /* fighter kann im Kampf getötet worden sein */
+      if (fig->alive <= 0) continue; /* fighter kann im Kampf getötet worden sein */
 
-    level = eff_skill(mage, SK_MAGIC, r);
-    if (level > 0) {
-      double power;
-      const spell *sp;
-      const struct locale * lang = mage->faction->locale;
-      char cmd[128];
-      order * ord;
+      level = eff_skill(mage, SK_MAGIC, r);
+      if (level > 0) {
+        double power;
+        const spell *sp;
+        const struct locale * lang = mage->faction->locale;
+        char cmd[128];
+        order * ord;
 
-      switch(was) {
+        switch(was) {
         case DO_PRECOMBATSPELL:
           sp = get_combatspell(mage, 0);
           sl = get_combatspelllevel(mage, 0);
@@ -1449,38 +1407,39 @@ do_combatmagic(battle *b, combatmagic_t was)
         default:
           /* Fehler! */
           return;
-      }
-      if (sp == NULL)
-        continue;
+        }
+        if (sp == NULL)
+          continue;
 
-      snprintf(cmd, 128, "%s \"%s\"",
-        LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
+        snprintf(cmd, 128, "%s \"%s\"",
+          LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
 
-      ord = parse_order(cmd, lang);
-      if (cancast(mage, sp, 1, 1, ord) == false) {
+        ord = parse_order(cmd, lang);
+        if (cancast(mage, sp, 1, 1, ord) == false) {
+          free_order(ord);
+          continue;
+        }
+
+        level = eff_spelllevel(mage, sp, level, 1);
+        if (sl > 0) level = min(sl, level);
+        if (level < 0) {
+          report_failed_spell(b, mage, sp);
+          free_order(ord);
+          continue;
+        }
+
+        power = spellpower(r, mage, sp, level, ord);
         free_order(ord);
-        continue;
-      }
-
-      level = eff_spelllevel(mage, sp, level, 1);
-      if (sl > 0) level = min(sl, level);
-      if (level < 0) {
-        report_failed_spell(b, mage, sp);
-        free_order(ord);
-        continue;
-      }
-
-      power = spellpower(r, mage, sp, level, ord);
-      free_order(ord);
-      if (power <= 0) { /* Effekt von Antimagie */
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, sp, level, 1);
-      } else if (fumble(r, mage, sp, sp->level) == true) {
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, sp, level, 1);
-      } else {
-        co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
-        add_castorder(&cll[(int)(sp->rank)], co);
+        if (power <= 0) { /* Effekt von Antimagie */
+          report_failed_spell(b, mage, sp);
+          pay_spell(mage, sp, level, 1);
+        } else if (fumble(r, mage, sp, sp->level) == true) {
+          report_failed_spell(b, mage, sp);
+          pay_spell(mage, sp, level, 1);
+        } else {
+          co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
+          add_castorder(&cll[(int)(sp->rank)], co);
+        }
       }
     }
   }
@@ -1901,20 +1860,23 @@ damage_building(battle *b, building *bldg, int damage_abs)
   /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
 
   if (bldg->type->flags & BTF_PROTECTION) {
-    fighter *fi;
+    side * s;
 
     bldg->sizeleft = bldg->size;
 
-    cv_foreach(fi, b->fighters) {
-      if (fi->building == bldg) {
-        if (bldg->sizeleft >= fi->unit->number) {
-          fi->building = bldg;
-          bldg->sizeleft -= fi->unit->number;
-        } else {
-          fi->building = NULL;
+    for (s=b->sides;s;s=s->next) {
+      fighter * fig;
+      for (fig=s->fighters;fig;fig=fig->next) {
+        if (fig->building == bldg) {
+          if (bldg->sizeleft >= fig->unit->number) {
+            fig->building = bldg;
+            bldg->sizeleft -= fig->unit->number;
+          } else {
+            fig->building = NULL;
+          }
         }
       }
-    } cv_next(fi);
+    }
   }
 }
 
@@ -1931,9 +1893,9 @@ static void
 make_heroes(battle * b)
 {
   side * s;
-  cv_foreach(s, b->sides) {
+  for (s=b->sides;s;s=s->next) {
     fighter * fig;
-    cv_foreach(fig, s->fighters) {
+    for (fig=s->fighters;fig;fig=fig->next) {
       unit * u = fig->unit;
       if (fval(u, UFL_HERO)) {
         int i;
@@ -1942,8 +1904,8 @@ make_heroes(battle * b)
           fig->person[i].speed += (HERO_SPEED-1);
         }
       }
-    } cv_next(fig);
-  } cv_next(s);
+    }
+  }
 }
 #endif
 
@@ -2262,18 +2224,23 @@ fleechance(unit * u)
   return c;
 }
 
-int nextside = 0;
+static int nextside = 0;
+
+/** add a new army to the conflict
+ * beware: armies need to be added _at the beginning_ of the list because 
+ * otherwise join_allies() will get into trouble */
 side *
-make_side(battle * b, const faction * f, const group * g, boolean stealth, const faction *stealthfaction)
+make_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction *stealthfaction)
 {
   side *s1 = calloc(sizeof(struct side), 1);
   bfaction * bf;
 
   s1->battle = b;
   s1->group = g;
-  s1->stealth = stealth;
+  s1->flags = flags;
   s1->stealthfaction = stealthfaction;
-  cv_pushback(&b->sides, s1);
+  s1->next = b->sides;
+  b->sides = s1;
   for (bf = b->factions;bf;bf=bf->next) {
     faction * f2 = bf->faction;
 
@@ -2314,7 +2281,7 @@ loot_items(fighter * corpse)
           itm->number -= loot;
 
           if (maxrow == LAST_ROW || rng_int() % 100 < lootchance) {
-            fighter *fig = select_enemy(b, corpse, FIGHT_ROW, maxrow, false).fighter;
+            fighter *fig = select_enemy(corpse, FIGHT_ROW, maxrow, false).fighter;
             if (fig) {
               item * l = fig->loot;
               while (l && l->type!=itm->type) l=l->next;
@@ -2334,7 +2301,6 @@ loot_items(fighter * corpse)
   }
 }
 
-#ifndef NO_RUNNING
 static void
 loot_fleeing(fighter* fig, unit* runner)
 {
@@ -2350,13 +2316,12 @@ merge_fleeloot(fighter* fig, unit* u)
 {
   i_merge(&u->items, &fig->run.items);
 }
-#endif
 
 static boolean
 seematrix(const faction * f, const side * s)
 {
   if (f==s->bf->faction) return true;
-  if (s->stealth) return false;
+  if (s->flags & SIDE_STEALTH) return false;
   return true;
 }
 
@@ -2389,8 +2354,6 @@ aftermath(battle * b)
   region *r = b->region;
   ship *sh;
   side *s;
-  cvector *fighters = &b->fighters;
-  void **fi;
   int dead_players = 0;
   bfaction * bf;
   boolean battle_was_relevant = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2);
@@ -2399,69 +2362,71 @@ aftermath(battle * b)
   int *trollsave = calloc(2 * cv_size(&b->factions), sizeof(int));
 #endif
 
-  for (fi = fighters->begin; fi != fighters->end; ++fi) {
-    fighter *df = *fi;
-    unit *du = df->unit;
-    int dead = du->number - df->alive - df->run.number;
-    int pr_mercy = 0;
+  for (s=b->sides; s; s=s->next) {
+    fighter * df;
+    for (df = s->fighters; df; df=df->next) {
+      unit *du = df->unit;
+      int dead = du->number - df->alive - df->run.number;
+      int pr_mercy = 0;
 #ifdef KARMA_MODULE
-    const attrib *a= a_find(du->attribs, &at_prayer_effect);
+      const attrib *a= a_find(du->attribs, &at_prayer_effect);
 
-    while (a && a->type==&at_prayer_effect) {
-      if (a->data.sa[0] == PR_MERCY) {
-        pr_mercy = a->data.sa[1];
+      while (a && a->type==&at_prayer_effect) {
+        if (a->data.sa[0] == PR_MERCY) {
+          pr_mercy = a->data.sa[1];
+        }
+        a = a->next;
       }
-      a = a->next;
-    }
 #endif /* KARMA_MODULE */
 
 #ifdef TROLLSAVE
-    /* Trolle können regenerieren */
-    if (df->alive > 0 && dead>0 && du->race == new_race[RC_TROLL]) {
-      for (i = 0; i != dead; ++i) {
-        if (chance(TROLL_REGENERATION)) {
-          ++df->alive;
-          ++df->side->alive;
-          ++df->side->battle->alive;
-          ++trollsave[df->side->index];
-          /* do not change dead here, or loop will not terminate! recalculate later */
+      /* Trolle können regenerieren */
+      if (df->alive > 0 && dead>0 && du->race == new_race[RC_TROLL]) {
+        for (i = 0; i != dead; ++i) {
+          if (chance(TROLL_REGENERATION)) {
+            ++df->alive;
+            ++s->alive;
+            ++s->battle->alive;
+            ++trollsave[s->index];
+            /* do not change dead here, or loop will not terminate! recalculate later */
+          }
         }
+        dead = du->number - df->alive - df->run.number;
       }
-      dead = du->number - df->alive - df->run.number;
-    }
 #endif
-    /* Regeneration durch PR_MERCY */
-    if (dead>0 && pr_mercy) {
-      for (i = 0; i != dead; ++i) {
-        if (rng_int()%100 < pr_mercy) {
-          ++df->alive;
-          ++df->side->alive;
-          ++df->side->battle->alive;
-          /* do not change dead here, or loop will not terminate! recalculate later */
+      /* Regeneration durch PR_MERCY */
+      if (dead>0 && pr_mercy) {
+        for (i = 0; i != dead; ++i) {
+          if (rng_int()%100 < pr_mercy) {
+            ++df->alive;
+            ++s->alive;
+            ++s->battle->alive;
+            /* do not change dead here, or loop will not terminate! recalculate later */
+          }
         }
+        dead = du->number - df->alive - df->run.number;
       }
-      dead = du->number - df->alive - df->run.number;
-    }
 
-    /* tote insgesamt: */
-    df->side->dead += dead;
-    /* Tote, die wiederbelebt werde können: */
-    if (playerrace(df->unit->race)) {
-      df->side->casualties += dead;
-    }
+      /* tote insgesamt: */
+      s->dead += dead;
+      /* Tote, die wiederbelebt werde können: */
+      if (playerrace(df->unit->race)) {
+        s->casualties += dead;
+      }
 #ifdef SHOW_KILLS
-    if (df->hits + df->kills) {
-      struct message * m = msg_message("killsandhits", "unit hits kills", du, df->hits, df->kills);
-      message_faction(b, du->faction, m);
-      msg_release(m);
-    }
+      if (df->hits + df->kills) {
+        struct message * m = msg_message("killsandhits", "unit hits kills", du, df->hits, df->kills);
+        message_faction(b, du->faction, m);
+        msg_release(m);
+      }
 #endif
+    }
   }
 
   /* POSTCOMBAT */
   do_combatmagic(b, DO_POSTCOMBATSPELL);
 
-  cv_foreach(s, b->sides) {
+  for (s=b->sides;s;s=s->next) {
     int snumber = 0;
     fighter *df;
 #ifndef SIMPLE_COMBAT
@@ -2472,7 +2437,7 @@ aftermath(battle * b)
 #endif
     s->flee = 0;
 
-    cv_foreach(df, s->fighters) {
+    for (df=s->fighters;df;df=df->next) {
       unit *du = df->unit;
       int dead = du->number - df->alive - df->run.number;
       int sum_hp = 0;
@@ -2504,7 +2469,6 @@ aftermath(battle * b)
         du->hp = sum_hp;
         continue; /* nichts passiert */
       } else if (df->run.hp) {
-#ifndef NO_RUNNING
         if (df->alive == 0) {
           /* Report the casualties */
           reportcasualties(b, df, dead);
@@ -2528,18 +2492,14 @@ aftermath(battle * b)
             run_to(du, df->run.region);
             df->run.region = du->region;
           }
-        } else
-#endif
-        {
+        } else {
           /* nur teilweise geflohene Einheiten mergen sich wieder */
           df->alive += df->run.number;
           s->size[0] += df->run.number;
           s->size[statusrow(df->status)] += df->run.number;
           s->alive += df->run.number;
           sum_hp += df->run.hp;
-#ifndef NO_RUNNING
           merge_fleeloot(df, du);
-#endif
           df->run.number = 0;
           df->run.hp = 0;
           /* df->run.region = NULL;*/
@@ -2554,9 +2514,7 @@ aftermath(battle * b)
           /* alle sind tot, niemand geflohen. Einheit auflösen */
           df->run.number = 0;
           df->run.hp = 0;
-#ifndef NO_RUNNING
           df->run.region = NULL;
-#endif
 
           /* Report the casualties */
           reportcasualties(b, df, dead);
@@ -2587,14 +2545,14 @@ aftermath(battle * b)
                    itoa36(du->no), du->hp, du->number));
         du->hp = du->number;
       }
-    } cv_next(df);
+    }
     s->alive+=s->healed;
     assert(snumber==s->flee+s->alive+s->dead);
-  } cv_next(s);
+  }
 
   battle_effects(b, dead_players);
 
-  cv_foreach(s, b->sides) {
+  for (s=b->sides;s;s=s->next) {
     message * seen = msg_message("battle::army_report",
       "index abbrev dead flown survived",
       s->index, sideabkz(s, false), s->dead, s->flee, s->alive);
@@ -2611,33 +2569,35 @@ aftermath(battle * b)
 
     msg_release(seen);
     msg_release(unseen);
-  } cv_next(s);
+  }
   /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
   * schonmal Schaden genommen hat. (moved und drifted
   * sollten in flags überführt werden */
 
-  for (fi = fighters->begin; fi != fighters->end; ++fi) {
-    fighter *df = *fi;
-    unit *du = df->unit;
-    item * l;
+  for (s=b->sides; s; s=s->next) {
+    fighter *df;
+    for (df=s->fighters; df; df=df->next) {
+      unit *du = df->unit;
+      item * l;
 
-    for (l=df->loot; l; l=l->next) {
-      const item_type * itype = l->type;
-      sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
-        l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
-      fbattlerecord(b, du->faction, buf);
-      i_change(&du->items, itype, l->number);
-    }
+      for (l=df->loot; l; l=l->next) {
+        const item_type * itype = l->type;
+        sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
+          l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
+        fbattlerecord(b, du->faction, buf);
+        i_change(&du->items, itype, l->number);
+      }
 
-    /* Wenn sich die Einheit auf einem Schiff befindet, wird
-    * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
-    * evt. zuvor verlassen wurde. */
+      /* Wenn sich die Einheit auf einem Schiff befindet, wird
+      * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
+      * evt. zuvor verlassen wurde. */
 
-    if (du->ship) sh = du->ship; else sh = leftship(du);
+      if (du->ship) sh = du->ship; else sh = leftship(du);
 
-    if (sh && fval(sh, SF_DAMAGED) && b->turn+(b->has_tactics_turn?1:0)>2) {
-      damage_ship(sh, 0.20);
-      freset(sh, SF_DAMAGED);
+      if (sh && fval(sh, SF_DAMAGED) && b->turn+(b->has_tactics_turn?1:0)>2) {
+        damage_ship(sh, 0.20);
+        freset(sh, SF_DAMAGED);
+      }
     }
   }
 
@@ -2685,12 +2645,12 @@ battle_punit(unit * u, battle * b)
 }
 
 static void
-print_fighters(battle * b, cvector * fighters)
+print_fighters(battle * b, fighter * fighters)
 {
   fighter *df;
   int lastrow = -1;
 
-  cv_foreach(df, *fighters) {
+  for (df=fighters; df; df=df->next) {
     unit *du = df->unit;
 
     int row = get_unitrow(df);
@@ -2703,39 +2663,47 @@ print_fighters(battle * b, cvector * fighters)
     }
     battle_punit(du, b);
   }
-  cv_next(df);
+}
+
+boolean
+is_attacker(const fighter * fig)
+{
+  return fval(fig, FIG_ATTACKER)!=0;
+}
+
+static void
+set_attacker(fighter * fig)
+{
+  fset(fig, FIG_ATTACKER);
 }
 
 static void
 print_header(battle * b)
 {
   bfaction * bf;
-  void **fi;
-  cvector *fighters = &b->fighters;
-  boolean * seen = malloc(sizeof(boolean)*cv_size(&b->sides));
 
   for (bf=b->factions;bf;bf=bf->next) {
     faction * f = bf->faction;
     const char * lastf = NULL;
     boolean first = false;
+    side * s;
 
     strcpy(buf, "Der Kampf wurde ausgelöst von ");
-    memset(seen, 0, sizeof(boolean)*cv_size(&b->sides));
-
-    for (fi = fighters->begin; fi != fighters->end; ++fi) {
-      fighter *df = *fi;
-      if (!fval(df, FIG_ATTACKED)) continue;
-      if (!seen[df->side->index] ) {
-        if (first) strcat(buf, ", ");
-        if (lastf) {
-          strcat(buf, lastf);
-          first = true;
+    for (s=b->sides; s; s=s->next) {
+      fighter *df;
+      for (df=s->fighters;df;df=df->next) {
+        if (is_attacker(df)) {
+          if (first) strcat(buf, ", ");
+          if (lastf) {
+            strcat(buf, lastf);
+            first = true;
+          }
+          if (seematrix(f, s) == true)
+            lastf = sidename(s, false);
+          else
+            lastf = "einer unbekannten Partei";
+          break;
         }
-        if (seematrix(f, df->side) == true)
-          lastf = sidename(df->side, false);
-        else
-          lastf = "einer unbekannten Partei";
-        seen[df->side->index] = true;
       }
     }
     if (first) strcat(buf, " und ");
@@ -2743,16 +2711,15 @@ print_header(battle * b)
     strcat(buf, ".");
     fbattlerecord(b, f, buf);
   }
-  free(seen);
 }
 
 static void
 print_stats(battle * b)
 {
   side *s2;
-  side *side;
+  side *s;
   int i = 0;
-  cv_foreach(side, b->sides) {
+  for (s=b->sides;s;s=s->next) {
     bfaction *bf;
     char *k;
 
@@ -2768,8 +2735,8 @@ print_stats(battle * b)
 
       fbattlerecord(b, f, " ");
 
-      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, side->index,
-        seematrix(f, side) ? sidename(side, false) : LOC(f->locale, "unknown_faction"));
+      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, s->index,
+        seematrix(f, s) ? sidename(s, false) : LOC(f->locale, "unknown_faction"));
       fbattlerecord(b, f, buf);
 
       bufp = buf;
@@ -2777,8 +2744,8 @@ print_stats(battle * b)
       komma = 0;
       header = LOC(f->locale, "battle_opponents");
 
-      cv_foreach(s2, b->sides) {
-        if (enemy(s2, side)) {
+      for (s2=b->sides;s2;s2=s2->next) {
+        if (enemy(s2, s)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)",
             komma++ ? "," : header, loc_army, s2->index, abbrev);
@@ -2787,7 +2754,6 @@ print_stats(battle * b)
           bufp += rsize;
         }
       }
-      cv_next(s2);
       if (komma) fbattlerecord(b, f, buf);
 
       bufp = buf;
@@ -2795,8 +2761,8 @@ print_stats(battle * b)
       komma = 0;
       header = LOC(f->locale, "battle_attack");
 
-      cv_foreach(s2, b->sides) {
-        if (side->enemy[s2->index] & E_ATTACKING) {
+      for (s2=b->sides;s2;s2=s2->next) {
+        if (s->enemy[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)", komma++ ? "," : header, loc_army,
             s2->index, abbrev);
@@ -2805,24 +2771,22 @@ print_stats(battle * b)
           bufp += rsize;
         }
       }
-      cv_next(s2);
       if (komma) fbattlerecord(b, f, buf);
     }
     buf[77] = (char)0;
     for (k = buf; *k; ++k) *k = '-';
     battlerecord(b, buf);
-    if (side->bf->faction) {
-      if (side->bf->faction->alliance) {
-        slprintf(buf, sizeof(buf), "##### %s (%s/%d)", side->bf->faction->name, itoa36(side->bf->faction->no),
-          side->bf->faction->alliance?side->bf->faction->alliance->id:0);
+    if (s->bf->faction) {
+      if (s->bf->faction->alliance) {
+        slprintf(buf, sizeof(buf), "##### %s (%s/%d)", s->bf->faction->name, itoa36(s->bf->faction->no),
+          s->bf->faction->alliance?s->bf->faction->alliance->id:0);
       } else {
-        slprintf(buf, sizeof(buf), "##### %s (%s)", side->bf->faction->name, itoa36(side->bf->faction->no));
+        slprintf(buf, sizeof(buf), "##### %s (%s)", s->bf->faction->name, itoa36(s->bf->faction->no));
       }
       battledebug(buf);
     }
-    print_fighters(b, &side->fighters);
+    print_fighters(b, s->fighters);
   }
-  cv_next(side);
 
   battlerecord(b, " ");
 
@@ -2830,19 +2794,20 @@ print_stats(battle * b)
 
   b->max_tactics = 0;
 
-  cv_foreach(side, b->sides) {
-    if (cv_size(&side->leader.fighters))
-      b->max_tactics = max(b->max_tactics, side->leader.value);
-  } cv_next(side);
+  for (s = b->sides; s; s = s->next) {
+    if (cv_size(&s->leader.fighters)) {
+      b->max_tactics = max(b->max_tactics, s->leader.value);
+    }
+  }
 
   if (b->max_tactics > 0) {
-    cv_foreach(side, b->sides) {
-      if (side->leader.value == b->max_tactics) {
+    for (s = b->sides; s; s = s->next) {
+      if (s->leader.value == b->max_tactics) {
         fighter *tf;
-        cv_foreach(tf, side->leader.fighters) {
+        cv_foreach(tf, s->leader.fighters) {
           unit *u = tf->unit;
           message * m = NULL;
-          if (!fval(tf, FIG_ATTACKED)) {
+          if (!is_attacker(tf)) {
             m = msg_message("battle::tactics_lost", "unit", u);
           } else {
             m = msg_message("battle::tactics_won", "unit", u);
@@ -2851,7 +2816,7 @@ print_stats(battle * b)
           msg_release(m);
         } cv_next(tf);
       }
-    } cv_next(side);
+    }
   }
 }
 
@@ -2882,14 +2847,18 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   int strongmen;
   int speeded = 0, speed = 1;
   boolean pr_aid = false;
-  boolean stealth = (boolean)((fval(u, UFL_PARTEITARNUNG)!=0)?true:false);
   int rest;
   const group * g = NULL;
   const attrib *a = a_find(u->attribs, &at_otherfaction);
   const faction *stealthfaction = a?get_otherfaction(a):NULL;
   static const struct item_type * it_demonseye;
   static boolean init = false;
+  unsigned int flags = 0;
 
+  if (fval(u, UFL_PARTEITARNUNG)!=0) flags |= SIDE_STEALTH;
+#ifdef SIMPLE_COMBAT
+  if (attack) flags |= SIDE_ATTACKER;
+#endif
   if (!init) {
     it_demonseye = it_find("demonseye");
     init=true;
@@ -2905,38 +2874,36 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     return NULL;
 
   if (s1==NULL) {
-    cv_foreach(s2, b->sides) {
-      if (s2->bf->faction == u->faction
-        && s2->stealth==stealth
-        && s2->stealthfaction == stealthfaction
-        ) {
-          if (s2->group==g) {
-            s1 = s2;
-            break;
-          }
+    for (s2 = b->sides; s2; s2 = s2->next) {
+      if (s2->bf->faction == u->faction && s2->group==g) {
+        if (s2->flags==flags && s2->stealthfaction==stealthfaction) {
+          s1 = s2;
+          break;
         }
-    } cv_next(s2);
+      }
+    }
 
     /* aliances are moved out of make_fighter and will be handled later */
-    if (!s1) s1 = make_side(b, u->faction, g, stealth, stealthfaction);
+    if (!s1) s1 = make_side(b, u->faction, g, flags, stealthfaction);
     /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
     * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
   }
   fig = calloc(1, sizeof(struct fighter));
 
-  cv_pushback(&s1->fighters, fig);
-  cv_pushback(&b->fighters, fig);
+  fig->next = s1->fighters;
+  s1->fighters = fig;
 
   fig->unit = u;
   /* In einer Burg muß man a) nicht Angreifer sein, und b) drin sein, und
-   * c) noch Platz finden. d) menschlich sein */
-  if (attack) fset(fig, FIG_ATTACKED);
-  if ((!attack) &&
-      u->building &&
-      u->building->sizeleft >= u->number &&
-      playerrace(u->race)) {
-    fig->building = u->building;
-    fig->building->sizeleft -= u->number;
+   * c) noch Platz finden. d) menschanähnlich sein */
+  if (attack) {
+    set_attacker(fig);
+  } else {
+    building * b = u->building;
+    if (b && b->sizeleft>=u->number && playerrace(u->race)) {
+      fig->building = b;
+      fig->building->sizeleft -= u->number;
+    }
   }
   fig->status = u->status;
   fig->side = s1;
@@ -3164,6 +3131,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   }
 #endif
   add_tactics(&fig->side->leader, fig, t);
+  ++b->nfighters;
   return fig;
 }
 
@@ -3171,23 +3139,34 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 static fighter *
 join_battle(battle * b, unit * u, boolean attack)
 {
+  side * s;
   fighter *c = NULL;
-  fighter *fig;
-  attrib * a = a_find(u->attribs, &at_fleechance);
 
-  if (a!=NULL) return NULL;
-
-  cv_foreach(fig, b->fighters) {
-    if (fig->unit == u) {
-      c = fig;
-      if (attack) fset(fig, FIG_ATTACKED);
-      break;
+  if (!attack) {
+    attrib * a = a_find(u->attribs, &at_fleechance);
+    if (a!=NULL) {
+      if (rng_double()<=a->data.flt) {
+        return NULL;
+      }
     }
   }
-  cv_next(fig);
+
+  for (s=b->sides;s;s=s->next) {
+    fighter *fig;
+    for (fig=s->fighters;fig;fig=fig->next) {
+      if (fig->unit == u) {
+        c = fig;
+        if (attack) {
+          set_attacker(fig);
+        }
+        break;
+      }
+    }
+  }
   if (!c) c = make_fighter(b, u, NULL, attack);
   return c;
 }
+
 static const char *
 simplename(region * r)
 {
@@ -3232,7 +3211,6 @@ make_battle(region * r)
   }
   nextside = 0;
 
-  /* cv_init(&b->sides); */
   b->region = r;
   b->plane = getplane(r);
   /* Finde alle Parteien, die den Kampf beobachten können: */
@@ -3264,7 +3242,6 @@ make_battle(region * r)
 static void
 free_side(side * si)
 {
-  cv_kill(&si->fighters);
   cv_kill(&si->leader.fighters);
 }
 
@@ -3287,8 +3264,7 @@ free_fighter(fighter * fig)
 static void
 free_battle(battle * b)
 {
-  side *side;
-  fighter *fighter;
+  side *snext;
   meffect *meffect;
   int max_fac_no = 0;
 
@@ -3304,19 +3280,21 @@ free_battle(battle * b)
     free(bf);
   }
 
-  cv_foreach(side, b->sides) {
-    free_side(side);
-    free(side);
+  snext = b->sides;
+  while (snext) {
+    side *s = snext;
+    fighter *fnext = s->fighters;
+    while (fnext) {
+      fighter *fig = fnext;
+      fnext = fig->next;
+      free_fighter(fig);
+      free(fig);
+    }
+    snext = s->next;
+    free_side(s);
+    free(s);
   }
-  cv_next(side);
-  cv_kill(&b->sides);
   cv_kill(&b->leaders);
-  cv_foreach(fighter, b->fighters) {
-    free_fighter(fighter);
-    free(fighter);
-  }
-  cv_next(fighter);
-  cv_kill(&b->fighters);
   cv_foreach(meffect, b->meffects) {
     free(meffect);
   }
@@ -3325,15 +3303,17 @@ free_battle(battle * b)
 }
 
 static int *
-get_alive(battle * b, side * s, faction * vf, boolean see)
+get_alive(battle * b, side * s, faction * f, boolean see)
 {
   static int alive[NUMROWS];
-  fighter *f;
+  fighter *fig;
   memset(alive, 0, NUMROWS * sizeof(int));
-  cv_foreach(f, s->fighters) {
-    if (f->alive && seematrix(vf, s)==see)
-      alive[get_unitrow(f)] += f->alive;
-  } cv_next(f);
+  for (fig=s->fighters;fig;fig=fig->next) {
+    if (fig->alive && seematrix(f, s)==see) {
+      int row = get_unitrow(fig);
+      alive[row] += fig->alive;
+    }
+  }
   return alive;
 }
 
@@ -3347,15 +3327,15 @@ battle_report(battle * b)
 
   buf[0] = 0;
 
-  cv_foreach(s, b->sides) {
-    cv_foreach(s2, b->sides) {
+  for (s=b->sides; s; s=s->next) {
+    for(s2=b->sides; s2; s2=s2->next) {
       if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
         cont = true;
         break;
       }
-    } cv_next(s2);
+    }
     if (cont) break;
-  } cv_next(s);
+  }
 
   printf(" %d", b->turn);
   fflush(stdout);
@@ -3374,7 +3354,7 @@ battle_report(battle * b)
     msg_release(m);
 
     komma   = false;
-    cv_foreach(s, b->sides) {
+    for (s=b->sides; s; s=s->next) {
       if (s->alive) {
         int r, k = 0, * alive = get_alive(b, s, fac, seematrix(fac, s));
         int l = FIGHT_ROW;
@@ -3425,7 +3405,7 @@ battle_report(battle * b)
 
         komma = true;
       }
-    } cv_next(s);
+    }
     fbattlerecord(b, fac, buf);
   }
   return cont;
@@ -3436,21 +3416,19 @@ join_allies(battle * b)
 {
   region * r = b->region;
   unit * u;
-  /* Die Anzahl der Teilnehmer kann sich in dieser Routine ändern.
-  * Deshalb muß das Ende des Vektors vorher gemerkt werden, damit
-  * neue Parteien nicht mit betrachtet werden:
-  */
-  size_t size = cv_size(&b->sides);
-  for (u=r->units;u;u=u->next)
+  side * sbegin = b->sides;
+  /* make_side might be adding a new faciton, but it adds them to the beginning
+   * of the list, so we're safe in our iteration here if we remember b->sides
+   * up front. */
+  for (u=r->units;u;u=u->next) {
     /* Was ist mit Schiffen? */
-    if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION|UFL_ISNEW) && u->number > 0)
-    {
-      size_t si;
+    if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION|UFL_ISNEW) && u->number > 0) {
       faction * f = u->faction;
       fighter * c = NULL;
-      for (si = 0; si != size; ++si) {
-        size_t se;
-        side *s = b->sides.begin[si];
+      side * s;
+
+      for (s = sbegin; s; s=s->next) {
+        side * se;
         /* Wenn alle attackierten noch FFL_NOAID haben, dann kämpfe nicht mit. */
         if (fval(s->bf->faction, FFL_NOAID)) continue;
         if (s->bf->faction!=f) {
@@ -3470,43 +3448,42 @@ join_allies(battle * b)
         /* einen alliierten angreifen dürfen sie nicht, es sei denn, der
         * ist mit einem alliierten verfeindet, der nicht attackiert
         * hat: */
-        for (se = 0; se != size; ++se) {
-          side * evil = b->sides.begin[se];
-          if (u->faction==evil->bf->faction) continue;
-          if (alliedunit(u, evil->bf->faction, HELP_FIGHT) &&
-            !evil->bf->attacker) continue;
-          if (enemy(s, evil)) break;
+        for (se = sbegin; se; se = se->next) {
+          if (u->faction==se->bf->faction) continue;
+          if (alliedunit(u, se->bf->faction, HELP_FIGHT) && !se->bf->attacker) {
+            continue;
+          }
+          if (enemy(s, se)) break;
         }
-        if (se==size) continue;
+        if (se==NULL) continue;
         /* Wenn die Einheit belagert ist, muß auch einer der Alliierten belagert sein: */
         if (besieged(u)) {
-          void ** fi;
-          boolean siege = false;
-          for (fi = s->fighters.begin; !siege && fi != s->fighters.end; ++fi) {
-            fighter *ally = *fi;
-            if (besieged(ally->unit)) siege = true;
+          fighter *ally;
+          for (ally = s->fighters; ally; ally=ally->next) {
+            if (besieged(ally->unit)) {
+              break;
+            }
           }
-          if (!siege) continue;
+          if (ally==NULL) continue;
         }
         /* keine Einwände, also soll er mitmachen: */
         if (!c) c = join_battle(b, u, false);
         if (!c) continue;
         /* Die Feinde meiner Freunde sind meine Feinde: */
-        for (se = 0; se != size; ++se) {
-          side * evil = b->sides.begin[se];
-          if (evil->bf->faction!=u->faction && enemy(s, evil)) {
-            set_enemy(evil, c->side, false);
+        for (se = sbegin; se; se=se->next) {
+          if (se->bf->faction!=u->faction && enemy(s, se)) {
+            set_enemy(se, c->side, false);
           }
         }
       }
     }
+  }
 }
 
 static void
 flee(const troop dt)
 {
   fighter * fig = dt.fighter;
-#ifndef NO_RUNNING
   unit * u = fig->unit;
   int carry = personcapacity(u) - u->race->weight;
   int money;
@@ -3549,7 +3526,6 @@ flee(const troop dt)
     i_change(&u->items, i_silver, -money);
     i_change(&fig->run.items, i_silver, +money);
   }
-#endif
 
   fig->run.hp += fig->person[dt.index].hp;
   ++fig->run.number;
@@ -3754,10 +3730,12 @@ battle_stats(FILE * F, battle * b)
     int number;
   } stat_info;
   side * s;
-  cv_foreach(s, b->sides) {
+
+  for (s = b->sides; s; s = s->next) {
     fighter * df;
     stat_info * stats = NULL, * stat;
-    cv_foreach(df, s->fighters) {
+
+    for (df = s->fighters; df; df = df->next) {
       unit *du = df->unit;
       troop dt;
       stat_info * slast = NULL;
@@ -3790,14 +3768,204 @@ battle_stats(FILE * F, battle * b)
         slast = stat;
         ++slast->number;
       }
-    } cv_next(df);
+    }
 
     fprintf(F, "##STATS## Heer %u - %s:\n", s->index, factionname(s->bf->faction));
     for (stat=stats;stat!=NULL;stat=stat->next) {
       fprintf(F, "%s %u : %u\n", stat->wtype?stat->wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
     }
     freelist(stats);
-  } cv_next(s);
+  }
+}
+
+/** randomly shuffle an array of fighters.
+ * for correctness, see Donald E. Knuth, The Art of Computer Programming
+ */
+#if 0
+static void 
+shuffle_fighters(fighter ** fighters, int n)
+{
+  int i;
+  for (i=0;i!=n;++i) {
+    int j = i + (rng_int() % (n-i));
+    fighter * fig = fighters[i];
+    fighters[i] = fighters[j];
+    fighters[j] = fig;
+  }
+}
+
+static void
+sort_fighters(fighter ** fighters, int * rows, int N)
+{
+  unsigned int n = N, i = n/2, parent, child;
+  int tr;
+  fighter * tf;
+
+  for (;;) {
+    if (i > 0) {
+      i--;
+      tr = rows[i];
+      tf = fighters[i];
+    } else {
+      n--;
+      if (n == 0) return;
+      tr = rows[n];
+      tf = fighters[n];
+      rows[n] = rows[0];
+      fighters[n] = fighters[0];
+    }
+
+    parent = i;
+    child = i*2 + 1;
+
+    while (child < n) {
+      if (child + 1 < n  &&  rows[child + 1] > rows[child]) {
+        child++;
+      }
+      if (rows[child] > tr) {
+        rows[parent] = rows[child];
+        fighters[parent] = fighters[child];
+        parent = child;
+        child = parent*2 + 1;
+      } else {
+        break;
+      }
+    }
+    rows[parent] = tr;
+    fighters[parent] = tf;
+  }
+}
+#endif
+
+/** execute one round of attacks
+ * fig->fighting is used to determine who attacks, not fig->alive, since
+ * the latter may be influenced by attacks that already took place.
+ */
+static void
+battle_attacks(battle * b)
+{
+  side * s;
+
+  for (s=b->sides;s;s=s->next) {
+    fighter *fig;
+    for (fig=s->fighters;fig;fig=fig->next) {
+
+      /* ist in dieser Einheit noch jemand handlungsfähig? */
+      if (fig->fighting <= 0) continue;
+
+      /* Taktikrunde: */
+      if (b->turn == 0) {
+        side *stac;
+
+        for (stac=b->sides; stac; stac=stac->next) {
+          if (b->max_tactics > 0 && stac->leader.value == b->max_tactics && helping(stac, fig->side)) {
+            break;
+          }
+        }
+        if (stac==NULL) continue;
+      }
+      /* Handle the unit's attack on someone */
+      do_attack(fig);
+    }
+  }
+}
+
+/** updates the number of attacking troops in each fighter struct.
+ * this has to be calculated _before_ the actual attacks take
+ * place because otherwise dead troops would not strike in the
+ * round they die. */
+static void 
+battle_update(battle * b)
+{
+  side * s;
+  for (s=b->sides;s;s=s->next) {
+    fighter *fig;
+    for (fig=s->fighters;fig;fig=fig->next) {
+      fig->fighting = fig->alive - fig->removed;
+    }
+  }
+}
+
+/** attempt to flee from battle before the next round begins
+ * there's a double attempt before the first round, but only
+ * one attempt before round zero, the potential tactics round. */
+static void
+battle_flee(battle * b)
+{
+  int attempt, flee_ops = 1;
+
+  if (b->turn==1)
+    flee_ops = 2;
+
+  for (attempt=1;attempt<=flee_ops;++attempt) {
+    side * s;
+    for (s=b->sides;s;s=s->next) {
+      fighter *fig;
+      for (fig=s->fighters;fig;fig=fig->next) {
+        unit *u = fig->unit;
+        troop dt;
+        int runners = 0;
+        /* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
+        int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
+        if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) continue;
+
+        if (u->ship) continue;
+        dt.fighter = fig;
+        if (!fig->run.region) fig->run.region = fleeregion(u);
+        if (!fig->run.region) continue;
+        dt.index = fig->alive - fig->removed;
+        while (s->size[SUM_ROW] && dt.index != 0) {
+          double ispaniced = 0.0;
+          --dt.index;
+          assert(dt.index>=0 && dt.index<fig->unit->number);
+          assert(fig->person[dt.index].hp > 0);
+
+          /* Versuche zu fliehen, wenn
+          * - Kampfstatus fliehe
+          * - schwer verwundet und nicht erste kampfrunde
+          * - in panik (Zauber)
+          * aber nicht, wenn der Zaubereffekt Held auf dir liegt!
+          */
+          switch (u->status) {
+              case ST_FLEE:
+                break;
+              default:
+                if ((fig->person[dt.index].flags & FL_HIT) == 0) continue;
+                if (b->turn<=1) continue;
+                if (fig->person[dt.index].hp <= runhp) break;
+                if (fig->person[dt.index].flags & FL_PANICED) {
+                  if ((fig->person[dt.index].flags & FL_COURAGE)==0) break;
+                }
+                continue;
+          }
+
+          if (fig->person[dt.index].flags & FL_PANICED) {
+            ispaniced = EFFECT_PANIC_SPELL;
+          }
+          if (chance(min(fleechance(u)+ispaniced, 0.90))) {
+            ++runners;
+            flee(dt);
+#ifdef SMALL_BATTLE_MESSAGES
+            if (b->small) {
+              sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
+                unitname(fig->unit), dt.index);
+              battlerecord(b, smallbuf);
+            }
+          } else if (b->small) {
+            sprintf(smallbuf, "%s/%d versucht zu fliehen, wird jedoch aufgehalten.",
+              unitname(fig->unit), dt.index);
+            battlerecord(b, smallbuf);
+#endif
+          }
+        }
+        if (runners > 0) {
+          char lbuf[256];
+          sprintf(lbuf, "Flucht: %d aus %s", runners, itoa36(fig->unit->no));
+          battledebug(lbuf);
+        }
+      }
+    }
+  }
 }
 
 void
@@ -3811,10 +3979,9 @@ do_battle(void)
   for (r=regions;r!=NULL;r=r->next) {
     battle *b = NULL;
     boolean fighting = false;
-    side *s;
     ship * sh;
-    void **fi;
     building *bu;
+    /* int *rows; */
 
     fighting = init_battle(r, &b);
 
@@ -3860,25 +4027,37 @@ do_battle(void)
     /* Nun erstellen wir eine Liste von allen Kämpfern, die wir
     * dann scramblen. Zuerst werden sie wild gemischt, und dann wird (stabil)
     * nach der Kampfreihe sortiert */
-    v_scramble(b->fighters.begin, b->fighters.end);
-    v_sort(b->fighters.begin, b->fighters.end, (v_sort_fun) sort_fighterrow);
-    cv_foreach(s, b->sides) {
+
+    /* das ist wahrscheinlich alles nicht wichtig, sondern uralt */
+#if 0
+    b->fighters = malloc(sizeof(fighter*)*b->nfighters);
+    for (i=0, s=b->sides; s; s=s->next) {
+      fighter * fig;
+      for (fig=s->fighters; fig; fig=fig->next) {
+        b->fighters[i++] = fig;
+      }
+    }
+    assert(i<=b->nfighters);
+    shuffle_fighters(b->fighters, b->nfighters);
+#endif
+    /*
+    rows = malloc(sizeof(int)*b->nfighters);
+    for (i=0;i!=b->nfighters;++i) {
+      rows[i] = get_unitrow(b->fighters[i]);
+    }
+    sort_fighters(b->fighters, rows, b->nfighters);
+    free(rows);
+
+    for (s = b->sides; s; s = s->next) {
       v_sort(s->fighters.begin, s->fighters.end, (v_sort_fun) sort_fighterrow);
     }
-    cv_next(side);
+    */
 
     print_stats(b); /* gibt die Kampfaufstellung aus */
     printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
 
-    b->dh = 0;
-    /* Kämpfer zählen und festlegen, ob es ein kleiner Kampf ist */
-    for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-      fighter *fig = *fi;
-      b->dh += fig->unit->number;
-    }
-
 #ifdef SMALL_BATTLE_MESSAGES
-    if (b->dh <= 30) {
+    if (b->nfighters <= 30) {
       b->small = true;
     } else {
       b->small = false;
@@ -3887,130 +4066,22 @@ do_battle(void)
 
     for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
       char lbuf[256];
-      int flee_ops = 1;
-      int i;
 
       sprintf(lbuf, "*** Runde: %d", b->turn);
       battledebug(lbuf);
 
-      /* Der doppelte Versuch immer am Anfang der 1. Kampfrunde, nur
-      * ein Versuch vor der Taktikerrunde. Die 0. Runde ist immer
-      * die Taktikerrunde. */
-      if (b->turn==1)
-        flee_ops = 2;
-
-      for (i=1;i<=flee_ops;i++) {
-        for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-          fighter *fig = *fi;
-          unit *u = fig->unit;
-          troop dt;
-          int runners = 0;
-          /* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
-          int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
-          side *side = fig->side;
-          if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) continue;
-
-          if (u->ship) continue;
-          dt.fighter = fig;
-#ifndef NO_RUNNING
-          if (!fig->run.region) fig->run.region = fleeregion(u);
-          if (!fig->run.region) continue;
-#endif
-          dt.index = fig->alive - fig->removed;
-          while (side->size[SUM_ROW] && dt.index != 0) {
-            double ispaniced = 0.0;
-            --dt.index;
-            assert(dt.index>=0 && dt.index<fig->unit->number);
-            assert(fig->person[dt.index].hp > 0);
-
-            /* Versuche zu fliehen, wenn
-            * - Kampfstatus fliehe
-            * - schwer verwundet und nicht erste kampfrunde
-            * - in panik (Zauber)
-            * aber nicht, wenn der Zaubereffekt Held auf dir liegt!
-            */
-            switch (u->status) {
-              case ST_FLEE:
-                break;
-              default:
-                if ((fig->person[dt.index].flags & FL_HIT) == 0) continue;
-                if (b->turn<=1) continue;
-                if (fig->person[dt.index].hp <= runhp) break;
-                if (fig->person[dt.index].flags & FL_PANICED) {
-                  if ((fig->person[dt.index].flags & FL_COURAGE)==0) break;
-                }
-                continue;
-            }
-
-            if (fig->person[dt.index].flags & FL_PANICED) {
-              ispaniced = EFFECT_PANIC_SPELL;
-            }
-            if (chance(min(fleechance(u)+ispaniced, 0.90))) {
-              ++runners;
-              flee(dt);
-#ifdef SMALL_BATTLE_MESSAGES
-              if (b->small) {
-                sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
-                  unitname(fig->unit), dt.index);
-                battlerecord(b, smallbuf);
-              }
-            } else if (b->small) {
-              sprintf(smallbuf, "%s/%d versucht zu fliehen, wird jedoch aufgehalten.",
-                unitname(fig->unit), dt.index);
-              battlerecord(b, smallbuf);
-#endif
-            }
-          }
-          if(runners > 0) {
-            sprintf(lbuf, "Flucht: %d aus %s", runners, itoa36(fig->unit->no));
-            battledebug(lbuf);
-          }
-        }
-      }
-
-      /* this has to be calculated before the actual attacks take
-      * place because otherwise the dead would not strike the
-      * round they die. */
-      for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-        fighter *fig = *fi;
-        fig->fighting = fig->alive - fig->removed;
-      }
-
-      for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-        fighter *fig = *fi;
-
-        /* ist in dieser Einheit noch jemand handlungsfähig? */
-        if (fig->fighting <= 0) continue;
-
-        /* Taktikrunde: */
-        if (b->turn == 0) {
-          side    *side;
-          boolean yes = false;
-
-          cv_foreach(side, b->sides) {
-            if (b->max_tactics > 0
-              && side->leader.value == b->max_tactics
-              && helping(side, fig->side))
-            {
-              yes = true;
-              break;
-            }
-          } cv_next(side);
-          if (!yes)
-            continue;
-        }
-        /* Handle the unit's attack on someone */
-        do_attack(fig);
-      }
+      battle_flee(b);
+      battle_update(b);
+      battle_attacks(b);
 
 #ifdef KARMA_MODULE
       /* Regeneration */
-      for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-        fighter *fig = *fi;
+      for (fi=0;fi!=b->nfighters;++fi) {
+        fighter *fig = b->fighters[fi];
 
         if (fspecial(fig->unit->faction, FS_REGENERATION)) {
           fig->fighting = fig->alive - fig->removed;
-          if(fig->fighting == 0) continue;
+          if (fig->fighting == 0) continue;
           do_regenerate(fig);
         }
       }

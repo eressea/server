@@ -21,7 +21,6 @@ Code cleanup:
 
 Larger Features:
 - eressea (b/g)zip reports?
-- NO_RUNNING
 - ZERSTÖRE - Man sollte alle Materialien zurückkriegen können:
 
 Scripts, etc:
