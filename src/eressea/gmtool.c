@@ -226,7 +226,7 @@ init_curses(void)
 
   if (has_colors() || force_color) {
     short bcol = COLOR_BLACK;
-    short hcol = COLOR_MAGENTA;
+    short hcol = COLOR_CYAN;
     start_color();
 #ifdef WIN32    
     /* looks crap on putty with TERM=linux */
@@ -444,7 +444,9 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c, i
   xp = cx * TWIDTH + (cy & 1) * TWIDTH/2;
   if (s && tagged_region(s, &mr->coord)) attr = A_REVERSE;
   if (mr->r) {
-    mvwaddch(win, yp, xp, mr_tile(mr, 0) | attr);
+    int hl = 0;
+    if (mr->r->flags & RF_MAPPER_HIGHLIGHT) hl = 1;
+    mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
   }
   else mvwaddch(win, yp, xp, ' ' | attr | COLOR_PAIR(COLOR_YELLOW));
   if (show) {
@@ -672,7 +674,7 @@ region2coord(const region * r, coordinate * c)
 #define FAST_RIGHT KEY_SRIGHT
 #endif
 
-enum { MODE_HIGHLIGHT = 0x0, MODE_SELECT = 0x1, MODE_INVERT = 0x2 };
+enum { MODE_HIGHLIGHT = 0x0, MODE_SELECT = 0x1 };
 
 static void
 select_regions(state * st, int selectmode)
@@ -690,12 +692,19 @@ select_regions(state * st, int selectmode)
     int i;
     sprintf(sbuffer, "%snone", status);
     statusline(st->wnd_status->handle, sbuffer);
-    for (i=0;i!=MAXTHASH;++i) {
-      tag ** tp = &st->selected->tags[i];
-      while (*tp) {
-        tag * t = *tp;
-        *tp = t->nexthash;
-        free(t);
+    if (selectmode&MODE_SELECT) {
+      for (i=0;i!=MAXTHASH;++i) {
+        tag ** tp = &st->selected->tags[i];
+        while (*tp) {
+          tag * t = *tp;
+          *tp = t->nexthash;
+          free(t);
+        }
+      }
+    } else {
+      region * r;
+      for (r=regions;r;r=r->next) {
+        r->flags &= ~RF_MAPPER_HIGHLIGHT;
       }
     }
   }
@@ -707,11 +716,9 @@ select_regions(state * st, int selectmode)
       if (r->units) {
         coordinate coord;
         if (selectmode&MODE_SELECT) {
-          if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
-          else tag_region(st->selected, region2coord(r, &coord));
+          tag_region(st->selected, region2coord(r, &coord));
         } else {
-          if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
-          else r->flags |= RF_MAPPER_HIGHLIGHT;
+          r->flags |= RF_MAPPER_HIGHLIGHT;
         }
       }
     }
@@ -724,11 +731,9 @@ select_regions(state * st, int selectmode)
       if (r->ships) {
         coordinate coord;
         if (selectmode&MODE_SELECT) {
-          if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
-          else tag_region(st->selected, region2coord(r, &coord));
+          tag_region(st->selected, region2coord(r, &coord));
         } else {
-          if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
-          else r->flags |= RF_MAPPER_HIGHLIGHT;
+          r->flags |= RF_MAPPER_HIGHLIGHT;
         }
       }
     }
@@ -749,11 +754,9 @@ select_regions(state * st, int selectmode)
         for (u=f->units;u;u=u->nextF) {
           region * r = u->region;
           if (selectmode&MODE_SELECT) {
-            if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
-            else tag_region(st->selected, region2coord(r, &coord));
+            tag_region(st->selected, region2coord(r, &coord));
           } else {
-            if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
-            else r->flags |= RF_MAPPER_HIGHLIGHT;
+            r->flags |= RF_MAPPER_HIGHLIGHT;
           }
         }
       } else {
@@ -776,11 +779,9 @@ select_regions(state * st, int selectmode)
         if (r->terrain==terrain) {
           coordinate coord;
           if (selectmode&MODE_SELECT) {
-            if (selectmode&MODE_INVERT) untag_region(st->selected, region2coord(r, &coord));
-            else tag_region(st->selected, region2coord(r, &coord));
+            tag_region(st->selected, region2coord(r, &coord));
           } else {
-            if (selectmode&MODE_INVERT) r->flags &= ~RF_MAPPER_HIGHLIGHT;
-            else r->flags |= RF_MAPPER_HIGHLIGHT;
+            r->flags |= RF_MAPPER_HIGHLIGHT;
           }
         }
       }
@@ -968,15 +969,9 @@ handlekey(state * st, int c)
     } while (c==0);
     break;
   case 'H':
-    select_regions(st, MODE_INVERT|MODE_HIGHLIGHT);
-    break;
-  case 'T':
-    select_regions(st, MODE_INVERT|MODE_SELECT);
-    break;
-  case 'h':
     select_regions(st, MODE_HIGHLIGHT);
     break;
-  case 't':
+  case 'T':
     select_regions(st, MODE_SELECT);
     break;
   case ';':
@@ -997,6 +992,7 @@ handlekey(state * st, int c)
       beep();
     }
     break;
+  case 't':
   case ' ':
     if (tagged_region(st->selected, cursor)) untag_region(st->selected, cursor);
     else tag_region(st->selected, cursor);
