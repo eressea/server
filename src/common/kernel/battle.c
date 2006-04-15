@@ -404,15 +404,14 @@ hpflee(int status)
   return 0.0;
 }
 
-int
-get_unitrow(const fighter * af)
+static int
+get_row(const side * s, int row)
 {
   boolean counted[MAXSIDES];
   int enemyfront = 0;
   int line, result;
   int retreat = 0;
   int size[NUMROWS];
-  int row = statusrow(af->status);
   int front = 0;
 
   memset(counted, 0, sizeof(counted));
@@ -420,17 +419,19 @@ get_unitrow(const fighter * af)
   for (line=FIRST_ROW;line!=NUMROWS;++line) {
     int si;
     /* how many enemies are there in the first row? */
-    for (si=0;af->side->enemies[si];++si) {
-      side *s = af->side->enemies[si];
-      if (s->size[line]>0) {
+    for (si=0;s->enemies[si];++si) {
+      side *se = s->enemies[si];
+      if (se->size[line]>0) {
         int ai;
-        enemyfront += s->size[line]; /* - s->nonblockers[line] (nicht, weil angreifer) */
-        for (ai=0;s->enemies[ai];++ai) {
-          side * ally = s->enemies[ai];
-          if (!counted[ally->index] && !enemy(ally, af->side)) {
+        enemyfront += se->size[line]; /* - s->nonblockers[line] (nicht, weil angreifer) */
+        for (ai=0;se->enemies[ai];++ai) {
+          side * ally = se->enemies[ai];
+          if (!counted[ally->index] && !enemy(ally, s)) {
             int i;
             counted[ally->index] = true;
-            for (i=0;i!=NUMROWS;++i) size[i] += ally->size[i] - ally->nonblockers[i];
+            for (i=0;i!=NUMROWS;++i) {
+              size[i] += ally->size[i] - ally->nonblockers[i];
+            }
           }
         }
       }
@@ -453,17 +454,11 @@ get_unitrow(const fighter * af)
   return result;
 }
 
-#if 0
-static int
-sort_fighterrow(fighter ** elem1, fighter ** elem2)
+int
+get_unitrow(const fighter * af)
 {
-  int a, b;
-
-  a = get_unitrow(*elem1);
-  b = get_unitrow(*elem2);
-  return (a < b) ? -1 : ((a == b) ? 0 : 1);
+  return get_row(af->side, statusrow(af->status));
 }
-#endif
 
 static void
 reportcasualties(battle * b, fighter * fig, int dead)
@@ -1320,7 +1315,7 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
  * cvector *fgs=fighters(b,af,FIGHT_ROW,BEHIND_ROW, FS_HELP|FS_ENEMY);
  * fighter *fig;
  *
- * Optional: Verwirbeln. Vorsicht: Aufwendig!
+ * Optional: Verwirbeln. Vorsicht: Aufwändig!
  * v_scramble(fgs->begin, fgs->end);
  *
  * for (fig = fgs->begin; fig != fgs->end; ++fig) {
@@ -2654,23 +2649,25 @@ battle_punit(unit * u, battle * b)
 }
 
 static void
-print_fighters(battle * b, fighter * fighters)
+print_fighters(battle * b, const side * s)
 {
   fighter *df;
-  int lastrow = -1;
+  int row;
 
-  for (df=fighters; df; df=df->next) {
-    unit *du = df->unit;
+  for (row=1;row!=NUMROWS;++row) {
+    int unitrow = get_row(s, row);
 
-    int row = get_unitrow(df);
+    for (df=s->fighters; df; df=df->next) {
+      unit *du = df->unit;
+      int thisrow = statusrow(df->unit->status);
 
-    if (row != lastrow) {
-      message * m = msg_message("battle::row_header", "row", row);
-      message_all(b, m);
-      msg_release(m);
-      lastrow = row;
+      if (row == thisrow) {
+        message * m = msg_message("battle::row_header", "row", unitrow);
+        message_all(b, m);
+        msg_release(m);
+      }
+      battle_punit(du, b);
     }
-    battle_punit(du, b);
   }
 }
 
@@ -2794,7 +2791,7 @@ print_stats(battle * b)
       }
       battledebug(buf);
     }
-    print_fighters(b, s->fighters);
+    print_fighters(b, s);
   }
 
   battlerecord(b, " ");
@@ -3787,65 +3784,6 @@ battle_stats(FILE * F, battle * b)
   }
 }
 
-/** randomly shuffle an array of fighters.
- * for correctness, see Donald E. Knuth, The Art of Computer Programming
- */
-#if 0
-static void 
-shuffle_fighters(fighter ** fighters, int n)
-{
-  int i;
-  for (i=0;i!=n;++i) {
-    int j = i + (rng_int() % (n-i));
-    fighter * fig = fighters[i];
-    fighters[i] = fighters[j];
-    fighters[j] = fig;
-  }
-}
-
-static void
-sort_fighters(fighter ** fighters, int * rows, int N)
-{
-  unsigned int n = N, i = n/2, parent, child;
-  int tr;
-  fighter * tf;
-
-  for (;;) {
-    if (i > 0) {
-      i--;
-      tr = rows[i];
-      tf = fighters[i];
-    } else {
-      n--;
-      if (n == 0) return;
-      tr = rows[n];
-      tf = fighters[n];
-      rows[n] = rows[0];
-      fighters[n] = fighters[0];
-    }
-
-    parent = i;
-    child = i*2 + 1;
-
-    while (child < n) {
-      if (child + 1 < n  &&  rows[child + 1] > rows[child]) {
-        child++;
-      }
-      if (rows[child] > tr) {
-        rows[parent] = rows[child];
-        fighters[parent] = fighters[child];
-        parent = child;
-        child = parent*2 + 1;
-      } else {
-        break;
-      }
-    }
-    rows[parent] = tr;
-    fighters[parent] = tf;
-  }
-}
-#endif
-
 /** execute one round of attacks
  * fig->fighting is used to determine who attacks, not fig->alive, since
  * the latter may be influenced by attacks that already took place.
@@ -4032,35 +3970,6 @@ do_battle(void)
 
     /* PRECOMBATSPELLS */
     do_combatmagic(b, DO_PRECOMBATSPELL);
-
-    /* Nun erstellen wir eine Liste von allen Kämpfern, die wir
-    * dann scramblen. Zuerst werden sie wild gemischt, und dann wird (stabil)
-    * nach der Kampfreihe sortiert */
-
-    /* das ist wahrscheinlich alles nicht wichtig, sondern uralt */
-#if 0
-    b->fighters = malloc(sizeof(fighter*)*b->nfighters);
-    for (i=0, s=b->sides; s; s=s->next) {
-      fighter * fig;
-      for (fig=s->fighters; fig; fig=fig->next) {
-        b->fighters[i++] = fig;
-      }
-    }
-    assert(i<=b->nfighters);
-    shuffle_fighters(b->fighters, b->nfighters);
-#endif
-    /*
-    rows = malloc(sizeof(int)*b->nfighters);
-    for (i=0;i!=b->nfighters;++i) {
-      rows[i] = get_unitrow(b->fighters[i]);
-    }
-    sort_fighters(b->fighters, rows, b->nfighters);
-    free(rows);
-
-    for (s = b->sides; s; s = s->next) {
-      v_sort(s->fighters.begin, s->fighters.end, (v_sort_fun) sort_fighterrow);
-    }
-    */
 
     print_stats(b); /* gibt die Kampfaufstellung aus */
     printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);

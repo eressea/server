@@ -58,9 +58,6 @@ extern "C" {
     bfaction * factions;
     int nfactions;
     int nfighters;
-#if 0
-    struct fighter ** fighters;
-#endif
     struct side * sides;
     int nsides;
     cvector meffects;

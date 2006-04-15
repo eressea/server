@@ -40,11 +40,7 @@ cvector *cv_kill(cvector * cv);
 size_t cv_size(cvector * cv);
 void cv_reserve(cvector * cv, size_t size);
 void cv_pushback(cvector * cv, void *u);
-void v_sort(void **begin, void **end, int (__cdecl * compare) (const void *, const void *));
-extern void **v_find(void **begin, void **end, void *);
-extern void **v_findx(void **begin, void **end, void *, int (__cdecl * cmp) (void *, void *));
 void v_scramble(void **begin, void **end);
-void cv_mergeunique(cvector * c, const cvector * a, const cvector * b, int (__cdecl * keyfun) (const void *));
 
 #define cv_remove(c, i) { void** x = v_find((c)->begin, (c)->end, (i)); if (x) { *x = *(c)->end; (c)->end--; } }
 #define cv_foreach(item, vector) \
