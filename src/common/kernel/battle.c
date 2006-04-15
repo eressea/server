@@ -2656,18 +2656,21 @@ print_fighters(battle * b, const side * s)
 
   for (row=1;row!=NUMROWS;++row) {
     int unitrow = get_row(s, row);
+    message * m = NULL;
 
     for (df=s->fighters; df; df=df->next) {
       unit *du = df->unit;
       int thisrow = statusrow(df->unit->status);
 
       if (row == thisrow) {
-        message * m = msg_message("battle::row_header", "row", unitrow);
-        message_all(b, m);
-        msg_release(m);
+        if (m==NULL) {
+          m = msg_message("battle::row_header", "row", unitrow);
+          message_all(b, m);
+        }
+        battle_punit(du, b);
       }
-      battle_punit(du, b);
     }
+    if (m!=NULL) msg_release(m);
   }
 }
 
