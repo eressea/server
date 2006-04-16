@@ -91,7 +91,6 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="4"
 				BufferSecurityCheck="TRUE"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/gmtool.pch"
@@ -108,7 +107,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="curses.lib libxml2.lib"
+				AdditionalDependencies="lua50.lib curses.lib libxml2.lib"
 				OutputFile=".\Debug/gmtool.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -217,11 +216,20 @@
 				RelativePath=".\gmtool.h">
 			</File>
 			<File
+				RelativePath=".\gmtool_structs.h">
+			</File>
+			<File
 				RelativePath=".\curses\listbox.h">
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\console.c">
+		</File>
+		<File
 			RelativePath=".\editing.c">
+		</File>
+		<File
+			RelativePath=".\gmmain.cpp">
 		</File>
 		<File
 			RelativePath=".\gmtool.c">

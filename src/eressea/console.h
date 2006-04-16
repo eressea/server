@@ -13,6 +13,8 @@ extern "C" {
 #include <lua50/lua.h>
 
   extern int lua_console(lua_State * L);
+  extern int lua_do(lua_State * L);
+  extern int (*lua_readline)(lua_State *l, const char *prompt);
 
 #ifdef __cplusplus
 }

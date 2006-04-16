@@ -8,70 +8,19 @@
  *  
  */
 
-/* types imported from eressea: */
-struct region;
+#ifndef H_GMTOOL
+#define H_GMTOOL
 
-typedef struct extent {
-  /* Ein Vektor */
-  int width, height;
-} extent;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef struct point {
-  /* Eine Koordinate in einer Ascii-Karte */
-  int x, y;
-} point;
+  extern int gmmain(int argc, char *argv[]);
+  extern int curses_readline(struct lua_State * L, const char * prompt);
 
-typedef struct coordinate {
-  /* Eine Koordinate in der Welt */
-  int x, y, p;
-} coordinate;
+#ifdef __cplusplus
+}
+#endif
 
-typedef struct map_region {
-  struct region * r;
-  coordinate coord;
-} map_region;
 
-typedef struct view {
-  struct map_region * regions;
-  int plane;
-  coordinate topleft; /* upper left corner in map. */
-  extent extent; /* dimensions. */
-} view;
-
-typedef struct tag {
-  coordinate coord;
-  struct tag * nexthash;
-} tag;
-
-#define MAXTHASH 512
-
-typedef struct selection {
-  tag * tags[MAXTHASH];
-} selection;
-
-typedef struct state {
-  coordinate cursor;
-  selection * selected;
-  struct state * undo;
-  struct faction * topf;
-  view display;
-  int modified;
-  unsigned int info_flags;
-  struct window * wnd_info;
-  struct window * wnd_map;
-  struct window * wnd_status;
-} state;
-
-typedef struct window {
-  boolean (*handlekey)(struct window * win, struct state * st, int key);
-  void (*paint)(struct window * win, const struct state * st);
-
-  WINDOW * handle;
-  struct window * next;
-  struct window * prev;
-  boolean initialized;
-  int update;
-} window;
-
-#define TWIDTH  2 /* width of tile */
-#define THEIGHT 1 /* height of tile */
+#endif

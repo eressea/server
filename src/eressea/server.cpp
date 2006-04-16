@@ -286,7 +286,7 @@ readshortpwds()
 }
 #endif
 
-lua_State *
+static lua_State *
 lua_init(void)
 {
   lua_State * luaState = lua_open();
@@ -312,7 +312,7 @@ lua_init(void)
   return luaState;
 }
 
-void
+static void
 lua_done(lua_State * luaState)
 {
   reset_scripts();

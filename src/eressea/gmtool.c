@@ -14,7 +14,9 @@
 #include <eressea.h>
 
 #include "gmtool.h"
+#include "gmtool_structs.h"
 #include "editing.h"
+#include "console.h"
 #include "curses/listbox.h"
 
 #include <modules/xmas.h>
@@ -72,6 +74,8 @@ static int force_color = 0;
 #define IFL_UNITS     (1<<1)
 #define IFL_FACTIONS  (1<<2)
 #define IFL_BUILDINGS (1<<3)
+
+static WINDOW * hstatus;
 
 static int
 usage(const char * prog, const char * arg)
@@ -221,7 +225,7 @@ game_done(void)
 static void
 init_curses(void)
 {
-  int fg, bg;
+  short fg, bg;
   initscr();
 
   if (has_colors() || force_color) {
@@ -968,6 +972,11 @@ handlekey(state * st, int c)
       }
     } while (c==0);
     break;
+  case 'L':
+    if (global.vm_state) {
+      lua_do((lua_State*)global.vm_state);
+    }
+    break;
   case 'H':
     select_regions(st, MODE_HIGHLIGHT);
     break;
@@ -1165,6 +1174,8 @@ run_mapper(void)
   init_view(&st.display, hwinmap);
   coor2point(&st.display.topleft, &tl);
 
+  hstatus = st.wnd_status->handle; /* the lua console needs this */
+
   while (!g_quit) {
     int c;
     point p;
@@ -1223,8 +1234,22 @@ run_mapper(void)
   endwin();
 }
 
+#define MAXINPUT 512
 int
-main(int argc, char *argv[])
+curses_readline(lua_State * L, const char * prompt)
+{
+  static char buffer[MAXINPUT];
+  askstring(hstatus, prompt, buffer, MAXINPUT);
+  if (buffer[0]==0) {
+    return 0;  /* read fails */
+  } else {
+    lua_pushstring(L, buffer);
+    return 1;
+  }
+}
+
+int
+gmmain(int argc, char *argv[])
 {
   int i;
   char * lc_ctype;
@@ -1244,7 +1269,6 @@ main(int argc, char *argv[])
   i = read_args(argc, argv);
   if (i!=0) return i;
   game_init();
-
 
   if (turn>first_turn) {
     char datafile[12];
@@ -1267,3 +1291,11 @@ main(int argc, char *argv[])
 
   return 0;
 }
+
+#ifdef USE_C_MAIN
+int
+main(int argc, char *argv[])
+{
+  return gmmain(argc, argv);
+}
+#endif

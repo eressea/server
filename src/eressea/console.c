@@ -16,9 +16,6 @@
 ** this macro defines a function to show the prompt and reads the
 ** next line for manual input
 */
-#ifndef lua_readline
-#define lua_readline(L,prompt) readline(L,prompt)
-
 /* maximum length of an input line */
 #ifndef MAXINPUT
 #define MAXINPUT        512
@@ -39,7 +36,8 @@ readline(lua_State *l, const char *prompt)
     return 1;
   }
 }
-#endif
+
+int (*lua_readline)(lua_State *l, const char *prompt) = readline;
 
 #ifndef PROMPT
 #define PROMPT          "E> "
@@ -176,5 +174,24 @@ lua_console(lua_State * L)
   }
   lua_settop(L, 0);  /* clear stack */
   fputs("\n", stdout);
+  return 0;
+}
+
+int
+lua_do(lua_State * L)
+{
+  int status = load_string(L);
+  if (status != -1) {
+    if (status == 0) status = lcall(L, 0, 0);
+    l_report(L, status);
+    if (status == 0 && lua_gettop(L) > 0) {  /* any result to print? */
+      lua_getglobal(L, "print");
+      lua_insert(L, 1);
+      if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
+        l_message(NULL, lua_pushfstring(L, "error calling `print' (%s)",
+        lua_tostring(L, -1)));
+    }
+  }
+  lua_settop(L, 0);  /* clear stack */
   return 0;
 }
