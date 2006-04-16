@@ -275,7 +275,7 @@ init_curses(void)
 map_region *
 mr_get(const view * vi, int xofs, int yofs)
 {
-  return vi->regions + xofs + yofs * vi->extent.width;
+  return vi->regions + xofs + yofs * vi->size.width;
 }
 
 static coordinate *
@@ -987,8 +987,21 @@ handlekey(state * st, int c)
     break;
   case 'L':
     if (global.vm_state) {
+      move(0, 0);
+      refresh();
       lua_do((lua_State*)global.vm_state);
+      /* todo: do this from inside the script */
+      clear();
+      st->wnd_info->update |= 1;
+      st->wnd_status->update |= 1;
+      st->wnd_map->update |= 1;
     }
+    break;
+  case 12: /* Ctrl-L */
+    clear();
+    st->wnd_info->update |= 1;
+    st->wnd_status->update |= 1;
+    st->wnd_map->update |= 1;
     break;
   case 'H':
     select_regions(st, MODE_HIGHLIGHT);
@@ -1125,17 +1138,17 @@ init_view(view * display, WINDOW * win)
   display->topleft.y = 1;
   display->topleft.p = 0;
   display->plane = 0;
-  display->extent.width = getmaxx(win)/TWIDTH;
-  display->extent.height = getmaxy(win)/THEIGHT;
-  display->regions = calloc(display->extent.height * display->extent.width, sizeof(map_region));
+  display->size.width = getmaxx(win)/TWIDTH;
+  display->size.height = getmaxy(win)/THEIGHT;
+  display->regions = calloc(display->size.height * display->size.width, sizeof(map_region));
 }
 
 static void
 update_view(view * vi)
 {
   int i, j;
-  for (i=0;i!=vi->extent.width;++i) {
-    for (j=0;j!=vi->extent.height;++j) {
+  for (i=0;i!=vi->size.width;++i) {
+    for (j=0;j!=vi->size.height;++j) {
       map_region * mr = mr_get(vi, i, j);
       mr->coord.x = vi->topleft.x + i - j/2;
       mr->coord.y = vi->topleft.y + j;
@@ -1206,19 +1219,19 @@ run_mapper(void)
       st.wnd_map->update |= 1;
     }
     if (p.y < tl.y) {
-      vi->topleft.y = st.cursor.y-vi->extent.height/2;
+      vi->topleft.y = st.cursor.y-vi->size.height/2;
       st.wnd_map->update |= 1;
     }
-    else if (p.y >= tl.y + vi->extent.height * THEIGHT) {
-      vi->topleft.y = st.cursor.y-vi->extent.height/2;
+    else if (p.y >= tl.y + vi->size.height * THEIGHT) {
+      vi->topleft.y = st.cursor.y-vi->size.height/2;
       st.wnd_map->update |= 1;
     }
     if (p.x <= tl.x) {
-      vi->topleft.x = st.cursor.x+(st.cursor.y-vi->topleft.y)/2-vi->extent.width / 2;
+      vi->topleft.x = st.cursor.x+(st.cursor.y-vi->topleft.y)/2-vi->size.width / 2;
       st.wnd_map->update |= 1;
     }
-    else if (p.x >= tl.x + vi->extent.width * TWIDTH-1) {
-      vi->topleft.x = st.cursor.x+(st.cursor.y-vi->topleft.y)/2-vi->extent.width / 2;
+    else if (p.x >= tl.x + vi->size.width * TWIDTH-1) {
+      vi->topleft.x = st.cursor.x+(st.cursor.y-vi->topleft.y)/2-vi->size.width / 2;
       st.wnd_map->update |= 1;
     }
 

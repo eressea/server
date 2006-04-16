@@ -42,7 +42,7 @@ typedef struct view {
   struct map_region * regions;
   int plane;
   coordinate topleft; /* upper left corner in map. */
-  extent extent; /* dimensions. */
+  extent size; /* dimensions. */
 } view;
 
 typedef struct tag {

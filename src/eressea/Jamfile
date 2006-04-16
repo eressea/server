@@ -48,6 +48,7 @@ LUASERVER_SOURCES =
 
 GMTOOL_SOURCES =
  $(SHARED_BINDINGS)
+ <lua>gm.cpp
  <curses>listbox.c
  console.c
  editing.c

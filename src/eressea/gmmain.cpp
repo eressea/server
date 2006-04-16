@@ -45,7 +45,7 @@ lua_init(void)
   bind_unit(L);
   bind_ship(L);
   bind_building(L);
-
+  bind_gmtool(L);
   lua_readline = curses_readline;
   return L;
 }
