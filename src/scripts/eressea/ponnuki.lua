@@ -29,7 +29,7 @@ local function init_ponnuki(home)
     u:set_racename("Ritter von Go")
   end
   if u.faction==f then
-    u:set_brain(ponnuki_brain)
+    set_unit_brain(u, ponnuki_brain)
   end
 end
 

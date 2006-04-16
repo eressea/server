@@ -107,7 +107,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="lua50.lib curses.lib libxml2.lib"
+				AdditionalDependencies="luabind.lib lua50.lib curses.lib libxml2.lib"
 				OutputFile=".\Debug/gmtool.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -220,6 +220,48 @@
 			</File>
 			<File
 				RelativePath=".\curses\listbox.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="bindings">
+			<File
+				RelativePath=".\lua\alliance.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\bindings.h">
+			</File>
+			<File
+				RelativePath=".\lua\building.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\eressea.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\faction.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\item.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\list.h">
+			</File>
+			<File
+				RelativePath=".\lua\objects.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\objects.h">
+			</File>
+			<File
+				RelativePath=".\lua\region.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\ship.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\spell.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\unit.cpp">
 			</File>
 		</Filter>
 		<File

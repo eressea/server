@@ -3,7 +3,7 @@
 #include <eressea.h>
 #include "list.h"
 #include "objects.h"
-#include "script.h"
+#include "bindings.h"
 
 // kernel includes
 #include <building.h>

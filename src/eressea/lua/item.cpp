@@ -1,7 +1,7 @@
 #include <config.h>
 #include <eressea.h>
 
-#include "script.h"
+#include "bindings.h"
 
 // kernel includes
 #include <kernel/item.h>

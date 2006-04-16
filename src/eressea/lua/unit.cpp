@@ -2,7 +2,7 @@
 #include <eressea.h>
 #include "list.h"
 #include "objects.h"
-#include "script.h"
+#include "bindings.h"
 #include "event.h"
 
 // Atributes includes
@@ -435,13 +435,6 @@ unit_clearorders(unit& u)
   free_orders(&u.orders);
 }
 
-static void 
-unit_setscript(struct unit& u, const luabind::object& f)
-{
-  luabind::object * fptr = new luabind::object(f);
-  setscript(&u.attribs, fptr);
-}
-
 static int
 unit_weight(const struct unit& u)
 {
@@ -568,8 +561,6 @@ bind_unit(lua_State * L)
 
     // npc logic:
     .def("add_handler", &unit_addhandler)
-    .def("set_brain", &unit_setscript)
-
 
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)

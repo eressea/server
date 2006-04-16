@@ -21,7 +21,8 @@ SERVER = eressea ;
 GMTOOL = gmtool ;
 
 SERVER_SOURCES = main.c korrektur.c ;
-LUASERVER_SOURCES =
+
+SHARED_BINDINGS =
  <lua>alliance.cpp
  <lua>building.cpp
  <lua>eressea.cpp
@@ -30,17 +31,23 @@ LUASERVER_SOURCES =
  <lua>message.cpp
  <lua>objects.cpp
  <lua>region.cpp
- <lua>script.cpp
  <lua>ship.cpp
  <lua>spell.cpp
  <lua>unit.cpp
  <lua>item.cpp
+;
+
+LUASERVER_SOURCES =
+ $(SHARED_BINDINGS)
+ <lua>script.cpp
+ <lua>gamecode.cpp
  server.cpp
  korrektur.c
  console.c
  ;
 
 GMTOOL_SOURCES =
+ $(SHARED_BINDINGS)
  <curses>listbox.c
  console.c
  editing.c

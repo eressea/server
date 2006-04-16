@@ -17,7 +17,6 @@
 
 /* lua includes */
 #include "lua/bindings.h"
-#include "lua/script.h"
 #include <boost/version.hpp>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -31,11 +30,13 @@ lua_init(void)
   luaopen_string(L);
   luaopen_io(L);
   luaopen_table(L);
-#if 0
+
   luabind::open(L);
   bind_objects(L);
   bind_eressea(L);
-  bind_script(L);
+  // bind_script(L);
+  // bind_message(L);
+  // bind_event(L);
   bind_spell(L);
   bind_alliance(L);
   bind_region(L);
@@ -44,9 +45,7 @@ lua_init(void)
   bind_unit(L);
   bind_ship(L);
   bind_building(L);
-  bind_event(L);
-  bind_message(L);
-#endif
+
   lua_readline = curses_readline;
   return L;
 }

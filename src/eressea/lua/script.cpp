@@ -1,10 +1,10 @@
 /* vi: set ts=2:
- +-------------------+  
+ +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
  | Eressea PBEM host |  Enno Rehling <enno@eressea-pbem.de>
  | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
  |                   |
- +-------------------+  
+ +-------------------+
 
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
@@ -15,6 +15,7 @@
 #include <lua.hpp>
 #include "eressea.h"
 #include "script.h"
+#include "bindings.h"
 
 // kernel includes
 #include <kernel/equipment.h>
@@ -37,7 +38,7 @@
 
 using namespace luabind;
 
-static void 
+static void
 free_script(attrib * a) {
   if (a->data.v!=NULL) {
     object * f = (object *)a->data.v;
@@ -46,19 +47,19 @@ free_script(attrib * a) {
 }
 
 attrib_type at_script = {
-  "script", 
-  NULL, free_script, NULL, 
-  NULL, NULL, ATF_UNIQUE 
+  "script",
+  NULL, free_script, NULL,
+  NULL, NULL, ATF_UNIQUE
 };
 
-int 
+int
 call_script(struct unit * u)
 {
   const attrib * a = a_findc(u->attribs, &at_script);
   if (a==NULL) a = a_findc(u->race->attribs, &at_script);
   if (a!=NULL && a->data.v!=NULL) {
     object * func = (object *)a->data.v;
-    try {	
+    try {
       func->operator()(u);
     }
     catch (error& e) {
@@ -72,7 +73,7 @@ call_script(struct unit * u)
   return -1;
 }
 
-void 
+void
 setscript(struct attrib ** ap, void * fptr)
 {
   attrib * a = a_find(*ap, &at_script);
@@ -86,7 +87,7 @@ setscript(struct attrib ** ap, void * fptr)
 }
 
 /** callback to use lua for spell functions */
-static int 
+static int
 lua_callspell(castorder *co)
 {
   const char * fname = co->sp->sname;
@@ -196,36 +197,6 @@ lua_changeresource(unit * u, const struct resource_type * rtype, int delta)
   return retval;
 }
 
-bool
-is_function(struct lua_State * luaState, const char * fname)
-{
-#if LUABIND_BETA>7 || (LUABIND_BETA==7 && LUABIND_DEVEL>=2)
-  object g = globals(luaState);
-  object fun = g[fname];
-  if (fun.is_valid()) {
-    if (type(fun)==LUA_TFUNCTION) {
-      return true;
-    }
-    log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
-    if (type(fun)!=LUA_TNIL) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
-    }
-  }
-#else
-  object g = get_globals(luaState);
-  object fun = g[fname];
-  if (fun.is_valid()) {
-    if (fun.type()==LUA_TFUNCTION) {
-      return true;
-    }
-    if (fun.type()!=LUA_TNIL) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
-    }
-  }
-#endif
-  return false;
-}
-
 static int
 lua_getresource(unit * u, const struct resource_type * rtype)
 {
@@ -315,8 +286,25 @@ overload(const char * name, const object& f)
   }
 }
 
+static void
+unit_setscript(struct unit& u, const luabind::object& f)
+{
+  luabind::object * fptr = new luabind::object(f);
+  setscript(&u.attribs, fptr);
+}
+
+static void
+race_setscript(const char * rcname, const luabind::object& f)
+{
+  race * rc = rc_find(rcname);
+  if (rc!=NULL) {
+    luabind::object * fptr = new luabind::object(f);
+    setscript(&rc->attribs, fptr);
+  }
+}
+
 void
-bind_script(lua_State * L) 
+bind_script(lua_State * L)
 {
   register_function((pf_generic)&lua_callspell, "lua_castspell");
   register_function((pf_generic)&lua_initfamiliar, "lua_initfamiliar");
@@ -325,7 +313,9 @@ bind_script(lua_State * L)
   register_function((pf_generic)&lua_changeresource, "lua_changeresource");
 
   module(L)[
-    def("overload", &overload)
+    def("overload", &overload),
+    def("set_race_brain", &race_setscript),
+    def("set_unit_brain", &unit_setscript)
   ];
 }
 

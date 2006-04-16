@@ -428,6 +428,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\lua\gamecode.cpp">
+			</File>
+			<File
 				RelativePath=".\lua\item.cpp">
 			</File>
 			<File

@@ -1,17 +1,11 @@
 #include <config.h>
 #include <eressea.h>
 
-#include "script.h"
-#include "../korrektur.h"
+#include "bindings.h"
 
 #include <attributes/key.h>
 #include <modules/autoseed.h>
 #include <modules/score.h>
-
-// gamecode includes
-#include <gamecode/laws.h>
-#include <gamecode/monster.h>
-#include <gamecode/creport.h>
 
 // kernel includes
 #include <kernel/alliance.h>
@@ -56,50 +50,6 @@ get_turn(void)
 {
   return turn;
 }
-
-static int
-read_game(const char * filename)
-{
-  int rv = readgame(filename, false);
-  printf(" - Korrekturen Runde %d\n", turn);
-  korrektur();
-  return rv;
-}
-
-static int
-write_game(const char *filename)
-{
-  free_units();
-  remove_empty_factions(true);
-
-  return writegame(filename, 0);
-}
-
-static summary * sum_begin = 0;
-
-static int
-init_summary()
-{
-  sum_begin = make_summary();
-  return 0;
-}
-
-static int
-write_summary()
-{
-  assert(sum_begin
-      || !"init_summary must be called before before write_summary");
-  if (sum_begin) {
-    summary * sum_end = make_summary();
-    report_summary(sum_end, sum_begin, false);
-    report_summary(sum_end, sum_begin, true);
-    return 0;
-  }
-  return -1;
-}
-
-
-extern int process_orders(void);
 
 static int
 find_plane_id(const char * name)
@@ -148,31 +98,6 @@ lua_getstring(const char * lname, const char * key)
   return locale_getstring(lang, key);
 }
 
-static void
-lua_planmonsters(void)
-{
-  unit * u;
-  faction * f = findfaction(MONSTER_FACTION);
-
-  if (f==NULL) return;
-  if (turn == 0) rng_init((int)time(0));
-  else rng_init(turn);
-  plan_monsters();
-  for (u=f->units;u;u=u->nextF) {
-    call_script(u);
-  }
-}
-
-static void
-race_setscript(const char * rcname, const luabind::object& f)
-{
-  race * rc = rc_find(rcname);
-  if (rc!=NULL) {
-    luabind::object * fptr = new luabind::object(f);
-    setscript(&rc->attribs, fptr);
-  }
-}
-
 #define ISLANDSIZE 20
 #define TURNS_PER_ISLAND 4
 static void
@@ -214,13 +139,6 @@ lua_writereport(faction * f)
 {
   time_t ltime = time(0);
   return write_reports(f, ltime);
-}
-
-int
-lua_writereports(void)
-{
-  init_reports();
-  return reports();
 }
 
 static void
@@ -272,41 +190,52 @@ lua_learnskill(unit& u, const char * skname, float chances)
   }
 }
 
+bool
+is_function(struct lua_State * luaState, const char * fname)
+{
+#if LUABIND_BETA>7 || (LUABIND_BETA==7 && LUABIND_DEVEL>=2)
+  object g = globals(luaState);
+  object fun = g[fname];
+  if (fun.is_valid()) {
+    if (type(fun)==LUA_TFUNCTION) {
+      return true;
+    }
+    log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
+    if (type(fun)!=LUA_TNIL) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
+    }
+  }
+#else
+  object g = get_globals(luaState);
+  object fun = g[fname];
+  if (fun.is_valid()) {
+    if (fun.type()==LUA_TFUNCTION) {
+      return true;
+    }
+    if (fun.type()!=LUA_TNIL) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    }
+  }
+#endif
+  return false;
+}
+
 void
 bind_eressea(lua_State * L)
 {
   module(L)[
     def("atoi36", &atoi36),
     def("itoa36", &itoa36),
-    def("read_game", &read_game),
-    def("write_map", &crwritemap),
-    def("write_game", &write_game),
-    def("write_passwords", &writepasswd),
-    def("init_reports", &init_reports),
     def("dice_roll", &dice_rand),
-    def("write_reports", &lua_writereports),
-    def("write_report", &lua_writereport),
-    def("init_summary", &init_summary),
-    def("write_summary", &write_summary),
-    def("read_orders", &readorders),
-    def("process_orders", &process_orders),
     def("equipment_setitem", &lua_addequipment),
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
 
     def("update_subscriptions", &update_subscriptions),
-    def("update_guards", &update_guards),
     def("update_scores", &score),
 
     def("equip_unit", &lua_equipunit),
     def("learn_skill", &lua_learnskill),
-
-    /* scripted monsters */
-    def("plan_monsters", &lua_planmonsters),
-    def("set_brain", &race_setscript),
-    def("spawn_braineaters", &spawn_braineaters),
-    def("spawn_undead", &spawn_undead),
-    def("spawn_dragons", &spawn_dragons),
 
     /* map making */
     def("autoseed", lua_autoseed),

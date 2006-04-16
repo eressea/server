@@ -332,7 +332,7 @@ function test_monsters()
     end
   end
 
-  set_brain("braineater", move_north)
+  set_race_brain("braineater", move_north)
   plan_monsters()
 end
 
