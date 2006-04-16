@@ -68,5 +68,5 @@ LinkLibraries $(GMTOOL) :
  kernel modules items attributes spells races triggers util ;
 luabind $(GMTOOL) ;
 libxml2 $(GMTOOL) ;
-LINKLIBS on $(GMTOOL) += -lm -lncurses ;
+LINKLIBS on $(GMTOOL) += -lm -lncurses -ldl -lstdc++ ;
 Main $(GMTOOL) : $(GMTOOL_SOURCES) ;

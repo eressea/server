@@ -168,8 +168,8 @@ lua_console(lua_State * L)
       lua_getglobal(L, "print");
       lua_insert(L, 1);
       if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
-        l_message(NULL, lua_pushfstring(L, "error calling `print' (%s)",
-        lua_tostring(L, -1)));
+          l_message(NULL, lua_pushfstring(L, "error calling `print' (%s)",
+                                          lua_tostring(L, -1)));
     }
   }
   lua_settop(L, 0);  /* clear stack */
