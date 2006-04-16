@@ -865,9 +865,10 @@ handlekey(state * st, int c)
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
     break;
+  case 'S':
   case KEY_SAVE:
   case KEY_F(2):
-    if (st->modified) {
+    /* if (st->modified) */ {
       char datafile[MAX_PATH];
 
       askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
