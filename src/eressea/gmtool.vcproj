@@ -240,6 +240,9 @@
 				RelativePath=".\lua\faction.cpp">
 			</File>
 			<File
+				RelativePath=".\lua\gm.cpp">
+			</File>
+			<File
 				RelativePath=".\lua\item.cpp">
 			</File>
 			<File

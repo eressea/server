@@ -11,6 +11,10 @@
 #ifndef H_GMTOOL_STRUCTS
 #define H_GMTOOL_STRUCTS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* types imported from eressea: */
 struct region;
 
@@ -65,18 +69,14 @@ typedef struct state {
   struct window * wnd_status;
 } state;
 
-typedef struct window {
-  boolean (*handlekey)(struct window * win, struct state * st, int key);
-  void (*paint)(struct window * win, const struct state * st);
-
-  WINDOW * handle;
-  struct window * next;
-  struct window * prev;
-  boolean initialized;
-  int update;
-} window;
+extern map_region * cursor_region(const view * v, const coordinate * c);
+extern state * current_state;
 
 #define TWIDTH  2 /* width of tile */
 #define THEIGHT 1 /* height of tile */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

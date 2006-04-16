@@ -61,6 +61,17 @@
 #include <string.h>
 #include <locale.h>
 
+typedef struct window {
+  boolean (*handlekey)(struct window * win, struct state * st, int key);
+  void (*paint)(struct window * win, const struct state * st);
+
+  WINDOW * handle;
+  struct window * next;
+  struct window * prev;
+  boolean initialized;
+  int update;
+} window;
+
 extern char * g_reportdir;
 extern char * g_datadir;
 extern char * g_basedir;
@@ -69,6 +80,8 @@ extern char * g_resourcedir;
 static int g_quit;
 static const char * g_logfile = "gmtool.log";
 static int force_color = 0;
+
+state * current_state = NULL;
 
 #define IFL_SHIPS     (1<<0)
 #define IFL_UNITS     (1<<1)
@@ -259,7 +272,7 @@ init_curses(void)
   refresh();
 }
 
-static map_region *
+map_region *
 mr_get(const view * vi, int xofs, int yofs)
 {
   return vi->regions + xofs + yofs * vi->extent.width;
@@ -416,7 +429,7 @@ paint_map(window * wnd, const state * st)
   }
 }
 
-static map_region *
+map_region *
 cursor_region(const view * v, const coordinate * c)
 {
   coordinate relpos;
@@ -1175,6 +1188,7 @@ run_mapper(void)
   coor2point(&st.display.topleft, &tl);
 
   hstatus = st.wnd_status->handle; /* the lua console needs this */
+  current_state = &st;
 
   while (!g_quit) {
     int c;
@@ -1232,6 +1246,7 @@ run_mapper(void)
   }
   curs_set(1);
   endwin();
+  current_state = NULL;
 }
 
 #define MAXINPUT 512
