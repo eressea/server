@@ -2242,7 +2242,7 @@ hunt(unit *u, order * ord)
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (fval(u, UFL_NOTMOVING)) {
-    cmistake(u, ord, 187, MSG_MOVE);
+    cmistake(u, ord, 319, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!can_move(u)) {
@@ -2437,13 +2437,19 @@ movement(void)
            * UFL_NOTMOVING is set in combat if the unit is not allowed
            * to move because it was involved in a battle.
            */
-          if (fval(u, UFL_LONGACTION|UFL_MOVED|UFL_NOTMOVING)) {
+          if (fval(u, UFL_LONGACTION)) {
+            cmistake(u, u->thisorder, 52, MSG_MOVE);
+            set_order(&u->thisorder, NULL);
+          } else if (fval(u, UFL_NOTMOVING)) {
+            cmistake(u, u->thisorder, 319, MSG_MOVE);
+            set_order(&u->thisorder, NULL);
+          } else if (fval(u, UFL_MOVED)) {
             cmistake(u, u->thisorder, 187, MSG_MOVE);
             set_order(&u->thisorder, NULL);
           } else if (!can_move(u)) {
             cmistake(u, u->thisorder, 55, MSG_MOVE);
             set_order(&u->thisorder, NULL);
-          } else if (!fval(u, UFL_MOVED|UFL_NOTMOVING)) {
+          } else {
             if (ships) {
               if (u->ship && fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
