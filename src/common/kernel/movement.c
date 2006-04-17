@@ -698,8 +698,9 @@ drifting_ships(region * r)
       ship * sh = *shp;
       region * rnext = NULL;
       region_list * route = NULL;
-      unit * captain;
+      unit *firstu = NULL, *captain;
       int d_offset;
+      direction_t dir = 0;
 
       /* Schiff schon abgetrieben oder durch Zauber geschützt? */
       if (fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
@@ -710,6 +711,7 @@ drifting_ships(region * r)
       /* Kapitän bestimmen */
       for (captain = r->units; captain; captain = captain->next) {
         if (captain->ship != sh) continue;
+        if (firstu==NULL) firstu = captain;
         if (eff_skill(captain, SK_SAILING, r) >= sh->type->cptskill) {
           break;
         }
@@ -727,7 +729,9 @@ drifting_ships(region * r)
       * zufällig. Falls unmögliches Resultat: vergiß es. */
       d_offset = rng_int() % MAXDIRECTIONS;
       for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region * rn = rconnect(r, (direction_t)((d + d_offset) % MAXDIRECTIONS));
+        region * rn;
+        dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+        rn = rconnect(r, dir);
         if (rn!=NULL && fval(rn->terrain, SAIL_INTO) && ship_allowed(sh, rn)) {
           rnext = rn;
           if (!fval(rnext->terrain, SEA_REGION)) break;
@@ -747,12 +751,26 @@ drifting_ships(region * r)
       sh = move_ship(sh, r, rnext, route);
       free_regionlist(route);
 
+      if (firstu!=NULL) {
+        unit *u, *lastu = NULL;
+        message * msg = msg_message("ship_drift", "ship dir", sh, dir);
+        for (u=firstu;u;u=u->next) {
+          if (u->ship==sh && !fval(u->faction, FL_MARK)) {
+            fset(u->faction, FL_MARK);
+            add_message(&u->faction->msgs, msg);
+            lastu = u->next;
+          }
+        }
+        for (u=firstu;u!=lastu;u=u->next) {
+          freset(u->faction, FL_MARK);
+        }
+        msg_release(msg);
+      }
+     
       if (sh!=NULL) {
-
         fset(sh, SF_DRIFTED);
 
         damage_ship(sh, 0.02);
-
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
           destroy_ship(sh);
         }

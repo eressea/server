@@ -763,6 +763,15 @@
     <text locale="fr">"The $ship($ship) has been damaged by a collision with an iceberg."</text>
     <text locale="en">"The $ship($ship) has been damaged by a collision with an iceberg."</text>
   </message>
+  <message name="ship_drift" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="dir" type="direction"/>
+    </type>
+    <text locale="de">"Die $region($ship) treibt nach $direction($dir)."</text>
+    <text locale="fr">"The ship $ship($ship) drifts to the $direction($dir)."</text>
+    <text locale="en">"The ship $ship($ship) drifts to the $direction($dir)."</text>
+  </message>
   <message name="iceberg_drift" section="events">
     <type>
       <arg name="region" type="region"/>
