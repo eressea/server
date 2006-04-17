@@ -276,6 +276,7 @@ lua_init(void)
   bind_building(luaState);
   bind_event(luaState);
   bind_message(luaState);
+  bind_gamecode(luaState);
   return luaState;
 }
 
