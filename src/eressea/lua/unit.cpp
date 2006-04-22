@@ -227,10 +227,30 @@ unit_addspell(unit& u, const char * name)
   if (!add) log_error(("spell %s could not be found\n", name));
 }
 
-static bool
+static unit *
 unit_isfamiliar(const unit& u)
 {
-  return is_familiar(&u)!=0;
+  attrib * a = a_find(u.attribs, &at_familiarmage);
+  if (a!=NULL) {
+    return (unit*)a->data.v;
+  }
+  return NULL;
+}
+
+static unit *
+unit_getfamiliar(const unit& u)
+{
+  attrib * a = a_find(u.attribs, &at_familiar);
+  if (a!=NULL) {
+    return (unit*)a->data.v;
+  }
+  return NULL;
+}
+
+static void
+unit_setfamiliar(unit& mage, unit& familiar)
+{
+  create_newfamiliar(&mage, &familiar);
 }
 
 static void
@@ -536,6 +556,9 @@ bind_unit(lua_State * L)
     .property("weight", &unit_weight)
     .property("capacity", &unit_capacity)
 
+    .property("is_familiar", &unit_isfamiliar)
+    .property("familiar", &unit_getfamiliar, &unit_setfamiliar)
+
     // orders:
     .def("add_order", &unit_addorder)
     .def("clear_orders", &unit_clearorders)
@@ -572,7 +595,6 @@ bind_unit(lua_State * L)
     .property("building", &unit_getbuilding, &unit_setbuilding)
     .property("ship", &unit_getship, &unit_setship)
     .property("region", &unit_getregion, &unit_setregion)
-    .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)
     .property("number", &unit_getnumber, &unit_setnumber)
     .property("race", &unit_getrace, &unit_setrace)

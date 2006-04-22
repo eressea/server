@@ -504,13 +504,6 @@ select_familiar(const race * magerace, magic_t magiegebiet)
 /* ------------------------------------------------------------- */
 /* der Vertraue des Magiers */
 
-boolean
-is_familiar(const unit *u)
-{
-  attrib * a = a_find(u->attribs, &at_familiarmage);
-  return i2b(a!=NULL);
-}
-
 static void
 make_familiar(unit *familiar, unit *mage)
 {

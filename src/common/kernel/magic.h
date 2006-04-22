@@ -365,7 +365,7 @@ extern struct unit * get_clone_mage(const struct unit *u);
 extern struct attrib_type at_familiar;
 extern struct attrib_type at_familiarmage;
 extern void remove_familiar(struct unit * mage);
-extern void create_newfamiliar(struct unit * mage, struct unit * familiar);
+extern boolean create_newfamiliar(struct unit * mage, struct unit * familiar);
 extern void create_newclone(struct unit * mage, struct unit * familiar);
 extern struct unit * has_clone(struct unit * mage);
 
