@@ -2172,31 +2172,26 @@ remove_familiar(unit *mage)
 boolean
 create_newfamiliar(unit * mage, unit * familiar)
 {
-	/* if the skill modifier for the mage does not yet exist, add it */
-	attrib *a;
+  /* if the skill modifier for the mage does not yet exist, add it */
+  attrib *a;
   attrib *afam = a_find(mage->attribs, &at_familiar);
   attrib *amage = a_find(familiar->attribs, &at_familiarmage);
-
-  if ((afam==NULL || afam->data.v==NULL) && (amage==NULL || amage->data.v==NULL)) {
-		afam = a_add(&mage->attribs, a_new(&at_familiar));
-		afam->data.v = familiar;
-
-    amage = a_add(&familiar->attribs, a_new(&at_familiarmage));
-    amage->data.v = mage;
-  } else {
-    assert(afam->data.v == familiar);
-    assert(amage->data.v == mage);
-    if (afam->data.v != familiar || amage->data.v != mage) {
-      return false;
-    }
+  
+  if (afam==NULL) {
+    afam = a_add(&mage->attribs, a_new(&at_familiar));
   }
+  afam->data.v = familiar;
+  if (amage==NULL) {
+    amage = a_add(&familiar->attribs, a_new(&at_familiarmage));
+  }
+  amage->data.v = mage;
 
   /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
-	/* Wenn der Magier stirbt, dann auch der Vertraute */
-	add_trigger(&mage->attribs, "destroy", trigger_killunit(familiar));
-	/* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
-	add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
-
+  /* Wenn der Magier stirbt, dann auch der Vertraute */
+  add_trigger(&mage->attribs, "destroy", trigger_killunit(familiar));
+  /* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
+  add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
+  
   a = a_find(mage->attribs, &at_skillmod);
   while (a && a->type==&at_skillmod) {
     skillmod_data * smd = (skillmod_data *)a->data.v;
