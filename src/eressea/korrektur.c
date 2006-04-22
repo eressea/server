@@ -849,65 +849,6 @@ check_mages(void)
 }
 
 static int
-fix_familiars(void)
-{
-  const struct locale * lang = find_locale("en");
-  region * r;
-  for (r=regions;r;r=r->next) {
-    unit * u;
-    for (u=r->units;u;u=u->next) {
-      if (u->faction->no!=MONSTER_FACTION && u->race->init_familiar) {
-        attrib * a = a_find(u->attribs, &at_familiar);
-        if (a!=NULL) {
-          /* this is a familiar */
-          unit * mage = get_familiar_mage(u);
-          equipment * eq;
-          char fname[64];
-
-          if (mage==0) {
-            log_error(("%s was a %s familiar with no mage for faction %s\n",
-                      unitid(u), racename(lang, u, u->race),
-                      factionid(u->faction)));
-            remove_familiar(u);
-          } else if (!is_mage(mage)) {
-            log_error(("%s was a %s familiar, but %s is not a mage for faction %s\n",
-                      unitid(u), racename(lang, u, u->race), unitid(mage),
-                      factionid(u->faction)));
-            remove_familiar(u);
-          } else if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
-            log_error(("%s is a familiar with magic skill, but did not have a mage-attribute\n",
-              unitid(u)));
-            create_mage(u, M_GRAU);
-          }
-
-          snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
-          eq = get_equipment(fname);
-          if (eq) {
-            spell_list * sp = eq->spells;
-
-            if (sp!=NULL) {
-              sc_mage * m = get_mage(u);
-              if (m==NULL) {
-                log_error(("%s is a %s-familiar with spells, but did not have a mage-attribute\n",
-                          unitid(u), racename(lang, u, u->race)));
-                create_mage(u, M_GRAU);
-              }
-              while (sp) {
-                if (!has_spell(u, sp->data)) {
-                  add_spell(m, sp->data);
-                }
-                sp = sp->next;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return 0;
-}
-
-static int
 fix_resources(void)
 {
   int retval = 0;
@@ -1044,7 +985,6 @@ korrektur(void)
    */
   fix_demands();
   fix_otherfaction();
-  fix_familiars();
   check_mages();
   do_once("tfrs", &fix_resources);
   /* trade_orders(); */
