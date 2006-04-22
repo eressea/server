@@ -88,6 +88,8 @@
     <skill name="taxation" level="1"/>
     <!-- spells -->
     <spell name="steal_aura" school="gray"/>
+    <spell name="shapeshift" school="gray"/>
+    <spell name="seduction" school="gray"/>
   </set>
 
   <set name="dreamcat_familiar">
