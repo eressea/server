@@ -1014,7 +1014,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
     force -= curse_geteffect(c);
     curse_changevigour(&r->attribs, c, -cast_level);
     cmistake(u, ord, 185, MSG_MAGIC);
-    if (mage!=NULL) {
+    if (mage!=NULL && mage->faction!=NULL) {
       if (force>0) {
         ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
       } else {
@@ -1030,7 +1030,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
     force -= curse_geteffect(c);
     curse_changevigour(&u->attribs, c, -1);
     cmistake(u, ord, 185, MSG_MAGIC);
-    if (mage!=NULL) {
+    if (mage!=NULL && mage->faction!=NULL) {
       if (force>0) {
         ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
       } else {
