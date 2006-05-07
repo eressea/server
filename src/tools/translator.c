@@ -60,7 +60,7 @@ test_message(void)
 }
 
 #include <string.h>
-#include <language.h>
+#include <util/language.h>
 
 message *
 new_message(struct faction * receiver, const char* sig, ...)

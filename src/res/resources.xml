@@ -617,7 +617,7 @@
 
   <resource name="p7" appearance="vial" sneak="yes">
     <item weight="0" score="90">
-      <function name="use" value="usefoolpotion"/>
+      <function name="useonother" value="usefoolpotion"/>
       <potion level="3"/>
       <construction skill="alchemy" minskill="6" reqsize="1">
         <requirement type="h2"/>

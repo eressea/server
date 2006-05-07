@@ -10,14 +10,14 @@
  without prior permission by the authors of Eressea.
 */
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
-#include <region.h>
-#include <faction.h>
-#include <unit.h>
-#include <save.h>
+#include <kernel/region.h>
+#include <kernel/faction.h>
+#include <kernel/unit.h>
+#include <kernel/save.h>
 
-#include <base36.h>
+#include <util/base36.h>
 
 #include <stdio.h>
 #include <string.h>

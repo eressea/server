@@ -816,9 +816,10 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
       assert(property!=NULL);
       if (strcmp((const char*)property, "give")==0) {
         itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
-      }
-      else if (strcmp((const char*)property, "use")==0) {
+      } else if (strcmp((const char*)property, "use")==0) {
         itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
+      } else if (strcmp((const char*)property, "useonother")==0) {
+        itype->useonother = (int (*)(struct unit *, int targetno, const struct item_type *, int, struct order *))fun;
       } else {
         log_error(("unknown function type '%s' for item '%s'\n",
           (const char*)property, rtype->_name[0]));

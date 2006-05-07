@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#include "language.h"
+#include <util/language.h>
 #include <assert.h>
 
 /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
@@ -69,7 +69,7 @@ typedef struct land_region {
   } * demands;
   const struct item_type * herbtype;
   short herbs;
-  int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
+  int trees[3]; /* 0 -> seeds, 1 -> shoots, 2 -> trees */
   int horses;
   int peasants;
   int newpeasants;
