@@ -2105,9 +2105,8 @@ report_plaintext(const char * filename, report_context * ctx)
           sh->type->construction->maxsize);
       }
       if (sh->damage) {
-        sprintf(buf+strlen(buf), ", %d%% %s",
-          sh->damage*100/(sh->size*DAMAGE_SCALE),
-          LOC(f->locale, "nr_damaged"));
+        int percent = (sh->damage+DAMAGE_SCALE-1)*100/(sh->size*DAMAGE_SCALE);
+        sprintf(buf+strlen(buf), ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
       }
       if (!fval(r->terrain, SEA_REGION)) {
         if (sh->coast != NODIRECTION) {

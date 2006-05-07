@@ -570,7 +570,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
   fprintf(F, "\"%s\";Typ\n", add_translation(sh->type->name[0], locale_string(f->locale, sh->type->name[0])));
   fprintf(F, "%d;Groesse\n", sh->size);
   if (sh->damage) {
-    int percent = sh->damage*100/(sh->size*DAMAGE_SCALE);
+    int percent = (sh->damage+DAMAGE_SCALE-1)*100/(sh->size*DAMAGE_SCALE);
     fprintf(F, "%d;Schaden\n", percent);
   }
   if (u)
