@@ -306,6 +306,7 @@ victorycondition(const alliance * al, const char * name)
       if (!found) return 0;
     }
     return 1;
+
   } else if (strcmp(name, "phoenix")==0) {
     faction_list * flist = al->members;
     for (;flist;flist=flist->next) {
@@ -315,7 +316,24 @@ victorycondition(const alliance * al, const char * name)
       }
     }
     return 0;
+
   } else if (strcmp(name, "pyramid")==0) {
+
+    /* Logik:
+     * - if (pyr > last_passed_size && pyr > all_others) {
+     *     pyr->passed->counter++;
+     *     for(all_other_pyrs) {
+     *       pyr->passed->counter=0;
+     *     }
+     *
+     *     if(pyr->passed->counter >= 3) {
+     *       set(pyr, passed);
+     *       pyr->owner->set_attrib(pyra);
+     *     }
+     *     last_passed_size = pyr->size;
+     *   }
+     */
+
     faction_list * flist = al->members;
     for (;flist;flist=flist->next) {
       faction * f = flist->data;

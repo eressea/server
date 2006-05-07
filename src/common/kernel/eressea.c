@@ -531,6 +531,7 @@ max_skill(faction * f, skill_t sk)
       int ac = listlen(f->alliance->members); /* number of factions */
       int al = allied_skilllimit(f, sk); /* limit per alliance */
       int fl = (al+ac-1)/ac; /* faction limit */
+      /* the following ist _very_ weird, please examine */
       int sc = al - allied_skillcount(f, sk);
       if (sc==0) return count_skill(f, sk);
       return fl;

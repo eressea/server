@@ -159,7 +159,6 @@
     <attack type="4" damage="5d30"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
     <attack type="6" spell="drain_skills"/>
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
@@ -173,11 +172,7 @@
     <attack type="4" damage="5d30"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="6" spell="drain_skills"/>
-    <attack type="6" spell="aura_of_fear"/>
-    <precombatspell spell="bloodthirst"/>
-    <precombatspell spell="heroic_song"/>
+    <precombatspell spell="frighten"/>
   </race>
   <race name="bastet" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="2.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes" shapeshift="yes">
     <ai splitsize="1" learn="yes"/>
@@ -188,7 +183,6 @@
     <attack type="4" damage="5d30"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
     <attack type="6" spell="drain_skills"/>
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="heroic_song"/>

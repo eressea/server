@@ -1049,27 +1049,27 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
 int
 sp_hero(fighter * fi, int level, double power, spell * sp)
 {
-  battle *b = fi->side->battle;
-  unit *mage = fi->unit;
-  /* Immer aus der ersten Reihe nehmen */
-  int minrow = FIGHT_ROW;
-  int maxrow = BEHIND_ROW-1;
-  int df_bonus = 0;
-  int force = 0;
-  int allies;
-  int targets = 0;
+	battle *b = fi->side->battle;
+	unit *mage = fi->unit;
+	/* Immer aus der ersten Reihe nehmen */
+	int minrow = FIGHT_ROW;
+	int maxrow = BEHIND_ROW;
+	int df_bonus = 0;
+	int force = 0;
+	int allies;
+	int targets = 0;
 
   sprintf(buf, "%s zaubert %s", unitname(mage),
     spell_name(sp, default_locale));
   switch(sp->id) {
     case SPL_HERO:
       df_bonus = (int)(power/5);
-      force = lovar(get_force(power, 4));
+      force = max(1, lovar(get_force(power, 4)));
       break;
 
     default:
       df_bonus = 1;
-      force = (int)power;
+      force = max(1, (int)power);
   }
   scat(":");
   battlerecord(b, buf);

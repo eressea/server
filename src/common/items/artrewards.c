@@ -98,8 +98,9 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
 
 #define SPEEDUP 2
 
+
 static int
-use_trappedairelemental(struct unit * u, int shipId, 
+useonother_trappedairelemental(struct unit * u, int shipId, 
                         const struct item_type * itype,
                         int amount, struct order * ord)
 {
@@ -131,10 +132,25 @@ use_trappedairelemental(struct unit * u, int shipId,
   return 0;
 }
 
+static int
+use_trappedairelemental(struct unit * u,
+    const struct item_type * itype,
+    int amount, struct order * ord)
+{
+  ship *sh = u->ship;
+
+  if(sh == NULL) {
+    cmistake(u, ord, 20, MSG_MOVE);
+    return -1;
+  }
+  return useonother_trappedairelemental(u, sh->no, itype, amount,ord);
+}
+
 void
 register_artrewards(void)
 {
   at_register(&at_peaceimmune);
   register_function((pf_generic)use_hornofdancing, "use_hornofdancing");
   register_function((pf_generic)use_trappedairelemental, "use_trappedairelemental");
+  register_function((pf_generic)useonother_trappedairelemental, "useonother_trappedairelemental");
 }

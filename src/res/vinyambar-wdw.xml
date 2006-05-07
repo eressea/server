@@ -88,9 +88,9 @@
   </strings>
 
   <resources>
-    <resource name="phoenixfeather">
+    <resource name="phoenixfeather" notlost="yes">
       <function name="change" value="changeitem"/>
-      <item weight="0"/>
+      <item weight="0" notlost="yes"/>
     </resource>
   </resources>
 

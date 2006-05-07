@@ -10,7 +10,10 @@ function update_phoenix()
   end
   f = get_faction(0)
   if (f~=nil) then
-    local r, nregions = 0
+    local r
+    local nregions
+
+    nregions = 0
     for r in regions() do
       nregions = nregions+1
     end

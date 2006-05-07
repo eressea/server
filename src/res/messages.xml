@@ -183,7 +183,15 @@
     </type>
     <text locale="de">"In dieser Gegend steht das Korn besonders gut im Feld. ($int36($id))"</text>
     <text locale="fr">"($int36($id))"</text>
-    <text locale="en">"The grain in this region is esecially healthy. ($int36($id))"</text>
+    <text locale="en">"The grain in this region is especially healthy. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::shipspeedup" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die Winde scheinen dieses Schiff besonders zu beguenstigen. ($int36($id))"</text>
+    <text locale="fr">"($int36($id))"</text>
+    <text locale="en">"The winds seem to favor this ship. ($int36($id))"</text>
   </message>
   <message name="curseinfo::holyground" section="events">
     <type>

@@ -19,26 +19,35 @@
     </construction>
     <construction skill="building" minskill="11" maxsize="12" reqsize="1">
       <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="10"/>
       <requirement type="mallorn" quantity="10"/>
       <requirement type="stone" quantity="10"/>
     </construction>
     <construction skill="building" minskill="11" maxsize="16" reqsize="1">
+      <requirement type="laen" quantity="1"/>
       <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="10"/>
       <requirement type="mallorn" quantity="10"/>
       <requirement type="stone" quantity="10"/>
     </construction>
     <construction skill="building" minskill="11" maxsize="20" reqsize="1">
+      <requirement type="laen" quantity="5"/>
       <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="10"/>
       <requirement type="mallorn" quantity="10"/>
       <requirement type="stone" quantity="10"/>
     </construction>
     <construction skill="building" minskill="11" maxsize="24" reqsize="1">
+      <requirement type="laen" quantity="10"/>
       <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="10"/>
       <requirement type="mallorn" quantity="10"/>
       <requirement type="stone" quantity="10"/>
     </construction>
     <construction skill="building" minskill="11" maxsize="28" reqsize="1">
+      <requirement type="laen" quantity="10"/>
       <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="10"/>
       <requirement type="mallorn" quantity="10"/>
       <requirement type="stone" quantity="10"/>
     </construction>

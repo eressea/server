@@ -1089,12 +1089,14 @@ quit(void)
     if (f->flags & FFL_QUIT) {
       if (EnhancedQuit()) {
         const char * token = get_variable(f->attribs, "quit");
-        int f2_id = atoi36(token);
-        faction *f2 = findfaction(f2_id);
+        if(token != NULL) {
+          int f2_id = atoi36(token);
+          faction *f2 = findfaction(f2_id);
 
-        assert(f2_id>0);
-        assert(f2!=NULL);
-        transfer_faction(f, f2);
+          assert(f2_id>0);
+          assert(f2!=NULL);
+          transfer_faction(f, f2);
+        }
       }
       destroyfaction(f);
     }

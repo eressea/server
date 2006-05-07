@@ -841,7 +841,7 @@ check_mages(void)
       }
       if (mages>maxmages) {
         log_error(("faction %s has %d of max %d magicians.\n",
-          factionid(u->faction), mages, maxmages));
+          factionid(f), mages, maxmages));
       }
     }
   }

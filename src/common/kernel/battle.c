@@ -1452,6 +1452,7 @@ do_combatmagic(battle *b, combatmagic_t was)
       const spell * sp = co->sp;
       int level = co->level;
       double power = co->force;
+
       if (sp->sp_function==NULL) {
         log_error(("spell '%s' has no function.\n", sp->sname));
       } else {
