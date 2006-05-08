@@ -46,25 +46,25 @@
         <resource name="laen" chance="0.05" level="1" base="4" div="100" />
     </terrain>
     <terrain name="glacier" size="100" road="250" arctic="yes" seed="2">
-        <herb name="h15" />
-        <herb name="h16" />
-        <herb name="h17" />
+        <herb name="h18" />
+        <herb name="h19" />
+        <herb name="h20" />
         <resource name="iron" chance="1.0" level="1" base="3" div="50" />
         <resource name="stone" chance="1.0" level="1" base="2" div="100" />
         <resource name="laen" chance="0.05" level="1" base="4" div="100" />
     </terrain>
     <terrain name="iceberg_sleep" size="100" road="250" arctic="yes">
-        <herb name="h15" />
-        <herb name="h16" />
-        <herb name="h17" />
+        <herb name="h18" />
+        <herb name="h19" />
+        <herb name="h20" />
         <resource name="iron" chance="0.9" level="1" base="3" div="50" />
         <resource name="stone" chance="0.9" level="1" base="2" div="100" />
         <resource name="laen" chance="0.05" level="1" base="4" div="100" />
     </terrain>
     <terrain name="iceberg" size="100" arctic="yes">
-        <herb name="h15" />
-        <herb name="h16" />
-        <herb name="h17" />
+        <herb name="h18" />
+        <herb name="h19" />
+        <herb name="h20" />
         <resource name="iron" chance="0.9" level="1" base="3" div="50" />
         <resource name="stone" chance="0.9" level="1" base="2" div="100" />
     </terrain>
