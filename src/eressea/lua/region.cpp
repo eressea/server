@@ -71,6 +71,21 @@ lua_region_getowner(const region& r) {
 }
 
 static void
+region_setherbtype(region& r, const char * str) {
+  const struct resource_type * rtype = rt_find(str);
+  if (rtype!=NULL && rtype->itype!=NULL) {
+    rsetherbtype(&r, rtype->itype);
+  }
+}
+
+static const char *
+region_getherbtype(const region& r) {
+  const struct item_type * itype = rherbtype(&r);
+  if (itype==NULL) return NULL;
+  return itype->rtype->_name[0];
+}
+
+static void
 region_setinfo(region& r, const char * info) {
   set_string(&r.display, info);
 }
@@ -80,7 +95,7 @@ region_getinfo(const region& r) {
   return r.display;
 }
 
-static int 
+static int
 region_plane(const region& r)
 {
   if (r.planep==NULL) return 0;
@@ -93,14 +108,14 @@ region_addnotice(region& r, const char * str)
   addmessage(&r, NULL, str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
-static std::ostream& 
+static std::ostream&
 operator<<(std::ostream& stream, const region& r)
 {
   stream << regionname(&r, NULL) << ", " << region_getterrain(r);
   return stream;
 }
 
-static bool 
+static bool
 operator==(const region& a, const region&b)
 {
   return a.x==b.x && a.y==b.y;
@@ -123,7 +138,7 @@ region_setflag(region& r, int bit, bool set)
 static int
 region_getresource(const region& r, const char * type)
 {
-	const resource_type * rtype = rt_find(type);
+  const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
     if (rtype==rt_find("money")) return rmoney(&r);
     if (rtype==rt_find("peasant")) return rpeasants(&r);
@@ -134,7 +149,7 @@ region_getresource(const region& r, const char * type)
     if (strcmp(type, "grave")==0) return deathcount(&r);
     if (strcmp(type, "chaos")==0) return chaoscount(&r);
   }
-	return 0;
+  return 0;
 }
 
 static void
@@ -183,7 +198,7 @@ region_terraform(short x, short y, const char * tname)
     if (r!=NULL) {
       if (r->units!=NULL) {
         // TODO: error message
-        return r; 
+        return r;
       }
       // TODO: region löschen
       terraform_region(r, NULL);
@@ -288,7 +303,7 @@ region_additem(region& r, const char * iname, int number)
 }
 
 void
-bind_region(lua_State * L) 
+bind_region(lua_State * L)
 {
   module(L)[
     def("regions", &get_regions, return_stl_iterator),
@@ -301,6 +316,7 @@ bind_region(lua_State * L)
     .property("name", &region_getname, &region_setname)
     .property("info", &region_getinfo, &region_setinfo)
     .property("owner", &lua_region_getowner, &lua_region_setowner)
+    .property("herbtype", &region_getherbtype, &region_setherbtype)
     .property("terrain", &region_getterrain)
     .def("add_notice", &region_addnotice)
     .def("add_direction", &region_adddirection)
