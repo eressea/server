@@ -2105,7 +2105,7 @@ report_plaintext(const char * filename, report_context * ctx)
           sh->type->construction->maxsize);
       }
       if (sh->damage) {
-        int percent = (sh->damage+DAMAGE_SCALE-1)*100/(sh->size*DAMAGE_SCALE);
+        int percent = (sh->damage*100+DAMAGE_SCALE-1)/(sh->size*DAMAGE_SCALE);
         sprintf(buf+strlen(buf), ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
       }
       if (!fval(r->terrain, SEA_REGION)) {
