@@ -156,6 +156,7 @@ a_unlink(attrib ** pa, attrib * a)
   attrib ** pnexttype = pa;
   attrib ** pnext = NULL;
 
+  assert(a!=NULL);
   while (*pnexttype) {
     attrib * next = *pnexttype;
     if (next->type==a->type) break;
@@ -187,10 +188,11 @@ a_unlink(attrib ** pa, attrib * a)
 int
 a_remove(attrib ** pa, attrib * a)
 {
-	int ok;
-	ok = a_unlink(pa, a);
-	if (ok) a_free(a);
-	return ok;
+  int ok;
+  assert(a!=NULL);
+  ok = a_unlink(pa, a);
+  if (ok) a_free(a);
+  return ok;
 }
 
 void

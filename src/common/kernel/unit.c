@@ -181,97 +181,98 @@ distribute_items(unit * u)
 void
 destroy_unit(unit * u)
 {
-	region *r = u->region;
-	boolean zombie = false;
-	unit *clone;
-
-	if (!ufindhash(u->no)) return;
-
-	if (!fval(u->race, RCF_ILLUSIONARY)) {
-		item ** p_item = &u->items;
-		unit * u3;
-
-		/* u->faction->no_units--; */ /* happens in u_setfaction now */
-
-		if (r) for (u3 = r->units; u3; u3 = u3->next) {
-			if (u3 != u && u3->faction == u->faction && playerrace(u3->race)) {
-				i_merge(&u3->items, &u->items);
-				u->items = NULL;
-				break;
-			}
-		}
-		u3 = NULL;
-		while (*p_item) {
-			item * item = *p_item;
-			if (item->number && item->type->flags & ITF_NOTLOST) {
-				if (u3==NULL) {
-					u3 = r->units;
-					while (u3 && u3!=u) u3 = u3->next;
-					if (!u3) {
-						zombie = true;
-						break;
-					}
-				}
-				if (u3) {
-					i_add(&u3->items, i_remove(p_item, item));
-				}
-			}
-			if (*p_item == item) p_item=&item->next;
-		}
+  region *r = u->region;
+  boolean zombie = false;
+  unit *clone;
+  
+  if (!ufindhash(u->no)) return;
+  
+  if (!fval(u->race, RCF_ILLUSIONARY)) {
+    item ** p_item = &u->items;
+    unit * u3;
+    
+    /* u->faction->no_units--; */ /* happens in u_setfaction now */
+    
+    if (r) for (u3 = r->units; u3; u3 = u3->next) {
+      if (u3 != u && u3->faction == u->faction && playerrace(u3->race)) {
+        i_merge(&u3->items, &u->items);
+        u->items = NULL;
+        break;
+      }
+    }
+    u3 = NULL;
+    while (*p_item) {
+      item * item = *p_item;
+      if (item->number && item->type->flags & ITF_NOTLOST) {
+        if (u3==NULL) {
+          u3 = r->units;
+          while (u3 && u3!=u) u3 = u3->next;
+          if (!u3) {
+            zombie = true;
+            break;
+          }
+        }
+        if (u3) {
+          i_add(&u3->items, i_remove(p_item, item));
+        }
+      }
+      if (*p_item == item) p_item=&item->next;
+    }
     if (u->items && strlen(u->faction->passw)>0) {
       distribute_items(u);
     }
-	}
-
-	/* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
-	 * Items haben, sonst Memory-Leak. */
-	
-	clone = has_clone(u);
-	if (clone && rng_int()%100 < 90) {
-		attrib *a;
-		int i;
-
-		/* TODO: Messages generieren. */
-		u->region = clone->region;
-		u->ship = clone->ship;
-		u->building = clone->building;
-		u->hp = 1;
-		i = u->no;
-		uunhash(u);
-		uunhash(clone);
-		u->no = clone->no;
-		clone->no = i;
-		uhash(u);
-		uhash(clone);
-		set_number(u, 1);
-		set_spellpoints(u, 0);
-		a = a_find(u->attribs, &at_clone);
-		a_remove(&u->attribs, a);
-		a = a_find(clone->attribs, &at_clonemage);
-		a_remove(&clone->attribs, a);
-		fset(u, UFL_LONGACTION);
-		set_number(clone, 0);
-		u = clone;
-		zombie = false;
-	}
+  }
+  
+  /* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
+   * Items haben, sonst Memory-Leak. */
+  
+  clone = has_clone(u);
+  if (clone && rng_int()%100 < 90) {
+    attrib *a;
+    int i;
+    
+    /* TODO: Messages generieren. */
+    u->region = clone->region;
+    u->ship = clone->ship;
+    u->building = clone->building;
+    u->hp = 1;
+    i = u->no;
+    uunhash(u);
+    uunhash(clone);
+    u->no = clone->no;
+    clone->no = i;
+    uhash(u);
+    uhash(clone);
+    set_number(u, 1);
+    set_spellpoints(u, 0);
+    a = a_find(u->attribs, &at_clone);
+    if (a!=NULL) a_remove(&u->attribs, a);
+    a = a_find(clone->attribs, &at_clonemage);
+    if (a!=NULL) a_remove(&clone->attribs, a);
+    fset(u, UFL_LONGACTION);
+    set_number(clone, 0);
+    u = clone;
+    zombie = false;
+  }
 		
-	if (zombie) {
-		u_setfaction(u, findfaction(MONSTER_FACTION));
-		scale_number(u, 1);
-		u->race = u->irace = new_race[RC_ZOMBIE];
-	} else {
-		if (u->number) set_number(u, 0);
-		handle_event(&u->attribs, "destroy", u);
-		if (r && !fval(r->terrain, SEA_REGION))
-			rsetmoney(r, rmoney(r) + get_money(u));
-		dhash(u->no, u->faction);
-		u_setfaction(u, NULL);
-		if (r) leave(r, u);
-		uunhash(u);
-		if (r) choplist(&r->units, u);
-		u->next = udestroy;
-		udestroy = u;
-	}
+  if (zombie) {
+    u_setfaction(u, findfaction(MONSTER_FACTION));
+    scale_number(u, 1);
+    u->race = u->irace = new_race[RC_ZOMBIE];
+  } else {
+    if (u->number) set_number(u, 0);
+    handle_event(&u->attribs, "destroy", u);
+    if (r && !fval(r->terrain, SEA_REGION)) {
+      rsetmoney(r, rmoney(r) + get_money(u));
+    }
+    dhash(u->no, u->faction);
+    u_setfaction(u, NULL);
+    if (r) leave(r, u);
+    uunhash(u);
+    if (r) choplist(&r->units, u);
+    u->next = udestroy;
+    udestroy = u;
+  }
 }
 
 unit *
