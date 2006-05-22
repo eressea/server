@@ -2758,6 +2758,8 @@ guard_on_cmd(unit * u, struct order * ord)
         guard(u, GUARD_ALL);
       } else if (!armedmen(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
+      } else if (u->faction->age < NewbieImmunity()) {
+        cmistake(u, ord, 304, MSG_EVENT);
       } else {
         guard(u, GUARD_ALL);
       }
