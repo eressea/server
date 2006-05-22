@@ -657,7 +657,8 @@ sp_destroy_magic(castorder *co)
   switch(obj) {
     case SPP_REGION:
     {
-      region *tr = pa->param[0]->data.r;
+      /* region *tr = pa->param[0]->data.r; -- farcasting! */
+      region *tr = co->rt;
       ap = &tr->attribs;
       strcpy(ts, regionname(tr, mage->faction));
       break;
