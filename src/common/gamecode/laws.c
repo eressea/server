@@ -553,9 +553,14 @@ peasants(region * r)
 
   if (peasants>0) {
     int glueck = 0;
-    int births = (int)(0.5F + peasants * 0.0001F * PEASANTGROWTH);
+    double fraction = peasants * 0.0001F * PEASANTGROWTH;
+    int births = (int)fraction;
     attrib * a = a_find(r->attribs, &at_peasantluck);
 
+    if (rng_double()<(fraction-births)) {
+      /* because we don't want regions that never grow pga. rounding. */
+      ++births;
+    }
     if (a!=NULL) {
       glueck = a->data.i * 1000;
     }
