@@ -691,6 +691,21 @@ region2coord(const region * r, coordinate * c)
 #define FAST_RIGHT KEY_SRIGHT
 #endif
 
+void
+highlight_region(region *r)
+{
+  if (r!=NULL) r->flags |= RF_MAPPER_HIGHLIGHT;
+}
+
+void
+select_coordinate(selection * selected, int x, int y)
+{
+  coordinate coord = { 0 };
+  coord.x = x;
+  coord.y = y;
+  tag_region(selected, &coord);
+}
+
 enum { MODE_HIGHLIGHT = 0x0, MODE_SELECT = 0x1 };
 
 static void
@@ -731,11 +746,10 @@ select_regions(state * st, int selectmode)
     statusline(st->wnd_status->handle, sbuffer);
     for (r=regions;r;r=r->next) {
       if (r->units) {
-        coordinate coord;
         if (selectmode&MODE_SELECT) {
-          tag_region(st->selected, region2coord(r, &coord));
+          select_coordinate(st->selected, r->x, r->y);
         } else {
-          r->flags |= RF_MAPPER_HIGHLIGHT;
+          highlight_region(r);
         }
       }
     }
@@ -746,11 +760,10 @@ select_regions(state * st, int selectmode)
     statusline(st->wnd_status->handle, sbuffer);
     for (r=regions;r;r=r->next) {
       if (r->ships) {
-        coordinate coord;
         if (selectmode&MODE_SELECT) {
-          tag_region(st->selected, region2coord(r, &coord));
+          select_coordinate(st->selected, r->x, r->y);
         } else {
-          r->flags |= RF_MAPPER_HIGHLIGHT;
+          highlight_region(r);
         }
       }
     }
@@ -764,16 +777,15 @@ select_regions(state * st, int selectmode)
       
       if (f!=NULL) {
         unit * u;
-        coordinate coord;
-        
+       
         sprintf(sbuffer, "%sfaction: %s", status, itoa36(f->no));
         statusline(st->wnd_status->handle, sbuffer);
         for (u=f->units;u;u=u->nextF) {
           region * r = u->region;
           if (selectmode&MODE_SELECT) {
-            tag_region(st->selected, region2coord(r, &coord));
+            select_coordinate(st->selected, r->x, r->y);
           } else {
-            r->flags |= RF_MAPPER_HIGHLIGHT;
+            highlight_region(r);
           }
         }
       } else {
@@ -794,11 +806,10 @@ select_regions(state * st, int selectmode)
       statusline(st->wnd_status->handle, sbuffer);
       for (r=regions;r;r=r->next) {
         if (r->terrain==terrain) {
-          coordinate coord;
           if (selectmode&MODE_SELECT) {
-            tag_region(st->selected, region2coord(r, &coord));
+            select_coordinate(st->selected, r->x, r->y);
           } else {
-            r->flags |= RF_MAPPER_HIGHLIGHT;
+            highlight_region(r);
           }
         }
       }

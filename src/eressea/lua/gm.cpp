@@ -3,6 +3,7 @@
 
 #include "bindings.h"
 #include "list.h"
+#include "../gmtool.h"
 #include "../gmtool_structs.h"
 
 #include <kernel/region.h>
@@ -57,12 +58,27 @@ selected_regions(void)
   return eressea::list<region *, tag *, selectedregion>(next_tag(0, current_state));
 }
 
+static void
+gmtool_select_coordinate(int x, int y)
+{
+  select_coordinate(current_state->selected, x, y);
+}
+
+static void
+gmtool_select_region(region& r)
+{
+  select_coordinate(current_state->selected, r.x, r.y);
+}
+
 void
 bind_gmtool(lua_State * L)
 {
-  module(L)[
-    def("selected_regions", &selected_regions, return_stl_iterator),
-    def("current_region", &current_region)
+  module(L, "gmtool")[
+    def("selection", &selected_regions, return_stl_iterator),
+    def("cursor", &current_region),
+    def("highlight", &highlight_region),
+    def("select", &gmtool_select_region),
+    def("select_at", &gmtool_select_coordinate)
   ];
 #ifdef LUABIND_NO_EXCEPTIONS
   luabind::set_error_callback(error_callback);
