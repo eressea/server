@@ -523,17 +523,16 @@ max_magicians(const faction * f)
 int
 max_skill(faction * f, skill_t sk)
 {
-  int     m = INT_MAX;
-
-  if (allied_skilllimit(f, sk)) {
+  int m = INT_MAX;
+  int al = allied_skilllimit(f, sk);
+  if (al>0) {
     if (sk!=SK_ALCHEMY && sk!=SK_MAGIC) return INT_MAX;
     if (f->alliance!=NULL) {
       int ac = listlen(f->alliance->members); /* number of factions */
-      int al = allied_skilllimit(f, sk); /* limit per alliance */
-      int fl = (al+ac-1)/ac; /* faction limit */
-      /* the following ist _very_ weird, please examine */
+      int fl = (al+ac-1)/ac; /* faction limit, rounded up */
+      /* the faction limit may not be achievable because it would break the alliance-limit */
       int sc = al - allied_skillcount(f, sk);
-      if (sc==0) return count_skill(f, sk);
+      if (sc<=0) return 0;
       return fl;
     }
   }

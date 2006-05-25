@@ -243,7 +243,7 @@ init_curses(void)
 
   if (has_colors() || force_color) {
     short bcol = COLOR_BLACK;
-    short hcol = COLOR_CYAN;
+    short hcol = COLOR_MAGENTA;
     start_color();
 #ifdef WIN32    
     /* looks crap on putty with TERM=linux */
@@ -698,7 +698,7 @@ highlight_region(region *r)
 }
 
 void
-select_coordinate(selection * selected, int x, int y)
+select_coordinate(struct selection * selected, int x, int y)
 {
   coordinate coord = { 0 };
   coord.x = x;
