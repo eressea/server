@@ -781,8 +781,9 @@ transfermen(unit * u, unit * u2, int n)
 	if (u2) {
 		skill *sv, *sn;
 		skill_t sk;
-		assert(u2->number+n>0);
+    ship * sh;
 
+    assert(u2->number+n>0);
 		if (demonfix && u2->race==new_race[RC_DAEMON]) fset(u2, UFL_DEBUG);
 
 		for (sk=0; sk!=MAXSKILLS; ++sk) {
@@ -834,7 +835,9 @@ transfermen(unit * u, unit * u2, int n)
 			if (olde->value) change_effect(u2, olde->type, olde->value);
 			a = a->next;
 		}
-		if (fval(u, UFL_LONGACTION)) fset(u2, UFL_LONGACTION);
+    sh = leftship(u);
+    if (sh!=NULL) set_leftship(u2, sh);
+    u2->flags |= u->flags&(UFL_LONGACTION|UFL_NOTMOVING|UFL_HUNGER|UFL_MOVED|UFL_ENTER);
 		if (u->attribs) {
 			transfer_curse(u, u2, n);
 		}
