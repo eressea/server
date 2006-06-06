@@ -1106,26 +1106,28 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
  * erblickt wird */
 {
   int n;
-  boolean cansee = false;
   unit *u2;
+
   if (u->race == new_race[RC_SPELL] || u->number == 0) return false;
-  else if (u->faction == f) cansee = true;
+  else if (u->faction == f) return true;
   else {
+    int rings;
 
     if (getguard(u) || usiege(u) || u->building || u->ship) {
-      cansee = true;
+      return true;
     }
 
     n = eff_stealth(u, r) - modifier;
-    if (n<=0) {
-      cansee = true;
+    rings = invisible(u, NULL);
+    if (rings==0 && n<=0) {
+      return true;
     }
 
-    for (u2 = r->units; !cansee && u2; u2 = u2->next){
+    for (u2 = r->units; u2; u2 = u2->next){
       if (u2->faction == f) {
         int o;
 
-        if (invisible(u, u2) >= u->number) continue;
+        if (rings && invisible(u, u2) >= u->number) continue;
 
         o = eff_skill(u2, SK_OBSERVATION, r);
 
@@ -1134,15 +1136,12 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
           o = NIGHT_EYE_TALENT;
 #endif
         if (o >= n) {
-          cansee = true;
+          return true;
         }
       }
     }
-    if (getguard(u) || usiege(u) || u->building || u->ship) {
-      cansee = true;
-    }
   }
-  return cansee;
+  return false;
 }
 
 #ifndef NDEBUG
