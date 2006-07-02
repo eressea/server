@@ -260,7 +260,7 @@
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
   </race>
-  <race name="mummy" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" teach="no" noheal="yes" undead="yes" equipment="yes" nogive="yes">
+  <race name="mummy" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" teach="no" noheal="yes" undead="yes" equipment="yes" giveitem="yes" getitem="yes">
     <ai splitsize="10000" moverandom="yes"/>
     <skill name="melee" modifier="1"/>
     <skill name="polearm" modifier="1"/>

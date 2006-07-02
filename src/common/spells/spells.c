@@ -2206,10 +2206,14 @@ sp_ironkeeper(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
 
+  /* this does not make sense anymore, iron and laen can appear
+   * in any region */
+  /*
   if (rterrain(r) != T_MOUNTAIN && rterrain(r) != T_GLACIER) {
     report_failure(mage, co->order);
     return 0;
   }
+  */
 
   keeper = create_unit(r, mage->faction, 1, new_race[RC_IRONKEEPER], 0, "Bergwächter", mage);
 

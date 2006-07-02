@@ -823,7 +823,7 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
   region *r = b->region;
   unit *mage = fi->unit;
   attrib *a;
-  int force = (int)get_force(power, 3);
+  int force = max(1, (int)get_force(power, 3));
 
   unused(sp);
 

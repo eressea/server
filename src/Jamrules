@@ -1,9 +1,9 @@
 #C++ = g++-3.3 ;
 #CC = gcc-3.3 ;
 #LINK = gcc-3.3 ;
-C++ = g++ ;
-CC = gcc ;
-LINK = gcc ;
+C++ = g++-4.0 ;
+CC = gcc-4.0 ;
+LINK = gcc-4.0 ;
 # ECHO $(JAMUNAME) ;
 
 # LINKFLAGS += -rdynamic ;
