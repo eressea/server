@@ -9470,7 +9470,6 @@ init_spells(void)
   at_register(&at_cursewall);
   at_register(&at_unitdissolve);
   at_register(&at_wdwpyramid);
-  register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
   register_bordertype(&bt_firewall);
   register_bordertype(&bt_wisps);
   register_bordertype(&bt_chaosgate);
@@ -9484,4 +9483,5 @@ register_spells(void)
   /* init_firewall(); */
   ct_register(&ct_firewall);
   register_curses();
+  register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
 }
