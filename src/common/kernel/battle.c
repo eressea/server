@@ -1750,10 +1750,9 @@ hits(troop at, troop dt, weapon * awp)
   if ((af->person[at.index].flags & FL_TIRED && rng_int()%100 < 50)
       || (af->person[at.index].flags & FL_SLEEPING))
     return 0;
-  if (awp && fval(awp->type, WTF_MISSILE)
-      && af->side->battle->reelarrow == true
-      && rng_int()%100 < 50)
-  {
+
+  /* effect of sp_reeling_arrows combatspell */
+  if (af->side->battle->reelarrow && awp && fval(awp->type, WTF_MISSILE) && rng_double() < 0.5) {
     return 0;
   }
 
