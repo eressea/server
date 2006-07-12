@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -26,9 +26,9 @@ struct locale;
 struct troop;
 
 typedef struct item {
-	const struct item_type * type;
-	int number;
-	struct item * next;
+  const struct item_type * type;
+  int number;
+  struct item * next;
 } item;
 
 typedef struct resource {
@@ -254,71 +254,65 @@ extern resource_type * r_unit;
 extern resource_type * r_hp;
 
 enum {
-	I_IRON,						/* 0 */
-	I_STONE,
-	I_HORSE,
-	/* alte Artefakte */
-	I_AMULET_OF_HEALING,
-	I_AMULET_OF_TRUE_SEEING,
-	I_RING_OF_INVISIBILITY,
-	I_RING_OF_POWER,
-	I_DRAGONHEAD,
-	I_CHASTITY_BELT, /* bleibt */
-	I_LAEN,
-	I_DRACHENBLUT,
-	I_FEENSTIEFEL,
-	I_BIRTHDAYAMULET,
-	I_PEGASUS,
-	I_UNICORN,
-	I_DOLPHIN,
-	I_RING_OF_NIMBLEFINGER,
-	I_TROLLBELT,
-	I_PRESSCARD,
-	I_AURAKULUM,
-	I_SEASERPENTHEAD,
+  I_IRON,           /* 0 */
+  I_STONE,
+  I_HORSE,
+  /* alte Artefakte */
+  I_AMULET_OF_HEALING,
+  I_AMULET_OF_TRUE_SEEING,
+  I_RING_OF_INVISIBILITY,
+  I_RING_OF_POWER,
+  I_CHASTITY_BELT, /* bleibt */
+  I_LAEN,
+  I_FEENSTIEFEL,
+  I_BIRTHDAYAMULET,
+  I_PEGASUS,
+  I_UNICORN,
+  I_DOLPHIN,
+  I_RING_OF_NIMBLEFINGER,
+  I_TROLLBELT,
+  I_PRESSCARD,
+  I_AURAKULUM,
   I_SPHERE_OF_INVISIBILITY,
   I_BAG_OF_HOLDING,
   I_SACK_OF_CONSERVATION,
-	I_TACTICCRYSTAL,
-	MAX_ITEMS /* do not use outside item.c ! */
+  I_TACTICCRYSTAL,
+  MAX_ITEMS /* do not use outside item.c ! */
 };
 
 enum {
-	/* ITEMS: */
-	R_IRON,
-	R_STONE,
-	R_HORSE,
+  /* ITEMS: */
+  R_IRON,
+  R_STONE,
+  R_HORSE,
   /**/
-	R_AMULET_OF_HEALING,
-	R_AMULET_OF_TRUE_SEEING,
-	R_RING_OF_INVISIBILITY,
-	R_RING_OF_POWER,
-	R_DRAGONHEAD,
-	R_CHASTITY_BELT,
-	R_EOG,
-	R_DRACHENBLUT,
-	R_FEENSTIEFEL,
-	R_BIRTHDAYAMULET,
-	R_PEGASUS,
-	R_UNICORN,
-	R_DOLPHIN,
-	R_RING_OF_NIMBLEFINGER,
-	R_TROLLBELT,
-	R_PRESSCARD,
-	R_AURAKULUM,
-	R_SEASERPENTHEAD,
+  R_AMULET_OF_HEALING,
+  R_AMULET_OF_TRUE_SEEING,
+  R_RING_OF_INVISIBILITY,
+  R_RING_OF_POWER,
+  R_CHASTITY_BELT,
+  R_EOG,
+  R_FEENSTIEFEL,
+  R_BIRTHDAYAMULET,
+  R_PEGASUS,
+  R_UNICORN,
+  R_DOLPHIN,
+  R_RING_OF_NIMBLEFINGER,
+  R_TROLLBELT,
+  R_PRESSCARD,
+  R_AURAKULUM,
   R_SPHERE_OF_INVISIBILITY,
   R_BAG_OF_HOLDING,
   R_SACK_OF_CONSERVATION,
-	R_TACTICCRYSTAL,
+  R_TACTICCRYSTAL,
 
-	/* SONSTIGE */
-	R_SILVER,
-	R_AURA,      /* Aura */
-	R_PERMAURA,  /* Permanente Aura */
+  /* SONSTIGE */
+  R_SILVER,
+  R_AURA,      /* Aura */
+  R_PERMAURA,  /* Permanente Aura */
 
-	MAX_RESOURCES, /* do not use outside item.c ! */
-	NORESOURCE = -1
+  MAX_RESOURCES, /* do not use outside item.c ! */
+  NORESOURCE = -1
 };
 
 extern struct potion_type * oldpotiontype[];

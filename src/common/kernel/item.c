@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -83,105 +83,105 @@ enum {
 static int
 res_changeaura(unit * u, const resource_type * rtype, int delta)
 {
-	assert(rtype!=NULL);
-	change_spellpoints(u, delta);
-	return 0;
+  assert(rtype!=NULL);
+  change_spellpoints(u, delta);
+  return 0;
 }
 
 static int
 res_changeperson(unit * u, const resource_type * rtype, int delta)
 {
-	assert(rtype!=NULL || !"not implemented");
-	scale_number(u, u->number+delta);
-	return 0;
+  assert(rtype!=NULL || !"not implemented");
+  scale_number(u, u->number+delta);
+  return 0;
 }
 
 static int
 res_changepermaura(unit * u, const resource_type * rtype, int delta)
 {
-	assert(rtype!=NULL);
-	change_maxspellpoints(u, delta);
-	return 0;
+  assert(rtype!=NULL);
+  change_maxspellpoints(u, delta);
+  return 0;
 }
 
 static int
 res_changehp(unit * u, const resource_type * rtype, int delta)
 {
-	assert(rtype!=NULL);
-	u->hp+=delta;
-	return 0;
+  assert(rtype!=NULL);
+  u->hp+=delta;
+  return 0;
 }
 
 static int
 res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
-	assert(rtype!=NULL && u->region->land);
-	u->region->land->peasants+=delta;
-	return 0;
+  assert(rtype!=NULL && u->region->land);
+  u->region->land->peasants+=delta;
+  return 0;
 }
 
 int
 res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
-	int num;
-	if (rtype == oldresourcetype[R_STONE] && u->race==new_race[RC_STONEGOLEM] && delta<=0) {
-		int reduce = delta / GOLEM_STONE;
-		if (delta % GOLEM_STONE != 0) --reduce;
-		scale_number(u, u->number+reduce);
-		num = u->number;
-	} else if (rtype == oldresourcetype[R_IRON] && u->race==new_race[RC_IRONGOLEM] && delta<=0) {
-		int reduce = delta / GOLEM_IRON;
-		if (delta % GOLEM_IRON != 0) --reduce;
-		scale_number(u, u->number+reduce);
-		num = u->number;
-	} else {
-		const item_type * itype = resource2item(rtype);
-		item * i;
-		assert(itype!=NULL);
-		i = i_change(&u->items, itype, delta);
-		if (i==NULL) return 0;
-		num = i->number;
-	}
-	return num;
+  int num;
+  if (rtype == oldresourcetype[R_STONE] && u->race==new_race[RC_STONEGOLEM] && delta<=0) {
+    int reduce = delta / GOLEM_STONE;
+    if (delta % GOLEM_STONE != 0) --reduce;
+    scale_number(u, u->number+reduce);
+    num = u->number;
+  } else if (rtype == oldresourcetype[R_IRON] && u->race==new_race[RC_IRONGOLEM] && delta<=0) {
+    int reduce = delta / GOLEM_IRON;
+    if (delta % GOLEM_IRON != 0) --reduce;
+    scale_number(u, u->number+reduce);
+    num = u->number;
+  } else {
+    const item_type * itype = resource2item(rtype);
+    item * i;
+    assert(itype!=NULL);
+    i = i_change(&u->items, itype, delta);
+    if (i==NULL) return 0;
+    num = i->number;
+  }
+  return num;
 }
 
 const char *
 resourcename(const resource_type * rtype, int flags)
 {
-	int i = 0;
+  int i = 0;
 
-	if (rtype->name) return rtype->name(rtype, flags);
+  if (rtype->name) return rtype->name(rtype, flags);
 
-	if (flags & NMF_PLURAL) i = 1;
-	if (flags & NMF_APPEARANCE && rtype->_appearance[i]) {
-		return rtype->_appearance[i];
-	}
-	return rtype->_name[i];
+  if (flags & NMF_PLURAL) i = 1;
+  if (flags & NMF_APPEARANCE && rtype->_appearance[i]) {
+    return rtype->_appearance[i];
+  }
+  return rtype->_name[i];
 }
 
 resource_type *
 new_resourcetype(const char ** names, const char ** appearances, int flags)
 {
-	resource_type * rtype = rt_find(names[0]);
+  resource_type * rtype = rt_find(names[0]);
 
-	if (rtype==NULL) {
-		int i;
-		rtype = calloc(sizeof(resource_type), 1);
+  if (rtype==NULL) {
+    int i;
+    rtype = calloc(sizeof(resource_type), 1);
 
-		for (i=0; i!=2; ++i) {
-			rtype->_name[i] = strdup(names[i]);
-			if (appearances) rtype->_appearance[i] = strdup(appearances[i]);
-			else rtype->_appearance[i] = NULL;
-		}
-		rt_register(rtype);
-	}
+    for (i=0; i!=2; ++i) {
+      rtype->_name[i] = strdup(names[i]);
+      if (appearances) rtype->_appearance[i] = strdup(appearances[i]);
+      else rtype->_appearance[i] = NULL;
+    }
+    rt_register(rtype);
+  }
 #ifndef NDEBUG
-	else {
-		/* TODO: check that this is the same type */
-	}
+  else {
+    /* TODO: check that this is the same type */
+  }
 #endif
-	rtype->flags |= flags;
-	return rtype;
+  rtype->flags |= flags;
+  return rtype;
 }
 
 void
@@ -189,83 +189,83 @@ it_register(item_type * itype)
 {
   int hash = hashstring(itype->rtype->_name[0]);
   int key = hash % IMAXHASH;
-	item_type ** p_itype = &itemtypes[key];
-	while (*p_itype && *p_itype != itype) p_itype = &(*p_itype)->next;
-	if (*p_itype==NULL) {
-		itype->rtype->itype = itype;
-		*p_itype = itype;
-		rt_register(itype->rtype);
-	}
+  item_type ** p_itype = &itemtypes[key];
+  while (*p_itype && *p_itype != itype) p_itype = &(*p_itype)->next;
+  if (*p_itype==NULL) {
+    itype->rtype->itype = itype;
+    *p_itype = itype;
+    rt_register(itype->rtype);
+  }
 }
 
 item_type *
 new_itemtype(resource_type * rtype,
              int iflags, int weight, int capacity)
 {
-	item_type * itype;
-	assert (resource2item(rtype) == NULL);
+  item_type * itype;
+  assert (resource2item(rtype) == NULL);
 
-	assert(rtype->flags & RTF_ITEM);
-	itype = calloc(sizeof(item_type), 1);
+  assert(rtype->flags & RTF_ITEM);
+  itype = calloc(sizeof(item_type), 1);
 
-	itype->rtype = rtype;
-	itype->weight = weight;
-	itype->capacity = capacity;
-	itype->flags |= iflags;
-	it_register(itype);
+  itype->rtype = rtype;
+  itype->weight = weight;
+  itype->capacity = capacity;
+  itype->flags |= iflags;
+  it_register(itype);
 
-	rtype->uchange = res_changeitem;
+  rtype->uchange = res_changeitem;
 
-	return itype;
+  return itype;
 }
 
 static void
 lt_register(luxury_type * ltype)
 {
-	ltype->itype->rtype->ltype = ltype;
-	ltype->next = luxurytypes;
-	luxurytypes = ltype;
+  ltype->itype->rtype->ltype = ltype;
+  ltype->next = luxurytypes;
+  luxurytypes = ltype;
 }
 
 luxury_type *
 new_luxurytype(item_type * itype, int price)
 {
-	luxury_type * ltype;
+  luxury_type * ltype;
 
-	assert(resource2luxury(itype->rtype) == NULL);
+  assert(resource2luxury(itype->rtype) == NULL);
 
-	ltype = calloc(sizeof(luxury_type), 1);
-	ltype->itype = itype;
-	ltype->price = price;
-	lt_register(ltype);
+  ltype = calloc(sizeof(luxury_type), 1);
+  ltype->itype = itype;
+  ltype->price = price;
+  lt_register(ltype);
 
-	return ltype;
+  return ltype;
 }
 
 weapon_type *
 new_weapontype(item_type * itype,
                int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t sk, int minskill)
 {
-	weapon_type * wtype;
+  weapon_type * wtype;
 
-	assert(resource2weapon(itype->rtype)==NULL);
+  assert(resource2weapon(itype->rtype)==NULL);
 
-	wtype = calloc(sizeof(weapon_type), 1);
-	if (damage) {
-		wtype->damage[0] = strdup(damage[0]);
-		wtype->damage[1] = strdup(damage[1]);
-	}
-	wtype->defmod = defmod;
-	wtype->flags |= wflags;
-	wtype->itype = itype;
-	wtype->magres = magres;
-	wtype->minskill = minskill;
-	wtype->offmod = offmod;
-	wtype->reload = reload;
-	wtype->skill = sk;
-	itype->rtype->wtype = wtype;
+  wtype = calloc(sizeof(weapon_type), 1);
+  if (damage) {
+    wtype->damage[0] = strdup(damage[0]);
+    wtype->damage[1] = strdup(damage[1]);
+  }
+  wtype->defmod = defmod;
+  wtype->flags |= wflags;
+  wtype->itype = itype;
+  wtype->magres = magres;
+  wtype->minskill = minskill;
+  wtype->offmod = offmod;
+  wtype->reload = reload;
+  wtype->skill = sk;
+  itype->rtype->wtype = wtype;
 
-	return wtype;
+  return wtype;
 }
 
 
@@ -291,25 +291,25 @@ new_armortype(item_type * itype, double penalty, double magres, int prot, unsign
 static void
 pt_register(potion_type * ptype)
 {
-	ptype->itype->rtype->ptype = ptype;
-	ptype->next = potiontypes;
-	potiontypes = ptype;
+  ptype->itype->rtype->ptype = ptype;
+  ptype->next = potiontypes;
+  potiontypes = ptype;
 }
 
 potion_type *
 new_potiontype(item_type * itype,
                int level)
 {
-	potion_type * ptype;
+  potion_type * ptype;
 
-	assert(resource2potion(itype->rtype)==NULL);
+  assert(resource2potion(itype->rtype)==NULL);
 
-	ptype = calloc(sizeof(potion_type), 1);
-	ptype->itype = itype;
-	ptype->level = level;
-	pt_register(ptype);
+  ptype = calloc(sizeof(potion_type), 1);
+  ptype->itype = itype;
+  ptype->level = level;
+  pt_register(ptype);
 
-	return ptype;
+  return ptype;
 }
 
 
@@ -317,7 +317,7 @@ void
 rt_register(resource_type * rtype)
 {
   resource_type ** prtype = &resourcetypes;
-  
+
   if (!rtype->hashkey) {
     rtype->hashkey = hashstring(rtype->_name[0]);
   }
@@ -336,7 +336,7 @@ item2resource(const item_type * itype)
 const item_type *
 resource2item(const resource_type * rtype)
 {
-	return rtype->itype;
+  return rtype->itype;
 }
 
 const weapon_type *
@@ -381,23 +381,23 @@ rt_find(const char * name)
   return rtype;
 }
 
-static const char * it_aliases[][2] = { 
-	{ "Runenschwert", "runesword" }, 
-	{ "p12", "truthpotion" },
-	{ "p1", "goliathwater" },
+static const char * it_aliases[][2] = {
+  { "Runenschwert", "runesword" },
+  { "p12", "truthpotion" },
+  { "p1", "goliathwater" },
   { "p5", "peasantblood" },
   { "p8", "nestwarmth" },
-	{ NULL, NULL },
+  { NULL, NULL },
 };
 
 static const char *
 it_alias(const char * zname)
 {
-	int i;
-	for (i=0;it_aliases[i][0];++i) {
-		if (strcasecmp(it_aliases[i][0], zname)==0) return it_aliases[i][1];
-	}
-	return zname;
+  int i;
+  for (i=0;it_aliases[i][0];++i) {
+    if (strcasecmp(it_aliases[i][0], zname)==0) return it_aliases[i][1];
+  }
+  return zname;
 }
 
 item_type *
@@ -407,7 +407,7 @@ it_find(const char * zname)
   unsigned int hash = hashstring(name);
   item_type * itype;
   unsigned int key = hash % IMAXHASH;
-  
+
   for (itype=itemtypes[key]; itype; itype=itype->next) {
     if (itype->rtype->hashkey==hash && strcmp(itype->rtype->_name[0], name) == 0) {
       break;
@@ -459,92 +459,92 @@ i_add(item ** pi, item * i)
 void
 i_merge(item ** pi, item ** si)
 {
-	item * i = *si;
-	while (i) {
-		item * itmp;
-		while (*pi) {
-			int d = strcmp((*pi)->type->rtype->_name[0], i->type->rtype->_name[0]);
-			if (d>=0) break;
-			pi=&(*pi)->next;
-		}
-		if (*pi && (*pi)->type==i->type) {
-			(*pi)->number += i->number;
-			i_free(i_remove(&i, i));
-		} else {
-			itmp = i->next;
-			i->next=*pi;
-			*pi = i;
-			i = itmp;
-		}
-	}
-	*si=NULL;
+  item * i = *si;
+  while (i) {
+    item * itmp;
+    while (*pi) {
+      int d = strcmp((*pi)->type->rtype->_name[0], i->type->rtype->_name[0]);
+      if (d>=0) break;
+      pi=&(*pi)->next;
+    }
+    if (*pi && (*pi)->type==i->type) {
+      (*pi)->number += i->number;
+      i_free(i_remove(&i, i));
+    } else {
+      itmp = i->next;
+      i->next=*pi;
+      *pi = i;
+      i = itmp;
+    }
+  }
+  *si=NULL;
 }
 
 item *
 i_change(item ** pi, const item_type * itype, int delta)
 {
-	assert(itype);
-	while (*pi) {
-		int d = strcmp((*pi)->type->rtype->_name[0], itype->rtype->_name[0]);
-		if (d>=0) break;
-		pi=&(*pi)->next;
-	}
-	if (!*pi || (*pi)->type!=itype) {
-		item * i;
-		if (delta==0) return NULL;
-		i = i_new(itype, delta);
-		i->next = *pi;
-		*pi = i;
-	} else {
-		item * i = *pi;
-		i->number+=delta;
-		assert(i->number >= 0);
-		if (i->number==0) {
-			*pi = i->next;
-			free(i);
-			return NULL;
-		}
-	}
-	return *pi;
+  assert(itype);
+  while (*pi) {
+    int d = strcmp((*pi)->type->rtype->_name[0], itype->rtype->_name[0]);
+    if (d>=0) break;
+    pi=&(*pi)->next;
+  }
+  if (!*pi || (*pi)->type!=itype) {
+    item * i;
+    if (delta==0) return NULL;
+    i = i_new(itype, delta);
+    i->next = *pi;
+    *pi = i;
+  } else {
+    item * i = *pi;
+    i->number+=delta;
+    assert(i->number >= 0);
+    if (i->number==0) {
+      *pi = i->next;
+      free(i);
+      return NULL;
+    }
+  }
+  return *pi;
 }
 
 item *
 i_remove(item ** pi, item * i)
 {
-	assert(i);
-	while ((*pi)->type!=i->type) pi = &(*pi)->next;
-	assert(*pi);
-	*pi = i->next;
-	i->next = NULL;
-	return i;
+  assert(i);
+  while ((*pi)->type!=i->type) pi = &(*pi)->next;
+  assert(*pi);
+  *pi = i->next;
+  i->next = NULL;
+  return i;
 }
 
 void
 i_free(item * i) {
-	assert(!i->next);
-	free(i);
+  assert(!i->next);
+  free(i);
 }
 
 void
 i_freeall(item **i) {
-	item *in;
+  item *in;
 
-	while(*i) {
-		in = (*i)->next;
-		free(*i);
-		*i = in;
-	}
+  while(*i) {
+    in = (*i)->next;
+    free(*i);
+    *i = in;
+  }
 }
 
 
 item *
 i_new(const item_type * itype, int size)
 {
-	item * i = calloc(1, sizeof(item));
-	assert(itype);
-	i->type = itype;
-	i->number = size;
-	return i;
+  item * i = calloc(1, sizeof(item));
+  assert(itype);
+  i->type = itype;
+  i->number = size;
+  return i;
 }
 
 #include "region.h"
@@ -552,9 +552,9 @@ i_new(const item_type * itype, int size)
 static boolean
 give_horses(const unit * s, const unit * d, const item_type * itype, int n, struct order * ord)
 {
-	if (d==NULL && itype == olditemtype[I_HORSE])
-		rsethorses(s->region, rhorses(s->region) + n);
-	return true;
+  if (d==NULL && itype == olditemtype[I_HORSE])
+    rsethorses(s->region, rhorses(s->region) + n);
+  return true;
 }
 
 #define R_MINOTHER R_SILVER
@@ -579,42 +579,33 @@ potion_type * oldpotiontype[MAXPOTIONS+1];
 int
 get_item(const unit * u, item_t it)
 {
-	const item_type * type = olditemtype[it];
-	item * i = *i_find((item**)&u->items, type);
-	if (i) assert(i->number>=0);
-	return i?i->number:0;
+  const item_type * type = olditemtype[it];
+  item * i = *i_find((item**)&u->items, type);
+  if (i) assert(i->number>=0);
+  return i?i->number:0;
 }
 
 int
 set_item(unit * u, item_t it, int value)
 {
-	const item_type * type = olditemtype[it];
-	item * i = *i_find(&u->items, type);
-	if (!i) {
-		i = i_add(&u->items, i_new(type, value));
-	} else {
-		i->number = value;
-	}
-	return value;
+  const item_type * type = olditemtype[it];
+  item * i = *i_find(&u->items, type);
+  if (!i) {
+    i = i_add(&u->items, i_new(type, value));
+  } else {
+    i->number = value;
+  }
+  return value;
 }
 
 void use_birthdayamulet(region * r, unit * magician, int amount, struct order * ord);
 
-enum {
-	IS_RESOURCE,
-	IS_PRODUCT,
-	IS_MAGIC,
- /* wird für ZEIGE gebraucht */
-	IS_ITEM,
-	IS_RACE
-};
-
 /* t_item::flags */
 #define FL_ITEM_CURSED  (1<<0)
 #define FL_ITEM_NOTLOST (1<<1)
-#define FL_ITEM_NOTINBAG	(1<<2)	/* nicht im Bag Of Holding */
-#define FL_ITEM_ANIMAL	(1<<3)	/* ist ein Tier */
-#define FL_ITEM_MOUNT	((1<<4) | FL_ITEM_ANIMAL)	/* ist ein Reittier */
+#define FL_ITEM_NOTINBAG  (1<<2)  /* nicht im Bag Of Holding */
+#define FL_ITEM_ANIMAL  (1<<3)  /* ist ein Tier */
+#define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
 
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
@@ -622,32 +613,32 @@ enum {
 static void
 use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 {
-	int i;
-	for (i=0;i!=amount;++i) {
-		int duration = 1; /* wirkt nur eine Runde */
-		int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
-											Fall egal, da der curse für den Kampf gelten soll,
-											der vor den Antimagiezaubern passiert */
-		curse * c;
+  int i;
+  for (i=0;i!=amount;++i) {
+    int duration = 1; /* wirkt nur eine Runde */
+    int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
+                      Fall egal, da der curse für den Kampf gelten soll,
+                      der vor den Antimagiezaubern passiert */
+    curse * c;
     variant effect;
 
     effect.i = rng_int()%6 - 1;
     c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
-			duration, effect, u->number);
-		c->data.i = SK_TACTICS;
-		unused(ord);
-	}
+      duration, effect, u->number);
+    c->data.i = SK_TACTICS;
+    unused(ord);
+  }
   use_pooled(u, oldresourcetype[R_TACTICCRYSTAL], GET_DEFAULT, amount);
-  ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal", 
+  ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
     "unit region", u, r));
-	return;
+  return;
 }
 
 typedef struct t_item {
   const char *name[4];
   /* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
   * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
-  item_t typ;
+  boolean is_resource;
   skill_t skill;
   int minskill;
   int gewicht;
@@ -657,112 +648,99 @@ typedef struct t_item {
 } t_item;
 
 static t_item itemdata[MAXITEMS] = {
-	/* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
-	 * benutze_funktion; */
-	{			/* I_IRON */
-		{"Eisen", "Eisen", "Eisen", "Eisen"},
-		IS_RESOURCE, SK_MINING, 1, 500, 0, FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_STONE */
-		{"Stein", "Steine", "Stein", "Steine"},
-		IS_RESOURCE, SK_QUARRYING, 1, 6000, 0, FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_HORSE */
-		{"Pferd", "Pferde", "Pferd", "Pferde"},
-		IS_RESOURCE, SK_HORSE_TRAINING, 1, 5000, 0, FL_ITEM_MOUNT | FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
-	},
-	{			/* I_AMULET_OF_HEALING */
-		{"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_AMULET_OF_TRUE_SEEING 22 */
-		{"Amulett des wahren Sehens", "Amulette des wahren Sehens", "Amulett",
-		"Amulette"},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_RING_OF_INVISIBILITY 24 */
-		{"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_RING_OF_POWER 25 */
-		{"Ring der Macht", "Ringe der Macht", "", ""},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_DRAGONHEAD 33 */
-		{"Drachenkopf", "Drachenköpfe", "Drachenkopf", "Drachenköpfe"},
-		IS_MAGIC, NOSKILL, 0, 500, 0, 0, NULL
-	},
-	{			/* I_CHASTITY_BELT 34 */
-		{"Amulett der Keuschheit", "Amulette der Keuschheit",
-			"Amulett", "Amulette"},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_LAEN 41 */
-		{"Laen", "Laen", "Laen", "Laen"},
-		IS_RESOURCE, SK_MINING, 7, 200, 0, 0, NULL
-	},
-	{			/* I_DRACHENBLUT 59 */
-		{"Drachenblut", "Drachenblut", "Drachenblut", "Drachenblut"},
-		IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
-	},
-	{			/* I_FEENSTIEFEL 60 */
-		{"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_BIRTHDAYAMULET 69 */
-		{"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"},
-		IS_MAGIC, NOSKILL, 0, 100, 0, 0, &use_birthdayamulet
-	},
-	{			/* I_PEGASUS 60 */
-		{"Pegasus", "Pegasi", "Pegasus", "Pegasi" },
-		IS_MAGIC, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_UNICORN 61 */
-		{"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"},
-		IS_MAGIC, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_DOLPHIN 62 */
-		{"Delphin", "Delphine", "Delphin", "Delphine"},
-		IS_MAGIC, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_RING_OF_NIMBLEFINGER 64 */
-		{"Ring der flinken Finger", "Ringe der flinken Finger", "", ""},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_TROLLBELT 65 */
-		{"Gürtel der Trollstärke", "Gürtel der Trollstärke", "", ""},
-		IS_MAGIC, NOSKILL, 0, 0, 0, 0, NULL
-	},
-	{			/* I_PRESSCARD 67 */
-		{"Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß",
-		 "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"},
-		IS_MAGIC, NOSKILL, 0, 0, 0, FL_ITEM_CURSED, NULL
-	},
-	{			/* I_AURAKULUM 69 */
-		{"Aurafocus", "Aurafocuse", "Amulett", "Amulette"},
-		IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
-	},
-	{			/* I_SEASERPENTHEAD 70 */
-		{"Seeschlangenkopf", "Seeschlangenköpfe",
-			"Seeschlangenkopf", "Seeschlangenköpfe"},
-		IS_MAGIC, NOSKILL, 0, 500, 0, 0, NULL
-	},
-  {			/* I_SPHERE_OF_INVISIBILITY */
+  /* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
+   * benutze_funktion; */
+  {     /* I_IRON */
+    {"Eisen", "Eisen", "Eisen", "Eisen"},
+    true, SK_MINING, 1, 500, 0, FL_ITEM_NOTLOST, NULL
+  },
+  {     /* I_STONE */
+    {"Stein", "Steine", "Stein", "Steine"},
+    true, SK_QUARRYING, 1, 6000, 0, FL_ITEM_NOTLOST, NULL
+  },
+  {     /* I_HORSE */
+    {"Pferd", "Pferde", "Pferd", "Pferde"},
+    true, SK_HORSE_TRAINING, 1, 5000, 0, FL_ITEM_MOUNT | FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
+  },
+  {     /* I_AMULET_OF_HEALING */
+    {"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_AMULET_OF_TRUE_SEEING 22 */
+    {"Amulett des wahren Sehens", "Amulette des wahren Sehens", "Amulett",
+    "Amulette"},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_RING_OF_INVISIBILITY 24 */
+    {"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_RING_OF_POWER 25 */
+    {"Ring der Macht", "Ringe der Macht", "", ""},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_CHASTITY_BELT 34 */
+    {"Amulett der Keuschheit", "Amulette der Keuschheit",
+      "Amulett", "Amulette"},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_LAEN 41 */
+    {"Laen", "Laen", "Laen", "Laen"},
+    true, SK_MINING, 7, 200, 0, 0, NULL
+  },
+  {     /* I_FEENSTIEFEL 60 */
+    {"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_BIRTHDAYAMULET 69 */
+    {"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"},
+    0, NOSKILL, 0, 100, 0, 0, &use_birthdayamulet
+  },
+  {     /* I_PEGASUS 60 */
+    {"Pegasus", "Pegasi", "Pegasus", "Pegasi" },
+    0, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
+  },
+  {     /* I_UNICORN 61 */
+    {"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"},
+    0, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
+  },
+  {     /* I_DOLPHIN 62 */
+    {"Delphin", "Delphine", "Delphin", "Delphine"},
+    0, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
+  },
+  {     /* I_RING_OF_NIMBLEFINGER 64 */
+    {"Ring der flinken Finger", "Ringe der flinken Finger", "", ""},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_TROLLBELT 65 */
+    {"Gürtel der Trollstärke", "Gürtel der Trollstärke", "", ""},
+    0, NOSKILL, 0, 0, 0, 0, NULL
+  },
+  {     /* I_PRESSCARD 67 */
+    {"Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß",
+     "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"},
+    0, NOSKILL, 0, 0, 0, FL_ITEM_CURSED, NULL
+  },
+  {     /* I_AURAKULUM 69 */
+    {"Aurafocus", "Aurafocuse", "Amulett", "Amulette"},
+    0, NOSKILL, 0, 100, 0, 0, NULL
+  },
+  {     /* I_SPHERE_OF_INVISIBILITY */
     {"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
-      IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
+      0, NOSKILL, 0, 100, 0, 0, NULL
   },
   { /* I_BAG_OF_HOLDING */
     {"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
-      IS_MAGIC, NOSKILL, 0, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
+      0, NOSKILL, 0, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
   },
   { /* I_SACK_OF_CONSERVATION */
     {"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""},
-      IS_MAGIC, NOSKILL, 0, 100, 0, 0, NULL
+      0, NOSKILL, 0, 100, 0, 0, NULL
   },
-	{			/* I_TACTICCRYSTAL 71 */
-		{"Traumauge", "Traumaugen", "", ""},
-		IS_MAGIC, NOSKILL, 0, 100, 0, 0, &use_tacticcrystal
-	},
+  {     /* I_TACTICCRYSTAL 71 */
+    {"Traumauge", "Traumaugen", "", ""},
+    0, NOSKILL, 0, 100, 0, 0, &use_tacticcrystal
+  },
 };
 
 #include "movement.h"
@@ -770,36 +748,36 @@ static t_item itemdata[MAXITEMS] = {
 static int
 mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-	if (u->race == new_race[RC_ELF]) return value;
-	unused(r);
-	return -118;
+  if (u->race == new_race[RC_ELF]) return value;
+  unused(r);
+  return -118;
 }
 
 static int
 limit_oldresource(const region * r, const resource_type * rtype)
-		/* TODO: split into seperate functions. really much nicer. */
+    /* TODO: split into seperate functions. really much nicer. */
 {
-	if (rtype==oldresourcetype[R_HORSE]) {
-		return rhorses(r);
-	} else {
-		assert(!"das kann man nicht produzieren!");
-	}
-	return 0;
+  if (rtype==oldresourcetype[R_HORSE]) {
+    return rhorses(r);
+  } else {
+    assert(!"das kann man nicht produzieren!");
+  }
+  return 0;
 }
 
 
 static void
 produce_oldresource(region * r, const resource_type * rtype, int norders)
-		/* TODO: split into seperate functions. really much nicer. */
+    /* TODO: split into seperate functions. really much nicer. */
 {
-	assert(norders>0);
-	if (rtype==oldresourcetype[R_HORSE]) {
-		int avail = rhorses(r);
-		assert(norders <= avail);
-		rsethorses(r, avail-norders);
-	} else {
-		assert(!"unknown resource");
-	}
+  assert(norders>0);
+  if (rtype==oldresourcetype[R_HORSE]) {
+    int avail = rhorses(r);
+    assert(norders <= avail);
+    rsethorses(r, avail-norders);
+  } else {
+    assert(!"unknown resource");
+  }
 }
 
 static int
@@ -817,42 +795,42 @@ use_olditem(struct unit * user, const struct item_type * itype, int amount, stru
 
 typedef const char* translate_t[5];
 static translate_t translation[] = {
-	{ "Delphin", "dolphin", "dolphin_p", "dolphin", "dolphin_p" },
-	{ "Holz", "log", "log_p", "log", "log_p" },
-	{ "Eisen", "iron", "iron_p", "iron", "iron_p" },
-	{ "Drachenblut", "dragonblood", "dragonblood_p", "dragonblood", "dragonblood_p" },
-	{ "Feenstiefel", "fairyboot", "fairyboot_p", "fairyboot", "fairyboot_p" },
-	{ "Gürtel der Trollstärke", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
+  { "Delphin", "dolphin", "dolphin_p", "dolphin", "dolphin_p" },
+  { "Holz", "log", "log_p", "log", "log_p" },
+  { "Eisen", "iron", "iron_p", "iron", "iron_p" },
+  { "Drachenblut", "dragonblood", "dragonblood_p", "dragonblood", "dragonblood_p" },
+  { "Feenstiefel", "fairyboot", "fairyboot_p", "fairyboot", "fairyboot_p" },
+  { "Gürtel der Trollstärke", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
   { "Tiegel mit Krötenschleim", "toadslime", "toadslime_p", "toadslime", "toadslime_p" },
-	{ "Mallorn", "mallorn", "mallorn_p", "mallorn", "mallorn_p" },
-	{ "Wagen", "cart", "cart_p", "cart", "cart_p" },
-	{ "Plattenpanzer", "plate", "plate_p", "plate", "plate_p" },
-	{ "Trollgürtel", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
-	{ "Balsam", "balm", "balm_p", "balm", "balm_p" },
-	{ "Gewürz", "spice", "spice_p", "spice", "spice_p" },
-	{ "Myrrhe", "myrrh", "myrrh_p", "myrrh", "myrrh_p" },
-	{ "Stein", "stone", "stone_p", "stone", "stone_p" },
-	{ "Öl", "oil", "oil_p", "oil", "oil_p" },
-	{ "Seide", "silk", "silk_p", "silk", "silk_p" },
-	{ "Weihrauch", "incense", "incense_p", "incense", "incense_p" },
-	{ "Bihänder", "greatsword", "greatsword_p", "greatsword", "greatsword_p" },
-	{ "Laen", "laen", "laen_p", "laen", "laen_p" },
-	{ "Goliathwasser", "goliathwater", "goliathwater_p", NULL, NULL },
-	{ "Wasser des Lebens", "p2", "p2_p", NULL, NULL },
-	{ "Bauernblut", "peasantblood", "peasantblood_p", NULL, NULL },
-	{ "Gehirnschmalz", "p6", "p6_p", NULL, NULL },
-	{ "Nestwärme", "nestwarmth", "nestwarmth_p", NULL, NULL },
-	{ "Pferdeglück", "p9", "p9_p", NULL, NULL },
-	{ "Berserkerblut", "p10", "p10_p", NULL, NULL },
-	{ "Bauernlieb", "p11", "p11_p", NULL, NULL },
-	{ "Heiltrank", "p14", "p14_p", NULL, NULL },
+  { "Mallorn", "mallorn", "mallorn_p", "mallorn", "mallorn_p" },
+  { "Wagen", "cart", "cart_p", "cart", "cart_p" },
+  { "Plattenpanzer", "plate", "plate_p", "plate", "plate_p" },
+  { "Trollgürtel", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
+  { "Balsam", "balm", "balm_p", "balm", "balm_p" },
+  { "Gewürz", "spice", "spice_p", "spice", "spice_p" },
+  { "Myrrhe", "myrrh", "myrrh_p", "myrrh", "myrrh_p" },
+  { "Stein", "stone", "stone_p", "stone", "stone_p" },
+  { "Öl", "oil", "oil_p", "oil", "oil_p" },
+  { "Seide", "silk", "silk_p", "silk", "silk_p" },
+  { "Weihrauch", "incense", "incense_p", "incense", "incense_p" },
+  { "Bihänder", "greatsword", "greatsword_p", "greatsword", "greatsword_p" },
+  { "Laen", "laen", "laen_p", "laen", "laen_p" },
+  { "Goliathwasser", "goliathwater", "goliathwater_p", NULL, NULL },
+  { "Wasser des Lebens", "p2", "p2_p", NULL, NULL },
+  { "Bauernblut", "peasantblood", "peasantblood_p", NULL, NULL },
+  { "Gehirnschmalz", "p6", "p6_p", NULL, NULL },
+  { "Nestwärme", "nestwarmth", "nestwarmth_p", NULL, NULL },
+  { "Pferdeglück", "p9", "p9_p", NULL, NULL },
+  { "Berserkerblut", "p10", "p10_p", NULL, NULL },
+  { "Bauernlieb", "p11", "p11_p", NULL, NULL },
+  { "Heiltrank", "p14", "p14_p", NULL, NULL },
 
-	{ "Flachwurz", "h0", "h0_p", NULL, NULL },
-	{ "Elfenlieb", "h5", "h5_p", NULL, NULL },
-	{ "Wasserfinder", "h9", "h9_p", NULL, NULL },
-	{ "Windbeutel", "h12", "h12_p", NULL, NULL },
-	{ "Steinbeißer", "h15", "h15_p", NULL, NULL },
-	{ NULL, NULL, NULL, NULL, NULL }
+  { "Flachwurz", "h0", "h0_p", NULL, NULL },
+  { "Elfenlieb", "h5", "h5_p", NULL, NULL },
+  { "Wasserfinder", "h9", "h9_p", NULL, NULL },
+  { "Windbeutel", "h12", "h12_p", NULL, NULL },
+  { "Steinbeißer", "h15", "h15_p", NULL, NULL },
+  { NULL, NULL, NULL, NULL, NULL }
 };
 
 static void
@@ -871,7 +849,6 @@ init_olditems(void)
     const char * appearance[2];
     int weight = itemdata[i].gewicht;
     int capacity = 0;
-    attrib * a;
     item_type * itype;
 
     if (itemdata[i].flags & FL_ITEM_CURSED) iflags |= ITF_CURSED;
@@ -920,20 +897,15 @@ init_olditems(void)
       if (itemdata[i].flags & FL_ITEM_MOUNT) itype->capacity = HORSECAPACITY;
     }
 
-    /* itemdata::typ Analyse. IS_PRODUCT und IS_MAGIC sind so gut wie egal. */
-    switch (itemdata[i].typ) {
-    case IS_RESOURCE:
+    if (itemdata[i].is_resource) {
+      attrib * a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+      resource_limit * rdata = (resource_limit*)a->data.v;
       rtype->flags |= RTF_LIMITED;
-      a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-      {
-        resource_limit * rdata = (resource_limit*)a->data.v;
-        if (i==I_HORSE) {
-          rdata->limit = limit_oldresource;
-          rdata->produce = produce_oldresource;
-        }
-        if (i==I_LAEN || i==I_IRON) rdata->guard |= GUARD_MINING;
+      if (i==I_HORSE) {
+        rdata->limit = limit_oldresource;
+        rdata->produce = produce_oldresource;
       }
-      break;
+      if (i==I_LAEN || i==I_IRON) rdata->guard |= GUARD_MINING;
     }
     if (itemdata[i].benutze_funktion) {
       itype->use = use_olditem;
@@ -963,135 +935,135 @@ init_olditems(void)
 
 static const char *potiontext[MAXPOTIONS] =
 {
-	/* Stufe 1: */
+  /* Stufe 1: */
   NULL,
   NULL,
   NULL,
 
-	/* Stufe 2: */
-	NULL,
-	NULL,
+  /* Stufe 2: */
+  NULL,
+  NULL,
   NULL,
 
   /* Stufe 3: */
-	"Für das Gehirnschmalz verrühre man den Saft eines Wasserfinders mit "
-	"recht viel geriebenem Windbeutel und ein wenig Gurgelkraut. Dies lasse "
-	"man kurz aufwallen. Wenn die Flüssigkeit nur noch handwarm ist, gebe "
-	"man etwas Steinbeißer dazu. Das ganze muß "
-	"genau siebenmal rechtsherum und siebenmal linksherum mit einem großen "
-	"Löffel gerührt werden. Wenn keine Bewegung mehr zu erkennen ist, "
-	"fülle man den Saft ab. Der Saft gibt mit einer Chance von 1/3 bis zu "
-	"zehn Personen einen zusätzlichen Lernversuch.",
+  "Für das Gehirnschmalz verrühre man den Saft eines Wasserfinders mit "
+  "recht viel geriebenem Windbeutel und ein wenig Gurgelkraut. Dies lasse "
+  "man kurz aufwallen. Wenn die Flüssigkeit nur noch handwarm ist, gebe "
+  "man etwas Steinbeißer dazu. Das ganze muß "
+  "genau siebenmal rechtsherum und siebenmal linksherum mit einem großen "
+  "Löffel gerührt werden. Wenn keine Bewegung mehr zu erkennen ist, "
+  "fülle man den Saft ab. Der Saft gibt mit einer Chance von 1/3 bis zu "
+  "zehn Personen einen zusätzlichen Lernversuch.",
 
-	"Das Dumpfbackenbrot ist eine sehr gemeine Sache, macht es doch jeden "
-	"Lernerfolg zunichte oder läßt einen gar Dinge vergessen! Für zehn "
-	"Portionen verknete man einen geriebenen Fjordwuchs, einen zerstoßenes "
-	"Eulenauge und einen kleingeschnittenen Grünen Spinnerich zu "
-	"einem geschmeidigen Teig. Diesen backe man eine Stunde lang bei guter Hitze "
+  "Das Dumpfbackenbrot ist eine sehr gemeine Sache, macht es doch jeden "
+  "Lernerfolg zunichte oder läßt einen gar Dinge vergessen! Für zehn "
+  "Portionen verknete man einen geriebenen Fjordwuchs, einen zerstoßenes "
+  "Eulenauge und einen kleingeschnittenen Grünen Spinnerich zu "
+  "einem geschmeidigen Teig. Diesen backe man eine Stunde lang bei guter Hitze "
    "und bestreiche das Ergebnis mit etwas Höhlenglimm. "
-	"Wer dieses Brot gegessen hat, kann eine Woche lang "
-	"nichts lernen, und so er nichts zu lernen versucht, wird er gar "
-	"eine Woche seiner besten Fähigkeit vergessen.",
+  "Wer dieses Brot gegessen hat, kann eine Woche lang "
+  "nichts lernen, und so er nichts zu lernen versucht, wird er gar "
+  "eine Woche seiner besten Fähigkeit vergessen.",
 
-	"Nestwärme erlaubt es einem Insekt, im Winter außerhalb von Wüsten neue "
-	"Rekruten anzuwerben. "
-	"Zur Zubereitung nimmt der geübte Alchemist einen Kakteenschwitz, "
-	"vermischt ihn mit einer Portion Spaltwachs, die in einer sternklaren "
-	"Nacht gesammelt wurde, gibt zur Vertreibung des Winters einige "
-	"Blütenblätter der Eisblume in den Sud, und rührt alles mit einem grünen "
-	"Spinnerich bis es eine "
-	"violette Farbe annimmt. Ein Trank reicht eine Woche lang für eine "
-	"ganze Region. ",
+  "Nestwärme erlaubt es einem Insekt, im Winter außerhalb von Wüsten neue "
+  "Rekruten anzuwerben. "
+  "Zur Zubereitung nimmt der geübte Alchemist einen Kakteenschwitz, "
+  "vermischt ihn mit einer Portion Spaltwachs, die in einer sternklaren "
+  "Nacht gesammelt wurde, gibt zur Vertreibung des Winters einige "
+  "Blütenblätter der Eisblume in den Sud, und rührt alles mit einem grünen "
+  "Spinnerich bis es eine "
+  "violette Farbe annimmt. Ein Trank reicht eine Woche lang für eine "
+  "ganze Region. ",
 
-	"Für das Pferdeglück zerhacke man einen Kakteenschwitz, "
-	"einen blauen Baumringel und etwas knotigen Saugwurz und koche das "
-	"ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu "
-	"und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es "
-	"den Pferden zu trinken, auf daß sie sich doppelt so schnell vermehren.",
+  "Für das Pferdeglück zerhacke man einen Kakteenschwitz, "
+  "einen blauen Baumringel und etwas knotigen Saugwurz und koche das "
+  "ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu "
+  "und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es "
+  "den Pferden zu trinken, auf daß sie sich doppelt so schnell vermehren.",
 
-	"Will man seine Krieger zu Höchstleistungen antreiben, sei das "
-	"Berserkerblut empfohlen. Um es herzustellen, braucht man einen "
-	"Weißen Wüterich, etwas Flachwurz, "
-	"Sandfäule und eine Alraune. Alle Zutaten müssen "
-	"möglichst klein geschnitten und anschließend zwei Stunden lang gekocht "
-	"werden. Den abgekühlten Brei gebe man in ein Tuch und presse ihn aus. "
-	"Der so gewonnene Saft reicht aus, um zehn Kämpfer besser angreifen zu "
-	"lassen.",
+  "Will man seine Krieger zu Höchstleistungen antreiben, sei das "
+  "Berserkerblut empfohlen. Um es herzustellen, braucht man einen "
+  "Weißen Wüterich, etwas Flachwurz, "
+  "Sandfäule und eine Alraune. Alle Zutaten müssen "
+  "möglichst klein geschnitten und anschließend zwei Stunden lang gekocht "
+  "werden. Den abgekühlten Brei gebe man in ein Tuch und presse ihn aus. "
+  "Der so gewonnene Saft reicht aus, um zehn Kämpfer besser angreifen zu "
+  "lassen.",
 
-	/* Stufe 4 */
-	"Das Bauernlieb betört Mann und Frau gleichwohl und läßt in ihnen "
-	"den Wunsch nach Kindern anwachsen. Für eine große Portion höhle "
-	"man eine Alraune aus, gebe kleingehackten Blasenmorchel, Elfenlieb "
-	"und Schneekristall dazu, streue ein wenig geriebenen Steinbeißer darüber und lasse dieses zwanzig "
-	"Stunden lang auf kleiner Flamme kochen. Bis zu 1000 Bauern vermag "
-	"der Trank das Glück von Zwillinge zu bescheren.",
+  /* Stufe 4 */
+  "Das Bauernlieb betört Mann und Frau gleichwohl und läßt in ihnen "
+  "den Wunsch nach Kindern anwachsen. Für eine große Portion höhle "
+  "man eine Alraune aus, gebe kleingehackten Blasenmorchel, Elfenlieb "
+  "und Schneekristall dazu, streue ein wenig geriebenen Steinbeißer darüber und lasse dieses zwanzig "
+  "Stunden lang auf kleiner Flamme kochen. Bis zu 1000 Bauern vermag "
+  "der Trank das Glück von Zwillinge zu bescheren.",
 
-	/* Stufe 1, Trank der Wahrheit */
+  /* Stufe 1, Trank der Wahrheit */
   NULL,
 
-	"Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht "
-	"dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. "
-	"Der Trank erhöht die Lebensenergie von maximal zehn "
-	"Personen auf das fünffache. Die Wirkung ist direkt nach der Einnahme "
-	"am stärksten und klingt danach langsam ab. Zur Herstellung "
-	"benötigt der Alchemist ein Elfenlieb, einen Windbeutel, "
-	"ein Stück Wasserfinder und einen Grünen Spinnerich. "
-	"Über dieses Mischung streue er schließlich einen zerriebenen Blasenmorchel "
-	"und rühre dieses Pulver unter etwas Drachenblut.",
+  "Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht "
+  "dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. "
+  "Der Trank erhöht die Lebensenergie von maximal zehn "
+  "Personen auf das fünffache. Die Wirkung ist direkt nach der Einnahme "
+  "am stärksten und klingt danach langsam ab. Zur Herstellung "
+  "benötigt der Alchemist ein Elfenlieb, einen Windbeutel, "
+  "ein Stück Wasserfinder und einen Grünen Spinnerich. "
+  "Über dieses Mischung streue er schließlich einen zerriebenen Blasenmorchel "
+  "und rühre dieses Pulver unter etwas Drachenblut.",
 
-	"Für einen Heiltrank nehme man die Schale eines Windbeutels "
-	"und etwas Gurgelkraut, rühre eine "
-	"kleingehacktes Elfenlieb dazu und bestreue alles mit den "
-	"Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am "
-	"zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig "
-	"den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern "
-	"(oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche "
-	"Wunden zu überleben. Der Trank wird von ihnen automatisch bei "
-	"Verletzung angewandt.",
+  "Für einen Heiltrank nehme man die Schale eines Windbeutels "
+  "und etwas Gurgelkraut, rühre eine "
+  "kleingehacktes Elfenlieb dazu und bestreue alles mit den "
+  "Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am "
+  "zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig "
+  "den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern "
+  "(oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche "
+  "Wunden zu überleben. Der Trank wird von ihnen automatisch bei "
+  "Verletzung angewandt.",
 };
 
-static int 
+static int
 heal(unit * user, int effect)
 {
-	int req = unit_max_hp(user) * user->number - user->hp;
-	if (req>0) {
-		req = min(req, effect);
-		effect -= req;
-		user->hp += req;
-	}
-	return effect;
+  int req = unit_max_hp(user) * user->number - user->hp;
+  if (req>0) {
+    req = min(req, effect);
+    effect -= req;
+    user->hp += req;
+  }
+  return effect;
 }
 
 static int
 use_healingpotion(struct unit *user, const struct item_type *itype, int amount, struct order * ord)
 {
-	int effect = amount * 400;
-	unit * u = user->region->units;
-	effect = heal(user, effect);
-	while (effect>0 && u!=NULL) {
-		if (u->faction==user->faction) {
-			effect = heal(u, effect);
-		}
-		u = u->next;
-	}
+  int effect = amount * 400;
+  unit * u = user->region->units;
+  effect = heal(user, effect);
+  while (effect>0 && u!=NULL) {
+    if (u->faction==user->faction) {
+      effect = heal(u, effect);
+    }
+    u = u->next;
+  }
   use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   usetpotionuse(user, itype->rtype->ptype);
 
   ADDMSG(&user->faction->msgs, msg_message("usepotion",
     "unit potion", user, itype->rtype));
-	return 0;
+  return 0;
 }
 
 static int
 use_warmthpotion(struct unit *u, const struct item_type *itype, int amount, struct order * ord)
 {
-	if (u->faction->race == new_race[RC_INSECT]) {
-		fset(u, UFL_WARMTH);
-	} else {
-		/* nur für insekten: */
-		cmistake(u, ord, 163, MSG_EVENT);
-		return ECUSTOM;
-	}
+  if (u->faction->race == new_race[RC_INSECT]) {
+    fset(u, UFL_WARMTH);
+  } else {
+    /* nur für insekten: */
+    cmistake(u, ord, 163, MSG_EVENT);
+    return ECUSTOM;
+  }
   use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   usetpotionuse(u, itype->rtype->ptype);
 
@@ -1103,29 +1075,29 @@ use_warmthpotion(struct unit *u, const struct item_type *itype, int amount, stru
 static int
 use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int amount, struct order * ord)
 {
-	unit * target = findunit(targetno);
-	if (target==NULL || u->region!=target->region) {
-		cmistake(u, ord, 63, MSG_EVENT);
-		return ECUSTOM;
-	}
-	if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {
-		cmistake(u, ord, 64, MSG_EVENT);
-		return ECUSTOM;
-	}
-	ADDMSG(&u->faction->msgs, msg_message("givedumb", 
-		"unit recipient amount", u, target, amount));
+  unit * target = findunit(targetno);
+  if (target==NULL || u->region!=target->region) {
+    cmistake(u, ord, 63, MSG_EVENT);
+    return ECUSTOM;
+  }
+  if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {
+    cmistake(u, ord, 64, MSG_EVENT);
+    return ECUSTOM;
+  }
+  ADDMSG(&u->faction->msgs, msg_message("givedumb",
+    "unit recipient amount", u, target, amount));
 
   change_effect(target, itype->rtype->ptype, amount);
-	use_pooled(u, itype->rtype, GET_DEFAULT, amount);
-	return 0;
+  use_pooled(u, itype->rtype, GET_DEFAULT, amount);
+  return 0;
 }
 
 static int
 use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struct order * ord)
 {
-	if (u->race == new_race[RC_DAEMON]  ) {
+  if (u->race == new_race[RC_DAEMON]  ) {
     change_effect(u, itype->rtype->ptype, 100*amount);
-	} else {
+  } else {
     trigger * trestore = trigger_changerace(u, u->race, u->irace);
     int duration = 2 + rng_int() % 8;
 
@@ -1137,7 +1109,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
 
   ADDMSG(&u->faction->msgs, msg_message("usepotion",
     "unit potion", u, itype->rtype));
-	return 0;
+  return 0;
 }
 
 #include <attributes/fleechance.h>
@@ -1153,9 +1125,9 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, st
   }
   use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
   a_add(&user->attribs, make_fleechance((float)1.0));
-  ADDMSG(&user->faction->msgs, 
+  ADDMSG(&user->faction->msgs,
          msg_message("use_item", "unit item", user, itype->rtype));
-  
+
   return 0;
 }
 
@@ -1174,7 +1146,7 @@ use_magicboost(struct unit * user, const struct item_type * itype, int amount, s
     return -1;
   }
   use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
-  
+
   a_add(&f->attribs, make_key(atoi36("mbst")));
   set_level(user, sk_find("magic"), 3);
 
@@ -1194,7 +1166,7 @@ static void
 init_oldpotions(void)
 {
   const char * potionnames[MAX_POTIONS] = {
-    "p0", "goliathwater", "p2", "p3", "p4", "peasantblood", "p6", 
+    "p0", "goliathwater", "p2", "p3", "p4", "peasantblood", "p6",
     "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13",  "p14"
   };
   int p;
@@ -1207,7 +1179,7 @@ init_oldpotions(void)
       }
       oldpotiontype[p] = itype->rtype->ptype;
     }
-	}
+  }
 }
 
 resource_type * r_silver;
@@ -1220,16 +1192,16 @@ resource_type * r_silver;
 item_type * i_silver;
 
 static const char * names[] = {
-	"money", "money_p",
-	"person", "person_p",
-	"permaura", "permaura_p",
-	"hp", "hp_p",
-	"peasant", "peasant_p",
-	"aura", "aura_p",
-	"unit", "unit_p"
+  "money", "money_p",
+  "person", "person_p",
+  "permaura", "permaura_p",
+  "hp", "hp_p",
+  "peasant", "peasant_p",
+  "aura", "aura_p",
+  "unit", "unit_p"
 };
 
-static int 
+static int
 item_score(item_t i)
 {
   switch (i) {
@@ -1266,30 +1238,30 @@ init_oldscores(void)
 void
 init_resources(void)
 {
-	static boolean initialized = false;
-	if (initialized) return;
-	initialized = true;
+  static boolean initialized = false;
+  if (initialized) return;
+  initialized = true;
 
   /* silver was never an item: */
-	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
-	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
-	r_silver->uchange = res_changeitem;
+  r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
+  i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
+  r_silver->uchange = res_changeitem;
 
-	r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
-	r_permaura->uchange = res_changepermaura;
+  r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
+  r_permaura->uchange = res_changepermaura;
 
-	r_hp = new_resourcetype(&names[6], NULL, RTF_NONE);
-	r_hp->uchange = res_changehp;
+  r_hp = new_resourcetype(&names[6], NULL, RTF_NONE);
+  r_hp->uchange = res_changehp;
 
-	r_aura = new_resourcetype(&names[10], NULL, RTF_NONE);
-	r_aura->uchange = res_changeaura;
+  r_aura = new_resourcetype(&names[10], NULL, RTF_NONE);
+  r_aura->uchange = res_changeaura;
 
-	r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
-	r_unit->uchange = res_changeperson;
+  r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
+  r_unit->uchange = res_changeperson;
 
-	oldresourcetype[R_SILVER] = r_silver;
-	oldresourcetype[R_AURA] = r_aura;
-	oldresourcetype[R_PERMAURA] = r_permaura;
+  oldresourcetype[R_SILVER] = r_silver;
+  oldresourcetype[R_AURA] = r_aura;
+  oldresourcetype[R_PERMAURA] = r_permaura;
 
   /* alte typen registrieren: */
   init_olditems();
@@ -1300,46 +1272,46 @@ init_resources(void)
 int
 get_money(const unit * u)
 {
-	const item * i = u->items;
-	while (i && i->type!=i_silver) i=i->next;
-	if (i==NULL) return 0;
-	return i->number;
+  const item * i = u->items;
+  while (i && i->type!=i_silver) i=i->next;
+  if (i==NULL) return 0;
+  return i->number;
 }
 
 int
 set_money(unit * u, int v)
 {
-	item ** ip = &u->items;
-	while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;
-	if ((*ip)==NULL && v) {
-		i_add(&u->items, i_new(i_silver, v));
-		return v;
-	}
-	if ((*ip)!=NULL) {
-		if (v) (*ip)->number = v;
-		else i_remove(ip, *ip);
-	}
-	return v;
+  item ** ip = &u->items;
+  while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;
+  if ((*ip)==NULL && v) {
+    i_add(&u->items, i_new(i_silver, v));
+    return v;
+  }
+  if ((*ip)!=NULL) {
+    if (v) (*ip)->number = v;
+    else i_remove(ip, *ip);
+  }
+  return v;
 }
 
 int
 change_money(unit * u, int v)
 {
-	item ** ip = &u->items;
-	while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;
-	if ((*ip)==NULL && v) {
-		i_add(&u->items, i_new(i_silver, v));
-		return v;
-	}
-	if ((*ip)!=NULL) {
-		item * i = *ip;
-		if (i->number + v != 0) {
-			i->number += v;
-			return i->number;
-		}
-		else i_free(i_remove(ip, *ip));
-	}
-	return 0;
+  item ** ip = &u->items;
+  while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;
+  if ((*ip)==NULL && v) {
+    i_add(&u->items, i_new(i_silver, v));
+    return v;
+  }
+  if ((*ip)!=NULL) {
+    item * i = *ip;
+    if (i->number + v != 0) {
+      i->number += v;
+      return i->number;
+    }
+    else i_free(i_remove(ip, *ip));
+  }
+  return 0;
 }
 
 
@@ -1348,33 +1320,33 @@ static local_names * rnames;
 const resource_type *
 findresourcetype(const char * name, const struct locale * lang)
 {
-	local_names * rn = rnames;
+  local_names * rn = rnames;
   variant token;
 
-	while (rn) {
-		if (rn->lang==lang) break;
-		rn = rn->next;
-	}
-	if (!rn) {
-		const resource_type * rtl = resourcetypes;
-		rn = calloc(sizeof(local_names), 1);
-		rn->next = rnames;
-		rn->lang = lang;
-		while (rtl) {
+  while (rn) {
+    if (rn->lang==lang) break;
+    rn = rn->next;
+  }
+  if (!rn) {
+    const resource_type * rtl = resourcetypes;
+    rn = calloc(sizeof(local_names), 1);
+    rn->next = rnames;
+    rn->lang = lang;
+    while (rtl) {
       token.v = (void*)rtl;
-			addtoken(&rn->names, locale_string(lang, rtl->_name[0]), token);
-			addtoken(&rn->names, locale_string(lang, rtl->_name[1]), token);
-			rtl=rtl->next;
-		}
-		rnames = rn;
-	}
+      addtoken(&rn->names, locale_string(lang, rtl->_name[0]), token);
+      addtoken(&rn->names, locale_string(lang, rtl->_name[1]), token);
+      rtl=rtl->next;
+    }
+    rnames = rn;
+  }
 
-	if (findtoken(&rn->names, name, &token)==E_TOK_NOMATCH) return NULL;
-	return (const resource_type*)token.v;
+  if (findtoken(&rn->names, name, &token)==E_TOK_NOMATCH) return NULL;
+  return (const resource_type*)token.v;
 }
 
 attrib_type at_showitem = {
-	"showitem"
+  "showitem"
 };
 
 static local_names * inames;
@@ -1398,7 +1370,7 @@ init_itemnames(void)
     if (in==NULL) in = calloc(sizeof(local_names), 1);
     in->next = inames;
     in->lang = lang;
-    
+
     if (!exist) {
       int key;
       for (key=0;key!=IMAXHASH;++key) {
@@ -1439,19 +1411,19 @@ finditemtype(const char * name, const struct locale * lang)
 static void
 init_resourcelimit(attrib * a)
 {
-	a->data.v = calloc(sizeof(resource_limit), 1);
+  a->data.v = calloc(sizeof(resource_limit), 1);
 }
 
 static void
 finalize_resourcelimit(attrib * a)
 {
-	free(a->data.v);
+  free(a->data.v);
 }
 
 attrib_type at_resourcelimit = {
-	"resourcelimit",
-	init_resourcelimit,
-	finalize_resourcelimit,
+  "resourcelimit",
+  init_resourcelimit,
+  finalize_resourcelimit,
 };
 
 void
