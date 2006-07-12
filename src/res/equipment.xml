@@ -360,7 +360,7 @@
 
   <set name="seaserpent_spoils">
     <item name="dragonblood" amount="6"/>
-    <item name="dragonhead" amount="1"/>
+    <item name="seaserpenthead" amount="1"/>
   </set>
 
 </equipment>
