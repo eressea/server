@@ -2355,6 +2355,14 @@
   </string>
 
   <namespace name="race">
+    <string name="snowman">
+      <text locale="de">Schneemann</text>
+      <text locale="en">snowman</text>
+    </string>
+    <string name="snowman_p">
+      <text locale="de">Schneemänner</text>
+      <text locale="en">snowmen</text>
+    </string>
     <string name="clone">
       <text locale="de">Klon</text>
       <text locale="en">clone</text>
