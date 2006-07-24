@@ -511,13 +511,15 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
       }
     } else if (a->type==&at_effect && self) {
       effect_data * data = (effect_data *)a->data.v;
-      sprintf(buf, "Auf der Einheit lieg%s %d Wirkung%s %s.",
+      if (data->value>0) {
+        sprintf(buf, "Auf der Einheit lieg%s %d Wirkung%s %s.",
           (data->value==1 ? "t" : "en"),
           data->value,
           (data->value==1 ? "" : "en"),
           LOC(default_locale, resourcename(data->type->itype->rtype, 0)));
-      rnl(F);
-      rparagraph(F, buf, indent, 2, 0);
+        rnl(F);
+        rparagraph(F, buf, indent, 2, 0);
+      }
     }
   }
 }

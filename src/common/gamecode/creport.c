@@ -266,12 +266,14 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
       }
     } else if (a->type==&at_effect && self) {
       effect_data * data = (effect_data *)a->data.v;
-      const char * key = resourcename(data->type->itype->rtype, 0);
-      if (!header) {
-        header = 1;
-        fputs("EFFECTS\n", F);
+      if (data->value>0) {
+        const char * key = resourcename(data->type->itype->rtype, 0);
+        if (!header) {
+          header = 1;
+          fputs("EFFECTS\n", F);
+        }
+        fprintf(F, "\"%d %s\"\n", data->value, add_translation(key, locale_string(default_locale, key)));
       }
-      fprintf(F, "\"%d %s\"\n", data->value, add_translation(key, locale_string(default_locale, key)));
     }
     a = a->next;
   }
