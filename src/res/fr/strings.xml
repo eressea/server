@@ -1,10 +1,10 @@
-<comment>
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<strings>
+<!--
   Due to extreme lazyness on Enno's part, this file doesn't contain everything.
   A lot of what it should contain is currently in de/strings.xml.
-</comment>
-
-<strings>
-  <comment> OPTION [x]</comment>
+-->
+  <!-- OPTION [x] -->
   <string name="DURCHREISE">
     <text locale="fr">PASSAGE</text>
   </string>
@@ -73,7 +73,7 @@
     <text locale="fr">INFO</text>
   </string>
 
-  <comment> ship types</comment>
+  <!-- ship types -->
   <string name="caravel">
     <text locale="fr">nef</text>
   </string>
@@ -93,7 +93,7 @@
     <text locale="fr">ballon</text>
   </string>
 
-  <comment>Schiffstypen</comment>
+  <!--Schiffstypen -->
   <string name="caravel_a">
     <text locale="fr">une nef</text>
   </string>
@@ -113,7 +113,7 @@
     <text locale="fr">une galère</text>
   </string>
 
-  <comment>  Terraintypen</comment>
+  <!--  Terraintypen -->
   <string name="activevolcano">
     <text locale="fr">volcan actif</text>
   </string>
@@ -237,7 +237,7 @@
     <text locale="fr">portail</text>
   </string>
 
-  <comment> directions</comment>
+  <!-- directions -->
   <string name="dir_nw">
     <text locale="fr">NO</text>
   </string>
@@ -311,7 +311,7 @@
     <text locale="fr">Nouveaux Sorts</text>
   </string>
 
-  <comment>  Building Types</comment>
+  <!--  Building Types -->
   <string name="academy">
     <text locale="fr">université</text>
   </string>
@@ -367,7 +367,7 @@
     <text locale="fr">tunnel</text>
   </string>
 
-  <comment>  Burgausbaustufen</comment>
+  <!--  Burgausbaustufen -->
   <string name="site">
     <text locale="fr">palissade</text>
   </string>
@@ -390,7 +390,7 @@
     <text locale="fr">citadelle</text>
   </string>
 
-  <comment>  Items</comment>
+  <!--  Items -->
   <string name="herb">
     <text locale="fr">plante</text>
   </string>
@@ -401,7 +401,7 @@
     <text locale="fr">fioles</text>
   </string>
 
-  <comment>  Resourcen</comment>
+  <!--  Resourcen -->
   <string name="money">
     <text locale="fr">écu</text>
   </string>
@@ -433,7 +433,7 @@
     <text locale="fr">paysans</text>
   </string>
 
-  <comment>  items</comment>
+  <!--  items -->
   <string name="almond">
     <text locale="fr">amande</text>
   </string>
@@ -900,7 +900,7 @@
     <text locale="fr">coeurs de pain d'épices</text>
   </string>
 
-  <comment>  luxury goods</comment>
+  <!--  luxury goods -->
   <string name="balm">
     <text locale="fr">baume</text>
   </string>
@@ -944,7 +944,7 @@
     <text locale="fr">encens</text>
   </string>
 
-  <comment>  Spezialitems</comment>
+  <!--  Spezialitems -->
   <string name="lmsreward">
     <text locale="fr">Ceinture des Légendes</text>
   </string>
@@ -952,7 +952,7 @@
     <text locale="fr">Ceintures des Légendes</text>
   </string>
 
-  <comment>  intranslatables:</comment>
+  <!--  intranslatables: -->
   <string name="h0">
     <text locale="fr">astragale</text>
   </string>
@@ -1170,7 +1170,7 @@
     <text locale="fr">potions de survie</text>
   </string>
 
-  <comment>  Parameters</comment>
+  <!--  Parameters -->
   <string name="AGGRESSIV">
     <text locale="fr">AGRESSIF</text>
   </string>
@@ -1388,7 +1388,7 @@
     </string>
   </namespace>
 
-  <comment>  Keywords</comment>
+  <!--  Keywords -->
   <string name="//">
     <text locale="fr">//</text>
   </string>
@@ -1999,7 +1999,7 @@
     </string>
   </namespace>
 
-  <comment>  NR generieren</comment>
+  <!--  NR generieren -->
   <string name="nr_options">
     <text locale="fr">Options</text>
   </string>
@@ -2021,7 +2021,7 @@
   <string name="nr_youaredead">
     <text locale="fr">Votre faction a été éliminée. Nous espérons que vous vous êtes bien amusé malgré tout, et vous encourageons à vous réincrire pour une nouvelle partie.</text>
   </string>
-  <comment> TODO: calendar ist noch komplexer</comment>
+  <!-- TODO: calendar ist noch komplexer -->
   <string name="nr_skills">
     <text locale="fr">compétences</text>
   </string>
@@ -2059,7 +2059,7 @@
     <text locale="fr">dégâts</text>
   </string>
 
-  <comment> Testitem</comment>
+  <!-- Testitem -->
   <string name="wand">
     <text locale="fr">baguette</text>
   </string>
@@ -2067,26 +2067,27 @@
     <text locale="fr">baguettes</text>
   </string>
 
-  <comment>  Küsten</comment>
-  <string name="Nordwestküste">
-    <text locale="fr">côte nord-ouest</text>
-  </string>
-  <string name="Nordostküste">
-    <text locale="fr">côte nord-est</text>
-  </string>
-  <string name="Ostküste">
-    <text locale="fr">côte est</text>
-  </string>
-  <string name="Südostküste">
-    <text locale="fr">côte sud-est</text>
-  </string>
-  <string name="Südwestküste">
-    <text locale="fr">côte sud-ouest</text>
-  </string>
-  <string name="Westküste">
-    <text locale="fr">côte ouest</text>
-  </string>
-
+  <!--  Küsten -->
+  <namespace name="coast">
+    <string name="nw">
+      <text locale="fr">côte nord-ouest</text>
+    </string>
+    <string name="ne">
+      <text locale="fr">côte nord-est</text>
+    </string>
+    <string name="e">
+      <text locale="fr">côte est</text>
+    </string>
+    <string name="se">
+      <text locale="fr">côte sud-est</text>
+    </string>
+    <string name="sw">
+      <text locale="fr">côte sud-ouest</text>
+    </string>
+    <string name="w">
+      <text locale="fr">côte ouest</text>
+    </string>
+  </namespace>
   <string name="nr_nmr">
     <text locale="fr">Aucun ordre reçu pour votre faction !</text>
   </string>
