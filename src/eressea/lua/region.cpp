@@ -309,6 +309,7 @@ bind_region(lua_State * L)
     def("regions", &get_regions, return_stl_iterator),
     def("get_region", &findregion),
     def("terraform", &region_terraform),
+    def("distance", &distance),
 
     class_<struct region>("region")
     .def(tostring(self))
