@@ -5,7 +5,7 @@
   <!-- Localization -->
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
-  <xi:include file="fr/strings.xml"/>
+  <xi:include href="fr/strings.xml"/>
 
   <xi:include href="resources.xml"/>
   <xi:include href="spoils.xml"/>
@@ -62,27 +62,24 @@
     <param name="hunger.long" value="1"></param>
     <param name="MaxAge" value="8"></param>
   </game>
-  <xi:include file="tutorial/de/strings.xml"/>
-  <xi:include file="tutorial/en/strings.xml"/>
-  <xi:include file="eressea/races.xml"/>
-  <xi:include file="eressea/items.xml"/>
-  <xi:include file="eressea/dungeons.xml"/>
+  <xi:include href="tutorial/de/strings.xml"/>
+  <xi:include href="tutorial/en/strings.xml"/>
+  <xi:include href="eressea/races.xml"/>
+  <xi:include href="eressea/items.xml"/>
+  <xi:include href="eressea/dungeons.xml"/>
   <strings>
     <string name="mailto">
       <text locale="en">tutorial@eressea.upb.de</text>
       <text locale="de">tutorial@eressea.upb.de</text>
+    </string>
+    <string name="newbie_info_1">
+      <text locale="en">Remember to send your orders to tutorial@eressea.upb.de with the subject ERESSEA ORDERS.</text>
+      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an tutorial@eressea.upb.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
     </string>
     <string name="mailcmd">
       <text locale="de">ERESSEA BEFEHLE</text>
       <text locale="en">ERESSEA ORDERS</text>
     </string>
   </strings>
-
-  <string name="defaultorder">
-    <text locale="de">ARBEITE</text>
-  </string>
-  <string name="defaultorder">
-    <text locale="en">WORK</text>
-  </string>
 
 </eressea>

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <strings>
 	<comment> report newbie info</comment>
-	<string name="newbie_info_1">
-		<text locale="en">Remember to send your orders to tutorial@eressea.upb.de with the subject ERESSEA ORDERS.</text>
-	</string>
 	<string name="newbie_info_2">
 		<text locale="en">If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of zombie players in Eressea.</text>
 	</string>

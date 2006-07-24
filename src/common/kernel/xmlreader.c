@@ -1886,74 +1886,78 @@ parse_main(xmlDocPtr doc)
   int i;
 
   xmlChar * property;
-  xmlNodePtr node = nodes->nodeTab[0];
+  if (nodes->nodeNr>0) {
+    xmlNodePtr node = nodes->nodeTab[0];
 
-  property = xmlGetProp(node, BAD_CAST "welcome");
-  if (property!=NULL) {
-    global.welcomepath = strdup((const char*)property);
-    xmlFree(property);
-  }
- 
-  global.unitsperalliance = xml_bvalue(node, "unitsperalliance", false);
-  global.maxunits = xml_ivalue(node, "units", INT_MAX);
+    property = xmlGetProp(node, BAD_CAST "welcome");
+    if (property!=NULL) {
+      global.welcomepath = strdup((const char*)property);
+      xmlFree(property);
+    }
 
-  property = xmlGetProp(node, BAD_CAST "name");
-  if (property!=NULL) {
-    global.gamename = strdup((const char*)property);
-    xmlFree(property);
-  }
+    global.unitsperalliance = xml_bvalue(node, "unitsperalliance", false);
+    global.maxunits = xml_ivalue(node, "units", INT_MAX);
 
-  xmlXPathFreeObject(result);
+    property = xmlGetProp(node, BAD_CAST "name");
+    if (property!=NULL) {
+      global.gamename = strdup((const char*)property);
+      xmlFree(property);
+    }
 
-  /* reading eressea/game/param */
-  xpath->node = node;
-  result = xmlXPathEvalExpression(BAD_CAST "param", xpath);
-  nodes = result->nodesetval;
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * name = xmlGetProp(node, BAD_CAST "name");
-    xmlChar * value = xmlGetProp(node, BAD_CAST "value");
+    xmlXPathFreeObject(result);
 
-    set_param(&global.parameters, (const char*)name, (const char*)value);
+    /* reading eressea/game/param */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "param", xpath);
+    nodes = result->nodesetval;
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+      xmlChar * value = xmlGetProp(node, BAD_CAST "value");
 
-    xmlFree(name);
-    xmlFree(value);
-  }
-  xmlXPathFreeObject(result);
+      set_param(&global.parameters, (const char*)name, (const char*)value);
 
-  /* reading eressea/game/order */
-  result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
-  nodes = result->nodesetval;
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * name = xmlGetProp(node, BAD_CAST "name");
-    boolean disable = xml_bvalue(node, "disable", false);
+      xmlFree(name);
+      xmlFree(value);
+    }
 
-    if (disable) {
-      int k;
-      for (k=0;k!=MAXKEYWORDS;++k) {
-        if (strcmp(keywords[k], (const char*)name)==0) {
-          global.disabled[k]=1;
-          break;
+    xmlXPathFreeObject(result);
+
+    /* reading eressea/game/order */
+    result = xmlXPathEvalExpression(BAD_CAST "order", xpath);
+    nodes = result->nodesetval;
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+      boolean disable = xml_bvalue(node, "disable", false);
+
+      if (disable) {
+        int k;
+        for (k=0;k!=MAXKEYWORDS;++k) {
+          if (strcmp(keywords[k], (const char*)name)==0) {
+            global.disabled[k]=1;
+            break;
+          }
+        }
+        if (k==MAXKEYWORDS) {
+          log_error(("trying to disable unknown comand %s\n", (const char*)name));
         }
       }
-      if (k==MAXKEYWORDS) {
-        log_error(("trying to disable unknown comand %s\n", (const char*)name));
-      }
+      xmlFree(name);
     }
-    xmlFree(name);
-  }
-  xmlXPathFreeObject(result);
 
-  /* reading eressea/game/skill */
-  result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-  nodes = result->nodesetval;
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * name = xmlGetProp(node, BAD_CAST "name");
-    boolean enable = xml_bvalue(node, "enable", true);
-    enable_skill((const char*)name, enable);
-    xmlFree(name);
+    xmlXPathFreeObject(result);
+
+    /* reading eressea/game/skill */
+    result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+    nodes = result->nodesetval;
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+      boolean enable = xml_bvalue(node, "enable", true);
+      enable_skill((const char*)name, enable);
+      xmlFree(name);
+    }
   }
   xmlXPathFreeObject(result);
 
