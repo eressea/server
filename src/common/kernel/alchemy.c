@@ -102,7 +102,7 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 
 	if (ptype==oldpotiontype[P_LIFE]) {
 		region * r = u->region;
-		int holz = 0;
+		int holz = 0, x;
 
 		/* für die Aufforstung von Mallornwäldern braucht man Mallorn */
 		if (fval(r, RF_MALLORN)) {
@@ -113,6 +113,9 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
 		}
 	  if (r->land==0) holz=0;
+    x = holz/10;
+    if (holz%10) ++x;
+    if (x<holz) holz = x;
 		rsettrees(r, 1, rtrees(r, 1) + holz);
     ADDMSG(&u->faction->msgs, msg_message("growtree_effect", 
       "mage amount", u, holz));
