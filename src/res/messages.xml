@@ -1969,18 +1969,18 @@
       <arg name="unit" type="unit"/>
       <arg name="direction" type="direction"/>
     </type>
-    <text locale="de">"$unit($unit) entdeckt dass im $direction($direction) Ozean ist."</text>
-    <text locale="fr">"$unit($unit) discovered that an Ocean lies in the $direction($direction)."</text>
-    <text locale="en">"$unit($unit) discovered that an Ocean lies in the $direction($direction)."</text>
+    <text locale="de">"$unit($unit) entdeckt dass im $direction($direction) $terrain($region) ist."</text>
+    <text locale="fr">"$unit($unit) discovered that an ocean lies in the $direction($direction)."</text>
+    <text locale="en">"$unit($unit) discovered that an ocean lies in the $direction($direction)."</text>
   </message>
   <message name="detectocean" section="movement">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($unit) entdeckt, dass $region($region) Ozean ist."</text>
-    <text locale="fr">"$unit($unit) discovered that $region($region) is Ocean."</text>
-    <text locale="en">"$unit($unit) discovered that $region($region) is Ocean."</text>
+    <text locale="de">"$unit($unit) entdeckt, dass $region($region) $terrain($region) ist."</text>
+    <text locale="fr">"$unit($unit) discovered that $region($region) is $terrain($region)."</text>
+    <text locale="en">"$unit($unit) discovered that $region($region) is $terrain($region)."</text>
   </message>
   <message name="sailnolandingstorm" section="movement">
     <type>

@@ -2923,6 +2923,19 @@ eval_region(struct opstack ** stack, const void * userdata) /* region -> string 
 }
 
 static void
+eval_terrain(struct opstack ** stack, const void * userdata) /* region -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct region * r = (const struct region *)opop(stack).v;
+  const char * c = LOC(f->locale, terrain_name(r));
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
 eval_ship(struct opstack ** stack, const void * userdata) /* ship -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
@@ -3091,6 +3104,7 @@ report_init(void)
   /* register functions that turn message contents to readable strings */
   add_function("alliance", &eval_alliance);
   add_function("region", &eval_region);
+  add_function("terrain", &eval_terrain);
   add_function("weight", &eval_weight);
   add_function("resource", &eval_resource);
   add_function("race", &eval_race);
