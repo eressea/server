@@ -50,6 +50,17 @@ ship_gettype(const ship& s) {
   return s.type->name[0];
 }
 
+int
+ship_getweight(const ship& s) {
+  int w, c;
+  getshipweight(&s, &w, &c);
+  return w;
+}
+
+int
+ship_getcapacity(const ship& s) {
+  return shipcapacity(&s);
+}
 
 void
 bind_ship(lua_State * L) 
@@ -62,6 +73,8 @@ bind_ship(lua_State * L)
     .def(self == ship())
     .def(tostring(self))
     .property("type", &ship_gettype)
+    .property("weight", &ship_getweight)
+    .property("capacity", &ship_getcapacity)
     .def_readonly("name", &ship::name)
     .def_readonly("region", &ship::region)
     .def_readonly("id", &ship::no)
