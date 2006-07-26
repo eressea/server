@@ -17,6 +17,7 @@
 #include "createunit.h"
 
 /* kernel includes */
+#include <faction.h>
 #include <unit.h>
 #include <race.h>
 #include <region.h>
@@ -40,7 +41,6 @@
 typedef struct createunit_data {
 	struct region * r;
 	struct faction * f;
-	struct unit * u;
 	const struct race * race;
 	int number;
 } createunit_data;
@@ -77,7 +77,7 @@ static void
 createunit_write(const trigger * t, FILE * F)
 {
 	createunit_data * td = (createunit_data*)t->data.v;
-	write_unit_reference(td->u, F);
+	write_faction_reference(td->f, F);
 	write_region_reference(td->r, F);
 	write_race_reference(td->race, F);
 	fprintf(F, "%d ", td->number);
@@ -88,7 +88,7 @@ createunit_read(trigger * t, FILE * F)
 {
 	createunit_data * td = (createunit_data*)t->data.v;
 
-	int uc = read_unit_reference(&td->u, F);
+	int uc = read_faction_reference(&td->f, F);
 	int rc = read_region_reference(&td->r, F);
 	int ic = read_race_reference(&td->race, F);
 
