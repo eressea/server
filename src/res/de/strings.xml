@@ -5244,13 +5244,12 @@
       <text locale="de">Mit Hilfe dieses Zauber entzieht der Magier einem
       Quarzkristall all seine magischen Energien. Der Kristall wird dann, wenn
       er zu feinem Staub zermahlen und verteilt wird, die beim Zaubern
-      freigesetzten magischen Energien aufsaugen und alle Zauber, welche in
-      der
-      betreffenden Woche in der Region gezaubert werden fehlschlagen lassen.</text>
+      freigesetzten magischen Energien aufsaugen und die Kraft aller Zauber
+      reduzieren, welche in der betreffenden Woche in der Region gezaubert
+      werden.</text>
       <text locale="en">This spell creates a portable crystal of antimagic
       which can be used by anybody to reduce or even eliminate the power of
-      all
-      spells cast in the region during the same week.</text>
+      all spells cast in the region during the same week.</text>
     </string>
     <string name="create_roqf">
       <text locale="de">Die berühmte Bardin Miriam bhean'Meddaf war bekannt
