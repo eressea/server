@@ -625,7 +625,7 @@
       <arg name="region" type="region"/>
       <arg name="string" type="string"/>
     </type>
-    <text locale="de">"Eine Botschaft von $unit($sender) aus $region($region): '$string'"</text>
+    <text locale="de">"Eine Botschaft von $unit.dative($sender) aus $region($region): '$string'"</text>
     <text locale="en">"A message by $unit($sender) from $region($region): '$string'"</text>
   </message>
   <message name="unitmessage" section="mail">
@@ -635,7 +635,7 @@
       <arg name="string" type="string"/>
       <arg name="sender" type="unit"/>
     </type>
-    <text locale="de">"In $region($region) erhielt $unit($unit) eine Botschaft von $unit($sender): '$string'"</text>
+    <text locale="de">"In $region($region) erhielt $unit($unit) eine Botschaft von $unit.dative($sender): '$string'"</text>
     <text locale="en">"In $region($region), $unit($unit) received a message by $unit($sender): '$string'"</text>
   </message>
   <message name="maintenance_nowork" section="events">
@@ -1498,7 +1498,7 @@
       <arg name="region" type="region"/>
       <arg name="spell" type="spell"/>
     </type>
-    <text locale="de">"Eine Botschaft von $unit($unit) in $region($region): 'Ups! Quack, Quack!'"</text>
+    <text locale="de">"Eine Botschaft von $unit.dative($unit) in $region($region): 'Ups! Quack, Quack!'"</text>
     <text locale="en">"A message from $unit($unit) in $region($region): 'Oops! Croak, Croak!'"</text>
   </message>
   <message name="familiar_farcast" section="magic">
@@ -1561,7 +1561,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber von $unit($unit) war viel zu schwach und löst sich gleich wieder auf."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber von $unit.dative($unit) war viel zu schwach und löst sich gleich wieder auf."</text>
   </message>
   <message name="objmagic_effect" section="magic">
     <type>
@@ -1596,7 +1596,7 @@
       <arg name="mage" type="unit"/>
       <arg name="target" type="unit"/>
     </type>
-    <text locale="de">"$unit($mage) erhöht die Körperkraft von $unit($target) beträchtlich."</text>
+    <text locale="de">"$unit($mage) erhöht die Körperkraft von $unit.dative($target) beträchtlich."</text>
     <text locale="en">"$unit($mage) increases the strength of $unit($target) dramatically."</text>
   </message>
   <message name="regenaura" section="magic">
@@ -2050,7 +2050,7 @@
       <arg name="region" type="region"/>
       <arg name="guard" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) wurde in $region($region) von $unit($guard) aufgehalten."</text>
+    <text locale="de">"$unit($unit) wurde in $region($region) von $unit.dative($guard) aufgehalten."</text>
     <text locale="fr">"$unit($unit) was kept in $region($region) by $unit($guard)."</text>
     <text locale="en">"$unit($unit) was kept in $region($region) by $unit($guard)."</text>
   </message>
@@ -2183,7 +2183,7 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Die Partei bekommt von $unit($unit) in $region($region) einen Spitznamen."</text>
+    <text locale="de">"Die Partei bekommt von $unit.dative($unit) in $region($region) einen Spitznamen."</text>
     <text locale="en">"Your faction received a nickname from $unit($unit)."</text>
   </message>
   <message name="renamed_building_notseen" section="events">
@@ -2200,7 +2200,7 @@
       <arg name="region" type="region"/>
       <arg name="renamer" type="unit"/>
     </type>
-    <text locale="de">"$building($building) in $region($region) bekommt von $unit($renamer) einen Spitznamen."</text>
+    <text locale="de">"$building($building) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen."</text>
     <text locale="en">"$building($building) in $region($region) received a nickname from $unit($renamer)."</text>
   </message>
   <message name="renamed_ship_notseen" section="events">
@@ -2217,7 +2217,7 @@
       <arg name="region" type="region"/>
       <arg name="renamer" type="unit"/>
     </type>
-    <text locale="de">"Die $ship($ship) in $region($region) bekommt von $unit($renamer) einen Spitznamen."</text>
+    <text locale="de">"Die $ship($ship) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen."</text>
     <text locale="en">"$ship($ship) in $region($region) received a nickname from $unit($renamer)."</text>
   </message>
   <message name="renamed_notseen" section="events">
@@ -2234,7 +2234,7 @@
       <arg name="region" type="region"/>
       <arg name="renamer" type="unit"/>
     </type>
-    <text locale="de">"$unit($renamed) in $region($region) bekommt von $unit($renamer) einen Spitznamen."</text>
+    <text locale="de">"$unit($renamed) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen."</text>
     <text locale="en">"$unit($renamed) in $region($region) received a nickname from $unit($renamer)."</text>
   </message>
   <message name="phunger" section="events">
@@ -2368,7 +2368,7 @@
       <arg name="mage" type="unit"/>
       <arg name="target" type="unit"/>
     </type>
-    <text locale="de">"$unit($mage) legt einen Schleier um die Ausrüstung von $unit($target)."</text>
+    <text locale="de">"$unit($mage) legt einen Schleier um die Ausrüstung von $unit.dative($target)."</text>
     <text locale="en">"$unit($mage) shrouds the equipment of $unit($target) in shadows."</text>
   </message>
   <message name="piratesawvictim" section="events">
@@ -2549,7 +2549,7 @@
       <arg name="target" type="unit"/>
       <arg name="unit" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) wurde von $unit($target) beim versuchten Diebstahl ertappt."</text>
+    <text locale="de">"$unit($unit) wurde von $unit.dative($target) beim versuchten Diebstahl ertappt."</text>
     <text locale="fr">"$unit($unit) was caught by $unit($target) in attempted theft."</text>
     <text locale="en">"$unit($unit) was caught by $unit($target) in attempted theft."</text>
   </message>
@@ -6291,7 +6291,7 @@
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Antimagie von $unit($self) blockiert in $region($region) einen Zauber von $unit($mage)."</text>
+    <text locale="de">"Antimagie von $unit.dative($self) blockiert in $region($region) einen Zauber von $unit.dative($mage)."</text>
     <text locale="en">"In $region($region), anti-magic from $unit($self) blocks the spell of $unit($mage)."</text>
   </message>
 
@@ -6301,7 +6301,7 @@
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($self) schwächt in $region($region) einen Zauber von $unit($mage) durch Antimagie ab."</text>
+    <text locale="de">"$unit($self) schwächt in $region($region) einen Zauber von $unit.dative($mage) durch Antimagie ab."</text>
     <text locale="en">"In $region($region), anti-magic from $unit($self) reduces the effect of $unit($mage)'s spell."</text>
   </message>
 

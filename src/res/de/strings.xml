@@ -656,19 +656,23 @@
 
   <!--Verschiedenes -->
   <string name="an_unknown_building">
-    <text locale="de">eine unbekanntes Gebäude</text>
+    <text locale="de">ein unbekanntes Gebäude</text>
     <text locale="en">an unknown building</text>
   </string>
   <string name="an_unknown_spell">
-    <text locale="de">eine unbekannter zauber</text>
+    <text locale="de">ein unbekannter zauber</text>
     <text locale="en">an unknown spell</text>
   </string>
   <string name="an_unknown_ship">
-    <text locale="de">eine unbekanntes Schiff</text>
+    <text locale="de">ein unbekanntes Schiff</text>
     <text locale="en">an unknown ship</text>
   </string>
   <string name="an_unknown_unit">
     <text locale="de">eine unbekannte Einheit</text>
+    <text locale="en">an unknown unit</text>
+  </string>
+  <string name="unknown_unit_dative">
+    <text locale="de">einer unbekannten Einheit</text>
     <text locale="en">an unknown unit</text>
   </string>
 

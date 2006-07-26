@@ -1256,7 +1256,7 @@ report_template(const char * filename, report_context * ctx)
 
   rps_nowrap(F, "");
   rnl(F);
-  sprintf(buf, "; ECHECK %s-w4 -r%d -v%s", (f->options & Pow(O_SILBERPOOL)) ? "-l " : "",
+  sprintf(buf, "; ECHECK %s-w4 -r%d -v%s", (f->options & want(O_SILBERPOOL)) ? "-l " : "",
     f->race->recruitcost, ECHECK_VERSION);
   /* -v3.4: ECheck Version 3.4.x */
   rps_nowrap(F, buf);
@@ -1748,7 +1748,7 @@ report_plaintext(const char * filename, report_context * ctx)
   attrib *a;
   message * m;
   unsigned char op;
-  int ix = Pow(O_STATISTICS);
+  int ix = want(O_STATISTICS);
   int wants_stats = (f->options & ix);
   FILE * F = fopen(filename, "wt");
   seen_region * sr = NULL;
@@ -1892,7 +1892,7 @@ report_plaintext(const char * filename, report_context * ctx)
 
   sprintf(buf, "%s:", LOC(f->locale, "nr_options"));
   for (op = 0; op != MAXOPTIONS; op++) {
-    if (f->options & (int) pow(2, op)) {
+    if (f->options & want(op)) {
       scat(" ");
       scat(LOC(f->locale, options[op]));
 #ifdef AT_OPTION
@@ -2844,6 +2844,19 @@ eval_unit(struct opstack ** stack, const void * userdata) /* unit -> string */
 }
 
 static void
+eval_unit_dative(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  const char * c = u?unitname(u):LOC(f->locale, "unknown_unit_dative");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
 eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
@@ -3111,6 +3124,7 @@ report_init(void)
   add_function("faction", &eval_faction);
   add_function("ship", &eval_ship);
   add_function("unit", &eval_unit);
+  add_function("unit.dative", &eval_unit_dative);
   add_function("unit.name", &eval_unitname);
   add_function("unit.id", &eval_unitid);
   add_function("building", &eval_building);
