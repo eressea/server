@@ -505,7 +505,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
-          if (rn && rn->land) {
+          if (rn && rn->land && virgin_region(rn)) {
             /* only expand islands that aren't single-islands and not too big already */
             int n = island_size(rn);
             if (n>2 && n<MAXISLANDSIZE) {
