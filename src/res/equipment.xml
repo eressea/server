@@ -363,5 +363,9 @@
     <item name="seaserpenthead" amount="1"/>
   </set>
 
+  <set name="ent_spoils">
+    <item name="log" amount="d3-1"/>
+  </set>
+
 </equipment>
 
