@@ -340,6 +340,10 @@
     <item name="chainmail" amount="1"/>
   </set>
 
+  <set name="item_log">
+    <item name="log" amount="1"/>
+  </set>
+
   <set name="item_rustychain">
     <item name="rustychainmail" amount="1"/>
   </set>
@@ -364,7 +368,9 @@
   </set>
 
   <set name="ent_spoils">
-    <item name="log" amount="d3-1"/>
+    <subset chance="0.1">
+      <set name="item_log"/>
+    </subset>
   </set>
 
 </equipment>
