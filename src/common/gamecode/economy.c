@@ -2730,31 +2730,23 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 
 	n = eff_skill(u, SK_STEALTH, r) - wahrnehmung(r, f);
 
-	if (n == 0) {
+	if (n <= 0) {
 		/* Wahrnehmung == Tarnung */
 		if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
       ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
-      ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
+      if (n==0) {
+        ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
+      } else {
+        ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
+      }
       return;
 		} else {
-      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
       ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u, u2));
+      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
       n = 1;
 			goblin = true;
 		}
-	} else if (n < 0) {
-		/* Wahrnehmung > Tarnung */
-		if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
-      ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u, u2));
-      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
-      return;
-		} else {	/* Goblin-Spezialdiebstahl, Meldung an Beklauten */
-      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
-			n = 1;
-			goblin = true;
-		}
 	}
-	n = max(0, n);
 
 	i = min(u->number, get_item(u,I_RING_OF_NIMBLEFINGER));
 	if (i > 0) {
