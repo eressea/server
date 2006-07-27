@@ -2134,7 +2134,7 @@ sp_fog_of_confusion(castorder *co)
   double power = co->force;
   region_list *rl, *rl2;
   int range = 1+(int)(power/8);
-  int duration = 1+(int)(power/6);
+  int duration = 2+(int)(power/6);
 
   rl = all_in_range(r, (short)range, NULL);
 
@@ -5423,7 +5423,7 @@ sp_dream_of_confusion(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   int range = 1+(int)(power/8);
-  int duration = 1+(int)(power/6);
+  int duration = 2+(int)(power/6);
 
   rl = all_in_range(r, (short)range, NULL);
 
