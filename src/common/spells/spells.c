@@ -2116,7 +2116,7 @@ sp_drought(castorder *co)
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
  * Wirkung:
- *  Alle Regionen innerhalb eines Radius von ((Stufe-15)/2 aufgerundet)
+ *  Alle Regionen innerhalb eines Radius von *siehe code*
  *  werden von einem verwirrenden Nebel bedeckt.  Innerhalb des Nebels
  *  können keine Himmelsrichtungen mehr erkannt werden, alle Bewegungen
  *  erfolgen in eine zufällige Richtung.
@@ -2132,16 +2132,13 @@ sp_fog_of_confusion(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  double range;
-  int duration;
-  region_list *rl,*rl2;
-
-  range = (power-11)/3-1;
-  duration = (int)((power-11)/1.5)+1;
+  region_list *rl, *rl2;
+  int range = 1+(int)(power/8);
+  int duration = 1+(int)(power/6);
 
   rl = all_in_range(r, (short)range, NULL);
 
-  for(rl2 = rl; rl2; rl2 = rl2->next) {
+  for (rl2 = rl; rl2; rl2 = rl2->next) {
     curse * c;
     variant effect;
 
@@ -5425,8 +5422,8 @@ sp_dream_of_confusion(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  double range = (power-14)/2-1;
-  int duration = (int)(power-14)+1;
+  int range = 1+(int)(power/8);
+  int duration = 1+(int)(power/6);
 
   rl = all_in_range(r, (short)range, NULL);
 
