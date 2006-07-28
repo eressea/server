@@ -3287,12 +3287,18 @@ sp_deathcloud(castorder *co)
 {
   region *r = co->rt;
   unit *mage = co->magician.u;
+  attrib *a = r->attribs;
 
-  attrib *a = a_find(r->attribs, &at_deathcloud);
-
-  if (a!=NULL) {
-    report_failure(mage, co->order);
-    return 0;
+  while (a) {
+    if ((a->type->flags & ATF_CURSE)) {
+      curse * c = a->data.v;
+      if (c->type==&ct_deathcloud) {
+        report_failure(mage, co->order);
+        return 0;
+      }
+      a = a->next;
+    }
+    else a = a->nexttype;
   }
 
   mk_deathcloud(mage, r, co->force, co->level);
