@@ -3182,35 +3182,10 @@ sp_unholypower(castorder *co)
  *   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
-static struct curse_type ct_deathcloud = {
-  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, NULL, cinfo_region,
-};
-
-static curse *
-mk_deathcloud(unit * mage, region * r, double force, int duration)
-{
-  variant effect;
-  curse * c;
-
-  effect.f = (float)force/2;
-  c = create_curse(mage, &r->attribs, &ct_deathcloud, force, duration, effect, 0);
-  c->data.v = r;
-  return c;
-}
-
-static void
-dc_finalize(struct attrib * a)
-{
-  curse * c = (curse*)a->data.v;
-  c->data.v = NULL;
-  destroy_curse(c);
-}
-
 static int
-dc_age(struct attrib * a)
+dc_age(struct curse * c)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {
-  curse * c = (curse*)a->data.v;
   region * r = (region*)c->data.v;
   unit ** up = &r->units;
   unit * mage = c->magician;
@@ -3251,13 +3226,24 @@ dc_age(struct attrib * a)
       "mage region", mage, r));
   }
 
-  return --c->duration;
+  return 0;
 }
 
-
-attrib_type at_deathcloud = {
-  "curse_dc", curse_init, curse_done, dc_age, curse_write, curse_read, ATF_CURSE
+static struct curse_type ct_deathcloud = {
+  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, NULL, cinfo_region, NULL, NULL, NULL, NULL, dc_age
 };
+
+static curse *
+mk_deathcloud(unit * mage, region * r, double force, int duration)
+{
+  variant effect;
+  curse * c;
+
+  effect.f = (float)force/2;
+  c = create_curse(mage, &r->attribs, &ct_deathcloud, force, duration, effect, 0);
+  c->data.v = r;
+  return c;
+}
 
 #define COMPAT_DEATHCLOUD
 #ifdef COMPAT_DEATHCLOUD

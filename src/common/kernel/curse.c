@@ -109,13 +109,19 @@ int
 curse_age(attrib * a)
 {
   curse * c = (curse*)a->data.v;
+  int result = 0;
 
-  if (c->flag & CURSE_NOAGE) {
+  if (c->type->age) {
+    result = c->type->age(c);
+  }
+  if (result!=0) {
+    c->duration = 0;
+  } else if (c->flag & CURSE_NOAGE) {
     c->duration = 1;
   } else {
     c->duration = max(0, c->duration-1);
   }
-  return (c->duration);
+  return c->duration;
 }
 
 void

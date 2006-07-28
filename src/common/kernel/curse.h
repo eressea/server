@@ -227,6 +227,7 @@ typedef struct curse_type {
 	int (*read)(FILE * F, curse * c);
 	int (*write)(FILE * F, const curse * c);
 	int (*cansee)(const struct faction*, const void*, typ_t, curse *, int);
+  int (*age)(curse *);
 } curse_type;
 
 

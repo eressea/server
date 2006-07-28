@@ -226,7 +226,6 @@ void magic(void);
 
 void regeneration_magiepunkte(void);
 
-extern attrib_type at_deathcloud;
 extern attrib_type at_seenspell;
 extern attrib_type at_mage;
 extern attrib_type at_familiarmage;
