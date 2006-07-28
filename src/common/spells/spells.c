@@ -3187,15 +3187,15 @@ dc_age(struct curse * c)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {
   region * r = (region*)c->data.v;
-  unit ** up = &r->units;
+  unit *u, **up;
   unit * mage = c->magician;
-  unit * u;
-
-  if (mage==NULL || mage->number==0) {
+  
+  if (r==NULL || mage==NULL || mage->number==0) {
     /* if the mage disappears, so does the spell. */
-    return 0;
+    return -1;
   }
 
+  up = &r->units;
   if (curse_active(c)) while (*up!=NULL) {
     unit * u = *up;
     double damage = c->effect.f * u->number;
@@ -3269,6 +3269,7 @@ dc_read_compat(struct attrib * a, FILE* F)
 
     effect.f = (float)strength;
     c = create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration, effect, 0);
+    c->data.v = r;
     if (u==NULL) {
       ur_add(var, (void**)&c->magician, resolve_unit);
     }
