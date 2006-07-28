@@ -3085,7 +3085,6 @@ attrib_init(void)
   at_register(&at_curse);
 
   at_register(&at_seenspell);
-  at_register(&at_deathcloud);
 
   /* neue REGION-Attribute */
   at_register(&at_direction);
