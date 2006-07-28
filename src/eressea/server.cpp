@@ -108,9 +108,10 @@
 /* libc includes */
 #include <cstdio>
 #include <cctype>
+#include <climits>
+#include <clocale>
 #include <cstring>
 #include <ctime>
-#include <clocale>
 
 #if defined(USE_DMALLOC)
 # define CLEANUP_CODE
@@ -535,6 +536,12 @@ read_args(int argc, char **argv, lua_State * luaState)
       default:
         usage(argv[0], argv[i]);
     }
+  }
+
+  if (orders==NULL) {
+    static char orderfile[MAX_PATH];
+    sprintf(orderfile, "%s/orders.%d", basepath(), turn);
+    orders = orderfile;
   }
 
   /* add some more variables to the lua globals */
