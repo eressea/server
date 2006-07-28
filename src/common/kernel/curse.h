@@ -169,7 +169,8 @@ typedef enum {
 /* typ von struct */
 enum {
 	CURSETYP_NORM,
-	CURSETYP_UNIT,
+  CURSETYP_UNIT,
+  CURSETYP_REGION, /* stores the region in c->data.v */
 	MAXCURSETYP
 };
 
@@ -253,6 +254,9 @@ curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type 
 	 * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
 	 * nochmal gesondert auf min(get_cursedmen, u->number) gesetzt werden.
 	 */
+
+extern void destroy_curse(curse * c);
+
 
 boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 	/* ignoriert CURSE_ISNEW */

@@ -16,13 +16,13 @@
 #include <eressea.h>
 #include "spells.h"
 
+#include "regioncurse.h"
 #include "alp.h"
 #include "combatspells.h"
 
 #include <curse.h>
 
 struct curse_type;
-extern const struct curse_type ct_firewall;
 extern void ct_register(const struct curse_type * ct);
 
 /* kernel includes */
@@ -326,7 +326,7 @@ destr_curse(curse* c, int cast_level, double force)
 }
 
 int
-destroy_curse(attrib **alist, int cast_level, double force, curse * c)
+break_curse(attrib **alist, int cast_level, double force, curse * c)
 {
   int succ = 0;
 /*  attrib **a = a_find(*ap, &at_curse); */
@@ -511,7 +511,7 @@ make_familiar(unit *familiar, unit *mage)
   if (familiar->race->init_familiar!=NULL) {
     familiar->race->init_familiar(familiar);
   } else {
-    log_error(("could not perform initialization for familiar %s.\n", 
+    log_error(("could not perform initialization for familiar %s.\n",
       familiar->faction->race->_name[0]));
   }
 
@@ -541,7 +541,7 @@ sp_summon_familiar(castorder *co)
   }
   rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
   if (rc==NULL) {
-    log_error(("could not find suitable familiar for %s.\n", 
+    log_error(("could not find suitable familiar for %s.\n",
       mage->faction->race->_name[0]));
     return 0;
   }
@@ -692,7 +692,7 @@ sp_destroy_magic(castorder *co)
       return 0;
   }
 
-  succ = destroy_curse(ap, cast_level, force, c);
+  succ = break_curse(ap, cast_level, force, c);
 
   if (succ) {
     ADDMSG(&mage->faction->msgs, msg_message(
@@ -3182,36 +3182,38 @@ sp_unholypower(castorder *co)
  *   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
-typedef struct dc_data {
-  region * r;
-  unit * mage;
-  double strength;
-  int countdown;
-  boolean active;
-} dc_data;
+static struct curse_type ct_deathcloud = {
+  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, NULL, cinfo_region,
+};
 
-static void
-dc_initialize(struct attrib *a)
+static curse *
+mk_deathcloud(unit * mage, region * r, double force, int duration)
 {
-  dc_data * data = (dc_data *)malloc(sizeof(dc_data));
-  a->data.v = data;
-  data->active = true;
+  variant effect;
+  curse * c;
+
+  effect.f = (float)force/2;
+  c = create_curse(mage, &r->attribs, &ct_deathcloud, force, duration, effect, 0);
+  c->data.v = r;
+  return c;
 }
 
 static void
 dc_finalize(struct attrib * a)
 {
-  free(a->data.v);
+  curse * c = (curse*)a->data.v;
+  c->data.v = NULL;
+  destroy_curse(c);
 }
 
 static int
 dc_age(struct attrib * a)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {
-  dc_data * data = (dc_data *)a->data.v;
-  region * r = data->r;
+  curse * c = (curse*)a->data.v;
+  region * r = (region*)c->data.v;
   unit ** up = &r->units;
-  unit * mage = data->mage;
+  unit * mage = c->magician;
   unit * u;
 
   if (mage==NULL || mage->number==0) {
@@ -3219,9 +3221,9 @@ dc_age(struct attrib * a)
     return 0;
   }
 
-  if (data->active) while (*up!=NULL) {
+  if (curse_active(c)) while (*up!=NULL) {
     unit * u = *up;
-    double damage = data->strength * u->number;
+    double damage = c->effect.f * u->number;
 
     freset(u->faction, FL_DH);
     if (target_resists_magic(mage, u, TYP_UNIT, 0)){
@@ -3249,45 +3251,50 @@ dc_age(struct attrib * a)
       "mage region", mage, r));
   }
 
-  return --data->countdown;
+  return --c->duration;
 }
 
-static void
-dc_write(const struct attrib * a, FILE* F)
-{
-  const dc_data * data = (const dc_data *)a->data.v;
-  fprintf(F, "%d %lf ", data->countdown, data->strength);
-  write_unit_reference(data->mage, F);
-  write_region_reference(data->r, F);
-}
-
-static int
-dc_read(struct attrib * a, FILE* F)
-/* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
-{
-  dc_data * data = (dc_data *)a->data.v;
-  fscanf(F, "%d %lf ", &data->countdown, &data->strength);
-  read_unit_reference(&data->mage, F);
-  return read_region_reference(&data->r, F);
-}
 
 attrib_type at_deathcloud = {
-  "zauber_todeswolke", dc_initialize, dc_finalize, dc_age, dc_write, dc_read
+  "curse_dc", curse_init, curse_done, dc_age, curse_write, curse_read, ATF_CURSE
 };
 
-static attrib *
-mk_deathcloud(unit * mage, region * r, double strength, int duration)
+#define COMPAT_DEATHCLOUD
+#ifdef COMPAT_DEATHCLOUD
+static int
+dc_read_compat(struct attrib * a, FILE* F)
+/* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
-  attrib * a = a_new(&at_deathcloud);
-  dc_data * data = (dc_data *)a->data.v;
+  char zId[10];
+  region * r = NULL;
+  unit * u;
+  variant var;
+  int duration;
+  double strength;
 
-  data->countdown = duration;
-  data->r = r;
-  data->mage = mage;
-  data->strength = strength;
-  data->active = false;
-  return a;
+  fscanf(F, "%d %lf %s", &duration, &strength, zId);
+  var.i = atoi36(zId);
+  u = findunit(var.i);
+
+  read_region_reference(&r, F);
+  if (r!=NULL) {
+    variant effect;
+    curse * c;
+
+    effect.f = (float)strength;
+    c = create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration, effect, 0);
+    if (u==NULL) {
+      ur_add(var, (void**)&c->magician, resolve_unit);
+    }
+  }
+  return AT_READ_FAIL; /* we don't care for the attribute. */
 }
+
+
+attrib_type at_deathcloud_compat = {
+  "zauber_todeswolke", NULL, NULL, NULL, NULL, dc_read_compat
+};
+#endif
 
 static int
 sp_deathcloud(castorder *co)
@@ -3302,7 +3309,7 @@ sp_deathcloud(castorder *co)
     return 0;
   }
 
-  a_add(&r->attribs, mk_deathcloud(mage, r, co->force/2, co->level));
+  mk_deathcloud(mage, r, co->force, co->level);
 
   return co->level;
 }
@@ -6908,7 +6915,7 @@ sp_q_antimagie(castorder *co)
     return 0;
   }
 
-  succ = destroy_curse(ap, cast_level, force, c);
+  succ = break_curse(ap, cast_level, force, c);
 
   if (succ) {
     ADDMSG(&mage->faction->msgs, msg_message(
@@ -6942,7 +6949,7 @@ sp_q_antimagie(castorder *co)
  *   (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
  */
 int
-sp_destroy_curse(castorder *co)
+sp_break_curse(castorder *co)
 {
   attrib **ap;
   int obj;
@@ -9026,7 +9033,7 @@ static spelldata spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_destroy_curse, NULL
+    (spell_f)sp_break_curse, NULL
   },
   {
     SPL_ETERNIZEWALL, "eternal_walls", NULL,
@@ -9479,6 +9486,9 @@ register_spells(void)
   register_alp();
   /* init_firewall(); */
   ct_register(&ct_firewall);
+  ct_register(&ct_deathcloud);
+
+  at_register(&at_deathcloud_compat);
   register_curses();
   register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
 }
