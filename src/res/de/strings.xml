@@ -6463,6 +6463,11 @@
     <text locale="en">Fighting against</text>
   </string>
 
+  <string name="battle_helpers">
+    <text locale="de">Hilft:</text>
+    <text locale="en">Helping</text>
+  </string>
+
   <string name="battle_army">
     <text locale="de">Heer</text>
     <text locale="en">army</text>
