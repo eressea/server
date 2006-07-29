@@ -546,7 +546,6 @@ enum {
 };
 
 #define want(i) (1<<i)
-#define Pow(i) (1<<i)
 
 extern const char *options[MAXOPTIONS];
 
@@ -1120,6 +1119,13 @@ extern int freadstr(FILE * F, char * str, size_t size);
 extern int fwritestr(FILE * F, const char * str);
 
 extern attrib_type at_guard;
+
+#if 1 /* disable to count all units */
+# define count_unit(u) playerrace(u->race)
+#else
+# define count_unit(u) 1
+#endif
+
 #ifdef __cplusplus
 }
 #endif
