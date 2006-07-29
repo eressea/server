@@ -718,7 +718,7 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
   size -= rsize;
   bufp += rsize;
   
-  if(u->faction->options & Pow(O_SHOWSKCHANGE)) {
+  if (u->faction->options & want(O_SHOWSKCHANGE)) {
     skill *skill = get_skill(u, sk);
     int oldeff = 0;
     int diff;

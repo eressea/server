@@ -1002,10 +1002,10 @@ readunit(FILE * F)
 		u_setfaction(u, findfaction(MONSTER_FACTION));
 		set_number(u, 0);
 	}
-	if (playerrace(u->race)) {
-		u->faction->no_units++;
-	}
-	set_number(u, number);
+
+  if (count_unit(u)) u->faction->no_units++;
+
+  set_number(u, number);
 	u->building = findbuilding(rid(F));
 	u->ship = findship(rid(F));
 
@@ -1561,9 +1561,9 @@ readfaction(FILE * F)
   
   i = f->options = ri(F);
 
-  if ((i & ((1<<O_REPORT)|(1<<O_COMPUTER)))==0 && f->no!=MONSTER_FACTION) {
+  if ((i & (want(O_REPORT)|want(O_COMPUTER)))==0 && f->no!=MONSTER_FACTION) {
     /* Kein Report eingestellt, Fehler */
-    f->options = f->options | Pow(O_REPORT) | Pow(O_ZUGVORLAGE);
+    f->options = f->options | want(O_REPORT) | want(O_ZUGVORLAGE);
   }
 
   if (global.data_version < TYPES_VERSION) {
@@ -1650,7 +1650,7 @@ writefaction(FILE * F, const faction * f)
 		wi(F, ur->y);
 	}
 	wnl(F);
-	wi(F, f->options & ~Pow(O_DEBUG));
+	wi(F, f->options & ~want(O_DEBUG));
 	wnl(F);
 
 	for (sf = f->allies; sf; sf = sf->next) {

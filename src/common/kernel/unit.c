@@ -904,9 +904,7 @@ u_setfaction(unit * u, faction * f)
   if (u->faction) {
     unit ** iunit;
     set_number(u, 0);
-    if (playerrace(u->race)) {
-      --u->faction->no_units;
-    }
+    --u->faction->no_units;
     join_group(u, NULL);
     free_orders(&u->orders);
     set_order(&u->thisorder, NULL);
@@ -932,9 +930,7 @@ u_setfaction(unit * u, faction * f)
   if (u->region) update_interval(f, u->region);
 	if (cnt && f) {
 		set_number(u, cnt);
-    if (playerrace(u->race)) {
-      ++f->no_units;
-    }
+    ++f->no_units;
 	}
 }
 

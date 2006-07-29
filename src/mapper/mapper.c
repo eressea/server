@@ -1520,7 +1520,7 @@ makemonsters(void)
 	f->locale=default_locale;
 	
 	factions=f;
-	f->options = Pow(O_REPORT);
+	f->options = want(O_REPORT);
 	f->no=MONSTER_FACTION;
 	f->subscription = 0;
 	f->name=strdup("Monster");
