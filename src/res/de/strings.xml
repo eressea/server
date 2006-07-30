@@ -91,15 +91,15 @@
     <string name="antimagic">
       <text locale="en">It may look like just another quartz, but your magician will tell you
         tha great power emenates from these crystals. Using it at the begining
-        of a week will release a strong negative energy that attacks all
-        spells cast in the region during that week.</text>
+        of a week will release a strong negative energy that reduce the
+        power of all spells cast in the region during that week.</text>
       <text locale="de">Für den ungeübten Betrachter mag der Antimagiekristall wie ein
         gewöhnlicher Quarzkristall ausschauen, doch ein Magier spürt, das ihm
         ganz besondere Kräfte innewohnen. Durch spezielle Rituale antimagisch
         aufgeladen wird der Kristall, wenn er zu feinem Staub zermahlen und
         verteilt wird, die beim Zaubern freigesetzten magischen Energien
-        aufsaugen und alle Zauber, welche in der betreffenden Woche in der
-        Region gezaubert werden fehlschlagen lassen.</text>
+        aufsaugen und die Kraft aller Zauber reduzieren, welche in der betreffenden
+        Woche in der Region gezaubert werden fehlschlagen lassen.</text>
     </string>
     <string name="rop">
       <text locale="en">A ring of power increases a magician's power. The level of all the
