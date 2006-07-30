@@ -89,65 +89,67 @@ herbsearch(region * r, unit * u, int max)
 int
 use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
-	const potion_type * ptype = resource2potion(itype->rtype);
-	const potion_type * use = ugetpotionuse(u);
-	assert(ptype!=NULL);
-
-	if (use != NULL && use!=ptype) {
-		ADDMSG(&u->faction->msgs,
-					msg_message("errusingpotion", "unit using command",
-          u, use->itype->rtype, ord));
-		return ECUSTOM;
-	}
-
-	if (ptype==oldpotiontype[P_LIFE]) {
-		region * r = u->region;
-		int holz = 0, x;
-
-		/* für die Aufforstung von Mallornwäldern braucht man Mallorn */
-		if (fval(r, RF_MALLORN)) {
-			holz = use_pooled(u, rt_find("mallorn"), 
-					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
-		} else {
-			holz = use_pooled(u, rt_find("log"), 
-					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
-		}
-	  if (r->land==0) holz=0;
-    x = holz/10;
-    if (holz%10) ++x;
-    if (x<holz) holz = x;
-		rsettrees(r, 1, rtrees(r, 1) + holz);
+  const potion_type * ptype = resource2potion(itype->rtype);
+  const potion_type * use = ugetpotionuse(u);
+  assert(ptype!=NULL);
+  
+  if (use != NULL && use!=ptype) {
+    ADDMSG(&u->faction->msgs,
+           msg_message("errusingpotion", "unit using command",
+                       u, use->itype->rtype, ord));
+    return ECUSTOM;
+  }
+  
+  if (ptype==oldpotiontype[P_LIFE]) {
+    region * r = u->region;
+    int holz = 0;
+    
+    /* für die Aufforstung von Mallornwäldern braucht man Mallorn */
+    if (fval(r, RF_MALLORN)) {
+      holz = use_pooled(u, rt_find("mallorn"), 
+                        GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
+    } else {
+      holz = use_pooled(u, rt_find("log"), 
+                        GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
+    }
+    if (r->land==0) holz=0;
+    if (holz<10*amount) {
+      int x = holz/10;
+      if (holz%10) ++x;
+      if (x<amount) amount = x;
+    }
+    rsettrees(r, 1, rtrees(r, 1) + holz);
     ADDMSG(&u->faction->msgs, msg_message("growtree_effect", 
       "mage amount", u, holz));
-	} else if (ptype==oldpotiontype[P_HEAL]) {
-		return EUNUSABLE;
-	} else if (ptype==oldpotiontype[P_HEILWASSER]) {
-		u->hp = min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
-	} else if (ptype==oldpotiontype[P_PEOPLE]) {
-		region * r = u->region;
-		attrib * a = (attrib*)a_find(r->attribs, &at_peasantluck);
-		if (!a) a = a_add(&r->attribs, a_new(&at_peasantluck));
-		a->data.i+=amount;
-	} else if (ptype==oldpotiontype[P_HORSE]) {
-		region * r = u->region;
-		attrib * a = (attrib*)a_find(r->attribs, &at_horseluck);
-		if (!a) a = a_add(&r->attribs, a_new(&at_horseluck));
-		a->data.i+=amount;
-	} else if (ptype==oldpotiontype[P_WAHRHEIT]) {
-		fset(u, UFL_DISBELIEVES);
-		amount=1;
-	} else if (ptype==oldpotiontype[P_MACHT]) {
-		/* Verfünffacht die HP von max. 10 Personen in der Einheit */
-		u->hp += min(u->number, 10*amount) * unit_max_hp(u) * 4;
-	} else {
-		change_effect(u, ptype, 10*amount);
-	}
-	use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
-	usetpotionuse(u, ptype);
-
-	ADDMSG(&u->faction->msgs, msg_message("usepotion",
-		"unit potion", u, ptype->itype->rtype));
-	return 0;
+  } else if (ptype==oldpotiontype[P_HEAL]) {
+    return EUNUSABLE;
+  } else if (ptype==oldpotiontype[P_HEILWASSER]) {
+    u->hp = min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+  } else if (ptype==oldpotiontype[P_PEOPLE]) {
+    region * r = u->region;
+    attrib * a = (attrib*)a_find(r->attribs, &at_peasantluck);
+    if (!a) a = a_add(&r->attribs, a_new(&at_peasantluck));
+    a->data.i+=amount;
+  } else if (ptype==oldpotiontype[P_HORSE]) {
+    region * r = u->region;
+    attrib * a = (attrib*)a_find(r->attribs, &at_horseluck);
+    if (!a) a = a_add(&r->attribs, a_new(&at_horseluck));
+    a->data.i+=amount;
+  } else if (ptype==oldpotiontype[P_WAHRHEIT]) {
+    fset(u, UFL_DISBELIEVES);
+    amount=1;
+  } else if (ptype==oldpotiontype[P_MACHT]) {
+    /* Verfünffacht die HP von max. 10 Personen in der Einheit */
+    u->hp += min(u->number, 10*amount) * unit_max_hp(u) * 4;
+  } else {
+    change_effect(u, ptype, 10*amount);
+  }
+  use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  usetpotionuse(u, ptype);
+  
+  ADDMSG(&u->faction->msgs, msg_message("usepotion",
+    "unit potion", u, ptype->itype->rtype));
+  return 0;
 }
 
 /*****************/
