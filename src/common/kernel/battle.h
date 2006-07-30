@@ -89,8 +89,9 @@ extern "C" {
     const struct group * group;
     struct tactics leader;				/* der beste Taktiker des Heeres */
 # define E_ENEMY 1
-# define E_ATTACKING 2
-    unsigned char enemy[128];
+# define E_FRIEND 2
+# define E_ATTACKING 4
+    unsigned char relations[128];
     struct side * enemies[128];
     struct fighter * fighters;
     int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
@@ -208,8 +209,10 @@ extern "C" {
   extern void do_battle(void);
 
   /* for combar spells and special attacks */
-  extern troop select_enemy(struct fighter * af, int minrow, int maxrow, boolean advance);
-  extern int count_enemies(struct battle * b, struct side * as, int minrow, int maxrow, boolean advance);
+  enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
+
+  extern troop select_enemy(struct fighter * af, int minrow, int maxrow, int select);
+  extern int count_enemies(struct battle * b, const struct fighter * af, int minrow, int maxrow, int select);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
   extern void battlemsg(battle * b, struct unit * u, const char * s);
   extern void battlerecord(battle * b, const char *s);
@@ -217,10 +220,10 @@ extern "C" {
   extern void message_faction(battle * b, struct faction * f, struct message * m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
-  extern struct cvector * fighters(struct battle *b, struct fighter *af, int minrow, int maxrow, int mask);
-  extern int count_allies(struct side * as, int minrow, int maxrow, boolean advance);
-  extern int get_unitrow(const struct fighter * af);
-  extern boolean helping(struct side * as, struct side * ds);
+  extern struct cvector * fighters(struct battle *b, const struct side * vs, int minrow, int maxrow, int mask);
+  extern int count_allies(const struct side * as, int minrow, int maxrow, int select);
+  extern int get_unitrow(const struct fighter * af, const struct side * vs);
+  extern boolean helping(const struct side * as, const struct side * ds);
   extern void rmfighter(fighter *df, int i);
   extern struct region * fleeregion(const struct unit * u);
   extern struct fighter * select_corpse(struct battle * b, struct fighter * af);

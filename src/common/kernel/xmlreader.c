@@ -714,7 +714,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
       }
       assert(property!=NULL);
       if (strcmp((const char*)property, "attack")==0) {
-        wtype->attack = (boolean (*)(const struct troop*, const struct weapon_type *, int*, int))fun;
+        wtype->attack = (boolean (*)(const struct troop*, const struct weapon_type *, int*))fun;
       } else {
         log_error(("unknown function type '%s' for item '%s'\n",
           (const char*)property, itype->rtype->_name[0]));
@@ -1144,16 +1144,16 @@ add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
 }
 
 static void
-add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSkills)
+add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSubsets)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  if (nsetSkills!=NULL && nsetSkills->nodeNr>0) {
+  if (nsetSubsets!=NULL && nsetSubsets->nodeNr>0) {
     int i;
 
-    eq->subsets = calloc(nsetSkills->nodeNr+1, sizeof(subset));
-    for (i=0;i!=nsetSkills->nodeNr;++i) {
+    eq->subsets = calloc(nsetSubsets->nodeNr+1, sizeof(subset));
+    for (i=0;i!=nsetSubsets->nodeNr;++i) {
       xmlXPathObjectPtr xpathResult;
-      xmlNodePtr node = nsetSkills->nodeTab[i];
+      xmlNodePtr node = nsetSubsets->nodeTab[i];
       xmlChar * property;
 
       eq->subsets[i].chance = 1.0f;

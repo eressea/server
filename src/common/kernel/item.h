@@ -207,7 +207,7 @@ typedef struct weapon_type {
   int reload; /* time to reload this weapon */
   weapon_mod * modifiers;
   /* --- functions --- */
-  boolean (*attack)(const struct troop *, const struct weapon_type *, int *deaths, int row);
+  boolean (*attack)(const struct troop *, const struct weapon_type *, int *deaths);
 } weapon_type;
 
 extern void rt_register(resource_type * it);

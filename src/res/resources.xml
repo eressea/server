@@ -283,7 +283,7 @@
   </resource>
 
   <resource name="catapult">
-    <item weight="4000">
+    <item weight="10000">
       <construction skill="cartmaking" minskill="5" reqsize="1">
         <requirement type="log" quantity="10"/>
       </construction>

@@ -1951,11 +1951,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
   else set_string(&u->name, dname);
   set_string(&u->display, "");
 
-  /* Nicht zu der Einheitenzahl zählen sollten auch alle Monster. Da
-   * aber auf die MAXUNITS nur in MACHE TEMP geprüft wird, ist es egal */
-  if (playerrace(u->race)) {
-    f->no_units++;
-  }
+  if (count_unit(u)) f->no_units++;
 
   if (creator) {
     attrib * a;

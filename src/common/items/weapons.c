@@ -73,72 +73,60 @@ static weapondata weapontable[WP_MAX + 1] =
 weapon_type * oldweapontype[WP_MAX];
 
 static boolean
-attack_firesword(const troop * at, const struct weapon_type * wtype, int *casualties, int row)
+attack_firesword(const troop * at, const struct weapon_type * wtype, int *casualties)
 {
-	fighter *fi = at->fighter;
-	troop dt;
-	/* Immer aus der ersten Reihe nehmen */
-	int minrow = FIGHT_ROW;
-	int maxrow = FIGHT_ROW;
-	int enemies = 0;
-	int killed = 0;
-	const char *damage = "2d8";
-	int force  = 1+rng_int()%10;
-
-	if (row==FIGHT_ROW) {
-		enemies = count_enemies(fi->side->battle, fi->side, minrow, maxrow, true);
-	}
-	if (!enemies) {
-		if (casualties) *casualties = 0;
-		return true; /* if no enemy found, no use doing standarad attack */
-	}
-
-	if (fi->catmsg == -1) {
-		int i, k=0;
-		for (i=0;i<=at->index;++i) {
-			struct weapon * wp = fi->person[i].melee;
-			if (wp!=NULL && wp->type == wtype) ++k;
-		}
-		sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
-			(k==1)?"t sein ":"en ihre",(k==1)?"":"er");
-		battlerecord(fi->side->battle, buf);
-		fi->catmsg = 0;
-	}
-
-	do {
-		dt = select_enemy(fi, minrow, maxrow, true);
-		assert(dt.fighter);
-		--force;
-		killed += terminate(dt, *at, AT_SPELL, damage, 1);
-	} while (force && killed < enemies);
-	if (casualties) *casualties = killed;
-	return true;
+  fighter *fi = at->fighter;
+  troop dt;
+  int killed = 0;
+  const char *damage = "2d8";
+  int force  = 1+rng_int()%10;
+  int enemies = count_enemies(fi->side->battle, fi, 0, 1, SELECT_ADVANCE|SELECT_DISTANCE);
+  
+  if (!enemies) {
+    if (casualties) *casualties = 0;
+    return true; /* if no enemy found, no use doing standarad attack */
+  }
+  
+  if (fi->catmsg == -1) {
+    int i, k=0;
+    for (i=0;i<=at->index;++i) {
+      struct weapon * wp = fi->person[i].melee;
+      if (wp!=NULL && wp->type == wtype) ++k;
+    }
+    sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
+            (k==1)?"t sein ":"en ihre",(k==1)?"":"er");
+    battlerecord(fi->side->battle, buf);
+    fi->catmsg = 0;
+  }
+  
+  do {
+    dt = select_enemy(fi, 0, 1, SELECT_ADVANCE|SELECT_DISTANCE);
+    assert(dt.fighter);
+    --force;
+    killed += terminate(dt, *at, AT_SPELL, damage, 1);
+  } while (force && killed < enemies);
+  if (casualties) *casualties = killed;
+  return true;
 }
 
 #define CATAPULT_ATTACKS 6
 
 static boolean
-attack_catapult(const troop * at, const struct weapon_type * wtype, int * casualties, int row)
+attack_catapult(const troop * at, const struct weapon_type * wtype, int * casualties)
 {
-	fighter *af = at->fighter;
-	unit *au = af->unit;
-	battle * b = af->side->battle;
-	troop dt;
-	int d = 0, n;
-	int minrow, maxrow;
-	weapon * wp = af->person[at->index].missile;
+  fighter *af = at->fighter;
+  unit *au = af->unit;
+  battle * b = af->side->battle;
+  troop dt;
+  int d = 0, enemies;
+  weapon * wp = af->person[at->index].missile;
   static item_type * it_catapultammo = NULL;
   if (it_catapultammo==NULL) {
     it_catapultammo = it_find("catapultammo");
   }
 	
-	assert(row>=FIGHT_ROW);
-	if (row>BEHIND_ROW) {
-    /* probiere noch weitere attacken, kann nicht schiessen */
-    return true;
-	}
-	assert(wp->type==wtype);
-	assert(af->person[at->index].reload==0);
+  assert(wp->type==wtype);
+  assert(af->person[at->index].reload==0);
 
   if (it_catapultammo!=NULL) {
     if (get_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1) <= 0) {
@@ -147,27 +135,29 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
     }
   }
 
-	if (af->catmsg == -1) {
-		int i, k=0;
-		for (i=0;i<=at->index;++i) {
-			if (af->person[i].reload==0 && af->person[i].missile == wp) ++k;
-		}
-		sprintf(buf, "%d Kämpfer aus %s feuer%s Katapult ab:", k, unitname(au), (k==1)?"t sein":"n ihr");
-		battlerecord(b, buf);
-		af->catmsg = 0;
-	}
-	minrow = FIGHT_ROW;
-	maxrow = FIGHT_ROW;
+  enemies = count_enemies(b, af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
+  enemies = min(enemies, CATAPULT_ATTACKS);
+  if (enemies==0) {
+    return true; /* allow further attacks */
+  }
 
-	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, minrow, maxrow, true));
+  if (af->catmsg == -1) {
+    int i, k=0;
+    for (i=0;i<=at->index;++i) {
+      if (af->person[i].reload==0 && af->person[i].missile == wp) ++k;
+    }
+    sprintf(buf, "%d Kämpfer aus %s feuer%s Katapult ab:", k, unitname(au), (k==1)?"t sein":"n ihr");
+    battlerecord(b, buf);
+    af->catmsg = 0;
+  }
 
   if (it_catapultammo!=NULL) {
     use_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
   }
 
-	while (--n >= 0) {
+	while (--enemies >= 0) {
 		/* Select defender */
-		dt = select_enemy(af, minrow, maxrow, true);
+		dt = select_enemy(af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
 		if (!dt.fighter)
 			break;
 
@@ -198,7 +188,7 @@ init_oldweapons(void)
 		int minskill = 1, wflags = WTF_NONE;
     int m;
 		weapon_mod * modifiers = NULL;
-		boolean (*attack)(const troop *, const struct weapon_type *, int *, int) = NULL;
+		boolean (*no_special_attack)(const troop *, const struct weapon_type *, int *) = NULL;
 
 		assert(itype!=NULL || !"item not initialized");
 
@@ -214,7 +204,7 @@ init_oldweapons(void)
 
 		oldweapontype[w] = new_weapontype(itype, wflags, weapontable[w].magres, damage, weapontable[w].attmod, weapontable[w].defmod, weapontable[w].reload.time, weapontable[w].skill, minskill);
 		oldweapontype[w]->modifiers = modifiers;
-		oldweapontype[w]->attack = attack;
+		oldweapontype[w]->attack = no_special_attack;
 
 #ifdef SCORE_MODULE
     if (itype->construction->materials==NULL) {
