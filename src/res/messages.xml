@@ -129,6 +129,13 @@
     <text locale="fr">"($int36($id))"</text>
     <text locale="en">"A veil of confusion lies over the region. ($int36($id))"</text>
   </message>
+  <message name="curseinfo::deathcloud" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"In der Region treibt ein Giftelementar sein Unwesen. ($int36($id))"</text>
+    <text locale="en">"A poison elemental is spreading pestilence and death. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::peacezone" section="events">
     <type>
       <arg name="id" type="int"/>
