@@ -2460,8 +2460,17 @@ aftermath(battle * b)
     fighter *df;
 #ifndef SIMPLE_COMBAT
     boolean relevant = false; /* Kampf relevant für diese Partei? */
-    if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
+
+    if (s->bf->lastturn>1) {
       relevant = true;
+    } else if (s->bf->lastturn==1 && b->has_tactics_turn) {
+      side * stac;
+      for (stac=b->sides; stac; stac=stac->next) {
+        if (stac->leader.value == b->max_tactics && helping(stac, s)) {
+          relevant = true;
+          break;
+        }
+      }
     }
 #endif
     s->flee = 0;
