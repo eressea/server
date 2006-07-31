@@ -1989,6 +1989,15 @@
     <text locale="fr">"$unit($unit) discovered that $region($region) is $terrain($region)."</text>
     <text locale="en">"$unit($unit) discovered that $region($region) is $terrain($region)."</text>
   </message>
+  <message name="leftship" section="movement">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) ist in dieser Runde gelandet und kann nicht weiter ins Landesinnere nach $region($region) vorstossen."</text>
+    <text locale="fr">"$unit($unit) has just landed and cannot continue moving to $region($region)."</text>
+    <text locale="en">"$unit($unit) has just landed and cannot continue moving to $region($region)."</text>
+  </message>
   <message name="sailnolandingstorm" section="movement">
     <type>
       <arg name="ship" type="ship"/>

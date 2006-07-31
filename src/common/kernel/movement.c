@@ -1326,6 +1326,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
   region * current = u->region;
   region_list * iroute = route_begin;
   int steps = 0;
+  boolean landing = false; /* aquarians have landed */
 
   while (iroute && iroute!=route_end) {
     region * next = iroute->data;
@@ -1355,8 +1356,14 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
             if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
             break;
           }
+          landing = true;
         } else if ((u->race->flags & RCF_WALK) == 0) {
           /* Spezialeinheiten, die nicht laufen können. */
+          ADDMSG(&u->faction->msgs, msg_message("detectocean",
+            "unit region", u, next));
+          break;
+        } else if (landing) {
+          /* wir sind diese woche angelandet */
           ADDMSG(&u->faction->msgs, msg_message("detectocean",
             "unit region", u, next));
           break;
