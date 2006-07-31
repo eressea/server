@@ -1729,6 +1729,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
         if (check_leuchtturm(current_point, NULL)) {
           ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
         } else {
+          ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh, next_point));
           damage_ship(sh, 0.10);
           /* we handle destruction at the end */
         }
