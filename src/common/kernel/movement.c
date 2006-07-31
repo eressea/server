@@ -1289,7 +1289,7 @@ movement_speed(unit * u)
 #endif /* KARMA_MODULE */
 
     /* Siebenmeilentee */
-    if ((u->race->flags & RCF_SWIM) == 0 && get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+    if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
       mp *= 2;
       change_effect(u, oldpotiontype[P_FAST], -u->number);
     }
