@@ -41,7 +41,7 @@ extern struct unit * can_find(struct faction *, struct faction *);
 void sparagraph(struct strlist ** SP, const char *s, int indent, char mark);
 void lparagraph(struct strlist ** SP, char *s, int indent, char mark);
 const char *hp_status(const struct unit * u);
-extern size_t spskill(char * pbuf, size_t siz, const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days); /* mapper */
+extern size_t spskill(char * pbuf, size_t siz, const struct locale * lang, const struct unit * u, struct skill * sv, int *dh, int days); /* mapper */
 extern void spunit(struct strlist ** SP, const struct faction * f, const struct unit * u, int indent, int mode);
 
 extern int reports(void);

@@ -198,7 +198,6 @@ int
 bufunit(const faction * f, const unit * u, int indent, int mode)
 {
   int i, dh;
-  skill_t sk;
   int getarnt = fval(u, UFL_PARTEITARNUNG);
   const char *pzTmp;
   building * b;
@@ -426,8 +425,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
   dh = 0;
   if (u->faction == f || telepath_see) {
-    for (sk = 0; sk != MAXSKILLS; sk++) {
-      rsize = spskill(bufp, size, f->locale, u, sk, &dh, 1);
+    skill * sv;
+    for (sv = u->skills;sv!=u->skills+u->skill_size;++sv) {
+      rsize = spskill(bufp, size, f->locale, u, sv, &dh, 1);
       if (rsize>size) rsize = size-1;
       size -= rsize;
       bufp += rsize;
@@ -640,7 +640,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
  */
 
 size_t
-spskill(char * buffer, size_t size, const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
+spskill(char * buffer, size_t size, const struct locale * lang, const struct unit * u, struct skill * sv, int *dh, int days)
 {
   char * bufp = buffer;
   int i, effsk;
@@ -648,9 +648,12 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
   size_t tsize = 0;
 
   if (!u->number) return 0;
+  if (sv->level<=0) {
+    if (sv->old<=0 || (u->faction->options & want(O_SHOWSKCHANGE))==0) {
+      return 0;
+    }
+  }
 
-  if (!has_skill(u, sk)) return 0;
-  
   rsize = strlcpy(bufp, ", ", size);
   tsize += rsize;
   if (rsize>size) rsize = size-1;
@@ -672,7 +675,7 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
 
     *dh = 1;
   }
-  rsize = strlcpy(bufp, skillname(sk, lang), size);
+  rsize = strlcpy(bufp, skillname(sv->id, lang), size);
   tsize += rsize;
   if (rsize>size) rsize = size-1;
   size -= rsize;
@@ -684,7 +687,7 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
   size -= rsize;
   bufp += rsize;
   
-  if (sk == SK_MAGIC){
+  if (sv->id == SK_MAGIC){
     if (find_magetype(u) != M_GRAU){
       rsize = strlcpy(bufp, LOC(lang, mkname("school", magietypen[find_magetype(u)])), size);
       tsize += rsize;
@@ -700,7 +703,7 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
     }
   }
   
-  if (sk == SK_STEALTH && fval(u, UFL_STEALTH)) {
+  if (sv->id == SK_STEALTH && fval(u, UFL_STEALTH)) {
     i = u_geteffstealth(u);
     if (i>=0) {
       rsize = slprintf(bufp, size, "%d/", i);
@@ -711,7 +714,7 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
     }
   }
   
-  effsk = effskill(u, sk);
+  effsk = effskill(u, sv->id);
   rsize = slprintf(bufp, size, "%d", effsk);
   tsize += rsize;
   if (rsize>size) rsize = size-1;
@@ -719,12 +722,11 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
   bufp += rsize;
   
   if (u->faction->options & want(O_SHOWSKCHANGE)) {
-    skill *skill = get_skill(u, sk);
     int oldeff = 0;
     int diff;
     
-    if (skill->old > 0) {
-      oldeff = skill->old + get_modifier(u, sk, skill->old, u->region, false);
+    if (sv->old > 0) {
+      oldeff = sv->old + get_modifier(u, sv->id, sv->old, u->region, false);
     }
     
     oldeff = max(0, oldeff);
@@ -838,25 +840,24 @@ spy_message(int spy, unit *u, unit *target)
 		}
 	}
 	if (spy > 0){
-		scat("Talente: ");
-		{
-			int first = 1;
-			int found = 0;
-			skill_t sk;
+    int first = 1;
+    int found = 0;
+    skill * sv;
 
-			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (has_skill(target, sk)) {
-					found++;
-					if (first == 1) {
-						first = 0;
-					} else {
-						scat(", ");
-					}
-					scat(skillname(sk, u->faction->locale));
-					scat(" ");
-					icat(eff_skill(target, sk, target->region));
-				}
-			}
+    scat("Talente: ");
+    for (sv = u->skills;sv!=u->skills+u->skill_size;++sv) {
+      if (sv->level>0) {
+        found++;
+        if (first == 1) {
+          first = 0;
+        } else {
+          scat(", ");
+        }
+        scat(skillname(sv->id, u->faction->locale));
+        scat(" ");
+        icat(eff_skill(target, sv->id, target->region));
+      }
+
 			if (found == 0) {
 				scat("Keine");
 			}

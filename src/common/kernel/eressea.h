@@ -79,6 +79,7 @@ struct party;
 struct unit;
 struct unit_list;
 struct item;
+struct skill;
 /* item */
 struct strlist;
 struct resource_type;
