@@ -728,12 +728,13 @@ give_cmd(unit * u, order * ord)
       if (u->items) {
         item **itmp=&u->items;
         while (*itmp) {
-          if ((*itmp)->number > 0
-            && (*itmp)->number - get_reservation(u, (*itmp)->type->rtype) > 0) {
-              n = (*itmp)->number - get_reservation(u, (*itmp)->type->rtype);
-              if (give_item(n, (*itmp)->type, u, u2, ord)==0) continue;
-            }
-            itmp = &(*itmp)->next;
+          item * itm = *itmp;
+          const item_type * itype = itm->type;
+          if (itm->number > 0 && itm->number - get_reservation(u, itype->rtype) > 0) {
+            n = itm->number - get_reservation(u, itype->rtype);
+            if (give_item(n, itype, u, u2, ord)==0) continue;
+          }
+          itmp = &itm->next;
         }
       }
       return;

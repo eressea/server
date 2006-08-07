@@ -3121,7 +3121,7 @@ renumber(void)
             u->no = i;
             uhash(u);
             break;
-
+#ifdef ALLOW_SHIP_RENUM
           case P_SHIP:
             if(!u->ship) {
               cmistake(u,ord,144,MSG_EVENT);
@@ -3149,7 +3149,7 @@ renumber(void)
             u->ship->no = i;
             shash(u->ship);
             break;
-
+#endif
           case P_BUILDING:
           case P_GEBAEUDE:
             if(!u->building) {
@@ -3180,7 +3180,7 @@ renumber(void)
             break;
 
           default:
-            cmistake(u,ord,239,MSG_EVENT);
+            cmistake(u, ord, 239, MSG_EVENT);
         }
       }
     }
