@@ -71,6 +71,8 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
   struct plane * p = rplane(u->region);
   unused(amount);
   unused(itype);
+#ifdef SPEEDAIL_ENABLED
+  /* disabled because of abuse */
   if (p!=NULL) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
   } else {
@@ -91,6 +93,7 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
       cmistake(u, ord, 144, MSG_EVENT);
     }
   }
+#endif
   return EUNUSABLE;
 }
 /* END speedsail */
