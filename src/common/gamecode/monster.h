@@ -29,7 +29,7 @@ extern "C" {
 
 void age_illusion(struct unit *u);
 
-void monsters_kill_peasants(void);
+void monsters_kill_peasants(struct unit * u);
 void plan_monsters(void);
 struct unit *random_unit(const struct region * r);
 

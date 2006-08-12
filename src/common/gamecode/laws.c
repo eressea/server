@@ -1196,12 +1196,7 @@ parse_restart(void)
   /* Clear away debris of destroyed factions */
 
   puts(" - beseitige leere Einheiten und leere Parteien...");
-
   remove_empty_units();
-
-  /* Auskommentiert: Wenn factions gelöscht werden, zeigen
-  * Spendenpointer ins Leere. */
-  /* remove_empty_factions(); */
 }
 /* ------------------------------------------------------------- */
 
@@ -1798,71 +1793,6 @@ deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
   }
 }
 
-static int
-prepare_mail_cmd(unit * u, struct order * ord)
-{
-  const char *s;
-  int n;
-
-  init_tokens(ord);
-  skip_token(); /* skip the keyword */
-  s = getstrtoken();
-
-  /* Falls kein Parameter, ist das eine Einheitsnummer;
-  * das Füllwort "AN" muß wegfallen, da gültige Nummer! */
-
-  if (strcasecmp(s, "to") == 0) s = getstrtoken();
-  else if (strcasecmp(s, "an") == 0) s = getstrtoken();
-
-  switch (findparam(s, u->faction->locale)) {
-  case P_REGION:
-    break;
-  case P_FACTION:
-    break;
-  case P_UNIT:
-    {
-      region *r = u->region;
-      unit *u2;
-      boolean see = false;
-
-      n = getid();
-
-      for (u2=r->units; u2; u2=u2->next) {
-        if (u2->no == n && cansee(u->faction, r, u2, 0)) {
-          see = true;
-          break;
-        }
-      }
-
-      if (see == false) {
-        break;
-      }
-
-      s = getstrtoken();
-      if (!s[0]) {
-        break;
-      }
-      u2 = findunitr(r,n);
-      if(u2 && cansee(u->faction, r, u2, 0)) {
-        event_arg args[3];
-        args[0].data.v = (void*)s;
-        args[0].type = "string";
-        args[1].data.v = (void*)u;
-        args[1].type = "unit";
-        args[2].type = NULL;
-        handle_event(&u2->attribs, "message", args);
-      }
-    }
-    break;
-  case P_BUILDING:
-  case P_GEBAEUDE:
-    break;
-  case P_SHIP:
-    break;
-  }
-  return 0;
-}
-
 static void
 mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
 {
@@ -1971,8 +1901,20 @@ mail_cmd(unit * u, struct order * ord)
       if (!s[0]) {
         cmistake(u, ord, 30, MSG_MESSAGE);
         break;
+      } else {
+        attrib * a = a_find(u2->attribs, &at_eventhandler);
+        if (a!=NULL) {
+          event_arg args[3];
+          args[0].data.v = (void*)s;
+          args[0].type = "string";
+          args[1].data.v = (void*)u;
+          args[1].type = "unit";
+          args[2].type = NULL;
+          handle_event(a, "message", args);
+        }
+
+        mailunit(r, u, n, ord, s);
       }
-      mailunit(r, u, n, ord, s);
     }
     break;
 
@@ -2165,43 +2107,6 @@ send_cmd(unit * u, struct order * ord)
     }
   }
   return 0;
-}
-
-static void
-set_passw(void)
-{
-  region *r;
-  puts(" - setze Passwörter, Adressen und Format, Abstimmungen");
-
-  for (r = regions; r; r = r->next) {
-    unit *u;
-    for (u = r->units; u; u = u->next) {
-      struct order * ord;
-      for (ord = u->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
-        case NOKEYWORD:
-          cmistake(u, ord, 22, MSG_EVENT);
-          break;
-
-        case K_BANNER:
-          if (banner_cmd(u, ord)!=0) ord = NULL;
-          break;
-
-        case K_EMAIL:
-          if (email_cmd(u, ord)!=0) ord = NULL;
-          break;
-
-        case K_PASSWORD:
-          if (password_cmd(u, ord)!=0) ord = NULL;
-          break;
-
-        case K_SEND:
-          if (send_cmd(u, ord)!=0) ord = NULL;
-          break;
-        }
-      }
-    }
-  }
 }
 
 static boolean
@@ -2667,7 +2572,6 @@ instant_orders(void)
     }
   }
 
-  parse(K_GROUP, group_cmd, false);
   for (r = regions; r; r = r->next) {
     unit * u;
     for (u = r->units; u; u = u->next) {
@@ -2774,27 +2678,22 @@ guard_on_cmd(unit * u, struct order * ord)
 }
 
 static void
-sinkships(void)
+sinkships(region * r)
 {
-  region *r;
+  ship *sh;
 
-  /* Unbemannte Schiffe können sinken */
-  for (r = regions; r; r = r->next) {
-    ship *sh;
-
-    list_foreach(ship, r->ships, sh) {
-      if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
-        /* Schiff nicht seetüchtig */
-        damage_ship(sh, 0.30);
-      }
-      if (shipowner(sh)==NULL) {
-        damage_ship(sh, 0.05);
-      }
-      if (sh->damage >= sh->size * DAMAGE_SCALE)
-        destroy_ship(sh);
+  list_foreach(ship, r->ships, sh) {
+    if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
+      /* Schiff nicht seetüchtig */
+      damage_ship(sh, 0.30);
     }
-    list_next(sh);
+    if (shipowner(sh)==NULL) {
+      damage_ship(sh, 0.05);
+    }
+    if (sh->damage >= sh->size * DAMAGE_SCALE)
+      destroy_ship(sh);
   }
+  list_next(sh);
 }
 
 /* The following functions do not really belong here: */
@@ -3064,128 +2963,119 @@ declare_war(void)
 }
 #endif
 
-static void
-renumber(void)
+static int
+renumber_cmd(unit * u, order * ord)
 {
-  region *r;
-  const char *s;
-  unit * u;
+  const char * s;
   int i;
+  faction * f = u->faction;
 
-  for (r=regions;r;r=r->next) {
-    for (u=r->units;u;u=u->next) {
-      faction * f = u->faction;
-      struct order * ord;
-      for (ord = u->orders; ord; ord = ord->next) if (get_keyword(ord)==K_NUMBER) {
-        init_tokens(ord);
-        skip_token();
-        s = getstrtoken();
-        switch(findparam(s, u->faction->locale)) {
+  init_tokens(ord);
+  skip_token();
+  s = getstrtoken();
+  switch(findparam(s, u->faction->locale)) {
 
-          case P_FACTION:
-            s = getstrtoken();
-            if (s && *s) {
-              int id = atoi36(s);
-              attrib * a = a_find(f->attribs, &at_number);
-              if (!a) a = a_add(&f->attribs, a_new(&at_number));
-              a->data.i = id;
-            }
-            break;
+    case P_FACTION:
+      s = getstrtoken();
+      if (s && *s) {
+        int id = atoi36(s);
+        attrib * a = a_find(f->attribs, &at_number);
+        if (!a) a = a_add(&f->attribs, a_new(&at_number));
+        a->data.i = id;
+      }
+      break;
 
-          case P_UNIT:
-            s = getstrtoken();
-            if(s == NULL || *s == 0) {
-              i = newunitid();
-            } else {
-              i = atoi36(s);
-              if (i<=0 || i>MAX_UNIT_NR) {
-                cmistake(u, ord, 114, MSG_EVENT);
-                continue;
-              }
+    case P_UNIT:
+      s = getstrtoken();
+      if (s == NULL || *s == 0) {
+        i = newunitid();
+      } else {
+        i = atoi36(s);
+        if (i<=0 || i>MAX_UNIT_NR) {
+          cmistake(u, ord, 114, MSG_EVENT);
+          break;
+        }
 
-              if(forbiddenid(i)) {
-                cmistake(u, ord, 116, MSG_EVENT);
-                continue;
-              }
+        if (forbiddenid(i)) {
+          cmistake(u, ord, 116, MSG_EVENT);
+          break;
+        }
 
-              if(findunitg(i, r)) {
-                cmistake(u, ord, 115, MSG_EVENT);
-                continue;
-              }
-            }
-            uunhash(u);
-            if (!ualias(u)) {
-              attrib *a = a_add(&u->attribs, a_new(&at_alias));
-              a->data.i = -u->no;
-            }
-            u->no = i;
-            uhash(u);
-            break;
-#ifdef ALLOW_SHIP_RENUM
-          case P_SHIP:
-            if(!u->ship) {
-              cmistake(u,ord,144,MSG_EVENT);
-              continue;
-            }
-            if(!fval(u, UFL_OWNER)) {
-              cmistake(u,ord,146,MSG_EVENT);
-              continue;
-            }
-            s = getstrtoken();
-            if(s == NULL || *s == 0) {
-              i = newcontainerid();
-            } else {
-              i = atoi36(s);
-              if (i<=0 || i>MAX_CONTAINER_NR) {
-                cmistake(u,ord,114,MSG_EVENT);
-                continue;
-              }
-              if (findship(i) || findbuilding(i)) {
-                cmistake(u,ord,115,MSG_EVENT);
-                continue;
-              }
-            }
-            sunhash(u->ship);
-            u->ship->no = i;
-            shash(u->ship);
-            break;
-#endif
-          case P_BUILDING:
-          case P_GEBAEUDE:
-            if(!u->building) {
-              cmistake(u,ord,145,MSG_EVENT);
-              continue;
-            }
-            if(!fval(u, UFL_OWNER)) {
-              cmistake(u,ord,148,MSG_EVENT);
-              continue;
-            }
-            s = getstrtoken();
-            if(*s == 0) {
-              i = newcontainerid();
-            } else {
-              i = atoi36(s);
-              if (i<=0 || i>MAX_CONTAINER_NR) {
-                cmistake(u,ord,114,MSG_EVENT);
-                continue;
-              }
-              if(findship(i) || findbuilding(i)) {
-                cmistake(u,ord,115,MSG_EVENT);
-                continue;
-              }
-            }
-            bunhash(u->building);
-            u->building->no = i;
-            bhash(u->building);
-            break;
-
-          default:
-            cmistake(u, ord, 239, MSG_EVENT);
+        if (findunitg(i, u->region)) {
+          cmistake(u, ord, 115, MSG_EVENT);
+          break;
         }
       }
-    }
+      uunhash(u);
+      if (!ualias(u)) {
+        attrib *a = a_add(&u->attribs, a_new(&at_alias));
+        a->data.i = -u->no;
+      }
+      u->no = i;
+      uhash(u);
+      break;
+#ifdef ALLOW_SHIP_RENUM
+    case P_SHIP:
+      if (!u->ship) {
+        cmistake(u,ord,144,MSG_EVENT);
+        break;
+      }
+      if (!fval(u, UFL_OWNER)) {
+        cmistake(u,ord,146,MSG_EVENT);
+        break;
+      }
+      s = getstrtoken();
+      if(s == NULL || *s == 0) {
+        i = newcontainerid();
+      } else {
+        i = atoi36(s);
+        if (i<=0 || i>MAX_CONTAINER_NR) {
+          cmistake(u,ord,114,MSG_EVENT);
+          break;
+        }
+        if (findship(i) || findbuilding(i)) {
+          cmistake(u,ord,115,MSG_EVENT);
+          break;
+        }
+      }
+      sunhash(u->ship);
+      u->ship->no = i;
+      shash(u->ship);
+      break;
+#endif
+    case P_BUILDING:
+    case P_GEBAEUDE:
+      if (!u->building) {
+        cmistake(u,ord,145,MSG_EVENT);
+        break;
+      }
+      if(!fval(u, UFL_OWNER)) {
+        cmistake(u,ord,148,MSG_EVENT);
+        break;
+      }
+      s = getstrtoken();
+      if(*s == 0) {
+        i = newcontainerid();
+      } else {
+        i = atoi36(s);
+        if (i<=0 || i>MAX_CONTAINER_NR) {
+          cmistake(u,ord,114,MSG_EVENT);
+          break;
+        }
+        if(findship(i) || findbuilding(i)) {
+          cmistake(u,ord,115,MSG_EVENT);
+          break;
+        }
+      }
+      bunhash(u->building);
+      u->building->no = i;
+      bhash(u->building);
+      break;
+
+    default:
+      cmistake(u, ord, 239, MSG_EVENT);
   }
-  renumber_factions();
+  return 0;
 }
 
 static building *
@@ -3260,7 +3150,7 @@ age_building(building * b)
   }
 
   a_age(&b->attribs);
-  handle_event(&b->attribs, "timer", b);
+  handle_event(b->attribs, "timer", b);
 
   return b;
 }
@@ -3302,7 +3192,7 @@ ageing(void)
   /* Factions */
   for (f=factions;f;f=f->next) {
     a_age(&f->attribs);
-    handle_event(&f->attribs, "timer", f);
+    handle_event(f->attribs, "timer", f);
   }
 
   /* Regionen */
@@ -3312,13 +3202,13 @@ ageing(void)
     ship ** sp;
 
     a_age(&r->attribs);
-    handle_event(&r->attribs, "timer", r);
+    handle_event(r->attribs, "timer", r);
 
     /* Einheiten */
     for (up=&r->units;*up;) {
       unit * u = *up;
       a_age(&u->attribs);
-      if (u==*up) handle_event(&u->attribs, "timer", u);
+      if (u==*up) handle_event(u->attribs, "timer", u);
       if (u==*up) up = &(*up)->next;
     }
 
@@ -3326,7 +3216,7 @@ ageing(void)
     for (sp=&r->ships;*sp;) {
       ship * s = *sp;
       a_age(&s->attribs);
-      if (s==*sp) handle_event(&s->attribs, "timer", s);
+      if (s==*sp) handle_event(s->attribs, "timer", s);
       if (s==*sp) sp = &(*sp)->next;
     }
 
@@ -3467,112 +3357,104 @@ new_units (void)
 }
 
 static void
-setdefaults (void)
+setdefaults(unit *u)
 {
-  region *r;
+  order *ord;
+  boolean trade = false;
+  boolean hunger = LongHunger(u);
 
-  for (r = regions; r; r = r->next) {
-    unit *u;
-
-    for (u = r->units; u; u = u->next) {
-      order *ord;
-      boolean trade = false;
-      boolean hunger = LongHunger(u);
-
-      freset(u, UFL_LONGACTION);
-      if (hunger) {
-        /* Hungernde Einheiten führen NUR den default-Befehl aus */
-        set_order(&u->thisorder, default_order(u->faction->locale));
-      }
+  freset(u, UFL_LONGACTION);
+  if (hunger) {
+    /* Hungernde Einheiten führen NUR den default-Befehl aus */
+    set_order(&u->thisorder, default_order(u->faction->locale));
+  }
 #ifdef LASTORDER
-      else {
-        /* by default the default long order becomes the new long order. */
-        u->thisorder = copy_order(u->lastorder);
-      }
+  else {
+    /* by default the default long order becomes the new long order. */
+    u->thisorder = copy_order(u->lastorder);
+  }
 #endif
-      /* check all orders for a potential new long order this round: */
-      for (ord = u->orders; ord; ord = ord->next) {
+  /* check all orders for a potential new long order this round: */
+  for (ord = u->orders; ord; ord = ord->next) {
 #ifndef LASTORDER
-        if (u->old_orders && is_repeated(ord)) {
-          /* this new order will replace the old defaults */
-          free_orders(&u->old_orders);
-          if (hunger) break;
-        }
+    if (u->old_orders && is_repeated(ord)) {
+      /* this new order will replace the old defaults */
+      free_orders(&u->old_orders);
+      if (hunger) break;
+    }
 #endif
-        if (hunger) continue;
+    if (hunger) continue;
 
-        if (is_exclusive(ord)) {
-          /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
-          if (idle(u->faction)) {
-            set_order(&u->thisorder, default_order(u->faction->locale));
-          } else {
-            set_order(&u->thisorder, copy_order(ord));
-          }
+    if (is_exclusive(ord)) {
+      /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
+      if (idle(u->faction)) {
+        set_order(&u->thisorder, default_order(u->faction->locale));
+      } else {
+        set_order(&u->thisorder, copy_order(ord));
+      }
+      break;
+    } else {
+      keyword_t keyword = get_keyword(ord);
+      switch (keyword) {
+        /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+        * werden. Da Handel erst nach anderen langen Befehlen kommt,
+        * muß das vorher abgefangen werden. Wir merken uns also
+        * hier, ob die Einheit handelt. */
+        case K_BUY:
+        case K_SELL:
+          /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+          * werden. */
+          trade = true;
           break;
-        } else {
-          keyword_t keyword = get_keyword(ord);
-          switch (keyword) {
-            /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-            * werden. Da Handel erst nach anderen langen Befehlen kommt,
-            * muß das vorher abgefangen werden. Wir merken uns also
-            * hier, ob die Einheit handelt. */
-            case K_BUY:
-            case K_SELL:
-              /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-              * werden. */
-              trade = true;
-              break;
 
-            case K_CAST:
-              /* dient dazu, das neben Zaubern kein weiterer Befehl
-              * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-              set_order(&u->thisorder, NULL);
-              break;
+        case K_CAST:
+          /* dient dazu, das neben Zaubern kein weiterer Befehl
+          * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+          set_order(&u->thisorder, NULL);
+          break;
 
-            case K_WEREWOLF:
-              set_order(&u->thisorder, copy_order(ord));
-              break;
-
-              /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-              * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-              * nicht moeglich ist, Schulden zu machen. */
-          }
-        }
-      }
-
-      if (hunger) continue;
-
-      /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-      * werden. */
-
-      if (trade == true) {
-        /* fset(u, UFL_LONGACTION); */
-        set_order(&u->thisorder, NULL);
-      }
-      /* thisorder kopieren wir nun nach lastorder. in lastorder steht
-      * der DEFAULT befehl der einheit. da MOVE kein default werden
-      * darf, wird MOVE nicht in lastorder kopiert. MACHE TEMP wurde ja
-      * schon gar nicht erst in thisorder kopiert, so dass MACHE TEMP
-      * durch diesen code auch nicht zum default wird Ebenso soll BIETE
-      * nicht hierher, da i.A. die Einheit dann ja weg ist (und damit
-      * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
-      * den Default übernommen werden */
-
-#ifdef LASTORDER
-      switch (get_keyword(u->thisorder)) {
-        case K_MOVE:
-        case K_ATTACK:
         case K_WEREWOLF:
-        case NOKEYWORD:
-          /* these can never be default orders */
+          set_order(&u->thisorder, copy_order(ord));
           break;
 
-        default:
-          set_order(&u->lastorder, copy_order(u->thisorder));
+          /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+          * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+          * nicht moeglich ist, Schulden zu machen. */
       }
-#endif
     }
   }
+
+  if (hunger) return;
+
+  /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+  * werden. */
+
+  if (trade == true) {
+    /* fset(u, UFL_LONGACTION); */
+    set_order(&u->thisorder, NULL);
+  }
+  /* thisorder kopieren wir nun nach lastorder. in lastorder steht
+  * der DEFAULT befehl der einheit. da MOVE kein default werden
+  * darf, wird MOVE nicht in lastorder kopiert. MACHE TEMP wurde ja
+  * schon gar nicht erst in thisorder kopiert, so dass MACHE TEMP
+  * durch diesen code auch nicht zum default wird Ebenso soll BIETE
+  * nicht hierher, da i.A. die Einheit dann ja weg ist (und damit
+  * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
+  * den Default übernommen werden */
+
+#ifdef LASTORDER
+  switch (get_keyword(u->thisorder)) {
+    case K_MOVE:
+    case K_ATTACK:
+    case K_WEREWOLF:
+    case NOKEYWORD:
+      /* these can never be default orders */
+      break;
+
+    default:
+      set_order(&u->lastorder, copy_order(u->thisorder));
+  }
+#endif
 }
 
 static int
@@ -3861,166 +3743,354 @@ claim_cmd(unit * u, struct order * ord)
   return 0;
 }
 
+typedef struct processor {
+  struct processor * next;
+  int priority;
+  enum { PR_GLOBAL, PR_REGION, PR_UNIT, PR_ORDER } type;
+  union {
+    struct {
+      keyword_t kword;
+      boolean thisorder;
+      int (*process)(struct unit *, struct order *);
+    } per_order;
+    struct {
+      void (*process)(struct unit *);
+    } per_unit;
+    struct {
+      void (*process)(struct region *);
+    } per_region;
+    struct {
+      void (*process)(void);
+    } global;
+  } data;
+  const char * name;
+} processor;
+
+static processor * processors;
+
+void
+add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struct order *), boolean thisorder, const char * name)
+{
+  processor **pproc = &processors;
+  processor *proc;
+
+  while (*pproc) {
+    proc = *pproc;
+    if (proc->priority>priority) break;
+    else if (proc->priority==priority && proc->type>=PR_ORDER) break;
+    pproc = &proc->next;
+  }
+
+  proc = malloc(sizeof(processor));
+  proc->priority = priority;
+  proc->type = PR_ORDER;
+  proc->data.per_order.process = parser;
+  proc->data.per_order.kword = kword;
+  proc->data.per_order.thisorder = thisorder;
+  proc->name = name;
+  proc->next = *pproc;
+  *pproc = proc;
+}
+
+void
+add_proc_global(int priority, void (*process)(void), const char * name)
+{
+  processor **pproc = &processors;
+  processor *proc;
+
+  while (*pproc) {
+    proc = *pproc;
+    if (proc->priority>priority) break;
+    else if (proc->priority==priority && proc->type>=PR_GLOBAL) break;
+    pproc = &proc->next;
+  }
+
+  proc = malloc(sizeof(processor));
+  proc->priority = priority;
+  proc->type = PR_GLOBAL;
+  proc->data.global.process = process;
+  proc->name = name;
+  proc->next = *pproc;
+  *pproc = proc;
+}
+
+void
+add_proc_region(int priority, void (*process)(region *), const char * name)
+{
+  processor **pproc = &processors;
+  processor *proc;
+
+  while (*pproc) {
+    proc = *pproc;
+    if (proc->priority>priority) break;
+    else if (proc->priority==priority && proc->type>=PR_REGION) break;
+    pproc = &proc->next;
+  }
+
+  proc = malloc(sizeof(processor));
+  proc->priority = priority;
+  proc->type = PR_REGION;
+  proc->data.per_region.process = process;
+  proc->name = name;
+  proc->next = *pproc;
+  *pproc = proc;
+}
+
+void
+add_proc_unit(int priority, void (*process)(unit *), const char * name)
+{
+  processor **pproc = &processors;
+  processor *proc;
+
+  while (*pproc) {
+    proc = *pproc;
+    if (proc->priority>priority) break;
+    else if (proc->priority==priority && proc->type>=PR_UNIT) break;
+    pproc = &proc->next;
+  }
+
+  proc = malloc(sizeof(processor));
+  proc->priority = priority;
+  proc->type = PR_UNIT;
+  proc->data.per_unit.process = process;
+  proc->name = name;
+  proc->next = *pproc;
+  *pproc = proc;
+}
+
+void
+process(void)
+{
+  processor *proc = processors;
+  while (proc) {
+    int prio = proc->priority;
+    region *r;
+    processor *pglobal = proc;
+
+    printf("- Step %u\n", prio);
+    while (proc && proc->priority==prio) {
+      if (proc->name) printf(" - %s\n", proc->name);
+      proc = proc->next;
+    }
+
+    while (pglobal && pglobal->priority==prio && pglobal->type==PR_GLOBAL) {
+      pglobal->data.global.process();
+      pglobal = pglobal->next;
+    }
+    if (pglobal==NULL || pglobal->priority!=prio) continue;
+
+    for (r = regions; r; r = r->next) {
+      unit **up;
+      processor *pregion = pglobal;
+
+      while (pregion && pregion->priority==prio && pregion->type==PR_REGION) {
+        pregion->data.per_region.process(r);
+        pregion = pregion->next;
+      }
+      if (pregion==NULL || pregion->priority!=prio) continue;
+
+      for (up=&r->units;*up;) {
+        unit * u = *up;
+        processor *porder, *punit = pregion;
+
+        while (punit && punit->priority==prio && punit->type==PR_UNIT) {
+          punit->data.per_unit.process(u);
+          punit = punit->next;
+        }
+        if (punit==NULL || punit->priority!=prio) continue;
+
+        porder = punit;
+        while (porder && porder->priority==prio && porder->type==PR_ORDER) {
+          order ** ordp = &u->orders;
+          if (porder->data.per_order.thisorder) ordp = &u->thisorder;
+          while (*ordp) {
+            order * ord = *ordp;
+            if (get_keyword(ord) == porder->data.per_order.kword) {
+              porder->data.per_order.process(u, ord);
+            }
+            if (*ordp==ord) ordp=&ord->next;
+          }
+          porder = porder->next;
+        }
+        assert(*up==u);
+        up=&u->next;
+      }
+    }
+  }
+}
+
+static void enter_1(region * r) { do_misc(r, false); }
+static void enter_2(region * r) { do_misc(r, true); }
+static void maintain_buildings_1(region * r) { maintain_buildings(r, false); }
+static void maintain_buildings_2(region * r) { maintain_buildings(r,true); }
+static void reset_moved(unit * u) { freset(u, UFL_MOVED); }
+
+static void reset_rng(void) {
+  if (turn == 0) rng_init((int)time(0));
+  else rng_init(turn);
+}
+
 void
 processorders (void)
 {
   region *r;
+  int p;
 
-  set_passw();    /* und pruefe auf illegale Befehle */
+  p = 10;
+  add_proc_global(p, &new_units, "Neue Einheiten erschaffen");
 
-  puts(" - neue Einheiten erschaffen...");
-  new_units();
+  p+=10;
+  add_proc_unit(p, &setdefaults, "Default-Befehle");
+  add_proc_order(p, K_BANNER, &banner_cmd, false, NULL);
+  add_proc_order(p, K_EMAIL, &email_cmd, false, NULL);
+  add_proc_order(p, K_PASSWORD, &password_cmd, false, NULL);
+  add_proc_order(p, K_SEND, &send_cmd, false, NULL);
+  add_proc_order(p, K_GROUP, &group_cmd, false, NULL);
 
-  puts(" - Defaults und Instant-Befehle...");
-  setdefaults();
-  instant_orders();
-
-  if (alliances!=NULL) alliancekick();
-
-  parse(K_MAIL, prepare_mail_cmd, false);
-  parse(K_MAIL, mail_cmd, false);
-  puts(" - Parteien altern");
-  age_factions();
-
-  puts(" - Benutzen");
-  parse(K_CLAIM, claim_cmd, false);
-  parse(K_USE, use_cmd, false);
-
-  puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
-  do_misc(false);
+  p+=10;
+  add_proc_unit(p, &reset_moved, "Instant-Befehle");
+  add_proc_order(p, K_QUIT, &quit_cmd, false, NULL);
+  add_proc_order(p, K_URSPRUNG, &origin_cmd, false, NULL);
+  add_proc_order(p, K_ALLY, &ally_cmd, false, NULL);
+  add_proc_order(p, K_PREFIX, &prefix_cmd, false, NULL);
+  add_proc_order(p, K_SYNONYM, &synonym_cmd, false, NULL);
+  add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, false, NULL);
+  add_proc_order(p, K_STATUS, &status_cmd, false, NULL);
+  add_proc_order(p, K_COMBAT, &combatspell_cmd, false, NULL);
+  add_proc_order(p, K_DISPLAY, &display_cmd, false, NULL);
+  add_proc_order(p, K_NAME, &name_cmd, false, NULL);
+  add_proc_order(p, K_GUARD, &guard_off_cmd, false, NULL);
+  add_proc_order(p, K_RESHOW, &reshow_cmd, false, NULL);
+#ifdef KARMA_MODULE
+  add_proc_order(p, K_WEREWOLF, &setwere_cmd, false, NULL);
+#endif /* KARMA_MODULE */
 
   if (alliances!=NULL) {
-    puts(" - Testen der Allianzbedingungen");
-    alliancevictory();
+    p+=10;
+    add_proc_global(p, &alliancekick, NULL);
   }
 
-  puts(" - GM Kommandos");
+  p+=10;
+  add_proc_global(p, &age_factions, "Parteienalter++");
+  add_proc_order(p, K_MAIL, &mail_cmd, false, "Botschaften");
+  add_proc_order(p, K_CLAIM, &claim_cmd, false, NULL);
+
+  p+=10; /* all claims must be done before we can USE */
+  add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
+  add_proc_order(p, K_USE, &use_cmd, false, "Benutzen");
+
+  if (alliances!=NULL) {
+    p+=10; /* in case USE changes it */
+    add_proc_global(p, &alliancevictory, "Testen der Allianzbedingungen");
+  }
+
 #ifdef INFOCMD_MODULE
-  infocommands();
+  add_proc_global(p, &infocommands, NULL);
 #endif
-  gmcommands();
+  add_proc_global(p, &gmcommands, "GM Kommandos");
 
-  puts(" - Verlassen");
-  parse(K_LEAVE, leave_cmd, false);
+  p += 10; /* in case it has any effects on allincevictories */
+  add_proc_order(p, K_LEAVE, &leave_cmd, false, "Verlassen");
 
-  puts(" - Kontakte löschen");
-  remove_contacts();
-
+  if (!nobattle) {
 #ifdef KARMA_MODULE
-  puts(" - Jihad-Angriffe");
-  jihad_attacks();
+    p+=10;
+    add_proc_global(p, &jihad_attacks, "Jihad-Angriffe");
 #endif
-
-  puts(" - Attackieren");
-  if (nobattle == false) do_battle();
-  if (turn == 0) rng_init((int)time(0));
-  else rng_init(turn);
-
-  puts(" - Belagern");
-  do_siege();
-
-  puts(" - Initialisieren des Pools, Reservieren");
-  init_pool();
-
-  puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (2.Versuch)");
-  do_misc(false);
-
-  puts(" - Folge auf Einheiten ersetzen");
-  follow_unit();
-
-  if (turn == 0) rng_init((int)time(0));
-  else rng_init(turn);
-
-  puts(" - Zerstören, Geben, Rekrutieren, Vergessen");
-  economics();
-  remove_empty_units();
-
-  puts(" - Gebäudeunterhalt (1. Versuch)");
-  maintain_buildings(false);
-
-  puts(" - Sterben, Neustart");
-  quit();
-  parse_restart();
-
-  puts(" - Zaubern");
-  magic();
-  remove_empty_units();
-
-  if (!global.disabled[K_TEACH]) {
-    puts(" - Lehren");
-    teaching();
+    add_proc_region(p, &do_battle, "Attackieren");
   }
 
-  puts(" - Lernen");
-  learn();
+  p+=10; /* after combat, reset rng */
+  add_proc_global(p, &reset_rng, NULL);
+  add_proc_region(p, &do_siege, "Belagern");
 
-  puts(" - Produzieren, Geldverdienen, Handeln, Anwerben");
-  produce();
+  p+=10; /* can't allow reserve before siege (weapons) */
+  add_proc_region(p, &enter_2, "Kontaktieren & Betreten (2. Versuch)");
+  add_proc_order(p, K_RESERVE, &reserve_cmd, false, "Reservieren");
+  add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
 
-  puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (3.Versuch)");
-  do_misc(true);
+  p+=10; /* rest rng again before economics */
+  add_proc_global(p, &reset_rng, NULL);
+  add_proc_region(p, &economics, "Zerstören, Geben, Rekrutieren, Vergessen");
 
-  puts(" - Schiffe sinken");
-  sinkships();
+  p+=10;
+  add_proc_region(p, &maintain_buildings_1, "Gebäudeunterhalt (1. Versuch)");
 
-  puts(" - Bewegungen");
-  movement();
+  p+=10; /* QUIT fuer sich alleine */
+  add_proc_global(p, &quit, "Sterben");
+  add_proc_global(p, &parse_restart, "Neustart");
 
-  puts(" - Bewache (an)");
-  parse(K_GUARD, guard_on_cmd, false);
+  p+=10;
+  add_proc_global(p, &magic, "Zaubern");
 
-  puts(" - Zufallsbegegnungen");
-  encounters();
+  p+=10;
+  if (!global.disabled[K_TEACH]) {
+    add_proc_region(p, &teaching, "Lehren");
+  }
+  add_proc_order(p, K_STUDY, &learn_cmd, true, "Lernen");
 
-  if (turn == 0) rng_init((int)time(0));
-  else rng_init(turn);
+  p+=10;
+  add_proc_global(p, &produce, "Produktion, Handel, Rekruten");
 
-  puts(" - Monster fressen und vertreiben Bauern");
-  monsters_kill_peasants();
+  p+=10;
+  add_proc_region(p, &enter_2, "Kontaktieren & Betreten (3. Versuch)");
 
-  puts(" - random events");
-  randomevents();
+  p+=10;
+  add_proc_region(p, &sinkships, "Schiffe sinken");
 
-  puts(" - newspaper commands");
+  p+=10;
+  add_proc_global(p, &movement, "Bewegungen");
+
+  p+=10;
+  add_proc_order(p, K_GUARD, &guard_on_cmd, false, "Bewache (an)");
 #ifdef XECMD_MODULE
-  xecmd();
+  /* can do together with guard */
+  add_proc_order(p, K_LEAVE, &xecmd, false, "Zeitung");
 #endif
 
-  puts(" - regeneration (healing & aura)");
-  monthly_healing();
-  regeneration_magiepunkte();
+  p+=10;
+  add_proc_global(p, &encounters, "Zufallsbegegnungen");
+  p+=10;
+  add_proc_global(p, &reset_rng, NULL);
+  add_proc_unit(p, &monsters_kill_peasants, "Monster fressen und vertreiben Bauern");
 
-  puts(" - Defaults setzen");
-  defaultorders();
+  p+=10;
+  add_proc_global(p, &randomevents, "Zufallsereignisse");
 
-  puts(" - Unterhaltskosten, Nachfrage, Seuchen, Wachstum, Auswanderung");
-  demographics();
+  p+=10;
+  add_proc_global(p, &monthly_healing, "Regeneration (HP)");
+  add_proc_global(p, &regeneration_magiepunkte, "Regeneration (Aura)");
+  add_proc_global(p, &defaultorders, "Defaults setzen");
+  add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
-  puts(" - Gebäudeunterhalt (2. Versuch)");
-  maintain_buildings(true);
+  p+=10;
+  add_proc_region(p, &maintain_buildings_2, "Gebäudeunterhalt (2. Versuch)");
 
+  p+=10;
+  add_proc_global(p, &reorder, "Einheiten sortieren");
 #ifdef KARMA_MODULE
-  puts(" - Jihads setzen");
-  karma();
+  p+=10;
+  add_proc_global(p, &karma, "Jihads setzen");
 #endif
-
-  puts(" - Einheiten Sortieren");
-  reorder();
 #ifdef ALLIANCEJOIN
-  alliancejoin();
+  p+=10;
+  add_proc_global(p, &alliancejoin, "Allianzen");
 #endif
 #ifdef ENEMIES
-  puts(" - Krieg & Frieden");
-  declare_war();
+  p+=10;
+  add_proc_global(p, &declare_war, "Krieg & Frieden");
 #endif
-
 #ifdef HEROES
-  puts(" - Heldenbeförderung");
-  parse(K_PROMOTION, promotion_cmd, false);
+  add_proc_order(p, K_PROMOTION, &promotion_cmd, false, "Heldenbeförderung");
 #endif
 
-  puts(" - Neue Nummern");
-  renumber();
+  p+=10;
+  add_proc_global(p, &renumber_factions, "Neue Nummern");
+  add_proc_order(p, K_NUMBER, &renumber_cmd, false, "Neue Nummern (Einheiten)");
+
+  process();
+  /*************************************************/
+
   for (r = regions;r;r=r->next) reorder_owners(r);
 
   puts(" - Attribute altern");

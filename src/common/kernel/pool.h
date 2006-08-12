@@ -46,7 +46,7 @@ int change_resource(struct unit * u, const struct resource_type * res, int chang
 int get_reservation(const struct unit * u, const struct resource_type * res);
 int change_reservation(struct unit * u, const struct resource_type * res, int value);
 
-void init_pool(void);
+int reserve_cmd(struct unit *u, struct order *ord);
 
 /** init_pool
  * initialisiert den regionalen Pool.

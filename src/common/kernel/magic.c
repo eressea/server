@@ -2807,6 +2807,7 @@ magic(void)
   for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
     free_castorders(cll[spellrank]);
   }
+  remove_empty_units();
 }
 
 const char *

@@ -47,11 +47,11 @@ extern int income(const struct unit * u);
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
 
-void economics(void);
+void economics(struct region *r);
 void produce(void);
 
 enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC };
-void maintain_buildings(boolean crash);
+void maintain_buildings(struct region * r, boolean crash);
 extern void add_spende(struct faction * f1, struct faction * f2, int betrag, struct region * r);
 
 #ifdef __cplusplus

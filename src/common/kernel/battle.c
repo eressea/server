@@ -3988,106 +3988,101 @@ battle_flee(battle * b)
 }
 
 void
-do_battle(void)
+do_battle(region * r)
 {
-  region *r;
 #ifdef SMALL_BATTLE_MESSAGES
   char smallbuf[512];
 #endif
+  battle *b = NULL;
+  boolean fighting = false;
+  ship * sh;
+  building *bu;
 
-  for (r=regions;r!=NULL;r=r->next) {
-    battle *b = NULL;
-    boolean fighting = false;
-    ship * sh;
-    building *bu;
-    /* int *rows; */
+  fighting = init_battle(r, &b);
 
-    fighting = init_battle(r, &b);
+  if (b==NULL) return;
 
-    if (b==NULL) continue;
-
-    /* Bevor wir die alliierten hineinziehen, sollten wir schauen, *
-    * Ob jemand fliehen kann. Dann erübrigt sich das ganze ja
-    * vielleicht schon. */
-    print_header(b);
-    if (!fighting) {
-      /* Niemand mehr da, Kampf kann nicht stattfinden. */
-      message * m = msg_message("battle::aborted", "");
-      message_all(b, m);
-      msg_release(m);
-      free_battle(b);
-      free(b);
-      continue;
-    }
-    join_allies(b);
+  /* Bevor wir die alliierten hineinziehen, sollten wir schauen, *
+  * Ob jemand fliehen kann. Dann erübrigt sich das ganze ja
+  * vielleicht schon. */
+  print_header(b);
+  if (!fighting) {
+    /* Niemand mehr da, Kampf kann nicht stattfinden. */
+    message * m = msg_message("battle::aborted", "");
+    message_all(b, m);
+    msg_release(m);
+    free_battle(b);
+    free(b);
+    return;
+  }
+  join_allies(b);
 #ifdef HEROES
-    make_heroes(b);
+  make_heroes(b);
 #endif
-    /* Alle Mann raus aus der Burg! */
-    for (bu=r->buildings; bu!=NULL; bu=bu->next) bu->sizeleft = bu->size;
+  /* Alle Mann raus aus der Burg! */
+  for (bu=r->buildings; bu!=NULL; bu=bu->next) bu->sizeleft = bu->size;
 
-    /* make sure no ships are damaged initially */
-    for (sh=r->ships; sh; sh=sh->next) freset(sh, SF_DAMAGED);
+  /* make sure no ships are damaged initially */
+  for (sh=r->ships; sh; sh=sh->next) freset(sh, SF_DAMAGED);
 
-    /* Gibt es eine Taktikrunde ? */
-    if (cv_size(&b->leaders)) {
-      b->turn = 0;
-      b->has_tactics_turn = true;
-    } else {
-      b->turn = 1;
-      b->has_tactics_turn = false;
-    }
+  /* Gibt es eine Taktikrunde ? */
+  if (cv_size(&b->leaders)) {
+    b->turn = 0;
+    b->has_tactics_turn = true;
+  } else {
+    b->turn = 1;
+    b->has_tactics_turn = false;
+  }
 
-    if (b->region->flags & RF_COMBATDEBUG) battle_stats(bdebug, b);
+  if (b->region->flags & RF_COMBATDEBUG) battle_stats(bdebug, b);
 
-    /* PRECOMBATSPELLS */
-    do_combatmagic(b, DO_PRECOMBATSPELL);
+  /* PRECOMBATSPELLS */
+  do_combatmagic(b, DO_PRECOMBATSPELL);
 
-    print_stats(b); /* gibt die Kampfaufstellung aus */
-    printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
+  print_stats(b); /* gibt die Kampfaufstellung aus */
+  printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
 
 #ifdef SMALL_BATTLE_MESSAGES
-    if (b->nfighters <= 30) {
-      b->small = true;
-    } else {
-      b->small = false;
-    }
+  if (b->nfighters <= 30) {
+    b->small = true;
+  } else {
+    b->small = false;
+  }
 #endif
 
-    for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
-      char lbuf[256];
+  for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
+    char lbuf[256];
 
-      sprintf(lbuf, "*** Runde: %d", b->turn);
-      battledebug(lbuf);
+    sprintf(lbuf, "*** Runde: %d", b->turn);
+    battledebug(lbuf);
 
-      battle_flee(b);
-      battle_update(b);
-      battle_attacks(b);
+    battle_flee(b);
+    battle_update(b);
+    battle_attacks(b);
 
 #ifdef KARMA_MODULE
-      /* Regeneration */
-      for (fi=0;fi!=b->nfighters;++fi) {
-        fighter *fig = b->fighters[fi];
+    /* Regeneration */
+    for (fi=0;fi!=b->nfighters;++fi) {
+      fighter *fig = b->fighters[fi];
 
-        if (fspecial(fig->unit->faction, FS_REGENERATION)) {
-          fig->fighting = fig->alive - fig->removed;
-          if (fig->fighting == 0) continue;
-          do_regenerate(fig);
-        }
+      if (fspecial(fig->unit->faction, FS_REGENERATION)) {
+        fig->fighting = fig->alive - fig->removed;
+        if (fig->fighting == 0) continue;
+        do_regenerate(fig);
       }
+    }
 #endif /* KARMA_MODULE */
-    }
+  }
 
-    printf("\n");
+  printf("\n");
 
-    /* Auswirkungen berechnen: */
-    aftermath(b);
-    /* Hier ist das Gefecht beendet, und wir können die
-    * Hilfsstrukturen * wieder löschen: */
+  /* Auswirkungen berechnen: */
+  aftermath(b);
+  /* Hier ist das Gefecht beendet, und wir können die
+  * Hilfsstrukturen * wieder löschen: */
 
-    if (b) {
-      free_battle(b);
-      free(b);
-    }
+  if (b) {
+    free_battle(b);
+    free(b);
   }
 }

@@ -761,23 +761,16 @@ monster_learn(unit *u)
 }
 
 void
-monsters_kill_peasants(void)
+monsters_kill_peasants(unit * u)
 {
-  region *r;
-  unit *u;
-
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u = u->next) if(!fval(u, UFL_MOVED)) {
-      if (u->race->flags & RCF_SCAREPEASANTS) {
-        scared_by_monster(u);
-      }
-      if (u->race->flags & RCF_KILLPEASANTS) {
-        eaten_by_monster(u);
-      }
-      if (u->race->flags & RCF_ABSORBPEASANTS) {
-        absorbed_by_monster(u);
-      }
-    }
+  if (u->race->flags & RCF_SCAREPEASANTS) {
+    scared_by_monster(u);
+  }
+  if (u->race->flags & RCF_KILLPEASANTS) {
+    eaten_by_monster(u);
+  }
+  if (u->race->flags & RCF_ABSORBPEASANTS) {
+    absorbed_by_monster(u);
   }
 }
 

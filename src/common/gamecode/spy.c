@@ -459,9 +459,8 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 				sprintf(buf, (dead == 1) ? person_lost_msg : persons_lost_msg,
 						dead, unitname(u), unit_dies_msg);
 			}
-			if (dead == u->number)
-				/* the poor creature, she dies */
-			{
+			if (dead == u->number) {
+        /* the poor creature, she dies */
 				*ui = u->next;
 				destroy_unit(u);
 			}

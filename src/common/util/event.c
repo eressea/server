@@ -200,20 +200,20 @@ add_trigger(struct attrib ** ap, const char * eventname, struct trigger * t)
 }
 
 void
-handle_event(attrib ** attribs, const char * eventname, void * data)
+handle_event(attrib * attribs, const char * eventname, void * data)
 {
-	while (*attribs) {
-		if ((*attribs)->type==&at_eventhandler) break;
-		attribs = &(*attribs)->next;
+	while (attribs) {
+		if (attribs->type==&at_eventhandler) break;
+		attribs = attribs->nexttype;
 	}
-	while (*attribs && (*attribs)->type==&at_eventhandler) {
-		handler_info * tl = (handler_info*)(*attribs)->data.v;
+	while (attribs && attribs->type==&at_eventhandler) {
+		handler_info * tl = (handler_info*)attribs->data.v;
     if (!strcmp(tl->event, eventname)) {
-      handler_info * tl = (handler_info*)(*attribs)->data.v;
+      handler_info * tl = (handler_info*)attribs->data.v;
       handle_triggers(&tl->triggers, data);
       break;
     }
-		attribs = &(*attribs)->next;
+		attribs = attribs->next;
 	}
 }
 

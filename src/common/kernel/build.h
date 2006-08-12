@@ -62,7 +62,7 @@ extern int leave_cmd(struct unit * u, struct order * ord);
 
 extern boolean can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
-void do_siege(void);
+void do_siege(struct region *r);
 void build_road(struct region * r, struct unit * u, int size, direction_t d);
 void create_ship(struct region * r, struct unit * u, const struct ship_type * newtype, int size, struct order * ord);
 void continue_ship(struct region * r, struct unit * u, int size);
@@ -70,8 +70,7 @@ void continue_ship(struct region * r, struct unit * u, int size);
 struct building * getbuilding(const struct region * r);
 struct ship *getship(const struct region * r);
 
-void remove_contacts(void);
-void do_misc(boolean tries);
+void do_misc(struct region *r, boolean tries);
 
 void reportevent(struct region * r, char *s);
 

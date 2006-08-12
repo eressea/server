@@ -995,93 +995,86 @@ gebaeude_stuerzt_ein(region * r, building * b)
 }
 
 void
-maintain_buildings(boolean crash)
+maintain_buildings(region * r, boolean crash)
 {
-	region * r;
-	for (r = regions; r; r = r->next) {
-		building **bp = &r->buildings;
-		while (*bp) {
-			building * b = *bp;
-      boolean maintained = maintain(b, !crash);
+	building **bp = &r->buildings;
+	while (*bp) {
+		building * b = *bp;
+    boolean maintained = maintain(b, !crash);
 
-      /* the second time, send a message */
-      if (crash) {
-        if (!maintained && (rng_int() % 100 < EINSTURZCHANCE)) {
-  				gebaeude_stuerzt_ein(r, b);
-	  			continue;
-        } else if (!fval(b, BLD_WORKING)) {
-          unit * u = buildingowner(r, b);
-          const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
-  	  		struct message * msg = msg_message(msgtype, "building", b);
+    /* the second time, send a message */
+    if (crash) {
+      if (!maintained && (rng_int() % 100 < EINSTURZCHANCE)) {
+  			gebaeude_stuerzt_ein(r, b);
+	  		continue;
+      } else if (!fval(b, BLD_WORKING)) {
+        unit * u = buildingowner(r, b);
+        const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
+  	  	struct message * msg = msg_message(msgtype, "building", b);
 
-          if (u) {
-						add_message(&u->faction->msgs, msg);
-						r_addmessage(r, u->faction, msg);
-          } else {
-            add_message(&r->msgs, msg);
-          }
-          msg_release(msg);
+        if (u) {
+					add_message(&u->faction->msgs, msg);
+					r_addmessage(r, u->faction, msg);
+        } else {
+          add_message(&r->msgs, msg);
         }
+        msg_release(msg);
       }
-			bp=&b->next;
-		}
+    }
+		bp=&b->next;
 	}
 }
 
 
 void
-economics(void)
+economics(region *r)
 {
-  region *r;
   unit *u;
+  request *recruitorders = NULL;
 
   /* Geben vor Selbstmord (doquit)! Hier alle unmittelbaren Befehle.
-  * Rekrutieren vor allen Einnahmequellen. Bewachen JA vor Steuern
-  * eintreiben. */
+   * Rekrutieren vor allen Einnahmequellen. Bewachen JA vor Steuern
+   * eintreiben. */
 
-  for (r = regions; r; r = r->next) if (r->units) {
-    request *recruitorders = NULL;
-
-    for (u = r->units; u; u = u->next) {
-      order * ord;
-      boolean destroyed = false;
-      for (ord = u->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
-          case K_DESTROY:
-            if (!destroyed) {
-              if (destroy_cmd(u, ord)!=0) ord = NULL;
-              destroyed = true;
-            }
-            break;
-
-          case K_GIVE:
-          case K_LIEFERE:
-            give_cmd(u, ord);
-            break;
-
-          case K_FORGET:
-            forget_cmd(u, ord);
-            break;
-
-        }
-	    	if (u->orders==NULL) break;
-      }
-    }
-    /* RECRUIT orders */
-
-    for (u = r->units; u; u = u->next) {
-			order * ord;
-			for (ord = u->orders; ord; ord = ord->next) {
-        if (get_keyword(ord) == K_RECRUIT) {
-          recruit(u, ord, &recruitorders);
+  for (u = r->units; u; u = u->next) {
+    order * ord;
+    boolean destroyed = false;
+    for (ord = u->orders; ord; ord = ord->next) {
+      switch (get_keyword(ord)) {
+        case K_DESTROY:
+          if (!destroyed) {
+            if (destroy_cmd(u, ord)!=0) ord = NULL;
+            destroyed = true;
+          }
           break;
-        }
+
+        case K_GIVE:
+        case K_LIEFERE:
+          give_cmd(u, ord);
+          break;
+
+        case K_FORGET:
+          forget_cmd(u, ord);
+          break;
+
+      }
+	    if (u->orders==NULL) break;
+    }
+  }
+  /* RECRUIT orders */
+
+  for (u = r->units; u; u = u->next) {
+		order * ord;
+		for (ord = u->orders; ord; ord = ord->next) {
+      if (get_keyword(ord) == K_RECRUIT) {
+        recruit(u, ord, &recruitorders);
+        break;
       }
     }
-
-    if (recruitorders) expandrecruit(r, recruitorders);
-
   }
+
+  if (recruitorders) expandrecruit(r, recruitorders);
+  remove_empty_units_in_region(r);
 }
 /* ------------------------------------------------------------- */
 

@@ -19,8 +19,8 @@
 extern "C" {
 #endif
 
-extern void teaching(void);
-extern void learn(void);
+extern void teaching(struct region * r);
+extern int learn_cmd(struct unit * u, struct order * ord);
 
 extern magic_t getmagicskill(void);
 extern boolean is_migrant(struct unit *u);

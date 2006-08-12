@@ -124,8 +124,8 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
       }
 #endif
 #endif
-      handle_event(&src->attribs, "give", dest);
-      handle_event(&dest->attribs, "receive", src);
+      handle_event(src->attribs, "give", dest);
+      handle_event(dest->attribs, "receive", src);
 #if defined(MUSEUM_MODULE) && defined(TODO)
 /* TODO: Einen Trigger für den museums-warden benutzen! */
         if (a_find(dest->attribs, &at_warden)) {

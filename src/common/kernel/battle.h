@@ -206,7 +206,7 @@ extern "C" {
 
   extern const troop no_troop;
 
-  extern void do_battle(void);
+  extern void do_battle(struct region * r);
 
   /* for combar spells and special attacks */
   enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };

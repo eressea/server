@@ -281,18 +281,14 @@ siege_cmd(unit * u, order * ord)
 }
 
 void
-do_siege(void)
+do_siege(region *r)
 {
-  region *r;
+  if (fval(r->terrain, LAND_REGION)) {
+    unit *u;
 
-  for (r = regions; r; r = r->next) {
-    if (fval(r->terrain, LAND_REGION)) {
-      unit *u;
-
-      for (u = r->units; u; u = u->next) {
-        if (get_keyword(u->thisorder) == K_BESIEGE) {
-          siege_cmd(u, u->thisorder);
-        }
+    for (u = r->units; u; u = u->next) {
+      if (get_keyword(u->thisorder) == K_BESIEGE) {
+        siege_cmd(u, u->thisorder);
       }
     }
   }
@@ -1106,26 +1102,6 @@ mayboard(const unit * u, const ship * sh)
 
 }
 
-void
-remove_contacts(void)
-{
-  region *r;
-
-  for (r = regions; r; r = r->next) {
-    unit *u;
-
-    for (u = r->units; u; u = u->next) {
-      attrib * a = (attrib *)a_find(u->attribs, &at_contact);
-
-      while (a!=NULL &&a->type==&at_contact) {
-        attrib * ar = a;
-        a = a->next;
-        a_remove(&u->attribs, ar);
-      }
-    }
-  }
-}
-
 int
 leave_cmd(unit * u, struct order * ord)
 {
@@ -1255,93 +1231,87 @@ enter_building(unit * u, order * ord, int id, boolean report)
 }
 
 void
-do_misc(boolean lasttry)
+do_misc(region * r, boolean lasttry)
 {
-  region *r;
+  unit **uptr, *uc;
 
-  /* lasttry: Fehler nur im zweiten Versuch melden. Sonst konfus. */
+  for (uc = r->units; uc; uc = uc->next) {
+    order * ord;
+    for (ord = uc->orders; ord; ord = ord->next) {
+      switch (get_keyword(ord)) {
+      case K_CONTACT:
+        contact_cmd(uc, ord, lasttry);
+        break;
+      }
+    }
+  }
 
-  for (r = regions; r; r = r->next) {
-    unit **uptr, *uc;
+  for (uptr = &r->units; *uptr;) {
+    unit * u = *uptr;
+    order ** ordp = &u->orders;
 
-    for (uc = r->units; uc; uc = uc->next) {
-      order * ord;
-      for (ord = uc->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
-        case K_CONTACT:
-          contact_cmd(uc, ord, lasttry);
+    while (*ordp) {
+      order * ord = *ordp;
+      if (get_keyword(ord) == K_ENTER) {
+        param_t p;
+        int id;
+        unit * ulast = NULL;
+
+        init_tokens(ord);
+        skip_token();
+        p = getparam(u->faction->locale);
+        id = getid();
+
+        switch (p) {
+        case P_BUILDING:
+        case P_GEBAEUDE:
+          if (u->building && u->building->no==id) break;
+          if (enter_building(u, ord, id, lasttry)) {
+            unit *ub;
+            for (ub=u;ub;ub=ub->next) {
+              if (ub->building==u->building) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        case P_SHIP:
+          if (u->ship && u->ship->no==id) break;
+          if (enter_ship(u, ord, id, lasttry)) {
+            unit *ub;
+            ulast = u;
+            for (ub=u;ub;ub=ub->next) {
+              if (ub->ship==u->ship) {
+                ulast = ub;
+              }
+            }
+          }
+          break;
+
+        default:
+          if (lasttry) cmistake(u, ord, 79, MSG_MOVE);
+
+        }
+        if (ulast!=NULL) {
+          /* Wenn wir hier angekommen sind, war der Befehl
+            * erfolgreich und wir löschen ihn, damit er im
+            * zweiten Versuch nicht nochmal ausgeführt wird. */
+          *ordp = ord->next;
+          ord->next = NULL;
+          free_order(ord);
+
+          if (ulast!=u) {
+            /* put u behind ulast so it's the last unit in the building */
+            *uptr = u->next;
+            u->next = ulast->next;
+            ulast->next = u;
+          }
           break;
         }
       }
+      if (*ordp==ord) ordp = &ord->next;
     }
-
-    for (uptr = &r->units; *uptr;) {
-      unit * u = *uptr;
-      order ** ordp = &u->orders;
-
-      while (*ordp) {
-        order * ord = *ordp;
-        if (get_keyword(ord) == K_ENTER) {
-          param_t p;
-          int id;
-          unit * ulast = NULL;
-
-          init_tokens(ord);
-          skip_token();
-          p = getparam(u->faction->locale);
-          id = getid();
-
-          switch (p) {
-          case P_BUILDING:
-          case P_GEBAEUDE:
-            if (u->building && u->building->no==id) break;
-            if (enter_building(u, ord, id, lasttry)) {
-              unit *ub;
-              for (ub=u;ub;ub=ub->next) {
-                if (ub->building==u->building) {
-                  ulast = ub;
-                }
-              }
-            }
-            break;
-
-          case P_SHIP:
-            if (u->ship && u->ship->no==id) break;
-            if (enter_ship(u, ord, id, lasttry)) {
-              unit *ub;
-              ulast = u;
-              for (ub=u;ub;ub=ub->next) {
-                if (ub->ship==u->ship) {
-                  ulast = ub;
-                }
-              }
-            }
-            break;
-
-          default:
-            if (lasttry) cmistake(u, ord, 79, MSG_MOVE);
-
-          }
-          if (ulast!=NULL) {
-            /* Wenn wir hier angekommen sind, war der Befehl
-             * erfolgreich und wir löschen ihn, damit er im
-             * zweiten Versuch nicht nochmal ausgeführt wird. */
-            *ordp = ord->next;
-            ord->next = NULL;
-            free_order(ord);
-
-            if (ulast!=u) {
-              /* put u behind ulast so it's the last unit in the building */
-              *uptr = u->next;
-              u->next = ulast->next;
-              ulast->next = u;
-            }
-            break;
-          }
-        }
-        if (*ordp==ord) ordp = &ord->next;
-      }
-      if (*uptr==u) uptr = &u->next;
-    }
+    if (*uptr==u) uptr = &u->next;
   }
 }

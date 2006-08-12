@@ -2524,83 +2524,81 @@ movement(void)
  * FOLLOW SHIP is a long order, and doesn't need to be treated in here.
  */
 void
-follow_unit(void)
+follow_unit(unit * u)
 {
-  region * r;
+  region * r = u->region;
+  attrib * a = NULL;
+  order * ord;
 
-  for (r=regions;r;r=r->next) {
-    unit * u;
+  if (fval(u, UFL_LONGACTION) || LongHunger(u)) return;
 
-    for (u=r->units;u;u=u->next) {
-      attrib * a;
-      order * ord;
+  for (ord=u->orders;ord;ord=ord->next) {
+    const struct locale * lang = u->faction->locale;
 
-      if (fval(u, UFL_LONGACTION) || LongHunger(u)) continue;
-      a = a_find(u->attribs, &at_follow);
-      for (ord=u->orders;ord;ord=ord->next) {
-        const struct locale * lang = u->faction->locale;
+    if (get_keyword(ord) == K_FOLLOW) {
+      init_tokens(ord);
+      skip_token();
+      if (getparam(lang) == P_UNIT) {
+        int id = read_unitid(u->faction, r);
 
-        if (get_keyword(ord) == K_FOLLOW) {
-          init_tokens(ord);
-          skip_token();
-          if (getparam(lang) == P_UNIT) {
-            int id = read_unitid(u->faction, r);
+        if (a!=NULL) {
+          a = a_find(u->attribs, &at_follow);
+        }
 
-            if (id>0) {
-              unit * uf = findunit(id);
-              if (!a) {
-                a = a_add(&u->attribs, make_follow(uf));
-              } else {
-                a->data.v = uf;
-              }
-            } else if (a) {
-              a_remove(&u->attribs, a);
-              a = NULL;
-            }
+        if (id>0) {
+          unit * uf = findunit(id);
+          if (!a) {
+            a = a_add(&u->attribs, make_follow(uf));
+          } else {
+            a->data.v = uf;
           }
+        } else if (a) {
+          a_remove(&u->attribs, a);
+          a = NULL;
         }
       }
+    }
+  }
 
-      if (a && !fval(u, UFL_MOVED|UFL_NOTMOVING)) {
-        unit * u2 = a->data.v;
-        boolean follow = false;
+  if (a && !fval(u, UFL_MOVED|UFL_NOTMOVING)) {
+    unit * u2 = a->data.v;
+    boolean follow = false;
 
-        if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0))
-          continue;
-    
-        switch (get_keyword(u2->thisorder)) {
-          case K_MOVE:
-          case K_ROUTE:
-          case K_DRIVE:
-            follow = true;
-            break;
-          default:
-            for (ord=u2->orders;ord;ord=ord->next) {
-              switch (get_keyword(ord)) {
-                case K_FOLLOW:
-                case K_PIRACY:
-                  follow = true;
-                  break;
-                default:
-                  continue;
-              }
+    if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0)) {
+      return;
+    }
+
+    switch (get_keyword(u2->thisorder)) {
+      case K_MOVE:
+      case K_ROUTE:
+      case K_DRIVE:
+        follow = true;
+        break;
+      default:
+        for (ord=u2->orders;ord;ord=ord->next) {
+          switch (get_keyword(ord)) {
+            case K_FOLLOW:
+            case K_PIRACY:
+              follow = true;
               break;
-            }
-            break;
-        }
-        if (!follow) {
-          attrib * a2 = a_find(u2->attribs, &at_follow);
-          if (a2!=NULL) {
-            unit * u3 = a2->data.v;
-            follow = (u3 && u2->region == u2->region);
+            default:
+              continue;
           }
+          break;
         }
-        if (follow) {
-          fset(u, UFL_FOLLOWING);
-          fset(u2, UFL_FOLLOWED);
-          set_order(&u->thisorder, NULL);
-        }
+        break;
+    }
+    if (!follow) {
+      attrib * a2 = a_find(u2->attribs, &at_follow);
+      if (a2!=NULL) {
+        unit * u3 = a2->data.v;
+        follow = (u3 && u2->region == u2->region);
       }
+    }
+    if (follow) {
+      fset(u, UFL_FOLLOWING);
+      fset(u2, UFL_FOLLOWED);
+      set_order(&u->thisorder, NULL);
     }
   }
 }

@@ -199,7 +199,7 @@ destroy_ship(ship * sh)
   }
   sunhash(sh);
   choplist(&r->ships, sh);
-  handle_event(&sh->attribs, "destroy", sh);
+  handle_event(sh->attribs, "destroy", sh);
 }
 
 const char *

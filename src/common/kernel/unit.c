@@ -179,6 +179,17 @@ distribute_items(unit * u)
 }
 
 void
+remove_unit(unit * u)
+{
+  region * r = u->region;
+  assert(u->number==0);
+  uunhash(u);
+  if (r) choplist(&r->units, u);
+  u->next = udestroy;
+  udestroy = u;
+}
+
+void
 destroy_unit(unit * u)
 {
   region *r = u->region;
@@ -261,17 +272,13 @@ destroy_unit(unit * u)
     u->race = u->irace = new_race[RC_ZOMBIE];
   } else {
     if (u->number) set_number(u, 0);
-    handle_event(&u->attribs, "destroy", u);
+    handle_event(u->attribs, "destroy", u);
     if (r && !fval(r->terrain, SEA_REGION)) {
       rsetmoney(r, rmoney(r) + get_money(u));
     }
     dhash(u->no, u->faction);
     u_setfaction(u, NULL);
     if (r) leave(r, u);
-    uunhash(u);
-    if (r) choplist(&r->units, u);
-    u->next = udestroy;
-    udestroy = u;
   }
 }
 

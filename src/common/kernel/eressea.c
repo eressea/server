@@ -2539,9 +2539,9 @@ remove_empty_units_in_region(region *r)
       faction * f = u->faction;
       if (!fval(f, FFL_NOTIMEOUT) && f->age > MaxAge()) set_number(u, 0);
     }
-    if ((u->number == 0 && u->race != new_race[RC_SPELL])
-      || (u->age <= 0 && u->race == new_race[RC_SPELL])) {
+    if ((u->number == 0 && u->race != new_race[RC_SPELL]) || (u->age <= 0 && u->race == new_race[RC_SPELL])) {
       destroy_unit(u);
+      if (u->number==0) remove_unit(u);
     }
     if (*up==u) up=&u->next;
   }

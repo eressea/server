@@ -260,38 +260,27 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
 }
 
 
-void
-init_pool(void)
+int
+reserve_cmd(unit * u, struct order *ord)
 {
-  unit *u;
-  region *r;
+  if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
+    int use, count = geti();
+    const resource_type * rtype;
 
-  /* Falls jemand diese Listen erweitert hat, muß er auch den R_* enum
-   * erweitert haben. */
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u = u->next) {
-      order * ord;
-      for (ord=u->orders; ord; ord=ord->next) {
-        if (u->number > 0 && (urace(u)->ec_flags & GETITEM) && get_keyword(ord) == K_RESERVE) {
-          int use, count = geti();
-          const resource_type * rtype;
+    init_tokens(ord);
+    skip_token();
+    count = geti();
 
-          init_tokens(ord);
-          skip_token();
-          count = geti();
+    rtype = findresourcetype(getstrtoken(), u->faction->locale);
+    if (rtype == NULL) return 0;
 
-          rtype = findresourcetype(getstrtoken(), u->faction->locale);
-          if (rtype == NULL) continue;
-
-          new_set_resvalue(u, rtype, 0);  /* make sure the pool is empty */
-          use = use_pooled(u, rtype, GET_DEFAULT, count);
-          if (use) {
-            new_set_resvalue(u, rtype, use);
-            change_resource(u, rtype, use);
-          }
-        }
-      }
+    new_set_resvalue(u, rtype, 0);  /* make sure the pool is empty */
+    use = use_pooled(u, rtype, GET_DEFAULT, count);
+    if (use) {
+      new_set_resvalue(u, rtype, use);
+      change_resource(u, rtype, use);
     }
   }
+  return 0;
 }
 

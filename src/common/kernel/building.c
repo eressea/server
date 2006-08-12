@@ -496,7 +496,7 @@ destroy_building(building * b)
 
   /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
   choplist(&b->region->buildings, b);
-  handle_event(&b->attribs, "destroy", b);
+  handle_event(b->attribs, "destroy", b);
 }
 
 extern attrib_type at_icastle;

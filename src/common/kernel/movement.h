@@ -61,7 +61,7 @@ extern void travelthru(const struct unit * u, struct region * r);
 extern struct ship * move_ship(struct ship * sh, struct region * from, struct region * to, struct region_list * route);
 extern int walkingcapacity(const struct unit * u);
 
-extern void follow_unit(void);
+extern void follow_unit(struct unit * u);
 
 struct building_type;
 boolean buildingtype_exists(const struct region * r, const struct building_type * bt);

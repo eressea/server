@@ -18,7 +18,7 @@ extern "C" {
 
 #ifdef XECMD_MODULE
 extern attrib_type at_xontormiaexpress;
-void xecmd(void);
+int xecmd(struct unit * u, struct order * ord);
 #endif
 
 #ifdef __cplusplus

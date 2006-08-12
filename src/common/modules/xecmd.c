@@ -88,36 +88,29 @@ xe_giveballon(unit *u, struct order *ord)
 	fset(u2, UFL_OWNER);
 }
 
-void
-xecmd(void)
+int
+xecmd(unit * u, order * ord)
 {
-  faction *f;
+  faction *f = u->faction;
 
-  for(f=factions; f; f=f->next) {
-    if(a_find(f->attribs, &at_xontormiaexpress)) {
-      unit *u;
-      for(u=f->units; u; u=u->nextF) {
-        order * ord;
-        for (ord=u->orders; ord; ord=ord->next) {
-          if (get_keyword(ord) == K_XE) {
-            init_tokens(ord);
-            skip_token();
-            switch(findparam(getstrtoken(),f->locale)) {
-              case P_XEPOTION:
-                xe_givepotion(u, ord);
-                break;
-              case P_XEBALLOON:
-                xe_giveballon(u, ord);
-                break;
-              case P_XELAEN:
-                xe_givelaen(u, ord);
-                break;
-            }
-          }
-        }
+  if (a_find(f->attribs, &at_xontormiaexpress)) {
+    if (get_keyword(ord) == K_XE) {
+      init_tokens(ord);
+      skip_token();
+      switch(findparam(getstrtoken(),f->locale)) {
+        case P_XEPOTION:
+          xe_givepotion(u, ord);
+          break;
+        case P_XEBALLOON:
+          xe_giveballon(u, ord);
+          break;
+        case P_XELAEN:
+          xe_givelaen(u, ord);
+          break;
       }
     }
   }
+  return 0;
 }
 
 #endif

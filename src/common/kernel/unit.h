@@ -189,6 +189,7 @@ extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct
 
 /* Einheiten werden nicht wirklich zerstört. */
 extern void destroy_unit(struct unit * u);
+extern void remove_unit(struct unit * u);
 extern void distribute_items(struct unit * u);
 
 /* see resolve.h */

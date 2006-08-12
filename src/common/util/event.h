@@ -58,7 +58,7 @@ extern void add_trigger(struct attrib ** ap, const char * eventname, struct trig
 extern void remove_triggers(struct attrib ** ap, const char * eventname, const trigger_type * tt);
 extern struct trigger ** get_triggers(struct attrib * ap, const char * eventname);
 /* calls handle() for each of these. e.g. used in timeout */
-extern void handle_event(struct attrib ** attribs, const char * eventname, void * data);
+extern void handle_event(struct attrib * attribs, const char * eventname, void * data);
 
 /* functions for making complex triggers: */
 extern void free_triggers(trigger * triggers); /* release all these triggers */

@@ -1465,6 +1465,7 @@ showunits(region * r)
         if (yes_no(0, lbuf, 'n')) {
           modified = 1;
           destroy_unit(clipunit);
+          if (clipunit->number==0) remove_unit(clipunit);
           clipunit = 0;
           clipregion = 0;
           for (pline = 0, tmp = eh; tmp != pointer; tmp = tmp->next)

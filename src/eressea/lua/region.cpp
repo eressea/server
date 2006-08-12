@@ -232,7 +232,9 @@ region_remove(region& r)
   while (*rp) {
     if (*rp==&r) {
       while (r.units) {
-        destroy_unit(r.units);
+        unit * u = r.units;
+        destroy_unit(u);
+        remove_unit(u);
       }
       *rp = r.next;
 #ifdef FAST_CONNECT
