@@ -285,7 +285,7 @@ fbattlerecord(battle * b, faction * f, const char *s)
 }
 
 #define enemy(as, ds) (as->relations[ds->index]&E_ENEMY)
-#define friendly(as, ds) (as->relations[ds->index]&E_FRIEND)
+#define friendly(as, ds) (as->bf->faction==ds->bf->faction || (as->relations[ds->index]&E_FRIEND))
 
 static void
 set_enemy(side * as, side * ds, boolean attacking)
@@ -3548,10 +3548,8 @@ join_allies(battle * b)
       int ai;
       for (ai=0; se->enemies[ai]; ++ai) {
         side * as = se->enemies[ai];
-        if (as!=s) {
-          if (!enemy(as, s)) {
-            set_friendly(as, s);
-          }
+        if (as==s || !enemy(as, s)) {
+          set_friendly(as, s);
         }
       }
     }
