@@ -2548,85 +2548,6 @@ combatspell_cmd(unit * u, struct order * ord)
   return 0;
 }
 
-static void
-instant_orders(void)
-{
-  region *r;
-  faction *f;
-
-  puts(" - Kontakte, Hilfe, Status, Kampfzauber, Texte, Bewachen (aus), Zeigen");
-
-  for (f = factions; f; f = f->next) {
-    attrib *a;
-    a = a_find(f->attribs, &at_showitem);
-    while (a!=NULL && a->type==&at_showitem) {
-      const item_type * itype = (const item_type *)a->data.v;
-      const potion_type * ptype = resource2potion(itype->rtype);
-      attrib * an = a->next;
-      if (ptype!=NULL) {
-        /* potions werden separat behandelt */
-        display_item(f, NULL, (const item_type *)a->data.v);
-        a_remove(&f->attribs, a);
-      }
-      a = an;
-    }
-  }
-
-  for (r = regions; r; r = r->next) {
-    unit * u;
-    for (u = r->units; u; u = u->next) {
-      order * ord;
-      freset(u, UFL_MOVED); /* reset, because it was saved in the datafile (monsters!) */
-      for (ord = u->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
-        case K_QUIT:
-          quit_cmd(u, ord);
-          break;
-        case K_URSPRUNG:
-          origin_cmd(u, ord);
-          break;
-        case K_ALLY:
-          ally_cmd(u, ord);
-          break;
-        case K_PREFIX:
-          prefix_cmd(u, ord);
-          break;
-        case K_SYNONYM:
-          synonym_cmd(u, ord);
-          break;
-        case K_SETSTEALTH:
-          setstealth_cmd(u, ord);
-          break;
-#ifdef KARMA_MODULE
-        case K_WEREWOLF:
-          setwere_cmd(u, ord);
-          break;
-#endif /* KARMA_MODULE */
-        case K_STATUS:
-          /* KAEMPFE [ NICHT | AGGRESSIV | DEFENSIV | HINTEN | FLIEHE ] */
-          status_cmd(u, ord);
-          break;
-        case K_COMBAT:
-          /* KAMPFZAUBER [[STUFE n] "<Spruchname>"] [NICHT] */
-          combatspell_cmd(u, ord);
-          break;
-        case K_DISPLAY:
-          display_cmd(u, ord);
-          break;
-        case K_NAME:
-          name_cmd(u, ord);
-          break;
-        case K_GUARD:
-          guard_off_cmd(u, ord);
-          break;
-        case K_RESHOW:
-          reshow_cmd(u, ord);
-          break;
-        }
-      }
-    }
-  }
-}
 /* ------------------------------------------------------------- */
 /* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
  * können */
@@ -3400,26 +3321,29 @@ setdefaults(unit *u)
         * werden. Da Handel erst nach anderen langen Befehlen kommt,
         * muß das vorher abgefangen werden. Wir merken uns also
         * hier, ob die Einheit handelt. */
-        case K_BUY:
-        case K_SELL:
-          /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-          * werden. */
-          trade = true;
-          break;
-
-        case K_CAST:
-          /* dient dazu, das neben Zaubern kein weiterer Befehl
-          * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-          set_order(&u->thisorder, NULL);
-          break;
-
-        case K_WEREWOLF:
-          set_order(&u->thisorder, copy_order(ord));
-          break;
-
-          /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-          * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-          * nicht moeglich ist, Schulden zu machen. */
+      case NOKEYWORD:
+        cmistake(u, ord, 22, MSG_EVENT);
+        break;
+      case K_BUY:
+      case K_SELL:
+        /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+         * werden. */
+        trade = true;
+        break;
+        
+      case K_CAST:
+        /* dient dazu, das neben Zaubern kein weiterer Befehl
+         * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+        set_order(&u->thisorder, NULL);
+        break;
+        
+      case K_WEREWOLF:
+        set_order(&u->thisorder, copy_order(ord));
+        break;
+        
+        /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+         * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+         * nicht moeglich ist, Schulden zu machen. */
       }
     }
   }
@@ -3648,10 +3572,12 @@ update_spells(void)
   for(r=regions; r; r=r->next) {
     unit *u;
     for(u=r->units;u;u=u->next) {
-      sc_mage *m = get_mage(u);
-      if (u->faction->no != MONSTER_FACTION && m != NULL) {
-        if (m->magietyp == M_GRAU) continue;
-        updatespelllist(u);
+      if (u->faction!=NULL && u->number>0) {
+        sc_mage *m = get_mage(u);
+        if (u->faction->no != MONSTER_FACTION && m != NULL) {
+          if (m->magietyp == M_GRAU) continue;
+          updatespelllist(u);
+        }
       }
     }
   }
@@ -3880,7 +3806,7 @@ process(void)
     if (pglobal==NULL || pglobal->priority!=prio) continue;
 
     for (r = regions; r; r = r->next) {
-      unit **up;
+      unit *u;
       processor *pregion = pglobal;
 
       while (pregion && pregion->priority==prio && pregion->type==PR_REGION) {
@@ -3889,8 +3815,7 @@ process(void)
       }
       if (pregion==NULL || pregion->priority!=prio) continue;
 
-      for (up=&r->units;*up;) {
-        unit * u = *up;
+      for (u=r->units;u;u=u->next) {
         processor *porder, *punit = pregion;
 
         while (punit && punit->priority==prio && punit->type==PR_UNIT) {
@@ -3912,8 +3837,6 @@ process(void)
           }
           porder = porder->next;
         }
-        assert(*up==u);
-        up=&u->next;
       }
     }
   }
@@ -4095,6 +4018,7 @@ processorders (void)
 
   puts(" - Attribute altern");
   ageing();
+  remove_empty_units();
 
 #ifdef WORMHOLE_MODULE
   create_wormholes();

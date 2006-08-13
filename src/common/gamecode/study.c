@@ -730,6 +730,7 @@ learn_cmd(unit * u, order * ord)
       }
     }
   }
+  return 0;
 }
 
 void

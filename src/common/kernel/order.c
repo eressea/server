@@ -464,7 +464,8 @@ write_order(const order * ord, const struct locale * lang, char * buffer, size_t
   } else {
     keyword_t kwd = ORD_KEYWORD(ord);
     if (kwd==NOKEYWORD) {
-      buffer[0]=0;
+      const char * text = ORD_STRING(ord);
+      strlcpy(buffer, text, size);
     } else {
       get_command(ord, buffer, size);
     }
