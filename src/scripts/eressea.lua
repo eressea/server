@@ -66,7 +66,7 @@ function process(orders)
   if nmrs >= 60 then
     print("Shit. More than 60 factions with 1 NMR (" .. nmrs .. ")")
     return -1
-  fi
+  end
   print (nmrs .. " Factions with 1 NMR")
   run_scripts()
 
