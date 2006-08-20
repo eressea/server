@@ -62,12 +62,6 @@ function process(orders)
     print("could not read " .. orders)
     return -1
   end
-  nmrs = get_nmrs(1)
-  if nmrs >= 60 then
-    print("Shit. More than 60 factions with 1 NMR (" .. nmrs .. ")")
-    return -1
-  end
-  print (nmrs .. " Factions with 1 NMR")
   run_scripts()
 
   -- create new monsters:
@@ -77,6 +71,14 @@ function process(orders)
   spawn_ents()
 
   plan_monsters()
+
+  local nmrs = get_nmrs(1)
+  if nmrs >= 60 then
+    print("Shit. More than 60 factions with 1 NMR (" .. nmrs .. ")")
+    return -1
+  end
+  print (nmrs .. " Factions with 1 NMR")
+
   process_orders()
 
   -- post-turn updates:

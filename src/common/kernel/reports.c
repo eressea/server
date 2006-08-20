@@ -171,6 +171,7 @@ update_nmrs(void)
 {
   int i, newplayers =0;
   faction *f;
+  int turn = global.data_turn;
 
   if (nmrs==NULL) nmrs = malloc(sizeof(int)*(NMRTimeout()+1));
   for (i = 0; i <= NMRTimeout(); ++i) {
@@ -181,7 +182,7 @@ update_nmrs(void)
     if (fval(f, FFL_ISNEW)) {
       ++newplayers;
     } else if (f->no != MONSTER_FACTION) {
-      int nmr = turn-f->lastorders;
+      int nmr = turn-f->lastorders+1;
       if (nmr<0 || nmr>NMRTimeout()) {
         log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
         nmr = max(0, nmr);
