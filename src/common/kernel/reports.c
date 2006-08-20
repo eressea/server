@@ -164,6 +164,35 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 }
 
 
+int * nmrs = NULL;
+
+int
+update_nmrs(void)
+{
+  int i, newplayers =0;
+  faction *f;
+
+  if (nmrs==NULL) nmrs = malloc(sizeof(int)*(NMRTimeout()+1));
+  for (i = 0; i <= NMRTimeout(); ++i) {
+    nmrs[i] = 0;
+  }
+
+  for (f = factions; f; f = f->next) {
+    if (fval(f, FFL_ISNEW)) {
+      ++newplayers;
+    } else if (f->no != MONSTER_FACTION) {
+      int nmr = turn-f->lastorders;
+      if (nmr<0 || nmr>NMRTimeout()) {
+        log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
+        nmr = max(0, nmr);
+        nmr = min(nmr, NMRTimeout());
+      }
+      ++nmrs[nmr];
+    }
+  }
+  return newplayers;
+}
+
 #define ORDERS_IN_NR 1
 static size_t
 buforder(char * bufp, size_t size, const order * ord, int mode)

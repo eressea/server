@@ -2646,18 +2646,15 @@ report_summary(summary * s, summary * o, boolean full)
   FILE * F = NULL;
   int i, newplayers = 0;
   faction * f;
-  int * nmrs = malloc(sizeof(int)*(NMRTimeout()+1));
+  char zText[MAX_PATH];
 
-  {
-    char zText[MAX_PATH];
-    if (full) {
-      sprintf(zText, "%s/parteien.full", basepath());
-    } else {
-      sprintf(zText, "%s/parteien", basepath());
-    }
-    F = cfopen(zText, "w");
-    if (!F) return;
+  if (full) {
+    sprintf(zText, "%s/parteien.full", basepath());
+  } else {
+    sprintf(zText, "%s/parteien", basepath());
   }
+  F = cfopen(zText, "w");
+  if (!F) return;
   printf("Schreibe Zusammenfassung (parteien)...\n");
   fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
   fprintf(F,   "Auswertung Nr:         %d\n\n", turn);
@@ -2751,24 +2748,8 @@ report_summary(summary * s, summary * o, boolean full)
 
   fprintf(F, "\n\n");
 
-  for (i = 0; i <= NMRTimeout(); ++i) {
-    nmrs[i] = 0;
-  }
-
-  for (f = factions; f; f = f->next) {
-    if (fval(f, FFL_ISNEW)) {
-      ++newplayers;
-    } else if (f->no != MONSTER_FACTION) {
-      int nmr = turn-f->lastorders;
-      if (nmr<0 || nmr>NMRTimeout()) {
-        log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
-        nmr = max(0, nmr);
-        nmr = min(nmr, NMRTimeout());
-      }
-      nmrs[nmr]++;
-    }
-  }
-
+  newplayers = update_nmrs();
+  
   for (i = 0; i <= NMRTimeout(); ++i) {
     if (i == NMRTimeout()) {
       fprintf(F, "+ NMRs:\t\t %d\n", nmrs[i]);
@@ -2827,6 +2808,7 @@ report_summary(summary * s, summary * o, boolean full)
     writemonument();
   }
   free(nmrs);
+  nmrs = NULL;
 }
 /******* end summary ******/
 

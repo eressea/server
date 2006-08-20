@@ -103,7 +103,10 @@ extern int bufunit(const struct faction * f, const struct unit * u, int indent, 
 extern const char * reportpath(void);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 
-extern void reports_init(void);
+  extern void reports_init(void);
+
+  extern int update_nmrs(void);
+  extern int * nmrs;
 
 #ifdef __cplusplus
 }

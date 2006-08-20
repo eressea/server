@@ -559,14 +559,14 @@ factionorders(void)
     /* Die Partei hat sich zumindest gemeldet, so daß sie noch
      * nicht als untätig gilt */
     
-		/* TODO: +1 ist ein Workaround, weil turn erst in process_orders
-		 * incrementiert wird. */
-		f->lastorders = global.data_turn+1;
-
-	} else
-		log_warning(("Befehle für die ungültige Partei %s\n", fid));
-
-	return f;
+    /* TODO: +1 ist ein Workaround, weil turn erst in process_orders
+     * incrementiert wird. */
+    f->lastorders = global.data_turn+1;
+    
+  } else {
+    log_warning(("Befehle für die ungültige Partei %s\n", fid));
+  }
+  return f;
 }
 
 double

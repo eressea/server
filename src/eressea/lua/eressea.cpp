@@ -52,6 +52,16 @@ get_turn(void)
 }
 
 static int
+get_nmrs(int n)
+{
+  if (n<=NMRTimeout()) {
+    if (nmrs==NULL) update_nmrs();
+    return nmrs[n];
+  }
+  return 0;
+}
+
+static int
 find_plane_id(const char * name)
 {
   plane * pl = getplanebyname(name);
@@ -229,6 +239,7 @@ bind_eressea(lua_State * L)
     def("dice_roll", &dice_rand),
     def("equipment_setitem", &lua_addequipment),
     def("get_turn", &get_turn),
+    def("get_nmrs", &get_nmrs),
     def("remove_empty_units", &remove_empty_units),
 
     def("update_subscriptions", &update_subscriptions),

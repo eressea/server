@@ -1,5 +1,9 @@
 local function kill_multis()
-  local multis = { ["ms04"]="Wird wegen Parteiuebernahme geloescht" }
+  local multis = { 
+--    ["Luna"]="Wird wegen Missbrauch von Sonnensegeln geloescht",
+--    ["amam"]="Wird wegen Missbrauch von Sonnensegeln geloescht",
+--    ["jr81"]="Wird wegen Missbrauch von Sonnensegeln geloescht"
+  }
   for k, v in multis do
     local f = get_faction(atoi36(k))
     if f~=nil then
