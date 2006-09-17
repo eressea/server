@@ -367,11 +367,5 @@
     <item name="seaserpenthead" amount="1"/>
   </set>
 
-  <set name="ent_spoils">
-    <subset chance="0.1">
-      <set name="item_log"/>
-    </subset>
-  </set>
-
 </equipment>
 
