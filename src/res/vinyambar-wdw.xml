@@ -67,7 +67,7 @@
     <param name="study.expensivemigrants" value="1"/>
     <param name="alliance.skilllimit" value="15"/>
     <param name="alliance.restricted" value="fight guard stealth money"/>
-    <param name="alliance.auto" value="fight"/>
+    <param name="alliance.auto" value="fight guard stealth money "/>
     <param name="alliance.transferquit" value="true"/>
   </game>
 

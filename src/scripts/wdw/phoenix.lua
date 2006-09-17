@@ -4,10 +4,12 @@ function update_phoenix()
     local u
     for u in f.units do
       if u.race=="phoenix" then
+        print("The phoenix is in " .. u.region.name() .. "(" .. u.region.x .. "," .. u.region.y .. ")")
         return
       end
     end
   end
+  print("The phoenix has not been found and needs to be regenerated")
   f = get_faction(0)
   if (f~=nil) then
     local r
@@ -25,7 +27,9 @@ function update_phoenix()
           local u = add_unit(f, r)
           u.race = "phoenix"
           u.name = "Der Phönix"
+          u.number = 1
           -- TODO: generate an appropriate region message
+          print("The phoenix has been generated in " .. u.region.name .. "(" .. u.region.x .. "," .. u.region.y .. ")")
           break
         end
       end
