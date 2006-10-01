@@ -1431,7 +1431,7 @@ regeneration_magiepunkte(void)
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
-			if (is_mage(u)) {
+			if (u->number && is_mage(u)) {
 				aura = get_spellpoints(u);
 				auramax = max_spellpoints(r, u);
 				if (aura < auramax) {
