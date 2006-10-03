@@ -1825,6 +1825,9 @@
   <string name="AGGRESSIV">
     <text locale="de">AGGRESSIV</text>
   </string>
+  <string name="JEDEM">
+    <text locale="de">JEDEM</text>
+  </string>
   <string name="ALLES">
     <text locale="de">ALLES</text>
   </string>

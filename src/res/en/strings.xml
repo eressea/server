@@ -1157,6 +1157,9 @@
   <string name="ALLES">
     <text locale="en">ALL</text>
   </string>
+  <string name="JEDEM">
+    <text locale="en">EACH</text>
+  </string>
   <string name="ANZAHL">
     <text locale="en">NUMBER</text>
   </string>

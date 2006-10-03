@@ -450,7 +450,8 @@ enum {
 typedef unsigned char param_t;
 enum {
 	P_LOCALE,
-	P_ANY,
+  P_ANY,
+  P_EACH,
 	P_PEASANT,
 	P_BUILDING,
 	P_UNIT,
