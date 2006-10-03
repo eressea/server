@@ -264,12 +264,18 @@ int
 reserve_cmd(unit * u, struct order *ord)
 {
   if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
-    int use, count = geti();
+    int use, count;
     const resource_type * rtype;
+    const char * s;
 
     init_tokens(ord);
     skip_token();
-    count = geti();
+    s = getstrtoken();
+    count = atoip(s);
+
+    if (count == 0 && findparam(s, u->faction->locale)==P_EACH) {
+      count = u->number;
+    }
 
     rtype = findresourcetype(getstrtoken(), u->faction->locale);
     if (rtype == NULL) return 0;
