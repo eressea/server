@@ -148,6 +148,25 @@ update_subscriptions(void)
 }
 
 static void
+message_unit(unit& sender, unit& target, const char * str)
+{
+  deliverMail(target.faction, sender.region, &sender, str, &target);
+}
+
+static void
+message_faction(unit& sender, faction& target, const char * str)
+{
+  deliverMail(&target, sender.region, &sender, str, NULL);
+}
+
+static void
+message_region(unit& sender, const char * str)
+{
+  sprintf(buf, "von %s: '%s'", unitname(&sender), str);
+  addmessage(sender.region, 0, buf, MSG_MESSAGE, ML_IMPORTANT);
+}
+
+static void
 lua_learnskill(unit& u, const char * skname, float chances)
 {
   skill_t sk = sk_find(skname);
@@ -265,6 +284,10 @@ bind_gamecode(lua_State * L)
     def("write_reports", &lua_writereports),
     def("write_report", &lua_writereport),
     def("update_guards", &update_guards),
+
+    def("message_unit", &message_unit),
+    def("message_faction", &message_faction),
+    def("message_region", &message_region),
 
     /* scripted monsters */
     def("spawn_braineaters", &spawn_braineaters),

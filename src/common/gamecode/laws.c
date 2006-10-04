@@ -1780,7 +1780,7 @@ name_cmd(unit * u, struct order * ord)
 }
 /* ------------------------------------------------------------- */
 
-static void
+void
 deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 {
   if (!cansee(f, r, u, 0)) {

@@ -161,6 +161,9 @@ function test_handler()
     print(u)
     print(u2)
     print(str)
+    message_unit(u, u2, "thanks unit, i got your message: " .. str)
+    message_faction(u, u2.faction, "thanks faction, i got your message: " .. str)
+    message_region(u, "thanks region, i got your message: " .. str)
   end
 
   plain = terraform(0, 0, "plain")
@@ -373,9 +376,42 @@ function run_scripts()
   end
 end
 
+function test_moving()
+  test_movement()
+  run_scripts()
+  process_orders()
+  write_reports() 
+
+  if swim.region==ocean then
+    print "ERROR: Meermenschen können nicht anschwimmen"
+  end
+  if sail.region~=r0 then
+    print "ERROR: Kapitän kann Schiff mit NACH ohne VERLASSE verlassen"
+  end
+  if crew.region==r0 then
+    print "ERROR: Einheiten kann Schiff nicht mit NACH ohne VERLASSE verlassen"
+  end
+  drift = false
+  for i = 1, 100 do
+    if ships[i].region ~= ocean then
+      drift = true
+      break
+    end
+  end
+  if not drift then
+    print "ERROR: Unbemannte Schiffe treiben nicht ab"
+  end
+  if foot.region ~= w1 then
+    print "ERROR: Fusseinheit hat ihr NACH nicht korrekt ausgeführt"
+  end
+  if astra.region ~= r4 then
+    print "ERROR: Astraleinheit konnte Wirbel nicht benutzen"
+  end
+end
+
 -- test_movement()
 -- test_fail()
--- test_handler()
+test_handler()
 -- test_parser()
 -- test_monsters()
 -- test_combat()
@@ -387,33 +423,8 @@ end
 -- write_game("../testg.txt")
 -- read_game("../testg.txt")
 
-test_movement()
 run_scripts()
 process_orders()
 write_reports() 
 
-if swim.region==ocean then
-  print "ERROR: Meermenschen können nicht anschwimmen"
-end
-if sail.region~=r0 then
-  print "ERROR: Kapitän kann Schiff mit NACH ohne VERLASSE verlassen"
-end
-if crew.region==r0 then
-  print "ERROR: Einheiten kann Schiff nicht mit NACH ohne VERLASSE verlassen"
-end
-drift = false
-for i = 1, 100 do
-  if ships[i].region ~= ocean then
-    drift = true
-    break
-  end
-end
-if not drift then
-  print "ERROR: Unbemannte Schiffe treiben nicht ab"
-end
-if foot.region ~= w1 then
-  print "ERROR: Fusseinheit hat ihr NACH nicht korrekt ausgeführt"
-end
-if astra.region ~= r4 then
-  print "ERROR: Astraleinheit konnte Wirbel nicht benutzen"
-end
+-- test_moving()
