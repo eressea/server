@@ -1788,7 +1788,6 @@ expandbuying(region * r, request * buyorders)
       trade = trades;
       while (trade->type!=ltype) ++trade;
       multi = trade->multi;
-      if (trade->number + 1 > max_products) ++multi;
       price = ltype->price * multi;
       
       if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT, price) >= price) {
@@ -1800,42 +1799,43 @@ expandbuying(region * r, request * buyorders)
          * merken muß. */
         attrib * a = a_find(u->attribs, &at_luxuries);
         if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
+
         i_change((item**)&a->data.v, ltype->itype, 1);
-			i_change(&oa[j].unit->items, ltype->itype, 1);
-			use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
-			if (u->n < 0)
-				u->n = 0;
-			u->n += price;
+			  i_change(&oa[j].unit->items, ltype->itype, 1);
+			  use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
+			  if (u->n < 0)
+				  u->n = 0;
+			  u->n += price;
 
-			rsetmoney(r, rmoney(r) + price);
+			  rsetmoney(r, rmoney(r) + price);
 
-			/* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
-			* der Preis Multiplikator für das Produkt um den Faktor 1. Der Zähler
-			* wird wieder auf 0 gesetzt. */
-			if (++trade->number > max_products) {
-				trade->number = 0;
-				++trade->multi;
-			}
-      fset(u, UFL_LONGACTION);
-		}
-	}
-	free(oa);
+			  /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
+			   * der Preis Multiplikator für das Produkt um den Faktor 1. Der Zähler
+			   * wird wieder auf 0 gesetzt. */
+			  if (++trade->number == max_products) {
+				  trade->number = 0;
+				  ++trade->multi;
+			  }
+        fset(u, UFL_LONGACTION);
+		  }
+	  }
+	  free(oa);
 
-	/* Ausgabe an Einheiten */
+	  /* Ausgabe an Einheiten */
 
-	for (u = r->units; u; u = u->next) {
-		attrib * a = a_find(u->attribs, &at_luxuries);
-		item * itm;
-		if (a==NULL) continue;
-		ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
-		for (itm=(item*)a->data.v; itm; itm=itm->next) {
-			if (itm->number) {
-				ADDMSG(&u->faction->msgs, msg_message("buyamount",
-          "unit amount resource", u, itm->number, itm->type->rtype));
-			}
-		}
-		a_remove(&u->attribs, a);
-	}
+	  for (u = r->units; u; u = u->next) {
+		  attrib * a = a_find(u->attribs, &at_luxuries);
+		  item * itm;
+		  if (a==NULL) continue;
+		  ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
+		  for (itm=(item*)a->data.v; itm; itm=itm->next) {
+			  if (itm->number) {
+				  ADDMSG(&u->faction->msgs, msg_message("buyamount",
+            "unit amount resource", u, itm->number, itm->type->rtype));
+			  }
+		  }
+		  a_remove(&u->attribs, a);
+	  }
   }
 }
 
