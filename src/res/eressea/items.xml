@@ -22,6 +22,10 @@
     </item>
   </resource>
 
+  <resource name="birthdaycake">
+    <item notlost="yes" weight="0"/>
+  </resource>
+
 <!-- ambassador rewards -->
   <resource name="seashell">
     <item cursed="true" weight="0">

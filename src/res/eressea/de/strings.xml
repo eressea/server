@@ -158,6 +158,14 @@
         the sky one cold winter night, is said to have aphrodisiacal powers.</text>
     </string>
   </namespace>
+  <string name="birthdaycake">
+    <text locale="de">Geburtstagstorte</text>
+    <text locale="en">birthday cake</text>
+  </string>
+  <string name="birthdaycake_p">
+    <text locale="de">Geburtstagstorten</text>
+    <text locale="en">birthday cakes</text>
+  </string>
   <string name="seashell">
     <text locale="de">Muschel</text>
     <text locale="en">seashell</text>
