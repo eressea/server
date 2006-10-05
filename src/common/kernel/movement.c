@@ -1351,7 +1351,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
         if (fval(current->terrain, SEA_REGION)) {
           int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
           /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-          if (moving != (RCF_SWIM|RCF_WALK) && (moving|RCF_COASTAL) == 0) {
+          if (moving != (RCF_SWIM|RCF_WALK) && (moving&RCF_COASTAL) == 0) {
             /* can't swim+walk and isn't allowed to enter coast from sea */
             if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
             break;
