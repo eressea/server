@@ -737,88 +737,83 @@ rrandneighbour(region *r)
 void
 volcano_outbreak(region *r)
 {
-	attrib *a;
-	region *rn;
-	unit *u, **up;
-	faction *f;
+  attrib *a;
+  region *rn;
+  unit *u, **up;
+  faction *f;
 
-	for (u=r->units; u; u=u->next) {
-		f = u->faction;
-		freset(f, FL_DH);
-	}
-	rn = rrandneighbour(r);
+  for (u=r->units; u; u=u->next) {
+    f = u->faction;
+    freset(f, FL_DH);
+  }
+  rn = rrandneighbour(r);
 
-	/* Vulkan-Region verwüsten */
+  /* Vulkan-Region verwüsten */
 
-	rsettrees(r, 2, 0);
-	rsettrees(r, 1, 0);
-	rsettrees(r, 0, 0);
+  rsettrees(r, 2, 0);
+  rsettrees(r, 1, 0);
+  rsettrees(r, 0, 0);
 
-	a = a_find(r->attribs, &at_reduceproduction);
-	if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
+  a = a_find(r->attribs, &at_reduceproduction);
+  if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
 
-	/* Produktion vierteln ... */
-	a->data.sa[0] = 25;
-	/* Für 6-17 Runden */
-	a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
+  /* Produktion vierteln ... */
+  a->data.sa[0] = 25;
+  /* Für 6-17 Runden */
+  a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
 
-	/* Personen bekommen 4W10 Punkte Schaden. */
+  /* Personen bekommen 4W10 Punkte Schaden. */
 
-	for (up=&r->units; *up;) {
-		unit * u = *up;
-		int dead = damage_unit(u, "4d10", true, false);
-		if (dead) {
+  for (up=&r->units; *up;) {
+    unit * u = *up;
+    int dead = damage_unit(u, "4d10", true, false);
+    if (dead) {
       ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
         "unit region dead", u, r, dead));
-		}
-		if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			if (rn) {
+    }
+    if (!fval(u->faction, FL_DH)) {
+      fset(u->faction, FL_DH);
+      if (rn) {
         ADDMSG(&u->faction->msgs, msg_message("volcanooutbreak", 
           "regionv regionn", r, rn));
       } else {
         ADDMSG(&u->faction->msgs, msg_message("volcanooutbreaknn", 
           "region", r));
-			}
-		}
-		if (u==*up) up=&u->next;
-	}
+      }
+    }
+    if (u==*up) up=&u->next;
+  }
 
-	remove_empty_units_in_region(r);
+  remove_empty_units_in_region(r);
 
-	/* Zufällige Nachbarregion verwüsten */
+  /* Zufällige Nachbarregion verwüsten */
 
-	if (rn) {
+  if (rn) {
 
-		rsettrees(r, 2, 0);
-		rsettrees(r, 1, 0);
-		rsettrees(r, 0, 0);
+    rsettrees(r, 2, 0);
+    rsettrees(r, 1, 0);
+    rsettrees(r, 0, 0);
 
-		a = a_find(rn->attribs, &at_reduceproduction);
-		if (!a) a = a_add(&rn->attribs, a_new(&at_reduceproduction));
+    a = a_find(rn->attribs, &at_reduceproduction);
+    if (!a) a = a_add(&rn->attribs, a_new(&at_reduceproduction));
 
-		/* Produktion vierteln ... */
-		a->data.sa[0] = 25;
-		/* Für 6-17 Runden */
-		a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
+    /* Produktion vierteln ... */
+    a->data.sa[0] = 25;
+    /* Für 6-17 Runden */
+    a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
 
-		/* Personen bekommen 3W10 Punkte Schaden. */
-		for (up=&rn->units; *up;) {
-			unit * u = *up;
-			int dead = damage_unit(u, "3d10", true, false);
-			if (dead) {
-        ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
-          "unit region dead", u, rn, dead));
-			}
-			if (!fval(u->faction, FL_DH)) {
+    /* Personen bekommen 3W10 Punkte Schaden. */
+    for (up=&rn->units; *up;) {
+      unit * u = *up;
+      int dead = damage_unit(u, "3d10", true, false);
+      if (dead) {
         ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
           "unit region dead", u, r, dead));
-				fset(u->faction, FL_DH);
-			}
-			if (u==*up) up=&u->next;
-		}
-		remove_empty_units_in_region(rn);
-	}
+      }
+      if (u==*up) up=&u->next;
+    }
+    remove_empty_units_in_region(rn);
+  }
 }
 
 static void
