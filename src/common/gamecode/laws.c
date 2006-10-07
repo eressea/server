@@ -2931,14 +2931,18 @@ renumber_cmd(unit * u, order * ord)
       u->no = i;
       uhash(u);
       break;
-#ifdef ALLOW_SHIP_RENUM
+
     case P_SHIP:
       if (!u->ship) {
-        cmistake(u,ord,144,MSG_EVENT);
+        cmistake(u, ord, 144, MSG_EVENT);
+        break;
+      }
+      if (u->ship->coast != NODIRECTION) {
+        cmistake(u, ord, 116, MSG_EVENT);
         break;
       }
       if (!fval(u, UFL_OWNER)) {
-        cmistake(u,ord,146,MSG_EVENT);
+        cmistake(u, ord, 146, MSG_EVENT);
         break;
       }
       s = getstrtoken();
@@ -2951,7 +2955,7 @@ renumber_cmd(unit * u, order * ord)
           break;
         }
         if (findship(i) || findbuilding(i)) {
-          cmistake(u,ord,115,MSG_EVENT);
+          cmistake(u, ord, 115, MSG_EVENT);
           break;
         }
       }
@@ -2959,7 +2963,6 @@ renumber_cmd(unit * u, order * ord)
       u->ship->no = i;
       shash(u->ship);
       break;
-#endif
     case P_BUILDING:
     case P_GEBAEUDE:
       if (!u->building) {
