@@ -172,7 +172,7 @@ extern "C" {
     } * person;
     unsigned int flags;
     struct {
-      int number;  /* number of people who have flown */
+      int number;  /* number of people who fled */
       int hp;      /* accumulated hp of fleeing people */
       struct region *region;  /* destination of fleeing people */
       struct item * items; /* items they take */

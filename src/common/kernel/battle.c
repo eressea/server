@@ -2592,10 +2592,10 @@ aftermath(battle * b)
 
   for (s=b->sides;s;s=s->next) {
     message * seen = msg_message("battle::army_report",
-      "index abbrev dead flown survived",
+      "index abbrev dead fled survived",
       army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
     message * unseen = msg_message("battle::army_report",
-      "index abbrev dead flown survived",
+      "index abbrev dead fled survived",
       army_index(s), "-?-", s->dead, s->flee, s->alive);
 
     for (bf=b->factions;bf;bf=bf->next) {

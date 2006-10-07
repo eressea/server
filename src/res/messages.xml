@@ -6265,11 +6265,11 @@
       <arg name="index" type="int"/>
       <arg name="abbrev" type="string"/>
       <arg name="dead" type="int"/>
-      <arg name="flown" type="int"/>
+      <arg name="fled" type="int"/>
       <arg name="survived" type="int"/>
     </type>
-    <text locale="de">"Heer $int($index)($abbrev): $int($dead) Tote, $int($flown) Geflohene, $int($survived) Überlebende."</text>
-    <text locale="en">"Army $int($index)($abbrev): $int($dead) dead, $int($flown) flown, $int($survived) survivors."</text>
+    <text locale="de">"Heer $int($index)($abbrev): $int($dead) Tote, $int($fled) Geflohene, $int($survived) Überlebende."</text>
+    <text locale="en">"Army $int($index)($abbrev): $int($dead) dead, $int($fled) fled, $int($survived) survivors."</text>
   </message>
   <message name="spellfail::nolevel" section="magic">
     <type>
