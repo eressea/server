@@ -929,10 +929,6 @@ demographics(void)
     if (fval(r->terrain, LAND_REGION)) {
       int rp = rpeasants(r) + r->land->newpeasants;
       rsetpeasants(r, max(0, rp));
-      /* Wenn keine Bauer da ist, soll auch kein Geld da sein */
-      /* Martin */
-      if (rpeasants(r) == 0)
-        rsetmoney(r, 0);
     }
   }
 
