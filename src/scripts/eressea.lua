@@ -31,6 +31,7 @@ function run_scripts()
     "eressea/wedding-jadee.lua", 
     "eressea/ponnuki.lua",
     "eressea/xmas2004.lua",
+    "eressea/10years.lua",
     "eressea/xmas2005.lua",
     "eressea/embassy.lua",
     "eressea/ents.lua"
@@ -75,6 +76,7 @@ function process(orders)
   local nmrs = get_nmrs(1)
   if nmrs >= 70 then
     print("Shit. More than 70 factions with 1 NMR (" .. nmrs .. ")")
+    write_summary()
     return -1
   end
   print (nmrs .. " Factions with 1 NMR")
