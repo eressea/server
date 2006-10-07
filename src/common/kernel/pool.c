@@ -192,7 +192,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode, int c
       if (u==v) continue;
       if (fval(v, UFL_LOCKED)) continue;
       if (urace(v)->ec_flags & NOGIVE) continue;
-      if (urace(v)->ec_flags & GIVEITEM == 0) continue;
+      if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
 
       if (v->faction == f) {
         if ((mode & GET_POOLED_FORCE)==0) {
@@ -245,7 +245,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     for (v = r->units; use>0 && v!=NULL; v = v->next) if (u!=v) {
       int mask;
       if (urace(v)->ec_flags & NOGIVE) continue;
-      if (urace(v)->ec_flags & GIVEITEM == 0) continue;
+      if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
 
       if (v->faction == f) {
         if ((mode & GET_POOLED_FORCE)==0) {
