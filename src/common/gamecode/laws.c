@@ -3726,7 +3726,7 @@ add_proc_global(int priority, void (*process)(void), const char * name)
   while (*pproc) {
     proc = *pproc;
     if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>=PR_GLOBAL) break;
+    else if (proc->priority==priority && proc->type>PR_GLOBAL) break;
     pproc = &proc->next;
   }
 
@@ -3748,7 +3748,7 @@ add_proc_region(int priority, void (*process)(region *), const char * name)
   while (*pproc) {
     proc = *pproc;
     if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>=PR_REGION) break;
+    else if (proc->priority==priority && proc->type>PR_REGION) break;
     pproc = &proc->next;
   }
 
@@ -3770,7 +3770,7 @@ add_proc_unit(int priority, void (*process)(unit *), const char * name)
   while (*pproc) {
     proc = *pproc;
     if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>=PR_UNIT) break;
+    else if (proc->priority==priority && proc->type>PR_UNIT) break;
     pproc = &proc->next;
   }
 

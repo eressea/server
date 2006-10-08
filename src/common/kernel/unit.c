@@ -236,14 +236,17 @@ destroy_unit(unit * u)
   
   /* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
    * Items haben, sonst Memory-Leak. */
-  
+#if 0
+  /* broken. */
   clone = has_clone(u);
   if (clone && rng_int()%100 < 90) {
     attrib *a;
     int i;
     
     /* TODO: Messages generieren. */
-    u->region = clone->region;
+    if (u->region!=clone->region) {
+      move_unit(u, clone->region, NULL);
+    }
     u->ship = clone->ship;
     u->building = clone->building;
     u->hp = 1;
@@ -262,10 +265,8 @@ destroy_unit(unit * u)
     if (a!=NULL) a_remove(&clone->attribs, a);
     fset(u, UFL_LONGACTION);
     set_number(clone, 0);
-    u = clone;
-    zombie = false;
-  }
-		
+  } else 
+#endif  
   if (zombie) {
     u_setfaction(u, findfaction(MONSTER_FACTION));
     scale_number(u, 1);
