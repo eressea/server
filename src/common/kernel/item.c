@@ -1098,11 +1098,18 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
   if (u->race == new_race[RC_DAEMON]  ) {
     change_effect(u, itype->rtype->ptype, 100*amount);
   } else {
-    trigger * trestore = trigger_changerace(u, u->race, u->irace);
-    int duration = 2 + rng_int() % 8;
+    static race * rcfailure;
+    if (!rcfailure) {
+      rcfailure = rc_find("smurf");
+      if (!rcfailure) rcfailure = rc_find("toad");
+    }
+    if (rcfailure) {
+      trigger * trestore = trigger_changerace(u, u->race, u->irace);
+      int duration = 2 + rng_int() % 8;
 
-    add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-    u->irace = u->race = new_race[RC_TOAD];
+      add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+      u->irace = u->race = rcfailure;
+    }
   }
   use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   usetpotionuse(u, itype->rtype->ptype);

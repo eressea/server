@@ -2948,6 +2948,23 @@
       <text locale="en">braineater</text>
     </string>
 
+    <string name="smurf">
+      <text locale="de">Schlumpf</text>
+      <text locale="en">smurf</text>
+    </string>
+    <string name="smurf_p">
+      <text locale="de">Schlümpfe</text>
+      <text locale="en">smurfs</text>
+    </string>
+    <string name="smurf_x">
+      <text locale="de">Schlumpf</text>
+      <text locale="en">smurf</text>
+    </string>
+    <string name="smurf_d">
+      <text locale="de">Schlümpfen</text>
+      <text locale="en">smurfs</text>
+    </string>
+
     <string name="toad">
       <text locale="de">Kröte</text>
       <text locale="en">toad</text>

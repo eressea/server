@@ -608,6 +608,38 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
+  <race name="smurf" weight="1000" capacity="540" speed="1.000000" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
+    <ai splitsize="1" learn="yes"/>
+    <skill name="alchemy" modifier="-10"/>
+    <skill name="crossbow" modifier="-10"/>
+    <skill name="mining" modifier="-10"/>
+    <skill name="bow" modifier="-10"/>
+    <skill name="building" modifier="-10"/>
+    <skill name="trade" modifier="-10"/>
+    <skill name="forestry" modifier="-10"/>
+    <skill name="catapult" modifier="-10"/>
+    <skill name="herbalism" modifier="-10"/>
+    <skill name="magic" modifier="-10"/>
+    <skill name="training" modifier="-10"/>
+    <skill name="riding" modifier="-10"/>
+    <skill name="armorer" modifier="-10"/>
+    <skill name="shipcraft" modifier="-10"/>
+    <skill name="melee" modifier="-10"/>
+    <skill name="sailing" modifier="-10"/>
+    <skill name="polearm" modifier="-10"/>
+    <skill name="espionage" modifier="-10"/>
+    <skill name="quarrying" modifier="-10"/>
+    <skill name="roadwork" modifier="-10"/>
+    <skill name="tactics" modifier="-10"/>
+    <skill name="stealth" modifier="2"/>
+    <skill name="entertainment" modifier="-10"/>
+    <skill name="weaponsmithing" modifier="-10"/>
+    <skill name="cartmaking" modifier="-10"/>
+    <skill name="perception" modifier="-10"/>
+    <skill name="taxation" modifier="-10"/>
+    <skill name="stamina" modifier="-10"/>
+    <attack type="4" damage="1d2"/>
+  </race>
   <race name="alp" magres="0.950000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="0" capacity="0" speed="1.500000" hp="20" ac="2" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="20" fly="yes" walk="yes" nolearn="yes" noteach="yes">
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>

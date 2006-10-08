@@ -682,7 +682,7 @@ drown(region *r)
 #else
       int amphibian_level = 0;
 #endif
-			if (u->ship || u->race == new_race[RC_SPELL]) {
+			if (u->ship || u->race == new_race[RC_SPELL] || u->number==0) {
 				up=&u->next;
 				continue;
 			}
