@@ -673,37 +673,37 @@ damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
 void
 drown(region *r)
 {
-	if (fval(r->terrain, SEA_REGION)) {
-		unit ** up = up=&r->units;
-		while (*up) {
-			unit *u = *up;
+  if (fval(r->terrain, SEA_REGION)) {
+    unit ** up = up=&r->units;
+    while (*up) {
+      unit *u = *up;
 #ifdef KARMA_MODULE
       int amphibian_level = fspecial(u->faction, FS_AMPHIBIAN);
 #else
       int amphibian_level = 0;
 #endif
-			if (u->ship || u->race == new_race[RC_SPELL] || u->number==0) {
-				up=&u->next;
-				continue;
-			}
+      if (u->ship || u->race == new_race[RC_SPELL] || u->number==0) {
+        up=&u->next;
+        continue;
+      }
 
-			if (amphibian_level) {
-				int dead = damage_unit(u, "5d1", false, false);
-				if (dead) {
+      if (amphibian_level) {
+        int dead = damage_unit(u, "5d1", false, false);
+        if (dead) {
           ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_dead", 
             "amount unit region", dead, u, r));
-				} else {
+        } else {
           ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_nodead", 
             "unit region",u, r));
-				}
+        }
       } else if (!(canswim(u) || canfly(u))) {
-				scale_number(u, 0);
+        scale_number(u, 0);
         ADDMSG(&u->faction->msgs, msg_message("drown", "unit region", u, r));
-			}
-			if (*up==u) up=&u->next;
-		}
-		remove_empty_units_in_region(r);
-	}
+      }
+      if (*up==u) up=&u->next;
+    }
+    remove_empty_units_in_region(r);
+  }
 }
 
 region *
@@ -1263,7 +1263,7 @@ randomevents(void)
   /* monster-einheiten desertieren */
   for (r = regions; r; r=r->next) {
     for (u=r->units; u; u=u->next) {
-      if (u->faction->no != MONSTER_FACTION
+      if (u->faction && u->faction->no != MONSTER_FACTION
         && (u->race->flags & RCF_DESERT)) {
           if (fval(u, UFL_ISNEW)) continue;
           if (rng_int()%100 < 5) {
@@ -1278,58 +1278,60 @@ randomevents(void)
 #ifdef KARMA_MODULE
   /* lycanthropen werden werwölfe */
   for (f = factions; f; f=f->next) {
-    int level = fspecial(f, FS_LYCANTROPE);
-    if (level > 0) {
-      for(u = f->units; u; u=u->nextF) {
-        if(rng_int()%100 < 2*level) {
-          ADDMSG(&u->faction->msgs, msg_message("becomewere",
-            "unit region", u, u->region));
-          fset(u, UFL_WERE);
+    if (f->alive) {
+      int level = fspecial(f, FS_LYCANTROPE);
+      if (level > 0) {
+        for(u = f->units; u; u=u->nextF) {
+          if (rng_int()%100 < 2*level) {
+            ADDMSG(&u->faction->msgs,
+                   msg_message("becomewere", "unit region", u, u->region));
+            fset(u, UFL_WERE);
+          }
         }
       }
     }
   }
 #endif
 
-	/* Chaos */
-	for (r = regions; r; r = r->next) {
-		int i;
-		if (fval(r, RF_CHAOTIC)) {
-			chaos(r);
-		}
-		i = chaoscount(r);
-		if (!i) continue;
-		chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
-	}
-
+  /* Chaos */
+  for (r = regions; r; r = r->next) {
+    int i;
+    if (fval(r, RF_CHAOTIC)) {
+      chaos(r);
+    }
+    i = chaoscount(r);
+    if (!i) continue;
+    chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
+  }
+  
 #ifdef HERBS_ROT
-	/* Kräuter verrotten */
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u=u->next) {
-			item **itmp = &u->items, *hbag = *i_find(&u->items, olditemtype[I_SACK_OF_CONSERVATION]);
-			int rot_chance = HERBROTCHANCE;
-
-			if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
-
-			while (*itmp) {
-				item * itm = *itmp;
-				int n = itm->number;
-				double k = n*rot_chance/100.0;
+  /* Kräuter verrotten */
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u=u->next) {
+      item **itmp = &u->items, *hbag = *i_find(&u->items, olditemtype[I_SACK_OF_CONSERVATION]);
+      int rot_chance = HERBROTCHANCE;
+      
+      if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
+      
+      while (*itmp) {
+        item * itm = *itmp;
+        int n = itm->number;
+        double k = n*rot_chance/100.0;
         if (fval(itm->type, ITF_HERB)) {
           double nv = normalvariate(k, k/4);
           int inv = (int)nv;
           int delta = min(n, inv);
           i_change(itmp, itm->type, -delta);
         }
-				if (itm==*itmp) itmp=&itm->next;
-			}
-	  }
-	}
+        if (itm==*itmp) itmp=&itm->next;
+      }
+    }
+  }
 #endif
-
-	dissolve_units();
-	check_split();
+  
+  dissolve_units();
+  check_split();
 #ifdef KARMA_MODULE
-	check_luck();
+  check_luck();
 #endif /* KARMA_MODULE */
 }
