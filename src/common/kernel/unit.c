@@ -782,8 +782,8 @@ transfermen(unit * u, unit * u2, int n)
 	int hp = u->hp;
 	region * r = u->region;
 
-	if (!n) return;
-
+	if (n==0) return;
+  assert(n > 0);
 	/* "hat attackiert"-status wird übergeben */
 
 	if (u2) {

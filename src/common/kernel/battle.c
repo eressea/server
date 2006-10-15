@@ -911,6 +911,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   boolean magic = false;
   int da = dice_rand(damage);
 
+  assert(du->number>0);
 #ifdef SHOW_KILLS
   ++at.fighter->hits;
 #endif
@@ -2914,6 +2915,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   static boolean init = false;
   unsigned int flags = 0;
 
+  assert(u->number);
   if (fval(u, UFL_PARTEITARNUNG)!=0) flags |= SIDE_STEALTH;
 #ifdef SIMPLE_COMBAT
   if (attack) flags |= SIDE_ATTACKER;

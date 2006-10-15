@@ -881,7 +881,7 @@ scale_number (unit * u, int n)
   int remain;
 
   if (n == u->number) return;
-  if (n && u->number) {
+  if (n && u->number>0) {
     int full;
     remain = ((u->hp%u->number) * (n % u->number)) % u->number;
 
@@ -894,17 +894,19 @@ scale_number (unit * u, int n)
     remain = 0;
     u->hp = 0;
   }
-  for (a = a_find(u->attribs, &at_effect);a && a->type==&at_effect;a=a->next) {
-    effect_data * data = (effect_data *)a->data.v;
-    int snew = data->value / u->number * n;
-    if (n) {
-      remain = data->value - snew / n * u->number;
-      snew += remain * n / u->number;
-      remain = (remain * n) % u->number;
-      if ((rng_int() % u->number) < remain)
-        ++snew; /* Nachkommastellen */
+  if (u->number>0) {
+    for (a = a_find(u->attribs, &at_effect);a && a->type==&at_effect;a=a->next) {
+      effect_data * data = (effect_data *)a->data.v;
+      int snew = data->value / u->number * n;
+      if (n) {
+        remain = data->value - snew / n * u->number;
+        snew += remain * n / u->number;
+        remain = (remain * n) % u->number;
+        if ((rng_int() % u->number) < remain)
+          ++snew; /* Nachkommastellen */
+      }
+      data->value = snew;
     }
-    data->value = snew;
   }
   if (u->number==0 || n==0) {
     for (sk = 0; sk < MAXSKILLS; sk++) {

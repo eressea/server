@@ -452,6 +452,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   int n, left;
   region * rn = rconnect(r,d);
 
+  assert(u->number);
   if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
     cmistake(u, u->thisorder, 103, MSG_PRODUCE);
     return;
@@ -611,6 +612,7 @@ build(unit * u, const construction * ctype, int completed, int want)
   int made = 0;
   int basesk, effsk;
 
+  assert(u->number);
   if (want<=0) return 0;
   if (type==NULL) return 0;
   if (type->improvement==NULL && completed==type->maxsize)
@@ -796,6 +798,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   order * new_order = NULL;
   const struct locale * lang = u->faction->locale;
 
+  assert(u->number);
   if (eff_skill(u, SK_BUILDING, r) == 0) {
     cmistake(u, ord, 101, MSG_PRODUCE);
     return;

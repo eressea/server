@@ -1085,6 +1085,7 @@ magic_resistance(unit *target)
 
   /* Bonus durch Rassenmagieresistenz */
   double probability = target->race->magres;
+  assert(target->number>0);
 
   /* Magier haben einen Resistenzbonus vom Magietalent * 5%*/
   probability += effskill(target, SK_MAGIC)*0.05;

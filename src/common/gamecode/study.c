@@ -446,11 +446,7 @@ learn_cmd(unit * u, order * ord)
   int p;
   magic_t mtyp;
   int l;
-  int studycost;
-
-  /* lernen nach lehren */
-
-  int days;
+  int studycost, days;
   double multi = 1.0;
   attrib * a = NULL;
   teaching_info * teach = NULL;
@@ -458,6 +454,7 @@ learn_cmd(unit * u, order * ord)
   skill_t sk;
   int maxalchemy = 0;
 
+  if (u->number==0) return;
   if (fval(r->terrain, SEA_REGION)) {
     /* sonderbehandlung aller die auf Ozeanen lernen können */
     if (u->race!=new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {

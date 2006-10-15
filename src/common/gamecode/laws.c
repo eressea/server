@@ -338,7 +338,7 @@ age_unit(region * r, unit * u)
     }
   } else {
     ++u->age;
-    if (u->race->age) {
+    if (u->number>0 && u->race->age) {
       u->race->age(u);
     }
   }

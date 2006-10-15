@@ -1077,16 +1077,18 @@ readunit(FILE * F)
 	assert(u->race);
 	if (global.data_version<NEWSKILL_VERSION) {
 		/* convert old data */
-		while ((sk = (skill_t) ri(F)) != NOSKILL) {
-			int days = ri(F) / u->number;
-			int lvl = level(days);
-			int weeks = lvl + 1 - (days - level_days(lvl))/30;
-			assert(weeks>0 && weeks<=lvl+1);
-			if (lvl) {
-				skill * sv = add_skill(u, sk);
-				sv->level = sv->old = (unsigned char)lvl;
-				sv->weeks = (unsigned char)weeks;
-			}
+    if (u->number) {
+      while ((sk = (skill_t) ri(F)) != NOSKILL) {
+			  int days = ri(F) / u->number;
+			  int lvl = level(days);
+			  int weeks = lvl + 1 - (days - level_days(lvl))/30;
+			  assert(weeks>0 && weeks<=lvl+1);
+			  if (lvl) {
+				  skill * sv = add_skill(u, sk);
+				  sv->level = sv->old = (unsigned char)lvl;
+				  sv->weeks = (unsigned char)weeks;
+			  }
+      }
 		}
 	} else {
 		while ((sk = (skill_t) ri(F)) != NOSKILL) {

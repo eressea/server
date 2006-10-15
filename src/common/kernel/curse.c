@@ -546,7 +546,7 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
 /* hier müssen alle c-typen, die auf Einheiten gezaubert werden können,
  * berücksichtigt werden */
 
-void
+static void
 do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 {
   int flag = c->flag;

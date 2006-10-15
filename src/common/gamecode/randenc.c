@@ -309,6 +309,7 @@ static void
 get_allies(region * r, unit * u)
 {
 	unit *newunit = NULL;
+  assert(u->number);
 
 	switch (rterrain(r)) {
 
@@ -422,27 +423,24 @@ void
 encounters(void)
 {
 	region *r;
-	unit *u;
-	int n;
-	int c;
-	int i;
 
 	for (r = regions; r; r = r->next) {
 		if (!fval(r->terrain, SEA_REGION) && fval(r, RF_ENCOUNTER)) {
-			c = 0;
+			int c = 0;
+      unit * u;
 			for (u = r->units; u; u = u->next) {
 				c += u->number;
 			}
 
 			if (c > 0) {
-				n = rng_int() % c;
-				u = r->units;
+        int i = 0;
+				int n = rng_int() % c;
 
-				for (i = u->number; i < n; i += u->number) {
-					u = u->next;
+        for (u = r->units; u; u = u->next) {
+					if (i+u->number>c) break;
 				}
-
-				encounter(r, u);
+        assert(u && u->number);
+        encounter(r, u);
 			}
 		}
 	}
@@ -609,12 +607,13 @@ damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
   int *hp = malloc(u->number * sizeof(int));
   int   h;
   int   i, dead = 0, hp_rem = 0, heiltrank;
+  double magres = magic_resistance(u);
 
+  assert(u->number);
   if (fval(u->race, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
     return 0;
   }
 
-  if (u->number==0) return 0;
   h = u->hp/u->number;
   /* HP verteilen */
   for (i=0; i<u->number; i++) hp[i] = h;
@@ -624,7 +623,7 @@ damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
   /* Schaden */
   for (i=0; i<u->number; i++) {
     int damage = dice_rand(dam);
-    if (magic) damage = (int)(damage * (1.0 - magic_resistance(u)));
+    if (magic) damage = (int)(damage * (1.0 - magres));
     if (physical) damage -= nb_armor(u, i);
     hp[i] -= damage;
   }
@@ -766,19 +765,21 @@ volcano_outbreak(region *r)
 
   for (up=&r->units; *up;) {
     unit * u = *up;
-    int dead = damage_unit(u, "4d10", true, false);
-    if (dead) {
-      ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
-        "unit region dead", u, r, dead));
-    }
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
-      if (rn) {
-        ADDMSG(&u->faction->msgs, msg_message("volcanooutbreak", 
-          "regionv regionn", r, rn));
-      } else {
-        ADDMSG(&u->faction->msgs, msg_message("volcanooutbreaknn", 
-          "region", r));
+    if (u->number) {
+      int dead = damage_unit(u, "4d10", true, false);
+      if (dead) {
+        ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
+          "unit region dead", u, r, dead));
+      }
+      if (!fval(u->faction, FL_DH)) {
+        fset(u->faction, FL_DH);
+        if (rn) {
+          ADDMSG(&u->faction->msgs, msg_message("volcanooutbreak", 
+            "regionv regionn", r, rn));
+        } else {
+          ADDMSG(&u->faction->msgs, msg_message("volcanooutbreaknn", 
+            "region", r));
+        }
       }
     }
     if (u==*up) up=&u->next;
@@ -805,10 +806,12 @@ volcano_outbreak(region *r)
     /* Personen bekommen 3W10 Punkte Schaden. */
     for (up=&rn->units; *up;) {
       unit * u = *up;
-      int dead = damage_unit(u, "3d10", true, false);
-      if (dead) {
-        ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
-          "unit region dead", u, r, dead));
+      if (u->number) {
+        int dead = damage_unit(u, "3d10", true, false);
+        if (dead) {
+          ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
+            "unit region dead", u, r, dead));
+        }
       }
       if (u==*up) up=&u->next;
     }

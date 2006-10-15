@@ -1249,6 +1249,7 @@ movement_speed(unit * u)
   static boolean init = false;
   double dk = u->race->speed;
 
+  assert(u->number);
   /* dragons have a fixed speed, and no other effects work on them: */
   switch (old_race(u->race)) {
     case RC_DRAGON:
@@ -2051,6 +2052,7 @@ move(unit * u, boolean move_on_land)
 {
   region_list * route = NULL;
 
+  assert(u->number);
   if (u->ship && fval(u, UFL_OWNER)) {
     sail(u, u->thisorder, move_on_land, &route);
   } else {

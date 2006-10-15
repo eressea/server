@@ -4708,7 +4708,7 @@ sp_headache(castorder *co)
   countspells(mage, 1);
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
-  if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+  if (target->number==0 || pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
   target = pa->param[0]->data.u; /* Zieleinheit */
 

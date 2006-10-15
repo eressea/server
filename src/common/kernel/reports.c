@@ -132,6 +132,7 @@ hp_status(const unit * u)
 void
 report_item(const unit * owner, const item * i, const faction * viewer, const char ** name, const char ** basename, int * number, boolean singular)
 {
+  assert(owner->number);
 	if (owner->faction == viewer) {
 		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, ((i->number!=1 && !singular)?GR_PLURAL:0)));
 		if (basename) *basename = resourcename(i->type->rtype, 0);

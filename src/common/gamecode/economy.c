@@ -1624,6 +1624,8 @@ make_cmd(unit * u, struct order * ord)
 	const char *s;
   const struct locale * lang = u->faction->locale;
   
+  if (u->number==NULL) return;
+
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
