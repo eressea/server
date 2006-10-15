@@ -1561,7 +1561,7 @@ heal_fighters(cvector *fgs, int * power, boolean heal_monsters)
     if (healhp<=0) break;
 
     /* Untote kann man nicht heilen */
-    if (fval(df->unit->race, RCF_NOHEAL)) continue;
+    if (df->unit->number==0 || fval(df->unit->race, RCF_NOHEAL)) continue;
 
     /* wir heilen erstmal keine Monster */
     if (heal_monsters || playerrace(df->unit->race)) {

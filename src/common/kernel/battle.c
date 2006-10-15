@@ -2929,7 +2929,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   }
 
   /* Illusionen und Zauber kaempfen nicht */
-  if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))
+  if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction) || u->number==0)
     return NULL;
 
   if (s1==NULL) {
