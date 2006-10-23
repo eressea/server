@@ -2538,12 +2538,17 @@ remove_empty_units_in_region(region *r)
 
   while (*up) {
     unit * u = *up;
-    if (MaxAge()>0) {
+
+    if (u->number) {
       faction * f = u->faction;
-      if (!fval(f, FFL_NOTIMEOUT) && f->age > MaxAge()) set_number(u, 0);
-    }
-    if (u->faction && !u->faction->alive) {
-      set_number(u, 0);
+      if (f==NULL || !f->alive) {
+        set_number(u, 0);
+      }
+      if (MaxAge()>0) {
+        if ((!fval(f, FFL_NOTIMEOUT) && f->age > MaxAge())) {
+          set_number(u, 0);
+        }
+      }
     }
     if ((u->number == 0 && u->race != new_race[RC_SPELL]) || (u->age <= 0 && u->race == new_race[RC_SPELL])) {
       destroy_unit(u);
