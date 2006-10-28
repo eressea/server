@@ -16,6 +16,7 @@
 #include <kernel/magic.h>
 #include <kernel/movement.h>
 #include <kernel/order.h>
+#include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -127,7 +128,27 @@ unit_additem(unit& u, const char * iname, int number)
   if (itype!=NULL) {
     item * i = i_change(&u.items, itype, number);
     return i?i->number:0;
-  } // if (itype!=NULL)
+  }
+  return -1;
+}
+
+static int
+unit_usepooled(unit& u, const char * iname, int number)
+{
+  const resource_type * rtype = rt_find(iname);
+  if (rtype!=NULL) {
+    return use_pooled(&u, rtype, GET_DEFAULT, number);
+  }
+  return -1;
+}
+
+static int
+unit_getpooled(unit& u, const char * iname)
+{
+  const resource_type * rtype = rt_find(iname);
+  if (rtype!=NULL) {
+    return get_pooled(&u, rtype, GET_DEFAULT, INT_MAX);
+  }
   return -1;
 }
 
@@ -574,6 +595,9 @@ bind_unit(lua_State * L)
     .def("get_item", &unit_getitem)
     .def("add_item", &unit_additem)
     .property("items", &unit_items, return_stl_iterator)
+
+    .def("get_pooled", &unit_getpooled)
+    .def("use_pooled", &unit_usepooled)
 
     // skills:
     .def("get_skill", &unit_getskill)
