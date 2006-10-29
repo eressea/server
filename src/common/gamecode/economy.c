@@ -353,6 +353,11 @@ do_recruiting(recruitment * recruits, int available)
         number = min(number, afford);
         use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, rc->recruitcost*number);
       }
+      if (u->number+number>UNIT_MAXSIZE) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_unit_size", "maxsize", UNIT_MAXSIZE));
+        number = UNIT_MAXSIZE-u->number;
+        assert(number>=0);
+      }
       add_recruits(u, number, req->qty);
       if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
         recruited += number * multi;

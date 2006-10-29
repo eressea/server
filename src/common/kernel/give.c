@@ -186,6 +186,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     if (u2 && n+u2->number > UNIT_MAXSIZE) {
       n = UNIT_MAXSIZE-u2->number;
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_unit_size", "maxsize", UNIT_MAXSIZE));
+      assert(n>=0);
     }
     if (n == 0) {
       error = 96;
