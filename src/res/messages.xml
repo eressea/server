@@ -5524,6 +5524,7 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
+      <arg name="maxsize" type="int"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Einheiten dürfen nicht mehr als $int($maxsize) Personen enthalten."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Units may not have more than $int($maxsize) members."</text>

@@ -1073,24 +1073,23 @@ readunit(FILE * F)
   }
   set_order(&u->thisorder, NULL);
 
-  assert(u->number <= UNIT_MAXSIZE);
-	assert(u->race);
-	if (global.data_version<NEWSKILL_VERSION) {
-		/* convert old data */
+  assert(u->race);
+  if (global.data_version<NEWSKILL_VERSION) {
+    /* convert old data */
     if (u->number) {
       while ((sk = (skill_t) ri(F)) != NOSKILL) {
-			  int days = ri(F) / u->number;
-			  int lvl = level(days);
-			  int weeks = lvl + 1 - (days - level_days(lvl))/30;
-			  assert(weeks>0 && weeks<=lvl+1);
-			  if (lvl) {
-				  skill * sv = add_skill(u, sk);
-				  sv->level = sv->old = (unsigned char)lvl;
-				  sv->weeks = (unsigned char)weeks;
-			  }
+        int days = ri(F) / u->number;
+        int lvl = level(days);
+        int weeks = lvl + 1 - (days - level_days(lvl))/30;
+        assert(weeks>0 && weeks<=lvl+1);
+        if (lvl) {
+          skill * sv = add_skill(u, sk);
+          sv->level = sv->old = (unsigned char)lvl;
+          sv->weeks = (unsigned char)weeks;
+        }
       }
-		}
-	} else {
+    }
+  } else {
 		while ((sk = (skill_t) ri(F)) != NOSKILL) {
 			int level = ri(F);
 			int weeks = ri(F);
@@ -1190,26 +1189,25 @@ writeunit(FILE * F, const unit * u)
   wnl(F);
 #endif
 
-  assert(u->number <= UNIT_MAXSIZE);
   assert(u->race);
 
-	for (i=0;i!=u->skill_size;++i) {
-		skill * sv = u->skills+i;
-		assert(sv->weeks<=sv->level*2+1);
-		if (sv->level>0) {
-			wi(F, sv->id);
-			wi(F, sv->level);
-			wi(F, sv->weeks);
-		}
-	}
-	wi(F, -1);
-	wnl(F);
-	write_items(F, u->items);
-	wnl(F);
-	if (u->hp == 0) {
-		log_error(("Einheit %s hat 0 Trefferpunkte\n", itoa36(u->no)));
-		((unit*)u)->hp = 1;
-	}
+  for (i=0;i!=u->skill_size;++i) {
+    skill * sv = u->skills+i;
+    assert(sv->weeks<=sv->level*2+1);
+    if (sv->level>0) {
+      wi(F, sv->id);
+      wi(F, sv->level);
+      wi(F, sv->weeks);
+    }
+  }
+  wi(F, -1);
+  wnl(F);
+  write_items(F, u->items);
+  wnl(F);
+  if (u->hp == 0) {
+    log_error(("Einheit %s hat 0 Trefferpunkte\n", itoa36(u->no)));
+    ((unit*)u)->hp = 1;
+  }
 	wi(F, u->hp);
 	wnl(F);
 	a_write(F, u->attribs);

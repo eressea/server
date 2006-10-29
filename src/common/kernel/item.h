@@ -26,9 +26,9 @@ struct locale;
 struct troop;
 
 typedef struct item {
+  struct item * next;
   const struct item_type * type;
   int number;
-  struct item * next;
 } item;
 
 typedef struct resource {
