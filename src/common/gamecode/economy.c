@@ -75,7 +75,8 @@
 
 typedef struct request {
   struct request * next;
-  struct unit *unit;
+  struct unit * unit;
+  struct order * ord;
   int qty;
   int no;
   union {
@@ -163,6 +164,7 @@ expandorders(region * r, request * requests)
 	}
 	while (requests) {
 		request * o = requests->next;
+    free_order(requests->ord);
 		free(requests);
 		requests = o;
 	}
@@ -354,7 +356,7 @@ do_recruiting(recruitment * recruits, int available)
         use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, rc->recruitcost*number);
       }
       if (u->number+number>UNIT_MAXSIZE) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_unit_size", "maxsize", UNIT_MAXSIZE));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size", "maxsize", UNIT_MAXSIZE));
         number = UNIT_MAXSIZE-u->number;
         assert(number>=0);
       }
@@ -555,6 +557,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   o = (request *) calloc(1, sizeof(request));
   o->qty = n;
   o->unit = u;
+  o->ord = copy_order(ord);
   addlist(recruitorders, o);
 }
 /* ------------------------------------------------------------- */
@@ -1629,7 +1632,7 @@ make_cmd(unit * u, struct order * ord)
 	const char *s;
   const struct locale * lang = u->faction->locale;
   
-  if (u->number==NULL) return;
+  if (u->number==0) return;
 
   init_tokens(ord);
   skip_token();
