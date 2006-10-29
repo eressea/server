@@ -437,7 +437,7 @@ encounters(void)
 				int n = rng_int() % c;
 
         for (u = r->units; u; u = u->next) {
-					if (i+u->number>c) break;
+					if (i+u->number>n) break;
 				}
         assert(u && u->number);
         encounter(r, u);
