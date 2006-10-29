@@ -947,10 +947,10 @@ void
 set_number(unit * u, int count)
 {
   assert (count >= 0);
-  assert (count <= USHRT_MAX);
+  assert (count <= UNIT_MAXSIZE);
 
 #ifndef NDEBUG
-  assert (u->faction != 0 || u->number > 0);
+  assert (u->faction != NULL || u->number > 0);
 #endif
   
   if (playerrace(u->race)) {

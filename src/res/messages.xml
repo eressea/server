@@ -5519,6 +5519,16 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have these herbs."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have these herbs."</text>
   </message>
+  <message name="unit_size" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Einheiten dürfen nicht mehr als $int($maxsize) Personen enthalten."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Units may not have more than $int($maxsize) members."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Units may not have more than $int($maxsize) members."</text>
+  </message>
   <message name="enter_overload" section="errors">
     <type>
       <arg name="unit" type="unit"/>

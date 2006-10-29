@@ -39,31 +39,6 @@ age_undead(unit *u)
 	region *r = u->region;
 	int n = 0;
 
-#if UNDEAD_REPRODUCTION > 0
-	if(fval(r->terrain, LAND_REGION)) {
-		int m;
-#ifndef SLOW_UNDEADS
-		if (u->number>100) {
-			int k = u->number;
-			for (m=0;m!=100;++m) {
-				int d = k/(100-m);
-				k-=d;
-				if (rng_int() % 100 < UNDEAD_REPRODUCTION)
-					n+=d;
-			}
-			assert(k==0);
-		} else
-#endif
-		for (m = u->number; m; m--)
-			if (rng_int() % 100 < UNDEAD_REPRODUCTION)
-				n++;
-		set_number(u, u->number + n);
-		u->hp += n * unit_max_hp(u);
-		n = rpeasants(r) - n;
-		n = max(0, n);
-		rsetpeasants(r, n);
-	}
-#endif
 	/* untote, die einer partei angehoeren, koennen sich
 	 * absplitten, anstatt sich zu vermehren. monster
 	 * untote vermehren sich nur noch */

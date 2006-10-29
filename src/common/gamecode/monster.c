@@ -68,7 +68,6 @@
 #include <string.h>
 #include <assert.h>
 
-#define UNDEAD_REPRODUCTION         0 	/* vermehrung */
 #define MOVECHANCE                  25	/* chance fuer bewegung */
 
 #define MAXILLUSION_TEXTS   3
