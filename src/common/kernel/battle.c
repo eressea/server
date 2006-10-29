@@ -2892,7 +2892,7 @@ weapon_weight(const weapon * w, boolean missile)
 fighter *
 make_fighter(battle * b, unit * u, side * s1, boolean attack)
 {
-#define WMAX 16
+#define WMAX 20
   weapon weapons[WMAX];
   int owp[WMAX];
   int dwp[WMAX];
@@ -3043,7 +3043,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
    * ihr kämpfen könnten, und was ihr Wert darin ist. */
   if (u->race->battle_flags & BF_EQUIPMENT) {
     int oi=0, di=0;
-    for (itm=u->items;itm;itm=itm->next) {
+    for (itm=u->items;itm && w!=WMAX;itm=itm->next) {
       const weapon_type * wtype = resource2weapon(itm->type->rtype);
       if (wtype==NULL || itm->number==0) continue;
       weapons[w].attackskill = weapon_skill(wtype, u, true);
@@ -3052,6 +3052,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
       weapons[w].used = 0;
       weapons[w].count = itm->number;
       ++w;
+      assert(w!=WMAX);
     }
     fig->weapons = calloc(sizeof(weapon), w+1);
     memcpy(fig->weapons, weapons, w*sizeof(weapon));
