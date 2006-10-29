@@ -5519,7 +5519,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have these herbs."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have these herbs."</text>
   </message>
-  <message name="unit_size" section="errors">
+  <message name="error_unit_size" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
