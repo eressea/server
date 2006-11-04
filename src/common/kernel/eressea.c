@@ -3052,8 +3052,10 @@ reorder_owners(region * r)
 int
 produceexp(struct unit * u, skill_t sk, int n)
 {
-  if (n==0 || !playerrace(u->race)) return 0;
-  learn_skill(u, sk, PRODUCEEXP/30.0);
+  if (global.producexpchance>0.0F) {
+    if (n==0 || !playerrace(u->race)) return 0;
+    learn_skill(u, sk, global.producexpchance);
+  }
   return 0;
 }
 

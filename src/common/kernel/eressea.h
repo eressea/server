@@ -336,7 +336,6 @@ extern void plagues(struct region * r, boolean ismagic);
 #define CMDSIZE             (DISPLAYSIZE*2+1)
 #define STARTMONEY          5000
 
-#define PRODUCEEXP          10
 #define TAVERN_MAINTENANCE  14
 /* Man gibt in einer Taverne mehr Geld aus! */
 
@@ -1088,6 +1087,7 @@ typedef struct settings {
   boolean disabled[MAXKEYWORDS];
   struct param * parameters;
   void * vm_state;
+  float producexpchance;
 
   struct global_functions {
     int (*wage)(const struct region *r, const struct faction * f, const struct race * rc);

@@ -1896,6 +1896,7 @@ parse_main(xmlDocPtr doc)
     }
 
     global.unitsperalliance = xml_bvalue(node, "unitsperalliance", false);
+    global.producexpchance = (float)xml_fvalue(node, "learningbydoing", 1.0/3);
     global.maxunits = xml_ivalue(node, "units", INT_MAX);
 
     property = xmlGetProp(node, BAD_CAST "name");
