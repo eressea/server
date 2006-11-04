@@ -54,6 +54,7 @@
     <skill name="stamina" enable="true"/>
     <skill name="unarmed" enable="true"/>
 
+    <param name="NewbieImmunity" value="8"/>
     <param name="entertain.base" value="0"></param>
     <param name="entertain.perlevel" value="20"></param>
     <param name="nmr.timeout" value="2"></param>

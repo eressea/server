@@ -56,7 +56,7 @@ extern void write_items(FILE *f, struct item *it);
 
 extern const char * datapath(void);
 
-#if RESOURCE_CONVERSION
+#ifdef RESOURCE_CONVERSION
 extern struct attrib_type at_resources;
 #endif
 

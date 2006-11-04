@@ -114,7 +114,7 @@ NewbieImmunity(void) {
   static int value = -1;
   if (value<0) {
     const char * str = get_param(global.parameters, "NewbieImmunity");
-    value = str?atoi(str):IMMUN_GEGEN_ANGRIFF;
+    value = str?atoi(str):0;
   }
   return value;
 }
@@ -2664,11 +2664,6 @@ lifestyle(const unit * u)
     astralspace = getplanebyname("Astralraum");
   }
 
-#ifndef ASTRAL_HUNGER
-  /* Keinen Unterhalt im Astralraum. */
-  if (getplane(u->region) == astralspace)
-    return 0;
-#endif
   if(u->region->planep && fval(u->region->planep, PFL_NOFEED))
     return 0;
 

@@ -185,7 +185,9 @@ struct building_type;
 # define RELEASE_VERSION ATTRIBREAD_VERSION
 #endif
 
-#if RESOURCE_CONVERSION
+#define RESOURCE_CONVERSION
+
+#ifdef RESOURCE_CONVERSION
 extern void init_resourcefix(void);
 extern void read_iron(struct region * r, int iron);
 extern void read_laen(struct region * r, int laen);

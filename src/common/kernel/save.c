@@ -85,7 +85,7 @@ int firstx = 0, firsty = 0;
 static region * current_region;
 
 
-#if RESOURCE_CONVERSION
+#ifdef RESOURCE_CONVERSION
 int laen_read(attrib * a, FILE * F)
 {
 	int laen;
@@ -750,7 +750,7 @@ read_items(FILE *F, item **ilist)
 	}
 }
 
-#if RESOURCE_CONVERSION
+#ifdef RESOURCE_CONVERSION
 struct attrib_type at_resources = {
 	"resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
 };
@@ -1299,7 +1299,7 @@ readregion(FILE * F, short x, short y)
 		i = ri(F); rsethorses(r, i);
 		if (global.data_version < NEWRESOURCE_VERSION) {
 			i = ri(F);
-#if RESOURCE_CONVERSION
+#ifdef RESOURCE_CONVERSION
 			if (i!=0) read_iron(r, i);
 #endif
 		} else {

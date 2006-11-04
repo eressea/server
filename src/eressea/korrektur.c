@@ -449,15 +449,12 @@ get_timeout(trigger * td, trigger * tfind)
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
 
-#if RESOURCE_CONVERSION
 extern struct attrib_type at_resources;
 void
 init_resourcefix(void)
 {
   at_register(&at_resources);
 }
-
-#endif
 
 int
 growing_trees(void)

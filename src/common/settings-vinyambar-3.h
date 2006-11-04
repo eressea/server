@@ -15,10 +15,7 @@
  * Include this file from settings.h to make eressea work.
  */
 #define ENTERTAINFRACTION 20
-#define IMMUN_GEGEN_ANGRIFF 8
-#define RESOURCE_CONVERSION 1
 #define TEACHDIFFERENCE 2
-#define PEASANT_ADJUSTMENT 1
 #define GUARD_DISABLES_RECRUIT 1
 #define GUARD_DISABLES_PRODUCTION 1
 #define RESOURCE_QUANTITY 0.5
