@@ -4707,10 +4707,10 @@ sp_headache(castorder *co)
   /* Macht alle nachfolgenden Zauber doppelt so teuer */
   countspells(mage, 1);
 
+  target = pa->param[0]->data.u; /* Zieleinheit */
+
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (target->number==0 || pa->param[0]->flag == TARGET_NOTFOUND) return 0;
-
-  target = pa->param[0]->data.u; /* Zieleinheit */
 
   /* finde das größte Talent: */
   for (i=0;i!=target->skill_size;++i) {
