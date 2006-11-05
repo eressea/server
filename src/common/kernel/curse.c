@@ -118,7 +118,7 @@ curse_age(attrib * a)
     c->duration = 0;
   } else if (c->flag & CURSE_NOAGE) {
     c->duration = 1;
-  } else {
+  } else if (c->duration!=INT_MAX) {
     c->duration = max(0, c->duration-1);
   }
   return c->duration;

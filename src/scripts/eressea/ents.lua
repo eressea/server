@@ -15,7 +15,6 @@ local function create_ents(r, number)
   return nil
 end
 
--- this is old stuff. it's not active at the moment.
 function spawn_ents()
   local r
   for r in regions() do

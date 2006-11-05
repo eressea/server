@@ -227,10 +227,11 @@
   <message name="use_speedsail" section="events">
     <type>
       <arg name="unit" type="unit"/>
+      <arg name="speed" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) setzt ein Sonnensegel. Die Geschwindigkeit des Schiffes erhöht sich dramatisch."</text>
-    <text locale="fr">"$unit($unit) sets a solar sail. The ship's speed is greatly increased."</text>
-    <text locale="en">"$unit($unit) sets a solar sail. The ship's speed is greatly increased."</text>
+    <text locale="de">"$unit($unit) setzt ein Sonnensegel. Die Geschwindigkeit des Schiffes erhöht um $int($speed)."</text>
+    <text locale="fr">"$unit($unit) sets a solar sail. The ship's speed is increased by $int($speed)."</text>
+    <text locale="en">"$unit($unit) sets a solar sail. The ship's speed is increased by $int($speed)."</text>
   </message>
   <message name="use_questkey_wrongregion" section="events">
     <type>

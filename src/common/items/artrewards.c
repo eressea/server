@@ -33,6 +33,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -100,7 +101,7 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
 
 
 static int
-useonother_trappedairelemental(struct unit * u, int shipId, 
+useonother_trappedairelemental(struct unit * u, int shipId,
                         const struct item_type * itype,
                         int amount, struct order * ord)
 {
@@ -120,13 +121,12 @@ useonother_trappedairelemental(struct unit * u, int shipId,
   }
 
   effect.i = SPEEDUP;
-  c = create_curse(u, &sh->attribs, ct_find("shipspeedup"),
-    20, 999999, effect, 0);
+  c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect, 0);
   curse_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",
     "unit region command ship", u, u->region, ord, sh));
-  
+
   itype->rtype->uchange(u, itype->rtype, -1);
 
   return 0;

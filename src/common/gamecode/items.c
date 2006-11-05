@@ -26,6 +26,8 @@
 #include <util/functions.h>
 #include <util/rand.h>
 
+#include <limits.h>
+
 /* BEGIN studypotion */
 #define MAXGAIN 15
 static int
@@ -65,36 +67,26 @@ use_studypotion(struct unit * u, const struct item_type * itype, int amount, str
 /* END studypotion */
 
 /* BEGIN speedsail */
+#define SPEEDSAIL_EFFECT 1
 static int
 use_speedsail(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
-#ifdef SPEEDAIL_ENABLED
-  struct plane * p = rplane(u->region);
-  /* disabled because of abuse */
-  if (p!=NULL) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
-  } else {
-    if (u->ship) {
-      attrib * a = a_find(u->ship->attribs, &at_speedup);
-      if (a==NULL) {
-        a = a_add(&u->ship->attribs, a_new(&at_speedup));
-        a->data.sa[0] = 50; /* speed */
-        a->data.sa[1] = 50; /* decay */
-        ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit", u));
-        /* Ticket abziehen */
-        i_change(&u->items, itype, -1);
-        return 0;
-      } else {
-        cmistake(u, ord, 211, MSG_EVENT);
-      }
-    } else {
-      cmistake(u, ord, 144, MSG_EVENT);
-    }
+  curse  *c;
+  variant effect;
+  ship * sh = u->ship;
+  if (!sh) {
+    cmistake(u, ord, 20, MSG_MOVE);
+    return -1;
   }
-#endif
-  unused(amount);
-  unused(itype);
-  return EUNUSABLE;
+
+  effect.i = SPEEDSAIL_EFFECT;
+  c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect, 0);
+  curse_setflag(c, CURSE_NOAGE);
+
+  ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit speed", u, SPEEDSAIL_EFFECT));
+  itype->rtype->uchange(u, itype->rtype, -1);
+
+  return 0;
 }
 /* END speedsail */
 
