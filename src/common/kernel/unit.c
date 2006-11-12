@@ -229,7 +229,7 @@ destroy_unit(unit * u)
       }
       if (*p_item == item) p_item=&item->next;
     }
-    if (u->items && strlen(u->faction->passw)>0) {
+    if (u->items && (u->faction==NULL || strlen(u->faction->passw)>0)) {
       distribute_items(u);
     }
   }
