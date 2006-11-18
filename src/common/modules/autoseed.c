@@ -674,13 +674,13 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
   
   if (rlist) {
 #define MINOCEANDIST 3
+#define MAXOCEANDIST 6
 #define MAXFILLDIST 10
 #define SPECIALCHANCE 80
     region_list ** rbegin = &rlist;
-    int i;
     int special = 1;
-    
-    for (i=0;i!=MINOCEANDIST;++i) {
+    int oceandist = MINOCEANDIST + (rng_int() % (MAXOCEANDIST-MINOCEANDIST));
+    while (oceandist--) {
       region_list ** rend = rbegin;
       while (*rend) rend=&(*rend)->next;
       while (rbegin!=rend) {
@@ -698,7 +698,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
             } else {
               special = 1;
             }
-						terraform_region(rn, terrain);
+            terraform_region(rn, terrain);
             /* the new region has an extra 15% chance to have laen */
             if (rng_int() % 100 < 15) rsetlaen(r, 5 + rng_int() % 5);
             /* the new region has an extra 20% chance to have mallorn */
