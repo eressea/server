@@ -579,6 +579,7 @@ load_inifile(const char * filename)
     g_resourcedir = iniparser_getstr(d, "common:res");
     xmlfile = iniparser_getstr(d, "common:xml");
     luafile = iniparser_getstr(d, "eressea:run");
+    quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
   }
   inifile = d;
 }

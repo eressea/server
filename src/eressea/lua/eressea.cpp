@@ -144,13 +144,6 @@ get_direction(const char * name)
   return NODIRECTION;
 }
 
-int
-lua_writereport(faction * f)
-{
-  time_t ltime = time(0);
-  return write_reports(f, ltime);
-}
-
 static void
 lua_equipunit(unit& u, const char * eqname)
 {
