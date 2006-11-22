@@ -10,6 +10,7 @@ SubDirHdrs $(SUBDIR)/.. ;
 UsingLua ;
 UsingLuabind ;
 
+SEARCH_SOURCE += [ FDirName $(TOP) common iniparser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
 SubDirC++Flags -DHAVE_LUA ;
@@ -39,6 +40,7 @@ SHARED_BINDINGS =
 
 LUASERVER_SOURCES =
  $(SHARED_BINDINGS)
+ <common!iniparser>iniparser.c
  <lua>script.cpp
  <lua>gamecode.cpp
  server.cpp
@@ -48,6 +50,7 @@ LUASERVER_SOURCES =
 
 GMTOOL_SOURCES =
  $(SHARED_BINDINGS)
+ <common!iniparser>iniparser.c
  <lua>gm.cpp
  <curses>listbox.c
  console.c

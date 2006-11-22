@@ -93,6 +93,9 @@
 # include <util/dl/malloc.h>
 #endif
 
+/* external iniparser */
+#include <iniparser/iniparser.h>
+
 /* lua includes */
 #include "lua/bindings.h"
 #include "lua/script.h"
@@ -566,6 +569,20 @@ my_lua_error(lua_State * L)
   return 1;
 }
 
+static dictionary * inifile;
+static void
+load_inifile(const char * filename)
+{
+  dictionary * d = iniparser_new(filename);
+  if (d) {
+    g_basedir = iniparser_getstr(d, "common:base");
+    g_resourcedir = iniparser_getstr(d, "common:res");
+    xmlfile = iniparser_getstr(d, "common:xml");
+    luafile = iniparser_getstr(d, "eressea:run");
+  }
+  inifile = d;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -595,9 +612,10 @@ main(int argc, char *argv[])
 #ifdef CRTDBG
   init_crtdbg();
 #endif
-
+  
   lua_State * luaState = lua_init();
   global.vm_state = luaState;
+  load_inifile("eressea.ini");
   if ((i=read_args(argc, argv, luaState))!=0) return i;
 
   kernel_init();
@@ -640,6 +658,8 @@ main(int argc, char *argv[])
   setlocale(LC_NUMERIC, lc_numeric);
   free(lc_ctype);
   free(lc_numeric);
+
+  if (inifile) iniparser_free(inifile);
 
   return 0;
 }

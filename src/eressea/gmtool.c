@@ -58,6 +58,8 @@
 #include <util/log.h>
 #include <util/base36.h>
 
+#include <iniparser/iniparser.h>
+
 #include <string.h>
 #include <locale.h>
 
@@ -72,10 +74,10 @@ typedef struct window {
   int update;
 } window;
 
-extern char * g_reportdir;
-extern char * g_datadir;
-extern char * g_basedir;
-extern char * g_resourcedir;
+extern const char * g_reportdir;
+extern const char * g_datadir;
+extern const char * g_basedir;
+extern const char * g_resourcedir;
 
 static int g_quit;
 static const char * g_logfile = "gmtool.log";
@@ -1288,6 +1290,19 @@ curses_readline(lua_State * L, const char * prompt)
   }
 }
 
+static dictionary * inifile;
+static void
+load_inifile(const char * filename)
+{
+  dictionary * d = iniparser_new(filename);
+  if (d) {
+    g_basedir = iniparser_getstr(d, "common:base");
+    g_resourcedir = iniparser_getstr(d, "common:res");
+    xmlfile = iniparser_getstr(d, "common:xml");
+  }
+  inifile = d;
+}
+
 int
 gmmain(int argc, char *argv[])
 {
@@ -1306,6 +1321,9 @@ gmmain(int argc, char *argv[])
   global.data_version = RELEASE_VERSION;
 
   kernel_init();
+  
+  load_inifile("eressea.ini");
+
   i = read_args(argc, argv);
   if (i!=0) return i;
   game_init();
@@ -1328,6 +1346,8 @@ gmmain(int argc, char *argv[])
 
   free(lc_ctype);
   free(lc_numeric);
+  
+  if (inifile) iniparser_free(inifile);
 
   return 0;
 }
