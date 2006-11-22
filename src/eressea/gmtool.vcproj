@@ -280,6 +280,12 @@
 			RelativePath=".\gmtool.c">
 		</File>
 		<File
+			RelativePath="..\common\iniparser\iniparser.c">
+		</File>
+		<File
+			RelativePath="..\common\iniparser\iniparser.h">
+		</File>
+		<File
 			RelativePath=".\curses\listbox.c">
 		</File>
 	</Files>

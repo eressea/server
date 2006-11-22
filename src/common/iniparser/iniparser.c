@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "iniparser.h"
 
@@ -170,9 +169,9 @@ static void * mem_double(void * ptr, int size)
 
 static unsigned dictionary_hash(const char * key)
 {
-    int         len ;
-    unsigned    hash ;
-    int         i ;
+    size_t len ;
+    unsigned int   hash ;
+    unsigned int i;
 
     len = strlen(key);
     for (hash=0, i=0 ; i<len ; i++) {

@@ -561,6 +561,12 @@
 			RelativePath=".\console.h">
 		</File>
 		<File
+			RelativePath="..\common\iniparser\iniparser.c">
+		</File>
+		<File
+			RelativePath="..\common\iniparser\iniparser.h">
+		</File>
+		<File
 			RelativePath=".\korrektur.c">
 			<FileConfiguration
 				Name="Release|Win32">

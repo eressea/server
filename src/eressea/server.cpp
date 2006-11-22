@@ -124,10 +124,10 @@
 ** global variables we are importing from other modules
 **/
 extern "C" {
-  extern char * g_reportdir;
-  extern char * g_datadir;
-  extern char * g_basedir;
-  extern char * g_resourcedir;
+  extern const char * g_reportdir;
+  extern const char * g_datadir;
+  extern const char * g_basedir;
+  extern const char * g_resourcedir;
 
   extern boolean nonr;
   extern boolean nosh;
