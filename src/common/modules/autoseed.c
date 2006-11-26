@@ -629,6 +629,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       assert(r->land && r->units==0);
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                                   nextf->lang, nextf->subscription));
+      fix_demand(r);
       f = u->faction;
       fset(f, FFL_ISNEW);
 			f->alliance = nextf->allies;
@@ -662,11 +663,6 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
     }
   }
 
-  if (r!=NULL) {
-    /* reicht das? */
-    fix_demand(r);
-  }
-  
   if (nsize!=0) {
     log_error(("Could not place all factions on the same island as requested\n"));
   }
