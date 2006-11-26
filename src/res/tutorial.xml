@@ -70,12 +70,12 @@
   <xi:include href="eressea/dungeons.xml"/>
   <strings>
     <string name="mailto">
-      <text locale="en">tutorial@eressea.upb.de</text>
-      <text locale="de">tutorial@eressea.upb.de</text>
+      <text locale="en">tutorial@eressea.de</text>
+      <text locale="de">tutorial@eressea.de</text>
     </string>
     <string name="newbie_info_1">
-      <text locale="en">Remember to send your orders to tutorial@eressea.upb.de with the subject ERESSEA ORDERS.</text>
-      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an tutorial@eressea.upb.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
+      <text locale="en">Remember to send your orders to tutorial@eressea.de with the subject ERESSEA ORDERS.</text>
+      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an tutorial@eressea.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
     </string>
     <string name="mailcmd">
       <text locale="de">ERESSEA BEFEHLE</text>
