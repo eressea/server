@@ -4005,10 +4005,10 @@ processorders (void)
 #ifdef HEROES
   add_proc_order(p, K_PROMOTION, &promotion_cmd, false, "Heldenbeförderung");
 #endif
+  add_proc_order(p, K_NUMBER, &renumber_cmd, false, "Neue Nummern (Einheiten)");
 
   p+=10;
   add_proc_global(p, &renumber_factions, "Neue Nummern");
-  add_proc_order(p, K_NUMBER, &renumber_cmd, false, "Neue Nummern (Einheiten)");
 
   process();
   /*************************************************/
