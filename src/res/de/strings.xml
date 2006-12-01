@@ -6581,6 +6581,11 @@
       <text locale="en">dark </text>
     </string>
 
+    <string name="black">
+      <text locale="de">Schwarz</text>
+      <text locale="en">black </text>
+    </string>
+
     <string name="Licht">
       <text locale="de">Licht</text>
       <text locale="en">light </text>
