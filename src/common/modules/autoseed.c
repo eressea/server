@@ -197,7 +197,7 @@ read_newfactions(const char * filename)
     email[0] = '\0';
     password[0] = '\0';
 
-    sscanf(buf, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance);
+    if (sscanf(buf, "%54s %20s %8s %d %d %16s %d", email, race, lang, &bonus, &subscription, password, &alliance)<6) break;
     if (email[0]=='\0') break;
     if (password[0]=='\0') {
       strcpy(password, itoa36(rng_int()));
