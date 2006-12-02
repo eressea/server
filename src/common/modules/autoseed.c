@@ -636,8 +636,8 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
 			log_printf("New faction (%s), %s at %s\n", itoa36(f->no),
 								 f->email, regionname(r, NULL));
       if (f->subscription) {
-        sql_print(("UPDATE subscriptions SET status='ACTIVE', faction='%s', lastturn=%d, password='%s' WHERE id=%u;\n",
-          factionid(f), f->lastorders, f->override, f->subscription));
+        sql_print(("UPDATE subscriptions SET status='ACTIVE', faction='%s', firstturn=%d, lastturn=%d, password='%s' WHERE id=%u;\n",
+          factionid(f), f->lastorders, f->lastorders, f->override, f->subscription));
       }
 
       /* remove duplicate email addresses */

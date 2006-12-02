@@ -2519,7 +2519,7 @@ remove_empty_factions(boolean writedropouts)
         }
       }
       if (f->subscription) {
-        sql_print(("UPDATE subscriptions set status='DEAD' where id=%u\n;",
+        sql_print(("UPDATE subscriptions set status='DEAD' where id=%u;\n",
                    f->subscription));
       }
 
