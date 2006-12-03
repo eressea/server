@@ -74,8 +74,8 @@ function process(orders)
   plan_monsters()
 
   local nmrs = get_nmrs(1)
-  if nmrs >= 70 then
-    print("Shit. More than 70 factions with 1 NMR (" .. nmrs .. ")")
+  if nmrs >= 80 then
+    print("Shit. More than 80 factions with 1 NMR (" .. nmrs .. ")")
     write_summary()
     return -1
   end

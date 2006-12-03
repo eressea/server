@@ -7018,12 +7018,12 @@ sp_break_curse(castorder *co)
       remove_curse(ap, c);
 
       ADDMSG(&mage->faction->msgs, msg_message(
-        "destroy_magic_effect", "unit region command id target",
+        "destroy_curse_effect", "unit region command id target",
         mage, mage->region, co->order, strdup(pa->param[1]->data.s),
         strdup(ts)));
     } else {
       ADDMSG(&mage->faction->msgs, msg_message(
-        "destroy_magic_noeffect", "unit region command",
+        "destroy_curse_noeffect", "unit region command",
         mage, mage->region, co->order));
     }
   }

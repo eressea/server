@@ -536,9 +536,18 @@ factionorders(void)
   char b[16];
   char * fid = strnzcpy(b, getstrtoken(), 15);
   const char * pass = getstrtoken();
-  faction *f;
-  
+  faction *f = NULL;
+
+#ifdef FUZZY_BASE36
+  int id = atoi36(fid);
+  if (id!=0) f = findfaction(id);
+  if (f==NULL) {
+    id = atoi(fid);
+    if (id!=0) f = findfaction(id);
+  }
+#else  
   f = findfaction(atoi36(fid));
+#endif
   
   if (f!=NULL) {
     /* Kontrolliere, ob das Passwort richtig eingegeben wurde. Es
