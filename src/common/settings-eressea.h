@@ -45,4 +45,4 @@
 #define WORMHOLE_MODULE
 #define XECMD_MODULE
 
-#define FUZZY_BASE36
+#undef FUZZY_BASE36
