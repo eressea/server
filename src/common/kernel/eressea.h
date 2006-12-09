@@ -805,8 +805,6 @@ typedef struct ally {
 	int status;
 } ally;
 
-#define FF_NEWID (1<<0) /* Die Partei hat bereits einmal ihre no gewechselt */
-
 void remove_empty_units_in_region(struct region *r);
 void remove_empty_units(void);
 void remove_empty_factions(boolean writedropouts);

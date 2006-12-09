@@ -34,6 +34,7 @@ typedef struct shortpwd {
 #endif
 
 /* faction flags */
+#define FFL_NEWID (1<<0) /* Die Partei hat bereits einmal ihre no gewechselt */  
 #define FFL_ISNEW         (1<<1)
 #define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
@@ -46,7 +47,7 @@ typedef struct shortpwd {
 #define FFL_NOTIMEOUT     (1<<29) /* ignore MaxAge() */
 #define FFL_GM            (1<<30) /* eine Partei mit Sonderrechten */
 
-#define FFL_SAVEMASK (FFL_GM|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
+#define FFL_SAVEMASK (FFL_NEWID|FFL_GM|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
 
 typedef struct faction {
 	struct faction *next;

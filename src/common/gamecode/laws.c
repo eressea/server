@@ -2642,7 +2642,7 @@ renumber_factions(void)
 
     if (!a) continue;
     want = a->data.i;
-    if (fval(f, FF_NEWID)) {
+    if (fval(f, FFL_NEWID)) {
       sprintf(buf, "NUMMER PARTEI %s: Die Partei kann nicht mehr als einmal ihre Nummer wecheln", itoa36(want));
       addmessage(0, f, buf, MSG_MESSAGE, ML_IMPORTANT);
     }
@@ -2685,7 +2685,7 @@ renumber_factions(void)
     funhash(f);
     f->no = rp->want;
     fhash(f);
-    fset(f, FF_NEWID);
+    fset(f, FFL_NEWID);
   }
   while (renum) {
     rp = renum->next;
