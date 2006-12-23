@@ -40,6 +40,13 @@
     </item>
   </resource>
 
+<!-- xmas 2006 -->
+  <resource name="xmastree" appearance="vial">
+    <item weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
 <!-- art rewards -->
   <resource name="trappedairelemental">
     <item weight="0">

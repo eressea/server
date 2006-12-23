@@ -33,6 +33,7 @@ function run_scripts()
     "eressea/xmas2004.lua",
     "eressea/10years.lua",
     "eressea/xmas2005.lua",
+    "eressea/xmas2006.lua",
     "eressea/embassy.lua",
     "eressea/ents.lua"
   }

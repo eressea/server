@@ -150,6 +150,10 @@
       <text locale="de">Dieses Abzeichen identifiziert die Partei seines Trägers offiziell
         als einen Besucher der Botschafterregion 'Muschelplateau'.</text>
     </string>
+    <string name="xmastree">
+      <text locale="de">Dieser wunderschoen geschmueckte Baum entfaltet in den Wintermonaten eine magsiche Wirkung auf den ganzen Wald.</text>
+      <text locale="en">In the winter months, this beautifully decorated tree has a mgical effect on the entire forest.</text>
+    </string>
     <string name="stardust">
       <text locale="de">Dieser magische Staub ist aus einem im Winter vom Himmel gefallenen
          Stern gewonnen worden, und ihm werden aphrodisiakische Eigenschaften
