@@ -2552,31 +2552,29 @@ plant_cmd(unit *u, struct order * ord)
 static void
 breedhorses(region *r, unit *u)
 {
-	int n, c;
-	int gezuechtet = 0;
-	struct building * b = inside_building(u);
-	const struct building_type * btype = b?b->type:NULL;
+  int n, c;
+  int gezuechtet = 0;
+  struct building * b = inside_building(u);
+  const struct building_type * btype = b?b->type:NULL;
+  
+  if (btype!=bt_find("stables")) {
+    cmistake(u, u->thisorder, 122, MSG_PRODUCE);
+    return;
+  }
+  if (get_item(u, I_HORSE) < 2) {
+    cmistake(u, u->thisorder, 107, MSG_PRODUCE);
+    return;
+  }
+  n = min(u->number * eff_skill(u, SK_HORSE_TRAINING, r), get_item(u, I_HORSE));
 
-	if (btype!=bt_find("stables")) {
-		cmistake(u, u->thisorder, 122, MSG_PRODUCE);
-		return;
-	}
-	if (get_item(u, I_HORSE) < 2) {
-		cmistake(u, u->thisorder, 107, MSG_PRODUCE);
-		return;
-	}
-	n = min(u->number * eff_skill(u, SK_HORSE_TRAINING, r), get_item(u, I_HORSE));
-
-	for (c = 0; c < n; c++) {
-		if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
-			i_change(&u->items, olditemtype[I_HORSE], 1);
-			gezuechtet++;
-		}
-	}
-
-	if (gezuechtet > 0) {
-		produceexp(u, SK_HORSE_TRAINING, u->number);
-	}
+  for (c = 0; c < n; c++) {
+    if (rng_int() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
+      i_change(&u->items, olditemtype[I_HORSE], 1);
+      gezuechtet++;
+    }
+  }
+  
+  produceexp(u, SK_HORSE_TRAINING, u->number);
 
   ADDMSG(&u->faction->msgs, msg_message("raised", 
     "unit amount", u, gezuechtet));
@@ -2585,42 +2583,42 @@ breedhorses(region *r, unit *u)
 static void
 breed_cmd(unit *u, struct order * ord)
 {
-	int m;
-	const char *s;
-	param_t p;
+  int m;
+  const char *s;
+  param_t p;
   region *r = u->region;
 
-	/* züchte [<anzahl>] <parameter> */
+  /* züchte [<anzahl>] <parameter> */
   init_tokens(ord);
   skip_token();
-	s = getstrtoken();
+  s = getstrtoken();
 
   m = atoi(s);
-	sprintf(buf, "%d", m);
-	if (!strcmp(buf, s)) {
-		/* first came a want-paramter */
-		s = getstrtoken();
-	} else {
-		m = INT_MAX;
-	}
-
-	if(!s[0]){
-		p = P_ANY;
-	} else {
-		p = findparam(s, u->faction->locale);
-	}
-
-	switch (p) {
-		case P_HERBS:
-			plant(r, u, m);
-			return;
-		case P_TREES:
-			breedtrees(r, u, m);
-			return;
-		default:
-			breedhorses(r, u);
-			return;
-	}
+  sprintf(buf, "%d", m);
+  if (!strcmp(buf, s)) {
+    /* first came a want-paramter */
+    s = getstrtoken();
+  } else {
+    m = INT_MAX;
+  }
+  
+  if(!s[0]){
+    p = P_ANY;
+  } else {
+    p = findparam(s, u->faction->locale);
+  }
+  
+  switch (p) {
+  case P_HERBS:
+    plant(r, u, m);
+    return;
+  case P_TREES:
+    breedtrees(r, u, m);
+    return;
+  default:
+    breedhorses(r, u);
+    return;
+  }
 }
 
 static const char *
