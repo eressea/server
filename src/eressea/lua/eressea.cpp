@@ -39,6 +39,7 @@ using namespace luabind;
 static int
 lua_addequipment(const char * eqname, const char * iname, const char * value)
 {
+  if (iname==NULL) return -1;
   const struct item_type * itype = it_find(iname);
   if (itype==NULL) return -1;
   equipment_setitem(create_equipment(eqname), itype, value);

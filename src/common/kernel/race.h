@@ -118,23 +118,24 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 
 #define RCF_MOVERANDOM     (1<<4)
 #define RCF_CANNOTMOVE     (1<<5)
-#define RCF_LEARN          (1<<6) 	/* Lernt automatisch wenn struct faction == 0 */
-#define RCF_FLY            (1<<7)   /* kann fliegen */
-#define RCF_SWIM           (1<<8)   /* kann schwimmen */
-#define RCF_WALK           (1<<9)   /* kann über Land gehen */
-#define RCF_NOLEARN        (1<<10) 	/* kann nicht normal lernen */
-#define RCF_NOTEACH        (1<<11) 	/* kann nicht lehren */
-#define RCF_HORSE          (1<<12)  /* Einheit ist Pferd, sozusagen */
-#define RCF_DESERT         (1<<13)  /* 5% Chance, das Einheit desertiert */
-#define RCF_ILLUSIONARY    (1<<14)	/* (Illusion & Spell) Does not drop items. */
-#define RCF_ABSORBPEASANTS (1<<15)  /* Tötet und absorbiert Bauern */
-#define RCF_NOHEAL         (1<<16)  /* Einheit kann nicht geheilt werden */
-#define RCF_NOWEAPONS      (1<<17)  /* Einheit kann keine Waffen benutzen */
-#define RCF_SHAPESHIFT     (1<<18)	/* Kann TARNE RASSE benutzen. */
-#define RCF_SHAPESHIFTANY  (1<<19)	/* Kann TARNE RASSE "string" benutzen. */
-#define RCF_UNDEAD         (1<<20)	/* Undead. */
-#define RCF_DRAGON         (1<<21)	/* Drachenart (für Zauber)*/
-#define RCF_COASTAL        (1<<22)  /* kann in Landregionen an der Küste sein */
+#define RCF_LEARN          (1<<6)  /* Lernt automatisch wenn struct faction == 0 */
+#define RCF_FLY            (1<<7)  /* kann fliegen */
+#define RCF_SWIM           (1<<8)  /* kann schwimmen */
+#define RCF_WALK           (1<<9)  /* kann über Land gehen */
+#define RCF_NOLEARN        (1<<10) /* kann nicht normal lernen */
+#define RCF_NOTEACH        (1<<11) /* kann nicht lehren */
+#define RCF_HORSE          (1<<12) /* Einheit ist Pferd, sozusagen */
+#define RCF_DESERT         (1<<13) /* 5% Chance, das Einheit desertiert */
+#define RCF_ILLUSIONARY    (1<<14) /* (Illusion & Spell) Does not drop items. */
+#define RCF_ABSORBPEASANTS (1<<15) /* Tötet und absorbiert Bauern */
+#define RCF_NOHEAL         (1<<16) /* Einheit kann nicht geheilt werden */
+#define RCF_NOWEAPONS      (1<<17) /* Einheit kann keine Waffen benutzen */
+#define RCF_SHAPESHIFT     (1<<18) /* Kann TARNE RASSE benutzen. */
+#define RCF_SHAPESHIFTANY  (1<<19) /* Kann TARNE RASSE "string" benutzen. */
+#define RCF_UNDEAD         (1<<20) /* Undead. */
+#define RCF_DRAGON         (1<<21) /* Drachenart (für Zauber)*/
+#define RCF_COASTAL        (1<<22) /* kann in Landregionen an der Küste sein */
+#define RCF_UNARMEDGUARD   (1<<23) /* kann ohne Waffen bewachen */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */

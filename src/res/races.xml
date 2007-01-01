@@ -644,7 +644,7 @@
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="mountainguard" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes" giveitem="yes">
+  <race name="mountainguard" unarmedguard="yes" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes" giveitem="yes">
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>

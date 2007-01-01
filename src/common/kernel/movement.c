@@ -850,13 +850,13 @@ bewegung_blockiert_von(unit * reisender, region * r)
 static boolean
 is_guardian(unit * u2, unit *u, unsigned int mask)
 {
-	if (u2->faction == u->faction) return false;
-	if ((getguard(u2) & mask) == 0) return false;
+  if (u2->faction == u->faction) return false;
+  if ((getguard(u2) & mask) == 0) return false;
   if (u2->number == 0) return false;
   if (alliedunit(u2, u->faction, HELP_GUARD)) return false;
   if (ucontact(u2, u)) return false;
   if (besieged(u2)) return false;
-  if (!armedmen(u2)) return false;
+  if (!armedmen(u2) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
   if (!cansee(u2->faction, u->region, u, 0)) return false;
   
   return true;
@@ -865,11 +865,11 @@ is_guardian(unit * u2, unit *u, unsigned int mask)
 unit *
 is_guarded(region * r, unit * u, unsigned int mask)
 {
-	unit *u2;
+  unit *u2;
 
-	for (u2 = r->units; u2; u2 = u2->next)
-		if (is_guardian(u2, u, mask)) return u2;
-	return NULL;
+  for (u2 = r->units; u2; u2 = u2->next)
+    if (is_guardian(u2, u, mask)) return u2;
+  return NULL;
 }
 
 static const char *shortdirections[MAXDIRECTIONS] =

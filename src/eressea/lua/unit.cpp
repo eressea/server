@@ -114,9 +114,11 @@ unit_getnumber(const unit& u)
 static int
 unit_getitem(const unit& u, const char * iname)
 {
-  const item_type * itype = it_find(iname);
-  if (itype!=NULL) {
-    return i_get(u.items, itype);
+  if (iname!=NULL) {
+    const item_type * itype = it_find(iname);
+    if (itype!=NULL) {
+      return i_get(u.items, itype);
+    }
   }
   return -1;
 }
@@ -124,6 +126,13 @@ unit_getitem(const unit& u, const char * iname)
 static int
 unit_additem(unit& u, const char * iname, int number)
 {
+  if (iname!=NULL) {
+    const item_type * itype = it_find(iname);
+    if (itype!=NULL) {
+      item * i = i_change(&u.items, itype, number);
+      return i?i->number:0;
+    } // if (itype!=NULL)
+  }
   const item_type * itype = it_find(iname);
   if (itype!=NULL) {
     item * i = i_change(&u.items, itype, number);

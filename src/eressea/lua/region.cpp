@@ -296,11 +296,13 @@ region_items(const region& r) {
 static int
 region_additem(region& r, const char * iname, int number)
 {
-  const item_type * itype = it_find(iname);
-  if (itype!=NULL && r.land) {
-    item * i = i_change(&r.land->items, itype, number);
-    return i?i->number:0;
-  } // if (itype!=NULL)
+  if (iname!=NULL) {
+    const item_type * itype = it_find(iname);
+    if (itype!=NULL && r.land) {
+      item * i = i_change(&r.land->items, itype, number);
+      return i?i->number:0;
+    } // if (itype!=NULL)
+  }
   return -1;
 }
 

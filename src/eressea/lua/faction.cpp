@@ -161,11 +161,13 @@ faction_delete_variable(faction& f, const char *key)
 static int
 faction_additem(faction& f, const char * iname, int number)
 {
-  const item_type * itype = it_find(iname);
-  if (itype!=NULL) {
-    item * i = i_change(&f.items, itype, number);
-    return i?i->number:0;
-  } // if (itype!=NULL)
+  if (iname!=NULL) {
+    const item_type * itype = it_find(iname);
+    if (itype!=NULL) {
+      item * i = i_change(&f.items, itype, number);
+      return i?i->number:0;
+    } // if (itype!=NULL)
+  }
   return -1;
 }
 

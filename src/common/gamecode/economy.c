@@ -1195,7 +1195,7 @@ can_guard(const unit * guard, const unit * u)
 {
   if (fval(guard, UFL_ISNEW)) return false;
   if (guard->number<=0 || !cansee(guard->faction, guard->region, u, 0)) return false;
-  if (besieged(guard) || !armedmen(guard)) return false;
+  if (besieged(guard) || !(fval(guard->race, RCF_UNARMEDGUARD) || armedmen(guard))) return false;
 
   return !alliedunit(guard, u->faction, HELP_GUARD);
 }
@@ -1208,92 +1208,91 @@ enum {
 static void
 allocate_resource(unit * u, const resource_type * rtype, int want)
 {
-	const item_type * itype = resource2item(rtype);
-	region * r = u->region;
-	int busy = u->number;
-	int dm = 0;
-	allocation_list * alist;
-	allocation * al;
+  const item_type * itype = resource2item(rtype);
+  region * r = u->region;
+  int busy = u->number;
+  int dm = 0;
+  allocation_list * alist;
+  allocation * al;
   attrib * a = a_find(rtype->attribs, &at_resourcelimit);
   resource_limit * rdata = (resource_limit*)a->data.v;
   int amount, skill;
 
-	/* momentan kann man keine ressourcen abbauen, wenn man dafür
-	* Materialverbrauch hat: */
-	assert(itype!=NULL && (itype->construction==NULL || itype->construction->materials==NULL));
+  /* momentan kann man keine ressourcen abbauen, wenn man dafür
+   * Materialverbrauch hat: */
+  assert(itype!=NULL && (itype->construction==NULL || itype->construction->materials==NULL));
   assert(rdata!=NULL);
-
+  
   if (rdata->limit!=NULL) {
     int avail = rdata->limit(r, rtype);
     if (avail<=0) {
       cmistake(u, u->thisorder, 121, MSG_PRODUCE);
       return;
     }
-
   }
-
+  
   if (itype == olditemtype[I_LAEN]) {
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-		if (btype != bt_find("mine")) {
-			cmistake(u, u->thisorder, 104, MSG_PRODUCE);
-			return;
-		}
-	}
-
-	if (besieged(u)) {
-		cmistake(u, u->thisorder, 60, MSG_PRODUCE);
-		return;
-	}
-
+    struct building * b = inside_building(u);
+    const struct building_type * btype = b?b->type:NULL;
+    if (btype != bt_find("mine")) {
+      cmistake(u, u->thisorder, 104, MSG_PRODUCE);
+      return;
+    }
+  }
+  
+  if (besieged(u)) {
+    cmistake(u, u->thisorder, 60, MSG_PRODUCE);
+    return;
+  }
+  
   if (rdata->guard!=0) {
     unit * u2;
-		for (u2 = r->units; u2; u2 = u2->next) {
-			if ((getguard(u2) & rdata->guard) && can_guard(u2, u)) {
+    for (u2 = r->units; u2; u2 = u2->next) {
+      if ((getguard(u2) & rdata->guard) && can_guard(u2, u)) {
         ADDMSG(&u->faction->msgs,
-          msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
+               msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
         return;
       }
-		}
-	}
-
-	/* Bergwächter können Abbau von Eisen/Laen durch Bewachen verhindern.
-	* Als magische Wesen 'sehen' Bergwächter alles und werden durch
-	* Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
-	*/
-	if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN]) {
+    }
+  }
+  
+  /* Bergwächter können Abbau von Eisen/Laen durch Bewachen verhindern.
+   * Als magische Wesen 'sehen' Bergwächter alles und werden durch
+   * Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
+   */
+  if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN]) {
     unit * u2;
-		for (u2 = r->units; u2; u2 = u2->next ) {
-			if (getguard(u) & GUARD_MINING
-				&& !fval(u2, UFL_ISNEW)
-				&& u2->number
-				&& !alliedunit(u2, u->faction, HELP_GUARD))
-			{
-				ADDMSG(&u->faction->msgs,
-					msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
-				return;
-			}
-		}
-	}
-
-	assert(itype->construction->skill!=0 || "limited resource needs a required skill for making it");
-	skill = eff_skill(u, itype->construction->skill, u->region);
-	if (skill == 0) {
-		skill_t sk = itype->construction->skill;
-		add_message(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
-		return;
-	}
-	if (skill < itype->construction->minskill) {
-		skill_t sk = itype->construction->skill;
-		add_message(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "manufacture_skills", "skill minskill product",
-			sk, itype->construction->minskill, itype->rtype));
-		return;
-	} else {
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-
+    for (u2 = r->units; u2; u2 = u2->next ) {
+      if (getguard(u) & GUARD_MINING
+          && !fval(u2, UFL_ISNEW)
+          && u2->number
+          && !alliedunit(u2, u->faction, HELP_GUARD))
+      {
+        ADDMSG(&u->faction->msgs,
+               msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
+        return;
+      }
+    }
+  }
+  
+  assert(itype->construction->skill!=0 || "limited resource needs a required skill for making it");
+  skill = eff_skill(u, itype->construction->skill, u->region);
+  if (skill == 0) {
+    skill_t sk = itype->construction->skill;
+    add_message(&u->faction->msgs,
+                msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
+    return;
+  }
+  if (skill < itype->construction->minskill) {
+    skill_t sk = itype->construction->skill;
+    add_message(&u->faction->msgs,
+                msg_feedback(u, u->thisorder, "manufacture_skills", "skill minskill product",
+                             sk, itype->construction->minskill, itype->rtype));
+    return;
+  } else {
+    struct building * b = inside_building(u);
+    const struct building_type * btype = b?b->type:NULL;
+    
     if (rdata->modifiers) {
       resource_mod * mod = rdata->modifiers;
       for (;mod->flags!=0;++mod) {
@@ -1306,51 +1305,51 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
         }
       }
     } else if (itype == olditemtype[I_IRON] && btype == bt_find("mine")) {
-			++skill;
-		}
-		else if (itype == olditemtype[I_STONE] && btype == bt_find("quarry")) {
-			++skill;
-		}
-	}
-	amount = skill * u->number;
-	/* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
-
-	/* mit Flinkfingerring verzehnfacht sich die Produktion */
-	amount += skill * min(u->number, get_item(u,I_RING_OF_NIMBLEFINGER)) * 9;
-
-	/* Schaffenstrunk: */
-	if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-		dm = min(dm, u->number);
-		change_effect(u, oldpotiontype[P_DOMORE], -dm);
-		amount += dm * skill;	/* dm Personen produzieren doppelt */
-	}
-
-	amount /= itype->construction->minskill;
-
-	/* Limitierung durch Parameter m. */
-	if (want > 0 && want < amount) amount = want;
-
-	busy = (amount + skill - 1) / skill; /* wieviel leute tun etwas? */
-
-	alist = allocations;
-	while (alist && alist->type!=rtype) alist = alist->next;
-	if (!alist) {
-		alist = calloc(sizeof(struct allocation_list), 1);
-		alist->next = allocations;
-		alist->type = rtype;
-		allocations = alist;
-	}
-	al = new_allocation();
-	al->want = amount;
-	al->save = 1.0;
-	al->next = alist->data;
-	al->unit = u;
-	alist->data = al;
-
+      ++skill;
+    }
+    else if (itype == olditemtype[I_STONE] && btype == bt_find("quarry")) {
+      ++skill;
+    }
+  }
+  amount = skill * u->number;
+  /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
+  
+  /* mit Flinkfingerring verzehnfacht sich die Produktion */
+  amount += skill * min(u->number, get_item(u,I_RING_OF_NIMBLEFINGER)) * 9;
+  
+  /* Schaffenstrunk: */
+  if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
+    dm = min(dm, u->number);
+    change_effect(u, oldpotiontype[P_DOMORE], -dm);
+    amount += dm * skill;	/* dm Personen produzieren doppelt */
+  }
+  
+  amount /= itype->construction->minskill;
+  
+  /* Limitierung durch Parameter m. */
+  if (want > 0 && want < amount) amount = want;
+  
+  busy = (amount + skill - 1) / skill; /* wieviel leute tun etwas? */
+  
+  alist = allocations;
+  while (alist && alist->type!=rtype) alist = alist->next;
+  if (!alist) {
+    alist = calloc(sizeof(struct allocation_list), 1);
+    alist->next = allocations;
+    alist->type = rtype;
+    allocations = alist;
+  }
+  al = new_allocation();
+  al->want = amount;
+  al->save = 1.0;
+  al->next = alist->data;
+  al->unit = u;
+  alist->data = al;
+  
   if (rdata->modifiers) {
     struct building * b = inside_building(u);
     const struct building_type * btype = b?b->type:NULL;
-
+    
     resource_mod * mod = rdata->modifiers;
     for (;mod->flags!=0;++mod) {
       if (mod->flags & RMF_SAVEMATERIAL) {
@@ -1362,21 +1361,21 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
       }
     }
   } else if (itype==olditemtype[I_IRON]) {
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-		if (btype==bt_find("mine"))
-			al->save *= 0.5;
-		if (u->race == new_race[RC_DWARF]) {
-			al->save *= 0.75;
-		}
-	} else if (itype==olditemtype[I_STONE]) {
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-		if (btype==bt_find("quarry"))
-			al->save = al->save*0.5;
-		if (u->race == new_race[RC_TROLL])
-			al->save = al->save*0.75;
-	}
+    struct building * b = inside_building(u);
+    const struct building_type * btype = b?b->type:NULL;
+    if (btype==bt_find("mine"))
+      al->save *= 0.5;
+    if (u->race == new_race[RC_DWARF]) {
+      al->save *= 0.75;
+    }
+  } else if (itype==olditemtype[I_STONE]) {
+    struct building * b = inside_building(u);
+    const struct building_type * btype = b?b->type:NULL;
+    if (btype==bt_find("quarry"))
+      al->save = al->save*0.5;
+    if (u->race == new_race[RC_TROLL])
+      al->save = al->save*0.75;
+  }
 }
 
 static int
