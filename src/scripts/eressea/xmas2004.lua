@@ -11,9 +11,9 @@ end
 
 function xmas2004()
   if get_gamename() == "Eressea" then
-    if not get_flag("xm04") then
+    if not get_key("xm04") then
       print("Es weihnachtet sehr (2004)")
-      set_flag("xm04", true)
+      set_key("xm04", true)
       for f in factions() do
         f:add_item("speedsail", 1)
         f:add_notice("santa2004")

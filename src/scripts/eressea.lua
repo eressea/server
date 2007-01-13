@@ -85,6 +85,7 @@ function process(orders)
   process_orders()
 
   -- post-turn updates:
+  update_xmas2006()
   update_embassies()
   update_guards()
   update_scores()
