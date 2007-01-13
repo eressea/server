@@ -13,6 +13,8 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <attributes/key.h>
+
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -306,6 +308,27 @@ region_additem(region& r, const char * iname, int number)
   return -1;
 }
 
+static bool
+region_getkey(region& r, const char * name)
+{
+  int flag = atoi36(name);
+  attrib * a = find_key(r.attribs, flag);
+  return (a!=NULL);
+}
+
+static void
+region_setkey(region& r, const char * name, bool value)
+{
+  int flag = atoi36(name);
+  attrib * a = find_key(r.attribs, flag);
+  if (a==NULL && value) {
+    add_key(&r.attribs, flag);
+  } else if (a!=NULL && !value) {
+    a_remove(&r.attribs, a);
+  }
+}
+
+
 void
 bind_region(lua_State * L)
 {
@@ -325,6 +348,9 @@ bind_region(lua_State * L)
     .property("terrain", &region_getterrain)
     .def("add_notice", &region_addnotice)
     .def("add_direction", &region_adddirection)
+
+    .def("get_key", &region_getkey)
+    .def("set_key", &region_setkey)
 
     .def("get_flag", &region_getflag)
     .def("set_flag", &region_setflag)

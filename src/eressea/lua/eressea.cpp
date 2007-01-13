@@ -70,7 +70,7 @@ find_plane_id(const char * name)
 }
 
 static bool
-get_flag(const char * name)
+get_key(const char * name)
 {
   int flag = atoi36(name);
   attrib * a = find_key(global.attribs, flag);
@@ -78,7 +78,7 @@ get_flag(const char * name)
 }
 
 static void
-set_flag(const char * name, bool value)
+set_key(const char * name, bool value)
 {
   int flag = atoi36(name);
   attrib * a = find_key(global.attribs, flag);
@@ -252,8 +252,8 @@ bind_eressea(lua_State * L)
     def("set_string", &lua_setstring),
     def("get_string", &lua_getstring),
 
-    def("set_flag", &set_flag),
-    def("get_flag", &get_flag),
+    def("set_key", &set_key),
+    def("get_key", &get_key),
 
     def("get_gamename", &get_gamename),
     /* planes not really implemented */
