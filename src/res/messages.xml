@@ -1563,6 +1563,10 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier verfängt sich in seinem eigenen Zauber."</text>
   </message>
+  <message name="xmastree_effect" section="magic">
+    <text locale="de">"In der Region erstrahlen des Nachts bunte Lichter, Gloeckchen klingeln und frohes Kindergelaechter klingt durch den Wald."</text>
+    <text locale="en">"At night, colourful lights can be seen in this region, bells are a-ringing and the laughter of happy children seems to be everywhere in the forests."</text>
+  </message>
   <message name="weakmagic" section="magic">
     <type>
       <arg name="unit" type="unit"/>
