@@ -9,6 +9,7 @@
 
 // kernel includes
 #include <kernel/alliance.h>
+#include <kernel/calendar.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -224,6 +225,14 @@ is_function(struct lua_State * luaState, const char * fname)
   return false;
 }
 
+static const char *
+get_season(void)
+{
+  gamedate gd;
+  get_gamedate(turn, &gd);
+  return seasonnames[gd.season];
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -233,6 +242,7 @@ bind_eressea(lua_State * L)
     def("dice_roll", &dice_rand),
     def("equipment_setitem", &lua_addequipment),
     def("get_turn", &get_turn),
+    def("get_season", &get_season),
     def("get_nmrs", &get_nmrs),
     def("remove_empty_units", &remove_empty_units),
 
