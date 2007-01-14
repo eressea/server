@@ -41,7 +41,7 @@
   </resource>
 
 <!-- xmas 2006 -->
-  <resource name="xmastree" appearance="vial">
+  <resource name="xmastree">
     <item weight="0">
       <function name="use" value="lua_useitem"/>
     </item>
