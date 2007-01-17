@@ -168,7 +168,7 @@ print_items(FILE * F, item * items, const struct locale * lang)
 
   for (itm=items; itm; itm=itm->next) {
     int in = itm->number;
-    const char * ic = resourcename(itm->type->rtype, in);
+    const char * ic = resourcename(itm->type->rtype, 0);
     if (itm==items) fputs("GEGENSTAENDE\n", F);
     fprintf(F, "%d;%s\n", in, add_translation(ic, LOC(lang, ic)));
   }
