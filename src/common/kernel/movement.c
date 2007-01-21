@@ -2106,35 +2106,35 @@ mk_piracy(const faction * pirate, const faction * target, direction_t target_dir
 static void
 piracy_cmd(unit *u, struct order * ord)
 {
-	region *r = u->region;
-	ship *sh = u->ship, *sh2;
-	direction_t dir, target_dir = NODIRECTION;
+  region *r = u->region;
+  ship *sh = u->ship, *sh2;
+  direction_t dir, target_dir = NODIRECTION;
   struct {
     const faction * target;
     int value;
   } aff[MAXDIRECTIONS];
-	int         saff = 0;
-	int					*il = NULL;
-	const char *s;
-	attrib      *a;
-
-	if (!sh) {
-		cmistake(u, ord, 144, MSG_MOVE);
-		return;
-	}
-
-	if (!fval(u, UFL_OWNER)) {
-		cmistake(u, ord, 146, MSG_MOVE);
-		return;
-	}
-
-	/* Feststellen, ob schon ein anderer alliierter Pirat ein
-	 * Ziel gefunden hat. */
-
-
+  int         saff = 0;
+  int					*il = NULL;
+  const char *s;
+  attrib      *a;
+  
+  if (!sh) {
+    cmistake(u, ord, 144, MSG_MOVE);
+    return;
+  }
+  
+  if (!fval(u, UFL_OWNER)) {
+    cmistake(u, ord, 146, MSG_MOVE);
+    return;
+  }
+  
+  /* Feststellen, ob schon ein anderer alliierter Pirat ein
+   * Ziel gefunden hat. */
+  
+  
   init_tokens(ord);
   skip_token();
-	s = getstrtoken();
+  s = getstrtoken();
   if (s!=NULL && *s) {
     il = intlist_init();
     while (s && *s) {
@@ -2143,33 +2143,34 @@ piracy_cmd(unit *u, struct order * ord)
     }
   }
 
-	for (a = a_find(r->attribs, &at_piracy_direction); a && a->type==&at_piracy_direction; a=a->next) {
+  for (a = a_find(r->attribs, &at_piracy_direction); a && a->type==&at_piracy_direction; a=a->next) {
     piracy_data * data = a->data.v;
-		const faction * p = data->pirate;
+    const faction * p = data->pirate;
     const faction * t = data->target;
 
-		if (alliedunit(u, p, HELP_FIGHT) && (il == 0 || intlist_find(il, t->no))) {
-			target_dir = data->dir;
-			break;
-		}
-	}
+    if (alliedunit(u, p, HELP_FIGHT)) {
+      if (il == 0 || (t && intlist_find(il, t->no))) {
+        target_dir = data->dir;
+        break;
+      }
+    }
+  }
 
-	/* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
+  /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
-	if (target_dir == NODIRECTION) {
+  if (target_dir == NODIRECTION) {
+    /* Einheit ist also Kapitän. Jetzt gucken, in wievielen
+     * Nachbarregionen potentielle Opfer sind. */
 
-		/* Einheit ist also Kapitän. Jetzt gucken, in wievielen
-		 * Nachbarregionen potentielle Opfer sind. */
-
-		for(dir = 0; dir < MAXDIRECTIONS; dir++) {
-			region *rc = rconnect(r, dir);
-			aff[dir].value = 0;
+    for(dir = 0; dir < MAXDIRECTIONS; dir++) {
+      region *rc = rconnect(r, dir);
+      aff[dir].value = 0;
       aff[dir].target = 0;
-			if (rc && fval(rc->terrain, SWIM_INTO)
-					&& check_takeoff(sh, r, rc) == true) {
-
-				for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
-					unit * cap = shipowner(sh2);
+      if (rc && fval(rc->terrain, SWIM_INTO)
+          && check_takeoff(sh, r, rc) == true) {
+        
+        for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
+          unit * cap = shipowner(sh2);
           if (cap) {
             faction * f = visible_faction(cap->faction, cap);
             if (alliedunit(u, f, HELP_FIGHT)) continue;
@@ -2180,46 +2181,46 @@ piracy_cmd(unit *u, struct order * ord)
               }
             }
           }
-				}
+        }
 
-				/* Und aufaddieren. */
-				saff += aff[dir].value;
-			}
-		}
-
-		if (saff != 0) {
-			saff = rng_int() % saff;
-			for (dir=0; dir!=MAXDIRECTIONS; ++dir) {
-				if (saff!=aff[dir].value) break;
-				saff -= aff[dir].value;
-			}
-			target_dir = dir;
+        /* Und aufaddieren. */
+        saff += aff[dir].value;
+      }
+    }
+    
+    if (saff != 0) {
+      saff = rng_int() % saff;
+      for (dir=0; dir!=MAXDIRECTIONS; ++dir) {
+        if (saff!=aff[dir].value) break;
+        saff -= aff[dir].value;
+      }
+      target_dir = dir;
       a = a_add(&r->attribs, mk_piracy(u->faction, aff[dir].target, target_dir));
-		}
-	}
-
-	free(il);
-
-	/* Wenn kein Ziel gefunden, entsprechende Meldung generieren */
-	if (target_dir == NODIRECTION) {
-		ADDMSG(&u->faction->msgs, msg_message("piratenovictim", 
-      "ship region", sh, r));
-		return;
-	}
-
-	/* Meldung generieren */
-	ADDMSG(&u->faction->msgs, msg_message("piratesawvictim",
-    "ship region dir", sh, r, target_dir));
-
-	/* Befehl konstruieren */
-	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
-		locale_string(u->faction->locale, directions[target_dir]));
-	set_order(&u->thisorder, parse_order(buf, u->faction->locale));
-
-	/* Bewegung ausführen */
+    }
+  }
+  
+  free(il);
+  
+  /* Wenn kein Ziel gefunden, entsprechende Meldung generieren */
+  if (target_dir == NODIRECTION) {
+    ADDMSG(&u->faction->msgs, msg_message("piratenovictim", 
+                                          "ship region", sh, r));
+    return;
+  }
+  
+  /* Meldung generieren */
+  ADDMSG(&u->faction->msgs, msg_message("piratesawvictim",
+                                        "ship region dir", sh, r, target_dir));
+  
+  /* Befehl konstruieren */
+  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+          locale_string(u->faction->locale, directions[target_dir]));
+  set_order(&u->thisorder, parse_order(buf, u->faction->locale));
+  
+  /* Bewegung ausführen */
   init_tokens(u->thisorder);
   skip_token();
-	move(u, true);
+  move(u, true);
 }
 
 static void

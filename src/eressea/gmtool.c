@@ -102,12 +102,13 @@ usage(const char * prog, const char * arg)
     "-b basedir       : gibt das basisverzeichnis an\n"
     "-d datadir       : gibt das datenverzeichnis an\n"
     "-r resdir        : gibt das resourceverzeichnis an\n"
-    "-t turn          : read this datafile, not the most current one\n"
+    "-t turn          : read this datafile\n"
     "-v               : be verbose\n"
     "-l logfile       : write messages to <logfile>\n"
     "--xml xmlfile    : read settings from <xmlfile>.\n"
     "--lomem          : save RAM\n"
     "--color          : force color mode\n"
+    "--current        : read the most current datafile\n"
     "--help           : help\n", prog);
   return -1;
 }
@@ -146,6 +147,8 @@ read_args(int argc, char **argv)
         lomem = true;
       } else if (strcmp(argv[i]+2, "color")==0) {
         force_color = 1;
+      } else if (strcmp(argv[i]+2, "current")==0) {
+        turn = -1;
       } else if (strcmp(argv[i]+2, "help")==0)
         return usage(argv[0], NULL);
       else
@@ -185,6 +188,17 @@ read_args(int argc, char **argv)
         }
       }
     }
+  }
+  if (turn==-1) {
+    char fname[MAX_PATH];
+    sprintf(fname, "%s/turn", basepath());
+    FILE * F = fopen(fname, "r+");
+    if (F) {
+      fgets(fname, sizeof(fname), F);
+      turn = atoi(fname);
+      fclose(F);
+    }
+    else turn = 0;
   }
   return 0;
 }
