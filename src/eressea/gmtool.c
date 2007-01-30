@@ -191,8 +191,10 @@ read_args(int argc, char **argv)
   }
   if (turn==-1) {
     char fname[MAX_PATH];
+    FILE *  F;
+
     sprintf(fname, "%s/turn", basepath());
-    FILE * F = fopen(fname, "r+");
+    F = fopen(fname, "r+");
     if (F) {
       fgets(fname, sizeof(fname), F);
       turn = atoi(fname);
