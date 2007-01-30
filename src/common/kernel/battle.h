@@ -79,7 +79,7 @@ extern "C" {
 
 #define SIDE_STEALTH   1<<0
 #ifdef SIMPLE_COMBAT
-#define SIDE_ATTACKER  1<<1
+#define SIDE_HASGUARDS  1<<1
 #endif
   typedef struct side {
     struct side * next; /* nächstes Heer in der Schlacht */

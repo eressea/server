@@ -69,7 +69,6 @@
 
 #define dbgprintf(a) fprintf a;
 static FILE *bdebug;
-#undef COUNT_DF
 #undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
 #define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
@@ -1995,15 +1994,6 @@ attack(battle *b, troop ta, const att *a, int numattack)
             td = select_opponent(b, ta, melee_range[0], melee_range[1]);
           }
           if (!td.fighter) return;
-#ifdef COUNT_DF
-          if (td.fighter->person[td.index].last_action < b->turn) {
-            td.fighter->person[td.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-            td.fighter->action_counter++;
-            td.fighter->side->bf->lastturn = b->turn;
-#endif
-          }
-#endif
           if (ta.fighter->person[ta.index].last_action < b->turn) {
             ta.fighter->person[ta.index].last_action = b->turn;
 #ifndef SIMPLE_COMBAT
@@ -2034,15 +2024,6 @@ attack(battle *b, troop ta, const att *a, int numattack)
   case AT_NATURAL:
     td = select_opponent(b, ta, melee_range[0], melee_range[1]);
     if (!td.fighter) return;
-#ifdef COUNT_DF
-    if(td.fighter->person[td.index].last_action < b->turn) {
-      td.fighter->person[td.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      td.fighter->action_counter++;
-      td.fighter->side->bf->lastturn = b->turn;
-#endif
-    }
-#endif
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
 #ifndef SIMPLE_COMBAT
@@ -2057,15 +2038,6 @@ attack(battle *b, troop ta, const att *a, int numattack)
   case AT_DRAIN_ST:
     td = select_opponent(b, ta, melee_range[0], melee_range[1]);
     if (!td.fighter) return;
-#ifdef COUNT_DF
-    if(td.fighter->person[td.index].last_action < b->turn) {
-      td.fighter->person[td.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      td.fighter->action_counter++;
-      td.fighter->side->bf->lastturn = b->turn;
-#endif
-    }
-#endif
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
 #ifndef SIMPLE_COMBAT
@@ -2088,15 +2060,6 @@ attack(battle *b, troop ta, const att *a, int numattack)
   case AT_DRAIN_EXP:
     td = select_opponent(b, ta, melee_range[0], melee_range[1]);
     if (!td.fighter) return;
-#ifdef COUNT_DF
-    if(td.fighter->person[td.index].last_action < b->turn) {
-      td.fighter->person[td.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      td.fighter->action_counter++;
-      td.fighter->side->bf->lastturn = b->turn;
-#endif
-    }
-#endif
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
 #ifndef SIMPLE_COMBAT
@@ -2111,15 +2074,6 @@ attack(battle *b, troop ta, const att *a, int numattack)
   case AT_DAZZLE:
     td = select_opponent(b, ta, melee_range[0], melee_range[1]);
     if (!td.fighter) return;
-#ifdef COUNT_DF
-    if(td.fighter->person[td.index].last_action < b->turn) {
-      td.fighter->person[td.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      td.fighter->action_counter++;
-      td.fighter->side->bf->lastturn = b->turn;
-#endif
-    }
-#endif
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
 #ifndef SIMPLE_COMBAT
@@ -2918,7 +2872,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   assert(u->number);
   if (fval(u, UFL_PARTEITARNUNG)!=0) flags |= SIDE_STEALTH;
 #ifdef SIMPLE_COMBAT
-  if (attack) flags |= SIDE_ATTACKER;
+  if (attack) flags |= SIDE_HASGUARDS;
 #endif
   if (!init) {
     it_demonseye = it_find("demonseye");
