@@ -194,8 +194,9 @@ destroy_unit(unit * u)
 {
   region *r = u->region;
   boolean zombie = false;
+#if 0
   unit *clone;
-  
+#endif  
   if (!ufindhash(u->no)) return;
   
   if (!fval(u->race, RCF_ILLUSIONARY)) {
