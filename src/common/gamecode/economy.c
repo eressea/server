@@ -1619,7 +1619,7 @@ create_item(unit * u, const item_type * itype, int want)
 	}
 }
 
-static void
+int
 make_cmd(unit * u, struct order * ord)
 {
   region * r = u->region;
@@ -1631,7 +1631,7 @@ make_cmd(unit * u, struct order * ord)
 	const char *s;
   const struct locale * lang = u->faction->locale;
   
-  if (u->number==0) return;
+  if (u->number==0) return 0;
 
   init_tokens(ord);
   skip_token();
@@ -1653,30 +1653,31 @@ make_cmd(unit * u, struct order * ord)
 	* aufruf von make geeicht */
 
 	if (p == P_ROAD) {
-		direction_t d;
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
 			cmistake(u, ord, 275, MSG_PRODUCE);
-			return;
-		}
-		d = finddirection(getstrtoken(), u->faction->locale);
-		if (d!=NODIRECTION) {
-			if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-				cmistake(u, ord, 94, MSG_PRODUCE);
-				return;
-			}
-			build_road(r, u, m, d);
-		} else cmistake(u, ord, 71, MSG_PRODUCE);
-		return;
+    } else {
+      direction_t d = finddirection(getstrtoken(), u->faction->locale);
+      if (d!=NODIRECTION) {
+        if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+          cmistake(u, ord, 94, MSG_PRODUCE);
+          return 0;
+        }
+        build_road(r, u, m, d);
+      } else {
+        cmistake(u, ord, 71, MSG_PRODUCE);
+      }
+    }
+		return 0;
 	} else if (p == P_SHIP) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
 			cmistake(u, ord, 276, MSG_PRODUCE);
-			return;
-		}
-		continue_ship(r, u, m);
-		return;
+    } else {
+      continue_ship(r, u, m);
+    }
+		return 0;
 	} else if (p == P_HERBS) {
 		herbsearch(r, u, m);
-		return;
+		return 0;
 	}
 
   /* since the string can match several objects, like in 'academy' and
@@ -1714,27 +1715,23 @@ make_cmd(unit * u, struct order * ord)
 	if (stype != NOSHIP) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
 			cmistake(u, ord, 276, MSG_PRODUCE);
-			return;
-		}
-		create_ship(r, u, stype, m, ord);
-		return;
-	}
-
-	if (btype != NOBUILDING) {
+    } else {
+      create_ship(r, u, stype, m, ord);
+    }
+	} else	if (btype != NOBUILDING) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
 			cmistake(u, ord, 94, MSG_PRODUCE);
-			return;
-		}
-		build_building(u, btype, m, ord);
-		return;
+    } else {
+      build_building(u, btype, m, ord);
+    }
 	}
-
-	if (itype!=NULL) {
+	else if (itype!=NULL) {
 		create_item(u, itype, m);
-		return;
-	}
+  } else {
+    cmistake(u, ord, 125, MSG_PRODUCE);
+  }
 
-	cmistake(u, ord, 125, MSG_PRODUCE);
+  return 0;
 }
 /* ------------------------------------------------------------- */
 
@@ -3131,9 +3128,6 @@ produce(void)
         continue;
 
       switch (todo) {
-        case K_MAKE:
-          make_cmd(u, u->thisorder);
-          break;
 
         case K_ENTERTAIN:
           entertain_cmd(u, u->thisorder);

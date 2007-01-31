@@ -53,6 +53,7 @@ void produce(void);
 enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC };
 void maintain_buildings(struct region * r, boolean crash);
 extern void add_spende(struct faction * f1, struct faction * f2, int betrag, struct region * r);
+extern int make_cmd(struct unit * u, struct order * ord);
 
 #ifdef __cplusplus
 }

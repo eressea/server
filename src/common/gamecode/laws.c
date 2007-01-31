@@ -3101,7 +3101,9 @@ ageing(void)
   /* altern spezieller Attribute, die eine Sonderbehandlung brauchen?  */
   for(r=regions;r;r=r->next) {
     unit *u;
-    for(u=r->units;u;u=u->next) {
+
+    a_age(&r->attribs);
+    for (u=r->units;u;u=u->next) {
       /* Goliathwasser */
       int i = get_effect(u, oldpotiontype[P_STRONG]);
       if (i > 0){
@@ -3944,7 +3946,7 @@ processorders (void)
   add_proc_region(p, &do_siege, "Belagern");
 
   p+=10; /* can't allow reserve before siege (weapons) */
-  add_proc_region(p, &enter_2, "Kontaktieren & Betreten (2. Versuch)");
+  add_proc_region(p, &enter_1, "Kontaktieren & Betreten (2. Versuch)");
   add_proc_order(p, K_RESERVE, &reserve_cmd, false, "Reservieren");
   add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
 
@@ -3969,7 +3971,8 @@ processorders (void)
   add_proc_order(p, K_STUDY, &learn_cmd, true, "Lernen");
 
   p+=10;
-  add_proc_global(p, &produce, "Produktion, Handel, Rekruten");
+  add_proc_order(p, K_MAKE, &make_cmd, true, "Produktion");
+  add_proc_global(p, &produce, "Arbeiten, Handel, Rekruten");
 
   p+=10;
   add_proc_region(p, &enter_2, "Kontaktieren & Betreten (3. Versuch)");
