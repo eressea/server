@@ -2203,13 +2203,13 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
 {
   side *s1 = calloc(sizeof(struct side), 1);
   bfaction * bf;
-  unit * u;
 
 #ifdef SIMPLE_COMBAT
   if (!fval(b->region->terrain, LAND_REGION)) {
     /* in ozeanregionen ist jeder kampf kurz */
     flags |= SIDE_HASGUARDS;
   } else {
+    unit * u;
     for (u = b->region->units; u; u = u->next) {
       if (getguard(u)) {
         faction *fv = visible_faction(f, u);
