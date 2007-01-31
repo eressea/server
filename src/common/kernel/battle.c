@@ -1494,6 +1494,15 @@ do_combatmagic(battle *b, combatmagic_t was)
   }
 }
 
+static void
+combat_action(fighter * af, int turn)
+{
+#ifndef SIMPLE_COMBAT
+  af->action_counter++;
+  af->side->bf->lastturn = turn;
+#endif
+}
+
 
 static void
 do_combatspell(troop at)
@@ -1565,10 +1574,7 @@ do_combatspell(troop at)
     level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
     if (level > 0) {
       pay_spell(mage, sp, level, 1);
-#ifndef SIMPLE_COMBAT
-      at.fighter->action_counter++;
-      at.fighter->side->bf->lastturn = b->turn;
-#endif
+      combat_action(at.fighter, b->turn);
     }
   }
 }
@@ -1978,10 +1984,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
           af->catmsg += dead;
           if (!standard_attack && af->person[ta.index].last_action < b->turn) {
             af->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-            af->action_counter++;
-            af->side->bf->lastturn = b->turn;
-#endif
+            combat_action(af, b->turn);
           }
         }
         if (standard_attack) {
@@ -1996,10 +1999,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
           if (!td.fighter) return;
           if (ta.fighter->person[ta.index].last_action < b->turn) {
             ta.fighter->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-            ta.fighter->action_counter++;
-            ta.fighter->side->bf->lastturn = b->turn;
-#endif
+            combat_action(ta.fighter, b->turn);
           }
           reload = true;
           if (hits(ta, td, wp)) {
@@ -2026,10 +2026,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
     if (!td.fighter) return;
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      ta.fighter->action_counter++;
-      ta.fighter->side->bf->lastturn = b->turn;
-#endif
+      combat_action(ta.fighter, b->turn);
     }
     if (hits(ta, td, NULL)) {
       terminate(td, ta, a->type, a->data.dice, false);
@@ -2040,10 +2037,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
     if (!td.fighter) return;
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      ta.fighter->action_counter++;
-      ta.fighter->side->bf->lastturn = b->turn;
-#endif
+      combat_action(ta.fighter, b->turn);
     }
     if (hits(ta, td, NULL)) {
       int c = dice_rand(a->data.dice);
@@ -2062,10 +2056,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
     if (!td.fighter) return;
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      ta.fighter->action_counter++;
-      ta.fighter->side->bf->lastturn = b->turn;
-#endif
+      combat_action(ta.fighter, b->turn);
     }
     if (hits(ta, td, NULL)) {
       drain_exp(td.fighter->unit, dice_rand(a->data.dice));
@@ -2076,10 +2067,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
     if (!td.fighter) return;
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      ta.fighter->action_counter++;
-      ta.fighter->side->bf->lastturn = b->turn;
-#endif
+      combat_action(ta.fighter, b->turn);
     }
     if (hits(ta, td, NULL)) {
       dazzle(b, &td);
@@ -2090,10 +2078,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
     if (!td.fighter) return;
     if(ta.fighter->person[ta.index].last_action < b->turn) {
       ta.fighter->person[ta.index].last_action = b->turn;
-#ifndef SIMPLE_COMBAT
-      ta.fighter->action_counter++;
-      ta.fighter->side->bf->lastturn = b->turn;
-#endif
+      combat_action(ta.fighter, b->turn);
     }
     if (td.fighter->unit->ship) {
       td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
@@ -2212,11 +2197,29 @@ static int nextside = 0;
 /** add a new army to the conflict
  * beware: armies need to be added _at the beginning_ of the list because 
  * otherwise join_allies() will get into trouble */
-side *
+static side *
 make_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction *stealthfaction)
 {
   side *s1 = calloc(sizeof(struct side), 1);
   bfaction * bf;
+  unit * u;
+
+#ifdef SIMPLE_COMBAT
+  if (!fval(b->region->terrain, LAND_REGION)) {
+    /* in ozeanregionen ist jeder kampf kurz */
+    flags |= SIDE_HASGUARDS;
+  } else {
+    for (u = b->region->units; u; u = u->next) {
+      if (getguard(u)) {
+        faction *fv = visible_faction(f, u);
+        if (alliedunit(u, fv, HELP_GUARD)) {
+          flags |= SIDE_HASGUARDS;
+          break;
+        }
+      }
+    }
+  }
+#endif
 
   s1->battle = b;
   s1->group = g;
@@ -2413,9 +2416,10 @@ aftermath(battle * b)
   for (s=b->sides;s;s=s->next) {
     int snumber = 0;
     fighter *df;
-#ifndef SIMPLE_COMBAT
     boolean relevant = false; /* Kampf relevant für diese Partei? */
-
+#ifdef SIMPLE_COMBAT
+    if (fval(s, SIDE_HASGUARDS) == 0) relevant = true;
+#else
     if (s->bf->lastturn>1) {
       relevant = true;
     } else if (s->bf->lastturn==1 && b->has_tactics_turn) {
@@ -2436,9 +2440,19 @@ aftermath(battle * b)
       int sum_hp = 0;
       int n;
 
+      for (n = 0; n != df->alive; ++n) {
+        if (df->person[n].hp > 0) {
+          sum_hp += df->person[n].hp;
+        }
+      }
       snumber += du->number;
 #ifdef SIMPLE_COMBAT
-      if (battle_was_relevant) {
+      if (relevant) {
+        /* didn't have any help from the guards, so combat is long */
+        fset(du, UFL_NOTMOVING|UFL_LONGACTION);
+      }
+      if (sum_hp<du->hp) {
+        /* someone on the ship got damaged, damage the ship */
         ship * sh = du->ship?du->ship:leftship(du);
         if (sh) fset(sh, SF_DAMAGED);
       }
@@ -2452,11 +2466,6 @@ aftermath(battle * b)
         }
       }
 #endif
-      for (n = 0; n != df->alive; ++n) {
-        if (df->person[n].hp > 0) {
-          sum_hp += df->person[n].hp;
-        }
-      }
 
       if (df->alive == du->number) {
         du->hp = sum_hp;
@@ -2563,39 +2572,43 @@ aftermath(battle * b)
     msg_release(seen);
     msg_release(unseen);
   }
-  /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
-  * schonmal Schaden genommen hat. (moved und drifted
-  * sollten in flags überführt werden */
-
-  for (s=b->sides; s; s=s->next) {
-    fighter *df;
-    for (df=s->fighters; df; df=df->next) {
-      unit *du = df->unit;
-      item * l;
-
-      for (l=df->loot; l; l=l->next) {
-        const item_type * itype = l->type;
-        sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
-          l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
-        fbattlerecord(b, du->faction, buf);
-        i_change(&du->items, itype, l->number);
-      }
-
-      /* Wenn sich die Einheit auf einem Schiff befindet, wird
-      * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
-      * evt. zuvor verlassen wurde. */
-
-      if (du->ship) sh = du->ship; else sh = leftship(du);
-
-      if (sh && fval(sh, SF_DAMAGED) && b->turn+(b->has_tactics_turn?1:0)>2) {
-        damage_ship(sh, 0.20);
-        freset(sh, SF_DAMAGED);
-      }
-    }
-  }
 
   if (battle_was_relevant) {
     ship **sp = &r->ships;
+
+    /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
+    * schonmal Schaden genommen hat. (moved und drifted
+    * sollten in flags überführt werden */
+
+    for (s=b->sides; s; s=s->next) {
+      fighter *df;
+      for (df=s->fighters; df; df=df->next) {
+        unit *du = df->unit;
+        item * l;
+
+        for (l=df->loot; l; l=l->next) {
+          const item_type * itype = l->type;
+          sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
+            l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
+          fbattlerecord(b, du->faction, buf);
+          i_change(&du->items, itype, l->number);
+        }
+
+        /* Wenn sich die Einheit auf einem Schiff befindet, wird
+        * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
+        * evt. zuvor verlassen wurde. */
+
+        if (du->ship) sh = du->ship; else sh = leftship(du);
+
+        if (sh && fval(sh, SF_DAMAGED)) {
+          int n = b->turn - 1;
+          if (n>0) {
+            damage_ship(sh, 0.05 * n);
+          }
+        }
+      }
+    }
+
     while (*sp) {
       ship * sh = *sp;
       freset(sh, SF_DAMAGED);
@@ -2871,9 +2884,6 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 
   assert(u->number);
   if (fval(u, UFL_PARTEITARNUNG)!=0) flags |= SIDE_STEALTH;
-#ifdef SIMPLE_COMBAT
-  if (attack) flags |= SIDE_HASGUARDS;
-#endif
   if (!init) {
     it_demonseye = it_find("demonseye");
     init=true;
@@ -2899,7 +2909,9 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     }
 
     /* aliances are moved out of make_fighter and will be handled later */
-    if (!s1) s1 = make_side(b, u->faction, g, flags, stealthfaction);
+    if (!s1) {
+      s1 = make_side(b, u->faction, g, flags, stealthfaction);
+    }
     /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
     * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
   }
@@ -3714,9 +3726,6 @@ init_battle(region * r, battle **bp)
               }
             }
             /* Ende Fehlerbehandlung */
-#ifdef SIMPLE_COMBAT
-            fset(u, UFL_LONGACTION);
-#endif
             if (b==NULL) {
               unit * utmp;
               for (utmp=r->units; utmp!=NULL; utmp=utmp->next) {

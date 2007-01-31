@@ -1721,7 +1721,7 @@ parse_messages(xmlDocPtr doc)
     /* arguments */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "type/arg", xpath);
-    if (result->nodesetval->nodeNr>0) {
+    if (result->nodesetval && result->nodesetval->nodeNr>0) {
       argv = malloc(sizeof(char*)*(result->nodesetval->nodeNr+1));
       for (k=0;k!=result->nodesetval->nodeNr;++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
