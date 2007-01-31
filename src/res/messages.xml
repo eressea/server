@@ -3605,6 +3605,26 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot transport us to this place."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot transport us to this place."</text>
   </message>
+  <message name="entrance_besieged" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $building($building) wird belagert."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $building($building) is under siege."</text>
+  </message>
+  <message name="entrance_denied" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Eintritt in $building($building) wurde verwehrt."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Entrance to $building($building) was denied."</text>
+  </message>
   <message name="error229" section="errors">
     <type>
       <arg name="unit" type="unit"/>

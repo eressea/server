@@ -1210,16 +1210,13 @@ enter_building(unit * u, order * ord, int id, boolean report)
   }
   if (!mayenter(r, u, b)) {
     if (report) {
-      sprintf(buf, "Der Eintritt in %s wurde verwehrt",
-        buildingname(b));
-      mistake(u, ord, buf, MSG_MOVE);
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied", "building", b));
     }
     return false;
   }
   if (!slipthru(r, u, b)) {
     if (report) {
-      sprintf(buf, "%s wird belagert", buildingname(b));
-      mistake(u, ord, buf, MSG_MOVE);
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged", "building", b));
     }
     return false;
   }
