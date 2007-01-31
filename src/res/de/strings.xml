@@ -202,9 +202,9 @@
     </string>
     <string name="speedsail">
       <text locale="de">Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
-      sich dessen Reichweite kurzfristig um 50 Regionen.</text>
-      <text locale="en">A unit setting this sail on a ship temporarily increases the
-      ship's range by 50 regions.</text>
+      sich dessen Reichweite permanent um 1 Region.</text>
+      <text locale="en">A unit setting this sail on a ship temporarily will permanently
+      increase the ship's range by 1.</text>
     </string>
     <string name="mistletoe">
       <text locale="de">Im Mistelzweig ruht eine magische
@@ -6799,11 +6799,3 @@
   </string>
 
 </strings>
-
-
-
-
-
-
-
-
