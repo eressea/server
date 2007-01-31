@@ -36,7 +36,7 @@ extern "C" {
 #define FLEE_ROW 4
 #define LAST_ROW (NUMROWS-1)
 #define FIRST_ROW FIGHT_ROW
-#define MAXSIDES 256 /* if there are ever more than this, we're fucked. */
+#define MAXSIDES 128 /* if there are ever more than this, we're fucked. */
 
   struct message;
 
@@ -91,8 +91,8 @@ extern "C" {
 # define E_ENEMY 1
 # define E_FRIEND 2
 # define E_ATTACKING 4
-    unsigned char relations[128];
-    struct side * enemies[128];
+    unsigned char relations[MAXSIDES];
+    struct side * enemies[MAXSIDES];
     struct fighter * fighters;
     int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
     int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */

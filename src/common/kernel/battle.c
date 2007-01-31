@@ -290,14 +290,15 @@ static void
 set_enemy(side * as, side * ds, boolean attacking)
 {
   int i;
-  for (i=0;i!=128;++i) {
+  for (i=0;i!=MAXSIDES;++i) {
     if (ds->enemies[i]==NULL) ds->enemies[i]=as;
     if (ds->enemies[i]==as) break;
   }
-  for (i=0;i!=128;++i) {
+  for (i=0;i!=MAXSIDES;++i) {
     if (as->enemies[i]==NULL) as->enemies[i]=ds;
     if (as->enemies[i]==ds) break;
   }
+  assert(i!=MAXSIDES);
   ds->relations[as->index] |= E_ENEMY;
   as->relations[ds->index] |= E_ENEMY;
   if (attacking) as->relations[ds->index] |= E_ATTACKING;
@@ -2236,6 +2237,7 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
       s1->nextF = bf->sides;
       bf->sides = s1;
       ++b->nsides;
+      assert(b->nsides<=MAXSIDES);
       break;
     }
   }
@@ -2901,7 +2903,14 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   if (s1==NULL) {
     for (s2 = b->sides; s2; s2 = s2->next) {
       if (s2->bf->faction == u->faction && s2->group==g) {
-        if (s2->flags==flags && s2->stealthfaction==stealthfaction) {
+#ifdef SIMPLE_COMBAT
+        int s1flags = flags|SIDE_HASGUARDS;
+        int s2flags = s2->flags|SIDE_HASGUARDS;
+#else
+        int s1flags = flags;
+        int s2flags = s2->flags;
+#endif
+        if (s1flags==s2flags && s2->stealthfaction==stealthfaction) {
           s1 = s2;
           break;
         }
