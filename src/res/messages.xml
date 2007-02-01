@@ -6184,6 +6184,15 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
   </message>
+  <message name="wormhole_requirements" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) kann in $region($region) nicht durch das Wurmloch reisen, da die Einheit entweder zu gross ist oder teure Talente besitzt."</text>
+    <text locale="fr">"$unit($unit) cannot travel through the wormhole in $region($region) because the unit is either too big or has restricted skills."</text>
+    <text locale="en">"$unit($unit) cannot travel through the wormhole in $region($region) because the unit is either too big or has restricted skills."</text>
+  </message>
   <message name="wormhole_exit" section="events">
     <type>
       <arg name="unit" type="unit"/>

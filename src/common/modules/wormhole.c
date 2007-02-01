@@ -1,10 +1,10 @@
 /* vi: set ts=2:
- +-------------------+  
+ +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
  | Eressea PBEM host |  Enno Rehling <enno@eressea-pbem.de>
  | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
  |                   |
- +-------------------+  
+ +-------------------+
 
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
@@ -53,13 +53,13 @@ typedef struct wormhole_data {
   building * exit;
 } wormhole_data;
 
-static void 
+static void
 wormhole_init(struct attrib *a)
 {
   a->data.v = calloc(1, sizeof(wormhole_data));
 }
 
-static void 
+static void
 wormhole_done(struct attrib * a)
 {
   free(a->data.v);
@@ -74,18 +74,20 @@ wormhole_age(struct attrib * a)
   unit * u = r->units;
 
   for (;u!=NULL && maxtransport!=0;u=u->next) {
-    message * m;
-    if (u->number>maxtransport) continue;
-    if (teure_talente(u)) continue;
-    if (u->building!=data->entry) continue;
-
-    if (data->exit!=NULL) {
-      move_unit(u, data->exit->region, NULL);
-      maxtransport -= u->number;
-      m = msg_message("wormhole_exit", "unit region", u, data->exit->region);
-      add_message(&data->exit->region->msgs, m);
-      add_message(&u->faction->msgs, m);
-      msg_release(m);
+    if (u->building==data->entry) {
+      message * m = NULL;
+      if (u->number>maxtransport || teure_talente(u)) {
+        m = msg_message("wormhole_requirements", "unit region", u, u->region);
+      } else if (data->exit!=NULL) {
+        move_unit(u, data->exit->region, NULL);
+        maxtransport -= u->number;
+        m = msg_message("wormhole_exit", "unit region", u, data->exit->region);
+        add_message(&data->exit->region->msgs, m);
+      }
+      if (m!=NULL) {
+        add_message(&u->faction->msgs, m);
+        msg_release(m);
+      }
     }
   }
 
@@ -99,7 +101,7 @@ wormhole_age(struct attrib * a)
   return -1;
 }
 
-static void 
+static void
 wormhole_write(const struct attrib * a, FILE* F)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
@@ -119,11 +121,11 @@ wormhole_read(struct attrib * a, FILE* F)
 }
 
 static attrib_type at_wormhole = {
-  "wormhole", 
-  wormhole_init, 
-  wormhole_done, 
-  wormhole_age, 
-  wormhole_write, 
+  "wormhole",
+  wormhole_init,
+  wormhole_done,
+  wormhole_age,
+  wormhole_write,
   wormhole_read,
   ATF_UNIQUE
 };
@@ -145,7 +147,7 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
   ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }
 
-void 
+void
 create_wormholes(void)
 {
 #define WORMHOLE_CHANCE 10000
@@ -190,7 +192,7 @@ create_wormholes(void)
   }
 }
 
-void 
+void
 register_wormholes(void)
 {
   at_register(&at_wormhole);
