@@ -18,7 +18,7 @@
   <xi:include href="terrains.xml"/>
   <xi:include href="dungeons.xml"/>
 
-  <game name="Eressea" welcome="eressea">
+  <game name="Eressea" welcome="eressea" units="1000">
     <!-- Game specific settings -->
     <order name="MEINUNG" disable="yes"/>
     <order name="MAGIEGEBIET" disable="yes"/>
