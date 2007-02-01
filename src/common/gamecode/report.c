@@ -912,11 +912,10 @@ describe(FILE * F, const region * r, int partial, faction * f)
       strcpy(bufp++, " ");
       bufp += strxcpy(bufp, LOC(f->locale, n==1?"peasant":"peasant_p"));
     }
-
-    if (rmoney(r) && partial == 0) {
-      bufp += sprintf(bufp, ", %d ", rmoney(r));
-      bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)));
-    }
+  }
+  if (rmoney(r) && partial == 0) {
+    bufp += sprintf(bufp, ", %d ", rmoney(r));
+    bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)));
   }
   /* Pferde */
 
@@ -1501,8 +1500,9 @@ enemies(FILE * F, const faction * f)
 
 static void
 guards(FILE * F, const region * r, const faction * see)
-{       /* die Partei  see  sieht dies; wegen
-                                * "unbekannte Partei", wenn man es selbst ist... */
+{
+  /* die Partei  see  sieht dies; wegen
+   * "unbekannte Partei", wenn man es selbst ist... */
 
   faction* guardians[512];
 
