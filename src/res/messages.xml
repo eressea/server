@@ -5173,15 +5173,25 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit does not take anybody."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit does not take anybody."</text>
   </message>
-  <message name="error74" section="errors">
+  <message name="error742" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine hungernde Einheit kann niemanden weggeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give away anybody."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give away anybody."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Hungry units cannot give anybody away."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Hungry units cannot give anybody away."</text>
+  </message>
+  <message name="error74" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kann niemanden weggeben."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give anybody away."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give anybody away."</text>
   </message>
   <message name="error73" section="errors">
     <type>
