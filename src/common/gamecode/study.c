@@ -453,6 +453,12 @@ learn_cmd(unit * u, order * ord)
   int money = 0;
   skill_t sk;
   int maxalchemy = 0;
+  static int learn_newskills = -1;
+  if (learn_newskills<0) {
+    const char * str = get_param(global.parameters, "study.newskills");
+    if (str && strcmp(str, "false")==0) learn_newskills = 0;
+    else learn_newskills = 1;
+  }
 
   if (u->number==0) return 0;
   if (fval(r->terrain, SEA_REGION)) {
@@ -494,6 +500,15 @@ learn_cmd(unit * u, order * ord)
     cmistake(u, ord, 77, MSG_EVENT);
     return 0;
   }
+  if (learn_newskills==0) {
+    skill * sv = get_skill(u, sk);
+    if (sv==NULL) {
+      /* we can only learn skills we already have */
+      cmistake(u, ord, 77, MSG_EVENT);
+      return 0;
+    }
+  }
+
   /* snotlings können Talente nur bis T8 lernen */
   if (u->race == new_race[RC_SNOTLING]){
     if (get_level(u, sk) >= 8){
