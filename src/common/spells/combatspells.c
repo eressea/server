@@ -1332,16 +1332,18 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   /* bewegung erst am Ende des Kampfes, zusammen mit den normalen
   * Flüchtlingen */
 
-  /* wir tun so, als wäre die Person geflohen */
-  fset(fi, FIG_NOLOOT);
-  fi->run.hp = mage->hp;
-  fi->run.number = mage->number;
-  /* fighter leeren */
-  rmfighter(fi, mage->number);
+  if (fi->run.region) {
+    /* wir tun so, als wäre die Person geflohen */
+    fset(fi, FIG_NOLOOT);
+    fi->run.hp = mage->hp;
+    fi->run.number = mage->number;
+    /* fighter leeren */
+    rmfighter(fi, mage->number);
 
-  scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
+    scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
       "seines Weges ziehen.");
-  battlerecord(b, buf);
+    battlerecord(b, buf);
+  }
   return level;
 }
 
