@@ -22,11 +22,11 @@ SOURCES =
 Main mapper : $(SOURCES) ;
 LinkLibraries mapper :
  gamecode 
+ items
+ spells
  kernel
  modules 
- items
  attributes
- spells
  races
  triggers
  util ;

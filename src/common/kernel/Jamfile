@@ -38,6 +38,7 @@ SOURCES =
  save.c
  ship.c
  skill.c
+ spy.c
  spell.c
  teleport.c
  terrain.c

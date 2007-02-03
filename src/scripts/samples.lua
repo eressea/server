@@ -323,8 +323,6 @@ function move_north(u)
 end
 
 function test_monsters()
-  read_game("23")
-
   -- magrathea = get_region(-67, -5)
   local magrathea = get_region(0, 0)
   if magrathea ~= nil then
@@ -411,9 +409,9 @@ end
 
 -- test_movement()
 -- test_fail()
-test_handler()
+-- test_handler()
 -- test_parser()
--- test_monsters()
+test_monsters()
 -- test_combat()
 -- test_rewards()
 -- test_give()
@@ -423,8 +421,10 @@ test_handler()
 -- write_game("../testg.txt")
 -- read_game("../testg.txt")
 
-run_scripts()
-process_orders()
-write_reports() 
+if 0==1 then
+  run_scripts()
+  process_orders()
+  write_reports() 
+end
 
 -- test_moving()

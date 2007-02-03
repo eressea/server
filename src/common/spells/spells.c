@@ -16,7 +16,10 @@
 #include <eressea.h>
 #include "spells.h"
 
+#include "buildingcurse.h"
 #include "regioncurse.h"
+#include "unitcurse.h"
+#include "shipcurse.h"
 #include "alp.h"
 #include "combatspells.h"
 
@@ -9475,6 +9478,7 @@ init_spells(void)
 void
 register_spells(void)
 {
+  
   /* sp_summon_alp */
   register_alp();
   /* init_firewall(); */
@@ -9482,6 +9486,9 @@ register_spells(void)
   ct_register(&ct_deathcloud);
 
   at_register(&at_deathcloud_compat);
-  register_curses();
+  register_unitcurse();
+  register_regioncurse();
+  register_shipcurse();
+  register_buildingcurse();
   register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
 }

@@ -50,12 +50,6 @@
 #include <math.h>
 #include <ctype.h>
 
-/* spells includes */
-#include <spells/regioncurse.h>
-#include <spells/unitcurse.h>
-#include <spells/shipcurse.h>
-#include <spells/buildingcurse.h>
-
 
 /* ------------------------------------------------------------- */
 
@@ -678,16 +672,6 @@ resolve_curse(variant id)
 {
    return cfindhash(id.i);
 }
-
-void
-register_curses(void)
-{
-  register_unitcurse();
-  register_regioncurse();
-  register_shipcurse();
-  register_buildingcurse();
-}
-
 
 static const char * oldnames[MAXCURSE] = {
   "fogtrap",

@@ -61,14 +61,14 @@ GMTOOL_SOURCES =
 
 # old eressea server. use only for testing.
 LinkLibraries $(SERVER) :
- gamecode kernel items modules attributes spells races triggers util ;
+ gamecode items spells kernel modules attributes races triggers util ;
 libxml2 $(SERVER) ;
 LINKLIBS on $(SERVER) += -lm ;
 Main $(SERVER) : $(SERVER_SOURCES) ;
 
 # eressea-server with lua scripting
 LinkLibraries $(LUASERVER) :
- gamecode kernel items modules attributes spells races triggers util ;
+ gamecode items spells kernel modules attributes races triggers util ;
 luabind $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
 LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
@@ -76,7 +76,7 @@ Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
 
 # the curses-based GM tool (now with luabind)
 LinkLibraries $(GMTOOL) :
- kernel modules items attributes spells races triggers util ;
+ items spells kernel modules attributes races triggers util ;
 luabind $(GMTOOL) ;
 libxml2 $(GMTOOL) ;
 LINKLIBS on $(GMTOOL) += -lm -lncurses -ldl -lstdc++ ;

@@ -17,7 +17,6 @@ SOURCES =
  monster.c
  randenc.c
  report.c
- spy.c
  study.c
  xmlreport.c
  ;
