@@ -102,6 +102,7 @@ extern int bufunit(const struct faction * f, const struct unit * u, int indent, 
 
 extern const char * reportpath(void);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
+extern const char * report_kampfstatus(const struct unit * u, const struct locale * lang);
 
   extern void reports_init(void);
 

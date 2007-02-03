@@ -23,8 +23,6 @@
 #include "eressea.h"
 #include "spy.h"
 
-#include "economy.h"
-
 /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/reports.h>
@@ -58,6 +56,145 @@
 
 #include <attributes/otherfaction.h>
 
+/* in spy steht der Unterschied zwischen Wahrnehmung des Opfers und
+ * Spionage des Spions */
+void
+spy_message(int spy, const unit *u, const unit *target)
+{
+	const char *c;
+
+	/* Infos:
+	 * - Kampfstatus
+	 * - verborgene Gegenstände: Amulette, Ringe, Phiolen, Geld
+	 * - Partei
+	 * - Talentinfo
+	 * - Zaubersprüche
+	 * - Zauberwirkungen
+	 */
+	/* mit spy=100 (magische Spionage) soll alles herausgefunden werden */
+
+	buf[0]='\0';
+	if (spy > 99){
+		/* magische Spionage */
+		/* Zauberwirkungen */
+	}
+	if (spy > 20){
+    sc_mage * m = get_mage(target);
+		/* bei Magiern Zaubersprüche und Magiegebiet */
+		if (m) {
+			spell_list *slist = m->spells;
+			boolean first = true;
+
+			scat("Magiegebiet: ");
+			scat(LOC(u->faction->locale, magietypen[find_magetype(target)]));
+			scat(", Sprüche: ");
+
+			for (;slist; slist=slist->next) {
+				spell * sp = slist->data;
+				if (first) {
+					first = false;
+				} else {
+					scat(", ");
+				}
+				scat(spell_name(sp, u->faction->locale));
+			}
+			if (first) scat("Keine");
+			scat(". ");
+		}
+	}
+	if (spy > 6){
+		/* wahre Partei */
+		scat("Partei '");
+		scat(factionname(target->faction));
+		scat("'. ");
+	} else {
+		/* ist die Einheit in Spionage nicht gut genug, glaubt sie die
+		 * Parteitarnung */
+		faction *fv = visible_faction(u->faction,target);
+
+		if (fv != target->faction){
+			scat("Partei '");
+			scat(factionname(fv));
+			scat("'. ");
+		} else if (!fval(target, UFL_PARTEITARNUNG)){
+			scat("Partei '");
+			scat(factionname(target->faction));
+			scat("'. ");
+		}
+	}
+	if (spy > 0){
+    int first = 1;
+    int found = 0;
+    skill * sv;
+
+    scat("Talente: ");
+    for (sv = target->skills;sv!=target->skills+target->skill_size;++sv) {
+      if (sv->level>0) {
+        found++;
+        if (first == 1) {
+          first = 0;
+        } else {
+          scat(", ");
+        }
+        scat(skillname(sv->id, u->faction->locale));
+        scat(" ");
+        icat(eff_skill(target, sv->id, target->region));
+      }
+
+			if (found == 0) {
+				scat("Keine");
+			}
+			scat(". ");
+		}
+
+		scat("Im Gepäck sind");
+		{
+			boolean first = true;
+			int found = 0;
+			item * itm;
+			for (itm=target->items;itm;itm=itm->next) {
+				if (itm->number>0) {
+					resource_type * rtype = itm->type->rtype;
+					++found;
+					if (first) {
+						first = false;
+						scat(": ");
+					} else {
+						scat(", ");
+					}
+
+					if (itm->number == 1) {
+						scat("1 ");
+						scat(locale_string(u->faction->locale, resourcename(rtype, 0)));
+					} else {
+						icat(itm->number);
+						scat(" ");
+						scat(locale_string(u->faction->locale, resourcename(rtype, NMF_PLURAL)));
+					}
+				}
+			}
+			if (found == 0) {
+				scat(" keine verborgenen Gegenstände");
+			}
+			scat(". ");
+		}
+	}
+	/* spion ist gleich gut wie Wahrnehmung Opfer */
+	/* spion ist schlechter als Wahrnehmung Opfer */
+	{ /* immer */
+		scat("Kampfstatus: ");
+		scat(report_kampfstatus(target, u->faction->locale));
+		c = locale_string(u->faction->locale, hp_status(target));
+		if (c && strlen(c))
+			sprintf(buf, "%s (%s)", buf, c);
+		scat(".");
+	}
+
+	ADDMSG(&u->faction->msgs, msg_message("spyreport",
+		"spy target report", u, target, strdup(buf)));
+}
+
+
 int
 spy_cmd(unit * u, struct order * ord)
 {
@@ -89,6 +226,7 @@ spy_cmd(unit * u, struct order * ord)
   spychance = 0.1 + max(spy*0.05, 0.0);
 
   if (chance(spychance)) {
+    produceexp(u, SK_SPY, u->number);
     spy_message(spy, u, target);
   } else {
     ADDMSG(&u->faction->msgs, msg_message("spyfail", "spy target", u, target));

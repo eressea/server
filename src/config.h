@@ -145,8 +145,10 @@ typedef struct stat stat_type;
 # define HAVE_SNPRINTF
 
 /* MSVC has _access, not access */
+#ifndef access
 # define access(f, m) _access(f, m)
-# define HAVE_ACCESS
+#endif
+#define HAVE_ACCESS
 
 /* MSVC has _stat, not stat */
 # define HAVE_STAT
@@ -229,10 +231,12 @@ extern char * strdup(const char *s);
 /****                      ****
  ** The Eressea boolean type **
  ****                      ****/
-#ifdef __cplusplus
-  typedef int boolean; /* not bool! wrong size. */
+#if defined(WIN32) && defined(USE_MYSQL)
+  typedef unsigned char boolean;
 #else
-  typedef int boolean;
+  typedef int boolean; /* not bool! wrong size. */
+#endif
+#ifndef __cplusplus
 # define false ((boolean)0)
 # define true ((boolean)!false)
 #endif

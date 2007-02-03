@@ -16,16 +16,16 @@
 #include "buildingcurse.h"
 
 /* kernel includes */
-#include <message.h>
-#include <nrmessage.h>
-#include <objtypes.h>
-#include <building.h>
-#include <ship.h>
-#include <curse.h>
+#include <kernel/message.h>
+#include <kernel/objtypes.h>
+#include <kernel/building.h>
+#include <kernel/ship.h>
+#include <kernel/curse.h>
 
 /* util includes */
-#include <base36.h>
-#include <functions.h>
+#include <util/nrmessage.h>
+#include <util/base36.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <string.h>

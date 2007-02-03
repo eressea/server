@@ -16,19 +16,19 @@
 #include "unitcurse.h"
 
 /* kernel includes */
-#include <message.h>
-#include <nrmessage.h>
-#include <race.h>
-#include <skill.h>
-#include <unit.h>
-#include <faction.h>
-#include <objtypes.h>
-#include <curse.h>
+#include <kernel/message.h>
+#include <kernel/race.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
+#include <kernel/faction.h>
+#include <kernel/objtypes.h>
+#include <kernel/curse.h>
 
 /* util includes */
-#include <message.h>
-#include <base36.h>
-#include <functions.h>
+#include <util/nrmessage.h>
+#include <util/message.h>
+#include <util/base36.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <string.h>

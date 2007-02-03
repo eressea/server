@@ -336,9 +336,6 @@
 			RelativePath=".\report.c">
 		</File>
 		<File
-			RelativePath=".\spy.c">
-		</File>
-		<File
 			RelativePath=".\study.c">
 		</File>
 		<File
