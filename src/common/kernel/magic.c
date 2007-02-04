@@ -2410,9 +2410,9 @@ get_clone(const unit *u)
 unit *
 get_clone_mage(const unit *u)
 {
-	attrib * a = a_find(u->attribs, &at_clonemage);
-	if (a!=NULL) return (unit*)a->data.v;
-	return NULL;
+  attrib * a = a_find(u->attribs, &at_clonemage);
+  if (a!=NULL) return (unit*)a->data.v;
+  return NULL;
 }
 
 static boolean
@@ -2420,7 +2420,7 @@ is_moving_ship(const region * r, const ship *sh)
 {
   const unit *u = shipowner(sh);
 
-  switch (get_keyword(u->thisorder)) {
+  if (u) switch (get_keyword(u->thisorder)) {
     case K_ROUTE:
     case K_MOVE:
     case K_FOLLOW:
