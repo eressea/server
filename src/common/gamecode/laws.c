@@ -3789,7 +3789,7 @@ process(void)
   while (proc) {
     int prio = proc->priority;
     region *r;
-    processor *pglobal = proc;
+    processor *pnext = proc;
 
     printf("- Step %u\n", prio);
     while (proc && proc->priority==prio) {
@@ -3797,51 +3797,48 @@ process(void)
       proc = proc->next;
     }
 
-    while (pglobal && pglobal->priority==prio && pglobal->type==PR_GLOBAL) {
-      pglobal->data.global.process();
-      pglobal = pglobal->next;
+    while (pnext && pnext->priority==prio && pnext->type==PR_GLOBAL) {
+      pnext->data.global.process();
+      pnext = pnext->next;
     }
-    if (pglobal==NULL || pglobal->priority!=prio) continue;
+    if (pnext==NULL || pnext->priority!=prio) continue;
 
     for (r = regions; r; r = r->next) {
       unit *u;
-      processor *pregion = pglobal;
 
-      while (pregion && pregion->priority==prio && pregion->type==PR_REGION_PRE) {
-        pregion->data.per_region.process(r);
-        pregion = pregion->next;
+      while (pnext && pnext->priority==prio && pnext->type==PR_REGION_PRE) {
+        pnext->data.per_region.process(r);
+        pnext = pnext->next;
       }
-      if (pregion==NULL || pregion->priority!=prio) continue;
+      if (pnext==NULL || pnext->priority!=prio) continue;
 
       for (u=r->units;u;u=u->next) {
-        processor *porder, *punit = pregion;
 
-        while (punit && punit->priority==prio && punit->type==PR_UNIT) {
-          punit->data.per_unit.process(u);
-          punit = punit->next;
+        while (pnext && pnext->priority==prio && pnext->type==PR_UNIT) {
+          pnext->data.per_unit.process(u);
+          pnext = pnext->next;
         }
-        if (punit==NULL || punit->priority!=prio) continue;
+        if (pnext==NULL || pnext->priority!=prio) continue;
 
-        porder = punit;
-        while (porder && porder->priority==prio && porder->type==PR_ORDER) {
+        while (pnext && pnext->priority==prio && pnext->type==PR_ORDER) {
           order ** ordp = &u->orders;
-          if (porder->data.per_order.thisorder) ordp = &u->thisorder;
+          if (pnext->data.per_order.thisorder) ordp = &u->thisorder;
           while (*ordp) {
             order * ord = *ordp;
-            if (get_keyword(ord) == porder->data.per_order.kword) {
-              porder->data.per_order.process(u, ord);
+            if (get_keyword(ord) == pnext->data.per_order.kword) {
+              pnext->data.per_order.process(u, ord);
             }
             if (*ordp==ord) ordp=&ord->next;
           }
-          porder = porder->next;
+          pnext = pnext->next;
         }
       }
-      while (pregion && pregion->priority==prio && pregion->type==PR_REGION_POST) {
-        pregion->data.per_region.process(r);
-        pregion = pregion->next;
-      }
-      if (pregion==NULL || pregion->priority!=prio) continue;
+      if (pnext==NULL || pnext->priority!=prio) continue;
 
+      while (pnext && pnext->priority==prio && pnext->type==PR_REGION_POST) {
+        pnext->data.per_region.process(r);
+        pnext = pnext->next;
+      }
     }
   }
 }
