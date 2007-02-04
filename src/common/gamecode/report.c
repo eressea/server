@@ -449,7 +449,7 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
     unit * owner  = shipowner(sh);
     a = sh->attribs;
     r = sh->region;
-    if((owner) != NULL){
+    if (owner) {
       if (owner->faction == viewer){
         self = 2;
       } else { /* steht eine person der Partei auf dem Schiff? */

@@ -652,8 +652,10 @@ ship_allowed(const struct ship * sh, const region * r)
 
       if (is_freezing(u)) {
         unit * captain = shipowner(sh);
-        ADDMSG(&captain->faction->msgs, msg_message("detectforbidden", 
-          "unit region", u, r));
+        if (captain) {
+          ADDMSG(&captain->faction->msgs, msg_message("detectforbidden", 
+            "unit region", u, r));
+        }
 
         return false;
       }

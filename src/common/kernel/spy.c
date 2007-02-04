@@ -494,36 +494,42 @@ crew_skill(region * r, faction * f, ship * sh, skill_t sk)
 static int
 try_destruction(unit * u, unit * u2, const char *name, int skilldiff)
 {
-	const char *destruction_success_msg = "%s wurde von %s zerstoert.";
-	const char *destruction_failed_msg = "%s konnte %s nicht zerstoeren.";
-	const char *destruction_detected_msg = "%s wurde beim Versuch, %s zu zerstoeren, entdeckt.";
-	const char *detect_failure_msg = "Es wurde versucht, %s zu zerstoeren.";
-	const char *object_destroyed_msg = "%s wurde zerstoert.";
+  const char *destruction_success_msg = "%s wurde von %s zerstoert.";
+  const char *destruction_failed_msg = "%s konnte %s nicht zerstoeren.";
+  const char *destruction_detected_msg = "%s wurde beim Versuch, %s zu zerstoeren, entdeckt.";
+  const char *detect_failure_msg = "Es wurde versucht, %s zu zerstoeren.";
+  const char *object_destroyed_msg = "%s wurde zerstoert.";
 
-	if (skilldiff == 0) {
-		/* tell the unit that the attempt failed: */
-		sprintf(buf, destruction_failed_msg, unitname(u), name);
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
-		/* tell the enemy about the attempt: */
-		sprintf(buf, detect_failure_msg, name);
-		addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
-		return 0;
-	}
-	if (skilldiff < 0) {
-		/* tell the unit that the attempt was detected: */
-		sprintf(buf, destruction_detected_msg, unitname(u), name);
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
-		/* tell the enemy whodunit: */
-		sprintf(buf, detect_failure_msg, unitname(u2), unitname(u), name);
-		addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
-		return 0;
-	}
-	/* tell the unit that the attempt succeeded */
-	sprintf(buf, destruction_success_msg, name, unitname(u));
-	addmessage(0, u->faction, buf, MSG_EVENT, ML_INFO);
-	sprintf(buf, object_destroyed_msg, name);
-	addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
-	return 1;					/* success */
+  if (skilldiff == 0) {
+    /* tell the unit that the attempt failed: */
+    sprintf(buf, destruction_failed_msg, unitname(u), name);
+    addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
+    /* tell the enemy about the attempt: */
+    if (u2) {
+      sprintf(buf, detect_failure_msg, name);
+      addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
+    }
+    return 0;
+  }
+  if (skilldiff < 0) {
+    /* tell the unit that the attempt was detected: */
+    sprintf(buf, destruction_detected_msg, unitname(u), name);
+    addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
+    /* tell the enemy whodunit: */
+    if (u2) {
+      sprintf(buf, detect_failure_msg, unitname(u2), unitname(u), name);
+      addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
+    }
+    return 0;
+  }
+  /* tell the unit that the attempt succeeded */
+  sprintf(buf, destruction_success_msg, name, unitname(u));
+  addmessage(0, u->faction, buf, MSG_EVENT, ML_INFO);
+  if (u2) {
+    sprintf(buf, object_destroyed_msg, name);
+    addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
+  }
+  return 1;					/* success */
 }
 
 static void

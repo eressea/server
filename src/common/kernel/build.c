@@ -1102,7 +1102,6 @@ mayboard(const unit * u, const ship * sh)
   unit *u2 = shipowner(sh);
 
   return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
-
 }
 
 int
