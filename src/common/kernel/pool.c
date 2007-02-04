@@ -277,7 +277,8 @@ reserve_cmd(unit * u, struct order *ord)
     count = atoip(s);
 
     if (count == 0 && findparam(s, u->faction->locale)==P_EACH) {
-      count = u->number;
+      s = getstrtoken();
+      count = atoip(s) * u->number;
     }
 
     rtype = findresourcetype(getstrtoken(), u->faction->locale);
