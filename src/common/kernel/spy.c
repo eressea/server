@@ -140,12 +140,11 @@ spy_message(int spy, const unit *u, const unit *target)
         scat(" ");
         icat(eff_skill(target, sv->id, target->region));
       }
-
-			if (found == 0) {
-				scat("Keine");
-			}
-			scat(". ");
-		}
+    }
+    if (found == 0) {
+      scat("Keine");
+    }
+    scat(". ");
 
 		scat("Im Gepäck sind");
 		{
