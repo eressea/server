@@ -1164,7 +1164,6 @@ enter_ship(unit * u, struct order * ord, int id, boolean report)
       getshipweight(sh, &sweight, &scabins);
       sweight += weight(u);
       scabins += u->number;
-      sweight = ((sweight+99) / 100) * 100; /* Silberreste aufrunden */
 
       if (sweight > mweight || scabins > mcabins) {
         if (report) cmistake(u, ord, 34, MSG_MOVE);
