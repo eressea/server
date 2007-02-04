@@ -3836,15 +3836,11 @@ process(void)
             }
             porder = porder->next;
           }
+        }
+      }
 
-          /* this is where the region post-processig will start: */
-          pregion = porder;
-        }
-      } else {
-        /* in case there weren't any units, move the pregion pointer over the unit/order tasks */
-        while (pregion && pregion->priority==prio && pregion->type!=PR_REGION_POST) {
-          pregion = pregion->next;
-        }
+      while (pregion && pregion->priority==prio && pregion->type!=PR_REGION_POST) {
+        pregion = pregion->next;
       }
 
       while (pregion && pregion->priority==prio && pregion->type==PR_REGION_POST) {
