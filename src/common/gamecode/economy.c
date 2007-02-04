@@ -1509,46 +1509,46 @@ get_allocator(const struct resource_type * rtype)
   return NULL;
 }
 
-static void
+void
 split_allocations(region * r)
 {
-	allocation_list ** p_alist=&allocations;
-	freset(r, RF_DH);
-	while (*p_alist) {
-		allocation_list * alist = *p_alist;
-		const resource_type * rtype = alist->type;
-		allocate_function alloc = get_allocator(rtype);
-		const item_type * itype = resource2item(rtype);
-		allocation ** p_al = &alist->data;
+  allocation_list ** p_alist=&allocations;
+  freset(r, RF_DH);
+  while (*p_alist) {
+    allocation_list * alist = *p_alist;
+    const resource_type * rtype = alist->type;
+    allocate_function alloc = get_allocator(rtype);
+    const item_type * itype = resource2item(rtype);
+    allocation ** p_al = &alist->data;
 
-		freset(r, RF_DH);
-		alloc(rtype, r, alist->data);
+    freset(r, RF_DH);
+    alloc(rtype, r, alist->data);
 
-		while (*p_al) {
-			allocation * al = *p_al;
-			if (al->get) {
-				assert(itype || !"not implemented for non-items");
-				i_change(&al->unit->items, itype, al->get);
-				produceexp(al->unit, itype->construction->skill, al->unit->number);
-				fset(r, RF_DH);
-			}
-			if (al->want==INT_MAX) al->want = al->get;
-			if (fval(al, AFL_LOWSKILL)) {
-				ADDMSG(&al->unit->faction->msgs,
-					msg_message("produce_lowskill", "unit region resource",
-					al->unit, al->unit->region, rtype));
-			} else {
-				ADDMSG(&al->unit->faction->msgs, msg_message("produce", 
+    while (*p_al) {
+      allocation * al = *p_al;
+      if (al->get) {
+        assert(itype || !"not implemented for non-items");
+        i_change(&al->unit->items, itype, al->get);
+        produceexp(al->unit, itype->construction->skill, al->unit->number);
+        fset(r, RF_DH);
+      }
+      if (al->want==INT_MAX) al->want = al->get;
+      if (fval(al, AFL_LOWSKILL)) {
+        ADDMSG(&al->unit->faction->msgs,
+          msg_message("produce_lowskill", "unit region resource",
+          al->unit, al->unit->region, rtype));
+      } else {
+        ADDMSG(&al->unit->faction->msgs, msg_message("produce", 
           "unit region amount wanted resource",
-					al->unit, al->unit->region, al->get, al->want, rtype));
-			}
-			*p_al=al->next;
-			free_allocation(al);
-		}
-		*p_alist=alist->next;
-		free(alist);
-	}
-	allocations = NULL;
+          al->unit, al->unit->region, al->get, al->want, rtype));
+      }
+      *p_al=al->next;
+      free_allocation(al);
+    }
+    *p_alist=alist->next;
+    free(alist);
+  }
+  allocations = NULL;
 }
 
 static void
@@ -3171,7 +3171,6 @@ produce(void)
       }
     }
 
-    split_allocations(r);
     /* Entertainment (expandentertainment) und Besteuerung (expandtax) vor den
     * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
     * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung

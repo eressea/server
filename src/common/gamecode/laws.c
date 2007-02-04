@@ -3690,7 +3690,7 @@ claim_cmd(unit * u, struct order * ord)
 typedef struct processor {
   struct processor * next;
   int priority;
-  enum { PR_GLOBAL, PR_REGION, PR_UNIT, PR_ORDER } type;
+  enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } type;
   union {
     struct {
       keyword_t kword;
@@ -3712,8 +3712,8 @@ typedef struct processor {
 
 static processor * processors;
 
-void
-add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struct order *), boolean thisorder, const char * name)
+processor *
+add_proc(int priority, const char * name, int type)
 {
   processor **pproc = &processors;
   processor *proc;
@@ -3721,87 +3721,67 @@ add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struc
   while (*pproc) {
     proc = *pproc;
     if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>=PR_ORDER) break;
+    else if (proc->priority==priority && proc->type>=type) break;
     pproc = &proc->next;
   }
 
   proc = malloc(sizeof(processor));
   proc->priority = priority;
-  proc->type = PR_ORDER;
-  proc->data.per_order.process = parser;
-  proc->data.per_order.kword = kword;
-  proc->data.per_order.thisorder = thisorder;
+  proc->type = type;
   proc->name = name;
   proc->next = *pproc;
   *pproc = proc;
+  return proc;
+}
+
+void
+add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struct order *), boolean thisorder, const char * name)
+{
+  processor * proc = add_proc(priority, name, PR_ORDER);
+  if (proc) {
+    proc->data.per_order.process = parser;
+    proc->data.per_order.kword = kword;
+    proc->data.per_order.thisorder = thisorder;
+  }
 }
 
 void
 add_proc_global(int priority, void (*process)(void), const char * name)
 {
-  processor **pproc = &processors;
-  processor *proc;
-
-  while (*pproc) {
-    proc = *pproc;
-    if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>PR_GLOBAL) break;
-    pproc = &proc->next;
+  processor * proc = add_proc(priority, name, PR_GLOBAL);
+  if (proc) {
+    proc->data.global.process = process;
   }
-
-  proc = malloc(sizeof(processor));
-  proc->priority = priority;
-  proc->type = PR_GLOBAL;
-  proc->data.global.process = process;
-  proc->name = name;
-  proc->next = *pproc;
-  *pproc = proc;
 }
 
 void
 add_proc_region(int priority, void (*process)(region *), const char * name)
 {
-  processor **pproc = &processors;
-  processor *proc;
-
-  while (*pproc) {
-    proc = *pproc;
-    if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>PR_REGION) break;
-    pproc = &proc->next;
+  processor * proc = add_proc(priority, name, PR_REGION_PRE);
+  if (proc) {
+    proc->data.per_region.process = process;
   }
+}
 
-  proc = malloc(sizeof(processor));
-  proc->priority = priority;
-  proc->type = PR_REGION;
-  proc->data.per_region.process = process;
-  proc->name = name;
-  proc->next = *pproc;
-  *pproc = proc;
+void
+add_proc_postregion(int priority, void (*process)(region *), const char * name)
+{
+  processor * proc = add_proc(priority, name, PR_REGION_POST);
+  if (proc) {
+    proc->data.per_region.process = process;
+  }
 }
 
 void
 add_proc_unit(int priority, void (*process)(unit *), const char * name)
 {
-  processor **pproc = &processors;
-  processor *proc;
-
-  while (*pproc) {
-    proc = *pproc;
-    if (proc->priority>priority) break;
-    else if (proc->priority==priority && proc->type>PR_UNIT) break;
-    pproc = &proc->next;
+  processor * proc = add_proc(priority, name, PR_UNIT);
+  if (proc) {
+    proc->data.per_unit.process = process;
   }
-
-  proc = malloc(sizeof(processor));
-  proc->priority = priority;
-  proc->type = PR_UNIT;
-  proc->data.per_unit.process = process;
-  proc->name = name;
-  proc->next = *pproc;
-  *pproc = proc;
 }
 
+/* per priority, execute processors in order from PR_GLOBAL down to PR_ORDER */
 void
 process(void)
 {
@@ -3827,7 +3807,7 @@ process(void)
       unit *u;
       processor *pregion = pglobal;
 
-      while (pregion && pregion->priority==prio && pregion->type==PR_REGION) {
+      while (pregion && pregion->priority==prio && pregion->type==PR_REGION_PRE) {
         pregion->data.per_region.process(r);
         pregion = pregion->next;
       }
@@ -3856,6 +3836,12 @@ process(void)
           porder = porder->next;
         }
       }
+      while (pregion && pregion->priority==prio && pregion->type==PR_REGION_POST) {
+        pregion->data.per_region.process(r);
+        pregion = pregion->next;
+      }
+      if (pregion==NULL || pregion->priority!=prio) continue;
+
     }
   }
 }
@@ -3971,8 +3957,9 @@ processorders (void)
   add_proc_order(p, K_STUDY, &learn_cmd, true, "Lernen");
 
   p+=10;
-  add_proc_order(p, K_MAKE, &make_cmd, true, "Produktion");
   add_proc_global(p, &produce, "Arbeiten, Handel, Rekruten");
+  add_proc_order(p, K_MAKE, &make_cmd, true, "Produktion");
+  add_proc_postregion(p, &split_allocations, "Produktion II");
 
   p+=10;
   add_proc_region(p, &enter_2, "Kontaktieren & Betreten (3. Versuch)");
