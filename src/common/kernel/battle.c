@@ -2597,15 +2597,16 @@ aftermath(battle * b)
         }
 
         /* Wenn sich die Einheit auf einem Schiff befindet, wird
-        * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
-        * evt. zuvor verlassen wurde. */
+         * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
+         * evt. zuvor verlassen wurde. */
 
         if (du->ship) sh = du->ship; else sh = leftship(du);
 
         if (sh && fval(sh, SF_DAMAGED)) {
-          int n = b->turn - 1;
+          int n = b->turn - 2;
           if (n>0) {
             damage_ship(sh, 0.05 * n);
+            freset(sh, SF_DAMAGED);
           }
         }
       }
