@@ -340,25 +340,25 @@ static char lbuf[MAXLINE];
 static char *
 getbuf(FILE * F)
 {
-	boolean cont = false;
-	boolean quote = false;
-	boolean comment = false;
-	char * cp = buf;
-
-	lbuf[MAXLINE-1] = '@';
-
-	do {
-		boolean eatwhite = true;
-		boolean start = true;
-		unsigned char * end;
-		unsigned char * bp = (unsigned char * )fgets(lbuf, MAXLINE, F);
-
-		comment = (boolean)(comment && cont);
-
-		if (!bp) return NULL;
-
-		end = bp + strlen((const char *)bp);
-		if (*(end-1)=='\n') *(--end) = 0;
+  boolean cont = false;
+  boolean quote = false;
+  boolean comment = false;
+  char * cp = buf;
+  
+  lbuf[MAXLINE-1] = '@';
+  
+  do {
+    boolean eatwhite = true;
+    boolean start = true;
+    unsigned char * end;
+    unsigned char * bp = (unsigned char * )fgets(lbuf, MAXLINE, F);
+    
+    comment = (boolean)(comment && cont);
+    
+    if (!bp) return NULL;
+    
+    end = bp + strlen((const char *)bp);
+    if (*(end-1)=='\n') *(--end) = 0;
     else {
       /* wenn die zeile länger als erlaubt war, ist sie ungültig,
        * und wird mit dem rest weggeworfen: */
@@ -372,53 +372,53 @@ getbuf(FILE * F)
       comment = false;
       bp = NULL;
     }
-		cont = false;
-		while (bp!=NULL && *bp && cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE) {
-			if (isspace(*bp)) {
-				if (eatwhite) {
-					do { ++bp; } while ((char*)bp!=lbuf+MAXLINE && isspace(*bp));
-					if (!quote && !start && !comment) *(cp++)=' ';
-				}
-				else {
+    cont = false;
+    while (bp!=NULL && *bp && cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE) {
+      if (isspace(*bp)) {
+        if (cont) ++bp; /* removes spaces and \r afer a backslash */
+        else if (eatwhite) {
+          do { ++bp; } while ((char*)bp!=lbuf+MAXLINE && isspace(*bp));
+          if (!quote && !start && !comment) *(cp++)=' ';
+        }
+        else {
           if (!comment) *(cp++)=*(bp++);
-					while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && isspace(*bp)) {
-						if (!comment) *(cp++)=*bp;
-						++bp;
-					}
+          while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && isspace(*bp)) {
+            if (!comment) *(cp++)=*bp;
+            ++bp;
+          }
           if (*bp==0) --cp;
-				}
-			}
-			else if (iscntrl(*bp)) {
-				*(cp++) = '?';
-				++bp;
-			} else {
-				cont = false;
-				if (*bp==COMMENT_CHAR && !quote) {
-/*					bp = max(end-1, bp+1); */
-					comment=true;
-				}
-				else {
-					if (*bp=='"') {
-						quote = (boolean)!quote;
+        }
+      }
+      else if (iscntrl(*bp)) {
+        *(cp++) = '?';
+        ++bp;
+      } else {
+        cont = false;
+        if (*bp==COMMENT_CHAR && !quote) {
+          comment=true;
+        }
+        else {
+          if (*bp=='"') {
+            quote = (boolean)!quote;
             *cp++ = *bp;
-						eatwhite=true;
-					}
-					else if (*bp=='\\') cont=true;
-					else {
-						if (!comment) *(cp++) = *bp;
-						eatwhite = (boolean)!quote;
-					}
-				}
-				++bp;
-			}
-			start = false;
-		}
-		if (cp==buf+MAXLINE) {
-			--cp;
-		}
-		*cp=0;
-	} while (cont || cp==buf);
-	return buf;
+            eatwhite=true;
+          }
+          else if (*bp=='\\') cont=true;
+          else {
+            if (!comment) *(cp++) = *bp;
+            eatwhite = (boolean)!quote;
+          }
+        }
+        ++bp;
+      }
+      start = false;
+    }
+    if (cp==buf+MAXLINE) {
+      --cp;
+    }
+    *cp=0;
+  } while (cont || cp==buf);
+  return buf;
 }
 
 #ifdef ENEMIES
