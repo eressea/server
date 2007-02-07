@@ -139,7 +139,6 @@ extern "C" {
   extern boolean nobattledebug;
   extern boolean dirtyload;
 
-  extern int demonfix;
   extern int loadplane;
 
   extern void debug_messagetypes(FILE * out);
@@ -468,9 +467,6 @@ read_args(int argc, char **argv, lua_State * luaState)
         break;
       case 'e':
         luafile = argv[++i];
-        break;
-      case 'D': /* DEBUG */
-        demonfix = atoi(argv[++i]);
         break;
       case 'd':
         g_datadir = argv[++i];

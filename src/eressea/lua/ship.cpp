@@ -45,6 +45,11 @@ add_ship(const char * sname, region& r)
   return sh;
 }
 
+static int
+ship_maxsize(const ship& s) {
+  return s.type->construction->maxsize;
+}
+
 const char *
 ship_gettype(const ship& s) {
   return s.type->name[0];
@@ -75,6 +80,7 @@ bind_ship(lua_State * L)
     .property("type", &ship_gettype)
     .property("weight", &ship_getweight)
     .property("capacity", &ship_getcapacity)
+    .property("maxsize", &ship_maxsize)
     .def_readonly("name", &ship::name)
     .def_readonly("region", &ship::region)
     .def_readonly("id", &ship::no)

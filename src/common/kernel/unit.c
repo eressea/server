@@ -57,8 +57,6 @@
 
 #define FIND_FOREIGN_TEMP
 
-int demonfix = 0;
-
 const unit *
 u_peasants(void)
 {
@@ -779,21 +777,20 @@ move_unit(unit * u, region * r, unit ** ulist)
 void
 transfermen(unit * u, unit * u2, int n)
 {
-	const attrib * a;
-	int hp = u->hp;
-	region * r = u->region;
-
-	if (n==0) return;
+  const attrib * a;
+  int hp = u->hp;
+  region * r = u->region;
+  
+  if (n==0) return;
   assert(n > 0);
-	/* "hat attackiert"-status wird übergeben */
+  /* "hat attackiert"-status wird übergeben */
 
-	if (u2) {
-		skill *sv, *sn;
-		skill_t sk;
+  if (u2) {
+    skill *sv, *sn;
+    skill_t sk;
     ship * sh;
 
     assert(u2->number+n>0);
-		if (demonfix && u2->race==new_race[RC_DAEMON]) fset(u2, UFL_DEBUG);
 
 		for (sk=0; sk!=MAXSKILLS; ++sk) {
 			double dlevel = 0.0;
