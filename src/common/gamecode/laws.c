@@ -3275,7 +3275,7 @@ new_units (void)
 
             g = getguard(u);
             if (g) setguard(u2, g);
-            else setguard(u, GUARD_NONE);
+            /* else setguard(u2, GUARD_NONE); */
 
             ordp = &makeord->next;
             newordersp = &u2->orders;

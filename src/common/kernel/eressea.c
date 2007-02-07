@@ -2432,6 +2432,7 @@ setguard(unit * u, unsigned int flags)
 {
   /* setzt die guard-flags der Einheit */
   attrib * a = NULL;
+  assert(flags==0 || !fval(u, UFL_MOVED));
   if (fval(u, UFL_GUARD)) {
     a = a_find(u->attribs, &at_guard);
   }
