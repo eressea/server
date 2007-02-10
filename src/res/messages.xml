@@ -5317,6 +5317,14 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit could not be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit could not be found."</text>
   </message>
+  <message name="stormwinds_effect" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) beschwört einen magischen Wind, der die Schiffe über das Wasser treibt."</text>
+    <text locale="en">"$unit($unit) calls up a magical storm that whips the ship over the waters."</text>
+    <text locale="fr">"$unit($unit) calls up a magical storm that whips the ship over the waters."</text>
+  </message>
   <message name="error59" section="errors">
     <type>
       <arg name="unit" type="unit"/>

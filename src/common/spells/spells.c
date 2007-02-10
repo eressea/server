@@ -2263,7 +2263,7 @@ sp_stormwinds(castorder *co)
   double power = co->force;
   spellparameter *pa = co->par;
   int n, force = (int)power;
-
+  message * m = NULL;
   /* melden vorbereiten */
   for(f = factions; f; f = f->next ) freset(f, FL_DH);
 
@@ -2298,26 +2298,26 @@ sp_stormwinds(castorder *co)
 
     /* melden vorbereiten: */
     for(u = r->units; u; u = u->next ) {
-      if(u->ship != sh )    /* nur den Schiffsbesatzungen! */
-        continue;
-
-      fset(u->faction, FL_DH);
-    }
-
-  }
-  /* melden, 1x pro Partei auf Schiff und für den Magier */
-  fset(mage->faction, FL_DH);
-  for(u = r->units; u; u = u->next ) {
-    if(fval(u->faction, FL_DH)) {
-      freset(u->faction, FL_DH);
-      if (erfolg > 0){
-        sprintf(buf, "%s beschwört einen magischen Wind, der die Schiffe "
-            "über das Wasser treibt.",
-            cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-        addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+      if (u->ship == sh ) {
+        /* nur den Schiffsbesatzungen! */
+        fset(u->faction, FL_DH);
       }
     }
   }
+  /* melden, 1x pro Partei auf Schiff und für den Magier */
+  fset(mage->faction, FL_DH);
+  for (u = r->units; u; u = u->next ) {
+    if (fval(u->faction, FL_DH)) {
+      freset(u->faction, FL_DH);
+      if (erfolg > 0) {
+        if (!m) {
+          m = msg_message("stormwinds_effect", "unit", mage);
+        }
+        r_addmessage(r, u->faction, m);
+      }
+    }
+  }
+  if (m) msg_release(m);
   return erfolg;
 }
 
