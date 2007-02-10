@@ -249,9 +249,9 @@ gm_teleport(const tnode * tnext, const char * str, void * data, struct order * o
   if (r==NULL || p!=rplane(r)) {
     mistake(u, ord, "In diese Region kann die Einheit nicht teleportieren.", 0);
   } else if (to==NULL) {
-    mistake(u, ord, "Die Einheit wurde nicht gefunden.", 0);
+    cmistake(u, ord, 63, MSG_MAGIC);
   } else if (rplane(to->region)!=rplane(r) && !ucontact(to, u)) {
-    mistake(u, ord, "Die Einheit hat uns nicht kontaktiert.", 0);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", to));
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);

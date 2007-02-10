@@ -1787,7 +1787,7 @@ sp_treewalkenter(castorder *co)
     }
 
     if (!ucontact(u, mage)) {
-      ADDMSG(&mage->faction->msgs, msg_feedback(mage, ord, "feedback_no_contact", "target", u));
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact", "target", u));
     } else {
       int w;
 
@@ -1903,8 +1903,7 @@ sp_treewalkexit(castorder *co)
     u = pa->param[n]->data.u;
 
     if (!ucontact(u, mage)) {
-      sprintf(buf, "%s hat uns nicht kontaktiert.", unitname(u));
-      addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact", "target", u));
     } else {
       int w = weight(u);
       if (!can_survive(u, rt)) {
@@ -5686,19 +5685,14 @@ sp_enterastral(castorder *co)
     u = pa->param[n]->data.u;
 
     if (!ucontact(u, mage)) {
-      if (power > 10 && !is_magic_resistant(mage, u, 0)
-          && can_survive(u, rt)) {
-        sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
-            "Zauber jedoch nicht.", unitname(u));
-        addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+      if (power > 10 && !is_magic_resistant(mage, u, 0) && can_survive(u, rt)) {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
         sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
           unitname(u),
           cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
         addmessage(r, u->faction, buf, MSG_MAGIC, ML_WARN);
       } else {
-        sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
-            "Zauber.", unitname(u));
-        addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
         sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
           cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
           unitname(u));
@@ -5813,18 +5807,14 @@ sp_pullastral(castorder *co)
       u = pa->param[n]->data.u;
 
       if (!ucontact(u, mage)) {
-        if(power > 12 && pa->param[n]->flag != TARGET_RESISTS && can_survive(u, rt)) {
-          sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
-            "Zauber jedoch nicht.", unitname(u));
-          addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+        if (power > 12 && pa->param[n]->flag != TARGET_RESISTS && can_survive(u, rt)) {
+          ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
           sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
             unitname(u),
             cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
           addmessage(r, u->faction, buf, MSG_MAGIC, ML_WARN);
         } else {
-          sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
-            "Zauber.", unitname(u));
-          addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+          ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
           sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
             cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
             unitname(u));
@@ -5934,17 +5924,13 @@ sp_leaveastral(castorder *co)
 
     if (!ucontact(u, mage)) {
       if (power > 10 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
-        sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
-          "Zauber jedoch nicht.", unitname(u));
-        addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
         sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
           unitname(u),
           cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
         addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
       } else {
-        sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
-          "Zauber.", unitname(u));
-        addmessage(r, mage->faction, buf, MSG_MAGIC, ML_WARN);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
         sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
           cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
           unitname(u));
@@ -6069,16 +6055,12 @@ sp_fetchastral(castorder *co)
 
     if (!ucontact(u, mage)) {
       if (power>12 && !(pa->param[n]->flag & TARGET_RESISTS)) {
-        sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
-          "Zauber jedoch nicht.", unitname(u));
-        addmessage(rt, mage->faction, buf, MSG_MAGIC, ML_INFO);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
         sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
           unitname(u), unitname(mage));
         addmessage(ro, u->faction, buf, MSG_EVENT, ML_WARN);
       } else {
-        sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
-          "Zauber.", unitname(u));
-        addmessage(rt, mage->faction, buf, MSG_MAGIC, ML_WARN);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
         sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
           unitname(mage), unitname(u));
         addmessage(ro, u->faction, buf, MSG_EVENT, ML_WARN);

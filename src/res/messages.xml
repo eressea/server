@@ -5204,6 +5204,28 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us."</text>
   </message>
+  <message name="feedback_no_contact_resist" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen und widersteht dem Zauber."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, and resists the spell."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, and resists the spell."</text>
+  </message>
+  <message name="feedback_no_contact_no_resist" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen, aber widersteht dem Zauber nicht."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, but cannot resist the spell."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, but cannot resist the spell."</text>
+  </message>
   <message name="error71" section="errors">
     <type>
       <arg name="unit" type="unit"/>
