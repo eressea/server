@@ -167,7 +167,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
   } else if (fval(u, UFL_LOCKED) || is_cursed(u->attribs, C_SLAVE, 0)) {
     error = 74;
   } else if (u2 && fval(u, UFL_HUNGER)) {
-    error = 320;
+    error = 73;
   } else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
     error = 75;
   } else if (u2 && u2->faction != u->faction && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {

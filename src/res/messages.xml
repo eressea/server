@@ -5173,7 +5173,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit does not take anybody."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit does not take anybody."</text>
   </message>
-  <message name="error742" section="errors">
+  <message name="error73" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
