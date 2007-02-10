@@ -5687,16 +5687,10 @@ sp_enterastral(castorder *co)
     if (!ucontact(u, mage)) {
       if (power > 10 && !is_magic_resistant(mage, u, 0) && can_survive(u, rt)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
-        sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
-          unitname(u),
-          cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
-        addmessage(r, u->faction, buf, MSG_MAGIC, ML_WARN);
+        ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
       } else {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
-        sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
-          cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
-          unitname(u));
-        addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
+        ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
         continue;
       }
     }
@@ -5809,16 +5803,10 @@ sp_pullastral(castorder *co)
       if (!ucontact(u, mage)) {
         if (power > 12 && pa->param[n]->flag != TARGET_RESISTS && can_survive(u, rt)) {
           ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
-          sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
-            unitname(u),
-            cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
-          addmessage(r, u->faction, buf, MSG_MAGIC, ML_WARN);
+          ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
         } else {
           ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
-          sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
-            cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
-            unitname(u));
-          addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
+          ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
           continue;
         }
       }
@@ -5925,16 +5913,10 @@ sp_leaveastral(castorder *co)
     if (!ucontact(u, mage)) {
       if (power > 10 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
-        sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
-          unitname(u),
-          cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
-        addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
+        ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
       } else {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
-        sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
-          cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
-          unitname(u));
-        addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
+        ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
         continue;
       }
     }
@@ -6056,14 +6038,10 @@ sp_fetchastral(castorder *co)
     if (!ucontact(u, mage)) {
       if (power>12 && !(pa->param[n]->flag & TARGET_RESISTS)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
-        sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
-          unitname(u), unitname(mage));
-        addmessage(ro, u->faction, buf, MSG_EVENT, ML_WARN);
+        ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
       } else {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
-        sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
-          unitname(mage), unitname(u));
-        addmessage(ro, u->faction, buf, MSG_EVENT, ML_WARN);
+        ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
         continue;
       }
     }

@@ -6722,4 +6722,24 @@
     <text locale="fr">"$unit($unit) is sent from the astral plain to $region($region)."</text>
   </message>
 
+  <message name="send_astral" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($target) wird von $unit($unit) in eine andere Welt geschleudert."</text>
+    <text locale="en">"$unit($unit) sends $unit($target) to another world."</text>
+    <text locale="fr">"$unit($unit) sends $unit($target) to another world."</text>
+  </message>
+
+  <message name="try_astral" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) versuchte erfolglos, $unit($target) in eine andere Welt zu schleudern."</text>
+    <text locale="en">"$unit($unit) tried but failed to send $unit($target) to another world."</text>
+    <text locale="fr">"$unit($unit) tried but failed to send $unit($target) to another world."</text>
+  </message>
+
 </messages>
