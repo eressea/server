@@ -1787,7 +1787,7 @@ sp_treewalkenter(castorder *co)
     }
 
     if (!ucontact(u, mage)) {
-      cmistake(mage, co->order, 73, MSG_MAGIC);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, ord, "feedback_no_contact", "target", u));
     } else {
       int w;
 
