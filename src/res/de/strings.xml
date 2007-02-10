@@ -4652,6 +4652,17 @@
       week. The boat can only carry 100 weight units. The enchanted ink's
       components include a windbag and a snowcrystal petal.</text>
     </string>
+    <string name="double_time">
+      <text locale=de>Diese praktische Anwendung des theoretischen Wissens um 
+      Raum und Zeit ermöglicht es, den Zeitfluß für einige Personen zu 
+      verändern. Auf diese Weise veränderte Personen bekommen für einige 
+      Wochen doppelt soviele Bewegungspunkte und doppelt soviele Angriffe
+      pro Runde.</text>
+      <text locale="en">Abstract theories of space and time at last find 
+      practical application in this spell which warps the very fabric of 
+      time around a person. Such a person has twice as many movement points 
+      and doubles their attacks per round for a few weeks.</text>
+    </string>
     <string name="shockwave">
       <text locale="de">Dieser Zauber läßt eine Welle aus purer Kraft über die
       gegnerischen Reihen hinwegfegen. Viele Kämpfer wird der Schock so

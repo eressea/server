@@ -9120,11 +9120,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_viewreality, NULL
   },
   {
-    SPL_SPEED2, "double_time",
-    "Diese praktische Anwendung des theoretischen Wissens um Raum und Zeit "
-    "ermöglicht es, den Zeitfluß für einige Personen zu verändern. Auf "
-    "diese Weise veränderte Personen bekommen für einige Wochen doppelt "
-    "soviele Bewegungspunkte und doppelt soviele Angriffe pro Runde.", NULL,
+    SPL_SPEED2, "double_time", NULL, NULL,
     "u+",
     M_ASTRAL, (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 5, 11,
     {
