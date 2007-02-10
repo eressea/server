@@ -174,12 +174,14 @@ extern "C" {
     struct {
       int number;  /* number of people who fled */
       int hp;      /* accumulated hp of fleeing people */
+#ifndef SIMPLE_ESCAPE
       struct region *region;  /* destination of fleeing people */
       struct item * items; /* items they take */
+#endif /* SIMPLE_ESCAPE */
     } run;
 #ifndef SIMPLE_COMBAT
     int action_counter;	/* number of active actions the struct unit did in the fight */
-#endif
+#endif /* SIMPLE_COMBAT */
 #ifdef SHOW_KILLS
     int kills;
     int hits;
@@ -225,7 +227,9 @@ extern "C" {
   extern int get_unitrow(const struct fighter * af, const struct side * vs);
   extern boolean helping(const struct side * as, const struct side * ds);
   extern void rmfighter(fighter *df, int i);
+#ifndef SIMPLE_ESCAPE
   extern struct region * fleeregion(const struct unit * u);
+#endif
   extern struct fighter * select_corpse(struct battle * b, struct fighter * af);
   extern fighter * make_fighter(struct battle * b, struct unit * u, side * s, boolean attack);
   extern int statusrow(int status);

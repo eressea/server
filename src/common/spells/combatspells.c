@@ -1316,6 +1316,7 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   /* irgendwie den langen befehl sperren */
   /* fset(fi, FIG_ATTACKED); */
 
+#ifndef SIMPLE_ESCAPE
   /* Hat der Magier ein NACH, wird die angegebene Richtung bevorzugt */
   switch (get_keyword(mage->thisorder)) {
   case K_MOVE:
@@ -1332,18 +1333,20 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   /* bewegung erst am Ende des Kampfes, zusammen mit den normalen
   * Flüchtlingen */
 
-  if (fi->run.region) {
-    /* wir tun so, als wäre die Person geflohen */
-    fset(fi, FIG_NOLOOT);
-    fi->run.hp = mage->hp;
-    fi->run.number = mage->number;
-    /* fighter leeren */
-    rmfighter(fi, mage->number);
+  if (!fi->run.region) return level;
+#endif /* SIMPLE_ESCAPE */
 
-    scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
-      "seines Weges ziehen.");
-    battlerecord(b, buf);
-  }
+  /* wir tun so, als wäre die Person geflohen */
+  fset(fi, FIG_NOLOOT);
+  fi->run.hp = mage->hp;
+  fi->run.number = mage->number;
+  /* fighter leeren */
+  rmfighter(fi, mage->number);
+
+  scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
+    "seines Weges ziehen.");
+  battlerecord(b, buf);
+
   return level;
 }
 

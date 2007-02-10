@@ -121,6 +121,7 @@ army_index(side * s)
   return s->battle->nsides - s->index - 1;
 }
 
+#ifndef SIMPLE_ESCAPE
 region *
 fleeregion(const unit * u)
 {
@@ -150,6 +151,7 @@ fleeregion(const unit * u)
     return NULL;
   return neighbours[rng_int() % c];
 }
+#endif /* SIMPLE_ESCAPE */
 
 static char *
 sidename(side * s, boolean truename)
@@ -482,13 +484,17 @@ static void
 reportcasualties(battle * b, fighter * fig, int dead)
 {
   struct message * m;
+  region * r = NULL;
   if (fig->alive == fig->unit->number) return;
+#ifndef SIMPLE_ESCAPE
   if (fig->run.region == NULL) {
     fig->run.region = fleeregion(fig->unit);
     if (fig->run.region == NULL) fig->run.region = b->region;
   }
+  r = fig->run.region;
+#endif /* SIMPLE_ESCAPE */
   m = msg_message("casualties", "unit runto run alive fallen",
-    fig->unit, fig->run.region, fig->run.number, fig->alive, dead);
+    fig->unit, r, fig->run.number, fig->alive, dead);
   message_all(b, m);
   msg_release(m);
 }
@@ -2290,6 +2296,7 @@ loot_items(fighter * corpse)
   }
 }
 
+#ifndef SIMPLE_ESCAPE
 static void
 loot_fleeing(fighter* fig, unit* runner)
 {
@@ -2305,6 +2312,7 @@ merge_fleeloot(fighter* fig, unit* u)
 {
   i_merge(&u->items, &fig->run.items);
 }
+#endif /* SIMPLE_ESCAPE */
 
 static boolean
 seematrix(const faction * f, const side * s)
@@ -2480,22 +2488,30 @@ aftermath(battle * b)
           /* Zuerst dürfen die Feinde plündern, die mitgenommenen Items
           * stehen in fig->run.items. Dann werden die Fliehenden auf
           * die leere (tote) alte Einheit gemapt */
+#ifdef SIMPLE_ESCAPE
+          if (!fval(df, FIG_NOLOOT)){
+            loot_items(df);
+          }
+#else
           if (fval(df, FIG_NOLOOT)){
             merge_fleeloot(df, du);
           } else {
             loot_items(df);
             loot_fleeing(df, du);
           }
+#endif /* SIMPLE_ESCAPE */
           scale_number(du, df->run.number);
           du->hp = df->run.hp;
           set_order(&du->thisorder, NULL);
           setguard(du, GUARD_NONE);
           fset(du, UFL_LONGACTION);
           leave(du->region, du);
+#ifndef SIMPLE_ESCAPE
           if (df->run.region) {
             run_to(du, df->run.region);
             df->run.region = du->region;
           }
+#endif /* SIMPLE_ESCAPE */
         } else {
           /* nur teilweise geflohene Einheiten mergen sich wieder */
           df->alive += df->run.number;
@@ -2503,7 +2519,9 @@ aftermath(battle * b)
           s->size[statusrow(df->status)] += df->run.number;
           s->alive += df->run.number;
           sum_hp += df->run.hp;
+#ifndef SIMPLE_ESCAPE
           merge_fleeloot(df, du);
+#endif /* SIMPLE_ESCAPE */
           df->run.number = 0;
           df->run.hp = 0;
           /* df->run.region = NULL;*/
@@ -2518,7 +2536,9 @@ aftermath(battle * b)
           /* alle sind tot, niemand geflohen. Einheit auflösen */
           df->run.number = 0;
           df->run.hp = 0;
+#ifndef SIMPLE_ESCAPE
           df->run.region = NULL;
+#endif /* SIMPLE_ESCAPE */
 
           /* Report the casualties */
           reportcasualties(b, df, dead);
@@ -3539,9 +3559,12 @@ static void
 flee(const troop dt)
 {
   fighter * fig = dt.fighter;
+
+#ifndef SIMPLE_ESCAPE
   unit * u = fig->unit;
   int carry = personcapacity(u) - u->race->weight;
   int money;
+
   item ** ip = &u->items;
 
   while (*ip) {
@@ -3581,6 +3604,7 @@ flee(const troop dt)
     i_change(&u->items, i_silver, -money);
     i_change(&fig->run.items, i_silver, +money);
   }
+#endif /* SIMPLE_ESCAPE */
 
   fig->run.hp += fig->person[dt.index].hp;
   ++fig->run.number;
@@ -3904,8 +3928,10 @@ battle_flee(battle * b)
 
         if (u->ship) continue;
         dt.fighter = fig;
+#ifndef SIMPLE_ESCAPE
         if (!fig->run.region) fig->run.region = fleeregion(u);
         if (!fig->run.region) continue;
+#endif /* SIMPLE_ESCAPE */
         dt.index = fig->alive - fig->removed;
         while (s->size[SUM_ROW] && dt.index != 0) {
           double ispaniced = 0.0;
@@ -3938,6 +3964,7 @@ battle_flee(battle * b)
           if (chance(min(fleechance(u)+ispaniced, 0.90))) {
             ++runners;
             flee(dt);
+
 #ifdef SMALL_BATTLE_MESSAGES
             if (b->small) {
               sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
