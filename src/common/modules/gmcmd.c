@@ -249,7 +249,7 @@ gm_teleport(const tnode * tnext, const char * str, void * data, struct order * o
   if (r==NULL || p!=rplane(r)) {
     mistake(u, ord, "In diese Region kann die Einheit nicht teleportieren.", 0);
   } else if (to==NULL) {
-    cmistake(u, ord, 63, MSG_MAGIC);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (rplane(to->region)!=rplane(r) && !ucontact(to, u)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", to));
   } else {
@@ -433,7 +433,7 @@ gm_messageunit(const tnode * tnext, const char * str, void * data, struct order 
   region * r;
 
   if (target == NULL) {
-    cmistake(u, ord, 63, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     return;
   }
 
@@ -468,7 +468,7 @@ gm_give(const tnode * tnext, const char * str, void * data, struct order * ord)
 
   if (to==NULL || rplane(to->region) != rplane(u->region)) {
     /* unknown or in another plane */
-    mistake(u, ord, "Die Einheit wurde nicht gefunden.", 0);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (itype==NULL || i_get(u->items, itype)==0) {
     /* unknown or not enough */
     mistake(u, ord, "So einen Gegenstand hat die Einheit nicht.", 0);
@@ -503,7 +503,7 @@ gm_take(const tnode * tnext, const char * str, void * data, struct order * ord)
 
   if (to==NULL || rplane(to->region) != rplane(u->region)) {
     /* unknown or in another plane */
-    mistake(u, ord, "Die Einheit wurde nicht gefunden.", 0);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (itype==NULL || i_get(to->items, itype)==0) {
     /* unknown or not enough */
     mistake(u, ord, "So einen Gegenstand hat die Einheit nicht.", 0);
@@ -538,7 +538,7 @@ gm_skill(const tnode * tnext, const char * str, void * data, struct order * ord)
 
   if (to==NULL || rplane(to->region) != rplane(u->region)) {
     /* unknown or in another plane */
-    mistake(u, ord, "Die Einheit wurde nicht gefunden.", 0);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
     /* unknown or not enough */
     mistake(u, ord, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.", 0);

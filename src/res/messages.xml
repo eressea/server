@@ -5307,7 +5307,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) is not sufficiently stealthy."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) is not sufficiently stealthy."</text>
   </message>
-  <message name="error63" section="errors">
+  <message name="feedback_unit_not_found" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -6495,8 +6495,8 @@
       <arg name="unit" type="unit"/>
       <arg name="target" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) ist zu weit entfernt."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) is too far away."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Region ist zu weit entfernt."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - That region is too far away."</text>
   </message>
 
   <message name="spellfail_block" section="errors">

@@ -5325,10 +5325,9 @@ sp_dreamreading(castorder *co)
   }
 
   /* Entfernung */
-  if(distance(mage->region, u->region) > power) {
-      addmessage(r, mage->faction, "Die Einheit ist zu weit "
-          "entfernt.", MSG_MAGIC, ML_MISTAKE);
-      return 0;
+  if (distance(mage->region, u->region) > power) {
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_distance", ""));
+    return 0;
   }
 
   u2 = createunit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL]);
@@ -5983,8 +5982,7 @@ sp_fetchastral(castorder *co)
   }
 
   if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-    ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance",
-      "command region unit", co->order, rt, mage));
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_distance", ""));
     return 0;
   }
 

@@ -991,14 +991,14 @@ init_transportation(void)
         skip_token();
         ut = getunit(r, u->faction);
         if (ut == NULL) {
-          cmistake(u, u->thisorder, 63, MSG_MOVE);
+          ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "feedback_unit_not_found", ""));
           continue;
         }
         if (!transport(ut, u)) {
           if (cansee(u->faction, r, ut, 0)) {
             cmistake(u, u->thisorder, 286, MSG_MOVE);
           } else {
-            cmistake(u, u->thisorder, 63, MSG_MOVE);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "feedback_unit_not_found", ""));
           }
         }
       }
@@ -1963,14 +1963,14 @@ travel_i(unit * u, region_list * route_begin, region_list * route_end, order * o
           if (cansee(u->faction, u->region, ut, 0)) {
             cmistake(u, ord, 90, MSG_MOVE);
           } else {
-            cmistake(u, ord, 63, MSG_MOVE);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
           }
         }
       } else {
         cmistake(u, ord, 99, MSG_MOVE);
       }
     } else {
-      cmistake(u, ord, 63, MSG_MOVE);
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     }
   }
   return route_end;

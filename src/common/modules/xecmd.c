@@ -51,7 +51,7 @@ xe_givelaen(unit *u, struct order * ord)
 	unit *u2 =getunitg(u->region, u->faction);
 
 	if(!u2) {
-		cmistake(u, ord, 63, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
 		return;
 	}
 	i_change(&u2->items, olditemtype[I_LAEN], 5);
@@ -63,7 +63,7 @@ xe_givepotion(unit *u, struct order *ord)
 	unit *u2 =getunitg(u->region, u->faction);
 
 	if(!u2) {
-		cmistake(u, ord, 63, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
 		return;
 	}
 	i_change(&u2->items, it_find("skillpotion"), 1);
@@ -76,7 +76,7 @@ xe_giveballon(unit *u, struct order *ord)
 	ship *sh;
 
 	if(!u2) {
-		cmistake(u, ord, 63, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
 		return;
 	}
 

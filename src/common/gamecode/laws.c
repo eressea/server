@@ -1690,7 +1690,7 @@ name_cmd(unit * u, struct order * ord)
       unit *u2 = getunit(r, u->faction);
 
       if (!u2 || !cansee(u->faction, r, u2, 0)) {
-        cmistake(u, ord, 63, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
         break;
       } else {
         const char * udefault = LOC(u2->faction->locale, "unitdefault");
@@ -1801,7 +1801,7 @@ mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
   else {
     /* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
     * keine Meldung -> EH hier. */
-    cmistake(u, ord, 63, MSG_MESSAGE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   }
 }
 
@@ -1889,7 +1889,7 @@ mail_cmd(unit * u, struct order * ord)
       }
 
       if (see == false) {
-        cmistake(u, ord, 63, MSG_MESSAGE);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
         break;
       }
 
@@ -2806,7 +2806,7 @@ evict(void)
 
         if (u2==NULL) {
           /* Einheit nicht gefunden */
-          cmistake(u,ord,63,MSG_EVENT);
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
           continue;
         }
 

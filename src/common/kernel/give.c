@@ -328,7 +328,7 @@ give_unit(unit * u, unit * u2, order * ord)
       give_men(u->number, u, NULL, ord);
       cmistake(u, ord, 153, MSG_COMMERCE);
     } else {
-      cmistake(u, ord, 63, MSG_COMMERCE);
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     }
     return;
   }

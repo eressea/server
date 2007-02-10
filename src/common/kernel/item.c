@@ -1077,7 +1077,7 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 {
   unit * target = findunit(targetno);
   if (target==NULL || u->region!=target->region) {
-    cmistake(u, ord, 63, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     return ECUSTOM;
   }
   if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {

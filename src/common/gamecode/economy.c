@@ -570,7 +570,6 @@ give_cmd(unit * u, order * ord)
   const char *s;
   int i, n;
   const item_type * itype;
-  int notfound_error = 63;
   param_t p;
 
   init_tokens(ord);
@@ -578,13 +577,13 @@ give_cmd(unit * u, order * ord)
   u2 = getunit(r, u->faction);
 
   if (!u2 && !getunitpeasants) {
-    cmistake(u, ord, notfound_error, MSG_COMMERCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     return;
   }
 
   /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
   if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL)) {
-    cmistake(u, ord, notfound_error, MSG_COMMERCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     return;
   }
   if (u == u2) {
@@ -604,7 +603,7 @@ give_cmd(unit * u, order * ord)
 
   if (p == P_CONTROL) {
     if (!u2) {
-      cmistake(u, ord, notfound_error, MSG_EVENT);
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
       return;
     }
     if (!u->building && !u->ship) {
@@ -641,7 +640,7 @@ give_cmd(unit * u, order * ord)
   }
 
   else if (u2 && u2->race == new_race[RC_SPELL]) {
-    cmistake(u, ord, notfound_error, MSG_COMMERCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     return;
   }
 
@@ -674,7 +673,7 @@ give_cmd(unit * u, order * ord)
     }
     if (!u2) {
       if (!getunitpeasants) {
-        cmistake(u, ord, notfound_error, MSG_COMMERCE);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
         return;
       }
     }
@@ -2725,7 +2724,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 	}
 
 	if (!u2) {
-		cmistake(u, ord, 63, MSG_INCOME);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
 		return;
 	}
 

@@ -207,7 +207,7 @@ spy_cmd(unit * u, struct order * ord)
   target = getunit(r, u->faction);
 
   if (!target) {
-    cmistake(u, u->thisorder, 63, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "feedback_unit_not_found", ""));
     return 0;
   }
   if (!can_contact(r, u, target)) {
