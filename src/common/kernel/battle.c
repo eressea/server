@@ -2458,8 +2458,11 @@ aftermath(battle * b)
       snumber += du->number;
 #ifdef SIMPLE_COMBAT
       if (relevant) {
-        /* didn't have any help from the guards, so combat is long */
-        fset(du, UFL_NOTMOVING|UFL_LONGACTION);
+        int flags = UFL_LONGACTION|UFL_NOTMOVING;
+#ifdef SIMPLE_ESCAPE
+        if (du->status==ST_FLEE) flags -= UFL_NOTMOVING;
+#endif /* SIMPLE_ESCAPE */
+        fset(du, flags);
       }
       if (sum_hp<du->hp) {
         /* someone on the ship got damaged, damage the ship */
