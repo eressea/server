@@ -397,8 +397,6 @@ usage(const char * prog, const char * arg)
 	return -1;
 }
 
-extern int demonfix;
-
 static int
 read_args(int argc, char **argv)
 {
@@ -431,9 +429,6 @@ read_args(int argc, char **argv)
 		} else switch(argv[i][1]) {
 			case 'o':
 				g_reportdir = argv[++i];
-				break;
-			case 'D': /* DEBUG */
-				demonfix = atoi(argv[++i]);
 				break;
 			case 'd':
 				g_datadir = argv[++i];
