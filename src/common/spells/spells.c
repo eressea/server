@@ -1015,7 +1015,7 @@ sp_maelstrom(castorder *co)
    * Existiert schon ein curse, so wird dieser verstärkt
    * (Max(Dauer), Max(Stärke))*/
   effect.i = (int)power;
-  c = create_curse(mage, &mage->attribs, ct_find("maelstrom"), power, duration, effect, 0);
+  c = create_curse(mage, &r->attribs, ct_find("maelstrom"), power, duration, effect, 0);
   curse_setflag(c, CURSE_ISNEW);
 
   /* melden, 1x pro Partei */
@@ -1101,7 +1101,7 @@ sp_blessedharvest(castorder *co)
    * Existiert schon ein curse, so wird dieser verstärkt
    * (Max(Dauer), Max(Stärke))*/
   effect.i = 1;
-  create_curse(mage,&r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
+  create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
   {
     message * seen = msg_message("harvest_effect", "mage", mage);
     message * unseen = msg_message("harvest_effect", "mage", NULL);
