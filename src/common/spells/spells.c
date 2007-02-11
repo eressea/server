@@ -3204,6 +3204,7 @@ dc_age(struct curse * c)
 
     freset(u->faction, FL_DH);
     if (u->number<=0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
+      up=&u->next;
       continue;
     }
 
