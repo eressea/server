@@ -943,7 +943,8 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
   for (k = 0; sp->components[k].type; ++k) {
     if (sp->components[k].amount > 0) {
       const resource_type * rtype = sp->components[k].type;
-      
+      int itemhave;
+
       /* Die Kosten für Aura sind auch von der Zahl der bereits
        * gezauberten Sprüche abhängig */
       if (rtype == r_aura) {
@@ -964,9 +965,10 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         break;
       }
       
-      if (get_pooled(u, rtype, GET_DEFAULT, itemanz) < itemanz) {
+      itemhave = get_pooled(u, rtype, GET_DEFAULT, itemanz);
+      if (itemhave < itemanz) {
         resource * res = malloc(sizeof(resource));
-        res->number = itemanz;
+        res->number = itemanz-itemhave;
         res->type = rtype;
         res->next = reslist;
         reslist = res;
