@@ -4417,7 +4417,7 @@
     <string name="create_trollbelt">
       <text locale="de">Erschaffe einen Gürtel der
       Trollstärke</text>
-      <text locale="en">Create A Girdle Of Troll
+      <text locale="en">Create A Belt Of Troll
       Strength</text>
     </string>
     <string name="auraleak">
@@ -4526,7 +4526,7 @@
     </string>
     <string name="dream_of_confusion">
       <text locale="de">Schleier der Verwirrung</text>
-      <text locale="en">Fog of Confusion</text>
+      <text locale="en">Veil of Confusion</text>
     </string>
     <string name="summon_alp">
       <text locale="de">Alp</text>
@@ -5688,12 +5688,13 @@
     </string>
     <string name="fogofconfusion">
       <text locale="de">Der Druide beschwört die Elementargeister des Nebels.
-        Sie werden sich für einige Zeit in der Umgebung festsetzen und sie mit
+        Sie werden sich für einige Zeit in in allen Wald- und Ozeanregionen 
+        der Umgebung festsetzen und sie mit
         dichtem Nebel überziehen. Personen innerhalb des magischen Nebels
         verlieren die Orientierung und haben große Schwierigkeiten, sich in
         eine bestimmte Richtung zu bewegen.</text>
       <text locale="en">The druid summons a group of water elementals that
-        cover the region in a thick fog. People inside this magical fog lose
+        cover nearby oceans and forests in thick fog. People inside this magical fog lose
         their orientation and have great difficulties moving in a specific
         direction.</text>
     </string>
@@ -6087,12 +6088,12 @@
         longer be unknown.</text>
     </string>
     <string name="dream_of_confusion">
-      <text locale="de">Der Magier erzeugt in allen Wald- und Ozeanregionen im Umkreis von
+      <text locale="de">Der Magier erzeugt im Umkreis von
       einigen Regionen einen magischen Schleier, der einige Wochen bestehen
       bleibt. Personen innerhalb des Schleiers verlieren
       leicht die Orientierung und haben große Schwierigkeiten, sich in
       eine bestimmte Richtung zu bewegen.</text>
-      <text locale="en">The magician creates a magic fog in every forrest and ocean region in a
+      <text locale="en">The magician creates a magic fog in every region in a
       perimeter of some regions. The fog lasts some weeks and persons
       passing this fog have a chance to get lost,  moving to a certain
       direction is difficult.</text>
