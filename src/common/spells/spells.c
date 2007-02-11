@@ -3676,7 +3676,7 @@ sp_summonundead(castorder *co)
     if (!fval(u->faction, FL_DH) ) {
       if (!m) m = msg_message("summonundead_effect", "unit", mage);
       fset(u->faction, FL_DH);
-      ADDMSG(&u->faction->msgs, m);
+      add_message(&u->faction->msgs, m);
     }
   }
   if (m) msg_release(m);
