@@ -3102,7 +3102,6 @@ ageing(void)
   for(r=regions;r;r=r->next) {
     unit *u;
 
-    a_age(&r->attribs);
     for (u=r->units;u;u=u->next) {
       /* Goliathwasser */
       int i = get_effect(u, oldpotiontype[P_STRONG]);
