@@ -2264,8 +2264,10 @@ sp_stormwinds(castorder *co)
   spellparameter *pa = co->par;
   int n, force = (int)power;
   message * m = NULL;
+
   /* melden vorbereiten */
-  for(f = factions; f; f = f->next ) freset(f, FL_DH);
+  freset(mage->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 
   for (n = 0; n < pa->length; n++) {
     if (force<=0) break;
@@ -3471,7 +3473,8 @@ sp_chaossuction(castorder *co)
       "Wirbel");
   new_border(&bt_chaosgate, r, rt);
 
-  for (f = factions; f; f = f->next) freset(f, FL_DH);
+  freset(mage->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
   for (u = r->units; u; u = u->next) {
     if (!fval(u->faction, FL_DH)) {
       fset(u->faction, FL_DH);
