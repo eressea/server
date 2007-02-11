@@ -1594,6 +1594,13 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gelingt es zwar die Region zu verzaubern, aber irgendwas ging schief."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) manages to put a spell on the region, but something went wrong nonetheless."</text>
   </message>
+  <message name="summonundead_effect" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) stört die Ruhe der Toten."</text>
+    <text locale="en">"$unit($unit) communicates with the dead."</text>
+  </message>
   <message name="regionmagic_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>

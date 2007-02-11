@@ -3643,6 +3643,7 @@ sp_summonundead(castorder *co)
   int cast_level = co->level;
   int force = (int)(co->force*10);
   const race * race = new_race[RC_SKELETON];
+  message * m;
 
   if (!r->land || deathcount(r) == 0) {
     sprintf(buf, "%s in %s: In %s sind keine Gräber.", unitname(mage),
@@ -3671,14 +3672,14 @@ sp_summonundead(castorder *co)
   /* melden, 1x pro Partei */
   for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 
-  for(u = r->units; u; u = u->next ) {
+  for (u = r->units; u; u = u->next ) {
     if (!fval(u->faction, FL_DH) ) {
+      if (!m) m = msg_message("summonundead_effect", "unit", mage);
       fset(u->faction, FL_DH);
-      sprintf(buf, "%s stört die Ruhe der Toten",
-        cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-      addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+      ADDMSG(&u->faction->msgs, m);
     }
   }
+  if (m) msg_release(m);
   return cast_level;
 }
 
