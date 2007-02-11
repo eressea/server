@@ -2257,7 +2257,6 @@ sp_ironkeeper(castorder *co)
 static int
 sp_stormwinds(castorder *co)
 {
-  faction *f;
   ship *sh;
   unit *u;
   int erfolg = 0;
@@ -3449,7 +3448,6 @@ sp_chaossuction(castorder *co)
 {
   unit *u;
   region *rt;
-  faction *f;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
