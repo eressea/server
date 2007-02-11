@@ -179,8 +179,14 @@ msg_message(const char * name, const char* sig, ...)
 static void
 caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-	message * m = NULL;
+  message * m = NULL;
 
+#define LOG_ENGLISH
+#ifdef LOG_ENGLISH
+  if (f && f->locale!=default_locale) {
+    log_warning(("message for locale \"%s\": %s\n", locale_name(f->locale), s));
+  }
+#endif
 	unused(level);
 	switch (mtype) {
 	case MSG_INCOME:

@@ -985,7 +985,7 @@ cr_reportspell(FILE * F,  spell *sp, const struct locale * lang)
   fprintf(F, "%d;level\n", sp->level);
   fprintf(F, "%d;rank\n", sp->rank);
   fprintf(F, "\"%s\";info\n", spell_info(sp, lang));
-  if (sp->syntax) fprintf(F, "\"%s\";syntax\n", sp->syntax);
+  if (sp->parameter) fprintf(F, "\"%s\";syntax\n", sp->parameter);
   else fputs("\"\";syntax\n", F);
 
   if (sp->sptyp & PRECOMBATSPELL) fputs("\"precombat\";class\n", F);
