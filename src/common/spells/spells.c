@@ -3643,7 +3643,7 @@ sp_summonundead(castorder *co)
   int cast_level = co->level;
   int force = (int)(co->force*10);
   const race * race = new_race[RC_SKELETON];
-  message * m;
+  message * m = NULL;
 
   if (!r->land || deathcount(r) == 0) {
     sprintf(buf, "%s in %s: In %s sind keine Gräber.", unitname(mage),
