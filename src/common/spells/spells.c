@@ -1912,6 +1912,8 @@ sp_treewalkexit(castorder *co)
         sprintf(buf, "%s ist zu schwer.", unitname(u));
         addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
       } else {
+        message * m = NULL;
+
         remaining_cap = remaining_cap - w;
         move_unit(u, rt, NULL);
         erfolg = cast_level;
@@ -1933,15 +1935,16 @@ sp_treewalkexit(castorder *co)
         /* Meldungen in der Zielregion */
 
         for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-        for(u2 = rt->units; u2; u2 = u2->next ) {
+        for (u2 = rt->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
-            fset(u2->faction, FL_DH);
             if (cansee(u2->faction, rt, u, 0)) {
-              sprintf(buf, "%s erscheint plötzlich.", unitname(u));
-              addmessage(rt, u2->faction, buf, MSG_EVENT, ML_INFO);
+              fset(u2->faction, FL_DH);
+              if (!m) m = msg_message("astral_appear", "unit", u);
+              r_addmessage(r, u2->faction, m);
             }
           }
         }
+        if (m) msg_release(m);
       }
     }
   }
@@ -5706,6 +5709,7 @@ sp_enterastral(castorder *co)
       addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
           MSG_MAGIC, ML_MISTAKE);
     } else {
+      message * m = NULL;
       remaining_cap = remaining_cap - w;
       move_unit(u, rt, NULL);
 
@@ -5728,13 +5732,14 @@ sp_enterastral(castorder *co)
       for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
       for (u2 = rt->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
-          fset(u2->faction, FL_DH);
           if (cansee(u2->faction, rt, u, 0)) {
-            sprintf(buf, "%s erscheint plötzlich.", unitname(u));
-            addmessage(rt, u2->faction, buf, MSG_EVENT, ML_INFO);
+            fset(u2->faction, FL_DH);
+            if (!m) m = msg_message("astral_appear", "unit", u);
+            r_addmessage(r, u2->faction, m);
           }
         }
       }
+      if (m) msg_release(m);
     }
   }
   return cast_level;
@@ -5823,6 +5828,8 @@ sp_pullastral(castorder *co)
         addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
           MSG_MAGIC, ML_MISTAKE);
       } else {
+        message * m = NULL;
+
         remaining_cap = remaining_cap - w;
         move_unit(u, rt, NULL);
 
@@ -5843,15 +5850,16 @@ sp_pullastral(castorder *co)
         /* Meldungen in der Zielregion */
 
         for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-        for(u2 = rt->units; u2; u2 = u2->next ) {
+        for (u2 = rt->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
-            fset(u2->faction, FL_DH);
             if (cansee(u2->faction, rt, u, 0)) {
-              sprintf(buf, "%s erscheint plötzlich.", unitname(u));
-              addmessage(rt, u2->faction, buf, MSG_EVENT, ML_INFO);
+              fset(u2->faction, FL_DH);
+              if (!m) m = msg_message("astral_appear", "unit", u);
+              r_addmessage(r, u2->faction, m);
             }
           }
         }
+        if (m) msg_release(m);
       }
     }
     return cast_level;
@@ -5933,6 +5941,8 @@ sp_leaveastral(castorder *co)
       addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
         MSG_MAGIC, ML_MISTAKE);
     } else {
+      message * m = NULL;
+
       remaining_cap = remaining_cap - w;
       move_unit(u, rt, NULL);
 
@@ -5955,13 +5965,14 @@ sp_leaveastral(castorder *co)
       for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
       for (u2 = rt->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
-          fset(u2->faction, FL_DH);
           if (cansee(u2->faction, rt, u, 0)) {
-            sprintf(buf, "%s erscheint plötzlich.", unitname(u));
-            addmessage(rt, u2->faction, buf, MSG_EVENT, ML_INFO);
+            fset(u2->faction, FL_DH);
+            if (!m) m = msg_message("astral_appear", "unit", u);
+            r_addmessage(r, u2->faction, m);
           }
         }
       }
+      if (m) msg_release(m);
     }
   }
   return cast_level;
