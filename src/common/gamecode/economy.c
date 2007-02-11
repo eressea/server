@@ -1067,8 +1067,9 @@ economics(region *r)
   for (u = r->units; u; u = u->next) {
     order * ord;
     boolean destroyed = false;
-    for (ord = u->orders; ord; ord = ord->next) {
-      switch (get_keyword(ord)) {
+    if (u->number>0) {
+      for (ord = u->orders; ord; ord = ord->next) {
+        switch (get_keyword(ord)) {
         case K_DESTROY:
           if (!destroyed) {
             if (destroy_cmd(u, ord)!=0) ord = NULL;
@@ -1085,8 +1086,9 @@ economics(region *r)
           forget_cmd(u, ord);
           break;
 
+        }
+        if (u->orders==NULL) break;
       }
-	    if (u->orders==NULL) break;
     }
   }
   /* RECRUIT orders */
