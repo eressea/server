@@ -78,35 +78,6 @@ cinfo_shipnodrift(const struct locale * lang, void * obj, typ_t typ, curse *c, i
 	return 1;
 }
 
-static int
-cinfo_disorientation(void * obj, typ_t typ, curse *c, int self)
-{
-	unused(typ);
-	unused(obj);
-	unused(self);
-
-	assert(typ == TYP_SHIP);
-
-	sprintf(buf, "Der Kompaß kaputt, die Segel zerrissen, der Himmel "
-			"wolkenverhangen. Wohin fahren wir? (%s)", curseid(c));
-
-	return 1;
-}
-
-static int
-cinfo_shipspeedup(void * obj, typ_t typ, curse *c, int self)
-{
-	unused(typ);
-	unused(obj);
-	unused(self);
-
-	assert(typ == TYP_SHIP);
-
-	sprintf(buf, "Ein Windgeist beschleunigt dieses Schiff. (%s)", curseid(c));
-
-	return 1;
-}
-
 static struct curse_type ct_stormwind = { "stormwind",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"",
@@ -122,7 +93,8 @@ static struct curse_type ct_nodrift = { "nodrift",
 	"Der Zauber auf diesem Schiff ist aus den elementaren Magien der Luft "
 	"und des Wassers gebunden. Der dem Wasser verbundene Teil des Zaubers "
 	"läßt es leichter durch die Wellen gleiten und der der Luft verbundene "
-	"Teil scheint es vor widrigen Winden zu schützen."
+	"Teil scheint es vor widrigen Winden zu schützen.",
+  cinfo_shipnodrift
 };
 static struct curse_type ct_shipdisorientation = { "shipdisorientation",
 	CURSETYP_NORM, 0, NO_MERGE,
@@ -136,10 +108,6 @@ static struct curse_type ct_shipspeedup = { "shipspeedup",
 void 
 register_shipcurse(void)
 {
-	register_function((pf_generic)cinfo_disorientation, "curseinfo::disorientation");
-	register_function((pf_generic)cinfo_shipnodrift, "curseinfo::shipnodrift");
-	register_function((pf_generic)cinfo_shipspeedup, "curseinfo::shipspeedup");
-
 	ct_register(&ct_stormwind);
 	ct_register(&ct_flyingship);
 	ct_register(&ct_nodrift);
