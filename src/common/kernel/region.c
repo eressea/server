@@ -123,21 +123,24 @@ regionname(const region * r, const faction * f)
 }
 
 int
-deathcount(const region * r) {
+deathcount(const region * r)
+{
   attrib * a = a_find(r->attribs, &at_deathcount);
   if (!a) return 0;
   return a->data.i;
 }
 
 int
-chaoscount(const region * r) {
+chaoscount(const region * r)
+{
   attrib * a = a_find(r->attribs, &at_chaoscount);
   if (!a) return 0;
   return a->data.i;
 }
 
 void
-deathcounts (region * r, int fallen) {
+deathcounts (region * r, int fallen)
+{
   attrib * a;
 
   if (fallen==0) return;
@@ -151,7 +154,8 @@ deathcounts (region * r, int fallen) {
 }
 
 void
-chaoscounts(region * r, int fallen) {
+chaoscounts(region * r, int fallen)
+{
   attrib * a;
 
   if (fallen==0) return;
@@ -166,13 +170,19 @@ chaoscounts(region * r, int fallen) {
 /********************/
 /*   at_direction   */
 /********************/
-void
+static void
 a_initdirection(attrib *a)
 {
   a->data.v = calloc(1, sizeof(spec_direction));
 }
 
-int
+static void
+a_freedirection(attrib *a)
+{
+  free(a->data.v);
+}
+
+static int
 a_agedirection(attrib *a)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
@@ -183,7 +193,7 @@ a_agedirection(attrib *a)
   return d->duration;
 }
 
-int
+static int
 a_readdirection(attrib *a, FILE *f)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
@@ -196,7 +206,7 @@ a_readdirection(attrib *a, FILE *f)
   return AT_READ_OK;
 }
 
-void
+static void
 a_writedirection(const attrib *a, FILE *f)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
@@ -208,7 +218,7 @@ a_writedirection(const attrib *a, FILE *f)
 attrib_type at_direction = {
   "direction",
   a_initdirection,
-  NULL,
+  a_freedirection,
   a_agedirection,
   a_writedirection,
   a_readdirection
