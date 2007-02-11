@@ -2476,14 +2476,14 @@ magic(void)
       boolean casted = false;
       order * ord;
 
-      if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
+      if (u->number<=0 || u->race == new_race[RC_SPELL])
         continue;
 
       if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
         !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
         continue;
 
-      if(fval(u, UFL_WERE|UFL_LONGACTION)) {
+      if (fval(u, UFL_WERE|UFL_LONGACTION)) {
         continue;
       }
 

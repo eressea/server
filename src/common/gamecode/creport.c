@@ -249,6 +249,8 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
           self = c->type->cansee(viewer, obj, typ, c, self);
         }
         dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
+      } else {
+        log_error(("no curseinfo for %s\n", c->type->cname));
       }
       if (dh==0) {
         if (c->type->info_str!=NULL) {
