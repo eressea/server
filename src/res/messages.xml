@@ -1526,7 +1526,7 @@
       <arg name="command" type="order"/>
       <arg name="mage" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann  durch $unit($unit) zu wirken."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann nicht genug Energie aufbringen, um diesen Spruch durch $unit($unit) zu wirken."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) cannot raise enough energy to channel the spell through $unit($unit)."</text>
   </message>
   <message name="spell_resist" section="magic">
