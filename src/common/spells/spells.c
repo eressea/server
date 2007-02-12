@@ -1790,6 +1790,8 @@ sp_treewalkenter(castorder *co)
       ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact", "target", u));
     } else {
       int w;
+      message * m = NULL;
+      unit * u2;
 
       if (!can_survive(u, rt)) {
         cmistake(mage, co->order, 231, MSG_MAGIC);
@@ -1810,7 +1812,17 @@ sp_treewalkenter(castorder *co)
       ADDMSG(&r->msgs, msg_message("astral_disappear", "unit", u));
 
       /* Meldungen in der Zielregion */
-      ADDMSG(&rt->msgs, msg_message("astral_appear", "unit", u));
+      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = rt->units; u2; u2 = u2->next ) {
+        if (!fval(u2->faction, FL_DH)) {
+          if (cansee(u2->faction, rt, u, 0)) {
+            fset(u2->faction, FL_DH);
+            if (!m) m = msg_message("astral_appear", "unit", u);
+            r_addmessage(rt, u2->faction, m);
+          }
+        }
+      }
+      if (m) msg_release(m);
     }
   }
   return erfolg;
@@ -1934,13 +1946,13 @@ sp_treewalkexit(castorder *co)
 
         /* Meldungen in der Zielregion */
 
-        for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
         for (u2 = rt->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
             if (cansee(u2->faction, rt, u, 0)) {
               fset(u2->faction, FL_DH);
               if (!m) m = msg_message("astral_appear", "unit", u);
-              r_addmessage(r, u2->faction, m);
+              r_addmessage(rt, u2->faction, m);
             }
           }
         }
@@ -5733,7 +5745,7 @@ sp_enterastral(castorder *co)
           if (cansee(u2->faction, rt, u, 0)) {
             fset(u2->faction, FL_DH);
             if (!m) m = msg_message("astral_appear", "unit", u);
-            r_addmessage(r, u2->faction, m);
+            r_addmessage(rt, u2->faction, m);
           }
         }
       }
@@ -5853,7 +5865,7 @@ sp_pullastral(castorder *co)
             if (cansee(u2->faction, rt, u, 0)) {
               fset(u2->faction, FL_DH);
               if (!m) m = msg_message("astral_appear", "unit", u);
-              r_addmessage(r, u2->faction, m);
+              r_addmessage(rt, u2->faction, m);
             }
           }
         }
@@ -5966,7 +5978,7 @@ sp_leaveastral(castorder *co)
           if (cansee(u2->faction, rt, u, 0)) {
             fset(u2->faction, FL_DH);
             if (!m) m = msg_message("astral_appear", "unit", u);
-            r_addmessage(r, u2->faction, m);
+            r_addmessage(rt, u2->faction, m);
           }
         }
       }
@@ -6002,8 +6014,9 @@ sp_fetchastral(castorder *co)
 
   /* für jede Einheit in der Kommandozeile */
   for (n=0; n!=pa->length; ++n) {
-    unit * u = pa->param[n]->data.u;
+    unit * u2, * u = pa->param[n]->data.u;
     int w;
+    message * m = NULL;
 
     if (pa->param[n]->flag & TARGET_NOTFOUND) continue;
 
@@ -6065,7 +6078,17 @@ sp_fetchastral(castorder *co)
     ADDMSG(&ro->msgs, msg_message("astral_disappear", "unit", u));
 
     /* Meldungen in der Zielregion */
-    ADDMSG(&rt->msgs, msg_message("astral_appear", "unit", u));
+    for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+    for (u2 = rt->units; u2; u2 = u2->next ) {
+      if (!fval(u2->faction, FL_DH)) {
+        if (cansee(u2->faction, rt, u, 0)) {
+          fset(u2->faction, FL_DH);
+          if (!m) m = msg_message("astral_appear", "unit", u);
+          r_addmessage(rt, u2->faction, m);
+        }
+      }
+    }
+    if (m) msg_release(m);
   }
   if (rtl!=NULL) free_regionlist(rtl);
   return cast_level;
