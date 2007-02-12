@@ -70,7 +70,7 @@ createmonsters(void)
 	set_string(&f->email, "monsters@eressea.de");
 	set_string(&f->name, "Monster");
 	f->alive = 1;
-	f->options = (char) pow(2, O_REPORT);
+	f->options = (char)(1<<O_REPORT);
 	addlist(&factions, f);
   fhash(f);
 }

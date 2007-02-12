@@ -1056,16 +1056,16 @@ farcasting(unit *magician, region *r)
 	int mult;
 
 	if (!r) {
-		return 1025;
+		return INT_MAX;
 	}
 
 	dist = koor_distance(r->x, r->y, magician->region->x, magician->region->y);
 
-	if (dist > 24) return 1025;
+	if (dist > 24) return INT_MAX;
 
-	mult = (int)pow(2.0,(double)dist);
+	mult = 1 << dist;
 	if (dist > 1) {
-		if (!path_exists(magician->region, r, dist*2, allowed_fly)) mult = 1025;
+		if (!path_exists(magician->region, r, dist*2, allowed_fly)) mult = INT_MAX;
 	}
 
 	return mult;

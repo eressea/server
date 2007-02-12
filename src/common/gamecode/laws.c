@@ -2094,12 +2094,12 @@ send_cmd(unit * u, struct order * ord)
       if (option == O_COMPRESS || option == O_BZIP2) {
         cmistake(u, ord, 305, MSG_EVENT);
       } else {
-        u->faction->options = u->faction->options & ~((int)pow(2, option));
+        u->faction->options = u->faction->options & ~(1<<option);
       }
     } else {
-      u->faction->options = u->faction->options | ((int)pow(2, option));
-      if(option == O_COMPRESS) u->faction->options &= ~((int)pow(2, O_BZIP2));
-      if(option == O_BZIP2) u->faction->options &= ~((int)pow(2, O_COMPRESS));
+      u->faction->options = u->faction->options | (1<<option);
+      if(option == O_COMPRESS) u->faction->options &= ~(1<<O_BZIP2);
+      if(option == O_BZIP2) u->faction->options &= ~(1<<O_COMPRESS);
     }
   }
   return 0;
