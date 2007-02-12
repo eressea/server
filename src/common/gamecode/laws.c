@@ -2461,22 +2461,22 @@ status_cmd(unit * u, struct order * ord)
   param = getstrtoken();
   switch (findparam(param, u->faction->locale)) {
   case P_NOT:
-    u->status = ST_AVOID;
+    setstatus(u, ST_AVOID);
     break;
   case P_BEHIND:
-    u->status = ST_BEHIND;
+    setstatus(u, ST_BEHIND);
     break;
   case P_FLEE:
-    u->status = ST_FLEE;
+    setstatus(u, ST_FLEE);
     break;
   case P_CHICKEN:
-    u->status = ST_CHICKEN;
+    setstatus(u, ST_CHICKEN);
     break;
   case P_AGGRO:
-    u->status = ST_AGGRO;
+    setstatus(u, ST_AGGRO);
     break;
   case P_VORNE:
-    u->status = ST_FIGHT;
+    setstatus(u, ST_FIGHT);
     break;
   case P_HELP:
     if (getparam(u->faction->locale) == P_NOT) {
@@ -2490,7 +2490,7 @@ status_cmd(unit * u, struct order * ord)
       add_message(&u->faction->msgs,
         msg_feedback(u, ord, "unknown_status", ""));
     } else {
-      u->status = ST_FIGHT;
+      setstatus(u, ST_FIGHT);
     }
   }
   return 0;
@@ -2548,11 +2548,14 @@ combatspell_cmd(unit * u, struct order * ord)
 /* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
  * können */
 
-enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE };
+enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
 
 static int
 can_start_guarding(const unit * u)
 {
+#ifdef SIMPLE_ESCAPE
+  if (u->status>=ST_FLEE) return E_GUARD_FLEEING;
+#endif
   if (fval(u->race, RCF_UNARMEDGUARD)) return E_GUARD_OK;
   if (!armedmen(u)) return E_GUARD_UNARMED;
   if (u->faction->age < NewbieImmunity()) return E_GUARD_NEWBIE;
@@ -2598,12 +2601,14 @@ guard_on_cmd(unit * u, struct order * ord)
         guard(u, GUARD_ALL);
       } else {
         int err = can_start_guarding(u);
-        if (err==E_GUARD_UNARMED) {
+        if (err==E_GUARD_OK) {
+          guard(u, GUARD_ALL);
+        } else if (err==E_GUARD_UNARMED) {
           ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
+        } else if (err==E_GUARD_FLEEING) {
+          cmistake(u, ord, 320, MSG_EVENT);
         } else if (err==E_GUARD_NEWBIE) {
           cmistake(u, ord, 304, MSG_EVENT);
-        } else {
-          guard(u, GUARD_ALL);
         }
       }
     }

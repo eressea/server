@@ -737,7 +737,7 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
   unused(sp);
 
   u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);
-  u->status = ST_FIGHT;
+  setstatus(u, ST_FIGHT);
 
   set_string(&u->name, racename(mage->faction->locale, u, u->race));
   set_level(u, SK_WEAPONLESS, (int)(power/2));
@@ -767,7 +767,7 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   unit *u = create_unit(r, mage->faction, force, new_race[RC_WOLF], 0, NULL, mage);
   unused(sp);
 
-  u->status = ST_FIGHT;
+  setstatus(u, ST_FIGHT);
 
   set_string(&u->name, racename(mage->faction->locale, u, u->race));
   set_level(u, SK_WEAPONLESS, (int)(power/3));
@@ -802,7 +802,7 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
   unused(sp);
 
   u = create_unit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT], 0, NULL, mage);
-  u->status = ST_FIGHT;
+  setstatus(u, ST_FIGHT);
 
   set_string(&u->name, "Schattenritter");
   u->hp = u->number * unit_max_hp(u);
@@ -1683,7 +1683,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         /* new units gets some stats from old unit */
         set_string(&u->name, du->name);
         set_string(&u->display, du->display);
-        u->status = du->status;
+        setstatus(u, du->status);
         setguard(u, GUARD_NONE);
 
         /* inherit stealth from magician */

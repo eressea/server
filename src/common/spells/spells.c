@@ -575,7 +575,7 @@ sp_summon_familiar(castorder *co)
     familiar->building = mage->building;
     familiar->ship = mage->ship;
   }
-  familiar->status = ST_FLEE; /* flieht */
+  setstatus(familiar, ST_FLEE);
   sprintf(buf, "Vertrauter von %s", unitname(mage));
   set_string(&familiar->name, buf);
   if (fval(mage, UFL_PARTEITARNUNG)) fset(familiar, UFL_PARTEITARNUNG);
@@ -2222,7 +2222,7 @@ sp_ironkeeper(castorder *co)
   /*keeper->age = cast_level + 2;*/
   guard(keeper, GUARD_MINING);
   fset(keeper, UFL_ISNEW);
-  keeper->status = ST_AVOID;  /* kaempft nicht */
+  setstatus(keeper, ST_AVOID); /* kaempft nicht */
   /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
   fset(keeper, UFL_PARTEITARNUNG);
   {
@@ -5291,7 +5291,7 @@ sp_clonecopy(castorder *co)
 
   sprintf(buf, "Klon von %s", unitname(mage));
   clone = create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, buf, mage);
-  clone->status = ST_FLEE;
+  setstatus(clone, ST_FLEE);
   fset(clone, UFL_LOCKED);
 
   create_newclone(mage, clone);

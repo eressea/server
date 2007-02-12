@@ -1960,7 +1960,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     attrib * a;
 
     /* erbt Kampfstatus */
-    u->status = creator->status;
+    setstatus(u, creator->status);
 
     /* erbt Gebäude/Schiff*/
     if (creator->region==r) {
@@ -2428,11 +2428,28 @@ attrib_type at_guard = {
 };
 
 void
+setstatus(struct unit * u, int status)
+{
+  assert(status>=ST_AGGRO && status<=ST_FLEE);
+  if (u->status!=status) {
+    u->status = status;
+#ifdef SIMPLE_ESCAPE
+    if (u->status==ST_FLEE) {
+      setguard(u, GUARD_NONE);
+    }
+#endif
+  }
+}
+
+void
 setguard(unit * u, unsigned int flags)
 {
   /* setzt die guard-flags der Einheit */
   attrib * a = NULL;
   assert(flags==0 || !fval(u, UFL_MOVED));
+#ifdef SIMPLE_ESCAPE
+  assert(flags==0 || u->status<ST_FLEE);
+#endif
   if (fval(u, UFL_GUARD)) {
     a = a_find(u->attribs, &at_guard);
   }
@@ -2449,7 +2466,6 @@ setguard(unit * u, unsigned int flags)
 unsigned int
 getguard(const unit * u)
 {
-
   if (!fval(u->region->terrain, LAND_REGION)) return GUARD_NONE;
   if (fval(u, UFL_GUARD)) {
     attrib * a = a_find(u->attribs, &at_guard);

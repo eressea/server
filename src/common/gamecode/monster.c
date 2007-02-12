@@ -805,10 +805,12 @@ recruit_dracoids(unit * dragon, int size)
   change_money(dragon, -un->number * 50);
   equip_unit(un, get_equipment("recruited_dracoid"));
 
-  un->status = ST_FIGHT;
+  setstatus(un, ST_FIGHT);
   for (weapon=un->items;weapon;weapon=weapon->next) {
     const weapon_type * wtype = weapon->type->rtype->wtype;
-    if (wtype && (wtype->flags & WTF_MISSILE)) un->status = ST_BEHIND;
+    if (wtype && (wtype->flags & WTF_MISSILE)) {
+      setstatus(un, ST_BEHIND);
+    }
     sprintf(buf, "%s \"%s\"", keywords[K_STUDY], 
       skillname(weapon->type->rtype->wtype->skill, f->locale));
     new_order = parse_order(buf, default_locale);
@@ -941,7 +943,10 @@ plan_monsters(void)
         attack_chance = 0.0;
       }
 
-      if (u->status>ST_BEHIND) u->status = ST_FIGHT; /* all monsters fight */
+      if (u->status>ST_BEHIND) {
+        setstatus(u, ST_FIGHT);
+        /* all monsters fight */
+      }
       /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
       produceexp(u, SK_OBSERVATION, u->number);
 

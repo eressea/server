@@ -1035,8 +1035,10 @@ void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtyp
 	/* Verhindert Abbau von Resourcen mit RTF_LIMITED */
 #define GUARD_ALL 0xFFFF
 
-extern void setguard(struct unit * u, unsigned int flags);
-	/* setzt die guard-flags der Einheit */
+extern void setstatus(struct unit * u, int status);
+/* !< sets combatstatus of a unit */
+extern void setguard(struct unit * u, unsigned int flags); 
+/* !< setzt die guard-flags der Einheit */
 extern unsigned int getguard(const struct unit * u);
 	/* liest die guard-flags der Einheit */
 extern void guard(struct unit * u, unsigned int mask);

@@ -1015,34 +1015,42 @@ readunit(FILE * F)
   if (count_unit(u)) u->faction->no_units++;
 
   set_number(u, number);
-	u->building = findbuilding(rid(F));
-	u->ship = findship(rid(F));
+  u->building = findbuilding(rid(F));
+  u->ship = findship(rid(F));
 
-	if (global.data_version <= 73) {
-		if (ri(F)) {
-			fset(u, UFL_OWNER);
-		} else {
-			freset(u, UFL_OWNER);
-		}
-	}
-	u->status = (status_t) ri(F);
-	if (global.data_version < NEWSTATUS_VERSION) {
-		switch (u->status) {
-		case 0: u->status = ST_FIGHT; break;
-		case 1: u->status = ST_BEHIND; break;
-		case 2: u->status = ST_AVOID; break;
-		case 3: u->status = ST_FLEE; break;
-		default: assert(0);
-		}
-	}
-	if (global.data_version <= 73) {
-		if (ri(F)) {
-			guard(u, GUARD_ALL);
-		} else {
-			guard(u, GUARD_NONE);
-		}
-	} else {
-		u->flags = ri(F) & ~UFL_DEBUG;
+  if (global.data_version <= 73) {
+    if (ri(F)) {
+      fset(u, UFL_OWNER);
+    } else {
+      freset(u, UFL_OWNER);
+    }
+  }
+  setstatus(u, ri(F));
+  if (global.data_version < NEWSTATUS_VERSION) {
+    switch (u->status) {
+      case 0:
+        setstatus(u, ST_FIGHT); 
+        break;
+      case 1: 
+        setstatus(u, ST_BEHIND);
+        break;
+      case 2: 
+        setstatus(u, ST_AVOID);
+        break;
+      case 3: 
+        setstatus(u, ST_FLEE);
+      default:
+        assert(!"unknown status in data");
+    }
+  }
+  if (global.data_version <= 73) {
+    if (ri(F)) {
+      guard(u, GUARD_ALL);
+    } else {
+      guard(u, GUARD_NONE);
+    }
+  } else {
+    u->flags = ri(F) & ~UFL_DEBUG;
     u->flags &= UFL_SAVEMASK;
   }
 	/* Persistente Befehle einlesen */

@@ -89,43 +89,43 @@ static attrib_type at_alp = {
 int
 sp_summon_alp(struct castorder *co)
 {
-	unit *alp, *opfer;
-	region *r = co->rt;
-	unit *mage = co->magician.u;
-	int cast_level = co->level;
-	spellparameter *pa = co->par;
+  unit *alp, *opfer;
+  region *r = co->rt;
+  unit *mage = co->magician.u;
+  int cast_level = co->level;
+  spellparameter *pa = co->par;
 
-	opfer = pa->param[0]->data.u;
+  opfer = pa->param[0]->data.u;
 
-	/* Der Alp gehört den Monstern, darum erhält der Magier auch keine
-	 * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
-	 * sobald der Alp sein Opfer erreicht hat.
-	 */
-	alp = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP]);
-	set_level(alp, SK_STEALTH, 7);
-	set_string(&alp->name, "Alp");
-	alp->status = ST_FLEE;	/* flieht */
+  /* Der Alp gehört den Monstern, darum erhält der Magier auch keine
+  * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
+  * sobald der Alp sein Opfer erreicht hat.
+  */
+  alp = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP]);
+  set_level(alp, SK_STEALTH, 7);
+  set_string(&alp->name, "Alp");
+  setstatus(alp, ST_FLEE); /* flieht */
 
-	{
-		attrib * a = a_add(&alp->attribs, a_new(&at_alp));
-		alp_data * ad = (alp_data*) a->data.v;
-		ad->mage = mage;
-		ad->target = opfer;
-	}
+  {
+    attrib * a = a_add(&alp->attribs, a_new(&at_alp));
+    alp_data * ad = (alp_data*) a->data.v;
+    ad->mage = mage;
+    ad->target = opfer;
+  }
 
-	{
-		/* Wenn der Alp stirbt, den Magier nachrichtigen */
-		add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, 
+  {
+    /* Wenn der Alp stirbt, den Magier nachrichtigen */
+    add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, 
       "Ein Alp starb, ohne sein Ziel zu erreichen.", MSG_EVENT, ML_INFO));
-		/* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
-		add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
-		add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
-	}
-	sprintf(buf, "%s beschwört den Alp %s für %s.", unitname(mage),
-		unitname(alp), unitname(opfer));
-	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+    /* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
+    add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
+    add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
+  }
+  sprintf(buf, "%s beschwört den Alp %s für %s.", unitname(mage),
+    unitname(alp), unitname(opfer));
+  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
-	return cast_level;
+  return cast_level;
 }
 
 

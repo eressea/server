@@ -2803,6 +2803,17 @@
     <text locale="en">"$unit($unit) drowns when $ship($ship) in $region($region) sinks."</text>
   </message>
 
+  <message name="error320" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie veruscht zu fliehen."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it's trying to flee."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it's trying to flee."</text>
+  </message>
+
   <message name="error319" section="errors">
     <type>
       <arg name="unit" type="unit"/>
