@@ -2432,7 +2432,7 @@ setstatus(struct unit * u, int status)
 {
   assert(status>=ST_AGGRO && status<=ST_FLEE);
   if (u->status!=status) {
-    u->status = status;
+    u->status = (status_t)status;
 #ifdef SIMPLE_ESCAPE
     if (u->status==ST_FLEE) {
       setguard(u, GUARD_NONE);
