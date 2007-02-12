@@ -3277,9 +3277,11 @@ new_units (void)
 
             a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
 
+            setstatus(u2, u->status);
+            /*
             g = getguard(u);
             if (g) setguard(u2, g);
-            /* else setguard(u2, GUARD_NONE); */
+            */
 
             ordp = &makeord->next;
             newordersp = &u2->orders;
