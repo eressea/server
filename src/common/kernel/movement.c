@@ -1007,29 +1007,32 @@ init_transportation(void)
     /* This calculates the weights of all transported units and
      * adds them to an internal counter which is used by travel () to
      * calculate effective weight and movement. */
-    for (u=r->units; u; u=u->next) {
-      order * ord;
-      int w = 0;
+    
+    if (!fval(r->terrain, SEA_REGION)) {
+      for (u=r->units; u; u=u->next) {
+        order * ord;
+        int w = 0;
 
-      for (ord = u->orders; ord; ord = ord->next) {
-        if (get_keyword(ord) == K_TRANSPORT) {
-          init_tokens(ord);
-          skip_token();
-          for (;;) {
-            unit * ut = getunit(r, u->faction);
+        for (ord = u->orders; ord; ord = ord->next) {
+          if (get_keyword(ord) == K_TRANSPORT) {
+            init_tokens(ord);
+            skip_token();
+            for (;;) {
+              unit * ut = getunit(r, u->faction);
 
-            if (ut == NULL) break;
-            if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
-              init_tokens(ut->thisorder);
-              skip_token();
-              if (getunit(r, ut->faction) == u) {
-                w += weight(ut);
+              if (ut == NULL) break;
+              if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+                init_tokens(ut->thisorder);
+                skip_token();
+                if (getunit(r, ut->faction) == u) {
+                  w += weight(ut);
+                }
               }
             }
           }
         }
+        if (w > 0) a_add(&u->attribs, a_new(&at_driveweight))->data.i = w;
       }
-      if (w > 0) a_add(&u->attribs, a_new(&at_driveweight))->data.i = w;
     }
   }
 }
