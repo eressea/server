@@ -190,7 +190,6 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode, int c
       int mask;
 
       if (u==v) continue;
-      if (fval(v, UFL_LOCKED)) continue;
       if (urace(v)->ec_flags & NOGIVE) continue;
       if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
 
