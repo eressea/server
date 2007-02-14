@@ -236,7 +236,7 @@ give_starting_equipment(struct unit *u)
     break;
   case RC_GOBLIN:
     set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-    scale_number(u, 10);
+    set_number(u, 10);
     break;
   case RC_HUMAN:
     {
@@ -264,7 +264,7 @@ give_starting_equipment(struct unit *u)
     rsethorses(r, 250+rng_int()%51+rng_int()%51);
     break;
   }
-  u->hp = unit_max_hp(u);
+  u->hp = unit_max_hp(u) * u->number;
 }
 
 boolean
