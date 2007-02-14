@@ -905,6 +905,7 @@ extern int atoi36(const char * s);
 
 extern boolean cansee(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
 boolean cansee_durchgezogen(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
+extern boolean cansee_unit(const struct unit * u, const struct unit * target, int modifier);
 boolean seefaction(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
 extern int effskill(const struct unit * u, skill_t sk);
 

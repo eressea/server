@@ -1101,6 +1101,40 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   return false;
 }
 
+boolean
+cansee_unit(const unit * u, const unit * target, int modifier)
+/* target->region kann != u->region sein, wenn es um durchreisen geht */
+{
+  if (target->race == new_race[RC_SPELL] || target->number == 0) return false;
+  else if (target->faction == u->faction) return true;
+  else {
+    int n, rings, o;
+
+    if (getguard(target) || usiege(target) || target->building || target->ship) {
+      return true;
+    }
+
+    n = eff_stealth(target, target->region) - modifier;
+    rings = invisible(target, NULL);
+    if (rings==0 && n<=0) {
+      return true;
+    }
+
+    if (rings && invisible(target, u) >= target->number) {
+      return false;
+    }
+    o = eff_skill(u, SK_OBSERVATION, target->region);
+
+#ifdef NIGHTEYES
+    if (u->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
+      o = NIGHT_EYE_TALENT;
+#endif
+    if (o >= n) {
+      return true;
+    }
+  }
+  return false;
+}
 
 boolean
 cansee_durchgezogen(const faction * f, const region * r, const unit * u, int modifier)

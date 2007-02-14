@@ -810,6 +810,21 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 }
 
 static void
+add_faction(faction_list ** flist, faction * sf)
+{
+  faction_list ** fnew = flist;
+  while (*fnew && (*fnew)->data->no < sf->no) {
+    fnew =&(*fnew)->next;
+  }
+  if ((*fnew==NULL) || (*fnew)->data!=sf) {
+    faction_list * finsert = malloc(sizeof(faction_list));
+    finsert->next = *fnew;
+    *fnew = finsert;
+    finsert->data = sf;
+  }
+}
+
+static void
 get_addresses(report_context * ctx)
 {
 /* "TODO: travelthru" */
@@ -825,44 +840,50 @@ get_addresses(report_context * ctx)
   }
   
   for (;sr!=NULL;sr=sr->next) {
-    const region * r = sr->r;
-    const unit * u = r->units;
-    
-    while (u!=NULL) {
-      faction * sf = visible_faction(ctx->f, u);
-      boolean ballied = sf && sf!=ctx->f && sf!=lastf
-          && !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, 0);
-      if (ballied || ALLIED(ctx->f, sf)) {
-        faction_list ** fnew = &flist;
-        while (*fnew && (*fnew)->data->no < sf->no) {
-          fnew =&(*fnew)->next;
+    if (sr->mode==see_travel) {
+      unit * u = r->units;
+      while (u) {
+        faction * sf = visible_faction(ctx->f, u);
+        assert(u->faction!=ctx->f);
+        if (lastf!=sf) {
+          attrib * a = a_find(r->attribs, &at_travelunit);
+          while (a && a->type==&at_travelunit) {
+            unit * u2 = (unit*)a->data.v;
+            if (u2->faction==ctx->f) {
+              if (cansee_unit(u2, u, 0)) {
+                add_faction(&flist, sf);
+                lastf = sf;
+                break;
+              }
+            }
+            a = a->next;
+          }
         }
-        if ((*fnew==NULL) || (*fnew)->data!=sf) {
-          faction_list * finsert = malloc(sizeof(faction_list));
-          finsert->next = *fnew;
-          *fnew = finsert;
-          finsert->data = sf;
-        }
-        lastf = sf;
+        u = u->next;
       }
-      u = u->next;
+    } else if (sr->mode<see_travel) {
+      const region * r = sr->r;
+      const unit * u = r->units;
+      while (u!=NULL) {
+        if (u->faction!=ctx->f) {
+          faction * sf = visible_faction(ctx->f, u);
+          boolean ballied = sf && sf!=ctx->f && sf!=lastf
+            && !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, 0);
+          if (ballied || ALLIED(ctx->f, sf)) {
+            add_faction(&flist, sf);
+            lastf = sf;
+          }
+        }
+        u = u->next;
+      }    
     }
   }
   
   if (ctx->f->alliance != NULL) {
     faction *f2;
-    for(f2 = factions; f2; f2 = f2->next) {
-      if(f2->alliance != NULL && f2->alliance == ctx->f->alliance) {
-        faction_list ** fnew = &flist;
-        while (*fnew && (*fnew)->data->no < f2->no) {
-          fnew =&(*fnew)->next;
-        }
-        if ((*fnew==NULL) || (*fnew)->data!=f2) {
-          faction_list * finsert = malloc(sizeof(faction_list));
-          finsert->next = *fnew;
-          *fnew = finsert;
-          finsert->data = f2;
-        }
+    for (f2 = factions; f2; f2 = f2->next) {
+      if (f2->alliance != NULL && f2->alliance == ctx->f->alliance) {
+        add_faction(&flist, f2);
       }
     }
   }
@@ -992,12 +1013,12 @@ static report_type * report_types;
 void 
 register_reporttype(const char * extension, report_fun write, int flag)
 {
-	report_type * type = malloc(sizeof(report_type));
-	type->extension = extension;
-	type->write = write;
-	type->flag = flag;
-	type->next = report_types;
-	report_types = type;
+  report_type * type = malloc(sizeof(report_type));
+  type->extension = extension;
+  type->write = write;
+  type->flag = flag;
+  type->next = report_types;
+  report_types = type;
 }
 
 static region_list *
