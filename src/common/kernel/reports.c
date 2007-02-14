@@ -840,6 +840,7 @@ get_addresses(report_context * ctx)
   }
   
   for (;sr!=NULL;sr=sr->next) {
+    r = sr->r;
     if (sr->mode==see_travel) {
       unit * u = r->units;
       while (u) {
@@ -862,7 +863,6 @@ get_addresses(report_context * ctx)
         u = u->next;
       }
     } else if (sr->mode<see_travel) {
-      const region * r = sr->r;
       const unit * u = r->units;
       while (u!=NULL) {
         if (u->faction!=ctx->f) {
