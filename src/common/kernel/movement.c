@@ -2246,14 +2246,18 @@ static direction_t
 hunted_dir(attrib *at, int id)
 {
   attrib *a = a_find(at, &at_shiptrail);
+  direction_t d = NODIRECTION;
 
   while (a!=NULL && a->type==&at_shiptrail) {
     traveldir *t = (traveldir *)(a->data.v);
-    if (t->no == id) return t->dir;
+    if (t->no == id) {
+      d = t->dir;
+      /* do not break, because we want the last one for this ship */
+    }
     a = a->next;
   }
 
-  return NODIRECTION;
+  return d;
 }
 
 static int
