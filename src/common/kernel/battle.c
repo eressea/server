@@ -2508,8 +2508,10 @@ aftermath(battle * b)
           set_order(&du->thisorder, NULL);
           setguard(du, GUARD_NONE);
           fset(du, UFL_LONGACTION);
+#ifdef SIMPLE_ESCAPE
+          if (du->status<=ST_FLEE) leave(du->region, du);
+#else
           leave(du->region, du);
-#ifndef SIMPLE_ESCAPE
           if (df->run.region) {
             run_to(du, df->run.region);
             df->run.region = du->region;
