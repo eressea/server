@@ -3205,7 +3205,7 @@ dc_age(struct curse * c)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {
   region * r = (region*)c->data.v;
-  unit *u, **up;
+  unit **up;
   unit * mage = c->magician;
   
   if (r==NULL || mage==NULL || mage->number==0) {
@@ -3229,20 +3229,6 @@ dc_age(struct curse * c)
     change_hitpoints(u, -(int)damage);
 
     if (*up==u) up=&u->next;
-  }
-
-  /* melden, 1x pro Partei */
-  for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
-      ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect",
-        "mage region", cansee(u->faction, r, mage, 0) ? mage : NULL, r));
-    }
-  }
-
-  if (!fval(mage->faction, FL_DH)) {
-    ADDMSG(&mage->faction->msgs, msg_message("deathcloud_effect",
-      "mage region", mage, r));
   }
 
   return 0;
@@ -3308,6 +3294,7 @@ sp_deathcloud(castorder *co)
   region *r = co->rt;
   unit *mage = co->magician.u;
   attrib *a = r->attribs;
+  unit * u;
 
   while (a) {
     if ((a->type->flags & ATF_CURSE)) {
@@ -3322,6 +3309,20 @@ sp_deathcloud(castorder *co)
   }
 
   mk_deathcloud(mage, r, co->force, co->level);
+
+  /* melden, 1x pro Partei */
+  for (u = r->units; u; u = u->next ) {
+    if (!fval(u->faction, FL_DH) ) {
+      fset(u->faction, FL_DH);
+      ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect",
+        "mage region", cansee(u->faction, r, mage, 0) ? mage : NULL, r));
+    }
+  }
+
+  if (!fval(mage->faction, FL_DH)) {
+    ADDMSG(&mage->faction->msgs, msg_message("deathcloud_effect",
+      "mage region", mage, r));
+  }
 
   return co->level;
 }
