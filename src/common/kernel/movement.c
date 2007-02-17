@@ -1045,16 +1045,16 @@ roadto(const region * r, direction_t dir)
   region * r2;
   static const curse_type * roads_ct = NULL;
 
-  if (roads_ct == NULL) roads_ct = ct_find("magicstreet"); 
-  if (roads_ct!=NULL) {
-    curse *c = get_curse(r->attribs, roads_ct);
-    if (c!=NULL) return true;
-  }
-  
   if (dir>=MAXDIRECTIONS || dir<0) return false;
   r2 = rconnect(r, dir);
   if (r == NULL || r2 == NULL) return false;
 
+  if (roads_ct == NULL) roads_ct = ct_find("magicstreet"); 
+  if (roads_ct!=NULL) {
+    if (get_curse(r->attribs, roads_ct)!=NULL) return true;
+    if (get_curse(r2->attribs, roads_ct)!=NULL) return true;
+  }
+  
   if (r->terrain->max_road == 0) return false;
   if (r2->terrain->max_road == 0) return false;
   if (rroad(r, dir) < r->terrain->max_road) return false;
