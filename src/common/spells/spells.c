@@ -3009,28 +3009,45 @@ wisps_name(const border * b, const region * r, const faction * f, int gflags)
     return "Irrlichter";
 }
 
+typedef struct wisps_data {
+  wall_data wall;
+  int rnd;
+} wisps_data;
+
 static region *
 wisps_move(const border * b, struct unit * u, struct region * from, struct region * next, boolean routing)
 {
   direction_t reldir = reldirection(from, next);
-  wall_data * wd = (wall_data*)b->data.v;
+  wisps_data * wd = (wisps_data*)b->data.v;
   assert(reldir!=D_SPECIAL);
 
-  if (routing && wd->active) {
-    /* pick left and right region: */
+  if (routing && wd->wall.active) {
     region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
     region * rr = rconnect(from, (direction_t)((reldir+1)%MAXDIRECTIONS));
-    int j = rng_int() % 3;
-    if (j==1 && rl && fval(rl->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rl;
-    if (j==2 && rr && fval(rr->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rr;
+    /* pick left and right region: */
+    if (wd->rnd<0) {
+      wd->rnd = rng_int() % 3;
+    }
+
+    if (wd->rnd == 1 && rl && fval(rl->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rl;
+    if (wd->rnd == 2 && rr && fval(rr->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rr;
   }
   return next;
+}
+
+static void
+wisps_init(border * b)
+{
+  wisps_data * wd = (wisps_data*)calloc(sizeof(wisps_data), 1);
+
+  b->data.v = wd;
+  wd->rnd = -1;
 }
 
 border_type bt_wisps = {
   "wisps", VAR_VOIDPTR,
   b_transparent, /* transparent */
-  wall_init, /* init */
+  wisps_init, /* init */
   wall_destroy, /* destroy */
   wall_read, /* read */
   wall_write, /* write */
