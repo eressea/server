@@ -2676,39 +2676,44 @@ research_cmd(unit *u, struct order * ord)
 static int
 wahrnehmung(region * r, faction * f)
 {
-	unit *u;
-	int w = 0;
+  unit *u;
+  int w = 0;
 
-	for (u = r->units; u; u = u->next) {
-		if (u->faction == f) {
-				if (eff_skill(u, SK_OBSERVATION, r) > w) {
-					w = eff_skill(u, SK_OBSERVATION, r);
-				}
-			}
-	}
+  for (u = r->units; u; u = u->next) {
+    if (u->faction == f) {
+      if (eff_skill(u, SK_OBSERVATION, r) > w) {
+        w = eff_skill(u, SK_OBSERVATION, r);
+      }
+    }
+  }
 
-	return w;
+  return w;
 }
 
 static void
 steal_cmd(unit * u, struct order * ord, request ** stealorders)
 {
-	int n, i, id;
-	boolean goblin = false;
-	request * o;
-	unit * u2 = NULL;
+  int n, i, id;
+  boolean goblin = false;
+  request * o;
+  unit * u2 = NULL;
   region * r = u->region;
-	faction * f = NULL;
+  faction * f = NULL;
+
+  if (!fval(u->race, RCF_CANSTEAL)) {
+    ADDMSG(&u->faction->msgs, msg_feedback("race_nosteal", "race", u->race));
+    return;
+  }
 
   if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]) {
     cmistake(u, ord, 242, MSG_INCOME);
     return;
   }
 
-	if (r->planep && fval(r->planep, PFL_NOATTACK)) {
-		cmistake(u, ord, 270, MSG_INCOME);
-		return;
-	}
+  if (r->planep && fval(r->planep, PFL_NOATTACK)) {
+    cmistake(u, ord, 270, MSG_INCOME);
+    return;
+  }
 
   init_tokens(ord);
   skip_token();

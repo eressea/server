@@ -115,7 +115,7 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define RCF_PLAYERRACE     (1<<0)	/* can be played by a player. */
 #define RCF_KILLPEASANTS   (1<<1)		/* Töten Bauern. Dämonen werden nicht über dieses Flag, sondern in randenc() behandelt. */
 #define RCF_SCAREPEASANTS  (1<<2)
-
+#define RCF_CANSTEAL       (1<<3)
 #define RCF_MOVERANDOM     (1<<4)
 #define RCF_CANNOTMOVE     (1<<5)
 #define RCF_LEARN          (1<<6)  /* Lernt automatisch wenn struct faction == 0 */

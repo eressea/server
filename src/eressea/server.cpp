@@ -571,11 +571,20 @@ load_inifile(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
-    g_basedir = iniparser_getstr(d, "common:base");
-    g_resourcedir = iniparser_getstr(d, "common:res");
-    xmlfile = iniparser_getstr(d, "common:xml");
-    luafile = iniparser_getstr(d, "eressea:run");
+    const char * str;
+
+    lomem = iniparser_getint(d, "eressea:lomem", lomem)?0:1;
     quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
+    str = iniparser_getstr(d, "eressea:run");
+    if (str) luafile = str;
+    str = iniparser_getstr(d, "common:base");
+    if (str) g_basedir = str;
+    str = iniparser_getstr(d, "common:res");
+    if (str) g_resourcedir = str;
+    str = iniparser_getstr(d, "common:xml");
+    if (str) xmlfile = str;
+    str = iniparser_getstr(d, "common:scripts");
+    if (str) script_path = str;
   }
   inifile = d;
 }

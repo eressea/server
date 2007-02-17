@@ -616,6 +616,17 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot be regrouped."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot be regrouped."</text>
   </message>
+  <message name="race_nosteal" section="production">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nichts stehelen."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot steal anything."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot steal anything."</text>
+  </message>
   <message name="race_nogive" section="production">
     <type>
       <arg name="unit" type="unit"/>

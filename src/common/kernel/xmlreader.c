@@ -1409,14 +1409,15 @@ parse_races(xmlDocPtr doc)
 
     if (xml_bvalue(node, "playerrace", false)) rc->flags |= RCF_PLAYERRACE;
     if (xml_bvalue(node, "scarepeasants", false)) rc->flags |= RCF_SCAREPEASANTS;
+    if (xml_bvalue(node, "cansteal", true)) rc->flags |= RCF_CANSTEAL;
     if (xml_bvalue(node, "cannotmove", false)) rc->flags |= RCF_CANNOTMOVE;
     if (xml_bvalue(node, "fly", false)) rc->flags |= RCF_FLY;
     if (xml_bvalue(node, "coastal", false)) rc->flags |= RCF_COASTAL;
     if (xml_bvalue(node, "unarmedguard", false)) rc->flags |= RCF_UNARMEDGUARD;
     if (xml_bvalue(node, "swim", false)) rc->flags |= RCF_SWIM;
     if (xml_bvalue(node, "walk", false)) rc->flags |= RCF_WALK;
-    if (xml_bvalue(node, "nolearn", false)) rc->flags |= RCF_NOLEARN;
-    if (xml_bvalue(node, "noteach", false)) rc->flags |= RCF_NOTEACH;
+    if (!xml_bvalue(node, "canlearn", true)) rc->flags |= RCF_NOLEARN;
+    if (!xml_bvalue(node, "canteach", true)) rc->flags |= RCF_NOTEACH;
     if (xml_bvalue(node, "horse", false)) rc->flags |= RCF_HORSE;
     if (xml_bvalue(node, "desert", false)) rc->flags |= RCF_DESERT;
     if (xml_bvalue(node, "absorbpeasants", false)) rc->flags |= RCF_ABSORBPEASANTS;
