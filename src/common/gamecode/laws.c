@@ -3241,7 +3241,7 @@ new_units (void)
           if (getparam(u->faction->locale) == P_TEMP) {
             const char * token;
             char * name = NULL;
-            int g, alias;
+            int alias;
             order ** newordersp;
 
             if (!checkunitnumber(u->faction, 1)) {

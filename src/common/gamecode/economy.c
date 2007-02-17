@@ -2701,7 +2701,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
   faction * f = NULL;
 
   if (!fval(u->race, RCF_CANSTEAL)) {
-    ADDMSG(&u->faction->msgs, msg_feedback("race_nosteal", "race", u->race));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race", u->race));
     return;
   }
 

@@ -1022,7 +1022,9 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
   sh = new_ship(newtype, u->faction->locale, r);
 
   leave(r, u);
-  u->ship = sh;
+  if (fval(u->race, RCF_CANSAIL)) {
+    u->ship = sh;
+  }
   fset(u, UFL_OWNER);
   sprintf(buffer, "%s %s %s",
     locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
@@ -1141,7 +1143,7 @@ enter_ship(unit * u, struct order * ord, int id, boolean report)
 
   /* Muß abgefangen werden, sonst könnten Schwimmer an
    * Bord von Schiffen an Land gelangen. */
-  if (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
+  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY))) {
     cmistake(u, ord, 233, MSG_MOVE);
     return false;
   }

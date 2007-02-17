@@ -136,6 +136,7 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define RCF_DRAGON         (1<<21) /* Drachenart (für Zauber)*/
 #define RCF_COASTAL        (1<<22) /* kann in Landregionen an der Küste sein */
 #define RCF_UNARMEDGUARD   (1<<23) /* kann ohne Waffen bewachen */
+#define RCF_CANSAIL        (1<<24) /* Einheit darf Schiffe betreten */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */

@@ -640,7 +640,7 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
-  <race name="alp" magres="0.950000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="0" capacity="0" speed="1.500000" hp="20" ac="2" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="20" fly="yes" walk="yes" canlearn="no" noteach="yes">
+  <race name="alp" magres="0.950000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="0" capacity="0" speed="1.500000" hp="20" ac="2" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="20" fly="yes" walk="yes" canlearn="no" canteach="no">
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>
   </race>
@@ -648,14 +648,14 @@
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>
-  <race name="shadowmaster" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes" nogive="yes">
+  <race name="shadowmaster" cansail="no" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes" nogive="yes">
     <ai splitsize="50" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="nameshadow"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
   </race>
-  <race name="shadowdemon" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="500" capacity="540" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes" nogive="yes">
+  <race name="shadowdemon" cansail="no" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="500" capacity="540" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes" nogive="yes">
     <ai splitsize="1000" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="nameshadow"/>
     <attack type="4" damage="2d3"/>

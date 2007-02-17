@@ -1999,6 +1999,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     /* erbt Gebäude/Schiff*/
     if (creator->region==r) {
       u->building = creator->building;
+      assert(creator->ship==NULL || fval(u->race, RCF_CANSAIL));
       u->ship = creator->ship;
     }
 

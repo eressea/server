@@ -1410,6 +1410,7 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "playerrace", false)) rc->flags |= RCF_PLAYERRACE;
     if (xml_bvalue(node, "scarepeasants", false)) rc->flags |= RCF_SCAREPEASANTS;
     if (xml_bvalue(node, "cansteal", true)) rc->flags |= RCF_CANSTEAL;
+    if (xml_bvalue(node, "cansail", true)) rc->flags |= RCF_CANSAIL;
     if (xml_bvalue(node, "cannotmove", false)) rc->flags |= RCF_CANNOTMOVE;
     if (xml_bvalue(node, "fly", false)) rc->flags |= RCF_FLY;
     if (xml_bvalue(node, "coastal", false)) rc->flags |= RCF_COASTAL;

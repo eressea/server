@@ -246,7 +246,9 @@ destroy_unit(unit * u)
     if (u->region!=clone->region) {
       move_unit(u, clone->region, NULL);
     }
-    u->ship = clone->ship;
+    if (fval(u->race, RCF_CANSAIL)) {
+      u->ship = clone->ship;
+    }
     u->building = clone->building;
     u->hp = 1;
     i = u->no;
