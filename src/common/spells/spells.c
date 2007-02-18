@@ -1790,7 +1790,7 @@ sp_treewalkenter(castorder *co)
       ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact", "target", u));
     } else {
       int w;
-      message * m = NULL;
+      message * m;
       unit * u2;
 
       if (!can_survive(u, rt)) {
@@ -1809,10 +1809,22 @@ sp_treewalkenter(castorder *co)
       erfolg = cast_level;
 
       /* Meldungen in der Ausgangsregion */
-      ADDMSG(&r->msgs, msg_message("astral_disappear", "unit", u));
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      m = NULL;
+      for (u2 = r->units; u2; u2 = u2->next ) {
+        if (!fval(u2->faction, FL_DH)) {
+          if (cansee(u2->faction, r, u, 0)) {
+            fset(u2->faction, FL_DH);
+            if (!m) m = msg_message("astral_disappear", "unit", u);
+            r_addmessage(r, u2->faction, m);
+          }
+        }
+      }
+      if (m) msg_release(m);
 
       /* Meldungen in der Zielregion */
       for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      m = NULL;
       for (u2 = rt->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
           if (cansee(u2->faction, rt, u, 0)) {
@@ -1924,7 +1936,7 @@ sp_treewalkexit(castorder *co)
         sprintf(buf, "%s ist zu schwer.", unitname(u));
         addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
       } else {
-        message * m = NULL;
+        message * m;
 
         remaining_cap = remaining_cap - w;
         move_unit(u, rt, NULL);
@@ -1933,20 +1945,22 @@ sp_treewalkexit(castorder *co)
         /* Meldungen in der Ausgangsregion */
 
         for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        m = NULL;
         for(u2 = r->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
-            fset(u2->faction, FL_DH);
             if (cansee(u2->faction, r, u, 0)) {
-              sprintf(buf, "%s wird durchscheinend und verschwindet.",
-                unitname(u));
-              addmessage(r, u2->faction, buf, MSG_EVENT, ML_INFO);
+              fset(u2->faction, FL_DH);
+              if (!m) m = msg_message("astral_disappear", "unit", u);
+              r_addmessage(rt, u2->faction, m);
             }
           }
         }
+        if (m) msg_release(m);
 
         /* Meldungen in der Zielregion */
 
         for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        m = NULL;
         for (u2 = rt->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
             if (cansee(u2->faction, rt, u, 0)) {
@@ -5737,27 +5751,29 @@ sp_enterastral(castorder *co)
       addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
           MSG_MAGIC, ML_MISTAKE);
     } else {
-      message * m = NULL;
+      message * m;
       remaining_cap = remaining_cap - w;
       move_unit(u, rt, NULL);
 
       /* Meldungen in der Ausgangsregion */
 
       for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-      for(u2 = r->units; u2; u2 = u2->next ) {
+      m = NULL;
+      for (u2 = r->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
-          fset(u2->faction, FL_DH);
           if (cansee(u2->faction, r, u, 0)) {
-            sprintf(buf, "%s wird durchscheinend und verschwindet.",
-              unitname(u));
-            addmessage(r, u2->faction, buf, MSG_EVENT, ML_INFO);
+            fset(u2->faction, FL_DH);
+            if (!m) m = msg_message("astral_disappear", "unit", u);
+            r_addmessage(rt, u2->faction, m);
           }
         }
       }
+      if (m) msg_release(m);
 
       /* Meldungen in der Zielregion */
 
       for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      m = NULL;
       for (u2 = rt->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
           if (cansee(u2->faction, rt, u, 0)) {
@@ -5856,7 +5872,7 @@ sp_pullastral(castorder *co)
         addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
           MSG_MAGIC, ML_MISTAKE);
       } else {
-        message * m = NULL;
+        message * m;
 
         remaining_cap = remaining_cap - w;
         move_unit(u, rt, NULL);
@@ -5864,20 +5880,22 @@ sp_pullastral(castorder *co)
         /* Meldungen in der Ausgangsregion */
 
         for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-        for(u2 = r->units; u2; u2 = u2->next ) {
+        m = NULL;
+        for (u2 = r->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
-            fset(u2->faction, FL_DH);
             if (cansee(u2->faction, r, u, 0)) {
-              sprintf(buf, "%s wird durchscheinend und verschwindet.",
-                unitname(u));
-              addmessage(r, u2->faction, buf, MSG_EVENT, ML_INFO);
+              fset(u2->faction, FL_DH);
+              if (!m) m = msg_message("astral_disappear", "unit", u);
+              r_addmessage(rt, u2->faction, m);
             }
           }
         }
+        if (m) msg_release(m);
 
         /* Meldungen in der Zielregion */
 
         for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        m = NULL;
         for (u2 = rt->units; u2; u2 = u2->next ) {
           if (!fval(u2->faction, FL_DH)) {
             if (cansee(u2->faction, rt, u, 0)) {
@@ -5969,7 +5987,7 @@ sp_leaveastral(castorder *co)
       addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
         MSG_MAGIC, ML_MISTAKE);
     } else {
-      message * m = NULL;
+      message * m;
 
       remaining_cap = remaining_cap - w;
       move_unit(u, rt, NULL);
@@ -5977,20 +5995,22 @@ sp_leaveastral(castorder *co)
       /* Meldungen in der Ausgangsregion */
 
       for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-      for(u2 = r->units; u2; u2 = u2->next ) {
+      m = NULL;
+      for (u2 = r->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
-          fset(u2->faction, FL_DH);
           if (cansee(u2->faction, r, u, 0)) {
-            sprintf(buf, "%s wird durchscheinend und verschwindet.",
-              unitname(u));
-            addmessage(r, u2->faction, buf, MSG_EVENT, ML_INFO);
+            fset(u2->faction, FL_DH);
+            if (!m) m = msg_message("astral_disappear", "unit", u);
+            r_addmessage(rt, u2->faction, m);
           }
         }
       }
+      if (m) msg_release(m);
 
       /* Meldungen in der Zielregion */
 
       for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      m = NULL;
       for (u2 = rt->units; u2; u2 = u2->next ) {
         if (!fval(u2->faction, FL_DH)) {
           if (cansee(u2->faction, rt, u, 0)) {
@@ -6034,7 +6054,7 @@ sp_fetchastral(castorder *co)
   for (n=0; n!=pa->length; ++n) {
     unit * u2, * u = pa->param[n]->data.u;
     int w;
-    message * m = NULL;
+    message * m;
 
     if (pa->param[n]->flag & TARGET_NOTFOUND) continue;
 
@@ -6093,10 +6113,22 @@ sp_fetchastral(castorder *co)
     move_unit(u, rt, NULL);
 
     /* Meldungen in der Ausgangsregion */
-    ADDMSG(&ro->msgs, msg_message("astral_disappear", "unit", u));
+    for (u2 = ro->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+    m = NULL;
+    for (u2 = ro->units; u2; u2 = u2->next ) {
+      if (!fval(u2->faction, FL_DH)) {
+        if (cansee(u2->faction, ro, u, 0)) {
+          fset(u2->faction, FL_DH);
+          if (!m) m = msg_message("astral_disappear", "unit", u);
+          r_addmessage(ro, u2->faction, m);
+        }
+      }
+    }
+    if (m) msg_release(m);
 
     /* Meldungen in der Zielregion */
     for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+    m = NULL;
     for (u2 = rt->units; u2; u2 = u2->next ) {
       if (!fval(u2->faction, FL_DH)) {
         if (cansee(u2->faction, rt, u, 0)) {
