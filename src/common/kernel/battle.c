@@ -2260,9 +2260,9 @@ loot_items(fighter * corpse)
   u->items = NULL;
 
   while (itm) {
-    int i;
     if (itm->number) {
-      for (i = 10; i != 0; --i) {
+      int i = min(10, itm->number);
+      for (; i != 0; --i) {
         int loot = itm->number / i;
         /* Looten tun hier immer nur die Gegner. Das ist als Ausgleich für die
         * neue Loot-regel (nur ganz tote Einheiten) fair.
