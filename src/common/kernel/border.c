@@ -469,10 +469,15 @@ b_validroad(const border * b)
 static boolean
 b_rvisibleroad(const border * b, const region * r)
 {
-	int x = b->data.i;
+  int x = b->data.i;
   x = (r==b->from)?b->data.sa[0]:b->data.sa[1];
-	if (x==0) return false;
-	return (boolean)(b->to==r || b->from==r);
+  if (x==0) {
+    return false;
+  }
+  if (b->to!=r && b->from!=r) {
+    return false;
+  }
+  return true;
 }
 
 border_type bt_road = {
