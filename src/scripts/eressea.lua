@@ -66,12 +66,6 @@ function process(orders)
   end
   run_scripts()
 
-  -- create new monsters:
-  spawn_dragons()
-  spawn_undead()
-  spawn_braineaters(0.25)
-  spawn_ents()
-
   plan_monsters()
 
   local nmrs = get_nmrs(1)
@@ -83,6 +77,12 @@ function process(orders)
   print (nmrs .. " Factions with 1 NMR")
 
   process_orders()
+
+  -- create new monsters:
+  spawn_dragons()
+  spawn_undead()
+  spawn_braineaters(0.25)
+  spawn_ents()
 
   -- post-turn updates:
   update_xmas2006()
