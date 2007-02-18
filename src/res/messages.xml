@@ -41,6 +41,14 @@
     <text locale="fr">"($int36($id))"</text>
     <text locale="de">"$unit($unit) goes from one amourous adventure to another. ($int36($id))"</text>
   </message>
+  <message name="curseinfo::magicresistance" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
+    <text locale="fr">"($int36($id))"</text>
+    <text locale="en">"The magical resistance has been strengthened. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::goodmagicresistancezone" section="events">
     <type>
       <arg name="id" type="int"/>
