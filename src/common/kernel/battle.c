@@ -2600,32 +2600,32 @@ aftermath(battle * b)
     msg_release(unseen);
   }
 
-  if (battle_was_relevant) {
-    ship **sp = &r->ships;
+  /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
+  * schonmal Schaden genommen hat. (moved und drifted
+  * sollten in flags überführt werden */
 
-    /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
-    * schonmal Schaden genommen hat. (moved und drifted
-    * sollten in flags überführt werden */
+  for (s=b->sides; s; s=s->next) {
+    fighter *df;
 
-    for (s=b->sides; s; s=s->next) {
-      fighter *df;
-      for (df=s->fighters; df; df=df->next) {
-        unit *du = df->unit;
-        item * l;
+    for (df=s->fighters; df; df=df->next) {
+      unit *du = df->unit;
+      item * l;
 
-        for (l=df->loot; l; l=l->next) {
-          const item_type * itype = l->type;
-          sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
-            l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
-          fbattlerecord(b, du->faction, buf);
-          i_change(&du->items, itype, l->number);
-        }
+      /* Beute verteilen */
+      for (l=df->loot; l; l=l->next) {
+        const item_type * itype = l->type;
+        sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
+          l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
+        fbattlerecord(b, du->faction, buf);
+        i_change(&du->items, itype, l->number);
+      }
 
-        /* Wenn sich die Einheit auf einem Schiff befindet, wird
-         * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
-         * evt. zuvor verlassen wurde. */
-
-        if (du->ship) sh = du->ship; else sh = leftship(du);
+      /* Wenn sich die Einheit auf einem Schiff befindet, wird
+      * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
+      * evt. zuvor verlassen wurde. */
+      if (battle_was_relevant) {
+        if (du->ship) sh = du->ship;
+        else sh = leftship(du);
 
         if (sh && fval(sh, SF_DAMAGED)) {
           int n = b->turn - 2;
@@ -2636,6 +2636,10 @@ aftermath(battle * b)
         }
       }
     }
+  }
+
+  if (battle_was_relevant) {
+    ship **sp = &r->ships;
 
     while (*sp) {
       ship * sh = *sp;
