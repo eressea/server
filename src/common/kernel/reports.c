@@ -862,7 +862,7 @@ get_addresses(report_context * ctx)
         }
         u = u->next;
       }
-    } else if (sr->mode<see_travel) {
+    } else if (sr->mode>see_travel) {
       const unit * u = r->units;
       while (u!=NULL) {
         if (u->faction!=ctx->f) {
