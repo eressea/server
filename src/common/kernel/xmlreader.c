@@ -1446,6 +1446,7 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "resistbash", false)) rc->battle_flags |= BF_RES_BASH;
     if (xml_bvalue(node, "resistcut", false)) rc->battle_flags |= BF_RES_CUT;
     if (xml_bvalue(node, "resistpierce", false)) rc->battle_flags |= BF_RES_PIERCE;
+    if (xml_bvalue(node, "canattack", true)) rc->battle_flags |= BF_CANATTACK;
 
     /* reading eressea/races/race/ai */
     xpath->node = node;

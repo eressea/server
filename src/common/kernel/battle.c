@@ -3660,18 +3660,21 @@ init_battle(region * r, battle **bp)
           unit *u2;
           fighter *c1, *c2;
 
-          if(r->planep && fval(r->planep, PFL_NOATTACK)) {
+          if (r->planep && fval(r->planep, PFL_NOATTACK)) {
             cmistake(u, ord, 271, MSG_BATTLE);
             continue;
           }
 
+          if ((u->race->battle_flags&BF_CANATTACK) == 0) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_no_attack", "race", u->race));
+            continue;
+          }
           /**
           ** Fehlerbehandlung Angreifer
           **/
 #ifdef DELAYED_OFFENSE
           if (get_moved(&u->attribs) && !guarded_by(r, u->faction)) {
-            add_message(&u->faction->msgs,
-              msg_message("no_attack_after_advance", "unit region command", u, u->region, ord));
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "no_attack_after_advance", ""));
           }
 #endif
           if (LongHunger(u)) {

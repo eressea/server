@@ -156,6 +156,7 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define BF_RES_CUT      (1<<3) /* Halber Schaden durch CUT */
 #define BF_RES_BASH     (1<<4) /* Halber Schaden durch BASH */
 #define BF_INV_NONMAGIC (1<<5) /* Immun gegen nichtmagischen Schaden */
+#define BF_CANATTACK    (1<<6) /* Kann keine ATTACKIERE Befehle ausfuehren */
 
 extern int unit_old_max_hp(struct unit * u);
 extern const char * racename(const struct locale *lang, const struct unit *u, const race * rc);

@@ -6018,6 +6018,17 @@
     <text locale="fr">"'$order($command)' - $unit($unit) marched into $region($region) during the last turn and is too exhausted to attack."</text>
     <text locale="en">"'$order($command)' - $unit($unit) marched into $region($region) during the last turn and is too exhausted to attack."</text>
   </message>
+  <message name="race_no_attack" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) sind friedliebend und attackieren niemand."</text>
+    <text locale="fr">"'$order($command)' - $race($race,0) are peace-loving and will not attack anyone."</text>
+    <text locale="en">"'$order($command)' - $race($race,0) are peace-loving and will not attack anyone."</text>
+  </message>
   <message name="skill_needed" section="production">
     <type>
       <arg name="unit" type="unit"/>
