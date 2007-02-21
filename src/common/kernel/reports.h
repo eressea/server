@@ -67,6 +67,7 @@ enum {
   see_unit,
   see_battle
 };
+extern int stealth_modifier(int seen_mode);
 
 typedef struct seen_region {
   struct seen_region * nextHash;

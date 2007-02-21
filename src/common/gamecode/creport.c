@@ -71,6 +71,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <math.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1252,7 +1253,6 @@ report_computer(const char * filename, report_context * ctx)
   }
   for (;sr!=NULL;sr=sr->next) {
     region * r = sr->r;
-    int modifier = 0;
     const char * tname;
 
     if (!rplane(r)) {
@@ -1288,6 +1288,7 @@ report_computer(const char * filename, report_context * ctx)
     if (sr->mode == see_neighbour) {
       cr_borders(ctx->seen, r, f, sr->mode, F);
     } else {
+      int stealthmod = stealth_modifier(sr->mode);
 #define RESOURCECOMPAT
       char cbuf[8192], *pos = cbuf;
 #ifdef RESOURCECOMPAT
@@ -1456,23 +1457,10 @@ report_computer(const char * filename, report_context * ctx)
 
       /* visible units */
       for (u = r->units; u; u = u->next) {
-        boolean visible = true;
-        switch (sr->mode) {
-        case see_unit:
-          modifier=0;
-          break;
-        case see_far:
-        case see_lighthouse:
-          modifier = -2;
-          break;
-        case see_travel:
-          modifier = -1;
-          break;
-        default:
-          visible=false;
+
+        if (u->building || u->ship || (stealthmod>INT_MIN && cansee(f, r, u, stealthmod))) {
+          cr_output_unit(F, r, f, u, sr->mode);
         }
-        if (u->building || u->ship || (visible && cansee(f, r, u, modifier)))
-            cr_output_unit(F, r, f, u, sr->mode);
       }
     } /* region traversal */
   }

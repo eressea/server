@@ -1989,29 +1989,12 @@ report_plaintext(const char * filename, report_context * ctx)
   }
   for (;sr!=NULL;sr=sr->next) {
     region * r = sr->r;
-    boolean unit_in_region = false;
-    boolean durchgezogen_in_region = false;
-    int turm_sieht_region = false;
+    int stealthmod = stealth_modifier(sr->mode);
 
-    switch (sr->mode) {
-    case see_lighthouse:
-      turm_sieht_region = true;
-      break;
-    case see_far:
-      break;
-    case see_travel:
-      durchgezogen_in_region = true;
-      break;
-    case see_unit:
-      unit_in_region = true;
-      anyunits = true;
-      break;
-    default:
-      continue;
-    }
+    if (sr->mode<see_lighthouse) continue;
     /* Beschreibung */
 
-    if (unit_in_region) {
+    if (sr->mode==see_unit) {
       describe(F, r, 0, f);
       if (!TradeDisabled() && !fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
         rnl(F);
@@ -2026,7 +2009,7 @@ report_plaintext(const char * filename, report_context * ctx)
         guards(F, r, f);
         durchreisende(F, r, f);
       }
-      else if (turm_sieht_region) {
+      else if (sr->mode==see_lighthouse) {
         describe(F, r, 2, f);
         durchreisende(F, r, f);
       } else {
@@ -2036,12 +2019,12 @@ report_plaintext(const char * filename, report_context * ctx)
     }
     /* Statistik */
 
-    if (wants_stats && unit_in_region == 1)
+    if (wants_stats && sr->mode==see_unit)
         statistics(F, r, f);
 
     /* Nachrichten an REGION in der Region */
 
-    if (unit_in_region || durchgezogen_in_region) {
+    if (sr->mode==see_unit || sr->mode==see_travel) {
       message_list * mlist = r_getmessages(r, f);
       rp_messages(F, r->msgs, f, 0, true);
       if (mlist) rp_messages(F, mlist, f, 0, true);
@@ -2055,15 +2038,10 @@ report_plaintext(const char * filename, report_context * ctx)
 
     /* Restliche Einheiten */
 
-    if (sr->mode>=see_lighthouse) {
+    if (stealthmod>INT_MIN) {
       for (u = r->units; u; u = u->next) {
         if (!u->building && !u->ship) {
-          if ((u->faction == f) ||
-              (unit_in_region && cansee(f, r, u, 0)) ||
-              (durchgezogen_in_region && cansee(f, r, u, -1)) ||
-              (sr->mode==see_far && cansee(f, r, u, -2)) ||
-              (turm_sieht_region && cansee(f, r, u, -2)))
-          {
+          if (u->faction == f || cansee(f, r, u, stealthmod)) {
             if (dh == 0 && !(rbuildings(r) || r->ships)) {
               dh = 1;
               /* rnl(F); */

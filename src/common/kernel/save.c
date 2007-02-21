@@ -1067,10 +1067,10 @@ readunit(FILE * F)
           orderp = &ord->next;
           ord = NULL;
         } else if (p==MAXPERSISTENT) {
-          log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
+          log_warning(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
         }
       } else if (n==MAXORDERS) {
-        log_error(("%s had %d or more orders\n", unitname(u), MAXORDERS));
+        log_warning(("%s had %d or more orders\n", unitname(u), MAXORDERS));
       }
       if (ord!=NULL) free_order(ord);
     }
@@ -1516,7 +1516,7 @@ readfaction(FILE * F)
 
   rds(F, &email);
   if (set_email(&f->email, email)!=0) {
-    log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
+    log_warning(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
     set_email(&f->email, "");
   }
   free(email);

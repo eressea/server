@@ -47,6 +47,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -824,6 +825,22 @@ add_faction(faction_list ** flist, faction * sf)
   }
 }
 
+int
+stealth_modifier(int seen_mode)
+{
+  switch (seen_mode) {
+  case see_unit:
+    return 0;
+  case see_far:
+  case see_lighthouse:
+    return -2;
+  case see_travel:
+    return -1;
+  default:
+    return INT_MIN;
+  }
+}
+
 static void
 get_addresses(report_context * ctx)
 {
@@ -840,8 +857,20 @@ get_addresses(report_context * ctx)
   }
   
   for (;sr!=NULL;sr=sr->next) {
+    int stealthmod = stealth_modifier(sr->mode);
     r = sr->r;
-    if (sr->mode==see_travel) {
+    if (sr->mode==see_lighthouse) {
+      unit * u = r->units;
+      for (;u;u=u->next) {
+        faction * sf = visible_faction(ctx->f, u);
+        if (lastf!=sf) {
+          if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
+            add_faction(&flist, sf);
+            lastf = sf;
+          }
+        }
+      }
+    } if (sr->mode==see_travel) {
       unit * u = r->units;
       while (u) {
         faction * sf = visible_faction(ctx->f, u);
@@ -851,7 +880,7 @@ get_addresses(report_context * ctx)
           while (a && a->type==&at_travelunit) {
             unit * u2 = (unit*)a->data.v;
             if (u2->faction==ctx->f) {
-              if (cansee_unit(u2, u, 0)) {
+              if (cansee_unit(u2, u, stealthmod)) {
                 add_faction(&flist, sf);
                 lastf = sf;
                 break;
@@ -868,7 +897,7 @@ get_addresses(report_context * ctx)
         if (u->faction!=ctx->f) {
           faction * sf = visible_faction(ctx->f, u);
           boolean ballied = sf && sf!=ctx->f && sf!=lastf
-            && !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, 0);
+            && !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, stealthmod);
           if (ballied || ALLIED(ctx->f, sf)) {
             add_faction(&flist, sf);
             lastf = sf;
