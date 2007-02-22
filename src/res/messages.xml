@@ -1999,8 +1999,8 @@
       <arg name="regions" type="string"/>
     </type>
     <text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($strlen($regions)," Dabei wurde $regions durchquert.","")"</text>
-    <text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end).$regions"</text>
-    <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end).$regions"</text>
+    <text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end) trans $regions"</text>
+    <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end)$if($strlen($regions)," by way of $regions","")."</text>
   </message>
   <message name="detectoceandir" section="movement">
     <type>
@@ -6296,6 +6296,13 @@
     <text locale="de">"Das Wurmloch in $region($region) schließt sich."</text>
     <text locale="fr">"The wormhole in $region($region) disappears."</text>
     <text locale="en">"The wormhole in $region($region) disappears."</text>
+  </message>
+  <message name="battle::header" section="battle">
+    <type>
+      <arg name="factions" type="string"/>
+    </type>
+    <text locale="de">"Der Kampf wurde ausgelöst von $factions."</text>
+    <text locale="en">"The battle was initiated by $factions."</text>
   </message>
   <message name="battle::potionsave" section="battle">
     <type>

@@ -2725,12 +2725,13 @@ print_header(battle * b)
   bfaction * bf;
 
   for (bf=b->factions;bf;bf=bf->next) {
+    message * m;
     faction * f = bf->faction;
     const char * lastf = NULL;
     boolean first = false;
     side * s;
 
-    strcpy(buf, "Der Kampf wurde ausgelöst von ");
+    buf[0] = 0;
     for (s=b->sides; s; s=s->next) {
       fighter *df;
       for (df=s->fighters;df;df=df->next) {
@@ -2743,15 +2744,22 @@ print_header(battle * b)
           if (seematrix(f, s) == true)
             lastf = sidename(s, false);
           else
-            lastf = "einer unbekannten Partei";
+            lastf = LOC(f->locale, "unknown_faction_dative");
           break;
         }
       }
     }
-    if (first) strcat(buf, " und ");
+    if (first) {
+      strcat(buf, " ");
+      strcat(buf, LOC(f->locale, "and"));
+      strcat(buf, " ");
+    }
     if (lastf) strcat(buf, lastf);
     strcat(buf, ".");
-    fbattlerecord(b, f, buf);
+
+    m = msg_message("battle::header", "factions", buf);
+    message_faction(b, f, m);
+    msg_release(m);
   }
 }
 

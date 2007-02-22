@@ -138,12 +138,9 @@ sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
       force = lovar(get_force(power,10));
   }
 
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
-
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
   if (enemies==0) {
-    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
     message_all(b, m);
     msg_release(m);
     return 0;
@@ -174,18 +171,18 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
   int force, enemies;
   int stoned = 0;
 
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
-
   force = lovar(get_force(power, 0));
 
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
+    spell_name(sp, default_locale));
+
   battlerecord(b, buf);
 
   while (force && stoned < enemies) {
@@ -225,9 +222,6 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
 
   if (power <= 0) return 0;
 
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
-
   switch(sp->id) {
     case SPL_SHOCKWAVE:
       force = lovar(get_force(power,1));
@@ -238,11 +232,14 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
 
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
+    spell_name(sp, default_locale));
+
   battlerecord(b, buf);
 
   stunned = 0;
@@ -370,17 +367,17 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
   int k = 0;
   /* Immer aus der ersten Reihe nehmen */
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   force = lovar(power * 25);
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(mage),
+    spell_name(sp, default_locale));
   battlerecord(b, buf);
 
   while (force && enemies) {
@@ -514,17 +511,17 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
   int force, enemies;
   int k = 0;
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   force = lovar(power * 25);
 
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(mage),
+    spell_name(sp, default_locale));
   battlerecord(b, buf);
 
   while (force && enemies) {
@@ -578,8 +575,6 @@ sp_dragonodem(fighter * fi, int level, double power, spell * sp)
   int killed = 0;
   const char *damage;
 
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
   /* 11-26 HP */
   damage = spell_damage(4);
   /* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
@@ -588,28 +583,27 @@ sp_dragonodem(fighter * fi, int level, double power, spell * sp)
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
 
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    struct message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
+  } else {
+    struct message * m;
+    
+    at.fighter = fi;
+    at.index = 0;
+
+    while (force && killed < enemies) {
+      dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
+      assert(dt.fighter);
+      --force;
+      killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+    }
+
+    m = msg_message("battle::combatspell", "mage spell dead", fi->unit, sp, killed);
+    message_all(b, m);
+    msg_release(m);
   }
-  scat(":");
-  battlerecord(b, buf);
-
-  at.fighter = fi;
-  at.index = 0;
-
-  while (force && killed < enemies) {
-    dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
-    assert(dt.fighter);
-    --force;
-    killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-  }
-
-  sprintf(buf, "%d Personen %s getötet",
-      killed, killed == 1 ? "wurde" : "wurden");
-
-  scat(".");
-  battlerecord(b, buf);
   return level;
 }
 
@@ -626,19 +620,19 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
   cvector *fgs;
   void **fig;
 
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
   /* 2d4 HP */
   damage = spell_damage(5);
   /* Betrifft alle Gegner */
   force = 99999;
 
   if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE|SELECT_FIND)) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
+    spell_name(sp, default_locale));
   battlerecord(b, buf);
 
   at.fighter = fi;
@@ -680,8 +674,6 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
   int killed = 0;
   const char *damage;
 
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
   /* 11-26 HP */
   damage = spell_damage(4);
   /* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
@@ -690,11 +682,13 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
 
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
+    spell_name(sp, default_locale));
   battlerecord(b, buf);
 
   at.fighter = fi;
@@ -863,24 +857,24 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
   void **fig;
   int k = 0;
 
+  if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE|SELECT_FIND)) {
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
+    return 0;
+  }
+
   switch (sp->id) {
     case SPL_CHAOSROW:
-      sprintf(buf, "%s murmelt eine düster klingende Formel", unitname(mage));
+      sprintf(buf, "%s murmelt eine düster klingende Formel. ", unitname(mage));
       power *= 40;
       break;
 
     case SPL_SONG_OF_CONFUSION:
-      sprintf(buf, "%s stimmt einen seltsamen Gesang an", unitname(mage));
+      sprintf(buf, "%s stimmt einen seltsamen Gesang an. ", unitname(mage));
       power = get_force(power, 5);
       break;
   }
-
-  if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE|SELECT_FIND)) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
-    return 0;
-  }
-  scat(". ");
 
   fgs = fighters(b, fi->side, FIGHT_ROW, NUMROWS, FS_ENEMY);
   v_scramble(fgs->begin, fgs->end);
@@ -1140,15 +1134,15 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
   df_malus = 2;
   force = (int)get_force(power, 2);
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
-  scat(":");
+  sprintf(buf, "%s zaubert %s:", unitname(mage),
+    spell_name(sp, default_locale));
   battlerecord(b, buf);
 
   while (force && enemies) {
@@ -1189,11 +1183,10 @@ sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
   int n = 0;
   int force = (int)(power * power * 4);
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE|SELECT_FIND)) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
 
@@ -1215,7 +1208,8 @@ sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  scat(": ");
+  sprintf(buf, "%s zaubert %s:", unitname(mage),
+    spell_name(sp, default_locale));
   if (n == 0) {
     scat("Der Zauber konnte keinen Krieger ermüden.");
   } else if (n == 1) {
@@ -1236,8 +1230,6 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
   int force, at_malus;
   int enemies;
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   switch(sp->id) {
     case SPL_WINDSHIELD:
       force = (int)get_force(power,4);
@@ -1250,8 +1242,9 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
   }
   enemies = count_enemies(b, fi, BEHIND_ROW, BEHIND_ROW, SELECT_ADVANCE);
   if (!enemies) {
-    scat(", aber niemand war in Reichweite.");
-    battlerecord(b, buf);
+    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
     return 0;
   }
 
@@ -1271,7 +1264,8 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  scat(": ");
+  sprintf(buf, "%s zaubert %s:", unitname(mage),
+    spell_name(sp, default_locale));
   scat("Ein Sturm kommt auf und die Schützen können kaum noch zielen.");
   battlerecord(b, buf);
   return level;

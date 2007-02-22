@@ -6517,6 +6517,14 @@
     <text locale="de">Unbekannte Partei</text>
     <text locale="en">unknown faction</text>
   </string>
+  <string name="unknown_faction_dative">
+    <text locale="de">einer unbekannten Partei</text>
+    <text locale="en">an unknown faction</text>
+  </string>
+  <string name="and">
+    <text locale="de">und</text>
+    <text locale="en">and</text>
+  </string>
 
   <string name="spinx00">
     <text locale="de">Das Schiff des Elfen hat ein rotes Segel</text>
@@ -6810,4 +6818,8 @@
     <text locale="en">stones</text>
   </string>
 
+  <string name="unit_guards">
+    <text locale="de">bewacht die Region</text>
+    <text locale="en">guards the region</text>
+  </string>
 </strings>

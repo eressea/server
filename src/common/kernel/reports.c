@@ -438,7 +438,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     }
   }
   if (getguard(u)) {
-    rsize = strlcpy(bufp, ", bewacht die Region", size);
+    rsize = strlcpy(bufp, LOC(f->locale, "unit_guards"), size);
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
