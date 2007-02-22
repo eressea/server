@@ -6301,8 +6301,8 @@
     <type>
       <arg name="factions" type="string"/>
     </type>
-    <text locale="de">"Der Kampf wurde ausgelöst von $factions."</text>
-    <text locale="en">"The battle was initiated by $factions."</text>
+    <text locale="de">"Der Kampf wurde ausgelöst von ${factions}."</text>
+    <text locale="en">"The battle was initiated by ${factions}."</text>
   </message>
   <message name="battle::potionsave" section="battle">
     <type>
