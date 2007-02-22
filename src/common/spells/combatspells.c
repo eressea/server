@@ -170,6 +170,7 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
   /* Wirkt auf erste und zweite Reihe */
   int force, enemies;
   int stoned = 0;
+  message * m;
 
   force = lovar(get_force(power, 0));
 
@@ -180,10 +181,6 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
-    spell_name(sp, default_locale));
-
-  battlerecord(b, buf);
 
   while (force && stoned < enemies) {
     troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
@@ -201,9 +198,11 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Personen %s versteinert.",
+  sprintf(buf, "%d Personen %s versteinert",
       stoned, stoned == 1 ? "wurde" : "wurden");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -213,14 +212,15 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
+  message * m;
   troop at;
   /* Aus beiden Reihen nehmen */
   int force=0, enemies;
   int stunned;
-  at.fighter = fi;
-  at.index   = 0;
 
   if (power <= 0) return 0;
+  at.fighter = fi;
+  at.index   = 0;
 
   switch(sp->id) {
     case SPL_SHOCKWAVE:
@@ -237,10 +237,6 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
-    spell_name(sp, default_locale));
-
-  battlerecord(b, buf);
 
   stunned = 0;
   while (force && stunned < enemies) {
@@ -255,11 +251,11 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%d Krieger %s für einen Moment benommen.",
+  sprintf(buf, "%d Krieger %s für einen Moment benommen",
       stunned, stunned == 1 ? "ist" : "sind");
-
-  scat(".");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -365,21 +361,18 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
   troop dt;
   int force, enemies;
   int k = 0;
+  message * m;
   /* Immer aus der ersten Reihe nehmen */
 
   force = lovar(power * 25);
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
   if (!enemies) {
-    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
     message_all(b, m);
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(mage),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
-
   while (force && enemies) {
     dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     assert(dt.fighter);
@@ -392,9 +385,11 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Krieger %s in Schlaf versetzt.",
+  sprintf(buf, "%d Krieger %s in Schlaf versetzt",
       k, k == 1 ? "wurde" : "wurden");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -441,11 +436,7 @@ sp_speed(fighter * fi, int level, double power, spell * sp)
   int force;
   int allies;
   int targets = 0;
-
-  sprintf(buf, "%s zaubert %s", unitname(fi->unit),
-    spell_name(sp, default_locale));
-  scat(":");
-  battlerecord(b, buf);
+  message * m;
 
   force = lovar(power * power * 5);
 
@@ -468,9 +459,11 @@ sp_speed(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%d Krieger %s magisch beschleunigt.",
+  sprintf(buf, "%d Krieger %s magisch beschleunigt",
       targets, targets == 1 ? "wurde" : "wurden");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return 1;
 }
 
@@ -510,19 +503,17 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
   int killed = 0;
   int force, enemies;
   int k = 0;
+  message * m;
 
   force = lovar(power * 25);
 
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
   if (!enemies) {
-    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
     message_all(b, m);
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(mage),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
 
   while (force && enemies) {
     dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
@@ -559,9 +550,10 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
     }
     scat(" getötet");
   }
-  scat(".");
 
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -619,6 +611,7 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
   const char *damage;
   cvector *fgs;
   void **fig;
+  message * m;
 
   /* 2d4 HP */
   damage = spell_damage(5);
@@ -631,9 +624,6 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
 
   at.fighter = fi;
   at.index = 0;
@@ -655,11 +645,9 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
   cv_kill(fgs);
   free(fgs);
 
-  sprintf(buf, "%d Personen %s getötet",
-      killed, killed == 1 ? "wurde" : "wurden");
-
-  scat(".");
-  battlerecord(b, buf);
+  m = msg_message("battle::combatspell", "mage spell killed", fi->unit, sp, killed);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -673,6 +661,7 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
   int drained = 0;
   int killed = 0;
   const char *damage;
+  message * m;
 
   /* 11-26 HP */
   damage = spell_damage(4);
@@ -682,14 +671,11 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
 
   if (!enemies) {
-    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
     message_all(b, m);
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(fi->unit),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
 
   at.fighter = fi;
   at.index = 0;
@@ -708,8 +694,9 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
   sprintf(buf, "%d Person%s wurde ihre Lebenskraft entzogen",
     drained, drained == 1 ? " wurde" : "en wurden");
 
-  scat(".");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -1011,15 +998,14 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
 int
 sp_hero(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
-	unit *mage = fi->unit;
-	int df_bonus = 0;
-	int force = 0;
-	int allies;
-	int targets = 0;
+  battle *b = fi->side->battle;
+  unit *mage = fi->unit;
+  int df_bonus = 0;
+  int force = 0;
+  int allies;
+  int targets = 0;
+  message * m;
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   switch(sp->id) {
     case SPL_HERO:
       df_bonus = (int)(power/5);
@@ -1030,8 +1016,6 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
       df_bonus = 1;
       force = max(1, (int)power);
   }
-  scat(":");
-  battlerecord(b, buf);
 
   allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
   /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
@@ -1055,9 +1039,10 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
 
   sprintf(buf, "%d Krieger %s moralisch gestärkt",
       targets, targets == 1 ? "wurde" : "wurden");
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  message_all(b, m);
+  msg_release(m);
 
-  scat(".");
-  battlerecord(b, buf);
   return level;
 }
 
@@ -1071,9 +1056,8 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
   int force = 0;
   int allies = 0;
   int targets = 0;
+  message * m;
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
   switch(sp->id) {
     case SPL_BERSERK:
     case SPL_BLOODTHIRST:
@@ -1087,8 +1071,6 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
       df_malus = 0;
       force = (int)power;
   }
-  scat(":");
-  battlerecord(b, buf);
 
   allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
   /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
@@ -1113,9 +1095,9 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
 
   sprintf(buf, "%d Krieger %s in Blutrausch versetzt",
       targets, targets == 1 ? "wurde" : "wurden");
-
-  scat(".");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -1129,6 +1111,7 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
   int force = 0;
   int enemies = 0;
   int targets = 0;
+  message * m;
 
   at_malus = max(1,level - 4);
   df_malus = 2;
@@ -1141,9 +1124,6 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
     msg_release(m);
     return 0;
   }
-  sprintf(buf, "%s zaubert %s:", unitname(mage),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
 
   while (force && enemies) {
     troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
@@ -1168,9 +1148,9 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
 
   sprintf(buf, "%d Krieger %s eingeschüchtert",
       targets, targets == 1 ? "wurde" : "wurden");
-
-  scat(".");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, buf);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -1182,6 +1162,8 @@ sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
   unit *mage = fi->unit;
   int n = 0;
   int force = (int)(power * power * 4);
+  message * m;
+  const char * effect;
 
   if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE|SELECT_FIND)) {
     message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
@@ -1208,17 +1190,17 @@ sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%s zaubert %s:", unitname(mage),
-    spell_name(sp, default_locale));
   if (n == 0) {
-    scat("Der Zauber konnte keinen Krieger ermüden.");
+    effect = "Der Zauber konnte keinen Krieger ermüden";
   } else if (n == 1) {
-    scat("Ein Krieger schleppt sich müde in den Kampf.");
+    effect = "Ein Krieger schleppt sich müde in den Kampf";
   } else {
-    icat(n);
-    scat(" Krieger schleppen sich müde in den Kampf.");
+    sprintf(buf, "%d Krieger schleppen sich müde in den Kampf", n);
+    effect = buf;
   }
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, effect);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -1229,6 +1211,7 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
   unit *mage = fi->unit;
   int force, at_malus;
   int enemies;
+  message * m;
 
   switch(sp->id) {
     case SPL_WINDSHIELD:
@@ -1242,7 +1225,7 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
   }
   enemies = count_enemies(b, fi, BEHIND_ROW, BEHIND_ROW, SELECT_ADVANCE);
   if (!enemies) {
-    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
     message_all(b, m);
     msg_release(m);
     return 0;
@@ -1264,10 +1247,10 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%s zaubert %s:", unitname(mage),
-    spell_name(sp, default_locale));
-  scat("Ein Sturm kommt auf und die Schützen können kaum noch zielen.");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, 
+    "Ein Sturm kommt auf und die Schützen können kaum noch zielen");
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -1275,16 +1258,15 @@ int
 sp_reeling_arrows(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
-  unit *mage = fi->unit;
+  message * m;
 
   unused(power);
 
   b->reelarrow = true;
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
-  scat(": ");
-  scat("Ein Sturm kommt auf und die Schützen können kaum noch zielen.");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, 
+    "Ein Sturm kommt auf und die Schützen können kaum noch zielen");
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -1297,11 +1279,9 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   region *r = b->region;
-  unused(power);
+  message * m;
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
-  scat(": ");
+  unused(power);
 
   /* Fliehende Einheiten verlassen auf jeden Fall Gebäude und Schiffe. */
   leave(r, mage);
@@ -1337,9 +1317,10 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   /* fighter leeren */
   rmfighter(fi, mage->number);
 
-  scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
-    "seines Weges ziehen.");
-  battlerecord(b, buf);
+  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp,
+    "Das Kampfgetümmel erstirbt und er kann unbehelligt seines Weges ziehen");
+  message_all(b, m);
+  msg_release(m);
 
   return level;
 }
@@ -1361,12 +1342,11 @@ sp_armorshield(fighter * fi, int level, double power, spell * sp)
 {
   int effect;
   int duration;
-  unit *mage = fi->unit;
   battle *b = fi->side->battle;
+  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
+  message_all(b, m);
+  msg_release(m);
 
   /* gibt Rüstung +effect für duration Treffer */
 
@@ -1389,12 +1369,10 @@ sp_reduceshield(fighter * fi, int level, double power, spell * sp)
 {
   int effect;
   int duration;
-  unit *mage = fi->unit;
   battle *b = fi->side->battle;
-
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
+  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
+  message_all(b, m);
+  msg_release(m);
 
   /* jeder Schaden wird um effect% reduziert bis der Schild duration
    * Trefferpunkte aufgefangen hat */
@@ -1418,12 +1396,11 @@ sp_fumbleshield(fighter * fi, int level, double power, spell * sp)
 {
   int effect;
   int duration;
-  unit *mage = fi->unit;
   battle *b = fi->side->battle;
+  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
 
-  sprintf(buf, "%s zaubert %s", unitname(mage),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
+  message_all(b, m);
+  msg_release(m);
 
   /* der erste Zauber schlägt mit 100% fehl  */
 
@@ -1537,10 +1514,10 @@ int
 sp_keeploot(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
+  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
 
-  sprintf(buf, "%s zaubert %s.", unitname(fi->unit),
-    spell_name(sp, default_locale));
-  battlerecord(b, buf);
+  message_all(b, m);
+  msg_release(m);
 
   b->keeploot = (int)max(25, b->keeploot + 5*power);
 
