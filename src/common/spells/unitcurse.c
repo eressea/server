@@ -35,29 +35,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-
-/* ------------------------------------------------------------- */
-int
-cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-  struct message * msg;
-
-  unused(typ);
-  unused(self);
-  unused(obj);
-
-  assert(typ == TYP_UNIT);
-
-  msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-  if (msg) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
-  }
-  log_warning(("There is no curseinfo for %s.\n", c->type->cname));
-  return 0;
-}
-
 static int
 cinfo_unit_onlyowner(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -221,8 +198,8 @@ static struct curse_type ct_speed = {
 /*
  * C_ORC
  */
-static int
-cinfo_orc(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+int
+cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
   unit *u;
   message * msg;
@@ -239,12 +216,13 @@ cinfo_orc(const struct locale * lang, const void * obj, typ_t typ, struct curse 
   }
   return 0;
 }
+
 static struct curse_type ct_orcish = {
   "orcish",
   CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
   "Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
   "ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
-  cinfo_orc
+  cinfo_unit
 };
 
 /* ------------------------------------------------------------- */
@@ -345,53 +323,22 @@ static struct curse_type ct_sparkle = { "sparkle",
 /*
  * C_STRENGTH
  */
-static int
-cinfo_strength(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-  unused(c);
-  unused(typ);
-
-  assert(typ == TYP_UNIT);
-  unused(obj);
-
-  if (self != 0){
-    sprintf(buf, "Die Leute strotzen nur so vor Kraft. (%s)",
-        curseid(c));
-    return 1;
-  }
-  return 0;
-}
 static struct curse_type ct_strength = { "strength",
   CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
   "Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
   "vielfaches.",
-  cinfo_strength
+  cinfo_simple
 };
 
 /* ------------------------------------------------------------- */
 /*
  * C_ALLSKILLS (Alp)
  */
-static int
-cinfo_allskills(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-  unused(obj);
-  unused(typ);
-  unused(c);
-
-  assert(typ == TYP_UNIT);
-
-  if (self != 0){
-    sprintf(buf, "Wird von einem Alp geritten. (%s)", curseid(c));
-    return 1;
-  }
-  return 0;
-}
 static struct curse_type ct_worse = {
   "worse",
   CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
   "",
-  cinfo_allskills
+  cinfo_unit
 };
 
 /* ------------------------------------------------------------- */
@@ -399,50 +346,19 @@ static struct curse_type ct_worse = {
 /*
  * C_ITEMCLOAK
  */
-static int
-cinfo_itemcloak(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-  unit *u;
-  unused(typ);
-
-  assert(typ == TYP_UNIT);
-  u = (unit *)obj;
-
-  if (self != 0) {
-    sprintf(buf, "Die Ausrüstung von %s scheint unsichtbar. (%s)",
-        u->name, curseid(c));
-    return 1;
-  }
-  return 0;
-}
 static struct curse_type ct_itemcloak = {
   "itemcloak",
   CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
   "Dieser Zauber macht die Ausrüstung unsichtbar.",
-  cinfo_itemcloak
+  cinfo_unit
 };
 /* ------------------------------------------------------------- */
 
-static int
-cinfo_fumble(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-  unit * u = (unit*)obj;
-  unused(typ);
-
-  assert(typ == TYP_UNIT);
-
-  if (self != 0){
-    sprintf(buf, "%s kann sich kaum konzentrieren. (%s)",
-        u->name, curseid(c));
-    return 1;
-  }
-  return 0;
-}
 static struct curse_type ct_fumble = {
   "fumble",
   CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
   "Eine Wolke negativer Energie umgibt die Einheit.",
-  cinfo_fumble
+  cinfo_unit
 };
 /* ------------------------------------------------------------- */
 
@@ -452,11 +368,12 @@ static struct curse_type ct_oldrace = { "oldrace",
   "",
   NULL
 };
+
 static struct curse_type ct_magicresistance = { "magicresistance",
   CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
   "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
   "Verzauberung.",
-  NULL
+  cinfo_simple
 };
 
 
@@ -500,6 +417,7 @@ cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, struct curs
   }
   return 0;
 }
+
 static struct curse_type ct_skillmod = {
   "skillmod",
   CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
@@ -513,20 +431,6 @@ static struct curse_type ct_skillmod = {
 void
 register_unitcurse(void)
 {
-  register_function((pf_generic)cinfo_unit_onlyowner, "curseinfo::unit_onlyowner");
-  register_function((pf_generic)cinfo_auraboost, "curseinfo::auraboost");
-  register_function((pf_generic)cinfo_slave, "curseinfo::slave");
-  register_function((pf_generic)cinfo_calm, "curseinfo::calm");
-  register_function((pf_generic)cinfo_speed, "curseinfo::speed");
-  register_function((pf_generic)cinfo_orc, "curseinfo::orc");
-  register_function((pf_generic)cinfo_kaelteschutz, "curseinfo::kaelteschutz");
-  register_function((pf_generic)cinfo_sparkle, "curseinfo::sparkle");
-  register_function((pf_generic)cinfo_strength, "curseinfo::strength");
-  register_function((pf_generic)cinfo_allskills, "curseinfo::allskills");
-  register_function((pf_generic)cinfo_skill, "curseinfo::skill");
-  register_function((pf_generic)cinfo_itemcloak, "curseinfo::itemcloak");
-  register_function((pf_generic)cinfo_fumble, "curseinfo::fumble");
-
   ct_register(&ct_auraboost);
   ct_register(&ct_magicboost);
   ct_register(&ct_slavery);
@@ -543,5 +447,4 @@ register_unitcurse(void)
   ct_register(&ct_oldrace);
   ct_register(&ct_magicresistance);
 }
-
 

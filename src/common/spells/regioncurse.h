@@ -19,7 +19,6 @@ extern "C" {
 
 struct curse;
 struct locale;
-extern int cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self);
 
 extern void register_regioncurse(void);
 

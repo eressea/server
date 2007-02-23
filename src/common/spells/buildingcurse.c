@@ -121,8 +121,6 @@ static struct curse_type ct_nocostbuilding = { "nocostbuilding",
 void
 register_buildingcurse(void)
 {
-  register_function((pf_generic)cinfo_magicrunes, "curseinfo::magicrunes");
-
   ct_register(&ct_magicwalls);
   ct_register(&ct_strongwall);
   ct_register(&ct_magicrunes);

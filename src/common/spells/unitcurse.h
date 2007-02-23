@@ -20,6 +20,7 @@ extern "C" {
 struct curse;
 struct locale;
 extern int cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self);
+
 extern void register_unitcurse(void);
 
 #ifdef __cplusplus

@@ -32,11 +32,13 @@
 #include "faction.h"
 #include "building.h"
 #include "ship.h"
+#include "message.h"
 #include "objtypes.h"
 
 /* util includes */
 #include <util/resolve.h>
 #include <util/base36.h>
+#include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/goodies.h>
@@ -733,3 +735,22 @@ oldcursename(int id)
   return oldnames[id];
 }
 
+/* ------------------------------------------------------------- */
+int
+cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+{
+  struct message * msg;
+
+  unused(typ);
+  unused(self);
+  unused(obj);
+
+  msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
+  if (msg) {
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    msg_release(msg);
+    return 1;
+  }
+  log_warning(("There is no curseinfo for %s.\n", c->type->cname));
+  return 0;
+}

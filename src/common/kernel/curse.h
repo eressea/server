@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -25,7 +25,7 @@ extern "C" {
  */
 
 /* Brainstorming Überarbeitung curse
- * 
+ *
  * Ziel: Keine Enum-Liste, flexible, leicht erweiterbare Curse-Objekte
  *
  * Was wird gebraucht?
@@ -58,13 +58,13 @@ extern "C" {
  * - Alterungsverhalten zb Flag NOAGE
  * - Effektverhalten, zb Bonus (variabel)
  * - bei Einheitenzaubern die Zahl der betroffenen Personen
- * 
+ *
  * Dabei sind nur die beiden letzten Punkte wirklich reine individuelle
  * Wirkung, die anderen sind eher allgemeine Kennzeichen eines jeden
  * Curse, die individuell belegt sind.
  * ONLYONE und NOAGE könnten auch Eigenschaften des Typs sein, nicht des
  * individuellen curse. Allgemein ist Alterung wohl eher eine
- * Typeigenschaft als die eines individuellen curse. 
+ * Typeigenschaft als die eines individuellen curse.
  * Dagegen ist der Widerstand gegen Antimagie sowohl abhängig von der
  * Güte des Verursachers, also des Magiers zum Zeitpunkt des Zaubers,
  * als auch vom Typ, der gegen bestimmte Arten des 'Fluchbrechens' immun
@@ -93,60 +93,60 @@ extern "C" {
 
 enum {
 /* struct's vom typ curse: */
-	C_FOGTRAP,
-	C_ANTIMAGICZONE,
-	C_FARVISION,
-	C_GBDREAM,
-	C_AURA,
-	C_MAELSTROM,
-	C_BLESSEDHARVEST,
-	C_DROUGHT,
-	C_BADLEARN,
-	C_SHIP_SPEEDUP,		/*  9 - Sturmwind-Zauber */
-	C_SHIP_FLYING,		/* 10 - Luftschiff-Zauber */
-	C_SHIP_NODRIFT,		/* 11 - GünstigeWinde-Zauber */
-	C_DEPRESSION,
-	C_MAGICWALLS,     /* 13 - Heimstein */
-	C_STRONGWALL,	    /* 14 - Feste Mauer - Precombat*/
-	C_ASTRALBLOCK,		/* 15 - Astralblock */
-	C_GENEROUS,	      /* 16 - Unterhaltung vermehren */
-	C_PEACE,          /* 17 - Regionsweit Attacken verhindern */
-	C_REGCONF,        /* 18 - Erschwert Bewegungen */
-	C_MAGICSTREET,    /* 19 - magisches Straßennetz */
-	C_RESIST_MAGIC,   /* 20 - verändert Magieresistenz von Objekten */
-	C_SONG_BADMR,     /* 21 - verändert Magieresistenz */
-	C_SONG_GOODMR,    /* 22 - verändert Magieresistenz */
-	C_SLAVE,          /* 23 - dient fremder Partei */
-	C_DISORIENTATION, /* 24 - Spezielle Auswirkung auf Schiffe */
-	C_CALM,           /* 25 - Beinflussung */
-	C_OLDRACE,
-	C_FUMBLE,
-	C_RIOT,           /*region in Aufruhr */
-	C_NOCOST,
-	C_HOLYGROUND,
-	C_CURSED_BY_THE_GODS,
-	C_FREE_14,
-	C_FREE_15,
-	C_FREE_16,
-	C_FREE_17,
-	C_FREE_18,
-	C_FREE_19,
+  C_FOGTRAP,
+  C_ANTIMAGICZONE,
+  C_FARVISION,
+  C_GBDREAM,
+  C_AURA,
+  C_MAELSTROM,
+  C_BLESSEDHARVEST,
+  C_DROUGHT,
+  C_BADLEARN,
+  C_SHIP_SPEEDUP,   /*  9 - Sturmwind-Zauber */
+  C_SHIP_FLYING,    /* 10 - Luftschiff-Zauber */
+  C_SHIP_NODRIFT,   /* 11 - GünstigeWinde-Zauber */
+  C_DEPRESSION,
+  C_MAGICWALLS,     /* 13 - Heimstein */
+  C_STRONGWALL,     /* 14 - Feste Mauer - Precombat*/
+  C_ASTRALBLOCK,    /* 15 - Astralblock */
+  C_GENEROUS,       /* 16 - Unterhaltung vermehren */
+  C_PEACE,          /* 17 - Regionsweit Attacken verhindern */
+  C_REGCONF,        /* 18 - Erschwert Bewegungen */
+  C_MAGICSTREET,    /* 19 - magisches Straßennetz */
+  C_RESIST_MAGIC,   /* 20 - verändert Magieresistenz von Objekten */
+  C_SONG_BADMR,     /* 21 - verändert Magieresistenz */
+  C_SONG_GOODMR,    /* 22 - verändert Magieresistenz */
+  C_SLAVE,          /* 23 - dient fremder Partei */
+  C_DISORIENTATION, /* 24 - Spezielle Auswirkung auf Schiffe */
+  C_CALM,           /* 25 - Beinflussung */
+  C_OLDRACE,
+  C_FUMBLE,
+  C_RIOT,           /*region in Aufruhr */
+  C_NOCOST,
+  C_HOLYGROUND,
+  C_CURSED_BY_THE_GODS,
+  C_FREE_14,
+  C_FREE_15,
+  C_FREE_16,
+  C_FREE_17,
+  C_FREE_18,
+  C_FREE_19,
 /* struct's vom untertyp curse_unit: */
-	C_SPEED,					/* Beschleunigt */
-	C_ORC,
-	C_MBOOST,
-	C_KAELTESCHUTZ,
-	C_STRENGTH,
-	C_ALLSKILLS,
-	C_MAGICRESISTANCE,    /* 44 - verändert Magieresistenz */
-	C_ITEMCLOAK,
-	C_SPARKLE,
-	C_FREE_22,
-	C_FREE_23,
-	C_FREE_24,
+  C_SPEED,          /* Beschleunigt */
+  C_ORC,
+  C_MBOOST,
+  C_KAELTESCHUTZ,
+  C_STRENGTH,
+  C_ALLSKILLS,
+  C_MAGICRESISTANCE,    /* 44 - verändert Magieresistenz */
+  C_ITEMCLOAK,
+  C_SPARKLE,
+  C_FREE_22,
+  C_FREE_23,
+  C_FREE_24,
 /* struct's vom untertyp curse_skill: */
-	C_SKILL,
-	MAXCURSE
+  C_SKILL,
+  MAXCURSE
 };
 
 /* ------------------------------------------------------------- */
@@ -156,22 +156,22 @@ enum {
 #define CURSE_NOAGE   2 /* wirkt ewig */
 #define CURSE_IMMUNE  4 /* ignoriert Antimagie */
 #define CURSE_ONLYONE 8 /* Verhindert, das ein weiterer Zauber dieser Art
-													 auf das Objekt gezaubert wird */
+                           auf das Objekt gezaubert wird */
 
 /* Verhalten von Zaubern auf Units beim Übergeben von Personen */
 typedef enum {
-	CURSE_SPREADNEVER,  /* wird nie mit übertragen */
-	CURSE_SPREADALWAYS, /* wird immer mit übertragen */
-	CURSE_SPREADMODULO, /* personenweise weitergabe */
-	CURSE_SPREADCHANCE  /* Ansteckungschance je nach Mengenverhältnis*/
+  CURSE_SPREADNEVER,  /* wird nie mit übertragen */
+  CURSE_SPREADALWAYS, /* wird immer mit übertragen */
+  CURSE_SPREADMODULO, /* personenweise weitergabe */
+  CURSE_SPREADCHANCE  /* Ansteckungschance je nach Mengenverhältnis*/
 } spread_t;
 
 /* typ von struct */
 enum {
-	CURSETYP_NORM,
+  CURSETYP_NORM,
   CURSETYP_UNIT,
   CURSETYP_REGION, /* stores the region in c->data.v */
-	MAXCURSETYP
+  MAXCURSETYP
 };
 
 /* Verhalten beim Zusammenfassen mit einem schon bestehenden Zauber
@@ -183,24 +183,24 @@ enum {
 #define M_MAXEFFECT   4 /* der Effekt ist der maximale Effekt beider */
 #define M_SUMEFFECT   8 /* der Effekt summiert sich */
 #define M_MEN        16 /* die Anzahl der betroffenen Personen summiert
-													 sich */
+                           sich */
 #define M_VIGOUR     32 /* das Maximum der beiden Stärken wird die
-													 Stärke des neuen Zaubers */
-#define M_VIGOUR_ADD 64	/* Vigour wird addiert */
+                           Stärke des neuen Zaubers */
+#define M_VIGOUR_ADD 64 /* Vigour wird addiert */
 
 /* ------------------------------------------------------------- */
 /* Allgemeine Zauberwirkungen */
 
 typedef struct curse {
-	struct curse *nexthash;
-	int no;            /* 'Einheitennummer' dieses Curse */
-	const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
-	int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
-	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
-	double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
-	struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
-	variant effect;
-	variant data;        /* pointer auf spezielle curse-unterstructs*/
+  struct curse *nexthash;
+  int no;            /* 'Einheitennummer' dieses Curse */
+  const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
+  int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
+  int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
+  double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+  struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
+  variant effect;
+  variant data;        /* pointer auf spezielle curse-unterstructs*/
 } curse;
 
 /* Die Unterattribute curse->data: */
@@ -209,24 +209,24 @@ typedef struct curse {
  * nicht immer auf ganze Einheiten wirken brauchen
  */
 typedef struct curse_unit {
-	int cursedmen;        /* verzauberte Personen in der Einheit */
+  int cursedmen;        /* verzauberte Personen in der Einheit */
 } curse_unit;
 
 
 /* ------------------------------------------------------------- */
 
 typedef struct curse_type {
-	const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
-	int typ;
-	spread_t spread;
-	unsigned int mergeflags;
-	const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
-								 Zauberanalyse angezeigt */
-	int (*curseinfo)(const struct locale*, const void*, typ_t, curse*, int);
-	void (*change_vigour)(curse*, double);
-	int (*read)(FILE * F, curse * c);
-	int (*write)(FILE * F, const curse * c);
-	int (*cansee)(const struct faction*, const void*, typ_t, curse *, int);
+  const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
+  int typ;
+  spread_t spread;
+  unsigned int mergeflags;
+  const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
+                 Zauberanalyse angezeigt */
+  int (*curseinfo)(const struct locale*, const void*, typ_t, curse*, int);
+  void (*change_vigour)(curse*, double);
+  int (*read)(FILE * F, curse * c);
+  int (*write)(FILE * F, const curse * c);
+  int (*cansee)(const struct faction*, const void*, typ_t, curse *, int);
   int (*age)(curse *);
 } curse_type;
 
@@ -249,56 +249,56 @@ extern int curse_read(struct attrib * a,FILE * f);
 */
 
 curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type * ctype,
-		double vigour, int duration, variant ceffect, int men);
-	/* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
-	 * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
-	 * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
-	 * nochmal gesondert auf min(get_cursedmen, u->number) gesetzt werden.
-	 */
+    double vigour, int duration, variant ceffect, int men);
+  /* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
+   * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
+   * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
+   * nochmal gesondert auf min(get_cursedmen, u->number) gesetzt werden.
+   */
 
 extern void destroy_curse(curse * c);
 
 
 boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
-	/* ignoriert CURSE_ISNEW */
+  /* ignoriert CURSE_ISNEW */
 
 extern void remove_curse(struct attrib **ap, const curse * c);
-	/* löscht einen konkreten Spruch auf einem Objekt. 
-	 */
+  /* löscht einen konkreten Spruch auf einem Objekt.
+   */
 
 extern int curse_geteffect(const curse * c);
-	/* gibt die Auswirkungen der Verzauberungen zurück. zB bei
-	 * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
-	 * gespeichert. Wird automatisch beim Anlegen eines neuen curse
-	 * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
-	 */
+  /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
+   * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
+   * gespeichert. Wird automatisch beim Anlegen eines neuen curse
+   * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
+   */
 
 
 extern double curse_changevigour(struct attrib **ap, curse * c, double i);
-	/* verändert die Stärke der Verzauberung um i */
+  /* verändert die Stärke der Verzauberung um i */
 
 extern int get_cursedmen(struct unit *u, struct curse *c);
-	/* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
-	 * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
+  /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
+   * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 
 extern void curse_setflag(curse * c, int flag);
-	/* setzt Spezialflag einer Verzauberung (zB 'dauert ewig') */
+  /* setzt Spezialflag einer Verzauberung (zB 'dauert ewig') */
 
 void transfer_curse(struct unit * u, struct unit * u2, int n);
-	/* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
-	 * korrekt gehandhabt werden. Je nach internen Flag kann dies
-	 * unterschiedlich gewünscht sein
-	 * */
+  /* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
+   * korrekt gehandhabt werden. Je nach internen Flag kann dies
+   * unterschiedlich gewünscht sein
+   * */
 
-extern curse * get_cursex(attrib *ap, const curse_type * ctype, variant data, 
-						  boolean(*compare)(const curse *, variant));
-	/* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
-	 * und für die compare() true liefert, oder einen NULL-pointer.
-	 * */
+extern curse * get_cursex(attrib *ap, const curse_type * ctype, variant data,
+              boolean(*compare)(const curse *, variant));
+  /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
+   * und für die compare() true liefert, oder einen NULL-pointer.
+   * */
 extern curse * get_curse(struct attrib *ap, const curse_type * ctype);
-	/* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
-	 * oder einen NULL-pointer
-	 * */
+  /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
+   * oder einen NULL-pointer
+   * */
 
 struct unit * get_tracingunit(struct attrib **ap, const curse_type * ct);
 int find_cursebyname(const char *c);
@@ -321,17 +321,18 @@ extern void * resolve_curse(variant data);
 extern boolean is_cursed_with(attrib *ap, curse *c);
 
 extern boolean curse_active(const curse * c);
-	/* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
+  /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
 
 /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
 extern const char * oldcursename(int id);
 extern void register_curses(void);
+extern int cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self);
 
 #define is_cursed(a, id, id2) \
-	curse_active(get_curse(a, ct_find(oldcursename(id))))
+  curse_active(get_curse(a, ct_find(oldcursename(id))))
 #define get_curseeffect(a, id, id2) \
-	curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
-	
+  curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
+
 #ifdef __cplusplus
 }
 #endif

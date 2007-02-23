@@ -712,6 +712,7 @@
   </string>
   <string name="section_newpotions">
     <text locale="de">Neue Tränke</text>
+    <text locale="en">New Potions</text>
   </string>
 
   <!--Gebäudetypen -->
@@ -2992,19 +2993,19 @@
 
     <string name="alp">
       <text locale="de">Alp</text>
-      <text locale="en">alp</text>
+      <text locale="en">nightmare</text>
     </string>
     <string name="alp_p">
       <text locale="de">Alps</text>
-      <text locale="en">alps</text>
+      <text locale="en">nightmaress</text>
     </string>
     <string name="alp_d">
       <text locale="de">Alps</text>
-      <text locale="en">alps</text>
+      <text locale="en">nightmares</text>
     </string>
     <string name="alp_x">
       <text locale="de">Alp</text>
-      <text locale="en">alp</text>
+      <text locale="en">nightmare</text>
     </string>
 
     <string name="mountainguard">

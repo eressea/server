@@ -47,14 +47,49 @@
     <text locale="fr">"A fog of negative energy enshrouds the region. ($int36($id))"</text>
     <text locale="en">"A fog of negative energy enshrouds the region. ($int36($id))"</text>
   </message>
+  <message name="curseinfo::strength" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die Leute strotzen nur so vor Kraft. ($int36($id))"</text>
+    <text locale="fr">"Testosterone levels are at an all-time high. ($int36($id))"</text>
+    <text locale="en">"Testosterone levels are at an all-time high. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::worse" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) wird von einem Alp geritten. ($int36($id))"</text>
+    <text locale="fr">"$unit($unit) is chased by a nightmare. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) is chased by a nightmare. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::orcish" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"$unit($unit) stürzt sich von einem amourösen Abenteuer ins nächste. ($int36($id))"</text>
-    <text locale="fr">"($int36($id))"</text>
-    <text locale="de">"$unit($unit) goes from one amourous adventure to another. ($int36($id))"</text>
+    <text locale="fr">"$unit($unit) goes from one amourous adventure to another. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) goes from one amourous adventure to another. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::fumble" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) kann sich kaum konzentrieren. ($int36($id))"</text>
+    <text locale="fr">"$unit($unit) can hardly focus on anything. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) can hardly focus on anything. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::itemcloak" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die Ausrüstung von $unit($unit) scheint unsichtbar. ($int36($id))"</text>
+    <text locale="fr">"$unit($unit)'s equipment is invisible. ($int36($id))"</text>
+    <text locale="en">"$unit($unit)'s equipment is invisible. ($int36($id))"</text>
   </message>
   <message name="curseinfo::magicresistance" section="events">
     <type>

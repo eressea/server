@@ -3263,7 +3263,7 @@ dc_age(struct curse * c)
 }
 
 static struct curse_type ct_deathcloud = {
-  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, NULL, cinfo_region, NULL, NULL, NULL, NULL, dc_age
+  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, NULL, cinfo_simple, NULL, NULL, NULL, NULL, dc_age
 };
 
 static curse *
