@@ -162,8 +162,7 @@ message_faction(unit& sender, faction& target, const char * str)
 static void
 message_region(unit& sender, const char * str)
 {
-  sprintf(buf, "von %s: '%s'", unitname(&sender), str);
-  addmessage(sender.region, 0, buf, MSG_MESSAGE, ML_IMPORTANT);
+  ADDMSG(&sender.region->msgs, msg_message("mail_result", "unit message", &sender, str));
 }
 
 static void

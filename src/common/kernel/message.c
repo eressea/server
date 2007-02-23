@@ -187,46 +187,46 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
     log_warning(("message for locale \"%s\": %s\n", locale_name(f->locale), s));
   }
 #endif
-	unused(level);
-	switch (mtype) {
-	case MSG_INCOME:
-		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
-		break;
-	case MSG_BATTLE:
-		assert(0 || !"battle-meldungen nicht über addmessage machen");
-		break;
-	case MSG_MOVE:
-		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_movement", "string", s));
-		break;
-	case MSG_COMMERCE:
-		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
-		break;
-	case MSG_PRODUCE:
-		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_production", "string", s));
-		break;
-	case MSG_MAGIC:
-	case MSG_COMMENT:
-	case MSG_MESSAGE:
-	case MSG_ORCVERMEHRUNG:
-	case MSG_EVENT:
-		/* Botschaften an REGION oder einzelne PARTEI */
-		m = msg_message("msg_event", "string", s);
-		if (!r) {
-			assert(f);
-			m = add_message(&f->msgs, m);
-		} else {
-			if (f==NULL) add_message(&r->msgs, m);
-			else r_addmessage(r, f, m);
-		}
-		break;
-	default:
-		assert(!"Ungültige Msg-Klasse!");
-	}
-	if (m) msg_release(m);
+  unused(level);
+  switch (mtype) {
+    case MSG_INCOME:
+      assert(f);
+      m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
+      break;
+    case MSG_BATTLE:
+      assert(0 || !"battle-meldungen nicht über addmessage machen");
+      break;
+    case MSG_MOVE:
+      assert(f);
+      m = add_message(&f->msgs, msg_message("msg_movement", "string", s));
+      break;
+    case MSG_COMMERCE:
+      assert(f);
+      m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
+      break;
+    case MSG_PRODUCE:
+      assert(f);
+      m = add_message(&f->msgs, msg_message("msg_production", "string", s));
+      break;
+    case MSG_MAGIC:
+    case MSG_COMMENT:
+    case MSG_MESSAGE:
+    case MSG_ORCVERMEHRUNG:
+    case MSG_EVENT:
+      /* Botschaften an REGION oder einzelne PARTEI */
+      m = msg_message("msg_event", "string", s);
+      if (!r) {
+        assert(f);
+        m = add_message(&f->msgs, m);
+      } else {
+        if (f==NULL) add_message(&r->msgs, m);
+        else r_addmessage(r, f, m);
+      }
+      break;
+    default:
+      assert(!"Ungültige Msg-Klasse!");
+  }
+  if (m) msg_release(m);
 }
 
 void

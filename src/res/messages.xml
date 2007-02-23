@@ -24,6 +24,21 @@
     <text locale="fr">"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
     <text locale="en">"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
   </message>
+  <message name="flying_ship_result" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($mage) beschwört einen Luftgeist, der die $ship($ship) in die Wolken hebt."</text>
+    <text locale="en">"$unit($mage) summons a wind spirit that lifts the $ship($ship) into the clouds."</text>
+  </message>
+  <message name="confusion_result" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) beschwört einen Schleier der Verwirrung."</text>
+    <text locale="en">"$unit($mage) summons a fog of confusion."</text>
+  </message>
   <message name="curseinfo::riotzone" section="events">
     <type>
       <arg name="id" type="int"/>
@@ -3817,7 +3832,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die materielle Welt ist hier nicht sichtbar."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The material world is not visible from here."</text>
   </message>
-  <message name="error217" section="errors">
+  <message name="spell_astral_only" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -6812,6 +6827,31 @@
     <text locale="de">"$unit($unit) versuchte erfolglos, $unit($target) in eine andere Welt zu schleudern."</text>
     <text locale="en">"$unit($unit) tried but failed to send $unit($target) to another world."</text>
     <text locale="fr">"$unit($unit) tried but failed to send $unit($target) to another world."</text>
+  </message>
+
+  <message name="renumber_twice" section="errors">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"NUMMER PARTEI $int36($id): Die Partei kann nicht mehr als einmal ihre Nummer wecheln."</text>
+    <text locale="en">"NUMBER FACTION $int36($id): Your faction can only change its number once."</text>
+  </message>
+
+  <message name="renumber_inuse" section="errors">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"NUMMER PARTEI $int36($id): Diese Nummer wird von einer anderen Partei benutzt."</text>
+    <text locale="en">"NUMBER FACTION $int36($id): This number is being used by another faction."</text>
+  </message>
+
+  <message name="mail_result" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="message" type="string"/>
+    </type>
+    <text locale="de">"Eine Botschaft von $unit($unit): '$message'"</text>
+    <text locale="en">"A message from $unit($unit): '$message'"</text>
   </message>
 
 </messages>

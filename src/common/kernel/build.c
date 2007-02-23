@@ -316,6 +316,7 @@ destroy_road(unit *u, int nmax, struct order * ord)
   }
 
   if (d==NODIRECTION) {
+    /* Die Richtung wurde nicht erkannt */
     cmistake(u, ord, 71, MSG_PRODUCE);
   } else {
     short road = rroad(r, d);

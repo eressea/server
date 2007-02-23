@@ -1451,9 +1451,10 @@ sp_sparkle(castorder *co)
 
   ADDMSG(&mage->faction->msgs, msg_message(
     "sparkle_effect", "mage target", mage, u));
-  if (u->faction!=mage->faction)
+  if (u->faction!=mage->faction) {
     ADDMSG(&u->faction->msgs, msg_message(
     "sparkle_effect", "mage target", mage, u));
+  }
 
   return cast_level;
 }
@@ -2172,6 +2173,7 @@ sp_fog_of_confusion(castorder *co)
   for (rl2 = rl; rl2; rl2 = rl2->next) {
     curse * c;
     variant effect;
+    message * m = NULL;
 
     if (!fval(rl2->data->terrain, SEA_REGION)
         && !r_isforest(rl2->data)) continue;
@@ -2192,16 +2194,15 @@ sp_fog_of_confusion(castorder *co)
     for (u = rl2->data->units; u; u = u->next ) {
       if (!fval(u->faction, FL_DH) ) {
         fset(u->faction, FL_DH);
-        sprintf(buf, "%s beschwört einen Schleier der Verwirrung.",
-            cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-        addmessage(rl2->data, u->faction, buf, MSG_EVENT, ML_INFO);
+        if (!m) m = msg_message("confusion_result", "mage", mage);
+        add_message(&u->faction->msgs, m);
       }
     }
     if (!fval(mage->faction, FL_DH)) {
-      sprintf(buf, "%s beschwört einen Schleier der Verwirrung.",
-          unitname(mage));
-      addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
+      if (!m) m = msg_message("confusion_result", "mage", mage);
+      add_message(&mage->faction->msgs, m);
     }
+    if (m) msg_release(m);
   }
   free_regionlist(rl);
   return cast_level;
@@ -5478,6 +5479,8 @@ sp_dream_of_confusion(castorder *co)
     region * r2 = rl2->data;
     variant effect;
     curse * c;
+    message * m = NULL;
+
     /* Magieresistenz jeder Region prüfen */
     if (target_resists_magic(mage, r2, TYP_REGION, 0)) {
       report_failure(mage, co->order);
@@ -5494,16 +5497,15 @@ sp_dream_of_confusion(castorder *co)
     for (u = r2->units; u; u = u->next ) {
       if (!fval(u->faction, FL_DH) ) {
         fset(u->faction, FL_DH);
-        sprintf(buf, "%s beschwört einen Schleier der Verwirrung.",
-            cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-        addmessage(r2, u->faction, buf, MSG_EVENT, ML_INFO);
+        if (!m) m = msg_message("confusion_result", "mage", mage);
+        add_message(&u->faction->msgs, m);
       }
     }
     if (!fval(mage->faction, FL_DH)) {
-      sprintf(buf, "%s beschwört einen Schleier der Verwirrung.",
-          unitname(mage));
-      addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
+      if (!m) m = msg_message("confusion_result", "mage", mage);
+      add_message(&u->faction->msgs, m);
     }
+    if (m) msg_release(m);
   }
   free_regionlist(rl);
   return cast_level;
@@ -5698,10 +5700,7 @@ sp_enterastral(castorder *co)
     ro = r;
     break;
   default:
-    sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
-        "nur in der materiellen Welt.", unitname(mage),
-        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    cmistake(mage, co->order, 190, MSG_MAGIC);
     return 0;
   }
 
@@ -5945,8 +5944,7 @@ sp_leaveastral(castorder *co)
     free_regionlist(rl);
     break;
   default:
-    sprintf(buf, "Der Zauber funktioniert nur in der astralen Welt.");
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spell_astral_only", ""));
     return 0;
   }
 
@@ -6244,7 +6242,7 @@ sp_viewreality(castorder *co)
 
   if (getplaneid(r) != 1) {
     /* sprintf(buf, "Dieser Zauber kann nur im Astralraum gezaubert werden."); */
-    cmistake(mage, co->order, 217, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spell_astral_only", ""));
     return 0;
   }
 
@@ -6511,11 +6509,8 @@ sp_movecastle(castorder *co)
   dir = finddirection(pa->param[1]->data.s, mage->faction->locale);
 
   if (dir == NODIRECTION) {
-    sprintf(buf, "%s in %s: 'ZAUBER %s': Ungültige Richtung %s.",
-      unitname(mage), regionname(mage->region, mage->faction),
-      spell_name(sp, mage->faction->locale),
-      pa->param[1]->data.s);
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    /* Die Richtung wurde nicht erkannt */
+    cmistake(mage, co->order, 71, MSG_PRODUCE);
     return 0;
   }
 
@@ -6597,6 +6592,7 @@ sp_flying_ship(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
+  message * m = NULL;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -6629,13 +6625,11 @@ sp_flying_ship(castorder *co)
     /* das sehen natürlich auch die Leute an Land */
     if (!fval(u->faction, FL_DH) ) {
       fset(u->faction, FL_DH);
-      sprintf(buf, "%s beschwört einen Luftgeist, der die %s in "
-          "die Wolken hebt.",
-        cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
-        shipname(sh));
-      addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+      if (!m) m = msg_message("flying_ship_result", "mage ship", mage, sh);
+      add_message(&u->faction->msgs, m);
     }
   }
+  if (m) msg_release(m);
   return cast_level;
 }
 

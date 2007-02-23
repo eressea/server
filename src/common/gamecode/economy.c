@@ -1025,32 +1025,32 @@ gebaeude_stuerzt_ein(region * r, building * b)
 void
 maintain_buildings(region * r, boolean crash)
 {
-	building **bp = &r->buildings;
-	while (*bp) {
-		building * b = *bp;
+  building **bp = &r->buildings;
+  while (*bp) {
+    building * b = *bp;
     boolean maintained = maintain(b, !crash);
 
     /* the second time, send a message */
     if (crash) {
       if (!maintained && (rng_int() % 100 < EINSTURZCHANCE)) {
-  			gebaeude_stuerzt_ein(r, b);
-	  		continue;
+        gebaeude_stuerzt_ein(r, b);
+        continue;
       } else if (!fval(b, BLD_WORKING)) {
         unit * u = buildingowner(r, b);
         const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
-  	  	struct message * msg = msg_message(msgtype, "building", b);
+        struct message * msg = msg_message(msgtype, "building", b);
 
         if (u) {
-					add_message(&u->faction->msgs, msg);
-					r_addmessage(r, u->faction, msg);
+          add_message(&u->faction->msgs, msg);
+          r_addmessage(r, u->faction, msg);
         } else {
           add_message(&r->msgs, msg);
         }
         msg_release(msg);
       }
     }
-		bp=&b->next;
-	}
+    bp=&b->next;
+  }
 }
 
 
@@ -1665,6 +1665,7 @@ make_cmd(unit * u, struct order * ord)
         }
         build_road(r, u, m, d);
       } else {
+        /* Die Richtung wurde nicht erkannt */
         cmistake(u, ord, 71, MSG_PRODUCE);
       }
     }

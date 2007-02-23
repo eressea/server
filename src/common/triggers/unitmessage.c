@@ -59,16 +59,16 @@ unitmessage_free(trigger * t)
 static int
 unitmessage_handle(trigger * t, void * data)
 {
-	/* call an event handler on unitmessage.
-	 * data.v -> ( variant event, int timer )
-	 */
-	unitmessage_data * td = (unitmessage_data*)t->data.v;
-	if (td->target!=NULL) {
-		addmessage(td->target->region, td->target->faction, td->string, td->type, td->level);
-	} else
-		log_error(("could not perform unitmessage::handle()\n"));
-	unused(data);
-	return 0;
+  /* call an event handler on unitmessage.
+  * data.v -> ( variant event, int timer )
+  */
+  unitmessage_data * td = (unitmessage_data*)t->data.v;
+  if (td->target!=NULL) {
+    addmessage(td->target->region, td->target->faction, td->string, td->type, td->level);
+  } else
+    log_error(("could not perform unitmessage::handle()\n"));
+  unused(data);
+  return 0;
 }
 
 static void

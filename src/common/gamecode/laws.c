@@ -1843,8 +1843,7 @@ mail_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 30, MSG_MESSAGE);
       break;
     } else {
-      sprintf(buf, "von %s: '%s'", unitname(u), s);
-      addmessage(r, 0, buf, MSG_MESSAGE, ML_IMPORTANT);
+      ADDMSG(&r->msgs, msg_message("mail_result", "unit message", u, s));
       break;
     }
     break;
@@ -2665,29 +2664,25 @@ renumber_factions(void)
     if (!a) continue;
     want = a->data.i;
     if (fval(f, FFL_NEWID)) {
-      sprintf(buf, "NUMMER PARTEI %s: Die Partei kann nicht mehr als einmal ihre Nummer wecheln", itoa36(want));
-      addmessage(0, f, buf, MSG_MESSAGE, ML_IMPORTANT);
+      ADDMSG(&f->msgs, msg_message("renumber_twice", "id", want));
+      continue;
     }
     old = findfaction(want);
     if (old) {
       a_remove(&f->attribs, a);
-      sprintf(buf, "Die Nummer %s wird von einer anderen Partei benutzt.", itoa36(want));
-      addmessage(0, f, buf, MSG_MESSAGE, ML_IMPORTANT);
+      ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
       continue;
     }
     if (!faction_id_is_unused(want)) {
       a_remove(&f->attribs, a);
-      sprintf(buf, "Die Nummer %s wurde schon einmal von einer anderen Partei benutzt.", itoa36(want));
-      addmessage(0, f, buf, MSG_MESSAGE, ML_IMPORTANT);
+      ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
       continue;
     }
     for (rn=&renum; *rn; rn=&(*rn)->next) {
       if ((*rn)->want>=want) break;
     }
     if (*rn && (*rn)->want==want) {
-      a_remove(&f->attribs, a);
-      sprintf(buf, "Die Nummer %s wurde bereits einer anderen Partei zugeteilt.", itoa36(want));
-      addmessage(0, f, buf, MSG_MESSAGE, ML_IMPORTANT);
+      ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
     } else {
       struct renum * r = calloc(sizeof(struct renum), 1);
       r->next = *rn;
