@@ -2757,7 +2757,7 @@ print_header(battle * b)
     if (lastf) strcat(buf, lastf);
     strcat(buf, ".");
 
-    m = msg_message("battle::header", "factions", buf);
+    m = msg_message("battle::starters", "factions", buf);
     message_faction(b, f, m);
     msg_release(m);
   }
