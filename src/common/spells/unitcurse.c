@@ -35,26 +35,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static int
-cinfo_unit_onlyowner(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-  message * msg;
-  struct unit *u;
-
-  unused(typ);
-
-  assert(typ == TYP_UNIT);
-  u = (struct unit *)obj;
-
-  if (self != 0){
-    msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
-  }
-  return 0;
-}
-
 /* ------------------------------------------------------------- */
 /*
  * C_AURA
