@@ -18,8 +18,10 @@
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/message.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
+#include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/save.h>
 #include <kernel/skill.h>
