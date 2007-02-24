@@ -1248,6 +1248,25 @@ count_enemies(battle * b, const fighter * af, int minrow, int maxrow, int select
   int i = 0;
   side *es, *as = af->side;
 
+#ifdef FASTCOUNT
+  int sr = statusrow(af->status);
+
+  if (select!=SELECT_FIND) {
+    if (b->alive==b->fast.alive && as==b->fast.side && sr==b->fast.status && minrow==b->fast.minrow && maxrow==b->fast.maxrow) {
+      if (b->fast.enemies[select]>=0) {
+        return b->fast.enemies[select];
+      }
+    } else {
+      b->fast.side = as;
+      b->fast.status = sr;
+      b->fast.minrow = minrow;
+      b->fast.alive=b->alive;
+      b->fast.maxrow = maxrow;
+      memset(b->fast.enemies, -1, sizeof(b->fast.enemies));
+    }
+  }
+
+#endif
   if (maxrow<FIRST_ROW) return 0;
   for (es = b->sides; es; es = es->next) {
     if (as==NULL || enemy(es, as)) {
@@ -1259,6 +1278,9 @@ count_enemies(battle * b, const fighter * af, int minrow, int maxrow, int select
       if (i>0 && (select&SELECT_FIND)) break;
     }
   }
+#ifdef FASTCOUNT
+  b->fast.enemies[select] = i;
+#endif
   return i;
 }
 

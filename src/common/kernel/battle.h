@@ -70,6 +70,16 @@ extern "C" {
 #ifdef SMALL_BATTLE_MESSAGES
     boolean small;
 #endif
+#define FASTCOUNT
+#ifdef FASTCOUNT
+    struct {
+      struct side * side;
+      int status;
+      int alive;
+      int minrow, maxrow;
+      int enemies[8];
+    } fast;
+#endif
   } battle;
 
   typedef struct tactics {
