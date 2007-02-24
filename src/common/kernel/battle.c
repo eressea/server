@@ -476,8 +476,23 @@ get_unitrow(const fighter * af, const side * vs)
     int i;
     for (i=FIGHT_ROW;i!=row;++i) if (af->side->size[i]) break;
     return FIGHT_ROW+(row-i);
+  } else {
+#ifdef FASTROW
+    battle * b = vs->battle;
+    if (row==b->rowcache.row && b->alive==b->rowcache.alive && af->side==b->rowcache.as && vs==b->rowcache.vs) {
+      return b->rowcache.result;
+    } else {
+      b->rowcache.alive = b->alive;
+      b->rowcache.as = af->side;
+      b->rowcache.vs = vs;
+      b->rowcache.row = row;
+      b->rowcache.result = get_row(af->side, row, vs);
+      return b->rowcache.result;
+    }
+#else
+    return b->rowcache.result;
+#endif
   }
-  return get_row(af->side, row, vs);
 }
 
 static void
@@ -1251,19 +1266,21 @@ count_enemies(battle * b, const fighter * af, int minrow, int maxrow, int select
 #ifdef FASTCOUNT
   int sr = statusrow(af->status);
 
-  if (select!=SELECT_FIND) {
-    if (b->alive==b->fast.alive && as==b->fast.side && sr==b->fast.status && minrow==b->fast.minrow && maxrow==b->fast.maxrow) {
-      if (b->fast.enemies[select]>=0) {
-        return b->fast.enemies[select];
-      }
-    } else {
-      b->fast.side = as;
-      b->fast.status = sr;
-      b->fast.minrow = minrow;
-      b->fast.alive=b->alive;
-      b->fast.maxrow = maxrow;
-      memset(b->fast.enemies, -1, sizeof(b->fast.enemies));
+  if (b->alive==b->fast.alive && as==b->fast.side && sr==b->fast.status && minrow==b->fast.minrow && maxrow==b->fast.maxrow) {
+    if (b->fast.enemies[select]>=0) {
+      return b->fast.enemies[select];
+    } else if (select&SELECT_FIND) {
+      if (b->fast.enemies[select-SELECT_FIND]>=0) {
+        return b->fast.enemies[select-SELECT_FIND];
+      } 
     }
+  } else {
+    b->fast.side = as;
+    b->fast.status = sr;
+    b->fast.minrow = minrow;
+    b->fast.alive=b->alive;
+    b->fast.maxrow = maxrow;
+    memset(b->fast.enemies, -1, sizeof(b->fast.enemies));
   }
 
 #endif

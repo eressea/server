@@ -70,6 +70,16 @@ extern "C" {
 #ifdef SMALL_BATTLE_MESSAGES
     boolean small;
 #endif
+#define FASTROW
+#ifdef FASTROW
+    struct {
+      const struct side * as;
+      const struct side * vs;
+      int alive;
+      int row;
+      int result;
+    } rowcache;
+#endif
 #define FASTCOUNT
 #ifdef FASTCOUNT
     struct {
