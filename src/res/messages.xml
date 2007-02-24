@@ -6439,8 +6439,8 @@
       <arg name="spell" type="spell"/>
       <arg name="effect" type="string"/>
     </type>
-    <text locale="de">"$unit($mage) zaubert $spell($spell)$if(strlen($effect),": $effect","")."</text>
-    <text locale="en">"$unit($mage) casts $spell($spell)$if(strlen($effect),": $effect","")."</text>
+    <text locale="de">"$unit($mage) zaubert $spell($spell)$if($strlen($effect),": $effect","")."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell)$if($strlen($effect),": $effect","")."</text>
   </message>
   <message name="battle::killed" section="battle">
     <type>

@@ -1274,7 +1274,7 @@ count_enemies(battle * b, const fighter * af, int minrow, int maxrow, int select
         return b->fast.enemies[select-SELECT_FIND];
       } 
     }
-  } else {
+  } else if (select!=SELECT_FIND || b->alive!=b->fast.alive) {
     b->fast.side = as;
     b->fast.status = sr;
     b->fast.minrow = minrow;
