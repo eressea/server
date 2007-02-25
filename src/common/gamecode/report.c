@@ -1995,6 +1995,7 @@ report_plaintext(const char * filename, report_context * ctx)
     /* Beschreibung */
 
     if (sr->mode==see_unit) {
+      anyunits = 1;
       describe(F, r, 0, f);
       if (!TradeDisabled() && !fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
         rnl(F);

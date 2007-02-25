@@ -1624,38 +1624,38 @@ int
 make_cmd(unit * u, struct order * ord)
 {
   region * r = u->region;
-	const building_type * btype;
-	const ship_type * stype;
-	param_t p;
-	int m;
-	const item_type * itype;
-	const char *s;
+  const building_type * btype;
+  const ship_type * stype;
+  param_t p;
+  int m;
+  const item_type * itype;
+  const char *s;
   const struct locale * lang = u->faction->locale;
-  
+
   if (u->number==0) return 0;
 
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
 
-	m = atoi(s);
-	sprintf(buf, "%d", m);
-	if (!strcmp(buf, s)) {
-		/* first came a want-paramter */
-		s = getstrtoken();
-	} else {
-		m = INT_MAX;
-	}
+  m = atoi(s);
+  sprintf(buf, "%d", m);
+  if (!strcmp(buf, s)) {
+    /* first came a want-paramter */
+    s = getstrtoken();
+  } else {
+    m = INT_MAX;
+  }
 
-	p = findparam(s, u->faction->locale);
+  p = findparam(s, u->faction->locale);
 
-	/* MACHE TEMP kann hier schon gar nicht auftauchen, weil diese nicht in
-	* thisorder abgespeichert werden - und auf den ist getstrtoken() beim
-	* aufruf von make geeicht */
+  /* MACHE TEMP kann hier schon gar nicht auftauchen, weil diese nicht in
+  * thisorder abgespeichert werden - und auf den ist getstrtoken() beim
+  * aufruf von make geeicht */
 
-	if (p == P_ROAD) {
-		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, ord, 275, MSG_PRODUCE);
+  if (p == P_ROAD) {
+    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+      cmistake(u, ord, 275, MSG_PRODUCE);
     } else {
       direction_t d = finddirection(getstrtoken(), u->faction->locale);
       if (d!=NODIRECTION) {
@@ -1669,27 +1669,27 @@ make_cmd(unit * u, struct order * ord)
         cmistake(u, ord, 71, MSG_PRODUCE);
       }
     }
-		return 0;
-	} else if (p == P_SHIP) {
-		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, ord, 276, MSG_PRODUCE);
+    return 0;
+  } else if (p == P_SHIP) {
+    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+      cmistake(u, ord, 276, MSG_PRODUCE);
     } else {
       continue_ship(r, u, m);
     }
-		return 0;
-	} else if (p == P_HERBS) {
-		herbsearch(r, u, m);
-		return 0;
-	}
+    return 0;
+  } else if (p == P_HERBS) {
+    herbsearch(r, u, m);
+    return 0;
+  }
 
   /* since the string can match several objects, like in 'academy' and
-   * 'academy of arts', we need to figure out what the player meant.
-   * This is not 100% safe.
-   */
-	stype = findshiptype(s, lang);
-	btype = findbuildingtype(s, lang);
-	itype = finditemtype(s, lang);
-  
+  * 'academy of arts', we need to figure out what the player meant.
+  * This is not 100% safe.
+  */
+  stype = findshiptype(s, lang);
+  btype = findbuildingtype(s, lang);
+  itype = finditemtype(s, lang);
+
   if (itype!=NULL && (btype!=NULL || stype!=NULL)) {
     if (itype->construction==NULL) {
       /* if the item cannot be made, we probably didn't mean to make it */
@@ -1713,22 +1713,22 @@ make_cmd(unit * u, struct order * ord)
     if (strlen(sname)<strlen(bname)) btype = NULL;
     else stype = NULL;
   }
-  
-	if (stype != NOSHIP) {
-		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, ord, 276, MSG_PRODUCE);
+
+  if (stype != NOSHIP) {
+    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+      cmistake(u, ord, 276, MSG_PRODUCE);
     } else {
       create_ship(r, u, stype, m, ord);
     }
-	} else	if (btype != NOBUILDING) {
-		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, ord, 94, MSG_PRODUCE);
+  } else	if (btype != NOBUILDING) {
+    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+      cmistake(u, ord, 94, MSG_PRODUCE);
     } else {
       build_building(u, btype, m, ord);
     }
-	}
-	else if (itype!=NULL) {
-		create_item(u, itype, m);
+  }
+  else if (itype!=NULL) {
+    create_item(u, itype, m);
   } else {
     cmistake(u, ord, 125, MSG_PRODUCE);
   }
