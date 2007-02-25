@@ -134,35 +134,35 @@ void
 report_item(const unit * owner, const item * i, const faction * viewer, const char ** name, const char ** basename, int * number, boolean singular)
 {
   assert(owner->number);
-	if (owner->faction == viewer) {
-		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, ((i->number!=1 && !singular)?GR_PLURAL:0)));
-		if (basename) *basename = resourcename(i->type->rtype, 0);
-		if (number) *number = i->number;
-	} else if (i->type->rtype==r_silver) {
-		int pp = i->number/owner->number;
-		if (number) *number = 1;
-		if (pp > 50000 && dragonrace(owner->race)) {
-			if (name) *name = locale_string(viewer->locale, "dragonhoard");
-			if (basename) *basename = "dragonhoard";
-		} else if (pp > 5000) {
-			if (name) *name = locale_string(viewer->locale, "moneychest");
-			if (basename) *basename = "moneychest";
-		} else if (pp > 500) {
-			if (name) *name = locale_string(viewer->locale, "moneybag");
-			if (basename) *basename = "moneybag";
-		} else {
-			if (number) *number = 0;
-			if (name) *name = NULL;
-			if (basename) *basename = NULL;
-		}
-	} else {
-		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, NMF_APPEARANCE|((i->number!=1 && !singular)?GR_PLURAL:0)));
-		if (basename) *basename = resourcename(i->type->rtype, NMF_APPEARANCE);
-		if (number) {
-			if (fval(i->type, ITF_HERB)) *number = 1;
-			else *number = i->number;
-		}
-	}
+  if (owner->faction == viewer) {
+    if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, ((i->number!=1 && !singular)?GR_PLURAL:0)));
+    if (basename) *basename = resourcename(i->type->rtype, 0);
+    if (number) *number = i->number;
+  } else if (i->type->rtype==r_silver) {
+    int pp = i->number/owner->number;
+    if (number) *number = 1;
+    if (pp > 50000 && dragonrace(owner->race)) {
+      if (name) *name = locale_string(viewer->locale, "dragonhoard");
+      if (basename) *basename = "dragonhoard";
+    } else if (pp > 5000) {
+      if (name) *name = locale_string(viewer->locale, "moneychest");
+      if (basename) *basename = "moneychest";
+    } else if (pp > 500) {
+      if (name) *name = locale_string(viewer->locale, "moneybag");
+      if (basename) *basename = "moneybag";
+    } else {
+      if (number) *number = 0;
+      if (name) *name = NULL;
+      if (basename) *basename = NULL;
+    }
+  } else {
+    if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, NMF_APPEARANCE|((i->number!=1 && !singular)?GR_PLURAL:0)));
+    if (basename) *basename = resourcename(i->type->rtype, NMF_APPEARANCE);
+    if (number) {
+      if (fval(i->type, ITF_HERB)) *number = 1;
+      else *number = i->number;
+    }
+  }
 }
 
 
@@ -1267,12 +1267,13 @@ prepare_report(faction * f)
 int
 write_reports(faction * f, time_t ltime)
 {
+  int backup = 1;
   boolean gotit = false;
   report_type * rtype = report_types;
   struct report_context ctx;
 
   ctx.f = f;
-  ctx.report_time	= time(NULL);
+  ctx.report_time = time(NULL);
   ctx.seen = prepare_report(f);
   ctx.first = firstregion(f);
   ctx.last = lastregion(f);
@@ -1281,24 +1282,32 @@ write_reports(faction * f, time_t ltime)
   get_seen_interval(&ctx);
   get_addresses(&ctx);
 
-  printf("Reports for %s:", factionname(f));
-  fflush(stdout);
+  do {
+    errno = 0;
+    printf("Reports for %s:", factionname(f));
+    fflush(stdout);
 
-  for (;rtype!=NULL;rtype=rtype->next) {
-    if (f->options & rtype->flag) {
-      char filename[MAX_PATH];
-      sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
-      if (rtype->write(filename, &ctx)==0) {
-        gotit = true;
+    for (;rtype!=NULL;rtype=rtype->next) {
+      if (f->options & rtype->flag) {
+        char filename[MAX_PATH];
+        sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
+        if (rtype->write(filename, &ctx)==0) {
+          gotit = true;
+        }
       }
     }
-  }
 
-  puts(" DONE");
-  if (!gotit) {
-    log_warning(("No report for faction %s!\n", factionid(f)));
-  }
-
+    puts(" DONE");
+    if (!gotit) {
+      log_warning(("No report for faction %s!\n", factionid(f)));
+    }
+    if (errno) {
+      sprintf(buf, "Error writing reports, waiting %u seconds before retry.\n", backup);
+      perror(buf);
+      sleep(backup);
+      backup *= 2;
+    }
+  } while (errno);
   freelist(ctx.addresses);
   seen_done(ctx.seen);
   return 0;

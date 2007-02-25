@@ -573,10 +573,6 @@ load_inifile(const char * filename)
   if (d) {
     const char * str;
 
-    lomem = iniparser_getint(d, "eressea:lomem", lomem)?1:0;
-    quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
-    str = iniparser_getstr(d, "eressea:run");
-    if (str) luafile = str;
     str = iniparser_getstr(d, "common:base");
     if (str) g_basedir = str;
     str = iniparser_getstr(d, "common:res");
@@ -585,6 +581,13 @@ load_inifile(const char * filename)
     if (str) xmlfile = str;
     str = iniparser_getstr(d, "common:scripts");
     if (str) script_path = str;
+    lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
+
+    quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
+    str = iniparser_getstr(d, "eressea:run");
+    if (str) luafile = str;
+    str = iniparser_getstr(d, "eressea:report");
+    if (str) g_reportdir = str;
   }
   inifile = d;
 }

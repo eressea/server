@@ -99,6 +99,7 @@ extern "C" {
 # define HAVE_STRNCASECMP
 # define HAVE_ACCESS
 # define HAVE_STAT
+# define HAVE_SLEEP
 typedef struct stat stat_type;
 # include <dirent.h>
 # define HAVE_READDIR
@@ -127,6 +128,7 @@ typedef struct stat stat_type;
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
 # define HAVE_STRDUP
+# define HAVE_SLEEP
 # define snprintf _snprintf
 # define HAVE_SNPRINTF
 # undef HAVE_STRCASECMP
@@ -158,6 +160,9 @@ typedef struct _stat stat_type;
 /* MSVC has _strdup */
 # define strdup _strdup
 # define HAVE_STRDUP
+
+# define sleep _sleep
+# define HAVE_SLEEP
 
 # define stricmp(a, b) _stricmp(a, b)
 # define HAVE_STRICMP
