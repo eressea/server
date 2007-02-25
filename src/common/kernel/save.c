@@ -947,31 +947,31 @@ fwriteorder(FILE * F, const order * ord, const struct locale * lang)
 unit *
 readunit(FILE * F)
 {
-	skill_t sk;
-	unit * u;
-	int number, n, p;
+  skill_t sk;
+  unit * u;
+  int number, n, p;
   order ** orderp;
 
-	n = rid(F);
-	u = findunit(n);
-	if (u==NULL) {
-		u = calloc(sizeof(unit), 1);
-		u->no = n;
-		uhash(u);
-	} else {
-		while (u->attribs) a_remove(&u->attribs, u->attribs);
-		while (u->items) i_free(i_remove(&u->items, u->items));
-		free(u->skills);
-		u->skills = 0;
-		u->skill_size = 0;
-		u_setfaction(u, NULL);
-	}
-	{
+  n = rid(F);
+  u = findunit(n);
+  if (u==NULL) {
+    u = calloc(sizeof(unit), 1);
+    u->no = n;
+    uhash(u);
+  } else {
+    while (u->attribs) a_remove(&u->attribs, u->attribs);
+    while (u->items) i_free(i_remove(&u->items, u->items));
+    free(u->skills);
+    u->skills = 0;
+    u->skill_size = 0;
+    u_setfaction(u, NULL);
+  }
+  {
     int n = rid(F);
-		faction * f = findfaction(n);
-		if (f!=u->faction) u_setfaction(u, f);
-	}
-	rds(F, &u->name);
+    faction * f = findfaction(n);
+    if (f!=u->faction) u_setfaction(u, f);
+  }
+  rds(F, &u->name);
   if (lomem) rds(F, 0);
   else rds(F, &u->display);
 #ifndef NDEBUG
@@ -1006,11 +1006,11 @@ readunit(FILE * F)
     if (strlen(buf)) u->irace = rc_find(buf);
     else u->irace = u->race;
   }
-	if (u->faction == NULL) {
-		log_error(("unit %s has faction == NULL\n", unitname(u)));
-		u_setfaction(u, findfaction(MONSTER_FACTION));
-		set_number(u, 0);
-	}
+  if (u->faction == NULL) {
+    log_error(("unit %s has faction == NULL\n", unitname(u)));
+    u_setfaction(u, findfaction(MONSTER_FACTION));
+    set_number(u, 0);
+  }
 
   if (count_unit(u)) u->faction->no_units++;
 
@@ -1053,12 +1053,13 @@ readunit(FILE * F)
     u->flags = ri(F) & ~UFL_DEBUG;
     u->flags &= UFL_SAVEMASK;
   }
-	/* Persistente Befehle einlesen */
-	free_orders(&u->orders);
-	freadstr(F, buf, sizeof(buf));
+  if (u->flags&UFL_GUARD) fset(u->region, UFL_GUARD);
+  /* Persistente Befehle einlesen */
+  free_orders(&u->orders);
+  freadstr(F, buf, sizeof(buf));
   p = n = 0;
   orderp = &u->orders;
-	while (*buf != 0) {
+  while (*buf != 0) {
     order * ord = parse_order(buf, u->faction->locale);
     if (ord!=NULL) {
       if (++n<MAXORDERS) {
@@ -1074,8 +1075,8 @@ readunit(FILE * F)
       }
       if (ord!=NULL) free_order(ord);
     }
-		freadstr(F, buf, sizeof(buf));
-	}
+    freadstr(F, buf, sizeof(buf));
+  }
   if (global.data_version<NOLASTORDER_VERSION) {
     order * ord;
     freadstr(F, buf, sizeof(buf));

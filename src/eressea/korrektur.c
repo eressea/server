@@ -892,6 +892,7 @@ fix_attribflags(void)
       while (a) {
         if (a->type==&at_guard) {
           fset(u, UFL_GUARD);
+          fset(u->region, RF_GUARDED);
         }
         else if (a->type==&at_group) {
           fset(u, UFL_GROUP);

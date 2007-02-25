@@ -50,6 +50,7 @@ extern "C" {
 
 /* flags that speed up attribute access: */
 #define RF_TRAVELUNIT    (1<<19)
+#define RF_GUARDED       (1<<20)
 
 #define RF_ALL 0xFFFFFF
 

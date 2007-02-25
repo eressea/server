@@ -2494,6 +2494,7 @@ setguard(unit * u, unsigned int flags)
     return;
   }
   fset(u, UFL_GUARD);
+  fset(u->region, RF_GUARDED);
   if (!a) a = a_add(&u->attribs, a_new(&at_guard));
   a->data.i = (int)flags;
 }
