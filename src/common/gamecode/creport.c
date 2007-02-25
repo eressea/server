@@ -1467,10 +1467,6 @@ report_computer(const char * filename, report_context * ctx)
   report_crtypes(F, f->locale);
   write_translations(F);
   reset_translations();
-  if (errno) {
-    log_error(("%s\n", strerror(errno)));
-    errno = 0;
-  }
   fclose(F);
   return 0;
 }

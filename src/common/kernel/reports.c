@@ -1269,7 +1269,6 @@ write_reports(faction * f, time_t ltime)
 {
   int backup = 1;
   boolean gotit = false;
-  report_type * rtype = report_types;
   struct report_context ctx;
 
   ctx.f = f;
@@ -1283,6 +1282,8 @@ write_reports(faction * f, time_t ltime)
   get_addresses(&ctx);
 
   do {
+    report_type * rtype = report_types;
+
     errno = 0;
     printf("Reports for %s:", factionname(f));
     fflush(stdout);
