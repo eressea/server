@@ -252,7 +252,6 @@ extern char * strdup(const char *s);
 #ifndef INLINE_FUNCTION
 # define INLINE_FUNCTION
 #endif
-/* this function must be implemented in a .o file */
-extern char * strnzcpy(char * dst, const char *src, size_t len);
+
 #endif
 

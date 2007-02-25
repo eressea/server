@@ -54,6 +54,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
@@ -533,11 +534,10 @@ unitorders(FILE * F, struct faction * f)
 static faction *
 factionorders(void)
 {
-  char b[16];
-  char * fid = strnzcpy(b, getstrtoken(), 15);
-  const char * pass = getstrtoken();
-  faction *f = NULL;
+  char fid[16];
+  faction * f = NULL;
 
+  strlcpy(fid, getstrtoken(), sizeof(fid));
 #ifdef FUZZY_BASE36
   int id = atoi36(fid);
   if (id!=0) f = findfaction(id);
@@ -550,6 +550,7 @@ factionorders(void)
 #endif
   
   if (f!=NULL) {
+    const char * pass = getstrtoken();
     /* Kontrolliere, ob das Passwort richtig eingegeben wurde. Es
      * muß in "Gänsefüßchen" stehen!! */
     

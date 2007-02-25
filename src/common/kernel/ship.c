@@ -205,12 +205,12 @@ destroy_ship(ship * sh)
 const char *
 shipname(const ship * sh)
 {
-	typedef char name[OBJECTIDSIZE + 1];
-	static name idbuf[8];
-	static int nextbuf = 0;
-	char *buf = idbuf[(++nextbuf) % 8];
-	sprintf(buf, "%s (%s)", strcheck(sh->name, NAMESIZE), itoa36(sh->no));
-	return buf;
+  typedef char name[OBJECTIDSIZE + 1];
+  static name idbuf[8];
+  static int nextbuf = 0;
+  char *ibuf = idbuf[(++nextbuf) % 8];
+  sprintf(ibuf, "%s (%s)", strcheck(sh->name, NAMESIZE), itoa36(sh->no));
+  return ibuf;
 }
 
 int

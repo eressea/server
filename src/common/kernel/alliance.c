@@ -227,18 +227,19 @@ setalliance(struct faction * f, alliance * al)
 const char *
 alliancename(const alliance * al)
 {
-	typedef char name[OBJECTIDSIZE + 1];
-	static name idbuf[8];
-	static int nextbuf = 0;
+  typedef char name[OBJECTIDSIZE + 1];
+  static name idbuf[8];
+  static int nextbuf = 0;
 
-	char *buf = idbuf[(++nextbuf) % 8];
+  char *ibuf = idbuf[(++nextbuf) % 8];
 
-	if (al && al->name) {
-		sprintf(buf, "%s (%s)", strcheck(al->name, NAMESIZE), itoa36(al->id));
-	} else {
-		return NULL;
-	}
-	return buf;
+  if (al && al->name) {
+    snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(al->name, NAMESIZE), itoa36(al->id));
+    ibuf[sizeof(name)] = 0;
+  } else {
+    return NULL;
+  }
+  return ibuf;
 }
 
 void

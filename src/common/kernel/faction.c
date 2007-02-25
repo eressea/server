@@ -62,18 +62,19 @@ random_unit_in_faction(const faction *f)
 const char *
 factionname(const faction * f)
 {
-  typedef char name[OBJECTIDSIZE + 1];
+  typedef char name[OBJECTIDSIZE+1];
   static name idbuf[8];
   static int nextbuf = 0;
 
-  char *buf = idbuf[(++nextbuf) % 8];
+  char *ibuf = idbuf[(++nextbuf) % 8];
 
   if (f && f->name) {
-    sprintf(buf, "%s (%s)", strcheck(f->name, NAMESIZE), itoa36(f->no));
+    snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(f->name, NAMESIZE), itoa36(f->no));
+    ibuf[sizeof(name)] = 0;
   } else {
-    sprintf(buf, "Unbekannte Partei (?)");
+    strcpy(ibuf, "Unbekannte Partei (?)");
   }
-  return buf;
+  return ibuf;
 }
 
 void *

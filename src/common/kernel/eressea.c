@@ -69,6 +69,7 @@
 #include <util/translation.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
+#include <util/bsdstring.h>
 
 /* libxml includes */
 #include <libxml/tree.h>
@@ -95,14 +96,6 @@ FILE    *updatelog;
 const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
 int turn;
-
-char *
-strnzcpy(char * dst, const char *src, size_t len)
-{
-  strncpy(dst, src, len);
-  dst[len]=0;
-  return dst;
-}
 
 static attrib_type at_creator = {
   "creator"
@@ -1190,7 +1183,7 @@ strcheck (const char *s, size_t maxlen)
     assert(maxlen < 16 * 1024);
     log_warning(("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n",
         (int)maxlen, s));
-    strnzcpy(buffer, s, maxlen);
+    strlcpy(buffer, s, maxlen);
     return buffer;
   }
   return s;
@@ -1782,24 +1775,24 @@ freestrlist (strlist * s)
 boolean lomem = false;
 
 /* - Namen der Strukturen -------------------------------------- */
-typedef char name[OBJECTIDSIZE + 1];
+typedef char name[OBJECTIDSIZE+1];
 static name idbuf[8];
 static int nextbuf = 0;
 
 char *
 estring(const char *s)
 {
-  char *buf = idbuf[(++nextbuf) % 8];
+  char *ibuf = idbuf[(++nextbuf) % 8];
   char *r;
 
-  strcpy(buf,s);
-  r = buf;
+  strlcpy(ibuf, s, sizeof(name));
+  r = ibuf;
 
-  while(*buf) {
-    if(*buf == ' ') {
-      *buf = '~';
+  while (*ibuf) {
+    if(*ibuf == ' ') {
+      *ibuf = '~';
     }
-    buf++;
+    ibuf++;
   }
   return r;
 }
@@ -1807,17 +1800,17 @@ estring(const char *s)
 char *
 cstring(const char *s)
 {
-  char *buf = idbuf[(++nextbuf) % 8];
+  char *ibuf = idbuf[(++nextbuf) % 8];
   char *r;
 
-  strcpy(buf,s);
-  r = buf;
+  strlcpy(ibuf,s, sizeof(name));
+  r = ibuf;
 
-  while(*buf) {
-    if(*buf == '~') {
-      *buf = ' ';
+  while (*ibuf) {
+    if (*ibuf == '~') {
+      *ibuf = ' ';
     }
-    buf++;
+    ibuf++;
   }
   return r;
 }
@@ -1825,10 +1818,11 @@ cstring(const char *s)
 const char *
 buildingname (const building * b)
 {
-  char *buf = idbuf[(++nextbuf) % 8];
+  char *ibuf = idbuf[(++nextbuf) % 8];
 
-  sprintf(buf, "%s (%s)", strcheck(b->name, NAMESIZE), itoa36(b->no));
-  return buf;
+  snprintf(ibuf, sizeof(ibuf), "%s (%s)", strcheck(b->name, NAMESIZE), itoa36(b->no));
+  ibuf[sizeof(name)] = 0;
+  return ibuf;
 }
 
 building *
@@ -1858,7 +1852,8 @@ const char *
 unitname(const unit * u)
 {
   char *ubuf = idbuf[(++nextbuf) % 8];
-  sprintf(ubuf, "%s (%s)", strcheck(u->name, NAMESIZE), itoa36(u->no));
+  snprintf(ubuf, sizeof(name), "%s (%s)", strcheck(u->name, NAMESIZE), itoa36(u->no));
+  ubuf[sizeof(name)] = 0;
   return ubuf;
 }
 

@@ -18,13 +18,13 @@ function process(orders)
 
   -- run the turn:
 
+  plan_monsters()
+  process_orders()
+
   -- create new monsters:
   spawn_dragons()
   spawn_undead()
   -- (no more braineaters) spawn_braineaters(0.25)
-
-  plan_monsters()
-  process_orders()
 
   -- post-turn updates:
   update_guards()
