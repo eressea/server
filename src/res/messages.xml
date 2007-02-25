@@ -6393,7 +6393,7 @@
     <type>
       <arg name="row" type="int"/>
     </type>
-    <text locale="de">"... in der $int($row) Kampflinie:"</text>
+    <text locale="de">"... in der $int($row). Kampflinie:"</text>
     <text locale="en">"... in combat rank $int($row):"</text>
   </message>
   <message name="battle::out_of_range" section="battle">
