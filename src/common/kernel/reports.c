@@ -47,6 +47,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <errno.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
@@ -1267,7 +1268,7 @@ prepare_report(faction * f)
 int
 write_reports(faction * f, time_t ltime)
 {
-  int backup = 1;
+  int backup = 1, maxbackup = 128;
   boolean gotit = false;
   struct report_context ctx;
 
@@ -1298,17 +1299,22 @@ write_reports(faction * f, time_t ltime)
       }
     }
 
-    puts(" DONE");
-    if (!gotit) {
-      log_warning(("No report for faction %s!\n", factionid(f)));
-    }
     if (errno) {
-      sprintf(buf, "Error writing reports, waiting %u seconds before retry.\n", backup);
+      puts(" ERROR");
+      sprintf(buf, "Waiting %u seconds before retry", backup);
       perror(buf);
       sleep(backup);
-      backup *= 2;
+      if (backup<maxbackup) {
+        backup *= 2;
+      }
+    }
+    else {
+      puts(" DONE");
     }
   } while (errno);
+  if (!gotit) {
+    log_warning(("No report for faction %s!\n", factionid(f)));
+  }
   freelist(ctx.addresses);
   seen_done(ctx.seen);
   return 0;
