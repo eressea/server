@@ -438,6 +438,10 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     }
   }
   if (getguard(u)) {
+    rsize = strlcpy(bufp, ", ", size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
     rsize = strlcpy(bufp, LOC(f->locale, "unit_guards"), size);
     if (rsize>size) rsize = size-1;
     size -= rsize;
@@ -1277,22 +1281,20 @@ write_reports(faction * f, time_t ltime)
   get_seen_interval(&ctx);
   get_addresses(&ctx);
 
-  printf("Reports für %s: ", factionname(f));
+  printf("Reports for %s:", factionname(f));
   fflush(stdout);
 
   for (;rtype!=NULL;rtype=rtype->next) {
     if (f->options & rtype->flag) {
-      char * filename;
-      sprintf(buf, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
-      filename = strdup(buf);
+      char filename[MAX_PATH];
+      sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
       if (rtype->write(filename, &ctx)==0) {
         gotit = true;
       }
-      free(filename);
     }
   }
 
-  printf("Reports for %s: DONE\n", factionname(f));
+  puts(" DONE");
   if (!gotit) {
     log_warning(("No report for faction %s!\n", factionid(f)));
   }
