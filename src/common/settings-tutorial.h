@@ -40,3 +40,11 @@
 #define HEROES
 
 #define SCORE_MODULE
+#undef MUSEUM_MODULE
+#undef ARENA_MODULE
+#undef WORMHOLE_MODULE
+#undef XECMD_MODULE
+
+#undef FUZZY_BASE36
+#define SIMPLE_COMBAT
+#define SIMPLE_ESCAPE

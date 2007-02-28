@@ -46,3 +46,5 @@
 #define XECMD_MODULE
 
 #undef FUZZY_BASE36
+#define SIMPLE_COMBAT
+#define SIMPLE_ESCAPE
