@@ -9000,7 +9000,7 @@ static spelldata spelldaten[] =
     "ZAUBER [STUFE n] \'Astraler Ruf\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
     "[<Einheit-Nr> ...]",
     "ru+",
-    M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
+    M_ASTRAL, (UNITSPELL | SPELLLEVEL), 7, 6,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
