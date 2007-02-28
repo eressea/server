@@ -878,7 +878,7 @@ is_guarded(region * r, unit * u, unsigned int mask)
     }
   }
   for (u2 = r->units; u2; u2 = u2->next) {
-    if (is_guardian(u2, u, mask)) {
+    if (u2!=guardcache && is_guardian(u2, u, mask)) {
       guardcache = u2;
       return u2;
     }

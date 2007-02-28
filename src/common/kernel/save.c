@@ -1054,7 +1054,6 @@ readunit(FILE * F)
     u->flags = ri(F) & ~UFL_DEBUG;
     u->flags &= UFL_SAVEMASK;
   }
-  if (u->flags&UFL_GUARD) fset(u->region, UFL_GUARD);
   /* Persistente Befehle einlesen */
   free_orders(&u->orders);
   freadstr(F, buf, sizeof(buf));
@@ -1917,6 +1916,7 @@ readgame(const char * filename, int backup)
 
       assert(u->region==NULL);
       u->region = r;
+      if (u->flags&UFL_GUARD) fset(r, RF_GUARDED);
       *up = u;
       up = &u->next;
 

@@ -235,7 +235,7 @@ alliancename(const alliance * al)
 
   if (al && al->name) {
     snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(al->name, NAMESIZE), itoa36(al->id));
-    ibuf[sizeof(name)] = 0;
+    ibuf[sizeof(name)-1] = 0;
   } else {
     return NULL;
   }

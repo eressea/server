@@ -70,7 +70,7 @@ factionname(const faction * f)
 
   if (f && f->name) {
     snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(f->name, NAMESIZE), itoa36(f->no));
-    ibuf[sizeof(name)] = 0;
+    ibuf[sizeof(name)-1] = 0;
   } else {
     strcpy(ibuf, "Unbekannte Partei (?)");
   }

@@ -1821,7 +1821,7 @@ buildingname (const building * b)
   char *ibuf = idbuf[(++nextbuf) % 8];
 
   snprintf(ibuf, sizeof(ibuf), "%s (%s)", strcheck(b->name, NAMESIZE), itoa36(b->no));
-  ibuf[sizeof(name)] = 0;
+  ibuf[sizeof(name)-1] = 0;
   return ibuf;
 }
 
@@ -1853,7 +1853,7 @@ unitname(const unit * u)
 {
   char *ubuf = idbuf[(++nextbuf) % 8];
   snprintf(ubuf, sizeof(name), "%s (%s)", strcheck(u->name, NAMESIZE), itoa36(u->no));
-  ubuf[sizeof(name)] = 0;
+  ubuf[sizeof(name)-1] = 0;
   return ubuf;
 }
 
