@@ -157,7 +157,7 @@ read_args(int argc, char **argv)
       int k;
       boolean next = false;
 
-      for (k=0;!next && argv[i][k];++k) {
+      for (k=1;!next && argv[i][k];++k) {
         int c = argv[i][k];
         switch (c) {
         case 'd':
