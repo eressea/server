@@ -327,7 +327,7 @@ cr_region(variant var, char * buffer, const void * userdata)
   const faction * report = (const faction*)userdata;
   region * r = (region *)var.v;
   if (r) {
-    plane * p = rplane(r);
+    plane * p = r->planep;
     if (!p || !(p->flags & PFL_NOCOORDS)) {
       sprintf(buffer, "%d %d %d", region_x(r, report), region_y(r, report), p?p->id:0);
       return 0;
@@ -1203,10 +1203,10 @@ report_computer(const char * filename, report_context * ctx)
   {
     struct bmsg * bm;
     for (bm=f->battles;bm;bm=bm->next) {
-      if (!rplane(bm->r)) fprintf(F, "BATTLE %d %d\n", region_x(bm->r, f), region_y(bm->r, f));
+      if (!bm->r->planep) fprintf(F, "BATTLE %d %d\n", region_x(bm->r, f), region_y(bm->r, f));
       else {
-        if (rplane(bm->r)->flags & PFL_NOCOORDS) fprintf(F, "BATTLESPEC %d %d\n", encode_region(f, bm->r), rplane(bm->r)->id);
-        else fprintf(F, "BATTLE %d %d %d\n", region_x(bm->r, f), region_y(bm->r, f), rplane(bm->r)->id);
+        if (bm->r->planep->flags & PFL_NOCOORDS) fprintf(F, "BATTLESPEC %d %d\n", encode_region(f, bm->r), bm->r->planep->id);
+        else fprintf(F, "BATTLE %d %d %d\n", region_x(bm->r, f), region_y(bm->r, f), bm->r->planep->id);
       }
       cr_output_messages(F, bm->msgs, f);
     }
@@ -1255,7 +1255,7 @@ report_computer(const char * filename, report_context * ctx)
     region * r = sr->r;
     const char * tname;
 
-    if (!rplane(r)) {
+    if (!r->planep) {
       if (opt_cr_absolute_coords) {
         fprintf(F, "REGION %d %d\n", r->x, r->x);
       } else {
@@ -1263,11 +1263,11 @@ report_computer(const char * filename, report_context * ctx)
       }
     } else {
 #if ENCODE_SPECIAL
-      if (rplane(r)->flags & PFL_NOCOORDS) fprintf(F, "SPEZIALREGION %d %d\n", encode_region(f, r), rplane(r)->id);
+      if (r->planep->flags & PFL_NOCOORDS) fprintf(F, "SPEZIALREGION %d %d\n", encode_region(f, r), r->planep->id);
 #else
-      if (rplane(r)->flags & PFL_NOCOORDS) continue;
+      if (r->planep->flags & PFL_NOCOORDS) continue;
 #endif
-      else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), rplane(r)->id);
+      else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
     }
     if (r->land && strlen(rname(r, f->locale))) fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
     if (is_cursed(r->attribs,C_MAELSTROM, 0))
@@ -1384,7 +1384,7 @@ report_computer(const char * filename, report_context * ctx)
       }
       print_curses(F, f, r, TYP_REGION);
       cr_borders(ctx->seen, r, f, sr->mode, F);
-      if (sr->mode==see_unit && rplane(r)==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
+      if (sr->mode==see_unit && r->planep==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
       {
         /* Sonderbehandlung Teleport-Ebene */
         region_list *rl = astralregions(r, inhabitable);
@@ -1477,7 +1477,7 @@ crwritemap(const char * filename)
   FILE * F = fopen(filename, "w+");
   region * r;
   for (r=regions;r;r=r->next) {
-    plane * p = rplane(r);
+    plane * p = r->planep;
     fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
     fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain_name(r)));
   }

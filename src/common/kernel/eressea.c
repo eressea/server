@@ -1002,7 +1002,7 @@ int
 alliedunit(const unit * u, const faction * f2, int mode)
 {
   ally * sf;
-  const plane * pl = getplane(u->region);
+  const plane * pl = u->region->planep;
   int automode;
 
   if (u->faction == f2) return mode;

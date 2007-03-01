@@ -163,19 +163,15 @@ plane_center_y(const plane *pl)
 short
 region_x(const region *r, const faction *f)
 {
-	plane *pl;
-	assert(r!=NULL);
-	pl = getplane(r);
-	return r->x - ursprung_x(f, pl, r) - plane_center_x(pl);
+  plane *pl = r->planep;
+  return r->x - ursprung_x(f, pl, r) - plane_center_x(pl);
 }
 
 short
 region_y(const region *r, const faction *f)
 {
-	plane *pl;
-	assert(r!=NULL);
-	pl = getplane(r);
-	return r->y - plane_center_y(pl) - ursprung_y(f, pl, r);
+  plane *pl = r->planep;
+  return r->y - plane_center_y(pl) - ursprung_y(f, pl, r);
 }
 
 void

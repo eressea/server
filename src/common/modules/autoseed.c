@@ -500,7 +500,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
      * like the last land virgin ocean region adjacent to land.
      */
     for (r=regions;r;r=r->next) {
-      struct plane * p = rplane(r);
+      struct plane * p = r->planep;
       if (rterrain(r)==T_OCEAN && p==NULL && virgin_region(r)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
@@ -546,7 +546,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
      * dmin = direction in which it's empty
      */
     for (r=regions;r;r=r->next) {
-      struct plane * p = rplane(r);
+      struct plane * p = r->planep;
       if (rterrain(r)==T_OCEAN && p==0 && (rmin==NULL || r->age<=MAXAGEDIFF)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {

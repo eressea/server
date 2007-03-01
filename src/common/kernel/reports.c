@@ -664,7 +664,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
   dh=0;
   if (!getarnt && f) {
-    if (alliedfaction(getplane(u->region), f, fv, HELP_ALL)) {
+    if (alliedfaction(u->region->planep, f, fv, HELP_ALL)) {
       dh = 1;
     }
   }
@@ -1185,7 +1185,7 @@ prepare_report(faction * f)
   for (r = firstregion(f); r != end; r = r->next) {
     attrib *ru;
     unit * u;
-    plane * p = rplane(r);
+    plane * p = r->planep;
     unsigned char mode = see_none;
     boolean dis = false;
     int light = 0;

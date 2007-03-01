@@ -103,20 +103,22 @@ regionname(const region * r, const faction * f)
 {
   static char buf[65];
   const struct locale * lang = f ? f->locale : 0;
-  plane *pl = getplane(r);
   if (r==NULL) {
     strcpy(buf, "(null)");
-  } else if (pl && fval(pl, PFL_NOCOORDS)) {
-    strncpy(buf, rname(r, lang), 65);
   } else {
+    plane *pl = r->planep;
+    if (pl && fval(pl, PFL_NOCOORDS)) {
+      strncpy(buf, rname(r, lang), 65);
+    } else {
 #ifdef HAVE_SNPRINTF
-    snprintf(buf, 65, "%s (%d,%d)", rname(r, lang),
-             region_x(r, f), region_y(r, f));
+      snprintf(buf, 65, "%s (%d,%d)", rname(r, lang),
+        region_x(r, f), region_y(r, f));
 #else
-    strncpy(buf, rname(r, lang), 50);
-    buf[50]=0;
-    sprintf(buf+strlen(buf), " (%d,%d)", region_x(r, f), region_y(r, f));
+      strncpy(buf, rname(r, lang), 50);
+      buf[50]=0;
+      sprintf(buf+strlen(buf), " (%d,%d)", region_x(r, f), region_y(r, f));
 #endif
+    }
   }
   buf[64] = 0;
   return buf;

@@ -639,12 +639,11 @@ rp_battles(FILE * F, faction * f)
 size_t
 f_regionid(const region * r, const faction * f, char * buffer, size_t size)
 {
-  plane * pl = NULL;
 
   if (!r) {
     strncpy(buffer, "(Chaos)", size);
   } else {
-    pl = getplane(r);
+    plane * pl = r->planep;
     strncpy(buffer, rname(r, f->locale), size);
     buffer[size-1]=0;
     if (pl==NULL || !fval(pl, PFL_NOCOORDS)) {
