@@ -479,9 +479,7 @@ get_unitrow(const fighter * af, const side * vs)
   } else {
 #ifdef FASTROW
     battle * b = vs->battle;
-    if (row==b->rowcache.row && b->alive==b->rowcache.alive && af->side==b->rowcache.as && vs==b->rowcache.vs) {
-      return b->rowcache.result;
-    } else {
+    if (row!=b->rowcache.row || b->alive!=b->rowcache.alive || af->side!=b->rowcache.as || vs!=b->rowcache.vs) {
       b->rowcache.alive = b->alive;
       b->rowcache.as = af->side;
       b->rowcache.vs = vs;
@@ -489,6 +487,12 @@ get_unitrow(const fighter * af, const side * vs)
       b->rowcache.result = get_row(af->side, row, vs);
       return b->rowcache.result;
     }
+#if 1 /* validation code */
+    {
+      int i = get_row(af->side, row, vs);
+      assert(i==b->rowcache.result);
+    }
+#endif
     return b->rowcache.result;
 #else
     return get_row(af->side, row, vs);
