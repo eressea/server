@@ -741,13 +741,7 @@ trailinto(const region * r, const struct locale * lang)
   char ref[32];
   const char * s;
   if (r) {
-    const char * tname;
-    if (is_cursed(r->attribs, C_MAELSTROM, 0)) {
-      /* das kostet. evtl. wäre ein FL_CURSED gut? */
-      tname = "maelstrom";
-    } else {
-      tname = terrain_name(r);
-    }
+    const char * tname = terrain_name(r);
     strcat(strcpy(ref, tname), "_trail");
     s = locale_string(lang, ref);
     if (s && *s) {
@@ -836,11 +830,8 @@ describe(FILE * F, const region * r, int partial, faction * f)
   /* Terrain */
 
   bufp += strxcpy(bufp, ", ");
-  if (is_cursed(r->attribs,C_MAELSTROM, 0)) {
-    tname = "maelstrom";
-  } else {
-    tname = terrain_name(r);
-  }
+
+  tname = terrain_name(r);
   bufp += strxcpy(bufp, LOC(f->locale, tname));
 
   /* Bäume */

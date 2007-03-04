@@ -2572,7 +2572,7 @@ aftermath(battle * b)
           * stehen in fig->run.items. Dann werden die Fliehenden auf
           * die leere (tote) alte Einheit gemapt */
 #ifdef SIMPLE_ESCAPE
-          if (!fval(df, FIG_NOLOOT)){
+          if (!fval(df, FIG_NOLOOT)) {
             loot_items(df);
           }
 #else

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -37,23 +37,23 @@
 #define MAXTERRAINS 20
 
 const char * terraindata[] = {
-	"ocean",
-	"plain",
-	"swamp",
-	"desert",
-	"highland",
-	"mountain",
-	"glacier",
-	"firewall",
-	"hell", /* dungeon module */
+  "ocean",
+  "plain",
+  "swamp",
+  "desert",
+  "highland",
+  "mountain",
+  "glacier",
+  "firewall",
+  "hell", /* dungeon module */
   "plain",  /* former grassland */
   "fog",
   "thickfog",
   "volcano",
-	"activevolcano",
+  "activevolcano",
   "iceberg_sleep",
   "iceberg",
-  
+
   "hall1", /* museum module */
   "corridor1", /* museum module */
   "plain", /* former magicstorm */
@@ -63,7 +63,7 @@ const char * terraindata[] = {
 
 static terrain_type * registered_terrains;
 
-const terrain_type * 
+const terrain_type *
 terrains(void)
 {
   return registered_terrains;
@@ -83,7 +83,7 @@ register_terrain(struct terrain_type * terrain)
   assert(terrain->next==NULL),
   terrain->next = registered_terrains;
   registered_terrains = terrain;
-  if (strcmp("plain", terrain->_name)==0) 
+  if (strcmp("plain", terrain->_name)==0)
     terrain->name = &plain_name;
 }
 
@@ -123,7 +123,13 @@ oldterrain(const struct terrain_type * terrain)
 const char *
 terrain_name(const struct region * r)
 {
-  if (r->terrain->name!=NULL) return r->terrain->name(r);
+  if (r->terrain->name!=NULL) {
+    return r->terrain->name(r);
+  } else if (fval(r->terrain, SEA_REGION)) {
+    if (is_cursed(r->attribs, C_MAELSTROM, 0)) {
+      return "maelstrom";
+    }
+  }
   return r->terrain->_name;
 }
 

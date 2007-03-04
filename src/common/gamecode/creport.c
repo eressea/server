@@ -1270,11 +1270,7 @@ report_computer(const char * filename, report_context * ctx)
       else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
     }
     if (r->land && strlen(rname(r, f->locale))) fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
-    if (is_cursed(r->attribs,C_MAELSTROM, 0))
-        tname = "maelstrom";
-    else {
-      tname = terrain_name(r);
-    }
+    tname = terrain_name(r);
 
     fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
     if (sr->mode!=see_unit) fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
