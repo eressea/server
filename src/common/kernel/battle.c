@@ -84,6 +84,8 @@ static FILE *bdebug;
 # define DAMAGE_QUOTIENT 1 /* damage += skilldiff/DAMAGE_QUOTIENT */
 #endif
 
+#define DEBUG_FAST /* should be disabled when I'm sure it works */
+
 typedef enum combatmagic {
   DO_PRECOMBATSPELL,
   DO_POSTCOMBATSPELL
@@ -487,7 +489,7 @@ get_unitrow(const fighter * af, const side * vs)
       b->rowcache.result = get_row(af->side, row, vs);
       return b->rowcache.result;
     }
-#if 1 /* validation code */
+#ifdef DEBUG_FAST /* validation code */
     {
       int i = get_row(af->side, row, vs);
       assert(i==b->rowcache.result);
@@ -1262,20 +1264,45 @@ count_allies(const side * as, int minrow, int maxrow, int select)
   return count;
 }
 
+static int
+count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow, int select)
+{
+  side *es, *as = af->side;
+  int i = 0;
+
+  for (es = b->sides; es; es = es->next) {
+    if (as==NULL || enemy(es, as)) {
+      int offset = 0;
+      if (select&SELECT_DISTANCE) {
+        offset = get_unitrow(af, es) - FIGHT_ROW;
+      }
+      i += count_side(es, as, minrow-offset, maxrow-offset, select);
+      if (i>0 && (select&SELECT_FIND)) break;
+    }
+  }
+  return i;
+}
+
 int
 count_enemies(battle * b, const fighter * af, int minrow, int maxrow, int select)
 {
-  int i = 0;
-  side *es, *as = af->side;
-
 #ifdef FASTCOUNT
   int sr = statusrow(af->status);
+  side *as = af->side;
 
   if (b->alive==b->fast.alive && as==b->fast.side && sr==b->fast.status && minrow==b->fast.minrow && maxrow==b->fast.maxrow) {
     if (b->fast.enemies[select]>=0) {
+#ifdef DEBUG_FAST
+      int i = count_enemies_i(b, af, minrow, maxrow, select);
+      assert(i==b->fast.enemies[select]);
+#endif
       return b->fast.enemies[select];
     } else if (select&SELECT_FIND) {
       if (b->fast.enemies[select-SELECT_FIND]>=0) {
+#ifdef DEBUG_FAST
+        int i = count_enemies_i(b, af, minrow, maxrow, select);
+        assert((i>0)==(b->fast.enemies[select-SELECT_FIND]>0));
+#endif
         return b->fast.enemies[select-SELECT_FIND];
       } 
     }
@@ -1287,23 +1314,15 @@ count_enemies(battle * b, const fighter * af, int minrow, int maxrow, int select
     b->fast.maxrow = maxrow;
     memset(b->fast.enemies, -1, sizeof(b->fast.enemies));
   }
-
 #endif
-  if (maxrow<FIRST_ROW) return 0;
-  for (es = b->sides; es; es = es->next) {
-    if (as==NULL || enemy(es, as)) {
-      int offset = 0;
-      if (select&SELECT_DISTANCE) {
-        offset = get_unitrow(af, es) - FIGHT_ROW;
-      }
-      i += count_side(es, as, minrow-offset, maxrow-offset, select);
-      if (i>0 && (select&SELECT_FIND)) break;
-    }
-  }
+  if (maxrow>=FIRST_ROW) {
+    int i = count_enemies_i(b, af, minrow, maxrow, select);
 #ifdef FASTCOUNT
-  b->fast.enemies[select] = i;
+    b->fast.enemies[select] = i;
 #endif
-  return i;
+    return i;
+  }
+  return 0;
 }
 
 troop
