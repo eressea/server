@@ -489,8 +489,9 @@ get_unitrow(const fighter * af, const side * vs)
       b->rowcache.result = get_row(af->side, row, vs);
       return b->rowcache.result;
     }
-#else
     return b->rowcache.result;
+#else
+    return get_row(af->side, row, vs);
 #endif
   }
 }

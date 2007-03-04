@@ -70,7 +70,7 @@ extern "C" {
 #ifdef SMALL_BATTLE_MESSAGES
     boolean small;
 #endif
-#define FASTROW
+#undef FASTROW
 #ifdef FASTROW
     struct {
       const struct side * as;
@@ -80,7 +80,7 @@ extern "C" {
       int result;
     } rowcache;
 #endif
-#define FASTCOUNT
+#undef FASTCOUNT
 #ifdef FASTCOUNT
     struct {
       struct side * side;

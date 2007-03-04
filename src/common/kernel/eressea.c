@@ -1820,7 +1820,7 @@ buildingname (const building * b)
 {
   char *ibuf = idbuf[(++nextbuf) % 8];
 
-  snprintf(ibuf, sizeof(ibuf), "%s (%s)", strcheck(b->name, NAMESIZE), itoa36(b->no));
+  snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(b->name, NAMESIZE), itoa36(b->no));
   ibuf[sizeof(name)-1] = 0;
   return ibuf;
 }
