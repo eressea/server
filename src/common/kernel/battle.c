@@ -2258,8 +2258,7 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
     unit * u;
     for (u = b->region->units; u; u = u->next) {
       if (getguard(u)) {
-        faction *fv = visible_faction(f, u);
-        if (alliedunit(u, fv, HELP_GUARD)) {
+        if (alliedunit(u, f, HELP_GUARD)) {
           flags |= SIDE_HASGUARDS;
           break;
         }
