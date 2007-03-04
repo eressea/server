@@ -817,7 +817,7 @@ rmfighter(fighter *df, int i)
 }
 
 
-void
+static void
 rmtroop(troop dt)
 {
   fighter *df = dt.fighter;
@@ -835,6 +835,24 @@ rmtroop(troop dt)
 
 void
 remove_troop(troop dt)
+{
+  fighter * df = dt.fighter;
+  struct person p = df->person[dt.index];
+  battle * b = df->side->battle;
+#ifdef FASTCOUNT
+  b->fast.alive = -1; /* invalidate cached value */
+#endif
+#ifdef FASTROW
+  b->rowcache.alive = -1; /* invalidate cached value */
+#endif
+  ++df->removed;
+  ++df->side->removed;
+  df->person[dt.index] = df->person[df->alive-df->removed];
+  df->person[df->alive - df->removed] = p;
+}
+
+void
+kill_troop(troop dt)
 {
   fighter * df = dt.fighter;
   unit * du = df->unit;
@@ -1211,7 +1229,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
       if (rng_int() % 4 < 1) i_change(pitm, itype, -1);
     }
   }
-  remove_troop(dt);
+  kill_troop(dt);
 
   return true;
 }
@@ -3687,7 +3705,7 @@ flee(const troop dt)
   fig->run.hp += fig->person[dt.index].hp;
   ++fig->run.number;
 
-  remove_troop(dt);
+  kill_troop(dt);
 }
 
 #ifdef DELAYED_OFFENSE

@@ -254,7 +254,8 @@ extern "C" {
   extern fighter * make_fighter(struct battle * b, struct unit * u, side * s, boolean attack);
   extern int statusrow(int status);
   extern void drain_exp(struct unit *u, int d);
-  extern void rmtroop(troop dt);
+  extern void kill_troop(troop dt);
+  extern void remove_troop(troop dt); /* not the same as the badly named rmtroop */
   extern boolean is_attacker(const fighter * fig);
 
 #ifdef __cplusplus

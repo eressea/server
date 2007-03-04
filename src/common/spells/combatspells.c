@@ -184,16 +184,11 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
 
   while (force && stoned < enemies) {
     troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-    fighter * df = dt.fighter;
-    unit * du = df->unit;
+    unit * du = dt.fighter->unit;
     if (is_magic_resistant(mage, du, 0) == false) {
       /* person ans ende hinter die lebenden schieben */
-      struct person p = dt.fighter->person[dt.index];
-      ++dt.fighter->removed;
-      ++dt.fighter->side->removed;
+      remove_troop(dt);
       ++stoned;
-      dt.fighter->person[dt.index] = dt.fighter->person[df->alive-df->removed];
-      dt.fighter->person[(df->alive - df->removed)] = p;
     }
     --force;
   }
@@ -528,7 +523,7 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
         reduce_skill(du, sv, n);
       } else {
         /* Keine Skills mehr, Einheit töten */
-        rmtroop(dt);
+        kill_troop(dt);
         ++killed;
       }
       --enemies;
