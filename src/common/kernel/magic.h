@@ -371,6 +371,8 @@ extern struct unit * has_clone(struct unit * mage);
 extern const char * spell_info(const struct spell * sp, const struct locale * lang);
 extern const char * spell_name(const struct spell * sp, const struct locale * lang);
 
+extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
+
 #ifdef __cplusplus
 }
 #endif

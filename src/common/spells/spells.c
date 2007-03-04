@@ -5365,9 +5365,7 @@ sp_dreamreading(castorder *co)
 
   /* Illusionen und Untote abfangen. */
   if (fval(u->race, RCF_UNDEAD|RCF_ILLUSIONARY)) {
-    ADDMSG(&mage->faction->msgs, msg_message(
-      "spellunitnotfound", "unit region command id",
-      mage, mage->region, co->order, strdup(itoa36(u->no))));
+    ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, pa->param[0]));
     return 0;
   }
 
@@ -5844,12 +5842,29 @@ sp_pullastral(castorder *co)
 
     /* für jede Einheit in der Kommandozeile */
     for (n = 1; n < pa->length; n++) {
-      if (pa->param[n]->flag == TARGET_NOTFOUND) continue;
+      spllprm * spobj = pa->param[n];
+      if (spobj->flag == TARGET_NOTFOUND) continue;
 
-      u = pa->param[n]->data.u;
+      u = spobj->data.u;
+
+      if (u->region!=r) {
+        /* Report this as unit not found */
+        char * uid;
+
+        if (spobj->typ==SPP_UNIT) {
+          uid = strdup(itoa36(spobj->data.i));
+        } else {
+          char tbuf[20];
+          sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
+            parameters[P_TEMP]), itoa36(spobj->data.i));
+          uid = strdup(tbuf);
+        }
+        ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, spobj));
+        return false;
+      }
 
       if (!ucontact(u, mage)) {
-        if (power > 12 && pa->param[n]->flag != TARGET_RESISTS && can_survive(u, rt)) {
+        if (power > 12 && spobj->flag != TARGET_RESISTS && can_survive(u, rt)) {
           ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
           ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
         } else {
@@ -9000,7 +9015,7 @@ static spelldata spelldaten[] =
     "ZAUBER [STUFE n] \'Astraler Ruf\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
     "[<Einheit-Nr> ...]",
     "ru+",
-    M_ASTRAL, (UNITSPELL | SPELLLEVEL), 7, 6,
+    M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },

@@ -1518,6 +1518,24 @@ verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj, orde
   return true;
 }
 
+message *
+msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj)
+{
+  /* Einheit nicht gefunden */
+  char tbuf[20];
+  const char * uid;
+
+  if (spobj->typ==SPP_UNIT) {
+    uid = itoa36(spobj->data.i);
+  } else {
+    sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
+      parameters[P_TEMP]), itoa36(spobj->data.i));
+    uid = tbuf;
+  }
+  return msg_message("spellunitnotfound", 
+    "unit region command id", mage, mage->region, ord, uid);
+}
+
 static boolean
 verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj, order * ord)
 {
@@ -1544,19 +1562,8 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj, order * 
 
   if (u==NULL) { 
     /* Einheit nicht gefunden */
-    char * uid;
     spobj->flag = TARGET_NOTFOUND;
-
-    if (spobj->typ==SPP_UNIT) {
-      uid = strdup(itoa36(spobj->data.i));
-    } else {
-      char tbuf[20];
-      sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
-        parameters[P_TEMP]), itoa36(spobj->data.i));
-      uid = strdup(tbuf);
-    }
-    ADDMSG(&mage->faction->msgs, msg_message("spellunitnotfound", 
-      "unit region command id", mage, mage->region, ord, uid));
+    ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, ord, spobj));
     return false;
   }
   /* Einheit wurde gefunden, pointer setzen */
@@ -1598,13 +1605,13 @@ verify_targets(castorder *co)
 
 			switch(spobj->typ) {
         case SPP_TEMP:
-				case SPP_UNIT:
+        case SPP_UNIT:
           if (!verify_unit(target_r, mage, sp, spobj, co->order)) ++failed;
           break;
-				case SPP_BUILDING:
+        case SPP_BUILDING:
           if (!verify_building(target_r, mage, sp, spobj, co->order)) ++failed;
           break;
-				case SPP_SHIP:
+        case SPP_SHIP:
           if (!verify_ship(target_r, mage, sp, spobj, co->order)) ++failed;
           break;
         default:
