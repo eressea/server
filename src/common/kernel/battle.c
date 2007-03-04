@@ -84,7 +84,7 @@ static FILE *bdebug;
 # define DAMAGE_QUOTIENT 1 /* damage += skilldiff/DAMAGE_QUOTIENT */
 #endif
 
-#define DEBUG_FAST /* should be disabled when I'm sure it works */
+#undef DEBUG_FAST /* should be disabled when I'm sure it works */
 
 typedef enum combatmagic {
   DO_PRECOMBATSPELL,
