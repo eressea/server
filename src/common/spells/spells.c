@@ -6254,6 +6254,7 @@ sp_viewreality(castorder *co)
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
+  message * m;
 
   if (getplaneid(r) != 1) {
     /* sprintf(buf, "Dieser Zauber kann nur im Astralraum gezaubert werden."); */
@@ -6279,9 +6280,10 @@ sp_viewreality(castorder *co)
 
   free_regionlist(rl);
 
-  sprintf(buf, "%s gelingt es, durch die Nebel auf die Realität zu blicken.",
-    unitname(mage));
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  m = msg_message("viewreality_effect", "unit", mage);
+  r_addmessage(r, mage->faction, m);
+  msg_release(m);
+
   return cast_level;
 }
 

@@ -790,6 +790,13 @@
     </type>
     <text locale="de">"$unit($unit) schwenkt sein Szepter und sorgt für Verwirrung und Chaos in der Region."</text>
   </message>
+  <message name="viewreality_effect" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) gelingt es, durch die Nebel auf die Realität zu blicken."</text>
+    <text locale="en">"$unit($unit) manages to catch a glimpse of reality through the fog."</text>
+  </message>
   <message name="wand_of_tears_effect" section="events">
     <type>
       <arg name="unit" type="unit"/>
