@@ -331,6 +331,12 @@ allysf(const side * s, const faction * f)
   return allysfm(s, f, HELP_FIGHT);
 }
 
+static int
+dead_fighters(const fighter * df)
+{
+  return df->unit->number - df->alive - df->run.number;
+}
+
 fighter *
 select_corpse(battle * b, fighter * af)
 /* Wählt eine Leiche aus, der af hilft. casualties ist die Anzahl der
@@ -353,7 +359,7 @@ select_corpse(battle * b, fighter * af)
     for (df=s->fighters;df;df=df->next) {
       /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
       * werden! */
-      int dead = df->unit->number - (df->alive + df->run.number);
+      int dead = dead_fighters(df);
       if (!playerrace(df->unit->race)) continue;
 
       if (af && !helping(af->side, df->side))
@@ -2337,13 +2343,16 @@ loot_items(fighter * corpse)
   unit * u = corpse->unit;
   item * itm = u->items;
   battle * b = corpse->side->battle;
-  u->items = NULL;
+  int dead = dead_fighters(corpse);
+
+  if (dead<=0) return;
 
   while (itm) {
+    float lootfactor = dead/(float)u->number; /* only loot the dead! */
     if (itm->number) {
       int i = min(10, itm->number);
       for (; i != 0; --i) {
-        int loot = itm->number / i;
+        int loot = (int)(itm->number*lootfactor/i);
         /* Looten tun hier immer nur die Gegner. Das ist als Ausgleich für die
         * neue Loot-regel (nur ganz tote Einheiten) fair.
         * zusätzlich looten auch geflohene, aber nach anderen Regeln.
@@ -2443,7 +2452,7 @@ aftermath(battle * b)
     fighter * df;
     for (df = s->fighters; df; df=df->next) {
       unit *du = df->unit;
-      int dead = du->number - df->alive - df->run.number;
+      int dead = dead_fighters(df);
       int pr_mercy = 0;
 #ifdef KARMA_MODULE
       const attrib *a= a_find(du->attribs, &at_prayer_effect);
@@ -2468,7 +2477,7 @@ aftermath(battle * b)
             /* do not change dead here, or loop will not terminate! recalculate later */
           }
         }
-        dead = du->number - df->alive - df->run.number;
+        dead = dead_fighters(df);
       }
 #endif
       /* Regeneration durch PR_MERCY */
@@ -2481,7 +2490,7 @@ aftermath(battle * b)
             /* do not change dead here, or loop will not terminate! recalculate later */
           }
         }
-        dead = du->number - df->alive - df->run.number;
+        dead = dead_fighters(df);
       }
 
       /* tote insgesamt: */
@@ -2526,7 +2535,7 @@ aftermath(battle * b)
 
     for (df=s->fighters;df;df=df->next) {
       unit *du = df->unit;
-      int dead = du->number - df->alive - df->run.number;
+      int dead = dead_fighters(df);
       int sum_hp = 0;
       int n;
 
