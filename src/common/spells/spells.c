@@ -9257,11 +9257,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_disruptastral, NULL
   },
   {
-    SPL_PERMTRANSFER, "sacrifice_strength",
-    "Mit Hilfe dieses Zaubers kann der Magier einen Teil seiner magischen "
-    "Kraft permanent auf einen anderen Magier übertragen. Auf einen Tybied-"
-    "Magier kann er die Hälfte der eingesetzten Kraft übertragen, auf einen "
-    "Magier eines anderen Gebietes ein Drittel.",
+    SPL_PERMTRANSFER, "sacrifice_strength", NULL,
     "ZAUBERE \'Opfere Kraft\' <Einheit-Nr> <Aura>",
     "ui",
     M_ASTRAL, (UNITSPELL|ONETARGET), 1, 15,
@@ -9278,7 +9274,7 @@ static spelldata spelldaten[] =
   /*  Definitionen von Create_Artefaktsprüchen    */
   {
     SPL_METEORRAIN, "meteor_rain",
-    "Ein Schauer von Meteoren regnet über das Schlachtfeld.", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL | SPELLLEVEL), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },

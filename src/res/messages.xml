@@ -802,6 +802,7 @@
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"Ein bohrender Schmerz durchzuckt $unit($unit), Verwirrung macht sich breit."</text>
+    <text locale="en">"Pain pulses through $unit($unit), confusion spreads."</text>
   </message>
   <message name="cryinpain" section="events">
     <type>
