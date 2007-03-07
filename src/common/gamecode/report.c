@@ -467,7 +467,7 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
     unit * owner;
     a = b->attribs;
     r = b->region;
-    if((owner = buildingowner(r,b)) != NULL){
+    if ((owner = buildingowner(r,b)) != NULL){
       if (owner->faction == viewer){
         self = 2;
       } else { /* steht eine Person der Partei in der Burg? */
@@ -495,17 +495,10 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
   }
 
   for(;a;a=a->next) {
-    int dh = 0;
 
     if (fval(a->type, ATF_CURSE)) {
       curse *c = (curse *)a->data.v;
-      if (c->type->curseinfo) {
-        if (c->type->cansee) {
-          self = c->type->cansee(viewer, obj, typ, c, self);
-        }
-        dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
-      }
-      if (dh == 1) {
+      if (print_curse(c, viewer, obj, typ, self)) {
         rnl(F);
         rparagraph(F, buf, indent, 2, 0);
       }

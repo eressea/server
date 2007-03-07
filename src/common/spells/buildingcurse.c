@@ -34,7 +34,7 @@
 
 
 static int
-cinfo_building(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_building(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg;
 
@@ -59,7 +59,7 @@ cinfo_building(const struct locale * lang, const void * obj, typ_t typ, curse *c
 
 /* C_MAGICWALLS*/
 static int
-cinfo_magicrunes(const struct locale* lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_magicrunes(const struct locale* lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg = NULL;
   if (typ == TYP_BUILDING){

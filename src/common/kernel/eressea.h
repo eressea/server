@@ -68,6 +68,7 @@ struct plane;
 struct order;
 struct spell;
 struct region;
+struct curse;
 struct fighter;
 struct region_list;
 struct race;

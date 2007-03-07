@@ -22,6 +22,7 @@
 #include "reports.h"
 
 /* kernel includes */
+#include <kernel/curse.h>
 #include <kernel/building.h>
 #include <kernel/border.h>
 #include <kernel/terrain.h>
@@ -806,6 +807,24 @@ spunit(struct strlist ** SP, const struct faction * f, const unit * u, int inden
 {
   int dh = bufunit(f, u, indent, mode);
   lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
+}
+
+int
+print_curse(const struct curse * c, const struct faction * viewer, const void * obj, typ_t typ, int self)
+{
+  if (c->type->curseinfo) {
+    if (c->type->cansee) {
+      self = c->type->cansee(viewer, obj, typ, c, self);
+    }
+    return c->type->curseinfo(viewer->locale, obj, typ, c, self);
+  } else {
+    if (c->type->info_str!=NULL) {
+      sprintf(buf, "%s (%s)", c->type->info_str, itoa36(c->no));
+      return 1;
+    }
+  }
+  log_error(("no curseinfo for %s\n", c->type->cname));
+  return 0;
 }
 
 const struct unit *

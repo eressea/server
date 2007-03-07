@@ -737,7 +737,7 @@ oldcursename(int id)
 
 /* ------------------------------------------------------------- */
 int
-cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, const struct curse *c, int self)
 {
   struct message * msg;
 

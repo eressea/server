@@ -110,6 +110,8 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
   extern int update_nmrs(void);
   extern int * nmrs;
 
+  extern int print_curse(const struct curse * c, const struct faction * viewer, const void * obj, typ_t typ, int self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -33,7 +33,7 @@
 
 
 int
-cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg;
 
@@ -41,7 +41,7 @@ cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, curse *c, in
   unused(obj);
   assert(typ == TYP_SHIP);
 
-  if (self != 0){ /* owner or inside */
+  if (self != 0) { /* owner or inside */
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
   } else {
     msg = msg_message(mkname("curseinfo", "shipunknown"), "id", c->no);
@@ -59,7 +59,7 @@ cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, curse *c, in
 
 /* C_SHIP_NODRIFT */
 static int
-cinfo_shipnodrift(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_shipnodrift(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   ship * sh;
   unused(typ);

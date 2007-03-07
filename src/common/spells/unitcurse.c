@@ -41,7 +41,7 @@
  */
 /* erhöht/senkt regeneration und maxaura um effect% */
 static int
-cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   struct unit *u;
   unused(typ);
@@ -52,7 +52,7 @@ cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, struct 
     if (curse_geteffect(c) > 100){
       sprintf(buf, "%s fühlt sich von starken magischen Energien "
         "durchströmt. (%s)", u->name, curseid(c));
-    }else{
+    } else {
       sprintf(buf, "%s hat Schwierigkeiten seine magischen Energien "
           "zu sammeln. (%s)", u->name, curseid(c));
     }
@@ -82,7 +82,7 @@ static struct curse_type ct_magicboost = {
  * C_SLAVE
  */
 static int
-cinfo_slave(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_slave(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u;
   unused(typ);
@@ -110,7 +110,7 @@ static struct curse_type ct_slavery = { "slavery",
  * C_CALM
  */
 static int
-cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u;
   const struct race * rc;
@@ -147,7 +147,7 @@ static struct curse_type ct_calmmonster = { "calmmonster",
  * C_SPEED
  */
 static int
-cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u;
   curse_unit * cu;
@@ -179,7 +179,7 @@ static struct curse_type ct_speed = {
  * C_ORC
  */
 int
-cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u;
   message * msg;
@@ -210,7 +210,7 @@ static struct curse_type ct_orcish = {
  * C_KAELTESCHUTZ
  */
 static int
-cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u;
   curse_unit * cu;
@@ -241,7 +241,7 @@ static struct curse_type ct_insectfur = {
  * C_SPARKLE
  */
 static int
-cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   const char * effects[] = {
     NULL, /* end grau*/
@@ -383,7 +383,7 @@ write_skill(FILE * F, const curse * c)
 }
 
 static int
-cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u = (unit *)obj;
   int sk = c->data.i;

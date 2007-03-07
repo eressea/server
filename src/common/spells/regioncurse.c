@@ -42,7 +42,7 @@
  * godcursezone
  */
 static int
-cinfo_cursed_by_the_gods(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_cursed_by_the_gods(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   region *r;
   message * msg;
@@ -82,7 +82,7 @@ static struct curse_type ct_godcursezone = {
  * C_GBDREAM
  */
 static int
-cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg;
 
@@ -91,7 +91,7 @@ cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, curse 
   unused(obj);
   assert(typ == TYP_REGION);
 
-  if (curse_geteffect(c) > 0){
+  if (curse_geteffect(c) > 0) {
     msg = msg_message("curseinfo::gooddream", "id", c->no);
   } else {
     msg = msg_message("curseinfo::baddream", "id", c->no);
@@ -117,7 +117,7 @@ static struct curse_type ct_gbdream = {
  *  erzeugt Straßennetz
  */
 static int
-cinfo_magicstreet(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_magicstreet(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg;
 
@@ -128,7 +128,7 @@ cinfo_magicstreet(const struct locale * lang, const void * obj, typ_t typ, curse
   assert(typ == TYP_REGION);
 
   /* Warnung vor Auflösung */
-  if (c->duration <= 2){
+  if (c->duration <= 2) {
     msg = msg_message("curseinfo::magicstreet", "id", c->no);
   } else {
     msg = msg_message("curseinfo::magicstreetwarn", "id", c->no);
@@ -153,7 +153,7 @@ static struct curse_type ct_magicstreet = {
 /* --------------------------------------------------------------------- */
 
 static int
-cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg;
 
@@ -164,13 +164,13 @@ cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, cur
   assert(typ == TYP_REGION);
 
   /* Magier spüren eine Antimagiezone */
-  if (self == 2 || self == 1){
+  if (self == 2 || self == 1) {
     msg = msg_message("curseinfo::antimagiczone", "id", c->no);
     if (msg) {
       nr_render(msg, lang, buf, sizeof(buf), NULL);
       msg_release(msg);
+      return 1;
     }
-    return 1;
   }
 
   return 0;
@@ -178,7 +178,7 @@ cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, cur
 
 /* alle Magier können eine Antimagiezone wahrnehmen */
 static int
-cansee_antimagiczone(const struct faction *viewer, const void * obj, typ_t typ, curse *c, int self)
+cansee_antimagiczone(const struct faction *viewer, const void * obj, typ_t typ, const curse *c, int self)
 {
   region *r;
   unit *u = NULL;
@@ -189,8 +189,8 @@ cansee_antimagiczone(const struct faction *viewer, const void * obj, typ_t typ, 
   assert(typ == TYP_REGION);
   r = (region *)obj;
   for (u = r->units; u; u = u->next) {
-    if (u->faction==viewer){
-      if (u==mage){
+    if (u->faction==viewer) {
+      if (u==mage) {
         self = 2;
         break;
       }
@@ -212,7 +212,7 @@ static struct curse_type ct_antimagiczone = {
 
 /* --------------------------------------------------------------------- */
 static int
-cinfo_farvision(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_farvision(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
 	message * msg;
 
@@ -222,7 +222,7 @@ cinfo_farvision(const struct locale * lang, const void * obj, typ_t typ, curse *
 	assert(typ == TYP_REGION);
 
 	/* Magier spüren eine farvision */
-	if (self != 0){
+	if (self != 0) {
 		msg = msg_message("curseinfo::farvision", "id", c->no);
 		nr_render(msg, lang, buf, sizeof(buf), NULL);
 		msg_release(msg);
