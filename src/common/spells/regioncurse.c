@@ -166,8 +166,10 @@ cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, cur
   /* Magier spüren eine Antimagiezone */
   if (self == 2 || self == 1){
     msg = msg_message("curseinfo::antimagiczone", "id", c->no);
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
+    if (msg) {
+      nr_render(msg, lang, buf, sizeof(buf), NULL);
+      msg_release(msg);
+    }
     return 1;
   }
 
