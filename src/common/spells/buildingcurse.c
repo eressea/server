@@ -34,47 +34,39 @@
 
 
 static message *
-cinfo_building(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+cinfo_building(const void * obj, typ_t typ, const curse *c, int self)
 {
   unused(typ);
   assert(typ == TYP_BUILDING);
 
   if (self != 0){ /* owner or inside */
     return msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-  } else { /* outside */
-    return msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
-  }
-  log_warning(("There is no curseinfo for %s.\n", c->type->cname));
-  return NULL;
+  }  
+  return msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
 }
 
 /* CurseInfo mit Spezialabfragen */
 
 /* C_MAGICWALLS*/
-static int
-cinfo_magicrunes(const struct locale* lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_magicrunes(const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg = NULL;
   if (typ == TYP_BUILDING){
     building * b;
     b = (building*)obj;
     if (self != 0) {
-      msg = msg_message(mkname("curseinfo", "magicrunes_building"), "building id", b, c->no);
+      msg = msg_message("curseinfo::magicrunes_building", "building id", b, c->no);
     }
   } else if (typ == TYP_SHIP) {
     ship *sh;
     sh = (ship*)obj;
     if (self != 0){
-      msg = msg_message(mkname("curseinfo", "magicrunes_ship"), "ship id", sh, c->no);
+      msg = msg_message("curseinfo::magicrunes_ship", "ship id", sh, c->no);
     }
   }
 
-  if (msg!=NULL) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
-  }
-  return 0;
+  return msg;
 }
 static struct curse_type ct_magicrunes = { "magicrunes",
   CURSETYP_NORM, 0, M_SUMEFFECT,
