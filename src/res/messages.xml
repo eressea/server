@@ -96,7 +96,7 @@
   </message>
   <message name="curseinfo::info_str" section="events">
     <type>
-      <arg name="info" type="string"/>
+      <arg name="text" type="string"/>
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"${info}. ($int36($id))"</text>

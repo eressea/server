@@ -257,7 +257,7 @@ cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
   if (end==begin) return NULL;
   else sprintf(buf, effects[begin + curse_geteffect(c) % (end-begin)], u->name);
 
-  return msg_message("curseinfo::info_str", "info id", buf, c->no);
+  return msg_message("curseinfo::info_str", "text id", buf, c->no);
 }
 static struct curse_type ct_sparkle = { "sparkle",
   CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),

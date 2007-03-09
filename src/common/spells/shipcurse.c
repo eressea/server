@@ -73,7 +73,7 @@ cinfo_shipnodrift(const void * obj, typ_t typ, const curse *c, int self)
   } else {
     sprintf(buf, "Ein silberner Schimmer umgibt das Schiff");
   }
-  return msg_message("curseinfo::info_str", buf, c->no);
+  return msg_message("curseinfo::info_str", "text id", buf, c->no);
 }
 
 static struct curse_type ct_stormwind = { "stormwind",
