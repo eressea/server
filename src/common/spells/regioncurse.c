@@ -41,29 +41,19 @@
 /*
  * godcursezone
  */
-static int
-cinfo_cursed_by_the_gods(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_cursed_by_the_gods(const void * obj, typ_t typ, const curse *c, int self)
 {
-  region *r;
-  message * msg;
+  region *r = (region *)obj;;
 
   unused(typ);
   unused(self);
-
   assert(typ == TYP_REGION);
-  r = (region *)obj;
+  
   if (fval(r->terrain, SEA_REGION)) {
-    msg = msg_message("curseinfo::godcurseocean", "id", c->no);
-  } else {
-    msg = msg_message("curseinfo::godcurse", "id", c->no);
+    return msg_message("curseinfo::godcurseocean", "id", c->no);
   }
-  if (msg!=NULL) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-
-    return 1;
-  }
-  return 0;
+  return msg_message("curseinfo::godcurse", "id", c->no);
 }
 
 static struct curse_type ct_godcursezone = {
@@ -81,27 +71,18 @@ static struct curse_type ct_godcursezone = {
 /*
  * C_GBDREAM
  */
-static int
-cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_dreamcurse(const void * obj, typ_t typ, const curse *c, int self)
 {
-  message * msg;
-
   unused(self);
   unused(typ);
   unused(obj);
   assert(typ == TYP_REGION);
 
   if (curse_geteffect(c) > 0) {
-    msg = msg_message("curseinfo::gooddream", "id", c->no);
-  } else {
-    msg = msg_message("curseinfo::baddream", "id", c->no);
+    return msg_message("curseinfo::gooddream", "id", c->no);
   }
-  if (msg!=NULL) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
-  }
-  return 0;
+  return msg_message("curseinfo::baddream", "id", c->no);
 }
 
 static struct curse_type ct_gbdream = { 
@@ -116,29 +97,19 @@ static struct curse_type ct_gbdream = {
  * C_MAGICSTREET
  *  erzeugt Straßennetz
  */
-static int
-cinfo_magicstreet(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_magicstreet(const void * obj, typ_t typ, const curse *c, int self)
 {
-  message * msg;
-
   unused(typ);
   unused(self);
   unused(obj);
-
   assert(typ == TYP_REGION);
 
   /* Warnung vor Auflösung */
   if (c->duration <= 2) {
-    msg = msg_message("curseinfo::magicstreet", "id", c->no);
-  } else {
-    msg = msg_message("curseinfo::magicstreetwarn", "id", c->no);
+    return msg_message("curseinfo::magicstreet", "id", c->no);
   }
-  if (msg!=NULL) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
-  }
-  return 0;
+  return msg_message("curseinfo::magicstreetwarn", "id", c->no);
 }
 
 static struct curse_type ct_magicstreet = {
@@ -152,28 +123,20 @@ static struct curse_type ct_magicstreet = {
 
 /* --------------------------------------------------------------------- */
 
-static int
-cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_antimagiczone(const void * obj, typ_t typ, const curse *c, int self)
 {
-  message * msg;
-
   unused(typ);
   unused(self);
   unused(obj);
-
   assert(typ == TYP_REGION);
 
   /* Magier spüren eine Antimagiezone */
-  if (self == 2 || self == 1) {
-    msg = msg_message("curseinfo::antimagiczone", "id", c->no);
-    if (msg) {
-      nr_render(msg, lang, buf, sizeof(buf), NULL);
-      msg_release(msg);
-      return 1;
-    }
+  if (self != 0) {
+    return msg_message("curseinfo::antimagiczone", "id", c->no);
   }
 
-  return 0;
+  return NULL;
 }
 
 /* alle Magier können eine Antimagiezone wahrnehmen */
@@ -211,25 +174,20 @@ static struct curse_type ct_antimagiczone = {
 };
 
 /* --------------------------------------------------------------------- */
-static int
-cinfo_farvision(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_farvision(const void * obj, typ_t typ, const curse *c, int self)
 {
-	message * msg;
+  unused(typ);
+  unused(obj);
 
-	unused(typ);
-	unused(obj);
+  assert(typ == TYP_REGION);
 
-	assert(typ == TYP_REGION);
+  /* Magier spüren eine farvision */
+  if (self != 0) {
+    return msg_message("curseinfo::farvision", "id", c->no);
+  }
 
-	/* Magier spüren eine farvision */
-	if (self != 0) {
-		msg = msg_message("curseinfo::farvision", "id", c->no);
-		nr_render(msg, lang, buf, sizeof(buf), NULL);
-		msg_release(msg);
-		return 1;
-	}
-
-	return 0;
+  return 0;
 }
 
 static struct curse_type ct_farvision = { 

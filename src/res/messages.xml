@@ -39,6 +39,96 @@
     <text locale="de">"$unit($mage) beschwört einen Schleier der Verwirrung."</text>
     <text locale="en">"$unit($mage) summons a fog of confusion."</text>
   </message>
+  <message name="curseinfo::calm_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="faction" type="faction"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) mag $faction($faction) zu mögen. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) likes $faction($faction). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::calm_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="race" type="race"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) scheint $race($race, 0) zu mögen. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) seems to like $race($race, 0). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::skill_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="skill" type="skill"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) ist ungewöhnlich geschickt in $skill($skill). ($int36($id))"</text>
+    <text locale="en">"$unit($unit) is incredibly skilled at $skill($skill). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::slave_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="duration" type="int"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) wird noch $int($duration) $if($eq($duration,1), "Woche", "Wochen") unter unserem Bann stehen. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) will be under our influence for $int($duration) more $if($eq($duration,1), "week", "weeks"). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::speed_1" section="events">
+    <type>
+      <arg name="number" type="int"/>
+      <arg name="unit" type="unit"/>
+      <arg name="duration" type="int"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$int($number) $if($eq($number,1), "Person", "Personen") von $unit($unit) $if($eq($number,1), "ist", "sind") noch $int($duration) $if($eq($duration,1), "Woche", "Wochen") beschleunigt. ($int36($id))"</text>
+    <text locale="en">"$int($number) $if($eq($number,1), "member", "members") of $unit($unit) $if($eq($number,1), "is", "are") accelerated for $int($duration) more $if($eq($duration,1), "week", "weeks"). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::warmth_1" section="events">
+    <type>
+      <arg name="number" type="int"/>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$int($number) $if($eq($number,1), "Person", "Personen") von $unit($unit) $if($eq($number,1), "fühlt", "fühlen") sich vor Kälte geschützt. ($int36($id))"</text>
+    <text locale="en">"$int($number) $if($eq($number,1), "member", "members") of $unit($unit) $if($eq($number,1), "is", "are") protected from the cold. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::info_str" section="events">
+    <type>
+      <arg name="info" type="string"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"${info}. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::ship_unknown" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein unbekannter Zauber liegt auf dem Schiff. ($int36($id))"</text>
+    <text locale="en">"An unknown spell lies on this ship. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::unit_unknown" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein unbekannter Zauber liegt auf der Einheit. ($int36($id))"</text>
+    <text locale="en">"An unknown spell lies on this unit. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::building_unknown" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein unbekannter Zauber liegt auf dem Gebäude. ($int36($id))"</text>
+    <text locale="en">"An unknown spell lies on this building. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::region_unknown" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein unbekannter Zauber liegt auf der Region. ($int36($id))"</text>
+    <text locale="en">"An unknown spell lies on this region. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::riotzone" section="events">
     <type>
       <arg name="id" type="int"/>
@@ -52,7 +142,6 @@
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"Die Leute strotzen nur so vor Kraft. ($int36($id))"</text>
-    <text locale="fr">"Testosterone levels are at an all-time high. ($int36($id))"</text>
     <text locale="en">"Testosterone levels are at an all-time high. ($int36($id))"</text>
   </message>
   <message name="curseinfo::worse" section="events">
@@ -61,7 +150,6 @@
       <arg name="id" type="int"/>
     </type>
     <text locale="de">"$unit($unit) wird von einem Alp geritten. ($int36($id))"</text>
-    <text locale="fr">"$unit($unit) is chased by a nightmare. ($int36($id))"</text>
     <text locale="en">"$unit($unit) is chased by a nightmare. ($int36($id))"</text>
   </message>
   <message name="curseinfo::orcish" section="events">

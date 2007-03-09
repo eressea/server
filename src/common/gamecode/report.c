@@ -498,9 +498,18 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 
     if (fval(a->type, ATF_CURSE)) {
       curse *c = (curse *)a->data.v;
-      if (print_curse(c, viewer, obj, typ, self)) {
+      message * msg;
+      
+      if (c->type->cansee) {
+        self = c->type->cansee(viewer, obj, typ, c, self);
+      }
+      msg = msg_curse(c, obj, typ, self);
+
+      if (msg) {
         rnl(F);
+        nr_render(msg, viewer->locale, buf, sizeof(buf), NULL);
         rparagraph(F, buf, indent, 2, 0);
+        msg_release(msg);
       }
     } else if (a->type==&at_effect && self) {
       effect_data * data = (effect_data *)a->data.v;

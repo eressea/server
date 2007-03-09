@@ -736,8 +736,8 @@ oldcursename(int id)
 }
 
 /* ------------------------------------------------------------- */
-int
-cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, const struct curse *c, int self)
+message *
+cinfo_simple(const void * obj, typ_t typ, const struct curse *c, int self)
 {
   struct message * msg;
 
@@ -746,11 +746,8 @@ cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, const stru
   unused(obj);
 
   msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-  if (msg) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
+  if (msg==NULL) {
+    log_error(("There is no curseinfo for %s.\n", c->type->cname));
   }
-  log_warning(("There is no curseinfo for %s.\n", c->type->cname));
-  return 0;
+  return msg;
 }

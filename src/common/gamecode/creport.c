@@ -239,31 +239,23 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
   }
 
   while (a) {
-    int dh = 0;
-    curse *c;
-
     if (fval(a->type, ATF_CURSE)) {
+      curse * c = (curse *)a->data.v;
+      message * msg;
 
-      c = (curse *)a->data.v;
-      if (c->type->curseinfo) {
-        if (c->type->cansee) {
-          self = c->type->cansee(viewer, obj, typ, c, self);
-        }
-        dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
+      if (c->type->cansee) {
+        self = c->type->cansee(viewer, obj, typ, c, self);
       }
-      if (dh==0) {
-        if (c->type->info_str!=NULL) {
-          sprintf(buf, "%s (%s)", c->type->info_str, itoa36(c->no));
-        } else {
-          log_error(("no curseinfo for %s\n", c->type->cname));
-          sprintf(buf, "an unknown curse lies on the region. (%s)", itoa36(c->no));
-        }
-      } else {
+      msg = msg_curse(c, obj, typ, self);
+
+      if (msg) {
         if (!header) {
           header = 1;
           fputs("EFFECTS\n", F);
         }
+        nr_render(msg, viewer->locale, buf, sizeof(buf), NULL);
         fprintf(F, "\"%s\"\n", buf);
+        msg_release(msg);
       }
     } else if (a->type==&at_effect && self) {
       effect_data * data = (effect_data *)a->data.v;

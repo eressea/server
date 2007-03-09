@@ -18,8 +18,8 @@ extern "C" {
 #endif
 
 struct locale;
-struct curse;
-extern int cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, const struct curse *c, int self);
+struct message;
+extern struct message * cinfo_ship(const void * obj, typ_t typ, const struct curse *c, int self);
 extern void register_shipcurse(void);
 	
 #ifdef __cplusplus

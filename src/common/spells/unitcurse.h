@@ -18,8 +18,8 @@ extern "C" {
 #endif
 
 struct curse;
-struct locale;
-extern int cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, const struct curse *c, int self);
+struct message;
+extern struct message * cinfo_unit(const void * obj, typ_t typ, const struct curse *c, int self);
 
 extern void register_unitcurse(void);
 

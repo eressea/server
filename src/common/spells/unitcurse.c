@@ -40,8 +40,8 @@
  * C_AURA
  */
 /* erhöht/senkt regeneration und maxaura um effect% */
-static int
-cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_auraboost(const void * obj, typ_t typ, const curse *c, int self)
 {
   struct unit *u;
   unused(typ);
@@ -51,14 +51,14 @@ cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, const c
   if (self != 0){
     if (curse_geteffect(c) > 100){
       sprintf(buf, "%s fühlt sich von starken magischen Energien "
-        "durchströmt. (%s)", u->name, curseid(c));
+        "durchströmt", u->name);
     } else {
       sprintf(buf, "%s hat Schwierigkeiten seine magischen Energien "
-          "zu sammeln. (%s)", u->name, curseid(c));
+          "zu sammeln", u->name);
     }
-    return 1;
+    return msg_message("curseinfo::info_str", "text id", buf, c->no);
   }
-  return 0;
+  return NULL;
 }
 static struct curse_type ct_auraboost = {
   "auraboost",
@@ -81,8 +81,8 @@ static struct curse_type ct_magicboost = {
 /*
  * C_SLAVE
  */
-static int
-cinfo_slave(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_slave(const void * obj, typ_t typ, const curse *c, int self)
 {
   unit *u;
   unused(typ);
@@ -91,11 +91,9 @@ cinfo_slave(const struct locale * lang, const void * obj, typ_t typ, const curse
   u = (unit *)obj;
 
   if (self != 0){
-    sprintf(buf, "%s wird noch %d Woche%s unter unserem Bann stehen. (%s)",
-        u->name, c->duration, (c->duration == 1)? "":"n", curseid(c));
-    return 1;
+    return msg_message("curseinfo::slave_1", "unit duration id", u, c->duration, c->no);
   }
-  return 0;
+  return NULL;
 }
 static struct curse_type ct_slavery = { "slavery",
   CURSETYP_NORM, 0, NO_MERGE,
@@ -109,31 +107,23 @@ static struct curse_type ct_slavery = { "slavery",
 /*
  * C_CALM
  */
-static int
-cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_calm(const void * obj, typ_t typ, const curse *c, int self)
 {
-  unit *u;
-  const struct race * rc;
-  faction *f;
   unused(typ);
-
   assert(typ == TYP_UNIT);
-  u = (unit *)obj;
+  
   if (c->magician && c->magician->faction) {
-    rc = c->magician->irace;
-    f = c->magician->faction;
-    if (f!=NULL && self != 0) {
-      sprintf(buf, "%s mag %s", u->name, factionname(f));
-    } else {
-      sprintf(buf, "%s scheint %s zu mögen", u->name, LOC(lang, rc_name(rc, 1)));
-    }
-    scat(". (");
-    scat(itoa36(c->no));
-    scat(")");
+    faction *f = c->magician->faction;
+    unit *u = (unit *)obj;
 
-    return 1;
+    if (f==NULL || self == 0) {
+      const struct race * rc = c->magician->irace;
+      return msg_message("curseinfo::calm_0", "unit race id", u, rc, c->no);
+    }
+    return msg_message("curseinfo::calm_1", "unit faction id", u, f, c->no);
   }
-  return 0;
+  return NULL;
 }
 static struct curse_type ct_calmmonster = { "calmmonster",
   CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
@@ -146,26 +136,18 @@ static struct curse_type ct_calmmonster = { "calmmonster",
 /*
  * C_SPEED
  */
-static int
-cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_speed(const void * obj, typ_t typ, const curse *c, int self)
 {
-  unit *u;
-  curse_unit * cu;
   unused(typ);
-
   assert(typ == TYP_UNIT);
-  u = (unit *)obj;
-  cu = (curse_unit *)c->data.v;
 
   if (self != 0){
-    sprintf(buf, "%d Person%s von %s %s noch %d Woche%s beschleunigt. (%s)",
-        cu->cursedmen, (cu->cursedmen == 1)? "":"en", u->name,
-        (cu->cursedmen == 1)? "ist":"sind", c->duration,
-        (c->duration == 1)? "":"n",
-        curseid(c));
-    return 1;
+    unit *u = (unit *)obj;
+    curse_unit * cu = (curse_unit *)c->data.v;
+    return msg_message("curseinfo::speed_1", "unit number duration id", u, cu->cursedmen, c->duration, c->no);
   }
-  return 0;
+  return NULL;
 }
 static struct curse_type ct_speed = {
   "speed",
@@ -178,23 +160,17 @@ static struct curse_type ct_speed = {
 /*
  * C_ORC
  */
-int
-cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+message *
+cinfo_unit(const void * obj, typ_t typ, const curse *c, int self)
 {
-  unit *u;
-  message * msg;
   unused(typ);
-
   assert(typ == TYP_UNIT);
-  u = (unit *)obj;
 
   if (self != 0){
-    msg = msg_message(mkname("curseinfo", c->type->cname), "unit id", u, c->no);
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
+    unit * u = (unit *)obj;
+    return msg_message(mkname("curseinfo", c->type->cname), "unit id", u, c->no);
   }
-  return 0;
+  return NULL;
 }
 
 static struct curse_type ct_orcish = {
@@ -209,25 +185,18 @@ static struct curse_type ct_orcish = {
 /*
  * C_KAELTESCHUTZ
  */
-static int
-cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_kaelteschutz(const void * obj, typ_t typ, const curse *c, int self)
 {
-  unit *u;
-  curse_unit * cu;
   unused(typ);
-
   assert(typ == TYP_UNIT);
-  u = (unit *)obj;
-  cu = (curse_unit *)c->data.v;
 
-  if (self != 0){
-    sprintf(buf, "%d Person%s von %s %s sich vor Kälte geschützt. (%s)",
-        cu->cursedmen, (cu->cursedmen == 1)? "":"en", u->name,
-        (cu->cursedmen == 1)? "fühlt":"fühlen",
-        curseid(c));
-    return 1;
+  if (self != 0) {
+    unit * u = (unit *)obj;
+    curse_unit *cu = (curse_unit *)c->data.v;
+    return msg_message("curseinfo::warmth_1", "unit number id", u, cu->cursedmen, c->no);
   }
-  return 0;
+  return NULL;
 }
 static struct curse_type ct_insectfur = {
   "insectfur",
@@ -240,33 +209,33 @@ static struct curse_type ct_insectfur = {
 /*
  * C_SPARKLE
  */
-static int
-cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
 {
   const char * effects[] = {
     NULL, /* end grau*/
-    "%s ist im Traum eine Fee erschienen.",
-    "%s wird von bösen Alpträumen geplagt.",
+    "%s ist im Traum eine Fee erschienen",
+    "%s wird von bösen Alpträumen geplagt",
     NULL, /* end traum */
-    "%s wird von einem glitzernden Funkenregen umgeben.",
-    "Ein schimmernder Lichterkranz umgibt %s.",
+    "%s wird von einem glitzernden Funkenregen umgeben",
+    "Ein schimmernder Lichterkranz umgibt %s",
     NULL, /* end tybied */
-    "Eine Melodie erklingt, und %s tanzt bis spät in die Nacht hinein.",
-    "%s findet eine kleine Flöte, die eine wundersame Melodie spielt.",
-    "Die Frauen des nahegelegenen Dorfes bewundern %s verstohlen.",
-    "Eine Gruppe vorbeiziehender Bergarbeiter rufen %s eindeutig Zweideutiges nach.",
+    "Eine Melodie erklingt, und %s tanzt bis spät in die Nacht hinein",
+    "%s findet eine kleine Flöte, die eine wundersame Melodie spielt",
+    "Die Frauen des nahegelegenen Dorfes bewundern %s verstohlen",
+    "Eine Gruppe vorbeiziehender Bergarbeiter rufen %s eindeutig Zweideutiges nach",
     NULL, /* end cerrdor */
-    "%s bekommt von einer Schlange einen Apfel angeboten.",
-    "Ein Einhorn berührt %s mit seinem Horn und verschwindet kurz darauf im Unterholz.",
-    "Vogelzwitschern begleitet %s auf all seinen Wegen.",
-    "Leuchtende Blumen erblühen rund um das Lager von %s.",
+    "%s bekommt von einer Schlange einen Apfel angeboten",
+    "Ein Einhorn berührt %s mit seinem Horn und verschwindet kurz darauf im Unterholz",
+    "Vogelzwitschern begleitet %s auf all seinen Wegen",
+    "Leuchtende Blumen erblühen rund um das Lager von %s",
     NULL, /* end gwyrrd */
-    "Über %s zieht eine Gruppe Geier ihre Kreise.",
-    "Der Kopf von %s hat sich in einen grinsenden Totenschädel verwandelt.",
-    "Ratten folgen %s auf Schritt und Tritt.",
-    "Pestbeulen befallen den Körper von %s.",
-    "Eine dunkle Fee erscheint %s im Schlaf. Sie ist von schauriger Schönheit.",
-    "Fäulnisgeruch dringt %s aus allen Körperöffnungen.",
+    "Über %s zieht eine Gruppe Geier ihre Kreise",
+    "Der Kopf von %s hat sich in einen grinsenden Totenschädel verwandelt",
+    "Ratten folgen %s auf Schritt und Tritt",
+    "Pestbeulen befallen den Körper von %s",
+    "Eine dunkle Fee erscheint %s im Schlaf. Sie ist von schauriger Schönheit",
+    "Fäulnisgeruch dringt %s aus allen Körperöffnungen",
     NULL, /* end draig */
   };
   int m, begin=0, end=0;
@@ -276,22 +245,19 @@ cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, const cur
   assert(typ == TYP_UNIT);
   u = (unit *)obj;
 
-  if(!c->magician || !c->magician->faction) return 0;
+  if (!c->magician || !c->magician->faction) return NULL;
 
-  for(m=0;m!=c->magician->faction->magiegebiet;++m) {
+  for (m=0;m!=c->magician->faction->magiegebiet;++m) {
     while (effects[end]!=NULL) ++end;
     begin = end+1;
     end = begin;
   }
 
   while (effects[end]!=NULL) ++end;
-  if (end==begin) return 0;
+  if (end==begin) return NULL;
   else sprintf(buf, effects[begin + curse_geteffect(c) % (end-begin)], u->name);
-  scat(" (");
-  scat(itoa36(c->no));
-  scat(")");
 
-  return 1;
+  return msg_message("curseinfo::info_str", "info id", buf, c->no);
 }
 static struct curse_type ct_sparkle = { "sparkle",
   CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
@@ -382,20 +348,17 @@ write_skill(FILE * F, const curse * c)
   return 0;
 }
 
-static int
-cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_skill(const void * obj, typ_t typ, const curse *c, int self)
 {
-  unit *u = (unit *)obj;
-  int sk = c->data.i;
-
   unused(typ);
 
-  if (self != 0){
-    sprintf(buf, "%s ist in %s ungewöhnlich ungeschickt. (%s)", u->name,
-        skillname((skill_t)sk, u->faction->locale), curseid(c));
-    return 1;
+  if (self != 0) {
+    unit *u = (unit *)obj;
+    int sk = c->data.i;
+    return msg_message("curseinfo::skill_1", "unit skill id", u, sk, c->no);
   }
-  return 0;
+  return NULL;
 }
 
 static struct curse_type ct_skillmod = {

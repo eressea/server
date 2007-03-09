@@ -33,26 +33,19 @@
 #include <assert.h>
 
 
-static int
+static message *
 cinfo_building(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
 {
-  message * msg;
-
   unused(typ);
   assert(typ == TYP_BUILDING);
 
   if (self != 0){ /* owner or inside */
-    msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
+    return msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
   } else { /* outside */
-    msg = msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
-  }
-  if (msg) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
+    return msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
   }
   log_warning(("There is no curseinfo for %s.\n", c->type->cname));
-  return 0;
+  return NULL;
 }
 
 /* CurseInfo mit Spezialabfragen */

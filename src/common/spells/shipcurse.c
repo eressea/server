@@ -32,8 +32,8 @@
 #include <assert.h>
 
 
-int
-cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+message *
+cinfo_ship(const void * obj, typ_t typ, const curse *c, int self)
 {
   message * msg;
 
@@ -44,22 +44,19 @@ cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, const curse 
   if (self != 0) { /* owner or inside */
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
   } else {
-    msg = msg_message(mkname("curseinfo", "shipunknown"), "id", c->no);
+    msg = msg_message("curseinfo::shipunknown", "id", c->no);
   }
-  if (msg) {
-    nr_render(msg, lang, buf, sizeof(buf), NULL);
-    msg_release(msg);
-    return 1;
+  if (msg==NULL) {
+    log_error(("There is no curseinfo for %s.\n", c->type->cname));
   }
-  log_warning(("There is no curseinfo for %s.\n", c->type->cname));
-  return 0;
+  return msg;
 }
 
 /* CurseInfo mit Spezialabfragen */
 
 /* C_SHIP_NODRIFT */
-static int
-cinfo_shipnodrift(const struct locale * lang, const void * obj, typ_t typ, const curse *c, int self)
+static message *
+cinfo_shipnodrift(const void * obj, typ_t typ, const curse *c, int self)
 {
   ship * sh;
   unused(typ);
@@ -74,12 +71,9 @@ cinfo_shipnodrift(const struct locale * lang, const void * obj, typ_t typ, const
     }
     scat(".");
   } else {
-    sprintf(buf, "Ein silberner Schimmer umgibt das Schiff.");
+    sprintf(buf, "Ein silberner Schimmer umgibt das Schiff");
   }
-  scat(" (");
-  scat(itoa36(c->no));
-  scat(")");
-  return 1;
+  return msg_message("curseinfo::info_str", buf, c->no);
 }
 
 static struct curse_type ct_stormwind = { "stormwind",

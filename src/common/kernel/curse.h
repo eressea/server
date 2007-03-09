@@ -222,7 +222,7 @@ typedef struct curse_type {
   unsigned int mergeflags;
   const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
                  Zauberanalyse angezeigt */
-  int (*curseinfo)(const struct locale*, const void*, typ_t, const curse*, int);
+  struct message * (*curseinfo)(const void*, typ_t, const curse*, int);
   void (*change_vigour)(curse*, double);
   int (*read)(FILE * F, curse * c);
   int (*write)(FILE * F, const curse * c);
@@ -325,7 +325,7 @@ extern boolean curse_active(const curse * c);
 /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
 extern const char * oldcursename(int id);
 extern void register_curses(void);
-extern int cinfo_simple(const struct locale * lang, const void * obj, typ_t typ, const struct curse *c, int self);
+extern struct message * cinfo_simple(const void * obj, typ_t typ, const struct curse *c, int self);
 
 #define is_cursed(a, id, id2) \
   curse_active(get_curse(a, ct_find(oldcursename(id))))

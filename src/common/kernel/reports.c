@@ -809,22 +809,19 @@ spunit(struct strlist ** SP, const struct faction * f, const unit * u, int inden
   lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 
-int
-print_curse(const struct curse * c, const struct faction * viewer, const void * obj, typ_t typ, int self)
+struct message * 
+msg_curse(const struct curse * c, const void * obj, typ_t typ, int self)
 {
   if (c->type->curseinfo) {
-    if (c->type->cansee) {
-      self = c->type->cansee(viewer, obj, typ, c, self);
-    }
-    return c->type->curseinfo(viewer->locale, obj, typ, c, self);
+    /* if curseinfo returns NULL, then we don't want to tell the viewer anything. */
+    return c->type->curseinfo(obj, typ, c, self);
+  } else if (c->type->info_str!=NULL) {
+    return msg_message(mkname("curseinfo", "info_str"), "info, id", c->type->info_str, c->no);
   } else {
-    if (c->type->info_str!=NULL) {
-      sprintf(buf, "%s (%s)", c->type->info_str, itoa36(c->no));
-      return 1;
-    }
+    const char * unknown[] = { "unit_unknown", "region_unknown", "building_unknown", "ship_unknown" };
+    log_error(("no curseinfo for %s\n", c->type->cname));
+    return msg_message(mkname("curseinfo", unknown[typ]), "id", c->no);
   }
-  log_error(("no curseinfo for %s\n", c->type->cname));
-  return 0;
 }
 
 const struct unit *
