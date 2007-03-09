@@ -253,7 +253,7 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
           header = 1;
           fputs("EFFECTS\n", F);
         }
-        nr_render(msg, viewer->locale, buf, sizeof(buf), NULL);
+        nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
         fprintf(F, "\"%s\"\n", buf);
         msg_release(msg);
       }

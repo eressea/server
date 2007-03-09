@@ -507,7 +507,7 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 
       if (msg) {
         rnl(F);
-        nr_render(msg, viewer->locale, buf, sizeof(buf), NULL);
+        nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
         rparagraph(F, buf, indent, 2, 0);
         msg_release(msg);
       }

@@ -99,7 +99,7 @@
       <arg name="text" type="string"/>
       <arg name="id" type="int"/>
     </type>
-    <text locale="de">"${info}. ($int36($id))"</text>
+    <text locale="de">"${text}. ($int36($id))"</text>
   </message>
   <message name="curseinfo::ship_unknown" section="events">
     <type>

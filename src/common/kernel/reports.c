@@ -816,7 +816,7 @@ msg_curse(const struct curse * c, const void * obj, typ_t typ, int self)
     /* if curseinfo returns NULL, then we don't want to tell the viewer anything. */
     return c->type->curseinfo(obj, typ, c, self);
   } else if (c->type->info_str!=NULL) {
-    return msg_message(mkname("curseinfo", "info_str"), "info, id", c->type->info_str, c->no);
+    return msg_message("curseinfo::info_str", "text id", c->type->info_str, c->no);
   } else {
     const char * unknown[] = { "unit_unknown", "region_unknown", "building_unknown", "ship_unknown" };
     log_error(("no curseinfo for %s\n", c->type->cname));
