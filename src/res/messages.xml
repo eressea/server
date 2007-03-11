@@ -1107,6 +1107,17 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier erschafft ein Traumgebäude."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The magician creates an illusionary building."</text>
   </message>
+  <message name="sp_shapeshift_fail" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) kann keine $race($race,1)-Gestalt annehmen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) cannot assume the shape of a $race($race,1)."</text>
+  </message>
   <message name="sp_migranten_fail1" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -6528,6 +6539,14 @@
     </type>
     <text locale="de">"$unit($mage) zaubert $spell($spell): $int($dead) $if($eq($dead,1),"Krieger wurde", "Krieger wurden") getötet."</text>
     <text locale="en">"$unit($mage) casts $spell($spell): $int($dead) $if($eq($dead,1),"enemy was", "enemies were") killed."</text>
+  </message>
+  <message name="summonshadow_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="number" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) beschwört $int($number) Dämonen aus dem Reich der Schatten."</text>
+    <text locale="en">"$unit($mage) summons $int($number) demons from the realm of shadows."</text>
   </message>
   <message name="cast_spell_effect" section="magic">
     <type>

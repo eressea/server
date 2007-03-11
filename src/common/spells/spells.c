@@ -3428,9 +3428,8 @@ sp_summonshadow(castorder *co)
   set_level(u, SK_STEALTH, val);
   set_level(u, SK_OBSERVATION, 1);
 
-  sprintf(buf, "%s beschwört %d Dämonen aus dem Reich der Schatten.",
-    unitname(mage), (int)(force*force));
-  addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("summonshadow_effect",
+    "mage number", mage, force*force));
 
   return cast_level;
 }
@@ -5103,11 +5102,7 @@ sp_illusionary_shapeshift(castorder *co)
 
   /* ähnlich wie in laws.c:setealth() */
   if (!playerrace(rc)) {
-    sprintf(buf, "%s %s keine %s-Gestalt annehmen.",
-      unitname(u),
-      u->number > 1 ? "können" : "kann",
-      LOC(u->faction->locale, rc_name(rc, 2)));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_shapeshift_fail", "target race", u, rc));
     return 0;
   }
   {
