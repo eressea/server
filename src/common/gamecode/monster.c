@@ -1096,8 +1096,10 @@ spawn_dragons(void)
       set_level(u, SK_OBSERVATION, 1+rng_int()%3);
       set_level(u, SK_STEALTH, 1);
       set_level(u, SK_AUSDAUER, 1);
-      log_printf("%d %s in %s.\n", u->number,
-        LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+      if (!quiet) {
+        log_printf("%d %s in %s.\n", u->number,
+          LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+      }
 
       name_unit(u);
 
@@ -1170,8 +1172,10 @@ spawn_undead(void)
       deathcounts(r, -undead);
       name_unit(u);
 
-      log_printf("%d %s in %s.\n", u->number,
-        LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+      if (!quiet) {
+        log_printf("%d %s in %s.\n", u->number,
+          LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+      }
 
       {
         message * msg = msg_message("undeadrise", "region", r);

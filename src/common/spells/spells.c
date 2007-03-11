@@ -5849,16 +5849,12 @@ sp_pullastral(castorder *co)
 
       if (u->region!=r) {
         /* Report this as unit not found */
-        char * uid;
-
-        if (spobj->typ==SPP_UNIT) {
-          uid = strdup(itoa36(spobj->data.i));
+        if (spobj->typ == SPP_UNIT) {
+          spobj->data.i = u->no;
         } else {
-          char tbuf[20];
-          sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
-            parameters[P_TEMP]), itoa36(spobj->data.i));
-          uid = strdup(tbuf);
+          spobj->data.i = ualias(u);
         }
+        spobj->flag = TARGET_NOTFOUND;
         ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, spobj));
         return false;
       }

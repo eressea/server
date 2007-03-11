@@ -6879,6 +6879,25 @@
     <text locale="en">"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) turn to dust."</text>
   </message>
 
+  <message name="curseinfo::shipnodrift_1" section="magic">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="duration" type="int"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die $ship($ship) ist mit gutem Wind gesegnet$if($lt($duration,3),", doch der Zauber beginnt sich bereits aufzulösen",""). ($int36($id))"</text>
+    <text locale="en">"The $ship($ship) is blessed with favourable winds$if($lt($duration,3),", but the spell is starting to wear thin",""). ($int36($id))"</text>
+  </message>
+
+  <message name="curseinfo::shipnodrift_0" section="magic">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein silberner Schimmer umgibt die $ship($ship). ($int36($id))"</text>
+    <text locale="en">"A silvery shimmer surrounds the $ship($ship). ($int36($id))"</text>
+  </message>
+
   <message name="curseinfo::magicrunes_building" section="magic">
     <type>
       <arg name="building" type="building"/>

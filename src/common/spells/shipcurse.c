@@ -58,22 +58,15 @@ cinfo_ship(const void * obj, typ_t typ, const curse *c, int self)
 static message *
 cinfo_shipnodrift(const void * obj, typ_t typ, const curse *c, int self)
 {
-  ship * sh;
+  ship * sh = (ship *)obj;
+
   unused(typ);
-
   assert(typ == TYP_SHIP);
-  sh = (ship*)obj;
 
-  if (self != 0){
-    sprintf(buf, "%s ist mit guten Wind gesegnet", sh->name);
-    if (c->duration <= 2){
-      scat(", doch der Zauber beginnt sich bereits aufzulösen");
-    }
-    scat(".");
-  } else {
-    sprintf(buf, "Ein silberner Schimmer umgibt das Schiff");
+  if (self != 0) {
+    return msg_message("curseinfo::shipnodrift_1", "ship duration id", sh, c->duration, c->no);
   }
-  return msg_message("curseinfo::info_str", "text id", buf, c->no);
+  return msg_message("curseinfo::shipnodrift_0", "ship duration id", sh, c->duration, c->no);
 }
 
 static struct curse_type ct_stormwind = { "stormwind",
