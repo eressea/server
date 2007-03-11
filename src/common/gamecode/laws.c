@@ -3373,7 +3373,7 @@ setdefaults(unit *u)
   * werden. */
 
   if (trade == true) {
-    /* fset(u, UFL_LONGACTION); */
+    /* fset(u, UFL_LONGACTION|UFL_NOTMOVING); */
     set_order(&u->thisorder, NULL);
   }
   /* thisorder kopieren wir nun nach lastorder. in lastorder steht

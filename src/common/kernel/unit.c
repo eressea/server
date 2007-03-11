@@ -264,7 +264,7 @@ destroy_unit(unit * u)
     if (a!=NULL) a_remove(&u->attribs, a);
     a = a_find(clone->attribs, &at_clonemage);
     if (a!=NULL) a_remove(&clone->attribs, a);
-    fset(u, UFL_LONGACTION);
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING);
     set_number(clone, 0);
   } else 
 #endif  
@@ -727,50 +727,49 @@ urace(const struct unit * u)
 boolean
 can_survive(const unit *u, const region *r)
 {
-  if ((fval(r->terrain, WALK_INTO)
-			&& (u->race->flags & RCF_WALK)) ||
-			(fval(r->terrain, SWIM_INTO)
-			&& (u->race->flags & RCF_SWIM)) ||
-			(fval(r->terrain, FLY_INTO)
-			&& (u->race->flags & RCF_FLY))) {
+  if ((fval(r->terrain, WALK_INTO) && (u->race->flags & RCF_WALK))
+    || (fval(r->terrain, SWIM_INTO) && (u->race->flags & RCF_SWIM)) 
+    || (fval(r->terrain, FLY_INTO) && (u->race->flags & RCF_FLY))) 
+  {
 
-		if (get_item(u, I_HORSE) && !fval(r->terrain, WALK_INTO))
-			return false;
+    if (get_item(u, I_HORSE) && !fval(r->terrain, WALK_INTO))
+      return false;
 
-		if (fval(u->race, RCF_UNDEAD) && is_cursed(r->attribs, C_HOLYGROUND, 0))
-			return false;
+    if (fval(u->race, RCF_UNDEAD) && is_cursed(r->attribs, C_HOLYGROUND, 0))
+      return false;
 
-		return true;
-	}
-	return false;
+    return true;
+  }
+  return false;
 }
 
 void
 move_unit(unit * u, region * r, unit ** ulist)
 {
-	int maxhp = 0;
-	assert(u && r);
+  int maxhp = 0;
+  assert(u && r);
 
-	if (u->region == r) return;
-	if (u->region!=NULL) maxhp = unit_max_hp(u);
-	if (!ulist) ulist = (&r->units);
-	if (u->region) {
+  if (u->region == r) return;
+  if (u->region!=NULL) maxhp = unit_max_hp(u);
+  if (!ulist) ulist = (&r->units);
+  if (u->region) {
 #ifdef DELAYED_OFFENSE
-		set_moved(&u->attribs);
+    set_moved(&u->attribs);
 #endif
-		setguard(u, GUARD_NONE);
-		fset(u, UFL_MOVED);
-		if (u->ship || u->building) leave(u->region, u);
-		translist(&u->region->units, ulist, u);
-	} else
-		addlist(ulist, u);
+    setguard(u, GUARD_NONE);
+    fset(u, UFL_MOVED);
+    if (u->ship || u->building) leave(u->region, u);
+    translist(&u->region->units, ulist, u);
+  } else {
+    addlist(ulist, u);
+  }
 
 #ifdef SMART_INTERVALS
   update_interval(u->faction, r);
 #endif
-	u->region = r;
-	/* keine automatische hp reduzierung bei bewegung */
-	/* if (maxhp>0) u->hp = u->hp * unit_max_hp(u) / maxhp; */
+  u->region = r;
+  /* keine automatische hp reduzierung bei bewegung */
+  /* if (maxhp>0) u->hp = u->hp * unit_max_hp(u) / maxhp; */
 }
 
 /* ist mist, aber wegen nicht skalierender attirbute notwendig: */

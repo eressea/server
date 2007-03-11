@@ -720,7 +720,7 @@ learn_cmd(unit * u, order * ord)
     a_remove(&u->attribs, a);
     a = NULL;
   }
-  fset(u, UFL_LONGACTION);
+  fset(u, UFL_LONGACTION|UFL_NOTMOVING);
 
   /* Anzeigen neuer Tränke */
   /* Spruchlistenaktualiesierung ist in Regeneration */

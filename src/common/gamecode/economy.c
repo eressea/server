@@ -1824,7 +1824,7 @@ expandbuying(region * r, request * buyorders)
 				  trade->number = 0;
 				  ++trade->multi;
 			  }
-        fset(u, UFL_LONGACTION);
+        fset(u, UFL_LONGACTION|UFL_NOTMOVING);
 		  }
 	  }
 	  free(oa);
@@ -2072,7 +2072,7 @@ expandselling(region * r, request * sellorders, int limit)
 			}
 			u->n += price;
 			change_money(u, price);
-      fset(u, UFL_LONGACTION);
+      fset(u, UFL_LONGACTION|UFL_NOTMOVING);
 
 			/* r->money -= price; --- dies wird eben nicht ausgeführt, denn die
 			* Produkte können auch als Steuern eingetrieben werden. In der Region
@@ -2319,7 +2319,7 @@ expandstealing(region * r, request * stealorders)
       ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
     }
     add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
-    fset(oa[i].unit, UFL_LONGACTION);
+    fset(oa[i].unit, UFL_LONGACTION|UFL_NOTMOVING);
   }
   free(oa);
 }
@@ -2822,7 +2822,7 @@ expandentertainment(region * r)
 		/* Nur soviel PRODUCEEXP wie auch tatsächlich gemacht wurde */
 		produceexp(u, SK_ENTERTAINMENT, min(u->n, u->number));
 		add_income(u, IC_ENTERTAIN, o->qty, u->n);
-    fset(u, UFL_LONGACTION);
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING);
 	}
 }
 
@@ -2915,7 +2915,7 @@ expandwork(region * r)
 		change_money(u, u->n);
 		working -= o->unit->number;
 		add_income(u, IC_WORK, o->qty, u->n);
-    fset(u, UFL_LONGACTION);
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING);
   }
 
 	n = m * p_wage;
@@ -2987,7 +2987,7 @@ expandtax(region * r, request * taxorders)
   for (u = r->units; u; u = u->next) {
     if (u->n >= 0) {
       add_income(u, IC_TAX, u->wants, u->n);
-      fset(u, UFL_LONGACTION);
+      fset(u, UFL_LONGACTION|UFL_NOTMOVING);
     }
 	}
 }
@@ -3121,7 +3121,7 @@ produce(void)
           if (a && a->data.i) {
             produceexp(u, SK_TRADE, u->number);
           }
-          fset(u, UFL_LONGACTION);
+          fset(u, UFL_LONGACTION|UFL_NOTMOVING);
           continue;
         }
       }

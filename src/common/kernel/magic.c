@@ -2698,7 +2698,7 @@ magic(void)
           add_castorder(&cll[(int)(sp->rank)], co);
         }
       }
-      if (casted) fset(u, UFL_LONGACTION);
+      if (casted) fset(u, UFL_LONGACTION|UFL_NOTMOVING);
     }
   }
 

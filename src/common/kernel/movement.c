@@ -94,7 +94,7 @@ get_followers(unit * target, region * r, region_list * route_end, follower ** fo
 {
   unit * uf;
   for (uf=r->units;uf;uf=uf->next) {
-    if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_LONGACTION)) {
+    if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
       const attrib * a = a_findc(uf->attribs, &at_follow);
       if (a && a->data.v == target) {
         follower * fnew = malloc(sizeof(follower));
@@ -994,10 +994,10 @@ init_transportation(void)
     unit *u;
 
     /* This is just a simple check for non-corresponding K_TRANSPORT/
-    * K_DRIVE. This is time consuming for an error check, but there
-    * doesn't seem to be an easy way to speed this up. */
+     * K_DRIVE. This is time consuming for an error check, but there
+     * doesn't seem to be an easy way to speed this up. */
     for (u=r->units; u; u=u->next) {
-      if (get_keyword(u->thisorder) == K_DRIVE && can_move(u) && !fval(u, UFL_LONGACTION) && !LongHunger(u)) {
+      if (get_keyword(u->thisorder) == K_DRIVE && can_move(u) && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
         unit * ut;
 
         init_tokens(u->thisorder);
@@ -1034,7 +1034,7 @@ init_transportation(void)
               unit * ut = getunit(r, u->faction);
 
               if (ut == NULL) break;
-              if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+              if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut) && !fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                 init_tokens(ut->thisorder);
                 skip_token();
                 if (getunit(r, ut->faction) == u) {
@@ -1507,7 +1507,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
     /* make orders for the followers */
   }
-  fset(u, UFL_LONGACTION);
+  fset(u, UFL_LONGACTION|UFL_NOTMOVING);
   setguard(u, GUARD_NONE);
   assert(u->region == current);
   return iroute;
@@ -1961,7 +1961,7 @@ travel_i(unit * u, region_list * route_begin, region_list * route_end, order * o
     if (ut!=NULL) {
       boolean found = false;
       if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut)) {
-        if (!fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+        if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
           init_tokens(ut->thisorder);
           skip_token();
           if (getunit(u->region, ut->faction) == u) {
@@ -2076,7 +2076,7 @@ move(unit * u, boolean move_on_land)
     travel(u, &route);
   }
 
-  fset(u, UFL_LONGACTION);
+  fset(u, UFL_LONGACTION|UFL_NOTMOVING);
   set_order(&u->thisorder, NULL);
 
   if (route!=NULL) free_regionlist(route);
@@ -2281,23 +2281,23 @@ hunt(unit *u, order * ord)
   char command[256];
   direction_t dir;
 
-  if (fval(u, UFL_LONGACTION)) {
+  if (fval(u, UFL_NOTMOVING)) {
     return 0;
   } else if (u->ship == NULL) {
     cmistake(u, ord, 144, MSG_MOVE);
-    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!fval(u, UFL_OWNER)) {
     cmistake(u, ord, 146, MSG_MOVE);
-    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (fval(u, UFL_NOTMOVING)) {
     cmistake(u, ord, 319, MSG_MOVE);
-    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!can_move(u)) {
     cmistake(u, ord, 55, MSG_MOVE);
-    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2305,7 +2305,7 @@ hunt(unit *u, order * ord)
 
   if (id <= 0) {
     cmistake(u,  ord, 20, MSG_MOVE);
-    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2316,7 +2316,7 @@ hunt(unit *u, order * ord)
     if (sh == NULL || sh->region!=rc) {
       cmistake(u, ord, 20, MSG_MOVE);
     }
-    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
+    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2397,7 +2397,7 @@ move_hunters(void)
 
             /* wir folgen definitiv einem Schiff. */
 
-            if (fval(u, UFL_LONGACTION)) {
+            if (fval(u, UFL_NOTMOVING)) {
               cmistake(u, ord, 52, MSG_MOVE);
               break;
             } else if (!can_move(u)) {
@@ -2405,7 +2405,7 @@ move_hunters(void)
               break;
             }
 
-            if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u, ord)) {
+            if (!fval(u, UFL_NOTMOVING) && !LongHunger(u) && hunt(u, ord)) {
               up = &r->units;
               break;
             }
@@ -2431,9 +2431,9 @@ move_pirates(void)
     while (*up) {
       unit *u = *up;
 
-      if (!fval(u, UFL_LONGACTION) && get_keyword(u->thisorder) == K_PIRACY) {
+      if (!fval(u, UFL_NOTMOVING) && get_keyword(u->thisorder) == K_PIRACY) {
         piracy_cmd(u, u->thisorder);
-        fset(u, UFL_LONGACTION);
+        fset(u, UFL_LONGACTION|UFL_NOTMOVING);
       }
 
       if (*up == u) {
@@ -2487,10 +2487,11 @@ movement(void)
            * UFL_NOTMOVING is set in combat if the unit is not allowed
            * to move because it was involved in a battle.
            */
-          if (fval(u, UFL_LONGACTION)) {
-            cmistake(u, u->thisorder, 52, MSG_MOVE);
-            set_order(&u->thisorder, NULL);
-          } else if (fval(u, UFL_NOTMOVING)) {
+          if (fval(u, UFL_NOTMOVING)) {
+            if (fval(u, UFL_LONGACTION)) {
+              cmistake(u, u->thisorder, 52, MSG_MOVE);
+              set_order(&u->thisorder, NULL);
+            }
             cmistake(u, u->thisorder, 319, MSG_MOVE);
             set_order(&u->thisorder, NULL);
           } else if (fval(u, UFL_MOVED)) {
@@ -2554,7 +2555,7 @@ follow_unit(unit * u)
   attrib * a = NULL;
   order * ord;
 
-  if (fval(u, UFL_LONGACTION) || LongHunger(u)) return;
+  if (fval(u, UFL_NOTMOVING) || LongHunger(u)) return;
 
   for (ord=u->orders;ord;ord=ord->next) {
     const struct locale * lang = u->faction->locale;

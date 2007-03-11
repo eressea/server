@@ -2596,7 +2596,7 @@ aftermath(battle * b)
           du->hp = df->run.hp;
           set_order(&du->thisorder, NULL);
           setguard(du, GUARD_NONE);
-          fset(du, UFL_LONGACTION);
+          fset(du, UFL_LONGACTION|UFL_NOTMOVING);
 #ifdef SIMPLE_ESCAPE
           if (du->status<=ST_FLEE) leave(du->region, du);
 #else
