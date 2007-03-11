@@ -80,13 +80,13 @@ getmagicskill(void)
 boolean
 is_migrant(unit *u)
 {
-	if (u->race == u->faction->race) return false;
+  if (u->race == u->faction->race) return false;
 
-	if (is_familiar(u)) return false;
+  if (fval(u->race, RCF_UNDEAD|RCF_ILLUSIONARY)) return false;
+  if (is_familiar(u)) return false;
+  if (u->race == new_race[RC_TOAD]) return false;
 
-	if (u->race == new_race[RC_TOAD]) return false;
-
-	return true;
+  return true;
 }
 
 /* ------------------------------------------------------------- */

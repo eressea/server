@@ -217,12 +217,18 @@ warn_items(void)
 static boolean
 kor_teure_talente(unit *u)
 {
-  if(effskill(u, SK_TACTICS) >= 1 ||
-     effskill(u, SK_MAGIC) >= 1 ||
-     effskill(u, SK_ALCHEMY) >= 1 ||
-     effskill(u, SK_HERBALISM) >= 1 ||
-     effskill(u, SK_SPY) >= 1) {
-        return true;
+  const skill_t expskills[] = { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
+  skill * sv = u->skills;
+  for (;sv!=u->skills+u->skill_size;++sv) {
+    int l = 0, h = 4;
+    skill_t sk = sv->id;
+    assert(expskills[h]==NOSKILL);
+    while (l<h) {
+      int m = (l+h)/2;
+      if (sk==expskills[m]) return true;
+      else if (sk>expskills[m]) l=m+1;
+      else h=m;
+    }
   }
   return false;
 }
@@ -231,25 +237,23 @@ static void
 no_teurefremde(boolean convert)
 {
   const curse_type * slave_ct = ct_find("slavery");
-  region *r;
+  faction * f;
 
-  for(r=regions;r;r=r->next) {
-    unit *u;
-
-    for(u=r->units;u;u=u->next) {
-      if (u->faction->no != MONSTER_FACTION && playerrace(u->faction->race)
-        && is_migrant(u) && kor_teure_talente(u))
-      {
-        if (slave_ct && curse_active(get_curse(u->attribs, slave_ct)))
-          continue;
-        log_warning(("Teurer Migrant: %s, Partei %s\n",
-          unitname(u), factionname(u->faction)));
-        if (convert) {
-          u->race = u->faction->race;
-          u->irace = u->faction->race;
-          sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
-            unitname(u));
-          addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+  for (f=factions;f;f=f->next) {
+    if (f->no != MONSTER_FACTION) {
+      unit *u;
+      for (u=f->units;u;u=u->nextF) {
+        if (is_migrant(u) && kor_teure_talente(u)) {
+          if (slave_ct && curse_active(get_curse(u->attribs, slave_ct)))
+            continue;
+          log_warning(("Teurer Migrant: %s, Partei %s\n", unitname(u), factionname(f)));
+          if (convert) {
+            u->race = f->race;
+            u->irace = f->race;
+            sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
+              unitname(u));
+            addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+          }
         }
       }
     }

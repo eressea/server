@@ -103,15 +103,15 @@ enable_skill(const char * skname, boolean value)
 skill_t
 sk_find(const char * name)
 {
-	skill_t i;
-	if (name==NULL) return NOSKILL;
+  skill_t i;
+  if (name==NULL) return NOSKILL;
   if (strncmp(name, "sk_", 3)==0) name+=3;
-	for (i=0;i!=MAXSKILLS;++i) {
+  for (i=0;i!=MAXSKILLS;++i) {
     if (skill_enabled[i]) {
       if (strcmp(name, skillnames[i])==0) return i;
     }
-	}
-	return NOSKILL;
+  }
+  return NOSKILL;
 }
 
 /** skillmod attribut **/

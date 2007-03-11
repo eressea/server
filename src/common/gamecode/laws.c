@@ -2035,8 +2035,8 @@ password_cmd(unit * u, struct order * ord)
     strncpy(pbuf, s, 31);
     pbuf[31] = 0;
     c = pbuf;
-    while(*c) {
-      if(!isalnum(*c)) pwok = false;
+    while (*c) {
+      if (!isalnum(*c)) pwok = false;
       c++;
     }
     if (pwok == false) {

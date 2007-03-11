@@ -1153,9 +1153,10 @@ demon_skillchanges(void)
               while (weeks--) learn_skill(u, sv->id, 1.0);
             }
             if (sv->old>sv->level) {
-              log_printf("%s dropped from %u to %u:%u in %s\n",
-                unitname(u), sv->old, sv->level,
-                sv->weeks, skillname(sv->id, NULL));
+              if (!quiet) {
+                log_printf("%s dropped from %u to %u:%u in %s\n",
+                  unitname(u), sv->old, sv->level, sv->weeks, skillname(sv->id, NULL));
+              }
             }
           }
           ++sv;
