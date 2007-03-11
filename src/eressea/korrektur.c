@@ -220,7 +220,7 @@ kor_teure_talente(unit *u)
   const skill_t expskills[] = { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
   skill * sv = u->skills;
   for (;sv!=u->skills+u->skill_size;++sv) {
-    int l = 0, h = 4;
+    int l = 0, h = 5;
     skill_t sk = sv->id;
     assert(expskills[h]==NOSKILL);
     while (l<h) {
