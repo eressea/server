@@ -2594,9 +2594,7 @@ aftermath(battle * b)
 #endif /* SIMPLE_ESCAPE */
           scale_number(du, df->run.number);
           du->hp = df->run.hp;
-          set_order(&du->thisorder, NULL);
           setguard(du, GUARD_NONE);
-          fset(du, UFL_LONGACTION|UFL_NOTMOVING);
 #ifdef SIMPLE_ESCAPE
           if (du->status<=ST_FLEE) leave(du->region, du);
 #else
@@ -2605,6 +2603,7 @@ aftermath(battle * b)
             run_to(du, df->run.region);
             df->run.region = du->region;
           }
+          fset(du, UFL_LONGACTION|UFL_NOTMOVING);
 #endif /* SIMPLE_ESCAPE */
         } else {
           /* nur teilweise geflohene Einheiten mergen sich wieder */
