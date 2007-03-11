@@ -385,13 +385,23 @@ translate(const char* format, const void * userdata, const char* vars, variant a
 }
 
 static void
+eval_lt(opstack ** stack, const void * userdata) /* (int, int) -> int */
+{
+  int a = opop_i(stack);
+  int b = opop_i(stack);
+  int rval = (b<a)?1:0;
+  opush_i(stack, rval);
+  unused(userdata);
+}
+
+static void
 eval_eq(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	int a = opop_i(stack);
-	int b = opop_i(stack);
-	int rval = (a==b)?1:0;
-	opush_i(stack, rval);
-	unused(userdata);
+  int a = opop_i(stack);
+  int b = opop_i(stack);
+  int rval = (a==b)?1:0;
+  opush_i(stack, rval);
+  unused(userdata);
 }
 
 static void
@@ -465,14 +475,15 @@ eval_locale(opstack ** stack, const void * userdata) /* (string) -> locale */
 void
 translation_init(void)
 {
-	add_function("eq", &eval_eq);
-	add_function("int", &eval_int);
-	add_function("add", &eval_add);
-	add_function("strlen", &eval_strlen);
-	add_function("if", &eval_if);
-	add_function("isnull", &eval_isnull);
-	add_function("localize", &eval_localize);
-	add_function("locale", &eval_locale);
+  add_function("lt", &eval_lt);
+  add_function("eq", &eval_eq);
+  add_function("int", &eval_int);
+  add_function("add", &eval_add);
+  add_function("strlen", &eval_strlen);
+  add_function("if", &eval_if);
+  add_function("isnull", &eval_isnull);
+  add_function("localize", &eval_localize);
+  add_function("locale", &eval_locale);
 }
 
 void
