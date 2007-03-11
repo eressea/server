@@ -4391,6 +4391,7 @@ sp_generous(castorder *co)
   double force = co->force;
   int duration = (int)force+1;
   variant effect;
+  message * msg[2] = { NULL, NULL };
 
   if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
     sprintf(buf, "%s in %s: Die Stimmung in %s ist so schlecht, das "
@@ -4406,19 +4407,20 @@ sp_generous(castorder *co)
   for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
   for (u = r->units; u; u = u->next ) {
     if (!fval(u->faction, FL_DH) ) {
+      message * m = NULL;
       fset(u->faction, FL_DH);
       if (cansee(u->faction, r, mage, 0)) {
-        sprintf(buf, "%s's Gesangskunst begeistert die Leute. Die "
-            "fröhliche und ausgelassene Stimmung der Lieder überträgt "
-            "sich auf alle Zuhörer.", unitname(mage));
-      }else{
-        sprintf(buf, "Die Darbietungen eines fahrenden Gauklers begeistern "
-            "die Leute. Die fröhliche und ausgelassene Stimmung seiner "
-            "Lieder überträgt sich auf alle Zuhörer.");
+        if (msg[0]==NULL) msg[0] = msg_message("song_of_peace_effect_0", "mage", mage);
+        m = msg[0];
+      } else {
+        if (msg[1]==NULL) msg[1] = msg_message("song_of_peace_effect_1", "");
+        m = msg[1];
       }
-      addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+      r_addmessage(r, u->faction, m);
     }
   }
+  if (msg[0]) msg_release(msg[0]);
+  if (msg[1]) msg_release(msg[1]);
   return cast_level;
 }
 

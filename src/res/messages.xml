@@ -6540,6 +6540,17 @@
     <text locale="de">"$unit($mage) zaubert $spell($spell): $int($dead) $if($eq($dead,1),"Krieger wurde", "Krieger wurden") getötet."</text>
     <text locale="en">"$unit($mage) casts $spell($spell): $int($dead) $if($eq($dead,1),"enemy was", "enemies were") killed."</text>
   </message>
+  <message name="generous_effect_1" section="magic">
+    <text locale="de">"Die Darbietungen eines fahrenden Gauklers begeistern die Leute. Die fröhliche und ausgelassene Stimmung seiner Lieder überträgt sich auf alle Zuhörer."</text>
+    <text locale="en">"A touring minstrel entertains the locals. The joyous and generous disposition of his songs prove infectious."</text>
+  </message>
+  <message name="generous_effect_0" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"Die Darbietungen von $unit($mage) begeistern die Leute. Die fröhliche und ausgelassene Stimmung seiner Lieder überträgt sich auf alle Zuhörer."</text>
+    <text locale="en">"$unit($mage) entertains the locals. The joyous and generous disposition of his songs prove infectious."</text>
+  </message>
   <message name="song_of_peace_effect_1" section="magic">
     <text locale="de">"In der Luft liegt ein wunderschönes Lied, dessen friedfertiger Stimmung sich niemand entziehen kann. Einige Leute werfen sogar ihre Waffen weg."</text>
     <text locale="en">"A wondrous song fills the air and enchants the public. The song's peaceful melody makes several listeners drop their weapon."</text>
