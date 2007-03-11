@@ -4347,25 +4347,27 @@ sp_song_of_peace(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   int duration = 2 + lovar(force/2);
+  message * msg[2] = { NULL, NULL };
 
-  create_curse(mage,&r->attribs, ct_find("peacezone"), force, duration, zero_effect, 0);
+  create_curse(mage, &r->attribs, ct_find("peacezone"), force, duration, zero_effect, 0);
 
   for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
   for (u = r->units; u; u = u->next ) {
     if (!fval(u->faction, FL_DH) ) {
+      message * m = NULL;
       fset(u->faction, FL_DH);
       if (cansee(u->faction, r, mage, 0)) {
-        sprintf(buf, "%s's Gesangskunst begeistert die Leute. Die "
-            "friedfertige Stimmung des Lieds überträgt sich auf alle "
-            "Zuhörer. Einige werfen ihre Waffen weg.", unitname(mage));
-      }else{
-        sprintf(buf, "In der Luft liegt ein wunderschönes Lied, dessen "
-            "friedfertiger Stimmung sich niemand entziehen kann. "
-            "Einige Leute werfen sogar ihre Waffen weg.");
+        if (msg[0]==NULL) msg[0] = msg_message("song_of_peace_effect_0", "mage", mage);
+        m = msg[0];
+      } else {
+        if (msg[1]==NULL) msg[1] = msg_message("song_of_peace_effect_1", "");
+        m = msg[1];
       }
-      addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+      r_addmessage(r, u->faction, m);
     }
   }
+  if (msg[0]) msg_release(msg[0]);
+  if (msg[1]) msg_release(msg[1]);
   return cast_level;
 
 }
