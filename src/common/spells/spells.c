@@ -5846,7 +5846,7 @@ sp_pullastral(castorder *co)
 
       u = spobj->data.u;
 
-      if (u->region!=r) {
+      if (u->region!=ro) {
         /* Report this as unit not found */
         if (spobj->typ == SPP_UNIT) {
           spobj->data.i = u->no;
