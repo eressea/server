@@ -2636,10 +2636,11 @@ aftermath(battle * b)
           /* Report the casualties */
           reportcasualties(b, df, dead);
 
-          setguard(du, GUARD_NONE);
-          scale_number(du, 0);
           /* Distribute Loot */
           loot_items(df);
+
+          setguard(du, GUARD_NONE);
+          scale_number(du, 0);
         } else {
           df->run.number = 0;
           df->run.hp = 0;
