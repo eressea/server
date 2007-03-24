@@ -2291,10 +2291,6 @@ hunt(unit *u, order * ord)
     cmistake(u, ord, 146, MSG_MOVE);
     fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
     return 0;
-  } else if (fval(u, UFL_NOTMOVING)) {
-    cmistake(u, ord, 319, MSG_MOVE);
-    fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
-    return 0;
   } else if (!can_move(u)) {
     cmistake(u, ord, 55, MSG_MOVE);
     fset(u, UFL_LONGACTION|UFL_NOTMOVING); /* FOLGE SCHIFF ist immer lang */
@@ -2491,9 +2487,10 @@ movement(void)
             if (fval(u, UFL_LONGACTION)) {
               cmistake(u, u->thisorder, 52, MSG_MOVE);
               set_order(&u->thisorder, NULL);
+            } else {
+              cmistake(u, u->thisorder, 319, MSG_MOVE);
+              set_order(&u->thisorder, NULL);
             }
-            cmistake(u, u->thisorder, 319, MSG_MOVE);
-            set_order(&u->thisorder, NULL);
           } else if (fval(u, UFL_MOVED)) {
             cmistake(u, u->thisorder, 187, MSG_MOVE);
             set_order(&u->thisorder, NULL);
