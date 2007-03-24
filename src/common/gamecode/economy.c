@@ -1634,6 +1634,11 @@ make_cmd(unit * u, struct order * ord)
 
   if (u->number==0) return 0;
 
+  if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]) {
+    cmistake(u, ord, 242, MSG_INCOME);
+    return;
+  }
+
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
