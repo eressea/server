@@ -4135,12 +4135,12 @@ sp_rallypeasantmob(castorder *co)
     if (!fval(mage->faction, FL_DH)) {
       sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
           unitname(mage), regionname(r, u->faction));
-      addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
+      addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
     }
   } else {
     sprintf(buf, "Der Bauernaufstand in %s hatte sich bereits verlaufen.",
-        regionname(r, u->faction));
-    addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
+        regionname(r, mage->faction));
+    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
   }
   return erfolg;
 }
