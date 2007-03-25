@@ -512,9 +512,9 @@
       <arg name="unit" type="unit"/>
       <arg name="index" type="int"/>
     </type>
-    <text locale="de">"$int36(${unit}.id($unit))/$int($index) erzielt einen kritischen Treffer."</text>
-    <text locale="fr">"$int36(${unit}.id($unit))/$int($index) does critical damage."</text>
-    <text locale="en">"$int36(${unit}.id($unit))/$int($index) does critical damage."</text>
+    <text locale="de">"$int36($unit.id($unit))/$int($index) erzielt einen kritischen Treffer."</text>
+    <text locale="fr">"$int36($unit.id($unit))/$int($index) does critical damage."</text>
+    <text locale="en">"$int36($unit.id($unit))/$int($index) does critical damage."</text>
   </message>
   <message name="teach_asgood" section="errors">
     <type>
@@ -688,8 +688,7 @@
       <arg name="ship" type="ship"/>
     </type>
     <text locale="de">"Die Mannschaft krank vom vergifteten Wasser, Planken, Ruder und Segel zerfressen von den Wassern des verfluchten Meeres, ergibt sich die $ship($ship) in ihr Schicksal und sinkt."</text>
-    <text locale="fr">"The sailors sick due to the poisened ocean, planks, rudder und sails corroded by the waters of the cursed ocean, the $ship($ship) finally succumbs to her destiny and sinks."</text>
-    <text locale="en">"The sailors sick due to the poisened ocean, planks, rudder und sails corroded by the waters of the cursed ocean, the $ship($ship) finally succumbs to her destiny and sinks."</text>
+    <text locale="en">"Her sailors sick from the poisened ocean, planks, rudder und sails corroded by the waters of the cursed ocean, the $ship($ship) finally succumbs to her destiny and sinks."</text>
   </message>
   <message name="skillpotion_use" section="events">
     <type>
@@ -2686,6 +2685,14 @@
     <text locale="de">"$unit($unit) verspeiste $int($amount) Bauern."</text>
     <text locale="fr">"$unit($unit) ate $int($amount) peasants."</text>
     <text locale="en">"$unit($unit) ate $int($amount) peasants."</text>
+  </message>
+  <message name="wrongpasswd" section="events">
+    <type>
+      <arg name="faction" type="int"/>
+      <arg name="password" type="string"/>
+    </type>
+    <text locale="de">"ERESSEA $atoi36($faction) \"${password}\" - Deine Befehle hatten ein falsches Passwort."</text>
+    <text locale="en">"ERESSEA $atoi36($faction) \"${password}\" - Your orders had the wrong password."</text>
   </message>
   <message name="changepasswd" section="events">
     <type>

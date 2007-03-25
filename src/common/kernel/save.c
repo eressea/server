@@ -562,8 +562,8 @@ factionorders(void)
     
     if (checkpasswd(f, pass, true) == false) {
       log_warning(("Invalid password for faction %s\n", fid));
-      ADDMSG(&f->msgs, msg_message("msg_errors", "string",
-                                   "Das Passwort wurde falsch eingegeben"));
+      ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
+                                   f->no, pass));
       return 0;
     }
     /* Die Partei hat sich zumindest gemeldet, so daß sie noch
