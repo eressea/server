@@ -5100,10 +5100,10 @@
     </string>
     <string name="ironkeeper">
       <text locale="de">Erschafft einen Wächtergeist, der
-        Eisen- und Laenabbau durch nichtalliierte
-        Parteien (HELFE BEWACHE) verhindert, solange er
-        die Region bewacht. Der Bergwächter ist an den
-        Ort der Beschwörung gebunden.</text>
+        in Gletschern und Bergen Eisen- und Laenabbau durch
+        nichtalliierte Parteien (HELFE BEWACHE) verhindert, 
+        solange er die Region bewacht. Der Bergwächter ist 
+        an den Ort der Beschwörung gebunden.</text>
       <text locale="en">Creates a guardian spirit on a
         mountain or glacier that keeps all factions that
         are not allied (HELP GUARD) from mining iron or
