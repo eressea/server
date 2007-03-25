@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-extern void teaching(struct region * r);
+extern int teach_cmd(struct unit * u, struct order * ord);
 extern int learn_cmd(struct unit * u, struct order * ord);
 
 extern magic_t getmagicskill(void);

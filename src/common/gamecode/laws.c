@@ -3688,14 +3688,18 @@ claim_cmd(unit * u, struct order * ord)
   return 0;
 }
 
+enum {
+  PROC_THISORDER = 1<<0,
+  PROC_LONGORDER = 1<<1
+};
 typedef struct processor {
   struct processor * next;
   int priority;
   enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } type;
+  unsigned int flags;
   union {
     struct {
       keyword_t kword;
-      boolean thisorder;
       int (*process)(struct unit *, struct order *);
     } per_order;
     struct {
@@ -3736,13 +3740,13 @@ add_proc(int priority, const char * name, int type)
 }
 
 void
-add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struct order *), boolean thisorder, const char * name)
+add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struct order *), unsigned int flags, const char * name)
 {
   processor * proc = add_proc(priority, name, PR_ORDER);
   if (proc) {
     proc->data.per_order.process = parser;
     proc->data.per_order.kword = kword;
-    proc->data.per_order.thisorder = thisorder;
+    proc->flags = flags;
   }
 }
 
@@ -3827,13 +3831,31 @@ process(void)
           porder = punit;
           while (porder && porder->priority==prio && porder->type==PR_ORDER) {
             order ** ordp = &u->orders;
-            if (porder->data.per_order.thisorder) ordp = &u->thisorder;
+            if (porder->flags & PROC_THISORDER) ordp = &u->thisorder;
             while (*ordp) {
               order * ord = *ordp;
               if (get_keyword(ord) == porder->data.per_order.kword) {
-                porder->data.per_order.process(u, ord);
+                if (u->number==0) {
+                  ord = NULL;
+                } else if (porder->flags & PROC_LONGORDER) {
+                  if (u->race == new_race[RC_INSECT] && r_insectstalled(r) && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
+                    ord = NULL;
+                  } else if (LongHunger(u)) {
+                    cmistake(u, ord, 224, MSG_MAGIC);
+                    ord = NULL;
+                  } else if (fval(u, UFL_LONGACTION)) {
+                    cmistake(u, ord, 52, MSG_PRODUCE);
+                    ord = NULL;
+                  } else if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
+                    cmistake(u, ord, 242, MSG_INCOME);
+                    ord = NULL;
+                  }
+                }
+                if (ord) {
+                  porder->data.per_order.process(u, ord);
+                }
               }
-              if (*ordp==ord) ordp=&ord->next;
+              if (!ord || *ordp==ord) ordp=&(*ordp)->next;
             }
             porder = porder->next;
           }
@@ -3876,28 +3898,28 @@ processorders (void)
 
   p+=10;
   add_proc_unit(p, &setdefaults, "Default-Befehle");
-  add_proc_order(p, K_BANNER, &banner_cmd, false, NULL);
-  add_proc_order(p, K_EMAIL, &email_cmd, false, NULL);
-  add_proc_order(p, K_PASSWORD, &password_cmd, false, NULL);
-  add_proc_order(p, K_SEND, &send_cmd, false, NULL);
-  add_proc_order(p, K_GROUP, &group_cmd, false, NULL);
+  add_proc_order(p, K_BANNER, &banner_cmd, 0, NULL);
+  add_proc_order(p, K_EMAIL, &email_cmd, 0, NULL);
+  add_proc_order(p, K_PASSWORD, &password_cmd, 0, NULL);
+  add_proc_order(p, K_SEND, &send_cmd, 0, NULL);
+  add_proc_order(p, K_GROUP, &group_cmd, 0, NULL);
 
   p+=10;
   add_proc_unit(p, &reset_moved, "Instant-Befehle");
-  add_proc_order(p, K_QUIT, &quit_cmd, false, NULL);
-  add_proc_order(p, K_URSPRUNG, &origin_cmd, false, NULL);
-  add_proc_order(p, K_ALLY, &ally_cmd, false, NULL);
-  add_proc_order(p, K_PREFIX, &prefix_cmd, false, NULL);
-  add_proc_order(p, K_SYNONYM, &synonym_cmd, false, NULL);
-  add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, false, NULL);
-  add_proc_order(p, K_STATUS, &status_cmd, false, NULL);
-  add_proc_order(p, K_COMBAT, &combatspell_cmd, false, NULL);
-  add_proc_order(p, K_DISPLAY, &display_cmd, false, NULL);
-  add_proc_order(p, K_NAME, &name_cmd, false, NULL);
-  add_proc_order(p, K_GUARD, &guard_off_cmd, false, NULL);
-  add_proc_order(p, K_RESHOW, &reshow_cmd, false, NULL);
+  add_proc_order(p, K_QUIT, &quit_cmd, 0, NULL);
+  add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
+  add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
+  add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
+  add_proc_order(p, K_SYNONYM, &synonym_cmd, 0, NULL);
+  add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
+  add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
+  add_proc_order(p, K_COMBAT, &combatspell_cmd, 0, NULL);
+  add_proc_order(p, K_DISPLAY, &display_cmd, 0, NULL);
+  add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
+  add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
+  add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
 #ifdef KARMA_MODULE
-  add_proc_order(p, K_WEREWOLF, &setwere_cmd, false, NULL);
+  add_proc_order(p, K_WEREWOLF, &setwere_cmd, 0, NULL);
 #endif /* KARMA_MODULE */
 
   if (alliances!=NULL) {
@@ -3907,12 +3929,12 @@ processorders (void)
 
   p+=10;
   add_proc_global(p, &age_factions, "Parteienalter++");
-  add_proc_order(p, K_MAIL, &mail_cmd, false, "Botschaften");
-  add_proc_order(p, K_CLAIM, &claim_cmd, false, NULL);
+  add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
+  add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
 
   p+=10; /* all claims must be done before we can USE */
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
-  add_proc_order(p, K_USE, &use_cmd, false, "Benutzen");
+  add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
   if (alliances!=NULL) {
     p+=10; /* in case USE changes it */
@@ -3925,7 +3947,7 @@ processorders (void)
   add_proc_global(p, &gmcommands, "GM Kommandos");
 
   p += 10; /* in case it has any effects on allincevictories */
-  add_proc_order(p, K_LEAVE, &leave_cmd, false, "Verlassen");
+  add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
   if (!nobattle) {
 #ifdef KARMA_MODULE
@@ -3941,7 +3963,7 @@ processorders (void)
 
   p+=10; /* can't allow reserve before siege (weapons) */
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (2. Versuch)");
-  add_proc_order(p, K_RESERVE, &reserve_cmd, false, "Reservieren");
+  add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "Reservieren");
   add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
 
   p+=10; /* rest rng again before economics */
@@ -3960,13 +3982,14 @@ processorders (void)
 
   p+=10;
   if (!global.disabled[K_TEACH]) {
-    add_proc_region(p, &teaching, "Lehren");
+    add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER|PROC_LONGORDER, "Lehren");
   }
-  add_proc_order(p, K_STUDY, &learn_cmd, true, "Lernen");
+  p+=10;
+  add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER|PROC_LONGORDER, "Lernen");
 
   p+=10;
   add_proc_global(p, &produce, "Arbeiten, Handel, Rekruten");
-  add_proc_order(p, K_MAKE, &make_cmd, true, "Produktion");
+  add_proc_order(p, K_MAKE, &make_cmd, PROC_THISORDER|PROC_LONGORDER, "Produktion");
   add_proc_postregion(p, &split_allocations, "Produktion II");
 
   p+=10;
@@ -3979,10 +4002,10 @@ processorders (void)
   add_proc_global(p, &movement, "Bewegungen");
 
   p+=10;
-  add_proc_order(p, K_GUARD, &guard_on_cmd, false, "Bewache (an)");
+  add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
 #ifdef XECMD_MODULE
   /* can do together with guard */
-  add_proc_order(p, K_LEAVE, &xecmd, false, "Zeitung");
+  add_proc_order(p, K_LEAVE, &xecmd, 0, "Zeitung");
 #endif
 
   p+=10;
@@ -4018,9 +4041,9 @@ processorders (void)
   add_proc_global(p, &declare_war, "Krieg & Frieden");
 #endif
 #ifdef HEROES
-  add_proc_order(p, K_PROMOTION, &promotion_cmd, false, "Heldenbeförderung");
+  add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbeförderung");
 #endif
-  add_proc_order(p, K_NUMBER, &renumber_cmd, false, "Neue Nummern (Einheiten)");
+  add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
 
   p+=10;
   add_proc_global(p, &renumber_factions, "Neue Nummern");

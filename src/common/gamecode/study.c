@@ -238,22 +238,33 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
   return n;
 }
 
-static void
-teach(unit * u, struct order * ord)
+int
+teach_cmd(unit * u, struct order * ord)
 {
+  static const curse_type * gbdream_ct = NULL;
+
   region * r = u->region;
   int teaching, i, j, count, academy=0;
   unit *u2;
   skill_t sk = NOSKILL;
 
+  if (gbdream_ct==0) gbdream_ct = ct_find("gbdream");
+  if (gbdream_ct) {
+    if (get_curse(u->region->attribs, gbdream_ct)) {
+      ADDMSG(&u->faction->msgs, 
+        msg_feedback(u, ord, "gbdream_noteach", ""));
+      return 0;
+    }
+  }
+
   if ((u->race->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
     cmistake(u, ord, 274, MSG_EVENT);
-    return;
+    return 0;
   }
 
   if (r->planep && fval(r->planep, PFL_NOTEACH)) {
     cmistake(u, ord, 273, MSG_EVENT);
-    return;
+    return 0;
   }
 
   teaching = u->number * 30 * TEACHNUMBER;
@@ -267,7 +278,7 @@ teach(unit * u, struct order * ord)
     ADDMSG(&u->faction->msgs, msg_message("teachdumb",
       "teacher amount", u, j));
   }
-  if (teaching == 0) return;
+  if (teaching == 0) return 0;
 
 
   u2 = 0;
@@ -436,6 +447,7 @@ teach(unit * u, struct order * ord)
     academy = academy/30; /* anzahl gelehrter wochen, max. 10 */
     learn_skill(u, sk, academy/30.0/TEACHNUMBER);
   }
+  return 0;
 }
 /* ------------------------------------------------------------- */
 
@@ -460,23 +472,6 @@ learn_cmd(unit * u, order * ord)
     else learn_newskills = 1;
   }
 
-  if (u->number==0) return 0;
-  if (fval(r->terrain, SEA_REGION)) {
-    /* sonderbehandlung aller die auf Ozeanen lernen können */
-    if (u->race!=new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
-      return 0;
-    }
-  }
-  if (fval(u, UFL_LONGACTION)) return 0;
-
-  if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
-    && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
-    return 0;
-  }
-  if (fval(u, UFL_LONGACTION)) {
-    cmistake(u, ord, 52, MSG_PRODUCE);
-    return 0;
-  }
   if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
     sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
     mistake(u, ord, buf, MSG_EVENT);
@@ -743,52 +738,4 @@ learn_cmd(unit * u, order * ord)
     }
   }
   return 0;
-}
-
-void
-teaching(region *r)
-{
-	/* das sind alles befehle, die 30 tage brauchen, und die in thisorder
-	 * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
-	 * (dosetdefaults).
-	 *
-	 * lehren vor lernen. */
-
-  unit *u;
-
-	for (u = r->units; u; u = u->next) {
-
-		if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
-			continue;
-
-		if (fval(r->terrain, SEA_REGION)
-				&& u->race != new_race[RC_AQUARIAN]
-				&& !(u->race->flags & RCF_SWIM))
-				continue;
-
-		if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
-				&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
-			continue;
-		}
-
-		switch (get_keyword(u->thisorder)) {
-		case K_TEACH:
-			if (fval(u, UFL_LONGACTION)) {
-				cmistake(u, u->thisorder, 52, MSG_PRODUCE);
-				continue;
-			} else {
-        static const curse_type * gbdream_ct = NULL;
-        if (gbdream_ct==0) gbdream_ct = ct_find("gbdream");
-        if (gbdream_ct) {
-          if (get_curse(u->region->attribs, gbdream_ct)) {
-            ADDMSG(&u->faction->msgs, 
-              msg_feedback(u, u->thisorder, "gbdream_noteach", ""));
-            continue;
-          }
-        }
-      }
-			teach(u, u->thisorder);
-			break;
-		}
-	}
 }

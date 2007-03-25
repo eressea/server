@@ -270,7 +270,7 @@ give_starting_equipment(struct unit *u)
 boolean
 r_insectstalled(const region * r)
 {
-	return fval(r->terrain, ARCTIC_REGION);
+  return fval(r->terrain, ARCTIC_REGION);
 }
 
 const char *

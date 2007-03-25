@@ -1604,20 +1604,20 @@ create_potion(unit * u, const potion_type * ptype, int want)
 static void
 create_item(unit * u, const item_type * itype, int want)
 {
-	if (fval(itype->rtype, RTF_LIMITED)) {
+  if (fval(itype->rtype, RTF_LIMITED)) {
 #if GUARD_DISABLES_PRODUCTION == 1
-		if(is_guarded(u->region, u, GUARD_PRODUCE)) {
-			cmistake(u, u->thisorder, 70, MSG_EVENT);
-			return;
-		}
+    if(is_guarded(u->region, u, GUARD_PRODUCE)) {
+      cmistake(u, u->thisorder, 70, MSG_EVENT);
+      return;
+    }
 #endif
-		allocate_resource(u, itype->rtype, want);
-	} else {
-		const potion_type * ptype = resource2potion(itype->rtype);
-		if (ptype!=NULL) create_potion(u, ptype, want);
-		else if (itype->construction && itype->construction->materials) manufacture(u, itype, want);
-		else cmistake(u, u->thisorder, 125, MSG_PRODUCE);
-	}
+    allocate_resource(u, itype->rtype, want);
+  } else {
+    const potion_type * ptype = resource2potion(itype->rtype);
+    if (ptype!=NULL) create_potion(u, ptype, want);
+    else if (itype->construction && itype->construction->materials) manufacture(u, itype, want);
+    else cmistake(u, u->thisorder, 125, MSG_PRODUCE);
+  }
 }
 
 int
@@ -1631,13 +1631,6 @@ make_cmd(unit * u, struct order * ord)
   const item_type * itype;
   const char *s;
   const struct locale * lang = u->faction->locale;
-
-  if (u->number==0) return 0;
-
-  if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]) {
-    cmistake(u, ord, 242, MSG_INCOME);
-    return;
-  }
 
   init_tokens(ord);
   skip_token();

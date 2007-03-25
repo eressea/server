@@ -49,41 +49,41 @@
 void
 herbsearch(region * r, unit * u, int max)
 {
-	int herbsfound;
-	const item_type * whichherb;
+  int herbsfound;
+  const item_type * whichherb;
 
-	if (eff_skill(u, SK_HERBALISM, r) == 0) {
-		cmistake(u, u->thisorder, 59, MSG_PRODUCE);
-		return;
-	}
+  if (eff_skill(u, SK_HERBALISM, r) == 0) {
+    cmistake(u, u->thisorder, 59, MSG_PRODUCE);
+    return;
+  }
 
-	if(is_guarded(r, u, GUARD_PRODUCE)) {
-		cmistake(u, u->thisorder, 70, MSG_EVENT);
-		return;
-	}
+  if(is_guarded(r, u, GUARD_PRODUCE)) {
+    cmistake(u, u->thisorder, 70, MSG_EVENT);
+    return;
+  }
 
-	whichherb = rherbtype(r);
-	if (whichherb == NULL) {
-		cmistake(u, u->thisorder, 108, MSG_PRODUCE);
-		return;
-	}
+  whichherb = rherbtype(r);
+  if (whichherb == NULL) {
+    cmistake(u, u->thisorder, 108, MSG_PRODUCE);
+    return;
+  }
 
-	if (max) max = min(max, rherbs(r));
-	else max = rherbs(r);
-	herbsfound = ntimespprob(eff_skill(u, SK_HERBALISM, r) * u->number,
-			(double)rherbs(r)/100.0L, -0.01L);
-	herbsfound = min(herbsfound, max);
-	rsetherbs(r, rherbs(r)-herbsfound);
+  if (max) max = min(max, rherbs(r));
+  else max = rherbs(r);
+  herbsfound = ntimespprob(eff_skill(u, SK_HERBALISM, r) * u->number,
+    (double)rherbs(r)/100.0L, -0.01L);
+  herbsfound = min(herbsfound, max);
+  rsetherbs(r, rherbs(r)-herbsfound);
 
-	if (herbsfound) {
-		produceexp(u, SK_HERBALISM, u->number);
-		i_change(&u->items, whichherb, herbsfound);
-		ADDMSG(&u->faction->msgs, msg_message("herbfound", 
+  if (herbsfound) {
+    produceexp(u, SK_HERBALISM, u->number);
+    i_change(&u->items, whichherb, herbsfound);
+    ADDMSG(&u->faction->msgs, msg_message("herbfound", 
       "unit region amount herb", u, r, herbsfound, whichherb->rtype));
-	} else {
+  } else {
     ADDMSG(&u->faction->msgs, msg_message("researchherb_none",
       "unit region", u, u->region));
-	}
+  }
 }
 
 int
