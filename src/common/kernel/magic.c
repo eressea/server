@@ -2723,7 +2723,7 @@ magic(void)
 
       if (co->level < 1) {
         /* Fehlermeldung mit Komponenten generieren */
-        cancast(u, sp, co->level, co->distance, ord);
+        cancast(u, sp, cast_level, co->distance, ord);
         continue;
       }
 
