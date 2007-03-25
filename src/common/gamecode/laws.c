@@ -3835,10 +3835,10 @@ process(void)
             while (*ordp) {
               order * ord = *ordp;
               if (get_keyword(ord) == porder->data.per_order.kword) {
-                if (u->number==0) {
-                  ord = NULL;
-                } else if (porder->flags & PROC_LONGORDER) {
-                  if (u->race == new_race[RC_INSECT] && r_insectstalled(r) && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
+                if (porder->flags & PROC_LONGORDER) {
+                  if (u->number==0) {
+                    ord = NULL;
+                  } else if (u->race == new_race[RC_INSECT] && r_insectstalled(r) && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
                     ord = NULL;
                   } else if (LongHunger(u)) {
                     cmistake(u, ord, 224, MSG_MAGIC);

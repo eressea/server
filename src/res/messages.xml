@@ -2985,7 +2985,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie veruscht zu fliehen."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie versucht zu fliehen."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it's trying to flee."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it's trying to flee."</text>
   </message>
@@ -5511,6 +5511,32 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit could not be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit could not be found."</text>
   </message>
+
+  <message name="seduce_effect" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und gut verspielt."</text>
+    <text locale="en">"$unit($unit) gambles for high stakes and loses almost everything."</text>
+  </message>
+
+  <message name="shapeshift_effect" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="target" type="unit"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($mage) läßt $unit($target) als $race($race,$unit.number($target)) erscheinen."</text>
+    <text locale="en">"$unit($mage) makes $unit($target) appear as $race($race,$unit.number($target))."</text>
+  </message>
+
+  <message name="magicresistance_effect" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) wird kurz von einem magischen Licht umhüllt."</text>
+    <text locale="en">"$unit($unit) is briefly surrounded by a magical light."</text>
+  </message>
   <message name="stormwinds_effect" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -6619,7 +6645,7 @@
   </message>
   <message name="spellfail::contact" section="magic">
     <type>
-      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
       <arg name="target" type="unit"/>

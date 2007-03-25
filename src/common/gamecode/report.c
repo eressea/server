@@ -2850,6 +2850,16 @@ eval_unitid(struct opstack ** stack, const void * userdata) /* unit -> int */
 }
 
 static void
+eval_unitsize(struct opstack ** stack, const void * userdata) /* unit -> int */
+{
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  variant var;
+
+  var.i = u->number;
+  opush(stack, var);
+}
+
+static void
 eval_faction(struct opstack ** stack, const void * userdata) /* faction -> string */
 {
   const struct faction * f = (const struct faction *)opop(stack).v;
@@ -3080,6 +3090,7 @@ report_init(void)
   add_function("unit.dative", &eval_unit_dative);
   add_function("unit.name", &eval_unitname);
   add_function("unit.id", &eval_unitid);
+  add_function("unit.size", &eval_unitsize);
   add_function("building", &eval_building);
   add_function("skill", &eval_skill);
   add_function("order", &eval_order);

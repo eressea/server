@@ -1934,8 +1934,7 @@ sp_treewalkexit(castorder *co)
       if (!can_survive(u, rt)) {
         cmistake(mage, co->order, 231, MSG_MAGIC);
       } else if (remaining_cap - w < 0) {
-        sprintf(buf, "%s ist zu schwer.", unitname(u));
-        addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy", "target", u));
       } else {
         message * m;
 
@@ -4315,9 +4314,8 @@ sp_migranten(castorder *co)
   }
 
   if (kontaktiert == 0) {
-    ADDMSG(&mage->faction->msgs, msg_message("spellfail::contact",
-      "mage region command target", mage, mage->region, co->order,
-      target));
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail::contact", "target", target));
     return 0;
   }
   u_setfaction(target,mage->faction);
@@ -4668,9 +4666,7 @@ sp_seduce(castorder *co)
   scat(".");
   addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
-  sprintf(buf, "%s verfiel dem Glücksspiel und hat fast sein ganzes Hab "
-      "und Gut verspielt.", unitname(target));
-  addmessage(r, target->faction, buf, MSG_EVENT, ML_WARN);
+  ADDMSG(&target->faction->msgs, msg_message("seduce_effect", "unit", target));
 
   return cast_level;
 }
@@ -5083,7 +5079,6 @@ sp_illusionary_shapeshift(castorder *co)
 {
   unit *u;
   const race * rc;
-  region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
@@ -5115,9 +5110,7 @@ sp_illusionary_shapeshift(castorder *co)
   }
   u->irace = rc;
 
-  sprintf(buf, "%s läßt %s als %s erscheinen.",
-    unitname(mage), unitname(u), LOC(u->faction->locale, rc_name(rc, u->number != 1)));
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("shapeshift_effect", "mage target race", mage, u, rc));
 
   return cast_level;
 }
@@ -5632,6 +5625,7 @@ sp_resist_magic_bonus(castorder *co)
 
   /* Schleife über alle angegebenen Einheiten */
   for (n = 0; n < pa->length; n++) {
+    message * msg;
     /* sollte nie negativ werden */
     if (opfer < 1)
       break;
@@ -5655,13 +5649,14 @@ sp_resist_magic_bonus(castorder *co)
     create_curse(mage, &u->attribs, ct_find("magicresistance"),
       power, duration, resistbonus, m);
 
-    sprintf(buf, "%s wird kurz von einem magischen Licht umhüllt.",
-        unitname(u));
-    addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+    msg = msg_message("magicresistance_effect", "unit", u);
+    add_message(&u->faction->msgs, msg);
 
     /* und noch einmal dem Magier melden */
-    if (u->faction != mage->faction)
-      addmessage(mage->region, mage->faction, buf, MSG_MAGIC, ML_INFO);
+    if (u->faction != mage->faction) {
+      add_message(&mage->faction->msgs, msg);
+    }
+    msg_release(msg);
   }
   /* pro 5 nicht verzauberte Personen kann der Level und damit die
    * Kosten des Zaubers um 1 reduziert werden. (die Formel geht von
@@ -5740,8 +5735,7 @@ sp_enterastral(castorder *co)
     if (!can_survive(u, rt)) {
       cmistake(mage, co->order, 231, MSG_MAGIC);
     } else if (remaining_cap - w < 0) {
-      addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
-          MSG_MAGIC, ML_MISTAKE);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy", "target", u));
     } else {
       message * m;
       remaining_cap = remaining_cap - w;
@@ -5874,8 +5868,7 @@ sp_pullastral(castorder *co)
       if (!can_survive(u, rt)) {
         cmistake(mage, co->order, 231, MSG_MAGIC);
       } else if (remaining_cap - w < 0) {
-        addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
-          MSG_MAGIC, ML_MISTAKE);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy", "target", u));
       } else {
         message * m;
 
@@ -5988,8 +5981,7 @@ sp_leaveastral(castorder *co)
     if (!can_survive(u, rt)) {
       cmistake(mage, co->order, 231, MSG_MAGIC);
     } else if (remaining_cap - w < 0) {
-      addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
-        MSG_MAGIC, ML_MISTAKE);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy", "target", u));
     } else {
       message * m;
 
