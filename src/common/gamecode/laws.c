@@ -3847,7 +3847,8 @@ process(void)
                     cmistake(u, ord, 52, MSG_PRODUCE);
                     ord = NULL;
                   } else if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
-                    cmistake(u, ord, 242, MSG_INCOME);
+                    /* error message disabled by popular demand */
+                    /* cmistake(u, ord, 242, MSG_INCOME); */
                     ord = NULL;
                   }
                 }

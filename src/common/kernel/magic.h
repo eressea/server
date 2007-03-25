@@ -155,17 +155,17 @@ typedef struct spell_component {
 } spell_component;
 
 typedef struct spell {
-	spellid_t id;
-	char *sname;
-	char *syntax;
-	char *parameter;
-	magic_t magietyp;
-	int sptyp;
-	char rank;  /* Reihenfolge der Zauber */
-	int level;  /* Stufe des Zaubers */
-	struct spell_component * components;
-	spell_f sp_function;
-	void (*patzer) (castorder*);
+  spellid_t id;
+  char *sname;
+  char *syntax;
+  char *parameter;
+  magic_t magietyp;
+  int sptyp;
+  int rank;  /* Reihenfolge der Zauber */
+  int level;  /* Stufe des Zaubers */
+  struct spell_component * components;
+  spell_f sp_function;
+  void (*patzer) (castorder*);
 } spell;
 
 typedef struct spell_list {
@@ -315,13 +315,18 @@ extern double spellpower(struct region *r, struct unit *u, const spell *sp, int 
 boolean fumble (struct region *r, struct unit *u, const spell *sp, int cast_level);
 	/*	true, wenn der Zauber misslingt, bei false gelingt der Zauber */
 
-/* */
+
+typedef struct spellrank {
+  struct castorder * begin;
+  struct castorder ** end;
+} spellrank;
+
 castorder *new_castorder(void *u, struct unit *familiar, const spell *sp, struct region *r,
 		int lev, double force, int distance, struct order * ord, spellparameter *p);
 	/* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
-void add_castorder(castorder **cll, castorder *co);
+void add_castorder(struct spellrank *cll, struct castorder *co);
 	/* Hänge c-order co an die letze c-order von cll an */
-void free_castorders(castorder *co);
+void free_castorders(struct castorder *co);
 	/* Speicher wieder freigeben */
 
 /* Prüfroutinen für Zaubern */

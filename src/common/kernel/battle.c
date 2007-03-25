@@ -1494,14 +1494,10 @@ do_combatmagic(battle *b, combatmagic_t was)
   side * s;
   region *r = b->region;
   castorder *co;
-  castorder *cll[MAX_SPELLRANK];
-  int level;
-  int spellrank;
-  int sl;
+  int level, rank, sl;
+  spellrank spellranks[MAX_SPELLRANK];
 
-  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-    cll[spellrank] = (castorder*)NULL;
-  }
+  memset(spellranks, 0, sizeof(spellranks));
 
   for (s = b->sides; s; s = s->next) {
     fighter * fig;
@@ -1561,13 +1557,13 @@ do_combatmagic(battle *b, combatmagic_t was)
           pay_spell(mage, sp, level, 1);
         } else {
           co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
-          add_castorder(&cll[(int)(sp->rank)], co);
+          add_castorder(&spellranks[sp->rank], co);
         }
       }
     }
   }
-  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-    for (co = cll[spellrank]; co; co = co->next) {
+  for (rank = 0; rank < MAX_SPELLRANK; rank++) {
+    for (co = spellranks[rank].begin; co; co = co->next) {
       fighter * fig = co->magician.fig;
       const spell * sp = co->sp;
       int level = co->level;
@@ -1583,8 +1579,8 @@ do_combatmagic(battle *b, combatmagic_t was)
       }
     }
   }
-  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-    free_castorders(cll[spellrank]);
+  for (rank = 0; rank < MAX_SPELLRANK; rank++) {
+    free_castorders(spellranks[rank].begin);
   }
 }
 
