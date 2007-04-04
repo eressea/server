@@ -9,7 +9,7 @@ function use_xmastree(u, amount)
 end
 
 function update_xmas2006()
-  if get_season == "winter" then
+  if get_season() == "winter" then
     msg = message("xmastree_effect")
     for r in regions() do
       if r:get_key("xm06") then
