@@ -2691,8 +2691,8 @@
       <arg name="faction" type="int"/>
       <arg name="password" type="string"/>
     </type>
-    <text locale="de">"ERESSEA $atoi36($faction) \"${password}\" - Deine Befehle hatten ein falsches Passwort."</text>
-    <text locale="en">"ERESSEA $atoi36($faction) \"${password}\" - Your orders had the wrong password."</text>
+    <text locale="de">"ERESSEA $int36($faction) \"${password}\" - Deine Befehle hatten ein falsches Passwort."</text>
+    <text locale="en">"ERESSEA $int36($faction) \"${password}\" - Your orders had the wrong password."</text>
   </message>
   <message name="changepasswd" section="events">
     <type>
@@ -5533,8 +5533,8 @@
       <arg name="target" type="unit"/>
       <arg name="race" type="race"/>
     </type>
-    <text locale="de">"$unit($mage) l‰ﬂt $unit($target) als $race($race,$unit.number($target)) erscheinen."</text>
-    <text locale="en">"$unit($mage) makes $unit($target) appear as $race($race,$unit.number($target))."</text>
+    <text locale="de">"$unit($mage) l‰ﬂt $unit($target) als $race($race,$unit.size($target)) erscheinen."</text>
+    <text locale="en">"$unit($mage) makes $unit($target) appear as $race($race,$unit.size($target))."</text>
   </message>
 
   <message name="magicresistance_effect" section="events">

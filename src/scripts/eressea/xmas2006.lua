@@ -9,12 +9,14 @@ function use_xmastree(u, amount)
 end
 
 function update_xmas2006()
-  if get_season() == "winter" then
+  season = get_season()
+  if season == "calendar::winter" then
+    print("it is " .. season .. ", the christmas trees do their magic")
     msg = message("xmastree_effect")
     for r in regions() do
       if r:get_key("xm06") then
         trees = r:get_resource("tree")
-        if trees>0 then
+        if trees*0.1>1 then
           r:set_resource("tree", trees * 1.1)
           msg:send_region(r)
         end
