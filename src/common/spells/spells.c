@@ -584,9 +584,7 @@ sp_summon_familiar(castorder *co)
 
   dh = 0;
   dh1 = 0;
-  sprintf(buf, "%s ruft einen Vertrauten. %s können ",
-    unitname(mage), LOC(mage->faction->locale, rc_name(rc, 1)));
-  for(sk=0;sk<MAXSKILLS;sk++) {
+  for (sk=0;sk<MAXSKILLS;sk++) {
     if (rc->bonus[sk] > -5) dh++;
   }
   for(sk=0;sk<MAXSKILLS;sk++) {
@@ -596,7 +594,7 @@ sp_summon_familiar(castorder *co)
         dh1 = 1;
       } else {
         if (dh == 0) {
-          scat(" und ");
+          scat(LOC(mage->faction->locale, "list_and"));
         } else {
           scat(", ");
         }
@@ -604,23 +602,8 @@ sp_summon_familiar(castorder *co)
       scat(skillname(sk, mage->faction->locale));
     }
   }
-  scat(" lernen.");
-  scat(" ");
-  scat("Der Vertraute verleiht dem Magier einen Bonus auf jedes Talent ");
-  scat("(ausgenommen Magie), welches der Vertraute beherrscht.");
-  scat(" ");
-  scat("Das spezielle Band zu seinem Vertrauten ermöglicht dem Magier ");
-  scat("auch, Sprüche durch diesen zu wirken. So gezauberte Sprüche ");
-  scat("wirken auf die Region des Vertrauten und brauchen keine Fernzauber ");
-  scat("zu sein. Die maximale Entfernung dafür entspricht dem Talent des ");
-  scat("Magiers. Einen Spruch durch das Vertrautenband zu richten ist ");
-  scat("jedoch gewissen Einschränkungen unterworfen. Die Stufe des Zaubers ");
-  scat("kann nicht größer als das Magietalent des Vertrauten oder das halbe ");
-  scat("Talent des Magiers sein. Auch verdoppeln sich die Kosten für den ");
-  scat("Spruch. (Um einen Zauber durch den Vertrauten zu wirken, gibt ");
-  scat("man statt dem Magier dem Vertrauten den Befehl ZAUBERE.)");
-
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",
+    "mage race skills", mage, rc, buf));
   return cast_level;
 }
 

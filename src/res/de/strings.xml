@@ -6837,4 +6837,9 @@
     <text locale="de">bewacht die Region</text>
     <text locale="en">guards the region</text>
   </string>
+
+  <string name="list_and">
+    <text locale="de"> und </text>
+    <text locale="en"> and </text>
+  </string>
 </strings>

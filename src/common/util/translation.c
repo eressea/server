@@ -198,187 +198,185 @@ static const char * parse(opstack **, const char* in, const void *);
 
 static const char *
 parse_symbol(opstack ** stack, const char* in, const void * userdata)
-	/* in is the symbol name and following text, starting after the $ 
-	 * result goes on the stack
-	 */
+/* in is the symbol name and following text, starting after the $ 
+ * result goes on the stack
+ */
 {
-	boolean braces = false;
-	char symbol[32];
-	char *cp = symbol; /* current position */
+  boolean braces = false;
+  char symbol[32];
+  char *cp = symbol; /* current position */
 
-	if (*in=='{') {
-		braces = true;
-		++in;
-	}
-	while (isalnum(*in) || *in=='.') *cp++ = *in++;
-	*cp = '\0';
-	/* symbol will now contain the symbol name */
-	if (*in=='(') {
-		/* it's a function we need to parse 
-		 * start by reading the parameters
-		 */
-		function * foo;
-		while (*in != ')') {
-			in = parse(stack, ++in, userdata); /* will push the result on the stack */
-			if (in==NULL) return NULL;
-		}
-		++in;
-		foo = find_function(symbol);
+  if (*in=='{') {
+    braces = true;
+    ++in;
+  }
+  while (isalnum(*in) || *in=='.') *cp++ = *in++;
+  *cp = '\0';
+  /* symbol will now contain the symbol name */
+  if (*in=='(') {
+    /* it's a function we need to parse, start by reading the parameters */
+    function * foo;
+    while (*in != ')') {
+      in = parse(stack, ++in, userdata); /* will push the result on the stack */
+      if (in==NULL) return NULL;
+    }
+    ++in;
+    foo = find_function(symbol);
     if (foo==NULL) {
       log_error(("parser does not know about \"%s\" function.\n", symbol));
       return NULL;
     }
-		foo->parse(stack, userdata); /* will pop parameters from stack (reverse order!) and push the result */
-	} else {
-		variable * var = find_variable(symbol);
-		if (braces && *in=='}') {
-			++in;
-		}
-		/* it's a constant (variable is a misnomer, but heck, const was taken;)) */
+    foo->parse(stack, userdata); /* will pop parameters from stack (reverse order!) and push the result */
+  } else {
+    variable * var = find_variable(symbol);
+    if (braces && *in=='}') {
+      ++in;
+    }
+    /* it's a constant (variable is a misnomer, but heck, const was taken;)) */
     if (var==NULL) {
       log_error(("parser does not know about \"%s\" variable.\n", symbol));
       return NULL;
     }
-		opush(stack, var->value);
-	}
-	return in;
+    opush(stack, var->value);
+  }
+  return in;
 }
 
 static const char *
 parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*) -> char* */
 {
-	char * c;
-	char * buffer = balloc(4*1024);
-	const char * ic = in;
-	char * oc = buffer;
-	/* mode flags */
-	boolean f_escape = false;
-	boolean bDone = false;
+  char * c;
+  char * buffer = balloc(4*1024);
+  const char * ic = in;
+  char * oc = buffer;
+  /* mode flags */
+  boolean f_escape = false;
+  boolean bDone = false;
   variant var;
 
-	while (*ic && !bDone) {
-		if (f_escape) {
-			f_escape = false;
-			switch (*ic) {
-			case 'n':
-				*oc++='\n';
-				break;
-			case 't':
-				*oc++='\t';
-				break;
-			default:
-				*oc++=*ic;
-			}
-		} else {
-			int ch = (unsigned char)(*ic);
-			switch (ch) {
-			case '\\':
-				f_escape = true;
-				++ic;
-				break;
-			case '"':
-				bDone = true;
-				++ic;
-				break;
-			case '$':
-				ic = parse_symbol(stack, ++ic, userdata);
-				if (ic==NULL) return NULL;
-				c = (char*)opop_v(stack);
-				oc += strlen(strcpy(oc, c));
-				bfree(c);
-				break;
-			default:
-				*oc++=*ic++;
-			}
-		}
-	}
-	*oc++ = '\0';
-	bfree(oc);
+  while (*ic && !bDone) {
+    if (f_escape) {
+      f_escape = false;
+      switch (*ic) {
+        case 'n':
+          *oc++='\n';
+          break;
+        case 't':
+          *oc++='\t';
+          break;
+        default:
+          *oc++=*ic;
+      }
+    } else {
+      int ch = (unsigned char)(*ic);
+      switch (ch) {
+        case '\\':
+          f_escape = true;
+          ++ic;
+          break;
+        case '"':
+          bDone = true;
+          ++ic;
+          break;
+        case '$':
+          ic = parse_symbol(stack, ++ic, userdata);
+          if (ic==NULL) return NULL;
+          c = (char*)opop_v(stack);
+          oc += strlen(strcpy(oc, c));
+          bfree(c);
+          break;
+        default:
+          *oc++=*ic++;
+      }
+    }
+  }
+  *oc++ = '\0';
+  bfree(oc);
   var.v = buffer;
-	opush(stack, var);
-	return ic;
+  opush(stack, var);
+  return ic;
 }
 
 static const char *
 parse_int(opstack ** stack, const char * in)
 {
-	int k = 0;
-	int vz = 1;
-	boolean ok = false;
+  int k = 0;
+  int vz = 1;
+  boolean ok = false;
   variant var;
-	do {
-		switch (*in) {
-		case '+':
-			++in;
-			break;
-		case '-':
-			++in;
-			vz=vz*-1;
-			break;
-		default:
-			ok = true;
-		}
-	} while (!ok);
-	while (isdigit(*in)) {
-		k = k * 10 + (*in++)-'0';
-	}
+  do {
+    switch (*in) {
+      case '+':
+        ++in;
+        break;
+      case '-':
+        ++in;
+        vz=vz*-1;
+        break;
+      default:
+        ok = true;
+    }
+  } while (!ok);
+  while (isdigit(*in)) {
+    k = k * 10 + (*in++)-'0';
+  }
   var.i = k*vz;
-	opush(stack, var);
-	return in;
+  opush(stack, var);
+  return in;
 }
 
 
 static const char *
 parse(opstack ** stack, const char* inn, const void * userdata)
 {
-	const char * b = inn;
-	while (*b) {
-		switch (*b) {
-		case '"':
-			return parse_string(stack, ++b, userdata);
-			break;
-		case '$':
-			return parse_symbol(stack, ++b, userdata);
-			break;
-		default:
-			if (isdigit(*b) || *b=='-' || *b=='+') {
-				return parse_int(stack, b);
-			}
-			else ++b;
-		}
-	}
-	log_error(("could not parse \"%s\". Probably invalid message syntax.", inn));
-	return NULL;
+  const char * b = inn;
+  while (*b) {
+    switch (*b) {
+      case '"':
+        return parse_string(stack, ++b, userdata);
+        break;
+      case '$':
+        return parse_symbol(stack, ++b, userdata);
+        break;
+      default:
+        if (isdigit(*b) || *b=='-' || *b=='+') {
+          return parse_int(stack, b);
+        }
+        else ++b;
+    }
+  }
+  log_error(("could not parse \"%s\". Probably invalid message syntax.", inn));
+  return NULL;
 }
 
 const char * 
 translate(const char* format, const void * userdata, const char* vars, variant args[])
 {
-	int i = 0;
-	const char *ic = vars;
-	char symbol[32];
-	char *oc = symbol;
-	opstack * stack = NULL;
+  int i = 0;
+  const char *ic = vars;
+  char symbol[32];
+  char *oc = symbol;
+  opstack * stack = NULL;
   const char * rv;
 
   brelease();
-	free_variables();
+  free_variables();
 
-	assert(format);
-	assert(*ic == 0 || isalnum(*ic));
-	while (*ic) {
-		*oc++ = *ic++;
-		if (!isalnum(*ic)) {
-			variant x = args[i++];
-			*oc = '\0';
-			oc = symbol;
-			add_variable(strcpy(balloc(strlen(symbol)+1), symbol), x);
-			while (*ic && !isalnum(*ic)) ++ic;
-		}
-	}
+  assert(format);
+  assert(*ic == 0 || isalnum(*ic));
+  while (*ic) {
+    *oc++ = *ic++;
+    if (!isalnum(*ic)) {
+      variant x = args[i++];
+      *oc = '\0';
+      oc = symbol;
+      add_variable(strcpy(balloc(strlen(symbol)+1), symbol), x);
+      while (*ic && !isalnum(*ic)) ++ic;
+    }
+  }
 
-	if (parse(&stack, format, userdata)==NULL) return NULL;
-	rv = (const char*)opop(&stack).v;
+  if (parse(&stack, format, userdata)==NULL) return NULL;
+  rv = (const char*)opop(&stack).v;
   free(stack->begin);
   free(stack);
   return rv;
