@@ -12,10 +12,6 @@
   </namespace>
   <namespace name="shipinfo">
     <!-- ship info is not implemented! -->
-    <string name="birthdaycake">
-      <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
-      <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
-    </string>
     <string name="no_info">
       <text locale="de">Keine Informationen über diesen Schiffstyp verfügbar.</text>
       <text locale="en">No Information available for this type of ship.</text>
@@ -34,6 +30,10 @@
     </string>
   </namespace>
   <namespace name="iteminfo">
+    <string name="birthdaycake">
+      <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
+      <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
+    </string>
     <string name="no_info">
       <text locale="de">Keine Informationen.</text>
       <text locale="en">No Information available.</text>

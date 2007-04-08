@@ -164,7 +164,7 @@ fix_demand(region *r)
   for (rl=rlist;rl;rl=rl->next) {
     region * r = rl->data;
     if (!fval(r, RF_CHAOTIC)) {
-      log_warning(("fixing demand in %s\n", regionname(r, NULL)));
+      log_error(("fixing demand in %s\n", regionname(r, NULL)));
     }
     sale = mlux[rng_int() % maxlux];
     if (sale) setluxuries(r, sale);

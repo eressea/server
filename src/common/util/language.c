@@ -74,18 +74,27 @@ debug_language(const char * log)
 const char *
 locale_getstring(const locale * lang, const char * key)
 {
-	unsigned int hkey = hashstring(key);
-	unsigned int id = hkey & (SMAXHASH-1);
-	const struct locale_str * find;
+  unsigned int hkey = hashstring(key);
+  unsigned int id = hkey & (SMAXHASH-1);
+  const struct locale_str * find;
 
-	assert(lang);
-	if (key==NULL || *key==0) return NULL;
-	find = lang->strings[id];
-	while (find) {
-		if (find->hashkey == hkey && !strcmp(key, find->key)) return find->str;
-		find = find->nexthash;
-	}
-	return NULL;
+  assert(lang);
+  if (key==NULL || *key==0) return NULL;
+  find = lang->strings[id];
+  while (find) {
+    if (find->hashkey == hkey) {
+      if (find->nexthash==NULL) {
+        /* if this is the only entry with this hash, fine. */
+        assert(strcmp(key, find->key)==0);
+        return find->str;
+      }
+      if (strcmp(key, find->key)==0) {
+        return find->str;
+      }
+    }
+    find = find->nexthash;
+  }
+  return NULL;
 }
 
 const char *

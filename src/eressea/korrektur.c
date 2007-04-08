@@ -328,7 +328,7 @@ fix_otherfaction(void)
       }
     }
   }
-  if (count) log_warning(("%u units had otherfaction=own faction.\n", count));
+  if (count) log_error(("%u units had otherfaction=own faction.\n", count));
 }
 
 static int

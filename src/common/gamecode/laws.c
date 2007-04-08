@@ -2126,7 +2126,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 
   name = resourcename(itype->rtype, 0);
   key = mkname("iteminfo", name);
-  info = locale_string(f->locale, key);
+  info = locale_getstring(f->locale, key);
 
   if (info==key || strcmp(info, key)==0) {
     info = locale_string(f->locale, mkname("iteminfo", "no_info"));
@@ -2178,7 +2178,7 @@ display_race(faction *f, unit *u, const race * rc)
   bufp += rsize;
 
   key = mkname("raceinfo", rc->_name[0]);
-  info = locale_string(f->locale, key);
+  info = locale_getstring(f->locale, key);
   if (info==key || strcmp(info, key)==0) {
     info = locale_string(f->locale, mkname("raceinfo", "no_info"));
   }
