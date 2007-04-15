@@ -16,7 +16,7 @@ function update_xmas2006()
     for r in regions() do
       if r:get_key("xm06") then
         trees = r:get_resource("tree")
-        if trees*0.1>1 then
+        if trees*0.1>=1 then
           r:set_resource("tree", trees * 1.1)
           msg:send_region(r)
         end

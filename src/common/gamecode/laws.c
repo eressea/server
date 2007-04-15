@@ -2128,7 +2128,7 @@ display_item(faction *f, unit *u, const item_type * itype)
   key = mkname("iteminfo", name);
   info = locale_getstring(f->locale, key);
 
-  if (info==key || strcmp(info, key)==0) {
+  if (info==NULL || info==key || strcmp(info, key)==0) {
     info = locale_string(f->locale, mkname("iteminfo", "no_info"));
   }
   ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
@@ -2179,7 +2179,7 @@ display_race(faction *f, unit *u, const race * rc)
 
   key = mkname("raceinfo", rc->_name[0]);
   info = locale_getstring(f->locale, key);
-  if (info==key || strcmp(info, key)==0) {
+  if (info==NULL || info==key || strcmp(info, key)==0) {
     info = locale_string(f->locale, mkname("raceinfo", "no_info"));
   }
 
