@@ -2598,16 +2598,14 @@ static void
 out_faction(FILE *file, faction *f)
 {
   if (alliances!=NULL) {
-    fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
+    fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
       LOC(default_locale, rc_name(f->race, 0)), magietypen[f->magiegebiet],
-      f->no_units, f->num_total, f->money, turn - f->lastorders,
-      turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+      f->no_units, f->num_total, f->money, turn - f->lastorders);
   } else {
-    fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
+    fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-      magietypen[f->magiegebiet], f->no_units, f->num_total, f->money,
-      turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+      magietypen[f->magiegebiet], f->no_units, f->num_total, f->money);
   }
 }
 
@@ -2723,10 +2721,9 @@ report_summary(summary * s, summary * o, boolean full)
   
   for (i = 0; i <= NMRTimeout(); ++i) {
     if (i == NMRTimeout()) {
-      fprintf(F, "+ NMRs:\t\t %d\n", nmrs[i]);
+      fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
     } else {
-      fprintf(F, "%d %s:\t\t %d\n", i,
-        i != 1 ? "NMRs" : "NMR ", nmrs[i]);
+      fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
     }
   }
   if (age) {
