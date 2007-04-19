@@ -2345,20 +2345,19 @@ loot_items(fighter * corpse)
 
   while (itm) {
     float lootfactor = dead/(float)u->number; /* only loot the dead! */
-    if (itm->number) {
-      int i = min(10, itm->number);
+    int maxloot = (int)(itm->number*lootfactor);
+    if (maxloot>0) {
+      int i = min(10, maxloot);
       for (; i != 0; --i) {
-        int loot = (int)(itm->number*lootfactor/i);
-        /* Looten tun hier immer nur die Gegner. Das ist als Ausgleich für die
-        * neue Loot-regel (nur ganz tote Einheiten) fair.
-        * zusätzlich looten auch geflohene, aber nach anderen Regeln.
-        */
+        int loot = maxloot/i;
+
         if (loot>0) {
           int maxrow = BEHIND_ROW;
           int lootchance = 50 + b->keeploot;
 
           if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) maxrow = LAST_ROW;
           itm->number -= loot;
+          maxloot -= loot;
 
           if (maxrow == LAST_ROW || rng_int() % 100 < lootchance) {
             fighter *fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
