@@ -2605,8 +2605,8 @@ out_faction(FILE *file, faction *f)
   } else {
     fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-      magietypen[f->magiegebiet], f->no_units, f->num_total, f->money),
-      turn - f->lastorders;
+      magietypen[f->magiegebiet], f->no_units, f->num_total, f->money,
+      turn - f->lastorders);
   }
 }
 
