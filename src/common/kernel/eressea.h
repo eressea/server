@@ -176,6 +176,7 @@ struct building_type;
 #define TERRAIN_VERSION 322 /* terrains are a full type and saved by name */
 #define REGIONITEMS_VERSION 323 /* regions have items */
 #define ATTRIBREAD_VERSION 324 /* remove a_readint */
+#define CURSEFLAGS_VERSION 325 /* remove a_readint */
 
 #define MIN_VERSION CURSETYPE_VERSION
 #define REGIONOWNERS_VERSION 400
@@ -183,7 +184,7 @@ struct building_type;
 #ifdef ENEMIES
 # define RELEASE_VERSION ENEMIES_VERSION
 #else
-# define RELEASE_VERSION ATTRIBREAD_VERSION
+# define RELEASE_VERSION CURSEFLAGS_VERSION
 #endif
 
 #define RESOURCE_CONVERSION

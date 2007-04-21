@@ -69,10 +69,11 @@ static struct curse_type ct_auraboost = {
   "benutzt werden.",
   cinfo_auraboost
 };
+
 /* Magic Boost - Gabe des Chaos */
 static struct curse_type ct_magicboost = {
   "magicboost",
-  CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+  CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_IMMUNE, M_MEN,
   "",
   NULL
 };
@@ -125,8 +126,10 @@ cinfo_calm(const void * obj, typ_t typ, const curse *c, int self)
   }
   return NULL;
 }
-static struct curse_type ct_calmmonster = { "calmmonster",
-  CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
+
+static struct curse_type ct_calmmonster = {
+  "calmmonster",
+  CURSETYP_NORM, CURSE_SPREADNEVER|CURSE_ONLYONE, NO_MERGE,
   "Dieser Beeinflussungszauber scheint die Einheit einem ganz "
   "bestimmten Volk wohlgesonnen zu machen.",
   cinfo_calm
@@ -282,7 +285,7 @@ static struct curse_type ct_strength = { "strength",
  */
 static struct curse_type ct_worse = {
   "worse",
-  CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+  CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_NOAGE, M_MEN,
   "",
   cinfo_unit
 };
@@ -302,7 +305,7 @@ static struct curse_type ct_itemcloak = {
 
 static struct curse_type ct_fumble = {
   "fumble",
-  CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
+  CURSETYP_NORM, CURSE_SPREADNEVER|CURSE_ONLYONE, NO_MERGE,
   "Eine Wolke negativer Energie umgibt die Einheit.",
   cinfo_unit
 };

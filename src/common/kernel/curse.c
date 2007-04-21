@@ -112,7 +112,7 @@ curse_age(attrib * a)
   }
   if (result!=0) {
     c->duration = 0;
-  } else if (c->flag & CURSE_NOAGE) {
+  } else if (c_flags(c) & CURSE_NOAGE) {
     c->duration = 1;
   } else if (c->duration!=INT_MAX) {
     c->duration = max(0, c->duration-1);
@@ -145,19 +145,26 @@ curse_read(attrib * a, FILE * f) {
   const curse_type * ct;
 
   char cursename[64];
+  unsigned int flags;
 
-  if(global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
-    fscanf(f, "%d %s %d %d %lf %d %d ", &c->no, cursename, &c->flag,
+  if (global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
+    fscanf(f, "%d %s %u %d %lf %d %d ", &c->no, cursename, &flags,
       &c->duration, &c->vigour, &mageid.i, &c->effect.i);
   } else {
     int vigour;
-    fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
+    fscanf(f, "%d %s %u %d %d %d %d ", &c->no, cursename, &flags,
       &c->duration, &vigour, &mageid.i, &c->effect.i);
     c->vigour = vigour;
   }
   ct = ct_find(cursename);
-
   assert(ct!=NULL);
+  c->type = ct;
+
+  if (global.data_version < CURSEFLAGS_VERSION) {
+    c_setflag(c, flags);
+  } else {
+    c->flags = flags;
+  }
 
 #ifdef CONVERT_DBLINK
   if (global.data_version<DBLINK_VERSION) {
@@ -168,7 +175,6 @@ curse_read(attrib * a, FILE * f) {
     }
   }
 #endif
-  c->type = ct;
 
   /* beim Einlesen sind noch nicht alle units da, muss also
    * zwischengespeichert werden. */
@@ -195,12 +201,12 @@ curse_read(attrib * a, FILE * f) {
 
 void
 curse_write(const attrib * a, FILE * f) {
-  int flag;
+  unsigned int flags;
   int mage_no;
   curse * c = (curse*)a->data.v;
   const curse_type * ct = c->type;
 
-  flag = (c->flag & ~(CURSE_ISNEW));
+  flags = (c->flags & ~(CURSE_ISNEW));
 
   if (c->magician){
     mage_no = c->magician->no;
@@ -208,7 +214,7 @@ curse_write(const attrib * a, FILE * f) {
     mage_no = -1;
   }
 
-  fprintf(f, "%d %s %d %d %f %d %d ", c->no, ct->cname, flag,
+  fprintf(f, "%d %s %d %d %f %d %d ", c->no, ct->cname, flags,
       c->duration, c->vigour, mage_no, c->effect.i);
 
   if (c->type->write) c->type->write(f, c);
@@ -436,9 +442,10 @@ set_cursedmen(curse *c, int cursedmen)
 
 /* ------------------------------------------------------------- */
 void
-curse_setflag(curse *c, int flag)
+c_setflag(curse *c, unsigned int flags)
 {
-  if (c) c->flag = (c->flag | flag);
+  assert(c);
+  c->flags = (c->flags & ~flags) | (flags & (c->type->flags ^ flags));
 }
 
 /* ------------------------------------------------------------- */
@@ -446,7 +453,7 @@ curse_setflag(curse *c, int flag)
  * dieses Typs geben, gibt es den bestehenden zurück.
  */
 static curse *
-set_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
+make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
     int duration, variant effect, int men)
 {
   curse *c;
@@ -457,7 +464,7 @@ set_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
   c = (curse*)a->data.v;
 
   c->type = ct;
-  c->flag = 0;
+  c->flags = CURSE_ISNEW;
   c->vigour = vigour;
   c->duration = duration;
   c->effect = effect;
@@ -497,7 +504,7 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
 
   c = get_curse(*ap, ct);
 
-  if(c && (c->flag & CURSE_ONLYONE)){
+  if (c && (c_flags(c) & CURSE_ONLYONE)){
     return NULL;
   }
   assert(c==NULL || ct==c->type);
@@ -533,7 +540,7 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
     }
     set_curseingmagician(magician, *ap, ct);
   } else {
-    c = set_curse(magician, ap, ct, vigour, duration, effect, men);
+    c = make_curse(magician, ap, ct, vigour, duration, effect, men);
   }
   return c;
 }
@@ -545,7 +552,6 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
 static void
 do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 {
-  int flag = c->flag;
   int cursedmen = 0;
   int men = 0;
   boolean dogive = false;
@@ -562,7 +568,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
       cursedmen = u->number;
   }
 
-  switch (ct->spread){
+  switch ((ct->flags | c->flags) & CURSE_SPREADMASK) {
     case CURSE_SPREADALWAYS:
       dogive = true;
       men = u2->number + n;
@@ -593,9 +599,9 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
   }
 
   if (dogive == true) {
-    curse * cnew = set_curse(c->magician, &u2->attribs, c->type, c->vigour,
+    curse * cnew = make_curse(c->magician, &u2->attribs, c->type, c->vigour,
       c->duration, c->effect, men);
-    curse_setflag(cnew, flag);
+    cnew->flags = c->flags;
 
     if (ct->typ == CURSETYP_UNIT) set_cursedmen(cnew, men);
   }
@@ -620,7 +626,7 @@ boolean
 curse_active(const curse *c)
 {
   if (!c) return false;
-  if (c->flag & CURSE_ISNEW) return false;
+  if (c_flags(c) & CURSE_ISNEW) return false;
   if (c->vigour <= 0) return false;
 
   return true;
@@ -706,14 +712,7 @@ static const char * oldnames[MAXCURSE] = {
   "fumble",
   "riotzone",
   "nocostbuilding",
-  "holyground",
   "godcursezone",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
   "speed",
   "orcish",
   "magicboost",
@@ -723,9 +722,6 @@ static const char * oldnames[MAXCURSE] = {
   "magicresistance",
   "itemcloak",
   "sparkle",
-  "",
-  "",
-  "",
   "skillmod"
 };
 

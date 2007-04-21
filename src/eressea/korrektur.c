@@ -120,7 +120,6 @@ curse_emptiness(void)
         curse * c;
         effect.i = 0;
         c = create_curse(NULL, &r->attribs, ct, 100, 100, effect, 0);
-        curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
       }
       freset(r, FL_MARK);
     }

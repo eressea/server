@@ -95,7 +95,7 @@ static struct curse_type ct_strongwall = { "strongwall",
 
 /* Ewige Mauern-Zauber */
 static struct curse_type ct_nocostbuilding = { "nocostbuilding",
-  CURSETYP_NORM, 0, NO_MERGE,
+  CURSETYP_NORM, CURSE_NOAGE|CURSE_ONLYONE, NO_MERGE,
   "Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
   "gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
   "auf Ewig stehen.",

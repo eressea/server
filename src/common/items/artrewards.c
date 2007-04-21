@@ -122,7 +122,7 @@ useonother_trappedairelemental(struct unit * u, int shipId,
 
   effect.i = SPEEDUP;
   c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect, 0);
-  curse_setflag(c, CURSE_NOAGE);
+  c_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",
     "unit region command ship", u, u->region, ord, sh));

@@ -731,11 +731,13 @@ can_survive(const unit *u, const region *r)
     || (fval(r->terrain, SWIM_INTO) && (u->race->flags & RCF_SWIM)) 
     || (fval(r->terrain, FLY_INTO) && (u->race->flags & RCF_FLY))) 
   {
+    static const curse_type * ctype = NULL;
 
     if (get_item(u, I_HORSE) && !fval(r->terrain, WALK_INTO))
       return false;
 
-    if (fval(u->race, RCF_UNDEAD) && is_cursed(r->attribs, C_HOLYGROUND, 0))
+    if (!ctype) ctype = ct_find("holyground");
+    if (fval(u->race, RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
       return false;
 
     return true;

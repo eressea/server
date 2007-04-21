@@ -81,7 +81,7 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 
   effect.i = SPEEDSAIL_EFFECT;
   c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect, 0);
-  curse_setflag(c, CURSE_NOAGE);
+  c_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit speed", u, SPEEDSAIL_EFFECT));
   itype->rtype->uchange(u, itype->rtype, -1);
@@ -131,7 +131,7 @@ use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struc
       c = (curse*)a->data.v;
 
       /* Immunität prüfen */
-      if (c->flag & CURSE_IMMUNE) {
+      if (c_flags(c) & CURSE_IMMUNE) {
         do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
         continue;
       }
@@ -143,7 +143,7 @@ use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struc
       if(*ap) ap = &(*ap)->next;
     }
 
-    if(force > 0) {
+    if (force > 0) {
       variant var ;
       var.i = effect;
       create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);

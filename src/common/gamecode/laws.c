@@ -3116,7 +3116,7 @@ ageing(void)
 
       if (is_cursed(u->attribs, C_OLDRACE, 0)){
         curse *c = get_curse(u->attribs, ct_find("oldrace"));
-        if (c->duration == 1 && !(c->flag & CURSE_NOAGE)) {
+        if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
           u->race = new_race[curse_geteffect(c)];
           u->irace = new_race[curse_geteffect(c)];
         }

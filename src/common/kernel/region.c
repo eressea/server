@@ -144,9 +144,11 @@ void
 deathcounts (region * r, int fallen)
 {
   attrib * a;
+  static const curse_type * ctype = NULL;
 
   if (fallen==0) return;
-  if (is_cursed(r->attribs, C_HOLYGROUND,0)) return;
+  if (!ctype) ctype = ct_find("holyground");
+  if (ctype && curse_active(get_curse(r->attribs, ctype))) return;
 
   a = a_find(r->attribs, &at_deathcount);
   if (!a) a = a_add(&r->attribs, a_new(&at_deathcount));

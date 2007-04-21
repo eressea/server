@@ -123,14 +123,7 @@ enum {
   C_FUMBLE,
   C_RIOT,           /*region in Aufruhr */
   C_NOCOST,
-  C_HOLYGROUND,
   C_CURSED_BY_THE_GODS,
-  C_FREE_14,
-  C_FREE_15,
-  C_FREE_16,
-  C_FREE_17,
-  C_FREE_18,
-  C_FREE_19,
 /* struct's vom untertyp curse_unit: */
   C_SPEED,          /* Beschleunigt */
   C_ORC,
@@ -141,9 +134,6 @@ enum {
   C_MAGICRESISTANCE,    /* 44 - verändert Magieresistenz */
   C_ITEMCLOAK,
   C_SPARKLE,
-  C_FREE_22,
-  C_FREE_23,
-  C_FREE_24,
 /* struct's vom untertyp curse_skill: */
   C_SKILL,
   MAXCURSE
@@ -152,19 +142,23 @@ enum {
 /* ------------------------------------------------------------- */
 /* Flags */
 
-#define CURSE_ISNEW   1 /* wirkt in der zauberrunde nicht (default)*/
-#define CURSE_NOAGE   2 /* wirkt ewig */
-#define CURSE_IMMUNE  4 /* ignoriert Antimagie */
-#define CURSE_ONLYONE 8 /* Verhindert, das ein weiterer Zauber dieser Art
-                           auf das Objekt gezaubert wird */
 
 /* Verhalten von Zaubern auf Units beim Übergeben von Personen */
 typedef enum {
-  CURSE_SPREADNEVER,  /* wird nie mit übertragen */
-  CURSE_SPREADALWAYS, /* wird immer mit übertragen */
-  CURSE_SPREADMODULO, /* personenweise weitergabe */
-  CURSE_SPREADCHANCE  /* Ansteckungschance je nach Mengenverhältnis*/
-} spread_t;
+  CURSE_ISNEW = 0x01, /* wirkt in der zauberrunde nicht (default)*/
+  CURSE_NOAGE = 0x02, /* wirkt ewig */
+  CURSE_IMMUNE = 0x04, /* ignoriert Antimagie */
+  CURSE_ONLYONE = 0x08, /* Verhindert, das ein weiterer Zauber dieser Art auf das Objekt gezaubert wird */
+
+  /* the following are mutually exclusive */
+  CURSE_SPREADNEVER = 0x00,  /* wird nie mit übertragen */
+  CURSE_SPREADALWAYS = 0x10, /* wird immer mit übertragen */
+  CURSE_SPREADMODULO = 0x20, /* personenweise weitergabe */
+  CURSE_SPREADCHANCE = 0x30 /* Ansteckungschance je nach Mengenverhältnis*/
+} curseflags;
+
+#define CURSE_FLAGSMASK 0x0F
+#define CURSE_SPREADMASK 0x30
 
 /* typ von struct */
 enum {
@@ -195,13 +189,15 @@ typedef struct curse {
   struct curse *nexthash;
   int no;            /* 'Einheitennummer' dieses Curse */
   const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
-  int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
+  unsigned int flags;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
   int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
   double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
   struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
   variant effect;
   variant data;        /* pointer auf spezielle curse-unterstructs*/
 } curse;
+
+#define c_flags(c) ((c)->type->flags ^ (c)->flags)
 
 /* Die Unterattribute curse->data: */
 /* Einheitenzauber:
@@ -218,7 +214,7 @@ typedef struct curse_unit {
 typedef struct curse_type {
   const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
   int typ;
-  spread_t spread;
+  unsigned int flags;
   unsigned int mergeflags;
   const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
                  Zauberanalyse angezeigt */
@@ -280,7 +276,7 @@ extern int get_cursedmen(struct unit *u, struct curse *c);
   /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
    * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 
-extern void curse_setflag(curse * c, int flag);
+extern void c_setflag(curse * c, unsigned int flag);
   /* setzt Spezialflag einer Verzauberung (zB 'dauert ewig') */
 
 void transfer_curse(struct unit * u, struct unit * u2, int n);

@@ -1131,8 +1131,10 @@ spawn_undead(void)
 
   for (r = regions; r; r = r->next) {
     int unburied = deathcount(r);
+    static const curse_type * ctype = NULL;
 
-    if (is_cursed(r->attribs, C_HOLYGROUND, 0)) continue;
+    if (!ctype) ctype = ct_find("holyground");
+    if (ctype && curse_active(get_curse(r->attribs, ctype))) continue;
 
     /* Chance 0.1% * chaosfactor */
     if (r->land && unburied > r->land->peasants / 20 && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {

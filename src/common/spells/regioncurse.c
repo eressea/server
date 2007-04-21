@@ -58,7 +58,7 @@ cinfo_cursed_by_the_gods(const void * obj, typ_t typ, const curse *c, int self)
 
 static struct curse_type ct_godcursezone = {
   "godcursezone",
-  CURSETYP_NORM, 0, (NO_MERGE),
+  CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
   "Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
   "über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
   "sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
@@ -305,7 +305,7 @@ static struct curse_type ct_riotzone = {
 };
 static struct curse_type ct_holyground = {
   "holyground",
-  CURSETYP_NORM, 0, (M_VIGOUR_ADD),
+  CURSETYP_NORM, CURSE_NOAGE, (M_VIGOUR_ADD),
   "Verschiedene Naturgeistern sind im Boden der Region gebunden und "
   "beschützen diese vor dem der dunklen Magie des lebenden Todes.",
   cinfo_simple

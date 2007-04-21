@@ -1204,7 +1204,7 @@ buildingmaintenance(const building * b, const resource_type * rtype)
   int c, cost=0;
   static boolean init = false;
   static const curse_type * nocost_ct;
-  if (!init) { init = true; nocost_ct = ct_find("nocost"); }
+  if (!init) { init = true; nocost_ct = ct_find("nocostbuilding"); }
   if (curse_active(get_curse(b->attribs, nocost_ct))) {
     return 0;
   }

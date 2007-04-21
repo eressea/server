@@ -175,7 +175,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib mysqlclient.lib zlib.lib"
+				AdditionalDependencies="luabind.lib lua50.lib libxml2.lib"
 				OutputFile=".\Debug/eressea-lua.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
