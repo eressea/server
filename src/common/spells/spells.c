@@ -4444,11 +4444,7 @@ sp_recruit(castorder *co)
   u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
   set_order(&u->thisorder, default_order(f->locale));
 
-  sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
-      n == 1 ? "Bauer" : "Bauern");
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
-
-  if (f->race==new_race[RC_URUK]) n = (n+1) / 2;
+  ADDMSG(&mage->faction->msgs, msg_message("recruit_effect", "mage amount", mage, n));
 
   return cast_level;
 }

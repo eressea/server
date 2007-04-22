@@ -217,28 +217,28 @@ cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
 {
   const char * effects[] = {
     NULL, /* end grau*/
-    "%s ist im Traum eine Fee erschienen",
-    "%s wird von bösen Alpträumen geplagt",
+    "sparkle_1",
+    "sparkle_2",
     NULL, /* end traum */
-    "%s wird von einem glitzernden Funkenregen umgeben",
-    "Ein schimmernder Lichterkranz umgibt %s",
+    "sparkle_3",
+    "sparkle_4",
     NULL, /* end tybied */
-    "Eine Melodie erklingt, und %s tanzt bis spät in die Nacht hinein",
-    "%s findet eine kleine Flöte, die eine wundersame Melodie spielt",
-    "Die Frauen des nahegelegenen Dorfes bewundern %s verstohlen",
-    "Eine Gruppe vorbeiziehender Bergarbeiter rufen %s eindeutig Zweideutiges nach",
+    "sparkle_5",
+    "sparkle_6",
+    "sparkle_7",
+    "sparkle_8",
     NULL, /* end cerrdor */
-    "%s bekommt von einer Schlange einen Apfel angeboten",
-    "Ein Einhorn berührt %s mit seinem Horn und verschwindet kurz darauf im Unterholz",
-    "Vogelzwitschern begleitet %s auf all seinen Wegen",
-    "Leuchtende Blumen erblühen rund um das Lager von %s",
+    "sparkle_9",
+    "sparkle_10",
+    "sparkle_11",
+    "sparkle_12",
     NULL, /* end gwyrrd */
-    "Über %s zieht eine Gruppe Geier ihre Kreise",
-    "Der Kopf von %s hat sich in einen grinsenden Totenschädel verwandelt",
-    "Ratten folgen %s auf Schritt und Tritt",
-    "Pestbeulen befallen den Körper von %s",
-    "Eine dunkle Fee erscheint %s im Schlaf. Sie ist von schauriger Schönheit",
-    "Fäulnisgeruch dringt %s aus allen Körperöffnungen",
+    "sparkle_13",
+    "sparkle_14",
+    "sparkle_15",
+    "sparkle_16",
+    "sparkle_17",
+    "sparkle_18",
     NULL, /* end draig */
   };
   int m, begin=0, end=0;
@@ -258,9 +258,10 @@ cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
 
   while (effects[end]!=NULL) ++end;
   if (end==begin) return NULL;
-  else sprintf(buf, effects[begin + curse_geteffect(c) % (end-begin)], u->name);
-
-  return msg_message("curseinfo::info_str", "text id", buf, c->no);
+  else {
+    int index = begin + curse_geteffect(c) % (end-begin);
+    return msg_message(mkname("curseinfo", effects[index]), "text id", buf, c->no);
+  }
 }
 static struct curse_type ct_sparkle = { "sparkle",
   CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),

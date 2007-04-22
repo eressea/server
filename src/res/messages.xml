@@ -39,6 +39,150 @@
     <text locale="de">"$unit($mage) beschwört einen Schleier der Verwirrung."</text>
     <text locale="en">"$unit($mage) summons a fog of confusion."</text>
   </message>
+  <message name="curseinfo::sparkle_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) ist im Traum eine Fee erschienen. ($int36($id))"</text>
+    <text locale="en">"In a dream, a fairy appears to $unit($unit). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_2" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) wird von bösen Alpträumen geplagt. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) is haunted by terrbile nightmares. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_3" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) wird von einem glitzernden Funkenregen umgeben. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) is surrounded by a shower of glittering sparkles. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_4" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein schimmernder Lichterkranz umgibt $unit($unit). ($int36($id))"</text>
+    <text locale="en">"A circle of shimmering lights surrounds $unit($unit). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_5" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Eine Melodie erklingt, und $unit($unit) tanzt bis spät in die Nacht hinein. ($int36($id))"</text>
+    <text locale="en">"A haunting melody fills the air, and $unit($unit) dances until late into the night. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_6" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) findet eine kleine Flöte, die eine wundersame Melodie spielt. ($int36($id))"</text>
+    <text locale="en">"$unit($unit) finds a small flute that plays a beautiful melody. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_7" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Die Frauen des nahegelegenen Dorfes bewundern $unit($unit) verstohlen. ($int36($id))"</text>
+    <text locale="en">"The women of the nearby village cast furtive looks at $unit($unit). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_8" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Eine Gruppe vorbeiziehender Bergarbeiter rufen $unit($unit) eindeutig Zweideutiges nach. ($int36($id))"</text>
+    <text locale="en">"A group of passing miners makes passes at $unit($unit). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_9" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) bekommt von einer Schlange einen Apfel angeboten. ($int36($id))"</text>
+    <text locale="en">"A large green snake offers $unit($unit) a fine-looking apple. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_10" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ein Einhorn berührt $unit($unit) mit seinem Horn und verschwindet kurz darauf im Unterholz. ($int36($id))"</text>
+    <text locale="en">"A unicorn touches $unit($unit) with its horn and vanishes into the forest quickly after. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_11" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Vogelzwitschern begleitet $unit($unit) auf all seinen Wegen. ($int36($id))"</text>
+    <text locale="en">"Bird songs follow $unit($unit) on all his travels. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_12" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Leuchtende Blumen erblühen rund um das Lager von $unit($unit). ($int36($id))"</text>
+    <text locale="en">"Brightly coloured flowers pop up all around $unit($unit)'s camp. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_13" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Über $unit($unit) zieht eine Gruppe Geier ihre Kreise. ($int36($id))"</text>
+    <text locale="en">"A group of vultures circles above $unit($unit). ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_14" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Der Kopf von $unit($unit) hat sich in einen grinsenden Totenschädel verwandelt. ($int36($id))"</text>
+    <text locale="en">"The head of $unit($unit) has turned into a madly grinning skull. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_15" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Ratten folgen $unit($unit) auf Schritt und Tritt. ($int36($id))"</text>
+    <text locale="en">"Rats follow $unit($unit)'s every step. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_16" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Pestbeulen befallen den Körper von $unit($unit). ($int36($id))"</text>
+    <text locale="en">"The body of $unit($unit) is disfigured by hideous boils. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_17" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Eine dunkle Fee erscheint $unit($unit) im Schlaf. Sie ist von schauriger Schönheit. ($int36($id))"</text>
+    <text locale="en">"A dark and mysterious fairy appears before $unit($unit). She is of bewitching beauty. ($int36($id))"</text>
+  </message>
+  <message name="curseinfo::sparkle_18" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Fäulnisgeruch dringt $unit($unit) aus allen Körperöffnungen. ($int36($id))"</text>
+    <text locale="en">"The stench of decay is poring from all the orifices of $unit($unit). ($int36($id))"</text>
+  </message>
   <message name="curseinfo::calm_1" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -883,6 +1027,14 @@
     </type>
     <text locale="de">"$unit($unit) gelingt es, durch die Nebel auf die Realität zu blicken."</text>
     <text locale="en">"$unit($unit) manages to catch a glimpse of reality through the fog."</text>
+  </message>
+  <message name="recruit_effect" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) konnte $int($amount) $if($eq($amount,1),"Bauer","Bauern") anwerben."</text>
+    <text locale="en">"$unit($mage) managed to recruit $int($amount) $if($eq($amount,1),"peasant","peasants")."</text>
   </message>
   <message name="wand_of_tears_effect" section="events">
     <type>
@@ -2536,8 +2688,7 @@
       <arg name="region" type="region"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region) stellt fest, dass es hier $localize($amount,$locale("de")) $resource($herb,$amount) gibt."</text>
-    <text locale="fr">"$unit($unit) discovers that $localize($amount,$locale("en")) $resource($herb,$amount) grow in $region($region)."</text>
-    <text locale="en">"$unit($unit) discovers that $localize($amount,$locale("fr")) $resource($herb,$amount) grow in $region($region)."</text>
+    <text locale="en">"$unit($unit) discovers that $localize($amount,$locale("en")) $resource($herb,$amount) grow in $region($region)."</text>
   </message>
   <message name="destroy_partial" section="events">
     <type>
