@@ -6584,12 +6584,11 @@ sp_flying_ship(castorder *co)
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+  sh = pa->param[0]->data.sh;
   if (sh->type->construction->maxsize>50) {
     /* TODO: error message */
     return 0;
   }
-
-  sh = pa->param[0]->data.sh;
 
   /* Duration = 1, nur diese Runde */
   c = shipcurse_flyingship(sh, mage, power, 1);
