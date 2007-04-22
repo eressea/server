@@ -1,5 +1,5 @@
 SubDir TOP ;
 SubInclude TOP common ;
 SubInclude TOP eressea ;
-SubInclude TOP mapper ;
+# SubInclude TOP mapper ;
 SubInclude TOP tools ;
