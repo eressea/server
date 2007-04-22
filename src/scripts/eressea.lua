@@ -30,6 +30,7 @@ function run_scripts()
     "eressea/eternath.lua",
     "eressea/wedding-jadee.lua", 
     "eressea/ponnuki.lua",
+    "eressea/items.lua",
     "eressea/xmas2004.lua",
     "eressea/10years.lua",
     "eressea/xmas2005.lua",

@@ -13,11 +13,14 @@
 #include <gamecode/monster.h>
 #include <gamecode/creport.h>
 
+#include <spells/spells.h>
+
 // kernel includes
 #include <kernel/alliance.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/ship.h>
 #include <kernel/message.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
@@ -265,6 +268,15 @@ process_orders(void)
   return 0;
 }
 
+static int
+levitate_ship(ship& sh, unit& mage, double power, int duration)
+{
+  curse * c = shipcurse_flyingship(&sh, &mage, power, duration);
+  if (c) {
+    return c->no;
+  }
+  return 0;
+}
 
 void
 bind_gamecode(lua_State * L)
@@ -289,6 +301,9 @@ bind_gamecode(lua_State * L)
     def("message_unit", &message_unit),
     def("message_faction", &message_faction),
     def("message_region", &message_region),
+
+    /* spells and stuff */
+    def("levitate_ship", &levitate_ship),
 
     /* scripted monsters */
     def("spawn_braineaters", &spawn_braineaters),

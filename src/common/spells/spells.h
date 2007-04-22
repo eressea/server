@@ -19,6 +19,8 @@ extern "C" {
 #endif
 
   extern void register_spells(void);
+  extern struct curse * shipcurse_flyingship(struct ship* sh, struct unit * mage, double power, int duration);
+
 
   /* für Feuerwände: in movement muß das noch explizit getestet werden.
   * besser wäre eine blcok_type::move() routine, die den effekt

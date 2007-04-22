@@ -30,6 +30,9 @@
     </string>
   </namespace>
   <namespace name="iteminfo">
+    <string name="ring_of_levitation">
+      <text locale="de">Benutzt der Kapitän des Schiffes diesen Talisman, so wird allen an Bord befindlichen Mallornsamen ihre magisch Energie entzogen, und das Schiff kann mit dieser Energie bis zu zwei Wochen lang fliegen.</text>
+    </string>
     <string name="birthdaycake">
       <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
       <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
@@ -166,6 +169,14 @@
         the sky one cold winter night, is said to have aphrodisiacal powers.</text>
     </string>
   </namespace>
+  <string name="ring_of_levitation">
+    <text locale="de">Ring der Levitation</text>
+    <text locale="en">ring of levitation</text>
+  </string>
+  <string name="ring_of_levitation_p">
+    <text locale="de">Ringe der Levitation</text>
+    <text locale="en">rings of levitation</text>
+  </string>
   <string name="birthdaycake">
     <text locale="de">Geburtstagstorte</text>
     <text locale="en">birthday cake</text>

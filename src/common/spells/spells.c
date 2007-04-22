@@ -6544,10 +6544,22 @@ sp_movecastle(castorder *co)
   return cast_level;
 }
 
-boolean
-shipcurse_flyingship(ship* sh, int power, int duration)
+curse *
+shipcurse_flyingship(ship* sh, unit * mage, double power, int duration)
 {
-  return false;
+  static const curse_type * ct_flyingship = NULL;
+  if (!ct_flyingship) {
+    ct_flyingship = ct_find("flyingship");
+    assert(ct_flyingship);
+  }
+  if (curse_active(get_curse(sh->attribs, ct_flyingship))) {
+    return NULL;
+  } else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
+    return NULL;
+  } else {
+    /* mit C_SHIP_NODRIFT haben wir kein Problem */
+    return create_curse(mage, &sh->attribs, ct_flyingship, power, duration, zero_effect, 0);
+  }
 }
 /* ------------------------------------------------------------- */
 /* Name:       Luftschiff
@@ -6572,30 +6584,29 @@ sp_flying_ship(castorder *co)
   double power = co->force;
   spellparameter *pa = co->par;
   message * m = NULL;
+  curse * c;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+  if (sh->type->construction->maxsize>50) {
+    /* TODO: error message */
+    return 0;
+  }
 
   sh = pa->param[0]->data.sh;
 
-  if (is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
-/*    sprintf(buf, "Auf dem Schiff befindet liegt bereits so ein Zauber."); */
-    cmistake(mage, co->order, 211, MSG_MAGIC);
-    return 0;
-  }
-  if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0) ) {
-/*    sprintf(buf, "Es ist zu gefährlich, ein sturmgepeitschtes Schiff "
-        "fliegen zu lassen."); */
-    cmistake(mage, co->order, 210, MSG_MAGIC);
-    return 0;
-  }
-  /* mit C_SHIP_NODRIFT haben wir kein Problem */
-
   /* Duration = 1, nur diese Runde */
-  create_curse(mage, &sh->attribs, ct_find("flyingship"), power, 1, zero_effect, 0);
-  /* Da der Spruch nur diese Runde wirkt, brauchen wir kein
-   * set_cursedisplay() zu benutzten - es sieht eh niemand...
-   */
+  c = shipcurse_flyingship(sh, mage, power, 1);
+  if (c==NULL) {
+    if (is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
+      /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
+      cmistake(mage, co->order, 211, MSG_MAGIC);
+    } else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0) ) {
+      /* Es ist zu gefährlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
+      cmistake(mage, co->order, 210, MSG_MAGIC);
+    }
+    return 0;
+  }
   sh->coast = NODIRECTION;
 
   /* melden, 1x pro Partei */

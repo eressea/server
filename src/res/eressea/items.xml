@@ -22,6 +22,12 @@
     </item>
   </resource>
 
+  <resource name="ring_of_levitation" appearance="ring">
+    <item notlost="yes" weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
   <resource name="birthdaycake">
     <item notlost="yes" weight="0"/>
   </resource>

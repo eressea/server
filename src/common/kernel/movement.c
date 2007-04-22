@@ -672,8 +672,13 @@ ship_allowed(const struct ship * sh, const region * r)
 static boolean
 flying_ship(const ship * sh)
 {
+  static const curse_type * ct_flyingship;
+  if (!ct_flyingship) {
+    ct_flyingship = ct_find("flyingship");
+    assert(ct_flyingship);
+  }
   if (sh->type->flags & SFL_FLY) return true;
-  if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) return true;
+  if (curse_active(get_curse(sh->attribs, ct_flyingship))) return true;
   return false;
 }
 
