@@ -260,9 +260,10 @@ cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
   if (end==begin) return NULL;
   else {
     int index = begin + curse_geteffect(c) % (end-begin);
-    return msg_message(mkname("curseinfo", effects[index]), "text id", buf, c->no);
+    return msg_message(mkname("curseinfo", effects[index]), "unit id", u, c->no);
   }
 }
+
 static struct curse_type ct_sparkle = { "sparkle",
   CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
   "Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
