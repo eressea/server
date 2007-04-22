@@ -277,7 +277,8 @@ extern int get_cursedmen(struct unit *u, struct curse *c);
    * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 
 extern void c_setflag(curse * c, unsigned int flag);
-  /* setzt Spezialflag einer Verzauberung (zB 'dauert ewig') */
+extern void c_clearflag(curse *c, unsigned int flags);
+  /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
 
 void transfer_curse(struct unit * u, struct unit * u2, int n);
   /* sorgt dafür, das bei der Übergabe von Personen die curse-attribute

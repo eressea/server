@@ -178,7 +178,7 @@ cinfo_unit(const void * obj, typ_t typ, const curse *c, int self)
 
 static struct curse_type ct_orcish = {
   "orcish",
-  CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+  CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_ISNEW, M_MEN,
   "Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
   "ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
   cinfo_unit

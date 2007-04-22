@@ -26,9 +26,10 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <event.h>
-#include <resolve.h>
-#include <base36.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/resolve.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -61,7 +62,7 @@ do_shock(unit *u, const char *reason)
   }
 
   /* Evt. Talenttageverlust */
-  for (i=0;i!=u->skill_size;++i) if (rand()%5==0) {
+  for (i=0;i!=u->skill_size;++i) if (rng_int()%5==0) {
     skill * sv = u->skills+i;
     int weeks = (sv->level * sv->level - sv->level) / 2;
     int change = (weeks+9) / 10;

@@ -58,6 +58,21 @@
 #define MAXENTITYHASH 7919
 curse *cursehash[MAXENTITYHASH];
 
+/* -------------------------------------------------------------------------- */
+void
+c_setflag(curse *c, unsigned int flags)
+{
+  assert(c);
+  c->flags = (c->flags & ~flags) | (flags & (c->type->flags ^ flags));
+}
+/* -------------------------------------------------------------------------- */
+void
+c_clearflag(curse *c, unsigned int flags)
+{
+  assert(c);
+  c->flags = (c->flags & ~flags) | (c->type->flags & flags);
+}
+
 void
 chash(curse *c)
 {
@@ -139,7 +154,8 @@ curse_done(attrib * a) {
 /* ------------------------------------------------------------- */
 
 int
-curse_read(attrib * a, FILE * f) {
+curse_read(attrib * a, FILE * f)
+{
   variant mageid;
   curse * c = (curse*)a->data.v;
   const curse_type * ct;
@@ -165,6 +181,7 @@ curse_read(attrib * a, FILE * f) {
   } else {
     c->flags = flags;
   }
+  c_clearflag(c, CURSE_ISNEW);
 
 #ifdef CONVERT_DBLINK
   if (global.data_version<DBLINK_VERSION) {
@@ -200,15 +217,17 @@ curse_read(attrib * a, FILE * f) {
 }
 
 void
-curse_write(const attrib * a, FILE * f) {
+curse_write(const attrib * a, FILE * f)
+{
   unsigned int flags;
   int mage_no;
   curse * c = (curse*)a->data.v;
   const curse_type * ct = c->type;
 
-  flags = (c->flags & ~(CURSE_ISNEW));
+  /* copied from c_clearflag */
+  flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
 
-  if (c->magician){
+  if (c->magician) {
     mage_no = c->magician->no;
   } else {
     mage_no = -1;
@@ -441,14 +460,6 @@ set_cursedmen(curse *c, int cursedmen)
 }
 
 /* ------------------------------------------------------------- */
-void
-c_setflag(curse *c, unsigned int flags)
-{
-  assert(c);
-  c->flags = (c->flags & ~flags) | (flags & (c->type->flags ^ flags));
-}
-
-/* ------------------------------------------------------------- */
 /* Legt eine neue Verzauberung an. Sollte es schon einen Zauber
  * dieses Typs geben, gibt es den bestehenden zurück.
  */
@@ -464,7 +475,7 @@ make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
   c = (curse*)a->data.v;
 
   c->type = ct;
-  c->flags = CURSE_ISNEW;
+  c->flags = 0;
   c->vigour = vigour;
   c->duration = duration;
   c->effect = effect;

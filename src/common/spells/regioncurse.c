@@ -44,7 +44,7 @@
 static message *
 cinfo_cursed_by_the_gods(const void * obj, typ_t typ, const curse *c, int self)
 {
-  region *r = (region *)obj;;
+  region *r = (region *)obj;
 
   unused(typ);
   unused(self);
@@ -58,7 +58,7 @@ cinfo_cursed_by_the_gods(const void * obj, typ_t typ, const curse *c, int self)
 
 static struct curse_type ct_godcursezone = {
   "godcursezone",
-  CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
+  CURSETYP_NORM, CURSE_IMMUNE|CURSE_ISNEW, (NO_MERGE),
   "Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
   "über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
   "sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
@@ -87,7 +87,7 @@ cinfo_dreamcurse(const void * obj, typ_t typ, const curse *c, int self)
 
 static struct curse_type ct_gbdream = { 
   "gbdream",
-  CURSETYP_NORM, 0, (NO_MERGE),
+  CURSETYP_NORM, CURSE_ISNEW, (NO_MERGE),
   "",
   cinfo_dreamcurse
 };
@@ -208,7 +208,7 @@ static struct curse_type ct_fogtrap = {
 };
 static struct curse_type ct_maelstrom = {
   "maelstrom",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+  CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
   "Dieser Zauber verursacht einen gigantischen magischen Strudel. Der "
   "Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer "
   "beschädigen.",
@@ -229,7 +229,7 @@ static struct curse_type ct_drought = {
 };
 static struct curse_type ct_badlearn = {
   "badlearn",
-  CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
+  CURSETYP_NORM, CURSE_ISNEW, ( M_DURATION | M_VIGOUR ),
   "Dieser Zauber scheint die Ursache für die Schlaflosigkeit und "
   "Mattigkeit zu sein, unter der die meisten Leute hier leiden und "
   "die dazu führt, das Lernen weniger Erfolg bringt. ",
@@ -273,7 +273,7 @@ static struct curse_type ct_peacezone = {
 /* erschwert geordnete Bewegungen */
 static struct curse_type ct_disorientationzone = {
   "disorientationzone",
-  CURSETYP_NORM, 0, NO_MERGE,
+  CURSETYP_NORM, CURSE_ISNEW, NO_MERGE,
   "",
   cinfo_simple
 };

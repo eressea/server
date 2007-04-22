@@ -69,7 +69,7 @@ attrib_type at_variable = {
 const char *
 get_variable(attrib *a, const char *key)
 {
-	attrib *ap = a_find(a, &at_variable);;
+	attrib *ap = a_find(a, &at_variable);
 
 	while (ap && ap->type==&at_variable) {
     variable * var = (variable *)ap->data.v;
