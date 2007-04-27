@@ -587,6 +587,7 @@ sp_summon_familiar(castorder *co)
   for (sk=0;sk<MAXSKILLS;sk++) {
     if (rc->bonus[sk] > -5) dh++;
   }
+  buf[0] = 0;
   for(sk=0;sk<MAXSKILLS;sk++) {
     if (rc->bonus[sk] > -5) {
       dh--;
