@@ -2083,7 +2083,7 @@ report_plaintext(const char * filename, report_context * ctx)
       }
       if (!fval(r->terrain, SEA_REGION)) {
         if (sh->coast != NODIRECTION) {
-          scat(LOC(f->locale, ", "));
+          scat(", ");
           scat(LOC(f->locale, coasts[sh->coast]));
         }
       }
