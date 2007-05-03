@@ -296,20 +296,6 @@ mr_get(const view * vi, int xofs, int yofs)
   return vi->regions + xofs + yofs * vi->size.width;
 }
 
-static coordinate *
-point2coor(const point * p, coordinate * c)
-{
-  int x, y;
-  assert(p && c);
-  /* wegen division (-1/2==0):
-  * verschiebung um (0x200000,0x200000) ins positive */
-  x = p->x + TWIDTH*0x200000+TWIDTH*0x100000;
-  y = p->y + THEIGHT*0x200000;
-  c->x = (x - y * TWIDTH / 2) / TWIDTH - 0x200000;
-  c->y = y / THEIGHT - 0x200000;
-  return c;
-}
-
 static point *
 coor2point(const coordinate * c, point * p)
 {

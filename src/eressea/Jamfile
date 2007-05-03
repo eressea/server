@@ -38,8 +38,9 @@ SHARED_BINDINGS =
  <lua>item.cpp
 ;
 
+Library luabindings : $(SHARED_BINDINGS) ;
+
 LUASERVER_SOURCES =
- $(SHARED_BINDINGS)
  <common!iniparser>iniparser.c
  <lua>script.cpp
  <lua>gamecode.cpp
@@ -49,7 +50,6 @@ LUASERVER_SOURCES =
  ;
 
 GMTOOL_SOURCES =
- $(SHARED_BINDINGS)
  <common!iniparser>iniparser.c
  <lua>gm.cpp
  <curses>listbox.c
@@ -64,11 +64,12 @@ LinkLibraries $(SERVER) :
  gamecode items spells kernel modules attributes races triggers util ;
 libxml2 $(SERVER) ;
 LINKLIBS on $(SERVER) += -lm ;
-Main $(SERVER) : $(SERVER_SOURCES) ;
+# build disabled:
+# Main $(SERVER) : $(SERVER_SOURCES) ;
 
 # eressea-server with lua scripting
 LinkLibraries $(LUASERVER) :
- gamecode items spells kernel modules attributes races triggers util ;
+ luabindings gamecode items spells kernel modules attributes races triggers util ;
 luabind $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
 LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
@@ -76,7 +77,7 @@ Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
 
 # the curses-based GM tool (now with luabind)
 LinkLibraries $(GMTOOL) :
- items spells kernel modules attributes races triggers util ;
+ luabindings items spells kernel modules attributes races triggers util ;
 luabind $(GMTOOL) ;
 libxml2 $(GMTOOL) ;
 LINKLIBS on $(GMTOOL) += -lm -lncurses -ldl -lstdc++ ;
