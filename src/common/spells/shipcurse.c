@@ -66,7 +66,7 @@ cinfo_shipnodrift(const void * obj, typ_t typ, const curse *c, int self)
   if (self != 0) {
     return msg_message("curseinfo::shipnodrift_1", "ship duration id", sh, c->duration, c->no);
   }
-  return msg_message("curseinfo::shipnodrift_0", "ship duration id", sh, c->duration, c->no);
+  return msg_message("curseinfo::shipnodrift_0", "ship id", sh, c->no);
 }
 
 static struct curse_type ct_stormwind = { "stormwind",

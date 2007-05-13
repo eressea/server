@@ -23,7 +23,7 @@
   </resource>
 
   <resource name="ring_of_levitation" appearance="ring">
-    <item notlost="yes" weight="0">
+    <item notlost="yes" weight="0" cursed="true">
       <function name="use" value="lua_useitem"/>
     </item>
   </resource>
