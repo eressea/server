@@ -5952,6 +5952,17 @@
     <text locale="fr">"$unit($unit) en $region($region): '$order($command)' - L'unité ne possède pas cet objet."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this item."</text>
   </message>
+  <message name="nogive_reserved" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="reservation" type="int"/>
+      <arg name="resource" type="resource"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diesen Gegenstand zwar, aber sämtliche $int($reservation) $resource($resource,$reservation) sind reserviert."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit has this item, but all $int($reservation) $resource($resource,$reservation) are reserved."</text>
+  </message>
   <message name="error35" section="errors">
     <type>
       <arg name="unit" type="unit"/>

@@ -100,11 +100,17 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
   n = min(want, n);
   if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
 		if (ord!=NULL) {
-    ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
-      "turns", GiveRestriction()));
+      ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
+        "turns", GiveRestriction()));
 		}
     return -1;
   } else if (n == 0) {
+    int reserve = get_reservation(src, itype->rtype);
+    if (reserve) {
+      msg_feedback(src, ord, "nogive_reserved", "resource reservation", 
+        itype->rtype, reserve);
+      return -1;
+    }
     error = 36;
   } else if (itype->flags & ITF_CURSED) {
     error = 25;
@@ -132,7 +138,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
           /* warden_add_give(src, dest, itype, n); */
         }
 #endif
-    }else{
+    } else {
       /* gib bauern */
       give_peasants(use, itype, src);
     }
