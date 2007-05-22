@@ -1169,7 +1169,7 @@ manufacture(unit * u, const item_type * itype, int want)
     ADDMSG(&u->faction->msgs, msg_message("manufacture",
       "unit region amount wanted resource", u, u->region, n, want, itype->rtype));
   } else {
-    cmistake(u, u->thisorder, 125, MSG_PRODUCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_cannotmake", ""));
   }
 }
 
@@ -1616,7 +1616,9 @@ create_item(unit * u, const item_type * itype, int want)
     const potion_type * ptype = resource2potion(itype->rtype);
     if (ptype!=NULL) create_potion(u, ptype, want);
     else if (itype->construction && itype->construction->materials) manufacture(u, itype, want);
-    else cmistake(u, u->thisorder, 125, MSG_PRODUCE);
+    else {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_cannotmake", ""));
+    }
   }
 }
 
@@ -1728,7 +1730,7 @@ make_cmd(unit * u, struct order * ord)
   else if (itype!=NULL) {
     create_item(u, itype, m);
   } else {
-    cmistake(u, ord, 125, MSG_PRODUCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
   }
 
   return 0;
@@ -2495,56 +2497,6 @@ breedtrees(region *r, unit *u, int raw)
     "unit region amount herb", u, r, planted, rtype));
 }
 
-static void
-plant_cmd(unit *u, struct order * ord)
-{
-  region * r = u->region;
-  int m;
-  const char *s;
-  param_t p;
-  const resource_type * rtype = NULL;
-  
-  if (r->land==NULL) {
-    /* TODO: error message here */
-    return;
-  }
-
-  /* pflanze [<anzahl>] <parameter> */
-  init_tokens(ord);
-  skip_token();
-  s = getstrtoken();
-  m = atoi(s);
-  sprintf(buf, "%d", m);
-  if (!strcmp(buf, s)) {
-    /* first came a want-paramter */
-    s = getstrtoken();
-  } else {
-    m = INT_MAX;
-  }
-  
-  if (!s[0]) {
-    p = P_ANY;
-  } else {
-    p = findparam(s, u->faction->locale);
-    rtype = findresourcetype(s, u->faction->locale);
-  }
-  
-  if (p==P_HERBS){
-    plant(r, u, m);
-    return;
-  }
-  else if (p==P_TREES){
-    breedtrees(r, u, m);
-    return;
-  }
-  else if (rtype!=NULL){
-    if (rtype==rt_mallornseed || rtype==rt_seed) {
-      breedtrees(r, u, m);
-      return;
-    }
-  }
-}
-
 /* züchte pferde */
 static void
 breedhorses(region *r, unit *u)
@@ -2584,6 +2536,12 @@ breed_cmd(unit *u, struct order * ord)
   const char *s;
   param_t p;
   region *r = u->region;
+  const resource_type * rtype = NULL;
+
+  if (r->land==NULL) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
+    return;
+  }
 
   /* züchte [<anzahl>] <parameter> */
   init_tokens(ord);
@@ -2591,15 +2549,14 @@ breed_cmd(unit *u, struct order * ord)
   s = getstrtoken();
 
   m = atoi(s);
-  sprintf(buf, "%d", m);
-  if (!strcmp(buf, s)) {
+  if (m!=0) {
     /* first came a want-paramter */
     s = getstrtoken();
   } else {
     m = INT_MAX;
   }
   
-  if(!s[0]){
+  if (!s[0]) {
     p = P_ANY;
   } else {
     p = findparam(s, u->faction->locale);
@@ -2608,13 +2565,23 @@ breed_cmd(unit *u, struct order * ord)
   switch (p) {
   case P_HERBS:
     plant(r, u, m);
-    return;
+    break;
   case P_TREES:
     breedtrees(r, u, m);
-    return;
+    break;
   default:
+    if (p!=P_ANY) {
+      rtype = findresourcetype(s, u->faction->locale);
+      if (rtype==rt_mallornseed || rtype==rt_seed) {
+        breedtrees(r, u, m);
+        break;
+      } else if (rtype!=oldresourcetype[R_HORSE]) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
+        break;
+      }
+    }
     breedhorses(r, u);
-    return;
+    break;
   }
 }
 
@@ -2705,7 +2672,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
   }
 
   if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]) {
-    cmistake(u, ord, 242, MSG_INCOME);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
     return;
   }
 
@@ -3162,12 +3129,9 @@ produce(void)
           sabotage_cmd(u, u->thisorder);
           break;
 
+        case K_PLANT:
         case K_BREED:
           breed_cmd(u, u->thisorder);
-          break;
-
-        case K_PLANT:
-          plant_cmd(u, u->thisorder);
           break;
 
         case K_RESEARCH:

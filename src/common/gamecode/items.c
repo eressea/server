@@ -162,7 +162,7 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
   building *b;
 
   if(u->region->land == NULL) {
-    cmistake(u, ord, 242, MSG_MAGIC);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
     return -1;
   }
 
@@ -186,7 +186,7 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
   building *b;
 
   if(u->region->land == NULL) {
-    cmistake(u, ord, 242, MSG_MAGIC);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
     return -1;
   }
 

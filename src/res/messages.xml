@@ -3839,7 +3839,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keine gültige Rasse angegeben."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You did not specify a valid race."</text>
   </message>
-  <message name="error242" section="errors">
+  <message name="error_onlandonly" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -5025,7 +5025,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot sell this."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot sell this."</text>
   </message>
-  <message name="error125" section="errors">
+  <message name="error_cannotmake" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>

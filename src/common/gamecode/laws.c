@@ -991,7 +991,7 @@ restart_cmd(unit * u, struct order * ord)
   skip_token(); /* skip keyword */
 
   if (!fval(u->region->terrain, LAND_REGION)) {
-    cmistake(u, ord, 242, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
   } else {
     const char * s_race = getstrtoken(), * s_pass;
     const race * frace = findrace(s_race, u->faction->locale);
@@ -3848,7 +3848,6 @@ process(void)
                     ord = NULL;
                   } else if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
                     /* error message disabled by popular demand */
-                    /* cmistake(u, ord, 242, MSG_INCOME); */
                     ord = NULL;
                   }
                 }
