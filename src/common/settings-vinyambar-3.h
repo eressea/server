@@ -22,7 +22,6 @@
 #define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
 #define NEWATSROI 0
 #define COMBAT_TURNS 5
-#define NEW_MIGRATION 1
 
 /* Vermehrungsrate Bauern in 1/10000.
 * Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */

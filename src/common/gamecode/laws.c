@@ -419,8 +419,6 @@ live(region * r)
  * - movement because of low loyalty relating to present parties.
  */
 
-#if NEW_MIGRATION == 1
-
 /* Arbeitsversion */
 static void
 calculate_emigration(region *r)
@@ -462,80 +460,6 @@ calculate_emigration(region *r)
     }
   }
 }
-
-#else
-void
-calculate_emigration(region *r)
-{
-  direction_t i, j;
-  int maxpeasants_here;
-  int maxpeasants[MAXDIRECTIONS];
-  double wfactor, gfactor;
-
-  /* Vermeidung von DivByZero */
-  maxpeasants_here = max(maxworkingpeasants(r),1);
-
-  for (i = 0; i != MAXDIRECTIONS; i++) {
-    region *c = rconnect(r, i);
-    if (c && rterrain(c) != T_OCEAN) {
-      maxpeasants[i] = maxworkingpeasants(c);
-    } else maxpeasants[i] = 0;
-  }
-
-  /* calculate emigration for all directions independently */
-
-  for (i = 0; i != MAXDIRECTIONS; i++) {
-    region * rc = rconnect(r, i);
-    if (!rc) continue;
-    if (fval(r, RF_ORCIFIED)==fval(rc, RF_ORCIFIED)) {
-      if (fval(rc->terrain, LAND_REGION) && fval(r->terrain, LAND_REGION)) {
-        int wandering_peasants;
-        double vfactor;
-
-        /* First let's calculate the peasants who wander off to less inhabited
-         * regions. wfactor indicates the difference of population denity.
-         * Never let more than PEASANTSWANDER_WEIGHT per cent wander off in one
-         * direction. */
-        wfactor = ((double) rpeasants(r) / maxpeasants_here -
-          ((double) rpeasants(rc) / maxpeasants[i]));
-        wfactor = max(wfactor, 0);
-        wfactor = min(wfactor, 1);
-
-        /* Now let's handle the greedy peasants. gfactor indicates the
-         * difference of per-head-wealth. Never let more than
-         * PEASANTSGREED_WEIGHT per cent wander off in one direction. */
-        gfactor = (((double) rmoney(rc) / max(rpeasants(rc), 1)) -
-               ((double) rmoney(r) / max(rpeasants(r), 1))) / 500;
-        gfactor = max(gfactor, 0);
-        gfactor = min(gfactor, 1);
-
-        /* This calculates the influence of volcanos on peasant
-         * migration. */
-
-        if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
-            vfactor = 0.10;
-        } else {
-            vfactor = 1.00;
-        }
-
-        for(j=0; j != MAXDIRECTIONS; j++) {
-          region *rv = rconnect(rc, j);
-          if(rv && (rterrain(rv) == T_VOLCANO || rterrain(rv) == T_VOLCANO_SMOKING)) {
-            vfactor *= 0.5;
-            break;
-          }
-        }
-
-        wandering_peasants = (int) (rpeasants(r) * (gfactor+wfactor)
-            * vfactor * PEASANTSWANDER_WEIGHT / 100.0);
-
-        r->land->newpeasants -= wandering_peasants;
-        rc->land->newpeasants += wandering_peasants;
-      }
-    }
-  }
-}
-#endif
 
 /** Bauern vermehren sich */
 
