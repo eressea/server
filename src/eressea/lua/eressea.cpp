@@ -226,10 +226,10 @@ is_function(struct lua_State * luaState, const char * fname)
 }
 
 static const char *
-get_season(void)
+get_season(int turnno)
 {
   gamedate gd;
-  get_gamedate(turn, &gd);
+  get_gamedate(turnno, &gd);
   return seasonnames[gd.season];
 }
 
