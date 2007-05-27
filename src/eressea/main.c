@@ -115,7 +115,7 @@ extern boolean noreports;
 extern boolean nomer;
 extern boolean nobattle;
 extern boolean nomonsters;
-extern boolean nobattledebug;
+extern boolean battledebug;
 extern boolean dirtyload;
 
 extern int loadplane;
@@ -420,7 +420,7 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
-			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
+			else if (strcmp(argv[i]+2, "nodebug")==0) battledebug = false;
 			else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
 			else if (strcmp(argv[i]+2, "help")==0)
 				return usage(argv[0], NULL);

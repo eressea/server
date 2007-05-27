@@ -231,9 +231,6 @@ extern void read_laen(struct region * r, int laen);
 /* Vermehrung trotz 90% Auslastung */
 #define PEASANTFORCE   0.75
 
-#define PEASANTSWANDER_WEIGHT 5
-#define PEASANTSGREED_WEIGHT  5
-
 #define TREESIZE     (MAXPEASANTS_PER_AREA-2)
 
 /* Eisen in Bergregionen bei Erschaffung */

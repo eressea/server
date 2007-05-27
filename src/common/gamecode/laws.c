@@ -419,43 +419,35 @@ live(region * r)
  * - movement because of low loyalty relating to present parties.
  */
 
-/* Arbeitsversion */
+#define MAX_EMIGRATION(p) ((p)/MAXDIRECTIONS)
+#define MAX_IMMIGRATION(p) ((p)*2/3)
+
 static void
 calculate_emigration(region *r)
 {
-  direction_t i;
-  int overpopulation = rpeasants(r) - maxworkingpeasants(r);
-  int weight[MAXDIRECTIONS], weightall;
+  int i;
+  int maxp = maxworkingpeasants(r);
+  int rp = rpeasants(r);
+  int max_immigrants = MAX_IMMIGRATION(maxp-rp);
 
-  /* Bauern wandern nur bei Überbevölkerung, sonst gar nicht */
-  if(overpopulation <= 0) return;
-
-  weightall = 0;
-
-  for (i = 0; i != MAXDIRECTIONS; i++) {
-    region *rc = rconnect(r,i);
-    int w;
-
-    if (rc == NULL || !fval(rc->terrain, LAND_REGION)) {
-      w = 0;
-    } else {
-      w = rpeasants(rc) - maxworkingpeasants(rc);
-      w = max(0,w);
-      if (rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
-        w = w/10;
-      }
-    }
-    weight[i]  = w;
-    weightall += w;
+  if (rterrain(r) == T_VOLCANO || rterrain(r) == T_VOLCANO_SMOKING) {
+    max_immigrants = max_immigrants/10;
   }
 
-  if (weightall !=0 ) for (i = 0; i != MAXDIRECTIONS; i++) {
-    region *rc = rconnect(r, i);
-    if (rc != NULL) {
-      int wandering_peasants = (overpopulation * weight[i])/weightall;
-      if (wandering_peasants > 0) {
-        r->land->newpeasants -= wandering_peasants;
-        rc->land->newpeasants += wandering_peasants;
+  for (i = 0; max_immigrants>0 && i != MAXDIRECTIONS; i++) {
+    int dir = (turn+i) % MAXDIRECTIONS;
+    region *rc = rconnect(r, (direction_t)dir);
+
+    if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
+      int rp2 = rpeasants(rc);
+      int maxp2 = maxworkingpeasants(rc);
+      int max_emigration = MAX_EMIGRATION(rp2-maxp2);
+      
+      if (max_emigration>0) {
+        max_emigration = min(max_emigration, max_immigrants);
+        r->land->newpeasants += max_emigration;
+        rc->land->newpeasants -= max_emigration;
+        max_immigrants -= max_emigration;
       }
     }
   }
@@ -817,26 +809,28 @@ demographics(void)
     if (!fval(r->terrain, SEA_REGION)) {
       /* die Nachfrage nach Produkten steigt. */
       struct demand * dmd;
-      if (r->land) for (dmd=r->land->demands;dmd;dmd=dmd->next) {
-        if (dmd->value>0 && dmd->value < MAXDEMAND) {
-          float rise = DMRISE;
-          if (buildingtype_exists(r, bt_find("harbour"))) rise = DMRISEHAFEN;
-          if (rng_double()<rise) ++dmd->value;
+      if (r->land) {
+        for (dmd=r->land->demands;dmd;dmd=dmd->next) {
+          if (dmd->value>0 && dmd->value < MAXDEMAND) {
+            float rise = DMRISE;
+            if (buildingtype_exists(r, bt_find("harbour"))) rise = DMRISEHAFEN;
+            if (rng_double()<rise) ++dmd->value;
+          }
+        }
+        /* Seuchen erst nachdem die Bauern sich vermehrt haben
+        * und gewandert sind */
+
+        calculate_emigration(r);
+        peasants(r);
+        plagues(r, false);
+        horses(r);
+        if (current_season != SEASON_WINTER) {
+          trees(r, current_season, last_weeks_season);
         }
       }
-      /* Seuchen erst nachdem die Bauern sich vermehrt haben
-       * und gewandert sind */
 
-      calculate_emigration(r);
-      peasants(r);
-      plagues(r, false);
-
-      horses(r);
-      if(current_season != SEASON_WINTER) {
-        trees(r, current_season, last_weeks_season);
-      }
       update_resources(r);
-      migrate(r);
+      if (r->land) migrate(r);
     }
   }
   while (free_migrants) {
@@ -850,7 +844,7 @@ demographics(void)
 
   puts(" - Einwanderung...");
   for (r = regions; r; r = r->next) {
-    if (fval(r->terrain, LAND_REGION)) {
+    if (r->land && r->land->newpeasants) {
       int rp = rpeasants(r) + r->land->newpeasants;
       rsetpeasants(r, max(0, rp));
     }

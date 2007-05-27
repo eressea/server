@@ -92,7 +92,7 @@ typedef enum combatmagic {
 } combatmagic_t;
 
 /* external variables */
-boolean nobattledebug = false;
+boolean battledebug = true;
 
 /* globals */
 static int obs_count = 0;
@@ -224,7 +224,7 @@ armedmen(const unit * u)
 }
 
 static void
-battledebug(const char *s)
+battle_log(const char *s)
 {
 #if SHOW_DEBUG
   puts(s);
@@ -1053,9 +1053,10 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     kritchance = min(0.9, kritchance);
 
     while (chance(kritchance)) {
-      sprintf(debugbuf,
-        "%s/%d landet einen kritischen Treffer", unitid(au), at.index);
-      battledebug(debugbuf);
+      if (battledebug) {
+        sprintf(debugbuf, "%s/%d landet einen kritischen Treffer", unitid(au), at.index);
+        battle_log(debugbuf);
+      }
       da += dice_rand(damage);
     }
 
@@ -1134,8 +1135,10 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
   }
 
-  sprintf(debugbuf, "Verursacht %dTP, Rüstung %d: %d -> %d HP",
-    da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
+  if (battledebug) {
+    sprintf(debugbuf, "Verursacht %dTP, Rüstung %d: %d -> %d HP",
+      da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
+  }
 
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
@@ -1152,7 +1155,9 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   df->person[dt.index].hp -= rda;
 
   if (df->person[dt.index].hp > 0) {  /* Hat überlebt */
-    battledebug(debugbuf);
+    if (battledebug) {
+      battle_log(debugbuf);
+    }
     if (au->race == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
       if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
@@ -1220,8 +1225,10 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     return false;
   }
 
-  strcat(debugbuf, ", tot");
-  battledebug(debugbuf);
+  if (battledebug) {
+    strcat(debugbuf, ", tot");
+    battle_log(debugbuf);
+  }
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
     strcat(smallbuf, ".");
@@ -1897,8 +1904,10 @@ hits(troop at, troop dt, weapon * awp)
   }
 #endif
   if (contest(skdiff, armor, shield)) {
-    strcat(debugbuf, " und trifft.");
-    battledebug(debugbuf);
+    if (battledebug) {
+      strcat(debugbuf, " und trifft.");
+      battle_log(debugbuf);
+    }
 #ifdef SMALL_BATTLE_MESSAGES
     if (b->small) {
       strcat(smallbuf, " und trifft.");
@@ -1907,8 +1916,10 @@ hits(troop at, troop dt, weapon * awp)
 #endif
     return 1;
   }
-  strcat(debugbuf, ".");
-  battledebug(debugbuf);
+  if (battledebug) {
+    strcat(debugbuf, ".");
+    battle_log(debugbuf);
+  }
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
     strcat(smallbuf, ".");
@@ -2102,8 +2113,10 @@ attack(battle *b, troop ta, const att *a, int numattack)
         }
         if (reload && wp && wp->type->reload && !getreload(ta)) {
           int i = setreload(ta);
-          sprintf(buf, " Nachladen gesetzt: %d", i);
-          battledebug(buf);
+          if (battledebug) {
+            sprintf(buf, " Nachladen gesetzt: %d", i);
+            battle_log(buf);
+          }
         }
       }
     }
@@ -2738,11 +2751,13 @@ aftermath(battle * b)
   free(trollsave);
 #endif
 
-  sprintf(buf, "The battle lasted %d turns, %s and %s.\n",
-    b->turn,
-    b->has_tactics_turn==true?"had a tactic turn":"had no tactic turn",
-    battle_was_relevant==true?"was relevant":"was not relevant.");
-  battledebug(buf);
+  if (battledebug) {
+    sprintf(buf, "The battle lasted %d turns, %s and %s.\n",
+      b->turn,
+      b->has_tactics_turn==true?"had a tactic turn":"had no tactic turn",
+      battle_was_relevant==true?"was relevant":"was not relevant.");
+    battle_log(buf);
+  }
 }
 
 static void
@@ -2758,8 +2773,9 @@ battle_punit(unit * u, battle * b)
     spunit(&S, f, u, 4, see_battle);
     for (x = S; x; x = x->next) {
       fbattlerecord(b, f, x->s);
-      if (u->faction == f)
-        battledebug(x->s);
+      if (battledebug && u->faction == f) {
+        battle_log(x->s);
+      }
     }
     if (S)
       freestrlist(S);
@@ -2926,14 +2942,14 @@ print_stats(battle * b)
     buf[77] = (char)0;
     for (k = buf; *k; ++k) *k = '-';
     battlerecord(b, buf);
-    if (s->bf->faction) {
+    if (battledebug && s->bf->faction) {
       if (s->bf->faction->alliance) {
         slprintf(buf, sizeof(buf), "##### %s (%s/%d)", s->bf->faction->name, itoa36(s->bf->faction->no),
           s->bf->faction->alliance?s->bf->faction->alliance->id:0);
       } else {
         slprintf(buf, sizeof(buf), "##### %s (%s)", s->bf->faction->name, itoa36(s->bf->faction->no));
       }
-      battledebug(buf);
+      battle_log(buf);
     }
     print_fighters(b, s);
   }
@@ -3354,7 +3370,7 @@ make_battle(region * r)
   bfaction * bf;
   static int max_fac_no = 0; /* need this only once */
 
-  if (!nobattledebug) {
+  if (battledebug) {
     char zText[MAX_PATH];
     char zFilename[MAX_PATH];
     sprintf(zText, "%s/battles", basepath());
@@ -3884,10 +3900,10 @@ init_battle(region * r, battle **bp)
               c1->side->bf->attacker = true;
 
               set_enemy(c1->side, c2->side, true);
-              if (!enemy(c1->side, c2->side)) {
+              if (battledebug && !enemy(c1->side, c2->side)) {
                 sprintf(buf, "%s attackiert %s", sidename(c1->side, false),
                   sidename(c2->side, false));
-                battledebug(buf);
+                battle_log(buf);
               }
               fighting = true;
             }
@@ -4081,10 +4097,10 @@ battle_flee(battle * b)
 #endif
           }
         }
-        if (runners > 0) {
+        if (battledebug && runners > 0) {
           char lbuf[256];
           sprintf(lbuf, "Flucht: %d aus %s", runners, itoa36(fig->unit->no));
-          battledebug(lbuf);
+          battle_log(lbuf);
         }
       }
     }
@@ -4155,11 +4171,11 @@ do_battle(region * r)
 #endif
 
   for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
-    char lbuf[256];
-
-    sprintf(lbuf, "*** Runde: %d", b->turn);
-    battledebug(lbuf);
-
+    if (battledebug) {
+      char lbuf[256];
+      sprintf(lbuf, "*** Runde: %d", b->turn);
+      battle_log(lbuf);
+    }
     battle_flee(b);
     battle_update(b);
     battle_attacks(b);

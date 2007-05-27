@@ -136,7 +136,7 @@ extern "C" {
   extern boolean nomer;
   extern boolean nobattle;
   extern boolean nomonsters;
-  extern boolean nobattledebug;
+  extern boolean battledebug;
   extern boolean dirtyload;
 
   extern int loadplane;
@@ -451,7 +451,7 @@ read_args(int argc, char **argv, lua_State * luaState)
       else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
       else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
       else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
-      else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
+      else if (strcmp(argv[i]+2, "nodebug")==0) battledebug = false;
       else if (strcmp(argv[i]+2, "console")==0) luafile=NULL;
       else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
       else if (strcmp(argv[i]+2, "help")==0)
@@ -584,6 +584,8 @@ load_inifile(const char * filename)
     lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
 
     quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
+    battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
+
     str = iniparser_getstr(d, "eressea:run");
     if (str) luafile = str;
     str = iniparser_getstr(d, "eressea:report");
