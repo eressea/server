@@ -32,6 +32,7 @@ extern "C" {
   extern void register_archetype(struct archetype * arch);
   extern void register_archetypes(void);
 
+  extern struct attrib_type at_recruit;
 
 #ifdef __cplusplus
 }

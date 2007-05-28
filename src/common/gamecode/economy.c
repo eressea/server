@@ -1068,6 +1068,7 @@ recruit_archetype(unit * u, order * ord)
   id = getid();
   if (n>0 && s && s[0]) {
     const archetype * arch = find_archetype(s, u->faction->locale);
+    attrib * a = NULL;
 
     if (u->number>0) {
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_new", ""));
@@ -1080,16 +1081,35 @@ recruit_archetype(unit * u, order * ord)
       /* TODO: error message */
       return 0;
     }
-    if (arch->btype && u->building->type!=arch->btype) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_in_building", "type", arch->btype));
-      /* TODO: error message */
-      return 0;
+    if (arch->btype) {
+      if (u->building==NULL || u->building->type!=arch->btype) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_in_building", "type", arch->btype));
+        /* TODO: error message */
+        return 0;
+      }
+      if (arch->size) {
+        int maxsize = u->building->size;
+        attrib * a = a_find(u->building->attribs, &at_recruit);
+        if (a!=NULL) {
+          maxsize -= a->data.i;
+        }
+        n = max(maxsize/arch->size, n);
+        if (n<=0) {
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "recruit_capacity_exhausted", "building", u->building));
+          /* TODO: error message */
+          return 0;
+        }
+      }
     }
 
     n = build(u, arch->ctype, 0, n);
     if (n>0) {
       scale_number(u, n);
       equip_unit(u, arch->equip);
+      if (arch->size) {
+        if (a==NULL) a = a_add(&u->building->attribs, a_new(&at_recruit));
+        a->data.i += n*arch->size;
+      }
       return n;
     } else switch(n) {
       case ENOMATERIALS:

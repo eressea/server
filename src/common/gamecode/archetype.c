@@ -24,6 +24,10 @@
 
 static struct archetype * archetypes;
 
+struct attrib_type at_recruit = {
+  "recruit", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
+};
+
 const struct archetype *
 find_archetype(const char * s, const struct locale * lang)
 {
@@ -102,7 +106,7 @@ parse_archetypes(xmlDocPtr doc)
       xmlFree(property);
     }
 
-    arch->size = xml_ivalue(node, "cost", 1);
+    arch->size = xml_ivalue(node, "cost", 0);
 
     xpath->node = node;
     sub = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
