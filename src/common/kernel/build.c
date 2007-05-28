@@ -343,10 +343,8 @@ destroy_cmd(unit * u, struct order * ord)
   ship *sh;
   unit *u2;
   region * r = u->region;
-#if 0
   const construction * con = NULL;
   int size = 0;
-#endif
   const char *s;
   int n = INT_MAX;
 
@@ -364,7 +362,7 @@ destroy_cmd(unit * u, struct order * ord)
 
   if (s && *s) {
     n = atoi(s);
-    if(n <= 0) {
+    if (n <= 0) {
       cmistake(u, ord, 288, MSG_PRODUCE);
       return 0;
     }
@@ -383,17 +381,19 @@ destroy_cmd(unit * u, struct order * ord)
   if (u->building) {
     building *b = u->building;
 
-    if(n >= b->size) {
+    if (n >= b->size) {
       /* destroy completly */
       /* all units leave the building */
-      for (u2 = r->units; u2; u2 = u2->next)
+      for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->building == b) {
           u2->building = 0;
           freset(u2, UFL_OWNER);
         }
-        ADDMSG(&u->faction->msgs, msg_message("destroy",
-          "building unit", b, u));
-        destroy_building(b);
+      }
+      ADDMSG(&u->faction->msgs, msg_message("destroy",
+        "building unit", b, u));
+      con = b->type->construction;
+      destroy_building(b);
     } else {
       /* partial destroy */
       b->size -= n;
@@ -408,17 +408,19 @@ destroy_cmd(unit * u, struct order * ord)
       return 0;
     }
 
-    if(n >= (sh->size*100)/sh->type->construction->maxsize) {
+    if (n >= (sh->size*100)/sh->type->construction->maxsize) {
       /* destroy completly */
       /* all units leave the ship */
-      for (u2 = r->units; u2; u2 = u2->next)
+      for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->ship == sh) {
           u2->ship = 0;
           freset(u2, UFL_OWNER);
         }
-        ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
-          "unit region ship", u, r, sh));
-        destroy_ship(sh);
+      }
+      ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
+        "unit region ship", u, r, sh));
+      con = sh->type->construction;
+      destroy_ship(sh);
     } else {
       /* partial destroy */
       sh->size -= (sh->type->construction->maxsize * n)/100;
@@ -430,19 +432,17 @@ destroy_cmd(unit * u, struct order * ord)
       unitname(u), u->faction->name, u->faction->email));
   }
 
-#if 0
-  /* Achtung: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
   if (con) {
-    /* TODO: ZERSTÖRE - Man sollte alle Materialien zurückkriegen können: */
+    /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
     int c;
     for (c=0;con->materials[c].number;++c) {
       const requirement * rq = con->materials+c;
       int recycle = (int)(rq->recycle * rq->number * size/con->reqsize);
-      if (recycle)
+      if (recycle) {
         change_resource(u, rq->rtype, recycle);
+      }
     }
   }
-#endif
   return 0;
 }
 /* ------------------------------------------------------------- */
