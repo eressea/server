@@ -1093,7 +1093,7 @@ recruit_archetype(unit * u, order * ord)
         if (a!=NULL) {
           maxsize -= a->data.i;
         }
-        n = max(maxsize/arch->size, n);
+        n = min(maxsize/arch->size, n);
         if (n<=0) {
           ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "recruit_capacity_exhausted", "building", u->building));
           /* TODO: error message */
