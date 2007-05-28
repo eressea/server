@@ -141,7 +141,6 @@ extern boolean opt_cr_absolute_coords;
 
 struct settings global = {
 	"Eressea", /* gamename */
-	"eressea", /* resourcepath */
 	1000, /* maxunits */
 };
 
