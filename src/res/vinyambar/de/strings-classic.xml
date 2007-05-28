@@ -6,7 +6,7 @@
 		<text locale="de">Weitere Informationen über das Spiel findest Du unter htpp://www.vinyambar.de/</text>
 	</string>
 	<string name="newbie_info_3">
-		<text locale="de">Mit der ersten Auswertung bekommst du einen Computerreport, den du mit vielen der Tools auf http://www.eressea-pbem.de/download.html benutzen kannst. Wenn du ihn nicht bekommen möchtest, gib einer deiner Einheiten den Befehl OPTION COMPUTER NICHT.</text>
+		<text locale="de">Mit der ersten Auswertung bekommst du einen Computerreport, den du mit vielen der Tools auf http://www.eressea.de/ benutzen kannst. Wenn du ihn nicht bekommen möchtest, gib einer deiner Einheiten den Befehl OPTION COMPUTER NICHT.</text>
 	</string>
 	<string name="defaultorder">
 		<text locale="de">ARBEITE</text>

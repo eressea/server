@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<strings>
+  <!-- OPTION [x] -->
+  <string name="knight">
+    <text locale="en">knight</text>
+    <text locale="de">Ritter</text>
+  </string>
+  <string name="knight_p">
+    <text locale="en">knights</text>
+  </string>
+  <string name="craftsman">
+    <text locale="en">craftsman</text>
+    <text locale="de">Handwerker</text>
+  </string>
+  <string name="craftsman_p">
+    <text locale="en">craftsmen</text>
+  </string>
+  <string name="swordsman">
+    <text locale="en">swordsman</text>
+    <text locale="de">Schwertkämpfer</text>
+  </string>
+  <string name="swordsman_p">
+    <text locale="en">swordsmen</text>
+  </string>
+  <string name="pikeman">
+    <text locale="en">swordsman</text>
+    <text locale="de">Pikenier</text>
+  </string>
+  <string name="pikeman_p">
+    <text locale="en">pikemen</text>
+    <text locale="de">Pikeniere</text>
+  </string>
+
+  <string name="barracks">
+    <text locale="en">Barracks</text>
+    <text locale="de">Kaserne</text>
+  </string>
+
+</strings>

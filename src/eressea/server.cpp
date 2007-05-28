@@ -223,7 +223,6 @@ game_init(void)
   register_ships();
   register_itemfunctions();
   register_spells();
-  register_archetypes();
 #ifdef DUNGEON_MODULE
   register_dungeon();
 #endif
@@ -239,6 +238,7 @@ game_init(void)
 
   register_itemtypes();
   register_xmlreader();
+  register_archetypes();
   enable_xml_gamecode();
 
   init_data(xmlfile);

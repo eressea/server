@@ -12,6 +12,7 @@
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="rts/buildings.xml"/>
+  <xi:include href="rts/strings.xml"/>
   <xi:include href="rts/units.xml"/>
   <xi:include href="rts/calendar.xml"/>
   <xi:include href="equipment.xml"/>

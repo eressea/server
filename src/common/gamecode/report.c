@@ -1791,6 +1791,7 @@ report_plaintext(const char * filename, report_context * ctx)
 
   dh = 0;
   if (f->age <= 2) {
+    const char * s;
     if (f->age <= 1) {
       ADDMSG(&f->msgs, msg_message("changepasswd",
         "value", f->passw));
@@ -1798,14 +1799,23 @@ report_plaintext(const char * filename, report_context * ctx)
     RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
     rnl(F);
     centre(F, buf, true);
-    rnl(F);
-    centre(F, LOC(f->locale, "newbie_info_1"), true);
-    rnl(F);
-    centre(F, LOC(f->locale, "newbie_info_2"), true);
+    s = locale_getstring(f->locale, "newbie_info_1");
+    if (s) {
+      rnl(F);
+      centre(F, s, true);
+    }
+    s = locale_getstring(f->locale, "newbie_info_2");
+    if (s) {
+      rnl(F);
+      centre(F, s, true);
+    }
     if ((f->options & want(O_COMPUTER)) == 0) {
       f->options |= want(O_COMPUTER);
-      rnl(F);
-      centre(F, LOC(f->locale, "newbie_info_3"), true);
+      s = locale_getstring(f->locale, "newbie_info_3");
+      if (s) {
+        rnl(F);
+        centre(F, s, true);
+      }
     }
   }
   rnl(F);

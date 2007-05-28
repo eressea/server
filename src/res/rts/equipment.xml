@@ -30,6 +30,7 @@
     <item name="money" amount="4200"/>
     <item name="log" amount="30"/>
     <item name="stone" amount="30"/>
+    <callback name="lua_equip"/>
   </set>
 
 </equipment>

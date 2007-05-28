@@ -225,12 +225,12 @@ unit_max_hp(const unit * u)
 	return h;
 }
 
-void
-give_starting_equipment(struct unit *u)
+static void
+equip_newunits(const struct equipment * eq, struct unit *u)
 {
   struct region *r = u->region;
 
-  switch(old_race(u->race)) {
+  switch (old_race(u->race)) {
   case RC_ELF:
     set_show_item(u->faction, I_FEENSTIEFEL);
     break;
@@ -239,7 +239,7 @@ give_starting_equipment(struct unit *u)
     set_number(u, 10);
     break;
   case RC_HUMAN:
-    {
+    if (u->building==NULL) {
       const building_type * btype = bt_find("castle");
       if (btype!=NULL) {
         building *b = new_building(btype, r, u->faction->locale);
@@ -264,7 +264,6 @@ give_starting_equipment(struct unit *u)
     rsethorses(r, 250+rng_int()%51+rng_int()%51);
     break;
   }
-  u->hp = unit_max_hp(u) * u->number;
 }
 
 boolean
@@ -449,6 +448,7 @@ register_races(void)
 	 * to generate battle spoils
 	 * race->itemdrop() */
   register_function((pf_generic)default_spoil, "defaultdrops");
+  register_function((pf_generic)equip_newunits, "equip_newunits");
 
 	sprintf(zBuffer, "%s/races.xml", resourcepath());
 }

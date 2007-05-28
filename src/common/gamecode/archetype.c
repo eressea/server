@@ -62,14 +62,21 @@ get_archetype(const char * name)
 void
 init_archetypes(void)
 {
+  char zName[64];
   const struct locale * lang = locales;
   for (;lang;lang=nextlocale(lang)) {
     variant var;
     archetype * arch = archetypes;
     struct tnode * tokens = get_translations(lang, UT_ARCHETYPES);
     for (;arch;arch=arch->next) {
+      const char * s;
       var.v = arch;
-      addtoken(tokens, LOC(lang, arch->name), var);
+
+      s = locale_getstring(lang, arch->name);
+      if (s!=NULL) addtoken(tokens, s, var);
+      sprintf(zName, "%s_p", arch->name);
+      s = locale_getstring(lang, zName);
+      if (s!=NULL) addtoken(tokens, s, var);
     }
   }
 }
@@ -82,38 +89,42 @@ parse_archetypes(xmlDocPtr doc)
   xmlNodeSetPtr nodes = result->nodesetval;
 
   xmlChar * property;
-  if (nodes && nodes->nodeNr>0) {
-    xmlNodePtr node = nodes->nodeTab[0];
-    archetype * arch = calloc(1, sizeof(archetype));
-    xmlXPathObjectPtr sub;
+  if (nodes) {
+    int i;
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlNodePtr node = nodes->nodeTab[i];
+      archetype * arch = calloc(1, sizeof(archetype));
+      xmlXPathObjectPtr sub;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    arch->name = strdup((const char *)property);
-    xmlFree(property);
-
-    property = xmlGetProp(node, BAD_CAST "equip");
-    if (property!=NULL) {
-      arch->equip = get_equipment((const char*)property);
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      arch->name = strdup((const char *)property);
       xmlFree(property);
-    } else {
-      arch->equip = get_equipment(arch->name);
-    }
 
-    property = xmlGetProp(node, BAD_CAST "building");
-    if (property!=NULL) {
-      arch->btype = bt_find((const char*)property);
-      xmlFree(property);
-    }
+      property = xmlGetProp(node, BAD_CAST "equip");
+      if (property!=NULL) {
+        arch->equip = get_equipment((const char*)property);
+        xmlFree(property);
+      } else {
+        arch->equip = get_equipment(arch->name);
+      }
 
-    arch->size = xml_ivalue(node, "cost", 0);
+      property = xmlGetProp(node, BAD_CAST "building");
+      if (property!=NULL) {
+        arch->btype = bt_find((const char*)property);
+        xmlFree(property);
+      }
 
-    xpath->node = node;
-    sub = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    if (sub->nodesetval) {
-      xml_readconstruction(xpath, sub->nodesetval, &arch->ctype);
+      arch->size = xml_ivalue(node, "cost", 0);
+
+      xpath->node = node;
+      sub = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
+      if (sub->nodesetval) {
+        xml_readconstruction(xpath, sub->nodesetval, &arch->ctype);
+      }
+      xmlXPathFreeObject(sub);
+      register_archetype(arch);
     }
-    xmlXPathFreeObject(sub);
   }
   xmlXPathFreeObject(result);
 

@@ -183,7 +183,7 @@ extern int read_race_reference(const struct race ** rp, FILE * F);
 
 extern const char * raceprefix(const struct unit *u);
 
-extern void give_starting_equipment(struct unit *u);
+extern void give_starting_equipment(const struct equipment * eq, struct unit *u);
 
 #ifdef __cplusplus
 }

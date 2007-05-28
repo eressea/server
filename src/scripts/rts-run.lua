@@ -33,6 +33,12 @@ function run_scripts()
   end
 end
 
+function equip_new_faction(u)
+  b = add_building(u.region, "castle")
+  b.size = 10
+  u.building = b
+end
+
 function process(orders)
   file = "" .. get_turn()
   if read_game(file)~=0 then

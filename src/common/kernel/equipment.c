@@ -50,6 +50,7 @@ create_equipment(const char * eqname)
       eq->items = NULL;
       eq->spells = NULL;
       eq->subsets = NULL;
+      eq->callback = NULL;
       memset(eq->skills, 0, sizeof(eq->skills));
       *eqp = eq;
       break;
@@ -114,6 +115,12 @@ equipment_setitem(equipment * eq, const item_type * itype, const char * value)
 }
 
 void
+equipment_setcallback(struct equipment * eq, void (*callback)(const struct equipment *, struct unit *))
+{
+  eq->callback = callback;
+}
+
+void
 equip_unit(struct unit * u, const struct equipment * eq)
 {
   if (eq) {
@@ -163,6 +170,8 @@ equip_unit(struct unit * u, const struct equipment * eq)
         }
       }
     }
+
+    if (eq->callback) eq->callback(eq, u);
   }
 }
 

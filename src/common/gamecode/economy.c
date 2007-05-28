@@ -1058,14 +1058,13 @@ maintain_buildings(region * r, boolean crash)
 static int
 recruit_archetype(unit * u, order * ord)
 {
-  int n, id;
+  int n;
   const char * s;
 
   init_tokens(ord);
   skip_token();
   n = geti();
   s = getstrtoken();
-  id = getid();
   if (n>0 && s && s[0]) {
     const archetype * arch = find_archetype(s, u->faction->locale);
     attrib * a = NULL;
@@ -1104,12 +1103,14 @@ recruit_archetype(unit * u, order * ord)
 
     n = build(u, arch->ctype, 0, n);
     if (n>0) {
-      scale_number(u, n);
+      set_number(u, n);
       equip_unit(u, arch->equip);
+      u->hp = n * unit_max_hp(u);
       if (arch->size) {
         if (a==NULL) a = a_add(&u->building->attribs, a_new(&at_recruit));
         a->data.i += n*arch->size;
       }
+      ADDMSG(&u->faction->msgs, msg_message("recruit_archetype", "unit archetype", u, arch->name));
       return n;
     } else switch(n) {
       case ENOMATERIALS:

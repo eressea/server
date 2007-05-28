@@ -1089,6 +1089,28 @@ add_items(equipment * eq, xmlNodeSetPtr nsetItems)
 }
 
 static void
+add_callbacks(equipment * eq, xmlNodeSetPtr nsetItems)
+{
+  if (nsetItems!=NULL && nsetItems->nodeNr>0) {
+    int i;
+    for (i=0;i!=nsetItems->nodeNr;++i) {
+      xmlNodePtr node = nsetItems->nodeTab[i];
+      xmlChar * property;
+      pf_generic fun;
+
+      property = xmlGetProp(node, BAD_CAST "name");
+      if (property!=NULL) {
+        fun = get_function((const char*)property);
+        if (fun) {
+          equipment_setcallback(eq, (void (*)(const struct equipment *, struct unit *))fun);
+        }
+        xmlFree(property);
+      }
+    }
+  }
+}
+
+static void
 add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
 {
   if (nsetItems!=NULL && nsetItems->nodeNr>0) {
@@ -1223,6 +1245,10 @@ parse_equipment(xmlDocPtr doc)
         xmlXPathObjectPtr xpathResult;
 
         xpath->node = node;
+
+        xpathResult = xmlXPathEvalExpression(BAD_CAST "callback", xpath);
+        add_callbacks(eq, xpathResult->nodesetval);
+        xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
         add_items(eq, xpathResult->nodesetval);

@@ -48,6 +48,7 @@ extern "C" {
     struct spell_list * spells;
     struct subset * subsets;
     struct equipment * next;
+    void (*callback)(const struct equipment *, struct unit *);
   } equipment;
 
 
@@ -57,6 +58,7 @@ extern "C" {
   extern void equipment_setitem(struct equipment * eq, const struct item_type * itype, const char * value);
   extern void equipment_setskill(struct equipment * eq, skill_t sk, const char * value);
   extern void equipment_addspell(struct equipment * eq, struct spell * sp);
+  extern void equipment_setcallback(struct equipment * eq, void (*callback)(const struct equipment *, struct unit *));
 
   extern void equip_unit(struct unit * u, const struct equipment * eq);
   extern void equip_items(struct item ** items, const struct equipment * eq);

@@ -303,6 +303,28 @@ race_setscript(const char * rcname, const luabind::object& f)
   }
 }
 
+static void
+lua_equipmentcallback(const struct equipment * eq, unit * u)
+{
+  char fname[64];
+  snprintf(fname, sizeof(fname), "equip_%s", eq->name);
+
+  lua_State * L = (lua_State *)global.vm_state;
+  if (is_function(L, fname)) {
+    try {
+      call_function<int>(L, fname, u);
+    }
+    catch (error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while %s tried to call '%s': %s.\n",
+        unitname(u), fname, error));
+      lua_pop(L, 1);
+      std::terminate();
+    }
+  }
+}
+
 void
 bind_script(lua_State * L)
 {
@@ -311,6 +333,7 @@ bind_script(lua_State * L)
   register_function((pf_generic)&lua_useitem, "lua_useitem");
   register_function((pf_generic)&lua_getresource, "lua_getresource");
   register_function((pf_generic)&lua_changeresource, "lua_changeresource");
+  register_function((pf_generic)&lua_equipmentcallback, "lua_equip");
 
   module(L)[
     def("overload", &overload),

@@ -137,6 +137,7 @@
 
   <set name="elf">
     <item name="fairyboot" amount="1"/>
+    <callback name="equip_newunits"/>
   </set>
 
   <set name="uruk">
@@ -149,6 +150,11 @@
 
   <set name="goblin">
     <item name="roi" amount="1"/>
+    <callback name="equip_newunits"/>
+  </set>
+
+  <set name="human">
+    <callback name="equip_newunits"/>
   </set>
 
   <set name="troll">
@@ -181,10 +187,16 @@
 
   <set name="cat">
     <item name="roi" amount="1"/>
+    <callback name="equip_newunits"/>
   </set>
 
   <set name="aquarian">
     <skill name="sailing" level="1"/>
+    <callback name="equip_newunits"/>
+  </set>
+
+  <set name="centaur">
+    <callback name="equip_newunits"/>
   </set>
 
   <!-- equipment-sets for random encounters -->
