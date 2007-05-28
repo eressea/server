@@ -1080,7 +1080,6 @@ extern const struct race * new_race[];
 /* globale settings des Spieles */
 typedef struct settings {
   const char    *gamename;
-  const char    *welcomepath;
 	boolean				 unitsperalliance;
   unsigned int   maxunits;
   struct attrib *attribs;
