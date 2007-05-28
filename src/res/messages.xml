@@ -523,6 +523,23 @@
     <text locale="fr">"$unit($unit) sets a solar sail. The ship's speed is increased by $int($speed)."</text>
     <text locale="en">"$unit($unit) sets a solar sail. The ship's speed is increased by $int($speed)."</text>
   </message>
+  <message name="missing_message" section="errors">
+    <type>
+      <arg name="name" type="string"/>
+    </type>
+    <text locale="de">"Interner Fehler: Meldung '$name' nicht definiert."</text>
+    <text locale="en">"Internal Error: Message '$name' is undefined."</text>
+  </message>
+  <message name="missing_feedback" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="name" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Interner Fehler: Meldung '$name' nicht definiert."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Internal Error: Message '$name' is undefined."</text>
+  </message>
   <message name="use_questkey_wrongregion" section="events">
     <type>
       <arg name="region" type="region"/>

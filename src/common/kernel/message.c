@@ -88,7 +88,7 @@ msg_feedback(const struct unit * u, struct order * ord, const char * name, const
 
 	if (!mtype) {
 		log_error(("trying to create message of unknown type \"%s\"\n", name));
-		return NULL;
+    return msg_message("missing_feedback", "unit region command name", u, u->region, ord, name);
 	}
 
   var.v = (void*)u;
@@ -141,8 +141,8 @@ msg_message(const char * name, const char* sig, ...)
   memset(args, 0, sizeof(args));
   
   if (!mtype) {
-    log_warning(("trying to create message of unknown type \"%s\"\n", name));
-    return NULL;
+    log_error(("trying to create message of unknown type \"%s\"\n", name));
+    return msg_message("missing_message", "name", name);
   }
   
   va_start(marker, sig);
