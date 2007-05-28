@@ -297,7 +297,7 @@ parse_buildings(xmlDocPtr doc)
           }
           assert(property!=NULL);
           if (strcmp((const char*)property, "name")==0) {
-            btype->name = (const char * (*)(int size))fun;
+            btype->name = (const char * (*)(const struct building_type*, int size))fun;
           } else if (strcmp((const char*)property, "init")==0) {
             btype->init = (void (*)(struct building_type*))fun;
           } else {

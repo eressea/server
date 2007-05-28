@@ -186,7 +186,7 @@ buildingtype(const building_type * btype, const building * b, int bsize)
 		if (a) s = (const char*)a->data.v;
 	}
 
-	if (btype->name) s = btype->name(bsize);
+	if (btype->name) s = btype->name(btype, bsize);
 	if (s==NULL) s = btype->_name;
 	return s;
 }
@@ -271,7 +271,7 @@ init_smithy(struct building_type * bt)
 }
 
 static const char *
-castle_name(int bsize)
+castle_name(const struct building_type* btype, int bsize)
 {
 	const char * fname[MAXBUILDINGS] = {
 	  "site",
@@ -282,15 +282,10 @@ castle_name(int bsize)
 	  "fortress",
 	  "citadel" };
 	const construction * ctype;
-	static const struct building_type * bt_castle;
 	int i = 0;
 
-	if (!bt_castle) bt_castle = bt_find("castle");
-	assert(bt_castle);
-	ctype = bt_castle->construction;
-	while (ctype &&
-			 ctype->maxsize != -1
-			 && ctype->maxsize<=bsize) {
+	ctype = btype->construction;
+	while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
 		bsize-=ctype->maxsize;
 		ctype=ctype->improvement;
 		++i;
@@ -301,17 +296,13 @@ castle_name(int bsize)
 #ifdef WDW_PYRAMID
 
 static const char *
-pyramid_name(int bsize)
+pyramid_name(const struct building_type* btype, int bsize)
 {
-	static const struct building_type * bt_pyramid;
   static char p_name_buf[32];
   int level=0;
   const construction * ctype;
 
-  if(!bt_pyramid) bt_pyramid = bt_find("pyramid");
-  assert(bt_pyramid);
-	
-  ctype = bt_pyramid->construction;
+  ctype = btype->construction;
   
 	while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
     bsize-=ctype->maxsize;

@@ -55,7 +55,7 @@ typedef struct building_type {
 	struct maintenance * maintenance; /* array of requirements */
 	struct construction * construction; /* construction of 1 building-level */
 
-	const char * (*name)(int size);
+	const char * (*name)(const struct building_type*, int size);
 	void (*init)(struct building_type*);
 	struct attrib * attribs;
 } building_type;
