@@ -757,7 +757,7 @@ static void
 eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
   const struct faction * f = (const struct faction *)userdata;
-  const struct locale * lang = (const struct locale*)opop(stack).v;
+  const struct locale * lang = f?f->locale:default_locale;
   const struct region * r = (const struct region*)opop(stack).v;
   const char * trail = trailinto(r, lang);
   const char * rn = f_regionid_s(r, f);

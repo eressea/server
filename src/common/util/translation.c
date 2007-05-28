@@ -454,20 +454,11 @@ eval_int(opstack ** stack, const void * userdata)
 static void
 eval_localize(opstack ** stack, const void * userdata) /* (string, locale) -> string */
 {
-	const struct locale *lang = (const struct locale *)opop_v(stack);
+  const struct faction * f = (const struct faction *)userdata;
+  const struct locale *lang = f?f->locale:default_locale;
 	const char *c = (const char *)opop_v(stack);
 	c = locale_string(lang, c);
 	opush_v(stack, strcpy(balloc(strlen(c)+1), c));
-	unused(userdata);
-}
-
-static void
-eval_locale(opstack ** stack, const void * userdata) /* (string) -> locale */
-{
-	const char *c = (const char *)opop_v(stack);
-  struct locale * lang = find_locale(c);
-	opush_v(stack, lang);
-	unused(userdata);
 }
 
 void
@@ -481,7 +472,6 @@ translation_init(void)
   add_function("if", &eval_if);
   add_function("isnull", &eval_isnull);
   add_function("localize", &eval_localize);
-  add_function("locale", &eval_locale);
 }
 
 void

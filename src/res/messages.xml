@@ -714,9 +714,8 @@
     <type>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">$trail($region,$locale("de"))</text>
-    <text locale="fr">$trail($region,$locale("en"))</text>
-    <text locale="en">$trail($region,$locale("en"))</text>
+    <text locale="de">$trail($region)</text>
+    <text locale="en">$trail($region)</text>
   </message>
   <message name="nr_migrants" section="nr">
     <type>
@@ -814,9 +813,8 @@
       <arg name="dir" type="int"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Im $direction($dir) der Region liegt $trail($region,$locale("de"))"</text>
-    <text locale="fr">"To the $direction($dir) lies $trail($region,$locale("en"))"</text>
-    <text locale="en">"To the $direction($dir) lies $trail($region,$locale("en"))"</text>
+    <text locale="de">"Im $direction($dir) der Region liegt $trail($region)"</text>
+    <text locale="en">"To the $direction($dir) lies $trail($region)"</text>
   </message>
   <message name="nr_market_price" section="nr">
     <type>
@@ -2704,8 +2702,8 @@
       <arg name="herb" type="resource"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region) stellt fest, dass es hier $localize($amount,$locale("de")) $resource($herb,$amount) gibt."</text>
-    <text locale="en">"$unit($unit) discovers that $localize($amount,$locale("en")) $resource($herb,$amount) grow in $region($region)."</text>
+    <text locale="de">"$unit($unit) in $region($region) stellt fest, dass es hier $localize($amount) $resource($herb,0) gibt."</text>
+    <text locale="en">"$unit($unit) discovers that $localize($amount) $resource($herb,0) grow in $region($region)."</text>
   </message>
   <message name="destroy_partial" section="events">
     <type>
@@ -7264,6 +7262,16 @@
     </type>
     <text locale="de">"Eine Botschaft von $unit($unit): '$message'"</text>
     <text locale="en">"A message from $unit($unit): '$message'"</text>
+  </message>
+
+  <message name="recruit_archetype" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="archetype" type="string"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) rekrutiert $int($amount) $localize($archetype)."</text>
+    <text locale="en">"$unit($unit) recruits $int($amount) $localize($archetype)."</text>
   </message>
 
 </messages>

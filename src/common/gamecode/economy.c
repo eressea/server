@@ -1110,7 +1110,8 @@ recruit_archetype(unit * u, order * ord)
         if (a==NULL) a = a_add(&u->building->attribs, a_new(&at_recruit));
         a->data.i += n*arch->size;
       }
-      ADDMSG(&u->faction->msgs, msg_message("recruit_archetype", "unit archetype", u, arch->name));
+      ADDMSG(&u->faction->msgs, msg_message("recruit_archetype", 
+        "unit amount archetype", u, n, arch->name));
       return n;
     } else switch(n) {
       case ENOMATERIALS:
