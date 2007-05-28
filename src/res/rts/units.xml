@@ -5,26 +5,26 @@
     <construction>
       <requirement type="money" quantity="100"/>
     </construction>
-  </building>
+  </archetype>
 
   <archetype name="pikeman" building="barracks" cost="10">
     <construction>
       <requirement type="money" quantity="100"/>
     </construction>
-  </building>
+  </archetype>
 
   <archetype name="knight" building="barracks" cost="100">
     <construction>
       <requirement type="money" quantity="1000"/>
       <requirement type="laen" quantity="1"/>
     </construction>
-  </building>
+  </archetype>
 
   <archetype name="craftsman" building="castle" cost="10">
     <construction>
       <requirement type="money" quantity="100"/>
     </construction>
-  </building>
+  </archetype>
 
 </archetypes>
 
