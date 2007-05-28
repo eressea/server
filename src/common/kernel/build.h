@@ -79,7 +79,7 @@ void sunhash(struct ship * sh);
 
 extern int build(struct unit * u, const construction * ctype, int completed, int want);
 extern int maxbuild(const struct unit *u, const construction *cons);
-extern struct message * msg_materials_required(struct unit * u, struct order * ord, const struct construction * ctype);
+extern struct message * msg_materials_required(struct unit * u, struct order * ord, const struct construction * ctype, int multi);
 /** error messages that build may return: */
 #define ELOWSKILL -1
 #define ENEEDSKILL -2

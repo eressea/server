@@ -1058,14 +1058,15 @@ maintain_buildings(region * r, boolean crash)
 static int
 recruit_archetype(unit * u, order * ord)
 {
-  int n;
+  int want;
   const char * s;
 
   init_tokens(ord);
   skip_token();
-  n = geti();
+  want = geti();
   s = getstrtoken();
-  if (n>0 && s && s[0]) {
+  if (want>0 && s && s[0]) {
+    int n = want;
     const archetype * arch = find_archetype(s, u->faction->locale);
     attrib * a = NULL;
 
@@ -1111,11 +1112,11 @@ recruit_archetype(unit * u, order * ord)
         a->data.i += n*arch->size;
       }
       ADDMSG(&u->faction->msgs, msg_message("recruit_archetype", 
-        "unit amount archetype", u, n, arch->name));
+        "unit amount archetype", u, n, arch->name[n==1]));
       return n;
     } else switch(n) {
       case ENOMATERIALS:
-        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype));
+        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype, want));
         break;
       case ELOWSKILL:
       case ENEEDSKILL:
@@ -1235,9 +1236,9 @@ manufacture(unit * u, const item_type * itype, int want)
     return;
   }
 
-  if(want==0)
-    want=maxbuild(u, itype->construction);
-
+  if (want==0) {
+    want = maxbuild(u, itype->construction);
+  }
   n = build(u, itype->construction, 0, want);
   switch (n) {
     case ENEEDSKILL:
@@ -1250,7 +1251,7 @@ manufacture(unit * u, const item_type * itype, int want)
         sk, minskill, itype->rtype, 1));
       return;
     case ENOMATERIALS:
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, itype->construction));
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, itype->construction, want));
       return;
   }
   if (n>0) {
@@ -1647,8 +1648,9 @@ create_potion(unit * u, const potion_type * ptype, int want)
 {
 	int built;
 
-	if(want==0)
-		want=maxbuild(u, ptype->itype->construction);
+  if (want==0) {
+		want = maxbuild(u, ptype->itype->construction);
+  }
 	built = build(u, ptype->itype->construction, 0, want);
 	switch (built) {
 		case ELOWSKILL:
@@ -1661,7 +1663,7 @@ create_potion(unit * u, const potion_type * ptype, int want)
 			break;
 		case ENOMATERIALS:
 			/* something missing from the list of materials */
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, ptype->itype->construction));
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, ptype->itype->construction, want));
 			return;
 			break;
 		default:

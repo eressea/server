@@ -754,6 +754,16 @@ trailinto(const region * r, const struct locale * lang)
 }
 
 static void
+eval_localize(struct opstack ** stack, const void * userdata) /* (string, locale) -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct locale * lang = f?f->locale:default_locale;
+  const char *c = (const char *)opop_v(stack);
+  c = locale_string(lang, c);
+  opush_v(stack, strcpy(balloc(strlen(c)+1), c));
+}
+
+static void
 eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
   const struct faction * f = (const struct faction *)userdata;
@@ -3105,6 +3115,7 @@ report_init(void)
   add_function("direction", &eval_direction);
   add_function("int36", &eval_int36);
   add_function("trail", &eval_trail);
+  add_function("localize", &eval_localize);
   add_function("spell", &eval_spell);
   add_function("resources", &eval_resources);
 

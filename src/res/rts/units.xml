@@ -26,5 +26,12 @@
     </construction>
   </archetype>
 
+  <archetype name="gamedesigner" building="castle" cost="1">
+    <construction reqsize="1">
+      <requirement type="laen" quantity="100"/>
+      <requirement type="mallorn" quantity="100"/>
+    </construction>
+  </archetype>
+
 </archetypes>
 

@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
   typedef struct archetype {
-    char * name;
+    char * name[2];
     int size;
     struct building_type * btype;
     struct equipment * equip;
@@ -28,7 +28,6 @@ extern "C" {
 
   extern const struct archetype * find_archetype(const char * s, const struct locale * lang);
   extern void init_archetypes(void);
-  extern const struct archetype * get_archetype(const char * name);
   extern void register_archetype(struct archetype * arch);
   extern void register_archetypes(void);
 

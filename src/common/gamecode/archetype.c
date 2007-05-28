@@ -47,36 +47,24 @@ register_archetype(archetype * arch)
   archetypes = arch;
 }
 
-const archetype * 
-get_archetype(const char * name)
-{
-  const archetype * arch = archetypes;
-  for (;arch;arch=arch->next) {
-    if (strcmp(name, arch->name)==0) {
-      return arch;
-    }
-  }
-  return NULL;
-}
-
 void
 init_archetypes(void)
 {
-  char zName[64];
   const struct locale * lang = locales;
   for (;lang;lang=nextlocale(lang)) {
     variant var;
     archetype * arch = archetypes;
     struct tnode * tokens = get_translations(lang, UT_ARCHETYPES);
     for (;arch;arch=arch->next) {
-      const char * s;
+      const char *s1, *s2;
       var.v = arch;
 
-      s = locale_getstring(lang, arch->name);
-      if (s!=NULL) addtoken(tokens, s, var);
-      sprintf(zName, "%s_p", arch->name);
-      s = locale_getstring(lang, zName);
-      if (s!=NULL) addtoken(tokens, s, var);
+      s1 = LOC(lang, arch->name[0]);
+      addtoken(tokens, s1, var);
+      s2 = LOC(lang, arch->name[1]);
+      if (strcmp(s2, s1)!=0) {
+        addtoken(tokens, s2, var);
+      }
     }
   }
 }
@@ -84,6 +72,7 @@ init_archetypes(void)
 static int
 parse_archetypes(xmlDocPtr doc)
 {
+  char zName[64];
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "/eressea/archetypes/archetype", xpath);
   xmlNodeSetPtr nodes = result->nodesetval;
@@ -98,7 +87,9 @@ parse_archetypes(xmlDocPtr doc)
 
       property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
-      arch->name = strdup((const char *)property);
+      arch->name[0] = strdup((const char *)property);
+      sprintf(zName, "%s_p", arch->name[0]);
+      arch->name[1] = strdup(zName);
       xmlFree(property);
 
       property = xmlGetProp(node, BAD_CAST "equip");
@@ -106,7 +97,7 @@ parse_archetypes(xmlDocPtr doc)
         arch->equip = get_equipment((const char*)property);
         xmlFree(property);
       } else {
-        arch->equip = get_equipment(arch->name);
+        arch->equip = get_equipment(arch->name[0]);
       }
 
       property = xmlGetProp(node, BAD_CAST "building");

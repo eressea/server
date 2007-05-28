@@ -769,15 +769,16 @@ build(unit * u, const construction * ctype, int completed, int want)
 }
 
 message *
-msg_materials_required(unit * u, order * ord, const construction * ctype)
+msg_materials_required(unit * u, order * ord, const construction * ctype, int multi)
 {
-  /* something missing from the list of materials */
   int c;
+  /* something missing from the list of materials */
   resource * reslist = NULL;
 
+  if (multi<=0 || multi==INT_MAX) multi = 1;
   for (c=0;ctype->materials[c].number; ++c) {
     resource * res = malloc(sizeof(resource));
-    res->number = ctype->materials[c].number / ctype->reqsize;
+    res->number = multi * ctype->materials[c].number / ctype->reqsize;
     res->type = ctype->materials[c].rtype;
     res->next = reslist;
     reslist = res;
@@ -812,7 +813,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 {
   region * r = u->region;
   boolean newbuilding = false;
-  int built = 0, id;
+  int n = want, built = 0, id;
   building * b = NULL;
   /* einmalige Korrektur */
   static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
@@ -869,26 +870,26 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       cmistake(u, ord, 318, MSG_PRODUCE);
       return;
     }
-    want = 1;
+    n = 1;
   }
 
   if (b) built = b->size;
-  if (want<=0 || want == INT_MAX) {
+  if (n<=0 || n == INT_MAX) {
     if(b == NULL) {
       if(btype->maxsize > 0) {
-        want = btype->maxsize - built;
+        n = btype->maxsize - built;
       } else {
-        want = INT_MAX;
+        n = INT_MAX;
       }
     } else {
-      if(b->type->maxsize > 0) {
-        want = b->type->maxsize - built;
+      if (b->type->maxsize > 0) {
+        n = b->type->maxsize - built;
       } else {
-        want = INT_MAX;
+        n = INT_MAX;
       }
     }
   }
-  built = build(u, btype->construction, built, want);
+  built = build(u, btype->construction, built, n);
 
   switch (built) {
   case ECOMPLETE:
@@ -896,7 +897,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     cmistake(u, ord, 4, MSG_PRODUCE);
     return;
   case ENOMATERIALS:
-    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, btype->construction));
+    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, btype->construction, want));
     return;
   case ELOWSKILL:
   case ENEEDSKILL:
@@ -930,13 +931,13 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
   btname = LOC(lang, btype->_name);
 
-  if (want-built <= 0) {
+  if (n-built <= 0) {
     /* gebäude fertig */
     strcpy(buffer, LOC(lang, "defaultorder"));
     new_order = parse_order(buffer, lang);
-  } else if (want!=INT_MAX) {
+  } else if (n!=INT_MAX) {
     /* reduzierte restgröße */
-    sprintf(buffer, "%s %d %s %s", LOC(lang, keywords[K_MAKE]), want-built, btname, buildingid(b));
+    sprintf(buffer, "%s %d %s %s", LOC(lang, keywords[K_MAKE]), n-built, btname, buildingid(b));
     new_order = parse_order(buffer, lang);
   } else if (btname) {
     /* Neues Haus, Befehl mit Gebäudename */
