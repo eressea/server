@@ -26,11 +26,13 @@
 /* gamecode includes */
 #include "laws.h"
 #include "randenc.h"
+#include "archetype.h"
 
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/give.h>
 #include <kernel/item.h>
@@ -1053,6 +1055,80 @@ maintain_buildings(region * r, boolean crash)
   }
 }
 
+static int
+recruit_archetype(unit * u, order * ord)
+{
+  int n, id;
+  const char * s;
+
+  init_tokens(ord);
+  skip_token();
+  n = geti();
+  s = getstrtoken();
+  id = getid();
+  if (n>0 && s && s[0]) {
+    const archetype * arch = find_archetype(s, u->faction->locale);
+
+    if (u->number>0) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_new", ""));
+      /* TODO: error message */
+      return 0;
+    }
+
+    if (arch==NULL) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unknown_archetype", "name", s));
+      /* TODO: error message */
+      return 0;
+    }
+    if (arch->btype && u->building->type!=arch->btype) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_in_building", "type", arch->btype));
+      /* TODO: error message */
+      return 0;
+    }
+
+    n = build(u, arch->ctype, 0, n);
+    if (n>0) {
+      scale_number(u, n);
+      equip_unit(u, arch->equip);
+      return n;
+    } else switch(n) {
+      case ENOMATERIALS:
+        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype));
+        return 0;
+      case ELOWSKILL:
+      case ENEEDSKILL:
+        /* no skill, or not enough skill points to build */
+        cmistake(u, ord, 50, MSG_PRODUCE);
+        return 0;
+      default:
+        assert(!"unhandled return value from build() in recruit_archetype");
+    }
+    return 0;
+  }
+  return -1;
+}
+
+static int
+recruit_classic(void)
+{
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "recruit.classic");
+    value = str?atoi(str):1;
+  }
+  return value;
+}
+
+static int
+recruit_archetypes(void)
+{
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "recruit.archetypes");
+    value = str?atoi(str):0;
+  }
+  return value;
+}
 
 void
 economics(region *r)
@@ -1095,9 +1171,19 @@ economics(region *r)
 
   for (u = r->units; u; u = u->next) {
 		order * ord;
+    if (!recruit_classic()) {
+      if (u->number>0) continue;
+    }
 		for (ord = u->orders; ord; ord = ord->next) {
       if (get_keyword(ord) == K_RECRUIT) {
-        recruit(u, ord, &recruitorders);
+        if (recruit_archetypes()) {
+          if (recruit_archetype(u, ord)>=0) {
+            continue;
+          }
+        }
+        if (recruit_classic()) {
+          recruit(u, ord, &recruitorders);
+        }
         break;
       }
     }
@@ -1142,26 +1228,8 @@ manufacture(unit * u, const item_type * itype, int want)
         sk, minskill, itype->rtype, 1));
       return;
     case ENOMATERIALS:
-      /* something missing from the list of materials */
-      strcpy(buf, "Dafür braucht man mindestens:");
-      {
-        int c, n;
-        const construction * cons = itype->construction;
-        char * ch = buf+strlen(buf);
-        assert(cons);
-        for (c=0;cons->materials[c].number; c++) {
-	  requirement * m = cons->materials+c;
-          if (c!=0)
-            strcat(ch++, ",");
-          n = m->number / cons->reqsize;
-          sprintf(ch, " %d %s", n?n:1,
-            locale_string(u->faction->locale,
-            resourcename(m->rtype, m->number!=1)));
-          ch = ch+strlen(ch);
-        }
-        mistake(u, u->thisorder, buf, MSG_PRODUCE);
-        return;
-      }
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, itype->construction));
+      return;
   }
   if (n>0) {
     i_change(&u->items, itype, n);
@@ -1571,26 +1639,8 @@ create_potion(unit * u, const potion_type * ptype, int want)
 			break;
 		case ENOMATERIALS:
 			/* something missing from the list of materials */
-			strcpy(buf, "Dafür braucht man mindestens:");
-			{
-				int c, n;
-				const construction * cons = ptype->itype->construction;
-				char * ch = buf+strlen(buf);
-				assert(cons);
-				for (c=0;cons->materials[c].number; c++) {
-				  const requirement * m = cons->materials+c;
-					if (c!=0)
-						strcat(ch++, ",");
-					n = m->number / cons->reqsize;
-					sprintf(ch, " %d %s", n?n:1,
-						LOC(u->faction->locale,
-						resourcename(m->rtype, m->number!=1)));
-					ch = ch+strlen(ch);
-				}
-				strcat(ch,".");
-				mistake(u, u->thisorder, buf, MSG_PRODUCE);
-				return;
-			}
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, ptype->itype->construction));
+			return;
 			break;
 		default:
 			i_change(&u->items, ptype->itype, built);

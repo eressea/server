@@ -1489,53 +1489,13 @@ findstr(const char **v, const char *s, unsigned char n)
   return -1;
 }
 
-enum {
-  UT_NONE,
-  UT_PARAM,
-  UT_ITEM,
-  UT_BUILDING,
-  UT_HERB,
-  UT_POTION,
-  UT_MAX
-};
-
-static struct lstr {
-  const struct locale * lang;
-  struct tnode tokens[UT_MAX];
-  struct tnode skillnames;
-  struct tnode keywords;
-  struct tnode races;
-  struct tnode directions;
-  struct tnode options;
-  struct lstr * next;
-} * lstrs;
-
-static struct lstr *
-get_lnames(const struct locale * lang)
-{
-  static struct lstr * lnames = NULL;
-  static const struct locale * lastlang = NULL;
-
-  if (lastlang!=lang || lnames==NULL) {
-    lnames = lstrs;
-    while (lnames && lnames->lang!=lang) lnames = lnames->next;
-    if (lnames==NULL) {
-      lnames = calloc(sizeof(struct lstr), 1);
-      lnames->lang = lang;
-      lnames->next = lstrs;
-      lstrs = lnames;
-    }
-  }
-  return lnames;
-}
-
 const struct race *
 findrace(const char * s, const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
+  struct tnode * tokens = get_translations(lang, UT_RACES);
   variant token;
 
-  if (findtoken(&lnames->races, s, &token)==E_TOK_SUCCESS) {
+  if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
     return (const struct race *)token.v;
   }
   return NULL;
@@ -1544,10 +1504,10 @@ findrace(const char * s, const struct locale * lang)
 int
 findoption(const char *s, const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
+  struct tnode * tokens = get_translations(lang, UT_OPTIONS);
   variant token;
 
-  if (findtoken(&lnames->options, s, &token)==E_TOK_SUCCESS) {
+  if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
     return (direction_t)token.i;
   }
   return NODIRECTION;
@@ -1556,22 +1516,23 @@ findoption(const char *s, const struct locale * lang)
 skill_t
 findskill(const char *s, const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
+  struct tnode * tokens = get_translations(lang, UT_SKILLS);
   variant token;
 
-  if (findtoken(&lnames->skillnames, s, &token)==E_TOK_NOMATCH) return NOSKILL;
+  if (findtoken(tokens, s, &token)==E_TOK_NOMATCH) return NOSKILL;
   return (skill_t)token.i;
 }
 
 keyword_t
 findkeyword(const char *s, const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
+  struct tnode * tokens = get_translations(lang, UT_KEYWORDS);
   variant token;
+
 #ifdef AT_PERSISTENT
   if (*s == '@') s++;
 #endif
-  if (findtoken(&lnames->keywords, s, &token)==E_TOK_NOMATCH) return NOKEYWORD;
+  if (findtoken(tokens, s, &token)==E_TOK_NOMATCH) return NOKEYWORD;
   if (global.disabled[token.i]) return NOKEYWORD;
   return (keyword_t) token.i;
 }
@@ -1579,12 +1540,11 @@ findkeyword(const char *s, const struct locale * lang)
 param_t
 findparam(const char *s, const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
-  const building_type * btype;
+  struct tnode * tokens = get_translations(lang, UT_PARAMS);
   variant token;
 
-  if (findtoken(&lnames->tokens[UT_PARAM], s, &token)==E_TOK_NOMATCH) {
-    btype = findbuildingtype(s, lang);
+  if (findtoken(tokens, s, &token)==E_TOK_NOMATCH) {
+    const building_type * btype = findbuildingtype(s, lang);
     if (btype!=NULL) return (param_t) P_GEBAEUDE;
     return NOPARAM;
   }
@@ -1943,6 +1903,11 @@ createunit(region * r, faction * f, int number, const struct race * rc)
   return create_unit(r, f, number, rc, 0, NULL, NULL);
 }
 
+/** creates a new unit.
+ *
+ * @param dname: name, set to NULL to get a default.
+ * @param creator: unit to inherit stealth, group, building, ship, etc. from
+ */
 unit *
 create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
 {
@@ -2026,7 +1991,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     a->data.v = creator;
   }
   /* Monster sind grundsätzlich parteigetarnt */
-  if(f->no <= 0) fset(u, UFL_PARTEITARNUNG);
+  if (f->no <= 0) fset(u, UFL_PARTEITARNUNG);
 
   return u;
 }
@@ -2299,21 +2264,22 @@ init_directions(tnode * root, const struct locale * lang)
     { NULL, NODIRECTION}
   };
   int i;
-  struct lstr * lnames = get_lnames(lang);
+  struct tnode * tokens = get_translations(lang, UT_DIRECTIONS);
+
   for (i=0; dirs[i].direction!=NODIRECTION;++i) {
     variant token;
     token.i = dirs[i].direction;
-    addtoken(&lnames->directions, LOC(lang, dirs[i].name), token);
+    addtoken(tokens, LOC(lang, dirs[i].name), token);
   }
 }
 
 direction_t
 finddirection(const char *s, const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
+  struct tnode * tokens = get_translations(lang, UT_DIRECTIONS);
   variant token;
 
-  if (findtoken(&lnames->directions, s, &token)==E_TOK_SUCCESS) {
+  if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
     return (direction_t)token.i;
   }
   return NODIRECTION;
@@ -2322,37 +2288,48 @@ finddirection(const char *s, const struct locale * lang)
 static void
 init_locale(const struct locale * lang)
 {
-  struct lstr * lnames = get_lnames(lang);
   variant var;
   int i;
   const struct race * rc;
+  struct tnode * tokens;
 
-  init_directions(&lnames->directions, lang);
+  tokens = get_translations(lang, UT_DIRECTIONS);
+  init_directions(tokens, lang);
+
+  tokens = get_translations(lang, UT_RACES);
   for (rc=races;rc;rc=rc->next) {
     var.v = (void*)rc;
-    addtoken(&lnames->races, LOC(lang, rc_name(rc, 1)), var);
-    addtoken(&lnames->races, LOC(lang, rc_name(rc, 0)), var);
+    addtoken(tokens, LOC(lang, rc_name(rc, 1)), var);
+    addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
   }
+
+  tokens = get_translations(lang, UT_PARAMS);
   for (i=0;i!=MAXPARAMS;++i) {
     var.i = i;
-    addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), var);
+    addtoken(tokens, LOC(lang, parameters[i]), var);
   }
+
+  tokens = get_translations(lang, UT_SKILLS);
   for (i=0;i!=MAXSKILLS;++i) {
     if (i!=SK_TRADE || !TradeDisabled()) {
       const char * skname = skillname((skill_t)i, lang);
       if (skname!=NULL) {
         var.i = i;
-        addtoken(&lnames->skillnames, skname, var);
+        addtoken(tokens, skname, var);
       }
     }
   }
+
+  tokens = get_translations(lang, UT_KEYWORDS);
   for (i=0;i!=MAXKEYWORDS;++i) {
     var.i = i;
-    addtoken(&lnames->keywords, LOC(lang, keywords[i]), var);
+    addtoken(tokens, LOC(lang, keywords[i]), var);
   }
+
+  tokens = get_translations(lang, UT_OPTIONS);
   for (i=0;i!=MAXOPTIONS;++i) {
     var.i = i;
-    addtoken(&lnames->options, LOC(lang, options[i]), var);
+    addtoken(tokens, LOC(lang, options[i]), var);
   }
 }
 

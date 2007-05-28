@@ -278,6 +278,9 @@
 			Name="Header"
 			Filter="*.h">
 			<File
+				RelativePath=".\archetype.h">
+			</File>
+			<File
 				RelativePath=".\creation.h">
 			</File>
 			<File
@@ -308,6 +311,9 @@
 				RelativePath=".\xmlreport.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\archetype.c">
+		</File>
 		<File
 			RelativePath=".\creation.c">
 		</File>

@@ -608,41 +608,45 @@ int
 build(unit * u, const construction * ctype, int completed, int want)
 {
   const construction * type = ctype;
-  int skills; /* number of skill points remainig */
-  int dm = get_effect(u, oldpotiontype[P_DOMORE]);
+  int skills = INT_MAX; /* number of skill points remainig */
+  int basesk = 0;
   int made = 0;
-  int basesk, effsk;
 
-  assert(u->number);
   if (want<=0) return 0;
   if (type==NULL) return 0;
   if (type->improvement==NULL && completed==type->maxsize)
     return ECOMPLETE;
 
-  basesk = effskill(u, type->skill);
-  if (basesk==0) return ENEEDSKILL;
+  if (type->skill!=NOSKILL) {
+    int effsk;
+    int dm = get_effect(u, oldpotiontype[P_DOMORE]);
 
-  effsk = basesk;
-  if (inside_building(u)) {
-    effsk = skillmod(u->building->type->attribs, u, u->region, type->skill,
+    assert(u->number);
+    basesk = effskill(u, type->skill);
+    if (basesk==0) return ENEEDSKILL;
+
+    effsk = basesk;
+    if (inside_building(u)) {
+      effsk = skillmod(u->building->type->attribs, u, u->region, type->skill,
+          effsk, SMF_PRODUCTION);
+    }
+    effsk = skillmod(type->attribs, u, u->region, type->skill,
         effsk, SMF_PRODUCTION);
-  }
-  effsk = skillmod(type->attribs, u, u->region, type->skill,
-      effsk, SMF_PRODUCTION);
-  if (effsk<0) return effsk; /* pass errors to caller */
-  if (effsk==0) return ENEEDSKILL;
+    if (effsk<0) return effsk; /* pass errors to caller */
+    if (effsk==0) return ENEEDSKILL;
 
-  skills = effsk * u->number;
+    skills = effsk * u->number;
 
-  /* technically, nimblefinge and domore should be in a global set of
-   * "game"-attributes, (as at_skillmod) but for a while, we're leaving
-   * them in here. */
+    /* technically, nimblefinge and domore should be in a global set of
+    * "game"-attributes, (as at_skillmod) but for a while, we're leaving
+    * them in here. */
 
-  if (dm != 0) {
-    /* Auswirkung Schaffenstrunk */
-    dm = min(dm, u->number);
-    change_effect(u, oldpotiontype[P_DOMORE], -dm);
-    skills += dm * effsk;
+    if (dm != 0) {
+      /* Auswirkung Schaffenstrunk */
+      dm = min(dm, u->number);
+      change_effect(u, oldpotiontype[P_DOMORE], -dm);
+      skills += dm * effsk;
+    }
   }
   for (;want>0 && skills>0;) {
     int c, n;
@@ -764,6 +768,23 @@ build(unit * u, const construction * ctype, int completed, int want)
   return made;
 }
 
+message *
+msg_materials_required(unit * u, order * ord, const construction * ctype)
+{
+  /* something missing from the list of materials */
+  int c;
+  resource * reslist = NULL;
+
+  for (c=0;ctype->materials[c].number; ++c) {
+    resource * res = malloc(sizeof(resource));
+    res->number = ctype->materials[c].number / ctype->reqsize;
+    res->type = ctype->materials[c].rtype;
+    res->next = reslist;
+    reslist = res;
+  }
+  return msg_feedback(u, ord, "build_required", "required", reslist);
+}
+
 int
 maxbuild(const unit * u, const construction * cons)
   /* calculate maximum size that can be built from available material */
@@ -791,7 +812,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 {
   region * r = u->region;
   boolean newbuilding = false;
-  int c, built = 0, id;
+  int built = 0, id;
   building * b = NULL;
   /* einmalige Korrektur */
   static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
@@ -874,22 +895,9 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     /* the building is already complete */
     cmistake(u, ord, 4, MSG_PRODUCE);
     return;
-  case ENOMATERIALS: {
-    /* something missing from the list of materials */
-    const construction * cons = btype->construction;
-    resource * reslist = NULL;
-    assert(cons);
-    for (c=0;cons->materials[c].number; ++c) {
-      resource * res = malloc(sizeof(resource));
-      res->number = cons->materials[c].number / cons->reqsize;
-      res->type = cons->materials[c].rtype;
-      res->next = reslist;
-      reslist = res;
-    }
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "build_required",
-      "required", reslist));
+  case ENOMATERIALS:
+    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, btype->construction));
     return;
-  }
   case ELOWSKILL:
   case ENEEDSKILL:
     /* no skill, or not enough skill points to build */

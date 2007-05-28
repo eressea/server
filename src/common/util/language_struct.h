@@ -5,6 +5,7 @@
  * feel that you need to include it, it's a sure sign that you're trying to
  * do something BAD. */
 
+#define MAXLOCALES 3
 #define SMAXHASH 2048
 typedef struct locale_str {
   unsigned int hashkey;
@@ -14,6 +15,7 @@ typedef struct locale_str {
 } locale_str;
 
 typedef struct locale {
+  int index;
 	struct locale * next;
 	unsigned int hashkey;
 	const char * name;

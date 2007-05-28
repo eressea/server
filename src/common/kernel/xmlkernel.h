@@ -10,13 +10,17 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#ifndef H_KRNL_XMLREADER_H
-#define H_KRNL_XMLREADER_H
+#ifndef H_KRNL_XML
+#define H_KRNL_XML
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-  extern void register_xmlreader(void);
-  extern void enable_xml_gamecode(void);
+
+#include <libxml/xpath.h>
+
+extern void xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, struct construction ** consPtr);
+
 #ifdef __cplusplus
 }
 #endif

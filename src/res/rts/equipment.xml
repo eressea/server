@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<equipment>
+
+  <!-- archetypes -->
+  <set name="pikeman">
+    <skill name="polearm" level="1"/>
+    <skill name="stamina" level="1"/>
+  </set>
+
+  <set name="swordsman">
+    <skill name="melee" level="1"/>
+    <skill name="stamina" level="1"/>
+  </set>
+
+  <set name="knight">
+    <skill name="melee" level="3"/>
+    <skill name="polearm" level="3"/>
+    <skill name="stamina" level="3"/>
+    <skill name="riding" level="3"/>
+  </set>
+
+  <set name="craftsman">
+    <skill name="building" level="1"/>
+  </set>
+
+</equipment>
+

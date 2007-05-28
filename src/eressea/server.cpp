@@ -54,6 +54,7 @@
 #endif
 
 /* gamecode includes */
+#include <gamecode/archetype.h>
 #include <gamecode/economy.h>
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
@@ -223,6 +224,7 @@ game_init(void)
   register_ships();
   register_itemfunctions();
   register_spells();
+  register_archetypes();
 #ifdef DUNGEON_MODULE
   register_dungeon();
 #endif
@@ -245,6 +247,7 @@ game_init(void)
   init_locales();
   /*  init_resources(); must be done inside the xml-read, because requirements use items */
 
+  init_archetypes();
   init_attributes();
   init_races();
   init_itemtypes();

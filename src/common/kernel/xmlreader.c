@@ -159,13 +159,13 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
   }
 }
 
-static void
-xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, construction ** consPtr)
+void
+xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, construction ** consPtr)
 {
   xmlNodePtr pushNode = xpath->node;
   int k;
-  for (k=0;k!=nodeNr;++k) {
-    xmlNodePtr node = nodeTab[k];
+  for (k=0;k!=nodeSet->nodeNr;++k) {
+    xmlNodePtr node = nodeSet->nodeTab[k];
     xmlChar * property;
     construction * con;
     xmlXPathObjectPtr req;
@@ -176,10 +176,13 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
     consPtr = &con->improvement;
 
     property = xmlGetProp(node, BAD_CAST "skill");
-    assert(property!=NULL);
-    con->skill = sk_find((const char*)property);
-    assert(con->skill!=NOSKILL);
-    xmlFree(property);
+    if (property!=NULL) {
+      con->skill = sk_find((const char*)property);
+      assert(con->skill!=NOSKILL);
+      xmlFree(property);
+    } else {
+      con->skill = NOSKILL;
+    }
 
     con->maxsize = xml_ivalue(node, "maxsize", -1);
     con->minskill = xml_ivalue(node, "minskill", -1);
@@ -207,7 +210,6 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
 
     }
     xmlXPathFreeObject(req);
-
   }
   xpath->node = pushNode;
 }
@@ -277,7 +279,7 @@ parse_buildings(xmlDocPtr doc)
       /* reading eressea/buildings/building/construction */
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-      xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &btype->construction);
+      xml_readconstruction(xpath, result->nodesetval, &btype->construction);
       xmlXPathFreeObject(result);
 
       if (gamecode_enabled) {
@@ -494,7 +496,7 @@ parse_ships(xmlDocPtr doc)
 	  /* reading eressea/ships/ship/construction */
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-      xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &st->construction);
+      xml_readconstruction(xpath, result->nodesetval, &st->construction);
       xmlXPathFreeObject(result);
 
 	  /* reading eressea/ships/ship/coast */
@@ -754,7 +756,7 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   /* reading item/construction */
   xpath->node = node;
   result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-  xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &itype->construction);
+  xml_readconstruction(xpath, result->nodesetval, &itype->construction);
   xmlXPathFreeObject(result);
 
   /* reading item/weapon */
@@ -1206,7 +1208,7 @@ parse_equipment(xmlDocPtr doc)
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr xpathRaces;
 
-  /* reading eressea/races/race */
+  /* reading eressea/equipment/set */
   xpathRaces = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/set", xpath);
   if (xpathRaces->nodesetval) {
     xmlNodeSetPtr nsetRaces = xpathRaces->nodesetval;

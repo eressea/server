@@ -407,6 +407,9 @@
 			RelativePath=".\unit.c">
 		</File>
 		<File
+			RelativePath=".\xmlkernel.h">
+		</File>
+		<File
 			RelativePath=".\xmlreader.c">
 		</File>
 	</Files>

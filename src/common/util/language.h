@@ -42,6 +42,19 @@ extern struct locale * default_locale;
 extern struct locale * locales;
 extern struct locale * nextlocale(const struct locale * lang);
 
+enum {
+  UT_PARAMS,
+  UT_KEYWORDS,
+  UT_SKILLS,
+  UT_RACES,
+  UT_OPTIONS,
+  UT_DIRECTIONS,
+  UT_ARCHETYPES,
+  UT_MAX
+};
+
+struct tnode * get_translations(const struct locale * lang, int index);
+
 #ifdef __cplusplus
 }
 #endif

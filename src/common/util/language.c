@@ -17,6 +17,7 @@
 
 #include "log.h"
 #include "goodies.h"
+#include "umlaut.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,6 +45,8 @@ find_locale(const char * name)
 	return l;
 }
 
+static int nextlocaleindex = 0;
+
 locale *
 make_locale(const char * name)
 {
@@ -57,6 +60,8 @@ make_locale(const char * name)
 	l->hashkey = hkey;
 	l->name = strdup(name);
 	l->next = locales;
+  l->index = nextlocaleindex++;
+  assert(nextlocaleindex<=MAXLOCALES);
 	locales = l;
 	if (default_locale==NULL) default_locale = l;
 	return l;
@@ -218,4 +223,23 @@ locale *
 nextlocale(const struct locale * lang)
 {
 	return lang->next;
+}
+
+typedef struct lstr {
+  tnode tokens[UT_MAX];
+} lstr;
+
+static lstr lstrs[MAXLOCALES];
+
+struct tnode *
+get_translations(const struct locale * lang, int index)
+{
+  static struct lstr * lnames = NULL;
+  static const struct locale * lastlang = NULL;
+
+  assert(lang->index<MAXLOCALES || "you have to increase MAXLOCALES and recompile");
+  if (lang->index<MAXLOCALES) {
+    return lstrs[lang->index].tokens+index;
+  }
+  return lstrs[0].tokens+index;
 }
