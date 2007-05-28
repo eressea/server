@@ -20,7 +20,16 @@
   </set>
 
   <set name="craftsman">
-    <skill name="building" level="1"/>
+    <skill name="building" level="2"/>
+  </set>
+
+  <set name="new_faction">
+    <subset>
+      <set name="craftsman"/>
+    </subset>
+    <item name="money" amount="4200"/>
+    <item name="log" amount="30"/>
+    <item name="stone" amount="30"/>
   </set>
 
 </equipment>

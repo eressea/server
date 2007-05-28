@@ -1114,12 +1114,12 @@ recruit_archetype(unit * u, order * ord)
     } else switch(n) {
       case ENOMATERIALS:
         ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype));
-        return 0;
+        break;
       case ELOWSKILL:
       case ENEEDSKILL:
         /* no skill, or not enough skill points to build */
         cmistake(u, ord, 50, MSG_PRODUCE);
-        return 0;
+        break;
       default:
         assert(!"unhandled return value from build() in recruit_archetype");
     }

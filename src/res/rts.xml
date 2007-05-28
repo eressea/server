@@ -13,8 +13,9 @@
   <xi:include href="ships.xml"/>
   <xi:include href="rts/buildings.xml"/>
   <xi:include href="rts/units.xml"/>
-  <xi:include href="eressea/calendar.xml"/>
+  <xi:include href="rts/calendar.xml"/>
   <xi:include href="equipment.xml"/>
+  <xi:include href="rts/equipment.xml"/>
   <xi:include href="spells.xml"/>
   <xi:include href="terrains.xml"/>
   <xi:include href="dungeons.xml"/>
