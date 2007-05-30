@@ -64,6 +64,7 @@ typedef short item_t;
 typedef unsigned int spellid_t;
 #endif
 
+struct equipment;
 struct plane;
 struct order;
 struct spell;
