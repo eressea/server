@@ -24,6 +24,7 @@
 #include "economy.h"
 
 /* gamecode includes */
+#include "give.h"
 #include "laws.h"
 #include "randenc.h"
 #include "archetype.h"
@@ -34,7 +35,6 @@
 #include <kernel/calendar.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
-#include <kernel/give.h>
 #include <kernel/item.h>
 #include <kernel/karma.h>
 #include <kernel/magic.h>
@@ -1081,6 +1081,37 @@ recruit_archetype(unit * u, order * ord)
       /* TODO: error message */
       return 0;
     }
+    if (arch->rules) {
+      /* Simple allow/deny style restrictions for archetypes (let only humans 
+       * recruit gamedesigners, etc). These need to be more powerful to be 
+       * useful, and the current way they are implemented is not, but the 
+       * general idea strikes me as good. Also, feedback should be configurable
+       * for each failed rule.
+       */
+      int k;
+      for (k=0;arch->rules[k].property;++k) {
+        boolean match = false;
+        if (arch->rules[k].value[0]=='*') match = true;
+        else if (strcmp(arch->rules[k].property, "race")==0) {
+          const race * rc = rc_find(arch->rules[k].value);
+          assert(rc);
+          if (rc==u->race) match = true;
+        } else if (strcmp(arch->rules[k].property, "building")==0) {
+          const building_type * btype = bt_find(arch->rules[k].value);
+          assert(btype);
+          if (u->building && u->building->type==btype) match = true;
+        }
+        if (match) {
+          if (arch->rules[k].allow) break;
+          else {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "recruit_rule_fail",
+              "property value", arch->rules[k].property, arch->rules[k].value));
+            /* TODO: error message */
+            return 0;
+          }
+        }
+      }
+    }
     if (arch->btype) {
       if (u->building==NULL || u->building->type!=arch->btype) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_in_building", "type", arch->btype));
@@ -1131,7 +1162,7 @@ recruit_archetype(unit * u, order * ord)
   return -1;
 }
 
-static int
+int
 recruit_classic(void)
 {
   static int value = -1;
@@ -1142,7 +1173,7 @@ recruit_classic(void)
   return value;
 }
 
-static int
+int
 recruit_archetypes(void)
 {
   static int value = -1;

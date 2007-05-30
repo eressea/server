@@ -27,6 +27,8 @@
   </archetype>
 
   <archetype name="gamedesigner" building="castle" cost="1">
+    <allow property="race" value="human"/>
+    <deny property="race" value="*"/>
     <construction reqsize="1">
       <requirement type="laen" quantity="100"/>
       <requirement type="mallorn" quantity="100"/>

@@ -1004,7 +1004,7 @@ add_skill(unit * u, skill_t id)
   skill * sv = u->skills;
 #ifndef NDEBUG
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-	assert(sv->id != id);
+    assert(sv->id != id);
   }
 #endif
   ++u->skill_size;

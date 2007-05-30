@@ -290,6 +290,9 @@
 				RelativePath=".\economy.h">
 			</File>
 			<File
+				RelativePath=".\give.h">
+			</File>
+			<File
 				RelativePath=".\items.h">
 			</File>
 			<File
@@ -322,6 +325,9 @@
 		</File>
 		<File
 			RelativePath=".\economy.c">
+		</File>
+		<File
+			RelativePath=".\give.c">
 		</File>
 		<File
 			RelativePath=".\items.c">

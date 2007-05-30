@@ -211,9 +211,6 @@
 				RelativePath=".\faction.h">
 			</File>
 			<File
-				RelativePath=".\give.h">
-			</File>
-			<File
 				RelativePath=".\group.h">
 			</File>
 			<File
@@ -327,9 +324,6 @@
 		</File>
 		<File
 			RelativePath=".\faction.c">
-		</File>
-		<File
-			RelativePath=".\give.c">
 		</File>
 		<File
 			RelativePath=".\group.c">

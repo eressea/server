@@ -109,6 +109,26 @@ parse_archetypes(xmlDocPtr doc)
       arch->size = xml_ivalue(node, "cost", 0);
 
       xpath->node = node;
+      sub = xmlXPathEvalExpression(BAD_CAST "allow|deny", xpath);
+      if (sub->nodesetval && sub->nodesetval->nodeNr) {
+        int k;
+        arch->rules = calloc(sub->nodesetval->nodeNr+1, sizeof(rule));
+        for (k=0;k!=sub->nodesetval->nodeNr;++k) {
+          xmlNodePtr rule = sub->nodesetval->nodeTab[k];
+          arch->rules[k].allow = (rule->name[0]=='a');
+
+          property = xmlGetProp(rule, BAD_CAST "property");
+          arch->rules[k].property = strdup((const char *)property);
+          xmlFree(property);
+
+          property = xmlGetProp(rule, BAD_CAST "value");
+          arch->rules[k].value = strdup((const char *)property);
+          xmlFree(property);
+        }
+      }
+      xmlXPathFreeObject(sub);
+
+      xpath->node = node;
       sub = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
       if (sub->nodesetval) {
         xml_readconstruction(xpath, sub->nodesetval, &arch->ctype);

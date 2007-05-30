@@ -25,6 +25,7 @@
 
 /* gamecode includes */
 #include "economy.h"
+#include "give.h"
 
 /* triggers includes */
 #include <triggers/removecurse.h>
@@ -40,7 +41,6 @@
 #include <kernel/build.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
-#include <kernel/give.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
 #include <kernel/movement.h>

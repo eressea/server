@@ -19,7 +19,6 @@ SOURCES =
  equipment.c
  faction.c
  group.c
- give.c
  item.c
  karma.c
  magic.c

@@ -8,9 +8,11 @@ SubDirHdrs $(SUBDIR)/../.. ;
 SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
+ archetype.c
  creation.c
  creport.c
  economy.c
+ give.c
  items.c
  laws.c
  luck.c

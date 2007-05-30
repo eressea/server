@@ -17,13 +17,20 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
+  typedef struct rule {
+    boolean allow;
+    char * property;
+    char * value;
+  } rule;
+
   typedef struct archetype {
+    struct archetype * next;
     char * name[2];
     int size;
     struct building_type * btype;
     struct equipment * equip;
     struct construction * ctype;
-    struct archetype * next;
+    struct rule * rules;
   } archetype;
 
   extern const struct archetype * find_archetype(const char * s, const struct locale * lang);

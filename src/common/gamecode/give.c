@@ -12,23 +12,24 @@
  */
 #include <config.h>
 #include "eressea.h"
-
 #include "give.h"
 
+#include "economy.h"
+
 /* kernel includes */
-#include "faction.h"
-#include "item.h"
-#include "magic.h"
-#include "message.h"
-#include "order.h"
-#include "pool.h"
-#include "race.h"
-#include "region.h"
-#include "reports.h"
-#include "ship.h"
-#include "skill.h"
-#include "terrain.h"
-#include "unit.h"
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/order.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -250,8 +251,28 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
       else freset(u2, UFL_HERO);
 #endif
     }
-    
+
     if (u2) {
+      if (u2->number!=0 && recruit_archetypes()) {
+        /* must have same set of skills */
+        boolean okay = false;
+        if (u->skill_size==u2->skill_size) {
+          int i;
+          for (i=0;i!=u->skill_size;++i) {
+            int j;
+            for (j=0;j!=u2->skill_size;++j) {
+              if (u->skills[i].id==u2->skills[j].id) break;
+            }
+            if (j!=u2->skill_size) break;
+          }
+          if (i==u->skill_size) okay = true;
+        }
+        if (!okay) {
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "give_cannot_merge", ""));
+        }
+      }
+
+
       /* Einheiten von Schiffen können nicht NACH in von
       * Nicht-alliierten bewachten Regionen ausführen */
       sh = leftship(u);
