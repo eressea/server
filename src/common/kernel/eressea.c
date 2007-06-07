@@ -1963,10 +1963,20 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
       u->ship = creator->ship;
     }
 
-    /* Temps von parteigetarnten Einheiten sind wieder parteigetarnt */
-    if (fval(creator, UFL_PARTEITARNUNG))
-      fset(u, UFL_PARTEITARNUNG);
+    /* Tarnlimit wird vererbt */
+    if (fval(creator, UFL_STEALTH)) {
+      attrib * a = a_find(creator->attribs, &at_stealth);
+      if (a) {
+        int stealth = a->data.i;
+        a = a_add(&u->attribs, a_new(&at_stealth));
+        a->data.i = stealth;
+      }
+    }
 
+    /* Temps von parteigetarnten Einheiten sind wieder parteigetarnt */
+    if (fval(creator, UFL_PARTEITARNUNG)) {
+      fset(u, UFL_PARTEITARNUNG);
+    }
     /* Daemonentarnung */
     set_racename(&u->attribs, get_racename(creator->attribs));
     if (fval(u->race, RCF_SHAPESHIFT) && fval(creator->race, RCF_SHAPESHIFT)) {

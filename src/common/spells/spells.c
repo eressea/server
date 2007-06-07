@@ -2953,7 +2953,7 @@ sp_firewall(castorder *co)
   b = get_borders(r, r2);
   while (b!=NULL) {
     if (b->type == &bt_firewall) break;
-  b = b->next;
+    b = b->next;
   }
   if (b==NULL) {
     b = new_border(&bt_firewall, r, r2);

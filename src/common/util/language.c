@@ -234,9 +234,6 @@ static lstr lstrs[MAXLOCALES];
 struct tnode *
 get_translations(const struct locale * lang, int index)
 {
-  static struct lstr * lnames = NULL;
-  static const struct locale * lastlang = NULL;
-
   assert(lang->index<MAXLOCALES || "you have to increase MAXLOCALES and recompile");
   if (lang->index<MAXLOCALES) {
     return lstrs[lang->index].tokens+index;
