@@ -944,6 +944,7 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
       fprintf(F, "\"%s\";Parteiname\n", f->name);
       fprintf(F, "\"%s\";email\n", f->email);
       fprintf(F, "\"%s\";banner\n", f->banner);
+      fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
       if (f->alliance!=NULL && f->alliance==uf->alliance) {
         fprintf(F, "%d;alliance\n", f->alliance->id);
         fprintf(F, "\"%s\";alliancename\n", f->alliance->name);
