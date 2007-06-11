@@ -21,25 +21,39 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 
+static const struct { 
+  const char * name;
+  int (*func)(lua_State *);
+} lualibs[] = {
+  {"",                luaopen_base},
+  {LUA_TABLIBNAME,    luaopen_table},
+  {LUA_IOLIBNAME,     luaopen_io},
+  {LUA_STRLIBNAME,    luaopen_string},
+  {LUA_MATHLIBNAME,   luaopen_math},
+  { NULL, NULL }
+};
+
+static void
+openlibs(lua_State * L)
+{
+  int i;
+  for (i=0;lualibs[i].func;++i) {
+    lua_pushcfunction(L, lualibs[i].func);
+    lua_pushstring(L, lualibs[i].name);
+    lua_call(L, 1, 0);
+  }
+}
+
 static lua_State *
 lua_init(void)
 {
   lua_State * L = lua_open();
-/*   
-  luaopen_base(L);
-  luaopen_math(L);
-  luaopen_string(L);
-  luaopen_io(L);
-  luaopen_table(L);
-*/
-  luaL_openlibs(L);
+
+  openlibs(L);
 
   luabind::open(L);
   bind_objects(L);
   bind_eressea(L);
-  // bind_script(L);
-  // bind_message(L);
-  // bind_event(L);
   bind_spell(L);
   bind_alliance(L);
   bind_region(L);
@@ -56,9 +70,6 @@ lua_init(void)
 static void
 lua_done(lua_State * L)
 {
-#if 0
-  reset_scripts();
-#endif
   lua_close(L);
 }
 
