@@ -2,10 +2,9 @@
 extern "C" {
 #endif
 
-#include <lua50/lua.h>
-#include <lua50/lauxlib.h>
-#include <lua50/lualib.h>
-
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 #ifdef __cplusplus
 }
 

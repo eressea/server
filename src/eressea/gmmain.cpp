@@ -25,11 +25,14 @@ static lua_State *
 lua_init(void)
 {
   lua_State * L = lua_open();
+/*   
   luaopen_base(L);
   luaopen_math(L);
   luaopen_string(L);
   luaopen_io(L);
   luaopen_table(L);
+*/
+  luaL_openlibs(L);
 
   luabind::open(L);
   bind_objects(L);

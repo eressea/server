@@ -10,7 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <lua50/lua.h>
+#include <lua.hpp>
 
   extern int lua_console(lua_State * L);
   extern int lua_do(lua_State * L);

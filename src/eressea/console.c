@@ -1,8 +1,7 @@
 #include "console.h"
 
 /* lua includes */
-#include <lua50/lauxlib.h>
-#include <lua50/lualib.h>
+#include <lua.hpp>
 
 /* libc includes */
 #include <assert.h>

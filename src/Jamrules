@@ -1,16 +1,14 @@
-#C++ = g++-3.3 ;
-#CC = gcc-3.3 ;
-#LINK = gcc-3.3 ;
-C++ = g++-4.0 ;
-CC = gcc-4.0 ;
-LINK = gcc-4.0 ;
-# ECHO $(JAMUNAME) ;
-
-# LINKFLAGS += -rdynamic ;
+C++ = g++ ;
+CC = gcc ;
+LINK = gcc ;
 
 if $(MSPACES) {
   CCFLAGS += -DMSPACES ;
   C++FLAGS += -DMSPACES ;
+}
+
+if ! $(LUA_VERSION) {
+  LUA_VERSION = 5.0 ;
 }
 
 if ! $(HAVE_LUA) {
@@ -99,7 +97,11 @@ rule iconv
 rule luabind
 {
   LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib ;
-  LINKLIBS on $(<) += -llua50 -llualib50 ;
+  if $(LUA_VERSION) = 5.1 {
+    LINKLIBS on $(<) += -llua5.1 ;
+  } else {
+    LINKLIBS on $(<) += -llua50 -llualib50 ;
+  }
   LINKLIBS on $(<) += -lm -lluabind ;
 }
 
@@ -115,7 +117,11 @@ rule UsingLuabind
 
 rule UsingLua
 {
-   SubDirHdrs /usr/include/lua50 ;
+  if $(LUA_VERSION) = 5.1 {
+    SubDirHdrs /usr/include/lua5.1 ;
+  } else {
+    SubDirHdrs /usr/include/lua50 ;
+  }
 }
 
 rule TargetDirectory

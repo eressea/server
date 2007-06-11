@@ -262,11 +262,14 @@ static lua_State *
 lua_init(void)
 {
   lua_State * luaState = lua_open();
+/*
   luaopen_base(luaState);
   luaopen_math(luaState);
   luaopen_string(luaState);
   luaopen_io(luaState);
   luaopen_table(luaState);
+ */
+  luaL_openlibs(luaState);
   luabind::open(luaState);
   bind_objects(luaState);
   bind_eressea(luaState);
