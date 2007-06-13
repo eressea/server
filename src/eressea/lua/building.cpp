@@ -56,7 +56,7 @@ lc_age(struct attrib * a)
     catch (luabind::error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
-      log_error(("An exception occured while %b tried to call '%s': %s.\n",
+      log_error(("An exception occured while %s tried to call '%s': %s.\n",
         buildingname(b), fname, error));
       lua_pop(L, 1);
       std::terminate();
