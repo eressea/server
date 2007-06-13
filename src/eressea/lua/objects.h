@@ -3,7 +3,6 @@
 
 #include <attributes/object.h>
 #include <lua.hpp>
-#include <luabind/luabind.hpp>
 #include <luabind/object.hpp>
 
 struct lua_State;
