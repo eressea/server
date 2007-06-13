@@ -10,8 +10,8 @@ function change_locales()
   -- local localechange = { }
   local localechange = { de = { "bLub" } }
   
-  for loc, flist in localechange do
-    for index, name in flist do
+  for loc, flist in pairs(localechange) do
+    for index, name in pairs(flist) do
       f = get_faction(atoi36(name))
       if f ~= nil then
         f.locale = loc
@@ -38,8 +38,8 @@ function run_scripts()
     "eressea/embassy.lua",
     "eressea/ents.lua"
   }
-  for index in scripts do
-    loadscript(scripts[index])
+  for index, value in pairs(scripts) do
+    loadscript(value)
   end
 end
 

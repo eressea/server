@@ -4,7 +4,9 @@ local function kill_multis()
 --    ["amam"]="Wird wegen Missbrauch von Sonnensegeln geloescht",
 --    ["jr81"]="Wird wegen Missbrauch von Sonnensegeln geloescht"
   }
-  for k, v in multis do
+  local k
+  local v
+  for k, v in pairs(multis) do
     local f = get_faction(atoi36(k))
     if f~=nil then
       print("- marking " .. tostring(f) .. " as a multi-player.")

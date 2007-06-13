@@ -1,8 +1,8 @@
 function teleport_all(map, grave)
   print("- teleporting all quest members to the grave")
   local index
-  for index in map do
-    local r = map[index]
+  local r
+  for index, r in pairs(map) do
     local u
     for u in r.units do
       u.region = grave
@@ -36,8 +36,8 @@ function wyrm()
  end
 
  local index
- for index in map do
-  local r = map[index]
+ local r
+ for index, r in pairs(map) do
   if r~=grave then
    if (math.mod(r.x,2)==math.mod(get_turn(),2)) then
      r:add_notice("Eine Botschaft von Igjarjuk, Herr der Wyrme: 'Die Zeit des Wartens ist beinahe vorrüber. Euer Fürst kehrt aus dem Grabe zurück.'")

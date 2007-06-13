@@ -10,8 +10,9 @@ function write_emails()
   local locales = { "de", "en" }
   local files = {}
   local key
-  for key in locales do
-    local locale = locales[key]
+  local locale
+  local file
+  for key, locale in pairs(locales) do
     files[locale] = io.open(basepath .. "/emails." .. locale, "w")
   end
 
@@ -21,8 +22,8 @@ function write_emails()
     files[faction.locale]:write(faction.email .. "\n")
   end
 
-  for key in files do
-    files[key]:close()
+  for key, file in pairs(files) do
+    file:close()
   end
 end
 

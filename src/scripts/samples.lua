@@ -285,9 +285,11 @@ function test_rewards()
   items = { "hornofdancing", "trappedairelemental", 
     "aurapotion50", "bagpipeoffear",
     "instantartacademy", "instantartsculpture" }
-  for index in items do  
-    u:add_item(items[index], 1)
-    u:add_order('@BENUTZEN "' .. get_string("de", items[index]) .. '"')
+  local index
+  local item
+  for index, item in pairs(items) do
+    u:add_item(item, 1)
+    u:add_order('@BENUTZEN "' .. get_string("de", item) .. '"')
   end
   u:add_order("NUMMER PARTEI eviL")
 
@@ -365,8 +367,10 @@ function run_scripts()
   scripts = { 
     "xmas2004.lua"
   }
-  for index in scripts do
-    local script = scriptpath .. "/" .. scripts[index]
+  local index
+  local name
+  for index, name in pairs(scripts) do
+    local script = scriptpath .. "/" .. name
     print("- loading " .. script)
     if pcall(dofile, script)==0 then
       print("Could not load " .. script)

@@ -4,7 +4,9 @@ end
 
 function write_spoils(file)
   items = { "elfspoil", "demonspoil", "goblinspoil", "dwarfspoil", "halflingspoil", "humanspoil", "aquarianspoil", "insectspoil", "catspoil", "orcspoil", "trollspoil" }
-  for index, iname in items do
+  local index
+  local iname
+  for index, iname in pairs(items) do
     printed = false
     for f in factions() do
       trophies = 0

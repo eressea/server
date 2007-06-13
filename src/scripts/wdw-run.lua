@@ -67,8 +67,10 @@ scripts = {
 if orderfile==nil then
   print "you must specify an orderfile"
 else
-  for index in scripts do
-    local script = scriptpath .. "/" .. scripts[index]
+  local name
+  local index
+  for index, name in pairs(scripts) do
+    local script = scriptpath .. "/" .. name
     print("- loading " .. script)
     if pcall(dofile, script)==0 then
       print("Could not load " .. script)

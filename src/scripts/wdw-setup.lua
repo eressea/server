@@ -77,7 +77,8 @@ function make_faction(position, alliance, number, email, race)
   end
   
   local sk
-  for sk in skills do
+  local skill
+  for sk, skill in pairs(skills) do
     u = add_unit(f, position)
 
     -- anzahl personen berechnen
@@ -86,7 +87,6 @@ function make_faction(position, alliance, number, email, race)
     skillno = skillno - 1
     u.number = number
 
-    local skill = skills[sk]
     u:set_skill(skill, 3)
 
     print("- " .. number .. " x " .. skill)

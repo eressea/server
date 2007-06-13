@@ -6,21 +6,6 @@ function loadscript(name)
   end
 end
 
-function change_locales()
-  -- local localechange = { }
-  local localechange = { de = { "bLub" } }
-  
-  for loc, flist in localechange do
-    for index, name in flist do
-      f = get_faction(atoi36(name))
-      if f ~= nil then
-        f.locale = loc
-        print("LOCALECHANGE ", f, loc)
-      end
-    end
-  end
-end
-
 function run_scripts()
   scripts = { 
     "spells.lua",
@@ -28,8 +13,8 @@ function run_scripts()
     "familiars.lua",
     "write_emails.lua"
   }
-  for index in scripts do
-    loadscript(scripts[index])
+  for index, name in pairs(scripts) do
+    loadscript(name)
   end
 end
 
@@ -70,8 +55,6 @@ function process(orders)
   update_guards()
   update_scores()
 
-  change_locales()
-  
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", false)
 

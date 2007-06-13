@@ -22,11 +22,12 @@ function write_standings()
 
   log(file, "** Erfüllte Siegbedingungen **")
   local condition
-  for condition in conditions do
+  local index
+  for index, condition in pairs(conditions) do
     local none = true
-    log(file, conditions[condition])
+    log(file, condition)
     for alliance in alliances() do
-      if victorycondition(alliance, condition)==1 then
+      if victorycondition(alliance, index)==1 then
         log(file, "  - " .. alliance.name .. " (" .. alliance.id .. ")")
         none = false
       end
