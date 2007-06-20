@@ -31,17 +31,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-enum {
-  WP_NONE,
-  WP_MAX
-};
-
 /* damage types */
-
-#define CUT           (1<<0)
-#define PIERCE        (1<<1)
-#define BASH          (1<<2)
-#define ARMORPIERCING (1<<3)
 
 static boolean
 attack_firesword(const troop * at, const struct weapon_type * wtype, int *casualties)
