@@ -500,7 +500,7 @@ typedef struct fctr_data {
 
 #include <exception>
 
-int __cdecl
+int
 fctr_handle(struct trigger * tp, void * data)
 {
   trigger * t = tp;
