@@ -707,16 +707,3 @@ abkz(const char *s, size_t max)
 
 	return buf;
 }
-
-void
-name_unit(unit *u)
-{
-	char name[16];
-
-	if (u->race->generate_name) {
-		set_string(&u->name, (u->race->generate_name(u)));
-	} else {
-		sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
-		set_string(&u->name, name);
-	}
-}

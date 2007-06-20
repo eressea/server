@@ -9,6 +9,7 @@
 #include <kernel/xmlreader.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/umlaut.h>
 #include <util/language.h>
 #include <util/xml.h>

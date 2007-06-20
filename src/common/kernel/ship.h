@@ -63,6 +63,7 @@ extern void st_register(const ship_type * type);
 #define SF_DRIFTED 1<<0
 #define SF_MOVED   1<<1
 #define SF_DAMAGED 1<<2 /* for use in combat */
+#define SF_SELECT  1<<3 /* previously FL_DH */
 
 typedef struct ship {
 	struct ship *next;

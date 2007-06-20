@@ -20,13 +20,15 @@
 #include "unit.h"
 #include "faction.h"
 #include "save.h"
+#include "version.h"
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
 
 /* util includes */
-#include <resolve.h>
-#include <base36.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/resolve.h>
 
 /* libc includes */
 #include <stdlib.h>

@@ -79,6 +79,8 @@ extern void bt_register(building_type * type);
 #define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
 #define BLD_EXPANDED       0x08 /* has been expanded this turn */
 
+#define BLD_SELECT         0x10 /* formerly FL_DH */
+
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 
 typedef struct building {
@@ -134,7 +136,7 @@ extern struct building *findbuilding(int n);
 
 extern struct unit * buildingowner(const struct region * r, const struct building * b);
 
-extern attrib_type at_building_action;
+extern struct attrib_type at_building_action;
 
 #ifdef WDW_PYRAMID
 extern int wdw_pyramid_level(const struct building *b);

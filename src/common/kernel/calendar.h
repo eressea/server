@@ -5,6 +5,14 @@
 extern "C" {
 #endif
 
+enum {
+  SEASON_WINTER,
+  SEASON_SPRING,
+  SEASON_SUMMER,
+  SEASON_AUTUMN
+};
+
+
 extern char *agename;
 extern int  first_turn;
 extern int  first_month;

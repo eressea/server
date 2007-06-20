@@ -71,10 +71,12 @@
 #include <attributes/variable.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -656,7 +658,7 @@ count_race(const region *r, const race *rc)
   return c;
 }
 
-extern attrib_type at_germs;
+extern struct attrib_type at_germs;
 
 static void
 trees(region * r, const int current_season, const int last_weeks_season)
@@ -1848,13 +1850,13 @@ mail_cmd(unit * u, struct order * ord)
         break;
       }
 
-      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
 
       for(u2=r->units; u2; u2=u2->next) {
-        if(u2->building == b && !fval(u2->faction, FL_DH)
+        if(u2->building == b && !fval(u2->faction, FFL_SELECT)
           && cansee(u->faction, r, u2, 0)) {
             mailunit(r, u, u2->no, ord, s);
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
           }
       }
     }
@@ -1876,13 +1878,13 @@ mail_cmd(unit * u, struct order * ord)
         break;
       }
 
-      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
 
       for(u2=r->units; u2; u2=u2->next) {
-        if(u2->ship == sh && !fval(u2->faction, FL_DH)
+        if(u2->ship == sh && !fval(u2->faction, FFL_SELECT)
           && cansee(u->faction, r, u2, 0)) {
             mailunit(r, u, u2->no, ord, s);
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
           }
       }
     }
@@ -2536,9 +2538,10 @@ guard_on_cmd(unit * u, struct order * ord)
 static void
 sinkships(region * r)
 {
-  ship *sh;
+  ship **shp = &r->ships;
 
-  list_foreach(ship, r->ships, sh) {
+  while (*shp) {
+    ship * sh = *shp;
     if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
       /* Schiff nicht seetüchtig */
       damage_ship(sh, 0.30);
@@ -2546,10 +2549,11 @@ sinkships(region * r)
     if (shipowner(sh)==NULL) {
       damage_ship(sh, 0.05);
     }
-    if (sh->damage >= sh->size * DAMAGE_SCALE)
+    if (sh->damage >= sh->size * DAMAGE_SCALE) {
       destroy_ship(sh);
+    }
+    if (*shp==sh) shp=&sh->next;
   }
-  list_next(sh);
 }
 
 /* The following functions do not really belong here: */
@@ -2638,7 +2642,7 @@ reorder(void)
     boolean sorted=false;
     while (*up) {
       unit * u = *up;
-      if (!fval(u, FL_MARK)) {
+      if (!fval(u, UFL_MARK)) {
         struct order * ord;
         for (ord = u->orders;ord;ord=ord->next) {
           if (get_keyword(ord)==K_SORT) {
@@ -2681,7 +2685,7 @@ reorder(void)
                 }
                 break;
               }
-              fset(u, FL_MARK);
+              fset(u, UFL_MARK);
               sorted = true;
             }
             break;
@@ -2692,7 +2696,7 @@ reorder(void)
     }
     if (sorted) {
       unit * u;
-      for (u=r->units;u;u=u->next) freset(u, FL_MARK);
+      for (u=r->units;u;u=u->next) freset(u, UFL_MARK);
     }
   }
 }

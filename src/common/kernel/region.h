@@ -46,7 +46,8 @@ extern "C" {
 #define RF_COMBATDEBUG (1<<14)
 #define RF_MAPPER_HIGHLIGHT (1<<14) /* only used by mapper, not stored */
 
-#define RF_DH          (1<<18)
+#define RF_SELECT      (1<<17)
+#define RF_MARK        (1<<18)
 
 /* flags that speed up attribute access: */
 #define RF_TRAVELUNIT    (1<<19)
@@ -146,16 +147,16 @@ int koor_distance(int ax, int ay, int bx, int by) ;
 extern direction_t reldirection(const struct region * from, const struct region * to);
 extern struct region * findregion(short x, short y);
 
-extern attrib_type at_direction;
-extern attrib_type at_moveblock;
+extern struct attrib_type at_direction;
+extern struct attrib_type at_moveblock;
 /* new: */
-extern attrib_type at_peasantluck;
-extern attrib_type at_horseluck;
-extern attrib_type at_chaoscount;
-extern attrib_type at_woodcount;
-extern attrib_type at_deathcount;
-extern attrib_type at_travelunit;
-extern attrib_type at_laen;
+extern struct attrib_type at_peasantluck;
+extern struct attrib_type at_horseluck;
+extern struct attrib_type at_chaoscount;
+extern struct attrib_type at_woodcount;
+extern struct attrib_type at_deathcount;
+extern struct attrib_type at_travelunit;
+extern struct attrib_type at_laen;
 
 void initrhash(void);
 void rhash(struct region * r);

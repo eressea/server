@@ -24,6 +24,7 @@
 #include "skill.h"
 
 #include "curse.h"
+#include "karma.h"
 #include "item.h"
 #include "magic.h"
 #include "race.h"
@@ -31,10 +32,10 @@
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
-#include "karma.h"
 
 #include <util/attrib.h>
 #include <util/goodies.h>
+#include <util/log.h>
 #include <util/rng.h>
 
 /* libc includes */

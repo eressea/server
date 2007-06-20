@@ -50,6 +50,7 @@
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -761,14 +762,14 @@ drifting_ships(region * r)
         unit *u, *lastu = NULL;
         message * msg = msg_message("ship_drift", "ship dir", sh, dir);
         for (u=firstu;u;u=u->next) {
-          if (u->ship==sh && !fval(u->faction, FL_MARK)) {
-            fset(u->faction, FL_MARK);
+          if (u->ship==sh && !fval(u->faction, FFL_MARK)) {
+            fset(u->faction, FFL_MARK);
             add_message(&u->faction->msgs, msg);
             lastu = u->next;
           }
         }
         for (u=firstu;u!=lastu;u=u->next) {
-          freset(u->faction, FL_MARK);
+          freset(u->faction, FFL_MARK);
         }
         msg_release(msg);
       }
@@ -2373,8 +2374,7 @@ move_hunters(void)
   region *r;
 
   for (r = regions; r; r = r->next) {
-    unit ** up = &r->units, * u;
-    for (u=r->units; u; u=u->next) freset(u, FL_DH);
+    unit ** up = &r->units;
 
     while (*up!=NULL) {
       unit * u = *up;

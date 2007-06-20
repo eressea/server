@@ -49,6 +49,7 @@
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/xmlreader.h>
+#include <kernel/version.h>
 
 #include <spells/spells.h>
 #include <attributes/attributes.h>
@@ -551,14 +552,14 @@ paint_info_region(window * wnd, const state * st)
       mvwaddnstr(win, line++, 1, "* factions:", size-5);
       wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
       for (u=r->units;u && line<maxline;u=u->next) {
-        if (!fval(u->faction, FL_MARK)) {
+        if (!fval(u->faction, FFL_MARK)) {
           mvwprintw(win, line, 1, "%.4s ", itoa36(u->faction->no));
           mvwaddnstr(win, line++, 6, u->faction->name, size-5);
-          fset(u->faction, FL_MARK);
+          fset(u->faction, FFL_MARK);
         }
       }
       for (u=r->units;u && line<maxline;u=u->next) {
-        freset(u->faction, FL_MARK);
+        freset(u->faction, FFL_MARK);
       }
     }
     if (r->units && (st->info_flags & IFL_UNITS)) {

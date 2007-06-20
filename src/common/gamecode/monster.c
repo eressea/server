@@ -60,6 +60,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/lists.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -725,7 +726,7 @@ random_growl(void)
 	return "";
 }
 
-extern attrib_type at_direction;
+extern struct attrib_type at_direction;
 
 static order *
 monster_learn(unit *u)
@@ -1110,12 +1111,12 @@ spawn_dragons(void)
       /* create new message to add to units */
       msg = msg_message("sighting", "region race number",
         u->region, u->race, u->number);
-      for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+      for (u=r->units;u;u=u->next) freset(u->faction, FFL_SELECT);
       for (u=r->units;u;u=u->next) {
         faction * f = u->faction;
-        if (!fval(f, FL_DH)) {
+        if (!fval(f, FFL_SELECT)) {
           add_message(&f->msgs, msg);
-          fset(f, FL_DH);
+          fset(f, FFL_SELECT);
         }
       }
       msg_release(msg);
@@ -1182,10 +1183,10 @@ spawn_undead(void)
       {
         message * msg = msg_message("undeadrise", "region", r);
         add_message(&r->msgs, msg);
-        for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+        for (u=r->units;u;u=u->next) freset(u->faction, FFL_SELECT);
         for (u=r->units;u;u=u->next) {
-          if (fval(u->faction, FL_DH)) continue;
-          fset(u->faction, FL_DH);
+          if (fval(u->faction, FFL_SELECT)) continue;
+          fset(u->faction, FFL_SELECT);
           add_message(&u->faction->msgs, msg);
         }
         msg_release(msg);

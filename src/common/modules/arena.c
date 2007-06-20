@@ -46,10 +46,12 @@
 #include <kernel/unit.h>
 
 /* util include */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 
@@ -340,6 +342,8 @@ guardian_faction(plane * pl, int id)
 		set_money(u, 1000);
 	}
 }
+
+#define BLOCKSIZE           9
 
 static void 
 block_create(short x1, short y1, char terrain)

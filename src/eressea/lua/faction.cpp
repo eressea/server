@@ -12,8 +12,9 @@
 #include <kernel/unit.h>
 
 // util includes
-#include <util/base36.h>
 #include <util/attrib.h>
+#include <util/base36.h>
+#include <util/language.h>
 
 // attrib includes
 #include <attributes/attributes.h>

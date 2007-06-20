@@ -226,14 +226,14 @@ void magic(void);
 
 void regeneration_magiepunkte(void);
 
-extern attrib_type at_seenspell;
-extern attrib_type at_mage;
-extern attrib_type at_familiarmage;
-extern attrib_type at_familiar;
-extern attrib_type at_clonemage;
-extern attrib_type at_clone;
-extern attrib_type at_reportspell;
-extern attrib_type at_icastle;
+extern struct attrib_type at_seenspell;
+extern struct attrib_type at_mage;
+extern struct attrib_type at_familiarmage;
+extern struct attrib_type at_familiar;
+extern struct attrib_type at_clonemage;
+extern struct attrib_type at_clone;
+extern struct attrib_type at_reportspell;
+extern struct attrib_type at_icastle;
 
 typedef struct icastle_data {
 	const struct building_type * type;

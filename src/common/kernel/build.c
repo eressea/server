@@ -267,13 +267,13 @@ siege_cmd(unit * u, order * ord)
   ADDMSG(&u->faction->msgs, msg_message("siege",
     "unit building destruction", u, b, d));
 
-  for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-  fset(u->faction, FL_DH);
+  for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
+  fset(u->faction, FFL_SELECT);
 
   /* Meldung fuer Burginsassen */
   for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2->building == b && !fval(u2->faction, FL_DH)) {
-      fset(u2->faction, FL_DH);
+    if (u2->building == b && !fval(u2->faction, FFL_SELECT)) {
+      fset(u2->faction, FFL_SELECT);
       ADDMSG(&u2->faction->msgs, msg_message("siege",
         "unit building destruction", u, b, d));
     }

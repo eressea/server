@@ -12,11 +12,12 @@
 
 #include <config.h>
 #include "eressea.h"
-
 #include "order.h"
+
 #include "skill.h"
 
 #include <util/bsdstring.h>
+#include <util/language.h>
 
 /* libc includes */
 #include <assert.h>
@@ -263,12 +264,10 @@ parse_order(const char * s, const struct locale * lang)
     int persistent = 0;
     int lindex;
 
-#ifdef AT_PERSISTENT
     while (*s=='@') {
       persistent = 1;
       ++s;
     }
-#endif
     sptr = s;
     kwd = findkeyword(parse_token(&sptr), lang);
     while (isspace(*(unsigned char*)sptr)) ++sptr;

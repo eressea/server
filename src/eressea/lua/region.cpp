@@ -13,6 +13,8 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <util/attrib.h>
+
 #include <attributes/key.h>
 
 // lua includes

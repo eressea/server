@@ -81,6 +81,7 @@
 #include <kernel/teleport.h>
 #include <kernel/unit.h>
 #include <kernel/xmlreader.h>
+#include <kernel/version.h>
 
 
 /* util includes */

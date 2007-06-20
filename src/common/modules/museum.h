@@ -22,10 +22,10 @@ extern "C" {
 #error "must define MUSEUM_MODULE to use this module"
 #endif
 
-extern attrib_type at_warden;
-extern attrib_type at_museumexit;
-extern attrib_type at_museumgivebackcookie;
-extern attrib_type at_museumgiveback;
+extern struct attrib_type at_warden;
+extern struct attrib_type at_museumexit;
+extern struct attrib_type at_museumgivebackcookie;
+extern struct attrib_type at_museumgiveback;
 
 typedef struct {
 	int       warden_no;

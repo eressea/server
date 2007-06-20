@@ -56,10 +56,6 @@ extern void write_items(FILE *f, struct item *it);
 
 extern const char * datapath(void);
 
-#ifdef RESOURCE_CONVERSION
-extern struct attrib_type at_resources;
-#endif
-
 extern void writeunit(FILE * stream, const struct unit * u);
 extern struct unit * readunit(FILE * stream);
 

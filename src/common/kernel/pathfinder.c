@@ -99,7 +99,7 @@ free_nodes(node * root)
 {
   while (root!=NULL) {
     region * r = root->r;
-    freset(r, FL_MARK);
+    freset(r, RF_MARK);
     root = free_node(root);
   }
 }
@@ -121,7 +121,7 @@ regions_in_range(struct region * start, int maxdist, boolean (*allowed)(const st
     for (d=0;d!=MAXDIRECTIONS; ++d) {
       region * rn = rconnect(r, d);
       if (rn==NULL) continue;
-      if (fval(rn, FL_MARK)) continue; /* already been there */
+      if (fval(rn, RF_MARK)) continue; /* already been there */
       if (allowed && !allowed(r, rn)) continue; /* can't go there */
 
       /* add the region to the list of available ones. */
@@ -129,7 +129,7 @@ regions_in_range(struct region * start, int maxdist, boolean (*allowed)(const st
 
       /* make sure we don't go here again, and put the region into the set for
          further BFS'ing */
-      fset(rn, FL_MARK);
+      fset(rn, RF_MARK);
       *end = new_node(rn, depth, n);
       end = &(*end)->next;
     }
@@ -150,7 +150,7 @@ internal_path_find(region *start, const region *target, int maxlen, boolean (*al
 	node * n = root;
 	boolean found = false;
 	assert(maxlen<=MAXDEPTH);
-	fset(start, FL_MARK);
+	fset(start, RF_MARK);
 
 	while (n!=NULL) {
 		region * r = n->r;
@@ -159,7 +159,7 @@ internal_path_find(region *start, const region *target, int maxlen, boolean (*al
 		for (d=0;d!=MAXDIRECTIONS; ++d) {
 			region * rn = rconnect(r, d);
 			if (rn==NULL) continue;
-			if (fval(rn, FL_MARK)) continue; /* already been there */
+			if (fval(rn, RF_MARK)) continue; /* already been there */
 			if (!allowed(r, rn)) continue; /* can't go there */
 			if (rn==target) {
 				int i = depth;
@@ -172,7 +172,7 @@ internal_path_find(region *start, const region *target, int maxlen, boolean (*al
 				found = true;
 				break;
 			} else {
-				fset(rn, FL_MARK);
+				fset(rn, RF_MARK);
 				*end = new_node(rn, depth, n);
 				end = &(*end)->next;
 			}
@@ -188,7 +188,7 @@ internal_path_find(region *start, const region *target, int maxlen, boolean (*al
 boolean
 path_exists(region *start, const region *target, int maxlen, boolean (*allowed)(const region*, const region*))
 {
-	assert((!fval(start, FL_MARK) && !fval(target, FL_MARK)) || !"Some Algorithm did not clear its FL_MARKs!");
+	assert((!fval(start, RF_MARK) && !fval(target, RF_MARK)) || !"Some Algorithm did not clear its RF_MARKs!");
 	if (start==target) return true;
 	if (internal_path_find(start, target, maxlen, allowed)!=NULL) return true;
 	return false;
@@ -197,6 +197,6 @@ path_exists(region *start, const region *target, int maxlen, boolean (*allowed)(
 region **
 path_find(region *start, const region *target, int maxlen, boolean (*allowed)(const region*, const region*))
 {
-	assert((!fval(start, FL_MARK) && !fval(target, FL_MARK)) || !"Did you call path_init()?");
+	assert((!fval(start, RF_MARK) && !fval(target, RF_MARK)) || !"Did you call path_init()?");
 	return internal_path_find(start, target, maxlen, allowed);
 }

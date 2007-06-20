@@ -59,6 +59,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/message.h>
 #include <util/rng.h>
 
@@ -854,17 +855,17 @@ give_cmd(unit * u, order * ord)
 static int
 forget_cmd(unit * u, order * ord)
 {
-	skill_t talent;
+	skill_t sk;
 	const char *s;
   
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
 
-	if ((talent = findskill(s, u->faction->locale)) != NOSKILL) {
+	if ((sk = findskill(s, u->faction->locale)) != NOSKILL) {
 		ADDMSG(&u->faction->msgs,
-			msg_message("forget", "unit skill", u, talent));
-		set_level(u, talent, 0);
+			msg_message("forget", "unit skill", u, sk));
+		set_level(u, sk, 0);
 	}
   return 0;
 }
@@ -920,12 +921,12 @@ maintain(building * b, boolean first)
       else need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
       if (!first && need > 0) {
         unit * ua;
-        for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
-        fset(u->faction, FL_DH); /* hat schon */
+        for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FFL_SELECT);
+        fset(u->faction, FFL_SELECT); /* hat schon */
         for (ua=r->units;ua;ua=ua->next) {
-          if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
+          if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
             need -= get_pooled(ua, m->rtype, GET_ALL, need);
-            fset(ua->faction, FL_DH);
+            fset(ua->faction, FFL_SELECT);
             if (need<=0) break;
           }
         }
@@ -961,14 +962,14 @@ maintain(building * b, boolean first)
 			else cost -= use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
 			if (!first && cost > 0) {
 				unit * ua;
-				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
-				fset(u->faction, FL_DH); /* hat schon */
+				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FFL_SELECT);
+				fset(u->faction, FFL_SELECT); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
-					if (!fval(ua->faction, FL_DH) && alliedunit(ua, u->faction, HELP_MONEY)) {
+					if (!fval(ua->faction, FFL_SELECT) && alliedunit(ua, u->faction, HELP_MONEY)) {
 						int give = use_pooled(ua, m->rtype, GET_ALL, cost);
 						if (!give) continue;
 						cost -= give;
-						fset(ua->faction, FL_DH);
+						fset(ua->faction, FFL_SELECT);
 						if (m->rtype==r_silver) add_spende(ua->faction, u->faction, give, r);
 						if (cost<=0) break;
 					}
@@ -997,12 +998,12 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		if (u->building == b) {
 			int loss = 0;
 
-			fset(u->faction, FL_MARK);
+			fset(u->faction, FFL_MARK);
 			freset(u, UFL_OWNER);
 			leave(r,u);
 			n = u->number;
 			for (i = 0; i < n; i++) {
-				if (rng_int() % 100 >= EINSTURZUEBERLEBEN) {
+				if (rng_double() >= COLLAPSE_SURVIVAL) {
 					++loss;
 				}
 			}
@@ -1015,8 +1016,8 @@ gebaeude_stuerzt_ein(region * r, building * b)
 	add_message(&r->msgs, msg);
 	for (u=r->units; u; u=u->next) {
 		faction * f = u->faction;
-		if (fval(f, FL_MARK)) {
-			freset(u->faction, FL_MARK);
+		if (fval(f, FFL_MARK)) {
+			freset(u->faction, FFL_MARK);
 			add_message(&f->msgs, msg);
 		}
 	}
@@ -1034,7 +1035,7 @@ maintain_buildings(region * r, boolean crash)
 
     /* the second time, send a message */
     if (crash) {
-      if (!maintained && (rng_int() % 100 < EINSTURZCHANCE)) {
+      if (!maintained && (rng_double() < COLLAPSE_CHANCE)) {
         gebaeude_stuerzt_ein(r, b);
         continue;
       } else if (!fval(b, BLD_WORKING)) {
@@ -1636,7 +1637,7 @@ void
 split_allocations(region * r)
 {
   allocation_list ** p_alist=&allocations;
-  freset(r, RF_DH);
+  freset(r, RF_SELECT);
   while (*p_alist) {
     allocation_list * alist = *p_alist;
     const resource_type * rtype = alist->type;
@@ -1644,7 +1645,7 @@ split_allocations(region * r)
     const item_type * itype = resource2item(rtype);
     allocation ** p_al = &alist->data;
 
-    freset(r, RF_DH);
+    freset(r, RF_SELECT);
     alloc(rtype, r, alist->data);
 
     while (*p_al) {
@@ -1653,7 +1654,7 @@ split_allocations(region * r)
         assert(itype || !"not implemented for non-items");
         i_change(&al->unit->items, itype, al->get);
         produceexp(al->unit, itype->construction->skill, al->unit->number);
-        fset(r, RF_DH);
+        fset(r, RF_SELECT);
       }
       if (al->want==INT_MAX) al->want = al->get;
       if (fval(al, AFL_LOWSKILL)) {
@@ -2403,7 +2404,7 @@ expandstealing(region * r, request * stealorders)
     if (oa[i].type.goblin) { /* Goblin-Spezialklau */
       int uct = 0;
       unit *u2;
-      assert(effskill(oa[i].unit, SK_STEALTH)>=4 || !"this goblin\'s talent is too low");
+      assert(effskill(oa[i].unit, SK_STEALTH)>=4 || !"this goblin\'s skill is too low");
       for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == u->faction) {
           uct += maintenance_cost(u2);
@@ -2992,7 +2993,7 @@ expandwork(region * r)
 
 	/* Der Rest wird von den Bauern verdient. n ist das uebriggebliebene
 	* Geld. */
-#if AFFECT_SALARY
+#ifdef AFFECT_SALARY
 	{
 		attrib * a = a_find(r->attribs, &at_salary);
 		if (a) verdienst = a->data.i;

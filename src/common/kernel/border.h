@@ -30,7 +30,7 @@ extern "C" {
     struct border * next; /* next border between these regions */
     struct border * nexthash; /* next border between these regions */
     struct region * from, * to; /* borders can be directed edges */
-    attrib * attribs;
+    struct attrib * attribs;
     variant data;
     unsigned int id; /* unique id */
   } border;
@@ -126,7 +126,7 @@ extern "C" {
   extern border_type bt_road;
   extern border_type bt_questportal;
 
-  extern attrib_type at_countdown;
+  extern struct attrib_type at_countdown;
 
 #ifdef __cplusplus
 }

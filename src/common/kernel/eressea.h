@@ -32,225 +32,27 @@ extern "C" {
  * your game to use) in there.
  * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
  */
-#include <settings.h>
+#include "types.h"
 
-/* basic types used in the eressea "kernel" */
-#ifdef __TINYC__
-#define order_t short
-#define terrain_t short
-#define direction_t short
-#define race_t short
-#define magic_t short
-#define skill_t short
-#define typ_t short
-#define herb_t short
-#define luxury_t short
-#define weapon_t short
-#define item_t short
-#define spellid_t unsigned int
-#else
-typedef short order_t;
-typedef short terrain_t;
-typedef short direction_t;
-typedef short race_t;
-typedef short magic_t;
-typedef short skill_t;
-typedef short typ_t;
-typedef short herb_t;
-typedef short potion_t;
-typedef short luxury_t;
-typedef short weapon_t;
-typedef short item_t;
-typedef unsigned int spellid_t;
-#endif
-
-struct equipment;
-struct plane;
-struct order;
-struct spell;
-struct region;
-struct curse;
-struct fighter;
-struct region_list;
-struct race;
-struct ship;
-struct terrain_type;
-struct building;
-struct faction;
-struct party;
-struct unit;
-struct unit_list;
-struct item;
-struct skill;
-/* item */
-struct strlist;
-struct resource_type;
-struct item_type;
-struct potion_type;
-struct luxury_type;
-struct weapon_type;
-/* types */
-struct ship_type;
-struct building_type;
-
-#include <util/attrib.h>
-#include <util/cvector.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/variant.h>
-#include <util/vmap.h>
-#include <util/vset.h>
-
-#define AT_PERSISTENT
 #define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
-/* eressea-defined attribute-type flags */
-#define ATF_CURSE  ATF_USER_DEFINED
+/* experimental gameplay features (that don't affect the savefile) */
+#define GOBLINKILL /* Goblin-Spezialklau kann tödlich enden */
+#define HERBS_ROT  /* herbs owned by units have a chance to rot. */
+#define SHIPDAMAGE /* Schiffsbeschädigungen */
+#define INSECT_POTION /* Spezialtrank für Insekten */
+#define ORCIFICATION /* gioving snotlings to the peasants gets counted */
+#undef TROLLSAVE /* saving throw for dead trolls */
+#undef AFFECT_SALARY /* gibt es ein attribut at_salary (ist noch nicht fertig!) */
 
-#define OLD_FAMILIAR_MOD /* conversion required */
-/* feature-dis/en-able */
-#define NEW_DRIVE     /* Neuer Algorithmus Transportiere/Fahre */
-#define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
-#define GOBLINKILL
+#include <settings.h>
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
+#define MAXPEASANTS_PER_AREA 10 /* number of peasants per region-size */
+#define TREESIZE (MAXPEASANTS_PER_AREA-2) /* space used by trees (in #peasants) */
 
-/**
- * heaps and heaps of unsupported versions:
-	#define RACES_VERSION 91
-	#define MAGIEGEBIET_VERSION 92
-	#define FATTRIBS_VERSION 94
-	#define ATNORD_VERSION 95
-	#define NEWMAGIC 100
-	#define MEMSAVE_VERSION 101
-	#define BORDER_VERSION 102
-	#define ATNAME_VERSION 103
-	#define ATTRIBFIX_VERSION 104
-	#define BORDERID_VERSION 105
-	#define NEWROAD_VERSION 106
-	#define GUARD_VERSION 107
-	#define TIMEOUT_VERSION 108
-	#define GUARDFIX_VERSION 109
-	#define NEW_FACTIONID_VERSION 110
-	#define ACTIONFIX1_VERSION 111
-	#define SHIPTYPE_VERSION 112
-	#define GROUPS_VERSION 113
-	#define MSGLEVEL_VERSION 114
-	#define DISABLE_ROADFIX 114
-	#define FACTIONFLAGS_VERSION 114
-	#define KARMA_VERSION 114
-	#define FULL_BASE36_VERSION 115
- **/
-#define TYPES_VERSION 117
-#define ITEMTYPE_VERSION 190
-#define NOFOREST_VERSION 191
-#define REGIONAGE_VERSION 192
-#define CURSE_NO_VERSION 193
-#define EFFSTEALTH_VERSION 194
-#define MAGE_ATTRIB_VERSION 195
-#define GLOBAL_ATTRIB_VERSION 196
-#define BASE36IDS_VERSION 197
-#define NEWSOURCE_VERSION 197
-#define NEWSTATUS_VERSION 198
-#define NEWNAMES_VERSION 199
-#define LOCALE_VERSION 300
-#define GROUPATTRIB_VERSION 301
-#define NEWRESOURCE_VERSION 303
-#define GROWTREE_VERSION 305
-#define RANDOMIZED_RESOURCES_VERSION 306 /* should be the same, but doesn't work */
-#define NEWRACE_VERSION 307
-#define INTERIM_VERSION 309
-#define NEWSKILL_VERSION 309
-#define WATCHERS_VERSION 310
-#define OVERRIDE_VERSION 311
-#define CURSETYPE_VERSION 312
-#define ALLIANCES_VERSION 313
-#define DBLINK_VERSION 314
-#define CURSEVIGOURISFLOAT_VERSION 315
-#define SAVEXMLNAME_VERSION 316
-#define SAVEALLIANCE_VERSION 317
-#define CLAIM_VERSION 318
-#define BACTION_VERSION 319 /* building action gets a param string */
-#define NOLASTORDER_VERSION 320 /* do not use lastorder */
-#define SPELLNAME_VERSION 321 /* reference spells by name */
-#define TERRAIN_VERSION 322 /* terrains are a full type and saved by name */
-#define REGIONITEMS_VERSION 323 /* regions have items */
-#define ATTRIBREAD_VERSION 324 /* remove a_readint */
-#define CURSEFLAGS_VERSION 325 /* remove a_readint */
-
-#define MIN_VERSION CURSETYPE_VERSION
-#define REGIONOWNERS_VERSION 400
-
-#ifdef ENEMIES
-# define RELEASE_VERSION ENEMIES_VERSION
-#else
-# define RELEASE_VERSION CURSEFLAGS_VERSION
-#endif
-
-#define RESOURCE_CONVERSION
-
-#ifdef RESOURCE_CONVERSION
-extern void init_resourcefix(void);
-extern void read_iron(struct region * r, int iron);
-extern void read_laen(struct region * r, int laen);
-#endif
-
-#define ECHECK_VERSION "4.01"
-
-/* changes from->to: 72->73: struct unit::lock entfernt.
- * 73->74: struct unit::flags eingeführt.
- * 74->75: parteitarnung als flag.
- * 75->76: #ifdef NEW_HP: hp
- * 76->77: ship->damage
- * 77->78: neue Message-Option "Orkvermehrung" (MAX_MSG +1)
- * 78->79: showdata nicht mehr speichern
- * 79->HEX_VERSION: hex
- * 80->82: ATTRIB_VERSION
- * 90: Ebenen
- * 92: Magiegebiet-Auswahl f->magiegebiet
- * 94: f->attribs wird gespeichert
- * 100: NEWMAGIC, neue Message-Option "Zauber" (MAX_MSG +1)
- * 108: Speichern von Timeouts
- * 193: curse bekommen id aus struct unit-nummernraum
- */
-
-/* NEWMAIL benutzt ein spezielles Skript zum Erstellen der Reportmails */
-#define MAIL				"eresseamail"
-
-#define DEFAULT_LOCALE "de"
-
-#define MAXPEASANTS_PER_AREA    10
-
-/* So lange kann die Partei nicht angegriffen werden */
-#undef STUDY_IF_NOT_WORKING
-
-/** Attackierende Einheiten können keine langen Befehle ausführen */
-
-#define DISALLOW_ATTACK_AND_WORK
-
-/* Vermehrung trotz 90% Auslastung */
-#define PEASANTFORCE   0.75
-
-#define TREESIZE     (MAXPEASANTS_PER_AREA-2)
-
-/* Eisen in Bergregionen bei Erschaffung */
-#define IRONSTART     250
-/* Zuwachs Eisen in Bergregionen */
-#define IRONPERTURN    25
-#define MAXLAENPERTURN  6
-/* Eisen in Gletschern */
-#define GLIRONSTART    20
-/* Zuwachs Eisen in Gletschern */
-#define GLIRONPERTURN   3
-/* Maximales Eisen in Gletschern */
-#define MAXGLIRON      80
-
-/* Verrottchance für Kräuter */
-#define HERBROTCHANCE 5
-#define HERBS_ROT
-
-#define STUDYCOST     200
+#define PEASANTFORCE 0.75 /* Chance einer Vermehrung trotz 90% Auslastung */
+#define HERBROTCHANCE 5 /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
 
 /* Gebäudegröße = Minimalbelagerer */
 #define SIEGEFACTOR     2
@@ -260,55 +62,21 @@ extern void read_laen(struct region * r, int laen);
 #define MAXALCHEMISTS   3
 
 /** Plagues **/
-/* Seuchenwahrscheinlichkeit (siehe plagues()) */
-#define SEUCHE         0.1F
-/* % Betroffene */
-#define SEUCHENOPFER   0.2F
-extern void plagues(struct region * r, boolean ismagic);
-
-/** Healing **/
-/* Wahrscheinlichkeit Heilung */
-#define HEILCHANCE     25
-/* Heilkosten */
-#define HEILKOSTEN     30
+#define PLAGUE_CHANCE      0.1F /* Seuchenwahrscheinlichkeit (siehe plagues()) */
+#define PLAGUE_VICTIMS     0.2F /* % Betroffene */
+#define PLAGUE_HEALCHANCE  0.25F /* Wahrscheinlichkeit Heilung */
+#define PLAGUE_HEALCOST    30    /* Heilkosten */
 
 /** Monster */
 
-/* Chance für Monsterangriff */
-#define MONSTERATTACK  0.4
+#define MONSTERATTACK  0.4F /* Chance für Monsterangriff */
 
 /** Gebäude */
-/* Chance für Einsturz bei unversorgtem Gebaeude */
-#define EINSTURZCHANCE     40
-/* Soviele % überleben den Einsturz */
-#define EINSTURZUEBERLEBEN 50
-
-/** Geographie. Nicht im laufenden Spiel ändern!!! */
-#define BLOCKSIZE           9
-
-/* Nur Bewaffnete bewachen */
-#undef TROLLSAVE
-
-/* Spezialtrank für Insekten */
-#define INSECT_POTION
-
-/* Schiffsbeschädigungen */
-#define SHIPDAMAGE
-
-/* regionen im Report der Parteien werden nur einmal berechnet: */
-#define FAST_REGION
+#define COLLAPSE_CHANCE    0.4F /* Chance für Einsturz bei unversorgtem Gebaeude */
+#define COLLAPSE_SURVIVAL  0.5F /* Soviele % überleben den Einsturz */
 
 /* Magiesystem */
 #define NIGHT_EYE_TALENT        5
-
-/* gibt es ein attribut at_salary */
-#undef AFFECT_SALARY
-/* ist noch nicht fertig! */
-
-#define ARENA_PLANE
-#undef UNDERWORLD_PLANE
-
-#define ORCIFICATION
 
 /* Bewegungsweiten: */
 #define BP_WALKING 4
@@ -335,447 +103,24 @@ extern void plagues(struct region * r, boolean ismagic);
 #define KEYWORDSIZE         15	/* max. Länge eines Keyword, ohne trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE)	/* max. Länge der Strings, die
 						 * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
-#define CMDSIZE             (DISPLAYSIZE*2+1)
-#define STARTMONEY          5000
-
-#define TAVERN_MAINTENANCE  14
-/* Man gibt in einer Taverne mehr Geld aus! */
 
 #define BAGCAPACITY		20000	/* soviel paßt in einen Bag of Holding */
 #define STRENGTHCAPACITY	50000	/* zusätzliche Tragkraft beim Kraftzauber (deprecated) */
 #define STRENGTHMULTIPLIER 50   /* multiplier for trollbelt */
 
-typedef struct ursprung {
-	struct ursprung *next;
-	int id;
-	short x, y;
-} ursprung;
-
 /* ----------------- Befehle ----------------------------------- */
 
-typedef unsigned char keyword_t;
-enum {
-  K_KOMMENTAR,
-  K_BANNER,
-  K_WORK,
-  K_ATTACK,
-  K_STEAL,
-  K_BESIEGE,
-  K_NAME,
-  K_USE,
-  K_DISPLAY,
-  K_ENTER,
-  K_GUARD,
-  K_MAIL,
-  K_END,
-  K_DRIVE,
-  K_NUMBER,
-  K_WAR,
-  K_PEACE,
-  K_FOLLOW,
-  K_RESEARCH,
-  K_GIVE,
-  K_ALLY,
-  K_STATUS,
-  K_COMBAT,
-  K_BUY,
-  K_CONTACT,
-  K_TEACH,
-  K_STUDY,
-  K_LIEFERE,
-  K_MAKE,
-  K_MOVE,
-  K_PASSWORD,
-  K_RECRUIT,
-  K_RESERVE,
-  K_ROUTE,
-  K_SABOTAGE,
-  K_SEND,
-  K_SPY,
-  K_QUIT,
-  K_SETSTEALTH,
-  K_TRANSPORT,
-  K_TAX,
-  K_ENTERTAIN,
-  K_SELL,
-  K_LEAVE,
-  K_FORGET,
-  K_CAST,
-  K_RESHOW,
-  K_DESTROY,
-  K_BREED,
-  K_DEFAULT,
-  K_URSPRUNG,
-  K_EMAIL,
-  K_VOTE,
-  K_MAGIEGEBIET,
-  K_PIRACY,
-  K_RESTART,
-  K_GROUP,
-  K_SACRIFICE,
-  K_PRAY,
-  K_SORT,
-  K_SETJIHAD,
-  K_GM,          /* perform GM commands */
-  K_INFO,        /* set player-info */
-  K_PREFIX,
-  K_SYNONYM,
-  K_PLANT,
-  K_WEREWOLF,
-  K_XE,
-  K_ALLIANCE,
-  K_CLAIM,
-#ifdef HEROES
-  K_PROMOTION,
-#endif
-  MAXKEYWORDS,
-  NOKEYWORD = (keyword_t) - 1
-};
-
 extern const char *keywords[MAXKEYWORDS];
-
-/* ------------------ Status von Einheiten --------------------- */
-
-typedef unsigned char status_t;
-enum {
-  ST_AGGRO,
-  ST_FIGHT,
-  ST_BEHIND,
-  ST_CHICKEN,
-  ST_AVOID,
-  ST_FLEE
-};
-
-/* ----------------- Parameter --------------------------------- */
-
-typedef unsigned char param_t;
-enum {
-	P_LOCALE,
-  P_ANY,
-  P_EACH,
-	P_PEASANT,
-	P_BUILDING,
-	P_UNIT,
-	P_PRIVAT,
-	P_BEHIND,
-	P_CONTROL,
-	P_HERBS,
-	P_NOT,
-	P_NEXT,
-	P_FACTION,
-	P_GAMENAME,
-	P_PERSON,
-	P_REGION,
-	P_SHIP,
-	P_SILVER,
-	P_ROAD,
-	P_TEMP,
-	P_FLEE,
-	P_GEBAEUDE,
-	P_GIB,
-	P_KAEMPFE,
-  P_TRAVEL,
-	P_GUARD,
-	P_ZAUBER,
-	P_PAUSE,
-	P_VORNE,
-	P_AGGRO,
-	P_CHICKEN,
-	P_LEVEL,
-	P_HELP,
-	P_FOREIGN,
-	P_AURA,
-	P_FOR,
-	P_AID,
-	P_MERCY,
-	P_AFTER,
-	P_BEFORE,
-	P_NUMBER,
-	P_ITEMS,
-	P_POTIONS,
-	P_GROUP,
-	P_FACTIONSTEALTH,
-	P_TREES,
-	P_XEPOTION,
-	P_XEBALLOON,
-	P_XELAEN,
-	MAXPARAMS,
-	NOPARAM = (param_t) - 1
-};
-
-typedef enum {					/* Fehler und Meldungen im Report */
-	MSG_BATTLE,
-	MSG_EVENT,
-	MSG_MOVE,
-	MSG_INCOME,
-	MSG_COMMERCE,
-	MSG_PRODUCE,
-	MSG_ORCVERMEHRUNG,
-	MSG_MESSAGE,
-	MSG_COMMENT,
-	MSG_MAGIC,
-	MAX_MSG
-} msg_t;
-
-enum {					/* Message-Level */
-	ML_IMPORTANT,				/* Sachen, die IMO erscheinen _muessen_ */
-	ML_DEBUG,
-	ML_MISTAKE,
-	ML_WARN,
-	ML_INFO,
-	ML_MAX
-};
-
 extern const char *parameters[MAXPARAMS];
 
-/* --------------- Reports Typen ------------------------------- */
-
-enum {
-	O_REPORT,				/* 1 */
-	O_COMPUTER,			/* 2 */
-	O_ZUGVORLAGE,		/* 4 */
-	O_SILBERPOOL,		/* 8 */
-	O_STATISTICS,		/* 16 */
-	O_DEBUG,				/* 32 */
-	O_COMPRESS,			/* 64 */
-	O_NEWS,					/* 128 */
-	O_MATERIALPOOL,	/* 256 */
-	O_ADRESSEN,			/* 512 */
-	O_BZIP2,				/* 1024 - compress as bzip2 */
-	O_SCORE,				/* 2048 - punkte anzeigen? */
-	O_SHOWSKCHANGE,	/* 4096 - Skillveränderungen anzeigen? */
-  O_XML,    			/* 8192 - XML report versenden */
-	MAXOPTIONS
-};
-
-#define want(i) (1<<i)
-
+/** report options **/
+#define want(option) (1<<option)
 extern const char *options[MAXOPTIONS];
-
-/* ------------------ Talente ---------------------------------- */
-
-enum {
-	SK_ALCHEMY,
-	SK_CROSSBOW,
-	SK_MINING,
-	SK_LONGBOW,
-	SK_BUILDING,
-	SK_TRADE,
-	SK_LUMBERJACK,
-	SK_CATAPULT,
-	SK_HERBALISM,
-	SK_MAGIC,
-	SK_HORSE_TRAINING,			/* 10 */
-	SK_RIDING,
-	SK_ARMORER,
-	SK_SHIPBUILDING,
-	SK_MELEE,
-	SK_SAILING,
-	SK_SPEAR,
-	SK_SPY,
-	SK_QUARRYING,
-	SK_ROAD_BUILDING,
-	SK_TACTICS,					/* 20 */
-	SK_STEALTH,
-	SK_ENTERTAINMENT,
-	SK_WEAPONSMITH,
-	SK_CARTMAKER,
-	SK_OBSERVATION,
-	SK_TAXING,
-	SK_AUSDAUER,
-	SK_WEAPONLESS,
-	MAXSKILLS,
-	NOSKILL = (skill_t) -1
-};
-
-/* ------------- Typ von Einheiten ----------------------------- */
-
-enum {
-	RC_DWARF,		/* 0 - Zwerg */
-	RC_ELF,
-	RC_ORC,
-	RC_GOBLIN,
-	RC_HUMAN,
-
-  RC_TROLL,
-  RC_DAEMON,
-	RC_INSECT,
-	RC_HALFLING,
-	RC_CAT,
-
-  RC_AQUARIAN,
-  RC_URUK,
-	RC_SNOTLING,
-	RC_UNDEAD,
-	RC_ILLUSION,
-
-  RC_FIREDRAGON,
-  RC_DRAGON,
-	RC_WYRM,
-	RC_TREEMAN,
-	RC_BIRTHDAYDRAGON,
-
-  RC_DRACOID,
-	RC_SPECIAL,
-	RC_SPELL,
-	RC_IRONGOLEM,
-	RC_STONEGOLEM,
-
-  RC_SHADOW,
-  RC_SHADOWLORD,
-	RC_IRONKEEPER,
-	RC_ALP,
-	RC_TOAD,
-
-  RC_HIRNTOETER,
-	RC_PEASANT,
-	RC_WOLF = 32,
-
-	RC_SONGDRAGON = 37,
-
-  RC_SEASERPENT = 51,
-	RC_SHADOWKNIGHT, 
-	RC_CENTAUR,
-	RC_SKELETON,
-
-  RC_SKELETON_LORD,
-	RC_ZOMBIE,
-	RC_ZOMBIE_LORD,
-	RC_GHOUL,
-	RC_GHOUL_LORD,
-
-	RC_MUS_SPIRIT,
-	RC_GNOME,     
-	RC_TEMPLATE,  
-	RC_CLONE,
-
-	MAXRACES,
-	NORACE = (race_t) - 1
-};
-
-/* movewhere error codes */
-enum {
-  E_MOVE_OK = 0,   /* possible to move */
-  E_MOVE_NOREGION, /* no region exists in this direction */
-  E_MOVE_BLOCKED   /* cannot see this region, there is a blocking border. */
-};
-
-/* Richtungen */
-enum {
-	D_NORTHWEST,
-	D_NORTHEAST,
-	D_EAST,
-	D_SOUTHEAST,
-	D_SOUTHWEST,
-	D_WEST,
-	MAXDIRECTIONS,
-	D_PAUSE,
-  D_SPECIAL,
-	NODIRECTION = (direction_t) - 1
-};
-
-/* Jahreszeiten, siehe auch res/timestrings */
-enum {
-	SEASON_WINTER,
-	SEASON_SPRING,
-	SEASON_SUMMER,
-	SEASON_AUTUMN
-};
-
-/* Siegbedingungen */
-
-#define VICTORY_NONE   0
-#define VICTORY_MURDER 1
 
 /* ------------------------------------------------------------- */
 
 extern int shipspeed(const struct ship * sh, const struct unit * u);
 extern int init_data(const char * filename);
-
-/* MAXSPEED setzt die groesse fuer den Array, der die Kuesten Beschreibungen
- * enthaelt. MAXSPEED muss 2x +3 so gross wie die groesste Geschw. sein
- * (Zauberspruch) */
-
-/* ------------------------------------------------------------- */
-
-/* ------------------------------------------------------------- */
-/* TODO
- * werden diese hier eigendlich noch für irgendwas gebraucht?*/
-
-
-/* Attribute: auf Einheiten */
-
-/* Klassen */
-
-enum {
-	A_KL_GEGENSTAND,
-	A_KL_EIGENSCHAFT
-};
-/* Eigenschaften (in i[0]) */
-
-#define ZEIGE_PARTEI	1		/* Zeigt s[0] in eigenem Report an */
-#define ZEIGE_ANDEREN 2			/* Zeigt s[1] in fremden Reports an */
-#define TALENTMOD			4	/* Gegenstand verändert Talent
-						 * i[2] um i[3] */
-
-/* A_KL_EIGENSCHAFT */
-
-enum {
-	A_TY_NOT_PARTEI_GETARNT,	/* In i[0] die Pseudopartei?! */
-	A_TY_NOT_FLAGS,		/* Verschiedene Eigenschaften in i[0] */
-	A_TY_EX_TYPNAME,		/* Was soll als Typname erscheinen? s[0] =
-				 * Singular, s[1] = Plural */
-	A_TY_EX_ZIELREGION,
-	A_TY_EX_BAUERNBLUT		/* In i[0] die Zahl der max. geschützten
-				 * Dämonen. */
-};
-
-/* A_TY_GESEHEN:    fuer cansee() in i[0] steht drin, welche Partei uns
- * sah, in i[1], wie gut (0,1 oder 2) */
-
-/* Auf Regionen */
-
-/* Klassen */
-
-enum {
-	A_KL_MERKMAL,
-	A_KL_ZAUBER
-};
-
-/* A_KL_MERKMAL */
-
-enum {
-	A_TY_MITHRIL,
-	A_TY_ADAMANTIUM,
-	A_TY_DIRECTION		/* In s[0] describe_txt, in s[1] das command,
-											 in i[0]-i[2] die Koordinaten des Ziels. */
-};
-
-/* Auf Schiffen */
-
-/* Klassen */
-
-enum {
-	A_KL_MERKMAL_SCHIFF
-};
-
-/* A_KL_MERKMAL */
-
-enum {
-	A_TY_EX_KUESTE		/* In i[0] steht die Richtung */
-};
-
-/* Auf Borders */
-
-/* Klassen */
-
-enum {
-	A_KL_BLOCK
-};
-
-enum {
-	A_TY_LOCK
-};
 
 #define DONT_HELP      0
 #define HELP_MONEY     1			/* Mitversorgen von Einheiten */
@@ -795,8 +140,6 @@ enum {
 #define ALLIED_NOBLOCK 2
 #define ALLIED_HELP    4
 
-extern vmap region_map;
-
 #define i2b(i) ((boolean)((i)?(true):(false)))
 
 typedef struct ally {
@@ -813,16 +156,6 @@ typedef struct strlist {
 	struct strlist *next;
 	char * s;
 } strlist;
-
-#define FL_DH             (1<<18) /* ehemals f->dh, u->dh, r->dh, etc... */
-#define FL_MARK           (1<<23) /* für markierende algorithmen, die das 
-                                   * hinterher auch wieder löschen müssen! 
-                                   * (FL_DH muss man vorher initialisieren, 
-                                   * FL_MARK hinterher löschen) */
-
-/* alle vierstelligen zahlen: */
-#define MAX_UNIT_NR (36*36*36*36-1)
-#define MAX_CONTAINER_NR (36*36*36*36-1)
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
@@ -919,7 +252,6 @@ int forbiddenid(int id);
 int newcontainerid(void);
 
 extern struct unit *createunit(struct region * r, struct faction * f, int number, const struct race * rc);
-extern struct unit *create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);
 extern void create_unitid(struct unit *u, int id);
 extern boolean getunitpeasants;
 extern struct unit *getunitg(const struct region * r, const struct faction * f);
@@ -1054,10 +386,17 @@ extern int maxworkingpeasants(const struct region * r);
 
 extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
 extern int maintenance_cost(const struct unit * u);
-extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
 extern void add_income(struct unit * u, int type, int want, int qty);
+
+/* movewhere error codes */
+enum {
+  E_MOVE_OK = 0,   /* possible to move */
+  E_MOVE_NOREGION, /* no region exists in this direction */
+  E_MOVE_BLOCKED   /* cannot see this region, there is a blocking border. */
+};
+extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 
 extern const char * basepath(void);
 extern const char * resourcepath(void);
@@ -1122,7 +461,9 @@ extern int entertainmoney(const struct region * r);
 extern int freadstr(FILE * F, char * str, size_t size);
 extern int fwritestr(FILE * F, const char * str);
 
-extern attrib_type at_guard;
+extern void plagues(struct region * r, boolean ismagic);
+
+extern struct attrib_type at_guard;
 
 #if 1 /* disable to count all units */
 # define count_unit(u) playerrace(u->race)

@@ -19,7 +19,9 @@
 #endif
 
 // util includes
+#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/lists.h>
 #include <util/log.h>
 
 using namespace luabind;

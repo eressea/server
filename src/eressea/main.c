@@ -88,6 +88,7 @@
 #include <util/xml.h>
 #include <util/goodies.h>
 #include <util/log.h>
+#include <util/lists.h>
 #include <util/sql.h>
 #include <util/base36.h>
 

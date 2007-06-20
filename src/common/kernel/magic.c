@@ -42,6 +42,7 @@
 #include "spellid.h"
 #include "terrain.h"
 #include "unit.h"
+#include "version.h"
 
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
@@ -52,6 +53,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>

@@ -59,11 +59,13 @@ extern void ct_register(const struct curse_type * ct);
 #include <spells/alp.h>
 
 /* util includes */
-#include <util/umlaut.h>
+#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/umlaut.h>
 #include <util/message.h>
 #include <util/event.h>
 #include <util/functions.h>
+#include <util/lists.h>
 #include <util/rand.h>
 #include <util/variant.h>
 #include <util/goodies.h>
@@ -377,11 +379,11 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   unit * u;
 
   /* melden, 1x pro Partei */
-  freset(mage->faction, FL_DH);
-  for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+  freset(mage->faction, FFL_SELECT);
+  for (u = r->units; u; u = u->next ) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
 
       /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
       if (u->faction != mage->faction) {
@@ -403,7 +405,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   }
   /* Ist niemand von der Partei des Magiers in der Region, dem Magier
   * nochmal gesondert melden */
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
     add_message(&mage->faction->msgs, seen);
   }
 }
@@ -802,19 +804,19 @@ sp_goodwinds(castorder *co)
   create_curse(mage, &sh->attribs, ct_find("nodrift"), power, duration, zero_effect, 0);
 
   /* melden, 1x pro Partei */
-  freset(mage->faction, FL_DH);
-  for(u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+  freset(mage->faction, FFL_SELECT);
+  for(u = r->units; u; u = u->next ) freset(u->faction, FFL_SELECT);
   for(u = r->units; u; u = u->next ) {
     if (u->ship != sh )    /* nur den Schiffsbesatzungen! */
       continue;
-    if (!fval(u->faction, FL_DH) ) {
+    if (!fval(u->faction, FFL_SELECT) ) {
       message * m = msg_message("wind_effect", "mage ship", cansee(u->faction, r, mage, 0) ? mage:NULL, sh);
       r_addmessage(r, u->faction, m);
       msg_release(m);
-      fset(u->faction, FL_DH);
+      fset(u->faction, FFL_SELECT);
     }
   }
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
     message * m = msg_message("wind_effect", "mage ship", mage, sh);
     r_addmessage(r, mage->faction, m);
     msg_release(m);
@@ -1673,11 +1675,11 @@ sp_great_drought(castorder *co)
   }
 
   /* melden, 1x pro partei */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
 
   for (u = r->units; u; u = u->next) {
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s ruft das Feuer der Sonne auf %s hinab.",
           cansee(u->faction, r, mage, 0)? unitname(mage) : "Jemand",
           regionname(r, u->faction));
@@ -1707,7 +1709,7 @@ sp_great_drought(castorder *co)
       }
     }
   }
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
     ADDMSG(&mage->faction->msgs, msg_message(
       "drought_effect", "mage region", mage, r));
   }
@@ -1793,12 +1795,12 @@ sp_treewalkenter(castorder *co)
       erfolg = cast_level;
 
       /* Meldungen in der Ausgangsregion */
-      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
       m = NULL;
       for (u2 = r->units; u2; u2 = u2->next ) {
-        if (!fval(u2->faction, FL_DH)) {
+        if (!fval(u2->faction, FFL_SELECT)) {
           if (cansee(u2->faction, r, u, 0)) {
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_disappear", "unit", u);
             r_addmessage(r, u2->faction, m);
           }
@@ -1807,12 +1809,12 @@ sp_treewalkenter(castorder *co)
       if (m) msg_release(m);
 
       /* Meldungen in der Zielregion */
-      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
       m = NULL;
       for (u2 = rt->units; u2; u2 = u2->next ) {
-        if (!fval(u2->faction, FL_DH)) {
+        if (!fval(u2->faction, FFL_SELECT)) {
           if (cansee(u2->faction, rt, u, 0)) {
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_appear", "unit", u);
             r_addmessage(rt, u2->faction, m);
           }
@@ -1927,12 +1929,12 @@ sp_treewalkexit(castorder *co)
 
         /* Meldungen in der Ausgangsregion */
 
-        for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
         m = NULL;
         for(u2 = r->units; u2; u2 = u2->next ) {
-          if (!fval(u2->faction, FL_DH)) {
+          if (!fval(u2->faction, FFL_SELECT)) {
             if (cansee(u2->faction, r, u, 0)) {
-              fset(u2->faction, FL_DH);
+              fset(u2->faction, FFL_SELECT);
               if (!m) m = msg_message("astral_disappear", "unit", u);
               r_addmessage(rt, u2->faction, m);
             }
@@ -1942,12 +1944,12 @@ sp_treewalkexit(castorder *co)
 
         /* Meldungen in der Zielregion */
 
-        for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
         m = NULL;
         for (u2 = rt->units; u2; u2 = u2->next ) {
-          if (!fval(u2->faction, FL_DH)) {
+          if (!fval(u2->faction, FFL_SELECT)) {
             if (cansee(u2->faction, rt, u, 0)) {
-              fset(u2->faction, FL_DH);
+              fset(u2->faction, FFL_SELECT);
               if (!m) m = msg_message("astral_appear", "unit", u);
               r_addmessage(rt, u2->faction, m);
             }
@@ -2037,10 +2039,10 @@ sp_homestone(castorder *co)
   c_setflag(c, CURSE_NOAGE);
 
   /* melden, 1x pro Partei in der Burg */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next) {
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
       if (u->building ==  mage->building) {
         sprintf(buf, "Mit einem Ritual bindet %s die magischen Kräfte "
             "der Erde in die Mauern von %s", unitname(mage),
@@ -2086,16 +2088,16 @@ sp_drought(castorder *co)
   }
 
   /* melden, 1x pro Partei */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for(u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s verflucht das Land, und eine Dürreperiode beginnt.",
           cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
       addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
     }
   }
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
     sprintf(buf, "%s verflucht das Land, und eine Dürreperiode beginnt.",
         unitname(mage));
     addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
@@ -2171,15 +2173,15 @@ sp_fog_of_confusion(castorder *co)
     if (!ctype) ctype = ct_find("disorientationzone");
     c = create_curse(mage, &r2->attribs, ctype, power, duration, effect, 0);
 
-    for (u = r2->units; u; u = u->next) freset(u->faction, FL_DH);
+    for (u = r2->units; u; u = u->next) freset(u->faction, FFL_SELECT);
     for (u = r2->units; u; u = u->next ) {
-      if (!fval(u->faction, FL_DH) ) {
-        fset(u->faction, FL_DH);
+      if (!fval(u->faction, FFL_SELECT) ) {
+        fset(u->faction, FFL_SELECT);
         if (!m) m = msg_message("confusion_result", "mage", mage);
         add_message(&u->faction->msgs, m);
       }
     }
-    if (!fval(mage->faction, FL_DH)) {
+    if (!fval(mage->faction, FFL_SELECT)) {
       if (!m) m = msg_message("confusion_result", "mage", mage);
       add_message(&mage->faction->msgs, m);
     }
@@ -2272,8 +2274,8 @@ sp_stormwinds(castorder *co)
   message * m = NULL;
 
   /* melden vorbereiten */
-  freset(mage->faction, FL_DH);
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  freset(mage->faction, FFL_SELECT);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
 
   for (n = 0; n < pa->length; n++) {
     if (force<=0) break;
@@ -2308,15 +2310,15 @@ sp_stormwinds(castorder *co)
     for(u = r->units; u; u = u->next ) {
       if (u->ship == sh ) {
         /* nur den Schiffsbesatzungen! */
-        fset(u->faction, FL_DH);
+        fset(u->faction, FFL_SELECT);
       }
     }
   }
   /* melden, 1x pro Partei auf Schiff und für den Magier */
-  fset(mage->faction, FL_DH);
+  fset(mage->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (fval(u->faction, FL_DH)) {
-      freset(u->faction, FL_DH);
+    if (fval(u->faction, FFL_SELECT)) {
+      freset(u->faction, FFL_SELECT);
       if (erfolg > 0) {
         if (!m) {
           m = msg_message("stormwinds_effect", "unit", mage);
@@ -2382,10 +2384,10 @@ sp_earthquake(castorder *co)
   }
 
   /* melden, 1x pro Partei */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s läßt die Erde in %s erzittern.",
           cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
           regionname(r, u->faction));
@@ -2494,11 +2496,11 @@ sp_forest_fire(castorder *co)
   probability = destroyed * 0.001;  /* Chance, dass es sich ausbreitet */
 
   /* melden, 1x pro Partei */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
 
   for(u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
           "den Flammen zum Opfer.",
           cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
@@ -2507,7 +2509,7 @@ sp_forest_fire(castorder *co)
       addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
     }
   }
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
     sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
         "den Flammen zum Opfer.", unitname(mage), destroyed+vernichtet_schoesslinge,
         destroyed+vernichtet_schoesslinge == 1 ? "Baum fiel" : "Bäume fielen");
@@ -3081,15 +3083,15 @@ sp_wisps(castorder *co)
   a_add(&b->attribs, a_new(&at_countdown))->data.i = cast_level;
 
   /* melden, 1x pro Partei */
-        {
-          message * seen = msg_message("wisps_effect", "mage region", mage, r);
-          message * unseen = msg_message("wisps_effect", "mage region", NULL, r);
-          report_effect(r, mage, seen, unseen);
-          msg_release(seen);
-          msg_release(unseen);
-        }
+  {
+    message * seen = msg_message("wisps_effect", "mage region", mage, r);
+    message * unseen = msg_message("wisps_effect", "mage region", NULL, r);
+    report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
+  }
 
-        return cast_level;
+  return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -3226,7 +3228,7 @@ dc_age(struct curse * c)
     unit * u = *up;
     double damage = c->effect.f * u->number;
 
-    freset(u->faction, FL_DH);
+    freset(u->faction, FFL_SELECT);
     if (u->number<=0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
       up=&u->next;
       continue;
@@ -3320,14 +3322,14 @@ sp_deathcloud(castorder *co)
 
   /* melden, 1x pro Partei */
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect",
         "mage region", cansee(u->faction, r, mage, 0) ? mage : NULL, r));
     }
   }
 
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
     ADDMSG(&mage->faction->msgs, msg_message("deathcloud_effect",
       "mage region", mage, r));
   }
@@ -3494,21 +3496,21 @@ sp_chaossuction(castorder *co)
       "Wirbel");
   new_border(&bt_chaosgate, r, rt);
 
-  freset(mage->faction, FL_DH);
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  freset(mage->faction, FFL_SELECT);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next) {
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s öffnete ein Chaostor.",
           cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand");
       addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
     }
   }
-  for (u = rt->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = rt->units; u; u = u->next) freset(u->faction, FFL_SELECT);
 
   for (u = rt->units; u; u = u->next) {
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
       addmessage(r, u->faction, "Ein Wirbel aus blendendem Licht erscheint.",
         MSG_EVENT, ML_INFO);
     }
@@ -3689,12 +3691,12 @@ sp_summonundead(castorder *co)
   addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
   /* melden, 1x pro Partei */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
 
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
+    if (!fval(u->faction, FFL_SELECT) ) {
       if (!m) m = msg_message("summonundead_effect", "unit", mage);
-      fset(u->faction, FL_DH);
+      fset(u->faction, FFL_SELECT);
       add_message(&u->faction->msgs, m);
     }
   }
@@ -3737,11 +3739,11 @@ sp_auraleak(castorder *co)
       lost_aura = (int)(get_spellpoints(u)*lost);
       change_spellpoints(u, -lost_aura);
     }
-    freset(u->faction, FL_DH);
+    freset(u->faction, FFL_SELECT);
   }
   for (u = r->units; u; u = u->next) {
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
       if (cansee(u->faction, r, mage, 0)) {
         sprintf(buf, "%s rief in %s einen Riss in dem Gefüge der Magie "
             "hervor, der alle magische Kraft aus der Region riss.",
@@ -4100,17 +4102,17 @@ sp_rallypeasantmob(castorder *co)
   }
 
   if (erfolg) {
-    for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+    for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
     for(u = r->units; u; u = u->next ) {
-      if (!fval(u->faction, FL_DH) ) {
-        fset(u->faction, FL_DH);
+      if (!fval(u->faction, FFL_SELECT) ) {
+        fset(u->faction, FFL_SELECT);
         sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
             cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
             regionname(r, u->faction));
         addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
       }
     }
-    if (!fval(mage->faction, FL_DH)) {
+    if (!fval(mage->faction, FFL_SELECT)) {
       sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
           unitname(mage), regionname(r, u->faction));
       addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
@@ -4179,16 +4181,16 @@ sp_raisepeasantmob(castorder *co)
 
   create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, duration, anteil, 0);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       ADDMSG(&u->faction->msgs, msg_message(
         "sp_raisepeasantmob_effect", "mage region",
         cansee(u->faction, r, mage, 0) ? mage : NULL, r ));
     }
   }
-  if (!fval(mage->faction, FL_DH)) {
+  if (!fval(mage->faction, FFL_SELECT)) {
       ADDMSG(&mage->faction->msgs, msg_message(
         "sp_raisepeasantmob_effect", "mage region", mage, r));
   }
@@ -4328,11 +4330,11 @@ sp_song_of_peace(castorder *co)
 
   create_curse(mage, &r->attribs, ct_find("peacezone"), force, duration, zero_effect, 0);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
+    if (!fval(u->faction, FFL_SELECT) ) {
       message * m = NULL;
-      fset(u->faction, FL_DH);
+      fset(u->faction, FFL_SELECT);
       if (cansee(u->faction, r, mage, 0)) {
         if (msg[0]==NULL) msg[0] = msg_message("song_of_peace_effect_0", "mage", mage);
         m = msg[0];
@@ -4381,11 +4383,11 @@ sp_generous(castorder *co)
   effect.i = 2;
   create_curse(mage,&r->attribs, ct_find("generous"), force, duration, effect, 0);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
+    if (!fval(u->faction, FFL_SELECT) ) {
       message * m = NULL;
-      fset(u->faction, FL_DH);
+      fset(u->faction, FFL_SELECT);
       if (cansee(u->faction, r, mage, 0)) {
         if (msg[0]==NULL) msg[0] = msg_message("song_of_peace_effect_0", "mage", mage);
         m = msg[0];
@@ -4802,10 +4804,10 @@ sp_raisepeasants(castorder *co)
   a->data.ca[1] = 15; /* 15% */
   a_add(&u2->attribs, a);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s wiegelt %d Bauern auf.",
           cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
           u2->number);
@@ -4838,10 +4840,10 @@ sp_depression(castorder *co)
 
   create_curse(mage,&r->attribs, ct_find("depression"), force, duration, zero_effect, 0);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       sprintf(buf, "%s sorgt für Trübsal unter den Bauern.",
           cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
       addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
@@ -5451,15 +5453,15 @@ sp_dream_of_confusion(castorder *co)
     c = create_curse(mage, &r2->attribs,
       ct_find("disorientationzone"), power, duration, effect, 0);
 
-    for (u = r2->units; u; u = u->next) freset(u->faction, FL_DH);
+    for (u = r2->units; u; u = u->next) freset(u->faction, FFL_SELECT);
     for (u = r2->units; u; u = u->next ) {
-      if (!fval(u->faction, FL_DH) ) {
-        fset(u->faction, FL_DH);
+      if (!fval(u->faction, FFL_SELECT) ) {
+        fset(u->faction, FFL_SELECT);
         if (!m) m = msg_message("confusion_result", "mage", mage);
         add_message(&u->faction->msgs, m);
       }
     }
-    if (!fval(mage->faction, FL_DH)) {
+    if (!fval(mage->faction, FFL_SELECT)) {
       if (!m) m = msg_message("confusion_result", "mage", mage);
       add_message(&u->faction->msgs, m);
     }
@@ -5711,12 +5713,12 @@ sp_enterastral(castorder *co)
 
       /* Meldungen in der Ausgangsregion */
 
-      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
       m = NULL;
       for (u2 = r->units; u2; u2 = u2->next ) {
-        if (!fval(u2->faction, FL_DH)) {
+        if (!fval(u2->faction, FFL_SELECT)) {
           if (cansee(u2->faction, r, u, 0)) {
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_disappear", "unit", u);
             r_addmessage(rt, u2->faction, m);
           }
@@ -5726,12 +5728,12 @@ sp_enterastral(castorder *co)
 
       /* Meldungen in der Zielregion */
 
-      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
       m = NULL;
       for (u2 = rt->units; u2; u2 = u2->next ) {
-        if (!fval(u2->faction, FL_DH)) {
+        if (!fval(u2->faction, FFL_SELECT)) {
           if (cansee(u2->faction, rt, u, 0)) {
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_appear", "unit", u);
             r_addmessage(rt, u2->faction, m);
           }
@@ -5845,12 +5847,12 @@ sp_pullastral(castorder *co)
 
         /* Meldungen in der Ausgangsregion */
 
-        for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
         m = NULL;
         for (u2 = r->units; u2; u2 = u2->next ) {
-          if (!fval(u2->faction, FL_DH)) {
+          if (!fval(u2->faction, FFL_SELECT)) {
             if (cansee(u2->faction, r, u, 0)) {
-              fset(u2->faction, FL_DH);
+              fset(u2->faction, FFL_SELECT);
               if (!m) m = msg_message("astral_disappear", "unit", u);
               r_addmessage(rt, u2->faction, m);
             }
@@ -5860,12 +5862,12 @@ sp_pullastral(castorder *co)
 
         /* Meldungen in der Zielregion */
 
-        for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+        for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
         m = NULL;
         for (u2 = rt->units; u2; u2 = u2->next ) {
-          if (!fval(u2->faction, FL_DH)) {
+          if (!fval(u2->faction, FFL_SELECT)) {
             if (cansee(u2->faction, rt, u, 0)) {
-              fset(u2->faction, FL_DH);
+              fset(u2->faction, FFL_SELECT);
               if (!m) m = msg_message("astral_appear", "unit", u);
               r_addmessage(rt, u2->faction, m);
             }
@@ -5958,12 +5960,12 @@ sp_leaveastral(castorder *co)
 
       /* Meldungen in der Ausgangsregion */
 
-      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
       m = NULL;
       for (u2 = r->units; u2; u2 = u2->next ) {
-        if (!fval(u2->faction, FL_DH)) {
+        if (!fval(u2->faction, FFL_SELECT)) {
           if (cansee(u2->faction, r, u, 0)) {
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_disappear", "unit", u);
             r_addmessage(rt, u2->faction, m);
           }
@@ -5973,12 +5975,12 @@ sp_leaveastral(castorder *co)
 
       /* Meldungen in der Zielregion */
 
-      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
       m = NULL;
       for (u2 = rt->units; u2; u2 = u2->next ) {
-        if (!fval(u2->faction, FL_DH)) {
+        if (!fval(u2->faction, FFL_SELECT)) {
           if (cansee(u2->faction, rt, u, 0)) {
-            fset(u2->faction, FL_DH);
+            fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_appear", "unit", u);
             r_addmessage(rt, u2->faction, m);
           }
@@ -6077,12 +6079,12 @@ sp_fetchastral(castorder *co)
     move_unit(u, rt, NULL);
 
     /* Meldungen in der Ausgangsregion */
-    for (u2 = ro->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+    for (u2 = ro->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
     m = NULL;
     for (u2 = ro->units; u2; u2 = u2->next ) {
-      if (!fval(u2->faction, FL_DH)) {
+      if (!fval(u2->faction, FFL_SELECT)) {
         if (cansee(u2->faction, ro, u, 0)) {
-          fset(u2->faction, FL_DH);
+          fset(u2->faction, FFL_SELECT);
           if (!m) m = msg_message("astral_disappear", "unit", u);
           r_addmessage(ro, u2->faction, m);
         }
@@ -6091,12 +6093,12 @@ sp_fetchastral(castorder *co)
     if (m) msg_release(m);
 
     /* Meldungen in der Zielregion */
-    for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+    for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
     m = NULL;
     for (u2 = rt->units; u2; u2 = u2->next ) {
-      if (!fval(u2->faction, FL_DH)) {
+      if (!fval(u2->faction, FFL_SELECT)) {
         if (cansee(u2->faction, rt, u, 0)) {
-          fset(u2->faction, FL_DH);
+          fset(u2->faction, FFL_SELECT);
           if (!m) m = msg_message("astral_appear", "unit", u);
           r_addmessage(rt, u2->faction, m);
         }
@@ -6377,10 +6379,10 @@ sp_eternizewall(castorder *co)
   }
 
   /* melden, 1x pro Partei in der Burg */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next) {
-    if (!fval(u->faction, FL_DH)) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
       if (u->building ==  b) {
         sprintf(buf, "Mit einem Ritual bindet %s die magischen Kräfte "
             "der Erde in die Mauern von %s", unitname(mage),
@@ -6606,11 +6608,11 @@ sp_flying_ship(castorder *co)
   sh->coast = NODIRECTION;
 
   /* melden, 1x pro Partei */
-  for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for(u = r->units; u; u = u->next ) {
     /* das sehen natürlich auch die Leute an Land */
-    if (!fval(u->faction, FL_DH) ) {
-      fset(u->faction, FL_DH);
+    if (!fval(u->faction, FFL_SELECT) ) {
+      fset(u->faction, FFL_SELECT);
       if (!m) m = msg_message("flying_ship_result", "mage ship", mage, sh);
       add_message(&u->faction->msgs, m);
     }

@@ -23,9 +23,11 @@
 #include <region.h>
 
 /* util includes */
-#include <event.h>
-#include <resolve.h>
-#include <base36.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/log.h>
+#include <util/resolve.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -65,7 +67,7 @@ createunit_handle(trigger * t, void * data)
 	 */
 	createunit_data * td = (createunit_data*)t->data.v;
 	if (td->r!=NULL && td->f!=NULL) {
-		createunit(td->r, td->f, td->number, td->race);
+		create_unit(td->r, td->f, td->number, td->race, 0, NULL, NULL);
 	} else {
 		log_error(("could not perform createunit::handle()\n"));
 	}

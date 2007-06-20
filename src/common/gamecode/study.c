@@ -44,6 +44,7 @@
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/rand.h>
 
@@ -100,11 +101,11 @@ magic_lowskill(unit *u)
 /* ------------------------------------------------------------- */
 
 int
-study_cost(unit *u, skill_t talent)
+study_cost(unit *u, skill_t sk)
 {
 	int stufe, k = 50;
 
-	switch (talent) {
+	switch (sk) {
 		case SK_SPY:
 			return 100;
 			break;
@@ -617,13 +618,8 @@ learn_cmd(unit * u, order * ord)
     studycost = p;	/* Ohne Univertreurung */
     money = min(money, studycost);
     if (p>0 && money < studycost * u->number) {
-  #ifdef PARTIAL_STUDY
       cmistake(u, ord, 65, MSG_EVENT);
       multi = money / (double)(studycost * u->number);
-  #else
-      cmistake(u, ord, 65, MSG_EVENT);
-      return 0;		/* nein, Silber reicht auch so nicht */
-  #endif
     }
   }
 

@@ -38,9 +38,12 @@ typedef struct shortpwd {
 #define FFL_ISNEW         (1<<1)
 #define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
-/* #define FL_DH             (1<<18) */
+#define FFL_SELECT        (1<<18) /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21) /* Hilfsflag Kampf */
-/* #define FL_MARK           (1<<23) */
+#define FFL_MARK          (1<<23) /* für markierende algorithmen, die das 
+                                   * hinterher auch wieder löschen müssen! 
+                                   * (FL_DH muss man vorher initialisieren, 
+                                   * FL_MARK hinterher löschen) */
 #define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
 #define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
 #define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */

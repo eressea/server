@@ -24,7 +24,7 @@ typedef struct group {
 	struct group * next;
 	struct group * nexthash;
 	struct faction * f;
-	attrib *attribs;
+	struct attrib *attribs;
 	char * name;
 	struct ally * allies;
 	int flags;
@@ -32,11 +32,11 @@ typedef struct group {
 	int members;
 } group;
 
-extern attrib_type at_group; /* attribute for units assigned to a group */
+extern struct attrib_type at_group; /* attribute for units assigned to a group */
 extern boolean join_group(struct unit * u, const char* name);
-extern void free_group(group * g);
+extern void free_group(struct group * g);
 
-extern void write_groups(FILE * F, group * g);
+extern void write_groups(FILE * F, struct group * g);
 extern void read_groups(FILE * F, struct faction * f);
 
 #ifdef __cplusplus

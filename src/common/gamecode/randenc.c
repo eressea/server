@@ -55,7 +55,9 @@
 #include <attributes/racename.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/rand.h>
+#include <util/lists.h>
 #include <util/message.h>
 #include <util/rng.h>
 
@@ -67,8 +69,8 @@
 #include <stdlib.h>
 
 #include <attributes/iceberg.h>
-extern attrib_type at_unitdissolve;
-extern attrib_type at_orcification;
+extern struct attrib_type at_unitdissolve;
+extern struct attrib_type at_orcification;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
  * auflöst, in a->data.ca[0] kann angegeben werden, wohin die Personen
@@ -743,7 +745,7 @@ volcano_outbreak(region *r)
 
   for (u=r->units; u; u=u->next) {
     f = u->faction;
-    freset(f, FL_DH);
+    freset(f, FFL_SELECT);
   }
   rn = rrandneighbour(r);
 
@@ -771,8 +773,8 @@ volcano_outbreak(region *r)
         ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
           "unit region dead", u, r, dead));
       }
-      if (!fval(u->faction, FL_DH)) {
-        fset(u->faction, FL_DH);
+      if (!fval(u->faction, FFL_SELECT)) {
+        fset(u->faction, FFL_SELECT);
         if (rn) {
           ADDMSG(&u->faction->msgs, msg_message("volcanooutbreak", 
             "regionv regionn", r, rn));
@@ -826,9 +828,9 @@ melt_iceberg(region *r)
 	unit *u;
 	building *b, *b2;
 
-	for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
-	for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
-		fset(u->faction, FL_DH);
+	for (u=r->units; u; u=u->next) freset(u->faction, FFL_SELECT);
+	for (u=r->units; u; u=u->next) if (!fval(u->faction, FFL_SELECT)) {
+		fset(u->faction, FFL_SELECT);
 		ADDMSG(&u->faction->msgs, msg_message("iceberg_melt", "region", r));
 	}
 
@@ -879,9 +881,9 @@ move_iceberg(region *r)
 			short x, y;
 
 
-			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
-			for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
-				fset(u->faction, FL_DH);
+			for (u=r->units; u; u=u->next) freset(u->faction, FFL_SELECT);
+			for (u=r->units; u; u=u->next) if (!fval(u->faction, FFL_SELECT)) {
+				fset(u->faction, FFL_SELECT);
 				ADDMSG(&u->faction->msgs, msg_message("iceberg_drift", 
           "region dir", r, dir));
 			}
@@ -903,12 +905,12 @@ move_iceberg(region *r)
 			/* Schiffe aus dem Zielozean werden in den Eisberg transferiert
 			 * und nehmen Schaden. */
 
-			for (sh = r->ships; sh; sh=sh->next) freset(sh, FL_DH);
+			for (sh = r->ships; sh; sh=sh->next) freset(sh, SF_SELECT);
 
 			for (sh = r->ships; sh; sh = sh->next) {
 				/* Meldung an Kapitän */
 				damage_ship(sh, 0.10);
-				fset(sh, FL_DH);
+				fset(sh, SF_SELECT);
 			}
 
 			/* Personen, Schiffe und Gebäude verschieben */
@@ -917,7 +919,7 @@ move_iceberg(region *r)
 				translist(&rc->buildings, &r->buildings, rc->buildings);
 			}
 			while (rc->ships) {
-				fset(rc->ships, FL_DH);
+				fset(rc->ships, SF_SELECT);
 				damage_ship(rc->ships, 0.10);
 				move_ship(rc->ships, rc, r, NULL);
 			}
@@ -932,7 +934,7 @@ move_iceberg(region *r)
 
 			for (sh = r->ships; sh;) {
 				shn = sh->next;
-				if (fval(sh, FL_DH)) {
+				if (fval(sh, SF_SELECT)) {
 					u = captain(sh, r);
 					if (sh->damage>=sh->size * DAMAGE_SCALE) {
             if (u!=NULL) {
@@ -954,9 +956,9 @@ move_iceberg(region *r)
 			rsetterrain(r, T_GLACIER);
 			a_remove(&r->attribs, a);
 
-			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
-			for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
-				fset(u->faction, FL_DH);
+			for (u=r->units; u; u=u->next) freset(u->faction, FFL_SELECT);
+			for (u=r->units; u; u=u->next) if (!fval(u->faction, FFL_SELECT)) {
+				fset(u->faction, FFL_SELECT);
         ADDMSG(&u->faction->msgs, msg_message("iceberg_land", "region", r));
 			}
 		}
@@ -969,15 +971,15 @@ move_icebergs(void)
 	region *r;
 
   for (r=regions; r; r=r->next) {
-    if (rterrain(r) == T_ICEBERG && !fval(r, RF_DH)) {
+    if (rterrain(r) == T_ICEBERG && !fval(r, RF_SELECT)) {
       int select = rng_int() % 10;
       if (select < 4) {
         /* 4% chance */
-  			fset(r, RF_DH);
+  			fset(r, RF_SELECT);
 	  		melt_iceberg(r);
       } else if (select<64) {
         /* 60% chance */
-        fset(r, RF_DH);
+        fset(r, RF_SELECT);
         move_iceberg(r);
       }
 		}
@@ -996,7 +998,7 @@ create_icebergs(void)
       region *rc;
       unit *u;
 
-      freset(r, RF_DH);
+      freset(r, RF_SELECT);
       for (dir=0; dir < MAXDIRECTIONS; dir++) {
         rc = rconnect(r, dir);
         if (rc && fval(rc->terrain, SEA_REGION)) {
@@ -1008,15 +1010,15 @@ create_icebergs(void)
 
       rsetterrain(r, T_ICEBERG);
 
-      fset(r, RF_DH);
+      fset(r, RF_SELECT);
       move_iceberg(r);
 
       for (u=r->units; u; u=u->next) {
-        freset(u->faction, FL_DH);
+        freset(u->faction, FFL_SELECT);
       }
       for (u=r->units; u; u=u->next) {
-        if (!fval(u->faction, FL_DH)) {
-          fset(u->faction, FL_DH);
+        if (!fval(u->faction, FFL_SELECT)) {
+          fset(u->faction, FFL_SELECT);
           ADDMSG(&u->faction->msgs, msg_message("iceberg_create", "region", r));
         }
       }

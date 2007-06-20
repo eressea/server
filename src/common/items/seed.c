@@ -11,18 +11,20 @@
 */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #include "seed.h"
 
-#include <build.h>
-#include <region.h>
+#include <kernel/build.h>
+#include <kernel/eressea.h>
+#include <kernel/region.h>
 
 /* kernel includes */
 #include <item.h>
 
 /* util includes */
-#include <functions.h>
+#include <util/attrib.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <assert.h>

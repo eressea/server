@@ -37,7 +37,7 @@ void update_guards(void);
 /* eressea-specific. put somewhere else, please. */
 #include "resolve.h"
 void processorders(void);
-extern attrib_type at_germs;
+extern struct attrib_type at_germs;
 
 #ifdef __cplusplus
 }

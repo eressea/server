@@ -28,6 +28,7 @@
 #include <kernel/ship.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/functions.h>
 #include <util/rand.h>
 

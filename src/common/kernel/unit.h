@@ -48,7 +48,6 @@ struct item;
 
 /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
-#define UFL_DH            (1<<18) /* same as FL_DH */
 #define UFL_STORM         (1<<19) /* Kapitän war in einem Sturm */
 #define UFL_FOLLOWING     (1<<20)
 #define UFL_FOLLOWED      (1<<21)
@@ -219,6 +218,10 @@ extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
 extern int invisible(const struct unit *target, const struct unit * viewer);
 extern void stripunit(struct unit * u);
 
+extern void name_unit(struct unit *u);
+extern struct unit * create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);
+
+extern struct attrib_type at_creator;
 #ifdef __cplusplus
 }
 #endif

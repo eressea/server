@@ -26,6 +26,7 @@
 #include <util/nrmessage.h>
 #include <util/base36.h>
 #include <util/functions.h>
+#include <util/language.h>
 
 /* libc includes */
 #include <string.h>

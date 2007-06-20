@@ -22,9 +22,10 @@
 #include <faction.h> /* FIXME: resolve_faction */
 
 /* util includes */
-#include <resolve.h>
-#include <event.h>
-#include <base36.h>
+#include <util/attrib.h>
+#include <util/event.h>
+#include <util/resolve.h>
+#include <util/base36.h>
 
 /* ansi includes */
 #include <stdio.h>

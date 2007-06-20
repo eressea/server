@@ -29,10 +29,12 @@ without prior permission by the authors of Eressea.
 #include "calendar.h"
 
 /* util includes */
+#include <util/attrib.h>
+#include <util/crmessage.h>
 #include <util/functions.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
-#include <util/crmessage.h>
+#include <util/language.h>
 
 /* libxml includes */
 #include <libxml/tree.h>

@@ -19,8 +19,9 @@
 #include <unit.h>
 
 /* util includes */
-#include <event.h>
-#include <log.h>
+#include <util/attrib.h>
+#include <util/event.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <stdlib.h>

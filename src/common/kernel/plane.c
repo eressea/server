@@ -28,7 +28,9 @@
 #include "faction.h"
 
 /* util includes */
-#include <resolve.h>
+#include <util/attrib.h>
+#include <util/resolve.h>
+#include <util/lists.h>
 
 /* libc includes */
 #include <assert.h>

@@ -48,18 +48,16 @@ enum {
 	P_WAHRHEIT,
 	P_MACHT,
 	P_HEAL,
-	MAX_POTIONS,
-	NOPOTION = (potion_t) - 1
+	MAX_POTIONS
 };
 
-herb_t rherb2herb(struct region *r);
 void herbsearch(struct region * r, struct unit * u, int max);
 int use_potion(struct unit * u, const struct item_type * itype, int amount, struct order *);
 void init_potions(void);
 
 extern int get_effect(const struct unit * u, const struct potion_type * effect);
 extern int change_effect(struct unit * u, const struct potion_type * effect, int value);
-extern attrib_type at_effect;
+extern struct attrib_type at_effect;
 
 /* rausnehmen, sobald man attribute splitten kann: */
 typedef struct effect_data {

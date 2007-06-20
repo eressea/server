@@ -28,6 +28,7 @@
 /* util includes */
 #include <util/base36.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/rng.h>
 #include <util/sql.h>
 
@@ -82,10 +83,10 @@ recurse_regions(region *r, region_list **rlist, boolean(*fun)(const region *r))
     rl->next = *rlist;
     rl->data = r;
     (*rlist) = rl;
-    fset(r, FL_MARK);
+    fset(r, RF_MARK);
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * nr = rconnect(r, d);
-      if (nr && !fval(nr, FL_MARK)) len += recurse_regions(nr, rlist, fun);
+      if (nr && !fval(nr, RF_MARK)) len += recurse_regions(nr, rlist, fun);
     }
     return len+1;
   }
@@ -145,7 +146,7 @@ fix_demand(region *r)
         }
       }
     }
-    freset(r, FL_MARK); /* undo recursive marker */
+    freset(r, RF_MARK); /* undo recursive marker */
   }
   if (maxlux<2) {
     int i;
@@ -414,7 +415,7 @@ get_island(region * root, region_list ** rlist)
   region_list ** rnext = rlist;
   while (*rnext) rnext=&(*rnext)->next;
 
-  fset(root, FL_MARK);
+  fset(root, RF_MARK);
   add_regionlist(rnext, root);
 
   while (*rnext) {
@@ -425,8 +426,8 @@ get_island(region * root, region_list ** rlist)
 
     for (dir=0;dir!=MAXDIRECTIONS;++dir) {
       region * r = rconnect(rcurrent, dir);
-      if (r!=NULL && r->land && !fval(r, FL_MARK)) {
-        fset(r, FL_MARK);
+      if (r!=NULL && r->land && !fval(r, RF_MARK)) {
+        fset(r, RF_MARK);
         add_regionlist(rnext, r);
       }
     }
@@ -434,7 +435,7 @@ get_island(region * root, region_list ** rlist)
   rnext=rlist;
   while (*rnext) {
     region_list * rptr = *rnext;
-    freset(rptr->data, FL_MARK);
+    freset(rptr->data, RF_MARK);
     rnext = &rptr->next;
   }
 }
@@ -447,25 +448,25 @@ island_size(region * r)
   region_list * island = NULL;
   add_regionlist(&rlist, r);
   island = rlist;
-  fset(r, FL_MARK);
+  fset(r, RF_MARK);
   while (rlist) {
     direction_t d;
     r = rlist->data;
     ++size;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
-      if (rn && !fval(rn, FL_MARK) && rn->land) {
+      if (rn && !fval(rn, RF_MARK) && rn->land) {
         region_list * rnew = malloc(sizeof(region_list));
         rnew->data = rn;
         rnew->next = rlist->next;
         rlist->next = rnew;
-        fset(rn, FL_MARK);
+        fset(rn, RF_MARK);
       }
     }
     rlist = rlist->next;
   }
   for (rlist=island;rlist;rlist=rlist->next) {
-    freset(rlist->data, FL_MARK);
+    freset(rlist->data, RF_MARK);
   }
   free_regionlist(island);
   return size;
@@ -525,14 +526,14 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         unit * u;
         for (u=r->units;u;u=u->next) {
           f = u->faction;
-          if (!fval(f, FL_MARK)) {
+          if (!fval(f, FFL_MARK)) {
             ++psize;
-            fset(f, FL_MARK);
+            fset(f, FFL_MARK);
           }
         }
       }
       free_regionlist(rlist);
-      if (psize>0) for (f=factions;f;f=f->next) freset(f, FL_MARK);
+      if (psize>0) for (f=factions;f;f=f->next) freset(f, FFL_MARK);
       if (psize<PLAYERS_PER_ISLAND) {
         r = rmin;
       }
@@ -573,7 +574,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
   }
   if (r!=NULL) {
     add_regionlist(&rlist, r);
-    fset(r, FL_MARK);
+    fset(r, RF_MARK);
     rsize = 1;
   }
 
@@ -585,20 +586,20 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
     while (i--) rnext=&(*rnext)->next;
     rfind = *rnext;
     r = rfind->data;
-    freset(r, FL_MARK);
+    freset(r, RF_MARK);
     *rnext = rfind->next;
     free(rfind);
     --rsize;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
-      if (rn && fval(rn, FL_MARK)) continue;
+      if (rn && fval(rn, RF_MARK)) continue;
       if (virgin_region(rn)) {
         if (rn==NULL) {
           rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
           terraform(rn, T_OCEAN);
         }
         add_regionlist(&rlist, rn);
-        fset(rn, FL_MARK);
+        fset(rn, RF_MARK);
         ++rsize;
       }
     }
@@ -727,7 +728,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
     while (rlist) {
       region_list * self = rlist;
       rlist = rlist->next;
-      freset(self->data, FL_MARK);
+      freset(self->data, RF_MARK);
       free(self);
     }
   }

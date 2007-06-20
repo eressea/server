@@ -30,8 +30,11 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
+/* util includes */
+#include <util/attrib.h>
+#include <util/base36.h>
+
 /* libc includes */
-#include <base36.h>
 #include <stdlib.h>
 #include <string.h>
 

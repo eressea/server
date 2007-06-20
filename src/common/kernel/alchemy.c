@@ -36,7 +36,8 @@
 #include "movement.h"
 
 /* util includes */
-#include <rand.h>
+#include <util/attrib.h>
+#include <util/rand.h>
 
 /* libc includes */
 #include <stdio.h>

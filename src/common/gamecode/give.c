@@ -36,6 +36,7 @@
 #include <attributes/orcification.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/event.h>
 #include <util/base36.h>
 

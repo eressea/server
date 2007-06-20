@@ -52,12 +52,14 @@
 #include <items/demonseye.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/cvector.h>
+#include <util/lists.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/log.h>
 
 /* libc includes */
 #include <assert.h>
@@ -3366,7 +3368,6 @@ make_battle(region * r)
 {
   battle *b = calloc(1, sizeof(struct battle));
   unit *u;
-  faction *lastf = NULL;
   bfaction * bf;
   static int max_fac_no = 0; /* need this only once */
 
@@ -3388,27 +3389,28 @@ make_battle(region * r)
   b->region = r;
   b->plane = getplane(r);
   /* Finde alle Parteien, die den Kampf beobachten können: */
-  list_foreach(unit, r->units, u)
+  for (u = r->units; u; u=u->next) {
     if (u->number > 0) {
-    if (lastf != u->faction) {  /* Speed optimiert, aufeinanderfolgende
-                 * * gleiche nicht getestet */
-      lastf = u->faction;
-      for (bf=b->factions;bf;bf=bf->next)
-        if (bf->faction==lastf) break;
-      if (!bf) {
-        bf = calloc(sizeof(bfaction), 1);
-        ++b->nfactions;
-        bf->faction = lastf;
-        bf->next = b->factions;
-        b->factions = bf;
+      if (!fval(u->faction, FFL_MARK)) {
+        fset(u->faction, FFL_MARK);
+        for (bf=b->factions;bf;bf=bf->next) {
+          if (bf->faction==u->faction) break;
+        }
+        if (!bf) {
+          bf = calloc(sizeof(bfaction), 1);
+          ++b->nfactions;
+          bf->faction = u->faction;
+          bf->next = b->factions;
+          b->factions = bf;
+        }
       }
     }
   }
-  list_next(u);
 
   for (bf=b->factions;bf;bf=bf->next) {
     faction * f = bf->faction;
     max_fac_no = max(max_fac_no, f->no);
+    freset(f, FFL_MARK);
   }
   return b;
 }

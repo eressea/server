@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+#include <util/cvector.h>
+
 #define SHOW_KILLS
 #undef SMALL_BATTLE_MESSAGES
 

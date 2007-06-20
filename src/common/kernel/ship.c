@@ -27,6 +27,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
 

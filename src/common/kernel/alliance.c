@@ -26,9 +26,11 @@
 #include <kernel/item.h>
 
 /* util includes */
-#include <util/command.h>
-#include <util/umlaut.h>
+#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/command.h>
+#include <util/lists.h>
+#include <util/umlaut.h>
 
 /* libc includes */
 #include <assert.h>
@@ -255,7 +257,7 @@ alliancevictory(void)
 			if (b->type==btype) {
 				unit * u = buildingowner(r, b);
 				if (u) {
-					fset(u->faction->alliance, FL_MARK);
+					fset(u->faction->alliance, FFL_MARK);
 				}
 			}
 			b = b->next;
@@ -263,7 +265,7 @@ alliancevictory(void)
 		r=r->next;
 	}
 	while (al!=NULL) {
-		if (!fval(al, FL_MARK)) {
+		if (!fval(al, FFL_MARK)) {
 			faction_list * flist = al->members;
 			while (flist!=0) {
 				faction * f = flist->data;
@@ -275,7 +277,7 @@ alliancevictory(void)
 				flist = flist->next;
 			}
 		} else {
-			freset(al, FL_MARK);
+			freset(al, FFL_MARK);
 		}
 		al = al->next;
 	}

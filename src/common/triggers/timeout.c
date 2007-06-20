@@ -17,8 +17,9 @@
 #include "timeout.h"
 
 /* util includes */
-#include <event.h>
-#include <log.h>
+#include <util/attrib.h>
+#include <util/event.h>
+#include <util/log.h>
 
 #include <stdio.h>
 #include <stdlib.h>

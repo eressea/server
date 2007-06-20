@@ -53,7 +53,7 @@ typedef struct construction {
 		 * last level of a building points to NULL, as do objects of
 		 * an unlimited size.
 		 */
-	attrib * attribs;
+	struct attrib * attribs;
 		/* stores skill modifiers and other attributes */
 } construction;
 

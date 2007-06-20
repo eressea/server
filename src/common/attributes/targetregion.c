@@ -18,7 +18,7 @@
 #include <kernel/eressea.h>
 #include <kernel/region.h>
 #include <kernel/save.h>
-
+#include <kernel/version.h>
 
 #include <util/attrib.h>
 #include <util/resolve.h>

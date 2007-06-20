@@ -15,6 +15,7 @@
 #include <kernel/region.h>
 #include <modules/autoseed.h>
 #include <util/rng.h>
+#include <util/lists.h>
 
 #define ISLANDSIZE 20
 #define TURNS_PER_ISLAND 4

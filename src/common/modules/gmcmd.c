@@ -39,6 +39,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/umlaut.h>
 #include <util/rng.h>
 
@@ -285,14 +286,14 @@ gm_messageplane(const tnode * tnext, const char * str, void * data, struct order
       faction * f;
       region * r;
       for (f=factions;f;f=f->next) {
-        freset(f, FL_DH);
+        freset(f, FFL_SELECT);
       }
       for (r=regions;r;r=r->next) {
         unit * u;
         if (rplane(r)!=p) continue;
-        for (u=r->units;u;u=u->next) if (!fval(u->faction, FL_DH)) {
+        for (u=r->units;u;u=u->next) if (!fval(u->faction, FFL_SELECT)) {
           f = u->faction;
-          fset(f, FL_DH);
+          fset(f, FFL_SELECT);
           add_message(&f->msgs, msg);
         }
       }

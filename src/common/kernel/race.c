@@ -41,6 +41,7 @@
 #include "skill.h"
 #include "terrain.h"
 #include "unit.h"
+#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>

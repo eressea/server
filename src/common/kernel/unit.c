@@ -40,11 +40,15 @@
 #include "terrain.h"
 
 #include <attributes/moved.h>
+#include <attributes/otherfaction.h>
+#include <attributes/racename.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -56,6 +60,11 @@
 #include <math.h>
 
 #define FIND_FOREIGN_TEMP
+
+attrib_type at_creator = {
+  "creator"
+    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
+};
 
 const unit *
 u_peasants(void)
@@ -1257,6 +1266,133 @@ unitlist_insert(struct unit_list **ul, struct unit *u)
   rl2->next = *ul;
 
   *ul = rl2;
+}
+
+
+static void
+createunitid(unit *u, int id)
+{
+  if (id<=0 || id > MAX_UNIT_NR || ufindhash(id) || dfindhash(id) || forbiddenid(id))
+    u->no = newunitid();
+  else
+    u->no = id;
+  uhash(u);
+}
+
+void
+name_unit(unit *u)
+{
+	char name[16];
+
+	if (u->race->generate_name) {
+		set_string(&u->name, (u->race->generate_name(u)));
+	} else {
+		sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
+		set_string(&u->name, name);
+	}
+}
+
+/** creates a new unit.
+*
+* @param dname: name, set to NULL to get a default.
+* @param creator: unit to inherit stealth, group, building, ship, etc. from
+*/
+unit *
+create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
+{
+  unit * u = calloc(1, sizeof(unit));
+  order * deford = default_order(f->locale);
+
+  assert(urace);
+  assert(deford);
+  assert(f->alive);
+  u_setfaction(u, f);
+  set_order(&u->thisorder, NULL);
+#ifdef LASTORDER
+  set_order(&u->lastorder, deford);
+#else
+  addlist(&u->orders, deford);
+#endif
+  u_seteffstealth(u, -1);
+  u->race = urace;
+  u->irace = urace;
+
+  set_number(u, number);
+
+  /* die nummer der neuen einheit muss vor name_unit generiert werden,
+  * da der default name immer noch 'Nummer u->no' ist */
+  createunitid(u, id);
+
+  /* zuerst in die Region setzen, da zb Drachennamen den Regionsnamen
+  * enthalten */
+  move_unit(u, r, NULL);
+
+  /* u->race muss bereits gesetzt sein, wird für default-hp gebraucht */
+  /* u->region auch */
+  u->hp = unit_max_hp(u) * number;
+
+  if (!dname) {
+    name_unit(u);
+  }
+  else set_string(&u->name, dname);
+  set_string(&u->display, "");
+
+  if (count_unit(u)) f->no_units++;
+
+  if (creator) {
+    attrib * a;
+
+    /* erbt Kampfstatus */
+    setstatus(u, creator->status);
+
+    /* erbt Gebäude/Schiff*/
+    if (creator->region==r) {
+      u->building = creator->building;
+      assert(creator->ship==NULL || fval(u->race, RCF_CANSAIL));
+      u->ship = creator->ship;
+    }
+
+    /* Tarnlimit wird vererbt */
+    if (fval(creator, UFL_STEALTH)) {
+      attrib * a = a_find(creator->attribs, &at_stealth);
+      if (a) {
+        int stealth = a->data.i;
+        a = a_add(&u->attribs, a_new(&at_stealth));
+        a->data.i = stealth;
+      }
+    }
+
+    /* Temps von parteigetarnten Einheiten sind wieder parteigetarnt */
+    if (fval(creator, UFL_PARTEITARNUNG)) {
+      fset(u, UFL_PARTEITARNUNG);
+    }
+    /* Daemonentarnung */
+    set_racename(&u->attribs, get_racename(creator->attribs));
+    if (fval(u->race, RCF_SHAPESHIFT) && fval(creator->race, RCF_SHAPESHIFT)) {
+      u->irace = creator->irace;
+    }
+
+    /* Gruppen */
+    if (fval(creator, UFL_GROUP)) {
+      a = a_find(creator->attribs, &at_group);
+      if (a) {
+        group * g = (group*)a->data.v;
+        a_add(&u->attribs, a_new(&at_group))->data.v = g;
+        fset(u, UFL_GROUP);
+      }
+    }
+    a = a_find(creator->attribs, &at_otherfaction);
+    if (a) {
+      a_add(&u->attribs, make_otherfaction(get_otherfaction(a)));
+    }
+
+    a = a_add(&u->attribs, a_new(&at_creator));
+    a->data.v = creator;
+  }
+  /* Monster sind grundsätzlich parteigetarnt */
+  if (f->no <= 0) fset(u, UFL_PARTEITARNUNG);
+
+  return u;
 }
 
 #ifdef HEROES

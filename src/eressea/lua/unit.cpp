@@ -25,8 +25,10 @@
 #include <kernel/unit.h>
 
 // util includes
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/lists.h>
 
 // lua includes
 #include <lua.hpp>

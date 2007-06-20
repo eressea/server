@@ -60,12 +60,13 @@
 #include <kernel/save.h>
 
 /* util includes */
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/crmessage.h>
+#include <util/goodies.h>
+#include <util/language.h>
 #include <util/message.h>
-#include <goodies.h>
-#include <crmessage.h>
-#include <nrmessage.h>
-#include <base36.h>
-#include <language.h>
+#include <util/nrmessage.h>
 
 /* libc includes */
 #include <assert.h>

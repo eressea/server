@@ -19,7 +19,7 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <types.h>
 
 /* misc includes */
 #include <attributes/key.h>
@@ -41,6 +41,7 @@
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/equipment.h>
+#include <kernel/eressea.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
@@ -62,6 +63,7 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -103,15 +105,15 @@ curse_emptiness(void)
     if (r->age<=200) continue;
     if (get_curse(r->attribs, ct)) continue;
     while (u && u->faction->no==MONSTER_FACTION) u=u->next;
-    if (u==NULL) fset(r, FL_MARK);
+    if (u==NULL) fset(r, RF_MARK);
   }
   for (r=regions;r!=NULL;r=r->next) {
-    if (fval(r, FL_MARK)) {
+    if (fval(r, RF_MARK)) {
       direction_t d;
       for (d=0;d!=MAXDIRECTIONS;++d) {
         region * rn = rconnect(r,d);
         if (rn==NULL) continue;
-        if (fval(rn, FL_MARK) || get_curse(rn->attribs, ct)) {
+        if (fval(rn, RF_MARK) || get_curse(rn->attribs, ct)) {
           break;
         }
       }
@@ -121,7 +123,7 @@ curse_emptiness(void)
         effect.i = 0;
         c = create_curse(NULL, &r->attribs, ct, 100, 100, effect, 0);
       }
-      freset(r, FL_MARK);
+      freset(r, RF_MARK);
     }
   }
   return 0;
@@ -451,13 +453,6 @@ get_timeout(trigger * td, trigger * tfind)
 
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
-
-extern struct attrib_type at_resources;
-void
-init_resourcefix(void)
-{
-  at_register(&at_resources);
-}
 
 int
 growing_trees(void)

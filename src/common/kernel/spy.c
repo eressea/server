@@ -43,9 +43,10 @@
 #include <attributes/racename.h>
 
 /* util includes */
-#include <util/vset.h>
+#include <util/attrib.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/vset.h>
 
 /* libc includes */
 #include <assert.h>
@@ -465,13 +466,12 @@ faction_skill(region * r, faction * f, skill_t sk)
 	int value = 0;
 	unit *u;
 
-	list_foreach(unit, r->units, u)
-		if (u->faction == f)
-		{
+  for (u=r->units; u; u=u->next) {
+		if (u->faction == f) {
 			int s = eff_skill(u, sk, r);
 			value = max(value, s);
 		}
-	list_next(u);
+  }
 	return value;
 }
 

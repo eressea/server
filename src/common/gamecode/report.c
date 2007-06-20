@@ -13,6 +13,7 @@
  */
 
 #define INDENT 0
+#define ECHECK_VERSION "4.01"
 
 #include <config.h>
 #include <eressea.h>
@@ -67,20 +68,23 @@
 #include <kernel/alliance.h>
 
 /* util includes */
+#include <util/attrib.h>
+#include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/goodies.h>
-#include <util/base36.h>
-#include <util/nrmessage.h>
-#include <util/translation.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include <util/lists.h>
 #include <util/log.h>
+#include <util/message.h>
+#include <util/nrmessage.h>
+#include <util/rng.h>
+#include <util/translation.h>
 
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <string.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
@@ -2378,7 +2382,7 @@ make_summary(void)
       /* Einheiten Info. nregions darf nur einmal pro Partei
        * incrementiert werden. */
 
-      for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+      for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
       for (u = r->units; u; u = u->next) {
         f = u->faction;
         if (u->faction->no != MONSTER_FACTION) {
@@ -2409,9 +2413,9 @@ make_summary(void)
             int aktskill = eff_skill(u, sk, r);
             if (aktskill > s->maxskill) s->maxskill = aktskill;
           }
-          if (!fval(f, FL_DH)) {
+          if (!fval(f, FFL_SELECT)) {
             f->nregions++;
-            fset(f, FL_DH);
+            fset(f, FFL_SELECT);
           }
         }
 
@@ -2455,7 +2459,7 @@ writemonument(void)
   for (r = regions; r; r = r->next) {
     for (b = r->buildings; b; b = b->next) {
       if (b->type == bt_find("monument") && b->display && *b->display) {
-        freset(b, FL_DH);
+        freset(b, BLD_SELECT);
         count++;
         if(b->size > size[6]) {
           for(i=0; i <= 6; i++) if(b->size >= size[i]) {
@@ -2473,7 +2477,7 @@ writemonument(void)
   }
 
   for(i=0; i <= 6; i++) if(buildings[i]) {
-    fset(buildings[i], FL_DH);
+    fset(buildings[i], BLD_SELECT);
   }
   {
     char zText[MAX_PATH];
@@ -2501,7 +2505,7 @@ writemonument(void)
     j = 0;
     for (r = regions; r; r = r->next) {
       for (b = r->buildings; b; b = b->next) {
-        if (b->type == bt_find("monument") && b->display && *b->display && !fval(b, FL_DH)) {
+        if (b->type == bt_find("monument") && b->display && *b->display && !fval(b, BLD_SELECT)) {
           j++;
           if(j == ra) {
             fprintf(F, "In %s", rname(b->region, NULL));

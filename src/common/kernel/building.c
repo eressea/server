@@ -13,6 +13,7 @@
  */
 
 #include <config.h>
+
 #include "eressea.h"
 #include "building.h"
 #include "attrib.h"
@@ -25,12 +26,14 @@
 #include "skill.h"
 #include "magic.h"
 #include "save.h"
+#include "version.h"
 
 /* util includes */
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 
@@ -490,7 +493,7 @@ destroy_building(building * b)
   handle_event(b->attribs, "destroy", b);
 }
 
-extern attrib_type at_icastle;
+extern struct attrib_type at_icastle;
 
 int
 buildingeffsize(const building * b, boolean img)

@@ -218,17 +218,17 @@ typedef struct curse_type {
   unsigned int mergeflags;
   const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
                  Zauberanalyse angezeigt */
-  struct message * (*curseinfo)(const void*, typ_t, const curse*, int);
+  struct message * (*curseinfo)(const void*, typ_t, const struct curse*, int);
   void (*change_vigour)(curse*, double);
   int (*read)(FILE * F, curse * c);
-  int (*write)(FILE * F, const curse * c);
-  int (*cansee)(const struct faction*, const void*, typ_t, const curse *, int);
+  int (*write)(FILE * F, const struct curse * c);
+  int (*cansee)(const struct faction*, const void*, typ_t, const struct curse *, int);
   int (*age)(curse *);
 } curse_type;
 
-extern attrib_type at_curse;
-extern void curse_write(const attrib * a,FILE * f);
-extern int curse_read(struct attrib * a,FILE * f);
+extern struct attrib_type at_curse;
+extern void curse_write(const struct attrib * a, FILE * f);
+extern int curse_read(struct attrib * a, FILE * f);
 
 
 /* ------------------------------------------------------------- */
@@ -257,11 +257,11 @@ extern void destroy_curse(curse * c);
 boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
   /* ignoriert CURSE_ISNEW */
 
-extern void remove_curse(struct attrib **ap, const curse * c);
+extern void remove_curse(struct attrib **ap, const struct curse * c);
   /* löscht einen konkreten Spruch auf einem Objekt.
    */
 
-extern int curse_geteffect(const curse * c);
+extern int curse_geteffect(const struct curse * c);
   /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
    * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
    * gespeichert. Wird automatisch beim Anlegen eines neuen curse
@@ -286,12 +286,12 @@ void transfer_curse(struct unit * u, struct unit * u2, int n);
    * unterschiedlich gewünscht sein
    * */
 
-extern curse * get_cursex(attrib *ap, const curse_type * ctype, variant data,
-              boolean(*compare)(const curse *, variant));
+extern struct curse * get_cursex(struct attrib *ap, const curse_type * ctype, variant data,
+              boolean(*compare)(const struct curse *, variant));
   /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
    * und für die compare() true liefert, oder einen NULL-pointer.
    * */
-extern curse * get_curse(struct attrib *ap, const curse_type * ctype);
+extern struct curse * get_curse(struct attrib *ap, const curse_type * ctype);
   /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
    * oder einen NULL-pointer
    * */
@@ -310,13 +310,13 @@ extern void curse_init(struct attrib * a);
 extern void curse_done(struct attrib * a);
 extern int curse_age(struct attrib * a);
 
-extern boolean cmp_curse(const attrib * a, const void * data);
-extern boolean cmp_cursetype(const attrib * a, const void * data);
+extern boolean cmp_curse(const struct attrib * a, const void * data);
+extern boolean cmp_cursetype(const struct attrib * a, const void * data);
 
 extern void * resolve_curse(variant data);
-extern boolean is_cursed_with(attrib *ap, curse *c);
+extern boolean is_cursed_with(const struct attrib *ap, const struct curse *c);
 
-extern boolean curse_active(const curse * c);
+extern boolean curse_active(const struct curse * c);
   /* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
 
 /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
@@ -328,6 +328,9 @@ extern struct message * cinfo_simple(const void * obj, typ_t typ, const struct c
   curse_active(get_curse(a, ct_find(oldcursename(id))))
 #define get_curseeffect(a, id, id2) \
   curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
+
+/* eressea-defined attribute-type flags */
+#define ATF_CURSE  ATF_USER_DEFINED
 
 #ifdef __cplusplus
 }

@@ -27,7 +27,6 @@ const char *drachen_name(const struct unit *u);
 const char *dracoid_name(const struct unit *u);
 const char *shadow_name(const struct unit *u);
 const char *abkz(const char *s, size_t max);
-void name_unit(struct unit *u);
 
 #ifdef __cplusplus
 }

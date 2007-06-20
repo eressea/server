@@ -17,13 +17,14 @@
 #include "unitmessage.h"
 
 /* kernel includes */
-#include <unit.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <resolve.h>
-#include <event.h>
-#include <base36.h>
-#include <goodies.h>
+#include <util/attrib.h>
+#include <util/resolve.h>
+#include <util/event.h>
+#include <util/base36.h>
+#include <util/goodies.h>
 
 /* ansi includes */
 #include <stdio.h>

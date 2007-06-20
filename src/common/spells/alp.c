@@ -12,16 +12,20 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "alp.h"
 
-#include <unit.h>
-#include <region.h>
-#include <skill.h>
-#include <magic.h>
+#include <kernel/eressea.h>
+#include <kernel/magic.h>
+#include <kernel/region.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <event.h>
+#include <util/attrib.h>
+#include <util/event.h>
+#include <util/umlaut.h>
+
 #include <triggers/createcurse.h>
 #include <triggers/killunit.h>
 #include <triggers/removecurse.h>
@@ -101,9 +105,8 @@ sp_summon_alp(struct castorder *co)
   * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
   * sobald der Alp sein Opfer erreicht hat.
   */
-  alp = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP]);
+  alp = create_unit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP], 0, "Alp", NULL);
   set_level(alp, SK_STEALTH, 7);
-  set_string(&alp->name, "Alp");
   setstatus(alp, ST_FLEE); /* flieht */
 
   {

@@ -40,6 +40,7 @@
 
 /* util includes */
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/vmap.h>
 #include <util/vset.h>
 

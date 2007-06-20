@@ -24,16 +24,18 @@
 #include "curse.h"
 
 /* kernel includes */
-#include "magic.h"
-#include "skill.h"
-#include "unit.h"
-#include "region.h"
-#include "race.h"
-#include "faction.h"
+#include "attrib.h"
 #include "building.h"
-#include "ship.h"
+#include "faction.h"
+#include "magic.h"
 #include "message.h"
 #include "objtypes.h"
+#include "race.h"
+#include "region.h"
+#include "ship.h"
+#include "skill.h"
+#include "unit.h"
+#include "version.h"
 
 /* util includes */
 #include <util/resolve.h>
@@ -656,12 +658,12 @@ is_cursed_internal(attrib *ap, const curse_type *ct)
 
 
 boolean
-is_cursed_with(attrib *ap, curse *c)
+is_cursed_with(const attrib *ap, const curse *c)
 {
-  attrib *a = ap;
+  const attrib *a = ap;
 
   while (a) {
-    if ((a->type->flags & ATF_CURSE) && (c == (curse *)a->data.v)) {
+    if ((a->type->flags & ATF_CURSE) && (c == (const curse *)a->data.v)) {
       return true;
     }
     a = a->next;

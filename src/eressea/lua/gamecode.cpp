@@ -37,6 +37,7 @@
 #include <luabind/iterator_policy.hpp>
 
 // util includes
+#include <util/lists.h>
 #include <util/language.h>
 #include <util/base36.h>
 #include <util/rand.h>

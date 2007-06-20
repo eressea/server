@@ -16,10 +16,11 @@
 #include <eressea.h>
 #include "hate.h"
 
-#include <unit.h>
+#include <kernel/unit.h>
+#include <kernel/version.h>
 
-#include <attrib.h>
-#include <resolve.h>
+#include <util/attrib.h>
+#include <util/resolve.h>
 
 static int
 verify_hate(attrib * a)

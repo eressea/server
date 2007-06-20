@@ -16,7 +16,8 @@
 #include "follow.h"
 
 #include <eressea.h>
-#include <unit.h>
+#include <kernel/unit.h>
+#include <kernel/version.h>
 
 #include <attrib.h>
 #include <resolve.h>

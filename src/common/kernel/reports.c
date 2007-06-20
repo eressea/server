@@ -22,10 +22,9 @@
 #include "reports.h"
 
 /* kernel includes */
-#include <kernel/curse.h>
-#include <kernel/building.h>
 #include <kernel/border.h>
-#include <kernel/terrain.h>
+#include <kernel/building.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -38,13 +37,16 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/base36.h>
 #include <util/functions.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 
 /* libc includes */
 #include <assert.h>
@@ -1077,21 +1079,21 @@ get_regions_distance(region * root, int radius)
   region_list * rptr, * rlist = NULL;
   region_list ** rp = &rlist;
   add_regionlist(rp, root);
-  fset(root, FL_MARK);
+  fset(root, RF_MARK);
   while (*rp) {
     region_list * r = *rp;
     direction_t d;
     rp = &r->next;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r->data, d);
-      if (rn!=NULL && !fval(rn, FL_MARK) && distance(rn, root)<=radius) {
+      if (rn!=NULL && !fval(rn, RF_MARK) && distance(rn, root)<=radius) {
         add_regionlist(rp, rn);
-        fset(rn, FL_MARK);
+        fset(rn, RF_MARK);
       }
     }
   }
   for (rptr=rlist;rptr;rptr=rptr->next) {
-    freset(rptr->data, FL_MARK);
+    freset(rptr->data, RF_MARK);
   }
   return rlist;
 }

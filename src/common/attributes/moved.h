@@ -21,7 +21,7 @@ extern "C" {
 struct attrib;
 struct attrib_type;
 
-extern boolean get_moved(attrib ** alist);
+extern boolean get_moved(struct attrib ** alist);
 extern void set_moved(struct attrib ** alist);
 extern void init_moved(void);
 

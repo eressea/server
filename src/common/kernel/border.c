@@ -22,6 +22,7 @@
 #include "unit.h"
 
 #include <util/rng.h>
+#include <util/attrib.h>
 
 /* libc includes */
 #include <assert.h>

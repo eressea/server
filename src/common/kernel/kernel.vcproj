@@ -289,6 +289,9 @@
 				RelativePath=".\terrain.h">
 			</File>
 			<File
+				RelativePath=".\types.h">
+			</File>
+			<File
 				RelativePath=".\unit.h">
 			</File>
 		</Filter>

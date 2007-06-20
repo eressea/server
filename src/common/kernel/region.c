@@ -40,6 +40,8 @@
 #include "unit.h"
 
 /* util includes */
+#include <util/attrib.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 
@@ -200,13 +202,14 @@ a_agedirection(attrib *a)
 static int
 a_readdirection(attrib *a, FILE *f)
 {
+  char lbuf[16];
   spec_direction *d = (spec_direction *)(a->data.v);
   fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
-  fscanf(f, "%s ", buf);
-  d->desc = strdup(cstring(buf));
-  fscanf(f, "%s ", buf);
-  d->keyword = strdup(cstring(buf));
-        d->active = true;
+  fscanf(f, "%15s ", lbuf);
+  d->desc = strdup(cstring(lbuf));
+  fscanf(f, "%15s ", lbuf);
+  d->keyword = strdup(cstring(lbuf));
+  d->active = true;
   return AT_READ_OK;
 }
 
@@ -533,8 +536,6 @@ attrib_type at_travelunit = {
 };
 
 extern int laen_read(attrib * a, FILE * F);
-#define LAEN_READ laen_read
-#define LAEN_WRITE NULL
 
 /***************/
 /*   at_laen   */
@@ -544,8 +545,8 @@ attrib_type at_laen = {
   DEFAULT_INIT,
   DEFAULT_FINALIZE,
   DEFAULT_AGE,
-  LAEN_WRITE,
-  LAEN_READ,
+  NULL,
+  laen_read,
   ATF_UNIQUE
 };
 

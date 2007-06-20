@@ -35,6 +35,7 @@
 #include <triggers/timeout.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
@@ -76,8 +77,7 @@ enum {
   H_GLACIER_1,
   H_GLACIER_2,
   H_GLACIER_3,
-  MAX_HERBS,
-  NOHERB = (herb_t) - 1
+  MAX_HERBS
 };
 
 static int

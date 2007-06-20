@@ -47,6 +47,7 @@
 #include "terrain.h"
 #include "terrainid.h" /* only for conversion code */
 #include "unit.h"
+#include "version.h"
 
 /* attributes includes */
 #include <attributes/key.h>
@@ -57,6 +58,7 @@
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/sql.h>
 #include <util/rand.h>
@@ -87,7 +89,36 @@ static region * current_region;
 
 
 #ifdef RESOURCE_CONVERSION
-int laen_read(attrib * a, FILE * F)
+struct attrib_type at_resources = {
+  "resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
+};
+
+static void
+read_iron(struct region * r, int iron)
+{
+  attrib * a = a_find(r->attribs, &at_resources);
+  assert(iron>=0);
+  if (a==NULL) {
+    a = a_add(&r->attribs, a_new(&at_resources));
+    a->data.sa[1] = -1;
+  }
+  a->data.sa[0] = (short)iron;
+}
+
+static void
+read_laen(struct region * r, int laen)
+{
+  attrib * a = a_find(r->attribs, &at_resources);
+  assert(laen>=0);
+  if (a==NULL) {
+    a = a_add(&r->attribs, a_new(&at_resources));
+    a->data.sa[0] = -1;
+  }
+  a->data.sa[1] = (short)laen;
+}
+
+int
+laen_read(attrib * a, FILE * F)
 {
 	int laen;
 	fscanf(F, "%d", &laen);
@@ -760,36 +791,6 @@ read_items(FILE *F, item **ilist)
 	}
 }
 
-#ifdef RESOURCE_CONVERSION
-struct attrib_type at_resources = {
-	"resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
-};
-
-void
-read_iron(struct region * r, int iron)
-{
-	attrib * a = a_find(r->attribs, &at_resources);
-	assert(iron>=0);
-	if (a==NULL) {
-		a = a_add(&r->attribs, a_new(&at_resources));
-		a->data.sa[1] = -1;
-	}
-	a->data.sa[0] = (short)iron;
-}
-
-void
-read_laen(struct region * r, int laen)
-{
-	attrib * a = a_find(r->attribs, &at_resources);
-	assert(laen>=0);
-	if (a==NULL) {
-		a = a_add(&r->attribs, a_new(&at_resources));
-		a->data.sa[0] = -1;
-	}
-	a->data.sa[1] = (short)laen;
-}
-#endif
-
 static void
 read_alliances(FILE * F)
 {
@@ -939,7 +940,7 @@ lastturn(void)
 }
 
 void
-fwriteorder(FILE * F, const order * ord, const struct locale * lang)
+fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
 {
   write_order(ord, lang, buf, sizeof(buf));
   if (buf[0]) fwritestr(F, buf);

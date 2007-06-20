@@ -24,7 +24,7 @@ typedef enum {
   TUNIT = 10, TFACTION = 11, TREGION = 12, TBUILDING = 13, TSHIP = 14, 
 } object_type;
 
-extern attrib_type at_object;
+extern struct attrib_type at_object;
 
 extern struct attrib * object_create(const char * name, object_type type, variant value);
 extern void object_get(const struct attrib * a, object_type * type, variant * value);

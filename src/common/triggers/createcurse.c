@@ -17,13 +17,15 @@
 #include "createcurse.h"
 
 /* kernel includes */
+#include <version.h>
 #include <curse.h>
 #include <unit.h>
 
 /* util includes */
-#include <event.h>
-#include <resolve.h>
-#include <base36.h>
+#include <util/attrib.h>
+#include <util/event.h>
+#include <util/resolve.h>
+#include <util/base36.h>
 
 /* ansi includes */
 #include <stdio.h>

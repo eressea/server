@@ -31,6 +31,7 @@
 #include <kernel/skill.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/rand.h>
 #include <util/rng.h>

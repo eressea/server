@@ -16,15 +16,17 @@
 #include "unitcurse.h"
 
 /* kernel includes */
+#include <kernel/curse.h>
 #include <kernel/message.h>
 #include <kernel/race.h>
 #include <kernel/skill.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/objtypes.h>
-#include <kernel/curse.h>
+#include <kernel/version.h>
 
 /* util includes */
+#include <util/language.h>
 #include <util/nrmessage.h>
 #include <util/message.h>
 #include <util/base36.h>

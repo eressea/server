@@ -69,6 +69,8 @@ extern boolean is_exclusive(const order *ord);
 extern boolean is_repeated(const order * ord);
 
 extern char * write_order(const order * ord, const struct locale * lang, char * buffer, size_t size);
+
+
 #ifdef __cplusplus
 }
 #endif
