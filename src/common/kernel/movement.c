@@ -2283,7 +2283,7 @@ static int
 hunt(unit *u, order * ord)
 {
   region *rc = u->region;
-  int moves, id;
+  int moves, id, speed;
   char command[256];
   direction_t dir;
 
@@ -2326,8 +2326,15 @@ hunt(unit *u, order * ord)
     locale_string(u->faction->locale, directions[dir]));
   moves = 1;
 
+  speed = geti();
+  if (speed==0) {
+    speed = shipspeed(u->ship, u);
+  } else {
+    int maxspeed = shipspeed(u->ship, u);
+    if (maxspeed<speed) speed = maxspeed;
+  }
   rc = rconnect(rc, dir);
-  while (moves < shipspeed(u->ship, u) && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
+  while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
   {
     strcat(command, " ");
     strcat(command, locale_string(u->faction->locale, directions[dir]));
