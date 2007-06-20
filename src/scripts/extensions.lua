@@ -29,6 +29,19 @@ function hp_changeresource(u, delta)
   return hp
 end
 
+function horse_limit(r)
+  return r:get_resource("horse")
+end
+
+function horse_produce(r, n)
+  local horses = r:get_resource("horse")
+  if horses>=n then
+    r:set_resource("horse", horses-n)
+  else
+    r:set_resource("horse", 0)
+  end
+end
+
 function log_limit(r)
   if r:get_flag(1) then -- RF_MALLORN
     return 0

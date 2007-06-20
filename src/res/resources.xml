@@ -1,6 +1,120 @@
 <?xml version="1.0"?>
 <resources>
 
+  <resource name="aoh" appearance="amulet">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="aots" appearance="amulet">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="roi" appearance="">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="rop" appearance="">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="roqf" appearance="">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="trollbelt">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="presspass" cursed="yes">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="aurafocus">
+    <item weight="100" score="6000"/>
+  </resource>
+
+  <resource name="sphereofinv">
+    <item weight="100" score="6000"/>
+  </resource>
+
+  <resource name="magicbag">
+    <item big="yes" notlost="yes" weight="100" score="6000"/>
+  </resource>
+
+  <resource name="magicherbbag" appearance="">
+    <item weight="100" score="6000"/>
+  </resource>
+
+  <resource name="ao_chastity" appearance="amulet">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="fairyboot" appearance="amulet">
+    <item weight="0" score="6000"/>
+  </resource>
+
+  <resource name="aoc" appearance="amulet">
+    <item weight="100">
+      <function name="use" value="use_birthdayamulet"/>
+    </item>
+  </resource>
+
+  <resource name="dreameye">
+    <item weight="100">
+      <function name="use" value="use_tacticcrystal"/>
+    </item>
+  </resource>
+
+  <resource name="pegasus">
+    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000"/>
+  </resource>
+
+  <resource name="elvenhorse">
+    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000"/>
+  </resource>
+
+  <resource name="dolphin">
+    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000"/>
+  </resource>
+
+  <resource name="iron" limited="yes">
+    <item weight="500" score="10">
+      <construction skill="mining" minskill="1" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier building="mine" type="skill" value="1"/>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="laen" limited="yes">
+    <item weight="200" score="100">
+      <construction skill="mining" minskill="7" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="stone" limited="yes">
+    <item weight="6000" score="10" big="yes" animal="yes">
+      <construction skill="quarrying" minskill="1" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier building="quarry" type="skill" value="1"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="horse" limited="yes">
+    <item weight="5000" score="10" capacity="7000">
+      <construction skill="training" minskill="1" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <function name="produce" value="lua_produceresource"/>
+      <function name="limit" value="lua_limitresource"/>
+    </resourcelimit>
+  </resource>
+
   <resource name="seaserpenthead">
     <item weight="500" score="400"/>
   </resource>

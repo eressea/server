@@ -570,9 +570,9 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, stru
 #define LASTLUXURY      (I_INCENSE +1)
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
-item_type * olditemtype[MAXITEMS+1];
-resource_type * oldresourcetype[MAXRESOURCES+1];
-potion_type * oldpotiontype[MAXPOTIONS+1];
+const item_type * olditemtype[MAXITEMS+1];
+const resource_type * oldresourcetype[MAXRESOURCES+1];
+const potion_type * oldpotiontype[MAXPOTIONS+1];
 
 /*** alte items ***/
 
@@ -635,7 +635,7 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 }
 
 typedef struct t_item {
-  const char *name[4];
+  const char *name;
   /* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
   * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
   boolean is_resource;
@@ -647,100 +647,13 @@ typedef struct t_item {
   void (*benutze_funktion) (struct region *, struct unit *, int amount, struct order *);
 } t_item;
 
-static t_item itemdata[MAXITEMS] = {
-  /* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
-   * benutze_funktion; */
-  {     /* I_IRON */
-    {"Eisen", "Eisen", "Eisen", "Eisen"},
-    true, SK_MINING, 1, 500, 0, FL_ITEM_NOTLOST, NULL
-  },
-  {     /* I_STONE */
-    {"Stein", "Steine", "Stein", "Steine"},
-    true, SK_QUARRYING, 1, 6000, 0, FL_ITEM_NOTLOST, NULL
-  },
-  {     /* I_HORSE */
-    {"Pferd", "Pferde", "Pferd", "Pferde"},
-    true, SK_HORSE_TRAINING, 1, 5000, 0, FL_ITEM_MOUNT | FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
-  },
-  {     /* I_AMULET_OF_HEALING */
-    {"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_AMULET_OF_TRUE_SEEING 22 */
-    {"Amulett des wahren Sehens", "Amulette des wahren Sehens", "Amulett",
-    "Amulette"},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_RING_OF_INVISIBILITY 24 */
-    {"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_RING_OF_POWER 25 */
-    {"Ring der Macht", "Ringe der Macht", "", ""},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_CHASTITY_BELT 34 */
-    {"Amulett der Keuschheit", "Amulette der Keuschheit",
-      "Amulett", "Amulette"},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_LAEN 41 */
-    {"Laen", "Laen", "Laen", "Laen"},
-    true, SK_MINING, 7, 200, 0, 0, NULL
-  },
-  {     /* I_FEENSTIEFEL 60 */
-    {"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_BIRTHDAYAMULET 69 */
-    {"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"},
-    0, NOSKILL, 0, 100, 0, 0, &use_birthdayamulet
-  },
-  {     /* I_PEGASUS 60 */
-    {"Pegasus", "Pegasi", "Pegasus", "Pegasi" },
-    0, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-  },
-  {     /* I_UNICORN 61 */
-    {"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"},
-    0, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-  },
-  {     /* I_DOLPHIN 62 */
-    {"Delphin", "Delphine", "Delphin", "Delphine"},
-    0, NOSKILL, 0, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-  },
-  {     /* I_RING_OF_NIMBLEFINGER 64 */
-    {"Ring der flinken Finger", "Ringe der flinken Finger", "", ""},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_TROLLBELT 65 */
-    {"Gürtel der Trollstärke", "Gürtel der Trollstärke", "", ""},
-    0, NOSKILL, 0, 0, 0, 0, NULL
-  },
-  {     /* I_PRESSCARD 67 */
-    {"Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß",
-     "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"},
-    0, NOSKILL, 0, 0, 0, FL_ITEM_CURSED, NULL
-  },
-  {     /* I_AURAKULUM 69 */
-    {"Aurafocus", "Aurafocuse", "Amulett", "Amulette"},
-    0, NOSKILL, 0, 100, 0, 0, NULL
-  },
-  {     /* I_SPHERE_OF_INVISIBILITY */
-    {"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
-      0, NOSKILL, 0, 100, 0, 0, NULL
-  },
-  { /* I_BAG_OF_HOLDING */
-    {"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
-      0, NOSKILL, 0, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
-  },
-  { /* I_SACK_OF_CONSERVATION */
-    {"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""},
-      0, NOSKILL, 0, 100, 0, 0, NULL
-  },
-  {     /* I_TACTICCRYSTAL 71 */
-    {"Traumauge", "Traumaugen", "", ""},
-    0, NOSKILL, 0, 100, 0, 0, &use_tacticcrystal
-  },
+const char * itemnames[MAXITEMS] = {
+  "iron", "stone", "horse", "aoh",
+  "aots", "roi", "rop", "ao_chastity",
+  "laen", "fairyboot", "aoc", "pegasus",
+  "elvenhorse", "dolphin", "roqf", "trollbelt",
+  "presspass", "aurafocus", "sphereofinv", "magicbag",
+  "magicherbbag", "dreameye"
 };
 
 #include "movement.h"
@@ -778,19 +691,6 @@ produce_oldresource(region * r, const resource_type * rtype, int norders)
   } else {
     assert(!"unknown resource");
   }
-}
-
-static int
-use_olditem(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
-{
-  item_t it;
-  for (it=0;it!=MAXITEMS;++it) {
-    if (olditemtype[it]==itype) {
-      itemdata[it].benutze_funktion(user->region, user, amount, ord);
-      return 0;
-    }
-  }
-  return EUNUSABLE;
 }
 
 typedef const char* translate_t[5];
@@ -833,103 +733,41 @@ static translate_t translation[] = {
   { NULL, NULL, NULL, NULL, NULL }
 };
 
+static int
+item_score(item_t i)
+{
+  switch (i) {
+    case I_AMULET_OF_HEALING:
+    case I_AMULET_OF_TRUE_SEEING:
+    case I_RING_OF_INVISIBILITY:
+    case I_RING_OF_POWER:
+    case I_CHASTITY_BELT:
+    case I_TROLLBELT:
+    case I_RING_OF_NIMBLEFINGER:
+    case I_FEENSTIEFEL:
+      return 6000;
+  }
+  return 0;
+}
+
 static void
 init_olditems(void)
 {
   item_t i;
+#if 0
   resource_type * rtype;
-
   const struct locale * lang = find_locale("de");
   assert(lang);
+#endif
 
   for (i=0; i!=MAXITEMS; ++i) {
-    int iflags = ITF_NONE;
-    int rflags = RTF_ITEM|RTF_POOLED;
-    const char * name[2];
-    const char * appearance[2];
-    int weight = itemdata[i].gewicht;
-    int capacity = 0;
-    item_type * itype;
+    /* item is defined in XML file, but IT_XYZ enum still in use */
+    const item_type * itype = it_find(itemnames[i]);
 
-    if (itemdata[i].flags & FL_ITEM_CURSED) iflags |= ITF_CURSED;
-    if (itemdata[i].flags & FL_ITEM_NOTLOST) iflags |= ITF_NOTLOST;
-    if (itemdata[i].flags & FL_ITEM_NOTINBAG) iflags |= ITF_BIG;
-    if (itemdata[i].flags & FL_ITEM_ANIMAL) iflags |= ITF_ANIMAL;
-
-    name[0]=NULL;
-    {
-      int ci;
-      for (ci=0;translation[ci][0];++ci) {
-        if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
-          name[0] = translation[ci][1];
-          name[1] = translation[ci][2];
-          appearance[0] = translation[ci][3];
-          appearance[1] = translation[ci][4];
-        }
-      }
-    }
-    if (name[0]==NULL) {
-      name[0] = reverse_lookup(lang, itemdata[i].name[0]);
-      name[1] = reverse_lookup(lang, itemdata[i].name[1]);
-      appearance[0] = reverse_lookup(lang, itemdata[i].name[2]);
-      appearance[1] = reverse_lookup(lang, itemdata[i].name[3]);
-    }
-    rtype = new_resourcetype(name, appearance, rflags);
-    itype = new_itemtype(rtype, iflags, weight, capacity);
-
-    switch (i) {
-    case I_HORSE:
-    case I_UNICORN:
-      itype->capacity = HORSECAPACITY;
-      itype->give = give_horses;
-      break;
-    case I_BAG_OF_HOLDING:
-      itype->capacity = BAGCAPACITY;
-      break;
-    case I_TROLLBELT:
-      /* This is wrong. according to the item description it multiplies
-       * the strength of the wearer by a factor of
-       * 50 (STRENGTHMULTIPLIER), not add a fixed 50000 */
-      /* only used in battle.c for items of type ITF_ANIMAL */
-      itype->capacity = STRENGTHCAPACITY;
-      break;
-    default:
-      if (itemdata[i].flags & FL_ITEM_MOUNT) itype->capacity = HORSECAPACITY;
-    }
-
-    if (itemdata[i].is_resource) {
-      attrib * a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-      resource_limit * rdata = (resource_limit*)a->data.v;
-      rtype->flags |= RTF_LIMITED;
-      if (i==I_HORSE) {
-        rdata->limit = limit_oldresource;
-        rdata->produce = produce_oldresource;
-      }
-      if (i==I_LAEN || i==I_IRON) rdata->guard |= GUARD_MINING;
-    }
-    if (itemdata[i].benutze_funktion) {
-      itype->use = use_olditem;
-    }
+    assert(itype);
     olditemtype[i] = itype;
-    oldresourcetype[i] = rtype;
-  }
-
-  for (i=0; i!=MAXITEMS; ++i) {
-    if (itemdata[i].skill!=NOSKILL) {
-      construction * con = calloc(sizeof(construction), 1);
-      item_type * itype = olditemtype[i];
-
-      con->minskill = itemdata[i].minskill;
-      if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
-        /* at least 4 levels on which you can mine laen */
-        con->minskill = SkillCap(SK_QUARRYING)-3;
-      }
-      con->skill = itemdata[i].skill;
-      con->maxsize = -1;
-      con->reqsize = 1;
-      con->improvement = NULL;
-      itype->construction = con;
-    }
+    oldresourcetype[i] = itype->rtype;
+    continue;
   }
 }
 
@@ -1208,40 +1046,6 @@ static const char * names[] = {
   "unit", "unit_p"
 };
 
-static int
-item_score(item_t i)
-{
-  switch (i) {
-    case I_IRON:
-    case I_STONE:
-    case I_HORSE:
-      return 10;
-    case I_LAEN:
-      return 100;
-    case I_AMULET_OF_HEALING:
-    case I_AMULET_OF_TRUE_SEEING:
-    case I_RING_OF_INVISIBILITY:
-    case I_RING_OF_POWER:
-    case I_CHASTITY_BELT:
-    case I_TROLLBELT:
-    case I_RING_OF_NIMBLEFINGER:
-    case I_FEENSTIEFEL:
-      return 6000;
-  }
-  return 0;
-}
-
-static void
-init_oldscores(void)
-{
-  item_t i;
-
-  for (i = 0;olditemtype[i];i++) {
-    item_type * itype = olditemtype[i];
-    itype->score = item_score(i);
-  }
-}
-
 void
 init_resources(void)
 {
@@ -1273,7 +1077,6 @@ init_resources(void)
   /* alte typen registrieren: */
   init_olditems();
   init_oldpotions();
-  init_oldscores();
 }
 
 int
@@ -1444,10 +1247,9 @@ register_resources(void)
   register_function((pf_generic)res_changehp, "changehp");
   register_function((pf_generic)res_changeaura, "changeaura");
 
-  register_function((pf_generic)use_olditem, "useolditem");
   register_function((pf_generic)use_potion, "usepotion");
-  register_function((pf_generic)use_tacticcrystal, "usetacticcrystal");
-  register_function((pf_generic)use_birthdayamulet, "usebirthdayamulet");
+  register_function((pf_generic)use_tacticcrystal, "use_tacticcrystal");
+  register_function((pf_generic)use_birthdayamulet, "use_birthdayamulet");
   register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
   register_function((pf_generic)use_bloodpotion, "usebloodpotion");
   register_function((pf_generic)use_healingpotion, "usehealingpotion");

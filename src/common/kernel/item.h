@@ -315,9 +315,9 @@ enum {
   NORESOURCE = -1
 };
 
-extern struct potion_type * oldpotiontype[];
-extern struct item_type * olditemtype[];
-extern struct resource_type * oldresourcetype[];
+extern const struct potion_type * oldpotiontype[];
+extern const struct item_type * olditemtype[];
+extern const struct resource_type * oldresourcetype[];
 
 int get_item(const struct unit *, item_t);
 int set_item(struct unit *, item_t, int);

@@ -1428,11 +1428,6 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
           }
         }
       }
-    } else if (itype == olditemtype[I_IRON] && btype == bt_find("mine")) {
-      ++skill;
-    }
-    else if (itype == olditemtype[I_STONE] && btype == bt_find("quarry")) {
-      ++skill;
     }
   }
   amount = skill * u->number;
