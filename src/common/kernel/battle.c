@@ -111,8 +111,6 @@ static int obs_count = 0;
 static const double EFFECT_PANIC_SPELL = 0.25;
 static const double TROLL_REGENERATION = 0.10;
 
-extern weapon_type * oldweapontype[];
-
 /* Nach dem alten System: */
 static int missile_range[2] = {FIGHT_ROW, BEHIND_ROW};
 static int melee_range[2] = {FIGHT_ROW, FIGHT_ROW};

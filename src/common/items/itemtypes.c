@@ -33,7 +33,6 @@ register_itemtypes(void)
 void
 init_itemtypes(void)
 {
-	init_weapons();
   init_seed();
   init_mallornseed();
 }

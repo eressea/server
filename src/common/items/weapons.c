@@ -43,35 +43,6 @@ enum {
 #define BASH          (1<<2)
 #define ARMORPIERCING (1<<3)
 
-typedef struct weapondata {
-  double magres;
-  const char *damfoot;
-  const char *damhorse;
-  item_t item;
-  skill_t skill;
-  char attmod;
-  char defmod;
-  boolean rear;
-  boolean is_magic;
-  struct reload {
-    int type;
-    char time;
-  } reload;
-  char damage_type;
-} weapondata;
-
-static weapondata weapontable[WP_MAX + 1] =
-/* MagRes, Schaden/Fuß, Schaden/Pferd, Item, Skill, OffMod, DefMod,
- * missile, is_magic */
-{
-	/* Unbewaffnet */
-	{0.00, "1d5+0", "1d6+0", MAX_ITEMS, SK_MELEE, 0, 0, false, false, { 0, 0}, BASH },
-	/* Dummy */
-	{0.00, "0d0+0", "0d0+0", MAX_ITEMS, SK_MELEE, 0, 0, false, false, { 0, 0}, 0 }
-};
-
-weapon_type * oldweapontype[WP_MAX];
-
 static boolean
 attack_firesword(const troop * at, const struct weapon_type * wtype, int *casualties)
 {
@@ -177,56 +148,9 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 	if (casualties) *casualties = d;
 	return false; /* keine weitren attacken */
 }
-
-static void
-init_oldweapons(void)
-{
-	int w;
-	for (w=0;w!=WP_MAX && weapontable[w].item!=MAX_ITEMS;++w) {
-		const char * damage[2];
-		item_type * itype = olditemtype[weapontable[w].item];
-		int minskill = 1, wflags = WTF_NONE;
-    int m;
-		weapon_mod * modifiers = NULL;
-		boolean (*no_special_attack)(const troop *, const struct weapon_type *, int *) = NULL;
-
-		assert(itype!=NULL || !"item not initialized");
-
-		if (weapontable[w].rear) wflags |= WTF_MISSILE;
-		if (weapontable[w].is_magic) wflags |= WTF_MAGICAL;
-		if (weapontable[w].damage_type & CUT) wflags |= WTF_CUT;
-		if (weapontable[w].damage_type & PIERCE) wflags |= WTF_PIERCE;
-		if (weapontable[w].damage_type & BASH) wflags |= WTF_BLUNT;
-		if (weapontable[w].damage_type & ARMORPIERCING) wflags |= WTF_ARMORPIERCING;
-
-		damage[0] = weapontable[w].damfoot;
-		damage[1] = weapontable[w].damhorse;
-
-		oldweapontype[w] = new_weapontype(itype, wflags, weapontable[w].magres, damage, weapontable[w].attmod, weapontable[w].defmod, weapontable[w].reload.time, weapontable[w].skill, minskill);
-		oldweapontype[w]->modifiers = modifiers;
-		oldweapontype[w]->attack = no_special_attack;
-
-#ifdef SCORE_MODULE
-    if (itype->construction->materials==NULL) {
-      itype->score = 6000;
-    } else for (m=0;itype->construction->materials[m].number;++m) {
-      const resource_type * rtype = itype->construction->materials[m].rtype;
-      int score = rtype->itype?rtype->itype->score:5;
-      itype->score = 2*itype->construction->materials[m].number * score;
-    }
-#endif
-  }
-}
-
 void
 register_weapons(void)
 {
   register_function((pf_generic)attack_catapult, "attack_catapult");
   register_function((pf_generic)attack_firesword, "attack_firesword");
-}
-
-void
-init_weapons(void)
-{
-  init_oldweapons();
 }
