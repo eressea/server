@@ -687,95 +687,6 @@ init_olditems(void)
   }
 }
 
-static const char *potiontext[MAXPOTIONS] =
-{
-  /* Stufe 1: */
-  NULL,
-  NULL,
-  NULL,
-
-  /* Stufe 2: */
-  NULL,
-  NULL,
-  NULL,
-
-  /* Stufe 3: */
-  "Für das Gehirnschmalz verrühre man den Saft eines Wasserfinders mit "
-  "recht viel geriebenem Windbeutel und ein wenig Gurgelkraut. Dies lasse "
-  "man kurz aufwallen. Wenn die Flüssigkeit nur noch handwarm ist, gebe "
-  "man etwas Steinbeißer dazu. Das ganze muß "
-  "genau siebenmal rechtsherum und siebenmal linksherum mit einem großen "
-  "Löffel gerührt werden. Wenn keine Bewegung mehr zu erkennen ist, "
-  "fülle man den Saft ab. Der Saft gibt mit einer Chance von 1/3 bis zu "
-  "zehn Personen einen zusätzlichen Lernversuch.",
-
-  "Das Dumpfbackenbrot ist eine sehr gemeine Sache, macht es doch jeden "
-  "Lernerfolg zunichte oder läßt einen gar Dinge vergessen! Für zehn "
-  "Portionen verknete man einen geriebenen Fjordwuchs, einen zerstoßenes "
-  "Eulenauge und einen kleingeschnittenen Grünen Spinnerich zu "
-  "einem geschmeidigen Teig. Diesen backe man eine Stunde lang bei guter Hitze "
-   "und bestreiche das Ergebnis mit etwas Höhlenglimm. "
-  "Wer dieses Brot gegessen hat, kann eine Woche lang "
-  "nichts lernen, und so er nichts zu lernen versucht, wird er gar "
-  "eine Woche seiner besten Fähigkeit vergessen.",
-
-  "Nestwärme erlaubt es einem Insekt, im Winter außerhalb von Wüsten neue "
-  "Rekruten anzuwerben. "
-  "Zur Zubereitung nimmt der geübte Alchemist einen Kakteenschwitz, "
-  "vermischt ihn mit einer Portion Spaltwachs, die in einer sternklaren "
-  "Nacht gesammelt wurde, gibt zur Vertreibung des Winters einige "
-  "Blütenblätter der Eisblume in den Sud, und rührt alles mit einem grünen "
-  "Spinnerich bis es eine "
-  "violette Farbe annimmt. Ein Trank reicht eine Woche lang für eine "
-  "ganze Region. ",
-
-  "Für das Pferdeglück zerhacke man einen Kakteenschwitz, "
-  "einen blauen Baumringel und etwas knotigen Saugwurz und koche das "
-  "ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu "
-  "und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es "
-  "den Pferden zu trinken, auf daß sie sich doppelt so schnell vermehren.",
-
-  "Will man seine Krieger zu Höchstleistungen antreiben, sei das "
-  "Berserkerblut empfohlen. Um es herzustellen, braucht man einen "
-  "Weißen Wüterich, etwas Flachwurz, "
-  "Sandfäule und eine Alraune. Alle Zutaten müssen "
-  "möglichst klein geschnitten und anschließend zwei Stunden lang gekocht "
-  "werden. Den abgekühlten Brei gebe man in ein Tuch und presse ihn aus. "
-  "Der so gewonnene Saft reicht aus, um zehn Kämpfer besser angreifen zu "
-  "lassen.",
-
-  /* Stufe 4 */
-  "Das Bauernlieb betört Mann und Frau gleichwohl und läßt in ihnen "
-  "den Wunsch nach Kindern anwachsen. Für eine große Portion höhle "
-  "man eine Alraune aus, gebe kleingehackten Blasenmorchel, Elfenlieb "
-  "und Schneekristall dazu, streue ein wenig geriebenen Steinbeißer darüber und lasse dieses zwanzig "
-  "Stunden lang auf kleiner Flamme kochen. Bis zu 1000 Bauern vermag "
-  "der Trank das Glück von Zwillinge zu bescheren.",
-
-  /* Stufe 1, Trank der Wahrheit */
-  NULL,
-
-  "Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht "
-  "dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. "
-  "Der Trank erhöht die Lebensenergie von maximal zehn "
-  "Personen auf das fünffache. Die Wirkung ist direkt nach der Einnahme "
-  "am stärksten und klingt danach langsam ab. Zur Herstellung "
-  "benötigt der Alchemist ein Elfenlieb, einen Windbeutel, "
-  "ein Stück Wasserfinder und einen Grünen Spinnerich. "
-  "Über dieses Mischung streue er schließlich einen zerriebenen Blasenmorchel "
-  "und rühre dieses Pulver unter etwas Drachenblut.",
-
-  "Für einen Heiltrank nehme man die Schale eines Windbeutels "
-  "und etwas Gurgelkraut, rühre eine "
-  "kleingehacktes Elfenlieb dazu und bestreue alles mit den "
-  "Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am "
-  "zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig "
-  "den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern "
-  "(oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche "
-  "Wunden zu überleben. Der Trank wird von ihnen automatisch bei "
-  "Verletzung angewandt.",
-};
-
 static int
 heal(unit * user, int effect)
 {
@@ -935,9 +846,6 @@ init_oldpotions(void)
   for (p=0;p!=MAXPOTIONS;++p) {
     item_type * itype = it_find(potionnames[p]);
     if (itype!=NULL) {
-      if (potiontext[p]) {
-        locale_setstring(default_locale, mkname("potion", potionnames[p]), potiontext[p]);
-      }
       oldpotiontype[p] = itype->rtype->ptype;
     }
   }
