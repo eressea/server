@@ -24,6 +24,7 @@
 
 #include <util/attrib.h>
 #include <util/functions.h>
+#include <util/parser.h>
 #include <util/rand.h>
 
 #include <limits.h>

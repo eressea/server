@@ -41,6 +41,7 @@
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/umlaut.h>
+#include <util/parser.h>
 #include <util/rng.h>
 
 /* libc includes */

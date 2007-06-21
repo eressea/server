@@ -94,8 +94,6 @@ extern "C" {
  */
 
 #define ENCCHANCE           10	/* %-Chance für einmalige Zufallsbegegnung */
-#define SPACE_REPLACEMENT   '~'
-#define ESCAPE_CHAR         '\\'
 
 #define DISPLAYSIZE         8191	/* max. Länge einer Beschreibung, ohne trailing 0 */
 #define NAMESIZE            127	/* max. Länge eines Namens, ohne trailing 0 */
@@ -206,16 +204,8 @@ int geti(void);
 extern int findstr(const char **v, const char *s, unsigned char n);
 
 extern const char *igetstrtoken(const char *s);
-extern const char *getstrtoken(void);
 
-extern void init_tokens_str(const char * initstr); /* initialize token parsing */
 extern void init_tokens(const struct order * ord); /* initialize token parsing */
-extern void skip_token(void);
-extern const char * parse_token(const char ** str);
-extern void parser_pushstate(void);
-extern void parser_popstate(void);
-extern boolean parser_end(void);
-
 extern skill_t findskill(const char *s, const struct locale * lang);
 
 extern keyword_t findkeyword(const char *s, const struct locale * lang);

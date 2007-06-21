@@ -61,6 +61,7 @@
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/message.h>
+#include <util/parser.h>
 #include <util/rng.h>
 
 /* libs includes */

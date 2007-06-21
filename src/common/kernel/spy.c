@@ -44,6 +44,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/vset.h>

@@ -59,6 +59,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 #include <util/sql.h>
 #include <util/rand.h>
@@ -533,7 +534,7 @@ unitorders(FILE * F, struct faction * f)
 
       if (!getbuf(F)) break;
 
-      init_tokens_str(buf);
+      init_tokens_str(buf, NULL);
       s = getstrtoken();
 
       if (findkeyword(s, u->faction->locale) == NOKEYWORD) {

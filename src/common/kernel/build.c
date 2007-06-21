@@ -49,6 +49,7 @@
 #include <base36.h>
 #include <event.h>
 #include <goodies.h>
+#include <parser.h>
 #include <resolve.h>
 #include <xml.h>
 

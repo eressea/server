@@ -54,6 +54,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/lists.h>
+#include <util/parser.h>
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>

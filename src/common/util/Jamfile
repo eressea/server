@@ -25,6 +25,7 @@ SOURCES =
  log.c
  message.c
  nrmessage.c
+ parser.c
  rand.c
  resolve.c
  sql.c

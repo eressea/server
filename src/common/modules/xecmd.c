@@ -33,6 +33,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/parser.h>
 
 /* libc includes */
 #include <stdlib.h>

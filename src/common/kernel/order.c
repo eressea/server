@@ -18,6 +18,7 @@
 
 #include <util/bsdstring.h>
 #include <util/language.h>
+#include <util/parser.h>
 
 /* libc includes */
 #include <assert.h>

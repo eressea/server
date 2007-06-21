@@ -63,6 +63,7 @@ extern void ct_register(const struct curse_type * ct);
 #include <util/base36.h>
 #include <util/umlaut.h>
 #include <util/message.h>
+#include <util/parser.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/lists.h>
