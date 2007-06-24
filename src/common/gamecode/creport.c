@@ -1109,6 +1109,7 @@ report_computer(const char * filename, report_context * ctx)
   /* initialisations, header and lists */
 
   fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+  fputs("\"ISO-8859-1\";charset\n", F);
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
   fprintf(F, "%d;noskillpoints\n", 1);
   fprintf(F, "%ld;date\n", ctx->report_time);
