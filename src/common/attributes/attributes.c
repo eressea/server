@@ -31,7 +31,6 @@
 #include "racename.h"
 #include "raceprefix.h"
 #include "reduceproduction.h"
-#include "synonym.h"
 #include "targetregion.h"
 #include "variable.h"
 #ifdef AT_OPTION
@@ -72,7 +71,6 @@ init_attributes(void)
 	init_reduceproduction();
 	init_otherfaction();
 	init_racename();
-	init_synonym();
 	init_movement();
 
 	init_moved();

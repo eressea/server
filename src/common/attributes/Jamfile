@@ -28,7 +28,6 @@ SOURCES =
  racename.c
  raceprefix.c
  reduceproduction.c
- synonym.c
  targetregion.c
  viewrange.c
  variable.c

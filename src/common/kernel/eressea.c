@@ -385,7 +385,6 @@ const char *keywords[MAXKEYWORDS] =
   "GM",
   "INFO",
   "PRAEFIX",
-  "SYNONYM",
   "PFLANZEN",
   "WERWESEN",
   "XONTORMIA",

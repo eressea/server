@@ -50,11 +50,6 @@ typedef struct att {
 	int flags;
 } att;
 
-typedef struct race_syn {
-	race_t race;
-	const char *synonyms[4];
-} race_syn;
-
 typedef struct race {
 	const char *_name[4]; /* neu: name[4]völker */
 	float magres;
@@ -176,7 +171,6 @@ extern boolean r_insectstalled(const struct region *r);
 
 extern void add_raceprefix(const char *);
 extern char ** race_prefixes;
-extern const struct race_syn race_synonyms[];
 
 extern void write_race_reference(const struct race * rc, FILE * F);
 extern int read_race_reference(const struct race ** rp, FILE * F);

@@ -135,7 +135,6 @@ enum {
   K_GM,          /* perform GM commands */
   K_INFO,        /* set player-info */
   K_PREFIX,
-  K_SYNONYM,
   K_PLANT,
   K_WEREWOLF,
   K_XE,

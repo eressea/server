@@ -67,7 +67,6 @@
 /* attributes includes */
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
-#include <attributes/synonym.h>
 #include <attributes/variable.h>
 
 /* util includes */
@@ -1275,52 +1274,6 @@ prefix_cmd(unit * u, struct order * ord)
     if (a) ap = &g->attribs;
   }
   set_prefix(ap, race_prefixes[i]);
-
-  return 0;
-}
-
-static int
-synonym_cmd(unit * u, struct order * ord)
-{
-  int i;
-  const char *s;
-
-  attrib * a = a_find(u->faction->attribs, &at_synonym);
-  if (a!=NULL) {  /* Kann nur einmal gesetzt werden */
-    cmistake(u, ord, 302, MSG_EVENT);
-    return 0;
-  }
-
-  init_tokens(ord);
-  skip_token();
-  s = getstrtoken();
-
-  if (s==NULL) {
-    cmistake(u, ord, 301, MSG_EVENT);
-    return 0;
-  }
-
-  for (i=0; race_synonyms[i].race != -1; i++) {
-    if (new_race[race_synonyms[i].race] == u->faction->race
-      && strcasecmp(s, race_synonyms[i].synonyms[0]) == 0) {
-        break;
-      }
-  }
-
-  if (race_synonyms[i].race == -1) {
-    cmistake(u, ord, 300, MSG_EVENT);
-    return 0;
-  }
-
-  a = a_add(&u->faction->attribs, a_new(&at_synonym));
-  ((frace_synonyms *)(a->data.v))->synonyms[0] =
-    strdup(race_synonyms[i].synonyms[0]);
-  ((frace_synonyms *)(a->data.v))->synonyms[1] =
-    strdup(race_synonyms[i].synonyms[1]);
-  ((frace_synonyms *)(a->data.v))->synonyms[2] =
-    strdup(race_synonyms[i].synonyms[2]);
-  ((frace_synonyms *)(a->data.v))->synonyms[3] =
-    strdup(race_synonyms[i].synonyms[3]);
 
   return 0;
 }
@@ -3833,7 +3786,6 @@ processorders (void)
   add_proc_order(p, K_URSPRUNG, &origin_cmd, 0, NULL);
   add_proc_order(p, K_ALLY, &ally_cmd, 0, NULL);
   add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
-  add_proc_order(p, K_SYNONYM, &synonym_cmd, 0, NULL);
   add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
   add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
   add_proc_order(p, K_COMBAT, &combatspell_cmd, 0, NULL);

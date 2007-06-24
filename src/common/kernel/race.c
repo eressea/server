@@ -50,7 +50,6 @@
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
-#include <attributes/synonym.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -181,12 +180,6 @@ add_raceprefix(const char * prefix)
 /* Die Bezeichnungen dürfen wegen der Art des Speicherns keine
  * Leerzeichen enthalten! */
 
-const struct race_syn race_synonyms[] = {
-	{1, {"Fee", "Feen", "Feen", "Feen"}},
-	{2, {"Gnoll", "Gnolle", "Gnollen", "Gnoll"}},
-	{-1, {NULL, NULL, NULL, NULL}}
-};
-
 /*                      "den Zwergen", "Halblingsparteien" */
 
 void
@@ -295,22 +288,15 @@ const char *
 racename(const struct locale *loc, const unit *u, const race * rc)
 {
   const char * prefix = raceprefix(u);
-  attrib * asyn = a_find(u->faction->attribs, &at_synonym);
 
   if (prefix!=NULL) {
     static char lbuf[80];
     char * s = lbuf;
     strcpy(lbuf, locale_string(loc, mkname("prefix", prefix)));
     s += strlen(lbuf);
-    if (asyn!=NULL) {
-      strcpy(s, LOC(loc, ((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
-    } else {
-      strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
-    }
+    strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
     s[0] = (char)tolower(s[0]);
     return lbuf;
-  } else if (asyn!=NULL) {
-    return(LOC(loc, ((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
   }
   return LOC(loc, rc_name(rc, u->number != 1));
 }
