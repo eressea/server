@@ -336,9 +336,6 @@
 				RelativePath=".\roadsoverride.h">
 			</File>
 			<File
-				RelativePath=".\synonym.h">
-			</File>
-			<File
 				RelativePath=".\targetregion.h">
 			</File>
 			<File
@@ -410,9 +407,6 @@
 		</File>
 		<File
 			RelativePath=".\reduceproduction.c">
-		</File>
-		<File
-			RelativePath=".\synonym.c">
 		</File>
 		<File
 			RelativePath=".\targetregion.c">
