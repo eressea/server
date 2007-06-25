@@ -69,6 +69,7 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
+#include <kernel/names.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -219,6 +220,7 @@ game_init(void)
 
   debug_language("locales.log");
   register_races();
+  register_names();
   register_resources();
   register_buildings();
   register_ships();

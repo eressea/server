@@ -79,6 +79,7 @@ typedef struct race {
 	race_t oldfamiliars[MAXMAGIETYP];
 
 	const char *(*generate_name) (const struct unit *);
+	const char *(*describe) (const struct unit *, const struct locale *);
 	void (*age)(struct unit *u);
 	boolean (*move_allowed)(const struct region *, const struct region *);
 	struct item * (*itemdrop)(const struct race *, int size);

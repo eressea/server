@@ -22,7 +22,7 @@ init_tokens_str(const char * initstr, char * cmd)
   if (state==NULL) {
     state = malloc(sizeof(parser_state));
   }
-  if (state->current_cmd) free(state->current_cmd);
+  else if (state->current_cmd) free(state->current_cmd);
   state->current_cmd = cmd;
   state->current_token = (const unsigned char *)initstr;
 }

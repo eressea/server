@@ -40,6 +40,7 @@
 /* util includes */
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/functions.h>
 #include <util/rng.h>
 
 /* Untote */
@@ -111,6 +112,12 @@ static const char *untot_nach[UNTOT_NACH] =
 	" aus dem Totenreich",
 	" aus der Unterwelt"
 };
+
+static const char *
+describe_braineater(unit * u, const struct locale * lang)
+{
+  return LOC(lang, "describe_braineater");
+}
 
 const char *
 untoten_name(const unit * u)
@@ -707,3 +714,21 @@ abkz(const char *s, size_t max)
 
 	return buf;
 }
+
+void
+register_names(void)
+{
+  register_function((pf_generic)describe_braineater, "describe_braineater");
+  /* function name 
+   * generate a name for a nonplayerunit
+   * race->generate_name() */
+  register_function((pf_generic)untoten_name, "nameundead");
+  register_function((pf_generic)skeleton_name, "nameskeleton");
+  register_function((pf_generic)zombie_name, "namezombie");
+  register_function((pf_generic)ghoul_name, "nameghoul");
+  register_function((pf_generic)drachen_name, "namedragon");
+  register_function((pf_generic)dracoid_name, "namedracoid");
+  register_function((pf_generic)shadow_name, "nameshadow");
+}
+
+

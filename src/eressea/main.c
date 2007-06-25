@@ -158,6 +158,7 @@ game_init(void)
 
   debug_language("locales.log");
   register_races();
+  register_names();
   register_resources();
   register_buildings();
   register_ships();

@@ -235,7 +235,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 {
   int i, dh;
   int getarnt = fval(u, UFL_PARTEITARNUNG);
-  const char *pzTmp;
+  const char *pzTmp, *str;
   building * b;
   boolean isbattle = (boolean)(mode == see_battle);
   int telepath_see = 0;
@@ -630,18 +630,19 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   }
   i = 0;
 
-  if (u->display && u->display[0]) {
+  str = u_description(u, f->locale);
+  if (str) {
     rsize = strlcpy(bufp, "; ", size);
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
 
-    rsize = strlcpy(bufp, u->display, size);
+    rsize = strlcpy(bufp, str, size);
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
 
-    i = u->display[strlen(u->display) - 1];
+    i = str[strlen(str) - 1];
   }
   if (i != '!' && i != '?' && i != '.') {
     if (size>1) {

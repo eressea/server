@@ -976,7 +976,9 @@ readunit(FILE * F)
   }
   rds(F, &u->name);
   if (lomem) rds(F, 0);
-  else rds(F, &u->display);
+  else {
+    rds(F, &u->display);
+  }
 #ifndef NDEBUG
   if (strlen(u->name)>=NAMESIZE) u->name[NAMESIZE] = 0;
   if (u->display && strlen(u->display)>=DISPLAYSIZE) u->display[DISPLAYSIZE] = 0;
@@ -1008,6 +1010,15 @@ readunit(FILE * F)
     rs(F, buf);
     if (strlen(buf)) u->irace = rc_find(buf);
     else u->irace = u->race;
+  }
+  if (u->race->describe) {
+    const char * rcdisp = u->race->describe(u, u->faction->locale);
+    if (u->display && rcdisp) {
+      /* see if the data file contains old descriptions */
+      if (strcmp(rcdisp, u->display)==0) {
+        set_string(&u->display, NULL);
+      }
+    }
   }
   if (u->faction == NULL) {
     log_error(("unit %s has faction == NULL\n", unitname(u)));

@@ -347,6 +347,17 @@ attrib_type at_private = {
 };
 
 const char *
+u_description(const unit * u, const struct locale * lang)
+{
+  if (u->display && u->display[0]) {
+    return u->display;
+  } else if (u->race->describe) {
+    return u->race->describe(u, lang);
+  }
+  return NULL;
+}
+
+const char *
 uprivate(const unit * u) {
 	attrib * a = a_find(u->attribs, &at_private);
 	if (!a) return NULL;

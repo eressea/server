@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+extern void register_names(void);
 const char *untoten_name(const struct unit * u);
 const char *skeleton_name(const struct unit * u);
 const char *zombie_name(const struct unit * u);

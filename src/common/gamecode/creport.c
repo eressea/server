@@ -604,6 +604,7 @@ cr_output_unit(FILE * F, const region * r,
 {
   /* Race attributes are always plural and item attributes always
    * singular */
+  const char * str;
   const item_type * lasttype;
   int pr;
   item *itm, *show;
@@ -632,9 +633,10 @@ cr_output_unit(FILE * F, const region * r,
 
   fprintf(F, "EINHEIT %d\n", u->no);
   fprintf(F, "\"%s\";Name\n", u->name);
-  if (u->display && strlen(u->display))
-    fprintf(F, "\"%s\";Beschr\n", u->display);
-
+  str = u_description(u, f->locale);
+  if (str) {
+    fprintf(F, "\"%s\";Beschr\n", str);
+  }
   {
     /* print faction information */
     const faction * sf = visible_faction(f, u);

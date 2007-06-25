@@ -154,7 +154,6 @@ spawn_braineaters(float chance)
       unit *u = createunit(r, f0, 1+rng_int()%10+rng_int()%10, new_race[RC_HIRNTOETER]);
 
       set_string(&u->name, "Hirntöter");
-      set_string(&u->display, "Wabernde grüne Schwaden treiben durch den Nebel und verdichten sich zu einer unheimlichen Kreatur, die nur aus einem langen Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.");
       set_level(u, SK_STEALTH, 1);
       set_level(u, SK_OBSERVATION, 1);
       next = rng_int() % (int)(chance*100);

@@ -171,7 +171,7 @@ extern const struct unit * u_peasants(void);
 extern const struct unit * u_unknown(void);
 
 extern struct unit * udestroy;
-
+extern const char * u_description(const unit * u, const struct locale * lang);
 extern struct skill * add_skill(struct unit * u, skill_t id);
 extern void remove_skill(struct unit *u, skill_t sk);
 extern struct skill * get_skill(const struct unit * u, skill_t id);

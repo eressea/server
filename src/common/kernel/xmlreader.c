@@ -1532,6 +1532,8 @@ parse_races(xmlDocPtr doc)
         assert(property!=NULL);
         if (strcmp((const char*)property, "name")==0) {
           rc->generate_name = (const char* (*)(const struct unit*))fun;
+        } else if (strcmp((const char*)property, "describe")==0) {
+          rc->describe = (const char* (*)(const struct unit*, const struct locale *))fun;
         } else if (strcmp((const char*)property, "age")==0) {
           rc->age = (void(*)(struct unit*))fun;
         } else if (strcmp((const char*)property, "move")==0) {

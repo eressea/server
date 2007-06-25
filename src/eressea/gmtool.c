@@ -41,6 +41,7 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/names.h>
 #include <kernel/teleport.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -213,6 +214,7 @@ game_init(void)
   init_xmas();
 
   register_races();
+  register_names();
   register_resources();
   register_buildings();
   register_ships();

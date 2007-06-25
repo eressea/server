@@ -410,17 +410,6 @@ register_races(void)
 	register_function((pf_generic)allowed_fly, "moveflying");
 	register_function((pf_generic)allowed_dragon, "movedragon");
 
-	/* function name 
-	 * generate a name for a nonplayerunit
-	 * race->generate_name() */
-	register_function((pf_generic)untoten_name, "nameundead");
-	register_function((pf_generic)skeleton_name, "nameskeleton");
-	register_function((pf_generic)zombie_name, "namezombie");
-	register_function((pf_generic)ghoul_name, "nameghoul");
-	register_function((pf_generic)drachen_name, "namedragon");
-	register_function((pf_generic)dracoid_name, "namedracoid");
-	register_function((pf_generic)shadow_name, "nameshadow");
-
 	/* function age 
 	 * race->age() */
 	register_function((pf_generic)age_undead, "ageundead");
