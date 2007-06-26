@@ -15,6 +15,7 @@ SOURCES =
  building.c
  calendar.c
  curse.c
+ command.c
  eressea.c
  equipment.c
  faction.c

@@ -25,7 +25,7 @@
 #include "log.h"
 #include "unicode.h"
 
-#include <ctype.h>
+#include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -54,7 +54,7 @@ addtoken(tnode * root, const xmlChar * str, variant id)
     { 230, "AE"},
     { 248, "OE"},
     { 229, "AA"},
-    { 0, 0 }
+    { 0, "" }
   };
 
   if (!*str) {

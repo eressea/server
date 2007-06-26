@@ -18,7 +18,6 @@ extern "C" {
 #endif
 
 struct locale;
-typedef unsigned char xmlChar;
 
 /** managing multiple locales: **/
 extern struct locale * find_locale(const char * name);

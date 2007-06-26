@@ -68,11 +68,13 @@ plane * arena = NULL;
 /* local vars */
 #define CENTRAL_VOLCANO 1
 
+#ifdef ARENA_CREATION
 static unsigned int arena_id = 0;
 static region * arena_center = NULL;
+static int newarena = 0;
+#endif
 static region * tower_region[6];
 static region * start_region[6];
-static int newarena = 0;
 
 static region *
 arena_region(int magic)
@@ -434,6 +436,7 @@ struct trigger_type tt_caldera = {
 	caldera_read
 };
 
+#ifdef ARENA_CREATION
 static trigger *
 trigger_caldera(building * b)
 {
@@ -441,6 +444,7 @@ trigger_caldera(building * b)
 	t->data.v = b;
 	return t;
 }
+#endif
 
 #ifdef ARENA_CREATION
 static void

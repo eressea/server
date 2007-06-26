@@ -12,7 +12,6 @@ SOURCES =
  attrib.c
  base36.c
  bsdstring.c
- command.c
  crmessage.c
  cvector.c
  dice.c

@@ -4,7 +4,7 @@
 #include "log.h"
 
 #include <assert.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <memory.h>
 
 #define SPACE_REPLACEMENT '~'
@@ -30,7 +30,7 @@ eatwhitespace_c(const xmlChar ** str)
   for (;;) {
     xmlChar utf8_character = (*str)[0];
     if (utf8_character <= 0x7F) {
-      if (!isspace(utf8_character)) break;
+      if (!iswspace(utf8_character)) break;
       ++*str;
     } else {
       ret = unicode_utf8_to_ucs4(&ucs, *str, &len);
