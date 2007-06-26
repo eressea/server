@@ -66,16 +66,15 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
   if (error) {
     cmistake(u, ord, error, MSG_COMMERCE);
   }
-  else if (!u2 || u2->faction!=u->faction) {
-    assert(rtype);
+  else if (u2==NULL) {
     ADDMSG(&u->faction->msgs,
-      msg_message("give", "unit target resource amount",
-      u, u2?ucansee(u->faction, u2, u_unknown()):u_peasants(), rtype, n));
-    if (u2) {
-      ADDMSG(&u2->faction->msgs,
-        msg_message("give", "unit target resource amount",
-        ucansee(u2->faction, u, u_unknown()), u2, rtype, n));
-    }
+      msg_message("give_peasants", "unit resource amount",
+      u, rtype, n));
+  } else if (u2->faction!=u->faction) {
+    message * msg = msg_message("give", "unit target resource amount", u, u2, rtype, n);
+    add_message(&u->faction->msgs, msg);
+    add_message(&u2->faction->msgs, msg);
+    msg_release(msg);
   }
 }
 
@@ -300,14 +299,14 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
   }
   if (error>0) {
     cmistake(u, ord, error, MSG_COMMERCE);
-  }
-  else if (!u2 || u2->faction!=u->faction) {
-    ADDMSG(&u->faction->msgs, msg_message("give_person", "unit target amount",
-      u, u2?ucansee(u->faction, u2, u_unknown()):u_peasants(), n));
-    if (u2) {
-      ADDMSG(&u2->faction->msgs, msg_message("give_person", "unit target amount",
-        ucansee(u2->faction, u, u_unknown()), u2, n));
-    }
+  } else if (!u2) {
+    ADDMSG(&u->faction->msgs,
+      msg_message("give_person_peasants", "unit amount", u, n));
+  } else if (u2->faction!=u->faction) {
+    message * msg = msg_message("give_person", "unit target amount", u, u2, n);
+    add_message(&u->faction->msgs, msg);
+    add_message(&u2->faction->msgs, msg);
+    msg_release(msg);
   }
 }
 

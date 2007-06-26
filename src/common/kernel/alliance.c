@@ -24,12 +24,13 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
+#include <kernel/command.h>
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/command.h>
 #include <util/lists.h>
+#include <util/parser.h>
 #include <util/umlaut.h>
 
 /* libc includes */
@@ -88,10 +89,10 @@ add_kick(attrib * a, const faction * f)
 }
 
 static void
-alliance_kick(const tnode * tnext, const char * str, void * data, struct order * ord)
+alliance_kick(const tnode * tnext, void * data, struct order * ord)
 {
 	unit * u = (unit*)data;
-	faction * f = findfaction(atoi36(igetstrtoken(str)));
+	faction * f = findfaction(getid());
 	attrib * a;
 	unused(tnext);
 
@@ -105,10 +106,10 @@ alliance_kick(const tnode * tnext, const char * str, void * data, struct order *
 }
 
 static void
-alliance_join(const tnode * tnext, const char * str, void * data, struct order * ord)
+alliance_join(const tnode * tnext, void * data, struct order * ord)
 {
 	unit * u = (unit*)data;
-	alliance * al = findalliance(atoi36(igetstrtoken(str)));
+	alliance * al = findalliance(getid());
 	unused(tnext);
 
 	if (u->faction->alliance!=NULL || al==NULL) {
@@ -236,7 +237,7 @@ alliancename(const alliance * al)
   char *ibuf = idbuf[(++nextbuf) % 8];
 
   if (al && al->name) {
-    snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(al->name, NAMESIZE), itoa36(al->id));
+    snprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
     ibuf[sizeof(name)-1] = 0;
   } else {
     return NULL;

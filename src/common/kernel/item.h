@@ -73,7 +73,7 @@ typedef struct resource_type {
 } resource_type;
 extern resource_type * resourcetypes;
 extern const char* resourcename(const resource_type * rtype, int flags);
-extern const resource_type * findresourcetype(const char * name, const struct locale * lang);
+extern const resource_type * findresourcetype(const xmlChar * name, const struct locale * lang);
 
 /* resource-limits for regions */
 #define RMF_SKILL         0x01 /* int, bonus on resource production skill */
@@ -135,7 +135,7 @@ typedef struct item_type {
   struct item_type * next;
 } item_type;
 
-extern const item_type * finditemtype(const char * name, const struct locale * lang);
+extern const item_type * finditemtype(const xmlChar * name, const struct locale * lang);
 extern void init_itemnames(void);
 
 typedef struct luxury_type {

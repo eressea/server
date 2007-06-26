@@ -187,6 +187,7 @@ warden_add_give(unit *src, unit *u, const item_type *itype, int n)
 void
 create_museum(void)
 {
+#if 0 /* TODO: move this to LUA. It should be possible. */
 	unsigned int museum_id = hashstring("museum");
 	plane *museum = getplanebyid(museum_id);
 	region *r;
@@ -201,7 +202,7 @@ create_museum(void)
 			9500, 9550, PFL_MUSEUM);
 	}
 
-	if(findregion(9525, 9525) == NULL) {
+	if (findregion(9525, 9525) == NULL) {
 		/* Eingangshalle */
 		r = new_region(9525, 9525);
 		terraform_region(r, terrain_hall);
@@ -280,6 +281,7 @@ create_museum(void)
 		rsetpeasants(r, 0);
 		set_string(&r->display, "Die Südliche Promenade führt den Besucher in den kulturgeschichtlichen Teil des Museums.");
 	}
+#endif
 }
 
 static int
@@ -308,7 +310,7 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, order *
 	unit_cookie = a->data.i;
 	a_remove(&u->attribs, a);
 
-	if(a) {
+	if (a) {
 		for(a = a_find(warden->attribs, &at_museumgiveback); a && a->type==&at_museumgiveback; a = a->next) {
 			if(((museumgiveback *)(a->data.v))->cookie == unit_cookie) break;
 		}
@@ -316,10 +318,10 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, order *
 			museumgiveback *gb = (museumgiveback *)(a->data.v);
 			item *it;
 
-			for(it = gb->items; it; it = it->next) {
+			for (it = gb->items; it; it = it->next) {
 				i_change(&u->items, it->type, it->number);
 			}
-      ADDMSG(&u->faction->msgs, msg_message("unitmessage", "region unit sender string", r, u, warden, buf));
+      ADDMSG(&u->faction->msgs, msg_message("museumgiveback", "region unit sender items", r, u, warden, gb->items));
 			a_remove(&warden->attribs, a);
 		}
 	}

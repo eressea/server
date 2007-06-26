@@ -70,6 +70,7 @@ score(void)
   region *r;
   faction *f;
   int allscores = 0;
+  char path[MAX_PATH];
 
   for (f = factions; f; f = f->next) f->score = 0;
 
@@ -164,8 +165,8 @@ score(void)
     allscores = 1;
   }
 
-  sprintf(buf, "%s/score", basepath());
-  scoreFP = fopen(buf, "w");
+  sprintf(path, "%s/score", basepath());
+  scoreFP = fopen(path, "w");
   for (f = factions; f; f = f->next) if (f->num_total != 0) {
     fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
       f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
@@ -179,8 +180,8 @@ score(void)
     alliance *a;
     const item_type * token = it_find("conquesttoken");
 
-    sprintf(buf, "%s/score.alliances", basepath());
-    scoreFP = fopen(buf, "w");
+    sprintf(path, "%s/score.alliances", basepath());
+    scoreFP = fopen(path, "w");
     fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
     for (a = alliances; a; a = a->next) {

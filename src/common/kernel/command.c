@@ -11,11 +11,15 @@
  
  */
 #include <config.h>
+#include "eressea.h"
 #include "command.h"
 
-#include "umlaut.h"
-#include "language.h"
-#include "log.h"
+#include <kernel/order.h>
+
+#include <util/umlaut.h>
+#include <util/language.h>
+#include <util/log.h>
+#include <util/parser.h>
 
 /* libc includes */
 #include <assert.h>
@@ -55,7 +59,7 @@ stree_create(void)
 
 void
 add_command(struct tnode * keys, struct tnode * tnext, 
-				const char * str, parser fun)
+				const xmlChar * str, parser fun)
 {
 	command * cmd = (command *)malloc(sizeof(command));
   variant var;
@@ -67,43 +71,33 @@ add_command(struct tnode * keys, struct tnode * tnext,
 }
 
 static int
-do_command_i(const struct tnode * keys, void * u, const char * str, struct order * ord)
+do_command_i(const struct tnode * keys, void * u, struct order * ord)
 {
-  size_t i;
-  char zText[16];
-  const char * c;
+  const xmlChar * c;
   variant var;
 
-  while (isspace(*str)) ++str;
-  c = str;
-  while (isalnum(*c)) ++c;
-  i = min(16, c-str);
-  strncpy(zText, str, i);
-  zText[i]=0;
-  if (findtoken(keys, zText, &var)==E_TOK_SUCCESS) {
+  c = getstrtoken();
+  if (findtoken(keys, c, &var)==E_TOK_SUCCESS) {
     command * cmd = (command *)var.v;
     if (cmd->nodes && *c) {
       assert(!cmd->fun);
-      return do_command_i(cmd->nodes, u, ++c, ord);
+      return do_command_i(cmd->nodes, u, ord);
     } else if (cmd->fun) {
-      cmd->fun(cmd->nodes, ++c, u, ord);
+      cmd->fun(cmd->nodes, u, ord);
       return E_TOK_SUCCESS;
     }
   }
   return E_TOK_NOMATCH;
 }
 
-struct unit;
-struct order;
-extern char * getcommand(struct order * ord);
-extern char * unitname(struct unit * u);
-
 void
 do_command(const struct tnode * keys, void * u, struct order * ord)
 {
-  char * cmd = getcommand(ord);
-  if (do_command_i(keys, u, cmd, ord)!=E_TOK_SUCCESS) {
+  init_tokens(ord);
+  skip_token();
+  if (do_command_i(keys, u, ord)!=E_TOK_SUCCESS) {
+    xmlChar * cmd = getcommand(ord);
     log_warning(("%s failed GM command '%s'\n", unitname(u), cmd));
+    free(cmd);
   }
-  free(cmd);
 }

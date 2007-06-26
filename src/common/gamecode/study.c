@@ -48,6 +48,7 @@
 #include <util/base36.h>
 #include <util/parser.h>
 #include <util/rand.h>
+#include <util/umlaut.h>
 
 /* libc includes */
 #include <assert.h>
@@ -65,16 +66,17 @@ getskill(const struct locale * lang)
 	return findskill(getstrtoken(), lang);
 }
 
-static magic_t
-findmagicskill(const char *s)
-{
-	return (char) findstr(magietypen, s, MAXMAGIETYP);
-}
-
 magic_t
-getmagicskill(void)
+getmagicskill(const struct locale * lang)
 {
-	return findmagicskill(getstrtoken());
+  struct tnode * tokens = get_translations(lang, UT_MAGIC);
+  variant token;
+  const xmlChar * s = getstrtoken();
+
+  if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
+    return (magic_t)token.i;
+  }
+  return M_NONE;
 }
 
 /* ------------------------------------------------------------- */
@@ -346,13 +348,13 @@ teach_cmd(unit * u, struct order * ord)
   else
 #endif
   {
-    static char zOrder[BUFSIZE];
+    static xmlChar zOrder[BUFSIZE];
     order * new_order;
 
     init_tokens(ord);
     skip_token();
 
-    strcpy(zOrder, locale_string(u->faction->locale, keywords[K_TEACH]));
+    strcpy((char*)zOrder, (const char *)locale_string(u->faction->locale, keywords[K_TEACH]));
 
     while (!parser_end()) {
       unit * u2 = getunit(r, u->faction);
@@ -361,7 +363,9 @@ teach_cmd(unit * u, struct order * ord)
       /* Falls die Unit nicht gefunden wird, Fehler melden */
 
       if (!u2) {
-        const char * token;
+        xmlChar tbuf[20];
+        const xmlChar * uid;
+        const xmlChar * token;
         /* Finde den string, der den Fehler verursacht hat */
         parser_pushstate();
         init_tokens(ord);
@@ -377,16 +381,16 @@ teach_cmd(unit * u, struct order * ord)
         /* Beginne die Fehlermeldung */
         strcpy(buf, "Die Einheit '");
 
-        if (findparam(token, u->faction->locale) == P_TEMP) {
-          /* Für: "Die Einheit 'TEMP ZET' wurde nicht gefunden" oder "Die Einheit
-          * 'TEMP' wurde nicht gefunden" */
-          scat(token);
+        if (findparam(token, u->faction->locale) != P_TEMP) {
+          uid = token;
+        } else {
           token = getstrtoken();
-          if (*token) scat(" ");
+          sprintf((char*)tbuf, "%s %s", LOC(u->faction->locale,
+            parameters[P_TEMP]), token);
+          uid = tbuf;
         }
-        scat(token);
-        scat("' wurde nicht gefunden");
-        mistake(u, ord, buf, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unitnotfound_id",
+          "id", uid));
 
         parser_popstate();
         continue;
@@ -394,8 +398,8 @@ teach_cmd(unit * u, struct order * ord)
 
       /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
        * ihre neuen Nummern übersetzt. */
-      strcat(zOrder, " ");
-      strcat(zOrder, unitid(u2));
+      strcat((char*)zOrder, " ");
+      strcat((char*)zOrder, unitid(u2));
 
       if (get_keyword(u2->thisorder) != K_STUDY) {
         ADDMSG(&u->faction->msgs,
@@ -558,7 +562,7 @@ learn_cmd(unit * u, order * ord)
         mistake(u, ord, buf, MSG_EVENT);
         return 0;
       }
-      mtyp = getmagicskill();
+      mtyp = getmagicskill(u->faction->locale);
       if (mtyp == M_NONE || mtyp == M_GRAU) {
         /* wurde kein Magiegebiet angegeben, wird davon
         * ausgegangen, daß das normal gelernt werden soll */
@@ -588,7 +592,7 @@ learn_cmd(unit * u, order * ord)
       /* ist schon ein Magier und kein Vertrauter */
       if(u->faction->magiegebiet == 0){
         /* die Partei hat noch kein Magiegebiet gewählt. */
-        mtyp = getmagicskill();
+        mtyp = getmagicskill(u->faction->locale);
         if (mtyp == M_NONE){
           cmistake(u, ord, 178, MSG_MAGIC);
           return 0;

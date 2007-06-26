@@ -81,11 +81,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmtool", "eressea\gmtool.vc
 		{4C837BEC-A428-4287-84B3-8F8F9DE7FA00} = {4C837BEC-A428-4287-84B3-8F8F9DE7FA00}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{9569C30D-742F-4F95-9C5D-BBF2B69C0727}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1D80D05F-BCF5-4971-8F06-D9581FD3B1F4} = {1D80D05F-BCF5-4971-8F06-D9581FD3B1F4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
 		Profile = Profile
 		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{330712B5-8B27-4B17-B3CF-7A02CC0F93C3}.Debug.ActiveCfg = Debug|Win32
@@ -160,6 +167,12 @@ Global
 		{57BA2AEE-5C65-4839-9294-C0FA2915A06C}.Profile.Build.0 = Profile|Win32
 		{57BA2AEE-5C65-4839-9294-C0FA2915A06C}.Release.ActiveCfg = Release|Win32
 		{57BA2AEE-5C65-4839-9294-C0FA2915A06C}.Release.Build.0 = Release|Win32
+		{9569C30D-742F-4F95-9C5D-BBF2B69C0727}.Debug.ActiveCfg = Debug|Win32
+		{9569C30D-742F-4F95-9C5D-BBF2B69C0727}.Debug.Build.0 = Debug|Win32
+		{9569C30D-742F-4F95-9C5D-BBF2B69C0727}.Profile.ActiveCfg = Release|Win32
+		{9569C30D-742F-4F95-9C5D-BBF2B69C0727}.Profile.Build.0 = Release|Win32
+		{9569C30D-742F-4F95-9C5D-BBF2B69C0727}.Release.ActiveCfg = Release|Win32
+		{9569C30D-742F-4F95-9C5D-BBF2B69C0727}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

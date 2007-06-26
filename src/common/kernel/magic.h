@@ -60,6 +60,7 @@ typedef struct spllprm{
 		struct building *b;
 		struct ship *sh;
 		char *s;
+    xmlChar * xs;
 		int i;
 	} data;
 } spllprm;
@@ -269,9 +270,6 @@ boolean is_familiar(const struct unit *u);
 	/*	gibt true, wenn eine Familiar-Relation besteht.  */
 
 /* Sprüche */
-spell *get_spellfromtoken(struct unit *u, const char *s, const struct locale * lang);
-	/*	versucht einen Spruch über den Namen zu identifizieren, gibt
-	 *	ansonsten NULL zurück */
 int get_combatspelllevel(const struct unit *u, int nr);
 	/*  versucht, eine eingestellte maximale Kampfzauberstufe
 	 *  zurückzugeben. 0 = Maximum, -1 u ist kein Magier. */
@@ -373,8 +371,8 @@ extern boolean create_newfamiliar(struct unit * mage, struct unit * familiar);
 extern void create_newclone(struct unit * mage, struct unit * familiar);
 extern struct unit * has_clone(struct unit * mage);
 
-extern const char * spell_info(const struct spell * sp, const struct locale * lang);
-extern const char * spell_name(const struct spell * sp, const struct locale * lang);
+extern const xmlChar * spell_info(const struct spell * sp, const struct locale * lang);
+extern const xmlChar * spell_name(const struct spell * sp, const struct locale * lang);
 
 extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
 

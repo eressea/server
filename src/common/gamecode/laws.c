@@ -81,6 +81,7 @@
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/sql.h>
+#include <util/umlaut.h>
 #include <util/message.h>
 #include <util/rng.h>
 
@@ -913,7 +914,7 @@ restart_cmd(unit * u, struct order * ord)
   if (!fval(u->region->terrain, LAND_REGION)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
   } else {
-    const char * s_race = getstrtoken(), * s_pass;
+    const xmlChar * s_race = getstrtoken(), * s_pass;
     const race * frace = findrace(s_race, u->faction->locale);
 
     if (!frace) {
@@ -965,7 +966,7 @@ static int
 quit_cmd(unit * u, struct order * ord)
 {
   faction * f = u->faction;
-  const char * passwd;
+  const xmlChar * passwd;
 
   init_tokens(ord);
   skip_token(); /* skip keyword */
@@ -973,8 +974,7 @@ quit_cmd(unit * u, struct order * ord)
   passwd = getstrtoken();
   if (checkpasswd(f, passwd, false)) {
     if (EnhancedQuit()) {
-      const char * token = getstrtoken();
-      int f2_id = atoi36(token);
+      int f2_id = getid();
       if (f2_id>0) {
         faction *f2 = findfaction(f2_id);
 
@@ -988,6 +988,7 @@ quit_cmd(unit * u, struct order * ord)
           cmistake(u, ord, 316, MSG_EVENT);
           return 0;
         } else {
+          const char * token = itoa36(f2_id);
           set_variable(&f->attribs, "quit", token);
         }
       }
@@ -1062,8 +1063,7 @@ parse_restart(void)
       continue;
     }
     if (fval(f, FFL_OVERRIDE)) {
-      free(f->override);
-      f->override = strdup(itoa36(rng_int()));
+      set_string(&f->override, (xmlChar*)strdup(itoa36(rng_int())));
       freset(f, FFL_OVERRIDE);
     }
     if (turn!=f->lastorders) {
@@ -1124,7 +1124,7 @@ ally_cmd(unit * u, struct order * ord)
   ally * sf, ** sfp;
   faction *f;
   int keyword, not_kw;
-  const char *s;
+  const xmlChar *s;
 
   init_tokens(ord);
   skip_token();
@@ -1230,12 +1230,61 @@ ally_cmd(unit * u, struct order * ord)
   return 0;
 }
 
+static struct local_names * pnames;
+
+static void
+init_prefixnames(void)
+{
+  int i;
+  for (i=0;localenames[i];++i) {
+    const struct locale * lang = find_locale(localenames[i]);
+    boolean exist = false;
+    struct local_names * in = pnames;
+
+    while (in!=NULL) {
+      if (in->lang==lang) {
+        exist = true;
+        break;
+      }
+      in = in->next;
+    }
+    if (in==NULL) in = calloc(sizeof(local_names), 1);
+    in->next = pnames;
+    in->lang = lang;
+
+    if (!exist) {
+      int key;
+      for (key=0;race_prefixes[key];++key) {
+        variant var;
+        const xmlChar * pname = locale_string(lang, race_prefixes[key]);
+        if (findtoken(&in->names, pname, &var)==E_TOK_NOMATCH || var.i!=key) {
+          var.i = key;
+          addtoken(&in->names, pname, var);
+          addtoken(&in->names, locale_string(lang, race_prefixes[key]), var);
+        }
+      }
+    }
+    pnames = in;
+  }
+}
+
 static int
 prefix_cmd(unit * u, struct order * ord)
 {
   attrib **ap;
-  int i;
-  const char *s;
+  const xmlChar *s;
+  local_names * in = pnames;
+  variant var;
+  const struct locale * lang = u->faction->locale;
+
+  while (in!=NULL) {
+    if (in->lang==lang) break;
+    in = in->next;
+  }
+  if (in==NULL) {
+    init_prefixnames();
+    for (in=pnames;in->lang!=lang;in=in->next) ;
+  }
 
   init_tokens(ord);
   skip_token();
@@ -1255,34 +1304,65 @@ prefix_cmd(unit * u, struct order * ord)
     return 0;
   }
 
-  for(i=0; race_prefixes[i] != NULL; i++) {
-    const char * tag = mkname("prefix", race_prefixes[i]);
-    if (strncasecmp(s, LOC(u->faction->locale, tag), strlen(s)) == 0) {
-      break;
-    }
-  }
-
-  if (race_prefixes[i] == NULL) {
-    cmistake(u, ord, 299, MSG_EVENT);
+  if (findtoken(&in->names, s, &var)==E_TOK_NOMATCH) {
     return 0;
+  } else if (race_prefixes[var.i] == NULL) {
+    cmistake(u, ord, 299, MSG_EVENT);
+  } else {
+    ap = &u->faction->attribs;
+    if (fval(u, UFL_GROUP)) {
+      attrib * a = a_find(u->attribs, &at_group);
+      group * g = (group*)a->data.v;
+      if (a) ap = &g->attribs;
+    }
+    set_prefix(ap, race_prefixes[var.i]);
   }
-
-  ap = &u->faction->attribs;
-  if (fval(u, UFL_GROUP)) {
-    attrib * a = a_find(u->attribs, &at_group);
-    group * g = (group*)a->data.v;
-    if (a) ap = &g->attribs;
-  }
-  set_prefix(ap, race_prefixes[i]);
-
   return 0;
+}
+
+static struct local_names * synonyms;
+
+static void
+init_synonyms(void)
+{
+  int i;
+  for (i=0;localenames[i];++i) {
+    const struct locale * lang = find_locale(localenames[i]);
+    boolean exist = false;
+    struct local_names * in = synonyms;
+
+    while (in!=NULL) {
+      if (in->lang==lang) {
+        exist = true;
+        break;
+      }
+      in = in->next;
+    }
+    if (in==NULL) in = calloc(sizeof(local_names), 1);
+    in->next = synonyms;
+    in->lang = lang;
+
+    if (!exist) {
+      int key;
+      for (key=0;race_prefixes[key];++key) {
+        variant var;
+        const xmlChar * pname = locale_string(lang, race_prefixes[key]);
+        if (findtoken(&in->names, pname, &var)==E_TOK_NOMATCH || var.i!=key) {
+          var.i = key;
+          addtoken(&in->names, pname, var);
+          addtoken(&in->names, locale_string(lang, race_prefixes[key]), var);
+        }
+      }
+    }
+    synonyms = in;
+  }
 }
 
 static int
 display_cmd(unit * u, struct order * ord)
 {
   building * b = u->building;
-  char **s = NULL;
+  xmlChar **s = NULL;
   region * r = u->region;
 
   init_tokens(ord);
@@ -1332,7 +1412,7 @@ display_cmd(unit * u, struct order * ord)
 
   case P_PRIVAT:
     {
-      const char *d = getstrtoken();
+      const xmlChar *d = getstrtoken();
       if(d == NULL || *d == 0) {
         usetprivate(u, NULL);
       } else {
@@ -1363,10 +1443,10 @@ display_cmd(unit * u, struct order * ord)
   }
 
   if (s!=NULL) {
-    const char * s2 = getstrtoken();
+    const xmlChar * s2 = getstrtoken();
 
     if (strlen(s2)>=DISPLAYSIZE) {
-      char * s3 = strdup(s2);
+      xmlChar * s3 = strdup(s2);
       s3[DISPLAYSIZE] = 0;
       set_string(s, s3);
       free(s3);
@@ -3763,6 +3843,33 @@ static void reset_rng(void) {
   else rng_init(turn);
 }
 
+/** warn about passwords that are not US ASCII.
+ * even though passwords are technically UTF8 strings, the server receives
+ * them as part of the Subject of an email when reports are requested.
+ * This means that we need to limit them to ASCII characters until that
+ * mechanism has been changed.
+ */
+static int
+warn_password(void)
+{
+  faction * f = factions;
+  while (f) {
+    boolean pwok = true;
+    const char * c = f->passw;
+    while (*c) {
+      if (!isalnum((unsigned char)*c)) pwok = false;
+      c++;
+    }
+    if (pwok == false) {
+      free(f->passw);
+      f->passw = strdup(itoa36(rng_int()));
+      ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
+    }
+    f = f->next;
+  }
+  return 0;
+}
+
 void
 processorders (void)
 {
@@ -3938,6 +4045,7 @@ processorders (void)
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
    * Beschreibungen geändert haben */
   update_spells();
+  warn_password();
 }
 
 int

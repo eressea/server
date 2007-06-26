@@ -18,6 +18,7 @@
 
 /* kernel includes */
 #include <kernel/unit.h>
+#include <kernel/faction.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -25,6 +26,7 @@
 #include <util/event.h>
 #include <util/base36.h>
 #include <util/goodies.h>
+#include <util/language.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -65,9 +67,11 @@ unitmessage_handle(trigger * t, void * data)
   */
   unitmessage_data * td = (unitmessage_data*)t->data.v;
   if (td->target!=NULL) {
-    addmessage(td->target->region, td->target->faction, td->string, td->type, td->level);
-  } else
+    struct faction * f = td->target->faction;
+    addmessage(td->target->region, f, LOC(f->locale, td->string), td->type, td->level);
+  } else {
     log_error(("could not perform unitmessage::handle()\n"));
+  }
   unused(data);
   return 0;
 }

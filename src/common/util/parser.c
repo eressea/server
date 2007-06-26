@@ -1,30 +1,59 @@
 #include <config.h>
 #include "parser.h"
+#include "unicode.h"
+#include "log.h"
 
 #include <assert.h>
 #include <ctype.h>
+#include <memory.h>
 
 #define SPACE_REPLACEMENT '~'
 #define ESCAPE_CHAR       '\\'
 #define MAXTOKENSIZE      8192
 
 typedef struct parser_state {
-  const unsigned char *current_token;
-  char * current_cmd;
+  const xmlChar *current_token;
+  xmlChar * current_cmd;
   struct parser_state * next;
 } parser_state;
 
 static parser_state * state;
 
+static int
+eatwhitespace_c(const xmlChar ** str)
+{
+  int ret;
+  wint_t ucs;
+  size_t len;
+
+  /* skip over potential whitespace */
+  for (;;) {
+    xmlChar utf8_character = (*str)[0];
+    if (utf8_character <= 0x7F) {
+      if (!isspace(utf8_character)) break;
+      ++*str;
+    } else {
+      ret = unicode_utf8_to_ucs4(&ucs, *str, &len);
+      if (ret!=0) {
+        log_warning(("illegal character sequence in UTF8 string: %s\n", *str));
+        return ret;
+      }
+      if (!iswspace(ucs)) break;
+      *str+=len;
+    }
+  }
+  return 0;
+}
+
 void
-init_tokens_str(const char * initstr, char * cmd)
+init_tokens_str(const xmlChar * initstr, xmlChar * cmd)
 {
   if (state==NULL) {
     state = malloc(sizeof(parser_state));
   }
   else if (state->current_cmd) free(state->current_cmd);
   state->current_cmd = cmd;
-  state->current_token = (const unsigned char *)initstr;
+  state->current_token = (const xmlChar *)initstr;
 }
 
 void
@@ -49,7 +78,7 @@ parser_popstate(void)
 boolean
 parser_end(void)
 {
-  while (isspace(*state->current_token)) ++state->current_token;
+  eatwhitespace_c(&state->current_token);
   return *state->current_token == 0;
 }
 
@@ -57,73 +86,107 @@ void
 skip_token(void)
 {
   char quotechar = 0;
+  eatwhitespace_c(&state->current_token);
 
-  while (isspace(*state->current_token)) ++state->current_token;
   while (*state->current_token) {
-    if (isspace(*state->current_token) && quotechar==0) {
+    wint_t ucs;
+    size_t len;
+
+    xmlChar utf8_character = state->current_token[0];
+    if (utf8_character <= 0x7F) {
+      ucs = utf8_character;
+      ++state->current_token;
+    } else {
+      int ret = unicode_utf8_to_ucs4(&ucs, state->current_token, &len);
+      if (ret==0) {
+        state->current_token+=len;
+      } else {
+        log_warning(("illegal character sequence in UTF8 string: %s\n", state->current_token));
+      }
+    }
+    if (iswspace(ucs) && quotechar==0) {
       return;
     } else {
-      switch(*state->current_token) {
+      switch(utf8_character) {
         case '"':
         case '\'':
-          if (*state->current_token==quotechar) return;
-          quotechar = *state->current_token;
+          if (utf8_character==quotechar) return;
+          quotechar = utf8_character;
           break;
         case ESCAPE_CHAR:
           ++state->current_token;
           break;
       }
     }
-    ++state->current_token;
   }
 }
 
-const char *
-parse_token(const char ** str)
+const xmlChar *
+parse_token(const xmlChar ** str)
 {
-  static char lbuf[MAXTOKENSIZE];
-  char * cursor = lbuf;
+  static xmlChar lbuf[MAXTOKENSIZE];
+  xmlChar * cursor = lbuf;
   char quotechar = 0;
   boolean escape = false;
-  const unsigned char * ctoken = (const unsigned char*)*str;
+  const xmlChar * ctoken = *str;
 
   assert(ctoken);
 
-  while (isspace(*ctoken)) ++ctoken;
+  eatwhitespace_c(&ctoken);
   while (*ctoken && cursor-lbuf < MAXTOKENSIZE-1) {
+    wint_t ucs;
+    size_t len;
+    boolean copy = false;
+
+    xmlChar utf8_character = *ctoken;
+    if (utf8_character <= 0x7F) {
+      ucs = utf8_character;
+      len = 1;
+    } else {
+      int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
+      if (ret!=0) {
+        log_warning(("illegal character sequence in UTF8 string: %s\n", ctoken));
+        break;
+      }
+    }
     if (escape) {
-      *cursor++ = *ctoken++;
-    } else if (isspace(*ctoken)) {
+      copy = true;
+    } else if (iswspace(ucs)) {
       if (quotechar==0) break;
-      *cursor++ = *ctoken++;
-    } else if (*ctoken=='"' || *ctoken=='\'') {
-      if (*ctoken==quotechar) {
+      copy = true;
+    } else if (utf8_character=='"' || utf8_character=='\'') {
+      if (utf8_character==quotechar) {
         ++ctoken;
         break;
       } else if (quotechar==0) {
-        quotechar = *ctoken;
+        quotechar = utf8_character;
         ++ctoken;
       } else {
         *cursor++ = *ctoken++;
       }
-    } else if (*ctoken==SPACE_REPLACEMENT) {
+    } else if (utf8_character==SPACE_REPLACEMENT) {
       *cursor++ = ' ';
       ++ctoken;
-    } else if (*ctoken==ESCAPE_CHAR) {
+    } else if (utf8_character==ESCAPE_CHAR) {
       escape = true;
       ++ctoken;
     } else {
-      *cursor++ = *ctoken++;
+      copy = true;
+    }
+    if (copy) {
+      memcpy(cursor, ctoken, len);
+      cursor+=len;
+      ctoken+=len;
     }
   }
 
   *cursor = '\0';
-  *str = (const char *)ctoken;
+  *str = ctoken;
   return lbuf;
 }
 
-const char *
+const xmlChar *
 getstrtoken(void)
 {
-  return parse_token((const char**)&state->current_token);
+  return parse_token((const xmlChar**)&state->current_token);
 }

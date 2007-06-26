@@ -100,7 +100,8 @@ dir_invert(direction_t dir)
   assert(!"illegal direction");
   return NODIRECTION;
 }
-const char *
+
+const xmlChar *
 regionname(const region * r, const faction * f)
 {
   static char buf[65];
@@ -729,7 +730,6 @@ new_region(short x, short y)
   r->y = y;
   r->age = 1;
   r->planep = findplane(x, y);
-  set_string(&r->display, "");
   rhash(r);
   if (last)
     addlist(&last, r);
@@ -1074,18 +1074,21 @@ r_getmessages(const struct region * r, const struct faction * viewer)
 struct message *
 r_addmessage(struct region * r, const struct faction * viewer, struct message * msg)
 {
-  struct individual_message * imsg;
   assert(r);
-  imsg = r->individual_messages;
-  while (imsg && imsg->viewer!=viewer) imsg = imsg->next;
-  if (imsg==NULL) {
-    imsg = malloc(sizeof(struct individual_message));
-    imsg->next = r->individual_messages;
-    imsg->msgs = NULL;
-    r->individual_messages = imsg;
-    imsg->viewer = viewer;
+  if (viewer) {
+    struct individual_message * imsg;
+    imsg = r->individual_messages;
+    while (imsg && imsg->viewer!=viewer) imsg = imsg->next;
+    if (imsg==NULL) {
+      imsg = malloc(sizeof(struct individual_message));
+      imsg->next = r->individual_messages;
+      imsg->msgs = NULL;
+      r->individual_messages = imsg;
+      imsg->viewer = viewer;
+    }
+    return add_message(&imsg->msgs, msg);
   }
-  return add_message(&imsg->msgs, msg);
+  return add_message(&r->msgs, msg);
 }
 
 struct faction *

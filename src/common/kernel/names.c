@@ -47,7 +47,7 @@
 
 #define UNTOT_VOR 23
 
-static const char *untot_vor[UNTOT_VOR] =
+static const xmlChar *untot_vor[UNTOT_VOR] =
 {
 	"Grausige ",
 	"Stöhnende ",
@@ -76,7 +76,7 @@ static const char *untot_vor[UNTOT_VOR] =
 
 #define UNTOT	13
 
-static const char *untot[UNTOT] =
+static const xmlChar *untot[UNTOT] =
 {
 	"Geister",
 	"Phantome",
@@ -95,7 +95,7 @@ static const char *untot[UNTOT] =
 
 #define UNTOT_NACH 14
 
-static const char *untot_nach[UNTOT_NACH] =
+static const xmlChar *untot_nach[UNTOT_NACH] =
 {
 	" der Nacht",
 	" der Schatten",
@@ -113,7 +113,7 @@ static const char *untot_nach[UNTOT_NACH] =
 	" aus der Unterwelt"
 };
 
-static const char *
+const xmlChar *
 describe_braineater(unit * u, const struct locale * lang)
 {
   return LOC(lang, "describe_braineater");
@@ -151,7 +151,7 @@ untoten_name(const unit * u)
 
 #define SKEL_VOR 19
 
-static const char *skel_vor[SKEL_VOR] =
+static const xmlChar *skel_vor[SKEL_VOR] =
 {
 	"Klapperige ",
 	"Stöhnende ",
@@ -176,7 +176,7 @@ static const char *skel_vor[SKEL_VOR] =
 
 #define SKEL	5
 
-static const char *skel[SKEL] =
+static const xmlChar *skel[SKEL] =
 {
 	"Skelette",
 	"Kreaturen",
@@ -187,7 +187,7 @@ static const char *skel[SKEL] =
 
 #define SKEL_NACH 14
 
-static const char *skel_nach[SKEL_NACH] =
+static const xmlChar *skel_nach[SKEL_NACH] =
 {
 	" der Nacht",
 	" der Schatten",
@@ -205,7 +205,7 @@ static const char *skel_nach[SKEL_NACH] =
 	" aus der Unterwelt"
 };
 
-const char *
+const xmlChar *
 skeleton_name(const unit * u)
 {
 	int uv, uu, un;
@@ -238,7 +238,7 @@ skeleton_name(const unit * u)
 
 #define ZOM_VOR 16
 
-static const char *zombie_vor[ZOM_VOR] =
+static const xmlChar *zombie_vor[ZOM_VOR] =
 {
 	"Faulende ",
 	"Zerschlagene ",
@@ -260,7 +260,7 @@ static const char *zombie_vor[ZOM_VOR] =
 
 #define ZOM	5
 
-static const char *zombie[ZOM] =
+static const xmlChar *zombie[ZOM] =
 {
 	"Zombies",
 	"Kreaturen",
@@ -271,7 +271,7 @@ static const char *zombie[ZOM] =
 
 #define ZOM_NACH 13
 
-static const char *zombie_nach[ZOM_NACH] =
+static const xmlChar *zombie_nach[ZOM_NACH] =
 {
 	" der Nacht",
 	" der Schatten",
@@ -288,7 +288,7 @@ static const char *zombie_nach[ZOM_NACH] =
 	" aus der Unterwelt"
 };
 
-const char *
+const xmlChar *
 zombie_name(const unit * u)
 {
 	int uv, uu, un;
@@ -321,7 +321,7 @@ zombie_name(const unit * u)
 
 #define GHOUL_VOR 17
 
-static const char *ghoul_vor[GHOUL_VOR] =
+static const xmlChar *ghoul_vor[GHOUL_VOR] =
 {
 	"Faulende ",
 	"Angsteinflößende ",
@@ -344,7 +344,7 @@ static const char *ghoul_vor[GHOUL_VOR] =
 
 #define GHOUL	6
 
-static const char *ghoul[GHOUL] =
+static const xmlChar *ghoul[GHOUL] =
 {
 	"Ghoule",
 	"Kreaturen",
@@ -356,7 +356,7 @@ static const char *ghoul[GHOUL] =
 
 #define GHOUL_NACH 13
 
-static const char *ghoul_nach[GHOUL_NACH] =
+static const xmlChar *ghoul_nach[GHOUL_NACH] =
 {
 	" der Nacht",
 	" der Schatten",
@@ -373,7 +373,7 @@ static const char *ghoul_nach[GHOUL_NACH] =
 	" aus der Unterwelt"
 };
 
-const char *
+const xmlChar *
 ghoul_name(const unit * u)
 {
 	int uv, uu, un;
@@ -407,7 +407,7 @@ ghoul_name(const unit * u)
 
 #define SIL1 15
 
-const char *silbe1[SIL1] = {
+const xmlChar *silbe1[SIL1] = {
 	"Tar",
 	"Ter",
 	"Tor",
@@ -427,7 +427,7 @@ const char *silbe1[SIL1] = {
 
 #define SIL2 19
 
-const char *silbe2[SIL2] = {
+const xmlChar *silbe2[SIL2] = {
 	"da",
 	"do",
 	"dil",
@@ -451,7 +451,7 @@ const char *silbe2[SIL2] = {
 
 #define SIL3 14
 
-const char *silbe3[SIL3] = {
+const xmlChar *silbe3[SIL3] = {
 	"gul",
 	"gol",
 	"dol",
@@ -470,7 +470,7 @@ const char *silbe3[SIL3] = {
 
 #define DTITEL 5
 
-const char *dtitel[6][DTITEL] =
+const xmlChar *dtitel[6][DTITEL] =
 {
 	{							/* Ebene, Hochland */
 		"der Weise",
@@ -516,21 +516,21 @@ const char *dtitel[6][DTITEL] =
 	}
 };
 
-const char *
-shadow_name(const unit *u)
+const xmlChar *
+generic_name(const unit *u)
 {
-	if(u->no == 1) {
-		return "Schattendämon";
-	}
-	return "Schattendämonen";
+  if (u->no == 1) {
+    return LOC(u->faction->locale, u->race->_name[0]);
+  }
+  return LOC(u->faction->locale, u->race->_name[1]);
 }
 
-const char *
+const xmlChar *
 drachen_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
 	int rnd = rng_int() % DTITEL;
-	const char *t = dtitel[0][rnd];
+	const xmlChar *t = dtitel[0][rnd];
 	int anzahl = 1;
 
 	if (u) {
@@ -583,7 +583,7 @@ drachen_name(const unit *u)
 /* Dracoide */
 
 #define DRAC_PRE 13
-static const char *drac_pre[DRAC_PRE] = {
+static const xmlChar *drac_pre[DRAC_PRE] = {
 		"Siss",
 		"Xxaa",
 		"Shht",
@@ -600,7 +600,7 @@ static const char *drac_pre[DRAC_PRE] = {
 };
 
 #define DRAC_MID 12
-static const char *drac_mid[DRAC_MID] = {
+static const xmlChar *drac_mid[DRAC_MID] = {
 		"siss",
 		"xxaa",
 		"shht",
@@ -616,7 +616,7 @@ static const char *drac_mid[DRAC_MID] = {
 };
 
 #define DRAC_SUF 10
-static const char *drac_suf[DRAC_SUF] = {
+static const xmlChar *drac_suf[DRAC_SUF] = {
 		"xil",
 		"shh",
 		"s",
@@ -629,7 +629,7 @@ static const char *drac_suf[DRAC_SUF] = {
 		"k"
 };
 
-const char *
+const xmlChar *
 dracoid_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
@@ -650,11 +650,11 @@ dracoid_name(const unit *u)
 	return name;
 }
 
-const char *
-abkz(const char *s, size_t max)
+const xmlChar *
+abkz(const xmlChar *s, size_t max)
 {
 	static char buf[32];
-	const char *p = s;
+	const xmlChar *p = s;
 	unsigned int c = 0;
 	size_t bpt, i;
 
@@ -662,7 +662,7 @@ abkz(const char *s, size_t max)
 
 	/* Prüfen, ob Kurz genug */
 
-	if (strlen(s) <= max) {
+	if (xmlStrlen(s) <= max) {
 		return s;
 	}
 	/* Anzahl der Wörter feststellen */
@@ -728,7 +728,7 @@ register_names(void)
   register_function((pf_generic)ghoul_name, "nameghoul");
   register_function((pf_generic)drachen_name, "namedragon");
   register_function((pf_generic)dracoid_name, "namedracoid");
-  register_function((pf_generic)shadow_name, "nameshadow");
+  register_function((pf_generic)generic_name, "namegeneric");
 }
 
 

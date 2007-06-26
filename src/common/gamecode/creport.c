@@ -229,7 +229,7 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
     unit *u = (unit *)obj;
     a = u->attribs;
     r = u->region;
-    if (u->faction == viewer){
+    if (u->faction == viewer) {
       self = 2;
     }
   } else if (typ == TYP_REGION) {
@@ -416,6 +416,26 @@ cr_resources(variant var, char * buffer, const void * userdata)
       if (rlist==NULL) break;
       wp += sprintf(wp, ", %d %s", rlist->number,
         resourcename(rlist->type, rlist->number!=1));
+    }
+    strcat(wp, "\"");
+  }
+  return 0;
+}
+
+static int
+cr_regions(variant var, char * buffer, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  const arg_regions * rdata = (const arg_regions *)var.v;
+  char * wp = buffer;
+  if (rdata!=NULL && rdata->nregions>0) {
+    region * r = rdata->regions[0];
+    int i, z = r->planep?r->planep->id:0;
+    wp += sprintf(wp, "\"%d %d %d", r->x, r->y, z);
+    for (i=1;i!=rdata->nregions;++i) {
+      r = rdata->regions[i];
+      z = r->planep?r->planep->id:0;
+      wp += sprintf(wp, ", %d %d %d", r->x, r->y, z);
     }
     strcat(wp, "\"");
   }
@@ -1495,6 +1515,7 @@ creport_init(void)
   tsf_register("direction", &cr_int);
   tsf_register("alliance", &cr_alliance);
   tsf_register("resources", &cr_resources);
+  tsf_register("regions", &cr_regions);
 
   register_reporttype("cr", &report_computer, 1<<O_COMPUTER);
 }

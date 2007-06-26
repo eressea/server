@@ -716,7 +716,6 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
   u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);
   setstatus(u, ST_FIGHT);
 
-  set_string(&u->name, racename(mage->faction->locale, u, u->race));
   set_level(u, SK_WEAPONLESS, (int)(power/2));
   set_level(u, SK_AUSDAUER, (int)(power/2));
   u->hp = u->number * unit_max_hp(u);
@@ -746,7 +745,6 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
 
   setstatus(u, ST_FIGHT);
 
-  set_string(&u->name, racename(mage->faction->locale, u, u->race));
   set_level(u, SK_WEAPONLESS, (int)(power/3));
   set_level(u, SK_AUSDAUER, (int)(power/3));
   u->hp = u->number * unit_max_hp(u);
@@ -781,7 +779,6 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
   u = create_unit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT], 0, NULL, mage);
   setstatus(u, ST_FIGHT);
 
-  set_string(&u->name, "Schattenritter");
   u->hp = u->number * unit_max_hp(u);
 
   if (fval(mage, UFL_PARTEITARNUNG))
@@ -1441,25 +1438,12 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int healable, j=0;
-  double c = 0.50;
+  double c = 0.50 + 0.02 * power;
   double k = EFFECT_HEALING_SPELL * power;
+  boolean use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
+  message * msg;
 
-  switch(sp->id) {
-    case SPL_REANIMATE:
-      sprintf(buf, "%s beginnt ein Ritual der Wiederbelebung",
-          unitname(mage));
-      c += 0.02 * power;
-      break;
-
-    default:
-      sprintf(buf, "%s zaubert %s",
-          unitname(mage),
-          spell_name(sp, default_locale));
-  }
-  if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
-    scat(" und benutzt das ");
-    scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
-    scat(", um den Zauber zu verst‰rken");
+  if (use_item) {
     k *= 2;
     c += 0.10;
   }
@@ -1490,18 +1474,16 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
       ++j;
     }
   }
-  if (j == 0) {
-    scat(", kann aber niemanden wiederbeleben.");
-    level = 0;
-  } else if (j == 1) {
-    scat(" und belebt einen Toten wieder.");
-    level = 1;
-  } else {
-    scat(" und belebt ");
-    icat(j);
-    scat(" Tote wieder.");
+  if (j <= 0) {
+    level = j;
   }
-  battlerecord(b, buf);
+  if (use_item) {
+    msg = msg_message("reanimate_effect_1", "mage amount item", mage, j, oldresourcetype[R_AMULET_OF_HEALING]);
+  } else {
+    msg = msg_message("reanimate_effect_0", "mage amount", mage, j);
+  }
+  message_all(b, msg);
+  msg_release(msg);
 
   return level;
 }
@@ -1566,19 +1548,15 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int j = 0;
-  int healhp = (int)power;
+  int healhp = (int)power * 200;
   cvector *fgs;
-
-  sprintf(buf, "%s k¸mmert sich um die Verletzten", unitname(mage));
+  message * msg;
+  boolean use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
 
   /* bis zu 11 Personen pro Stufe (einen HP m¸ssen sie ja noch
-  * haben, sonst w‰ren sie tot) kˆnnen geheilt werden */
-  healhp *= 200;
+   * haben, sonst w‰ren sie tot) kˆnnen geheilt werden */
 
-  if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
-    scat(" und benutzt das ");
-    scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
-    scat(", um die Heilzauber zu verst‰rken");
+  if (use_item) {
     healhp *= 2;
   }
 
@@ -1592,18 +1570,16 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
   cv_kill(fgs);
   free(fgs);
 
-  if (j == 0) {
-    scat(", doch niemand muﬂte magisch geheilt werden.");
-    level = 0;
-  } else if (j == 1) {
-    scat(" und heilt einen Verwundeten.");
-    level = 1;
-  } else {
-    scat(" und heilt ");
-    icat(j);
-    scat(" Verwundete.");
+  if (j <= 0) {
+    level = j;
   }
-  battlerecord(b, buf);
+  if (use_item) {
+    msg = msg_message("healing_effect_1", "mage amount item", mage, j, oldresourcetype[R_AMULET_OF_HEALING]);
+  } else {
+    msg = msg_message("healing_effect_0", "mage amount", mage, j);
+  }
+  message_all(b, msg);
+  msg_release(msg);
 
   return level;
 }

@@ -124,7 +124,7 @@ get_spellnames(const struct locale * lang, magic_t mtype)
 }
 
 static spell *
-get_spellfromtoken_i(const char *name, const struct locale * lang, magic_t mtype)
+get_spellfromtoken_i(const xmlChar *name, const struct locale * lang, magic_t mtype)
 {
   variant token = { 0 };
   spell_names * sn;
@@ -147,7 +147,7 @@ get_spellfromtoken_i(const char *name, const struct locale * lang, magic_t mtype
 }
 
 spell *
-get_spellfromtoken(unit *u, const char *name, const struct locale * lang)
+get_spellfromtoken(unit *u, const xmlChar *name, const struct locale * lang)
 {
   sc_mage * m = get_mage(u);
   spell * sp;

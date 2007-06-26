@@ -952,7 +952,7 @@ change_money(unit * u, int v)
 static local_names * rnames;
 
 const resource_type *
-findresourcetype(const char * name, const struct locale * lang)
+findresourcetype(const xmlChar * name, const struct locale * lang)
 {
   local_names * rn = rnames;
   variant token;
@@ -1011,7 +1011,7 @@ init_itemnames(void)
         const item_type * itl;
         for (itl=itemtypes[key];itl;itl=itl->next) {
           variant var;
-          const char * iname = locale_string(lang, itl->rtype->_name[0]);
+          const xmlChar * iname = locale_string(lang, itl->rtype->_name[0]);
           if (findtoken(&in->names, iname, &var)==E_TOK_NOMATCH || var.v!=itl) {
             var.v = (void*)itl;
             addtoken(&in->names, iname, var);
@@ -1025,7 +1025,7 @@ init_itemnames(void)
 }
 
 const item_type *
-finditemtype(const char * name, const struct locale * lang)
+finditemtype(const xmlChar * name, const struct locale * lang)
 {
   local_names * in = inames;
   variant var;

@@ -179,107 +179,78 @@ improve_all(faction * f, skill_t sk, int by_weeks)
 void
 find_manual(region * r, unit * u)
 {
+  char zLocation[32];
+  char zBook[32];
   skill_t skill = NOSKILL;
-  sprintf(buf, "%s stolper%c bei der Erforschung der Region über ",
-          unitname(u), "nt"[u->number == 1]);
-  
-  switch (rng_int() % 4) {
-  case 0:
-    scat("die Ruine eines alten Tempels");
-    break;
-  case 1:
-    scat("eine alte Burgruine");
-    break;
-  case 2:
-    scat("ein zerfallenes Bauernhaus");
-    break;
-  case 3:
-    scat("eine Leiche am Wegesrand");
-    break;
-  }
-  
-  scat(". Bei der Durchsuchung ");
-  if (u->number == 1) {
-    scat("stößt");
-  } else {
-    scat("stoßen");
-  }
-  scat(" sie auf das zerfledderte Exemplar eines alten Buches, betitelt ");
-  
+  message * msg;
+
   switch (rng_int() % 36) {
   case 0:
-    scat("\'Magie der Elemente\'");
     skill = SK_MAGIC;
     break;
   case 1:
   case 2:
   case 3:
   case 4:
-    scat("\'Schwerter, Armbrüste, Langbögen\'");
     skill = SK_WEAPONSMITH;
     break;
   case 5:
   case 6:
-    scat("\'Gorms Almanach der Rationellen Kriegsführung\'");
     skill = SK_TACTICS;
     break;
   case 7:
   case 8:
   case 9:
   case 10:
-    scat("\'Katamarane, Koggen, Karavellen\'");
     skill = SK_SHIPBUILDING;
     break;
   case 11:
   case 12:
   case 13:
   case 14:
-    scat("\'Wege der Sterne\'");
     skill = SK_SAILING;
     break;
   case 15:
   case 16:
   case 17:
-    scat("\'Nadishahs Kleine Gift- und Kräuterkunde\'");
     skill = SK_HERBALISM;
     break;
   case 18:
   case 19:
-    scat("\'Mandricks Kompendium der Alchemie\'");
     skill = SK_ALCHEMY;
     break;
   case 20:
   case 21:
   case 22:
   case 23:
-    scat("\'Die Konstruktion der Burgen und Schlösser von Zentralandune\'");
     skill = SK_BUILDING;
     break;
   case 24:
   case 25:
   case 26:
   case 27:
-    scat("\'Die Esse\'");
     skill = SK_ARMORER;
     break;
   case 28:
   case 29:
   case 30:
   case 31:
-    scat("\'Über die Gewinnung von Erzen\'");
     skill = SK_MINING;
     break;
   case 32:
   case 33:
   case 34:
   case 35:
-    scat("\'Barinions Lieder, eine Einführung für Unbedarfte\'");
     skill = SK_ENTERTAINMENT;
     break;
   }
-  
-  scat(". Der Wissensschub ist enorm.");
-  addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+
+  sprintf(zLocation, "manual_location_%d", rng_int() % 4);
+  sprintf(zBook, "manual_title_%s", skillnames[skill]);
+
+  msg = msg_message("find_manual", "unit location book", u, zLocation, zBook);
+  r_addmessage(r, u->faction, msg);
+  msg_release(msg);
 
   if (improve_all(u->faction, skill, 3) == 3) {
     int i;
@@ -288,22 +259,17 @@ find_manual(region * r, unit * u)
 }
 
 static void
-get_unit(region * r, unit * u)
+get_villagers(region * r, unit * u)
 {
 	unit *newunit;
-	sprintf(buf, "%s entdeck%s ein kleines Dorf. Die meisten Häuser "
-			"wurden durch einen über die Ufer getretenen Fluß zerstört. Eine "
-			"Gruppe der verzweifelten Menschen schließt sich deiner Partei an.",
-			unitname(u), "en\0t" + (3 - 3 * (u->number == 1)));
+  message * msg = msg_message("encounter_villagers", "unit", u);
+  const xmlChar * name = LOC(u->faction->locale, "villagers");
 
-	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+  r_addmessage(r, u->faction, msg);
+  msg_release(msg);
 
-	newunit = createunit(r, u->faction, rng_int() % 20 + 3, u->faction->race);
+	newunit = create_unit(r, u->faction, rng_int() % 20 + 3, u->faction->race, 0, name, u);
   fset(newunit, UFL_ISNEW|UFL_MOVED);
-	set_string(&newunit->name, "Dorfbewohner");
-  if (fval(u, UFL_PARTEITARNUNG)) {
-    fset(newunit, UFL_PARTEITARNUNG);
-  }
   equip_unit(newunit, get_equipment("random_villagers"));
 }
 
@@ -311,17 +277,21 @@ static void
 get_allies(region * r, unit * u)
 {
 	unit *newunit = NULL;
+  const char * name;
+  const char * equip;
+  int number;
+  message * msg;
+
   assert(u->number);
 
-	switch (rterrain(r)) {
-
+  switch (rterrain(r)) {
 	case T_PLAIN:
 		if (!r_isforest(r)) {
 			if (get_money(u) / u->number < 100 + rng_int() % 200)
 				return;
-			newunit = createunit(r, u->faction, rng_int() % 8 + 2, u->faction->race);
-			set_string(&newunit->name, "Söldner");
-      equip_unit(newunit, get_equipment("random_plain"));
+      name = "random_plain_men";
+      equip = "random_plain";
+      number = rng_int() % 8 + 2;
 			break;
 		} else {
 			if (eff_skill(u, SK_LONGBOW, r) < 3
@@ -329,9 +299,9 @@ get_allies(region * r, unit * u)
 				&& eff_skill(u, SK_MAGIC, r) < 2) {
 				return;
 			}
-			newunit = createunit(r, u->faction, rng_int() % 6 + 2, u->faction->race);
-			set_string(&newunit->name, "Waldbewohner");
-      equip_unit(newunit, get_equipment("random_forest"));
+      name = "random_forest_men";
+      equip = "random_forest";
+      number = rng_int() % 6 + 2;
 		}
 		break;
 
@@ -339,67 +309,65 @@ get_allies(region * r, unit * u)
 		if (eff_skill(u, SK_OBSERVATION, r) <= 3) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rng_int() % 6 + 2, u->faction->race);
-		set_string(&newunit->name, "Sumpfbewohner");
-    equip_unit(newunit, get_equipment("random_swamp"));
+    name = "random_swamp_men";
+    equip = "random_swamp";
+    number = rng_int() % 6 + 2;
 		break;
 
 	case T_DESERT:
 		if (eff_skill(u, SK_RIDING, r) <= 2) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rng_int() % 12 + 2, u->faction->race);
-		set_string(&newunit->name, "Berber");
-    equip_unit(newunit, get_equipment("random_desert"));
+    name = "random_desert_men";
+    equip = "random_desert";
+    number = rng_int() % 12 + 2;
 		break;
 
 	case T_HIGHLAND:
 		if (eff_skill(u, SK_MELEE, r) <= 1) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rng_int() % 8 + 2, u->faction->race);
-		set_string(&newunit->name, "Hochlandbarbaren");
-    equip_unit(newunit, get_equipment("random_highland"));
+    name = "random_highland_men";
+    equip = "random_highland";
+    number = rng_int() % 8 + 2;
 		break;
 
 	case T_MOUNTAIN:
-		if (eff_skill(u, SK_MELEE, r) <= 1
-			|| eff_skill(u, SK_TRADE, r) <= 2) {
-			return;
-		}
-		newunit = createunit(r, u->faction, rng_int() % 6 + 2, u->faction->race);
-		set_string(&newunit->name, "Bergbewohner");
-    equip_unit(newunit, get_equipment("random_mountain"));
-
+    if (eff_skill(u, SK_MELEE, r) <= 1 || eff_skill(u, SK_TRADE, r) <= 2) {
+      return;
+    }
+    name = "random_mountain_men";
+    equip = "random_mountain";
+    number = rng_int() % 6 + 2;
 		break;
 
 	case T_GLACIER:
-		if (eff_skill(u, SK_MELEE, r) <= 1
-			|| eff_skill(u, SK_TRADE, r) <= 1) {
+		if (eff_skill(u, SK_MELEE, r) <= 1 || eff_skill(u, SK_TRADE, r) <= 1) {
 			return;
 		}
-		newunit = createunit(r, u->faction, rng_int() % 4 + 2, u->faction->race);
-		set_string(&newunit->name, "Eisleute");
-    equip_unit(newunit, get_equipment("random_glacier"));
-
+    name = "random_glacier_men";
+    equip = "random_glacier";
+    number = rng_int() % 4 + 2;
 		break;
+
+  default:
+    return;
 	}
 
-  if (newunit!=NULL) {
-	  u_setfaction(newunit, u->faction);
-	  set_racename(&newunit->attribs, get_racename(u->attribs));
-	  if(u->race->flags & RCF_SHAPESHIFT) {
-		  newunit->irace = u->irace;
-	  }
-	  if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
-	  fset(newunit, UFL_ISNEW);
+  newunit = create_unit(r, u->faction, number, u->faction->race, 0, LOC(u->faction->locale, name), u);
+  equip_unit(newunit, get_equipment(equip));
 
-	  sprintf(buf, "Plötzlich stolper%c %s über einige %s. Nach kurzem "
-		  "Zögern entschließen sich die %s, sich Deiner Partei anzuschließen.",
-	  u->number == 1 ? 't' : 'n', unitname(u), newunit->name, newunit->name);
+	u_setfaction(newunit, u->faction);
+	set_racename(&newunit->attribs, get_racename(u->attribs));
+	if(u->race->flags & RCF_SHAPESHIFT) {
+		newunit->irace = u->irace;
+	}
+	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
+	fset(newunit, UFL_ISNEW);
 
-	  addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
-  }
+  msg = msg_message("encounter_allies", "unit name", u, name);
+  r_addmessage(r, u->faction, msg);
+  msg_release(msg);
 }
 
 static void
@@ -413,7 +381,7 @@ encounter(region * r, unit * u)
 		find_manual(r, u);
 		break;
 	case 1:
-		get_unit(r, u);
+		get_villagers(r, u);
 		break;
 	case 2:
 		get_allies(r, u);
@@ -484,9 +452,7 @@ chaos(region * r)
 			if (!fval(r->terrain, SEA_REGION)) {
 				u = random_unit(r);
 				if (u && playerrace(u->race)) {
-					sprintf(buf, "%s scheint von einer seltsamen Krankheit befallen.",
-							unitname(u));
-					addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+          ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
 					u_setfaction(u, findfaction(MONSTER_FACTION));
 					u->race = new_race[RC_GHOUL];
 				}
@@ -499,29 +465,14 @@ chaos(region * r)
 				case 0:
 					mfac = 100;
 					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 8 + 1, new_race[RC_FIREDRAGON]);
-					if (u->number == 1) {
-						set_string(&u->name, "Feuerdrache");
-					} else {
-						set_string(&u->name, "Feuerdrachen");
-					}
 					break;
 				case 1:
 					mfac = 500;
 					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 4 + 1, new_race[RC_DRAGON]);
-					if (u->number == 1) {
-						set_string(&u->name, "Drache");
-					} else {
-						set_string(&u->name, "Drachen");
-					}
 					break;
 				case 2:
 					mfac = 1000;
 					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 2 + 1, new_race[RC_WYRM]);
-					if (u->number == 1) {
-						set_string(&u->name, "Wyrm");
-					} else {
-						set_string(&u->name, "Wyrme");
-					}
 					break;
 				}
 				if (mfac) set_money(u, u->number * (rng_int() % mfac));

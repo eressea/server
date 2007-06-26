@@ -86,7 +86,7 @@ xml_to_locale(const xmlChar * xmlStr)
   static char zText[1024];
   const xmlChar * inbuf = xmlStr;
   char * outbuf = zText;
-  int inbytes = (int)strlen((const char*)xmlStr)+1;
+  int inbytes = (int)xmlStrlen(xmlStr)+1;
   int outbytes = (int)sizeof(zText);
 
   if (UTF8Toisolat1((xmlChar*)outbuf, &outbytes, inbuf, &inbytes)<0) {
@@ -1531,9 +1531,9 @@ parse_races(xmlDocPtr doc)
         }
         assert(property!=NULL);
         if (strcmp((const char*)property, "name")==0) {
-          rc->generate_name = (const char* (*)(const struct unit*))fun;
+          rc->generate_name = (const xmlChar* (*)(const struct unit*))fun;
         } else if (strcmp((const char*)property, "describe")==0) {
-          rc->describe = (const char* (*)(const struct unit*, const struct locale *))fun;
+          rc->describe = (const xmlChar* (*)(const struct unit*, const struct locale *))fun;
         } else if (strcmp((const char*)property, "age")==0) {
           rc->age = (void(*)(struct unit*))fun;
         } else if (strcmp((const char*)property, "move")==0) {
@@ -1852,7 +1852,7 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
       if (text!=NULL) {
         assert(strcmp(zName, (const char*)xml_cleanup_string(BAD_CAST zName))==0);
         xml_cleanup_string(text);
-        locale_setstring(lang, zName, xml_to_locale(text));
+        locale_setstring(lang, zName, text);
         xmlFree(text);
       } else {
         log_warning(("string %s has no text in locale %s\n",

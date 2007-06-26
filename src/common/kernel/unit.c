@@ -66,28 +66,6 @@ attrib_type at_creator = {
     /* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
 
-const unit *
-u_peasants(void)
-{
-	static unit peasants = { 0 };
-	if (peasants.name==NULL) {
-		peasants.name = strdup("die Bauern");
-    peasants.no = 2;
-	}
-	return &peasants;
-}
-
-const unit *
-u_unknown(void)
-{
-	static unit unknown = { 0 };
-	if (unknown.name==NULL) {
-		unknown.name =strdup("eine unbekannte Einheit");
-    unknown.no = 1;
-	}
-	return &unknown;
-}
-
 #define DMAXHASH 7919
 typedef struct dead {
 	struct dead * nexthash;
@@ -237,7 +215,7 @@ destroy_unit(unit * u)
       }
       if (*p_item == item) p_item=&item->next;
     }
-    if (u->items && (u->faction==NULL || strlen(u->faction->passw)>0)) {
+    if (u->items && (u->faction==NULL || u->faction->passw[0])) {
       distribute_items(u);
     }
   }
@@ -346,7 +324,7 @@ attrib_type at_private = {
 	a_readstring
 };
 
-const char *
+const xmlChar *
 u_description(const unit * u, const struct locale * lang)
 {
   if (u->display && u->display[0]) {
@@ -357,15 +335,15 @@ u_description(const unit * u, const struct locale * lang)
   return NULL;
 }
 
-const char *
+const xmlChar *
 uprivate(const unit * u) {
 	attrib * a = a_find(u->attribs, &at_private);
 	if (!a) return NULL;
-	return (const char*)a->data.v;
+	return (const xmlChar*)a->data.v;
 }
 
 void
-usetprivate(unit * u, const char * str) {
+usetprivate(unit * u, const xmlChar * str) {
 	attrib * a = a_find(u->attribs, &at_private);
 
 	if(str == NULL) {
@@ -374,7 +352,7 @@ usetprivate(unit * u, const char * str) {
 	}
 	if (!a) a = a_add(&u->attribs, a_new(&at_private));
 	if (a->data.v) free(a->data.v);
-	a->data.v = strdup(str);
+	a->data.v = strdup((const char*)str);
 }
 
 /*********************/
@@ -1293,12 +1271,11 @@ createunitid(unit *u, int id)
 void
 name_unit(unit *u)
 {
-	char name[16];
-
 	if (u->race->generate_name) {
 		set_string(&u->name, (u->race->generate_name(u)));
 	} else {
-		sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
+    xmlChar name[16];
+		sprintf((char*)name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
 		set_string(&u->name, name);
 	}
 }
@@ -1309,7 +1286,7 @@ name_unit(unit *u)
 * @param creator: unit to inherit stealth, group, building, ship, etc. from
 */
 unit *
-create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
+create_unit(region * r, faction * f, int number, const struct race *urace, int id, const xmlChar * dname, unit *creator)
 {
   unit * u = calloc(1, sizeof(unit));
   order * deford = default_order(f->locale);
@@ -1346,7 +1323,6 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     name_unit(u);
   }
   else set_string(&u->name, dname);
-  set_string(&u->display, "");
 
   if (count_unit(u)) f->no_units++;
 

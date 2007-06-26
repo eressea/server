@@ -2879,7 +2879,7 @@ print_stats(battle * b)
       faction * f = bf->faction;
       const char * loc_army = LOC(f->locale, "battle_army");
       char * bufp;
-      const char * header;
+      const xmlChar * header;
       size_t rsize, size;
       int komma;
 

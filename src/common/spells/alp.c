@@ -16,7 +16,10 @@
 #include "alp.h"
 
 #include <kernel/eressea.h>
+#include <kernel/faction.h>
 #include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/skill.h>
 #include <kernel/unit.h>
@@ -98,6 +101,9 @@ sp_summon_alp(struct castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
+  const struct race * rc = new_race[RC_ALP];
+  struct faction * f = findfaction(MONSTER_FACTION);
+  struct message * msg;
 
   opfer = pa->param[0]->data.u;
 
@@ -105,7 +111,7 @@ sp_summon_alp(struct castorder *co)
   * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
   * sobald der Alp sein Opfer erreicht hat.
   */
-  alp = create_unit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP], 0, "Alp", NULL);
+  alp = create_unit(r, f, 1, rc, 0, NULL, NULL);
   set_level(alp, SK_STEALTH, 7);
   setstatus(alp, ST_FLEE); /* flieht */
 
@@ -119,14 +125,14 @@ sp_summon_alp(struct castorder *co)
   {
     /* Wenn der Alp stirbt, den Magier nachrichtigen */
     add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, 
-      "Ein Alp starb, ohne sein Ziel zu erreichen.", MSG_EVENT, ML_INFO));
+      "trigger_alp_destroy", MSG_EVENT, ML_INFO));
     /* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
     add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
     add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
   }
-  sprintf(buf, "%s beschwört den Alp %s für %s.", unitname(mage),
-    unitname(alp), unitname(opfer));
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  msg = msg_message("summon_alp_effect", "mage alp target", mage, alp, opfer);
+  r_addmessage(r, mage->faction, msg);
+  msg_release(msg);
 
   return cast_level;
 }
@@ -141,17 +147,16 @@ alp_findet_opfer(unit *alp, region *r)
 	unit *mage = ad->mage;
 	unit *opfer = ad->target;
   variant effect;
+  message * msg;
 
 	assert(opfer);
 	assert(mage);
 
 	/* Magier und Opfer Bescheid geben */
-	strcpy(buf, "Ein Alp hat sein Opfer gefunden!");
-	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
-
-	sprintf(buf, "Ein Alp springt auf den Rücken von %s.",
-					unitname(opfer));
-	addmessage(r, opfer->faction, buf, MSG_EVENT, ML_IMPORTANT);
+  msg = msg_message("alp_success", "target", opfer);
+  add_message(&mage->faction->msgs, msg);
+  r_addmessage(opfer->region, opfer->faction, msg);
+  msg_release(msg);
 
 	/* Relations werden in destroy_unit(alp) automatisch gelöscht.
 	 * Die Aktionen, die beim Tod des Alps ausgelöst werden sollen,

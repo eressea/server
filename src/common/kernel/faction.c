@@ -72,7 +72,7 @@ factionname(const faction * f)
   char *ibuf = idbuf[(++nextbuf) % 8];
 
   if (f && f->name) {
-    snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(f->name, NAMESIZE), itoa36(f->no));
+    snprintf(ibuf, sizeof(name), "%s (%s)", f->name, itoa36(f->no));
     ibuf[sizeof(name)-1] = 0;
   } else {
     strcpy(ibuf, "Unbekannte Partei (?)");
@@ -100,12 +100,12 @@ unused_faction_id(void)
 }
 
 faction *
-addfaction(const char *email, const char * password,
+addfaction(const char *email, const xmlChar * password,
            const struct race * frace, const struct locale *loc,
            int subscription)
 {
-  int i;
   faction * f = calloc(sizeof(faction), 1);
+  const char * pass = itoa36(rng_int());
 
   assert(frace && frace != new_race[RC_ORC]);
 
@@ -113,14 +113,13 @@ addfaction(const char *email, const char * password,
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
 
+  set_string(&f->override, (const xmlChar *)pass);
   if (password) {
     set_string(&f->passw, password);
   } else {
-    for (i = 0; i < 6; i++) buf[i] = (char) (97 + rng_int() % 26); buf[i] = 0;
-    set_string(&f->passw, buf);
+    pass = itoa36(rng_int());
+    set_string(&f->passw, (const xmlChar *)pass);
   }
-  for (i = 0; i < 6; i++) buf[i] = (char) (97 + rng_int() % 26); buf[i] = 0;
-  set_string(&f->override, buf);
 
   f->lastorders = turn;
   f->alive = 1;
@@ -137,7 +136,7 @@ addfaction(const char *email, const char * password,
   fhash(f);
 
   sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
-  set_string(&f->name, buf);
+  set_string(&f->name, (const xmlChar*)buf);
 
   return f;
 }
@@ -166,7 +165,7 @@ addplayer(region *r, faction * f)
 }
 
 boolean
-checkpasswd(const faction * f, const char * passwd, boolean shortp)
+checkpasswd(const faction * f, const xmlChar * passwd, boolean shortp)
 {
 #ifdef SHORTPWDS
   shortpwd * slist = f->shortpwds;
@@ -178,8 +177,8 @@ checkpasswd(const faction * f, const char * passwd, boolean shortp)
     slist = slist->next;
   }
 #endif
-  if (strcasecmp(f->passw, passwd)==0) return true;
-  if (strcasecmp(f->override, passwd)==0) return true;
+  if (xmlStrcmp(f->passw, passwd)==0) return true;
+  if (xmlStrcmp(f->override, passwd)==0) return true;
   return false;
 }
 

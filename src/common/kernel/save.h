@@ -34,7 +34,7 @@ double version(void);
  * dass hier ein Fehler (fehlende ") vorliegt */
 
 FILE * cfopen(const char *filename, const char *mode);
-int readorders(const char *);
+int readorders(const char *filename, const char * encoding);
 int creategame(void);
 extern int readgame(const char * filename, int backup);
 int writegame(const char *filename, int quiet);

@@ -284,7 +284,7 @@ raceprefix(const unit *u)
   return get_prefix(asource);
 }
 
-const char *
+const xmlChar *
 racename(const struct locale *loc, const unit *u, const race * rc)
 {
   const char * prefix = raceprefix(u);

@@ -25,9 +25,6 @@ extern "C" {
  * implemented yet) saving approx. 50% of all string-related memory.
  */
 
-#define SHARE_ORDERS
-
-#ifdef SHARE_ORDERS
 struct order_data;
 
 typedef struct order {
@@ -36,23 +33,9 @@ typedef struct order {
   struct order_data * data;
   int _persistent : 1;
 } order;
-#else
-typedef struct order_data {
-  char * _str; 
-  int _lindex : 8;
-  keyword_t _keyword;
-} order_data;
-
-typedef struct order {
-  struct order * next;
-  /* do not access this data: */
-  struct order_data data;
-  int _persistent : 1;
-} order;
-#endif
 
 /* constructor */
-extern order * parse_order(const char * s, const struct locale * lang);
+extern order * parse_order(const xmlChar * s, const struct locale * lang);
 extern void replace_order(order ** dst, order * orig, const order * src);
 
 /* reference counted copies of orders: */
@@ -63,12 +46,12 @@ extern void free_orders(order ** olist);
 /* access functions for orders */
 extern keyword_t get_keyword(const order * ord);
 extern void set_order(order ** destp, order * src);
-extern char * getcommand(const order * ord);
+extern xmlChar * getcommand(const order * ord);
 extern boolean is_persistent(const order *ord);
 extern boolean is_exclusive(const order *ord);
 extern boolean is_repeated(const order * ord);
 
-extern char * write_order(const order * ord, const struct locale * lang, char * buffer, size_t size);
+extern xmlChar * write_order(const order * ord, const struct locale * lang, xmlChar * buffer, size_t size);
 
 
 #ifdef __cplusplus

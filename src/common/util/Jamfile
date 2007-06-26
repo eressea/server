@@ -32,6 +32,7 @@ SOURCES =
  strncpy.c
  translation.c
  umlaut.c
+ unicode.c
  vmap.c
  vset.c
  windir.c

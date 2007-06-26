@@ -185,6 +185,8 @@ read_newfactions(const char * filename)
 {
   newfaction * newfactions = NULL;
   FILE * F = fopen(filename, "r");
+  char buf[1024];
+
   if (F==NULL) return NULL;
   for (;;) {
     faction * f;
@@ -218,7 +220,7 @@ read_newfactions(const char * filename)
                  itoa36(subscription), email));
       continue;
     }
-    nf->password = strdup(password);
+    nf->password = (xmlChar *)strdup(password);
     nf->race = rc_find(race);
     nf->subscription = subscription;
     if (alliances!=NULL) {
@@ -232,7 +234,11 @@ read_newfactions(const char * filename)
     } else {
       nf->allies = NULL;
     }
-    if (nf->race==NULL) nf->race = findrace(race, default_locale);
+    if (nf->race==NULL) {
+      /* if the script didn't supply the race as a token, then it gives us a
+       * race in the default locale (which means that itis a UTF8 string) */
+      nf->race = findrace((const xmlChar*)race, default_locale);
+    }
     nf->lang = find_locale(lang);
     nf->bonus = bonus;
     assert(nf->race && nf->email && nf->lang);

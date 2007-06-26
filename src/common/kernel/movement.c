@@ -48,6 +48,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -55,17 +56,17 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-/* libc includes */
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-
 /* attributes includes */
 #include <attributes/follow.h>
 #include <attributes/targetregion.h>
 #include <attributes/movement.h>
 #include <attributes/otherfaction.h>
+
+/* libc includes */
+#include <assert.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 int * storms;
 
@@ -907,18 +908,19 @@ static void
 cycle_route(order * ord, unit *u, int gereist)
 {
 	int cm = 0;
-	char tail[1024];
-	char neworder[2048];
-	const char *token;
+	xmlChar tail[1024];
+	xmlChar neworder[2048];
+	const xmlChar *token;
 	direction_t d = NODIRECTION;
 	boolean paused = false;
 	boolean pause;
   order * norder;
+  xmlChar * tail_end = tail;
 
 	if (get_keyword(ord) != K_ROUTE) return;
 	tail[0] = '\0';
 
-	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
+	xmlStrcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
 
   init_tokens(ord);
   skip_token();
@@ -936,24 +938,34 @@ cycle_route(order * ord, unit *u, int gereist)
 		if (cm<gereist) {
 			/* hier sollte keine PAUSE auftreten */
 			assert(!pause);
-			if (!pause) strcat(strcat(tail, " "), LOC(lang, shortdirections[d]));
+      if (!pause) {
+        size_t size = sizeof(tail)-(tail_end-tail);
+        const xmlChar * loc = LOC(lang, shortdirections[d]);
+        *tail_end++ = ' ';
+        tail_end += strlcpy((char*)tail_end, (const char *)loc, size-1);
+      }
 		}
-		else if (strlen(neworder)>sizeof(neworder)/2) break;
+		else if (xmlStrlen(neworder)>sizeof(neworder)/2) break;
 		else if (cm == gereist && !paused && pause) {
-			strcat(strcat(tail, " "), LOC(lang, parameters[P_PAUSE]));
-			paused=true;
+      size_t size = sizeof(tail)-(tail_end-tail);
+      const xmlChar * loc = LOC(lang, parameters[P_PAUSE]);
+      *tail_end++ = ' ';
+      tail_end += strlcpy((char*)tail_end, (const char *)loc, size-1);
+			paused = true;
 		}
 		else if (pause) {
 			/* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
 			 * hier keine normale direction), muss jede PAUSE einzeln
 			 * herausgefiltert und explizit gesetzt werden */
-			strcat(strcat(neworder, " "), LOC(lang, parameters[P_PAUSE]));
+      strcat((char *)neworder, " ");
+      strcat((char *)neworder, (const char *)LOC(lang, parameters[P_PAUSE]));
 		} else {
-			strcat(strcat(neworder, " "), LOC(lang, shortdirections[d]));
+      strcat((char *)neworder, " ");
+			strcat((char *)neworder, (const char *)LOC(lang, shortdirections[d]));
 		}
 	}
 
-	strcat(neworder, tail);
+	strcat((char *)neworder, (const char *)tail);
   norder = parse_order(neworder, u->faction->locale);
 #ifdef LASTORDER
 	set_order(&u->lastorder, norder);
@@ -1217,7 +1229,7 @@ make_route(unit * u, order * ord, region_list ** routep)
   region_list **iroute = routep;
   region * current = u->region;
   region * next = NULL;
-  const char * token = getstrtoken();
+  const xmlChar * token = getstrtoken();
   int error = movewhere(u, token, current, &next);
 
   if (error!=E_MOVE_OK) {
@@ -1472,8 +1484,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
   if (iroute!=route_begin) {
     /* the unit has moved at least one region */
     int walkmode;
-    region_list *rlist = route_begin;
-    char * p = buf;
+    region_list **rlist = &route_begin;
     region * next = r;
 
     setguard(u, GUARD_NONE);
@@ -1490,23 +1501,22 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
     /* Berichte über Durchreiseregionen */
 
-    *p = 0;
-    while (rlist!=iroute) {
+    while (*rlist!=iroute) {
       if (next!=u->region && next!=current) {
         MSG(("travelthru_trail", "region", next), 
           p, sizeof(buf) - (p-buf), u->faction->locale, u->faction);
-        if (rlist->data!=current) {
-          if (rlist->next->data == current) scat(" und ");
-          else scat(", ");
-        }
-        p += strlen(p);
       }
       next = rlist->data;
       rlist = rlist->next;
     }
+    /* remove excess regions */
+    *rlist = NULL;
+    free_regionlist(iroute);
+    iroute = NULL;
+
     if (mode!=TRAVEL_TRANSPORTED) {
       ADDMSG(&u->faction->msgs, msg_message("travel", 
-        "unit mode start end regions", u, walkmode, r, current, buf));
+        "unit mode start end regions", u, walkmode, r, current, route_begin));
     }
 
     mark_travelthru(u, r, route_begin, iroute);
@@ -1621,7 +1631,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   faction * f = u->faction;
   region * next_point = NULL;
   int error;
-  const char * token = getstrtoken();
+  const xmlChar * token = getstrtoken();
 
   if (routep) *routep = NULL;
 
@@ -1653,7 +1663,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   * befahrene Region. */
 
   while (next_point && current_point!=next_point && step < k) {
-    const char * token;
+    const xmlChar * token;
     int error;
     const terrain_type * tthis = current_point->terrain;
     /* these values need to be updated if next_point changes (due to storms): */
@@ -2327,7 +2337,7 @@ hunt(unit *u, order * ord)
     locale_string(u->faction->locale, directions[dir]));
   moves = 1;
 
-  speed = geti();
+  speed = getuint();
   if (speed==0) {
     speed = shipspeed(u->ship, u);
   } else {

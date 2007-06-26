@@ -196,6 +196,9 @@
 				RelativePath=".\calendar.h">
 			</File>
 			<File
+				RelativePath=".\command.h">
+			</File>
+			<File
 				RelativePath=".\creation.h">
 			</File>
 			<File
@@ -315,6 +318,9 @@
 		</File>
 		<File
 			RelativePath=".\calendar.c">
+		</File>
+		<File
+			RelativePath=".\command.c">
 		</File>
 		<File
 			RelativePath=".\curse.c">

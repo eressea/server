@@ -131,14 +131,14 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 }
 
 size_t
-nr_render(const struct message * msg, const struct locale * lang, char * buffer, size_t size, const void * userdata)
+nr_render(const struct message * msg, const struct locale * lang, xmlChar * buffer, size_t size, const void * userdata)
 {
   struct nrmessage_type * nrt = nrt_find(lang, msg->type);
 
   if (nrt) {
     const char * m = translate(nrt->string, userdata, nrt->vars, msg->parameters);
     if (m) {
-      return strlcpy(buffer, m, size);
+      return strlcpy((char*)buffer, m, size);
     } else {
       log_error(("Couldn't render message %s\n", nrt->mtype->name));
     }

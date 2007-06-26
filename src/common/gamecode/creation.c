@@ -68,8 +68,8 @@ createmonsters(void)
 	/* alles ist auf null gesetzt, ausser dem folgenden. achtung - partei
 	 * no 0 muss keine orders einreichen! */
 
-	set_string(&f->email, "monsters@eressea.de");
-	set_string(&f->name, "Monster");
+	f->email = strdup("monsters@eressea.de");
+	set_string(&f->name, (xmlChar*)"Monster");
 	f->alive = 1;
 	f->options = (char)(1<<O_REPORT);
 	addlist(&factions, f);

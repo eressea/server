@@ -177,7 +177,7 @@ msg_message(const char * name, const char* sig, ...)
 }
 
 static void
-caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+caddmessage(region * r, faction * f, const xmlChar *s, msg_t mtype, int level)
 {
   message * m = NULL;
 
@@ -230,7 +230,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 }
 
 void
-addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+addmessage(region * r, faction * f, const xmlChar *s, msg_t mtype, int level)
 {
   caddmessage(r, f, s, mtype, level);
 }

@@ -175,8 +175,8 @@ faction_additem(faction& f, const char * iname, int number)
 static void
 faction_addnotice(faction& f, const char * str)
 {
-  str = LOC(f.locale, str);
-  ADDMSG(&f.msgs, msg_message("msg_event", "string", str));
+  const xmlChar * loc = LOC(f.locale, str);
+  ADDMSG(&f.msgs, msg_message("msg_event", "string", loc));
 }
 
 static const char *

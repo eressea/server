@@ -91,7 +91,6 @@
 region  *regions;
 faction *factions;
 settings global;
-char     buf[BUFSIZE + 1];
 FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
@@ -252,12 +251,16 @@ const char *directions[MAXDIRECTIONS+2] =
   "pause"
 };
 
+/** Returns the English name of the race, which is what the database uses.
+ */
 const char *
 dbrace(const struct race * rc)
 {
   static char zText[32];
   char * zPtr = zText;
-  strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
+
+  /* the english names are all in ASCII, so we don't need to worry about UTF8 */
+  strcpy(zText, (const char*)LOC(find_locale("en"), rc_name(rc, 0)));
   while (*zPtr) {
     *zPtr = (char)(toupper(*zPtr));
     ++zPtr;
@@ -785,7 +788,7 @@ change_hitpoints (unit * u, int value)
   return hp;
 }
 
-int
+unsigned int
 atoip(const char *s)
 {
   int n;
@@ -797,22 +800,6 @@ atoip(const char *s)
 
   return n;
 }
-
-void
-scat (const char *s)
-{
-  strncat (buf, s, BUFSIZE - strlen (buf));
-}
-
-void
-icat (int n)
-{
-  char s[12];
-
-  sprintf (s, "%d", n);
-  scat (s);
-}
-
 
 region *
 findunitregion (const unit * su)
@@ -1291,7 +1278,7 @@ count_maxmigrants(const faction * f)
 void
 init_tokens(const struct order * ord)
 {
-  char * cmd = getcommand(ord);
+  xmlChar * cmd = getcommand(ord);
   init_tokens_str(cmd, cmd);
 }
 
@@ -1320,8 +1307,8 @@ parse(keyword_t kword, int (*dofun)(unit *, struct order *), boolean thisorder)
   }
 }
 
-const char *
-igetstrtoken(const char * initstr)
+const xmlChar *
+igetstrtoken(const xmlChar * initstr)
 {
   if (initstr!=NULL) {
     init_tokens_str(initstr, NULL);
@@ -1330,36 +1317,20 @@ igetstrtoken(const char * initstr)
   return getstrtoken();
 }
 
-int
-geti (void)
+unsigned int
+getuint (void)
 {
-  return atoip (getstrtoken ());
+  return atoip((const char *)getstrtoken());
 }
 
-/* GET KEYWORD, SKILL, ITEM, SPELL benutzen FINDSTR - welche Item um Item eine
- * Liste durchsucht.
- *
- * FIND wird immer von GET aufgerufen. GET braucht keine Parameter, IGET braucht
- * einen String aus dem gelesen wird. In FIND stehen dann listen etc drinnen.
- * FIND kann man auch allein verwenden, wenn der string _nur_ noch das gesuchte
- * object enthaelt. Steht noch weitere info darin, sollte man GET verwenden,
- * bzw. GETI wenn die info am Anfang eines neuen Stringes steht. */
-
 int
-findstr(const char **v, const char *s, unsigned char n)
+getint (void)
 {
-  int i;
-  size_t ss = strlen(s);
-  if (!ss)
-    return -1;
-  for (i = 0; i != n; i++)
-    if (!strncasecmp(s, v[i], ss))
-      return i;
-  return -1;
+  return atoi((const char *)getstrtoken());
 }
 
 const struct race *
-findrace(const char * s, const struct locale * lang)
+findrace(const xmlChar * s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_RACES);
   variant token;
@@ -1371,7 +1342,7 @@ findrace(const char * s, const struct locale * lang)
 }
 
 int
-findoption(const char *s, const struct locale * lang)
+findoption(const xmlChar *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_OPTIONS);
   variant token;
@@ -1383,7 +1354,7 @@ findoption(const char *s, const struct locale * lang)
 }
 
 skill_t
-findskill(const char *s, const struct locale * lang)
+findskill(const xmlChar *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_SKILLS);
   variant token;
@@ -1393,7 +1364,7 @@ findskill(const char *s, const struct locale * lang)
 }
 
 keyword_t
-findkeyword(const char *s, const struct locale * lang)
+findkeyword(const xmlChar *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_KEYWORDS);
   variant token;
@@ -1405,7 +1376,7 @@ findkeyword(const char *s, const struct locale * lang)
 }
 
 param_t
-findparam(const char *s, const struct locale * lang)
+findparam(const xmlChar *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_PARAMS);
   variant token;
@@ -1518,19 +1489,19 @@ read_newunitid (const faction * f, const region * r)
 int
 read_unitid (const faction * f, const region * r)
 {
-  const char * s = getstrtoken ();
+  const xmlChar * s = getstrtoken();
 
   /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-  switch (findparam (s, f->locale)) {
+  switch (findparam(s, f->locale)) {
   case P_TEMP:
     return read_newunitid(f, r);
   }
   if (!s || *s == 0)
     return -1;
-  return atoi36(s);
+  return atoi36((const char *)s);
 }
 
 /* exported symbol */
@@ -1647,7 +1618,7 @@ buildingname (const building * b)
 {
   char *ibuf = idbuf[(++nextbuf) % 8];
 
-  snprintf(ibuf, sizeof(name), "%s (%s)", strcheck(b->name, NAMESIZE), itoa36(b->no));
+  snprintf(ibuf, sizeof(name), "%s (%s)", b->name, itoa36(b->no));
   ibuf[sizeof(name)-1] = 0;
   return ibuf;
 }
@@ -1679,7 +1650,7 @@ const char *
 unitname(const unit * u)
 {
   char *ubuf = idbuf[(++nextbuf) % 8];
-  snprintf(ubuf, sizeof(name), "%s (%s)", strcheck(u->name, NAMESIZE), itoa36(u->no));
+  snprintf(ubuf, sizeof(name), "%s (%s)", u->name, itoa36(u->no));
   ubuf[sizeof(name)-1] = 0;
   return ubuf;
 }
@@ -1988,17 +1959,17 @@ use_birthdayamulet(region * r, unit * magician, order * ord)
 {
   region *tr;
   direction_t d;
+  message * msg = msg_message("meow", "");
 
   unused(ord);
   unused(magician);
 
+  add_message(&r->msgs, msg);
   for(d=0;d<MAXDIRECTIONS;d++) {
     tr = rconnect(r, d);
-    if(tr) addmessage(tr, 0, "Miiauuuuuu...", MSG_MESSAGE, ML_IMPORTANT);
+    if (tr) add_message(&tr->msgs, msg);
   }
-
-  tr = r;
-  addmessage(r, 0, "Miiauuuuuu...", MSG_MESSAGE, ML_IMPORTANT);
+  msg_release(msg);
 }
 
 static void
@@ -2036,7 +2007,7 @@ init_directions(tnode * root, const struct locale * lang)
 }
 
 direction_t
-finddirection(const char *s, const struct locale * lang)
+finddirection(const xmlChar *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_DIRECTIONS);
   variant token;
@@ -2054,6 +2025,13 @@ init_locale(const struct locale * lang)
   int i;
   const struct race * rc;
   struct tnode * tokens;
+  const terrain_type * terrain;
+
+  tokens = get_translations(lang, UT_MAGIC);
+  for (i=0;i!=MAXMAGIETYP;++i) {
+    var.i = i;
+    addtoken(tokens, LOC(lang, magietypen[i]), var);
+  }
 
   tokens = get_translations(lang, UT_DIRECTIONS);
   init_directions(tokens, lang);
@@ -2074,7 +2052,7 @@ init_locale(const struct locale * lang)
   tokens = get_translations(lang, UT_SKILLS);
   for (i=0;i!=MAXSKILLS;++i) {
     if (i!=SK_TRADE || !TradeDisabled()) {
-      const char * skname = skillname((skill_t)i, lang);
+      const xmlChar * skname = skillname((skill_t)i, lang);
       if (skname!=NULL) {
         var.i = i;
         addtoken(tokens, skname, var);
@@ -2092,6 +2070,12 @@ init_locale(const struct locale * lang)
   for (i=0;i!=MAXOPTIONS;++i) {
     var.i = i;
     addtoken(tokens, LOC(lang, options[i]), var);
+  }
+
+  tokens = get_translations(lang, UT_TERRAINS);
+  for (terrain=terrains();terrain!=NULL;terrain=terrain->next) {
+    var.v = terrain;
+    addtoken(tokens, LOC(lang, terrain->_name), var);
   }
 }
 
@@ -2633,16 +2617,16 @@ wage(const region *r, const faction * f, const race * rc)
 
 
 static region *
-findspecialdirection(const region *r, const char *token)
+findspecialdirection(const region *r, const xmlChar *token)
 {
   attrib *a;
   spec_direction *d;
 
-  if (strlen(token)==0) return NULL;
+  if (xmlStrlen(token)==0) return NULL;
   for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
     d = (spec_direction *)(a->data.v);
 
-    if (d->active && strncasecmp(d->keyword, token, strlen(token)) == 0) {
+    if (d->active && xmlStrncasecmp(d->keyword, token, xmlStrlen(token)) == 0) {
       return findregion(d->x, d->y);
     }
   }
@@ -2663,7 +2647,7 @@ maintenance_cost(const struct unit * u)
 }
 
 message *
-movement_error(unit * u, const char * token, order * ord, int error_code)
+movement_error(unit * u, const xmlChar * token, order * ord, int error_code)
 {
   direction_t d;
   switch (error_code) {
@@ -2677,7 +2661,7 @@ movement_error(unit * u, const char * token, order * ord, int error_code)
 }
 
 int
-movewhere(const unit *u, const char * token, region * r, region** resultp)
+movewhere(const unit *u, const xmlChar * token, region * r, region** resultp)
 {
   region * r2;
   direction_t d;

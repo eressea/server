@@ -23,7 +23,7 @@ struct newfaction;
 typedef struct newfaction {
   struct newfaction * next;
   char * email;
-  char * password;
+  xmlChar * password;
   const struct locale * lang;
   const struct race * race;
   int bonus;

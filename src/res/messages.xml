@@ -961,6 +961,16 @@
     <text locale="de">"In $region($region) erhielt $unit($unit) eine Botschaft von $unit.dative($sender): '$string'"</text>
     <text locale="en">"In $region($region), $unit($unit) received a message by $unit($sender): '$string'"</text>
   </message>
+  <message name="museumgiveback" section="mail">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="items" type="items"/>
+      <arg name="sender" type="unit"/>
+    </type>
+    <text locale="de">"In $region($region) erhielt $unit($unit) von $unit.dative($sender) $resources($items)"</text>
+    <text locale="en">"In $region($region), $unit($unit) received $resources($items) from $unit($sender)"</text>
+  </message>
   <message name="maintenance_nowork" section="events">
     <type>
       <arg name="building" type="building"/>
@@ -1036,6 +1046,86 @@
     </type>
     <text locale="de">"$unit($unit) schwenkt sein Szepter und sorgt für Verwirrung und Chaos in der Region."</text>
   </message>
+
+  <message name="find_manual" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="location" type="string"/>
+      <arg name="book" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit) stolpert bei der Erforschung der Region über $localize($location). Nähere Durchsuchung fördert ein zerfleddertes altes Buch mit dem Titel '$localize($book)' zu Tage. Der Wissensschub ist enorm."</text>
+  </message>
+
+  <message name="alp_success" section="events">
+    <text locale="de">"Ein Alp hat sein Opfer gefunden und springt auf den Rücken von $unit($target)!"</text>
+  </message>
+
+  <message name="summon_alp_effect" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="alp" type="unit"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) beschwört den Alp $unit($alp) für $unit($target)."</text>
+    <text locale="en">"$unit($mage) summons the alp $unit($alp) for $unit($target)."</text>
+  </message>
+
+  <message name="healing_effect_0" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) kümmert sich um die Verletzten und heilt $int($amount) Verwundete."</text>
+  </message>
+
+  <message name="healing_effect_1" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="item" type="resource"/>
+    </type>
+    <text locale="de">"$unit($mage) kümmert sich um die Verletzten und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Verwundete werden geheilt."</text>
+  </message>
+
+  <message name="reanimate_effect_0" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) beginnt ein Ritual der Wiederbelebung. $int($amount) Krieger stehen von den Toten auf."</text>
+  </message>
+
+  <message name="reanimate_effect_1" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="item" type="resource"/>
+    </type>
+    <text locale="de">"$unit($mage) beginnt ein Ritual der Wiederbelebung und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Krieger stehen von den Toten auf."</text>
+  </message>
+
+  <message name="chaosgate_effect_1" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) öffnet ein Chaostor."</text>
+    <text locale="en">"$unit($mage) opens a chaos gate."</text>
+  </message>
+
+  <message name="chaosgate_effect_2" section="events">
+    <text locale="de">Ein Wirbel aus blendendem Licht erscheint."</text>
+    <text locale="en">"A vortex of blinding light appears."</text>
+  </message>
+
+  <message name="summonundead_effect_1" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) erweckt $int($amount) Untote aus ihren Gräbern."</text>
+    <text locale="en">"$unit($mage) calls $int($amount) undead from their graves."</text>
+  </message>
+
   <message name="viewreality_effect" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1043,6 +1133,7 @@
     <text locale="de">"$unit($unit) gelingt es, durch die Nebel auf die Realität zu blicken."</text>
     <text locale="en">"$unit($unit) manages to catch a glimpse of reality through the fog."</text>
   </message>
+
   <message name="recruit_effect" section="events">
     <type>
       <arg name="mage" type="unit"/>
@@ -1398,15 +1489,7 @@
     <text locale="de">"$unit($unit) in $region($region) wird von einem Unbekannten verflucht."</text>
     <text locale="en">"$unit($unit) in $region($region) was cursed by an unknown magician."</text>
   </message>
-  <message name="drought_effect" section="magic">
-    <type>
-      <arg name="mage" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="extended" type="string"/>
-    </type>
-    <text locale="de">"$unit($mage) ruft das Feuer der Sonne auf $region($region) herab."</text>
-    <text locale="en">"$unit($mage) calls the fires of the sun upon $region($region)."</text>
-  </message>
+
   <message name="sparkle_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
@@ -1759,7 +1842,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Building $int36($id) could not be located."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Building $int36($id) could not be located."</text>
   </message>
-  <message name="spellunitnotfound" section="magic">
+  <message name="unitnotfound_id" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -1945,7 +2028,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gelingt es zwar die Region zu verzaubern, aber irgendwas ging schief."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) manages to put a spell on the region, but something went wrong nonetheless."</text>
   </message>
-  <message name="summonundead_effect" section="magic">
+  <message name="summonundead_effect_2" section="magic">
     <type>
       <arg name="unit" type="unit"/>
     </type>
@@ -2328,11 +2411,11 @@
       <arg name="mode" type="int"/>
       <arg name="start" type="region"/>
       <arg name="end" type="region"/>
-      <arg name="regions" type="string"/>
+      <arg name="regions" type="regions"/>
     </type>
-    <text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($strlen($regions)," Dabei wurde $regions durchquert.","")"</text>
-    <text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end) trans $regions"</text>
-    <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end)$if($strlen($regions)," by way of $regions","")."</text>
+    <text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($isnull($regions),""," Dabei wurde $regions($regions,1,-2) durchquert.")"</text>
+    <text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end) trans $regions($regions,1,-2)"</text>
+    <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end)$if($isnull($regions),""," by way of $regions($regions,1,-2)")."</text>
   </message>
   <message name="detectoceandir" section="movement">
     <type>
@@ -3862,6 +3945,16 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit muß sich an Land befinden."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit must be on land."</text>
+  </message>
+  <message name="error_nograves" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In $region($target) sind keine Gräber."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are no graves in $region($target)."</text>
   </message>
   <message name="error241" section="errors">
     <type>
@@ -6468,9 +6561,18 @@
       <arg name="target" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),"","en") an $unit($target)."</text>
-    <text locale="fr">"$unit($unit) transfers $int($amount) person$if($eq($amount,1),"","s") to $unit($target)."</text>
     <text locale="en">"$unit($unit) transfers $int($amount) person$if($eq($amount,1),"","s") to $unit($target)."</text>
   </message>
+
+  <message name="give_person_peasants" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),"","en") an die Bauern."</text>
+    <text locale="en">"$unit($unit) transfers $int($amount) person$if($eq($amount,1),"","s") to the local peasants."</text>
+  </message>
+
   <message name="give" section="economy">
     <type>
       <arg name="unit" type="unit"/>
@@ -6478,9 +6580,14 @@
       <arg name="resource" type="resource"/>
       <arg name="target" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an $unit($target)."</text>
-    <text locale="fr">"$unit($unit) gives $int($amount) $resource($resource,$amount) to $unit($target)."</text>
-    <text locale="en">"$unit($unit) gives $int($amount) $resource($resource,$amount) to $unit($target)."</text>
+  <message name="give_peasants" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="resource" type="resource"/>
+    </type>
+    <text locale="de">"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an die Bauern."</text>
+    <text locale="en">"$unit($unit) gives $int($amount) $resource($resource,$amount) to the local peasants."</text>
   </message>
   <message name="maintenance" section="economy">
     <type>
@@ -6627,6 +6734,29 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Pyramids may be build in this region."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Pyramids may be build in this region."</text>
   </message>
+  
+  <message name="error_spell_on_ship_already" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt beeits ein Zauber."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is already a spell on $ship($ship)."</text>
+  </message>
+  
+  <message name="error_spell_on_flying_ship" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es ist zu gefährlich, diesen Zauber auf das fliegende Schiff $ship($ship) zu legen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - It is far too dangerous to put this spell on the flying ship $ship($ship)."</text>
+  </message>
+  
   <message name="wdw_pyramidspell_notfound" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -6639,6 +6769,7 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
   </message>
+
   <message name="wormhole_requirements" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -6759,10 +6890,108 @@
     <text locale="de">"$unit($mage) zaubert $spell($spell): $int($dead) $if($eq($dead,1),"Krieger wurde", "Krieger wurden") getötet."</text>
     <text locale="en">"$unit($mage) casts $spell($spell): $int($dead) $if($eq($dead,1),"enemy was", "enemies were") killed."</text>
   </message>
+
+  <message name="earthquake_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) läßt die Erde in $region($region) erzittern."</text>
+    <text locale="en">"$unit($mage) shakes the earth in $region($region)."</text>
+  </message>
+  
+  <message name="drought_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) verflucht das Land, und eine Dürreperiode beginnt."</text>
+    <text locale="en">"$unit($mage) puts a curse on the land and a drought sets in."</text>
+  </message>
+  
+  <message name="summon_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($mage) beschwört $int($amount) $race($race,$amount)."</text>
+    <text locale="en">"$unit($mage) summons  $int($amount) $race($race,$amount)."</text>
+  </message>
+  
+  <message name="forestfire_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) erschafft in $region($region) eine verheerende Feuersbrunst. $int($amount) Bäume fallen den Flammen zum Opfer."</text>
+    <text locale="de">"$unit($mage) creates a flaming inferno in $region($region). $int($amount) trees fall vistim to the flames."</text>
+</text>
+  </message>
+  
+  <message name="recruit_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) konnte $int($amount) Bauern anwerben."</text>
+    <text locale="en">"$unit($mage) recruited $int($amount) peasants."</text>
+  </message>
+
+  <message name="homestone_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"Mit einem Ritual bindet $unit($unit) die magischen Kräfte der Erde in die Mauern von $building($building)."</text>
+  </message>
+
+  <message name="blessedstonecircle_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($mage) weight $building($building)."</text>
+    <text locale="en">"$unit($mage) blesses $building($building)."</text>
+  </message>
+
+  <message name="drought_effect_1" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Eis schmilzt und verwandelt sich in Morast. Reißende Ströme spülen die mageren Felder weg und ersäufen Mensch und Tier. Was an Bauten nicht den Fluten zum Opfer fiel, verschlingt der Morast. Die sengende Hitze verändert die Region für immer."</text>
+  </message>
+
+  <message name="drought_effect_2" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die Felder verdorren und Pferde verdursten. Die Hungersnot kostet vielen Bauern das Leben. Vertrocknete Bäume recken ihre kahlen Zweige in den blauen Himmel, von dem erbarmungslos die sengende Sonne brennt."</text>
+  </message>
+
+  <message name="drought_effect_3" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die Felder verdorren und Pferde verdursten. Die Hungersnot kostet vielen Bauern das Leben. Vertrocknete Bäume recken ihre kahlen Zweige in den blauen Himmel, von dem erbarmungslos die sengende Sonne brennt. Die Dürre verändert die Region für immer."</text>
+  </message>
+
+  <message name="drought_effect_4" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Das Eis zerbricht und eine gewaltige Flutwelle verschlingt die Region."</text>
+  </message>
+
   <message name="generous_effect_1" section="magic">
     <text locale="de">"Die Darbietungen eines fahrenden Gauklers begeistern die Leute. Die fröhliche und ausgelassene Stimmung seiner Lieder überträgt sich auf alle Zuhörer."</text>
     <text locale="en">"A touring minstrel entertains the locals. The joyous and generous disposition of his songs prove infectious."</text>
   </message>
+
   <message name="generous_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
@@ -7264,6 +7493,35 @@
     <text locale="en">"A message from $unit($unit): '$message'"</text>
   </message>
 
+  <message name="encounter_allies" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="name" type="string"/>
+    </type>
+    <text locale="de">"Plötzlich stolpert $unit($unit) über einige $localize($name). Nach kurzem Zögern entschließen die $localize($name), sich Deiner Partei anzuschließen."</text>
+  </message>
+
+  <message name="encounter_villagers" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) entdeckt ein kleines Dorf. Die meisten Häuser wurden durch einen über die Ufer getretenen Fluß zerstört. Eine Gruppe der verzweifelten Menschen schließt sich deiner Partei an."</text>
+    <text locale="en">"$unit($unit) discovers a small village. Most of the houses have been destroyed by flooding, and a group of the distressed villagers join your faction."</text>
+  </message>
+
+  <message name="mob_warning" section="events">
+    <text locale="de">"Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier."</text>
+    <text locale="en">"An angry mob forms and hunts practitioners of the dark arts."</text>
+  </message>
+
+  <message name="familiar_name" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"Vertrauter von $unit($unit)"</text>
+    <text locale="en">"Familiar of $unit($unit)"</text>
+  </message>
+
   <message name="recruit_archetype" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -7272,6 +7530,73 @@
     </type>
     <text locale="de">"$unit($unit) rekrutiert $int($amount) $localize($archetype)."</text>
     <text locale="en">"$unit($unit) recruits $int($amount) $localize($archetype)."</text>
+  </message>
+
+  <message name="illegal_password" section="events">
+    <type>
+      <arg name="newpass" type="string"/>
+    </type>
+    <text locale="de">"Dein Passwort enthält Zeichen, die bei der Nachsendung von Reports Probleme bereiten können. Bitte beachte, dass Passwortenur aus Buchstaben von A bis Z und Zahlen bestehen dürfen. Dein neues Passwort ist '${newpass}'."</text>
+    <text locale="en">"Your password was changed because it contained illegal characters. Legal passwords may only contain numbers and letters from A to Z. Your new Password is '${newpass}'."</text>
+  </message>
+
+  <message name="meow" section="events">
+    <text locale="de">"Miiauuuuuu..."</text>
+    <text locale="en">"Meeoooooow..."</text>
+  </message>
+
+  <message name="migrant_conversion" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"Die Götter segnen $unit($unit) mit der richtigen Rasse."</text>
+    <text locale="en">"The gods are blessing $unit($unit) with the correct race."</text>
+  </message>
+
+  <message name="arena_leave_fail" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"Der Versuch, die Greifenschwingen zu benutzen, schlug fehl. $unit($unit) konnte die Ebene der Herausforderung nicht verlassen."</text>
+  </message>
+
+  <message name="caldera_handle_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) springt in die ewigen Feuer des Kraters."</text>
+  </message>
+
+  <message name="caldera_handle_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="items" type="items"/>
+    </type>
+    <text locale="de">"$unit($unit) springt in die ewigen Feuer des Kraters."</text>
+  </message>
+
+  <message name="arena_enter_fail" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"In $region($region) erklingt die Stimme des Torwächters: 'Nur wer ohne materielle Güter und noch lernbegierig ist, der darf die Ebene der Herausforderung betreten. Und vergiß nicht mein Trinkgeld.'. $unit($unit) erhielt keinen Einlaß."</text>
+  </message>
+
+  <message name="arena_enter" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"In $region($region) öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. $unit($unit) durchschreitet das Tor zu einer anderen Welt."</text>
+  </message>
+
+  <message name="chaos_disease" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) scheint von einer seltsamen Krankheit befallen."</text>
+    <text locale="en">"$unit($unit) is stricken by a strange disease."</text>
   </message>
 
 </messages>

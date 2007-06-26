@@ -22,7 +22,7 @@ extern "C" {
 extern int teach_cmd(struct unit * u, struct order * ord);
 extern int learn_cmd(struct unit * u, struct order * ord);
 
-extern magic_t getmagicskill(void);
+extern magic_t getmagicskill(const struct locale * lang);
 extern boolean is_migrant(struct unit *u);
 extern int study_cost(struct unit *u, skill_t talent);
 

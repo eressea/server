@@ -107,9 +107,9 @@ report_faction(report_context * ctx, faction * f)
 {
   xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "faction");
   xmlNewProp(node, BAD_CAST "id", xml_i(f->no));
-  xmlNewProp(node, BAD_CAST "name", xml_s(f->name));
+  xmlNewProp(node, BAD_CAST "name", f->name);
   xmlNewProp(node, BAD_CAST "email", xml_s(f->email));
-  if (f->banner && *f->banner) xmlNewProp(node, BAD_CAST "banner", xml_s(f->banner));
+  if (f->banner && *f->banner) xmlNewProp(node, BAD_CAST "banner", f->banner);
   if (f==ctx->f) {
     const char * s;
     xmlNewProp(node, BAD_CAST "locale", BAD_CAST locale_name(f->locale));

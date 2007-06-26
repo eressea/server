@@ -64,11 +64,11 @@ typedef struct faction {
 	int no;
 	int subscription;
 	unsigned int flags;
-	char *name;
-	char *banner;
+	xmlChar *name;
+	xmlChar *banner;
 	char *email;
-	char *passw;
-	char *override;
+	xmlChar *passw;
+	xmlChar *override;
 #ifdef SHORTPWDS
   struct shortpwd * shortpwds;
 #endif
@@ -121,10 +121,10 @@ extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(variant data);
 extern struct unit * addplayer(struct region *r, faction * f);
-extern struct faction * addfaction(const char *email, const char* password, 
+extern struct faction * addfaction(const char *email, const xmlChar* password, 
                                    const struct race * frace, 
                                    const struct locale *loc, int subscription);
-extern boolean checkpasswd(const faction * f, const char * passwd, boolean shortp);
+extern boolean checkpasswd(const faction * f, const xmlChar * passwd, boolean shortp);
 extern void destroyfaction(faction * f);
 
 extern void set_alliance(struct faction * a, struct faction * b, int status);

@@ -284,9 +284,6 @@
 				RelativePath=".\bsdstring.h">
 			</File>
 			<File
-				RelativePath=".\command.h">
-			</File>
-			<File
 				RelativePath=".\crmessage.h">
 			</File>
 			<File
@@ -318,6 +315,9 @@
 			</File>
 			<File
 				RelativePath=".\nrmessage.h">
+			</File>
+			<File
+				RelativePath=".\parser.h">
 			</File>
 			<File
 				RelativePath=".\rand.h">
@@ -403,7 +403,7 @@
 			RelativePath=".\base36.c">
 		</File>
 		<File
-			RelativePath=".\command.c">
+			RelativePath="..\..\config.h">
 		</File>
 		<File
 			RelativePath=".\crmessage.c">
@@ -416,6 +416,9 @@
 		</File>
 		<File
 			RelativePath=".\event.c">
+		</File>
+		<File
+			RelativePath=".\filereader.c">
 		</File>
 		<File
 			RelativePath=".\functions.c">
@@ -448,6 +451,9 @@
 			RelativePath=".\nrmessage.c">
 		</File>
 		<File
+			RelativePath=".\parser.c">
+		</File>
+		<File
 			RelativePath=".\rand.c">
 		</File>
 		<File
@@ -461,6 +467,12 @@
 		</File>
 		<File
 			RelativePath=".\umlaut.c">
+		</File>
+		<File
+			RelativePath=".\unicode.c">
+		</File>
+		<File
+			RelativePath=".\unicode.h">
 		</File>
 		<File
 			RelativePath=".\vmap.c">

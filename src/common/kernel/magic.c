@@ -1535,7 +1535,7 @@ msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spll
       parameters[P_TEMP]), itoa36(spobj->data.i));
     uid = tbuf;
   }
-  return msg_message("spellunitnotfound", 
+  return msg_message("unitnotfound_id", 
     "unit region command id", mage, mage->region, ord, uid);
 }
 
@@ -1791,34 +1791,34 @@ free_spellparameter(spellparameter *pa)
 }
 
 static int
-addparam_string(char ** param, spllprm ** spobjp)
+addparam_string(const xmlChar ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
 
   spobj->flag = 0;
   spobj->typ = SPP_STRING;
-  spobj->data.s = strdup(param[0]);
+  spobj->data.xs = xmlStrdup(param[0]);
   return 1;
 }
 
 static int
-addparam_int(char ** param, spllprm ** spobjp)
+addparam_int(const xmlChar ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
 
   spobj->flag = 0;
   spobj->typ = SPP_INT;
-  spobj->data.i = atoi(param[0]);
+  spobj->data.i = atoi((char*)param[0]);
   return 1;
 }
 
 static int
-addparam_ship(char ** param, spllprm ** spobjp)
+addparam_ship(const xmlChar ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
-  int id = atoi36(param[0]);
+  int id = atoi36((const char *)param[0]);
 
   spobj->flag = 0;
   spobj->typ = SPP_SHIP;
@@ -1827,10 +1827,10 @@ addparam_ship(char ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_building(char ** param, spllprm ** spobjp)
+addparam_building(const xmlChar ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
-  int id = atoi36(param[0]);
+  int id = atoi36((const char *)param[0]);
   
   spobj->flag = 0;
   spobj->typ = SPP_BUILDING;
@@ -1839,7 +1839,7 @@ addparam_building(char ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_region(char ** param, spllprm ** spobjp, const unit * u, order * ord)
+addparam_region(const xmlChar ** param, spllprm ** spobjp, const unit * u, order * ord)
 {
   assert(param[0]);
   if (param[1]==0) {
@@ -1847,7 +1847,7 @@ addparam_region(char ** param, spllprm ** spobjp, const unit * u, order * ord)
     cmistake(u, ord, 194, MSG_MAGIC);
     return -1;
   } else {
-    int tx = atoi(param[0]), ty = atoi(param[1]);
+    int tx = atoi((const char*)param[0]), ty = atoi((const char*)param[1]);
     short x = rel_to_abs(0, u->faction, (short)tx, 0);
     short y = rel_to_abs(0, u->faction, (short)ty, 1);
     region *rt = findregion(x,y);
@@ -1869,7 +1869,7 @@ addparam_region(char ** param, spllprm ** spobjp, const unit * u, order * ord)
 
 
 static int
-addparam_unit(char ** param, spllprm ** spobjp, const unit * u, order * ord)
+addparam_unit(const xmlChar ** param, spllprm ** spobjp, const unit * u, order * ord)
 {
   spllprm *spobj;
   int i = 0;
@@ -1889,13 +1889,13 @@ addparam_unit(char ** param, spllprm ** spobjp, const unit * u, order * ord)
   spobj = *spobjp = malloc(sizeof(spllprm));
   spobj->flag = 0;
   spobj->typ = otype;
-  spobj->data.i = atoi36(param[i]);
+  spobj->data.i = atoi36((const char*)param[i]);
 
   return i+1;
 }
 
 static spellparameter *
-add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param, int size, struct order * ord)
+add_spellparameter(region *target_r, unit *u, const char *syntax, xmlChar ** param, int size, struct order * ord)
 {
   boolean fail = false;
   int i = 0;
@@ -2443,7 +2443,7 @@ cast_cmd(unit * u, order * ord)
   region * target_r = r;
   int level, range;
   unit *familiar = NULL, *mage = u;
-  const char * s;
+  const xmlChar * s;
   spell * sp;
   spellparameter *args = NULL;
 
@@ -2462,8 +2462,8 @@ cast_cmd(unit * u, order * ord)
   s = getstrtoken();
   /* für Syntax ' STUFE x REGION y z ' */
   if (findparam(s, u->faction->locale) == P_LEVEL) {
-    s = getstrtoken();
-    level = min(atoip(s), level);
+    int p = getint();
+    level = min(p, level);
     if (level < 1) {
       /* Fehler "Das macht wenig Sinn" */
       cmistake(u, ord, 10, MSG_MAGIC);
@@ -2472,8 +2472,8 @@ cast_cmd(unit * u, order * ord)
     s = getstrtoken();
   }
   if (findparam(s, u->faction->locale) == P_REGION) {
-    short t_x = (short)atoi(getstrtoken());
-    short t_y = (short)atoi(getstrtoken());
+    short t_x = (short)getint();
+    short t_y = (short)getint();
     t_x = rel_to_abs(getplane(u->region),u->faction,t_x,0);
     t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
     target_r = findregion(t_x, t_y);
@@ -2488,16 +2488,16 @@ cast_cmd(unit * u, order * ord)
   /* für Syntax ' REGION x y STUFE z '
   * hier nach REGION nochmal auf STUFE prüfen */
   if (findparam(s, u->faction->locale) == P_LEVEL) {
-    s = getstrtoken();
-    level = min(atoip(s), level);
-    s = getstrtoken();
+    int p = getint();
+    level = min(p, level);
     if (level < 1) {
       /* Fehler "Das macht wenig Sinn" */
       cmistake(u, ord, 10, MSG_MAGIC);
       return 0;
     }
+    s = getstrtoken();
   }
-  if (!s[0] || strlen(s) == 0) {
+  if (!s[0] || xmlStrlen(s) == 0) {
     /* Fehler "Es wurde kein Zauber angegeben" */
     cmistake(u, ord, 172, MSG_MAGIC);
     return 0;
@@ -2619,7 +2619,7 @@ cast_cmd(unit * u, order * ord)
   }
   /* Weitere Argumente zusammenbasten */
   if (sp->parameter) {
-    char ** params = malloc(2*sizeof(char*));
+    xmlChar ** params = malloc(2*sizeof(char*));
     int p = 0, size = 2;
     for (;;) {
       s = getstrtoken();
@@ -2628,7 +2628,7 @@ cast_cmd(unit * u, order * ord)
         size*=2;
         params = realloc(params, sizeof(char*)*size);
       }
-      params[p++] = strdup(s);
+      params[p++] = xmlStrdup(s);
     }
     params[p] = 0;
     args = add_spellparameter(target_r, mage, sp->parameter, params, p, ord);
@@ -2818,13 +2818,13 @@ magic(void)
   remove_empty_units();
 }
 
-const char *
+const xmlChar *
 spell_info(const spell * sp, const struct locale * lang)
 {
   return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
-const char *
+const xmlChar *
 spell_name(const spell * sp, const struct locale * lang)
 {
   return LOC(lang, mkname("spell", sp->sname));

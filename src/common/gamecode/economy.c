@@ -64,6 +64,12 @@
 #include <util/parser.h>
 #include <util/rng.h>
 
+#include <attributes/reduceproduction.h>
+#include <attributes/racename.h>
+#include <attributes/orcification.h>
+
+#include <items/seed.h>
+
 /* libs includes */
 #include <math.h>
 #include <stdio.h>
@@ -71,11 +77,6 @@
 #include <assert.h>
 #include <limits.h>
 
-#include <attributes/reduceproduction.h>
-#include <attributes/racename.h>
-#include <attributes/orcification.h>
-
-#include <items/seed.h>
 
 typedef struct request {
   struct request * next;
@@ -443,15 +444,15 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 
   init_tokens(ord);
   skip_token();
-  n = geti();
+  n = getuint();
   if (f->no==MONSTER_FACTION) {
     /* Monster dürfen REKRUTIERE 15 dracoid machen */
-    const char * str = getstrtoken();
+    const xmlChar * str = getstrtoken();
     if (str!=NULL && *str) {
       for (rc = races;rc;rc=rc->next) {
-        if (strncasecmp(LOC(f->locale, rc->_name[0]), str, strlen(str))==0)
+        if (xmlStrncasecmp(LOC(f->locale, rc->_name[0]), str, xmlStrlen(str))==0)
           break;
-        if (strncasecmp(LOC(f->locale, rc->_name[1]), str, strlen(str))==0)
+        if (xmlStrncasecmp(LOC(f->locale, rc->_name[1]), str, xmlStrlen(str))==0)
           break;
       }
     }
@@ -571,7 +572,7 @@ give_cmd(unit * u, order * ord)
 {
   region * r = u->region;
   unit *u2;
-  const char *s;
+  const xmlChar *s;
   int i, n;
   const item_type * itype;
   param_t p;
@@ -606,6 +607,8 @@ give_cmd(unit * u, order * ord)
   p = findparam(s, u->faction->locale);
 
   if (p == P_CONTROL) {
+    message * msg;
+
     if (!u2) {
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
       return;
@@ -633,13 +636,12 @@ give_cmd(unit * u, order * ord)
     freset(u, UFL_OWNER);
     fset(u2, UFL_OWNER);
 
-    ADDMSG(&u->faction->msgs,
-      msg_message("givecommand", "unit receipient", u, u2));
+    msg = msg_message("givecommand", "unit receipient", u, u2);
+    add_message(&u->faction->msgs, msg);
     if (u->faction != u2->faction) {
-      ADDMSG(&u2->faction->msgs,
-        msg_message("givecommand", "unit receipient",
-        ucansee(u2->faction, u, u_unknown()), u2));
+      add_message(&u2->faction->msgs, msg);
     }
+    msg_release(msg);
     return;
   }
 
@@ -721,7 +723,7 @@ give_cmd(unit * u, order * ord)
   }
 
   else if (p==P_ANY) {
-    const char * s = getstrtoken();
+    const xmlChar * s = getstrtoken();
 
     if (*s == 0) { /* Alle Gegenstände übergeben */
 
@@ -802,7 +804,7 @@ give_cmd(unit * u, order * ord)
     s = getstrtoken(); /* skip one ahead to get the amount. */
   }
 
-  n = atoip(s);		/* n: anzahl */
+  n = atoip((const char *)s);		/* n: anzahl */
   if (p==P_EACH) {
     n *= u2->number;
   }
@@ -857,7 +859,7 @@ static int
 forget_cmd(unit * u, order * ord)
 {
 	skill_t sk;
-	const char *s;
+	const xmlChar *s;
   
   init_tokens(ord);
   skip_token();
@@ -1061,11 +1063,11 @@ static int
 recruit_archetype(unit * u, order * ord)
 {
   int want;
-  const char * s;
+  const xmlChar * s;
 
   init_tokens(ord);
   skip_token();
-  want = geti();
+  want = getuint();
   s = getstrtoken();
   if (want>0 && s && s[0]) {
     int n = want;
@@ -1733,16 +1735,16 @@ make_cmd(unit * u, struct order * ord)
   param_t p;
   int m;
   const item_type * itype;
-  const char *s;
+  const xmlChar *s;
   const struct locale * lang = u->faction->locale;
 
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
 
-  m = atoi(s);
+  m = atoi((const char *)s);
   sprintf(buf, "%d", m);
-  if (!strcmp(buf, s)) {
+  if (!strcmp(buf, (const char *)s)) {
     /* first came a want-paramter */
     s = getstrtoken();
   } else {
@@ -1797,22 +1799,22 @@ make_cmd(unit * u, struct order * ord)
       /* if the item cannot be made, we probably didn't mean to make it */
       itype = NULL;
     } else if (stype!=NULL) {
-      const char * sname = LOC(lang, stype->name[0]);
-      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (strlen(iname)<strlen(sname)) stype = NULL;
+      const xmlChar * sname = LOC(lang, stype->name[0]);
+      const xmlChar * iname = LOC(lang, resourcename(itype->rtype, 0));
+      if (xmlStrlen(iname)<xmlStrlen(sname)) stype = NULL;
       else itype = NULL;
     } else {
-      const char * bname = LOC(lang, btype->_name);
-      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (strlen(iname)<strlen(bname)) btype = NULL;
+      const xmlChar * bname = LOC(lang, btype->_name);
+      const xmlChar * iname = LOC(lang, resourcename(itype->rtype, 0));
+      if (xmlStrlen(iname)<xmlStrlen(bname)) btype = NULL;
       else itype = NULL;
     }
   }
 
   if (btype!=NULL && stype!=NULL) {
-    const char * bname = LOC(lang, btype->_name);
-    const char * sname = LOC(lang, stype->name[0]);
-    if (strlen(sname)<strlen(bname)) btype = NULL;
+    const xmlChar * bname = LOC(lang, btype->_name);
+    const xmlChar * sname = LOC(lang, stype->name[0]);
+    if (xmlStrlen(sname)<xmlStrlen(bname)) btype = NULL;
     else stype = NULL;
   }
 
@@ -1980,7 +1982,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
 
   init_tokens(ord);
   skip_token();
-	n = geti();
+	n = getuint();
 	if (!n) {
 		cmistake(u, ord, 26, MSG_COMMERCE);
 		return;
@@ -2245,7 +2247,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
   const luxury_type * ltype=NULL;
   int n;
   region * r = u->region;
-  const char *s;
+  const xmlChar *s;
   
   if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
 		cmistake(u, ord, 69, MSG_INCOME);
@@ -2268,7 +2270,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
 			return false;
 		}
 	} else {
-		n = atoi(s);
+		n = atoi((const char *)s);
 		if (n==0) {
 			cmistake(u, ord, 27, MSG_COMMERCE);
 			return false;
@@ -2635,7 +2637,7 @@ static void
 breed_cmd(unit *u, struct order * ord)
 {
   int m;
-  const char *s;
+  const xmlChar *s;
   param_t p;
   region *r = u->region;
   const resource_type * rtype = NULL;
@@ -2650,7 +2652,7 @@ breed_cmd(unit *u, struct order * ord)
   skip_token();
   s = getstrtoken();
 
-  m = atoi(s);
+  m = atoi((const char *)s);
   if (m!=0) {
     /* first came a want-paramter */
     s = getstrtoken();
@@ -2936,7 +2938,7 @@ entertain_cmd(unit * u, struct order * ord)
 
   init_tokens(ord);
   skip_token();
-  max_e = geti();
+  max_e = getuint();
   if (max_e != 0) {
     u->wants = min(u->wants,max_e);
   }
@@ -3092,7 +3094,7 @@ tax_cmd(unit * u, struct order * ord, request ** taxorders)
 
   init_tokens(ord);
   skip_token();
-  max = geti();
+  max = getuint();
 
   if (max == 0) max = INT_MAX;
 	if (!playerrace(u->race)) {

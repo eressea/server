@@ -18,19 +18,20 @@ extern "C" {
 #endif
 
 struct locale;
+typedef unsigned char xmlChar;
 
 /** managing multiple locales: **/
 extern struct locale * find_locale(const char * name);
 extern struct locale * make_locale(const char * key);
 
 /** operations on locales: **/
-extern void locale_setstring(struct locale * lang, const char * key, const char * value);
-extern const char * locale_getstring(const struct locale * lang, const char * key);
-extern const char * locale_string(const struct locale * lang, const char * key); /* does fallback */
+extern void locale_setstring(struct locale * lang, const char * key, const xmlChar * value);
+extern const xmlChar * locale_getstring(const struct locale * lang, const char * key);
+extern const xmlChar * locale_string(const struct locale * lang, const char * key); /* does fallback */
 extern unsigned int locale_hashkey(const struct locale * lang);
 extern const char * locale_name(const struct locale * lang);
 
-extern const char * reverse_lookup(const struct locale * lang, const char * str);
+extern const char * reverse_lookup(const struct locale * lang, const xmlChar * str);
 extern const char * mkname(const char * namespc, const char * key);
 extern char * mkname_buf(const char * namespc, const char * key, char * buffer);
 
@@ -50,6 +51,8 @@ enum {
   UT_OPTIONS,
   UT_DIRECTIONS,
   UT_ARCHETYPES,
+  UT_MAGIC,
+  UT_TERRAINS,
   UT_MAX
 };
 

@@ -57,6 +57,7 @@
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/event.h>
+#include <util/filereader.h>
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/parser.h>
@@ -65,6 +66,8 @@
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+
+#include <libxml/encoding.h>
 
 /* libc includes */
 #include <string.h>
@@ -328,6 +331,8 @@ rs(FILE * F, char *s)
 	*s = 0;
 }
 
+#define rss(F, buf, size) rs(F, buf) /* should check size but doesn't */
+
 static int
 ri(FILE * F)
 {
@@ -355,103 +360,19 @@ ri(FILE * F)
 static int
 ri36(FILE * F)
 {
-	char buf[64];
+	char buf[10];
 	int i = 0;
 	rc(F);
 	while (!isalnum(nextc)) rc(F);
 	while (isalnum(nextc)) {
-		buf[i++]=(char)nextc;
+    if (i+1<sizeof(buf)) {
+  		buf[i++]=(char)nextc;
+    }
 		rc(F);
 	}
 	buf[i]=0;
 	i = atoi36(buf);
 	return i;
-}
-
-#define MAXLINE 4096*16
-static char lbuf[MAXLINE];
-static char *
-getbuf(FILE * F)
-{
-  boolean cont = false;
-  boolean quote = false;
-  boolean comment = false;
-  char * cp = buf;
-  
-  lbuf[MAXLINE-1] = '@';
-  
-  do {
-    boolean eatwhite = true;
-    boolean start = true;
-    unsigned char * end;
-    unsigned char * bp = (unsigned char * )fgets(lbuf, MAXLINE, F);
-    
-    comment = (boolean)(comment && cont);
-    
-    if (!bp) return NULL;
-    
-    end = bp + strlen((const char *)bp);
-    if (*(end-1)=='\n') *(--end) = 0;
-    else {
-      /* wenn die zeile länger als erlaubt war, ist sie ungültig,
-       * und wird mit dem rest weggeworfen: */
-      for (;;) {
-        bp = (unsigned char *)fgets(lbuf, MAXLINE, F);
-        if (bp==NULL) break;
-        end = bp + strlen((const char *)bp);
-        if (*(end-1)=='\n') break;
-        lbuf[MAXLINE-1] = 0;
-      }
-      comment = false;
-      bp = NULL;
-    }
-    cont = false;
-    while (bp!=NULL && *bp && cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE) {
-      if (isspace(*bp)) {
-        if (cont) ++bp; /* removes spaces and \r afer a backslash */
-        else if (eatwhite) {
-          do { ++bp; } while ((char*)bp!=lbuf+MAXLINE && isspace(*bp));
-          if (!quote && !start && !comment) *(cp++)=' ';
-        }
-        else {
-          if (!comment) *(cp++)=*(bp++);
-          while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && isspace(*bp)) {
-            if (!comment) *(cp++)=*bp;
-            ++bp;
-          }
-          if (*bp==0) --cp;
-        }
-      }
-      else if (iscntrl(*bp)) {
-        *(cp++) = '?';
-        ++bp;
-      } else {
-        cont = false;
-        if (*bp==COMMENT_CHAR && !quote) {
-          comment=true;
-        }
-        else {
-          if (*bp=='"') {
-            quote = (boolean)!quote;
-            *cp++ = *bp;
-            eatwhite=true;
-          }
-          else if (*bp=='\\') cont=true;
-          else {
-            if (!comment) *(cp++) = *bp;
-            eatwhite = (boolean)!quote;
-          }
-        }
-        ++bp;
-      }
-      start = false;
-    }
-    if (cp==buf+MAXLINE) {
-      --cp;
-    }
-    *cp=0;
-  } while (cont || cp==buf);
-  return buf;
 }
 
 #ifdef ENEMIES
@@ -485,7 +406,7 @@ write_enemies(FILE * F, const faction_list * flist)
 #endif
 
 static unit *
-unitorders(FILE * F, struct faction * f)
+unitorders(FILE * F, int enc, struct faction * f)
 {
   int i;
   unit *u;
@@ -527,14 +448,15 @@ unitorders(FILE * F, struct faction * f)
     ordp = &u->orders;
 
     for (;;) {
-      const char * s;
+      const xmlChar * s;
       /* Erst wenn wir sicher sind, dass kein Befehl
       * eingegeben wurde, checken wir, ob nun eine neue
       * Einheit oder ein neuer Spieler drankommt */
 
-      if (!getbuf(F)) break;
+      s = getbuf(F, enc);
+      if (s==NULL) break;
 
-      init_tokens_str(buf, NULL);
+      init_tokens_str(s, NULL);
       s = getstrtoken();
 
       if (findkeyword(s, u->faction->locale) == NOKEYWORD) {
@@ -549,9 +471,9 @@ unitorders(FILE * F, struct faction * f)
         }
         if (quit) break;
       }
-      if (buf[0]) {
+      if (s[0]) {
         /* Nun wird der Befehl erzeut und eingehängt */
-        *ordp = parse_order(buf, u->faction->locale);
+        *ordp = parse_order(s, u->faction->locale);
         if (*ordp) ordp = &(*ordp)->next;
       }
     }
@@ -619,25 +541,26 @@ version(void)
 /* ------------------------------------------------------------- */
 
 static param_t
-igetparam (const char *s, const struct locale *lang)
+igetparam (const xmlChar *s, const struct locale *lang)
 {
   return findparam (igetstrtoken (s), lang);
 }
 
 int
-readorders(const char *filename)
+readorders(const char *filename, const char * encoding)
 {
 	FILE * F = NULL;
 	char *b;
 	int nfactions=0;
 	struct faction *f = NULL;
+  int enc = xmlParseCharEncoding(encoding);
 
 	if (filename) F = cfopen(filename, "rt");
 	if (F==NULL) return 0;
 
 	puts(" - lese Befehlsdatei...\n");
 
-	b = getbuf(F);
+	b = getbuf(F, enc);
 
 	/* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
 	 * Partei */
@@ -657,7 +580,7 @@ readorders(const char *filename)
 			}
 #endif
 
-			b = getbuf(F);
+			b = getbuf(F, enc);
 			break;
 		case P_GAMENAME:
 		case P_FACTION:
@@ -666,7 +589,7 @@ readorders(const char *filename)
 				++nfactions;
 			}
 
-			b = getbuf(F);
+			b = getbuf(F, enc);
 			break;
 
 			/* in factionorders wird nur eine zeile gelesen:
@@ -675,8 +598,8 @@ readorders(const char *filename)
 			 * vermerkt. */
 
 		case P_UNIT:
-			if (!f || !unitorders(F, f)) do {
-				b = getbuf(F);
+			if (!f || !unitorders(F, enc, f)) do {
+				b = getbuf(F, enc);
 				if (!b) break;
 				p = igetparam(b, lang);
 			} while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT && p != P_GAMENAME);
@@ -691,11 +614,11 @@ readorders(const char *filename)
 
 		case P_NEXT:
 			f = NULL;
-      b = getbuf(F);
+      b = getbuf(F, enc);
       break;
 
     default:
-			b = getbuf(F);
+			b = getbuf(F, enc);
       break;
 		}
 	}
@@ -781,10 +704,11 @@ void
 read_items(FILE *F, item **ilist)
 {
 	for (;;) {
+    char ibuf[32];
     const item_type * itype;
-		rs(F, buf);
-		if (!strcmp("end", buf)) break;
-    itype = it_find(buf);
+		rss(F, ibuf, sizeof(ibuf));
+		if (!strcmp("end", ibuf)) break;
+    itype = it_find(ibuf);
     assert(itype!=NULL);
     if (itype!=NULL) {
       i_change(ilist, itype, ri(F));
@@ -801,10 +725,11 @@ read_alliances(FILE * F)
     if (!AllianceRestricted() && !AllianceAuto()) return;
   }
 
-  rs(F, pbuf);
+  rss(F, pbuf, sizeof(pbuf));
 	while (strcmp(pbuf, "end")!=0) {
-		rs(F, buf);
-		makealliance(atoi36(pbuf), buf);
+    char aname[128];
+		rss(F, aname, sizeof(aname));
+		makealliance(atoi36(pbuf), aname);
 		rs(F, pbuf);
 	}
 }
@@ -943,8 +868,9 @@ lastturn(void)
 void
 fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
 {
-  write_order(ord, lang, buf, sizeof(buf));
-  if (buf[0]) fwritestr(F, buf);
+  char obuf[1024];
+  write_order(ord, lang, obuf, sizeof(obuf));
+  if (obuf[0]) fwritestr(F, obuf);
 }
 
 unit *
@@ -954,6 +880,7 @@ readunit(FILE * F)
   unit * u;
   int number, n, p;
   order ** orderp;
+  char obuf[1024];
 
   n = rid(F);
   u = findunit(n);
@@ -990,9 +917,10 @@ readunit(FILE * F)
     u->irace = new_race[(race_t)ri(F)];
   } else {
     char * space;
+    char rname[32];
     
-    rs(F, buf);
-    space = strchr(buf, ' ');
+    rss(F, rname, sizeof(rname));
+    space = strchr(rname, ' ');
     if (space!=NULL) {
       char * inc = space+1;
       char * outc = space;
@@ -1005,10 +933,10 @@ readunit(FILE * F)
       } while (*inc);
       *outc = 0;
     }
-    u->race = rc_find(buf);
+    u->race = rc_find(rname);
     assert(u->race);
-    rs(F, buf);
-    if (strlen(buf)) u->irace = rc_find(buf);
+    rss(F, rname, sizeof(rname));
+    if (strlen(rname)) u->irace = rc_find(rname);
     else u->irace = u->race;
   }
   if (u->race->describe) {
@@ -1069,11 +997,11 @@ readunit(FILE * F)
   }
   /* Persistente Befehle einlesen */
   free_orders(&u->orders);
-  freadstr(F, buf, sizeof(buf));
+  freadstr(F, obuf, sizeof(obuf));
   p = n = 0;
   orderp = &u->orders;
-  while (*buf != 0) {
-    order * ord = parse_order(buf, u->faction->locale);
+  while (obuf[0]) {
+    order * ord = parse_order(obuf, u->faction->locale);
     if (ord!=NULL) {
       if (++n<MAXORDERS) {
         if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
@@ -1088,12 +1016,12 @@ readunit(FILE * F)
       }
       if (ord!=NULL) free_order(ord);
     }
-    freadstr(F, buf, sizeof(buf));
+    freadstr(F, obuf, sizeof(obuf));
   }
   if (global.data_version<NOLASTORDER_VERSION) {
     order * ord;
-    freadstr(F, buf, sizeof(buf));
-    ord = parse_order(buf, u->faction->locale);
+    freadstr(F, obuf, sizeof(obuf));
+    ord = parse_order(obuf, u->faction->locale);
     if (ord!=NULL) {
 #ifdef LASTORDER
       set_order(&u->lastorder, ord);
@@ -1250,6 +1178,7 @@ readregion(FILE * F, short x, short y)
 {
 	region * r = findregion(x, y);
 	const terrain_type * terrain;
+  char token[32];
 
 	if (r==NULL) {
 		r = new_region(x, y);
@@ -1338,12 +1267,12 @@ readregion(FILE * F, short x, short y)
 			assert(*pres==NULL);
 			for (;;) {
 				rawmaterial * res;
-				rs(F, buf);
-				if (strcmp(buf, "end")==0) break;
+				rss(F, token, sizeof(token));
+				if (strcmp(token, "end")==0) break;
 				res = calloc(sizeof(rawmaterial), 1);
-				res->type = rmt_find(buf);
+				res->type = rmt_find(token);
         if (res->type==NULL) {
-          log_error(("invalid resourcetype %s in data.\n", buf));
+          log_error(("invalid resourcetype %s in data.\n", token));
         }
 				assert(res->type!=NULL);
 				res->level = ri(F);
@@ -1368,9 +1297,9 @@ readregion(FILE * F, short x, short y)
 				pres=&res->next;
 			}
 		}
-		rs(F, buf);
-		if (strcmp(buf, "noherb") != 0) {
-      const resource_type * rtype = rt_find(buf);
+		rss(F, token, sizeof(token));
+		if (strcmp(token, "noherb") != 0) {
+      const resource_type * rtype = rt_find(token);
       assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
       rsetherbtype(r, rtype->itype);
 		} else {
@@ -1389,9 +1318,9 @@ readregion(FILE * F, short x, short y)
 	if (r->land) {
 		for (;;) {
       const struct item_type * itype;
-			rs(F, buf);
-			if (!strcmp(buf, "end")) break;
-      itype = it_find(buf);
+			rss(F, token, sizeof(token));
+			if (!strcmp(token, "end")) break;
+      itype = it_find(token);
       assert(itype->rtype->ltype);
 			r_setdemand(r, itype->rtype->ltype, ri(F));
 		}
@@ -1498,6 +1427,7 @@ readfaction(FILE * F)
   int i = rid(F);
   faction * f = findfaction(i);
   char * email = NULL;
+  char token[32];
 
   if (f==NULL) {
     f = (faction *) calloc(1, sizeof(faction));
@@ -1544,8 +1474,8 @@ readfaction(FILE * F)
   if (global.data_version < LOCALE_VERSION) {
     f->locale = find_locale("de");
   } else {
-    rs(F, buf);
-    f->locale = find_locale(buf);
+    rss(F, token, sizeof(token));
+    f->locale = find_locale(token);
   }
   f->lastorders = ri(F);
   f->age = ri(F);
@@ -1553,8 +1483,8 @@ readfaction(FILE * F)
     race_t rc = (char) ri(F);
     f->race = new_race[rc];
   } else {
-    rs(F, buf);
-    f->race = rc_find(buf);
+    rss(F, token, sizeof(token));
+    f->race = rc_find(token);
     assert(f->race);
   }
 #ifdef CONVERT_DBLINK
@@ -1577,8 +1507,8 @@ readfaction(FILE * F)
   }
   for (;;) {
     int level;
-    fscanf(F, "%s", buf);
-    if (strcmp("end", buf)==0) break;
+    fscanf(F, "%s", token);
+    if (strcmp("end", token)==0) break;
     fscanf(F, "%d ", &level);
   } 
   planes = ri(F);
@@ -1619,10 +1549,10 @@ readfaction(FILE * F)
     }
   } else {
     for (;;) {
-      rs(F, buf);
-      if (strcmp(buf, "end")==0) break;
+      rs(F, token);
+      if (strcmp(token, "end")==0) break;
       else {
-        int aid = atoi36(buf);
+        int aid = atoi36(token);
         int state = ri(F);
         sfp = addally(f, sfp, aid, state);
       }
@@ -1711,11 +1641,13 @@ readgame(const char * filename, int backup)
   unit *u;
   FILE * F;
   int rmax = maxregions;
+  char path[MAX_PATH];
+  char token[32];
 
-  sprintf(buf, "%s/%s", datapath(), filename);
+  sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
-  if (backup) create_backup(buf);
-  F = cfopen(buf, "r");
+  if (backup) create_backup(path);
+  F = cfopen(path, "r");
   if (F==NULL) {
     log_error(("Keine Spieldaten gefunden.\n"));
     return -1;
@@ -1767,16 +1699,16 @@ readgame(const char * filename, int backup)
     pl->maxy = (short)ri(F);
     pl->flags = ri(F);
     if (global.data_version>WATCHERS_VERSION) {
-      rs(F, buf);
-      while (strcmp(buf, "end")!=0) {
+      rss(F, token, sizeof(token));
+      while (strcmp(token, "end")!=0) {
         watcher * w = calloc(sizeof(watcher),1);
         variant fno;
-        fno.i = atoi36(buf);
+        fno.i = atoi36(token);
         w->mode = (unsigned char)ri(F);
         w->next = pl->watchers;
         pl->watchers = w;
         ur_add(fno, (void**)&w->faction, resolve_faction);
-        rs(F, buf);
+        rss(F, token, sizeof(token));
       }
     }
     a_read(F, &pl->attribs);
@@ -1845,9 +1777,10 @@ readgame(const char * filename, int backup)
     }
     if (skip) {
       char * r;
+      char buffer[128];
       do {
-        r = fgets(buf, BUFSIZE, F); /* skip region */
-      } while (r && buf[0]!='\n');
+        r = fgets(buffer, sizeof(buffer), F); /* skip region */
+      } while (r && buffer[0]!='\n');
       continue;
     }
     --rmax;
@@ -1878,8 +1811,8 @@ readgame(const char * filename, int backup)
         /* b->type = oldbuildings[ri(F)]; */
       }
       else {
-        rs(F, buf);
-        b->type = bt_find(buf);
+        rss(F, token, sizeof(token));
+        b->type = bt_find(token);
       }
       b->region = r;
       a_read(F, &b->attribs);
@@ -1904,8 +1837,12 @@ readgame(const char * filename, int backup)
       if (sh->display && strlen(sh->display)>=DISPLAYSIZE) sh->display[DISPLAYSIZE] = 0;
 #endif
 
-      rs(F, buf);
-      sh->type = st_find(buf);
+      rss(F, token, sizeof(token));
+      sh->type = st_find(token);
+      if (sh->type==NULL) {
+        /* old datafiles */
+        sh->type = st_find(locale_string(default_locale, token));
+      }
       assert(sh->type || !"ship_type not registered!");
       sh->size = ri(F);
       sh->damage = ri(F);
@@ -1999,23 +1936,21 @@ writegame(const char *filename, int quiet)
   unit *u;
   plane *pl;
   FILE * F;
-#ifdef USE_PLAYERS
-  char playerfile[MAX_PATH];
-#endif
+  char path[MAX_PATH];
 
 #ifdef USE_PLAYERS
-  sprintf(buf, "%s/%d.players", datapath(), turn);
-  export_players(playerfile);
+  sprintf(path, "%s/%d.players", datapath(), turn);
+  export_players(path);
 #endif
 
-  sprintf(buf, "%s/%s", datapath(), filename);
+  sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
-  if (access(buf, R_OK) == 0) {
+  if (access(path, R_OK) == 0) {
     /* make sure we don't overwrite some hardlinkedfile */
-    unlink(buf);
+    unlink(path);
   }
 #endif
-  F = cfopen(buf, "w");
+  F = cfopen(path, "w");
   if (F==NULL)
     return -1;
 

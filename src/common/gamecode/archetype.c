@@ -30,7 +30,7 @@ struct attrib_type at_recruit = {
 };
 
 const struct archetype *
-find_archetype(const char * s, const struct locale * lang)
+find_archetype(const xmlChar * s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_ARCHETYPES);
   variant token;
@@ -57,13 +57,13 @@ init_archetypes(void)
     archetype * arch = archetypes;
     struct tnode * tokens = get_translations(lang, UT_ARCHETYPES);
     for (;arch;arch=arch->next) {
-      const char *s1, *s2;
+      const xmlChar *s1, *s2;
       var.v = arch;
 
       s1 = LOC(lang, arch->name[0]);
       addtoken(tokens, s1, var);
       s2 = LOC(lang, arch->name[1]);
-      if (strcmp(s2, s1)!=0) {
+      if (xmlStrcmp(s2, s1)!=0) {
         addtoken(tokens, s2, var);
       }
     }

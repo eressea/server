@@ -75,19 +75,21 @@ static region * start_region[6];
 static int newarena = 0;
 
 static region *
-arena_region(int magic) {
+arena_region(int magic)
+{
 	return tower_region[magic];
 }
 
 static building *
-arena_tower(int magic) {
+arena_tower(int magic)
+{
 	return arena_region(magic)->buildings;
 }
 
 static int
-leave_fail(unit * u) {
-	sprintf(buf, "Der Versuch, die Greifenschwingen zu benutzen, schlug fehl. %s konnte die Ebene der Herausforderung nicht verlassen.", unitname(u));
-	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+leave_fail(unit * u)
+{
+  ADDMSG(&u->faction->msgs, msg_message("arena_leave_fail", "unit", u));
 	return 1;
 }
 
@@ -104,9 +106,9 @@ leave_arena(struct unit * u, const struct item_type * itype, int amount, order *
 }
 
 static int
-enter_fail(unit * u) {
-	sprintf(buf, "In %s erklingt die Stimme des Torwächters: 'Nur wer ohne materielle Güter und noch lernbegierig ist, der darf die Ebene der Herausforderung betreten. Und vergiß nicht mein Trinkgeld.'. %s erhielt keinen Einlaß.", regionname(u->region, u->faction), unitname(u));
-	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+enter_fail(unit * u)
+{
+  ADDMSG(&u->faction->msgs, msg_message("arena_enter_fail", "region unit", u->region, u));
 	return 1;
 }
 
@@ -146,8 +148,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
     if (u2) change_money(u2, get_money(u) - fee);
     else if (enter_fail(u)) return -1;
   }
-  sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionname(u->region, u->faction), unitname(u));
-  addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+  ADDMSG(&u->faction->msgs, msg_message("arena_enter_fail", "region unit", u->region, u));
   use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE, 1);
   use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee);
   set_money(u, 109);
@@ -233,6 +234,7 @@ static attrib_type at_hurting = {
 	"hurting", NULL, NULL, age_hurting, write_hurting, read_hurting
 };
 
+#ifdef ARENA_CREATION
 static void
 make_temple(region * r)
 {
@@ -253,10 +255,12 @@ make_temple(region * r)
 	b->display = strdup("Ein Schrein aus spitzen Knochen und lodernden Flammen, gewidmet dem Wyrm der Wyrme");
 	a_add(&b->attribs, a_new(&at_hurting))->data.v=b;
 }
+#endif
 
 /**
  * Initialisierung Türme */
 
+#ifdef ARENA_CREATION
 static void
 tower_init(void)
 {
@@ -294,7 +298,9 @@ tower_init(void)
 		set_string(&b->name, "Höhle des Greifen");
 	}
 }
+#endif
 
+#ifdef ARENA_CREATION
 static void
 guardian_faction(plane * pl, int id)
 {
@@ -342,9 +348,11 @@ guardian_faction(plane * pl, int id)
 		set_money(u, 1000);
 	}
 }
+#endif
 
 #define BLOCKSIZE           9
 
+#ifdef ARENA_CREATION
 static void 
 block_create(short x1, short y1, char terrain)
 {
@@ -356,6 +364,7 @@ block_create(short x1, short y1, char terrain)
 		}
 	}
 }
+#endif
 
 #ifdef CENTRAL_VOLCANO
 
@@ -371,28 +380,26 @@ caldera_handle(trigger * t, void * data)
 		while (*up) {
 			unit * u = *up;
 			if (u->building==b) {
-				sprintf(buf, "%s springt in die ewigen Feuer des Kraters.", unitname(u));
+        message * msg;
 				if (u->items) {
 					item ** ip = &u->items;
-					strcat(buf, " Mit der sterblichen Hülle des Helden verglühen");
+          msg = msg_message("caldera_handle_1", "unit items", u, u->items);
 					while (*ip) {
 						item * i = *ip;
-						char zText[10];
-						sprintf(zText, " %d %s", i->number, locale_string(default_locale, resourcename(i->type->rtype, i->number!=1)));
-						strcat(buf, zText);
 						i_remove(ip, i);
 						if (*ip==i) ip=&i->next;
-						if (i->next) strcat(buf, ",");
 					}
-					strcat(buf, ".");
-				}
-				addmessage(u->region, NULL, buf, MSG_MESSAGE, ML_IMPORTANT);
+        } else {
+          msg = msg_message("caldera_handle_0", "unit", u);
+        }
+				add_message(&u->region->msgs, msg);
 				set_number(u, 0);
 			}
 			if (*up==u) up = &u->next;
 		}
-	} else
+  } else {
 		log_error(("could not perform caldera::handle()\n"));
+  }
 	unused(data);
 	return 0;
 }
@@ -435,6 +442,7 @@ trigger_caldera(building * b)
 	return t;
 }
 
+#ifdef ARENA_CREATION
 static void
 init_volcano(void)
 {
@@ -451,7 +459,9 @@ init_volcano(void)
 	tt_register(&tt_caldera);
 }
 #endif
+#endif
 
+#ifdef ARENA_CREATION
 void
 create_arena(void)
 {
@@ -500,7 +510,7 @@ create_arena(void)
 	rsetpeasants(arena_center, 0);
 	tower_init();
 }
-
+#endif
 void
 register_arena(void)
 {

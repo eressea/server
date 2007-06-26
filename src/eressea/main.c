@@ -253,7 +253,7 @@ processturn(char *filename)
 #endif
 	begin = make_summary();
 	turn++;
-	if ((i=readorders(filename))!=0) return i;
+	if ((i=readorders(filename, "ISO-8859-1"))!=0) return i;
   if (!nomonsters) {
     if (turn == 0) rng_init((int)time(0));
     else rng_init(turn);

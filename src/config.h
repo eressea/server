@@ -253,5 +253,7 @@ extern char * strdup(const char *s);
 # define INLINE_FUNCTION
 #endif
 
+#include <libxml/xmlstring.h>
+
 #endif
 

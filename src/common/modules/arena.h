@@ -25,7 +25,9 @@ extern "C" {
 extern struct plane * arena;
 
 extern void register_arena(void);
+#ifdef ARENA_CREATION
 extern void create_arena(void);
+#endif
 
 #ifdef __cplusplus
 }

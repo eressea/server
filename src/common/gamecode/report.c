@@ -3058,6 +3058,41 @@ eval_resources(struct opstack ** stack, const void * userdata) /* order -> strin
 }
 
 static void
+eval_regions(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+  const faction * report = (const faction*)userdata;
+  int i = opop(stack).i;
+  int end, begin = opop(stack).i;
+  const arg_regions * regions = (const arg_regions *)opop(stack).v;
+  static char buf[256];
+  size_t len = sizeof(buf);
+  variant var;
+  char * edit = buf;
+
+  if (regions==NULL) {
+    end = begin;
+  } else {
+    if (i>=0) end = begin+i;
+    else end = regions->nregions+i;
+  }
+  for (i=begin;i<end;++i) {
+    const char * rname = (const char*)regionname(regions->regions[i], report);
+    size_t written = strlcpy(edit, rname, len);
+    len -= written;
+    edit += written;
+
+    if (i+1<end && len>2) {
+      strcat(edit, ", ");
+      edit += 2;
+      len -= 2;
+    }
+  }
+  *edit = 0;
+  var.v = strcpy(balloc(edit-buf+1), buf);
+  opush(stack, var);
+}
+
+static void
 eval_direction(struct opstack ** stack, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
@@ -3122,6 +3157,7 @@ report_init(void)
   add_function("localize", &eval_localize);
   add_function("spell", &eval_spell);
   add_function("resources", &eval_resources);
+  add_function("regions", &eval_regions);
 
   register_reporttype("nr", &report_plaintext, 1<<O_REPORT);
   register_reporttype("txt", &report_template, 1<<O_ZUGVORLAGE);

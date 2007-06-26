@@ -314,6 +314,7 @@
   </race>
   <race name="wolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
+    <function name="name" value="namegeneric"/>
     <function name="initfamiliar" value="oldfamiliars"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -572,7 +573,7 @@
   </race>
   <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="540" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
-    <function name="describe" value="describe_braineater"/>
+    <function name="name" value="namegeneric"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
@@ -643,15 +644,17 @@
   </race>
   <race name="alp" magres="0.950000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="0" capacity="0" speed="1.500000" hp="20" ac="2" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="20" fly="yes" walk="yes" canlearn="no" canteach="no">
     <ai splitsize="1"/>
+    <function name="name" value="namegeneric"/>
     <attack type="1" damage="1d4"/>
   </race>
   <race name="mountainguard" unarmedguard="yes" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" canlearn="no" teach="no" noweapons="yes" giveitem="yes">
     <ai splitsize="1"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d40"/>
   </race>
   <race name="shadowmaster" cansail="no" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes" nogive="yes">
     <ai splitsize="50" killpeasants="yes" moverandom="yes" learn="yes"/>
-    <function name="name" value="nameshadow"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
@@ -670,6 +673,7 @@
   </race>
   <race name="irongolem" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
     <ai splitsize="50"/>
+    <function name="name" value="namegeneric"/>
     <skill name="armorer" modifier="14"/>
     <skill name="weaponsmithing" modifier="14"/>
     <attack type="4" damage="2d8+4"/>
@@ -698,6 +702,7 @@
   </race>
   <race name="ent" magres="0.250000" maxaura="1.000000" regaura="0.500000" recruitcost="5000" weight="5000" capacity="2500" speed="1.000000" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" scarepeasants="yes" walk="yes" teach="no">
     <ai splitsize="1000" moverandom="yes" learn="yes"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
@@ -1150,6 +1155,7 @@
   </race>
   <race name="shadowknight" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" nogive="yes" walk="yes" canlearn="no" teach="no" noblock="yes">
     <ai splitsize="20000" moverandom="yes"/>
+    <function name="name" value="namegeneric"/>
     <attack type="1" damage="1d1"/>
   </race>
   <race name="seaserpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes">
@@ -1328,11 +1334,13 @@
   </race>
   <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="500" capacity="540" speed="1.000000" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="1d6"/>
     <attack type="3" damage="1d1"/>
   </race>
   <race name="nightmare" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="100" capacity="540" speed="1.000000" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
@@ -1341,6 +1349,7 @@
   </race>
   <race name="vampunicorn" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="5000" capacity="2000" speed="1.000000" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d10"/>
     <attack type="3" damage="1d4"/>
     <attack type="3" damage="1d4"/>

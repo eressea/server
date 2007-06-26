@@ -89,8 +89,8 @@ typedef struct building {
 
 	const struct building_type * type;
 	struct region *region;
-	char *name;
-	char *display;
+	xmlChar *name;
+	xmlChar *display;
 	struct attrib * attribs;
 	int no;
 	int size;
@@ -123,7 +123,7 @@ void bunhash(struct building * b);
 int buildingcapacity(const struct building * b);
 void destroy_building(struct building * b);
 
-const struct building_type * findbuildingtype(const char * name, const struct locale * lang);
+const struct building_type * findbuildingtype(const xmlChar * name, const struct locale * lang);
 
 #include "build.h"
 #define NOBUILDING NULL

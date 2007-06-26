@@ -59,6 +59,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/lists.h>
 #include <util/rand.h>
@@ -136,7 +137,7 @@ monster_attack(unit * u, const unit * target)
   sprintf(zText, "%s %s",
           locale_string(u->faction->locale, keywords[K_ATTACK]), 
           unitid(target));
-  return parse_order(zText, u->faction->locale);
+  return parse_order((xmlChar*)zText, u->faction->locale);
 }
 
 
@@ -157,7 +158,9 @@ get_money_for_dragon(region * r, unit * u, int wanted)
 	/* falls genug geld in der region ist, treiben wir steuern ein. */
   if (rmoney(r) >= wanted) {
     /* 5% chance, dass der drache aus einer laune raus attackiert */
-    if (chance(1.0-u->race->aggression)) return parse_order(keywords[K_TAX], default_locale);
+    if (chance(1.0-u->race->aggression)) {
+      return parse_order(LOC(default_locale, keywords[K_TAX]), default_locale);
+    }
   }
 
   /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
@@ -179,7 +182,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
   /* falls die einnahmen erreicht werden, bleibt das monster noch eine
 	 * runde hier. */
   if (n + rmoney(r) >= wanted) {
-    return parse_order(keywords[K_TAX], default_locale);
+    return parse_order(LOC(default_locale, keywords[K_TAX]), default_locale);
   }
 
   /* wenn wir NULL zurückliefern, macht der drache was anderes, z.b. weggehen */
@@ -352,6 +355,7 @@ static order *
 monster_move(region * r, unit * u)
 {
   direction_t d = NODIRECTION;
+  xmlChar zOrder[64];
 
   if (is_waiting(u)) return NULL;
   switch(old_race(u->race)) {
@@ -374,11 +378,11 @@ monster_move(region * r, unit * u)
   if (d == NODIRECTION)
     return NULL;
 
-  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
+  sprintf((char*)zOrder, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
           locale_string(u->faction->locale, directions[d]));
 
   reduce_weight(u);
-  return parse_order(buf, u->faction->locale);
+  return parse_order(zOrder, u->faction->locale);
 }
 
 /* Wir machen das mal autoconf-style: */
@@ -441,9 +445,11 @@ set_new_dragon_target(unit * u, region * r, int range)
 		} else {
 			a->data.v = max_region;
 		}
+#if 0
 		sprintf(buf, "Kommt aus: %s, Will nach: %s", 
       regionname(r, u->faction), regionname(max_region, u->faction));
 		usetprivate(u, buf);
+#endif
 		return a;
 	}
 	return NULL;
@@ -455,27 +461,26 @@ make_movement_order(unit * u, const region * target, int moves, boolean (*allowe
 	region * r = u->region;
 	region ** plan;
 	int position = 0;
-	char * c;
+  xmlChar zOrder[128];
+  char * c = (char*)zOrder;
 
   if (is_waiting(u)) return NULL;
 
   plan = path_find(r, target, DRAGON_RANGE*5, allowed);
 	if (plan==NULL) return NULL;
 
-	strcpy(buf, locale_string(u->faction->locale, keywords[K_MOVE]));
-	c = buf + strlen(buf);
+	c += strlcpy(c, (const char *)LOC(u->faction->locale, keywords[K_MOVE]), sizeof(zOrder));
 
-	while (position!=moves && plan[position+1]) {
+  while (position!=moves && plan[position+1]) {
 		region * prev = plan[position];
 		region * next = plan[++position];
 		direction_t dir = reldirection(prev, next);
 		assert(dir!=NODIRECTION && dir!=D_SPECIAL);
 		*c++ = ' ';
-		strcpy(c, locale_string(u->faction->locale, directions[dir]));
-		c += strlen(c);
+		c += strlcpy(c, (const char *)LOC(u->faction->locale, directions[dir]), sizeof(zOrder)-(c-(const char *)zOrder));
 	}
 
-	return parse_order(buf, u->faction->locale);
+	return parse_order(zOrder, u->faction->locale);
 }
 
 static order *
@@ -486,6 +491,7 @@ monster_seeks_target(region *r, unit *u)
 	int dist, dist2;
 	direction_t i;
 	region *nr;
+  xmlChar zOrder[128];
 
 	/* Das Monster sucht ein bestimmtes Opfer. Welches, steht
 	 * in einer Referenz/attribut
@@ -533,9 +539,9 @@ monster_seeks_target(region *r, unit *u)
   }
   assert(d != NODIRECTION );
   
-  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+  sprintf((char *)zOrder, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
           locale_string(u->faction->locale, directions[d]));
-  return parse_order(buf, u->faction->locale);
+  return parse_order(zOrder, u->faction->locale);
 }
 
 unit *
@@ -751,9 +757,10 @@ monster_learn(unit *u)
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->level>0) {
       if (++c == n) {
-        sprintf(buf, "%s \"%s\"", locale_string(lang, keywords[K_STUDY]),
+        xmlChar zOrder[128];          
+        sprintf((char*)zOrder, "%s \"%s\"", locale_string(lang, keywords[K_STUDY]),
                 skillname(sv->id, lang));
-        return parse_order(buf, lang);
+        return parse_order(zOrder, lang);
       }
     }
   }
@@ -809,12 +816,13 @@ recruit_dracoids(unit * dragon, int size)
   setstatus(un, ST_FIGHT);
   for (weapon=un->items;weapon;weapon=weapon->next) {
     const weapon_type * wtype = weapon->type->rtype->wtype;
+    xmlChar zOrder[128];
     if (wtype && (wtype->flags & WTF_MISSILE)) {
       setstatus(un, ST_BEHIND);
     }
-    sprintf(buf, "%s \"%s\"", keywords[K_STUDY], 
+    sprintf((char*)zOrder, "%s \"%s\"", keywords[K_STUDY], 
       skillname(weapon->type->rtype->wtype->skill, f->locale));
-    new_order = parse_order(buf, default_locale);
+    new_order = parse_order(zOrder, default_locale);
   }
 
   if (new_order!=NULL) {

@@ -344,7 +344,7 @@ wdw_pyramid_level(const struct building *b)
 static local_names * bnames;
 
 const building_type *
-findbuildingtype(const char * name, const struct locale * lang)
+findbuildingtype(const xmlChar * name, const struct locale * lang)
 {
   variant type;
 	local_names * bn = bnames;
@@ -359,7 +359,7 @@ findbuildingtype(const char * name, const struct locale * lang)
 		bn->next = bnames;
 		bn->lang = lang;
 		while (btl) {
-			const char * n = locale_string(lang, btl->type->_name);
+			const xmlChar * n = locale_string(lang, btl->type->_name);
       type.v = (void*)btl->type;
 			addtoken(&bn->names, n, type);
 			btl=btl->next;
@@ -440,7 +440,6 @@ new_building(const struct building_type * btype, region * r, const struct locale
 	bhash(b);
 
 	b->type = btype;
-	set_string(&b->display, "");
 	b->region = r;
 	addlist(&r->buildings, b);
 

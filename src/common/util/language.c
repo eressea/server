@@ -76,7 +76,7 @@ debug_language(const char * log)
   s_logfile = strdup(log);
 }
 
-const char *
+const xmlChar *
 locale_getstring(const locale * lang, const char * key)
 {
   unsigned int hkey = hashstring(key);
@@ -102,7 +102,7 @@ locale_getstring(const locale * lang, const char * key)
   return NULL;
 }
 
-const char *
+const xmlChar *
 locale_string(const locale * lang, const char * key)
 {
   if (key!=NULL) {
@@ -111,7 +111,7 @@ locale_string(const locale * lang, const char * key)
     struct locale_str * find;
     
     if (key == NULL || *key==0) return NULL;
-    if (lang == NULL) return key;
+    if (lang == NULL) return BAD_CAST key;
     find = lang->strings[id];
     while (find) {
       if (find->hashkey == hkey) {
@@ -125,7 +125,7 @@ locale_string(const locale * lang, const char * key)
       find = find->nexthash;
     }
     if (!find) {
-      const char * s = key;
+      const xmlChar * s = BAD_CAST key;
       log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
       if (lang!=default_locale) {
         s = locale_string(default_locale, key);
@@ -146,7 +146,7 @@ locale_string(const locale * lang, const char * key)
 }
 
 void
-locale_setstring(locale * lang, const char * key, const char * value)
+locale_setstring(locale * lang, const char * key, const xmlChar * value)
 {
   unsigned int hkey = hashstring(key);
   unsigned int id = hkey & (SMAXHASH-1);
@@ -163,13 +163,13 @@ locale_setstring(locale * lang, const char * key, const char * value)
     lang->strings[id] = find;
     find->hashkey = hkey;
     find->key = strdup(key);
-    find->str = strdup(value);
+    find->str = xmlStrdup(value);
   }
   else {
-    if (strcmp(find->str, value)!=0) {
+    if (xmlStrcmp(find->str, value)!=0) {
       log_error(("Duplicate key %s for '%s' and '%s'\n", key, value, find->str));
     }
-    assert(!strcmp(find->str, value) || !"duplicate string for key");
+    assert(!xmlStrcmp(find->str, value) || !"duplicate string for key");
   }
 }
 
@@ -181,24 +181,23 @@ locale_name(const locale * lang)
 }
 
 const char *
-reverse_lookup(const locale * lang, const char * str)
+reverse_lookup(const locale * lang, const xmlChar * str)
 {
 	int i;
 	assert(lang);
-	if (strlen(str)) {
+	if (xmlStrlen(str)) {
 		if (lang!=NULL) {
 			for (i=0;i!=SMAXHASH;++i) {
 				struct locale_str * ls;
 				for (ls=lang->strings[i];ls;ls=ls->nexthash) {
-					if (strcasecmp(ls->key, str)==0) return ls->key;
-					if (strcasecmp(ls->str, str)==0) return ls->key;
+					if (xmlStrcasecmp(ls->str, str)==0) return ls->key;
 				}
 			}
 		}
 		log_error(("could not do a reverse_lookup for \"%s\" in locale %s\n", str, lang->name));
     assert(!"failed to do a reverse_lookup");
 	}
-	return str;
+	return NULL;
 }
 
 char *

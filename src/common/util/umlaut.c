@@ -1,26 +1,29 @@
 /* vi: set ts=2:
- *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- *  based on:
- *
- * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schröder
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
- */
+*
+*	
+* Eressea PB(E)M host Copyright (C) 1998-2003
+*      Christian Schlittchen (corwin@amber.kn-bremen.de)
+*      Katja Zedel (katze@felidae.kn-bremen.de)
+*      Henning Peters (faroul@beyond.kn-bremen.de)
+*      Enno Rehling (enno@eressea-pbem.de)
+*      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
+*
+* based on:
+*
+*      Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
+*      Atlantis v1.7                    Copyright 1996 by Alex Schröder
+*
+* This program may not be used, modified or distributed without
+* prior permission by the authors of Eressea.
+* This program may not be sold or used commercially without prior written
+* permission from the authors.
+*/
 
 #include <config.h>
 #include "umlaut.h"
+
+#include "log.h"
+#include "unicode.h"
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -28,135 +31,132 @@
 #include <assert.h>
 
 typedef struct tref {
-	struct tref * nexthash;
-	char c;
-	struct tnode * node;
+  struct tref * nexthash;
+  wint_t ucs;
+  struct tnode * node;
 } tref;
 
 #define LEAF 1 /* leaf node for a word. always matches */
 #define SHARED 2 /* at least two words share the node */
 
 void
-addtoken(tnode * root, const char* str, variant id)
+addtoken(tnode * root, const xmlChar * str, variant id)
 {
-	static struct replace {
-		char c;
-		const char * str;
-	} replace[] = {
-		{'ä', "ae"},
-		{'Ä', "ae"},
-		{'ö', "oe"},
-		{'Ö', "oe"},
-		{'ü', "ue"},
-		{'Ü', "ue"},
-		{'ß', "ss"},
-		{ 0, 0 }
-	};
-	if (!*str) {
-		root->id = id;
-		root->flags |= LEAF;
-	} else {
-		tref * next;
-		int index, i = 0;
-		register char c = *str;
-		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
-#if NODEHASHSIZE == 8
-		index = c & 7;
-#else
-    index = ((unsigned char)c) % NODEHASHSIZE;
-#endif
-		next = root->next[index];
-		if (!(root->flags & LEAF)) root->id = id;
-		while (next && next->c != c) next = next->nexthash;
-		if (!next) {
-			tref * ref;
-			char u = (char)toupper((unsigned char)c);
-			tnode * node = calloc(1, sizeof(tnode));
+  static struct replace {
+    wint_t ucs;
+    const char str[3];
+  } replace[] = {
+    /* match lower-case (!) umlauts and others to transcriptions */
+    { 228, "AE"},
+    { 246, "OE"},
+    { 252, "UE"},
+    { 223, "SS"},
+    { 230, "AE"},
+    { 248, "OE"},
+    { 229, "AA"},
+    { 0, 0 }
+  };
 
-			ref = malloc(sizeof(tref));
-			ref->c = c;
-			ref->node = node;
-			ref->nexthash=root->next[index];
-			root->next[index] = ref;
-			
-			if (u!=c) {
+  if (!*str) {
+    root->id = id;
+    root->flags |= LEAF;
+  } else {
+    tref * next;
+    int ret, index, i = 0;
+    wint_t ucs, lcs;
+    size_t len;
+
+    ret = unicode_utf8_to_ucs4(&ucs, str, &len);
+    assert(ret==0 || !"invalid utf8 string");
+    lcs = ucs;
+
 #if NODEHASHSIZE == 8
-        index = u & 7;
+    index = ucs & 7;
 #else
-        index = ((unsigned char)u) % NODEHASHSIZE;
+    index = ucs % NODEHASHSIZE;
 #endif
-				ref = malloc(sizeof(tref));
-				ref->c = u;
-				ref->node = node;
-				ref->nexthash = root->next[index];
-				root->next[index] = ref;
-			}
-			next=ref;
-		} else {
-			next->node->flags |= SHARED;
-			if ((next->node->flags & LEAF) == 0) next->node->id.v = NULL; /* why?*/
-		}
-		addtoken(next->node, str+1, id);
-		while (replace[i].str) {
-			if (*str==replace[i].c) {
-        char zText[1024];
-				strcat(strcpy(zText, replace[i].str), str+1);
-				addtoken(root, zText, id);
-				break;
-			}
-			++i;
-		}
-	}
+    next = root->next[index];
+    if (!(root->flags & LEAF)) root->id = id;
+    while (next && next->ucs != ucs) next = next->nexthash;
+    if (!next) {
+      tref * ref;
+      tnode * node = calloc(1, sizeof(tnode));
+
+      if (ucs<'a' || ucs>'z') {
+        lcs = towlower(ucs);
+      }
+      if (ucs==lcs) {
+        ucs = towupper(ucs);
+      }
+
+      ref = malloc(sizeof(tref));
+      ref->ucs = ucs;
+      ref->node = node;
+      ref->nexthash=root->next[index];
+      root->next[index] = ref;
+
+      /* try lower/upper casing the character, and try again */
+      if (ucs!=lcs) {
+#if NODEHASHSIZE == 8
+        index = lcs & 7;
+#else
+        index = lcs % NODEHASHSIZE;
+#endif
+        ref = malloc(sizeof(tref));
+        ref->ucs = lcs;
+        ref->node = node;
+        ref->nexthash = root->next[index];
+        root->next[index] = ref;
+      }
+      next=ref;
+    } else {
+      next->node->flags |= SHARED;
+      if ((next->node->flags & LEAF) == 0) next->node->id.v = NULL; /* why?*/
+    }
+    addtoken(next->node, str+len, id);
+    while (replace[i].str[0]) {
+      if (lcs==replace[i].ucs) {
+        xmlChar zText[1024];
+        memcpy(zText, replace[i].str, 3);
+        strcpy((char*)zText+2, (const char*)str+len);
+        addtoken(root, zText, id);
+        break;
+      }
+      ++i;
+    }
+  }
 }
 
 int
-findtoken(const tnode * tk, const char * str, variant* result)
+findtoken(const tnode * tk, const xmlChar * str, variant* result)
 {
-	if (!str || *str==0) return E_TOK_NOMATCH;
+  if (!str || *str==0) return E_TOK_NOMATCH;
 
-	do {
-		int index;
-		const tref * ref;
-		char c = *str;
+  do {
+    int index;
+    const tref * ref;
+    wint_t ucs;
+    size_t len;
+    int ret = unicode_utf8_to_ucs4(&ucs, str, &len);
 
+    if (ret!=0) {
+      /* encoding is broken. youch */
+      return E_TOK_NOMATCH;
+    }
 #if NODEHASHSIZE == 8
-    index = c & 7;
+    index = ucs & 7;
 #else
-    index = ((unsigned char)c) % NODEHASHSIZE;
+    index = ucs % NODEHASHSIZE;
 #endif
-		ref = tk->next[index];
-		while (ref && ref->c!=c) ref = ref->nexthash;
-		++str;
-		if (!ref) return E_TOK_NOMATCH;
-		tk = ref->node;
-	} while (*str);
-	if (tk) {
-		*result = tk->id;
-		return E_TOK_SUCCESS;
-	}
-	return E_TOK_NOMATCH;
+    ref = tk->next[index];
+    while (ref && ref->ucs!=ucs) ref = ref->nexthash;
+    str+=len;
+    if (!ref) return E_TOK_NOMATCH;
+    tk = ref->node;
+  } while (*str);
+  if (tk) {
+    *result = tk->id;
+    return E_TOK_SUCCESS;
+  }
+  return E_TOK_NOMATCH;
 }
-
-#ifdef TEST_UMLAUT
-#include <stdio.h>
-tnode root;
-
-int
-main(int argc, char ** argv)
-{
-	char buf[1024];
-	int i = 0;
-	for (;;) {
-		int k;
-		fgets(buf, sizeof(buf), stdin);
-		buf[strlen(buf)-1]=0;
-		if (findtoken(&root, buf, (void**)&k)==0) {
-			printf("%s returned %d\n", buf, k);
-		} else {
-			addtoken(&root, buf, (void*)++i);
-			printf("added %s=%d\n", buf, i);
-		}
-	}
-	return 0;
-}
-#endif

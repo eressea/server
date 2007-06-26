@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *skillnames[MAXSKILLS] =
+const char *skillnames[MAXSKILLS] =
 {
 	"alchemy",
 	"crossbow",
@@ -79,7 +79,7 @@ static const char *skillnames[MAXSKILLS] =
 
 static boolean skill_enabled[MAXSKILLS];
 
-const char * 
+const xmlChar * 
 skillname(skill_t sk, const struct locale * lang)
 {
   if (skill_enabled[sk]) {

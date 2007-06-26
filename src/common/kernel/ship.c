@@ -41,7 +41,7 @@ ship_typelist *shiptypes = NULL;
 static local_names * snames;
 
 const ship_type *
-findshiptype(const char * name, const struct locale * lang)
+findshiptype(const xmlChar * name, const struct locale * lang)
 {
 	local_names * sn = snames;
 	variant var;
@@ -57,7 +57,7 @@ findshiptype(const char * name, const struct locale * lang)
 		sn->lang = lang;
 		while (stl) {
       variant var;
-			const char * n = locale_string(lang, stl->type->name[0]);
+			const xmlChar * n = locale_string(lang, stl->type->name[0]);
       var.v = (void*)stl->type;
 			addtoken(&sn->names, n, var);
 			stl = stl->next;
@@ -73,10 +73,6 @@ st_find(const char* name)
 {
 	const struct ship_typelist * stl = shiptypes;
 	while (stl && strcasecmp(stl->type->name[0], name)) stl = stl->next;
-	if (!stl) { /* compatibility for old datafiles */
-		stl = shiptypes;
-		while (stl && strcasecmp(locale_string(default_locale, stl->type->name[0]), name)) stl = stl->next;
-	}
 	return stl?stl->type:NULL;
 }
 
@@ -170,7 +166,7 @@ captain(ship *sh, region *r)
 ship *
 new_ship(const ship_type * stype, const struct locale * lang, region * r)
 {
-	static char buffer[7 + IDSIZE + 1];
+	static xmlChar buffer[7 + IDSIZE + 1];
 	ship *sh = (ship *) calloc(1, sizeof(ship));
 
 	sh->no = newcontainerid();
@@ -178,9 +174,8 @@ new_ship(const ship_type * stype, const struct locale * lang, region * r)
 	sh->type = stype;
 	sh->region = r;
 
-	sprintf(buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
+	sprintf((char*)buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
 	set_string(&sh->name, buffer);
-	set_string(&sh->display, "");
 	shash(sh);
   addlist(&r->ships, sh);
 	return sh;
@@ -210,7 +205,7 @@ shipname(const ship * sh)
   static name idbuf[8];
   static int nextbuf = 0;
   char *ibuf = idbuf[(++nextbuf) % 8];
-  sprintf(ibuf, "%s (%s)", strcheck(sh->name, NAMESIZE), itoa36(sh->no));
+  sprintf(ibuf, "%s (%s)", sh->name, itoa36(sh->no));
   return ibuf;
 }
 

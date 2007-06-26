@@ -251,9 +251,7 @@ no_teurefremde(boolean convert)
           if (convert) {
             u->race = f->race;
             u->irace = f->race;
-            sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
-              unitname(u));
-            addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+            ADDMSG(&u->faction->msgs, msg_message("migrant_conversion", "unit", u));
           }
         }
       }
@@ -391,7 +389,7 @@ fix_icastles(void)
         a = a_add(&b->attribs, a_new(&at_icastle));
       }
       if (b->type!=bt_find("illusion")) {
-        /* gebäudetyp war falsch */
+        /* wrong building type */
         btype = b->type;
         b->type = bt_find("illusion");
       }
@@ -405,7 +403,7 @@ fix_icastles(void)
         data->type = btype;
       }
       if (data->building!=b) {
-        /* rückwärtszeiger auf das gebäude reparieren */
+        /* fix reverse pointer to the building */
         data->building=b;
       }
     }
@@ -715,28 +713,6 @@ fix_astralplane(void)
   return 0;
 }
 
-static int
-warn_password(void)
-{
-  faction * f = factions;
-  while (f) {
-    boolean pwok = true;
-    const char * c = f->passw;
-    while (*c) {
-      if (!isalnum((unsigned char)*c)) pwok = false;
-      c++;
-    }
-    if (pwok == false) {
-      ADDMSG(&f->msgs, msg_message("msg_errors", "string",
-        "Dein Passwort enthält Zeichen, die bei der Nachsendung "
-        "von Reports Probleme bereiten können. Bitte wähle ein neues "
-        "Passwort, bevorzugt nur aus Buchstaben und Zahlen bestehend."));
-    }
-    f = f->next;
-  }
-  return 0;
-}
-
 extern border *borders[];
 
 static void
@@ -973,7 +949,6 @@ korrektur(void)
   }
   fix_allies();
   /* fix_unitrefs(); */
-  warn_password();
   fix_road_borders();
   if (turn>1000) curse_emptiness(); /*** disabled ***/
   /* seems something fishy is going on, do this just

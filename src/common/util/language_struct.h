@@ -10,7 +10,7 @@
 typedef struct locale_str {
   unsigned int hashkey;
   struct locale_str * nexthash;
-  char * str;
+  xmlChar * str;
   char * key;
 } locale_str;
 

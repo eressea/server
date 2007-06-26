@@ -231,7 +231,7 @@ buforder(char * bufp, size_t size, const order * ord, int mode)
 }
 
 int
-bufunit(const faction * f, const unit * u, int indent, int mode)
+bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, size_t size)
 {
   int i, dh;
   int getarnt = fval(u, UFL_PARTEITARNUNG);
@@ -247,7 +247,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   boolean itemcloak = false;
   static const curse_type * itemcloak_ct = 0;
   static boolean init = false;
-  size_t size = sizeof(buf), rsize;
+  size_t rsize;
 
   if (!init) {
     init = true;
@@ -1319,9 +1319,10 @@ write_reports(faction * f, time_t ltime)
     }
 
     if (errno) {
+      char zText[64];
       puts(" ERROR");
-      sprintf(buf, "Waiting %u seconds before retry", backup);
-      perror(buf);
+      sprintf(zText, "Waiting %u seconds before retry", backup);
+      perror(zText);
       sleep(backup);
       if (backup<maxbackup) {
         backup *= 2;
@@ -1387,6 +1388,7 @@ static void
 write_script(FILE * F, const faction * f)
 {
   report_type * rtype;
+  char buf[1024];
 
   fprintf(F, "faction=%s:email=%s", factionid(f), f->email);
   if (f->options & (1<<O_BZIP2)) fputs(":compression=bz2", F);
@@ -1446,15 +1448,16 @@ reports(void)
   time_t ltime = time(NULL);
   const char * str;
   int retval = 0;
+  char path[MAX_PATH];
 
   nmr_warnings();
   report_donations();
   remove_empty_units();
 
-  sprintf(buf, "%s/reports.txt", reportpath());
-  mailit = fopen(buf, "w");
+  sprintf(path, "%s/reports.txt", reportpath());
+  mailit = fopen(path, "w");
   if (mailit == NULL) {
-    log_error(("%s konnte nicht geöffnet werden!\n", buf));
+    log_error(("%s konnte nicht geöffnet werden!\n", path));
   }
 
   for (f = factions; f; f = f->next) {
@@ -1467,8 +1470,8 @@ reports(void)
   str = get_param(global.parameters, "globalreport"); 
 #ifdef GLOBAL_REPORT
   if (str!=NULL) {
-    sprintf(buf, "%s/%s.%u.cr", reportpath(), str, turn);
-    global_report(buf);
+    sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
+    global_report(path);
   }
 #endif
   return retval;
@@ -1529,6 +1532,37 @@ var_free_resources(variant x)
   }
 }
 
+static variant
+var_copy_regions(variant x)
+{
+  region_list * rsrc;
+  size_t size = 0;
+
+  for (rsrc = (region_list*)x.v; rsrc!=NULL; rsrc=rsrc->next) {
+    ++size;
+  }
+
+  if (size>0) {
+    arg_regions * dst = (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region*) * size);
+    dst->nregions = size;
+    dst->regions = (region**)(dst+1);
+    size = 0;
+    for (rsrc = (region_list*)x.v; rsrc!=NULL; rsrc=rsrc->next) {
+      dst->regions[size++] = rsrc->data;
+    }
+    x.v = dst;
+  } else {
+    x.v = NULL;
+  }
+  return x;
+}
+
+static void
+var_free_regions(variant x)
+{
+  free(x.v);
+}
+
 void
 reports_init(void)
 {
@@ -1549,6 +1583,7 @@ reports_init(void)
   register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
   register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
   register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
+  register_argtype("regions", var_free_regions, var_copy_regions, VAR_VOIDPTR);
 
   /* register alternative visibility functions */
   register_function((pf_generic)view_neighbours, "view_neighbours");

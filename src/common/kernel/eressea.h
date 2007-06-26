@@ -177,13 +177,9 @@ extern int count_skill(struct faction * f, skill_t sk);
 
 /* direction, geography */
 extern const char *directions[];
-extern direction_t finddirection(const char *s, const struct locale *);
+extern direction_t finddirection(const xmlChar *s, const struct locale *);
 
-extern int findoption(const char *s, const struct locale * lang);
-
-/* shared character-buffer */
-#define BUFSIZE 32765
-extern char buf[BUFSIZE + 1];
+extern int findoption(const xmlChar *s, const struct locale * lang);
 
 /* special units */
 void make_undead_unit(struct unit *);
@@ -195,27 +191,22 @@ void addstrlist(strlist ** SP, const char *s);
 
 int armedmen(const struct unit * u);
 
-void scat(const char *s);
-void icat(int n);
+unsigned int atoip(const char *s);
+unsigned int getuint(void);
+int getint(void);
 
-int atoip(const char *s);
-int geti(void);
-
-extern int findstr(const char **v, const char *s, unsigned char n);
-
-extern const char *igetstrtoken(const char *s);
+extern const xmlChar *igetstrtoken(const xmlChar *s);
 
 extern void init_tokens(const struct order * ord); /* initialize token parsing */
-extern skill_t findskill(const char *s, const struct locale * lang);
+extern skill_t findskill(const xmlChar *s, const struct locale * lang);
 
-extern keyword_t findkeyword(const char *s, const struct locale * lang);
+extern keyword_t findkeyword(const xmlChar *s, const struct locale * lang);
 
-extern param_t findparam(const char *s, const struct locale * lang);
+extern param_t findparam(const xmlChar *s, const struct locale * lang);
 extern param_t getparam(const struct locale * lang);
 
 extern int atoi36(const char * s);
-#define getid() atoi36(getstrtoken())
-#define getstruct unitid() getid()
+#define getid() atoi36((const char *)getstrtoken())
 #define unitid(x) itoa36((x)->no)
 
 #define getshipid() getid()
@@ -276,14 +267,14 @@ extern int count_migrants (const struct faction * f);
 extern int count_maxmigrants(const struct faction * f);
 
 extern boolean teure_talente(const struct unit * u);
-extern const struct race * findrace(const char *, const struct locale *);
+extern const struct race * findrace(const xmlChar *, const struct locale *);
 
 int eff_stealth(const struct unit * u, const struct region * r);
 void scale_number(struct unit * u, int n);
 int unit_max_hp(const struct unit * u);
 int ispresent(const struct faction * f, const struct region * r);
 
-char * set_string(char **s, const char *neu);
+xmlChar * set_string(xmlChar **s, const xmlChar *neu);
 
 int check_option(struct faction * f, int option);
 extern void parse(keyword_t kword, int (*dofun)(struct unit *, struct order *), boolean thisorder);
@@ -313,19 +304,12 @@ struct unit *ufindhash(int i);
 void fhash(struct faction * f);
 void funhash(struct faction * f);
 
-#ifndef NDEBUG
-const char *strcheck(const char *s, size_t maxlen);
-
-#else
-#define strcheck(s, ml) (s)
-#endif
-
 boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
 
 /* simple garbage collection: */
 void * gc_add(void * p);
-void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
+void addmessage(struct region * r, struct faction * f, const xmlChar *s, msg_t mtype, int level);
 
 /* grammatik-flags: */
 #define GF_NONE 0
@@ -376,7 +360,7 @@ extern int maxworkingpeasants(const struct region * r);
 
 extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
 extern int maintenance_cost(const struct unit * u);
-extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
+extern struct message * movement_error(struct unit * u, const xmlChar * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
 extern void add_income(struct unit * u, int type, int want, int qty);
 
@@ -386,7 +370,7 @@ enum {
   E_MOVE_NOREGION, /* no region exists in this direction */
   E_MOVE_BLOCKED   /* cannot see this region, there is a blocking border. */
 };
-extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
+extern int movewhere(const struct unit *u, const xmlChar * token, struct region * r, struct region** resultp);
 
 extern const char * basepath(void);
 extern const char * resourcepath(void);
