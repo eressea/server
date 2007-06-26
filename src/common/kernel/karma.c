@@ -589,8 +589,7 @@ jihad_attacks(void)
 
 					if (sf) sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
 
-					sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(u));
-					addlist(&u2->orders, parse_order(buf, u->faction->locale));
+					addlist(&u2->orders, create_order(K_ATTACK, u->faction->locale, "%i", u->no));
 				}
 			}
 		}

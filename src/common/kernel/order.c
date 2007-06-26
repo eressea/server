@@ -267,27 +267,20 @@ create_order(keyword_t kwd, const struct locale * lang, const char * params, ...
   va_list marker;
   char zBuffer[DISPLAYSIZE];
   char * sptr = zBuffer;
-  char quote = 0;
 
   va_start(marker, params);
   while (params) {
     switch (*params) {
       case '%':
-      case ' ':
         /* ignore these, they are syntactical sugar */
         break;
       case '"':
       case '\'':
+      case ' ':
         *sptr++ = *params;
-        if (!quote) quote = *params;
-        else if (quote==*params) {
-          quote = 0;
-          *sptr++ = ' ';
-        }
         break;
       case 's':
         sptr += strlcpy(sptr, va_arg(marker, const char *), sizeof(zBuffer)-(sptr-zBuffer));
-        if (!quote) *sptr++ = ' ';
         break;
       case 'd':
         sptr += strlcpy(sptr, itoa10(va_arg(marker, int)), sizeof(zBuffer)-(sptr-zBuffer));
@@ -295,6 +288,8 @@ create_order(keyword_t kwd, const struct locale * lang, const char * params, ...
       case 'i':
         sptr += strlcpy(sptr, itoa36(va_arg(marker, int)), sizeof(zBuffer)-(sptr-zBuffer));
         break;
+      default:
+        assert(!"unknown format-character in create_order");
     }
   }
   va_end(marker);

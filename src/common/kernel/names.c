@@ -120,7 +120,7 @@ describe_braineater(unit * u, const struct locale * lang)
 }
 
 const char *
-untoten_name(const unit * u)
+undead_name(const unit * u)
 {
 	int uv, uu, un;
 	static char name[NAMESIZE + 1];
@@ -526,7 +526,7 @@ generic_name(const unit *u)
 }
 
 const xmlChar *
-drachen_name(const unit *u)
+dragon_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
 	int rnd = rng_int() % DTITEL;
@@ -722,11 +722,11 @@ register_names(void)
   /* function name 
    * generate a name for a nonplayerunit
    * race->generate_name() */
-  register_function((pf_generic)untoten_name, "nameundead");
+  register_function((pf_generic)undead_name, "nameundead");
   register_function((pf_generic)skeleton_name, "nameskeleton");
   register_function((pf_generic)zombie_name, "namezombie");
   register_function((pf_generic)ghoul_name, "nameghoul");
-  register_function((pf_generic)drachen_name, "namedragon");
+  register_function((pf_generic)dragon_name, "namedragon");
   register_function((pf_generic)dracoid_name, "namedracoid");
   register_function((pf_generic)generic_name, "namegeneric");
 }
