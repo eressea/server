@@ -253,5 +253,6 @@ extern char * strdup(const char *s);
 # define INLINE_FUNCTION
 #endif
 
+typedef unsigned char xmlChar;
 #endif
 
