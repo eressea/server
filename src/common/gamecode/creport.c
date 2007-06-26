@@ -1388,7 +1388,6 @@ report_computer(const char * filename, report_context * ctx)
             fprintf(F, "SCHEMEN %d %d\n", region_x(r, f), region_y(r, f));
             fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
             rl2 = rl2->next;
-            if(rl2) scat(", ");
           }
           free_regionlist(rl);
         }
