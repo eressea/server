@@ -35,6 +35,7 @@ typedef struct order {
 } order;
 
 /* constructor */
+extern order * create_order(keyword_t kwd, const struct locale * lang, const char * params, ...);
 extern order * parse_order(const xmlChar * s, const struct locale * lang);
 extern void replace_order(order ** dst, order * orig, const order * src);
 

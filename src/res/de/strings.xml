@@ -6955,4 +6955,9 @@
     <text locale="en">An alp died before it reached its target.</text>
   </string>
 
+  <string name="unarmed">
+    <text locale="de">unbewaffnet</text>
+    <text locale="en">unarmed</text>
+  </string>
+
 </strings>

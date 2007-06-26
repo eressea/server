@@ -267,20 +267,16 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
   battle *b = fi->side->battle;
   cvector *fgs;
   void **fig;
-  int force;
+  int force = lovar(power * 15);
   int k = 0;
+
   /* Immer aus der ersten Reihe nehmen */
-  static const char * msgt[] = {
-    "ruft ein fürchterliches Unwetter über seine Feinde, doch es gab niemanden mehr, den dies treffen konnte.",
-    "ruft ein fürchterliches Unwetter über seine Feinde, doch der magische Regen zeigt keinen Effekt.",
-    "ruft ein fürchterliches Unwetter über seine Feinde, Der magischen Regen lässt alles Eisen rosten."
-  };
   unused(sp);
 
-  force = lovar(power * 15);
-
   if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE|SELECT_FIND)) {
-    battlemsg(b, fi->unit, msgt[0]);
+    message * msg = msg_message("rust_effect_0", "mage", fi->unit);
+    message_all(b, msg);
+    msg_release(msg);
     return 0;
   }
 
@@ -339,11 +335,15 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 
   if (k == 0) {
     /* keine Waffen mehr da, die zerstört werden könnten */
-    battlemsg(b, fi->unit, msgt[1]);
+    message * msg = msg_message("rust_effect_1", "mage", fi->unit);
+    message_all(b, msg);
+    msg_release(msg);
     fi->magic = 0; /* kämpft nichtmagisch weiter */
     level = 0;
   } else {
-    battlemsg(b, fi->unit, msgt[2]);
+    message * msg = msg_message("rust_effect_2", "mage", fi->unit);
+    message_all(b, msg);
+    msg_release(msg);
   }
   return level;
 }

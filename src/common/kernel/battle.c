@@ -70,7 +70,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define dbgprintf(a) fprintf a;
 static FILE *bdebug;
 #undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
@@ -156,20 +155,20 @@ fleeregion(const unit * u)
 }
 #endif /* SIMPLE_ESCAPE */
 
-static char *
-sidename(side * s, boolean truename)
+static xmlChar *
+sidename(side * s)
 {
 #define SIDENAMEBUFLEN 256
   static char sidename_buf[SIDENAMEBUFLEN];
 
-  if(s->stealthfaction && truename == false) {
+  if (s->stealthfaction) {
     snprintf(sidename_buf, SIDENAMEBUFLEN,
       "%s", factionname(s->stealthfaction));
   } else {
     snprintf(sidename_buf, SIDENAMEBUFLEN,
       "%s", factionname(s->bf->faction));
   }
-  return sidename_buf;
+  return (xmlChar *)sidename_buf;
 }
 
 static const char *
@@ -224,18 +223,6 @@ armedmen(const unit * u)
   return n;
 }
 
-static void
-battle_log(const char *s)
-{
-#if SHOW_DEBUG
-  puts(s);
-  putc('\n');
-#endif
-  if (bdebug) {
-    dbgprintf((bdebug, "%s\n", s));
-  }
-}
-
 void
 message_all(battle * b, message * m)
 {
@@ -255,35 +242,15 @@ message_all(battle * b, message * m)
 void
 battlerecord(battle * b, const char *s)
 {
-  struct message * m = msg_message("msg_battle", "string", s);
+  struct message * m = msg_message("battle_msg", "string", s);
   message_all(b, m);
-  msg_release(m);
-}
-
-void
-battlemsg(battle * b, unit * u, const char * s)
-{
-  bfaction * bf;
-  struct message * m;
-  plane * p = rplane(b->region);
-  watcher * w;
-
-  sprintf(buf, "%s %s", unitname(u), s);
-  m = msg_message("msg_battle", "string", buf);
-  for (bf=b->factions;bf;bf=bf->next) {
-    message_faction(b, bf->faction, m);
-  }
-  if (p) for (w=p->watchers;w;w=w->next) {
-    for (bf = b->factions;bf;bf=bf->next) if (bf->faction==w->faction) break;
-    if (bf==NULL) message_faction(b, w->faction, m);
-  }
   msg_release(m);
 }
 
 static void
 fbattlerecord(battle * b, faction * f, const char *s)
 {
-  message * m = msg_message("msg_battle", "string", s);
+  message * m = msg_message("battle_msg", "string", s);
   message_faction(b, f, m);
   msg_release(m);
 }
@@ -945,7 +912,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   unit *du = df->unit;
   battle *b = df->side->battle;
   int heiltrank = 0;
-  char debugbuf[512];
 
   /* Schild */
   void **si;
@@ -1054,9 +1020,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     kritchance = min(0.9, kritchance);
 
     while (chance(kritchance)) {
-      if (battledebug) {
-        sprintf(debugbuf, "%s/%d landet einen kritischen Treffer", unitid(au), at.index);
-        battle_log(debugbuf);
+      if (bdebug) {
+        fprintf(bdebug, "%s/%d landet einen kritischen Treffer", unitid(au), at.index);
       }
       da += dice_rand(damage);
     }
@@ -1136,11 +1101,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
   }
 
-  if (battledebug) {
-    sprintf(debugbuf, "Verursacht %dTP, Rüstung %d: %d -> %d HP",
-      da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
-  }
-
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
     if (rda > 0) {
@@ -1156,8 +1116,9 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   df->person[dt.index].hp -= rda;
 
   if (df->person[dt.index].hp > 0) {  /* Hat überlebt */
-    if (battledebug) {
-      battle_log(debugbuf);
+    if (bdebug) {
+      fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
+        da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
     }
     if (au->race == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
@@ -1226,9 +1187,9 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     return false;
   }
 
-  if (battledebug) {
-    strcat(debugbuf, ", tot");
-    battle_log(debugbuf);
+  if (bdebug) {
+    fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP, tot.\n",
+      da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
   }
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
@@ -1519,7 +1480,6 @@ do_combatmagic(battle *b, combatmagic_t was)
         double power;
         const spell *sp;
         const struct locale * lang = mage->faction->locale;
-        char cmd[128];
         order * ord;
 
         switch(was) {
@@ -1538,10 +1498,7 @@ do_combatmagic(battle *b, combatmagic_t was)
         if (sp == NULL)
           continue;
 
-        snprintf(cmd, 128, "%s \"%s\"",
-          LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
-
-        ord = parse_order(cmd, lang);
+        ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
         if (cancast(mage, sp, 1, 1, ord) == false) {
           free_order(ord);
           continue;
@@ -1616,7 +1573,6 @@ do_combatspell(troop at)
   void **mg;
   order * ord;
   int sl;
-  char cmd[128];
   const struct locale * lang = mage->faction->locale;
 
   sp = get_combatspell(mage, 1);
@@ -1624,9 +1580,7 @@ do_combatspell(troop at)
     fi->magic = 0; /* Hat keinen Kampfzauber, kämpft nichtmagisch weiter */
     return;
   }
-  snprintf(cmd, 128, "%s \"%s\"",
-    LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
-  ord = parse_order(cmd, lang);
+  ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
   if (cancast(mage, sp, 1, 1, ord) == false) {
     fi->magic = 0; /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
     return;
@@ -1849,6 +1803,20 @@ attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 }
 #endif
 
+static void
+debug_hit(troop at, const weapon * awp, troop dt, const weapon * dwp, int skdiff, int dist, boolean success)
+{
+  fprintf(bdebug, "%.4s/%d [%6s/%d] %s %.4s/%d [%6s/%d] with %d distance %d",
+    unitid(at.fighter->unit), at.index,
+    LOC(default_locale, awp ? resourcename(awp->type->itype->rtype, 0) : "unarmed"),
+    weapon_effskill(at, dt, awp, true, dist>1),
+    success?"hits":"misses",
+    unitid(dt.fighter->unit), dt.index,
+    LOC(default_locale, dwp ? resourcename(dwp->type->itype->rtype, 0) : "unarmed"),
+    weapon_effskill(dt, at, dwp, false, dist>1),
+    skdiff, dist);
+}
+
 int
 hits(troop at, troop dt, weapon * awp)
 {
@@ -1857,8 +1825,6 @@ hits(troop at, troop dt, weapon * awp)
   battle * b = at.fighter->side->battle;
 #endif
   fighter *af = at.fighter, *df = dt.fighter;
-  unit *au = af->unit, *du = df->unit;
-  char debugbuf[512];
   const armor_type * armor, * shield;
   int skdiff = 0;
   int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
@@ -1889,25 +1855,14 @@ hits(troop at, troop dt, weapon * awp)
   /* Verteidiger bekommt eine Rüstung */
   armor = select_armor(dt, true);
   shield = select_armor(dt, false);
-  sprintf(debugbuf, "%.4s/%d [%6s/%d] attackiert %.4s/%d [%6s/%d] mit %d dist %d",
-      unitid(au), at.index,
-      (awp != NULL) ?
-        locale_string(default_locale, resourcename(awp->type->itype->rtype, 0)) : "unbewaffnet",
-      weapon_effskill(at, dt, awp, true, dist>1),
-      unitid(du), dt.index,
-      (dwp != NULL) ?
-        locale_string(default_locale, resourcename(dwp->type->itype->rtype, 0)) : "unbewaffnet",
-      weapon_effskill(dt, at, dwp, false, dist>1),
-      skdiff, dist);
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
     smallbuf = attack_message(at, dt, awp, dist);
   }
 #endif
   if (contest(skdiff, armor, shield)) {
-    if (battledebug) {
-      strcat(debugbuf, " und trifft.");
-      battle_log(debugbuf);
+    if (bdebug) {
+      debug_hit(at, awp, dt, dwp, skdiff, dist, true);
     }
 #ifdef SMALL_BATTLE_MESSAGES
     if (b->small) {
@@ -1917,9 +1872,8 @@ hits(troop at, troop dt, weapon * awp)
 #endif
     return 1;
   }
-  if (battledebug) {
-    strcat(debugbuf, ".");
-    battle_log(debugbuf);
+  if (bdebug) {
+    debug_hit(at, awp, dt, dwp, skdiff, dist, false);
   }
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
@@ -2114,9 +2068,8 @@ attack(battle *b, troop ta, const att *a, int numattack)
         }
         if (reload && wp && wp->type->reload && !getreload(ta)) {
           int i = setreload(ta);
-          if (battledebug) {
-            sprintf(buf, " Nachladen gesetzt: %d", i);
-            battle_log(buf);
+          if (bdebug) {
+            fprintf(bdebug, " reloading %d turns\n", i);
           }
         }
       }
@@ -2712,9 +2665,9 @@ aftermath(battle * b)
       /* Beute verteilen */
       for (l=df->loot; l; l=l->next) {
         const item_type * itype = l->type;
-        sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
-          l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
-        fbattlerecord(b, du->faction, buf);
+        message * m = msg_message("battle_loot", "unit amount item", du, l->number, itype->rtype);
+        message_faction(b, du->faction, m);
+        msg_release(m);
         i_change(&du->items, itype, l->number);
       }
 
@@ -2752,12 +2705,11 @@ aftermath(battle * b)
   free(trollsave);
 #endif
 
-  if (battledebug) {
-    sprintf(buf, "The battle lasted %d turns, %s and %s.\n",
+  if (bdebug) {
+    fprintf(bdebug, "The battle lasted %d turns, %s and %s.\n",
       b->turn,
-      b->has_tactics_turn==true?"had a tactic turn":"had no tactic turn",
-      battle_was_relevant==true?"was relevant":"was not relevant.");
-    battle_log(buf);
+      b->has_tactics_turn?"had a tactic turn":"had no tactic turn",
+      battle_was_relevant?"was relevant":"was not relevant.");
   }
 }
 
@@ -2774,8 +2726,8 @@ battle_punit(unit * u, battle * b)
     spunit(&S, f, u, 4, see_battle);
     for (x = S; x; x = x->next) {
       fbattlerecord(b, f, x->s);
-      if (battledebug && u->faction == f) {
-        battle_log(x->s);
+      if (bdebug && u->faction == f) {
+        fputs(x->s, bdebug);
       }
     }
     if (S)
@@ -2824,26 +2776,29 @@ static void
 print_header(battle * b)
 {
   bfaction * bf;
+  char zText[1024];
 
   for (bf=b->factions;bf;bf=bf->next) {
     message * m;
     faction * f = bf->faction;
-    const char * lastf = NULL;
+    const xmlChar * lastf = NULL;
     boolean first = false;
     side * s;
+    size_t size;
 
-    buf[0] = 0;
+    zText[0] = 0;
+    size = sizeof(zText);
     for (s=b->sides; s; s=s->next) {
       fighter *df;
       for (df=s->fighters;df;df=df->next) {
         if (is_attacker(df)) {
-          if (first) strcat(buf, ", ");
+          if (first) size -= strlcat(zText, ", ", size);
           if (lastf) {
-            strcat(buf, lastf);
+            size -= strlcat(zText, (const char *)lastf, size);
             first = true;
           }
           if (seematrix(f, s) == true)
-            lastf = sidename(s, false);
+            lastf = sidename(s);
           else
             lastf = LOC(f->locale, "unknown_faction_dative");
           break;
@@ -2851,13 +2806,13 @@ print_header(battle * b)
       }
     }
     if (first) {
-      strcat(buf, " ");
-      strcat(buf, LOC(f->locale, "and"));
-      strcat(buf, " ");
+      size -= strlcat(zText, " ", size);
+      size -= strlcat(zText, (const char *)LOC(f->locale, "and"), size);
+      size -= strlcat(zText, " ", size);
     }
-    if (lastf) strcat(buf, lastf);
+    if (lastf) size -= strlcat(zText, (const char *)lastf, size);
 
-    m = msg_message("battle::starters", "factions", buf);
+    m = msg_message("battle::starters", "factions", zText);
     message_faction(b, f, m);
     msg_release(m);
   }
@@ -2871,23 +2826,25 @@ print_stats(battle * b)
   int i = 0;
   for (s=b->sides;s;s=s->next) {
     bfaction *bf;
-    char *k;
 
     ++i;
 
     for (bf=b->factions;bf;bf=bf->next) {
       faction * f = bf->faction;
-      const char * loc_army = LOC(f->locale, "battle_army");
+      const xmlChar * loc_army = LOC(f->locale, "battle_army");
       char * bufp;
       const xmlChar * header;
       size_t rsize, size;
       int komma;
+      const xmlChar * sname = seematrix(f, s) ? sidename(s) : LOC(f->locale, "unknown_faction");
+      message * msg;
+      char buf[1024];
 
       fbattlerecord(b, f, " ");
 
-      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, army_index(s),
-        seematrix(f, s) ? sidename(s, false) : LOC(f->locale, "unknown_faction"));
-      fbattlerecord(b, f, buf);
+      msg = msg_message("msg_army", "index name", army_index(s), sname);
+      message_faction(b, f, msg);
+      msg_release(msg);
 
       bufp = buf;
       size = sizeof(buf);
@@ -2898,7 +2855,7 @@ print_stats(battle * b)
         if (enemy(s2, s)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)",
-            komma++ ? "," : header, loc_army, army_index(s2), abbrev);
+            komma++ ? "," : (const char*)header, loc_army, army_index(s2), abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
           bufp += rsize;
@@ -2915,7 +2872,7 @@ print_stats(battle * b)
         if (friendly(s2, s)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)",
-            komma++ ? "," : header, loc_army, army_index(s2), abbrev);
+            komma++ ? "," : (const char*)header, loc_army, army_index(s2), abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
           bufp += rsize;
@@ -2931,7 +2888,7 @@ print_stats(battle * b)
       for (s2=b->sides;s2;s2=s2->next) {
         if (s->relations[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          rsize = slprintf(bufp, size, "%s %s %d(%s)", komma++ ? "," : header, loc_army,
+          rsize = slprintf(bufp, size, "%s %s %d(%s)", komma++ ? "," : (const char*)header, loc_army,
             army_index(s2), abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
@@ -2940,17 +2897,14 @@ print_stats(battle * b)
       }
       if (komma) fbattlerecord(b, f, buf);
     }
-    buf[77] = (char)0;
-    for (k = buf; *k; ++k) *k = '-';
-    battlerecord(b, buf);
-    if (battledebug && s->bf->faction) {
+
+    if (bdebug && s->bf->faction) {
       if (s->bf->faction->alliance) {
-        slprintf(buf, sizeof(buf), "##### %s (%s/%d)", s->bf->faction->name, itoa36(s->bf->faction->no),
+        fprintf(bdebug, "##### %s (%s/%d)\n", s->bf->faction->name, itoa36(s->bf->faction->no),
           s->bf->faction->alliance?s->bf->faction->alliance->id:0);
       } else {
-        slprintf(buf, sizeof(buf), "##### %s (%s)", s->bf->faction->name, itoa36(s->bf->faction->no));
+        fprintf(bdebug, "##### %s (%s)\n", s->bf->faction->name, itoa36(s->bf->faction->no));
       }
-      battle_log(buf);
     }
     print_fighters(b, s);
   }
@@ -3018,16 +2972,10 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   const group * g = NULL;
   const attrib *a = a_find(u->attribs, &at_otherfaction);
   const faction *stealthfaction = a?get_otherfaction(a):NULL;
-  static const struct item_type * it_demonseye;
-  static boolean init = false;
   unsigned int flags = 0;
 
   assert(u->number);
   if (fval(u, UFL_PARTEITARNUNG)!=0) flags |= SIDE_STEALTH;
-  if (!init) {
-    it_demonseye = it_find("demonseye");
-    init=true;
-  }
 
   if (fval(u, UFL_GROUP)) {
     const attrib * agroup = a_find(u->attribs, &at_group);
@@ -3213,17 +3161,6 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     }
   }
 
-  if (it_demonseye && i_get(u->items, it_demonseye)) {
-    char lbuf[80];
-    const char * s = LOC(default_locale, rc_name(u->race, 3));
-    char * c = lbuf;
-    while (*s) *c++ = (char)toupper(*s++);
-    *c = 0;
-    fig->person[0].hp = unit_max_hp(u) * 3;
-    slprintf(buf, sizeof(buf), "Eine Stimme ertönt über dem Schlachtfeld. 'DIESES %sKIND IST MEIN. IHR SOLLT ES NICHT HABEN.'. Eine leuchtende Aura umgibt %s", lbuf, unitname(u));
-    battlerecord(b, buf);
-  }
-
   s1->size[statusrow(fig->status)] += u->number;
   s1->size[SUM_ROW] += u->number;
   if (u->race->battle_flags & BF_NOBLOCK) {
@@ -3379,7 +3316,7 @@ make_battle(region * r)
     bdebug = fopen(zFilename, "w");
     if (!bdebug) log_error(("battles können nicht debugged werden\n"));
     else {
-      dbgprintf((bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL)));
+      fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL));
     }
     obs_count++;
   }
@@ -3503,8 +3440,6 @@ battle_report(battle * b)
   boolean komma;
   bfaction *bf;
 
-  buf[0] = 0;
-
   for (s=b->sides; s; s=s->next) {
     for(s2=b->sides; s2; s2=s2->next) {
       if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
@@ -3520,6 +3455,7 @@ battle_report(battle * b)
 
   for (bf=b->factions;bf;bf=bf->next) {
     faction * fac = bf->faction;
+    char buf[1024];
     char * bufp = buf;
     size_t size = sizeof(buf), rsize;
     message * m;
@@ -3537,7 +3473,7 @@ battle_report(battle * b)
         int r, k = 0, * alive = get_alive(s);
         int l = FIGHT_ROW;
         const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
-        const char * loc_army = LOC(fac->locale, "battle_army");
+        const xmlChar * loc_army = LOC(fac->locale, "battle_army");
         char buffer[32];
 
         if (komma) {
@@ -3799,15 +3735,12 @@ init_battle(region * r, battle **bp)
           if (fval(u, UFL_LONGACTION)) continue;
 
           if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
-            sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
-              "hier niemanden angreifen.", unitname(u));
-            mistake(u, ord, buf, MSG_BATTLE);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "peace_active", ""));
             continue;
           }
 
           if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) {
-            sprintf(buf, "%s kämpft nicht.", unitname(u));
-            mistake(u, ord, buf, MSG_BATTLE);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "slave_active", ""));
             continue;
           }
 
@@ -3836,78 +3769,71 @@ init_battle(region * r, battle **bp)
           /* Fehler: "Die Einheit wurde nicht gefunden" */
           if (!u2 || u2->number == 0 || !cansee(u->faction, u->region, u2, 0)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-              continue;
+            continue;
+          }
+          /* Fehler: "Die Einheit ist eine der unsrigen" */
+          if (u2->faction == u->faction) {
+            cmistake(u, ord, 45, MSG_BATTLE);
+            continue;
+          }
+          /* Fehler: "Die Einheit ist mit uns alliert" */
+          if (alliedunit(u, u2->faction, HELP_FIGHT)) {
+            cmistake(u, ord, 47, MSG_BATTLE);
+            continue;
+          }
+          if (u2->faction->age < NewbieImmunity()) {
+            add_message(&u->faction->msgs,
+              msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns", NewbieImmunity()));
+            continue;
+          }
+          /* Fehler: "Die Einheit ist mit uns alliert" */
+
+          if (calm_ct) {
+            attrib * a = a_find(u->attribs, &at_curse);
+            boolean calm = false;
+            while (a && a->type==&at_curse) {
+              curse * c = (curse *)a->data.v;
+              if (c->type==calm_ct && c->effect.i==u2->faction->subscription) {
+                if (curse_active(c)) {
+                  calm = true;
+                  break;
+                }
+              }
+              a = a->next;
             }
-            /* Fehler: "Die Einheit ist eine der unsrigen" */
-            if (u2->faction == u->faction) {
-              cmistake(u, ord, 45, MSG_BATTLE);
-              continue;
-            }
-            /* Fehler: "Die Einheit ist mit uns alliert" */
-            if (alliedunit(u, u2->faction, HELP_FIGHT)) {
+            if (calm) {
               cmistake(u, ord, 47, MSG_BATTLE);
               continue;
             }
-            /* xmas */
-            if (u2->no==atoi36("xmas") && u2->irace==new_race[RC_GNOME]) {
-              a_add(&u->attribs, a_new(&at_key))->data.i = atoi36("coal");
-              sprintf(buf, "%s ist böse gewesen...", unitname(u));
-              mistake(u, ord, buf, MSG_BATTLE);
-              continue;
-            } if (u2->faction->age < NewbieImmunity()) {
-              add_message(&u->faction->msgs,
-                msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns", NewbieImmunity()));
-              continue;
+          }
+          /* Ende Fehlerbehandlung */
+          if (b==NULL) {
+            unit * utmp;
+            for (utmp=r->units; utmp!=NULL; utmp=utmp->next) {
+              fset(utmp->faction, FFL_NOAID);
             }
-            /* Fehler: "Die Einheit ist mit uns alliert" */
+            b = make_battle(r);
+          }
+          c1 = join_battle(b, u, true);
+          c2 = join_battle(b, u2, false);
 
-            if (calm_ct) {
-              attrib * a = a_find(u->attribs, &at_curse);
-              boolean calm = false;
-              while (a && a->type==&at_curse) {
-                curse * c = (curse *)a->data.v;
-                if (c->type==calm_ct && c->effect.i==u2->faction->subscription) {
-                  if (curse_active(c)) {
-                    calm = true;
-                    break;
-                  }
-                }
-                a = a->next;
-              }
-              if (calm) {
-                cmistake(u, ord, 47, MSG_BATTLE);
-                continue;
-              }
+          /* Hat die attackierte Einheit keinen Noaid-Status,
+          * wird das Flag von der Faction genommen, andere
+          * Einheiten greifen ein. */
+          if (!fval(u2, UFL_NOAID)) freset(u2->faction, FFL_NOAID);
+
+          if (c1!=NULL && c2!=NULL) {
+            /* Merken, wer Angreifer ist, für die Rückzahlung der
+            * Präcombataura bei kurzem Kampf. */
+            c1->side->bf->attacker = true;
+
+            set_enemy(c1->side, c2->side, true);
+            if (bdebug && !enemy(c1->side, c2->side)) {
+              fprintf(bdebug, "%s attacks %s\n", sidename(c1->side),
+                sidename(c2->side));
             }
-            /* Ende Fehlerbehandlung */
-            if (b==NULL) {
-              unit * utmp;
-              for (utmp=r->units; utmp!=NULL; utmp=utmp->next) {
-                fset(utmp->faction, FFL_NOAID);
-              }
-              b = make_battle(r);
-            }
-            c1 = join_battle(b, u, true);
-            c2 = join_battle(b, u2, false);
-
-            /* Hat die attackierte Einheit keinen Noaid-Status,
-            * wird das Flag von der Faction genommen, andere
-            * Einheiten greifen ein. */
-            if (!fval(u2, UFL_NOAID)) freset(u2->faction, FFL_NOAID);
-
-            if (c1!=NULL && c2!=NULL) {
-              /* Merken, wer Angreifer ist, für die Rückzahlung der
-              * Präcombataura bei kurzem Kampf. */
-              c1->side->bf->attacker = true;
-
-              set_enemy(c1->side, c2->side, true);
-              if (battledebug && !enemy(c1->side, c2->side)) {
-                sprintf(buf, "%s attackiert %s", sidename(c1->side, false),
-                  sidename(c2->side, false));
-                battle_log(buf);
-              }
-              fighting = true;
-            }
+            fighting = true;
+          }
         }
       }
     }
@@ -4098,10 +4024,8 @@ battle_flee(battle * b)
 #endif
           }
         }
-        if (battledebug && runners > 0) {
-          char lbuf[256];
-          sprintf(lbuf, "Flucht: %d aus %s", runners, itoa36(fig->unit->no));
-          battle_log(lbuf);
+        if (bdebug && runners > 0) {
+          fprintf(bdebug, "Fleeing: %d from %s\n", runners, itoa36(fig->unit->no));
         }
       }
     }
@@ -4172,10 +4096,8 @@ do_battle(region * r)
 #endif
 
   for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
-    if (battledebug) {
-      char lbuf[256];
-      sprintf(lbuf, "*** Runde: %d", b->turn);
-      battle_log(lbuf);
+    if (bdebug) {
+      fprintf(bdebug, "*** Turn: %d\n", b->turn);
     }
     battle_flee(b);
     battle_update(b);

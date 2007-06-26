@@ -258,7 +258,8 @@ struct region *findunitregion(const struct unit * su);
 
 char *estring(const char *s);
 char *cstring(const char *s);
-const char *unitname(const struct unit * u);
+extern const xmlChar *unitname(const struct unit * u);
+extern xmlChar * write_unitname(const struct unit * u, xmlChar * buffer, size_t size);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 

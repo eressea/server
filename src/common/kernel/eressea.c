@@ -1646,13 +1646,19 @@ largestbuilding (const region * r, boolean img)
   return best;
 }
 
-const char *
+xmlChar *
+write_unitname(const unit * u, xmlChar * buffer, size_t size)
+{
+  snprintf((char*)buffer, size, "%s (%s)", (const char*)u->name, itoa36(u->no));
+  buffer[size-1] = 0;
+  return buffer;
+}
+
+const xmlChar *
 unitname(const unit * u)
 {
   char *ubuf = idbuf[(++nextbuf) % 8];
-  snprintf(ubuf, sizeof(name), "%s (%s)", u->name, itoa36(u->no));
-  ubuf[sizeof(name)-1] = 0;
-  return ubuf;
+  return write_unitname(u, (xmlChar*)ubuf, sizeof(name));
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
@@ -2074,7 +2080,7 @@ init_locale(const struct locale * lang)
 
   tokens = get_translations(lang, UT_TERRAINS);
   for (terrain=terrains();terrain!=NULL;terrain=terrain->next) {
-    var.v = terrain;
+    var.v = (void*)terrain;
     addtoken(tokens, LOC(lang, terrain->_name), var);
   }
 }

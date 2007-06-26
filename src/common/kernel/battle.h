@@ -238,7 +238,6 @@ extern "C" {
   extern troop select_enemy(struct fighter * af, int minrow, int maxrow, int select);
   extern int count_enemies(struct battle * b, const struct fighter * af, int minrow, int maxrow, int select);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
-  extern void battlemsg(battle * b, struct unit * u, const char * s);
   extern void battlerecord(battle * b, const char *s);
   extern void message_all(battle * b, struct message * m);
   extern void message_faction(battle * b, struct faction * f, struct message * m);

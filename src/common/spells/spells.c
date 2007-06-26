@@ -25,6 +25,7 @@
 
 #include <kernel/curse.h>
 #include <util/nrmessage.h>
+#include <util/bsdstring.h>
 
 struct curse_type;
 extern void ct_register(const struct curse_type * ct);
@@ -544,6 +545,7 @@ sp_summon_familiar(castorder *co)
   direction_t d;
   message * msg;
   xmlChar zText[NAMESIZE];
+  size_t size;
 
   if (get_familiar(mage) != NULL ) {
     cmistake(mage, co->order, 199, MSG_MAGIC);
@@ -591,6 +593,7 @@ sp_summon_familiar(castorder *co)
     if (rc->bonus[sk] > -5) dh++;
   }
   zText[0] = 0;
+  size = sizeof(zText);
   for (sk=0;sk<MAXSKILLS;sk++) {
     if (rc->bonus[sk] > -5) {
       dh--;
@@ -598,12 +601,12 @@ sp_summon_familiar(castorder *co)
         dh1 = 1;
       } else {
         if (dh == 0) {
-          strncat((char*)zText, (const char*)LOC(mage->faction->locale, "list_and"), sizeof(zText));
+          size -= strlcat((char*)zText, (const char*)LOC(mage->faction->locale, "list_and"), size);
         } else {
-          strncat((char*)zText, (const char*)", ", sizeof(zText));
+          size -= strlcat((char*)zText, (const char*)", ", size);
         }
       }
-      strncat((char*)zText, (const char*)skillname(sk, mage->faction->locale), sizeof(zText));
+      size -= strlcat((char*)zText, (const char*)skillname(sk, mage->faction->locale), size);
     }
   }
   ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",

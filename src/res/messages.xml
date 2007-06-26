@@ -1060,6 +1060,27 @@
     <text locale="de">"Ein Alp hat sein Opfer gefunden und springt auf den Rücken von $unit($target)!"</text>
   </message>
 
+  <message name="rust_effect_0" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch es gab niemanden mehr, den dies treffen konnte."</text>
+  </message>
+
+  <message name="rust_effect_1" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch der magische Regen zeigt keinen Effekt."</text>
+  </message>
+
+  <message name="rust_effect_2" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, Der magischen Regen lässt alles Eisen rosten."</text>
+  </message>
+
   <message name="summon_alp_effect" section="events">
     <type>
       <arg name="mage" type="unit"/>
@@ -1272,12 +1293,20 @@
     <text locale="fr">"$unit($unit) hit $int($hits) times and killed $int($kills) enemies."</text>
     <text locale="en">"$unit($unit) hit $int($hits) times and killed $int($kills) enemies."</text>
   </message>
-  <message name="msg_battle" section="battle">
+  <message name="battle_msg" section="battle">
     <type>
       <arg name="string" type="string"/>
     </type>
     <text locale="de">"$string"</text>
     <text locale="en">"$string"</text>
+  </message>
+  <message name="battle_army" section="battle">
+    <type>
+      <arg name="index" type="int"/>
+      <arg name="name" type="int"/>
+    </type>
+    <text locale="de">"Heer $int($index): $name"</text>
+    <text locale="en">"Army $int($index): $name"</text>
   </message>
   <message name="sp_bloodsacrifice_effect" section="magic">
     <type>
@@ -7597,6 +7626,36 @@
     </type>
     <text locale="de">"$unit($unit) scheint von einer seltsamen Krankheit befallen."</text>
     <text locale="en">"$unit($unit) is stricken by a strange disease."</text>
+  </message>
+
+  <message name="battle_loot" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="item" type="resource"/>
+    </type>
+    <text locale="de">"$unit($unit) erbeutet $int($amount) $resource($item,$amount)."</text>
+    <text locale="en">"$unit($unit) collects $int($amount) $resource($item,$amount)."</text>
+  </message>
+
+  <message name="peace_active" section="battle">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es ist so schön friedlich, man möchte hier niemanden angreifen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - It's so quiet and peaceful, nobody wants to attack anybody right now."</text>
+  </message>
+
+  <message name="slave_active" section="battle">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kämpft nicht."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit will not fight."</text>
   </message>
 
 </messages>
