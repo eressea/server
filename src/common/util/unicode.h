@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #include <wchar.h>
+#include <libxml/xmlstring.h>
 
   extern int unicode_utf8_to_ucs4(wint_t *ucs4_character, const xmlChar *utf8_string, size_t *length);
 
