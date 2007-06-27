@@ -106,6 +106,7 @@ addfaction(const char *email, const xmlChar * password,
 {
   faction * f = calloc(sizeof(faction), 1);
   const char * pass = itoa36(rng_int());
+  char buf[128];
 
   assert(frace && frace != new_race[RC_ORC]);
 
@@ -135,7 +136,7 @@ addfaction(const char *email, const xmlChar * password,
   addlist(&factions, f);
   fhash(f);
 
-  sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
+  snprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
   set_string(&f->name, (const xmlChar*)buf);
 
   return f;

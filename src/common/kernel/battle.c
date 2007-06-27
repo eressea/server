@@ -3284,9 +3284,9 @@ simplename(region * r)
 {
   int i;
   static char name[17];
-  const char * cp = rname(r, NULL);
+  const xmlChar * cp = rname(r, NULL);
   for (i=0;*cp && i!=16;++i, ++cp) {
-    int c = *(unsigned char*)cp;
+    int c = *cp;
     while (c && !isalpha(c) && !isspace(c)) {
       ++cp;
       c = *(unsigned char*)cp;

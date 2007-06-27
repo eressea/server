@@ -45,6 +45,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/rng.h>
 
@@ -290,12 +291,12 @@ racename(const struct locale *loc, const unit *u, const race * rc)
   const char * prefix = raceprefix(u);
 
   if (prefix!=NULL) {
-    static char lbuf[80];
-    char * s = lbuf;
-    strcpy(lbuf, locale_string(loc, mkname("prefix", prefix)));
-    s += strlen(lbuf);
-    strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
-    s[0] = (char)tolower(s[0]);
+    static xmlChar lbuf[80];
+    xmlChar * s = lbuf;
+    s += xstrlcpy(lbuf, LOC(loc, mkname("prefix", prefix)), sizeof(lbuf));
+    xstrlcpy(s, LOC(loc, rc_name(rc, u->number != 1)), sizeof(lbuf)-(s-lbuf));
+    assert(s[0]<=0x7F || !"unicode/not implemented");
+    s[0] = (xmlChar)tolower(s[0]);
     return lbuf;
   }
   return LOC(loc, rc_name(rc, u->number != 1));
