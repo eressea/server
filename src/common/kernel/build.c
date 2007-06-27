@@ -815,7 +815,6 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   int n = want, built = 0, id;
   building * b = NULL;
   /* einmalige Korrektur */
-  static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
   const xmlChar * btname;
   order * new_order = NULL;
   const struct locale * lang = u->faction->locale;
@@ -994,7 +993,6 @@ build_ship(unit * u, ship * sh, int want)
 void
 create_ship(region * r, unit * u, const struct ship_type * newtype, int want, order * ord)
 {
-  static char buffer[IDSIZE + 2 * KEYWORDSIZE + 3];
   ship *sh;
   int msize;
   const construction * cons = newtype->construction;

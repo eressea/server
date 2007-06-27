@@ -430,24 +430,25 @@ add_buildinglist(building_list **blist, building *b)
 building *
 new_building(const struct building_type * btype, region * r, const struct locale * lang)
 {
-	building *b = (building *) calloc(1, sizeof(building));
+  building *b = (building *) calloc(1, sizeof(building));
 
-	b->no  = newcontainerid();
-	bhash(b);
-
-	b->type = btype;
-	b->region = r;
-	addlist(&r->buildings, b);
-
-	{
-		static char buffer[IDSIZE + 1 + NAMESIZE + 1];
-		if (b->type->name)
-			sprintf(buffer, "%s", locale_string(lang, btype->_name));
-		else
-			sprintf(buffer, "%s", LOC(lang, buildingtype(btype, b, 0)));
-		set_string(&b->name, buffer);
-	}
-	return b;
+  b->no  = newcontainerid();
+  bhash(b);
+  
+  b->type = btype;
+  b->region = r;
+  addlist(&r->buildings, b);
+  
+  {
+    const xmlChar * bname;
+    if (b->type->name==NULL) {
+      bname = LOC(lang, btype->_name);
+    } else {
+      bname = LOC(lang, buildingtype(btype, b, 0));
+    }
+    set_string(&b->name, bname);
+  }
+  return b;
 }
 
 void
