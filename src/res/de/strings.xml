@@ -6960,4 +6960,69 @@
     <text locale="en">unarmed</text>
   </string>
 
+  <string name="stat_hitpoints">
+    <text locale="de">Trefferpunkte</text>
+    <text locale="en">hitpoints</text>
+  </string>
+
+  <string name="stat_armor">
+    <text locale="de">Rüstung</text>
+    <text locale="en">armor</text>
+  </string>
+
+  <string name="stat_attack">
+    <text locale="de">Angriff</text>
+    <text locale="en">attack</text>
+  </string>
+
+  <string name="stat_attacks">
+    <text locale="de">Angriffe</text>
+    <text locale="en">attacks</text>
+  </string>
+
+  <string name="stat_defense">
+    <text locale="de">Verteidigung</text>
+    <text locale="en">defense</text>
+  </string>
+
+  <string name="stat_equipment">
+    <text locale="de">Kann Waffen benutzen.</text>
+    <text locale="en">May use weapons.</text>
+  </string>
+
+  <string name="stat_pierce">
+    <text locale="de">Ist durch Stichwaffen, Bögen und Armbrüste schwer zu verwunden.</text>
+    <text locale="en">Is hard to hit by piercing weapons.</text>
+  </string>
+
+  <string name="stat_cut">
+    <text locale="de">Ist durch Hiebwaffen schwer zu verwunden.</text>
+    <text locale="en">Is hard to hit by slashing weapons.</text>
+  </string>
+
+  <string name="stat_bash">
+    <text locale="de">Ist durch Schlagwaffen und Katapulte schwer zu verwunden.</text>
+    <text locale="en">Is hard to hit by blunt weapons and catapults.</text>
+  </string>
+
+  <string name="attack_standard">
+    <text locale="de">ein Angriff mit der Waffe oder unbewaffnet</text>
+    <text locale="en">an attack with a weapon or an unarmed attack</text>
+  </string>
+
+  <string name="attack_natural">
+    <text locale="de">ein Angriff mit der Waffe oder unbewaffnet</text>
+    <text locale="en">an attack with a weapon or an unarmed attack</text>
+  </string>
+
+  <string name="attack_magical">
+    <text locale="de">ein magischer Angriff</text>
+    <text locale="en">a magical attack</text>
+  </string>
+
+  <string name="attack_structural">
+    <text locale="de">ein Angriff, der GEbäudeschaden verursacht</text>
+    <text locale="en">an attack causing structural damage to buildings</text>
+  </string>
+
 </strings>

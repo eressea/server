@@ -1060,28 +1060,153 @@
     <text locale="de">"Ein Alp hat sein Opfer gefunden und springt auf den Rücken von $unit($target)!"</text>
   </message>
 
-  <message name="rust_effect_0" section="events">
+  <message name="curseinfo::auraboost_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) fühlt sich von starken magischen Energien durchströmt. ($int36($id))"</text>
+    <text locale="en">"Powerful magical energies are pulsing through $unit($unit). ($int36($id))"</text>
+  </message>
+
+  <message name="curseinfo::auraboost_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) hat Schwierigkeiten seine magischen Energien zu sammeln. ($int36($id))"</text>
+  </message>
+
+  <message name="cast_stun_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger sind für einen Moment benommen."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were momentarily stunned."</text>
+  </message>
+
+  <message name="cast_sleep_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden in Schlaf versetzt."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters have fallen asleep."</text>
+  </message>
+
+  <message name="cast_drainlife_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Kriegern wurde ihre Lebenskraft entzogen."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters had their life energy drained."</text>
+  </message>
+
+  <message name="cast_petrify_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Kriegern wurden versteinert."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were petrified."</text>
+  </message>
+
+  <message name="cast_berserk_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden in einen Blutrausch versetzt."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters went into a mindless rage."</text>
+  </message>
+
+  <message name="cast_frighten_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden eingeschüchtert."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were intimidated."</text>
+  </message>
+
+  <message name="cast_escape_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): Das Kampfgetümmel erstirbt und er kann unbehelligt seines Weges ziehen."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): The noise of the battle dies down and he is able to slip away unharmed."</text>
+  </message>
+
+  <message name="cast_storm_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): Ein Sturm kommt auf und die Schützen können kaum noch zielen."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): Strong stormwinds are blowing and the archers are having a hard time aiming."</text>
+  </message>
+
+  <message name="cast_tired_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger schleppten sich müde in den Kampf."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters had trouble staying awake."</text>
+  </message>
+
+  <message name="cast_hero_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden moralisch gestärkt."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters had their moral boosted."</text>
+  </message>
+
+  <message name="cast_speed_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden magisch beschleunigt."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were magically accelerated."</text>
+  </message>
+
+  <message name="rust_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
     <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch es gab niemanden mehr, den dies treffen konnte."</text>
   </message>
 
-  <message name="rust_effect_1" section="events">
+  <message name="rust_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
     <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch der magische Regen zeigt keinen Effekt."</text>
   </message>
 
-  <message name="rust_effect_2" section="events">
+  <message name="rust_effect_2" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
-    <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, Der magischen Regen lässt alles Eisen rosten."</text>
+    <text locale="de">"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde. Der magischen Regen lässt alles Eisen rosten."</text>
   </message>
 
-  <message name="summon_alp_effect" section="events">
+  <message name="summon_alp_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="alp" type="unit"/>
@@ -1091,7 +1216,7 @@
     <text locale="en">"$unit($mage) summons the alp $unit($alp) for $unit($target)."</text>
   </message>
 
-  <message name="healing_effect_0" section="events">
+  <message name="healing_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -1099,7 +1224,7 @@
     <text locale="de">"$unit($mage) kümmert sich um die Verletzten und heilt $int($amount) Verwundete."</text>
   </message>
 
-  <message name="healing_effect_1" section="events">
+  <message name="healing_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -1108,7 +1233,7 @@
     <text locale="de">"$unit($mage) kümmert sich um die Verletzten und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Verwundete werden geheilt."</text>
   </message>
 
-  <message name="reanimate_effect_0" section="events">
+  <message name="reanimate_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -1116,7 +1241,7 @@
     <text locale="de">"$unit($mage) beginnt ein Ritual der Wiederbelebung. $int($amount) Krieger stehen von den Toten auf."</text>
   </message>
 
-  <message name="reanimate_effect_1" section="events">
+  <message name="reanimate_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -1125,7 +1250,7 @@
     <text locale="de">"$unit($mage) beginnt ein Ritual der Wiederbelebung und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Krieger stehen von den Toten auf."</text>
   </message>
 
-  <message name="chaosgate_effect_1" section="events">
+  <message name="chaosgate_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
@@ -1133,12 +1258,12 @@
     <text locale="en">"$unit($mage) opens a chaos gate."</text>
   </message>
 
-  <message name="chaosgate_effect_2" section="events">
+  <message name="chaosgate_effect_2" section="magic">
     <text locale="de">Ein Wirbel aus blendendem Licht erscheint."</text>
     <text locale="en">"A vortex of blinding light appears."</text>
   </message>
 
-  <message name="summonundead_effect_1" section="events">
+  <message name="summonundead_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -1147,7 +1272,7 @@
     <text locale="en">"$unit($mage) calls $int($amount) undead from their graves."</text>
   </message>
 
-  <message name="viewreality_effect" section="events">
+  <message name="viewreality_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>
     </type>
@@ -1155,7 +1280,7 @@
     <text locale="en">"$unit($unit) manages to catch a glimpse of reality through the fog."</text>
   </message>
 
-  <message name="recruit_effect" section="events">
+  <message name="recruit_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -7752,6 +7877,15 @@
     </type>
     <text locale="de">"$unit($unit) erhielt $resources($items) von der $ship($ship)."</text>
     <text locale="en">"$unit($unit) received $resources($items) from the $ship($ship)."</text>
+  </message>
+  
+  <message name="error_not_on_undead" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nciht auf Untote gezaubert werden."</text>
   </message>
 
 </messages>
