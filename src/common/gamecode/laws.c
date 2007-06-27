@@ -1321,44 +1321,6 @@ prefix_cmd(unit * u, struct order * ord)
   return 0;
 }
 
-static struct local_names * synonyms;
-
-static void
-init_synonyms(void)
-{
-  int i;
-  for (i=0;localenames[i];++i) {
-    const struct locale * lang = find_locale(localenames[i]);
-    boolean exist = false;
-    struct local_names * in = synonyms;
-
-    while (in!=NULL) {
-      if (in->lang==lang) {
-        exist = true;
-        break;
-      }
-      in = in->next;
-    }
-    if (in==NULL) in = calloc(sizeof(local_names), 1);
-    in->next = synonyms;
-    in->lang = lang;
-
-    if (!exist) {
-      int key;
-      for (key=0;race_prefixes[key];++key) {
-        variant var;
-        const xmlChar * pname = locale_string(lang, race_prefixes[key]);
-        if (findtoken(&in->names, pname, &var)==E_TOK_NOMATCH || var.i!=key) {
-          var.i = key;
-          addtoken(&in->names, pname, var);
-          addtoken(&in->names, locale_string(lang, race_prefixes[key]), var);
-        }
-      }
-    }
-    synonyms = in;
-  }
-}
-
 static int
 display_cmd(unit * u, struct order * ord)
 {

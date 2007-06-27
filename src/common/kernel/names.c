@@ -45,73 +45,6 @@
 
 /* Untote */
 
-#define UNTOT_VOR 23
-
-static const xmlChar *untot_vor[UNTOT_VOR] =
-{
-	"Grausige ",
-	"Stöhnende ",
-	"Schlurfende ",
-	"Schwarzgewandete ",
-	"Faulende ",
-	"Angsteinflößende ",
-	"Heulende ",
-	"Wartende ",
-	"Grauenvolle ",
-	"Schwarze ",
-	"Dunkle ",
-	"Fürchterliche ",
-	"Grauenhafte ",
-	"Furchtbare ",
-	"Entsetzliche ",
-	"Schauderhafte ",
-	"Schreckliche ",
-	"Gespenstische ",
-	"Ekelhafte ",
-	"Düstere ",
-	"Schaurige ",
-	"Erbarmungslose ",
-	"Hungrige "
-};
-
-#define UNTOT	13
-
-static const xmlChar *untot[UNTOT] =
-{
-	"Geister",
-	"Phantome",
-	"Vampire",
-	"Zombies",
-	"Gespenster",
-	"Kreaturen",
-	"Gestalten",
-	"Schemen",
-	"Monster",
-	"Krieger",
-	"Ghule",
-	"Kopflose",
-	"Irrlichter"
-};
-
-#define UNTOT_NACH 14
-
-static const xmlChar *untot_nach[UNTOT_NACH] =
-{
-	" der Nacht",
-	" der Schatten",
-	" der Finsternis",
-	" des Bösen",
-	" der Erschlagenen",
-	" der Verfluchten",
-	" der Gefolterten",
-	" der Ruhelosen",
-	" aus dem Nebel",
-	" aus dem Dunkel",
-	" der Tiefe",
-	" in Ketten",
-	" aus dem Totenreich",
-	" aus der Unterwelt"
-};
 
 const xmlChar *
 describe_braineater(unit * u, const struct locale * lang)
@@ -119,31 +52,59 @@ describe_braineater(unit * u, const struct locale * lang)
   return LOC(lang, "describe_braineater");
 }
 
-const char *
+const xmlChar *
 undead_name(const unit * u)
 {
+  static int num_postfix, num_name, num_prefix;
 	int uv, uu, un;
-	static char name[NAMESIZE + 1];
+	static xmlChar name[NAMESIZE + 1];
+  char zText[32];
+  const xmlChar * str;
 
+  if (num_prefix==0) {
+
+    for (num_prefix=0;;++num_prefix) {
+      sprintf(zText, "undead_prefix_%d", num_prefix);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+
+    for (num_name=0;;++num_name) {
+      sprintf(zText, "undead_name_%d", num_name);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+
+    for (num_postfix=0;;++num_postfix) {
+      sprintf(zText, "undead_postfix_%d", num_postfix);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+  }
 	/* nur 50% aller Namen haben "Vor-Teil" */
 	u=u;
-	uv = rng_int() % (UNTOT_VOR * 2);
+	uv = rng_int() % (num_prefix * 2);
 
-	uu = rng_int() % UNTOT;
-	un = rng_int() % (UNTOT_NACH * (uv >= UNTOT_VOR ? 1 : 2));
+	uu = rng_int() % num_name;
+	un = rng_int() % (num_postfix * (uv >= num_prefix ? 1 : 2));
 	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
 
-	if (uv < UNTOT_VOR) {
-		strcpy(name, untot_vor[uv]);
-	} else {
-		name[0] = 0;
+  name[0] = 0;
+	if (uv < num_prefix) {
+    sprintf(zText, "undead_prefix_%d", uv);
+    str = locale_getstring(default_locale, zText);
+		if (str) xstrcat(name, str);
 	}
 
-	strcat(name, untot[uu]);
+  sprintf(zText, "undead_name_%d", uu);
+  str = locale_getstring(default_locale, zText);
+	if (str) xstrcat(name, str);
 
-	if (un < UNTOT_NACH)
-		strcat(name, untot_nach[un]);
-
+  if (un < num_postfix) {
+    sprintf(zText, "undead_postfix_%d", un);
+    str = locale_getstring(default_locale, zText);
+		if (str) xstrcat(name, str);
+  }
 	return name;
 }
 
@@ -583,7 +544,7 @@ dragon_name(const unit *u)
 /* Dracoide */
 
 #define DRAC_PRE 13
-static const xmlChar *drac_pre[DRAC_PRE] = {
+static const char *drac_pre[DRAC_PRE] = {
 		"Siss",
 		"Xxaa",
 		"Shht",
@@ -600,7 +561,7 @@ static const xmlChar *drac_pre[DRAC_PRE] = {
 };
 
 #define DRAC_MID 12
-static const xmlChar *drac_mid[DRAC_MID] = {
+static const char *drac_mid[DRAC_MID] = {
 		"siss",
 		"xxaa",
 		"shht",
@@ -616,7 +577,7 @@ static const xmlChar *drac_mid[DRAC_MID] = {
 };
 
 #define DRAC_SUF 10
-static const xmlChar *drac_suf[DRAC_SUF] = {
+static const char *drac_suf[DRAC_SUF] = {
 		"xil",
 		"shh",
 		"s",
