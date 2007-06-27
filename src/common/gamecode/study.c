@@ -348,13 +348,11 @@ teach_cmd(unit * u, struct order * ord)
   else
 #endif
   {
-    static xmlChar zOrder[BUFSIZE];
+    char zOrder[4096];
     order * new_order;
 
     init_tokens(ord);
     skip_token();
-
-    strcpy((char*)zOrder, (const char *)locale_string(u->faction->locale, keywords[K_TEACH]));
 
     while (!parser_end()) {
       unit * u2 = getunit(r, u->faction);
@@ -379,8 +377,6 @@ teach_cmd(unit * u, struct order * ord)
         token = getstrtoken();
 
         /* Beginne die Fehlermeldung */
-        strcpy(buf, "Die Einheit '");
-
         if (findparam(token, u->faction->locale) != P_TEMP) {
           uid = token;
         } else {
@@ -398,8 +394,8 @@ teach_cmd(unit * u, struct order * ord)
 
       /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
        * ihre neuen Nummern übersetzt. */
-      strcat((char*)zOrder, " ");
-      strcat((char*)zOrder, unitid(u2));
+      strcat(zOrder, " ");
+      strcat(zOrder, unitid(u2));
 
       if (get_keyword(u2->thisorder) != K_STUDY) {
         ADDMSG(&u->faction->msgs,
@@ -432,16 +428,14 @@ teach_cmd(unit * u, struct order * ord)
         if (find_magetype(u2) != 0
           && find_magetype(u) != find_magetype(u2))
         {
-          sprintf(buf, "%s versteht unsere Art von Magie nicht", unitname(u2));
-          mistake(u, ord, buf, MSG_EVENT);
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_different_magic", "target", u2));
           continue;
         }
       }
 
       teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
-
     }
-    new_order = parse_order(zOrder, u->faction->locale);
+    new_order = create_order(K_TEACH, u->faction->locale, "%s", zOrder);
 #ifdef LASTORDER
     set_order(&u->lastorder, new_order);
 #else
@@ -479,8 +473,7 @@ learn_cmd(unit * u, order * ord)
   }
 
   if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
-    sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
-    mistake(u, ord, buf, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race", u->race));
     return 0;
   }
 
@@ -528,8 +521,7 @@ learn_cmd(unit * u, order * ord)
   * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
   * studycost darf hier noch nicht durch Akademie erhöht sein */
   if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
-    sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
-    mistake(u, ord, buf, MSG_EVENT);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_migrants_nolearn", ""));
     return 0;
   }
   /* Akademie: */
@@ -553,13 +545,11 @@ learn_cmd(unit * u, order * ord)
       mtyp = M_GRAU;
       if (!is_mage(u)) create_mage(u, mtyp);
     } else if (!has_skill(u, SK_MAGIC)) {
+      int mmax = max_skill(u->faction, SK_MAGIC);
       /* Die Einheit ist noch kein Magier */
-      if (count_skill(u->faction, SK_MAGIC) + u->number >
-        max_skill(u->faction, SK_MAGIC))
+      if (count_skill(u->faction, SK_MAGIC) + u->number > mmax)
       {
-        sprintf(buf, "Es kann maximal %d Magier pro Partei geben",
-          max_skill(u->faction, SK_MAGIC));
-        mistake(u, ord, buf, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_magicians", "amount", mmax));
         return 0;
       }
       mtyp = getmagicskill(u->faction->locale);
@@ -605,14 +595,13 @@ learn_cmd(unit * u, order * ord)
   }
   if (sk == SK_ALCHEMY) {
     maxalchemy = eff_skill(u, SK_ALCHEMY, r);
-    if (has_skill(u, SK_ALCHEMY)==0
-      && count_skill(u->faction, SK_ALCHEMY) + u->number >
-      max_skill(u->faction, SK_ALCHEMY)) {
-        sprintf(buf, "Es kann maximal %d Alchemisten pro Partei geben",
-          max_skill(u->faction, SK_ALCHEMY));
-        mistake(u, ord, buf, MSG_EVENT);
+    if (!has_skill(u, SK_ALCHEMY)) {
+      int amax = max_skill(u->faction, SK_ALCHEMY);
+      if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists", "amount", amax));
         return 0;
       }
+    }
   }
   if (studycost) {
     int cost = studycost * u->number;

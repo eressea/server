@@ -450,9 +450,9 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     const xmlChar * str = getstrtoken();
     if (str!=NULL && *str) {
       for (rc = races;rc;rc=rc->next) {
-        if (xmlStrncasecmp(LOC(f->locale, rc->_name[0]), str, xmlStrlen(str))==0)
+        if (xmlStrncasecmp(LOC(f->locale, rc->_name[0]), str, xstrlen(str))==0)
           break;
-        if (xmlStrncasecmp(LOC(f->locale, rc->_name[1]), str, xmlStrlen(str))==0)
+        if (xmlStrncasecmp(LOC(f->locale, rc->_name[1]), str, xstrlen(str))==0)
           break;
       }
     }
@@ -1737,14 +1737,15 @@ make_cmd(unit * u, struct order * ord)
   const item_type * itype;
   const xmlChar *s;
   const struct locale * lang = u->faction->locale;
+  char ibuf[16];
 
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
 
   m = atoi((const char *)s);
-  sprintf(buf, "%d", m);
-  if (!strcmp(buf, (const char *)s)) {
+  sprintf(ibuf, "%d", m);
+  if (!strcmp(ibuf, (const char *)s)) {
     /* first came a want-paramter */
     s = getstrtoken();
   } else {
@@ -1801,12 +1802,12 @@ make_cmd(unit * u, struct order * ord)
     } else if (stype!=NULL) {
       const xmlChar * sname = LOC(lang, stype->name[0]);
       const xmlChar * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (xmlStrlen(iname)<xmlStrlen(sname)) stype = NULL;
+      if (xstrlen(iname)<xstrlen(sname)) stype = NULL;
       else itype = NULL;
     } else {
       const xmlChar * bname = LOC(lang, btype->_name);
       const xmlChar * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (xmlStrlen(iname)<xmlStrlen(bname)) btype = NULL;
+      if (xstrlen(iname)<xstrlen(bname)) btype = NULL;
       else itype = NULL;
     }
   }
@@ -1814,7 +1815,7 @@ make_cmd(unit * u, struct order * ord)
   if (btype!=NULL && stype!=NULL) {
     const xmlChar * bname = LOC(lang, btype->_name);
     const xmlChar * sname = LOC(lang, stype->name[0]);
-    if (xmlStrlen(sname)<xmlStrlen(bname)) btype = NULL;
+    if (xstrlen(sname)<xstrlen(bname)) btype = NULL;
     else stype = NULL;
   }
 

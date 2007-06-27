@@ -67,6 +67,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/message.h>
+#include <kernel/names.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/skill.h>
@@ -126,10 +127,6 @@ extern void free_region(region * r);
 extern void render_init(void);
 extern void free_borders(void);
 
-
-#ifdef FUZZY_BASE36
-extern int fuzzy_hits;
-#endif /* FUZZY_BASE36 */
 
 /**
  ** global variables that we are exporting
@@ -244,6 +241,7 @@ processturn(char *filename)
 	struct summary * begin, * end;
   newfaction * players;
 	int i;
+  char path[MAX_PATH];
 
   if (turn == 0) rng_init((int)time(0));
   else rng_init(turn);
@@ -261,7 +259,7 @@ processturn(char *filename)
     plan_monsters();
   }
 	processorders();
-  sprintf(buf, "%s/newfactions", basepath());
+  sprintf(path, "%s/newfactions", basepath());
   players = read_newfactions(filename);
   while (players) {
     int n = listlen(players);
@@ -284,11 +282,6 @@ processturn(char *filename)
 	free(end);
 	free(begin);
 	writepasswd();
-#ifdef FUZZY_BASE36
-	fputs("==--------------------------==\n", stdout);
-	fprintf(stdout, "## fuzzy base10 hits: %5d ##\n", fuzzy_hits);
-	fputs("==--------------------------==\n", stdout);
-#endif /* FUZZY_BASE36 */
 	if (!nowrite) {
 		char ztext[64];
 		sprintf(ztext, "%d", turn);

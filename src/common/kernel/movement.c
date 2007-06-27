@@ -945,7 +945,7 @@ cycle_route(order * ord, unit *u, int gereist)
         tail_end += strlcpy((char*)tail_end, (const char *)loc, size-1);
       }
 		}
-		else if (xmlStrlen(neworder)>sizeof(neworder)/2) break;
+		else if (xstrlen(neworder)>sizeof(neworder)/2) break;
 		else if (cm == gereist && !paused && pause) {
       size_t size = sizeof(tail)-(tail_end-tail);
       const xmlChar * loc = LOC(lang, parameters[P_PAUSE]);
@@ -2063,14 +2063,11 @@ travel(unit * u, region_list ** routep)
 
     if (uf->region == r) {
       order * follow_order;
-      char str[32];
+      const struct locale * lang = u->faction->locale;
 
       /* construct an order */
-      sprintf(str, "%s %s %s", 
-        locale_string(uf->faction->locale, keywords[K_FOLLOW]), 
-        locale_string(uf->faction->locale, parameters[P_UNIT]), 
-        itoa36(ut->no));
-      follow_order = parse_order(str, uf->faction->locale);
+      follow_order = create_order(K_FOLLOW, lang, "%s %i",
+        LOC(uf->faction->locale, parameters[P_UNIT]), ut->no);
 
       route_end = reroute(uf, route_begin, route_end);
       travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING, &followers);
@@ -2247,9 +2244,8 @@ piracy_cmd(unit *u, struct order * ord)
                                         "ship region dir", sh, r, target_dir));
   
   /* Befehl konstruieren */
-  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
-          locale_string(u->faction->locale, directions[target_dir]));
-  set_order(&u->thisorder, parse_order(buf, u->faction->locale));
+  set_order(&u->thisorder, create_order(K_MOVE, u->faction->locale, "%s",
+    LOC(u->faction->locale, directions[target_dir])));
   
   /* Bewegung ausführen */
   init_tokens(u->thisorder);

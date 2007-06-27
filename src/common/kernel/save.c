@@ -360,7 +360,7 @@ ri(FILE * F)
 static int
 ri36(FILE * F)
 {
-	char buf[10];
+	char buf[16];
 	int i = 0;
 	rc(F);
 	while (!isalnum(nextc)) rc(F);
@@ -488,34 +488,20 @@ unitorders(FILE * F, int enc, struct faction * f)
 static faction *
 factionorders(void)
 {
-  char fid[16];
   faction * f = NULL;
+  int fid = getid();
 
-  strlcpy(fid, getstrtoken(), sizeof(fid));
-#ifdef FUZZY_BASE36
-  int id = atoi36(fid);
-  if (id!=0) f = findfaction(id);
-  if (f==NULL) {
-    id = atoi(fid);
-    if (id!=0) f = findfaction(id);
-  }
-#else  
-  f = findfaction(atoi36(fid));
-#endif
+  f = findfaction(fid);
   
   if (f!=NULL) {
-    const char * pass = getstrtoken();
-    /* Kontrolliere, ob das Passwort richtig eingegeben wurde. Es
-     * muß in "Gänsefüßchen" stehen!! */
-    
-    /* War vorher in main.c:getgarbage() */
+    const xmlChar * pass = getstrtoken();
     if (quiet==0) {
       printf(" %4s;", factionid(f));
       fflush(stdout);
     }
     
     if (checkpasswd(f, pass, true) == false) {
-      log_warning(("Invalid password for faction %s\n", fid));
+      log_warning(("Invalid password for faction %s\n", itoa36(fid)));
       ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
                                    f->no, pass));
       return 0;
@@ -528,7 +514,7 @@ factionorders(void)
     f->lastorders = global.data_turn+1;
     
   } else {
-    log_warning(("Befehle für die ungültige Partei %s\n", fid));
+    log_warning(("orders for invalid faction %s\n", itoa36(fid)));
   }
   return f;
 }

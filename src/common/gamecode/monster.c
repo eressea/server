@@ -878,7 +878,7 @@ plan_dragon(unit * u)
       const struct locale * lang = u->faction->locale;
       /* do a growl */
       if (rname(tr, lang)) {
-        addlist(&u->orders, create_order(K_MAIL, lang, "%s '%s %s %s %s'",
+        addlist(&u->orders, create_order(K_MAIL, lang, "%s '%s... %s %s %s'",
           LOC(lang, parameters[P_REGION]), random_growl(), 
           u->number==1?"Ich rieche":"Wir riechen",
           "etwas in", rname(tr, u->faction->locale)));

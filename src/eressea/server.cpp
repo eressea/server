@@ -150,9 +150,6 @@ extern "C" {
   extern void free_borders(void);
   extern boolean opt_cr_absolute_coords;
 
-#ifdef FUZZY_BASE36
-  extern int fuzzy_hits;
-#endif /* FUZZY_BASE36 */
 }
 
 /**

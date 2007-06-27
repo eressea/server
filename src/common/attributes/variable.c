@@ -50,7 +50,7 @@ write_variable(const struct attrib * a, FILE *F)
 static int
 read_variable(struct attrib *a, FILE *F)
 {
-	char localBuffer[BUFSIZE];
+	char localBuffer[1024];
 
 	freadstr(F, localBuffer, sizeof(localBuffer));
 	((variable *)(a->data.v))->key = strdup(localBuffer);

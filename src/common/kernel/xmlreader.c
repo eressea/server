@@ -86,7 +86,7 @@ xml_to_locale(const xmlChar * xmlStr)
   static char zText[1024];
   const xmlChar * inbuf = xmlStr;
   char * outbuf = zText;
-  int inbytes = (int)xmlStrlen(xmlStr)+1;
+  int inbytes = (int)xstrlen(xmlStr)+1;
   int outbytes = (int)sizeof(zText);
 
   if (UTF8Toisolat1((xmlChar*)outbuf, &outbytes, inbuf, &inbytes)<0) {

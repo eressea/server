@@ -539,7 +539,7 @@ resolve_unit(variant id)
 int
 read_unit_reference(unit ** up, FILE * F)
 {
-  char zId[10];
+  char zId[16];
   variant var;
 
   assert(up!=NULL);

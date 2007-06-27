@@ -1396,32 +1396,11 @@ getparam (const struct locale * lang)
   return findparam (getstrtoken (), lang);
 }
 
-#ifdef FUZZY_BASE36
-extern int fuzzy_hits;
-boolean enable_fuzzy = false;
-#endif /* FUZZY_BASE36 */
-
 faction *
 findfaction (int n)
 {
   faction * f = ffindhash(n);
   return f;
-#ifdef FUZZY_BASE36
-  if(enable_fuzzy) {
-    n = atoi(itoa36(n));
-    if (n) {
-      f = ffindhash(n);
-      if (f) return f;
-      for (f = factions; f; f = f->next) {
-        if (f->no == n) {
-          fhash(f);
-          return (f);
-        }
-      }
-    }
-  }
-  return NULL;
-#endif /* FUZZY_BASE36 */
 }
 
 faction *
@@ -2628,11 +2607,11 @@ findspecialdirection(const region *r, const xmlChar *token)
   attrib *a;
   spec_direction *d;
 
-  if (xmlStrlen(token)==0) return NULL;
+  if (xstrlen(token)==0) return NULL;
   for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
     d = (spec_direction *)(a->data.v);
 
-    if (d->active && xmlStrncasecmp(d->keyword, token, xmlStrlen(token)) == 0) {
+    if (d->active && xmlStrncasecmp(d->keyword, token, xstrlen(token)) == 0) {
       return findregion(d->x, d->y);
     }
   }

@@ -662,7 +662,7 @@ abkz(const xmlChar *s, size_t max)
 
 	/* Prüfen, ob Kurz genug */
 
-	if (xmlStrlen(s) <= max) {
+	if (xstrlen(s) <= max) {
 		return s;
 	}
 	/* Anzahl der Wörter feststellen */

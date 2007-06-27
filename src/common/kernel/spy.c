@@ -63,6 +63,7 @@
 void
 spy_message(int spy, const unit *u, const unit *target)
 {
+  char buf[4096];
 	const char *c;
 
 	/* Infos:

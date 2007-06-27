@@ -125,13 +125,14 @@ a_readicastle(attrib * a, FILE * f)
 		return AT_READ_FAIL;
 	} else {
 		variant bno;
-		fscanf(f, "%s %d %d", buf, &bno.i, &data->time);
+    char token[32];
+		fscanf(f, "%s %d %d", token, &bno.i, &data->time);
 		data->building = findbuilding(bno.i);
 		if (!data->building) {
 			/* this shouldn't happen, but just in case it does: */
 			ur_add(bno, (void**)&data->building, resolve_building);
 		}
-		data->type = bt_find(buf);
+		data->type = bt_find(token);
 		return AT_READ_OK;
 	}
 }
@@ -370,15 +371,16 @@ read_seenspell(attrib * a, FILE * f)
 {
   int i;
   spell * sp = NULL;
+  char token[32];
 
-  fscanf(f, "%s", buf);
-  i = atoi(buf);
+  fscanf(f, "%s", token);
+  i = atoi(token);
   if (i!=0) {
     sp = find_spellbyid(M_GRAU, (spellid_t)i);
   } else {
     int mtype;
     fscanf(f, "%d", &mtype);
-    sp = find_spell((magic_t)mtype, buf);
+    sp = find_spell((magic_t)mtype, token);
   }
   if (sp==NULL) {
     /* log_error(("could not find seenspell '%s'\n", buf)); */
@@ -2233,8 +2235,10 @@ static int
 read_familiar(attrib * a, FILE * F)
 {
 	variant id;
-	fscanf(F, "%s", buf);
-	id.i = atoi36(buf);
+  char token[32];
+
+  fscanf(F, "%s", token);
+	id.i = atoi36(token);
 	ur_add(id, &a->data.v, resolve_familiar);
 	return AT_READ_OK;
 }
@@ -2310,8 +2314,10 @@ static int
 read_clone(attrib * a, FILE * F)
 {
 	variant id;
-	fscanf(F, "%s", buf);
-	id.i = atoi36(buf);
+  char token[32];
+
+	fscanf(F, "%s", token);
+	id.i = atoi36(token);
 	ur_add(id, &a->data.v, resolve_clone);
 	return AT_READ_OK;
 }
@@ -2336,8 +2342,10 @@ static int
 read_magician(attrib * a, FILE * F)
 {
 	variant id;
-	fscanf(F, "%s", buf);
-	id.i = atoi36(buf);
+  char token[32];
+
+  fscanf(F, "%s", token);
+	id.i = atoi36(token);
 	ur_add(id, &a->data.v, resolve_mage);
 	return AT_READ_OK;
 }
@@ -2497,7 +2505,7 @@ cast_cmd(unit * u, order * ord)
     }
     s = getstrtoken();
   }
-  if (!s[0] || xmlStrlen(s) == 0) {
+  if (!s[0] || xstrlen(s) == 0) {
     /* Fehler "Es wurde kein Zauber angegeben" */
     cmistake(u, ord, 172, MSG_MAGIC);
     return 0;

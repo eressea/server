@@ -30,7 +30,6 @@ extern const xmlChar * locale_string(const struct locale * lang, const char * ke
 extern unsigned int locale_hashkey(const struct locale * lang);
 extern const char * locale_name(const struct locale * lang);
 
-extern const char * reverse_lookup(const struct locale * lang, const xmlChar * str);
 extern const char * mkname(const char * namespc, const char * key);
 extern char * mkname_buf(const char * namespc, const char * key, char * buffer);
 

@@ -7648,6 +7648,60 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - It's so quiet and peaceful, nobody wants to attack anybody right now."</text>
   </message>
 
+  <message name="error_race_nolearn" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nichts lernen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot study."</text>
+  </message>
+
+  <message name="error_migrants_nolearn" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Migranten können keine kostenpflichtigen Talente lernen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Migrants cannot study this."</text>
+  </message>
+
+  <message name="error_max_magicians" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es kann maximal $int($amount) Magier pro Partei geben."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There may not be more tha $int($amount) magicians in your faction."</text>
+  </message>
+
+  <message name="error_max_alchemists" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es kann maximal $int($amount) Alchemisten pro Partei geben."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There may not be more tha $int($amount) alchemists in your faction."</text>
+  </message>
+
+  <message name="error_different_magic" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) versteht unsere Art von Mague nicht."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) does not understand our kind of magic."</text>
+  </message>
+
   <message name="slave_active" section="battle">
     <type>
       <arg name="region" type="region"/>

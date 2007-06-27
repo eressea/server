@@ -180,26 +180,6 @@ locale_name(const locale * lang)
 	return lang->name;
 }
 
-const char *
-reverse_lookup(const locale * lang, const xmlChar * str)
-{
-	int i;
-	assert(lang);
-	if (xmlStrlen(str)) {
-		if (lang!=NULL) {
-			for (i=0;i!=SMAXHASH;++i) {
-				struct locale_str * ls;
-				for (ls=lang->strings[i];ls;ls=ls->nexthash) {
-					if (xmlStrcasecmp(ls->str, str)==0) return ls->key;
-				}
-			}
-		}
-		log_error(("could not do a reverse_lookup for \"%s\" in locale %s\n", str, lang->name));
-    assert(!"failed to do a reverse_lookup");
-	}
-	return NULL;
-}
-
 char *
 mkname_buf(const char * space, const char * name, char * buffer)
 {

@@ -396,7 +396,7 @@ int
 read_building_reference(struct building ** b, FILE * F)
 {
 	variant var;
-	char zText[10];
+	char zText[16];
 	fscanf(F, "%s ", zText);
 	var.i = atoi36(zText);
 	if (var.i==0) {

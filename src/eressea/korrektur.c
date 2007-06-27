@@ -367,10 +367,6 @@ fix_allies(void)
   }
 }
 
-#ifdef FUZZY_BASE36
-extern boolean enable_fuzzy;
-#endif
-
 static void
 fix_icastles(void)
 {
@@ -968,7 +964,4 @@ korrektur(void)
   create_teleport_plane();
 
   if (global.data_version<TYPES_VERSION) fix_icastles();
-#ifdef FUZZY_BASE36
-  enable_fuzzy = true;
-#endif
 }

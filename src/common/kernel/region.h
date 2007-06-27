@@ -62,7 +62,7 @@ struct rawmaterial;
 struct donation;
 
 typedef struct land_region {
-  char *name;
+  xmlChar *name;
   /* TODO: demand kann nach Konvertierung entfernt werden. */
   struct demand {
     struct demand * next;

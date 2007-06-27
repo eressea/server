@@ -934,16 +934,13 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
   if (n-built <= 0) {
     /* gebäude fertig */
-    strcpy(buffer, LOC(lang, "defaultorder"));
-    new_order = parse_order(buffer, lang);
+    new_order = default_order(lang);
   } else if (n!=INT_MAX) {
     /* reduzierte restgröße */
-    sprintf(buffer, "%s %d %s %s", LOC(lang, keywords[K_MAKE]), n-built, btname, buildingid(b));
-    new_order = parse_order(buffer, lang);
+    new_order = create_order(K_MAKE, lang, "%d '%s' %i", n-built, btname, b->no);
   } else if (btname) {
     /* Neues Haus, Befehl mit Gebäudename */
-    sprintf(buffer, "%s %s %s", LOC(lang, keywords[K_MAKE]), btname, buildingid(b));
-    new_order = parse_order(buffer, u->faction->locale);
+    new_order = create_order(K_MAKE, lang, "'%s' %i", btname, b->no);
   }
 
   if (new_order) {
@@ -1037,10 +1034,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
     u->ship = sh;
   }
   fset(u, UFL_OWNER);
-  sprintf(buffer, "%s %s %s",
-    locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
-
-  new_order = parse_order(buffer, u->faction->locale);
+  new_order = create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale, parameters[P_SHIP]), sh->no);
 #ifdef LASTORDER
   set_order(&u->lastorder, new_order);
 #else

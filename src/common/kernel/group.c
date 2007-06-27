@@ -39,7 +39,7 @@ static group * ghash[GMAXHASH];
 static int maxgid;
 
 static group *
-new_group(faction * f, const char * name, int gid)
+new_group(faction * f, const xmlChar * name, int gid)
 {
 	group ** gp = &f->groups;
 	int index = gid % GMAXHASH;
@@ -49,7 +49,7 @@ new_group(faction * f, const char * name, int gid)
 	*gp = g;
 
 	maxgid = max(gid, maxgid);
-	g->name = strdup(name);
+	g->name = xstrdup(name);
 	g->gid = gid;
 
 	g->nexthash = ghash[index];
@@ -71,7 +71,7 @@ init_group(faction * f, group * g)
 }
 
 static group *
-find_groupbyname(group * g, const char * name)
+find_groupbyname(group * g, const xmlChar * name)
 {
 	while (g && strcasecmp(name, g->name)) g = g->next;
 	return g;
@@ -131,7 +131,7 @@ free_group(group * g)
 }
 
 boolean
-join_group(unit * u, const char * name)
+join_group(unit * u, const xmlChar * name)
 {
 	attrib * a = NULL;
 	group * g;
@@ -184,9 +184,11 @@ read_groups(FILE * F, faction * f)
 		ally ** pa;
 		group * g;
 		int gid;
-		fscanf(F, "%d ", &gid);
+    char buf[1024];
+
+    fscanf(F, "%d ", &gid);
 		if (!gid) break;
-		rsf(F, buf, 1024);
+		rsf(F, buf, sizeof(buf));
 		g = new_group(f, buf, gid);
 		pa = &g->allies;
 		for (;;) {

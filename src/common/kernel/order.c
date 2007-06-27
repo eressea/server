@@ -184,7 +184,7 @@ create_data(keyword_t kwd, const xmlChar * sptr, int lindex)
           data->_keyword = kwd;
           data->_lindex = lindex;
           if (xmlStrchr(skname, ' ')!=NULL) {
-            size_t len = xmlStrlen(skname);
+            size_t len = xstrlen(skname);
             data->_str = (xmlChar*)malloc(len+3);
             data->_str[0]='\"';
             memcpy(data->_str+1, skname, len);
