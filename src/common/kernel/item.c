@@ -395,7 +395,7 @@ it_alias(const char * zname)
 {
   int i;
   for (i=0;it_aliases[i][0];++i) {
-    if (strcasecmp(it_aliases[i][0], zname)==0) return it_aliases[i][1];
+    if (strcmp(it_aliases[i][0], zname)==0) return it_aliases[i][1];
   }
   return zname;
 }

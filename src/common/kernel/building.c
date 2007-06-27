@@ -133,11 +133,7 @@ bt_find(const char* name)
 			}
 		}
 	}
-	while (btl && strcasecmp(btl->type->_name, name)) btl = btl->next;
-	if (!btl) {
-		btl = buildingtypes;
-		while (btl && strncasecmp(btl->type->_name, name, strlen(name))) btl = btl->next;
-	}
+	while (btl && strcmp(btl->type->_name, name)) btl = btl->next;
 	return btl?btl->type:NULL;
 }
 

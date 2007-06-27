@@ -920,11 +920,10 @@ cycle_route(order * ord, unit *u, int gereist)
 	if (get_keyword(ord) != K_ROUTE) return;
 	tail[0] = '\0';
 
-	xmlStrcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
-
   init_tokens(ord);
   skip_token();
 
+  neworder[0]=0;
 	for (cm=0;;++cm) {
 		const struct locale * lang = u->faction->locale;
 		pause = false;
@@ -966,7 +965,7 @@ cycle_route(order * ord, unit *u, int gereist)
 	}
 
 	strcat((char *)neworder, (const char *)tail);
-  norder = parse_order(neworder, u->faction->locale);
+  norder = create_order(K_ROUTE, u->faction->locale, "%s", neworder);
 #ifdef LASTORDER
 	set_order(&u->lastorder, norder);
 #else
@@ -1485,7 +1484,6 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     /* the unit has moved at least one region */
     int walkmode;
     region_list **rlist = &route_begin;
-    region * next = r;
 
     setguard(u, GUARD_NONE);
     cycle_route(ord, u, steps);
@@ -1502,12 +1500,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     /* Berichte über Durchreiseregionen */
 
     while (*rlist!=iroute) {
-      if (next!=u->region && next!=current) {
-        MSG(("travelthru_trail", "region", next), 
-          p, sizeof(buf) - (p-buf), u->faction->locale, u->faction);
-      }
-      next = rlist->data;
-      rlist = rlist->next;
+      rlist = &(*rlist)->next;
     }
     /* remove excess regions */
     *rlist = NULL;
@@ -1538,10 +1531,8 @@ ship_ready(const region * r, unit * u)
 		return false;
 	}
 	if (eff_skill(u, SK_SAILING, r) < u->ship->type->cptskill) {
-		sprintf(buf, "Der Kapitän muß mindestens Segeln %d haben, "
-				"um %s zu befehligen ", u->ship->type->cptskill,
-				LOC(u->faction->locale, u->ship->type->name[1]));
-		mistake(u, u->thisorder, buf, MSG_MOVE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_captain_skill_low",
+      "value ship", u->ship->type->cptskill, u->ship));
 		return false;
 	}
 	assert(u->ship->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
@@ -1855,7 +1846,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     if (sh && hafenmeister != NULL) {
       item * itm;
       unit * u2;
-      boolean first = true;
       item * trans = NULL;
 
       for (u2 = current_point->units; u2; u2 = u2->next) {
@@ -1881,29 +1871,10 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
           }
       }
       if (trans) {
-        sprintf(buf, "%s erhielt ", hafenmeister->name);
-        for (itm = trans; itm; itm=itm->next) {
-          if (!first) {
-            if (itm->next!=NULL && itm->next->next == NULL) {
-              scat(" und ");
-            } else {
-              scat(", ");
-            }
-          }
-          first = false;
-          icat(trans->number);
-          scat(" ");
-          if (itm->number == 1) {
-            scat(locale_string(default_locale, resourcename(itm->type->rtype, 0)));
-          } else {
-            scat(locale_string(default_locale, resourcename(itm->type->rtype, NMF_PLURAL)));
-          }
-        }
-        scat(" von der ");
-        scat(shipname(u->ship));
-        scat(".");
-        addmessage(0, u->faction, buf, MSG_COMMERCE, ML_INFO);
-        addmessage(0, hafenmeister->faction, buf, MSG_INCOME, ML_INFO);
+        message * msg = msg_message("harbor_trade", "unit items ship", hafenmeister, trans, u->ship);
+        add_message(&u->faction->msgs, msg);
+        add_message(&hafenmeister->faction->msgs, msg);
+        msg_release(msg);
         while (trans) i_remove(&trans, trans);
       }
     }
@@ -2144,10 +2115,10 @@ piracy_cmd(unit *u, struct order * ord)
     const faction * target;
     int value;
   } aff[MAXDIRECTIONS];
-  int         saff = 0;
-  int					*il = NULL;
-  const char *s;
-  attrib      *a;
+  int saff = 0;
+  int *il = NULL;
+  const xmlChar *s;
+  attrib *a;
   
   if (!sh) {
     cmistake(u, ord, 144, MSG_MOVE);
@@ -2169,7 +2140,7 @@ piracy_cmd(unit *u, struct order * ord)
   if (s!=NULL && *s) {
     il = intlist_init();
     while (s && *s) {
-      il = intlist_add(il, atoi36(s));
+      il = intlist_add(il, atoi36((const char *)s));
       s = getstrtoken();
     }
   }
@@ -2291,7 +2262,8 @@ hunt(unit *u, order * ord)
 {
   region *rc = u->region;
   int moves, id, speed;
-  char command[256];
+  xmlChar command[256];
+  size_t size = sizeof(command);
   direction_t dir;
 
   if (fval(u, UFL_NOTMOVING)) {
@@ -2329,8 +2301,9 @@ hunt(unit *u, order * ord)
     return 0;
   }
 
-  sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+  sprintf((char *)command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
     locale_string(u->faction->locale, directions[dir]));
+  size -= xstrlen(command);
   moves = 1;
 
   speed = getuint();
@@ -2343,8 +2316,8 @@ hunt(unit *u, order * ord)
   rc = rconnect(rc, dir);
   while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
   {
-    strcat(command, " ");
-    strcat(command, locale_string(u->faction->locale, directions[dir]));
+    size -= xstrlcat(command, " ", size);
+    size -= xstrlcat(command, LOC(u->faction->locale, directions[dir]), size);
     moves++;
     rc = rconnect(rc, dir);
   }

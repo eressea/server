@@ -7702,6 +7702,38 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) does not understand our kind of magic."</text>
   </message>
 
+  <message name="error_captain_skill_low" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="value" type="int"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Kapitän muß ein Segeltalent von mindestens $int($value) haben, um $ship($ship) zu befehligen."</text>
+  </message>
+
+  <message name="error_roads_finished" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In dieser Region gibt es keine Brücken uns Straßen mehr zu bauen."</text>
+  </message>
+
+  <message name="error_build_skill_low" section="errors">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="command" type="order"/>
+      <arg name="value" type="int"/>
+      <arg name="name" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Um $localize($name) zu bauen, braucht man ein Talent von mindestens $int($value)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - To build $localize($name) requires a skill of at least $int($value)."</text>
+  </message>
+
   <message name="slave_active" section="battle">
     <type>
       <arg name="region" type="region"/>
@@ -7710,6 +7742,16 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kämpft nicht."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit will not fight."</text>
+  </message>
+
+  <message name="harbor_trade" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="items" type="items"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) erhielt $resources($items) von der $ship($ship)."</text>
+    <text locale="en">"$unit($unit) received $resources($items) from the $ship($ship)."</text>
   </message>
 
 </messages>

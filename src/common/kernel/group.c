@@ -140,7 +140,7 @@ join_group(unit * u, const xmlChar * name)
   }
 
 	if (a) ((group *)(a->data.v))->members--;
-	if (!name || !strlen(name)) {
+	if (!name || !xstrlen(name)) {
     if (a) {
       a_remove(&u->attribs, a);
       freset(u, UFL_GROUP);
@@ -189,7 +189,7 @@ read_groups(FILE * F, faction * f)
     fscanf(F, "%d ", &gid);
 		if (!gid) break;
 		rsf(F, buf, sizeof(buf));
-		g = new_group(f, buf, gid);
+		g = new_group(f, (const xmlChar *)buf, gid);
 		pa = &g->allies;
 		for (;;) {
 			ally * a;

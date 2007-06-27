@@ -257,9 +257,11 @@ extern char * strdup(const char *s);
 
 #define xstrlen(a) strlen((const char*)(a))
 #define xstrcmp(a, b) strcmp((const char*)(a), (const char *)(b))
+#define xstrcat(a, b) (xmlChar *)strcat((char*)(a), (const char *)(b))
 #define xstrncmp(a, b, s) strncmp((const char*)(a), (const char *)(b), s)
 #define xstrdup(a) (xmlChar *)strdup((const char*)(a))
 #define xstrlcpy(a, b, s) strlcpy((char*)(a), (const char*)(b), s)
+#define xstrlcat(a, b, s) strlcat((char*)(a), (const char *)(b), s)
 
 #endif
 

@@ -170,15 +170,15 @@ checkpasswd(const faction * f, const xmlChar * passwd, boolean shortp)
 #ifdef SHORTPWDS
   shortpwd * slist = f->shortpwds;
   if (shortp) while (slist) {
-    if (strcasecmp(slist->pwd, passwd)==0) {
+    if (xstrcmp(slist->pwd, passwd)==0) {
       slist->used = true;
       return true;
     }
     slist = slist->next;
   }
 #endif
-  if (xmlStrcmp(f->passw, passwd)==0) return true;
-  if (xmlStrcmp(f->override, passwd)==0) return true;
+  if (xstrcmp(f->passw, passwd)==0) return true;
+  if (xstrcmp(f->override, passwd)==0) return true;
   return false;
 }
 

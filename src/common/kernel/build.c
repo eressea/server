@@ -346,7 +346,7 @@ destroy_cmd(unit * u, struct order * ord)
   region * r = u->region;
   const construction * con = NULL;
   int size = 0;
-  const char *s;
+  const xmlChar *s;
   int n = INT_MAX;
 
   if (u->number < 1)
@@ -362,7 +362,7 @@ destroy_cmd(unit * u, struct order * ord)
   }
 
   if (s && *s) {
-    n = atoi(s);
+    n = atoi((const char *)s);
     if (n <= 0) {
       cmistake(u, ord, 288, MSG_PRODUCE);
       return 0;
@@ -508,9 +508,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 
   /* hoffentlich ist r->road <= r->terrain->max_road, n also >= 0 */
   if (left <= 0) {
-    sprintf(buf, "In %s gibt es keine Brücken und Straßen "
-      "mehr zu bauen", regionname(r, u->faction));
-    mistake(u, u->thisorder, buf, MSG_PRODUCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_roads_finished", ""));
     return;
   }
 
@@ -818,7 +816,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   building * b = NULL;
   /* einmalige Korrektur */
   static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
-  const char * btname;
+  const xmlChar * btname;
   order * new_order = NULL;
   const struct locale * lang = u->faction->locale;
 
@@ -834,7 +832,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
    * baut man an der eigenen burg weiter. */
 
   /* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
-  id = atoi36(getstrtoken());
+  id = getid();
   if (id!=0){ /* eine Nummer angegeben, keine neue Burg bauen */
     b = findbuilding(id);
     if (!b || b->region != u->region){ /* eine Burg mit dieser Nummer gibt es hier nicht */
@@ -1013,9 +1011,8 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
 
   /* check if skill and material for 1 size is available */
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
-    sprintf(buf, "Um %s zu bauen, braucht man ein Talent von "
-      "mindestens %d.", newtype->name[1], cons->minskill);
-    mistake(u, ord, buf, MSG_PRODUCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_build_skill_low", "value name", 
+      cons->minskill, newtype->name[1]));
     return;
   }
 
@@ -1073,9 +1070,8 @@ continue_ship(region * r, unit * u, int want)
     return;
   }
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
-    sprintf(buf, "Um %s zu bauen, braucht man ein Talent von "
-        "mindestens %d.", sh->type->name[1], cons->minskill);
-    mistake(u, u->thisorder, buf, MSG_PRODUCE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_build_skill_low", "value name", 
+      cons->minskill, sh->type->name[1]));
     return;
   }
   msize = maxbuild(u, cons);
@@ -1132,8 +1128,7 @@ leave_cmd(unit * u, struct order * ord)
     }
   }
   if (!slipthru(r, u, u->building)) {
-    sprintf(buf, "%s wird belagert.", buildingname(u->building));
-    mistake(u, ord, buf, MSG_MOVE);
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged", "building", u->building));
   } else {
     leave(r, u);
   }

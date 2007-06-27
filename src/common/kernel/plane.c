@@ -65,7 +65,7 @@ getplanebyname(const char * name)
 	plane *p;
 
 	for (p=planes; p; p=p->next)
-		if (!strcasecmp(p->name, name))
+		if (!strcmp(p->name, name))
 			return p;
 	return NULL;
 }

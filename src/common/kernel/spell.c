@@ -46,11 +46,6 @@ spell_list * spells = NULL;
 void
 register_spell(spell * sp)
 {
-#ifndef NDEBUG
-  const char * name = mkname("spell", sp->sname);
-  assert(name!=LOC(default_locale, name));
-  assert(strchr(sp->sname, ' ')==NULL);
-#endif
   if (sp->id==0) {
     sp->id = hashstring(sp->sname);
   }
@@ -102,7 +97,7 @@ init_spellnames(const struct locale * lang, magic_t mtype)
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
     if (sp->magietyp==mtype) {
-      const char * n = spell_name(sp, lang);
+      const xmlChar * n = spell_name(sp, lang);
       variant token;
       token.v = sp;
       addtoken(&sn->names, n, token);

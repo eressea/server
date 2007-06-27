@@ -72,7 +72,7 @@ const ship_type *
 st_find(const char* name)
 {
 	const struct ship_typelist * stl = shiptypes;
-	while (stl && strcasecmp(stl->type->name[0], name)) stl = stl->next;
+	while (stl && strcmp(stl->type->name[0], name)) stl = stl->next;
 	return stl?stl->type:NULL;
 }
 

@@ -2368,8 +2368,8 @@ origin_cmd(unit * u, struct order * ord)
   init_tokens(ord);
   skip_token();
 
-  px = (short)atoi(getstrtoken());
-  py = (short)atoi(getstrtoken());
+  px = (short)getint();
+  py = (short)getint();
 
   set_ursprung(u->faction, getplaneid(u->region), px, py);
   return 0;
@@ -2443,7 +2443,7 @@ status_cmd(unit * u, struct order * ord)
     }
     break;
   default:
-    if (strlen(param)) {
+    if (param[0]) {
       add_message(&u->faction->msgs,
         msg_feedback(u, ord, "unknown_status", ""));
     } else {
@@ -2473,8 +2473,7 @@ combatspell_cmd(unit * u, struct order * ord)
   /* Optional: STUFE n */
   if (findparam(s, u->faction->locale) == P_LEVEL) {
     /* Merken, setzen kommt erst später */
-    s = getstrtoken();
-    level = atoi(s);
+    level = getint();
     level = max(0, level);
     s = getstrtoken();
   }
@@ -2872,7 +2871,7 @@ renumber_cmd(unit * u, order * ord)
     case P_FACTION:
       s = getstrtoken();
       if (s && *s) {
-        int id = atoi36(s);
+        int id = atoi36((const char *)s);
         attrib * a = a_find(f->attribs, &at_number);
         if (!a) a = a_add(&f->attribs, a_new(&at_number));
         a->data.i = id;
@@ -2884,7 +2883,7 @@ renumber_cmd(unit * u, order * ord)
       if (s == NULL || *s == 0) {
         i = newunitid();
       } else {
-        i = atoi36(s);
+        i = atoi36((const char *)s);
         if (i<=0 || i>MAX_UNIT_NR) {
           cmistake(u, ord, 114, MSG_EVENT);
           break;
@@ -2923,10 +2922,10 @@ renumber_cmd(unit * u, order * ord)
         break;
       }
       s = getstrtoken();
-      if(s == NULL || *s == 0) {
+      if (s == NULL || *s == 0) {
         i = newcontainerid();
       } else {
-        i = atoi36(s);
+        i = atoi36((const char *)s);
         if (i<=0 || i>MAX_CONTAINER_NR) {
           cmistake(u,ord,114,MSG_EVENT);
           break;
@@ -2954,7 +2953,7 @@ renumber_cmd(unit * u, order * ord)
       if(*s == 0) {
         i = newcontainerid();
       } else {
-        i = atoi36(s);
+        i = atoi36((const char *)s);
         if (i<=0 || i>MAX_CONTAINER_NR) {
           cmistake(u,ord,114,MSG_EVENT);
           break;
@@ -3195,7 +3194,7 @@ new_units (void)
           skip_token();
           if (getparam(u->faction->locale) == P_TEMP) {
             const xmlChar * token;
-            char * name = NULL;
+            xmlChar * name = NULL;
             int alias;
             order ** newordersp;
 
@@ -3223,8 +3222,8 @@ new_units (void)
             alias = getid();
 
             token = getstrtoken();
-            if (token && strlen(token)>0) {
-              name = strdup(token);
+            if (token && token[0]) {
+              name = xstrdup(token);
             }
             u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
             if (name!=NULL) free(name);
@@ -3511,11 +3510,11 @@ defaultorders (void)
       while (*ordp!=NULL) {
         order * ord = *ordp;
         if (get_keyword(ord)==K_DEFAULT) {
-          char * cmd;
+          const xmlChar * cmd;
           order * new_order;
           init_tokens(ord);
           skip_token(); /* skip the keyword */
-          cmd = strdup(getstrtoken());
+          cmd = getstrtoken();
           new_order = parse_order(cmd, u->faction->locale);
           *ordp = ord->next;
           ord->next = NULL;
@@ -3532,7 +3531,6 @@ defaultorders (void)
           }
           if (new_order) addlist(&u->old_orders, new_order);
 #endif
-          free(cmd);
         }
         else ordp = &ord->next;
       }
@@ -3588,7 +3586,7 @@ use_cmd(unit * u, struct order * ord)
   skip_token();
 
   t = getstrtoken();
-  n = atoi(t);
+  n = atoi((const char *)t);
   if (n==0) {
     if (findparam(t, u->faction->locale) == P_ANY) {
       /* BENUTZE ALLES Yanxspirit */
@@ -3627,7 +3625,7 @@ claim_cmd(unit * u, struct order * ord)
   skip_token();
 
   t = getstrtoken();
-  n = atoi(t);
+  n = atoi((const char *)t);
   if (n==0) {
     n = 1;
   } else {
@@ -3866,7 +3864,7 @@ warn_password(void)
     }
     if (pwok == false) {
       free(f->passw);
-      f->passw = strdup(itoa36(rng_int()));
+      f->passw = (xmlChar*)strdup(itoa36(rng_int()));
       ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
     }
     f = f->next;
