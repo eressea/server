@@ -164,7 +164,7 @@ sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
 
 /* Versteinern */
 int
-sp_versteinern(fighter * fi, int level, double power, spell * sp)
+sp_petrify(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
@@ -194,9 +194,7 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Personen %s versteinert",
-      stoned, stoned == 1 ? "wurde" : "wurden");
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  m = msg_message("cast_petrify_effect", "mage spell amount", fi->unit, sp, stoned);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -247,9 +245,7 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%d Krieger %s für einen Moment benommen",
-      stunned, stunned == 1 ? "ist" : "sind");
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  m = msg_message("cast_stun_effect", "mage spell amount", fi->unit, sp, stunned);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -381,9 +377,7 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Krieger %s in Schlaf versetzt",
-      k, k == 1 ? "wurde" : "wurden");
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  m = msg_message("cast_sleep_effect", "mage spell amount", fi->unit, sp, k);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -455,9 +449,7 @@ sp_speed(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%d Krieger %s magisch beschleunigt",
-      targets, targets == 1 ? "wurde" : "wurden");
-  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, buf);
+  m = msg_message("cast_speed_effect", "mage spell amount", fi->unit, sp, targets);
   message_all(b, m);
   msg_release(m);
   return 1;
@@ -687,10 +679,7 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Person%s wurde ihre Lebenskraft entzogen",
-    drained, drained == 1 ? " wurde" : "en wurden");
-
-  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, buf);
+  m = msg_message("cast_drainlife_effect", "mage spell amount", fi->unit, sp, drained);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1030,9 +1019,7 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%d Krieger %s moralisch gestärkt",
-      targets, targets == 1 ? "wurde" : "wurden");
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  m = msg_message("cast_hero_effect", "mage spell amount", fi->unit, sp, targets);
   message_all(b, m);
   msg_release(m);
 
@@ -1086,9 +1073,7 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  sprintf(buf, "%d Krieger %s in Blutrausch versetzt",
-      targets, targets == 1 ? "wurde" : "wurden");
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  m = msg_message("cast_berserk_effect", "mage spell amount", fi->unit, sp, targets);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1139,9 +1124,7 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Krieger %s eingeschüchtert",
-      targets, targets == 1 ? "wurde" : "wurden");
-  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, buf);
+  m = msg_message("cast_frighten_effect", "mage spell amount", fi->unit, sp, targets);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1183,15 +1166,7 @@ sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  if (n == 0) {
-    effect = "Der Zauber konnte keinen Krieger ermüden";
-  } else if (n == 1) {
-    effect = "Ein Krieger schleppt sich müde in den Kampf";
-  } else {
-    sprintf(buf, "%d Krieger schleppen sich müde in den Kampf", n);
-    effect = buf;
-  }
-  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, effect);
+  m = msg_message("cast_tired_effect", "mage spell amount", fi->unit, sp, n);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1240,8 +1215,7 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
     }
   }
 
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, 
-    "Ein Sturm kommt auf und die Schützen können kaum noch zielen");
+  m = msg_message("cast_storm_effect", "mage spell", fi->unit, sp);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1256,8 +1230,7 @@ sp_reeling_arrows(fighter * fi, int level, double power, spell * sp)
   unused(power);
 
   b->reelarrow = true;
-  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, 
-    "Ein Sturm kommt auf und die Schützen können kaum noch zielen");
+  m = msg_message("cast_tired_effect", "mage spell amount", fi->unit, sp, n);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1310,8 +1283,7 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   /* fighter leeren */
   rmfighter(fi, mage->number);
 
-  m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp,
-    "Das Kampfgetümmel erstirbt und er kann unbehelligt seines Weges ziehen");
+  m = msg_message("cast_escape_effect", "mage spell", fi->unit, sp);
   message_all(b, m);
   msg_release(m);
 

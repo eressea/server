@@ -64,6 +64,7 @@
 #define REGIONITEMS_VERSION 323 /* regions have items */
 #define ATTRIBREAD_VERSION 324 /* remove a_readint */
 #define CURSEFLAGS_VERSION 325 /* remove a_readint */
+#define UNICODE_VERSION 326 /* everything is stored as UTF8 */
 
 #define MIN_VERSION CURSETYPE_VERSION
 #define REGIONOWNERS_VERSION 400

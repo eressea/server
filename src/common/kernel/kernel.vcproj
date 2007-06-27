@@ -410,6 +410,9 @@
 			RelativePath=".\unit.c">
 		</File>
 		<File
+			RelativePath=".\version.h">
+		</File>
+		<File
 			RelativePath=".\xmlkernel.h">
 		</File>
 		<File

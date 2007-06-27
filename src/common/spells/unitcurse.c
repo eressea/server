@@ -45,20 +45,16 @@
 static message *
 cinfo_auraboost(const void * obj, typ_t typ, const curse *c, int self)
 {
-  struct unit *u;
+  struct unit *u = (struct unit *)obj;
   unused(typ);
   assert(typ == TYP_UNIT);
-  u = (struct unit *)obj;
 
   if (self != 0){
     if (curse_geteffect(c) > 100){
-      sprintf(buf, "%s fühlt sich von starken magischen Energien "
-        "durchströmt", u->name);
+      return msg_message("curseinfo::auraboost_0", "unit id", u, c->no);
     } else {
-      sprintf(buf, "%s hat Schwierigkeiten seine magischen Energien "
-          "zu sammeln", u->name);
+      return msg_message("curseinfo::auraboost_1", "unit id", u, c->no);
     }
-    return msg_message("curseinfo::info_str", "text id", buf, c->no);
   }
   return NULL;
 }

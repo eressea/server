@@ -109,7 +109,8 @@ extern void add_buildinglist(building_list **bl, struct building *b);
 
 extern struct attrib_type at_building_generic_type;
 extern const char * buildingtype(const building_type * btype, const struct building * b, int bsize);
-extern const char * buildingname(const struct building * b);
+extern const xmlChar * buildingname(const struct building * b);
+extern const xmlChar * write_buildingname(const building * b, xmlChar * ibuf, size_t size);
 extern int buildingcapacity(const struct building * b);
 extern struct building *new_building(const struct building_type * typ, struct region * r, const struct locale * lang);
 void build_building(struct unit * u, const struct building_type * typ, int size, struct order * ord);

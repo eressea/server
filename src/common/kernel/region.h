@@ -131,8 +131,8 @@ typedef struct spec_direction {
   short x, y;
   int  duration;
   boolean active;
-  xmlChar *desc;
-  xmlChar *keyword;
+  char *desc;
+  char *keyword;
 } spec_direction;
 
 typedef struct {
@@ -209,7 +209,7 @@ extern boolean r_isforest(const struct region * r);
 #define rterrain(r) (oldterrain((r)->terrain))
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
-extern const char * rname(const struct region * r, const struct locale * lang);
+extern const xmlChar * rname(const struct region * r, const struct locale * lang);
 #define rsetname(r, str) (set_string(&(r)->land->name, str))
 
 #define rplane(r) getplane(r)
@@ -218,6 +218,8 @@ extern void r_setdemand(struct region * r, const struct luxury_type * ltype, int
 extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 
 extern const xmlChar * regionname(const struct region * r, const struct faction * f);
+extern const xmlChar * write_regionname(const struct region * r, const struct faction * f, xmlChar * buffer, size_t size);
+
 extern void * resolve_region(variant data);
 extern struct region * new_region(short x, short y);
 extern void terraform(struct region * r, terrain_t terrain);

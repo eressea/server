@@ -448,14 +448,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   if (f->no==MONSTER_FACTION) {
     /* Monster dürfen REKRUTIERE 15 dracoid machen */
     const xmlChar * str = getstrtoken();
-    if (str!=NULL && *str) {
-      for (rc = races;rc;rc=rc->next) {
-        if (xmlStrncasecmp(LOC(f->locale, rc->_name[0]), str, xstrlen(str))==0)
-          break;
-        if (xmlStrncasecmp(LOC(f->locale, rc->_name[1]), str, xstrlen(str))==0)
-          break;
-      }
-    }
+    rc = findrace(str, f->locale);
     if (rc==NULL) rc = f->race;
   }
 
@@ -2992,21 +2985,10 @@ expandwork(region * r)
 
 	/* Der Rest wird von den Bauern verdient. n ist das uebriggebliebene
 	* Geld. */
-#ifdef AFFECT_SALARY
-	{
-		attrib * a = a_find(r->attribs, &at_salary);
-		if (a) verdienst = a->data.i;
-	}
-#endif
-  
+ 
 	earnings = min(n, rpeasants(r) * p_wage) + verdienst;
 	/* Mehr oder weniger durch Trank "Riesengrass" oder "Faulobstschnaps" */
 
-	if (verdienst) {
-		sprintf(buf, "%d Bauern verdienen ein Silber %s durch %s.",
-			abs(verdienst), (verdienst > 0) ? "mehr" : "weniger",
-			(verdienst > 0) ? "Riesengras" : "Faulobstschnaps");
-	}
 	rsetmoney(r, rmoney(r) + earnings);
 }
 

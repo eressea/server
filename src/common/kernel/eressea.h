@@ -43,7 +43,6 @@ extern "C" {
 #define INSECT_POTION /* Spezialtrank für Insekten */
 #define ORCIFICATION /* gioving snotlings to the peasants gets counted */
 #undef TROLLSAVE /* saving throw for dead trolls */
-#undef AFFECT_SALARY /* gibt es ein attribut at_salary (ist noch nicht fertig!) */
 
 #include <settings.h>
 
@@ -256,8 +255,10 @@ struct unit *findunit(int n);
 struct unit *findunitr(const struct region * r, int n);
 struct region *findunitregion(const struct unit * su);
 
-char *estring(const char *s);
-char *cstring(const char *s);
+extern char *estring(const char *s);
+extern char *estring_i(char *s);
+extern char *cstring(const char *s);
+extern char *cstring_i(char *s);
 extern const xmlChar *unitname(const struct unit * u);
 extern xmlChar * write_unitname(const struct unit * u, xmlChar * buffer, size_t size);
 

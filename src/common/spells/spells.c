@@ -580,7 +580,7 @@ sp_summon_familiar(castorder *co)
   }
 
   msg = msg_message("familiar_name", "unit", mage);
-  nr_render(msg, mage->faction->locale, zText, sizeof(zText), mage->faction);
+  nr_render(msg, mage->faction->locale, (char *)zText, sizeof(zText), mage->faction);
   msg_release(msg);
   familiar = create_unit(target_region, mage->faction, 1, rc, 0, zText, mage);
   setstatus(familiar, ST_FLEE);
@@ -635,7 +635,7 @@ sp_destroy_magic(castorder *co)
   double force = co->force;
   spellparameter *pa = co->par;
   curse * c = NULL;
-  char ts[80];
+  xmlChar ts[80];
   attrib **ap;
   int obj;
   int succ;
@@ -653,7 +653,7 @@ sp_destroy_magic(castorder *co)
       /* region *tr = pa->param[0]->data.r; -- farcasting! */
       region *tr = co->rt;
       ap = &tr->attribs;
-      strcpy(ts, regionname(tr, mage->faction));
+      write_regionname(tr, mage->faction, ts, sizeof(ts));
       break;
     }
     case SPP_TEMP:
@@ -662,7 +662,7 @@ sp_destroy_magic(castorder *co)
       unit *u;
       u = pa->param[0]->data.u;
       ap = &u->attribs;
-      strcpy(ts, unitname(u));
+      write_unitname(u, ts, sizeof(ts));
       break;
     }
     case SPP_BUILDING:
@@ -4450,9 +4450,7 @@ sp_pump(castorder *co)
   target = pa->param[0]->data.u; /* Zieleinheit */
 
   if (fval(target->race, RCF_UNDEAD)) {
-    sprintf(buf, "%s kann nicht auf Untote gezaubert werden.",
-      spell_name(sp, mage->faction->locale));
-    addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_not_on_undead", ""));
     return 0;
   }
   if (is_magic_resistant(mage, target, 0) || target->faction->no == MONSTER_FACTION) {
@@ -7357,7 +7355,7 @@ static spelldata spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_versteinern, NULL
+    (spell_f)sp_petrify, NULL
   },
   {
     SPL_STRONG_WALL, "strongwall", NULL, NULL, NULL,

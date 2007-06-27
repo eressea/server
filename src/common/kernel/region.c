@@ -38,6 +38,7 @@
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
+#include "version.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -102,29 +103,30 @@ dir_invert(direction_t dir)
 }
 
 const xmlChar *
-regionname(const region * r, const faction * f)
+write_regionname(const region * r, const faction * f, xmlChar * buffer, size_t size)
 {
-  static char buf[65];
+  char * buf = (char *)buffer;
   const struct locale * lang = f ? f->locale : 0;
   if (r==NULL) {
     strcpy(buf, "(null)");
   } else {
     plane *pl = r->planep;
     if (pl && fval(pl, PFL_NOCOORDS)) {
-      strncpy(buf, rname(r, lang), 65);
+      strncpy(buf, (const char *)rname(r, lang), size);
     } else {
-#ifdef HAVE_SNPRINTF
-      snprintf(buf, 65, "%s (%d,%d)", rname(r, lang),
+      snprintf(buf, size, "%s (%d,%d)", rname(r, lang),
         region_x(r, f), region_y(r, f));
-#else
-      strncpy(buf, rname(r, lang), 50);
-      buf[50]=0;
-      sprintf(buf+strlen(buf), " (%d,%d)", region_x(r, f), region_y(r, f));
-#endif
     }
   }
   buf[64] = 0;
-  return buf;
+  return buffer;
+}
+
+const xmlChar *
+regionname(const region * r, const faction * f)
+{
+  static xmlChar buf[65];
+  return write_regionname(r, f, buf, sizeof(buf));
 }
 
 int
@@ -207,9 +209,15 @@ a_readdirection(attrib *a, FILE *f)
   spec_direction *d = (spec_direction *)(a->data.v);
   fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
   fscanf(f, "%15s ", lbuf);
-  d->desc = strdup(cstring(lbuf));
+  d->desc = strdup(lbuf);
   fscanf(f, "%15s ", lbuf);
-  d->keyword = strdup(cstring(lbuf));
+  d->keyword = strdup(lbuf);
+  if (global.data_version<UNICODE_VERSION) {
+    cstring_i(d->desc);
+    cstring_i(d->keyword);
+    /* TODO: reverse lookup of desc and keyword or something? */
+    assert(!"not implemented");
+  }
   d->active = true;
   return AT_READ_OK;
 }
@@ -220,7 +228,7 @@ a_writedirection(const attrib *a, FILE *f)
   spec_direction *d = (spec_direction *)(a->data.v);
 
   fprintf(f, "%d %d %d %s %s ", d->x, d->y, d->duration,
-      estring(d->desc), estring(d->keyword));
+      (const char *)d->desc, (const char *)d->keyword);
 }
 
 attrib_type at_direction = {
@@ -686,11 +694,12 @@ r_demand(const region * r, const luxury_type * ltype)
   return d->value;
 }
 
-const char *
+const xmlChar *
 rname(const region * r, const struct locale * lang) {
-  if (r->land)
+  if (r->land) {
     return r->land->name;
-  return locale_string(lang, terrain_name(r));
+  }
+  return LOC(lang, terrain_name(r));
 }
 
 int
@@ -789,7 +798,10 @@ free_region(region * r)
   free(r);
 }
 
-static char *
+/** creates a name for a region
+ * TODO: Make this XML-configurable and allow non-ascii characters again.
+ */
+static xmlChar *
 makename(void)
 {
   int s, v, k, e, p = 0, x = 0;
@@ -797,12 +809,16 @@ makename(void)
   static char name[16];
   const char *kons = "bcdfghklmnprstvwz",
     *end = "nlrdst",
-    *vokal = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy",
+#if 0
+    *vowels = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy",
+#else
+    *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy",
+#endif
     *start = "bcdgtskpvfr";
 
   nk = strlen(kons);
   ne = strlen(end);
-  nv = strlen(vokal);
+  nv = strlen(vowels);
   ns = strlen(start);
 
   for (s = rng_int() % 3 + 2; s > 0; s--) {
@@ -816,7 +832,7 @@ makename(void)
       p++;
     }
     v = rng_int() % (int)nv;
-    name[p] = vokal[v];
+    name[p] = vowels[v];
     p++;
     if (rng_int() % 3 == 2 || s == 1) {
       e = rng_int() % (int)ne;
@@ -828,7 +844,7 @@ makename(void)
   }
   name[p] = '\0';
   name[0] = (char) toupper(name[0]);
-  return name;
+  return (xmlChar*)name;
 }
 
 void

@@ -138,7 +138,7 @@ report_region(report_context * ctx, seen_region * sr)
     xmlNewProp(node, BAD_CAST "plane", xml_s(r->planep->name));
   }
   if (r->land!=NULL) {
-    xmlNewProp(node, BAD_CAST "name", xml_s(r->land->name));
+    xmlNewProp(node, BAD_CAST "name", r->land->name);
   }
   return node;
 }

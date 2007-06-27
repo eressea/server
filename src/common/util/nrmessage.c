@@ -119,8 +119,8 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
     else nrt->section = NULL;
     messagetypes[hash] = nrt;
     assert(string && *string);
-    nrt->string = strdup(string);
-                *c = '\0';
+    nrt->string = xstrdup(string);
+    *c = '\0';
     for (i=0;i!=mtype->nparameters;++i) {
       if (i!=0) *c++ = ' ';
       c+= strlen(strcpy(c, mtype->pnames[i]));
@@ -131,7 +131,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 }
 
 size_t
-nr_render(const struct message * msg, const struct locale * lang, xmlChar * buffer, size_t size, const void * userdata)
+nr_render(const struct message * msg, const struct locale * lang, char * buffer, size_t size, const void * userdata)
 {
   struct nrmessage_type * nrt = nrt_find(lang, msg->type);
 

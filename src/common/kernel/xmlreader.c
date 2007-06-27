@@ -103,12 +103,12 @@ xml_cleanup_string(xmlChar * str)
 
   while (*read) {
     /* eat leading whitespace */
-	if (*read && isspace(*read)) {
-	  while (*read && isspace(*read)) {
-		++read;
-	  }
-	  *write++ = ' ';
-	}
+    if (*read && isspace(*read)) {
+      while (*read && isspace(*read)) {
+        ++read;
+      }
+      *write++ = ' ';
+    }
     while (*read) {
       if (*read== '\n') break;
       if (*read== '\r') break;
@@ -1625,7 +1625,7 @@ parse_terrains(xmlDocPtr doc)
 
   xpath = xmlXPathNewContext(doc);
 
-  /* reading eressea/strings/string */
+  /* reading eressea/terrains/terrain */
   terrains = xmlXPathEvalExpression(BAD_CAST "/eressea/terrains/terrain", xpath);
   nodes = terrains->nodesetval;
   for (i=0;i!=nodes->nodeNr;++i) {
@@ -1740,7 +1740,7 @@ parse_messages(xmlDocPtr doc)
 
   xpath = xmlXPathNewContext(doc);
 
-  /* reading eressea/strings/string */
+  /* reading eressea/messages/message */
   messages = xmlXPathEvalExpression(BAD_CAST "/eressea/messages/message", xpath);
   nodes = messages->nodesetval;
   for (i=0;i!=nodes->nodeNr;++i) {
@@ -1806,7 +1806,7 @@ parse_messages(xmlDocPtr doc)
 
       xml_readtext(node, &lang, &text);
       xml_cleanup_string(text);
-      nrt_register(mtype, lang, xml_to_locale(text), 0, (const char*)section);
+      nrt_register(mtype, lang, (const char *)text, 0, (const char*)section);
       xmlFree(text);
 
     }

@@ -1557,49 +1557,64 @@ static name idbuf[8];
 static int nextbuf = 0;
 
 char *
+estring_i(char *ibuf)
+{
+  char *p = ibuf;
+
+  while (*p) {
+    if (isspace(*(unsigned*)p) == ' ') {
+      *p = '~';
+    }
+    ++p;
+  }
+  return ibuf;
+}
+
+char *
 estring(const char *s)
 {
   char *ibuf = idbuf[(++nextbuf) % 8];
-  char *r;
 
   strlcpy(ibuf, s, sizeof(name));
-  r = ibuf;
+  return estring_i(ibuf);
+}
 
-  while (*ibuf) {
-    if(*ibuf == ' ') {
-      *ibuf = '~';
+char *
+cstring_i(char *ibuf)
+{
+  char *p = ibuf;
+
+  while (*p) {
+    if (*p == '~') {
+      *p = ' ';
     }
-    ibuf++;
+    ++p;
   }
-  return r;
+  return ibuf;
 }
 
 char *
 cstring(const char *s)
 {
   char *ibuf = idbuf[(++nextbuf) % 8];
-  char *r;
 
   strlcpy(ibuf,s, sizeof(name));
-  r = ibuf;
-
-  while (*ibuf) {
-    if (*ibuf == '~') {
-      *ibuf = ' ';
-    }
-    ibuf++;
-  }
-  return r;
+  return cstring_i(ibuf);
 }
 
-const char *
-buildingname (const building * b)
+const xmlChar *
+write_buildingname(const building * b, xmlChar * ibuf, size_t size)
 {
-  char *ibuf = idbuf[(++nextbuf) % 8];
-
-  snprintf(ibuf, sizeof(name), "%s (%s)", b->name, itoa36(b->no));
+  snprintf((char*)ibuf, sizeof(name), "%s (%s)", b->name, itoa36(b->no));
   ibuf[sizeof(name)-1] = 0;
   return ibuf;
+}
+
+const xmlChar *
+buildingname(const building * b)
+{
+  char *ibuf = idbuf[(++nextbuf) % 8];
+  return write_buildingname(b, (xmlChar*)ibuf, sizeof(name));
 }
 
 building *

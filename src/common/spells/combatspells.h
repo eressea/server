@@ -36,7 +36,7 @@ extern "C" {
   extern int sp_sleep(struct fighter * fi, int level, double power, struct spell * sp);
   extern int sp_windshield(struct fighter * fi, int level, double power, struct spell * sp);
   extern int sp_strong_wall(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_versteinern(struct fighter * fi, int level, double power, struct spell * sp);
+  extern int sp_petrify(struct fighter * fi, int level, double power, struct spell * sp);
   extern int sp_hero(struct fighter * fi, int level, double power, struct spell * sp);
   extern int sp_frighten(struct fighter * fi, int level, double power, struct spell * sp);
   extern int sp_mindblast(struct fighter * fi, int level, double power, struct spell * sp);

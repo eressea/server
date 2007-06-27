@@ -2147,34 +2147,35 @@ display_race(faction *f, unit *u, const race * rc)
   bufp += rsize;
 
   /* hp_p : Trefferpunkte */
-  sprintf(buf2, " %d Trefferpunkte", rc->hitpoints);
+  sprintf(buf2, " %d %s", rc->hitpoints, LOC(f->locale, "stat_hitpoints"));
 
   rsize = strlcpy(bufp, buf2, size);
   if (rsize>size) rsize = size-1;
   size -= rsize;
   bufp += rsize;
 
-  /* b_armor : Rüstung */
-  if (rc->armor > 0){
-    sprintf(buf2, ", Rüstung: %d", rc->armor);
-    rsize = strlcpy(bufp, buf2, size);
-    if (rsize>size) rsize = size-1;
-    size -= rsize;
-    bufp += rsize;
-  }
   /* b_attacke : Angriff */
-  sprintf(buf2, ", Angriff: %d", (rc->at_default+rc->at_bonus));
+  sprintf(buf2, ", %s: %d", LOC(f->locale, "stat_attack"), (rc->at_default+rc->at_bonus));
   rsize = strlcpy(bufp, buf2, size);
   if (rsize>size) rsize = size-1;
   size -= rsize;
   bufp += rsize;
 
   /* b_defense : Verteidigung */
-  sprintf(buf2, ", Verteidigung: %d", (rc->df_default+rc->df_bonus));
+  sprintf(buf2, ", %s: %d", LOC(f->locale, "stat_defense"), (rc->df_default+rc->df_bonus));
   rsize = strlcpy(bufp, buf2, size);
   if (rsize>size) rsize = size-1;
   size -= rsize;
   bufp += rsize;
+
+  /* b_armor : Rüstung */
+  if (rc->armor > 0) {
+    sprintf(buf2, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
+    rsize = strlcpy(bufp, buf2, size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
+  }
 
   if (size>1) {
     strcpy(bufp++, ".");
@@ -2189,31 +2190,31 @@ display_race(faction *f, unit *u, const race * rc)
     }
   }
   if (rc->battle_flags & BF_EQUIPMENT) {
-    rsize = strlcpy(bufp, " Kann Waffen benutzen.", size);
+    rsize = snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"));
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
   }
   if (rc->battle_flags & BF_RES_PIERCE) {
-    rsize = strlcpy(bufp, " Ist durch Stichwaffen, Bögen und Armbrüste schwer zu verwunden.", size);
+    rsize = snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"));
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
   }
   if (rc->battle_flags & BF_RES_CUT) {
-    rsize = strlcpy(bufp, " Ist durch Hiebwaffen schwer zu verwunden.", size);
+    rsize = snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"));
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
   }
   if (rc->battle_flags & BF_RES_BASH) {
-    rsize = strlcpy(bufp, " Ist durch Schlagwaffen und Katapulte schwer zu verwunden.", size);
+    rsize = snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"));
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
   }
 
-  sprintf(buf2, " Hat %d Angriff%s", at_count, (at_count>1)?"e":"");
+  sprintf(buf2, " %d %s", at_count, LOC(f->locale, (at_count==1)?"stat_attack":"stat_attacks"));
   rsize = strlcpy(bufp, buf2, size);
   if (rsize>size) rsize = size-1;
   size -= rsize;
@@ -2229,19 +2230,19 @@ display_race(faction *f, unit *u, const race * rc)
       }
       switch(rc->attack[a].type) {
       case AT_STANDARD:
-        sprintf(buf2, "ein Angriff mit der Waffe oder macht unbewaffnet %s Schaden", rc->def_damage);
+        sprintf(buf2, "%s (%s)", LOC(f->locale, "attack_standard"), rc->def_damage);
         break;
       case AT_NATURAL:
-        sprintf(buf2, "ein Angriff mit Krallen, Zähnen oder Klauen, der %s Schaden macht", rc->attack[a].data.dice);
+        sprintf(buf2, "%s (%s)", LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
         break;
       case AT_SPELL:
       case AT_COMBATSPELL:
       case AT_DRAIN_ST:
       case AT_DAZZLE:
-        sprintf(buf2, "ein magischer Angriff");
+        sprintf(buf2, "%s", LOC(f->locale, "attack_natural"));
         break;
       case AT_STRUCTURAL:
-        sprintf(buf2, "ein Angriff, der %s Gebäudeschaden verursacht", rc->attack[a].data.dice);
+        sprintf(buf2, "%s (%s)", LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
       }
       rsize = strlcpy(bufp, buf2, size);
       if (rsize>size) rsize = size-1;
@@ -2255,7 +2256,7 @@ display_race(faction *f, unit *u, const race * rc)
     --size;
   }
 
-  addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
+  addmessage(0, f, (const xmlChar *)buf, MSG_EVENT, ML_IMPORTANT);
 
   return true;
 }
