@@ -1793,7 +1793,7 @@ free_spellparameter(spellparameter *pa)
 }
 
 static int
-addparam_string(const xmlChar ** param, spllprm ** spobjp)
+addparam_string(const xmlChar * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
@@ -1805,7 +1805,7 @@ addparam_string(const xmlChar ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_int(const xmlChar ** param, spllprm ** spobjp)
+addparam_int(const xmlChar * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
@@ -1817,7 +1817,7 @@ addparam_int(const xmlChar ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_ship(const xmlChar ** param, spllprm ** spobjp)
+addparam_ship(const xmlChar * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   int id = atoi36((const char *)param[0]);
@@ -1829,7 +1829,7 @@ addparam_ship(const xmlChar ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_building(const xmlChar ** param, spllprm ** spobjp)
+addparam_building(const xmlChar * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   int id = atoi36((const char *)param[0]);
@@ -1841,7 +1841,7 @@ addparam_building(const xmlChar ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_region(const xmlChar ** param, spllprm ** spobjp, const unit * u, order * ord)
+addparam_region(const xmlChar * const param[], spllprm ** spobjp, const unit * u, order * ord)
 {
   assert(param[0]);
   if (param[1]==0) {
@@ -1871,7 +1871,7 @@ addparam_region(const xmlChar ** param, spllprm ** spobjp, const unit * u, order
 
 
 static int
-addparam_unit(const xmlChar ** param, spllprm ** spobjp, const unit * u, order * ord)
+addparam_unit(const xmlChar * const param[], spllprm ** spobjp, const unit * u, order * ord)
 {
   spllprm *spobj;
   int i = 0;
@@ -1897,7 +1897,7 @@ addparam_unit(const xmlChar ** param, spllprm ** spobjp, const unit * u, order *
 }
 
 static spellparameter *
-add_spellparameter(region *target_r, unit *u, const char *syntax, xmlChar ** param, int size, struct order * ord)
+add_spellparameter(region *target_r, unit *u, const char *syntax, const xmlChar * const param[], int size, struct order * ord)
 {
   boolean fail = false;
   int i = 0;
@@ -2625,21 +2625,21 @@ cast_cmd(unit * u, order * ord)
       familiar = u;
     }
   }
-  /* Weitere Argumente zusammenbasten */
+  /* Weitere Argumente zusammenbasteln */
   if (sp->parameter) {
-    xmlChar ** params = malloc(2*sizeof(char*));
+    xmlChar ** params = malloc(2*sizeof(xmlChar*));
     int p = 0, size = 2;
     for (;;) {
       s = getstrtoken();
       if (*s==0) break;
       if (p+1>=size) {
         size*=2;
-        params = realloc(params, sizeof(char*)*size);
+        params = realloc(params, sizeof(xmlChar*)*size);
       }
       params[p++] = xmlStrdup(s);
     }
     params[p] = 0;
-    args = add_spellparameter(target_r, mage, sp->parameter, params, p, ord);
+    args = add_spellparameter(target_r, mage, sp->parameter, (const xmlChar * const *)params, p, ord);
     for (p=0;params[p];++p) free(params[p]);
     free(params);
     if (args==NULL) {
