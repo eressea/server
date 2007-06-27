@@ -6,6 +6,7 @@ SubDirHdrs $(SUBDIR)/../kernel ;
 SubDirHdrs $(SUBDIR)/../util ;
 SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
  alp.c
