@@ -17,7 +17,11 @@
   <xi:include href="spells.xml"/>
   <xi:include href="terrains.xml"/>
   <xi:include href="dungeons.xml"/>
+
   <xi:include href="names-undead.xml"/>
+  <xi:include href="names-skeletons.xml"/>
+  <xi:include href="names-zombies.xml"/>
+  <xi:include href="names-ghouls.xml"/>
 
   <game name="Eressea" units="1000">
     <!-- Game specific settings -->

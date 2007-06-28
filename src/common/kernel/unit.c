@@ -1272,12 +1272,17 @@ void
 name_unit(unit *u)
 {
 	if (u->race->generate_name) {
-		set_string(&u->name, (u->race->generate_name(u)));
-	} else {
+    const xmlChar * gen_name = u->race->generate_name(u); 
+    if (gen_name) {
+      set_string(&u->name, gen_name);
+    } else {
+      set_string(&u->name, racename(u->faction->locale, u, u->race));
+    }
+  } else {
     xmlChar name[16];
-		sprintf((char*)name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
-		set_string(&u->name, name);
-	}
+  	sprintf((char*)name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
+	  set_string(&u->name, name);
+  }
 }
 
 /** creates a new unit.

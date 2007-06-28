@@ -52,315 +52,102 @@ describe_braineater(unit * u, const struct locale * lang)
   return LOC(lang, "describe_braineater");
 }
 
+static const xmlChar *
+make_names(const char * monster, int * num_postfix, int pprefix, int * num_name, int * num_prefix, int ppostfix)
+{
+  int uv, uu, un;
+  static xmlChar name[NAMESIZE + 1];
+  char zText[32];
+  const xmlChar * str;
+
+  if (*num_prefix==0) {
+
+    for (*num_prefix=0;;++*num_prefix) {
+      sprintf(zText, "%s_prefix_%d", monster, *num_prefix);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+
+    for (*num_name=0;;++*num_name) {
+      sprintf(zText, "%s_name_%d", monster, *num_name);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+
+    for (*num_postfix=0;;++*num_postfix) {
+      sprintf(zText, "%s_postfix_%d", monster, *num_postfix);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+  }
+
+  if (*num_name==0) {
+    return NULL;
+  }
+
+  /* nur 50% aller Namen haben "Vor-Teil" */
+  uv = rng_int() % (*num_prefix * pprefix);
+
+  uu = rng_int() % *num_name;
+
+  /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
+  if (uv>=*num_prefix) {
+    un = rng_int() % *num_postfix;
+  } else {
+    un = rng_int() % (*num_postfix * ppostfix);
+  }
+
+  name[0] = 0;
+  if (uv < *num_prefix) {
+    sprintf(zText, "%s_prefix_%d", monster, uv);
+    str = locale_getstring(default_locale, zText);
+    if (str) {
+      xstrcat(name, str);
+      xstrcat(name, " ");
+    }
+  }
+
+  sprintf(zText, "%s_name_%d", monster, uu);
+  str = locale_getstring(default_locale, zText);
+  if (str) xstrcat(name, str);
+
+  if (un < *num_postfix) {
+    sprintf(zText, "%s_postfix_%d", monster, un);
+    str = locale_getstring(default_locale, zText);
+    if (str) {
+      xstrcat(name, " ");
+      xstrcat(name, str);
+    }
+  }
+  return name;
+}
+
 const xmlChar *
 undead_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
-	int uv, uu, un;
-	static xmlChar name[NAMESIZE + 1];
-  char zText[32];
-  const xmlChar * str;
-
-  if (num_prefix==0) {
-
-    for (num_prefix=0;;++num_prefix) {
-      sprintf(zText, "undead_prefix_%d", num_prefix);
-      str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
-    }
-
-    for (num_name=0;;++num_name) {
-      sprintf(zText, "undead_name_%d", num_name);
-      str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
-    }
-
-    for (num_postfix=0;;++num_postfix) {
-      sprintf(zText, "undead_postfix_%d", num_postfix);
-      str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
-    }
-  }
-	/* nur 50% aller Namen haben "Vor-Teil" */
-	u=u;
-	uv = rng_int() % (num_prefix * 2);
-
-	uu = rng_int() % num_name;
-	un = rng_int() % (num_postfix * (uv >= num_prefix ? 1 : 2));
-	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-
-  name[0] = 0;
-	if (uv < num_prefix) {
-    sprintf(zText, "undead_prefix_%d", uv);
-    str = locale_getstring(default_locale, zText);
-		if (str) xstrcat(name, str);
-	}
-
-  sprintf(zText, "undead_name_%d", uu);
-  str = locale_getstring(default_locale, zText);
-	if (str) xstrcat(name, str);
-
-  if (un < num_postfix) {
-    sprintf(zText, "undead_postfix_%d", un);
-    str = locale_getstring(default_locale, zText);
-		if (str) xstrcat(name, str);
-  }
-	return name;
+  return make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
 }
-
-/* Skelette */
-
-#define SKEL_VOR 19
-
-static const xmlChar *skel_vor[SKEL_VOR] =
-{
-	"Klapperige ",
-	"Stöhnende ",
-	"Schwarzknochige ",
-	"Schwarzgewandete ",
-	"Angsteinflößende ",
-	"Heulende ",
-	"Wartende ",
-	"Grauenvolle ",
-	"Schwarze ",
-	"Dunkle ",
-	"Fürchterliche ",
-	"Grauenhafte ",
-	"Furchtbare ",
-	"Entsetzliche ",
-	"Schauderhafte ",
-	"Schreckliche ",
-	"Düstere ",
-	"Schaurige ",
-	"Erbarmungslose "
-};
-
-#define SKEL	5
-
-static const xmlChar *skel[SKEL] =
-{
-	"Skelette",
-	"Kreaturen",
-	"Krieger",
-	"Kämpfer",
-	"Rächer"
-};
-
-#define SKEL_NACH 14
-
-static const xmlChar *skel_nach[SKEL_NACH] =
-{
-	" der Nacht",
-	" der Schatten",
-	" der Finsternis",
-	" des Bösen",
-	" der Erschlagenen",
-	" der Verfluchten",
-	" der Gefolterten",
-	" der Ruhelosen",
-	" aus dem Nebel",
-	" aus dem Dunkel",
-	" der Tiefe",
-	" in Ketten",
-	" aus dem Totenreich",
-	" aus der Unterwelt"
-};
 
 const xmlChar *
 skeleton_name(const unit * u)
 {
-	int uv, uu, un;
-	static char name[NAMESIZE + 1];
-
-	u=u;
-
-	/* nur 20% aller Namen haben "Vor-Teil" */
-	uv = rng_int() % (SKEL_VOR * 5);
-	uu = rng_int() % SKEL;
-	un = rng_int() % (SKEL_NACH * (uv >= SKEL_VOR ? 1 : 2));
-
-	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-
-	if (uv < SKEL_VOR) {
-		strcpy(name, skel_vor[uv]);
-	} else {
-		name[0] = 0;
-	}
-
-	strcat(name, skel[uu]);
-
-	if (un < SKEL_NACH)
-		strcat(name, skel_nach[un]);
-
-	return name;
+  static int num_postfix, num_name, num_prefix;
+  return make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
-
-/* Zombies */
-
-#define ZOM_VOR 16
-
-static const xmlChar *zombie_vor[ZOM_VOR] =
-{
-	"Faulende ",
-	"Zerschlagene ",
-	"Gefolterte ",
-	"Angsteinflößende ",
-	"Leise Schlurfende ",
-	"Kinderfressende ",
-	"Schwarze ",
-	"Dunkle ",
-	"Fürchterliche ",
-	"Grauenhafte ",
-	"Furchtbare ",
-	"Entsetzliche ",
-	"Schauderhafte ",
-	"Schreckliche ",
-	"Düstere ",
-	"Schaurige "
-};
-
-#define ZOM	5
-
-static const xmlChar *zombie[ZOM] =
-{
-	"Zombies",
-	"Kreaturen",
-	"Verlorene",
-	"Erschlagene",
-	"Verdammte"
-};
-
-#define ZOM_NACH 13
-
-static const xmlChar *zombie_nach[ZOM_NACH] =
-{
-	" der Nacht",
-	" der Schatten",
-	" der Finsternis",
-	" des Bösen",
-	" der Erschlagenen",
-	" der Verfluchten",
-	" der Ruhelosen",
-	" aus dem Nebel",
-	" aus dem Dunkel",
-	" der Tiefe",
-	" in Ketten",
-	" aus dem Totenreich",
-	" aus der Unterwelt"
-};
 
 const xmlChar *
 zombie_name(const unit * u)
 {
-	int uv, uu, un;
-	static char name[NAMESIZE + 1];
-
-	u=u;
-
-	/* nur 20% aller Namen haben "Vor-Teil" */
-	uv = rng_int() % (ZOM_VOR * 5);
-	uu = rng_int() % ZOM;
-	un = rng_int() % (ZOM_NACH * (uv >= ZOM_VOR ? 1 : 2));
-
-	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-
-	if (uv < ZOM_VOR) {
-		strlcpy(name, zombie_vor[uv], sizeof(name));
-	} else {
-		name[0] = 0;
-	}
-
-	strlcat(name, zombie[uu], sizeof(name));
-
-	if (un < ZOM_NACH)
-		strlcat(name, zombie_nach[un], sizeof(name));
-
-	return name;
+  static int num_postfix, num_name, num_prefix;
+  return make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
-
-/* Ghoule */
-
-#define GHOUL_VOR 17
-
-static const xmlChar *ghoul_vor[GHOUL_VOR] =
-{
-	"Faulende ",
-	"Angsteinflößende ",
-	"Leise ",
-	"Kinderfressende ",
-	"Menschenfressende ",
-	"Wahnsinnige ",
-	"Brutale ",
-	"Schwarze ",
-	"Dunkle ",
-	"Fürchterliche ",
-	"Grauenhafte ",
-	"Furchtbare ",
-	"Entsetzliche ",
-	"Schauderhafte ",
-	"Schreckliche ",
-	"Düstere ",
-	"Schaurige "
-};
-
-#define GHOUL	6
-
-static const xmlChar *ghoul[GHOUL] =
-{
-	"Ghoule",
-	"Kreaturen",
-	"Verlorene",
-	"Erschlagene",
-	"Verdammte",
-	"Schlurfende Ghoule",
-};
-
-#define GHOUL_NACH 13
-
-static const xmlChar *ghoul_nach[GHOUL_NACH] =
-{
-	" der Nacht",
-	" der Schatten",
-	" der Finsternis",
-	" des Bösen",
-	" der Erschlagenen",
-	" der Verfluchten",
-	" der Ruhelosen",
-	" aus dem Nebel",
-	" aus dem Dunkel",
-	" der Tiefe",
-	" in Ketten",
-	" aus dem Totenreich",
-	" aus der Unterwelt"
-};
 
 const xmlChar *
 ghoul_name(const unit * u)
 {
-	int uv, uu, un;
-	static char name[NAMESIZE + 1];
-
-	u=u;
-
-	/* nur 20% aller Namen haben "Vor-Teil" */
-	uv = rng_int() % (GHOUL_VOR * 5);
-	uu = rng_int() % GHOUL;
-	un = rng_int() % (GHOUL_NACH * (uv >= GHOUL_VOR ? 1 : 4));
-
-	/* nur 25% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-
-	if (uv < GHOUL_VOR) {
-		strcpy(name, ghoul_vor[uv]);
-	} else {
-		name[0] = 0;
-	}
-
-	strcat(name, ghoul[uu]);
-
-	if (un < GHOUL_NACH)
-		strcat(name, ghoul_nach[un]);
-
-	return name;
+  static int num_postfix, num_name, num_prefix;
+  return make_names("ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
 }
 
 
@@ -368,7 +155,7 @@ ghoul_name(const unit * u)
 
 #define SIL1 15
 
-const xmlChar *silbe1[SIL1] = {
+const char *silbe1[SIL1] = {
 	"Tar",
 	"Ter",
 	"Tor",
@@ -388,7 +175,7 @@ const xmlChar *silbe1[SIL1] = {
 
 #define SIL2 19
 
-const xmlChar *silbe2[SIL2] = {
+const char *silbe2[SIL2] = {
 	"da",
 	"do",
 	"dil",
@@ -412,7 +199,7 @@ const xmlChar *silbe2[SIL2] = {
 
 #define SIL3 14
 
-const xmlChar *silbe3[SIL3] = {
+const char *silbe3[SIL3] = {
 	"gul",
 	"gol",
 	"dol",
@@ -608,7 +395,7 @@ dracoid_name(const unit *u)
 		strcat(name, drac_mid[rng_int()%DRAC_MID]);
 	}
 	strcat(name, drac_suf[rng_int()%DRAC_SUF]);
-	return name;
+	return (const xmlChar *)name;
 }
 
 const xmlChar *
