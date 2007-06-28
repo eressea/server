@@ -22,6 +22,7 @@
   <xi:include href="names-skeletons.xml"/>
   <xi:include href="names-zombies.xml"/>
   <xi:include href="names-ghouls.xml"/>
+  <xi:include href="names-dragons.xml"/>
 
   <game name="Eressea" units="1000">
     <!-- Game specific settings -->

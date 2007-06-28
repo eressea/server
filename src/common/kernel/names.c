@@ -216,54 +216,6 @@ const char *silbe3[SIL3] = {
 	"bus",
 };
 
-#define DTITEL 5
-
-const xmlChar *dtitel[6][DTITEL] =
-{
-	{							/* Ebene, Hochland */
-		"der Weise",
-		"der Allwissende",
-		"der Mächtige",
-		"die Ehrwürdige",
-		"die Listige"
-	},
-	{			/* Wald */
-		"der Grüne",
-		"die Strafende",
-		"der Sehende",
-		"der Reisende",
-		"die Wissende"
-	},
-	{			/* Berge */
-		"der Goldene",
-		"der Graue",
-		"der Steinerne",
-		"die Alte",
-		"die Mächtige"
-	},
-	{							/* Wüste */
-		"die Goldene",
-		"der Grausame",
-		"der Sanddrache",
-		"der Durstige",
-		"die Verzehrende"
-	},
-	{			/* Sumpf */
-		"die Grüne",
-		"die Rote",
-		"der Furchtlose",
-		"der Allmächtige",
-		"der Weitblickende"
-	},
-	{			/* Gletscher */
-		"der Weiße",
-		"die Glänzende",
-		"der Wissende",
-		"die Unbarmherzige",
-		"die Schöne"
-	}
-};
-
 const xmlChar *
 generic_name(const unit *u)
 {
@@ -277,34 +229,59 @@ const xmlChar *
 dragon_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
-	int rnd = rng_int() % DTITEL;
-	const xmlChar *t = dtitel[0][rnd];
+	int rnd, ter = 0;
 	int anzahl = 1;
+  static int num_postfix;
+  char zText[32];
+  const xmlChar * str;
+
+  if (num_postfix==0) {
+    for (num_postfix=0;;++num_postfix) {
+      sprintf(zText, "dragon_postfix_%d", num_postfix);
+      str = locale_getstring(default_locale, zText);
+      if (str==NULL) break;
+    }
+    if (num_postfix==0) num_postfix = -1;
+  }
+  if (num_postfix<=0) {
+    return NULL;
+  }
 
 	if (u) {
 		region *r = u->region;
 		anzahl = u->number;
 		switch (rterrain(r)) {
 		case T_PLAIN:
-			t = dtitel[1][rnd];
+			ter = 1;
 			break;
 		case T_MOUNTAIN:
-			t = dtitel[2][rnd];
+			ter = 2;
 			break;
 		case T_DESERT:
-			t = dtitel[3][rnd];
+			ter = 3;
 			break;
 		case T_SWAMP:
-			t = dtitel[4][rnd];
+			ter = 4;
 			break;
 		case T_GLACIER:
-			t = dtitel[5][rnd];
+			ter = 5;
 			break;
 		}
 	}
 
-	if (anzahl > 1) {
-		sprintf(name, "Die %sn von %s", t+4, rname(u->region, NULL));
+  rnd = num_postfix / 6;
+  rnd = (rng_int() % rnd) + ter * rnd;
+
+  sprintf(zText, "dragon_postfix_%d", rnd);
+
+  str = locale_getstring(default_locale, zText);
+  assert(str!=NULL);
+
+  if (anzahl > 1) {
+    const char * no_article = strchr((const char *)str, ' ');
+    assert(no_article);
+    /* TODO: GERMAN */
+  	sprintf(name, "Die %sn von %s", no_article, rname(u->region, NULL));
 	} else {
 		char n[32];
 
@@ -312,20 +289,20 @@ dragon_name(const unit *u)
 		strcat(n, silbe2[rng_int() % SIL2]);
 		strcat(n, silbe3[rng_int() % SIL3]);
 		if (rng_int() % 5 > 2) {
-			sprintf(name, "%s, %s", n, t);	/* "Name, der Titel" */
+			sprintf(name, "%s, %s", n, str);	/* "Name, der Titel" */
 		} else {
-			strcpy(name, t);	/* "Der Titel Name" */
-			name[0] = (char) toupper(name[0]);
+			strcpy(name, (const char *)str);	/* "Der Titel Name" */
+			name[0] = (char)toupper(name[0]);
 			strcat(name, " ");
 			strcat(name, n);
 		}
 		if (u && (rng_int() % 3 == 0)) {
 			strcat(name, " von ");
-			strcat(name, rname(u->region, NULL));
+			strcat(name, (const char *)rname(u->region, NULL));
 		}
 	}
 
-	return name;
+	return (xmlChar *)name;
 }
 
 /* Dracoide */
@@ -406,6 +383,8 @@ abkz(const xmlChar *s, size_t max)
 	unsigned int c = 0;
 	size_t bpt, i;
 
+  /* TODO: UNICODE. This function uses isalnum */
+
 	max = min(max, 79);
 
 	/* Prüfen, ob Kurz genug */
@@ -460,7 +439,7 @@ abkz(const xmlChar *s, size_t max)
 
 	buf[c] = 0;
 
-	return buf;
+	return (const xmlChar *)buf;
 }
 
 void
