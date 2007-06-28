@@ -56,7 +56,7 @@ static const xmlChar *
 make_names(const char * monster, int * num_postfix, int pprefix, int * num_name, int * num_prefix, int ppostfix)
 {
   int uv, uu, un;
-  static xmlChar name[NAMESIZE + 1];
+  static char name[NAMESIZE + 1];
   char zText[32];
   const xmlChar * str;
 
@@ -102,24 +102,24 @@ make_names(const char * monster, int * num_postfix, int pprefix, int * num_name,
     sprintf(zText, "%s_prefix_%d", monster, uv);
     str = locale_getstring(default_locale, zText);
     if (str) {
-      xstrcat(name, str);
-      xstrcat(name, " ");
+      strcat(name, (const char *)str);
+      strcat(name, " ");
     }
   }
 
   sprintf(zText, "%s_name_%d", monster, uu);
   str = locale_getstring(default_locale, zText);
-  if (str) xstrcat(name, str);
+  if (str) strcat(name, (const char *)str);
 
   if (un < *num_postfix) {
     sprintf(zText, "%s_postfix_%d", monster, un);
     str = locale_getstring(default_locale, zText);
     if (str) {
-      xstrcat(name, " ");
-      xstrcat(name, str);
+      strcat(name, " ");
+      strcat(name, (const char *)str);
     }
   }
-  return name;
+  return (const xmlChar *)name;
 }
 
 const xmlChar *
