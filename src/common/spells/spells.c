@@ -670,7 +670,7 @@ sp_destroy_magic(castorder *co)
       building *b;
       b = pa->param[0]->data.b;
       ap = &b->attribs;
-      strcpy(ts, buildingname(b));
+      write_buildingname(b, ts, sizeof(ts));
       break;
     }
     case SPP_SHIP:
@@ -678,7 +678,7 @@ sp_destroy_magic(castorder *co)
       ship *sh;
       sh = pa->param[0]->data.sh;
       ap = &sh->attribs;
-      strcpy(ts, shipname(sh));
+      write_shipname(sh, ts, sizeof(ts));
       break;
     }
     default:
@@ -690,7 +690,7 @@ sp_destroy_magic(castorder *co)
   if (succ) {
     ADDMSG(&mage->faction->msgs, msg_message(
       "destroy_magic_effect", "unit region command succ target",
-      mage, mage->region, co->order, succ, strdup(ts)));
+      mage, mage->region, co->order, succ, ts));
   } else {
     ADDMSG(&mage->faction->msgs, msg_message(
       "destroy_magic_noeffect", "unit region command",

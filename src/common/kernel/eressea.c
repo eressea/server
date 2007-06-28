@@ -1602,21 +1602,6 @@ cstring(const char *s)
   return cstring_i(ibuf);
 }
 
-const xmlChar *
-write_buildingname(const building * b, xmlChar * ibuf, size_t size)
-{
-  snprintf((char*)ibuf, sizeof(name), "%s (%s)", b->name, itoa36(b->no));
-  ibuf[sizeof(name)-1] = 0;
-  return ibuf;
-}
-
-const xmlChar *
-buildingname(const building * b)
-{
-  char *ibuf = idbuf[(++nextbuf) % 8];
-  return write_buildingname(b, (xmlChar*)ibuf, sizeof(name));
-}
-
 building *
 largestbuilding (const region * r, boolean img)
 {

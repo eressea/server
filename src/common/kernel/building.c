@@ -520,6 +520,24 @@ buildingeffsize(const building * b, boolean img)
 	return n;
 }
 
+const xmlChar *
+write_buildingname(const building * b, xmlChar * ibuf, size_t size)
+{
+  snprintf((char*)ibuf, size, "%s (%s)", b->name, itoa36(b->no));
+  ibuf[size-1] = 0;
+  return ibuf;
+}
+
+const xmlChar *
+buildingname(const building * b)
+{
+  typedef char name[OBJECTIDSIZE + 1];
+  static name idbuf[8];
+  static int nextbuf = 0;
+  char *ibuf = idbuf[(++nextbuf) % 8];
+  return write_buildingname(b, (xmlChar*)ibuf, sizeof(name));
+}
+
 unit *
 buildingowner(const region * r, const building * b)
 {

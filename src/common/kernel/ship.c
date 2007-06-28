@@ -198,15 +198,22 @@ destroy_ship(ship * sh)
   handle_event(sh->attribs, "destroy", sh);
 }
 
-const char *
+const xmlChar *
+write_shipname(const ship * sh, xmlChar * ibuf, size_t size)
+{
+  snprintf((char*)ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
+  ibuf[size-1] = 0;
+  return ibuf;
+}
+
+const xmlChar *
 shipname(const ship * sh)
 {
   typedef char name[OBJECTIDSIZE + 1];
   static name idbuf[8];
   static int nextbuf = 0;
   char *ibuf = idbuf[(++nextbuf) % 8];
-  sprintf(ibuf, "%s (%s)", sh->name, itoa36(sh->no));
-  return ibuf;
+  return write_shipname(sh, (xmlChar*)ibuf, sizeof(name));
 }
 
 int
