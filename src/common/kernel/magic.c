@@ -2576,9 +2576,8 @@ cast_cmd(unit * u, order * ord)
       return 0;
     }
     if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
-      ADDMSG(&u->faction->msgs, msg_message("spellfail::nocontact",
-        "mage region command target", u, u->region, ord, 
-        regionname(target_r, u->faction)));
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "spellfail::nocontact",
+        "target", target_r));
       return 0;
     }
   }

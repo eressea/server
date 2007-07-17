@@ -1753,7 +1753,7 @@ sp_treewalkenter(castorder *co)
 
   rt = r_standard_to_astral(r);
   if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-    cmistake(mage, co->order, 192, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
 
@@ -1859,7 +1859,7 @@ sp_treewalkexit(castorder *co)
     return 0;
   }
   if (is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
-    cmistake(mage, co->order, 192, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
 
@@ -3447,9 +3447,12 @@ sp_chaossuction(castorder *co)
 
   rt  = r_standard_to_astral(r);
 
-  if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+  if (rt==NULL) {
     /* Hier gibt es keine Verbindung zur astralen Welt.*/
     cmistake(mage, co->order, 216, MSG_MAGIC);
+    return 0;
+  } else if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
 
@@ -4767,6 +4770,7 @@ sp_icastle(castorder *co)
   spellparameter *pa = co->par;
   icastle_data * data;
   const xmlChar * bname;
+  message * msg;
 
   if ((type=findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
     type = bt_find("castle");
@@ -4807,9 +4811,9 @@ sp_icastle(castorder *co)
     "icastle_create", "unit region command", mage, mage->region,
     co->order));
 
-  addmessage(r, 0,
-    "Verwundert blicken die Bauern auf ein plötzlich erschienenes Gebäude.",
-    MSG_EVENT, ML_INFO);
+  msg = msg_message("sp_icastle_effect", "region", r);
+  report_spell(mage, r, msg);
+  msg_release(msg);
 
   return cast_level;
 }
@@ -5021,21 +5025,24 @@ sp_clonecopy(castorder *co)
   region *target_region = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
+  message * msg;
+  char name[NAMESIZE];
 
   if (get_clone(mage) != NULL ) {
     cmistake(mage, co->order, 298, MSG_MAGIC);
     return 0;
   }
 
-  sprintf(buf, "Klon von %s", unitname(mage));
-  clone = create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, buf, mage);
+  snprintf(name, sizeof(name), (const char*)LOC(mage->faction->locale, "clone_of"), unitname(mage));
+  clone = create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, (const xmlChar *)name, mage);
   setstatus(clone, ST_FLEE);
   fset(clone, UFL_LOCKED);
 
   create_newclone(mage, clone);
 
-  sprintf(buf, "%s erschafft einen Klon.", unitname(mage));
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  msg = msg_message("sp_clone_effet", "mage", mage);
+  r_addmessage(r, mage->faction, msg);
+  msg_release(msg);
 
   return cast_level;
 }
@@ -5050,6 +5057,7 @@ sp_dreamreading(castorder *co)
   int cast_level = co->level;
   spellparameter *pa = co->par;
   double power = co->force;
+  message * msg;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -5072,15 +5080,14 @@ sp_dreamreading(castorder *co)
     return 0;
   }
 
-  u2 = createunit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL]);
+  u2 = create_unit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, (const xmlChar*)"spell/dreamreading", NULL);
   set_number(u2, 1);
-  set_string(&u2->name, "sp_dreamreading");
-  u2->age  = 2;   /* Nur für diese Runde. */
+  u2->age = 2;   /* Nur für diese Runde. */
   set_level(u2, SK_OBSERVATION, eff_skill(u, SK_OBSERVATION, u2->region));
 
-  sprintf(buf, "%s verliert sich in die Träume von %s und erhält einen "
-      "Eindruck von %s.", unitname(mage), unitname(u), regionname(u->region, mage->faction));
-  addmessage(r, mage->faction, buf, MSG_EVENT, ML_INFO);
+  msg = msg_message("sp_dreamreading_effect", "mage unit region", mage, u, u->region);
+  r_addmessage(r, mage->faction, msg);
+  msg_release(msg);
   return cast_level;
 }
 
@@ -5104,6 +5111,7 @@ sp_sweetdreams(castorder *co)
     curse * c;
     unit *u;
     variant effect;
+    message * msg;
     /* sollte nie negativ werden */
     if (opfer < 1) break;
 
@@ -5125,9 +5133,12 @@ sp_sweetdreams(castorder *co)
     effect.i = 5;
     c = create_curse(mage,&u->attribs, ct_find("orcish"), power, duration, effect, men);
 
-    sprintf(buf, "%s verschafft %s ein interessanteres Nachtleben.",
-        unitname(mage), unitname(u));
-    addmessage(r, mage->faction, buf, MSG_EVENT, ML_INFO);
+    msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
+    r_addmessage(r, mage->faction, msg);
+    if (u->faction!=mage->faction) {
+      r_addmessage(r, u->faction, msg);
+    }
+    msg_release(msg);
   }
   return cast_level;
 }
@@ -5147,9 +5158,7 @@ sp_disturbingdreams(castorder *co)
   effect.i = 10;
   c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, effect, 0);
 
-  sprintf(buf, "%s sorgt für schlechten Schlaf in %s.",
-      unitname(mage), regionname(r, mage->faction));
-  addmessage(0, mage->faction, buf, MSG_EVENT, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect", "mage region", mage, r));
   return cast_level;
 }
 
@@ -5405,12 +5414,8 @@ sp_enterastral(castorder *co)
     return 0;
   }
 
-  if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0) ||
-      is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
-    sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
-        "dieser astralen Region hergestellt werden.", unitname(mage),
-        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+  if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0) || is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
 
@@ -5506,10 +5511,8 @@ sp_pullastral(castorder *co)
         rl2 = rl2->next;
       }
       if (!rl2) {
-        sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
-          "dieser Region hergestellt werden.", unitname(mage),
-          regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-        addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "spellfail::nocontact",
+          "target", rt));
         free_regionlist(rl);
         return 0;
       }
@@ -5523,91 +5526,87 @@ sp_pullastral(castorder *co)
       return 0;
   }
 
-  if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0) ||
-    is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
-      sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
-        "dieser Region hergestellt werden.", unitname(mage),
-        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-      addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-      return 0;
-    }
+  if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0) || is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
+    return 0;
+  }
 
-    remaining_cap = (int)((power-3) * 1500);
+  remaining_cap = (int)((power-3) * 1500);
 
-    /* für jede Einheit in der Kommandozeile */
-    for (n = 1; n < pa->length; n++) {
-      spllprm * spobj = pa->param[n];
-      if (spobj->flag == TARGET_NOTFOUND) continue;
+  /* für jede Einheit in der Kommandozeile */
+  for (n = 1; n < pa->length; n++) {
+    spllprm * spobj = pa->param[n];
+    if (spobj->flag == TARGET_NOTFOUND) continue;
 
-      u = spobj->data.u;
+    u = spobj->data.u;
 
-      if (u->region!=ro) {
-        /* Report this as unit not found */
-        if (spobj->typ == SPP_UNIT) {
-          spobj->data.i = u->no;
-        } else {
-          spobj->data.i = ualias(u);
-        }
-        spobj->flag = TARGET_NOTFOUND;
-        ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, spobj));
-        return false;
-      }
-
-      if (!ucontact(u, mage)) {
-        if (power > 12 && spobj->flag != TARGET_RESISTS && can_survive(u, rt)) {
-          ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
-          ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
-        } else {
-          ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
-          ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
-          continue;
-        }
-      }
-
-      w = weight(u);
-
-      if (!can_survive(u, rt)) {
-        cmistake(mage, co->order, 231, MSG_MAGIC);
-      } else if (remaining_cap - w < 0) {
-        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy", "target", u));
+    if (u->region!=ro) {
+      /* Report this as unit not found */
+      if (spobj->typ == SPP_UNIT) {
+        spobj->data.i = u->no;
       } else {
-        message * m;
+        spobj->data.i = ualias(u);
+      }
+      spobj->flag = TARGET_NOTFOUND;
+      ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, spobj));
+      return false;
+    }
 
-        remaining_cap = remaining_cap - w;
-        move_unit(u, rt, NULL);
-
-        /* Meldungen in der Ausgangsregion */
-
-        for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
-        m = NULL;
-        for (u2 = r->units; u2; u2 = u2->next ) {
-          if (!fval(u2->faction, FFL_SELECT)) {
-            if (cansee(u2->faction, r, u, 0)) {
-              fset(u2->faction, FFL_SELECT);
-              if (!m) m = msg_message("astral_disappear", "unit", u);
-              r_addmessage(rt, u2->faction, m);
-            }
-          }
-        }
-        if (m) msg_release(m);
-
-        /* Meldungen in der Zielregion */
-
-        for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
-        m = NULL;
-        for (u2 = rt->units; u2; u2 = u2->next ) {
-          if (!fval(u2->faction, FFL_SELECT)) {
-            if (cansee(u2->faction, rt, u, 0)) {
-              fset(u2->faction, FFL_SELECT);
-              if (!m) m = msg_message("astral_appear", "unit", u);
-              r_addmessage(rt, u2->faction, m);
-            }
-          }
-        }
-        if (m) msg_release(m);
+    if (!ucontact(u, mage)) {
+      if (power > 12 && spobj->flag != TARGET_RESISTS && can_survive(u, rt)) {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
+        ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
+      } else {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
+        ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
+        continue;
       }
     }
-    return cast_level;
+
+    w = weight(u);
+
+    if (!can_survive(u, rt)) {
+      cmistake(mage, co->order, 231, MSG_MAGIC);
+    } else if (remaining_cap - w < 0) {
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy", "target", u));
+    } else {
+      message * m;
+
+      remaining_cap = remaining_cap - w;
+      move_unit(u, rt, NULL);
+
+      /* Meldungen in der Ausgangsregion */
+
+      for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
+      m = NULL;
+      for (u2 = r->units; u2; u2 = u2->next ) {
+        if (!fval(u2->faction, FFL_SELECT)) {
+          if (cansee(u2->faction, r, u, 0)) {
+            fset(u2->faction, FFL_SELECT);
+            if (!m) m = msg_message("astral_disappear", "unit", u);
+            r_addmessage(rt, u2->faction, m);
+          }
+        }
+      }
+      if (m) msg_release(m);
+
+      /* Meldungen in der Zielregion */
+
+      for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
+      m = NULL;
+      for (u2 = rt->units; u2; u2 = u2->next ) {
+        if (!fval(u2->faction, FFL_SELECT)) {
+          if (cansee(u2->faction, rt, u, 0)) {
+            fset(u2->faction, FFL_SELECT);
+            if (!m) m = msg_message("astral_appear", "unit", u);
+            r_addmessage(rt, u2->faction, m);
+          }
+        }
+      }
+      if (m) msg_release(m);
+    }
+  }
+  return cast_level;
 }
 
 int
@@ -5629,8 +5628,7 @@ sp_leaveastral(castorder *co)
     ro = r;
     rt = pa->param[0]->data.r;
     if (!rt) {
-      addmessage(r, mage->faction, "Dorthin führt kein Weg.",
-        MSG_MAGIC, ML_MISTAKE);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail::noway", ""));
       return 0;
     }
     rl  = astralregions(r, inhabitable);
@@ -5640,8 +5638,7 @@ sp_leaveastral(castorder *co)
       rl2 = rl2->next;
     }
     if (rl2==NULL) {
-      addmessage(r, mage->faction, "Dorthin führt kein Weg.",
-        MSG_MAGIC, ML_MISTAKE);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail::noway", ""));
       free_regionlist(rl);
       return 0;
     }
@@ -5653,8 +5650,7 @@ sp_leaveastral(castorder *co)
   }
 
   if (ro==NULL || is_cursed(ro->attribs, C_ASTRALBLOCK, 0) || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-    sprintf(buf, "Die Wege aus dieser astralen Region sind blockiert.");
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
 
@@ -5778,8 +5774,7 @@ sp_fetchastral(castorder *co)
     }
 
     if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-      ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance",
-        "command region unit", co->order, mage->region, mage));
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_distance", ""));
       continue;
     }
 
@@ -5952,8 +5947,7 @@ sp_viewreality(castorder *co)
   }
 
   if (is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
-    /* sprintf(buf, "Die materielle Welt ist hier nicht sichtbar.");*/
-    cmistake(mage, co->order, 218, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
 
@@ -5961,9 +5955,8 @@ sp_viewreality(castorder *co)
 
   /* Irgendwann mal auf Curses u/o Attribut umstellen. */
   for (rl2=rl; rl2; rl2=rl2->next) {
-    u = createunit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
+    u = create_unit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, (const xmlChar*)"spell/viewreality", NULL);
     set_level(u, SK_OBSERVATION, co->level/2);
-    set_string(&u->name, "Zauber: Blick in die Realität");
     u->age = 2;
   }
 
@@ -6066,8 +6059,6 @@ sp_disruptastral(castorder *co)
     effect.i = 100;
     create_curse(mage, &rl2->data->attribs, ct_find("astralblock"),
       power, duration, effect, 0);
-    addmessage(r2, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
-        MSG_COMMENT, ML_IMPORTANT);
   }
 
   free_regionlist(rl);

@@ -1451,6 +1451,14 @@
     <text locale="de">"Heer $int($index): $name"</text>
     <text locale="en">"Army $int($index): $name"</text>
   </message>
+
+  <message name="sp_icastle_effect" section="magic">
+    <type>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"Verwundert blicken die Bauern von $region($region) auf ein neues Gebäude."</text>
+  </message>
+
   <message name="sp_bloodsacrifice_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -1461,6 +1469,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gewinnt durch das Ritual $int($amount) Aura."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) receives $int($amount) aura."</text>
   </message>
+
   <message name="sp_holyground_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
@@ -4475,15 +4484,6 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is an active spell in this region that prevents this."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is an active spell in this region that prevents this."</text>
   </message>
-  <message name="error218" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die materielle Welt ist hier nicht sichtbar."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The material world is not visible from here."</text>
-  </message>
   <message name="spell_astral_only" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -4782,13 +4782,13 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in der Geisterwelt."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell will only work in the realm of spirits."</text>
   </message>
-  <message name="error192" section="errors">
+  <message name="spellfail_astralblock" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Wege zur Geisterwelt scheinen blockiert zu sein."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Wege zwischen Geisterwelt und Realität scheinen blockiert zu sein."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The paths to the spirit world seem to be blocked."</text>
   </message>
   <message name="error191" section="errors">
@@ -7115,6 +7115,40 @@
     <text locale="en">"$unit($mage) puts a curse on the lands of $region($region) and a drought sets in."</text>
   </message>
   
+  <message name="sp_clone_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) erschafft einen Klon."</text>
+    <text locale="en">"$unit($mage) creates a clone."</text>
+  </message>
+  
+  <message name="sp_dreamreading_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) verliert sich in die Träume von $unit($unit) und erhält einen Eindruck von $region($region)."</text>
+  </message>
+  
+  <message name="sp_sweetdreams_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) verschafft $unit($unit) ein schönes Nachtleben in $region($region)."</text>
+  </message>
+  
+  <message name="sp_disturbingdreams_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) sorgt für schlechten Schlaf in $region($region)."</text>
+  </message>
+  
   <message name="summon_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
@@ -7262,15 +7296,24 @@
     <text locale="de">"$unit($mage) in $region($region): '$order($command)' - Dieser Zauber kann nicht mit Stufenangabe gezaubert werden."</text>
     <text locale="en">"$unit($mage) in $region($region): '$order($command)' - This spell cannot be cast with variable level."</text>
   </message>
-  <message name="spellfail::nocontact" section="magic">
+  <message name="spellfail::noway" section="magic">
     <type>
-      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="target" type="string"/>
     </type>
-    <text locale="de">"$unit($mage) in $region($region): '$order($command)' - Zur Region $target kann kein Kontakt hergestellt werden."</text>
-    <text locale="en">"$unit($mage) in $region($region): '$order($command)' - The region $target could not be contacted."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no way leading there."</text>
+  </message>
+  <message name="spellfail::nocontact" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Zu $region($target) kann kein Kontakt hergestellt werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $region($target) could not be contacted."</text>
   </message>
   <message name="spellfail::contact" section="magic">
     <type>
@@ -7583,6 +7626,14 @@
     </type>
     <text locale="de">"Die $ship($ship) ist mit gutem Wind gesegnet$if($lt($duration,3),", doch der Zauber beginnt sich bereits aufzulösen",""). ($int36($id))"</text>
     <text locale="en">"The $ship($ship) is blessed with favourable winds$if($lt($duration,3),", but the spell is starting to wear thin",""). ($int36($id))"</text>
+  </message>
+
+  <message name="curseinfo::astralblock" section="magic">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Mächtige Magie verhindert den Kontakt zur Realität. ($int36($id))"</text>
+    <text locale="en">"Powerful magic disrupts our contact with reality. ($int36($id))"</text>
   </message>
 
   <message name="curseinfo::shipnodrift_0" section="magic">

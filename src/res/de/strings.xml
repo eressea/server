@@ -7392,6 +7392,11 @@
     <text locale="en">a magical attack</text>
   </string>
 
+  <string name="clone_of">
+    <text locale="de">Klon von %s</text>
+    <text locale="en">Clone of %s</text>
+  </string>
+
   <string name="attack_structural">
     <text locale="de">ein Angriff, der GEbäudeschaden verursacht</text>
     <text locale="en">an attack causing structural damage to buildings</text>
