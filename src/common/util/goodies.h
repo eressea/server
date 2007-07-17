@@ -30,6 +30,8 @@ extern const char *escape_string(const char * str, char * buffer, unsigned int l
 #endif
 
 extern boolean locale_check(void);
+extern char * set_string(char **s, const char *neu);
+
 
 extern int set_email(char** pemail, const char *newmail);
 /* fast strncat */

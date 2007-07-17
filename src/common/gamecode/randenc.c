@@ -245,8 +245,8 @@ find_manual(region * r, unit * u)
     break;
   }
 
-  sprintf(zLocation, "manual_location_%d", (int)(rng_int() % 4));
-  sprintf(zBook, "manual_title_%s", skillnames[skill]);
+  snprintf(zLocation, sizeof(zLocation), "manual_location_%d", (int)(rng_int() % 4));
+  snprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
 
   msg = msg_message("find_manual", "unit location book", u, zLocation, zBook);
   r_addmessage(r, u->faction, msg);

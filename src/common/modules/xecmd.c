@@ -86,7 +86,8 @@ xe_giveballon(unit *u, struct order *ord)
 
 	sh = new_ship(st_find("balloon"), u2->faction->locale, u2->region);
 	sh->size = 5;
-	set_string(&sh->name, (const xmlChar*)"Xontormia-Ballon");
+  free(sh->name);
+  sh->name = xstrdup(BAD_CAST "Xontormia-Ballon");
 	leave(u2->region, u2);
 	u2->ship = sh;
 	fset(u2, UFL_OWNER);

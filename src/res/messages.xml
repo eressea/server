@@ -1003,6 +1003,7 @@
     <text locale="fr">"$building($building) in $region($region) collapses.$if($opfer," There are $int($opfer) caualties.","")"</text>
     <text locale="en">"$building($building) in $region($region) collapses.$if($opfer," There are $int($opfer) caualties.","")"</text>
   </message>
+
   <message name="error_pflnorecruit" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -1012,6 +1013,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In der Ebene der Herausforderung kann niemand rekrutiert werden."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot recruit in this plane."</text>
   </message>
+
   <message name="drown" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -1087,11 +1089,27 @@
     <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were momentarily stunned."</text>
   </message>
 
+  <message name="cast_rally_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) besänftigt den Bauernaufstand in $region($region)."</text>
+    <text locale="en">"$unit($mage) quells the uprising in $region($region)."</text>
+  </message>
+
+  <message name="cast_auraleak_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) rief in $region($region) einen Riss in dem Gefüge der Magie hervor, der alle magische Kraft aus der Region riss."</text>
+  </message>
+
   <message name="cast_sleep_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
-      <arg name="spell" type="spell"/>
-      <arg name="amount" type="int"/>
+      <arg name="region" type="region"/>
     </type>
     <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden in Schlaf versetzt."</text>
     <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters have fallen asleep."</text>
@@ -1443,12 +1461,13 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gewinnt durch das Ritual $int($amount) Aura."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) receives $int($amount) aura."</text>
   </message>
-  <message name="holyground" section="magic">
+  <message name="sp_holyground_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($mage) beschwört Naturgeister in den Boden der Region."</text>
-    <text locale="en">"$unit($mage) summons natural spirits into the ground of this region."</text>
+    <text locale="de">"$unit($mage) beschwört Naturgeister in den Boden von $region($region)."</text>
+    <text locale="en">"$unit($mage) summons natural spirits into the ground of $region($region)."</text>
   </message>
   <message name="unholypower_limitedeffect" section="magic">
     <type>
@@ -1509,6 +1528,26 @@
     <text locale="de">"$unit($mage) wiegelt in $region($region) die Bauern zum Aufstand auf."</text>
     <text locale="en">"$unit($mage) incites a revolt among the peasants of $region($region)."</text>
   </message>
+
+  <message name="sp_raisepeasants_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) wiegelt in $region($region) $int($amount) Bauern zum Aufstand auf."</text>
+    <text locale="en">"$unit($mage) incites a revolt among $int($amount) peasants of $region($region)."</text>
+  </message>
+
+  <message name="sp_depression_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) sorgt in $region($region) für Trübsal unter den Bauern."</text>
+    <text locale="en">"$unit($mage) causes great sadness among the peasants of $region($region)."</text>
+  </message>
+
   <message name="icastle_create" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -1635,6 +1674,7 @@
     <text locale="de">"$unit($mage) beschwört einen Giftelementar in $region($region)."</text>
     <text locale="en">"$unit($mage) summons a poison elemental in $region($region)."</text>
   </message>
+
   <message name="fumblecurse" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -1779,85 +1819,77 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="ship" type="ship"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="fr">"$unit($mage) discovers that $ship($ship) is charmed with $spell, which will last for, about $int($months) more weeks."</text>
-    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with $spell, which will last for, about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with $curse($curse), which will last for, about $int($months) more weeks."</text>
   </message>
   <message name="analyse_building_age" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="fr">"$unit($mage) discovers that $building($building) is charmed with $spell, which will last for, about $int($months) more weeks."</text>
-    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with $spell, which will last for, about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with $curse($curse), which will last for, about $int($months) more weeks."</text>
   </message>
   <message name="analyse_unit_age" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="fr">"$unit($mage) discovers that $unit($unit) is charmed with $spell that willlast for about $int($months) more weeks."</text>
-    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with $spell that willlast for about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with $curse($curse) that will last for about $int($months) more weeks."</text>
   </message>
   <message name="analyse_region_age" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
       <arg name="months" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
-    <text locale="fr">"$unit($mage) discovers that $region($region) is charmed with $spell, which will last for, about $int($months) more weeks."</text>
-    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with $spell, which will last for, about $int($months) more weeks."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $curse($curse) liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
+    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with $curse($curse), which will last for, about $int($months) more weeks."</text>
   </message>
   <message name="analyse_ship_noage" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="ship" type="ship"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="fr">"$unit($mage) discovers that $ship($ship) is charmed with $spell, which will last for centuries."</text>
-    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with $spell, which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $ship($ship) is charmed with $curse($curse), which will last for centuries."</text>
   </message>
   <message name="analyse_building_noage" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="fr">"$unit($mage) discovers that $building($building) is charmed with $spell, which will last for centuries."</text>
-    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with $spell, which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $building($building) is charmed with $curse($curse), which will last for centuries."</text>
   </message>
   <message name="analyse_unit_noage" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="fr">"$unit($mage) discovers that $unit($unit) is charmed with $spell, which will last for centuries."</text>
-    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with $spell, which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $unit($unit) is charmed with $curse($curse), which will last for centuries."</text>
   </message>
   <message name="analyse_region_noage" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="curse" type="string"/>
+      <arg name="curse" type="curse"/>
     </type>
-    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
-    <text locale="fr">"$unit($mage) discovers that $region($region) is charmed with $spell, which will last for centuries."</text>
-    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with $spell, which will last for centuries."</text>
+    <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $curse($curse) liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
+    <text locale="en">"$unit($mage) discovers that $region($region) is charmed with $curse($curse), which will last for centuries."</text>
   </message>
   <message name="analyse_ship_fail" section="magic">
     <type>
@@ -2117,6 +2149,34 @@
     <text locale="de">"$unit($mage) ruft einen Vertrauten. $race($race, 0) können $skills lernen."</text>
     <text locale="en">"$unit($mage) summons a familiar. $race($race, 0) can learn $skills."</text>
   </message>
+
+  <message name="babbler_resist" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) hat einen feuchtfröhlichen Abend in der Taverne verbracht. Ausser einem fürchterlichen Brummschädel ist da auch noch das dumme Gefühl $unit($mage) seine ganze Lebensgeschichte erzählt zu haben."</text>
+  </message>
+
+  <message name="babbler_effect" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) hat einen feuchtfröhlichen Abend in der
+     Taverne verbracht. Ausser einem fürchterlichen Brummschädel ist da auch
+     noch das dumme Gefühl die ganze Taverne mit seiner Lebensgeschichte
+     unterhalten zu haben."</text>
+  </message>
+
+  <message name="charming_effect" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="mage" type="unit"/>
+      <arg name="duration" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) gelingt es $unit($unit) zu verzaubern. $unit($unit) wird für etwa $int($duration) Wochen unseren Befehlen gehorchen."</text>
+  </message>
+
   <message name="spell_resist" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -3651,7 +3711,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur ein Magier kann einen Astralkristall benutzen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Only mages may use an astralcrystal."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Only mages may use an astralcrystal."</text>
   </message>
   <message name="error293" section="errors">
@@ -4100,6 +4159,29 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit muß sich an Land befinden."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit must be on land."</text>
   </message>
+
+  <message name="error_notstonecircle" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $building($building) ist kein Steinkreis."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $building($building) is not a stonecircle."</text>
+  </message>
+
+  <message name="error_notcomplete" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $building($building) muss vor der Weihe fertiggestellt sein."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $building($building) has to be complete before it can be blessed."</text>
+  </message>
+
   <message name="error_nograves" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -4372,7 +4454,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht bauen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot build such a thing."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot build such a thing."</text>
   </message>
   <message name="error220" section="errors">
@@ -4437,7 +4518,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Einheit ist kein Magier."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Unit is not a magician."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Unit is not a magician."</text>
   </message>
   <message name="error213" section="errors">
@@ -4447,7 +4527,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Parameter nicht korrekt angegeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Incorrect parameter."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Incorrect parameter."</text>
   </message>
   <message name="error212" section="errors">
@@ -4457,7 +4536,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier befindet sich nicht auf einem Schiff."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The magician is not on board a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The magician is not on board a ship."</text>
   </message>
   <message name="error211" section="errors">
@@ -4467,7 +4545,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff liegt bereits so ein Zauber."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship is already under this spell."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is already under this spell."</text>
   </message>
   <message name="error210" section="errors">
@@ -4495,7 +4572,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Auraangabe fehlerhaft."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - wrong Aura values."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - wrong Aura values."</text>
   </message>
   <message name="error207" section="errors">
@@ -4505,7 +4581,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Zu dieser Einheit kann keine Aura übertragen werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot pass aura on to this unit."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot pass aura on to this unit."</text>
   </message>
   <message name="error206" section="errors">
@@ -4517,6 +4592,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Auf dem Gebäude liegt bereits so ein Zauber."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is alrady a spell on that building."</text>
   </message>
+
   <message name="spellfail_onocean" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -4524,9 +4600,71 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf hoher See gezaubert werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This spell cannot be cast while you are on the ocean."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell cannot be cast while you are on the ocean."</text>
   </message>
+
+  <message name="spellfail_nomonsters" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Monster gezaubert werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell cannot be cast on monsters."</text>
+  </message>
+
+  <message name="spellfail_noundead" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Untote  gezaubert werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell cannot be cast on undead."</text>
+  </message>
+
+  <message name="spellfail_generous" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Stimmung in der Region ist so schlecht, dass niemand auf den Zauber reagiert."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The mood in this region is so bad that nobody reacts t the spell."</text>
+  </message>
+
+  <message name="spellfail_pump" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+      <arg name="tregion" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) wusste trotz intensivem Verhör nichts über $region($tregion) zu berichten."</text>
+  </message>
+
+  <message name="spellfail_toomanytargets" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So viele Persoenen übersteigen die Kräfte des Magiers."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' -This many people exceed the powers of the magician."</text>
+  </message>
+
+  <message name="spellfail_noexpensives" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="target" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat unaufkündbare Bindungen an seine alte Partei."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) have unbreakable prior commitments to their faction."</text>
+  </message>
+
   <message name="error205" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -4534,7 +4672,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber gelingt nur in einer Ozeanregion."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This spell works only in an ocean region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell works only in an ocean region."</text>
   </message>
   <message name="error204" section="errors">
@@ -4544,7 +4681,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In einer Region ohne Bäume kann man diesen Zauber nicht wirken."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell in a region without trees."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell in a region without trees."</text>
   </message>
   <message name="error203" section="errors">
@@ -4554,7 +4690,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Ziel wurde vergessen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No target has been supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No target has been supplied."</text>
   </message>
   <message name="error202" section="errors">
@@ -4564,7 +4699,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das ist keine gültige Rasse."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This is not a valid race."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This is not a valid race."</text>
   </message>
   <message name="error201" section="errors">
@@ -4574,7 +4708,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Rasse und Zieleinheit wurden vergessen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Race and target unit have not been supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Race and target unit have not been supplied."</text>
   </message>
   <message name="error200" section="errors">
@@ -4584,7 +4717,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die maximale Aura reicht nicht für diesen Zauber."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Magician's maximum Aura is not high enough for this spell."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Magician's maximum Aura is not high enough for this spell."</text>
   </message>
   <message name="error199" section="errors">
@@ -4621,7 +4753,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das ist keine Waldregion."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This is not a forest region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This is not a forest region."</text>
   </message>
   <message name="error195" section="errors">
@@ -4631,7 +4762,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No way is leading in this direction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No way is leading in this direction."</text>
   </message>
   <message name="error194" section="errors">
@@ -4641,7 +4771,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Zielregion wurde nicht korrekt angegeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Target region was supplied incorrectly."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Target region was supplied incorrectly."</text>
   </message>
   <message name="error193" section="errors">
@@ -4669,7 +4798,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in Wäldern."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This spell works only in forests."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell works only in forests."</text>
   </message>
   <message name="error190" section="errors">
@@ -4679,7 +4807,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in der materiellen Welt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This spell works only in the material world."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell works only in the material world."</text>
   </message>
   <message name="error189" section="errors">
@@ -4698,7 +4825,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht im Sumpf gezaubert werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell in a swamp."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell in a swamp."</text>
   </message>
   <message name="error186" section="errors">
@@ -4708,7 +4834,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nur auf Land gelegt werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This spell works only ashore."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This spell works only ashore."</text>
   </message>
   <message name="error185" section="errors">
@@ -4727,7 +4852,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann den Befehl in dieser Runde nicht ausführen, da sie sich bewegt hat."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has moved."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute this command because it has moved."</text>
   </message>
   <message name="error184" section="errors">
@@ -4737,7 +4861,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit bewegt sich nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not move."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not move."</text>
   </message>
   <message name="error183" section="errors">
@@ -4747,7 +4870,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier befindet sich nicht auf einem Schiff."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The magician is not on board a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The magician is not on board a ship."</text>
   </message>
   <message name="error182" section="errors">
@@ -4757,7 +4879,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff kann in diese Richtung nicht ablegen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship cannot leave in this direction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship cannot leave in this direction."</text>
   </message>
   <message name="error181" section="errors">
@@ -4767,7 +4888,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dazu muß sich der Magier in der Burg oder an Bord des Schiffes befinden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - To do this, the magician has to be in a castle or on board a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - To do this, the magician has to be in a castle or on board a ship."</text>
   </message>
   <message name="error180" section="errors">
@@ -4777,7 +4897,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber schlägt fehl."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The spell fails."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The spell fails."</text>
   </message>
   <message name="error179" section="errors">
@@ -4787,7 +4906,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieses Magiegebiet kann die Einheit nicht lernen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot learn this magic sphere."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot learn this magic sphere."</text>
   </message>
   <message name="error178" section="errors">
@@ -4797,7 +4915,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Magiegebiet angegeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No magic sphere was supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No magic sphere was supplied."</text>
   </message>
   <message name="error177" section="errors">
@@ -4816,7 +4933,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Spruch kann man nicht in die Ferne richten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell on a distant target."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell on a distant target."</text>
   </message>
   <message name="error175" section="errors">
@@ -4826,7 +4942,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Spruch kann man nicht auf einem sich bewegenden Schiff stehend zaubern."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell while standing on a moving ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot cast this spell while standing on a moving ship."</text>
   </message>
   <message name="error174" section="errors">
@@ -4836,7 +4951,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber ist nur im Kampf sinnvoll."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - this spell makes only sense in combat."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - this spell makes only sense in combat."</text>
   </message>
   <message name="error173" section="errors">
@@ -4846,7 +4960,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Selbst in der Bibliothek von Xontormia konnte dieser Spruch nicht gefunden werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Even in the Xontormia Library, this spell could not be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Even in the Xontormia Library, this spell could not be found."</text>
   </message>
   <message name="error172" section="errors">
@@ -4856,7 +4969,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Zauber angegeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There was no spell supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There was no spell supplied."</text>
   </message>
   <message name="error171" section="errors">
@@ -4866,7 +4978,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Kampfzauber gibt es nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This combat spell does not exist."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This combat spell does not exist."</text>
   </message>
   <message name="error170" section="errors">
@@ -4876,7 +4987,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Bauern nehmen dieses großzügige Geschenk nicht an."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The peasants did not accept this gracious gift."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The peasants did not accept this gracious gift."</text>
   </message>
   <message name="error169" section="errors">
@@ -4886,7 +4996,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Zauber kennt die Einheit nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not know this spell."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not know this spell."</text>
   </message>
   <message name="error168" section="errors">
@@ -4896,7 +5005,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es konnten keine Luxusgüter verkauft werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No luxury items could be sold."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No luxury items could be sold."</text>
   </message>
   <message name="error167" section="errors">
@@ -4906,7 +5014,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit geht nicht zu den Bauern."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not go to the peasants."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not go to the peasants."</text>
   </message>
   <message name="error166" section="errors">
@@ -4916,7 +5023,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann eine Burg nicht belagern."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This race cannot siege a castle."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This race cannot siege a castle."</text>
   </message>
   <message name="error165" section="errors">
@@ -4926,7 +5032,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Trank bekommt der Einheit nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit disagreed with the potion."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit disagreed with the potion."</text>
   </message>
   <message name="error163" section="errors">
@@ -4945,7 +5050,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Heiltrank wird automatisch bei Bedarf benutzt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This healing potion will be automatically used when needed."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This healing potion will be automatically used when needed."</text>
   </message>
   <message name="error161" section="errors">
@@ -4955,7 +5059,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit besitzt den Trank nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this potion."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this potion."</text>
   </message>
   <message name="error160" section="errors">
@@ -4965,7 +5068,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es konnten keine Luxusgüter gekauft werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No luxury items could be bought."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No luxury items could be bought."</text>
   </message>
   <message name="error159" section="errors">
@@ -4975,7 +5077,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es konnten keine Personen übergeben werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No person could be handed over."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No person could be handed over."</text>
   </message>
   <message name="error158" section="errors">
@@ -4985,7 +5086,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Magier arbeiten grundsätzlich nur alleine!"</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Magicians always work alone!"</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Magicians always work alone!"</text>
   </message>
   <message name="error157" section="errors">
@@ -4995,7 +5095,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Partei hat ein anderes Magiegebiet."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The faction has a different magic sphere."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The faction has a different magic sphere."</text>
   </message>
   <message name="error156" section="errors">
@@ -5005,7 +5104,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Zuviele Alchemisten in der Partei."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Too many alchemists in the faction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Too many alchemists in the faction."</text>
   </message>
   <message name="error155" section="errors">
@@ -5015,7 +5113,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Zuviele Magier in der Partei."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Too many magicians in the faction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Too many magicians in the faction."</text>
   </message>
   <message name="error154" section="errors">
@@ -5025,7 +5122,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Hochqualifizierte Personen weigern sich, für andere Parteien zu arbeiten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Highly qualified people refuse to work for other parties."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Highly qualified people refuse to work for other parties."</text>
   </message>
   <message name="error153" section="errors">
@@ -5035,7 +5131,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit schließt sich den Bauern an."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit joins the local peasants."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit joins the local peasants."</text>
   </message>
   <message name="error152" section="errors">
@@ -5045,7 +5140,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit springt über Bord und ertrinkt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit jumps over board and drowns."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit jumps over board and drowns."</text>
   </message>
   <message name="error69" section="errors">
@@ -5055,7 +5149,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Region wird bewacht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The region is guarded."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The region is guarded."</text>
   </message>
   <message name="error135" section="errors">
@@ -5065,7 +5158,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Unbekannte Option."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Unknown Option."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Unknown Option."</text>
   </message>
   <message name="error60" section="errors">
@@ -5075,7 +5167,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit wird belagert."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is under siege."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is under siege."</text>
   </message>
   <message name="error151" section="errors">
@@ -5085,7 +5176,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Zum Straßenbau braucht man Steine."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You need stones to build a road."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You need stones to build a road."</text>
   </message>
   <message name="error149" section="errors">
@@ -5095,7 +5185,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Wohin soll die Botschaft gehen?"</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Who is supposed to get this message?"</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Who is supposed to get this message?"</text>
   </message>
   <message name="error148" section="errors">
@@ -5105,7 +5194,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Burgherr."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not in command of a castle."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not in command of a castle."</text>
   </message>
   <message name="error147" section="errors">
@@ -5115,7 +5203,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht Burgherr der größten Burg in der Region."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not in command of the largest castle in the region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not in command of the largest castle in the region."</text>
   </message>
   <message name="error146" section="errors">
@@ -5125,7 +5212,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Kapitän des Schiffes."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not captain of a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not captain of a ship."</text>
   </message>
   <message name="error145" section="errors">
@@ -5135,7 +5221,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keiner Burg."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not in a castle."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not in a castle."</text>
   </message>
   <message name="error144" section="errors">
@@ -5145,7 +5230,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf keinem Schiff."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not on board a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not on board a ship."</text>
   </message>
   <message name="error143" section="errors">
@@ -5155,7 +5239,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf einem Schiff."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is on board a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is on board a ship."</text>
   </message>
   <message name="error142" section="errors">
@@ -5165,7 +5248,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat zuwenig Silber, um zu rekrutieren."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have enough silver for recruiting."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have enough silver for recruiting."</text>
   </message>
   <message name="error141" section="errors">
@@ -5184,7 +5266,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich weder in einer Burg noch in einem Schiff."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is neither in a castle nor on board a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is neither in a castle nor on board a ship."</text>
   </message>
   <message name="error139" section="errors">
@@ -5194,7 +5275,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Unterschiedliche Typen können nicht gemischt werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Different types do not mix."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Different types do not mix."</text>
   </message>
   <message name="error138" section="errors">
@@ -5204,7 +5284,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Uns gehört nichts, was man abreißen oder versenken könnte."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - We do not have anything that could be demolished."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - We do not have anything that could be demolished."</text>
   </message>
   <message name="error137" section="errors">
@@ -5214,7 +5293,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Unbekannter Hilfe-Modus."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Unknown Help- Mode."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Unknown Help- Mode."</text>
   </message>
   <message name="error134" section="errors">
@@ -5224,7 +5302,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Unbekannte Meldungs-Option."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Unknown Report-Option."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Unknown Report-Option."</text>
   </message>
   <message name="error133" section="errors">
@@ -5234,7 +5311,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Um in Wüsten Straßen bauen zu können, muß zuerst eine Karawanserei errichtet werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You've got to build a caravansary before building roads through deserts."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You've got to build a caravansary before building roads through deserts."</text>
   </message>
   <message name="error132" section="errors">
@@ -5244,7 +5320,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Um in Sümpfen Straßen bauen zu können, muß zuerst ein Damm errichtet werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You've got to build a dam before building roads through swamps."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You've got to build a dam before building roads through swamps."</text>
   </message>
   <message name="error129" section="errors">
@@ -5254,7 +5329,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So viele Leute kann die Partei nicht aufnehmen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The faction cannot hire so many strangers."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The faction cannot hire so many strangers."</text>
   </message>
   <message name="error128" section="errors">
@@ -5264,7 +5338,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So viele Fremde kann die Partei nicht aufnehmen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The faction cannot hire so many strangers."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The faction cannot hire so many strangers."</text>
   </message>
   <message name="error127" section="errors">
@@ -5274,7 +5347,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So viele Fremde kann Deine Partei nicht aufnehmen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Your faction cannot hire so many strangers."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Your faction cannot hire so many strangers."</text>
   </message>
   <message name="error126" section="errors">
@@ -5284,7 +5356,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht verkaufen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot sell this."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot sell this."</text>
   </message>
   <message name="error_cannotmake" section="errors">
@@ -5294,7 +5365,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht machen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot produce this."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot produce this."</text>
   </message>
   <message name="error124" section="errors">
@@ -5304,7 +5374,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht auf dem Markt kaufen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot buy that on a market place."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot buy that on a market place."</text>
   </message>
   <message name="error123" section="errors">
@@ -5314,7 +5383,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas hat die Einheit nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have such a thing."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have such a thing."</text>
   </message>
   <message name="error122" section="errors">
@@ -5324,7 +5392,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Pferde kann man nur in einer Pferdezucht züchten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You can breed horses only in a stable."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You can breed horses only in a stable."</text>
   </message>
   <message name="error121" section="errors">
@@ -5334,7 +5401,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas gibt es hier nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - That resource does not exist in this region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - That resource does not exist in this region."</text>
   </message>
   <message name="error120" section="errors">
@@ -5344,7 +5410,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Personen können nur an Menschen übergeben werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Characters can be given only to Human parties."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Characters can be given only to Human parties."</text>
   </message>
   <message name="error119" section="errors">
@@ -5354,7 +5419,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ohne einen Handelsposten gibt es keinen Markt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is no marketplace without at least a tradepost."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no marketplace without at least a tradepost."</text>
   </message>
   <message name="error118" section="errors">
@@ -5364,7 +5428,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur Elfen können diese Bögen herstellen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Only Elves can make these bows."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Only Elves can make these bows."</text>
   </message>
   <message name="error117" section="errors">
@@ -5374,7 +5437,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur die EMail-Adresse angeben!"</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Submit only email-address, please!"</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Submit only email-address, please!"</text>
   </message>
   <message name="error116" section="errors">
@@ -5384,7 +5446,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nummer kann nicht vergeben werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Number can not be assigned."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Number can not be assigned."</text>
   </message>
   <message name="error115" section="errors">
@@ -5394,7 +5455,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nummer ist schon belegt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Number is already in use."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Number is already in use."</text>
   </message>
   <message name="error114" section="errors">
@@ -5404,7 +5464,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nummer ist nicht im gültigen Bereich."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Number is not valid."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Number is not valid."</text>
   </message>
   <message name="error113" section="errors">
@@ -5414,7 +5473,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nichts angegeben, was wir übergeben sollen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Item to be handed over was not supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Item to be handed over was not supplied."</text>
   </message>
   <message name="error112" section="errors">
@@ -5424,7 +5482,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Namen dürfen keine Klammern enthalten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Names may not contain parenthesis."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Names may not contain parenthesis."</text>
   </message>
   <message name="error111" section="errors">
@@ -5434,7 +5491,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nachricht zu lang - gekürzt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Message has been cut (too long).."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Message has been cut (too long).."</text>
   </message>
   <message name="error110" section="errors">
@@ -5444,7 +5500,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Man muß angeben, ob eine Burg, ein Schiff, eine Region oder eine Einheit beschrieben werden soll."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Specify if description is for a castle, a ship, a region or a unit."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Specify if description is for a castle, a ship, a region or a unit."</text>
   </message>
   <message name="error109" section="errors">
@@ -5454,7 +5509,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Man muß angeben, ob eine Burg, ein Schiff, eine Einheit, eine Region oder eine Partei benannt werden soll."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Specify if a castle, a ship, a region or a unit is supposed to be named."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Specify if a castle, a ship, a region or a unit is supposed to be named."</text>
   </message>
   <message name="error108" section="errors">
@@ -5464,7 +5518,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es sind keine Kräuter zu finden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No herbs could be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No herbs could be found."</text>
   </message>
   <message name="error107" section="errors">
@@ -5474,7 +5527,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Man braucht mindestens zwei Pferde, um sie zu züchten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You need at least two horses to breed more."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You need at least two horses to breed more."</text>
   </message>
   <message name="error106" section="errors">
@@ -5484,7 +5536,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Magier müssen zum studieren allein sein."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - When studying, magicians need to be alone."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - When studying, magicians need to be alone."</text>
   </message>
   <message name="error105" section="errors">
@@ -5494,7 +5545,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Leere Einheiten können nicht übergeben werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Empty units can not be handed over."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Empty units can not be handed over."</text>
   </message>
   <message name="error104" section="errors">
@@ -5504,7 +5554,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Laen kann nur in einem Bergwerk abgebaut werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Laen can be excavated only in a mine."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Laen can be excavated only in a mine."</text>
   </message>
   <message name="error103" section="errors">
@@ -5514,7 +5563,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann Straßen bauen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Nobody here can build roads."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Nobody here can build roads."</text>
   </message>
   <message name="error102" section="errors">
@@ -5524,7 +5572,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann handeln."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Nobody here can trade."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Nobody here can trade."</text>
   </message>
   <message name="error101" section="errors">
@@ -5534,7 +5581,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann ein Gebäude errichten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Nobody here can construct a building."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Nobody here can construct a building."</text>
   </message>
   <message name="error100" section="errors">
@@ -5544,7 +5590,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keiner hier ist gelernter Schiffbauer."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Nobody here is a skilled ship builder."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Nobody here is a skilled ship builder."</text>
   </message>
   <message name="error99" section="errors">
@@ -5554,7 +5599,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit will nicht transportiert werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit doen not want to be transported."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit doen not want to be transported."</text>
   </message>
   <message name="error98" section="errors">
@@ -5564,7 +5608,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Insekten können im Winter nur in Wüsten rekrutiert werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - In winter, insects can be recruited only in deserts."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - In winter, insects can be recruited only in deserts."</text>
   </message>
   <message name="error97" section="errors">
@@ -5574,7 +5617,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In Gletschern können keine Insekten rekrutiert werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Insects cannot be recruited in glaciers."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Insects cannot be recruited in glaciers."</text>
   </message>
   <message name="error96" section="errors">
@@ -5584,7 +5626,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In dieser Einheit gibt es niemanden, den man transferieren könnte."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Nobody in this unit can be transferred."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Nobody in this unit can be transferred."</text>
   </message>
   <message name="error95" section="errors">
@@ -5594,7 +5635,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Illusionen können eine Region nicht bewachen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Illusions cannot guard a region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Illusions cannot guard a region."</text>
   </message>
   <message name="error94" section="errors">
@@ -5604,7 +5644,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Hier kann man keine Straße bauen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You cannot build a road here."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot build a road here."</text>
   </message>
   <message name="error93" section="errors">
@@ -5614,8 +5653,16 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Hier gibt es schon einen Hafen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is already a port in this region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is already a port in this region."</text>
+  </message>
+  <message name="error_nopeasants" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keine Bauern."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are no peasants in this region."</text>
   </message>
   <message name="error92" section="errors">
     <type>
@@ -5624,7 +5671,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keinen normalen Wald."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is no normal forest in this region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no normal forest in this region."</text>
   </message>
   <message name="error91" section="errors">
@@ -5634,7 +5680,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keine Mallornbäume."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There are no Mallorn trees here."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There are no Mallorn trees here."</text>
   </message>
   <message name="error90" section="errors">
@@ -5644,7 +5689,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit fährt nicht mit uns."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have a RIDE-order."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have a RIDE-order."</text>
   </message>
   <message name="error89" section="errors">
@@ -5654,7 +5698,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Geldgebot fehlt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Money offer is missing."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Money offer is missing."</text>
   </message>
   <message name="error88" section="errors">
@@ -5664,7 +5707,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für den Schiffbau braucht man Holz."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - You need wood to build a ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You need wood to build a ship."</text>
   </message>
   <message name="error87" section="errors">
@@ -5683,7 +5725,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Falsches Passwort."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Wrong password."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Wrong password."</text>
   </message>
   <message name="error85" section="errors">
@@ -5693,7 +5734,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es wurde keine EMail-Adresse angegeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No email-address was supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No email-address was supplied."</text>
   </message>
   <message name="error84" section="errors">
@@ -5703,7 +5743,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Name angegeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No name was supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No name was supplied."</text>
   </message>
   <message name="error83" section="errors">
@@ -5713,7 +5752,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es konnte kein Bauer gefangen werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - No peasant could be caught."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No peasant could be caught."</text>
   </message>
   <message name="error82" section="errors">
@@ -5723,7 +5761,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es gibt keine Abstimmung mit dieser Nummer."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is no agreement with this number."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no agreement with this number."</text>
   </message>
   <message name="error81" section="errors">
@@ -5733,7 +5770,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Einheit muß zuerst die Region bewachen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - first, the unit must guard the region."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - first, the unit must guard the region."</text>
   </message>
   <message name="error80" section="errors">
@@ -5743,7 +5779,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Einheit ist nicht bewaffnet und kampffähig."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not armed and fighting fit."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not armed and fighting fit."</text>
   </message>
   <message name="error79" section="errors">
@@ -5753,7 +5788,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ein Schiff oder eine Burg muß angegeben werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - A ship or a castle must be supplied."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - A ship or a castle must be supplied."</text>
   </message>
   <message name="error78" section="errors">
@@ -5941,12 +5975,58 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit could not be found."</text>
   </message>
 
-  <message name="seduce_effect" section="events">
+  <message name="pump_effect" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
+      <arg name="tregion" type="region"/>
+    </type>
+    <text locale="de">"$unit($mage) horcht $unit($unit) über $region($tregion) aus."</text>
+    <text locale="en">"$unit($mage) questions $unit($unit) about $region($tregion)."</text>
+  </message>
+
+  <message name="headache_effect_0" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) verschafft $unit($unit) einige feuchtfröhliche Stunden mit heftigen Nachwirkungen."</text>
+    <text locale="en">"$unit($mage) invites $unit($unit) for a few too many drinks and a massive hangover."</text>
+  </message>
+
+  <message name="headache_effect_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing...."</text>
+    <text locale="en">"$unit($unit) has a splitting headache and can hardly remember last week. Except that it all started in the tavern..."</text>
+  </message>
+
+  <message name="calm_effect" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) besänftigt $unit($unit)."</text>
+    <text locale="en">"$unit($mage) calms $unit($unit)."</text>
+  </message>
+
+  <message name="seduce_effect_1" section="events">
     <type>
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und gut verspielt."</text>
     <text locale="en">"$unit($unit) gambles for high stakes and loses almost everything."</text>
+  </message>
+
+  <message name="seduce_effect_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="mage" type="unit"/>
+      <arg name="items" type="items"/>
+    </type>
+    <text locale="de">"$unit($unit) schenkt $unit($mage) $resources($items)."</text>
+    <text locale="en">"$unit($unit) gives $unit($mage) $resources($items)."</text>
   </message>
 
   <message name="shapeshift_effect" section="events">
@@ -6001,7 +6081,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit trägt zuviel Gewicht, um sich bewegen zu können."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is too heavily loaded to move."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is too heavily loaded to move."</text>
   </message>
   <message name="error56" section="errors">
@@ -6011,7 +6090,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann soviele Pferde nicht bändigen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot tame that many horses."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot tame that many horses."</text>
   </message>
   <message name="error55" section="errors">
@@ -6021,7 +6099,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann sich nicht fortbewegen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot move."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot move."</text>
   </message>
   <message name="error54" section="errors">
@@ -6031,7 +6108,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht handeln."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot trade."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot trade."</text>
   </message>
   <message name="error53" section="errors">
@@ -6041,7 +6117,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine Tränke herstellen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot make potions."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot make potions."</text>
   </message>
   <message name="error52" section="errors">
@@ -6051,7 +6126,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren langen Befehle ausführen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is exhausted from battle."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is exhausted from battle."</text>
   </message>
   <message name="error51" section="errors">
@@ -6071,7 +6145,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht erfahren genug dafür."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not experienced enough to do this."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not experienced enough to do this."</text>
   </message>
   <message name="error49" section="errors">
@@ -6081,7 +6154,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Eigentümer."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not he owner."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not he owner."</text>
   </message>
   <message name="error48" section="errors">
@@ -6091,7 +6163,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht bewaffnet und kampffähig."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not armed and fighting fit."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not armed and fighting fit."</text>
   </message>
   <message name="error47" section="errors">
@@ -6101,7 +6172,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit uns alliiert."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit is one of our allies."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit is one of our allies."</text>
   </message>
   <message name="error46" section="errors">
@@ -6111,7 +6181,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keiner Taverne."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not in a tavern."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not in a tavern."</text>
   </message>
   <message name="error45" section="errors">
@@ -6121,7 +6190,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist eine der unsrigen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit is one of our own."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit is one of our own."</text>
   </message>
   <message name="error44" section="errors">
@@ -6131,7 +6199,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf hoher See."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is off shore."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is off shore."</text>
   </message>
   <message name="error43" section="errors">
@@ -6141,7 +6208,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat soetwas nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this."</text>
   </message>
   <message name="error42" section="errors">
@@ -6151,7 +6217,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht genug Wagenlenker oder zuviel andere Fracht, um die Wagen aufzuladen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have enough coachmen or too much freights to lad the wagons."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have enough coachmen or too much freights to lad the wagons."</text>
   </message>
   <message name="error41" section="errors">
@@ -6161,7 +6226,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht genug Silber."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have enough silver."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have enough silver."</text>
   </message>
   <message name="error40" section="errors">
@@ -6171,7 +6235,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat keinen Kontakt mit uns aufgenommen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit did not contact us."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit did not contact us."</text>
   </message>
   <message name="error39" section="errors">
@@ -6181,7 +6244,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat keine Spionage gelernt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit has not yet learned espionage."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit has not yet learned espionage."</text>
   </message>
   <message name="error38" section="errors">
@@ -6191,7 +6253,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat keine Kräuter."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have any herbs."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have any herbs."</text>
   </message>
   <message name="error37" section="errors">
@@ -6201,7 +6262,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diesen Trank nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this potion."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this potion."</text>
   </message>
   <message name="error36" section="errors">
@@ -6211,7 +6271,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diesen Gegenstand nicht."</text>
-    <text locale="fr">"$unit($unit) en $region($region): '$order($command)' - L'unité ne possède pas cet objet."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have this item."</text>
   </message>
   <message name="nogive_reserved" section="errors">
@@ -6232,7 +6291,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diese Kräuter nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit does not have these herbs."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit does not have these herbs."</text>
   </message>
   <message name="error_unit_size" section="errors">
@@ -6243,7 +6301,6 @@
       <arg name="maxsize" type="int"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Einheiten dürfen nicht mehr als $int($maxsize) Personen enthalten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Units may not have more than $int($maxsize) members."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Units may not have more than $int($maxsize) members."</text>
   </message>
   <message name="enter_overload" section="errors">
@@ -6253,7 +6310,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit darf nicht an Bord kommen, da sie das Schiff überladen würde."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit cannot go aboard, the ship would be overloaded."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot go aboard, the ship would be overloaded."</text>
   </message>
   <message name="error34" section="errors">
@@ -6263,7 +6319,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit darf nicht an Bord kommen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit has no permission to come on board."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit has no permission to come on board."</text>
   </message>
   <message name="error33" section="errors">
@@ -6273,7 +6328,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht in unserer Burg."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not in our castle."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not in our castle."</text>
   </message>
   <message name="error32" section="errors">
@@ -6283,7 +6337,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht an Bord unseres Schiffes."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit is not on board our ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is not on board our ship."</text>
   </message>
   <message name="error31" section="errors">
@@ -6293,7 +6346,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Burg wurde nicht gefunden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The castle could not be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The castle could not be found."</text>
   </message>
   <message name="error30" section="errors">
@@ -7054,12 +7106,13 @@
     <text locale="en">"$unit($mage) shakes the earth in $region($region)."</text>
   </message>
   
-  <message name="drought_effect" section="magic">
+  <message name="sp_drought_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($mage) verflucht das Land, und eine Dürreperiode beginnt."</text>
-    <text locale="en">"$unit($mage) puts a curse on the land and a drought sets in."</text>
+    <text locale="de">"$unit($mage) verflucht das Land in $region($region), und eine Dürreperiode beginnt."</text>
+    <text locale="en">"$unit($mage) puts a curse on the lands of $region($region) and a drought sets in."</text>
   </message>
   
   <message name="summon_effect" section="magic">

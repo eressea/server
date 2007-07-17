@@ -17,6 +17,7 @@
   <xi:include href="spells.xml"/>
   <xi:include href="terrains.xml"/>
   <xi:include href="dungeons.xml"/>
+  <xi:include href="directions.xml"/>
 
   <xi:include href="names-undead.xml"/>
   <xi:include href="names-skeletons.xml"/>

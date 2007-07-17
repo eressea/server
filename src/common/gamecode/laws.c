@@ -33,6 +33,7 @@
 #include "economy.h"
 #include "monster.h"
 #include "randenc.h"
+#include "spy.h"
 #include "study.h"
 
 /* kernel includes */
@@ -59,7 +60,6 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
-#include <kernel/spy.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h> /* for volcanoes in emigration (needs a flag) */

@@ -452,6 +452,17 @@ cr_spell(variant var, char * buffer, const void * userdata)
   return 0;
 }
 
+static int
+cr_curse(variant var, char * buffer, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  const curse_type * ctype = (const curse_type*)var.v;
+  if (ctype!=NULL) {
+    sprintf(buffer, "\"%s\"", curse_name(ctype, report->locale));
+  } else strcpy(buffer, "\"\"");
+  return 0;
+}
+
 /*static int msgno; */
 
 #define MTMAXHASH 1021
@@ -1503,6 +1514,7 @@ creport_init(void)
   tsf_register("string", &cr_string);
   tsf_register("order", &cr_order);
   tsf_register("spell", &cr_spell);
+  tsf_register("curse", &cr_curse);
   tsf_register("int", &cr_int);
   tsf_register("unit", &cr_unit);
   tsf_register("region", &cr_region);

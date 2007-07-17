@@ -501,7 +501,7 @@ i_change(item ** pi, const item_type * itype, int delta)
     assert(i->number >= 0);
     if (i->number==0) {
       *pi = i->next;
-      free(i);
+      i_free(i);
       return NULL;
     }
   }
@@ -519,10 +519,20 @@ i_remove(item ** pi, item * i)
   return i;
 }
 
+static item * icache;
+static int icache_size;
+#define ICACHE_MAX 100
+
 void
-i_free(item * i) {
-  assert(!i->next);
-  free(i);
+i_free(item * i)
+{
+  if (icache_size>=ICACHE_MAX) {
+    free(i);
+  } else {
+    i->next = icache;
+    icache = i;
+    ++icache_size;
+  }
 }
 
 void
@@ -531,7 +541,7 @@ i_freeall(item **i) {
 
   while(*i) {
     in = (*i)->next;
-    free(*i);
+    i_free(*i);
     *i = in;
   }
 }
@@ -540,8 +550,16 @@ i_freeall(item **i) {
 item *
 i_new(const item_type * itype, int size)
 {
-  item * i = calloc(1, sizeof(item));
+  item * i;
+  if (icache_size>0) {
+    i = icache;
+    icache = i->next;
+    --icache_size;
+  } else {
+    i = malloc(sizeof(item));
+  }
   assert(itype);
+  i->next = NULL;
   i->type = itype;
   i->number = size;
   return i;

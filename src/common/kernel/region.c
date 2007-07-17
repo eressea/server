@@ -44,6 +44,8 @@
 #include <util/attrib.h>
 #include <util/lists.h>
 #include <util/resolve.h>
+#include <util/umlaut.h>
+#include <util/language.h>
 #include <util/rng.h>
 
 /* libc includes */
@@ -80,11 +82,11 @@ const short delta_y[MAXDIRECTIONS] =
 static const direction_t back[MAXDIRECTIONS] =
 {
   D_SOUTHEAST,
-    D_SOUTHWEST,
-    D_WEST,
-    D_NORTHWEST,
-    D_NORTHEAST,
-    D_EAST,
+  D_SOUTHWEST,
+  D_WEST,
+  D_NORTHWEST,
+  D_NORTHEAST,
+  D_EAST,
 };
 
 direction_t
@@ -176,6 +178,8 @@ chaoscounts(region * r, int fallen)
   if (a->data.i<=0) a_remove(&r->attribs, a);
 }
 
+
+
 /********************/
 /*   at_direction   */
 /********************/
@@ -202,21 +206,72 @@ a_agedirection(attrib *a)
   return d->duration;
 }
 
+typedef struct dir_lookup {
+  char * name;
+  const xmlChar * oldname;
+  struct dir_lookup * next;
+} dir_lookup;
+
+static dir_lookup * dir_name_lookup;
+
+void
+register_special_direction(const char * name)
+{
+  struct locale * lang;
+  char * str = strdup(name);
+
+  for (lang=locales;lang;lang=nextlocale(lang)) {
+    tnode * tokens = get_translations(lang, UT_SPECDIR);
+    const xmlChar * token = LOC(lang, name);
+
+    if (token) {
+      variant var;
+
+      var.v = str;
+      addtoken(tokens, token, var);
+
+      if (lang==default_locale) {
+        dir_lookup * dl = malloc(sizeof(dir_lookup));
+        dl->name = str;
+        dl->oldname = token;
+        dl->next = dir_name_lookup;
+        dir_name_lookup = dl;
+      }
+    } else {
+      log_error(("no translation for spec_direction '%s' in locale '%s'\n",
+                 name, locale_name(lang)));
+    }
+  }
+}
+
 static int
 a_readdirection(attrib *a, FILE *f)
 {
   char lbuf[16];
   spec_direction *d = (spec_direction *)(a->data.v);
+
   fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
   fscanf(f, "%15s ", lbuf);
   d->desc = strdup(lbuf);
   fscanf(f, "%15s ", lbuf);
-  d->keyword = strdup(lbuf);
   if (global.data_version<UNICODE_VERSION) {
+    dir_lookup * dl = dir_name_lookup;
+    
     cstring_i(d->desc);
-    cstring_i(d->keyword);
-    /* TODO: reverse lookup of desc and keyword or something? */
-    assert(!"not implemented");
+    cstring_i(lbuf);
+    for (;dl;dl=dl->next) {
+      if (strcmp(lbuf, (const char *)dl->oldname)==0) {
+        d->keyword=strdup(dl->name);
+        break;
+      }
+    }
+    if (dl==NULL) {
+      log_error(("unknown spec_direction '%s'\n", lbuf));
+      assert(!"not implemented");
+    }
+  }
+  else {
+    d->keyword = strdup(lbuf);
   }
   d->active = true;
   return AT_READ_OK;
@@ -228,7 +283,7 @@ a_writedirection(const attrib *a, FILE *f)
   spec_direction *d = (spec_direction *)(a->data.v);
 
   fprintf(f, "%d %d %d %s %s ", d->x, d->y, d->duration,
-      (const char *)d->desc, (const char *)d->keyword);
+          d->desc, d->keyword);
 }
 
 attrib_type at_direction = {
@@ -240,6 +295,29 @@ attrib_type at_direction = {
   a_readdirection
 };
 
+region *
+find_special_direction(const region *r, const xmlChar *token, const struct locale * lang)
+{
+  attrib *a;
+  spec_direction *d;
+
+  if (xstrlen(token)==0) return NULL;
+  for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
+    d = (spec_direction *)(a->data.v);
+
+    if (d->active) { 
+      tnode * tokens = get_translations(lang, UT_SPECDIR);
+      variant var;
+      if (findtoken(tokens, token, &var)==E_TOK_SUCCESS) {
+        if (strcmp((const char *)var.v, d->keyword)==0) {
+          return findregion(d->x, d->y);
+        }
+      }
+    }
+  }
+
+  return NULL;
+}
 
 attrib *
 create_special_direction(region *r, region * rt, int duration,

@@ -24,10 +24,11 @@
 #include "economy.h"
 
 /* gamecode includes */
+#include "archetype.h"
 #include "give.h"
 #include "laws.h"
 #include "randenc.h"
-#include "archetype.h"
+#include "spy.h"
 
 /* kernel includes */
 #include <kernel/alchemy.h>
@@ -49,7 +50,6 @@
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
-#include <kernel/spy.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

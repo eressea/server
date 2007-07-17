@@ -121,6 +121,18 @@
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
+  <spell name="blabbermouth" parameters="u" type="cerddor" ship="false" los="true" rank="5" level="4" index="115">
+    <function name="cast" value="cast_babbler"/>
+    <resource name="aura" amount="10" cost="fixed"/>
+    <!-- missing syntactical info: ONETARGET | UNITSPELL -->
+  </spell>
+
+  <spell name="readmind" parameters="u" type="illaun" ship="false" rank="5" level="7" index="114">
+    <function name="cast" value="cast_readmind"/>
+    <resource name="aura" amount="20" cost="fixed"/>
+    <!-- missing syntactical info: ONETARGET | UNITSPELL -->
+  </spell>
+
   <!-- tybied spells -->
   <spell name="create_roi" type="tybied" ship="true" rank="5" level="6" index="133">
     <function name="cast" value="lua_castspell"/>

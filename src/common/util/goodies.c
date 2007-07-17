@@ -39,22 +39,22 @@ intlist_init(void)
 int *
 intlist_add(int *i_p, int i)
 {
-	i_p[0]++;
-	i_p = realloc(i_p, (i_p[0]+1) * sizeof(int));
-
-	i_p[i_p[0]] = i;
-	return (i_p);
+  i_p[0]++;
+  i_p = realloc(i_p, (i_p[0]+1) * sizeof(int));
+  
+  i_p[i_p[0]] = i;
+  return (i_p);
 }
 
 int *
 intlist_find(int *i_p, int fi)
 {
-	int i;
-
-	for(i=1; i <= i_p[0]; i++) {
-		if(i_p[i] == fi) return (&i_p[i]);
-	}
-	return NULL;
+  int i;
+  
+  for(i=1; i <= i_p[0]; i++) {
+    if(i_p[i] == fi) return (&i_p[i]);
+  }
+  return NULL;
 }
 
 char *
@@ -70,7 +70,7 @@ set_string (char **s, const char *neu)
     *s = realloc(*s, strlen(neu) + 1);
     strcpy(*s, neu);
   }
-	return *s;
+  return *s;
 }
 
 boolean

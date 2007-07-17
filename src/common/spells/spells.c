@@ -51,7 +51,6 @@ extern void ct_register(const struct curse_type * ct);
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
-#include <kernel/spy.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -110,6 +109,15 @@ attrib_type at_wdwpyramid = {
 /* ----------------------------------------------------------------------- */
 
 static void
+report_spell(unit * mage, region * r, message * msg)
+{
+  r_addmessage(r, NULL, msg);
+  if (mage && mage->region!=r) {
+    add_message(&mage->faction->msgs, msg);
+  }
+}
+
+static void
 report_failure(unit * mage, struct order * ord) {
   /* Fehler: "Der Zauber schlägt fehl" */
   cmistake(mage, ord, 180, MSG_MAGIC);
@@ -130,7 +138,6 @@ magicanalyse_region(region *r, unit *mage, double force)
 {
   attrib *a;
   boolean found = false;
-  const struct locale * lang = mage->faction->locale;
 
   for (a=r->attribs;a;a=a->next) {
     curse * c = (curse*)a->data.v;
@@ -150,11 +157,11 @@ magicanalyse_region(region *r, unit *mage, double force)
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_region_noage", "mage region curse",
-          mage, r, LOC(lang, mkname("spell", c->type->cname))));
+          mage, r, c->type));
       } else {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_region_age", "mage region curse months",
-          mage, r, LOC(lang, mkname("spell", c->type->cname)), mon));
+          mage, r, c->type, mon));
       }
     } else {
       ADDMSG(&mage->faction->msgs, msg_message(
@@ -172,7 +179,6 @@ magicanalyse_unit(unit *u, unit *mage, double force)
 {
   attrib *a;
   boolean found = false;
-  const struct locale * lang = mage->faction->locale;
 
   for (a=u->attribs;a;a=a->next) {
     curse * c;
@@ -191,11 +197,11 @@ magicanalyse_unit(unit *u, unit *mage, double force)
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_unit_noage", "mage unit curse",
-          mage, u, LOC(lang, mkname("spell", c->type->cname))));
+          mage, u, c->type));
       }else{
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_unit_age", "mage unit curse months",
-          mage, u, LOC(lang, mkname("spell", c->type->cname)), mon));
+          mage, u, c->type, mon));
       }
     } else {
       ADDMSG(&mage->faction->msgs, msg_message(
@@ -213,7 +219,6 @@ magicanalyse_building(building *b, unit *mage, double force)
 {
   attrib *a;
   boolean found = false;
-  const struct locale * lang = mage->faction->locale;
 
   for (a=b->attribs;a;a=a->next) {
     curse * c;
@@ -233,11 +238,11 @@ magicanalyse_building(building *b, unit *mage, double force)
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_building_age", "mage building curse",
-          mage, b, LOC(lang, mkname("spell", c->type->cname))));
+          mage, b, c->type));
       }else{
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_building_age", "mage building curse months",
-          mage, b, LOC(lang, mkname("spell", c->type->cname)), mon));
+          mage, b, c->type, mon));
       }
     } else {
       ADDMSG(&mage->faction->msgs, msg_message(
@@ -256,7 +261,6 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
 {
   attrib *a;
   boolean found = false;
-  const struct locale * lang = mage->faction->locale;
 
   for (a=sh->attribs;a;a=a->next) {
     curse * c;
@@ -275,11 +279,11 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_ship_noage", "mage ship curse",
-          mage, sh, LOC(lang, mkname("spell", c->type->cname))));
+          mage, sh, c->type));
       }else{
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_ship_age", "mage ship curse months",
-          mage, sh, LOC(lang, mkname("spell", c->type->cname)), mon));
+          mage, sh, c->type, mon));
       }
     } else {
       ADDMSG(&mage->faction->msgs, msg_message(
@@ -795,6 +799,7 @@ sp_goodwinds(castorder *co)
   double power = co->force;
   int duration = cast_level+1;
   spellparameter *pa = co->par;
+  message * m;
   ship *sh;
   unit *u;
 
@@ -810,21 +815,19 @@ sp_goodwinds(castorder *co)
   /* melden, 1x pro Partei */
   freset(mage->faction, FFL_SELECT);
   for(u = r->units; u; u = u->next ) freset(u->faction, FFL_SELECT);
+  m = msg_message("wind_effect", "mage ship", mage, sh);
   for(u = r->units; u; u = u->next ) {
     if (u->ship != sh )    /* nur den Schiffsbesatzungen! */
       continue;
     if (!fval(u->faction, FFL_SELECT) ) {
-      message * m = msg_message("wind_effect", "mage ship", cansee(u->faction, r, mage, 0) ? mage:NULL, sh);
       r_addmessage(r, u->faction, m);
-      msg_release(m);
       fset(u->faction, FFL_SELECT);
     }
   }
   if (!fval(mage->faction, FFL_SELECT)) {
-    message * m = msg_message("wind_effect", "mage ship", mage, sh);
     r_addmessage(r, mage->faction, m);
-    msg_release(m);
   }
+  msg_release(m);
 
   return cast_level;
 }
@@ -916,8 +919,8 @@ sp_summonent(castorder *co)
     message * seen = msg_message("ent_effect", "mage amount", mage, ents);
     message * unseen = msg_message("ent_effect", "mage amount", NULL, ents);
     report_effect(r, mage, seen, unseen);
-    msg_release(seen);
     msg_release(unseen);
+    msg_release(seen);
   }
   return cast_level;
 }
@@ -952,14 +955,12 @@ sp_blessstonecircle(castorder *co)
   b = p->param[0]->data.b;
 
   if (b->type != bt_find("stonecircle")) {
-    sprintf(buf, "%s ist kein Steinkreis.", buildingname(b));
-    mistake(mage, co->order, buf, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_notstonecircle", "building", b));
     return 0;
   }
 
   if (b->size < b->type->maxsize) {
-    sprintf(buf, "%s muss vor der Weihe fertiggestellt sein.", buildingname(b));
-    mistake(mage, co->order, buf, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_notcomplete", "building", b));
     return 0;
   }
 
@@ -1978,7 +1979,8 @@ sp_holyground(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   curse * c;
-  message * msg = r_addmessage(r, mage->faction, msg_message("holyground", "mage", mage));
+  message * msg = msg_message("sp_holyground_effect", "mage region", mage, r);
+  report_spell(mage, r, msg);
   msg_release(msg);
 
   if (!ctype) ctype = ct_find("holyground");
@@ -2082,8 +2084,8 @@ sp_drought(castorder *co)
   }
 
   /* melden, 1x pro Partei */
-  msg = msg_message("drought_effect", "mage", mage);
-  r_addmessage(r, NULL, msg);
+  msg = msg_message("sp_drought_effect", "mage region", mage, r);
+  report_spell(mage, r, msg);
   msg_release(msg);
 
   /* Wenn schon Duerre herrscht, dann setzen wir nur den Power-Level
@@ -2665,8 +2667,10 @@ sp_summondragon(castorder *co)
         } else {
           a->data.v = co->rt;
         }
+#if 0
         sprintf(buf, "Kommt aus: %s, Will nach: %s", regionname(r2, u->faction), regionname(co->rt, u->faction));
         usetprivate(u, buf);
+#endif
       }
     }
   }
@@ -3449,12 +3453,8 @@ sp_chaossuction(castorder *co)
     return 0;
   }
 
-  create_special_direction(r, rt, 2,
-      "Ein Wirbel aus reinem Chaos zieht über die Region",
-      "Wirbel");
-  create_special_direction(rt, r, 2,
-      "Ein Wirbel aus reinem Chaos zieht über die Region",
-      "Wirbel");
+  create_special_direction(r, rt, 2, "vortex_desc", "vortex");
+  create_special_direction(rt, r, 2, "vortex_desc", "vortex");
   new_border(&bt_chaosgate, r, rt);
 
   add_message(&r->msgs, msg_message("chaosgate_effect_1", "mage", mage));
@@ -3656,7 +3656,8 @@ sp_auraleak(castorder *co)
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
-
+  message * msg;
+  
   lost = min(0.95, cast_level * 0.05);
 
   for(u = r->units; u; u = u->next) {
@@ -3669,81 +3670,15 @@ sp_auraleak(castorder *co)
     }
     freset(u->faction, FFL_SELECT);
   }
-  for (u = r->units; u; u = u->next) {
-    if (!fval(u->faction, FFL_SELECT)) {
-      fset(u->faction, FFL_SELECT);
-      if (cansee(u->faction, r, mage, 0)) {
-        sprintf(buf, "%s rief in %s einen Riss in dem Gefüge der Magie "
-            "hervor, der alle magische Kraft aus der Region riss.",
-            unitname(mage), regionname(r, u->faction));
-      } else {
-        sprintf(buf, "In %s entstand ein Riss in dem Gefüge der Magie, "
-            "der alle magische Kraft aus der Region riss.",
-            regionname(r, u->faction));
-      }
-      addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
-    }
-  }
+  msg = msg_message("cast_auraleak_effect", "mage region", mage, r);
+  r_addmessage(r, NULL, msg);
+  msg_release(msg);
   return cast_level;
 }
 
 /* ------------------------------------------------------------- */
 /* BARDE  - CERDDOR*/
 /* ------------------------------------------------------------- */
-/* Name:       Plappermaul
- * Stufe:      4
- * Gebiet:     Cerddor
- * Kategorie:  Einheit
- *
- * Wirkung:
- *  Einheit ausspionieren. Gibt auch Zauber und Kampfstatus aus.  Wirkt
- *  gegen Magieresistenz. Ist diese zu hoch, so wird der Zauber entdeckt
- *  (Meldung) und der Zauberer erhält nur die Talente, nicht die Werte
- *  der Einheit und auch keine Zauber.
- *
- * Flag:
- *  (UNITSPELL | ONETARGET | TESTCANSEE)
- */
-static int
-sp_babbler(castorder *co)
-{
-  unit *target;
-  region *r = co->rt;
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  spellparameter *pa = co->par;
-
-  /* wenn kein Ziel gefunden, Zauber abbrechen */
-  if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
-
-  target = pa->param[0]->data.u;
-
-  if (target->faction == mage->faction) {
-    /* Die Einheit ist eine der unsrigen */
-    cmistake(mage, co->order, 45, MSG_MAGIC);
-  }
-
-  /* Magieresistenz Unit */
-  if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
-    spy_message(5, mage, target);
-    sprintf(buf, "%s hat einen feuchtfröhlichen Abend in der Taverne "
-        "verbracht. Ausser einem fürchterlichen Brummschädel ist da auch "
-        "noch das dumme Gefühl %s seine ganze Lebensgeschichte "
-        "erzählt zu haben.", unitname(target),
-        cansee(target->faction, r, mage, 0)? "irgendjemanden":unitname(mage));
-    addmessage(r, target->faction, buf, MSG_EVENT, ML_WARN);
-
-  } else {
-    spy_message(100, mage, target);
-    sprintf(buf, "%s hat einen feuchtfröhlichen Abend in der Taverne "
-        "verbracht. Ausser einem fürchterlichen Brummschädel ist da auch "
-        "noch das dumme Gefühl die ganze Taverne mit seiner Lebensgeschichte "
-        "unterhalten zu haben.", unitname(target));
-    addmessage(r, target->faction, buf, MSG_EVENT, ML_WARN);
-  }
-  return cast_level;
-}
-
 /* ------------------------------------------------------------- */
 /* Name:       Magie analysieren - Gebäude, Schiffe, Region
  * Name:       Lied des Ortes analysieren
@@ -3898,9 +3833,11 @@ sp_charmingsong(castorder *co)
   /* Magieresistenz */
   if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)) {
     report_failure(mage, co->order);
+#if 0
     sprintf(buf, "%s fühlt sich einen Moment lang benommen und desorientiert.",
         unitname(target));
     addmessage(target->region, target->faction, buf, MSG_EVENT, ML_WARN);
+#endif
     return 0;
   }
 
@@ -3925,10 +3862,7 @@ sp_charmingsong(castorder *co)
    * steckt */
   fset(target, UFL_PARTEITARNUNG);
 
-  sprintf(buf, "%s gelingt es %s zu verzaubern. %s wird für etwa %d "
-      "Wochen unseren Befehlen gehorchen.", unitname(mage),
-      unitname(target), unitname(target), duration);
-  addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("charming_effect", "mage unit duration", mage, target, duration));
 
   return cast_level;
 }
@@ -4016,6 +3950,7 @@ sp_rallypeasantmob(castorder *co)
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
+  message * msg;
 
   for (u = r->units; u; u = un) {
     un = u->next;
@@ -4029,27 +3964,9 @@ sp_rallypeasantmob(castorder *co)
     }
   }
 
-  if (erfolg) {
-    for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
-    for(u = r->units; u; u = u->next ) {
-      if (!fval(u->faction, FFL_SELECT) ) {
-        fset(u->faction, FFL_SELECT);
-        sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
-            cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
-            regionname(r, u->faction));
-        addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
-      }
-    }
-    if (!fval(mage->faction, FFL_SELECT)) {
-      sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
-          unitname(mage), regionname(r, u->faction));
-      addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
-    }
-  } else {
-    sprintf(buf, "Der Bauernaufstand in %s hatte sich bereits verlaufen.",
-        regionname(r, mage->faction));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
-  }
+  msg = msg_message("cast_rally_effect", "mage region", mage, r);
+  r_addmessage(r, NULL, msg);
+  msg_release(msg);
   return erfolg;
 }
 
@@ -4084,6 +4001,7 @@ sp_raisepeasantmob(castorder *co)
   double force = co->force;
   int duration = (int)force+1;
   faction * monsters = findfaction(MONSTER_FACTION);
+  message * msg;
 
   anteil.i = 6 + (rng_int()%4);
 
@@ -4109,19 +4027,9 @@ sp_raisepeasantmob(castorder *co)
 
   create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, duration, anteil, 0);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
-  for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FFL_SELECT) ) {
-      fset(u->faction, FFL_SELECT);
-      ADDMSG(&u->faction->msgs, msg_message(
-        "sp_raisepeasantmob_effect", "mage region",
-        cansee(u->faction, r, mage, 0) ? mage : NULL, r ));
-    }
-  }
-  if (!fval(mage->faction, FFL_SELECT)) {
-      ADDMSG(&mage->faction->msgs, msg_message(
-        "sp_raisepeasantmob_effect", "mage region", mage, r));
-  }
+  msg = msg_message("sp_raisepeasantmob_effect", "mage region", mage, r);
+  report_spell(mage, r, msg);
+  msg_release(msg);
 
   return cast_level;
 }
@@ -4141,13 +4049,10 @@ static int
 sp_migranten(castorder *co)
 {
   unit *target;
-  order * ord;
-  int kontaktiert = 0;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
-  const spell *sp = co->sp;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4168,50 +4073,27 @@ sp_migranten(castorder *co)
 
   /* Keine Monstereinheiten */
   if (!playerrace(target->race)) {
-    sprintf(buf, "%s kann nicht auf Monster gezaubert werden.",
-      spell_name(sp, mage->faction->locale));
-    addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail_nomonsters", ""));
     return 0;
   }
   /* niemand mit teurem Talent */
   if (teure_talente(target)) {
-    sprintf(buf, "%s hat unaufkündbare Bindungen an seine alte Partei.",
-      unitname(target));
-    addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail_noexpensives", "target", target));
     return 0;
   }
   /* maximal Stufe Personen */
   if (target->number > cast_level
     || target->number > max_spellpoints(r, mage))
   {
-    sprintf(buf, "%s in %s: 'ZAUBER %s': So viele Personen übersteigen "
-      "meine Kräfte.", unitname(mage), regionname(mage->region, mage->faction),
-      spell_name(sp, mage->faction->locale));
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail_toomanytargets", ""));
+    return 0;
   }
 
   /* Kontakt prüfen (aus alter Teleportroutine übernommen) */
-  {
-    /* Nun kommt etwas reichlich krankes, um den
-    * KONTAKTIERE-Befehl des Ziels zu überprüfen. */
-
-    for (ord = target->orders; ord; ord = ord->next) {
-      if (get_keyword(ord) == K_CONTACT) {
-        int kontakt;
-
-        init_tokens(ord);
-        skip_token();
-        kontakt = getid();
-
-        if (kontakt == mage->no) {
-          kontaktiert = 1;
-          break;
-        }
-      }
-    }
-  }
-
-  if (kontaktiert == 0) {
+  if (!ucontact(target, mage)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
       "spellfail::contact", "target", target));
     return 0;
@@ -4220,8 +4102,8 @@ sp_migranten(castorder *co)
   set_order(&target->thisorder, NULL);
 
   /* Erfolg melden */
-  ADDMSG(&mage->faction->msgs, msg_message("sp_migranten",
-    "unit region command target", mage, mage->region, co->order, target));
+  ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_migranten",
+    "target", target));
 
   return target->number;
 }
@@ -4290,10 +4172,7 @@ sp_generous(castorder *co)
   message * msg[2] = { NULL, NULL };
 
   if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
-    sprintf(buf, "%s in %s: Die Stimmung in %s ist so schlecht, das "
-        "niemand auf den Zauber reagiert.", unitname(mage),
-        regionname(mage->region, mage->faction), regionname(r, mage->faction));
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_generous", ""));
     return 0;
   }
 
@@ -4438,11 +4317,9 @@ sp_pump(castorder *co)
   unit *u, *target;
   region *rt;
   boolean see = false;
-  region *r = co->rt;
   unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
-  const spell *sp = co->sp;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4466,15 +4343,10 @@ sp_pump(castorder *co)
   }
 
   if (see == false) {
-    sprintf(buf, "%s horcht %s über %s aus, aber %s wusste nichts zu "
-        "berichten.", unitname(mage), unitname(target), regionname(rt, mage->faction),
-        unitname(target));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_pump", "target tregion", target, rt));
     return cast_level/2;
   } else {
-    sprintf(buf, "%s horcht %s über %s aus.", unitname(mage),
-        unitname(target), regionname(rt, mage->faction));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+    ADDMSG(&mage->faction->msgs, msg_message("pump_effect", "mage unit tregion", mage, target, rt));
   }
 
   u = create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, (const xmlChar*)"spell/pump", NULL);
@@ -4502,14 +4374,12 @@ sp_pump(castorder *co)
 static int
 sp_seduce(castorder *co)
 {
+  item *items = NULL;
   unit *target;
-  int loot;
   item **itmp;
-  region *r = co->rt;
   unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
-  const spell *sp = co->sp;
   double force = co->force;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -4518,48 +4388,40 @@ sp_seduce(castorder *co)
   target = pa->param[0]->data.u; /* Zieleinheit */
 
   if (fval(target->race, RCF_UNDEAD)) {
-    sprintf(buf, "%s kann nicht auf Untote gezaubert werden.",
-      spell_name(sp, mage->faction->locale));
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail_noundead", ""));
     return 0;
   }
 
   /* Erfolgsmeldung */
-  sprintf(buf, "%s schenkt %s ", unitname(target), unitname(mage));
 
-  loot = min(cast_level * 1000, get_money(target) - (maintenance_cost(target)));
-  loot = max(loot, 0);
-  change_money(mage, loot);
-  change_money(target, -loot);
-
-  if (loot > 0) {
-    icat(loot);
-  } else {
-    scat("kein");
-  }
-  scat(" Silber");
   itmp=&target->items;
   while (*itmp) {
     item * itm = *itmp;
-    loot = itm->number/2;
-    if (itm->number % 2) {
-      loot += rng_int() % 2;
+    int loot;
+    if (itm->type==i_silver) {
+      loot = min(cast_level * 1000, get_money(target) - (maintenance_cost(target)));
+      loot = max(loot, 0);
+    } else {
+      loot = itm->number/2;
+      if (itm->number % 2) {
+        loot += rng_int() % 2;
+      }
+      if (loot > 0) {
+        loot = (int)min(loot, force * 5);
+      }
     }
-    if (loot > 0) {
-      loot = (int)min(loot, force * 5);
-      scat(", ");
-      icat(loot);
-      scat(" ");
-      scat(locale_string(mage->faction->locale, resourcename(itm->type->rtype, (loot==1)?0:GR_PLURAL)));
+    if (loot>0) {
       i_change(&mage->items, itm->type, loot);
-      i_change(&target->items, itm->type, -loot);
+      i_change(&items, itm->type, loot);
+      i_change(itmp, itm->type, -loot);
     }
     if (*itmp==itm) itmp=&itm->next;
   }
-  scat(".");
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
-  ADDMSG(&target->faction->msgs, msg_message("seduce_effect", "unit", target));
+  ADDMSG(&mage->faction->msgs, msg_message("seduce_effect_0", "mage unit items", mage, target, items));
+  i_freeall(&items);
+  ADDMSG(&target->faction->msgs, msg_message("seduce_effect_1", "unit", target));
 
   return cast_level;
 }
@@ -4585,13 +4447,12 @@ sp_calm_monster(castorder *co)
 {
   curse * c;
   unit *target;
-  region *r = co->rt;
   unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
   double force = co->force;
-  const spell *sp = co->sp;
   variant effect;
+  message * msg;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4599,9 +4460,8 @@ sp_calm_monster(castorder *co)
   target = pa->param[0]->data.u; /* Zieleinheit */
 
   if (fval(target->race, RCF_UNDEAD)) {
-    sprintf(buf, "%s kann nicht auf Untote gezaubert werden.",
-      spell_name(sp, mage->faction->locale));
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail_noundead", ""));
     return 0;
   }
 
@@ -4613,8 +4473,9 @@ sp_calm_monster(castorder *co)
     return 0;
   }
 
-  sprintf(buf, "%s besänftigt %s.", unitname(mage), unitname(target));
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  msg = msg_message("calm_effect", "mage unit", mage, target);
+  r_addmessage(mage->region, mage->faction, msg);
+  msg_release(msg);
   return cast_level;
 }
 
@@ -4638,10 +4499,10 @@ sp_headache(castorder *co)
   skill * smax = NULL;
   int i;
   unit *target;
-  region *r = co->rt;
   unit *mage = co->magician.u;
   spellparameter *pa = co->par;
   int cast_level = co->level;
+  message * msg;
 
   /* Macht alle nachfolgenden Zauber doppelt so teuer */
   countspells(mage, 1);
@@ -4665,14 +4526,13 @@ sp_headache(castorder *co)
   }
   set_order(&target->thisorder, NULL);
 
-  sprintf(buf, "%s verschafft %s einige feuchtfröhliche Stunden mit heftigen "
-    "Nachwirkungen.", unitname(mage), unitname(target));
-  addmessage(mage->region, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  msg = msg_message("hangover_effect_0", "mage unit", mage, target);
+  r_addmessage(mage->region, mage->faction, msg);
+  msg_release(msg);
 
-  sprintf(buf, "%s hat höllische Kopfschmerzen und kann sich an die "
-    "vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit "
-    "einer fröhlichen Feier in irgendeiner Taverne anfing...", unitname(target));
-  addmessage(r, target->faction, buf, MSG_EVENT, ML_WARN);
+  msg = msg_message("hangover_effect_1", "unit", target);
+  r_addmessage(target->region, target->faction, msg);
+  msg_release(msg);
 
   return cast_level;
 }
@@ -4694,23 +4554,22 @@ static int
 sp_raisepeasants(castorder *co)
 {
   int bauern;
-  unit *u, *u2;
+  unit *u2;
   attrib *a;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
+  message * msg;
 
   if (rpeasants(r) == 0) {
-    addmessage(r, mage->faction, "Hier gibt es keine Bauern.",
-        MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_nopeasants", ""));
     return 0;
   }
   bauern = (int)min(rpeasants(r), power*250);
   rsetpeasants(r, rpeasants(r) - bauern);
 
-  u2 = create_unit(r, mage->faction, bauern, new_race[RC_PEASANT], 0, "Wilder Bauernmob", mage);
-  set_string(&u2->name, "Erzürnte Bauern");
+  u2 = create_unit(r, mage->faction, bauern, new_race[RC_PEASANT], 0, LOC(mage->faction->locale, "furious_mob"), mage);
 
   fset(u2, UFL_LOCKED);
   fset(u2, UFL_PARTEITARNUNG);
@@ -4720,16 +4579,13 @@ sp_raisepeasants(castorder *co)
   a->data.ca[1] = 15; /* 15% */
   a_add(&u2->attribs, a);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
-  for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FFL_SELECT) ) {
-      fset(u->faction, FFL_SELECT);
-      sprintf(buf, "%s wiegelt %d Bauern auf.",
-          cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
-          u2->number);
-      addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
-    }
+  msg = msg_message("sp_raisepeasants_effect", "mage region amount", mage, r, u2->number);
+  r_addmessage(r, NULL, msg);
+  if (mage->region!=r) {
+    add_message(&mage->faction->msgs, msg);
   }
+  msg_release(msg);
+
   return cast_level;
 }
 
@@ -4747,24 +4603,21 @@ sp_raisepeasants(castorder *co)
 static int
 sp_depression(castorder *co)
 {
-  unit *u;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
+  message * msg;
 
-  create_curse(mage,&r->attribs, ct_find("depression"), force, duration, zero_effect, 0);
+  create_curse(mage, &r->attribs, ct_find("depression"), force, duration, zero_effect, 0);
 
-  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
-  for (u = r->units; u; u = u->next ) {
-    if (!fval(u->faction, FFL_SELECT) ) {
-      fset(u->faction, FFL_SELECT);
-      sprintf(buf, "%s sorgt für Trübsal unter den Bauern.",
-          cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-      addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
-    }
+  msg = msg_message("sp_depression_effect", "mage region", mage, r);
+  r_addmessage(r, NULL, msg);
+  if (mage->region!=r) {
+    add_message(&mage->faction->msgs, msg);
   }
+  msg_release(msg);
   return cast_level;
 }
 
@@ -4913,6 +4766,7 @@ sp_icastle(castorder *co)
   double power = co->force;
   spellparameter *pa = co->par;
   icastle_data * data;
+  const xmlChar * bname;
 
   if ((type=findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
     type = bt_find("castle");
@@ -4928,8 +4782,14 @@ sp_icastle(castorder *co)
   } else {
     b->size = type->maxsize;
   }
-  sprintf(buf, "%s %s", LOC(mage->faction->locale, buildingtype(type, b, 0)), buildingid(b));
-  set_string(&b->name, buf);
+
+  if (type->name==NULL) {
+    bname = LOC(mage->faction->locale, type->_name);
+  } else {
+    bname = LOC(mage->faction->locale, buildingtype(type, b, 0));
+  }
+  free(b->name);
+  b->name = xstrdup(bname);
 
   /* TODO: Auf timeout und action_destroy umstellen */
   a = a_add(&b->attribs, a_new(&at_icastle));
@@ -5003,51 +4863,6 @@ sp_illusionary_shapeshift(castorder *co)
   u->irace = rc;
 
   ADDMSG(&mage->faction->msgs, msg_message("shapeshift_effect", "mage target race", mage, u, rc));
-
-  return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Name:     Traumdeuten
- * Stufe:   7
- * Kategorie:      Einheit
- *
- * Wirkung:
- *  Wirkt gegen Magieresistenz.  Spioniert die Einheit aus. Gibt alle
- *  Gegenstände, Talente mit Stufe, Zauber und Kampfstatus an.
- *
- *  Magieresistenz hier prüfen, wegen Fehlermeldung
- *
- * Flag:
- * (UNITSPELL | ONETARGET)
- */
-int
-sp_readmind(castorder *co)
-{
-  unit *target;
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  spellparameter *pa = co->par;
-
-  /* wenn kein Ziel gefunden, Zauber abbrechen */
-  if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
-
-  target = pa->param[0]->data.u;
-
-  if (target->faction == mage->faction) {
-    /* Die Einheit ist eine der unsrigen */
-    cmistake(mage, co->order, 45, MSG_MAGIC);
-  }
-
-  /* Magieresistenz Unit */
-  if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
-    report_failure(mage, co->order);
-    /* "Fühlt sich beobachtet"*/
-    ADDMSG(&target->faction->msgs, msg_message(
-                "stealdetect", "unit", target));
-    return 0;
-  }
-  spy_message(2, mage, target);
 
   return cast_level;
 }
@@ -5702,7 +5517,7 @@ sp_pullastral(castorder *co)
       break;
     default:
       sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
-        "nur in der astralen  Welt.", unitname(mage),
+        "nur in der astralen Welt.", unitname(mage),
         regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
       addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
       return 0;
@@ -6812,14 +6627,14 @@ sp_q_antimagie(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
-  char *ts;
+  const xmlChar *ts = NULL;
 
   obj = pa->param[0]->typ;
 
   switch(obj) {
     case SPP_REGION:
       ap = &r->attribs;
-      set_string(&ts, regionname(r, mage->faction));
+      ts = regionname(r, mage->faction);
       break;
 
     case SPP_TEMP:
@@ -6827,21 +6642,21 @@ sp_q_antimagie(castorder *co)
     {
       unit *u = pa->param[0]->data.u;
       ap = &u->attribs;
-      set_string(&ts, unitid(u));
+      ts = (const xmlChar *) unitid(u);
       break;
     }
     case SPP_BUILDING:
     {
       building *b = pa->param[0]->data.b;
       ap = &b->attribs;
-      set_string(&ts, buildingid(b));
+      ts =(const xmlChar *) buildingid(b);
       break;
     }
     case SPP_SHIP:
     {
       ship *sh = pa->param[0]->data.sh;
       ap = &sh->attribs;
-      set_string(&ts, shipid(sh));
+      ts =(const xmlChar *) shipid(sh);
       break;
     }
     default:
@@ -6855,13 +6670,12 @@ sp_q_antimagie(castorder *co)
   if (succ) {
     ADDMSG(&mage->faction->msgs, msg_message(
       "destroy_magic_effect", "unit region command succ target",
-      mage, mage->region, co->order, succ, strdup(ts)));
+      mage, mage->region, co->order, succ, ts));
   } else {
     ADDMSG(&mage->faction->msgs, msg_message(
       "destroy_magic_noeffect", "unit region command",
       mage, mage->region, co->order));
   }
-
   return max(succ, 1);
 }
 
@@ -6894,7 +6708,7 @@ sp_break_curse(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
-  char *ts = NULL;
+  const xmlChar *ts = NULL;
 
   if (pa->length < 2) {
     /* Das Zielobjekt wurde vergessen */
@@ -6903,7 +6717,7 @@ sp_break_curse(castorder *co)
 
   obj = pa->param[0]->typ;
 
-  c = findcurse(atoi36(pa->param[1]->data.xs));
+  c = findcurse(atoi36(pa->param[1]->data.s));
   if (!c) {
     /* Es wurde kein Ziel gefunden */
     ADDMSG(&mage->faction->msgs, msg_message(
@@ -6913,7 +6727,7 @@ sp_break_curse(castorder *co)
     switch(obj) {
     case SPP_REGION:
       ap = &r->attribs;
-      set_string(&ts, regionname(r, mage->faction));
+      ts = regionname(r, mage->faction);
       break;
 
     case SPP_TEMP:
@@ -6921,21 +6735,21 @@ sp_break_curse(castorder *co)
     {
       unit *u = pa->param[0]->data.u;
       ap = &u->attribs;
-      set_string(&ts, unitid(u));
+      ts = (const xmlChar *)unitid(u);
       break;
     }
     case SPP_BUILDING:
     {
       building *b = pa->param[0]->data.b;
       ap = &b->attribs;
-      set_string(&ts, buildingid(b));
+      ts = (const xmlChar *)buildingid(b);
       break;
     }
     case SPP_SHIP:
     {
       ship *sh = pa->param[0]->data.sh;
       ap = &sh->attribs;
-      set_string(&ts, shipid(sh));
+      ts = (const xmlChar *)shipid(sh);
       break;
     }
     default:
@@ -6961,15 +6775,14 @@ sp_break_curse(castorder *co)
 
       ADDMSG(&mage->faction->msgs, msg_message(
         "destroy_curse_effect", "unit region command id target",
-        mage, mage->region, co->order, strdup(pa->param[1]->data.xs),
-        strdup(ts)));
+        mage, mage->region, co->order, pa->param[1]->data.xs,
+        ts));
     } else {
       ADDMSG(&mage->faction->msgs, msg_message(
         "destroy_curse_noeffect", "unit region command",
         mage, mage->region, co->order));
     }
   }
-  if (ts != NULL) free(ts);
 
   return cast_level;
 }
@@ -7063,7 +6876,7 @@ sp_wdwpyramid(castorder *co)
 typedef struct spelldata {
   spellid_t id;
   const char *sname;
-  const char *info;
+  const xmlChar *info;
   const char *syntax;
   const char *parameter;
   magic_t magietyp;
@@ -7503,11 +7316,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_fog_of_confusion, NULL
   },
   {
-    SPL_MAELSTROM, "maelstrom",
-    "Dieses Ritual beschört einen großen Wasserelementar aus den "
-    "Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen "
-    "Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren, "
-    "schwer beschädigen kann.", NULL, NULL,
+    SPL_MAELSTROM, "maelstrom", NULL, NULL, NULL,
     M_DRUIDE,
     (OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
     5, 15,
@@ -7521,12 +7330,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_maelstrom, NULL
   },
   {
-    SPL_MALLORN, "magic_roots",
-    "Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner Kraft "
-    "dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird "
-    "das Gleichgewicht der Natur in der Region für immer verändert, und in "
-    "Zukunft werden nur noch die anspruchsvollen, aber kräftigen "
-    "Mallorngewächse in der Region gedeihen.", NULL, NULL,
+    SPL_MALLORN, "magic_roots", NULL, NULL, NULL,
     M_DRUIDE,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE),
     5, 16,
@@ -7540,13 +7344,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_mallorn, NULL
   },
   {
-    SPL_GREAT_DROUGHT, "great_drought",
-    "Dieses mächtige Ritual öffnet ein Tor in die Elementarebene der "
-    "Hitze. Eine grosse Dürre kommt über das Land. Bauern, Tiere und "
-    "Pflanzen der Region kämpfen um das nackte Überleben, aber eine "
-    "solche Dürre überlebt wohl nur die Hälfte aller Lebewesen. "
-    "Der Landstrich kann über Jahre hinaus von den Folgen einer "
-    "solchen Dürre betroffen sein.", NULL, NULL,
+    SPL_GREAT_DROUGHT, "great_drought", NULL, NULL, NULL,
     M_DRUIDE,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE),
     5, 17,
@@ -8036,11 +7834,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_sleep, NULL
   },
   {
-    SPL_WISPS, "wisps",
-    "Der Zauberer spricht eine Beschwörung über einen Teil der Region, "
-    "und in der Folgewoche entstehen dort Irrlichter. "
-    "Wer durch diese Nebel wandert, wird von Visionen geplagt und "
-    "in die Irre geleitet.",
+    SPL_WISPS, "wisps", NULL,
     "ZAUBERE [REGION x y] [STUFE n] \'Irrlichter\' <Richtung>",
     "c",
     M_TRAUM, (SPELLLEVEL | FARCASTING), 5, 7,
@@ -8052,19 +7846,6 @@ static spelldata spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_wisps, NULL
-  },
-  {
-    SPL_READMIND, "readmind", NULL, NULL,
-    "u",
-    M_TRAUM, (UNITSPELL | ONETARGET), 5, 7,
-    {
-      { "aura", 20, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_readmind, NULL
   },
   {
     SPL_GOODDREAMS, "gooddreams", NULL, NULL, NULL,
@@ -8112,16 +7893,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_CLONECOPY, "clone",
-    "Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod "
-    "bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen "
-    "Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem "
-    "Wasser des Lebens. "
-    "Anschließend transferiert er in einem aufwändigen Ritual einen Teil "
-    "seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den "
-    "Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. "
-    "Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele "
-    "nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.", NULL, NULL,
+    SPL_CLONECOPY, "clone", NULL, NULL, NULL,
     M_TRAUM, (NOTFAMILIARCAST), 5, 9,
     {
       { "aura", 100, SPC_FIX },
@@ -8133,10 +7905,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_clonecopy, NULL
   },
   {
-    SPL_BADDREAMS, "bad_dreams",
-    "Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten "
-    "Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie "
-    "vorübergehend einen Teil ihrer Erinnerungen verlieren.", NULL, NULL,
+    SPL_BADDREAMS, "bad_dreams", NULL, NULL, NULL,
     M_TRAUM,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
     {
@@ -8292,18 +8061,6 @@ static spelldata spelldaten[] =
     (spell_f)sp_chaosrow, NULL
   },
   {
-    SPL_BABBLER, "blabbermouth", NULL, NULL, "u",
-    M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 4,
-    {
-      { "aura", 10, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_babbler, NULL
-  },
-  {
     SPL_HERO, "heroic_song", NULL, NULL, NULL,
     M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
     {
@@ -8355,11 +8112,7 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_fumbleshield, NULL
   },
-  { SPL_CALM_MONSTER, "calm_monster",
-    "Dieser einschmeichelnde Gesang kann fast jedes intelligente Monster "
-    "zähmen. Es wird von Angriffen auf den Magier absehen und auch seine "
-    "Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es "
-    "wird dennoch ein unberechenbares Wesen bleiben.", NULL,
+  { SPL_CALM_MONSTER, "calm_monster", NULL, NULL,
     "u",
     M_BARDE,
     (UNITSPELL | ONSHIPCAST | ONETARGET | TESTRESISTANCE | TESTCANSEE),
@@ -8373,11 +8126,7 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_calm_monster, NULL
   },
-  { SPL_SEDUCE, "seduction",
-    "Mit diesem Lied kann eine Einheit derartig betört werden, so dass "
-    "sie dem Barden den größten Teil ihres Bargelds und ihres Besitzes "
-    "schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben "
-    "braucht.", NULL,
+  { SPL_SEDUCE, "seduction", NULL, NULL,
     "u",
     M_BARDE,
     (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
@@ -8392,35 +8141,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_seduce, NULL
   },
   {
-    SPL_HEADACHE, "headache",
-    "Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: "
-    "'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen "
-    "entstanden, doch es kann genausogut in jedem andern verrufenen "
-    "Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass "
-    "schlechtesten Weines, je billiger und ungesunder, desto "
-    "wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure "
-    "Essenz zu destillieren, die weitaus anspruchsvoller als das einfache "
-    "Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden "
-    "und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie "
-    "es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des "
-    "Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit "
-    "einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht "
-    "ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist "
-    "die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht "
-    "verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränkt "
-    "des Opfers geträufelt werden. Ihr Meister der Betöhrung und "
-    "Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis "
-    "stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu "
-    "kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr "
-    "lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht "
-    "die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier "
-    "innewohnt, sondern das der Trunkenheit so sicher ein gar "
-    "fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die "
-    "Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit "
-    "einige Tage bis hin zu den Studien zweier Wochen vergessen haben. "
-    "Noch ein Wort der Warnung: Dieses ist sehr aufwendig, und so Ihr "
-    "noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch "
-    "schwerer fallen.'", NULL,
+    SPL_HEADACHE, "headache", NULL, NULL,
     "u",
     M_BARDE,
     (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
@@ -8434,11 +8155,7 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_headache, NULL
   },
-  { SPL_PUMP, "sound_out",
-    "Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen, "
-    "was sie über die gefragte Region weiß. Ist in der Region niemand "
-    "ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das "
-    "erzählen, was sie selber sehen könnte.",
+  { SPL_PUMP, "sound_out", NULL,
     "ZAUBERE \'Aushorchen\' <Einheit-Nr> <Zielregion-X> <Zielregion-Y>",
     "ur",
     M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 7,
@@ -8452,14 +8169,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_pump, NULL
   },
   {
-    SPL_BLOODTHIRST, "bloodthirst",
-    "Wie viele magischen Gesänge, so entstammt auch dieser den altem "
-    "Wissen der Katzen, die schon immer um die machtvolle Wirkung der "
-    "Stimme wussten. Mit diesem Lied wird die Stimmung der Krieger "
-    "aufgepeitscht, sie gar in wilde Raserrei und Blutrausch versetzt. "
-    "Ungeachtet eigener Schmerzen werden sie kämpfen bis zum "
-    "Tode und niemals fliehen. Während ihre Attacke verstärkt ist "
-    "achten sie kaum auf sich selbst.", NULL, NULL,
+    SPL_BLOODTHIRST, "bloodthirst", NULL, NULL, NULL,
     M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 7,
     {
       { "aura", 5, SPC_LEVEL },
@@ -8471,10 +8181,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_berserk, NULL
   },
   {
-    SPL_FRIGHTEN, "frighten",
-    "Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt "
-    "so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen "
-    "und Furcht ihren Schildarm lähmen.", NULL, NULL,
+    SPL_FRIGHTEN, "frighten", NULL, NULL, NULL,
     M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
     {
       { "aura", 5, SPC_LEVEL },
@@ -8486,12 +8193,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_frighten, NULL
   },
   {
-    SPL_OBJ_ANALYSESONG, "analyse_object",
-    "Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen "
-    "ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören. "
-    "Und so, wie wie aus dem Lebenslied einer Person erkannt werden kann, "
-    "ob diese unter einem Zauber steht, so ist dies auch bei Burgen, "
-    "Schiffen oder Regionen möglich.",
+    SPL_OBJ_ANALYSESONG, "analyse_object", NULL,
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGION\n"
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBÄUDE <Gebäude-nr>\n"
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' SCHIFF <Schiff-nr>",
@@ -8507,10 +8209,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_analysesong_obj, NULL
   },
   {
-    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic",
-    "Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es. "
-    "Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu "
-    "verstärken und die Veränderungen aus dem Lied zu tilgen.",
+    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic", NULL,
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' REGION\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' GEBÄUDE <Gebäude-Nr>\n"
@@ -8529,18 +8228,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_MIGRANT, "migration",
-    "Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die "
-    "eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig "
-    "und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er "
-    "durch KONTAKTIEREn des Magiers. Auch wird er die Woche über "
-    "ausschliesslich mit Vorbereitungen auf das Ritual beschäftigt sein. "
-    "Das Ritual wird fehlschlagen, wenn er zu stark an seine alte Partei "
-    "gebunden ist, dieser etwa Dienst für seine teuere Ausbildung "
-    "schuldet. Der das Ritual leitende Magier muss für die permanente "
-    "Bindung des Aufnahmewilligen an seine Partei naturgemäß auch "
-    "permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann "
-    "er eine Person aufnehmen.", NULL,
+    SPL_MIGRANT, "migration", NULL, NULL,
     "u",
     M_BARDE, (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE), 5, 9,
     {
@@ -8553,10 +8241,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_migranten, NULL
   },
   {
-    SPL_CERDDOR_FAMILIAR, "summon_familiar",
-    "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
-    "ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-    "Magier anschließen wird.", NULL, NULL,
+    SPL_CERDDOR_FAMILIAR, "summon_familiar", NULL, NULL, NULL,
     M_BARDE, (NOTFAMILIARCAST), 5, 9,
     {
       { "aura", 100, SPC_FIX },
@@ -8568,13 +8253,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_RAISEPEASANTS, "raise_mob",
-    "Mit Hilfe dieses magischen Gesangs überzeugt der Magier die Bauern "
-    "der Region, sich ihm anzuschließen. Die Bauern werden ihre Heimat jedoch "
-    "nicht verlassen, und keine ihrer Besitztümer fortgeben. Jede Woche "
-    "werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder "
-    "zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der "
-    "Kraft seines Gesangs ab.", NULL, NULL,
+    SPL_RAISEPEASANTS, "raise_mob", NULL, NULL, NULL,
     M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
     {
       { "aura", 4, SPC_LEVEL },
@@ -8587,15 +8266,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SONG_RESISTMAGIC, "song_resist_magic",
-    "Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der "
-    "Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang "
-    "überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem "
-    "Gedächnis der Region entschwunden ist, ist von dem Geschick des Barden "
-    "abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen "
-    "Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen "
-    "eigenem Volk, einen einmaligen Bonus von 15% "
-    "auf die natürliche Widerstandskraft gegen eine Verzauberung "
-    "verleihen.", NULL, NULL,
+    NULL, NULL, NULL,
     M_BARDE,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     2, 10,
@@ -8609,10 +8280,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_song_resistmagic, NULL
   },
   {
-    SPL_DEPRESSION, "melancholy",
-    "Mit diesem Gesang verbreitet der Barde eine melancholische, traurige "
-    "Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre "
-    "Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen.", NULL, NULL,
+    SPL_DEPRESSION, "melancholy", NULL, NULL, NULL,
     M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
     {
       { "aura", 40, SPC_FIX },
@@ -8624,11 +8292,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_depression, NULL
   },
   {
-    SPL_SONG_SUSCEPTMAGIC, "song_suscept_magic",
-    "Dieses Lied, das in die magische Essenz der Region gewoben wird, "
-    "schwächt die natürliche Widerstandskraft gegen eine "
-    "Verzauberung einmalig um 15%. Nur die Verbündeten des Barden "
-    "(HELFE BEWACHE) sind gegen die Wirkung des Gesangs gefeit.", NULL, NULL,
+    SPL_SONG_SUSCEPTMAGIC, "song_suscept_magic", NULL, NULL, NULL,
     M_BARDE,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     2, 12,
@@ -8642,10 +8306,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_song_susceptmagic, NULL
   },
   {
-    SPL_SONG_OF_PEACE, "song_of_peace",
-    "Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der "
-    "ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben. "
-    "Die Wirkung kann etliche Wochen andauern", NULL, NULL,
+    SPL_SONG_OF_PEACE, "song_of_peace", NULL, NULL, NULL,
     M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 12,
     {
       { "aura", 20, SPC_LEVEL },
@@ -8657,11 +8318,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_song_of_peace, NULL
   },
   {
-    SPL_SONG_OF_ENSLAVE, "song_of_slavery",
-    "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und "
-    "unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer "
-    "sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden "
-    "zugehörig fühlen.", NULL,
+    SPL_SONG_OF_ENSLAVE, "song_of_slavery", NULL, NULL,
     "u",
     M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 13,
     {
@@ -8674,15 +8331,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_charmingsong, NULL
   },
   {
-    SPL_BIGRECRUIT, "big_recruit",
-    "Aus 'Wanderungen' von Firudin dem Weisen: "
-    "'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der "
-    "nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof "
-    "bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf "
-    "war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die "
-    "gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt "
-    "und verbannt. Nur zögerlich war er bereit mir das Geheimniss seiner "
-    "Überzeugungskraft zu lehren.'", NULL, NULL,
+    SPL_BIGRECRUIT, "big_recruit", NULL, NULL, NULL,
     M_BARDE, (SPELLLEVEL), 5, 14,
     {
       { "aura", 20, SPC_LEVEL },
@@ -8694,10 +8343,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_bigrecruit, NULL
   },
   {
-    SPL_RALLYPEASANTMOB, "calm_riot",
-    "Mit Hilfe dieses magischen Gesangs kann der Magier eine Region in "
-    "Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen "
-    "und wieder auf ihre Felder zurückkehren.", NULL, NULL,
+    SPL_RALLYPEASANTMOB, "calm_riot", NULL, NULL, NULL,
     M_BARDE, (FARCASTING), 5, 15,
     {
       { "aura", 30, SPC_FIX },
@@ -8710,11 +8356,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_RAISEPEASANTMOB, "incite_riot",
-    "Mit Hilfe dieses magischen Gesangs versetzt der Magier eine ganze "
-    "Region in Aufruhr. Rebellierende Bauernhorden machen jedes Besteuern "
-    "unmöglich, kaum jemand wird mehr für Gaukeleien Geld spenden und "
-    "es können keine neuen Leute angeworben werden. Nach einigen Wochen "
-    "beruhigt sich der Mob wieder.", NULL, NULL,
+        NULL, NULL, NULL,
     M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 16,
     {
       { "aura", 40, SPC_FIX },
@@ -8771,8 +8413,7 @@ static spelldata spelldaten[] =
 #ifdef SHOWASTRAL_NOT_BORKED
   {
     SPL_SHOWASTRAL, "show_astral",
-    "Der Magier kann kurzzeitig in die Astralebene blicken und erfährt "
-    "so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen.", NULL, NULL,
+        NULL, NULL, NULL,
     M_ASTRAL, (SPELLLEVEL), 5, 2,
     {
       { "aura", 1, SPC_LEVEL },
@@ -8823,7 +8464,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_enterastral, NULL
   },
   {
-    SPL_LEAVEASTRAL, "leaveastral", 0,
+    SPL_LEAVEASTRAL, "leaveastral", NULL,
     "ZAUBER [STUFE n] \'Astraler Ausgang\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
     "[<Einheit-Nr> ...]",
     "ru+",
@@ -8838,11 +8479,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_leaveastral, NULL
   },
   {
-    SPL_TRANSFERAURA_ASTRAL, "auratransfer",
-    "Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis "
-    "2:1 auf einen anderen Magier des gleichen Magiegebietes oder im "
-    "Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes "
-    "übertragen.",
+    SPL_TRANSFERAURA_ASTRAL, "auratransfer", NULL,
     "ZAUBERE \'Auratransfer\' <Einheit-Nr> <investierte Aura>",
     "ui",
     M_ASTRAL, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
@@ -8987,15 +8624,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_eternizewall, NULL
   },
   {
-    SPL_SCHILDRUNEN, "protective_runes",
-    "Zeichnet man diese Runen auf die Wände eines Gebäudes oder auf die "
-    "Planken eines Schiffes, so wird es schwerer durch Zauber zu "
-    "beeinflussen sein. Jedes Ritual erhöht die Widerstandskraft des "
-    "Gebäudes oder Schiffes gegen Verzauberung um 20%. "
-    "Werden mehrere Schutzzauber übereinander gelegt, so addiert "
-    "sich ihre Wirkung, doch ein hundertprozentiger Schutz läßt sich so "
-    "nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach "
-    "Talent des Magiers aber auch viel länger.",
+    SPL_SCHILDRUNEN, "protective_runes", NULL,
     "ZAUBERE \'Runen des Schutzes\' GEBÄUDE <Gebäude-Nr> | "
     "SCHIFF <Schiff-Nr>]",
     "kc",
@@ -9012,12 +8641,7 @@ static spelldata spelldaten[] =
 
   {
     SPL_REDUCESHIELD, "fish_shield",
-    "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der "
-    "eigenen Truppen vorzuspiegeln, so wie der Fisch im Wasser auch nicht "
-    "dort ist wo er zu sein scheint. Von jedem Treffer kann so die Hälfte "
-    "des Schadens unschädlich abgeleitet werden. Doch hält der Schild nur "
-    "einige Hundert Schwerthiebe aus, danach wird er sich auflösen. "
-    "Je stärker der Magier, desto mehr Schaden hält der Schild aus.", NULL, NULL,
+    NULL, NULL, NULL,
     M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 8,
     {
       { "aura", 4, SPC_LEVEL },
@@ -9030,9 +8654,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SPEED, "combat_speed",
-    "Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite "
-    "so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal "
-    "angreifen können.", NULL, NULL,
+    NULL, NULL, NULL,
     M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 5, 9,
     {
       { "aura", 5, SPC_LEVEL },
@@ -9045,9 +8667,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_VIEWREALITY, "view_reality",
-    "Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die "
-    "materielle Ebene blicken und die Regionen und Einheiten genau "
-    "erkennen.", NULL, NULL,
+    NULL, NULL, NULL,
     M_ASTRAL, (0), 5, 10,
     {
       { "aura", 40, SPC_FIX },
@@ -9073,10 +8693,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ARMORSHIELD, "armor_shield",
-    "Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
-    "einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
-    "reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann "
-    "im Kampf auflösen wird.", NULL, NULL,
+        NULL, NULL, NULL,
     M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
     {
       { "aura", 4, SPC_LEVEL },
@@ -9089,9 +8706,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TYBIED_FAMILIAR, "summon_familiar",
-    "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
-    "ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-    "Magier anschließen wird.", NULL, NULL,
+        NULL, NULL, NULL,
     M_ASTRAL, (NOTFAMILIARCAST), 5, 12,
     {
       { "aura", 100, SPC_FIX },
@@ -9104,14 +8719,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MOVECASTLE, "living_rock",
-    "Dieses kräftezehrende Ritual beschwört mit Hilfe einer Kugel aus "
-    "konzentriertem Laen einen gewaltigen Erdelementar und bannt ihn "
-    "in ein Gebäude. Dem Elementar kann dann befohlen werden, das "
-    "Gebäude mitsamt aller Bewohner in eine Nachbarregion zu tragen. "
-    "Die Stärke des beschworenen Elementars hängt vom Talent des "
-    "Magiers ab: Der Elementar kann maximal [Stufe-12]*250 Größeneinheiten "
-    "große Gebäude versetzen. Das Gebäude wird diese Prozedur nicht "
-    "unbeschädigt überstehen.",
+        NULL,
     "ZAUBER [STUFE n] \'Belebtes Gestein\' <Burg-Nr> <Richtung>",
     "bc",
     M_ASTRAL,
@@ -9128,11 +8736,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DISRUPTASTRAL, "astral_disruption",
-    "Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb "
-    "eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, "
-    "die dem Zauber nicht wiederstehen können, aus der astralen Ebene "
-    "geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist "
-    "für Stufe/3 Wochen gestört.", NULL, NULL,
+        NULL, NULL, NULL,
     M_ASTRAL, (REGIONSPELL), 4, 14,
     {
       { "aura", 140, SPC_FIX },
@@ -9174,12 +8778,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_BECOMEWYRM, "wyrm_transformation",
-    "Mit Hilfe dieses Zaubers kann sich der Magier permanent in einen "
-    "mächtigen Wyrm verwandeln. Der Magier behält seine Talente und "
-    "Möglichkeiten, bekommt jedoch die Kampf- und Bewegungseigenschaften "
-    "eines Wyrms. Der Odem des Wyrms wird sich mit steigendem Magie-Talent "
-    "verbessern. Der Zauber ist sehr kraftraubend und der Wyrm wird einige "
-    "Zeit brauchen, um sich zu erholen.", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, 0, 5, 1,
     {
       { "aura", 1, SPC_FIX },
@@ -9192,7 +8791,7 @@ static spelldata spelldaten[] =
   },
   /* Monstersprüche */
   { SPL_FIREDRAGONODEM, "fiery_dragonbreath",
-    "Verbrennt die Feinde", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 3,
     {
       { "aura", 1, SPC_FIX },
@@ -9204,7 +8803,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_dragonodem, NULL
   },
   { SPL_DRAGONODEM, "icy_dragonbreath",
-    "Tötet die Feinde", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 6,
     {
       { "aura", 2, SPC_FIX },
@@ -9216,7 +8815,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_dragonodem, NULL
   },
   { SPL_WYRMODEM, "powerful_dragonbreath",
-    "Verbrennt die Feinde", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
       { "aura", 3, SPC_FIX },
@@ -9228,7 +8827,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_dragonodem, NULL
   },
   { SPL_DRAINODEM, "drain_skills",
-    "Entzieht Talentstufen und macht Schaden wie Großer Odem", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
       { "aura", 4, SPC_FIX },
@@ -9241,7 +8840,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_AURA_OF_FEAR, "aura_of_fear",
-    "Panik", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
       { "aura", 1, SPC_LEVEL },
@@ -9254,7 +8853,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SHADOWCALL, "shadowcall",
-    "Ruft Schattenwesen.", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (PRECOMBATSPELL), 5, 12,
     {
       { "aura", 2, SPC_LEVEL },
@@ -9267,7 +8866,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_IMMOLATION, "immolation",
-    "Verletzt alle Gegner.", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
       { "aura", 2, SPC_LEVEL },
@@ -9279,7 +8878,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_immolation, NULL
   },
   { SPL_FIREODEM, "firestorm",
-    "Tötet die Feinde", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
       { "aura", 2, SPC_FIX },
@@ -9291,7 +8890,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_immolation, NULL
   },
   { SPL_ICEODEM, "coldfront",
-    "Tötet die Feinde", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
       { "aura", 2, SPC_FIX },
@@ -9303,7 +8902,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_immolation, NULL
   },
   { SPL_ACIDODEM, "acidrain",
-    "Tötet die Feinde", NULL, NULL,
+    NULL, NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
       { "aura", 2, SPC_FIX },

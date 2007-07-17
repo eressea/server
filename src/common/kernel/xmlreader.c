@@ -22,6 +22,7 @@ without prior permission by the authors of Eressea.
 #include "item.h"
 #include "message.h"
 #include "race.h"
+#include "region.h"
 #include "ship.h"
 #include "terrain.h"
 #include "skill.h"
@@ -78,21 +79,6 @@ xml_spell(xmlNode * node, const char * name)
     xmlFree(property);
   }
   return sp;
-}
-
-static const char *
-xml_to_locale(const xmlChar * xmlStr)
-{
-  static char zText[1024];
-  const xmlChar * inbuf = xmlStr;
-  char * outbuf = zText;
-  int inbytes = (int)xstrlen(xmlStr)+1;
-  int outbytes = (int)sizeof(zText);
-
-  if (UTF8Toisolat1((xmlChar*)outbuf, &outbytes, inbuf, &inbytes)<0) {
-    log_error(("string is too long: %s.\n", (const char*)xmlStr));
-  }
-  return zText;
 }
 
 static xmlChar *
@@ -454,6 +440,30 @@ parse_calendar(xmlDocPtr doc)
     xmlXPathFreeObject(xpathSeasons);
   }
   xmlXPathFreeObject(xpathCalendars);
+  xmlXPathFreeContext(xpath);
+ 
+  return rv;
+}
+
+static int
+parse_directions(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathObjectPtr xpathDirections;
+  xmlNodeSetPtr nsetDirections;
+  int rv = 0;
+
+  /* reading eressea/directions/dir */
+  xpathDirections = xmlXPathEvalExpression(BAD_CAST "/eressea/directions/dir", xpath);
+  nsetDirections = xpathDirections->nodesetval;
+  if (nsetDirections!=NULL) {
+    xmlNodePtr dir = nsetDirections->nodeTab[0];
+    xmlChar * property = xmlGetProp(dir, BAD_CAST "name");
+
+    register_special_direction((const char *)property);
+    xmlFree(property);
+  }
+  xmlXPathFreeObject(xpathDirections);
   xmlXPathFreeContext(xpath);
  
   return rv;
@@ -1304,6 +1314,11 @@ parse_spells(xmlDocPtr doc)
       sp->sname = strdup((const char*)property);
       xmlFree(property);
 
+      property = xmlGetProp(node, BAD_CAST "parameters");
+      if (property) {
+        sp->parameter=strdup((const char *)property);
+        xmlFree(property);
+      }
       /* magic type */
       property = xmlGetProp(node, BAD_CAST "type");
       assert(property!=NULL);
@@ -1317,6 +1332,7 @@ parse_spells(xmlDocPtr doc)
       sp->id = xml_ivalue(node, "index", 0);
       sp->level = xml_ivalue(node, "level", -1);
       sp->rank = (char)xml_ivalue(node, "rank", -1);
+      if (xml_bvalue(node, "los", false)) sp->sptyp |= TESTCANSEE; /* must see or have contact */
       if (xml_bvalue(node, "ship", false)) sp->sptyp |= ONSHIPCAST;
       if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
       if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
@@ -2013,4 +2029,5 @@ register_xmlreader(void)
   xml_register_callback(parse_equipment); /* requires spells */
   xml_register_callback(parse_races); /* requires spells */
   xml_register_callback(parse_calendar);
+  xml_register_callback(parse_directions);
 }

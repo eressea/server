@@ -2838,6 +2838,12 @@ spell_name(const spell * sp, const struct locale * lang)
   return LOC(lang, mkname("spell", sp->sname));
 }
 
+const xmlChar *
+curse_name(const curse_type * ctype, const struct locale * lang)
+{
+  return LOC(lang, mkname("spell", ctype->cname));
+}
+
 void
 spelllist_add(spell_list ** lspells, spell * sp)
 {

@@ -276,8 +276,6 @@ void scale_number(struct unit * u, int n);
 int unit_max_hp(const struct unit * u);
 int ispresent(const struct faction * f, const struct region * r);
 
-xmlChar * set_string(xmlChar **s, const xmlChar *neu);
-
 int check_option(struct faction * f, int option);
 extern void parse(keyword_t kword, int (*dofun)(struct unit *, struct order *), boolean thisorder);
 

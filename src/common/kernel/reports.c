@@ -1577,6 +1577,7 @@ reports_init(void)
   register_argtype("ship", NULL, NULL, VAR_VOIDPTR);
   register_argtype("skill", NULL, NULL, VAR_VOIDPTR);
   register_argtype("spell", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("curse", NULL, NULL, VAR_VOIDPTR);
   register_argtype("unit", NULL, NULL, VAR_VOIDPTR);
   register_argtype("int", NULL, NULL, VAR_INT);
   register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);

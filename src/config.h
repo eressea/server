@@ -22,6 +22,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define _CRT_SECURE_NO_DEPRECATE
+
 #ifdef __cplusplus
 # include <cstdio>
 # include <cstdlib>

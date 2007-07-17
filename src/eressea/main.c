@@ -30,6 +30,7 @@
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
 #include <spells/spells.h>
+#include <gamecode/spells.h>
 #include <triggers/triggers.h>
 #include <items/itemtypes.h>
 
@@ -161,6 +162,7 @@ game_init(void)
   register_ships();
   register_itemfunctions();
   register_spells();
+  register_gcspells();
 #ifdef DUNGEON_MODULE
   register_dungeon();
 #endif

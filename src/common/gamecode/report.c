@@ -122,7 +122,7 @@ gamedate_season(const struct locale * lang)
 
   get_gamedate(turn, &gd);
 
-  sprintf(buf, LOC(lang, "nr_calendar_season"),
+  sprintf(buf, (const char *)LOC(lang, "nr_calendar_season"),
     LOC(lang, weeknames[gd.week]),
     LOC(lang, monthnames[gd.month]),
     gd.year,
@@ -2845,6 +2845,19 @@ eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
 }
 
 static void
+eval_curse(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct curse_type * sp = (const struct curse_type *)opop(stack).v;
+  const char * c = sp?curse_name(sp, f->locale):LOC(f->locale, "an_unknown_curse");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
 eval_unitname(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
@@ -3156,6 +3169,7 @@ report_init(void)
   add_function("trail", &eval_trail);
   add_function("localize", &eval_localize);
   add_function("spell", &eval_spell);
+  add_function("curse", &eval_curse);
   add_function("resources", &eval_resources);
   add_function("regions", &eval_regions);
 

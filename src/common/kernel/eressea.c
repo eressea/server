@@ -2601,24 +2601,6 @@ wage(const region *r, const faction * f, const race * rc)
 }
 
 
-static region *
-findspecialdirection(const region *r, const xmlChar *token)
-{
-  attrib *a;
-  spec_direction *d;
-
-  if (xstrlen(token)==0) return NULL;
-  for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
-    d = (spec_direction *)(a->data.v);
-
-    if (d->active && xmlStrncasecmp(d->keyword, token, xstrlen(token)) == 0) {
-      return findregion(d->x, d->y);
-    }
-  }
-
-  return NULL;
-}
-
 #define MAINTENANCE 10
 int
 maintenance_cost(const struct unit * u)
@@ -2663,7 +2645,7 @@ movewhere(const unit *u, const xmlChar * token, region * r, region** resultp)
     break;
 
   case NODIRECTION:
-    r2 = findspecialdirection(r, token);
+    r2 = find_special_direction(r, token, u->faction->locale);
     if (r2==NULL) {
       return E_MOVE_NOREGION;
     }

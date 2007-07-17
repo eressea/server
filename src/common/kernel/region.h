@@ -164,6 +164,9 @@ void runhash(struct region * r);
 
 void free_regionlist(region_list *rl);
 void add_regionlist(region_list **rl, struct region *r);
+
+extern struct region * find_special_direction(const struct region *r, const xmlChar *token, const struct locale * lang);
+extern void register_special_direction(const char * name);
 extern struct spec_direction * special_direction(const region * from, const region * to);
 extern struct attrib *create_special_direction(struct region *r, struct region *rt,
                                                int duration, const char *desc, 

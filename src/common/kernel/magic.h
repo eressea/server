@@ -373,6 +373,7 @@ extern struct unit * has_clone(struct unit * mage);
 
 extern const xmlChar * spell_info(const struct spell * sp, const struct locale * lang);
 extern const xmlChar * spell_name(const struct spell * sp, const struct locale * lang);
+extern const xmlChar * curse_name(const struct curse_type * ctype, const struct locale * lang);
 
 extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
 

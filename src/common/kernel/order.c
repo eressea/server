@@ -84,10 +84,10 @@ get_keyword(const order * ord)
   return ORD_KEYWORD(ord);
 }
 
-static xmlChar *
-get_command(const order * ord, xmlChar * sbuffer, size_t bufsize)
+static char *
+get_command(const order * ord, char * sbuffer, size_t bufsize)
 {
-  xmlChar * str = sbuffer;
+  char * str = sbuffer;
   const xmlChar * text = ORD_STRING(ord);
   keyword_t kwd = ORD_KEYWORD(ord);
 
@@ -96,13 +96,13 @@ get_command(const order * ord, xmlChar * sbuffer, size_t bufsize)
     const struct locale * lang = ORD_LOCALE(ord);
     size_t size = bufsize-(str-sbuffer);
     if (text) --size;
-    str += strlcpy((char*)str, (const char*)LOC(lang, keywords[kwd]), size);
+    str += strlcpy(str, (const char*)LOC(lang, keywords[kwd]), size);
     if (text) {
       *str++ = ' ';
     }
   }
   if (text) {
-    str += strlcpy((char*)str, (const char *)text, bufsize-(str-sbuffer));
+    str += strlcpy(str, (const char *)text, bufsize-(str-sbuffer));
   }
   return sbuffer;
 }
@@ -110,8 +110,8 @@ get_command(const order * ord, xmlChar * sbuffer, size_t bufsize)
 xmlChar *
 getcommand(const order * ord)
 {
-  xmlChar sbuffer[DISPLAYSIZE*2];
-  return xmlStrdup(get_command(ord, sbuffer, sizeof(sbuffer)));
+  char sbuffer[DISPLAYSIZE*2];
+  return xmlStrdup((xmlChar *)get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
 void 
@@ -459,8 +459,8 @@ is_persistent(const order * ord)
 	return persist || is_repeated(ord);
 }
 
-xmlChar * 
-write_order(const order * ord, const struct locale * lang, xmlChar * buffer, size_t size)
+char * 
+write_order(const order * ord, const struct locale * lang, char * buffer, size_t size)
 {
   if (ord==0) {
     buffer[0]=0;
@@ -468,7 +468,7 @@ write_order(const order * ord, const struct locale * lang, xmlChar * buffer, siz
     keyword_t kwd = ORD_KEYWORD(ord);
     if (kwd==NOKEYWORD) {
       const xmlChar * text = ORD_STRING(ord);
-      strlcpy((char *)buffer, (const char *)text, size);
+      strlcpy(buffer, (const char *)text, size);
     } else {
       get_command(ord, buffer, size);
     }

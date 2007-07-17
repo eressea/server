@@ -51,6 +51,7 @@ enum {
   UT_ARCHETYPES,
   UT_MAGIC,
   UT_TERRAINS,
+  UT_SPECDIR,
   UT_MAX
 };
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -124,28 +124,28 @@ read_laen(struct region * r, int laen)
 int
 laen_read(attrib * a, FILE * F)
 {
-	int laen;
-	fscanf(F, "%d", &laen);
-	read_laen(current_region, laen);
-	return AT_READ_FAIL;
+  int laen;
+  fscanf(F, "%d", &laen);
+  read_laen(current_region, laen);
+  return AT_READ_FAIL;
 }
 #endif
 
 char *
 rns(FILE * f, char *c, size_t size)
 {
-	char * s = c;
-	do {
-		*s = (char) getc(f);
-	} while (*s!='"');
+  char * s = c;
+  do {
+    *s = (char) getc(f);
+  } while (*s!='"');
 
-	for (;;) {
-		*s = (char) getc(f);
-		if (*s=='"') break;
-		if (s<c+size) ++s;
-	}
-	*s = 0;
-	return c;
+  for (;;) {
+    *s = (char) getc(f);
+    if (*s=='"') break;
+    if (s<c+size) ++s;
+  }
+  *s = 0;
+  return c;
 }
 
 extern unsigned int __at_hashkey(const char* s);
@@ -153,14 +153,14 @@ extern unsigned int __at_hashkey(const char* s);
 FILE *
 cfopen(const char *filename, const char *mode)
 {
-	FILE * F = fopen(filename, mode);
+  FILE * F = fopen(filename, mode);
 
-	if (F == 0) {
-		perror(filename);
-		return NULL;
-	}
-	setvbuf(F, 0, _IOFBF, 32 * 1024);	/* 32 kb buffer size */
-	return F;
+  if (F == 0) {
+    perror(filename);
+    return NULL;
+  }
+  setvbuf(F, 0, _IOFBF, 32 * 1024);  /* 32 kb buffer size */
+  return F;
 }
 
 /* ------------------------------------------------------------- */
@@ -176,9 +176,9 @@ static int nextc;
 #ifdef CONVERT_DBLINK
 
 typedef struct uniquenode {
-	struct uniquenode * next;
-	int id;
-	faction * f;
+  struct uniquenode * next;
+  int id;
+  faction * f;
 } uniquenode;
 
 #define HASHSIZE 2039
@@ -187,25 +187,25 @@ static uniquenode * uniquehash[HASHSIZE];
 static faction *
 uniquefaction(int id)
 {
-	uniquenode * node = uniquehash[id%HASHSIZE];
-	while (node && node->id!=id) node=node->next;
-	return node?node->f:NULL;
+  uniquenode * node = uniquehash[id%HASHSIZE];
+  while (node && node->id!=id) node=node->next;
+  return node?node->f:NULL;
 }
 
 static void
 addunique(int id, faction * f)
 {
-	uniquenode * fnode = calloc(1, sizeof(uniquenode));
-	fnode->f = f;
-	fnode->id = id;
-	fnode->next = uniquehash[id%HASHSIZE];
-	uniquehash[id%HASHSIZE] = fnode;
+  uniquenode * fnode = calloc(1, sizeof(uniquenode));
+  fnode->f = f;
+  fnode->id = id;
+  fnode->next = uniquehash[id%HASHSIZE];
+  uniquehash[id%HASHSIZE] = fnode;
 }
 
 typedef struct mapnode {
-	struct mapnode * next;
-	int fno;
-	int subscription;
+  struct mapnode * next;
+  int fno;
+  int subscription;
 } mapnode;
 
 static mapnode * subscriptions[HASHSIZE];
@@ -213,71 +213,71 @@ static mapnode * subscriptions[HASHSIZE];
 void
 convertunique(faction * f)
 {
-	int unique = f->subscription;
-	static FILE * F = NULL;
-	mapnode * mnode;
-	addunique(unique, f);
-	if (F==NULL) {
-		static char zText[MAX_PATH];
-		strcat(strcpy(zText, basepath()), "/subscriptions");
-		F = fopen(zText, "r");
-		if (F==NULL) {
-			log_warning(("could not open %s.\n", zText));
-			abort();
-		}
-		for (;;) {
-			char zFaction[5];
-			int subscription, fno;
-			if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
-			mnode = calloc(1, sizeof(mapnode));
-			fno = atoi36(zFaction);
-			mnode->next = subscriptions[fno%HASHSIZE];
-			mnode->fno = fno;
-			mnode->subscription = subscription;
-			subscriptions[fno%HASHSIZE] = mnode;
-		}
-	}
-	mnode = subscriptions[f->no%HASHSIZE];
-	while (mnode!=NULL && mnode->fno!=f->no) mnode = mnode->next;
-	if (mnode) f->subscription = mnode->subscription;
-	else {
-		log_printf("%s %s %s %s\n",
-				   itoa36(f->no), f->email, f->override, dbrace(f->race));
-	}
+  int unique = f->subscription;
+  static FILE * F = NULL;
+  mapnode * mnode;
+  addunique(unique, f);
+  if (F==NULL) {
+    static char zText[MAX_PATH];
+    strcat(strcpy(zText, basepath()), "/subscriptions");
+    F = fopen(zText, "r");
+    if (F==NULL) {
+      log_warning(("could not open %s.\n", zText));
+      abort();
+    }
+    for (;;) {
+      char zFaction[5];
+      int subscription, fno;
+      if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
+      mnode = calloc(1, sizeof(mapnode));
+      fno = atoi36(zFaction);
+      mnode->next = subscriptions[fno%HASHSIZE];
+      mnode->fno = fno;
+      mnode->subscription = subscription;
+      subscriptions[fno%HASHSIZE] = mnode;
+    }
+  }
+  mnode = subscriptions[f->no%HASHSIZE];
+  while (mnode!=NULL && mnode->fno!=f->no) mnode = mnode->next;
+  if (mnode) f->subscription = mnode->subscription;
+  else {
+    log_printf("%s %s %s %s\n",
+           itoa36(f->no), f->email, f->override, dbrace(f->race));
+  }
 }
 #endif
 
-void
-rds(FILE * F, char **ds)
+static void
+rds(FILE * F, void **ds)
 {
-	static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
-	char *s = &buffer[0];
+  static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
+  char *s = &buffer[0];
 
-	while (nextc != '"') {
-		if (nextc == EOF) {
-			*s = 0;
-			fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
-			abort();
-		}
-		rc(F);
-	}
+  while (nextc != '"') {
+    if (nextc == EOF) {
+      *s = 0;
+      fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
+      abort();
+    }
+    rc(F);
+  }
 
-	rc(F);
+  rc(F);
 
-	while (nextc != '"') {
-		if (nextc == EOF) {
-			*s = 0;
-			fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
-			abort();
-		}
+  while (nextc != '"') {
+    if (nextc == EOF) {
+      *s = 0;
+      fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
+      abort();
+    }
     if (s - buffer < DISPLAYSIZE) {
       *s++ = (char)nextc;
     }
-		rc(F);
-	}
+    rc(F);
+  }
 
-	rc(F);
-	*s = 0;
+  rc(F);
+  *s = 0;
   if (ds) {
     *ds = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
     strcpy(*ds, buffer);
@@ -288,47 +288,47 @@ rds(FILE * F, char **ds)
 void
 rsf(FILE * F, char *s, size_t len)
 {
-	char * begin = s;
-	int nextc;
-	do {
-		nextc = rcf(F);
-		if (nextc == EOF) {
-			puts("Die Datei bricht vorzeitig ab.");
-			abort();
-		}
-	} while (nextc != '"');
+  char * begin = s;
+  int nextc;
+  do {
+    nextc = rcf(F);
+    if (nextc == EOF) {
+      puts("Die Datei bricht vorzeitig ab.");
+      abort();
+    }
+  } while (nextc != '"');
 
-	for (;;) {
-		nextc = rcf(F);
-		if (nextc == '"') break;
-		else if (nextc == EOF) {
-			puts("Die Datei bricht vorzeitig ab.");
-			abort();
-		}
-		if (s-begin<(int)len-1)
-			*s++ = (char)nextc;
-	}
-	*s = 0;
+  for (;;) {
+    nextc = rcf(F);
+    if (nextc == '"') break;
+    else if (nextc == EOF) {
+      puts("Die Datei bricht vorzeitig ab.");
+      abort();
+    }
+    if (s-begin<(int)len-1)
+      *s++ = (char)nextc;
+  }
+  *s = 0;
 }
 
 static void
 rs(FILE * F, char *s)
 {
-	boolean apos = false;
-	while (isspace(nextc)) rc(F);
-	if (nextc=='"') {
-		apos=true;
-		rc(F);
-	}
-	for (;;) {
-		if (nextc=='"') {
-			rc(F);
-			break;
-		} else if (!apos && isspace(nextc)) break;
-		*s++ = (char)nextc;
-		rc(F);
-	}
-	*s = 0;
+  boolean apos = false;
+  while (isspace(nextc)) rc(F);
+  if (nextc=='"') {
+    apos=true;
+    rc(F);
+  }
+  for (;;) {
+    if (nextc=='"') {
+      rc(F);
+      break;
+    } else if (!apos && isspace(nextc)) break;
+    *s++ = (char)nextc;
+    rc(F);
+  }
+  *s = 0;
 }
 
 #define rss(F, buf, size) rs(F, buf) /* should check size but doesn't */
@@ -336,43 +336,43 @@ rs(FILE * F, char *s)
 static int
 ri(FILE * F)
 {
-	int i = 0, vz = 1;
+  int i = 0, vz = 1;
 
-	while (!xisdigit(nextc)) {
-		if (nextc == EOF) {
-			puts("Die Datei bricht vorzeitig ab.");
-			abort();
-		}
-		rc(F);
-	}
+  while (!xisdigit(nextc)) {
+    if (nextc == EOF) {
+      puts("Die Datei bricht vorzeitig ab.");
+      abort();
+    }
+    rc(F);
+  }
 
-	while (xisdigit(nextc)) {
-		if (nextc == '-')
-			vz = -1;
-		else
-			i = 10 * i + (nextc - '0');
-		rc(F);
-	}
+  while (xisdigit(nextc)) {
+    if (nextc == '-')
+      vz = -1;
+    else
+      i = 10 * i + (nextc - '0');
+    rc(F);
+  }
 
-	return i * vz;
+  return i * vz;
 }
 
 static int
 ri36(FILE * F)
 {
-	char buf[16];
-	int i = 0;
-	rc(F);
-	while (!isalnum(nextc)) rc(F);
-	while (isalnum(nextc)) {
+  char buf[16];
+  int i = 0;
+  rc(F);
+  while (!isalnum(nextc)) rc(F);
+  while (isalnum(nextc)) {
     if (i+1<sizeof(buf)) {
-  		buf[i++]=(char)nextc;
+      buf[i++]=(char)nextc;
     }
-		rc(F);
-	}
-	buf[i]=0;
-	i = atoi36(buf);
-	return i;
+    rc(F);
+  }
+  buf[i]=0;
+  i = atoi36(buf);
+  return i;
 }
 
 #ifdef ENEMIES
@@ -522,7 +522,7 @@ factionorders(void)
 double
 version(void)
 {
-	return RELEASE_VERSION * 0.1;
+  return RELEASE_VERSION * 0.1;
 }
 /* ------------------------------------------------------------- */
 
@@ -535,84 +535,84 @@ igetparam (const xmlChar *s, const struct locale *lang)
 int
 readorders(const char *filename, const char * encoding)
 {
-	FILE * F = NULL;
-	char *b;
-	int nfactions=0;
-	struct faction *f = NULL;
+  FILE * F = NULL;
+  const xmlChar *b;
+  int nfactions=0;
+  struct faction *f = NULL;
   int enc = xmlParseCharEncoding(encoding);
 
-	if (filename) F = cfopen(filename, "rt");
-	if (F==NULL) return 0;
+  if (filename) F = cfopen(filename, "rt");
+  if (F==NULL) return 0;
 
-	puts(" - lese Befehlsdatei...\n");
+  puts(" - lese Befehlsdatei...\n");
 
-	b = getbuf(F, enc);
+  b = getbuf(F, enc);
 
-	/* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
-	 * Partei */
+  /* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
+   * Partei */
 
-	while (b) {
-		const struct locale * lang = f?f->locale:default_locale;
-		int p;
-		const char * s;
+  while (b) {
+    const struct locale * lang = f?f->locale:default_locale;
+    int p;
+    const xmlChar * s;
 
-		switch (igetparam(b, lang)) {
-		case P_LOCALE:
-			s = getstrtoken();
+    switch (igetparam(b, lang)) {
+    case P_LOCALE:
+      s = getstrtoken();
 #undef LOCALE_CHANGE
 #ifdef LOCALE_CHANGE
-			if (f && find_locale(s)) {
-				f->locale = find_locale(s);
-			}
+      if (f && find_locale(s)) {
+        f->locale = find_locale(s);
+      }
 #endif
 
-			b = getbuf(F, enc);
-			break;
-		case P_GAMENAME:
-		case P_FACTION:
-			f = factionorders();
-			if (f) {
-				++nfactions;
-			}
+      b = getbuf(F, enc);
+      break;
+    case P_GAMENAME:
+    case P_FACTION:
+      f = factionorders();
+      if (f) {
+        ++nfactions;
+      }
 
-			b = getbuf(F, enc);
-			break;
+      b = getbuf(F, enc);
+      break;
 
-			/* in factionorders wird nur eine zeile gelesen:
-			 * diejenige mit dem passwort. Die befehle der units
-			 * werden geloescht, und die Partei wird als aktiv
-			 * vermerkt. */
+      /* in factionorders wird nur eine zeile gelesen:
+       * diejenige mit dem passwort. Die befehle der units
+       * werden geloescht, und die Partei wird als aktiv
+       * vermerkt. */
 
-		case P_UNIT:
-			if (!f || !unitorders(F, enc, f)) do {
-				b = getbuf(F, enc);
-				if (!b) break;
-				p = igetparam(b, lang);
-			} while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT && p != P_GAMENAME);
-			break;
+    case P_UNIT:
+      if (!f || !unitorders(F, enc, f)) do {
+        b = getbuf(F, enc);
+        if (!b) break;
+        p = igetparam(b, lang);
+      } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT && p != P_GAMENAME);
+      break;
 
-			/* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
-			 * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
-			 * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-			 * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-			 * muß buf erneut gefüllt werden, da die betreffende Information in nur
-			 * einer Zeile steht, und nun die nächste gelesen werden muß. */
+      /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
+       * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
+       * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
+       * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
+       * muß buf erneut gefüllt werden, da die betreffende Information in nur
+       * einer Zeile steht, und nun die nächste gelesen werden muß. */
 
-		case P_NEXT:
-			f = NULL;
+    case P_NEXT:
+      f = NULL;
       b = getbuf(F, enc);
       break;
 
     default:
-			b = getbuf(F, enc);
+      b = getbuf(F, enc);
       break;
-		}
-	}
+    }
+  }
 
-	fclose(F);
-	puts("\n");
-	log_printf("   %d Befehlsdateien gelesen\n", nfactions);
-	return 0;
+  fclose(F);
+  puts("\n");
+  log_printf("   %d Befehlsdateien gelesen\n", nfactions);
+  return 0;
 }
 /* ------------------------------------------------------------- */
 
@@ -622,16 +622,16 @@ readorders(const char *filename, const char * encoding)
 int
 inner_world(region * r)
 {
-	static int xy[2] =
-	{18, -45};
-	static int size[2] =
-	{27, 27};
+  static int xy[2] =
+  {18, -45};
+  static int size[2] =
+  {27, 27};
 
-	if (r->x >= xy[0] && r->x < xy[0] + size[0] && r->y >= xy[1] && r->y < xy[1] + size[1])
-		return 2;
-	if (r->x >= xy[0] - 9 && r->x < xy[0] + size[0] + 9 && r->y >= xy[1] - 9 && r->y < xy[1] + size[1] + 9)
-		return 1;
-	return 0;
+  if (r->x >= xy[0] && r->x < xy[0] + size[0] && r->y >= xy[1] && r->y < xy[1] + size[1])
+    return 2;
+  if (r->x >= xy[0] - 9 && r->x < xy[0] + size[0] + 9 && r->y >= xy[1] - 9 && r->y < xy[1] + size[1] + 9)
+    return 1;
+  return 0;
 }
 
 int maxregions = -1;
@@ -641,25 +641,25 @@ boolean dirtyload = false;
 boolean incomplete_data = false;
 
 enum {
-	U_MAN,
-	U_UNDEAD,
-	U_ILLUSION,
-	U_FIREDRAGON,
-	U_DRAGON,
-	U_WYRM,
-	U_SPELL,
-	U_TAVERNE,
-	U_MONSTER,
-	U_BIRTHDAYDRAGON,
-	U_TREEMAN,
-	MAXTYPES
+  U_MAN,
+  U_UNDEAD,
+  U_ILLUSION,
+  U_FIREDRAGON,
+  U_DRAGON,
+  U_WYRM,
+  U_SPELL,
+  U_TAVERNE,
+  U_MONSTER,
+  U_BIRTHDAYDRAGON,
+  U_TREEMAN,
+  MAXTYPES
 };
 
 race_t
 typus2race(unsigned char typus)
 {
-	if (typus>0 && typus <=11) return (race_t)(typus-1);
-	return NORACE;
+  if (typus>0 && typus <=11) return (race_t)(typus-1);
+  return NORACE;
 }
 
 void
@@ -681,25 +681,25 @@ create_backup(char *file)
 const char *
 datapath(void)
 {
-	static char zText[MAX_PATH];
-	if (g_datadir) return g_datadir;
-	return strcat(strcpy(zText, basepath()), "/data");
+  static char zText[MAX_PATH];
+  if (g_datadir) return g_datadir;
+  return strcat(strcpy(zText, basepath()), "/data");
 }
 
 void
 read_items(FILE *F, item **ilist)
 {
-	for (;;) {
+  for (;;) {
     char ibuf[32];
     const item_type * itype;
-		rss(F, ibuf, sizeof(ibuf));
-		if (!strcmp("end", ibuf)) break;
+    rss(F, ibuf, sizeof(ibuf));
+    if (!strcmp("end", ibuf)) break;
     itype = it_find(ibuf);
     assert(itype!=NULL);
     if (itype!=NULL) {
       i_change(ilist, itype, ri(F));
     }
-	}
+  }
 }
 
 static void
@@ -712,12 +712,12 @@ read_alliances(FILE * F)
   }
 
   rss(F, pbuf, sizeof(pbuf));
-	while (strcmp(pbuf, "end")!=0) {
+  while (strcmp(pbuf, "end")!=0) {
     char aname[128];
-		rss(F, aname, sizeof(aname));
-		makealliance(atoi36(pbuf), aname);
-		rs(F, pbuf);
-	}
+    rss(F, aname, sizeof(aname));
+    makealliance(atoi36(pbuf), aname);
+    rs(F, pbuf);
+  }
 }
 
 #define wc(F, c) putc(c, F);
@@ -727,128 +727,128 @@ read_alliances(FILE * F)
 void
 wsn(FILE * F, const char *s)
 {
-	if (!s)
-		return;
-	while (*s)
-		wc(F, *s++);
+  if (!s)
+    return;
+  while (*s)
+    wc(F, *s++);
 }
 
 void
 ws(FILE * F, const char *s)
 {
-	fputc('"', F);
-	wsn(F, s);
-	fputs("\" ", F);
+  fputc('"', F);
+  wsn(F, s);
+  fputs("\" ", F);
 }
 
 static void
 wi(FILE * F, int n)
 {
-	fprintf(F, "%d ", n);
+  fprintf(F, "%d ", n);
 }
 
 static void 
 wi36(FILE * F, int n)
 {
-	fprintf(F, "%s ", itoa36(n));
+  fprintf(F, "%s ", itoa36(n));
 }
 
 void
 write_alliances(FILE * F)
 {
-	alliance * al = alliances;
-	while (al) {
-		wi36(F, al->id);
-		ws(F, al->name);
-		al = al->next;
-		wnl(F);
-	}
-	fprintf(F, "end ");
-	wnl(F);
+  alliance * al = alliances;
+  while (al) {
+    wi36(F, al->id);
+    ws(F, al->name);
+    al = al->next;
+    wnl(F);
+  }
+  fprintf(F, "end ");
+  wnl(F);
 }
 
 void
 write_items(FILE *F, item *ilist)
 {
-	item * itm;
-	for (itm=ilist;itm;itm=itm->next) if (itm->number) {
+  item * itm;
+  for (itm=ilist;itm;itm=itm->next) if (itm->number) {
     fprintf(F, "%s %i ", resourcename(itm->type->rtype, 0), itm->number);
-	}
-	fputs("end ", F);
+  }
+  fputs("end ", F);
 }
 
 #ifdef USE_PLAYERS
 static void
 export_players(const char * path)
 {
-	FILE * F;
-	player * p = get_players();
-	if (p==NULL) return;
+  FILE * F;
+  player * p = get_players();
+  if (p==NULL) return;
 
-	F = cfopen(path, "w");
-	if (F==NULL) return;
+  F = cfopen(path, "w");
+  if (F==NULL) return;
 
-	fputs("name;email;passwd;faction;info\n", F);
-	while (p) {
-		/* name */
-		fputc('\"', F);
-		if (p->name) fputs(p->name, F);
+  fputs("name;email;passwd;faction;info\n", F);
+  while (p) {
+    /* name */
+    fputc('\"', F);
+    if (p->name) fputs(p->name, F);
 
-		/* email */
-		fputs("\";\"", F);
-		if (p->email) fputs(p->email, F);
-		else if (p->faction) fputs(p->faction->email, F);
-		fputs("\";\"", F);
+    /* email */
+    fputs("\";\"", F);
+    if (p->email) fputs(p->email, F);
+    else if (p->faction) fputs(p->faction->email, F);
+    fputs("\";\"", F);
 
-		/* passwd */
-		fputs("\";\"", F);
-		if (p->faction) fputs(p->faction->passw, F);
+    /* passwd */
+    fputs("\";\"", F);
+    if (p->faction) fputs(p->faction->passw, F);
 
-		/* faction */
-		fputs("\";\"", F);
-		if (p->faction) fputs(itoa36(p->faction->no), F);
+    /* faction */
+    fputs("\";\"", F);
+    if (p->faction) fputs(itoa36(p->faction->no), F);
 
-		/* info */
-		fputs("\";\"", F);
-		if (p->info) fputs(p->info, F);
-		else if (p->faction) fputs(p->faction->banner, F);
+    /* info */
+    fputs("\";\"", F);
+    if (p->info) fputs(p->info, F);
+    else if (p->faction) fputs(p->faction->banner, F);
 
-		fputs("\"\n", F);
+    fputs("\"\n", F);
 
-		p = next_player(p);
-	}
-	fclose(F);
+    p = next_player(p);
+  }
+  fclose(F);
 }
 #endif
 
 int
 lastturn(void)
 {
-	int turn = 0;
+  int turn = 0;
 #ifdef HAVE_READDIR
-	DIR *data_dir = NULL;
-	struct dirent *entry = NULL;
-	const char * dir = datapath();
-	data_dir = opendir(dir);
-	if (data_dir != NULL) {
-		entry = readdir(data_dir);
-	}
-	if (data_dir != NULL && entry != NULL) {
-		turn = 0;
-		do {
-			int i = atoi(entry->d_name);
-			if (i > turn)
-				turn = i;
-			entry = readdir(data_dir);
-		} while (entry != NULL);
+  DIR *data_dir = NULL;
+  struct dirent *entry = NULL;
+  const char * dir = datapath();
+  data_dir = opendir(dir);
+  if (data_dir != NULL) {
+    entry = readdir(data_dir);
+  }
+  if (data_dir != NULL && entry != NULL) {
+    turn = 0;
+    do {
+      int i = atoi(entry->d_name);
+      if (i > turn)
+        turn = i;
+      entry = readdir(data_dir);
+    } while (entry != NULL);
 #ifdef HAVE_CLOSEDIR
-		closedir(data_dir);
+    closedir(data_dir);
 #endif
-	}
+  }
 #else
 # error "requires dirent.h or an equivalent to compile!"
 #endif
-	return turn;
+  return turn;
 }
 
 void
@@ -892,10 +892,6 @@ readunit(FILE * F)
   else {
     rds(F, &u->display);
   }
-#ifndef NDEBUG
-  if (strlen(u->name)>=NAMESIZE) u->name[NAMESIZE] = 0;
-  if (u->display && strlen(u->display)>=DISPLAYSIZE) u->display[DISPLAYSIZE] = 0;
-#endif
   number = ri(F);
   u->age = (short)ri(F);
   if (global.data_version<NEWRACE_VERSION) {
@@ -926,11 +922,12 @@ readunit(FILE * F)
     else u->irace = u->race;
   }
   if (u->race->describe) {
-    const char * rcdisp = u->race->describe(u, u->faction->locale);
+    const xmlChar * rcdisp = u->race->describe(u, u->faction->locale);
     if (u->display && rcdisp) {
       /* see if the data file contains old descriptions */
-      if (strcmp(rcdisp, u->display)==0) {
-        set_string(&u->display, NULL);
+      if (xstrcmp(rcdisp, u->display)==0) {
+        free(u->display);
+        u->display = NULL;
       }
     }
   }
@@ -987,7 +984,7 @@ readunit(FILE * F)
   p = n = 0;
   orderp = &u->orders;
   while (obuf[0]) {
-    order * ord = parse_order(obuf, u->faction->locale);
+    order * ord = parse_order((const xmlChar *)obuf, u->faction->locale);
     if (ord!=NULL) {
       if (++n<MAXORDERS) {
         if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
@@ -1007,7 +1004,7 @@ readunit(FILE * F)
   if (global.data_version<NOLASTORDER_VERSION) {
     order * ord;
     freadstr(F, obuf, sizeof(obuf));
-    ord = parse_order(obuf, u->faction->locale);
+    ord = parse_order((const xmlChar *)obuf, u->faction->locale);
     if (ord!=NULL) {
 #ifdef LASTORDER
       set_order(&u->lastorder, ord);
@@ -1035,73 +1032,73 @@ readunit(FILE * F)
       }
     }
   } else {
-		while ((sk = (skill_t) ri(F)) != NOSKILL) {
-			int level = ri(F);
-			int weeks = ri(F);
-			if (level) {
-				skill * sv = add_skill(u, sk);
-				sv->level = sv->old = (unsigned char)level;
-				sv->weeks = (unsigned char)weeks;
-			}
-		}
-	}
-	read_items(F, &u->items);
-	u->hp = ri(F);
-	if (u->hp < u->number) {
-		log_error(("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no),
-				   u->number, u->hp));
-		u->hp=u->number;
-	}
+    while ((sk = (skill_t) ri(F)) != NOSKILL) {
+      int level = ri(F);
+      int weeks = ri(F);
+      if (level) {
+        skill * sv = add_skill(u, sk);
+        sv->level = sv->old = (unsigned char)level;
+        sv->weeks = (unsigned char)weeks;
+      }
+    }
+  }
+  read_items(F, &u->items);
+  u->hp = ri(F);
+  if (u->hp < u->number) {
+    log_error(("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no),
+           u->number, u->hp));
+    u->hp=u->number;
+  }
 
-	if (global.data_version < MAGE_ATTRIB_VERSION) {
-		int i = ri(F);
-		if (i != -1){
-			attrib * a;
-			int csp = 0;
-			sc_mage * mage = calloc(1, sizeof(sc_mage));
+  if (global.data_version < MAGE_ATTRIB_VERSION) {
+    int i = ri(F);
+    if (i != -1){
+      attrib * a;
+      int csp = 0;
+      sc_mage * mage = calloc(1, sizeof(sc_mage));
 
       mage->magietyp = (magic_t) i;
-			mage->spellpoints = ri(F);
-			mage->spchange = ri(F);
-			while ((i = ri(F)) != -1) {
-				mage->combatspells[csp].sp = find_spellbyid(mage->magietyp, (spellid_t)i);
-				mage->combatspells[csp].level = ri(F);
-				csp++;
-			}
-			while ((i = ri(F)) != -1) {
-				add_spell(mage, find_spellbyid(mage->magietyp, (spellid_t)i));
-			}
-			mage->spellcount = 0;
-			a = a_add(&u->attribs, a_new(&at_mage));
-			a->data.v = mage;
-		}
-	}
-	a_read(F, &u->attribs);
-	return u;
+      mage->spellpoints = ri(F);
+      mage->spchange = ri(F);
+      while ((i = ri(F)) != -1) {
+        mage->combatspells[csp].sp = find_spellbyid(mage->magietyp, (spellid_t)i);
+        mage->combatspells[csp].level = ri(F);
+        csp++;
+      }
+      while ((i = ri(F)) != -1) {
+        add_spell(mage, find_spellbyid(mage->magietyp, (spellid_t)i));
+      }
+      mage->spellcount = 0;
+      a = a_add(&u->attribs, a_new(&at_mage));
+      a->data.v = mage;
+    }
+  }
+  a_read(F, &u->attribs);
+  return u;
 }
 
 void
 writeunit(FILE * F, const unit * u)
 {
-	order * ord;
-	int i, p = 0;
-	wi36(F, u->no);
-	wi36(F, u->faction->no);
-	ws(F, u->name);
-  ws(F, u->display?u->display:"");
-	wi(F, u->number);
-	wi(F, u->age);
-	ws(F, u->race->_name[0]);
-	ws(F, u->irace!=u->race?u->irace->_name[0]:"");
-	if (u->building)
-		wi36(F, u->building->no);
-	else
-		wi(F, 0);
-	if (u->ship) wi36(F, u->ship->no);
-	else wi36(F, 0);
-	wi(F, u->status);
-	wi(F, u->flags & UFL_SAVEMASK);
-	wnl(F);
+  order * ord;
+  int i, p = 0;
+  wi36(F, u->no);
+  wi36(F, u->faction->no);
+  ws(F, (const char *)u->name);
+  ws(F, u->display?(const char *)u->display:"");
+  wi(F, u->number);
+  wi(F, u->age);
+  ws(F, u->race->_name[0]);
+  ws(F, u->irace!=u->race?u->irace->_name[0]:"");
+  if (u->building)
+    wi36(F, u->building->no);
+  else
+    wi(F, 0);
+  if (u->ship) wi36(F, u->ship->no);
+  else wi36(F, 0);
+  wi(F, u->status);
+  wi(F, u->flags & UFL_SAVEMASK);
+  wnl(F);
 #ifndef LASTORDER
   for (ord = u->old_orders; ord; ord=ord->next) {
     if (++p<MAXPERSISTENT) {
@@ -1153,35 +1150,35 @@ writeunit(FILE * F, const unit * u)
     log_error(("Einheit %s hat 0 Trefferpunkte\n", itoa36(u->no)));
     ((unit*)u)->hp = 1;
   }
-	wi(F, u->hp);
-	wnl(F);
-	a_write(F, u->attribs);
-	wnl(F);
+  wi(F, u->hp);
+  wnl(F);
+  a_write(F, u->attribs);
+  wnl(F);
 }
 
 region *
 readregion(FILE * F, short x, short y)
 {
-	region * r = findregion(x, y);
-	const terrain_type * terrain;
+  region * r = findregion(x, y);
+  const terrain_type * terrain;
   char token[32];
 
-	if (r==NULL) {
-		r = new_region(x, y);
-	} else {
-		current_region = r;
-		while (r->attribs) a_remove(&r->attribs, r->attribs);
-		if (r->land) {
-			free(r->land); /* mem leak */
-			r->land->demands = 0; /* mem leak */
-		}
-		while (r->resources) {
-			rawmaterial * rm = r->resources;
-			r->resources = rm->next;
-			free(rm);
-		}
-		r->land = 0;
-	}
+  if (r==NULL) {
+    r = new_region(x, y);
+  } else {
+    current_region = r;
+    while (r->attribs) a_remove(&r->attribs, r->attribs);
+    if (r->land) {
+      free(r->land); /* mem leak */
+      r->land->demands = 0; /* mem leak */
+    }
+    while (r->resources) {
+      rawmaterial * rm = r->resources;
+      r->resources = rm->next;
+      free(rm);
+    }
+    r->land = 0;
+  }
   if (lomem) rds(F, 0);
   else rds(F, &r->display);
   
@@ -1211,167 +1208,164 @@ readregion(FILE * F, short x, short y)
   if (fval(r->terrain, LAND_REGION)) {
     r->land = calloc(1, sizeof(land_region));
     rds(F, &r->land->name);
-#ifndef NDEBUG
-    if (strlen(r->land->name)>=NAMESIZE) r->land->name[NAMESIZE] = 0;
-#endif
   }
-	if (r->land) {
-		int i;
-		if(global.data_version < GROWTREE_VERSION) {
-			i = ri(F); rsettrees(r, 2, i);
-		} else {
-			i = ri(F);
-			if (i<0) {
-				log_error(("number of trees in %s is %d.\n", 
-						   regionname(r, NULL), i));
-				i=0;
-			}
-			rsettrees(r, 0, i);
-			i = ri(F); 
-			if (i<0) {
-				log_error(("number of young trees in %s is %d.\n", 
-						   regionname(r, NULL), i));
-				i=0;
-			}
-			rsettrees(r, 1, i);
-			i = ri(F); 
-			if (i<0) {
-				log_error(("number of seeds in %s is %d.\n", 
-						   regionname(r, NULL), i));
-				i=0;
-			}
-			rsettrees(r, 2, i);
-		}
-		i = ri(F); rsethorses(r, i);
-		if (global.data_version < NEWRESOURCE_VERSION) {
-			i = ri(F);
+  if (r->land) {
+    int i;
+    if(global.data_version < GROWTREE_VERSION) {
+      i = ri(F); rsettrees(r, 2, i);
+    } else {
+      i = ri(F);
+      if (i<0) {
+        log_error(("number of trees in %s is %d.\n", 
+               regionname(r, NULL), i));
+        i=0;
+      }
+      rsettrees(r, 0, i);
+      i = ri(F); 
+      if (i<0) {
+        log_error(("number of young trees in %s is %d.\n", 
+               regionname(r, NULL), i));
+        i=0;
+      }
+      rsettrees(r, 1, i);
+      i = ri(F); 
+      if (i<0) {
+        log_error(("number of seeds in %s is %d.\n", 
+               regionname(r, NULL), i));
+        i=0;
+      }
+      rsettrees(r, 2, i);
+    }
+    i = ri(F); rsethorses(r, i);
+    if (global.data_version < NEWRESOURCE_VERSION) {
+      i = ri(F);
 #ifdef RESOURCE_CONVERSION
-			if (i!=0) read_iron(r, i);
+      if (i!=0) read_iron(r, i);
 #endif
-		} else {
-			rawmaterial ** pres = &r->resources;
-			assert(*pres==NULL);
-			for (;;) {
-				rawmaterial * res;
-				rss(F, token, sizeof(token));
-				if (strcmp(token, "end")==0) break;
-				res = calloc(sizeof(rawmaterial), 1);
-				res->type = rmt_find(token);
+    } else {
+      rawmaterial ** pres = &r->resources;
+      assert(*pres==NULL);
+      for (;;) {
+        rawmaterial * res;
+        rss(F, token, sizeof(token));
+        if (strcmp(token, "end")==0) break;
+        res = calloc(sizeof(rawmaterial), 1);
+        res->type = rmt_find(token);
         if (res->type==NULL) {
           log_error(("invalid resourcetype %s in data.\n", token));
         }
-				assert(res->type!=NULL);
-				res->level = ri(F);
-				res->amount = ri(F);
+        assert(res->type!=NULL);
+        res->level = ri(F);
+        res->amount = ri(F);
 
-				if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
-					res->startlevel = ri(F);
-					res->base = ri(F);
-					res->divisor = ri(F);
-				} else {
-					int i;
-					for (i=0;r->terrain->production[i].type;++i) {
-						if (res->type->rtype == r->terrain->production[i].type) break;
-					}
+        if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
+          res->startlevel = ri(F);
+          res->base = ri(F);
+          res->divisor = ri(F);
+        } else {
+          int i;
+          for (i=0;r->terrain->production[i].type;++i) {
+            if (res->type->rtype == r->terrain->production[i].type) break;
+          }
 
           res->base = dice_rand(r->terrain->production[i].base);
-					res->divisor = dice_rand(r->terrain->production[i].divisor);
+          res->divisor = dice_rand(r->terrain->production[i].divisor);
           res->startlevel = 1;
-				}
+        }
 
-				*pres = res;
-				pres=&res->next;
-			}
-		}
-		rss(F, token, sizeof(token));
-		if (strcmp(token, "noherb") != 0) {
+        *pres = res;
+        pres=&res->next;
+      }
+    }
+    rss(F, token, sizeof(token));
+    if (strcmp(token, "noherb") != 0) {
       const resource_type * rtype = rt_find(token);
       assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
       rsetherbtype(r, rtype->itype);
-		} else {
-			rsetherbtype(r, NULL);
-		}
-		rsetherbs(r, (short)ri(F));
-		rsetpeasants(r, ri(F));
-		rsetmoney(r, ri(F));
-	}
+    } else {
+      rsetherbtype(r, NULL);
+    }
+    rsetherbs(r, (short)ri(F));
+    rsetpeasants(r, ri(F));
+    rsetmoney(r, ri(F));
+  }
 
-	assert(r->terrain!=NULL);
-	assert(rhorses(r) >= 0);
-	assert(rpeasants(r) >= 0);
-	assert(rmoney(r) >= 0);
+  assert(r->terrain!=NULL);
+  assert(rhorses(r) >= 0);
+  assert(rpeasants(r) >= 0);
+  assert(rmoney(r) >= 0);
 
-	if (r->land) {
-		for (;;) {
+  if (r->land) {
+    for (;;) {
       const struct item_type * itype;
-			rss(F, token, sizeof(token));
-			if (!strcmp(token, "end")) break;
+      rss(F, token, sizeof(token));
+      if (!strcmp(token, "end")) break;
       itype = it_find(token);
       assert(itype->rtype->ltype);
-			r_setdemand(r, itype->rtype->ltype, ri(F));
-		}
+      r_setdemand(r, itype->rtype->ltype, ri(F));
+    }
     if (global.data_version>=REGIONITEMS_VERSION) {
       read_items(F, &r->land->items);
     }
-	}
-	a_read(F, &r->attribs);
+  }
+  a_read(F, &r->attribs);
 
-	return r;
+  return r;
 }
 
 void
 writeregion(FILE * F, const region * r)
 {
-  ws(F, r->display?r->display:"");
-	ws(F, r->terrain->_name);
-	wi(F, r->flags & RF_SAVEMASK);
-	wi(F, r->age);
-	wnl(F);
-	if (fval(r->terrain, LAND_REGION)) {
-		const item_type *rht;
-		struct demand * demand;
+  ws(F, r->display?(const char *)r->display:"");
+  ws(F, r->terrain->_name);
+  wi(F, r->flags & RF_SAVEMASK);
+  wi(F, r->age);
+  wnl(F);
+  if (fval(r->terrain, LAND_REGION)) {
+    const item_type *rht;
+    struct demand * demand;
     rawmaterial * res = r->resources;
-		ws(F, r->land->name);
-		assert(rtrees(r,0)>=0);
-		assert(rtrees(r,1)>=0);
-		assert(rtrees(r,2)>=0);
-		wi(F, rtrees(r,0));
-		wi(F, rtrees(r,1));
-		wi(F, rtrees(r,2));
-		wi(F, rhorses(r));
+    ws(F, (const char *)r->land->name);
+    assert(rtrees(r,0)>=0);
+    assert(rtrees(r,1)>=0);
+    assert(rtrees(r,2)>=0);
+    wi(F, rtrees(r,0));
+    wi(F, rtrees(r,1));
+    wi(F, rtrees(r,2));
+    wi(F, rhorses(r));
 
     while (res) {
       ws(F, res->type->name);
-			wi(F, res->level);
-			wi(F, res->amount);
-			wi(F, res->startlevel);
-			wi(F, res->base);
-			wi(F, res->divisor);
-			res = res->next;
-		}
-		fputs("end ", F);
+      wi(F, res->level);
+      wi(F, res->amount);
+      wi(F, res->startlevel);
+      wi(F, res->base);
+      wi(F, res->divisor);
+      res = res->next;
+    }
+    fputs("end ", F);
 
     rht = rherbtype(r);
-		if (rht) {
-			ws(F, resourcename(rht->rtype, 0));
-		} else {
-			ws(F, "noherb");
-		}
-		wi(F, rherbs(r));
-		wi(F, rpeasants(r));
-		wi(F, rmoney(r));
-		if (r->land) for (demand=r->land->demands; demand; demand=demand->next) {
-			ws(F, resourcename(demand->type->itype->rtype, 0));
-			wi(F, demand->value);
-		}
-		fputs("end \n", F);
+    if (rht) {
+      ws(F, resourcename(rht->rtype, 0));
+    } else {
+      ws(F, "noherb");
+    }
+    wi(F, rherbs(r));
+    wi(F, rpeasants(r));
+    wi(F, rmoney(r));
+    if (r->land) for (demand=r->land->demands; demand; demand=demand->next) {
+      ws(F, resourcename(demand->type->itype->rtype, 0));
+      wi(F, demand->value);
+    }
+    fputs("end \n", F);
 #if RELEASE_VERSION>=REGIONITEMS_VERSION
     write_items(F, r->land->items);
     wnl(F);
 #endif
-	}
-	a_write(F, r->attribs);
-	wnl(F);
+  }
+  a_write(F, r->attribs);
+  wnl(F);
 }
 
 static ally **
@@ -1437,10 +1431,6 @@ readfaction(FILE * F)
 
   rds(F, &f->name);
   rds(F, &f->banner);
-#ifndef NDEBUG
-  if (strlen(f->name)>=NAMESIZE) f->name[NAMESIZE] = 0;
-  if (strlen(f->banner)>=DISPLAYSIZE) f->banner[DISPLAYSIZE] = 0;
-#endif
 
   if (quiet==0) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
 
@@ -1454,7 +1444,7 @@ readfaction(FILE * F)
   if (global.data_version >= OVERRIDE_VERSION) {
     rds(F, &f->override);
   } else {
-    f->override = strdup(itoa36(rng_int()));
+    f->override = xstrdup(itoa36(rng_int()));
   }
 
   if (global.data_version < LOCALE_VERSION) {
@@ -1554,63 +1544,63 @@ readfaction(FILE * F)
 void
 writefaction(FILE * F, const faction * f)
 {
-	ally *sf;
-	ursprung *ur;
+  ally *sf;
+  ursprung *ur;
 
-	wi36(F, f->no);
-	wi(F, f->subscription);
+  wi36(F, f->no);
+  wi(F, f->subscription);
   if (alliances!=NULL) {
     if (f->alliance) wi36(F, f->alliance->id);
     else wi36(F, 0);
   }
 
-	ws(F, f->name);
-	ws(F, f->banner);
-	ws(F, f->email);
-	ws(F, f->passw);
-	ws(F, f->override);
-	ws(F, locale_name(f->locale));
-	wi(F, f->lastorders);
-	wi(F, f->age);
-	ws(F, f->race->_name[0]);
-	wnl(F);
-	wi(F, f->magiegebiet);
+  ws(F, (const char *)f->name);
+  ws(F, (const char *)f->banner);
+  ws(F, f->email);
+  ws(F, (const char *)f->passw);
+  ws(F, (const char *)f->override);
+  ws(F, locale_name(f->locale));
+  wi(F, f->lastorders);
+  wi(F, f->age);
+  ws(F, f->race->_name[0]);
+  wnl(F);
+  wi(F, f->magiegebiet);
 #ifdef KARMA_MODULE
-	wi(F, f->karma);
+  wi(F, f->karma);
 #else
   wi(F, 0);
 #endif /* KARMA_MODULE */
 
-	wi(F, f->flags&FFL_SAVEMASK);
-	a_write(F, f->attribs);
-	wnl(F);
+  wi(F, f->flags&FFL_SAVEMASK);
+  a_write(F, f->attribs);
+  wnl(F);
 #if RELEASE_VERSION>=CLAIM_VERSION
   write_items(F, f->items);
   wnl(F);
 #endif
   fputs("end ", F);
   wnl(F);
-	wi(F, listlen(f->ursprung));
-	for(ur = f->ursprung;ur;ur=ur->next) {
-		wi(F, ur->id);
-		wi(F, ur->x);
-		wi(F, ur->y);
-	}
-	wnl(F);
-	wi(F, f->options & ~want(O_DEBUG));
-	wnl(F);
+  wi(F, listlen(f->ursprung));
+  for(ur = f->ursprung;ur;ur=ur->next) {
+    wi(F, ur->id);
+    wi(F, ur->x);
+    wi(F, ur->y);
+  }
+  wnl(F);
+  wi(F, f->options & ~want(O_DEBUG));
+  wnl(F);
 
-	for (sf = f->allies; sf; sf = sf->next) {
-		int no = (sf->faction!=NULL)?sf->faction->no:0;
-		int status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
-		if (status!=0) {
-			wi36(F, no);
-			wi(F, sf->status);
-		}
-	}
-	fprintf(F, "end ");
-	wnl(F);
-	write_groups(F, f->groups);
+  for (sf = f->allies; sf; sf = sf->next) {
+    int no = (sf->faction!=NULL)?sf->faction->no:0;
+    int status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
+    if (status!=0) {
+      wi36(F, no);
+      wi(F, sf->status);
+    }
+  }
+  fprintf(F, "end ");
+  wnl(F);
+  write_groups(F, f->groups);
 #ifdef ENEMIES
   write_enemies(F, f->enemies);
 #endif
@@ -1757,7 +1747,7 @@ readgame(const char * filename, int backup)
       if (dirtyload) break;
       skip = true;
     }
-    if (quiet<2 && (n & 0x3FF) == 0) {	/* das spart extrem Zeit */
+    if (quiet<2 && (n & 0x3FF) == 0) {  /* das spart extrem Zeit */
       printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
       printf("* %d,%d    \r", x, y);
     }
@@ -1787,10 +1777,6 @@ readgame(const char * filename, int backup)
       rds(F, &b->name);
       if (lomem) rds(F, 0);
       else rds(F, &b->display);
-#ifndef NDEBUG
-      if (strlen(b->name)>=NAMESIZE) b->name[NAMESIZE] = 0;
-      if (b->display && strlen(b->display)>=DISPLAYSIZE) b->display[DISPLAYSIZE] = 0;
-#endif
       b->size = ri(F);
       if (global.data_version < TYPES_VERSION) {
         assert(!"data format is no longer supported");
@@ -1818,16 +1804,12 @@ readgame(const char * filename, int backup)
       rds(F, &sh->name);
       if (lomem) rds(F, 0);
       else rds(F, &sh->display);
-#ifndef NDEBUG
-      if (sh->name && strlen(sh->name)>=NAMESIZE) sh->name[NAMESIZE] = 0;
-      if (sh->display && strlen(sh->display)>=DISPLAYSIZE) sh->display[DISPLAYSIZE] = 0;
-#endif
 
       rss(F, token, sizeof(token));
       sh->type = st_find(token);
       if (sh->type==NULL) {
         /* old datafiles */
-        sh->type = st_find(locale_string(default_locale, token));
+        sh->type = st_find((const char *)locale_string(default_locale, token));
       }
       assert(sh->type || !"ship_type not registered!");
       sh->size = ri(F);
@@ -2016,7 +1998,7 @@ writegame(const char *filename, int quiet)
 
   for (r = regions; r; r = r->next, --n) {
     /* plus leerzeile */
-    if (quiet<2 && (n%1024)==0) {	/* das spart extrem Zeit */
+    if (quiet<2 && (n%1024)==0) {  /* das spart extrem Zeit */
       printf(" - Schreibe Regionen: %d  \r", n);
       fflush(stdout);
     }
@@ -2029,8 +2011,8 @@ writegame(const char *filename, int quiet)
     wnl(F);
     for (b = r->buildings; b; b = b->next) {
       wi36(F, b->no);
-      ws(F, b->name);
-      ws(F, b->display?b->display:"");
+      ws(F, (const char *)b->name);
+      ws(F, b->display?(const char *)b->display:"");
       wi(F, b->size);
       ws(F, b->type->_name);
       wnl(F);
@@ -2043,8 +2025,8 @@ writegame(const char *filename, int quiet)
     for (sh = r->ships; sh; sh = sh->next) {
       assert(sh->region == r);
       wi36(F, sh->no);
-      ws(F, sh->name);
-      ws(F, sh->display?sh->display:"");
+      ws(F, (const char *)sh->name);
+      ws(F, sh->display?(const char *)sh->display:"");
       ws(F, sh->type->name[0]);
       wi(F, sh->size);
       wi(F, sh->damage);
@@ -2071,7 +2053,7 @@ writegame(const char *filename, int quiet)
 int
 a_readint(attrib * a, FILE * f)
 {
-  /*	assert(sizeof(int)==sizeof(a->data)); */
+  /*  assert(sizeof(int)==sizeof(a->data)); */
   fscanf(f, "%d", &a->data.i);
   return AT_READ_OK;
 }

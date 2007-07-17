@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include <util/bsdstring.h>
 /**
  ** simple operand stack
  **/
@@ -242,11 +243,12 @@ parse_symbol(opstack ** stack, const char* in, const void * userdata)
   return in;
 }
 
+#define TOKENSIZE 4096
 static const char *
 parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*) -> char* */
 {
   char * c;
-  char * buffer = balloc(4*1024);
+  char * buffer = balloc(TOKENSIZE);
   const char * ic = in;
   char * oc = buffer;
   /* mode flags */
@@ -282,7 +284,7 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
           ic = parse_symbol(stack, ++ic, userdata);
           if (ic==NULL) return NULL;
           c = (char*)opop_v(stack);
-          oc += strlen(strcpy(oc, c));
+          oc += strlcpy(oc, c, TOKENSIZE-(oc-buffer));
           bfree(c);
           break;
         default:
