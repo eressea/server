@@ -1855,7 +1855,7 @@ sp_treewalkexit(castorder *co)
   int cast_level = co->level;
 
   if (getplane(r) != get_astralplane()) {
-    cmistake(mage, co->order, 193, MSG_MAGIC);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralonly", ""));
     return 0;
   }
   if (is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
@@ -5394,7 +5394,6 @@ sp_enterastral(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
-  const spell *sp = co->sp;
 
   switch(getplaneid(r)) {
   case 0:
@@ -5407,10 +5406,7 @@ sp_enterastral(castorder *co)
   }
 
   if (!rt) {
-    sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann hier kein Kontakt zur "
-        "Astralwelt hergestellt werden.", unitname(mage),
-        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_astralregion", ""));
     return 0;
   }
 
@@ -5494,7 +5490,6 @@ sp_pullastral(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
-  const spell *sp = co->sp;
 
   switch (getplaneid(r)) {
     case 1:
@@ -5511,7 +5506,7 @@ sp_pullastral(castorder *co)
         rl2 = rl2->next;
       }
       if (!rl2) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "spellfail::nocontact",
+        ADDMSG(&u->faction->msgs, msg_feedback(u, co->order, "spellfail::nocontact",
           "target", rt));
         free_regionlist(rl);
         return 0;
@@ -5519,10 +5514,7 @@ sp_pullastral(castorder *co)
       free_regionlist(rl);
       break;
     default:
-      sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
-        "nur in der astralen Welt.", unitname(mage),
-        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-      addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralonly", ""));
       return 0;
   }
 
@@ -5756,7 +5748,7 @@ sp_fetchastral(castorder *co)
        * regions. Only possible on the intersections of schemes */
       region_list * rfind;
       if (getplane(u->region) != get_astralplane()) {
-        cmistake(mage, co->order, 193, MSG_MAGIC);
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralonly", ""));
         continue;
       }
       if (rtl!=NULL) free_regionlist(rtl);

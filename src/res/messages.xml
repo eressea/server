@@ -4773,7 +4773,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Zielregion wurde nicht korrekt angegeben."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Target region was supplied incorrectly."</text>
   </message>
-  <message name="error193" section="errors">
+  <message name="spellfail_astralonly" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -5850,6 +5850,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give anybody away."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give anybody away."</text>
   </message>
+
   <message name="feedback_no_contact" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -5858,9 +5859,19 @@
       <arg name="target" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us."</text>
   </message>
+
+  <message name="feedback_no_astralregion" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es kann hier kein Kontakt zur Astralwelt aufgenommen werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no connection to the astral plane."</text>
+  </message>
+
   <message name="feedback_no_contact_resist" section="errors">
     <type>
       <arg name="unit" type="unit"/>
