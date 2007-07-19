@@ -239,14 +239,6 @@ message_all(battle * b, message * m)
   }
 }
 
-void
-battlerecord(battle * b, const char *s)
-{
-  struct message * m = msg_message("battle_msg", "string", s);
-  message_all(b, m);
-  msg_release(m);
-}
-
 static void
 fbattlerecord(battle * b, faction * f, const char *s)
 {

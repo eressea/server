@@ -5506,7 +5506,7 @@ sp_pullastral(castorder *co)
         rl2 = rl2->next;
       }
       if (!rl2) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, co->order, "spellfail::nocontact",
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail::nocontact",
           "target", rt));
         free_regionlist(rl);
         return 0;
@@ -6079,6 +6079,7 @@ sp_eternizewall(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
+  message * msg;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -6094,17 +6095,21 @@ sp_eternizewall(castorder *co)
 
   /* melden, 1x pro Partei in der Burg */
   for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
+  msg = msg_message("sp_eternizewall_effect", "mage building region", mage, b, r);
   for (u = r->units; u; u = u->next) {
     if (!fval(u->faction, FFL_SELECT)) {
       fset(u->faction, FFL_SELECT);
       if (u->building ==  b) {
-        sprintf(buf, "Mit einem Ritual bindet %s die magischen Kr‰fte "
-            "der Erde in die Mauern von %s", unitname(mage),
-            buildingname(b));
-        addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+        r_addmessage(r, u->faction, msg);
       }
     }
   }
+  if (r!=mage->region) {
+    add_message(&mage->faction->msgs, msg);
+  } else if (mage->building!=b) {
+    r_addmessage(r, mage->faction, msg);
+  } 
+  msg_release(msg);
 
   return cast_level;
 }
@@ -6133,11 +6138,11 @@ sp_permtransfer(castorder *co)
 {
   int aura;
   unit *tu;
-  region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
   const spell *sp = co->sp;
+  message * msg;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -6167,8 +6172,12 @@ sp_permtransfer(castorder *co)
     change_maxspellpoints(tu, aura/3);
   }
 
-  sprintf(buf, "%s opfert %s %d Aura.", unitname(mage), unitname(tu), aura);
-  addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  msg = msg_message("sp_permtransfer_effect", "mage target amount", mage, tu, aura);
+  add_message(&mage->faction->msgs, msg);
+  if (tu->faction!=mage->faction) {
+    add_message(&tu->faction->msgs, msg);
+  }
+  msg_release(msg);
 
   return cast_level;
 }
@@ -6187,7 +6196,7 @@ sp_movecastle(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
-  const spell *sp = co->sp;
+  message* msg;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -6202,22 +6211,14 @@ sp_movecastle(castorder *co)
   }
 
   if (b->size > (cast_level-12) * 250) {
-    sprintf(buf, "%s in %s: 'ZAUBER %s': Der Elementar ist "
-      "zu klein, um das Geb‰ude zu tragen.", unitname(mage),
-      regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_movecastle_fail_0", ""));
     return cast_level;
   }
 
   target_region = rconnect(r,dir);
 
   if (!(target_region->terrain->flags & LAND_REGION)) {
-    sprintf(buf, "%s in %s: 'ZAUBER %s': Der Erdelementar "
-        "weigert sich, nach %s zu gehen.",
-      unitname(mage), regionname(mage->region, mage->faction),
-      spell_name(sp, mage->faction->locale),
-      locale_string(mage->faction->locale, directions[dir]));
-    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_movecastle_fail_1", "direction", dir));
     return cast_level;
   }
 
@@ -6237,10 +6238,6 @@ sp_movecastle(castorder *co)
     u = unext;
   }
 
-  sprintf(buf, "Ein Beben ersch¸ttert %s. Viele kleine Pseudopodien "
-    "erheben das Geb‰ude und tragen es in Richtung %s.",
-    buildingname(b), locale_string(mage->faction->locale, directions[dir]));
-
   if ((b->type==bt_find("caravan") || b->type==bt_find("dam") || b->type==bt_find("tunnel"))) {
     boolean damage = false;
     direction_t d;
@@ -6250,9 +6247,12 @@ sp_movecastle(castorder *co)
         damage = true;
       }
     }
-    if (damage) strcat(buf, " Die Straﬂen der Region wurden besch‰digt.");
+/*    if (damage) strcat(buf, " Die Straﬂen der Region wurden besch‰digt."); */
   }
-  addmessage(r, 0, buf, MSG_MAGIC, ML_INFO);
+
+  msg = msg_message("sp_movecastle_effect", "building direction", b, dir);
+  r_addmessage(r, NULL, msg);
+  msg_release(msg);
 
   return cast_level;
 }

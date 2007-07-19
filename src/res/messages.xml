@@ -1251,6 +1251,24 @@
     <text locale="de">"$unit($mage) kümmert sich um die Verletzten und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Verwundete werden geheilt."</text>
   </message>
 
+  <message name="sp_eternizewall_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="building" type="building"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde von $region($region) in die Mauern von $building($building)."</text>
+  </message>
+
+  <message name="sp_permtransfer_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="target" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) opfert $unit($target) $int($amount) Aura."</text>
+  </message>
+
   <message name="reanimate_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
@@ -1575,8 +1593,31 @@
       <arg name="race" type="race"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) kann keine $race($race,1)-Gestalt annehmen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) cannot assume the shape of a $race($race,1)."</text>
   </message>
+
+  <message name="sp_movecastle_fail_0" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Elementar ist zu klein, um das Gebäude zu tragen."</text>
+</text>
+  </message>
+
+  <message name="sp_movecastle_fail_1" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="direction" type="direction"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Elementar weigert sich, nach $direction($direction) zu gehen."</text>
+</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The elemental refuses to go $direction($direction)."</text>
+</text>
+  </message>
+
   <message name="sp_migranten_fail1" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -1607,6 +1648,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ruft Drachen nach $region($target)."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) calls dragons to $region($target)."</text>
   </message>
+
   <message name="magiccreate_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -1619,6 +1661,15 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) creates $int($amount) ${item}."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($unit) creates $int($amount) ${item}."</text>
   </message>
+
+  <message name="sp_movecastle_effect" section="magic">
+    <type>
+      <arg name="building" type="building"/>
+      <arg name="direction" type="direction"/>
+    </type>
+    <text locale="de">"Ein Beben erschüttert $building($building). Viele kleine Pseudopodien erheben das Gebäude und tragen es in Richtung $direction($direction)."</text>
+  </message>
+
   <message name="use_tacticcrystal" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -7270,15 +7321,35 @@
     <text locale="de">"$unit($mage) beschwört $int($number) Dämonen aus dem Reich der Schatten."</text>
     <text locale="en">"$unit($mage) summons $int($number) demons from the realm of shadows."</text>
   </message>
+
   <message name="cast_spell_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>
-      <arg name="effect" type="string"/>
     </type>
-    <text locale="de">"$unit($mage) zaubert $spell($spell)$if($strlen($effect),": $effect","")."</text>
-    <text locale="en">"$unit($mage) casts $spell($spell)$if($strlen($effect),": $effect","")."</text>
+    <text locale="de">"$unit($mage) zaubert $spell($spell)."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell)."</text>
   </message>
+
+  <message name="sp_mindblast_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+      <arg name="dead" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren Erinnerungen, $int($dead) wurden getötet."</text>
+  </message>
+
+  <message name="sp_shadowcall_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft $int($amount) $race($race, 0) zu Hilfe."</text>
+  </message>
+
   <message name="battle::killed" section="battle">
     <type>
       <arg name="unit" type="unit"/>

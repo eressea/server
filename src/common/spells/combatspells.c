@@ -525,21 +525,7 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  sprintf(buf, "%d Krieger %s Erinnerungen", k, k == 1 ? "verliert" : "verlieren");
-
-  if (killed > 0) {
-    scat(", ");
-    icat(killed);
-    scat(" Krieger ");
-    if (killed == 1) {
-      scat("wurde");
-    } else {
-      scat("wurden");
-    }
-    scat(" getötet");
-  }
-
-  m = msg_message("cast_spell_effect", "mage spell effect", mage, sp, buf);
+  m = msg_message("sp_midblast_effect", "mage spell amount dead", mage, sp, k, killed);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -699,6 +685,7 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
   unit *u;
   const char * races[3] = { "shadowbat", "nightmare", "vampunicorn" };
   const race *rc = rc_find(races[rng_int()%3]);
+  message * msg;
 
   unused(sp);
 
@@ -715,9 +702,9 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
   a_add(&u->attribs, a);
 
   make_fighter(b, u, fi->side, is_attacker(fi));
-  sprintf(buf, "%s ruft %d %s zu Hilfe", unitname(mage), force,
-    racename(default_locale, u, u->race));
-  battlerecord(b, buf);
+  msg = msg_message("sp_shadowcall_effect", "mage amount race", mage, u->number, u->race);
+  message_all(b, msg);
+  msg_release(msg);
   return level;
 }
 
@@ -1308,7 +1295,7 @@ sp_armorshield(fighter * fi, int level, double power, spell * sp)
   int effect;
   int duration;
   battle *b = fi->side->battle;
-  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
+  message * m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
 
   message_all(b, m);
   msg_release(m);
@@ -1335,7 +1322,7 @@ sp_reduceshield(fighter * fi, int level, double power, spell * sp)
   int effect;
   int duration;
   battle *b = fi->side->battle;
-  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
+  message * m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
   message_all(b, m);
   msg_release(m);
 
@@ -1362,7 +1349,7 @@ sp_fumbleshield(fighter * fi, int level, double power, spell * sp)
   int effect;
   int duration;
   battle *b = fi->side->battle;
-  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
+  message * m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
 
   message_all(b, m);
   msg_release(m);
@@ -1464,7 +1451,7 @@ int
 sp_keeploot(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
-  message * m = msg_message("cast_spell_effect", "mage spell effect", fi->unit, sp, "");
+  message * m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
 
   message_all(b, m);
   msg_release(m);
