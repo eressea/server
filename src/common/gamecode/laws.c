@@ -1064,7 +1064,8 @@ parse_restart(void)
       continue;
     }
     if (fval(f, FFL_OVERRIDE)) {
-      set_string(&f->override, (xmlChar*)strdup(itoa36(rng_int())));
+      free(f->override);
+      f->override = (xmlChar*)strdup(itoa36(rng_int()));
       freset(f, FFL_OVERRIDE);
     }
     if (turn!=f->lastorders) {
@@ -1408,13 +1409,11 @@ display_cmd(unit * u, struct order * ord)
   if (s!=NULL) {
     const xmlChar * s2 = getstrtoken();
 
+    free(*s);
+    *s = xstrdup(s2);
     if (xstrlen(s2)>=DISPLAYSIZE) {
-      xmlChar * s3 = xstrdup(s2);
-      s3[DISPLAYSIZE] = 0;
-      set_string(s, s3);
-      free(s3);
-    } else
-    set_string(s, s2);
+      (*s)[DISPLAYSIZE] = 0;
+    }
   }
 
   return 0;
@@ -1677,14 +1676,11 @@ name_cmd(unit * u, struct order * ord)
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
 
+    free(*s);
+    *s = xstrdup(s2);
     if (xstrlen(s2)>=NAMESIZE) {
-      xmlChar * s3 = xstrdup(s2);
-      s3[NAMESIZE] = 0;
-      set_string(s, s3);
-      free(s3);
-    } else
-      set_string(s, s2);
-
+      (*s)[NAMESIZE] = 0;
+    }
   }
 
   return 0;

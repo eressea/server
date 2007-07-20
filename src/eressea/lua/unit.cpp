@@ -378,7 +378,8 @@ unit_getname(const unit& u)
 static void
 unit_setname(unit& u, const char * name)
 {
-  set_string(&u.name, name);
+  free(u.name);
+  u.name = xstrdup(name);
 }
 
 static const char *
@@ -390,7 +391,8 @@ unit_getinfo(const unit& u)
 static void
 unit_setinfo(unit& u, const char * info)
 {
-  set_string(&u.display, info);
+  free(u.display);
+  u.display = xstrdup(info);
 }
 
 static bool

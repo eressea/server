@@ -169,7 +169,6 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
 
   b = new_building(bt_find("artsculpture"), u->region, u->faction->locale);
   b->size = 100;
-  set_string(&b->name, LOC(u->faction->locale, "artsculpture"));
 
   ADDMSG(&u->region->msgs, msg_message("artsculpture_create", "unit region", 
     u, u->region));
@@ -192,7 +191,6 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
 
   b = new_building(bt_find("artacademy"), u->region, u->faction->locale);
   b->size = 100;
-  set_string(&b->name, LOC(u->faction->locale, "artacademy"));
 
   ADDMSG(&u->region->msgs, msg_message(
     "artacademy_create", "unit region", u, u->region));

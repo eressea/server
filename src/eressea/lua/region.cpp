@@ -90,8 +90,10 @@ region_getherbtype(const region& r) {
 }
 
 static void
-region_setinfo(region& r, const char * info) {
-  set_string(&r.display, info);
+region_setinfo(region& r, const char * info)
+{
+  free(r.display);
+  r.display = xstrdup(info);
 }
 
 static const char *

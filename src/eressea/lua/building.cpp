@@ -82,25 +82,27 @@ building_addaction(building& b, const char * fname, const char * param)
 static const char *
 building_getinfo(const building& b)
 {
-  return b.display;
+  return (const char*)b.display;
 }
 
 static void
 building_setinfo(building& b, const char * info)
 {
-  set_string(&b.display, info);
+  free(b.display);
+  b.display = (xmlChar*)strdup(info);
 }
 
 static const char *
 building_getname(const building& b)
 {
-  return b.name;
+  return (const char *)b.name;
 }
 
 static void
 building_setname(building& b, const char * name)
 {
-  set_string(&b.name, name);
+  free(b.name);
+  b.name = (xmlChar*)strdup(name);
 }
 
 static region *

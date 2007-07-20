@@ -772,6 +772,15 @@ r_demand(const region * r, const luxury_type * ltype)
   return d->value;
 }
 
+void
+rsetname(struct region * r, const xmlChar * name)
+{
+  if (r->land) {
+    free(r->land->name);
+    r->land->name = strdup(name);
+  }
+}
+
 const xmlChar *
 rname(const region * r, const struct locale * lang) {
   if (r->land) {

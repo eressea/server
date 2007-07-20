@@ -1155,6 +1155,25 @@
     <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were intimidated."</text>
   </message>
 
+  <message name="sp_flee_effect_0" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell), aber es gab niemanden, der beeinflusst werden konnte."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell), but nobody is impressed."</text>
+  </message>
+
+  <message name="sp_flee_effect_1" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden von Furcht gepackt."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($amount) fighters were consumed by fear."</text>
+  </message>
+
   <message name="cast_escape_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
@@ -1297,6 +1316,14 @@
   <message name="chaosgate_effect_2" section="magic">
     <text locale="de">Ein Wirbel aus blendendem Licht erscheint."</text>
     <text locale="en">"A vortex of blinding light appears."</text>
+  </message>
+
+  <message name="summonundead_effect_0" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) kann keine Unjtoten rufen."</text>
+    <text locale="en">"$unit($mage) cannot summon any undead."</text>
   </message>
 
   <message name="summonundead_effect_1" section="magic">
@@ -7129,12 +7156,74 @@
     <text locale="de">"$unit($mage) zaubert $spell($spell), aber niemand war in Reichweite."</text>
     <text locale="en">"$unit($mage) casts $spell($spell), but nobody was in range."</text>
   </message>
+
   <message name="battle::after" section="battle">
     <type>
     </type>
     <text locale="de">"Einheiten nach dem Kampf:"</text>
     <text locale="en">"Units after the battle:"</text>
   </message>
+  
+  <message name="battle::section" section="battle">
+    <type>
+    </type>
+    <text locale="de">""</text>
+    <text locale="en">""</text>
+  </message>
+  
+  <message name="sp_wolfhowl_effect" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($mage) ruft $int($amount) $race($race, $amount) zu Hilfe."</text>
+    <text locale="en">"$unit($mage) calls for the help of $int($amount) $race($race, $amount)."</text>
+  </message>
+  
+  <message name="sp_shadowknights_effect" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) beschwört Trugbilder herauf."</text>
+  </message>
+  
+  <message name="sp_chaosrow_effect_0" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) murmelt eine düster klingende Formel. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt."</text>
+  </message>
+  
+  <message name="sp_chaosrow_effect_1" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) murmelt eine düster klingende Formel. Ein plötzlicher Tumult entsteht und bringt die Kampfaufstellung durcheinander."</text>
+  </message>
+  
+  <message name="sp_confusion_effect_0" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt."</text>
+  </message>
+  
+  <message name="sp_confusion_effect_1" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht und bringt die Kampfaufstellung durcheinander."</text>
+  </message>
+  
+  <message name="sp_strongwalls_effect" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($mage) läßt die Mauern von $building($building) in einem unheimlichen magischen Licht erglühen."</text>
+  </message>
+  
   <message name="battle::lineup" section="battle">
     <type>
       <arg name="turn" type="int"/>

@@ -114,6 +114,7 @@ static const double TROLL_REGENERATION = 0.10;
 /* Nach dem alten System: */
 static int missile_range[2] = {FIGHT_ROW, BEHIND_ROW};
 static int melee_range[2] = {FIGHT_ROW, FIGHT_ROW};
+static message * msg_separator;
 
 const troop no_troop = {0, 0};
 
@@ -2832,7 +2833,7 @@ print_stats(battle * b)
       message * msg;
       char buf[1024];
 
-      fbattlerecord(b, f, " ");
+      message_faction(b, f, msg_separator);
 
       msg = msg_message("msg_army", "index name", army_index(s), sname);
       message_faction(b, f, msg);
@@ -2901,7 +2902,7 @@ print_stats(battle * b)
     print_fighters(b, s);
   }
 
-  battlerecord(b, " ");
+  message_all(b, msg_separator);
 
   /* Besten Taktiker ermitteln */
 
@@ -3452,7 +3453,7 @@ battle_report(battle * b)
     size_t size = sizeof(buf), rsize;
     message * m;
 
-    fbattlerecord(b, fac, " ");
+    message_faction(b, fac, msg_separator);
 
     if (cont) m = msg_message("battle::lineup", "turn", b->turn);
     else m = msg_message("battle::after", "");
@@ -4034,6 +4035,10 @@ do_battle(region * r)
   boolean fighting = false;
   ship * sh;
   building *bu;
+
+  if (msg_separator==NULL) {
+    msg_separator = msg_message("battle::section", "");
+  }
 
   fighting = init_battle(r, &b);
 

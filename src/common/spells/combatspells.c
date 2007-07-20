@@ -38,6 +38,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <string.h>
 
 #define EFFECT_HEALING_SPELL     5
 
@@ -715,6 +716,7 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   region *r = b->region;
   unit *mage = fi->unit;
   attrib *a;
+  message * msg;
   int force = (int)(get_force(power, 3)/2);
   unit *u = create_unit(r, mage->faction, force, new_race[RC_WOLF], 0, NULL, mage);
   unused(sp);
@@ -734,9 +736,10 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   a_add(&u->attribs, a);
 
   make_fighter(b, u, fi->side, is_attacker(fi));
-  sprintf(buf, "%s ruft %d %s zu Hilfe", unitname(mage), force,
-    racename(default_locale, u, u->race));
-  battlerecord(b, buf);
+  msg = msg_message("sp_wolfhowl_effect", "mage amount race", mage, u->number, u->race);
+  message_all(b, msg);
+  msg_release(msg);
+
   return level;
 }
 
@@ -749,8 +752,10 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
   unit *mage = fi->unit;
   attrib *a;
   int force = max(1, (int)get_force(power, 3));
+  message * msg;
 
   unused(sp);
+
 
   u = create_unit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT], 0, NULL, mage);
   setstatus(u, ST_FIGHT);
@@ -767,8 +772,10 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
 
   make_fighter(b, u, fi->side, is_attacker(fi));
 
-  sprintf(buf, "%s beschwört Trugbilder herauf", unitname(mage));
-  battlerecord(b, buf);
+  msg = msg_message("sp_shadowknights_effect", "mage", mage);
+  message_all(b, msg);
+  msg_release(msg);
+
   return level;
 }
 
@@ -780,15 +787,13 @@ sp_strong_wall(fighter * fi, int level, double power, spell * sp)
   building *burg;
   variant effect;
   static boolean init = false;
+  message * msg;
   static const curse_type * strongwall_ct;
   if (!init) { init = true; strongwall_ct = ct_find("strongwall"); }
 
   unused(sp);
 
   if (!mage->building) {
-    sprintf(buf, "%s zaubert nicht, denn dieser Zauber hätte hier keinen "
-        "Sinn.", unitname(mage));
-    battlerecord(b, buf);
     return 0;
   }
   burg = mage->building;
@@ -798,9 +803,10 @@ sp_strong_wall(fighter * fi, int level, double power, spell * sp)
 
   create_curse(mage, &burg->attribs, strongwall_ct, power, 1, effect, 0);
 
-  sprintf(buf, "%s Mauern erglühen in einem unheimlichen magischen Licht.",
-      buildingname(burg));
-  battlerecord(b, buf);
+  msg = msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);
+  message_all(b, msg);
+  msg_release(msg);
+
   return level;
 }
 
@@ -811,26 +817,19 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
   unit *mage = fi->unit;
   cvector *fgs;
   void **fig;
+  message * m;
+  const char * mtype;
   int k = 0;
 
   if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE|SELECT_FIND)) {
-    message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
     message_all(b, m);
     msg_release(m);
     return 0;
   }
 
-  switch (sp->id) {
-    case SPL_CHAOSROW:
-      sprintf(buf, "%s murmelt eine düster klingende Formel. ", unitname(mage));
-      power *= 40;
-      break;
-
-    case SPL_SONG_OF_CONFUSION:
-      sprintf(buf, "%s stimmt einen seltsamen Gesang an. ", unitname(mage));
-      power = get_force(power, 5);
-      break;
-  }
+  if (sp->id==SPL_CHAOSROW) power *=40;
+  else power = get_force(power, 5);
 
   fgs = fighters(b, fi->side, FIGHT_ROW, NUMROWS, FS_ENEMY);
   v_scramble(fgs->begin, fgs->end);
@@ -880,13 +879,14 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
   cv_kill(fgs);
   free(fgs);
 
-  scat("Ein plötzlicher Tumult entsteht");
-  if (k > 0) {
-    scat(" und bringt die Kampfaufstellung durcheinander.");
+  if (sp->id==SPL_CHAOSROW) {
+    mtype = (k>0) ? "sp_chaosrow_effect_1" : "sp_chaosrow_effect_0";
   } else {
-    scat(", der sich jedoch schnell wieder legt.");
+    mtype = (k>0) ? "sp_confusion_effect_1" : "sp_confusion_effect_0";
   }
-  battlerecord(b, buf);
+  m = msg_message(mtype, "mage", mage);
+  message_all(b, m);
+  msg_release(m);
   return level;
 }
 
@@ -902,19 +902,16 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
   void **fig;
   int force, n;
   int panik = 0;
+  message * msg;
 
   switch(sp->id) {
     case SPL_FLEE:
-      sprintf(buf, "%s zaubert %s", unitname(mage),
-        spell_name(sp, default_locale));
       force = (int)get_force(power,4);
       break;
     case SPL_SONG_OF_FEAR:
-      sprintf(buf, "%s stimmt einen düsteren Gesang an", unitname(mage));
       force = (int)get_force(power,3);
       break;
     case SPL_AURA_OF_FEAR:
-      sprintf(buf, "%s ist von dunklen Schatten umgeben", unitname(mage));
       force = (int)get_force(power,5);
       break;
     default:
@@ -922,12 +919,11 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
   }
 
   if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE|SELECT_FIND)) {
-    scat(", aber es gab niemanden mehr, der beeinflusst werden konnte.");
-    battlerecord(b, buf);
+    msg = msg_message("sp_flee_effect_0", "mage spell", mage, sp);
+    message_all(b, msg);
+    msg_release(msg);
     return 0;
   }
-  scat(":");
-  battlerecord(b, buf);
 
   fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
   v_scramble(fgs->begin, fgs->end);
@@ -956,9 +952,9 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
   cv_kill(fgs);
   free(fgs);
 
-  sprintf(buf, "%d Krieger %s von Furcht gepackt.", panik,
-      panik == 1 ? "wurde" : "wurden");
-  battlerecord(b, buf);
+  msg = msg_message("sp_flee_effect_1", "mage spell amount", mage, sp, panik);
+  message_all(b, msg);
+  msg_release(msg);
 
   return level;
 }
@@ -968,7 +964,6 @@ int
 sp_hero(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
-  unit *mage = fi->unit;
   int df_bonus = 0;
   int force = 0;
   int allies;
@@ -1017,7 +1012,6 @@ int
 sp_berserk(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
-  unit *mage = fi->unit;
   int at_bonus = 0;
   int df_malus = 0;
   int force = 0;
@@ -1126,7 +1120,6 @@ sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
   int n = 0;
   int force = (int)(power * power * 4);
   message * m;
-  const char * effect;
 
   if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE|SELECT_FIND)) {
     message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
@@ -1163,7 +1156,6 @@ int
 sp_windshield(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
-  unit *mage = fi->unit;
   int force, at_malus;
   int enemies;
   message * m;
@@ -1217,7 +1209,7 @@ sp_reeling_arrows(fighter * fi, int level, double power, spell * sp)
   unused(power);
 
   b->reelarrow = true;
-  m = msg_message("cast_tired_effect", "mage spell amount", fi->unit, sp, n);
+  m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
   message_all(b, m);
   msg_release(m);
   return level;
@@ -1552,6 +1544,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   cvector *fgs;
   void **fig;
   int n, undead = 0;
+  message * msg;
   int force = (int)get_force(power,0);
   double c = 0.50 + 0.02 * power;
 
@@ -1580,15 +1573,15 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
       }
 
       if (j > 0) {
-        unit * u = create_unit(r, mage->faction, 0, new_race[RC_UNDEAD], 0, NULL, mage);
+        unit * u = create_unit(r, mage->faction, 0, new_race[RC_UNDEAD], 0, du->name, du);
 
         /* new units gets some stats from old unit */
-        set_string(&u->name, du->name);
-        set_string(&u->display, du->display);
+        free(u->display);
+        u->display = xstrdup(du->display);
         setstatus(u, du->status);
         setguard(u, GUARD_NONE);
 
-        /* inherit stealth from magician */
+        /* inheit stealth from magician */
         if (fval(mage, UFL_PARTEITARNUNG)) {
           fset(u, UFL_PARTEITARNUNG);
         }
@@ -1608,19 +1601,14 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   cv_kill(fgs);
   free(fgs);
 
+  level = min(level, undead);
   if (undead == 0) {
-    sprintf(buf, "%s kann keine Untoten rufen.", unitname(mage));
-    level = 0;
-  } else if (undead == 1) {
-    sprintf(buf, "%s erweckt einen Untoten.", unitname(mage));
-    level = 1;
+    msg = msg_message("summonundead_effect_0", "mage", mage);
   } else {
-    sprintf(buf, "%s erweckt %d Untote.", unitname(mage), undead);
+    msg = msg_message("summonundead_effect_1", "mage", mage);
   }
 
-  battlerecord(b, buf);
+  message_all(b, msg);
+  msg_release(msg);
   return level;
 }
-
-
-/* ------------------------------------------------------------------ */

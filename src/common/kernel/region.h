@@ -213,7 +213,7 @@ extern boolean r_isforest(const struct region * r);
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
 extern const xmlChar * rname(const struct region * r, const struct locale * lang);
-#define rsetname(r, str) (set_string(&(r)->land->name, str))
+extern void rsetname(struct region * r, const xmlChar * name);
 
 #define rplane(r) getplane(r)
 
