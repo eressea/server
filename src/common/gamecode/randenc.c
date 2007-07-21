@@ -1015,11 +1015,13 @@ godcurse(void)
 static unit *
 split_unit(region * r, unit *u)
 {
-  unit *u2 = createunit(r, u->faction, 0, u->race);
+  unit *u2 = create_unit(r, u->faction, 0, u->race, 0, u->name, u);
   int newsize = u->number/2;
 
-  set_string(&u2->name, u->name);
-  set_string(&u2->display, u->display);
+  if (u->display) {
+    free(u2->display);
+    u2->display = xstrdup(u->display);
+  }
   transfermen(u, u2, newsize);
   return u2;
 }

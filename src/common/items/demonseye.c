@@ -48,9 +48,7 @@ summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, str
 static boolean
 give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, struct order * ord)
 {
-	sprintf(buf, "Eine höhere Macht hindert %s daran, das Objekt zu übergeben. "
-			"'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'.", unitname(src));
-	mistake(src, ord, buf, MSG_COMMERCE);
+  ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "error_giveeye", ""));
 	return false;
 }
 

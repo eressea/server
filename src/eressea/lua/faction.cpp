@@ -31,14 +31,15 @@
 #endif
 
 #include <ostream>
+#include <cstring>
 using namespace luabind;
 
 static faction *
 add_faction(const char * email, const char * racename, const char * lang)
 {
-  const race * frace = findrace(racename, default_locale);
-  if (frace==NULL) frace = findrace(racename, find_locale("de"));
-  if (frace==NULL) frace = findrace(racename, find_locale("en"));
+  const race * frace = findrace((const xmlChar*)racename, default_locale);
+  if (frace==NULL) frace = findrace((const xmlChar*)racename, find_locale("de"));
+  if (frace==NULL) frace = findrace((const xmlChar*)racename, find_locale("en"));
   if (frace==NULL) return NULL;
   locale * loc = find_locale(lang);
   faction * f = addfaction(email, NULL, frace, loc, 0);
@@ -202,7 +203,8 @@ faction_items(const faction& f) {
 void
 faction_set_passw(faction& f, const char * passw)
 {
-  set_string(&f.passw, passw);
+  free(f.passw);
+  f.passw = strdup(passw);
 }
 
 const char *
@@ -214,19 +216,21 @@ faction_get_passw(const faction& f)
 void
 faction_set_banner(faction& f, const char * banner)
 {
-  set_string(&f.banner, banner);
+  free(f.banner);
+  f.banner = BAD_CAST strdup(banner);
 }
 
 const char *
 faction_get_banner(const faction& f)
 {
-  return f.banner;
+  return (const char*)f.banner;
 }
 
 void
 faction_set_email(faction& f, const char * email)
 {
-  set_string(&f.email, email);
+  free(f.email);
+  f.email = strdup(email);
 }
 
 const char *

@@ -119,7 +119,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
     else nrt->section = NULL;
     messagetypes[hash] = nrt;
     assert(string && *string);
-    nrt->string = xstrdup(string);
+    nrt->string = strdup(string);
     *c = '\0';
     for (i=0;i!=mtype->nparameters;++i) {
       if (i!=0) *c++ = ' ';

@@ -175,7 +175,7 @@ new_ship(const ship_type * stype, const struct locale * lang, region * r)
 	sh->region = r;
 
 	sprintf((char*)buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
-	set_string(&sh->name, buffer);
+	sh->name = xstrdup(buffer);
 	shash(sh);
   addlist(&r->ships, sh);
 	return sh;

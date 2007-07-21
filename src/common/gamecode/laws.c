@@ -940,7 +940,7 @@ restart_cmd(unit * u, struct order * ord)
       return 0;
     }
 
-    if (!checkpasswd(u->faction, s_pass, false)) {
+    if (!checkpasswd(u->faction, (const char *)s_pass, false)) {
       cmistake(u, ord, 86, MSG_EVENT);
       log_warning(("NEUSTART mit falschem Passwort für Partei %s: %s\n",
         factionid(u->faction), s_pass));
@@ -973,7 +973,7 @@ quit_cmd(unit * u, struct order * ord)
   skip_token(); /* skip keyword */
 
   passwd = getstrtoken();
-  if (checkpasswd(f, passwd, false)) {
+  if (checkpasswd(f, (const char *)passwd, false)) {
     if (EnhancedQuit()) {
       int f2_id = getid();
       if (f2_id>0) {
@@ -1065,7 +1065,7 @@ parse_restart(void)
     }
     if (fval(f, FFL_OVERRIDE)) {
       free(f->override);
-      f->override = (xmlChar*)strdup(itoa36(rng_int()));
+      f->override = strdup(itoa36(rng_int()));
       freset(f, FFL_OVERRIDE);
     }
     if (turn!=f->lastorders) {
@@ -1898,7 +1898,8 @@ banner_cmd(unit * u, struct order * ord)
   init_tokens(ord);
   skip_token();
 
-  set_string(&u->faction->banner, getstrtoken());
+  free(u->faction->banner);
+  u->faction->banner = xstrdup(getstrtoken());
   add_message(&u->faction->msgs, msg_message("changebanner", "value",
     u->faction->banner));
 
@@ -1931,9 +1932,10 @@ email_cmd(unit * u, struct order * ord)
 static int
 password_cmd(unit * u, struct order * ord)
 {
-  xmlChar pbuf[32];
+  char pbuf[32];
   int i;
   const xmlChar * s;
+  boolean pwok = true;
 
   init_tokens(ord);
   skip_token();
@@ -1943,23 +1945,23 @@ password_cmd(unit * u, struct order * ord)
     for(i=0; i<6; i++) pbuf[i] = (char)(97 + rng_int() % 26);
     pbuf[6] = 0;
   } else {
-    boolean pwok = true;
-    xmlChar *c;
+    char *c;
 
-    xstrlcpy(pbuf, s, 31);
+    strlcpy(pbuf, (const char *)s, 31);
     pbuf[31] = 0;
     c = pbuf;
-    while (*c) {
+    while (*c && pwok) {
       if (!isalnum(*c)) pwok = false;
       c++;
     }
-    if (pwok == false) {
-      cmistake(u, ord, 283, MSG_EVENT);
-      for(i=0; i<6; i++) pbuf[i] = (char)(97 + rng_int() % 26);
-      pbuf[6] = 0;
-    }
   }
-  set_string(&u->faction->passw, pbuf);
+  free(u->faction->passw);
+  if (pwok == false) {
+    cmistake(u, ord, 283, MSG_EVENT);
+    u->faction->passw = strdup(itoa36(rng_int()));
+  } else {
+    u->faction->passw = strdup(pbuf);
+  }
   fset(u->faction, FFL_OVERRIDE);
   ADDMSG(&u->faction->msgs, msg_message("changepasswd",
     "value", u->faction->passw));
@@ -3816,14 +3818,14 @@ warn_password(void)
   faction * f = factions;
   while (f) {
     boolean pwok = true;
-    const xmlChar * c = f->passw;
-    while (*c) {
+    const char * c = f->passw;
+    while (*c && pwok) {
       if (!isalnum((unsigned char)*c)) pwok = false;
       c++;
     }
-    if (pwok == false) {
+    if (!pwok) {
       free(f->passw);
-      f->passw = (xmlChar*)strdup(itoa36(rng_int()));
+      f->passw = strdup(itoa36(rng_int()));
       ADDMSG(&f->msgs, msg_message("illegal_password", "newpass", f->passw));
     }
     f = f->next;

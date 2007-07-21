@@ -156,13 +156,13 @@ update_subscriptions(void)
 static void
 message_unit(unit& sender, unit& target, const char * str)
 {
-  deliverMail(target.faction, sender.region, &sender, str, &target);
+  deliverMail(target.faction, sender.region, &sender, (const xmlChar *)str, &target);
 }
 
 static void
 message_faction(unit& sender, faction& target, const char * str)
 {
-  deliverMail(&target, sender.region, &sender, str, NULL);
+  deliverMail(&target, sender.region, &sender, (const xmlChar *)str, NULL);
 }
 
 static void

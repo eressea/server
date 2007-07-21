@@ -1364,12 +1364,23 @@
     </type>
     <text locale="de">""AAAAAAAGHHHHHH!" - Ein Schrei durchzieht die Region, $unit($unit) windet sich vor Schmerz."</text>
   </message>
+
+  <message name="error_giveeye" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine höhere Macht hindert $unit($unit) daran, das Objekt zu übergeben. 'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'."</text>
+  </message>
+
   <message name="praytoigjarjuk" section="events">
     <type>
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) sendet ein Stoßgebet an den Herrn der Schreie."</text>
   </message>
+
   <message name="iceberg_melt" section="events">
     <type>
       <arg name="region" type="region"/>
@@ -7098,6 +7109,22 @@
     <text locale="de">"Das Wurmloch in $region($region) schließt sich."</text>
     <text locale="fr">"The wormhole in $region($region) disappears."</text>
     <text locale="en">"The wormhole in $region($region) disappears."</text>
+  </message>
+  <message name="battle::useflamingsword" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$int($amount) Krieger von $unit($unit) benutzen ihre Flammenschwerter."</text>
+    <text locale="en">"$int($amount) fighters of $unit($unit) are using their flaming sword."</text>
+  </message>
+  <message name="battle::usecatapult" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$int($amount) Krieger von $unit($unit) feuern ihre Katapulte ab."</text>
+    <text locale="en">"$int($amount) fighters of $unit($unit) launch their catapults."</text>
   </message>
   <message name="battle::starters" section="battle">
     <type>

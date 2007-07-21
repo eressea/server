@@ -444,9 +444,10 @@ new_building(const struct building_type * btype, region * r, const struct locale
     if (b->type->name==NULL) {
       bname = LOC(lang, btype->_name);
     } else {
+      /* TODO: optimization potential: make b->name NULL and use this as default */
       bname = LOC(lang, buildingtype(btype, b, 0));
     }
-    set_string(&b->name, bname);
+    b->name = xstrdup(bname);
   }
   return b;
 }

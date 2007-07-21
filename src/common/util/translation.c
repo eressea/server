@@ -13,6 +13,7 @@
 
 #include "translation.h"
 #include "log.h"
+#include "bsdstring.h"
 
 /* libc includes */
 #include <assert.h>
@@ -21,7 +22,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <util/bsdstring.h>
 /**
  ** simple operand stack
  **/

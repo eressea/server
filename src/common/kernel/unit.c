@@ -1271,17 +1271,18 @@ createunitid(unit *u, int id)
 void
 name_unit(unit *u)
 {
+  free(u->name);
 	if (u->race->generate_name) {
     const xmlChar * gen_name = u->race->generate_name(u); 
     if (gen_name) {
-      set_string(&u->name, gen_name);
+      u->name = xstrdup(gen_name);
     } else {
-      set_string(&u->name, racename(u->faction->locale, u, u->race));
+      u->name = xstrdup(racename(u->faction->locale, u, u->race));
     }
   } else {
     xmlChar name[16];
   	sprintf((char*)name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
-	  set_string(&u->name, name);
+	  u->name = xstrdup(name);
   }
 }
 
@@ -1326,9 +1327,9 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 
   if (!dname) {
     name_unit(u);
+  } else {
+    u->name = xstrdup(dname);
   }
-  else set_string(&u->name, dname);
-
   if (count_unit(u)) f->no_units++;
 
   if (creator) {

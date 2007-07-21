@@ -16,12 +16,13 @@
 #include <eressea.h>
 #include "weapons.h"
 
-#include <unit.h>
-#include <build.h>
-#include <race.h>
-#include <item.h>
-#include <battle.h>
-#include <pool.h>
+#include <kernel/unit.h>
+#include <kernel/build.h>
+#include <kernel/race.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/battle.h>
+#include <kernel/pool.h>
 
 /* util includes */
 #include <util/functions.h>
@@ -50,13 +51,14 @@ attack_firesword(const troop * at, const struct weapon_type * wtype, int *casual
   
   if (fi->catmsg == -1) {
     int i, k=0;
+    message * msg;
     for (i=0;i<=at->index;++i) {
       struct weapon * wp = fi->person[i].melee;
       if (wp!=NULL && wp->type == wtype) ++k;
     }
-    sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
-            (k==1)?"t sein ":"en ihre",(k==1)?"":"er");
-    battlerecord(fi->side->battle, buf);
+    msg = msg_message("battle::useflamingsword", "amount unit", k, fi->unit);
+    message_all(fi->side->battle, msg);
+    msg_release(msg);
     fi->catmsg = 0;
   }
   
@@ -104,11 +106,14 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 
   if (af->catmsg == -1) {
     int i, k=0;
+    message * msg;
+
     for (i=0;i<=at->index;++i) {
       if (af->person[i].reload==0 && af->person[i].missile == wp) ++k;
     }
-    sprintf(buf, "%d Kämpfer aus %s feuer%s Katapult ab:", k, unitname(au), (k==1)?"t sein":"n ihr");
-    battlerecord(b, buf);
+    msg = msg_message("battle::usecatapult", "amount unit", k, au);
+    message_all(b, msg);
+    msg_release(msg);
     af->catmsg = 0;
   }
 

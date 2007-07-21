@@ -1,5 +1,4 @@
 #include <config.h>
-#include <cstring>
 #include <eressea.h>
 #include "list.h"
 #include "objects.h"

@@ -50,17 +50,17 @@ region_ships(const region& r) {
 
 static void
 region_setname(region& r, const char * name) {
-  if (r.land) rsetname((&r), name);
+  if (r.land) rsetname((&r), (const xmlChar *)name);
 }
 
 static const char *
 region_getterrain(const region& r) {
-  return r.terrain->_name;
+  return (const char *)r.terrain->_name;
 }
 
 static const char *
 region_getname(const region& r) {
-  if (r.land) return r.land->name;
+  if (r.land) return (const char *)r.land->name;
   return NULL;
 }
 
@@ -98,7 +98,7 @@ region_setinfo(region& r, const char * info)
 
 static const char *
 region_getinfo(const region& r) {
-  return r.display;
+  return (const char *)r.display;
 }
 
 static int
@@ -111,7 +111,7 @@ region_plane(const region& r)
 static void
 region_addnotice(region& r, const char * str)
 {
-  addmessage(&r, NULL, str, MSG_MESSAGE, ML_IMPORTANT);
+  addmessage(&r, NULL, (const xmlChar *)str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
 static std::ostream&

@@ -93,7 +93,7 @@ crtag(const char * key)
 {
   static const struct locale * lang = NULL;
   if (!lang) lang = find_locale(TAG_LOCALE);
-  return locale_string(lang, key);
+  return (const xmlChar*)locale_string(lang, key);
 }
 #else
 #define crtag(x) (x)
@@ -104,7 +104,7 @@ crtag(const char * key)
 typedef struct translation {
   struct translation * next;
   char * key;
-  const char * value;
+  const xmlChar * value;
 } translation;
 
 #define TRANSMAXHASH 257
@@ -112,7 +112,7 @@ static translation * translation_table[TRANSMAXHASH];
 static translation * junkyard;
 
 static const char *
-add_translation(const char * key, const char * value)
+add_translation(const char * key, const xmlChar * value)
 {
   int kk = ((key[0] << 5) + key[0]) % TRANSMAXHASH;
   translation * t = translation_table[kk];

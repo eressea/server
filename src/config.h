@@ -22,7 +22,21 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifdef _MSC_VER
+# pragma warning (disable: 4201 4214 4514 4115 4711)
+# pragma warning(disable: 4056)
+/* warning C4056: overflow in floating point constant arithmetic */
+# pragma warning(disable: 4201)
+/* warning C4201: Nicht dem Standard entsprechende Erweiterung : Struktur/Union ohne Namen */
+# pragma warning(disable: 4214)
+/* warning C4214: Nicht dem Standard entsprechende Erweiterung : Basistyp fuer Bitfeld ist nicht int */
+# pragma warning(disable: 4100)
+/* warning C4100: <name> : unreferenced formal parameter */
+# pragma warning(disable: 4996)
+/* warning C4100: <name> was declared deprecated */
 #define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 
 #ifdef __cplusplus
 # include <cstdio>
@@ -62,18 +76,6 @@ extern "C" {
 #ifdef SOLARIS
 # define _SYS_PROCSET_H
 # define _XOPEN_SOURCE
-#endif
-
-#ifdef _MSC_VER
-# pragma warning (disable: 4201 4214 4514 4115 4711)
-# pragma warning(disable: 4056)
-  /* warning C4056: overflow in floating point constant arithmetic */
-# pragma warning(disable: 4201)
-  /* warning C4201: Nicht dem Standard entsprechende Erweiterung : Struktur/Union ohne Namen */
-# pragma warning(disable: 4214)
-  /* warning C4214: Nicht dem Standard entsprechende Erweiterung : Basistyp fuer Bitfeld ist nicht int */
-# pragma warning(disable: 4100)
-  /* warning C4100: <name> : unreferenced formal parameter */
 #endif
 
 #ifdef __GNUC__
@@ -140,6 +142,7 @@ typedef struct stat stat_type;
 
 /* Microsoft Visual C */
 #ifdef _MSC_VER
+# include <string.h> /* must be included here so strdup is not redefined */
 # define R_OK 4
 # define HAVE__MKDIR_WITHOUT_PERMISSION
 # define HAVE_INLINE

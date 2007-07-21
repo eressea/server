@@ -100,7 +100,7 @@ unused_faction_id(void)
 }
 
 faction *
-addfaction(const char *email, const xmlChar * password,
+addfaction(const char *email, const char * password,
            const struct race * frace, const struct locale *loc,
            int subscription)
 {
@@ -114,12 +114,12 @@ addfaction(const char *email, const xmlChar * password,
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
 
-  set_string(&f->override, (const xmlChar *)pass);
+  f->override = strdup(pass);
   if (password) {
-    set_string(&f->passw, password);
+    f->passw = strdup(password);
   } else {
     pass = itoa36(rng_int());
-    set_string(&f->passw, (const xmlChar *)pass);
+    f->passw = strdup(pass);
   }
 
   f->lastorders = turn;
@@ -137,7 +137,7 @@ addfaction(const char *email, const xmlChar * password,
   fhash(f);
 
   snprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
-  set_string(&f->name, (const xmlChar*)buf);
+  f->name = xstrdup(buf);
 
   return f;
 }
@@ -166,7 +166,7 @@ addplayer(region *r, faction * f)
 }
 
 boolean
-checkpasswd(const faction * f, const xmlChar * passwd, boolean shortp)
+checkpasswd(const faction * f, const char * passwd, boolean shortp)
 {
 #ifdef SHORTPWDS
   shortpwd * slist = f->shortpwds;
@@ -178,8 +178,8 @@ checkpasswd(const faction * f, const xmlChar * passwd, boolean shortp)
     slist = slist->next;
   }
 #endif
-  if (xstrcmp(f->passw, passwd)==0) return true;
-  if (xstrcmp(f->override, passwd)==0) return true;
+  if (strcmp(f->passw, passwd)==0) return true;
+  if (strcmp(f->override, passwd)==0) return true;
   return false;
 }
 
