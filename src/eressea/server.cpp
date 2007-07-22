@@ -666,6 +666,7 @@ main(int argc, char *argv[])
   // run the main script
   if (luafile==NULL) lua_console(luaState);
   else {
+    char buf[MAX_PATH];
     if (script_path) sprintf(buf, "%s/%s", script_path, luafile);
     else strcpy(buf, luafile);
 #ifdef LUABIND_NO_EXCEPTIONS

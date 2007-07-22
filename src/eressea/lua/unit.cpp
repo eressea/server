@@ -66,7 +66,7 @@ class bind_orders {
 public:
   static order * next(order * node) { return node->next; }
   static std::string value(order * node) { 
-    char * cmd = getcommand(node); 
+    char * cmd = (char*)getcommand(node); 
     std::string s(cmd);
     free(cmd);
     return s;
@@ -372,7 +372,7 @@ unit_setid(unit& u, int id)
 static const char *
 unit_getname(const unit& u)
 {
-  return u.name;
+  return (const char *)u.name;
 }
 
 static void
@@ -385,7 +385,7 @@ unit_setname(unit& u, const char * name)
 static const char *
 unit_getinfo(const unit& u)
 {
-  return u.display;
+  return (const char *)u.display;
 }
 
 static void
@@ -478,7 +478,7 @@ unit_setmagic(unit& u, const char * type)
 static void
 unit_addorder(unit& u, const char * str)
 {
-  order * ord = parse_order(str, u.faction->locale);
+  order * ord = parse_order((const xmlChar *)str, u.faction->locale);
   addlist(&u.orders, ord);
   u.faction->lastorders = turn;
 }
@@ -568,7 +568,7 @@ unit_capacity(const struct unit& u)
 static void
 unit_addnotice(unit& u, const char * str)
 {
-  addmessage(u.region, u.faction, str, MSG_MESSAGE, ML_IMPORTANT);
+  addmessage(u.region, u.faction, (const xmlChar*)str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
 void

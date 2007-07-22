@@ -19,7 +19,7 @@
 /* tweakable features */
 #define ENCODE_SPECIAL 1
 #define RENDER_CRMESSAGES
-
+#define BUFFERSIZE 32768
 /* modules include */
 #include <modules/score.h>
 
@@ -88,7 +88,7 @@ boolean opt_cr_absolute_coords = false;
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
-static const char *
+static const xmlChar *
 crtag(const char * key)
 {
   static const struct locale * lang = NULL;
@@ -96,7 +96,7 @@ crtag(const char * key)
   return (const xmlChar*)locale_string(lang, key);
 }
 #else
-#define crtag(x) (x)
+#define crtag(x) (const xmlChar*)(x)
 #endif
 /*
  * translation table
@@ -111,7 +111,7 @@ typedef struct translation {
 static translation * translation_table[TRANSMAXHASH];
 static translation * junkyard;
 
-static const char *
+static const xmlChar *
 add_translation(const char * key, const xmlChar * value)
 {
   int kk = ((key[0] << 5) + key[0]) % TRANSMAXHASH;
@@ -250,6 +250,7 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
       msg = msg_curse(c, obj, typ, self);
 
       if (msg) {
+        char buf[BUFFERSIZE];
         if (!header) {
           header = 1;
           fputs("EFFECTS\n", F);
@@ -370,7 +371,7 @@ cr_skill(variant var, char * buffer, const void * userdata)
   const faction * report = (const faction*)userdata;
   skill_t sk = (skill_t)var.i;
   if (sk!=NOSKILL) sprintf(buffer, "\"%s\"",
-    add_translation(skillname(sk, NULL), skillname(sk, report->locale)));
+    add_translation(skillnames[sk], skillname(sk, report->locale)));
   else strcpy(buffer, "\"\"");
   return 0;
 }
@@ -381,8 +382,8 @@ cr_order(variant var, char * buffer, const void * userdata)
   order * ord = (order*)var.v;
   if (ord!=NULL) {
     char * wp = buffer;
-    char * cmd = getcommand(ord);
-    const char * rp = cmd;
+    xmlChar * cmd = getcommand(ord);
+    const xmlChar * rp = cmd;
 
     *wp++ = '\"';
     while (*rp) {
@@ -425,7 +426,6 @@ cr_resources(variant var, char * buffer, const void * userdata)
 static int
 cr_regions(variant var, char * buffer, const void * userdata)
 {
-  const faction * report = (const faction*)userdata;
   const arg_regions * rdata = (const arg_regions *)var.v;
   char * wp = buffer;
   if (rdata!=NULL && rdata->nregions>0) {
@@ -502,7 +502,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 {
   struct mlist* m = msgs->begin;
   while (m) {
-    char crbuffer[1024*32]; /* gross, wegen spionage-messages :-( */
+    char crbuffer[BUFFERSIZE]; /* gross, wegen spionage-messages :-( */
     boolean printed = false;
     const struct message_type * mtype = m->msg->type;
     unsigned int hash = mtype->key;
@@ -570,7 +570,7 @@ cr_output_buildings(FILE * F, building * b, const unit * owner, int fno, faction
   bname = buildingtype(type, b, b->size);
   fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
   fprintf(F, "\"%s\";Name\n", b->name);
-  if (b->display && strlen(b->display))
+  if (b->display && b->display[0])
     fprintf(F, "\"%s\";Beschr\n", b->display);
   if (b->size)
     fprintf(F, "%d;Groesse\n", b->size);
@@ -592,7 +592,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
   assert(sh);
   fprintf(F, "SCHIFF %d\n", sh->no);
   fprintf(F, "\"%s\";Name\n", sh->name);
-  if (sh->display && strlen(sh->display))
+  if (sh->display && sh->display[0])
     fprintf(F, "\"%s\";Beschr\n", sh->display);
   fprintf(F, "\"%s\";Typ\n", add_translation(sh->type->name[0], locale_string(f->locale, sh->type->name[0])));
   fprintf(F, "%d;Groesse\n", sh->size);
@@ -635,7 +635,7 @@ cr_output_unit(FILE * F, const region * r,
 {
   /* Race attributes are always plural and item attributes always
    * singular */
-  const char * str;
+  const xmlChar * str;
   const item_type * lasttype;
   int pr;
   item *itm, *show;
@@ -761,7 +761,8 @@ cr_output_unit(FILE * F, const region * r,
   /* additional information for own units */
   if (u->faction == f || omniscient(f)) {
     order * ord;
-    const char *c;
+    const xmlChar *xc;
+    const char * c;
     int i;
 
     i = ualias(u);
@@ -781,9 +782,9 @@ cr_output_unit(FILE * F, const region * r,
         fprintf(F, "%d;Tarnung\n", i);
       }
     }
-    c = uprivate(u);
-    if (c) {
-      fprintf(F, "\"%s\";privat\n", c);
+    xc = uprivate(u);
+    if (xc) {
+      fprintf(F, "\"%s\";privat\n", xc);
     }
     c = hp_status(u);
     if (c && *c && (u->faction == f || omniscient(f))) {
@@ -840,7 +841,7 @@ cr_output_unit(FILE * F, const region * r,
           fprintf(F, "TALENTE\n");
         }
         fprintf(F, "%d %d;%s\n", u->number*level_days(sv->level), esk,
-          add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
+          add_translation(skillnames[sk], skillname(sk, f->locale)));
       }
     }
     /* spells */
@@ -854,14 +855,14 @@ cr_output_unit(FILE * F, const region * r,
         for (;slist; slist = slist->next) {
           spell * sp = slist->data;
           if (sp->level <= t) {
-            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+            const xmlChar * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
             fprintf(F, "\"%s\"\n", name);
           }
         }
         for (i=0;i!=MAXCOMBATSPELLS;++i) {
           const spell * sp = mage->combatspells[i].sp;
           if (sp) {
-            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+            const xmlChar * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
             fprintf(F, "KAMPFZAUBER %d\n", i);
             fprintf(F, "\"%s\";name\n", name);
             fprintf(F, "%d;level\n", mage->combatspells[i].level);
@@ -1006,9 +1007,9 @@ static void
 cr_reportspell(FILE * F,  spell *sp, const struct locale * lang)
 {
   int k;
-  const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, lang));
+  const xmlChar * name = add_translation(mkname("spell", sp->sname), spell_name(sp, lang));
 
-  fprintf(F, "ZAUBER %d\n", hashstring(spell_name(sp, default_locale)));
+  fprintf(F, "ZAUBER %d\n", hashstring(sp->sname));
   fprintf(F, "\"%s\";name\n", name);
   fprintf(F, "%d;level\n", sp->level);
   fprintf(F, "%d;rank\n", sp->rank);
@@ -1125,7 +1126,7 @@ report_computer(const char * filename, report_context * ctx)
   building *b;
   ship *sh;
   unit *u;
-  const char * mailto = locale_string(f->locale, "mailto");
+  const xmlChar * mailto = locale_string(f->locale, "mailto");
   const attrib * a;
   seen_region * sr = NULL;
 #ifdef SCORE_MODULE
@@ -1249,7 +1250,8 @@ report_computer(const char * filename, report_context * ctx)
   for (a=a_find(f->attribs, &at_showitem);a && a->type==&at_showitem;a=a->next) {
     const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
     requirement * m;
-    const char * ch, * description = NULL;
+    const char * ch;
+    const xmlChar * description = NULL;
 
     if (ptype==NULL) continue;
     m = ptype->itype->construction->materials;
@@ -1264,7 +1266,7 @@ report_computer(const char * filename, report_context * ctx)
       description = LOC(f->locale, potiontext);
     }
 
-          fprintf(F, "\"%s\";Beschr\n", description);
+    fprintf(F, "\"%s\";Beschr\n", description);
     fprintf(F, "ZUTATEN\n");
 
     while (m->number) {
@@ -1296,7 +1298,12 @@ report_computer(const char * filename, report_context * ctx)
 #endif
       else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
     }
-    if (r->land && strlen(rname(r, f->locale))) fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
+    if (r->land) {
+      const xmlChar * str = rname(r, f->locale);
+      if (str && str[0]) {
+        fprintf(F, "\"%s\";Name\n", str);
+      }
+    }
     tname = terrain_name(r);
 
     fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
@@ -1313,9 +1320,9 @@ report_computer(const char * filename, report_context * ctx)
     } else {
       int stealthmod = stealth_modifier(sr->mode);
 #define RESOURCECOMPAT
-      char cbuf[8192], *pos = cbuf;
+      char cbuf[BUFFERSIZE], *pos = cbuf;
 #ifdef RESOURCECOMPAT
-      if (r->display && strlen(r->display))
+      if (r->display && r->display[0])
           fprintf(F, "\"%s\";Beschr\n", r->display);
 #endif
       if (fval(r->terrain, LAND_REGION)) {

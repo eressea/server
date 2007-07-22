@@ -497,7 +497,7 @@ paint_status(window * wnd, const state * st)
   map_region * mr = cursor_region(&st->display, &st->cursor);
   if (mr && mr->r) {
     if (mr->r->land) {
-      name = mr->r->land->name;
+      name = (const char *)mr->r->land->name;
     } else {
       name = mr->r->terrain->_name;
     }
@@ -527,7 +527,7 @@ paint_info_region(window * wnd, const state * st)
   if (mr && mr->r) {
     const region * r = mr->r;
     if (r->land) {
-      mvwaddnstr(win, line++, 1, r->land->name, size);
+      mvwaddnstr(win, line++, 1, (char *)r->land->name, size);
     } else {
       mvwaddnstr(win, line++, 1, r->terrain->_name, size);
     }
@@ -556,7 +556,7 @@ paint_info_region(window * wnd, const state * st)
       for (u=r->units;u && line<maxline;u=u->next) {
         if (!fval(u->faction, FFL_MARK)) {
           mvwprintw(win, line, 1, "%.4s ", itoa36(u->faction->no));
-          mvwaddnstr(win, line++, 6, u->faction->name, size-5);
+          mvwaddnstr(win, line++, 6, (char *)u->faction->name, size-5);
           fset(u->faction, FFL_MARK);
         }
       }
@@ -571,7 +571,7 @@ paint_info_region(window * wnd, const state * st)
       wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
       for (u=r->units;u && line<maxline;u=u->next) {
         mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
-        mvwaddnstr(win, line++, 6, u->name, size-5);
+        mvwaddnstr(win, line++, 6, (char *)u->name, size-5);
       }
     }
   }
@@ -1101,7 +1101,7 @@ handlekey(state * st, int c)
         }
       }
       for (r=first;;) {
-        if (findmode=='r' && r->land && r->land->name && strstr(r->land->name, locate)) {
+        if (findmode=='r' && r->land && r->land->name && strstr((const char*)r->land->name, locate)) {
           break;
         } else if (findmode=='f') {
           unit * u;
