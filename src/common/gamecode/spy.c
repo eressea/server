@@ -184,11 +184,12 @@ spy_message(int spy, const unit *u, const unit *target)
   /* spion ist gleich gut wie Wahrnehmung Opfer */
   /* spion ist schlechter als Wahrnehmung Opfer */
   { /* immer */
+    const xmlChar * str;
     scat("Kampfstatus: ");
     scat(report_kampfstatus(target, u->faction->locale));
-    c = locale_string(u->faction->locale, hp_status(target));
-    if (c && strlen(c))
-      sprintf(buf, "%s (%s)", buf, c);
+    str = locale_string(u->faction->locale, hp_status(target));
+    if (str && str[0])
+      sprintf(buf, "%s (%s)", buf, str);
     scat(".");
   }
 
@@ -297,7 +298,7 @@ setwere_cmd(unit *u, struct order * ord)
 int
 setstealth_cmd(unit * u, struct order * ord)
 {
-  const char *s;
+  const xmlChar *s;
   char level;
   const race * trace;
 
@@ -359,11 +360,11 @@ setstealth_cmd(unit * u, struct order * ord)
     } else if (findparam(s, u->faction->locale) == P_NOT) {
       freset(u, UFL_PARTEITARNUNG);
     } else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
-      const char *s2 = getstrtoken();
+      const xmlChar *s2 = getstrtoken();
       int nr = -1;
 
-      if(s2) nr = atoi36(s2);
-      if(!s2 || *s2 == 0 || nr == u->faction->no) {
+      if (s2) nr = atoi36(s2);
+      if (!s2 || *s2 == 0 || nr == u->faction->no) {
         a_removeall(&u->attribs, &at_otherfaction);
       } else {
         struct faction * f = findfaction(nr);
@@ -450,8 +451,7 @@ setstealth_cmd(unit * u, struct order * ord)
       /* Tarnungslevel setzen */
       level = (char) atoip(s);
       if (level > effskill(u, SK_STEALTH)) {
-        sprintf(buf, "%s kann sich nicht so gut tarnen.", unitname(u));
-        mistake(u, ord, buf, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth", ""));
         return 0;
       }
       u_seteffstealth(u, level);
@@ -493,42 +493,36 @@ crew_skill(region * r, faction * f, ship * sh, skill_t sk)
 }
 
 static int
-try_destruction(unit * u, unit * u2, const char *name, int skilldiff)
+try_destruction(unit * u, unit * u2, const ship *sh, int skilldiff)
 {
-  const char *destruction_success_msg = "%s wurde von %s zerstoert.";
-  const char *destruction_failed_msg = "%s konnte %s nicht zerstoeren.";
-  const char *destruction_detected_msg = "%s wurde beim Versuch, %s zu zerstoeren, entdeckt.";
-  const char *detect_failure_msg = "Es wurde versucht, %s zu zerstoeren.";
-  const char *object_destroyed_msg = "%s wurde zerstoert.";
+  const char *destruction_success_msg = "destroy_ship_0";
+  const char *destruction_failed_msg = "destroy_ship_1";
+  const char *destruction_detected_msg = "destroy_ship_2";
+  const char *detect_failure_msg = "destroy_ship_3";
+  const char *object_destroyed_msg = "destroy_ship_4";
 
   if (skilldiff == 0) {
     /* tell the unit that the attempt failed: */
-    sprintf(buf, destruction_failed_msg, unitname(u), name);
-    addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
+    ADDMSG(&u->faction->msgs, msg_message(destruction_failed_msg, "ship unit", sh, u));
     /* tell the enemy about the attempt: */
     if (u2) {
-      sprintf(buf, detect_failure_msg, name);
-      addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
+      ADDMSG(&u2->faction->msgs, msg_message(detect_failure_msg, "ship", sh));
     }
     return 0;
-  }
-  if (skilldiff < 0) {
+  } else if (skilldiff < 0) {
     /* tell the unit that the attempt was detected: */
-    sprintf(buf, destruction_detected_msg, unitname(u), name);
-    addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
+    ADDMSG(&u2->faction->msgs, msg_message(destruction_detected_msg, "ship unit", sh, u));
     /* tell the enemy whodunit: */
     if (u2) {
-      sprintf(buf, detect_failure_msg, unitname(u2), unitname(u), name);
-      addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
+      ADDMSG(&u2->faction->msgs, msg_message(detect_failure_msg, "ship unit", sh, u));
     }
     return 0;
-  }
+  } else {
   /* tell the unit that the attempt succeeded */
-  sprintf(buf, destruction_success_msg, name, unitname(u));
-  addmessage(0, u->faction, buf, MSG_EVENT, ML_INFO);
-  if (u2) {
-    sprintf(buf, object_destroyed_msg, name);
-    addmessage(0, u2->faction, buf, MSG_EVENT, ML_IMPORTANT);
+    ADDMSG(&u->faction->msgs, msg_message(destruction_success_msg, "ship unit", sh, u));
+    if (u2) {
+      ADDMSG(&u2->faction->msgs, msg_message(object_destroyed_msg, "ship", sh));
+    }
   }
   return 1;					/* success */
 }
@@ -536,23 +530,16 @@ try_destruction(unit * u, unit * u2, const char *name, int skilldiff)
 static void
 sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 {
-  const char *person_lost_msg = "- %d Person von %s ertrinkt; %s.";
-  const char *persons_lost_msg = "- %d Personen von %s ertrinken; %s.";
-  const char *unit_dies_msg = "Die Einheit wird ausgeloescht";
-  const char *unit_lives_msg = "Die Einheit rettet sich nach ";
-  const char *unit_intact_msg = "%s ueberlebt unbeschadet und rettet sich nach %s.";
-  const char *ship_sinks_msg = "%s versinkt im Ozean.";
-  const char *enemy_discovers_spy_msg = "%s wurde beim versenken von %s entdeckt.";
-  const char *spy_discovered_msg = "%s entdeckte %s beim versenken von %s.";
   unit **ui;
   region *safety = r;
   int i;
   direction_t d;
   unsigned int index;
   double probability = 0.0;
-  char buffer[DISPLAYSIZE + 1];
   vset informed;
   vset survivors;
+  message * sink_msg = NULL;
+  message * enemy_discovers_spy_msg = NULL;
 
   vset_init(&informed);
   vset_init(&survivors);
@@ -577,6 +564,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
     vset_add(&informed, u->faction);
     if (u->ship == sh) {
       int dead = 0;
+      message * msg;
 
       /* if this fails, I misunderstood something: */
       for (i = 0; i != u->number; ++i)
@@ -588,22 +576,24 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
       {
         vset_add(&survivors, u);
         if (dead > 0) {
-          strcat(strcpy(buffer, unit_lives_msg), regionname(safety, u->faction));
-          sprintf(buf, (dead == 1) ? person_lost_msg : persons_lost_msg,
-            dead, unitname(u), buffer);
-        } else
-          sprintf(buf, unit_intact_msg, unitname(u), regionname(safety, u->faction));
-        addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
+          msg = msg_message("sink_lost_msg", "dead region unit", dead, safety, u);
+        } else {
+          msg = msg_message("sink_saved_msg", "region unit", safety, u);
+        }
         set_leftship(u, u->ship);
         u->ship = 0;
-        if (r != safety)
+        if (r != safety) {
           setguard(u, GUARD_NONE);
-        while (u->items) i_remove(&u->items, u->items);
+        }
+        while (u->items) {
+          i_remove(&u->items, u->items);
+        }
         move_unit(u, safety, NULL);
       } else {
-        sprintf(buf, (dead == 1) ? person_lost_msg : persons_lost_msg,
-          dead, unitname(u), unit_dies_msg);
+        msg = msg_message("sink_lost_msg", "dead region unit", dead, NULL, u);
       }
+      add_message(&u->faction->msgs, msg);
+      msg_release(msg);
       if (dead == u->number) {
         /* the poor creature, she dies */
         *ui = u->next;
@@ -644,18 +634,22 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
       }
     }
     /* finally, report to this faction that the ship sank: */
-    sprintf(buf, ship_sinks_msg, name);
-    addmessage(0, f, buf, MSG_EVENT, ML_WARN);
+    if (sink_msg==NULL) {
+      sink_msg = msg_message("sink_msg", "ship region", sh, r);
+    }
+    add_message(&f->msgs, sink_msg);
     vset_erase(&informed, f);
-    if (spy == 1 && f != saboteur->faction &&
-      faction_skill(r, f, SK_OBSERVATION) - eff_skill(saboteur, SK_STEALTH, r) > 0) {
-        /* the unit is discovered */
-        sprintf(buf, spy_discovered_msg, lastunit, unitname(saboteur), name);
-        addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
-        sprintf(buf, enemy_discovers_spy_msg, unitname(saboteur), name);
-        addmessage(0, saboteur->faction, buf, MSG_EVENT, ML_MISTAKE);
+    if (spy == 1 && f != saboteur->faction && faction_skill(r, f, SK_OBSERVATION) - eff_skill(saboteur, SK_STEALTH, r) > 0) {
+      /* the unit is discovered */
+      ADDMSG(&f->msgs, msg_message("spy_discovered_msg", "unit saboteur ship", lastunit, saboteur, sh));
+      if (enemy_discovers_spy_msg==NULL) {
+        enemy_discovers_spy_msg = msg_message("enemy_discovers_spy_msg", "unit ship", saboteur, sh);
+      }
+      add_message(&saboteur->faction->msgs, sink_msg);
     }
   }
+  if (enemy_discovers_spy_msg) msg_release(enemy_discovers_spy_msg);
+  if (sink_msg) msg_release(sink_msg);
   /* finally, get rid of the ship */
   destroy_ship(sh);
   vset_destroy(&informed);
@@ -665,12 +659,13 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 int
 sabotage_cmd(unit * u, struct order * ord)
 {
-  const char *s;
+  const xmlChar *s;
   int i;
   ship *sh;
   unit *u2;
   char buffer[DISPLAYSIZE];
   region * r = u->region;
+  int skdiff;
 
   init_tokens(ord);
   skip_token();
@@ -686,9 +681,8 @@ sabotage_cmd(unit * u, struct order * ord)
       return 0;
     }
     u2 = shipowner(sh);
-    strcat(strcpy(buffer, shipname(sh)), sh->type->name[0]);
-    if (try_destruction(u, u2, buffer, eff_skill(u, SK_SPY, r)
-      - crew_skill(r, u2->faction, sh, SK_OBSERVATION))) {
+    skdiff = eff_skill(u, SK_SPY, r)-crew_skill(r, u2->faction, sh, SK_OBSERVATION);
+    if (try_destruction(u, u2, sh, skdiff)) {
         sink_ship(r, sh, buffer, 1, u);
     }
     break;

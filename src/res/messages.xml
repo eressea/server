@@ -1014,16 +1014,111 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot recruit in this plane."</text>
   </message>
 
+  <message name="error_lowstealth" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die einheit kann sich nicht so gut tarnen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' -The unit cannot hide that well."</text>
+  </message>
+
+  <message name="destroy_ship_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="en">"$ship($ship) was destroyed by $unit($unit)."</text>
+    <text locale="de">"$ship($ship) wurde von $unit($unit) zerstört."</text>
+  </message>
+
+  <message name="destroy_ship_1" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="en">"$unit($unit) could not destroy $ship($ship)."</text>
+    <text locale="de">"$unit($unit) konnte $ship($ship) nicht zerstören."</text>
+  </message>
+
+  <message name="destroy_ship_2" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="en">"$unit($unit) was detected while trying to destroy $ship($ship)."</text>
+    <text locale="de">"$unit($unit) wurde beim Versuch $ship($ship) zu zerstören entdeckt."</text>
+  </message>
+
+  <message name="destroy_ship_3" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="en">"Somebody attempted to destroy $ship($ship)."</text>
+    <text locale="de">"Es wurde versucht, $ship($ship) zu zerstören."</text>
+  </message>
+
+  <message name="destroy_ship_4" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="en">"$ship($ship) was destroyed."</text>
+    <text locale="de">"$ship($ship) wurde zerstört."</text>
+  </message>
+
+  <message name="sink_lost_msg" section="events">
+    <type>
+      <arg name="dead" type="int"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$int($amount) Personen von $unit($unit) ertrinken.$if($isnull($region),""," Die Einheit rettet sich nach $region($region).")"</text>
+  </message>
+
+  <message name="sink_saved_msg" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) ueberlebt unbeschadet und rettet sich nach $region($region)."</text>
+  </message>
+
+  <message name="sink_msg" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$ship($ship) versinkt in den Fluten von $region($region)."</text>
+  </message>
+
+  <message name="enemy_discovers_spy_msg" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) wurde beim versenken von $ship($ship) entdeckt."</text>
+  </message>
+
+  <message name="spy_discovered_msg" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="unit" type="unit"/>
+      <arg name="saboteur" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) entdeckte $unit($saboteur) beim versenken von $ship($ship)."</text>
+  </message>
+
   <message name="drown" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
     <text locale="de">"$unit($unit) ertrinkt in $region($region)."</text>
-    <text locale="fr">"$unit($unit) drowns in in $region($region)."</text>
     <text locale="en">"$unit($unit) drowns in in $region($region)."</text>
   </message>
-  <message name="drown_amphibian_dead" section="events">
+
+<message name="drown_amphibian_dead" section="events">
     <type>
       <arg name="amount" type="int"/>
       <arg name="unit" type="unit"/>
