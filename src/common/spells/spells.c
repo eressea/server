@@ -23,14 +23,8 @@
 #include "alp.h"
 #include "combatspells.h"
 
-#include <kernel/curse.h>
-#include <util/nrmessage.h>
-#include <util/bsdstring.h>
-
-struct curse_type;
-extern void ct_register(const struct curse_type * ct);
-
 /* kernel includes */
+#include <kernel/curse.h>
 #include <kernel/battle.h> /* für lovar */
 #include <kernel/border.h>
 #include <kernel/building.h>
@@ -69,6 +63,9 @@ extern void ct_register(const struct curse_type * ct);
 #include <util/functions.h>
 #include <util/lists.h>
 #include <util/rand.h>
+#include <util/log.h>
+#include <util/nrmessage.h>
+#include <util/bsdstring.h>
 #include <util/variant.h>
 #include <util/goodies.h>
 #include <util/resolve.h>

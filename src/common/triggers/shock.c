@@ -28,6 +28,7 @@
 /* util includes */
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 

@@ -48,9 +48,6 @@
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
 
-/* items includes */
-#include <items/demonseye.h>
-
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>

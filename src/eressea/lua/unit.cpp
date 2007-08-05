@@ -29,6 +29,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/lists.h>
+#include <util/log.h>
 
 // lua includes
 #include <lua.hpp>

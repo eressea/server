@@ -37,8 +37,9 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/event.h>
 #include <util/base36.h>
+#include <util/event.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <limits.h>

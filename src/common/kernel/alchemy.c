@@ -72,7 +72,7 @@ herbsearch(region * r, unit * u, int max)
   if (max) max = min(max, rherbs(r));
   else max = rherbs(r);
   herbsfound = ntimespprob(eff_skill(u, SK_HERBALISM, r) * u->number,
-    (double)rherbs(r)/100.0L, -0.01L);
+    (double)rherbs(r)/100.0F, -0.01F);
   herbsfound = min(herbsfound, max);
   rsetherbs(r, rherbs(r)-herbsfound);
 

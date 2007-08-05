@@ -24,6 +24,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/log.h>
 #include <util/resolve.h>
 
 /* ansi includes */
@@ -62,8 +63,9 @@ giveitem_handle(trigger * t, void * data)
 	giveitem_data * td = (giveitem_data*)t->data.v;
 	if (td->u!=NULL) {
 		i_change(&td->u->items, td->itype, td->number);
-	} else
+  } else {
 		log_error(("could not perform giveitem::handle()\n"));
+  }
 	unused(data);
 	return 0;
 }

@@ -166,8 +166,6 @@ extern const xmlChar * racename(const struct locale *lang, const struct unit *u,
 
 extern boolean allowed_dragon(const struct region * src, const struct region * target);
 
-extern void register_races(void);
-extern void init_races(void);
 extern boolean r_insectstalled(const struct region *r);
 
 extern void add_raceprefix(const char *);

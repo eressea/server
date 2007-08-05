@@ -47,6 +47,7 @@
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/functions.h>
+#include <util/log.h>
 #include <util/rng.h>
 
 /* attrib includes */
@@ -392,45 +393,4 @@ read_race_reference(const struct race ** rp, FILE * F)
 		assert(*rp!=NULL);
 	}
 	return AT_READ_OK;
-}
-
-/* Die Funktionen werden über den hier registrierten Namen in races.xml
- * in die jeweilige Rassendefiniton eingebunden */
-void
-register_races(void)
-{
-	char zBuffer[MAX_PATH];
-	/* function initfamiliar */
-	register_function((pf_generic)oldfamiliars, "oldfamiliars");
-
-	/* function move
-	 * into which regiontyp moving is allowed for this race
-	 * race->move_allowed() */
-	register_function((pf_generic)allowed_swim, "moveswimming");
-	register_function((pf_generic)allowed_walk, "movewalking");
-	register_function((pf_generic)allowed_fly, "moveflying");
-	register_function((pf_generic)allowed_dragon, "movedragon");
-
-	/* function age 
-	 * race->age() */
-	register_function((pf_generic)age_undead, "ageundead");
-	register_function((pf_generic)age_illusion, "ageillusion");
-	register_function((pf_generic)age_skeleton, "ageskeleton");
-	register_function((pf_generic)age_zombie, "agezombie");
-	register_function((pf_generic)age_ghoul, "ageghoul");
-	register_function((pf_generic)age_dragon, "agedragon");
-	register_function((pf_generic)age_firedragon, "agefiredragon");
-
-	/* function itemdrop
-	 * to generate battle spoils
-	 * race->itemdrop() */
-  register_function((pf_generic)default_spoil, "defaultdrops");
-  register_function((pf_generic)equip_newunits, "equip_newunits");
-
-	sprintf(zBuffer, "%s/races.xml", resourcepath());
-}
-
-void 
-init_races(void)
-{
 }

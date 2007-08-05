@@ -213,7 +213,6 @@ game_init(void)
   init_triggers();
   init_xmas();
 
-  register_races();
   register_names();
   register_resources();
   register_buildings();
@@ -241,8 +240,6 @@ game_init(void)
   /*  init_resources(); must be done inside the xml-read, because requirements use items */
 
   init_attributes();
-  init_races();
-  init_itemtypes();
   init_rawmaterials();
 
   init_gmcmd();

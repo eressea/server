@@ -34,7 +34,9 @@
 /* warning C4100: <name> : unreferenced formal parameter */
 # pragma warning(disable: 4996)
 /* warning C4100: <name> was declared deprecated */
-#define _CRT_SECURE_NO_DEPRECATE
+#ifndef _CRT_SECURE_NO_DEPRECATE
+# define _CRT_SECURE_NO_DEPRECATE
+#endif
 #endif
 
 
@@ -159,6 +161,7 @@ typedef struct stat stat_type;
 
 /* MSVC has _stat, not stat */
 # define HAVE_STAT
+#include <sys/stat.h>
 # define stat(a, b) _stat(a, b)
 typedef struct _stat stat_type;
 

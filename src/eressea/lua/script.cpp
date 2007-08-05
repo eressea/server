@@ -29,6 +29,7 @@
 // util includes
 #include <util/attrib.h>
 #include <util/functions.h>
+#include <util/log.h>
 
 #include <luabind/luabind.hpp>
 #include <luabind/object.hpp>

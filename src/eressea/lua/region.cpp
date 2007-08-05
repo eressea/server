@@ -14,6 +14,7 @@
 #include <kernel/unit.h>
 
 #include <util/attrib.h>
+#include <util/log.h>
 
 #include <attributes/key.h>
 

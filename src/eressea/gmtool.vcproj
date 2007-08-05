@@ -1,292 +1,312 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8.00"
 	Name="gmtool"
-	ProjectGUID="{57BA2AEE-5C65-4839-9294-C0FA2915A06C}"
-	SccProjectName=""
-	SccLocalPath="">
+	ProjectGUID="{B1DBAFC8-38DC-BC45-A6F3-549F725A99A5}"
+	RootNamespace="gmtool"
+	Keyword="Win32Proj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			Name="Debug|Win32"
+			OutputDirectory="Debug"
+			IntermediateDirectory="Debug"
 			ConfigurationType="1"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				ImproveFloatingPointConsistency="TRUE"
-				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
-				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
-				StringPooling="TRUE"
-				RuntimeLibrary="4"
-				EnableFunctionLevelLinking="TRUE"
-				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\Release/gmtool.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
-				WarningLevel="4"
-				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="1"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="curses.lib libxml2.lib"
-				OutputFile=".\Release/gmtool.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Release/gmtool.pdb"
-				SubSystem="1"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/gmtool.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1031"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
-			ConfigurationType="1"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				ImproveFloatingPointConsistency="TRUE"
-				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
-				PreprocessorDefinitions="_CONSOLE,WIN32"
+				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="4"
-				BufferSecurityCheck="TRUE"
+				RuntimeLibrary="3"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Debug/gmtool.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="4"
-				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabind.lib lua50.lib curses.lib libxml2.lib"
-				OutputFile=".\Debug/gmtool.exe"
-				LinkIncremental="2"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories=""
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Debug/gmtool.pdb"
-				SubSystem="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\Debug/gmtool.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1031"/>
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..;../common;../common/kernel"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLinkerTool"
+				AdditionalDependencies="../common/Debug/util/util.lib ../common/Debug/kernel/kernel.lib lua/Debug/bindings/bindings.lib libxml2.lib curses.lib lua5.1_d.lib luabind_d.lib"
+				OutputFile="$(OutDir)/gmtool.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories=".."
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/gmtool.pdb"
+				SubSystem="1"
+				EntryPointSymbol="mainCRTStartup"
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Profile|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="Profile"
+			IntermediateDirectory="Profile"
 			ConfigurationType="1"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
-				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
-				StringPooling="TRUE"
-				RuntimeLibrary="4"
-				EnableFunctionLevelLinking="TRUE"
-				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\Release/gmtool.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
 				WarningLevel="4"
-				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="1"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="curses.lib libxml2.lib"
-				OutputFile=".\Release/gmtool.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Release/gmtool.pdb"
-				SubSystem="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/gmtool.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1031"/>
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..;../common;../common/kernel"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLinkerTool"
+				AdditionalDependencies="../common/Profile/util/util.lib ../common/Profile/kernel/kernel.lib lua/Profile/bindings/bindings.lib libxml2.lib curses.lib lua5.1.lib luabind.lib"
+				OutputFile="$(OutDir)/gmtool.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories=".."
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/gmtool.pdb"
+				SubSystem="1"
+				EntryPointSymbol="mainCRTStartup"
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
+			ConfigurationType="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
+				AdditionalIncludeDirectories="..;../common;../common/kernel"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="../common/Release/util/util.lib ../common/Release/kernel/kernel.lib lua/Release/bindings/bindings.lib libxml2.lib curses.lib lua5.1.lib luabind.lib"
+				OutputFile="$(OutDir)/gmtool.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories=".."
+				GenerateDebugInformation="false"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				EntryPointSymbol="mainCRTStartup"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
 	</References>
 	<Files>
 		<Filter
-			Name="Header"
-			Filter="*.h">
-			<File
-				RelativePath=".\editing.h">
-			</File>
-			<File
-				RelativePath=".\gmtool.h">
-			</File>
-			<File
-				RelativePath=".\gmtool_structs.h">
-			</File>
+			Name="curses"
+			Filter=""
+			>
 			<File
 				RelativePath=".\curses\listbox.h">
 			</File>
+			<File
+				RelativePath=".\curses\listbox.c">
+			</File>
 		</Filter>
 		<Filter
-			Name="bindings">
-			<File
-				RelativePath=".\lua\alliance.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\bindings.h">
-			</File>
-			<File
-				RelativePath=".\lua\building.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\eressea.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\faction.cpp">
-			</File>
+			Name="lua"
+			Filter=""
+			>
 			<File
 				RelativePath=".\lua\gm.cpp">
 			</File>
-			<File
-				RelativePath=".\lua\item.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\list.h">
-			</File>
-			<File
-				RelativePath=".\lua\objects.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\objects.h">
-			</File>
-			<File
-				RelativePath=".\lua\region.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\ship.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\spell.cpp">
-			</File>
-			<File
-				RelativePath=".\lua\unit.cpp">
-			</File>
 		</Filter>
 		<File
-			RelativePath=".\console.c">
-		</File>
-		<File
-			RelativePath=".\editing.c">
-		</File>
-		<File
-			RelativePath=".\gmmain.cpp">
+			RelativePath=".\gmtool.h">
 		</File>
 		<File
 			RelativePath=".\gmtool.c">
 		</File>
 		<File
-			RelativePath="..\common\iniparser\iniparser.c">
+			RelativePath=".\editing.c">
 		</File>
 		<File
-			RelativePath="..\common\iniparser\iniparser.h">
+			RelativePath=".\editing.h">
 		</File>
 		<File
-			RelativePath=".\curses\listbox.c">
+			RelativePath=".\gmmain.cpp">
+		</File>
+		<File
+			RelativePath=".\console.c">
 		</File>
 	</Files>
 	<Globals>

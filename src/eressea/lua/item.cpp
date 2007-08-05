@@ -11,6 +11,7 @@
 // util includes
 #include <util/attrib.h>
 #include <util/functions.h>
+#include <util/log.h>
 
 // lua includes
 #include <lua.hpp>

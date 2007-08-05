@@ -27,6 +27,7 @@
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
+#include <util/log.h>
 
 /* ansi includes */
 #include <stdio.h>

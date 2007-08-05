@@ -35,7 +35,6 @@ void update_guards(void);
   extern void deliverMail(struct faction * f, struct region * r, struct unit * u, const xmlChar *s, struct unit * receiver);
 
 /* eressea-specific. put somewhere else, please. */
-#include "resolve.h"
 void processorders(void);
 extern struct attrib_type at_germs;
 

@@ -43,6 +43,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 #include <util/language.h>

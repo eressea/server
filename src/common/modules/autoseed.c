@@ -29,6 +29,7 @@
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/rng.h>
 #include <util/sql.h>
 
@@ -220,7 +221,7 @@ read_newfactions(const char * filename)
                  itoa36(subscription), email));
       continue;
     }
-    nf->password = (xmlChar *)strdup(password);
+    nf->password = strdup(password);
     nf->race = rc_find(race);
     nf->subscription = subscription;
     if (alliances!=NULL) {

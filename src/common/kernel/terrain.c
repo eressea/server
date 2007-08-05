@@ -29,6 +29,8 @@
 #include "region.h"
 #include "resources.h"
 
+#include <util/log.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdlib.h>

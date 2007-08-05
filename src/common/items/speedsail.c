@@ -27,7 +27,9 @@
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/functions.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <assert.h>

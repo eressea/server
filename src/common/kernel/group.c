@@ -73,7 +73,7 @@ init_group(faction * f, group * g)
 static group *
 find_groupbyname(group * g, const xmlChar * name)
 {
-	while (g && strcasecmp(name, g->name)) g = g->next;
+	while (g && xml_strcasecmp(name, g->name)) g = g->next;
 	return g;
 }
 

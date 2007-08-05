@@ -36,6 +36,7 @@
 #include <gamecode/spells.h>
 #include <triggers/triggers.h>
 #include <items/itemtypes.h>
+#include <races/races.h>
 
 /* modules includes */
 #include <modules/xmas.h>
@@ -250,7 +251,6 @@ game_init(void)
 
   init_archetypes();
   init_attributes();
-  init_races();
   init_itemtypes();
   init_rawmaterials();
 

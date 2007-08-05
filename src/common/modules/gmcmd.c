@@ -40,6 +40,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/umlaut.h>
 #include <util/parser.h>
 #include <util/rng.h>
@@ -682,8 +683,8 @@ gm_addfaction(const char * email, plane * p, region * r)
   a_add(&f->attribs, make_key(atoi36("quest")));
   f->banner = (xmlChar*)strdup("quest faction");
   f->name = (xmlChar*)strdup("quest faction");
-  f->passw = (xmlChar*)strdup(itoa36(rng_int()));
-  f->override = (xmlChar*)strdup(itoa36(rng_int()));
+  f->passw = strdup(itoa36(rng_int()));
+  f->override = strdup(itoa36(rng_int()));
   if (set_email(&f->email, email)!=0) {
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }

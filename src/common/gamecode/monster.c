@@ -62,6 +62,7 @@
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 

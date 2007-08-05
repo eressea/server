@@ -32,6 +32,7 @@
 #include "unit.h"
 
 #include <util/parser.h>
+#include <util/log.h>
 
 #include <assert.h>
 #include <stdlib.h>

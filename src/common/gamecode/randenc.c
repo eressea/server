@@ -56,9 +56,10 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/rand.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/message.h>
+#include <util/rand.h>
 #include <util/rng.h>
 
 /* libc includes */

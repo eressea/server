@@ -38,12 +38,13 @@
 #include "version.h"
 
 /* util includes */
-#include <util/resolve.h>
 #include <util/base36.h>
+#include <util/goodies.h>
+#include <util/log.h>
 #include <util/nrmessage.h>
 #include <util/rand.h>
+#include <util/resolve.h>
 #include <util/rng.h>
-#include <util/goodies.h>
 #include <util/variant.h>
 
 /* libc includes */

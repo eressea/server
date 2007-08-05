@@ -60,6 +60,7 @@
 #include <util/filereader.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/resolve.h>
 #include <util/sql.h>
@@ -500,7 +501,7 @@ factionorders(void)
       fflush(stdout);
     }
     
-    if (checkpasswd(f, pass, true) == false) {
+    if (!checkpasswd(f, (const char *)pass, true)) {
       log_warning(("Invalid password for faction %s\n", itoa36(fid)));
       ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
                                    f->no, pass));
@@ -1444,7 +1445,7 @@ readfaction(FILE * F)
   if (global.data_version >= OVERRIDE_VERSION) {
     rds(F, &f->override);
   } else {
-    f->override = xstrdup(itoa36(rng_int()));
+    f->override = strdup(itoa36(rng_int()));
   }
 
   if (global.data_version < LOCALE_VERSION) {

@@ -35,6 +35,7 @@
 /* util includes */
 #include <util/goodies.h>
 #include <util/language.h>
+#include <util/log.h>
 #include <util/umlaut.h>
 
  /* Bitte die Sprüche nach Gebieten und Stufe ordnen, denn in derselben

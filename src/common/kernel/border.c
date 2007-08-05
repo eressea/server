@@ -21,8 +21,9 @@
 #include "terrain.h"
 #include "unit.h"
 
-#include <util/rng.h>
 #include <util/attrib.h>
+#include <util/log.h>
+#include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
@@ -536,15 +537,15 @@ read_borders(FILE * f)
     from = findregion(fx, fy);
     if (from==NULL) {
       if (!incomplete_data) {
-		log_error(("border for unknown region %d,%d\n", fx, fy));
-	  }
+        log_error(("border for unknown region %d,%d\n", fx, fy));
+      }
       from = new_region(fx, fy);
     }
     to = findregion(tx, ty);
     if (to==NULL)  {
       if (!incomplete_data) {
-		log_error(("border for unknown region %d,%d\n", tx, ty));
-	  }
+        log_error(("border for unknown region %d,%d\n", tx, ty));
+      }
       to = new_region(tx, ty);
     }
 

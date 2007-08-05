@@ -19,9 +19,10 @@
 #include <unit.h>
 
 /* util includes */
-#include <event.h>
-#include <resolve.h>
-#include <base36.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/log.h>
+#include <util/resolve.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,8 +39,9 @@ killunit_handle(trigger * t, void * data)
 	unit * u = (unit*)t->data.v;
 	if (u!=NULL) {
 		destroy_unit(u);
-	} else
+  } else {
 		log_error(("could not perform killunit::handle()\n"));
+  }
 	unused(data);
 	return 0;
 }

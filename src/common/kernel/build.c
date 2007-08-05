@@ -45,13 +45,14 @@
 #include "unit.h"
 
 /* from libutil */
-#include <attrib.h>
-#include <base36.h>
-#include <event.h>
-#include <goodies.h>
-#include <parser.h>
-#include <resolve.h>
-#include <xml.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/goodies.h>
+#include <util/log.h>
+#include <util/parser.h>
+#include <util/resolve.h>
+#include <util/xml.h>
 
 /* from libc */
 #include <assert.h>

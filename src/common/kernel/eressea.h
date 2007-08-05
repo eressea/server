@@ -381,8 +381,6 @@ extern void reorder_owners(struct region * r);
 
 extern const char *localenames[];
 
-#include <log.h>
-
 #ifdef _MSC_VER
 #include <stdafx.h>
 #endif

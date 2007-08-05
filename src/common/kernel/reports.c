@@ -47,6 +47,7 @@
 #include <util/functions.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <assert.h>
@@ -808,7 +809,8 @@ void
 spunit(struct strlist ** SP, const struct faction * f, const unit * u, int indent,
        int mode)
 {
-  int dh = bufunit(f, u, indent, mode);
+  char buf[DISPLAYSIZE];
+  int dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
   lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 
@@ -1351,6 +1353,7 @@ nmr_warnings(void)
       for (fa=factions;fa;fa=fa->next) {
         if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
           if (msg==NULL) {
+            char buf[4096];
             sprintf(buf, "Achtung: %s hat einige Zeit keine "
               "Züge eingeschickt und könnte dadurch in Kürze aus dem "
               "Spiel ausscheiden.", factionname(f));

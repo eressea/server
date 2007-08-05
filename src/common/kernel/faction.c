@@ -33,6 +33,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
