@@ -29,7 +29,7 @@
 #include "karma.h"
 #include "magic.h"
 #include "message.h"
-#include "movement.h"
+#include "move.h"
 #include "names.h"
 #include "order.h"
 #include "plane.h"

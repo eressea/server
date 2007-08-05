@@ -46,7 +46,7 @@
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
-#include <kernel/movement.h>
+#include <kernel/move.h>
 #include <kernel/names.h>
 #include <kernel/pathfinder.h>
 #include <kernel/plane.h>

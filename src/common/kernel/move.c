@@ -20,7 +20,7 @@
 
 #include <config.h>
 #include "eressea.h"
-#include "movement.h"
+#include "move.h"
 
 #include "alchemy.h"
 #include "border.h"

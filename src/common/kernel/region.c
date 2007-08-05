@@ -778,7 +778,7 @@ rsetname(struct region * r, const xmlChar * name)
 {
   if (r->land) {
     free(r->land->name);
-    r->land->name = strdup(name);
+    r->land->name = xstrdup(name);
   }
 }
 

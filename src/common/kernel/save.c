@@ -33,7 +33,7 @@
 #include "karma.h"
 #include "magic.h"
 #include "message.h"
-#include "movement.h"
+#include "move.h"
 #include "objtypes.h"
 #include "order.h"
 #include "pathfinder.h"

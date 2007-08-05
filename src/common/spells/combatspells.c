@@ -24,7 +24,7 @@
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/movement.h>
+#include <kernel/move.h>
 #include <kernel/spell.h>
 #include <kernel/spellid.h>
 #include <kernel/race.h>

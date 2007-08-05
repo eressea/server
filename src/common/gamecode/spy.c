@@ -31,7 +31,7 @@
 #include <kernel/faction.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
-#include <kernel/movement.h>
+#include <kernel/move.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>

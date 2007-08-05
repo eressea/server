@@ -33,7 +33,7 @@
 #include "item.h"
 #include "magic.h"
 #include "message.h"
-#include "movement.h"
+#include "move.h"
 #include "order.h"
 #include "pool.h"
 #include "race.h"

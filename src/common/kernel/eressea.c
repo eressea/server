@@ -42,7 +42,7 @@
 #include "karma.h"
 #include "magic.h"
 #include "message.h"
-#include "movement.h"
+#include "move.h"
 #include "names.h"
 #include "objtypes.h"
 #include "order.h"

@@ -45,7 +45,7 @@
 #include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
-#include <kernel/movement.h>
+#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>

@@ -33,7 +33,7 @@
 #include "race.h"
 #include "unit.h"
 #include "skill.h"
-#include "movement.h"
+#include "move.h"
 
 /* util includes */
 #include <util/attrib.h>

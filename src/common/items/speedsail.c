@@ -20,7 +20,7 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
-#include <kernel/movement.h>
+#include <kernel/move.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>

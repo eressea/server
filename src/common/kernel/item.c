@@ -674,7 +674,7 @@ const char * itemnames[MAXITEMS] = {
   "magicherbbag", "dreameye"
 };
 
-#include "movement.h"
+#include "move.h"
 
 static int
 mod_elves_only(const unit * u, const region * r, skill_t sk, int value)

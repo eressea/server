@@ -15,18 +15,18 @@
 #include "xmas.h"
 
 /* kernel includes */
-#include <unit.h>
-#include <building.h>
-#include <region.h>
-#include <event.h>
-#include <movement.h>
-#include <faction.h>
-#include <item.h>
-#include <race.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/move.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <base36.h>
-#include <goodies.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <stdlib.h>

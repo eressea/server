@@ -48,7 +48,7 @@
 #include <kernel/item.h>
 #include <kernel/karma.h>
 #include <kernel/message.h>
-#include <kernel/movement.h>
+#include <kernel/move.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
