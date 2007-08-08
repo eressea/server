@@ -8,10 +8,10 @@ end
 
 function run_scripts()
   scripts = { 
+    "default.lua",
     "spells.lua",
     "extensions.lua",
-    "familiars.lua",
-    "write_emails.lua"
+    "familiars.lua"
   }
   for index, name in pairs(scripts) do
     loadscript(name)
@@ -58,10 +58,7 @@ function process(orders)
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", false)
 
-  write_passwords()
-  write_reports()
-  write_emails()
-  write_summary()
+  write_files(locales)
 
   file = "" .. get_turn()
   if write_game(file)~=0 then 

@@ -78,7 +78,6 @@
 #include <assert.h>
 
 #define xisdigit(c)     (((c) >= '0' && (c) <= '9') || (c) == '-')
-#define COMMENT_CHAR    ';'
 
 #define ESCAPE_FIX
 #define MAXORDERS 256

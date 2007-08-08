@@ -29,7 +29,7 @@
 #include "karma.h"
 #include "border.h"
 #include "item.h"
-#include "movement.h"
+#include "move.h"
 #include "order.h"
 #include "plane.h"
 #include "race.h"

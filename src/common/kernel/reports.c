@@ -103,7 +103,7 @@ groupid(const struct group * g, const struct faction * f)
 	return buf;
 }
 
-const char *
+const xmlChar *
 report_kampfstatus(const unit * u, const struct locale * lang)
 {
 	static char fsbuf[64];
@@ -112,13 +112,13 @@ report_kampfstatus(const unit * u, const struct locale * lang)
 		"status_rear", "status_defensive",
 		"status_avoid", "status_flee" };
 
-	strcpy(fsbuf, LOC(lang, azstatus[u->status]));
+	xstrlcpy(fsbuf, LOC(lang, azstatus[u->status]), sizeof(fsbuf));
 	if (fval(u, UFL_NOAID)) {
 		strcat(fsbuf, ", ");
-		strcat(fsbuf, LOC(lang, "status_noaid"));
+		xstrcat(fsbuf, LOC(lang, "status_noaid"));
 	}
 
-	return fsbuf;
+	return (xmlChar *)fsbuf;
 }
 
 const char *
@@ -1442,6 +1442,24 @@ global_report(const char * filename)
   fclose(F);
 }
 #endif
+
+void
+writeaddresses(void)
+{
+  faction *f;
+  FILE *F;
+  char zText[MAX_PATH];
+  sprintf(zText, "%s/addresses", basepath());
+  F = cfopen(zText, "w");
+  if (!F) return;
+
+  for (f = factions; f; f = f->next) {
+    if (f->no != MONSTER_FACTION && playerrace(f->race)) {
+      fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
+    }
+  }
+  fclose(F);
+}
 
 int
 reports(void)

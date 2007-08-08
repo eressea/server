@@ -3459,11 +3459,42 @@
     <type>
       <arg name="spy" type="unit"/>
       <arg name="target" type="unit"/>
-      <arg name="report" type="string"/>
+      <arg name="status" type="string"/>
     </type>
-    <text locale="de">"$unit($spy) gelang es, Informationen über $unit($target) herauszubekommen: '$report'."</text>
-    <text locale="fr">"$unit($spy) managed to gather information about $unit($target): '$report'."</text>
-    <text locale="en">"$unit($spy) managed to gather information about $unit($target): '$report'."</text>
+    <text locale="de">"$unit($spy) gelang es, Informationen über $unit($target) ($status) herauszubekommen."</text>
+    <text locale="en">"$unit($spy) managed to gather information about $unit($target)."</text>
+  </message>
+  <message name="spyreport_mage" section="events">
+    <type>
+      <arg name="target" type="unit"/>
+      <arg name="type" type="string"/>
+    </type>
+    <text locale="de">"$unit($target) ist ein $type-Magier."</text>
+    <text locale="en">"$unit($target) is a $type-magician"</text>
+  </message>
+  <message name="spyreport_skills" section="events">
+    <type>
+      <arg name="target" type="unit"/>
+      <arg name="skills" type="string"/>
+    </type>
+    <text locale="de">"$unit($target) beherrscht $skills."</text>
+    <text locale="en">"$unit($target) has the skills $skills"</text>
+  </message>
+  <message name="spyreport_items" section="events">
+    <type>
+      <arg name="target" type="unit"/>
+      <arg name="items" type="items"/>
+    </type>
+    <text locale="de">"In Gepäck von $unit($target) sind $resources($items)."</text>
+    <text locale="en">"$unit($target) carries $resources($items)"</text>
+  </message>
+  <message name="spyreport_faction" section="events">
+    <type>
+      <arg name="target" type="unit"/>
+      <arg name="faction" type="faction"/>
+    </type>
+    <text locale="de">"$unit($target) gehört der Partei $faction($faction) an."</text>
+    <text locale="en">"$unit($target) belongs to $faction($faction)."</text>
   </message>
   <message name="spydetect" section="events">
     <type>

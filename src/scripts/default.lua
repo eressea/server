@@ -1,13 +1,4 @@
-function loadscript(name)
-  local script = scriptpath .. "/" .. name
-  print("- loading " .. script)
-  if pcall(dofile, script)==0 then
-    print("Could not load " .. script)
-  end
-end
-
-function write_emails()
-  local locales = { "de", "en" }
+function write_emails(locales)
   local files = {}
   local key
   local locale
@@ -27,62 +18,29 @@ function write_emails()
   end
 end
 
-function process(orders)
-  -- initialize starting equipment for new players
-  equipment_setitem("new_faction", "conquesttoken", "1");
-  equipment_setitem("new_faction", "log", "30");
-  equipment_setitem("new_faction", "stone", "30");
-  equipment_setitem("new_faction", "money", "4200");
+function write_aliases()
+  local file
+  local key
+  local locale
 
-  file = "" .. get_turn()
-  if read_game(file)~=0 then
-    print("could not read game")
-    return -1
+  file = io.open(basepath .. "/aliases." .. locale, "w")
+
+  local faction
+  for faction in factions() do
+    local unit
+    file:write("partei-" .. itoa36(faction.id) .. ": " .. faction.email .. "\n")
+    for unit in f.units do
+      file:write("einheit-" .. itoa36(unit.id) .. ": " .. faction.email .. "\n")
+    end
   end
-  init_summary()
+ 
+  file:close()
+end
 
-  -- run the turn:
-  read_orders(orders)  
-
-  -- create new monsters:
-  spawn_dragons()
-  spawn_undead()
-  spawn_braineaters(0.25)
-
-  plan_monsters()
-  process_orders()
-
-  -- post-turn updates:
-  update_guards()
-  update_scores()
-
-  
-  -- use newfactions file to place out new players
-  autoseed(basepath .. "/newfactions", true)
-
+function write_files(locales)
   write_passwords()
   write_reports()
-  write_emails()
+  write_emails(locales)
+  write_aliases()
   write_summary()
-
-  file = "" .. get_turn()
-  if write_game(file)~=0 then 
-    print("could not write game")
-    return -1
-  end
 end
-
-
---
--- main body of script
---
-
--- orderfile: contains the name of the orders.
-if orderfile==nil then
-  print "you must specify an orderfile"
-else
-  loadscript("spells.lua")
-  loadscript("extensions.lua")
-  process(orderfile)
-end
-

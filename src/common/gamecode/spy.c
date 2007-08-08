@@ -44,6 +44,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/base36.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -63,138 +64,51 @@
 void
 spy_message(int spy, const unit *u, const unit *target)
 {
-  char buf[4096];
-  const char *c;
+  const xmlChar * str = report_kampfstatus(target, u->faction->locale);
 
-  /* Infos:
-  * - Kampfstatus
-  * - verborgene Gegenstände: Amulette, Ringe, Phiolen, Geld
-  * - Partei
-  * - Talentinfo
-  * - Zaubersprüche
-  * - Zauberwirkungen
-  */
-  /* mit spy=100 (magische Spionage) soll alles herausgefunden werden */
-
-  buf[0]='\0';
-  if (spy > 99){
-    /* magische Spionage */
-    /* Zauberwirkungen */
-  }
-  if (spy > 20){
+  ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u, target, str));
+  if (spy > 20) {
     sc_mage * m = get_mage(target);
     /* bei Magiern Zaubersprüche und Magiegebiet */
     if (m) {
-      spell_list *slist = m->spells;
-      boolean first = true;
-
-      scat("Magiegebiet: ");
-      scat(LOC(u->faction->locale, magietypen[find_magetype(target)]));
-      scat(", Sprüche: ");
-
-      for (;slist; slist=slist->next) {
-        spell * sp = slist->data;
-        if (first) {
-          first = false;
-        } else {
-          scat(", ");
-        }
-        scat(spell_name(sp, u->faction->locale));
-      }
-      if (first) scat("Keine");
-      scat(". ");
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type", target, magietypen[find_magetype(target)]));
     }
   }
-  if (spy > 6){
-    /* wahre Partei */
-    scat("Partei '");
-    scat(factionname(target->faction));
-    scat("'. ");
-  } else {
-    /* ist die Einheit in Spionage nicht gut genug, glaubt sie die
-    * Parteitarnung */
-    faction *fv = visible_faction(u->faction,target);
-
-    if (fv != target->faction){
-      scat("Partei '");
-      scat(factionname(fv));
-      scat("'. ");
-    } else if (!fval(target, UFL_PARTEITARNUNG)){
-      scat("Partei '");
-      scat(factionname(target->faction));
-      scat("'. ");
+  if (spy > 6) {
+    faction * fv = visible_faction(u->faction,target);
+    if (fv && fv!=target->faction) {
+      /* wahre Partei */
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_faction", "target faction", target, target->faction));
     }
   }
-  if (spy > 0){
+  if (spy > 0) {
     int first = 1;
     int found = 0;
     skill * sv;
+    char buf[4096];
 
-    scat("Talente: ");
+    buf[0] = 0;
     for (sv = target->skills;sv!=target->skills+target->skill_size;++sv) {
       if (sv->level>0) {
         found++;
         if (first == 1) {
           first = 0;
         } else {
-          scat(", ");
+          strncat(buf, ", ", sizeof(buf));
         }
-        scat(skillname(sv->id, u->faction->locale));
-        scat(" ");
-        icat(eff_skill(target, sv->id, target->region));
+        strncat(buf, (const char *)skillname(sv->id, u->faction->locale), sizeof(buf));
+        strncat(buf, " ", sizeof(buf));
+        strncat(buf, itoa10(eff_skill(target, sv->id, target->region)), sizeof(buf));
       }
     }
-    if (found == 0) {
-      scat("Keine");
+    if (found) {
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "target skills", target, buf));
     }
-    scat(". ");
 
-    scat("Im Gepäck sind");
-    {
-      boolean first = true;
-      int found = 0;
-      item * itm;
-      for (itm=target->items;itm;itm=itm->next) {
-        if (itm->number>0) {
-          resource_type * rtype = itm->type->rtype;
-          ++found;
-          if (first) {
-            first = false;
-            scat(": ");
-          } else {
-            scat(", ");
-          }
-
-          if (itm->number == 1) {
-            scat("1 ");
-            scat(locale_string(u->faction->locale, resourcename(rtype, 0)));
-          } else {
-            icat(itm->number);
-            scat(" ");
-            scat(locale_string(u->faction->locale, resourcename(rtype, NMF_PLURAL)));
-          }
-        }
-      }
-      if (found == 0) {
-        scat(" keine verborgenen Gegenstände");
-      }
-      scat(". ");
+    if (target->items) {
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items", target, target->items));
     }
   }
-  /* spion ist gleich gut wie Wahrnehmung Opfer */
-  /* spion ist schlechter als Wahrnehmung Opfer */
-  { /* immer */
-    const xmlChar * str;
-    scat("Kampfstatus: ");
-    scat(report_kampfstatus(target, u->faction->locale));
-    str = locale_string(u->faction->locale, hp_status(target));
-    if (str && str[0])
-      sprintf(buf, "%s (%s)", buf, str);
-    scat(".");
-  }
-
-  ADDMSG(&u->faction->msgs, msg_message("spyreport",
-    "spy target report", u, target, strdup(buf)));
 }
 
 
@@ -299,7 +213,7 @@ int
 setstealth_cmd(unit * u, struct order * ord)
 {
   const xmlChar *s;
-  char level;
+  int level;
   const race * trace;
 
   init_tokens(ord);
@@ -360,7 +274,7 @@ setstealth_cmd(unit * u, struct order * ord)
     } else if (findparam(s, u->faction->locale) == P_NOT) {
       freset(u, UFL_PARTEITARNUNG);
     } else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
-      const xmlChar *s2 = getstrtoken();
+      const char *s2 = (const char *)getstrtoken();
       int nr = -1;
 
       if (s2) nr = atoi36(s2);
@@ -449,7 +363,7 @@ setstealth_cmd(unit * u, struct order * ord)
   default:
     if (isdigit(s[0])) {
       /* Tarnungslevel setzen */
-      level = (char) atoip(s);
+      level = atoi((const char *)s);
       if (level > effskill(u, SK_STEALTH)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth", ""));
         return 0;

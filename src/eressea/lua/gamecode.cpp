@@ -12,6 +12,7 @@
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
 #include <gamecode/creport.h>
+#include <gamecode/report.h>
 
 #include <spells/spells.h>
 
@@ -217,6 +218,7 @@ write_summary()
     summary * sum_end = make_summary();
     report_summary(sum_end, sum_begin, false);
     report_summary(sum_end, sum_begin, true);
+    writeaddresses();
     return 0;
   }
   return -1;

@@ -50,10 +50,6 @@ extern int init_reports(void);
 
 extern const struct unit *ucansee(const struct faction *f, const struct unit *u, const struct unit *x);
 
-struct summary;
-extern void report_summary(struct summary * n, struct summary * o, boolean full);
-extern struct summary * make_summary(void);
-
 int hat_in_region(item_t itm, struct region * r, struct faction * f);
 
 /* für fast_region und neuen CR: */
@@ -102,8 +98,9 @@ extern void report_building(FILE *F, const struct region * r, const struct build
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode, char * buf, size_t size);
 
 extern const char * reportpath(void);
-extern const char * trailinto(const struct region * r, const struct locale * lang);
-extern const char * report_kampfstatus(const struct unit * u, const struct locale * lang);
+extern const xmlChar * trailinto(const struct region * r, const struct locale * lang);
+extern const xmlChar * report_kampfstatus(const struct unit * u, const struct locale * lang);
+  extern void writeaddresses(void);
 
   extern void reports_init(void);
 

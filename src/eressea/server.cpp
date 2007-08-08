@@ -61,7 +61,9 @@
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
 #include <gamecode/creport.h>
+#ifdef REPORT_FORMAT_NR
 #include <gamecode/report.h>
+#endif
 #include <gamecode/xmlreport.h>
 
 /* kernel includes */
@@ -162,7 +164,7 @@ static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_ignore_errors = false;
 static boolean opt_reportonly = false;
-static const char * luafile = "default.lua";
+static const char * luafile = NULL;
 static const char * script_path = "scripts";
 
 struct settings global = {
@@ -213,7 +215,9 @@ game_init(void)
   init_xmas();
 
   reports_init();
+#ifdef REPORT_FORMAT_NR
   report_init();
+#endif
   creport_init();
   xmlreport_init();
 
@@ -378,7 +382,9 @@ game_done(void)
   }
 
   creport_cleanup();
+#ifdef REPORT_FORMAT_NR
   report_cleanup();
+#endif
   calendar_cleanup();
 }
 #endif
@@ -419,7 +425,7 @@ usage(const char * prog, const char * arg)
     "-o reportdir     : gibt das reportverzeichnis an\n"
     "-l path          : specify the base script directory\n"
     "-C               : run in interactive mode\n"
-    "-e script        : main lua script (default: default.lua)\n"
+    "-e script        : main lua script\n"
     "-R               : erstellt nur die Reports neu\n"
     "--lomem          : keine Messages (RAM sparen)\n"
     "--nobattle       : keine Kämpfe\n"

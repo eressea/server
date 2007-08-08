@@ -741,7 +741,7 @@ see_border(const border * b, const faction * f, const region * r)
   return cs;
 }
 
-const char *
+const xmlChar *
 trailinto(const region * r, const struct locale * lang)
 {
   char ref[32];
@@ -2526,81 +2526,6 @@ writemonument(void)
 }
 
 static void
-writeadresses(void)
-{
-  faction *f;
-  FILE *F;
-  char zText[MAX_PATH];
-  sprintf(zText, "%s/adressen", basepath());
-  F = cfopen(zText, "w");
-  if (!F) return;
-
-  for (f = factions; f; f = f->next) {
-    if (f->no != MONSTER_FACTION && playerrace(f->race)) {
-      fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
-    }
-  }
-  fclose(F);
-}
-
-static void
-writenewssubscriptions(void)
-{
-  char zText[MAX_PATH];
-  FILE *F;
-
-  sprintf(zText, "%s/news-subscriptions", basepath());
-  F = cfopen(zText, "w");
-  if (!F) return;
-#ifdef AT_OPTION
-  {
-    faction *f;
-    for(f=factions; f; f=f->next) {
-      attrib *a = a_find(f->attribs, &at_option_news);
-      if(!a) {
-        fprintf(F, "%s:0\n", f->email);
-      } else {
-        fprintf(F, "%s:%d\n", f->email, a->data.i);
-      }
-    }
-  }
-#endif
-  fclose(F);
-}
-
-static void
-writeforward(void)
-{
-  FILE *forwardFile;
-  region *r;
-  faction *f;
-  unit *u;
-
-  {
-    char zText[MAX_PATH];
-    sprintf(zText, "%s/aliases", basepath());
-    forwardFile = cfopen(zText, "w");
-    if (!forwardFile) return;
-  }
-
-  for (f = factions; f; f = f->next) {
-    if (f->no != MONSTER_FACTION) {
-      fprintf(forwardFile,"partei-%s: %s\n", factionid(f), f->email);
-    }
-  }
-
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u = u->next) {
-      if (u->faction->no != MONSTER_FACTION) {
-        fprintf(forwardFile,"einheit-%s: %s\n", unitid(u), u->faction->email);
-      }
-    }
-  }
-
-  fclose(forwardFile);
-}
-
-static void
 writeturn(void)
 {
   char zText[MAX_PATH];
@@ -2790,11 +2715,6 @@ report_summary(summary * s, summary * o, boolean full)
   fclose(F);
 
   if (full) {
-    printf("Schreibe Liste der Adressen (adressen)...\n");
-    writeadresses();
-    writenewssubscriptions();
-    writeforward();
-
     printf("writing date & turn\n");
     writeturn();
 

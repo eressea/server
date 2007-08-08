@@ -1,3 +1,6 @@
+-- the locales that this gameworld supports.
+local locales = { "de", "en" }
+
 function process(orders)
   -- read game and orders
   local turnfile = "" .. get_turn()
@@ -30,11 +33,7 @@ function process(orders)
   update_guards()
   update_scores()
 
-  -- write out the initial reports (no need to run a turn)
-  write_passwords()
-  write_reports()
-  write_emails()
-  write_summary()
+  write_files(locales)
 
   -- siegbedingungen ausgeben
   write_standings()
@@ -54,10 +53,10 @@ end
 print("- Running wdw-run.lua")
 
 scripts = {
+  "default.lua",
   "spells.lua",
   "extensions.lua",
   "familiars.lua",
-  "write_emails.lua",
   "wdw/sphinx.lua",
   "wdw/phoenix.lua",
   "wdw/standings.lua"

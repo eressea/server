@@ -1,3 +1,6 @@
+-- the locales that this gameworld supports.
+local locales = { "de", "en" }
+
 function loadscript(name)
   local script = scriptpath .. "/" .. name
   print("- loading " .. script)
@@ -26,7 +29,7 @@ function run_scripts()
     "spells.lua",
     "extensions.lua",
     "familiars.lua",
-    "write_emails.lua",
+    "default.lua",
     "eressea/eternath.lua",
     "eressea/wedding-jadee.lua", 
     "eressea/ponnuki.lua",
@@ -96,10 +99,7 @@ function process(orders)
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", false)
 
-  write_passwords()
-  write_reports()
-  write_emails()
-  write_summary()
+  write_files(locales)
 
   file = "" .. get_turn()
   if write_game(file)~=0 then 

@@ -498,6 +498,14 @@ report_crtypes(FILE * F, const struct locale* lang)
   }
 }
 
+static unsigned int
+messagehash(const struct message * msg)
+{
+  variant var;
+  var.v = (void *)msg;
+  return (unsigned int)var.i;
+}
+
 static void
 render_messages(FILE * F, faction * f, message_list *msgs)
 {
@@ -511,7 +519,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
     char nrbuffer[1024*32];
     nrbuffer[0] = '\0';
     if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f)>0 && nrbuffer[0]) {
-      fprintf(F, "MESSAGE %u\n", (unsigned int)m->msg);/*++msgno); */
+      fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
       fprintf(F, "%d;type\n", hash);
       fwritestr(F, nrbuffer);
       fputs(";rendered\n", F);
@@ -520,7 +528,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 #endif
     crbuffer[0] = '\0';
     if (cr_render(m->msg, crbuffer, (const void*)f)==0) {
-      if (!printed) fprintf(F, "MESSAGE %u\n", (unsigned int)m->msg);/*++msgno); */
+      if (!printed) fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
       if (crbuffer[0]) fputs(crbuffer, F);
     } else {
       log_error(("could not render cr-message %p: %s\n", m->msg, m->msg->type->name));

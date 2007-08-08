@@ -1,28 +1,11 @@
+-- the locales that this gameworld supports.
+local locales = { "de", "en" }
+
 function loadscript(name)
   local script = scriptpath .. "/" .. name
   print("- loading " .. script)
   if pcall(dofile, script)==0 then
     print("Could not load " .. script)
-  end
-end
-
-function write_emails()
-  local locales = { "de", "en" }
-  local files = {}
-  local key
-  for key in locales do
-    local locale = locales[key]
-    files[locale] = io.open(basepath .. "/emails." .. locale, "w")
-  end
-
-  local faction
-  for faction in factions() do
-    -- print(faction.id .. " - " .. faction.locale)
-    files[faction.locale]:write(faction.email .. "\n")
-  end
-
-  for key in files do
-    files[key]:close()
   end
 end
 
@@ -83,10 +66,7 @@ function process(orders)
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", true)
 
-  write_passwords()
-  write_reports()
-  write_emails()
-  write_summary()
+  write_files(locales)
 
   file = "" .. get_turn()
   if write_game(file)~=0 then 
@@ -104,7 +84,7 @@ end
 if orderfile==nil then
   print "you must specify an orderfile"
 else
-  -- loadscript("spells.lua")
+  loadscript("default.lua")
   loadscript("extensions.lua")
   loadscript("kingdoms/extensions.lua")
   process(orderfile)

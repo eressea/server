@@ -20,7 +20,7 @@ extern "C" {
 #endif
 
 #include <wchar.h>
-
+#define USE_UNICODE
   extern int unicode_utf8_to_ucs4(wint_t *ucs4_character, const xmlChar *utf8_string, size_t *length);
 
 #ifdef __cplusplus
