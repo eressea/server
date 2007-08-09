@@ -119,9 +119,6 @@
 #define DMRISEHAFEN    0.2F /* weekly chance that demand goes up with harbor */
 
 
-/* - external symbols ------------------------------------------ */
-extern int dropouts[2];
-extern int * age;
 /* - exported global symbols ----------------------------------- */
 boolean nobattle = false;
 boolean nomonsters = false;
@@ -1026,6 +1023,9 @@ quit(void)
     if (*fptr==f) fptr=&f->next;
   }
 }
+
+int dropouts[2];
+int * age = NULL;
 
 static void
 parse_restart(void)

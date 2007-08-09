@@ -38,6 +38,9 @@ void update_guards(void);
 void processorders(void);
 extern struct attrib_type at_germs;
 
+extern int dropouts[2];
+extern int * age;
+
 #ifdef __cplusplus
 }
 #endif

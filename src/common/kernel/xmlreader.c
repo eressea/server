@@ -458,11 +458,14 @@ parse_directions(xmlDocPtr doc)
   xpathDirections = xmlXPathEvalExpression(BAD_CAST "/eressea/directions/dir", xpath);
   nsetDirections = xpathDirections->nodesetval;
   if (nsetDirections!=NULL) {
-    xmlNodePtr dir = nsetDirections->nodeTab[0];
-    xmlChar * property = xmlGetProp(dir, BAD_CAST "name");
+    int k;
+    for (k=0;k!=nsetDirections->nodeNr;++k) {
+      xmlNodePtr dir = nsetDirections->nodeTab[k];
+      xmlChar * property = xmlGetProp(dir, BAD_CAST "name");
 
-    register_special_direction((const char *)property);
-    xmlFree(property);
+      register_special_direction((const char *)property);
+      xmlFree(property);
+    }
   }
   xmlXPathFreeObject(xpathDirections);
   xmlXPathFreeContext(xpath);

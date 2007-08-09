@@ -5,15 +5,19 @@
  * | (c) 1998 - 2007   |  
  * |                   |  This program may not be used, modified or distributed
  * +-------------------+  without prior permission by the authors of Eressea.
+ *  
  */
 
-#ifndef GC_SPELLS_H
-#define GC_SPELLS_H
+#ifndef H_GC_SUMMARY
+#define H_GC_SUMMARY
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  extern void register_gcspells(void);
+  struct summary;
+  extern void report_summary(struct summary * n, struct summary * o, boolean full);
+  extern struct summary * make_summary(void);
 
 #ifdef __cplusplus
 }

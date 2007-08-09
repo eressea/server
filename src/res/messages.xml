@@ -1735,7 +1735,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Elementar ist zu klein, um das Gebäude zu tragen."</text>
-</text>
   </message>
 
   <message name="sp_movecastle_fail_1" section="magic">
@@ -1746,9 +1745,7 @@
       <arg name="direction" type="direction"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Elementar weigert sich, nach $direction($direction) zu gehen."</text>
-</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The elemental refuses to go $direction($direction)."</text>
-</text>
   </message>
 
   <message name="sp_migranten_fail1" section="magic">
@@ -7012,6 +7009,8 @@
       <arg name="resource" type="resource"/>
       <arg name="target" type="unit"/>
     </type>
+  </message>
+
   <message name="give_peasants" section="economy">
     <type>
       <arg name="unit" type="unit"/>
@@ -7021,6 +7020,7 @@
     <text locale="de">"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an die Bauern."</text>
     <text locale="en">"$unit($unit) gives $int($amount) $resource($resource,$amount) to the local peasants."</text>
   </message>
+
   <message name="maintenance" section="economy">
     <type>
       <arg name="unit" type="unit"/>
@@ -7471,7 +7471,6 @@
     </type>
     <text locale="de">"$unit($mage) erschafft in $region($region) eine verheerende Feuersbrunst. $int($amount) Bäume fallen den Flammen zum Opfer."</text>
     <text locale="de">"$unit($mage) creates a flaming inferno in $region($region). $int($amount) trees fall vistim to the flames."</text>
-</text>
   </message>
   
   <message name="recruit_effect" section="magic">
@@ -8314,6 +8313,13 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nciht auf Untote gezaubert werden."</text>
+  </message>
+  
+  <message name="warn_dropout" section="errors">
+    <type>
+      <arg name="faction" type="faction"/>
+    </type>
+    <text locale="de">"Achtung: $faction($faction) hat einige Zeit keine Züge eingeschickt und könnte dadurch in Kürze aus dem Spiel ausscheiden"</text>
   </message>
 
 </messages>

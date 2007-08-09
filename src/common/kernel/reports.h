@@ -32,6 +32,9 @@ extern "C" {
 
 extern const char *directions[];
 extern const char *coasts[];
+extern boolean nonr;
+extern boolean nocr;
+extern boolean noreports;
 
 /* kann_finden speedups */
 extern boolean kann_finden(struct faction * f1, struct faction * f2);
@@ -100,7 +103,6 @@ extern int bufunit(const struct faction * f, const struct unit * u, int indent, 
 extern const char * reportpath(void);
 extern const xmlChar * trailinto(const struct region * r, const struct locale * lang);
 extern const xmlChar * report_kampfstatus(const struct unit * u, const struct locale * lang);
-  extern void writeaddresses(void);
 
   extern void reports_init(void);
 

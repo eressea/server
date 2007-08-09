@@ -661,7 +661,7 @@
   </race>
   <race name="shadowdemon" cansail="no" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="500" capacity="540" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes" nogive="yes">
     <ai splitsize="1000" killpeasants="yes" moverandom="yes" learn="yes"/>
-    <function name="name" value="nameshadow"/>
+    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>

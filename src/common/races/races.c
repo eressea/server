@@ -109,7 +109,7 @@ default_spoil(const struct race * rc, int size)
 }
 
 /* Die Funktionen werden über den hier registrierten Namen in races.xml
-* in die jeweilige Rassendefiniton eingebunden */
+ * in die jeweilige Rassendefiniton eingebunden */
 void
 register_races(void)
 {
@@ -118,8 +118,11 @@ register_races(void)
 
   register_function((pf_generic)allowed_dragon, "movedragon");
 
-  /* function age 
-  * race->age() */
+  register_function((pf_generic)allowed_swim, "moveswimming");
+  register_function((pf_generic)allowed_fly, "moveflying");
+  register_function((pf_generic)allowed_walk, "movewalking");
+
+  /* function age for race->age() */
   register_function((pf_generic)age_undead, "ageundead");
   register_function((pf_generic)age_illusion, "ageillusion");
   register_function((pf_generic)age_skeleton, "ageskeleton");

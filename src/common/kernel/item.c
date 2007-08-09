@@ -330,13 +330,13 @@ rt_register(resource_type * rtype)
 const resource_type *
 item2resource(const item_type * itype)
 {
-  return itype->rtype;
+  return itype?itype->rtype:NULL;
 }
 
 const item_type *
 resource2item(const resource_type * rtype)
 {
-  return rtype->itype;
+  return rtype?rtype->itype:NULL;
 }
 
 const weapon_type *

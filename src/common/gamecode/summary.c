@@ -1,0 +1,407 @@
+/* vi: set ts=2:
+ * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ * |                   |  Enno Rehling <enno@eressea.de>
+ * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ * | (c) 1998 - 2007   |  
+ * |                   |  This program may not be used, modified or distributed
+ * +-------------------+  without prior permission by the authors of Eressea.
+ *  
+ */
+
+/* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#include <config.h>
+#include <eressea.h>
+
+#include "summary.h"
+
+#include "laws.h"
+
+#include <kernel/alliance.h>
+#include <kernel/calendar.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/save.h>
+#include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/unit.h>
+
+#include <util/base36.h>
+#include <util/language.h>
+#include <util/lists.h>
+
+#include <string.h>
+
+typedef struct summary {
+  int waffen;
+  int factions;
+  int ruestungen;
+  int schiffe;
+  int gebaeude;
+  int maxskill;
+  int heroes;
+  int inhabitedregions;
+  int peasants;
+  int nunits;
+  int playerpop;
+  double playermoney;
+  double peasantmoney;
+  int armed_men;
+  int poprace[MAXRACES];
+  int factionrace[MAXRACES];
+  int landregionen;
+  int regionen_mit_spielern;
+  int landregionen_mit_spielern;
+  int orkifizierte_regionen;
+  int inactive_volcanos;
+  int active_volcanos;
+  int spielerpferde;
+  int pferde;
+  struct language {
+    struct language * next;
+    int number;
+    const struct locale * locale;
+  } * languages;
+} summary;
+
+static char *
+pcomp(double i, double j)
+{
+  static char buf[32];
+  sprintf(buf, "%.0f (%s%.0f)", i, (i>=j)?"+":"", i-j);
+  return buf;
+}
+
+static char *
+rcomp(int i, int j)
+{
+  static char buf[32];
+  sprintf(buf, "%d (%s%d,%s%d%%)",
+    i, (i>=j)?"+":"", i-j, (i>=j)?"+":"",j?((i-j)*100)/j:0);
+  return buf;
+}
+
+
+static void
+out_faction(FILE *file, const struct faction *f)
+{
+  if (alliances!=NULL) {
+    fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
+      f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
+      LOC(default_locale, rc_name(f->race, 0)), magietypen[f->magiegebiet],
+      f->no_units, f->num_total, f->money, turn - f->lastorders);
+  } else {
+    fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
+      factionname(f), LOC(default_locale, rc_name(f->race, 0)),
+      magietypen[f->magiegebiet], f->no_units, f->num_total, f->money,
+      turn - f->lastorders);
+  }
+}
+
+static char *
+gamedate2(const struct locale * lang)
+{
+  static char buf[256];
+  gamedate gd;
+
+  get_gamedate(turn, &gd);
+  sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
+    LOC(lang, weeknames2[gd.week]),
+    LOC(lang, monthnames[gd.month]),
+    gd.year,
+    LOC(lang, agename));
+  return buf;
+}
+
+static void
+writeturn(void)
+{
+  char zText[MAX_PATH];
+  FILE *f;
+
+  sprintf(zText, "%s/datum", basepath());
+  f = cfopen(zText, "w");
+  if (!f) return;
+  fputs(gamedate2(default_locale), f);
+  fclose(f);
+  sprintf(zText, "%s/turn", basepath());
+  f = cfopen(zText, "w");
+  if (!f) return;
+  fprintf(f, "%d\n", turn);
+  fclose(f);
+}
+
+void
+report_summary(summary * s, summary * o, boolean full)
+{
+  FILE * F = NULL;
+  int i, newplayers = 0;
+  faction * f;
+  char zText[MAX_PATH];
+
+  if (full) {
+    sprintf(zText, "%s/parteien.full", basepath());
+  } else {
+    sprintf(zText, "%s/parteien", basepath());
+  }
+  F = cfopen(zText, "w");
+  if (!F) return;
+  printf("Schreibe Zusammenfassung (parteien)...\n");
+  fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
+  fprintf(F,   "Auswertung Nr:         %d\n\n", turn);
+  fprintf(F,   "Parteien:              %s\n", pcomp(s->factions, o->factions));
+  fprintf(F,   "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));
+  fprintf(F,   "Spielerpopulation:     %s\n",
+    pcomp(s->playerpop, o->playerpop));
+  fprintf(F,   " davon bewaffnet:      %s\n",
+    pcomp(s->armed_men, o->armed_men));
+#ifdef HEROES
+  fprintf(F,   " Helden:               %s\n", pcomp(s->heroes, o->heroes));
+#endif
+
+  if (full) {
+    fprintf(F, "Regionen:              %d\n", listlen(regions));
+    fprintf(F, "Bewohnte Regionen:     %d\n", s->inhabitedregions);
+    fprintf(F, "Landregionen:          %d\n", s->landregionen);
+    fprintf(F, "Spielerregionen:       %d\n", s->regionen_mit_spielern);
+    fprintf(F, "Landspielerregionen:   %d\n", s->landregionen_mit_spielern);
+    fprintf(F, "Orkifizierte Regionen: %d\n", s->orkifizierte_regionen);
+    fprintf(F, "Inaktive Vulkane:      %d\n", s->inactive_volcanos);
+    fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
+  }
+
+  for (i = 0; i < MAXRACES; i++) {
+    const race * rc = new_race[i];
+    if (s->factionrace[i] && rc && playerrace(rc)
+      && i != RC_TEMPLATE && i != RC_CLONE) {
+        fprintf(F, "%14svölker: %s\n", LOC(default_locale, rc_name(rc, 3)),
+          pcomp(s->factionrace[i], o->factionrace[i]));
+    }
+  }
+
+  if(full) {
+    fprintf(F, "\n");
+    {
+      struct language * plang = s->languages;
+      while (plang!=NULL) {
+        struct language * olang = o->languages;
+        int nold = 0;
+        while (olang && olang->locale!=plang->locale) olang=olang->next;
+        if (olang) nold = olang->number;
+        fprintf(F, "Sprache %12s: %s\n", locale_name(plang->locale),
+          rcomp(plang->number, nold));
+        plang=plang->next;
+      }
+    }
+  }
+
+  fprintf(F, "\n");
+  if (full) {
+    for (i = 0; i < MAXRACES; i++) {
+      const race * rc = new_race[i];
+      if (s->poprace[i]) {
+        fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+          rcomp(s->poprace[i], o->poprace[i]));
+      }
+    }
+  } else {
+    for (i = 0; i < MAXRACES; i++) {
+      const race * rc = new_race[i];
+      if (s->poprace[i] && playerrace(rc)
+        && i != RC_TEMPLATE && i != RC_CLONE) {
+          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+            rcomp(s->poprace[i], o->poprace[i]));
+      }
+    }
+  }
+
+  if (full) {
+    fprintf(F, "\nWaffen:               %s\n", pcomp(s->waffen,o->waffen));
+    fprintf(F, "Rüstungen:            %s\n",
+      pcomp(s->ruestungen,o->ruestungen));
+    fprintf(F, "ungezähmte Pferde:    %s\n", pcomp(s->pferde, o->pferde));
+    fprintf(F, "gezähmte Pferde:      %s\n",
+      pcomp(s->spielerpferde,o->spielerpferde));
+    fprintf(F, "Schiffe:              %s\n", pcomp(s->schiffe, o->schiffe));
+    fprintf(F, "Gebäude:              %s\n", pcomp(s->gebaeude, o->gebaeude));
+
+    fprintf(F, "\nBauernpopulation:     %s\n", pcomp(s->peasants,o->peasants));
+
+    fprintf(F, "Population gesamt:    %d\n\n", s->playerpop+s->peasants);
+
+    fprintf(F, "Reichtum Spieler:     %s Silber\n",
+      pcomp(s->playermoney,o->playermoney));
+    fprintf(F, "Reichtum Bauern:      %s Silber\n",
+      pcomp(s->peasantmoney, o->peasantmoney));
+    fprintf(F, "Reichtum gesamt:      %s Silber\n\n",
+      pcomp(s->playermoney+s->peasantmoney, o->playermoney+o->peasantmoney));
+  }
+
+  fprintf(F, "\n\n");
+
+  newplayers = update_nmrs();
+
+  for (i = 0; i <= NMRTimeout(); ++i) {
+    if (i == NMRTimeout()) {
+      fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
+    } else {
+      fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
+    }
+  }
+  if (age) {
+    if (age[2] != 0) {
+      fprintf(F, "Erstabgaben:\t %d%%\n", 100 - (dropouts[0] * 100 / age[2]));
+    }
+    if (age[3] != 0) {
+      fprintf(F, "Zweitabgaben:\t %d%%\n", 100 - (dropouts[1] * 100 / age[3]));
+    }
+  }
+  fprintf(F, "Neue Spieler:\t %d\n", newplayers);
+
+  if (full) {
+    if (factions)
+      fprintf(F, "\nParteien:\n\n");
+
+    for (f = factions; f; f = f->next) {
+      out_faction(F, f);
+    }
+
+    if (NMRTimeout() && full) {
+      fprintf(F, "\n\nFactions with NMRs:\n");
+      for (i = NMRTimeout(); i > 0; --i) {
+        for(f=factions; f; f=f->next) {
+          if(i == NMRTimeout()) {
+            if(turn - f->lastorders >= i) {
+              out_faction(F, f);
+            }
+          } else {
+            if(turn - f->lastorders == i) {
+              out_faction(F, f);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  fclose(F);
+
+  if (full) {
+    printf("writing date & turn\n");
+    writeturn();
+  }
+  free(nmrs);
+  nmrs = NULL;
+}
+
+summary *
+make_summary(void)
+{
+  faction *f;
+  region *r;
+  unit *u;
+  summary * s = calloc(1, sizeof(summary));
+
+  for (f = factions; f; f = f->next) {
+    const struct locale * lang = f->locale;
+    struct language * plang = s->languages;
+    while (plang && plang->locale != lang) plang=plang->next;
+    if (!plang) {
+      plang = calloc(sizeof(struct language), 1);
+      plang->next = s->languages;
+      s->languages = plang;
+      plang->locale = lang;
+    }
+    ++plang->number;
+    f->nregions = 0;
+    f->num_total = 0;
+    f->money = 0;
+    if (f->alive && f->units) {
+      s->factions++;
+      /* Problem mit Monsterpartei ... */
+      if (f->no!=MONSTER_FACTION) {
+        s->factionrace[old_race(f->race)]++;
+      }
+    }
+  }
+
+  /* Alles zählen */
+
+  for (r = regions; r; r = r->next) {
+    s->pferde += rhorses(r);
+    s->schiffe += listlen(r->ships);
+    s->gebaeude += listlen(r->buildings);
+    if (!fval(r->terrain, SEA_REGION)) {
+      s->landregionen++;
+      if (r->units) {
+        s->landregionen_mit_spielern++;
+      }
+      if (fval(r, RF_ORCIFIED)) {
+        s->orkifizierte_regionen++;
+      }
+      if (rterrain(r) == T_VOLCANO) {
+        s->inactive_volcanos++;
+      } else if(rterrain(r) == T_VOLCANO_SMOKING) {
+        s->active_volcanos++;
+      }
+    }
+    if (r->units) {
+      s->regionen_mit_spielern++;
+    }
+    if (rpeasants(r) || r->units) {
+      s->inhabitedregions++;
+      s->peasants += rpeasants(r);
+      s->peasantmoney += rmoney(r);
+
+      /* Einheiten Info. nregions darf nur einmal pro Partei
+      * incrementiert werden. */
+
+      for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
+      for (u = r->units; u; u = u->next) {
+        f = u->faction;
+        if (u->faction->no != MONSTER_FACTION) {
+          skill * sv;
+          item * itm;
+
+          s->nunits++;
+          s->playerpop += u->number;
+          if (u->flags & UFL_HERO) {
+            s->heroes += u->number;
+          }
+          s->spielerpferde += get_item(u, I_HORSE);
+          s->playermoney += get_money(u);
+          s->armed_men += armedmen(u);
+          for (itm=u->items;itm;itm=itm->next) {
+            if (itm->type->rtype->wtype) {
+              s->waffen += itm->number;
+            }
+            if (itm->type->rtype->atype) {
+              s->ruestungen += itm->number;
+            }
+          }
+
+          s->spielerpferde += get_item(u, I_HORSE);
+
+          for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+            skill_t sk = sv->id;
+            int aktskill = eff_skill(u, sk, r);
+            if (aktskill > s->maxskill) s->maxskill = aktskill;
+          }
+          if (!fval(f, FFL_SELECT)) {
+            f->nregions++;
+            fset(f, FFL_SELECT);
+          }
+        }
+
+        f->num_total += u->number;
+        f->money += get_money(u);
+        s->poprace[old_race(u->race)] += u->number;
+      }
+    }
+  }
+
+  return s;
+}

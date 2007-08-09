@@ -28,6 +28,7 @@ extern "C" {
   */
   extern struct border_type bt_chaosgate;
   extern struct border_type bt_firewall;
+
   typedef struct wall_data {
     struct unit * mage;
     int force;

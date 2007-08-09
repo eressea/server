@@ -13,6 +13,7 @@
 #include <gamecode/monster.h>
 #include <gamecode/creport.h>
 #include <gamecode/report.h>
+#include <gamecode/summary.h>
 
 #include <spells/spells.h>
 
@@ -65,41 +66,12 @@ lua_planmonsters(void)
   }
 }
 
-#define ISLANDSIZE 20
-#define TURNS_PER_ISLAND 4
-static void
-lua_autoseed(const char * filename, bool new_island)
-{
-  newfaction * players = read_newfactions(filename);
-  if (players!=NULL) {
-    rng_init(players->subscription);
-    while (players) {
-      int n = listlen(players);
-      int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
-      k = n / k;
-      n = autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
-      if (n==0) {
-        break;
-      }
-    }
-  }
-}
-
 #ifdef LUABIND_NO_EXCEPTIONS
 static void
 error_callback(lua_State * L)
 {
 }
 #endif
-
-static int
-get_direction(const char * name)
-{
-  for (int i=0;i!=MAXDIRECTIONS;++i) {
-    if (strcasecmp(directions[i], name)==0) return i;
-  }
-  return NODIRECTION;
-}
 
 static int
 lua_writereport(faction * f)
@@ -113,46 +85,6 @@ lua_writereports(void)
 {
   init_reports();
   return reports();
-}
-
-static void
-lua_equipunit(unit& u, const char * eqname)
-{
-  equip_unit(&u, get_equipment(eqname));
-}
-
-static void
-update_subscriptions(void)
-{
-  FILE * F;
-  char zText[MAX_PATH];
-  faction * f;
-  strcat(strcpy(zText, basepath()), "/subscriptions");
-  F = fopen(zText, "r");
-  if (F==NULL) {
-    log_info((0, "could not open %s.\n", zText));
-    return;
-  }
-  for (;;) {
-    char zFaction[5];
-    int subscription, fno;
-    if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
-    fno = atoi36(zFaction);
-    f = findfaction(fno);
-    if (f!=NULL) {
-      f->subscription=subscription;
-    }
-  }
-  fclose(F);
-
-  sprintf(zText, "subscriptions.%u", turn);
-  F = fopen(zText, "w");
-  for (f=factions;f!=NULL;f=f->next) {
-    fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
-      itoa36(f->no), f->subscription, f->email, f->override,
-      dbrace(f->race), f->lastorders);
-  }
-  fclose(F);
 }
 
 static void
@@ -171,15 +103,6 @@ static void
 message_region(unit& sender, const char * str)
 {
   ADDMSG(&sender.region->msgs, msg_message("mail_result", "unit message", &sender, str));
-}
-
-static void
-lua_learnskill(unit& u, const char * skname, float chances)
-{
-  skill_t sk = sk_find(skname);
-  if (sk!=NOSKILL) {
-    learn_skill(&u, sk, chances);
-  }
 }
 
 static int
@@ -218,7 +141,6 @@ write_summary()
     summary * sum_end = make_summary();
     report_summary(sum_end, sum_begin, false);
     report_summary(sum_end, sum_begin, true);
-    writeaddresses();
     return 0;
   }
   return -1;

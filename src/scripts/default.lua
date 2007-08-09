@@ -18,14 +18,24 @@ function write_emails(locales)
   end
 end
 
+function write_addresses()
+  local file
+  local faction
+
+  file = io.open(basepath .. "/adressen", "w")
+  for faction in factions() do
+    -- print(faction.id .. " - " .. faction.locale)
+    file:write(tostring(faction) .. ":" .. faction.email .. ":" .. faction.banner .. "\n")
+  end
+
+  file:close()
+end
+
 function write_aliases()
   local file
-  local key
-  local locale
+  local faction
 
   file = io.open(basepath .. "/aliases." .. locale, "w")
-
-  local faction
   for faction in factions() do
     local unit
     file:write("partei-" .. itoa36(faction.id) .. ": " .. faction.email .. "\n")
@@ -43,4 +53,5 @@ function write_files(locales)
   write_emails(locales)
   write_aliases()
   write_summary()
+  write_addresses()
 end

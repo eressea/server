@@ -29,10 +29,12 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/resolve.h>
+#include <util/unicode.h>
 
 /* libc includes */
 #include <stdlib.h>
 #include <string.h>
+#include <wctype.h>
 
 #define GMAXHASH 2039
 static group * ghash[GMAXHASH];
@@ -73,7 +75,7 @@ init_group(faction * f, group * g)
 static group *
 find_groupbyname(group * g, const xmlChar * name)
 {
-	while (g && xml_strcasecmp(name, g->name)) g = g->next;
+	while (g && unicode_utf8_strcasecmp(name, g->name)!=0) g = g->next;
 	return g;
 }
 

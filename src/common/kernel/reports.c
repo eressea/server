@@ -63,6 +63,10 @@
 #include <attributes/racename.h>
 #include <attributes/viewrange.h>
 
+boolean nocr = false;
+boolean nonr = false;
+boolean noreports = false;
+
 const char * g_reportdir;
 const char * visibility[] = {
   "none",
@@ -1353,11 +1357,7 @@ nmr_warnings(void)
       for (fa=factions;fa;fa=fa->next) {
         if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
           if (msg==NULL) {
-            char buf[4096];
-            sprintf(buf, "Achtung: %s hat einige Zeit keine "
-              "Züge eingeschickt und könnte dadurch in Kürze aus dem "
-              "Spiel ausscheiden.", factionname(f));
-            msg = msg_message("msg_event", "string", buf);
+            msg = msg_message("warn_dropout", "faction", f);
           }
           add_message(&fa->msgs, msg);
         }
@@ -1443,22 +1443,24 @@ global_report(const char * filename)
 }
 #endif
 
-void
-writeaddresses(void)
+int
+init_reports(void)
 {
-  faction *f;
-  FILE *F;
-  char zText[MAX_PATH];
-  sprintf(zText, "%s/addresses", basepath());
-  F = cfopen(zText, "w");
-  if (!F) return;
+  update_intervals();
 
-  for (f = factions; f; f = f->next) {
-    if (f->no != MONSTER_FACTION && playerrace(f->race)) {
-      fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
+#ifdef HAVE_STAT
+  {
+    stat_type st;
+    if (stat(reportpath(), &st)==0) return 0;
+  }
+#endif
+  if (makedir(reportpath(), 0700)!=0) {
+    if (errno!=EEXIST) {
+      perror("could not create reportpath");
+      return -1;
     }
   }
-  fclose(F);
+  return 0;
 }
 
 int
@@ -1478,7 +1480,7 @@ reports(void)
   sprintf(path, "%s/reports.txt", reportpath());
   mailit = fopen(path, "w");
   if (mailit == NULL) {
-    log_error(("%s konnte nicht geöffnet werden!\n", path));
+    log_error(("%s could not be opened!\n", path));
   }
 
   for (f = factions; f; f = f->next) {
@@ -1557,7 +1559,7 @@ static variant
 var_copy_regions(variant x)
 {
   region_list * rsrc;
-  size_t size = 0;
+  int size = 0;
 
   for (rsrc = (region_list*)x.v; rsrc!=NULL; rsrc=rsrc->next) {
     ++size;

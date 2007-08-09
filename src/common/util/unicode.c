@@ -13,6 +13,37 @@
 
 #include <errno.h>
 
+int
+unicode_utf8_strcasecmp(const xmlChar * a, const xmlChar * b)
+{
+  while (*a && *b) {
+    int ret;
+    size_t size;
+    wint_t ucsa = *a, ucsb = *b;
+
+    if (ucsa>0x7F) {
+      ret = unicode_utf8_to_ucs4(&ucsa, a, &size);
+      if (ret!=0) return -1;
+      a += size;
+    } else ++a;
+    if (ucsb>0x7F) {
+      ret = unicode_utf8_to_ucs4(&ucsb, b, &size);
+      if (ret!=0) return -1;
+      b += size;
+    } else ++b;
+
+    if (ucsb!=ucsa) {
+      ucsb = towlower(ucsb);
+      ucsa = towlower(ucsa);
+      if (ucsb<ucsa) return 1;
+      if (ucsb>ucsa) return -1;
+    }
+  }
+  if (*b) return -1;
+  if (*a) return 1;
+  return 0;
+}
+
 /* Convert a UTF-8 encoded character to UCS-4. */
 int
 unicode_utf8_to_ucs4(wint_t *ucs4_character, const xmlChar *utf8_string, 
