@@ -238,7 +238,7 @@ read_newfactions(const char * filename)
     if (nf->race==NULL) {
       /* if the script didn't supply the race as a token, then it gives us a
        * race in the default locale (which means that itis a UTF8 string) */
-      nf->race = findrace((const xmlChar*)race, default_locale);
+      nf->race = findrace(race, default_locale);
     }
     nf->lang = find_locale(lang);
     nf->bonus = bonus;

@@ -176,9 +176,9 @@ extern int count_skill(struct faction * f, skill_t sk);
 
 /* direction, geography */
 extern const char *directions[];
-extern direction_t finddirection(const xmlChar *s, const struct locale *);
+extern direction_t finddirection(const char *s, const struct locale *);
 
-extern int findoption(const xmlChar *s, const struct locale * lang);
+extern int findoption(const char *s, const struct locale * lang);
 
 /* special units */
 void make_undead_unit(struct unit *);
@@ -194,14 +194,14 @@ unsigned int atoip(const char *s);
 unsigned int getuint(void);
 int getint(void);
 
-extern const xmlChar *igetstrtoken(const xmlChar *s);
+extern const char *igetstrtoken(const char *s);
 
 extern void init_tokens(const struct order * ord); /* initialize token parsing */
-extern skill_t findskill(const xmlChar *s, const struct locale * lang);
+extern skill_t findskill(const char *s, const struct locale * lang);
 
-extern keyword_t findkeyword(const xmlChar *s, const struct locale * lang);
+extern keyword_t findkeyword(const char *s, const struct locale * lang);
 
-extern param_t findparam(const xmlChar *s, const struct locale * lang);
+extern param_t findparam(const char *s, const struct locale * lang);
 extern param_t getparam(const struct locale * lang);
 
 extern int atoi36(const char * s);
@@ -259,8 +259,8 @@ extern char *estring(const char *s);
 extern char *estring_i(char *s);
 extern char *cstring(const char *s);
 extern char *cstring_i(char *s);
-extern const xmlChar *unitname(const struct unit * u);
-extern xmlChar * write_unitname(const struct unit * u, xmlChar * buffer, size_t size);
+extern const char *unitname(const struct unit * u);
+extern char * write_unitname(const struct unit * u, char * buffer, size_t size);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 
@@ -269,7 +269,7 @@ extern int count_migrants (const struct faction * f);
 extern int count_maxmigrants(const struct faction * f);
 
 extern boolean teure_talente(const struct unit * u);
-extern const struct race * findrace(const xmlChar *, const struct locale *);
+extern const struct race * findrace(const char *, const struct locale *);
 
 int eff_stealth(const struct unit * u, const struct region * r);
 void scale_number(struct unit * u, int n);
@@ -309,7 +309,7 @@ boolean unit_has_cursed_item(struct unit *u);
 
 /* simple garbage collection: */
 void * gc_add(void * p);
-void addmessage(struct region * r, struct faction * f, const xmlChar *s, msg_t mtype, int level);
+void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
 
 /* grammatik-flags: */
 #define GF_NONE 0
@@ -360,7 +360,7 @@ extern int maxworkingpeasants(const struct region * r);
 
 extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
 extern int maintenance_cost(const struct unit * u);
-extern struct message * movement_error(struct unit * u, const xmlChar * token, struct order * ord, int error_code);
+extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
 extern void add_income(struct unit * u, int type, int want, int qty);
 
@@ -370,7 +370,7 @@ enum {
   E_MOVE_NOREGION, /* no region exists in this direction */
   E_MOVE_BLOCKED   /* cannot see this region, there is a blocking border. */
 };
-extern int movewhere(const struct unit *u, const xmlChar * token, struct region * r, struct region** resultp);
+extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 
 extern const char * basepath(void);
 extern const char * resourcepath(void);
@@ -430,7 +430,7 @@ extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern struct order * default_order(const struct locale * lang);
 extern int entertainmoney(const struct region * r);
 
-extern int freadstr(FILE * F, char * str, size_t size);
+extern int freadstr(FILE * F, int encoding, char * str, size_t size);
 extern int fwritestr(FILE * F, const char * str);
 
 extern void plagues(struct region * r, boolean ismagic);

@@ -89,15 +89,15 @@ boolean opt_cr_absolute_coords = false;
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
-static const xmlChar *
+static const char *
 crtag(const char * key)
 {
   static const struct locale * lang = NULL;
   if (!lang) lang = find_locale(TAG_LOCALE);
-  return (const xmlChar*)locale_string(lang, key);
+  return locale_string(lang, key);
 }
 #else
-#define crtag(x) (const xmlChar*)(x)
+#define crtag(x) (x)
 #endif
 /*
  * translation table
@@ -105,15 +105,15 @@ crtag(const char * key)
 typedef struct translation {
   struct translation * next;
   char * key;
-  const xmlChar * value;
+  const char * value;
 } translation;
 
 #define TRANSMAXHASH 257
 static translation * translation_table[TRANSMAXHASH];
 static translation * junkyard;
 
-static const xmlChar *
-add_translation(const char * key, const xmlChar * value)
+static const char *
+add_translation(const char * key, const char * value)
 {
   int kk = ((key[0] << 5) + key[0]) % TRANSMAXHASH;
   translation * t = translation_table[kk];
@@ -383,8 +383,8 @@ cr_order(variant var, char * buffer, const void * userdata)
   order * ord = (order*)var.v;
   if (ord!=NULL) {
     char * wp = buffer;
-    xmlChar * cmd = getcommand(ord);
-    const xmlChar * rp = cmd;
+    char * cmd = getcommand(ord);
+    const char * rp = cmd;
 
     *wp++ = '\"';
     while (*rp) {
@@ -644,7 +644,7 @@ cr_output_unit(FILE * F, const region * r,
 {
   /* Race attributes are always plural and item attributes always
    * singular */
-  const xmlChar * str;
+  const char * str;
   const item_type * lasttype;
   int pr;
   item *itm, *show;
@@ -770,7 +770,7 @@ cr_output_unit(FILE * F, const region * r,
   /* additional information for own units */
   if (u->faction == f || omniscient(f)) {
     order * ord;
-    const xmlChar *xc;
+    const char *xc;
     const char * c;
     int i;
 
@@ -864,14 +864,14 @@ cr_output_unit(FILE * F, const region * r,
         for (;slist; slist = slist->next) {
           spell * sp = slist->data;
           if (sp->level <= t) {
-            const xmlChar * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
             fprintf(F, "\"%s\"\n", name);
           }
         }
         for (i=0;i!=MAXCOMBATSPELLS;++i) {
           const spell * sp = mage->combatspells[i].sp;
           if (sp) {
-            const xmlChar * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
             fprintf(F, "KAMPFZAUBER %d\n", i);
             fprintf(F, "\"%s\";name\n", name);
             fprintf(F, "%d;level\n", mage->combatspells[i].level);
@@ -1016,7 +1016,7 @@ static void
 cr_reportspell(FILE * F,  spell *sp, const struct locale * lang)
 {
   int k;
-  const xmlChar * name = add_translation(mkname("spell", sp->sname), spell_name(sp, lang));
+  const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, lang));
 
   fprintf(F, "ZAUBER %d\n", hashstring(sp->sname));
   fprintf(F, "\"%s\";name\n", name);
@@ -1126,7 +1126,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
 
 /* main function of the creport. creates the header and traverses all regions */
 static int
-report_computer(const char * filename, report_context * ctx)
+report_computer(const char * filename, report_context * ctx, const char * charset)
 {
   int i;
   faction * f = ctx->f;
@@ -1135,7 +1135,7 @@ report_computer(const char * filename, report_context * ctx)
   building *b;
   ship *sh;
   unit *u;
-  const xmlChar * mailto = locale_string(f->locale, "mailto");
+  const char * mailto = locale_string(f->locale, "mailto");
   const attrib * a;
   seen_region * sr = NULL;
 #ifdef SCORE_MODULE
@@ -1152,7 +1152,7 @@ report_computer(const char * filename, report_context * ctx)
   /* initialisations, header and lists */
 
   fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-  fputs("\"ISO-8859-1\";charset\n", F);
+  fprintf(F, "\"%s\";charset\n", charset);
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
   fprintf(F, "%d;noskillpoints\n", 1);
   fprintf(F, "%ld;date\n", ctx->report_time);
@@ -1260,7 +1260,7 @@ report_computer(const char * filename, report_context * ctx)
     const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
     requirement * m;
     const char * ch;
-    const xmlChar * description = NULL;
+    const char * description = NULL;
 
     if (ptype==NULL) continue;
     m = ptype->itype->construction->materials;
@@ -1308,7 +1308,7 @@ report_computer(const char * filename, report_context * ctx)
       else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
     }
     if (r->land) {
-      const xmlChar * str = rname(r, f->locale);
+      const char * str = rname(r, f->locale);
       if (str && str[0]) {
         fprintf(F, "\"%s\";Name\n", str);
       }

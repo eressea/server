@@ -64,7 +64,7 @@
 void
 spy_message(int spy, const unit *u, const unit *target)
 {
-  const xmlChar * str = report_kampfstatus(target, u->faction->locale);
+  const char * str = report_kampfstatus(target, u->faction->locale);
 
   ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u, target, str));
   if (spy > 20) {
@@ -212,7 +212,7 @@ setwere_cmd(unit *u, struct order * ord)
 int
 setstealth_cmd(unit * u, struct order * ord)
 {
-  const xmlChar *s;
+  const char *s;
   int level;
   const race * trace;
 
@@ -573,7 +573,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 int
 sabotage_cmd(unit * u, struct order * ord)
 {
-  const xmlChar *s;
+  const char *s;
   int i;
   ship *sh;
   unit *u2;

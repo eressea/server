@@ -78,8 +78,8 @@ typedef struct race {
 	int ec_flags;
 	race_t oldfamiliars[MAXMAGIETYP];
 
-	const xmlChar *(*generate_name) (const struct unit *);
-	const xmlChar *(*describe) (const struct unit *, const struct locale *);
+	const char *(*generate_name) (const struct unit *);
+	const char *(*describe) (const struct unit *, const struct locale *);
 	void (*age)(struct unit *u);
 	boolean (*move_allowed)(const struct region *, const struct region *);
 	struct item * (*itemdrop)(const struct race *, int size);
@@ -155,7 +155,7 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define BF_CANATTACK    (1<<6) /* Kann keine ATTACKIERE Befehle ausfuehren */
 
 extern int unit_old_max_hp(struct unit * u);
-extern const xmlChar * racename(const struct locale *lang, const struct unit *u, const race * rc);
+extern const char * racename(const struct locale *lang, const struct unit *u, const race * rc);
 
 #define omniscient(f) (((f)->race)==new_race[RC_ILLUSION] || ((f)->race)==new_race[RC_TEMPLATE])
 

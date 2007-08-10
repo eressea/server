@@ -107,7 +107,7 @@ groupid(const struct group * g, const struct faction * f)
 	return buf;
 }
 
-const xmlChar *
+const char *
 report_kampfstatus(const unit * u, const struct locale * lang)
 {
 	static char fsbuf[64];
@@ -116,13 +116,13 @@ report_kampfstatus(const unit * u, const struct locale * lang)
 		"status_rear", "status_defensive",
 		"status_avoid", "status_flee" };
 
-	xstrlcpy(fsbuf, LOC(lang, azstatus[u->status]), sizeof(fsbuf));
+	strlcpy(fsbuf, LOC(lang, azstatus[u->status]), sizeof(fsbuf));
 	if (fval(u, UFL_NOAID)) {
 		strcat(fsbuf, ", ");
-		xstrcat(fsbuf, LOC(lang, "status_noaid"));
+		strcat(fsbuf, LOC(lang, "status_noaid"));
 	}
 
-	return (xmlChar *)fsbuf;
+	return fsbuf;
 }
 
 const char *
@@ -1296,6 +1296,7 @@ write_reports(faction * f, time_t ltime)
   int backup = 1, maxbackup = 128;
   boolean gotit = false;
   struct report_context ctx;
+  const char * encoding = "UTF-8";
 
   ctx.f = f;
   ctx.report_time = time(NULL);
@@ -1318,7 +1319,7 @@ write_reports(faction * f, time_t ltime)
       if (f->options & rtype->flag) {
         char filename[MAX_PATH];
         sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
-        if (rtype->write(filename, &ctx)==0) {
+        if (rtype->write(filename, &ctx, encoding)==0) {
           gotit = true;
         }
       }
@@ -1408,40 +1409,6 @@ write_script(FILE * F, const faction * f)
   fputs(buf, F);
   fputc('\n', F);
 }
-
-#undef GLOBAL_REPORT
-#ifdef GLOBAL_REPORT
-static void
-global_report(const char * filename)
-{
-  FILE * F = fopen(filename, "w");
-  region * r;
-  faction * f;
-  faction * monsters = findfaction(MONSTER_FACTION);
-  faction_list * addresses = NULL;
-  struct seen_region ** seen;
-
-  if (!monsters) return;
-  if (!F) return;
-
-  /* list of all addresses */
-  for (f=factions;f;f=f->next) {
-    faction_list * flist = calloc(1, sizeof(faction_list));
-    flist->data = f;
-    flist->next = addresses;
-    addresses = flist;
-  }
-
-  seen = seen_init();
-  for (r = regions; r; r = r->next) {
-    add_seen(seen, r, see_unit, true);
-  }
-  report_computer(F, monsters, seen, addresses, time(NULL));
-  freelist(addresses);
-  seen_done(seen);
-  fclose(F);
-}
-#endif
 
 int
 init_reports(void)

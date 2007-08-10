@@ -62,7 +62,7 @@ struct rawmaterial;
 struct donation;
 
 typedef struct land_region {
-  xmlChar *name;
+  char *name;
   /* TODO: demand kann nach Konvertierung entfernt werden. */
   struct demand {
     struct demand * next;
@@ -97,7 +97,7 @@ typedef struct region {
      and lastregion */
   short x, y;
   struct plane *planep;
-  xmlChar *display;
+  char *display;
   unsigned int flags;
   unsigned short age;
   struct message_list *msgs;
@@ -165,7 +165,7 @@ void runhash(struct region * r);
 void free_regionlist(region_list *rl);
 void add_regionlist(region_list **rl, struct region *r);
 
-extern struct region * find_special_direction(const struct region *r, const xmlChar *token, const struct locale * lang);
+extern struct region * find_special_direction(const struct region *r, const char *token, const struct locale * lang);
 extern void register_special_direction(const char * name);
 extern struct spec_direction * special_direction(const region * from, const region * to);
 extern struct attrib *create_special_direction(struct region *r, struct region *rt,
@@ -212,16 +212,16 @@ extern boolean r_isforest(const struct region * r);
 #define rterrain(r) (oldterrain((r)->terrain))
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
-extern const xmlChar * rname(const struct region * r, const struct locale * lang);
-extern void rsetname(struct region * r, const xmlChar * name);
+extern const char * rname(const struct region * r, const struct locale * lang);
+extern void rsetname(struct region * r, const char * name);
 
 #define rplane(r) getplane(r)
 
 extern void r_setdemand(struct region * r, const struct luxury_type * ltype, int value);
 extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 
-extern const xmlChar * regionname(const struct region * r, const struct faction * f);
-extern const xmlChar * write_regionname(const struct region * r, const struct faction * f, xmlChar * buffer, size_t size);
+extern const char * regionname(const struct region * r, const struct faction * f);
+extern const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
 extern void * resolve_region(variant data);
 extern struct region * new_region(short x, short y);

@@ -411,11 +411,11 @@ function test_moving()
   end
 end
 
--- test_movement()
+test_movement()
 -- test_fail()
 -- test_handler()
 -- test_parser()
-test_monsters()
+-- test_monsters()
 -- test_combat()
 -- test_rewards()
 -- test_give()
@@ -425,7 +425,7 @@ test_monsters()
 -- write_game("../testg.txt")
 -- read_game("../testg.txt")
 
-if 0==1 then
+if 1==1 then
   run_scripts()
   process_orders()
   write_reports() 

@@ -90,13 +90,13 @@ lua_writereports(void)
 static void
 message_unit(unit& sender, unit& target, const char * str)
 {
-  deliverMail(target.faction, sender.region, &sender, (const xmlChar *)str, &target);
+  deliverMail(target.faction, sender.region, &sender, str, &target);
 }
 
 static void
 message_faction(unit& sender, faction& target, const char * str)
 {
-  deliverMail(&target, sender.region, &sender, (const xmlChar *)str, NULL);
+  deliverMail(&target, sender.region, &sender, str, NULL);
 }
 
 static void
@@ -106,9 +106,9 @@ message_region(unit& sender, const char * str)
 }
 
 static int
-read_game(const char * filename)
+read_game(const char * filename, const char * encoding)
 {
-  int rv = readgame(filename, false);
+  int rv = readgame(filename, false, encoding);
   printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   return rv;

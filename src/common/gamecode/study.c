@@ -71,7 +71,7 @@ getmagicskill(const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_MAGIC);
   variant token;
-  const xmlChar * s = getstrtoken();
+  const char * s = getstrtoken();
 
   if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
     return (magic_t)token.i;
@@ -361,9 +361,9 @@ teach_cmd(unit * u, struct order * ord)
       /* Falls die Unit nicht gefunden wird, Fehler melden */
 
       if (!u2) {
-        xmlChar tbuf[20];
-        const xmlChar * uid;
-        const xmlChar * token;
+        char tbuf[20];
+        const char * uid;
+        const char * token;
         /* Finde den string, der den Fehler verursacht hat */
         parser_pushstate();
         init_tokens(ord);
@@ -381,7 +381,7 @@ teach_cmd(unit * u, struct order * ord)
           uid = token;
         } else {
           token = getstrtoken();
-          sprintf((char*)tbuf, "%s %s", LOC(u->faction->locale,
+          sprintf(tbuf, "%s %s", LOC(u->faction->locale,
             parameters[P_TEMP]), token);
           uid = tbuf;
         }

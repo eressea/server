@@ -271,7 +271,7 @@ reserve_cmd(unit * u, struct order *ord)
   if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
     int use, count;
     const resource_type * rtype;
-    const xmlChar * s;
+    const char * s;
 
     init_tokens(ord);
     skip_token();

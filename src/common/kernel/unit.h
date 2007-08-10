@@ -82,8 +82,8 @@ typedef struct unit {
 	struct region *region;
   int no;
   int hp;
-	xmlChar *name;
-	xmlChar *display;
+	char *name;
+	char *display;
 	struct faction *faction;
 	struct building *building;
 	struct ship *ship;
@@ -155,8 +155,8 @@ void usettarget(struct unit * u, const struct unit * b);
 
 extern const struct race * urace(const struct unit * u);
 
-const xmlChar* uprivate(const struct unit * u);
-void usetprivate(struct unit * u, const xmlChar * c);
+const char * uprivate(const struct unit * u);
+void usetprivate(struct unit * u, const char * c);
 
 const struct potion_type * ugetpotionuse(const struct unit * u); /* benutzt u einein trank? */
 void usetpotionuse(struct unit * u, const struct potion_type * p); /* u benutzt trank p (es darf halt nur einer pro runde) */
@@ -167,7 +167,7 @@ void usetcontact(struct unit * u, const struct unit * c);
 struct unit * findnewunit (const struct region * r, const struct faction *f, int alias);
 
 extern struct unit * udestroy;
-extern const xmlChar * u_description(const unit * u, const struct locale * lang);
+extern const char * u_description(const unit * u, const struct locale * lang);
 extern struct skill * add_skill(struct unit * u, skill_t id);
 extern void remove_skill(struct unit *u, skill_t sk);
 extern struct skill * get_skill(const struct unit * u, skill_t id);
@@ -215,7 +215,7 @@ extern int invisible(const struct unit *target, const struct unit * viewer);
 extern void stripunit(struct unit * u);
 
 extern void name_unit(struct unit *u);
-extern struct unit * create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const xmlChar * dname, struct unit *creator);
+extern struct unit * create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);
 
 extern struct attrib_type at_creator;
 #ifdef __cplusplus

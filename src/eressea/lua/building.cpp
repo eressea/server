@@ -88,7 +88,7 @@ static void
 building_setinfo(building& b, const char * info)
 {
   free(b.display);
-  b.display = (xmlChar*)strdup(info);
+  b.display = strdup(info);
 }
 
 static const char *
@@ -101,7 +101,7 @@ static void
 building_setname(building& b, const char * name)
 {
   free(b.name);
-  b.name = (xmlChar*)strdup(name);
+  b.name = strdup(name);
 }
 
 static region *

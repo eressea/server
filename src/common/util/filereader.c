@@ -27,7 +27,7 @@ eatwhite(const char * ptr, size_t * total_size)
   while (*ptr) {
     wint_t ucs;
     size_t size = 0;
-    ret = unicode_utf8_to_ucs4(&ucs, (const xmlChar*)ptr, &size);
+    ret = unicode_utf8_to_ucs4(&ucs, ptr, &size);
     if (ret!=0) break;
     if (!iswspace(ucs)) break;
     *total_size += size;
@@ -40,7 +40,7 @@ eatwhite(const char * ptr, size_t * total_size)
   return ret;
 }
 
-const xmlChar *
+const char *
 getbuf(FILE * F, int encoding)
 {
   boolean cont = false;
@@ -100,7 +100,7 @@ getbuf(FILE * F, int encoding)
         }
       }
 
-      ret = unicode_utf8_to_ucs4(&ucs, (const xmlChar *)bp, &size);
+      ret = unicode_utf8_to_ucs4(&ucs, bp, &size);
       
       if (ret!=0) {
         unicode_warning(bp);
@@ -159,5 +159,5 @@ getbuf(FILE * F, int encoding)
     }
     *cp=0;
   } while (cont || cp==fbuf);
-  return (const xmlChar*)fbuf;
+  return fbuf;
 }

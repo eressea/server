@@ -87,6 +87,8 @@
 const char * xmlfile = "eressea.xml";
 const char * g_datadir;
 int firstx = 0, firsty = 0;
+const char * enc_gamedata = NULL;
+const char * enc_orderfile = NULL;
 
 /* local symbols */
 static region * current_region;
@@ -169,9 +171,6 @@ cfopen(const char *filename, const char *mode)
 
 #define rid(F) ri36(F)
 
-static int nextc;
-#define rc(F) (nextc = getc(F))
-
 #undef CONVERT_DBLINK
 #ifdef CONVERT_DBLINK
 
@@ -252,35 +251,99 @@ rds(FILE * F, void **ds)
 {
   static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
   char *s = &buffer[0];
-
-  while (nextc != '"') {
-    if (nextc == EOF) {
+  int c = getc(F);
+  while (c != '"') {
+    if (c == EOF) {
       *s = 0;
       fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
       abort();
     }
-    rc(F);
+    c = getc(F);
   }
 
-  rc(F);
+  c = getc(F);
 
-  while (nextc != '"') {
-    if (nextc == EOF) {
+  while (c != '"') {
+    if (c == EOF) {
       *s = 0;
       fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
       abort();
     }
     if (s - buffer < DISPLAYSIZE) {
-      *s++ = (char)nextc;
+      *s++ = (char)c;
     }
-    rc(F);
+    c = getc(F);
   }
 
-  rc(F);
+  c = getc(F);
   *s = 0;
   if (ds) {
     *ds = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
     strcpy(*ds, buffer);
+  }
+}
+
+static int
+xrs(FILE * F, char *dest, size_t size, int encoding)
+{
+  char buffer[4096];
+  char * begin = dest;
+  char * s = begin;
+  boolean quote = false;
+  size_t maxs = size;
+
+  for (;;) {
+    int c = getc(F);
+
+    if (c=='"') {
+      if (quote) {
+        c = getc(F);
+        if (isspace(c)) break;
+      } else if (s==begin) {
+        quote = true;
+        continue;
+      }
+    } else if (isspace(c) && !quote) {
+      break;
+    }
+
+    if ((c & 0x80) && encoding!=XML_CHAR_ENCODING_NONE && encoding!=XML_CHAR_ENCODING_UTF8) {
+      if (begin!=buffer) {
+        size_t cp = s-begin;
+        maxs = min(sizeof(buffer), maxs);
+        if (cp>maxs) cp = maxs;
+        memcpy(buffer, begin, cp);
+        begin = buffer;
+        s = begin + cp;
+      }
+    }
+    *s++ = (char)c;
+  }
+  *s = 0;
+  if (begin==buffer) {
+    // convert
+    const char * inbuf = begin;
+    char * outbuf = dest;
+    int inbytes = (int)(s-begin)+1;
+    int outbytes = (int)size;
+
+    assert(encoding==XML_CHAR_ENCODING_8859_1);
+    return isolat1ToUTF8((xmlChar *)outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
+  }
+  return (int)(s-begin);
+}
+
+static void
+xrds(FILE * F, void **ds, int encoding)
+{
+  static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
+  int len = xrs(F, buffer, sizeof(buffer), encoding);
+
+  if (len>=0) {
+    if (ds) {
+      *ds = realloc(*ds, sizeof(char) * (len + 1));
+      strcpy(*ds, buffer);
+    }
   }
 }
 
@@ -289,24 +352,24 @@ void
 rsf(FILE * F, char *s, size_t len)
 {
   char * begin = s;
-  int nextc;
+  int c;
   do {
-    nextc = rcf(F);
-    if (nextc == EOF) {
+    c = getc(F);;
+    if (c == EOF) {
       puts("Die Datei bricht vorzeitig ab.");
       abort();
     }
-  } while (nextc != '"');
+  } while (c != '"');
 
   for (;;) {
-    nextc = rcf(F);
-    if (nextc == '"') break;
-    else if (nextc == EOF) {
+    c = getc(F);
+    if (c == '"') break;
+    else if (c == EOF) {
       puts("Die Datei bricht vorzeitig ab.");
       abort();
     }
     if (s-begin<(int)len-1)
-      *s++ = (char)nextc;
+      *s++ = (char)c;
   }
   *s = 0;
 }
@@ -315,18 +378,19 @@ static void
 rs(FILE * F, char *s)
 {
   boolean apos = false;
-  while (isspace(nextc)) rc(F);
-  if (nextc=='"') {
-    apos=true;
-    rc(F);
+  int c = getc(F);
+  while (isspace(c)) c = getc(F);
+  if (c=='"') {
+    apos = true;
+    c = getc(F);
   }
   for (;;) {
-    if (nextc=='"') {
-      rc(F);
+    if (c=='"') {
+      c = getc(F);
       break;
-    } else if (!apos && isspace(nextc)) break;
-    *s++ = (char)nextc;
-    rc(F);
+    } else if (!apos && isspace(c)) break;
+    *s++ = (char)c;
+    c = getc(F);
   }
   *s = 0;
 }
@@ -338,20 +402,21 @@ ri(FILE * F)
 {
   int i = 0, vz = 1;
 
-  while (!xisdigit(nextc)) {
-    if (nextc == EOF) {
+  int c = getc(F);
+  while (!xisdigit(c)) {
+    if (c == EOF) {
       puts("Die Datei bricht vorzeitig ab.");
       abort();
     }
-    rc(F);
+    c = getc(F);
   }
 
-  while (xisdigit(nextc)) {
-    if (nextc == '-')
+  while (xisdigit(c)) {
+    if (c == '-')
       vz = -1;
     else
-      i = 10 * i + (nextc - '0');
-    rc(F);
+      i = 10 * i + (c - '0');
+    c = getc(F);
   }
 
   return i * vz;
@@ -362,13 +427,13 @@ ri36(FILE * F)
 {
   char buf[16];
   int i = 0;
-  rc(F);
-  while (!isalnum(nextc)) rc(F);
-  while (isalnum(nextc)) {
+  int c = getc(F);
+  while (!isalnum(c)) c = getc(F);
+  while (isalnum(c)) {
     if (i+1<sizeof(buf)) {
-      buf[i++]=(char)nextc;
+      buf[i++]=(char)c;
     }
-    rc(F);
+    c = getc(F);
   }
   buf[i]=0;
   i = atoi36(buf);
@@ -448,7 +513,7 @@ unitorders(FILE * F, int enc, struct faction * f)
     ordp = &u->orders;
 
     for (;;) {
-      const xmlChar * s;
+      const char * s;
       /* Erst wenn wir sicher sind, dass kein Befehl
       * eingegeben wurde, checken wir, ob nun eine neue
       * Einheit oder ein neuer Spieler drankommt */
@@ -494,7 +559,7 @@ factionorders(void)
   f = findfaction(fid);
   
   if (f!=NULL) {
-    const xmlChar * pass = getstrtoken();
+    const char * pass = getstrtoken();
     if (quiet==0) {
       printf(" %4s;", factionid(f));
       fflush(stdout);
@@ -527,7 +592,7 @@ version(void)
 /* ------------------------------------------------------------- */
 
 static param_t
-igetparam (const xmlChar *s, const struct locale *lang)
+igetparam (const char *s, const struct locale *lang)
 {
   return findparam (igetstrtoken (s), lang);
 }
@@ -536,7 +601,7 @@ int
 readorders(const char *filename, const char * encoding)
 {
   FILE * F = NULL;
-  const xmlChar *b;
+  const char *b;
   int nfactions=0;
   struct faction *f = NULL;
   int enc = xmlParseCharEncoding(encoding);
@@ -554,7 +619,7 @@ readorders(const char *filename, const char * encoding)
   while (b) {
     const struct locale * lang = f?f->locale:default_locale;
     int p;
-    const xmlChar * s;
+    const char * s;
 
     switch (igetparam(b, lang)) {
     case P_LOCALE:
@@ -716,7 +781,7 @@ read_alliances(FILE * F)
     char aname[128];
     rss(F, aname, sizeof(aname));
     makealliance(atoi36(pbuf), aname);
-    rs(F, pbuf);
+    rss(F, pbuf, sizeof(pbuf));
   }
 }
 
@@ -860,7 +925,7 @@ fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
 }
 
 unit *
-readunit(FILE * F)
+readunit(FILE * F, int encoding)
 {
   skill_t sk;
   unit * u;
@@ -887,10 +952,10 @@ readunit(FILE * F)
     faction * f = findfaction(n);
     if (f!=u->faction) u_setfaction(u, f);
   }
-  rds(F, &u->name);
-  if (lomem) rds(F, 0);
+  xrds(F, &u->name, encoding);
+  if (lomem) rds(F, NULL);
   else {
-    rds(F, &u->display);
+    xrds(F, &u->display, encoding);
   }
   number = ri(F);
   u->age = (short)ri(F);
@@ -922,10 +987,10 @@ readunit(FILE * F)
     else u->irace = u->race;
   }
   if (u->race->describe) {
-    const xmlChar * rcdisp = u->race->describe(u, u->faction->locale);
+    const char * rcdisp = u->race->describe(u, u->faction->locale);
     if (u->display && rcdisp) {
       /* see if the data file contains old descriptions */
-      if (xstrcmp(rcdisp, u->display)==0) {
+      if (strcmp(rcdisp, u->display)==0) {
         free(u->display);
         u->display = NULL;
       }
@@ -980,11 +1045,11 @@ readunit(FILE * F)
   }
   /* Persistente Befehle einlesen */
   free_orders(&u->orders);
-  freadstr(F, obuf, sizeof(obuf));
+  freadstr(F, encoding, obuf, sizeof(obuf));
   p = n = 0;
   orderp = &u->orders;
   while (obuf[0]) {
-    order * ord = parse_order((const xmlChar *)obuf, u->faction->locale);
+    order * ord = parse_order(obuf, u->faction->locale);
     if (ord!=NULL) {
       if (++n<MAXORDERS) {
         if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
@@ -999,12 +1064,12 @@ readunit(FILE * F)
       }
       if (ord!=NULL) free_order(ord);
     }
-    freadstr(F, obuf, sizeof(obuf));
+    freadstr(F, encoding, obuf, sizeof(obuf));
   }
   if (global.data_version<NOLASTORDER_VERSION) {
     order * ord;
-    freadstr(F, obuf, sizeof(obuf));
-    ord = parse_order((const xmlChar *)obuf, u->faction->locale);
+    freadstr(F, encoding, obuf, sizeof(obuf));
+    ord = parse_order(obuf, u->faction->locale);
     if (ord!=NULL) {
 #ifdef LASTORDER
       set_order(&u->lastorder, ord);
@@ -1157,7 +1222,7 @@ writeunit(FILE * F, const unit * u)
 }
 
 region *
-readregion(FILE * F, short x, short y)
+readregion(FILE * F, int encoding, short x, short y)
 {
   region * r = findregion(x, y);
   const terrain_type * terrain;
@@ -1179,8 +1244,8 @@ readregion(FILE * F, short x, short y)
     }
     r->land = 0;
   }
-  if (lomem) rds(F, 0);
-  else rds(F, &r->display);
+  if (lomem) rds(F, NULL);
+  else xrds(F, &r->display, encoding);
   
   if (global.data_version < TERRAIN_VERSION) {
     int ter = ri(F);
@@ -1190,7 +1255,7 @@ readregion(FILE * F, short x, short y)
     terrain = newterrain((terrain_t)ter);
   } else {
     char name[64];
-    rs(F, name);
+    rss(F, name, sizeof(name));
     terrain = get_terrain(name);
     if (terrain==NULL) {
       log_error(("Unknown terrain '%s'\n", name));
@@ -1207,7 +1272,7 @@ readregion(FILE * F, short x, short y)
 
   if (fval(r->terrain, LAND_REGION)) {
     r->land = calloc(1, sizeof(land_region));
-    rds(F, &r->land->name);
+    xrds(F, &r->land->name, encoding);
   }
   if (r->land) {
     int i;
@@ -1400,7 +1465,7 @@ addally(const faction * f, ally ** sfp, int aid, int state)
  * faction may not already exist, however.
  */
 faction *
-readfaction(FILE * F)
+readfaction(FILE * F, int encoding)
 {
   ally **sfp;
   int planes;
@@ -1429,8 +1494,8 @@ readfaction(FILE * F)
     }
   }
 
-  rds(F, &f->name);
-  rds(F, &f->banner);
+  xrds(F, &f->name, encoding);
+  xrds(F, &f->banner, encoding);
 
   if (quiet==0) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
 
@@ -1607,7 +1672,7 @@ writefaction(FILE * F, const faction * f)
 }
 
 int
-readgame(const char * filename, int backup)
+readgame(const char * filename, int backup, const char * encoding)
 {
   int i, n, p;
   faction *f, **fp;
@@ -1619,6 +1684,7 @@ readgame(const char * filename, int backup)
   int rmax = maxregions;
   char path[MAX_PATH];
   char token[32];
+  int enc = xmlParseCharEncoding(encoding);
 
   sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
@@ -1628,8 +1694,6 @@ readgame(const char * filename, int backup)
     log_error(("Keine Spieldaten gefunden.\n"));
     return -1;
   }
-
-  rc(F);
 
   /* globale Variablen */
 
@@ -1668,7 +1732,7 @@ readgame(const char * filename, int backup)
   while(--n >= 0) {
     plane *pl = calloc(1, sizeof(plane));
     pl->id = ri(F);
-    rds(F, &pl->name);
+    xrds(F, &pl->name, enc);
     pl->minx = (short)ri(F);
     pl->maxx = (short)ri(F);
     pl->miny = (short)ri(F);
@@ -1703,7 +1767,7 @@ readgame(const char * filename, int backup)
   /* fflush (stdout); */
 
   while (--n >= 0) {
-    faction * f = readfaction(F);
+    faction * f = readfaction(F, enc);
 
     *fp = f;
     fp = &f->next;
@@ -1761,7 +1825,7 @@ readgame(const char * filename, int backup)
     }
     --rmax;
 
-    r = readregion(F, x, y);
+    r = readregion(F, enc, x, y);
 
     /* Burgen */
     p = ri(F);
@@ -1774,9 +1838,9 @@ readgame(const char * filename, int backup)
       *bp = b;
       bp = &b->next;
       bhash(b);
-      rds(F, &b->name);
+      xrds(F, &b->name, enc);
       if (lomem) rds(F, 0);
-      else rds(F, &b->display);
+      else xrds(F, &b->display, enc);
       b->size = ri(F);
       if (global.data_version < TYPES_VERSION) {
         assert(!"data format is no longer supported");
@@ -1801,9 +1865,9 @@ readgame(const char * filename, int backup)
       *shp = sh;
       shp = &sh->next;
       shash(sh);
-      rds(F, &sh->name);
-      if (lomem) rds(F, 0);
-      else rds(F, &sh->display);
+      xrds(F, &sh->name, enc);
+      if (lomem) rds(F, NULL);
+      else xrds(F, &sh->display, enc);
 
       rss(F, token, sizeof(token));
       sh->type = st_find(token);
@@ -1829,7 +1893,7 @@ readgame(const char * filename, int backup)
     up = &r->units;
 
     while (--p >= 0) {
-      unit * u = readunit(F);
+      unit * u = readunit(F, enc);
       sc_mage * mage;
 
       assert(u->region==NULL);

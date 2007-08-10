@@ -100,7 +100,7 @@ object_read(attrib *a, FILE *F)
       fscanf(F, "%lf", &data->data.real);
       break;
     case TSTRING:
-      freadstr(F, buffer, sizeof(buffer));
+      freadstr(F, enc_gamedata, buffer, sizeof(buffer));
       data->data.str = strdup(buffer);
       break;
     case TBUILDING:

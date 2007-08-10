@@ -37,9 +37,9 @@ using namespace luabind;
 static faction *
 add_faction(const char * email, const char * racename, const char * lang)
 {
-  const race * frace = findrace((const xmlChar*)racename, default_locale);
-  if (frace==NULL) frace = findrace((const xmlChar*)racename, find_locale("de"));
-  if (frace==NULL) frace = findrace((const xmlChar*)racename, find_locale("en"));
+  const race * frace = findrace(racename, default_locale);
+  if (frace==NULL) frace = findrace(racename, find_locale("de"));
+  if (frace==NULL) frace = findrace(racename, find_locale("en"));
   if (frace==NULL) return NULL;
   locale * loc = find_locale(lang);
   faction * f = addfaction(email, NULL, frace, loc, 0);
@@ -176,7 +176,7 @@ faction_additem(faction& f, const char * iname, int number)
 static void
 faction_addnotice(faction& f, const char * str)
 {
-  const xmlChar * loc = LOC(f.locale, str);
+  const char * loc = LOC(f.locale, str);
   ADDMSG(&f.msgs, msg_message("msg_event", "string", loc));
 }
 
@@ -217,7 +217,7 @@ void
 faction_set_banner(faction& f, const char * banner)
 {
   free(f.banner);
-  f.banner = BAD_CAST strdup(banner);
+  f.banner = strdup(banner);
 }
 
 const char *

@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-const xmlChar * getbuf(FILE *, int encoding);
+const char * getbuf(FILE *, int encoding);
 
 #ifdef __cplusplus
 }

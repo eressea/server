@@ -36,7 +36,7 @@ double version(void);
 FILE * cfopen(const char *filename, const char *mode);
 int readorders(const char *filename, const char * encoding);
 int creategame(void);
-extern int readgame(const char * filename, int backup);
+extern int readgame(const char * filename, int backup, const char * encoding);
 int writegame(const char *filename, int quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);
@@ -47,6 +47,8 @@ extern int data_version;
 extern int maxregions;
 extern int firstx, firsty;
 extern const char *xmlfile;
+extern const char * enc_gamedata;
+extern const char * enc_orderfile;
 
 extern void init_locales(void);
 extern int lastturn(void);
@@ -57,13 +59,13 @@ extern void write_items(FILE *f, struct item *it);
 extern const char * datapath(void);
 
 extern void writeunit(FILE * stream, const struct unit * u);
-extern struct unit * readunit(FILE * stream);
+extern struct unit * readunit(FILE * stream, int encoding);
 
 extern void writeregion(FILE * stream, const struct region * r);
-extern struct region * readregion(FILE * stream, short x, short y);
+extern struct region * readregion(FILE * stream, int encoding, short x, short y);
 
 extern void writefaction(FILE * stream, const struct faction * f);
-extern struct faction * readfaction(FILE * stream);
+extern struct faction * readfaction(FILE * stream, int encoding);
 
 extern void fwriteorder(FILE * F, const struct order * ord, const struct locale * lang);
 

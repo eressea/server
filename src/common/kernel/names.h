@@ -19,14 +19,14 @@
 extern "C" {
 #endif
 extern void register_names(void);
-const xmlChar *undead_name(const struct unit * u);
-const xmlChar *skeleton_name(const struct unit * u);
-const xmlChar *zombie_name(const struct unit * u);
-const xmlChar *ghoul_name(const struct unit * u);
-const xmlChar *dragon_name(const struct unit *u);
-const xmlChar *dracoid_name(const struct unit *u);
-const xmlChar *generic_name(const struct unit *u);
-const xmlChar *abkz(const xmlChar *s, size_t max);
+const char *undead_name(const struct unit * u);
+const char *skeleton_name(const struct unit * u);
+const char *zombie_name(const struct unit * u);
+const char *ghoul_name(const struct unit * u);
+const char *dragon_name(const struct unit *u);
+const char *dracoid_name(const struct unit *u);
+const char *generic_name(const struct unit *u);
+const char *abkz(const char *s, size_t max);
 
 #ifdef __cplusplus
 }

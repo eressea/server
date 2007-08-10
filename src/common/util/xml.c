@@ -26,10 +26,10 @@ int
 xml_ivalue(xmlNodePtr node, const char * name, int dflt)
 {
   int i = dflt;
-  xmlChar * property = xmlGetProp(node, BAD_CAST name);
-  if (property!=NULL) {
-    i = atoi((const char*)property);
-    xmlFree(property);
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
+  if (propValue!=NULL) {
+    i = atoi((const char*)propValue);
+    xmlFree(propValue);
   }
   return i;
 }
@@ -38,21 +38,21 @@ boolean
 xml_bvalue(xmlNodePtr node, const char * name, boolean dflt)
 {
   boolean result = dflt;
-  xmlChar * property = xmlGetProp(node, BAD_CAST name);
-  if (property!=NULL) {
-    if (strcmp((const char*)property, "no")==0) result = false;
-    else if (strcmp((const char*)property, "yes")==0) result = true;
-    else if (strcmp((const char*)property, "false")==0) result = true;
-    else if (strcmp((const char*)property, "true")==0) result = true;
-    else if (strcmp((const char*)property, "1")==0) {
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
+  if (propValue!=NULL) {
+    if (strcmp((const char*)propValue, "no")==0) result = false;
+    else if (strcmp((const char*)propValue, "yes")==0) result = true;
+    else if (strcmp((const char*)propValue, "false")==0) result = true;
+    else if (strcmp((const char*)propValue, "true")==0) result = true;
+    else if (strcmp((const char*)propValue, "1")==0) {
       log_warning(("boolean value is '1': %s::%s\n", node->name, name));
       result = true;
     }
-    else if (strcmp((const char*)property, "0")==0) {
+    else if (strcmp((const char*)propValue, "0")==0) {
       log_warning(("boolean value is '0': %s::%s\n", node->name, name));
       result = false;
     }
-    xmlFree(property);
+    xmlFree(propValue);
   }
   return result;
 }
@@ -61,10 +61,10 @@ double
 xml_fvalue(xmlNodePtr node, const char * name, double dflt)
 {
   double result = dflt;
-  xmlChar * property = xmlGetProp(node, BAD_CAST name);
-  if (property!=NULL) {
-    result = atof((const char*)property);
-    xmlFree(property);
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
+  if (propValue!=NULL) {
+    result = atof((const char*)propValue);
+    xmlFree(propValue);
   }
   return result;
 }

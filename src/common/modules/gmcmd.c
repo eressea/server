@@ -150,7 +150,7 @@ gm_create(const tnode * tnext, void * data, struct order * ord)
   i = getint();
 
   if (i>0) {
-    const xmlChar * iname = getstrtoken();
+    const char * iname = getstrtoken();
     const item_type * itype = finditemtype(iname, u->faction->locale);
     if (itype==NULL) {
       mistake(u, ord, "Unbekannter Gegenstand.", 0);
@@ -215,7 +215,7 @@ gm_terraform(const tnode * tnext, void * data, struct order * ord)
   const struct plane * p = rplane(u->region);
   short x = rel_to_abs(p, u->faction, (short)getint(), 0);
   short y = rel_to_abs(p, u->faction, (short)getint(), 1);
-  const xmlChar * c = getstrtoken();
+  const char * c = getstrtoken();
   region * r = findregion(x, y);
   variant token;
   tnode * tokens = get_translations(u->faction->locale, UT_TERRAINS);
@@ -274,7 +274,7 @@ gm_messageplane(const tnode * tnext, void * data, struct order * ord)
 {
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
-  const xmlChar * zmsg = getstrtoken();
+  const char * zmsg = getstrtoken();
   if (p==NULL) {
     mistake(u, ord, "In diese Ebene kann keine Nachricht gesandt werden.", 0);
   } else {
@@ -310,7 +310,7 @@ gm_messagefaction(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   int n = getid();
   faction * f = findfaction(n);
-  const xmlChar * msg = getstrtoken();
+  const char * msg = getstrtoken();
   plane * p = rplane(u->region);
   attrib * permissions = a_find(u->faction->attribs, &at_permissions);
   if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
@@ -341,7 +341,7 @@ gm_messageregion(const tnode * tnext, void * data, struct order * ord)
   const struct plane * p = rplane(u->region);
   short x = rel_to_abs(p, u->faction, (short)getint(), 0);
   short y = rel_to_abs(p, u->faction, (short)getint(), 1);
-  const xmlChar * msg = getstrtoken();
+  const char * msg = getstrtoken();
   region * r = findregion(x, y);
 
   if (r==NULL || p!=rplane(r)) {
@@ -368,7 +368,7 @@ gm_killunit(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
   unit * target = findunit(getid());
-  const xmlChar * msg = getstrtoken();
+  const char * msg = getstrtoken();
   region * r = target->region;
 
   if (r==NULL || p!=rplane(r)) {
@@ -398,7 +398,7 @@ gm_killfaction(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   int n = getid();
   faction * f = findfaction(n);
-  const xmlChar * msg = getstrtoken();
+  const char * msg = getstrtoken();
   plane * p = rplane(u->region);
   attrib * permissions = a_find(u->faction->attribs, &at_permissions);
   if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
@@ -432,7 +432,7 @@ gm_messageunit(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
   unit * target = findunit(getid());
-  const xmlChar * msg = getstrtoken();
+  const char * msg = getstrtoken();
   region * r;
 
   if (target == NULL) {
@@ -570,22 +570,22 @@ init_gmcmd(void)
 {
   at_register(&at_gmcreate);
   at_register(&at_permissions);
-  add_command(&g_root, &g_keys, (const xmlChar *)"gm", NULL);
-  add_command(&g_keys, NULL, (const xmlChar *)"terraform", &gm_terraform);
-  add_command(&g_keys, NULL, (const xmlChar *)"create", &gm_create);
-  add_command(&g_keys, NULL, (const xmlChar *)"gate", &gm_gate);
-  add_command(&g_keys, NULL, (const xmlChar *)"give", &gm_give);
-  add_command(&g_keys, NULL, (const xmlChar *)"take", &gm_take);
-  add_command(&g_keys, NULL, (const xmlChar *)"teleport", &gm_teleport);
-  add_command(&g_keys, NULL, (const xmlChar *)"skill", &gm_skill);
-  add_command(&g_keys, &g_tell, (const xmlChar *)"tell", NULL);
-  add_command(&g_tell, NULL, (const xmlChar *)"region", &gm_messageregion);
-  add_command(&g_tell, NULL, (const xmlChar *)"unit", &gm_messageunit);
-  add_command(&g_tell, NULL, (const xmlChar *)"plane", &gm_messageplane);
-  add_command(&g_tell, NULL, (const xmlChar *)"faction", &gm_messagefaction);
-  add_command(&g_keys, &g_kill, (const xmlChar *)"kill", NULL);
-  add_command(&g_kill, NULL, (const xmlChar *)"unit", &gm_killunit);
-  add_command(&g_kill, NULL, (const xmlChar *)"faction", &gm_killfaction);
+  add_command(&g_root, &g_keys, "gm", NULL);
+  add_command(&g_keys, NULL, "terraform", &gm_terraform);
+  add_command(&g_keys, NULL, "create", &gm_create);
+  add_command(&g_keys, NULL, "gate", &gm_gate);
+  add_command(&g_keys, NULL, "give", &gm_give);
+  add_command(&g_keys, NULL, "take", &gm_take);
+  add_command(&g_keys, NULL, "teleport", &gm_teleport);
+  add_command(&g_keys, NULL, "skill", &gm_skill);
+  add_command(&g_keys, &g_tell, "tell", NULL);
+  add_command(&g_tell, NULL, "region", &gm_messageregion);
+  add_command(&g_tell, NULL, "unit", &gm_messageunit);
+  add_command(&g_tell, NULL, "plane", &gm_messageplane);
+  add_command(&g_tell, NULL, "faction", &gm_messagefaction);
+  add_command(&g_keys, &g_kill, "kill", NULL);
+  add_command(&g_kill, NULL, "unit", &gm_killunit);
+  add_command(&g_kill, NULL, "faction", &gm_killfaction);
 }
 
 /*
@@ -681,8 +681,8 @@ gm_addfaction(const char * email, plane * p, region * r)
 
   /* GM faction */
   a_add(&f->attribs, make_key(atoi36("quest")));
-  f->banner = (xmlChar*)strdup("quest faction");
-  f->name = (xmlChar*)strdup("quest faction");
+  f->banner = strdup("quest faction");
+  f->name = strdup("quest faction");
   f->passw = strdup(itoa36(rng_int()));
   f->override = strdup(itoa36(rng_int()));
   if (set_email(&f->email, email)!=0) {
@@ -724,7 +724,7 @@ gm_addfaction(const char * email, plane * p, region * r)
     a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
   }
   /* one initial unit */
-  u = create_unit(r, f, 1, new_race[RC_TEMPLATE], 1, (const xmlChar*)"quest master", NULL);
+  u = create_unit(r, f, 1, new_race[RC_TEMPLATE], 1, "quest master", NULL);
   u->irace = new_race[RC_GNOME];
 
   return f;

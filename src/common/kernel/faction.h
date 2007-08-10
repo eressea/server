@@ -64,8 +64,8 @@ typedef struct faction {
 	int no;
 	int subscription;
 	unsigned int flags;
-	xmlChar *name;
-	xmlChar *banner;
+	char *name;
+	char *banner;
 	char *email;
 	char *passw;
 	char *override;

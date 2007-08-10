@@ -447,7 +447,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   n = getuint();
   if (f->no==MONSTER_FACTION) {
     /* Monster dürfen REKRUTIERE 15 dracoid machen */
-    const xmlChar * str = getstrtoken();
+    const char * str = getstrtoken();
     rc = findrace(str, f->locale);
     if (rc==NULL) rc = f->race;
   }
@@ -565,7 +565,7 @@ give_cmd(unit * u, order * ord)
 {
   region * r = u->region;
   unit *u2;
-  const xmlChar *s;
+  const char *s;
   int i, n;
   const item_type * itype;
   param_t p;
@@ -716,7 +716,7 @@ give_cmd(unit * u, order * ord)
   }
 
   else if (p==P_ANY) {
-    const xmlChar * s = getstrtoken();
+    const char * s = getstrtoken();
 
     if (*s == 0) { /* Alle Gegenstände übergeben */
 
@@ -852,7 +852,7 @@ static int
 forget_cmd(unit * u, order * ord)
 {
 	skill_t sk;
-	const xmlChar *s;
+	const char *s;
   
   init_tokens(ord);
   skip_token();
@@ -1056,7 +1056,7 @@ static int
 recruit_archetype(unit * u, order * ord)
 {
   int want;
-  const xmlChar * s;
+  const char * s;
 
   init_tokens(ord);
   skip_token();
@@ -1728,7 +1728,7 @@ make_cmd(unit * u, struct order * ord)
   param_t p;
   int m;
   const item_type * itype;
-  const xmlChar *s;
+  const char *s;
   const struct locale * lang = u->faction->locale;
   char ibuf[16];
 
@@ -1793,22 +1793,22 @@ make_cmd(unit * u, struct order * ord)
       /* if the item cannot be made, we probably didn't mean to make it */
       itype = NULL;
     } else if (stype!=NULL) {
-      const xmlChar * sname = LOC(lang, stype->name[0]);
-      const xmlChar * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (xstrlen(iname)<xstrlen(sname)) stype = NULL;
+      const char * sname = LOC(lang, stype->name[0]);
+      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
+      if (strlen(iname)<strlen(sname)) stype = NULL;
       else itype = NULL;
     } else {
-      const xmlChar * bname = LOC(lang, btype->_name);
-      const xmlChar * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (xstrlen(iname)<xstrlen(bname)) btype = NULL;
+      const char * bname = LOC(lang, btype->_name);
+      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
+      if (strlen(iname)<strlen(bname)) btype = NULL;
       else itype = NULL;
     }
   }
 
   if (btype!=NULL && stype!=NULL) {
-    const xmlChar * bname = LOC(lang, btype->_name);
-    const xmlChar * sname = LOC(lang, stype->name[0]);
-    if (xstrlen(sname)<xstrlen(bname)) btype = NULL;
+    const char * bname = LOC(lang, btype->_name);
+    const char * sname = LOC(lang, stype->name[0]);
+    if (strlen(sname)<strlen(bname)) btype = NULL;
     else stype = NULL;
   }
 
@@ -2241,7 +2241,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
   const luxury_type * ltype=NULL;
   int n;
   region * r = u->region;
-  const xmlChar *s;
+  const char *s;
   
   if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
 		cmistake(u, ord, 69, MSG_INCOME);
@@ -2631,7 +2631,7 @@ static void
 breed_cmd(unit *u, struct order * ord)
 {
   int m;
-  const xmlChar *s;
+  const char *s;
   param_t p;
   region *r = u->region;
   const resource_type * rtype = NULL;

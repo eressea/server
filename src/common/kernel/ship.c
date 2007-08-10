@@ -41,7 +41,7 @@ ship_typelist *shiptypes = NULL;
 static local_names * snames;
 
 const ship_type *
-findshiptype(const xmlChar * name, const struct locale * lang)
+findshiptype(const char * name, const struct locale * lang)
 {
 	local_names * sn = snames;
 	variant var;
@@ -57,7 +57,7 @@ findshiptype(const xmlChar * name, const struct locale * lang)
 		sn->lang = lang;
 		while (stl) {
       variant var;
-			const xmlChar * n = locale_string(lang, stl->type->name[0]);
+			const char * n = locale_string(lang, stl->type->name[0]);
       var.v = (void*)stl->type;
 			addtoken(&sn->names, n, var);
 			stl = stl->next;
@@ -166,7 +166,7 @@ captain(ship *sh, region *r)
 ship *
 new_ship(const ship_type * stype, const struct locale * lang, region * r)
 {
-	static xmlChar buffer[7 + IDSIZE + 1];
+	static char buffer[7 + IDSIZE + 1];
 	ship *sh = (ship *) calloc(1, sizeof(ship));
 
 	sh->no = newcontainerid();
@@ -174,8 +174,8 @@ new_ship(const ship_type * stype, const struct locale * lang, region * r)
 	sh->type = stype;
 	sh->region = r;
 
-	sprintf((char*)buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
-	sh->name = xstrdup(buffer);
+	sprintf(buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
+	sh->name = strdup(buffer);
 	shash(sh);
   addlist(&r->ships, sh);
 	return sh;
@@ -198,22 +198,22 @@ destroy_ship(ship * sh)
   handle_event(sh->attribs, "destroy", sh);
 }
 
-const xmlChar *
-write_shipname(const ship * sh, xmlChar * ibuf, size_t size)
+const char *
+write_shipname(const ship * sh, char * ibuf, size_t size)
 {
-  snprintf((char*)ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
+  snprintf(ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
   ibuf[size-1] = 0;
   return ibuf;
 }
 
-const xmlChar *
+const char *
 shipname(const ship * sh)
 {
   typedef char name[OBJECTIDSIZE + 1];
   static name idbuf[8];
   static int nextbuf = 0;
   char *ibuf = idbuf[(++nextbuf) % 8];
-  return write_shipname(sh, (xmlChar*)ibuf, sizeof(name));
+  return write_shipname(sh, ibuf, sizeof(name));
 }
 
 int

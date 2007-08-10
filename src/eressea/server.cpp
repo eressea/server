@@ -601,25 +601,20 @@ load_inifile(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
-    const char * str;
-
-    str = iniparser_getstr(d, "common:base");
-    if (str) g_basedir = str;
-    str = iniparser_getstr(d, "common:res");
-    if (str) g_resourcedir = str;
-    str = iniparser_getstr(d, "common:xml");
-    if (str) xmlfile = str;
-    str = iniparser_getstr(d, "common:scripts");
-    if (str) script_path = str;
+    g_basedir = iniparser_getstring(d, "common:base", g_basedir);
+    g_resourcedir = iniparser_getstring(d, "common:res", g_resourcedir);
+    xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
+    script_path = iniparser_getstring(d, "common:scripts", script_path);
     lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
+
+    enc_gamedata = iniparser_getstring(d, "common:gamedata_encoding", enc_gamedata);
+    enc_orderfile = iniparser_getstring(d, "common:orderfile_encoding", enc_orderfile);
 
     quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
 
-    str = iniparser_getstr(d, "eressea:run");
-    if (str) luafile = str;
-    str = iniparser_getstr(d, "eressea:report");
-    if (str) g_reportdir = str;
+    luafile = iniparser_getstring(d, "eressea:run", luafile);
+    g_reportdir = iniparser_getstring(d, "eressea:report", g_reportdir);
   }
   inifile = d;
 }

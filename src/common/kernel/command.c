@@ -59,7 +59,7 @@ stree_create(void)
 
 void
 add_command(struct tnode * keys, struct tnode * tnext, 
-				const xmlChar * str, parser fun)
+				const char * str, parser fun)
 {
 	command * cmd = (command *)malloc(sizeof(command));
   variant var;
@@ -73,7 +73,7 @@ add_command(struct tnode * keys, struct tnode * tnext,
 static int
 do_command_i(const struct tnode * keys, void * u, struct order * ord)
 {
-  const xmlChar * c;
+  const char * c;
   variant var;
 
   c = getstrtoken();
@@ -96,7 +96,7 @@ do_command(const struct tnode * keys, void * u, struct order * ord)
   init_tokens(ord);
   skip_token();
   if (do_command_i(keys, u, ord)!=E_TOK_SUCCESS) {
-    xmlChar * cmd = getcommand(ord);
+    char * cmd = getcommand(ord);
     log_warning(("%s failed GM command '%s'\n", unitname(u), cmd));
     free(cmd);
   }

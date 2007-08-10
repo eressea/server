@@ -32,8 +32,8 @@ typedef struct tnode {
 	variant id;
 } tnode;
 
-int findtoken(const struct tnode * tk, const xmlChar * str, variant* result);
-void addtoken(struct tnode * root, const xmlChar* str, variant id);
+int findtoken(const struct tnode * tk, const char * str, variant* result);
+void addtoken(struct tnode * root, const char * str, variant id);
 
 typedef struct local_names {
   struct local_names * next;

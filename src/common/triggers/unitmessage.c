@@ -81,8 +81,7 @@ static void
 unitmessage_write(const trigger * t, FILE * F)
 {
 	unitmessage_data * td = (unitmessage_data*)t->data.v;
-	fprintf(F, "%s ", itoa36(td->target->no));
-  fwritestr(F, td->string);
+	fprintf(F, "%s %s", itoa36(td->target->no), td->string);
 	fprintf(F, " %d %d ", td->type, td->level);
 }
 
@@ -98,7 +97,7 @@ unitmessage_read(trigger * t, FILE * F)
 	td->target = findunit(var.i);
 	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
 
-  freadstr(F, zText, sizeof(zText));
+  fscanf(F, "%s", zText);
 	fscanf(F, "%d %d ", &td->type, &td->level);
 	td->string = strdup(zText);
 

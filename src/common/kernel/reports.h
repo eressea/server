@@ -93,7 +93,7 @@ typedef struct report_context {
   time_t report_time;
 } report_context;
 
-typedef int (*report_fun)(const char * filename, report_context * ctx);
+typedef int (*report_fun)(const char * filename, report_context * ctx, const char * charset);
 extern void register_reporttype(const char * extension, report_fun write, int flag);
   
 extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
@@ -101,8 +101,8 @@ extern void report_building(FILE *F, const struct region * r, const struct build
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode, char * buf, size_t size);
 
 extern const char * reportpath(void);
-extern const xmlChar * trailinto(const struct region * r, const struct locale * lang);
-extern const xmlChar * report_kampfstatus(const struct unit * u, const struct locale * lang);
+extern const char * trailinto(const struct region * r, const struct locale * lang);
+extern const char * report_kampfstatus(const struct unit * u, const struct locale * lang);
 
   extern void reports_init(void);
 

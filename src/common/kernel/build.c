@@ -347,7 +347,7 @@ destroy_cmd(unit * u, struct order * ord)
   region * r = u->region;
   const construction * con = NULL;
   int size = 0;
-  const xmlChar *s;
+  const char *s;
   int n = INT_MAX;
 
   if (u->number < 1)
@@ -816,7 +816,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   int n = want, built = 0, id;
   building * b = NULL;
   /* einmalige Korrektur */
-  const xmlChar * btname;
+  const char * btname;
   order * new_order = NULL;
   const struct locale * lang = u->faction->locale;
 

@@ -324,7 +324,7 @@ attrib_type at_private = {
 	a_readstring
 };
 
-const xmlChar *
+const char *
 u_description(const unit * u, const struct locale * lang)
 {
   if (u->display && u->display[0]) {
@@ -335,15 +335,15 @@ u_description(const unit * u, const struct locale * lang)
   return NULL;
 }
 
-const xmlChar *
+const char *
 uprivate(const unit * u) {
 	attrib * a = a_find(u->attribs, &at_private);
 	if (!a) return NULL;
-	return (const xmlChar*)a->data.v;
+	return a->data.v;
 }
 
 void
-usetprivate(unit * u, const xmlChar * str) {
+usetprivate(unit * u, const char * str) {
 	attrib * a = a_find(u->attribs, &at_private);
 
 	if(str == NULL) {
@@ -1273,16 +1273,16 @@ name_unit(unit *u)
 {
   free(u->name);
 	if (u->race->generate_name) {
-    const xmlChar * gen_name = u->race->generate_name(u); 
+    const char * gen_name = u->race->generate_name(u); 
     if (gen_name) {
-      u->name = xstrdup(gen_name);
+      u->name = strdup(gen_name);
     } else {
-      u->name = xstrdup(racename(u->faction->locale, u, u->race));
+      u->name = strdup(racename(u->faction->locale, u, u->race));
     }
   } else {
-    xmlChar name[16];
-  	sprintf((char*)name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
-	  u->name = xstrdup(name);
+    char name[16];
+  	sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
+	  u->name = strdup(name);
   }
 }
 
@@ -1292,7 +1292,7 @@ name_unit(unit *u)
 * @param creator: unit to inherit stealth, group, building, ship, etc. from
 */
 unit *
-create_unit(region * r, faction * f, int number, const struct race *urace, int id, const xmlChar * dname, unit *creator)
+create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
 {
   unit * u = calloc(1, sizeof(unit));
   order * deford = default_order(f->locale);
@@ -1328,7 +1328,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
   if (!dname) {
     name_unit(u);
   } else {
-    u->name = xstrdup(dname);
+    u->name = strdup(dname);
   }
   if (count_unit(u)) f->no_units++;
 

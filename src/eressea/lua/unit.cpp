@@ -380,7 +380,7 @@ static void
 unit_setname(unit& u, const char * name)
 {
   free(u.name);
-  u.name = xstrdup(name);
+  u.name = strdup(name);
 }
 
 static const char *
@@ -393,7 +393,7 @@ static void
 unit_setinfo(unit& u, const char * info)
 {
   free(u.display);
-  u.display = xstrdup(info);
+  u.display = strdup(info);
 }
 
 static bool
@@ -479,7 +479,7 @@ unit_setmagic(unit& u, const char * type)
 static void
 unit_addorder(unit& u, const char * str)
 {
-  order * ord = parse_order((const xmlChar *)str, u.faction->locale);
+  order * ord = parse_order(str, u.faction->locale);
   addlist(&u.orders, ord);
   u.faction->lastorders = turn;
 }
@@ -569,7 +569,7 @@ unit_capacity(const struct unit& u)
 static void
 unit_addnotice(unit& u, const char * str)
 {
-  addmessage(u.region, u.faction, (const xmlChar*)str, MSG_MESSAGE, ML_IMPORTANT);
+  addmessage(u.region, u.faction, str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
 void

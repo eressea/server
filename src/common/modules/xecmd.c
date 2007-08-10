@@ -76,7 +76,7 @@ xe_givepotion(unit *u, struct order *ord)
 static void
 xe_giveballon(unit *u, struct order *ord)
 {
-	unit *u2 =getunitg(u->region, u->faction);
+	unit *u2 = getunitg(u->region, u->faction);
 	ship *sh;
 
 	if(!u2) {
@@ -87,7 +87,7 @@ xe_giveballon(unit *u, struct order *ord)
 	sh = new_ship(st_find("balloon"), u2->faction->locale, u2->region);
 	sh->size = 5;
   free(sh->name);
-  sh->name = xstrdup(BAD_CAST "Xontormia-Ballon");
+  sh->name = strdup("Xontormia-Ballon");
 	leave(u2->region, u2);
 	u2->ship = sh;
 	fset(u2, UFL_OWNER);

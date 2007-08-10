@@ -153,7 +153,7 @@ fleeregion(const unit * u)
 }
 #endif /* SIMPLE_ESCAPE */
 
-static xmlChar *
+static char *
 sidename(side * s)
 {
 #define SIDENAMEBUFLEN 256
@@ -166,7 +166,7 @@ sidename(side * s)
     snprintf(sidename_buf, SIDENAMEBUFLEN,
       "%s", factionname(s->bf->faction));
   }
-  return (xmlChar *)sidename_buf;
+  return sidename_buf;
 }
 
 static const char *
@@ -2771,7 +2771,7 @@ print_header(battle * b)
   for (bf=b->factions;bf;bf=bf->next) {
     message * m;
     faction * f = bf->faction;
-    const xmlChar * lastf = NULL;
+    const char * lastf = NULL;
     boolean first = false;
     side * s;
     size_t size;
@@ -2821,12 +2821,12 @@ print_stats(battle * b)
 
     for (bf=b->factions;bf;bf=bf->next) {
       faction * f = bf->faction;
-      const xmlChar * loc_army = LOC(f->locale, "battle_army");
+      const char * loc_army = LOC(f->locale, "battle_army");
       char * bufp;
-      const xmlChar * header;
+      const char * header;
       size_t rsize, size;
       int komma;
-      const xmlChar * sname = seematrix(f, s) ? sidename(s) : LOC(f->locale, "unknown_faction");
+      const char * sname = seematrix(f, s) ? sidename(s) : LOC(f->locale, "unknown_faction");
       message * msg;
       char buf[1024];
 
@@ -3274,7 +3274,7 @@ simplename(region * r)
 {
   int i;
   static char name[17];
-  const xmlChar * cp = rname(r, NULL);
+  const char * cp = rname(r, NULL);
   for (i=0;*cp && i!=16;++i, ++cp) {
     int c = *cp;
     while (c && !isalpha(c) && !isspace(c)) {
@@ -3463,7 +3463,7 @@ battle_report(battle * b)
         int r, k = 0, * alive = get_alive(s);
         int l = FIGHT_ROW;
         const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
-        const xmlChar * loc_army = LOC(fac->locale, "battle_army");
+        const char * loc_army = LOC(fac->locale, "battle_army");
         char buffer[32];
 
         if (komma) {

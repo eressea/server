@@ -70,8 +70,8 @@ typedef struct ship {
 	struct ship *nexthash;
 	int no;
 	struct region *region;
-	xmlChar *name;
-	xmlChar *display;
+	char *name;
+	char *display;
 	struct attrib * attribs;
 	int size;
 	int damage; /* damage in 100th of a point of size */
@@ -87,12 +87,12 @@ extern int shipcapacity(const struct ship * sh);
 extern void getshipweight(const struct ship * sh, int *weight, int *cabins);
 
 extern ship *new_ship(const struct ship_type * stype, const struct locale * lang, struct region * r);
-extern const xmlChar *shipname(const struct ship * sh);
-extern const xmlChar *write_shipname(const struct ship * sh, xmlChar * buffer, size_t size);
+extern const char *shipname(const struct ship * sh);
+extern const char *write_shipname(const struct ship * sh, char * buffer, size_t size);
 extern struct ship *findship(int n);
 extern struct ship *findshipr(const struct region *r, int n);
 
-extern const struct ship_type * findshiptype(const xmlChar *s, const struct locale * lang);
+extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
 
 extern void register_ships(void);
 

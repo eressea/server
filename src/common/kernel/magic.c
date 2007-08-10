@@ -1794,19 +1794,19 @@ free_spellparameter(spellparameter *pa)
 }
 
 static int
-addparam_string(const xmlChar * const param[], spllprm ** spobjp)
+addparam_string(const char * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
 
   spobj->flag = 0;
   spobj->typ = SPP_STRING;
-  spobj->data.xs = xmlStrdup(param[0]);
+  spobj->data.xs = strdup(param[0]);
   return 1;
 }
 
 static int
-addparam_int(const xmlChar * const param[], spllprm ** spobjp)
+addparam_int(const char * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
@@ -1818,7 +1818,7 @@ addparam_int(const xmlChar * const param[], spllprm ** spobjp)
 }
 
 static int
-addparam_ship(const xmlChar * const param[], spllprm ** spobjp)
+addparam_ship(const char * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   int id = atoi36((const char *)param[0]);
@@ -1830,7 +1830,7 @@ addparam_ship(const xmlChar * const param[], spllprm ** spobjp)
 }
 
 static int
-addparam_building(const xmlChar * const param[], spllprm ** spobjp)
+addparam_building(const char * const param[], spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   int id = atoi36((const char *)param[0]);
@@ -1842,7 +1842,7 @@ addparam_building(const xmlChar * const param[], spllprm ** spobjp)
 }
 
 static int
-addparam_region(const xmlChar * const param[], spllprm ** spobjp, const unit * u, order * ord)
+addparam_region(const char * const param[], spllprm ** spobjp, const unit * u, order * ord)
 {
   assert(param[0]);
   if (param[1]==0) {
@@ -1872,7 +1872,7 @@ addparam_region(const xmlChar * const param[], spllprm ** spobjp, const unit * u
 
 
 static int
-addparam_unit(const xmlChar * const param[], spllprm ** spobjp, const unit * u, order * ord)
+addparam_unit(const char * const param[], spllprm ** spobjp, const unit * u, order * ord)
 {
   spllprm *spobj;
   int i = 0;
@@ -1898,7 +1898,7 @@ addparam_unit(const xmlChar * const param[], spllprm ** spobjp, const unit * u, 
 }
 
 static spellparameter *
-add_spellparameter(region *target_r, unit *u, const char *syntax, const xmlChar * const param[], int size, struct order * ord)
+add_spellparameter(region *target_r, unit *u, const char *syntax, const char * const param[], int size, struct order * ord)
 {
   boolean fail = false;
   int i = 0;
@@ -2452,7 +2452,7 @@ cast_cmd(unit * u, order * ord)
   region * target_r = r;
   int level, range;
   unit *familiar = NULL, *mage = u;
-  const xmlChar * s;
+  const char * s;
   spell * sp;
   spellparameter *args = NULL;
 
@@ -2506,7 +2506,7 @@ cast_cmd(unit * u, order * ord)
     }
     s = getstrtoken();
   }
-  if (!s[0] || xstrlen(s) == 0) {
+  if (!s[0] || strlen(s) == 0) {
     /* Fehler "Es wurde kein Zauber angegeben" */
     cmistake(u, ord, 172, MSG_MAGIC);
     return 0;
@@ -2627,19 +2627,19 @@ cast_cmd(unit * u, order * ord)
   }
   /* Weitere Argumente zusammenbasteln */
   if (sp->parameter) {
-    xmlChar ** params = malloc(2*sizeof(xmlChar*));
+    char ** params = malloc(2*sizeof(char*));
     int p = 0, size = 2;
     for (;;) {
       s = getstrtoken();
       if (*s==0) break;
       if (p+1>=size) {
         size*=2;
-        params = realloc(params, sizeof(xmlChar*)*size);
+        params = realloc(params, sizeof(char*)*size);
       }
-      params[p++] = xmlStrdup(s);
+      params[p++] = strdup(s);
     }
     params[p] = 0;
-    args = add_spellparameter(target_r, mage, sp->parameter, (const xmlChar * const *)params, p, ord);
+    args = add_spellparameter(target_r, mage, sp->parameter, (const char * const *)params, p, ord);
     for (p=0;params[p];++p) free(params[p]);
     free(params);
     if (args==NULL) {
@@ -2826,19 +2826,19 @@ magic(void)
   remove_empty_units();
 }
 
-const xmlChar *
+const char *
 spell_info(const spell * sp, const struct locale * lang)
 {
   return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
-const xmlChar *
+const char *
 spell_name(const spell * sp, const struct locale * lang)
 {
   return LOC(lang, mkname("spell", sp->sname));
 }
 
-const xmlChar *
+const char *
 curse_name(const curse_type * ctype, const struct locale * lang)
 {
   return LOC(lang, mkname("spell", ctype->cname));

@@ -1293,14 +1293,16 @@ curses_readline(lua_State * L, const char * prompt)
 }
 
 static dictionary * inifile;
+
 static void
 load_inifile(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
-    g_basedir = iniparser_getstr(d, "common:base");
-    g_resourcedir = iniparser_getstr(d, "common:res");
-    xmlfile = iniparser_getstr(d, "common:xml");
+    g_basedir = iniparser_getstring(d, "common:base", g_basedir);
+    g_resourcedir = iniparser_getstring(d, "common:res", g_resourcedir);
+    xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
+    enc_gamedata = iniparser_getstring(d, "common:gamedata_encoding", enc_gamedata);
   }
   inifile = d;
 }
@@ -1333,7 +1335,7 @@ gmmain(int argc, char *argv[])
   if (turn>first_turn) {
     char datafile[12];
     sprintf(datafile, "%u", turn);
-    readgame(datafile, 0);
+    readgame(datafile, 0, enc_gamedata);
   }
 
   run_mapper();

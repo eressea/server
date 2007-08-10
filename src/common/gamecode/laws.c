@@ -912,7 +912,7 @@ restart_cmd(unit * u, struct order * ord)
   if (!fval(u->region->terrain, LAND_REGION)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
   } else {
-    const xmlChar * s_race = getstrtoken(), * s_pass;
+    const char * s_race = getstrtoken(), * s_pass;
     const race * frace = findrace(s_race, u->faction->locale);
 
     if (!frace) {
@@ -964,7 +964,7 @@ static int
 quit_cmd(unit * u, struct order * ord)
 {
   faction * f = u->faction;
-  const xmlChar * passwd;
+  const char * passwd;
 
   init_tokens(ord);
   skip_token(); /* skip keyword */
@@ -1126,7 +1126,7 @@ ally_cmd(unit * u, struct order * ord)
   ally * sf, ** sfp;
   faction *f;
   int keyword, not_kw;
-  const xmlChar *s;
+  const char *s;
 
   init_tokens(ord);
   skip_token();
@@ -1258,7 +1258,7 @@ init_prefixnames(void)
       int key;
       for (key=0;race_prefixes[key];++key) {
         variant var;
-        const xmlChar * pname = locale_string(lang, race_prefixes[key]);
+        const char * pname = locale_string(lang, race_prefixes[key]);
         if (findtoken(&in->names, pname, &var)==E_TOK_NOMATCH || var.i!=key) {
           var.i = key;
           addtoken(&in->names, pname, var);
@@ -1274,7 +1274,7 @@ static int
 prefix_cmd(unit * u, struct order * ord)
 {
   attrib **ap;
-  const xmlChar *s;
+  const char *s;
   local_names * in = pnames;
   variant var;
   const struct locale * lang = u->faction->locale;
@@ -1326,7 +1326,7 @@ static int
 display_cmd(unit * u, struct order * ord)
 {
   building * b = u->building;
-  xmlChar **s = NULL;
+  char **s = NULL;
   region * r = u->region;
 
   init_tokens(ord);
@@ -1376,7 +1376,7 @@ display_cmd(unit * u, struct order * ord)
 
   case P_PRIVAT:
     {
-      const xmlChar *d = getstrtoken();
+      const char *d = getstrtoken();
       if(d == NULL || *d == 0) {
         usetprivate(u, NULL);
       } else {
@@ -1407,11 +1407,11 @@ display_cmd(unit * u, struct order * ord)
   }
 
   if (s!=NULL) {
-    const xmlChar * s2 = getstrtoken();
+    const char * s2 = getstrtoken();
 
     free(*s);
-    *s = xstrdup(s2);
-    if (xstrlen(s2)>=DISPLAYSIZE) {
+    *s = strdup(s2);
+    if (strlen(s2)>=DISPLAYSIZE) {
       (*s)[DISPLAYSIZE] = 0;
     }
   }
@@ -1424,9 +1424,9 @@ renamed_building(const building * b)
 {
   const struct locale * lang = locales;
   for (;lang;lang=nextlocale(lang)) {
-    const xmlChar * bdname = LOC(lang, b->type->_name);
-    size_t bdlen = xstrlen(bdname);
-    if (xstrlen(b->name)>=bdlen && xstrncmp(b->name, bdname, bdlen)==0) {
+    const char * bdname = LOC(lang, b->type->_name);
+    size_t bdlen = strlen(bdname);
+    if (strlen(b->name)>=bdlen && strncmp(b->name, bdname, bdlen)==0) {
       return false;
     }
   }
@@ -1438,7 +1438,7 @@ name_cmd(unit * u, struct order * ord)
 {
   building * b = u->building;
   region * r = u->region;
-  xmlChar **s = NULL;
+  char **s = NULL;
   param_t p;
   boolean foreign = false;
 
@@ -1526,9 +1526,9 @@ name_cmd(unit * u, struct order * ord)
       } else {
         const struct locale * lang = locales;
         for (;lang;lang=nextlocale(lang)) {
-          const xmlChar * fdname = LOC(lang, "factiondefault");
-          size_t fdlen = xstrlen(fdname);
-          if (xstrlen(f->name)>=fdlen && xstrncmp(f->name, fdname, fdlen)==0) {
+          const char * fdname = LOC(lang, "factiondefault");
+          size_t fdlen = strlen(fdname);
+          if (strlen(f->name)>=fdlen && strncmp(f->name, fdname, fdlen)==0) {
             break;
           }
         }
@@ -1559,15 +1559,15 @@ name_cmd(unit * u, struct order * ord)
       } else {
         const struct locale * lang = locales;
         for (;lang;lang=nextlocale(lang)) {
-          const xmlChar * sdname = LOC(lang, sh->type->name[0]);
-          size_t sdlen = xstrlen(sdname);
-          if (xstrlen(sh->name)>=sdlen && xstrncmp(sh->name, sdname, sdlen)==0) {
+          const char * sdname = LOC(lang, sh->type->name[0]);
+          size_t sdlen = strlen(sdname);
+          if (strlen(sh->name)>=sdlen && strncmp(sh->name, sdname, sdlen)==0) {
             break;
           }
 
           sdname = LOC(lang, parameters[P_SHIP]);
-          sdlen = xstrlen(sdname);
-          if (xstrlen(sh->name)>=sdlen && xstrncmp(sh->name, sdname, sdlen)==0) {
+          sdlen = strlen(sdname);
+          if (strlen(sh->name)>=sdlen && strncmp(sh->name, sdname, sdlen)==0) {
             break;
           }
 
@@ -1609,10 +1609,10 @@ name_cmd(unit * u, struct order * ord)
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
         break;
       } else {
-        const xmlChar * udefault = LOC(u2->faction->locale, "unitdefault");
-        size_t udlen = xstrlen(udefault);
-        size_t unlen = xstrlen(u2->name);
-        if (unlen>=udlen && xstrncmp(u2->name, udefault, udlen)!=0) {
+        const char * udefault = LOC(u2->faction->locale, "unitdefault");
+        size_t udlen = strlen(udefault);
+        size_t unlen = strlen(u2->name);
+        if (unlen>=udlen && strncmp(u2->name, udefault, udlen)!=0) {
           cmistake(u2, ord, 244, MSG_EVENT);
           break;
         }
@@ -1666,7 +1666,7 @@ name_cmd(unit * u, struct order * ord)
   }
 
   if (s!=NULL) {
-    const xmlChar * s2 = getstrtoken();
+    const char * s2 = getstrtoken();
 
     if (!s2[0]) {
       cmistake(u, ord, 84, MSG_EVENT);
@@ -1677,8 +1677,8 @@ name_cmd(unit * u, struct order * ord)
      * names, phishing-style? () come to mind. */
 
     free(*s);
-    *s = xstrdup(s2);
-    if (xstrlen(s2)>=NAMESIZE) {
+    *s = strdup(s2);
+    if (strlen(s2)>=NAMESIZE) {
       (*s)[NAMESIZE] = 0;
     }
   }
@@ -1688,7 +1688,7 @@ name_cmd(unit * u, struct order * ord)
 /* ------------------------------------------------------------- */
 
 void
-deliverMail(faction * f, region * r, unit * u, const xmlChar *s, unit * receiver)
+deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 {
   if (!cansee(f, r, u, 0)) {
     u = NULL;
@@ -1701,7 +1701,7 @@ deliverMail(faction * f, region * r, unit * u, const xmlChar *s, unit * receiver
 }
 
 static void
-mailunit(region * r, unit * u, int n, struct order * ord, const xmlChar * s)
+mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
 {
   unit * u2 = findunitr(r,n);
 
@@ -1717,7 +1717,7 @@ mailunit(region * r, unit * u, int n, struct order * ord, const xmlChar * s)
 }
 
 static void
-mailfaction(unit * u, int n, struct order * ord, const xmlChar * s)
+mailfaction(unit * u, int n, struct order * ord, const char * s)
 {
   faction *f;
 
@@ -1733,7 +1733,7 @@ mail_cmd(unit * u, struct order * ord)
 {
   region * r = u->region;
   unit *u2;
-  const xmlChar *s;
+  const char *s;
   int n, cont;
 
   init_tokens(ord);
@@ -1899,7 +1899,7 @@ banner_cmd(unit * u, struct order * ord)
   skip_token();
 
   free(u->faction->banner);
-  u->faction->banner = xstrdup(getstrtoken());
+  u->faction->banner = strdup(getstrtoken());
   add_message(&u->faction->msgs, msg_message("changebanner", "value",
     u->faction->banner));
 
@@ -1909,7 +1909,7 @@ banner_cmd(unit * u, struct order * ord)
 static int
 email_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * s;
+  const char * s;
 
   init_tokens(ord);
   skip_token();
@@ -1934,7 +1934,7 @@ password_cmd(unit * u, struct order * ord)
 {
   char pbuf[32];
   int i;
-  const xmlChar * s;
+  const char * s;
   boolean pwok = true;
 
   init_tokens(ord);
@@ -1971,7 +1971,7 @@ password_cmd(unit * u, struct order * ord)
 static int
 send_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * s;
+  const char * s;
   int option;
 
   init_tokens(ord);
@@ -2025,7 +2025,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 {
   const char *name;
   const char *key;
-  const xmlChar *info;
+  const char *info;
 
   if (u!=NULL) {
     int i = i_get(u->items, itype);
@@ -2080,7 +2080,7 @@ static boolean
 display_race(faction *f, unit *u, const race * rc)
 {
   const char *name, *key;
-  const xmlChar *info;
+  const char *info;
   int a, at_count;
   char buf[2048];
   char buf2[128];
@@ -2101,7 +2101,7 @@ display_race(faction *f, unit *u, const race * rc)
     info = locale_string(f->locale, mkname("raceinfo", "no_info"));
   }
 
-  rsize = xstrlcpy(bufp, info, size);
+  rsize = strlcpy(bufp, info, size);
   if (rsize>size) rsize = size-1;
   size -= rsize;
   bufp += rsize;
@@ -2216,13 +2216,13 @@ display_race(faction *f, unit *u, const race * rc)
     --size;
   }
 
-  addmessage(0, f, (const xmlChar *)buf, MSG_EVENT, ML_IMPORTANT);
+  addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
 
   return true;
 }
 
 static void
-reshow(unit * u, struct order * ord, const xmlChar * s, param_t p)
+reshow(unit * u, struct order * ord, const char * s, param_t p)
 {
   int skill, c;
   const potion_type * ptype;
@@ -2311,7 +2311,7 @@ promotion_cmd(unit * u, struct order * ord)
 static int
 group_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * s;
+  const char * s;
 
   init_tokens(ord);
   skip_token();
@@ -2352,7 +2352,7 @@ guard_off_cmd(unit * u, struct order * ord)
 static int
 reshow_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * s;
+  const char * s;
   param_t p = NOPARAM;
 
   init_tokens(ord);
@@ -2371,7 +2371,7 @@ reshow_cmd(unit * u, struct order * ord)
 static int
 status_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * param;
+  const char * param;
 
   init_tokens(ord);
   skip_token();
@@ -2417,7 +2417,7 @@ status_cmd(unit * u, struct order * ord)
 static int
 combatspell_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * s;
+  const char * s;
   int level = 0;
   spell * spell;
 
@@ -2644,7 +2644,7 @@ reorder(void)
         struct order * ord;
         for (ord = u->orders;ord;ord=ord->next) {
           if (get_keyword(ord)==K_SORT) {
-            const xmlChar * s;
+            const char * s;
             param_t p;
             int id;
             unit *v;
@@ -2772,7 +2772,7 @@ declare_war(void)
           init_tokens(ord);
           skip_token();
           for (;;) {
-            const xmlChar * s = getstrtoken();
+            const char * s = getstrtoken();
             if (s[0]==0) break;
             else {
               faction * enemy = findfaction(atoi36(s));
@@ -2792,7 +2792,7 @@ declare_war(void)
           init_tokens(ord);
           skip_token();
           for (;;) {
-            const xmlChar * s = getstrtoken();
+            const char * s = getstrtoken();
             if (s[0]==0) break;
             else {
               faction * enemy = findfaction(atoi36(s));
@@ -2820,7 +2820,7 @@ declare_war(void)
 static int
 renumber_cmd(unit * u, order * ord)
 {
-  const xmlChar * s;
+  const char * s;
   int i;
   faction * f = u->faction;
 
@@ -3154,8 +3154,8 @@ new_units (void)
           init_tokens(makeord);
           skip_token();
           if (getparam(u->faction->locale) == P_TEMP) {
-            const xmlChar * token;
-            xmlChar * name = NULL;
+            const char * token;
+            char * name = NULL;
             int alias;
             order ** newordersp;
 
@@ -3184,7 +3184,7 @@ new_units (void)
 
             token = getstrtoken();
             if (token && token[0]) {
-              name = xstrdup(token);
+              name = strdup(token);
             }
             u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
             if (name!=NULL) free(name);
@@ -3471,7 +3471,7 @@ defaultorders (void)
       while (*ordp!=NULL) {
         order * ord = *ordp;
         if (get_keyword(ord)==K_DEFAULT) {
-          const xmlChar * cmd;
+          const char * cmd;
           order * new_order;
           init_tokens(ord);
           skip_token(); /* skip the keyword */
@@ -3539,7 +3539,7 @@ age_factions(void)
 static int
 use_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * t;
+  const char * t;
   int n;
   const item_type * itype;
 
@@ -3578,7 +3578,7 @@ use_cmd(unit * u, struct order * ord)
 static int
 claim_cmd(unit * u, struct order * ord)
 {
-  const xmlChar * t;
+  const char * t;
   int n;
   const item_type * itype;
 

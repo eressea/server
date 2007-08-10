@@ -36,7 +36,7 @@ typedef struct order {
 
 /* constructor */
 extern order * create_order(keyword_t kwd, const struct locale * lang, const char * params, ...);
-extern order * parse_order(const xmlChar * s, const struct locale * lang);
+extern order * parse_order(const char * s, const struct locale * lang);
 extern void replace_order(order ** dst, order * orig, const order * src);
 
 /* reference counted copies of orders: */
@@ -47,7 +47,7 @@ extern void free_orders(order ** olist);
 /* access functions for orders */
 extern keyword_t get_keyword(const order * ord);
 extern void set_order(order ** destp, order * src);
-extern xmlChar * getcommand(const order * ord);
+extern char * getcommand(const order * ord);
 extern boolean is_persistent(const order *ord);
 extern boolean is_exclusive(const order *ord);
 extern boolean is_repeated(const order * ord);

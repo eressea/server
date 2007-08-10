@@ -1577,7 +1577,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
 
         /* new units gets some stats from old unit */
         free(u->display);
-        u->display = xstrdup(du->display);
+        u->display = strdup(du->display);
         setstatus(u, du->status);
         setguard(u, GUARD_NONE);
 

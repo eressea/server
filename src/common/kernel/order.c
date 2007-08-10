@@ -24,6 +24,7 @@
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,7 +43,7 @@ static struct locale_data * locale_array[16];
 static int nlocales = 0;
 
 typedef struct order_data {
-  xmlChar * _str; 
+  char * _str; 
   int _refcount : 20;
   int _lindex : 4;
   keyword_t _keyword;
@@ -88,7 +89,7 @@ static char *
 get_command(const order * ord, char * sbuffer, size_t bufsize)
 {
   char * str = sbuffer;
-  const xmlChar * text = ORD_STRING(ord);
+  const char * text = ORD_STRING(ord);
   keyword_t kwd = ORD_KEYWORD(ord);
 
   if (ord->_persistent) *str++ = '@';
@@ -107,11 +108,11 @@ get_command(const order * ord, char * sbuffer, size_t bufsize)
   return sbuffer;
 }
 
-xmlChar *
+char *
 getcommand(const order * ord)
 {
   char sbuffer[DISPLAYSIZE*2];
-  return xmlStrdup((xmlChar *)get_command(ord, sbuffer, sizeof(sbuffer)));
+  return strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
 void 
@@ -159,9 +160,9 @@ free_orders(order ** olist)
 }
 
 static order_data *
-create_data(keyword_t kwd, const xmlChar * sptr, int lindex)
+create_data(keyword_t kwd, const char * sptr, int lindex)
 {
-  const xmlChar * s = sptr;
+  const char * s = sptr;
   order_data * data;
   const struct locale * lang = locale_array[lindex]->lang;
 
@@ -178,20 +179,20 @@ create_data(keyword_t kwd, const xmlChar * sptr, int lindex)
       default: /* nur skill als Parameter, keine extras */
         data = locale_array[lindex]->study_orders[sk];
         if (data==NULL) {
-          const xmlChar * skname = skillname(sk, lang);
+          const char * skname = skillname(sk, lang);
           data = (order_data*)malloc(sizeof(order_data));
           locale_array[lindex]->study_orders[sk] = data;
           data->_keyword = kwd;
           data->_lindex = lindex;
-          if (xmlStrchr(skname, ' ')!=NULL) {
-            size_t len = xstrlen(skname);
-            data->_str = (xmlChar*)malloc(len+3);
+          if (strchr(skname, ' ')!=NULL) {
+            size_t len = strlen(skname);
+            data->_str = malloc(len+3);
             data->_str[0]='\"';
             memcpy(data->_str+1, skname, len);
             data->_str[len+1]='\"';
             data->_str[len+2]='\0';
           } else {
-            data->_str = xmlStrdup(skname);
+            data->_str = strdup(skname);
           }
           data->_refcount = 1;
         }
@@ -217,13 +218,13 @@ create_data(keyword_t kwd, const xmlChar * sptr, int lindex)
   data = (order_data*)malloc(sizeof(order_data));
   data->_keyword = kwd;
   data->_lindex = lindex;
-  data->_str = s?xmlStrdup(s):NULL;
+  data->_str = s?strdup(s):NULL;
   data->_refcount = 1;
   return data;
 }
 
 static order *
-create_order_i(keyword_t kwd, const xmlChar * sptr, int persistent, const struct locale * lang)
+create_order_i(keyword_t kwd, const char * sptr, int persistent, const struct locale * lang)
 {
   order * ord = NULL;
   int lindex;
@@ -269,7 +270,7 @@ create_order(keyword_t kwd, const struct locale * lang, const char * params, ...
   char * sptr = zBuffer;
 
   va_start(marker, params);
-  while (params) {
+  while (*params) {
     switch (*params) {
       case '%':
         /* ignore these, they are syntactical sugar */
@@ -291,19 +292,20 @@ create_order(keyword_t kwd, const struct locale * lang, const char * params, ...
       default:
         assert(!"unknown format-character in create_order");
     }
+    ++params;
   }
   va_end(marker);
 
-  return create_order_i(kwd, (const xmlChar*)sptr, 0, lang);
+  return create_order_i(kwd, zBuffer, 0, lang);
 }
 
 order * 
-parse_order(const xmlChar * s, const struct locale * lang)
+parse_order(const char * s, const struct locale * lang)
 {
   while (*s && !isalnum(*(unsigned char*)s) && !ispunct(*(unsigned char*)s)) ++s;
   if (*s!=0) {
     keyword_t kwd;
-    const xmlChar * sptr;
+    const char * sptr;
     int persistent = 0;
 
     while (*s=='@') {
@@ -467,7 +469,7 @@ write_order(const order * ord, const struct locale * lang, char * buffer, size_t
   } else {
     keyword_t kwd = ORD_KEYWORD(ord);
     if (kwd==NOKEYWORD) {
-      const xmlChar * text = ORD_STRING(ord);
+      const char * text = ORD_STRING(ord);
       strlcpy(buffer, (const char *)text, size);
     } else {
       get_command(ord, buffer, size);

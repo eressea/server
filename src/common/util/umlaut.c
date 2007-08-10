@@ -40,7 +40,7 @@ typedef struct tref {
 #define SHARED 2 /* at least two words share the node */
 
 void
-addtoken(tnode * root, const xmlChar * str, variant id)
+addtoken(tnode * root, const char * str, variant id)
 {
   static struct replace {
     wint_t ucs;
@@ -116,9 +116,9 @@ addtoken(tnode * root, const xmlChar * str, variant id)
     addtoken(next->node, str+len, id);
     while (replace[i].str[0]) {
       if (lcs==replace[i].ucs) {
-        xmlChar zText[1024];
+        char zText[1024];
         memcpy(zText, replace[i].str, 3);
-        strcpy((char*)zText+2, (const char*)str+len);
+        strcpy(zText+2, (const char*)str+len);
         addtoken(root, zText, id);
         break;
       }
@@ -128,7 +128,7 @@ addtoken(tnode * root, const xmlChar * str, variant id)
 }
 
 int
-findtoken(const tnode * tk, const xmlChar * str, variant* result)
+findtoken(const tnode * tk, const char * str, variant* result)
 {
   if (!str || *str==0) return E_TOK_NOMATCH;
 

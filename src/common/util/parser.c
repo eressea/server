@@ -12,15 +12,15 @@
 #define MAXTOKENSIZE      8192
 
 typedef struct parser_state {
-  const xmlChar *current_token;
-  xmlChar * current_cmd;
+  const char *current_token;
+  char * current_cmd;
   struct parser_state * next;
 } parser_state;
 
 static parser_state * state;
 
 static int
-eatwhitespace_c(const xmlChar ** str)
+eatwhitespace_c(const char ** str)
 {
   int ret;
   wint_t ucs;
@@ -28,8 +28,8 @@ eatwhitespace_c(const xmlChar ** str)
 
   /* skip over potential whitespace */
   for (;;) {
-    xmlChar utf8_character = (*str)[0];
-    if (utf8_character <= 0x7F) {
+    unsigned char utf8_character = (*(unsigned char**)str)[0];
+    if (~utf8_character & 0x80) {
       if (!iswspace(utf8_character)) break;
       ++*str;
     } else {
@@ -46,14 +46,14 @@ eatwhitespace_c(const xmlChar ** str)
 }
 
 void
-init_tokens_str(const xmlChar * initstr, xmlChar * cmd)
+init_tokens_str(const char * initstr, char * cmd)
 {
   if (state==NULL) {
     state = malloc(sizeof(parser_state));
   }
   else if (state->current_cmd) free(state->current_cmd);
   state->current_cmd = cmd;
-  state->current_token = (const xmlChar *)initstr;
+  state->current_token = initstr;
 }
 
 void
@@ -92,8 +92,8 @@ skip_token(void)
     wint_t ucs;
     size_t len;
 
-    xmlChar utf8_character = state->current_token[0];
-    if (utf8_character <= 0x7F) {
+    unsigned char utf8_character = (unsigned char)state->current_token[0];
+    if (~utf8_character & 0x80) {
       ucs = utf8_character;
       ++state->current_token;
     } else {
@@ -121,14 +121,14 @@ skip_token(void)
   }
 }
 
-const xmlChar *
-parse_token(const xmlChar ** str)
+const char *
+parse_token(const char ** str)
 {
-  static xmlChar lbuf[MAXTOKENSIZE];
-  xmlChar * cursor = lbuf;
+  static char lbuf[MAXTOKENSIZE];
+  char * cursor = lbuf;
   char quotechar = 0;
   boolean escape = false;
-  const xmlChar * ctoken = *str;
+  const char * ctoken = *str;
 
   assert(ctoken);
 
@@ -138,8 +138,8 @@ parse_token(const xmlChar ** str)
     size_t len;
     boolean copy = false;
 
-    xmlChar utf8_character = *ctoken;
-    if (utf8_character <= 0x7F) {
+    unsigned char utf8_character = *(unsigned char *)ctoken;
+    if (~utf8_character & 0x80) {
       ucs = utf8_character;
       len = 1;
     } else {
@@ -185,8 +185,8 @@ parse_token(const xmlChar ** str)
   return lbuf;
 }
 
-const xmlChar *
+const char *
 getstrtoken(void)
 {
-  return parse_token((const xmlChar**)&state->current_token);
+  return parse_token((const char **)&state->current_token);
 }

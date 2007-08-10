@@ -79,7 +79,7 @@ const char *skillnames[MAXSKILLS] =
 
 static boolean skill_enabled[MAXSKILLS];
 
-const xmlChar * 
+const char * 
 skillname(skill_t sk, const struct locale * lang)
 {
   if (skill_enabled[sk]) {

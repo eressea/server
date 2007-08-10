@@ -21,8 +21,8 @@ extern "C" {
 
 #include <wchar.h>
 #define USE_UNICODE
-  extern int unicode_utf8_to_ucs4(wint_t *ucs4_character, const xmlChar *utf8_string, size_t *length);
-  extern int unicode_utf8_strcasecmp(const xmlChar * a, const xmlChar * b);
+  extern int unicode_utf8_to_ucs4(wint_t *ucs4_character, const char *utf8_string, size_t *length);
+  extern int unicode_utf8_strcasecmp(const char * a, const char * b);
 
 #ifdef __cplusplus
 }

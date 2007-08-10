@@ -76,7 +76,7 @@ debug_language(const char * log)
   s_logfile = strdup(log);
 }
 
-const xmlChar *
+const char *
 locale_getstring(const locale * lang, const char * key)
 {
   unsigned int hkey = hashstring(key);
@@ -102,7 +102,7 @@ locale_getstring(const locale * lang, const char * key)
   return NULL;
 }
 
-const xmlChar *
+const char *
 locale_string(const locale * lang, const char * key)
 {
   if (key!=NULL) {
@@ -111,7 +111,7 @@ locale_string(const locale * lang, const char * key)
     struct locale_str * find;
     
     if (key == NULL || *key==0) return NULL;
-    if (lang == NULL) return BAD_CAST key;
+    if (lang == NULL) return key;
     find = lang->strings[id];
     while (find) {
       if (find->hashkey == hkey) {
@@ -125,7 +125,7 @@ locale_string(const locale * lang, const char * key)
       find = find->nexthash;
     }
     if (!find) {
-      const xmlChar * s = BAD_CAST key;
+      const char * s = key;
       log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
       if (lang!=default_locale) {
         s = locale_string(default_locale, key);
@@ -146,7 +146,7 @@ locale_string(const locale * lang, const char * key)
 }
 
 void
-locale_setstring(locale * lang, const char * key, const xmlChar * value)
+locale_setstring(locale * lang, const char * key, const char * value)
 {
   unsigned int hkey = hashstring(key);
   unsigned int id = hkey & (SMAXHASH-1);
@@ -163,13 +163,13 @@ locale_setstring(locale * lang, const char * key, const xmlChar * value)
     lang->strings[id] = find;
     find->hashkey = hkey;
     find->key = strdup(key);
-    find->str = xmlStrdup(value);
+    find->str = strdup(value);
   }
   else {
-    if (xmlStrcmp(find->str, value)!=0) {
+    if (strcmp(find->str, value)!=0) {
       log_error(("Duplicate key %s for '%s' and '%s'\n", key, value, find->str));
     }
-    assert(!xmlStrcmp(find->str, value) || !"duplicate string for key");
+    assert(!strcmp(find->str, value) || !"duplicate string for key");
   }
 }
 

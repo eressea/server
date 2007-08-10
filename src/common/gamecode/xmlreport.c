@@ -81,25 +81,25 @@
 
 #define L10N(x) x
 
-static xmlChar*
+static const xmlChar *
 xml_s(const char * str)
 {
   static xmlChar buffer[1024];
   const char * inbuf = str;
-  xmlChar * outbuf = buffer;
+  unsigned char * outbuf = buffer;
   int inbytes = (int)strlen(str)+1;
   int outbytes = (int)sizeof(buffer);
 
-  isolat1ToUTF8(outbuf, &outbytes, BAD_CAST inbuf, &inbytes);
+  isolat1ToUTF8(outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
   return buffer;
 }
 
-static xmlChar*
+static const xmlChar *
 xml_i(double number)
 {
   static char buffer[128];
   sprintf(buffer, "%.0lf", number);
-  return (xmlChar*)buffer;
+  return (const xmlChar *)buffer;
 }
 
 static xmlNodePtr
@@ -107,9 +107,9 @@ report_faction(report_context * ctx, faction * f)
 {
   xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "faction");
   xmlNewProp(node, BAD_CAST "id", xml_i(f->no));
-  xmlNewProp(node, BAD_CAST "name", f->name);
+  xmlNewProp(node, BAD_CAST "name", (const xmlChar *)f->name);
   xmlNewProp(node, BAD_CAST "email", xml_s(f->email));
-  if (f->banner && *f->banner) xmlNewProp(node, BAD_CAST "banner", f->banner);
+  if (f->banner && *f->banner) xmlNewProp(node, BAD_CAST "banner", (const xmlChar *)f->banner);
   if (f==ctx->f) {
     const char * s;
     xmlNewProp(node, BAD_CAST "locale", BAD_CAST locale_name(f->locale));
@@ -138,14 +138,14 @@ report_region(report_context * ctx, seen_region * sr)
     xmlNewProp(node, BAD_CAST "plane", xml_s(r->planep->name));
   }
   if (r->land!=NULL) {
-    xmlNewProp(node, BAD_CAST "name", r->land->name);
+    xmlNewProp(node, BAD_CAST "name", (const xmlChar *)r->land->name);
   }
   return node;
 }
 
 /* main function of the xmlreport. creates the header and traverses all regions */
 static int
-report_xml(const char * filename, report_context * ctx)
+report_xml(const char * filename, report_context * ctx, const char * encoding)
 {
   xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
   xmlNodePtr xmlReport = xmlNewNode(NULL, BAD_CAST "report");

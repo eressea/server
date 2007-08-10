@@ -14,19 +14,19 @@
 #include <errno.h>
 
 int
-unicode_utf8_strcasecmp(const xmlChar * a, const xmlChar * b)
+unicode_utf8_strcasecmp(const char * a, const char * b)
 {
   while (*a && *b) {
     int ret;
     size_t size;
     wint_t ucsa = *a, ucsb = *b;
 
-    if (ucsa>0x7F) {
+    if (ucsa & 0x80) {
       ret = unicode_utf8_to_ucs4(&ucsa, a, &size);
       if (ret!=0) return -1;
       a += size;
     } else ++a;
-    if (ucsb>0x7F) {
+    if (ucsb & 0x80) {
       ret = unicode_utf8_to_ucs4(&ucsb, b, &size);
       if (ret!=0) return -1;
       b += size;
@@ -46,14 +46,14 @@ unicode_utf8_strcasecmp(const xmlChar * a, const xmlChar * b)
 
 /* Convert a UTF-8 encoded character to UCS-4. */
 int
-unicode_utf8_to_ucs4(wint_t *ucs4_character, const xmlChar *utf8_string, 
+unicode_utf8_to_ucs4(wint_t *ucs4_character, const char *utf8_string, 
                      size_t *length)
 {
-  xmlChar utf8_character = utf8_string[0];
+  unsigned char utf8_character = (unsigned char)utf8_string[0];
 
   /* Is the character in the ASCII range? If so, just copy it to the
   output. */
-  if (utf8_character <= 0x7F)
+  if (~utf8_character & 0x80)
   {
     *ucs4_character = utf8_character;
     *length = 1;

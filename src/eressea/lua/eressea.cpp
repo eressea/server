@@ -103,7 +103,7 @@ static void
 lua_setstring(const char * lname, const char * key, const char * str)
 {
   struct locale * lang = find_locale(lname);
-  locale_setstring(lang, key, (const xmlChar*)str);
+  locale_setstring(lang, key, str);
 }
 
 static const char *

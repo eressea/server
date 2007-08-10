@@ -60,7 +60,7 @@ typedef struct spllprm{
 		struct building *b;
 		struct ship *sh;
 		char *s;
-    xmlChar * xs;
+    char * xs;
 		int i;
 	} data;
 } spllprm;
@@ -371,9 +371,9 @@ extern boolean create_newfamiliar(struct unit * mage, struct unit * familiar);
 extern void create_newclone(struct unit * mage, struct unit * familiar);
 extern struct unit * has_clone(struct unit * mage);
 
-extern const xmlChar * spell_info(const struct spell * sp, const struct locale * lang);
-extern const xmlChar * spell_name(const struct spell * sp, const struct locale * lang);
-extern const xmlChar * curse_name(const struct curse_type * ctype, const struct locale * lang);
+extern const char * spell_info(const struct spell * sp, const struct locale * lang);
+extern const char * spell_name(const struct spell * sp, const struct locale * lang);
+extern const char * curse_name(const struct curse_type * ctype, const struct locale * lang);
 
 extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
 

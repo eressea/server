@@ -138,7 +138,7 @@ addfaction(const char *email, const char * password,
   fhash(f);
 
   snprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), factionid(f));
-  f->name = xstrdup(buf);
+  f->name = strdup(buf);
 
   return f;
 }
@@ -172,7 +172,7 @@ checkpasswd(const faction * f, const char * passwd, boolean shortp)
 #ifdef SHORTPWDS
   shortpwd * slist = f->shortpwds;
   if (shortp) while (slist) {
-    if (xstrcmp(slist->pwd, passwd)==0) {
+    if (strcmp(slist->pwd, passwd)==0) {
       slist->used = true;
       return true;
     }

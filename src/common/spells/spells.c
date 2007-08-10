@@ -545,7 +545,7 @@ sp_summon_familiar(castorder *co)
   int dh, dh1;
   direction_t d;
   message * msg;
-  xmlChar zText[NAMESIZE];
+  char zText[NAMESIZE];
   size_t size;
 
   if (get_familiar(mage) != NULL ) {
@@ -581,7 +581,7 @@ sp_summon_familiar(castorder *co)
   }
 
   msg = msg_message("familiar_name", "unit", mage);
-  nr_render(msg, mage->faction->locale, (char *)zText, sizeof(zText), mage->faction);
+  nr_render(msg, mage->faction->locale, zText, sizeof(zText), mage->faction);
   msg_release(msg);
   familiar = create_unit(target_region, mage->faction, 1, rc, 0, zText, mage);
   setstatus(familiar, ST_FLEE);
@@ -602,12 +602,12 @@ sp_summon_familiar(castorder *co)
         dh1 = 1;
       } else {
         if (dh == 0) {
-          size -= strlcat((char*)zText, (const char*)LOC(mage->faction->locale, "list_and"), size);
+          size -= strlcat(zText, (const char*)LOC(mage->faction->locale, "list_and"), size);
         } else {
-          size -= strlcat((char*)zText, (const char*)", ", size);
+          size -= strlcat(zText, (const char*)", ", size);
         }
       }
-      size -= strlcat((char*)zText, (const char*)skillname(sk, mage->faction->locale), size);
+      size -= strlcat(zText, (const char*)skillname(sk, mage->faction->locale), size);
     }
   }
   ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",
@@ -636,7 +636,7 @@ sp_destroy_magic(castorder *co)
   double force = co->force;
   spellparameter *pa = co->par;
   curse * c = NULL;
-  xmlChar ts[80];
+  char ts[80];
   attrib **ap;
   int obj;
   int succ;
@@ -4349,7 +4349,7 @@ sp_pump(castorder *co)
     ADDMSG(&mage->faction->msgs, msg_message("pump_effect", "mage unit tregion", mage, target, rt));
   }
 
-  u = create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, (const xmlChar*)"spell/pump", NULL);
+  u = create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/pump", NULL);
   u->age = 2;
   set_level(u, SK_OBSERVATION, eff_skill(target, SK_OBSERVATION, u->region));
 
@@ -4766,7 +4766,7 @@ sp_icastle(castorder *co)
   double power = co->force;
   spellparameter *pa = co->par;
   icastle_data * data;
-  const xmlChar * bname;
+  const char * bname;
   message * msg;
 
   if ((type=findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
@@ -4790,7 +4790,7 @@ sp_icastle(castorder *co)
     bname = LOC(mage->faction->locale, buildingtype(type, b, 0));
   }
   free(b->name);
-  b->name = xstrdup(bname);
+  b->name = strdup(bname);
 
   /* TODO: Auf timeout und action_destroy umstellen */
   a = a_add(&b->attribs, a_new(&at_icastle));
@@ -5031,7 +5031,7 @@ sp_clonecopy(castorder *co)
   }
 
   snprintf(name, sizeof(name), (const char*)LOC(mage->faction->locale, "clone_of"), unitname(mage));
-  clone = create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, (const xmlChar *)name, mage);
+  clone = create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, name, mage);
   setstatus(clone, ST_FLEE);
   fset(clone, UFL_LOCKED);
 
@@ -5077,7 +5077,7 @@ sp_dreamreading(castorder *co)
     return 0;
   }
 
-  u2 = create_unit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, (const xmlChar*)"spell/dreamreading", NULL);
+  u2 = create_unit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/dreamreading", NULL);
   set_number(u2, 1);
   u2->age = 2;   /* Nur für diese Runde. */
   set_level(u2, SK_OBSERVATION, eff_skill(u, SK_OBSERVATION, u2->region));
@@ -5944,7 +5944,7 @@ sp_viewreality(castorder *co)
 
   /* Irgendwann mal auf Curses u/o Attribut umstellen. */
   for (rl2=rl; rl2; rl2=rl2->next) {
-    u = create_unit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, (const xmlChar*)"spell/viewreality", NULL);
+    u = create_unit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/viewreality", NULL);
     set_level(u, SK_OBSERVATION, co->level/2);
     u->age = 2;
   }
@@ -6607,7 +6607,7 @@ sp_q_antimagie(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
-  const xmlChar *ts = NULL;
+  const char *ts = NULL;
 
   obj = pa->param[0]->typ;
 
@@ -6622,21 +6622,21 @@ sp_q_antimagie(castorder *co)
     {
       unit *u = pa->param[0]->data.u;
       ap = &u->attribs;
-      ts = (const xmlChar *) unitid(u);
+      ts =  unitid(u);
       break;
     }
     case SPP_BUILDING:
     {
       building *b = pa->param[0]->data.b;
       ap = &b->attribs;
-      ts =(const xmlChar *) buildingid(b);
+      ts = buildingid(b);
       break;
     }
     case SPP_SHIP:
     {
       ship *sh = pa->param[0]->data.sh;
       ap = &sh->attribs;
-      ts =(const xmlChar *) shipid(sh);
+      ts = shipid(sh);
       break;
     }
     default:
@@ -6688,7 +6688,7 @@ sp_break_curse(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
-  const xmlChar *ts = NULL;
+  const char *ts = NULL;
 
   if (pa->length < 2) {
     /* Das Zielobjekt wurde vergessen */
@@ -6715,21 +6715,21 @@ sp_break_curse(castorder *co)
     {
       unit *u = pa->param[0]->data.u;
       ap = &u->attribs;
-      ts = (const xmlChar *)unitid(u);
+      ts = unitid(u);
       break;
     }
     case SPP_BUILDING:
     {
       building *b = pa->param[0]->data.b;
       ap = &b->attribs;
-      ts = (const xmlChar *)buildingid(b);
+      ts = buildingid(b);
       break;
     }
     case SPP_SHIP:
     {
       ship *sh = pa->param[0]->data.sh;
       ap = &sh->attribs;
-      ts = (const xmlChar *)shipid(sh);
+      ts = shipid(sh);
       break;
     }
     default:
@@ -6856,7 +6856,7 @@ sp_wdwpyramid(castorder *co)
 typedef struct spelldata {
   spellid_t id;
   const char *sname;
-  const xmlChar *info;
+  const char *info;
   const char *syntax;
   const char *parameter;
   magic_t magietyp;

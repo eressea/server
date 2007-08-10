@@ -69,7 +69,7 @@ createmonsters(void)
 	 * no 0 muss keine orders einreichen! */
 
 	f->email = strdup("monsters@eressea.de");
-	f->name = (xmlChar*)strdup("Monster");
+	f->name = strdup("Monster");
 	f->alive = 1;
 	f->options = (char)(1<<O_REPORT);
 	addlist(&factions, f);

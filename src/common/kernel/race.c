@@ -286,18 +286,20 @@ raceprefix(const unit *u)
   return get_prefix(asource);
 }
 
-const xmlChar *
+const char *
 racename(const struct locale *loc, const unit *u, const race * rc)
 {
   const char * prefix = raceprefix(u);
 
   if (prefix!=NULL) {
-    static xmlChar lbuf[80];
-    xmlChar * s = lbuf;
-    s += xstrlcpy(lbuf, LOC(loc, mkname("prefix", prefix)), sizeof(lbuf));
-    xstrlcpy(s, LOC(loc, rc_name(rc, u->number != 1)), sizeof(lbuf)-(s-lbuf));
-    assert(s[0]<=0x7F || !"unicode/not implemented");
-    s[0] = (xmlChar)tolower(s[0]);
+    static char lbuf[80];
+    char * s = lbuf;
+    int ch;
+    s += strlcpy(lbuf, LOC(loc, mkname("prefix", prefix)), sizeof(lbuf));
+    strlcpy(s, LOC(loc, rc_name(rc, u->number != 1)), sizeof(lbuf)-(s-lbuf));
+    assert(~s[0] & 0x80|| !"unicode/not implemented");
+    ch = tolower(*(unsigned char *)s);
+    *s = (char)ch;
     return lbuf;
   }
   return LOC(loc, rc_name(rc, u->number != 1));

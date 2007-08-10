@@ -60,11 +60,11 @@ enable_xml_gamecode(void)
 static void
 xml_readtext(xmlNodePtr node, struct locale ** lang, xmlChar **text)
 {
-  xmlChar * property = xmlGetProp(node, BAD_CAST "locale");
-  assert(property!=NULL);
-  *lang = find_locale((const char*)property);
-  if (*lang==NULL) *lang = make_locale((const char*)property);
-  xmlFree(property);
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST "locale");
+  assert(propValue!=NULL);
+  *lang = find_locale((const char*)propValue);
+  if (*lang==NULL) *lang = make_locale((const char*)propValue);
+  xmlFree(propValue);
 
   *text = xmlNodeListGetString(node->doc, node->children, 1);
 }
@@ -73,11 +73,11 @@ static const spell *
 xml_spell(xmlNode * node, const char * name)
 {
   const spell * sp = NULL;
-  xmlChar * property = xmlGetProp(node, BAD_CAST name);
-  if (property!=NULL) {
-    sp = find_spell(M_NONE, (const char *)property);
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
+  if (propValue!=NULL) {
+    sp = find_spell(M_NONE, (const char *)propValue);
     assert(sp);
-    xmlFree(property);
+    xmlFree(propValue);
   }
   return sp;
 }
@@ -135,14 +135,14 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 
   for (req=0;req!=nodeNr;++req) {
     xmlNodePtr node = nodeTab[req];
-    xmlChar * property;
+    xmlChar * propValue;
 
     radd->number = xml_ivalue(node, "quantity", 1);
     radd->recycle = xml_fvalue(node, "recycle", 0.5);
 
-    property = xmlGetProp(node, BAD_CAST "type");
-    radd->rtype = rt_findorcreate((const char*)property);
-    xmlFree(property);
+    propValue = xmlGetProp(node, BAD_CAST "type");
+    radd->rtype = rt_findorcreate((const char*)propValue);
+    xmlFree(propValue);
 
     ++radd;
   }
@@ -155,7 +155,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, constructi
   int k;
   for (k=0;k!=nodeSet->nodeNr;++k) {
     xmlNodePtr node = nodeSet->nodeTab[k];
-    xmlChar * property;
+    xmlChar * propValue;
     construction * con;
     xmlXPathObjectPtr req;
     int m;
@@ -164,11 +164,11 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, constructi
     *consPtr = con = calloc(sizeof(construction), 1);
     consPtr = &con->improvement;
 
-    property = xmlGetProp(node, BAD_CAST "skill");
-    if (property!=NULL) {
-      con->skill = sk_find((const char*)property);
+    propValue = xmlGetProp(node, BAD_CAST "skill");
+    if (propValue!=NULL) {
+      con->skill = sk_find((const char*)propValue);
       assert(con->skill!=NOSKILL);
-      xmlFree(property);
+      xmlFree(propValue);
     } else {
       con->skill = NOSKILL;
     }
@@ -190,11 +190,11 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, constructi
     for (m=0;m!=req->nodesetval->nodeNr;++m) {
       xmlNodePtr node = req->nodesetval->nodeTab[m];
 
-      property = xmlGetProp(node, BAD_CAST "function");
-      if (property!=NULL) {
-        pf_generic foo = get_function((const char*)property);
+      propValue = xmlGetProp(node, BAD_CAST "function");
+      if (propValue!=NULL) {
+        pf_generic foo = get_function((const char*)propValue);
         a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, (skillmod_fun)foo, 1.0, 0));
-        xmlFree(property);
+        xmlFree(propValue);
       }
 
     }
@@ -207,15 +207,15 @@ static int
 parse_function(xmlNodePtr node, pf_generic * funPtr, xmlChar ** namePtr)
 {
   pf_generic fun;
-  xmlChar * property = xmlGetProp(node, BAD_CAST "value");
-  assert(property!=NULL);
-  fun = get_function((const char*)property);
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST "value");
+  assert(propValue!=NULL);
+  fun = get_function((const char*)propValue);
   if (fun!=NULL) {
-    xmlFree(property);
+    xmlFree(propValue);
 
-    property = xmlGetProp(node, BAD_CAST "name");
+    propValue = xmlGetProp(node, BAD_CAST "name");
   }
-  *namePtr = property;
+  *namePtr = propValue;
   *funPtr = fun;
   return 0;
 }
@@ -233,20 +233,20 @@ parse_buildings(xmlDocPtr doc)
     xmlNodeSetPtr nodes = buildings->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       building_type * btype;
       xmlXPathObjectPtr result;
       int k;
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      btype = bt_find((const char*)property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
+      btype = bt_find((const char*)propValue);
       if (btype==NULL) {
         btype = calloc(sizeof(building_type), 1);
-        btype->_name = strdup((const char *)property);
+        btype->_name = strdup((const char *)propValue);
         bt_register(btype);
       }
-      xmlFree(property);
+      xmlFree(propValue);
 
       btype->capacity = xml_ivalue(node, "capacity", -1);
       btype->maxcapacity = xml_ivalue(node, "maxcapacity", -1);
@@ -278,24 +278,24 @@ parse_buildings(xmlDocPtr doc)
         for (k=0;k!=result->nodesetval->nodeNr;++k) {
           xmlNodePtr node = result->nodesetval->nodeTab[k];
           pf_generic fun;
-          parse_function(node, &fun, &property);
+          parse_function(node, &fun, &propValue);
 
           if (fun==NULL) {
             log_error(("unknown function name '%s' for building %s\n",
-              (const char*)property, btype->_name));
-            xmlFree(property);
+              (const char*)propValue, btype->_name));
+            xmlFree(propValue);
             continue;
           }
-          assert(property!=NULL);
-          if (strcmp((const char*)property, "name")==0) {
+          assert(propValue!=NULL);
+          if (strcmp((const char*)propValue, "name")==0) {
             btype->name = (const char * (*)(const struct building_type*, int size))fun;
-          } else if (strcmp((const char*)property, "init")==0) {
+          } else if (strcmp((const char*)propValue, "init")==0) {
             btype->init = (void (*)(struct building_type*))fun;
           } else {
             log_error(("unknown function type '%s' for building %s\n",
-              (const char*)property, btype->_name));
+              (const char*)propValue, btype->_name));
           }
-          xmlFree(property);
+          xmlFree(propValue);
         }
         xmlXPathFreeObject(result);
       }
@@ -312,11 +312,11 @@ parse_buildings(xmlDocPtr doc)
         mt = btype->maintenance + k;
         mt->number = xml_ivalue(node, "amount", 0);
 
-        property = xmlGetProp(node, BAD_CAST "type");
-        assert(property!=NULL);
-        mt->rtype = rt_find((const char*)property);
+        propValue = xmlGetProp(node, BAD_CAST "type");
+        assert(propValue!=NULL);
+        mt->rtype = rt_find((const char*)propValue);
         assert(mt->rtype!=NULL);
-        xmlFree(property);
+        xmlFree(propValue);
 
         if (xml_bvalue(node, "variable", false)) mt->flags |= MTF_VARIABLE;
         if (xml_bvalue(node, "vital", false)) mt->flags |= MTF_VITAL;
@@ -352,13 +352,13 @@ parse_calendar(xmlDocPtr doc)
     xmlNodePtr calendar = nsetCalendars->nodeTab[0];
     xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
     xmlNodeSetPtr nsetWeeks, nsetMonths, nsetSeasons;
-    xmlChar * property = xmlGetProp(calendar, BAD_CAST "name");
+    xmlChar * propValue = xmlGetProp(calendar, BAD_CAST "name");
     xmlChar * newyear = xmlGetProp(calendar, BAD_CAST "newyear");
 
     first_turn = xml_ivalue(calendar, "start", 0);
-    if (property) {
-      agename = strdup(mkname("calendar", (const char*)property));
-      xmlFree(property);
+    if (propValue) {
+      agename = strdup(mkname("calendar", (const char*)propValue));
+      xmlFree(propValue);
     }
 
     xpath->node = calendar;
@@ -372,12 +372,12 @@ parse_calendar(xmlDocPtr doc)
       weeknames2 = malloc(sizeof(char *) * weeks_per_month);
       for (i=0;i!=nsetWeeks->nodeNr;++i) {
         xmlNodePtr week = nsetWeeks->nodeTab[i];
-        xmlChar * property = xmlGetProp(week, BAD_CAST "name");
-        if (property) {
-          weeknames[i] = strdup(mkname("calendar", (const char*)property));
+        xmlChar * propValue = xmlGetProp(week, BAD_CAST "name");
+        if (propValue) {
+          weeknames[i] = strdup(mkname("calendar", (const char*)propValue));
           weeknames2[i] = malloc(strlen(weeknames[i])+3);
           sprintf(weeknames2[i], "%s_d", weeknames[i]);
-          xmlFree(property);
+          xmlFree(propValue);
         }
       }
     }
@@ -394,10 +394,10 @@ parse_calendar(xmlDocPtr doc)
 
       for (i=0;i!=nsetSeasons->nodeNr;++i) {
         xmlNodePtr season = nsetSeasons->nodeTab[i];
-        xmlChar * property = xmlGetProp(season, BAD_CAST "name");
-        if (property) {
-          seasonnames[i] = strdup(mkname("calendar", (const char*)property));
-          xmlFree(property);
+        xmlChar * propValue = xmlGetProp(season, BAD_CAST "name");
+        if (propValue) {
+          seasonnames[i] = strdup(mkname("calendar", (const char*)propValue));
+          xmlFree(propValue);
         }
       }
     }
@@ -414,17 +414,17 @@ parse_calendar(xmlDocPtr doc)
 
       for (i=0;i!=nsetMonths->nodeNr;++i) {
         xmlNodePtr month = nsetMonths->nodeTab[i];
-        xmlChar * property = xmlGetProp(month, BAD_CAST "name");
+        xmlChar * propValue = xmlGetProp(month, BAD_CAST "name");
         int j;
 
-        if (property) {
-          if (newyear && strcmp((const char*)newyear, (const char*)property)==0) {
+        if (propValue) {
+          if (newyear && strcmp((const char*)newyear, (const char*)propValue)==0) {
             first_month = i;
             xmlFree(newyear);
             newyear = NULL;
           }
-          monthnames[i] = strdup(mkname("calendar", (const char*)property));
-          xmlFree(property);
+          monthnames[i] = strdup(mkname("calendar", (const char*)propValue));
+          xmlFree(propValue);
         }
         for (j=0;j!=seasons;++j) {
           xmlNodePtr season = month->parent;
@@ -461,10 +461,10 @@ parse_directions(xmlDocPtr doc)
     int k;
     for (k=0;k!=nsetDirections->nodeNr;++k) {
       xmlNodePtr dir = nsetDirections->nodeTab[k];
-      xmlChar * property = xmlGetProp(dir, BAD_CAST "name");
+      xmlChar * propValue = xmlGetProp(dir, BAD_CAST "name");
 
-      register_special_direction((const char *)property);
-      xmlFree(property);
+      register_special_direction((const char *)propValue);
+      xmlFree(propValue);
     }
   }
   xmlXPathFreeObject(xpathDirections);
@@ -486,16 +486,16 @@ parse_ships(xmlDocPtr doc)
     xmlNodeSetPtr nodes = ships->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       ship_type * st = calloc(sizeof(ship_type), 1);
       xmlXPathObjectPtr result;
       int k, c;
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      st->name[0] = strdup((const char *)property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
+      st->name[0] = strdup((const char *)propValue);
       st->name[1] = strcat(strcpy(malloc(strlen(st->name[0])+3), st->name[0]),"_a");
-      xmlFree(property);
+      xmlFree(propValue);
 
       st->cabins = xml_ivalue(node, "cabins", 0);
       st->cargo = xml_ivalue(node, "cargo", 0);
@@ -527,14 +527,14 @@ parse_ships(xmlDocPtr doc)
           st->coasts[result->nodesetval->nodeNr] = NULL;
         }
 
-        property = xmlGetProp(node, BAD_CAST "terrain");
-        assert(property!=NULL);
-        st->coasts[c] = get_terrain((const char*)property);
+        propValue = xmlGetProp(node, BAD_CAST "terrain");
+        assert(propValue!=NULL);
+        st->coasts[c] = get_terrain((const char*)propValue);
         if (st->coasts[c]!=NULL) ++c;
         else {
-          log_warning(("ship %s mentions a non-existing terrain %s.\n", st->name[0], property));
+          log_warning(("ship %s mentions a non-existing terrain %s.\n", st->name[0], propValue));
         }
-        xmlFree(property);
+        xmlFree(propValue);
       }
       xmlXPathFreeObject(result);
 
@@ -626,7 +626,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   weapon_type * wtype = NULL;
   unsigned int flags = WTF_NONE;
   xmlXPathObjectPtr result;
-  xmlChar * property;
+  xmlChar * propValue;
   int k;
   skill_t sk;
   int minskill = xml_ivalue(node, "minskill", 0);
@@ -642,11 +642,11 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   if (xml_bvalue(node, "cut", false)) flags |= WTF_CUT;
   if (xml_bvalue(node, "blunt", false)) flags |= WTF_BLUNT;
 
-  property = xmlGetProp(node, BAD_CAST "skill");
-  assert(property!=NULL);
-  sk = sk_find((const char*)property);
+  propValue = xmlGetProp(node, BAD_CAST "skill");
+  assert(propValue!=NULL);
+  sk = sk_find((const char*)propValue);
   assert(sk!=NOSKILL);
-  xmlFree(property);
+  xmlFree(propValue);
 
   wtype = new_weapontype(itype, flags, magres, NULL, offmod, defmod, reload, sk, minskill);
 
@@ -658,16 +658,16 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     xmlNodePtr node = result->nodesetval->nodeTab[k];
     int pos = 0;
 
-    property = xmlGetProp(node, BAD_CAST "type");
-    if (strcmp((const char *)property, "footman")!=0) {
+    propValue = xmlGetProp(node, BAD_CAST "type");
+    if (strcmp((const char *)propValue, "footman")!=0) {
       pos = 1;
     }
-    xmlFree(property);
+    xmlFree(propValue);
 
-    property = xmlGetProp(node, BAD_CAST "value");
-    wtype->damage[pos] = gc_add(strdup((const char*)property));
+    propValue = xmlGetProp(node, BAD_CAST "value");
+    wtype->damage[pos] = gc_add(strdup((const char*)propValue));
     if (k==0) wtype->damage[1-pos] = wtype->damage[pos];
-    xmlFree(property);
+    xmlFree(propValue);
   }
   xmlXPathFreeObject(result);
 
@@ -688,11 +688,11 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     if (xml_bvalue(node, "offensive", false)) flags|=WMF_OFFENSIVE;
     if (xml_bvalue(node, "defensive", false)) flags|=WMF_DEFENSIVE;
 
-    property = xmlGetProp(node, BAD_CAST "type");
-    if (strcmp((const char*)property, "damage")==0) flags|=WMF_DAMAGE;
-    else if (strcmp((const char*)property, "skill")==0) flags|=WMF_SKILL;
-    else if (strcmp((const char*)property, "missile_target")==0) flags|=WMF_MISSILE_TARGET;
-    xmlFree(property);
+    propValue = xmlGetProp(node, BAD_CAST "type");
+    if (strcmp((const char*)propValue, "damage")==0) flags|=WMF_DAMAGE;
+    else if (strcmp((const char*)propValue, "skill")==0) flags|=WMF_SKILL;
+    else if (strcmp((const char*)propValue, "missile_target")==0) flags|=WMF_MISSILE_TARGET;
+    xmlFree(propValue);
 
     wtype->modifiers[k].flags = flags;
     wtype->modifiers[k].value = xml_ivalue(node, "value", 0);
@@ -702,12 +702,12 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     for (r=0;r!=races->nodesetval->nodeNr;++r) {
       xmlNodePtr node = races->nodesetval->nodeTab[r];
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      if (property!=NULL) {
-        const race * rc = rc_find((const char*)property);
-        if (rc==NULL) rc = rc_add(rc_new((const char*)property));
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      if (propValue!=NULL) {
+        const race * rc = rc_find((const char*)propValue);
+        if (rc==NULL) rc = rc_add(rc_new((const char*)propValue));
         racelist_insert(&wtype->modifiers[k].races, rc);
-        xmlFree(property);
+        xmlFree(propValue);
       }
     }
     xmlXPathFreeObject(races);
@@ -720,24 +720,24 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      xmlChar * property;
+      xmlChar * propValue;
       pf_generic fun;
 
-      parse_function(node, &fun, &property);
+      parse_function(node, &fun, &propValue);
       if (fun==NULL) {
         log_error(("unknown function name '%s' for item '%s'\n",
-          (const char*)property, itype->rtype->_name[0]));
-        xmlFree(property);
+          (const char*)propValue, itype->rtype->_name[0]));
+        xmlFree(propValue);
         continue;
       }
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "attack")==0) {
+      assert(propValue!=NULL);
+      if (strcmp((const char*)propValue, "attack")==0) {
         wtype->attack = (boolean (*)(const struct troop*, const struct weapon_type *, int*))fun;
       } else {
         log_error(("unknown function type '%s' for item '%s'\n",
-          (const char*)property, itype->rtype->_name[0]));
+          (const char*)propValue, itype->rtype->_name[0]));
       }
-      xmlFree(property);
+      xmlFree(propValue);
     }
     xmlXPathFreeObject(result);
   }
@@ -821,28 +821,28 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      xmlChar * property;
+      xmlChar * propValue;
       pf_generic fun;
 
-      parse_function(node, &fun, &property);
+      parse_function(node, &fun, &propValue);
       if (fun==NULL) {
         log_error(("unknown function name '%s' for item '%s'\n",
-          (const char*)property, rtype->_name[0]));
-        xmlFree(property);
+          (const char*)propValue, rtype->_name[0]));
+        xmlFree(propValue);
         continue;
       }
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "give")==0) {
+      assert(propValue!=NULL);
+      if (strcmp((const char*)propValue, "give")==0) {
         itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
-      } else if (strcmp((const char*)property, "use")==0) {
+      } else if (strcmp((const char*)propValue, "use")==0) {
         itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
-      } else if (strcmp((const char*)property, "useonother")==0) {
+      } else if (strcmp((const char*)propValue, "useonother")==0) {
         itype->useonother = (int (*)(struct unit *, int targetno, const struct item_type *, int, struct order *))fun;
       } else {
         log_error(("unknown function type '%s' for item '%s'\n",
-          (const char*)property, rtype->_name[0]));
+          (const char*)propValue, rtype->_name[0]));
       }
-      xmlFree(property);
+      xmlFree(propValue);
     }
     xmlXPathFreeObject(result);
   }
@@ -863,7 +863,7 @@ parse_resources(xmlDocPtr doc)
   nodes = resources->nodesetval;
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar *property, *name, *appearance;
+    xmlChar *propValue, *name, *appearance;
     const char *names[2], *appearances[2];
     char * namep = NULL, * appearancep = NULL;
     resource_type * rtype;
@@ -918,26 +918,26 @@ parse_resources(xmlDocPtr doc)
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         pf_generic fun;
 
-        parse_function(node, &fun, &property);
+        parse_function(node, &fun, &propValue);
         if (fun==NULL) {
           log_error(("unknown function name '%s' for resource %s\n",
-            (const char*)property, rtype->_name[0]));
-          xmlFree(property);
+            (const char*)propValue, rtype->_name[0]));
+          xmlFree(propValue);
           continue;
         }
 
-        assert(property!=NULL);
-        if (strcmp((const char*)property, "change")==0) {
+        assert(propValue!=NULL);
+        if (strcmp((const char*)propValue, "change")==0) {
           rtype->uchange = (rtype_uchange)fun;
-        } else if (strcmp((const char*)property, "get")==0) {
+        } else if (strcmp((const char*)propValue, "get")==0) {
           rtype->uget = (rtype_uget)fun;
-        } else if (strcmp((const char*)property, "name")==0) {
+        } else if (strcmp((const char*)propValue, "name")==0) {
           rtype->name = (rtype_name)fun;
         } else {
           log_error(("unknown function type '%s' for resource %s\n",
-            (const char*)property, rtype->_name[0]));
+            (const char*)propValue, rtype->_name[0]));
         }
-        xmlFree(property);
+        xmlFree(propValue);
       }
       xmlXPathFreeObject(result);
     }
@@ -965,42 +965,42 @@ parse_resources(xmlDocPtr doc)
           building_type * btype = NULL;
           const race * rc = NULL;
 
-          property = xmlGetProp(node, BAD_CAST "race");
-          if (property!=NULL) {
-            rc = rc_find((const char*)property);
-            if (rc==NULL) rc = rc_add(rc_new((const char*)property));
-            xmlFree(property);
+          propValue = xmlGetProp(node, BAD_CAST "race");
+          if (propValue!=NULL) {
+            rc = rc_find((const char*)propValue);
+            if (rc==NULL) rc = rc_add(rc_new((const char*)propValue));
+            xmlFree(propValue);
           }
           rdata->modifiers[k].race = rc;
 
-          property = xmlGetProp(node, BAD_CAST "building");
-          if (property!=NULL) {
-            btype = bt_find((const char*)property);
+          propValue = xmlGetProp(node, BAD_CAST "building");
+          if (propValue!=NULL) {
+            btype = bt_find((const char*)propValue);
             if (btype==NULL) {
               btype = calloc(sizeof(building_type), 1);
-              btype->_name = strdup((const char *)property);
+              btype->_name = strdup((const char *)propValue);
               bt_register(btype);
             }
-            xmlFree(property);
+            xmlFree(propValue);
           }
           rdata->modifiers[k].btype = btype;
 
-          property = xmlGetProp(node, BAD_CAST "type");
-          assert(property!=NULL);
-          if (strcmp((const char *)property, "skill")==0) {
+          propValue = xmlGetProp(node, BAD_CAST "type");
+          assert(propValue!=NULL);
+          if (strcmp((const char *)propValue, "skill")==0) {
             rdata->modifiers[k].value.i = xml_ivalue(node, "value", 0);
             rdata->modifiers[k].flags |= RMF_SKILL;
-          } else if (strcmp((const char *)property, "material")==0) {
+          } else if (strcmp((const char *)propValue, "material")==0) {
             rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
             rdata->modifiers[k].flags |= RMF_SAVEMATERIAL;
-          } else if (strcmp((const char *)property, "resource")==0) {
+          } else if (strcmp((const char *)propValue, "resource")==0) {
             rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
             rdata->modifiers[k].flags |= RMF_SAVERESOURCE;
           } else {
             log_error(("unknown type '%s' for resourcelimit-modifier '%s'\n",
-              (const char*)property, rtype->_name[0]));
+              (const char*)propValue, rtype->_name[0]));
           }
-          xmlFree(property);
+          xmlFree(propValue);
         }
       }
       xmlXPathFreeObject(result);
@@ -1008,15 +1008,15 @@ parse_resources(xmlDocPtr doc)
       result = xmlXPathEvalExpression(BAD_CAST "guard", xpath);
       if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
-        xmlChar * flag = xmlGetProp(node, BAD_CAST "flag");
+        xmlChar * propFlag = xmlGetProp(node, BAD_CAST "flag");
         
-        if (flag!=NULL) {
-          if (strcmp((char*)flag, "logging")==0) {
+        if (propFlag!=NULL) {
+          if (strcmp((const char *)propFlag, "logging")==0) {
             rdata->guard |= GUARD_TREES;
-          } else if (strcmp((char*)flag, "mining")==0) {
+          } else if (strcmp((const char *)propFlag, "mining")==0) {
             rdata->guard |= GUARD_MINING;
           }
-          xmlFree(flag);
+          xmlFree(propFlag);
         }
       }
       xmlXPathFreeObject(result);
@@ -1027,28 +1027,28 @@ parse_resources(xmlDocPtr doc)
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         pf_generic fun;
 
-        property = xmlGetProp(node, BAD_CAST "value");
-        assert(property!=NULL);
-        fun = get_function((const char*)property);
+        propValue = xmlGetProp(node, BAD_CAST "value");
+        assert(propValue!=NULL);
+        fun = get_function((const char*)propValue);
         if (fun==NULL) {
           log_error(("unknown limit '%s' for resource %s\n",
-            (const char*)property, rtype->_name[0]));
-          xmlFree(property);
+            (const char*)propValue, rtype->_name[0]));
+          xmlFree(propValue);
           continue;
         }
-        xmlFree(property);
+        xmlFree(propValue);
 
-        property = xmlGetProp(node, BAD_CAST "name");
-        assert(property!=NULL);
-        if (strcmp((const char*)property, "produce")==0) {
+        propValue = xmlGetProp(node, BAD_CAST "name");
+        assert(propValue!=NULL);
+        if (strcmp((const char*)propValue, "produce")==0) {
           rdata->produce = (rlimit_produce)fun;
-        } else if (strcmp((const char*)property, "limit")==0) {
+        } else if (strcmp((const char*)propValue, "limit")==0) {
           rdata->limit = (rlimit_limit)fun;
         } else {
           log_error(("unknown limit '%s' for resource %s\n",
-            (const char*)property, rtype->_name[0]));
+            (const char*)propValue, rtype->_name[0]));
         }
-        xmlFree(property);
+        xmlFree(propValue);
       }
     }
     xmlXPathFreeObject(result);
@@ -1086,18 +1086,18 @@ add_items(equipment * eq, xmlNodeSetPtr nsetItems)
     int i;
     for (i=0;i!=nsetItems->nodeNr;++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       const struct item_type * itype;
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      itype = it_find((const char*)property);
-      xmlFree(property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
+      itype = it_find((const char*)propValue);
+      xmlFree(propValue);
       if (itype!=NULL) {
-        property = xmlGetProp(node, BAD_CAST "amount");
-        if (property!=NULL) {
-          equipment_setitem(eq, itype, (const char*)property);
-          xmlFree(property);
+        propValue = xmlGetProp(node, BAD_CAST "amount");
+        if (propValue!=NULL) {
+          equipment_setitem(eq, itype, (const char*)propValue);
+          xmlFree(propValue);
         }
       }
     }
@@ -1111,16 +1111,16 @@ add_callbacks(equipment * eq, xmlNodeSetPtr nsetItems)
     int i;
     for (i=0;i!=nsetItems->nodeNr;++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       pf_generic fun;
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      if (property!=NULL) {
-        fun = get_function((const char*)property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      if (propValue!=NULL) {
+        fun = get_function((const char*)propValue);
         if (fun) {
           equipment_setcallback(eq, (void (*)(const struct equipment *, struct unit *))fun);
         }
-        xmlFree(property);
+        xmlFree(propValue);
       }
     }
   }
@@ -1133,24 +1133,24 @@ add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
     int i;
     for (i=0;i!=nsetItems->nodeNr;++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       magic_t mtype = M_GRAU;
       struct spell * sp;
 
-      property = xmlGetProp(node, BAD_CAST "school");
-      if (property!=NULL) {
+      propValue = xmlGetProp(node, BAD_CAST "school");
+      if (propValue!=NULL) {
         for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
-          if (strcmp((const char*)property, magietypen[mtype])==0) break;
+          if (strcmp((const char*)propValue, magietypen[mtype])==0) break;
         }
         assert(mtype!=MAXMAGIETYP);
-        xmlFree(property);
+        xmlFree(propValue);
       }
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      sp = find_spell(mtype, (const char*)property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
+      sp = find_spell(mtype, (const char*)propValue);
       assert(sp);
-      xmlFree(property);
+      xmlFree(propValue);
       if (sp!=NULL) {
         equipment_addspell(eq, sp);
       }
@@ -1165,18 +1165,18 @@ add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
     int i;
     for (i=0;i!=nsetSkills->nodeNr;++i) {
       xmlNodePtr node = nsetSkills->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       skill_t sk;
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      sk = sk_find((const char*)property);
-      xmlFree(property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
+      sk = sk_find((const char*)propValue);
+      xmlFree(propValue);
       if (sk!=NOSKILL) {
-        property = xmlGetProp(node, BAD_CAST "level");
-        if (property!=NULL) {
-          equipment_setskill(eq, sk, (const char*)property);
-          xmlFree(property);
+        propValue = xmlGetProp(node, BAD_CAST "level");
+        if (propValue!=NULL) {
+          equipment_setskill(eq, sk, (const char*)propValue);
+          xmlFree(propValue);
         } 
       }
     }
@@ -1194,13 +1194,13 @@ add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSubsets)
     for (i=0;i!=nsetSubsets->nodeNr;++i) {
       xmlXPathObjectPtr xpathResult;
       xmlNodePtr node = nsetSubsets->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
 
       eq->subsets[i].chance = 1.0f;
-      property = xmlGetProp(node, BAD_CAST "chance");
-      if (property!=NULL) {
-        eq->subsets[i].chance = (float)atof((const char *)property);
-        xmlFree(property);
+      propValue = xmlGetProp(node, BAD_CAST "chance");
+      if (propValue!=NULL) {
+        eq->subsets[i].chance = (float)atof((const char *)propValue);
+        xmlFree(propValue);
       }
       xpath->node = node;
       xpathResult = xmlXPathEvalExpression(BAD_CAST "set", xpath);
@@ -1215,18 +1215,18 @@ add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSubsets)
             xmlNodePtr nodeSet = nsetSets->nodeTab[set];
             float chance = 1.0f;
 
-            property = xmlGetProp(nodeSet, BAD_CAST "chance");
-            if (property!=NULL) {
-              chance = (float)atof((const char *)property);
-              xmlFree(property);
+            propValue = xmlGetProp(nodeSet, BAD_CAST "chance");
+            if (propValue!=NULL) {
+              chance = (float)atof((const char *)propValue);
+              xmlFree(propValue);
             }
             totalChance += chance;
 
-            property = xmlGetProp(nodeSet, BAD_CAST "name");
-            assert(property!=NULL);
+            propValue = xmlGetProp(nodeSet, BAD_CAST "name");
+            assert(propValue!=NULL);
             eq->subsets[i].sets[set].chance = chance;
-            eq->subsets[i].sets[set].set = create_equipment((const char*)property);
-            xmlFree(property);
+            eq->subsets[i].sets[set].set = create_equipment((const char*)propValue);
+            xmlFree(propValue);
           }
         }
         if (totalChance>1.0f) {
@@ -1254,10 +1254,10 @@ parse_equipment(xmlDocPtr doc)
 
     for (i=0;i!=nsetRaces->nodeNr;++i) {
       xmlNodePtr node = nsetRaces->nodeTab[i];
-      xmlChar * property = xmlGetProp(node, BAD_CAST "name");
+      xmlChar * propName = xmlGetProp(node, BAD_CAST "name");
 
-      if (property!=NULL) {
-        equipment * eq = create_equipment((const char*)property);
+      if (propName!=NULL) {
+        equipment * eq = create_equipment((const char*)propName);
         xmlXPathObjectPtr xpathResult;
 
         xpath->node = node;
@@ -1282,7 +1282,7 @@ parse_equipment(xmlDocPtr doc)
         add_subsets(doc, eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 
-        xmlFree(property);
+        xmlFree(propName);
       }
     }
   }
@@ -1308,29 +1308,29 @@ parse_spells(xmlDocPtr doc)
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlXPathObjectPtr result;
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * property;
+      xmlChar * propValue;
       int k;
       spell * sp = calloc(1, sizeof(spell));
 
       /* spellname */
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
-      sp->sname = strdup((const char*)property);
-      xmlFree(property);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
+      sp->sname = strdup((const char*)propValue);
+      xmlFree(propValue);
 
-      property = xmlGetProp(node, BAD_CAST "parameters");
-      if (property) {
-        sp->parameter=strdup((const char *)property);
-        xmlFree(property);
+      propValue = xmlGetProp(node, BAD_CAST "parameters");
+      if (propValue) {
+        sp->parameter=strdup((const char *)propValue);
+        xmlFree(propValue);
       }
       /* magic type */
-      property = xmlGetProp(node, BAD_CAST "type");
-      assert(property!=NULL);
+      propValue = xmlGetProp(node, BAD_CAST "type");
+      assert(propValue!=NULL);
       for (sp->magietyp=0;sp->magietyp!=MAXMAGIETYP;++sp->magietyp) {
-        if (strcmp(magietypen[sp->magietyp], (const char *)property)==0) break;
+        if (strcmp(magietypen[sp->magietyp], (const char *)propValue)==0) break;
       }
       assert(sp->magietyp!=MAXMAGIETYP);
-      xmlFree(property);
+      xmlFree(propValue);
 
       /* level, rank and flags */
       sp->id = xml_ivalue(node, "index", 0);
@@ -1350,23 +1350,23 @@ parse_spells(xmlDocPtr doc)
           xmlNodePtr node = result->nodesetval->nodeTab[k];
           pf_generic fun;
 
-          parse_function(node, &fun, &property);
+          parse_function(node, &fun, &propValue);
           if (fun==NULL) {
             log_error(("unknown function name '%s' for spell '%s'\n",
-              (const char*)property, sp->sname));
-            xmlFree(property);
+              (const char*)propValue, sp->sname));
+            xmlFree(propValue);
             continue;
           }
-          assert(property!=NULL);
-          if (strcmp((const char*)property, "cast")==0) {
+          assert(propValue!=NULL);
+          if (strcmp((const char*)propValue, "cast")==0) {
             sp->sp_function = (spell_f)fun;
-          } else if (strcmp((const char*)property, "fumble")==0) {
+          } else if (strcmp((const char*)propValue, "fumble")==0) {
             sp->patzer = (pspell_f)fun;
           } else {
             log_error(("unknown function type '%s' for spell %s\n", 
-              (const char*)property, sp->sname));
+              (const char*)propValue, sp->sname));
           }
-          xmlFree(property);
+          xmlFree(propValue);
         }
         xmlXPathFreeObject(result);
       }
@@ -1380,21 +1380,21 @@ parse_spells(xmlDocPtr doc)
       }
       for (k=0;k!=result->nodesetval->nodeNr;++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
-        property = xmlGetProp(node, BAD_CAST "name");
-        assert(property);
-        sp->components[k].type = rt_find((const char *)property);
+        propValue = xmlGetProp(node, BAD_CAST "name");
+        assert(propValue);
+        sp->components[k].type = rt_find((const char *)propValue);
         assert(sp->components[k].type);
-        xmlFree(property);
+        xmlFree(propValue);
         sp->components[k].amount = xml_ivalue(node, "amount", 1);
         sp->components[k].cost = SPC_FIX;
-        property = xmlGetProp(node, BAD_CAST "cost");
-        if (property!=NULL) {
-          if (strcmp((const char *)property, "linear")==0) {
+        propValue = xmlGetProp(node, BAD_CAST "cost");
+        if (propValue!=NULL) {
+          if (strcmp((const char *)propValue, "linear")==0) {
             sp->components[k].cost = SPC_LINEAR;
-          } else if (strcmp((const char *)property, "level")==0) {
+          } else if (strcmp((const char *)propValue, "level")==0) {
             sp->components[k].cost = SPC_LEVEL;
           }
-          xmlFree(property);
+          xmlFree(propValue);
         }
       }
       xmlXPathFreeObject(result);
@@ -1424,22 +1424,22 @@ parse_races(xmlDocPtr doc)
   nodes = races->nodesetval;
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * property;
+    xmlChar * propValue;
     race * rc;
     xmlXPathObjectPtr result;
     int k;
     struct att * attack;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    rc = rc_find((const char*)property);
-    if (rc==NULL) rc = rc_add(rc_new((const char*)property));
-    xmlFree(property);
+    propValue = xmlGetProp(node, BAD_CAST "name");
+    assert(propValue!=NULL);
+    rc = rc_find((const char*)propValue);
+    if (rc==NULL) rc = rc_add(rc_new((const char*)propValue));
+    xmlFree(propValue);
 
-    property = xmlGetProp(node, BAD_CAST "damage");
-    assert(property!=NULL);
-    rc->def_damage = strdup((const char*)property);
-    xmlFree(property);
+    propValue = xmlGetProp(node, BAD_CAST "damage");
+    assert(propValue!=NULL);
+    rc->def_damage = strdup((const char*)propValue);
+    xmlFree(propValue);
 
     rc->magres = (float)xml_fvalue(node, "magres", 0.0);
     rc->maxaura = (float)xml_fvalue(node, "maxaura", 0.0);
@@ -1519,18 +1519,18 @@ parse_races(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       int mod = xml_ivalue(node, "modifier", 0);
 
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property!=NULL);
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue!=NULL);
       if (mod!=0) {
-        skill_t sk = sk_find((const char*)property);
+        skill_t sk = sk_find((const char*)propValue);
         if (sk!=NOSKILL) {
           rc->bonus[sk] = (char)mod;
         } else {
           log_error(("unknown skill '%s' in race '%s'\n",
-            (const char*)property, rc->_name[0]));
+            (const char*)propValue, rc->_name[0]));
         }
       }
-      xmlFree(property);
+      xmlFree(propValue);
     }
     xmlXPathFreeObject(result);
 
@@ -1542,31 +1542,31 @@ parse_races(xmlDocPtr doc)
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         pf_generic fun;
 
-        parse_function(node, &fun, &property);
+        parse_function(node, &fun, &propValue);
         if (fun==NULL) {
           log_error(("unknown function name '%s' for race %s\n",
-            (const char*)property, rc->_name[0]));
-          xmlFree(property);
+            (const char*)propValue, rc->_name[0]));
+          xmlFree(propValue);
           continue;
         }
-        assert(property!=NULL);
-        if (strcmp((const char*)property, "name")==0) {
-          rc->generate_name = (const xmlChar* (*)(const struct unit*))fun;
-        } else if (strcmp((const char*)property, "describe")==0) {
-          rc->describe = (const xmlChar* (*)(const struct unit*, const struct locale *))fun;
-        } else if (strcmp((const char*)property, "age")==0) {
+        assert(propValue!=NULL);
+        if (strcmp((const char*)propValue, "name")==0) {
+          rc->generate_name = (const char * (*)(const struct unit*))fun;
+        } else if (strcmp((const char*)propValue, "describe")==0) {
+          rc->describe = (const char * (*)(const struct unit*, const struct locale *))fun;
+        } else if (strcmp((const char*)propValue, "age")==0) {
           rc->age = (void(*)(struct unit*))fun;
-        } else if (strcmp((const char*)property, "move")==0) {
+        } else if (strcmp((const char*)propValue, "move")==0) {
           rc->move_allowed = (boolean(*)(const struct region *, const struct region *))fun;
-        } else if (strcmp((const char*)property, "itemdrop")==0) {
+        } else if (strcmp((const char*)propValue, "itemdrop")==0) {
           rc->itemdrop = (struct item *(*)(const struct race *, int))fun;
-        } else if (strcmp((const char*)property, "initfamiliar")==0) {
+        } else if (strcmp((const char*)propValue, "initfamiliar")==0) {
           rc->init_familiar = (void(*)(struct unit *))fun;
         } else {
           log_error(("unknown function type '%s' for race %s\n",
-            (const char*)property, rc->_name[0]));
+            (const char*)propValue, rc->_name[0]));
         }
-        xmlFree(property);
+        xmlFree(propValue);
       }
       xmlXPathFreeObject(result);
     }
@@ -1578,14 +1578,14 @@ parse_races(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       race * frc;
 
-      property = xmlGetProp(node, BAD_CAST "race");
-      assert(property!=NULL);
-      frc = rc_find((const char *)property);
+      propValue = xmlGetProp(node, BAD_CAST "race");
+      assert(propValue!=NULL);
+      frc = rc_find((const char *)propValue);
       if (frc == NULL) {
         log_error(("%s not registered, is familiar for %s\n",
-          (const char*)property, rc->_name[0]));
+          (const char*)propValue, rc->_name[0]));
         assert(frc!=NULL);
-        frc = rc_add(rc_new((const char*)property));
+        frc = rc_add(rc_new((const char*)propValue));
       }
       if (xml_bvalue(node, "default", false)) {
         rc->familiars[k] = rc->familiars[0];
@@ -1593,7 +1593,7 @@ parse_races(xmlDocPtr doc)
       } else {
         rc->familiars[k] = frc;
       }
-      xmlFree(property);
+      xmlFree(propValue);
     }
     xmlXPathFreeObject(result);
 
@@ -1615,10 +1615,10 @@ parse_races(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       while (attack->type!=AT_NONE) ++attack;
 
-      property = xmlGetProp(node, BAD_CAST "damage");
-      if (property!=NULL) {
-        attack->data.dice = strdup((const char*)property);
-        xmlFree(property);
+      propValue = xmlGetProp(node, BAD_CAST "damage");
+      if (propValue!=NULL) {
+        attack->data.dice = strdup((const char*)propValue);
+        xmlFree(propValue);
       } else {
         attack->data.sp = xml_spell(node, "spell");
       }
@@ -1651,14 +1651,14 @@ parse_terrains(xmlDocPtr doc)
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
     terrain_type * terrain = calloc(1, sizeof(terrain_type));
-    xmlChar * property;
+    xmlChar * propValue;
     xmlXPathObjectPtr xpathChildren;
     xmlNodeSetPtr children;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    terrain->_name = strdup((const char *)property);
-    xmlFree(property);
+    propValue = xmlGetProp(node, BAD_CAST "name");
+    assert(propValue!=NULL);
+    terrain->_name = strdup((const char *)propValue);
+    xmlFree(propValue);
 
     terrain->max_road = (short)xml_ivalue(node, "road", -1);
     terrain->size = xml_ivalue(node, "size", 0);
@@ -1691,12 +1691,12 @@ parse_terrains(xmlDocPtr doc)
         xmlNodePtr nodeHerb = children->nodeTab[k];
         const struct resource_type * rtype;
 
-        property = xmlGetProp(nodeHerb, BAD_CAST "name");
-        assert(property!=NULL);
-        rtype = rt_find((const char*)property);
+        propValue = xmlGetProp(nodeHerb, BAD_CAST "name");
+        assert(propValue!=NULL);
+        rtype = rt_find((const char*)propValue);
         assert(rtype!=NULL && rtype->itype!=NULL && fval(rtype->itype, ITF_HERB));
         terrain->herbs[k] = rtype->itype;
-        xmlFree(property);
+        xmlFree(propValue);
       }
     }
     xmlXPathFreeObject(xpathChildren);
@@ -1712,26 +1712,26 @@ parse_terrains(xmlDocPtr doc)
       for (k=0;k!=children->nodeNr;++k) {
         xmlNodePtr nodeProd = children->nodeTab[k];
 
-        property = xmlGetProp(nodeProd, BAD_CAST "name");
-        assert(property!=NULL);
-        terrain->production[k].type = rt_find((const char*)property);
+        propValue = xmlGetProp(nodeProd, BAD_CAST "name");
+        assert(propValue!=NULL);
+        terrain->production[k].type = rt_find((const char*)propValue);
         assert(terrain->production[k].type);
-        xmlFree(property);
+        xmlFree(propValue);
 
-        property = xmlGetProp(nodeProd, BAD_CAST "level");
-        assert(property);
-        terrain->production[k].startlevel = strdup((const char *)property);
-        xmlFree(property);
+        propValue = xmlGetProp(nodeProd, BAD_CAST "level");
+        assert(propValue);
+        terrain->production[k].startlevel = strdup((const char *)propValue);
+        xmlFree(propValue);
 
-        property = xmlGetProp(nodeProd, BAD_CAST "base");
-        assert(property);
-        terrain->production[k].base = strdup((const char *)property);
-        xmlFree(property);
+        propValue = xmlGetProp(nodeProd, BAD_CAST "base");
+        assert(propValue);
+        terrain->production[k].base = strdup((const char *)propValue);
+        xmlFree(propValue);
 
-        property = xmlGetProp(nodeProd, BAD_CAST "div");
-        assert(property);
-        terrain->production[k].divisor = strdup((const char *)property);
-        xmlFree(property);
+        propValue = xmlGetProp(nodeProd, BAD_CAST "div");
+        assert(propValue);
+        terrain->production[k].divisor = strdup((const char *)propValue);
+        xmlFree(propValue);
 
         terrain->production[k].chance = (float)xml_fvalue(nodeProd, "chance", 1.0);
       }
@@ -1766,8 +1766,8 @@ parse_messages(xmlDocPtr doc)
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
     const char * default_section = "events";
-    xmlChar * section;
-    xmlChar * property;
+    xmlChar * propSection;
+    xmlChar * propValue;
     xmlXPathObjectPtr result;
     int k;
     char ** argv = NULL;
@@ -1781,13 +1781,13 @@ parse_messages(xmlDocPtr doc)
       for (k=0;k!=result->nodesetval->nodeNr;++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         char zBuffer[128];
-        xmlChar * name, * type;
+        xmlChar * propName, * propType;
 
-        name = xmlGetProp(node, BAD_CAST "name");
-        type = xmlGetProp(node, BAD_CAST "type");
-        sprintf(zBuffer, "%s:%s", (const char*)name, (const char*)type);
-        xmlFree(name);
-        xmlFree(type);
+        propName = xmlGetProp(node, BAD_CAST "name");
+        propType = xmlGetProp(node, BAD_CAST "type");
+        sprintf(zBuffer, "%s:%s", (const char*)propName, (const char*)propType);
+        xmlFree(propName);
+        xmlFree(propType);
         argv[k] = strdup(zBuffer);
       }
       argv[result->nodesetval->nodeNr] = NULL;
@@ -1795,14 +1795,14 @@ parse_messages(xmlDocPtr doc)
     xmlXPathFreeObject(result);
 
     /* add the messagetype */
-    property = xmlGetProp(node, BAD_CAST "name");
-    mtype = mt_find((const char *)property);
+    propValue = xmlGetProp(node, BAD_CAST "name");
+    mtype = mt_find((const char *)propValue);
     if (mtype==NULL) {
-      mtype = mt_register(mt_new((const char *)property, (const char**)argv));
+      mtype = mt_register(mt_new((const char *)propValue, (const char**)argv));
     } else {
       assert(argv!=NULL || !"cannot redefine arguments of message now");
     }
-    xmlFree(property);
+    xmlFree(propValue);
 
     /* register the type for the CR */
     crt_register(mtype);
@@ -1813,8 +1813,8 @@ parse_messages(xmlDocPtr doc)
       free(argv);
     }
 
-    section = xmlGetProp(node, BAD_CAST "section");
-    if (section==NULL) section = BAD_CAST default_section;
+    propSection = xmlGetProp(node, BAD_CAST "section");
+    if (propSection==NULL) propSection = BAD_CAST default_section;
 
     /* strings */
     xpath->node = node;
@@ -1822,17 +1822,17 @@ parse_messages(xmlDocPtr doc)
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       struct locale * lang;
-      xmlChar * text;
+      xmlChar * propText;
 
-      xml_readtext(node, &lang, &text);
-      xml_cleanup_string(text);
-      nrt_register(mtype, lang, (const char *)text, 0, (const char*)section);
-      xmlFree(text);
+      xml_readtext(node, &lang, &propText);
+      xml_cleanup_string(propText);
+      nrt_register(mtype, lang, (const char *)propText, 0, (const char*)propSection);
+      xmlFree(propText);
 
     }
     xmlXPathFreeObject(result);
 
-    if (section != BAD_CAST default_section) xmlFree(section);
+    if (propSection != BAD_CAST default_section) xmlFree(propSection);
   }
 
   xmlXPathFreeObject(messages);
@@ -1848,17 +1848,17 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
 
   for (i=0;i!=nodeNr;++i) {
     xmlNodePtr stringNode = nodeTab[i];
-    xmlChar * name = xmlGetProp(stringNode, BAD_CAST "name");
-    xmlChar * nspc = NULL;
+    xmlChar * propName = xmlGetProp(stringNode, BAD_CAST "name");
+    xmlChar * propNamespace = NULL;
     xmlXPathObjectPtr result;
     int k;
     char zName[128];
 
-    assert(name!=NULL);
-    if (names) nspc = xmlGetProp(stringNode->parent, BAD_CAST "name");
-    mkname_buf((const char*)nspc, (const char*)name, zName);
-    if (nspc!=NULL) xmlFree(nspc);
-    xmlFree(name);
+    assert(propName!=NULL);
+    if (names) propNamespace = xmlGetProp(stringNode->parent, BAD_CAST "name");
+    mkname_buf((const char*)propNamespace, (const char*)propName, zName);
+    if (propNamespace!=NULL) xmlFree(propNamespace);
+    xmlFree(propName);
 
     /* strings */
     xpath->node = stringNode;
@@ -1866,14 +1866,14 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr textNode = result->nodesetval->nodeTab[k];
       struct locale * lang;
-      xmlChar * text;
+      xmlChar * propText;
 
-      xml_readtext(textNode, &lang, &text);
-      if (text!=NULL) {
+      xml_readtext(textNode, &lang, &propText);
+      if (propText!=NULL) {
         assert(strcmp(zName, (const char*)xml_cleanup_string(BAD_CAST zName))==0);
-        xml_cleanup_string(text);
-        locale_setstring(lang, zName, text);
-        xmlFree(text);
+        xml_cleanup_string(propText);
+        locale_setstring(lang, zName, (const char *)propText);
+        xmlFree(propText);
       } else {
         log_warning(("string %s has no text in locale %s\n",
           zName, locale_name(lang)));
@@ -1909,11 +1909,11 @@ xml_readprefixes(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, boo
 
   for (i=0;i!=nodeNr;++i) {
     xmlNodePtr node = nodeTab[i];
-    xmlChar * text = xmlNodeListGetString(node->doc, node->children, 1);
+    xmlChar * propText = xmlNodeListGetString(node->doc, node->children, 1);
 
-    if (text!=NULL) {
-      add_raceprefix((const char*)text);
-      xmlFree(text);
+    if (propText!=NULL) {
+      add_raceprefix((const char*)propText);
+      xmlFree(propText);
     }
   }
 }
@@ -1941,7 +1941,7 @@ parse_main(xmlDocPtr doc)
   xmlNodeSetPtr nodes = result->nodesetval;
   int i;
 
-  xmlChar * property;
+  xmlChar * propValue;
   if (nodes->nodeNr>0) {
     xmlNodePtr node = nodes->nodeTab[0];
 
@@ -1949,10 +1949,10 @@ parse_main(xmlDocPtr doc)
     global.producexpchance = (float)xml_fvalue(node, "learningbydoing", 1.0/3);
     global.maxunits = xml_ivalue(node, "units", INT_MAX);
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    if (property!=NULL) {
-      global.gamename = strdup((const char*)property);
-      xmlFree(property);
+    propValue = xmlGetProp(node, BAD_CAST "name");
+    if (propValue!=NULL) {
+      global.gamename = strdup((const char*)propValue);
+      xmlFree(propValue);
     }
 
     xmlXPathFreeObject(result);
@@ -1963,13 +1963,13 @@ parse_main(xmlDocPtr doc)
     nodes = result->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * name = xmlGetProp(node, BAD_CAST "name");
-      xmlChar * value = xmlGetProp(node, BAD_CAST "value");
+      xmlChar * propName = xmlGetProp(node, BAD_CAST "name");
+      xmlChar * propValue = xmlGetProp(node, BAD_CAST "value");
 
-      set_param(&global.parameters, (const char*)name, (const char*)value);
+      set_param(&global.parameters, (const char*)propName, (const char*)propValue);
 
-      xmlFree(name);
-      xmlFree(value);
+      xmlFree(propName);
+      xmlFree(propValue);
     }
 
     xmlXPathFreeObject(result);
@@ -1979,22 +1979,22 @@ parse_main(xmlDocPtr doc)
     nodes = result->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+      xmlChar * propName = xmlGetProp(node, BAD_CAST "name");
       boolean disable = xml_bvalue(node, "disable", false);
 
       if (disable) {
         int k;
         for (k=0;k!=MAXKEYWORDS;++k) {
-          if (strcmp(keywords[k], (const char*)name)==0) {
+          if (strcmp(keywords[k], (const char*)propName)==0) {
             global.disabled[k]=1;
             break;
           }
         }
         if (k==MAXKEYWORDS) {
-          log_error(("trying to disable unknown comand %s\n", (const char*)name));
+          log_error(("trying to disable unknown comand %s\n", (const char*)propName));
         }
       }
-      xmlFree(name);
+      xmlFree(propName);
     }
 
     xmlXPathFreeObject(result);
@@ -2004,10 +2004,10 @@ parse_main(xmlDocPtr doc)
     nodes = result->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+      xmlChar * propName = xmlGetProp(node, BAD_CAST "name");
       boolean enable = xml_bvalue(node, "enable", true);
-      enable_skill((const char*)name, enable);
-      xmlFree(name);
+      enable_skill((const char*)propName, enable);
+      xmlFree(propName);
     }
   }
   xmlXPathFreeObject(result);

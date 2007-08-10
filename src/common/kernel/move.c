@@ -908,14 +908,14 @@ static void
 cycle_route(order * ord, unit *u, int gereist)
 {
 	int cm = 0;
-	xmlChar tail[1024];
-	xmlChar neworder[2048];
-	const xmlChar *token;
+	char tail[1024];
+	char neworder[2048];
+	const char *token;
 	direction_t d = NODIRECTION;
 	boolean paused = false;
 	boolean pause;
   order * norder;
-  xmlChar * tail_end = tail;
+  char * tail_end = tail;
 
 	if (get_keyword(ord) != K_ROUTE) return;
 	tail[0] = '\0';
@@ -939,32 +939,32 @@ cycle_route(order * ord, unit *u, int gereist)
 			assert(!pause);
       if (!pause) {
         size_t size = sizeof(tail)-(tail_end-tail);
-        const xmlChar * loc = LOC(lang, shortdirections[d]);
+        const char * loc = LOC(lang, shortdirections[d]);
         *tail_end++ = ' ';
-        tail_end += strlcpy((char*)tail_end, (const char *)loc, size-1);
+        tail_end += strlcpy(tail_end, loc, size-1);
       }
 		}
-		else if (xstrlen(neworder)>sizeof(neworder)/2) break;
+		else if (strlen(neworder)>sizeof(neworder)/2) break;
 		else if (cm == gereist && !paused && pause) {
       size_t size = sizeof(tail)-(tail_end-tail);
-      const xmlChar * loc = LOC(lang, parameters[P_PAUSE]);
+      const char * loc = LOC(lang, parameters[P_PAUSE]);
       *tail_end++ = ' ';
-      tail_end += strlcpy((char*)tail_end, (const char *)loc, size-1);
+      tail_end += strlcpy(tail_end, loc, size-1);
 			paused = true;
 		}
 		else if (pause) {
 			/* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
 			 * hier keine normale direction), muss jede PAUSE einzeln
 			 * herausgefiltert und explizit gesetzt werden */
-      strcat((char *)neworder, " ");
-      strcat((char *)neworder, (const char *)LOC(lang, parameters[P_PAUSE]));
+      if (neworder[0]) strcat(neworder, " ");
+      strcat(neworder, LOC(lang, parameters[P_PAUSE]));
 		} else {
-      strcat((char *)neworder, " ");
-			strcat((char *)neworder, (const char *)LOC(lang, shortdirections[d]));
+      if (neworder[0]) strcat(neworder, " ");
+			strcat(neworder, LOC(lang, shortdirections[d]));
 		}
 	}
 
-	strcat((char *)neworder, (const char *)tail);
+	strcat(neworder, tail);
   norder = create_order(K_ROUTE, u->faction->locale, "%s", neworder);
 #ifdef LASTORDER
 	set_order(&u->lastorder, norder);
@@ -1228,7 +1228,7 @@ make_route(unit * u, order * ord, region_list ** routep)
   region_list **iroute = routep;
   region * current = u->region;
   region * next = NULL;
-  const xmlChar * token = getstrtoken();
+  const char * token = getstrtoken();
   int error = movewhere(u, token, current, &next);
 
   if (error!=E_MOVE_OK) {
@@ -1622,7 +1622,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   faction * f = u->faction;
   region * next_point = NULL;
   int error;
-  const xmlChar * token = getstrtoken();
+  const char * token = getstrtoken();
 
   if (routep) *routep = NULL;
 
@@ -1654,7 +1654,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   * befahrene Region. */
 
   while (next_point && current_point!=next_point && step < k) {
-    const xmlChar * token;
+    const char * token;
     int error;
     const terrain_type * tthis = current_point->terrain;
     /* these values need to be updated if next_point changes (due to storms): */
@@ -2117,7 +2117,7 @@ piracy_cmd(unit *u, struct order * ord)
   } aff[MAXDIRECTIONS];
   int saff = 0;
   int *il = NULL;
-  const xmlChar *s;
+  const char *s;
   attrib *a;
   
   if (!sh) {
@@ -2140,7 +2140,7 @@ piracy_cmd(unit *u, struct order * ord)
   if (s!=NULL && *s) {
     il = intlist_init();
     while (s && *s) {
-      il = intlist_add(il, atoi36((const char *)s));
+      il = intlist_add(il, atoi36(s));
       s = getstrtoken();
     }
   }
@@ -2262,7 +2262,7 @@ hunt(unit *u, order * ord)
 {
   region *rc = u->region;
   int moves, id, speed;
-  xmlChar command[256];
+  char command[256];
   size_t size = sizeof(command);
   direction_t dir;
 
@@ -2301,9 +2301,9 @@ hunt(unit *u, order * ord)
     return 0;
   }
 
-  sprintf((char *)command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+  sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
     locale_string(u->faction->locale, directions[dir]));
-  size -= xstrlen(command);
+  size -= strlen(command);
   moves = 1;
 
   speed = getuint();
@@ -2316,8 +2316,8 @@ hunt(unit *u, order * ord)
   rc = rconnect(rc, dir);
   while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
   {
-    size -= xstrlcat(command, " ", size);
-    size -= xstrlcat(command, LOC(u->faction->locale, directions[dir]), size);
+    size -= strlcat(command, " ", size);
+    size -= strlcat(command, LOC(u->faction->locale, directions[dir]), size);
     moves++;
     rc = rconnect(rc, dir);
   }

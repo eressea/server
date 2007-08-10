@@ -72,12 +72,7 @@ lc_write(const struct attrib * a, FILE* F)
   building * b = data->b;
 
   write_building_reference(b, F);
-  fwritestr(F, fname);
-#if RELEASE_VERSION>=BACTION_VERSION
-  fputc(' ', F);
-  fwritestr(F, fparam?fparam:NULLSTRING);
-#endif
-  fputc(' ', F);
+  fprintf(F, "%s %s ", fname, fparam?fparam:NULLSTRING);
 }
 
 static int
@@ -87,10 +82,10 @@ lc_read(struct attrib * a, FILE* F)
   building_action * data = (building_action*)a->data.v;
 
   read_building_reference(&data->b, F);
-  freadstr(F, lbuf, sizeof(lbuf));
+  fscanf(F, "%s", lbuf);
   data->fname = strdup(lbuf);
   if (global.data_version>=BACTION_VERSION) {
-    freadstr(F, lbuf, sizeof(lbuf));
+    fscanf(F, "%s", lbuf);
     if (strcmp(lbuf, NULLSTRING)==0) data->param = NULL;
     else data->param = strdup(lbuf);
   } else {
@@ -340,7 +335,7 @@ wdw_pyramid_level(const struct building *b)
 static local_names * bnames;
 
 const building_type *
-findbuildingtype(const xmlChar * name, const struct locale * lang)
+findbuildingtype(const char * name, const struct locale * lang)
 {
   variant type;
 	local_names * bn = bnames;
@@ -355,7 +350,7 @@ findbuildingtype(const xmlChar * name, const struct locale * lang)
 		bn->next = bnames;
 		bn->lang = lang;
 		while (btl) {
-			const xmlChar * n = locale_string(lang, btl->type->_name);
+			const char * n = locale_string(lang, btl->type->_name);
       type.v = (void*)btl->type;
 			addtoken(&bn->names, n, type);
 			btl=btl->next;
@@ -440,14 +435,14 @@ new_building(const struct building_type * btype, region * r, const struct locale
   addlist(&r->buildings, b);
   
   {
-    const xmlChar * bname;
+    const char * bname;
     if (b->type->name==NULL) {
       bname = LOC(lang, btype->_name);
     } else {
       /* TODO: optimization potential: make b->name NULL and use this as default */
       bname = LOC(lang, buildingtype(btype, b, 0));
     }
-    b->name = xstrdup(bname);
+    b->name = strdup(bname);
   }
   return b;
 }
@@ -521,22 +516,22 @@ buildingeffsize(const building * b, boolean img)
 	return n;
 }
 
-const xmlChar *
-write_buildingname(const building * b, xmlChar * ibuf, size_t size)
+const char *
+write_buildingname(const building * b, char * ibuf, size_t size)
 {
   snprintf((char*)ibuf, size, "%s (%s)", b->name, itoa36(b->no));
   ibuf[size-1] = 0;
   return ibuf;
 }
 
-const xmlChar *
+const char *
 buildingname(const building * b)
 {
   typedef char name[OBJECTIDSIZE + 1];
   static name idbuf[8];
   static int nextbuf = 0;
   char *ibuf = idbuf[(++nextbuf) % 8];
-  return write_buildingname(b, (xmlChar*)ibuf, sizeof(name));
+  return write_buildingname(b, ibuf, sizeof(name));
 }
 
 unit *

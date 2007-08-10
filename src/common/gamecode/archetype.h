@@ -33,7 +33,7 @@ extern "C" {
     struct rule * rules;
   } archetype;
 
-  extern const struct archetype * find_archetype(const xmlChar * s, const struct locale * lang);
+  extern const struct archetype * find_archetype(const char * s, const struct locale * lang);
   extern void init_archetypes(void);
   extern void register_archetype(struct archetype * arch);
   extern void register_archetypes(void);

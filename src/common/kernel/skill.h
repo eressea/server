@@ -46,7 +46,7 @@ extern void skill_init(void);
 extern void skill_done(void);
 extern struct attrib * make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special, double multiplier, int bonus);
 
-extern const xmlChar * skillname(skill_t, const struct locale *);
+extern const char * skillname(skill_t, const struct locale *);
 extern skill_t sk_find(const char * name);
 extern void enable_skill(const char * name, boolean value);
 extern int level_days(int level);

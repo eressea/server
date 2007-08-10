@@ -98,7 +98,7 @@ init_spellnames(const struct locale * lang, magic_t mtype)
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
     if (sp->magietyp==mtype) {
-      const xmlChar * n = spell_name(sp, lang);
+      const char * n = spell_name(sp, lang);
       variant token;
       token.v = sp;
       addtoken(&sn->names, n, token);
@@ -120,7 +120,7 @@ get_spellnames(const struct locale * lang, magic_t mtype)
 }
 
 static spell *
-get_spellfromtoken_i(const xmlChar *name, const struct locale * lang, magic_t mtype)
+get_spellfromtoken_i(const char *name, const struct locale * lang, magic_t mtype)
 {
   variant token = { 0 };
   spell_names * sn;
@@ -143,7 +143,7 @@ get_spellfromtoken_i(const xmlChar *name, const struct locale * lang, magic_t mt
 }
 
 spell *
-get_spellfromtoken(unit *u, const xmlChar *name, const struct locale * lang)
+get_spellfromtoken(unit *u, const char *name, const struct locale * lang)
 {
   sc_mage * m = get_mage(u);
   spell * sp;

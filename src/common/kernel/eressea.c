@@ -1278,7 +1278,7 @@ count_maxmigrants(const faction * f)
 void
 init_tokens(const struct order * ord)
 {
-  xmlChar * cmd = getcommand(ord);
+  char * cmd = getcommand(ord);
   init_tokens_str(cmd, cmd);
 }
 
@@ -1307,8 +1307,8 @@ parse(keyword_t kword, int (*dofun)(unit *, struct order *), boolean thisorder)
   }
 }
 
-const xmlChar *
-igetstrtoken(const xmlChar * initstr)
+const char *
+igetstrtoken(const char * initstr)
 {
   if (initstr!=NULL) {
     init_tokens_str(initstr, NULL);
@@ -1330,7 +1330,7 @@ getint (void)
 }
 
 const struct race *
-findrace(const xmlChar * s, const struct locale * lang)
+findrace(const char * s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_RACES);
   variant token;
@@ -1342,7 +1342,7 @@ findrace(const xmlChar * s, const struct locale * lang)
 }
 
 int
-findoption(const xmlChar *s, const struct locale * lang)
+findoption(const char *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_OPTIONS);
   variant token;
@@ -1354,7 +1354,7 @@ findoption(const xmlChar *s, const struct locale * lang)
 }
 
 skill_t
-findskill(const xmlChar *s, const struct locale * lang)
+findskill(const char *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_SKILLS);
   variant token;
@@ -1364,7 +1364,7 @@ findskill(const xmlChar *s, const struct locale * lang)
 }
 
 keyword_t
-findkeyword(const xmlChar *s, const struct locale * lang)
+findkeyword(const char *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_KEYWORDS);
   variant token;
@@ -1376,7 +1376,7 @@ findkeyword(const xmlChar *s, const struct locale * lang)
 }
 
 param_t
-findparam(const xmlChar *s, const struct locale * lang)
+findparam(const char *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_PARAMS);
   variant token;
@@ -1468,7 +1468,7 @@ read_newunitid (const faction * f, const region * r)
 int
 read_unitid (const faction * f, const region * r)
 {
-  const xmlChar * s = getstrtoken();
+  const char * s = getstrtoken();
 
   /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
@@ -1625,19 +1625,19 @@ largestbuilding (const region * r, boolean img)
   return best;
 }
 
-xmlChar *
-write_unitname(const unit * u, xmlChar * buffer, size_t size)
+char *
+write_unitname(const unit * u, char * buffer, size_t size)
 {
   snprintf((char*)buffer, size, "%s (%s)", (const char*)u->name, itoa36(u->no));
   buffer[size-1] = 0;
   return buffer;
 }
 
-const xmlChar *
+const char *
 unitname(const unit * u)
 {
   char *ubuf = idbuf[(++nextbuf) % 8];
-  return write_unitname(u, (xmlChar*)ubuf, sizeof(name));
+  return write_unitname(u, ubuf, sizeof(name));
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
@@ -1992,7 +1992,7 @@ init_directions(tnode * root, const struct locale * lang)
 }
 
 direction_t
-finddirection(const xmlChar *s, const struct locale * lang)
+finddirection(const char *s, const struct locale * lang)
 {
   struct tnode * tokens = get_translations(lang, UT_DIRECTIONS);
   variant token;
@@ -2037,7 +2037,7 @@ init_locale(const struct locale * lang)
   tokens = get_translations(lang, UT_SKILLS);
   for (i=0;i!=MAXSKILLS;++i) {
     if (i!=SK_TRADE || !TradeDisabled()) {
-      const xmlChar * skname = skillname((skill_t)i, lang);
+      const char * skname = skillname((skill_t)i, lang);
       if (skname!=NULL) {
         var.i = i;
         addtoken(tokens, skname, var);
@@ -2614,7 +2614,7 @@ maintenance_cost(const struct unit * u)
 }
 
 message *
-movement_error(unit * u, const xmlChar * token, order * ord, int error_code)
+movement_error(unit * u, const char * token, order * ord, int error_code)
 {
   direction_t d;
   switch (error_code) {
@@ -2628,7 +2628,7 @@ movement_error(unit * u, const xmlChar * token, order * ord, int error_code)
 }
 
 int
-movewhere(const unit *u, const xmlChar * token, region * r, region** resultp)
+movewhere(const unit *u, const char * token, region * r, region** resultp)
 {
   region * r2;
   direction_t d;

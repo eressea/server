@@ -105,8 +105,8 @@ dir_invert(direction_t dir)
   return NODIRECTION;
 }
 
-const xmlChar *
-write_regionname(const region * r, const faction * f, xmlChar * buffer, size_t size)
+const char *
+write_regionname(const region * r, const faction * f, char * buffer, size_t size)
 {
   char * buf = (char *)buffer;
   const struct locale * lang = f ? f->locale : 0;
@@ -115,7 +115,7 @@ write_regionname(const region * r, const faction * f, xmlChar * buffer, size_t s
   } else {
     plane *pl = r->planep;
     if (pl && fval(pl, PFL_NOCOORDS)) {
-      strncpy(buf, (const char *)rname(r, lang), size);
+      strncpy(buf, rname(r, lang), size);
     } else {
       snprintf(buf, size, "%s (%d,%d)", rname(r, lang),
         region_x(r, f), region_y(r, f));
@@ -125,10 +125,10 @@ write_regionname(const region * r, const faction * f, xmlChar * buffer, size_t s
   return buffer;
 }
 
-const xmlChar *
+const char *
 regionname(const region * r, const faction * f)
 {
-  static xmlChar buf[65];
+  static char buf[65];
   return write_regionname(r, f, buf, sizeof(buf));
 }
 
@@ -209,7 +209,7 @@ a_agedirection(attrib *a)
 
 typedef struct dir_lookup {
   char * name;
-  const xmlChar * oldname;
+  const char * oldname;
   struct dir_lookup * next;
 } dir_lookup;
 
@@ -223,7 +223,7 @@ register_special_direction(const char * name)
 
   for (lang=locales;lang;lang=nextlocale(lang)) {
     tnode * tokens = get_translations(lang, UT_SPECDIR);
-    const xmlChar * token = LOC(lang, name);
+    const char * token = LOC(lang, name);
 
     if (token) {
       variant var;
@@ -261,7 +261,7 @@ a_readdirection(attrib *a, FILE *f)
     cstring_i(d->desc);
     cstring_i(lbuf);
     for (;dl;dl=dl->next) {
-      if (strcmp(lbuf, (const char *)dl->oldname)==0) {
+      if (strcmp(lbuf, dl->oldname)==0) {
         d->keyword=strdup(dl->name);
         break;
       }
@@ -297,12 +297,12 @@ attrib_type at_direction = {
 };
 
 region *
-find_special_direction(const region *r, const xmlChar *token, const struct locale * lang)
+find_special_direction(const region *r, const char *token, const struct locale * lang)
 {
   attrib *a;
   spec_direction *d;
 
-  if (xstrlen(token)==0) return NULL;
+  if (strlen(token)==0) return NULL;
   for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
     d = (spec_direction *)(a->data.v);
 
@@ -774,15 +774,15 @@ r_demand(const region * r, const luxury_type * ltype)
 }
 
 void
-rsetname(struct region * r, const xmlChar * name)
+rsetname(struct region * r, const char * name)
 {
   if (r->land) {
     free(r->land->name);
-    r->land->name = xstrdup(name);
+    r->land->name = strdup(name);
   }
 }
 
-const xmlChar *
+const char *
 rname(const region * r, const struct locale * lang) {
   if (r->land) {
     return r->land->name;
@@ -889,7 +889,7 @@ free_region(region * r)
 /** creates a name for a region
  * TODO: Make this XML-configurable and allow non-ascii characters again.
  */
-static xmlChar *
+static char *
 makename(void)
 {
   int s, v, k, e, p = 0, x = 0;
@@ -932,7 +932,7 @@ makename(void)
   }
   name[p] = '\0';
   name[0] = (char) toupper(name[0]);
-  return (xmlChar*)name;
+  return name;
 }
 
 void

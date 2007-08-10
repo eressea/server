@@ -89,8 +89,8 @@ typedef struct building {
 
 	const struct building_type * type;
 	struct region *region;
-	xmlChar *name;
-	xmlChar *display;
+	char *name;
+	char *display;
 	struct attrib * attribs;
 	int no;
 	int size;
@@ -109,8 +109,8 @@ extern void add_buildinglist(building_list **bl, struct building *b);
 
 extern struct attrib_type at_building_generic_type;
 extern const char * buildingtype(const building_type * btype, const struct building * b, int bsize);
-extern const xmlChar * buildingname(const struct building * b);
-extern const xmlChar * write_buildingname(const building * b, xmlChar * ibuf, size_t size);
+extern const char * buildingname(const struct building * b);
+extern const char * write_buildingname(const building * b, char * ibuf, size_t size);
 extern int buildingcapacity(const struct building * b);
 extern struct building *new_building(const struct building_type * typ, struct region * r, const struct locale * lang);
 void build_building(struct unit * u, const struct building_type * typ, int size, struct order * ord);
@@ -124,7 +124,7 @@ void bunhash(struct building * b);
 int buildingcapacity(const struct building * b);
 void destroy_building(struct building * b);
 
-const struct building_type * findbuildingtype(const xmlChar * name, const struct locale * lang);
+const struct building_type * findbuildingtype(const char * name, const struct locale * lang);
 
 #include "build.h"
 #define NOBUILDING NULL

@@ -264,7 +264,7 @@ get_villagers(region * r, unit * u)
 {
 	unit *newunit;
   message * msg = msg_message("encounter_villagers", "unit", u);
-  const xmlChar * name = LOC(u->faction->locale, "villagers");
+  const char * name = LOC(u->faction->locale, "villagers");
 
   r_addmessage(r, u->faction, msg);
   msg_release(msg);
@@ -1021,7 +1021,7 @@ split_unit(region * r, unit *u)
 
   if (u->display) {
     free(u2->display);
-    u2->display = xstrdup(u->display);
+    u2->display = strdup(u->display);
   }
   transfermen(u, u2, newsize);
   return u2;

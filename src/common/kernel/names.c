@@ -46,19 +46,19 @@
 /* Untote */
 
 
-const xmlChar *
+const char *
 describe_braineater(unit * u, const struct locale * lang)
 {
   return LOC(lang, "describe_braineater");
 }
 
-static const xmlChar *
+static const char *
 make_names(const char * monster, int * num_postfix, int pprefix, int * num_name, int * num_prefix, int ppostfix)
 {
   int uv, uu, un;
   static char name[NAMESIZE + 1];
   char zText[32];
-  const xmlChar * str;
+  const char * str;
 
   if (*num_prefix==0) {
 
@@ -119,31 +119,31 @@ make_names(const char * monster, int * num_postfix, int pprefix, int * num_name,
       strcat(name, (const char *)str);
     }
   }
-  return (const xmlChar *)name;
+  return name;
 }
 
-const xmlChar *
+const char *
 undead_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
   return make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
 }
 
-const xmlChar *
+const char *
 skeleton_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
   return make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
-const xmlChar *
+const char *
 zombie_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
   return make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
-const xmlChar *
+const char *
 ghoul_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
@@ -216,7 +216,7 @@ const char *silbe3[SIL3] = {
 	"bus",
 };
 
-const xmlChar *
+const char *
 generic_name(const unit *u)
 {
   if (u->no == 1) {
@@ -225,7 +225,7 @@ generic_name(const unit *u)
   return LOC(u->faction->locale, u->race->_name[1]);
 }
 
-const xmlChar *
+const char *
 dragon_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
@@ -233,7 +233,7 @@ dragon_name(const unit *u)
 	int anzahl = 1;
   static int num_postfix;
   char zText[32];
-  const xmlChar * str;
+  const char * str;
 
   if (num_postfix==0) {
     for (num_postfix=0;;++num_postfix) {
@@ -302,7 +302,7 @@ dragon_name(const unit *u)
 		}
 	}
 
-	return (xmlChar *)name;
+	return name;
 }
 
 /* Dracoide */
@@ -354,7 +354,7 @@ static const char *drac_suf[DRAC_SUF] = {
 		"k"
 };
 
-const xmlChar *
+const char *
 dracoid_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
@@ -372,14 +372,14 @@ dracoid_name(const unit *u)
 		strcat(name, drac_mid[rng_int()%DRAC_MID]);
 	}
 	strcat(name, drac_suf[rng_int()%DRAC_SUF]);
-	return (const xmlChar *)name;
+	return name;
 }
 
-const xmlChar *
-abkz(const xmlChar *s, size_t max)
+const char *
+abkz(const char *s, size_t max)
 {
 	static char buf[32];
-	const xmlChar *p = s;
+	const char *p = s;
 	unsigned int c = 0;
 	size_t bpt, i;
 
@@ -389,7 +389,7 @@ abkz(const xmlChar *s, size_t max)
 
 	/* Prüfen, ob Kurz genug */
 
-	if (xstrlen(s) <= max) {
+	if (strlen(s) <= max) {
 		return s;
 	}
 	/* Anzahl der Wörter feststellen */
@@ -439,7 +439,7 @@ abkz(const xmlChar *s, size_t max)
 
 	buf[c] = 0;
 
-	return (const xmlChar *)buf;
+	return buf;
 }
 
 void

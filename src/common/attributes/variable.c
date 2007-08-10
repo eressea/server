@@ -41,8 +41,7 @@ finalize_variable(struct attrib * a)
 static void
 write_variable(const struct attrib * a, FILE *F)
 {
-	fwritestr(F, ((variable *)(a->data.v))->key);
-	fputc(' ', F);
+	fprintf(F, "%s ", ((variable *)(a->data.v))->key);
 	fwritestr(F, ((variable *)(a->data.v))->value);
 	fputc(' ', F);
 }
@@ -52,10 +51,10 @@ read_variable(struct attrib *a, FILE *F)
 {
 	char localBuffer[1024];
 
-	freadstr(F, localBuffer, sizeof(localBuffer));
+	fscanf(F, "%s", localBuffer);
 	((variable *)(a->data.v))->key = strdup(localBuffer);
 
-	freadstr(F, localBuffer, sizeof(localBuffer));
+	freadstr(F, enc_gamedata, localBuffer, sizeof(localBuffer));
 	((variable *)(a->data.v))->value = strdup(localBuffer);
 
 	return AT_READ_OK;

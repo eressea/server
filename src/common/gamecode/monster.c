@@ -453,8 +453,8 @@ make_movement_order(unit * u, const region * target, int moves, boolean (*allowe
 	region * r = u->region;
 	region ** plan;
 	int position = 0;
-  xmlChar zOrder[128];
-  char * c = (char*)zOrder;
+  char zOrder[128];
+  char * c = zOrder;
 
   if (is_waiting(u)) return NULL;
 

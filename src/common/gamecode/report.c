@@ -720,7 +720,7 @@ see_border(const border * b, const faction * f, const region * r)
   return cs;
 }
 
-const xmlChar *
+const char *
 trailinto(const region * r, const struct locale * lang)
 {
   char ref[32];
