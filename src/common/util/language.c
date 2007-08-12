@@ -67,6 +67,26 @@ make_locale(const char * name)
 	return l;
 }
 
+/** creates a list of locales
+ * This function takes a comma-delimited list of locale-names and creates
+ * the locales using the make_locale function (useful for ini-files).
+ */
+void
+make_locales(const char * str)
+{
+  const char * tok = str;
+  while (*tok) {
+    char zText[32];
+    while (*tok && *tok !=',') ++tok;
+    strncpy(zText, str, tok-str);
+    zText[tok-str] = 0;
+    make_locale(zText);
+    if (*tok) {
+      str = ++tok;
+    }
+  }
+}
+
 static FILE * s_debug = NULL;
 static char * s_logfile = NULL;
 

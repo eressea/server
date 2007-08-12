@@ -526,7 +526,7 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
     --force;
   }
 
-  m = msg_message("sp_midblast_effect", "mage spell amount dead", mage, sp, k, killed);
+  m = msg_message("sp_mindblast_effect", "mage spell amount dead", mage, sp, k, killed);
   message_all(b, m);
   msg_release(m);
   return level;

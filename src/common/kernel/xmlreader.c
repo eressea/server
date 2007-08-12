@@ -63,7 +63,9 @@ xml_readtext(xmlNodePtr node, struct locale ** lang, xmlChar **text)
   xmlChar * propValue = xmlGetProp(node, BAD_CAST "locale");
   assert(propValue!=NULL);
   *lang = find_locale((const char*)propValue);
+#ifdef MAKE_LOCALES
   if (*lang==NULL) *lang = make_locale((const char*)propValue);
+#endif
   xmlFree(propValue);
 
   *text = xmlNodeListGetString(node->doc, node->children, 1);
@@ -1825,8 +1827,10 @@ parse_messages(xmlDocPtr doc)
       xmlChar * propText;
 
       xml_readtext(node, &lang, &propText);
-      xml_cleanup_string(propText);
-      nrt_register(mtype, lang, (const char *)propText, 0, (const char*)propSection);
+      if (lang) {
+        xml_cleanup_string(propText);
+        nrt_register(mtype, lang, (const char *)propText, 0, (const char*)propSection);
+      }
       xmlFree(propText);
 
     }
@@ -1871,8 +1875,10 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
       xml_readtext(textNode, &lang, &propText);
       if (propText!=NULL) {
         assert(strcmp(zName, (const char*)xml_cleanup_string(BAD_CAST zName))==0);
-        xml_cleanup_string(propText);
-        locale_setstring(lang, zName, (const char *)propText);
+        if (lang) {
+          xml_cleanup_string(propText);
+          locale_setstring(lang, zName, (const char *)propText);
+        }
         xmlFree(propText);
       } else {
         log_warning(("string %s has no text in locale %s\n",

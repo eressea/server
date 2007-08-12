@@ -575,22 +575,22 @@ unitorders(FILE * F, int enc, struct faction * f)
       s = getbuf(F, enc);
       if (s==NULL) break;
 
-      init_tokens_str(s, NULL);
-      s = getstrtoken();
-
-      if (findkeyword(s, u->faction->locale) == NOKEYWORD) {
-        boolean quit = false;
-        switch (findparam(s, u->faction->locale)) {
-          case P_UNIT:
-          case P_REGION:
-          case P_FACTION:
-          case P_NEXT:
-          case P_GAMENAME:
-            quit = true;
-        }
-        if (quit) break;
-      }
       if (s[0]) {
+        const char * stok = s;
+        stok = parse_token(&stok);
+
+        if (stok) {
+          boolean quit = false;
+          switch (findparam(stok, u->faction->locale)) {
+            case P_UNIT:
+            case P_REGION:
+            case P_FACTION:
+            case P_NEXT:
+            case P_GAMENAME:
+              quit = true;
+          }
+          if (quit) break;
+        }
         /* Nun wird der Befehl erzeut und eingehängt */
         *ordp = parse_order(s, u->faction->locale);
         if (*ordp) ordp = &(*ordp)->next;
@@ -816,7 +816,12 @@ read_items(FILE *F, item **ilist)
     itype = it_find(ibuf);
     assert(itype!=NULL);
     if (itype!=NULL) {
-      i_change(ilist, itype, ri(F));
+      int i = ri(F);
+      if (i<=0) {
+        log_error(("data contains an entry with %d %s\n", i, itype->rtype->_name[1]));
+      } else {
+        i_change(ilist, itype, i);
+      }
     }
   }
 }
@@ -890,8 +895,11 @@ void
 write_items(FILE *F, item *ilist)
 {
   item * itm;
-  for (itm=ilist;itm;itm=itm->next) if (itm->number) {
-    fprintf(F, "%s %i ", resourcename(itm->type->rtype, 0), itm->number);
+  for (itm=ilist;itm;itm=itm->next) {
+    assert(itm->number>=0);
+    if (itm->number) {
+      fprintf(F, "%s %i ", resourcename(itm->type->rtype, 0), itm->number);
+    }
   }
   fputs("end ", F);
 }

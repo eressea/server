@@ -5,8 +5,8 @@ function use_ring_of_levitation(u, amount)
       if u2.ship==u.ship then
         local i = u2:get_item("mallornseed")
         if i>0 then
-          u2:use_item("mallornseed", i)
-          u2:add_item("seed", i)
+          u2:use_pooled("mallornseed", i)
+          u2:use_pooled("seed", i)
           mallorn = mallorn + i
         end
       end

@@ -34,6 +34,7 @@ extern const char * mkname(const char * namespc, const char * key);
 extern char * mkname_buf(const char * namespc, const char * key, char * buffer);
 
 extern void debug_language(const char * log);
+extern void make_locales(const char * str);
 
 #define LOC(lang, s) locale_string(lang, s)
 

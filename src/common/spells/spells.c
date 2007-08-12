@@ -4768,15 +4768,21 @@ sp_icastle(castorder *co)
   icastle_data * data;
   const char * bname;
   message * msg;
+  static const building_type * bt_illusion;
+
+  if (bt_illusion==NULL) bt_illusion = bt_find("illusioncastle");
+  if (bt_illusion==NULL) {
+    return 0;
+  }
 
   if ((type=findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
     type = bt_find("castle");
   }
 
-  b = new_building(bt_find("illusion"), r, mage->faction->locale);
+  b = new_building(bt_illusion, r, mage->faction->locale);
 
   /* Größe festlegen. */
-  if (type == bt_find("illusion")) {
+  if (type == bt_illusion) {
     b->size = (rng_int()%(int)((power*power)+1)*10);
   } else if (type->maxsize == -1) {
     b->size = ((rng_int()%(int)(power))+1)*5;

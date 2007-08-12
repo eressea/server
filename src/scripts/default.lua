@@ -35,11 +35,11 @@ function write_aliases()
   local file
   local faction
 
-  file = io.open(basepath .. "/aliases." .. locale, "w")
+  file = io.open(basepath .. "/aliases", "w")
   for faction in factions() do
     local unit
     file:write("partei-" .. itoa36(faction.id) .. ": " .. faction.email .. "\n")
-    for unit in f.units do
+    for unit in faction.units do
       file:write("einheit-" .. itoa36(unit.id) .. ": " .. faction.email .. "\n")
     end
   end
