@@ -169,7 +169,7 @@ typedef struct _stat stat_type;
 # define strdup _strdup
 # define HAVE_STRDUP
 
-# define sleep _sleep
+# define sleep(sec) _sleep(sec*1000000)
 # define HAVE_SLEEP
 
 # define stricmp(a, b) _stricmp(a, b)

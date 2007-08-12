@@ -372,7 +372,7 @@ cr_skill(variant var, char * buffer, const void * userdata)
   const faction * report = (const faction*)userdata;
   skill_t sk = (skill_t)var.i;
   if (sk!=NOSKILL) sprintf(buffer, "\"%s\"",
-    add_translation(skillnames[sk], skillname(sk, report->locale)));
+    add_translation(mkname("skill", skillnames[sk]), skillname(sk, report->locale)));
   else strcpy(buffer, "\"\"");
   return 0;
 }
@@ -850,7 +850,7 @@ cr_output_unit(FILE * F, const region * r,
           fprintf(F, "TALENTE\n");
         }
         fprintf(F, "%d %d;%s\n", u->number*level_days(sv->level), esk,
-          add_translation(skillnames[sk], skillname(sk, f->locale)));
+          add_translation(mkname("skill", skillnames[sk]), skillname(sk, f->locale)));
       }
     }
     /* spells */

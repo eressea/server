@@ -17,11 +17,12 @@
 #include "object.h"
 
 /* kernel includes */
-#include <kernel/unit.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/ship.h>
-#include <kernel/building.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/attrib.h>

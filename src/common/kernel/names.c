@@ -220,9 +220,9 @@ const char *
 generic_name(const unit *u)
 {
   if (u->no == 1) {
-    return LOC(u->faction->locale, u->race->_name[0]);
+    return LOC(u->faction->locale, mkname("race", u->race->_name[0]));
   }
-  return LOC(u->faction->locale, u->race->_name[1]);
+  return LOC(u->faction->locale, mkname("race", u->race->_name[1]));
 }
 
 const char *

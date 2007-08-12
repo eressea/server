@@ -110,6 +110,8 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 
+#include <libxml/encoding.h>
+
 /* stdc++ includes */
 #include <stdexcept>
 #include <string>
@@ -386,18 +388,17 @@ game_done(void)
 
 #include "magic.h"
 
+#define CRTDBG
+
 #ifdef CRTDBG
 void
 init_crtdbg(void)
 {
 #if (defined(_MSC_VER))
-# if MALLOCDBG == 2
-#  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF)
-# elif MALLOCDBG == 3
-#  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & 0)
-# elif MALLOCDBG == 1
-#  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_DELAY_FREE_MEM_DF)
-# endif
+  int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+  // flags = (flags&0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
+  // flags |= _CRTDBG_CHECK_ALWAYS_DF; /* expensive */
+  _CrtSetDbgFlag(flags);
 #endif
 }
 #endif
@@ -601,14 +602,17 @@ load_inifile(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
+    const char * str;
     g_basedir = iniparser_getstring(d, "common:base", g_basedir);
     g_resourcedir = iniparser_getstring(d, "common:res", g_resourcedir);
     xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
     script_path = iniparser_getstring(d, "common:scripts", script_path);
     lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
 
-    enc_gamedata = iniparser_getstring(d, "common:gamedata_encoding", enc_gamedata);
-    enc_orderfile = iniparser_getstring(d, "common:orderfile_encoding", enc_orderfile);
+    str = iniparser_getstring(d, "common:gamedata_encoding", NULL);
+    if (str) enc_gamedata = xmlParseCharEncoding(str);
+    str = iniparser_getstring(d, "common:orderfile_encoding", NULL);
+    if (str) enc_orderfile = xmlParseCharEncoding(str);
 
     quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;

@@ -2015,7 +2015,7 @@ init_locale(const struct locale * lang)
   tokens = get_translations(lang, UT_MAGIC);
   for (i=0;i!=MAXMAGIETYP;++i) {
     var.i = i;
-    addtoken(tokens, LOC(lang, magietypen[i]), var);
+    addtoken(tokens, LOC(lang, mkname("school", magietypen[i])), var);
   }
 
   tokens = get_translations(lang, UT_DIRECTIONS);
@@ -2913,93 +2913,4 @@ entertainmoney(const region *r)
   }
 
   return n;
-}
-
-int
-freadstr(FILE * F, char * start, size_t size)
-{
-  char * str = start;
-  boolean quote = false;
-  int nread = 0;
-  for (;;) {
-    int c = fgetc(F);
-
-    ++nread;
-    if (isspace(c)) {
-      if (str==start) {
-        continue;
-      }
-      if (!quote) {
-        *str = 0;
-        return nread;
-      }
-    }
-    switch (c) {
-      case EOF:
-        return EOF;
-      case '"':
-        if (!quote && str!=start) {
-          log_error(("datafile contains a \" that isn't at the start of a string.\n"));
-          assert(!"datafile contains a \" that isn't at the start of a string.\n");
-        }
-        if (quote) {
-          *str = 0;
-          return nread;
-        }
-        quote = true;
-        break;
-      case '\\':
-        c = fgetc(F);
-        ++nread;
-        switch (c) {
-          case EOF:
-            return EOF;
-          case 'n':
-            if ((size_t)(str-start+1)<size) {
-              *str++ = '\n';
-            }
-            break;
-          default:
-            if ((size_t)(str-start+1)<size) {
-              *str++ = (char)c;
-            }
-        }
-        break;
-      default:
-        if ((size_t)(str-start+1)<size) {
-          *str++ = (char)c;
-        }
-    }
-  }
-}
-
-/** writes a quoted string to the file
- * no trailing space, since this is used to make the creport.
- */
-int
-fwritestr(FILE * F, const char * str)
-{
-  int nwrite = 0;
-  fputc('\"', F);
-  while (*str) {
-    int c = (int)(unsigned char)*str++;
-    switch (c) {
-      case '"':
-      case '\\':
-        fputc('\\', F);
-        fputc(c, F);
-        nwrite+=2;
-        break;
-      case '\n':
-        fputc('\\', F);
-        fputc('n', F);
-        nwrite+=2;
-        break;
-      default:
-        fputc(c, F);
-        ++nwrite;
-    }
-  }
-  fputc('\"', F);
-  return nwrite + 2;
 }

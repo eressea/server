@@ -8,7 +8,8 @@
    -->
   <string name="vortex">
     <text locale="de">Wirbel</text>
-    <text locale="en">Vortex</text>
+    <text locale="en">vortex</text>
+    <text locale="fr">remous</text>
   </string>
   <string name="vortex_desc">
     <text locale="de">Ein Wirbel aus reinem Chaos zieht über die Region</text>

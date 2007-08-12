@@ -15,6 +15,8 @@
 #include <attrib.h>
 #include "variable.h"
 
+#include <kernel/save.h>
+
 /* libc includes */
 #include <stdlib.h>
 #include <stdio.h>

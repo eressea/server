@@ -87,8 +87,8 @@
 const char * xmlfile = "eressea.xml";
 const char * g_datadir;
 int firstx = 0, firsty = 0;
-const char * enc_gamedata = NULL;
-const char * enc_orderfile = NULL;
+int enc_gamedata = 0;
+int enc_orderfile = 0;
 
 /* local symbols */
 static region * current_region;
@@ -246,6 +246,109 @@ convertunique(faction * f)
 }
 #endif
 
+int
+freadstr(FILE * F, int encoding, char * start, size_t size)
+{
+  char * str = start;
+  boolean quote = false;
+  for (;;) {
+    int c = fgetc(F);
+
+    if (isspace(c)) {
+      if (str==start) {
+        continue;
+      }
+      if (!quote) {
+        *str = 0;
+        return (int)(str-start);
+      }
+    }
+    switch (c) {
+      case EOF:
+        return EOF;
+      case '"':
+        if (!quote && str!=start) {
+          log_error(("datafile contains a \" that isn't at the start of a string.\n"));
+          assert(!"datafile contains a \" that isn't at the start of a string.\n");
+        }
+        if (quote) {
+          *str = 0;
+          return (int)(str-start);
+        }
+        quote = true;
+        break;
+      case '\\':
+        c = fgetc(F);
+        switch (c) {
+          case EOF:
+            return EOF;
+          case 'n':
+            if ((size_t)(str-start+1)<size) {
+              *str++ = '\n';
+            }
+            break;
+          default:
+            if ((size_t)(str-start+1)<size) {
+              if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
+                char inbuf = (char)c;
+                int inbytes = 1;
+                int outbytes = (int)(size-(str-start));
+                int ret = isolat1ToUTF8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+                if (ret>0) str+=ret;
+              } else {
+                *str++ = (char)c;
+              }
+            }
+        }
+        break;
+      default:
+        if ((size_t)(str-start+1)<size) {
+          if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
+            char inbuf = (char)c;
+            int inbytes = 1;
+            int outbytes = (int)(size-(str-start));
+            int ret = isolat1ToUTF8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+            if (ret>0) str+=ret;
+          } else {
+            *str++ = (char)c;
+          }
+        }
+    }
+  }
+}
+
+/** writes a quoted string to the file
+* no trailing space, since this is used to make the creport.
+*/
+int
+fwritestr(FILE * F, const char * str)
+{
+  int nwrite = 0;
+  fputc('\"', F);
+  while (*str) {
+    int c = (int)(unsigned char)*str++;
+    switch (c) {
+      case '"':
+      case '\\':
+        fputc('\\', F);
+        fputc(c, F);
+        nwrite+=2;
+        break;
+      case '\n':
+        fputc('\\', F);
+        fputc('n', F);
+        nwrite+=2;
+        break;
+      default:
+        fputc(c, F);
+        ++nwrite;
+    }
+  }
+  fputc('\"', F);
+  return nwrite + 2;
+}
+
+
 static void
 rds(FILE * F, void **ds)
 {
@@ -283,61 +386,12 @@ rds(FILE * F, void **ds)
   }
 }
 
-static int
-xrs(FILE * F, char *dest, size_t size, int encoding)
-{
-  char buffer[4096];
-  char * begin = dest;
-  char * s = begin;
-  boolean quote = false;
-  size_t maxs = size;
-
-  for (;;) {
-    int c = getc(F);
-
-    if (c=='"') {
-      if (quote) {
-        c = getc(F);
-        if (isspace(c)) break;
-      } else if (s==begin) {
-        quote = true;
-        continue;
-      }
-    } else if (isspace(c) && !quote) {
-      break;
-    }
-
-    if ((c & 0x80) && encoding!=XML_CHAR_ENCODING_NONE && encoding!=XML_CHAR_ENCODING_UTF8) {
-      if (begin!=buffer) {
-        size_t cp = s-begin;
-        maxs = min(sizeof(buffer), maxs);
-        if (cp>maxs) cp = maxs;
-        memcpy(buffer, begin, cp);
-        begin = buffer;
-        s = begin + cp;
-      }
-    }
-    *s++ = (char)c;
-  }
-  *s = 0;
-  if (begin==buffer) {
-    // convert
-    const char * inbuf = begin;
-    char * outbuf = dest;
-    int inbytes = (int)(s-begin)+1;
-    int outbytes = (int)size;
-
-    assert(encoding==XML_CHAR_ENCODING_8859_1);
-    return isolat1ToUTF8((xmlChar *)outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
-  }
-  return (int)(s-begin);
-}
 
 static void
 xrds(FILE * F, void **ds, int encoding)
 {
   static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
-  int len = xrs(F, buffer, sizeof(buffer), encoding);
+  int len = freadstr(F, encoding, buffer, sizeof(buffer));
 
   if (len>=0) {
     if (ds) {
@@ -1314,7 +1368,7 @@ readregion(FILE * F, int encoding, short x, short y)
         rawmaterial * res;
         rss(F, token, sizeof(token));
         if (strcmp(token, "end")==0) break;
-        res = calloc(sizeof(rawmaterial), 1);
+        res = malloc(sizeof(rawmaterial));
         res->type = rmt_find(token);
         if (res->type==NULL) {
           log_error(("invalid resourcetype %s in data.\n", token));
@@ -1322,6 +1376,7 @@ readregion(FILE * F, int encoding, short x, short y)
         assert(res->type!=NULL);
         res->level = ri(F);
         res->amount = ri(F);
+        res->flags = 0;
 
         if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
           res->startlevel = ri(F);
@@ -1341,6 +1396,7 @@ readregion(FILE * F, int encoding, short x, short y)
         *pres = res;
         pres=&res->next;
       }
+      *pres = NULL;
     }
     rss(F, token, sizeof(token));
     if (strcmp(token, "noherb") != 0) {
@@ -1672,7 +1728,7 @@ writefaction(FILE * F, const faction * f)
 }
 
 int
-readgame(const char * filename, int backup, const char * encoding)
+readgame(const char * filename, int backup, int encoding)
 {
   int i, n, p;
   faction *f, **fp;
@@ -1684,7 +1740,6 @@ readgame(const char * filename, int backup, const char * encoding)
   int rmax = maxregions;
   char path[MAX_PATH];
   char token[32];
-  int enc = xmlParseCharEncoding(encoding);
 
   sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
@@ -1732,7 +1787,7 @@ readgame(const char * filename, int backup, const char * encoding)
   while(--n >= 0) {
     plane *pl = calloc(1, sizeof(plane));
     pl->id = ri(F);
-    xrds(F, &pl->name, enc);
+    xrds(F, &pl->name, encoding);
     pl->minx = (short)ri(F);
     pl->maxx = (short)ri(F);
     pl->miny = (short)ri(F);
@@ -1767,7 +1822,7 @@ readgame(const char * filename, int backup, const char * encoding)
   /* fflush (stdout); */
 
   while (--n >= 0) {
-    faction * f = readfaction(F, enc);
+    faction * f = readfaction(F, encoding);
 
     *fp = f;
     fp = &f->next;
@@ -1825,7 +1880,7 @@ readgame(const char * filename, int backup, const char * encoding)
     }
     --rmax;
 
-    r = readregion(F, enc, x, y);
+    r = readregion(F, encoding, x, y);
 
     /* Burgen */
     p = ri(F);
@@ -1838,9 +1893,9 @@ readgame(const char * filename, int backup, const char * encoding)
       *bp = b;
       bp = &b->next;
       bhash(b);
-      xrds(F, &b->name, enc);
+      xrds(F, &b->name, encoding);
       if (lomem) rds(F, 0);
-      else xrds(F, &b->display, enc);
+      else xrds(F, &b->display, encoding);
       b->size = ri(F);
       if (global.data_version < TYPES_VERSION) {
         assert(!"data format is no longer supported");
@@ -1865,9 +1920,9 @@ readgame(const char * filename, int backup, const char * encoding)
       *shp = sh;
       shp = &sh->next;
       shash(sh);
-      xrds(F, &sh->name, enc);
+      xrds(F, &sh->name, encoding);
       if (lomem) rds(F, NULL);
-      else xrds(F, &sh->display, enc);
+      else xrds(F, &sh->display, encoding);
 
       rss(F, token, sizeof(token));
       sh->type = st_find(token);
@@ -1893,7 +1948,7 @@ readgame(const char * filename, int backup, const char * encoding)
     up = &r->units;
 
     while (--p >= 0) {
-      unit * u = readunit(F, enc);
+      unit * u = readunit(F, encoding);
       sc_mage * mage;
 
       assert(u->region==NULL);

@@ -1,6 +1,6 @@
 -- the locales that this gameworld supports.
 local locales = { "de", "en" }
-enc_orders = "UTF-8"
+enc_orders = "ISO-8859-1"
 enc_game = "ISO-8859-1"
 
 function loadscript(name)

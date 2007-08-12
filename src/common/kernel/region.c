@@ -128,7 +128,7 @@ write_regionname(const region * r, const faction * f, char * buffer, size_t size
 const char *
 regionname(const region * r, const faction * f)
 {
-  static char buf[65];
+  static char buf[NAMESIZE];
   return write_regionname(r, f, buf, sizeof(buf));
 }
 
@@ -758,7 +758,8 @@ r_setdemand(region * r, const luxury_type * ltype, int value)
   while (*dp && (*dp)->type != ltype) dp = &(*dp)->next;
   d = *dp;
   if (!d) {
-    d = *dp = calloc(sizeof(struct demand), 1);
+    d = *dp = malloc(sizeof(struct demand));
+    d->next = NULL;
     d->type = ltype;
   }
   d->value = value;
@@ -945,9 +946,10 @@ setluxuries(region * r, const luxury_type * sale)
   if(r->land->demands) freelist(r->land->demands);
 
   for (ltype=luxurytypes; ltype; ltype=ltype->next) {
-    struct demand * dmd = calloc(sizeof(struct demand), 1);
+    struct demand * dmd = malloc(sizeof(struct demand));
     dmd->type = ltype;
     if (ltype!=sale) dmd->value = 1 + rng_int() % 5;
+    else dmd->value = 0;
     dmd->next = r->land->demands;
     r->land->demands = dmd;
   }

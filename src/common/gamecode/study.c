@@ -351,6 +351,7 @@ teach_cmd(unit * u, struct order * ord)
     char zOrder[4096];
     order * new_order;
 
+    zOrder[0] = '\0';
     init_tokens(ord);
     skip_token();
 

@@ -62,6 +62,8 @@
 
 #include <iniparser/iniparser.h>
 
+#include <libxml/encoding.h>
+
 #include <string.h>
 #include <locale.h>
 
@@ -1299,10 +1301,13 @@ load_inifile(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
+    const char * str;
     g_basedir = iniparser_getstring(d, "common:base", g_basedir);
     g_resourcedir = iniparser_getstring(d, "common:res", g_resourcedir);
     xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
-    enc_gamedata = iniparser_getstring(d, "common:gamedata_encoding", enc_gamedata);
+    
+    str = iniparser_getstring(d, "common:gamedata_encoding", NULL);
+    if (str) enc_gamedata = xmlParseCharEncoding(str);
   }
   inifile = d;
 }

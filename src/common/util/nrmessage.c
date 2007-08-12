@@ -54,7 +54,7 @@ nrt_find(const struct locale * lang, const struct message_type * mtype)
     }
     type = type->next;
   }
-  if (lang && found->lang!=lang) {
+  if (lang && found && found->lang!=lang) {
     log_warning(("could not find nr-type %s for locale %s, substituting with %s\n",
       mtype->name, locale_name(lang), locale_name(found->lang)));
   }

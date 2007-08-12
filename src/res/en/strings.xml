@@ -173,6 +173,9 @@
   <string name="glacier_trail">
     <text locale="en">the glacier of %s</text>
   </string>
+  <string name="wall1">
+    <text locale="en">Wall</text>
+  </string>
   <string name="hall1_trail">
     <text locale="en">the %s</text>
   </string>

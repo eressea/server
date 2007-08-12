@@ -36,7 +36,7 @@ double version(void);
 FILE * cfopen(const char *filename, const char *mode);
 int readorders(const char *filename, const char * encoding);
 int creategame(void);
-extern int readgame(const char * filename, int backup, const char * encoding);
+extern int readgame(const char * filename, int backup, int encoding);
 int writegame(const char *filename, int quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);
@@ -47,8 +47,8 @@ extern int data_version;
 extern int maxregions;
 extern int firstx, firsty;
 extern const char *xmlfile;
-extern const char * enc_gamedata;
-extern const char * enc_orderfile;
+extern int enc_gamedata;
+extern int enc_orderfile;
 
 extern void init_locales(void);
 extern int lastturn(void);
@@ -80,6 +80,9 @@ extern void a_writevoid(const struct attrib * a, FILE * F);
 extern int a_readstring(struct attrib * a, FILE * F);
 extern void a_writestring(const struct attrib * a, FILE * F);
 extern void a_finalizestring(struct attrib * a);
+
+extern int freadstr(FILE * F, int encoding, char * str, size_t size);
+extern int fwritestr(FILE * F, const char * str);
 
 extern void create_backup(char *file);
 

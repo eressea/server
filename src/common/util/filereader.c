@@ -4,6 +4,11 @@
 #include <util/log.h>
 #include <util/unicode.h>
 
+#include <libxml/encoding.h>
+
+#include <ctype.h>
+#include <wctype.h>
+
 #define COMMENT_CHAR    ';'
 #define CONTINUE_CHAR    '\\'
 #define MAXLINE 4096*16
@@ -22,7 +27,6 @@ eatwhite(const char * ptr, size_t * total_size)
   int ret = 0;
 
   *total_size = 0;
-#ifdef USE_UNICODE
 
   while (*ptr) {
     wint_t ucs;
@@ -33,15 +37,128 @@ eatwhite(const char * ptr, size_t * total_size)
     *total_size += size;
     ptr += size;
   }
-#else 
-  *total_size = 0;
-  while (ptr[*total_size] && isspace(*(unsigned char*)ptr[*total_size])) ++*total_size;
-#endif
   return ret;
 }
 
-const char *
-getbuf(FILE * F, int encoding)
+static const char *
+getbuf_latin1(FILE * F)
+{
+  boolean cont = false;
+  char quote = 0;
+  boolean comment = false;
+  char * cp = fbuf;
+  char * tail = lbuf+MAXLINE-2;
+
+  tail[1] = '@'; /* if this gets overwritten by fgets then the line was very long. */
+  do {
+    const char * bp = fgets(lbuf, MAXLINE, F);
+
+    if (bp==NULL) return NULL;
+    while (*bp && isspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
+
+    comment = (boolean)(comment && cont);
+
+    if (tail[1]==0) {
+      /* we read he maximum number of bytes! */
+      if (tail[0]!='\n') {
+        /* it wasn't enough space to finish the line, eat the rest */
+        for (;;) {
+          tail[1] = '@';
+          bp = fgets(lbuf, MAXLINE, F);
+          if (bp==NULL) return NULL;
+          if (tail[1]) {
+            /* read enough this time to end the line */
+            break;
+          }
+        }
+        comment = false;
+        cont = false;
+        bp = NULL;
+        continue;
+      } else {
+        tail[1] = '@';
+      }
+    }
+    cont = false;
+    while (*bp && cp<fbuf+MAXLINE) {
+      int c = *(unsigned char *)bp;
+      
+      if (c==COMMENT_CHAR && !quote) {
+        /* comment begins. we need to keep going, to look for CONTINUE_CHAR */
+        comment = true;
+        ++bp;
+        continue;
+      }
+      if (c=='"' || c=='\'') {
+        if (quote==c) {
+          quote = 0;
+          if (cp<fbuf+MAXLINE) *cp++ = *bp;
+          ++bp;
+          continue;
+        } else if (!quote) {
+          quote = *bp++;
+          if (cp<fbuf+MAXLINE) *cp++ = quote;
+          continue;
+        }
+      }
+
+      if (isspace(c)) {
+        if (!quote) {
+          ++bp;
+          while (*bp && isspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
+          if (!comment && *bp && *bp!=COMMENT_CHAR && cp<fbuf+MAXLINE) *(cp++) = ' ';
+        }
+        else if (!comment && cp+1<=fbuf+MAXLINE) {
+          *(cp++)=*(bp++);
+        } else {
+          ++bp;
+        }
+        continue;
+      } else if (iscntrl(c)) {
+        if (!comment && cp<fbuf+MAXLINE) *(cp++) = '?';
+        ++bp;
+        continue;
+      } else if (c==CONTINUE_CHAR) {
+        const char * end = ++bp;
+        while (*end && isspace(*(unsigned char*)end)) ++end; /* eatwhite */
+        if (*end == '\0') {
+          bp = end;
+          cont = true;
+          continue;
+        }
+        if (comment) {
+          ++bp;
+          continue;
+        }
+      } else if (comment) {
+        ++bp;
+        continue;
+      }
+
+      if (c < 0x80) {
+        if (cp+1<=fbuf+MAXLINE) {
+          *(cp++)=*(bp++);
+        }
+      } else {
+        char inbuf = (char)c;
+        int inbytes = 1;
+        int outbytes = (int)(MAXLINE-(cp-fbuf));
+        int ret = isolat1ToUTF8((xmlChar *)cp, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+        if (ret>0) cp+=ret;
+        ++bp;
+        continue;
+      }
+    }
+    if (cp==fbuf+MAXLINE) {
+      --cp;
+    }
+    *cp=0;
+  } while (cont || cp==fbuf);
+  return fbuf;
+}
+
+static const char *
+getbuf_utf8(FILE * F)
 {
   boolean cont = false;
   char quote = 0;
@@ -74,7 +191,9 @@ getbuf(FILE * F, int encoding)
           }
         }
         comment = false;
+        cont = false;
         bp = NULL;
+        continue;
       } else {
         tail[1] = '@';
       }
@@ -160,4 +279,11 @@ getbuf(FILE * F, int encoding)
     *cp=0;
   } while (cont || cp==fbuf);
   return fbuf;
+}
+
+const char *
+getbuf(FILE * F, int encoding)
+{
+  if (encoding==XML_CHAR_ENCODING_UTF8) return getbuf_utf8(F);
+  return getbuf_latin1(F);
 }

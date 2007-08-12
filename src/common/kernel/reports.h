@@ -116,6 +116,7 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
     struct region ** regions;
   } arg_regions;
 
+  extern size_t f_regionid(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
 #ifdef __cplusplus
 }

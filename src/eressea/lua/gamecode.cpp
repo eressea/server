@@ -46,6 +46,8 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
+#include <libxml/encoding.h>
+
 #include <cstring>
 #include <ctime>
 
@@ -108,7 +110,8 @@ message_region(unit& sender, const char * str)
 static int
 read_game(const char * filename, const char * encoding)
 {
-  int rv = readgame(filename, false, encoding);
+  int enc = xmlParseCharEncoding(encoding);
+  int rv = readgame(filename, false, enc);
   printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   return rv;

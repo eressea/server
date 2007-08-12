@@ -265,37 +265,43 @@ create_order_i(keyword_t kwd, const char * sptr, int persistent, const struct lo
 order *
 create_order(keyword_t kwd, const struct locale * lang, const char * params, ...)
 {
-  va_list marker;
   char zBuffer[DISPLAYSIZE];
-  char * sptr = zBuffer;
+  if (params) {
+    char * sptr = zBuffer;
+    va_list marker;
 
-  va_start(marker, params);
-  while (*params) {
-    switch (*params) {
-      case '%':
-        /* ignore these, they are syntactical sugar */
-        break;
-      case '"':
-      case '\'':
-      case ' ':
+    va_start(marker, params);
+    while (*params) {
+      if (*params=='%') {
+        int i;
+        const char * s;
+        ++params;
+        switch (*params) {
+          case 's':
+            s = va_arg(marker, const char *);
+            sptr += strlcpy(sptr, s, sizeof(zBuffer)-(sptr-zBuffer));
+            break;
+          case 'd':
+            i = va_arg(marker, int);
+            sptr += strlcpy(sptr, itoa10(i), sizeof(zBuffer)-(sptr-zBuffer));
+            break;
+          case 'i':
+            i = va_arg(marker, int);
+            sptr += strlcpy(sptr, itoa36(i), sizeof(zBuffer)-(sptr-zBuffer));
+            break;
+          default:
+            assert(!"unknown format-character in create_order");
+        }
+      } else {
         *sptr++ = *params;
-        break;
-      case 's':
-        sptr += strlcpy(sptr, va_arg(marker, const char *), sizeof(zBuffer)-(sptr-zBuffer));
-        break;
-      case 'd':
-        sptr += strlcpy(sptr, itoa10(va_arg(marker, int)), sizeof(zBuffer)-(sptr-zBuffer));
-        break;
-      case 'i':
-        sptr += strlcpy(sptr, itoa36(va_arg(marker, int)), sizeof(zBuffer)-(sptr-zBuffer));
-        break;
-      default:
-        assert(!"unknown format-character in create_order");
+      }
+      ++params;
     }
-    ++params;
+    va_end(marker);
+    *sptr = 0;
+  } else {
+    zBuffer[0] = 0;
   }
-  va_end(marker);
-
   return create_order_i(kwd, zBuffer, 0, lang);
 }
 

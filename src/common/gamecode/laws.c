@@ -1258,11 +1258,11 @@ init_prefixnames(void)
       int key;
       for (key=0;race_prefixes[key];++key) {
         variant var;
-        const char * pname = locale_string(lang, race_prefixes[key]);
+        const char * pname = locale_string(lang, mkname("prefix", race_prefixes[key]));
         if (findtoken(&in->names, pname, &var)==E_TOK_NOMATCH || var.i!=key) {
           var.i = key;
           addtoken(&in->names, pname, var);
-          addtoken(&in->names, locale_string(lang, race_prefixes[key]), var);
+          addtoken(&in->names, locale_string(lang, mkname("prefix", race_prefixes[key])), var);
         }
       }
     }
@@ -1883,7 +1883,7 @@ mail_cmd(unit * u, struct order * ord)
     default:
       /* possibly filler token? */
       s = getstrtoken();
-      cont = 1;
+      if (s && *s) cont = 1;
       break;
     }
   } while (cont);

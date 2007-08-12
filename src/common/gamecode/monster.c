@@ -155,7 +155,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
   if (rmoney(r) >= wanted) {
     /* 5% chance, dass der drache aus einer laune raus attackiert */
     if (chance(1.0-u->race->aggression)) {
-      return create_order(K_TAX, default_locale, "");
+      return create_order(K_TAX, default_locale, NULL);
     }
   }
 
@@ -178,7 +178,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
   /* falls die einnahmen erreicht werden, bleibt das monster noch eine
 	 * runde hier. */
   if (n + rmoney(r) >= wanted) {
-    return create_order(K_TAX, default_locale, "");
+    return create_order(K_TAX, default_locale, NULL);
   }
 
   /* wenn wir NULL zurückliefern, macht der drache was anderes, z.b. weggehen */
@@ -965,7 +965,7 @@ plan_monsters(void)
 
       /* All monsters guard the region: */
       if (!is_waiting(u) && r->land) {
-        addlist(&u->orders, create_order(K_GUARD, u->faction->locale, ""));
+        addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));
       }
 
       /* Einheiten mit Bewegungsplan kriegen ein NACH: */
@@ -997,7 +997,7 @@ plan_monsters(void)
 
         switch (old_race(u->race)) {
           case RC_SEASERPENT:
-            long_order = create_order(K_PIRACY, f->locale, "");
+            long_order = create_order(K_PIRACY, f->locale, NULL);
             break;
           case RC_ALP:
             long_order = monster_seeks_target(r, u);

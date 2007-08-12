@@ -22,6 +22,7 @@
 #include "reports.h"
 
 /* kernel includes */
+#include <kernel/alliance.h>
 #include <kernel/border.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -31,6 +32,7 @@
 #include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
+#include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
@@ -45,6 +47,7 @@
 #include <util/bsdstring.h>
 #include <util/base36.h>
 #include <util/functions.h>
+#include <util/translation.h>
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -1553,6 +1556,416 @@ var_free_regions(variant x)
   free(x.v);
 }
 
+const char *
+trailinto(const region * r, const struct locale * lang)
+{
+  char ref[32];
+  const char * s;
+  if (r) {
+    const char * tname = terrain_name(r);
+    strcat(strcpy(ref, tname), "_trail");
+    s = locale_string(lang, ref);
+    if (s && *s) {
+      if (strstr(s, "%s"))  return s;
+    }
+  }
+  return "%s";
+}
+
+size_t
+f_regionid(const region * r, const faction * f, char * buffer, size_t size)
+{
+
+  if (!r) {
+    strncpy(buffer, "(Chaos)", size);
+  } else {
+    plane * pl = r->planep;
+    strncpy(buffer, rname(r, f->locale), size);
+    buffer[size-1]=0;
+    if (pl==NULL || !fval(pl, PFL_NOCOORDS)) {
+      sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
+    }
+  }
+  return strlen(buffer);
+}
+
+static char *
+f_regionid_s(const region * r, const faction * f)
+{
+  static int i = 0;
+  static char bufs[4][NAMESIZE + 20];
+  char * buf = bufs[(++i)%4];
+
+  f_regionid(r, f, buf, NAMESIZE + 20);
+  return buf;
+}
+
+/*** BEGIN MESSAGE RENDERING ***/
+static void
+eval_localize(struct opstack ** stack, const void * userdata) /* (string, locale) -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct locale * lang = f?f->locale:default_locale;
+  const char *c = (const char *)opop_v(stack);
+  c = locale_string(lang, c);
+  opush_v(stack, strcpy(balloc(strlen(c)+1), c));
+}
+
+static void
+eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct locale * lang = f?f->locale:default_locale;
+  const struct region * r = (const struct region*)opop(stack).v;
+  const char * trail = trailinto(r, lang);
+  const char * rn = f_regionid_s(r, f);
+  variant var;
+  char * x = var.v = balloc(strlen(trail)+strlen(rn));
+  sprintf(x, trail, rn);
+  opush(stack, var);
+}
+
+static void
+eval_unit(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  const char * c = u?unitname(u):LOC(f->locale, "an_unknown_unit");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_unit_dative(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  const char * c = u?unitname(u):LOC(f->locale, "unknown_unit_dative");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct spell * sp = (const struct spell *)opop(stack).v;
+  const char * c = sp?spell_name(sp, f->locale):LOC(f->locale, "an_unknown_spell");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_curse(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct curse_type * sp = (const struct curse_type *)opop(stack).v;
+  const char * c = sp?curse_name(sp, f->locale):LOC(f->locale, "an_unknown_curse");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_unitname(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  const char * c = u?u->name:LOC(f->locale, "an_unknown_unit");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+
+static void
+eval_unitid(struct opstack ** stack, const void * userdata) /* unit -> int */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  const char * c = u?u->name:LOC(f->locale, "an_unknown_unit");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_unitsize(struct opstack ** stack, const void * userdata) /* unit -> int */
+{
+  const struct unit * u = (const struct unit *)opop(stack).v;
+  variant var;
+
+  var.i = u->number;
+  opush(stack, var);
+}
+
+static void
+eval_faction(struct opstack ** stack, const void * userdata) /* faction -> string */
+{
+  const struct faction * f = (const struct faction *)opop(stack).v;
+  const char * c = factionname(f);
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_alliance(struct opstack ** stack, const void * userdata) /* faction -> string */
+{
+  const struct alliance * al = (const struct alliance *)opop(stack).v;
+  const char * c = alliancename(al);
+  variant var;
+  if (c!=NULL) {
+    size_t len = strlen(c);
+    var.v = strcpy(balloc(len+1), c);
+  }
+  else var.v = NULL;
+  opush(stack, var);
+}
+
+static void
+eval_region(struct opstack ** stack, const void * userdata) /* region -> string */
+{
+  char name[NAMESIZE+32];
+  const struct faction * f = (const struct faction *)userdata;
+  const struct region * r = (const struct region *)opop(stack).v;
+  const char * c = write_regionname(r, f, name, sizeof(name));
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_terrain(struct opstack ** stack, const void * userdata) /* region -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct region * r = (const struct region *)opop(stack).v;
+  const char * c = LOC(f->locale, terrain_name(r));
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_ship(struct opstack ** stack, const void * userdata) /* ship -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct ship * u = (const struct ship *)opop(stack).v;
+  const char * c = u?shipname(u):LOC(f->locale, "an_unknown_ship");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_building(struct opstack ** stack, const void * userdata) /* building -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct building * u = (const struct building *)opop(stack).v;
+  const char * c = u?buildingname(u):LOC(f->locale, "an_unknown_building");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_weight(struct opstack ** stack, const void * userdata) /* region -> string */
+{
+  char buffer[32];
+  const struct faction * f = (const struct faction *)userdata;
+  const struct locale * lang = f->locale;
+  int weight = opop_i(stack);
+  variant var;
+
+  if (weight % SCALEWEIGHT == 0) {
+    if (weight==SCALEWEIGHT) {
+      sprintf(buffer, "1 %s", LOC(lang, "weight_unit"));
+    } else {
+      sprintf(buffer, "%u %s", weight/SCALEWEIGHT, LOC(lang, "weight_unit_p"));
+    }
+  } else {
+    if (weight==1) {
+      sprintf(buffer, "1 %s %u", LOC(lang, "weight_per"), SCALEWEIGHT);
+    } else {
+      sprintf(buffer, "%u %s %u", weight, LOC(lang, "weight_per_p"), SCALEWEIGHT);
+    }
+  }
+
+  var.v = strcpy(balloc(strlen(buffer)+1), buffer);
+  opush(stack, var);
+}
+
+static void
+eval_resource(struct opstack ** stack, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  int j = opop(stack).i;
+  const struct resource_type * res = (const struct resource_type *)opop(stack).v;
+  const char * c = LOC(report->locale, resourcename(res, j!=1));
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_race(struct opstack ** stack, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  int j = opop(stack).i;
+  const race * r = (const race *)opop(stack).v;
+  const char * c = LOC(report->locale, rc_name(r, j!=1));
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+  const faction * report = (const faction*)userdata;
+  const struct order * ord = (const struct order *)opop(stack).v;
+  static char buf[256];
+  size_t len;
+  variant var;
+
+  write_order(ord, report->locale, buf, sizeof(buf));
+  len = strlen(buf);
+  var.v = strcpy(balloc(len+1), buf);
+  opush(stack, var);
+}
+
+static void
+eval_resources(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+  const faction * report = (const faction*)userdata;
+  const struct resource * res = (const struct resource *)opop(stack).v;
+  static char buf[256];
+  size_t len = sizeof(buf);
+  variant var;
+
+  char * edit = buf;
+  while (res!=NULL && len > 4) {
+    const char * rname = resourcename(res->type, (res->number!=1)?NMF_PLURAL:0);
+    int written = snprintf(edit, len, "%d %s", res->number, LOC(report->locale, rname));
+    len -= written;
+    edit += written;
+
+    res = res->next;
+    if (res!=NULL && len>2) {
+      strcat(edit, ", ");
+      edit += 2;
+      len -= 2;
+    }
+  }
+  *edit = 0;
+  var.v = strcpy(balloc(edit-buf+1), buf);
+  opush(stack, var);
+}
+
+static void
+eval_regions(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+  const faction * report = (const faction*)userdata;
+  int i = opop(stack).i;
+  int end, begin = opop(stack).i;
+  const arg_regions * regions = (const arg_regions *)opop(stack).v;
+  static char buf[256];
+  size_t len = sizeof(buf);
+  variant var;
+  char * edit = buf;
+
+  if (regions==NULL) {
+    end = begin;
+  } else {
+    if (i>=0) end = begin+i;
+    else end = regions->nregions+i;
+  }
+  for (i=begin;i<end;++i) {
+    const char * rname = (const char*)regionname(regions->regions[i], report);
+    size_t written = strlcpy(edit, rname, len);
+    len -= written;
+    edit += written;
+
+    if (i+1<end && len>2) {
+      strcat(edit, ", ");
+      edit += 2;
+      len -= 2;
+    }
+  }
+  *edit = 0;
+  var.v = strcpy(balloc(edit-buf+1), buf);
+  opush(stack, var);
+}
+
+static void
+eval_direction(struct opstack ** stack, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  int i = opop(stack).i;
+  const char * c = LOC(report->locale, (i>=0)?directions[i]:"unknown_direction");
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_skill(struct opstack ** stack, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  skill_t sk = (skill_t)opop(stack).i;
+  const char * c = skillname(sk, report->locale);
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+}
+
+static void
+eval_int36(struct opstack ** stack, const void * userdata)
+{
+  int i = opop(stack).i;
+  const char * c = itoa36(i);
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
+  unused(userdata);
+}
+/*** END MESSAGE RENDERING ***/
+
 void
 reports_init(void)
 {
@@ -1575,6 +1988,32 @@ reports_init(void)
   register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
   register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
   register_argtype("regions", var_free_regions, var_copy_regions, VAR_VOIDPTR);
+
+  /* register functions that turn message contents to readable strings */
+  add_function("alliance", &eval_alliance);
+  add_function("region", &eval_region);
+  add_function("terrain", &eval_terrain);
+  add_function("weight", &eval_weight);
+  add_function("resource", &eval_resource);
+  add_function("race", &eval_race);
+  add_function("faction", &eval_faction);
+  add_function("ship", &eval_ship);
+  add_function("unit", &eval_unit);
+  add_function("unit.dative", &eval_unit_dative);
+  add_function("unit.name", &eval_unitname);
+  add_function("unit.id", &eval_unitid);
+  add_function("unit.size", &eval_unitsize);
+  add_function("building", &eval_building);
+  add_function("skill", &eval_skill);
+  add_function("order", &eval_order);
+  add_function("direction", &eval_direction);
+  add_function("int36", &eval_int36);
+  add_function("trail", &eval_trail);
+  add_function("localize", &eval_localize);
+  add_function("spell", &eval_spell);
+  add_function("curse", &eval_curse);
+  add_function("resources", &eval_resources);
+  add_function("regions", &eval_regions);
 
   /* register alternative visibility functions */
   register_function((pf_generic)view_neighbours, "view_neighbours");

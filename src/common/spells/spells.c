@@ -2404,7 +2404,7 @@ patzer_peasantmob(castorder *co)
     u = create_unit(r, f, n, new_race[RC_PEASANT], 0, LOC(f->locale, "angry_mob"), NULL);
     fset(u, UFL_ISNEW);
     /* guard(u, GUARD_ALL);  hier zu früh! Befehl BEWACHE setzten */
-    addlist(&u->orders, create_order(K_GUARD, lang, ""));
+    addlist(&u->orders, create_order(K_GUARD, lang, NULL));
     set_order(&u->thisorder, default_order(lang));
     a = a_new(&at_unitdissolve);
     a->data.ca[0] = 1;  /* An rpeasants(r). */

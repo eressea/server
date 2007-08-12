@@ -2832,7 +2832,7 @@ print_stats(battle * b)
 
       message_faction(b, f, msg_separator);
 
-      msg = msg_message("msg_army", "index name", army_index(s), sname);
+      msg = msg_message("battle_army", "index name", army_index(s), sname);
       message_faction(b, f, msg);
       msg_release(msg);
 

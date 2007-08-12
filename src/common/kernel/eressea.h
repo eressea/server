@@ -430,9 +430,6 @@ extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern struct order * default_order(const struct locale * lang);
 extern int entertainmoney(const struct region * r);
 
-extern int freadstr(FILE * F, int encoding, char * str, size_t size);
-extern int fwritestr(FILE * F, const char * str);
-
 extern void plagues(struct region * r, boolean ismagic);
 
 extern struct attrib_type at_guard;
