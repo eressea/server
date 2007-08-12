@@ -2270,6 +2270,10 @@ sp_stormwinds(castorder *co)
 
     sh = pa->param[n]->data.sh;
 
+    if (sh->type->cargo>50000) {
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_flying_ship_too_big", "ship", sh))
+      continue;
+    }
     /* mit C_SHIP_NODRIFT haben wir kein Problem */
     if (is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
       ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_spell_on_flying_ship", "ship", sh))

@@ -453,11 +453,6 @@ cansail(const region * r, ship * sh)
 	  return false;
 	getshipweight(sh, &n, &p);
 
-  if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
-		if (sh->type->cargo>500*100)
-			assert(!"Ein Schiff wurde verzaubert, das zu groß ist");
-		if (n > 10000) return false;
-	}
 	if (n > shipcapacity(sh)) return false;
 	if (p > sh->type->cabins) return false;
 

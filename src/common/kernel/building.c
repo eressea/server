@@ -34,6 +34,7 @@
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 

@@ -1485,6 +1485,7 @@ name_cmd(unit * u, struct order * ord)
       }
       s = &b->name;
     } else {
+      // TODO: building types static speichern um lookups zu sparen
       if (!b) {
         cmistake(u, ord, 145, MSG_PRODUCE);
         break;
@@ -1493,7 +1494,7 @@ name_cmd(unit * u, struct order * ord)
         cmistake(u, ord, 148, MSG_PRODUCE);
         break;
       }
-      if (b->type == bt_find("generic")) {
+      if (b->type == bt_find("genericbuilding")) {
         cmistake(u, ord, 278, MSG_EVENT);
         break;
       }
@@ -1503,7 +1504,7 @@ name_cmd(unit * u, struct order * ord)
           break;
         }
       }
-      if (b->type == bt_find("artsculpure")) {
+      if (b->type == bt_find("artsculpture")) {
         cmistake(u, ord, 29, MSG_EVENT);
         break;
       }
