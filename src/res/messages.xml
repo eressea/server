@@ -2345,7 +2345,7 @@
       <arg name="race" type="race"/>
     </type>
     <text locale="de">"$unit($mage) ruft einen Vertrauten. $race($race, 0) können $skills lernen."</text>
-    <text locale="en">"$unit($mage) summons a familiar. $race($race, 0) can learn $skills."</text>
+    <text locale="en">"$unit($mage) summons a familiar. $race($race, 0) can learn ${skills}."</text>
   </message>
 
   <message name="babbler_resist" section="magic">
@@ -3475,8 +3475,8 @@
       <arg name="target" type="unit"/>
       <arg name="skills" type="string"/>
     </type>
-    <text locale="de">"$unit($target) beherrscht $skills."</text>
-    <text locale="en">"$unit($target) has the skills $skills"</text>
+    <text locale="de">"$unit($target) beherrscht ${skills}."</text>
+    <text locale="en">"$unit($target) has the skills ${skills}."</text>
   </message>
   <message name="spyreport_items" section="events">
     <type>
@@ -4048,21 +4048,14 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dazu muss erst die Spezialeigenschaft erworben werden."</text>
   </message>
-  <message name="error279" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Beschreibung des Gebäudes kann nicht geändert werden."</text>
-  </message>
   <message name="error278" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Name des Gebäudes kann nicht geändert werden."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Name und Beschreibung des Gebäudes können nicht geändert werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot change the name and description of this building."</text>
   </message>
   <message name="error277" section="errors">
     <type>
@@ -6579,18 +6572,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Botschaft enthält keinen Text."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The message does not contain text."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The message does not contain text."</text>
-  </message>
-  <message name="error29" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Beschreibung von Monumenten kann man nicht verändern."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The description of a monument can not be changed anymore."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The description of a monument can not be changed anymore."</text>
   </message>
   <message name="error28" section="errors">
     <type>
@@ -6607,7 +6589,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Anzahl zu verkaufender Produkte fehlt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The amount of items for sale is missing."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The amount of items for sale is missing."</text>
   </message>
   <message name="error26" section="errors">
@@ -6617,7 +6598,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Anzahl zu kaufender Produkte fehlt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The amount of items to buy is missing."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The amount of items to buy is missing."</text>
   </message>
   <message name="error25" section="errors">
@@ -6627,7 +6607,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Fluch verhindert das."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The escape prevented that from happening."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The escape prevented that from happening."</text>
   </message>
   <message name="error24" section="errors">
@@ -6637,7 +6616,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Belagerungszustand macht Spionage unmöglich."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Espionage was not possible due to siege."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Espionage was not possible due to siege."</text>
   </message>
   <message name="error23" section="errors">
@@ -6647,7 +6625,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Belagerungszustand macht die Kontaktaufnahme unmöglich."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Contact was not possible due to siege."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Contact was not possible due to siege."</text>
   </message>
   <message name="error22" section="errors">
@@ -6657,7 +6634,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Befehl wurde nicht erkannt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Unknown command."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Unknown command."</text>
   </message>
   <message name="error21" section="errors">
@@ -6667,7 +6643,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dazu gibt es keine Informationen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is no information available for the request."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no information available for the request."</text>
   </message>
   <message name="error20" section="errors">
@@ -6677,7 +6652,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff wurde nicht gefunden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship could not be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship could not be found."</text>
   </message>
   <message name="error19" section="errors">
@@ -6687,7 +6661,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff muß erst verlassen werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - First you have to leave the ship."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - First you have to leave the ship."</text>
   </message>
   <message name="error18" section="errors">
@@ -6697,17 +6670,17 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist zu schwer beladen, um in See zu stechen."</text>
-    <text locale="fr">"$unit($unit) en $region($region): '$order($command)' - L'unité est trop chargée pour se déplacer."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is too heavily loaded to sail."</text>
   </message>
-  <message name="error17" section="errors">
+  <message name="error_flying_ship_too_big" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
+      <arg name="ship" type="ship"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist zu schwer beladen, um fliegen zu können."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is too much cargo on board this ship to fly."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $ship($ship) ist zu groß, um fliegen zu können."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $ship($ship) is too bulky to fly."</text>
   </message>
   <message name="error16" section="errors">
     <type>
@@ -7950,6 +7923,14 @@
     </type>
     <text locale="de">"Die $ship($ship) ist mit gutem Wind gesegnet$if($lt($duration,3),", doch der Zauber beginnt sich bereits aufzulösen",""). ($int36($id))"</text>
     <text locale="en">"The $ship($ship) is blessed with favourable winds$if($lt($duration,3),", but the spell is starting to wear thin",""). ($int36($id))"</text>
+  </message>
+
+  <message name="curseinfo::flyingship" section="magic">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Kräftige Stürme haben dieses Schiff in die Luft gehoben. ($int36($id))"</text>
+    <text locale="en">"Powerful storms have lifted this ship high into the air. ($int36($id))"</text>
   </message>
 
   <message name="curseinfo::astralblock" section="magic">

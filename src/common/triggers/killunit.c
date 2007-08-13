@@ -40,7 +40,7 @@ killunit_handle(trigger * t, void * data)
 	if (u!=NULL) {
 		destroy_unit(u);
   } else {
-		log_error(("could not perform killunit::handle()\n"));
+		log_warning(("could not perform killunit::handle()\n"));
   }
 	unused(data);
 	return 0;

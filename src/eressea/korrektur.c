@@ -804,7 +804,9 @@ check_mages(void)
       int maxmages = max_skill(f, SK_MAGIC);
 
       for (u = f->units;u!=NULL;u=u->nextF) {
-        if (is_mage(u) && !is_familiar(u)) ++mages;
+        if (is_mage(u) && !is_familiar(u)) {
+          ++mages;
+        }
       }
       if (mages>maxmages) {
         log_error(("faction %s has %d of max %d magicians.\n",

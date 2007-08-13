@@ -131,7 +131,6 @@ bt_find(const char* name)
 	}
 	while (btl && strcmp(btl->type->_name, name)) btl = btl->next;
   if (btl==NULL) {
-    log_error(("could not locate building type '%s'.\n", name));
     return NULL;
   }
 	return btl->type;

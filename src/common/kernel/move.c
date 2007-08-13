@@ -1542,10 +1542,7 @@ ship_ready(const region * r, unit * u)
 		return false;
 	}
 	if (!cansail(r, u->ship)) {
-		if( is_cursed(u->ship->attribs, C_SHIP_FLYING, 0) )
-			cmistake(u, u->thisorder, 17, MSG_MOVE);
-		else
-			cmistake(u, u->thisorder, 18, MSG_MOVE);
+    cmistake(u, u->thisorder, 18, MSG_MOVE);
 		return false;
 	}
 	return true;

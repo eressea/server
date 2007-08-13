@@ -262,6 +262,7 @@ parse_buildings(xmlDocPtr doc)
       if (xml_bvalue(node, "nodestroy", false)) btype->flags |= BTF_INDESTRUCTIBLE;
       if (xml_bvalue(node, "oneperturn", false)) btype->flags |= BTF_ONEPERTURN;
       if (xml_bvalue(node, "nobuild", false)) btype->flags |= BTF_NOBUILD;
+      if (xml_bvalue(node, "namechange", true)) btype->flags |= BTF_NAMECHANGE;
       if (xml_bvalue(node, "unique", false)) btype->flags |= BTF_UNIQUE;
       if (xml_bvalue(node, "decay", false)) btype->flags |= BTF_DECAY;
       if (xml_bvalue(node, "magic", false)) btype->flags |= BTF_MAGIC;

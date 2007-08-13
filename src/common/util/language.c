@@ -52,17 +52,17 @@ make_locale(const char * name)
 {
 	unsigned int hkey = hashstring(name);
 	locale * l = (locale *)calloc(sizeof(locale), 1);
-#ifndef NDEBUG
-	locale * lp = locales;
-	while (lp && lp->hashkey!=hkey) lp=lp->next;
-	assert(lp == NULL);
-#endif
+	locale ** lp = &locales;
+
+  while (*lp && (*lp)->hashkey!=hkey) lp=&(*lp)->next;
+	assert(*lp == NULL);
+
 	l->hashkey = hkey;
 	l->name = strdup(name);
-	l->next = locales;
+	l->next = NULL;
   l->index = nextlocaleindex++;
   assert(nextlocaleindex<=MAXLOCALES);
-	locales = l;
+	*lp = l;
 	if (default_locale==NULL) default_locale = l;
 	return l;
 }
@@ -70,6 +70,7 @@ make_locale(const char * name)
 /** creates a list of locales
  * This function takes a comma-delimited list of locale-names and creates
  * the locales using the make_locale function (useful for ini-files).
+ * For maximum performance, locales should be created in order of popularity.
  */
 void
 make_locales(const char * str)

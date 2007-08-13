@@ -1543,6 +1543,7 @@ creport_init(void)
   tsf_register("direction", &cr_int);
   tsf_register("alliance", &cr_alliance);
   tsf_register("resources", &cr_resources);
+  tsf_register("items", &cr_resources);
   tsf_register("regions", &cr_regions);
 
   register_reporttype("cr", &report_computer, 1<<O_COMPUTER);

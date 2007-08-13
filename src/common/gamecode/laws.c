@@ -1343,16 +1343,8 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 5, MSG_PRODUCE);
       break;
     }
-    if (b->type == bt_find("generic")) {
-      cmistake(u, ord, 279, MSG_PRODUCE);
-      break;
-    }
-    if (b->type == bt_find("monument") && b->display && b->display[0] != 0) {
-      cmistake(u, ord, 29, MSG_PRODUCE);
-      break;
-    }
-    if (b->type == bt_find("artsculpture") && b->display && b->display[0] != 0) {
-      cmistake(u, ord, 29, MSG_PRODUCE);
+    if (!fval(b->type, BTF_NAMECHANGE) && b->display && b->display[0] != 0) {
+      cmistake(u, ord, 278, MSG_EVENT);
       break;
     }
     s = &b->display;
@@ -1485,7 +1477,6 @@ name_cmd(unit * u, struct order * ord)
       }
       s = &b->name;
     } else {
-      // TODO: building types static speichern um lookups zu sparen
       if (!b) {
         cmistake(u, ord, 145, MSG_PRODUCE);
         break;
@@ -1494,18 +1485,8 @@ name_cmd(unit * u, struct order * ord)
         cmistake(u, ord, 148, MSG_PRODUCE);
         break;
       }
-      if (b->type == bt_find("genericbuilding")) {
+      if (!fval(b->type, BTF_NAMECHANGE)) {
         cmistake(u, ord, 278, MSG_EVENT);
-        break;
-      }
-      if (b->type == bt_find("monument")) {
-        if (renamed_building(b)) {
-          cmistake(u, ord, 29, MSG_EVENT);
-          break;
-        }
-      }
-      if (b->type == bt_find("artsculpture")) {
-        cmistake(u, ord, 29, MSG_EVENT);
         break;
       }
       s = &b->name;
