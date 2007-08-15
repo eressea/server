@@ -26,7 +26,6 @@
 #include "variant.h"
 
 typedef struct unresolved {
-	struct unresolved * next;
 	void ** ptrptr;
 		/* pointer to the location where the unresolved object
 		 * should be, or NULL if special handling is required */
@@ -36,26 +35,46 @@ typedef struct unresolved {
 		/* function to resolve the unknown object */
 } unresolved;
 
-unresolved * ur_list;
+#define BLOCKSIZE 1024
+static unresolved * ur_list;
+static unresolved * ur_begin;
+static unresolved * ur_current;
 
 void
-ur_add(variant data, void ** ptrptr, resolve_fun fun) {
-   unresolved * ur = malloc(sizeof(unresolved));
-   ur->data = data;
-   ur->resolve = fun;
-   ur->ptrptr = ptrptr;
-   ur->next = ur_list;
-   ur_list = ur;
+ur_add(variant data, void ** ptrptr, resolve_fun fun)
+{
+  if (ur_list==NULL) {
+    ur_list = malloc(BLOCKSIZE*sizeof(unresolved));
+    ur_begin = ur_current = ur_list;
+  }
+  else if (ur_current-ur_begin==BLOCKSIZE-1) {
+    ur_begin = malloc(BLOCKSIZE*sizeof(unresolved));
+    ur_current->data.v = ur_begin;
+    ur_current = ur_begin;
+  }
+  ur_current->data = data;
+  ur_current->resolve = fun;
+  ur_current->ptrptr = ptrptr;
+
+  ++ur_current;
+  ur_current->resolve = NULL;
+  ur_current->data.v = NULL;
 }
 
 void
 resolve(void)
 {
-	while (ur_list) {
-		unresolved * ur = ur_list;
-		ur_list = ur->next;
-		if (ur->ptrptr) *ur->ptrptr = ur->resolve(ur->data);
-		else ur->resolve(ur->data);
-		free(ur);
-	}
+  unresolved * ur = ur_list;
+  while (ur) {
+    if (ur->resolve==NULL) {
+      ur = ur->data.v;
+      free(ur_list);
+      ur_list = ur;
+      continue;
+    }
+    if (ur->ptrptr) *ur->ptrptr = ur->resolve(ur->data);
+    else ur->resolve(ur->data);
+    ++ur;
+  }
+  ur_list = ur_begin = ur_current;
 }

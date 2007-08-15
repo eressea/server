@@ -25,7 +25,7 @@ function write_addresses()
   file = io.open(basepath .. "/adressen", "w")
   for faction in factions() do
     -- print(faction.id .. " - " .. faction.locale)
-    file:write(tostring(faction) .. ":" .. faction.email .. ":" .. faction.banner .. "\n")
+    file:write(tostring(faction) .. ":" .. faction.email .. ":" .. faction.info .. "\n")
   end
 
   file:close()

@@ -163,6 +163,7 @@ static boolean g_ignore_errors = false;
 static boolean opt_reportonly = false;
 static const char * luafile = NULL;
 static const char * script_path = "scripts";
+static int memdebug = 0;
 
 struct settings global = {
   "Eressea", /* gamename */
@@ -386,18 +387,22 @@ game_done(void)
 }
 #endif
 
-#include "magic.h"
-
 #define CRTDBG
-
 #ifdef CRTDBG
 void
 init_crtdbg(void)
 {
 #if (defined(_MSC_VER))
   int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-  // flags = (flags&0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
-  // flags |= _CRTDBG_CHECK_ALWAYS_DF; /* expensive */
+  if (memdebug==1) {
+    flags |= _CRTDBG_CHECK_ALWAYS_DF; /* expensive */
+  } else if (memdebug==2) {
+    flags = (flags&0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
+  } else if (memdebug==3) {
+    flags = (flags&0x0000FFFF) | _CRTDBG_CHECK_EVERY_128_DF;
+  } else if (memdebug==4) {
+    flags = (flags&0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
+  }
   _CrtSetDbgFlag(flags);
 #endif
 }
@@ -608,6 +613,7 @@ load_inifile(const char * filename)
     xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
     script_path = iniparser_getstring(d, "common:scripts", script_path);
     lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
+    memdebug = iniparser_getint(d, "common:memcheck", memdebug);
 
     str = iniparser_getstring(d, "common:gamedata_encoding", NULL);
     if (str) enc_gamedata = xmlParseCharEncoding(str);
@@ -652,14 +658,15 @@ main(int argc, char *argv[])
     return -1;
   }
 #endif
-#ifdef CRTDBG
-  init_crtdbg();
-#endif
   
   lua_State * luaState = lua_init();
   global.vm_state = luaState;
   load_inifile("eressea.ini");
   if ((i=read_args(argc, argv, luaState))!=0) return i;
+
+#ifdef CRTDBG
+  init_crtdbg();
+#endif
 
   kernel_init();
   game_init();

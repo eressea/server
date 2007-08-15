@@ -199,13 +199,14 @@ read_groups(FILE * F, faction * f)
 			fscanf(F, "%s ", buf);
 			aid.i = atoi36(buf);
 			if (aid.i==0) break;
-			a = calloc(sizeof(ally), 1);
+			a = malloc(sizeof(ally));
 			*pa = a;
 			pa = &a->next;
 			fscanf(F, "%d ", &a->status);
 			a->faction = findfaction(aid.i);
 			if (!a->faction) ur_add(aid, (void**)&a->faction, resolve_faction);
 		}
+    *pa = 0;
 		if(global.data_version >= GROUPATTRIB_VERSION) {
 			a_read(F, &g->attribs);
 		}

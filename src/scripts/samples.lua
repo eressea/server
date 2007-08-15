@@ -411,7 +411,7 @@ function test_moving()
   end
 end
 
-test_movement()
+-- test_movement()
 -- test_fail()
 -- test_handler()
 -- test_parser()
@@ -425,10 +425,12 @@ test_movement()
 -- write_game("../testg.txt")
 -- read_game("../testg.txt")
 
-if 1==1 then
+if 0==1 then
   run_scripts()
   process_orders()
   write_reports() 
 end
 
 -- test_moving()
+
+read_game("530", "ISO-8859-1")
