@@ -1343,7 +1343,7 @@ gmmain(int argc, char *argv[])
   if (turn>first_turn) {
     char datafile[12];
     sprintf(datafile, "%u", turn);
-    readgame(datafile, 0, enc_gamedata);
+    readgame(datafile, 0);
   }
 
   run_mapper();

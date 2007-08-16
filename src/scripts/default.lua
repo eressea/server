@@ -9,8 +9,9 @@ function write_emails(locales)
 
   local faction
   for faction in factions() do
-    -- print(faction.id .. " - " .. faction.locale)
-    files[faction.locale]:write(faction.email .. "\n")
+    if faction.email~="" then
+      files[faction.locale]:write(faction.email .. "\n")
+    end
   end
 
   for key, file in pairs(files) do

@@ -56,7 +56,8 @@ function process(orders)
   equipment_setitem("new_faction", "money", "4200");
 
   file = "" .. get_turn()
-  if read_game(file, enc_game)~=0 then
+  set_encoding(enc_game)
+  if read_game(file)~=0 then
     print("could not read game")
     return -1
   end

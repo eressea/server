@@ -615,10 +615,8 @@ load_inifile(const char * filename)
     lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
     memdebug = iniparser_getint(d, "common:memcheck", memdebug);
 
-    str = iniparser_getstring(d, "common:gamedata_encoding", NULL);
+    str = iniparser_getstring(d, "common:encoding", NULL);
     if (str) enc_gamedata = xmlParseCharEncoding(str);
-    str = iniparser_getstring(d, "common:orderfile_encoding", NULL);
-    if (str) enc_orderfile = xmlParseCharEncoding(str);
 
     quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;

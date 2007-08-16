@@ -3692,6 +3692,8 @@ void
 process(void)
 {
   processor *proc = processors;
+  faction * f;
+
   while (proc) {
     int prio = proc->priority;
     region *r;
@@ -3775,6 +3777,20 @@ process(void)
 
     }
   }
+
+  if (quiet<2) printf("\n - Leere Gruppen löschen...\n");
+  for (f=factions; f; f=f->next) {
+    group ** gp = &f->groups;
+    while (*gp) {
+      group * g = *gp;
+      if (g->members==0) {
+        *gp = g->next;
+        free_group(g);
+      } else
+        gp = &g->next;
+    }
+  }
+
 }
 
 static void enter_1(region * r) { do_misc(r, false); }

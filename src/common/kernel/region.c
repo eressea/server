@@ -446,7 +446,10 @@ r_connect(const region * r, direction_t dir)
   buffer[dir] = rfindhash(r->x + delta_x[dir], r->y + delta_y[dir]);
   set |= (1<<dir);
 #ifdef FAST_CONNECT
-  rmodify->connect[dir] = buffer[dir];
+  if (buffer[dir]) {
+    rmodify->connect[dir] = buffer[dir];
+    buffer[dir]->connect[back[dir]] = rmodify;
+  }
 #endif
   return buffer[dir];
 }

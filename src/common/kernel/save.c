@@ -88,7 +88,6 @@ const char * xmlfile = "eressea.xml";
 const char * g_datadir;
 int firstx = 0, firsty = 0;
 int enc_gamedata = 0;
-int enc_orderfile = 0;
 
 /* local symbols */
 static region * current_region;
@@ -652,20 +651,19 @@ igetparam (const char *s, const struct locale *lang)
 }
 
 int
-readorders(const char *filename, const char * encoding)
+readorders(const char *filename)
 {
   FILE * F = NULL;
   const char *b;
   int nfactions=0;
   struct faction *f = NULL;
-  int enc = xmlParseCharEncoding(encoding);
 
   if (filename) F = cfopen(filename, "rt");
   if (F==NULL) return 0;
 
   puts(" - lese Befehlsdatei...\n");
 
-  b = getbuf(F, enc);
+  b = getbuf(F, enc_gamedata);
 
   /* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
    * Partei */
@@ -685,7 +683,7 @@ readorders(const char *filename, const char * encoding)
       }
 #endif
 
-      b = getbuf(F, enc);
+      b = getbuf(F, enc_gamedata);
       break;
     case P_GAMENAME:
     case P_FACTION:
@@ -694,7 +692,7 @@ readorders(const char *filename, const char * encoding)
         ++nfactions;
       }
 
-      b = getbuf(F, enc);
+      b = getbuf(F, enc_gamedata);
       break;
 
       /* in factionorders wird nur eine zeile gelesen:
@@ -703,8 +701,8 @@ readorders(const char *filename, const char * encoding)
        * vermerkt. */
 
     case P_UNIT:
-      if (!f || !unitorders(F, enc, f)) do {
-        b = getbuf(F, enc);
+      if (!f || !unitorders(F, enc_gamedata, f)) do {
+        b = getbuf(F, enc_gamedata);
         if (!b) break;
         p = igetparam(b, lang);
       } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT && p != P_GAMENAME);
@@ -719,11 +717,11 @@ readorders(const char *filename, const char * encoding)
 
     case P_NEXT:
       f = NULL;
-      b = getbuf(F, enc);
+      b = getbuf(F, enc_gamedata);
       break;
 
     default:
-      b = getbuf(F, enc);
+      b = getbuf(F, enc_gamedata);
       break;
     }
   }
@@ -1736,7 +1734,7 @@ writefaction(FILE * F, const faction * f)
 }
 
 int
-readgame(const char * filename, int backup, int encoding)
+readgame(const char * filename, int backup)
 {
   int i, n, p;
   faction *f, **fp;
@@ -1795,7 +1793,7 @@ readgame(const char * filename, int backup, int encoding)
   while(--n >= 0) {
     plane *pl = calloc(1, sizeof(plane));
     pl->id = ri(F);
-    xrds(F, &pl->name, encoding);
+    xrds(F, &pl->name, enc_gamedata);
     pl->minx = (short)ri(F);
     pl->maxx = (short)ri(F);
     pl->miny = (short)ri(F);
@@ -1830,7 +1828,7 @@ readgame(const char * filename, int backup, int encoding)
   /* fflush (stdout); */
 
   while (--n >= 0) {
-    faction * f = readfaction(F, encoding);
+    faction * f = readfaction(F, enc_gamedata);
 
     *fp = f;
     fp = &f->next;
@@ -1888,7 +1886,7 @@ readgame(const char * filename, int backup, int encoding)
     }
     --rmax;
 
-    r = readregion(F, encoding, x, y);
+    r = readregion(F, enc_gamedata, x, y);
 
     /* Burgen */
     p = ri(F);
@@ -1901,9 +1899,9 @@ readgame(const char * filename, int backup, int encoding)
       *bp = b;
       bp = &b->next;
       bhash(b);
-      xrds(F, &b->name, encoding);
+      xrds(F, &b->name, enc_gamedata);
       if (lomem) rds(F, 0);
-      else xrds(F, &b->display, encoding);
+      else xrds(F, &b->display, enc_gamedata);
       b->size = ri(F);
       if (global.data_version < TYPES_VERSION) {
         assert(!"data format is no longer supported");
@@ -1928,9 +1926,9 @@ readgame(const char * filename, int backup, int encoding)
       *shp = sh;
       shp = &sh->next;
       shash(sh);
-      xrds(F, &sh->name, encoding);
+      xrds(F, &sh->name, enc_gamedata);
       if (lomem) rds(F, NULL);
-      else xrds(F, &sh->display, encoding);
+      else xrds(F, &sh->display, enc_gamedata);
 
       rss(F, token, sizeof(token));
       sh->type = st_find(token);
@@ -1956,7 +1954,7 @@ readgame(const char * filename, int backup, int encoding)
     up = &r->units;
 
     while (--p >= 0) {
-      unit * u = readunit(F, encoding);
+      unit * u = readunit(F, enc_gamedata);
       sc_mage * mage;
 
       assert(u->region==NULL);
@@ -1983,19 +1981,6 @@ readgame(const char * filename, int backup, int encoding)
   /* Unaufgeloeste Zeiger initialisieren */
   if (quiet<2) printf("\n - Referenzen initialisieren...\n");
   resolve();
-
-  if (quiet<2) printf("\n - Leere Gruppen löschen...\n");
-  for (f=factions; f; f=f->next) {
-    group ** gp = &f->groups;
-    while (*gp) {
-      group * g = *gp;
-      if (g->members==0) {
-        *gp = g->next;
-        free_group(g);
-      } else
-        gp = &g->next;
-    }
-  }
 
   for (r=regions;r;r=r->next) {
     building * b;

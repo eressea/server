@@ -107,11 +107,22 @@ message_region(unit& sender, const char * str)
   ADDMSG(&sender.region->msgs, msg_message("mail_result", "unit message", &sender, str));
 }
 
-static int
-read_game(const char * filename, const char * encoding)
+static void
+set_encoding(const char * str)
 {
-  int enc = xmlParseCharEncoding(encoding);
-  int rv = readgame(filename, false, enc);
+  enc_gamedata = xmlParseCharEncoding(str);
+}
+
+static const char *
+get_encoding(void)
+{
+  return xmlGetCharEncodingName((xmlCharEncoding)enc_gamedata);
+}
+
+static int
+read_game(const char * filename)
+{
+  int rv = readgame(filename, false);
   printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   return rv;
@@ -213,6 +224,9 @@ bind_gamecode(lua_State * L)
   module(L)[
     def("read_game", &read_game),
     def("write_game", &write_game),
+
+    def("get_encoding", &get_encoding),
+    def("set_encoding", &set_encoding),
 
     def("init_summary", &init_summary),
     def("write_summary", &write_summary),

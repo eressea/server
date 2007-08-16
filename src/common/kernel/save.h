@@ -34,9 +34,9 @@ double version(void);
  * dass hier ein Fehler (fehlende ") vorliegt */
 
 FILE * cfopen(const char *filename, const char *mode);
-int readorders(const char *filename, const char * encoding);
+int readorders(const char *filename);
 int creategame(void);
-extern int readgame(const char * filename, int backup, int encoding);
+extern int readgame(const char * filename, int backup);
 int writegame(const char *filename, int quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);
@@ -48,7 +48,6 @@ extern int maxregions;
 extern int firstx, firsty;
 extern const char *xmlfile;
 extern int enc_gamedata;
-extern int enc_orderfile;
 
 extern void init_locales(void);
 extern int lastturn(void);
