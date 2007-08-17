@@ -3139,6 +3139,7 @@ new_units (void)
             const char * token;
             char * name = NULL;
             int alias;
+            ship * sh;
             order ** newordersp;
 
             if (!checkunitnumber(u->faction, 1)) {
@@ -3173,12 +3174,9 @@ new_units (void)
             fset(u2, UFL_ISNEW);
 
             a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
-
+            sh = leftship(u);
+            if (sh) set_leftship(u2, sh);
             setstatus(u2, u->status);
-            /*
-            g = getguard(u);
-            if (g) setguard(u2, g);
-            */
 
             ordp = &makeord->next;
             newordersp = &u2->orders;

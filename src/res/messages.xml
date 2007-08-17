@@ -6131,6 +6131,16 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This region is guarded by a non allied faction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This region is guarded by a non allied faction."</text>
   </message>
+  <message name="region_guarded" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="guard" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Region wird von $unit($guard), einer nichtalliierten Einheit, bewacht."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This region is guarded by $unit($guard), a non-allied unit."</text>
+  </message>
   <message name="error67" section="errors">
     <type>
       <arg name="unit" type="unit"/>

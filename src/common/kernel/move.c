@@ -1993,9 +1993,12 @@ travel(unit * u, region_list ** routep)
       sh = leftship(u);
       if (sh && sh->region!=u->region) sh = NULL;
     }
-    if (sh && is_guarded(r, u, GUARD_LANDING)) {
-      cmistake(u, u->thisorder, 70, MSG_MOVE);
-      return;
+    if (sh) {
+      unit * guard = is_guarded(r, u, GUARD_LANDING);
+      if (guard) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "region_guarded", "guard", guard));
+        return;
+      }
     }
     if (u->ship && u->race->flags & RCF_SWIM) {
       cmistake(u, u->thisorder, 143, MSG_MOVE);
@@ -2457,7 +2460,13 @@ movement(void)
 
       while (*up) {
         unit *u = *up;
-        keyword_t kword = get_keyword(u->thisorder);
+        keyword_t kword;
+ 
+        if (u->ship && fval(u->ship, SF_DRIFTED)) {
+          up = &u->next;
+          continue;
+        }
+        kword = get_keyword(u->thisorder);
 
         switch (kword) {
         case K_ROUTE:
