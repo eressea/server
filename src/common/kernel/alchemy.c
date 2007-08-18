@@ -37,6 +37,8 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/base36.h>
+#include <util/log.h>
 #include <util/rand.h>
 
 /* libc includes */
@@ -220,8 +222,8 @@ change_effect (unit * u, const potion_type * effect, int delta)
     attrib * a = a_find(u->attribs, &at_effect);
     effect_data * data = NULL;
 
-	  while (a && a->type==&at_effect) {
-		  data = (effect_data *)a->data.v;
+    while (a && a->type==&at_effect) {
+      data = (effect_data *)a->data.v;
       if (data->type==effect) {
         if (data->value+delta==0) {
           a_remove(&u->attribs, a);
@@ -231,14 +233,15 @@ change_effect (unit * u, const potion_type * effect, int delta)
           return data->value;
         }
       }
-		  a = a->next;
-	  }
-
+      a = a->next;
+    }
+    
     a = a_add(&u->attribs, a_new(&at_effect));
     data = (effect_data*)a->data.v;
     data->type = effect;
     data->value = delta;
+    return data->value;
   }
   log_error(("change effect with delta==0 for unit %s\n", itoa36(u->no)));
-	return data->value;
+  return 0;
 }

@@ -53,6 +53,7 @@
 #include <util/log.h>
 
 /* libc includes */
+#include <sys/stat.h>
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -1420,7 +1421,7 @@ init_reports(void)
 
 #ifdef HAVE_STAT
   {
-    stat_type st;
+    struct stat st;
     if (stat(reportpath(), &st)==0) return 0;
   }
 #endif

@@ -221,47 +221,6 @@ unit_max_hp(const unit * u)
 	return h;
 }
 
-static void
-equip_newunits(const struct equipment * eq, struct unit *u)
-{
-  struct region *r = u->region;
-
-  switch (old_race(u->race)) {
-  case RC_ELF:
-    set_show_item(u->faction, I_FEENSTIEFEL);
-    break;
-  case RC_GOBLIN:
-    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-    set_number(u, 10);
-    break;
-  case RC_HUMAN:
-    if (u->building==NULL) {
-      const building_type * btype = bt_find("castle");
-      if (btype!=NULL) {
-        building *b = new_building(btype, r, u->faction->locale);
-        b->size = 10;
-        u->building = b;
-        fset(u, UFL_OWNER);
-      }
-    }
-    break;
-  case RC_CAT:
-    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-    break;
-  case RC_AQUARIAN:
-    {
-      ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
-      sh->size = sh->type->construction->maxsize;
-      u->ship = sh;
-      fset(u, UFL_OWNER);
-    }
-    break;
-  case RC_CENTAUR:
-    rsethorses(r, 250+rng_int()%51+rng_int()%51);
-    break;
-  }
-}
-
 boolean
 r_insectstalled(const region * r)
 {
@@ -303,35 +262,6 @@ racename(const struct locale *loc, const unit *u, const race * rc)
     return lbuf;
   }
   return LOC(loc, rc_name(rc, u->number != 1));
-}
-
-static void
-oldfamiliars(unit * u)
-{
-  char fname[64];
-  /* these familiars have no special skills.
-   */
-  snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
-  create_mage(u, M_GRAU);
-  equip_unit(u, get_equipment(fname));
-}
-
-static item *
-default_spoil(const struct race * rc, int size)
-{
-  item * itm = NULL;
-
-  if (rng_int()%100 < RACESPOILCHANCE) {
-    char spoilname[32];
-    const item_type * itype;
-
-    sprintf(spoilname,  "%sspoil", rc->_name[0]);
-    itype = it_find(spoilname);
-    if (itype!=NULL) {
-      i_add(&itm, i_new(itype, size));
-    }
-	}
-	return itm;
 }
 
 int

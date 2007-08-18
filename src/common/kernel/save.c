@@ -349,7 +349,7 @@ fwritestr(FILE * F, const char * str)
 
 
 static void
-rds(FILE * F, void **ds)
+rds(FILE * F, char **ds)
 {
   static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
   char *s = &buffer[0];
@@ -387,7 +387,7 @@ rds(FILE * F, void **ds)
 
 
 static void
-xrds(FILE * F, void **ds, int encoding)
+xrds(FILE * F, char **ds, int encoding)
 {
   static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
   int len = freadstr(F, encoding, buffer, sizeof(buffer));

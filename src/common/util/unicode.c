@@ -12,6 +12,7 @@
 #include "unicode.h"
 
 #include <errno.h>
+#include <wctype.h>
 
 int
 unicode_utf8_strcasecmp(const char * a, const char * b)

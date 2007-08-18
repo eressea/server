@@ -24,7 +24,7 @@ SOURCES =
  karma.c
  magic.c
  message.c
- movement.c
+ move.c
  names.c
  order.c
  pathfinder.c
