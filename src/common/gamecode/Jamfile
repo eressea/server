@@ -18,10 +18,11 @@ SOURCES =
  luck.c
  monster.c
  randenc.c
-# report.c
+ report.c
  spells.c
  spy.c
  study.c
+ summary.c
  xmlreport.c
  ;
 

@@ -16,6 +16,7 @@ SOURCES =
  cvector.c
  dice.c
  event.c
+ filereader.c
  functions.c
  goodies.c
  graph.c

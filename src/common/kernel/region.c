@@ -248,21 +248,21 @@ register_special_direction(const char * name)
 static int
 a_readdirection(attrib *a, FILE *f)
 {
-  char lbuf[16];
   spec_direction *d = (spec_direction *)(a->data.v);
 
   fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
-  fscanf(f, "%15s ", lbuf);
-  d->desc = strdup(lbuf);
-  fscanf(f, "%15s ", lbuf);
   if (global.data_version<UNICODE_VERSION) {
+    char lbuf[16];
+    fscanf(f, "%*s ");
+    fscanf(f, "%s ", lbuf);
     dir_lookup * dl = dir_name_lookup;
     
-    cstring_i(d->desc);
     cstring_i(lbuf);
     for (;dl;dl=dl->next) {
       if (strcmp(lbuf, dl->oldname)==0) {
         d->keyword=strdup(dl->name);
+        sprintf(lbuf, "%s_desc", d->keyword);
+        d->desc=strdup(dl->name);
         break;
       }
     }
@@ -272,6 +272,10 @@ a_readdirection(attrib *a, FILE *f)
     }
   }
   else {
+    char lbuf[16];
+    fscanf(f, "%15s ", lbuf);
+    d->desc = strdup(lbuf);
+    fscanf(f, "%15s ", lbuf);
     d->keyword = strdup(lbuf);
   }
   d->active = true;

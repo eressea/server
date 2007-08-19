@@ -169,7 +169,7 @@ extern struct region * find_special_direction(const struct region *r, const char
 extern void register_special_direction(const char * name);
 extern struct spec_direction * special_direction(const region * from, const region * to);
 extern struct attrib *create_special_direction(struct region *r, struct region *rt,
-                                               int duration, const char *desc, 
+                                               int duration, const char *desc,
                                                const char *keyword);
 
 int deathcount(const struct region * r);

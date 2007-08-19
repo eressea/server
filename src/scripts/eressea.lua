@@ -1,7 +1,5 @@
 -- the locales that this gameworld supports.
 local locales = { "de", "en" }
-enc_orders = "ISO-8859-1"
-enc_game = "ISO-8859-1"
 
 function loadscript(name)
   local script = scriptpath .. "/" .. name
@@ -56,7 +54,7 @@ function process(orders)
   equipment_setitem("new_faction", "money", "4200");
 
   file = "" .. get_turn()
-  set_encoding(enc_game)
+  --  set_encoding(enc_game)
   if read_game(file)~=0 then
     print("could not read game")
     return -1
@@ -67,7 +65,7 @@ function process(orders)
   loadscript("eressea/multis.lua")
 
   -- run the turn:
-  if read_orders(orders, enc_orders) ~= 0 then
+  if read_orders(orders) ~= 0 then
     print("could not read " .. orders)
     return -1
   end

@@ -620,7 +620,7 @@ load_inifile(const char * filename)
     luafile = iniparser_getstring(d, "eressea:run", luafile);
     g_reportdir = iniparser_getstring(d, "eressea:report", g_reportdir);
 
-    str = iniparser_getstring(d, "common:locales", "de");
+    str = iniparser_getstring(d, "common:locales", "de,en");
     make_locales(str);
   }
   inifile = d;

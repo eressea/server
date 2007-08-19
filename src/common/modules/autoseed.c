@@ -33,6 +33,8 @@
 #include <util/rng.h>
 #include <util/sql.h>
 
+#include <libxml/encoding.h>
+
 /* libc includes */
 #include <limits.h>
 #include <memory.h>
@@ -239,6 +241,18 @@ read_newfactions(const char * filename)
       /* if the script didn't supply the race as a token, then it gives us a
        * race in the default locale (which means that itis a UTF8 string) */
       nf->race = findrace(race, default_locale);
+      if (nf->race==NULL) {
+        char buffer[32];
+        int outbytes = sizeof(buffer);
+        int inbytes = strlen(race);
+        isolat1ToUTF8((unsigned char *)buffer, &outbytes, (const unsigned char *)race, &inbytes);
+        nf->race = findrace(buffer, default_locale);
+        if (nf->race==NULL) {
+          log_error(("new faction has unknown race '%s'.\n", race));
+          free(nf);
+          continue;
+        }
+      }
     }
     nf->lang = find_locale(lang);
     nf->bonus = bonus;

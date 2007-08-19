@@ -11,6 +11,7 @@ SubDirHdrs $(XMLHDRS) ;
 SOURCES =
  dragons.c
  illusion.c
+ races.c
  zombies.c
  ;
 

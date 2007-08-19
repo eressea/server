@@ -908,12 +908,12 @@ describe(FILE * F, const region * r, int partial, faction * f)
     /* Spezielle Richtungen */
     for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
       spec_direction * d = (spec_direction *)(a->data.v);
-      strcpy(bufp++, " ");
-      bufp += strxcpy(bufp, d->desc);
-      bufp += strxcpy(bufp, " (\"");
-      bufp += strxcpy(bufp, d->keyword);
-      bufp += strxcpy(bufp, "\")");
-      strcpy(bufp++, ".");
+      bufp += strlcpy(bufp, " ", sizeof(buf) - (bufp-buf));
+      bufp += strlcpy(bufp, LOC(f->locale, d->desc), sizeof(buf) - (bufp-buf));
+      bufp += strlcpy(bufp, " (\"", sizeof(buf) - (bufp-buf));
+      bufp += strlcpy(bufp, LOC(f->locale, d->keyword), sizeof(buf) - (bufp-buf));
+      bufp += strlcpy(bufp, "\")", sizeof(buf) - (bufp-buf));
+      bufp += strlcpy(bufp, ".", sizeof(buf) - (bufp-buf));
       dh = 1;
     }
   }
