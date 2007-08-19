@@ -89,7 +89,7 @@ getbuf_latin1(FILE * F)
         ++bp;
         continue;
       }
-      if (c=='"' || c=='\'') {
+      if (!comment && (c=='"' || c=='\'')) {
         if (quote==c) {
           quote = 0;
           if (cp<fbuf+MAXLINE) *cp++ = *bp;

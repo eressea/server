@@ -7399,8 +7399,37 @@
   </string>
 
   <string name="attack_structural">
-    <text locale="de">ein Angriff, der GEbäudeschaden verursacht</text>
+    <text locale="de">ein Angriff, der Gebäudeschaden verursacht</text>
     <text locale="en">an attack causing structural damage to buildings</text>
+  </string>
+
+  <string name="sptype_precombat">
+    <text locale="de">Präkampfzauber</text>
+  </string>
+
+  <string name="sptype_postcombat">
+    <text locale="de">Postkampfzauber</text>
+  </string>
+
+  <string name="sptype_combat">
+    <text locale="de">Kampfzauber</text>
+  </string>
+
+  <string name="sptype_normal">
+    <text locale="de">Normaler Zauber</text>
+  </string>
+  
+  <string name="nr_insectwinter">
+    <text locale="de">Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren.</text>
+  </string>
+
+  <string name="nr_insectfall">
+    <text locale="de">Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können.</text>
+  </string>
+
+  <string name="nr_owner">
+    <text locale="de">Eigentümer</text>
+    <text locale="en">Owner</text>
   </string>
 
 </strings>

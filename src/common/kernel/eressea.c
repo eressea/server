@@ -123,7 +123,6 @@ ally_flag(const char * s)
 {
   if (strcmp(s, "money")==0) return HELP_MONEY;
   if (strcmp(s, "fight")==0) return HELP_FIGHT;
-  if (strcmp(s, "observe")==0) return HELP_OBSERVE;
   if (strcmp(s, "give")==0) return HELP_GIVE;
   if (strcmp(s, "guard")==0) return HELP_GUARD;
   if (strcmp(s, "stealth")==0) return HELP_FSTEALTH;

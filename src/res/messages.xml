@@ -7098,6 +7098,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Your faction must be at least $int($turns) weeks old to give something to another faction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Your faction must be at least $int($turns) weeks old to give something to another faction."</text>
   </message>
+
   <message name="turnreminder" section="errors">
     <type>
   </type>
@@ -7105,6 +7106,7 @@
     <text locale="fr">"Merci d'envoyer vos ordres pour le tour suivant si vous désirez continuer à jouer."</text>
     <text locale="en">"Please send in orders for the next turn if you want to continue playing."</text>
   </message>
+
   <message name="newbieimmunity" section="events">
     <type>
       <arg name="turns" type="int"/>

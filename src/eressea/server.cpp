@@ -61,9 +61,7 @@
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
 #include <gamecode/creport.h>
-#ifdef REPORT_FORMAT_NR
 #include <gamecode/report.h>
-#endif
 #include <gamecode/xmlreport.h>
 
 /* kernel includes */
@@ -213,9 +211,7 @@ game_init(void)
   init_xmas();
 
   reports_init();
-#ifdef REPORT_FORMAT_NR
   report_init();
-#endif
   creport_init();
   xmlreport_init();
 

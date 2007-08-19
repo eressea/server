@@ -47,6 +47,7 @@
 #include <kernel/item.h>
 #include <kernel/karma.h>
 #include <kernel/message.h>
+#include <kernel/move.h>
 #include <kernel/objtypes.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -75,6 +76,8 @@
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <util/rng.h>
+
+#include <libxml/encoding.h>
 
 /* libc includes */
 #include <assert.h>
@@ -222,6 +225,7 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
 {
   int k, itemanz, costtyp;
   int dh = 0;
+  char buf[4096];
   char * bufp;
 
   rnl(F);
@@ -231,16 +235,16 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
   rparagraph(F, spell_info(sp, lang), 2, 0, 0);
 
   bufp = buf;
-  bufp += strxcpy(bufp, LOC(lang, "nr_spell_type"));
+  bufp += strlcpy(bufp, LOC(lang, "nr_spell_type"), sizeof(buf)-(bufp-buf));
   *bufp++ = ' ';
   if (sp->sptyp & PRECOMBATSPELL) {
-    bufp += strxcpy(bufp, "Präkampfzauber");
+    bufp += strlcpy(bufp, LOC(lang, "sptype_precombat"), sizeof(buf)-(bufp-buf));
   } else if (sp->sptyp & COMBATSPELL) {
-    bufp += strxcpy(bufp, "Kampfzauber");
+    bufp += strlcpy(bufp, LOC(lang, "sptype_combat"), sizeof(buf)-(bufp-buf));
   } else if (sp->sptyp & POSTCOMBATSPELL) {
-    bufp += strxcpy(bufp, "Postkampfzauber");
+    bufp += strlcpy(bufp, LOC(lang, "sptype_postcombat"), sizeof(buf)-(bufp-buf));
   } else {
-    bufp += strxcpy(bufp, "Normaler Zauber");
+    bufp += strlcpy(bufp, LOC(lang, "sptype_normal"), sizeof(buf)-(bufp-buf));
   }
   rparagraph(F, buf, 0, 0, 0);
 
@@ -259,7 +263,7 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
       if (sp->sptyp & SPELLLEVEL) {
         bufp = buf + sprintf(buf, "  %d %s", itemanz, LOC(lang, resourcename(rtype, itemanz!=1)));
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
-          bufp += strxcpy(bufp, " * Stufe");
+          bufp += sprintf(bufp, " * %s", LOC(lang, "nr_level"));
         }
       } else {
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
@@ -271,35 +275,35 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
     }
   }
 
-  bufp = buf + strxcpy(buf, LOC(lang, "nr_spell_modifiers"));
+  bufp = buf + strlcpy(buf, LOC(lang, "nr_spell_modifiers"), sizeof(buf)-(bufp-buf));
   if (sp->sptyp & FARCASTING) {
-    bufp += strxcpy(bufp, " Fernzauber");
+    bufp += strlcpy(bufp, " Fernzauber", sizeof(buf)-(bufp-buf));
     dh = 1;
   }
   if (sp->sptyp & OCEANCASTABLE) {
     if (dh == 1) {
-      bufp += strxcpy(bufp, ",");
+      bufp += strlcpy(bufp, ",", sizeof(buf)-(bufp-buf));
     }
-    bufp += strxcpy(bufp, " Seezauber");
+    bufp += strlcpy(bufp, " Seezauber", sizeof(buf)-(bufp-buf));
     dh = 1;
   }
   if (sp->sptyp & ONSHIPCAST) {
     if (dh == 1){
-      bufp += strxcpy(bufp, ",");
+      bufp += strlcpy(bufp, ",", sizeof(buf)-(bufp-buf));
     }
-    bufp += strxcpy(bufp, " Schiffszauber");
+    bufp += strlcpy(bufp, " Schiffszauber", sizeof(buf)-(bufp-buf));
     dh = 1;
   }
   if (sp->sptyp & NOTFAMILIARCAST) {
     if (dh == 1){
-      bufp += strxcpy(bufp, ", k");
+      bufp += strlcpy(bufp, ", k", sizeof(buf)-(bufp-buf));
     } else {
-      bufp += strxcpy(bufp, " K");
+      bufp += strlcpy(bufp, " K", sizeof(buf)-(bufp-buf));
     }
-    bufp += strxcpy(bufp, "ann nicht vom Vertrauten gezaubert werden");
+    bufp += strlcpy(bufp, "ann nicht vom Vertrauten gezaubert werden", sizeof(buf)-(bufp-buf));
     dh = 1;
   }
-  if (dh == 0) bufp += strxcpy(bufp, " Keine");
+  if (dh == 0) bufp += strlcpy(bufp, " Keine", sizeof(buf)-(bufp-buf));
   rparagraph(F, buf, 0, 0, 0);
 
   rparagraph(F, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
@@ -325,7 +329,7 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
       } else if (sp->sptyp & SHIPSPELL) {
         bufp += strxcpy(bufp, "<Schiff-Nr>");
       } else if (sp->sptyp & BUILDINGSPELL) {
-        bufp += strxcpy(bufp, "<Gebäude-Nr>");
+        bufp += strxcpy(bufp, "<Gebaeude-Nr>");
       }
     } else {
       if (sp->sptyp & UNITSPELL) {
@@ -333,7 +337,7 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
       } else if (sp->sptyp & SHIPSPELL) {
         bufp += strxcpy(bufp, "<Schiff-Nr> [<Schiff-Nr> ...]");
       } else if (sp->sptyp & BUILDINGSPELL) {
-        bufp += strxcpy(bufp, "<Gebäude-Nr> [<Gebäude-Nr> ...]");
+        bufp += strxcpy(bufp, "<Gebaeude-Nr> [<Gebaeude-Nr> ...]");
       }
     }
     rparagraph(F, buf, 2, 0, 0);
@@ -369,7 +373,7 @@ sparagraph(strlist ** SP, const char *s, int indent, char mark)
 
         /* j zeigt auf das ende der aktuellen zeile, i zeigt auf den anfang der
          * nächsten zeile. existiert ein wort am anfang der zeile, welches
-         * länger als eine zeile ist, muß dieses hier abgetrennt werden. */
+         * länger als eine zeile ist, muss dieses hier abgetrennt werden. */
 
         if (i == 0)
           i = width - 1;
@@ -474,7 +478,8 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
     /* fehler */
   }
 
-  for(;a;a=a->next) {
+  for (;a;a=a->next) {
+    char buf[4096];
 
     if (fval(a->type, ATF_CURSE)) {
       curse *c = (curse *)a->data.v;
@@ -534,12 +539,13 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   char marker;
   int dh;
   boolean isbattle = (boolean)(mode == see_battle);
+  char buf[8192];
 
   if (u->race == new_race[RC_SPELL]) return;
 
   {
     rnl(F);
-    dh = bufunit(f, u, indent, mode);
+    dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
   }
 
   a_otherfaction = a_find(u->attribs, &at_otherfaction);
@@ -608,7 +614,8 @@ rp_battles(FILE * F, faction * f)
     rnl(F);
 
     while (bm) {
-      RENDER(f, buf, 80, ("battle::header", "region", bm->r));
+      char buf[80];
+      RENDER(f, buf, sizeof(buf), ("battle::header", "region", bm->r));
       rnl(F);
       centre(F, buf, true);
       rnl(F);
@@ -625,6 +632,7 @@ prices(FILE * F, const region * r, const faction * f)
   struct demand * dmd;
   message * m;
   int n = 0;
+  char buf[4096];
 
   if (r->land==NULL || r->land->demands==NULL) return;
   for (dmd=r->land->demands;dmd;dmd=dmd->next) {
@@ -640,27 +648,26 @@ prices(FILE * F, const region * r, const faction * f)
 
   if (n > 0) {
     char * bufp = buf + strlen(buf);
-    bufp += strxcpy(bufp, " ");
-    bufp += strxcpy(bufp, LOC(f->locale, "nr_trade_intro"));
-    bufp += strxcpy(bufp, " ");
+    bufp += strlcpy(bufp, " ", sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_intro"), sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, " ", sizeof(buf)-(bufp-buf));
 
     for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) {
       m = msg_message("nr_market_price", "product price",
         dmd->type->itype->rtype, dmd->value * dmd->type->price);
-      nr_render(m, f->locale, bufp, sizeof(buf)-(bufp-buf), f);
+      bufp += nr_render(m, f->locale, bufp, sizeof(buf)-(bufp-buf), f);
       msg_release(m);
       n--;
-      bufp += strlen(bufp);
       if (n == 0) {
-        bufp += strxcpy(bufp, LOC(f->locale, "nr_trade_end"));
+        bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_end"), sizeof(buf)-(bufp-buf));
       }
       else if (n == 1) {
-        strcpy(bufp++, " ");
-        bufp += strxcpy(bufp, LOC(f->locale, "nr_trade_final"));
-        strcpy(bufp++, " ");
+        bufp += strlcpy(bufp, " ", sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_final"), sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, " ", sizeof(buf)-(bufp-buf));
       } else {
-        bufp += strxcpy(bufp, LOC(f->locale, "nr_trade_next"));
-        strcpy(bufp++, " ");
+        bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_next"), sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, " ", sizeof(buf)-(bufp-buf));
       }
     }
   }
@@ -708,6 +715,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
     direction_t lastd;
   } * edges = NULL, * e;
   boolean see[MAXDIRECTIONS];
+  char buf[8192];
   char * bufp = buf;
 
   for (d = 0; d != MAXDIRECTIONS; d++) {
@@ -758,7 +766,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
   tname = terrain_name(r);
   bufp += strxcpy(bufp, LOC(f->locale, tname));
 
-  /* Bäume */
+  /* Trees */
 
   trees  = rtrees(r,2);
   saplings = rtrees(r,1);
@@ -858,59 +866,56 @@ describe(FILE * F, const region * r, int partial, faction * f)
     }
   }
 
-  if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-    attrib *a_do = a_find(r->attribs, &at_overrideroads);
-    if(a_do) {
-      strcpy(bufp++, " ");
-      bufp += strxcpy(bufp, (char *)a_do->data.v);
-    } else {
-      int nrd = 0;
+  a = a_find(r->attribs, &at_overrideroads);
+  if (a) {
+    strcpy(bufp++, " ");
+    bufp += strxcpy(bufp, (char *)a->data.v);
+  } else {
+    int nrd = 0;
 
-      /* Nachbarregionen, die gesehen werden, ermitteln */
-      for (d = 0; d != MAXDIRECTIONS; d++)
-        if (see[d] && rconnect(r, d)) nrd++;
+    /* Nachbarregionen, die gesehen werden, ermitteln */
+    for (d = 0; d != MAXDIRECTIONS; d++)
+      if (see[d] && rconnect(r, d)) nrd++;
 
-      /* Richtungen aufzählen */
+    /* list directions */
 
-      dh = false;
-      for (d = 0; d != MAXDIRECTIONS; d++) if (see[d]) {
-        region * r2 = rconnect(r, d);
-        if(!r2) continue;
-        nrd--;
-        if (dh) {
-          char regname[4096];
-          if (nrd == 0) {
-            strcpy(bufp++, " ");
-            bufp += strxcpy(bufp, LOC(f->locale, "nr_nb_final"));
-          } else {
-            bufp += strxcpy(bufp, LOC(f->locale, "nr_nb_next"));
-          }
-          bufp += strxcpy(bufp, LOC(f->locale, directions[d]));
+    dh = false;
+    for (d = 0; d != MAXDIRECTIONS; d++) if (see[d]) {
+      region * r2 = rconnect(r, d);
+      if(!r2) continue;
+      nrd--;
+      if (dh) {
+        char regname[4096];
+        if (nrd == 0) {
           strcpy(bufp++, " ");
-          bufp += sprintf(bufp, trailinto(r2, f->locale),
-              f_regionid(r2, f, regname, sizeof(regname)));
+          bufp += strxcpy(bufp, LOC(f->locale, "nr_nb_final"));
+        } else {
+          bufp += strxcpy(bufp, LOC(f->locale, "nr_nb_next"));
         }
-        else {
-          strcpy(bufp++, " ");
-          MSG(("nr_vicinitystart", "dir region", d, r2), bufp, sizeof(buf)-(bufp-buf), f->locale, f);
-          bufp += strlen(bufp);
-          dh = true;
-        }
-      }
-      /* Spezielle Richtungen */
-      for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
-        spec_direction * d = (spec_direction *)(a->data.v);
+        bufp += strxcpy(bufp, LOC(f->locale, directions[d]));
         strcpy(bufp++, " ");
-        bufp += strxcpy(bufp, d->desc);
-        bufp += strxcpy(bufp, " (\"");
-        bufp += strxcpy(bufp, d->keyword);
-        bufp += strxcpy(bufp, "\")");
-        strcpy(bufp++, ".");
-        dh = 1;
+        f_regionid(r2, f, regname, sizeof(regname));
+        bufp += sprintf(bufp, trailinto(r2, f->locale),
+            regname);
+      }
+      else {
+        strcpy(bufp++, " ");
+        MSG(("nr_vicinitystart", "dir region", d, r2), bufp, sizeof(buf)-(bufp-buf), f->locale, f);
+        bufp += strlen(bufp);
+        dh = true;
       }
     }
-  } else {
-    bufp += strxcpy(bufp, " Große Verwirrung befällt alle Reisenden in dieser Region.");
+    /* Spezielle Richtungen */
+    for (a = a_find(r->attribs, &at_direction);a && a->type==&at_direction;a=a->next) {
+      spec_direction * d = (spec_direction *)(a->data.v);
+      strcpy(bufp++, " ");
+      bufp += strxcpy(bufp, d->desc);
+      bufp += strxcpy(bufp, " (\"");
+      bufp += strxcpy(bufp, d->keyword);
+      bufp += strxcpy(bufp, "\")");
+      strcpy(bufp++, ".");
+      dh = 1;
+    }
   }
   rnl(F);
   rparagraph(F, buf, 0, 0, 0);
@@ -988,13 +993,12 @@ static void
 statistics(FILE * F, const region * r, const faction * f)
 {
   const unit *u;
-  int number, p;
+  int number = 0, p = rpeasants(r);
   message * m;
   item *itm, *items = NULL;
-  p = rpeasants(r);
-  number = 0;
+  char buf[4096];
 
-  /* zählen */
+  /* count */
   for (u = r->units; u; u = u->next) {
     if (u->faction == f && u->race != new_race[RC_SPELL]) {
       for (itm=u->items;itm;itm=itm->next) {
@@ -1003,7 +1007,7 @@ statistics(FILE * F, const region * r, const faction * f)
       number += u->number;
     }
   }
-  /* Ausgabe */
+  /* print */
   rnl(F);
   m = msg_message("nr_stat_header", "region", r);
   nr_render(m, f->locale, buf, sizeof(buf), f);
@@ -1043,7 +1047,7 @@ statistics(FILE * F, const region * r, const faction * f)
       msg_release(m);
     }
   }
-  /* Info über Einheiten */
+  /* info about units */
 
   m = msg_message("nr_stat_people", "max", number);
   nr_render(m, f->locale, buf, sizeof(buf), f);
@@ -1065,9 +1069,10 @@ durchreisende(FILE * F, const region * r, const faction * f)
   if (fval(r, RF_TRAVELUNIT)) {
     attrib *abegin = a_find(r->attribs, &at_travelunit), *a;
     int counter = 0, maxtravel = 0;
+    char buf[8192];
     char * str = buf;
 
-    /* Wieviele sind aufzulisten? Für die Grammatik. */
+    /* How many are we listing? For grammar. */
     for (a = abegin; a && a->type==&at_travelunit; a = a->next) {
       unit * u = (unit*)a->data.v;
 
@@ -1094,27 +1099,27 @@ durchreisende(FILE * F, const region * r, const faction * f)
           ++counter;
           if (u->ship != NULL) {
             if (counter == 1) {
-              str += strxcpy(str, "Die ");
+              str += strlcpy(str, "Die ", sizeof(buf)-(str-buf));
             } else {
-              str += strxcpy(str, "die ");
+              str += strlcpy(str, "die ", sizeof(buf)-(str-buf));
             }
-            str += strxcpy(str, shipname(u->ship));
+            str += strlcpy(str, shipname(u->ship), sizeof(buf)-(str-buf));
           } else {
-            str += strxcpy(str, unitname(u));
+            str += strlcpy(str, unitname(u), sizeof(buf)-(str-buf));
           }
           if (counter + 1 < maxtravel) {
-            str += strxcpy(str, ", ");
+            str += strlcpy(str, ", ", sizeof(buf)-(str-buf));
           } else if (counter + 1 == maxtravel) {
-            str += strxcpy(str, " und ");
+            str += strlcpy(str, LOC(f->locale, "list_and"), sizeof(buf)-(str-buf));
           }
         }
       }
     }
     if (maxtravel == 1) {
-      str += strxcpy(str, " hat die Region durchquert.");
+      str += strlcpy(str, " hat die Region durchquert.", sizeof(buf)-(str-buf));
       rparagraph(F, buf, 0, 0, 0);
     } else {
-      str += strxcpy(str, " haben die Region durchquert.");
+      str += strlcpy(str, " haben die Region durchquert.", sizeof(buf)-(str-buf));
       rparagraph(F, buf, 0, 0, 0);
     }
   }
@@ -1144,17 +1149,25 @@ buildingmaintenance(const building * b, const resource_type * rtype)
 }
 
 static int
-report_template(const char * filename, report_context * ctx)
+report_template(const char * filename, report_context * ctx, const char * charset)
 {
   faction * f = ctx->f;
   region *r;
   plane *pl;
   FILE * F = fopen(filename, "wt");
   seen_region * sr = NULL;
+  char buf[8192];
+  char * bufp;
+  int enc = xmlParseCharEncoding(charset);
 
   if (F==NULL) {
     perror(filename);
     return -1;
+  }
+
+  if (enc==XML_CHAR_ENCODING_UTF8) {
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    fwrite(utf8_bom, 1, 3, F);
   }
 
   rps_nowrap(F, "");
@@ -1213,31 +1226,26 @@ report_template(const char * filename, report_context * ctx)
         }
         dh = 1;
 
-        sprintf(buf, "%s %s;    %s [%d,%d$", LOC(u->faction->locale, parameters[P_UNIT]),
+        bufp = buf + sprintf(buf, "%s %s;    %s [%d,%d$", LOC(u->faction->locale, parameters[P_UNIT]),
           unitid(u), u->name, u->number, get_money(u));
         if (u->building != NULL && fval(u, UFL_OWNER)) {
           building * b = u->building;
           int cost = buildingmaintenance(b, r_silver);
 
           if (cost > 0) {
-            scat(",U");
-            icat(cost);
+            bufp += strlcpy(bufp, ",U", sizeof(buf)-(bufp-buf));
+            bufp += strlcpy(bufp, itoa10(cost), sizeof(buf)-(bufp-buf));
           }
-#if TODO
-          if (buildingdaten[u->building->typ].spezial != 0) {
-            scat("+");
-          }
-#endif
         } else if (u->ship) {
           if (fval(u, UFL_OWNER))
-            scat(",S");
+            bufp += strlcpy(bufp, ",S", sizeof(buf)-(bufp-buf));
           else
-            scat(",s");
-          scat(shipid(u->ship));
+            bufp += strlcpy(bufp, ",s", sizeof(buf)-(bufp-buf));
+          bufp += strlcpy(bufp, shipid(u->ship), sizeof(buf)-(bufp-buf));
         }
         if (lifestyle(u) == 0)
-          scat(",I");
-        scat("]");
+          bufp += strlcpy(bufp, ",I", sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, "]", sizeof(buf)-(bufp-buf));
 
         rps_nowrap(F, buf);
         rnl(F);
@@ -1284,12 +1292,14 @@ report_template(const char * filename, report_context * ctx)
 }
 
 static void
-show_allies(const faction * f, const ally * allies)
+show_allies(FILE * F, const faction * f, const ally * allies, char * buf, size_t size)
 {
   int allierte = 0;
   int i=0, h, hh = 0;
   int dh = 0;
   const ally * sf;
+  char * bufp = buf + strlen(buf); /* buf already contains data */
+
   for (sf = allies; sf; sf = sf->next) {
     int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
     if (mode > 0) ++allierte;
@@ -1301,78 +1311,69 @@ show_allies(const faction * f, const ally * allies)
     i++;
     if (dh) {
       if (i == allierte)
-        scat(" und ");
+        bufp += strlcpy(bufp, LOC(f->locale, "list_and"), size-(bufp-buf));
       else
-        scat(", ");
+        bufp += strlcpy(bufp, ", ", size-(bufp-buf));
     }
     dh = 1;
     hh = 0;
-    scat(factionname(sf->faction));
-    scat(" (");
+    bufp += strlcpy(bufp, factionname(sf->faction), size-(bufp-buf));
+    bufp += strlcpy(bufp, " (", size-(bufp-buf));
     if ((mode & HELP_ALL) == HELP_ALL) {
-      scat("Alles");
-    } else
+      bufp += strlcpy(bufp, "Alles", size-(bufp-buf));
+    } else {
       for (h = 1; h < HELP_ALL; h *= 2) {
-        if ((mode & h) == h)
+        int p = MAXPARAMS;
+        if ((mode & h) == h) {
           switch (h) {
           case HELP_TRAVEL:
-            scat("Durchreise");
-            hh = 1;
+            p = P_TRAVEL;
             break;
           case HELP_MONEY:
-            scat("Silber");
+            p = P_MONEY;
             hh = 1;
             break;
           case HELP_FIGHT:
-            if (hh)
-              scat(", ");
-            scat("Kämpfe");
-            hh = 1;
-            break;
-          case HELP_OBSERVE:
-            if (hh)
-              scat(", ");
-            scat("Wahrnehmung");
-            hh = 1;
+            p = P_FIGHT;
             break;
           case HELP_GIVE:
-            if (hh)
-              scat(", ");
-            scat("Gib");
-            hh = 1;
+            p = P_GIVE;
             break;
           case HELP_GUARD:
-            if (hh)
-              scat(", ");
-            scat("Bewache");
-            hh = 1;
+            p = P_GUARD;
             break;
           case HELP_FSTEALTH:
-            if (hh)
-              scat(", ");
-            scat("Parteitarnung");
-            hh = 1;
+            p = P_FACTIONSTEALTH;
             break;
           }
+        }
+        if (p!=MAXPARAMS) {
+          if (hh) strlcpy(bufp, ", ", size-(bufp-buf));
+          bufp += strlcpy(bufp, parameters[p], size-(bufp-buf));
+          hh = 1;
+        }
       }
-    scat(")");
+    }
+    strlcpy(bufp, ")", size-(bufp-buf));
   }
+  strlcpy(bufp, ".", size-(bufp-buf));
+  rparagraph(F, buf, 0, 0, 0);
+  rnl(F);
 }
 
 static void
 allies(FILE * F, const faction * f)
 {
   const group * g = f->groups;
+  char buf[8192];
+
   if (f->allies) {
     if (!f->allies->next) {
       strcpy(buf, "Wir helfen der Partei ");
     } else {
       strcpy(buf, "Wir helfen den Parteien ");
     }
-    show_allies(f, f->allies);
-    scat(".");
-    rparagraph(F, buf, 0, 0, 0);
-    rnl(F);
+    show_allies(F, f, f->allies, buf, sizeof(buf));
   }
 
   while (g) {
@@ -1382,10 +1383,7 @@ allies(FILE * F, const faction * f)
       } else {
         sprintf(buf, "%s hilft den Parteien ", g->name);
       }
-      show_allies(f, g->allies);
-      scat(".");
-      rparagraph(F, buf, 0, 0, 0);
-      rnl(F);
+      show_allies(F, f, g->allies, buf, sizeof(buf));
     }
     g = g->next;
   }
@@ -1450,25 +1448,25 @@ guards(FILE * F, const region * r, const faction * see)
   }
 
   if (nextguard || tarned) {
-    strcpy(buf, "Die Region wird von ");
-  } else {
-    return;
-  }
+    char buf[8192];
+    char * bufp = buf;
+    bufp += strlcpy(bufp, "Die Region wird von ", sizeof(buf) - (bufp-buf));
 
-  for (i = 0; i!=nextguard+(tarned?1:0); ++i) {
-    if (i!=0) {
-      if (i == nextguard-(tarned?0:1))
-        scat(" und ");
-      else
-        scat(", ");
+    for (i = 0; i!=nextguard+(tarned?1:0); ++i) {
+      if (i!=0) {
+        if (i == nextguard-(tarned?0:1))
+          strlcpy(bufp, LOC(see->locale, "list_and"), sizeof(buf) - (bufp-buf));
+        else
+          strlcpy(bufp, ", ", sizeof(buf) - (bufp-buf));
+      }
+      if (i<nextguard) strlcpy(bufp, factionname(guardians[i]), sizeof(buf) - (bufp-buf));
+
+      else strlcpy(bufp, "unbekannten Einheiten", sizeof(buf) - (bufp-buf));
     }
-    if (i<nextguard) scat(factionname(guardians[i]));
-
-    else scat("unbekannten Einheiten");
+    strlcpy(bufp, " bewacht.", sizeof(buf) - (bufp-buf));
+    rnl(F);
+    rparagraph(F, buf, 0, 0, 0);
   }
-  scat(" bewacht.");
-  rnl(F);
-  rparagraph(F, buf, 0, 0, 0);
 }
 
 static void
@@ -1493,6 +1491,8 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
   while (flist!=NULL) {
     const faction * f = flist->data;
     if (f->no!=MONSTER_FACTION) {
+      char buf[8192];
+
       sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
       rparagraph(F, buf, 4, 0, (char)(ALLIED(uf, f)?'+':'*'));
 #ifdef SHORTPWDS
@@ -1524,12 +1524,13 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
   const struct locale * lang = NULL;
   const building_type * type = b->type;
   static const struct building_type * bt_illusion;
+  char buffer[8192];
+  char * bufp = buffer;
 
   if (!bt_illusion) bt_illusion = bt_find("illusion");
   if (f) lang = f->locale;
 
-  sprintf(buf, "%s, %s %d, ", buildingname(b), LOC(f->locale, "nr_size"),
-          b->size);
+  bufp += snprintf(bufp, sizeof(buffer)-(bufp-buffer), "%s, %s %d, ", buildingname(b), LOC(f->locale, "nr_size"), b->size);
 
   if (b->type==bt_illusion) {
     attrib * a = a_find(b->attribs, &at_icastle);
@@ -1538,7 +1539,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
     }
   }
   bname = LOC(lang, buildingtype(type, b, b->size));
-  strcat(buf, bname);
+  bufp += strlcpy(bufp, bname, sizeof(buffer)-(bufp-buffer));
   if (type!=b->type) {
     unit * owner = buildingowner(r, b);
     if (owner && owner->faction==f) {
@@ -1546,28 +1547,26 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
       char lbuf[32];
       bname = LOC(lang, buildingtype(b->type, b, b->size));
       sprintf(lbuf, " (%s)", bname);
-      strcat(buf, lbuf);
+      bufp += strlcpy(bufp, lbuf, sizeof(buffer)-(bufp-buffer));
     }
   }
 
   if (b->size < type->maxsize) {
-    scat(" (im Bau)");
+    bufp += strlcpy(bufp, " (im Bau)", sizeof(buffer)-(bufp-buffer));
   }
 
   if (b->besieged > 0 && mode>=see_lighthouse) {
-    scat(", belagert von ");
-    icat(b->besieged);
-    scat(" Personen ");
+    bufp += strlcpy(bufp, ", belagert von ", sizeof(buffer)-(bufp-buffer));
+    bufp += strlcpy(bufp, itoa10(b->besieged), sizeof(buffer)-(bufp-buffer));
+    bufp += strlcpy(bufp, " Personen ", sizeof(buffer)-(bufp-buffer));
     if (b->besieged >= b->size * SIEGEFACTOR) {
-      scat("(abgeschnitten)");
-    } else {
-      scat("(unvollständig belagert)");
+      bufp += strlcpy(bufp, "(abgeschnitten)", sizeof(buffer)-(bufp-buffer));
     }
   }
   i = 0;
   if (b->display && b->display[0]) {
-    scat("; ");
-    scat(b->display);
+    bufp += strlcpy(bufp, "; ", sizeof(buffer)-(bufp-buffer));
+    bufp += strlcpy(bufp, b->display, sizeof(buffer)-(bufp-buffer));
     i = b->display[strlen(b->display) - 1];
   }
 
@@ -1624,11 +1623,11 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 #else
 
   if (i != '!' && i != '?' && i != '.')
-      scat(".");
+      bufp += strlcpy(bufp, ".", sizeof(buffer)-(bufp-buffer));
 
 #endif
 
-  rparagraph(F, buf, 2, 0, 0);
+  rparagraph(F, buffer, 2, 0, 0);
 
   if (mode<see_lighthouse) return;
 
@@ -1648,7 +1647,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 }
 
 int
-report_plaintext(const char * filename, report_context * ctx)
+report_plaintext(const char * filename, report_context * ctx, const char * charset)
 {
   int flag = 0;
   char ch;
@@ -1667,10 +1666,17 @@ report_plaintext(const char * filename, report_context * ctx)
   int wants_stats = (f->options & ix);
   FILE * F = fopen(filename, "wt");
   seen_region * sr = NULL;
+  char buf[8192];
+  char * bufp;
+  int enc = xmlParseCharEncoding(charset);
 
   if (F==NULL) {
     perror(filename);
     return -1;
+  }
+  if (enc==XML_CHAR_ENCODING_UTF8) {
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    fwrite(utf8_bom, 1, 3, F);
   }
 
   strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
@@ -1779,47 +1785,28 @@ report_plaintext(const char * filename, report_context * ctx)
     centre(F, buf, true);
   }
 
-  if (f->age > 1 && f->lastorders != turn) {
-    rnl(F);
-    if (turn - f->lastorders == 1) {
-      centre(F, LOC(f->locale, "nr_nmr"), true);
-    } else {
-      sprintf(buf,
-        "Deine Partei hat seit %d Runden keinen Zug abgegeben! Wenn du"
-        " drei Runden nacheinander keinen Zug abgibst, wird sie"
-        " automatisch gelöscht.",
-        turn - f->lastorders);
-      centre(F, buf, true);
-    }
-    rnl(F);
-  }
-
   /* Insekten-Winter-Warnung */
-  if(f->race == new_race[RC_INSECT]) {
+  if (f->race == new_race[RC_INSECT]) {
     static int thisseason = -1;
     if (thisseason<0) thisseason = get_gamedate(turn+1, 0)->season;
     if (thisseason == 0) {
-      strcpy(buf, "Es ist Winter, und Insekten können nur in Wüsten oder mit "
-        "Hilfe des Nestwärme-Tranks Personen rekrutieren.");
-      centre(F, buf, true);
+      centre(F, LOC(f->locale, "nr_insectwinter"), true);
       rnl(F);
     } else {
       static int nextseason = -1;
       if (nextseason<0) nextseason = get_gamedate(turn+2, 0)->season;
       if (nextseason == 0) {
-        strcpy(buf, "Es ist Spätherbst, und diese Woche ist die letzte vor dem "
-          "Winter, in der Insekten rekrutieren können.");
-        centre(F, buf, true);
+        centre(F, LOC(f->locale, "nr_insectfall"), true);
         rnl(F);
       }
     }
   }
 
-  sprintf(buf, "%s:", LOC(f->locale, "nr_options"));
+  bufp = buf + sprintf(buf, "%s:", LOC(f->locale, "nr_options"));
   for (op = 0; op != MAXOPTIONS; op++) {
     if (f->options & want(op)) {
-      scat(" ");
-      scat(LOC(f->locale, options[op]));
+      bufp += strlcpy(bufp, " ", sizeof(buf)-(bufp-buf));
+      bufp += strlcpy(bufp, LOC(f->locale, options[op]), sizeof(buf)-(bufp-buf));
 #ifdef AT_OPTION
       if(op == O_NEWS) {
         attrib *a = a_find(f->attribs, &at_option_news);
@@ -1829,15 +1816,15 @@ report_plaintext(const char * filename, report_context * ctx)
         } else {
           int sec = a->data.i;
           int i;
-          scat("(");
+          bufp += strlcpy(bufp, "(", sizeof(buf)-(bufp-buf));
           for(i=1; sec != 0; i *= 2) {
             if(sec & i) {
-              icat(i);
+              bufp += strlcpy(bufp, itoa10(i), sizeof(buf)-(bufp-buf));
               sec = sec & ~i;
-              if(sec) scat(",");
+              if (sec) bufp += strlcpy(bufp, ",", sizeof(buf)-(bufp-buf));
             }
           }
-          scat(")");
+          bufp += strlcpy(bufp, ")", sizeof(buf)-(bufp-buf));
         }
       }
 #endif
@@ -1869,6 +1856,8 @@ report_plaintext(const char * filename, report_context * ctx)
     requirement * m;
     if (ptype!=NULL) {
       const char * pname = resourcename(ptype->itype->rtype, 0);
+      char * bufp;
+
       m = ptype->itype->construction->materials;
       if (ch==0) {
         rnl(F);
@@ -1881,11 +1870,13 @@ report_plaintext(const char * filename, report_context * ctx)
       sprintf(buf, "%s %d", LOC(f->locale, "nr_level"), ptype->level);
       centre(F, buf, true);
       rnl(F);
-      sprintf(buf, "%s: ", LOC(f->locale, "nr_herbsrequired"));
+      
+      bufp = buf + sprintf(buf, "%s: ", LOC(f->locale, "nr_herbsrequired"));
       while (m->number) {
-        scat(LOC(f->locale, resourcename(m->rtype, 0)));
+        bufp += strlcpy(bufp, resourcename(m->rtype, 0), sizeof(buf)-(bufp-buf));
         ++m;
-        if (m->number) scat(", ");
+        if (m->number)
+        bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
       }
       centre(F, buf, true);
       rnl(F);
@@ -1998,37 +1989,37 @@ report_plaintext(const char * filename, report_context * ctx)
         getshipweight(sh, &n, &p);
         n = (n+99) / 100; /* 1 Silber = 1 GE */
 
-        sprintf(buf, "%s, %s, (%d/%d)", shipname(sh),
+        bufp = buf + sprintf(buf, "%s, %s, (%d/%d)", shipname(sh),
           LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
       } else {
-        sprintf(buf, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
+        bufp = buf + sprintf(buf, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
       }
 
       assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
       if (sh->size!=sh->type->construction->maxsize) {
-        sprintf(buf+strlen(buf), ", %s (%d/%d)",
+        bufp += sprintf(bufp, ", %s (%d/%d)",
           LOC(f->locale, "nr_undercons"), sh->size,
           sh->type->construction->maxsize);
       }
       if (sh->damage) {
         int percent = (sh->damage*100+DAMAGE_SCALE-1)/(sh->size*DAMAGE_SCALE);
-        sprintf(buf+strlen(buf), ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
+        bufp += sprintf(bufp, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
       }
       if (!fval(r->terrain, SEA_REGION)) {
         if (sh->coast != NODIRECTION) {
-          scat(", ");
-          scat(LOC(f->locale, coasts[sh->coast]));
+          bufp += strlcpy(bufp, ", ", sizeof(buf) - (bufp-buf));
+          bufp += strlcpy(bufp, LOC(f->locale, coasts[sh->coast]), sizeof(buf) - (bufp-buf));
         }
       }
       ch = 0;
       if (sh->display && sh->display[0]) {
-        scat("; ");
-        scat(sh->display);
+        bufp += strlcpy(bufp, "; ", sizeof(buf) - (bufp-buf));
+        bufp += strlcpy(bufp, sh->display, sizeof(buf) - (bufp-buf));
 
         ch = sh->display[strlen(sh->display) - 1];
       }
       if (ch != '!' && ch != '?' && ch != '.')
-        scat(".");
+        bufp += strlcpy(bufp, ".", sizeof(buf) - (bufp-buf));
 
       rparagraph(F, buf, 2, 0, 0);
 
@@ -2171,87 +2162,6 @@ kann_finden(faction * f1, faction * f2)
 {
   update_find();
   return (boolean)(can_find(f1, f2)!=NULL);
-}
-
-static void
-writemonument(void)
-{
-  FILE * F;
-  region *r;
-  building *b;
-  building *buildings[7] = {NULL, NULL, NULL, NULL, NULL,  NULL, NULL};
-  int size[7] = {0,0,0,0,0,0,0};
-  int i, j, ra;
-  int count = 0;
-  unit *owner;
-
-  for (r = regions; r; r = r->next) {
-    for (b = r->buildings; b; b = b->next) {
-      if (b->type == bt_find("monument") && b->display && *b->display) {
-        freset(b, BLD_SELECT);
-        count++;
-        if(b->size > size[6]) {
-          for(i=0; i <= 6; i++) if(b->size >= size[i]) {
-            for(j=5;j >= i; j--) {
-              size[j+1] = size[j];
-              buildings[j+1] = buildings[j];
-            }
-            buildings[i] = b;
-            size[i] = b->size;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  for(i=0; i <= 6; i++) if(buildings[i]) {
-    fset(buildings[i], BLD_SELECT);
-  }
-  {
-    char zText[MAX_PATH];
-    sprintf(zText, "%s/news-monument", basepath());
-    F = cfopen(zText, "w");
-    if (!F) return;
-  }
-  fprintf(F, "\n--- maintitle ---\n\n");
-  for(i = 0; i<=6; i++) {
-    if (buildings[i] != NULL) {
-      fprintf(F, "In %s", rname(buildings[i]->region, NULL));
-      if ((owner=buildingowner(buildings[i]->region,buildings[i]))!=NULL && !fval(owner,UFL_PARTEITARNUNG)) {
-        fprintf(F, ", Eigentümer: %s", factionname(owner->faction));
-      }
-      fprintf(F, "\n\n");
-      report_building(F, buildings[i]->region, buildings[i], findfaction(0), see_neighbour);
-      fprintf(F, "\n\n");
-    }
-  }
-
-  fprintf(F, "\n--- newcomer ---\n\n");
-
-  if(count > 7) {
-    ra = rng_int()%(count-7);
-    j = 0;
-    for (r = regions; r; r = r->next) {
-      for (b = r->buildings; b; b = b->next) {
-        if (b->type == bt_find("monument") && b->display && *b->display && !fval(b, BLD_SELECT)) {
-          j++;
-          if(j == ra) {
-            fprintf(F, "In %s", rname(b->region, NULL));
-            if ((owner=buildingowner(b->region,b))!=NULL && !fval(owner,UFL_PARTEITARNUNG)) {
-              fprintf(F, ", Eigentümer: %s", factionname(owner->faction));
-            }
-            fprintf(F, "\n\n");
-            report_building(F, b->region, b, findfaction(0), see_neighbour);
-            fprintf(F, "\n\n");
-          }
-        }
-      }
-    }
-  }
-
-  fclose(F);
-
 }
 
 /******* end summary ******/

@@ -1190,21 +1190,21 @@ ally_cmd(unit * u, struct order * ord)
       sf->status = sf->status | HELP_TRAVEL;
     break;
 
-  case P_GIB:
+  case P_GIVE:
     if (not_kw == P_NOT)
       sf->status = sf->status & (HELP_ALL - HELP_GIVE);
     else
       sf->status = sf->status | HELP_GIVE;
     break;
 
-  case P_SILVER:
+  case P_MONEY:
     if (not_kw == P_NOT)
       sf->status = sf->status & (HELP_ALL - HELP_MONEY);
     else
       sf->status = sf->status | HELP_MONEY;
     break;
 
-  case P_KAEMPFE:
+  case P_FIGHT:
     if (not_kw == P_NOT)
       sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
     else

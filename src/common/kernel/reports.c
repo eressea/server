@@ -681,6 +681,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
       dh = 1;
     }
   }
+  if (size<=1) {
+    log_warning(("bufunit ran out of space after writing %u bytes.\n", (bufp-buf)));
+  }
   return dh;
 }
 
@@ -1421,7 +1424,7 @@ init_reports(void)
 
 #ifdef HAVE_STAT
   {
-    struct stat st;
+    stat_type st;
     if (stat(reportpath(), &st)==0) return 0;
   }
 #endif
