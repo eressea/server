@@ -1348,15 +1348,15 @@ show_allies(FILE * F, const faction * f, const ally * allies, char * buf, size_t
           }
         }
         if (p!=MAXPARAMS) {
-          if (hh) strlcpy(bufp, ", ", size-(bufp-buf));
+          if (hh) bufp += strlcpy(bufp, ", ", size-(bufp-buf));
           bufp += strlcpy(bufp, parameters[p], size-(bufp-buf));
           hh = 1;
         }
       }
     }
-    strlcpy(bufp, ")", size-(bufp-buf));
+    bufp += strlcpy(bufp, ")", size-(bufp-buf));
   }
-  strlcpy(bufp, ".", size-(bufp-buf));
+  bufp += strlcpy(bufp, ".", size-(bufp-buf));
   rparagraph(F, buf, 0, 0, 0);
   rnl(F);
 }
@@ -1455,15 +1455,15 @@ guards(FILE * F, const region * r, const faction * see)
     for (i = 0; i!=nextguard+(tarned?1:0); ++i) {
       if (i!=0) {
         if (i == nextguard-(tarned?0:1))
-          strlcpy(bufp, LOC(see->locale, "list_and"), sizeof(buf) - (bufp-buf));
+           bufp += strlcpy(bufp, LOC(see->locale, "list_and"), sizeof(buf) - (bufp-buf));
         else
-          strlcpy(bufp, ", ", sizeof(buf) - (bufp-buf));
+           bufp += strlcpy(bufp, ", ", sizeof(buf) - (bufp-buf));
       }
-      if (i<nextguard) strlcpy(bufp, factionname(guardians[i]), sizeof(buf) - (bufp-buf));
+      if (i<nextguard) bufp += strlcpy(bufp, factionname(guardians[i]), sizeof(buf) - (bufp-buf));
 
-      else strlcpy(bufp, "unbekannten Einheiten", sizeof(buf) - (bufp-buf));
+      else bufp += strlcpy(bufp, "unbekannten Einheiten", sizeof(buf) - (bufp-buf));
     }
-    strlcpy(bufp, " bewacht.", sizeof(buf) - (bufp-buf));
+    bufp += strlcpy(bufp, " bewacht.", sizeof(buf) - (bufp-buf));
     rnl(F);
     rparagraph(F, buf, 0, 0, 0);
   }
