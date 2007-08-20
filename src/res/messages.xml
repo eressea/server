@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <messages>
+  <message name="give" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="resource" type="resource"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an $unit($target)."</text>
+    <text locale="en">"$unit($unit) gives $int($amount) $resource($resource,$amount) to $unit($target)."</text>
+</message>
+
   <message name="nr_claims" section="nr">
     <type>
       <arg name="items" type="items"/>
@@ -6984,15 +6995,6 @@
     </type>
     <text locale="de">"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),"","en") an die Bauern."</text>
     <text locale="en">"$unit($unit) transfers $int($amount) person$if($eq($amount,1),"","s") to the local peasants."</text>
-  </message>
-
-  <message name="give" section="economy">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="amount" type="int"/>
-      <arg name="resource" type="resource"/>
-      <arg name="target" type="unit"/>
-    </type>
   </message>
 
   <message name="give_peasants" section="economy">

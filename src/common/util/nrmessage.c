@@ -54,9 +54,13 @@ nrt_find(const struct locale * lang, const struct message_type * mtype)
     }
     type = type->next;
   }
+  if (!found) {
+    log_warning(("could not find nr-type %s for locale %s\n",
+                 mtype->name, locale_name(lang)));
+  }
   if (lang && found && found->lang!=lang) {
-    log_warning(("could not find nr-type %s for locale %s, substituting with %s\n",
-      mtype->name, locale_name(lang), locale_name(found->lang)));
+    log_warning(("could not find nr-type %s for locale %s, using %s\n",
+                 mtype->name, locale_name(lang), locale_name(found->lang)));
   }
   return found;
 }
@@ -151,18 +155,18 @@ int
 nr_level(const struct message *msg)
 {
   nrmessage_type * nrt = nrt_find(NULL, msg->type);
-  return nrt->level;
+  return nrt?nrt->level:0;
 }
 
 const char *
 nr_section(const struct message *msg)
 {
   nrmessage_type * nrt = nrt_find(default_locale, msg->type);
-  return nrt->section;
+  return nrt?nrt->section:NULL;
 }
 
 const char *
 nrt_section(const nrmessage_type * nrt)
 {
-  return nrt->section;
+  return nrt?nrt->section:NULL;
 }
