@@ -614,7 +614,7 @@ rp_battles(FILE * F, faction * f)
     rnl(F);
 
     while (bm) {
-      char buf[80];
+      char buf[256];
       RENDER(f, buf, sizeof(buf), ("battle::header", "region", bm->r));
       rnl(F);
       centre(F, buf, true);
@@ -1365,7 +1365,7 @@ static void
 allies(FILE * F, const faction * f)
 {
   const group * g = f->groups;
-  char buf[8192];
+  char buf[16384];
 
   if (f->allies) {
     if (!f->allies->next) {

@@ -546,7 +546,7 @@ sp_summon_familiar(castorder *co)
   direction_t d;
   message * msg;
   char zText[NAMESIZE];
-  size_t size;
+  char * bufp = zText;
 
   if (get_familiar(mage) != NULL ) {
     cmistake(mage, co->order, 199, MSG_MAGIC);
@@ -593,8 +593,7 @@ sp_summon_familiar(castorder *co)
   for (sk=0;sk<MAXSKILLS;sk++) {
     if (rc->bonus[sk] > -5) dh++;
   }
-  zText[0] = 0;
-  size = sizeof(zText);
+
   for (sk=0;sk<MAXSKILLS;sk++) {
     if (rc->bonus[sk] > -5) {
       dh--;
@@ -602,12 +601,12 @@ sp_summon_familiar(castorder *co)
         dh1 = 1;
       } else {
         if (dh == 0) {
-          size -= strlcat(zText, (const char*)LOC(mage->faction->locale, "list_and"), size);
+          bufp += strlcpy(bufp, (const char*)LOC(mage->faction->locale, "list_and"), sizeof(zText) - (bufp-zText));
         } else {
-          size -= strlcat(zText, (const char*)", ", size);
+          bufp += strlcpy(bufp, (const char*)", ", sizeof(zText) - (bufp-zText));
         }
       }
-      size -= strlcat(zText, (const char*)skillname(sk, mage->faction->locale), size);
+      bufp += strlcpy(bufp, (const char*)skillname(sk, mage->faction->locale), sizeof(zText) - (bufp-zText));
     }
   }
   ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",

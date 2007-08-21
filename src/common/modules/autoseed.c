@@ -244,7 +244,7 @@ read_newfactions(const char * filename)
       if (nf->race==NULL) {
         char buffer[32];
         int outbytes = sizeof(buffer);
-        int inbytes = strlen(race);
+        int inbytes = (int)strlen(race);
         isolat1ToUTF8((unsigned char *)buffer, &outbytes, (const unsigned char *)race, &inbytes);
         nf->race = findrace(buffer, default_locale);
         if (nf->race==NULL) {
@@ -717,8 +717,6 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
               special = 1;
             }
             terraform_region(rn, terrain);
-            /* the new region has an extra 15% chance to have laen */
-            if (rng_int() % 100 < 15) rsetlaen(r, 5 + rng_int() % 5);
             /* the new region has an extra 20% chance to have mallorn */
             if (rng_int() % 100 < 20) fset(r, RF_MALLORN);
             add_regionlist(rend, rn);

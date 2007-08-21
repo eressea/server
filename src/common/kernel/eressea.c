@@ -2229,6 +2229,10 @@ remove_empty_factions(boolean writedropouts)
   sprintf(zText, "%s/dropouts.%d", basepath(), turn);
 
   if (writedropouts) dofp = fopen(zText, "w");
+  if (dofp) {
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    fwrite(utf8_bom, 1, 3, dofp);
+  }
 
   for (fp = &factions; *fp;) {
     faction * f = *fp;
@@ -2863,7 +2867,6 @@ attrib_init(void)
   register_bordertype(&bt_questportal);
 
   at_register(&at_germs);
-  at_register(&at_laen); /* required for old datafiles */
 #ifdef XECMD_MODULE
   at_register(&at_xontormiaexpress); /* required for old datafiles */
 #endif

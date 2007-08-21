@@ -207,8 +207,6 @@ read_groups(FILE * F, faction * f)
 			if (!a->faction) ur_add(aid, (void**)&a->faction, resolve_faction);
 		}
     *pa = 0;
-		if(global.data_version >= GROUPATTRIB_VERSION) {
-			a_read(F, &g->attribs);
-		}
+		a_read(F, &g->attribs);
 	}
 }

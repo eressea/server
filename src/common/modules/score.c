@@ -167,50 +167,58 @@ score(void)
 
   sprintf(path, "%s/score", basepath());
   scoreFP = fopen(path, "w");
-  for (f = factions; f; f = f->next) if (f->num_total != 0) {
-    fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
-      f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
-      ((float) f->score / (float) allscores) * 100.0,
-      (float) f->score / f->num_total,
-      f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f), f->age);
+  if (scoreFP) {
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    fwrite(utf8_bom, 1, 3, scoreFP);
+    for (f = factions; f; f = f->next) if (f->num_total != 0) {
+      fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
+        f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
+        ((float) f->score / (float) allscores) * 100.0,
+        (float) f->score / f->num_total,
+        f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f), f->age);
+    }
+    fclose(scoreFP);
   }
-  fclose(scoreFP);
-
   if (alliances!=NULL) {
     alliance *a;
     const item_type * token = it_find("conquesttoken");
 
     sprintf(path, "%s/score.alliances", basepath());
     scoreFP = fopen(path, "w");
-    fprintf(scoreFP, "# alliance:factions:persons:score\n");
+    if (scoreFP) {
+      const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+      fwrite(utf8_bom, 1, 3, scoreFP);
 
-    for (a = alliances; a; a = a->next) {
-      int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
-      int grails = 0;
+      fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
-      for (f = factions; f; f = f->next) {
-        if (f->alliance && f->alliance->id == a->id) {
-          alliance_factions++;
-          alliance_score  += f->score;
-          alliance_number += f->num_total;
-          if (token!=NULL) {
-            unit * u = f->units;
-            while (u!=NULL) {
-              item ** iitem = i_find(&u->items, token);
-              if (iitem!=NULL && *iitem!=NULL) {
-                grails += (*iitem)->number;
+      for (a = alliances; a; a = a->next) {
+        int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
+        int grails = 0;
+
+        for (f = factions; f; f = f->next) {
+          if (f->alliance && f->alliance->id == a->id) {
+            alliance_factions++;
+            alliance_score  += f->score;
+            alliance_number += f->num_total;
+            if (token!=NULL) {
+              unit * u = f->units;
+              while (u!=NULL) {
+                item ** iitem = i_find(&u->items, token);
+                if (iitem!=NULL && *iitem!=NULL) {
+                  grails += (*iitem)->number;
+                }
+                u=u->nextF;
               }
-              u=u->nextF;
             }
           }
         }
-      }
 
-      fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions, alliance_number, alliance_score);
-      if (token!=NULL) fprintf(scoreFP, ":%d", grails);
-      fputc('\n', scoreFP);
+        fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions, alliance_number, alliance_score);
+        if (token!=NULL) fprintf(scoreFP, ":%d", grails);
+        fputc('\n', scoreFP);
+      }
+      fclose(scoreFP);
     }
-    fclose(scoreFP);
   }
 }
 

@@ -40,14 +40,7 @@ write_hate(const attrib * a, FILE * F)
 static int
 read_hate(attrib * a, FILE * F)
 {
-	if (global.data_version < BASE36IDS_VERSION) {
-		variant var;
-		fscanf(F, "%d", &var.i);
-		ur_add(var, (void**)&a->data.v, resolve_unit);
-	} else {
-		return read_unit_reference((unit**)&a->data.v, F);
-	}
-	return AT_READ_OK;
+	return read_unit_reference((unit**)&a->data.v, F);
 }
 
 attrib_type at_hate = {

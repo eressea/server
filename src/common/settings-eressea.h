@@ -46,5 +46,3 @@
 
 #define SIMPLE_COMBAT
 #define SIMPLE_ESCAPE
-
-#define RESOURCE_CONVERSION /* support for data files < NEWRESOURCE_VERSION */

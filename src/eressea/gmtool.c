@@ -1306,10 +1306,10 @@ load_inifile(const char * filename)
     g_resourcedir = iniparser_getstring(d, "common:res", g_resourcedir);
     xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
     
-    str = iniparser_getstring(d, "common:gamedata_encoding", NULL);
+    str = iniparser_getstring(d, "common:encoding", NULL);
     if (str) enc_gamedata = xmlParseCharEncoding(str);
 
-    str = iniparser_getstring(d, "common:locales", "de");
+    str = iniparser_getstring(d, "common:locales", "de,en");
     make_locales(str);
   }
   inifile = d;

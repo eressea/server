@@ -189,13 +189,9 @@ int
 read_faction_reference(faction ** f, FILE * F)
 {
   variant id;
-  if (global.data_version >= BASE36IDS_VERSION) {
-    char zText[16];
-    fscanf(F, "%s ", zText);
-    id.i = atoi36(zText);
-  } else {
-    fscanf(F, "%d ", &id.i);
-  }
+  char zText[16];
+  fscanf(F, "%s ", zText);
+  id.i = atoi36(zText);
   if (id.i<0) {
     *f = NULL;
     return AT_READ_FAIL;

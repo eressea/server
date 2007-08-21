@@ -156,7 +156,6 @@ extern struct attrib_type at_chaoscount;
 extern struct attrib_type at_woodcount;
 extern struct attrib_type at_deathcount;
 extern struct attrib_type at_travelunit;
-extern struct attrib_type at_laen;
 
 void initrhash(void);
 void rhash(struct region * r);
@@ -197,9 +196,6 @@ int rhorses(const struct region * r);
 void rsethorses(const struct region * r, int value);
 
 #define rbuildings(r) ((r)->buildings)
-
-extern int rlaen(const struct region * r);
-extern void rsetlaen(struct region * r, int value);
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
 #define rsetherbtype(r, value) ((r)->land?((r)->land->herbtype=(value)):(value),0)

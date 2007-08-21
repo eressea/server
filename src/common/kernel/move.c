@@ -2258,7 +2258,7 @@ hunt(unit *u, order * ord)
   region *rc = u->region;
   int moves, id, speed;
   char command[256];
-  size_t size = sizeof(command);
+  char * bufp = command;
   direction_t dir;
 
   if (fval(u, UFL_NOTMOVING)) {
@@ -2296,9 +2296,8 @@ hunt(unit *u, order * ord)
     return 0;
   }
 
-  sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+  bufp = command + sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
     locale_string(u->faction->locale, directions[dir]));
-  size -= strlen(command);
   moves = 1;
 
   speed = getuint();
@@ -2311,8 +2310,8 @@ hunt(unit *u, order * ord)
   rc = rconnect(rc, dir);
   while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
   {
-    size -= strlcat(command, " ", size);
-    size -= strlcat(command, LOC(u->faction->locale, directions[dir]), size);
+    bufp += strlcpy(bufp, " ", sizeof(command) - (bufp-command));
+    bufp += strlcpy(bufp, LOC(u->faction->locale, directions[dir]), sizeof(command) - (bufp-command));
     moves++;
     rc = rconnect(rc, dir);
   }

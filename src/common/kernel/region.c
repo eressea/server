@@ -253,9 +253,10 @@ a_readdirection(attrib *a, FILE *f)
   fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
   if (global.data_version<UNICODE_VERSION) {
     char lbuf[16];
+    dir_lookup * dl = dir_name_lookup;
+
     fscanf(f, "%*s ");
     fscanf(f, "%s ", lbuf);
-    dir_lookup * dl = dir_name_lookup;
     
     cstring_i(lbuf);
     for (;dl;dl=dl->next) {
@@ -629,38 +630,6 @@ attrib_type at_travelunit = {
   NO_WRITE,
   NO_READ
 };
-
-extern int laen_read(attrib * a, FILE * F);
-
-/***************/
-/*   at_laen   */
-/***************/
-attrib_type at_laen = {
-  "laen",
-  DEFAULT_INIT,
-  DEFAULT_FINALIZE,
-  DEFAULT_AGE,
-  NULL,
-  laen_read,
-  ATF_UNIQUE
-};
-
-void
-rsetlaen(region * r, int val)
-{
-  attrib * a = a_find(r->attribs, &at_laen);
-  if (!a && val>=0) a = a_add(&r->attribs, a_new(&at_laen));
-  else if (a && val<0) a_remove(&r->attribs, a);
-  if (val>=0) a->data.i = val;
-}
-
-int
-rlaen(const region * r)
-{
-  attrib * a = a_find(r->attribs, &at_laen);
-  if (!a) return -1;
-  return a->data.i;
-}
 
 void
 rsetroad(region * r, direction_t d, short val)

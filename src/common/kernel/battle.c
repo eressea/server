@@ -2774,17 +2774,15 @@ print_header(battle * b)
     const char * lastf = NULL;
     boolean first = false;
     side * s;
-    size_t size;
+    char * bufp = zText;
 
-    zText[0] = 0;
-    size = sizeof(zText);
     for (s=b->sides; s; s=s->next) {
       fighter *df;
       for (df=s->fighters;df;df=df->next) {
         if (is_attacker(df)) {
-          if (first) size -= strlcat(zText, ", ", size);
+          if (first) bufp += strlcpy(bufp, ", ", sizeof(zText) - (bufp-zText));
           if (lastf) {
-            size -= strlcat(zText, (const char *)lastf, size);
+            bufp += strlcpy(bufp, (const char *)lastf, sizeof(zText) - (bufp-zText));
             first = true;
           }
           if (seematrix(f, s) == true)
@@ -2796,11 +2794,11 @@ print_header(battle * b)
       }
     }
     if (first) {
-      size -= strlcat(zText, " ", size);
-      size -= strlcat(zText, (const char *)LOC(f->locale, "and"), size);
-      size -= strlcat(zText, " ", size);
+      bufp += strlcpy(bufp, " ", sizeof(zText) - (bufp-zText));
+      bufp += strlcpy(bufp, (const char *)LOC(f->locale, "and"), sizeof(zText) - (bufp-zText));
+      bufp += strlcpy(bufp, " ", sizeof(zText) - (bufp-zText));
     }
-    if (lastf) size -= strlcat(zText, (const char *)lastf, size);
+    if (lastf) bufp += strlcpy(bufp, (const char *)lastf, sizeof(zText) - (bufp-zText));
 
     m = msg_message("battle::starters", "factions", zText);
     message_faction(b, f, m);
@@ -3306,6 +3304,8 @@ make_battle(region * r)
     bdebug = fopen(zFilename, "w");
     if (!bdebug) log_error(("battles können nicht debugged werden\n"));
     else {
+      const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+      fwrite(utf8_bom, 1, 3, bdebug);
       fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL));
     }
     obs_count++;
@@ -3445,7 +3445,7 @@ battle_report(battle * b)
 
   for (bf=b->factions;bf;bf=bf->next) {
     faction * fac = bf->faction;
-    char buf[1024];
+    char buf[32*MAXSIDES];
     char * bufp = buf;
     size_t size = sizeof(buf), rsize;
     message * m;

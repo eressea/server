@@ -118,24 +118,16 @@ static int
 a_readicastle(attrib * a, FILE * f)
 {
 	icastle_data * data = (icastle_data*)a->data.v;
-	if (global.data_version<TYPES_VERSION) {
-		int t;
-		fscanf(f, "%d", &t);
-		data->time = 0;
-		data->type = NULL;
-		return AT_READ_FAIL;
-	} else {
-		variant bno;
-    char token[32];
-		fscanf(f, "%s %d %d", token, &bno.i, &data->time);
-		data->building = findbuilding(bno.i);
-		if (!data->building) {
-			/* this shouldn't happen, but just in case it does: */
-			ur_add(bno, (void**)&data->building, resolve_building);
-		}
-		data->type = bt_find(token);
-		return AT_READ_OK;
+	variant bno;
+  char token[32];
+	fscanf(f, "%s %d %d", token, &bno.i, &data->time);
+	data->building = findbuilding(bno.i);
+	if (!data->building) {
+		/* this shouldn't happen, but just in case it does: */
+		ur_add(bno, (void**)&data->building, resolve_building);
 	}
+	data->type = bt_find(token);
+	return AT_READ_OK;
 }
 
 static void

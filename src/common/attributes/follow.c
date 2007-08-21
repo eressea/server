@@ -35,14 +35,7 @@ verify_follow(attrib * a)
 static int
 read_follow(attrib * a, FILE * F)
 {
-	if (global.data_version < BASE36IDS_VERSION) {
-		variant var;
-		fscanf(F, "%d", &var.i);
-		ur_add(var, (void**)&a->data.v, resolve_unit);
-	} else {
-		return read_unit_reference(NULL, F);
-	}
-	return AT_READ_OK;
+	return read_unit_reference(NULL, F);
 }
 
 attrib_type at_follow = {

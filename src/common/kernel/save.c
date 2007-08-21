@@ -92,46 +92,6 @@ int enc_gamedata = 0;
 /* local symbols */
 static region * current_region;
 
-
-#ifdef RESOURCE_CONVERSION
-struct attrib_type at_resources = {
-  "resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
-};
-
-static void
-read_iron(struct region * r, int iron)
-{
-  attrib * a = a_find(r->attribs, &at_resources);
-  assert(iron>=0);
-  if (a==NULL) {
-    a = a_add(&r->attribs, a_new(&at_resources));
-    a->data.sa[1] = -1;
-  }
-  a->data.sa[0] = (short)iron;
-}
-
-static void
-read_laen(struct region * r, int laen)
-{
-  attrib * a = a_find(r->attribs, &at_resources);
-  assert(laen>=0);
-  if (a==NULL) {
-    a = a_add(&r->attribs, a_new(&at_resources));
-    a->data.sa[0] = -1;
-  }
-  a->data.sa[1] = (short)laen;
-}
-
-int
-laen_read(attrib * a, FILE * F)
-{
-  int laen;
-  fscanf(F, "%d", &laen);
-  read_laen(current_region, laen);
-  return AT_READ_FAIL;
-}
-#endif
-
 char *
 rns(FILE * f, char *c, size_t size)
 {
@@ -169,81 +129,6 @@ cfopen(const char *filename, const char *mode)
 /* Dummy-Funktion für die Kompatibilität */
 
 #define rid(F) ri36(F)
-
-#undef CONVERT_DBLINK
-#ifdef CONVERT_DBLINK
-
-typedef struct uniquenode {
-  struct uniquenode * next;
-  int id;
-  faction * f;
-} uniquenode;
-
-#define HASHSIZE 2039
-static uniquenode * uniquehash[HASHSIZE];
-
-static faction *
-uniquefaction(int id)
-{
-  uniquenode * node = uniquehash[id%HASHSIZE];
-  while (node && node->id!=id) node=node->next;
-  return node?node->f:NULL;
-}
-
-static void
-addunique(int id, faction * f)
-{
-  uniquenode * fnode = calloc(1, sizeof(uniquenode));
-  fnode->f = f;
-  fnode->id = id;
-  fnode->next = uniquehash[id%HASHSIZE];
-  uniquehash[id%HASHSIZE] = fnode;
-}
-
-typedef struct mapnode {
-  struct mapnode * next;
-  int fno;
-  int subscription;
-} mapnode;
-
-static mapnode * subscriptions[HASHSIZE];
-
-void
-convertunique(faction * f)
-{
-  int unique = f->subscription;
-  static FILE * F = NULL;
-  mapnode * mnode;
-  addunique(unique, f);
-  if (F==NULL) {
-    static char zText[MAX_PATH];
-    strcat(strcpy(zText, basepath()), "/subscriptions");
-    F = fopen(zText, "r");
-    if (F==NULL) {
-      log_warning(("could not open %s.\n", zText));
-      abort();
-    }
-    for (;;) {
-      char zFaction[5];
-      int subscription, fno;
-      if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
-      mnode = calloc(1, sizeof(mapnode));
-      fno = atoi36(zFaction);
-      mnode->next = subscriptions[fno%HASHSIZE];
-      mnode->fno = fno;
-      mnode->subscription = subscription;
-      subscriptions[fno%HASHSIZE] = mnode;
-    }
-  }
-  mnode = subscriptions[f->no%HASHSIZE];
-  while (mnode!=NULL && mnode->fno!=f->no) mnode = mnode->next;
-  if (mnode) f->subscription = mnode->subscription;
-  else {
-    log_printf("%s %s %s %s\n",
-           itoa36(f->no), f->email, f->override, dbrace(f->race));
-  }
-}
-#endif
 
 int
 freadstr(FILE * F, int encoding, char * start, size_t size)
@@ -663,6 +548,7 @@ readorders(const char *filename)
 
   puts(" - lese Befehlsdatei...\n");
 
+  /* TODO: recognize UTF8 BOM */
   b = getbuf(F, enc_gamedata);
 
   /* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
@@ -902,50 +788,6 @@ write_items(FILE *F, item *ilist)
   fputs("end ", F);
 }
 
-#ifdef USE_PLAYERS
-static void
-export_players(const char * path)
-{
-  FILE * F;
-  player * p = get_players();
-  if (p==NULL) return;
-
-  F = cfopen(path, "w");
-  if (F==NULL) return;
-
-  fputs("name;email;passwd;faction;info\n", F);
-  while (p) {
-    /* name */
-    fputc('\"', F);
-    if (p->name) fputs(p->name, F);
-
-    /* email */
-    fputs("\";\"", F);
-    if (p->email) fputs(p->email, F);
-    else if (p->faction) fputs(p->faction->email, F);
-    fputs("\";\"", F);
-
-    /* passwd */
-    fputs("\";\"", F);
-    if (p->faction) fputs(p->faction->passw, F);
-
-    /* faction */
-    fputs("\";\"", F);
-    if (p->faction) fputs(itoa36(p->faction->no), F);
-
-    /* info */
-    fputs("\";\"", F);
-    if (p->info) fputs(p->info, F);
-    else if (p->faction) fputs(p->faction->banner, F);
-
-    fputs("\"\n", F);
-
-    p = next_player(p);
-  }
-  fclose(F);
-}
-#endif
-
 int
 lastturn(void)
 {
@@ -1076,23 +918,6 @@ readunit(FILE * F, int encoding)
     }
   }
   setstatus(u, ri(F));
-  if (global.data_version < NEWSTATUS_VERSION) {
-    switch (u->status) {
-      case 0:
-        setstatus(u, ST_FIGHT); 
-        break;
-      case 1: 
-        setstatus(u, ST_BEHIND);
-        break;
-      case 2: 
-        setstatus(u, ST_AVOID);
-        break;
-      case 3: 
-        setstatus(u, ST_FLEE);
-      default:
-        assert(!"unknown status in data");
-    }
-  }
   if (global.data_version <= 73) {
     if (ri(F)) {
       guard(u, GUARD_ALL);
@@ -1175,29 +1000,6 @@ readunit(FILE * F, int encoding)
     u->hp=u->number;
   }
 
-  if (global.data_version < MAGE_ATTRIB_VERSION) {
-    int i = ri(F);
-    if (i != -1){
-      attrib * a;
-      int csp = 0;
-      sc_mage * mage = calloc(1, sizeof(sc_mage));
-
-      mage->magietyp = (magic_t) i;
-      mage->spellpoints = ri(F);
-      mage->spchange = ri(F);
-      while ((i = ri(F)) != -1) {
-        mage->combatspells[csp].sp = find_spellbyid(mage->magietyp, (spellid_t)i);
-        mage->combatspells[csp].level = ri(F);
-        csp++;
-      }
-      while ((i = ri(F)) != -1) {
-        add_spell(mage, find_spellbyid(mage->magietyp, (spellid_t)i));
-      }
-      mage->spellcount = 0;
-      a = a_add(&u->attribs, a_new(&at_mage));
-      a->data.v = mage;
-    }
-  }
   a_read(F, &u->attribs);
   return u;
 }
@@ -1309,9 +1111,6 @@ readregion(FILE * F, int encoding, short x, short y)
   
   if (global.data_version < TERRAIN_VERSION) {
     int ter = ri(F);
-    if (global.data_version < NOFOREST_VERSION) {
-      if (ter>T_PLAIN) --ter;
-    }
     terrain = newterrain((terrain_t)ter);
   } else {
     char name[64];
@@ -1325,10 +1124,7 @@ readregion(FILE * F, int encoding, short x, short y)
   r->terrain = terrain;
   r->flags = (char) ri(F);
 
-  if (global.data_version >= REGIONAGE_VERSION)
-      r->age = (unsigned short) ri(F);
-  else
-      r->age = 0;
+  r->age = (unsigned short) ri(F);
 
   if (fval(r->terrain, LAND_REGION)) {
     r->land = calloc(1, sizeof(land_region));
@@ -1336,6 +1132,7 @@ readregion(FILE * F, int encoding, short x, short y)
   }
   if (r->land) {
     int i;
+    rawmaterial ** pres = &r->resources;
     if(global.data_version < GROWTREE_VERSION) {
       i = ri(F); rsettrees(r, 2, i);
     } else {
@@ -1362,48 +1159,41 @@ readregion(FILE * F, int encoding, short x, short y)
       rsettrees(r, 2, i);
     }
     i = ri(F); rsethorses(r, i);
-    if (global.data_version < NEWRESOURCE_VERSION) {
-      i = ri(F);
-#ifdef RESOURCE_CONVERSION
-      if (i!=0) read_iron(r, i);
-#endif
-    } else {
-      rawmaterial ** pres = &r->resources;
-      assert(*pres==NULL);
-      for (;;) {
-        rawmaterial * res;
-        rss(F, token, sizeof(token));
-        if (strcmp(token, "end")==0) break;
-        res = malloc(sizeof(rawmaterial));
-        res->type = rmt_find(token);
-        if (res->type==NULL) {
-          log_error(("invalid resourcetype %s in data.\n", token));
-        }
-        assert(res->type!=NULL);
-        res->level = ri(F);
-        res->amount = ri(F);
-        res->flags = 0;
-
-        if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
-          res->startlevel = ri(F);
-          res->base = ri(F);
-          res->divisor = ri(F);
-        } else {
-          int i;
-          for (i=0;r->terrain->production[i].type;++i) {
-            if (res->type->rtype == r->terrain->production[i].type) break;
-          }
-
-          res->base = dice_rand(r->terrain->production[i].base);
-          res->divisor = dice_rand(r->terrain->production[i].divisor);
-          res->startlevel = 1;
-        }
-
-        *pres = res;
-        pres=&res->next;
+    assert(*pres==NULL);
+    for (;;) {
+      rawmaterial * res;
+      rss(F, token, sizeof(token));
+      if (strcmp(token, "end")==0) break;
+      res = malloc(sizeof(rawmaterial));
+      res->type = rmt_find(token);
+      if (res->type==NULL) {
+        log_error(("invalid resourcetype %s in data.\n", token));
       }
-      *pres = NULL;
+      assert(res->type!=NULL);
+      res->level = ri(F);
+      res->amount = ri(F);
+      res->flags = 0;
+
+      if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
+        res->startlevel = ri(F);
+        res->base = ri(F);
+        res->divisor = ri(F);
+      } else {
+        int i;
+        for (i=0;r->terrain->production[i].type;++i) {
+          if (res->type->rtype == r->terrain->production[i].type) break;
+        }
+
+        res->base = dice_rand(r->terrain->production[i].base);
+        res->divisor = dice_rand(r->terrain->production[i].divisor);
+        res->startlevel = 1;
+      }
+
+      *pres = res;
+      pres=&res->next;
     }
+    *pres = NULL;
+
     rss(F, token, sizeof(token));
     if (strcmp(token, "noherb") != 0) {
       const resource_type * rtype = rt_find(token);
@@ -1574,12 +1364,8 @@ readfaction(FILE * F, int encoding)
     f->override = strdup(itoa36(rng_int()));
   }
 
-  if (global.data_version < LOCALE_VERSION) {
-    f->locale = find_locale("de");
-  } else {
-    rss(F, token, sizeof(token));
-    f->locale = find_locale(token);
-  }
+  rss(F, token, sizeof(token));
+  f->locale = find_locale(token);
   f->lastorders = ri(F);
   f->age = ri(F);
   if (global.data_version < NEWRACE_VERSION) {
@@ -1590,9 +1376,6 @@ readfaction(FILE * F, int encoding)
     f->race = rc_find(token);
     assert(f->race);
   }
-#ifdef CONVERT_DBLINK
-  convertunique(f);
-#endif
   f->magiegebiet = (magic_t)ri(F);
 
 #ifdef KARMA_MODULE
@@ -1628,18 +1411,6 @@ readfaction(FILE * F, int encoding)
   if ((i & (want(O_REPORT)|want(O_COMPUTER)))==0 && f->no!=MONSTER_FACTION) {
     /* Kein Report eingestellt, Fehler */
     f->options = f->options | want(O_REPORT) | want(O_ZUGVORLAGE);
-  }
-
-  if (global.data_version < TYPES_VERSION) {
-    int sk = ri(F); /* f->seenspell überspringen */
-    spell_list * slist;
-    for (slist=spells;slist!=NULL;slist=slist->next) {
-      spell * sp = slist->data;
-
-      if (sp->magietyp==f->magiegebiet && sp->level<=sk) {
-        a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
-      }
-    }
   }
 
   sfp = &f->allies;
@@ -1758,10 +1529,11 @@ readgame(const char * filename, int backup)
 
   /* globale Variablen */
 
+  /* TODO: recognize UTF8 BOM */
   global.data_version = ri(F);
   assert(global.data_version>=MIN_VERSION || !"unsupported data format");
   assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
-  assert(global.data_version >= NEWSOURCE_VERSION);
+  assert(global.data_version >= GROWTREE_VERSION);
   if(global.data_version >= SAVEXMLNAME_VERSION) {
     char basefile[1024];
     const char *basearg = "(null)";
@@ -1780,9 +1552,7 @@ readgame(const char * filename, int backup)
       getchar();
     }
   }
-  if (global.data_version >= GLOBAL_ATTRIB_VERSION) {
-    a_read(F, &global.attribs);
-  }
+  a_read(F, &global.attribs);
   global.data_turn = turn = ri(F);
   ri(F); /* max_unique_id = */ 
   nextborder = ri(F);
@@ -1903,14 +1673,8 @@ readgame(const char * filename, int backup)
       if (lomem) rds(F, 0);
       else xrds(F, &b->display, enc_gamedata);
       b->size = ri(F);
-      if (global.data_version < TYPES_VERSION) {
-        assert(!"data format is no longer supported");
-        /* b->type = oldbuildings[ri(F)]; */
-      }
-      else {
-        rss(F, token, sizeof(token));
-        b->type = bt_find(token);
-      }
+      rss(F, token, sizeof(token));
+      b->type = bt_find(token);
       b->region = r;
       a_read(F, &b->attribs);
     }
@@ -2018,11 +1782,6 @@ writegame(const char *filename, int quiet)
   FILE * F;
   char path[MAX_PATH];
 
-#ifdef USE_PLAYERS
-  sprintf(path, "%s/%d.players", datapath(), turn);
-  export_players(path);
-#endif
-
   sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
   if (access(path, R_OK) == 0) {
@@ -2031,9 +1790,12 @@ writegame(const char *filename, int quiet)
   }
 #endif
   F = cfopen(path, "w");
-  if (F==NULL)
+  if (F==NULL) {
     return -1;
-
+  } else {
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    fwrite(utf8_bom, 1, 3, F);
+  }
   if (!quiet)
     printf("Schreibe die %d. Runde...\n", turn);
 

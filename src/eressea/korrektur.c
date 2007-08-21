@@ -964,6 +964,4 @@ korrektur(void)
 
   /* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
   create_teleport_plane();
-
-  if (global.data_version<TYPES_VERSION) fix_icastles();
 }

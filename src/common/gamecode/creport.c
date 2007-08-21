@@ -69,6 +69,8 @@
 #include <util/message.h>
 #include <util/nrmessage.h>
 
+#include <libxml/encoding.h>
+
 /* libc includes */
 #include <assert.h>
 #include <errno.h>
@@ -1141,10 +1143,15 @@ report_computer(const char * filename, report_context * ctx, const char * charse
 #ifdef SCORE_MODULE
   int score = 0, avgscore = 0;
 #endif
+  int enc = xmlParseCharEncoding(charset);
   FILE * F = fopen(filename, "wt");
+
   if (F==NULL) {
     perror(filename);
     return -1;
+  } else if (enc==XML_CHAR_ENCODING_UTF8) {
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    fwrite(utf8_bom, 1, 3, F);
   }
 
   /* must call this to get all the neighbour regions */

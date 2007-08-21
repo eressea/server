@@ -32,13 +32,7 @@ write_targetregion(const attrib * a, FILE * F)
 static int
 read_targetregion(attrib * a, FILE * F)
 {
-	if (global.data_version < BASE36IDS_VERSION) {
-		a_readint(a, F);
-		a->data.v = findregion(a->data.sa[0], a->data.sa[1]);
-	} else {
-		return read_region_reference((region**)&a->data.v, F);
-	}
-	return AT_READ_OK;
+	return read_region_reference((region**)&a->data.v, F);
 }
 
 attrib_type at_targetregion = {
