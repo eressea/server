@@ -223,7 +223,10 @@ faction_set_banner(faction& f, const char * banner)
 const char *
 faction_get_banner(const faction& f)
 {
-  return (const char*)f.banner;
+  if (f.banner) {
+    return (const char*)f.banner;
+  }
+  return "";
 }
 
 void
