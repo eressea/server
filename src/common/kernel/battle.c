@@ -3302,7 +3302,7 @@ make_battle(region * r)
     makedir(zText, 0700);
     sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
     bdebug = fopen(zFilename, "w");
-    if (!bdebug) log_error(("battles können nicht debugged werden\n"));
+    if (!bdebug) log_error(("battles cannot be debugged\n"));
     else {
       const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
       fwrite(utf8_bom, 1, 3, bdebug);
