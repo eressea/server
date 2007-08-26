@@ -121,7 +121,7 @@ write_regionname(const region * r, const faction * f, char * buffer, size_t size
         region_x(r, f), region_y(r, f));
     }
   }
-  buf[64] = 0;
+  buf[size-1] = 0;
   return buffer;
 }
 

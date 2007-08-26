@@ -34,6 +34,7 @@ typedef struct group {
 
 extern struct attrib_type at_group; /* attribute for units assigned to a group */
 extern boolean join_group(struct unit * u, const char * name);
+extern void set_group(struct unit * u, struct group * g);
 extern void free_group(struct group * g);
 
 extern void write_groups(FILE * F, struct group * g);

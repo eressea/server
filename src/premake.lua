@@ -17,7 +17,7 @@ for k,v in project.configs do
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
   end
-  if v=="Release" then
+  if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")
   end
 end
@@ -44,7 +44,7 @@ for k,v in project.configs do
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
   end
-  if v=="Release" then
+  if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")
   end
 end
@@ -65,7 +65,7 @@ for k,v in project.configs do
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
   end
-  if v=="Release" then
+  if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")
   end
 end
@@ -87,7 +87,7 @@ for k,v in project.configs do
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
   end
-  if v=="Release" then
+  if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")
   end
 end
@@ -112,9 +112,7 @@ for k,v in project.configs do
     package.config[v].links = { "lua5.1_d", "luabind_d" }
   else
     package.config[v].links = { "lua5.1", "luabind" }
-    if v=="Release" then
-      table.insert(package.config[v].defines, "NDEBUG")
-    end
+    table.insert(package.config[v].defines, "NDEBUG")
   end
 end
 
@@ -139,9 +137,7 @@ for k,v in project.configs do
     package.config[v].links = { "lua5.1_d", "luabind_d" }
   else
     package.config[v].links = { "lua5.1", "luabind" }
-    if v=="Release" then
-      table.insert(package.config[v].defines, "NDEBUG")
-    end
+    table.insert(package.config[v].defines, "NDEBUG")
   end
 --  package.config["Debug"].linkoptions = { "/NODEFAULTLIB:MSVCRT /NODEFAULTLIB:LIBCMT" }
 end

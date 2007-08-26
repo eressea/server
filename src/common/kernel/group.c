@@ -132,34 +132,48 @@ free_group(group * g)
 	free(g);
 }
 
-boolean
-join_group(unit * u, const char * name)
+void
+set_group(struct unit * u, struct group * g)
 {
-	attrib * a = NULL;
-	group * g;
+  attrib * a = NULL;
+
   if (fval(u, UFL_GROUP)) {
     a = a_find(u->attribs, &at_group);
   }
 
-	if (a) ((group *)(a->data.v))->members--;
-	if (!name || !strlen(name)) {
-    if (a) {
-      a_remove(&u->attribs, a);
-      freset(u, UFL_GROUP);
-    }
-		return true;
-	}
-	g = find_groupbyname(u->faction->groups, name);
-	if (!g) {
-		g = new_group(u->faction, name, ++maxgid);
-		init_group(u->faction, g);
-	}
-  if (!a) {
-    a = a_add(&u->attribs, a_new(&at_group));
-    fset(u, UFL_GROUP);
+  if (a) {
+    group * og = (group *)a->data.v;
+    if (og==g) return;
+    --og->members;
   }
-	a->data.v = g;
-	g->members++;
+
+  if (g) {
+    if (!a) {
+      a = a_add(&u->attribs, a_new(&at_group));
+      fset(u, UFL_GROUP);
+    }
+    a->data.v = g;
+    g->members++;
+  } else if (a) {
+    a_remove(&u->attribs, a);
+    freset(u, UFL_GROUP);
+  }
+}
+
+boolean
+join_group(unit * u, const char * name)
+{
+	group * g = NULL;
+
+	if (name && name[0]) {
+  	g = find_groupbyname(u->faction->groups, name);
+	  if (g==NULL) {
+		  g = new_group(u->faction, name, ++maxgid);
+		  init_group(u->faction, g);
+	  }
+  }
+
+  set_group(u, g);
 	return true;
 }
 

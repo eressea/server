@@ -1370,8 +1370,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
       a = a_find(creator->attribs, &at_group);
       if (a) {
         group * g = (group*)a->data.v;
-        a_add(&u->attribs, a_new(&at_group))->data.v = g;
-        fset(u, UFL_GROUP);
+        set_group(u, g);
       }
     }
     a = a_find(creator->attribs, &at_otherfaction);
