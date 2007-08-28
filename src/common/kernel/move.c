@@ -1504,7 +1504,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
     if (mode!=TRAVEL_TRANSPORTED) {
       ADDMSG(&u->faction->msgs, msg_message("travel", 
-        "unit mode start end regions", u, walkmode, r, current, route_begin));
+        "unit mode start end regions", u, walkmode, r, current, route_begin->next?route_begin:NULL));
     }
 
     mark_travelthru(u, r, route_begin, iroute);

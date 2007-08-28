@@ -1615,8 +1615,8 @@ eval_localize(struct opstack ** stack, const void * userdata) /* (string, locale
   opush_v(stack, strcpy(balloc(strlen(c)+1), c));
 }
 
-static void
-eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
+static void 
+eval_trailto(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
   const struct faction * f = (const struct faction *)userdata;
   const struct locale * lang = f?f->locale:default_locale;
@@ -1931,6 +1931,36 @@ eval_regions(struct opstack ** stack, const void * userdata) /* order -> string 
 }
 
 static void
+eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+  const faction * report = (const faction*)userdata;
+  int i, end = 0, begin = 0;
+  const arg_regions * regions = (const arg_regions *)opop(stack).v;
+  static char buf[256];
+  variant var;
+  char * edit = buf;
+
+  if (regions!=NULL) {
+    end = regions->nregions-1;
+    for (i=begin;i<end;++i) {
+      region * r = regions->regions[i];
+      const char * trail = trailinto(r, report->locale);
+      const char * rn = f_regionid_s(r, report);
+
+      edit += snprintf(edit, sizeof(buf)-(edit-buf), trail, rn);
+      if (i+2<end) {
+        edit += strlcpy(edit, ", ", sizeof(buf)-(edit-buf));
+      } else if (i+1<end) {
+        edit += strlcpy(edit, LOC(report->locale, "list_and"), sizeof(buf)-(edit-buf));
+      }
+    }
+  }
+  buf[sizeof(buf)-1] = 0;
+  var.v = strcpy(balloc(edit-buf+1), buf);
+  opush(stack, var);
+}
+
+static void
 eval_direction(struct opstack ** stack, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
@@ -2012,12 +2042,13 @@ reports_init(void)
   add_function("order", &eval_order);
   add_function("direction", &eval_direction);
   add_function("int36", &eval_int36);
-  add_function("trail", &eval_trail);
+  add_function("trailto", &eval_trailto);
   add_function("localize", &eval_localize);
   add_function("spell", &eval_spell);
   add_function("curse", &eval_curse);
   add_function("resources", &eval_resources);
   add_function("regions", &eval_regions);
+  add_function("trail", &eval_trail);
 
   /* register alternative visibility functions */
   register_function((pf_generic)view_neighbours, "view_neighbours");

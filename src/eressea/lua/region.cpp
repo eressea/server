@@ -148,6 +148,7 @@ region_getresource(const region& r, const char * type)
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
     if (rtype==rt_find("money")) return rmoney(&r);
+    if (rtype==rt_find("horse")) return rhorses(&r);
     if (rtype==rt_find("peasant")) return rpeasants(&r);
   } else {
     if (strcmp(type, "seed")==0) return rtrees(&r, 0);
@@ -165,7 +166,8 @@ region_setresource(region& r, const char * type, int value)
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
     if (rtype==rt_find("money")) rsetmoney(&r, value);
-    if (rtype==rt_find("peasant")) return rsetpeasants(&r, value);
+    else if (rtype==rt_find("peasant")) rsetpeasants(&r, value);
+    else if (rtype==rt_find("horse")) rsethorses(&r, value);
   } else {
     if (strcmp(type, "seed")==0) {
       rsettrees(&r, 0, value);

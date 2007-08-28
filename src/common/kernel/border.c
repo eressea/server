@@ -427,25 +427,25 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
 
 	unused(f);
 	if (gflags & GF_ARTICLE) {
-		if (!(gflags & GF_DETAILED)) strcpy(buffer, "eine Straße");
+		if (!(gflags & GF_DETAILED)) return LOC(f->locale, "nr_a_road");
 		else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
 			if (r2->terrain->max_road<=remote) {
-				strcpy(buffer, "eine Straße");
+				return LOC(f->locale, "nr_a_road");
 			} else {
-				strcpy(buffer, "eine unvollständige Straße");
+				return LOC(f->locale, "nr_an_incomplete_road");
 			}
 		} else {
 			int percent = max(1, 100*local/r->terrain->max_road);
 			if (local) {
-				sprintf(buffer, "eine zu %d%% vollendete Straße", percent);
+				sprintf(buffer, LOC(f->locale, "nr_road_percent"), percent);
 			} else {
-				strcpy(buffer, "ein Straßenanschluß");
+				return LOC(f->locale, "nr_a_road_connection");
 			}
 		}
 	}
-	else if (gflags & GF_PLURAL) return "Straßen";
-	else return "Straße";
+	else if (gflags & GF_PLURAL) return LOC(f->locale, "nr_roads");
+	else return LOC(f->locale, "nr_road");
 	return buffer;
 }
 

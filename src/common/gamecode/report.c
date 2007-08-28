@@ -1331,7 +1331,6 @@ show_allies(FILE * F, const faction * f, const ally * allies, char * buf, size_t
             break;
           case HELP_MONEY:
             p = P_MONEY;
-            hh = 1;
             break;
           case HELP_FIGHT:
             p = P_FIGHT;

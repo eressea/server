@@ -714,8 +714,8 @@
     <type>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">$trail($region)</text>
-    <text locale="en">$trail($region)</text>
+    <text locale="de">$trailto($region)</text>
+    <text locale="en">$trailto($region)</text>
   </message>
   <message name="nr_migrants" section="nr">
     <type>
@@ -813,8 +813,8 @@
       <arg name="dir" type="int"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Im $direction($dir) der Region liegt $trail($region)"</text>
-    <text locale="en">"To the $direction($dir) lies $trail($region)"</text>
+    <text locale="de">"Im $direction($dir) der Region liegt $trailto($region)"</text>
+    <text locale="en">"To the $direction($dir) lies $trailto($region)"</text>
   </message>
   <message name="nr_market_price" section="nr">
     <type>
@@ -2819,9 +2819,9 @@
       <arg name="end" type="region"/>
       <arg name="regions" type="regions"/>
     </type>
-    <text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($isnull($regions),""," Dabei wurde $regions($regions,1,-2) durchquert.")"</text>
-    <text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end) trans $regions($regions,1,-2)"</text>
-    <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end)$if($isnull($regions),""," by way of $regions($regions,1,-2)")."</text>
+    <text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($isnull($regions),""," Dabei wurde $trail($regions) durchquert.")"</text>
+    <text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end) trans $trail($regions)"</text>
+    <text locale="en">"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end)$if($isnull($regions),""," by way of $trail($regions)")."</text>
   </message>
   <message name="detectoceandir" section="movement">
     <type>
@@ -7476,7 +7476,7 @@
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
     </type>
-    <text locale="de">"Mit einem Ritual bindet $unit($unit) die magischen Kräfte der Erde in die Mauern von $building($building)."</text>
+    <text locale="de">"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde in die Mauern von $building($building)."</text>
   </message>
 
   <message name="blessedstonecircle_effect" section="magic">

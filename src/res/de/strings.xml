@@ -7432,4 +7432,34 @@
     <text locale="en">Owner</text>
   </string>
 
+  <string name="nr_a_road">
+    <text locale="de">eine Straﬂe</text>
+    <text locale="en">a road</text>
+  </string>
+
+  <string name="nr_roads">
+    <text locale="de">Straﬂen</text>
+    <text locale="en">roads</text>
+  </string>
+
+  <string name="nr_road">
+    <text locale="de">Straﬂe</text>
+    <text locale="en">road</text>
+  </string>
+
+  <string name="nr_road_percent">
+    <text locale="de">eine zu %d%% vollendete Straﬂe</text>
+    <text locale="en">a road that is %d%% complete</text>
+  </string>
+
+  <string name="nr_a_road_connection">
+    <text locale="de">ein Straﬂenanschluﬂ</text>
+    <text locale="en">a connection to another road</text>
+  </string>
+
+  <string name="nr_an_incomplete_road">
+    <text locale="de">eine unvollst‰ndige Straﬂe</text>
+    <text locale="en">an incomplete road</text>
+  </string>
+
 </strings>
