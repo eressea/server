@@ -892,9 +892,6 @@ rel_dam(int dam, int hp)
 boolean
 terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 {
-#ifdef SMALL_BATTLE_MESSAGES
-  char smallbuf[512];
-#endif
   item ** pitm;
   fighter *df = dt.fighter;
   fighter *af = at.fighter;
@@ -1091,17 +1088,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
   }
 
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->small) {
-    if (rda > 0) {
-      sprintf(smallbuf, "Der Treffer verursacht %s",
-        rel_dam(rda, df->person[dt.index].hp));
-    } else {
-      sprintf(smallbuf, "Der Treffer verursacht keinen Schaden");
-    }
-  }
-#endif
-
   assert(dt.index<du->number);
   df->person[dt.index].hp -= rda;
 
@@ -1120,32 +1106,14 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
       }
     }
     df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      strcat(smallbuf, ".");
-      battlerecord(b, smallbuf);
-    }
-#endif
     return false;
   }
 #ifdef SHOW_KILLS
   ++at.fighter->kills;
 #endif
 
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->small) {
-    strcat(smallbuf, ", die tödlich ist");
-  }
-#endif
-
   /* Sieben Leben */
   if (du->race == new_race[RC_CAT] && (chance(1.0 / 7))) {
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      strcat(smallbuf, ", doch die Katzengöttin ist gnädig");
-      battlerecord(b, smallbuf);
-    }
-#endif
     assert(dt.index>=0 && dt.index<du->number);
     df->person[dt.index].hp = unit_max_hp(du);
     return false;
@@ -1161,12 +1129,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     heiltrank = 1;
   }
   if (heiltrank && (chance(0.50))) {
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      strcat(smallbuf, ", doch ein Heiltrank bringt Rettung");
-      battlerecord(b, smallbuf);
-    } else
-#endif
     {
       message * m = msg_message("battle::potionsave", "unit", du);
       message_faction(b, du->faction, m);
@@ -1181,12 +1143,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP, tot.\n",
       da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
   }
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->small) {
-    strcat(smallbuf, ".");
-    battlerecord(b, smallbuf);
-  }
-#endif
   for (pitm=&du->items; *pitm; pitm=&(*pitm)->next) {
     const item_type * itype = (*pitm)->type;
     if (!itype->flags & ITF_CURSED && dt.index < (*pitm)->number) {
@@ -1752,47 +1708,6 @@ getreload(troop at)
   return at.fighter->person[at.index].reload;
 }
 
-#ifdef SMALL_BATTLE_MESSAGES
-static char *
-attack_message(const troop at, const troop dt, const weapon * wp, int dist)
-{
-  static char smallbuf[512];
-  char a_unit[NAMESIZE+8], d_unit[NAMESIZE+8];
-        const char *noweap_string[4] = {"schlägt nach",
-          "tritt nach",
-          "beißt nach",
-          "kratzt nach"};
-
-  if (at.fighter->unit->number > 1)
-    sprintf(a_unit, "%s/%d", unitname(at.fighter->unit), at.index);
-  else
-    sprintf(a_unit, "%s", unitname(at.fighter->unit));
-
-  if (dt.fighter->unit->number > 1)
-    sprintf(d_unit, "%s/%d", unitname(dt.fighter->unit), dt.index);
-  else
-    sprintf(d_unit, "%s", unitname(dt.fighter->unit));
-
-  if (wp == NULL) {
-    sprintf(smallbuf, "%s %s %s",
-      a_unit, noweap_string[rng_int()%4], d_unit);
-    return smallbuf;
-  }
-
-  if (dist > 1 || wp->type->missile) {
-    sprintf(smallbuf, "%s schießt mit %s auf %s",
-      a_unit,
-      locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
-  } else {
-    sprintf(smallbuf, "%s schlägt mit %s nach %s",
-      a_unit,
-      locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
-  }
-
-  return smallbuf;
-}
-#endif
-
 static void
 debug_hit(troop at, const weapon * awp, troop dt, const weapon * dwp, int skdiff, int dist, boolean success)
 {
@@ -1810,10 +1725,6 @@ debug_hit(troop at, const weapon * awp, troop dt, const weapon * dwp, int skdiff
 int
 hits(troop at, troop dt, weapon * awp)
 {
-#ifdef SMALL_BATTLE_MESSAGES
-  char * smallbuf = NULL;
-  battle * b = at.fighter->side->battle;
-#endif
   fighter *af = at.fighter, *df = dt.fighter;
   const armor_type * armor, * shield;
   int skdiff = 0;
@@ -1845,85 +1756,37 @@ hits(troop at, troop dt, weapon * awp)
   /* Verteidiger bekommt eine Rüstung */
   armor = select_armor(dt, true);
   shield = select_armor(dt, false);
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->small) {
-    smallbuf = attack_message(at, dt, awp, dist);
-  }
-#endif
   if (contest(skdiff, armor, shield)) {
     if (bdebug) {
       debug_hit(at, awp, dt, dwp, skdiff, dist, true);
     }
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      strcat(smallbuf, " und trifft.");
-      battlerecord(b,smallbuf);
-    }
-#endif
     return 1;
   }
   if (bdebug) {
     debug_hit(at, awp, dt, dwp, skdiff, dist, false);
   }
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->small) {
-    strcat(smallbuf, ".");
-    battlerecord(b,smallbuf);
-  }
-#endif
   return 0;
 }
 
 void
 dazzle(battle *b, troop *td)
 {
-#ifdef SMALL_BATTLE_MESSAGES
-  char smallbuf[512];
-#endif
-
   /* Nicht kumulativ ! */
   if(td->fighter->person[td->index].flags & FL_DAZZLED) return;
 
 #ifdef TODO_RUNESWORD
   if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      strcpy(smallbuf, "Das Runenschwert glüht kurz auf.");
-      battlerecord(b,smallbuf);
-    }
-#endif
     return;
   }
 #endif
   if (td->fighter->person[td->index].flags & FL_COURAGE) {
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
-        "schnell wieder.", unitname(td->fighter->unit), td->index);
-      battlerecord(b,smallbuf);
-    }
-#endif
-                return;
-  }
-
-  if (td->fighter->person[td->index].flags & FL_DAZZLED) {
-#ifdef SMALL_BATTLE_MESSAGES
-    if (b->small) {
-      sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
-        "schnell wieder.", unitname(td->fighter->unit), td->index);
-      battlerecord(b,smallbuf);
-    }
-#endif
     return;
   }
 
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->small) {
-    sprintf(smallbuf, "%s/%d fühlt sich, als würde Kraft entzogen.",
-      unitname(td->fighter->unit), td->index);
-    battlerecord(b,smallbuf);
+  if (td->fighter->person[td->index].flags & FL_DAZZLED) {
+    return;
   }
-#endif
+
   td->fighter->person[td->index].flags |= FL_DAZZLED;
   td->fighter->person[td->index].defence--;
 }
@@ -4000,18 +3863,6 @@ battle_flee(battle * b)
           if (chance(min(fleechance(u)+ispaniced, 0.90))) {
             ++runners;
             flee(dt);
-
-#ifdef SMALL_BATTLE_MESSAGES
-            if (b->small) {
-              sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
-                unitname(fig->unit), dt.index);
-              battlerecord(b, smallbuf);
-            }
-          } else if (b->small) {
-            sprintf(smallbuf, "%s/%d versucht zu fliehen, wird jedoch aufgehalten.",
-              unitname(fig->unit), dt.index);
-            battlerecord(b, smallbuf);
-#endif
           }
         }
         if (bdebug && runners > 0) {
@@ -4025,9 +3876,6 @@ battle_flee(battle * b)
 void
 do_battle(region * r)
 {
-#ifdef SMALL_BATTLE_MESSAGES
-  char smallbuf[512];
-#endif
   battle *b = NULL;
   boolean fighting = false;
   ship * sh;
@@ -4080,14 +3928,6 @@ do_battle(region * r)
 
   print_stats(b); /* gibt die Kampfaufstellung aus */
   printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
-
-#ifdef SMALL_BATTLE_MESSAGES
-  if (b->nfighters <= 30) {
-    b->small = true;
-  } else {
-    b->small = false;
-  }
-#endif
 
   for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
     if (bdebug) {

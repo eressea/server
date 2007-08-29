@@ -1606,7 +1606,7 @@
   <message name="battle_army" section="battle">
     <type>
       <arg name="index" type="int"/>
-      <arg name="name" type="int"/>
+      <arg name="name" type="string"/>
     </type>
     <text locale="de">"Heer $int($index): $name"</text>
     <text locale="en">"Army $int($index): $name"</text>
