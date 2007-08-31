@@ -778,9 +778,9 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 static int
 use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struct order * ord)
 {
-  if (u->race == new_race[RC_DAEMON]  ) {
+  if (u->race == new_race[RC_DAEMON]) {
     change_effect(u, itype->rtype->ptype, 100*amount);
-  } else {
+  } else if (u->irace == u->race) {
     static race * rcfailure;
     if (!rcfailure) {
       rcfailure = rc_find("smurf");
@@ -788,10 +788,12 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
     }
     if (rcfailure) {
       trigger * trestore = trigger_changerace(u, u->race, u->irace);
-      int duration = 2 + rng_int() % 8;
+      if (trestore) {
+        int duration = 2 + rng_int() % 8;
 
-      add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-      u->irace = u->race = rcfailure;
+        add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+        u->irace = u->race = rcfailure;
+      }
     }
   }
   use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);

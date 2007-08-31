@@ -3954,6 +3954,7 @@ sp_rallypeasantmob(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   message * msg;
+  curse * c;
 
   for (u = r->units; u; u = un) {
     un = u->next;
@@ -3965,6 +3966,11 @@ sp_rallypeasantmob(castorder *co)
       set_number(u, 0);
       erfolg = cast_level;
     }
+  }
+
+  c = get_curse(r->attribs, ct_find(oldcursename(C_RIOT)));
+  if (c!=NULL) {
+    remove_curse(&r->attribs, c);
   }
 
   msg = msg_message("cast_rally_effect", "mage region", mage, r);
@@ -4866,11 +4872,11 @@ sp_illusionary_shapeshift(castorder *co)
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_shapeshift_fail", "target race", u, rc));
     return 0;
   }
-  {
+  if (u->irace == u->race) {
     trigger * trestore = trigger_changerace(u, NULL, u->irace);
     add_trigger(&u->attribs, "timer", trigger_timeout((int)power+2, trestore));
+    u->irace = rc;
   }
-  u->irace = rc;
 
   ADDMSG(&mage->faction->msgs, msg_message("shapeshift_effect", "mage target race", mage, u, rc));
 

@@ -1316,28 +1316,31 @@ do_fumble(castorder *co)
 
   case 1:
     /* Kröte */
-    duration = rng_int()%level/2;
-    if (duration<2) duration = 2;
-    {
+    if (u->irace == u->race) {
       /* one or two things will happen: the toad changes her race back,
       * and may or may not get toadslime.
       * The list of things to happen are attached to a timeout
       * trigger and that's added to the triggerlit of the mage gone toad.
       */
       trigger * trestore = trigger_changerace(u, u->race, u->irace);
+
       if (chance(0.7)) {
         const item_type * it_toadslime = it_find("toadslime");
         if (it_toadslime!=NULL) {
           t_add(&trestore, trigger_giveitem(u, it_toadslime, 1));
         }
       }
+
+      duration = rng_int()%level/2;
+      if (duration<2) duration = 2;
       add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+      u->race = new_race[RC_TOAD];
+      u->irace = new_race[RC_TOAD];
+      ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell",
+        u, r, sp));
+      break;
     }
-    u->race = new_race[RC_TOAD];
-    u->irace = new_race[RC_TOAD];
-    ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell",
-      u, r, sp));
-    break;
+    /* fall-through is intentional! */
 
   case 2:
     /* temporärer Stufenverlust */
@@ -1581,17 +1584,18 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj, order * 
 
 /* gibt bei Misserfolg 0 zurück, bei Magieresistenz zumindeste eines
  * Objektes 1 und bei Erfolg auf ganzer Linie 2 */
-static int
-verify_targets(castorder *co)
+static void
+verify_targets(castorder *co, int * invalid, int * resist, int * success)
 {
 	unit *mage = co->magician.u;
 	const spell *sp = co->sp;
 	region *target_r = co->rt;
 	spellparameter *sa = co->par;
-	int failed = 0;
-	int resists = 0;
-	int success = 0;
-	int i;
+  int i;
+
+  *invalid = 0;
+  *resist = 0;
+  *success = 0;
 
 	if (sa) {
 		/* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
@@ -1604,13 +1608,13 @@ verify_targets(castorder *co)
 			switch(spobj->typ) {
         case SPP_TEMP:
         case SPP_UNIT:
-          if (!verify_unit(target_r, mage, sp, spobj, co->order)) ++failed;
+          if (!verify_unit(target_r, mage, sp, spobj, co->order)) ++*invalid;
           break;
         case SPP_BUILDING:
-          if (!verify_building(target_r, mage, sp, spobj, co->order)) ++failed;
+          if (!verify_building(target_r, mage, sp, spobj, co->order)) ++*invalid;
           break;
         case SPP_SHIP:
-          if (!verify_ship(target_r, mage, sp, spobj, co->order)) ++failed;
+          if (!verify_ship(target_r, mage, sp, spobj, co->order)) ++*invalid;
           break;
         default:
           break;
@@ -1637,7 +1641,7 @@ verify_targets(castorder *co)
             /* Fehlermeldung */
 						spobj->data.i = u->no;
 						spobj->flag = TARGET_RESISTS;
-						++resists;
+						++*resist;
 						ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
               "unit region command target",
 							mage, mage->region, co->order, u));
@@ -1645,7 +1649,7 @@ verify_targets(castorder *co)
 					}
 
 					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
-					++success;
+					++*success;
 					break;
 				case SPP_BUILDING:
 					b = spobj->data.b;
@@ -1655,13 +1659,13 @@ verify_targets(castorder *co)
 					{ /* Fehlermeldung */
 						spobj->data.i = b->no;
 						spobj->flag = TARGET_RESISTS;
-						resists++;
+						++*resist;
             ADDMSG(&mage->faction->msgs, msg_message("spellbuildingresists",
               "unit region command id", 
               mage, mage->region, co->order, spobj->data.i));
 						break;
 					}
-					success++;
+					++*success;
 					break;
 				case SPP_SHIP:
 					sh = spobj->data.sh;
@@ -1671,12 +1675,12 @@ verify_targets(castorder *co)
 					{ /* Fehlermeldung */
 						spobj->data.i = sh->no;
 						spobj->flag = TARGET_RESISTS;
-						resists++;
+						++*resist;
 						ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
               "spellshipresists", "ship", sh));
 						break;
 					}
-					success++;
+					++*success;
 					break;
 
         case SPP_REGION:
@@ -1688,16 +1692,16 @@ verify_targets(castorder *co)
 							&& target_resists_magic(mage, tr, TYP_REGION, 0))
 					{ /* Fehlermeldung */
 						spobj->flag = TARGET_RESISTS;
-						resists++;
+						++*resist;
 						ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
               "unit region command", mage, mage->region, co->order));
 						break;
 					}
-					success++;
+					++*success;
 					break;
 				case SPP_INT:
 				case SPP_STRING:
-					success++;
+					++*success;
 					break;
 
 				default:
@@ -1727,35 +1731,15 @@ verify_targets(castorder *co)
           ADDMSG(&mage->faction->msgs, msg_message("spellregionresists", 
             "unit region command", mage, mage->region, co->order));
 					spobj->flag = TARGET_RESISTS;
-					resists++;
+					++*resist;
 				} else {
-					success++;
+					++*success;
 				}
 			} else {
-				success++;
+				++*success;
 			}
 		}
 	}
-	if (failed > 0) {
-		/* mindestens ein Ziel wurde nicht gefunden */
-		if (sa->length <= failed) {
-			return 0;
-		}
-		if (success == 0) {
-			/* kein Ziel war ein Erfolg */
-			if (resists > 0){
-				/* aber zumindest ein Ziel wurde gefunden, hat nur wiederstanden */
-				return 1;
-			} else {
-				/* nur Fehlschläge */
-				return 0;
-			}
-		}
-	} /* kein Fehlschlag gefunden */
-	if (resists > 0){
-		return 1;
-	}
-	return 2;
 }
 
 /* ------------------------------------------------------------- */
@@ -2709,7 +2693,7 @@ magic(void)
   for (rank = 0; rank < MAX_SPELLRANK; rank++) {
     for (co = spellranks[rank].begin; co; co = co->next) {
       order * ord = co->order;
-      int verify, cast_level = co->level;
+      int invalid, resist, success, cast_level = co->level;
       boolean fumbled = false;
       unit * u = co->magician.u;
       const spell *sp = co->sp;
@@ -2753,46 +2737,39 @@ magic(void)
       * Spruch an der Magieresistenz, so ist verify_targets = 1, bei
       * Erfolg auf ganzer Linie ist verify_targets= 2
       */
-      verify = verify_targets(co);
-      if (verify==0) {
+      verify_targets(co, &invalid, &resist, &success);
+      if (success+resist==0) {
         /* kein Ziel gefunden, Fehlermeldungen sind in verify_targets */
         /* keine kosten für den zauber */
         continue; /* äußere Schleife, nächster Zauberer */
-      } else if (co->force>0 && verify==1) {
+      } else if (co->force>0 && resist>0) {
         /* einige oder alle Ziele waren magieresistent */
-        spellparameter *pa = co->par;
-        int n;
-        for (n=0; n!=pa->length;++n) {
-          if ((pa->param[n]->flag & (TARGET_RESISTS|TARGET_NOTFOUND)) ==0) {
-            /* mindestens ein erfolgreicher Zauberversuch, wir machen normal weiter */
-            break;
-          }
-        }
-        if (n==pa->length) {
+        if (success==0) {
           co->force = 0;
           /* zwar wurde mindestens ein Ziel gefunden, das widerstand
             * jedoch dem Zauber. Kosten abziehen und abbrechen. */
           ADDMSG(&u->faction->msgs, msg_message("spell_resist", "unit region spell",
             u, r, sp));
-          co->force = 0;
         }
       }
 
       /* Auch für Patzer gibt es Erfahrung, müssen die Spruchkosten
-      * bezahlt werden und die nachfolgenden Sprüche werden teurer */
-      if (co->force>0 && fumble(target_r, u, sp, co->level)) {
-        /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
-        fumbled = true;
-      } else if (co->force>0) {
-        if (sp->sp_function==NULL) {
-          log_error(("spell '%s' has no function.\n", sp->sname));
-          co->level = 0;
+       * bezahlt werden und die nachfolgenden Sprüche werden teurer */
+      if (co->force>0) {
+        if (fumble(target_r, u, sp, co->level)) {
+          /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
+          fumbled = true;
         } else {
-          co->level = ((nspell_f)sp->sp_function)(co);
-        }
-        if (co->level <= 0) {
-          /* Kosten nur für real benötige Stufe berechnen */
-          continue;
+          if (sp->sp_function==NULL) {
+            log_error(("spell '%s' has no function.\n", sp->sname));
+            co->level = 0;
+          } else {
+            co->level = ((nspell_f)sp->sp_function)(co);
+          }
+          if (co->level <= 0) {
+            /* Kosten nur für real benötige Stufe berechnen */
+            continue;
+          }
         }
       }
       pay_spell(u, sp, co->level, co->distance);
