@@ -46,6 +46,7 @@ void lparagraph(struct strlist ** SP, char *s, int indent, char mark);
 const char *hp_status(const struct unit * u);
 extern size_t spskill(char * pbuf, size_t siz, const struct locale * lang, const struct unit * u, struct skill * sv, int *dh, int days); /* mapper */
 extern void spunit(struct strlist ** SP, const struct faction * f, const struct unit * u, int indent, int mode);
+extern int wrptr(char ** ptr, size_t * size, int bytes);
 
 extern int reports(void);
 extern int write_reports(struct faction * f, time_t ltime);

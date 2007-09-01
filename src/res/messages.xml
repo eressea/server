@@ -1355,6 +1355,7 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($mage) kümmert sich um die Verletzten und heilt $int($amount) Verwundete."</text>
+    <text locale="en">"$unit($mage) sees after the wounded and heals $int($amount)."</text>
   </message>
 
   <message name="healing_effect_1" section="magic">
@@ -1364,6 +1365,7 @@
       <arg name="item" type="resource"/>
     </type>
     <text locale="de">"$unit($mage) kümmert sich um die Verletzten und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Verwundete werden geheilt."</text>
+    <text locale="en">"$unit($mage) sees after the wounded and heals $int($amount). A $resource($item,1) improves the spell."</text>
   </message>
 
   <message name="sp_eternizewall_effect" section="magic">
@@ -8269,6 +8271,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In dieser Region gibt es keine Brücken uns Straßen mehr zu bauen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - the roads and bridges in this region are complete."</text>
   </message>
 
   <message name="error_build_skill_low" section="errors">
@@ -8316,7 +8319,11 @@
     <type>
       <arg name="faction" type="faction"/>
     </type>
-    <text locale="de">"Achtung: $faction($faction) hat einige Zeit keine Züge eingeschickt und könnte dadurch in Kürze aus dem Spiel ausscheiden"</text>
+    <text locale="de">"Achtung: $faction($faction) hat einige Zeit keine
+    Züge eingeschickt und könnte dadurch in Kürze aus dem Spiel
+    ausscheiden."</text>
+    <text locale="en">"Warning: $faction($faction) has not been sending in
+    orders for some time and may be leaving the game soon."</text>
   </message>
 
 </messages>
