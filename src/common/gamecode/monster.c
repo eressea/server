@@ -452,26 +452,32 @@ make_movement_order(unit * u, const region * target, int moves, boolean (*allowe
 {
 	region * r = u->region;
 	region ** plan;
-	int position = 0;
-  char zOrder[128];
-  char * c = zOrder;
+	int bytes, position = 0;
+  char zOrder[128], * bufp = zOrder;
+  size_t size = sizeof(zOrder) - 1;
 
   if (is_waiting(u)) return NULL;
 
   plan = path_find(r, target, DRAGON_RANGE*5, allowed);
 	if (plan==NULL) return NULL;
 
-	c += strlcpy(c, (const char *)LOC(u->faction->locale, keywords[K_MOVE]), sizeof(zOrder));
+	bytes = (int)strlcpy(bufp, (const char *)LOC(u->faction->locale, keywords[K_MOVE]), size);
+  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
   while (position!=moves && plan[position+1]) {
 		region * prev = plan[position];
 		region * next = plan[++position];
 		direction_t dir = reldirection(prev, next);
 		assert(dir!=NODIRECTION && dir!=D_SPECIAL);
-		*c++ = ' ';
-		c += strlcpy(c, (const char *)LOC(u->faction->locale, directions[dir]), sizeof(zOrder)-(c-(const char *)zOrder));
+    if (size>1) {
+      *bufp++ = ' ';
+      --size;
+    }
+		bytes = (int)strlcpy(bufp, (const char *)LOC(u->faction->locale, directions[dir]), size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 	}
 
+  *bufp = 0;
 	return parse_order(zOrder, u->faction->locale);
 }
 

@@ -52,6 +52,7 @@
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -902,15 +903,15 @@ static const char *shortdirections[MAXDIRECTIONS] =
 static void
 cycle_route(order * ord, unit *u, int gereist)
 {
-	int cm = 0;
-	char tail[1024];
+	int bytes, cm = 0;
+	char tail[1024], * bufp = tail;
 	char neworder[2048];
 	const char *token;
 	direction_t d = NODIRECTION;
 	boolean paused = false;
 	boolean pause;
   order * norder;
-  char * tail_end = tail;
+  size_t size = sizeof(tail) - 1;
 
 	if (get_keyword(ord) != K_ROUTE) return;
 	tail[0] = '\0';
@@ -933,18 +934,20 @@ cycle_route(order * ord, unit *u, int gereist)
 			/* hier sollte keine PAUSE auftreten */
 			assert(!pause);
       if (!pause) {
-        size_t size = sizeof(tail)-(tail_end-tail);
         const char * loc = LOC(lang, shortdirections[d]);
-        *tail_end++ = ' ';
-        tail_end += strlcpy(tail_end, loc, size-1);
+        bytes = (int)strlcpy(bufp, " ", size);
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        bytes = (int)strlcpy(bufp, loc, size);
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       }
 		}
 		else if (strlen(neworder)>sizeof(neworder)/2) break;
 		else if (cm == gereist && !paused && pause) {
-      size_t size = sizeof(tail)-(tail_end-tail);
       const char * loc = LOC(lang, parameters[P_PAUSE]);
-      *tail_end++ = ' ';
-      tail_end += strlcpy(tail_end, loc, size-1);
+      bytes = (int)strlcpy(bufp, " ", size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      bytes = (int)strlcpy(bufp, loc, size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 			paused = true;
 		}
 		else if (pause) {
@@ -2256,9 +2259,9 @@ static int
 hunt(unit *u, order * ord)
 {
   region *rc = u->region;
-  int moves, id, speed;
-  char command[256];
-  char * bufp = command;
+  int bytes, moves, id, speed;
+  char command[256], * bufp = command;
+  size_t size = sizeof(command);
   direction_t dir;
 
   if (fval(u, UFL_NOTMOVING)) {
@@ -2296,8 +2299,11 @@ hunt(unit *u, order * ord)
     return 0;
   }
 
-  bufp = command + sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
-    locale_string(u->faction->locale, directions[dir]));
+  bufp = command;
+  bytes = snprintf(bufp, size, "%s %s", LOC(u->faction->locale, keywords[K_MOVE]),
+    LOC(u->faction->locale, directions[dir]));
+  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+
   moves = 1;
 
   speed = getuint();
@@ -2310,8 +2316,10 @@ hunt(unit *u, order * ord)
   rc = rconnect(rc, dir);
   while (moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
   {
-    bufp += strlcpy(bufp, " ", sizeof(command) - (bufp-command));
-    bufp += strlcpy(bufp, LOC(u->faction->locale, directions[dir]), sizeof(command) - (bufp-command));
+    bytes = (int)strlcpy(bufp, " ", size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    bytes = (int)strlcpy(bufp, LOC(u->faction->locale, directions[dir]), size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     moves++;
     rc = rconnect(rc, dir);
   }

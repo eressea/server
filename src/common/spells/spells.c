@@ -542,11 +542,11 @@ sp_summon_familiar(castorder *co)
   int cast_level = co->level;
   const race * rc;
   skill_t sk;
-  int dh, dh1;
+  int dh, dh1, bytes;
   direction_t d;
   message * msg;
-  char zText[NAMESIZE];
-  char * bufp = zText;
+  char zText[NAMESIZE], * bufp = zText;
+  size_t size = sizeof(zText) - 1;
 
   if (get_familiar(mage) != NULL ) {
     cmistake(mage, co->order, 199, MSG_MAGIC);
@@ -601,12 +601,14 @@ sp_summon_familiar(castorder *co)
         dh1 = 1;
       } else {
         if (dh == 0) {
-          bufp += strlcpy(bufp, (const char*)LOC(mage->faction->locale, "list_and"), sizeof(zText) - (bufp-zText));
+          bytes = (int)strlcpy(bufp, (const char*)LOC(mage->faction->locale, "list_and"), size);
         } else {
-          bufp += strlcpy(bufp, (const char*)", ", sizeof(zText) - (bufp-zText));
+          bytes = (int)strlcpy(bufp, (const char*)", ", size);
         }
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       }
-      bufp += strlcpy(bufp, (const char*)skillname(sk, mage->faction->locale), sizeof(zText) - (bufp-zText));
+      bytes = (int)strlcpy(bufp, (const char*)skillname(sk, mage->faction->locale), size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     }
   }
   ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",

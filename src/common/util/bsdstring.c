@@ -1,6 +1,24 @@
 #include <config.h>
 #include <string.h>
+#include <errno.h>
+
+#ifndef HAVE_INLINE
 #include "bsdstring.h"
+#endif
+
+INLINE_FUNCTION int
+wrptr(char ** ptr, size_t * size, int bytes)
+{
+  if (bytes<=*(int*)size) {
+    *ptr += bytes;
+    *size -= bytes;
+    return 0;
+  }
+
+  *ptr += *size;
+  *size = 0;
+  return ENAMETOOLONG;
+}
 
 #if !defined(HAVE_STRLCPY)
 INLINE_FUNCTION size_t
@@ -22,10 +40,11 @@ strlcpy(char *dst, const char *src, size_t siz)   /* copied from OpenBSD source 
   if (n == 0) {
     if (siz != 0)
       *d = '\0';              /* NUL-terminate dst */
+    while (*s++)
+      ;
   }
 
-/*  return(s - src - 1);    count does not include NUL */
-  return siz - n - 1;
+  return(s - src - 1);    /* count does not include NUL */
 }
 
 

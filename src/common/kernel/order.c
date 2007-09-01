@@ -19,6 +19,7 @@
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/language.h>
+#include <util/log.h>
 #include <util/parser.h>
 
 /* libc includes */
@@ -86,25 +87,35 @@ get_keyword(const order * ord)
 }
 
 static char *
-get_command(const order * ord, char * sbuffer, size_t bufsize)
+get_command(const order * ord, char * sbuffer, size_t size)
 {
-  char * str = sbuffer;
+  char * bufp = sbuffer;
   const char * text = ORD_STRING(ord);
   keyword_t kwd = ORD_KEYWORD(ord);
+  int bytes;
 
-  if (ord->_persistent) *str++ = '@';
-  if (kwd!=NOKEYWORD) {
-    const struct locale * lang = ORD_LOCALE(ord);
-    size_t size = bufsize-(str-sbuffer);
-    if (text) --size;
-    str += strlcpy(str, (const char*)LOC(lang, keywords[kwd]), size);
-    if (text) {
-      *str++ = ' ';
+  if (ord->_persistent) {
+    if (size>0) {
+      *bufp++ = '@';
+      --size;
+    } else {
+      WARN_STATIC_BUFFER();
     }
   }
-  if (text) {
-    str += strlcpy(str, (const char *)text, bufsize-(str-sbuffer));
+  if (kwd!=NOKEYWORD) {
+    const struct locale * lang = ORD_LOCALE(ord);
+    if (size>0) {
+      if (text) --size;
+      bytes = (int)strlcpy(bufp, (const char*)LOC(lang, keywords[kwd]), size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      if (text) *bufp++ = ' ';
+    } else WARN_STATIC_BUFFER();
   }
+  if (text) {
+    bytes = (int)strlcpy(bufp, (const char *)text, size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  }
+  *bufp = 0;
   return sbuffer;
 }
 
@@ -267,7 +278,9 @@ create_order(keyword_t kwd, const struct locale * lang, const char * params, ...
 {
   char zBuffer[DISPLAYSIZE];
   if (params) {
-    char * sptr = zBuffer;
+    char * bufp = zBuffer;
+    int bytes;
+    size_t size = sizeof(zBuffer) - 1;
     va_list marker;
 
     va_start(marker, params);
@@ -279,26 +292,30 @@ create_order(keyword_t kwd, const struct locale * lang, const char * params, ...
         switch (*params) {
           case 's':
             s = va_arg(marker, const char *);
-            sptr += strlcpy(sptr, s, sizeof(zBuffer)-(sptr-zBuffer));
+            bytes = (int)strlcpy(bufp, s, size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             break;
           case 'd':
             i = va_arg(marker, int);
-            sptr += strlcpy(sptr, itoa10(i), sizeof(zBuffer)-(sptr-zBuffer));
+            bytes = (int)strlcpy(bufp, itoa10(i), size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             break;
           case 'i':
             i = va_arg(marker, int);
-            sptr += strlcpy(sptr, itoa36(i), sizeof(zBuffer)-(sptr-zBuffer));
+            bytes = (int)strlcpy(bufp, itoa36(i), size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             break;
           default:
             assert(!"unknown format-character in create_order");
         }
-      } else {
-        *sptr++ = *params;
+      } else if (size>0) {
+        *bufp++ = *params;
+        --size;
       }
       ++params;
     }
     va_end(marker);
-    *sptr = 0;
+    *bufp = 0;
   } else {
     zBuffer[0] = 0;
   }

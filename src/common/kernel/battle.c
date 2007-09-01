@@ -2638,14 +2638,18 @@ print_header(battle * b)
     boolean first = false;
     side * s;
     char * bufp = zText;
+    size_t size = sizeof(zText) - 1;
+    int bytes;
 
     for (s=b->sides; s; s=s->next) {
       fighter *df;
       for (df=s->fighters;df;df=df->next) {
         if (is_attacker(df)) {
-          if (first) bufp += strlcpy(bufp, ", ", sizeof(zText) - (bufp-zText));
+          if (first) bytes = (int)strlcpy(bufp, ", ", size);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
           if (lastf) {
-            bufp += strlcpy(bufp, (const char *)lastf, sizeof(zText) - (bufp-zText));
+            bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             first = true;
           }
           if (seematrix(f, s) == true)
@@ -2657,11 +2661,17 @@ print_header(battle * b)
       }
     }
     if (first) {
-      bufp += strlcpy(bufp, " ", sizeof(zText) - (bufp-zText));
-      bufp += strlcpy(bufp, (const char *)LOC(f->locale, "and"), sizeof(zText) - (bufp-zText));
-      bufp += strlcpy(bufp, " ", sizeof(zText) - (bufp-zText));
+      bytes = (int)strlcpy(bufp, " ", size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      bytes = (int)strlcpy(bufp, (const char *)LOC(f->locale, "and"), size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      bytes = (int)strlcpy(bufp, " ", size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     }
-    if (lastf) bufp += strlcpy(bufp, (const char *)lastf, sizeof(zText) - (bufp-zText));
+    if (lastf) {
+      bytes = (int)strlcpy(bufp, (const char *)lastf, size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    }
 
     m = msg_message("battle::starters", "factions", zText);
     message_faction(b, f, m);
@@ -3310,7 +3320,8 @@ battle_report(battle * b)
     faction * fac = bf->faction;
     char buf[32*MAXSIDES];
     char * bufp = buf;
-    size_t size = sizeof(buf), rsize;
+    int bytes;
+    size_t size = sizeof(buf) - 1;
     message * m;
 
     message_faction(b, fac, msg_separator);
@@ -3330,40 +3341,30 @@ battle_report(battle * b)
         char buffer[32];
 
         if (komma) {
-          rsize = strlcpy(bufp, ", ", size);
-          if (rsize>size) rsize = size-1;
-          size -= rsize;
-          bufp += rsize;
+          bytes = (int)strlcpy(bufp, ", ", size);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
         }
         snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
           loc_army, army_index(s), abbrev);
         buffer[sizeof(buffer)-1] = 0;
 
-        rsize = strlcpy(bufp, buffer, size);
-        if (rsize>size) rsize = size-1;
-        size -= rsize;
-        bufp += rsize;
+        bytes = (int)strlcpy(bufp, buffer, size);
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
         for (r=FIGHT_ROW;r!=NUMROWS;++r) {
           if (alive[r]) {
             if (l!=FIGHT_ROW) {
-              rsize = strlcpy(bufp, "+", size);
-              if (rsize>size) rsize = size-1;
-              size -= rsize;
-              bufp += rsize;
+              bytes = (int)strlcpy(bufp, "+", size);
+              if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             }
             while (k--) {
-              rsize = strlcpy(bufp, "0+", size);
-              if (rsize>size) rsize = size-1;
-              size -= rsize;
-              bufp += rsize;
+              bytes = (int)strlcpy(bufp, "0+", size);
+              if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             }
             sprintf(buffer, "%d", alive[r]);
 
-            rsize = strlcpy(bufp, buffer, size);
-            if (rsize>size) rsize = size-1;
-            size -= rsize;
-            bufp += rsize;
+            bytes = (int)strlcpy(bufp, buffer, size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
             k = 0;
             l = r+1;
@@ -3373,6 +3374,7 @@ battle_report(battle * b)
         komma = true;
       }
     }
+    *bufp = 0;
     fbattlerecord(b, fac, buf);
   }
   return cont;

@@ -249,6 +249,7 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
 {
   char * c;
   char * buffer = balloc(TOKENSIZE);
+  size_t size = TOKENSIZE - 1;
   const char * ic = in;
   char * oc = buffer;
   /* mode flags */
@@ -261,16 +262,18 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
       f_escape = false;
       switch (*ic) {
         case 'n':
-          *oc++='\n';
+          if (size>0) { *oc++='\n'; --size; }
           break;
         case 't':
-          *oc++='\t';
+          if (size>0) { *oc++='\t'; --size; }
           break;
         default:
-          *oc++=*ic;
+          if (size>0) { *oc++=*ic; --size; }
       }
     } else {
       int ch = (unsigned char)(*ic);
+      int bytes;
+
       switch (ch) {
         case '\\':
           f_escape = true;
@@ -284,11 +287,14 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
           ic = parse_symbol(stack, ++ic, userdata);
           if (ic==NULL) return NULL;
           c = (char*)opop_v(stack);
-          oc += strlcpy(oc, c, TOKENSIZE-(oc-buffer));
+          bytes = (int)strlcpy(oc, c, size);
+          if (bytes<(int)size) oc += bytes;
+          else oc += size;
           bfree(c);
           break;
         default:
-          *oc++=*ic++;
+          if (size>0) { *oc++=*ic++; --size; }
+          else ++ic;
       }
     }
   }

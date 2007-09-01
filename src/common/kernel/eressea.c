@@ -1597,7 +1597,7 @@ cstring(const char *s)
 {
   char *ibuf = idbuf[(++nextbuf) % 8];
 
-  strlcpy(ibuf,s, sizeof(name));
+  strlcpy(ibuf, s, sizeof(name));
   return cstring_i(ibuf);
 }
 
