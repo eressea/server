@@ -72,28 +72,19 @@ cinfo_shipnodrift(const void * obj, typ_t typ, const curse *c, int self)
 }
 
 static struct curse_type ct_stormwind = { "stormwind",
-  CURSETYP_NORM, 0, NO_MERGE,
-  "", cinfo_ship
+  CURSETYP_NORM, 0, NO_MERGE, cinfo_ship
 };
 static struct curse_type ct_flyingship = { "flyingship",
-  CURSETYP_NORM, 0, NO_MERGE,
-  "", cinfo_ship
+  CURSETYP_NORM, 0, NO_MERGE, cinfo_ship
 };
 static struct curse_type ct_nodrift = { "nodrift",
-  CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-  "Der Zauber auf diesem Schiff ist aus den elementaren Magien der Luft "
-  "und des Wassers gebunden. Der dem Wasser verbundene Teil des Zaubers "
-  "läßt es leichter durch die Wellen gleiten und der der Luft verbundene "
-  "Teil scheint es vor widrigen Winden zu schützen.",
-  cinfo_shipnodrift
+  CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ), cinfo_shipnodrift
 };
 static struct curse_type ct_shipdisorientation = { "shipdisorientation",
-  CURSETYP_NORM, 0, NO_MERGE,
-  "Dieses Schiff hat sich verfahren.", cinfo_ship
+  CURSETYP_NORM, 0, NO_MERGE, cinfo_ship
 };
 static struct curse_type ct_shipspeedup = { "shipspeedup",
-  CURSETYP_NORM, 0, 0,
-  NULL, cinfo_ship
+  CURSETYP_NORM, 0, 0, cinfo_ship
 };
 
 void

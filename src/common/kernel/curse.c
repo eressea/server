@@ -276,6 +276,7 @@ ct_register(const curse_type * ct)
 {
   unsigned int hash = tolower(ct->cname[0]);
   cursetype_list ** ctlp = &cursetypes[hash];
+
   while (*ctlp) {
     cursetype_list * ctl = *ctlp;
     if (ctl->type==ct) return;
@@ -295,7 +296,7 @@ ct_find(const char *c)
     if (!strncasecmp(c, ctl->type->cname, k)) return ctl->type;
     ctl = ctl->next;
   }
-  /* disable this assert to be able to remoce certain curses from the game
+  /* disable this assert to be able to remove certain curses from the game
    * make sure that all locations using that curse can deal with a NULL
    * return value.
    */
@@ -681,7 +682,6 @@ is_cursed_with(const attrib *ap, const curse *c)
  *  int typ;
  *  spread_t spread;
  *  unsigned int mergeflags;
- *  const char *info_str;  Wirkung des curse, wird bei einer gelungenen Zauberanalyse angezeigt
  *  int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
  *  void (*change_vigour)(curse*, double);
  *  int (*read)(FILE * F, curse * c);

@@ -70,37 +70,22 @@ cinfo_magicrunes(const void * obj, typ_t typ, const curse *c, int self)
   return msg;
 }
 static struct curse_type ct_magicrunes = { "magicrunes",
-  CURSETYP_NORM, 0, M_SUMEFFECT,
-  "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
-  "Verzauberung.",
-  cinfo_magicrunes
+  CURSETYP_NORM, 0, M_SUMEFFECT, cinfo_magicrunes
 };
 
 /* Heimstein-Zauber */
 static struct curse_type ct_magicwalls = { "magicwalls",
-  CURSETYP_NORM, 0, NO_MERGE,
-  "Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
-  "gebunden. Starke elementarmagische Kräfte sind zu spüren. "
-  "Vieleicht wurde gar ein Erdelementar in diese Mauern gebannt. "
-  "Ausser ebenso starkter Antimagie wird nichts je diese Mauern "
-  "gefährden können.",
-  cinfo_building
+  CURSETYP_NORM, 0, NO_MERGE, cinfo_building
 };
 
 /* Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
 static struct curse_type ct_strongwall = { "strongwall",
-  CURSETYP_NORM, 0, NO_MERGE,
-  "",
-  NULL
+  CURSETYP_NORM, 0, NO_MERGE, NULL
 };
 
 /* Ewige Mauern-Zauber */
 static struct curse_type ct_nocostbuilding = { "nocostbuilding",
-  CURSETYP_NORM, CURSE_NOAGE|CURSE_ONLYONE, NO_MERGE,
-  "Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
-  "gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
-  "auf Ewig stehen.",
-  cinfo_building
+  CURSETYP_NORM, CURSE_NOAGE|CURSE_ONLYONE, NO_MERGE, cinfo_building
 };
 
 

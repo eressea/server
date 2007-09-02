@@ -61,10 +61,6 @@ cinfo_auraboost(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_auraboost = {
   "auraboost",
   CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
-  "Dieser Zauber greift irgendwie in die Verbindung zwischen Magier "
-  "und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
-  "wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
-  "benutzt werden.",
   cinfo_auraboost
 };
 
@@ -72,7 +68,6 @@ static struct curse_type ct_auraboost = {
 static struct curse_type ct_magicboost = {
   "magicboost",
   CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_IMMUNE, M_MEN,
-  "",
   NULL
 };
 
@@ -96,9 +91,6 @@ cinfo_slave(const void * obj, typ_t typ, const curse *c, int self)
 }
 static struct curse_type ct_slavery = { "slavery",
   CURSETYP_NORM, 0, NO_MERGE,
-  "Dieser mächtige Bann scheint die Einheit ihres freien Willens "
-  "zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen "
-  "ihres neuen Herrn gehorchen.",
   cinfo_slave
 };
 
@@ -128,8 +120,6 @@ cinfo_calm(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_calmmonster = {
   "calmmonster",
   CURSETYP_NORM, CURSE_SPREADNEVER|CURSE_ONLYONE, NO_MERGE,
-  "Dieser Beeinflussungszauber scheint die Einheit einem ganz "
-  "bestimmten Volk wohlgesonnen zu machen.",
   cinfo_calm
 };
 
@@ -153,7 +143,6 @@ cinfo_speed(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_speed = {
   "speed",
   CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
-  "Diese Einheit bewegt sich doppelt so schnell.",
   cinfo_speed
 };
 
@@ -177,8 +166,6 @@ cinfo_unit(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_orcish = {
   "orcish",
   CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_ISNEW, M_MEN,
-  "Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
-  "ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
   cinfo_unit
 };
 
@@ -202,7 +189,6 @@ cinfo_kaelteschutz(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_insectfur = {
   "insectfur",
   CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
-  "Dieser Zauber schützt vor den Auswirkungen der Kälte.",
   cinfo_kaelteschutz
 };
 
@@ -263,9 +249,7 @@ cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
 }
 
 static struct curse_type ct_sparkle = { "sparkle",
-  CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
-  "Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
-  cinfo_sparkle
+  CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ), cinfo_sparkle
 };
 
 /* ------------------------------------------------------------- */
@@ -273,10 +257,7 @@ static struct curse_type ct_sparkle = { "sparkle",
  * C_STRENGTH
  */
 static struct curse_type ct_strength = { "strength",
-  CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-  "Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
-  "vielfaches.",
-  cinfo_simple
+  CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_simple
 };
 
 /* ------------------------------------------------------------- */
@@ -284,10 +265,7 @@ static struct curse_type ct_strength = { "strength",
  * C_ALLSKILLS (Alp)
  */
 static struct curse_type ct_worse = {
-  "worse",
-  CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_NOAGE, M_MEN,
-  "",
-  cinfo_unit
+  "worse", CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_NOAGE, M_MEN, cinfo_unit
 };
 
 /* ------------------------------------------------------------- */
@@ -296,33 +274,22 @@ static struct curse_type ct_worse = {
  * C_ITEMCLOAK
  */
 static struct curse_type ct_itemcloak = {
-  "itemcloak",
-  CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
-  "Dieser Zauber macht die Ausrüstung unsichtbar.",
-  cinfo_unit
+  "itemcloak", CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION, cinfo_unit
 };
 /* ------------------------------------------------------------- */
 
 static struct curse_type ct_fumble = {
-  "fumble",
-  CURSETYP_NORM, CURSE_SPREADNEVER|CURSE_ONLYONE, NO_MERGE,
-  "Eine Wolke negativer Energie umgibt die Einheit.",
-  cinfo_unit
+  "fumble", CURSETYP_NORM, CURSE_SPREADNEVER|CURSE_ONLYONE, NO_MERGE, cinfo_unit
 };
 /* ------------------------------------------------------------- */
 
 
-static struct curse_type ct_oldrace = { "oldrace",
-  CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE,
-  "",
-  NULL
+static struct curse_type ct_oldrace = {
+  "oldrace", CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE, NULL
 };
 
-static struct curse_type ct_magicresistance = { "magicresistance",
-  CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-  "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
-  "Verzauberung.",
-  cinfo_simple
+static struct curse_type ct_magicresistance = {
+  "magicresistance", CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_simple
 };
 
 
@@ -365,12 +332,8 @@ cinfo_skill(const void * obj, typ_t typ, const curse *c, int self)
 }
 
 static struct curse_type ct_skillmod = {
-  "skillmod",
-  CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
-  "",
-  cinfo_skill,
-  NULL,
-  read_skill, write_skill
+  "skillmod", CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN, cinfo_skill,
+  NULL, read_skill, write_skill
 };
 
 /* ------------------------------------------------------------- */

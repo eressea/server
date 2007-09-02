@@ -58,12 +58,7 @@ cinfo_cursed_by_the_gods(const void * obj, typ_t typ, const curse *c, int self)
 
 static struct curse_type ct_godcursezone = {
   "godcursezone",
-  CURSETYP_NORM, CURSE_IMMUNE|CURSE_ISNEW, (NO_MERGE),
-  "Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
-  "über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
-  "sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
-  "überzogen. Niemand kann hier lange überleben.",
-  cinfo_cursed_by_the_gods,
+  CURSETYP_NORM, CURSE_IMMUNE|CURSE_ISNEW, (NO_MERGE), cinfo_cursed_by_the_gods,
 };
 
 
@@ -87,9 +82,7 @@ cinfo_dreamcurse(const void * obj, typ_t typ, const curse *c, int self)
 
 static struct curse_type ct_gbdream = { 
   "gbdream",
-  CURSETYP_NORM, CURSE_ISNEW, (NO_MERGE),
-  "",
-  cinfo_dreamcurse
+  CURSETYP_NORM, CURSE_ISNEW, (NO_MERGE), cinfo_dreamcurse
 };
 
 /* --------------------------------------------------------------------- */
@@ -115,9 +108,6 @@ cinfo_magicstreet(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_magicstreet = {
   "magicstreet",
   CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  "Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle "
-  "Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer "
-  "Straße kommt man so viel besser und schneller vorwärts.",
   cinfo_magicstreet
 };
 
@@ -166,7 +156,7 @@ cansee_antimagiczone(const struct faction *viewer, const void * obj, typ_t typ, 
 }
 static struct curse_type ct_antimagiczone = { 
   "antimagiczone",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR), NULL,
+  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
   cinfo_antimagiczone, NULL, NULL, NULL, cansee_antimagiczone
 };
 
@@ -190,7 +180,6 @@ cinfo_farvision(const void * obj, typ_t typ, const curse *c, int self)
 static struct curse_type ct_farvision = { 
   "farvision",
   CURSETYP_NORM, 0, (NO_MERGE),
-  "",
   cinfo_farvision
 };
 
@@ -200,47 +189,32 @@ static struct curse_type ct_farvision = {
 static struct curse_type ct_fogtrap = {
   "fogtrap",
   CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  "",
   cinfo_simple
 };
 static struct curse_type ct_maelstrom = {
   "maelstrom",
   CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
-  "Dieser Zauber verursacht einen gigantischen magischen Strudel. Der "
-  "Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer "
-  "beschädigen.",
   NULL
 };
 static struct curse_type ct_blessedharvest = {
   "blessedharvest",
   CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-  "Dieser Fruchtbarkeitszauber erhöht die Erträge der Felder.",
   cinfo_simple
 };
 static struct curse_type ct_drought = {
   "drought",
   CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-  "Dieser Zauber strahlt starke negative Energien aus. Warscheinlich "
-  "ist er die Ursache der Dürre."	,
   cinfo_simple
 };
 static struct curse_type ct_badlearn = {
   "badlearn",
   CURSETYP_NORM, CURSE_ISNEW, ( M_DURATION | M_VIGOUR ),
-  "Dieser Zauber scheint die Ursache für die Schlaflosigkeit und "
-  "Mattigkeit zu sein, unter der die meisten Leute hier leiden und "
-  "die dazu führt, das Lernen weniger Erfolg bringt. ",
   cinfo_simple
 };
 /*  Trübsal-Zauber */
 static struct curse_type ct_depression = {
   "depression",
   CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-  "Wie schon zu vermuten war, sind der ewig graue Himmel und die "
-  "depressive Stimmung in der Region nicht natürlich. Dieser Fluch "
-  "hat sich wie ein bleiernes Tuch auf die Gemüter der Bevölkerung "
-  "gelegt und eh er nicht gebrochen oder verklungen ist, wird keiner "
-  "sich an Gaukelleien erfreuen können.",
   cinfo_simple
 };
 
@@ -248,30 +222,24 @@ static struct curse_type ct_depression = {
 static struct curse_type ct_astralblock = {
   "astralblock",
   CURSETYP_NORM, 0, NO_MERGE,
-  "",
   cinfo_simple
 };
 /* Unterhaltungsanteil vermehren */
 static struct curse_type ct_generous = {
   "generous",
   CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR | M_MAXEFFECT ),
-  "Dieser Zauber beeinflusst die allgemeine Stimmung in der Region positiv. "
-  "Die gute Laune macht die Leute freigiebiger.",
   cinfo_simple
 };
 /* verhindert Attackiere regional */
 static struct curse_type ct_peacezone = {
   "peacezone",
   CURSETYP_NORM, 0, NO_MERGE,
-  "Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im "
-  "Keim.",
   cinfo_simple
 };
 /* erschwert geordnete Bewegungen */
 static struct curse_type ct_disorientationzone = {
   "disorientationzone",
   CURSETYP_NORM, CURSE_ISNEW, NO_MERGE,
-  "",
   cinfo_simple
 };
 /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur 1x
@@ -279,9 +247,6 @@ static struct curse_type ct_disorientationzone = {
 static struct curse_type ct_badmagicresistancezone = {
   "badmagicresistancezone",
   CURSETYP_NORM, 0, NO_MERGE,
-  "Dieses Lied, das irgendwie in die magische Essenz der Region gewoben "
-  "ist, schwächt die natürliche Widerstandskraft gegen eine "
-  "Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
   cinfo_simple
 };
 /* erhöht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
@@ -289,28 +254,21 @@ static struct curse_type ct_badmagicresistancezone = {
 static struct curse_type ct_goodmagicresistancezone = {
   "goodmagicresistancezone",
   CURSETYP_NORM, 0, NO_MERGE,
-  "Dieses Lied, das irgendwie in die magische Essenz der Region gewoben "
-  "ist, verstärkt die natürliche Widerstandskraft gegen eine "
-  "Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
   cinfo_simple
 };
 static struct curse_type ct_riotzone = {
   "riotzone",
   CURSETYP_NORM, 0, (M_DURATION),
-  NULL,
   cinfo_simple
 };
 static struct curse_type ct_holyground = {
   "holyground",
   CURSETYP_NORM, CURSE_NOAGE, (M_VIGOUR_ADD),
-  "Verschiedene Naturgeistern sind im Boden der Region gebunden und "
-  "beschützen diese vor dem der dunklen Magie des lebenden Todes.",
   cinfo_simple
 };
 static struct curse_type ct_healing = {
   "healingzone",
   CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
-  "Heilung ist in dieser Region magisch beeinflusst.",
   cinfo_simple
 };
 

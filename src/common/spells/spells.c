@@ -2722,7 +2722,6 @@ wall_vigour(curse* c, double delta)
 const curse_type ct_firewall = {
   "Feuerwand",
   CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
-  "Eine Feuerwand blockiert die Ein- und Ausreise",
   NULL, /* curseinfo */
   wall_vigour /* change_vigour */
 };
@@ -3214,7 +3213,7 @@ dc_age(struct curse * c)
 }
 
 static struct curse_type ct_deathcloud = {
-  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, NULL, cinfo_simple, NULL, NULL, NULL, NULL, dc_age
+  "deathcloud", CURSETYP_REGION, 0, NO_MERGE, cinfo_simple, NULL, NULL, NULL, NULL, dc_age
 };
 
 static curse *

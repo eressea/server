@@ -216,8 +216,6 @@ typedef struct curse_type {
   int typ;
   unsigned int flags;
   unsigned int mergeflags;
-  const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
-                 Zauberanalyse angezeigt */
   struct message * (*curseinfo)(const void*, typ_t, const struct curse*, int);
   void (*change_vigour)(curse*, double);
   int (*read)(FILE * F, curse * c);
