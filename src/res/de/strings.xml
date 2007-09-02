@@ -7462,6 +7462,11 @@
     <text locale="en">a connection to another road</text>
   </string>
 
+  <string name="nr_reduced_production">
+    <text locale="de">Die Region ist verwüstet, der Boden karg.</text>
+    <text locale="en">The region is ravaged, the ground infertile.</text>
+  </string>
+
   <string name="nr_an_incomplete_road">
     <text locale="de">eine unvollständige Straße</text>
     <text locale="en">an incomplete road</text>

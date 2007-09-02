@@ -1069,9 +1069,9 @@ describe(FILE * F, const region * r, int partial, faction * f)
 
   /* Produktionsreduktion */
   a = a_find(r->attribs, &at_reduceproduction);
-  if(a) {
-    sprintf(buf, "Die Region ist verwüstet, der Boden karg.");
-    rparagraph(F, buf, 0, 0, 0);
+  if (a) {
+    const char * str = LOC(f->locale, "nr_reduced_production");
+    rparagraph(F, str, 0, 0, 0);
   }
 
   if (edges) rnl(F);
