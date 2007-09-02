@@ -84,6 +84,7 @@
 #define MAXPERSISTENT 128
 
 /* exported symbols symbols */
+const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
 const char * xmlfile = "eressea.xml";
 const char * g_datadir;
 int firstx = 0, firsty = 0;
@@ -1517,6 +1518,7 @@ readgame(const char * filename, int backup)
   int rmax = maxregions;
   char path[MAX_PATH];
   char token[32];
+  int encoding = enc_gamedata;
 
   sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
@@ -1527,10 +1529,16 @@ readgame(const char * filename, int backup)
     return -1;
   }
 
-  /* globale Variablen */
+  /* recognize UTF8 BOM */
+  rss(F, token, sizeof(token));
+  if (memcmp(token, utf8_bom, 3)==0 && enc_gamedata!=XML_CHAR_ENCODING_UTF8) {
+    encoding = XML_CHAR_ENCODING_UTF8;
+    log_warning(("Found UTF-8 BOM, assuming unicode gamedata.\n"));
+    global.data_version = atoi(token+3);
+  } else {
+    global.data_version = atoi(token);
+  }
 
-  /* TODO: recognize UTF8 BOM */
-  global.data_version = ri(F);
   assert(global.data_version>=MIN_VERSION || !"unsupported data format");
   assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
   assert(global.data_version >= GROWTREE_VERSION);
@@ -1563,7 +1571,7 @@ readgame(const char * filename, int backup)
   while(--n >= 0) {
     plane *pl = calloc(1, sizeof(plane));
     pl->id = ri(F);
-    xrds(F, &pl->name, enc_gamedata);
+    xrds(F, &pl->name, encoding);
     pl->minx = (short)ri(F);
     pl->maxx = (short)ri(F);
     pl->miny = (short)ri(F);
@@ -1598,7 +1606,7 @@ readgame(const char * filename, int backup)
   /* fflush (stdout); */
 
   while (--n >= 0) {
-    faction * f = readfaction(F, enc_gamedata);
+    faction * f = readfaction(F, encoding);
 
     *fp = f;
     fp = &f->next;
@@ -1656,7 +1664,7 @@ readgame(const char * filename, int backup)
     }
     --rmax;
 
-    r = readregion(F, enc_gamedata, x, y);
+    r = readregion(F, encoding, x, y);
 
     /* Burgen */
     p = ri(F);
@@ -1669,9 +1677,9 @@ readgame(const char * filename, int backup)
       *bp = b;
       bp = &b->next;
       bhash(b);
-      xrds(F, &b->name, enc_gamedata);
+      xrds(F, &b->name, encoding);
       if (lomem) rds(F, 0);
-      else xrds(F, &b->display, enc_gamedata);
+      else xrds(F, &b->display, encoding);
       b->size = ri(F);
       rss(F, token, sizeof(token));
       b->type = bt_find(token);
@@ -1690,9 +1698,9 @@ readgame(const char * filename, int backup)
       *shp = sh;
       shp = &sh->next;
       shash(sh);
-      xrds(F, &sh->name, enc_gamedata);
+      xrds(F, &sh->name, encoding);
       if (lomem) rds(F, NULL);
-      else xrds(F, &sh->display, enc_gamedata);
+      else xrds(F, &sh->display, encoding);
 
       rss(F, token, sizeof(token));
       sh->type = st_find(token);
@@ -1718,7 +1726,7 @@ readgame(const char * filename, int backup)
     up = &r->units;
 
     while (--p >= 0) {
-      unit * u = readunit(F, enc_gamedata);
+      unit * u = readunit(F, encoding);
       sc_mage * mage;
 
       assert(u->region==NULL);
@@ -1793,7 +1801,6 @@ writegame(const char *filename, int quiet)
   if (F==NULL) {
     return -1;
   } else {
-    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
     fwrite(utf8_bom, 1, 3, F);
   }
   if (!quiet)
