@@ -44,10 +44,6 @@
     <type><arg name="id" type="int"/></type>
     <text locale="de">Eine Feuerwand blockiert die Ein- und Ausreise. ($int36($id))</text>
   </message>
-  <message name="curseinfo::auraboost">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber greift irgendwie in die Verbindung zwischen Magier und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil benutzt werden. ($int36($id))</text>
-  </message>
   <message name="curseinfo::slavery">
     <type><arg name="id" type="int"/></type>
     <text locale="de">Dieser mächtige Bann scheint die Einheit ihres freien Willens zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen ihres neuen Herrn gehorchen. ($int36($id))</text>
@@ -56,109 +52,17 @@
     <type><arg name="id" type="int"/></type>
     <text locale="de">Dieser Beeinflussungszauber scheint die Einheit einem ganz bestimmten Volk wohlgesonnen zu machen. ($int36($id))</text>
   </message>
-  <message name="curseinfo::speed">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Diese Einheit bewegt sich doppelt so schnell. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::orcish">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks ist eine deutliche Neigung zur Fortpflanzung zu beobachten. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::insectfur">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber schützt vor den Auswirkungen der Kälte. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::sparkle">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::strength">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein vielfaches. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::itemcloak">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber macht die Ausrüstung unsichtbar. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::fumble">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Eine Wolke negativer Energie umgibt die Einheit. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::magicresistance">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine Verzauberung. ($int36($id))</text>
-  </message>
   <message name="curseinfo::maelstrom">
     <type><arg name="id" type="int"/></type>
     <text locale="de">Dieser Zauber verursacht einen gigantischen magischen Strudel. Der Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::blessedharvest">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Fruchtbarkeitszauber erhöht die Erträge der Felder. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::drought">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber strahlt starke negative Energien aus. Warscheinlich ist er die Ursache der Dürre. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::badlearn">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber scheint die Ursache für die Schlaflosigkeit und Mattigkeit zu sein, unter der die meisten Leute hier leiden und die dazu führt, das Lernen weniger Erfolg bringt. . ($int36($id))</text>
-  </message>
-  <message name="curseinfo::depression">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Wie schon zu vermuten war, sind der ewig graue Himmel und die depressive Stimmung in der Region nicht natürlich. Dieser Fluch hat sich wie ein bleiernes Tuch auf die Gemüter der Bevölkerung gelegt und eh er nicht gebrochen oder verklungen ist, wird keiner sich an Gaukelleien erfreuen können. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::generous">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber beeinflusst die allgemeine Stimmung in der Region positiv. Die gute Laune macht die Leute freigiebiger. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::peacezone">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im Keim. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::magicstreet">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer Straße kommt man so viel besser und schneller vorwärts. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::badmagicresistancezone">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieses Lied, das irgendwie in die magische Essenz der Region gewoben ist, schwächt die natürliche Widerstandskraft gegen eine Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::goodmagicresistancezone">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieses Lied, das irgendwie in die magische Essenz der Region gewoben ist, verstärkt die natürliche Widerstandskraft gegen eine Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::godcursezone">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz überzogen. Niemand kann hier lange überleben. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::holyground">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Verschiedene Naturgeistern sind im Boden der Region gebunden und beschützen diese vor dem der dunklen Magie des lebenden Todes. ($int36($id))</text>
   </message>
   <message name="curseinfo::healingzone">
     <type><arg name="id" type="int"/></type>
     <text locale="de">Heilung ist in dieser Region magisch beeinflusst. ($int36($id))</text>
   </message>
-  <message name="curseinfo::nodrift">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Der Zauber auf diesem Schiff ist aus den elementaren Magien der Luft und des Wassers gebunden. Der dem Wasser verbundene Teil des Zaubers läßt es leichter durch die Wellen gleiten und der der Luft verbundene Teil scheint es vor widrigen Winden zu schützen. ($int36($id))</text>
-  </message>
   <message name="curseinfo::shipdisorientation">
     <type><arg name="id" type="int"/></type>
     <text locale="de">Dieses Schiff hat sich verfahren. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::magicwalls">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern gebunden. Starke elementarmagische Kräfte sind zu spüren. Vieleicht wurde gar ein Erdelementar in diese Mauern gebannt. Ausser ebenso starkter Antimagie wird nichts je diese Mauern gefährden können. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::magicrunes">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine Verzauberung. ($int36($id))</text>
-  </message>
-  <message name="curseinfo::nocostbuilding">
-    <type><arg name="id" type="int"/></type>
-    <text locale="de">Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl auf Ewig stehen. ($int36($id))</text>
   </message>
 
   <message name="curseinfo::sparkle_1" section="events">

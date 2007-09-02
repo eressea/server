@@ -727,9 +727,15 @@ msg_curse(const struct curse * c, const void * obj, typ_t typ, int self)
     /* if curseinfo returns NULL, then we don't want to tell the viewer anything. */
     return c->type->curseinfo(obj, typ, c, self);
   } else {
-    const char * unknown[] = { "unit_unknown", "region_unknown", "building_unknown", "ship_unknown" };
-    log_error(("no curseinfo for %s\n", c->type->cname));
-    return msg_message(mkname("curseinfo", unknown[typ]), "id", c->no);
+    message * msg = cinfo_simple(obj, typ, c, self);
+    if (msg==NULL) {
+      const char * unknown[] = { "unit_unknown", "region_unknown", "building_unknown", "ship_unknown" };
+      msg = msg_message(mkname("curseinfo", unknown[typ]), "id", c->no);
+      log_error(("no curseinfo function for %s and no fallback either.\n", c->type->cname));
+    } else {
+      log_error(("no curseinfo function for %s, using cinfo_simple fallback.\n", c->type->cname));
+    }
+    return msg;
   }
 }
 
