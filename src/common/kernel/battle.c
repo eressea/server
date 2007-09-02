@@ -2629,7 +2629,7 @@ static void
 print_header(battle * b)
 {
   bfaction * bf;
-  char zText[1024];
+  char zText[32*MAXSIDES];
 
   for (bf=b->factions;bf;bf=bf->next) {
     message * m;
@@ -2645,8 +2645,10 @@ print_header(battle * b)
       fighter *df;
       for (df=s->fighters;df;df=df->next) {
         if (is_attacker(df)) {
-          if (first) bytes = (int)strlcpy(bufp, ", ", size);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+          if (first) {
+            bytes = (int)strlcpy(bufp, ", ", size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+          }
           if (lastf) {
             bytes = (int)strlcpy(bufp, (const char *)lastf, size);
             if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();

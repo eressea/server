@@ -1413,7 +1413,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
 }
 
 static void
-show_allies(FILE * F, const faction * f, const ally * allies, char * buf, size_t size)
+show_allies(const faction * f, const ally * allies, char * buf, size_t size)
 {
   int allierte = 0;
   int i=0, h, hh = 0;
@@ -1491,8 +1491,6 @@ show_allies(FILE * F, const faction * f, const ally * allies, char * buf, size_t
   bytes = (int)strlcpy(bufp, ".", size);
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   *bufp = 0;
-  rparagraph(F, buf, 0, 0, 0);
-  rnl(F);
 }
 
 static void
@@ -1510,7 +1508,9 @@ allies(FILE * F, const faction * f)
       bytes = (int)strlcpy(buf, "Wir helfen den Parteien ", size);
     }
     size -= bytes;
-    show_allies(F, f, f->allies, buf + bytes, size);
+    show_allies(f, f->allies, buf + bytes, size);
+    rparagraph(F, buf, 0, 0, 0);
+    rnl(F);
   }
 
   while (g) {
@@ -1523,7 +1523,9 @@ allies(FILE * F, const faction * f)
         bytes = snprintf(buf, size, "%s hilft den Parteien ", g->name);
       }
       size -= bytes;
-      show_allies(F, f, g->allies, buf + bytes, size);
+      show_allies(f, g->allies, buf + bytes, size);
+      rparagraph(F, buf, 0, 0, 0);
+      rnl(F);
     }
     g = g->next;
   }
