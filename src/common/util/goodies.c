@@ -23,7 +23,7 @@
 #include "goodies.h"
 
 /* libc includes */
-#include <ctype.h>
+#include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -76,21 +76,21 @@ set_string (char **s, const char *neu)
 boolean
 locale_check(void) 
 {
-	int i, errorlevel = 0;
-	unsigned char * umlaute = (unsigned char*)"äöüÄÖÜß";
-	/* E: das prüft, ob umlaute funktionieren. Wenn äöü nicht mit isalpha() true sind, kriegen wir ärger. */
-	for (i=0;i!=3;++i) {
-		if (toupper(umlaute[i])!=(int)umlaute[i+3]) {
-			++errorlevel;
-		}
-	}
-	for (i=0;umlaute[i]!=0;++i) {
-		if (!isalpha(umlaute[i]) || isspace(umlaute[i]) || iscntrl(umlaute[i])) {
-			++errorlevel;
-		}
-	}
-	if (errorlevel) return false;
-	return true;
+  int i, errorlevel = 0;
+  const unsigned char * umlaute = (const unsigned char*)"äöüÄÖÜß";
+  /* E: das testet, ob umlaute funktionieren. Wenn äöü nicht mit isalpha() true sind, kriegen wir ärger. */
+  for (i=0;i!=3;++i) {
+    if (towupper(umlaute[i])!=(int)umlaute[i+3]) {
+      ++errorlevel;
+    }
+  }
+  for (i=0;umlaute[i]!=0;++i) {
+    if (!iswalpha(umlaute[i]) || iswspace(umlaute[i]) || iswcntrl(umlaute[i])) {
+      ++errorlevel;
+    }
+  }
+  if (errorlevel) return false;
+  return true;
 }
 
 static int 
