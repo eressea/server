@@ -166,10 +166,7 @@ cansee_antimagiczone(const struct faction *viewer, const void * obj, typ_t typ, 
 }
 static struct curse_type ct_antimagiczone = { 
   "antimagiczone",
-  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-  "Dieser Zauber scheint magische Energien irgendwie abzuleiten und "
-  "so alle in der Region gezauberten Sprüche in ihrer Wirkung zu "
-  "schwächen oder ganz zu verhindern.",
+  CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR), NULL,
   cinfo_antimagiczone, NULL, NULL, NULL, cansee_antimagiczone
 };
 

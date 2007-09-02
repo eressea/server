@@ -7405,22 +7405,27 @@
 
   <string name="sptype_precombat">
     <text locale="de">Präkampfzauber</text>
+    <text locale="en">pre-combat spell</text>
   </string>
 
   <string name="sptype_postcombat">
     <text locale="de">Postkampfzauber</text>
+    <text locale="en">post-combat spell</text>
   </string>
 
   <string name="sptype_combat">
     <text locale="de">Kampfzauber</text>
+    <text locale="en">combat spell</text>
   </string>
 
   <string name="sptype_normal">
     <text locale="de">Normaler Zauber</text>
+    <text locale="en">regular spell</text>
   </string>
   
   <string name="nr_insectwinter">
     <text locale="de">Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren.</text>
+    <text locale="en">It is winter, and insects can only recruit in deserts or with the aid of nestwarmth potions.</text>
   </string>
 
   <string name="nr_insectfall">
