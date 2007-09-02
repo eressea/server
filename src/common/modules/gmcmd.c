@@ -55,6 +55,15 @@
  **/
 
 static void
+mistake(const unit * u, struct order * ord, const char *comment)
+{
+  if (u->faction->no != MONSTER_FACTION) {
+    ADDMSG(&u->faction->msgs, msg_message("mistake",
+      "command error unit region", ord, comment, u, u->region));
+  }
+}
+
+static void
 write_permissions(const attrib * a, FILE * F)
 {
   a_write(F, (attrib*)a->data.v);
@@ -153,13 +162,13 @@ gm_create(const tnode * tnext, void * data, struct order * ord)
     const char * iname = getstrtoken();
     const item_type * itype = finditemtype(iname, u->faction->locale);
     if (itype==NULL) {
-      mistake(u, ord, "Unbekannter Gegenstand.", 0);
+      mistake(u, ord, "unknown item.");
     } else {
       attrib * a = a_find(permissions, &at_gmcreate);
 
       while (a && a->type==&at_gmcreate && a->data.v!=(void*)itype) a=a->next;
       if (a) i_change(&u->items, itype, i);
-      else mistake(u, ord, "Diesen Gegenstand darf deine Partei nicht machen.", 0);
+      else mistake(u, ord, "your faction cannot create this item.");
     }
   }
 }
@@ -186,7 +195,7 @@ gm_gate(const tnode * tnext, void * data, struct order * ord)
   region * r = findregion(x, y);
   building * b = findbuilding(id);
   if (b==NULL || r==NULL || p!=rplane(b->region) || p!=rplane(r)) {
-    mistake(u, ord, "Dieses Gebäude kann die Einheit nicht umwandeln.", 0);
+    mistake(u, ord, "the unit cannot transform this building.");
     return;
   } else {
     /* checking permissions */
@@ -221,7 +230,7 @@ gm_terraform(const tnode * tnext, void * data, struct order * ord)
   tnode * tokens = get_translations(u->faction->locale, UT_TERRAINS);
 
   if (r==NULL || p!=rplane(r)) {
-    mistake(u, ord, "Diese Region kann die Einheit nicht umwandeln.", 0);
+    mistake(u, ord, "region is in another plane.");
     return;
   } else {
     /* checking permissions */
@@ -250,7 +259,7 @@ gm_teleport(const tnode * tnext, void * data, struct order * ord)
   region * r = findregion(x, y);
 
   if (r==NULL || p!=rplane(r)) {
-    mistake(u, ord, "In diese Region kann die Einheit nicht teleportieren.", 0);
+    mistake(u, ord, "region is in another plane.");
   } else if (to==NULL) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (rplane(to->region)!=rplane(r) && !ucontact(to, u)) {
@@ -259,7 +268,7 @@ gm_teleport(const tnode * tnext, void * data, struct order * ord)
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmtele"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else move_unit(to, r, NULL);
   }
@@ -276,12 +285,12 @@ gm_messageplane(const tnode * tnext, void * data, struct order * ord)
   const struct plane * p = rplane(u->region);
   const char * zmsg = getstrtoken();
   if (p==NULL) {
-    mistake(u, ord, "In diese Ebene kann keine Nachricht gesandt werden.", 0);
+    mistake(u, ord, "In diese Ebene kann keine Nachricht gesandt werden.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       message * msg = msg_message("msg_event", "string", zmsg);
@@ -314,7 +323,7 @@ gm_messagefaction(const tnode * tnext, void * data, struct order * ord)
   plane * p = rplane(u->region);
   attrib * permissions = a_find(u->faction->attribs, &at_permissions);
   if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-    mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+    mistake(u, ord, "permission denied.");
     return;
   }
   if (f!=NULL) {
@@ -327,7 +336,7 @@ gm_messagefaction(const tnode * tnext, void * data, struct order * ord)
       }
     }
   }
-  mistake(u, ord, "An diese Partei kann keine Nachricht gesandt werden.", 0);
+  mistake(u, ord, "cannot send messages to this faction.");
 }
 
 /**
@@ -345,12 +354,12 @@ gm_messageregion(const tnode * tnext, void * data, struct order * ord)
   region * r = findregion(x, y);
 
   if (r==NULL || p!=rplane(r)) {
-    mistake(u, ord, "In diese Region kann keine Nachricht gesandt werden.", 0);
+    mistake(u, ord, "region is in another plane.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       add_message(&r->msgs, msg_message("msg_event", "string", msg));
@@ -372,12 +381,12 @@ gm_killunit(const tnode * tnext, void * data, struct order * ord)
   region * r = target->region;
 
   if (r==NULL || p!=rplane(r)) {
-    mistake(u, ord, "In dieser Region kann niemand getötet werden.", 0);
+    mistake(u, ord, "region is in another plane.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       scale_number(target, 0);
@@ -402,7 +411,7 @@ gm_killfaction(const tnode * tnext, void * data, struct order * ord)
   plane * p = rplane(u->region);
   attrib * permissions = a_find(u->faction->attribs, &at_permissions);
   if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
-    mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+    mistake(u, ord, "permission denied.");
     return;
   }
   if (f!=NULL) {
@@ -419,7 +428,7 @@ gm_killfaction(const tnode * tnext, void * data, struct order * ord)
       }
     }
   }
-  mistake(u, ord, "Aus dieser Partei kann niemand gelöscht werden.", 0);
+  mistake(u, ord, "cannot remove a unit from this faction.");
 }
 
 /**
@@ -443,12 +452,12 @@ gm_messageunit(const tnode * tnext, void * data, struct order * ord)
   r = target->region;
 
   if (r==NULL || p!=rplane(r)) {
-    mistake(u, ord, "In diese Region kann keine Nachricht gesandt werden.", 0);
+    mistake(u, ord, "region is in another plane.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmmsgu"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       add_message(&target->faction->msgs,
@@ -474,12 +483,12 @@ gm_give(const tnode * tnext, void * data, struct order * ord)
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (itype==NULL || i_get(u->items, itype)==0) {
     /* unknown or not enough */
-    mistake(u, ord, "So einen Gegenstand hat die Einheit nicht.", 0);
+    mistake(u, ord, "invalid item or item not found.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmgive"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       int i = i_get(u->items, itype);
@@ -509,12 +518,12 @@ gm_take(const tnode * tnext, void * data, struct order * ord)
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (itype==NULL || i_get(to->items, itype)==0) {
     /* unknown or not enough */
-    mistake(u, ord, "So einen Gegenstand hat die Einheit nicht.", 0);
+    mistake(u, ord, "invalid item or item not found.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmtake"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       int i = i_get(to->items, itype);
@@ -544,15 +553,15 @@ gm_skill(const tnode * tnext, void * data, struct order * ord)
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
   } else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
     /* unknown or not enough */
-    mistake(u, ord, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.", 0);
+    mistake(u, ord, "unknown skill, or skill cannot be raised.");
   } else if (num<0 || num>30) {
     /* sanity check failed */
-    mistake(u, ord, "Der gewählte Wert ist nicht zugelassen.", 0);
+    mistake(u, ord, "invalid value.");
   } else {
     /* checking permissions */
     attrib * permissions = a_find(u->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmskil"))) {
-      mistake(u, ord, "Unzureichende Rechte für diesen Befehl.", 0);
+      mistake(u, ord, "permission denied.");
     }
     else {
       set_level(to, skill, num);

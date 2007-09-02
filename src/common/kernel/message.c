@@ -236,15 +236,6 @@ addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 }
 
 void
-mistake(const unit * u, struct order * ord, const char *comment, int mtype)
-{
-  if (u->faction->no != MONSTER_FACTION) {
-    ADDMSG(&u->faction->msgs, msg_message("mistake",
-      "command error unit region", ord, comment, u, u->region));
-  }
-}
-
-void
 cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
 	static char ebuf[20];

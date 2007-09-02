@@ -794,9 +794,9 @@ new_region(short x, short y)
   region *r = rfindhash(x, y);
 
   if (r) {
-    fprintf(stderr, "\ndoppelte regionen entdeckt: %s(%d,%d)\n", regionname(r, NULL), x, y);
+    log_error(("duplicate region discovered: %s(%d,%d)\n", regionname(r, NULL), x, y));
     if (r->units)
-      fprintf(stderr, "doppelte region enthält einheiten\n");
+      log_error(("duplicate region contains units\n"));
     return r;
   }
   r = calloc(1, sizeof(region));

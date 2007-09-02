@@ -50,8 +50,6 @@ extern struct message * add_message(struct message_list** pm, struct message * m
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 
 extern void cmistake(const struct unit * u, struct order *ord, int mno, int mtype);
-extern void mistake(const struct unit * u, struct order *ord, const char *text, int mtype);
-
 #ifdef __cplusplus
 }
 #endif
