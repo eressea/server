@@ -117,6 +117,7 @@
     </type>
     <text locale="en">"A spell is deflecting magical energies and weakening all other spells cast in the region. ($int36($id))"</text>
     <text locale="de">"Dieser Zauber scheint magische Energien irgendwie abzuleiten und so alle in der Region gezauberten Sprüche in ihrer Wirkung zu schwächen oder ganz zu verhindern. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::sparkle_10" section="events">
     <type>
       <arg name="unit" type="unit"/>

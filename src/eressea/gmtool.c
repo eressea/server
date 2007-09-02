@@ -1322,7 +1322,7 @@ gmmain(int argc, char *argv[])
   char * lc_ctype;
   char * lc_numeric;
 
-  lc_ctype = setlocale(LC_CTYPE, "");
+  lc_ctype = setlocale(LC_ALL, "");
   lc_numeric = setlocale(LC_NUMERIC, "C");
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
