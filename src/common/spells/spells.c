@@ -7453,7 +7453,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL,
-    "ZAUBERE \'Machtübertragung\' <Einheit-Nr> <investierte Aura>",
+    "ZAUBERE \'Machtuebertragung\' <Einheit-Nr> <investierte Aura>",
     "ui",
     M_CHAOS, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 7,
     {
@@ -7707,7 +7707,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ICASTLE, "icastle", NULL,
-    "ZAUBERE \"Traumschlößchen\" <Gebäude-Typ>",
+    "ZAUBERE \"Traumschloesschen\" <Gebaeude-Typ>",
     "c",
     M_TRAUM, (0), 5, 3,
     {
@@ -8179,7 +8179,7 @@ static spelldata spelldaten[] =
   {
     SPL_OBJ_ANALYSESONG, "analyse_object", NULL,
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGION\n"
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBÄUDE <Gebäude-nr>\n"
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBAEUDE <Gebaeude-Nr>\n"
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' SCHIFF <Schiff-nr>",
     "kc?",
     M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 8,
