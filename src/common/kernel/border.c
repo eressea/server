@@ -509,9 +509,7 @@ write_borders(FILE * f)
         if (b->type->valid && !b->type->valid(b)) continue;
         fprintf(f, "%s %d %d %d %d %d ", b->type->__name, b->id, b->from->x, b->from->y, b->to->x, b->to->y);
         if (b->type->write) b->type->write(b, f);
-#if	RELEASE_VERSION>BORDER_VERSION
         a_write(f, b->attribs);
-#endif
         putc('\n', f);
       }
     }
