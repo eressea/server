@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  +-------------------+
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- | Eressea PBEM host |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
  | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
  |                   |
  +-------------------+

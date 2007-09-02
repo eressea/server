@@ -5,7 +5,7 @@
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
+ *      Enno Rehling (enno@eressea.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
  * This program may not be used, modified or distributed without
@@ -325,57 +325,79 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
 
   rparagraph(F, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
   if (!sp->syntax) {
+    static int targets[] = { P_REGION, P_UNIT, P_SHIP, P_BUILDING, MAXPARAMS };
+    int * targetp = NULL;
     bufp = buf;
     size = sizeof(buf) - 1;
-    if (sp->sptyp & ISCOMBATSPELL) {
-      bytes = (int)strlcpy(buf, LOC(lang, keywords[K_COMBAT]), size);
-    } else {
-      bytes = (int)strlcpy(buf, LOC(lang, keywords[K_CAST]), size);
-    }
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-
-    /* Reihenfolge beachten: Erst REGION, dann STUFE! */
-    if (sp->sptyp & FARCASTING) {
-      bytes = snprintf(bufp, size, " [%s x y]", LOC(lang, parameters[P_REGION]));
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    }
-    if (sp->sptyp & SPELLLEVEL) {
-      bytes = snprintf(bufp, size, " [%s n]", LOC(lang, parameters[P_LEVEL]));
-    }
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-
-    bytes = (int)strlcpy(bufp, " \"", size);
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     
-    bytes = (int)strlcpy(bufp, spell_name(sp, lang), size);
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    
-    bytes = (int)strlcpy(bufp, "\" ", size);
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    if ((sp->sptyp & ANYTARGET) == ANYTARGET) targetp = targets;
 
-    if (sp->sptyp & ONETARGET){
-      if (sp->sptyp & UNITSPELL) {
-        bytes = (int)strlcpy(bufp, "<Einheit-Nr>", size);
-      } else if (sp->sptyp & SHIPSPELL) {
-        bytes = (int)strlcpy(bufp, "<Schiff-Nr>", size);
-      } else if (sp->sptyp & BUILDINGSPELL) {
-        bytes = (int)strlcpy(bufp, "<Gebaeude-Nr>", size);
+    do {
+      if (sp->sptyp & ISCOMBATSPELL) {
+        bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBAT]), size);
       } else {
-        bytes = 0;
+        bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_CAST]), size);
       }
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    } else {
-      if (sp->sptyp & UNITSPELL) {
-        bytes = (int)strlcpy(bufp, "<Einheit-Nr> [<Einheit-Nr> ...]", size);
-      } else if (sp->sptyp & SHIPSPELL) {
-        bytes = (int)strlcpy(bufp, "<Schiff-Nr> [<Schiff-Nr> ...]", size);
-      } else if (sp->sptyp & BUILDINGSPELL) {
-        bytes = (int)strlcpy(bufp, "<Gebaeude-Nr> [<Gebaeude-Nr> ...]", size);
-      } else {
-        bytes = 0;
+
+      /* Reihenfolge beachten: Erst REGION, dann STUFE! */
+      if (sp->sptyp & FARCASTING) {
+        bytes = snprintf(bufp, size, " [%s x y]", LOC(lang, parameters[P_REGION]));
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      }
+      if (sp->sptyp & SPELLLEVEL) {
+        bytes = snprintf(bufp, size, " [%s n]", LOC(lang, parameters[P_LEVEL]));
       }
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    }
+
+      bytes = (int)strlcpy(bufp, " \"", size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      
+      bytes = (int)strlcpy(bufp, spell_name(sp, lang), size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      
+      bytes = (int)strlcpy(bufp, "\" ", size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+
+      if (sp->sptyp & ONETARGET || targetp) {
+        if (targetp) {
+          bytes = (int)snprintf(bufp, size, "%s ", parameters[*targetp]);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        }
+        if (sp->sptyp & UNITSPELL) {
+          bytes = (int)strlcpy(bufp, "<Einheit-Nr>", size);
+        } else if (sp->sptyp & SHIPSPELL) {
+          bytes = (int)strlcpy(bufp, "<Schiff-Nr>", size);
+        } else if (sp->sptyp & BUILDINGSPELL) {
+          bytes = (int)strlcpy(bufp, "<Gebaeude-Nr>", size);
+        } else {
+          bytes = 0;
+        }
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      } else {
+        assert(!targetp);
+        if (sp->sptyp & UNITSPELL) {
+          bytes = (int)strlcpy(bufp, "<Einheit-Nr> [<Einheit-Nr> ...]", size);
+        } else if (sp->sptyp & SHIPSPELL) {
+          bytes = (int)strlcpy(bufp, "<Schiff-Nr> [<Schiff-Nr> ...]", size);
+        } else if (sp->sptyp & BUILDINGSPELL) {
+          bytes = (int)strlcpy(bufp, "<Gebaeude-Nr> [<Gebaeude-Nr> ...]", size);
+        } else {
+          bytes = 0;
+        }
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      }
+      if (targetp) {
+        ++targetp;
+        if (*targetp!=MAXPARAMS) {
+          bytes = (int)strlcpy(bufp, "\n", size);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        } else {
+          targetp = NULL;
+        }
+      }
+    } while (targetp);
+
     *bufp = 0;
     rparagraph(F, buf, 2, 0, 0);
   } else {
@@ -940,8 +962,8 @@ describe(FILE * F, const region * r, int partial, faction * f)
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     }
   }
-
   a = a_find(r->attribs, &at_overrideroads);
+
   if (a) {
     bytes = (int)strlcpy(bufp, " ", size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();

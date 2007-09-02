@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  +-------------------+  
  |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- | Eressea PBEM host |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
  | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
  |                   |
  +-------------------+  
@@ -86,6 +86,10 @@ get_keyword(const order * ord)
   return ORD_KEYWORD(ord);
 }
 
+/** returns a plain-text representation of the order.
+ * This is the inverse function to the parse_order command. Note that
+ * keywords are expanded to their full length.
+ */
 static char *
 get_command(const order * ord, char * sbuffer, size_t size)
 {
@@ -113,7 +117,12 @@ get_command(const order * ord, char * sbuffer, size_t size)
   }
   if (text) {
     bytes = (int)strlcpy(bufp, (const char *)text, size);
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    if (wrptr(&bufp, &size, bytes)!=0) {
+      WARN_STATIC_BUFFER();
+      if (bufp-sbuffer>=5) {
+        memcpy(bufp-5, "[...]", 5); /* TODO: make sure this only happens in eval_command */
+      }
+    }
   }
   if (size>0) *bufp = 0;
   return sbuffer;

@@ -5,7 +5,7 @@
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
+ *      Enno Rehling (enno@eressea.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
  * This program may not be used, modified or distributed without
@@ -6488,7 +6488,7 @@ sp_antimagiczone(castorder *co)
  * (ONSHIPCAST | TESTRESISTANCE)
  *
  * Syntax:
- *  ZAUBERE \"Runen des Schutzes\" GEBÄUDE <Gebäude-Nr>
+ *  ZAUBERE \"Runen des Schutzes\" GEBAEUDE <Gebaeude-Nr>
  *  ZAUBERE \"Runen des Schutzes\" SCHIFF <Schiff-Nr>
  * "kc"
  */
@@ -6602,7 +6602,7 @@ sp_speed2(castorder *co)
  * Syntax:
  *  ZAUBERE \"Magiefresser\" REGION
  *  ZAUBERE \"Magiefresser\" EINHEIT <Einheit-Nr>
- *  ZAUBERE \"Magiefresser\" GEBÄUDE <Gebäude-Nr>
+ *  ZAUBERE \"Magiefresser\" GEBAEUDE <Gebaeude-Nr>
  *  ZAUBERE \"Magiefresser\" SCHIFF <Schiff-Nr>
  *
  *  "kc?c"
@@ -6686,7 +6686,7 @@ sp_q_antimagie(castorder *co)
  * Syntax:
  *  ZAUBERE \"Fluch brechen\" REGION <Zauber-id>
  *  ZAUBERE \"Fluch brechen\" EINHEIT <Einheit-Nr> <Zauber-id>
- *  ZAUBERE \"Fluch brechen\" GEBÄUDE <Gebäude-Nr> <Zauber-id>
+ *  ZAUBERE \"Fluch brechen\" GEBAEUDE <Gebaeude-Nr> <Zauber-id>
  *  ZAUBERE \"Fluch brechen\" SCHIFF <Schiff-Nr> <Zauber-id>
  *
  *  "kcc"
@@ -7179,14 +7179,10 @@ static spelldata spelldaten[] =
     (spell_f)sp_strong_wall, NULL
   },
   {
-    SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' REGION\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' EINHEIT <Einheit-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' SCHIFF <Schiff-Nr>",
+    SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL, NULL,
     "kc?",
     M_DRUIDE,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
     2, 8,
     {
       { "aura", 6, SPC_LEVEL },
@@ -7570,14 +7566,10 @@ static spelldata spelldaten[] =
     (spell_f)sp_forest_fire, patzer_peasantmob
   },
   {
-    SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' REGION\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>",
+    SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL, NULL,
     "kc?",
     M_CHAOS,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
     2, 10,
     {
       { "aura", 10, SPC_LEVEL },
@@ -7858,14 +7850,10 @@ static spelldata spelldaten[] =
     (spell_f)sp_gooddreams, NULL
   },
   {
-    SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' REGION\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' EINHEIT <Einheit-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' SCHIFF <Schiff-Nr>",
+    SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL, NULL,
     "kc?",
     M_TRAUM,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
     2, 8,
     {
       { "aura", 6, SPC_LEVEL },
@@ -8205,14 +8193,10 @@ static spelldata spelldaten[] =
     (spell_f)sp_analysesong_obj, NULL
   },
   {
-    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' REGION\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' EINHEIT <Einheit-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' SCHIFF <Schiff-Nr>",
+    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic", NULL, NULL,
     "kc?",
     M_BARDE,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
     2, 8,
     {
       { "aura", 5, SPC_LEVEL },
@@ -8365,13 +8349,9 @@ static spelldata spelldaten[] =
   },
   /* M_ASTRAL */
   {
-    SPL_ANALYSEMAGIC, "analyze_magic", NULL,
-    "ZAUBERE [STUFE n] \'Magie analysieren\' REGION\n"
-    "ZAUBERE [STUFE n] \'Magie analysieren\' EINHEIT <Einheit-Nr>\n"
-    "ZAUBERE [STUFE n] \'Magie analysieren\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [STUFE n] \'Magie analysieren\' SCHIFF <Schiff-Nr>",
+    SPL_ANALYSEMAGIC, "analyze_magic", NULL, NULL,
     "kc?",
-    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
+    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8514,14 +8494,10 @@ static spelldata spelldaten[] =
     (spell_f)sp_antimagiczone, NULL
   },
   {
-    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' REGION\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' EINHEIT <Einheit-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' SCHIFF <Schiff-Nr>",
+    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic", NULL, NULL,
     "kc?",
     M_ASTRAL,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
     2, 5,
     {
       { "aura", 4, SPC_LEVEL },
@@ -8587,13 +8563,9 @@ static spelldata spelldaten[] =
     (spell_f)sp_flying_ship, NULL
   },
   {
-    SPL_DESTROY_MAGIC, "break_curse", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' REGION <Zauber-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' EINHEIT <Einheit-Nr> <Zauber-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' GEBÄUDE <Gebäude-Nr> <Zauber-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' SCHIFF <Schiff-Nr> <Zauber-Nr>",
+    SPL_DESTROY_MAGIC, "break_curse", NULL, NULL,
     "kcc",
-    M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 3, 7,
+    M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET), 3, 7,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8605,7 +8577,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ETERNIZEWALL, "eternal_walls", NULL,
-    "ZAUBERE \'Mauern der Ewigkeit\' <Gebäude-Nr>",
+    "ZAUBERE \'Mauern der Ewigkeit\' <Gebaeude-Nr>",
     "b",
     M_ASTRAL,
     (SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE | ONSHIPCAST),
@@ -8621,7 +8593,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SCHILDRUNEN, "protective_runes", NULL,
-    "ZAUBERE \'Runen des Schutzes\' GEBÄUDE <Gebäude-Nr> | "
+    "ZAUBERE \'Runen des Schutzes\' GEBAEUDE <Gebaeude-Nr> | "
     "SCHIFF <Schiff-Nr>]",
     "kc",
     M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE), 2, 8,

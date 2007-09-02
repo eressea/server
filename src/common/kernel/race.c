@@ -4,7 +4,7 @@
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
+ *      Enno Rehling (enno@eressea.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
  *  based on:
@@ -258,13 +258,14 @@ racename(const struct locale *loc, const unit *u, const race * rc)
 
     bytes = (int)strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+
     bytes = (int)strlcpy(bufp, LOC(loc, rc_name(rc, u->number != 1)), size);
+    assert(~bufp[0] & 0x80|| !"unicode/not implemented");
+    ch = tolower(*(unsigned char *)bufp);
+    bufp[0] = (char)ch;
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     *bufp = 0;
 
-    assert(~lbuf[0] & 0x80|| !"unicode/not implemented");
-    ch = tolower(*(unsigned char *)lbuf);
-    lbuf[0] = (char)ch;
     return lbuf;
   }
   return LOC(loc, rc_name(rc, u->number != 1));

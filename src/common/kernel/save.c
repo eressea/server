@@ -4,7 +4,7 @@
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
+ *      Enno Rehling (enno@eressea.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
  *  based on:
@@ -2019,10 +2019,10 @@ read_quoted(FILE * f, char *c, size_t size)
 }
 
 int
-a_readstring(attrib * a, FILE * f)
+a_readstring(attrib * a, FILE * F)
 {
   char zText[4096];
-  read_quoted(f, zText, sizeof(zText));
+  freadstr(F, enc_gamedata, zText, sizeof(zText));
   a->data.v = strdup(zText);
   return AT_READ_OK;
 }

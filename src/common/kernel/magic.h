@@ -5,7 +5,7 @@
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
+ *      Enno Rehling (enno@eressea.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
  * This program may not be used, modified or distributed without
@@ -186,7 +186,7 @@ extern spell_list ** spelllist_find(spell_list ** lspells, const struct spell * 
  * Gebäuden und Schiffen. */
 #define UNITSPELL       (1<<2)	/* ZAUBER .. <Einheit-Nr> [<Einheit-Nr> ..] */
 #define SHIPSPELL       (1<<3)	/* ZAUBER .. <Schiff-Nr> [<Schiff-Nr> ..] */
-#define BUILDINGSPELL   (1<<4)	/* ZAUBER .. <Gebäude-Nr> [<Gebäude-Nr> ..] */
+#define BUILDINGSPELL   (1<<4)	/* ZAUBER .. <Gebaeude-Nr> [<Gebaeude-Nr> ..] */
 #define REGIONSPELL     (1<<5)  /* wirkt auf struct region */
 #define ONETARGET       (1<<6)	/* ZAUBER .. <Ziel-Nr> */
 
@@ -206,6 +206,7 @@ extern spell_list ** spelllist_find(spell_list ** lspells, const struct spell * 
 #define SEARCHGLOBAL    (1<<14) /* Ziel global anstatt nur in target_region
 																	 suchen */
 #define TESTCANSEE      (1<<15) /* alle Zielunits auf cansee prüfen */
+#define ANYTARGET       (1<<16) /* wirkt auf alle objekttypen (unit, ship, building, region) */
 
 /* Flag Spruchkostenberechnung: */
 enum{

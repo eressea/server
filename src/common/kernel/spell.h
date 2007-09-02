@@ -5,7 +5,7 @@
 *      Christian Schlittchen (corwin@amber.kn-bremen.de)
 *      Katja Zedel (katze@felidae.kn-bremen.de)
 *      Henning Peters (faroul@beyond.kn-bremen.de)
-*      Enno Rehling (enno@eressea-pbem.de)
+*      Enno Rehling (enno@eressea.de)
 *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
 *
 * This program may not be used, modified or distributed without
@@ -107,7 +107,7 @@ extern "C" {
  * SPELLLEVEL: ZAUBER [STUFE n]
  * UNITSPELL : ZAUBER <spruchname> <Einheit-Nr> [<Einheit-Nr> ..]
  * SHIPSPELL : ZAUBER <spruchname> <Schiff-Nr> [<Schiff-Nr> ..]
- * BUILDINGSPELL: ZAUBER <spruchname> <Gebäude-Nr> [<Gebäude-Nr> ..]
+ * BUILDINGSPELL: ZAUBER <spruchname> <Gebaeude-Nr> [<Gebaeude-Nr> ..]
  * ONETARGET : ZAUBER <spruchname> <target-nr>
  * PRECOMBATSPELL : KAMPFZAUBER [STUFE n] <spruchname>
  * COMBATSPELL    : KAMPFZAUBER [STUFE n] <spruchname>
