@@ -32,19 +32,17 @@
 #include "terrain.h"
 #include "terrainid.h"
 
-/* libc includes */
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-
 /* util includes */
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/rng.h>
+#include <util/unicode.h>
 
-/* Untote */
-
+/* libc includes */
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 const char *
 describe_braineater(unit * u, const struct locale * lang)
@@ -375,69 +373,94 @@ dracoid_name(const unit *u)
 	return name;
 }
 
+/** returns an abbreviation of a string.
+ * TODO: buflen is being ignored */
+
 const char *
-abkz(const char *s, size_t max)
+abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
 {
-	static char buf[32];
 	const char *p = s;
+  char * bufp;
 	unsigned int c = 0;
 	size_t bpt, i;
-
-  /* TODO: UNICODE. This function uses isalnum */
-
-	max = min(max, 79);
+  wint_t ucs;
+  size_t size;
+  int result;
 
 	/* Prüfen, ob Kurz genug */
 
-	if (strlen(s) <= max) {
+	if (strlen(s) <= maxchars) {
 		return s;
 	}
 	/* Anzahl der Wörter feststellen */
 
 	while (*p != 0) {
-		/* Leerzeichen überspringen */
-		while (*p != 0 && !isalnum(*(unsigned char*)p))
-			p++;
+    
+    result = unicode_utf8_to_ucs4(&ucs, p, &size);
+    assert(result==0 || "damnit, we're not handling invalid input here!");
 
-		/* Counter erhöhen */
-		if (*p != 0)
-			c++;
+    /* Leerzeichen überspringen */
+    while (*p != 0 && !iswalnum(ucs)) {
+			p += size;
+      result = unicode_utf8_to_ucs4(&ucs, p, &size);
+      assert(result==0 || "damnit, we're not handling invalid input here!");
+    }
+
+    /* Counter erhöhen */
+    if (*p != 0) ++c;
 
 		/* alnums überspringen */
-		while(*p != 0 && isalnum(*(unsigned char*)p))
-			p++;
+    while (*p != 0 && iswalnum(ucs)) {
+			p+=size;
+      result = unicode_utf8_to_ucs4(&ucs, p, &size);
+      assert(result==0 || "damnit, we're not handling invalid input here!");
+    }
 	}
 
 	/* Buchstaben pro Teilkürzel = max(1,max/AnzWort) */
 
-	bpt = max(1, max / c);
+	bpt = max(1, maxchars / c);
 
 	/* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 
 	p = s;
 	c = 0;
+  bufp = buf;
 
-	while (*p != 0 && c < max) {
+  result = unicode_utf8_to_ucs4(&ucs, p, &size);
+  assert(result==0 || "damnit, we're not handling invalid input here!");
+
+	while (*p != 0 && c < maxchars) {
 		/* Leerzeichen überspringen */
 
-		while (*p != 0 && !isalnum(*(unsigned char*)p))
-			p++;
+    while (*p != 0 && !iswalnum(ucs)) {
+			p+=size;
+      result = unicode_utf8_to_ucs4(&ucs, p, &size);
+      assert(result==0 || "damnit, we're not handling invalid input here!");
+    }
 
 		/* alnums übertragen */
 
-		for (i = 0; i < bpt && *p != 0 && isalnum(*(unsigned char*)p); i++) {
-			buf[c] = *p;
-			c++;
-			p++;
+		for (i = 0; i < bpt && *p != 0 && iswalnum(ucs); ++i) {
+			memcpy(bufp, p, size);
+			p += size;
+      bufp += size;
+      ++c;
+
+      result = unicode_utf8_to_ucs4(&ucs, p, &size);
+      assert(result==0 || "damnit, we're not handling invalid input here!");
 		}
 
 		/* Bis zum nächsten Leerzeichen */
 
-		while (c < max && *p != 0 && isalnum(*(unsigned char*)p))
-			p++;
+    while (c < maxchars && *p != 0 && iswalnum(ucs)) {
+			p+=size;
+      result = unicode_utf8_to_ucs4(&ucs, p, &size);
+      assert(result==0 || "damnit, we're not handling invalid input here!");
+    }
 	}
 
-	buf[c] = 0;
+	*bufp = 0;
 
 	return buf;
 }

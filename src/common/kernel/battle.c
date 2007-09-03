@@ -172,12 +172,12 @@ sidename(side * s)
 static const char *
 sideabkz(side *s, boolean truename)
 {
-  static char sideabkz_buf[4];
+  static char sideabkz_buf[8];
 
-  if(s->stealthfaction && truename == false) {
-    snprintf(sideabkz_buf, 4, "%s", abkz(s->stealthfaction->name, 3));
+  if (s->stealthfaction && truename == false) {
+    abkz(s->stealthfaction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
   } else {
-    snprintf(sideabkz_buf, 4, "%s", abkz(s->bf->faction->name, 3));
+    abkz(s->bf->faction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
   }
   return sideabkz_buf;
 }

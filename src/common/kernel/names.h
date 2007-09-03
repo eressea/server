@@ -26,7 +26,7 @@ const char *ghoul_name(const struct unit * u);
 const char *dragon_name(const struct unit *u);
 const char *dracoid_name(const struct unit *u);
 const char *generic_name(const struct unit *u);
-const char *abkz(const char *s, size_t max);
+const char *abkz(const char *s, char * buf, size_t size, size_t maxchars);
 
 #ifdef __cplusplus
 }
