@@ -41,6 +41,7 @@
 
 /* libc includes */
 #include <ctype.h>
+#include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -290,7 +291,7 @@ dragon_name(const unit *u)
 			sprintf(name, "%s, %s", n, str);	/* "Name, der Titel" */
 		} else {
 			strcpy(name, (const char *)str);	/* "Der Titel Name" */
-			name[0] = (char)toupper(name[0]);
+			name[0] = (char)toupper(name[0]); /* TODO: UNICODE - should use towupper() */
 			strcat(name, " ");
 			strcat(name, n);
 		}
