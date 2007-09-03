@@ -123,6 +123,9 @@
 #include <cstring>
 #include <ctime>
 
+#if defined(_MSC_VER)
+# include <crtdbg.h>
+#endif
 #if defined(USE_DMALLOC)
 # define CLEANUP_CODE
 #endif

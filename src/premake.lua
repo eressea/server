@@ -13,6 +13,8 @@ for k,v in project.configs do
   package.config[v].objdir   = v .. "/" .. package.name
   package.config[v].libdir   = v .. "/" .. package.name
   table.insert(package.config[v].buildflags, "extra-warnings")
+  table.insert(package.config[v].buildflags, "no-debug-runtime")
+  table.insert(package.config[v].buildflags, "singlethread-runtime")
   if (windows) then
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
@@ -34,12 +36,16 @@ package.excludes = {
   "modules/victoryconditions.c",
   "modules/victoryconditions.h",
   "items/studypotion.c",
-  "items/studypotion.h"
+  "items/studypotion.h",
+  "kernel/sqlstore.c",
+  "kernel/sqlstore.h"
 }
 for k,v in project.configs do
   package.config[v].objdir   = v .. "/" .. package.name
   package.config[v].libdir   = v .. "/" .. package.name
   table.insert(package.config[v].buildflags, "extra-warnings")
+  table.insert(package.config[v].buildflags, "no-debug-runtime")
+  table.insert(package.config[v].buildflags, "singlethread-runtime")
   if (windows) then
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
@@ -61,6 +67,8 @@ for k,v in project.configs do
   package.config[v].objdir   = v .. "/" .. package.name
   package.config[v].libdir   = v .. "/" .. package.name
   table.insert(package.config[v].buildflags, "extra-warnings")
+  table.insert(package.config[v].buildflags, "no-debug-runtime")
+  table.insert(package.config[v].buildflags, "singlethread-runtime")
   if (windows) then
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
@@ -83,6 +91,8 @@ for k,v in project.configs do
   package.config[v].objdir   = v .. "/" .. package.name
   package.config[v].libdir   = v .. "/" .. package.name
   table.insert(package.config[v].buildflags, "extra-warnings")
+  table.insert(package.config[v].buildflags, "no-debug-runtime")
+  table.insert(package.config[v].buildflags, "singlethread-runtime")
   if (windows) then
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
@@ -104,14 +114,22 @@ for k,v in project.configs do
   package.config[v].objdir   = v
   package.config[v].bindir   = v
   table.insert(package.config[v].buildflags, "extra-warnings")
+  table.insert(package.config[v].buildflags, "no-debug-runtime")
+  table.insert(package.config[v].buildflags, "singlethread-runtime")
   if (windows) then
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
+    if target=="vs2005" then
+      if v=="Debug" then
+          package.config[v].links = { "lua5.1_d", "luabind_d" }
+      else
+        package.config[v].links = { "lua5.1", "luabind" }
+      end
+    else
+      package.config[v].links = { "lua50", "luabind" }
+    end
   end
-  if v=="Debug" then
-    package.config[v].links = { "lua5.1_d", "luabind_d" }
-  else
-    package.config[v].links = { "lua5.1", "luabind" }
+  if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")
   end
 end
@@ -129,14 +147,22 @@ for k,v in project.configs do
   package.config[v].objdir   = v
   package.config[v].bindir   = v
   table.insert(package.config[v].buildflags, "extra-warnings")
+  table.insert(package.config[v].buildflags, "no-debug-runtime")
+  table.insert(package.config[v].buildflags, "singlethread-runtime")
   if (windows) then
     table.insert(package.config[v].defines, "WIN32")
     table.insert(package.config[v].defines, "_CRT_SECURE_NO_DEPRECATE")
+    if target=="vs2005" then
+      if v=="Debug" then
+          package.config[v].links = { "lua5.1_d", "luabind_d" }
+      else
+        package.config[v].links = { "lua5.1", "luabind" }
+      end
+    else
+      package.config[v].links = { "lua50", "luabind" }
+    end
   end
-  if v=="Debug" then
-    package.config[v].links = { "lua5.1_d", "luabind_d" }
-  else
-    package.config[v].links = { "lua5.1", "luabind" }
+  if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")
   end
 --  package.config["Debug"].linkoptions = { "/NODEFAULTLIB:MSVCRT /NODEFAULTLIB:LIBCMT" }

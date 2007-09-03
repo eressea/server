@@ -7896,16 +7896,59 @@
     <text locale="en">"$unit($unit) reactivates the astral protection shield in $region($region)."</text>
   </message>
 
-  <message name="dissolve_units" section="events">
+  <message name="dissolve_units_1" section="events">
     <type>
       <arg name="region" type="region"/>
       <arg name="unit" type="unit"/>
       <arg name="number" type="int"/>
       <arg name="race" type="race"/>
-      <arg name="action" type="string"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $action"</text>
-    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) $action"</text>
+    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"kehrte auf seine", "kehrten auf ihre") Felder zurück."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) returned to the fields."</text>
+  </message>
+
+  <message name="dissolve_units_2" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="number" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"wurde zum Baum", "wurden zu Bäumen")."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) turned into $if($eq($number,1),"a tree", "trees")."</text>
+  </message>
+
+  <message name="dissolve_units_3" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="number" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"verfaulte", "verfaulten")."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) whithered and died."</text>
+  </message>
+
+  <message name="dissolve_units_4" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="number" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"zerfiel", "zerfielen") zu Staub."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) turned to dust."</text>
+  </message>
+
+  <message name="dissolve_units_5" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="number" type="int"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),"verschwand", "verschwanden") über Nacht."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) disappearedin the night."</text>
   </message>
 
   <message name="forestfire_spread" section="events">

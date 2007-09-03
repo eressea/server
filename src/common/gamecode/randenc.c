@@ -88,7 +88,8 @@ dissolve_units(void)
 		for (u=r->units;u;u=u->next) {
 			attrib * a = a_find(u->attribs, &at_unitdissolve);
 			if (a) {
-        const char * str = NULL;
+        message * msg;
+
 				if (u->age == 0 && a->data.ca[1] < 100) continue;
 
 				/* TODO: Durch einzelne Berechnung ersetzen */
@@ -111,46 +112,27 @@ dissolve_units(void)
 				switch(a->data.ca[0]) {
 				case 1:
 					rsetpeasants(r, rpeasants(r) + n);
-					if (n == 1) {
-						str = "kehrte auf sein Feld zurück.";
-					} else {
-						str = "kehrten auf ihre Felder zurück.";
-					}
+          msg = msg_message("dissolve_units_1", "unit region number race", u, r, n, u->race);
 					break;
 				case 2:
 					if (r->land && !fval(r, RF_MALLORN)) {
   					rsettrees(r, 2, rtrees(r,2) + n);
-						if (n == 1) {
-							str = "wurde zum Baum.";
-						} else {
-							str = "wurden zu Bäumen.";
-						}
+            msg = msg_message("dissolve_units_2", "unit region number race", u, r, n, u->race);
 					} else {
-						if(n == 1) {
-							str = "verfaulte.";
-						} else {
-							str = "verfaulten.";
-						}
+            msg = msg_message("dissolve_units_3", "unit region number race", u, r, n, u->race);
 					}
 					break;
 				default:
 					if (u->race == new_race[RC_STONEGOLEM] || u->race == new_race[RC_IRONGOLEM]) {
-						if (n == 1) {
-							str = "zerfiel zu Staub.";
-						} else {
-							str = "zerfielen zu Staub.";
-						}
-					}else{
-						if (n == 1) {
-							str = "verschwand über Nacht.";
-						}else{
-							str = "verschwanden über Nacht.";
-						}
+						msg = msg_message("dissolve_units_4", "unit region number race", u, r, n, u->race);
+					} else {
+            msg = msg_message("dissolve_units_5", "unit region number race", u, r, n, u->race);
 					}
 					break;
 				}
-        ADDMSG(&u->faction->msgs, msg_message("dissolve_units",
-          "unit region number race action", u, r, n, u->race, str));
+
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
 			}
 		}
 	}

@@ -1536,8 +1536,13 @@ readgame(const char * filename, int backup)
     log_warning(("Found UTF-8 BOM, assuming unicode gamedata.\n"));
     global.data_version = atoi(token+3);
   } else {
+    if (encoding==XML_CHAR_ENCODING_NONE) {
+      encoding=XML_CHAR_ENCODING_8859_1;
+      log_warning(("No BOM, assuming 8859-1 gamedata.\n"));
+    }
     global.data_version = atoi(token);
   }
+  enc_gamedata = encoding;
 
   assert(global.data_version>=MIN_VERSION || !"unsupported data format");
   assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
