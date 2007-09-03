@@ -119,8 +119,14 @@ get_command(const order * ord, char * sbuffer, size_t size)
     bytes = (int)strlcpy(bufp, (const char *)text, size);
     if (wrptr(&bufp, &size, bytes)!=0) {
       WARN_STATIC_BUFFER();
-      if (bufp-sbuffer>=5) {
-        memcpy(bufp-5, "[...]", 5); /* TODO: make sure this only happens in eval_command */
+      if (bufp-sbuffer>=6) {
+        bufp -= 6;
+        while (bufp>sbuffer&& (*bufp&0x80)!=0) {
+          ++size;
+          --bufp;
+        }
+        memcpy(bufp+1, "[...]", 5); /* TODO: make sure this only happens in eval_command */
+        bufp += 6;
       }
     }
   }
