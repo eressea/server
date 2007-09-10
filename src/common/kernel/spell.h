@@ -108,7 +108,6 @@ extern "C" {
  * UNITSPELL : ZAUBER <spruchname> <Einheit-Nr> [<Einheit-Nr> ..]
  * SHIPSPELL : ZAUBER <spruchname> <Schiff-Nr> [<Schiff-Nr> ..]
  * BUILDINGSPELL: ZAUBER <spruchname> <Gebaeude-Nr> [<Gebaeude-Nr> ..]
- * ONETARGET : ZAUBER <spruchname> <target-nr>
  * PRECOMBATSPELL : KAMPFZAUBER [STUFE n] <spruchname>
  * COMBATSPELL    : KAMPFZAUBER [STUFE n] <spruchname>
  * POSTCOMBATSPELL: KAMPFZAUBER [STUFE n] <spruchname>

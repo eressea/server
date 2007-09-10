@@ -935,20 +935,22 @@ readunit(FILE * F, int encoding)
   p = n = 0;
   orderp = &u->orders;
   while (obuf[0]) {
-    order * ord = parse_order(obuf, u->faction->locale);
-    if (ord!=NULL) {
-      if (++n<MAXORDERS) {
-        if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
-          *orderp = ord;
-          orderp = &ord->next;
-          ord = NULL;
-        } else if (p==MAXPERSISTENT) {
-          log_warning(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
+    if (!lomem) {
+      order * ord = parse_order(obuf, u->faction->locale);
+      if (ord!=NULL) {
+        if (++n<MAXORDERS) {
+          if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
+            *orderp = ord;
+            orderp = &ord->next;
+            ord = NULL;
+          } else if (p==MAXPERSISTENT) {
+            log_warning(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
+          }
+        } else if (n==MAXORDERS) {
+          log_warning(("%s had %d or more orders\n", unitname(u), MAXORDERS));
         }
-      } else if (n==MAXORDERS) {
-        log_warning(("%s had %d or more orders\n", unitname(u), MAXORDERS));
+        if (ord!=NULL) free_order(ord);
       }
-      if (ord!=NULL) free_order(ord);
     }
     freadstr(F, encoding, obuf, sizeof(obuf));
   }
@@ -1897,8 +1899,8 @@ writegame(const char *filename, int quiet)
     wnl(F);
     for (b = r->buildings; b; b = b->next) {
       wi36(F, b->no);
-      ws(F, (const char *)b->name);
-      ws(F, b->display?(const char *)b->display:"");
+      ws(F, b->name);
+      ws(F, b->display?b->display:"");
       wi(F, b->size);
       ws(F, b->type->_name);
       wnl(F);

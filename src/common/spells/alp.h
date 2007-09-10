@@ -36,7 +36,7 @@ struct castorder;
  * TODO: Der Alp-Curse sollte sich durch besondere Antimagie (Tybied)
  * entfernen lassen.
  *
- * (UNITSPELL | ONETARGET | SEARCHGLOBAL | TESTRESISTANCE)
+ * (UNITSPELL | SEARCHGLOBAL | TESTRESISTANCE)
  */
 
 extern int sp_summon_alp(struct castorder *co);

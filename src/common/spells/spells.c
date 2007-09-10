@@ -717,7 +717,7 @@ sp_destroy_magic(castorder *co)
  *  "ZAUBERE <spruchname> <Einheit-Nr> <investierte Aura>"
  *  "ui"
  * Flags:
- *  (UNITSPELL|ONSHIPCAST|ONETARGET)
+ *  (UNITSPELL|ONSHIPCAST)
  * */
 
 static int
@@ -785,7 +785,7 @@ sp_transferaura(castorder *co)
  * verdoppelt), und "Luftschiff".
  *
  * Flags:
- * (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|ONETARGET|TESTRESISTANCE)
+ * (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|TESTRESISTANCE)
  */
 
 static int
@@ -934,7 +934,7 @@ sp_summonent(castorder *co)
  *  fertigen Steinkreis mittels des Zaubers erschaffen.
  *
  * Flags:
- * (BUILDINGSPELL | ONETARGET)
+ * (BUILDINGSPELL)
  *
  */
 static int
@@ -1412,7 +1412,7 @@ sp_kaelteschutz(castorder *co)
  * Beschreibung auftaucht, aber nur visuellen Effekt hat.
  *
  * Flag:
- * (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET)
+ * (UNITSPELL | TESTCANSEE | SPELLLEVEL)
  */
 /* Syntax: ZAUBER "Funkenregen" eh1 */
 
@@ -2531,7 +2531,7 @@ sp_forest_fire(castorder *co)
  *  Magier wird selbst betroffen
  *
  * Flags:
- *  (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE | TESTRESISTANCE)
+ *  (UNITSPELL | SPELLLEVEL | TESTCANSEE | TESTRESISTANCE)
  *
  */
 static int
@@ -3747,7 +3747,7 @@ sp_analysesong_obj(castorder *co)
  *  c->vigour)*10 + 100 %).
  *
  * Flag:
- *  (UNITSPELL|ONSHIPCAST|ONETARGET|TESTCANSEE)
+ *  (UNITSPELL|ONSHIPCAST|TESTCANSEE)
  */
 static int
 sp_analysesong_unit(castorder *co)
@@ -3795,7 +3795,7 @@ sp_analysesong_unit(castorder *co)
  *
  *   Attackiere verbieten
  * Flags:
- *   (UNITSPELL | ONETARGET | TESTCANSEE)
+ *   (UNITSPELL | TESTCANSEE)
  */
 static int
 sp_charmingsong(castorder *co)
@@ -4053,7 +4053,7 @@ sp_raisepeasantmob(castorder *co)
  *  angeworbene Einheit muss kontaktieren. Keine teuren Talente
  *
  * Flag:
- *  (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE)
+ *  (UNITSPELL | SPELLLEVEL | TESTCANSEE)
  */
 static int
 sp_migranten(castorder *co)
@@ -4317,7 +4317,7 @@ sp_bigrecruit(castorder *co)
  *  niemand ihrer Partei, so weiß sie nichts zu berichten.  Auch kann
  *  sie nur das erzählen, was sie selber sehen könnte.
  * Flags:
- *   (UNITSPELL | ONETARGET | TESTCANSEE)
+ *   (UNITSPELL | TESTCANSEE)
  */
 
 /* restistenz der einheit prüfen */
@@ -4379,7 +4379,7 @@ sp_pump(castorder *co)
  *  kommt Itemzahl%2 mit 50% chance
  *
  * Flags:
- * (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE)
+ * (UNITSPELL | TESTRESISTANCE | TESTCANSEE)
  */
 static int
 sp_seduce(castorder *co)
@@ -4449,7 +4449,7 @@ sp_seduce(castorder *co)
  *  anderen Magier nochmal gezaubert, schlägt der Zauber fehl.
  *
  * Flags:
- * (UNITSPELL | ONSHIPCAST | ONETARGET | TESTRESISTANCE | TESTCANSEE)
+ * (UNITSPELL | ONSHIPCAST | TESTRESISTANCE | TESTCANSEE)
  */
 
 static int
@@ -4500,7 +4500,7 @@ sp_calm_monster(castorder *co)
  *  Wirkt auf bis zu 10 Personen in der Einheit
  *
  * Flags:
- * (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE)
+ * (UNITSPELL | TESTRESISTANCE | TESTCANSEE)
  */
 
 static int
@@ -4840,7 +4840,7 @@ sp_icastle(castorder *co)
  *  (wie bei dämonischer Rassetarnung).
  * Syntax: ZAUBERE "Gestaltwandlung"  <einheit>     <rasse>
  * Flags:
- *  (UNITSPELL | SPELLLEVEL | ONETARGET)
+ *  (UNITSPELL | SPELLLEVEL)
  */
 
 int
@@ -6140,7 +6140,7 @@ sp_eternizewall(castorder *co)
  *   übertragen, auf einen Magier eines anderen Gebietes ein Drittel.
  *
  * Flags:
- * (UNITSPELL|ONETARGET)
+ * (UNITSPELL)
  *
  * Syntax:
  * ZAUBERE \"Opfere Kraft\" <Einheit-Nr> <Aura>
@@ -6297,7 +6297,7 @@ shipcurse_flyingship(ship* sh, unit * mage, double power, int duration)
  * Kombinierbar mit "Günstige Winde", aber nicht mit "Sturmwind".
  *
  * Flag:
- *  (ONSHIPCAST | SHIPSPELL | ONETARGET | TESTRESISTANCE)
+ *  (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE)
  */
 int
 sp_flying_ship(castorder *co)
@@ -6359,7 +6359,7 @@ sp_flying_ship(castorder *co)
  *     zuführen.
  *
  * Flags:
- * (FARCASTING | SPELLLEVEL | UNITSPELL | ONETARGET | TESTRESISTANCE |
+ * (FARCASTING | SPELLLEVEL | UNITSPELL | TESTRESISTANCE |
  * TESTCANSEE)
  * */
 int
@@ -7042,7 +7042,7 @@ static spelldata spelldaten[] =
   { SPL_GOODWINDS, "goodwinds", NULL, NULL,
     "s",
     M_DRUIDE,
-    (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|ONETARGET|TESTRESISTANCE),
+    (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|TESTRESISTANCE),
     5, 4,
     {
       { "aura", 1, SPC_LEVEL },
@@ -7091,9 +7091,9 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL,
-    "ZAUBERE \'Meditation\' <Einheit-Nr> <investierte Aura>",
+    "aura",
     "ui",
-    M_DRUIDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 6,
+    M_DRUIDE, (UNITSPELL|ONSHIPCAST), 1, 6,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7182,7 +7182,7 @@ static spelldata spelldaten[] =
     SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL, NULL,
     "kc?",
     M_DRUIDE,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 8,
     {
       { "aura", 6, SPC_LEVEL },
@@ -7207,8 +7207,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_treewalkenter, NULL
   },
   {
-    SPL_TREEWALKEXIT, "treewalkexit", NULL,
-    "ZAUBERE \'Sog des Lebens\' <Ziel-X> <Ziel-Y> <Einheit> [<Einheit> ..]",
+    SPL_TREEWALKEXIT, "treewalkexit", NULL, NULL,
     "ru+",
     M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
     {
@@ -7259,7 +7258,7 @@ static spelldata spelldaten[] =
   {
     SPL_BLESSSTONECIRCLE, "blessstonecircle", NULL, NULL,
     "b",
-    M_DRUIDE, (BUILDINGSPELL | ONETARGET), 5, 11,
+    M_DRUIDE, (BUILDINGSPELL), 5, 11,
     {
       { "aura", 350, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -7353,7 +7352,7 @@ static spelldata spelldaten[] =
   {
     SPL_SPARKLE_CHAOS, "sparklechaos", NULL, NULL,
     "u",
-    M_CHAOS, (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET), 5, 1,
+    M_CHAOS, (UNITSPELL | TESTCANSEE | SPELLLEVEL), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7415,7 +7414,7 @@ static spelldata spelldaten[] =
     SPL_FUMBLECURSE, "fumblecurse", NULL, NULL,
     "u",
     M_CHAOS,
-    (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE | TESTRESISTANCE),
+    (UNITSPELL | SPELLLEVEL | TESTCANSEE | TESTRESISTANCE),
     4, 5,
     {
       { "aura", 4, SPC_LEVEL },
@@ -7453,9 +7452,9 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL,
-    "ZAUBERE \'Machtuebertragung\' <Einheit-Nr> <investierte Aura>",
+    "aura",
     "ui",
-    M_CHAOS, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 7,
+    M_CHAOS, (UNITSPELL|ONSHIPCAST), 1, 7,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7467,7 +7466,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FIREWALL, "firewall", NULL,
-    "ZAUBERE \'Feuerwand\' <Richtung>",
+    "direction",
     "c",
     M_CHAOS, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
     {
@@ -7569,7 +7568,7 @@ static spelldata spelldaten[] =
     SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL, NULL,
     "kc?",
     M_CHAOS,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 10,
     {
       { "aura", 10, SPC_LEVEL },
@@ -7658,7 +7657,7 @@ static spelldata spelldaten[] =
     SPL_SPARKLE_DREAM, "sparkledream", NULL, NULL,
     "u",
     M_TRAUM,
-    (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET | ONSHIPCAST),
+    (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONSHIPCAST),
     5, 1,
     {
       { "aura", 1, SPC_LEVEL },
@@ -7707,7 +7706,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ICASTLE, "icastle", NULL,
-    "ZAUBERE \"Traumschloesschen\" <Gebaeude-Typ>",
+    "buildingtype",
     "c",
     M_TRAUM, (0), 5, 3,
     {
@@ -7721,9 +7720,9 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL,
-    "ZAUBERE \'Traum der Magie\' <Einheit-Nr> <investierte Aura>",
+    "aura",
     "ui",
-    M_TRAUM, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 3,
+    M_TRAUM, (UNITSPELL|ONSHIPCAST), 1, 3,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7735,9 +7734,9 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ILL_SHAPESHIFT, "shapeshift", NULL,
-    "ZAUBERE [STUFE n] \'Gestaltwandlung\' <Einheit-nr> <Rasse>",
+    "race",
     "uc",
-    M_TRAUM, (UNITSPELL|SPELLLEVEL|ONETARGET), 5, 3,
+    M_TRAUM, (UNITSPELL|SPELLLEVEL), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7750,7 +7749,7 @@ static spelldata spelldaten[] =
   {
     SPL_DREAMREADING, "dreamreading", NULL, NULL,
     "u",
-    M_TRAUM, (FARCASTING | UNITSPELL | ONETARGET | TESTRESISTANCE), 5, 4,
+    M_TRAUM, (FARCASTING | UNITSPELL | TESTRESISTANCE), 5, 4,
     {
       { "aura", 8, SPC_FIX },
       { 0, 0, 0 },
@@ -7787,7 +7786,7 @@ static spelldata spelldaten[] =
   {
     SPL_ANALYSEDREAM, "analysedream", NULL, NULL,
     "u",
-    M_TRAUM, (UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE), 5, 5,
+    M_TRAUM, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 5,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7823,7 +7822,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_WISPS, "wisps", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Irrlichter\' <Richtung>",
+    "direction",
     "c",
     M_TRAUM, (SPELLLEVEL | FARCASTING), 5, 7,
     {
@@ -7853,7 +7852,7 @@ static spelldata spelldaten[] =
     SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL, NULL,
     "kc?",
     M_TRAUM,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 8,
     {
       { "aura", 6, SPC_LEVEL },
@@ -7930,7 +7929,7 @@ static spelldata spelldaten[] =
   {
     SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
     M_TRAUM,
-    (UNITSPELL | ONETARGET | SEARCHGLOBAL | TESTRESISTANCE),
+    (UNITSPELL | SEARCHGLOBAL | TESTRESISTANCE),
     5, 15,
     {
       { "aura", 350, SPC_FIX },
@@ -8059,7 +8058,7 @@ static spelldata spelldaten[] =
   {
     SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, NULL,
     "ui",
-    M_BARDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
+    M_BARDE, (UNITSPELL|ONSHIPCAST), 1, 5,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -8073,7 +8072,7 @@ static spelldata spelldaten[] =
     SPL_UNIT_ANALYSESONG, "analysesong_unit", NULL, NULL,
     "u",
     M_BARDE,
-    (UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    (UNITSPELL | ONSHIPCAST | TESTCANSEE),
     5, 5,
     {
       { "aura", 10, SPC_FIX },
@@ -8099,7 +8098,7 @@ static spelldata spelldaten[] =
   { SPL_CALM_MONSTER, "calm_monster", NULL, NULL,
     "u",
     M_BARDE,
-    (UNITSPELL | ONSHIPCAST | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    (UNITSPELL | ONSHIPCAST | TESTRESISTANCE | TESTCANSEE),
     5, 6,
     {
       { "aura", 15, SPC_FIX },
@@ -8113,7 +8112,7 @@ static spelldata spelldaten[] =
   { SPL_SEDUCE, "seduction", NULL, NULL,
     "u",
     M_BARDE,
-    (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    (UNITSPELL | TESTRESISTANCE | TESTCANSEE),
     5, 6,
     {
       { "aura", 12, SPC_FIX },
@@ -8128,7 +8127,7 @@ static spelldata spelldaten[] =
     SPL_HEADACHE, "headache", NULL, NULL,
     "u",
     M_BARDE,
-    (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    (UNITSPELL | TESTRESISTANCE | TESTCANSEE),
     5, 7,
     {
       { "aura", 4, SPC_LINEAR },
@@ -8140,9 +8139,9 @@ static spelldata spelldaten[] =
     (spell_f)sp_headache, NULL
   },
   { SPL_PUMP, "sound_out", NULL,
-    "ZAUBERE \'Aushorchen\' <Einheit-Nr> <Zielregion-X> <Zielregion-Y>",
+    NULL,
     "ur",
-    M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 7,
+    M_BARDE, (UNITSPELL | TESTCANSEE), 5, 7,
     {
       { "aura", 4, SPC_FIX },
       { "money", 100, SPC_FIX },
@@ -8177,12 +8176,9 @@ static spelldata spelldaten[] =
     (spell_f)sp_frighten, NULL
   },
   {
-    SPL_OBJ_ANALYSESONG, "analyse_object", NULL,
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGION\n"
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBAEUDE <Gebaeude-Nr>\n"
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' SCHIFF <Schiff-nr>",
+    SPL_OBJ_ANALYSESONG, "analyse_object", NULL, NULL,
     "kc?",
-    M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 8,
+    M_BARDE, (SPELLLEVEL | ONSHIPCAST | REGIONSPELL | BUILDINGSPELL | SHIPSPELL), 5, 8,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8196,7 +8192,7 @@ static spelldata spelldaten[] =
     SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic", NULL, NULL,
     "kc?",
     M_BARDE,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 8,
     {
       { "aura", 5, SPC_LEVEL },
@@ -8210,7 +8206,7 @@ static spelldata spelldaten[] =
   {
     SPL_MIGRANT, "migration", NULL, NULL,
     "u",
-    M_BARDE, (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE), 5, 9,
+    M_BARDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 9,
     {
       { "aura", 3, SPC_LEVEL },
       { "permaura", 1, SPC_LEVEL },
@@ -8300,7 +8296,7 @@ static spelldata spelldaten[] =
   {
     SPL_SONG_OF_ENSLAVE, "song_of_slavery", NULL, NULL,
     "u",
-    M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 13,
+    M_BARDE, (UNITSPELL | TESTCANSEE), 5, 13,
     {
       { "aura", 40, SPC_FIX },
       { 0, 0, 0 },
@@ -8351,7 +8347,7 @@ static spelldata spelldaten[] =
   {
     SPL_ANALYSEMAGIC, "analyze_magic", NULL, NULL,
     "kc?",
-    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET), 5, 1,
+    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8364,7 +8360,7 @@ static spelldata spelldaten[] =
   {
     SPL_ITEMCLOAK, "concealing_aura", NULL, NULL,
     "u",
-    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | ONETARGET), 5, 1,
+    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8440,9 +8436,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_enterastral, NULL
   },
   {
-    SPL_LEAVEASTRAL, "leaveastral", NULL,
-    "ZAUBER [STUFE n] \'Astraler Ausgang\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
-    "[<Einheit-Nr> ...]",
+    SPL_LEAVEASTRAL, "leaveastral", NULL, NULL,
     "ru+",
     M_ASTRAL, (UNITSPELL |SPELLLEVEL), 7, 4,
     {
@@ -8456,9 +8450,9 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_ASTRAL, "auratransfer", NULL,
-    "ZAUBERE \'Auratransfer\' <Einheit-Nr> <investierte Aura>",
+    "aura",
     "ui",
-    M_ASTRAL, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
+    M_ASTRAL, (UNITSPELL|ONSHIPCAST), 1, 5,
     {
       { "aura", 1, SPC_FIX },
       { 0, 0, 0 },
@@ -8497,7 +8491,7 @@ static spelldata spelldaten[] =
     SPL_TYBIED_DESTROY_MAGIC, "destroy_magic", NULL, NULL,
     "kc?",
     M_ASTRAL,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET),
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 5,
     {
       { "aura", 4, SPC_LEVEL },
@@ -8509,9 +8503,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_PULLASTRAL, "pull_astral", NULL,
-    "ZAUBER [STUFE n] \'Astraler Ruf\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
-    "[<Einheit-Nr> ...]",
+    SPL_PULLASTRAL, "pull_astral", NULL, NULL,
     "ru+",
     M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
     {
@@ -8539,7 +8531,7 @@ static spelldata spelldaten[] =
   {
     SPL_STEALAURA, "steal_aura", NULL, NULL, "u",
     M_ASTRAL,
-    (FARCASTING | SPELLLEVEL | UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    (FARCASTING | SPELLLEVEL | UNITSPELL | TESTRESISTANCE | TESTCANSEE),
     3, 6,
     {
       { "aura", 2, SPC_LEVEL },
@@ -8552,7 +8544,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FLYING_SHIP, "airship", NULL, NULL, "s",
-    M_ASTRAL, (ONSHIPCAST | SHIPSPELL | ONETARGET | TESTRESISTANCE), 5, 6,
+    M_ASTRAL, (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE), 5, 6,
     {
       { "aura", 10, SPC_FIX },
       { "h12", 1, SPC_FIX },
@@ -8565,7 +8557,7 @@ static spelldata spelldaten[] =
   {
     SPL_DESTROY_MAGIC, "break_curse", NULL, NULL,
     "kcc",
-    M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE | ANYTARGET), 3, 7,
+    M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 3, 7,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8576,11 +8568,9 @@ static spelldata spelldaten[] =
     (spell_f)sp_break_curse, NULL
   },
   {
-    SPL_ETERNIZEWALL, "eternal_walls", NULL,
-    "ZAUBERE \'Mauern der Ewigkeit\' <Gebaeude-Nr>",
-    "b",
+    SPL_ETERNIZEWALL, "eternal_walls", NULL, NULL, "b",
     M_ASTRAL,
-    (SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE | ONSHIPCAST),
+    (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE | ONSHIPCAST),
     5, 7,
     {
       { "aura", 50, SPC_FIX },
@@ -8592,11 +8582,8 @@ static spelldata spelldaten[] =
     (spell_f)sp_eternizewall, NULL
   },
   {
-    SPL_SCHILDRUNEN, "protective_runes", NULL,
-    "ZAUBERE \'Runen des Schutzes\' GEBAEUDE <Gebaeude-Nr> | "
-    "SCHIFF <Schiff-Nr>]",
-    "kc",
-    M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE), 2, 8,
+    SPL_SCHILDRUNEN, "protective_runes", NULL, NULL, "kc",
+    M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE | BUILDINGSPELL | SHIPSPELL), 2, 8,
     {
       { "aura", 20, SPC_FIX },
       { 0, 0, 0 },
@@ -8686,12 +8673,10 @@ static spelldata spelldaten[] =
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_MOVECASTLE, "living_rock",
-        NULL,
-    "ZAUBER [STUFE n] \'Belebtes Gestein\' <Burg-Nr> <Richtung>",
+    SPL_MOVECASTLE, "living_rock", NULL, "direction",
     "bc",
     M_ASTRAL,
-    (SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE),
+    (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE),
     5, 13,
     {
       { "aura", 10, SPC_LEVEL },
@@ -8717,9 +8702,8 @@ static spelldata spelldaten[] =
   },
   {
     SPL_PERMTRANSFER, "sacrifice_strength", NULL,
-    "ZAUBERE \'Opfere Kraft\' <Einheit-Nr> <Aura>",
-    "ui",
-    M_ASTRAL, (UNITSPELL|ONETARGET), 1, 15,
+    "aura", "ui",
+    M_ASTRAL, (UNITSPELL), 1, 15,
     {
       { "aura", 100, SPC_FIX },
       { 0, 0, 0 },

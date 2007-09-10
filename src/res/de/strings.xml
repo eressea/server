@@ -7472,4 +7472,36 @@
     <text locale="en">an incomplete road</text>
   </string>
 
+  <string name="par_unit">
+    <text locale="de">Einheit-Nr</text>
+    <text locale="en">unitid</text>
+  </string>
+
+  <string name="par_ship">
+    <text locale="de">Schiff-Nr</text>
+    <text locale="en">shipid</text>
+  </string>
+
+  <string name="par_building">
+    <text locale="de">Gebäude-Nr</text>
+    <text locale="en">buildingid</text>
+  </string>
+  
+  <namespace name="spellpar">
+    <string name="aura">
+      <text locale="de">Aura</text>
+      <text locale="en">aura</text>
+    </string>
+
+    <string name="direction">
+      <text locale="de">Richtung</text>
+      <text locale="en">direction</text>
+    </string>
+
+    <string name="buildingtype">
+      <text locale="de">Gebäudetyp</text>
+      <text locale="en">buildingtype</text>
+    </string>
+  </namespace>
+
 </strings>

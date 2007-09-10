@@ -1326,6 +1326,13 @@ parse_spells(xmlDocPtr doc)
         sp->parameter=strdup((const char *)propValue);
         xmlFree(propValue);
       }
+
+      propValue = xmlGetProp(node, BAD_CAST "syntax");
+      if (propValue) {
+        sp->syntax=strdup((const char *)propValue);
+        xmlFree(propValue);
+      }
+
       /* magic type */
       propValue = xmlGetProp(node, BAD_CAST "type");
       assert(propValue!=NULL);

@@ -221,6 +221,7 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
   char buf[4096];
   char * bufp = buf;
   size_t size = sizeof(buf) - 1;
+  const char * params = sp->parameter;
 
   rnl(F);
   centre(F, spell_name(sp, lang), true);
@@ -324,85 +325,137 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
   rparagraph(F, buf, 0, 0, 0);
 
   rparagraph(F, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
-  if (!sp->syntax) {
-    static int targets[] = { P_REGION, P_UNIT, P_SHIP, P_BUILDING, MAXPARAMS };
-    int * targetp = NULL;
-    bufp = buf;
-    size = sizeof(buf) - 1;
-    
-    if ((sp->sptyp & ANYTARGET) == ANYTARGET) targetp = targets;
 
-    do {
-      if (sp->sptyp & ISCOMBATSPELL) {
-        bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBAT]), size);
-      } else {
-        bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_CAST]), size);
-      }
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-
-      /* Reihenfolge beachten: Erst REGION, dann STUFE! */
-      if (sp->sptyp & FARCASTING) {
-        bytes = snprintf(bufp, size, " [%s x y]", LOC(lang, parameters[P_REGION]));
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      }
-      if (sp->sptyp & SPELLLEVEL) {
-        bytes = snprintf(bufp, size, " [%s n]", LOC(lang, parameters[P_LEVEL]));
-      }
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-
-      bytes = (int)strlcpy(bufp, " \"", size);
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      
-      bytes = (int)strlcpy(bufp, spell_name(sp, lang), size);
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      
-      bytes = (int)strlcpy(bufp, "\" ", size);
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-
-      if (sp->sptyp & ONETARGET || targetp) {
-        if (targetp) {
-          bytes = (int)snprintf(bufp, size, "%s ", parameters[*targetp]);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        }
-        if (sp->sptyp & UNITSPELL) {
-          bytes = (int)strlcpy(bufp, "<Einheit-Nr>", size);
-        } else if (sp->sptyp & SHIPSPELL) {
-          bytes = (int)strlcpy(bufp, "<Schiff-Nr>", size);
-        } else if (sp->sptyp & BUILDINGSPELL) {
-          bytes = (int)strlcpy(bufp, "<Gebaeude-Nr>", size);
-        } else {
-          bytes = 0;
-        }
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      } else {
-        assert(!targetp);
-        if (sp->sptyp & UNITSPELL) {
-          bytes = (int)strlcpy(bufp, "<Einheit-Nr> [<Einheit-Nr> ...]", size);
-        } else if (sp->sptyp & SHIPSPELL) {
-          bytes = (int)strlcpy(bufp, "<Schiff-Nr> [<Schiff-Nr> ...]", size);
-        } else if (sp->sptyp & BUILDINGSPELL) {
-          bytes = (int)strlcpy(bufp, "<Gebaeude-Nr> [<Gebaeude-Nr> ...]", size);
-        } else {
-          bytes = 0;
-        }
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      }
-      if (targetp) {
-        ++targetp;
-        if (*targetp!=MAXPARAMS) {
-          bytes = (int)strlcpy(bufp, "\n", size);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        } else {
-          targetp = NULL;
-        }
-      }
-    } while (targetp);
-
-    *bufp = 0;
-    rparagraph(F, buf, 2, 0, 0);
+  bufp = buf;
+  size = sizeof(buf) - 1;
+  
+  if (sp->sptyp & ISCOMBATSPELL) {
+    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBAT]), size);
   } else {
-    rparagraph(F, sp->syntax, 2, 0, 0);
+    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_CAST]), size);
   }
+  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+
+  /* Reihenfolge beachten: Erst REGION, dann STUFE! */
+  if (sp->sptyp & FARCASTING) {
+    bytes = snprintf(bufp, size, " [%s x y]", LOC(lang, parameters[P_REGION]));
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  }
+  if (sp->sptyp & SPELLLEVEL) {
+    bytes = snprintf(bufp, size, " [%s n]", LOC(lang, parameters[P_LEVEL]));
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  }
+
+  bytes = (int)snprintf(bufp, size, " \"%s\"", spell_name(sp, lang));
+  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  
+  while (params && *params) {
+    typedef struct starget {
+      param_t param;
+      int flag;
+      const char * vars;
+    } starget;
+    starget targets[] = { 
+      { P_REGION, REGIONSPELL, NULL }, 
+      { P_UNIT, UNITSPELL, "par_unit" }, 
+      { P_SHIP, SHIPSPELL, "par_ship" },
+      { P_BUILDING, BUILDINGSPELL, "par_building" },
+      { 0, 0, NULL } 
+    };
+    starget * targetp;
+    char cp = *params++;
+    int i, maxparam = 0;
+    const char * locp;
+    const char * syntaxp = sp->syntax;
+
+    if (cp=='u') {
+      targetp = targets+1;
+      locp = LOC(lang, targetp->vars);
+      bytes = (int)snprintf(bufp, size, " <%s>", locp);
+      if (*params=='+') {
+        ++params;
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+      }
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    } else if (cp=='s') {
+      targetp = targets+2;
+      locp = LOC(lang, targetp->vars);
+      bytes = (int)snprintf(bufp, size, " <%s>", locp);
+      if (*params=='+') {
+        ++params;
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+      }
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    } else if (cp=='r') {
+      bytes = (int)strlcpy(bufp, " <x> <y>", size);
+      if (*params=='+') {
+        ++params;
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        bytes = (int)strlcpy(bufp, " [<x> <y> ...]", size);
+      }
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    } else if (cp=='b') {
+      targetp = targets+3;
+      locp = LOC(lang, targetp->vars);
+      bytes = (int)snprintf(bufp, size, " <%s>", locp);
+      if (*params=='+') {
+        ++params;
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+      }
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    } else if (cp=='k') {
+      for (targetp=targets;targetp->flag;++targetp) {
+        if (sp->sptyp&targetp->flag) ++maxparam;
+      }
+      if (maxparam>1) {
+        bytes = (int)strlcpy(bufp, " (", size);
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      }
+      i = 0;
+      for (targetp=targets;targetp->flag;++targetp) {
+        if (sp->sptyp&targetp->flag) {
+          if (i++!=0) {
+            bytes = (int)strlcpy(bufp, " |", size);
+            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+          }
+          if (targetp->param) {
+            locp = LOC(lang, targetp->vars);
+            bytes = (int)snprintf(bufp, size, " %s <%s>", parameters[targetp->param], locp);
+            if (*params=='+') {
+              ++params;
+              if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+              bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+            }
+          } else {
+            bytes = (int)snprintf(bufp, size, " %s", parameters[targetp->param]);
+          }
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        }
+      }
+      if (maxparam>1) {
+        bytes = (int)strlcpy(bufp, " )", size);
+        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      }
+    } else {
+      const char * cstr = strchr(syntaxp, ':');
+      if (!cstr) {
+        locp = LOC(lang, mkname("spellpar", syntaxp));
+      } else {
+        char substr[32];
+        strncpy(substr, syntaxp, cstr-syntaxp);
+        substr[cstr-syntaxp] = 0;
+        locp = LOC(lang, mkname("spellpar", substr));
+        syntaxp = substr + 1;
+      }
+      bytes = (int)snprintf(bufp, size, " <%s>", locp);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    }
+  }
+  *bufp = 0;
+  rparagraph(F, buf, 2, 0, 0);
   rnl(F);
 }
 

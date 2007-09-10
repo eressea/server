@@ -39,7 +39,7 @@
  *  der Einheit und auch keine Zauber.
  *
  * Flag:
- *  (UNITSPELL | ONETARGET | TESTCANSEE)
+ *  (UNITSPELL | TESTCANSEE)
  */
 static int
 sp_babbler(castorder *co)
@@ -86,7 +86,7 @@ sp_babbler(castorder *co)
  *  Magieresistenz hier prüfen, wegen Fehlermeldung
  *
  * Flag:
- * (UNITSPELL | ONETARGET)
+ * (UNITSPELL)
  */
 static int
 sp_readmind(castorder *co)
