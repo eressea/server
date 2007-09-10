@@ -7090,9 +7090,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_fumbleshield, NULL
   },
   {
-    SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL,
-    "aura",
-    "ui",
+    SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL, "aura", "ui",
     M_DRUIDE, (UNITSPELL|ONSHIPCAST), 1, 6,
     {
       { "aura", 2, SPC_FIX },
@@ -7451,9 +7449,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_combatrosthauch, NULL
   },
   {
-    SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL,
-    "aura",
-    "ui",
+    SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL, "aura", "ui",
     M_CHAOS, (UNITSPELL|ONSHIPCAST), 1, 7,
     {
       { "aura", 2, SPC_FIX },
@@ -7719,9 +7715,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_icastle, NULL
   },
   {
-    SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL,
-    "aura",
-    "ui",
+    SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL, "aura", "ui",
     M_TRAUM, (UNITSPELL|ONSHIPCAST), 1, 3,
     {
       { "aura", 2, SPC_FIX },
@@ -8056,8 +8050,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_hero, NULL
   },
   {
-    SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, NULL,
-    "ui",
+    SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, "aura", "ui",
     M_BARDE, (UNITSPELL|ONSHIPCAST), 1, 5,
     {
       { "aura", 2, SPC_FIX },
@@ -8449,9 +8442,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_leaveastral, NULL
   },
   {
-    SPL_TRANSFERAURA_ASTRAL, "auratransfer", NULL,
-    "aura",
-    "ui",
+    SPL_TRANSFERAURA_ASTRAL, "auratransfer", NULL, "aura", "ui",
     M_ASTRAL, (UNITSPELL|ONSHIPCAST), 1, 5,
     {
       { "aura", 1, SPC_FIX },
@@ -8555,8 +8546,8 @@ static spelldata spelldaten[] =
     (spell_f)sp_flying_ship, NULL
   },
   {
-    SPL_DESTROY_MAGIC, "break_curse", NULL, NULL,
-    "kcc",
+    SPL_DESTROY_MAGIC, "break_curse", NULL, "spellid",
+    "kcc?",
     M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 3, 7,
     {
       { "aura", 3, SPC_LEVEL },

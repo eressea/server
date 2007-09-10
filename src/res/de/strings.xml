@@ -7493,6 +7493,11 @@
       <text locale="en">aura</text>
     </string>
 
+    <string name="spellid">
+      <text locale="de">Zauber-ID</text>
+      <text locale="en">spellid</text>
+    </string>
+
     <string name="direction">
       <text locale="de">Richtung</text>
       <text locale="en">direction</text>

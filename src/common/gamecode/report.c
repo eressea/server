@@ -407,6 +407,10 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
       }
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     } else if (cp=='k') {
+      if (*params=='c') {
+        /* skip over a potential id */
+        ++params;
+      }
       for (targetp=targets;targetp->flag;++targetp) {
         if (sp->sptyp&targetp->flag) ++maxparam;
       }
@@ -439,8 +443,10 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
         bytes = (int)strlcpy(bufp, " )", size);
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       }
-    } else {
-      const char * cstr = strchr(syntaxp, ':');
+    } else if (cp=='i' || cp=='c') {
+      const char * cstr;
+      assert(syntaxp);
+      cstr = strchr(syntaxp, ':');
       if (!cstr) {
         locp = LOC(lang, mkname("spellpar", syntaxp));
       } else {

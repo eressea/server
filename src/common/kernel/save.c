@@ -2008,23 +2008,6 @@ a_writevoid(const attrib * a, FILE * f)
 {
 }
 
-static char *
-read_quoted(FILE * f, char *c, size_t size)
-{
-  char * s = c;
-  do {
-    *s = (char) fgetc(f);
-  } while (*s!='"');
-
-  for (;;) {
-    *s = (char) fgetc(f);
-    if (*s=='"') break;
-    if (s<c+size) ++s;
-  }
-  *s = 0;
-  return c;
-}
-
 int
 a_readstring(attrib * a, FILE * F)
 {
