@@ -83,10 +83,18 @@ lc_read(struct attrib * a, FILE* F)
   building_action * data = (building_action*)a->data.v;
 
   read_building_reference(&data->b, F);
-  fscanf(F, "%s", lbuf);
+  if (global.data_version<UNICODE_VERSION) {
+    freadstr(F, enc_gamedata, lbuf, sizeof(lbuf));
+  } else {
+    fscanf(F, "%s", lbuf);
+  }
   data->fname = strdup(lbuf);
   if (global.data_version>=BACTION_VERSION) {
-    fscanf(F, "%s", lbuf);
+    if (global.data_version<UNICODE_VERSION) {
+      freadstr(F, enc_gamedata, lbuf, sizeof(lbuf));
+    } else {
+      fscanf(F, "%s", lbuf);
+    }
     if (strcmp(lbuf, NULLSTRING)==0) data->param = NULL;
     else data->param = strdup(lbuf);
   } else {
