@@ -75,6 +75,7 @@ addtoken(tnode * root, const char * str, variant id)
 #else
     index = ucs % NODEHASHSIZE;
 #endif
+    assert(index>=0);
     next = root->next[index];
     if (!(root->flags & LEAF)) root->id = id;
     while (next && next->ucs != ucs) next = next->nexthash;

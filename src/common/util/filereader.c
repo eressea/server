@@ -83,6 +83,10 @@ getbuf_latin1(FILE * F)
     while (*bp && cp<fbuf+MAXLINE) {
       int c = *(unsigned char *)bp;
       
+      if (c=='\n' || c=='\r') {
+        /* line breaks, shmine breaks */
+        break;
+      }
       if (c==COMMENT_CHAR && !quote) {
         /* comment begins. we need to keep going, to look for CONTINUE_CHAR */
         comment = true;
@@ -102,7 +106,13 @@ getbuf_latin1(FILE * F)
         }
       }
 
-      if (isspace(c)) {
+      if (iscntrl(c)) {
+        if (!comment && cp<fbuf+MAXLINE) {
+          *cp++ = isspace(c)?' ':'?';
+        }
+        ++bp;
+        continue;
+      } else if (isspace(c)) {
         if (!quote) {
           ++bp;
           while (*bp && isspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
@@ -113,10 +123,6 @@ getbuf_latin1(FILE * F)
         } else {
           ++bp;
         }
-        continue;
-      } else if (iscntrl(c)) {
-        if (!comment && cp<fbuf+MAXLINE) *(cp++) = '?';
-        ++bp;
         continue;
       } else if (c==CONTINUE_CHAR) {
         const char * end = ++bp;
@@ -204,6 +210,11 @@ getbuf_utf8(FILE * F)
       size_t size;
       int ret;
       
+      if (*bp=='\n' || *bp=='\r') {
+        /* line breaks, shmine breaks */
+        break;
+      }
+
       if (*bp==COMMENT_CHAR && !quote) {
         /* comment begins. we need to keep going, to look for CONTINUE_CHAR */
         comment = true;
@@ -226,7 +237,12 @@ getbuf_utf8(FILE * F)
         break;
       }
 
-      if (iswspace(ucs)) {
+      if (iswcntrl(ucs)) {
+        if (!comment && cp<fbuf+MAXLINE) {
+          *cp++ = iswspace(*bp)?' ':'?';
+        }
+        bp+=size;
+      } else if (iswspace(ucs)) {
         if (!quote) {
           bp+=size;
           ret = eatwhite(bp, &size);
@@ -247,10 +263,7 @@ getbuf_utf8(FILE * F)
           bp+=size;
         }
       }
-      else if (iswcntrl(ucs)) {
-        if (!comment && cp<fbuf+MAXLINE) *(cp++) = '?';
-        bp+=size;
-      } else {
+      else {
         if (*bp==CONTINUE_CHAR) {
           const char * end;
           eatwhite(bp+1, &white);

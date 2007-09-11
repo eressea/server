@@ -73,6 +73,9 @@ LinkLibraries $(LUASERVER) :
 luabind $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
 LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
+if $(DEBUG) = 1 {
+   LINKLIBS on $(LUASERVER) += -lmcheck ;
+}
 Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
 
 # the curses-based GM tool (now with luabind)

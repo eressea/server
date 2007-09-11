@@ -27,9 +27,9 @@ extern "C" {
 struct tref;
 
 typedef struct tnode {
-	struct tref * next[NODEHASHSIZE];
-	unsigned char flags;
-	variant id;
+  struct tref * next[NODEHASHSIZE];
+  unsigned char flags;
+  variant id;
 } tnode;
 
 int findtoken(const struct tnode * tk, const char * str, variant* result);
