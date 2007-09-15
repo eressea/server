@@ -22,11 +22,13 @@
 #include <config.h>
 #include "goodies.h"
 
+/* libxml2 includes */
+#include <libxml/encoding.h>
+
 /* libc includes */
 #include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 /* Simple Integer-Liste */
 
@@ -78,6 +80,13 @@ locale_check(void)
 {
   int i, errorlevel = 0;
   const unsigned char * umlaute = (const unsigned char*)"äöüÄÖÜß";
+  unsigned char result[32];
+  int inbytes = (int)strlen((const char *)umlaute);
+  int outbytes = (int)sizeof(result);
+  int ret = isolat1ToUTF8(result, &outbytes, umlaute, &inbytes);
+  if (ret<=0) {
+    ++errorlevel;
+  }
   /* E: das testet, ob umlaute funktionieren. Wenn äöü nicht mit isalpha() true sind, kriegen wir ärger. */
   for (i=0;i!=3;++i) {
     if (towupper(umlaute[i])!=(int)umlaute[i+3]) {
