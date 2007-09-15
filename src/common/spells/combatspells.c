@@ -1603,9 +1603,9 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
 
   level = min(level, undead);
   if (undead == 0) {
-    msg = msg_message("summonundead_effect_0", "mage", mage);
+    msg = msg_message("summonundead_effect_0", "mage region", mage, mage->region);
   } else {
-    msg = msg_message("summonundead_effect_1", "mage", mage);
+    msg = msg_message("summonundead_effect_1", "mage region amount", mage, mage->region, undead);
   }
 
   message_all(b, msg);

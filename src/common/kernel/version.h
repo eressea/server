@@ -42,6 +42,7 @@
 #define SAVEXMLNAME_VERSION 316
 #define SAVEALLIANCE_VERSION 317
 #define CLAIM_VERSION 318
+/* 319 is the HSE4 data version */
 #define BACTION_VERSION 319 /* building action gets a param string */
 #define NOLASTORDER_VERSION 320 /* do not use lastorder */
 #define SPELLNAME_VERSION 321 /* reference spells by name */

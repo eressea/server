@@ -1446,26 +1446,28 @@
   <message name="summonundead_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($mage) kann keine Unjtoten rufen."</text>
-    <text locale="en">"$unit($mage) cannot summon any undead."</text>
+    <text locale="de">"$unit($mage) kann in $region($region) keine Untoten rufen."</text>
+    <text locale="en">"$unit($mage) cannot summon any undead in $region($region)."</text>
   </message>
 
   <message name="summonundead_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
       <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$unit($mage) erweckt $int($amount) Untote aus ihren Gräbern."</text>
-    <text locale="en">"$unit($mage) calls $int($amount) undead from their graves."</text>
+    <text locale="de">"$unit($mage) erweckt in $region($region) $int($amount) Untote aus ihren Gräbern."</text>
+    <text locale="en">"$unit($mage) calls $int($amount) undead from their graves in $region($region)."</text>
   </message>
 
   <message name="summonundead_effect_2" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
-    <text locale="de">"$unit($mage) stört die Ruhe der Toten."</text>
-    <text locale="en">"$unit($mage) communicates with the dead."</text>
+    <text locale="de">"$unit($mage) stört in $region($region) die Ruhe der Toten."</text>
+    <text locale="en">"$unit($mage) communicates with the dead in $region($region)."</text>
   </message>
 
   <message name="viewreality_effect" section="magic">

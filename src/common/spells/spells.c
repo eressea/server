@@ -3631,8 +3631,8 @@ sp_summonundead(castorder *co)
   u = create_unit(r, mage->faction, undead, race, 0, NULL, mage);
   make_undead_unit(u);
 
-  ADDMSG(&mage->faction->msgs, msg_message("summonundead_effect_1", "mage amount", mage, undead));
-  ADDMSG(&r->msgs, msg_message("summonundead_effect_2", "mage", mage));
+  ADDMSG(&mage->faction->msgs, msg_message("summonundead_effect_1", "mage region amount", mage, r, undead));
+  ADDMSG(&r->msgs, msg_message("summonundead_effect_2", "mage region", mage, r));
   return cast_level;
 }
 
