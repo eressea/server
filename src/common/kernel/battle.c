@@ -83,7 +83,8 @@ static FILE *bdebug;
 # define DAMAGE_QUOTIENT 1 /* damage += skilldiff/DAMAGE_QUOTIENT */
 #endif
 
-#undef DEBUG_FAST /* should be disabled when I'm sure it works */
+#undef DEBUG_FAST /* should be disabled when b->fast and b->rowcache works */
+#define DEBUG_SELECT /* should be disabled if select_enemy works */
 
 typedef enum combatmagic {
   DO_PRECOMBATSPELL,
@@ -248,7 +249,7 @@ fbattlerecord(battle * b, faction * f, const char *s)
 #define enemy(as, ds) (as->relations[ds->index]&E_ENEMY)
 #define friendly(as, ds) (as->bf->faction==ds->bf->faction || (as->relations[ds->index]&E_FRIEND))
 
-static void
+static boolean
 set_enemy(side * as, side * ds, boolean attacking)
 {
   int i;
@@ -261,14 +262,21 @@ set_enemy(side * as, side * ds, boolean attacking)
     if (as->enemies[i]==ds) break;
   }
   assert(i!=MAXSIDES);
-  ds->relations[as->index] |= E_ENEMY;
-  as->relations[ds->index] |= E_ENEMY;
   if (attacking) as->relations[ds->index] |= E_ATTACKING;
+  if ((ds->relations[as->index] & E_ENEMY)==0) {
+    /* enemy-relation are always symmetrical */
+    assert((as->relations[ds->index] & (E_ENEMY|E_FRIEND))==0);
+    ds->relations[as->index] |= E_ENEMY;
+    as->relations[ds->index] |= E_ENEMY;
+    return true;
+  }
+  return false;
 }
 
 static void
 set_friendly(side * as, side * ds)
 {
+  assert((as->relations[ds->index] & E_ENEMY)==0);
   ds->relations[as->index] |= E_FRIEND;
   as->relations[ds->index] |= E_FRIEND;
 }
@@ -1269,9 +1277,11 @@ select_enemy(fighter * af, int minrow, int maxrow, int select)
 {
   side *as = af->side;
   battle * b = as->battle;
-  int si;
+  int si, selected;
   int enemies;
-
+#ifdef DEBUG_SELECT
+  troop result = no_troop;
+#endif
   if (af->unit->race->flags & RCF_FLY) {
     /* flying races ignore min- and maxrow and can attack anyone fighting
     * them */
@@ -1285,7 +1295,7 @@ select_enemy(fighter * af, int minrow, int maxrow, int select)
   /* Niemand ist in der angegebenen Entfernung? */
   if (enemies<=0) return no_troop;
 
-  enemies = rng_int() % enemies;
+  selected = rng_int() % enemies;
   for (si=0;as->enemies[si];++si) {
     side *ds = as->enemies[si];
     fighter * df;
@@ -1312,17 +1322,32 @@ select_enemy(fighter * af, int minrow, int maxrow, int select)
 
       if (select&SELECT_DISTANCE) dr += offset;
       if (dr < minrow || dr > maxrow) continue;
-      if (df->alive - df->removed > enemies) {
+      if (df->alive - df->removed > selected) {
+#ifdef DEBUG_SELECT
+        if (result.fighter==NULL) {
+          result.index = selected;
+          result.fighter = df;
+        }
+#else
         troop dt;
-        dt.index = enemies;
+        dt.index = selected;
         dt.fighter = df;
         return dt;
+#endif
       }
-      else enemies -= (df->alive - df->removed);
+      selected -= (df->alive - df->removed);
+      enemies -= (df->alive - df->removed);
     }
   }
-  assert(!enemies);
+  if (enemies!=0) {
+    log_error(("select_enemies has a bug.\n"));
+  }
+#ifdef DEBUG_SELECT
+  return result;
+#else
+  assert(!selected);
   return no_troop;
+#endif
 }
 
 static troop
@@ -2581,6 +2606,7 @@ battle_punit(unit * u, battle * b)
       fbattlerecord(b, f, x->s);
       if (bdebug && u->faction == f) {
         fputs(x->s, bdebug);
+        fputc('\n', bdebug);
       }
     }
     if (S)
@@ -3111,8 +3137,8 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 }
 
 
-static fighter *
-join_battle(battle * b, unit * u, boolean attack)
+static int
+join_battle(battle * b, unit * u, boolean attack, fighter ** cp)
 {
   side * s;
   fighter *c = NULL;
@@ -3121,7 +3147,8 @@ join_battle(battle * b, unit * u, boolean attack)
     attrib * a = a_find(u->attribs, &at_fleechance);
     if (a!=NULL) {
       if (rng_double()<=a->data.flt) {
-        return NULL;
+        *cp = NULL;
+        return false;
       }
     }
   }
@@ -3138,8 +3165,12 @@ join_battle(battle * b, unit * u, boolean attack)
       }
     }
   }
-  if (!c) c = make_fighter(b, u, NULL, attack);
-  return c;
+  if (!c) {
+    *cp = make_fighter(b, u, NULL, attack);
+    return *cp!=NULL;
+  }
+  *cp = c;
+  return false;
 }
 
 static const char *
@@ -3437,20 +3468,38 @@ join_allies(battle * b)
           if (ally==NULL) continue;
         }
         /* keine Einwände, also soll er mitmachen: */
-        if (!c) c = join_battle(b, u, false);
-        if (!c) continue;
+        if (c==NULL) {
+          if (join_battle(b, u, false, &c)) {
+            if (battledebug) {
+              fprintf(bdebug, "%s joins to help %s against %s.\n",
+                      unitname(u), factionname(s->bf->faction), 
+                      factionname(se->bf->faction));
+            }
+          } else if (c==NULL) {
+            continue;
+          }
+        }
+
         /* Die Feinde meiner Freunde sind meine Feinde: */
         for (se = sbegin; se; se=se->next) {
           if (se->bf->faction!=u->faction && enemy(s, se)) {
-            set_enemy(se, c->side, false);
+            if (set_enemy(se, c->side, false) && battledebug) {
+              fprintf(bdebug, "%u/%s hates %u/%s because they are enemies with %u/%s.\n",
+                      c->side->index, sidename(c->side),
+                      se->index, sidename(se),
+                      s->index, sidename(s));
+            }
           }
         }
       }
     }
   }
 
-  for (s=sbegin;s;s=s->next) {
+  for (s=b->sides;s;s=s->next) {
     int si;
+    side * sa;
+    faction * f = s->bf->faction;
+
     /* Den Feinden meiner Feinde gebe ich Deckung (gegen gemeinsame Feinde): */
     for (si=0; s->enemies[si]; ++si) {
       side * se = s->enemies[si];
@@ -3461,6 +3510,15 @@ join_allies(battle * b)
           set_friendly(as, s);
         }
       }
+    }
+
+    for (sa=s->next;sa;sa=sa->next) {
+      if (enemy(s, sa)) continue;
+      if (friendly(s, sa)) continue;
+      if (!alliedgroup(r->planep, f, sa->bf->faction, f->allies, HELP_FIGHT)) continue;
+      if (!alliedgroup(r->planep, sa->bf->faction, f, sa->bf->faction->allies, HELP_FIGHT)) continue;
+
+      set_friendly(s, sa);
     }
   }
 }
@@ -3671,8 +3729,18 @@ init_battle(region * r, battle **bp)
             }
             b = make_battle(r);
           }
-          c1 = join_battle(b, u, true);
-          c2 = join_battle(b, u2, false);
+          if (join_battle(b, u, true, &c1)) {
+            if (battledebug) {
+              fprintf(bdebug, "%s joins by attacking %s.\n",
+                      unitname(u), unitname(u2));
+            }
+          }
+          if (join_battle(b, u2, false, &c2)) {
+            if (battledebug) {
+              fprintf(bdebug, "%s joins because of an attack from %s.\n",
+                      unitname(u2), unitname(u));
+            }
+          }
 
           /* Hat die attackierte Einheit keinen Noaid-Status,
           * wird das Flag von der Faction genommen, andere
@@ -3684,10 +3752,10 @@ init_battle(region * r, battle **bp)
             * Präcombataura bei kurzem Kampf. */
             c1->side->bf->attacker = true;
 
-            set_enemy(c1->side, c2->side, true);
-            if (bdebug && !enemy(c1->side, c2->side)) {
-              fprintf(bdebug, "%s attacks %s\n", sidename(c1->side),
-                sidename(c2->side));
+            if (set_enemy(c1->side, c2->side, true) && battledebug) {
+              fprintf(bdebug, "%u/%s hates %u/%s because they attacked them.\n",
+                c2->side->index, sidename(c2->side),
+                c1->side->index, sidename(c1->side));
             }
             fighting = true;
           }
