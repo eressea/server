@@ -61,9 +61,10 @@
 
 /* util includes */
 #include <util/message.h>
-#include <goodies.h>
-#include <base36.h>
-#include <language.h>
+#include <util/goodies.h>
+#include <util/base36.h>
+#include <util/language.h>
+#include <util/unicode.h>
 
 /* libxml2 includes */
 #include <libxml/tree.h>
@@ -87,10 +88,10 @@ xml_s(const char * str)
   static xmlChar buffer[1024];
   const char * inbuf = str;
   unsigned char * outbuf = buffer;
-  int inbytes = (int)strlen(str)+1;
-  int outbytes = (int)sizeof(buffer);
+  size_t inbytes = strlen(str)+1;
+  size_t outbytes = sizeof(buffer);
 
-  isolat1ToUTF8(outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
+  unicode_latin1_to_utf8(outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
   return buffer;
 }
 

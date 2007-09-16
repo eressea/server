@@ -22,8 +22,7 @@
 #include <config.h>
 #include "goodies.h"
 
-/* libxml2 includes */
-#include <libxml/encoding.h>
+#include "unicode.h"
 
 /* libc includes */
 #include <wctype.h>
@@ -81,9 +80,9 @@ locale_check(void)
   int i, errorlevel = 0;
   const unsigned char * umlaute = (const unsigned char*)"äöüÄÖÜß";
   unsigned char result[32];
-  int inbytes = (int)strlen((const char *)umlaute);
-  int outbytes = (int)sizeof(result);
-  int ret = isolat1ToUTF8(result, &outbytes, umlaute, &inbytes);
+  size_t inbytes = strlen((const char *)umlaute);
+  size_t outbytes = sizeof(result);
+  int ret = unicode_latin1_to_utf8(result, &outbytes, umlaute, &inbytes);
   if (ret<=0) {
     ++errorlevel;
   }

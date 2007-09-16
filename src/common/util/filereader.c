@@ -147,10 +147,15 @@ getbuf_latin1(FILE * F)
         }
       } else {
         char inbuf = (char)c;
-        int inbytes = 1;
-        int outbytes = (int)(MAXLINE-(cp-fbuf));
-        int ret = isolat1ToUTF8((xmlChar *)cp, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+        size_t inbytes = 1;
+        size_t outbytes = MAXLINE-(cp-fbuf);
+        int ret = unicode_latin1_to_utf8((xmlChar *)cp, &outbytes, (const xmlChar *)&inbuf, &inbytes);
         if (ret>0) cp+=ret;
+        else {
+          log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+          return NULL;
+        }
+
         ++bp;
         continue;
       }

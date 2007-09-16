@@ -15,6 +15,35 @@
 #include <wctype.h>
 
 int
+unicode_latin1_to_utf8(unsigned char *out, size_t *outlen, const unsigned char *in, size_t *inlen)
+{
+  int is = (int)*inlen;
+  int os = (int)*outlen;
+  const unsigned char * ip = in;
+  unsigned char * op = out;
+
+  while (ip-in<is) {
+    unsigned char c = *ip;
+    if (c > 0xBF) {
+      if (op-out>=os-1) break;
+      *op++ = 0xC3;
+      *op++ = c-64;
+    } else if (c>0x7F) {
+      if (op-out>=os-1) break;
+      *op++ = 0xC2;
+      *op++ = c;
+    } else {
+      if (op-out>=os) break;
+      *op++ = c;
+    }
+    ++ip;
+  }
+  *outlen = op-out;
+  *inlen = ip-in;
+  return (int)*outlen;
+}
+
+int
 unicode_utf8_strcasecmp(const char * a, const char * b)
 {
   while (*a && *b) {

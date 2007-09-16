@@ -32,6 +32,7 @@
 #include <util/log.h>
 #include <util/rng.h>
 #include <util/sql.h>
+#include <util/unicode.h>
 
 #include <libxml/encoding.h>
 
@@ -243,9 +244,9 @@ read_newfactions(const char * filename)
       nf->race = findrace(race, default_locale);
       if (nf->race==NULL) {
         char buffer[32];
-        int outbytes = sizeof(buffer);
-        int inbytes = (int)strlen(race);
-        isolat1ToUTF8((unsigned char *)buffer, &outbytes, (const unsigned char *)race, &inbytes);
+        size_t outbytes = sizeof(buffer);
+        size_t inbytes = strlen(race);
+        unicode_latin1_to_utf8((unsigned char *)buffer, &outbytes, (const unsigned char *)race, &inbytes);
         nf->race = findrace(buffer, default_locale);
         if (nf->race==NULL) {
           log_error(("new faction has unknown race '%s'.\n", race));

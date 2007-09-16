@@ -533,32 +533,28 @@ read_borders(FILE * f)
     fscanf(f, "%u %hd %hd %hd %hd", &bid, &fx, &fy, &tx, &ty);
 
     from = findregion(fx, fy);
-    if (from==NULL) {
-      if (!incomplete_data) {
-        log_error(("border for unknown region %d,%d\n", fx, fy));
-      }
-      from = new_region(fx, fy);
+    if (!incomplete_data && from==NULL) {
+      log_error(("border for unknown region %d,%d\n", fx, fy));
     }
     to = findregion(tx, ty);
-    if (to==NULL)  {
-      if (!incomplete_data) {
-        log_error(("border for unknown region %d,%d\n", tx, ty));
-      }
-      to = new_region(tx, ty);
+    if (!incomplete_data && to==NULL)  {
+      log_error(("border for unknown region %d,%d\n", tx, ty));
     }
 
     type = find_bordertype(zText);
-    if (type==NULL) {
-      log_error(("[read_borders] unknown border type %s in %s\n", zText, 
-				 regionname(from, NULL)));
-      assert(type || !"border type not registered");
+    if (from) {
+      if (type==NULL) {
+        log_error(("[read_borders] unknown border type %s in %s\n", zText, 
+				  regionname(from, NULL)));
+        assert(type || !"border type not registered");
+      }
     }
 
-    if (to==from) {
+    if (to==from && type && from) {
       direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
       region * r = rconnect(from, dir);
       log_error(("[read_borders] invalid %s in %s\n", type->__name, 
-				 regionname(from, NULL)));
+        regionname(from, NULL)));
       if (r!=NULL) to = r;
     }
     b = new_border(type, from, to);
@@ -567,5 +563,8 @@ read_borders(FILE * f)
     assert(bid<=nextborder);
     if (type->read) type->read(b, f);
     a_read(f, &b->attribs);
+    if (!to || !from) {
+      erase_border(b);
+    }
   }
 }

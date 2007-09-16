@@ -67,6 +67,7 @@
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+#include <util/unicode.h>
 
 #include <libxml/encoding.h>
 
@@ -176,10 +177,15 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
             if ((size_t)(str-start+1)<size) {
               if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
                 char inbuf = (char)c;
-                int inbytes = 1;
-                int outbytes = (int)(size-(str-start));
-                int ret = isolat1ToUTF8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+                size_t inbytes = 1;
+                size_t outbytes = size-(str-start);
+                int ret = unicode_latin1_to_utf8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
                 if (ret>0) str+=ret;
+                else {
+                  log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+                  encoding = XML_CHAR_ENCODING_ERROR;
+                  *str++ = (char)c;
+                }
               } else {
                 *str++ = (char)c;
               }
@@ -190,10 +196,15 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
         if ((size_t)(str-start+1)<size) {
           if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
             char inbuf = (char)c;
-            int inbytes = 1;
-            int outbytes = (int)(size-(str-start));
-            int ret = isolat1ToUTF8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+            size_t inbytes = 1;
+            size_t outbytes = size-(str-start);
+            int ret = unicode_latin1_to_utf8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
             if (ret>0) str+=ret;
+            else {
+              log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+              encoding = XML_CHAR_ENCODING_ERROR;
+              *str++ = (char)c;
+            }
           } else {
             *str++ = (char)c;
           }
