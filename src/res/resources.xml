@@ -70,7 +70,9 @@
   </resource>
 
   <resource name="elvenhorse">
-    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes"/>
+    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes">
+      <function name="give" value="givehorses"/>
+    </item>
   </resource>
 
   <resource name="dolphin">
@@ -112,6 +114,7 @@
   <resource name="horse" limited="yes">
     <item weight="5000" score="10" capacity="7000" animal="yes">
       <construction skill="training" minskill="1" reqsize="1"/>
+      <function name="give" value="givehorses"/>
     </item>
     <resourcelimit>
       <function name="produce" value="lua_produceresource"/>

@@ -567,12 +567,24 @@ i_new(const item_type * itype, int size)
 
 #include "region.h"
 
-static boolean
-give_horses(const unit * s, const unit * d, const item_type * itype, int n, struct order * ord)
+static int
+give_horses(unit * s, unit * d, const item_type * itype, int n, struct order * ord)
 {
-  if (d==NULL && itype == olditemtype[I_HORSE])
+  if (d==NULL) {
     rsethorses(s->region, rhorses(s->region) + n);
-  return true;
+    return 0;
+  }
+  return -1; /* use the mechanism */
+}
+
+static int
+give_money(unit * s, unit * d, const item_type * itype, int n, struct order * ord)
+{
+  if (d==NULL) {
+    rsetmoney(s->region, rmoney(s->region) + n);
+    return 0;
+  }
+  return -1; /* use the mechanism */
 }
 
 #define R_MINOTHER R_SILVER
@@ -901,6 +913,7 @@ init_resources(void)
   r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
   i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
   r_silver->uchange = res_changeitem;
+  i_silver->give = give_money;
 
   r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
   r_permaura->uchange = res_changepermaura;

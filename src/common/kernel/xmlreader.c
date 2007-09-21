@@ -836,7 +836,7 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
       }
       assert(propValue!=NULL);
       if (strcmp((const char*)propValue, "give")==0) {
-        itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
+        itype->give = (int (*)(struct unit*, struct unit*, const struct item_type *, int, struct order *))fun;
       } else if (strcmp((const char*)propValue, "use")==0) {
         itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
       } else if (strcmp((const char*)propValue, "useonother")==0) {

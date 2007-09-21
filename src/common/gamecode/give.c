@@ -116,9 +116,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
     error = 36;
   } else if (itype->flags & ITF_CURSED) {
     error = 25;
-  } else if (itype->give && !itype->give(src, dest, itype, n, ord)) {
-    return -1;
-  } else {
+  } else if (itype->give==NULL || itype->give(src, dest, itype, n, ord)!=0) {
     int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
     if (use<n) use += use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
     if (dest) {
