@@ -1930,7 +1930,7 @@ sp_treewalkexit(castorder *co)
             if (cansee(u2->faction, r, u, 0)) {
               fset(u2->faction, FFL_SELECT);
               if (!m) m = msg_message("astral_disappear", "unit", u);
-              r_addmessage(rt, u2->faction, m);
+              r_addmessage(r, u2->faction, m);
             }
           }
         }
@@ -5389,8 +5389,8 @@ sp_resist_magic_bonus(castorder *co)
   return cast_level;
 }
 
-/* ------------------------------------------------------------- */
-/* "ZAUBERE [STUFE n]  \"Astraler Weg\" <Einheit-Nr> [<Einheit-Nr> ...]",
+/** spell 'Astraler Weg'.
+ * Syntax "ZAUBERE [STUFE n] 'Astraler Weg' <Einheit-Nr> [<Einheit-Nr> ...]",
  *
  * Parameter:
  * pa->param[0]->data.xs
@@ -5465,7 +5465,7 @@ sp_enterastral(castorder *co)
           if (cansee(u2->faction, r, u, 0)) {
             fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_disappear", "unit", u);
-            r_addmessage(rt, u2->faction, m);
+            r_addmessage(r, u2->faction, m);
           }
         }
       }
@@ -5490,6 +5490,8 @@ sp_enterastral(castorder *co)
   return cast_level;
 }
 
+/** Spell 'Astraler Ruf' / 'Astral Call'.
+ */
 int
 sp_pullastral(castorder *co)
 {
@@ -5589,7 +5591,7 @@ sp_pullastral(castorder *co)
           if (cansee(u2->faction, r, u, 0)) {
             fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_disappear", "unit", u);
-            r_addmessage(rt, u2->faction, m);
+            r_addmessage(r, u2->faction, m);
           }
         }
       }
@@ -5699,7 +5701,7 @@ sp_leaveastral(castorder *co)
           if (cansee(u2->faction, r, u, 0)) {
             fset(u2->faction, FFL_SELECT);
             if (!m) m = msg_message("astral_disappear", "unit", u);
-            r_addmessage(rt, u2->faction, m);
+            r_addmessage(r, u2->faction, m);
           }
         }
       }
