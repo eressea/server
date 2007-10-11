@@ -679,16 +679,18 @@ give_cmd(unit * u, order * ord)
     if (u->items) {
       item **itmp=&u->items;
       while (*itmp) {
-        const item_type * itype = (*itmp)->type;
-        if (fval(itype, ITF_HERB) && (*itmp)->number>0) {
+        item * itm = *itmp;
+        const item_type * itype = itm->type;
+        if (fval(itype, ITF_HERB) && itm->number>0) {
           /* give_item ändert im fall,das man alles übergibt, die
           * item-liste der unit, darum continue vor pointerumsetzten */
-          if (give_item((*itmp)->number, (*itmp)->type, u, u2, ord)==0) {
+          if (give_item(itm->number, itm->type, u, u2, ord)==0) {
             given = true;
+            if (*itmp!=itm) continue;
             continue;
           }
         }
-        itmp = &(*itmp)->next;
+        itmp = &itm->next;
       }
     }
     if (!given) cmistake(u, ord, 38, MSG_COMMERCE);
@@ -746,7 +748,9 @@ give_cmd(unit * u, order * ord)
           const item_type * itype = itm->type;
           if (itm->number > 0 && itm->number - get_reservation(u, itype->rtype) > 0) {
             n = itm->number - get_reservation(u, itype->rtype);
-            if (give_item(n, itype, u, u2, ord)==0) continue;
+            if (give_item(n, itype, u, u2, ord)==0) {
+              if (*itmp!=itm) continue;
+            }
           }
           itmp = &itm->next;
         }
@@ -1221,11 +1225,11 @@ economics(region *r)
   /* RECRUIT orders */
 
   for (u = r->units; u; u = u->next) {
-		order * ord;
+    order * ord;
     if (!recruit_classic()) {
       if (u->number>0) continue;
     }
-		for (ord = u->orders; ord; ord = ord->next) {
+    for (ord = u->orders; ord; ord = ord->next) {
       if (get_keyword(ord) == K_RECRUIT) {
         if (recruit_archetypes()) {
           if (recruit_archetype(u, ord)>=0) {

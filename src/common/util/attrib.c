@@ -61,7 +61,7 @@ static attrib_type *
 at_find(unsigned int hk)
 {
 	const char* translate[3][2] = {
-		{ "zielregion", "targetregion" }, /* remapping: früher zielregion, heute targetregion */
+		{ "zielregion", "targetregion" }, /* remapping: from 'zielregion, heute targetregion */
 		{ "verzaubert", "curse" }, /* remapping: früher verzaubert, jetzt curse */
 		{ NULL, NULL }
 	};

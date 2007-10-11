@@ -3180,7 +3180,7 @@ simplename(region * r)
   static char name[17];
   const char * cp = rname(r, NULL);
   for (i=0;*cp && i!=16;++i, ++cp) {
-    int c = *cp;
+    int c = *(unsigned char *)cp;
     while (c && !isalpha(c) && !isspace(c)) {
       ++cp;
       c = *(unsigned char*)cp;

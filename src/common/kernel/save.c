@@ -1674,9 +1674,19 @@ readgame(const char * filename, int backup)
     }
     if (skip) {
       char * r;
-      char buffer[128];
+#define SKIPSIZE 4096
+      char buffer[SKIPSIZE];
+      buffer[SKIPSIZE-1] = '@';
       do {
         r = fgets(buffer, sizeof(buffer), F); /* skip region */
+        if (r && buffer[SKIPSIZE-1]!='@') {
+          while (r && buffer[SKIPSIZE-1]!='@') {
+            /* our buffer was not big enough */
+            buffer[SKIPSIZE-1] = '@';
+            r = fgets(buffer, sizeof(buffer), F);
+          }
+          if (r) continue;
+        }
       } while (r && buffer[0]!='\n');
       continue;
     }

@@ -27,17 +27,24 @@
 # pragma warning(disable: 4056)
 /* warning C4056: overflow in floating point constant arithmetic */
 # pragma warning(disable: 4201)
-/* warning C4201: Nicht dem Standard entsprechende Erweiterung : Struktur/Union ohne Namen */
+/* warning C4201: nonstandard extension used : nameless struct/union */
 # pragma warning(disable: 4214)
-/* warning C4214: Nicht dem Standard entsprechende Erweiterung : Basistyp fuer Bitfeld ist nicht int */
+/* warning C4214: nonstandard extension used : bit field types other than int */
 # pragma warning(disable: 4100)
 /* warning C4100: <name> : unreferenced formal parameter */
 # pragma warning(disable: 4996)
+
 /* warning C4100: <name> was declared deprecated */
 #ifndef _CRT_SECURE_NO_DEPRECATE
 # define _CRT_SECURE_NO_DEPRECATE
 #endif
+
+/* http://msdn2.microsoft.com/en-us/library/ms235505(VS.80).aspx */
+#ifndef _CRT_DISABLE_PERFCRIT_LOCKS
+# define _CRT_DISABLE_PERFCRIT_LOCKS
 #endif
+
+#endif /* _MSC_VER_ */
 
 
 #ifdef __cplusplus

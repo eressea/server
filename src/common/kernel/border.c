@@ -95,12 +95,13 @@ get_borders(const region * r1, const region * r2)
 border *
 new_border(border_type * type, region * from, region * to)
 {
-  border ** bp = get_borders_i(from, to);
   border * b = calloc(1, sizeof(struct border));
 
-  while (*bp) bp = &(*bp)->next;
-
-  *bp = b;
+  if (from && to) {
+    border ** bp = get_borders_i(from, to);
+    while (*bp) bp = &(*bp)->next;
+    *bp = b;
+  }
   b->type = type;
   b->from = from;
   b->to = to;
@@ -113,26 +114,28 @@ new_border(border_type * type, region * from, region * to)
 void
 erase_border(border * b)
 {
-  border ** bp = get_borders_i(b->from, b->to);
   attrib ** ap = &b->attribs;
 
   while (*ap) a_remove(&b->attribs, *ap);
 
-  assert(*bp!=NULL || !"error: border is not registered");
-  if (*bp==b) {
-    /* it is the first in the list, so it is in the nexthash list */
-    if (b->next) {
-      *bp = b->next;
-      (*bp)->nexthash = b->nexthash;
+  if (b->from && b->to) {
+    border ** bp = get_borders_i(b->from, b->to);
+    assert(*bp!=NULL || !"error: border is not registered");
+    if (*bp==b) {
+      /* it is the first in the list, so it is in the nexthash list */
+      if (b->next) {
+        *bp = b->next;
+        (*bp)->nexthash = b->nexthash;
+      } else {
+        *bp = b->nexthash;
+      }
     } else {
-      *bp = b->nexthash;
+      while (*bp && *bp != b) {
+        bp = &(*bp)->next;
+      }
+      assert(*bp==b || !"error: border is not registered");
+      *bp = b->next;
     }
-  } else {
-    while (*bp && *bp != b) {
-      bp = &(*bp)->next;
-    }
-    assert(*bp==b || !"error: border is not registered");
-    *bp = b->next;
   }
   if (b->type->destroy) b->type->destroy(b);
   free(b);
@@ -542,12 +545,10 @@ read_borders(FILE * f)
     }
 
     type = find_bordertype(zText);
-    if (from) {
-      if (type==NULL) {
-        log_error(("[read_borders] unknown border type %s in %s\n", zText, 
-				  regionname(from, NULL)));
-        assert(type || !"border type not registered");
-      }
+    if (type==NULL) {
+      log_error(("[read_borders] unknown border type %s in %s\n", zText, 
+        regionname(from, NULL)));
+      assert(type || !"border type not registered");
     }
 
     if (to==from && type && from) {
