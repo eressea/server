@@ -2920,13 +2920,13 @@ age_building(building * b)
           int n, unicorns = 0;
           for (n=0; n!=u->number; ++n) {
             if (chance(0.02)) {
-              i_change(&u->items, olditemtype[I_UNICORN], 1);
+              i_change(&u->items, olditemtype[I_ELVENHORSE], 1);
               ++unicorns;
             }
             if (unicorns) {
               ADDMSG(&u->faction->msgs, msg_message("scunicorn", 
                 "unit amount rtype", u, unicorns, 
-                olditemtype[I_UNICORN]->rtype));
+                olditemtype[I_ELVENHORSE]->rtype));
             }
           }
         }

@@ -398,48 +398,48 @@ canfly(unit *u)
 boolean
 canswim(unit *u)
 {
-	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
-		return true;
+  if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
+    return true;
 
 #ifdef KARMA_MODULE
-	if (fspecial(u->faction, FS_AMPHIBIAN)) return true;
+  if (fspecial(u->faction, FS_AMPHIBIAN)) return true;
 #endif /* KARMA_MODULE */
-	if (u->race->flags & RCF_FLY) return true;
+  if (u->race->flags & RCF_FLY) return true;
 
-	if (u->race->flags & RCF_SWIM) return true;
+  if (u->race->flags & RCF_SWIM) return true;
 
-	if (get_movement(&u->attribs, MV_FLY)) return true;
+  if (get_movement(&u->attribs, MV_FLY)) return true;
 
-	if (get_movement(&u->attribs, MV_SWIM)) return true;
+  if (get_movement(&u->attribs, MV_SWIM)) return true;
 
-	return false;
+  return false;
 }
 
 static int
 canride(unit * u)
 {
-	int pferde, maxpferde, unicorns, maxunicorns;
-	int skill = effskill(u, SK_RIDING);
+  int pferde, maxpferde, unicorns, maxunicorns;
+  int skill = effskill(u, SK_RIDING);
 
-	unicorns = get_item(u, I_UNICORN);
-	pferde = get_item(u, I_HORSE);
-	maxunicorns = (skill/5) * u->number;
-	maxpferde = skill * u->number * 2;
+  unicorns = get_item(u, I_ELVENHORSE);
+  pferde = get_item(u, I_HORSE);
+  maxunicorns = (skill/5) * u->number;
+  maxpferde = skill * u->number * 2;
 
-	if(!(u->race->flags & RCF_HORSE)
-		&& ((pferde == 0 && unicorns == 0)
-			|| pferde > maxpferde || unicorns > maxunicorns)) {
-		return 0;
-	}
+  if(!(u->race->flags & RCF_HORSE)
+    && ((pferde == 0 && unicorns == 0)
+    || pferde > maxpferde || unicorns > maxunicorns)) {
+      return 0;
+  }
 
-	if (ridingcapacity(u) - eff_weight(u) >= 0) {
-		if(pferde == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
-			return 2;
-		}
-		return 1;
-	}
+  if (ridingcapacity(u) - eff_weight(u) >= 0) {
+    if(pferde == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
+      return 2;
+    }
+    return 1;
+  }
 
-	return 0;
+  return 0;
 }
 
 static boolean
@@ -1412,7 +1412,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
       if (fval(current->terrain, SEA_REGION) || fval(next->terrain, SEA_REGION)) {
         /* trying to enter or exit ocean with horses, are we? */
-        if (get_item(u, I_HORSE) > 0 || get_item(u, I_UNICORN) > 0) {
+        if (get_item(u, I_HORSE) > 0 || get_item(u, I_ELVENHORSE) > 0) {
           /* tries to do it with horses */
           if (ord!=NULL) cmistake(u, ord, 67, MSG_MOVE);
           break;

@@ -1097,7 +1097,7 @@ magic_resistance(unit *target)
   }
 
   /* Unicorn +10 */
-  n = get_item(target, I_UNICORN);
+  n = get_item(target, I_ELVENHORSE);
   if (n) probability += n*0.1/target->number;
 
   /* Auswirkungen von Zaubern auf der Region */

@@ -2110,7 +2110,7 @@ fleechance(unit * u)
 
   c += (eff_skill(u, SK_STEALTH, r) * 0.05);
 
-  if (get_item(u, I_UNICORN) >= u->number && eff_skill(u, SK_RIDING, r) >= 5)
+  if (get_item(u, I_ELVENHORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 5)
     c += 0.30;
   else if (get_item(u, I_HORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 1)
     c += 0.10;
@@ -3061,7 +3061,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     fig->elvenhorses = 0;
   } else {
     fig->horses = get_item(u, I_HORSE);
-    fig->elvenhorses = get_item(u, I_UNICORN);
+    fig->elvenhorses = get_item(u, I_ELVENHORSE);
   }
 
   if (u->race->battle_flags & BF_EQUIPMENT) {
