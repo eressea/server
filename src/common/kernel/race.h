@@ -140,7 +140,6 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
 #define GETITEM        (1<<4)   /* nimmt Gegenstände an */
-#define CANGUARD       (1<<5)   /* bewachen auch ohne Waffen */
 #define ECF_REC_HORSES     (1<<6)   /* Rekrutiert aus Pferden */
 #define ECF_REC_ETHEREAL   (1<<7)   /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<8)   /* Rekrutiert ohne Limit */

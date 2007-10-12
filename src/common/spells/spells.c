@@ -3590,6 +3590,22 @@ sp_bloodsacrifice(castorder *co)
   return cast_level;
 }
 
+/** gives a summoned undead unit some base skills.
+ */
+static void
+skill_summoned(unit * u, int level)
+{
+  if (level>0) {
+    const race * rc = u->race;
+    skill_t sk;
+    for (sk=0;sk!=MAXSKILLS;++sk) {
+      if (rc->bonus[sk>0]) {
+        set_level(u, sk, level);
+      }
+    }
+  }
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Totenruf - Mächte des Todes
  * Stufe:      6
@@ -3630,6 +3646,7 @@ sp_summonundead(castorder *co)
 
   u = create_unit(r, mage->faction, undead, race, 0, NULL, mage);
   make_undead_unit(u);
+  skill_summoned(u, cast_level/2);
 
   ADDMSG(&mage->faction->msgs, msg_message("summonundead_effect_1", "mage region amount", mage, r, undead));
   ADDMSG(&r->msgs, msg_message("summonundead_effect_2", "mage region", mage, r));

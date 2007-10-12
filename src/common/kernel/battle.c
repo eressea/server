@@ -203,7 +203,7 @@ armedmen(const unit * u)
   item * itm;
   int n = 0;
   if (!(urace(u)->flags & RCF_NOWEAPONS)) {
-    if ((urace(u)->ec_flags & CANGUARD) || effskill(u, SK_WEAPONLESS)>=1) {
+    if (effskill(u, SK_WEAPONLESS)>=1) {
       /* kann ohne waffen bewachen: fuer drachen */
       n = u->number;
     } else {

@@ -1495,7 +1495,6 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "giveperson", false)) rc->ec_flags |= GIVEPERSON;
     if (xml_bvalue(node, "giveunit", false)) rc->ec_flags |= GIVEUNIT;
     if (xml_bvalue(node, "getitem", false)) rc->ec_flags |= GETITEM;
-    if (xml_bvalue(node, "canguard", false)) rc->ec_flags |= CANGUARD;
     if (xml_bvalue(node, "recruithorses", false)) rc->ec_flags |= ECF_REC_HORSES;
     if (xml_bvalue(node, "recruitethereal", false)) rc->ec_flags |= ECF_REC_ETHEREAL;
     if (xml_bvalue(node, "recruitunlimited", false)) rc->ec_flags |= ECF_REC_UNLIMITED;
