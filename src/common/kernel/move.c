@@ -483,9 +483,7 @@ do_maelstrom(region *r, unit *u)
 
   damage = rng_int()%150 - eff_skill(u, SK_SAILING, r)*5;
 
-  if(damage <= 0) {
-    ADDMSG(&u->faction->msgs, msg_message("entermaelstrom", 
-      "region ship damage sink", r, u->ship, damage, 1));
+  if (damage <= 0) {
     return u->ship;
   }
 
