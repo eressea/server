@@ -1727,9 +1727,12 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
     const faction * f = flist->data;
     if (f->no!=MONSTER_FACTION) {
       char buf[8192];
+      char label = '-';
 
       sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
-      rparagraph(F, buf, 4, 0, (char)(ALLIED(uf, f)?'+':'*'));
+      if (ALLIED(uf, f)) label = '+';
+      else if (alliedfaction(NULL, uf, f, HELP_ALL)) label = '*';
+      rparagraph(F, buf, 4, 0, label);
 #ifdef SHORTPWDS
       if (f->shortpwds) {
         shortpwd * spwd = f->shortpwds;
