@@ -183,7 +183,7 @@ sideabkz(side *s, boolean truename)
   return sideabkz_buf;
 }
 
-void
+static void
 message_faction(battle * b, faction * f, struct message * m)
 {
   region * r = b->region;
@@ -1396,23 +1396,20 @@ fighters(battle *b, const side * vs, int minrow, int maxrow, int mask)
 
   for (s = b->sides; s; s = s->next) {
     fighter *fig;
+
+    if (mask==FS_ENEMY) {
+      if (!enemy(s, vs)) continue;
+    } else if (mask==FS_HELP) {
+      if (enemy(s, vs) || !allysf(s, vs->bf->faction)) {
+        continue;
+      }
+    } else {
+      assert(mask==(FS_HELP|FS_ENEMY) || !"invalid alliance state");
+    }
     for (fig = s->fighters; fig; fig = fig->next) {
       int row = get_unitrow(fig, vs);
       if (row >= minrow && row <= maxrow) {
-        switch (mask) {
-        case FS_ENEMY:
-          if (enemy(fig->side, vs)) cv_pushback(fightervp, fig);
-          break;
-        case FS_HELP:
-          if (!enemy(fig->side, vs) && allysf(fig->side, vs->bf->faction))
-            cv_pushback(fightervp, fig);
-          break;
-        case FS_HELP|FS_ENEMY:
-          cv_pushback(fightervp, fig);
-          break;
-        default:
-          assert(0 || !"Ungültiger Allianzstatus in fighters()");
-        }
+        cv_pushback(fightervp, fig);
       }
     }
   }

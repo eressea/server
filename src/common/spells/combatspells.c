@@ -370,7 +370,7 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
     dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     assert(dt.fighter);
     du = dt.fighter->unit;
-    if (is_magic_resistant(mage, du, 0) == false) {
+    if (!is_magic_resistant(mage, du, 0)) {
       dt.fighter->person[dt.index].flags |= FL_SLEEPING;
       ++k;
       --enemies;
@@ -810,6 +810,9 @@ sp_strong_wall(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
+/** Spells: chaosrow / song of confusion.
+ * German Title: 'Gesang der Verwirrung'
+ */
 int
 sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 {

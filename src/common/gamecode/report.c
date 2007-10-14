@@ -179,7 +179,7 @@ rparagraph(FILE *F, const char *str, ptrdiff_t indent, int hanging_indent, char 
   }
   begin = end = str;
 
-  while (*begin) {
+  do {
     const char * last_space = begin;
 
     if (mark && indent>=2) {
@@ -210,7 +210,7 @@ rparagraph(FILE *F, const char *str, ptrdiff_t indent, int hanging_indent, char 
     }
     if (begin>end) begin = end;
     fputc('\n', F);
-  }
+  } while (*begin);
 }
 
 static void
@@ -700,7 +700,7 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
     struct mlist * m = msgs->begin;
     while (m) {
       /* messagetype * mt = m->type; */
-      if (strcmp(nr_section(m->msg), section->name)==0) {
+      if (!categorized || strcmp(nr_section(m->msg), section->name)==0) {
         char lbuf[8192];
 
         if (!k && categorized) {
@@ -719,6 +719,7 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
       }
       m = m->next;
     }
+    if (!categorized) break;
   }
 }
 

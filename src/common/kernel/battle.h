@@ -239,7 +239,6 @@ extern "C" {
   extern int count_enemies(struct battle * b, const struct fighter * af, int minrow, int maxrow, int select);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
   extern void message_all(battle * b, struct message * m);
-  extern void message_faction(battle * b, struct faction * f, struct message * m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
   extern struct cvector * fighters(struct battle *b, const struct side * vs, int minrow, int maxrow, int mask);
