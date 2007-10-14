@@ -268,7 +268,7 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
           if (size>0) { *oc++='\t'; --size; }
           break;
         default:
-          if (size>0) { *oc++=*ic; --size; }
+          if (size>0) { *oc++=*ic++; --size; }
       }
     } else {
       int ch = (unsigned char)(*ic);
