@@ -2939,9 +2939,9 @@ sp_firewall(castorder *co)
   a = a_find(b->attribs, &at_countdown);
   if (a==NULL) {
     a = a_add(&b->attribs, a_new(&at_countdown));
-    a->data.i = cast_level;
+    a->data.i = cast_level+1;
   } else {
-    a->data.i = max(a->data.i, cast_level);
+    a->data.i = max(a->data.i, cast_level+1);
   }
 
   /* melden, 1x pro Partei */
