@@ -2,8 +2,10 @@
 #define LUA_OBJECTS_H
 
 #include <attributes/object.h>
-#include <lua.hpp>
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <luabind/object.hpp>
+#pragma warning (pop)
 
 struct lua_State;
 

@@ -105,8 +105,11 @@
 #include "lua/bindings.h"
 #include "lua/script.h"
 #include <boost/version.hpp>
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#pragma warning (pop)
 
 #include <libxml/encoding.h>
 

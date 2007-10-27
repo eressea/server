@@ -10,9 +10,12 @@
 #include <util/attrib.h>
 
 // lua includes
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/object.hpp>
+#pragma warning (pop)
 
 #include <string>
 

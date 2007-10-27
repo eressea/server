@@ -10,8 +10,11 @@
 #include <util/event.h>
 
 // lua includes
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#pragma warning (pop)
 
 using namespace luabind;
 

@@ -806,11 +806,11 @@ get_addresses(report_context * ctx)
           }
         }
       }
-    } if (sr->mode==see_travel) {
+    } else if (sr->mode==see_travel) {
       unit * u = r->units;
       while (u) {
         faction * sf = visible_faction(ctx->f, u);
-        assert(u->faction!=ctx->f);
+        assert(u->faction!=ctx->f); /* if this is see_travel only, then I shouldn't be here. */
         if (lastf!=sf) {
           attrib * a = a_find(r->attribs, &at_travelunit);
           while (a && a->type==&at_travelunit) {
@@ -1103,97 +1103,107 @@ view_regatta(struct seen_region ** seen, region * r, faction * f)
   recurse_regatta(seen, r, r, f, skill/2);
 }
 
-static struct seen_region **
-prepare_report(faction * f)
+static void
+prepare_reports(void)
 {
   region * r;
-  region * end = lastregion(f);
-  struct seen_region ** seen = seen_init();
-
+  faction * f;
   static const struct building_type * bt_lighthouse = NULL;
   if (bt_lighthouse==NULL) bt_lighthouse = bt_find("lighthouse");
 
-  for (r = firstregion(f); r != end; r = r->next) {
+  for (f = factions; f ; f = f->next) {
+    if (f->seen) seen_done(f->seen);
+    f->seen = seen_init();
+  }
+
+  for (r = regions; r ; r = r->next) {
     attrib *ru;
     unit * u;
     plane * p = r->planep;
-    unsigned char mode = see_none;
-    boolean dis = false;
-    int light = 0;
 
     if (p) {
       watcher * w = p->watchers;
-      while (w) {
-        if (f==w->faction) {
-          mode = w->mode;
-          break;
-        }
-        w = w->next;
+      for (;w;w=w->next) {
+        add_seen(w->faction->seen, r, w->mode, false);
+#ifdef SMART_INTERVALS
+        update_interval(w->faction, r);
+#endif
       }
     }
 
     for (u = r->units; u; u = u->next) {
-      if (u->faction == f) {
-        if (u->building && u->building->type==bt_lighthouse) {
-          int r = lighthouse_range(u->building, f);
-          if (r>light) light = r;
-        }
-        if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
-          mode = see_unit;
-          if (fval(u, UFL_DISBELIEVES)) {
-            dis = true;
-            break;
-          }
-        }
-      }
-    }
+      if (u->building && u->building->type==bt_lighthouse) {
+        /* we are in a lighthouse. add the regions we can see from here! */
+        int range = lighthouse_range(u->building, u->faction);
+        region_list * rlist = get_regions_distance(r, range);
+        region_list * rp = rlist;
 
-    if (light) {
-      /* we are in a lighthouse. add the others! */
-      region_list * rlist = get_regions_distance(r, light);
-      region_list * rp = rlist;
-      while (rp) {
-        region * rl = rp->data;
-        if (fval(rl->terrain, SEA_REGION)) {
-          direction_t d;
-          add_seen(seen, rl, see_lighthouse, false);
-          for (d=0;d!=MAXDIRECTIONS;++d) {
-            region * rn = rconnect(rl, d);
-            if (rn!=NULL) {
-              add_seen(seen, rn, see_neighbour, false);
+        while (rp) {
+          region * rl = rp->data;
+          if (fval(rl->terrain, SEA_REGION)) {
+            direction_t d;
+            add_seen(u->faction->seen, rl, see_lighthouse, false);
+            for (d=0;d!=MAXDIRECTIONS;++d) {
+              region * rn = rconnect(rl, d);
+              if (rn!=NULL) {
+                add_seen(u->faction->seen, rn, see_neighbour, false);
+              }
             }
           }
+          rp = rp->next;
         }
-        rp = rp->next;
+        free_regionlist(rlist);
       }
-      free_regionlist(rlist);
+
+      if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
+        if (fval(u, UFL_DISBELIEVES)) {
+          add_seen(u->faction->seen, r, see_unit, true);
+        } else {
+          add_seen(u->faction->seen, r, see_unit, false);
+        }
+      }
     }
 
-    if (mode<see_travel && fval(r, RF_TRAVELUNIT)) {
+    if (fval(r, RF_TRAVELUNIT)) {
       for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
         unit * u = (unit*)ru->data.v;
-        if (u->faction == f) {
-          mode = see_travel;
-          break;
+
+        /* make sure the faction has not been removed this turn: */
+        if (u->faction) {
+          add_seen(u->faction->seen, r, see_travel, false);
         }
       }
     }
+  }
+}
 
-    if (mode == see_none)
-      continue;
+static seen_region **
+prepare_report(faction * f)
+{
+  struct seen_region * sr;
+  region * r = firstregion(f);
+  region * last = lastregion(f);
 
-    add_seen(seen, r, mode, dis);
-    /* nicht, wenn Verwirrung herrscht: */
-    if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-      void (*view)(struct seen_region **, region * r, faction * f) = view_default;
-      if (p && fval(p, PFL_SEESPECIAL)) {
-        attrib * a = a_find(p->attribs, &at_viewrange);
-        if (a) view = (void (*)(struct seen_region **, region * r, faction * f))a->data.f;
+  for (sr=NULL; sr==NULL && r!=last; r=r->next) {
+    sr = find_seen(f->seen, r);
+  }
+
+  for (;sr!=NULL;sr=sr->next) {
+    if (sr->mode>see_neighbour) {
+      region * r = sr->r;
+      plane * p = r->planep;
+      /* if no confusion in the region, add neighbors: */
+      if (!is_cursed(r->attribs, C_REGCONF, 0)) {
+        void (*view)(struct seen_region **, region *, faction *) = view_default;
+        if (p && fval(p, PFL_SEESPECIAL)) {
+          attrib * a = a_find(p->attribs, &at_viewrange);
+          if (a) view = (void (*)(struct seen_region **, region *, faction *))a->data.f;
+        }
+        view(f->seen, r, f);
       }
-      view(seen, r, f);
     }
   }
-  return seen;
+  return f->seen;
 }
 
 int
@@ -1319,8 +1329,7 @@ write_script(FILE * F, const faction * f)
 int
 init_reports(void)
 {
-  update_intervals();
-
+  prepare_reports();
 #ifdef HAVE_STAT
   {
     stat_type st;

@@ -398,7 +398,7 @@ select_ally(fighter * af, int minrow, int maxrow)
   }
   allies = rng_int() % allies;
 
-  for (ds=b->sides; ds; ds=ds->next) {
+  for (ds=b->sides;ds!=b->sides+b->nsides;++ds) {
     if (helping(as, ds)) {
       fighter * df;
       for (df=ds->fighters; df; df=df->next) {
@@ -1377,7 +1377,7 @@ count_healable(battle *b, fighter *df)
   side *s;
   int  healable = 0;
 
-  for (s=b->sides; s; s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     if (helping(df->side, s)) {
       healable += s->casualties;
     }

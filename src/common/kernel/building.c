@@ -438,6 +438,13 @@ building *
 new_building(const struct building_type * btype, region * r, const struct locale * lang)
 {
   building *b = (building *) calloc(1, sizeof(building));
+  static boolean init_lighthouse = false;
+  static const struct building_type * bt_lighthouse = 0;
+
+  if (!init_lighthouse) {
+    bt_lighthouse = bt_find("lighthouse");
+    init_lighthouse = true;
+  }
 
   b->no  = newcontainerid();
   bhash(b);
@@ -446,6 +453,9 @@ new_building(const struct building_type * btype, region * r, const struct locale
   b->region = r;
   addlist(&r->buildings, b);
   
+  if (b->type==bt_lighthouse) {
+    r->flags |= RF_LIGHTHOUSE;
+  }
   {
     const char * bname;
     if (b->type->name==NULL) {

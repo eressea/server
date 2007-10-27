@@ -52,6 +52,40 @@ extern "C" {
     boolean attacker;
   } bfaction;
 
+  typedef struct tactics {
+    cvector fighters;
+    int value;
+  } tactics;
+
+#define SIDE_STEALTH   1<<0
+#ifdef SIMPLE_COMBAT
+#define SIDE_HASGUARDS  1<<1
+#endif
+  typedef struct side {
+    struct side * nextF; /* next army of same faction */
+    struct battle * battle;
+    struct bfaction * bf; /* battle info that goes with the faction */
+    struct faction * faction; /* cache optimization for bf->faction */
+    const struct group * group;
+    struct tactics leader; /* this army's best tactician */
+# define E_ENEMY 1
+# define E_FRIEND 2
+# define E_ATTACKING 4
+    unsigned char relations[MAXSIDES];
+    struct side * enemies[MAXSIDES];
+    struct fighter * fighters;
+    int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
+    int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */
+    int nonblockers[NUMROWS]; /* Anzahl nichtblockierender Kämpfer, z.B. Schattenritter. */
+    int alive;		/* Die Partei hat den Kampf verlassen */
+    int removed;  /* stoned */
+    int flee;
+    int dead;
+    int casualties; /* those dead that were real people, not undead! */
+    int healed;
+    unsigned int flags;
+    const struct faction *stealthfaction;
+  } side;
 
   typedef struct battle {
     cvector leaders;
@@ -60,7 +94,7 @@ extern "C" {
     bfaction * factions;
     int nfactions;
     int nfighters;
-    struct side * sides;
+    side sides[MAXSIDES];
     int nsides;
     cvector meffects;
     int		max_tactics;
@@ -93,41 +127,6 @@ extern "C" {
     } fast;
 #endif
   } battle;
-
-  typedef struct tactics {
-    cvector fighters;
-    int value;
-  } tactics;
-
-#define SIDE_STEALTH   1<<0
-#ifdef SIMPLE_COMBAT
-#define SIDE_HASGUARDS  1<<1
-#endif
-  typedef struct side {
-    struct side * next; /* nächstes Heer in der Schlacht */
-    struct side * nextF; /* nächstes Heer der gleichen Partei */
-    struct battle * battle;
-    struct bfaction * bf; /* Die Partei, die hier kämpft */
-    const struct group * group;
-    struct tactics leader;				/* der beste Taktiker des Heeres */
-# define E_ENEMY 1
-# define E_FRIEND 2
-# define E_ATTACKING 4
-    unsigned char relations[MAXSIDES];
-    struct side * enemies[MAXSIDES];
-    struct fighter * fighters;
-    int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
-    int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */
-    int nonblockers[NUMROWS]; /* Anzahl nichtblockierender Kämpfer, z.B. Schattenritter. */
-    int alive;		/* Die Partei hat den Kampf verlassen */
-    int removed;  /* stoned */
-    int flee;
-    int dead;
-    int casualties; /* those dead that were real people, not undead! */
-    int healed;
-    unsigned int flags;
-    const struct faction *stealthfaction;
-  } side;
 
   typedef struct weapon {
     int count, used;

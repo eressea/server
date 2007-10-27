@@ -14,9 +14,12 @@
 #include <util/log.h>
 
 // lua includes
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
+#pragma warning (pop)
 
 using namespace luabind;
 

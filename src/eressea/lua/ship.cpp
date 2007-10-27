@@ -8,12 +8,15 @@
 #include <region.h>
 
 // lua includes
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 #if LUABIND_BETA >= 7
 # include <luabind/operator.hpp>
 #endif
+#pragma warning (pop)
 
 #include <util/base36.h>
 

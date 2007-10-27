@@ -31,8 +31,11 @@
 #include <util/functions.h>
 #include <util/log.h>
 
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <luabind/luabind.hpp>
 #include <luabind/object.hpp>
+#pragma warning (pop)
 
 #include <cstdio>
 #include <cstring>

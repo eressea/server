@@ -1532,6 +1532,7 @@ readgame(const char * filename, int backup)
   char path[MAX_PATH];
   char token[32];
   int encoding = enc_gamedata;
+  const struct building_type * bt_lighthouse = bt_find("lighthouse");
 
   sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
@@ -1713,6 +1714,9 @@ readgame(const char * filename, int backup)
       b->type = bt_find(token);
       b->region = r;
       a_read(F, &b->attribs);
+      if (b->type==bt_lighthouse) {
+        r->flags |= RF_LIGHTHOUSE;
+      }
     }
     /* Schiffe */
 
@@ -1783,8 +1787,10 @@ readgame(const char * filename, int backup)
   resolve();
 
   for (r=regions;r;r=r->next) {
-    building * b;
-    for (b=r->buildings;b;b=b->next) update_lighthouse(b);
+    if (r->flags & RF_LIGHTHOUSE) {
+      building * b;
+      for (b=r->buildings;b;b=b->next) update_lighthouse(b);
+    }
   }
   if (quiet < 2) printf(" - Regionen initialisieren & verbinden...\n");
   for (f = factions; f; f = f->next) {

@@ -18,8 +18,11 @@
 /* lua includes */
 #include "lua/bindings.h"
 #include <boost/version.hpp>
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#pragma warning (pop)
 
 static const struct { 
   const char * name;

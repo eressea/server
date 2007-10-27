@@ -19,7 +19,8 @@ extern "C" {
 struct player;
 struct alliance;
 struct item;
-  
+struct seen_region;
+
 /* SMART_INTERVALS: define to speed up finding the interval of regions that a 
    faction is in. defining this speeds up the turn by 30-40% */
 #define SMART_INTERVALS
@@ -53,63 +54,64 @@ typedef struct shortpwd {
 #define FFL_SAVEMASK (FFL_NEWID|FFL_GM|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
 
 typedef struct faction {
-	struct faction *next;
-	struct faction *nexthash;
+  struct faction *next;
+  struct faction *nexthash;
 
-	struct player *owner;
+  struct player *owner;
 #ifdef SMART_INTERVALS
-	struct region *first;
-	struct region *last;
+  struct region *first;
+  struct region *last;
 #endif
-	int no;
-	int subscription;
-	unsigned int flags;
-	char *name;
-	char *banner;
-	char *email;
-	char *passw;
-	char *override;
+  int no;
+  int subscription;
+  unsigned int flags;
+  char *name;
+  char *banner;
+  char *email;
+  char *passw;
+  char *override;
 #ifdef SHORTPWDS
   struct shortpwd * shortpwds;
 #endif
-	const struct locale * locale;
-	int lastorders;	/* enno: short? */
-	int age;	/* enno: short? */
-	struct ursprung *ursprung;
-	const struct race * race;
-	magic_t magiegebiet;
-	int newbies;
-	int num_people;				/* Anzahl Personen ohne Monster */
+  const struct locale * locale;
+  int lastorders;	/* enno: short? */
+  int age;	/* enno: short? */
+  struct ursprung *ursprung;
+  const struct race * race;
+  magic_t magiegebiet;
+  int newbies;
+  int num_people;				/* Anzahl Personen ohne Monster */
   int num_total;        /* Anzahl Personen mit Monstern */
-	int options;
-	int no_units;
-	struct ally *allies;
-	struct group *groups;
-	boolean alive; /* enno: sollte ein flag werden */
-	int nregions;
-	int money;
+  int options;
+  int no_units;
+  struct ally *allies;
+  struct group *groups;
+  boolean alive; /* enno: sollte ein flag werden */
+  int nregions;
+  int money;
 #ifdef SCORE_MODULE
   int score;
 #endif
 #ifdef KARMA_MODULE
   int karma;
 #endif
-	struct alliance * alliance;
+  struct alliance * alliance;
 #ifdef VICTORY_DELAY
-	unsigned char victory_delay;
+  unsigned char victory_delay;
 #endif
-	struct unit * units;
-	struct attrib *attribs;
-	struct message_list * msgs;
+  struct unit * units;
+  struct attrib *attribs;
+  struct message_list * msgs;
 #ifdef ENEMIES
   struct faction_list * enemies;
 #endif
-	struct bmsg {
-		struct bmsg * next;
-		struct region * r;
-		struct message_list * msgs;
-	} * battles;
+  struct bmsg {
+    struct bmsg * next;
+    struct region * r;
+    struct message_list * msgs;
+  } * battles;
   struct item * items; /* items this faction can claim */
+  struct seen_region ** seen;
 } faction;
 
 typedef struct faction_list {

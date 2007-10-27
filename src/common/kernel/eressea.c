@@ -1198,6 +1198,10 @@ update_lighthouse(building * lh)
     short d = (short)log10(lh->size) + 1;
     short x;
 
+    if (lh->size>0) {
+      r->flags |= RF_LIGHTHOUSE;
+    }
+
     for (x=-d;x<=d;++x) {
       short y;
       for (y=-d;y<=d;++y) {
@@ -1219,7 +1223,6 @@ update_lighthouse(building * lh)
       }
     }
   }
-
 }
 
 int
@@ -1884,27 +1887,6 @@ firstregion (faction * f)
   return f->first = regions;
 #else
   return regions;
-#endif
-}
-
-void
-update_intervals(void)
-{
-#ifdef SMART_INTERVALS
-  region *r;
-  for (r = regions; r; r = r->next) {
-    plane * p = rplane(r);
-
-    if (p!=NULL) {
-      struct watcher * w = p->watchers;
-      while (w) {
-        if (w->faction!=NULL) {
-          update_interval(w->faction, r);
-        }
-        w = w->next;
-      }
-    }
-  }
 #endif
 }
 

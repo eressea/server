@@ -1730,8 +1730,8 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
       char label = '-';
 
       sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
-      if (ALLIED(uf, f)) label = '+';
-      else if (alliedfaction(NULL, uf, f, HELP_ALL)) label = '*';
+      if (ALLIED(uf, f)) label = '*';
+      else if (alliedfaction(NULL, uf, f, HELP_ALL)) label = '+';
       rparagraph(F, buf, 4, 0, label);
 #ifdef SHORTPWDS
       if (f->shortpwds) {

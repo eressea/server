@@ -165,7 +165,7 @@ sidename(side * s)
       "%s", factionname(s->stealthfaction));
   } else {
     snprintf(sidename_buf, SIDENAMEBUFLEN,
-      "%s", factionname(s->bf->faction));
+      "%s", factionname(s->faction));
   }
   return sidename_buf;
 }
@@ -178,7 +178,7 @@ sideabkz(side *s, boolean truename)
   if (s->stealthfaction && truename == false) {
     abkz(s->stealthfaction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
   } else {
-    abkz(s->bf->faction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
+    abkz(s->faction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
   }
   return sideabkz_buf;
 }
@@ -246,8 +246,11 @@ fbattlerecord(battle * b, faction * f, const char *s)
   msg_release(m);
 }
 
+/* being an enemy or a friend is (and must always be!) symmetrical */
+#define enemy_i(as, di) (as->relations[di]&E_ENEMY)
+#define friendly_i(as, di) (as->relations[di]&E_FRIEND)
 #define enemy(as, ds) (as->relations[ds->index]&E_ENEMY)
-#define friendly(as, ds) (as->bf->faction==ds->bf->faction || (as->relations[ds->index]&E_FRIEND))
+#define friendly(as, ds) (as->relations[ds->index]&E_FRIEND)
 
 static boolean
 set_enemy(side * as, side * ds, boolean attacking)
@@ -284,11 +287,11 @@ set_friendly(side * as, side * ds)
 static int
 allysfm(const side * s, const faction * f, int mode)
 {
-  if (s->bf->faction==f) return mode;
+  if (s->faction==f) return mode;
   if (s->group) {
-    return alliedgroup(s->battle->plane, s->bf->faction, f, s->group->allies, mode);
+    return alliedgroup(s->battle->plane, s->faction, f, s->group->allies, mode);
   }
-  return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
+  return alliedfaction(s->battle->plane, s->faction, f, mode);
 }
 
 static int
@@ -311,17 +314,18 @@ select_corpse(battle * b, fighter * af)
  *
  * Untote werden nicht ausgewählt (casualties, not dead) */
 {
-  int di, maxcasualties = 0;
+  int si, di, maxcasualties = 0;
   fighter *df;
   side *s;
 
-  for (s=b->sides;s;s=s->next) {
-    if (af==NULL || (!enemy(af->side, s) && allysf(af->side, s->bf->faction))) {
+  for (si=0;si!=b->nsides;++si) {
+    side * s = b->sides+si;
+    if (af==NULL || (!enemy_i(af->side, si) && allysf(af->side, s->faction))) {
       maxcasualties += s->casualties;
     }
   }
   di = rng_int() % maxcasualties;
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     for (df=s->fighters;df;df=df->next) {
       /* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
       * werden! */
@@ -343,8 +347,8 @@ select_corpse(battle * b, fighter * af)
 boolean
 helping(const side * as, const side * ds)
 {
-  if (as->bf->faction==ds->bf->faction) return true;
-  return (boolean)(!enemy(as, ds) && allysf(as, ds->bf->faction));
+  if (as->faction==ds->faction) return true;
+  return (boolean)(!enemy(as, ds) && allysf(as, ds->faction));
 }
 
 int
@@ -397,12 +401,12 @@ get_row(const side * s, int row, const side * vs)
   int retreat = 0;
   int size[NUMROWS];
   int front = 0;
+  battle * b = s->battle;
 
   memset(counted, 0, sizeof(counted));
   memset(size, 0, sizeof(size));
   for (line=FIRST_ROW;line!=NUMROWS;++line) {
-    int si;
-    side *sa;
+    int si, sa_i;
     /* how many enemies are there in the first row? */
     for (si=0;s->enemies[si];++si) {
       side *se = s->enemies[si];
@@ -411,16 +415,17 @@ get_row(const side * s, int row, const side * vs)
         /* - s->nonblockers[line] (nicht, weil angreifer) */
       }
     }
-    for (sa = s->battle->sides; sa; sa=sa->next) {
+    for (sa_i=0; sa_i!=b->nsides; ++sa_i) {
+      side * sa = b->sides+sa_i;
       /* count people that like me, but don't like my enemy */
-      if (friendly(sa, s) && enemy(sa, vs)) {
-        if (!counted[sa->index]) {
+      if (friendly_i(s, sa_i) && enemy_i(vs, sa_i)) {
+        if (!counted[sa_i]) {
           int i;
           
           for (i=0;i!=NUMROWS;++i) {
             size[i] += sa->size[i] - sa->nonblockers[i];
           }
-          counted[sa->index] = true;
+          counted[sa_i] = true;
         }
       }
     }
@@ -744,7 +749,7 @@ meffect_protection(battle * b, meffect * s, side * ds)
   if (!s->magician->alive) return false;
   if (s->duration <= 0) return false;
   if (enemy(s->magician->side, ds)) return false;
-  if (allysf(s->magician->side, ds->bf->faction)) return true;
+  if (allysf(s->magician->side, ds->faction)) return true;
   return false;
 }
 
@@ -1203,7 +1208,7 @@ count_allies(const side * as, int minrow, int maxrow, int select)
   side *s;
   int count = 0;
 
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     if (!helping(as, s)) continue;
     count += count_side(s, NULL, minrow, maxrow, select);
     if (count>0 && (select&SELECT_FIND)) break;
@@ -1217,7 +1222,7 @@ count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow, int sele
   side *es, *as = af->side;
   int i = 0;
 
-  for (es = b->sides; es; es = es->next) {
+  for (es=b->sides;es!=b->sides+b->nsides;++es) {
     if (as==NULL || enemy(es, as)) {
       int offset = 0;
       if (select&SELECT_DISTANCE) {
@@ -1394,13 +1399,13 @@ fighters(battle *b, const side * vs, int minrow, int maxrow, int mask)
   assert(vs!=NULL);
   cv_init(fightervp);
 
-  for (s = b->sides; s; s = s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
 
     if (mask==FS_ENEMY) {
       if (!enemy(s, vs)) continue;
     } else if (mask==FS_HELP) {
-      if (enemy(s, vs) || !allysf(s, vs->bf->faction)) {
+      if (enemy(s, vs) || !allysf(s, vs->faction)) {
         continue;
       }
     } else {
@@ -1436,7 +1441,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 
   memset(spellranks, 0, sizeof(spellranks));
 
-  for (s = b->sides; s; s = s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter * fig;
     for (fig = s->fighters; fig; fig = fig->next) {
       unit * mage = fig->unit;
@@ -1828,7 +1833,7 @@ damage_building(battle *b, building *bldg, int damage_abs)
 
     bldg->sizeleft = bldg->size;
 
-    for (s=b->sides;s;s=s->next) {
+    for (s=b->sides;s!=b->sides+b->nsides;++s) {
       fighter * fig;
       for (fig=s->fighters;fig;fig=fig->next) {
         if (fig->building == bldg) {
@@ -1857,7 +1862,7 @@ static void
 make_heroes(battle * b)
 {
   side * s;
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter * fig;
     for (fig=s->fighters;fig;fig=fig->next) {
       unit * u = fig->unit;
@@ -2124,20 +2129,18 @@ fleechance(unit * u)
   return c;
 }
 
-static int nextside = 0;
-
 /** add a new army to the conflict
  * beware: armies need to be added _at the beginning_ of the list because 
  * otherwise join_allies() will get into trouble */
 static side *
 make_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction *stealthfaction)
 {
-  side *s1 = calloc(sizeof(struct side), 1);
+  side *s1 = b->sides+b->nsides;
   bfaction * bf;
 
 #ifdef SIMPLE_COMBAT
   if (!fval(b->region->terrain, LAND_REGION)) {
-    /* in ozeanregionen ist jeder kampf kurz */
+    /* every fight in an ocean is short */
     flags |= SIDE_HASGUARDS;
   } else {
     unit * u;
@@ -2156,17 +2159,15 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
   s1->group = g;
   s1->flags = flags;
   s1->stealthfaction = stealthfaction;
-  s1->next = b->sides;
-  b->sides = s1;
   for (bf = b->factions;bf;bf=bf->next) {
     faction * f2 = bf->faction;
 
     if (f2 == f) {
       s1->bf = bf;
-      s1->index = nextside++;
+      s1->faction = f2;
+      s1->index = b->nsides++;
       s1->nextF = bf->sides;
       bf->sides = s1;
-      ++b->nsides;
       assert(b->nsides<=MAXSIDES);
       break;
     }
@@ -2243,7 +2244,7 @@ merge_fleeloot(fighter* fig, unit* u)
 static boolean
 seematrix(const faction * f, const side * s)
 {
-  if (f==s->bf->faction) return true;
+  if (f==s->faction) return true;
   if (s->flags & SIDE_STEALTH) return false;
   return true;
 }
@@ -2285,7 +2286,7 @@ aftermath(battle * b)
   int *trollsave = calloc(2 * cv_size(&b->factions), sizeof(int));
 #endif
 
-  for (s=b->sides; s; s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter * df;
     for (df = s->fighters; df; df=df->next) {
       unit *du = df->unit;
@@ -2349,7 +2350,7 @@ aftermath(battle * b)
   /* POSTCOMBAT */
   do_combatmagic(b, DO_POSTCOMBATSPELL);
 
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     int snumber = 0;
     fighter *df;
     boolean relevant = false; /* Kampf relevant für diese Partei? */
@@ -2507,7 +2508,7 @@ aftermath(battle * b)
 
   battle_effects(b, dead_players);
 
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     message * seen = msg_message("battle::army_report",
       "index abbrev dead fled survived",
       army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
@@ -2530,7 +2531,7 @@ aftermath(battle * b)
   * schonmal Schaden genommen hat. (moved und drifted
   * sollten in flags überführt werden */
 
-  for (s=b->sides; s; s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *df;
 
     for (df=s->fighters; df; df=df->next) {
@@ -2664,7 +2665,7 @@ print_header(battle * b)
     size_t size = sizeof(zText) - 1;
     int bytes;
 
-    for (s=b->sides; s; s=s->next) {
+    for (s=b->sides;s!=b->sides+b->nsides;++s) {
       fighter *df;
       for (df=s->fighters;df;df=df->next) {
         if (is_attacker(df)) {
@@ -2710,7 +2711,7 @@ print_stats(battle * b)
   side *s2;
   side *s;
   int i = 0;
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     bfaction *bf;
 
     ++i;
@@ -2737,7 +2738,7 @@ print_stats(battle * b)
       komma = 0;
       header = LOC(f->locale, "battle_opponents");
 
-      for (s2=b->sides;s2;s2=s2->next) {
+      for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
         if (enemy(s2, s)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)",
@@ -2754,7 +2755,7 @@ print_stats(battle * b)
       komma = 0;
       header = LOC(f->locale, "battle_helpers");
 
-      for (s2=b->sides;s2;s2=s2->next) {
+      for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
         if (friendly(s2, s)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)",
@@ -2771,7 +2772,7 @@ print_stats(battle * b)
       komma = 0;
       header = LOC(f->locale, "battle_attack");
 
-      for (s2=b->sides;s2;s2=s2->next) {
+      for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
         if (s->relations[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
           rsize = slprintf(bufp, size, "%s %s %d(%s)", komma++ ? "," : (const char*)header, loc_army,
@@ -2784,12 +2785,12 @@ print_stats(battle * b)
       if (komma) fbattlerecord(b, f, buf);
     }
 
-    if (bdebug && s->bf->faction) {
-      if (s->bf->faction->alliance) {
-        fprintf(bdebug, "##### %s (%s/%d)\n", s->bf->faction->name, itoa36(s->bf->faction->no),
-          s->bf->faction->alliance?s->bf->faction->alliance->id:0);
+    if (bdebug && s->faction) {
+      if (s->faction->alliance) {
+        fprintf(bdebug, "##### %s (%s/%d)\n", s->faction->name, itoa36(s->faction->no),
+          s->faction->alliance?s->faction->alliance->id:0);
       } else {
-        fprintf(bdebug, "##### %s (%s)\n", s->bf->faction->name, itoa36(s->bf->faction->no));
+        fprintf(bdebug, "##### %s (%s)\n", s->faction->name, itoa36(s->faction->no));
       }
     }
     print_fighters(b, s);
@@ -2801,14 +2802,14 @@ print_stats(battle * b)
 
   b->max_tactics = 0;
 
-  for (s = b->sides; s; s = s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     if (cv_size(&s->leader.fighters)) {
       b->max_tactics = max(b->max_tactics, s->leader.value);
     }
   }
 
   if (b->max_tactics > 0) {
-    for (s = b->sides; s; s = s->next) {
+    for (s=b->sides;s!=b->sides+b->nsides;++s) {
       if (s->leader.value == b->max_tactics) {
         fighter *tf;
         cv_foreach(tf, s->leader.fighters) {
@@ -2873,8 +2874,8 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     return NULL;
 
   if (s1==NULL) {
-    for (s2 = b->sides; s2; s2 = s2->next) {
-      if (s2->bf->faction == u->faction && s2->group==g) {
+    for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
+      if (s2->faction == u->faction && s2->group==g) {
 #ifdef SIMPLE_COMBAT
         int s1flags = flags|SIDE_HASGUARDS;
         int s2flags = s2->flags|SIDE_HASGUARDS;
@@ -3150,7 +3151,7 @@ join_battle(battle * b, unit * u, boolean attack, fighter ** cp)
     }
   }
 
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
     for (fig=s->fighters;fig;fig=fig->next) {
       if (fig->unit == u) {
@@ -3213,7 +3214,6 @@ make_battle(region * r)
     }
     obs_count++;
   }
-  nextside = 0;
 
   b->region = r;
   b->plane = getplane(r);
@@ -3269,7 +3269,7 @@ free_fighter(fighter * fig)
 static void
 free_battle(battle * b)
 {
-  side *snext;
+  side *s;
   meffect *meffect;
   int max_fac_no = 0;
 
@@ -3285,9 +3285,7 @@ free_battle(battle * b)
     free(bf);
   }
 
-  snext = b->sides;
-  while (snext) {
-    side *s = snext;
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fnext = s->fighters;
     while (fnext) {
       fighter *fig = fnext;
@@ -3295,9 +3293,7 @@ free_battle(battle * b)
       free_fighter(fig);
       free(fig);
     }
-    snext = s->next;
     free_side(s);
-    free(s);
   }
   cv_kill(&b->leaders);
   cv_foreach(meffect, b->meffects) {
@@ -3333,8 +3329,8 @@ battle_report(battle * b)
   boolean komma;
   bfaction *bf;
 
-  for (s=b->sides; s; s=s->next) {
-    for(s2=b->sides; s2; s2=s2->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
+    for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
       if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
         cont = true;
         break;
@@ -3362,7 +3358,7 @@ battle_report(battle * b)
     msg_release(m);
 
     komma   = false;
-    for (s=b->sides; s; s=s->next) {
+    for (s=b->sides;s!=b->sides+b->nsides;++s) {
       if (s->alive) {
         int r, k = 0, * alive = get_alive(s);
         int l = FIGHT_ROW;
@@ -3415,9 +3411,9 @@ join_allies(battle * b)
 {
   region *r = b->region;
   unit *u;
-  side *s, *sbegin = b->sides;
-  /* make_side might be adding a new faciton, but it adds them to the beginning
-   * of the list, so we're safe in our iteration here if we remember b->sides
+  side *s, *s_end = b->sides+b->nsides;
+  /* make_side might be adding a new faction, but it adds them to the end
+   * of the list, so we're safe in our iteration here if we remember the end
    * up front. */
   for (u=r->units;u;u=u->next) {
     /* Was ist mit Schiffen? */
@@ -3425,15 +3421,15 @@ join_allies(battle * b)
       faction * f = u->faction;
       fighter * c = NULL;
 
-      for (s = sbegin; s; s=s->next) {
+      for (s=b->sides;s!=s_end;++s) {
         side * se;
         /* Wenn alle attackierten noch FFL_NOAID haben, dann kämpfe nicht mit. */
-        if (fval(s->bf->faction, FFL_NOAID)) continue;
-        if (s->bf->faction!=f) {
+        if (fval(s->faction, FFL_NOAID)) continue;
+        if (s->faction!=f) {
           /* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
           if (s->bf->attacker) continue;
           /* alliiert müssen wir schon sein, sonst ist's eh egal : */
-          if (!alliedunit(u, s->bf->faction, HELP_FIGHT)) continue;
+          if (!alliedunit(u, s->faction, HELP_FIGHT)) continue;
           /* wenn die partei verborgen ist, oder gar eine andere
           * vorgespiegelt wird, und er sich uns gegenüber nicht zu
           * erkennen gibt, helfen wir ihm nicht */
@@ -3446,14 +3442,14 @@ join_allies(battle * b)
         /* einen alliierten angreifen dürfen sie nicht, es sei denn, der
         * ist mit einem alliierten verfeindet, der nicht attackiert
         * hat: */
-        for (se = sbegin; se; se = se->next) {
-          if (u->faction==se->bf->faction) continue;
-          if (alliedunit(u, se->bf->faction, HELP_FIGHT) && !se->bf->attacker) {
+        for (se=b->sides;se!=s_end;++se) {
+          if (u->faction==se->faction) continue;
+          if (alliedunit(u, se->faction, HELP_FIGHT) && !se->bf->attacker) {
             continue;
           }
           if (enemy(s, se)) break;
         }
-        if (se==NULL) continue;
+        if (se==s_end) continue;
         /* Wenn die Einheit belagert ist, muß auch einer der Alliierten belagert sein: */
         if (besieged(u)) {
           fighter *ally;
@@ -3469,17 +3465,17 @@ join_allies(battle * b)
           if (join_battle(b, u, false, &c)) {
             if (battledebug) {
               fprintf(bdebug, "%s joins to help %s against %s.\n",
-                      unitname(u), factionname(s->bf->faction), 
-                      factionname(se->bf->faction));
+                      unitname(u), factionname(s->faction), 
+                      factionname(se->faction));
             }
           } else if (c==NULL) {
             continue;
           }
         }
 
-        /* Die Feinde meiner Freunde sind meine Feinde: */
-        for (se = sbegin; se; se=se->next) {
-          if (se->bf->faction!=u->faction && enemy(s, se)) {
+        /* the enemy of my friend is my enemy: */
+        for (se=b->sides;se!=s_end;++se) {
+          if (se->faction!=u->faction && enemy(s, se)) {
             if (set_enemy(se, c->side, false) && battledebug) {
               fprintf(bdebug, "%u/%s hates %u/%s because they are enemies with %u/%s.\n",
                       c->side->index, sidename(c->side),
@@ -3492,10 +3488,10 @@ join_allies(battle * b)
     }
   }
 
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     int si;
     side * sa;
-    faction * f = s->bf->faction;
+    faction * f = s->faction;
 
     /* Den Feinden meiner Feinde gebe ich Deckung (gegen gemeinsame Feinde): */
     for (si=0; s->enemies[si]; ++si) {
@@ -3509,11 +3505,11 @@ join_allies(battle * b)
       }
     }
 
-    for (sa=s->next;sa;sa=sa->next) {
+    for (sa=s+1;sa!=b->sides+b->nsides;sa=++sa) {
       if (enemy(s, sa)) continue;
       if (friendly(s, sa)) continue;
-      if (!alliedgroup(r->planep, f, sa->bf->faction, f->allies, HELP_FIGHT)) continue;
-      if (!alliedgroup(r->planep, sa->bf->faction, f, sa->bf->faction->allies, HELP_FIGHT)) continue;
+      if (!alliedgroup(r->planep, f, sa->faction, f->allies, HELP_FIGHT)) continue;
+      if (!alliedgroup(r->planep, sa->faction, f, sa->faction->allies, HELP_FIGHT)) continue;
 
       set_friendly(s, sa);
     }
@@ -3775,7 +3771,7 @@ battle_stats(FILE * F, battle * b)
   } stat_info;
   side * s;
 
-  for (s = b->sides; s; s = s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter * df;
     stat_info * stats = NULL, * stat;
 
@@ -3814,7 +3810,7 @@ battle_stats(FILE * F, battle * b)
       }
     }
 
-    fprintf(F, "##STATS## Heer %u - %s:\n", army_index(s), factionname(s->bf->faction));
+    fprintf(F, "##STATS## Heer %u - %s:\n", army_index(s), factionname(s->faction));
     for (stat=stats;stat!=NULL;stat=stat->next) {
       fprintf(F, "%s %u : %u\n", stat->wtype?stat->wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
     }
@@ -3831,7 +3827,7 @@ battle_attacks(battle * b)
 {
   side * s;
 
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
     for (fig=s->fighters;fig;fig=fig->next) {
 
@@ -3842,7 +3838,7 @@ battle_attacks(battle * b)
       if (b->turn == 0) {
         side *stac;
 
-        for (stac=b->sides; stac; stac=stac->next) {
+        for (stac=b->sides;stac!=b->sides+b->nsides;++stac) {
           if (b->max_tactics > 0 && stac->leader.value == b->max_tactics && helping(stac, fig->side)) {
             break;
           }
@@ -3863,7 +3859,7 @@ static void
 battle_update(battle * b)
 {
   side * s;
-  for (s=b->sides;s;s=s->next) {
+  for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
     for (fig=s->fighters;fig;fig=fig->next) {
       fig->fighting = fig->alive - fig->removed;
@@ -3884,7 +3880,7 @@ battle_flee(battle * b)
 
   for (attempt=1;attempt<=flee_ops;++attempt) {
     side * s;
-    for (s=b->sides;s;s=s->next) {
+    for (s=b->sides;s!=b->sides+b->nsides;++s) {
       fighter *fig;
       for (fig=s->fighters;fig;fig=fig->next) {
         unit *u = fig->unit;

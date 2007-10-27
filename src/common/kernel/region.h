@@ -45,6 +45,7 @@ extern "C" {
   /* debug flags */
 #define RF_COMBATDEBUG (1<<14)
 #define RF_MAPPER_HIGHLIGHT (1<<14) /* only used by mapper, not stored */
+#define RF_LIGHTHOUSE (1<<15) /* this region may contain a lighthouse */
 
 #define RF_SELECT      (1<<17)
 #define RF_MARK        (1<<18)

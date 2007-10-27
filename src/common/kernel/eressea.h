@@ -274,7 +274,6 @@ int weight(const struct unit * u);
 void changeblockchaos(void);
 
 /* intervall, in dem die regionen der partei zu finden sind */
-extern void update_intervals(void);
 extern struct region *firstregion(struct faction * f);
 extern struct region *lastregion(struct faction * f);
 

@@ -9,10 +9,12 @@
 #include <kernel/alliance.h>
 
 // lua includes
-#include <lua.hpp>
+#pragma warning (push)
+#pragma warning (disable: 4127)
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 #include <luabind/object.hpp>
+#pragma warning (pop)
 
 using namespace luabind;
 
