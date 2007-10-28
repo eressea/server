@@ -1228,7 +1228,7 @@ write_reports(faction * f, time_t ltime)
     report_type * rtype = report_types;
 
     errno = 0;
-    printf("Reports for %s:", factionname(f));
+    log_stdio(stdout, "Reports for %s:", factionname(f));
     fflush(stdout);
 
     for (;rtype!=NULL;rtype=rtype->next) {

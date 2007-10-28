@@ -511,7 +511,7 @@ factionorders(void)
   if (f!=NULL) {
     const char * pass = getstrtoken();
     if (quiet==0) {
-      printf(" %4s;", factionid(f));
+      log_stdio(stdout, " %4s;", factionid(f));
       fflush(stdout);
     }
     
@@ -1363,7 +1363,7 @@ readfaction(FILE * F, int encoding)
   xrds(F, &f->name, encoding);
   xrds(F, &f->banner, encoding);
 
-  if (quiet==0) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
+  if (quiet==0) log_stdio(stdout, "   - Lese Partei %s (%s)\n", f->name, factionid(f));
 
   rds(F, &email);
   if (set_email(&f->email, email)!=0) {

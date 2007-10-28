@@ -9,8 +9,8 @@ function run_scripts()
     "hse/portals.lua",
     "hse/stats.lua"
   }
-  for index in scripts do
-    local script = scriptpath .. "/" .. scripts[index]
+  for index, value in pairs(scripts) do
+    local script = scriptpath .. "/" .. value
     print("- loading " .. script)
     if pcall(dofile, script)==0 then
       print("Could not load " .. script)
@@ -30,6 +30,7 @@ function process(orders)
     print("could not read game")
     return -1
   end
+  init_summary()
 
   -- run the turn:
   read_orders(orders)

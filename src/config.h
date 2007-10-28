@@ -23,6 +23,7 @@
 #define CONFIG_H
 
 #ifdef _MSC_VER
+# define STDIO_CP 1252 /* log.c, convert to console character set */
 # pragma warning (disable: 4201 4214 4514 4115 4711)
 # pragma warning(disable: 4056)
 /* warning C4056: overflow in floating point constant arithmetic */

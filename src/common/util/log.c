@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 */
 #include <config.h>
 #include "log.h"
+#include "unicode.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -20,8 +21,14 @@ without prior permission by the authors of Eressea.
 
 /* TODO: set from external function */
 int log_flags = LOG_FLUSH|LOG_CPERROR|LOG_CPWARNING;
+#ifdef STDIO_CP
+static int stdio_codepage = STDIO_CP;
+#else
+static int stdio_codepage = 0;
+#endif
 static FILE * logfile;
 
+#define MAXLENGTH 4096 /* because I am lazy, CP437 output is limited to this many chars */
 void 
 log_flush(void)
 {
@@ -36,6 +43,32 @@ log_puts(const char * str)
   fputs(str, logfile);
 }
 
+static int
+cp_convert(const char * format, char * buffer, size_t length, int codepage)
+{
+  /* when console output on MSDOS, convert to codepage */
+  const char * input = format;
+  char * pos = buffer;
+
+  while (pos+1<buffer+length && *input) {
+    size_t length = 0;
+    int result = 0;
+    if (codepage==437) {
+      result = unicode_utf8_to_cp437(pos, input, &length);
+    } else if (codepage==1252) {
+      result = unicode_utf8_to_cp1252(pos, input, &length);
+    }
+    if (result!=0) {
+      *pos = 0; /* just in case caller ignores our return value */
+      return result;
+    }
+    ++pos;
+    input+=length;
+  }
+  *pos = 0;
+  return 0;
+}
+
 void 
 log_printf(const char * format, ...)
 {
@@ -43,6 +76,34 @@ log_printf(const char * format, ...)
   if (!logfile) logfile = stderr;
   va_start(marker, format);
   vfprintf(logfile, format, marker);
+  va_end(marker);
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
+  }
+}
+
+void 
+log_stdio(FILE * io, const char * format, ...)
+{
+  va_list marker;
+  if (!logfile) logfile = stderr;
+  va_start(marker, format);
+  if (stdio_codepage) {
+    char buffer[MAXLENGTH];
+    char converted[MAXLENGTH];
+
+    vsnprintf(buffer, sizeof(buffer), format, marker);
+    if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage)==0) {
+      fputs(converted, stderr);
+    } else {
+      /* fall back to non-converted output */
+      va_end(marker);
+      va_start(marker, format);
+      vfprintf(io, format, marker);
+    }
+  } else {
+    vfprintf(io, format, marker);
+  }
   va_end(marker);
   if (log_flags & LOG_FLUSH) {
     log_flush();
@@ -116,7 +177,22 @@ _log_warn(const char * format, ...)
       va_list marker;
       fputs("WARNING: ", stderr);
       va_start(marker, format);
-      vfprintf(stderr, format, marker);
+      if (stdio_codepage) {
+        char buffer[MAXLENGTH];
+        char converted[MAXLENGTH];
+
+        vsnprintf(buffer, sizeof(buffer), format, marker);
+        if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage)==0) {
+          fputs(converted, stderr);
+        } else {
+          /* fall back to non-converted output */
+          va_end(marker);
+          va_start(marker, format);
+          vfprintf(stderr, format, marker);
+        }
+      } else {
+        vfprintf(stderr, format, marker);
+      }
       va_end(marker);
     }
     if (log_flags & LOG_FLUSH) {
@@ -143,9 +219,25 @@ _log_error(const char * format, ...)
     if (logfile!=stderr) {
       if (log_flags & LOG_CPERROR) {
         va_list marker;
+
         fputs("ERROR: ", stderr);
         va_start(marker, format);
-        vfprintf(stderr, format, marker);
+        if (stdio_codepage) {
+          char buffer[MAXLENGTH];
+          char converted[MAXLENGTH];
+
+          vsnprintf(buffer, sizeof(buffer), format, marker);
+          if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage)==0) {
+            fputs(converted, stderr);
+          } else {
+            /* fall back to non-converted output */
+            va_end(marker);
+            va_start(marker, format);
+            vfprintf(stderr, format, marker);
+          }
+        } else {
+          vfprintf(stderr, format, marker);
+        }
         va_end(marker);
       }
       log_flush();
@@ -168,7 +260,22 @@ _log_info(unsigned int flag, const char * format, ...)
     if (log_flags & flag) {
       fprintf(stderr, "INFO[%u]: ", flag);
       va_start(marker, format);
-      vfprintf(stderr, format, marker);
+      if (stdio_codepage) {
+        char buffer[MAXLENGTH];
+        char converted[MAXLENGTH];
+
+        vsnprintf(buffer, sizeof(buffer), format, marker);
+        if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage)==0) {
+          fputs(converted, stderr);
+        } else {
+          /* fall back to non-converted output */
+          va_end(marker);
+          va_start(marker, format);
+          vfprintf(stderr, format, marker);
+        }
+      } else {
+        vfprintf(stderr, format, marker);
+      }
       va_end(marker);
     }
     if (log_flags & LOG_FLUSH) {

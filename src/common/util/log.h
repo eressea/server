@@ -20,6 +20,7 @@ extern "C" {
   extern void log_puts(const char * str);
   extern void log_close(void);
   extern void log_flush(void);
+  extern void log_stdio(FILE * io, const char * format, ...);
 
 #define log_warning(x) _log_warn x
 #define log_error(x) _log_error x
