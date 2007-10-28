@@ -737,7 +737,7 @@ verify_data(void)
       if (u->number > UNIT_MAXSIZE) {
         if (lf != f->no) {
           lf = f->no;
-          printf("Partei %s:\n", factionid(f));
+          log_stdio(stdout, "Partei %s:\n", factionid(f));
         }
         log_warning(("Einheit %s hat %d Personen\n", unitid(u), u->number));
       }
@@ -2224,7 +2224,7 @@ remove_empty_factions(boolean writedropouts)
     if ((f->units==NULL || f->alive == 0) && f->no != MONSTER_FACTION) {
       ursprung * ur = f->ursprung;
       while (ur && ur->id!=0) ur=ur->next;
-      if (!quiet) printf("\t%s\n", factionname(f));
+      if (!quiet) log_stdio(stdout, "\t%s\n", factionname(f));
 
       /* Einfach in eine Datei schreiben und später vermailen */
 

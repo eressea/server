@@ -3670,7 +3670,7 @@ process(void)
 
     printf("- Step %u\n", prio);
     while (proc && proc->priority==prio) {
-      if (proc->name) printf(" - %s\n", proc->name);
+      if (proc->name) log_stdio(stdout, " - %s\n", proc->name);
       proc = proc->next;
     }
 

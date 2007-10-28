@@ -1258,18 +1258,9 @@ fumble(region * r, unit * u, const spell * sp, int cast_grade)
 	/* wenn die Chance kleiner als 0 ist, können wir gleich false
 	 * zurückgeben */
 	if (patzer <= 0) {
-#ifdef PATZERDEBUG
-		printf("%s: Zauber Stufe %d, Talent %d, Patzerchance %d\n",
-			unitname(u), cast_grade, eff_skill(u, SK_MAGIC, r), patzer);
-#endif
 		return false;
 	}
 	rnd = rng_int()%100;
-
-#ifdef PATZERDEBUG
-	printf("%s: Zauber Stufe %d, Talent %d, Patzerchance %d, rand: %d\n",
-			unitname(u), cast_grade, eff_skill(u, SK_MAGIC, r), patzer, rnd);
-#endif
 
 	if (rnd > patzer) {
 		/* Glück gehabt, kein Patzer */

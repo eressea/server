@@ -3992,7 +3992,7 @@ do_battle(region * r)
   do_combatmagic(b, DO_PRECOMBATSPELL);
 
   print_stats(b); /* gibt die Kampfaufstellung aus */
-  printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
+  log_stdio(stdout, "%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
 
   for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
     if (bdebug) {
