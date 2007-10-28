@@ -3505,7 +3505,7 @@ join_allies(battle * b)
       }
     }
 
-    for (sa=s+1;sa!=b->sides+b->nsides;sa=++sa) {
+    for (sa=s+1;sa!=b->sides+b->nsides;++sa) {
       if (enemy(s, sa)) continue;
       if (friendly(s, sa)) continue;
       if (!alliedgroup(r->planep, f, sa->faction, f->allies, HELP_FIGHT)) continue;
