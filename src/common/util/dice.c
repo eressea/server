@@ -50,7 +50,7 @@ term_eval(const char **sptr)
   int state = 1;
 
   for (;;) {
-    if (isdigit((int)*c)) {
+    if (isdigit(*(unsigned char*)c)) {
       k = k*10+(*c-'0');
     } 
     else if (*c=='+' || *c=='-' || *c==0 || *c=='*' || *c==')' || *c=='(') {

@@ -35,11 +35,11 @@ atoi36(const char * str)
   assert(s);
   if(!(*s)) return 0;
 
-  while(isspace((int)*s)) ++s;
-  while(isalnum((int)*s)) {
-    if (isupper((int)*s)) i = i*36 + (*s)-'A' + 10;
-    else if (islower((int)*s)) i=i*36 + (*s)-'a' + 10;
-    else if (isdigit((int)*s)) i=i*36 + (*s)-'0';
+  while(isspace(*(unsigned char*)s)) ++s;
+  while(isalnum(*(unsigned char*)s)) {
+    if (isupper(*(unsigned char*)s)) i = i*36 + (*s)-'A' + 10;
+    else if (islower(*(unsigned char*)s)) i=i*36 + (*s)-'a' + 10;
+    else if (isdigit(*(unsigned char*)s)) i=i*36 + (*s)-'0';
     else
       break;
     ++s;

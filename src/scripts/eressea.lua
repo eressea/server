@@ -54,7 +54,6 @@ function process(orders)
   equipment_setitem("new_faction", "money", "4200");
 
   file = "" .. get_turn()
-  --  set_encoding(enc_game)
   if read_game(file)~=0 then
     print("could not read game")
     return -1
@@ -65,6 +64,7 @@ function process(orders)
   loadscript("eressea/multis.lua")
 
   -- run the turn:
+  set_encoding("utf8")
   if read_orders(orders) ~= 0 then
     print("could not read " .. orders)
     return -1

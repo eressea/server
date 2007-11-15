@@ -325,7 +325,7 @@ parse_int(opstack ** stack, const char * in)
         ok = true;
     }
   } while (!ok);
-  while (isdigit(*in)) {
+  while (isdigit(*(unsigned char*)in)) {
     k = k * 10 + (*in++)-'0';
   }
   var.i = k*vz;
@@ -347,7 +347,7 @@ parse(opstack ** stack, const char* inn, const void * userdata)
         return parse_symbol(stack, ++b, userdata);
         break;
       default:
-        if (isdigit(*b) || *b=='-' || *b=='+') {
+        if (isdigit(*(unsigned char*)b) || *b=='-' || *b=='+') {
           return parse_int(stack, b);
         }
         else ++b;
