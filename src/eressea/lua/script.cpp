@@ -334,7 +334,7 @@ bind_script(lua_State * L)
 {
   register_function((pf_generic)&lua_callspell, "lua_castspell");
   register_function((pf_generic)&lua_initfamiliar, "lua_initfamiliar");
-  register_function((pf_generic)&lua_useitem, "lua_useitem");
+  register_item_use(&lua_useitem, "lua_useitem");
   register_function((pf_generic)&lua_getresource, "lua_getresource");
   register_function((pf_generic)&lua_changeresource, "lua_changeresource");
   register_function((pf_generic)&lua_equipmentcallback, "lua_equip");

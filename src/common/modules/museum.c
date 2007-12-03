@@ -384,8 +384,8 @@ register_museum(void)
 	at_register(&at_museumgivebackcookie);
 	at_register(&at_museumgiveback);
 
-	register_function((pf_generic)use_museumticket, "use_museumticket");
-	register_function((pf_generic)use_museumexitticket, "use_museumexitticket");
+	register_item_use(use_museumticket, "use_museumticket");
+	register_item_use(use_museumexitticket, "use_museumexitticket");
 }
 
 #endif

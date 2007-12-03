@@ -628,7 +628,25 @@ set_item(unit * u, item_t it, int value)
   return value;
 }
 
-void use_birthdayamulet(region * r, unit * magician, int amount, struct order * ord);
+static int
+use_birthdayamulet(unit * u, const struct item_type * itype, int amount, struct order * ord)
+{
+  direction_t d;
+  message * msg = msg_message("meow", "");
+
+  unused(ord);
+  unused(amount);
+  unused(itype);
+
+  add_message(&u->region->msgs, msg);
+  for(d=0;d<MAXDIRECTIONS;d++) {
+    region * tr = rconnect(u->region, d);
+    if (tr) add_message(&tr->msgs, msg);
+  }
+  msg_release(msg);
+  return 0;
+}
+
 
 /* t_item::flags */
 #define FL_ITEM_CURSED  (1<<0)
@@ -640,8 +658,8 @@ void use_birthdayamulet(region * r, unit * magician, int amount, struct order * 
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
  * Runde um -1 - 4 Punkte. */
-static void
-use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
+static int
+use_tacticcrystal(unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
   int i;
   for (i=0;i!=amount;++i) {
@@ -658,10 +676,10 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
     c->data.i = SK_TACTICS;
     unused(ord);
   }
-  use_pooled(u, oldresourcetype[R_TACTICCRYSTAL], GET_DEFAULT, amount);
+  use_pooled(u, itype->rtype, GET_DEFAULT, amount);
   ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
-    "unit region", u, r));
-  return;
+    "unit region", u, u->region));
+  return 0;
 }
 
 typedef struct t_item {
@@ -727,6 +745,18 @@ heal(unit * user, int effect)
     user->hp += req;
   }
   return effect;
+}
+
+void
+register_item_use(int (*foo) (struct unit *, const struct item_type *, int, struct order *), const char * name)
+{
+  register_function((pf_generic)foo, name);
+}
+
+void
+register_item_useonother(int (*foo) (struct unit *, int, const struct item_type *, int, struct order *), const char * name)
+{
+  register_function((pf_generic)foo, name);
 }
 
 static int
@@ -1104,16 +1134,16 @@ register_resources(void)
   register_function((pf_generic)res_changehp, "changehp");
   register_function((pf_generic)res_changeaura, "changeaura");
 
-  register_function((pf_generic)use_potion, "usepotion");
-  register_function((pf_generic)use_tacticcrystal, "use_tacticcrystal");
-  register_function((pf_generic)use_birthdayamulet, "use_birthdayamulet");
-  register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
-  register_function((pf_generic)use_bloodpotion, "usebloodpotion");
-  register_function((pf_generic)use_healingpotion, "usehealingpotion");
-  register_function((pf_generic)use_foolpotion, "usefoolpotion");
-  register_function((pf_generic)use_mistletoe, "usemistletoe");
-  register_function((pf_generic)use_magicboost, "usemagicboost");
-  register_function((pf_generic)use_snowball, "usesnowball");
+  register_item_use(use_potion, "usepotion");
+  register_item_use(use_tacticcrystal, "use_tacticcrystal");
+  register_item_use(use_birthdayamulet, "use_birthdayamulet");
+  register_item_use(use_warmthpotion, "usewarmthpotion");
+  register_item_use(use_bloodpotion, "usebloodpotion");
+  register_item_use(use_healingpotion, "usehealingpotion");
+  register_item_useonother(use_foolpotion, "usefoolpotion");
+  register_item_use(use_mistletoe, "usemistletoe");
+  register_item_use(use_magicboost, "usemagicboost");
+  register_item_use(use_snowball, "usesnowball");
 
   register_function((pf_generic)give_horses, "givehorses");
 

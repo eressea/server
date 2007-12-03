@@ -421,6 +421,10 @@ extern struct attrib_type at_guard;
 # define count_unit(u) 1
 #endif
 
+#ifdef XECMD_MODULE
+extern struct attrib_type at_xontormiaexpress;
+#endif
+
 #ifdef __cplusplus
 }
 #endif

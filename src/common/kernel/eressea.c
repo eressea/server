@@ -21,9 +21,6 @@
 #include <config.h>
 #include "eressea.h"
 
-/* modules includes */
-#include <modules/xecmd.h>
-
 /* attributes includes */
 #include <attributes/reduceproduction.h>
 #include <attributes/gm.h>
@@ -97,6 +94,17 @@ const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
 int turn;
 
+#ifdef XECMD_MODULE
+attrib_type at_xontormiaexpress = {
+  "xontormiaexpress",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  a_writeint,
+  a_readint,
+  ATF_UNIQUE
+};
+#endif
 int
 NewbieImmunity(void) {
   static int value = -1;
@@ -1918,24 +1926,6 @@ gc_add(void * p)
   blk_index = (blk_index+1) % 1024;
   if (!blk_index) ++ list_index;
   return p;
-}
-
-void
-use_birthdayamulet(region * r, unit * magician, order * ord)
-{
-  region *tr;
-  direction_t d;
-  message * msg = msg_message("meow", "");
-
-  unused(ord);
-  unused(magician);
-
-  add_message(&r->msgs, msg);
-  for(d=0;d<MAXDIRECTIONS;d++) {
-    tr = rconnect(r, d);
-    if (tr) add_message(&tr->msgs, msg);
-  }
-  msg_release(msg);
 }
 
 static void

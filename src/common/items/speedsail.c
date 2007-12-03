@@ -28,7 +28,6 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/functions.h>
 #include <util/log.h>
 
 /* libc includes */
@@ -66,5 +65,5 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 void
 register_speedsail(void)
 {
-	register_function((pf_generic)use_speedsail, "use_speedsail");
+  register_item_use(use_speedsail, "use_speedsail");
 }

@@ -519,11 +519,11 @@ create_arena(void)
 void
 register_arena(void)
 {
-	at_register(&at_hurting);
-	register_function((pf_generic)use_wand_of_tears, "use_wand_of_tears");
-	register_function((pf_generic)enter_arena, "enter_arena");
-	register_function((pf_generic)leave_arena, "leave_arena");
-	tt_register(&tt_caldera);
+  at_register(&at_hurting);
+  register_item_use(use_wand_of_tears, "use_wand_of_tears");
+  register_function((pf_generic)enter_arena, "enter_arena");
+  register_function((pf_generic)leave_arena, "leave_arena");
+  tt_register(&tt_caldera);
 }
 
 #endif /* def ARENA_MODULE */

@@ -55,6 +55,6 @@ give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_
 void
 register_demonseye(void)
 {
-	register_function((pf_generic)summon_igjarjuk, "useigjarjuk");
-	register_function((pf_generic)give_igjarjuk, "giveigjarjuk");
+  register_item_use(summon_igjarjuk, "useigjarjuk");
+  register_function((pf_generic)give_igjarjuk, "giveigjarjuk");
 }

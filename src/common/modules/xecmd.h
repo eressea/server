@@ -17,7 +17,6 @@ extern "C" {
 #endif
 
 #ifdef XECMD_MODULE
-extern struct attrib_type at_xontormiaexpress;
 int xecmd(struct unit * u, struct order * ord);
 #endif
 

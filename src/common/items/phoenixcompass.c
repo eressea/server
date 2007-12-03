@@ -119,6 +119,6 @@ use_phoenixcompass(struct unit * u, const struct item_type * itype,
 void
 register_phoenixcompass(void)
 {
-  register_function((pf_generic)use_phoenixcompass, "use_phoenixcompass");
+  register_item_use(use_phoenixcompass, "use_phoenixcompass");
 }
 

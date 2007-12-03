@@ -23,7 +23,6 @@
 #include <items/demonseye.h>
 
 #include <util/attrib.h>
-#include <util/functions.h>
 #include <util/parser.h>
 #include <util/rand.h>
 
@@ -256,11 +255,11 @@ void
 register_itemfunctions(void)
 {
   register_demonseye();
-  register_function((pf_generic)use_antimagiccrystal, "use_antimagiccrystal");
-  register_function((pf_generic)use_instantartsculpture, "use_instantartsculpture");
-  register_function((pf_generic)use_studypotion, "use_studypotion");
-	register_function((pf_generic)use_speedsail, "use_speedsail");
-  register_function((pf_generic)use_instantartacademy, "use_instantartacademy");
-  register_function((pf_generic)use_bagpipeoffear, "use_bagpipeoffear");
-  register_function((pf_generic)use_aurapotion50, "use_aurapotion50");
+  register_item_use(use_antimagiccrystal, "use_antimagiccrystal");
+  register_item_use(use_instantartsculpture, "use_instantartsculpture");
+  register_item_use(use_studypotion, "use_studypotion");
+  register_item_use(use_speedsail, "use_speedsail");
+  register_item_use(use_instantartacademy, "use_instantartacademy");
+  register_item_use(use_bagpipeoffear, "use_bagpipeoffear");
+  register_item_use(use_aurapotion50, "use_aurapotion50");
 }

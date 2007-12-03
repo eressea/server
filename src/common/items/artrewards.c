@@ -29,7 +29,6 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/functions.h>
 #include <util/rand.h>
 
 /* libc includes */
@@ -151,7 +150,7 @@ void
 register_artrewards(void)
 {
   at_register(&at_peaceimmune);
-  register_function((pf_generic)use_hornofdancing, "use_hornofdancing");
-  register_function((pf_generic)use_trappedairelemental, "use_trappedairelemental");
-  register_function((pf_generic)useonother_trappedairelemental, "useonother_trappedairelemental");
+  register_item_use(use_hornofdancing, "use_hornofdancing");
+  register_item_use(use_trappedairelemental, "use_trappedairelemental");
+  register_item_useonother(useonother_trappedairelemental, "useonother_trappedairelemental");
 }

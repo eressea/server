@@ -39,16 +39,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-attrib_type at_xontormiaexpress = {
-	"xontormiaexpress",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	a_writeint,
-	a_readint,
-	ATF_UNIQUE
-};
-
 static void
 xe_givelaen(unit *u, struct order * ord)
 {
