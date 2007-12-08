@@ -174,7 +174,7 @@ checkorders(void)
 {
   faction *f;
 
-  puts(" - Warne späte Spieler...");
+  puts(" - Warne spaete Spieler...");
   for (f = factions; f; f = f->next)
     if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTimeout() - 1)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
@@ -373,8 +373,8 @@ live(region * r)
 
   while (*up) {
     unit * u = *up;
-    /* IUW: age_unit() kann u löschen, u->next ist dann
-    * undefiniert, also müssen wir hier schon das nächste
+    /* IUW: age_unit() kann u loeschen, u->next ist dann
+    * undefiniert, also muessen wir hier schon das nächste
     * Element bestimmen */
 
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
@@ -3747,7 +3747,7 @@ process(void)
     }
   }
 
-  if (quiet<2) printf("\n - Leere Gruppen löschen...\n");
+  if (quiet<2) printf("\n - Leere Gruppen loeschen...\n");
   for (f=factions; f; f=f->next) {
     group ** gp = &f->groups;
     while (*gp) {
@@ -3880,10 +3880,10 @@ processorders (void)
 
   p+=10; /* rest rng again before economics */
   add_proc_global(p, &reset_rng, NULL);
-  add_proc_region(p, &economics, "Zerstören, Geben, Rekrutieren, Vergessen");
+  add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
 
   p+=10;
-  add_proc_region(p, &maintain_buildings_1, "Gebäudeunterhalt (1. Versuch)");
+  add_proc_region(p, &maintain_buildings_1, "Gebaeudeunterhalt (1. Versuch)");
 
   p+=10; /* QUIT fuer sich alleine */
   add_proc_global(p, &quit, "Sterben");
@@ -3936,7 +3936,7 @@ processorders (void)
   add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
   p+=10;
-  add_proc_region(p, &maintain_buildings_2, "Gebäudeunterhalt (2. Versuch)");
+  add_proc_region(p, &maintain_buildings_2, "Gebaeudeunterhalt (2. Versuch)");
 
   p+=10;
   add_proc_global(p, &reorder, "Einheiten sortieren");
@@ -3953,7 +3953,7 @@ processorders (void)
   add_proc_global(p, &declare_war, "Krieg & Frieden");
 #endif
 #ifdef HEROES
-  add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbeförderung");
+  add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
 #endif
   add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
 
