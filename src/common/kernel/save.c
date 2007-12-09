@@ -1545,8 +1545,10 @@ readgame(const char * filename, int backup)
 
   /* recognize UTF8 BOM */
   rss(F, token, sizeof(token));
-  if (memcmp(token, utf8_bom, 3)==0 && enc_gamedata!=XML_CHAR_ENCODING_UTF8) {
-    encoding = XML_CHAR_ENCODING_UTF8;
+  if (memcmp(token, utf8_bom, 3)==0) {
+    if (enc_gamedata!=XML_CHAR_ENCODING_UTF8) {
+      encoding = XML_CHAR_ENCODING_UTF8;
+    }
     log_warning(("Found UTF-8 BOM, assuming unicode gamedata.\n"));
     global.data_version = atoi(token+3);
   } else {
