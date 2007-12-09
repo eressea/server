@@ -1578,25 +1578,25 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj, order * 
 static void
 verify_targets(castorder *co, int * invalid, int * resist, int * success)
 {
-	unit *mage = co->magician.u;
-	const spell *sp = co->sp;
-	region *target_r = co->rt;
-	spellparameter *sa = co->par;
+  unit *mage = co->magician.u;
+  const spell *sp = co->sp;
+  region *target_r = co->rt;
+  spellparameter *sa = co->par;
   int i;
 
   *invalid = 0;
   *resist = 0;
   *success = 0;
 
-	if (sa) {
-		/* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
-		 * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
-		 * gar nicht global hätte suchen dürften, setzen wir das Objekt
-		 * zurück. */
-		for (i=0;i<sa->length;i++) {
-			spllprm * spobj = sa->param[i];
+  if (sa) {
+    /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
+    * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
+    * gar nicht global hätte suchen dürften, setzen wir das Objekt
+    * zurück. */
+    for (i=0;i<sa->length;i++) {
+      spllprm * spobj = sa->param[i];
 
-			switch(spobj->typ) {
+      switch(spobj->typ) {
         case SPP_TEMP:
         case SPP_UNIT:
           if (!verify_unit(target_r, mage, sp, spobj, co->order)) ++*invalid;
@@ -1609,128 +1609,130 @@ verify_targets(castorder *co, int * invalid, int * resist, int * success)
           break;
         default:
           break;
-			}
-		}
+      }
+    }
 
     /* Nun folgen die Tests auf cansee und Magieresistenz */
-		for (i=0;i<sa->length;i++) {
-			spllprm * spobj = sa->param[i];
+    for (i=0;i<sa->length;i++) {
+      spllprm * spobj = sa->param[i];
       unit * u;
       building * b;
       ship * sh;
       region * tr;
 
       if (spobj->flag == TARGET_NOTFOUND) continue;
-			switch(spobj->typ) {
+      switch(spobj->typ) {
         case SPP_TEMP:
-				case SPP_UNIT:
-					u = spobj->data.u;
+        case SPP_UNIT:
+          u = spobj->data.u;
 
           if ((sp->sptyp & TESTRESISTANCE)
-							&& target_resists_magic(mage, u, TYP_UNIT, 0))
-					{ 
+            && target_resists_magic(mage, u, TYP_UNIT, 0))
+          { 
             /* Fehlermeldung */
-						spobj->data.i = u->no;
-						spobj->flag = TARGET_RESISTS;
-						++*resist;
-						ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
+            spobj->data.i = u->no;
+            spobj->flag = TARGET_RESISTS;
+            ++*resist;
+            ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
               "unit region command target",
-							mage, mage->region, co->order, u));
-						break;
-					}
+              mage, mage->region, co->order, u));
+            break;
+          }
 
-					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
-					++*success;
-					break;
-				case SPP_BUILDING:
-					b = spobj->data.b;
+          /* TODO: Test auf Parteieigenschaft Magieresistsenz */
+          ++*success;
+          break;
+        case SPP_BUILDING:
+          b = spobj->data.b;
 
-					if ((sp->sptyp & TESTRESISTANCE)
-								&& target_resists_magic(mage, b, TYP_BUILDING, 0))
-					{ /* Fehlermeldung */
-						spobj->data.i = b->no;
-						spobj->flag = TARGET_RESISTS;
-						++*resist;
+          if ((sp->sptyp & TESTRESISTANCE)
+            && target_resists_magic(mage, b, TYP_BUILDING, 0))
+          { /* Fehlermeldung */
+            spobj->data.i = b->no;
+            spobj->flag = TARGET_RESISTS;
+            ++*resist;
             ADDMSG(&mage->faction->msgs, msg_message("spellbuildingresists",
               "unit region command id", 
               mage, mage->region, co->order, spobj->data.i));
-						break;
-					}
-					++*success;
-					break;
-				case SPP_SHIP:
-					sh = spobj->data.sh;
+            break;
+          }
+          ++*success;
+          break;
+        case SPP_SHIP:
+          sh = spobj->data.sh;
 
-					if ((sp->sptyp & TESTRESISTANCE)
-								&& target_resists_magic(mage, sh, TYP_SHIP, 0))
-					{ /* Fehlermeldung */
-						spobj->data.i = sh->no;
-						spobj->flag = TARGET_RESISTS;
-						++*resist;
-						ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+          if ((sp->sptyp & TESTRESISTANCE)
+            && target_resists_magic(mage, sh, TYP_SHIP, 0))
+          { /* Fehlermeldung */
+            spobj->data.i = sh->no;
+            spobj->flag = TARGET_RESISTS;
+            ++*resist;
+            ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
               "spellshipresists", "ship", sh));
-						break;
-					}
-					++*success;
-					break;
+            break;
+          }
+          ++*success;
+          break;
 
         case SPP_REGION:
           /* haben wir ein Regionsobjekt, dann wird auch dieses und
-						 nicht target_r überprüft. */
-					tr = spobj->data.r;
+          nicht target_r überprüft. */
+          tr = spobj->data.r;
 
-					if ((sp->sptyp & TESTRESISTANCE)
-							&& target_resists_magic(mage, tr, TYP_REGION, 0))
-					{ /* Fehlermeldung */
-						spobj->flag = TARGET_RESISTS;
-						++*resist;
-						ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
+          if ((sp->sptyp & TESTRESISTANCE)
+            && target_resists_magic(mage, tr, TYP_REGION, 0))
+          { /* Fehlermeldung */
+            spobj->flag = TARGET_RESISTS;
+            ++*resist;
+            ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
               "unit region command", mage, mage->region, co->order));
-						break;
-					}
-					++*success;
-					break;
-				case SPP_INT:
-				case SPP_STRING:
-					++*success;
-					break;
+            break;
+          }
+          ++*success;
+          break;
+        case SPP_INT:
+        case SPP_STRING:
+          ++*success;
+          break;
 
-				default:
-					break;
-			}
-		}
-	} else {
-		/* der Zauber hat keine expliziten Parameter/Ziele, es kann sich
-		 * aber um einen Regionszauber handeln. Wenn notwendig hier die
-		 * Magieresistenz der Region prüfen. */
-		if ((sp->sptyp & REGIONSPELL)) {
-			/* Zielobjekt Region anlegen */
+        default:
+          break;
+      }
+    }
+  } else {
+    /* der Zauber hat keine expliziten Parameter/Ziele, es kann sich
+    * aber um einen Regionszauber handeln. Wenn notwendig hier die
+    * Magieresistenz der Region prüfen. */
+    if ((sp->sptyp & REGIONSPELL)) {
+      /* Zielobjekt Region anlegen */
       spllprm * spobj = malloc(sizeof(spllprm));
       spobj->flag = 0;
       spobj->typ = SPP_REGION;
       spobj->data.r = target_r;
-      
-      sa = calloc(1, sizeof(spellparameter));
-			sa->length = 1;
-			sa->param = calloc(sa->length, sizeof(spllprm *));
-			sa->param[0] = spobj;
-			co->par = sa;
 
-			if ((sp->sptyp & TESTRESISTANCE)) {
-				if (target_resists_magic(mage, target_r, TYP_REGION, 0)) {
-					/* Fehlermeldung */
+      sa = calloc(1, sizeof(spellparameter));
+      sa->length = 1;
+      sa->param = calloc(sa->length, sizeof(spllprm *));
+      sa->param[0] = spobj;
+      co->par = sa;
+
+      if ((sp->sptyp & TESTRESISTANCE)) {
+        if (target_resists_magic(mage, target_r, TYP_REGION, 0)) {
+          /* Fehlermeldung */
           ADDMSG(&mage->faction->msgs, msg_message("spellregionresists", 
             "unit region command", mage, mage->region, co->order));
-					spobj->flag = TARGET_RESISTS;
-					++*resist;
-				} else {
-					++*success;
-				}
-			} else {
-				++*success;
-			}
-		}
-	}
+          spobj->flag = TARGET_RESISTS;
+          ++*resist;
+        } else {
+          ++*success;
+        }
+      } else {
+        ++*success;
+      }
+    } else {
+      ++*success;
+    }
+  }
 }
 
 /* ------------------------------------------------------------- */
