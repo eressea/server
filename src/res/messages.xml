@@ -1465,6 +1465,7 @@
   <message name="summonundead_effect_2" section="magic">
     <type>
       <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
     </type>
     <text locale="de">"$unit($mage) stört in $region($region) die Ruhe der Toten."</text>
     <text locale="en">"$unit($mage) communicates with the dead in $region($region)."</text>
