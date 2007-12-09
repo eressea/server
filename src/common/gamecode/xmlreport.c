@@ -89,9 +89,10 @@ xml_s(const char * str)
   const char * inbuf = str;
   unsigned char * outbuf = buffer;
   size_t inbytes = strlen(str)+1;
-  size_t outbytes = sizeof(buffer);
+  size_t outbytes = sizeof(buffer) - 1;
 
   unicode_latin1_to_utf8(outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
+  buffer[outbytes] = 0;
   return buffer;
 }
 
