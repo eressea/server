@@ -1184,6 +1184,8 @@ prepare_report(faction * f)
   region * r = firstregion(f);
   region * last = lastregion(f);
 
+  link_seen(f->seen, r, last);
+
   for (sr=NULL; sr==NULL && r!=last; r=r->next) {
     sr = find_seen(f->seen, r);
   }
