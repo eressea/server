@@ -1736,9 +1736,8 @@ mail_cmd(unit * u, struct order * ord)
         break;
       } else {
         ADDMSG(&r->msgs, msg_message("mail_result", "unit message", u, s));
-        break;
+        return 0;
       }
-      break;
 
     case P_FACTION:
       {
@@ -1764,8 +1763,8 @@ mail_cmd(unit * u, struct order * ord)
           break;
         }
         mailfaction(u, n, ord, s);
+        return 0;
       }
-      break;
 
     case P_UNIT:
       {
@@ -1781,7 +1780,7 @@ mail_cmd(unit * u, struct order * ord)
 
         if (see == false) {
           ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-          break;
+          return 0;
         }
 
         s = getstrtoken();
@@ -1802,8 +1801,8 @@ mail_cmd(unit * u, struct order * ord)
 
           mailunit(r, u, n, ord, s);
         }
+        return 0;
       }
-      break;
 
     case P_BUILDING:
     case P_GEBAEUDE:
@@ -1831,8 +1830,8 @@ mail_cmd(unit * u, struct order * ord)
               fset(u2->faction, FFL_SELECT);
             }
         }
+        return 0;
       }
-      break;
 
     case P_SHIP:
       {
@@ -1853,14 +1852,13 @@ mail_cmd(unit * u, struct order * ord)
         for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
 
         for(u2=r->units; u2; u2=u2->next) {
-          if(u2->ship == sh && !fval(u2->faction, FFL_SELECT)
-            && cansee(u->faction, r, u2, 0)) {
-              mailunit(r, u, u2->no, ord, s);
-              fset(u2->faction, FFL_SELECT);
-            }
+          if(u2->ship == sh && !fval(u2->faction, FFL_SELECT) && cansee(u->faction, r, u2, 0)) {
+            mailunit(r, u, u2->no, ord, s);
+            fset(u2->faction, FFL_SELECT);
+          }
         }
+        return 0;
       }
-      break;
 
     default:
       /* possibly filler token? */

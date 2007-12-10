@@ -6335,11 +6335,6 @@ sp_flying_ship(castorder *co)
     return 0;
   }
 
-  if (sh->type->cargo>50000) {
-    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_flying_ship_too_big", "ship", sh));
-    return 0;
-  }
-
   /* Duration = 1, nur diese Runde */
   c = shipcurse_flyingship(sh, mage, power, 1);
   if (c==NULL) {

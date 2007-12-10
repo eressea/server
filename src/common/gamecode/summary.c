@@ -181,7 +181,7 @@ report_summary(summary * s, summary * o, boolean full)
     const race * rc = new_race[i];
     if (s->factionrace[i] && rc && playerrace(rc)
       && i != RC_TEMPLATE && i != RC_CLONE) {
-        fprintf(F, "%14svölker: %s\n", LOC(default_locale, rc_name(rc, 3)),
+        fprintf(F, "%13svoelker: %s\n", LOC(default_locale, rc_name(rc, 3)),
           pcomp(s->factionrace[i], o->factionrace[i]));
     }
   }
@@ -224,13 +224,13 @@ report_summary(summary * s, summary * o, boolean full)
 
   if (full) {
     fprintf(F, "\nWaffen:               %s\n", pcomp(s->waffen,o->waffen));
-    fprintf(F, "Rüstungen:            %s\n",
+    fprintf(F, "Ruestungen:           %s\n",
       pcomp(s->ruestungen,o->ruestungen));
-    fprintf(F, "ungezähmte Pferde:    %s\n", pcomp(s->pferde, o->pferde));
-    fprintf(F, "gezähmte Pferde:      %s\n",
+    fprintf(F, "ungezaehmte Pferde:   %s\n", pcomp(s->pferde, o->pferde));
+    fprintf(F, "gezaehmte Pferde:     %s\n",
       pcomp(s->spielerpferde,o->spielerpferde));
     fprintf(F, "Schiffe:              %s\n", pcomp(s->schiffe, o->schiffe));
-    fprintf(F, "Gebäude:              %s\n", pcomp(s->gebaeude, o->gebaeude));
+    fprintf(F, "Gebaeude:             %s\n", pcomp(s->gebaeude, o->gebaeude));
 
     fprintf(F, "\nBauernpopulation:     %s\n", pcomp(s->peasants,o->peasants));
 

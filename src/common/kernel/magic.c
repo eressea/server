@@ -1337,7 +1337,7 @@ do_fumble(castorder *co)
     /* temporärer Stufenverlust */
     duration = max(rng_int()%level/2, 2);
     effect.i = -(level/2);
-    c = create_curse(u, &u->attribs, ct_find("skil"), level, duration,
+    c = create_curse(u, &u->attribs, ct_find("skill"), level, duration,
       effect, 1);
     c->data.i = SK_MAGIC;
     ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
