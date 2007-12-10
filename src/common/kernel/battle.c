@@ -701,11 +701,11 @@ select_armor(troop t, boolean shield)
   const armor * a = t.fighter->armors;
   int geschuetzt = 0;
 
-  /* Drachen benutzen keine Rüstungen */
+  /* dragons do not use armor */
   if (!(u->race->battle_flags & BF_EQUIPMENT))
     return NULL;
 
-  /* ... und Werwölfe auch nicht */
+  /* ... neither do werewolves */
   if (fval(u, UFL_WERE)) {
     return NULL;
   }

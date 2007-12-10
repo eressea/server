@@ -935,10 +935,20 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     new_order = default_order(lang);
   } else if (n!=INT_MAX) {
     /* reduzierte restgröße */
-    new_order = create_order(K_MAKE, lang, "%d '%s' %i", n-built, btname, b->no);
+    const char * hasspace = strchr(btname, ' ');
+    if (hasspace) {
+      new_order = create_order(K_MAKE, lang, "%d \"%s\" %i", n-built, btname, b->no);
+    } else {
+      new_order = create_order(K_MAKE, lang, "%d %s %i", n-built, btname, b->no);
+    }
   } else if (btname) {
     /* Neues Haus, Befehl mit Gebäudename */
-    new_order = create_order(K_MAKE, lang, "'%s' %i", btname, b->no);
+    const char * hasspace = strchr(btname, ' ');
+    if (hasspace) {
+      new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);
+    } else {
+      new_order = create_order(K_MAKE, lang, "%s %i", btname, b->no);
+    }
   }
 
   if (new_order) {
