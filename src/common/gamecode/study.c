@@ -395,7 +395,7 @@ teach_cmd(unit * u, struct order * ord)
 
       /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
        * ihre neuen Nummern übersetzt. */
-      strcat(zOrder, " ");
+      if (zOrder[0]) strcat(zOrder, " ");
       strcat(zOrder, unitid(u2));
 
       if (get_keyword(u2->thisorder) != K_STUDY) {

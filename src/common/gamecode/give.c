@@ -184,7 +184,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
   } else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
     error = 312;
   } else if (u2 && u2->number!=0 && u2->race != u->race) {
-    log_warning(("facion %s attempts to give %s to faction %s.\n",
+    log_warning(("faction %s attempts to give %s to faction %s.\n",
                  itoa36(u->faction->no), u->race->_name[0],
                  u2->race->_name[1]));
     error = 139;

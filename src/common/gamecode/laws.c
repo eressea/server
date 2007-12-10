@@ -3420,12 +3420,12 @@ defaultorders (void)
       while (*ordp!=NULL) {
         order * ord = *ordp;
         if (get_keyword(ord)==K_DEFAULT) {
-          const char * cmd;
+          char lbuf[8192];
           order * new_order;
           init_tokens(ord);
           skip_token(); /* skip the keyword */
-          cmd = getstrtoken();
-          new_order = parse_order(cmd, u->faction->locale);
+          strcpy(lbuf, getstrtoken());
+          new_order = parse_order(lbuf, u->faction->locale);
           *ordp = ord->next;
           ord->next = NULL;
           free_order(ord);
