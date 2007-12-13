@@ -659,9 +659,13 @@ uunhash (unit * u)
 unit *
 ufindhash (int i)
 {
-  unit * u = unithash[i % UMAXHASH];
-  while (u && u->no!=i) u = u->nexthash;
-  return u;
+  assert(i>=0);
+  if (i>=0) {
+    unit * u = unithash[i % UMAXHASH];
+    while (u && u->no!=i) u = u->nexthash;
+    return u;
+  }
+  return NULL;
 }
 
 #define FMAXHASH 2039
