@@ -37,7 +37,7 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
-
+#include <util/unicode.h>
 #include <attributes/otherfaction.h>
 
 /* libc includes */
