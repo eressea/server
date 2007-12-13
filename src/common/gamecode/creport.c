@@ -1111,11 +1111,12 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
         }
       }
       if (cs) {
+        const char * bname = b->type->__name; /* bug 1326 - I hate this */
         fprintf(F, "GRENZE %d\n", ++g);
-        fprintf(F, "\"%s\";typ\n", b->type->name(b, r, f, GF_NONE));
+        fprintf(F, "\"%s\";typ\n", LOC(default_locale, bname));
         fprintf(F, "%d;richtung\n", d);
         if (!b->type->transparent(b, f)) fputs("1;opaque\n", F);
-        /* pfusch: */
+        /* hack: */
         if (b->type==&bt_road) {
           int p = rroad(r, d)*100/r->terrain->max_road;
           fprintf(F, "%d;prozent\n", p);
