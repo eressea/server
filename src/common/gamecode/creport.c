@@ -431,11 +431,12 @@ cr_regions(variant var, char * buffer, const void * userdata)
 {
   faction * f = (faction*)userdata;
   const arg_regions * rdata = (const arg_regions *)var.v;
-  char * wp = buffer;
 
   if (rdata!=NULL && rdata->nregions>0) {
     region * r = rdata->regions[0];
     int i, z = r->planep?r->planep->id:0;
+    char * wp = buffer;
+
     wp += sprintf(wp, "\"%d %d %d", region_x(r, f), region_y(r, f), z);
     for (i=1;i!=rdata->nregions;++i) {
       r = rdata->regions[i];
@@ -443,6 +444,8 @@ cr_regions(variant var, char * buffer, const void * userdata)
       wp += sprintf(wp, ", %d %d %d", region_x(r, f), region_y(r, f), z);
     }
     strcat(wp, "\"");
+  } else {
+    strcpy(buffer, "\"\"");
   }
   return 0;
 }

@@ -198,7 +198,7 @@ curse_read(attrib * a, FILE * f)
 
   /* beim Einlesen sind noch nicht alle units da, muss also
    * zwischengespeichert werden. */
-  if (mageid.i == -1){
+  if (mageid.i < 0) {
     c->magician = (unit *)NULL;
   } else {
     ur_add(mageid, (void**)&c->magician, resolve_unit);
@@ -230,8 +230,9 @@ curse_write(const attrib * a, FILE * f)
   /* copied from c_clearflag */
   flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
 
-  if (c->magician) {
+  if (c->magician && c->magician->number) {
     mage_no = c->magician->no;
+    assert(mage_no>0);
   } else {
     mage_no = -1;
   }
