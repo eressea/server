@@ -179,8 +179,8 @@ checkpasswd(const faction * f, const char * passwd, boolean shortp)
     slist = slist->next;
   }
 #endif
-  if (strcmp(f->passw, passwd)==0) return true;
-  if (strcmp(f->override, passwd)==0) return true;
+  if (unicode_utf8_strcasecmp(f->passw, passwd)==0) return true;
+  if (unicode_utf8_strcasecmp(f->override, passwd)==0) return true;
   return false;
 }
 

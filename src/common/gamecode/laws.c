@@ -3986,7 +3986,7 @@ writepasswd(void)
   F = cfopen(zText, "w");
   if (F) {
     faction *f;
-    puts("Schreibe Passwörter...");
+    puts("writing passwords...");
 
     for (f = factions; f; f = f->next) {
       fprintf(F, "%s:%s:%s:%s:%u\n",
