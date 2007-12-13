@@ -424,32 +424,32 @@ border_type bt_questportal = {
 static const char *
 b_nameroad(const border * b, const region * r, const struct faction * f, int gflags)
 {
-	region * r2 = (r==b->to)?b->from:b->to;
-	int local = (r==b->from)?b->data.sa[0]:b->data.sa[1];
-	static char buffer[64];
+  region * r2 = (r==b->to)?b->from:b->to;
+  int local = (r==b->from)?b->data.sa[0]:b->data.sa[1];
+  static char buffer[64];
 
-	unused(f);
-	if (gflags & GF_ARTICLE) {
-		if (!(gflags & GF_DETAILED)) return LOC(f->locale, "nr_a_road");
-		else if (r->terrain->max_road<=local) {
+  unused(f);
+  if (gflags & GF_ARTICLE) {
+    if (!(gflags & GF_DETAILED)) return LOC(f->locale, "nr_a_road");
+    else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
-			if (r2->terrain->max_road<=remote) {
-				return LOC(f->locale, "nr_a_road");
-			} else {
-				return LOC(f->locale, "nr_an_incomplete_road");
-			}
-		} else {
-			int percent = max(1, 100*local/r->terrain->max_road);
-			if (local) {
-				sprintf(buffer, LOC(f->locale, "nr_road_percent"), percent);
-			} else {
-				return LOC(f->locale, "nr_a_road_connection");
-			}
-		}
-	}
-	else if (gflags & GF_PLURAL) return LOC(f->locale, "nr_roads");
-	else return LOC(f->locale, "nr_road");
-	return buffer;
+      if (r2->terrain->max_road<=remote) {
+        return LOC(f->locale, "nr_a_road");
+      } else {
+        return LOC(f->locale, "nr_an_incomplete_road");
+      }
+    } else {
+      int percent = max(1, 100*local/r->terrain->max_road);
+      if (local) {
+        snprintf(buffer, sizeof(buffer), LOC(f->locale, "nr_road_percent"), percent);
+      } else {
+        return LOC(f->locale, "nr_a_road_connection");
+      }
+    }
+  }
+  else if (gflags & GF_PLURAL) return LOC(f->locale, "nr_roads");
+  else return LOC(f->locale, "nr_road");
+  return buffer;
 }
 
 static void
