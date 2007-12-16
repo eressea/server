@@ -134,10 +134,10 @@ read_game(const char * filename)
 static int
 write_game(const char *filename)
 {
-  free_units();
+  int result;
   remove_empty_factions(true);
-
-  return writegame(filename, 0);
+  result = writegame(filename, 0);
+  return result;
 }
 
 static summary * sum_begin = 0;

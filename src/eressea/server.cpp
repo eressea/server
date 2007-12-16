@@ -333,9 +333,11 @@ static void
 game_done(void)
 {
   /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
-  * zum Debugging interessant, wenn man Leak Detection hat, und nach
-  * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
-  * wird (temporäre Hilsstrukturen) */
+   * zum Debugging interessant, wenn man Leak Detection hat, und nach
+   * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
+   * wird (temporäre Hilsstrukturen) */
+
+  free_units();
 
   while (regions) {
     region *r = regions;
