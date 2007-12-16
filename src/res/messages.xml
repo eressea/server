@@ -1439,7 +1439,7 @@
   </message>
 
   <message name="chaosgate_effect_2" section="magic">
-    <text locale="de">Ein Wirbel aus blendendem Licht erscheint."</text>
+    <text locale="de">"Ein Wirbel aus blendendem Licht erscheint."</text>
     <text locale="en">"A vortex of blinding light appears."</text>
   </message>
 
