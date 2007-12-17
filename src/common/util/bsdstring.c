@@ -1,6 +1,7 @@
 #include <config.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 
 #ifndef HAVE_INLINE
 #include "bsdstring.h"
@@ -9,6 +10,15 @@
 INLINE_FUNCTION int
 wrptr(char ** ptr, size_t * size, int bytes)
 {
+  assert(bytes>=0 || !"you're not using snprintf right, maybe?");
+
+  if (bytes==0) {
+    return 0;
+  }
+  if (bytes<0) {
+    *size = 0;
+    return EINVAL;
+  }
   if (bytes<=*(int*)size) {
     *ptr += bytes;
     *size -= bytes;

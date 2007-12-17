@@ -221,7 +221,7 @@ fwritestr(FILE * F, const char * str)
 {
   int nwrite = 0;
   fputc('\"', F);
-  while (*str) {
+  if (str) while (*str) {
     int c = (int)(unsigned char)*str++;
     switch (c) {
       case '"':

@@ -314,7 +314,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
         if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
           faction * f = get_otherfaction(a_otherfaction);
           bytes = snprintf(bufp, size, ", %s (%s)", factionname(f), factionname(u->faction));
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+          if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
         } else {
           bytes = (int)strlcpy(bufp, ", ", size);
           if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
@@ -333,7 +333,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
   } else {
     bytes = snprintf(bufp, size, "%d ", u->number);
   }
-  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
   pzTmp = get_racename(u->attribs);
   if (pzTmp) {
@@ -462,7 +462,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
 
     if (!dh) {
       bytes = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       dh = 1;
     }
     if (in == 1) {
@@ -470,7 +470,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
     } else {
       bytes = snprintf(bufp, size, "%d %s", in, ic);
     }
-    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
   if (show!=u->items) while (show) i_free(i_remove(&show, show));
 
@@ -481,7 +481,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
       spell_list *slist = m->spells;
       int t = effskill(u, SK_MAGIC);
       int bytes = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region,u));
-      if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
       for (dh=0; slist; slist=slist->next) {
         spell * sp = slist->data;
@@ -492,9 +492,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
         } else {
           bytes = (int)strlcpy(bufp, ", ", size);
         }
-        if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
         bytes = (int)strlcpy(bufp, spell_name(sp, f->locale), size);
-        if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       }
 
       for (i=0; i!=MAXCOMBATSPELLS; ++i) {
@@ -502,7 +502,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
       }
       if (i!=MAXCOMBATSPELLS) {
         bytes = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
-        if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
         dh = 0;
         for (i = 0; i < MAXCOMBATSPELLS; i++){
@@ -525,7 +525,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
 
             if (sl > 0) {
               bytes = snprintf(bufp, size, " (%d)", sl);
-              if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+              if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
             }
           } else {
             bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_nospells"), size);
@@ -1790,7 +1790,7 @@ eval_resources(struct opstack ** stack, const void * userdata) /* order -> strin
   while (res!=NULL && size > 4) {
     const char * rname = resourcename(res->type, (res->number!=1)?NMF_PLURAL:0);
     int bytes = snprintf(bufp, size, "%d %s", res->number, LOC(report->locale, rname));
-    if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
     res = res->next;
     if (res!=NULL && size>2) {
@@ -1844,7 +1844,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
   const faction * report = (const faction*)userdata;
   int i, end = 0, begin = 0;
   const arg_regions * regions = (const arg_regions *)opop(stack).v;
-  static char buf[256];
+  static char buf[512];
   size_t size = sizeof(buf) - 1;
   variant var;
   char * bufp = buf;
@@ -1856,7 +1856,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
       const char * trail = trailinto(r, report->locale);
       const char * rn = f_regionid_s(r, report);
       int bytes = snprintf(bufp, size, trail, rn);
-      if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
       if (i+2<end) {
         bytes = (int)strlcpy(bufp, ", ", size);
