@@ -67,8 +67,7 @@ static struct curse_type ct_auraboost = {
 /* Magic Boost - Gabe des Chaos */
 static struct curse_type ct_magicboost = {
   "magicboost",
-  CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_IMMUNE, M_MEN,
-  NULL
+  CURSETYP_UNIT, CURSE_SPREADMODULO|CURSE_IMMUNE, M_MEN, cinfo_simple
 };
 
 /* ------------------------------------------------------------- */
