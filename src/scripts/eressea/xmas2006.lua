@@ -14,8 +14,6 @@ function update_xmas2006()
   if season == "calendar::winter" then
     print("it is " .. season .. ", the christmas trees do their magic")
     local msg = message("xmastree_effect")
-    local nextseason = get_season(turn-1)
-    local clear = (nextseason ~= "calendar::winter")
     for r in regions() do
       if r:get_key("xm06") then
         trees = r:get_resource("tree")
@@ -24,7 +22,15 @@ function update_xmas2006()
           msg:send_region(r)
         end
         if clear then
-          -- we celebrate knut and kick out the trees.
+        end
+      end
+    end
+  else
+    local prevseason = get_season(turn-1)
+    if prevseason == "calendar::winter" then
+      -- we celebrate knut and kick out the trees.
+      for r in regions() do
+        if r:get_key("xm06") then
           r:set_key("xm06", false)
         end
       end
