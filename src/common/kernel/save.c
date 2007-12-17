@@ -1025,8 +1025,8 @@ writeunit(FILE * F, const unit * u)
   int i, p = 0;
   wi36(F, u->no);
   wi36(F, u->faction->no);
-  ws(F, (const char *)u->name);
-  ws(F, u->display?(const char *)u->display:"");
+  fwritestr(F, (const char *)u->name);
+  fwritestr(F, u->display?(const char *)u->display:"");
   wi(F, u->number);
   wi(F, u->age);
   ws(F, u->race->_name[0]);
@@ -1247,7 +1247,7 @@ readregion(FILE * F, int encoding, short x, short y)
 void
 writeregion(FILE * F, const region * r)
 {
-  ws(F, r->display?(const char *)r->display:"");
+  fwritestr(F, r->display?(const char *)r->display:"");
   ws(F, r->terrain->_name);
   wi(F, r->flags & RF_SAVEMASK);
   wi(F, r->age);
@@ -1256,7 +1256,7 @@ writeregion(FILE * F, const region * r)
     const item_type *rht;
     struct demand * demand;
     rawmaterial * res = r->resources;
-    ws(F, (const char *)r->land->name);
+    fwritestr(F, (const char *)r->land->name);
     assert(rtrees(r,0)>=0);
     assert(rtrees(r,1)>=0);
     assert(rtrees(r,2)>=0);
@@ -1466,8 +1466,8 @@ writefaction(FILE * F, const faction * f)
     else wi36(F, 0);
   }
 
-  ws(F, (const char *)f->name);
-  ws(F, (const char *)f->banner);
+  fwritestr(F, (const char *)f->name);
+  fwritestr(F, (const char *)f->banner);
   ws(F, f->email);
   ws(F, (const char *)f->passw);
   ws(F, (const char *)f->override);
@@ -1848,7 +1848,7 @@ writegame(const char *filename, int quiet)
   wnl(F);
 
   base = strrchr(xmlfile, '/');
-  if(base) {
+  if (base) {
     ws(F, base+1);
   } else {
     ws(F, xmlfile);
@@ -1870,7 +1870,7 @@ writegame(const char *filename, int quiet)
   for(pl = planes; pl; pl=pl->next) {
     watcher * w;
     wi(F, pl->id);
-    ws(F, pl->name);
+    fwritestr(F, pl->name);
     wi(F, pl->minx);
     wi(F, pl->maxx);
     wi(F, pl->miny);
@@ -1928,8 +1928,8 @@ writegame(const char *filename, int quiet)
     wnl(F);
     for (b = r->buildings; b; b = b->next) {
       wi36(F, b->no);
-      ws(F, b->name);
-      ws(F, b->display?b->display:"");
+      fwritestr(F, b->name);
+      fwritestr(F, b->display?b->display:"");
       wi(F, b->size);
       ws(F, b->type->_name);
       wnl(F);
@@ -1942,8 +1942,8 @@ writegame(const char *filename, int quiet)
     for (sh = r->ships; sh; sh = sh->next) {
       assert(sh->region == r);
       wi36(F, sh->no);
-      ws(F, (const char *)sh->name);
-      ws(F, sh->display?(const char *)sh->display:"");
+      fwritestr(F, (const char *)sh->name);
+      fwritestr(F, sh->display?(const char *)sh->display:"");
       ws(F, sh->type->name[0]);
       wi(F, sh->size);
       wi(F, sh->damage);

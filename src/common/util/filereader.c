@@ -242,17 +242,12 @@ getbuf_utf8(FILE * F)
         break;
       }
 
-      if (iswcntrl(ucs)) {
-        if (!comment && cp<fbuf+MAXLINE) {
-          *cp++ = iswspace(*bp)?' ':'?';
-        }
-        bp+=size;
-      } else if (iswspace(ucs)) {
+      if (iswspace(ucs)) {
         if (!quote) {
-          bp+=size;
-          ret = eatwhite(bp, &size);
-          if (!comment && *bp && *bp!=COMMENT_CHAR && cp<fbuf+MAXLINE) *(cp++) = ' ';
           bp += size;
+          ret = eatwhite(bp, &size);
+          bp += size;
+          if (!comment && *bp && *bp!=COMMENT_CHAR && cp<fbuf+MAXLINE) *(cp++) = ' ';
           if (ret!=0) {
             unicode_warning(bp);
             break;
@@ -267,8 +262,12 @@ getbuf_utf8(FILE * F)
         } else {
           bp+=size;
         }
-      }
-      else {
+      } else if (iswcntrl(ucs)) {
+        if (!comment && cp<fbuf+MAXLINE) {
+          *cp++ = '?';
+        }
+        bp+=size;
+      } else {
         if (*bp==CONTINUE_CHAR) {
           const char * end;
           eatwhite(bp+1, &white);

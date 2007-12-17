@@ -1931,7 +1931,7 @@ password_cmd(unit * u, struct order * ord)
     pwbuf[31] = 0;
     c = pwbuf;
     while (*c && pwok) {
-      if (!isalnum(*c)) pwok = false;
+      if (!isalnum(*(unsigned char*)c)) pwok = false;
       c++;
     }
   }
