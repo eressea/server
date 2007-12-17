@@ -2127,7 +2127,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
 
       rnl(F);
       centre(F, LOC(f->locale, pname), true);
-      sprintf(buf, "%s %d", LOC(f->locale, "nr_level"), ptype->level);
+      snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"), ptype->level);
       centre(F, buf, true);
       rnl(F);
       
@@ -2136,7 +2136,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
       bytes = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       while (m->number) {
-        bytes = (int)strlcpy(bufp, resourcename(m->rtype, 0), size);
+        bytes = (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
         ++m;
         if (m->number)

@@ -25,6 +25,11 @@
       <text locale="de">Keine Informationen über diese Rasse verfügbar.</text>
       <text locale="en">No Information available for this race.</text>
     </string>
+    <string name="songdragon">
+      <text locale="de">Singdrachen sind von der Größe eines ausgewachsenden Tigers. Ihre Färbung reicht von schillerndem Rot, über dunkles Grün bis hin zu tiefem Schwarz. Alle bekannten Drachen dieser Art weisen eine hohe Intelligenz und ein hohes Maß an magischen Fähigkeiten auf. Wie Ihre großen Verwandten verfügen sie über einen Feuerodem. Sie lieben den Gesang und das üppige Mahl. Von Zeit zu Zeit gehen sie eine engen magisches Bund zu einem Magier ein. Wenn dies geschieht, so steht dem Magier ein äußerst loyaler und lohnender Vertrauter zur Seite.
+</text>
+      <text locale="en">Song Dragons are roughly the size of a fully grown tiger. Their coloring ranges from bright red, through a dark green shade to a deep black. All known dragons of this species display a high level of intelligence and highly developed magical skills. Like their larger cousins, Song Dragons posess a firegland. They love singing and a good meal. From time to time one of these magnificent creatures will bond with a mage. When this happens, the mage is assured of a most loyal and useful familiar at his side.</text>
+    </string>
     <string name="unicorn">
       <text locale="de">Dieses mystische Wesen lebt bevorzugt in den tiefsten Wäldern und
         vermag sich hervorragend vor den Augen anderer zu verbergen. Nur
@@ -2847,19 +2852,19 @@
 
     <string name="songdragon">
       <text locale="de">Singdrache</text>
-      <text locale="en">songdragon</text>
+      <text locale="en">song dragon</text>
     </string>
     <string name="songdragon_p">
       <text locale="de">Singdrachen</text>
-      <text locale="en">songdragons</text>
+      <text locale="en">song dragons</text>
     </string>
     <string name="songdragon_d">
       <text locale="de">Singdrachen</text>
-      <text locale="en">songdragons</text>
+      <text locale="en">song dragons</text>
     </string>
     <string name="songdragon_x">
       <text locale="de">Singdrachen</text>
-      <text locale="en">songdragon</text>
+      <text locale="en">song dragon</text>
     </string>
 
     <string name="rat">
