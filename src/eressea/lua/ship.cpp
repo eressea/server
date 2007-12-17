@@ -3,9 +3,10 @@
 #include "objects.h"
 
 // kernel includes
-#include <build.h>
-#include <ship.h>
-#include <region.h>
+#include <kernel/build.h>
+#include <kernel/ship.h>
+#include <kernel/region.h>
+#include <kernel/move.h>
 
 // lua includes
 #pragma warning (push)
@@ -70,6 +71,18 @@ ship_getcapacity(const ship& s) {
   return shipcapacity(&s);
 }
 
+static void
+ship_setregion(ship& sh, region& r)
+{
+  move_ship(&sh, sh.region, &r, NULL);
+}
+
+static region *
+ship_getregion(const ship& sh)
+{
+  return sh.region;
+}
+
 void
 bind_ship(lua_State * L) 
 {
@@ -85,7 +98,7 @@ bind_ship(lua_State * L)
     .property("capacity", &ship_getcapacity)
     .property("maxsize", &ship_maxsize)
     .def_readonly("name", &ship::name)
-    .def_readonly("region", &ship::region)
+    .property("region", &ship_getregion, &ship_setregion)
     .def_readonly("id", &ship::no)
     .def_readonly("info", &ship::display)
     .def_readwrite("damage", &ship::damage)
