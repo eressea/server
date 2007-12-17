@@ -3364,9 +3364,9 @@ sp_summonshadow(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   unit *u;
-  int val;
+  int val, number = (int)(force*force);
 
-  u = create_unit(r, mage->faction, (int)(force*force), new_race[RC_SHADOW], 0, NULL, mage);
+  u = create_unit(r, mage->faction, number, new_race[RC_SHADOW], 0, NULL, mage);
 
   /* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
   val = get_level(mage, SK_MAGIC) + get_level(mage, SK_STEALTH);
@@ -3375,7 +3375,7 @@ sp_summonshadow(castorder *co)
   set_level(u, SK_OBSERVATION, 1);
 
   ADDMSG(&mage->faction->msgs, msg_message("summonshadow_effect",
-    "mage number", mage, force*force));
+    "mage number", mage, number));
 
   return cast_level;
 }
