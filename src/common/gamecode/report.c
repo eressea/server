@@ -1033,9 +1033,9 @@ describe(FILE * F, const region * r, int partial, faction * f)
     int nrd = 0;
 
     /* Nachbarregionen, die gesehen werden, ermitteln */
-    for (d = 0; d != MAXDIRECTIONS; d++)
+    for (d = 0; d != MAXDIRECTIONS; d++) {
       if (see[d] && rconnect(r, d)) nrd++;
-
+    }
     /* list directions */
 
     dh = false;
@@ -1055,7 +1055,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
         bytes = (int)strlcpy(bufp, LOC(f->locale, directions[d]), size);
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp++, " ", size);
+        bytes = (int)strlcpy(bufp, " ", size);
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
         f_regionid(r2, f, regname, sizeof(regname));
         bytes = snprintf(bufp, size, trailinto(r2, f->locale), regname);
