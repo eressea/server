@@ -278,11 +278,14 @@ age_borders(void)
 static const char *
 b_namewall(const border * b, const region * r, const struct faction * f, int gflags)
 {
+  const char * bname = "wall";
+
   unused(f);
   unused(r);
   unused(b);
-  if (gflags & GF_ARTICLE) return "a_wall";
-  return "wall";
+  if (gflags & GF_ARTICLE) bname = "a_wall";
+  if (gflags & GF_PURE) return bname;
+  return LOC(f->locale, mkname("border", bname));
 }
 
 border_type bt_wall = {
@@ -319,8 +322,9 @@ b_namefogwall(const border * b, const region * r, const struct faction * f, int 
   unused(f);
   unused(b);
   unused(r);
-  if (gflags & GF_ARTICLE) return "a_fogwall";
-  return "fogwall";
+  if (gflags & GF_PURE) return "fogwall";
+  if (gflags & GF_ARTICLE) return LOC(f->locale, mkname("border", "a_fogwall"));
+  return LOC(f->locale, mkname("border", "fogwall"));
 }
 
 static boolean
@@ -349,11 +353,15 @@ border_type bt_fogwall = {
 static const char *
 b_nameillusionwall(const border * b, const region * r, const struct faction * f, int gflags)
 {
+  /* TODO: UNICODE: f->locale bestimmt die Sprache */
   int fno = b->data.i;
   unused(b);
   unused(r);
-  if (gflags & GF_ARTICLE) return (f && fno==f->subscription)?"an_illusionwall":"a_wall";
-  return (f && fno==f->no)?"illusionwall":"wall";
+  if (gflags & GF_PURE) return (f && fno==f->no)?"illusionwall":"wall";
+  if (gflags & GF_ARTICLE) {
+    return LOC(f->locale, mkname("border", (f && fno==f->subscription)?"an_illusionwall":"a_wall"));
+  }
+  return LOC(f->locale, mkname("border", (f && fno==f->no)?"illusionwall":"wall"));
 }
 
 border_type bt_illusionwall = {
@@ -382,23 +390,27 @@ boolean b_blockquestportal(const border * b, const unit * u, const region * r) {
 static const char *
 b_namequestportal(const border * b, const region * r, const struct faction * f, int gflags)
 {
+  /* TODO: UNICODE: f->locale bestimmt die Sprache */
+  const char * bname;
   int lock = b->data.i;
   unused(b);
   unused(r);
 
   if (gflags & GF_ARTICLE) {
-    if(lock > 0) {
-      return "a_gate_locked";
+    if (lock > 0) {
+      bname = "a_gate_locked";
     } else {
-      return "a_gate_open";
+      bname = "a_gate_open";
     }
   } else {
-    if(lock > 0) {
-      return "gate_locked";
+    if (lock > 0) {
+      bname = "gate_locked";
     } else {
-      return "gate_open";
+      bname = "gate_open";
     }
   }
+  if (gflags & GF_PURE) return bname;
+  return LOC(f->locale, mkname("border", bname));
 }
 
 border_type bt_questportal = {
@@ -427,26 +439,27 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
   static char buffer[64];
 
   unused(f);
+  if (gflags & GF_PURE) return "road";
   if (gflags & GF_ARTICLE) {
-    if (!(gflags & GF_DETAILED)) return "a_road";
+    if (!(gflags & GF_DETAILED)) return LOC(f->locale, mkname("border", "a_road"));
     else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
       if (r2->terrain->max_road<=remote) {
-        return "a_road";
+        return LOC(f->locale, mkname("border", "a_road"));
       } else {
-        return "an_incomplete_road";
+        return LOC(f->locale, mkname("border", "an_incomplete_road"));
       }
     } else {
       int percent = max(1, 100*local/r->terrain->max_road);
       if (local) {
-        snprintf(buffer, sizeof(buffer), "a_road_percent", percent);
+        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border", "road_percent")), percent);
       } else {
-        return "a_road_connection";
+        return LOC(f->locale, mkname("border", "a_road_connection"));
       }
     }
   }
-  else if (gflags & GF_PLURAL) return "roads";
-  else return "road";
+  else if (gflags & GF_PLURAL) return LOC(f->locale, mkname("border", "roads"));
+  else return LOC(f->locale, mkname("border", "road"));
   return buffer;
 }
 

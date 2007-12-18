@@ -7524,13 +7524,13 @@
       <text locale="en">a massive open door</text>
     </string>
 
-    <string name="gate_closed">
-      <text locale="de">gewaltiges geschlossenes Tor</text>
+    <string name="gate_locked">
+      <text locale="de">gewaltiges verschlossenes Tor</text>
       <text locale="en">massive locked door</text>
     </string>
 
-    <string name="a_gate_closed">
-      <text locale="de">ein gewaltiges geschlossenes Tor</text>
+    <string name="a_gate_locked">
+      <text locale="de">ein gewaltiges verschlossenes Tor</text>
       <text locale="en">a massive locked door</text>
     </string>
 

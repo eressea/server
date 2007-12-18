@@ -840,7 +840,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
   const char *tname;
   struct edge {
     struct edge * next;
-    const char * name;
+    char * name;
     boolean transparent;
     boolean block;
     boolean exist[MAXDIRECTIONS];
@@ -868,10 +868,10 @@ describe(FILE * F, const region * r, int partial, faction * f)
         b = b->next;
         continue;
       }
-      while (e && (e->transparent != transparent || strcmp(name, e->name))) e = e->next;
+      while (e && (e->transparent != transparent || strcmp(name,e->name))) e = e->next;
       if (!e) {
         e = calloc(sizeof(struct edge), 1);
-        e->name = name;
+        e->name = strdup(name);
         e->transparent = transparent;
         e->next = edges;
         edges = e;
@@ -989,7 +989,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
     bytes = (int)strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)), size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
-  /* horses */
+  /* Pferde */
 
   if (rhorses(r)) {
     bytes = snprintf(bufp, size, ", %d ", rhorses(r));
@@ -1152,7 +1152,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
     if (!e->transparent) bytes = (int)strlcpy(bufp, " versperrt ", size);
     else bytes = (int)strlcpy(bufp, " befindet sich ", size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    bytes = (int)strlcpy(bufp, LOC(f->locale, mkname("border", e->name)), size);
+    bytes = (int)strlcpy(bufp, e->name, size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     if (!e->transparent) bytes = (int)strlcpy(bufp, " die Sicht.", size);
     else bytes = (int)strlcpy(bufp, ".", size);
@@ -1163,6 +1163,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
   if (edges) {
     while (edges) {
       e = edges->next;
+      free(edges->name);
       free(edges);
       edges = e;
     }

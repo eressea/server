@@ -545,7 +545,7 @@ sp_summon_familiar(castorder *co)
   int dh, dh1, bytes;
   direction_t d;
   message * msg;
-  char zText[1024], * bufp = zText;
+  char zText[NAMESIZE], * bufp = zText;
   size_t size = sizeof(zText) - 1;
 
   if (get_familiar(mage) != NULL ) {
@@ -2810,13 +2810,15 @@ resolve_buddy(variant data)
 static const char *
 b_namefirewall(const border * b, const region * r, const faction * f, int gflags)
 {
+  const char * bname;
   unused(f);
   unused(r);
   unused(b);
-  if (gflags & GF_ARTICLE)
-    return "a_firewall";
-  else
-    return "firewall";
+  if (gflags & GF_ARTICLE) bname = "a_firewall";
+  else bname = "firewall";
+
+  if (gflags & GF_PURE) return bname;
+  return LOC(f->locale, mkname("border", bname));
 }
 
 static void
@@ -2955,15 +2957,19 @@ sp_firewall(castorder *co)
 /* ------------------------------------------------------------- */
 
 static const char *
-b_namewisps(const border * b, const region * r, const faction * f, int gflags)
+wisps_name(const border * b, const region * r, const faction * f, int gflags)
 {
+  const char * bname;
   unused(f);
   unused(r);
   unused(b);
-  if (gflags & GF_ARTICLE)
-    return "a_wisps";
-  else
-    return "wisps";
+  if (gflags & GF_ARTICLE) {
+    bname = "a_wisps";
+  } else {
+    bname = "wisps";
+  }
+  if (gflags & GF_PURE) return bname;
+  return LOC(f->locale, mkname("border", bname));
 }
 
 typedef struct wisps_data {
@@ -3009,7 +3015,7 @@ border_type bt_wisps = {
   wall_read, /* read */
   wall_write, /* write */
   b_blocknone, /* block */
-  b_namewisps, /* name */
+  wisps_name, /* name */
   b_rvisible, /* rvisible */
   b_fvisible, /* fvisible */
   b_uvisible, /* uvisible */

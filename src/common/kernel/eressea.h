@@ -303,6 +303,8 @@ void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtyp
 	/* der, die, das vs. ein, eine */
 #define GF_DETAILED 32
 	/* mehr Informationen. z.b. straﬂe zu 50% */
+#define GF_PURE 64
+    /* untranslated */
 
 #define GUARD_NONE 0
 #define GUARD_TAX 1
