@@ -19,6 +19,7 @@
     <text locale="de">Wabernde gr¸ne Schwaden treiben durch den Nebel und
     verdichten sich zu einer unheimlichen Kreatur, die nur aus einem langen
     Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.</text>
+    <text locale="en">Wobbling green vapours drift through the mists to form an eldritch creature that seems to be entirely made up of huge jaws and a long tail.</text>
   </string>
   <namespace name="raceinfo">
     <string name="no_info">
@@ -7442,39 +7443,112 @@
     <text locale="en">Owner</text>
   </string>
 
-  <string name="nr_a_road">
-    <text locale="de">eine Straﬂe</text>
-    <text locale="en">a road</text>
-  </string>
+  <namespace name="border">
+    <string name="a_road">
+      <text locale="de">eine Straﬂe</text>
+      <text locale="en">a road</text>
+    </string>
 
-  <string name="nr_roads">
-    <text locale="de">Straﬂen</text>
-    <text locale="en">roads</text>
-  </string>
+    <string name="roads">
+      <text locale="de">Straﬂen</text>
+      <text locale="en">roads</text>
+    </string>
 
-  <string name="nr_road">
-    <text locale="de">Straﬂe</text>
-    <text locale="en">road</text>
-  </string>
+    <string name="road">
+      <text locale="de">Straﬂe</text>
+      <text locale="en">road</text>
+    </string>
 
-  <string name="nr_road_percent">
-    <text locale="de">eine zu %d%% vollendete Straﬂe</text>
-    <text locale="en">a road that is %d%% complete</text>
-  </string>
+    <string name="a_road_percent">
+      <text locale="de">eine zu %d%% vollendete Straﬂe</text>
+      <text locale="en">a road that is %d%% complete</text>
+    </string>
 
-  <string name="nr_a_road_connection">
-    <text locale="de">ein Straﬂenanschluﬂ</text>
-    <text locale="en">a connection to another road</text>
-  </string>
+    <string name="a_road_connection">
+      <text locale="de">ein Straﬂenanschluﬂ</text>
+      <text locale="en">a connection to another road</text>
+    </string>
+
+    <string name="an_incomplete_road">
+      <text locale="de">eine unvollst‰ndige Straﬂe</text>
+      <text locale="en">an incomplete road</text>
+    </string>
+
+    <string name="wall">
+      <text locale="de">Wand</text>
+      <text locale="en">wall</text>
+    </string>
+
+    <string name="a_wall">
+      <text locale="de">eine Wand</text>
+      <text locale="en">a wall</text>
+    </string>
+
+    <string name="firewall">
+      <text locale="de">Feuerwand</text>
+      <text locale="en">firewall</text>
+    </string>
+
+    <string name="a_firewall">
+      <text locale="de">eine Feuerwand</text>
+      <text locale="en">a firewall</text>
+    </string>
+
+    <string name="fogwall">
+      <text locale="de">Nebelwand</text>
+      <text locale="en">wall of fog</text>
+    </string>
+
+    <string name="a_fogwall">
+      <text locale="de">eine Nebelwand</text>
+      <text locale="en">a wall of fog</text>
+    </string>
+
+    <string name="wisps">
+      <text locale="de">Irrlichter</text>
+      <text locale="en">wisps</text>
+    </string>
+
+    <string name="a_wisps">
+      <text locale="de">eine Gruppe von Irrlichtern</text>
+      <text locale="en">a cloud of wisps</text>
+    </string>
+
+    <string name="gate_open">
+      <text locale="de">gewaltiges offenes Tor</text>
+      <text locale="en">massive open door</text>
+    </string>
+
+    <string name="a_gate_open">
+      <text locale="de">ein gewaltiges offenes Tor</text>
+      <text locale="en">a massive open door</text>
+    </string>
+
+    <string name="gate_closed">
+      <text locale="de">gewaltiges geschlossenes Tor</text>
+      <text locale="en">massive locked door</text>
+    </string>
+
+    <string name="a_gate_closed">
+      <text locale="de">ein gewaltiges geschlossenes Tor</text>
+      <text locale="en">a massive locked door</text>
+    </string>
+
+    <string name="illusionwall">
+      <text locale="de">Illusionswand</text>
+      <text locale="en">illusionary wall</text>
+    </string>
+
+    <string name="an_illusionwall">
+      <text locale="de">eine Illusionswand</text>
+      <text locale="en">an illusionary wall</text>
+    </string>
+
+  </namespace>
 
   <string name="nr_reduced_production">
     <text locale="de">Die Region ist verw¸stet, der Boden karg.</text>
     <text locale="en">The region is ravaged, the ground infertile.</text>
-  </string>
-
-  <string name="nr_an_incomplete_road">
-    <text locale="de">eine unvollst‰ndige Straﬂe</text>
-    <text locale="en">an incomplete road</text>
   </string>
 
   <string name="par_unit">

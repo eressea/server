@@ -545,7 +545,7 @@ sp_summon_familiar(castorder *co)
   int dh, dh1, bytes;
   direction_t d;
   message * msg;
-  char zText[NAMESIZE], * bufp = zText;
+  char zText[1024], * bufp = zText;
   size_t size = sizeof(zText) - 1;
 
   if (get_familiar(mage) != NULL ) {
@@ -2808,15 +2808,15 @@ resolve_buddy(variant data)
 
 
 static const char *
-fire_name(const border * b, const region * r, const faction * f, int gflags)
+b_namefirewall(const border * b, const region * r, const faction * f, int gflags)
 {
   unused(f);
   unused(r);
   unused(b);
   if (gflags & GF_ARTICLE)
-    return "eine Feuerwand";
+    return "a_firewall";
   else
-    return "Feuerwand";
+    return "firewall";
 }
 
 static void
@@ -2881,7 +2881,7 @@ border_type bt_firewall = {
   wall_read, /* read */
   wall_write, /* write */
   b_blocknone, /* block */
-  fire_name, /* name */
+  b_namefirewall, /* name */
   b_rvisible, /* rvisible */
   b_finvisible, /* fvisible */
   b_uinvisible, /* uvisible */
@@ -2955,15 +2955,15 @@ sp_firewall(castorder *co)
 /* ------------------------------------------------------------- */
 
 static const char *
-wisps_name(const border * b, const region * r, const faction * f, int gflags)
+b_namewisps(const border * b, const region * r, const faction * f, int gflags)
 {
   unused(f);
   unused(r);
   unused(b);
   if (gflags & GF_ARTICLE)
-    return "eine Gruppe von Irrlichtern";
+    return "a_wisps";
   else
-    return "Irrlichter";
+    return "wisps";
 }
 
 typedef struct wisps_data {
@@ -3009,7 +3009,7 @@ border_type bt_wisps = {
   wall_read, /* read */
   wall_write, /* write */
   b_blocknone, /* block */
-  wisps_name, /* name */
+  b_namewisps, /* name */
   b_rvisible, /* rvisible */
   b_fvisible, /* fvisible */
   b_uvisible, /* uvisible */

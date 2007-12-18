@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -41,10 +41,10 @@ border_type * bordertypes;
 void
 free_borders(void)
 {
-	int i;
-	for (i=0;i!=BMAXHASH;++i) {
-		borders[i] = NULL;
-	}
+  int i;
+  for (i=0;i!=BMAXHASH;++i) {
+    borders[i] = NULL;
+  }
 }
 
 border *
@@ -144,11 +144,11 @@ erase_border(border * b)
 void
 register_bordertype(border_type * type)
 {
-	border_type ** btp = &bordertypes;
+  border_type ** btp = &bordertypes;
 
-	while (*btp && *btp!=type) btp = &(*btp)->next;
-	if (*btp) return;
-	*btp = type;
+  while (*btp && *btp!=type) btp = &(*btp)->next;
+  if (*btp) return;
+  *btp = type;
 }
 
 
@@ -217,17 +217,17 @@ boolean b_uinvisible(const border * b, const unit * u) { unused(u); unused(b); r
 static int
 a_agecountdown(attrib * a)
 {
-	a->data.i = max(a->data.i-1, 0);
-	return a->data.i;
+  a->data.i = max(a->data.i-1, 0);
+  return a->data.i;
 }
 
 attrib_type at_countdown = {
-	"countdown",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	a_agecountdown,
-	a_writeint,
-	a_readint
+  "countdown",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  a_agecountdown,
+  a_writeint,
+  a_readint
 };
 
 void
@@ -278,97 +278,96 @@ age_borders(void)
 static const char *
 b_namewall(const border * b, const region * r, const struct faction * f, int gflags)
 {
-	unused(f);
-	unused(r);
-	unused(b);
-	if (gflags & GF_ARTICLE) return "eine Wand";
-	return "Wand";
+  unused(f);
+  unused(r);
+  unused(b);
+  if (gflags & GF_ARTICLE) return "a_wall";
+  return "wall";
 }
 
 border_type bt_wall = {
-	"wall", VAR_INT,
-	b_opaque,
-	NULL, /* init */
-	NULL, /* destroy */
-	b_read, /* read */
-	b_write, /* write */
-	b_blockall, /* block */
-	b_namewall, /* name */
-	b_rvisible, /* rvisible */
-	b_fvisible, /* fvisible */
-	b_uvisible, /* uvisible */
+  "wall", VAR_INT,
+  b_opaque,
+  NULL, /* init */
+  NULL, /* destroy */
+  b_read, /* read */
+  b_write, /* write */
+  b_blockall, /* block */
+  b_namewall, /* name */
+  b_rvisible, /* rvisible */
+  b_fvisible, /* fvisible */
+  b_uvisible, /* uvisible */
 };
 
 border_type bt_noway = {
-	"noway", VAR_INT,
-	b_transparent,
-	NULL, /* init */
-	NULL, /* destroy */
-	b_read, /* read */
-	b_write, /* write */
-	b_blockall, /* block */
-	NULL, /* name */
-	b_rinvisible, /* rvisible */
-	b_finvisible, /* fvisible */
-	b_uinvisible, /* uvisible */
+  "noway", VAR_INT,
+  b_transparent,
+  NULL, /* init */
+  NULL, /* destroy */
+  b_read, /* read */
+  b_write, /* write */
+  b_blockall, /* block */
+  NULL, /* name */
+  b_rinvisible, /* rvisible */
+  b_finvisible, /* fvisible */
+  b_uinvisible, /* uvisible */
 };
 
 static const char *
 b_namefogwall(const border * b, const region * r, const struct faction * f, int gflags)
 {
-	unused(f);
-	unused(b);
-	unused(r);
-	if (gflags & GF_ARTICLE) return "eine Nebelwand";
-	return "Nebelwand";
+  unused(f);
+  unused(b);
+  unused(r);
+  if (gflags & GF_ARTICLE) return "a_fogwall";
+  return "fogwall";
 }
 
 static boolean
 b_blockfogwall(const border * b, const unit * u, const region * r)
 {
-	unused(b);
-	unused(r);
-	if (!u) return true;
-	return (boolean)(effskill(u, SK_OBSERVATION) > 4); /* Das ist die alte Nebelwand */
+  unused(b);
+  unused(r);
+  if (!u) return true;
+  return (boolean)(effskill(u, SK_OBSERVATION) > 4); /* Das ist die alte Nebelwand */
 }
 
 border_type bt_fogwall = {
-	"fogwall", VAR_INT,
-	b_transparent, /* transparent */
-	NULL, /* init */
-	NULL, /* destroy */
-	b_read, /* read */
-	b_write, /* write */
-	b_blockfogwall, /* block */
-	b_namefogwall, /* name */
-	b_rvisible, /* rvisible */
-	b_fvisible, /* fvisible */
-	b_uvisible, /* uvisible */
+  "fogwall", VAR_INT,
+  b_transparent, /* transparent */
+  NULL, /* init */
+  NULL, /* destroy */
+  b_read, /* read */
+  b_write, /* write */
+  b_blockfogwall, /* block */
+  b_namefogwall, /* name */
+  b_rvisible, /* rvisible */
+  b_fvisible, /* fvisible */
+  b_uvisible, /* uvisible */
 };
 
 static const char *
 b_nameillusionwall(const border * b, const region * r, const struct faction * f, int gflags)
 {
-	/* TODO: UNICODE: f->locale bestimmt die Sprache */
-	int fno = b->data.i;
-	unused(b);
-	unused(r);
-	if (gflags & GF_ARTICLE) return (f && fno==f->subscription)?"eine Illusionswand":"eine Wand";
-	return (f && fno==f->no)?"Illusionswand":"Wand";
+  int fno = b->data.i;
+  unused(b);
+  unused(r);
+  if (gflags & GF_ARTICLE) return (f && fno==f->subscription)?"an_illusionwall":"a_wall";
+  return (f && fno==f->no)?"illusionwall":"wall";
 }
 
 border_type bt_illusionwall = {
-	"illusionwall", VAR_INT,
-	b_opaque,
-	NULL, /* init */
-	NULL, /* destroy */
-	b_read, /* read */
-	b_write, /* write */
-	b_blocknone, /* block */
-	b_nameillusionwall, /* name */
-	b_rvisible, /* rvisible */
-	b_fvisible, /* fvisible */
-	b_uvisible, /* uvisible */
+  "illusionwall", VAR_INT,
+  b_opaque,
+  NULL, /* init */
+  NULL, /* destroy */
+  b_read, /* read */
+  b_write, /* write */
+  b_blocknone, /* block */
+  b_nameillusionwall, /* name */
+  b_rvisible, /* rvisible */
+  b_fvisible, /* fvisible */
+  b_uvisible, /* uvisible */
 };
 
 /***
@@ -376,45 +375,44 @@ border_type bt_illusionwall = {
  ***/
 
 boolean b_blockquestportal(const border * b, const unit * u, const region * r) {
-	if(b->data.i > 0) return true;
-	return false;
+  if(b->data.i > 0) return true;
+  return false;
 }
 
 static const char *
 b_namequestportal(const border * b, const region * r, const struct faction * f, int gflags)
 {
-	/* TODO: UNICODE: f->locale bestimmt die Sprache */
-	int lock = b->data.i;
-	unused(b);
-	unused(r);
+  int lock = b->data.i;
+  unused(b);
+  unused(r);
 
-	if (gflags & GF_ARTICLE) {
-		if(lock > 0) {
-			return "ein gewaltiges verschlossenes Tor";
-		} else {
-			return "ein gewaltiges offenes Tor";
-		}
-	} else {
-		if(lock > 0) {
-			return "gewaltiges verschlossenes Tor";
-		} else {
-			return "gewaltiges offenes Tor";
-		}
-	}
+  if (gflags & GF_ARTICLE) {
+    if(lock > 0) {
+      return "a_gate_locked";
+    } else {
+      return "a_gate_open";
+    }
+  } else {
+    if(lock > 0) {
+      return "gate_locked";
+    } else {
+      return "gate_open";
+    }
+  }
 }
 
 border_type bt_questportal = {
-	"questportal", VAR_INT,
-	b_opaque,
-	NULL, /* init */
-	NULL, /* destroy */
-	b_read, /* read */
-	b_write, /* write */
-	b_blockquestportal, /* block */
-	b_namequestportal, /* name */
-	b_rvisible, /* rvisible */
-	b_fvisible, /* fvisible */
-	b_uvisible, /* uvisible */
+  "questportal", VAR_INT,
+  b_opaque,
+  NULL, /* init */
+  NULL, /* destroy */
+  b_read, /* read */
+  b_write, /* write */
+  b_blockquestportal, /* block */
+  b_namequestportal, /* name */
+  b_rvisible, /* rvisible */
+  b_fvisible, /* fvisible */
+  b_uvisible, /* uvisible */
 };
 
 /***
@@ -430,32 +428,32 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
 
   unused(f);
   if (gflags & GF_ARTICLE) {
-    if (!(gflags & GF_DETAILED)) return LOC(f->locale, "nr_a_road");
+    if (!(gflags & GF_DETAILED)) return "a_road";
     else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
       if (r2->terrain->max_road<=remote) {
-        return LOC(f->locale, "nr_a_road");
+        return "a_road";
       } else {
-        return LOC(f->locale, "nr_an_incomplete_road");
+        return "an_incomplete_road";
       }
     } else {
       int percent = max(1, 100*local/r->terrain->max_road);
       if (local) {
-        snprintf(buffer, sizeof(buffer), LOC(f->locale, "nr_road_percent"), percent);
+        snprintf(buffer, sizeof(buffer), "a_road_percent", percent);
       } else {
-        return LOC(f->locale, "nr_a_road_connection");
+        return "a_road_connection";
       }
     }
   }
-  else if (gflags & GF_PLURAL) return LOC(f->locale, "nr_roads");
-  else return LOC(f->locale, "nr_road");
+  else if (gflags & GF_PLURAL) return "roads";
+  else return "road";
   return buffer;
 }
 
 static void
 b_readroad(border * b, FILE *f)
 {
-	fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
+  fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
 }
 
 static void
@@ -467,8 +465,8 @@ b_writeroad(const border * b, FILE *f)
 static boolean
 b_validroad(const border * b)
 {
-	if (b->data.sa[0]==SHRT_MAX) return false;
-	return true;
+  if (b->data.sa[0]==SHRT_MAX) return false;
+  return true;
 }
 
 static boolean
@@ -486,18 +484,18 @@ b_rvisibleroad(const border * b, const region * r)
 }
 
 border_type bt_road = {
-	"road", VAR_INT,
-	b_transparent,
-	NULL, /* init */
-	NULL, /* destroy */
-	b_readroad, /* read */
-	b_writeroad, /* write */
-	b_blocknone, /* block */
-	b_nameroad, /* name */
-	b_rvisibleroad, /* rvisible */
-	b_finvisible, /* fvisible */
-	b_uinvisible, /* uvisible */
-	b_validroad /* valid */
+  "road", VAR_INT,
+  b_transparent,
+  NULL, /* init */
+  NULL, /* destroy */
+  b_readroad, /* read */
+  b_writeroad, /* write */
+  b_blocknone, /* block */
+  b_nameroad, /* name */
+  b_rvisibleroad, /* rvisible */
+  b_finvisible, /* fvisible */
+  b_uinvisible, /* uvisible */
+  b_validroad /* valid */
 };
 
 void

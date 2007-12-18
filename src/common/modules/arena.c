@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -80,39 +80,39 @@ static region * start_region[6];
 static region *
 arena_region(int magic)
 {
-	return tower_region[magic];
+  return tower_region[magic];
 }
 
 static building *
 arena_tower(int magic)
 {
-	return arena_region(magic)->buildings;
+  return arena_region(magic)->buildings;
 }
 
 static int
 leave_fail(unit * u)
 {
   ADDMSG(&u->faction->msgs, msg_message("arena_leave_fail", "unit", u));
-	return 1;
+  return 1;
 }
 
 static int
 leave_arena(struct unit * u, const struct item_type * itype, int amount, order * ord)
 {
-	if (!u->building && leave_fail(u)) return -1;
-	if (u->building!=arena_tower(u->faction->magiegebiet) && leave_fail(u)) return -1;
-	unused(amount);
-	unused(ord);
-	unused(itype);
-	assert(!"not implemented");
-	return 0;
+  if (!u->building && leave_fail(u)) return -1;
+  if (u->building!=arena_tower(u->faction->magiegebiet) && leave_fail(u)) return -1;
+  unused(amount);
+  unused(ord);
+  unused(itype);
+  assert(!"not implemented");
+  return 0;
 }
 
 static int
 enter_fail(unit * u)
 {
   ADDMSG(&u->faction->msgs, msg_message("arena_enter_fail", "region unit", u->region, u));
-	return 1;
+  return 1;
 }
 
 static int
@@ -136,16 +136,16 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
   
   assert(!"not implemented");
 /*
-	for (res=0;res!=MAXRESOURCES;++res) if (res!=R_SILVER && res!=R_ARENA_GATE && (is_item(res) || is_herb(res) || is_potion(res))) {
-		int x = get_resource(u, res);
-		if (x) {
-			if (u2) {
-				change_resource(u2, res, x);
-				change_resource(u, res, -x);
-			}
-			else if (enter_fail(u)) return -1;
-		}
-	}
+  for (res=0;res!=MAXRESOURCES;++res) if (res!=R_SILVER && res!=R_ARENA_GATE && (is_item(res) || is_herb(res) || is_potion(res))) {
+    int x = get_resource(u, res);
+    if (x) {
+      if (u2) {
+        change_resource(u2, res, x);
+        change_resource(u, res, -x);
+      }
+      else if (enter_fail(u)) return -1;
+    }
+  }
 */
   if (get_money(u) > fee) {
     if (u2) change_money(u2, get_money(u) - fee);
@@ -167,25 +167,25 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 static int
 use_wand_of_tears(unit * user, const struct item_type * itype, int amount, order * ord)
 {
-	int i;
-	unused(ord);
-	for (i=0;i!=amount;++i) {
-		unit * u;
-		for (u=user->region->units;u;u=u->next) {
-			if (u->faction != user->faction) {
-				int i;
+  int i;
+  unused(ord);
+  for (i=0;i!=amount;++i) {
+    unit * u;
+    for (u=user->region->units;u;u=u->next) {
+      if (u->faction != user->faction) {
+        int i;
 
-				for (i=0;i!=u->skill_size;++i) {
-					if (rng_int()%3) reduce_skill(u, u->skills+i, 1);
-				}
-				ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
-					"unit", u));
-			}
-		}
-	}
-	ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage",
-		"unit", user));
-	return 0;
+        for (i=0;i!=u->skill_size;++i) {
+          if (rng_int()%3) reduce_skill(u, u->skills+i, 1);
+        }
+        ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
+          "unit", u));
+      }
+    }
+  }
+  ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage",
+    "unit", user));
+  return 0;
 }
 
 /**
@@ -193,70 +193,70 @@ use_wand_of_tears(unit * user, const struct item_type * itype, int amount, order
 
 static int
 age_hurting(attrib * a) {
-	building * b = (building *)a->data.v;
-	unit * u;
-	int active = 0;
-	if (b==NULL) return 0;
-	for (u=b->region->units;u;u=u->next) {
-		if (u->building==b) {
-			if (u->faction->magiegebiet==M_CHAOS) {
-				active ++;
-				ADDMSG(&b->region->msgs, msg_message("praytoigjarjuk", "unit", u));
-			}
-		}
-	}
-	if (active) for (u=b->region->units;u;u=u->next) if (playerrace(u->faction->race)) {
-		int i;
-		if (u->faction->magiegebiet!=M_CHAOS) {
-			for (i=0;i!=active;++i) u->hp = (u->hp+1) / 2; /* make them suffer, but not die */
-			ADDMSG(&b->region->msgs, msg_message("cryinpain", "unit", u));
-		}
-	}
-	return 1;
+  building * b = (building *)a->data.v;
+  unit * u;
+  int active = 0;
+  if (b==NULL) return 0;
+  for (u=b->region->units;u;u=u->next) {
+    if (u->building==b) {
+      if (u->faction->magiegebiet==M_CHAOS) {
+        active ++;
+        ADDMSG(&b->region->msgs, msg_message("praytoigjarjuk", "unit", u));
+      }
+    }
+  }
+  if (active) for (u=b->region->units;u;u=u->next) if (playerrace(u->faction->race)) {
+    int i;
+    if (u->faction->magiegebiet!=M_CHAOS) {
+      for (i=0;i!=active;++i) u->hp = (u->hp+1) / 2; /* make them suffer, but not die */
+      ADDMSG(&b->region->msgs, msg_message("cryinpain", "unit", u));
+    }
+  }
+  return 1;
 }
 
 static void
 write_hurting(const attrib * a, FILE * F) {
-	building * b = a->data.v;
-	fprintf(F, "%d ", b->no);
+  building * b = a->data.v;
+  fprintf(F, "%d ", b->no);
 }
 
 static int
 read_hurting(attrib * a, FILE * F) {
-	int i;
-	fscanf(F, "%d", &i);
-	a->data.v = (void*)findbuilding(i);
-	if (a->data.v==NULL) {
-		log_error(("temple of pain is broken\n"));
-		return AT_READ_FAIL;
-	}
-	return AT_READ_OK;
+  int i;
+  fscanf(F, "%d", &i);
+  a->data.v = (void*)findbuilding(i);
+  if (a->data.v==NULL) {
+    log_error(("temple of pain is broken\n"));
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 static attrib_type at_hurting = {
-	"hurting", NULL, NULL, age_hurting, write_hurting, read_hurting
+  "hurting", NULL, NULL, age_hurting, write_hurting, read_hurting
 };
 
 #ifdef ARENA_CREATION
 static void
 make_temple(region * r)
 {
-	const building_type * btype = bt_find("temple");
-	building * b;
+  const building_type * btype = bt_find("temple");
+  building * b;
   if (btype==NULL) {
     log_error(("could not find buildingtype 'temple'\n"));
     return;
   }
 
   b = r->buildings;
-	while (b!=NULL && b->type!=btype) b = b->next;
-	if (b!=NULL) return; /* gibt schon einen */
+  while (b!=NULL && b->type!=btype) b = b->next;
+  if (b!=NULL) return; /* gibt schon einen */
 
-	b = new_building(btype, r, NULL);
-	b->size = btype->maxsize;
-	b->name = strdup("Igjarjuk's Tempel der Schreie");
-	b->display = strdup("Ein Schrein aus spitzen Knochen und lodernden Flammen, gewidmet dem Wyrm der Wyrme");
-	a_add(&b->attribs, a_new(&at_hurting))->data.v=b;
+  b = new_building(btype, r, NULL);
+  b->size = btype->maxsize;
+  b->name = strdup("Igjarjuk's Tempel der Schreie");
+  b->display = strdup("Ein Schrein aus spitzen Knochen und lodernden Flammen, gewidmet dem Wyrm der Wyrme");
+  a_add(&b->attribs, a_new(&at_hurting))->data.v=b;
 }
 #endif
 
@@ -267,39 +267,39 @@ make_temple(region * r)
 static void
 tower_init(void)
 {
-	int i, first = newarena;
+  int i, first = newarena;
   item_type * it_demonseye = it_find("demonseye");
   item_type * it_griphonwing = it_find("griphonwing");
   assert(it_griphonwing && it_demonseye);
-	for (i=0;i!=6;++i) {
-		region * r = tower_region[i] = findregion(arena_center->x+delta_x[i]*3, arena_center->y+delta_y[i]*3);
+  for (i=0;i!=6;++i) {
+    region * r = tower_region[i] = findregion(arena_center->x+delta_x[i]*3, arena_center->y+delta_y[i]*3);
         if (r) {
-			start_region[i] = findregion(arena_center->x+delta_x[i]*2, arena_center->y+delta_y[i]*2);
-			if (rterrain(r)!=T_DESERT) terraform(r, T_DESERT);
-			if (!r->buildings) {
-				building * b = new_building(bt_find("castle"), r, NULL);
-				b->size = 10;
+      start_region[i] = findregion(arena_center->x+delta_x[i]*2, arena_center->y+delta_y[i]*2);
+      if (rterrain(r)!=T_DESERT) terraform(r, T_DESERT);
+      if (!r->buildings) {
+        building * b = new_building(bt_find("castle"), r, NULL);
+        b->size = 10;
         if (i!=0) {
           sprintf(buf, "Turm des %s", 
             LOC(default_locale, mkname("school", magietypen[i])));
         }
-				else sprintf(buf, "Turm der Ahnungslosen");
-				set_string(&b->name, buf);
-			}
-		}
-	}
-	if (first && !arena_center->buildings) {
-		building * b = new_building(bt_find("castle"), arena_center, NULL);
-		attrib * a;
-		item * items;
+        else sprintf(buf, "Turm der Ahnungslosen");
+        set_string(&b->name, buf);
+      }
+    }
+  }
+  if (first && !arena_center->buildings) {
+    building * b = new_building(bt_find("castle"), arena_center, NULL);
+    attrib * a;
+    item * items;
 
-		i_add(&items, i_new(it_griphonwing, 1));
-		i_add(&items, i_new(it_demonseye, 1));
-		a = a_add(&b->attribs, make_giveitem(b, items));
+    i_add(&items, i_new(it_griphonwing, 1));
+    i_add(&items, i_new(it_demonseye, 1));
+    a = a_add(&b->attribs, make_giveitem(b, items));
 
-		b->size = 10;
-		set_string(&b->name, "Höhle des Greifen");
-	}
+    b->size = 10;
+    set_string(&b->name, "Höhle des Greifen");
+  }
 }
 #endif
 
@@ -307,49 +307,49 @@ tower_init(void)
 static void
 guardian_faction(plane * pl, int id)
 {
-	region * r;
-	faction * f = findfaction(id);
+  region * r;
+  faction * f = findfaction(id);
 
-	if (!f) {
-		f = calloc(1, sizeof(faction));
-		f->banner = strdup("Sie dienen dem großen Wyrm");
-		f->passw = strdup(itoa36(rng_int()));
-		f->override = strdup(itoa36(rng_int()));
+  if (!f) {
+    f = calloc(1, sizeof(faction));
+    f->banner = strdup("Sie dienen dem grossen Wyrm");
+    f->passw = strdup(itoa36(rng_int()));
+    f->override = strdup(itoa36(rng_int()));
     set_email(&f->email, "igjarjuk@eressea.de");
-		f->name = strdup("Igjarjuks Kundschafter");
-		f->race = new_race[RC_ILLUSION];
-		f->age = turn;
-		f->locale = find_locale("de");
-		f->options = want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN) | want(O_DEBUG);
+    f->name = strdup("Igjarjuks Kundschafter");
+    f->race = new_race[RC_ILLUSION];
+    f->age = turn;
+    f->locale = find_locale("de");
+    f->options = want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN) | want(O_DEBUG);
 
-		f->no = id;
-		addlist(&factions, f);
+    f->no = id;
+    addlist(&factions, f);
     fhash(f);
-	}
-	if (f->race != new_race[RC_ILLUSION]) {
-		assert(!"guardian id vergeben");
-		exit(0);
-	}
-	f->lastorders = turn;
-	f->alive = true;
-	for (r=regions;r;r=r->next) if (getplane(r)==pl && rterrain(r)!=T_FIREWALL)
-	{
-		unit * u;
-		freset(r, RF_ENCOUNTER);
-		for (u=r->units;u;u=u->next) {
-			if (u->faction==f) break;
-		}
-		if (u) continue;
-		u = createunit(r, f, 1, new_race[RC_GOBLIN]);
-		set_string(&u->name, "Igjarjuks Auge");
-		set_item(u, I_RING_OF_INVISIBILITY, 1);
-		set_order(&u->thisorder, NULL);
+  }
+  if (f->race != new_race[RC_ILLUSION]) {
+    assert(!"guardian id vergeben");
+    exit(0);
+  }
+  f->lastorders = turn;
+  f->alive = true;
+  for (r=regions;r;r=r->next) if (getplane(r)==pl && rterrain(r)!=T_FIREWALL)
+  {
+    unit * u;
+    freset(r, RF_ENCOUNTER);
+    for (u=r->units;u;u=u->next) {
+      if (u->faction==f) break;
+    }
+    if (u) continue;
+    u = createunit(r, f, 1, new_race[RC_GOBLIN]);
+    set_string(&u->name, "Igjarjuks Auge");
+    set_item(u, I_RING_OF_INVISIBILITY, 1);
+    set_order(&u->thisorder, NULL);
 #ifdef LASTORDER
-		set_order(&u->lastorder, NULL);
+    set_order(&u->lastorder, NULL);
 #endif
-		fset(u, UFL_PARTEITARNUNG);
-		set_money(u, 1000);
-	}
+    fset(u, UFL_PARTEITARNUNG);
+    set_money(u, 1000);
+  }
 }
 #endif
 
@@ -359,13 +359,13 @@ guardian_faction(plane * pl, int id)
 static void 
 block_create(short x1, short y1, char terrain)
 {
-	short x, y;
-	for (x=0;x!=BLOCKSIZE;++x) {
-		for (y=0;y!=BLOCKSIZE;++y) {
-			region * r = new_region(x1 + x, y1 + y);
-			terraform(r, terrain);
-		}
-	}
+  short x, y;
+  for (x=0;x!=BLOCKSIZE;++x) {
+    for (y=0;y!=BLOCKSIZE;++y) {
+      region * r = new_region(x1 + x, y1 + y);
+      terraform(r, terrain);
+    }
+  }
 }
 #endif
 
@@ -374,76 +374,76 @@ block_create(short x1, short y1, char terrain)
 static int
 caldera_handle(trigger * t, void * data)
 {
-	/* call an event handler on caldera.
-	 * data.v -> ( variant event, int timer )
-	 */
-	building *b = (building *)t->data.v;
-	if (b!=NULL) {
-		unit ** up = &b->region->units;
-		while (*up) {
-			unit * u = *up;
-			if (u->building==b) {
+  /* call an event handler on caldera.
+   * data.v -> ( variant event, int timer )
+   */
+  building *b = (building *)t->data.v;
+  if (b!=NULL) {
+    unit ** up = &b->region->units;
+    while (*up) {
+      unit * u = *up;
+      if (u->building==b) {
         message * msg;
-				if (u->items) {
-					item ** ip = &u->items;
+        if (u->items) {
+          item ** ip = &u->items;
           msg = msg_message("caldera_handle_1", "unit items", u, u->items);
-					while (*ip) {
-						item * i = *ip;
-						i_remove(ip, i);
-						if (*ip==i) ip=&i->next;
-					}
+          while (*ip) {
+            item * i = *ip;
+            i_remove(ip, i);
+            if (*ip==i) ip=&i->next;
+          }
         } else {
           msg = msg_message("caldera_handle_0", "unit", u);
         }
-				add_message(&u->region->msgs, msg);
-				set_number(u, 0);
-			}
-			if (*up==u) up = &u->next;
-		}
+        add_message(&u->region->msgs, msg);
+        set_number(u, 0);
+      }
+      if (*up==u) up = &u->next;
+    }
   } else {
-		log_error(("could not perform caldera::handle()\n"));
+    log_error(("could not perform caldera::handle()\n"));
   }
-	unused(data);
-	return 0;
+  unused(data);
+  return 0;
 }
 
 static void
 caldera_write(const trigger * t, FILE * F)
 {
-	building *b = (building *)t->data.v;
-	fprintf(F, "%s ", itoa36(b->no));
+  building *b = (building *)t->data.v;
+  fprintf(F, "%s ", itoa36(b->no));
 }
 
 static int
 caldera_read(trigger * t, FILE * F)
 {
-	char zText[128];
-	variant var;
+  char zText[128];
+  variant var;
 
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	t->data.v = findbuilding(var.i);
-	if (t->data.v==NULL) ur_add(var, &t->data.v, resolve_building);
+  fscanf(F, "%s", zText);
+  var.i = atoi36(zText);
+  t->data.v = findbuilding(var.i);
+  if (t->data.v==NULL) ur_add(var, &t->data.v, resolve_building);
 
-	return AT_READ_OK;
+  return AT_READ_OK;
 }
 
 struct trigger_type tt_caldera = {
-	"caldera",
-	NULL,
-	NULL,
-	caldera_handle,
-	caldera_write,
-	caldera_read
+  "caldera",
+  NULL,
+  NULL,
+  caldera_handle,
+  caldera_write,
+  caldera_read
 };
 
 #ifdef ARENA_CREATION
 static trigger *
 trigger_caldera(building * b)
 {
-	trigger * t = t_new(&tt_caldera);
-	t->data.v = b;
-	return t;
+  trigger * t = t_new(&tt_caldera);
+  t->data.v = b;
+  return t;
 }
 #endif
 
@@ -451,17 +451,17 @@ trigger_caldera(building * b)
 static void
 init_volcano(void)
 {
-	building * b;
-	region * r = arena_center;
-	assert(arena_center);
-	if (rterrain(r)!=T_DESERT) return; /* been done before */
-	terraform(arena_center, T_VOLCANO_SMOKING);
-	b = new_building(bt_find("caldera"), r, NULL);
-	b->size = 1;
-	b->name = strdup("Igjarjuk's Schlund");
-	b->display = strdup("Feurige Lava fließt aus dem Krater des großen Vulkans. Alles wird von ihr verschlungen.");
-	add_trigger(&b->attribs, "timer", trigger_caldera(b));
-	tt_register(&tt_caldera);
+  building * b;
+  region * r = arena_center;
+  assert(arena_center);
+  if (rterrain(r)!=T_DESERT) return; /* been done before */
+  terraform(arena_center, T_VOLCANO_SMOKING);
+  b = new_building(bt_find("caldera"), r, NULL);
+  b->size = 1;
+  b->name = strdup("Igjarjuk's Schlund");
+  b->display = strdup("Feurige Lava fließt aus dem Krater des großen Vulkans. Alles wird von ihr verschlungen.");
+  add_trigger(&b->attribs, "timer", trigger_caldera(b));
+  tt_register(&tt_caldera);
 }
 #endif
 #endif
@@ -470,50 +470,50 @@ init_volcano(void)
 void
 create_arena(void)
 {
-	short x;
-	arena_id = hashstring("arena");
-	arena = getplanebyid(arena_id);
-	if (arena!=NULL) return;
-	score(); /* ist wichtig, damit alle Parteien einen score haben, wenn sie durchs Tor wollen. */
-	guardian_faction(arena, 999);
-	if (arena) arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
-	if (!arena_center) {
-		newarena = 1;
-		arena = create_new_plane(arena_id, "Arena", -10000, -10000, 0, BLOCKSIZE-1, PFL_LOWSTEALING | PFL_NORECRUITS | PFL_NOALLIANCES);
-		block_create(arena->minx, arena->miny, T_OCEAN);
-		arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
-		for (x=0;x!=BLOCKSIZE;++x) {
-			short y;
-			for (y=0;y!=BLOCKSIZE;++y) {
-				region * r = findregion(arena->minx+x, arena->miny+y);
-				freset(r, RF_ENCOUNTER);
-				r->planep = arena;
-				switch (distance(r, arena_center)) {
-				case 4:
-					terraform(r, T_FIREWALL);
-					break;
-				case 0:
-					terraform(r, T_GLACIER);
-					break;
-				case 1:
-					terraform(r, T_SWAMP);
-					break;
-				case 2:
-					terraform(r, T_MOUNTAIN);
-					break;
-				}
-			}
-		}
-	}
-	make_temple(arena_center);
+  short x;
+  arena_id = hashstring("arena");
+  arena = getplanebyid(arena_id);
+  if (arena!=NULL) return;
+  score(); /* ist wichtig, damit alle Parteien einen score haben, wenn sie durchs Tor wollen. */
+  guardian_faction(arena, 999);
+  if (arena) arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
+  if (!arena_center) {
+    newarena = 1;
+    arena = create_new_plane(arena_id, "Arena", -10000, -10000, 0, BLOCKSIZE-1, PFL_LOWSTEALING | PFL_NORECRUITS | PFL_NOALLIANCES);
+    block_create(arena->minx, arena->miny, T_OCEAN);
+    arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
+    for (x=0;x!=BLOCKSIZE;++x) {
+      short y;
+      for (y=0;y!=BLOCKSIZE;++y) {
+        region * r = findregion(arena->minx+x, arena->miny+y);
+        freset(r, RF_ENCOUNTER);
+        r->planep = arena;
+        switch (distance(r, arena_center)) {
+        case 4:
+          terraform(r, T_FIREWALL);
+          break;
+        case 0:
+          terraform(r, T_GLACIER);
+          break;
+        case 1:
+          terraform(r, T_SWAMP);
+          break;
+        case 2:
+          terraform(r, T_MOUNTAIN);
+          break;
+        }
+      }
+    }
+  }
+  make_temple(arena_center);
 #ifdef CENTRAL_VOLCANO
-	init_volcano();
+  init_volcano();
 #else
-	if (arena_center->terrain!=T_DESERT) terraform(arena_center, T_DESERT);
+  if (arena_center->terrain!=T_DESERT) terraform(arena_center, T_DESERT);
 #endif
-	rsetmoney(arena_center, 0);
-	rsetpeasants(arena_center, 0);
-	tower_init();
+  rsetmoney(arena_center, 0);
+  rsetpeasants(arena_center, 0);
+  tower_init();
 }
 #endif
 void
