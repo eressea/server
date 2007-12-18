@@ -333,6 +333,7 @@ extern struct attrib_type at_seenitem; /* knows this potion's description, no ne
 extern void register_resources(void);
 extern void init_resources(void);
 
+extern void register_item_give(int (*foo) (struct unit *, struct unit *, const struct item_type *, int, struct order *), const char * name);
 extern void register_item_use(int (*foo) (struct unit *, const struct item_type *, int, struct order *), const char * name);
 extern void register_item_useonother(int (*foo) (struct unit *, int, const struct item_type *, int, struct order *), const char * name);
 

@@ -24,6 +24,33 @@
 using namespace luabind;
 
 static int
+lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order * ord)
+{
+  char fname[64];
+  int retval = -1;
+  const char * iname = itype->rtype->_name[0];
+
+  assert(s!=NULL);
+  strcat(strcpy(fname, iname), "_give");
+
+  lua_State * L = (lua_State *)global.vm_state;
+  if (is_function(L, fname)) {
+    try {
+      retval = luabind::call_function<int>(L, fname, s, d, iname, n);
+    }
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while %s tried to call '%s': %s.\n",
+        unitname(s), fname, error));
+      lua_pop(L, 1);
+      std::terminate();
+    }
+  }
+  return retval;
+}
+
+static int
 lua_useitem(struct unit * u, const struct item_type * itype,
             int amount, struct order *ord)
 {
@@ -121,6 +148,7 @@ bind_item(lua_State * L)
 {
   register_function((pf_generic)produce_resource, "lua_produceresource");
   register_function((pf_generic)limit_resource, "lua_limitresource");
+  register_item_give(lua_giveitem, "lua_giveitem");
 
   module(L)[
     def("register_item", &item_register)

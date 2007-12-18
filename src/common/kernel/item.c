@@ -571,7 +571,9 @@ static int
 give_horses(unit * s, unit * d, const item_type * itype, int n, struct order * ord)
 {
   if (d==NULL) {
-    rsethorses(s->region, rhorses(s->region) + n);
+    int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
+    if (use<n) use += use_pooled(s, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
+    rsethorses(s->region, rhorses(s->region) + use);
     return 0;
   }
   return -1; /* use the mechanism */
@@ -581,7 +583,9 @@ static int
 give_money(unit * s, unit * d, const item_type * itype, int n, struct order * ord)
 {
   if (d==NULL) {
-    rsetmoney(s->region, rmoney(s->region) + n);
+    int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
+    if (use<n) use += use_pooled(s, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
+    rsetmoney(s->region, rmoney(s->region) + use);
     return 0;
   }
   return -1; /* use the mechanism */
@@ -745,6 +749,12 @@ heal(unit * user, int effect)
     user->hp += req;
   }
   return effect;
+}
+
+void 
+register_item_give(int (*foo) (struct unit *, struct unit *, const struct item_type *, int, struct order *), const char * name)
+{
+  register_function((pf_generic)foo, name);
 }
 
 void
@@ -1145,7 +1155,7 @@ register_resources(void)
   register_item_use(use_magicboost, "usemagicboost");
   register_item_use(use_snowball, "usesnowball");
 
-  register_function((pf_generic)give_horses, "givehorses");
+  register_item_give(give_horses, "givehorses");
 
   /* make sure noone has deleted an I_ tpe without deleting the R_ type that goes with it! */
   assert((int)I_TACTICCRYSTAL == (int)R_TACTICCRYSTAL);

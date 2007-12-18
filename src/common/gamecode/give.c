@@ -79,18 +79,6 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
   }
 }
 
-static void
-give_peasants(int n, const item_type * itype, unit * src)
-{
-  region *r = src->region;
-
-  /* horses are given to the region via itype->give! */
-
-  if (itype->rtype==r_silver) {
-    rsetmoney(r, rmoney(r) + n);
-  }
-}
-
 int
 give_item(int want, const item_type * itype, unit * src, unit * dest, struct order * ord)
 {
@@ -101,10 +89,10 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
   n = get_pooled(src, item2resource(itype), GET_DEFAULT, want);
   n = min(want, n);
   if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
-		if (ord!=NULL) {
+    if (ord!=NULL) {
       ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
         "turns", GiveRestriction()));
-		}
+    }
     return -1;
   } else if (n == 0) {
     int reserve = get_reservation(src, itype->rtype);
@@ -130,18 +118,15 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
       }
 #endif
 #endif
-      handle_event(src->attribs, "give", dest);
-      handle_event(dest->attribs, "receive", src);
 #if defined(MUSEUM_MODULE) && defined(TODO)
-/* TODO: Einen Trigger für den museums-warden benutzen! */
-        if (a_find(dest->attribs, &at_warden)) {
-          /* warden_add_give(src, dest, itype, n); */
-        }
+      /* TODO: use a trigger for the museum warden! */
+      if (a_find(dest->attribs, &at_warden)) {
+        warden_add_give(src, dest, itype, n);
+      }
 #endif
-    } else {
-      /* gib bauern */
-      give_peasants(use, itype, src);
+      handle_event(dest->attribs, "receive", src);
     }
+    handle_event(src->attribs, "give", dest);
   }
   add_give(src, dest, n, item2resource(itype), ord, error);
   if (error) return -1;

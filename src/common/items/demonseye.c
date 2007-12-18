@@ -45,16 +45,16 @@ summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, str
 	}
 }
 
-static boolean
+static int
 give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, struct order * ord)
 {
   ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "error_giveeye", ""));
-	return false;
+  return 0;
 }
 
 void
 register_demonseye(void)
 {
   register_item_use(summon_igjarjuk, "useigjarjuk");
-  register_function((pf_generic)give_igjarjuk, "giveigjarjuk");
+  register_item_give(give_igjarjuk, "giveigjarjuk");
 }
