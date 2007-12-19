@@ -49,6 +49,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
@@ -524,10 +525,11 @@ free_units(void)
 	}
 }
 
+
 void
 write_unit_reference(const unit * u, FILE * F)
 {
-  assert(u->number>0);
+  assert(u==NULL || u->number>0);
   fprintf(F, "%s ", (u!=NULL && u->no!=0)?itoa36(u->no):"0");
 }
 
@@ -1406,10 +1408,18 @@ countheroes(const struct faction * f)
 {
   const unit * u = f->units;
   int n = 0;
+  int m = 0;
+
   while (u) {
     if (fval(u, UFL_HERO)) n+= u->number;
     u = u->nextF;
   }
+#ifndef NDEBUG
+  m = maxheroes(f);
+  if (n>m) {
+    log_warning(("%s has %d of %d heroes\n", factionname(f), n, m));
+  }
+#endif
   return n;
 }
 

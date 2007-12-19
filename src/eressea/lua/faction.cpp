@@ -277,15 +277,27 @@ faction_setorigin_x(faction& f, short x) {
   f.ursprung->x = x;
 }
 
-short
+static short
 faction_getorigin_y(const faction& f) {
   return f.ursprung->y;
 }
-void
+
+static void
 faction_setorigin_y(faction& f, short y) {
   f.ursprung->y = y;
 }
 
+static int
+faction_countheroes(const faction& f)
+{
+  return countheroes(&f);
+}
+
+static int
+faction_maxheroes(const faction& f)
+{
+  return maxheroes(&f);
+}
 
 void
 bind_faction(lua_State * L) 
@@ -301,9 +313,16 @@ bind_faction(lua_State * L)
     .def(self == faction())
     .def("set_policy", &faction_setpolicy)
     .def("get_policy", &faction_getpolicy)
+
+    // temporary variables
     .def("set_variable", &faction_set_variable)
     .def("get_variable", &faction_get_variable)
     .def("delete_variable", &faction_delete_variable)
+
+    // heroes
+    .def("heroes", &faction_countheroes)
+    .def("max_heroes", &faction_maxheroes)
+
     .def_readonly("name", &faction::name)
     .def_readonly("score", &faction::score)
     .def_readonly("id", &faction::no)
