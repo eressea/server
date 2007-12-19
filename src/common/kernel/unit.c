@@ -1408,14 +1408,13 @@ countheroes(const struct faction * f)
 {
   const unit * u = f->units;
   int n = 0;
-  int m = 0;
 
   while (u) {
     if (fval(u, UFL_HERO)) n+= u->number;
     u = u->nextF;
   }
-#ifndef NDEBUG
-  m = maxheroes(f);
+#ifdef DEBUG_MAXHEROES
+  int m = maxheroes(f);
   if (n>m) {
     log_warning(("%s has %d of %d heroes\n", factionname(f), n, m));
   }
