@@ -428,7 +428,7 @@ try_destruction(unit * u, unit * u2, const ship *sh, int skilldiff)
     ADDMSG(&u2->faction->msgs, msg_message(destruction_detected_msg, "ship unit", sh, u));
     /* tell the enemy whodunit: */
     if (u2) {
-      ADDMSG(&u2->faction->msgs, msg_message(detect_failure_msg, "ship unit", sh, u));
+      ADDMSG(&u2->faction->msgs, msg_message(detect_failure_msg, "ship", sh));
     }
     return 0;
   } else {

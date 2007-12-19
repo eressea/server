@@ -84,7 +84,7 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
   c_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit speed", u, SPEEDSAIL_EFFECT));
-  itype->rtype->uchange(u, itype->rtype, -1);
+  use_pooled(u, itype->rtype, GET_DEFAULT, 1);
 
   return 0;
 }
@@ -149,7 +149,7 @@ use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struc
       create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
     }
   }
-  use_pooled(u, rt_crystal, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  use_pooled(u, rt_crystal, GET_DEFAULT, amount);
   ADDMSG(&u->faction->msgs, msg_message("use_antimagiccrystal", 
     "unit region", u, r));
   return 0;
@@ -172,7 +172,7 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
   ADDMSG(&u->region->msgs, msg_message("artsculpture_create", "unit region", 
     u, u->region));
 
-  itype->rtype->uchange(u, itype->rtype, -1);
+  use_pooled(u, itype->rtype, GET_DEFAULT, 1);
 
   return 0;
 }
@@ -194,7 +194,7 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
   ADDMSG(&u->region->msgs, msg_message(
     "artacademy_create", "unit region", u, u->region));
 
-  itype->rtype->uchange(u, itype->rtype, -1);
+  use_pooled(u, itype->rtype, GET_DEFAULT, 1);
 
   return 0;
 }
@@ -209,7 +209,7 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
   int money;
   variant effect;
 
-  if(get_curse(u->region->attribs, ct_find("depression"))) {
+  if (get_curse(u->region->attribs, ct_find("depression"))) {
     cmistake(u, ord, 58, MSG_MAGIC);
     return -1;
   }
@@ -235,7 +235,7 @@ static int
 use_aurapotion50(struct unit * u, const struct item_type * itype,
                  int amount, struct order * ord)
 {
-  if(!is_mage(u)) {
+  if (!is_mage(u)) {
     cmistake(u, ord, 214, MSG_MAGIC);
     return -1;
   }
@@ -245,7 +245,7 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
   ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
     "unit region command", u, u->region, ord));
 
-  itype->rtype->uchange(u, itype->rtype, -1);
+  use_pooled(u, itype->rtype, GET_DEFAULT, 1);
 
   return 0;
 }

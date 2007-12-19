@@ -150,7 +150,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     /* Snotlings können nicht an Bauern übergeben werden. */
     error = 307;
 #ifdef HEROES
-  } else if (u2 && u2->number>0 && fval(u, UFL_HERO)!=fval(u2, UFL_HERO)) {
+  } else if (fval(u, UFL_HERO) || (u2 && fval(u2, UFL_HERO))) {
     error = 75;
 #endif
   } else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {

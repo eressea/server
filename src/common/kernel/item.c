@@ -448,6 +448,7 @@ i_add(item ** pi, item * i)
   }
   if (*pi && (*pi)->type==i->type) {
     (*pi)->number += i->number;
+    assert((*pi)->number>=0);
     i_free(i);
   } else {
     i->next = *pi;
@@ -469,6 +470,7 @@ i_merge(item ** pi, item ** si)
     }
     if (*pi && (*pi)->type==i->type) {
       (*pi)->number += i->number;
+      assert((*pi)->number>=0);
       i_free(i_remove(&i, i));
     } else {
       itmp = i->next;
@@ -562,6 +564,7 @@ i_new(const item_type * itype, int size)
   i->next = NULL;
   i->type = itype;
   i->number = size;
+  assert(i->number>=0);
   return i;
 }
 
@@ -628,6 +631,7 @@ set_item(unit * u, item_t it, int value)
     i = i_add(&u->items, i_new(type, value));
   } else {
     i->number = value;
+    assert(i->number>=0);
   }
   return value;
 }
@@ -995,7 +999,10 @@ set_money(unit * u, int v)
     return v;
   }
   if ((*ip)!=NULL) {
-    if (v) (*ip)->number = v;
+    if (v) {
+      (*ip)->number = v;
+      assert((*ip)->number>=0);
+    }
     else i_remove(ip, *ip);
   }
   return v;
@@ -1014,6 +1021,7 @@ change_money(unit * u, int v)
     item * i = *ip;
     if (i->number + v != 0) {
       i->number += v;
+      assert(i->number>=0);
       return i->number;
     }
     else i_free(i_remove(ip, *ip));

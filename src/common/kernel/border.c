@@ -452,7 +452,7 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
     } else {
       int percent = max(1, 100*local/r->terrain->max_road);
       if (local) {
-        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border", "road_percent")), percent);
+        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border", "a_road_percent")), percent);
       } else {
         return LOC(f->locale, mkname("border", "a_road_connection"));
       }

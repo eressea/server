@@ -17,6 +17,7 @@
 
 /* kernel includes */
 #include <kernel/item.h>
+#include <kernel/pool.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
@@ -109,7 +110,7 @@ useonother_trappedairelemental(struct unit * u, int shipId,
   ship   *sh;
   variant effect;
 
-  if(shipId <= 0) {
+  if (shipId <= 0) {
     cmistake(u, ord, 20, MSG_MOVE);
     return -1;
   }
@@ -127,7 +128,7 @@ useonother_trappedairelemental(struct unit * u, int shipId,
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",
     "unit region command ship", u, u->region, ord, sh));
 
-  itype->rtype->uchange(u, itype->rtype, -1);
+  use_pooled(u, itype->rtype, GET_DEFAULT, 1);
 
   return 0;
 }
