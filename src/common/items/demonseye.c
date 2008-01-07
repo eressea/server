@@ -46,7 +46,7 @@ summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, str
 }
 
 static int
-give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, struct order * ord)
+give_igjarjuk(struct unit * src, struct unit * d, const struct item_type * itype, int n, struct order * ord)
 {
   ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "error_giveeye", ""));
   return 0;
