@@ -469,6 +469,43 @@ typedef struct gate_data {
   struct region * target;
 } gate_data;
 
+static int
+fix_undead(void)
+{
+  region * r;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    for (u=r->units;u;u=u->next) {
+      if (u->race!=u->faction->race && u->skill_size>20) {
+        skill * sm = get_skill(u, SK_MAGIC);
+        skill * sa = get_skill(u, SK_HERBALISM);
+
+        if (sm && sa) {
+          int level = sm->level;
+          attrib * a = a_find(u->attribs, &at_mage);
+          if (a) {
+            a_remove(&u->attribs, a);
+          }
+          free(u->skills);
+          u->skills = 0;
+          u->skill_size = 0;
+
+          if (level>0) {
+            const race * rc = u->race;
+            skill_t sk;
+            for (sk=0;sk!=MAXSKILLS;++sk) {
+              if (rc->bonus[sk]>0) {
+                set_level(u, sk, level);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 static void
 fix_gates(void)
 {
@@ -926,7 +963,7 @@ korrektur(void)
   setup_locales();
 #endif
   do_once("rdec", &road_decay);
-
+  do_once("unfi", &fix_undead);
   do_once("chgt", &fix_chaosgates);
   do_once("atrx", &fix_attribflags);
   do_once("asfi", &fix_astral_firewalls);
