@@ -3601,7 +3601,7 @@ skill_summoned(unit * u, int level)
     const race * rc = u->race;
     skill_t sk;
     for (sk=0;sk!=MAXSKILLS;++sk) {
-      if (rc->bonus[sk>0]) {
+      if (rc->bonus[sk]>0) {
         set_level(u, sk, level);
       }
     }
