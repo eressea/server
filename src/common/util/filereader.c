@@ -181,7 +181,9 @@ getbuf_utf8(FILE * F)
   do {
     const char * bp = fgets(lbuf, MAXLINE, F);
     size_t white;
-    if (bp==NULL) return NULL;
+    if (bp==NULL) {
+      return NULL;
+    }
 
     eatwhite(bp, &white); /* decoding errors will get caught later on, don't have to check */
     bp += white;

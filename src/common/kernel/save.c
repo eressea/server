@@ -435,11 +435,6 @@ unitorders(FILE * F, int enc, struct faction * f)
   if (u && u->faction == f) {
     order ** ordp;
 
-    if (quiet==0) {
-      printf(",_%4s_", itoa36(u->no));
-      fflush(stdout);
-    }
-
     if (!fval(u, UFL_ORDERS)) {
       /* alle wiederholbaren, langen befehle werden gesichert: */
       fset(u, UFL_ORDERS);
@@ -555,7 +550,7 @@ readorders(const char *filename)
   int nfactions=0;
   struct faction *f = NULL;
 
-  if (filename) F = cfopen(filename, "rt");
+  if (filename) F = cfopen(filename, "rb");
   if (F==NULL) return 0;
 
   puts(" - lese Befehlsdatei...\n");

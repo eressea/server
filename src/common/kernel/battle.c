@@ -3829,22 +3829,27 @@ battle_attacks(battle * b)
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
+
+    /* Taktikrunde: */
+    if (b->turn == 0) {
+      side *stac;
+
+      for (stac=b->sides;stac!=b->sides+b->nsides;++stac) {
+        if (b->max_tactics > 0 && stac->leader.value == b->max_tactics && helping(stac, s)) {
+          break;
+        }
+      }
+      if (stac==b->sides+b->nsides) {
+        /* could not find a side that is helping us and won the tactics round */
+        continue;
+      }
+    }
+
     for (fig=s->fighters;fig;fig=fig->next) {
 
       /* ist in dieser Einheit noch jemand handlungsfähig? */
       if (fig->fighting <= 0) continue;
 
-      /* Taktikrunde: */
-      if (b->turn == 0) {
-        side *stac;
-
-        for (stac=b->sides;stac!=b->sides+b->nsides;++stac) {
-          if (b->max_tactics > 0 && stac->leader.value == b->max_tactics && helping(stac, fig->side)) {
-            break;
-          }
-        }
-        if (stac==NULL) continue;
-      }
       /* Handle the unit's attack on someone */
       do_attack(fig);
     }
