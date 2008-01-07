@@ -490,6 +490,8 @@ fix_undead(void)
           u->skills = 0;
           u->skill_size = 0;
 
+          log_warning(("fixing skills for %s %s, level %d.\n", u->race->_name[0], itoa36(u->no), level));
+
           if (level>0) {
             const race * rc = u->race;
             skill_t sk;
