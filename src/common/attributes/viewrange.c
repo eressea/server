@@ -33,7 +33,8 @@ a_readfunction(struct attrib *a, FILE *F)
 /* return 1 on success, 0 if attrib needs removal */
 {
 	char buf[64];
-	fscanf(F, "%s ", buf);
+	int result = fscanf(F, "%s ", buf);
+    if (result<0) return result;
 	a->data.f = get_function(buf);
 	return AT_READ_OK;
 }

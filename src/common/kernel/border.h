@@ -101,7 +101,7 @@ extern "C" {
   extern void register_bordertype(border_type * type);
   /* register a new bordertype */
 
-  extern void read_borders(FILE * f);
+  extern int read_borders(FILE * f);
   extern void write_borders(FILE * f);
   extern void age_borders(void);
 

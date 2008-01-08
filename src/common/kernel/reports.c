@@ -1216,6 +1216,9 @@ write_reports(faction * f, time_t ltime)
   struct report_context ctx;
   const char * encoding = "UTF-8";
 
+  if (noreports) {
+    return false;
+  }
   ctx.f = f;
   ctx.report_time = time(NULL);
   ctx.seen = prepare_report(f);

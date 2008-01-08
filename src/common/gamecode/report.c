@@ -2446,8 +2446,8 @@ kann_finden(faction * f1, faction * f2)
 void
 report_init(void)
 {
-  register_reporttype("nr", &report_plaintext, 1<<O_REPORT);
-  register_reporttype("txt", &report_template, 1<<O_ZUGVORLAGE);
+  if (!nocr) register_reporttype("nr", &report_plaintext, 1<<O_REPORT);
+  if (!nonr) register_reporttype("txt", &report_template, 1<<O_ZUGVORLAGE);
 }
 
 void

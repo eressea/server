@@ -431,6 +431,11 @@ unitorders(FILE * F, int enc, struct faction * f)
   i = getid();
   u = findunitg(i, NULL);
 
+  if (quiet==0) {
+    log_stdio(stdout, "-%4s;", unitid(u));
+    fflush(stdout);
+  }
+
   if (u && u->race == new_race[RC_SPELL]) return NULL;
   if (u && u->faction == f) {
     order ** ordp;
@@ -472,13 +477,22 @@ unitorders(FILE * F, int enc, struct faction * f)
 
         if (stok) {
           boolean quit = false;
-          switch (findparam(stok, u->faction->locale)) {
+          param_t param = findparam(stok, u->faction->locale);
+          switch (param) {
             case P_UNIT:
             case P_REGION:
+              quit = true;
+              break;
             case P_FACTION:
             case P_NEXT:
             case P_GAMENAME:
-              quit = true;
+              /* these terminate the orders, so we apply extra checking */
+              if (strlen(stok)>=3) {
+                quit = true;
+                break;
+              } else {
+                quit = false;
+              }
           }
           if (quit) break;
         }
@@ -1021,7 +1035,9 @@ writeunit(FILE * F, const unit * u)
   wi36(F, u->no);
   wi36(F, u->faction->no);
   fwritestr(F, (const char *)u->name);
+  fputc(' ', F);
   fwritestr(F, u->display?(const char *)u->display:"");
+  fputc(' ', F);
   wi(F, u->number);
   wi(F, u->age);
   ws(F, u->race->_name[0]);
@@ -1243,6 +1259,7 @@ void
 writeregion(FILE * F, const region * r)
 {
   fwritestr(F, r->display?(const char *)r->display:"");
+  fputc(' ', F);
   ws(F, r->terrain->_name);
   wi(F, r->flags & RF_SAVEMASK);
   wi(F, r->age);
@@ -1252,6 +1269,7 @@ writeregion(FILE * F, const region * r)
     struct demand * demand;
     rawmaterial * res = r->resources;
     fwritestr(F, (const char *)r->land->name);
+    fputc(' ', F);
     assert(rtrees(r,0)>=0);
     assert(rtrees(r,1)>=0);
     assert(rtrees(r,2)>=0);
@@ -1462,7 +1480,9 @@ writefaction(FILE * F, const faction * f)
   }
 
   fwritestr(F, (const char *)f->name);
+  fputc(' ', F);
   fwritestr(F, (const char *)f->banner);
+  fputc(' ', F);
   ws(F, f->email);
   ws(F, (const char *)f->passw);
   ws(F, (const char *)f->override);
@@ -1866,6 +1886,7 @@ writegame(const char *filename, int quiet)
     watcher * w;
     wi(F, pl->id);
     fwritestr(F, pl->name);
+    fputc(' ', F);
     wi(F, pl->minx);
     wi(F, pl->maxx);
     wi(F, pl->miny);
@@ -1924,7 +1945,9 @@ writegame(const char *filename, int quiet)
     for (b = r->buildings; b; b = b->next) {
       wi36(F, b->no);
       fwritestr(F, b->name);
+      fputc(' ', F);
       fwritestr(F, b->display?b->display:"");
+      fputc(' ', F);
       wi(F, b->size);
       ws(F, b->type->_name);
       wnl(F);
@@ -1938,7 +1961,9 @@ writegame(const char *filename, int quiet)
       assert(sh->region == r);
       wi36(F, sh->no);
       fwritestr(F, (const char *)sh->name);
+      fputc(' ', F);
       fwritestr(F, sh->display?(const char *)sh->display:"");
+      fputc(' ', F);
       ws(F, sh->type->name[0]);
       wi(F, sh->size);
       wi(F, sh->damage);

@@ -51,15 +51,17 @@ write_variable(const struct attrib * a, FILE *F)
 static int
 read_variable(struct attrib *a, FILE *F)
 {
-	char localBuffer[1024];
+  char localBuffer[1024];
 
-	fscanf(F, "%s", localBuffer);
-	((variable *)(a->data.v))->key = strdup(localBuffer);
+  int result = fscanf(F, "%s", localBuffer);
+  if (result<0) return result;
+  ((variable *)(a->data.v))->key = strdup(localBuffer);
 
-	freadstr(F, enc_gamedata, localBuffer, sizeof(localBuffer));
-	((variable *)(a->data.v))->value = strdup(localBuffer);
+  result = freadstr(F, enc_gamedata, localBuffer, sizeof(localBuffer));
+  if (result<0) return result;
+  ((variable *)(a->data.v))->value = strdup(localBuffer);
 
-	return AT_READ_OK;
+  return AT_READ_OK;
 }
 
 attrib_type at_variable = {

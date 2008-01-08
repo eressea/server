@@ -52,22 +52,26 @@ a_writegive(const attrib * a, FILE * F)
 static int
 a_readgive(attrib * a, FILE * F)
 {
-	give_data * gdata = (give_data*)a->data.v;
-	variant var;
-	char zText[32];
+  give_data * gdata = (give_data*)a->data.v;
+  variant var;
+  int result;
+  char zText[32];
 
-	fscanf(F, "%s ", zText);
-	var.i = atoi36(zText);
-	gdata->building = findbuilding(var.i);
-	if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
-	for (;;) {
+  result = fscanf(F, "%s ", zText);
+  if (result<0) return result;
+  var.i = atoi36(zText);
+  gdata->building = findbuilding(var.i);
+  if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
+  for (;;) {
     int i;
-		fscanf(F, "%s", zText);
-		if (!strcmp("end", zText)) break;
-		fscanf(F, "%d", &i);
-		if (i==0) i_add(&gdata->items, i_new(it_find(zText), i));
-	}
-	return AT_READ_OK;
+    result = fscanf(F, "%s", zText);
+    if (result==EOF) return EOF;
+    if (!strcmp("end", zText)) break;
+    result = fscanf(F, "%d", &i);
+    if (result==EOF) return EOF;
+    if (i==0) i_add(&gdata->items, i_new(it_find(zText), i));
+  }
+  return AT_READ_OK;
 }
 
 static void

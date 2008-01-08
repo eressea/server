@@ -27,9 +27,10 @@ write_movement(const attrib * a, FILE * F)
 static int
 read_movement(attrib * a, FILE * F)
 {
-	fscanf(F, "%d", &a->data.i);
-	if (a->data.i !=0 ) return AT_READ_OK;
-	else return AT_READ_FAIL;
+  int result = fscanf(F, "%d", &a->data.i);
+  if (result<0) return result;
+  if (a->data.i !=0 ) return AT_READ_OK;
+  else return AT_READ_FAIL;
 }
 
 attrib_type at_movement = {

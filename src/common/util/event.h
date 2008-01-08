@@ -63,7 +63,7 @@ extern void handle_event(struct attrib * attribs, const char * eventname, void *
 /* functions for making complex triggers: */
 extern void free_triggers(trigger * triggers); /* release all these triggers */
 extern void write_triggers(FILE * F, const trigger * t);
-extern void read_triggers(FILE * F, trigger ** tp);
+extern int read_triggers(FILE * F, trigger ** tp);
 extern int handle_triggers(trigger ** triggers, void * data);
 
 extern struct attrib_type at_eventhandler;

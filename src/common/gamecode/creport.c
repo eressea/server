@@ -1559,7 +1559,7 @@ creport_init(void)
   tsf_register("items", &cr_resources);
   tsf_register("regions", &cr_regions);
 
-  register_reporttype("cr", &report_computer, 1<<O_COMPUTER);
+  if (!nocr) register_reporttype("cr", &report_computer, 1<<O_COMPUTER);
 }
 
 void

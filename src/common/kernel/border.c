@@ -164,20 +164,23 @@ find_bordertype(const char * name)
 void
 b_read(border * b, FILE *f)
 {
+  int result;
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
-      fscanf(f, "%x ", &b->data.i);
+      result = fscanf(f, "%x ", &b->data.i);
       break;
     case VAR_VOIDPTR:
-      fscanf(f, "%p ", &b->data.v);
+      result = fscanf(f, "%p ", &b->data.v);
       break;
     case VAR_SHORTA:
-      fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
+      result = fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
       break;
     default:
       assert(!"unhandled variant type in border");
+      result = 0;
   }
+  assert(result>=0 || "EOF encountered?");
 }
 
 void
@@ -531,7 +534,7 @@ write_borders(FILE * f)
   fputs("end ", f);
 }
 
-void
+int
 read_borders(FILE * f)
 {
   for (;;) {
@@ -541,10 +544,13 @@ read_borders(FILE * f)
     border * b;
     region * from, * to;
     border_type * type;
+    int result;
 
-    fscanf(f, "%s", zText);
+    result = fscanf(f, "%s", zText);
+    if (result<0) return result;
     if (!strcmp(zText, "end")) break;
-    fscanf(f, "%u %hd %hd %hd %hd", &bid, &fx, &fy, &tx, &ty);
+    result = fscanf(f, "%u %hd %hd %hd %hd", &bid, &fx, &fy, &tx, &ty);
+    if (result<0) return result;
 
     from = findregion(fx, fy);
     if (!incomplete_data && from==NULL) {
@@ -574,9 +580,11 @@ read_borders(FILE * f)
     b->id = bid;
     assert(bid<=nextborder);
     if (type->read) type->read(b, f);
-    a_read(f, &b->attribs);
+    result = a_read(f, &b->attribs);
+    if (result<0) return result;
     if (!to || !from) {
       erase_border(b);
     }
   }
+  return 0;
 }

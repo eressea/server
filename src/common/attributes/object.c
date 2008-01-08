@@ -88,20 +88,21 @@ static int
 object_read(attrib *a, FILE *F)
 {
   object_data * data = (object_data *)a->data.v;
-  int type;
+  int type, result;
   char buffer[128];
-  fscanf(F, "%s %d", buffer, &type);
+  result = fscanf(F, "%s %d", buffer, &type);
+  if (result<0) return result;
   data->name = strdup(buffer);
   data->type = (object_type)type;
   switch (data->type) {
     case TINTEGER:
-      fscanf(F, "%d", &data->data.i);
+      result = fscanf(F, "%d", &data->data.i);
       break;
     case TREAL:
-      fscanf(F, "%lf", &data->data.real);
+      result = fscanf(F, "%lf", &data->data.real);
       break;
     case TSTRING:
-      freadstr(F, enc_gamedata, buffer, sizeof(buffer));
+      result = freadstr(F, enc_gamedata, buffer, sizeof(buffer));
       data->data.str = strdup(buffer);
       break;
     case TBUILDING:
@@ -121,6 +122,7 @@ object_read(attrib *a, FILE *F)
     default:
       return AT_READ_FAIL;
   }
+  if (result<0) return result;
   return AT_READ_OK;
 }
 

@@ -38,33 +38,35 @@ write_triggers(FILE * F, const trigger * t)
 	fputs("end ", F);
 }
 
-void
+int
 read_triggers(FILE * F, trigger ** tp)
 {
-	for (;;) {
-		trigger_type * ttype;
-		char zText[128];
-		fscanf(F, "%s", zText);
-		if (!strcmp(zText, "end")) break;
-		ttype = tt_find(zText);
-		assert(ttype || !"unknown trigger-type");
-		*tp = t_new(ttype);
-		if (ttype->read) {
-			int i = ttype->read(*tp, F);
-			switch (i) {
-			case AT_READ_OK:
-				tp = &(*tp)->next;
-				break;
-			case AT_READ_FAIL:
-				t_free(*tp);
-				*tp = NULL;
-				break;
-			default:
-				assert(!"invalid return value");
-				break;
-			}
-		}
-	}
+  for (;;) {
+    trigger_type * ttype;
+    char zText[128];
+    int result = fscanf(F, "%s", zText);
+    if (result<0) return result;
+    if (!strcmp(zText, "end")) break;
+    ttype = tt_find(zText);
+    assert(ttype || !"unknown trigger-type");
+    *tp = t_new(ttype);
+    if (ttype->read) {
+      int i = ttype->read(*tp, F);
+      switch (i) {
+        case AT_READ_OK:
+          tp = &(*tp)->next;
+          break;
+        case AT_READ_FAIL:
+          t_free(*tp);
+          *tp = NULL;
+          break;
+        default:
+          assert(!"invalid return value");
+          break;
+      }
+    }
+  }
+  return 0;
 }
 
 trigger *
@@ -142,7 +144,8 @@ read_handler(attrib * a, FILE * F)
 {
 	char zText[128];
 	handler_info *hi = (handler_info*)a->data.v;
-	fscanf(F, "%s ", zText);
+    int result = fscanf(F, "%s", zText);
+    if (result<0) return result;
 	hi->event = strdup(zText);
 	read_triggers(F, &hi->triggers);
 	if (hi->triggers!=NULL) {

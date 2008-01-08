@@ -34,7 +34,8 @@ write_moved(const attrib * a, FILE * F)
 static int
 read_moved(attrib * a, FILE * F)
 {
-	fscanf(F, "%d", &a->data.i);
+	int result = fscanf(F, "%d", &a->data.i);
+    if (result<0) return result;
 	if (a->data.i !=0 ) return AT_READ_OK;
 	else return AT_READ_FAIL;
 }

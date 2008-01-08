@@ -35,12 +35,13 @@ write_of(const struct attrib * a, FILE* F)
 
 int
 read_of(struct attrib * a, FILE* F) /* return 1 on success, 0 if attrib needs removal */
-{
-	int of;
-	fscanf(F, "%d", &of);
-	a->data.v = findfaction(of);
-	if (a->data.v) return AT_READ_OK;
-	return AT_READ_FAIL;
+  {
+  int of, result;
+  result = fscanf(F, "%d", &of);
+  if (result<0) return result;
+  a->data.v = findfaction(of);
+  if (a->data.v) return AT_READ_OK;
+  return AT_READ_FAIL;
 }
 
 attrib_type at_otherfaction = {

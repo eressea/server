@@ -181,18 +181,20 @@ a_writeeffect(const attrib *a, FILE *f)
 static int
 a_readeffect(attrib *a, FILE *f)
 {
-	int power;
+  int power, result;
   const item_type * itype;
-	effect_data * edata = (effect_data*)a->data.v;
-	char zText[32];
-	fscanf(f, "%s %d", zText, &power);
-	itype = it_find(zText);
+  effect_data * edata = (effect_data*)a->data.v;
+  char zText[32];
+
+  result = fscanf(f, "%s %d", zText, &power);
+  if (result<0) return result;
+  itype = it_find(zText);
   if (itype==NULL || itype->rtype==NULL || itype->rtype->ptype==NULL || power<=0) {
     return AT_READ_FAIL;
   }
-	edata->type = itype->rtype->ptype;
-	edata->value = power;
-	return AT_READ_OK;
+  edata->type = itype->rtype->ptype;
+  edata->value = power;
+  return AT_READ_OK;
 }
 
 attrib_type at_effect = {
