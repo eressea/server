@@ -489,25 +489,27 @@ attrib_type at_contact = {
 void
 usetcontact(unit * u, const unit * u2)
 {
-	attrib * a = a_find(u->attribs, &at_contact);
-	while (a && a->type==&at_contact && a->data.v!=u2) a = a->next;
-	if (a && a->type==&at_contact) return;
-	a_add(&u->attribs, a_new(&at_contact))->data.v = (void*)u2;
+  attrib * a = a_find(u->attribs, &at_contact);
+  while (a && a->type==&at_contact && a->data.v!=u2) a = a->next;
+  if (a && a->type==&at_contact) return;
+  a_add(&u->attribs, a_new(&at_contact))->data.v = (void*)u2;
 }
 
 boolean
 ucontact(const unit * u, const unit * u2)
 /* Prüft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
 {
-	attrib *ru;
+  attrib *ru;
   if (u->faction==u2->faction) return true;
 
-	/* Explizites KONTAKTIERE */
-  for (ru = a_find(u->attribs, &at_contact); ru && ru->type==&at_contact; ru = ru->next)
-		if (((unit*)ru->data.v) == u2)
-			return true;
-
-	return false;
+  /* Explizites KONTAKTIERE */
+  for (ru = a_find(u->attribs, &at_contact); ru && ru->type==&at_contact; ru = ru->next) {
+    if (((unit*)ru->data.v) == u2) {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 /***
@@ -517,12 +519,12 @@ ucontact(const unit * u, const unit * u2)
 void
 free_units(void)
 {
-	while (udestroy) {
-		unit * u = udestroy;
-		udestroy = udestroy->next;
-		stripunit(u);
-		free(u);
-	}
+  while (udestroy) {
+    unit * u = udestroy;
+    udestroy = udestroy->next;
+    stripunit(u);
+    free(u);
+  }
 }
 
 
