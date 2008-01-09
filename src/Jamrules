@@ -2,6 +2,8 @@ C++ = g++ ;
 CC = gcc ;
 LINK = gcc ;
 
+MSPACES = 1 ;
+
 if $(MSPACES) {
   CCFLAGS += -DMSPACES ;
   C++FLAGS += -DMSPACES ;
