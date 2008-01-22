@@ -517,7 +517,7 @@ factionorders(void)
 
   f = findfaction(fid);
   
-  if (f!=NULL) {
+  if (f!=NULL && f->no!=MONSTER_FACTION) {
     const char * pass = getstrtoken();
     if (quiet==0) {
       log_stdio(stdout, " %4s;", factionid(f));

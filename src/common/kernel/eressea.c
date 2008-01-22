@@ -1250,7 +1250,7 @@ count_all(const faction * f)
     }
   }
   if (f->num_people != n) {
-    log_error(("Anzahl Personen für (%s) ist != num_people: %d statt %d.\n",
+    log_error(("# of people in %s is != num_people: %d should be %d.\n",
       factionid(f), f->num_people, n));
     return n;
   }

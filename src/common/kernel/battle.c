@@ -158,16 +158,18 @@ static char *
 sidename(side * s)
 {
 #define SIDENAMEBUFLEN 256
-  static char sidename_buf[SIDENAMEBUFLEN];
+  static int bufno;
+  static char sidename_buf[4][SIDENAMEBUFLEN];
 
+  bufno = bufno % 4;
   if (s->stealthfaction) {
-    snprintf(sidename_buf, SIDENAMEBUFLEN,
+    snprintf(sidename_buf[bufno], SIDENAMEBUFLEN,
       "%s", factionname(s->stealthfaction));
   } else {
-    snprintf(sidename_buf, SIDENAMEBUFLEN,
+    snprintf(sidename_buf[bufno], SIDENAMEBUFLEN,
       "%s", factionname(s->faction));
   }
-  return sidename_buf;
+  return sidename_buf[bufno++];
 }
 
 static const char *
