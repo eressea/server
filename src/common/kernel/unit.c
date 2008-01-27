@@ -786,7 +786,7 @@ transfermen(unit * u, unit * u2, int n)
   const attrib * a;
   int hp = u->hp;
   region * r = u->region;
-  
+
   if (n==0) return;
   assert(n > 0);
   /* "hat attackiert"-status wird übergeben */
@@ -798,85 +798,86 @@ transfermen(unit * u, unit * u2, int n)
 
     assert(u2->number+n>0);
 
-		for (sk=0; sk!=MAXSKILLS; ++sk) {
-			double dlevel = 0.0;
-			int weeks, level = 0;
+    for (sk=0; sk!=MAXSKILLS; ++sk) {
+      double dlevel = 0.0;
+      int weeks, level = 0;
 
-			sv = get_skill(u, sk);
-			sn = get_skill(u2, sk);
+      sv = get_skill(u, sk);
+      sn = get_skill(u2, sk);
 
-			if (sv==NULL && sn==NULL) continue;
-			if (sv && sv->level) {
-				dlevel += (sv->level + 1 - sv->weeks/(sv->level+1.0)) * n;
-				level += sv->level * n;
-			}
-			if (sn && sn->level) {
-				dlevel += (sn->level + 1 - sn->weeks/(sn->level+1.0)) * u2->number;
-				level += sn->level * u2->number;
-			}
+      if (sv==NULL && sn==NULL) continue;
+      if (sv && sv->level) {
+        dlevel += (sv->level + 1 - sv->weeks/(sv->level+1.0)) * n;
+        level += sv->level * n;
+      }
+      if (sn && sn->level) {
+        dlevel += (sn->level + 1 - sn->weeks/(sn->level+1.0)) * u2->number;
+        level += sn->level * u2->number;
+      }
 
-			dlevel = dlevel / (n + u2->number);
-			level = level / (n + u2->number);
-			if (level<=dlevel) {
-				/* apply the remaining fraction to the number of weeks to go.
-				 * subtract the according number of weeks, getting closer to the
-				 * next level */
-				level = (int)dlevel;
-				weeks = (level+1) - (int)((dlevel - level) * (level+1));
-			} else {
-				/* make it harder to reach the next level. 
-				 * weeks+level is the max difficulty, 1 - the fraction between
-				 * level and dlevel applied to the number of weeks between this
-				 * and the previous level is the added difficutly */
-				level = (int)dlevel+1;
-				weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
-			}
-			if (level) {
-				if (sn==NULL) sn = add_skill(u2, sk);
-				sn->level = (unsigned char)level;
-				sn->weeks = (unsigned char)weeks;
-				assert(sn->weeks>0 && sn->weeks<=sn->level*2+1);
-			} else if (sn) {
-				remove_skill(u2, sk);
-				sn = NULL;
-			}
-		}
-		a = a_find(u->attribs, &at_effect);
-		while (a && a->type==&at_effect) {
-			effect_data * olde = (effect_data*)a->data.v;
-			if (olde->value) change_effect(u2, olde->type, olde->value);
-			a = a->next;
-		}
+      dlevel = dlevel / (n + u2->number);
+      level = level / (n + u2->number);
+      if (level<=dlevel) {
+        /* apply the remaining fraction to the number of weeks to go.
+        * subtract the according number of weeks, getting closer to the
+        * next level */
+        level = (int)dlevel;
+        weeks = (level+1) - (int)((dlevel - level) * (level+1));
+      } else {
+        /* make it harder to reach the next level. 
+        * weeks+level is the max difficulty, 1 - the fraction between
+        * level and dlevel applied to the number of weeks between this
+        * and the previous level is the added difficutly */
+        level = (int)dlevel+1;
+        weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
+      }
+      if (level) {
+        if (sn==NULL) sn = add_skill(u2, sk);
+        sn->level = (unsigned char)level;
+        sn->weeks = (unsigned char)weeks;
+        assert(sn->weeks>0 && sn->weeks<=sn->level*2+1);
+      } else if (sn) {
+        remove_skill(u2, sk);
+        sn = NULL;
+      }
+    }
+    a = a_find(u->attribs, &at_effect);
+    while (a && a->type==&at_effect) {
+      effect_data * olde = (effect_data*)a->data.v;
+      if (olde->value) change_effect(u2, olde->type, olde->value);
+      a = a->next;
+    }
     sh = leftship(u);
     if (sh!=NULL) set_leftship(u2, sh);
     u2->flags |= u->flags&(UFL_LONGACTION|UFL_NOTMOVING|UFL_HUNGER|UFL_MOVED|UFL_ENTER);
-		if (u->attribs) {
-			transfer_curse(u, u2, n);
-		}
-	}
-	scale_number(u, u->number - n);
-	if (u2) {
-		set_number(u2, u2->number + n);
-		hp -= u->hp;
-		u2->hp += hp;
-		/* TODO: Das ist schnarchlahm! und gehört ncht hierhin */
-		a = a_find(u2->attribs, &at_effect);
-		while (a && a->type==&at_effect) {
-			attrib * an = a->next;
-			effect_data * olde = (effect_data*)a->data.v;
-			int e = get_effect(u, olde->type);
-			if (e!=0) change_effect(u2, olde->type, -e);
-			a = an;
-		}
-	}
-	else if (r->land)
-		if(u->race != new_race[RC_DAEMON]) {
-			if(u->race != new_race[RC_URUK]) {
-				rsetpeasants(r, rpeasants(r) + n);
-			} else {
-				rsetpeasants(r, rpeasants(r) + n/2);
-			}
-		}
+    if (u->attribs) {
+      transfer_curse(u, u2, n);
+    }
+  }
+  scale_number(u, u->number - n);
+  if (u2) {
+    set_number(u2, u2->number + n);
+    hp -= u->hp;
+    u2->hp += hp;
+    /* TODO: Das ist schnarchlahm! und gehört nicht hierhin */
+    a = a_find(u2->attribs, &at_effect);
+    while (a && a->type==&at_effect) {
+      attrib * an = a->next;
+      effect_data * olde = (effect_data*)a->data.v;
+      int e = get_effect(u, olde->type);
+      if (e!=0) change_effect(u2, olde->type, -e);
+      a = an;
+    }
+  }
+  else if (r->land) {
+    if ((u->race->ec_flags & ECF_REC_UNLIMITED)==0) {
+      if(u->race != new_race[RC_URUK]) {
+        rsetpeasants(r, rpeasants(r) + n);
+      } else {
+        rsetpeasants(r, rpeasants(r) + n/2);
+      }
+    }
+  }
 }
 
 struct building * 

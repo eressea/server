@@ -939,7 +939,7 @@ restart_cmd(unit * u, struct order * ord)
 
     if (!checkpasswd(u->faction, (const char *)s_pass, false)) {
       cmistake(u, ord, 86, MSG_EVENT);
-      log_warning(("NEUSTART mit falschem Passwort für Partei %s: %s\n",
+      log_warning(("RESTART with wrong password, faction %s, pass %s\n",
         factionid(u->faction), s_pass));
       return 0;
     }

@@ -70,7 +70,10 @@
 static FILE *bdebug;
 #undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
-#define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
+#define TACTICS_BONUS 1 /* when undefined, we have a tactics round. else this is the bonus tactics give */
+#define TACTICS_RANDOM /* undefine this to deactivate */
+#define TACTICS_MODIFIER 1 /* modifier for generals in the fromt/rear */
+
 #define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rng_int() % INITIAL */
 #define CATAPULT_STRUCTURAL_DAMAGE
 
@@ -96,9 +99,6 @@ boolean battledebug = true;
 
 /* globals */
 static int obs_count = 0;
-
-#define TACTICS_MALUS 1
-#undef  MAGIC_TURNS
 
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
@@ -3102,11 +3102,11 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   /* Schauen, wie gut wir in Taktik sind. */
   if (t > 0 && u->race == new_race[RC_INSECT])
     t -= 1 - (int) log10(fig->side->size[SUM_ROW]);
+#ifdef TACTICS_MODIFIER
   if (t > 0 && statusrow(fig->status) == FIGHT_ROW)
-    t += 1;
-#ifdef TACTICS_MALUS
+    t += TACTICS_MODIFIER;
   if (t > 0 && statusrow(fig->status) > BEHIND_ROW) {
-    t -= TACTICS_MALUS;
+    t -= TACTICS_MODIFIER;
   }
 #endif
 #ifdef TACTICS_RANDOM

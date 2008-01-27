@@ -147,17 +147,19 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
   } else if (u == u2) {
     error = 10;
   } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
-    /* Snotlings können nicht an Bauern übergeben werden. */
+    /* snotlings may not be given to the peasants. */
     error = 307;
 #ifdef HEROES
-  } else if (fval(u, UFL_HERO) || (u2 && fval(u2, UFL_HERO))) {
+  } else if (u2 && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
+    /* heroes may not be given to non-heroes and vice versa*/
     error = 75;
 #endif
-  } else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
+  } else if (unit_has_cursed_item(u) || (u2 && unit_has_cursed_item(u2))) {
     error = 78;
   } else if (fval(u, UFL_LOCKED) || is_cursed(u->attribs, C_SLAVE, 0)) {
     error = 74;
   } else if (u2 && fval(u, UFL_HUNGER)) {
+    /* hungry people cannot be given away */
     error = 73;
   } else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
     error = 75;
@@ -165,8 +167,10 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_no_contact", "target", u2));
     error = -1;
   } else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
+    /* cannot give units to and from magicians */
     error = 158;
-  } else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
+  } else if (u2 && (fval(u, UFL_WERE) != fval(u2, UFL_WERE))) {
+    /* werewolves can't be given to non-werewolves and vice-versa */
     error = 312;
   } else if (u2 && u2->number!=0 && u2->race != u->race) {
     log_warning(("faction %s attempts to give %s to faction %s.\n",

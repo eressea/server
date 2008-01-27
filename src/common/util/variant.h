@@ -5,12 +5,12 @@ extern "C" {
 #endif
 
 typedef union variant {
-	void *v;
+  void *v;
   int   i;
-	char  c;
-	short s;
-	short sa[2];
-	char  ca[4];
+  char  c;
+  short s;
+  short sa[2];
+  char  ca[4];
   float f;
 } variant;
 
