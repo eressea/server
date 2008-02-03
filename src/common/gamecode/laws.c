@@ -515,7 +515,7 @@ peasants(region * r)
   /* Es verhungert maximal die unterernährten Bevölkerung. */
 
   n = min(peasants - satiated, rpeasants(r));
-    dead += (int)(n * PEASANT_STARVATION_CHANCE);
+    dead += (int)(0.5F + n * PEASANT_STARVATION_CHANCE);
 
   if (dead > 0) {
     message * msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
