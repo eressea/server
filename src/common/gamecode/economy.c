@@ -2256,7 +2256,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
 
   init_tokens(ord);
   skip_token();
-	s = getstrtoken();
+  s = getstrtoken();
 
   if (findparam(s, u->faction->locale) == P_ANY) {
     unlimited = false;
@@ -2334,6 +2334,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
       if (o->type.ltype==ltype && o->unit->faction == u->faction) {
         int fpool = o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
         available -= max(0, fpool);
+        assert(available>=0);
       }
     }
     

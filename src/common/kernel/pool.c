@@ -110,7 +110,11 @@ change_resource(unit * u, const resource_type * rtype, int change)
 int
 get_reservation(const unit * u, const resource_type * rtype)
 {
+  faction * f = u->faction;
   struct reservation * res = u->reservations;
+  if ((rtype==r_silver && !(f->options & want_sp)) || (rtype!=r_silver && !(f->options & want_mp))) {
+    return get_resource(u, rtype);
+  }
 
   if (!rc_stonegolem) init_static();
 
