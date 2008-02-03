@@ -956,6 +956,38 @@ fix_chaosgates(void)
   return 0;
 }
 
+static void
+fix_groups(void)
+{
+  region * r;
+
+  for (r=regions;r!=NULL;r=r->next) {
+    unit * u;
+
+    for (u=r->units;u;u=u->next) {
+      if (fval(u, UFL_GROUP)) {
+        attrib * a = a_find(u->attribs, &at_group);
+        if (a) {
+          group * g = (group *)a->data.v;
+          if (g) {
+            faction * f = u->faction;
+            group * fg;
+            
+            for (fg=f->groups;fg;fg=fg->next) {
+              if (fg==g) break;
+            }
+            /* assert(fg==g); */
+            if (fg!=g) {
+              log_error(("%s is in group %s which is not part of faction %s\n", unitname(u), g->name, factionname(f)));
+              join_group(u, NULL);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 void
 korrektur(void)
 {
@@ -985,6 +1017,7 @@ korrektur(void)
     no_teurefremde(true);
   }
   fix_allies();
+  fix_groups();
   /* fix_unitrefs(); */
   fix_road_borders();
   if (turn>1000) curse_emptiness(); /*** disabled ***/
