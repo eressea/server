@@ -969,6 +969,8 @@ terraform_region(region * r, const terrain_type * terrain)
   terraform_resources(r);
 
   if (!fval(terrain, LAND_REGION)) {
+    free(r->display);
+    r->display = NULL;
     if (r->land!=NULL) {
       i_freeall(&r->land->items);
       freeland(r->land);

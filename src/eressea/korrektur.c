@@ -964,6 +964,11 @@ fix_groups(void)
   for (r=regions;r!=NULL;r=r->next) {
     unit * u;
 
+    if (r->display && !fval(r->terrain, LAND_REGION)) {
+      free(r->display);
+      r->display = NULL;
+    }
+
     for (u=r->units;u;u=u->next) {
       if (fval(u, UFL_GROUP)) {
         attrib * a = a_find(u->attribs, &at_group);
