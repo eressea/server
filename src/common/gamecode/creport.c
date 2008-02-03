@@ -410,16 +410,17 @@ cr_order(variant var, char * buffer, const void * userdata)
 static int
 cr_resources(variant var, char * buffer, const void * userdata)
 {
+  faction * f = (faction*)userdata;
   resource * rlist = (resource*)var.v;
   char * wp = buffer;
   if (rlist!=NULL) {
-    wp += sprintf(wp, "\"%d %s", rlist->number,
-      resourcename(rlist->type, rlist->number!=1));
+    const char * name = resourcename(rlist->type, rlist->number!=1);
+    wp += sprintf(wp, "\"%d %s", rlist->number, add_translation(name, LOC(f->locale, name)));
     for (;;) {
       rlist = rlist->next;
       if (rlist==NULL) break;
-      wp += sprintf(wp, ", %d %s", rlist->number,
-        resourcename(rlist->type, rlist->number!=1));
+      name = resourcename(rlist->type, rlist->number!=1);
+      wp += sprintf(wp, ", %d %s", rlist->number, add_translation(name, LOC(f->locale, name)));
     }
     strcat(wp, "\"");
   }
@@ -1572,4 +1573,5 @@ creport_cleanup(void)
   }
   junkyard = 0;
 }
+
 
