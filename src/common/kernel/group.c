@@ -163,18 +163,18 @@ set_group(struct unit * u, struct group * g)
 boolean
 join_group(unit * u, const char * name)
 {
-	group * g = NULL;
+  group * g = NULL;
 
-	if (name && name[0]) {
-  	g = find_groupbyname(u->faction->groups, name);
-	  if (g==NULL) {
-		  g = new_group(u->faction, name, ++maxgid);
-		  init_group(u->faction, g);
-	  }
+  if (name && name[0]) {
+    g = find_groupbyname(u->faction->groups, name);
+    if (g==NULL) {
+      g = new_group(u->faction, name, ++maxgid);
+      init_group(u->faction, g);
+    }
   }
 
   set_group(u, g);
-	return true;
+  return true;
 }
 
 void
