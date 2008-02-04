@@ -290,7 +290,7 @@ any_recruiters(const struct race * rc, int qty)
 static int
 peasant_recruiters(const struct race * rc, int qty)
 {
-  if (rc->ec_flags & ECF_REC_UNLIMITED) return -1;
+  if (rc->ec_flags & ECF_REC_ETHEREAL) return -1;
   if (rc->ec_flags & ECF_REC_HORSES) return -1;
   if (rc==new_race[RC_URUK]) return qty;
   return qty * 2;
@@ -299,7 +299,7 @@ peasant_recruiters(const struct race * rc, int qty)
 static int
 horse_recruiters(const struct race * rc, int qty)
 {
-  if (rc->ec_flags & ECF_REC_UNLIMITED) return -1;
+  if (rc->ec_flags & ECF_REC_ETHEREAL) return -1;
   if (rc->ec_flags & ECF_REC_HORSES) return qty * 2;
   return -1;
 }
@@ -424,7 +424,11 @@ expandrecruit(region * r, request * recruitorders)
   /* no limit: */
   recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
-    do_recruiting(recruits, INT_MAX);
+    int recruited, peasants = rpeasants(r);
+    recruited = do_recruiting(recruits, INT_MAX);
+    if (recruited>0)  {
+      rsetpeasants(r, peasants - recruited/2);
+    }
     free_recruitments(recruits);
   }
 

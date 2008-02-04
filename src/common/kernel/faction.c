@@ -228,13 +228,14 @@ destroyfaction(faction * f)
     distribute_items(u);
     if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
       const race * rc = u->race;
-      int p = rpeasants(u->region);
       int m = rmoney(u->region);
-      int h = rhorses(u->region);
 
-      /* Personen gehen nur an die Bauern, wenn sie auch von dort
-       * stammen */
-      if ((rc->ec_flags & ECF_REC_UNLIMITED)==0) {
+      if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
+        int p = rpeasants(u->region);
+        int h = rhorses(u->region);
+
+        /* Personen gehen nur an die Bauern, wenn sie auch von dort
+         * stammen */
         if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
           h += u->number;
         } else if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
@@ -242,11 +243,11 @@ destroyfaction(faction * f)
         } else {
           p += u->number;
         }
+        h += get_item(u, I_HORSE);
+        rsetpeasants(r, p);
+        rsethorses(r, h);
       }
       m += get_money(u);
-      h += get_item(u, I_HORSE);
-      rsetpeasants(r, p);
-      rsethorses(r, h);
       rsetmoney(r, m);
 
     }

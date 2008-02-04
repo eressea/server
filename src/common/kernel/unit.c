@@ -870,11 +870,19 @@ transfermen(unit * u, unit * u2, int n)
     }
   }
   else if (r->land) {
-    if ((u->race->ec_flags & ECF_REC_UNLIMITED)==0) {
-      if(u->race != new_race[RC_URUK]) {
-        rsetpeasants(r, rpeasants(r) + n);
+    if ((u->race->ec_flags & ECF_REC_ETHEREAL)==0) {
+      const race * rc = u->race;
+      if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
+        int h = rhorses(r) + u->number;
+        rsethorses(r, h);
       } else {
-        rsetpeasants(r, rpeasants(r) + n/2);
+        int p = rpeasants(r);
+        if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
+          p += u->number/2;
+        } else {
+          p += u->number;
+        }
+        rsetpeasants(r, p);
       }
     }
   }
