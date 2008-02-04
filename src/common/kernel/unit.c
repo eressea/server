@@ -531,7 +531,6 @@ free_units(void)
 void
 write_unit_reference(const unit * u, FILE * F)
 {
-  assert(u==NULL || u->number>=0);
   fprintf(F, "%s ", (u!=NULL && u->no!=0)?itoa36(u->no):"0");
 }
 
@@ -560,13 +559,13 @@ read_unit_reference(unit ** up, FILE * F)
 }
 
 attrib_type at_stealth = {
-	"stealth", NULL, NULL, NULL, a_writeint, a_readint
+  "stealth", NULL, NULL, NULL, a_writeint, a_readint
 };
 
 void
 u_seteffstealth(unit * u, int value)
 {
-	attrib * a = NULL;
+  attrib * a = NULL;
   if (fval(u, UFL_STEALTH)) {
     a = a_find(u->attribs, &at_stealth);
   }
@@ -581,7 +580,7 @@ u_seteffstealth(unit * u, int value)
     a = a_add(&u->attribs, a_new(&at_stealth));
     fset(u, UFL_STEALTH);
   }
-	a->data.i = value;
+  a->data.i = value;
 }
 
 int
@@ -597,32 +596,32 @@ u_geteffstealth(const struct unit * u)
 int
 get_level(const unit * u, skill_t id)
 {
-	skill * sv = u->skills;
-	while (sv != u->skills + u->skill_size) {
-		if (sv->id == id) {
-			return sv->level;
-		}
-		++sv;
-	}
-	return 0;
+  skill * sv = u->skills;
+  while (sv != u->skills + u->skill_size) {
+    if (sv->id == id) {
+      return sv->level;
+    }
+    ++sv;
+  }
+  return 0;
 }
 
 void 
 set_level(unit * u, skill_t sk, int value)
 {
-	skill * sv = u->skills;
-	if (value==0) {
-		remove_skill(u, sk);
-		return;
-	}
-	while (sv != u->skills + u->skill_size) {
-		if (sv->id == sk) {
-			sk_set(sv, value);
-			return;
-		}
-		++sv;
-	}
-	sk_set(add_skill(u, sk), value);
+  skill * sv = u->skills;
+  if (value==0) {
+    remove_skill(u, sk);
+    return;
+  }
+  while (sv != u->skills + u->skill_size) {
+    if (sv->id == sk) {
+      sk_set(sv, value);
+      return;
+    }
+    ++sv;
+  }
+  sk_set(add_skill(u, sk), value);
 }
 
 static int  
