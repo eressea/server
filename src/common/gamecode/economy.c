@@ -813,12 +813,8 @@ give_cmd(unit * u, order * ord)
   }
 
   if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-    const resource_type * rtype = findresourcetype(s, u->faction->locale);
-    if (rtype==NULL || !fval(rtype, RTF_SNEAK))
-    {
-      cmistake(u, ord, 40, MSG_COMMERCE);
-      return;
-    }
+    cmistake(u, ord, 40, MSG_COMMERCE);
+    return;
   }
   i = findparam(s, u->faction->locale);
   if (i == P_PERSON) {

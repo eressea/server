@@ -40,10 +40,9 @@ typedef struct resource {
 /* bitfield values for resource_type::flags */
 #define RTF_NONE     0
 #define RTF_ITEM     (1<<0) /* this resource is an item */
-#define RTF_SNEAK    (1<<1) /* can be sneaked to another struct unit, e.g. P_FOOL */
-#define RTF_LIMITED  (1<<2) /* a resource that's freely available, but in
+#define RTF_LIMITED  (1<<1) /* a resource that's freely available, but in
                              * limited supply */
-#define RTF_POOLED   (1<<3) /* resource is available in pool */
+#define RTF_POOLED   (1<<2) /* resource is available in pool */
 
 /* flags for resource_type::name() */
 #define NMF_PLURAL     0x01

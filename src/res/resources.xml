@@ -748,7 +748,7 @@
     </item>
   </resource>
 
-  <resource name="p7" appearance="vial" sneak="yes">
+  <resource name="p7" appearance="vial">
     <item weight="0" score="90">
       <function name="useonother" value="usefoolpotion"/>
       <potion level="3"/>
