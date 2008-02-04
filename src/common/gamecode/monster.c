@@ -133,7 +133,7 @@ monster_attack(unit * u, const unit * target)
   if (!cansee(u->faction, u->region, target, 0)) return NULL;
   if (is_waiting(u)) return NULL;
   
-  return create_order(K_ATTACK, u->faction->locale, "%i", u->no);
+  return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
 
@@ -576,7 +576,7 @@ monster_attacks(unit * u)
   unit * u2;
 
   for (u2=r->units;u2;u2=u2->next) {
-    if (chance(0.75)) {
+    if (u2->faction!=u->faction && chance(0.75)) {
       order * ord = monster_attack(u, u2);
       if (ord) addlist(&u->orders, ord);
     }
