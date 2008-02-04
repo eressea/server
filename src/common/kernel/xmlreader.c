@@ -876,7 +876,6 @@ parse_resources(xmlDocPtr doc)
 
     if (xml_bvalue(node, "pooled", true)) flags |= RTF_POOLED;
     if (xml_bvalue(node, "limited", false)) flags |= RTF_LIMITED;
-    if (xml_bvalue(node, "sneak", false)) flags |= RTF_SNEAK;
 
     name = xmlGetProp(node, BAD_CAST "name");
     appearance = xmlGetProp(node, BAD_CAST "appearance");
