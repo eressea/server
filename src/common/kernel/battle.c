@@ -119,7 +119,7 @@ const troop no_troop = {0, 0};
 static int
 army_index(side * s)
 {
-  return s->battle->nsides - s->index - 1;
+  return s->index;
 }
 
 #ifndef SIMPLE_ESCAPE
