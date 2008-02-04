@@ -5581,7 +5581,6 @@ sp_pullastral(castorder *co)
     if (!ucontact(u, mage)) {
       if (power > 12 && spobj->flag != TARGET_RESISTS && can_survive(u, rt)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_no_resist", "target", u));
-        ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
       } else {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_contact_resist", "target", u));
         ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage, u));
@@ -5598,6 +5597,7 @@ sp_pullastral(castorder *co)
     } else {
       message * m;
 
+      ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage, u));
       remaining_cap = remaining_cap - w;
       move_unit(u, rt, NULL);
 
