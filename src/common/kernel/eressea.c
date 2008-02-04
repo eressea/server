@@ -1040,7 +1040,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 
   if (u->faction == f || omniscient(f)) {
     return true;
-  } else if (u->race == new_race[RC_SPELL]) {
+  } else if (fval(u->race, RCF_INVISIBLE)) {
     return false;
   } else if (u->number == 0) {
     attrib *a = a_find(u->attribs, &at_creator);
@@ -1091,7 +1091,7 @@ boolean
 cansee_unit(const unit * u, const unit * target, int modifier)
 /* target->region kann != u->region sein, wenn es um durchreisen geht */
 {
-  if (target->race == new_race[RC_SPELL] || target->number == 0) return false;
+  if (fval(target->race, RCF_INVISIBLE) || target->number == 0) return false;
   else if (target->faction == u->faction) return true;
   else {
     int n, rings, o;
@@ -1131,7 +1131,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
   int n;
   unit *u2;
 
-  if (u->race == new_race[RC_SPELL] || u->number == 0) return false;
+  if (fval(u->race, RCF_INVISIBLE) || u->number == 0) return false;
   else if (u->faction == f) return true;
   else {
     int rings;

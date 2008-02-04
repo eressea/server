@@ -659,7 +659,7 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   boolean isbattle = (boolean)(mode == see_battle);
   char buf[8192];
 
-  if (u->race == new_race[RC_SPELL]) return;
+  if (fval(u->race, RCF_INVISIBLE)) return;
 
   {
     rnl(F);
@@ -1181,7 +1181,7 @@ statistics(FILE * F, const region * r, const faction * f)
 
   /* count */
   for (u = r->units; u; u = u->next) {
-    if (u->faction == f && u->race != new_race[RC_SPELL]) {
+    if (u->faction == f && !fval(u->race, RCF_INVISIBLE)) {
       for (itm=u->items;itm;itm=itm->next) {
         i_change(&items, itm->type, itm->number);
       }
@@ -1391,7 +1391,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
     if (sr->mode<see_unit) continue;
 
     for (u = r->units; u; u = u->next) {
-      if (u->faction == f && u->race != new_race[RC_SPELL]) {
+      if (u->faction == f && !fval(u->race, RCF_INVISIBLE)) {
         order * ord;
         if (!dh) {
           rps_nowrap(F, "");

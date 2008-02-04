@@ -133,6 +133,7 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define RCF_COASTAL        (1<<22) /* kann in Landregionen an der Küste sein */
 #define RCF_UNARMEDGUARD   (1<<23) /* kann ohne Waffen bewachen */
 #define RCF_CANSAIL        (1<<24) /* Einheit darf Schiffe betreten */
+#define RCF_INVISIBLE      (1<<25) /* not visible in any report */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */

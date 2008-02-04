@@ -1473,6 +1473,7 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "cansail", true)) rc->flags |= RCF_CANSAIL;
     if (xml_bvalue(node, "cannotmove", false)) rc->flags |= RCF_CANNOTMOVE;
     if (xml_bvalue(node, "fly", false)) rc->flags |= RCF_FLY;
+    if (xml_bvalue(node, "invisible", false)) rc->flags |= RCF_INVISIBLE;
     if (xml_bvalue(node, "coastal", false)) rc->flags |= RCF_COASTAL;
     if (xml_bvalue(node, "unarmedguard", false)) rc->flags |= RCF_UNARMEDGUARD;
     if (xml_bvalue(node, "swim", false)) rc->flags |= RCF_SWIM;

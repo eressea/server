@@ -664,6 +664,8 @@ cr_output_unit(FILE * F, const region * r,
   static const curse_type * itemcloak_ct = 0;
   static boolean init = false;
 
+  if (fval(u->race, RCF_INVISIBLE)) return;
+
   if (!init) {
     init = true;
     itemcloak_ct = ct_find("itemcloak");
