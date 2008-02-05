@@ -2134,7 +2134,7 @@ display_race(faction *f, unit *u, const race * rc)
   for (a = 0; a < 6; a++) {
     if (rc->attack[a].type != AT_NONE){
       if (a!=0) bytes = (int)strlcpy(bufp, ", ", size);
-      else strlcpy(bufp, ": ", size);
+      else bytes = (int)strlcpy(bufp, ": ", size);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
       switch(rc->attack[a].type) {
@@ -2148,7 +2148,7 @@ display_race(faction *f, unit *u, const race * rc)
       case AT_COMBATSPELL:
       case AT_DRAIN_ST:
       case AT_DAZZLE:
-        bytes = snprintf(bufp, size, "%s", LOC(f->locale, "attack_natural"));
+        bytes = snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
         break;
       case AT_STRUCTURAL:
         bytes = snprintf(bufp, size, "%s (%s)", LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);

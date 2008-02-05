@@ -7390,8 +7390,8 @@
   </string>
 
   <string name="attack_natural">
-    <text locale="de">ein Angriff mit der Waffe oder unbewaffnet</text>
-    <text locale="en">an attack with a weapon or an unarmed attack</text>
+    <text locale="de">ein unbewaffneter Angriff</text>
+    <text locale="en">an unarmed attack</text>
   </string>
 
   <string name="attack_magical">
