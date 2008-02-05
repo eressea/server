@@ -41,7 +41,7 @@ extern "C" {
 #define HERBS_ROT  /* herbs owned by units have a chance to rot. */
 #define SHIPDAMAGE /* Schiffsbeschädigungen */
 #define INSECT_POTION /* Spezialtrank für Insekten */
-#define ORCIFICATION /* gioving snotlings to the peasants gets counted */
+#define ORCIFICATION /* giving snotlings to the peasants gets counted */
 #undef TROLLSAVE /* saving throw for dead trolls */
 
 #include <settings.h>

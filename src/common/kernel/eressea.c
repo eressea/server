@@ -2180,7 +2180,7 @@ setguard(unit * u, unsigned int flags)
 unsigned int
 getguard(const unit * u)
 {
-  if (!fval(u->region->terrain, LAND_REGION)) return GUARD_NONE;
+  if (fval(u->region->terrain, SEA_REGION)) return GUARD_NONE;
   if (fval(u, UFL_GUARD)) {
     attrib * a = a_find(u->attribs, &at_guard);
     if (a) return (unsigned int)a->data.i;

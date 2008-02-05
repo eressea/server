@@ -2141,7 +2141,7 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
   bfaction * bf;
 
 #ifdef SIMPLE_COMBAT
-  if (!fval(b->region->terrain, LAND_REGION)) {
+  if (fval(b->region->terrain, SEA_REGION)) {
     /* every fight in an ocean is short */
     flags |= SIDE_HASGUARDS;
   } else {
@@ -2282,7 +2282,7 @@ aftermath(battle * b)
   side *s;
   int dead_players = 0;
   bfaction * bf;
-  boolean battle_was_relevant = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2);
+  boolean ships_damaged = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2); /* only used for ship damage! */
 
 #ifdef TROLLSAVE
   int *trollsave = calloc(2 * cv_size(&b->factions), sizeof(int));
@@ -2552,7 +2552,7 @@ aftermath(battle * b)
       /* Wenn sich die Einheit auf einem Schiff befindet, wird
       * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
       * evt. zuvor verlassen wurde. */
-      if (battle_was_relevant) {
+      if (ships_damaged) {
         if (du->ship) sh = du->ship;
         else sh = leftship(du);
 
@@ -2567,7 +2567,7 @@ aftermath(battle * b)
     }
   }
 
-  if (battle_was_relevant) {
+  if (ships_damaged) {
     ship **sp = &r->ships;
 
     while (*sp) {
@@ -2587,7 +2587,7 @@ aftermath(battle * b)
     fprintf(bdebug, "The battle lasted %d turns, %s and %s.\n",
       b->turn,
       b->has_tactics_turn?"had a tactic turn":"had no tactic turn",
-      battle_was_relevant?"was relevant":"was not relevant.");
+      ships_damaged?"was relevant":"was not relevant.");
   }
 }
 
