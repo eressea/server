@@ -1875,6 +1875,15 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier konnte keinen Fluch zerstören."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The magician could not destroy any magic."</text>
   </message>
+  <message name="speed_time_effect" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"In $region($region) dehnt $unit($unit) die Zeit für $int($amount) Personen."</text>
+    <text locale="en">"In $region($region), $unit($unit) bends time for $int($amount) men."</text>
+  </message>
   <message name="destroy_magic_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>

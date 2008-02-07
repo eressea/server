@@ -6606,7 +6606,7 @@ sp_speed2(castorder *co)
     used += men;
   }
 
-  /* TODO: Erfolg melden*/
+  ADDMSG(&mage->faction->msgs, msg_message("speed_time_effect", "unit region amount", mage, mage->region, used));
   /* Effektiv benötigten cast_level (mindestens 1) zurückgeben */
   used = (int)sqrt(used/2);
   return max(1, used);
