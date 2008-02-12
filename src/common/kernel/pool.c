@@ -40,9 +40,6 @@
 #define TODO_POOL
 #undef TODO_RESOURCES
 
-static int want_mp = 1 << O_MATERIALPOOL;
-static int want_sp = 1 << O_SILBERPOOL;
-
 static const race * rc_stonegolem;
 static const race * rc_irongolem;
 
@@ -102,19 +99,14 @@ change_resource(unit * u, const resource_type * rtype, int change)
     i = change_maxspellpoints(u, change);
   else
     assert(!"undefined resource detected. rtype->uchange not initialized.");
-  assert(i >= 0 && (i < 100000000));  /* Softer Test, daß kein Unfug
-                                        * * passiert */
+  assert(i >= 0 && (i < 100000000));  /* soft test to catch mischief */
   return i;
 }
 
 int
 get_reservation(const unit * u, const resource_type * rtype)
 {
-  faction * f = u->faction;
   struct reservation * res = u->reservations;
-  if ((rtype==r_silver && !(f->options & want_sp)) || (rtype!=r_silver && !(f->options & want_mp))) {
-    return get_resource(u, rtype);
-  }
 
   if (!rc_stonegolem) init_static();
 
@@ -201,10 +193,6 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode, int c
       if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
 
       if (v->faction == f) {
-        if ((mode & GET_POOLED_FORCE)==0) {
-          if (rtype==r_silver && !(f->options & want_sp)) continue;
-          if (rtype!=r_silver && !(f->options & want_mp)) continue;
-        }
         mask = (mode >> 3) & (GET_SLACK|GET_RESERVE);
       }
       else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
@@ -254,10 +242,6 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
       if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
 
       if (v->faction == f) {
-        if ((mode & GET_POOLED_FORCE)==0) {
-          if (rtype==r_silver && !(f->options & want_sp)) continue;
-          if (rtype!=r_silver && !(f->options & want_mp)) continue;
-        }
         mask = (mode >> 3) & (GET_SLACK|GET_RESERVE);
       }
       else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);

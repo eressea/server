@@ -3767,8 +3767,12 @@ static void maintain_buildings_2(region * r) { maintain_buildings(r,true); }
 static void reset_moved(unit * u) { freset(u, UFL_MOVED); }
 
 static void reset_rng(void) {
-  if (turn == 0) rng_init((int)time(0));
-  else rng_init(turn);
+  rng_init(turn?turn:(int)time(0));
+}
+
+static void reset_rng_region(const region * r)
+{
+  rng_init(r->index);
 }
 
 /** warn about passwords that are not US ASCII.
@@ -3895,6 +3899,7 @@ processorders (void)
     add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER|PROC_LONGORDER, "Lehren");
   }
   p+=10;
+  add_proc_region(p, &reset_rng_region, NULL);
   add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER|PROC_LONGORDER, "Lernen");
 
   p+=10;

@@ -131,7 +131,7 @@ addfaction(const char *email, const char * password,
   f->locale = loc;
   f->subscription = subscription;
 
-  f->options = want(O_REPORT) | want(O_ZUGVORLAGE) | want(O_SILBERPOOL) | want(O_COMPUTER) | want(O_COMPRESS) | want(O_ADRESSEN) | want(O_STATISTICS);
+  f->options = want(O_REPORT) | want(O_ZUGVORLAGE) | want(O_COMPUTER) | want(O_COMPRESS) | want(O_ADRESSEN) | want(O_STATISTICS);
 
   f->no = unused_faction_id();
   addlist(&factions, f);

@@ -242,21 +242,21 @@ extern const char *parameters[MAXPARAMS];
 /* --------------- Reports Typen ------------------------------- */
 
 enum {
-	O_REPORT,				/* 1 */
-	O_COMPUTER,			/* 2 */
-	O_ZUGVORLAGE,		/* 4 */
-	O_SILBERPOOL,		/* 8 */
-	O_STATISTICS,		/* 16 */
-	O_DEBUG,				/* 32 */
-	O_COMPRESS,			/* 64 */
-	O_NEWS,					/* 128 */
-	O_MATERIALPOOL,	/* 256 */
-	O_ADRESSEN,			/* 512 */
-	O_BZIP2,				/* 1024 - compress as bzip2 */
-	O_SCORE,				/* 2048 - punkte anzeigen? */
-	O_SHOWSKCHANGE,	/* 4096 - Skillveränderungen anzeigen? */
+  O_REPORT,				/* 1 */
+  O_COMPUTER,			/* 2 */
+  O_ZUGVORLAGE,		/* 4 */
+  O_UNUSED_3,
+  O_STATISTICS,		/* 16 */
+  O_DEBUG,				/* 32 */
+  O_COMPRESS,			/* 64 */
+  O_NEWS,					/* 128 */
+  O_UNUSED_8,
+  O_ADRESSEN,			/* 512 */
+  O_BZIP2,				/* 1024 - compress as bzip2 */
+  O_SCORE,				/* 2048 - punkte anzeigen? */
+  O_SHOWSKCHANGE,	/* 4096 - Skillveränderungen anzeigen? */
   O_XML,    			/* 8192 - XML report versenden */
-	MAXOPTIONS
+  MAXOPTIONS
 };
 
 /* ------------------ Talente ---------------------------------- */

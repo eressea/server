@@ -433,12 +433,12 @@ const char *options[MAXOPTIONS] =
   "AUSWERTUNG",
   "COMPUTER",
   "ZUGVORLAGE",
-  "SILBERPOOL",
+  NULL,
   "STATISTIK",
   "DEBUG",
   "ZIPPED",
   "ZEITUNG",        /* Option hat Sonderbehandlung! */
-  "MATERIALPOOL",
+  NULL,
   "ADRESSEN",
   "BZIP2",
   "PUNKTE",
@@ -2023,13 +2023,13 @@ init_locale(const struct locale * lang)
   tokens = get_translations(lang, UT_KEYWORDS);
   for (i=0;i!=MAXKEYWORDS;++i) {
     var.i = i;
-    addtoken(tokens, LOC(lang, keywords[i]), var);
+    if (keywords[i]) addtoken(tokens, LOC(lang, keywords[i]), var);
   }
 
   tokens = get_translations(lang, UT_OPTIONS);
   for (i=0;i!=MAXOPTIONS;++i) {
     var.i = i;
-    addtoken(tokens, LOC(lang, options[i]), var);
+    if (options[i]) addtoken(tokens, LOC(lang, options[i]), var);
   }
 
   tokens = get_translations(lang, UT_TERRAINS);
@@ -2859,10 +2859,7 @@ kernel_init(void)
   translation_init();
 
   if (!turn) turn = lastturn();
-  if (turn == 0)
-    rng_init((int)time(0));
-  else
-    rng_init(turn);
+  rng_init(turn?turn:(int)time(0));
   if (sqlpatch) {
     sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
     sql_init(zBuffer);

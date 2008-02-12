@@ -1230,7 +1230,12 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   print_items(F, f->items, f->locale);
   fputs("OPTIONEN\n", F);
   for (i=0;i!=MAXOPTIONS;++i) {
-    fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);
+    int flag = want(i);
+    if (options[i]) {
+      fprintf(F, "%d;%s\n", (f->options&flag)?1:0, options[i]);
+    } else if (f->options&flag) {
+      f->options &= (~flag);
+    }
   }
 #ifdef ENEMIES
   show_enemies(F, f->enemies);

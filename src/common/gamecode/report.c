@@ -1373,8 +1373,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
 
   rps_nowrap(F, "");
   rnl(F);
-  sprintf(buf, "; ECHECK %s-w4 -r%d -v%s", (f->options & want(O_SILBERPOOL)) ? "-l " : "",
-    f->race->recruitcost, ECHECK_VERSION);
+  sprintf(buf, "; ECHECK -l -w4 -r%d -v%s", f->race->recruitcost, ECHECK_VERSION);
   /* -v3.4: ECheck Version 3.4.x */
   rps_nowrap(F, buf);
   rnl(F);
@@ -2056,7 +2055,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   bytes = snprintf(buf, size,"%s:", LOC(f->locale, "nr_options"));
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   for (op = 0; op != MAXOPTIONS; op++) {
-    if (f->options & want(op)) {
+    if (f->options & want(op) && options[op]) {
       bytes = (int)strlcpy(bufp, " ", size);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       bytes = (int)strlcpy(bufp, LOC(f->locale, options[op]), size);
