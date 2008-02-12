@@ -798,7 +798,6 @@ maxbuild(const unit * u, const construction * cons)
     int have = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
     int need = required(1, cons->reqsize, cons->materials[c].number);
     if (have<need) {
-      cmistake(u, u->thisorder, 88, MSG_PRODUCE);
       return 0;
     }
     else maximum = min(maximum, have/need);

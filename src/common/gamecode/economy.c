@@ -1673,33 +1673,33 @@ split_allocations(region * r)
 static void
 create_potion(unit * u, const potion_type * ptype, int want)
 {
-	int built;
+  int built;
 
   if (want==0) {
-		want = maxbuild(u, ptype->itype->construction);
+    want = maxbuild(u, ptype->itype->construction);
   }
-	built = build(u, ptype->itype->construction, 0, want);
-	switch (built) {
-		case ELOWSKILL:
-		case ENEEDSKILL:
-			/* no skill, or not enough skill points to build */
-			cmistake(u, u->thisorder, 50, MSG_PRODUCE);
-			break;
-		case ECOMPLETE:
-			assert(0);
-			break;
-		case ENOMATERIALS:
-			/* something missing from the list of materials */
+  built = build(u, ptype->itype->construction, 0, want);
+  switch (built) {
+    case ELOWSKILL:
+    case ENEEDSKILL:
+      /* no skill, or not enough skill points to build */
+      cmistake(u, u->thisorder, 50, MSG_PRODUCE);
+      break;
+    case ECOMPLETE:
+      assert(0);
+      break;
+    case ENOMATERIALS:
+      /* something missing from the list of materials */
       ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, ptype->itype->construction, want));
-			return;
-			break;
-		default:
-			i_change(&u->items, ptype->itype, built);
-			if (want==INT_MAX) want = built;
-			ADDMSG(&u->faction->msgs, msg_message("manufacture",
-				"unit region amount wanted resource", u, u->region, built, want, ptype->itype->rtype));
-			break;
-	}
+      return;
+      break;
+    default:
+      i_change(&u->items, ptype->itype, built);
+      if (want==INT_MAX) want = built;
+      ADDMSG(&u->faction->msgs, msg_message("manufacture",
+        "unit region amount wanted resource", u, u->region, built, want, ptype->itype->rtype));
+      break;
+  }
 }
 
 static void
