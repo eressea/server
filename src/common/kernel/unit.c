@@ -872,14 +872,14 @@ transfermen(unit * u, unit * u2, int n)
     if ((u->race->ec_flags & ECF_REC_ETHEREAL)==0) {
       const race * rc = u->race;
       if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
-        int h = rhorses(r) + u->number;
+        int h = rhorses(r) + n;
         rsethorses(r, h);
       } else {
         int p = rpeasants(r);
         if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
-          p += u->number/2;
+          p += n/2;
         } else {
-          p += u->number;
+          p += n;
         }
         rsetpeasants(r, p);
       }
