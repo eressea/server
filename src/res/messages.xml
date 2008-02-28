@@ -5513,7 +5513,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich weder in einer Burg noch in einem Schiff."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich weder in einer Burg noch auf einem Schiff."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is neither in a castle nor on board a ship."</text>
   </message>
   <message name="error139" section="errors">
