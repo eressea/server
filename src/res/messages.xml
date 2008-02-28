@@ -8353,7 +8353,7 @@
       <arg name="unit" type="unit"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In dieser Region gibt es keine Brücken uns Straßen mehr zu bauen."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - In dieser Region gibt es keine Brücken und Straßen mehr zu bauen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - the roads and bridges in this region are complete."</text>
   </message>
 
