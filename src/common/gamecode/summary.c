@@ -35,6 +35,8 @@
 
 #include <string.h>
 
+#undef SUMMARY_BOM /* write a BOM in the summary file */
+
 typedef struct summary {
   int waffen;
   int factions;
@@ -149,10 +151,12 @@ report_summary(summary * s, summary * o, boolean full)
   }
   F = cfopen(zText, "w");
   if (!F) return;
+#ifdef SUMMARY_BOM
   else {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
     fwrite(utf8_bom, 1, 3, F);
   }
+#endif
   printf("Schreibe Zusammenfassung (parteien)...\n");
   fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
   fprintf(F,   "Auswertung Nr:         %d\n\n", turn);

@@ -2233,6 +2233,11 @@ promotion_cmd(unit * u, struct order * ord)
 {
   int money, people;
 
+  if (fval(u, UFL_HERO)) {
+    /* TODO: message "is already a hero" */
+    return 0;
+  }
+
   if (maxheroes(u->faction) < countheroes(u->faction)+u->number) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_maxed", "max count",
       maxheroes(u->faction), countheroes(u->faction)));
@@ -3803,9 +3808,8 @@ warn_password(void)
 }
 
 void
-processorders (void)
+init_processor(void)
 {
-  region *r;
   int p;
 
   p = 10;
@@ -3962,7 +3966,18 @@ processorders (void)
 
   p+=10;
   add_proc_global(p, &renumber_factions, "Neue Nummern");
+}
 
+void
+processorders (void)
+{
+  static int init = 0;
+  region *r;
+
+  if (!init) {
+    init_processor();
+    init = 1;
+  }
   process();
   /*************************************************/
 

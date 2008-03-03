@@ -152,7 +152,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     /* snotlings may not be given to the peasants. */
     error = 307;
 #ifdef HEROES
-  } else if (u2 && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
+  } else if (u2 && u2->number && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
     /* heroes may not be given to non-heroes and vice versa*/
     error = 75;
 #endif

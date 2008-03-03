@@ -107,7 +107,7 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
     region * r = u->region;
     int holz = 0;
     
-    /* für die Aufforstung von Mallornwäldern braucht man Mallorn */
+    /* mallorn is required to make mallorn forests, wood for regular ones */
     if (fval(r, RF_MALLORN)) {
       holz = use_pooled(u, rt_find("mallorn"), 
                         GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
