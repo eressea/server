@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -69,9 +69,9 @@ attrib_type at_creator = {
 
 #define DMAXHASH 7919
 typedef struct dead {
-	struct dead * nexthash;
-	faction * f;
-	int no;
+  struct dead * nexthash;
+  faction * f;
+  int no;
 } dead;
 
 static dead* deadhash[DMAXHASH];
@@ -79,25 +79,27 @@ static dead* deadhash[DMAXHASH];
 static void
 dhash(int no, faction * f)
 {
-	dead * hash = (dead*)calloc(1, sizeof(dead));
-	dead * old = deadhash[no % DMAXHASH];
-	hash->no = no;
-	hash->f = f;
-	deadhash[no % DMAXHASH] = hash;
-	hash->nexthash = old;
+  dead * hash = (dead*)calloc(1, sizeof(dead));
+  dead * old = deadhash[no % DMAXHASH];
+  hash->no = no;
+  hash->f = f;
+  deadhash[no % DMAXHASH] = hash;
+  hash->nexthash = old;
 }
 
 faction *
 dfindhash(int no)
 {
-	dead * old;
+  dead * old;
 
-	if(no < 0) return 0;
+  if(no < 0) return 0;
 
-	for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash)
-		if (old->no == no)
-			return old->f;
-	return 0;
+  for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash) {
+    if (old->no == no) {
+      return old->f;
+    }
+  }
+  return 0;
 }
 
 unit * udestroy = NULL;
@@ -275,20 +277,20 @@ destroy_unit(unit * u)
 unit *
 findnewunit (const region * r, const faction *f, int n)
 {
-	unit *u2;
+  unit *u2;
 
-	if (n == 0)
-		return 0;
+  if (n == 0)
+    return 0;
 
-	for (u2 = r->units; u2; u2 = u2->next)
-		if (u2->faction == f && ualias(u2) == n)
-			return u2;
+  for (u2 = r->units; u2; u2 = u2->next)
+    if (u2->faction == f && ualias(u2) == n)
+      return u2;
 #ifdef FIND_FOREIGN_TEMP
-	for (u2 = r->units; u2; u2 = u2->next)
-		if (ualias(u2) == n)
-			return u2;
+  for (u2 = r->units; u2; u2 = u2->next)
+    if (ualias(u2) == n)
+      return u2;
 #endif
-	return 0;
+  return 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -298,31 +300,31 @@ findnewunit (const region * r, const faction *f, int n)
 /*   at_alias   */
 /*********************/
 attrib_type at_alias = {
-	"alias",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	NO_WRITE,
-	NO_READ
+  "alias",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  NO_WRITE,
+  NO_READ
 };
 
 int
 ualias(const unit * u) {
-	attrib * a = a_find(u->attribs, &at_alias);
-	if (!a) return 0;
-	return a->data.i;
+  attrib * a = a_find(u->attribs, &at_alias);
+  if (!a) return 0;
+  return a->data.i;
 }
 
 /*********************/
 /*   at_private   */
 /*********************/
 attrib_type at_private = {
-	"private",
-	DEFAULT_INIT,
-	a_finalizestring,
-	DEFAULT_AGE,
-	a_writestring,
-	a_readstring
+  "private",
+  DEFAULT_INIT,
+  a_finalizestring,
+  DEFAULT_AGE,
+  a_writestring,
+  a_readstring
 };
 
 const char *
@@ -338,22 +340,22 @@ u_description(const unit * u, const struct locale * lang)
 
 const char *
 uprivate(const unit * u) {
-	attrib * a = a_find(u->attribs, &at_private);
-	if (!a) return NULL;
-	return a->data.v;
+  attrib * a = a_find(u->attribs, &at_private);
+  if (!a) return NULL;
+  return a->data.v;
 }
 
 void
 usetprivate(unit * u, const char * str) {
-	attrib * a = a_find(u->attribs, &at_private);
+  attrib * a = a_find(u->attribs, &at_private);
 
-	if(str == NULL) {
-		if(a) a_remove(&u->attribs, a);
-		return;
-	}
-	if (!a) a = a_add(&u->attribs, a_new(&at_private));
-	if (a->data.v) free(a->data.v);
-	a->data.v = strdup((const char*)str);
+  if(str == NULL) {
+    if(a) a_remove(&u->attribs, a);
+    return;
+  }
+  if (!a) a = a_add(&u->attribs, a_new(&at_private));
+  if (a->data.v) free(a->data.v);
+  a->data.v = strdup((const char*)str);
 }
 
 /*********************/
@@ -361,65 +363,65 @@ usetprivate(unit * u, const char * str) {
 /*********************/
 /* Einheit BENUTZT einen Trank */
 attrib_type at_potionuser = {
-	"potionuser",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	NO_WRITE,
-	NO_READ
+  "potionuser",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  NO_WRITE,
+  NO_READ
 };
 
 void
 usetpotionuse(unit * u, const potion_type * ptype)
 {
-	attrib * a = a_find(u->attribs, &at_potionuser);
-	if (!a) a = a_add(&u->attribs, a_new(&at_potionuser));
-	a->data.v = (void*)ptype;
+  attrib * a = a_find(u->attribs, &at_potionuser);
+  if (!a) a = a_add(&u->attribs, a_new(&at_potionuser));
+  a->data.v = (void*)ptype;
 }
 
 const potion_type *
 ugetpotionuse(const unit * u) {
-	attrib * a = a_find(u->attribs, &at_potionuser);
-	if (!a) return NULL;
-	return (const potion_type *)a->data.v;
+  attrib * a = a_find(u->attribs, &at_potionuser);
+  if (!a) return NULL;
+  return (const potion_type *)a->data.v;
 }
 
 /*********************/
 /*   at_target   */
 /*********************/
 attrib_type at_target = {
-	"target",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	NO_WRITE,
-	NO_READ
+  "target",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  NO_WRITE,
+  NO_READ
 };
 
 unit *
 utarget(const unit * u) {
-	attrib * a;
-	if (!fval(u, UFL_TARGET)) return NULL;
-	a = a_find(u->attribs, &at_target);
-	assert (a || !"flag set, but no target found");
-	return (unit*)a->data.v;
+  attrib * a;
+  if (!fval(u, UFL_TARGET)) return NULL;
+  a = a_find(u->attribs, &at_target);
+  assert (a || !"flag set, but no target found");
+  return (unit*)a->data.v;
 }
 
 void
 usettarget(unit * u, const unit * t)
 {
-	attrib * a = a_find(u->attribs, &at_target);
-	if (!a && t) a = a_add(&u->attribs, a_new(&at_target));
-	if (a) {
-		if (!t) {
-			a_remove(&u->attribs, a);
-			freset(u, UFL_TARGET);
-		}
-		else {
-			a->data.v = (void*)t;
-			fset(u, UFL_TARGET);
-		}
-	}
+  attrib * a = a_find(u->attribs, &at_target);
+  if (!a && t) a = a_add(&u->attribs, a_new(&at_target));
+  if (a) {
+    if (!t) {
+      a_remove(&u->attribs, a);
+      freset(u, UFL_TARGET);
+    }
+    else {
+      a->data.v = (void*)t;
+      fset(u, UFL_TARGET);
+    }
+  }
 }
 
 /*********************/
@@ -429,61 +431,61 @@ usettarget(unit * u, const unit * t)
 void
 a_writesiege(const attrib * a, FILE * f)
 {
-	struct building * b = (struct building*)a->data.v;
-	write_building_reference(b, f);
+  struct building * b = (struct building*)a->data.v;
+  write_building_reference(b, f);
 }
 
 int
 a_readsiege(attrib * a, FILE * f)
 {
-	return read_building_reference((struct building**)&a->data.v, f);
+  return read_building_reference((struct building**)&a->data.v, f);
 }
 
 attrib_type at_siege = {
-	"siege",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	a_writesiege,
-	a_readsiege
+  "siege",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  a_writesiege,
+  a_readsiege
 };
 
 struct building *
 usiege(const unit * u) {
-	attrib * a;
-	if (!fval(u, UFL_SIEGE)) return NULL;
-	a = a_find(u->attribs, &at_siege);
-	assert (a || !"flag set, but no siege found");
-	return (struct building *)a->data.v;
+  attrib * a;
+  if (!fval(u, UFL_SIEGE)) return NULL;
+  a = a_find(u->attribs, &at_siege);
+  assert (a || !"flag set, but no siege found");
+  return (struct building *)a->data.v;
 }
 
 void
 usetsiege(unit * u, const struct building * t)
 {
-	attrib * a = a_find(u->attribs, &at_siege);
-	if (!a && t) a = a_add(&u->attribs, a_new(&at_siege));
-	if (a) {
-		if (!t) {
-			a_remove(&u->attribs, a);
-			freset(u, UFL_SIEGE);
-		}
-		else {
-			a->data.v = (void*)t;
-			fset(u, UFL_SIEGE);
-		}
-	}
+  attrib * a = a_find(u->attribs, &at_siege);
+  if (!a && t) a = a_add(&u->attribs, a_new(&at_siege));
+  if (a) {
+    if (!t) {
+      a_remove(&u->attribs, a);
+      freset(u, UFL_SIEGE);
+    }
+    else {
+      a->data.v = (void*)t;
+      fset(u, UFL_SIEGE);
+    }
+  }
 }
 
 /*********************/
 /*   at_contact   */
 /*********************/
 attrib_type at_contact = {
-	"contact",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	NO_WRITE,
-	NO_READ
+  "contact",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  NO_WRITE,
+  NO_READ
 };
 
 void
@@ -633,97 +635,97 @@ leftship_age(struct attrib * a)
 }
 
 static attrib_type at_leftship = {
-	"leftship", NULL, NULL, leftship_age
+  "leftship", NULL, NULL, leftship_age
 };
 
 static attrib *
 make_leftship(struct ship * leftship)
 {
-	attrib * a = a_new(&at_leftship);
-	a->data.v = leftship;
-	return a;
+  attrib * a = a_new(&at_leftship);
+  a->data.v = leftship;
+  return a;
 }
 
 void
 set_leftship(unit *u, ship *sh)
 {
-	a_add(&u->attribs, make_leftship(sh));
+  a_add(&u->attribs, make_leftship(sh));
 }
 
 ship *
 leftship(const unit *u)
 {
-	attrib * a = a_find(u->attribs, &at_leftship);
+  attrib * a = a_find(u->attribs, &at_leftship);
 
-	/* Achtung: Es ist nicht garantiert, daß der Rückgabewert zu jedem
-	 * Zeitpunkt noch auf ein existierendes Schiff zeigt! */
+  /* Achtung: Es ist nicht garantiert, daß der Rückgabewert zu jedem
+   * Zeitpunkt noch auf ein existierendes Schiff zeigt! */
 
-	if (a) return (ship *)(a->data.v);
+  if (a) return (ship *)(a->data.v);
 
-	return NULL;
+  return NULL;
 }
 
 void
 leave_ship(unit * u)
 {
-	struct ship * sh = u->ship;
-	if (sh==NULL) return;
-	u->ship = NULL;
-	set_leftship(u, sh);
+  struct ship * sh = u->ship;
+  if (sh==NULL) return;
+  u->ship = NULL;
+  set_leftship(u, sh);
 
-	if (fval(u, UFL_OWNER)) {
-		unit *u2, *owner = NULL;
-		freset(u, UFL_OWNER);
+  if (fval(u, UFL_OWNER)) {
+    unit *u2, *owner = NULL;
+    freset(u, UFL_OWNER);
 
-		for (u2 = u->region->units; u2; u2 = u2->next) {
-			if (u2->ship == sh) {
-				if (u2->faction == u->faction) {
-					owner = u2;
-					break;
-				} 
-				else if (owner==NULL) owner = u2;
-			}
-		}
-		if (owner!=NULL) fset(owner, UFL_OWNER);
-	}
+    for (u2 = u->region->units; u2; u2 = u2->next) {
+      if (u2->ship == sh) {
+        if (u2->faction == u->faction) {
+          owner = u2;
+          break;
+        } 
+        else if (owner==NULL) owner = u2;
+      }
+    }
+    if (owner!=NULL) fset(owner, UFL_OWNER);
+  }
 }
 
 void
 leave_building(unit * u)
 {
-	struct building * b = u->building;
-	if (!b) return;
-	u->building = NULL;
+  struct building * b = u->building;
+  if (!b) return;
+  u->building = NULL;
 
-	if (fval(u, UFL_OWNER)) {
-		unit *u2, *owner = NULL;
-		freset(u, UFL_OWNER);
+  if (fval(u, UFL_OWNER)) {
+    unit *u2, *owner = NULL;
+    freset(u, UFL_OWNER);
 
-		for (u2 = u->region->units; u2; u2 = u2->next) {
-			if (u2->building == b) {
-				if (u2->faction == u->faction) {
-					owner = u2;
-					break;
-				} 
-				else if (owner==NULL) owner = u2;
-			}
-		}
-		if (owner!=NULL) fset(owner, UFL_OWNER);
-	}
+    for (u2 = u->region->units; u2; u2 = u2->next) {
+      if (u2->building == b) {
+        if (u2->faction == u->faction) {
+          owner = u2;
+          break;
+        } 
+        else if (owner==NULL) owner = u2;
+      }
+    }
+    if (owner!=NULL) fset(owner, UFL_OWNER);
+  }
 }
 
 void
 leave(struct region * r, unit * u)
 {
-	if (u->building) leave_building(u);
-	else if (u->ship) leave_ship(u);
-	unused(r);
+  if (u->building) leave_building(u);
+  else if (u->ship) leave_ship(u);
+  unused(r);
 }
 
 const struct race * 
 urace(const struct unit * u)
 {
-	return u->race;
+  return u->race;
 }
 
 boolean
@@ -890,29 +892,29 @@ transfermen(unit * u, unit * u2, int n)
 struct building * 
 inside_building(const struct unit * u)
 {
-	if (u->building==NULL) return NULL;
+  if (u->building==NULL) return NULL;
 
-	if (!fval(u->building, BLD_WORKING)) {
-		/* Unterhalt nicht bezahlt */
-		return NULL;
-	} else if (u->building->size < u->building->type->maxsize) {
-		/* Gebäude noch nicht fertig */
-		return NULL;
-	} else {
-		int p = 0, cap = buildingcapacity(u->building);
-		const unit * u2;
-		for (u2 = u->region->units; u2; u2 = u2->next) {
-			if (u2->building == u->building) {
-				p += u2->number;
-				if (u2 == u) {
-					if (p <= cap) return u->building;
-					return NULL;
-				}
-				if (p > cap) return NULL;
-			}
-		}	
-	}
-	return NULL;
+  if (!fval(u->building, BLD_WORKING)) {
+    /* Unterhalt nicht bezahlt */
+    return NULL;
+  } else if (u->building->size < u->building->type->maxsize) {
+    /* Gebäude noch nicht fertig */
+    return NULL;
+  } else {
+    int p = 0, cap = buildingcapacity(u->building);
+    const unit * u2;
+    for (u2 = u->region->units; u2; u2 = u2->next) {
+      if (u2->building == u->building) {
+        p += u2->number;
+        if (u2 == u) {
+          if (p <= cap) return u->building;
+          return NULL;
+        }
+        if (p > cap) return NULL;
+      }
+    }  
+  }
+  return NULL;
 }
 
 void
@@ -948,10 +950,10 @@ u_setfaction(unit * u, faction * f)
 
   u->faction = f;
   if (u->region) update_interval(f, u->region);
-	if (cnt && f) {
-		set_number(u, cnt);
+  if (cnt && f) {
+    set_number(u, cnt);
     if (count_unit(u)) ++f->no_units;
-	}
+  }
 }
 
 /* vorsicht Sprüche können u->number == RS_FARVISION haben! */
@@ -964,7 +966,7 @@ set_number(unit * u, int count)
 #ifndef NDEBUG
   assert (u->faction != NULL || u->number > 0);
 #endif
-  
+
   if (playerrace(u->race)) {
     u->faction->num_people += count - u->number;
   }
@@ -974,39 +976,39 @@ set_number(unit * u, int count)
 boolean
 learn_skill(unit * u, skill_t sk, double chance)
 {
-	skill * sv = u->skills;
-	if (chance < 1.0 && rng_int()%10000>=chance*10000) return false;
-	while (sv != u->skills + u->skill_size) {
-		assert (sv->weeks>0);
-		if (sv->id == sk) {
-			if (sv->weeks<=1) {
-				sk_set(sv, sv->level+1);
-			} else {
-				sv->weeks--;
-			}
-			return true;
-		}
-		++sv;
-	}
-	sv = add_skill(u, sk);
-	sk_set(sv, 1);
-	return true;
+  skill * sv = u->skills;
+  if (chance < 1.0 && rng_int()%10000>=chance*10000) return false;
+  while (sv != u->skills + u->skill_size) {
+    assert (sv->weeks>0);
+    if (sv->id == sk) {
+      if (sv->weeks<=1) {
+        sk_set(sv, sv->level+1);
+      } else {
+        sv->weeks--;
+      }
+      return true;
+    }
+    ++sv;
+  }
+  sv = add_skill(u, sk);
+  sk_set(sv, 1);
+  return true;
 }
 
 void
 remove_skill(unit *u, skill_t sk)
 {
-	skill * sv = u->skills;
-	for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-		if (sv->id==sk) {
-			skill * sl = u->skills + u->skill_size - 1;
-			if (sl!=sv) {
-				*sv = *sl;
-			}
-			--u->skill_size;
-			return;
-		}
-	}
+  skill * sv = u->skills;
+  for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+    if (sv->id==sk) {
+      skill * sl = u->skills + u->skill_size - 1;
+      if (sl!=sv) {
+        *sv = *sl;
+      }
+      --u->skill_size;
+      return;
+    }
+  }
 }
 
 skill * 
@@ -1031,74 +1033,74 @@ add_skill(unit * u, skill_t id)
 skill *
 get_skill(const unit * u, skill_t sk)
 {
-	skill * sv = u->skills;
-	while (sv!=u->skills+u->skill_size) {
-		if (sv->id==sk) return sv;
-		++sv;
-	}
-	return NULL;
+  skill * sv = u->skills;
+  while (sv!=u->skills+u->skill_size) {
+    if (sv->id==sk) return sv;
+    ++sv;
+  }
+  return NULL;
 }
 
 boolean
 has_skill(const unit * u, skill_t sk)
 {
-	skill * sv = u->skills;
-	while (sv!=u->skills+u->skill_size) {
-		if (sv->id==sk) {
-			return (sv->level>0);
-		}
-		++sv;
-	}
-	return false;
+  skill * sv = u->skills;
+  while (sv!=u->skills+u->skill_size) {
+    if (sv->id==sk) {
+      return (sv->level>0);
+    }
+    ++sv;
+  }
+  return false;
 }
 
 static int
 item_modification(const unit *u, skill_t sk, int val)
 {
-	/* Presseausweis: *2 Spionage, 0 Tarnung */
-	if(sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
-		val = val * 2;
-	} else if(sk == SK_STEALTH) {
+  /* Presseausweis: *2 Spionage, 0 Tarnung */
+  if(sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
+    val = val * 2;
+  } else if(sk == SK_STEALTH) {
 #if NEWATSROI == 1
-		if (get_item(u, I_RING_OF_INVISIBILITY)
-				+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY) >= u->number) {
-			val += ROIBONUS;
-		}
+    if (get_item(u, I_RING_OF_INVISIBILITY)
+      + 100 * get_item(u, I_SPHERE_OF_INVISIBILITY) >= u->number) {
+        val += ROIBONUS;
+    }
 #endif
-		if(get_item(u, I_PRESSCARD) >= u->number) {
-			val = 0;
-		}
-	}
+    if(get_item(u, I_PRESSCARD) >= u->number) {
+      val = 0;
+    }
+  }
 #if NEWATSROI == 1
-	if(sk == SK_OBSERVATION) {
-		if(get_item(u, I_AMULET_OF_TRUE_SEEING) >= u->number) {
-			val += ATSBONUS;
-		}
-	}
+  if(sk == SK_OBSERVATION) {
+    if(get_item(u, I_AMULET_OF_TRUE_SEEING) >= u->number) {
+      val += ATSBONUS;
+    }
+  }
 #endif
-	return val;
+  return val;
 }
 
 static int
 att_modification(const unit *u, skill_t sk)
 {
-	int bonus = 0, malus = 0;
-	attrib * a;
-	int result = 0;
-	static boolean init = false;
-	static const curse_type * skillmod_ct, * gbdream_ct, * worse_ct;
+  int bonus = 0, malus = 0;
+  attrib * a;
+  int result = 0;
+  static boolean init = false;
+  static const curse_type * skillmod_ct, * gbdream_ct, * worse_ct;
   curse * c;
 
-	if (!init) { 
-		init = true; 
-		skillmod_ct = ct_find("skillmod"); 
-		gbdream_ct = ct_find("gbdream");
+  if (!init) { 
+    init = true; 
+    skillmod_ct = ct_find("skillmod"); 
+    gbdream_ct = ct_find("gbdream");
     worse_ct = ct_find("worse");
-	}
+  }
 
   c = get_curse(u->attribs, worse_ct);
-	if (c!=NULL) result += curse_geteffect(c);
-	if (skillmod_ct) {
+  if (c!=NULL) result += curse_geteffect(c);
+  if (skillmod_ct) {
     attrib * a = a_find(u->attribs, &at_curse);
     while (a && a->type==&at_curse) {
       curse * c = (curse *)a->data.v;
@@ -1108,14 +1110,14 @@ att_modification(const unit *u, skill_t sk)
       }
       a = a->next;
     }
-	}
+  }
 
-	/* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
-	 * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
-	 * durchsuchen und aufaddieren müssen */
-	a = a_find(u->region->attribs, &at_curse);
-	while (a && a->type==&at_curse) {
-		curse * c = (curse*)a->data.v;
+  /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
+  * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
+  * durchsuchen und aufaddieren müssen */
+  a = a_find(u->region->attribs, &at_curse);
+  while (a && a->type==&at_curse) {
+    curse * c = (curse*)a->data.v;
     if (c->type==gbdream_ct) {
       int mod = curse_geteffect(c);
       unit * mage = c->magician;
@@ -1130,89 +1132,89 @@ att_modification(const unit *u, skill_t sk)
         }
       }
     }
-		a = a->next;
-	}
-	result = result + bonus + malus;
+    a = a->next;
+  }
+  result = result + bonus + malus;
 
-	return result;
+  return result;
 }
 
 int
 get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noitem)
 {
-	int bskill = level;
-	int skill = bskill;
+  int bskill = level;
+  int skill = bskill;
 
-	if (r->planep && sk == SK_STEALTH && fval(r->planep, PFL_NOSTEALTH)) return 0;
+  if (r->planep && sk == SK_STEALTH && fval(r->planep, PFL_NOSTEALTH)) return 0;
 
-	assert(r);
-	skill += rc_skillmod(u->race, r, sk);
-	skill += att_modification(u, sk);
+  assert(r);
+  skill += rc_skillmod(u->race, r, sk);
+  skill += att_modification(u, sk);
 
-	if (noitem == false) {
-		skill = item_modification(u, sk, skill);
-	}
-	skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
+  if (noitem == false) {
+    skill = item_modification(u, sk, skill);
+  }
+  skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
 #ifdef KARMA_MODULE
-	if (fspecial(u->faction, FS_TELEPATHY)) {
-		switch(sk) {
-		case SK_ALCHEMY:
-		case SK_HERBALISM:
-		case SK_MAGIC:
-		case SK_SPY:
-		case SK_STEALTH:
-		case SK_OBSERVATION:
-			break;
-		default:
-			skill -= 2;
-		}
-	}
+  if (fspecial(u->faction, FS_TELEPATHY)) {
+    switch(sk) {
+    case SK_ALCHEMY:
+    case SK_HERBALISM:
+    case SK_MAGIC:
+    case SK_SPY:
+    case SK_STEALTH:
+    case SK_OBSERVATION:
+      break;
+    default:
+      skill -= 2;
+    }
+  }
 #endif
 
 #ifdef HUNGER_REDUCES_SKILL
-	if (fval(u, UFL_HUNGER)) {
-		skill = skill/2;
-	}
+  if (fval(u, UFL_HUNGER)) {
+    skill = skill/2;
+  }
 #endif
-	return skill - bskill;
+  return skill - bskill;
 }
 
 int
 eff_skill(const unit * u, skill_t sk, const region * r)
 {
-	int level = get_level(u, sk);
-	if (level>0) {
-		int mlevel = level + get_modifier(u, sk, level, r, false);
+  int level = get_level(u, sk);
+  if (level>0) {
+    int mlevel = level + get_modifier(u, sk, level, r, false);
 
-		if (mlevel>0) {
-			int skillcap = SkillCap(sk);
-			if (skillcap && mlevel>skillcap) {
-				return skillcap;
-			}
-			return mlevel;
-		}
-	}
-	return 0;
+    if (mlevel>0) {
+      int skillcap = SkillCap(sk);
+      if (skillcap && mlevel>skillcap) {
+        return skillcap;
+      }
+      return mlevel;
+    }
+  }
+  return 0;
 }
 
 int
 eff_skill_study(const unit * u, skill_t sk, const region * r)
 {
-	int level = get_level(u, sk);
-	if (level>0) {
-		int mlevel = level + get_modifier(u, sk, level, r, true);
+  int level = get_level(u, sk);
+  if (level>0) {
+    int mlevel = level + get_modifier(u, sk, level, r, true);
 
-		if (mlevel>0) return mlevel;
-	}
-	return 0;
+    if (mlevel>0) return mlevel;
+  }
+  return 0;
 }
 
 int
 invisible(const unit *target, const unit * viewer)
 {
 #if NEWATSROI == 1
-	return 0;
+  return 0;
 #else
   if (viewer && viewer->faction==target->faction) return 0;
   else {
@@ -1285,7 +1287,7 @@ void
 name_unit(unit *u)
 {
   free(u->name);
-	if (u->race->generate_name) {
+  if (u->race->generate_name) {
     const char * gen_name = u->race->generate_name(u); 
     if (gen_name) {
       u->name = strdup(gen_name);
@@ -1294,8 +1296,8 @@ name_unit(unit *u)
     }
   } else {
     char name[16];
-  	sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
-	  u->name = strdup(name);
+    sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
+    u->name = strdup(name);
   }
 }
 
