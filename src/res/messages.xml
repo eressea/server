@@ -1889,6 +1889,17 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier zerstört den Fluch($id) auf ${target}."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The magician destroys the spell on ${target}."</text>
   </message>
+  <message name="destroy_curse_noeffect" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="id" type="string"/>
+      <arg name="target" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Zauber ist nicht stark genug, um den Fluch auf ${target} zu zerstören."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The spell is not strong enough to destroy the curse on ${target}."</text>
+  </message>
   <message name="deathcloud_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
