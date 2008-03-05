@@ -19,6 +19,7 @@
   <message name="mallorn_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
+      <arg name="mage" type="unit"/>
     </type>
     <text locale="de">"$unit($mage) läßt einen Teil seiner selbst in die Erde fliessen. Die Bäume, die Transformation überlebt haben, erscheinen nun viel kräftiger."</text>
     <text locale="fr">"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
@@ -460,14 +461,6 @@
     <text locale="fr">"($int36($id))"</text>
     <text locale="en">"Everyone in this region seems to be in a peacful mood. ($int36($id))"</text>
   </message>
-  <message name="curseinfo::astralblock" section="events">
-    <type>
-      <arg name="id" type="int"/>
-    </type>
-    <text locale="de">"Etwas verhindert den Kontakt zur Realität. ($int36($id))"</text>
-    <text locale="fr">"($int36($id))"</text>
-    <text locale="en">"Something is blocking contact with reality. ($int36($id))"</text>
-  </message>
   <message name="curseinfo::generous" section="events">
     <type>
       <arg name="id" type="int"/>
@@ -901,17 +894,6 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieses Luxusgut wird hier nicht verkauft."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - These goods are not on sale here."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - These goods are not on sale here."</text>
-  </message>
-  <message name="region_guarded" section="production">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-      <arg name="guard" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($guard) bewacht die Region."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($guard) is guarding the region."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($guard) is guarding the region."</text>
   </message>
   <message name="resource_missing" section="production">
     <type>
@@ -1418,7 +1400,7 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($mage) beginnt ein Ritual der Wiederbelebung. $int($amount) Krieger stehen von den Toten auf."</text>
-    <text locale="de">"$unit($mage) begins a ritual of resurrection. $int($amount) warriors rise from the dead."</text>
+    <text locale="en">"$unit($mage) begins a ritual of resurrection. $int($amount) warriors rise from the dead."</text>
   </message>
 
   <message name="reanimate_effect_1" section="magic">
@@ -1428,6 +1410,7 @@
       <arg name="item" type="resource"/>
     </type>
     <text locale="de">"$unit($mage) beginnt ein Ritual der Wiederbelebung und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Krieger stehen von den Toten auf."</text>
+    <text locale="en">"$unit($mage) begins a ritual of resurrection using a $resource($item,1). $int($amount) warriors rise from the dead."</text>
   </message>
 
   <message name="chaosgate_effect_1" section="magic">
@@ -7501,18 +7484,9 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($mage) erschafft in $region($region) eine verheerende Feuersbrunst. $int($amount) Bäume fallen den Flammen zum Opfer."</text>
-    <text locale="de">"$unit($mage) creates a flaming inferno in $region($region). $int($amount) trees fall vistim to the flames."</text>
+    <text locale="en">"$unit($mage) creates a flaming inferno in $region($region). $int($amount) trees fall vistim to the flames."</text>
   </message>
   
-  <message name="recruit_effect" section="magic">
-    <type>
-      <arg name="mage" type="unit"/>
-      <arg name="amount" type="int"/>
-    </type>
-    <text locale="de">"$unit($mage) konnte $int($amount) Bauern anwerben."</text>
-    <text locale="en">"$unit($mage) recruited $int($amount) peasants."</text>
-  </message>
-
   <message name="homestone_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>

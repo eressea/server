@@ -104,6 +104,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
   while (nrt && (nrt->lang!=lang || nrt->mtype!=mtype)) {
     nrt = nrt->next;
   }
+  assert(!nrt || !"trying to register same nr-type twice");
   if (!nrt) {
     int i;
     char zNames[256];
