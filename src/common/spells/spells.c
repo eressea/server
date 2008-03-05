@@ -5354,22 +5354,22 @@ int
 sp_resist_magic_bonus(castorder *co)
 {
   unit *u;
-  int n, m, opfer;
+  int n, m;
   variant resistbonus;
   int duration = 6;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
-
   /* Pro Stufe können bis zu 5 Personen verzaubert werden */
-  opfer = (int)(power * 5);
+  double maxvictims = power * 5;
+  int victims = (int)maxvictims;
 
   /* Schleife über alle angegebenen Einheiten */
   for (n = 0; n < pa->length; n++) {
     message * msg;
     /* sollte nie negativ werden */
-    if (opfer < 1)
+    if (victims < 1)
       break;
 
     if (pa->param[n]->flag == TARGET_RESISTS
@@ -5384,8 +5384,8 @@ sp_resist_magic_bonus(castorder *co)
       continue;
     */
 
-    m = min(u->number,opfer);
-    opfer -= m;
+    m = min(u->number,victims);
+    victims -= m;
 
     resistbonus.i = 20;
     create_curse(mage, &u->attribs, ct_find("magicresistance"),
@@ -5400,12 +5400,9 @@ sp_resist_magic_bonus(castorder *co)
     }
     msg_release(msg);
   }
-  /* pro 5 nicht verzauberte Personen kann der Level und damit die
-   * Kosten des Zaubers um 1 reduziert werden. (die Formel geht von
-   * immer abrunden da int aus) */
-  cast_level -= opfer/5;
 
-  return cast_level;
+  cast_level = min(cast_level, (int)(cast_level*(victims+4)/maxvictims));
+  return max(cast_level, 1);
 }
 
 /** spell 'Astraler Weg'.
