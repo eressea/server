@@ -3703,7 +3703,7 @@ init_battle(region * r, battle **bp)
             boolean calm = false;
             while (a && a->type==&at_curse) {
               curse * c = (curse *)a->data.v;
-              if (c->type==calm_ct && c->effect.i==u2->faction->subscription) {
+              if (c->type==calm_ct && curse_geteffect(c)==u2->faction->subscription) {
                 if (curse_active(c)) {
                   calm = true;
                   break;

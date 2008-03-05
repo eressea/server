@@ -189,7 +189,7 @@ typedef struct curse {
   struct curse *nexthash;
   int no;            /* 'Einheitennummer' dieses Curse */
   const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
-  unsigned int flags;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
+  unsigned int flags;          /* WARNING: these are XORed with type->flags! */
   int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
   double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
   struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */

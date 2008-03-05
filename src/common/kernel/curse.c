@@ -418,8 +418,9 @@ curse_changevigour(attrib **ap, curse *c, double vigour)
 int
 curse_geteffect(const curse *c)
 {
-  if (c) return c->effect.i;
-  return 0;
+  if (c==NULL) return 0;
+  if (c_flags(c) & CURSE_ISNEW) return 0;
+  return c->effect.i;
 }
 
 /* ------------------------------------------------------------- */

@@ -1118,7 +1118,7 @@ att_modification(const unit *u, skill_t sk)
   a = a_find(u->region->attribs, &at_curse);
   while (a && a->type==&at_curse) {
     curse * c = (curse*)a->data.v;
-    if (c->type==gbdream_ct) {
+    if (curse_active(c) && c->type==gbdream_ct) {
       int mod = curse_geteffect(c);
       unit * mage = c->magician;
       /* wir suchen jeweils den größten Bonus und den größten Malus */
