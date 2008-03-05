@@ -51,9 +51,9 @@ enum {
 	MAX_POTIONS
 };
 
-void herbsearch(struct region * r, struct unit * u, int max);
-int use_potion(struct unit * u, const struct item_type * itype, int amount, struct order *);
-void init_potions(void);
+extern void herbsearch(struct region * r, struct unit * u, int max);
+extern int use_potion(struct unit * u, const struct item_type * itype, int amount, struct order *);
+extern void init_potions(void);
 
 extern int get_effect(const struct unit * u, const struct potion_type * effect);
 extern int change_effect(struct unit * u, const struct potion_type * effect, int value);

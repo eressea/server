@@ -1382,7 +1382,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     }
 
     /* Gruppen */
-    if (fval(creator, UFL_GROUP)) {
+    if (creator->faction==f && fval(creator, UFL_GROUP)) {
       a = a_find(creator->attribs, &at_group);
       if (a) {
         group * g = (group*)a->data.v;

@@ -1584,7 +1584,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         setstatus(u, du->status);
         setguard(u, GUARD_NONE);
 
-        /* inheit stealth from magician */
+        /* inherit stealth from magician */
         if (fval(mage, UFL_PARTEITARNUNG)) {
           fset(u, UFL_PARTEITARNUNG);
         }
