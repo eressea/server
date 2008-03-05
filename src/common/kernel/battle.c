@@ -1109,7 +1109,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   if (df->person[dt.index].hp > 0) {  /* Hat überlebt */
     if (bdebug) {
       fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP\n",
-        da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
+        da, ar, df->person[dt.index].hp + rda, df->person[dt.index].hp);
     }
     if (au->race == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
@@ -1123,9 +1123,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
     return false;
   }
-#ifdef SHOW_KILLS
-  ++at.fighter->kills;
-#endif
 
   /* Sieben Leben */
   if (du->race == new_race[RC_CAT] && (chance(1.0 / 7))) {
@@ -1153,6 +1150,10 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     df->person[dt.index].hp = du->race->hitpoints;
     return false;
   }
+
+#ifdef SHOW_KILLS
+  ++at.fighter->kills;
+#endif
 
   if (bdebug) {
     fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP, tot.\n",
