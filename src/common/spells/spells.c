@@ -5761,11 +5761,6 @@ sp_fetchastral(castorder *co)
     return 0;
   }
 
-  if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_distance", ""));
-    return 0;
-  }
-
   /* für jede Einheit in der Kommandozeile */
   for (n=0; n!=pa->length; ++n) {
     unit * u2, * u = pa->param[n]->data.u;
@@ -5796,8 +5791,8 @@ sp_fetchastral(castorder *co)
       ro = u->region;
     }
 
-    if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_distance", ""));
+    if (is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
       continue;
     }
 
@@ -5969,18 +5964,16 @@ sp_viewreality(castorder *co)
     return 0;
   }
 
-  if (is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
-    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
-    return 0;
-  }
-
   rl = astralregions(r, NULL);
 
   /* Irgendwann mal auf Curses u/o Attribut umstellen. */
   for (rl2=rl; rl2; rl2=rl2->next) {
-    u = create_unit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/viewreality", NULL);
-    set_level(u, SK_OBSERVATION, co->level/2);
-    u->age = 2;
+    region * rt = rl2->data;
+    if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+      u = create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/viewreality", NULL);
+      set_level(u, SK_OBSERVATION, co->level/2);
+      u->age = 2;
+    }
   }
 
   free_regionlist(rl);
