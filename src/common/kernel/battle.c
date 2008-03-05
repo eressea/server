@@ -1740,7 +1740,7 @@ getreload(troop at)
 static void
 debug_hit(troop at, const weapon * awp, troop dt, const weapon * dwp, int skdiff, int dist, boolean success)
 {
-  fprintf(bdebug, "%.4s/%d [%6s/%d] %s %.4s/%d [%6s/%d] with %d distance %d",
+  fprintf(bdebug, "%.4s/%d [%6s/%d] %s %.4s/%d [%6s/%d] with %d, distance %d\n",
     unitid(at.fighter->unit), at.index,
     LOC(default_locale, awp ? resourcename(awp->type->itype->rtype, 0) : "unarmed"),
     weapon_effskill(at, dt, awp, true, dist>1),
