@@ -545,7 +545,7 @@ sp_summon_familiar(castorder *co)
   int dh, dh1, bytes;
   direction_t d;
   message * msg;
-  char zText[NAMESIZE], * bufp = zText;
+  char zText[2048], * bufp = zText;
   size_t size = sizeof(zText) - 1;
 
   if (get_familiar(mage) != NULL ) {

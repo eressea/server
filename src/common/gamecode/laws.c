@@ -3775,7 +3775,7 @@ static void reset_rng(void) {
   rng_init(turn?turn:(int)time(0));
 }
 
-static void reset_rng_region(const region * r)
+static void reset_rng_region(region * r)
 {
   rng_init(r->index);
 }

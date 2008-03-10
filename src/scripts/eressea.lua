@@ -11,7 +11,7 @@ end
 
 function change_locales()
   -- local localechange = { }
-  local localechange = { de = { "bLub" } }
+  local localechange = { en = { "adun" } }
   
   for loc, flist in pairs(localechange) do
     for index, name in pairs(flist) do
@@ -96,7 +96,7 @@ function process(orders)
   update_scores()
 
   change_locales()
-  
+
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", false)
 
