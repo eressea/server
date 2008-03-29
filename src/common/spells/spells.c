@@ -7907,7 +7907,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MINDBLAST, "mindblast", NULL, NULL, NULL,
-    M_TRAUM, (COMBATSPELL | SPELLLEVEL), 5, 11,
+    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 11,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7915,7 +7915,7 @@ static spelldata spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_mindblast, NULL
+    (spell_f)sp_mindblast_temp, NULL
   },
   {
     SPL_ORKDREAM, "orkdream", NULL, NULL,

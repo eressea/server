@@ -127,6 +127,7 @@ finalize_skillmod(attrib * a)
 	free(a->data.v);
 }
 
+/** temporary skill modification (NOT SAVED!). */
 attrib_type at_skillmod = {
 	"skillmod",
 	init_skillmod,

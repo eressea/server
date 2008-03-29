@@ -7598,6 +7598,15 @@
     <text locale="de">"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren Erinnerungen, $int($dead) wurden getötet."</text>
   </message>
 
+  <message name="sp_mindblast_temp_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="amount" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren kurzzeitig ihr Gedächtnis."</text>
+  </message>
+
   <message name="sp_shadowcall_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>

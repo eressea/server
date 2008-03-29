@@ -206,16 +206,29 @@ read_mage(attrib * a, FILE * F)
   fscanf(F, "%d %d %d", &mtype, &mage->spellpoints, &mage->spchange);
   mage->magietyp = (magic_t)mtype;
   for (i=0;i!=MAXCOMBATSPELLS;++i) {
+    spell * sp = NULL;
+    int level = 0;
     if (global.data_version<SPELLNAME_VERSION) {
       int spid;
-      fscanf (F, "%d %d", &spid, &mage->combatspells[i].level);
+      fscanf (F, "%d %d", &spid, &level);
       if (spid>=0) {
-        mage->combatspells[i].sp = find_spellbyid(mage->magietyp, (spellid_t)spid);
+        sp = find_spellbyid(mage->magietyp, (spellid_t)spid);
       }
     } else {
-      fscanf (F, "%s %d", spname, &mage->combatspells[i].level);
+      fscanf (F, "%s %d", spname, &level);
+
       if (strcmp("none", spname)!=0) {
-        mage->combatspells[i].sp = find_spell(mage->magietyp, spname);
+        sp = find_spell(mage->magietyp, spname);
+      }
+    }
+    if (sp && level>0) {
+      int slot = -1;
+      if (sp->sptyp & PRECOMBATSPELL) slot = 0;
+      else if (sp->sptyp & COMBATSPELL) slot = 1;
+      else if (sp->sptyp & POSTCOMBATSPELL) slot = 2;
+      if (slot>=0) {
+        mage->combatspells[slot].level = level;
+        mage->combatspells[slot].sp = sp;
       }
     }
   }
@@ -524,50 +537,50 @@ get_combatspelllevel(const unit *u, int nr)
 const spell*
 get_combatspell(const unit *u, int nr)
 {
-	sc_mage *m;
+  sc_mage *m;
 
-	assert(nr < MAXCOMBATSPELLS);
-	m = get_mage(u);
-	if (m) {
-		return m->combatspells[nr].sp;
-	} else if (u->race->precombatspell != NULL) {
-		return u->race->precombatspell;
-	}
+  assert(nr < MAXCOMBATSPELLS);
+  m = get_mage(u);
+  if (m) {
+    return m->combatspells[nr].sp;
+  } else if (u->race->precombatspell != NULL) {
+    return u->race->precombatspell;
+  }
 
-	return NULL;
+  return NULL;
 }
 
 void
 set_combatspell(unit *u, spell *sp, struct order * ord, int level)
 {
-	sc_mage *m = get_mage(u);
+  sc_mage *m = get_mage(u);
   int i = -1;
-	if (!m) return;
+  if (!m) return;
 
-	/* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
-	if (knowsspell(u->region, u, sp) == false){
-		/* Fehler 'Spell not found' */
-		cmistake(u, ord, 173, MSG_MAGIC);
-		return;
-	}
-	if (!has_spell(u, sp)) {
-		/* Diesen Zauber kennt die Einheit nicht */
-		cmistake(u, ord, 169, MSG_MAGIC);
-		return;
-	}
-	if (!(sp->sptyp & ISCOMBATSPELL)) {
-		/* Diesen Kampfzauber gibt es nicht */
-		cmistake(u, ord, 171, MSG_MAGIC);
-		return;
-	}
+  /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
+  if (knowsspell(u->region, u, sp) == false){
+    /* Fehler 'Spell not found' */
+    cmistake(u, ord, 173, MSG_MAGIC);
+    return;
+  }
+  if (!has_spell(u, sp)) {
+    /* Diesen Zauber kennt die Einheit nicht */
+    cmistake(u, ord, 169, MSG_MAGIC);
+    return;
+  }
+  if (!(sp->sptyp & ISCOMBATSPELL)) {
+    /* Diesen Kampfzauber gibt es nicht */
+    cmistake(u, ord, 171, MSG_MAGIC);
+    return;
+  }
 
-	if (sp->sptyp & PRECOMBATSPELL) i = 0;
+  if (sp->sptyp & PRECOMBATSPELL) i = 0;
   else if (sp->sptyp & COMBATSPELL) i = 1;
   else if (sp->sptyp & POSTCOMBATSPELL) i = 2;
   assert(i>=0);
-	m->combatspells[i].sp = sp;
-	m->combatspells[i].level = level;
-	return;
+  m->combatspells[i].sp = sp;
+  m->combatspells[i].level = level;
+  return;
 }
 
 void
@@ -580,7 +593,6 @@ unset_combatspell(unit *u, spell *sp)
 	m = get_mage(u);
 	if (!m) return;
 
-	/* Kampfzauber löschen */
 	if (!sp) {
 		for (i=0;i<MAXCOMBATSPELLS;i++) {
 			m->combatspells[i].sp = NULL;
