@@ -283,8 +283,8 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
   for (fig = fgs->begin; fig != fgs->end; ++fig) {
     fighter *df = *fig;
 
-                if (df->alive==0) continue;
-                if (force<=0) break;
+    if (df->alive==0) continue;
+    if (force<=0) break;
 
     /* da n min(force, x), sollte force maximal auf 0 sinken */
     assert(force >= 0);
@@ -1237,26 +1237,6 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   setguard(mage, GUARD_NONE);
   /* irgendwie den langen befehl sperren */
   /* fset(fi, FIG_ATTACKED); */
-
-#ifndef SIMPLE_ESCAPE
-  /* Hat der Magier ein NACH, wird die angegebene Richtung bevorzugt */
-  switch (get_keyword(mage->thisorder)) {
-  case K_MOVE:
-  case K_ROUTE:
-    init_tokens(mage->thisorder);
-    skip_token();
-    if (movewhere(mage, getstrtoken(), mage->region, &fi->run.region)!=E_MOVE_OK) {
-      fi->run.region = fleeregion(mage);
-    }
-    break;
-  default:
-    fi->run.region = fleeregion(mage);
-  }
-  /* bewegung erst am Ende des Kampfes, zusammen mit den normalen
-  * Flüchtlingen */
-
-  if (!fi->run.region) return level;
-#endif /* SIMPLE_ESCAPE */
 
   /* wir tun so, als wäre die Person geflohen */
   fset(fi, FIG_NOLOOT);

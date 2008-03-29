@@ -2426,9 +2426,7 @@ enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING };
 static int
 can_start_guarding(const unit * u)
 {
-#ifdef SIMPLE_ESCAPE
   if (u->status>=ST_FLEE) return E_GUARD_FLEEING;
-#endif
   if (fval(u->race, RCF_UNARMEDGUARD)) return E_GUARD_OK;
   if (!armedmen(u)) return E_GUARD_UNARMED;
   if (u->faction->age < NewbieImmunity()) return E_GUARD_NEWBIE;

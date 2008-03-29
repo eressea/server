@@ -3519,7 +3519,7 @@
       <arg name="target" type="unit"/>
       <arg name="items" type="items"/>
     </type>
-    <text locale="de">"In Gepäck von $unit($target) sind $resources($items)."</text>
+    <text locale="de">"Im Gepäck von $unit($target) sind $resources($items)."</text>
     <text locale="en">"$unit($target) carries $resources($items)"</text>
   </message>
   <message name="spyreport_faction" section="events">

@@ -1785,7 +1785,7 @@ eval_resources(struct opstack ** stack, const void * userdata) /* order -> strin
 {
   const faction * report = (const faction*)userdata;
   const struct resource * res = (const struct resource *)opop(stack).v;
-  static char buf[512];
+  static char buf[1024]; /* but we only use about half of this */
   size_t size = sizeof(buf) - 1;
   variant var;
 
@@ -1793,7 +1793,10 @@ eval_resources(struct opstack ** stack, const void * userdata) /* order -> strin
   while (res!=NULL && size > 4) {
     const char * rname = resourcename(res->type, (res->number!=1)?NMF_PLURAL:0);
     int bytes = snprintf(bufp, size, "%d %s", res->number, LOC(report->locale, rname));
-    if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    if (bytes<0 || wrptr(&bufp, &size, bytes)!=0 || size<sizeof(buf)/2) {
+      WARN_STATIC_BUFFER();
+      break;
+    }
 
     res = res->next;
     if (res!=NULL && size>2) {
