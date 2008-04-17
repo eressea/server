@@ -521,13 +521,13 @@ has_spell(const unit *u, const spell * sp)
 int
 get_combatspelllevel(const unit *u, int nr)
 {
-	sc_mage *m = get_mage(u);
+  sc_mage *m = get_mage(u);
 
-	assert(nr < MAXCOMBATSPELLS);
-	if (m) {
+  assert(nr < MAXCOMBATSPELLS);
+  if (m) {
     int level = eff_skill(u, SK_MAGIC, u->region);
     return min(m->combatspells[nr].level, level);
-	}
+  }
   return -1;
 }
 

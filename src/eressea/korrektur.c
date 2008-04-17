@@ -957,6 +957,41 @@ fix_chaosgates(void)
 }
 
 static void
+fix_toads(void)
+{
+  region * r;
+  const struct race * toad = rc_find("toad");
+
+  for (r=regions;r!=NULL;r=r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      if (u->race==toad) {
+        int found = 0;
+	handler_info * td = NULL;
+	attrib * a = a_find(u->attribs, &at_eventhandler);
+	while (!found && a!=NULL && a->type==&at_eventhandler) {
+          td = (handler_info *)a->data.v;
+          if (strcmp(td->event, "timer")==0) {
+            trigger * tr = td->triggers;
+            while (tr && !found) {
+              if (tr->type==&tt_changerace) {
+                found = 1;
+              }
+              tr = tr->next;
+            }
+          }
+          a = a->next;
+	}
+        if (!found) {
+          log_error(("fixed toad %s.\n", unitname(u)));
+          u->race=u->faction->race;
+        }
+      }
+    }
+  }
+}
+
+static void
 fix_groups(void)
 {
   region * r;
@@ -1015,6 +1050,7 @@ korrektur(void)
   fix_astralplane();
   fix_firewalls();
   fix_gates();
+  fix_toads();
   verify_owners(false);
   /* fix_herbtypes(); */
   /* In Vin 3+ können Parteien komplett übergeben werden. */
