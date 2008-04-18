@@ -477,7 +477,7 @@ random_skill(unit *u, boolean weighted)
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->level>0) {
       if (weighted) {
-        if (n<sv->level) return sv->id;
+        if (n<(int)sv->level) return sv->id;
         n-=sv->level;
       } else {
         if (n == 0) return sv->id;

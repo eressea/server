@@ -151,6 +151,7 @@ parse_token(const char ** str)
     }
     if (escape) {
       copy = true;
+      escape = false;
     } else if (iswspace(ucs)) {
       if (quotechar==0) break;
       copy = true;
