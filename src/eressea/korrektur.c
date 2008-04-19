@@ -19,7 +19,7 @@
  */
 
 #include <config.h>
-#include <types.h>
+#include <kernel/types.h>
 
 /* misc includes */
 #include <attributes/key.h>
@@ -343,7 +343,7 @@ fix_demands(void)
   return 0;
 }
 
-#include "group.h"
+#include <kernel/group.h>
 static void
 fix_allies(void)
 {

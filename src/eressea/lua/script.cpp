@@ -13,7 +13,7 @@
 #include <config.h>
 #include <boost/version.hpp>
 #include <lua.hpp>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "script.h"
 #include "bindings.h"
 

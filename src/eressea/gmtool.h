@@ -21,6 +21,7 @@ extern "C" {
 
   extern void highlight_region(struct region *r);
   extern void select_coordinate(struct selection * selected, int x, int y);
+  extern void run_mapper(void);
 
 #ifdef __cplusplus
 }

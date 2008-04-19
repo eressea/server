@@ -1,13 +1,13 @@
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "list.h"
 #include "objects.h"
 #include "bindings.h"
 
 // kernel includes
-#include <building.h>
-#include <region.h>
-#include <unit.h>
+#include <kernel/building.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
 
 // lua includes
 #pragma warning (push)

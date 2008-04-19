@@ -18,8 +18,6 @@ SubDirC++Flags -DHAVE_LUA ;
 SubDirHdrs $(XMLHDRS) ;
 
 LUASERVER = eressea-lua ;
-SERVER = eressea ;
-GMTOOL = gmtool ;
 
 SERVER_SOURCES = main.c korrektur.c ;
 
@@ -42,46 +40,25 @@ Library luabindings : $(SHARED_BINDINGS) ;
 
 LUASERVER_SOURCES =
  <common!iniparser>iniparser.c
+ <common!iniparser>iniparser.c
+ <lua>gm.cpp
  <lua>script.cpp
  <lua>gamecode.cpp
+ <curses>listbox.c
  server.cpp
  korrektur.c
  console.c
- ;
-
-GMTOOL_SOURCES =
- <common!iniparser>iniparser.c
- <lua>gm.cpp
- <curses>listbox.c
- console.c
  editing.c
- gmmain.cpp
  gmtool.c
  ;
-
-# old eressea server. use only for testing.
-LinkLibraries $(SERVER) :
- gamecode items spells kernel modules attributes races triggers util ;
-libxml2 $(SERVER) ;
-LINKLIBS on $(SERVER) += -lm ;
-# build disabled:
-# Main $(SERVER) : $(SERVER_SOURCES) ;
 
 # eressea-server with lua scripting
 LinkLibraries $(LUASERVER) :
  luabindings gamecode items spells kernel modules attributes races triggers util ;
 luabind $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
-LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
+LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ -lncurses ;
 if $(DEBUG) = 1 {
    LINKLIBS on $(LUASERVER) += -lmcheck ;
 }
 Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
-
-# the curses-based GM tool (now with luabind)
-LinkLibraries $(GMTOOL) :
- luabindings items spells kernel modules attributes races triggers util ;
-luabind $(GMTOOL) ;
-libxml2 $(GMTOOL) ;
-LINKLIBS on $(GMTOOL) += -lm -lncurses -ldl -lstdc++ ;
-Main $(GMTOOL) : $(GMTOOL_SOURCES) ;

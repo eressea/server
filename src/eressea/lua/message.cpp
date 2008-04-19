@@ -1,10 +1,10 @@
 #include <config.h>
-#include <eressea.h>
-#include "message.h"
+#include <kernel/eressea.h>
 
 // kernel includes
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/message.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 

@@ -1,5 +1,5 @@
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #include "bindings.h"
 #include "list.h"
@@ -77,6 +77,7 @@ void
 bind_gmtool(lua_State * L)
 {
   module(L, "gmtool")[
+    def("editor", &run_mapper),
     def("selection", &selected_regions, return_stl_iterator),
     def("cursor", &current_region),
     def("highlight", &highlight_region),

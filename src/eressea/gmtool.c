@@ -11,7 +11,7 @@
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <config.h>
 #include <curses.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #include "gmtool.h"
 #include "gmtool_structs.h"
@@ -1176,18 +1176,22 @@ update_view(view * vi)
   }
 }
 
-static void 
+void 
 run_mapper(void)
 {
   WINDOW * hwinstatus;
   WINDOW * hwininfo;
   WINDOW * hwinmap;
   int width, height, x, y;
-  int split = 20;
+  int split = 20, old_flags = log_flags;
   state st;
   point tl;
+
+  log_flags &= ~(LOG_CPERROR|LOG_CPWARNING);
   init_curses();
   curs_set(1);
+
+  set_readline(curses_readline);
 
   getbegyx(stdscr, x, y);
   width = getmaxx(stdscr);
@@ -1275,8 +1279,10 @@ run_mapper(void)
     draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 0);
     handlekey(&st, c);
   }
+  set_readline(NULL);
   curs_set(1);
   endwin();
+  log_flags = old_flags;
   current_state = NULL;
 }
 
@@ -1315,6 +1321,7 @@ load_inifile(const char * filename)
   inifile = d;
 }
 
+#ifdef USE_C_MAIN
 int
 gmmain(int argc, char *argv[])
 {
@@ -1364,7 +1371,6 @@ gmmain(int argc, char *argv[])
   return 0;
 }
 
-#ifdef USE_C_MAIN
 int
 main(int argc, char *argv[])
 {

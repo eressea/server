@@ -26,7 +26,7 @@
 
 /* config includes */
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #include "console.h"
 
@@ -251,8 +251,6 @@ game_init(void)
   init_data(xmlfile);
 
   init_locales();
-  /*  init_resources(); must be done inside the xml-read, because requirements use items */
-
   init_archetypes();
   init_attributes();
   init_itemtypes();
@@ -290,32 +288,27 @@ openlibs(lua_State * L)
 static lua_State *
 lua_init(void)
 {
-  lua_State * luaState = lua_open();
-/*
-  luaopen_base(luaState);
-  luaopen_math(luaState);
-  luaopen_string(luaState);
-  luaopen_io(luaState);
-  luaopen_table(luaState);
-  luaL_openlibs(luaState);
- */
-  openlibs(luaState);
-  luabind::open(luaState);
-  bind_objects(luaState);
-  bind_eressea(luaState);
-  bind_script(luaState);
-  bind_spell(luaState);
-  bind_alliance(luaState);
-  bind_region(luaState);
-  bind_item(luaState);
-  bind_faction(luaState);
-  bind_unit(luaState);
-  bind_ship(luaState);
-  bind_building(luaState);
-  bind_event(luaState);
-  bind_message(luaState);
-  bind_gamecode(luaState);
-  return luaState;
+  lua_State * L = lua_open();
+
+  openlibs(L);
+  luabind::open(L);
+
+  bind_objects(L);
+  bind_eressea(L);
+  bind_script(L);
+  bind_spell(L);
+  bind_alliance(L);
+  bind_region(L);
+  bind_item(L);
+  bind_faction(L);
+  bind_unit(L);
+  bind_ship(L);
+  bind_building(L);
+  bind_event(L);
+  bind_message(L);
+  bind_gamecode(L);
+  bind_gmtool(L);
+  return L;
 }
 
 static void

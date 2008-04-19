@@ -1,5 +1,5 @@
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "list.h"
 
 // kernel includes

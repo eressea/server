@@ -14,7 +14,9 @@ extern "C" {
 
   extern int lua_console(lua_State * L);
   extern int lua_do(lua_State * L);
-  extern int (*lua_readline)(lua_State *l, const char *prompt);
+  
+  typedef int (*readline)(struct lua_State *, const char *);
+  extern void set_readline(readline foo);
 
 #ifdef __cplusplus
 }

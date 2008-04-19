@@ -1,5 +1,5 @@
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #include "script.h"
 #include "../korrektur.h"
@@ -125,7 +125,7 @@ static int
 read_game(const char * filename)
 {
   int rv = readgame(filename, false);
-  printf(" - Korrekturen Runde %d\n", turn);
+  log_printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   return rv;
 }

@@ -21,7 +21,7 @@
 #endif
 
 static int 
-readline(lua_State *l, const char *prompt) 
+stdin_readline(lua_State *l, const char *prompt) 
 {
   static char buffer[MAXINPUT];
   if (prompt) {
@@ -36,7 +36,17 @@ readline(lua_State *l, const char *prompt)
   }
 }
 
-int (*lua_readline)(lua_State *l, const char *prompt) = readline;
+static int (*lua_readline)(lua_State *l, const char *prompt) = stdin_readline;
+
+void
+set_readline(readline foo)
+{
+  if (foo) {
+    lua_readline = foo;
+  } else {
+    lua_readline = stdin_readline;
+  }
+}
 
 #ifndef PROMPT
 #define PROMPT          "E> "
@@ -127,31 +137,37 @@ lstop(lua_State *l, lua_Debug *ar)
   luaL_error(l, "interrupted!");
 }
 
-static lua_State * global_state = NULL;
+/* BAD hack, all this action stuff. */
+#define STATESTACK_MAX 16
+static lua_State * state_stack[STATESTACK_MAX];
+int state_stack_top = -1;
+
+
 static void 
 laction(int i) 
 {
   signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
                       terminate process (default action) */
-  assert(global_state!=NULL);
-  lua_sethook(global_state, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+  assert(state_stack_top>=0 && state_stack_top<STATESTACK_MAX);
+  lua_sethook(state_stack[state_stack_top], lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
 static int 
 lcall(lua_State * L, int narg, int clear) 
 {
-  int status;
+  int status, pop_state = state_stack_top;
   int base = lua_gettop(L) - narg;  /* function index */
   lua_pushliteral(L, "_TRACEBACK");
   lua_rawget(L, LUA_GLOBALSINDEX);  /* get traceback function */
   lua_insert(L, base);  /* put it under chunk and args */
-  assert(global_state==NULL);
-  global_state = L; /* baaaad hack */
+  if (state_stack_top<0 || L != state_stack[state_stack_top]) {
+    assert(state_stack_top+1<STATESTACK_MAX);
+    state_stack[++state_stack_top] = L; 
+  }
   signal(SIGINT, laction);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   signal(SIGINT, SIG_DFL);
-  assert(global_state==L);
-  global_state=NULL;
+  state_stack_top = pop_state;
   lua_remove(L, base);  /* remove traceback function */
   return status;
 }
