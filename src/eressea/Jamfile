@@ -40,7 +40,6 @@ Library luabindings : $(SHARED_BINDINGS) ;
 
 LUASERVER_SOURCES =
  <common!iniparser>iniparser.c
- <common!iniparser>iniparser.c
  <lua>gm.cpp
  <lua>script.cpp
  <lua>gamecode.cpp

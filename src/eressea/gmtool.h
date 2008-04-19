@@ -23,6 +23,8 @@ extern "C" {
   extern void select_coordinate(struct selection * selected, int x, int y);
   extern void run_mapper(void);
 
+  extern int force_color;
+
 #ifdef __cplusplus
 }
 #endif

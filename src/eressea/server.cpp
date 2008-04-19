@@ -29,6 +29,7 @@
 #include <kernel/eressea.h>
 
 #include "console.h"
+#include "gmtool.h"
 
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
@@ -432,6 +433,7 @@ usage(const char * prog, const char * arg)
     "--nodebug        : keine Logfiles für Kämpfe\n"
     "--noreports      : absolut keine Reporte schreiben\n"
     "--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
+    "--color          : force curses to use colors even when not detected\n"
     "--nocr           : keine CRs\n"
     "--nonr           : keine Reports\n"
     "--crabsolute     : absolute Koordinaten im CR\n"
@@ -487,6 +489,12 @@ read_args(int argc, char **argv, lua_State * luaState)
       else if (strcmp(argv[i]+2, "nodebug")==0) battledebug = false;
       else if (strcmp(argv[i]+2, "console")==0) luafile=NULL;
       else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
+      else if (strcmp(argv[i]+2, "color")==0) {
+        /* force the editor to have colors */
+        force_color = 1;
+      } else if (strcmp(argv[i]+2, "current")==0) {
+        turn = -1;
+      }
       else if (strcmp(argv[i]+2, "help")==0)
         return usage(argv[0], NULL);
       else
@@ -620,6 +628,9 @@ load_inifile(const char * filename)
 
     luafile = iniparser_getstring(d, "eressea:run", luafile);
     g_reportdir = iniparser_getstring(d, "eressea:report", g_reportdir);
+
+    /* editor settings */
+    force_color = iniparser_getint(d, "editor:color", force_color);
 
     str = iniparser_getstring(d, "common:locales", "de,en");
     make_locales(str);
