@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-#ifndef WORMHOLE_MODULE
+#if WORMHOLE_MODULE == 0
 #error "must define WORMHOLE_MODULE to use this module"
 #endif
 

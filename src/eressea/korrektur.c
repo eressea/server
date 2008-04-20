@@ -605,9 +605,7 @@ frame_regions(void)
   }
 }
 
-#define GLOBAL_WARMING 200
-
-#ifdef GLOBAL_WARMING
+#if GLOBAL_WARMING
 
 static void
 iceberg(region * r)
@@ -994,16 +992,13 @@ korrektur(void)
 {
   check_dissolve();
   french_testers();
-#if TEST_LOCALES
-  setup_locales();
-#endif
   do_once("rdec", &road_decay);
   do_once("unfi", &fix_undead);
   do_once("chgt", &fix_chaosgates);
   do_once("atrx", &fix_attribflags);
   do_once("asfi", &fix_astral_firewalls);
   frame_regions();
-#ifdef GLOBAL_WARMING
+#if GLOBAL_WARMING
   if (get_gamedate(turn, NULL)->season == SEASON_SUMMER) {
     global_warming();
   }

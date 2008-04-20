@@ -6799,7 +6799,7 @@ sp_break_curse(castorder *co)
 int
 sp_becomewyrm(castorder *co)
 {
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   unit *u = co->magician.u;
   int wyrms_already_created = 0;
   int wyrms_allowed = 0;

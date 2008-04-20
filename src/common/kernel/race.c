@@ -204,7 +204,7 @@ unit_max_hp(const unit * u)
 	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
 	h += (int) (h * p + 0.5);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 	if (fspecial(u->faction, FS_UNDEAD)) {
 		h *= 2;
 	}

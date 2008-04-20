@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-#ifdef XECMD_MODULE
+#if XECMD_MODULE
 int xecmd(struct unit * u, struct order * ord);
 #endif
 

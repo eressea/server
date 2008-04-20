@@ -53,7 +53,7 @@
 #include <assert.h>
 #include <math.h>
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 
 #define STANDARD_LUCK 0
 

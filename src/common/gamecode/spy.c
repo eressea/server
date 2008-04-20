@@ -174,7 +174,7 @@ spy_cmd(unit * u, struct order * ord)
 int
 setwere_cmd(unit *u, struct order * ord)
 {
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   int level = fspecial(u->faction, FS_LYCANTROPE);
   const char *s;
 
@@ -320,7 +320,7 @@ setstealth_cmd(unit * u, struct order * ord)
     /* TARNE ALLES (was nicht so alles geht?) */
     u_seteffstealth(u, -1);
     break;
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   case P_NUMBER:
     /* TARNE ANZAHL [NICHT] */
     if (!fspecial(u->faction, FS_HIDDEN)) {
@@ -339,7 +339,7 @@ setstealth_cmd(unit * u, struct order * ord)
     }
     break;
 #endif /* KARMA_MODULE */
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   case P_ITEMS:
     /* TARNE GEGENSTÄNDE [NICHT] */
     if(!fspecial(u->faction, FS_HIDDEN)) {

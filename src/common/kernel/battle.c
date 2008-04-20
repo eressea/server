@@ -936,7 +936,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   ++at.fighter->hits;
 #endif
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if (fval(au, UFL_WERE)) {
     int level = fspecial(du->faction, FS_LYCANTROPE);
     da += level;
@@ -974,7 +974,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
   am = select_magicarmor(dt);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if(fval(du, UFL_WERE)) {
     /* this counts as magical armor */
     int level = fspecial(du->faction, FS_LYCANTROPE);
@@ -982,8 +982,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
 #endif /* KARMA_MODULE */
 
-#if CHANGED_CROSSBOWS == 1
-  if(awtype && fval(awtype,WTF_ARMORPIERCING)) {
+#if CHANGED_CROSSBOWS
+  if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
     /* crossbows */
     ar /= 2;
     an /= 2;
@@ -1001,7 +1001,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   if (type!=AT_COMBATSPELL && type!=AT_SPELL) {
     /* Kein Zauber, normaler Waffenschaden */
     double kritchance = (sk * 3 - sd) / 200.0;
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
     int faerie_level = fspecial(du->faction, FS_FAERIE);
 
     da += jihad(au->faction, du->race);
@@ -1646,7 +1646,7 @@ skilldiff(troop at, troop dt, int dist)
     skdiff += 5;
   }
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   /* Werwolf */
   if(fval(au, UFL_WERE)) {
     skdiff += fspecial(au->faction, FS_LYCANTROPE);
@@ -1657,7 +1657,7 @@ skilldiff(troop at, troop dt, int dist)
       af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * 10)
     skdiff += 1;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   /* TODO this should be a skillmod */
   skdiff += jihad(au->faction, du->race);
 #endif
@@ -1676,7 +1676,7 @@ skilldiff(troop at, troop dt, int dist)
       int beff = buildingeffsize(df->building, false)-1;
       /* -1 because the tradepost has no protection value */
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
       if (fspecial(au->faction, FS_SAPPER)) {
         /* Halbe Schutzwirkung, aufgerundet */
         beff = (beff+1)/2;
@@ -2294,7 +2294,7 @@ aftermath(battle * b)
       unit *du = df->unit;
       int dead = dead_fighters(df);
       int pr_mercy = 0;
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
       const attrib *a= a_find(du->attribs, &at_prayer_effect);
 
       while (a && a->type==&at_prayer_effect) {
@@ -2951,7 +2951,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   /* Effekte von Artefakten */
   strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   for (a = a_find(u->attribs, &at_prayer_effect); a && a->type==&at_prayer_effect; a = a->next) {
     if (a->data.sa[0] == PR_AID) {
       pr_aid = true;
@@ -4009,7 +4009,7 @@ do_battle(region * r)
     battle_update(b);
     battle_attacks(b);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
     /* Regeneration */
     for (fi=0;fi!=b->nfighters;++fi) {
       fighter *fig = b->fighters[fi];

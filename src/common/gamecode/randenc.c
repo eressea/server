@@ -612,7 +612,7 @@ drown(region *r)
     unit ** up = up=&r->units;
     while (*up) {
       unit *u = *up;
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
       int amphibian_level = fspecial(u->faction, FS_AMPHIBIAN);
 #else
       int amphibian_level = 0;
@@ -1121,7 +1121,7 @@ icebergs(void)
 void
 randomevents(void)
 {
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 	faction *f;
 #endif /* KARMA_MODULE */
 	region *r;
@@ -1217,7 +1217,7 @@ randomevents(void)
     }
   }
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   /* lycanthropen werden werwölfe */
   for (f = factions; f; f=f->next) {
     if (f->alive) {
@@ -1273,7 +1273,7 @@ randomevents(void)
   
   dissolve_units();
   check_split();
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   check_luck();
 #endif /* KARMA_MODULE */
 }

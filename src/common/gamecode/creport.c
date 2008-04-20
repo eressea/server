@@ -676,7 +676,7 @@ cr_output_unit(FILE * F, const region * r,
 
   assert(u);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if (fspecial(u->faction, FS_HIDDEN))
     a_fshidden = a_find(u->attribs, &at_fshidden);
 #endif /* KARMA_MODULE */
@@ -1149,7 +1149,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   const char * mailto = locale_string(f->locale, "mailto");
   const attrib * a;
   seen_region * sr = NULL;
-#ifdef SCORE_MODULE
+#if SCORE_MODULE
   int score = 0, avgscore = 0;
 #endif
   int enc = xmlParseCharEncoding(charset);
@@ -1186,7 +1186,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
   fprintf(F, "%d;age\n", f->age);
   fprintf(F, "%d;Optionen\n", f->options);
-#ifdef SCORE_MODULE
+#if SCORE_MODULE
   if (f->options & want(O_SCORE) && f->age>DISPLAYSCORE) {
     score = f->score;
     avgscore = average_score_of_age(f->age, f->age / 24 + 1);

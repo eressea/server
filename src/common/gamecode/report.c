@@ -1944,7 +1944,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     centre(F, alliancename(f->alliance), true);
   }
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   buf[0] = 0;
   dh = 0;
   for (a=a_find(f->attribs, &at_faction_special); a && a->type==&at_faction_special; a=a->next) {
@@ -1996,7 +1996,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     }
   }
   rnl(F);
-#ifdef SCORE_MODULE
+#if SCORE_MODULE
   if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
     RENDER(f, buf, sizeof(buf), ("nr_score", "score average", f->score, average_score_of_age(f->age, f->age / 24 + 1)));
     centre(F, buf, true);

@@ -214,7 +214,7 @@ personcapacity(const unit *u)
 {
 	int cap = u->race->weight+u->race->capacity;
 	
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 	if (fspecial(u->faction, FS_QUICK))
 		cap -= 200;
 #endif /* KARMA_MODULE */
@@ -401,7 +401,7 @@ canswim(unit *u)
   if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
     return true;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if (fspecial(u->faction, FS_AMPHIBIAN)) return true;
 #endif /* KARMA_MODULE */
   if (u->race->flags & RCF_FLY) return true;
@@ -1315,7 +1315,7 @@ movement_speed(unit * u)
 
   default:
     mp = BP_WALKING;
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
     /* faction special */
     if (fspecial(u->faction, FS_QUICK)) mp = BP_RIDING;
 #endif /* KARMA_MODULE */

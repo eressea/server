@@ -21,16 +21,16 @@
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
-#ifdef MUSEUM_MODULE
+#if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#ifdef ARENA_MODULE
+#if ARENA_MODULE
 #include <modules/arena.h>
 #endif
-#ifdef WORMHOLE_MODULE
+#if WORMHOLE_MODULE
 #include <modules/wormhole.h>
 #endif
-#ifdef DUNGEON_MODULE
+#if DUNGEON_MODULE
 #include <modules/dungeon.h>
 #endif
 

@@ -21,7 +21,7 @@
 #include <config.h>
 
 #include <kernel/eressea.h>
-#ifdef MUSEUM_MODULE
+#if MUSEUM_MODULE
 #include "museum.h"
 
 /* kernel includes */

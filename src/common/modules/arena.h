@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#ifndef ARENA_MODULE
+#if ARENA_MODULE == 0
 #error "must define ARENA_MODULE to use this module"
 #endif
 /* exports: */

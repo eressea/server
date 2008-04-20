@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#ifndef SCORE_MODULE
+#if SCORE_MODULE == 0
 #error "must define SCORE_MODULE to use this module"
 #endif
 

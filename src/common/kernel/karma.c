@@ -69,7 +69,7 @@ attrib_type at_jihad = {
 	"jihad", NULL, NULL, NULL, a_writeshorts, a_readshorts
 };
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 	{
 		"Regeneration",

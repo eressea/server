@@ -13,7 +13,7 @@
 #include <config.h>
 #include <kernel/eressea.h>
 
-#ifdef INFOCMD_MODULE
+#if INFOCMD_MODULE
 #include "infocmd.h"
 
 #include "command.h"

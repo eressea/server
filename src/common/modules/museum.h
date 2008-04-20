@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#ifndef MUSEUM_MODULE
+#if MUSEUM_MODULE == 0
 #error "must define MUSEUM_MODULE to use this module"
 #endif
 

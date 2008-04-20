@@ -25,7 +25,7 @@
 
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
-#ifdef WORMHOLE_MODULE
+#if WORMHOLE_MODULE
 #include <modules/wormhole.h>
 #endif
 
@@ -3048,7 +3048,7 @@ maxunits(const faction *f)
   if (global.unitsperalliance == true) {
     float mult = 1.0;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
     faction *f2;
     for (f2 = factions; f2; f2 = f2->next) {
       if (f2->alliance == f->alliance) {
@@ -3058,7 +3058,7 @@ maxunits(const faction *f)
 #endif /* KARMA_MODULE */
     return (int) (global.maxunits * mult);
   }
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   return (int) (global.maxunits * (1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
 #else
   return global.maxunits;
@@ -3354,7 +3354,7 @@ monthly_healing(void)
         continue;
       }
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
       if (fspecial(u->faction, FS_UNDEAD)) continue;
 
       if(fspecial(u->faction, FS_REGENERATION)) {
@@ -3834,7 +3834,7 @@ init_processor(void)
   add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
   add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
   add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   add_proc_order(p, K_WEREWOLF, &setwere_cmd, 0, NULL);
 #endif /* KARMA_MODULE */
 
@@ -3857,7 +3857,7 @@ init_processor(void)
     add_proc_global(p, &alliancevictory, "Testen der Allianzbedingungen");
   }
 
-#ifdef INFOCMD_MODULE
+#if INFOCMD_MODULE
   add_proc_global(p, &infocommands, NULL);
 #endif
   add_proc_global(p, &gmcommands, "GM Kommandos");
@@ -3866,7 +3866,7 @@ init_processor(void)
   add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
   if (!nobattle) {
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
     p+=10;
     add_proc_global(p, &jihad_attacks, "Jihad-Angriffe");
 #endif
@@ -3920,7 +3920,7 @@ init_processor(void)
 
   p+=10;
   add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
-#ifdef XECMD_MODULE
+#if XECMD_MODULE
   /* can do together with guard */
   add_proc_order(p, K_LEAVE, &xecmd, 0, "Zeitung");
 #endif
@@ -3945,7 +3945,7 @@ init_processor(void)
 
   p+=10;
   add_proc_global(p, &reorder, "Einheiten sortieren");
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   p+=10;
   add_proc_global(p, &karma, "Jihads setzen");
 #endif
@@ -3985,7 +3985,7 @@ processorders (void)
   ageing();
   remove_empty_units();
 
-#ifdef WORMHOLE_MODULE
+#if WORMHOLE_MODULE
   create_wormholes();
 #endif
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich

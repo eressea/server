@@ -1404,7 +1404,7 @@ readfaction(FILE * F, int encoding)
   }
   f->magiegebiet = (magic_t)ri(F);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   f->karma = ri(F);
 #else
   /* ignore karma */
@@ -1491,7 +1491,7 @@ writefaction(FILE * F, const faction * f)
   ws(F, f->race->_name[0]);
   wnl(F);
   wi(F, f->magiegebiet);
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   wi(F, f->karma);
 #else
   wi(F, 0);

@@ -640,7 +640,7 @@ learn_cmd(unit * u, order * ord)
     change_effect(u, oldpotiontype[P_FOOL], -l);
   }
 
-  #ifdef KARMA_MODULE
+  #if KARMA_MODULE
   l = fspecial(u->faction, FS_WARRIOR);
   if (l > 0) {
     if (sk == SK_CROSSBOW || sk == SK_LONGBOW

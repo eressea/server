@@ -13,7 +13,7 @@
 #include <config.h>
 #include <kernel/eressea.h>
 
-#ifdef XECMD_MODULE
+#if XECMD_MODULE
 #include "xecmd.h"
 
 #include <items/xerewards.h>

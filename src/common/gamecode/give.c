@@ -118,7 +118,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
       }
 #endif
 #endif
-#if defined(MUSEUM_MODULE) && defined(TODO)
+#if MUSEUM_MODULE && defined(TODO)
       /* TODO: use a trigger for the museum warden! */
       if (a_find(dest->attribs, &at_warden)) {
         warden_add_give(src, dest, itype, n);

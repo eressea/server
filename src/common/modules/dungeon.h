@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-#ifndef DUNGEON_MODULE
+#if DUNGEON_MODULE == 0
 #error "must define DUNGEON_MODULE to use this module"
 #endif
 

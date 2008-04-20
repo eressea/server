@@ -43,16 +43,16 @@
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
-#ifdef MUSEUM_MODULE
+#if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#ifdef WORMHOLE_MODULE
+#if WORMHOLE_MODULE
 #include <modules/wormhole.h>
 #endif
-#ifdef ARENA_MODULE
+#if ARENA_MODULE
 #include <modules/arena.h>
 #endif
-#ifdef DUNGEON_MODULE
+#if DUNGEON_MODULE
 #include <modules/dungeon.h>
 #endif
 
@@ -235,16 +235,16 @@ game_init(void)
   register_itemfunctions();
   register_spells();
   register_gcspells();
-#ifdef DUNGEON_MODULE
+#if DUNGEON_MODULE
   register_dungeon();
 #endif
-#ifdef MUSEUM_MODULE
+#if MUSEUM_MODULE
   register_museum();
 #endif
-#ifdef ARENA_MODULE
+#if ARENA_MODULE
   register_arena();
 #endif
-#ifdef WORMHOLE_MODULE
+#if WORMHOLE_MODULE
   register_wormholes();
 #endif
 
@@ -262,7 +262,7 @@ game_init(void)
   init_rawmaterials();
 
   init_gmcmd();
-#ifdef INFOCMD_MODULE
+#if INFOCMD_MODULE
   init_info();
 #endif
 }

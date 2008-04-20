@@ -93,7 +93,7 @@ const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
 int turn;
 
-#ifdef XECMD_MODULE
+#if XECMD_MODULE
 attrib_type at_xontormiaexpress = {
   "xontormiaexpress",
   DEFAULT_INIT,
@@ -512,7 +512,7 @@ max_magicians(const faction * f)
     m = a->data.i;
   }
   if (f->race == new_race[RC_ELF]) ++m;
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   m += fspecial(f, FS_MAGOCRACY) * 2;
 #endif /* KARMA_MODULE */
   return m;
@@ -2318,7 +2318,7 @@ weight(const unit * u)
       in_bag += w;
   }
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   faerie_level = fspecial(u->faction, FS_FAERIE);
 #endif /* KARMA_MODULE */
 
@@ -2397,7 +2397,7 @@ lifestyle(const unit * u)
   if(u->region->planep && fval(u->region->planep, PFL_NOFEED))
     return 0;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if(fspecial(u->faction, FS_REGENERATION))
     need += 1;
   if(fspecial(u->faction, FS_ADMINISTRATOR))
@@ -2523,7 +2523,7 @@ default_wage(const region *r, const faction * f, const race * rc)
       index = 1;
     }
     wage = wagetable[esize][index];
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
     if (fspecial(f, FS_URBAN)) {
       wage += wagetable[esize][3];
     }
@@ -2818,7 +2818,7 @@ attrib_init(void)
   at_register(&at_guard);
   at_register(&at_group);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   at_register(&at_faction_special);
   at_register(&at_prayer_timeout);
   at_register(&at_wyrm);
@@ -2838,7 +2838,7 @@ attrib_init(void)
   register_bordertype(&bt_questportal);
 
   at_register(&at_germs);
-#ifdef XECMD_MODULE
+#if XECMD_MODULE
   at_register(&at_xontormiaexpress); /* required for old datafiles */
 #endif
   at_register(&at_speedup);

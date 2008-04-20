@@ -13,7 +13,7 @@
 #include <config.h>
 #include <kernel/eressea.h>
 
-#ifdef WORMHOLE_MODULE
+#if WORMHOLE_MODULE
 #include "wormhole.h"
 
 /* kernel includes */

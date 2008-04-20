@@ -430,7 +430,7 @@ updatespelllist(unit * u)
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
   sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
     add_spell(mage, find_spellbyid(M_GRAU, SPL_BECOMEWYRM));
   }
@@ -1174,7 +1174,7 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
         skill * sv;
         unit * u = (unit*)obj;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
         if (fspecial(u->faction, FS_MAGICIMMUNE)) return true;
 #endif /* KARMA_MODULE */
         at = effskill(magician, SK_MAGIC);
@@ -1406,7 +1406,7 @@ regeneration(unit * u)
 	double potenz = 1.5;
 	double divisor = 2.0;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 	if (fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
 #endif /* KARMA_MODULE */
 

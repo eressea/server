@@ -267,7 +267,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
     itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
   }
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   if (fspecial(u->faction, FS_HIDDEN)) {
     a_fshidden = a_find(u->attribs, &at_fshidden);
   }

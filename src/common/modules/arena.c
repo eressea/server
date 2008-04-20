@@ -15,7 +15,7 @@
 #include <config.h>
 #include <kernel/eressea.h>
 
-#ifdef ARENA_MODULE
+#if ARENA_MODULE
 #include "arena.h"
 
 /* modules include */

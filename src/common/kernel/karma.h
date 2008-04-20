@@ -42,7 +42,7 @@ typedef enum {
 	MAXFACTIONSPECIALS
 } fspecial_t;
 
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
 typedef enum {
 	PR_AID,
 	PR_MERCY,

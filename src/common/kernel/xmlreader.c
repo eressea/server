@@ -767,7 +767,7 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   if (xml_bvalue(node, "animal", false)) flags |= ITF_ANIMAL;
   if (xml_bvalue(node, "vehicle", false)) flags |= ITF_VEHICLE;
   itype = new_itemtype(rtype, flags, weight, capacity);
-#ifdef SCORE_MODULE
+#if SCORE_MODULE
   itype->score = xml_ivalue(node, "score", 0);
 #endif
 

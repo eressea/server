@@ -128,7 +128,7 @@ typedef struct item_type {
   int (*use)(struct unit * user, const struct item_type * itype, int amount, struct order * ord);
   int (*useonother)(struct unit * user, int targetno, const struct item_type * itype, int amount, struct order * ord);
   int (*give)(struct unit * src, struct unit * dest, const struct item_type * itm, int number, struct order * ord);
-#ifdef SCORE_MODULE
+#if SCORE_MODULE
   int score;
 #endif
   struct item_type * next;

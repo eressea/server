@@ -89,10 +89,10 @@ typedef struct faction {
   boolean alive; /* enno: sollte ein flag werden */
   int nregions;
   int money;
-#ifdef SCORE_MODULE
+#if SCORE_MODULE
   int score;
 #endif
-#ifdef KARMA_MODULE
+#if KARMA_MODULE
   int karma;
 #endif
   struct alliance * alliance;

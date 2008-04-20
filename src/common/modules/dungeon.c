@@ -13,7 +13,7 @@
 #include <config.h>
 #include <kernel/eressea.h>
 
-#ifdef DUNGEON_MODULE
+#if DUNGEON_MODULE
 #include "dungeon.h"
 #include "gmcmd.h"
 

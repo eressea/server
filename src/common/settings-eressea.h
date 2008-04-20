@@ -38,11 +38,20 @@
 #define ROW_FACTOR 3 /* factor for combat row advancement rule */
 #define HEROES
 
-#define SCORE_MODULE
-#define MUSEUM_MODULE
-#define ARENA_MODULE
-#define WORMHOLE_MODULE
-#define XECMD_MODULE
+/* optional game components. TODO: These should either be 
+ * configuration variables (XML), script extensions (lua),
+ * or both. We don't want separate binaries for different games
+ */
+#define SCORE_MODULE 1
+#define MUSEUM_MODULE 1
+#define ARENA_MODULE 1
+#define WORMHOLE_MODULE 1
+#define XECMD_MODULE 1
+#define KARMA_MODULE 0
+#define DUNGEON_MODULE 0
+#define INFOCMD_MODULE 0
+#define CHANGED_CROSSBOWS 0 /* use the WTF_ARMORPIERCING flag */
+#define GLOBAL_WARMING 200 /* number of turns before global warming sets in */
 
 #define SIMPLE_COMBAT
 #define SIMPLE_ESCAPE
