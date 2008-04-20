@@ -13,7 +13,7 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "unitmessage.h"
 
 /* kernel includes */

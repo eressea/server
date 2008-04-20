@@ -32,15 +32,19 @@
 #include <util/log.h>
 
 // lua includes
+#ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 4127)
+#endif
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 #if LUABIND_BETA>=7
 # include <luabind/operator.hpp>
 #endif
+#ifdef _MSC_VER
 #pragma warning (pop)
+#endif
 
 #include <ostream>
 #include <string>

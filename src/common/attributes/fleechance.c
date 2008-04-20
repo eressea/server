@@ -15,7 +15,7 @@
 #include <config.h>
 #include "fleechance.h"
 
-#include <attrib.h>
+#include <util/attrib.h>
 
 attrib_type at_fleechance = {
 	"fleechance",

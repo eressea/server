@@ -367,45 +367,6 @@ fix_allies(void)
   }
 }
 
-static void
-fix_icastles(void)
-{
-  region * r;
-  for (r=regions; r; r=r->next) {
-    building * b;
-    for (b=r->buildings; b; b=b->next) {
-      attrib * a;
-      const building_type * btype = bt_find("castle");
-      icastle_data * data;
-      a = a_find(b->attribs, &at_icastle);
-      if (b->type!=bt_find("illusion") && !a) continue;
-
-      if (!a) {
-        /* attribut hat gefehle */
-        a = a_add(&b->attribs, a_new(&at_icastle));
-      }
-      if (b->type!=bt_find("illusion")) {
-        /* wrong building type */
-        btype = b->type;
-        b->type = bt_find("illusion");
-      }
-      data = (icastle_data*)a->data.v;
-      if (data->time<=0) {
-        /* zeit war kaputt oder abgelaufen */
-        data->time = 1;
-      }
-      if (!data->type) {
-        /* typ muss gesetzt werden, weil er nicht geladen wurde */
-        data->type = btype;
-      }
-      if (data->building!=b) {
-        /* fix reverse pointer to the building */
-        data->building=b;
-      }
-    }
-  }
-}
-
 #include <triggers/timeout.h>
 #include <triggers/changerace.h>
 #include <triggers/changefaction.h>

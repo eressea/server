@@ -12,7 +12,7 @@
 
 #include <config.h>
 #include <kernel/eressea.h>
-#include <attrib.h>
+#include <util/attrib.h>
 #include "variable.h"
 
 #include <kernel/save.h>

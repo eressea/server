@@ -12,13 +12,12 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "otherfaction.h"
 
-#include <faction.h>
-#include <unit.h>
-#include <attrib.h>
-
+#include <kernel/faction.h>
+#include <kernel/unit.h>
+#include <util/attrib.h>
 #include <assert.h>
 
 /*

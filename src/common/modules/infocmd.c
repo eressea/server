@@ -11,7 +11,7 @@
  
  */
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #ifdef INFOCMD_MODULE
 #include "infocmd.h"

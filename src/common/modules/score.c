@@ -20,7 +20,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #ifdef SCORE_MODULE
 #include "score.h"
 
@@ -38,8 +38,7 @@
 #include <kernel/pool.h>
 
 /* util includes */
-#include <base36.h>
-#include <goodies.h>
+#include <util/base36.h>
 
 /* libc includes */
 #include <math.h>

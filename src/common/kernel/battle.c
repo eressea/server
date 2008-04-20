@@ -13,7 +13,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "battle.h"
 
 #include "alchemy.h"
@@ -23,7 +23,6 @@
 #include "curse.h"
 #include "equipment.h"
 #include "faction.h"
-#include "goodies.h"
 #include "group.h"
 #include "item.h"
 #include "karma.h"

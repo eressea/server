@@ -11,9 +11,9 @@
 */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "gmcmd.h"
-#include "command.h"
+#include <kernel/command.h>
 
 /* misc includes */
 #include <items/demonseye.h>
@@ -22,17 +22,17 @@
 #include <triggers/unguard.h>
 
 /* kernel includes */
-#include <building.h>
-#include <reports.h>
-#include <faction.h>
-#include <item.h>
-#include <message.h>
-#include <order.h>
-#include <plane.h>
-#include <region.h>
-#include <terrain.h>
-#include <terrainid.h>
-#include <unit.h>
+#include <kernel/building.h>
+#include <kernel/reports.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/attrib.h>

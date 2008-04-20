@@ -20,7 +20,7 @@
 
 #include <config.h>
 
-#include <eressea.h>
+#include <kernel/eressea.h>
 #ifdef MUSEUM_MODULE
 #include "museum.h"
 
@@ -39,9 +39,9 @@
 #include <kernel/faction.h>
 
 /* util includes */
-#include <attrib.h>
-#include <functions.h>
-#include <goodies.h>
+#include <util/attrib.h>
+#include <util/functions.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <limits.h>

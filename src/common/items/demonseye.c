@@ -13,19 +13,19 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "demonseye.h"
 
 /* kernel includes */
-#include <faction.h>
-#include <item.h>
-#include <message.h>
-#include <plane.h>
-#include <region.h>
-#include <unit.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/plane.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <functions.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <assert.h>

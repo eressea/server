@@ -20,7 +20,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "alchemy.h"
 
 #include "item.h"

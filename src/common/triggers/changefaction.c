@@ -13,13 +13,13 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "changefaction.h"
 
 /* kernel includes */
-#include <unit.h>
-#include <save.h>
-#include <faction.h> /* FIXME: resolve_faction */
+#include <kernel/unit.h>
+#include <kernel/save.h>
+#include <kernel/faction.h> /* FIXME: resolve_faction */
 
 /* util includes */
 #include <util/attrib.h>

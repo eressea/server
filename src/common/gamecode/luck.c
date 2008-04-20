@@ -20,7 +20,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 
 #include "luck.h"
 
@@ -32,15 +32,15 @@
 #include "randenc.h"
 
 /* kernel include */
-#include <unit.h>
-#include <faction.h>
-#include <item.h>
-#include <message.h>
-#include <race.h>
-#include <pool.h>
-#include <region.h>
-#include <skill.h>
-#include <karma.h>
+#include <kernel/unit.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/race.h>
+#include <kernel/pool.h>
+#include <kernel/region.h>
+#include <kernel/skill.h>
+#include <kernel/karma.h>
 
 /* util includes */
 #include <util/rand.h>

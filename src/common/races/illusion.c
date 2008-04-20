@@ -13,13 +13,13 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "illusion.h"
 
 /* kernel includes */
-#include <unit.h>
-#include <faction.h>
-#include <message.h>
+#include <kernel/unit.h>
+#include <kernel/faction.h>
+#include <kernel/message.h>
 
 /* libc includes */
 #include <stdlib.h>

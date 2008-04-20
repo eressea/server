@@ -13,14 +13,14 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "gm.h"
 
 /* kernel includes */
-#include <plane.h>
+#include <kernel/plane.h>
 
 /* util includes */
-#include <attrib.h>
+#include <util/attrib.h>
 
 static void
 write_gm(const attrib * a, FILE * F)

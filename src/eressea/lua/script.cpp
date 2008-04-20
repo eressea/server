@@ -31,11 +31,15 @@
 #include <util/functions.h>
 #include <util/log.h>
 
+#ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 4127)
+#endif
 #include <luabind/luabind.hpp>
 #include <luabind/object.hpp>
+#ifdef _MSC_VER
 #pragma warning (pop)
+#endif
 
 #include <cstdio>
 #include <cstring>
@@ -102,7 +106,7 @@ lua_callspell(castorder *co)
 
   if (hashpos!=NULL) {
     ptrdiff_t len = hashpos - fname;
-    assert(len<sizeof(fbuf));
+    assert(len<(ptrdiff_t)sizeof(fbuf));
     strncpy(fbuf, fname, len);
     fbuf[len] = '\0';
     fname = fbuf;

@@ -10,7 +10,7 @@
 
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 #include "summary.h"
 

@@ -13,12 +13,12 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "giveitem.h"
 
 /* kernel includes */
-#include <item.h>
-#include <unit.h>
+#include <kernel/item.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/attrib.h>

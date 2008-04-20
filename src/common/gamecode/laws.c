@@ -20,7 +20,7 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "laws.h"
 
 #include <modules/gmcmd.h>
@@ -2509,8 +2509,8 @@ sinkships(region * r)
 }
 
 /* The following functions do not really belong here: */
-#include "eressea.h"
-#include "build.h"
+#include <kernel/eressea.h>
+#include <kernel/build.h>
 
 static attrib_type at_number = {
   "faction_renum",

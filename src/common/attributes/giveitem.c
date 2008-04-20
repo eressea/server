@@ -14,19 +14,19 @@
 
 #include <config.h>
 #include "giveitem.h"
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 /* kernel includes */
-#include <building.h>
-#include <region.h>
-#include <unit.h>
-#include <item.h>
+#include <kernel/building.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
+#include <kernel/item.h>
 
 /* util includes */
-#include <attrib.h>
-#include <base36.h>
-#include <resolve.h>
-#include <goodies.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/resolve.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <stdlib.h>

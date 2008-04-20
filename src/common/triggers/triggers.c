@@ -18,7 +18,7 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 
 /* triggers includes */
 #include <triggers/changefaction.h>
@@ -36,7 +36,7 @@
 #include <triggers/clonedied.h>
 
 /* util includes */
-#include <event.h>
+#include <util/event.h>
 
 /* libc includes */
 #include <stdio.h>

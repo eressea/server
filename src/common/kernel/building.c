@@ -14,9 +14,8 @@
 
 #include <config.h>
 
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "building.h"
-#include "attrib.h"
 
 /* kernel includes */
 #include "item.h"
@@ -29,6 +28,7 @@
 #include "version.h"
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/functions.h>

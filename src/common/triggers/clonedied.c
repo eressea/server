@@ -13,13 +13,13 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "clonedied.h"
 
 /* kernel includes */
-#include <spell.h>
-#include <magic.h>
-#include <unit.h>
+#include <kernel/spell.h>
+#include <kernel/magic.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/attrib.h>

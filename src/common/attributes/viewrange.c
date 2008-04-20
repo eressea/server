@@ -16,8 +16,8 @@
 #include "viewrange.h"
 
 /* util includes */
-#include <attrib.h>
-#include <functions.h>
+#include <util/attrib.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <assert.h>

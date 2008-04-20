@@ -13,13 +13,13 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "createcurse.h"
 
 /* kernel includes */
-#include <version.h>
-#include <curse.h>
-#include <unit.h>
+#include <kernel/version.h>
+#include <kernel/curse.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/attrib.h>

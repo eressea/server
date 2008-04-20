@@ -106,11 +106,15 @@
 #include "lua/bindings.h"
 #include "lua/script.h"
 #include <boost/version.hpp>
+#ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 4127)
+#endif
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#ifdef _MSC_VER
 #pragma warning (pop)
+#endif
 
 #include <libxml/encoding.h>
 
@@ -175,7 +179,7 @@ struct settings global = {
   1000, /* maxunits */
 };
 
-#ifdef __GNUC__
+#if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
 #include <execinfo.h>
 #include <signal.h>
 

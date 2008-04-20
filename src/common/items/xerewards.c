@@ -12,21 +12,21 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "xerewards.h"
 
 /* kernel includes */
-#include <item.h>
-#include <region.h>
-#include <faction.h>
-#include <unit.h>
-#include <skill.h>
-#include <curse.h>
-#include <message.h>
-#include <magic.h>
+#include <kernel/item.h>
+#include <kernel/region.h>
+#include <kernel/faction.h>
+#include <kernel/unit.h>
+#include <kernel/skill.h>
+#include <kernel/curse.h>
+#include <kernel/message.h>
+#include <kernel/magic.h>
 
 /* util includes */
-#include <functions.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <assert.h>

@@ -23,7 +23,7 @@
 #define TEACH_FRIENDS
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "study.h"
 
 #include <kernel/alchemy.h>

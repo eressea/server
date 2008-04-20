@@ -19,13 +19,12 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "magic.h"
 
 #include "building.h"
 #include "curse.h"
 #include "faction.h"
-#include "goodies.h"
 #include "item.h"
 #include "karma.h"
 #include "message.h"

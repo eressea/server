@@ -61,7 +61,7 @@ if $(PROFILE) = 1 {
 CCFLAGS += -Wall ;
 
 CCFLAGS += -Wwrite-strings 
-#		   -W
+		   -Wundef
 		   -Wstrict-prototypes 
 		   -Werror-implicit-function-declaration
 		   -Wno-char-subscripts

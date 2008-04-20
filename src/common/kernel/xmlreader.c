@@ -11,10 +11,8 @@ without prior permission by the authors of Eressea.
 */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "xmlreader.h"
-
-#include <xml.h>
 
 /* kernel includes */
 #include "building.h"
@@ -37,6 +35,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/xml.h>
 
 /* libxml includes */
 #include <libxml/tree.h>

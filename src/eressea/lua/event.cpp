@@ -10,11 +10,15 @@
 #include <util/event.h>
 
 // lua includes
+#ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 4127)
+#endif
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#ifdef _MSC_VER
 #pragma warning (pop)
+#endif
 
 using namespace luabind;
 

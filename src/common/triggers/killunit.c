@@ -13,10 +13,10 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "killunit.h"
 
-#include <unit.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/base36.h>

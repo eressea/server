@@ -19,12 +19,11 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "save.h"
 
 #include "alchemy.h"
 #include "alliance.h"
-#include "attrib.h"
 #include "border.h"
 #include "building.h"
 #include "faction.h"
@@ -689,7 +688,7 @@ typus2race(unsigned char typus)
 void
 create_backup(char *file)
 {
-#ifdef HAVE_UNISTD_H
+#ifdef HAVE_LINK
   char bfile[MAX_PATH];
   int c = 1;
 
@@ -1635,7 +1634,7 @@ readgame(const char * filename, int backup)
     read_alliances(F);
   }
   n = ri(F);
-  if (quiet<2) printf(" - Einzulesende Parteien: %d\n", n);
+  if (quiet<2) log_printf(" - Einzulesende Parteien: %d\n", n);
   fp = &factions;
   while (*fp) fp=&(*fp)->next;
 

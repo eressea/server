@@ -104,6 +104,8 @@ extern "C" {
 #ifdef WIN32
 # include <common/util/windir.h>
 # define HAVE_READDIR
+# define HAVE__MKDIR_WITHOUT_PERMISSION
+# define HAVE__SLEEP_MSEC
 #endif
 
 #if defined(__USE_SVID) || defined(_BSD_SOURCE) || defined(__USE_XOPEN_EXTENDED) || defined(_BE_SETUP_H) || defined(CYGWIN)
@@ -113,15 +115,20 @@ extern "C" {
 # define HAVE_STRNCASECMP
 # define HAVE_ACCESS
 # define HAVE_STAT
-# define HAVE_SLEEP
 typedef struct stat stat_type;
 # include <dirent.h>
 # define HAVE_READDIR
 # define HAVE_OPENDIR
-# define HAVE_MKDIR_WITH_PERMISSION
 # include <string.h>
 # define HAVE_STRDUP
 # define HAVE_SNPRINTF
+#ifdef _POSIX_SOURCE /* MINGW doesn't seem to have these */
+# define HAVE_EXECINFO
+# define HAVE_MKDIR_WITH_PERMISSION
+# define HAVE_SIGACTION
+# define HAVE_LINK
+# define HAVE_SLEEP
+#endif
 #endif
 
 /* egcpp 4 dos */
@@ -135,7 +142,6 @@ typedef struct stat stat_type;
 # include <string.h>
 # include <direct.h>
 # include <io.h>
-# define HAVE_MKDIR_WITHOUT_PERMISSION
 # define HAVE_ACCESS
 # define HAVE_STAT
 typedef struct stat stat_type;
@@ -154,7 +160,6 @@ typedef struct stat stat_type;
 #ifdef _MSC_VER
 # include <string.h> /* must be included here so strdup is not redefined */
 # define R_OK 4
-# define HAVE__MKDIR_WITHOUT_PERMISSION
 # define HAVE_INLINE
 # define INLINE_FUNCTION __inline
 
@@ -176,9 +181,6 @@ typedef struct _stat stat_type;
 /* MSVC has _strdup */
 # define strdup _strdup
 # define HAVE_STRDUP
-
-# define sleep(sec) _sleep(sec)
-# define HAVE_SLEEP
 
 # define stricmp(a, b) _stricmp(a, b)
 # define HAVE_STRICMP
@@ -218,6 +220,14 @@ _CRTIMP int __cdecl _mkdir(const char *);
 
 #ifndef HAVE_STRDUP
 extern char * strdup(const char *s);
+#endif
+
+#ifndef HAVE_SLEEP
+#ifdef HAVE__SLEEP_MSEC
+# define sleep(sec) _sleep(1000*sec)
+#elif defined(HAVE__SLEEP)
+# define sleep(sec) _sleep(sec)
+#endif
 #endif
 
 #if !defined(MAX_PATH)

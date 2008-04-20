@@ -10,17 +10,17 @@
  without prior permission by the authors of Eressea.
 */
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "unguard.h"
 
 /* kernel includes */
-#include <building.h>
-#include <region.h>
-#include <unit.h>
+#include <kernel/building.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <event.h>
-#include <log.h>
+#include <util/event.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <stdlib.h>

@@ -13,12 +13,12 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "changerace.h"
 
 /* kernel includes */
-#include <unit.h>
-#include <race.h>
+#include <kernel/unit.h>
+#include <kernel/race.h>
 
 /* util includes */
 #include <util/attrib.h>

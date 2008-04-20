@@ -19,7 +19,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "message.h"
 
 /* kernel includes */
@@ -56,7 +56,7 @@ typedef struct msg_setting {
 /************ Compatibility function *************/
 #define MAXSTRLEN (4*DISPLAYSIZE+3)
 #include "region.h"
-#include "eressea.h"
+#include <kernel/eressea.h>
 
 static void
 arg_set(variant args[], const message_type * mtype, const char * buffer, variant v)

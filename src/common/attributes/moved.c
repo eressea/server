@@ -13,10 +13,10 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "moved.h"
 
-#include <attrib.h>
+#include <util/attrib.h>
 
 static int
 age_moved(attrib * a)

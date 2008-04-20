@@ -13,12 +13,12 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "dragons.h"
 
 /* kernel includes */
-#include <region.h>
-#include <unit.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <util/rng.h>

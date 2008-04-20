@@ -23,6 +23,9 @@ namespace eressea {
       bool operator==(const iterator& iter) {
         return iter.m_index==m_index;
       }
+      bool operator!=(const iterator& iter) {
+        return iter.m_index!=m_index;
+      }
       iterator& operator++() {
         if (m_index) m_index = nodetype::next(m_index);
         return *this;

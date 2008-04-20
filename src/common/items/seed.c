@@ -15,12 +15,11 @@
 
 #include "seed.h"
 
+/* kernel includes */
 #include <kernel/build.h>
 #include <kernel/eressea.h>
+#include <kernel/item.h>
 #include <kernel/region.h>
-
-/* kernel includes */
-#include <item.h>
 
 /* util includes */
 #include <util/attrib.h>

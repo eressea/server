@@ -13,14 +13,14 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "createunit.h"
 
 /* kernel includes */
-#include <faction.h>
-#include <unit.h>
-#include <race.h>
-#include <region.h>
+#include <kernel/faction.h>
+#include <kernel/unit.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
 
 /* util includes */
 #include <util/attrib.h>

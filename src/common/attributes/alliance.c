@@ -10,7 +10,7 @@
  */
 
 #include <config.h>
-#include <types.h>
+#include <kernel/types.h>
 #include "alliance.h"
 
 #include <kernel/save.h>

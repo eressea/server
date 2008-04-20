@@ -13,7 +13,7 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "creport.h"
 
 /* tweakable features */
@@ -164,7 +164,7 @@ reset_translations(void)
   }
 }
 
-#include "objtypes.h"
+#include <kernel/objtypes.h>
 
 static void
 print_items(FILE * F, item * items, const struct locale * lang)

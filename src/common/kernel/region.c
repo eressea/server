@@ -20,7 +20,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "region.h"
 
 /* kernel includes */
@@ -47,13 +47,13 @@
 #include <util/resolve.h>
 #include <util/umlaut.h>
 #include <util/language.h>
+#include <util/rand.h>
 #include <util/rng.h>
 
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
-#include <rand.h>
 #include <stdio.h>
 #include <string.h>
 

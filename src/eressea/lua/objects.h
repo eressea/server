@@ -2,10 +2,14 @@
 #define LUA_OBJECTS_H
 
 #include <attributes/object.h>
+#ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 4127)
+#endif
 #include <luabind/object.hpp>
+#ifdef _MSC_VER
 #pragma warning (pop)
+#endif
 
 struct lua_State;
 

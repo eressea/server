@@ -19,7 +19,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
@@ -75,7 +75,6 @@
 
 /* libc includes */
 #include <stdio.h>
-#include <message.h>
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>

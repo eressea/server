@@ -18,7 +18,7 @@
  * permission from the authors.
  */
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "equipment.h"
 
 /* kernel includes */

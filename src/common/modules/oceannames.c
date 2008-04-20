@@ -13,15 +13,15 @@
  */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "oceannames.h"
 
 /* kernel includes */
-#include <region.h>
-#include <faction.h>
+#include <kernel/region.h>
+#include <kernel/faction.h>
 
 /* util includes */
-#include <attrib.h>
+#include <util/attrib.h>
 
 /* libc includes */
 #include <stdlib.h>

@@ -20,11 +20,10 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "curse.h"
 
 /* kernel includes */
-#include "attrib.h"
 #include "building.h"
 #include "faction.h"
 #include "magic.h"
@@ -38,6 +37,7 @@
 #include "version.h"
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/log.h>
@@ -263,7 +263,7 @@ attrib_type at_curse =
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
-#include "umlaut.h"
+#include <util/umlaut.h>
 
 typedef struct cursetype_list {
   struct cursetype_list * next;

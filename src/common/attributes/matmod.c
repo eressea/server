@@ -15,7 +15,7 @@
 #include <config.h>
 #include "matmod.h"
 
-#include <attrib.h>
+#include <util/attrib.h>
 
 attrib_type at_matmod = {
 	"matmod",

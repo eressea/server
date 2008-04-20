@@ -12,15 +12,14 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "shipcurse.h"
 
 /* kernel includes */
-#include <message.h>
-#include <ship.h>
-#include <nrmessage.h>
-#include <objtypes.h>
-#include <curse.h>
+#include <kernel/message.h>
+#include <kernel/ship.h>
+#include <kernel/objtypes.h>
+#include <kernel/curse.h>
 
 /* util includes */
 #include <util/base36.h>

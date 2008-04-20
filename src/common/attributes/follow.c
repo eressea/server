@@ -15,13 +15,13 @@
 #include <config.h>
 #include "follow.h"
 
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include <kernel/unit.h>
 #include <kernel/version.h>
 
-#include <attrib.h>
-#include <resolve.h>
-#include <variant.h>
+#include <util/attrib.h>
+#include <util/resolve.h>
+#include <util/variant.h>
 
 static int
 verify_follow(attrib * a)

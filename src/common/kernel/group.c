@@ -13,7 +13,7 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <kernel/eressea.h>
 #include "group.h"
 
 /* kernel includes */
