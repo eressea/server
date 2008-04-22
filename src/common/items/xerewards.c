@@ -41,19 +41,19 @@ use_skillpotion(struct unit * u, const struct item_type * itype, int amount, str
    * currently saved, it doesn't look likely (can't make eressea::list 
    * from them)
    */
-	int i;
-	for (i=0;i!=amount;++i) {
-		skill * sv = u->skills;
-		while (sv!=u->skills+u->skill_size) {
-			int i;
-			for (i=0;i!=3;++i) learn_skill(u, sv->id, 1.0);
-			++sv;
-		}
-	}
+  int n;
+  for (n=0;n!=amount;++n) {
+    skill * sv = u->skills;
+    while (sv!=u->skills+u->skill_size) {
+      int i;
+      for (i=0;i!=3;++i) learn_skill(u, sv->id, 1.0);
+      ++sv;
+    }
+  }
   ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));
 
-	res_changeitem(u, itype->rtype, -amount);
-	return 0;
+  res_changeitem(u, itype->rtype, -amount);
+  return 0;
 }
 
 static int

@@ -753,18 +753,18 @@ handlekey(state * st, int c)
     if (regions!=NULL) {
       map_region * mr = cursor_region(&st->display, cursor);
       region * first = mr->r;
-      region * r = (first&&first->next)?first->next:regions;
-      while (r!=first) {
+      region * cur = (first&&first->next)?first->next:regions;
+      while (cur!=first) {
         coordinate coord;
-        region2coord(r, &coord);
+        region2coord(cur, &coord);
         if (tagged_region(st->selected, &coord)) {
           st->cursor = coord;
           st->wnd_info->update |= 1;
           st->wnd_status->update |= 1;
           break;
         }
-        r = r->next;
-        if (!r && first) r = regions;
+        cur = cur->next;
+        if (!cur && first) cur = regions;
       }
     }
     break;
@@ -773,16 +773,16 @@ handlekey(state * st, int c)
     if (regions!=NULL) {
       map_region * mr = cursor_region(&st->display, cursor);
       if (mr->r) {
-        region * r = mr->r;
-        if (r->planep==NULL) {
-          r = r_standard_to_astral(r);
+        region * cur = mr->r;
+        if (cur->planep==NULL) {
+          cur = r_standard_to_astral(cur);
         } else if (r->planep==get_astralplane()) {
-          r = r_astral_to_standard(r);
+          cur = r_astral_to_standard(cur);
         } else {
-          r = NULL;
+          cur = NULL;
         }
-        if (r!=NULL) {
-          region2coord(r, &st->cursor);
+        if (cur!=NULL) {
+          region2coord(cur, &st->cursor);
         } else {
           beep();
         }

@@ -104,7 +104,7 @@ f_nolux(const region * r)
 }
 
 int
-fix_demand(region *r)
+fix_demand(region *rd)
 {
   region_list *rl, *rlist = NULL;
   static const struct luxury_type **mlux = 0, ** ltypes;
@@ -113,7 +113,7 @@ fix_demand(region *r)
   int maxluxuries = get_maxluxuries();
   
   if (maxluxuries==0) return 0;
-  recurse_regions(r, &rlist, f_nolux);
+  recurse_regions(rd, &rlist, f_nolux);
   if (mlux==0) {
     int i = 0;
     mlux = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));

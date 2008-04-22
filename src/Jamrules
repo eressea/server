@@ -68,9 +68,10 @@ CCFLAGS += -Wwrite-strings
 		   -Wpointer-arith
 #		   -Wshadow
 #		   -Wcast-qual
-#		   -Wcast-align
+		   -Wcast-align
 #		   -Wconversion
 #		   -Wunreachable-code
+                   -Werror
 		   ;
 
 # this require the latet luabind from CVS
@@ -139,8 +140,8 @@ rule TargetDirectory
         LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(path) ;
         SOURCE_GRIST = $(path) ;
         if $(DEBUG) = 1 {
-            SubDirCcFlags -ggdb ;
-            SubDirC++Flags -ggdb ;
+            SubDirCcFlags -ggdb -DDEBUG=1 ;
+            SubDirC++Flags -ggdb -DDEBUG=1 ;
             OPTIM = -O0 ;
         }
         else {

@@ -281,16 +281,16 @@ gm_teleport(const tnode * tnext, void * data, struct order * ord)
 static void
 gm_messageplane(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  const struct plane * p = rplane(u->region);
+  unit * gm = (unit*)data;
+  const struct plane * p = rplane(gm->region);
   const char * zmsg = getstrtoken();
   if (p==NULL) {
-    mistake(u, ord, "In diese Ebene kann keine Nachricht gesandt werden.");
+    mistake(gm, ord, "In diese Ebene kann keine Nachricht gesandt werden.");
   } else {
     /* checking permissions */
-    attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+    attrib * permissions = a_find(gm->faction->attribs, &at_permissions);
     if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-      mistake(u, ord, "permission denied.");
+      mistake(gm, ord, "permission denied.");
     }
     else {
       message * msg = msg_message("msg_event", "string", zmsg);
@@ -316,14 +316,14 @@ gm_messageplane(const tnode * tnext, void * data, struct order * ord)
 static void
 gm_messagefaction(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
+  unit * gm = (unit*)data;
   int n = getid();
   faction * f = findfaction(n);
   const char * msg = getstrtoken();
-  plane * p = rplane(u->region);
-  attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+  plane * p = rplane(gm->region);
+  attrib * permissions = a_find(gm->faction->attribs, &at_permissions);
   if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-    mistake(u, ord, "permission denied.");
+    mistake(gm, ord, "permission denied.");
     return;
   }
   if (f!=NULL) {
@@ -336,7 +336,7 @@ gm_messagefaction(const tnode * tnext, void * data, struct order * ord)
       }
     }
   }
-  mistake(u, ord, "cannot send messages to this faction.");
+  mistake(gm, ord, "cannot send messages to this faction.");
 }
 
 /**
@@ -705,12 +705,12 @@ gm_addfaction(const char * email, plane * p, region * r)
   f->options = want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN);
   {
     faction * xist;
-    int i = atoi36("gm00")-1;
+    int id = atoi36("gm00")-1;
     do {
-      xist = findfaction(++i);
+      xist = findfaction(++id);
     } while (xist);
 
-    f->no = i;
+    f->no = id;
     addlist(&factions, f);
     fhash(f);
   }

@@ -2736,7 +2736,7 @@ static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
   display chunk addresses, sizes, bins, and other instrumentation.
 */
 
-static void do_check_malloc_state()
+static void do_check_malloc_state(void)
 {
   mstate av = get_malloc_state();
   int i;

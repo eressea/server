@@ -78,22 +78,22 @@ static region * tower_region[6];
 static region * start_region[6];
 
 static region *
-arena_region(int magic)
+arena_region(int school)
 {
-	return tower_region[magic];
+  return tower_region[school];
 }
 
 static building *
-arena_tower(int magic)
+arena_tower(int school)
 {
-	return arena_region(magic)->buildings;
+  return arena_region(school)->buildings;
 }
 
 static int
 leave_fail(unit * u)
 {
   ADDMSG(&u->faction->msgs, msg_message("arena_leave_fail", "unit", u));
-	return 1;
+  return 1;
 }
 
 static int
@@ -167,25 +167,25 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 static int
 use_wand_of_tears(unit * user, const struct item_type * itype, int amount, order * ord)
 {
-	int i;
-	unused(ord);
-	for (i=0;i!=amount;++i) {
-		unit * u;
-		for (u=user->region->units;u;u=u->next) {
-			if (u->faction != user->faction) {
-				int i;
-
-				for (i=0;i!=u->skill_size;++i) {
-					if (rng_int()%3) reduce_skill(u, u->skills+i, 1);
-				}
-				ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
-					"unit", u));
-			}
-		}
-	}
-	ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage",
-		"unit", user));
-	return 0;
+  int n;
+  unused(ord);
+  for (n=0;n!=amount;++n) {
+    unit * u;
+    for (u=user->region->units;u;u=u->next) {
+      if (u->faction != user->faction) {
+        int i;
+        
+        for (i=0;i!=u->skill_size;++i) {
+          if (rng_int()%3) reduce_skill(u, u->skills+i, 1);
+        }
+        ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
+                                              "unit", u));
+      }
+    }
+  }
+  ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage",
+                                          "unit", user));
+  return 0;
 }
 
 /**

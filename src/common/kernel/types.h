@@ -21,6 +21,15 @@
 #ifndef ERESSEA_TYPES_H
 #define ERESSEA_TYPES_H
 
+/*
+ * Features enabled:
+ * If you are lacking the settings.h, create a new file common/settings.h,
+ * and write #include <settings-eressea.h> (or whatever settings you want
+ * your game to use) in there.
+ * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
+ * settings.h should always be the first thing you include (after config.h).
+ */
+#include <settings.h>
 #include <util/variant.h>
 
 typedef short terrain_t;

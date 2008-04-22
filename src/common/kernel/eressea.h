@@ -25,26 +25,19 @@
 extern "C" {
 #endif
 
-/*
- * Features enabled:
- * If you are lacking the settings.h, create a new file common/settings.h,
- * and write #include <settings-eressea.h> (or whatever settings you want
- * your game to use) in there.
- * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
- */
+ /* this should always be the first thing included after config.h */
 #include "types.h"
 
-#define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
-
-/* experimental gameplay features (that don't affect the savefile) */
+  /* experimental gameplay features (that don't affect the savefile) */
+  /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL /* Goblin-Spezialklau kann tödlich enden */
 #define HERBS_ROT  /* herbs owned by units have a chance to rot. */
 #define SHIPDAMAGE /* Schiffsbeschädigungen */
 #define INSECT_POTION /* Spezialtrank für Insekten */
 #define ORCIFICATION /* giving snotlings to the peasants gets counted */
-#undef TROLLSAVE /* saving throw for dead trolls */
-
-#include <settings.h>
+#undef TROLLSAVE /* saving throw for dead trolls */  
+  
+#define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
 #ifndef MAXREGIONS
 # define MAXREGIONS 262139 /* must be prime for hashing. 262139=last<2^18 */

@@ -183,12 +183,12 @@ verify_owners(boolean bOnce)
 
 /* make sure that this is done only once! */
 static void
-do_once(const char * magic, int (*fptr)(void))
+do_once(const char * magic_id, int (*fptr)(void))
 {
-  attrib * a = find_key(global.attribs, atoi36(magic));
+  attrib * a = find_key(global.attribs, atoi36(magic_id));
   if (!a) {
-    log_warning(("[do_once] a unique fix %d=\"%s\" was applied.\n", atoi36(magic), magic));
-    if (fptr() == 0) a_add(&global.attribs, make_key(atoi36(magic)));
+    log_warning(("[do_once] a unique fix %d=\"%s\" was applied.\n", atoi36(magic_id), magic_id));
+    if (fptr() == 0) a_add(&global.attribs, make_key(atoi36(magic_id)));
   }
 }
 
@@ -442,7 +442,7 @@ fix_undead(void)
         skill * sa = get_skill(u, SK_HERBALISM);
 
         if (sm && sa) {
-          int level = sm->level;
+          int lvl = sm->level;
           attrib * a = a_find(u->attribs, &at_mage);
           if (a) {
             a_remove(&u->attribs, a);
@@ -451,14 +451,14 @@ fix_undead(void)
           u->skills = 0;
           u->skill_size = 0;
 
-          log_warning(("fixing skills for %s %s, level %d.\n", u->race->_name[0], itoa36(u->no), level));
+          log_warning(("fixing skills for %s %s, level %d.\n", u->race->_name[0], itoa36(u->no), lvl));
 
-          if (level>0) {
+          if (lvl>0) {
             const race * rc = u->race;
             skill_t sk;
             for (sk=0;sk!=MAXSKILLS;++sk) {
               if (rc->bonus[sk]>0) {
-                set_level(u, sk, level);
+                set_level(u, sk, lvl);
               }
             }
           }
@@ -483,12 +483,12 @@ fix_gates(void)
         while (t && t->type!= &tt_gate) t=t->next;
         if (t!=NULL) {
           gate_data * gd = (gate_data*)t->data.v;
-          struct building * b = gd->gate;
+          struct building * bgate = gd->gate;
           struct region * rtarget = gd->target;
-          if (r!=b->region) {
-            add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
-            add_trigger(&b->attribs, "create", trigger_unguard(b));
-            fset(b, BLD_UNGUARDED);
+          if (r!=bgate->region) {
+            add_trigger(&bgate->attribs, "timer", trigger_gate(bgate, rtarget));
+            add_trigger(&bgate->attribs, "create", trigger_unguard(bgate));
+            fset(bgate, BLD_UNGUARDED);
           }
         }
         remove_triggers(&u->attribs, "timer", &tt_gate);
@@ -502,14 +502,14 @@ fix_gates(void)
         while (t && t->type!= &tt_gate) t=t->next;
         if (t!=NULL) {
           gate_data * gd = (gate_data*)t->data.v;
-          struct building * b = gd->gate;
+          struct building * bgate = gd->gate;
           struct region * rtarget = gd->target;
-          remove_triggers(&b->attribs, "timer", &tt_gate);
-          remove_triggers(&b->attribs, "create", &tt_unguard);
-          if (r!=b->region) {
-            add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
-            add_trigger(&b->attribs, "create", trigger_unguard(b));
-            fset(b, BLD_UNGUARDED);
+          remove_triggers(&bgate->attribs, "timer", &tt_gate);
+          remove_triggers(&bgate->attribs, "create", &tt_unguard);
+          if (r!=bgate->region) {
+            add_trigger(&bgate->attribs, "timer", trigger_gate(bgate, rtarget));
+            add_trigger(&bgate->attribs, "create", trigger_unguard(bgate));
+            fset(bgate, BLD_UNGUARDED);
           }
         }
       }
@@ -654,7 +654,7 @@ static int
 fix_astralplane(void)
 {
   plane * astralplane = get_astralplane();
-  region * r;
+  region * rs;
   region_list * rlist = NULL;
   faction * monsters = findfaction(MONSTER_FACTION);
 
@@ -664,15 +664,15 @@ fix_astralplane(void)
   freset(astralplane, PFL_NOFEED);
   set_ursprung(monsters, astralplane->id, 0, 0);
 
-  for (r=regions;r;r=r->next) if (rplane(r)==astralplane) {
-    region * ra = r_standard_to_astral(r);
+  for (rs=regions;rs;rs=rs->next) if (rplane(rs)==astralplane) {
+    region * ra = r_standard_to_astral(rs);
     if (ra==NULL) continue;
-    if (rterrain(r)!=T_FIREWALL) continue;
+    if (rterrain(rs)!=T_FIREWALL) continue;
     if (rterrain(ra)==T_ASTRALB) continue;
     if (ra->units!=NULL) {
       add_regionlist(&rlist, ra);
     }
-    log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(r, NULL), regionname(ra, NULL));
+    log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(rs, NULL), regionname(ra, NULL));
     terraform(ra, T_ASTRALB);
   }
   while (rlist!=NULL) {
@@ -718,11 +718,11 @@ fix_road_borders(void)
   int i = 0;
 
   if (incomplete_data) return;
-  for(hash=0; hash<BMAXHASH && i!=MAXDEL; hash++) {
-    border * bhash;
-    for (bhash=borders[hash];bhash && i!=MAXDEL;bhash=bhash->nexthash) {
+  for (hash=0; hash<BMAXHASH && i!=MAXDEL; hash++) {
+    border * blist;
+    for (blist=borders[hash];blist && i!=MAXDEL;blist=blist->nexthash) {
       border * b;
-      for (b=bhash;b && i!=MAXDEL;b=b->next) {
+      for (b=blist;b && i!=MAXDEL;b=b->next) {
         if (b->type == &bt_road) {
           short x1, x2, y1, y2;
           region *r1, *r2;

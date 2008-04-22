@@ -67,11 +67,11 @@ score(void)
 {
   FILE *scoreFP;
   region *r;
-  faction *f;
+  faction *fc;
   int allscores = 0;
   char path[MAX_PATH];
 
-  for (f = factions; f; f = f->next) f->score = 0;
+  for (fc = factions; fc; fc = fc->next) fc->score = 0;
 
   for (r = regions; r; r = r->next) {
     unit * u;
@@ -108,9 +108,9 @@ score(void)
       }
     }
     for (s = r->ships; s; s = s->next) {
-      unit * u = shipowner(s);
-      if (u && u->faction) {
-        u->faction->score += s->size * 2;
+      unit * cap = shipowner(s);
+      if (cap && cap->faction) {
+        cap->faction->score += s->size * 2;
       }
     }
     for (u = r->units; u; u = u->next) {
@@ -154,10 +154,10 @@ score(void)
     }
   }
 
-  for (f = factions; f; f = f->next) {
-    f->score = f->score / 5;
-    if (f->no != MONSTER_FACTION && f->race != new_race[RC_TEMPLATE]) {
-      allscores += f->score;
+  for (fc = factions; fc; fc = fc->next) {
+    fc->score = fc->score / 5;
+    if (fc->no != MONSTER_FACTION && fc->race != new_race[RC_TEMPLATE]) {
+      allscores += fc->score;
     }
   }
   if (allscores == 0) {
@@ -168,6 +168,7 @@ score(void)
   scoreFP = fopen(path, "w");
   if (scoreFP) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    faction * f;
     fwrite(utf8_bom, 1, 3, scoreFP);
     for (f = factions; f; f = f->next) if (f->num_total != 0) {
       fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
@@ -193,6 +194,7 @@ score(void)
       for (a = alliances; a; a = a->next) {
         int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
         int grails = 0;
+        faction * f;
 
         for (f = factions; f; f = f->next) {
           if (f->alliance && f->alliance->id == a->id) {

@@ -73,36 +73,36 @@ const attrib_type at_kick = { "kick",
 static attrib *
 make_kick(void)
 {
-	return a_new(&at_kick);
+  return a_new(&at_kick);
 }
 
-void
-add_kick(attrib * a, const faction * f)
+static void
+add_kick(attrib * a, faction * f)
 {
-	faction_list * flist = (faction_list*)a->data.v;
-	while (flist && flist->data!=f) flist = flist->next;
-	if (flist) return;
-	flist = calloc(1, sizeof(faction_list));
-	flist->data = (void*)f;
-	flist->next = (faction_list*)a->data.v;
-	a->data.v = flist;
+  faction_list * flist = (faction_list*)a->data.v;
+  while (flist && flist->data!=f) flist = flist->next;
+  if (flist) return;
+  flist = calloc(1, sizeof(faction_list));
+  flist->data = (void*)f;
+  flist->next = (faction_list*)a->data.v;
+  a->data.v = flist;
 }
 
 static void
 alliance_kick(const tnode * tnext, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	faction * f = findfaction(getid());
-	attrib * a;
-	unused(tnext);
-
-	if (f==NULL || f->alliance!=u->faction->alliance) {
-		/* does not belong to our alliance */
-		return;
-	}
-	a = a_find(f->attribs, &at_kick);
-	if (a==NULL) a = a_add(&f->attribs, make_kick());
-	add_kick(a, f);
+  unit * u = (unit*)data;
+  faction * f = findfaction(getid());
+  attrib * a;
+  unused(tnext);
+  
+  if (f==NULL || f->alliance!=u->faction->alliance) {
+    /* does not belong to our alliance */
+    return;
+  }
+  a = a_find(f->attribs, &at_kick);
+  if (a==NULL) a = a_add(&f->attribs, make_kick());
+  add_kick(a, f);
 }
 
 static void
