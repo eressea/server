@@ -49,7 +49,7 @@ make_block(short x, short y, short radius, const struct terrain_type * terrain)
     for (cy = y - radius; cy != y+radius; ++cy) {
       if (koor_distance(cx, cy, x, y) < radius) {
         if (!findregion(cx, cy)) {
-          r = new_region(cx, cy);
+          r = new_region(cx, cy, 0);
           terraform_region(r, terrain);
         }
       }

@@ -379,8 +379,28 @@ attrib_type at_moveblock = {
 };
 
 
-#define RMAXHASH 65521
-region *regionhash[RMAXHASH];
+#define RMAXHASH 65521 /* last prime <2^16 */
+static region *regionhash[RMAXHASH];
+static unsigned int uidhash[MAXREGIONS];
+
+unsigned int 
+generate_region_id(void)
+{
+  unsigned int uid;
+  for (;;) {
+    int key;
+    do {
+      uid = rng_int();
+    } while (uid==0);
+    key = uid % MAXREGIONS;
+    while (uidhash[key]!=0 && uidhash[key]!=uid) ++key;
+    if (uidhash[key]==0) {
+      uidhash[key] = uid;
+      break;
+    }
+  }
+  return uid;
+}
 
 static region *
 rfindhash(short x, short y)
@@ -789,7 +809,7 @@ static region *last;
 static unsigned int max_index = 0;
 
 region *
-new_region(short x, short y)
+new_region(short x, short y, unsigned int uid)
 {
   region *r = rfindhash(x, y);
 
@@ -802,6 +822,8 @@ new_region(short x, short y)
   r = calloc(1, sizeof(region));
   r->x = x;
   r->y = y;
+  if (uid==0) uid = generate_region_id();
+  r->uid = uid;
   r->age = 1;
   r->planep = findplane(x, y);
   rhash(r);

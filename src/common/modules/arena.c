@@ -362,7 +362,7 @@ block_create(short x1, short y1, char terrain)
 	short x, y;
 	for (x=0;x!=BLOCKSIZE;++x) {
 		for (y=0;y!=BLOCKSIZE;++y) {
-			region * r = new_region(x1 + x, y1 + y);
+			region * r = new_region(x1 + x, y1 + y, 0);
 			terraform(r, terrain);
 		}
 	}

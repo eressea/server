@@ -46,6 +46,10 @@ extern "C" {
 
 #include <settings.h>
 
+#ifndef MAXREGIONS
+# define MAXREGIONS 262139 /* must be prime for hashing. 262139=last<2^18 */
+#endif
+
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
 #define MAXPEASANTS_PER_AREA 10 /* number of peasants per region-size */
 #define TREESIZE (MAXPEASANTS_PER_AREA-2) /* space used by trees (in #peasants) */

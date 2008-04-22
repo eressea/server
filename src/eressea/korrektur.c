@@ -597,7 +597,7 @@ frame_regions(void)
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
       if (rn==NULL) {
-        rn = new_region(r->x+delta_x[d], r->y+delta_y[d]);
+        rn = new_region(r->x+delta_x[d], r->y+delta_y[d], 0);
         terraform(rn, T_FIREWALL);
         rn->age=r->age;
       }

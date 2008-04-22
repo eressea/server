@@ -84,5 +84,5 @@
     <!-- used for the museum only -->
     <terrain name="hall1" fly="no" size="0" />
     <terrain name="corridor1" fly="no" size="0" />
-    <terrain name="wall1" sail="no" land="no" walk="no" sail="no" fly="no" forbidden="yes" size="0" />
+    <terrain name="wall1" sail="no" walk="no" fly="no" forbidden="yes" size="0" />
 </terrains>

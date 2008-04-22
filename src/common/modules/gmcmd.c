@@ -650,12 +650,12 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
   maxx = minx+2*radius; cx = minx+radius;
   maxy = miny+2*radius; cy = miny+radius;
   p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
-  center = new_region(cx, cy);
+  center = new_region(cx, cy, 0);
   for (x=0;x<=2*radius;++x) {
     short y;
     for (y=0;y<=2*radius;++y) {
       region * r = findregion(minx+x, miny+y);
-      if (!r) r = new_region(minx+x, miny+y);
+      if (!r) r = new_region(minx+x, miny+y, 0);
       freset(r, RF_ENCOUNTER);
       r->planep = p;
       if (distance(r, center)==radius) {
@@ -763,12 +763,12 @@ gm_addplane(short radius, unsigned int flags, const char * name)
   maxx = minx+2*radius; cx = minx+radius;
   maxy = miny+2*radius; cy = miny+radius;
   p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
-  center = new_region(cx, cy);
+  center = new_region(cx, cy, 0);
   for (x=0;x<=2*radius;++x) {
     short y;
     for (y=0;y<=2*radius;++y) {
       region * r = findregion(minx+x, miny+y);
-      if (!r) r = new_region(minx+x, miny+y);
+      if (!r) r = new_region(minx+x, miny+y, 0);
       freset(r, RF_ENCOUNTER);
       r->planep = p;
       if (distance(r, center)==radius) {

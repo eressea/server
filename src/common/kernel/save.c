@@ -1113,10 +1113,18 @@ readregion(FILE * F, int encoding, short x, short y)
   region * r = findregion(x, y);
   const terrain_type * terrain;
   char token[32];
+  unsigned int uid = 0;
+
+  if (global.data_version>=UID_VERSION) {
+    uid = ri(F);
+  } else {
+    uid = generate_region_id();
+  }
 
   if (r==NULL) {
-    r = new_region(x, y);
+    r = new_region(x, y, uid);
   } else {
+    r->uid = uid;
     current_region = r;
     while (r->attribs) a_remove(&r->attribs, r->attribs);
     if (r->land) {
@@ -1257,6 +1265,7 @@ readregion(FILE * F, int encoding, short x, short y)
 void
 writeregion(FILE * F, const region * r)
 {
+  wi(F, r->uid);
   fwritestr(F, r->display?(const char *)r->display:"");
   fputc(' ', F);
   ws(F, r->terrain->_name);
@@ -1659,6 +1668,7 @@ readgame(const char * filename, int backup)
   /* Regionen */
 
   n = ri(F);
+  assert(n<MAXREGIONS);
   if (rmax<0) rmax = n;
   if (quiet<2) printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
   if (loadplane || dirtyload || firstx || firsty || maxregions>=0) {

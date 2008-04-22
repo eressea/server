@@ -591,7 +591,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       assert(virgin_region(rconnect(rmin, dmin)));
       x = rmin->x + delta_x[dmin];
       y = rmin->y + delta_y[dmin];
-      r = new_region(x, y);
+      r = new_region(x, y, 0);
       terraform(r, T_OCEAN); /* we change the terrain later */
     }
   }
@@ -618,7 +618,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       if (rn && fval(rn, RF_MARK)) continue;
       if (virgin_region(rn)) {
         if (rn==NULL) {
-          rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+          rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
           terraform(rn, T_OCEAN);
         }
         add_regionlist(&rlist, rn);
@@ -711,7 +711,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
           region * rn = rconnect(r, d);
           if (rn==NULL) {
             const struct terrain_type * terrain = newterrain(T_OCEAN);
-            rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+            rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
             if (rng_int() % SPECIALCHANCE < special) {
               terrain = random_terrain(true);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
@@ -740,7 +740,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         }
         if (i!=MAXFILLDIST) {
           while (--i) {
-            region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d]);
+            region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d], 0);
             terraform(rn, T_OCEAN);
           }
         }

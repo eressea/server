@@ -96,6 +96,7 @@ typedef struct region {
   /* an ascending number, to improve the speed of determining the interval in 
      which a faction has its units. See the implementations of firstregion 
      and lastregion */
+  unsigned int uid; /* a unique id */
   short x, y;
   struct plane *planep;
   char *display;
@@ -221,7 +222,7 @@ extern const char * regionname(const struct region * r, const struct faction * f
 extern const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
 extern void * resolve_region(variant data);
-extern struct region * new_region(short x, short y);
+extern struct region * new_region(short x, short y, unsigned int uid);
 extern void terraform(struct region * r, terrain_t terrain);
 extern void terraform_region(struct region * r, const struct terrain_type * terrain);
 
@@ -241,6 +242,8 @@ extern struct region * r_connect(const struct region *, direction_t dir);
 #else
 # define rconnect(r, dir) r_connect(r, dir)
 #endif
+
+extern unsigned int generate_region_id(void);
 
 #ifdef __cplusplus
 }

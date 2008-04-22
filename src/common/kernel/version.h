@@ -51,12 +51,7 @@
 #define ATTRIBREAD_VERSION 324 /* remove a_readint */
 #define CURSEFLAGS_VERSION 325 /* remove a_readint */
 #define UNICODE_VERSION 326 /* everything is stored as UTF8 */
+#define UID_VERSION 327 /* everything is stored as UTF8 */
 
-#define MIN_VERSION CURSETYPE_VERSION
-#define REGIONOWNERS_VERSION 400
-
-#ifdef ENEMIES
-# define RELEASE_VERSION ENEMIES_VERSION
-#else
-# define RELEASE_VERSION UNICODE_VERSION
-#endif
+#define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
+#define RELEASE_VERSION UID_VERSION /* current datafile */

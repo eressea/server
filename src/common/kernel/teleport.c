@@ -209,7 +209,7 @@ create_teleport_plane(void)
       plane * pl = findplane(x, y);
 
       if (pl==aplane) {
-        ra = new_region(x, y);
+        ra = new_region(x, y, 0);
         
         if (fval(r->terrain, FORBIDDEN_REGION)) {
           terraform_region(ra, thickfog);

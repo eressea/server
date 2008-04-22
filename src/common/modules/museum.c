@@ -204,7 +204,7 @@ create_museum(void)
 
 	if (findregion(9525, 9525) == NULL) {
 		/* Eingangshalle */
-		r = new_region(9525, 9525);
+		r = new_region(9525, 9525, 0);
 		terraform_region(r, terrain_hall);
 		r->planep  = museum;
 		rsetname(r, "Eingangshalle");
@@ -217,7 +217,7 @@ create_museum(void)
 	r = findregion(9526, 9525);
 	if(!r) {
 		/* Lounge */
-		r = new_region(9526, 9525);
+		r = new_region(9526, 9525, 0);
 		terraform_region(r, terrain_hall);
 		r->planep  = museum;
 		rsetname(r, "Lounge");
@@ -261,7 +261,7 @@ create_museum(void)
 
 	r = findregion(9524, 9526);
 	if(!r) {
-		r = new_region(9524, 9526);
+		r = new_region(9524, 9526, 0);
 		terraform_region(r, terrain_corridor);
 		r->planep  = museum;
 		rsetname(r, "Nördliche Promenade");
@@ -272,7 +272,7 @@ create_museum(void)
 	}
 	r = findregion(9525, 9524);
 	if(!r) {
-		r = new_region(9525, 9524);
+		r = new_region(9525, 9524, 0);
 		terraform_region(r, terrain_corridor);
 		r->planep  = museum;
 		rsetname(r, "Südliche Promenade");

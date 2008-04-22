@@ -440,7 +440,7 @@ terraform_at(coordinate * c, const terrain_type *terrain)
   if (terrain!=NULL) {
     short x = (short)c->x, y = (short)c->y;
     region * r = findregion(x, y);
-    if (r==NULL) r = new_region(x, y);
+    if (r==NULL) r = new_region(x, y, 0);
     terraform_region(r, terrain);
   }
 }
@@ -457,7 +457,7 @@ terraform_selection(selection * selected, const terrain_type *terrain)
       tag * t = *tp;
       short x = (short)t->coord.x, y = (short)t->coord.y;
       region * r = findregion(x, y);
-      if (r==NULL) r = new_region(x, y);
+      if (r==NULL) r = new_region(x, y, 0);
       terraform_region(r, terrain);
       tp = &t->nexthash;
     }

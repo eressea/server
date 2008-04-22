@@ -221,7 +221,7 @@ region_terraform(short x, short y, const char * tname)
     }
     return NULL;
   }
-  if (r==NULL) r = new_region(x, y);
+  if (r==NULL) r = new_region(x, y, 0);
   terraform_region(r, terrain);
   return r;
 }
@@ -380,6 +380,7 @@ bind_region(lua_State * L)
     .def("set_resource", &region_setresource)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
+    .def_readonly("id", &region::uid)
     .def_readwrite("age", &region::age)
     .def("add_item", &region_additem)
     .property("items", &region_items, return_stl_iterator)
