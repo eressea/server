@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?fileVersion 4.0.0?>
 
 <cproject>
@@ -23,7 +23,6 @@
 <option id="gnu.both.asm.option.include.paths.516875632" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea/common}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\include&quot;"/>
 </option>
 <option id="gnu.both.asm.option.flags.1162663603" name="Assembler flags" superClass="gnu.both.asm.option.flags"/>
 <option id="gnu.both.asm.option.warnings.nowarn.973241866" name="Suppress warnings (-W)" superClass="gnu.both.asm.option.warnings.nowarn"/>
@@ -37,8 +36,6 @@
 <option id="gnu.cpp.compiler.option.include.paths.1393341890" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea/common}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\include&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\boost\boost_1_34_1&quot;"/>
 </option>
 <option id="gnu.cpp.compiler.option.preprocessor.nostdinc.509155758" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
 <option id="gnu.cpp.compiler.option.preprocessor.preprocess.717960248" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
@@ -64,7 +61,6 @@
 <option id="gnu.c.compiler.option.include.paths.1649940257" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea/common}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\include&quot;"/>
 </option>
 <option id="gnu.c.compiler.option.preprocessor.nostdinc.1689698239" name="Do not search system directories (-nostdinc)" superClass="gnu.c.compiler.option.preprocessor.nostdinc"/>
 <option id="gnu.c.compiler.option.preprocessor.preprocess.1908177862" name="Preprocess only (-E)" superClass="gnu.c.compiler.option.preprocessor.preprocess"/>
@@ -97,9 +93,7 @@
 <listOptionValue builtIn="false" value="xml2"/>
 <listOptionValue builtIn="false" value="pdcurses"/>
 </option>
-<option id="gnu.cpp.link.option.paths.1128737822" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\lib&quot;"/>
-</option>
+<option id="gnu.cpp.link.option.paths.1128737822" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
 <option id="gnu.cpp.link.option.flags.727417691" name="Linker flags" superClass="gnu.cpp.link.option.flags"/>
 <option id="gnu.cpp.link.option.other.1598614473" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other"/>
 <option id="gnu.cpp.link.option.userobjs.797217777" name="Other objects" superClass="gnu.cpp.link.option.userobjs"/>
@@ -554,12 +548,11 @@
 <folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.release.1541791553." name="/" resourcePath="">
 <toolChain id="cdt.managedbuild.toolchain.gnu.mingw.exe.release.1027782906" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.exe.release">
 <targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.exe.release.1998459463" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.exe.release"/>
-<builder buildPath="${workspace_loc:/eressea/Release}" id="cdt.managedbuild.tool.gnu.builder.mingw.base.452448843" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+<builder autoBuildTarget="" buildPath="${workspace_loc:/eressea/Release}" cleanBuildTarget="" id="cdt.managedbuild.tool.gnu.builder.mingw.base.452448843" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="-1" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 <tool id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.release.141808870" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.release">
 <option id="gnu.both.asm.option.include.paths.1704788626" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea/common}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\include&quot;"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.assembler.input.1185170495" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 </tool>
@@ -570,8 +563,6 @@
 <option id="gnu.cpp.compiler.option.include.paths.346750431" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea/common}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\boost\boost_1_34_1&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\include&quot;"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1399935560" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 </tool>
@@ -581,15 +572,12 @@
 <option id="gnu.c.compiler.option.include.paths.1295238050" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/eressea/common}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;C:\usr\mingw\include&quot;"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1811165260" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.release.928774754" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.release"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.release.356286294" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.release">
-<option id="gnu.cpp.link.option.paths.417330353" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-<listOptionValue builtIn="false" value="&quot;C:\usr\lib&quot;"/>
-</option>
+<option id="gnu.cpp.link.option.paths.417330353" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1922446018" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>
