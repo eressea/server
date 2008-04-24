@@ -42,6 +42,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/goodies.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>
@@ -379,8 +380,10 @@ attrib_type at_moveblock = {
 };
 
 
-#define RMAXHASH 65521 /* last prime <2^16 */
-static region *regionhash[RMAXHASH];
+#define coor_hashkey(x, y) (unsigned int)((x<<16) + y)
+#define RMAXHASH MAXREGIONS
+static region * regionhash[RMAXHASH];
+static region * delmarker = (region*)regionhash; /* a funny hack */
 static unsigned int uidhash[MAXREGIONS];
 
 unsigned int 
@@ -402,29 +405,49 @@ generate_region_id(void)
   return uid;
 }
 
+#define HASH_STATISTICS 1
+#if HASH_STATISTICS
+static int hash_requests;
+static int hash_misses;
+#endif
+
 static region *
 rfindhash(short x, short y)
 {
-  region *old;
-  for (old = regionhash[coor_hashkey(x, y) % RMAXHASH]; old; old = old->nexthash)
-    if (old->x == x && old->y == y)
-      return old;
-  return 0;
+  unsigned int rid = coor_hashkey(x, y);
+#if HASH_STATISTICS
+  ++hash_requests;
+#endif
+  if (rid>=0) {
+    int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
+    while (regionhash[key]!=NULL && (regionhash[key]==delmarker || regionhash[key]->x!=x || regionhash[key]->y!=y)) {
+      key = (key + gk) % RMAXHASH;
+#if HASH_STATISTICS
+      ++hash_misses;
+#endif
+    }
+    return regionhash[key];
+  }
+  return NULL;
 }
 
 void
 rhash(region * r)
 {
-  int key = coor_hashkey(r->x, r->y) % RMAXHASH;
-  region *old = regionhash[key];
+  unsigned int  rid = coor_hashkey(r->x, r->y);
+  int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
+  while (regionhash[key]!=NULL && regionhash[key]!=delmarker && regionhash[key]!=r) {
+    key = (key + gk) % RMAXHASH;
+  }
+  assert(regionhash[key]!=r || !"trying to add the same region twice");
   regionhash[key] = r;
-  r->nexthash = old;
 }
 
 void
 runhash(region * r)
 {
-  region **show;
+  unsigned int  rid = coor_hashkey(r->x, r->y);
+  int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
 
 #ifdef FAST_CONNECT
   int d, di;
@@ -437,16 +460,11 @@ runhash(region * r)
     }
   }
 #endif
-  for (show = &regionhash[coor_hashkey(r->x, r->y) % RMAXHASH]; *show; show = &(*show)->nexthash) {
-    if ((*show)->x == r->x && (*show)->y == r->y) {
-      break;
-    }
+  while (regionhash[key]!=NULL && regionhash[key]!=r) {
+    key = (key + gk) % RMAXHASH;
   }
-  if (*show) {
-    assert(*show == r);
-    *show = (*show)->nexthash;
-    r->nexthash = 0;
-  }
+  assert(regionhash[key]==r || !"trying to remove a unit that is not hashed");
+  regionhash[key] = delmarker;
 }
 
 region *

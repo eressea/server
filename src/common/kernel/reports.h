@@ -118,6 +118,8 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
 
   extern size_t f_regionid(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
+#define GR_PLURAL     0x01 /* grammar: plural */
+
 #ifdef __cplusplus
 }
 #endif

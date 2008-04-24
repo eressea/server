@@ -41,10 +41,10 @@ extern "C" {
 
 /* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
 #ifndef MAXREGIONS
-# define MAXREGIONS 262139 /* must be prime for hashing. */
+# define MAXREGIONS 524287 /* must be prime for hashing. 262139 was a little small */
 #endif
 #ifndef MAXUNITS
-# define MAXUNITS 524287 /* must be prime for hashing. */
+# define MAXUNITS 1048573 /* must be prime for hashing. 524287 was >90% full */
 #endif
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */

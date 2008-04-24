@@ -109,7 +109,6 @@ typedef struct region {
     struct message_list *msgs;
   } * individual_messages;
   struct attrib *attribs;
-  struct region *nexthash;
   struct donation * donations;
   const struct terrain_type * terrain;
   struct rawmaterial * resources;
@@ -142,7 +141,6 @@ typedef struct {
 } moveblock;
 
 #define reg_hashkey(r) (r->index)
-#define coor_hashkey(x, y) (abs(x + 0x100 * y))
 
 int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;

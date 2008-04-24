@@ -7605,6 +7605,7 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren kurzzeitig ihr Gedächtnis."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell). $int($amount) fighters are temporarily losing some of their memories."</text>
   </message>
 
   <message name="sp_shadowcall_effect" section="magic">

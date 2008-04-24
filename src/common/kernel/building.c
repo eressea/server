@@ -211,17 +211,17 @@ bhash(building * b)
 void
 bunhash(building * b)
 {
-	building **show;
+  building **show;
 
-	for (show = &buildhash[b->no % BMAXHASH]; *show; show = &(*show)->nexthash) {
-		if ((*show)->no == b->no)
-			break;
-	}
-	if (*show) {
-		assert(*show == b);
-		*show = (*show)->nexthash;
-		b->nexthash = 0;
-	}
+  for (show = &buildhash[b->no % BMAXHASH]; *show; show = &(*show)->nexthash) {
+    if ((*show)->no == b->no)
+      break;
+  }
+  if (*show) {
+    assert(*show == b);
+    *show = (*show)->nexthash;
+    b->nexthash = 0;
+  }
 }
 
 static building *
