@@ -39,8 +39,12 @@ extern "C" {
   
 #define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
+/* for some good prime numbers, check http://www.math.niu.edu/~rusin/known-math/98/pi_x */
 #ifndef MAXREGIONS
-# define MAXREGIONS 262139 /* must be prime for hashing. 262139=last<2^18 */
+# define MAXREGIONS 262139 /* must be prime for hashing. */
+#endif
+#ifndef MAXUNITS
+# define MAXUNITS 524287 /* must be prime for hashing. */
 #endif
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
@@ -273,11 +277,6 @@ void changeblockchaos(void);
 /* intervall, in dem die regionen der partei zu finden sind */
 extern struct region *firstregion(struct faction * f);
 extern struct region *lastregion(struct faction * f);
-
-void inituhash(void);
-void uhash(struct unit * u);
-void uunhash(struct unit * u);
-struct unit *ufindhash(int i);
 
 void fhash(struct faction * f);
 void funhash(struct faction * f);

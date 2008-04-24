@@ -76,48 +76,47 @@ extern int countheroes(const struct faction * f);
 #endif
 
 typedef struct unit {
-	struct unit *next; /* needs to be first entry, for region's unitlist */
-	struct unit *nexthash;
-	struct unit *nextF; /* nächste Einheit der Partei */
-	struct region *region;
+  struct unit *next; /* needs to be first entry, for region's unitlist */
+  struct unit *nextF; /* nächste Einheit der Partei */
+  struct region *region;
   int no;
   int hp;
-	char *name;
-	char *display;
-	struct faction *faction;
-	struct building *building;
-	struct ship *ship;
+  char *name;
+  char *display;
+  struct faction *faction;
+  struct building *building;
+  struct ship *ship;
   unsigned short number;
   short age;
 
-	/* skill data */
-	short skill_size;
-	struct skill *skills;
-	struct item * items;
-	struct reservation {
-		struct reservation * next;
-		const struct resource_type * type;
-		int value;
-	} * reservations;
+  /* skill data */
+  short skill_size;
+  struct skill *skills;
+  struct item * items;
+  struct reservation {
+    struct reservation * next;
+    const struct resource_type * type;
+    int value;
+  } * reservations;
 
-	/* orders */
-	struct order * orders;
-	struct order * thisorder;
+  /* orders */
+  struct order * orders;
+  struct order * thisorder;
 #ifdef LASTORDER
-	struct order * lastorder;
+  struct order * lastorder;
 #else
   struct order * old_orders;
 #endif
 
-	/* race and illusionary race */
-	const struct race * race;
-	const struct race * irace;
+  /* race and illusionary race */
+  const struct race * race;
+  const struct race * irace;
 
-	unsigned int flags;
-	struct attrib * attribs;
-	status_t status;
-	int n; /* enno: attribut? */
-	int wants; /* enno: attribut? */
+  unsigned int flags;
+  struct attrib * attribs;
+  status_t status;
+  int n; /* enno: attribut? */
+  int wants; /* enno: attribut? */
 } unit;
 
 typedef struct unit_list {
@@ -216,6 +215,10 @@ extern void stripunit(struct unit * u);
 
 extern void name_unit(struct unit *u);
 extern struct unit * create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);
+
+extern void uhash(struct unit * u);
+extern void uunhash(struct unit * u);
+extern struct unit *ufindhash(int i);
 
 extern struct attrib_type at_creator;
 #ifdef __cplusplus

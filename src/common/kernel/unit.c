@@ -67,6 +67,92 @@ attrib_type at_creator = {
     /* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
 
+#define UMAXHASH MAXUNITS
+static unit * unithash[UMAXHASH];
+static unit * delmarker = (unit*)unithash; /* a funny hack */
+
+#define HASH_STATISTICS 1
+#if HASH_STATISTICS
+static int hash_requests;
+static int hash_misses;
+#endif
+
+/* benchmark: 
+ * jenkins_hash: 5.25 misses/hit
+ * wang_hash:    5.33 misses/hit
+ */
+
+INLINE_FUNCTION unsigned int jenkins_hash(unsigned int a)
+{
+  a = (a+0x7ed55d16) + (a<<12);
+  a = (a^0xc761c23c) ^ (a>>19);
+  a = (a+0x165667b1) + (a<<5);
+  a = (a+0xd3a2646c) ^ (a<<9);
+  a = (a+0xfd7046c5) + (a<<3);
+  a = (a^0xb55a4f09) ^ (a>>16);
+  return a;
+}
+
+INLINE_FUNCTION unsigned int wang_hash(unsigned int a)
+{
+  a = ~a + (a << 15); // a = (a << 15) - a - 1;
+  a = a ^ (a >> 12);
+  a = a + (a << 2);
+  a = a ^ (a >> 4);
+  a = a * 2057; // a = (a + (a << 3)) + (a << 11);
+  a = a ^ (a >> 16);
+  return a;
+}
+
+#define HASH1(a, m) (jenkins_hash(a) % m)
+#define HASH2(a, m) 1
+/*
+#define HASH1(a, m) ((a) % m)
+#define HASH2(a, m) (m - 2 - a % (m-2))
+*/
+
+void
+uhash(unit * u)
+{
+  int key = HASH1(u->no, UMAXHASH), gk = HASH2(u->no, UMAXHASH);
+  while (unithash[key]!=NULL && unithash[key]!=delmarker && unithash[key]!=u) {
+    key = (key + gk) % UMAXHASH;
+  }
+  assert(unithash[key]!=u || !"trying to add the same unit twice");
+  unithash[key] = u;
+}
+
+void
+uunhash(unit * u)
+{
+  int key = HASH1(u->no, UMAXHASH), gk = HASH2(u->no, UMAXHASH);
+  while (unithash[key]!=NULL && unithash[key]!=u) {
+    key = (key + gk) % UMAXHASH;
+  }
+  assert(unithash[key]==u || !"trying to remove a unit that is not hashed");
+  unithash[key] = delmarker;
+}
+
+unit *
+ufindhash(int uid)
+{
+  assert(uid>=0);
+#if HASH_STATISTICS
+  ++hash_requests;
+#endif
+  if (uid>=0) {
+    int key = HASH1(uid, UMAXHASH), gk = HASH2(uid, UMAXHASH);
+    while (unithash[key]!=NULL && (unithash[key]==delmarker || unithash[key]->no!=uid)) {
+      key = (key + gk) % UMAXHASH;
+#if HASH_STATISTICS
+      ++hash_misses;
+#endif
+    }
+    return unithash[key];
+  }
+  return NULL;
+}
+
 #define DMAXHASH 7919
 typedef struct dead {
   struct dead * nexthash;

@@ -633,40 +633,6 @@ shipspeed (const ship * sh, const unit * u)
   return k;
 }
 
-/* erwartete Anzahl Einheiten x 2 */
-#define UMAXHASH 199999
-unit *unithash[UMAXHASH];
-
-void
-uhash (unit * u)
-{
-  assert(!u->nexthash || !"unit ist bereits gehasht");
-  u->nexthash = unithash[u->no % UMAXHASH];
-  unithash[u->no % UMAXHASH] = u;
-}
-
-void
-uunhash (unit * u)
-{
-  unit ** x = &(unithash[u->no % UMAXHASH]);
-  while (*x && *x!=u) x = &(*x)->nexthash;
-  assert(*x || !"unit nicht gefunden");
-  *x = u->nexthash;
-  u->nexthash=NULL;
-}
-
-unit *
-ufindhash (int i)
-{
-  assert(i>=0);
-  if (i>=0) {
-    unit * u = unithash[i % UMAXHASH];
-    while (u && u->no!=i) u = u->nexthash;
-    return u;
-  }
-  return NULL;
-}
-
 #define FMAXHASH 2039
 faction * factionhash[FMAXHASH];
 
@@ -1438,7 +1404,10 @@ findunitr (const region * r, int n)
 
 unit *findunit(int n)
 {
-  return findunitg(n, NULL);
+  if (n <= 0) {
+    return NULL;
+  }
+  return ufindhash(n);
 }
 
 unit *
@@ -1446,12 +1415,12 @@ findunitg (int n, const region * hint)
 {
 
   /* Abfangen von Syntaxfehlern. */
-  if(n <= 0)
+  if (n <= 0)
     return NULL;
 
   /* findunit global! */
   hint = 0;
-  return ufindhash (n);
+  return ufindhash(n);
 }
 
 unit *
