@@ -5,7 +5,7 @@ SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
 SubDirHdrs $(XMLHDRS) ;
 
-SEARCH_SOURCE += 
+SEARCH_SOURCE +=
  [ FDirName $(SUBDIR) dl ] ;
 
 SOURCES =

@@ -4,11 +4,6 @@ LINK = gcc ;
 
 MSPACES = 1 ;
 
-if $(MSPACES) {
-  CCFLAGS += -DMSPACES ;
-  C++FLAGS += -DMSPACES ;
-}
-
 if ! $(LUA_VERSION) {
   LUA_VERSION = 5.0 ;
 }
@@ -140,8 +135,8 @@ rule TargetDirectory
         LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(path) ;
         SOURCE_GRIST = $(path) ;
         if $(DEBUG) = 1 {
-            SubDirCcFlags -ggdb -DDEBUG=1 ;
-            SubDirC++Flags -ggdb -DDEBUG=1 ;
+            SubDirCcFlags -ggdb ;
+            SubDirC++Flags -ggdb ;
             OPTIM = -O0 ;
         }
         else {
@@ -154,6 +149,11 @@ rule TargetDirectory
 if ! $(DEBUG) {
    ECHO Assuming DEBUG=1 ;
    DEBUG = 1 ;
+}
+
+if $(MSPACES) {
+  CCFLAGS += -DMSPACES -DDL_DEBUG=$(DEBUG) ;
+  C++FLAGS += -DMSPACES -DDL_DEBUG=$(DEBUG) ;
 }
 
 if $(WITHOUT_LUA) {

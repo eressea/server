@@ -199,7 +199,7 @@
     USE_DL_PREFIX              NOT defined
     USE_PUBLIC_MALLOC_WRAPPERS NOT defined
     USE_MALLOC_LOCK            NOT defined
-    DEBUG                      NOT defined
+    DL_DEBUG                   NOT defined
     REALLOC_ZERO_BYTES_FREES   NOT defined
     MALLOC_FAILURE_ACTION      errno = ENOMEM, if __STD_C defined, else no-op
     TRIM_FASTBINS              0
@@ -338,27 +338,27 @@ extern "C" {
   programs.  This can be very effective (albeit in an annoying way)
   in helping track down dangling pointers.
 
-  If you compile with -DDEBUG, a number of assertion checks are
+  If you compile with -DDL_DEBUG, a number of assertion checks are
   enabled that will catch more memory errors. You probably won't be
   able to make much sense of the actual assertion errors, but they
   should help you locate incorrectly overwritten memory.  The
   checking is fairly extensive, and will slow down execution
-  noticeably. Calling malloc_stats or mallinfo with DEBUG set will
+  noticeably. Calling malloc_stats or mallinfo with DL_DEBUG set will
   attempt to check every non-mmapped allocated and free chunk in the
   course of computing the summmaries. (By nature, mmapped regions
   cannot be checked very much automatically.)
 
-  Setting DEBUG may also be helpful if you are trying to modify
+  Setting DL_DEBUG may also be helpful if you are trying to modify
   this code. The assertions in the check routines spell out in more
   detail the assumptions and invariants underlying the algorithms.
 
-  Setting DEBUG does NOT provide an automated mechanism for checking
+  Setting DL_DEBUG does NOT provide an automated mechanism for checking
   that all accesses to malloced memory stay within their
   bounds. However, there are several add-ons and adaptations of this
   or other mallocs available that do this.
 */
 
-#if DEBUG
+#if DL_DEBUG
 #include <assert.h>
 #else
 #define assert(x) ((void)0)
@@ -2452,7 +2452,7 @@ static struct malloc_state av_;  /* never directly referenced */
    At most one "call" to get_malloc_state is made per invocation of
    the public versions of malloc and free, but other routines
    that in turn invoke malloc and/or free may call more then once. 
-   Also, it is called in check* routines if DEBUG is set.
+   Also, it is called in check* routines if DL_DEBUG is set.
 */
 
 #define get_malloc_state() (&(av_))
@@ -2526,7 +2526,7 @@ static Void_t** iALLOc();
   in malloc. In which case, please report it!)
 */
 
-#if ! DEBUG
+#if ! DL_DEBUG
 
 #define check_chunk(P)
 #define check_free_chunk(P)
@@ -3847,7 +3847,7 @@ void fREe(mem) Void_t* mem;
       If the chunk was allocated via mmap, release via munmap()
       Note that if HAVE_MMAP is false but chunk_is_mmapped is
       true, then user must have overwritten memory. There's nothing
-      we can do to catch this error unless DEBUG is set, in which case
+      we can do to catch this error unless DL_DEBUG is set, in which case
       check_inuse_chunk (above) will have triggered error.
     */
 
@@ -4533,7 +4533,7 @@ static Void_t** iALLOc(n_elements, sizes, opts, chunks) size_t n_elements; size_
     }
   }
 
-#if DEBUG
+#if DL_DEBUG
   if (marray != chunks) {
     /* final element must have exactly exhausted chunk */
     if (element_size != 0) 
