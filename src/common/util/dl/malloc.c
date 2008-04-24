@@ -745,7 +745,7 @@ extern Void_t*     sbrk();
 */
 
 #ifndef HAVE_MREMAP
-#ifdef linux
+#if defined(linux) && defined(__USE_GNU)
 #define HAVE_MREMAP 1
 #else
 #define HAVE_MREMAP 0
