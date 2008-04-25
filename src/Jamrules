@@ -57,7 +57,7 @@ CCFLAGS += -Wall ;
 
 CCFLAGS += -Wwrite-strings 
 		   -Wundef
-		   -Wstrict-prototypes 
+		   -Wstrict-prototypes
 		   -Werror-implicit-function-declaration
 		   -Wno-char-subscripts
 		   -Wpointer-arith
@@ -67,6 +67,7 @@ CCFLAGS += -Wwrite-strings
 #		   -Wconversion
 #		   -Wunreachable-code
                    -Werror
+                   -fno-strict-aliasing
 		   ;
 
 # this require the latet luabind from CVS

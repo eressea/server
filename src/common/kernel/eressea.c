@@ -84,7 +84,7 @@
 #include <time.h>
 #include <errno.h>
 
-#define PTRIES 1
+#define PTRIES 0 /* it turns out they are slow :-( */
 #if PTRIES
 #include <util/patricia.h>
 #endif
