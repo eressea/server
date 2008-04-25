@@ -116,8 +116,11 @@ lua_setstring(const char * lname, const char * key, const char * str)
 static const char *
 lua_getstring(const char * lname, const char * key)
 {
-  struct locale * lang = find_locale(lname);
-  return (const char*)locale_getstring(lang, key);
+  if (key) {
+    struct locale * lang = find_locale(lname);
+    return (const char*)locale_getstring(lang, key);
+  }
+  return NULL;
 }
 
 #define ISLANDSIZE 20

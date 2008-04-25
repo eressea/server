@@ -18,7 +18,6 @@
 extern "C" {
 #endif
 
-extern boolean locale_check(void);
 extern char * set_string(char **s, const char *neu);
 extern int set_email(char** pemail, const char *newmail);
 

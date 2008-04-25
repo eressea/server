@@ -19,11 +19,6 @@
 * permission from the authors.
 */
 
-#define LOCALE_CHECK
-#ifdef __LCC__
-#undef LOCALE_CHECK
-#endif
-
 /* config includes */
 #include <config.h>
 #include <kernel/eressea.h>
@@ -312,7 +307,9 @@ lua_init(void)
   bind_event(L);
   bind_message(L);
   bind_gamecode(L);
+
   bind_gmtool(L);
+  bind_test(L);
   return L;
 }
 
@@ -662,12 +659,6 @@ main(int argc, char *argv[])
   lc_numeric = setlocale(LC_NUMERIC, "C");
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
-#ifdef LOCALE_CHECK
-  if (!locale_check()) {
-    log_error(("The current locale is not suitable for international Eressea.\n"));
-    return -1;
-  }
-#endif
   
   lua_State * luaState = lua_init();
   global.vm_state = luaState;

@@ -32,7 +32,7 @@
 
 typedef struct tref {
   struct tref * nexthash;
-  wint_t ucs;
+  ucs4_t ucs;
   struct tnode * node;
 } tref;
 
@@ -43,7 +43,7 @@ void
 addtoken(tnode * root, const char * str, variant id)
 {
   static struct replace {
-    wint_t ucs;
+    ucs4_t ucs;
     const char str[3];
   } replace[] = {
     /* match lower-case (!) umlauts and others to transcriptions */
@@ -63,7 +63,7 @@ addtoken(tnode * root, const char * str, variant id)
   } else {
     tref * next;
     int ret, index, i = 0;
-    wint_t ucs, lcs;
+    ucs4_t ucs, lcs;
     size_t len;
 
     ret = unicode_utf8_to_ucs4(&ucs, str, &len);
@@ -84,10 +84,10 @@ addtoken(tnode * root, const char * str, variant id)
       tnode * node = calloc(1, sizeof(tnode));
 
       if (ucs<'a' || ucs>'z') {
-        lcs = towlower(ucs);
+        lcs = towlower((wint_t)ucs);
       }
       if (ucs==lcs) {
-        ucs = towupper(ucs);
+        ucs = towupper((wint_t)ucs);
       }
 
       ref = malloc(sizeof(tref));
@@ -136,7 +136,7 @@ findtoken(const tnode * tk, const char * str, variant* result)
   do {
     int index;
     const tref * ref;
-    wint_t ucs;
+    ucs4_t ucs;
     size_t len;
     int ret = unicode_utf8_to_ucs4(&ucs, str, &len);
 

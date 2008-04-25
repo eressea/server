@@ -16,6 +16,9 @@ extern void bind_event(struct lua_State * L);
 extern void bind_message(struct lua_State * L);
 extern void bind_objects(struct lua_State * L);
 
+/* test routines */
+extern void bind_test(struct lua_State * L);
+
 /* server only */
 extern void bind_script(struct lua_State * L);
 extern void bind_gamecode(struct lua_State * L);

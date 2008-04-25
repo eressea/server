@@ -246,7 +246,7 @@ read_newfactions(const char * filename)
         char buffer[32];
         size_t outbytes = sizeof(buffer) - 1;
         size_t inbytes = strlen(race);
-        unicode_latin1_to_utf8((unsigned char *)buffer, &outbytes, (const unsigned char *)race, &inbytes);
+        unicode_latin1_to_utf8(buffer, &outbytes, race, &inbytes);
         buffer[outbytes] = 0;
         nf->race = findrace(buffer, default_locale);
         if (nf->race==NULL) {

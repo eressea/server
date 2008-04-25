@@ -384,7 +384,7 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
   char * bufp;
 	unsigned int c = 0;
 	size_t bpt, i;
-  wint_t ucs;
+  ucs4_t ucs;
   size_t size;
   int result;
 
@@ -401,7 +401,7 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
     assert(result==0 || "damnit, we're not handling invalid input here!");
 
     /* Leerzeichen überspringen */
-    while (*p != 0 && !iswalnum(ucs)) {
+    while (*p != 0 && !iswalnum((wint_t)ucs)) {
 			p += size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
       assert(result==0 || "damnit, we're not handling invalid input here!");
@@ -411,7 +411,7 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
     if (*p != 0) ++c;
 
 		/* alnums überspringen */
-    while (*p != 0 && iswalnum(ucs)) {
+    while (*p != 0 && iswalnum((wint_t)ucs)) {
 			p+=size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
       assert(result==0 || "damnit, we're not handling invalid input here!");
@@ -434,7 +434,7 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
 	while (*p != 0 && c < maxchars) {
 		/* Leerzeichen überspringen */
 
-    while (*p != 0 && !iswalnum(ucs)) {
+    while (*p != 0 && !iswalnum((wint_t)ucs)) {
 			p+=size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
       assert(result==0 || "damnit, we're not handling invalid input here!");
@@ -442,7 +442,7 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
 
 		/* alnums übertragen */
 
-		for (i = 0; i < bpt && *p != 0 && iswalnum(ucs); ++i) {
+		for (i = 0; i < bpt && *p != 0 && iswalnum((wint_t)ucs); ++i) {
 			memcpy(bufp, p, size);
 			p += size;
       bufp += size;
@@ -454,7 +454,7 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
 
 		/* Bis zum nächsten Leerzeichen */
 
-    while (c < maxchars && *p != 0 && iswalnum(ucs)) {
+    while (c < maxchars && *p != 0 && iswalnum((wint_t)ucs)) {
 			p+=size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
       assert(result==0 || "damnit, we're not handling invalid input here!");

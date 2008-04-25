@@ -87,11 +87,11 @@ xml_s(const char * str)
 {
   static xmlChar buffer[1024];
   const char * inbuf = str;
-  unsigned char * outbuf = buffer;
+  char * outbuf = (char *)buffer;
   size_t inbytes = strlen(str)+1;
   size_t outbytes = sizeof(buffer) - 1;
 
-  unicode_latin1_to_utf8(outbuf, &outbytes, (const xmlChar *)inbuf, &inbytes);
+  unicode_latin1_to_utf8(outbuf, &outbytes, inbuf, &inbytes);
   buffer[outbytes] = 0;
   return buffer;
 }

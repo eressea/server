@@ -23,7 +23,7 @@ static int
 eatwhitespace_c(const char ** str)
 {
   int ret;
-  wint_t ucs;
+  ucs4_t ucs;
   size_t len;
 
   /* skip over potential whitespace */
@@ -38,7 +38,7 @@ eatwhitespace_c(const char ** str)
         log_warning(("illegal character sequence in UTF8 string: %s\n", *str));
         return ret;
       }
-      if (!iswspace(ucs)) break;
+      if (!iswspace((wint_t)ucs)) break;
       *str+=len;
     }
   }
@@ -89,7 +89,7 @@ skip_token(void)
   eatwhitespace_c(&state->current_token);
 
   while (*state->current_token) {
-    wint_t ucs;
+    ucs4_t ucs;
     size_t len;
 
     unsigned char utf8_character = (unsigned char)state->current_token[0];
@@ -104,7 +104,7 @@ skip_token(void)
         log_warning(("illegal character sequence in UTF8 string: %s\n", state->current_token));
       }
     }
-    if (iswspace(ucs) && quotechar==0) {
+    if (iswspace((wint_t)ucs) && quotechar==0) {
       return;
     } else {
       switch(utf8_character) {
@@ -134,7 +134,7 @@ parse_token(const char ** str)
 
   eatwhitespace_c(&ctoken);
   while (*ctoken && cursor-lbuf < MAXTOKENSIZE-1) {
-    wint_t ucs;
+    ucs4_t ucs;
     size_t len;
     boolean copy = false;
 
@@ -152,7 +152,7 @@ parse_token(const char ** str)
     if (escape) {
       copy = true;
       escape = false;
-    } else if (iswspace(ucs)) {
+    } else if (iswspace((wint_t)ucs)) {
       if (quotechar==0) break;
       copy = true;
     } else if (utf8_character=='"' || utf8_character=='\'') {

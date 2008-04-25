@@ -29,11 +29,11 @@ eatwhite(const char * ptr, size_t * total_size)
   *total_size = 0;
 
   while (*ptr) {
-    wint_t ucs;
+    ucs4_t ucs;
     size_t size = 0;
     ret = unicode_utf8_to_ucs4(&ucs, ptr, &size);
     if (ret!=0) break;
-    if (!iswspace(ucs)) break;
+    if (!iswspace((wint_t)ucs)) break;
     *total_size += size;
     ptr += size;
   }
@@ -149,7 +149,7 @@ getbuf_latin1(FILE * F)
         char inbuf = (char)c;
         size_t inbytes = 1;
         size_t outbytes = MAXLINE-(cp-fbuf);
-        int ret = unicode_latin1_to_utf8((xmlChar *)cp, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+        int ret = unicode_latin1_to_utf8(cp, &outbytes, &inbuf, &inbytes);
         if (ret>0) cp+=ret;
         else {
           log_error(("input data was not iso-8859-1! assuming utf-8\n"));
@@ -213,7 +213,7 @@ getbuf_utf8(FILE * F)
     }
     cont = false;
     while (*bp && cp<fbuf+MAXLINE) {
-      wint_t ucs;
+      ucs4_t ucs;
       size_t size;
       int ret;
       
@@ -244,7 +244,7 @@ getbuf_utf8(FILE * F)
         break;
       }
 
-      if (iswspace(ucs)) {
+      if (iswspace((wint_t)ucs)) {
         if (!quote) {
           bp += size;
           ret = eatwhite(bp, &size);
@@ -264,7 +264,7 @@ getbuf_utf8(FILE * F)
         } else {
           bp+=size;
         }
-      } else if (iswcntrl(ucs)) {
+      } else if (iswcntrl((wint_t)ucs)) {
         if (!comment && cp<fbuf+MAXLINE) {
           *cp++ = '?';
         }

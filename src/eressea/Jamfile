@@ -34,6 +34,7 @@ SHARED_BINDINGS =
  <lua>spell.cpp
  <lua>unit.cpp
  <lua>item.cpp
+ <lua>test.cpp
 ;
 
 Library luabindings : $(SHARED_BINDINGS) ;

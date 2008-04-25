@@ -74,32 +74,6 @@ set_string (char **s, const char *neu)
   return *s;
 }
 
-boolean
-locale_check(void) 
-{
-  int i, errorlevel = 0;
-  const unsigned char * umlaute = (const unsigned char*)"äöüÄÖÜß";
-  unsigned char result[32];
-  size_t inbytes = strlen((const char *)umlaute);
-  size_t outbytes = sizeof(result);
-  int ret = unicode_latin1_to_utf8(result, &outbytes, umlaute, &inbytes);
-  if (ret<=0) {
-    ++errorlevel;
-  }
-  /* E: das testet, ob umlaute funktionieren. Wenn äöü nicht mit isalpha() true sind, kriegen wir ärger. */
-  for (i=0;i!=3;++i) {
-    if (towupper(umlaute[i])!=(int)umlaute[i+3]) {
-      ++errorlevel;
-    }
-  }
-  for (i=0;umlaute[i]!=0;++i) {
-    if (!iswalpha(umlaute[i]) || iswspace(umlaute[i]) || iswcntrl(umlaute[i])) {
-      ++errorlevel;
-    }
-  }
-  if (errorlevel) return false;
-  return true;
-}
 
 static int 
 spc_email_isvalid(const char *address) 

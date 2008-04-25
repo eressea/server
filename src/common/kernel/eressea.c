@@ -68,6 +68,7 @@
 #include <util/umlaut.h>
 #include <util/xml.h>
 #include <util/bsdstring.h>
+#include <util/unicode.h>
 
 /* libxml includes */
 #include <libxml/tree.h>
@@ -82,6 +83,11 @@
 #include <limits.h>
 #include <time.h>
 #include <errno.h>
+
+#define PTRIES 1
+#if PTRIES
+#include <util/patricia.h>
+#endif
 
 /* exported variables */
 region  *regions;
@@ -1332,14 +1338,126 @@ findoption(const char *s, const struct locale * lang)
   return NODIRECTION;
 }
 
+#if PTRIES
+static struct trie_node * ptries[UT_MAX][4];
+
+static struct trie_node **
+get_ptrie(const struct locale * lang, int type)
+{
+  int index = (strcmp(locale_name(lang), "de")==0);
+  return &(ptries[type][index]);
+}
+
+static int
+umlaut_substitution(const char * ip, char * op, size_t outlen)
+{
+#define UMAX 7
+  static struct replace {
+    ucs4_t ucs;
+    const char str[3];
+  } replace[UMAX] = {
+    /* match lower-case (!) umlauts and others to transcriptions */
+    { 223, "ss"}, /* szlig */
+    { 228, "ae"}, /* auml */
+    { 229, "aa"}, /* norsk */
+    { 230, "ae"}, /* norsk */
+    { 246, "oe"}, /* ouml */
+    { 248, "oe"}, /* norsk */
+    { 252, "ue"}, /* uuml */
+  };
+  int subs = 0;
+  while (*ip) {
+    ucs4_t ucs = *ip;
+    size_t size = 1;
+    size_t cpsize = 1;
+
+    if (ucs & 0x80) {
+      int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
+      if (ret!=0) {
+        return ret;
+      }
+      cpsize = size;
+      if (ucs >= replace[0].ucs && ucs <= replace[UMAX-1].ucs) {
+        int i;
+        for (i=0;i!=UMAX;++i) {
+          if (replace[i].ucs==ucs) {
+            cpsize = 0;
+            memcpy(op, replace[i].str, 2);
+            op+=2;
+            ++subs;
+            break;
+          }
+        }
+      }
+    }
+    if (cpsize) {
+      if (cpsize>outlen) {
+        return -1;
+      }
+      memcpy(op, ip, cpsize);
+    }
+
+    ip += size;
+    op += cpsize;
+    outlen -= cpsize;
+  }
+
+  if (outlen<=0) {
+    return -1;
+  }
+  *op = 0;
+  return subs;
+}
+
+static int
+ptrie_find(struct trie_node *ptrie, const char * key, void * data, size_t size)
+{
+  trie_node * node = trie_find_prefix(ptrie, key);
+  if (node) {
+    void * result = trie_getdata(node);
+    memcpy(data, result, size);
+    return 0;
+  }
+  return -1;
+}
+
+static int
+ptrie_insert(struct trie_node **ptrie, const char * name, void * data, size_t size)
+{
+  char converted[256];
+  char simple[256];
+  int ret = unicode_utf8_tolower(converted, 256, name);
+  if (ret==0) {
+    int subs = umlaut_substitution(converted, simple, sizeof(simple));
+    if (subs>0) {
+      trie_insert(ptrie, simple, data, size);
+    }
+    trie_insert(ptrie, converted, data, size);
+  }
+  return ret;
+}
+#endif
+
 skill_t
 findskill(const char *s, const struct locale * lang)
 {
+#if PTRIES
+  char lowercase[256];
+  int res = unicode_utf8_tolower(lowercase, sizeof(lowercase), s);
+  if (res==0) {
+    trie_node ** ptrie = get_ptrie(lang, UT_SKILLS);
+    skill_t sk;
+    int result = ptrie_find(*ptrie, lowercase, &sk, sizeof(sk));
+    if (result==0) return sk;
+  }
+  return NOSKILL;
+#else
   struct tnode * tokens = get_translations(lang, UT_SKILLS);
   variant token;
 
   if (findtoken(tokens, s, &token)==E_TOK_NOMATCH) return NOSKILL;
   return (skill_t)token.i;
+#endif
 }
 
 keyword_t
@@ -1954,6 +2072,9 @@ init_locale(const struct locale * lang)
   const struct race * rc;
   struct tnode * tokens;
   const terrain_type * terrain;
+#if PTRIES
+  trie_node ** ptrie;
+#endif
 
   tokens = get_translations(lang, UT_MAGIC);
   for (i=0;i!=MAXMAGIETYP;++i) {
@@ -1976,7 +2097,18 @@ init_locale(const struct locale * lang)
     var.i = i;
     addtoken(tokens, LOC(lang, parameters[i]), var);
   }
-
+#if PTRIES
+  ptrie = get_ptrie(lang, UT_SKILLS);
+  for (i=0;i!=MAXSKILLS;++i) {
+    if (i!=SK_TRADE || !TradeDisabled()) {
+      skill_t sk = (skill_t)i;
+      const char * skname = skillname(sk, lang);
+      if (skname!=NULL) {
+        ptrie_insert(ptrie, skname, &sk, sizeof(sk));
+      }
+    }
+  }
+#else
   tokens = get_translations(lang, UT_SKILLS);
   for (i=0;i!=MAXSKILLS;++i) {
     if (i!=SK_TRADE || !TradeDisabled()) {
@@ -1987,6 +2119,7 @@ init_locale(const struct locale * lang)
       }
     }
   }
+#endif
 
   tokens = get_translations(lang, UT_KEYWORDS);
   for (i=0;i!=MAXKEYWORDS;++i) {

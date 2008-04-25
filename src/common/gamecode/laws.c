@@ -3775,7 +3775,7 @@ static void reset_rng(void) {
 
 static void reset_rng_region(region * r)
 {
-  rng_init(r->index);
+  rng_init(r->index+turn);
 }
 
 /** warn about passwords that are not US ASCII.

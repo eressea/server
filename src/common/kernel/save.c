@@ -178,7 +178,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
                 char inbuf = (char)c;
                 size_t inbytes = 1;
                 size_t outbytes = size-(str-start);
-                int ret = unicode_latin1_to_utf8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+                int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
                 if (ret>0) str+=ret;
                 else {
                   log_error(("input data was not iso-8859-1! assuming utf-8\n"));
@@ -197,7 +197,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
             char inbuf = (char)c;
             size_t inbytes = 1;
             size_t outbytes = size-(str-start);
-            int ret = unicode_latin1_to_utf8((xmlChar *)str, &outbytes, (const xmlChar *)&inbuf, &inbytes);
+            int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
             if (ret>0) str+=ret;
             else {
               log_error(("input data was not iso-8859-1! assuming utf-8\n"));
