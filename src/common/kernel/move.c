@@ -852,40 +852,81 @@ bewegung_blockiert_von(unit * reisender, region * r)
 }
 
 static boolean
-is_guardian(unit * u2, unit *u, unsigned int mask)
+is_guardian_u(unit * u2, unit *u, unsigned int mask)
 {
   if (u2->faction == u->faction) return false;
-  if ((getguard(u2) & mask) == 0) return false;
-  if (u2->number == 0) return false;
   if (alliedunit(u2, u->faction, HELP_GUARD)) return false;
   if (ucontact(u2, u)) return false;
-  if (besieged(u2)) return false;
-  if (!armedmen(u2) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
   if (!cansee(u2->faction, u->region, u, 0)) return false;
   
   return true;
 }
 
+static boolean
+is_guardian_r(unit * u2, unsigned int mask)
+{
+  if ((getguard(u2) & mask) == 0) return false;
+  if (u2->number == 0) return false;
+  if (besieged(u2)) return false;
+  if (!armedmen(u2) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
+  return true;
+}
+
+#define MAXGUARDCACHE 16
 unit *
 is_guarded(region * r, unit * u, unsigned int mask)
 {
-  unit *u2;
-  static unit * guardcache;
+  unit *u2 = NULL;
+  int i;
+  static unit * guardcache[MAXGUARDCACHE], * lastguard;
 
   if (!fval(r, RF_GUARDED)) {
     return NULL;
   }
-  if (guardcache && guardcache->region==r) {
-    if (is_guardian(guardcache, u, mask)) {
-      return guardcache;
+
+  if (lastguard && lastguard->region==r) {
+    if (is_guardian_u(lastguard, u, mask)) {
+      return lastguard;
     }
   }
-  for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2!=guardcache && is_guardian(u2, u, mask)) {
-      guardcache = u2;
-      return u2;
+  for (i=0;i!=MAXGUARDCACHE;++i) {
+    unit * guard = guardcache[i];
+    if (guard && guard!=lastguard && guard->region==r) {
+      if (is_guardian_u(guard, u, mask)) {
+        lastguard = guard;
+        return guard;
+      }
+      if (u2==guard) {
+        /* same guard twice signals we've tested everyone */
+        return NULL;
+      }
+      u2 = guard;
+    } else {
+      /* exhausted all the guards in the cache, but maybe we'll find one later? */
+      break;
     }
   }
+
+  /* at this point, u2 is the last unit we tested to 
+   * be a guard (and failed), or NULL
+   * i is the position of the first free slot in the cache */
+  
+  for (u2 = (u2?u2->next:r->units); u2; u2=u2->next) {
+    if (is_guardian_r(u2, mask)) {
+      /* u2 is a guard, so worth remembering */
+      if (i<MAXGUARDCACHE) guardcache[i++] = u2;
+      if (is_guardian_u(u2, u, mask)) {
+        /* u2 is our guard. stop processing (we might have to go further next time) */
+        return u2;
+      }
+    }
+  }
+  /* there are no more guards. we signal this by duplicating the last one.
+   * i is still the position of the first free slot in the cache */
+  if (i>0 && i<MAXGUARDCACHE) {
+    guardcache[i] = guardcache[i-1];
+  }
+
   return NULL;
 }
 

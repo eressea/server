@@ -3611,6 +3611,7 @@ init_battle(region * r, battle **bp)
         if (get_keyword(ord) == K_ATTACK) {
           unit *u2;
           fighter *c1, *c2;
+          ship * lsh = NULL;
 
           if (r->planep && fval(r->planep, PFL_NOATTACK)) {
             cmistake(u, ord, 271, MSG_BATTLE);
@@ -3652,16 +3653,14 @@ init_battle(region * r, battle **bp)
             continue;
           }
 
-
-          if (is_guarded(r, u, GUARD_TRAVELTHRU)) {
-            /* Fehler: "Das Schiff muﬂ erst verlassen werden" */
-            if (u->ship != NULL && !fval(r->terrain, SEA_REGION)) {
-              cmistake(u, ord, 19, MSG_BATTLE);
-              continue;
-            }
-
-            if (leftship(u)) {
-              cmistake(u, ord, 234, MSG_BATTLE);
+          if ((u->ship != NULL && !fval(r->terrain, SEA_REGION)) || (lsh = leftship(u))!=NULL) {
+            if (is_guarded(r, u, GUARD_TRAVELTHRU)) {
+              if (lsh) {
+                cmistake(u, ord, 234, MSG_BATTLE);
+              } else {
+                /* Fehler: "Das Schiff muﬂ erst verlassen werden" */
+                cmistake(u, ord, 19, MSG_BATTLE);
+              }
               continue;
             }
           }
