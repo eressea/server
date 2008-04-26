@@ -131,8 +131,10 @@ read_game(const char * filename, const char * mode)
   int rv, m = IO_TEXT;
   if (strcmp(mode, "binary")==0) m = IO_BINARY;
   rv = readgame(filename, m, false);
-  log_printf(" - Korrekturen Runde %d\n", turn);
-  korrektur();
+  if (rv==0) {
+    log_printf(" - Korrekturen Runde %d\n", turn);
+    korrektur();
+  }
   return rv;
 }
 

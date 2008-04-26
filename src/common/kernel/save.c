@@ -1612,7 +1612,7 @@ readgame(const char * filename, int mode, int backup)
     int id = store->r_int(store);
     plane *pl = getplanebyid(id);
     if (pl==NULL) {
-      calloc(1, sizeof(plane));
+      pl = calloc(1, sizeof(plane));
     } else {
       log_warning(("the plane with id=%d already exists.\n", id));
     }
