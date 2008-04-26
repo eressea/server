@@ -36,7 +36,6 @@
 #define NEW_DAEMONHUNGER_RULE
 #define NEW_COMBATSKILLS_RULE
 #define ROW_FACTOR 3 /* factor for combat row advancement rule */
-#define HEROES
 
 /* optional game components. TODO: These should either be 
  * configuration variables (XML), script extensions (lua),

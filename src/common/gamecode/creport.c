@@ -804,11 +804,9 @@ cr_output_unit(FILE * F, const region * r,
     if (c && *c && (u->faction == f || omniscient(f))) {
       fprintf(F, "\"%s\";hp\n", add_translation(c, locale_string(u->faction->locale, c)));
     }
-#ifdef HEROES
     if (fval(u, UFL_HERO)) {
       fputs("1;hero\n", F);
     }
-#endif
 
     if (fval(u, UFL_HUNGER) && (u->faction == f)) {
       fputs("1;hunger\n", F);
@@ -1208,12 +1206,10 @@ report_computer(const char * filename, report_context * ctx, const char * charse
     fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
   }
 
-#ifdef HEROES
   i = countheroes(f);
   if (i>0) fprintf(F, "%d;heroes\n", i);
   i = maxheroes(f);
   if (i>0) fprintf(F, "%d;max_heroes\n", i);
-#endif
 
   if (f->age > 1 && f->lastorders != turn) {
     fprintf(F, "%d;nmr\n", turn-f->lastorders);

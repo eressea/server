@@ -2227,7 +2227,6 @@ reshow(unit * u, struct order * ord, const char * s, param_t p)
   }
 }
 
-#ifdef HEROES
 static int
 promotion_cmd(unit * u, struct order * ord)
 {
@@ -2262,7 +2261,6 @@ promotion_cmd(unit * u, struct order * ord)
     u, people));
   return 0;
 }
-#endif
 
 static int
 group_cmd(unit * u, struct order * ord)
@@ -3957,9 +3955,7 @@ init_processor(void)
   p+=10;
   add_proc_global(p, &declare_war, "Krieg & Frieden");
 #endif
-#ifdef HEROES
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
-#endif
   add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
 
   p+=10;

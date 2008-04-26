@@ -1,23 +1,23 @@
 /* vi: set ts=2:
- *
- *  
- *  Eressea PB(E)M host Copyright (C) 1998-2003
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- *  based on:
- *
- * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schröder
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
- */
+*
+*  
+*  Eressea PB(E)M host Copyright (C) 1998-2003
+*      Christian Schlittchen (corwin@amber.kn-bremen.de)
+*      Katja Zedel (katze@felidae.kn-bremen.de)
+*      Henning Peters (faroul@beyond.kn-bremen.de)
+*      Enno Rehling (enno@eressea.de)
+*      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
+*
+*  based on:
+*
+* Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
+* Atlantis v1.7                    Copyright 1996 by Alex Schröder
+*
+* This program may not be used, modified or distributed without
+* prior permission by the authors of Eressea.
+* This program may not be sold or used commercially without prior written
+* permission from the authors.
+*/
 
 #include <config.h>
 #include <kernel/eressea.h>
@@ -65,7 +65,7 @@
 
 attrib_type at_creator = {
   "creator"
-    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
+  /* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
 
 #define UMAXHASH MAXUNITS
@@ -239,13 +239,13 @@ destroy_unit(unit * u)
   unit *clone;
 #endif  
   if (!ufindhash(u->no)) return;
-  
+
   if (!fval(u->race, RCF_ILLUSIONARY)) {
     item ** p_item = &u->items;
     unit * u3;
-    
+
     /* u->faction->no_units--; */ /* happens in u_setfaction now */
-    
+
     if (r) for (u3 = r->units; u3; u3 = u3->next) {
       if (u3 != u && u3->faction == u->faction && playerrace(u3->race)) {
         i_merge(&u3->items, &u->items);
@@ -275,16 +275,16 @@ destroy_unit(unit * u)
       distribute_items(u);
     }
   }
-  
+
   /* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
-   * Items haben, sonst Memory-Leak. */
+  * Items haben, sonst Memory-Leak. */
 #if 0
   /* broken. */
   clone = has_clone(u);
   if (clone && rng_int()%100 < 90) {
     attrib *a;
     int i;
-    
+
     /* TODO: Messages generieren. */
     if (u->region!=clone->region) {
       move_unit(u, clone->region, NULL);
@@ -311,20 +311,20 @@ destroy_unit(unit * u)
     set_number(clone, 0);
   } else 
 #endif  
-  if (zombie) {
-    u_setfaction(u, findfaction(MONSTER_FACTION));
-    scale_number(u, 1);
-    u->race = u->irace = new_race[RC_ZOMBIE];
-  } else {
-    if (u->number) set_number(u, 0);
-    handle_event(u->attribs, "destroy", u);
-    if (r && !fval(r->terrain, SEA_REGION)) {
-      rsetmoney(r, rmoney(r) + get_money(u));
+    if (zombie) {
+      u_setfaction(u, findfaction(MONSTER_FACTION));
+      scale_number(u, 1);
+      u->race = u->irace = new_race[RC_ZOMBIE];
+    } else {
+      if (u->number) set_number(u, 0);
+      handle_event(u->attribs, "destroy", u);
+      if (r && !fval(r->terrain, SEA_REGION)) {
+        rsetmoney(r, rmoney(r) + get_money(u));
+      }
+      dhash(u->no, u->faction);
+      u_setfaction(u, NULL);
+      if (r) leave(r, u);
     }
-    dhash(u->no, u->faction);
-    u_setfaction(u, NULL);
-    if (r) leave(r, u);
-  }
 }
 
 unit *
@@ -362,10 +362,19 @@ attrib_type at_alias = {
 };
 
 int
-ualias(const unit * u) {
+ualias(const unit * u)
+{
   attrib * a = a_find(u->attribs, &at_alias);
   if (!a) return 0;
   return a->data.i;
+}
+
+int
+a_readprivate(attrib * a, struct storage * store)
+{
+  a->data.v = store->r_str(store);
+  if (a->data.v) return AT_READ_OK;
+  return AT_READ_FAIL;
 }
 
 /*********************/
@@ -377,7 +386,7 @@ attrib_type at_private = {
   a_finalizestring,
   DEFAULT_AGE,
   a_writestring,
-  a_readstring
+  a_readprivate
 };
 
 const char *
@@ -392,18 +401,20 @@ u_description(const unit * u, const struct locale * lang)
 }
 
 const char *
-uprivate(const unit * u) {
+uprivate(const unit * u)
+{
   attrib * a = a_find(u->attribs, &at_private);
   if (!a) return NULL;
   return a->data.v;
 }
 
 void
-usetprivate(unit * u, const char * str) {
+usetprivate(unit * u, const char * str)
+{
   attrib * a = a_find(u->attribs, &at_private);
 
-  if(str == NULL) {
-    if(a) a_remove(&u->attribs, a);
+  if (str == NULL) {
+    if (a) a_remove(&u->attribs, a);
     return;
   }
   if (!a) a = a_add(&u->attribs, a_new(&at_private));
@@ -504,12 +515,12 @@ attrib_type at_siege = {
 };
 
 struct building *
-usiege(const unit * u) {
-  attrib * a;
-  if (!fval(u, UFL_SIEGE)) return NULL;
-  a = a_find(u->attribs, &at_siege);
-  assert (a || !"flag set, but no siege found");
-  return (struct building *)a->data.v;
+  usiege(const unit * u) {
+    attrib * a;
+    if (!fval(u, UFL_SIEGE)) return NULL;
+    a = a_find(u->attribs, &at_siege);
+    assert (a || !"flag set, but no siege found");
+    return (struct building *)a->data.v;
 }
 
 void
@@ -563,13 +574,13 @@ ucontact(const unit * u, const unit * u2)
       return true;
     }
   }
-  
+
   return false;
 }
 
 /***
- ** init & cleanup module
- **/
+** init & cleanup module
+**/
 
 void
 free_units(void)
@@ -709,7 +720,7 @@ leftship(const unit *u)
   attrib * a = a_find(u->attribs, &at_leftship);
 
   /* Achtung: Es ist nicht garantiert, daß der Rückgabewert zu jedem
-   * Zeitpunkt noch auf ein existierendes Schiff zeigt! */
+  * Zeitpunkt noch auf ein existierendes Schiff zeigt! */
 
   if (a) return (ship *)(a->data.v);
 
@@ -941,7 +952,7 @@ transfermen(unit * u, unit * u2, int n)
 }
 
 struct building * 
-inside_building(const struct unit * u)
+  inside_building(const struct unit * u)
 {
   if (u->building==NULL) return NULL;
 
@@ -1210,15 +1221,15 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
 #if KARMA_MODULE
   if (fspecial(u->faction, FS_TELEPATHY)) {
     switch(sk) {
-    case SK_ALCHEMY:
-    case SK_HERBALISM:
-    case SK_MAGIC:
-    case SK_SPY:
-    case SK_STEALTH:
-    case SK_OBSERVATION:
-      break;
-    default:
-      skill -= 2;
+case SK_ALCHEMY:
+case SK_HERBALISM:
+case SK_MAGIC:
+case SK_SPY:
+case SK_STEALTH:
+case SK_OBSERVATION:
+  break;
+default:
+  skill -= 2;
     }
   }
 #endif
@@ -1454,7 +1465,6 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
   return u;
 }
 
-#ifdef HEROES
 int 
 maxheroes(const struct faction * f)
 {
@@ -1485,4 +1495,3 @@ countheroes(const struct faction * f)
   return n;
 }
 
-#endif

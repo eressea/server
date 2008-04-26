@@ -2013,7 +2013,6 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     msg_release(m);
     centre(F, buf, true);
   }
-#ifdef HEROES
   {
     int maxh = maxheroes(f);
     if (maxh) {
@@ -2023,7 +2022,6 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
       centre(F, buf, true);
     }
   }
-#endif
 
   if (f->items!=NULL) {
     message * msg = msg_message("nr_claims", "items", f->items);

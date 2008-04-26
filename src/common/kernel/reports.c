@@ -364,14 +364,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
     }
   }
 
-#ifdef HEROES
   if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
     bytes = (int)strlcpy(bufp, ", ", size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     bytes = (int)strlcpy(bufp, LOC(f->locale, "hero"), size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
-#endif
   /* status */
 
   if (u->number && (u->faction == f || telepath_see || isbattle)) {

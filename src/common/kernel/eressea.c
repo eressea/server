@@ -405,9 +405,7 @@ const char *keywords[MAXKEYWORDS] =
   "XONTORMIA",
   "ALLIANZ",
   "BEANSPRUCHEN",
-#ifdef HEROES
   "PROMOTION",
-#endif
 };
 
 const char *report_options[MAX_MSG] =

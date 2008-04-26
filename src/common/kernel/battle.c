@@ -1858,7 +1858,6 @@ attacks_per_round(troop t)
 }
 
 
-#ifdef HEROES
 #define HERO_SPEED 10
 static void
 make_heroes(battle * b)
@@ -1878,7 +1877,6 @@ make_heroes(battle * b)
     }
   }
 }
-#endif
 
 static void
 attack(battle *b, troop ta, const att *a, int numattack)
@@ -3975,9 +3973,8 @@ do_battle(region * r)
     return;
   }
   join_allies(b);
-#ifdef HEROES
   make_heroes(b);
-#endif
+
   /* Alle Mann raus aus der Burg! */
   for (bu=r->buildings; bu!=NULL; bu=bu->next) bu->sizeleft = bu->size;
 

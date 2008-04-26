@@ -166,9 +166,7 @@ report_summary(summary * s, summary * o, boolean full)
     pcomp(s->playerpop, o->playerpop));
   fprintf(F,   " davon bewaffnet:      %s\n",
     pcomp(s->armed_men, o->armed_men));
-#ifdef HEROES
   fprintf(F,   " Helden:               %s\n", pcomp(s->heroes, o->heroes));
-#endif
 
   if (full) {
     fprintf(F, "Regionen:              %d\n", listlen(regions));

@@ -149,11 +149,9 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
   } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
     /* snotlings may not be given to the peasants. */
     error = 307;
-#ifdef HEROES
   } else if (u2 && u2->number && (fval(u, UFL_HERO) != fval(u2, UFL_HERO))) {
     /* heroes may not be given to non-heroes and vice versa*/
     error = 75;
-#endif
   } else if (unit_has_cursed_item(u) || (u2 && unit_has_cursed_item(u2))) {
     error = 78;
   } else if (fval(u, UFL_LOCKED) || is_cursed(u->attribs, C_SLAVE, 0)) {
@@ -234,10 +232,8 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
       set_racename(&u2->attribs, get_racename(u->attribs));
       u2->race = u->race;
       u2->irace = u->irace;
-#ifdef HEROES
       if (fval(u, UFL_HERO)) fset(u2, UFL_HERO);
       else freset(u2, UFL_HERO);
-#endif
     }
 
     if (u2) {
@@ -309,12 +305,10 @@ give_unit(unit * u, unit * u2, order * ord)
     return;
   }
 
-#ifdef HEROES
   if (fval(u, UFL_HERO)) {
     cmistake(u, ord, 75, MSG_COMMERCE);
     return;
   }
-#endif
   if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
     cmistake(u, ord, 74, MSG_COMMERCE);
     return;

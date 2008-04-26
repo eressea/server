@@ -63,17 +63,11 @@ struct item;
 #define UFL_GROUP         (1<<28)
 
 /* Flags, die gespeichert werden sollen: */
-#ifndef HEROES
-# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_STEALTH | UFL_GROUP )
-#else
-# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_STEALTH | UFL_GROUP | UFL_HERO)
-#endif
+#define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_STEALTH | UFL_GROUP | UFL_HERO)
 
 #define UNIT_MAXSIZE 50000
-#ifdef HEROES
 extern int maxheroes(const struct faction * f);
 extern int countheroes(const struct faction * f);
-#endif
 
 typedef struct unit {
   struct unit *next; /* needs to be first entry, for region's unitlist */
