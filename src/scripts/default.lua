@@ -1,3 +1,11 @@
+function open_game(turn)
+  file = "" .. get_turn()
+  if read_game(file .. ".dat", "binary")~=0 then
+    return read_game(file, "text")
+  end
+  return 0
+end
+
 function write_emails(locales)
   local files = {}
   local key

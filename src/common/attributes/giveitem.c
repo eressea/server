@@ -56,7 +56,6 @@ a_readgive(attrib * a, struct storage * store)
 {
   give_data * gdata = (give_data*)a->data.v;
   variant var;
-  int result;
   char zText[32];
 
   var.i = store->r_id(store);

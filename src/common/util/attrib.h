@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+  struct storage;
 typedef void (*afun)(void);
 
 typedef struct attrib {

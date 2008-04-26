@@ -3,8 +3,7 @@ local locales = { "de", "en" }
 
 function process(orders)
   -- read game and orders
-  local turnfile = "" .. get_turn()
-  if read_game(turnfile)~=0 then 
+  if open_game(get_turn())~=0 then
     print("could not read game")
     return -1
   end
@@ -40,7 +39,7 @@ function process(orders)
 
   -- save the game
   outfile = "" .. get_turn()
-  if write_game(outfile)~=0 then 
+  if write_game(outfile, "text")~=0 then
     print("could not write game")
     return -1
   end

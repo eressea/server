@@ -21,7 +21,8 @@ extern "C" {
 
 struct attrib;
 struct trigger;
-
+struct storage;
+  
 typedef struct trigger_type {
 	const char * name;
 	void (*initialize)(struct trigger *);

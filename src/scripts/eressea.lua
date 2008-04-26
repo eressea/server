@@ -9,6 +9,8 @@ function loadscript(name)
   end
 end
 
+loadscript("default.lua")
+
 function change_locales()
   -- local localechange = { }
   local localechange = { en = { "adun" } }
@@ -29,7 +31,6 @@ function run_scripts()
     "spells.lua",
     "extensions.lua",
     "familiars.lua",
-    "default.lua",
     "eressea/eternath.lua",
     "eressea/wedding-jadee.lua", 
     "eressea/ponnuki.lua",
@@ -53,8 +54,7 @@ function process(orders)
   equipment_setitem("new_faction", "stone", "30");
   equipment_setitem("new_faction", "money", "4200");
 
-  file = "" .. get_turn()
-  if read_game(file)~=0 then
+  if open_game(get_turn())~=0 then
     print("could not read game")
     return -1
   end
@@ -102,8 +102,8 @@ function process(orders)
 
   write_files(locales)
 
-  file = "" .. get_turn()
-  if write_game(file)~=0 then 
+  file = "" .. get_turn() .. ".dat"
+  if write_game(file, "binary")~=0 then
     print("could not write game")
     return -1
   end

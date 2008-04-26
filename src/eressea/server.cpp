@@ -268,9 +268,11 @@ static const struct {
   {"",                luaopen_base},
   {LUA_TABLIBNAME,    luaopen_table},
   {LUA_IOLIBNAME,     luaopen_io},
-  {LUA_OSLIBNAME,     luaopen_os},
   {LUA_STRLIBNAME,    luaopen_string},
   {LUA_MATHLIBNAME,   luaopen_math},
+#if LUA_VERSION_NUM>=501
+  {LUA_OSLIBNAME,     luaopen_os},
+#endif
   { NULL, NULL }
 };
 

@@ -43,6 +43,8 @@ SOURCES =
  terrain.c
  unit.c
  xmlreader.c
+ textstore.c
+ binarystore.c
  ;
 
 Library kernel : $(SOURCES) ;
