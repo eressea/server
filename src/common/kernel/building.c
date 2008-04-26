@@ -36,6 +36,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/umlaut.h>
 
 /* libc includes */
@@ -65,35 +66,35 @@ lc_done(struct attrib *a)
 }
 
 static void 
-lc_write(const struct attrib * a, FILE* F)
+lc_write(const struct attrib * a, struct storage * store)
 {
   building_action * data = (building_action*)a->data.v;
   const char * fname = data->fname;
   const char * fparam = data->param;
   building * b = data->b;
 
-  write_building_reference(b, F);
-  fprintf(F, "%s %s ", fname, fparam?fparam:NULLSTRING);
+  write_building_reference(b, store);
+  store->w_tok(store, fname);
+  store->w_tok(store, fparam?fparam:NULLSTRING);
 }
 
 static int
-lc_read(struct attrib * a, FILE* F)
+lc_read(struct attrib * a, struct storage * store)
 {
-  char lbuf[256];
   building_action * data = (building_action*)a->data.v;
 
-  read_building_reference(&data->b, F);
-  if (global.data_version<UNICODE_VERSION) {
-    freadstr(F, enc_gamedata, lbuf, sizeof(lbuf));
+  read_building_reference(&data->b, store);
+  if (store->version<UNICODE_VERSION) {
+    data->fname = store->r_str(store);
   } else {
-    fscanf(F, "%s", lbuf);
+    data->fname = store->r_tok(store);
   }
-  data->fname = strdup(lbuf);
-  if (global.data_version>=BACTION_VERSION) {
-    if (global.data_version<UNICODE_VERSION) {
-      freadstr(F, enc_gamedata, lbuf, sizeof(lbuf));
+  if (store->version>=BACTION_VERSION) {
+    char lbuf[256];
+    if (store->version<UNICODE_VERSION) {
+      store->r_str_buf(store, lbuf, sizeof(lbuf));
     } else {
-      fscanf(F, "%s", lbuf);
+      store->r_tok_buf(store, lbuf, sizeof(lbuf));
     }
     if (strcmp(lbuf, NULLSTRING)==0) data->param = NULL;
     else data->param = strdup(lbuf);
@@ -120,28 +121,12 @@ static building_typelist *buildingtypes;
 building_type *
 bt_find(const char* name)
 {
-	const struct building_typelist * btl = buildingtypes;
-
-	if (global.data_version < RELEASE_VERSION) {
-		const char * translation[3][2] = { 
-			{ "illusion", "illusioncastle" }, 
-			{ "generic", "genericbuilding" }, 
-			{ NULL, NULL } 
-		};
-		int i;
-		for (i=0;translation[i][0];++i) {
-			/* calling a building "illusion" was a bad idea" */
-			if (strcmp(translation[i][0], name)==0) {
-				name = translation[i][1];
-				break;
-			}
-		}
-	}
-	while (btl && strcmp(btl->type->_name, name)) btl = btl->next;
+  const struct building_typelist * btl = buildingtypes;
+  while (btl && strcmp(btl->type->_name, name)) btl = btl->next;
   if (btl==NULL) {
     return NULL;
   }
-	return btl->type;
+  return btl->type;
 }
 
 void
@@ -390,19 +375,17 @@ resolve_building(variant id) {
 }
 
 void
-write_building_reference(const struct building * b, FILE * F)
+write_building_reference(const struct building * b, struct storage * store)
 {
-	fprintf(F, "%s ", b?itoa36(b->no):"0");
+  store->w_id(store, b?b->no:-1);
 }
 
 int
-read_building_reference(struct building ** b, FILE * F)
+read_building_reference(struct building ** b, struct storage * store)
 {
 	variant var;
-	char zText[16];
-	fscanf(F, "%s ", zText);
-	var.i = atoi36(zText);
-	if (var.i==0) {
+    var.i = store->r_id(store);
+	if (var.i<=0) {
 		*b = NULL;
 		return AT_READ_FAIL;
 	}

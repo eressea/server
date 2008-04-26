@@ -22,17 +22,18 @@
 
 #include <util/attrib.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 
 static void
-write_targetregion(const attrib * a, FILE * F)
+write_targetregion(const attrib * a, struct storage * store)
 {
-	write_region_reference((region*)a->data.v, F);
+	write_region_reference((region*)a->data.v, store);
 }
 
 static int
-read_targetregion(attrib * a, FILE * F)
+read_targetregion(attrib * a, struct storage * store)
 {
-	return read_region_reference((region**)&a->data.v, F);
+	return read_region_reference((region**)&a->data.v, store);
 }
 
 attrib_type at_targetregion = {

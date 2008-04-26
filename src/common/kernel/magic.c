@@ -58,6 +58,7 @@
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/storage.h>
 #include <util/base36.h>
 #include <util/event.h>
 
@@ -114,26 +115,30 @@ MagicPower(void)
 }
 
 static int
-a_readicastle(attrib * a, FILE * f)
+a_readicastle(attrib * a, struct storage * store)
 {
-	icastle_data * data = (icastle_data*)a->data.v;
-	variant bno;
+  icastle_data * data = (icastle_data*)a->data.v;
+  variant bno;
   char token[32];
-	fscanf(f, "%s %d %d", token, &bno.i, &data->time);
-	data->building = findbuilding(bno.i);
-	if (!data->building) {
-		/* this shouldn't happen, but just in case it does: */
-		ur_add(bno, (void**)&data->building, resolve_building);
-	}
-	data->type = bt_find(token);
-	return AT_READ_OK;
+  store->r_tok_buf(store, token, sizeof(token));
+  bno.i = store->r_int(store);
+  data->time = store->r_int(store);
+  data->building = findbuilding(bno.i);
+  if (!data->building) {
+    /* this shouldn't happen, but just in case it does: */
+    ur_add(bno, (void**)&data->building, resolve_building);
+  }
+  data->type = bt_find(token);
+  return AT_READ_OK;
 }
 
 static void
-a_writeicastle(const attrib * a, FILE * f)
+a_writeicastle(const attrib * a, struct storage * store)
 {
-	icastle_data * data = (icastle_data*)a->data.v;
-	fprintf(f, "%s %d %d ", data->type->_name, data->building->no, data->time);
+  icastle_data * data = (icastle_data*)a->data.v;
+  store->w_tok(store, data->type->_name);
+  store->w_int(store, data->building->no);
+  store->w_int(store, data->time);
 }
 
 static int
@@ -196,25 +201,29 @@ free_mage(attrib * a)
 }
 
 static int
-read_mage(attrib * a, FILE * F)
+read_mage(attrib * a, struct storage * store)
 {
   int i, mtype;
   sc_mage * mage = (sc_mage*)a->data.v;
   char spname[64];
 
-  fscanf(F, "%d %d %d", &mtype, &mage->spellpoints, &mage->spchange);
+  mtype = store->r_int(store);
+  mage->spellpoints = store->r_int(store);
+  mage->spchange = store->r_int(store);
   mage->magietyp = (magic_t)mtype;
   for (i=0;i!=MAXCOMBATSPELLS;++i) {
     spell * sp = NULL;
     int level = 0;
-    if (global.data_version<SPELLNAME_VERSION) {
+    if (store->version<SPELLNAME_VERSION) {
       int spid;
-      fscanf (F, "%d %d", &spid, &level);
+      spid = store->r_int(store);
+      level = store->r_int(store);
       if (spid>=0) {
         sp = find_spellbyid(mage->magietyp, (spellid_t)spid);
       }
     } else {
-      fscanf (F, "%s %d", spname, &level);
+      store->r_tok_buf(store, spname, sizeof(spname));
+      level = store->r_int(store);
 
       if (strcmp("none", spname)!=0) {
         sp = find_spell(mage->magietyp, spname);
@@ -235,12 +244,12 @@ read_mage(attrib * a, FILE * F)
   for (;;) {
     spell * sp;
 
-    if (global.data_version<SPELLNAME_VERSION) {
-      fscanf (F, "%d", &i);
+    if (store->version<SPELLNAME_VERSION) {
+      i = store->r_int(store);
       if (i < 0) break;
       sp = find_spellbyid(mage->magietyp, (spellid_t)i);
     } else {
-      fscanf(F, "%s", spname);
+      store->r_tok_buf(store, spname, sizeof(spname));
       if (strcmp(spname, "end")==0) break;
       sp = find_spell(mage->magietyp, spname);
     }
@@ -255,25 +264,24 @@ read_mage(attrib * a, FILE * F)
 }
 
 static void
-write_mage(const attrib * a, FILE * F) {
+write_mage(const attrib * a, struct storage * store)
+{
   int i;
   sc_mage *mage = (sc_mage*)a->data.v;
   spell_list *slist = mage->spells;
-  fprintf(F, "%d %d %d ", mage->magietyp, mage->spellpoints, mage->spchange);
+  store->w_int(store, mage->magietyp);
+  store->w_int(store, mage->spellpoints);
+  store->w_int(store, mage->spchange);
   for (i=0;i!=MAXCOMBATSPELLS;++i) {
-    fputs(mage->combatspells[i].sp?mage->combatspells[i].sp->sname:"none", F);
-    fprintf(F, " %d ", mage->combatspells[i].level);
+    store->w_tok(store, mage->combatspells[i].sp?mage->combatspells[i].sp->sname:"none");
+    store->w_int(store, mage->combatspells[i].level);
   }
   while (slist!=NULL) {
     spell * sp = slist->data;
-    fprintf (F, "%s ", sp->sname);
+    store->w_tok(store, sp->sname);
     slist = slist->next;
   }
-#if RELEASE_VERSION < SPELLNAME_VERSION
-  fprintf (F, "-1 ");
-#else
-  fputs("end ", F);
-#endif
+  store->w_tok(store, "end");
 }
 
 attrib_type at_mage = {
@@ -372,19 +380,19 @@ create_mage(unit * u, magic_t mtyp)
 
 
 static int
-read_seenspell(attrib * a, FILE * f)
+read_seenspell(attrib * a, struct storage * store)
 {
   int i;
   spell * sp = NULL;
   char token[32];
 
-  fscanf(f, "%s", token);
+  store->r_tok_buf(store, token, sizeof(token));
   i = atoi(token);
   if (i!=0) {
     sp = find_spellbyid(M_GRAU, (spellid_t)i);
   } else {
     int mtype;
-    fscanf(f, "%d", &mtype);
+    mtype = store->r_int(store);
     sp = find_spell((magic_t)mtype, token);
   }
   if (sp==NULL) {
@@ -396,10 +404,11 @@ read_seenspell(attrib * a, FILE * f)
 }
 
 static void
-write_seenspell(const attrib * a, FILE * f)
+write_seenspell(const attrib * a, struct storage * store)
 {
   const spell * sp = (const spell*)a->data.v;
-  fprintf(f, "%s %d ", sp->sname, sp->magietyp);
+  store->w_tok(store, sp->sname);
+  store->w_int(store, sp->magietyp);
 }
 
 attrib_type at_seenspell = {
@@ -1023,7 +1032,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
   if (curse_active(c)) {
     unit * mage = c->magician;
     force -= curse_geteffect(c);
-    curse_changevigour(&r->attribs, c, -cast_level);
+    curse_changevigour(&r->attribs, c, (float)-cast_level);
     cmistake(u, ord, 185, MSG_MAGIC);
     if (mage!=NULL && mage->faction!=NULL) {
       if (force>0) {
@@ -1348,7 +1357,7 @@ do_fumble(castorder *co)
     /* temporärer Stufenverlust */
     duration = max(rng_int()%level/2, 2);
     effect.i = -(level/2);
-    c = create_curse(u, &u->attribs, ct_find("skill"), level, duration,
+    c = create_curse(u, &u->attribs, ct_find("skill"), (float)level, duration,
       effect, 1);
     c->data.i = SK_MAGIC;
     ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
@@ -2085,10 +2094,10 @@ is_familiar(const unit *u)
 }
 
 static void
-write_unit(const attrib * a, FILE * F)
+write_unit(const attrib * a, struct storage * store)
 {
   unit * u = (unit*)a->data.v;
-  write_unit_reference(u, F);
+  write_unit_reference(u, store);
 }
 
 static int
@@ -2201,25 +2210,22 @@ create_newfamiliar(unit * mage, unit * familiar)
 static void *
 resolve_familiar(variant data)
 {
-	unit * familiar = resolve_unit(data);
-	if (familiar) {
-		attrib * a = a_find(familiar->attribs, &at_familiarmage);
-		if (a!=NULL && a->data.v) {
-			unit * mage = (unit *)a->data.v;
-			set_familiar(mage, familiar);
-		}
-	}
-	return familiar;
+  unit * familiar = resolve_unit(data);
+  if (familiar) {
+    attrib * a = a_find(familiar->attribs, &at_familiarmage);
+    if (a!=NULL && a->data.v) {
+      unit * mage = (unit *)a->data.v;
+      set_familiar(mage, familiar);
+    }
+  }
+  return familiar;
 }
 
 static int
-read_familiar(attrib * a, FILE * F)
+read_familiar(attrib * a, struct storage * store)
 {
 	variant id;
-  char token[32];
-
-  fscanf(F, "%s", token);
-	id.i = atoi36(token);
+  id.i = store->r_id(store);
 	ur_add(id, &a->data.v, resolve_familiar);
 	return AT_READ_OK;
 }
@@ -2280,25 +2286,22 @@ has_clone(unit *mage)
 static void *
 resolve_clone(variant data)
 {
-	unit * clone = resolve_unit(data);
-	if (clone) {
-		attrib * a = a_find(clone->attribs, &at_clonemage);
-		if (a!=NULL && a->data.v) {
-			unit * mage = (unit *)a->data.v;
-			set_clone(mage, clone);
-		}
-	}
-	return clone;
+  unit * clone = resolve_unit(data);
+  if (clone) {
+    attrib * a = a_find(clone->attribs, &at_clonemage);
+    if (a!=NULL && a->data.v) {
+      unit * mage = (unit *)a->data.v;
+      set_clone(mage, clone);
+    }
+  }
+  return clone;
 }
 
 static int
-read_clone(attrib * a, FILE * F)
+read_clone(attrib * a, struct storage * store)
 {
 	variant id;
-  char token[32];
-
-	fscanf(F, "%s", token);
-	id.i = atoi36(token);
+  id.i = store->r_id(store);
 	ur_add(id, &a->data.v, resolve_clone);
 	return AT_READ_OK;
 }
@@ -2308,55 +2311,53 @@ read_clone(attrib * a, FILE * F)
 static void *
 resolve_mage(variant data)
 {
-	unit * mage = resolve_unit(data);
-	if (mage) {
-		attrib * a = a_find(mage->attribs, &at_familiar);
-		if (a!=NULL && a->data.v) {
-			unit * familiar = (unit *)a->data.v;
-			set_familiar(mage, familiar);
-		}
-	}
-	return mage;
+  unit * mage = resolve_unit(data);
+  if (mage) {
+    attrib * a = a_find(mage->attribs, &at_familiar);
+    if (a!=NULL && a->data.v) {
+      unit * familiar = (unit *)a->data.v;
+      set_familiar(mage, familiar);
+    }
+  }
+  return mage;
 }
 
 static int
-read_magician(attrib * a, FILE * F)
+read_magician(attrib * a, struct storage * store)
 {
-	variant id;
-  char token[32];
+  variant id;
 
-  fscanf(F, "%s", token);
-	id.i = atoi36(token);
-	ur_add(id, &a->data.v, resolve_mage);
-	return AT_READ_OK;
+  id.i = store->r_id(store);
+  ur_add(id, &a->data.v, resolve_mage);
+  return AT_READ_OK;
 }
 
 static int
 age_unit(attrib * a)
-	/* if unit is gone or dead, remove the attribute */
+/* if unit is gone or dead, remove the attribute */
 {
-	unit * u = (unit*)a->data.v;
-	return (u!=NULL && u->number>0);
+  unit * u = (unit*)a->data.v;
+  return (u!=NULL && u->number>0);
 }
 
 attrib_type at_familiarmage = {
-	"familiarmage",
-	NULL,
-	NULL,
-	age_unit,
-	write_unit,
-	read_magician,
-	ATF_UNIQUE
+  "familiarmage",
+  NULL,
+  NULL,
+  age_unit,
+  write_unit,
+  read_magician,
+  ATF_UNIQUE
 };
 
 attrib_type at_familiar = {
-	"familiar",
-	NULL,
-	NULL,
-	age_unit,
-	write_unit,
-	read_familiar,
-	ATF_UNIQUE
+  "familiar",
+  NULL,
+  NULL,
+  age_unit,
+  write_unit,
+  read_familiar,
+  ATF_UNIQUE
 };
 
 attrib_type at_clonemage = {

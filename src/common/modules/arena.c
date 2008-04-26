@@ -55,6 +55,7 @@
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* libc include */
 #include <assert.h>
@@ -216,15 +217,15 @@ age_hurting(attrib * a) {
 }
 
 static void
-write_hurting(const attrib * a, FILE * F) {
+write_hurting(const attrib * a, struct storage * store) {
 	building * b = a->data.v;
-	fprintf(F, "%d ", b->no);
+	store->w_int(store, b->no);
 }
 
 static int
-read_hurting(attrib * a, FILE * F) {
+read_hurting(attrib * a, struct storage * store) {
 	int i;
-	fscanf(F, "%d", &i);
+	i = store->r_int(store);
 	a->data.v = (void*)findbuilding(i);
 	if (a->data.v==NULL) {
 		log_error(("temple of pain is broken\n"));
@@ -408,23 +409,16 @@ caldera_handle(trigger * t, void * data)
 }
 
 static void
-caldera_write(const trigger * t, FILE * F)
+caldera_write(const trigger * t, struct storage * store)
 {
 	building *b = (building *)t->data.v;
-	fprintf(F, "%s ", itoa36(b->no));
+    write_building_reference(b, store);
 }
 
 static int
-caldera_read(trigger * t, FILE * F)
+caldera_read(trigger * t, struct storage * store)
 {
-	char zText[128];
-	variant var;
-
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	t->data.v = findbuilding(var.i);
-	if (t->data.v==NULL) ur_add(var, &t->data.v, resolve_building);
-
+    read_building_reference((building**)&t->data.v, store);
 	return AT_READ_OK;
 }
 

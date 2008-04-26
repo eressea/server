@@ -41,15 +41,15 @@ unguard_handle(trigger * t, void * data)
 }
 
 static void
-unguard_write(const trigger * t, FILE * F)
+unguard_write(const trigger * t, struct storage * store)
 {
-	write_building_reference((building*)t->data.v, F);
+	write_building_reference((building*)t->data.v, store);
 }
 
 static int
-unguard_read(trigger * t, FILE * F)
+unguard_read(trigger * t, struct storage * store)
 {
-	return read_building_reference((building**)&t->data.v, F);
+	return read_building_reference((building**)&t->data.v, store);
 }
 
 struct trigger_type tt_unguard = {

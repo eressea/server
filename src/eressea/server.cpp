@@ -145,7 +145,6 @@ extern "C" {
   extern boolean nobattle;
   extern boolean nomonsters;
   extern boolean battledebug;
-  extern boolean dirtyload;
 
   extern int loadplane;
 
@@ -269,6 +268,7 @@ static const struct {
   {"",                luaopen_base},
   {LUA_TABLIBNAME,    luaopen_table},
   {LUA_IOLIBNAME,     luaopen_io},
+  {LUA_OSLIBNAME,     luaopen_os},
   {LUA_STRLIBNAME,    luaopen_string},
   {LUA_MATHLIBNAME,   luaopen_math},
   { NULL, NULL }
@@ -414,8 +414,6 @@ usage(const char * prog, const char * arg)
     fprintf(stderr, "unknown argument: %s\n\n", arg);
   }
   fprintf(stderr, "Usage: %s [options]\n"
-    "-x n             : Lädt nur die ersten n regionen\n"
-    "-f x y           : Lädt nur die regionen ab (x,y)\n"
     "-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
     "-q               : be less verbose\n"
     "-d datadir       : gibt das datenverzeichnis an\n"
@@ -482,7 +480,6 @@ read_args(int argc, char **argv, lua_State * luaState)
       }
       else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
       else if (strcmp(argv[i]+2, "ignore-errors")==0) g_ignore_errors = true;
-      else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
       else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
       else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
       else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
@@ -525,10 +522,6 @@ read_args(int argc, char **argv, lua_State * luaState)
       case 't':
         turn = atoi(argv[++i]);
         break;
-      case 'f':
-        firstx = atoi(argv[++i]);
-        firsty = atoi(argv[++i]);
-        break;
       case 'q':
         quiet = 1;
         break;
@@ -541,13 +534,6 @@ read_args(int argc, char **argv, lua_State * luaState)
         break;
       case 'p':
         loadplane = atoi(argv[++i]);
-        break;
-      case 'x':
-        maxregions = atoi(argv[++i]);
-        maxregions = (maxregions*81+80) / 81;
-        break;
-      case 'X':
-        dirtyload = true;
         break;
       case 's':
         c = argv[++i];
@@ -648,7 +634,6 @@ main(int argc, char *argv[])
 
   setup_signal_handler();
 
-  global.data_version = RELEASE_VERSION;
   sqlpatch = true;
   log_open("eressea.log");
   printf("\n%s PBEM host\n"

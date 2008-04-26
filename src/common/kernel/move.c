@@ -56,6 +56,7 @@
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* attributes includes */
 #include <attributes/follow.h>
@@ -135,23 +136,23 @@ shiptrail_age(attrib *a)
 }
 
 static int
-shiptrail_read(attrib *a, FILE *f)
+shiptrail_read(attrib *a, storage * store)
 {
 	traveldir *t = (traveldir *)(a->data.v);
-	int       no, age, dir;
 
-	fscanf(f, "%d %d %d", &no, &dir, &age);
-	t->no  = no;
-	t->dir = (direction_t)dir;
-	t->age = age;
+	t->no  = store->r_int(store);
+	t->dir = (direction_t)store->r_int(store);
+	t->age = store->r_int(store);
 	return AT_READ_OK;
 }
 
 static void
-shiptrail_write(const attrib *a, FILE *f)
+shiptrail_write(const attrib *a, storage * store)
 {
-	  traveldir *t = (traveldir *)(a->data.v);
-	  fprintf(f, "%d %d %d ", t->no, (int)t->dir, t->age);
+  traveldir *t = (traveldir *)(a->data.v);
+  store->w_int(store, t->no);
+  store->w_int(store, t->dir);
+  store->w_int(store, t->age);
 }
 
 attrib_type at_shiptrail = {
@@ -1439,7 +1440,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     if (fval(u->race, RCF_ILLUSIONARY)) {
       curse * c = get_curse(next->attribs, ct_find("antimagiczone"));
       if (curse_active(c)) {
-        curse_changevigour(&next->attribs, c, - u->number);
+        curse_changevigour(&next->attribs, c, (float)-u->number);
         ADDMSG(&u->faction->msgs, msg_message("illusionantimagic", "unit", u));
         set_number(u, 0);
         break;

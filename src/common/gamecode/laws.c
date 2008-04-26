@@ -2948,7 +2948,7 @@ age_building(building * b)
           effect.i = 100;
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
-            sk, sk/2, effect, 0);
+            (float)sk, sk/2, effect, 0);
           ADDMSG(&r->msgs, msg_message("astralshield_activate", 
             "region unit", r, mage));
         }

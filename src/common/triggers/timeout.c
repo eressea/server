@@ -20,6 +20,7 @@
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/log.h>
+#include <util/storage.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,19 +64,19 @@ timeout_handle(trigger * t, void * data)
 }
 
 static void
-timeout_write(const trigger * t, FILE * F)
+timeout_write(const trigger * t, struct storage * store)
 {
   timeout_data * td = (timeout_data*)t->data.v;
-  fprintf(F, "%d ", td->timer);
-  write_triggers(F, td->triggers);
+  store->w_int(store, td->timer);
+  write_triggers(store, td->triggers);
 }
 
 static int
-timeout_read(trigger * t, FILE * F)
+timeout_read(trigger * t, struct storage * store)
 {
   timeout_data * td = (timeout_data*)t->data.v;
-  fscanf(F, "%d", &td->timer);
-  read_triggers(F, &td->triggers);
+  td->timer = store->r_int(store);
+  read_triggers(store, &td->triggers);
   if (td->timer>20) {
     trigger * tr = td->triggers;
     log_warning(("there is a timeout lasting for another %d turns\n", td->timer));

@@ -672,7 +672,7 @@ use_tacticcrystal(unit * u, const struct item_type * itype, int amount, struct o
   int i;
   for (i=0;i!=amount;++i) {
     int duration = 1; /* wirkt nur eine Runde */
-    int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
+    float power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
                       Fall egal, da der curse für den Kampf gelten soll,
                       der vor den Antimagiezaubern passiert */
     curse * c;

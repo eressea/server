@@ -49,6 +49,7 @@
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
@@ -304,32 +305,32 @@ rc_specialdamage(const race * ar, const race * dr, const struct weapon_type * wt
 }
 
 void
-write_race_reference(const race * rc, FILE * F)
+write_race_reference(const race * rc, struct storage * store)
 {
-	fprintf(F, "%s ", rc?rc->_name[0]:"none");
+  store->w_tok(store, rc?rc->_name[0]:"none");
 }
 
 int
-read_race_reference(const struct race ** rp, FILE * F)
+read_race_reference(const struct race ** rp, struct storage * store)
 {
-	char zName[20];
-	if (global.data_version<NEWRACE_VERSION) {
-		int i;
-		fscanf(F, "%d", &i);
-		if (i>=0) {
-			*rp = new_race[i];
-		} else {
-			*rp = NULL;
-			return AT_READ_FAIL;
-		}
-	} else {
-		fscanf(F, "%s", zName);
-		if (strcmp(zName, "none")==0) {
-			*rp = NULL;
-			return AT_READ_OK;
-		}
-		*rp = rc_find(zName);
-		assert(*rp!=NULL);
-	}
-	return AT_READ_OK;
+  char zName[20];
+  if (store->version<NEWRACE_VERSION) {
+    int i;
+    i = store->r_int(store);
+    if (i>=0) {
+      *rp = new_race[i];
+    } else {
+      *rp = NULL;
+      return AT_READ_FAIL;
+    }
+  } else {
+    store->r_tok_buf(store, zName, sizeof(zName));
+    if (strcmp(zName, "none")==0) {
+      *rp = NULL;
+      return AT_READ_OK;
+    }
+    *rp = rc_find(zName);
+    assert(*rp!=NULL);
+  }
+  return AT_READ_OK;
 }

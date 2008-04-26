@@ -47,8 +47,8 @@ typedef struct attrib_type {
 	void (*finalize)(struct attrib *);
 	int  (*age)(struct attrib *);
 	/* age returns 0 if the attribute needs to be removed, !=0 otherwise */
-	void (*write)(const struct attrib *, FILE*);
-	int  (*read)(struct attrib *, FILE*); /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+	void (*write)(const struct attrib *, struct storage *);
+	int  (*read)(struct attrib *, struct storage *); /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 	unsigned int flags;
 	/* ---- internal data, do not modify: ---- */
 	struct attrib_type * nexthash;
@@ -67,8 +67,8 @@ extern attrib * a_new(const attrib_type * at);
 extern void a_free(attrib * a);
 
 extern int a_age(attrib ** attribs);
-extern int a_read(FILE * F, attrib ** attribs);
-extern void a_write(FILE * F, const attrib * attribs);
+extern int a_read(struct storage * store, attrib ** attribs);
+extern void a_write(struct storage * store, const attrib * attribs);
 
 #define DEFAULT_AGE NULL
 #define DEFAULT_INIT NULL

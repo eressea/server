@@ -23,6 +23,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,16 +48,16 @@ killunit_handle(trigger * t, void * data)
 }
 
 static void
-killunit_write(const trigger * t, FILE * F)
+killunit_write(const trigger * t, struct storage * store)
 {
 	unit * u = (unit*)t->data.v;
-	write_unit_reference(u, F);
+	write_unit_reference(u, store);
 }
 
 static int
-killunit_read(trigger * t, FILE * F)
+killunit_read(trigger * t, struct storage * store)
 {
-	return read_unit_reference((unit**)&t->data.v, F);
+	return read_unit_reference((unit**)&t->data.v, store);
 }
 
 trigger_type tt_killunit = {

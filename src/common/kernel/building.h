@@ -131,8 +131,8 @@ const struct building_type * findbuildingtype(const char * name, const struct lo
 #define NOBUILDING NULL
 
 extern void * resolve_building(variant data);
-extern void write_building_reference(const struct building * b, FILE * F);
-extern int read_building_reference(struct building ** b, FILE * F);
+extern void write_building_reference(const struct building * b, struct storage * store);
+extern int read_building_reference(struct building ** b, struct storage * store);
 
 extern struct building *findbuilding(int n);
 

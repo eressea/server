@@ -28,6 +28,7 @@
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/umlaut.h>
+#include <util/storage.h>
 
 #include <triggers/createcurse.h>
 #include <triggers/killunit.h>
@@ -66,19 +67,19 @@ alp_verify(attrib * a)
 }
 
 static void
-alp_write(const attrib * a, FILE * F)
+alp_write(const attrib * a, struct storage * store)
 {
 	alp_data * ad = (alp_data*)a->data.v;
-	write_unit_reference(ad->mage, F);
-	write_unit_reference(ad->target, F);
+	write_unit_reference(ad->mage, store);
+	write_unit_reference(ad->target, store);
 }
 
 static int
-alp_read(attrib * a, FILE * F)
+alp_read(attrib * a, struct storage * store)
 {
 	alp_data * ad = (alp_data*)a->data.v;
-	int m = read_unit_reference(&ad->mage, F);
-	int t = read_unit_reference(&ad->target, F);
+	int m = read_unit_reference(&ad->mage, store);
+	int t = read_unit_reference(&ad->target, store);
 	if (m!=AT_READ_OK || t!=AT_READ_OK) return AT_READ_FAIL;
 	return AT_READ_OK;
 }

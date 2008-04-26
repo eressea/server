@@ -48,6 +48,9 @@
 #include "unit.h"
 #include "version.h"
 
+#include "textstore.h"
+#include "binarystore.h"
+
 /* attributes includes */
 #include <attributes/key.h>
 
@@ -61,10 +64,11 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
-#include <util/resolve.h>
-#include <util/sql.h>
 #include <util/rand.h>
+#include <util/resolve.h>
 #include <util/rng.h>
+#include <util/sql.h>
+#include <util/storage.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
@@ -84,7 +88,6 @@
 #define MAXPERSISTENT 128
 
 /* exported symbols symbols */
-const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
 const char * xmlfile = "eressea.xml";
 const char * g_datadir;
 int firstx = 0, firsty = 0;
@@ -125,12 +128,6 @@ cfopen(const char *filename, const char *mode)
   return F;
 }
 
-/* ------------------------------------------------------------- */
-
-/* Dummy-Funktion für die Kompatibilität */
-
-#define rid(F) ri36(F)
-
 int
 freadstr(FILE * F, int encoding, char * start, size_t size)
 {
@@ -165,30 +162,30 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
       case '\\':
         c = fgetc(F);
         switch (c) {
-          case EOF:
-            return EOF;
-          case 'n':
-            if ((size_t)(str-start+1)<size) {
-              *str++ = '\n';
+      case EOF:
+        return EOF;
+      case 'n':
+        if ((size_t)(str-start+1)<size) {
+          *str++ = '\n';
+        }
+        break;
+      default:
+        if ((size_t)(str-start+1)<size) {
+          if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
+            char inbuf = (char)c;
+            size_t inbytes = 1;
+            size_t outbytes = size-(str-start);
+            int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
+            if (ret>0) str+=ret;
+            else {
+              log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+              encoding = XML_CHAR_ENCODING_ERROR;
+              *str++ = (char)c;
             }
-            break;
-          default:
-            if ((size_t)(str-start+1)<size) {
-              if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
-                char inbuf = (char)c;
-                size_t inbytes = 1;
-                size_t outbytes = size-(str-start);
-                int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
-                if (ret>0) str+=ret;
-                else {
-                  log_error(("input data was not iso-8859-1! assuming utf-8\n"));
-                  encoding = XML_CHAR_ENCODING_ERROR;
-                  *str++ = (char)c;
-                }
-              } else {
-                *str++ = (char)c;
-              }
-            }
+          } else {
+            *str++ = (char)c;
+          }
+        }
         }
         break;
       default:
@@ -211,6 +208,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
     }
   }
 }
+
 
 /** writes a quoted string to the file
 * no trailing space, since this is used to make the creport.
@@ -243,9 +241,11 @@ fwritestr(FILE * F, const char * str)
   return nwrite + 2;
 }
 
+#if 0
+#define store->r_id(store) ri36(F)
 
 static void
-rds(FILE * F, char **ds)
+rds(struct storage * store, char **ds)
 {
   static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
   char *s = &buffer[0];
@@ -283,10 +283,10 @@ rds(FILE * F, char **ds)
 
 
 static void
-xrds(FILE * F, char **ds, int encoding)
+xrds(struct storage * store, char **ds, int encoding)
 {
   static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
-  int len = freadstr(F, encoding, buffer, sizeof(buffer));
+  int len = store->r_str_buf(store, buffer, sizeof(buffer));
 
   if (len>=0) {
     if (ds) {
@@ -298,7 +298,7 @@ xrds(FILE * F, char **ds, int encoding)
 
 #define rcf(F) (getc(F));
 void
-rsf(FILE * F, char *s, size_t len)
+rsf(struct storage * store, char *s, size_t len)
 {
   char * begin = s;
   int c;
@@ -324,7 +324,7 @@ rsf(FILE * F, char *s, size_t len)
 }
 
 static void
-rs(FILE * F, char *s)
+rs(struct storage * store, char *s)
 {
   boolean apos = false;
   int c = getc(F);
@@ -344,10 +344,10 @@ rs(FILE * F, char *s)
   *s = 0;
 }
 
-#define rss(F, buf, size) rs(F, buf) /* should check size but doesn't */
+#define store->r_str_buf(store, buf, size) store->r_tok_buf(store, buf) /* should check size but doesn't */
 
 static int
-ri(FILE * F)
+ri(struct storage * store)
 {
   int i = 0, vz = 1;
 
@@ -372,7 +372,7 @@ ri(FILE * F)
 }
 
 static int
-ri36(FILE * F)
+ri36(struct storage * store)
 {
   char buf[16];
   int i = 0;
@@ -388,19 +388,18 @@ ri36(FILE * F)
   i = atoi36(buf);
   return i;
 }
+#endif
 
 #ifdef ENEMIES
 static void
-read_enemies(FILE * F, faction * f)
+read_enemies(struct storage * store, faction * f)
 {
-  if (global.data_version<ENEMIES_VERSION) return;
+  if (store->version<ENEMIES_VERSION) return;
   f->enemies = NULL;
   for (;;) {
-    char zText[32];
-    fscanf(F, "%s", zText);
-    if (strcmp(zText, "end")==0) break;
+    int fno = store->r_id(store);
+    if (fno<0) break;
     else {
-      int fno = atoi36(zText);
       faction_list * flist = malloc(sizeof(faction_list));
       flist->next = f->enemies;
       f->enemies = flist;
@@ -410,12 +409,12 @@ read_enemies(FILE * F, faction * f)
 }
 
 static void
-write_enemies(FILE * F, const faction_list * flist)
+write_enemies(struct storage * store, const faction_list * flist)
 {
   while (flist) {
-    fprintf(F, "%s ", itoa36(flist->data->no));
+    write_faction_reference(flist->data, store);
   }
-  fputs("end \n", F);
+  store->w_id(store, -1);
 }
 #endif
 
@@ -429,11 +428,6 @@ unitorders(FILE * F, int enc, struct faction * f)
 
   i = getid();
   u = findunitg(i, NULL);
-
-  if (quiet==0) {
-    log_stdio(stdout, "-%4s;", unitid(u));
-    fflush(stdout);
-  }
 
   if (u && u->race == new_race[RC_SPELL]) return NULL;
   if (u && u->faction == f) {
@@ -518,11 +512,7 @@ factionorders(void)
   
   if (f!=NULL && f->no!=MONSTER_FACTION) {
     const char * pass = getstrtoken();
-    if (quiet==0) {
-      log_stdio(stdout, " %4s;", factionid(f));
-      fflush(stdout);
-    }
-    
+
     if (!checkpasswd(f, (const char *)pass, true)) {
       log_warning(("Invalid password for faction %s\n", itoa36(fid)));
       ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
@@ -660,9 +650,6 @@ inner_world(region * r)
 int maxregions = -1;
 int loadplane = 0;
 
-boolean dirtyload = false;
-boolean incomplete_data = false;
-
 enum {
   U_MAN,
   U_UNDEAD,
@@ -710,17 +697,17 @@ datapath(void)
 }
 
 void
-read_items(FILE *F, item **ilist)
+read_items(struct storage * store, item **ilist)
 {
   for (;;) {
     char ibuf[32];
     const item_type * itype;
-    rss(F, ibuf, sizeof(ibuf));
+    store->r_str_buf(store, ibuf, sizeof(ibuf));
     if (!strcmp("end", ibuf)) break;
     itype = it_find(ibuf);
     assert(itype!=NULL);
     if (itype!=NULL) {
-      int i = ri(F);
+      int i = store->r_int(store);
       if (i<=0) {
         log_error(("data contains an entry with %d %s\n", i, itype->rtype->_name[1]));
       } else {
@@ -731,81 +718,90 @@ read_items(FILE *F, item **ilist)
 }
 
 static void
-read_alliances(FILE * F)
+read_alliances(struct storage * store)
 {
   char pbuf[32];
 
-  if (global.data_version<SAVEALLIANCE_VERSION) {
+  if (store->version<SAVEALLIANCE_VERSION) {
     if (!AllianceRestricted() && !AllianceAuto()) return;
   }
 
-  rss(F, pbuf, sizeof(pbuf));
+  store->r_str_buf(store, pbuf, sizeof(pbuf));
   while (strcmp(pbuf, "end")!=0) {
     char aname[128];
-    rss(F, aname, sizeof(aname));
+    store->r_str_buf(store, aname, sizeof(aname));
     makealliance(atoi36(pbuf), aname);
-    rss(F, pbuf, sizeof(pbuf));
+    store->r_str_buf(store, pbuf, sizeof(pbuf));
   }
 }
 
+#if 0
 #define wc(F, c) putc(c, F);
 #define wnl(F) putc('\n', F);
 #define whs(F, s) fputs(s, F); putc(' ', F)
 
-void
-wsn(FILE * F, const char *s)
+size_t
+wsn(struct storage * store, const char *s)
 {
+  size_t n = 0;
   if (!s)
-    return;
-  while (*s)
+    return 0;
+  while (*s) {
     wc(F, *s++);
+    ++n;
+  }
+  return n;
 }
 
-void
-ws(FILE * F, const char *s)
+size_t
+ws(struct storage * store, const char *s)
 {
+  size_t n;
   fputc('"', F);
-  wsn(F, s);
+  n = wsn(F, s);
   fputs("\" ", F);
+  return n+3;
 }
 
-static void
-wi(FILE * F, int n)
+static int
+wi(struct storage * store, int n)
 {
-  fprintf(F, "%d ", n);
+  return fprintf(F, "%d ", n);
 }
 
-static void 
-wi36(FILE * F, int n)
+static int
+wi36(struct storage * store, int n)
 {
-  fprintf(F, "%s ", itoa36(n));
+  return fprintf(F, "%s ", itoa36(n));
 }
+#endif
 
 void
-write_alliances(FILE * F)
+write_alliances(struct storage * store)
 {
   alliance * al = alliances;
   while (al) {
-    wi36(F, al->id);
-    ws(F, al->name);
+    store->w_id(store, al->id);
+    store->w_tok(store, al->name);
     al = al->next;
-    wnl(F);
+    store->w_brk(store);
   }
-  fprintf(F, "end ");
-  wnl(F);
+  store->w_tok(store, "end");
+  store->w_brk(store);
 }
 
 void
-write_items(FILE *F, item *ilist)
+write_items(struct storage * store, item *ilist)
 {
   item * itm;
   for (itm=ilist;itm;itm=itm->next) {
     assert(itm->number>=0);
     if (itm->number) {
-      fprintf(F, "%s %i ", resourcename(itm->type->rtype, 0), itm->number);
+      store->w_tok(store, resourcename(itm->type->rtype, 0));
+      store->w_int(store, itm->number);
     }
   }
-  fputs("end ", F);
+  store->w_tok(store, "end");
 }
 
 int
@@ -843,11 +839,19 @@ fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
 {
   char obuf[1024];
   write_order(ord, lang, obuf, sizeof(obuf));
-  if (obuf[0]) fwritestr(F, obuf);
+  if (obuf[0]) fputs(obuf, F);
+}
+
+static void
+writeorder(struct storage * store, const struct order * ord, const struct locale * lang)
+{
+  char obuf[1024];
+  write_order(ord, lang, obuf, sizeof(obuf));
+  if (obuf[0]) store->w_str(store, obuf);
 }
 
 unit *
-readunit(FILE * F, int encoding)
+readunit(struct storage * store)
 {
   skill_t sk;
   unit * u;
@@ -855,7 +859,7 @@ readunit(FILE * F, int encoding)
   order ** orderp;
   char obuf[1024];
 
-  n = rid(F);
+  n = store->r_id(store);
   u = findunit(n);
   if (u==NULL) {
     u = calloc(sizeof(unit), 1);
@@ -870,42 +874,51 @@ readunit(FILE * F, int encoding)
     u_setfaction(u, NULL);
   }
   {
-    int n = rid(F);
+    int n = store->r_id(store);
     faction * f = findfaction(n);
     if (f!=u->faction) u_setfaction(u, f);
   }
-  xrds(F, &u->name, encoding);
-  if (lomem) rds(F, NULL);
-  else {
-    xrds(F, &u->display, encoding);
-  }
-  number = ri(F);
-  u->age = (short)ri(F);
-  if (global.data_version<NEWRACE_VERSION) {
-    u->race = new_race[(race_t)ri(F)];
-    u->irace = new_race[(race_t)ri(F)];
+  u->name = store->r_str(store);
+  if (lomem) {
+    store->r_str_buf(store, NULL, 0);
   } else {
-    char * space;
+    u->display = store->r_str(store);
+  }
+  number = store->r_int(store);
+  u->age = (short)store->r_int(store);
+  if (store->version<NEWRACE_VERSION) {
+    u->race = new_race[(race_t)store->r_int(store)];
+    u->irace = new_race[(race_t)store->r_int(store)];
+  } else {
     char rname[32];
     
-    rss(F, rname, sizeof(rname));
-    space = strchr(rname, ' ');
-    if (space!=NULL) {
-      char * inc = space+1;
-      char * outc = space;
-      do {
-        while (*inc==' ') ++inc;
-        while (*inc) {
-          *outc++ = *inc++;
-          if (*inc==' ') break;
-        }
-      } while (*inc);
-      *outc = 0;
+    if (store->version<STORAGE_VERSION) {
+      char * space;
+      store->r_str_buf(store, rname, sizeof(rname));
+      space = strchr(rname, ' ');
+      if (space!=NULL) {
+        char * inc = space+1;
+        char * outc = space;
+        do {
+          while (*inc==' ') ++inc;
+          while (*inc) {
+            *outc++ = *inc++;
+            if (*inc==' ') break;
+          }
+        } while (*inc);
+        *outc = 0;
+      }
+    } else {
+      store->r_tok_buf(store, rname, sizeof(rname));
     }
     u->race = rc_find(rname);
     assert(u->race);
-    rss(F, rname, sizeof(rname));
-    if (strlen(rname)) u->irace = rc_find(rname);
+    if (store->version<STORAGE_VERSION) {
+      store->r_str_buf(store, rname, sizeof(rname));
+    } else {
+      store->r_tok_buf(store, rname, sizeof(rname));
+    }
+    if (rname[0]) u->irace = rc_find(rname);
     else u->irace = u->race;
   }
   if (u->race->describe) {
@@ -927,30 +940,34 @@ readunit(FILE * F, int encoding)
   if (count_unit(u)) u->faction->no_units++;
 
   set_number(u, number);
-  u->building = findbuilding(rid(F));
-  u->ship = findship(rid(F));
 
-  if (global.data_version <= 73) {
-    if (ri(F)) {
+  n = store->r_id(store);
+  if (n>=0) u->building = findbuilding(n);
+
+  n = store->r_id(store);
+  if (n>=0) u->ship = findship(n);
+
+  if (store->version <= 73) {
+    if (store->r_int(store)) {
       fset(u, UFL_OWNER);
     } else {
       freset(u, UFL_OWNER);
     }
   }
-  setstatus(u, ri(F));
-  if (global.data_version <= 73) {
-    if (ri(F)) {
+  setstatus(u, store->r_int(store));
+  if (store->version <= 73) {
+    if (store->r_int(store)) {
       guard(u, GUARD_ALL);
     } else {
       guard(u, GUARD_NONE);
     }
   } else {
-    u->flags = ri(F) & ~UFL_DEBUG;
+    u->flags = store->r_int(store) & ~UFL_DEBUG;
     u->flags &= UFL_SAVEMASK;
   }
   /* Persistente Befehle einlesen */
   free_orders(&u->orders);
-  freadstr(F, encoding, obuf, sizeof(obuf));
+  store->r_str_buf(store, obuf, sizeof(obuf));
   p = n = 0;
   orderp = &u->orders;
   while (obuf[0]) {
@@ -971,11 +988,11 @@ readunit(FILE * F, int encoding)
         if (ord!=NULL) free_order(ord);
       }
     }
-    freadstr(F, encoding, obuf, sizeof(obuf));
+    store->r_str_buf(store, obuf, sizeof(obuf));
   }
-  if (global.data_version<NOLASTORDER_VERSION) {
+  if (store->version<NOLASTORDER_VERSION) {
     order * ord;
-    freadstr(F, encoding, obuf, sizeof(obuf));
+    store->r_str_buf(store, obuf, sizeof(obuf));
     ord = parse_order(obuf, u->faction->locale);
     if (ord!=NULL) {
 #ifdef LASTORDER
@@ -988,11 +1005,11 @@ readunit(FILE * F, int encoding)
   set_order(&u->thisorder, NULL);
 
   assert(u->race);
-  if (global.data_version<NEWSKILL_VERSION) {
+  if (store->version<NEWSKILL_VERSION) {
     /* convert old data */
     if (u->number) {
-      while ((sk = (skill_t) ri(F)) != NOSKILL) {
-        int days = ri(F) / u->number;
+      while ((sk = (skill_t) store->r_int(store)) != NOSKILL) {
+        int days = store->r_int(store) / u->number;
         int lvl = level(days);
         int weeks = lvl + 1 - (days - level_days(lvl))/30;
         assert(weeks>0 && weeks<=lvl+1);
@@ -1004,9 +1021,9 @@ readunit(FILE * F, int encoding)
       }
     }
   } else {
-    while ((sk = (skill_t) ri(F)) != NOSKILL) {
-      int level = ri(F);
-      int weeks = ri(F);
+    while ((sk = (skill_t) store->r_int(store)) != NOSKILL) {
+      int level = store->r_int(store);
+      int weeks = store->r_int(store);
       if (level) {
         skill * sv = add_skill(u, sk);
         sv->level = sv->old = (unsigned char)level;
@@ -1014,47 +1031,40 @@ readunit(FILE * F, int encoding)
       }
     }
   }
-  read_items(F, &u->items);
-  u->hp = ri(F);
+  read_items(store, &u->items);
+  u->hp = store->r_int(store);
   if (u->hp < u->number) {
     log_error(("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no),
            u->number, u->hp));
     u->hp=u->number;
   }
 
-  a_read(F, &u->attribs);
+  a_read(store, &u->attribs);
   return u;
 }
 
 void
-writeunit(FILE * F, const unit * u)
+writeunit(struct storage * store, const unit * u)
 {
   order * ord;
   int i, p = 0;
-  wi36(F, u->no);
-  wi36(F, u->faction->no);
-  fwritestr(F, (const char *)u->name);
-  fputc(' ', F);
-  fwritestr(F, u->display?(const char *)u->display:"");
-  fputc(' ', F);
-  wi(F, u->number);
-  wi(F, u->age);
-  ws(F, u->race->_name[0]);
-  ws(F, u->irace!=u->race?u->irace->_name[0]:"");
-  if (u->building)
-    wi36(F, u->building->no);
-  else
-    wi(F, 0);
-  if (u->ship) wi36(F, u->ship->no);
-  else wi36(F, 0);
-  wi(F, u->status);
-  wi(F, u->flags & UFL_SAVEMASK);
-  wnl(F);
+  write_unit_reference(u, store);
+  write_faction_reference(u->faction, store);
+  store->w_str(store, (const char *)u->name);
+  store->w_str(store, u->display?(const char *)u->display:"");
+  store->w_int(store, u->number);
+  store->w_int(store, u->age);
+  store->w_tok(store, u->race->_name[0]);
+  store->w_tok(store, u->irace!=u->race?u->irace->_name[0]:"");
+  write_building_reference(u->building, store);
+  write_ship_reference(u->ship, store);
+  store->w_int(store, u->status);
+  store->w_int(store, u->flags & UFL_SAVEMASK);
+  store->w_brk(store);
 #ifndef LASTORDER
   for (ord = u->old_orders; ord; ord=ord->next) {
     if (++p<MAXPERSISTENT) {
-      fwriteorder(F, ord, u->faction->locale);
-      fputc(' ', F);
+      writeorder(store, ord, u->faction->locale);
     } else {
       log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
       break;
@@ -1065,8 +1075,7 @@ writeunit(FILE * F, const unit * u)
     if (u->old_orders && is_repeated(ord)) continue; /* has new defaults */
     if (is_persistent(ord)) {
       if (++p<MAXPERSISTENT) {
-        fwriteorder(F, ord, u->faction->locale);
-        fputc(' ', F);
+        writeorder(store, ord, u->faction->locale);
       } else {
         log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
         break;
@@ -1074,13 +1083,8 @@ writeunit(FILE * F, const unit * u)
     }
   }
   /* write an empty string to terminate the list */
-  fputs("\"\"", F);
-  wnl(F);
-#if RELEASE_VERSION<NOLASTORDER_VERSION
-  /* the current default order */
-  fwriteorder(F, u->lastorder, u->faction->locale);
-  wnl(F);
-#endif
+  store->w_str(store, "");
+  store->w_brk(store);
 
   assert(u->race);
 
@@ -1088,35 +1092,35 @@ writeunit(FILE * F, const unit * u)
     skill * sv = u->skills+i;
     assert(sv->weeks<=sv->level*2+1);
     if (sv->level>0) {
-      wi(F, sv->id);
-      wi(F, sv->level);
-      wi(F, sv->weeks);
+      store->w_int(store, sv->id);
+      store->w_int(store, sv->level);
+      store->w_int(store, sv->weeks);
     }
   }
-  wi(F, -1);
-  wnl(F);
-  write_items(F, u->items);
-  wnl(F);
+  store->w_int(store, -1);
+  store->w_brk(store);
+  write_items(store, u->items);
+  store->w_brk(store);
   if (u->hp == 0) {
     log_error(("Einheit %s hat 0 Trefferpunkte\n", itoa36(u->no)));
     ((unit*)u)->hp = 1;
   }
-  wi(F, u->hp);
-  wnl(F);
-  a_write(F, u->attribs);
-  wnl(F);
+  store->w_int(store, u->hp);
+  store->w_brk(store);
+  a_write(store, u->attribs);
+  store->w_brk(store);
 }
 
-region *
-readregion(FILE * F, int encoding, short x, short y)
+static region *
+readregion(struct storage * store, short x, short y)
 {
   region * r = findregion(x, y);
   const terrain_type * terrain;
   char token[32];
   unsigned int uid = 0;
 
-  if (global.data_version>=UID_VERSION) {
-    uid = ri(F);
+  if (store->version>=UID_VERSION) {
+    uid = store->r_int(store);
   } else {
     uid = generate_region_id();
   }
@@ -1138,15 +1142,18 @@ readregion(FILE * F, int encoding, short x, short y)
     }
     r->land = 0;
   }
-  if (lomem) rds(F, NULL);
-  else xrds(F, &r->display, encoding);
+  if (lomem) {
+    store->r_str_buf(store, NULL, 0);
+  } else {
+    r->display = store->r_str(store);
+  }
   
-  if (global.data_version < TERRAIN_VERSION) {
-    int ter = ri(F);
+  if (store->version < TERRAIN_VERSION) {
+    int ter = store->r_int(store);
     terrain = newterrain((terrain_t)ter);
   } else {
     char name[64];
-    rss(F, name, sizeof(name));
+    store->r_str_buf(store, name, sizeof(name));
     terrain = get_terrain(name);
     if (terrain==NULL) {
       log_error(("Unknown terrain '%s'\n", name));
@@ -1154,35 +1161,36 @@ readregion(FILE * F, int encoding, short x, short y)
     }
   }
   r->terrain = terrain;
-  r->flags = (char) ri(F);
+  r->flags = (char) store->r_int(store);
 
-  r->age = (unsigned short) ri(F);
+  r->age = (unsigned short) store->r_int(store);
 
   if (fval(r->terrain, LAND_REGION)) {
     r->land = calloc(1, sizeof(land_region));
-    xrds(F, &r->land->name, encoding);
+    r->land->name = store->r_str(store);
   }
   if (r->land) {
     int i;
     rawmaterial ** pres = &r->resources;
-    if(global.data_version < GROWTREE_VERSION) {
-      i = ri(F); rsettrees(r, 2, i);
+    if (store->version < GROWTREE_VERSION) {
+      i = store->r_int(store);
+      rsettrees(r, 2, i);
     } else {
-      i = ri(F);
+      i = store->r_int(store);
       if (i<0) {
         log_error(("number of trees in %s is %d.\n", 
                regionname(r, NULL), i));
         i=0;
       }
       rsettrees(r, 0, i);
-      i = ri(F); 
+      i = store->r_int(store); 
       if (i<0) {
         log_error(("number of young trees in %s is %d.\n", 
                regionname(r, NULL), i));
         i=0;
       }
       rsettrees(r, 1, i);
-      i = ri(F); 
+      i = store->r_int(store); 
       if (i<0) {
         log_error(("number of seeds in %s is %d.\n", 
                regionname(r, NULL), i));
@@ -1190,11 +1198,11 @@ readregion(FILE * F, int encoding, short x, short y)
       }
       rsettrees(r, 2, i);
     }
-    i = ri(F); rsethorses(r, i);
+    i = store->r_int(store); rsethorses(r, i);
     assert(*pres==NULL);
     for (;;) {
       rawmaterial * res;
-      rss(F, token, sizeof(token));
+      store->r_str_buf(store, token, sizeof(token));
       if (strcmp(token, "end")==0) break;
       res = malloc(sizeof(rawmaterial));
       res->type = rmt_find(token);
@@ -1202,14 +1210,14 @@ readregion(FILE * F, int encoding, short x, short y)
         log_error(("invalid resourcetype %s in data.\n", token));
       }
       assert(res->type!=NULL);
-      res->level = ri(F);
-      res->amount = ri(F);
+      res->level = store->r_int(store);
+      res->amount = store->r_int(store);
       res->flags = 0;
 
-      if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
-        res->startlevel = ri(F);
-        res->base = ri(F);
-        res->divisor = ri(F);
+      if(store->version >= RANDOMIZED_RESOURCES_VERSION) {
+        res->startlevel = store->r_int(store);
+        res->base = store->r_int(store);
+        res->divisor = store->r_int(store);
       } else {
         int i;
         for (i=0;r->terrain->production[i].type;++i) {
@@ -1226,7 +1234,7 @@ readregion(FILE * F, int encoding, short x, short y)
     }
     *pres = NULL;
 
-    rss(F, token, sizeof(token));
+    store->r_str_buf(store, token, sizeof(token));
     if (strcmp(token, "noherb") != 0) {
       const resource_type * rtype = rt_find(token);
       assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
@@ -1234,9 +1242,9 @@ readregion(FILE * F, int encoding, short x, short y)
     } else {
       rsetherbtype(r, NULL);
     }
-    rsetherbs(r, (short)ri(F));
-    rsetpeasants(r, ri(F));
-    rsetmoney(r, ri(F));
+    rsetherbs(r, (short)store->r_int(store));
+    rsetpeasants(r, store->r_int(store));
+    rsetmoney(r, store->r_int(store));
   }
 
   assert(r->terrain!=NULL);
@@ -1247,77 +1255,75 @@ readregion(FILE * F, int encoding, short x, short y)
   if (r->land) {
     for (;;) {
       const struct item_type * itype;
-      rss(F, token, sizeof(token));
+      store->r_str_buf(store, token, sizeof(token));
       if (!strcmp(token, "end")) break;
       itype = it_find(token);
       assert(itype->rtype->ltype);
-      r_setdemand(r, itype->rtype->ltype, ri(F));
+      r_setdemand(r, itype->rtype->ltype, store->r_int(store));
     }
-    if (global.data_version>=REGIONITEMS_VERSION) {
-      read_items(F, &r->land->items);
+    if (store->version>=REGIONITEMS_VERSION) {
+      read_items(store, &r->land->items);
     }
   }
-  a_read(F, &r->attribs);
+  a_read(store, &r->attribs);
 
   return r;
 }
 
 void
-writeregion(FILE * F, const region * r)
+writeregion(struct storage * store, const region * r)
 {
-  wi(F, r->uid);
-  fwritestr(F, r->display?(const char *)r->display:"");
-  fputc(' ', F);
-  ws(F, r->terrain->_name);
-  wi(F, r->flags & RF_SAVEMASK);
-  wi(F, r->age);
-  wnl(F);
+  store->w_int(store, r->uid);
+  store->w_str(store, r->display?(const char *)r->display:"");
+  store->w_tok(store, r->terrain->_name);
+  store->w_int(store, r->flags & RF_SAVEMASK);
+  store->w_int(store, r->age);
+  store->w_brk(store);
   if (fval(r->terrain, LAND_REGION)) {
     const item_type *rht;
     struct demand * demand;
     rawmaterial * res = r->resources;
-    fwritestr(F, (const char *)r->land->name);
-    fputc(' ', F);
+    store->w_str(store, (const char *)r->land->name);
     assert(rtrees(r,0)>=0);
     assert(rtrees(r,1)>=0);
     assert(rtrees(r,2)>=0);
-    wi(F, rtrees(r,0));
-    wi(F, rtrees(r,1));
-    wi(F, rtrees(r,2));
-    wi(F, rhorses(r));
+    store->w_int(store, rtrees(r,0));
+    store->w_int(store, rtrees(r,1));
+    store->w_int(store, rtrees(r,2));
+    store->w_int(store, rhorses(r));
 
     while (res) {
-      ws(F, res->type->name);
-      wi(F, res->level);
-      wi(F, res->amount);
-      wi(F, res->startlevel);
-      wi(F, res->base);
-      wi(F, res->divisor);
+      store->w_tok(store, res->type->name);
+      store->w_int(store, res->level);
+      store->w_int(store, res->amount);
+      store->w_int(store, res->startlevel);
+      store->w_int(store, res->base);
+      store->w_int(store, res->divisor);
       res = res->next;
     }
-    fputs("end ", F);
+    store->w_tok(store, "end");
 
     rht = rherbtype(r);
     if (rht) {
-      ws(F, resourcename(rht->rtype, 0));
+      store->w_tok(store, resourcename(rht->rtype, 0));
     } else {
-      ws(F, "noherb");
+      store->w_tok(store, "noherb");
     }
-    wi(F, rherbs(r));
-    wi(F, rpeasants(r));
-    wi(F, rmoney(r));
+    store->w_int(store, rherbs(r));
+    store->w_int(store, rpeasants(r));
+    store->w_int(store, rmoney(r));
     if (r->land) for (demand=r->land->demands; demand; demand=demand->next) {
-      ws(F, resourcename(demand->type->itype->rtype, 0));
-      wi(F, demand->value);
+      store->w_tok(store, resourcename(demand->type->itype->rtype, 0));
+      store->w_int(store, demand->value);
     }
-    fputs("end \n", F);
+    store->w_tok(store, "end");
 #if RELEASE_VERSION>=REGIONITEMS_VERSION
-    write_items(F, r->land->items);
-    wnl(F);
+    write_items(store, r->land->items);
+    store->w_brk(store);
 #endif
   }
-  a_write(F, r->attribs);
-  wnl(F);
+  a_write(store, r->attribs);
+  store->w_brk(store);
 }
 
 static ally **
@@ -1352,13 +1358,13 @@ addally(const faction * f, ally ** sfp, int aid, int state)
  * faction may not already exist, however.
  */
 faction *
-readfaction(FILE * F, int encoding)
+readfaction(struct storage * store)
 {
   ally **sfp;
   int planes;
-  int i = rid(F);
+  int i = store->r_id(store);
   faction * f = findfaction(i);
-  char * email = NULL;
+  char email[128];
   char token[32];
 
   if (f==NULL) {
@@ -1368,11 +1374,11 @@ readfaction(FILE * F, int encoding)
     f->allies = NULL; /* mem leak */
     while (f->attribs) a_remove(&f->attribs, f->attribs);
   }
-  f->subscription = ri(F);
+  f->subscription = store->r_int(store);
 
   if (alliances!=NULL) {
-    int allianceid = rid(F);
-    if (allianceid!=0) f->alliance = findalliance(allianceid);
+    int allianceid = store->r_id(store);
+    if (allianceid>=0) f->alliance = findalliance(allianceid);
     if (f->alliance) {
       faction_list * flist = malloc(sizeof(faction_list));
       flist->data = f;
@@ -1381,67 +1387,67 @@ readfaction(FILE * F, int encoding)
     }
   }
 
-  xrds(F, &f->name, encoding);
-  xrds(F, &f->banner, encoding);
+  f->name = store->r_str(store);
+  f->banner = store->r_str(store);
 
-  if (quiet==0) log_stdio(stdout, "   - Lese Partei %s (%s)\n", f->name, factionid(f));
+  log_info((3, "   - Lese Partei %s (%s)\n", f->name, factionid(f)));
 
-  rds(F, &email);
+  store->r_str_buf(store, email, sizeof(email));
   if (set_email(&f->email, email)!=0) {
     log_warning(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
     set_email(&f->email, "");
   }
-  free(email);
-  rds(F, &f->passw);
-  if (global.data_version >= OVERRIDE_VERSION) {
-    rds(F, &f->override);
+
+  f->passw = store->r_str(store);
+  if (store->version >= OVERRIDE_VERSION) {
+    f->override = store->r_str(store);
   } else {
     f->override = strdup(itoa36(rng_int()));
   }
 
-  rss(F, token, sizeof(token));
+  store->r_str_buf(store, token, sizeof(token));
   f->locale = find_locale(token);
-  f->lastorders = ri(F);
-  f->age = ri(F);
-  if (global.data_version < NEWRACE_VERSION) {
-    race_t rc = (char) ri(F);
+  f->lastorders = store->r_int(store);
+  f->age = store->r_int(store);
+  if (store->version < NEWRACE_VERSION) {
+    race_t rc = (char) store->r_int(store);
     f->race = new_race[rc];
   } else {
-    rss(F, token, sizeof(token));
+    store->r_str_buf(store, token, sizeof(token));
     f->race = rc_find(token);
     assert(f->race);
   }
-  f->magiegebiet = (magic_t)ri(F);
+  f->magiegebiet = (magic_t)store->r_int(store);
 
 #if KARMA_MODULE
-  f->karma = ri(F);
+  f->karma = store->r_int(store);
 #else
   /* ignore karma */
-  ri(F);
+  store->r_int(store);
 #endif /* KARMA_MODULE */
 
-  f->flags = ri(F);
+  f->flags = store->r_int(store);
 
-  a_read(F, &f->attribs);
-  if (global.data_version>=CLAIM_VERSION) {
-    read_items(F, &f->items);
+  a_read(store, &f->attribs);
+  if (store->version>=CLAIM_VERSION) {
+    read_items(store, &f->items);
   }
   for (;;) {
     int level;
-    fscanf(F, "%s", token);
+    store->r_tok_buf(store, token, sizeof(token));
     if (strcmp("end", token)==0) break;
-    fscanf(F, "%d ", &level);
+    level = store->r_int(store);
   } 
-  planes = ri(F);
+  planes = store->r_int(store);
   while(--planes >= 0) {
-    int id = ri(F);
-    short ux = (short)ri(F);
-    short uy = (short)ri(F);
+    int id = store->r_int(store);
+    short ux = (short)store->r_int(store);
+    short uy = (short)store->r_int(store);
     set_ursprung(f, id, ux, uy);
   }
   f->newbies = 0;
   
-  i = f->options = ri(F);
+  i = f->options = store->r_int(store);
 
   if ((i & (want(O_REPORT)|want(O_COMPUTER)))==0 && f->no!=MONSTER_FACTION) {
     /* Kein Report eingestellt, Fehler */
@@ -1449,100 +1455,106 @@ readfaction(FILE * F, int encoding)
   }
 
   sfp = &f->allies;
-  if (global.data_version<ALLIANCES_VERSION) {
-    int p = ri(F);
+  if (store->version<ALLIANCES_VERSION) {
+    int p = store->r_int(store);
     while (--p >= 0) {
-      int aid = rid(F);
-      int state = ri(F);
+      int aid = store->r_id(store);
+      int state = store->r_int(store);
       sfp = addally(f, sfp, aid, state);
     }
   } else {
     for (;;) {
-      rs(F, token);
-      if (strcmp(token, "end")==0) break;
-      else {
-        int aid = atoi36(token);
-        int state = ri(F);
+      int aid = 0;
+      if (store->version<STORAGE_VERSION) {
+        store->r_tok_buf(store, token, sizeof(token));
+        if (strcmp(token, "end")!=0) {
+          aid = atoi36(token);
+        }
+      } else {
+        aid = store->r_id(store);
+      }
+      if (aid>0) {
+        int state = store->r_int(store);
         sfp = addally(f, sfp, aid, state);
+      } else {
+        break;
       }
     }
   }
-  read_groups(F, f);
+  read_groups(store, f);
 #ifdef ENEMIES
-  read_enemies(F, f);
+  read_enemies(store, f);
 #endif
   return f;
 }
 
 void
-writefaction(FILE * F, const faction * f)
+writefaction(struct storage * store, const faction * f)
 {
   ally *sf;
   ursprung *ur;
 
-  wi36(F, f->no);
-  wi(F, f->subscription);
+  write_faction_reference(f, store);
+  store->w_int(store, f->subscription);
   if (alliances!=NULL) {
-    if (f->alliance) wi36(F, f->alliance->id);
-    else wi36(F, 0);
+    if (f->alliance) store->w_id(store, f->alliance->id);
+    else store->w_id(store, -1);
   }
 
-  fwritestr(F, (const char *)f->name);
-  fputc(' ', F);
-  fwritestr(F, (const char *)f->banner);
-  fputc(' ', F);
-  ws(F, f->email);
-  ws(F, (const char *)f->passw);
-  ws(F, (const char *)f->override);
-  ws(F, locale_name(f->locale));
-  wi(F, f->lastorders);
-  wi(F, f->age);
-  ws(F, f->race->_name[0]);
-  wnl(F);
-  wi(F, f->magiegebiet);
+  store->w_str(store, (const char *)f->name);
+  store->w_str(store, (const char *)f->banner);
+  store->w_str(store, f->email);
+  store->w_tok(store, (const char *)f->passw);
+  store->w_tok(store, (const char *)f->override);
+  store->w_tok(store, locale_name(f->locale));
+  store->w_int(store, f->lastorders);
+  store->w_int(store, f->age);
+  store->w_tok(store, f->race->_name[0]);
+  store->w_brk(store);
+  store->w_int(store, f->magiegebiet);
 #if KARMA_MODULE
-  wi(F, f->karma);
+  store->w_int(store, f->karma);
 #else
-  wi(F, 0);
+  store->w_int(store, 0);
 #endif /* KARMA_MODULE */
 
-  wi(F, f->flags&FFL_SAVEMASK);
-  a_write(F, f->attribs);
-  wnl(F);
+  store->w_int(store, f->flags&FFL_SAVEMASK);
+  a_write(store, f->attribs);
+  store->w_brk(store);
 #if RELEASE_VERSION>=CLAIM_VERSION
-  write_items(F, f->items);
-  wnl(F);
+  write_items(store, f->items);
+  store->w_brk(store);
 #endif
-  fputs("end ", F);
-  wnl(F);
-  wi(F, listlen(f->ursprung));
+  store->w_tok(store, "end");
+  store->w_brk(store);
+  store->w_int(store, listlen(f->ursprung));
   for(ur = f->ursprung;ur;ur=ur->next) {
-    wi(F, ur->id);
-    wi(F, ur->x);
-    wi(F, ur->y);
+    store->w_int(store, ur->id);
+    store->w_int(store, ur->x);
+    store->w_int(store, ur->y);
   }
-  wnl(F);
-  wi(F, f->options & ~want(O_DEBUG));
-  wnl(F);
+  store->w_brk(store);
+  store->w_int(store, f->options & ~want(O_DEBUG));
+  store->w_brk(store);
 
   for (sf = f->allies; sf; sf = sf->next) {
     int no = (sf->faction!=NULL)?sf->faction->no:0;
     int status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
     if (status!=0) {
-      wi36(F, no);
-      wi(F, sf->status);
+      store->w_id(store, no);
+      store->w_int(store, sf->status);
     }
   }
-  fprintf(F, "end ");
-  wnl(F);
-  write_groups(F, f->groups);
+  store->w_id(store, -1);
+  store->w_brk(store);
+  write_groups(store, f->groups);
 #ifdef ENEMIES
-  write_enemies(F, f->enemies);
+  write_enemies(store, f->enemies);
 #endif
 }
 
 int
-readgame(const char * filename, int backup)
+readgame(const char * filename, int mode, int backup)
 {
   int i, n, p;
   faction *f, **fp;
@@ -1550,47 +1562,31 @@ readgame(const char * filename, int backup)
   building *b, **bp;
   ship **shp;
   unit *u;
-  FILE * F;
   int rmax = maxregions;
   char path[MAX_PATH];
   char token[32];
-  int encoding = enc_gamedata;
   const struct building_type * bt_lighthouse = bt_find("lighthouse");
+  storage my_store = (mode==IO_BINARY)?binary_store:text_store;
+  storage * store = &my_store;
 
   sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
   if (backup) create_backup(path);
-  F = cfopen(path, "r");
-  if (F==NULL) {
-    log_error(("Keine Spieldaten gefunden.\n"));
+
+  store->encoding = enc_gamedata;
+  if (store->open(store, path, IO_READ)!=0) {
     return -1;
   }
+  enc_gamedata = store->encoding;
 
-  /* recognize UTF8 BOM */
-  rss(F, token, sizeof(token));
-  if (memcmp(token, utf8_bom, 3)==0) {
-    if (enc_gamedata!=XML_CHAR_ENCODING_UTF8) {
-      encoding = XML_CHAR_ENCODING_UTF8;
-    }
-    log_warning(("Found UTF-8 BOM, assuming unicode gamedata.\n"));
-    global.data_version = atoi(token+3);
-  } else {
-    if (encoding==XML_CHAR_ENCODING_NONE) {
-      encoding=XML_CHAR_ENCODING_8859_1;
-      log_warning(("No BOM, assuming 8859-1 gamedata.\n"));
-    }
-    global.data_version = atoi(token);
-  }
-  enc_gamedata = encoding;
-
-  assert(global.data_version>=MIN_VERSION || !"unsupported data format");
-  assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
-  assert(global.data_version >= GROWTREE_VERSION);
-  if(global.data_version >= SAVEXMLNAME_VERSION) {
+  assert(store->version>=MIN_VERSION || !"unsupported data format");
+  assert(store->version<=RELEASE_VERSION || !"unsupported data format");
+  assert(store->version >= GROWTREE_VERSION);
+  if(store->version >= SAVEXMLNAME_VERSION) {
     char basefile[1024];
     const char *basearg = "(null)";
 
-    rs(F, basefile);
+    store->r_str_buf(store, basefile, sizeof(basefile));
     assert(xmlfile != NULL);
     basearg = strrchr(xmlfile, '/');
     if (basearg==NULL) {
@@ -1604,53 +1600,51 @@ readgame(const char * filename, int backup)
       getchar();
     }
   }
-  a_read(F, &global.attribs);
-  global.data_turn = turn = ri(F);
-  ri(F); /* max_unique_id = */ 
-  nextborder = ri(F);
+  a_read(store, &global.attribs);
+  global.data_turn = turn = store->r_int(store);
+  store->r_int(store); /* max_unique_id = */ 
+  nextborder = store->r_int(store);
 
   /* Planes */
   planes = NULL;
-  n = ri(F);
+  n = store->r_int(store);
   while(--n >= 0) {
     plane *pl = calloc(1, sizeof(plane));
-    pl->id = ri(F);
-    xrds(F, &pl->name, encoding);
-    pl->minx = (short)ri(F);
-    pl->maxx = (short)ri(F);
-    pl->miny = (short)ri(F);
-    pl->maxy = (short)ri(F);
-    pl->flags = ri(F);
-    if (global.data_version>WATCHERS_VERSION) {
-      rss(F, token, sizeof(token));
+    pl->id = store->r_int(store);
+    pl->name = store->r_str(store);
+    pl->minx = (short)store->r_int(store);
+    pl->maxx = (short)store->r_int(store);
+    pl->miny = (short)store->r_int(store);
+    pl->maxy = (short)store->r_int(store);
+    pl->flags = store->r_int(store);
+    if (store->version>WATCHERS_VERSION) {
+      store->r_str_buf(store, token, sizeof(token));
       while (strcmp(token, "end")!=0) {
         watcher * w = calloc(sizeof(watcher),1);
         variant fno;
         fno.i = atoi36(token);
-        w->mode = (unsigned char)ri(F);
+        w->mode = (unsigned char)store->r_int(store);
         w->next = pl->watchers;
         pl->watchers = w;
         ur_add(fno, (void**)&w->faction, resolve_faction);
-        rss(F, token, sizeof(token));
+        store->r_str_buf(store, token, sizeof(token));
       }
     }
-    a_read(F, &pl->attribs);
+    a_read(store, &pl->attribs);
     addlist(&planes, pl);
   }
 
   /* Read factions */
-  if (global.data_version>=ALLIANCES_VERSION) {
-    read_alliances(F);
+  if (store->version>=ALLIANCES_VERSION) {
+    read_alliances(store);
   }
-  n = ri(F);
-  if (quiet<2) log_printf(" - Einzulesende Parteien: %d\n", n);
+  n = store->r_int(store);
+  log_info((1, " - Einzulesende Parteien: %d\n", n));
   fp = &factions;
   while (*fp) fp=&(*fp)->next;
 
-  /* fflush (stdout); */
-
   while (--n >= 0) {
-    faction * f = readfaction(F, encoding);
+    faction * f = readfaction(store);
 
     *fp = f;
     fp = &f->next;
@@ -1659,132 +1653,102 @@ readgame(const char * filename, int backup)
   *fp = 0;
 
   /* Benutzte Faction-Ids */
-
-  i = ri(F);
-  while (i--) {
-    ri(F); /* used faction ids. ignore. */
+  if (store->version<STORAGE_VERSION) {
+    i = store->r_int(store);
+    while (i--) {
+      store->r_int(store); /* used faction ids. ignore. */
+    }
   }
 
   /* Regionen */
 
-  n = ri(F);
+  n = store->r_int(store);
   assert(n<MAXREGIONS);
   if (rmax<0) rmax = n;
-  if (quiet<2) printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
-  if (loadplane || dirtyload || firstx || firsty || maxregions>=0) {
-    incomplete_data = true;
-  }
+  log_info((1, " - Einzulesende Regionen: %d/%d\r", rmax, n));
   while (--n >= 0) {
     unit **up;
-    boolean skip = false;
-    short x = (short)ri(F);
-    short y = (short)ri(F);
-    plane * pl = findplane(x, y);
+    short x = (short)store->r_int(store);
+    short y = (short)store->r_int(store);
 
-    if (firstx || firsty) {
-      if (x!=firstx || y!=firsty) {
-        skip = true;
-      } else {
-        firstx=0;
-        firsty=0;
-        if (rmax>0) rmax = min(n, rmax)-1;
-      }
-    }
-    if (loadplane && (!pl || pl->id!=loadplane)) skip = true;
-    if (rmax==0) {
-      if (dirtyload) break;
-      skip = true;
-    }
-    if (quiet<2 && (n & 0x3FF) == 0) {  /* das spart extrem Zeit */
-      printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
-      printf("* %d,%d    \r", x, y);
-    }
-    if (skip) {
-      char * r;
-#define SKIPSIZE 4096
-      char buffer[SKIPSIZE];
-      buffer[SKIPSIZE-1] = '@';
-      do {
-        r = fgets(buffer, sizeof(buffer), F); /* skip region */
-        if (r && buffer[SKIPSIZE-1]!='@') {
-          while (r && buffer[SKIPSIZE-1]!='@') {
-            /* our buffer was not big enough */
-            buffer[SKIPSIZE-1] = '@';
-            r = fgets(buffer, sizeof(buffer), F);
-          }
-          if (r) continue;
-        }
-      } while (r && buffer[0]!='\n');
-      continue;
+    if ((n & 0x3FF) == 0) {  /* das spart extrem Zeit */
+      log_info((2, " - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, n, x, y));
     }
     --rmax;
 
-    r = readregion(F, encoding, x, y);
+    r = readregion(store, x, y);
 
     /* Burgen */
-    p = ri(F);
+    p = store->r_int(store);
     bp = &r->buildings;
 
     while (--p >= 0) {
 
       b = (building *) calloc(1, sizeof(building));
-      b->no = rid(F);
+      b->no = store->r_id(store);
       *bp = b;
       bp = &b->next;
       bhash(b);
-      xrds(F, &b->name, encoding);
-      if (lomem) rds(F, 0);
-      else xrds(F, &b->display, encoding);
-      b->size = ri(F);
-      rss(F, token, sizeof(token));
+      b->name = store->r_str(store);
+      if (lomem) {
+        store->r_str_buf(store, NULL, 0);
+      }
+      else {
+        b->display = store->r_str(store);
+      }
+      b->size = store->r_int(store);
+      store->r_str_buf(store, token, sizeof(token));
       b->type = bt_find(token);
       b->region = r;
-      a_read(F, &b->attribs);
+      a_read(store, &b->attribs);
       if (b->type==bt_lighthouse) {
         r->flags |= RF_LIGHTHOUSE;
       }
     }
     /* Schiffe */
 
-    p = ri(F);
+    p = store->r_int(store);
     shp = &r->ships;
 
     while (--p >= 0) {
       ship * sh = (ship *) calloc(1, sizeof(ship));
       sh->region = r;
-      sh->no = rid(F);
+      sh->no = store->r_id(store);
       *shp = sh;
       shp = &sh->next;
       shash(sh);
-      xrds(F, &sh->name, encoding);
-      if (lomem) rds(F, NULL);
-      else xrds(F, &sh->display, encoding);
-
-      rss(F, token, sizeof(token));
+      sh->name = store->r_str(store);
+      if (lomem) {
+        store->r_str_buf(store, NULL, 0);
+      }
+      else {
+        sh->display = store->r_str(store);
+      }
+      store->r_str_buf(store, token, sizeof(token));
       sh->type = st_find(token);
       if (sh->type==NULL) {
         /* old datafiles */
         sh->type = st_find((const char *)locale_string(default_locale, token));
       }
       assert(sh->type || !"ship_type not registered!");
-      sh->size = ri(F);
-      sh->damage = ri(F);
+      sh->size = store->r_int(store);
+      sh->damage = store->r_int(store);
 
       /* Attribute rekursiv einlesen */
 
-      sh->coast = (direction_t)ri(F);
-      a_read(F, &sh->attribs);
+      sh->coast = (direction_t)store->r_int(store);
+      a_read(store, &sh->attribs);
     }
 
     *shp = 0;
 
     /* Einheiten */
 
-    p = ri(F);
+    p = store->r_int(store);
     up = &r->units;
 
     while (--p >= 0) {
-      unit * u = readunit(F, encoding);
+      unit * u = readunit(store);
       sc_mage * mage;
 
       assert(u->region==NULL);
@@ -1801,15 +1765,13 @@ readgame(const char * filename, int backup)
       }
     }
   }
-  if (quiet<2) printf("\n");
-  if (!dirtyload) {
-    read_borders(F);
-  }
+  log_info((1, "\n"));
+  read_borders(store);
 
-  fclose(F);
+  store->close(store);
 
   /* Unaufgeloeste Zeiger initialisieren */
-  if (quiet<2) printf("\n - Referenzen initialisieren...\n");
+  log_info((1, "\n - Referenzen initialisieren...\n"));
   resolve();
 
   for (r=regions;r;r=r->next) {
@@ -1818,7 +1780,7 @@ readgame(const char * filename, int backup)
       for (b=r->buildings;b;b=b->next) update_lighthouse(b);
     }
   }
-  if (quiet < 2) printf(" - Regionen initialisieren & verbinden...\n");
+  log_info((1, " - Regionen initialisieren & verbinden...\n"));
   for (f = factions; f; f = f->next) {
     for (u = f->units; u; u = u->nextF) {
       if (u->number>0) {
@@ -1835,9 +1797,8 @@ readgame(const char * filename, int backup)
   }
   return 0;
 }
-
 int
-writegame(const char *filename, int quiet)
+writegame(const char *filename, int mode)
 {
   char *base;
   int n;
@@ -1847,8 +1808,9 @@ writegame(const char *filename, int quiet)
   ship *sh;
   unit *u;
   plane *pl;
-  FILE * F;
   char path[MAX_PATH];
+  storage my_store = (mode==IO_BINARY)?binary_store:text_store;
+  storage * store = &my_store;
 
   sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
@@ -1857,229 +1819,215 @@ writegame(const char *filename, int quiet)
     unlink(path);
   }
 #endif
-  F = cfopen(path, "w");
-  if (F==NULL) {
+
+  store->encoding = enc_gamedata;
+  if (store->open(store, path, IO_WRITE)!=0) {
     return -1;
-  } else {
-    fwrite(utf8_bom, 1, 3, F);
   }
-  if (!quiet)
-    printf("Schreibe die %d. Runde...\n", turn);
 
   /* globale Variablen */
 
-  wi(F, RELEASE_VERSION);
-  wnl(F);
-
   base = strrchr(xmlfile, '/');
   if (base) {
-    ws(F, base+1);
+    store->w_str(store, base+1);
   } else {
-    ws(F, xmlfile);
+    store->w_str(store, xmlfile);
   }
-  wnl(F);
+  store->w_brk(store);
 
-  a_write(F, global.attribs);
-  wnl(F);
+  a_write(store, global.attribs);
+  store->w_brk(store);
 
-  wi(F, turn);
-  wi(F, 0/*max_unique_id*/);
-  wi(F, nextborder);
+  store->w_int(store, turn);
+  store->w_int(store, 0/*max_unique_id*/);
+  store->w_int(store, nextborder);
 
   /* Write planes */
-  wnl(F);
-  wi(F, listlen(planes));
-  wnl(F);
+  store->w_brk(store);
+  store->w_int(store, listlen(planes));
+  store->w_brk(store);
 
   for(pl = planes; pl; pl=pl->next) {
     watcher * w;
-    wi(F, pl->id);
-    fwritestr(F, pl->name);
-    fputc(' ', F);
-    wi(F, pl->minx);
-    wi(F, pl->maxx);
-    wi(F, pl->miny);
-    wi(F, pl->maxy);
-    wi(F, pl->flags);
+    store->w_int(store, pl->id);
+    store->w_str(store, pl->name);
+    store->w_int(store, pl->minx);
+    store->w_int(store, pl->maxx);
+    store->w_int(store, pl->miny);
+    store->w_int(store, pl->maxy);
+    store->w_int(store, pl->flags);
     w = pl->watchers;
     while (w) {
       if (w->faction) {
-        wi36(F, w->faction->no);
-        wi(F, w->mode);
+        write_faction_reference(w->faction, store);
+        store->w_int(store, w->mode);
       }
       w = w->next;
     }
-    fputs("end ", F);
-    a_write(F, pl->attribs);
-    wnl(F);
+    store->w_tok(store, "end");
+    a_write(store, pl->attribs);
+    store->w_brk(store);
   }
 
 
   /* Write factions */
 #if RELEASE_VERSION>=ALLIANCES_VERSION
-  write_alliances(F);
+  write_alliances(store);
 #endif
   n = listlen(factions);
-  wi(F, n);
-  wnl(F);
+  store->w_int(store, n);
+  store->w_brk(store);
 
-  if (quiet < 2) printf(" - Schreibe %d Parteien...\n",n);
+  log_info((1, " - Schreibe %d Parteien...\n", n));
   for (f = factions; f; f = f->next) {
-    writefaction(F, f);
+    writefaction(store, f);
+    store->w_brk(store);
   }
-
-  wi(F, 0); /* used faction ids. old stuff */
-  wnl(F);
 
   /* Write regions */
 
   n=listlen(regions);
-  wi(F, n);
-  wnl(F);
-  if (quiet<2) printf(" - Schreibe Regionen: %d  \r", n);
+  store->w_int(store, n);
+  store->w_brk(store);
+  log_info((1, " - Schreibe Regionen: %d  \r", n));
 
   for (r = regions; r; r = r->next, --n) {
     /* plus leerzeile */
-    if (quiet<2 && (n%1024)==0) {  /* das spart extrem Zeit */
-      printf(" - Schreibe Regionen: %d  \r", n);
+    if ((n%1024)==0) {  /* das spart extrem Zeit */
+      log_info((2, " - Schreibe Regionen: %d  \r", n));
       fflush(stdout);
     }
-    wnl(F);
-    wi(F, r->x);
-    wi(F, r->y);
-    writeregion(F, r);
+    store->w_brk(store);
+    store->w_int(store, r->x);
+    store->w_int(store, r->y);
+    writeregion(store, r);
 
-    wi(F, listlen(r->buildings));
-    wnl(F);
+    store->w_int(store, listlen(r->buildings));
+    store->w_brk(store);
     for (b = r->buildings; b; b = b->next) {
-      wi36(F, b->no);
-      fwritestr(F, b->name);
-      fputc(' ', F);
-      fwritestr(F, b->display?b->display:"");
-      fputc(' ', F);
-      wi(F, b->size);
-      ws(F, b->type->_name);
-      wnl(F);
-      a_write(F, b->attribs);
-      wnl(F);
+      write_building_reference(b, store);
+      store->w_str(store, b->name);
+      store->w_str(store, b->display?b->display:"");
+      store->w_int(store, b->size);
+      store->w_tok(store, b->type->_name);
+      store->w_brk(store);
+      a_write(store, b->attribs);
+      store->w_brk(store);
     }
 
-    wi(F, listlen(r->ships));
-    wnl(F);
+    store->w_int(store, listlen(r->ships));
+    store->w_brk(store);
     for (sh = r->ships; sh; sh = sh->next) {
       assert(sh->region == r);
-      wi36(F, sh->no);
-      fwritestr(F, (const char *)sh->name);
-      fputc(' ', F);
-      fwritestr(F, sh->display?(const char *)sh->display:"");
-      fputc(' ', F);
-      ws(F, sh->type->name[0]);
-      wi(F, sh->size);
-      wi(F, sh->damage);
-      wi(F, sh->coast);
-      wnl(F);
-      a_write(F, sh->attribs);
-      wnl(F);
+      write_ship_reference(sh, store);
+      store->w_str(store, (const char *)sh->name);
+      store->w_str(store, sh->display?(const char *)sh->display:"");
+      store->w_tok(store, sh->type->name[0]);
+      store->w_int(store, sh->size);
+      store->w_int(store, sh->damage);
+      store->w_int(store, sh->coast);
+      store->w_brk(store);
+      a_write(store, sh->attribs);
+      store->w_brk(store);
     }
 
-    wi(F, listlen(r->units));
-    wnl(F);
+    store->w_int(store, listlen(r->units));
+    store->w_brk(store);
     for (u = r->units; u; u = u->next) {
-      writeunit(F, u);
+      writeunit(store, u);
     }
   }
-  wnl(F);
-  write_borders(F);
-  wnl(F);
-  fclose(F);
-  if (quiet<2) printf("\nOk.\n");
+  store->w_brk(store);
+  write_borders(store);
+  store->w_brk(store);
+  
+  store->close(store);
+
+  log_info((1, "\nOk.\n"));
   return 0;
 }
 
 int
-a_readint(attrib * a, FILE * f)
+a_readint(attrib * a, struct storage * store)
 {
   /*  assert(sizeof(int)==sizeof(a->data)); */
-  fscanf(f, "%d", &a->data.i);
+  a->data.i = store->r_int(store);
   return AT_READ_OK;
 }
 
 void
-a_writeint(const attrib * a, FILE * f)
+a_writeint(const attrib * a, struct storage * store)
 {
-  fprintf(f, "%d ", a->data.i);
+  store->w_int(store, a->data.i);
 }
 
 int
-a_readshorts(attrib * a, FILE * f)
+a_readshorts(attrib * a, struct storage * store)
 {
-  if (global.data_version<ATTRIBREAD_VERSION) {
-    return a_readint(a, f);
+  if (store->version<ATTRIBREAD_VERSION) {
+    return a_readint(a, store);
   }
-  fscanf(f, "%hd %hd", &a->data.sa[0], &a->data.sa[1]);
+  a->data.sa[0] = (short)store->r_int(store);
+  a->data.sa[1] = (short)store->r_int(store);
   return AT_READ_OK;
 }
 
 void
-a_writeshorts(const attrib * a, FILE * f)
+a_writeshorts(const attrib * a, struct storage * store)
 {
-  fprintf(f, "%hd %hd ", a->data.sa[0], a->data.sa[1]);
+  store->w_int(store, a->data.sa[0]);
+  store->w_int(store, a->data.sa[1]);
 }
 
 int
-a_readchars(attrib * a, FILE * f)
+a_readchars(attrib * a, struct storage * store)
 {
   int i;
-  if (global.data_version<ATTRIBREAD_VERSION) {
-    return a_readint(a, f);
+  if (store->version<ATTRIBREAD_VERSION) {
+    return a_readint(a, store);
   }
   for (i=0;i!=4;++i) {
-    int c;
-    fscanf(f, "%d", &c);
-    a->data.ca[i] = (char)c;
+    a->data.ca[i] = (char)store->r_int(store);
   }
   return AT_READ_OK;
 }
 
 void
-a_writechars(const attrib * a, FILE * f)
+a_writechars(const attrib * a, struct storage * store)
 {
   int i;
   
   for (i=0;i!=4;++i) {
-    int c = a->data.ca[i];
-    fprintf(f, "%d ", c);
+    store->w_int(store, a->data.ca[i]);
   }
 }
 
 int
-a_readvoid(attrib * a, FILE * f)
+a_readvoid(attrib * a, struct storage * store)
 {
-  if (global.data_version<ATTRIBREAD_VERSION) {
-    return a_readint(a, f);
+  if (store->version<ATTRIBREAD_VERSION) {
+    return a_readint(a, store);
   }
   return AT_READ_OK;
 }
 
 void
-a_writevoid(const attrib * a, FILE * f)
+a_writevoid(const attrib * a, struct storage * store)
 {
 }
 
 int
-a_readstring(attrib * a, FILE * F)
+a_readstring(attrib * a, struct storage * store)
 {
-  char zText[4096];
-  freadstr(F, enc_gamedata, zText, sizeof(zText));
-  a->data.v = strdup(zText);
+  a->data.v = store->r_str(store);
   return AT_READ_OK;
 }
 
 void
-a_writestring(const attrib * a, FILE * f)
+a_writestring(const attrib * a, struct storage * store)
 {
   assert(a->data.v);
-  fprintf(f, "\"%s\" ", (char*)a->data.v);
+  store->w_str(store, (const char *)a->data.v);
 }
 
 void

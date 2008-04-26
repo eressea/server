@@ -188,8 +188,8 @@ extern void distribute_items(struct unit * u);
 
 /* see resolve.h */
 extern void * resolve_unit(variant data);
-extern void write_unit_reference(const struct unit * u, FILE * F);
-extern int read_unit_reference(unit ** up, FILE * F);
+extern void write_unit_reference(const struct unit * u, struct storage * store);
+extern int read_unit_reference(unit ** up, struct storage * store);
 
 extern void leave(struct region * r, struct unit * u);
 extern void leave_ship(unit * u);

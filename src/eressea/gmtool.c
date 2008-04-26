@@ -730,7 +730,7 @@ handlekey(state * st, int c)
       if (strlen(datafile)>0) {
         create_backup(datafile);
         remove_empty_units();
-        writegame(datafile, quiet);
+        writegame(datafile, IO_TEXT);
         st->modified = 0;
       }
     }

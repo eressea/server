@@ -26,6 +26,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/base36.h>
 
 /* ansi includes */
@@ -81,39 +82,44 @@ createcurse_handle(trigger * t, void * data)
 }
 
 static void
-createcurse_write(const trigger * t, FILE * F)
+createcurse_write(const trigger * t, struct storage * store)
 {
-	createcurse_data * td = (createcurse_data*)t->data.v;
-	fprintf(F, "%s ", itoa36(td->mage->no));
-	fprintf(F, "%s ", itoa36(td->target->no));
-	fprintf(F, "%s %lf %d %d %d ", td->type->cname, td->vigour, td->duration, td->effect, td->men);
+  createcurse_data * td = (createcurse_data*)t->data.v;
+  write_unit_reference(td->mage, store);
+  write_unit_reference(td->target, store);
+  store->w_tok(store, td->type->cname);
+  store->w_flt(store, (float)td->vigour);
+  store->w_int(store, td->duration);
+  store->w_int(store, td->effect);
+  store->w_int(store, td->men);
 }
 
 static int
-createcurse_read(trigger * t, FILE * F)
+createcurse_read(trigger * t, struct storage * store)
 {
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	char zText[128];
-	variant var;
 
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	td->mage = findunit(var.i);
-	if (td->mage==NULL) ur_add(var, (void**)&td->mage, resolve_unit);
+    read_unit_reference(&td->mage, store);
+    read_unit_reference(&td->target, store);
 
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	td->target = findunit(var.i);
-	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
-
-	if (global.data_version<CURSETYPE_VERSION) {
+	if (store->version<CURSETYPE_VERSION) {
 		int id1, id2;
-		fscanf(F, "%d %d %lf %d %d %d ", &id1, &id2, &td->vigour, &td->duration, &td->effect, &td->men);
-		assert(id2==0);
-		td->type = ct_find(oldcursename(id1));
+        id1 = store->r_int(store);
+        id2 = store->r_int(store);
+        assert(id2==0);
+        td->vigour = store->r_flt(store);
+        td->duration = store->r_int(store);
+        td->effect = store->r_int(store);
+        td->men = store->r_int(store);
+        td->type = ct_find(oldcursename(id1));
 	} else {
-		fscanf(F, "%s %lf %d %d %d ", zText, &td->vigour, &td->duration, &td->effect, &td->men);
-		td->type = ct_find(zText);
+      store->r_tok_buf(store, zText, sizeof(zText));
+      td->type = ct_find(zText);
+      td->vigour = store->r_flt(store);
+      td->duration = store->r_int(store);
+      td->effect = store->r_int(store);
+      td->men = store->r_int(store);
 	}
 	return AT_READ_OK;
 }

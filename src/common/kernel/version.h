@@ -28,6 +28,7 @@
  * 193: curse bekommen id aus struct unit-nummernraum
  */
 
+#define HEX_VERSION 81
 #define GROWTREE_VERSION 305
 #define RANDOMIZED_RESOURCES_VERSION 306 /* should be the same, but doesn't work */
 #define NEWRACE_VERSION 307
@@ -51,7 +52,8 @@
 #define ATTRIBREAD_VERSION 324 /* remove a_readint */
 #define CURSEFLAGS_VERSION 325 /* remove a_readint */
 #define UNICODE_VERSION 326 /* everything is stored as UTF8 */
-#define UID_VERSION 327 /* everything is stored as UTF8 */
+#define UID_VERSION 327 /* regions have a unique id */
+#define STORAGE_VERSION 328 /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION UID_VERSION /* current datafile */
+#define RELEASE_VERSION STORAGE_VERSION /* current datafile */

@@ -90,7 +90,6 @@
 #undef XMAS2002
 
 extern void reorder_owners(struct region * r);
-extern int incomplete_data;
 
 static int
 curse_emptiness(void)
@@ -717,7 +716,6 @@ fix_road_borders(void)
   int hash;
   int i = 0;
 
-  if (incomplete_data) return;
   for (hash=0; hash<BMAXHASH && i!=MAXDEL; hash++) {
     border * blist;
     for (blist=borders[hash];blist && i!=MAXDEL;blist=blist->nexthash) {

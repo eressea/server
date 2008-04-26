@@ -21,6 +21,7 @@
 
 #include <util/attrib.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/variant.h>
 
 static int
@@ -33,9 +34,9 @@ verify_follow(attrib * a)
 }
 
 static int
-read_follow(attrib * a, FILE * F)
+read_follow(attrib * a, struct storage * store)
 {
-	return read_unit_reference(NULL, F);
+	return read_unit_reference(NULL, store);
 }
 
 attrib_type at_follow = {

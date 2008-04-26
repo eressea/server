@@ -50,6 +50,7 @@
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -247,17 +248,19 @@ register_special_direction(const char * name)
 }
 
 static int
-a_readdirection(attrib *a, FILE *f)
+a_readdirection(attrib *a, storage * store)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
 
-  fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
-  if (global.data_version<UNICODE_VERSION) {
+  d->x = (short)store->r_int(store);
+  d->y = (short)store->r_int(store);
+  d->duration = store->r_int(store);
+  if (store->version<UNICODE_VERSION) {
     char lbuf[16];
     dir_lookup * dl = dir_name_lookup;
 
-    fscanf(f, "%*s ");
-    fscanf(f, "%s ", lbuf);
+    store->r_tok_buf(store, NULL, 0);
+    store->r_tok_buf(store, lbuf, sizeof(lbuf));
     
     cstring_i(lbuf);
     for (;dl;dl=dl->next) {
@@ -274,23 +277,23 @@ a_readdirection(attrib *a, FILE *f)
     }
   }
   else {
-    char lbuf[16];
-    fscanf(f, "%15s ", lbuf);
-    d->desc = strdup(lbuf);
-    fscanf(f, "%15s ", lbuf);
-    d->keyword = strdup(lbuf);
+    d->desc = store->r_tok(store);
+    d->keyword = store->r_tok(store);
   }
   d->active = true;
   return AT_READ_OK;
 }
 
 static void
-a_writedirection(const attrib *a, FILE *f)
+a_writedirection(const attrib *a, storage * store)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
 
-  fprintf(f, "%d %d %d %s %s ", d->x, d->y, d->duration,
-          d->desc, d->keyword);
+  store->w_int(store, d->x);
+  store->w_int(store, d->y);
+  store->w_int(store, d->duration);
+  store->w_tok(store, d->desc);
+  store->w_tok(store, d->keyword);
 }
 
 attrib_type at_direction = {
@@ -358,21 +361,21 @@ a_initmoveblock(attrib *a)
 }
 
 int
-a_readmoveblock(attrib *a, FILE *f)
+a_readmoveblock(attrib *a, storage * store)
 {
   moveblock *m = (moveblock *)(a->data.v);
   int       i;
 
-  fscanf(f, "%d", &i);
+  i = store->r_int(store);
   m->dir = (direction_t)i;
   return AT_READ_OK;
 }
 
 void
-a_writemoveblock(const attrib *a, FILE *f)
+a_writemoveblock(const attrib *a, storage * store)
 {
   moveblock *m = (moveblock *)(a->data.v);
-  fprintf(f, "%d ", (int)m->dir);
+  store->w_int(store, (int)m->dir);
 }
 
 attrib_type at_moveblock = {
@@ -1157,10 +1160,11 @@ production(const region *r)
 }
 
 int
-read_region_reference(region ** r, FILE * F)
+read_region_reference(region ** r, struct storage * store)
 {
   variant coor;
-  fscanf(F, "%hd %hd", &coor.sa[0], &coor.sa[1]);
+  coor.sa[0] = (short)store->r_int(store);
+  coor.sa[1] = (short)store->r_int(store);
   if (coor.sa[0]==SHRT_MAX) {
     *r = NULL;
     return AT_READ_FAIL;
@@ -1174,10 +1178,16 @@ read_region_reference(region ** r, FILE * F)
 }
 
 void
-write_region_reference(const region * r, FILE * F)
+write_region_reference(const region * r, struct storage * store)
 {
-  if (r) fprintf(F, "%d %d ", r->x, r->y);
-  else fprintf(F, "%d %d ", SHRT_MAX, SHRT_MAX);
+  if (r) {
+    store->w_int(store, r->x);
+    store->w_int(store, r->y);
+  }
+  else {
+    store->w_int(store, SHRT_MAX);
+    store->w_int(store, SHRT_MAX);
+  }
 }
 
 void *

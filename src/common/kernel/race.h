@@ -171,8 +171,8 @@ extern boolean r_insectstalled(const struct region *r);
 extern void add_raceprefix(const char *);
 extern char ** race_prefixes;
 
-extern void write_race_reference(const struct race * rc, FILE * F);
-extern int read_race_reference(const struct race ** rp, FILE * F);
+extern void write_race_reference(const struct race * rc, struct storage * store);
+extern int read_race_reference(const struct race ** rp, struct storage * store);
 
 extern const char * raceprefix(const struct unit *u);
 

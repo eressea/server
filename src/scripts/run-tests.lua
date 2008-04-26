@@ -10,4 +10,14 @@ function test_locales()
 end
 
 test_locales()
+
+local now = os.clock()
+--read_game("566", "text")
+--write_game("566.dat", "binary")
+read_game("566.dat", "binary")
+local elapsed = os.clock() - now
+-- text: 51.203
+-- binary: 20.859
+print(elapsed)
+
 io.stdin:read("*line")

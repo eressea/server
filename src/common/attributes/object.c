@@ -26,6 +26,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/storage.h>
 
 /* stdc includes */
 #include <string.h>
@@ -46,36 +47,37 @@ typedef struct object_data {
 } object_data;
 
 static void
-object_write(const attrib *a, FILE *F)
+object_write(const attrib *a, struct storage * store)
 {
   const object_data * data = (object_data *)a->data.v;
   int type = (int)data->type;
-  fprintf(F, "%s %d ", data->name, type);
+  store->w_tok(store, data->name);
+  store->w_int(store, type);
   switch (data->type) {
     case TINTEGER:
-      fprintf(F, "%d ", data->data.i);
+      store->w_int(store, data->data.i);
       break;
     case TREAL:
-      fprintf(F, "%lf ", data->data.real);
+      store->w_flt(store, (float)data->data.real);
       break;
     case TSTRING:
-      fwritestr(F, data->data.str);
+      store->w_str(store, data->data.str);
       break;
     case TUNIT:
-      write_unit_reference(data->data.u, F);
+      write_unit_reference(data->data.u, store );
       break;
     case TFACTION:
-      write_faction_reference(data->data.f, F);
+      write_faction_reference(data->data.f, store);
       break;
     case TBUILDING:
-      write_building_reference(data->data.b, F);
+      write_building_reference(data->data.b, store);
       break;
     case TSHIP:
-      /* write_ship_reference(data->data.sh, F); */
+      /* write_ship_reference(data->data.sh, store); */
       assert(!"not implemented");
       break;
     case TREGION:
-      write_region_reference(data->data.r, F);
+      write_region_reference(data->data.r, store);
       break;
     case TNONE:
       break;
@@ -85,36 +87,32 @@ object_write(const attrib *a, FILE *F)
 }
 
 static int
-object_read(attrib *a, FILE *F)
+object_read(attrib *a, struct storage * store)
 {
   object_data * data = (object_data *)a->data.v;
-  int type, result;
-  char buffer[128];
-  result = fscanf(F, "%s %d", buffer, &type);
-  if (result<0) return result;
-  data->name = strdup(buffer);
-  data->type = (object_type)type;
+
+  data->name = store->r_str(store);
+  data->type = (object_type)store->r_int(store);
   switch (data->type) {
     case TINTEGER:
-      result = fscanf(F, "%d", &data->data.i);
+      data->data.i = store->r_int(store);
       break;
     case TREAL:
-      result = fscanf(F, "%lf", &data->data.real);
+      data->data.real = store->r_flt(store);
       break;
     case TSTRING:
-      result = freadstr(F, enc_gamedata, buffer, sizeof(buffer));
-      data->data.str = strdup(buffer);
+      data->data.str = store->r_str(store);
       break;
     case TBUILDING:
-      return read_building_reference(&data->data.b, F);
+      return read_building_reference(&data->data.b, store);
     case TUNIT:
-      return read_unit_reference(&data->data.u, F);
+      return read_unit_reference(&data->data.u, store);
     case TFACTION:
-      return read_faction_reference(&data->data.f, F);
+      return read_faction_reference(&data->data.f, store);
     case TREGION:
-      return read_region_reference(&data->data.r, F);
+      return read_region_reference(&data->data.r, store);
     case TSHIP:
-      /* return read_ship_reference(&data->data.sh, F); */
+      /* return read_ship_reference(&data->data.sh, store); */
       assert(!"not implemented");
       break;
     case TNONE:
@@ -122,7 +120,6 @@ object_read(attrib *a, FILE *F)
     default:
       return AT_READ_FAIL;
   }
-  if (result<0) return result;
   return AT_READ_OK;
 }
 

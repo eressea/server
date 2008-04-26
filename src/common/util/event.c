@@ -18,6 +18,7 @@
 /* util includes */
 #include "attrib.h"
 #include "log.h"
+#include "storage.h"
 
 /* libc includes */
 #include <assert.h>
@@ -26,32 +27,32 @@
 #include <string.h>
 
 void 
-write_triggers(FILE * F, const trigger * t)
+write_triggers(struct storage * store, const trigger * t)
 {
-	while (t) {
-		if (t->type->write) {
-			fprintf(F, "%s ", t->type->name);
-			t->type->write(t, F);
-		}
-		t = t->next;
-	}
-	fputs("end ", F);
+  while (t) {
+    if (t->type->write) {
+      store->w_tok(store, t->type->name);
+      t->type->write(t, store);
+    }
+    t = t->next;
+  }
+  store->w_tok(store, "end");
 }
 
 int
-read_triggers(FILE * F, trigger ** tp)
+read_triggers(struct storage * store, trigger ** tp)
 {
   for (;;) {
     trigger_type * ttype;
     char zText[128];
-    int result = fscanf(F, "%s", zText);
-    if (result<0) return result;
+
+    store->r_tok_buf(store, zText, sizeof(zText));
     if (!strcmp(zText, "end")) break;
     ttype = tt_find(zText);
     assert(ttype || !"unknown trigger-type");
     *tp = t_new(ttype);
     if (ttype->read) {
-      int i = ttype->read(*tp, F);
+      int i = ttype->read(*tp, store);
       switch (i) {
         case AT_READ_OK:
           tp = &(*tp)->next;
@@ -132,22 +133,22 @@ free_handler(attrib * a) {
 }
 
 static void
-write_handler(const attrib * a, FILE * F)
+write_handler(const attrib * a, struct storage * store)
 {
 	handler_info *hi = (handler_info*)a->data.v;
-	fprintf(F, "%s ", hi->event);
-	write_triggers(F, hi->triggers);
+	store->w_tok(store, hi->event);
+	write_triggers(store, hi->triggers);
 }
 
 static int
-read_handler(attrib * a, FILE * F)
+read_handler(attrib * a, struct storage * store)
 {
 	char zText[128];
 	handler_info *hi = (handler_info*)a->data.v;
-    int result = fscanf(F, "%s", zText);
-    if (result<0) return result;
+
+    store->r_tok_buf(store, zText, sizeof(zText));
 	hi->event = strdup(zText);
-	read_triggers(F, &hi->triggers);
+	read_triggers(store, &hi->triggers);
 	if (hi->triggers!=NULL) {
 		return AT_READ_OK;
 	}

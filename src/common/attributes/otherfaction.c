@@ -18,6 +18,7 @@
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <util/attrib.h>
+#include <util/storage.h>
 #include <assert.h>
 
 /*
@@ -26,18 +27,16 @@
 
 
 void 
-write_of(const struct attrib * a, FILE* F)
+write_of(const struct attrib * a, struct storage * store)
 {
   const faction * f = (faction*)a->data.v;
-  fprintf(F, "%d ", f->no);
+  store->w_int(store, f->no);
 }
 
 int
-read_of(struct attrib * a, FILE* F) /* return 1 on success, 0 if attrib needs removal */
+read_of(struct attrib * a, struct storage * store) /* return 1 on success, 0 if attrib needs removal */
 {
-  int of, result;
-  result = fscanf(F, "%d", &of);
-  if (result<0) return result;
+  int of = store->r_int(store);
   a->data.v = findfaction(of);
   if (a->data.v) return AT_READ_OK;
   return AT_READ_FAIL;

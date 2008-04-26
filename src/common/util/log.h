@@ -31,9 +31,12 @@ extern "C" {
   extern void _log_error(const char * format, ...);
   extern void _log_info(unsigned int flag, const char * format, ...);
 
-#define LOG_FLUSH      (1<<0)
-#define LOG_CPWARNING  (1<<1)
-#define LOG_CPERROR    (1<<2)
+#define LOG_FLUSH      0x01
+#define LOG_CPWARNING  0x02
+#define LOG_CPERROR    0x04
+#define LOG_INFO1      0x08
+#define LOG_INFO2      0x10
+#define LOG_INFO3      0x20
 
   extern int log_flags;
 #ifdef __cplusplus

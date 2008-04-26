@@ -26,6 +26,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/base36.h>
 
 /* libc includes */
@@ -55,16 +56,16 @@ clonedied_handle(trigger * t, void * data)
 }
 
 static void
-clonedied_write(const trigger * t, FILE * F)
+clonedied_write(const trigger * t, struct storage * store)
 {
 	unit * u = (unit*)t->data.v;
-	write_unit_reference(u, F);
+	write_unit_reference(u, store);
 }
 
 static int
-clonedied_read(trigger * t, FILE * F)
+clonedied_read(trigger * t, struct storage * store)
 {
-	return read_unit_reference((unit**)&t->data.v, F);
+	return read_unit_reference((unit**)&t->data.v, store);
 }
 
 trigger_type tt_clonedied = {

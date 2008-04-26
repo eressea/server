@@ -36,48 +36,41 @@ double version(void);
 FILE * cfopen(const char *filename, const char *mode);
 int readorders(const char *filename);
 int creategame(void);
-extern int readgame(const char * filename, int backup);
-int writegame(const char *filename, int quiet);
+extern int readgame(const char * filename, int mode, int backup);
+int writegame(const char *filename, int mode);
 
 extern void rsf(FILE * F, char *s, size_t len);
 
+#define IO_READ 0x01
+#define IO_WRITE 0x02
+#define IO_BINARY 0x04
+#define IO_TEXT 0x08
+
 /* Versionsänderungen: */
-#define HEX_VERSION 81
 extern int data_version;
-extern int maxregions;
-extern int firstx, firsty;
 extern const char *xmlfile;
 extern int enc_gamedata;
 
 extern void init_locales(void);
 extern int lastturn(void);
 
-extern void read_items(FILE *f, struct item **it);
-extern void write_items(FILE *f, struct item *it);
+extern void read_items(struct storage * store, struct item **it);
+extern void write_items(struct storage * store, struct item *it);
 
 extern const char * datapath(void);
 
-extern void writeunit(FILE * stream, const struct unit * u);
-extern struct unit * readunit(FILE * stream, int encoding);
-
-extern void writeregion(FILE * stream, const struct region * r);
-extern struct region * readregion(FILE * stream, int encoding, short x, short y);
-
-extern void writefaction(FILE * stream, const struct faction * f);
-extern struct faction * readfaction(FILE * stream, int encoding);
-
 extern void fwriteorder(FILE * F, const struct order * ord, const struct locale * lang);
 
-extern int a_readint(struct attrib * a, FILE * F);
-extern void a_writeint(const struct attrib * a, FILE * F);
-extern int a_readshorts(struct attrib * a, FILE * F);
-extern void a_writeshorts(const struct attrib * a, FILE * F);
-extern int a_readchars(struct attrib * a, FILE * F);
-extern void a_writechars(const struct attrib * a, FILE * F);
-extern int a_readvoid(struct attrib * a, FILE * F);
-extern void a_writevoid(const struct attrib * a, FILE * F);
-extern int a_readstring(struct attrib * a, FILE * F);
-extern void a_writestring(const struct attrib * a, FILE * F);
+extern int a_readint(struct attrib * a, struct storage * store);
+extern void a_writeint(const struct attrib * a, struct storage * store);
+extern int a_readshorts(struct attrib * a, struct storage * store);
+extern void a_writeshorts(const struct attrib * a, struct storage * store);
+extern int a_readchars(struct attrib * a, struct storage * store);
+extern void a_writechars(const struct attrib * a, struct storage * store);
+extern int a_readvoid(struct attrib * a, struct storage * store);
+extern void a_writevoid(const struct attrib * a, struct storage * store);
+extern int a_readstring(struct attrib * a, struct storage * store);
+extern void a_writestring(const struct attrib * a, struct storage * store);
 extern void a_finalizestring(struct attrib * a);
 
 extern int freadstr(FILE * F, int encoding, char * str, size_t size);

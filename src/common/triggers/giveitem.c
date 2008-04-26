@@ -26,6 +26,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -71,26 +72,24 @@ giveitem_handle(trigger * t, void * data)
 }
 
 static void
-giveitem_write(const trigger * t, FILE * F)
+giveitem_write(const trigger * t, struct storage * store)
 {
 	giveitem_data * td = (giveitem_data*)t->data.v;
-	fprintf(F, "%s ", itoa36(td->u->no));
-	fprintf(F, "%d %s ", td->number, td->itype->rtype->_name[0]);
+    write_unit_reference(td->u, store);
+    store->w_int(store, td->number);
+    store->w_tok(store, td->itype->rtype->_name[0]);
 }
 
 static int
-giveitem_read(trigger * t, FILE * F)
+giveitem_read(trigger * t, struct storage * store)
 {
 	giveitem_data * td = (giveitem_data*)t->data.v;
 	char zText[128];
-	variant var;
 
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	td->u = findunit(var.i);
-	if (td->u==NULL) ur_add(var, (void**)&td->u, resolve_unit);
+    read_unit_reference(&td->u, store);
 
-	fscanf(F, "%d %s", &td->number, zText);
+    td->number = store->r_int(store);
+    store->r_tok_buf(store, zText, sizeof(zText));
 	td->itype = it_find(zText);
 	assert(td->itype);
 

@@ -30,6 +30,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/lists.h>
 
 /* libc includes */
@@ -238,16 +239,16 @@ resolve_plane(variant id)
 }
 
 void
-write_plane_reference(const plane * u, FILE * F)
+write_plane_reference(const plane * u, struct storage * store)
 {
-	fprintf(F, "%d ", u?(u->id):0);
+  store->w_int(store, u?(u->id):0);
 }
 
 int
-read_plane_reference(plane ** pp, FILE * F)
+read_plane_reference(plane ** pp, struct storage * store)
 {
 	variant id;
-	fscanf(F, "%d", &id.i);
+	id.i = store->r_int(store);
 	if (id.i==0) {
 		*pp = NULL;
 		return AT_READ_FAIL;

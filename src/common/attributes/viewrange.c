@@ -18,23 +18,24 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/functions.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <assert.h>
 
 static void 
-a_writefunction(const struct attrib * a, FILE* F)
+a_writefunction(const struct attrib * a, storage * store)
 {
-	fprintf(F, "%s ", get_functionname((pf_generic)a->data.f));
+  const char * str = get_functionname((pf_generic)a->data.f);
+  store->w_tok(store, str);
 }
 
 static int 
-a_readfunction(struct attrib *a, FILE *F)
+a_readfunction(struct attrib *a, storage * store)
 /* return 1 on success, 0 if attrib needs removal */
 {
 	char buf[64];
-	int result = fscanf(F, "%s ", buf);
-    if (result<0) return result;
+    store->r_tok_buf(store, buf, sizeof(buf));
 	a->data.f = get_function(buf);
 	return AT_READ_OK;
 }

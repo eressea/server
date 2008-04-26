@@ -45,6 +45,7 @@
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/storage.h>
 #include <util/variant.h>
 
 /* libc includes */
@@ -157,62 +158,59 @@ curse_done(attrib * a) {
 /* ------------------------------------------------------------- */
 
 int
-curse_read(attrib * a, FILE * f)
+curse_read(attrib * a, struct storage * store)
 {
-  variant mageid;
   curse * c = (curse*)a->data.v;
   const curse_type * ct;
 
   char cursename[64];
   unsigned int flags;
 
-  if (global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
-    fscanf(f, "%d %s %u %d %lf %d %d ", &c->no, cursename, &flags,
-      &c->duration, &c->vigour, &mageid.i, &c->effect.i);
+  c->no = store->r_int(store);
+  store->r_tok_buf(store, cursename, sizeof(cursename));
+  flags = store->r_int(store);
+  c->duration = store->r_int(store);
+  if (store->version >= CURSEVIGOURISFLOAT_VERSION) {
+    c->vigour = store->r_flt(store);
   } else {
-    int vigour;
-    fscanf(f, "%d %s %u %d %d %d %d ", &c->no, cursename, &flags,
-      &c->duration, &vigour, &mageid.i, &c->effect.i);
+    int vigour = store->r_int(store);
     c->vigour = vigour;
   }
+  if (store->version<STORAGE_VERSION) {
+    variant mageid;
+    mageid.i = store->r_int(store);
+    if (mageid.i <= 0) {
+      c->magician = (unit *)NULL;
+    } else {
+      c->magician = findunit(mageid.i);
+      if (!c->magician) {
+        ur_add(mageid, (void**)&c->magician, resolve_unit);
+      }
+    }
+  } else {
+    read_unit_reference(&c->magician, store);
+  }
+  c->effect.i = store->r_int(store);
   ct = ct_find(cursename);
   assert(ct!=NULL);
   c->type = ct;
 
-  if (global.data_version < CURSEFLAGS_VERSION) {
+  if (store->version < CURSEFLAGS_VERSION) {
     c_setflag(c, flags);
   } else {
     c->flags = flags;
   }
   c_clearflag(c, CURSE_ISNEW);
 
-#ifdef CONVERT_DBLINK
-  if (global.data_version<DBLINK_VERSION) {
-    static const curse_type * cmonster = NULL;
-    if (!cmonster) cmonster=ct_find("calmmonster");
-    if (ct==cmonster) {
-      c->effect.v = uniquefaction(c->effect.i);
-    }
-  }
-#endif
-
-  /* beim Einlesen sind noch nicht alle units da, muss also
-   * zwischengespeichert werden. */
-  if (mageid.i < 0) {
-    c->magician = (unit *)NULL;
-  } else {
-    ur_add(mageid, (void**)&c->magician, resolve_unit);
-  }
-
-  if (c->type->read) c->type->read(f, c);
+  if (c->type->read) c->type->read(store, c);
   else if (c->type->typ==CURSETYP_UNIT) {
     curse_unit * cc = calloc(1, sizeof(curse_unit));
 
     c->data.v = cc;
-    fscanf(f, "%d ", &cc->cursedmen);
+    cc->cursedmen = store->r_int(store);
   }
   if (c->type->typ == CURSETYP_REGION) {
-    read_region_reference((region**)&c->data.v, f);
+    read_region_reference((region**)&c->data.v, store);
   }
   chash(c);
 
@@ -220,7 +218,7 @@ curse_read(attrib * a, FILE * f)
 }
 
 void
-curse_write(const attrib * a, FILE * f)
+curse_write(const attrib * a, struct storage * store)
 {
   unsigned int flags;
   int mage_no;
@@ -237,16 +235,21 @@ curse_write(const attrib * a, FILE * f)
     mage_no = -1;
   }
 
-  fprintf(f, "%d %s %d %d %f %d %d ", c->no, ct->cname, flags,
-      c->duration, c->vigour, mage_no, c->effect.i);
+  store->w_int(store, c->no);
+  store->w_tok(store, ct->cname);
+  store->w_int(store, flags);
+  store->w_int(store, c->duration);
+  store->w_flt(store, (float)c->vigour);
+  store->w_int(store, mage_no);
+  store->w_int(store, c->effect.i);
 
-  if (c->type->write) c->type->write(f, c);
+  if (c->type->write) c->type->write(store, c);
   else if (c->type->typ == CURSETYP_UNIT) {
     curse_unit * cc = (curse_unit*)c->data.v;
-    fprintf(f, "%d ", cc->cursedmen);
+    store->w_int(store, cc->cursedmen);
   }
   if (c->type->typ == CURSETYP_REGION) {
-    write_region_reference((region*)c->data.v, f);
+    write_region_reference((region*)c->data.v, store);
   }
 }
 
@@ -686,8 +689,8 @@ is_cursed_with(const attrib *ap, const curse *c)
  *  unsigned int mergeflags;
  *  int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
  *  void (*change_vigour)(curse*, double);
- *  int (*read)(FILE * F, curse * c);
- *  int (*write)(FILE * F, const curse * c);
+ *  int (*read)(struct storage * store, curse * c);
+ *  int (*write)(struct storage * store, const curse * c);
  * } curse_type;
  */
 

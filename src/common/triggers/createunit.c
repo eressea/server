@@ -28,6 +28,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -76,25 +77,25 @@ createunit_handle(trigger * t, void * data)
 }
 
 static void
-createunit_write(const trigger * t, FILE * F)
+createunit_write(const trigger * t, struct storage * store)
 {
 	createunit_data * td = (createunit_data*)t->data.v;
-	write_faction_reference(td->f, F);
-	write_region_reference(td->r, F);
-	write_race_reference(td->race, F);
-	fprintf(F, "%d ", td->number);
+	write_faction_reference(td->f, store);
+	write_region_reference(td->r, store);
+	write_race_reference(td->race, store);
+	store->w_int(store, td->number);
 }
 
 static int
-createunit_read(trigger * t, FILE * F)
+createunit_read(trigger * t, struct storage * store)
 {
 	createunit_data * td = (createunit_data*)t->data.v;
 
-	int uc = read_faction_reference(&td->f, F);
-	int rc = read_region_reference(&td->r, F);
-	int ic = read_race_reference(&td->race, F);
+	int uc = read_faction_reference(&td->f, store);
+	int rc = read_region_reference(&td->r, store);
+	int ic = read_race_reference(&td->race, store);
 
-	fscanf(F, "%d ", &td->number);
+	td->number = store->r_int(store);
 
 	if (uc!=AT_READ_OK || rc!=AT_READ_OK || ic!=AT_READ_OK) return AT_READ_FAIL;
 	return AT_READ_OK;

@@ -27,6 +27,7 @@
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/base36.h>
+#include <util/storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -73,20 +74,20 @@ changefaction_handle(trigger * t, void * data)
 }
 
 static void
-changefaction_write(const trigger * t, FILE * F)
+changefaction_write(const trigger * t, struct storage * store)
 {
 	changefaction_data * td = (changefaction_data*)t->data.v;
-	write_unit_reference(td->unit, F);
-	write_faction_reference(td->faction, F);
+	write_unit_reference(td->unit, store);
+	write_faction_reference(td->faction, store);
 }
 
 static int
-changefaction_read(trigger * t, FILE * F)
+changefaction_read(trigger * t, struct storage * store)
 {
 	changefaction_data * td = (changefaction_data*)t->data.v;
 
-	int u = read_unit_reference(&td->unit, F);
-	int f = read_faction_reference(&td->faction, F);
+	int u = read_unit_reference(&td->unit, store);
+	int f = read_faction_reference(&td->faction, store);
 
 	if (u!=AT_READ_OK || f!=AT_READ_OK) return AT_READ_FAIL;
 	return AT_READ_OK;

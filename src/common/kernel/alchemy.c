@@ -40,6 +40,7 @@
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/rand.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -172,23 +173,25 @@ a_finalizeeffect(attrib * a)
 }
 
 static void
-a_writeeffect(const attrib *a, FILE *f)
+a_writeeffect(const attrib *a, storage * store)
 {
 	effect_data * edata = (effect_data*)a->data.v;
-	fprintf(f, "%s %d ", resourcename(edata->type->itype->rtype, 0), edata->value);
+    store->w_tok(store, resourcename(edata->type->itype->rtype, 0));
+	store->w_int(store, edata->value);
 }
 
 static int
-a_readeffect(attrib *a, FILE *f)
+a_readeffect(attrib *a, storage * store)
 {
-  int power, result;
+  int power;
   const item_type * itype;
   effect_data * edata = (effect_data*)a->data.v;
   char zText[32];
 
-  result = fscanf(f, "%s %d", zText, &power);
-  if (result<0) return result;
+  store->r_tok_buf(store, zText, sizeof(zText));
   itype = it_find(zText);
+
+  power = store->r_int(store);
   if (itype==NULL || itype->rtype==NULL || itype->rtype->ptype==NULL || power<=0) {
     return AT_READ_FAIL;
   }

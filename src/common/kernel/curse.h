@@ -218,15 +218,15 @@ typedef struct curse_type {
   unsigned int mergeflags;
   struct message * (*curseinfo)(const void*, typ_t, const struct curse*, int);
   void (*change_vigour)(curse*, double);
-  int (*read)(FILE * F, curse * c);
-  int (*write)(FILE * F, const struct curse * c);
+  int (*read)(struct storage * store, curse * c);
+  int (*write)(struct storage * store, const struct curse * c);
   int (*cansee)(const struct faction*, const void*, typ_t, const struct curse *, int);
   int (*age)(curse *);
 } curse_type;
 
 extern struct attrib_type at_curse;
-extern void curse_write(const struct attrib * a, FILE * f);
-extern int curse_read(struct attrib * a, FILE * f);
+extern void curse_write(const struct attrib * a, struct storage * store);
+extern int curse_read(struct attrib * a, struct storage * store);
 
 
 /* ------------------------------------------------------------- */

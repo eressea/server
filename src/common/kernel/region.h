@@ -228,8 +228,8 @@ extern const short delta_x[MAXDIRECTIONS];
 extern const short delta_y[MAXDIRECTIONS];
 extern direction_t dir_invert(direction_t dir);
 extern int production(const struct region *r);
-extern int read_region_reference(struct region ** r, FILE * F);
-extern void write_region_reference(const struct region * r, FILE * F);
+extern int read_region_reference(struct region ** r, struct storage * store);
+extern void write_region_reference(const struct region * r, struct storage * store);
 
 void region_setowner(struct region * r, struct faction * owner);
 extern struct faction * region_owner(const struct region * r);

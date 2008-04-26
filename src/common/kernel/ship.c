@@ -29,6 +29,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/umlaut.h>
+#include <util/storage.h>
 #include <util/xml.h>
 
 /* libc includes */
@@ -277,6 +278,12 @@ shipowner(const ship * sh)
 	if (first)
 		fset(first, UFL_OWNER);
 	return first;
+}
+
+void
+write_ship_reference(const struct ship * sh, struct storage * store)
+{
+  store->w_id(store, sh?sh->no:-1);
 }
 
 void

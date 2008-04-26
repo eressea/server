@@ -25,6 +25,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/base36.h>
 
 /* ansi includes */
@@ -73,26 +74,22 @@ removecurse_handle(trigger * t, void * data)
 }
 
 static void
-removecurse_write(const trigger * t, FILE * F)
+removecurse_write(const trigger * t, struct storage * store)
 {
 	removecurse_data * td = (removecurse_data*)t->data.v;
-	fprintf(F, "%s ", td->target?itoa36(td->target->no):0);
-	fprintf(F, "%d ", td->curse?td->curse->no:0);
+	store->w_tok(store, td->target?itoa36(td->target->no):0);
+	store->w_int(store, td->curse?td->curse->no:0);
 }
 
 static int
-removecurse_read(trigger * t, FILE * F)
+removecurse_read(trigger * t, struct storage * store)
 {
 	removecurse_data * td = (removecurse_data*)t->data.v;
-	char zText[128];
-	variant var;
+    variant var;
 
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	td->target = findunit(var.i);
-	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
+    read_unit_reference(&td->target, store);
 
-	fscanf(F, "%d", &var.i);
+	var.i = store->r_int(store);
 	td->curse = cfindhash(var.i);
 	if (td->curse==NULL) ur_add(var, (void**)&td->curse, resolve_curse);
 

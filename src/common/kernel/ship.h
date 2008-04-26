@@ -95,6 +95,7 @@ extern struct ship *findshipr(const struct region *r, int n);
 extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
 
 extern void register_ships(void);
+extern void write_ship_reference(const struct ship * sh, struct storage * store);
 
 extern void destroy_ship(struct ship * s);
 

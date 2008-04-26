@@ -49,6 +49,7 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 
 /* spells includes */
 #include <spells/alp.h>
@@ -70,6 +71,7 @@
 #include <util/goodies.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -2731,10 +2733,10 @@ cw_init(attrib * a) {
 }
 
 void
-cw_write(const attrib * a, FILE * f) {
+cw_write(const attrib * a, storage * store) {
   border * b = ((wallcurse*)((curse*)a->data.v)->data.v)->wall;
-  curse_write(a, f);
-  fprintf(f, "%d ", b->id);
+  curse_write(a, store);
+  store->w_int(store, b->id);
 }
 
 typedef struct bresvole {
@@ -2745,16 +2747,16 @@ typedef struct bresvole {
 static void * resolve_buddy(variant data);
 
 static int
-cw_read(attrib * a, FILE * f)
+cw_read(attrib * a, storage * store)
 {
   bresolve * br = calloc(sizeof(bresolve), 1);
   curse * c = (curse*)a->data.v;
   wallcurse * wc = (wallcurse*)c->data.v;
   variant var;
 
-  curse_read(a, f);
+  curse_read(a, store);
   br->self = c;
-  fscanf(f, "%u ", &br->id);
+  br->id = store->r_int(store);
 
   var.i = br->id;
   ur_add(var, (void**)&wc->wall, resolve_borderid);
@@ -2834,24 +2836,30 @@ wall_destroy(border * b)
 }
 
 static void
-wall_read(border * b, FILE * f)
+wall_read(border * b, storage * store)
 {
   wall_data * fd = (wall_data*)b->data.v;
   variant mno;
   assert(fd);
-  fscanf(f, "%d %d ", &mno.i, &fd->force);
-  fd->mage = findunitg(mno.i, NULL);
-  fd->active = true;
-  if (!fd->mage) {
-    ur_add(mno, (void**)&fd->mage, resolve_unit);
+  if (store->version<STORAGE_VERSION) {
+    mno.i = store->r_int(store);
+    fd->mage = findunit(mno.i);
+    if (!fd->mage) {
+      ur_add(mno, (void**)&fd->mage, resolve_unit);
+    }
+  } else {
+    read_unit_reference(&fd->mage, store);
   }
+  fd->force = store->r_int(store);
+  fd->active = true;
 }
 
 static void
-wall_write(const border * b, FILE * f)
+wall_write(const border * b, storage * store)
 {
   wall_data * fd = (wall_data*)b->data.v;
-  fprintf(f, "%d %d ", fd->mage?fd->mage->no:0, fd->force);
+  write_unit_reference(fd->mage, store);
+  store->w_int(store, fd->force);
 }
 
 static region *
@@ -3233,21 +3241,19 @@ mk_deathcloud(unit * mage, region * r, double force, int duration)
 #define COMPAT_DEATHCLOUD
 #ifdef COMPAT_DEATHCLOUD
 static int
-dc_read_compat(struct attrib * a, FILE* F)
+dc_read_compat(struct attrib * a, storage * store)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
-  char zId[16];
   region * r = NULL;
   unit * u;
   variant var;
-  int duration;
-  double strength;
+  int duration = store->r_int(store);
+  double strength = store->r_flt(store);
 
-  fscanf(F, "%d %lf %s", &duration, &strength, zId);
-  var.i = atoi36(zId);
+  var.i = store->r_id(store);
   u = findunit(var.i);
 
-  read_region_reference(&r, F);
+  read_region_reference(&r, store);
   if (r!=NULL) {
     variant effect;
     curse * c;

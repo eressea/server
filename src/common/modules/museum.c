@@ -21,6 +21,7 @@
 #include <config.h>
 
 #include <kernel/eressea.h>
+
 #if MUSEUM_MODULE
 #include "museum.h"
 
@@ -42,6 +43,7 @@
 #include <util/attrib.h>
 #include <util/functions.h>
 #include <util/goodies.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <limits.h>
@@ -66,18 +68,20 @@ a_finalizemuseumgivebackcookie(attrib *a)
 }
 
 static void
-a_writemuseumgivebackcookie(const attrib *a, FILE *f)
+a_writemuseumgivebackcookie(const attrib *a, storage * store)
 {
-	museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
-	fprintf(f,"%d %d ", gbc->warden_no, gbc->cookie);
+  museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
+  store->w_int(store, gbc->warden_no);
+  store->w_int(store, gbc->cookie);
 }
 
 static int
-a_readmuseumgivebackcookie(attrib *a, FILE *f)
+a_readmuseumgivebackcookie(attrib *a, storage * store)
 {
-	museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
-	fscanf(f, "%d %d", &gbc->warden_no, &gbc->cookie);
-	return AT_READ_OK;
+  museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
+  gbc->warden_no = store->r_int(store);
+  gbc->cookie = store->r_int(store);
+  return AT_READ_OK;
 }
 
 attrib_type at_museumgivebackcookie = {
@@ -108,19 +112,19 @@ a_finalizemuseumgiveback(attrib *a)
 }
 
 static void
-a_writemuseumgiveback(const attrib *a, FILE *f)
+a_writemuseumgiveback(const attrib *a, storage * store)
 {
 	museumgiveback *gb = (museumgiveback *)a->data.v;
-	fprintf(f,"%d ", gb->cookie);
-	write_items(f, gb->items);
+	store->w_int(store, gb->cookie);
+	write_items(store, gb->items);
 }
 
 static int
-a_readmuseumgiveback(attrib *a, FILE *f)
+a_readmuseumgiveback(attrib *a, storage * store)
 {
 	museumgiveback *gb = (museumgiveback *)a->data.v;
-	fscanf(f, "%d", &gb->cookie);
-	read_items(f, &gb->items);
+	gb->cookie = store->r_int(store);
+	read_items(store, &gb->items);
 	return AT_READ_OK;
 }
 

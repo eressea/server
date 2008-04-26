@@ -27,6 +27,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -102,20 +103,20 @@ wormhole_age(struct attrib * a)
 }
 
 static void
-wormhole_write(const struct attrib * a, FILE* F)
+wormhole_write(const struct attrib * a, storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
-  write_building_reference(data->entry, F);
-  write_building_reference(data->exit, F);
+  write_building_reference(data->entry, store);
+  write_building_reference(data->exit, store);
 }
 
 static int
-wormhole_read(struct attrib * a, FILE* F)
+wormhole_read(struct attrib * a, storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
 
-  read_building_reference(&data->entry, F);
-  read_building_reference(&data->exit, F);
+  read_building_reference(&data->entry, store);
+  read_building_reference(&data->exit, store);
   /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
   return AT_READ_OK;
 }

@@ -21,6 +21,7 @@
 
 #include <util/attrib.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 
 static int
 verify_hate(attrib * a)
@@ -32,15 +33,15 @@ verify_hate(attrib * a)
 }
 
 static void
-write_hate(const attrib * a, FILE * F)
+write_hate(const attrib * a, struct storage * store)
 {
-	write_unit_reference((unit*)a->data.v, F);
+	write_unit_reference((unit*)a->data.v, store);
 }
 
 static int
-read_hate(attrib * a, FILE * F)
+read_hate(attrib * a, struct storage * store)
 {
-	return read_unit_reference((unit**)&a->data.v, F);
+	return read_unit_reference((unit**)&a->data.v, store);
 }
 
 attrib_type at_hate = {

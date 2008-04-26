@@ -52,6 +52,7 @@
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/storage.h>
 #include <util/variant.h>
 
 /* libc includes */
@@ -481,16 +482,16 @@ usettarget(unit * u, const unit * t)
 /*********************/
 
 void
-a_writesiege(const attrib * a, FILE * f)
+a_writesiege(const attrib * a, struct storage * store)
 {
   struct building * b = (struct building*)a->data.v;
-  write_building_reference(b, f);
+  write_building_reference(b, store);
 }
 
 int
-a_readsiege(attrib * a, FILE * f)
+a_readsiege(attrib * a, struct storage * store)
 {
-  return read_building_reference((struct building**)&a->data.v, f);
+  return read_building_reference((struct building**)&a->data.v, store);
 }
 
 attrib_type at_siege = {
@@ -583,9 +584,9 @@ free_units(void)
 
 
 void
-write_unit_reference(const unit * u, FILE * F)
+write_unit_reference(const unit * u, struct storage * store)
 {
-  fprintf(F, "%s ", (u!=NULL && u->no!=0)?itoa36(u->no):"0");
+  store->w_id(store, u?u->no:-1);
 }
 
 void *
@@ -595,15 +596,13 @@ resolve_unit(variant id)
 }
 
 int
-read_unit_reference(unit ** up, FILE * F)
+read_unit_reference(unit ** up, struct storage * store)
 {
-  char zId[16];
   variant var;
 
   assert(up!=NULL);
-  fscanf(F, "%s", zId);
-  var.i = atoi36(zId);
-  if (var.i==0) {
+  var.i = store->r_id(store);
+  if (var.i<=0) {
     *up = NULL;
     return AT_READ_FAIL;
   }

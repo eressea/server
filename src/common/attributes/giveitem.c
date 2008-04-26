@@ -26,6 +26,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/goodies.h>
 
 /* libc includes */
@@ -38,37 +39,34 @@ typedef struct give_data {
 } give_data;
 
 static void
-a_writegive(const attrib * a, FILE * F)
+a_writegive(const attrib * a, struct storage * store)
 {
 	give_data * gdata = (give_data*)a->data.v;
 	item * itm;
-	fprintf(F, "%s ", buildingid(gdata->building));
+    write_building_reference(gdata->building, store);
 	for (itm=gdata->items;itm;itm=itm->next) {
-		fprintf(F, "%s %d ", resourcename(itm->type->rtype, 0), itm->number);
+      store->w_tok(store, resourcename(itm->type->rtype, 0));
+      store->w_int(store, itm->number);
 	}
-	fputs("end ", F);
+	store->w_tok(store, "end");
 }
 
 static int
-a_readgive(attrib * a, FILE * F)
+a_readgive(attrib * a, struct storage * store)
 {
   give_data * gdata = (give_data*)a->data.v;
   variant var;
   int result;
   char zText[32];
 
-  result = fscanf(F, "%s ", zText);
-  if (result<0) return result;
-  var.i = atoi36(zText);
+  var.i = store->r_id(store);
   gdata->building = findbuilding(var.i);
   if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
   for (;;) {
     int i;
-    result = fscanf(F, "%s", zText);
-    if (result==EOF) return EOF;
+    store->r_tok_buf(store, zText, sizeof(zText));
     if (!strcmp("end", zText)) break;
-    result = fscanf(F, "%d", &i);
-    if (result==EOF) return EOF;
+    i = store->r_int(store);
     if (i==0) i_add(&gdata->items, i_new(it_find(zText), i));
   }
   return AT_READ_OK;

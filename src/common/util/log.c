@@ -244,21 +244,24 @@ _log_error(const char * format, ...)
     }
   }
 }
+static unsigned int logfile_level = 0;
+static unsigned int stderr_level = 1;
 
 void 
-_log_info(unsigned int flag, const char * format, ...)
+_log_info(unsigned int level, const char * format, ...)
 {
   va_list marker;
   fflush(stdout);
   if (!logfile) logfile = stderr;
-
-  fprintf(logfile, "INFO[%u]: ", flag);
-  va_start(marker, format);
-  vfprintf(logfile, format, marker);
-  va_end(marker);
+  if (logfile_level>=level) {
+    fprintf(logfile, "INFO[%u]: ", level);
+    va_start(marker, format);
+    vfprintf(logfile, format, marker);
+    va_end(marker);
+  }
   if (logfile!=stderr) {
-    if (log_flags & flag) {
-      fprintf(stderr, "INFO[%u]: ", flag);
+    if (stderr_level>=level) {
+      fprintf(stderr, "INFO[%u]: ", level);
       va_start(marker, format);
       if (stdio_codepage) {
         char buffer[MAXLENGTH];

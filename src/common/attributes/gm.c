@@ -21,17 +21,18 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/storage.h>
 
 static void
-write_gm(const attrib * a, FILE * F)
+write_gm(const attrib * a, struct storage * store)
 {
-	write_plane_reference((plane*)a->data.v, F);
+	write_plane_reference((plane*)a->data.v, store);
 }
 
 static int
-read_gm(attrib * a, FILE * F)
+read_gm(attrib * a, struct storage * store)
 {
-	return read_plane_reference((plane**)&a->data.v, F);
+	return read_plane_reference((plane**)&a->data.v, store);
 }
 
 

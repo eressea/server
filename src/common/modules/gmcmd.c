@@ -44,6 +44,7 @@
 #include <util/umlaut.h>
 #include <util/parser.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -64,16 +65,16 @@ mistake(const unit * u, struct order * ord, const char *comment)
 }
 
 static void
-write_permissions(const attrib * a, FILE * F)
+write_permissions(const attrib * a, struct storage * store)
 {
-  a_write(F, (attrib*)a->data.v);
+  a_write(store, (attrib*)a->data.v);
 }
 
 static int
-read_permissions(attrib * at, FILE * F)
+read_permissions(attrib * at, struct storage * store)
 {
   attrib ** p_a = (attrib**)&at->data.v;
-  a_read(F, p_a);
+  a_read(store, p_a);
   /* eliminate duplicates: */
   while (*p_a) {
     attrib * a = (*p_a)->next;
@@ -112,19 +113,19 @@ make_atpermissions(void)
  **/
 
 static void
-write_gmcreate(const attrib * a, FILE * F)
+write_gmcreate(const attrib * a, struct storage * store)
 {
   const item_type * itype = (const item_type *)a->data.v;
   assert(itype);
-  fprintf(F, "%s ", resourcename(itype->rtype, 0));
+  store->w_tok(store, resourcename(itype->rtype, 0));
 }
 
 static int
-read_gmcreate(attrib * a, FILE * F)
+read_gmcreate(attrib * a, struct storage * store)
 {
   char zText[32];
   const item_type ** p_itype = (const item_type **)&a->data.v;
-  fscanf(F, "%s", zText);
+  store->r_tok_buf(store, zText, sizeof(zText));
   *p_itype = it_find(zText);
   if (a->data.v==NULL) {
     log_error(("unknown itemtype %s in gmcreate attribute\n", zText));

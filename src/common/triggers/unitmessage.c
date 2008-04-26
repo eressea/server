@@ -1,16 +1,11 @@
 /* vi: set ts=2:
- *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- */
++-------------------+  Enno Rehling <enno@eressea.de>
+| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
+| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
++-------------------+  
+This program may not be used, modified or distributed 
+without prior permission by the authors of Eressea.
+*/
 
 #include <config.h>
 #include <kernel/eressea.h>
@@ -22,12 +17,13 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/resolve.h>
-#include <util/event.h>
 #include <util/base36.h>
+#include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/resolve.h>
+#include <util/storage.h>
 
 /* ansi includes */
 #include <stdio.h>
@@ -36,28 +32,28 @@
 #include <assert.h>
 
 /***
- ** give an item to someone
- **/
+** give an item to someone
+**/
 
 typedef struct unitmessage_data {
-	struct unit * target;
-	char * string;
-	int type;
-	int level;
+  struct unit * target;
+  char * string;
+  int type;
+  int level;
 } unitmessage_data;
 
 static void
 unitmessage_init(trigger * t)
 {
-	t->data.v = calloc(sizeof(unitmessage_data), 1);
+  t->data.v = calloc(sizeof(unitmessage_data), 1);
 }
 
 static void
 unitmessage_free(trigger * t)
 {
-	unitmessage_data * sd = (unitmessage_data*)t->data.v;
-	free(sd->string);
-	free(t->data.v);
+  unitmessage_data * sd = (unitmessage_data*)t->data.v;
+  free(sd->string);
+  free(t->data.v);
 }
 
 static int
@@ -78,49 +74,48 @@ unitmessage_handle(trigger * t, void * data)
 }
 
 static void
-unitmessage_write(const trigger * t, FILE * F)
+unitmessage_write(const trigger * t, struct storage * store)
 {
-	unitmessage_data * td = (unitmessage_data*)t->data.v;
-	fprintf(F, "%s %s", itoa36(td->target->no), td->string);
-	fprintf(F, " %d %d ", td->type, td->level);
+  unitmessage_data * td = (unitmessage_data*)t->data.v;
+  write_unit_reference(td->target, store);
+  store->w_tok(store, td->string);
+  store->w_int(store, td->type);
+  store->w_int(store, td->level);
 }
 
 static int
-unitmessage_read(trigger * t, FILE * F)
+unitmessage_read(trigger * t, struct storage * store)
 {
-	unitmessage_data * td = (unitmessage_data*)t->data.v;
-	char zText[256];
-	variant var;
+  unitmessage_data * td = (unitmessage_data*)t->data.v;
+  char zText[256];
 
-	fscanf(F, "%s", zText);
-	var.i = atoi36(zText);
-	td->target = findunit(var.i);
-	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
+  read_unit_reference(&td->target, store);
 
-  fscanf(F, "%s", zText);
-	fscanf(F, "%d %d ", &td->type, &td->level);
-	td->string = strdup(zText);
+  td->string = store->r_tok(store);
+  td->type = store->r_int(store);
+  td->level = store->r_int(store);
+  td->string = strdup(zText);
 
-	return AT_READ_OK;
+  return AT_READ_OK;
 }
 
 trigger_type tt_unitmessage = {
-	"unitmessage",
-	unitmessage_init,
-	unitmessage_free,
-	unitmessage_handle,
-	unitmessage_write,
-	unitmessage_read
+  "unitmessage",
+  unitmessage_init,
+  unitmessage_free,
+  unitmessage_handle,
+  unitmessage_write,
+  unitmessage_read
 };
 
 trigger *
 trigger_unitmessage(unit * target, const char * string, int type, int level)
 {
-	trigger * t = t_new(&tt_unitmessage);
-	unitmessage_data * td = (unitmessage_data*)t->data.v;
-	td->target = target;
-	td->string = strdup(string);
-	td->type = type;
-	td->level = level;
-	return t;
+  trigger * t = t_new(&tt_unitmessage);
+  unitmessage_data * td = (unitmessage_data*)t->data.v;
+  td->target = target;
+  td->string = strdup(string);
+  td->type = type;
+  td->level = level;
+  return t;
 }

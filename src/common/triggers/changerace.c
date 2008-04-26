@@ -25,6 +25,7 @@
 #include <util/event.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/base36.h>
 
 /* ansi includes */
@@ -74,21 +75,21 @@ changerace_handle(trigger * t, void * data)
 }
 
 static void
-changerace_write(const trigger * t, FILE * F)
+changerace_write(const trigger * t, struct storage * store)
 {
 	changerace_data * td = (changerace_data*)t->data.v;
-	write_unit_reference(td->u, F);
-	write_race_reference(td->race, F);
-	write_race_reference(td->irace, F);
+	write_unit_reference(td->u, store);
+	write_race_reference(td->race, store);
+	write_race_reference(td->irace, store);
 }
 
 static int
-changerace_read(trigger * t, FILE * F)
+changerace_read(trigger * t, struct storage * store)
 {
 	changerace_data * td = (changerace_data*)t->data.v;
-	int uc = read_unit_reference(&td->u, F);
-	int rc = read_race_reference(&td->race, F);
-	int ic = read_race_reference(&td->irace, F);
+	int uc = read_unit_reference(&td->u, store);
+	int rc = read_race_reference(&td->race, store);
+	int ic = read_race_reference(&td->irace, store);
 	if (uc!=AT_READ_OK || rc!=AT_READ_OK || ic!=AT_READ_OK) return AT_READ_FAIL;
 	return AT_READ_OK;
 }

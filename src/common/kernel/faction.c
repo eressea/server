@@ -36,6 +36,7 @@
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/storage.h>
 #include <util/variant.h>
 #include <util/unicode.h>
 #include <attributes/otherfaction.h>
@@ -186,12 +187,10 @@ checkpasswd(const faction * f, const char * passwd, boolean shortp)
 
 
 int
-read_faction_reference(faction ** f, FILE * F)
+read_faction_reference(faction ** f, struct storage * store)
 {
   variant id;
-  char zText[16];
-  fscanf(F, "%s ", zText);
-  id.i = atoi36(zText);
+  id.i = store->r_id(store);
   if (id.i<0) {
     *f = NULL;
     return AT_READ_FAIL;
@@ -202,9 +201,9 @@ read_faction_reference(faction ** f, FILE * F)
 }
 
 void
-write_faction_reference(const faction * f, FILE * F)
+write_faction_reference(const faction * f, struct storage * store)
 {
-  fprintf(F, "%s ", itoa36(f->no));
+  store->w_id(store, f?f->no:-1);
 }
 
 void

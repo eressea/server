@@ -49,8 +49,8 @@ extern "C" {
     /* constructor: initialize the border. allocate extra memory if needed */
     void (*destroy)(border *);
     /* destructor: remove all extra memory for destruction */
-    void (*read)(border *, FILE *);
-    void (*write)(const border *, FILE *);
+    void (*read)(border *, struct storage *);
+    void (*write)(const border *, struct storage *);
     boolean (*block)(const border *, const struct unit *, const struct region * r);
     /* return true if it blocks movement of u from
     * r to the opposite struct region.
@@ -101,13 +101,13 @@ extern "C" {
   extern void register_bordertype(border_type * type);
   /* register a new bordertype */
 
-  extern int read_borders(FILE * f);
-  extern void write_borders(FILE * f);
+  extern int read_borders(struct storage * store);
+  extern void write_borders(struct storage * store);
   extern void age_borders(void);
 
   /* provide default implementations for some member functions: */
-  extern void b_read(border * b, FILE *f);
-  extern void b_write(const border * b, FILE *f);
+  extern void b_read(border * b, struct storage * store);
+  extern void b_write(const border * b, struct storage * store);
   extern boolean b_blockall(const border *, const struct unit *, const struct region *);
   extern boolean b_blocknone(const border *, const struct unit *, const struct region *);
   extern boolean b_rvisible(const border *, const struct region * r);

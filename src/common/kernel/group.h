@@ -37,8 +37,8 @@ extern boolean join_group(struct unit * u, const char * name);
 extern void set_group(struct unit * u, struct group * g);
 extern void free_group(struct group * g);
 
-extern void write_groups(FILE * F, struct group * g);
-extern void read_groups(FILE * F, struct faction * f);
+extern void write_groups(struct storage * F, struct group * g);
+extern void read_groups(struct storage * F, struct faction * f);
 
 #ifdef __cplusplus
 }

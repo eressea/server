@@ -27,8 +27,8 @@ typedef struct trigger_type {
 	void (*initialize)(struct trigger *);
 	void (*finalize)(struct trigger *);
 	int (*handle)(struct trigger *, void *);
-	void (*write)(const struct trigger *, FILE * F);
-	int (*read)(struct trigger *, FILE * F);
+	void (*write)(const struct trigger *, struct storage * store);
+	int (*read)(struct trigger *, struct storage * store);
 
 	struct trigger_type * next;
 } trigger_type;
@@ -62,8 +62,8 @@ extern void handle_event(struct attrib * attribs, const char * eventname, void *
 
 /* functions for making complex triggers: */
 extern void free_triggers(trigger * triggers); /* release all these triggers */
-extern void write_triggers(FILE * F, const trigger * t);
-extern int read_triggers(FILE * F, trigger ** tp);
+extern void write_triggers(struct storage * store, const trigger * t);
+extern int read_triggers(struct storage * store, trigger ** tp);
 extern int handle_triggers(trigger ** triggers, void * data);
 
 extern struct attrib_type at_eventhandler;

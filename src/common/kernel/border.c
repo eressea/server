@@ -24,13 +24,12 @@
 #include <util/attrib.h>
 #include <util/log.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
-
-extern boolean incomplete_data;
 
 unsigned int nextborder = 0;
 
@@ -162,43 +161,41 @@ find_bordertype(const char * name)
 }
 
 void
-b_read(border * b, FILE *f)
+b_read(border * b, storage * store)
 {
-  int result;
+  int result = 0;
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
-      result = fscanf(f, "%x ", &b->data.i);
-      break;
-    case VAR_VOIDPTR:
-      result = fscanf(f, "%p ", &b->data.v);
+      b->data.i = store->r_int(store);
       break;
     case VAR_SHORTA:
-      result = fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
+      b->data.sa[0] = (short)store->r_int(store);
+      b->data.sa[1] = (short)store->r_int(store);
       break;
+    case VAR_VOIDPTR:
     default:
-      assert(!"unhandled variant type in border");
+      assert(!"invalid variant type in border");
       result = 0;
   }
   assert(result>=0 || "EOF encountered?");
 }
 
 void
-b_write(const border * b, FILE *f)
+b_write(const border * b, storage * store)
 {
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
-      fprintf(f, "%x ", b->data.i);
-      break;
-    case VAR_VOIDPTR:
-      fprintf(f, "%p ", b->data.v);
+      store->w_int(store, b->data.i);
       break;
     case VAR_SHORTA:
-      fprintf(f, "%d %d ", b->data.sa[0], b->data.sa[1]);
+      store->w_int(store, b->data.sa[0]);
+      store->w_int(store, b->data.sa[1]);
       break;
+    case VAR_VOIDPTR:
     default:
-      assert(!"unhandled variant type in border");
+      assert(!"invalid variant type in border");
   }
 }
 
@@ -467,15 +464,17 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
 }
 
 static void
-b_readroad(border * b, FILE *f)
+b_readroad(border * b, storage * store)
 {
-  fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
+  b->data.sa[0] = (short)store->r_int(store);
+  b->data.sa[1] = (short)store->r_int(store);
 }
 
 static void
-b_writeroad(const border * b, FILE *f)
+b_writeroad(const border * b, storage * store)
 {
-  fprintf(f, "%d %d ", b->data.sa[0], b->data.sa[1]);
+  store->w_int(store, b->data.sa[0]);
+  store->w_int(store, b->data.sa[1]);
 }
 
 static boolean
@@ -515,7 +514,7 @@ border_type bt_road = {
 };
 
 void
-write_borders(FILE * f)
+write_borders(struct storage * store)
 {
   int i;
   for (i=0;i!=BMAXHASH;++i) {
@@ -524,18 +523,24 @@ write_borders(FILE * f)
       border * b;
       for (b=bhash;b!=NULL;b=b->next) {
         if (b->type->valid && !b->type->valid(b)) continue;
-        fprintf(f, "%s %d %d %d %d %d ", b->type->__name, b->id, b->from->x, b->from->y, b->to->x, b->to->y);
-        if (b->type->write) b->type->write(b, f);
-        a_write(f, b->attribs);
-        putc('\n', f);
+        store->w_tok(store, b->type->__name);
+        store->w_int(store, b->id);
+        store->w_int(store, b->from->x);
+        store->w_int(store, b->from->y);
+        store->w_int(store, b->to->x);
+        store->w_int(store, b->to->y);
+
+        if (b->type->write) b->type->write(b, store);
+        a_write(store, b->attribs);
+        store->w_brk(store);
       }
     }
   }
-  fputs("end ", f);
+  store->w_tok(store, "end");
 }
 
 int
-read_borders(FILE * f)
+read_borders(struct storage * store)
 {
   for (;;) {
     short fx, fy, tx, ty;
@@ -546,18 +551,20 @@ read_borders(FILE * f)
     border_type * type;
     int result;
 
-    result = fscanf(f, "%s", zText);
-    if (result<0) return result;
+    store->r_tok_buf(store, zText, sizeof(zText));
     if (!strcmp(zText, "end")) break;
-    result = fscanf(f, "%u %hd %hd %hd %hd", &bid, &fx, &fy, &tx, &ty);
-    if (result<0) return result;
+    bid = store->r_int(store);
+    fx = (short)store->r_int(store);
+    fy = (short)store->r_int(store);
+    tx = (short)store->r_int(store);
+    ty = (short)store->r_int(store);
 
     from = findregion(fx, fy);
-    if (!incomplete_data && from==NULL) {
+    if (from==NULL) {
       log_error(("border for unknown region %d,%d\n", fx, fy));
     }
     to = findregion(tx, ty);
-    if (!incomplete_data && to==NULL)  {
+    if (to==NULL)  {
       log_error(("border for unknown region %d,%d\n", tx, ty));
     }
 
@@ -579,8 +586,8 @@ read_borders(FILE * f)
     nextborder--; /* new_border erhöht den Wert */
     b->id = bid;
     assert(bid<=nextborder);
-    if (type->read) type->read(b, f);
-    result = a_read(f, &b->attribs);
+    if (type->read) type->read(b, store);
+    result = a_read(store, &b->attribs);
     if (result<0) return result;
     if (!to || !from) {
       erase_border(b);

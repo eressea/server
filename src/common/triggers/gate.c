@@ -22,6 +22,7 @@
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/log.h>
+#include <util/storage.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -57,23 +58,23 @@ gate_handle(trigger * t, void * data)
 }
 
 static void
-gate_write(const trigger * t, FILE * F)
+gate_write(const trigger * t, struct storage * store)
 {
 	gate_data * gd = (gate_data*)t->data.v;
 	building * b = gd->gate;
 	region * r = gd->target;
 
-	write_building_reference(b, F);
-	write_region_reference(r, F);
+	write_building_reference(b, store);
+	write_region_reference(r, store);
 }
 
 static int
-gate_read(trigger * t, FILE * F)
+gate_read(trigger * t, struct storage * store)
 {
 	gate_data * gd = (gate_data*)t->data.v;
 
-	int bc = read_building_reference(&gd->gate, F);
-	int rc = read_region_reference(&gd->target, F);
+	int bc = read_building_reference(&gd->gate, store);
+	int rc = read_region_reference(&gd->target, store);
 
 	if (rc!=AT_READ_OK || bc!=AT_READ_OK) return AT_READ_FAIL;
 	return AT_READ_OK;

@@ -16,6 +16,7 @@
 #include "attrib.h"
 
 #include "log.h"
+#include "storage.h"
 
 #include <assert.h>
 #include <string.h>
@@ -248,63 +249,63 @@ a_age(attrib ** p)
 }
 
 int
-a_read(FILE * f, attrib ** attribs)
+a_read(struct storage * store, attrib ** attribs)
 {
-	int key, retval = AT_READ_OK;
-	char zText[128];
-	strcpy(zText, "unknown");
+  int key, retval = AT_READ_OK;
+  char zText[128];
+  strcpy(zText, "unknown");
 
-	key = -1;
-	fscanf(f, "%s", zText);
-	if (strcmp(zText, "end")==0) return retval;
-	else key = __at_hashkey(zText);
+  key = -1;
+  store->r_tok_buf(store, zText, sizeof(zText));
+  if (strcmp(zText, "end")==0) return retval;
+  else key = __at_hashkey(zText);
 
-	while(key!=-1) {
-		attrib_type * at = at_find(key);
-		if (!at) {
-			fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
-			assert(at || !"attribute not registered");
-		}
-		if (at->read) {
-			attrib * na = a_new(at);
-			int i = at->read(na, f);
-			switch (i) {
-			case AT_READ_OK:
-				a_add(attribs, na);
-				break;
-			case AT_READ_FAIL:
-        retval = AT_READ_FAIL;
-				a_free(na);
-				break;
-			default:
-				assert(!"invalid return value");
-				break;
-			}
-		} else {
-			assert(!"fehler: keine laderoutine für attribut");
-		}
+  while(key!=-1) {
+    attrib_type * at = at_find(key);
+    if (!at) {
+      fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
+      assert(at || !"attribute not registered");
+    }
+    if (at->read) {
+      attrib * na = a_new(at);
+      int i = at->read(na, store);
+      switch (i) {
+        case AT_READ_OK:
+          a_add(attribs, na);
+          break;
+        case AT_READ_FAIL:
+          retval = AT_READ_FAIL;
+          a_free(na);
+          break;
+        default:
+          assert(!"invalid return value");
+          break;
+      }
+    } else {
+      assert(!"fehler: keine laderoutine für attribut");
+    }
 
-		fscanf(f, " %s", zText);
-		if (!strcmp(zText, "end")) break;
-		key = __at_hashkey(zText);
-	}
+    store->r_tok_buf(store, zText, sizeof(zText));
+    if (!strcmp(zText, "end")) break;
+    key = __at_hashkey(zText);
+  }
   return retval;
 }
 
 void
-a_write(FILE * f, const attrib * attribs)
+a_write(struct storage * store, const attrib * attribs)
 {
-	const attrib * na = attribs;
+  const attrib * na = attribs;
 
-	while(na) {
-		if (na->type->write) {
-			assert(na->type->hashkey || !"attribute not registered");
-			fprintf(f, "%s ", na->type->name);
-			na->type->write(na, f);
+  while(na) {
+    if (na->type->write) {
+      assert(na->type->hashkey || !"attribute not registered");
+      store->w_tok(store, na->type->name);
+      na->type->write(na, store);
       na = na->next;
     } else {
       na = na->nexttype;
     }
-	}
-	fprintf(f, "end ");
+  }
+  store->w_tok(store, "end");
 }

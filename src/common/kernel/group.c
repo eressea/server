@@ -29,6 +29,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/resolve.h>
+#include <util/storage.h>
 #include <util/unicode.h>
 
 /* libc includes */
@@ -89,24 +90,23 @@ find_group(int gid)
 }
 
 static int
-read_group(attrib * a, FILE * f)
+read_group(attrib * a, struct storage * store)
 {
-	int gid;
-	group * g;
-	fscanf(f, "%d ", &gid);
-	a->data.v = g = find_group(gid);
-	if (g!=0) {
-		g->members++;
-		return AT_READ_OK;
-	}
-	return AT_READ_FAIL;
+  group * g;
+  int gid = store->r_int(store);
+  a->data.v = g = find_group(gid);
+  if (g!=0) {
+    g->members++;
+    return AT_READ_OK;
+  }
+  return AT_READ_FAIL;
 }
 
 static void
-write_group(const attrib * a, FILE * f)
+write_group(const attrib * a, struct storage * store)
 {
-	group * g = (group*)a->data.v;
-	fprintf(f, "%d ", g->gid);
+  group * g = (group*)a->data.v;
+  store->w_int(store, g->gid);
 }
 
 attrib_type
@@ -178,49 +178,54 @@ join_group(unit * u, const char * name)
 }
 
 void
-write_groups(FILE * F, group * g)
+write_groups(struct storage * store, group * g)
 {
-	while (g) {
-		ally * a;
-		fprintf(F, "%d \"%s\" ", g->gid, g->name);
-		for (a=g->allies;a;a=a->next) if (a->faction)
-			fprintf(F, "%s %d ", factionid(a->faction), a->status);
-		fputs("0 ", F);
-		a_write(F, g->attribs);
-		fputs("\n", F);
-		g=g->next;
-	}
-	fputs("0\n", F);
+  while (g) {
+    ally * a;
+    store->w_int(store, g->gid);
+    store->w_str(store, g->name);
+    for (a=g->allies;a;a=a->next) {
+      if (a->faction) {
+        write_faction_reference(a->faction, store);
+        store->w_int(store, a->status);
+      }
+    }
+    store->w_id(store, -1);
+    a_write(store, g->attribs);
+    store->w_brk(store);
+    g=g->next;
+  }
+  store->w_int(store, 0);
 }
 
 void
-read_groups(FILE * F, faction * f)
+read_groups(struct storage * store, faction * f)
 {
-	for(;;) {
-		ally ** pa;
-		group * g;
-		int gid;
+  for(;;) {
+    ally ** pa;
+    group * g;
+    int gid;
     char buf[1024];
 
-    fscanf(F, "%d ", &gid);
-		if (!gid) break;
-    freadstr(F, enc_gamedata, buf, sizeof(buf));
-		g = new_group(f, buf, gid);
-		pa = &g->allies;
-		for (;;) {
-			ally * a;
-			variant aid;
-			fscanf(F, "%s ", buf);
-			aid.i = atoi36(buf);
-			if (aid.i==0) break;
-			a = malloc(sizeof(ally));
-			*pa = a;
-			pa = &a->next;
-			fscanf(F, "%d ", &a->status);
-			a->faction = findfaction(aid.i);
-			if (!a->faction) ur_add(aid, (void**)&a->faction, resolve_faction);
-		}
+    gid = store->r_int(store);
+    if (gid==0) break;
+    store->r_str_buf(store, buf, sizeof(buf));
+    g = new_group(f, buf, gid);
+    pa = &g->allies;
+    for (;;) {
+      ally * a;
+      variant fid;
+      fid.i = store->r_id(store);
+      if (fid.i<0) break;
+      if (store->version<STORAGE_VERSION && fid.i==0) break;
+      a = malloc(sizeof(ally));
+      *pa = a;
+      pa = &a->next;
+      a->status = store->r_int(store);
+      a->faction = findfaction(fid.i);
+      if (!a->faction) ur_add(fid, (void**)&a->faction, resolve_faction);
+    }
     *pa = 0;
-		a_read(F, &g->attribs);
-	}
+    a_read(store, &g->attribs);
+  }
 }

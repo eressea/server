@@ -17,18 +17,18 @@
 #include "movement.h"
 
 #include <util/attrib.h>
+#include <util/storage.h>
 
 static void
-write_movement(const attrib * a, FILE * F)
+write_movement(const attrib * a, struct storage * store)
 {
-	fprintf(F, "%d ", a->data.i);
+	store->w_int(store, a->data.i);
 }
 
 static int
-read_movement(attrib * a, FILE * F)
+read_movement(attrib * a, struct storage * store)
 {
-  int result = fscanf(F, "%d", &a->data.i);
-  if (result<0) return result;
+  a->data.i = store->r_int(store);
   if (a->data.i !=0 ) return AT_READ_OK;
   else return AT_READ_FAIL;
 }

@@ -126,20 +126,23 @@ get_encoding(void)
 }
 
 static int
-read_game(const char * filename)
+read_game(const char * filename, const char * mode)
 {
-  int rv = readgame(filename, false);
+  int rv, m = IO_TEXT;
+  if (strcmp(mode, "binary")==0) m = IO_BINARY;
+  rv = readgame(filename, m, false);
   log_printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   return rv;
 }
 
 static int
-write_game(const char *filename)
+write_game(const char *filename, const char * mode)
 {
-  int result;
+  int result, m = IO_TEXT;
+  if (strcmp(mode, "binary")==0) m = IO_BINARY;
   remove_empty_factions(true);
-  result = writegame(filename, 0);
+  result = writegame(filename, m);
   return result;
 }
 
