@@ -59,8 +59,6 @@ extern void write_items(struct storage * store, struct item *it);
 
 extern const char * datapath(void);
 
-extern void fwriteorder(FILE * F, const struct order * ord, const struct locale * lang);
-
 extern int a_readint(struct attrib * a, struct storage * store);
 extern void a_writeint(const struct attrib * a, struct storage * store);
 extern int a_readshorts(struct attrib * a, struct storage * store);

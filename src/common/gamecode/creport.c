@@ -637,7 +637,16 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 
   print_curses(F, f, sh, TYP_SHIP);
 }
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
+
+static void
+fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
+{
+  char obuf[1024];
+  fputc('"', F);
+  write_order(ord, lang, obuf, sizeof(obuf));
+  if (obuf[0]) fputs(obuf, F);
+  fputc('"', F);
+}
 
 /* prints all that belongs to a unit */
 static void
@@ -1319,7 +1328,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
 #endif
       else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
     }
-    fprintf(F, "\"%d\";id\n", r->uid);
+    /* fprintf(F, "\"%d\";id\n", r->uid); */ 
     if (r->land) {
       const char * str = rname(r, f->locale);
       if (str && str[0]) {

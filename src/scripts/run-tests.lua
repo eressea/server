@@ -12,12 +12,14 @@ end
 test_locales()
 
 local now = os.clock()
---read_game("566", "text")
---write_game("566.dat", "binary")
 read_game("566.dat", "binary")
+--read_game("566", "text")
 local elapsed = os.clock() - now
--- text: 51.203
--- binary: 20.859
 print(elapsed)
+-- text: 50.574
+-- bin0: 19.547
+-- bin1: 18.953
+
+write_game("566.dat", "binary")
 
 io.stdin:read("*line")

@@ -21,10 +21,92 @@ without prior permission by the authors of Eressea.
 #include <libxml/encoding.h>
 
 #define file(store) (FILE *)((store)->userdata)
+
+#define STREAM_VERSION 1
+
+INLINE_FUNCTION size_t
+pack_int(int v, char * buffer)
+{
+  int sign = (v<0);
+
+  if (sign) {
+    v = ~v + 1;
+    sign = 0x40;
+  }
+  if (v<0x40) {
+    buffer[0] = (char)(v | sign);
+    return 1;
+  } else if (v<0x2000) {
+    buffer[0] = (char)((v>> 6) | 0x80);
+    buffer[1] = (char)((v & 0x3F) | sign);
+    return 2;
+  } else if (v<0x100000) {
+    buffer[0] = (char)((v>>13) & 0x7f | 0x80);
+    buffer[1] = (char)((v>> 6) & 0x7f | 0x80);
+    buffer[2] = (char)((v & 0x3F) | sign);
+    return 3;
+  } else if (v<0x8000000) {
+    buffer[0] = (char)((v>>20) & 0x7f | 0x80);
+    buffer[1] = (char)((v>>13) & 0x7f | 0x80);
+    buffer[2] = (char)((v>> 6) & 0x7f | 0x80);
+    buffer[3] = (char)((v & 0x3F) | sign);
+    return 4;
+  }
+  buffer[0] = (char)((v>>27) & 0x7f | 0x80);
+  buffer[1] = (char)((v>>20) & 0x7f | 0x80);
+  buffer[2] = (char)((v>>13) & 0x7f | 0x80);
+  buffer[3] = (char)((v>> 6) & 0x7f | 0x80);
+  buffer[4] = (char)((v & 0x3F) | sign);
+  return 5;
+}
+
+INLINE_FUNCTION int
+unpack_int(const char * buffer)
+{
+  int i = 0, v = 0;
+
+  while (buffer[i] & 0x80) {
+    v = (v << 7) | (buffer[i++] & 0x7f);
+  }
+  v = (v << 6) | (buffer[i] & 0x3f);
+
+  if (buffer[i] & 0x40) {
+    v = ~v + 1;
+  }
+  return v;
+}
+
 static int 
 bin_w_brk(struct storage * store)
 {
   return 0;
+}
+
+static int 
+bin_w_int_pak(struct storage * store, int arg)
+{
+  char buffer[5];
+  size_t size = pack_int(arg, buffer);
+  return (int)fwrite(buffer, sizeof(char), size, file(store));
+}
+
+static int
+bin_r_int_pak(struct storage * store)
+{
+  int v = 0;
+  char ch;
+
+  fread(&ch, sizeof(char), 1, file(store));
+  while (ch & 0x80) {
+    v = (v << 7) | (ch & 0x7f);
+    fread(&ch, sizeof(char), 1, file(store));
+  }
+  v = (v << 6) | (ch & 0x3f);
+
+  if (ch & 0x40) {
+    v = ~v + 1;
+  }
+  return v;
 }
 
 static int 
@@ -60,21 +142,21 @@ bin_w_str(struct storage * store, const char * tok)
 {
   int result;
   if (tok==NULL || tok[0]==0) {
-    static const int empty = 0;
-    result = (int)fwrite(&empty, sizeof(int), 1, file(store));
+    result = store->w_int(store, 0);
   } else {
     int size = (int)strlen(tok);
-    result = (int)fwrite(&size, sizeof(int), 1, file(store));
+    result = store->w_int(store, size);
     result += (int)fwrite(tok, size, 1, file(store));
   }
   return result;
 }
+
 static char *
 bin_r_str(struct storage * store)
 {
   int len;
 
-  fread(&len, sizeof(len), 1, file(store));
+  len = store->r_int(store);
   if (len) {
     char * result = malloc(len+1);
 
@@ -84,13 +166,14 @@ bin_r_str(struct storage * store)
   }
   return NULL;
 }
+
 static void
 bin_r_str_buf(struct storage * store, char * result, size_t size)
 {
   int i;
   size_t rd, len;
 
-  fread(&i, sizeof(int), 1, file(store));
+  i = store->r_int(store);
   assert(i>=0);
   if (i==0) {
     result[0] = 0;
@@ -116,9 +199,18 @@ bin_open(struct storage * store, const char * filename, int mode)
   store->encoding=XML_CHAR_ENCODING_UTF8; /* always utf8 it is */
   if (F) {
     if (mode==IO_READ) {
-      store->version = store->r_int(store);
+      int stream_version = 0;
+      store->version = bin_r_int(store);
+      if (store->version>=INTPAK_VERSION) {
+        stream_version = bin_r_int(store);
+      }
+      if (stream_version==0) {
+        store->r_int = bin_r_int;
+        store->w_int = bin_w_int;
+      }
     } else if (store->encoding==XML_CHAR_ENCODING_UTF8) {
-      store->w_int(store, RELEASE_VERSION);
+      bin_w_int(store, RELEASE_VERSION);
+      bin_w_int(store, STREAM_VERSION);
     }
   }
   return (F==NULL);
@@ -131,12 +223,12 @@ bin_close(struct storage * store)
 }
 
 const storage binary_store = {
-  bin_w_brk,
-  bin_w_int, bin_r_int,
-  bin_w_flt, bin_r_flt,
-  bin_w_int, bin_r_int,
-  bin_w_str, bin_r_str, bin_r_str_buf,
-  bin_w_str, bin_r_str, bin_r_str_buf,
+  bin_w_brk, /* newline (ignore) */
+  bin_w_int_pak, bin_r_int_pak, /* int storage */
+  bin_w_flt, bin_r_flt, /* float storage */
+  bin_w_int, bin_r_int, /* id storage */
+  bin_w_str, bin_r_str, bin_r_str_buf, /* token storage */
+  bin_w_str, bin_r_str, bin_r_str_buf, /* string storage */
   bin_open, bin_close,
   0, 0, NULL
 };

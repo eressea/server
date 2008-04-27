@@ -176,7 +176,7 @@ curse_read(attrib * a, struct storage * store)
     int vigour = store->r_int(store);
     c->vigour = vigour;
   }
-  if (store->version<STORAGE_VERSION) {
+  if (store->version<INTPAK_VERSION) {
     variant mageid;
     mageid.i = store->r_int(store);
     if (mageid.i <= 0) {
@@ -221,26 +221,19 @@ void
 curse_write(const attrib * a, struct storage * store)
 {
   unsigned int flags;
-  int mage_no;
   curse * c = (curse*)a->data.v;
   const curse_type * ct = c->type;
+  unit * mage = (c->magician && c->magician->number)?c->magician:NULL;
 
   /* copied from c_clearflag */
   flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
-
-  if (c->magician && c->magician->number) {
-    mage_no = c->magician->no;
-    assert(mage_no>0);
-  } else {
-    mage_no = -1;
-  }
 
   store->w_int(store, c->no);
   store->w_tok(store, ct->cname);
   store->w_int(store, flags);
   store->w_int(store, c->duration);
   store->w_flt(store, (float)c->vigour);
-  store->w_int(store, mage_no);
+  write_unit_reference(mage, store);
   store->w_int(store, c->effect.i);
 
   if (c->type->write) c->type->write(store, c);

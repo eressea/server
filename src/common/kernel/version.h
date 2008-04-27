@@ -54,6 +54,7 @@
 #define UNICODE_VERSION 326 /* everything is stored as UTF8 */
 #define UID_VERSION 327 /* regions have a unique id */
 #define STORAGE_VERSION 328 /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
+#define INTPAK_VERSION 329 /* in binary, ints can get packed */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION STORAGE_VERSION /* current datafile */
+#define RELEASE_VERSION INTPAK_VERSION /* current datafile */
