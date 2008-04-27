@@ -31,11 +31,15 @@ atoi36(const char * str)
 {
   /* cannot use strtol, becuase invalid strings will cause crash */
   const unsigned char * s = (const unsigned char *)str;
-  int i = 0;
+  int i = 0, sign = 1;
   assert(s);
   if(!(*s)) return 0;
 
   while(isspace(*(unsigned char*)s)) ++s;
+  if (*s == '-') {
+    sign = -1;
+    ++s;
+  }
   while(isalnum(*(unsigned char*)s)) {
     if (isupper(*(unsigned char*)s)) i = i*36 + (*s)-'A' + 10;
     else if (islower(*(unsigned char*)s)) i=i*36 + (*s)-'a' + 10;
@@ -45,7 +49,7 @@ atoi36(const char * str)
     ++s;
   }
   if (i<0) return 0;
-  return i;
+  return i * sign;
 }
 
 const char*

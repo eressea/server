@@ -33,6 +33,7 @@
 #include <util/unicode.h>
 
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wctype.h>
@@ -216,7 +217,7 @@ read_groups(struct storage * store, faction * f)
       ally * a;
       variant fid;
       fid.i = store->r_id(store);
-      if (fid.i<0) break;
+      if (fid.i<=0) break;
       if (store->version<STORAGE_VERSION && fid.i==0) break;
       a = malloc(sizeof(ally));
       *pa = a;
