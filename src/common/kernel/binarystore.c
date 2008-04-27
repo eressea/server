@@ -41,21 +41,21 @@ pack_int(int v, char * buffer)
     buffer[1] = (char)((v & 0x3F) | sign);
     return 2;
   } else if (v<0x100000) {
-    buffer[0] = (char)((v>>13) & 0x7f | 0x80);
-    buffer[1] = (char)((v>> 6) & 0x7f | 0x80);
+    buffer[0] = (char)(((v>>13) & 0x7f) | 0x80);
+    buffer[1] = (char)(((v>> 6) & 0x7f) | 0x80);
     buffer[2] = (char)((v & 0x3F) | sign);
     return 3;
   } else if (v<0x8000000) {
-    buffer[0] = (char)((v>>20) & 0x7f | 0x80);
-    buffer[1] = (char)((v>>13) & 0x7f | 0x80);
-    buffer[2] = (char)((v>> 6) & 0x7f | 0x80);
+    buffer[0] = (char)(((v>>20) & 0x7f) | 0x80);
+    buffer[1] = (char)(((v>>13) & 0x7f) | 0x80);
+    buffer[2] = (char)(((v>> 6) & 0x7f) | 0x80);
     buffer[3] = (char)((v & 0x3F) | sign);
     return 4;
   }
-  buffer[0] = (char)((v>>27) & 0x7f | 0x80);
-  buffer[1] = (char)((v>>20) & 0x7f | 0x80);
-  buffer[2] = (char)((v>>13) & 0x7f | 0x80);
-  buffer[3] = (char)((v>> 6) & 0x7f | 0x80);
+  buffer[0] = (char)(((v>>27) & 0x7f) | 0x80);
+  buffer[1] = (char)(((v>>20) & 0x7f) | 0x80);
+  buffer[2] = (char)(((v>>13) & 0x7f) | 0x80);
+  buffer[3] = (char)(((v>> 6) & 0x7f) | 0x80);
   buffer[4] = (char)((v & 0x3F) | sign);
   return 5;
 }
