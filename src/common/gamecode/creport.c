@@ -1328,7 +1328,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
 #endif
       else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
     }
-    /* fprintf(F, "\"%d\";id\n", r->uid); */ 
+    fprintf(F, "%d;id\n", r->uid);
     if (r->land) {
       const char * str = rname(r, f->locale);
       if (str && str[0]) {
