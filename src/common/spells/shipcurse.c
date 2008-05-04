@@ -45,7 +45,7 @@ cinfo_ship(const void * obj, typ_t typ, const curse *c, int self)
   if (self != 0) { /* owner or inside */
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
   } else {
-    msg = msg_message("curseinfo::shipunknown", "id", c->no);
+    msg = msg_message("curseinfo::ship_unknown", "id", c->no);
   }
   if (msg==NULL) {
     log_error(("There is no curseinfo for %s.\n", c->type->cname));

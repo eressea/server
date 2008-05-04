@@ -1383,6 +1383,7 @@
       <arg name="region" type="region"/>
     </type>
     <text locale="de">"Mit einem Ritual bindet $unit($mage) die magischen Kr‰fte der Erde von $region($region) in die Mauern von $building($building)."</text>
+    <text locale="en">"$unit($mage) performs a ritual that binds the magical forces of $region($region) into the walls of $building($building)."</text>
   </message>
 
   <message name="sp_permtransfer_effect" section="magic">
@@ -1392,6 +1393,7 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($mage) opfert $unit($target) $int($amount) Aura."</text>
+    <text locale="en">"$unit($mage) sacrifices $int($amount) aura for $unit($target)."</text>
   </message>
 
   <message name="reanimate_effect_0" section="magic">
@@ -8340,6 +8342,7 @@
       <arg name="ship" type="ship"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Kapit‰n muﬂ ein Segeltalent von mindestens $int($value) haben, um $ship($ship) zu befehligen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The captain needs a sailing skill of at least $int($value), to command $ship($ship)."</text>
   </message>
 
   <message name="error_roads_finished" section="errors">
