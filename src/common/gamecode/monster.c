@@ -934,7 +934,7 @@ plan_monsters(void)
       order * long_order = NULL;
 
       /* Ab hier nur noch Befehle für NPC-Einheiten. */
-      if (u->faction->no != MONSTER_FACTION) continue;
+      if (!is_monsters(u->faction)) continue;
 
       if (attack_chance>0.0) {
         if (chance(attack_chance)) attacking = true;

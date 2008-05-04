@@ -1017,7 +1017,7 @@ check_split(void)
 
   for(r=regions;r;r=r->next) {
     for(u=r->units;u;u=u->next) {
-      if(u->faction->no == MONSTER_FACTION) {
+      if(is_monsters(u->faction)) {
         if(u->number > u->race->splitsize) {
           unit * u2 = split_unit(r, u);
           fset(u2, UFL_ISNEW|UFL_MOVED);
@@ -1205,7 +1205,7 @@ randomevents(void)
   /* monster-einheiten desertieren */
   for (r = regions; r; r=r->next) {
     for (u=r->units; u; u=u->next) {
-      if (u->faction && u->faction->no != MONSTER_FACTION
+      if (u->faction && !is_monsters(u->faction)
         && (u->race->flags & RCF_DESERT)) {
           if (fval(u, UFL_ISNEW)) continue;
           if (rng_int()%100 < 5) {

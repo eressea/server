@@ -510,7 +510,7 @@ factionorders(void)
 
   f = findfaction(fid);
   
-  if (f!=NULL && f->no!=MONSTER_FACTION) {
+  if (f!=NULL && !is_monsters(f)) {
     const char * pass = getstrtoken();
 
     if (!checkpasswd(f, (const char *)pass, true)) {
@@ -1441,7 +1441,7 @@ readfaction(struct storage * store)
   
   i = f->options = store->r_int(store);
 
-  if ((i & (want(O_REPORT)|want(O_COMPUTER)))==0 && f->no!=MONSTER_FACTION) {
+  if ((i & (want(O_REPORT)|want(O_COMPUTER)))==0 && !is_monsters(f)) {
     /* Kein Report eingestellt, Fehler */
     f->options = f->options | want(O_REPORT) | want(O_ZUGVORLAGE);
   }

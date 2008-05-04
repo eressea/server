@@ -449,7 +449,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   init_tokens(ord);
   skip_token();
   n = getuint();
-  if (f->no==MONSTER_FACTION) {
+  if (is_monsters(f)) {
     /* Monster dürfen REKRUTIERE 15 dracoid machen */
     const char * str = getstrtoken();
     rc = findrace(str, f->locale);
@@ -3058,7 +3058,7 @@ tax_cmd(unit * u, struct order * ord, request ** taxorders)
 	request *o;
 	int max;
 
-	if (!humanoidrace(u->race) && u->faction != findfaction(MONSTER_FACTION)) {
+	if (!humanoidrace(u->race) && !is_monsters(u->faction)) {
 		cmistake(u, ord, 228, MSG_INCOME);
 		return;
 	}

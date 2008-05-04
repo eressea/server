@@ -241,7 +241,7 @@ cmistake(const unit * u, struct order *ord, int mno, int mtype)
 	static char ebuf[20];
   unused(mtype);
 
-	if (u->faction->no == MONSTER_FACTION) return;
+	if (is_monsters(u->faction)) return;
 	sprintf(ebuf, "error%d", mno);
 	ADDMSG(&u->faction->msgs, msg_message(ebuf, 
 		"command unit region", ord, u, u->region));

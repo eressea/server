@@ -1724,7 +1724,7 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
 
   while (flist!=NULL) {
     const faction * f = flist->data;
-    if (f->no!=MONSTER_FACTION) {
+    if (!is_monsters(f)) {
       char buf[8192];
       char label = '-';
 
@@ -2315,7 +2315,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     rnl(F);
     rpline(F);
   }
-  if (f->no != MONSTER_FACTION) {
+  if (!is_monsters(f)) {
     if (!anyunits) {
       rnl(F);
       rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 2, 0);

@@ -103,7 +103,7 @@ curse_emptiness(void)
     if (rterrain(r)==T_GLACIER) continue;
     if (r->age<=200) continue;
     if (get_curse(r->attribs, ct)) continue;
-    while (u && u->faction->no==MONSTER_FACTION) u=u->next;
+    while (u && is_monsters(u->faction)) u=u->next;
     if (u==NULL) fset(r, RF_MARK);
   }
   for (r=regions;r!=NULL;r=r->next) {
@@ -240,7 +240,7 @@ no_teurefremde(boolean convert)
   faction * f;
 
   for (f=factions;f;f=f->next) {
-    if (f->no != MONSTER_FACTION) {
+    if (!is_monsters(f)) {
       unit *u;
       for (u=f->units;u;u=u->nextF) {
         if (is_migrant(u) && kor_teure_talente(u)) {
@@ -267,7 +267,7 @@ fix_age(void)
   const race * oldorc = rc_find("orc");
   const race * uruk = rc_find("uruk");
   for (f=factions;f;f=f->next) {
-    if (f->no!=MONSTER_FACTION && playerrace(f->race)) continue;
+    if (!is_monsters(f) && playerrace(f->race)) continue;
     if (f->race==oldorc) f->race= uruk;
     else if (f->age!=turn) {
       log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
@@ -686,7 +686,7 @@ fix_astralplane(void)
       while (r->units) {
         unit * u = r->units;
         move_unit(u, rnext, NULL);
-        if (u->faction->no==MONSTER_FACTION) {
+        if (is_monsters(u->faction)) {
           set_number(u, 0);
         }
       }
@@ -695,7 +695,7 @@ fix_astralplane(void)
     if (r->units!=NULL) {
       unit * u;
       for (u=r->units;u;u=u->next) {
-        if (u->faction->no!=MONSTER_FACTION) {
+        if (!is_monsters(u->faction)) {
           log_error(("Einheit %s in %u, %u steckt im Nebel fest.\n",
             unitname(u), r->x, r->y));
         }
@@ -768,7 +768,7 @@ check_dissolve(void)
   region * r;
   for (r=regions;r!=NULL;r=r->next) {
     unit * u;
-    for (u=r->units;u!=NULL;u=u->next) if (u->faction->no!=MONSTER_FACTION) {
+    for (u=r->units;u!=NULL;u=u->next) if (!is_monsters(u->faction)) {
       if (u->race==new_race[RC_STONEGOLEM]) {
         fix_dissolve(u, STONEGOLEM_CRUMBLE, 0);
         continue;
@@ -794,7 +794,7 @@ check_mages(void)
 {
   faction * f;
   for (f=factions;f!=NULL;f=f->next) {
-    if (f->no!=MONSTER_FACTION) {
+    if (!is_monsters(f)) {
       unit * u;
       int mages = 0;
       int maxmages = max_skill(f, SK_MAGIC);
@@ -924,21 +924,21 @@ fix_toads(void)
     for (u=r->units; u; u=u->next) {
       if (u->race==toad) {
         int found = 0;
-	handler_info * td = NULL;
-	attrib * a = a_find(u->attribs, &at_eventhandler);
-	while (!found && a!=NULL && a->type==&at_eventhandler) {
+        handler_info * td = NULL;
+        attrib * a = a_find(u->attribs, &at_eventhandler);
+        while (!found && a!=NULL && a->type==&at_eventhandler) {
           td = (handler_info *)a->data.v;
           if (strcmp(td->event, "timer")==0) {
             trigger * tr = td->triggers;
             while (tr && !found) {
-              if (tr->type==&tt_changerace) {
+              if (tr->type==&tt_timeout) {
                 found = 1;
               }
               tr = tr->next;
             }
           }
           a = a->next;
-	}
+        }
         if (!found) {
           log_error(("fixed toad %s.\n", unitname(u)));
           u->race=u->faction->race;

@@ -2144,6 +2144,17 @@ typedef struct param {
   char * data;
 } param;
 
+int
+getid(void)
+{
+  const char * str = (const char *)getstrtoken();
+  int i = atoi36(str);
+  if (i<0) {
+    return -1;
+  }
+  return i;
+}
+
 const char *
 get_param(const struct param * p, const char * key)
 {
@@ -2310,7 +2321,7 @@ remove_empty_factions(boolean writedropouts)
     /* monster (0) werden nicht entfernt. alive kann beim readgame
      * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
      * haben. */
-    if ((f->units==NULL || f->alive == 0) && f->no != MONSTER_FACTION) {
+    if ((f->units==NULL || f->alive == 0) && !is_monsters(f)) {
       ursprung * ur = f->ursprung;
       while (ur && ur->id!=0) ur=ur->next;
       if (!quiet) log_stdio(stdout, "\t%s\n", factionname(f));
@@ -2486,7 +2497,7 @@ lifestyle(const unit * u)
   static plane * astralspace = NULL;
   int need;
 
-  if (u->faction->no == MONSTER_FACTION) return 0;
+  if (is_monsters(u->faction)) return 0;
 
   need = maintenance_cost(u);
 

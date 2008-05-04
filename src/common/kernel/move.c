@@ -353,7 +353,7 @@ canwalk(unit * u)
   /* workaround: monsters are too stupid to drop items, therefore they have
 	 * infinite carrying capacity */
 
-	if (u->faction->no == MONSTER_FACTION) return E_CANWALK_OK;
+	if (is_monsters(u->faction)) return E_CANWALK_OK;
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 

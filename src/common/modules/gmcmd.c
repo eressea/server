@@ -58,7 +58,7 @@
 static void
 mistake(const unit * u, struct order * ord, const char *comment)
 {
-  if (u->faction->no != MONSTER_FACTION) {
+  if (!is_monsters(u->faction)) {
     ADDMSG(&u->faction->msgs, msg_message("mistake",
       "command error unit region", ord, comment, u, u->region));
   }

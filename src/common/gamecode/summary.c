@@ -328,7 +328,7 @@ make_summary(void)
     if (f->alive && f->units) {
       s->factions++;
       /* Problem mit Monsterpartei ... */
-      if (f->no!=MONSTER_FACTION) {
+      if (!is_monsters(f)) {
         s->factionrace[old_race(f->race)]++;
       }
     }
@@ -368,7 +368,7 @@ make_summary(void)
       for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
       for (u = r->units; u; u = u->next) {
         f = u->faction;
-        if (u->faction->no != MONSTER_FACTION) {
+        if (!is_monsters(u->faction)) {
           skill * sv;
           item * itm;
 

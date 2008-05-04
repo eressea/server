@@ -3984,7 +3984,7 @@ sp_rallypeasantmob(castorder *co)
 
   for (u = r->units; u; u = un) {
     un = u->next;
-    if (u->faction->no == MONSTER_FACTION && u->race == new_race[RC_PEASANT]) {
+    if (is_monsters(u->faction) && u->race == new_race[RC_PEASANT]) {
       rsetpeasants(r, rpeasants(r) + u->number);
       rsetmoney(r, rmoney(r) + get_money(u));
       set_money(u, 0);

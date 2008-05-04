@@ -48,6 +48,7 @@ extern "C" {
 #endif
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
+#define is_monsters(f) ((f)->no==MONSTER_FACTION)
 #define MAXPEASANTS_PER_AREA 10 /* number of peasants per region-size */
 #define TREESIZE (MAXPEASANTS_PER_AREA-2) /* space used by trees (in #peasants) */
 
@@ -188,7 +189,7 @@ extern param_t findparam(const char *s, const struct locale * lang);
 extern param_t getparam(const struct locale * lang);
 
 extern int atoi36(const char * s);
-#define getid() atoi36((const char *)getstrtoken())
+extern int getid(void);
 #define unitid(x) itoa36((x)->no)
 
 #define getshipid() getid()

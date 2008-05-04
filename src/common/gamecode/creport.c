@@ -995,7 +995,7 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
   const faction_list * flist = addresses;
   while (flist!=NULL) {
     const faction * f = flist->data;
-    if (uf!=f && f->no != MONSTER_FACTION) {
+    if (uf!=f && !is_monsters(f)) {
       fprintf(F, "PARTEI %d\n", f->no);
       fprintf(F, "\"%s\";Parteiname\n", f->name);
       fprintf(F, "\"%s\";email\n", f->email);

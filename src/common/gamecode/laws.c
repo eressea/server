@@ -176,7 +176,7 @@ checkorders(void)
 
   puts(" - Warne spaete Spieler...");
   for (f = factions; f; f = f->next)
-    if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTimeout() - 1)
+    if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
 static boolean
@@ -1093,7 +1093,7 @@ parse_restart(void)
     "gemeldet haben...");
 
   age = calloc(max(4,turn+1), sizeof(int));
-  for (f = factions; f; f = f->next) if (f->no != MONSTER_FACTION) {
+  for (f = factions; f; f = f->next) if (!is_monsters(f)) {
     if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
       if (f->age>=0 && f->age <= turn) ++age[f->age];
       if (f->age == 2 || f->age == 3) {
@@ -2466,7 +2466,7 @@ guard_on_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 95, MSG_EVENT);
     } else {
       /* Monster der Monsterpartei dürfen immer bewachen */
-      if (u->faction == findfaction(MONSTER_FACTION)) {
+      if (is_monsters(u->faction)) {
         guard(u, GUARD_ALL);
       } else {
         int err = can_start_guarding(u);
@@ -3462,7 +3462,7 @@ update_spells(void)
     for(u=r->units;u;u=u->next) {
       if (u->faction!=NULL && u->number>0) {
         sc_mage *m = get_mage(u);
-        if (u->faction->no != MONSTER_FACTION && m != NULL) {
+        if (!is_monsters(u->faction) && m != NULL) {
           if (m->magietyp == M_GRAU) continue;
           updatespelllist(u);
         }

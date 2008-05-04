@@ -43,7 +43,7 @@ age_undead(unit *u)
 	 * absplitten, anstatt sich zu vermehren. monster
 	 * untote vermehren sich nur noch */
 
-	if (u->number > UNDEAD_MIN && u->faction->no != MONSTER_FACTION && rng_int() % 100 < UNDEAD_BREAKUP) {
+	if (u->number > UNDEAD_MIN && !is_monsters(u->faction) && rng_int() % 100 < UNDEAD_BREAKUP) {
 		int m;
 		unit *u2;
 

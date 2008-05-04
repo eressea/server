@@ -434,7 +434,7 @@ updatespelllist(unit * u)
   spell * sp;
   struct sc_mage * mage = get_mage(u);
   magic_t gebiet = find_magetype(u);
-  boolean ismonster = u->faction->no==MONSTER_FACTION;
+  boolean ismonster = is_monsters(u->faction);
 
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
   sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);

@@ -196,7 +196,7 @@ update_nmrs(void)
   for (f = factions; f; f = f->next) {
     if (fval(f, FFL_ISNEW)) {
       ++newplayers;
-    } else if (f->no != MONSTER_FACTION) {
+    } else if (!is_monsters(f)) {
       int nmr = turn-f->lastorders+1;
       if (nmr<0 || nmr>NMRTimeout()) {
         log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
@@ -1272,7 +1272,7 @@ nmr_warnings(void)
   faction *f,*fa;
 #define FRIEND (HELP_GUARD|HELP_MONEY)
   for (f=factions;f;f=f->next) {
-    if (f->no != MONSTER_FACTION && (turn-f->lastorders) >= 2) {
+    if (!is_monsters(f) && (turn-f->lastorders) >= 2) {
       message * msg = NULL;
       for (fa=factions;fa;fa=fa->next) {
         if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {

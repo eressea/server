@@ -50,7 +50,7 @@ average_score_of_age(int age, int a)
   int sum = 0, count = 0;
 
   for (f = factions; f; f = f->next) {
-    if (f->no != MONSTER_FACTION && f->race != new_race[RC_TEMPLATE] && f->age <= age + a && f->age >= age - a) {
+    if (!is_monsters(f) && f->race != new_race[RC_TEMPLATE] && f->age <= age + a && f->age >= age - a) {
       sum += f->score;
       count++;
     }
