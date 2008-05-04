@@ -29,7 +29,7 @@
 int
 atoi36(const char * str)
 {
-  /* cannot use strtol, becuase invalid strings will cause crash */
+  /* cannot use strtol, because invalid strings will cause crash */
   const unsigned char * s = (const unsigned char *)str;
   int i = 0, sign = 1;
   assert(s);

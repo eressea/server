@@ -7561,6 +7561,11 @@
     <text locale="en">shipid</text>
   </string>
 
+  <string name="stat_tribe_p">
+    <text locale="de">völker</text>
+    <text locale="en"> tribes</text>
+  </string>
+  
   <string name="par_building">
     <text locale="de">Gebäude-Nr</text>
     <text locale="en">buildingid</text>

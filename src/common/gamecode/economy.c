@@ -603,6 +603,7 @@ give_cmd(unit * u, order * ord)
   s = getstrtoken();
   p = findparam(s, u->faction->locale);
 
+  /* first, do all the ones that do not require HELP_GIVE or CONTACT */
   if (p == P_CONTROL) {
     message * msg;
 
@@ -633,7 +634,7 @@ give_cmd(unit * u, order * ord)
     freset(u, UFL_OWNER);
     fset(u2, UFL_OWNER);
 
-    msg = msg_message("givecommand", "unit receipient", u, u2);
+    msg = msg_message("givecommand", "unit recipient", u, u2);
     add_message(&u->faction->msgs, msg);
     if (u->faction != u2->faction) {
       add_message(&u2->faction->msgs, msg);
@@ -647,21 +648,17 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  /* if ((u->race->ec_flags & NOGIVE) || fval(u,UFL_LOCKED)) {*/
-  else if (u->race->ec_flags & NOGIVE && u2!=NULL) {
+  else if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
+    cmistake(u, ord, 40, MSG_COMMERCE);
+    return;
+  }
+
+  else if (u2 && u->race->ec_flags & NOGIVE) {
     ADDMSG(&u->faction->msgs,
       msg_feedback(u, ord, "race_nogive", "race", u->race));
     return;
   }
-  /* sperrt hier auch personenübergaben!
-  else if (u2 && !(u2->race->ec_flags & GETITEM)) {
-  ADDMSG(&u->faction->msgs,
-  msg_feedback(u, ord, "race_notake", "race", u2->race));
-  return;
-  }
-  */
 
-  /* Übergabe aller Kräuter */
   else if (p == P_HERBS) {
     boolean given = false;
     if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
@@ -713,10 +710,6 @@ give_cmd(unit * u, order * ord)
       return;
     }
 
-    if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-      cmistake(u, ord, 40, MSG_COMMERCE);
-      return;
-    }
     give_unit(u, u2, ord);
     return;
   }
@@ -725,11 +718,6 @@ give_cmd(unit * u, order * ord)
     const char * s = getstrtoken();
 
     if (*s == 0) { /* Alle Gegenstände übergeben */
-
-      if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-        cmistake(u, ord, 40, MSG_COMMERCE);
-        return;
-      }
 
       /* do these checks once, not for each item we have: */
       if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
@@ -805,7 +793,7 @@ give_cmd(unit * u, order * ord)
     s = getstrtoken(); /* skip one ahead to get the amount. */
   }
 
-  n = atoip((const char *)s);		/* n: anzahl */
+  n = atoip((const char *)s);		/* n: Anzahl */
   if (p==P_EACH) {
     n *= u2->number;
   }

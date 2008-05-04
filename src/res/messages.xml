@@ -3669,11 +3669,11 @@
   <message name="givecommand" section="events">
     <type>
       <arg name="unit" type="unit"/>
-      <arg name="receipient" type="unit"/>
+      <arg name="recipient" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) gibt das Kommando an $unit($receipient)."</text>
-    <text locale="fr">"$unit($unit) gave control to $unit($receipient)."</text>
-    <text locale="en">"$unit($unit) gave control to $unit($receipient)."</text>
+    <text locale="de">"$unit($unit) gibt das Kommando an $unit($recipient)."</text>
+    <text locale="fr">"$unit($unit) gave control to $unit($recipient)."</text>
+    <text locale="en">"$unit($unit) gave control to $unit($recipient)."</text>
   </message>
   <message name="givedumb" section="events">
     <type>

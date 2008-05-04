@@ -183,7 +183,7 @@ report_summary(summary * s, summary * o, boolean full)
     const race * rc = new_race[i];
     if (s->factionrace[i] && rc && playerrace(rc)
       && i != RC_TEMPLATE && i != RC_CLONE) {
-        fprintf(F, "%13svoelker: %s\n", LOC(default_locale, rc_name(rc, 3)),
+        fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)), LOC(default_locale, "stat_tribe_p"),
           pcomp(s->factionrace[i], o->factionrace[i]));
     }
   }
