@@ -3153,13 +3153,15 @@ join_battle(battle * b, unit * u, boolean attack, fighter ** cp)
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
-    for (fig=s->fighters;fig;fig=fig->next) {
-      if (fig->unit == u) {
-        c = fig;
-        if (attack) {
-          set_attacker(fig);
+    if (s->faction==u->faction) {
+      for (fig=s->fighters;fig;fig=fig->next) {
+        if (fig->unit == u) {
+          c = fig;
+          if (attack) {
+            set_attacker(fig);
+          }
+          break;
         }
-        break;
       }
     }
   }
@@ -3330,13 +3332,15 @@ battle_report(battle * b)
   bfaction *bf;
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
-    for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
-      if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2)) {
-        cont = true;
-        break;
+    if (s->alive-s->removed > 0) {
+      for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
+        if (s2->alive-s2->removed > 0 && enemy(s, s2)) {
+          cont = true;
+          break;
+        }
       }
+      if (cont) break;
     }
-    if (cont) break;
   }
 
   printf(" %d", b->turn);
