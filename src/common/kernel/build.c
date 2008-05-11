@@ -834,7 +834,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   id = getid();
   if (id>0) { /* eine Nummer angegeben, keine neue Burg bauen */
     b = findbuilding(id);
-    if (!b || b->region != u->region){ /* eine Burg mit dieser Nummer gibt es hier nicht */
+    if (!b || b->region != u->region) { /* eine Burg mit dieser Nummer gibt es hier nicht */
       /* vieleicht Tippfehler und die eigene Burg ist gemeint? */
       if (u->building && u->building->type==btype) {
         b = u->building;
@@ -844,6 +844,8 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
         return;
       }
     }
+  } else if (u->building && u->building->type==btype) {
+    b = u->building;
   }
 
   if (b) btype = b->type;
