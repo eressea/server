@@ -229,7 +229,7 @@ read_mage(attrib * a, struct storage * store)
         sp = find_spell(mage->magietyp, spname);
       }
     }
-    if (sp && level>0) {
+    if (sp && level>=0) {
       int slot = -1;
       if (sp->sptyp & PRECOMBATSPELL) slot = 0;
       else if (sp->sptyp & COMBATSPELL) slot = 1;
