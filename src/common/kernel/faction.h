@@ -141,6 +141,7 @@ extern void remove_enemy(struct faction * f, struct faction * enemy);
 extern void write_faction_reference(const struct faction * f, struct storage * store);
 extern int read_faction_reference(struct faction ** f, struct storage * store);
 
+void renumber_faction(faction * f, int no);
 
 #ifdef SMART_INTERVALS
 extern void update_interval(struct faction * f, struct region * r);

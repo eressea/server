@@ -2567,14 +2567,7 @@ renumber_factions(void)
   for (rp=renum;rp;rp=rp->next) {
     f = rp->faction;
     a_remove(&f->attribs, rp->attrib);
-    if (f->subscription) {
-      sql_print(("UPDATE subscriptions set faction='%s' where id=%u;\n",
-                 itoa36(rp->want), f->subscription));
-    }
-    funhash(f);
-    f->no = rp->want;
-    fhash(f);
-    fset(f, FFL_NEWID);
+    renumber_faction(f, rp->want);
   }
   while (renum) {
     rp = renum->next;

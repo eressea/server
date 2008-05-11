@@ -46,6 +46,8 @@ extern void rsf(FILE * F, char *s, size_t len);
 #define IO_BINARY 0x04
 #define IO_TEXT 0x08
 
+#define IO_DEFAULT IO_BINARY
+
 /* Versionsänderungen: */
 extern int data_version;
 extern const char *xmlfile;

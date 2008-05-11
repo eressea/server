@@ -22,7 +22,7 @@ print(elapsed)
 -- bin1: 18.953
 f = get_faction(0)
 
-renumber(f, 666)
+--renumber(f, 666)
 --write_game("566.dat", "binary")
 
-io.stdin:read("*line")
+--io.stdin:read("*line")

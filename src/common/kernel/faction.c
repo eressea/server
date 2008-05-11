@@ -37,6 +37,7 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/storage.h>
+#include <util/sql.h>
 #include <util/variant.h>
 #include <util/unicode.h>
 #include <attributes/otherfaction.h>
@@ -322,6 +323,18 @@ set_alliance(faction * a, faction * b, int status)
     return;
   }
   (*sfp)->status |= status;
+}
+
+void renumber_faction(faction * f, int no)
+{
+  if (f->subscription) {
+    sql_print(("UPDATE subscriptions set faction='%s' where id=%u;\n",
+      itoa36(no), f->subscription));
+  }
+  funhash(f);
+  f->no = no;
+  fhash(f);
+  fset(f, FFL_NEWID);
 }
 
 #ifdef SMART_INTERVALS

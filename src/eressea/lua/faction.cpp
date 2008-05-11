@@ -297,6 +297,12 @@ faction_countheroes(const faction& f)
   return countheroes(&f);
 }
 
+static void
+faction_renumber(faction& f, int no)
+{
+  renumber_faction(&f, no);
+}
+
 static int
 faction_maxheroes(const faction& f)
 {
@@ -342,6 +348,7 @@ bind_faction(lua_State * L)
     .property("y", &faction_getorigin_y, &faction_setorigin_y)
     //.property("origin", &faction_getorigin, &faction_setorigin, pure_out_value(_2) + pure_out_value(_3), copy)
 
+    .def("renum", &faction_renumber)
     .def("add_notice", &faction_addnotice)
     .property("password", &faction_get_passw, &faction_set_passw)
     .property("info", &faction_get_banner, &faction_set_banner)
