@@ -50,8 +50,12 @@ typedef struct shortpwd {
 #define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */
 #define FFL_NOTIMEOUT     (1<<29) /* ignore MaxAge() */
 #define FFL_GM            (1<<30) /* eine Partei mit Sonderrechten */
+#define FFL_NPC           (1<<31) /* eine Partei mit Monstern */
 
-#define FFL_SAVEMASK (FFL_NEWID|FFL_GM|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
+#define FFL_SAVEMASK (FFL_NEWID|FFL_GM|FFL_NPC|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
+
+struct faction * get_monsters(void);
+#define is_monsters(f) ((f)->flags&FFL_NPC)
 
 typedef struct faction {
   struct faction *next;

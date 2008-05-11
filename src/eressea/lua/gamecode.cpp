@@ -64,7 +64,7 @@ static void
 lua_planmonsters(void)
 {
   unit * u;
-  faction * f = findfaction(MONSTER_FACTION);
+  faction * f = get_monsters();
 
   if (f==NULL) return;
   rng_init(turn?turn:(int)time(0));

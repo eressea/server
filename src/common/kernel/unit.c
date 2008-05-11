@@ -312,7 +312,7 @@ destroy_unit(unit * u)
   } else 
 #endif  
     if (zombie) {
-      u_setfaction(u, findfaction(MONSTER_FACTION));
+      u_setfaction(u, get_monsters());
       scale_number(u, 1);
       u->race = u->irace = new_race[RC_ZOMBIE];
     } else {

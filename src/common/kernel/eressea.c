@@ -2412,7 +2412,7 @@ remove_empty_units(void)
 boolean
 faction_id_is_unused(int id)
 {
-  return findfaction(id)==NULL && id!=MONSTER_FACTION;
+  return findfaction(id)==NULL;
 }
 
 int

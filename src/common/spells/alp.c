@@ -103,7 +103,7 @@ sp_summon_alp(struct castorder *co)
   int cast_level = co->level;
   spellparameter *pa = co->par;
   const struct race * rc = new_race[RC_ALP];
-  struct faction * f = findfaction(MONSTER_FACTION);
+  struct faction * f = get_monsters();
   struct message * msg;
 
   opfer = pa->param[0]->data.u;

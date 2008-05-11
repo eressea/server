@@ -919,7 +919,7 @@ void
 plan_monsters(void)
 {
   region *r;
-  faction *f = findfaction(MONSTER_FACTION);
+  faction *f = get_monsters();
 
   if (!f) return;
   f->lastorders = turn;
@@ -1060,13 +1060,14 @@ void
 spawn_dragons(void)
 {
   region * r;
+  faction * monsters = get_monsters();
 
   for (r = regions; r; r = r->next) {
     unit * u;
     message * msg;
 
     if (fval(r->terrain, SEA_REGION) && rng_int()%10000 < 1) {
-      u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
+      u = createunit(r, monsters, 1, new_race[RC_SEASERPENT]);
       fset(u, UFL_ISNEW|UFL_MOVED);
       set_level(u, SK_MAGIC, 4);
       set_level(u, SK_OBSERVATION, 3);
@@ -1077,9 +1078,9 @@ spawn_dragons(void)
     if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) 
     {
       if (chance(0.80)) {
-        u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
+        u = createunit(r, monsters, nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
       } else {
-        u = createunit(r, findfaction(MONSTER_FACTION), nrand(30, 20) + 1, new_race[RC_DRAGON]);
+        u = createunit(r, monsters, nrand(30, 20) + 1, new_race[RC_DRAGON]);
       }
       fset(u, UFL_ISNEW|UFL_MOVED);
 
@@ -1120,6 +1121,7 @@ void
 spawn_undead(void)
 {
   region * r;
+  faction * monsters = get_monsters();
 
   for (r = regions; r; r = r->next) {
     int unburied = deathcount(r);
@@ -1150,7 +1152,7 @@ spawn_undead(void)
         rc = new_race[RC_GHOUL]; break;
       }
 
-      u = createunit(r, findfaction(MONSTER_FACTION), undead, rc);
+      u = createunit(r, monsters, undead, rc);
       fset(u, UFL_ISNEW|UFL_MOVED);
       if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rng_int()%10 < 4) {
         equip_unit(u, get_equipment("rising_undead"));

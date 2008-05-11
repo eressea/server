@@ -426,87 +426,87 @@ chaosterrain(void)
 void
 chaos(region * r)
 {
-	unit *u = NULL, *u2;
-	building *b, *b2;
+  unit *u = NULL, *u2;
+  building *b, *b2;
 
-	if (rng_int() % 100 < 8) {
-		switch (rng_int() % 3) {
-		case 0:				/* Untote */
-			if (!fval(r->terrain, SEA_REGION)) {
-				u = random_unit(r);
-				if (u && playerrace(u->race)) {
+  if (rng_int() % 100 < 8) {
+    switch (rng_int() % 3) {
+    case 0:				/* Untote */
+      if (!fval(r->terrain, SEA_REGION)) {
+        u = random_unit(r);
+        if (u && playerrace(u->race)) {
           ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
-					u_setfaction(u, findfaction(MONSTER_FACTION));
-					u->race = new_race[RC_GHOUL];
-				}
-			}
-			break;
-		case 1:				/* Drachen */
-			if (random_unit(r)) {
-				int mfac = 0;
-				switch (rng_int() % 3) {
-				case 0:
-					mfac = 100;
-					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 8 + 1, new_race[RC_FIREDRAGON]);
-					break;
-				case 1:
-					mfac = 500;
-					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 4 + 1, new_race[RC_DRAGON]);
-					break;
-				case 2:
-					mfac = 1000;
-					u = createunit(r, findfaction(MONSTER_FACTION), rng_int() % 2 + 1, new_race[RC_WYRM]);
-					break;
-				}
-				if (mfac) set_money(u, u->number * (rng_int() % mfac));
+          u_setfaction(u, get_monsters());
+          u->race = new_race[RC_GHOUL];
+        }
+      }
+      break;
+    case 1:				/* Drachen */
+      if (random_unit(r)) {
+        int mfac = 0;
+        switch (rng_int() % 3) {
+        case 0:
+          mfac = 100;
+          u = createunit(r, get_monsters(), rng_int() % 8 + 1, new_race[RC_FIREDRAGON]);
+          break;
+        case 1:
+          mfac = 500;
+          u = createunit(r, get_monsters(), rng_int() % 4 + 1, new_race[RC_DRAGON]);
+          break;
+        case 2:
+          mfac = 1000;
+          u = createunit(r, get_monsters(), rng_int() % 2 + 1, new_race[RC_WYRM]);
+          break;
+        }
+        if (mfac) set_money(u, u->number * (rng_int() % mfac));
         fset(u, UFL_ISNEW|UFL_MOVED);
-			}
-		case 2:	/* Terrainveränderung */
-			if (!fval(r->terrain, FORBIDDEN_REGION)) {
-				if (!fval(r->terrain, SEA_REGION)) {
-					direction_t dir;
-					for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-            region * rn = rconnect(r, dir);
-						if (rn && fval(rn->terrain, SEA_REGION)) break;
-					}
-					if (dir!=MAXDIRECTIONS) {
-						ship * sh = r->ships;
-						while (sh) {
-							ship * nsh = sh->next;
-							damage_ship(sh, 0.50);
-							if (sh->damage >= sh->size * DAMAGE_SCALE) destroy_ship(sh);
-							sh = nsh;
-						}
-
-						for (u = r->units; u;) {
-							u2 = u->next;
-							if (u->race != new_race[RC_SPELL] && u->ship == 0) {
-								set_number(u, 0);
-							}
-							u = u2;
-						}
-						ADDMSG(&r->msgs, msg_message("tidalwave", "region", r));
-
-						for (b = rbuildings(r); b;) {
-							b2 = b->next;
-							destroy_building(b);
-							b = b2;
-						}
-						terraform(r, T_OCEAN);
-					}
-				} else {
-					direction_t dir;
-					for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+      }
+    case 2:	/* Terrainveränderung */
+      if (!fval(r->terrain, FORBIDDEN_REGION)) {
+        if (!fval(r->terrain, SEA_REGION)) {
+          direction_t dir;
+          for (dir=0;dir!=MAXDIRECTIONS;++dir) {
             region * rn = rconnect(r, dir);
             if (rn && fval(rn->terrain, SEA_REGION)) break;
-					}
-					if (dir!=MAXDIRECTIONS) {
-						terraform_region(r, chaosterrain());
-					}
-				}
-			}
-		}
-	}
+          }
+          if (dir!=MAXDIRECTIONS) {
+            ship * sh = r->ships;
+            while (sh) {
+              ship * nsh = sh->next;
+              damage_ship(sh, 0.50);
+              if (sh->damage >= sh->size * DAMAGE_SCALE) destroy_ship(sh);
+              sh = nsh;
+            }
+
+            for (u = r->units; u;) {
+              u2 = u->next;
+              if (u->race != new_race[RC_SPELL] && u->ship == 0) {
+                set_number(u, 0);
+              }
+              u = u2;
+            }
+            ADDMSG(&r->msgs, msg_message("tidalwave", "region", r));
+
+            for (b = rbuildings(r); b;) {
+              b2 = b->next;
+              destroy_building(b);
+              b = b2;
+            }
+            terraform(r, T_OCEAN);
+          }
+        } else {
+          direction_t dir;
+          for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+            region * rn = rconnect(r, dir);
+            if (rn && fval(rn->terrain, SEA_REGION)) break;
+          }
+          if (dir!=MAXDIRECTIONS) {
+            terraform_region(r, chaosterrain());
+          }
+        }
+      }
+    }
+  }
 }
 
 
@@ -1211,7 +1211,7 @@ randomevents(void)
           if (rng_int()%100 < 5) {
             ADDMSG(&u->faction->msgs, msg_message("desertion",
               "unit region", u, r));
-            u_setfaction(u, findfaction(MONSTER_FACTION));
+            u_setfaction(u, get_monsters());
           }
         }
     }

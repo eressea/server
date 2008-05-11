@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-void createmonsters(void);
+struct faction * createmonsters(int no);
 
 #ifdef __cplusplus
 }

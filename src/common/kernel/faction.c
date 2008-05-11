@@ -47,6 +47,22 @@
 #include <string.h>
 #include <stdlib.h>
 
+faction *
+get_monsters(void)
+{
+  static faction * monsters = NULL;
+
+  if (!monsters) {
+    faction * f;
+    for (f=factions;f;f=f->next) {
+      if (f->flags&FFL_NPC) {
+        return monsters=f;
+      }
+    }
+  }
+  return monsters;
+}
+
 const unit *
 random_unit_in_faction(const faction *f)
 {

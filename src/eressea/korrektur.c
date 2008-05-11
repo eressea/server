@@ -655,7 +655,7 @@ fix_astralplane(void)
   plane * astralplane = get_astralplane();
   region * rs;
   region_list * rlist = NULL;
-  faction * monsters = findfaction(MONSTER_FACTION);
+  faction * monsters = get_monsters();
 
   if (astralplane==NULL || monsters==NULL) return 0;
 

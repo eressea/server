@@ -141,7 +141,7 @@ void
 spawn_braineaters(float chance)
 {
   region *r;
-  faction *f0 = findfaction(MONSTER_FACTION);
+  faction *f0 = get_monsters();
   int next = rng_int() % (int)(chance*100);
   
   if (f0==NULL) return;

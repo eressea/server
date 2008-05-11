@@ -1212,7 +1212,7 @@ patzer_ents(castorder *co)
   }
 
   ents = (int)(force*10);
-  u = create_unit(r, findfaction(MONSTER_FACTION), ents, new_race[RC_TREEMAN], 0, NULL, NULL);
+  u = create_unit(r, get_monsters(), ents, new_race[RC_TREEMAN], 0, NULL, NULL);
 
   /* 'Erfolg' melden */
   ADDMSG(&mage->faction->msgs, msg_message(
@@ -2395,7 +2395,7 @@ patzer_peasantmob(castorder *co)
   }
 
   if (r->land) {
-    faction * f = findfaction(MONSTER_FACTION);
+    faction * f = get_monsters();
     const struct locale * lang = f->locale;
     message * msg;
 
@@ -2621,7 +2621,7 @@ sp_summondragon(castorder *co)
   int number;
   const race * race;
 
-  f = findfaction(MONSTER_FACTION);
+  f = get_monsters();
 
   if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT
       && rterrain(r) != T_GLACIER) {
@@ -4035,7 +4035,7 @@ sp_raisepeasantmob(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
-  faction * monsters = findfaction(MONSTER_FACTION);
+  faction * monsters = get_monsters();
   message * msg;
 
   anteil.i = 6 + (rng_int()%4);
@@ -4365,7 +4365,7 @@ sp_pump(castorder *co)
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_not_on_undead", ""));
     return 0;
   }
-  if (is_magic_resistant(mage, target, 0) || target->faction->no == MONSTER_FACTION) {
+  if (is_magic_resistant(mage, target, 0) || is_monsters(target->faction)) {
     report_failure(mage, co->order);
     return 0;
   }
@@ -4684,7 +4684,7 @@ sp_dragonsong(castorder *co)
 
   /* TODO HP-Effekt */
 
-  f = findfaction(MONSTER_FACTION);
+  f = get_monsters();
 
   rl = all_in_range(r, (int)power);
 

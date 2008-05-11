@@ -156,7 +156,7 @@ score(void)
 
   for (fc = factions; fc; fc = fc->next) {
     fc->score = fc->score / 5;
-    if (fc->no != MONSTER_FACTION && fc->race != new_race[RC_TEMPLATE]) {
+    if (!is_monsters(fc) && fc->race != new_race[RC_TEMPLATE]) {
       allscores += fc->score;
     }
   }

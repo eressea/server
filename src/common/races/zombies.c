@@ -36,25 +36,25 @@
 void
 age_undead(unit *u)
 {
-	region *r = u->region;
-	int n = 0;
+  region *r = u->region;
+  int n = 0;
 
-	/* untote, die einer partei angehoeren, koennen sich
-	 * absplitten, anstatt sich zu vermehren. monster
-	 * untote vermehren sich nur noch */
+  /* untote, die einer partei angehoeren, koennen sich
+  * absplitten, anstatt sich zu vermehren. monster
+  * untote vermehren sich nur noch */
 
-	if (u->number > UNDEAD_MIN && !is_monsters(u->faction) && rng_int() % 100 < UNDEAD_BREAKUP) {
-		int m;
-		unit *u2;
+  if (u->number > UNDEAD_MIN && !is_monsters(u->faction) && rng_int() % 100 < UNDEAD_BREAKUP) {
+    int m;
+    unit *u2;
 
-		n = 0;
-		for (m = u->number; m; m--)
-			if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION)
-				n++;
-		u2 = create_unit(r, findfaction(MONSTER_FACTION), 0, new_race[RC_UNDEAD], 0, NULL, u);
+    n = 0;
+    for (m = u->number; m; m--) {
+      if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION) ++n;
+    }
+    u2 = create_unit(r, get_monsters(), 0, new_race[RC_UNDEAD], 0, NULL, u);
     make_undead_unit(u2);
-		transfermen(u, u2, u->number - n);
-	}
+    transfermen(u, u2, u->number - n);
+  }
 }
 
 void

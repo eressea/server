@@ -925,7 +925,7 @@ readunit(struct storage * store)
   }
   if (u->faction == NULL) {
     log_error(("unit %s has faction == NULL\n", unitname(u)));
-    u_setfaction(u, findfaction(MONSTER_FACTION));
+    u_setfaction(u, get_monsters());
     set_number(u, 0);
   }
 

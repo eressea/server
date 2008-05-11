@@ -89,7 +89,7 @@ make_dungeon(const dungeon * data)
 	int iterations = size * size;
 	unsigned int flags = PFL_NORECRUITS;
 	int n = 0;
-	struct faction * fmonsters = findfaction(MONSTER_FACTION);
+	struct faction * fmonsters = get_monsters();
 	plane * p;
 	region *r, *center;
 	region * rnext;

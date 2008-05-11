@@ -54,24 +54,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-void
-createmonsters(void)
+faction *
+createmonsters(int no)
 {
-	faction *f;
+  faction *f = findfaction(no);
 
-	if (findfaction(MONSTER_FACTION)) {
-		puts("* Fehler! Die Monster Partei gibt es schon.");
-		return;
-	}
-	f = (faction *) calloc(1, sizeof(faction));
-	f->no = MONSTER_FACTION;
-	/* alles ist auf null gesetzt, ausser dem folgenden. achtung - partei
-	 * no 0 muss keine orders einreichen! */
+  if (f) {
+    puts("* Fehler! Die Monster Partei gibt es schon.");
+    return f;
+  }
+  f = (faction *) calloc(1, sizeof(faction));
+  f->no = no;
+  /* alles ist auf null gesetzt, ausser dem folgenden. achtung - partei
+  * no 0 muss keine orders einreichen! */
 
-	f->email = strdup("monsters@eressea.de");
-	f->name = strdup("Monster");
-	f->alive = 1;
-	f->options = (char)(1<<O_REPORT);
-	addlist(&factions, f);
+  f->email = strdup("monsters@eressea.de");
+  f->name = strdup("Monster");
+  f->alive = 1;
+  f->options = (char)(1<<O_REPORT);
+  addlist(&factions, f);
   fhash(f);
+  return f;
 }

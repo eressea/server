@@ -47,8 +47,6 @@ extern "C" {
 # define MAXUNITS 1048573 /* must be prime for hashing. 524287 was >90% full */
 #endif
 
-#define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
-#define is_monsters(f) ((f)->no==MONSTER_FACTION)
 #define MAXPEASANTS_PER_AREA 10 /* number of peasants per region-size */
 #define TREESIZE (MAXPEASANTS_PER_AREA-2) /* space used by trees (in #peasants) */
 
