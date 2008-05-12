@@ -341,7 +341,8 @@ set_alliance(faction * a, faction * b, int status)
   (*sfp)->status |= status;
 }
 
-void renumber_faction(faction * f, int no)
+void
+renumber_faction(faction * f, int no)
 {
   if (f->subscription) {
     sql_print(("UPDATE subscriptions set faction='%s' where id=%u;\n",

@@ -1419,6 +1419,9 @@ readfaction(struct storage * store)
 #endif /* KARMA_MODULE */
 
   f->flags = store->r_int(store);
+  if (f->no==0) {
+    f->flags |= FFL_NPC;
+  }
 
   a_read(store, &f->attribs);
   if (store->version>=CLAIM_VERSION) {
@@ -1769,32 +1772,42 @@ readgame(const char * filename, int mode, int backup)
   store->close(store);
 
   /* Unaufgeloeste Zeiger initialisieren */
-  log_info((1, "\n - Referenzen initialisieren...\n"));
+  log_info((1, "fixing unresolved references.\n"));
   resolve();
 
+  log_info((1, "updating area information for lighthouses.\n"));
   for (r=regions;r;r=r->next) {
     if (r->flags & RF_LIGHTHOUSE) {
       building * b;
       for (b=r->buildings;b;b=b->next) update_lighthouse(b);
     }
   }
-  log_info((1, " - Regionen initialisieren & verbinden...\n"));
+  log_info((1, "marking factions as alive.\n"));
   for (f = factions; f; f = f->next) {
-    for (u = f->units; u; u = u->nextF) {
-      if (u->number>0) {
-        f->alive = 1;
-        break;
+    if (f->flags & FFL_NPC) {
+      f->alive = 1;
+      if (f->no==0) {
+        int no=666;
+        while (findfaction(no)) ++no;
+        log_warning(("renum(monsters, %d)\n", no));
+        renumber_faction(f, no);
+      }
+    } else {
+      for (u = f->units; u; u = u->nextF) {
+        if (u->number>0) {
+          f->alive = 1;
+          break;
+        }
       }
     }
-  }
-  if (findfaction(0)) {
-    findfaction(0)->alive = 1;
   }
   if (loadplane || maxregions>=0) {
     remove_empty_factions(false);
   }
+  log_info((1, "Done loading turn %d.\n", turn));
   return 0;
 }
+
 int
 writegame(const char *filename, int mode)
 {
