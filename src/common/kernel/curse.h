@@ -111,13 +111,11 @@ enum {
   C_ASTRALBLOCK,    /* 15 - Astralblock */
   C_GENEROUS,       /* 16 - Unterhaltung vermehren */
   C_PEACE,          /* 17 - Regionsweit Attacken verhindern */
-  C_REGCONF,        /* 18 - Erschwert Bewegungen */
   C_MAGICSTREET,    /* 19 - magisches Straﬂennetz */
   C_RESIST_MAGIC,   /* 20 - ver‰ndert Magieresistenz von Objekten */
   C_SONG_BADMR,     /* 21 - ver‰ndert Magieresistenz */
   C_SONG_GOODMR,    /* 22 - ver‰ndert Magieresistenz */
   C_SLAVE,          /* 23 - dient fremder Partei */
-  C_DISORIENTATION, /* 24 - Spezielle Auswirkung auf Schiffe */
   C_CALM,           /* 25 - Beinflussung */
   C_OLDRACE,
   C_FUMBLE,

@@ -1192,15 +1192,13 @@ prepare_report(faction * f)
     if (sr->mode>see_neighbour) {
       region * r = sr->r;
       plane * p = r->planep;
-      /* if no confusion in the region, add neighbors: */
-      if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-        void (*view)(struct seen_region **, region *, faction *) = view_default;
-        if (p && fval(p, PFL_SEESPECIAL)) {
-          attrib * a = a_find(p->attribs, &at_viewrange);
-          if (a) view = (void (*)(struct seen_region **, region *, faction *))a->data.f;
-        }
-        view(f->seen, r, f);
+
+      void (*view)(struct seen_region **, region *, faction *) = view_default;
+      if (p && fval(p, PFL_SEESPECIAL)) {
+        attrib * a = a_find(p->attribs, &at_viewrange);
+        if (a) view = (void (*)(struct seen_region **, region *, faction *))a->data.f;
       }
+      view(f->seen, r, f);
     }
   }
   return f->seen;

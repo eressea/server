@@ -79,9 +79,6 @@ static struct curse_type ct_flyingship = { "flyingship",
 static struct curse_type ct_nodrift = { "nodrift",
   CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ), cinfo_shipnodrift
 };
-static struct curse_type ct_shipdisorientation = { "shipdisorientation",
-  CURSETYP_NORM, 0, NO_MERGE, cinfo_ship
-};
 static struct curse_type ct_shipspeedup = { "shipspeedup",
   CURSETYP_NORM, 0, 0, cinfo_ship
 };
@@ -92,7 +89,6 @@ register_shipcurse(void)
   ct_register(&ct_stormwind);
   ct_register(&ct_flyingship);
   ct_register(&ct_nodrift);
-  ct_register(&ct_shipdisorientation);
   ct_register(&ct_shipspeedup);
 }
 

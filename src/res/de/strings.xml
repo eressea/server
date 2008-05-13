@@ -4521,10 +4521,6 @@
       <text locale="de">Traumdeuten</text>
       <text locale="en">Mind Probe</text>
     </string>
-    <string name="dream_of_confusion">
-      <text locale="de">Schleier der Verwirrung</text>
-      <text locale="en">Veil of Confusion</text>
-    </string>
     <string name="summon_alp">
       <text locale="de">Alp</text>
       <text locale="en">Nightmare</text>
@@ -6461,17 +6457,6 @@
         to reveal his most intimate secrets. The
         target's faction, skills and possessions will no
         longer be unknown.</text>
-    </string>
-    <string name="dream_of_confusion">
-      <text locale="de">Der Magier erzeugt im Umkreis von
-      einigen Regionen einen magischen Schleier, der einige Wochen bestehen
-      bleibt. Personen innerhalb des Schleiers verlieren
-      leicht die Orientierung und haben große Schwierigkeiten, sich in
-      eine bestimmte Richtung zu bewegen.</text>
-      <text locale="en">The magician creates a magic fog in every region in a
-      perimeter of some regions. The fog lasts some weeks and persons
-      passing this fog have a chance to get lost,  moving to a certain
-      direction is difficult.</text>
     </string>
     <string name="summon_alp">
       <text locale="de">Der Magier beschwört ein kleines Monster, einen Alp.  Dieses bewegt sich

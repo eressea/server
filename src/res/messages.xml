@@ -3625,20 +3625,6 @@
     <text locale="de">"Die $ship($ship) segelt von $region($from) nach $region($to)."</text>
     <text locale="en">"The $ship($ship) sails from $region($from) to $region($to)."</text>
   </message>
-  <message name="shipnoconf" section="events">
-    <type>
-      <arg name="ship" type="ship"/>
-    </type>
-    <text locale="de">"Die $ship($ship) ist wieder auf Kurs."</text>
-    <text locale="en">"The $ship($ship) is back on course."</text>
-  </message>
-  <message name="shipconf" section="events">
-    <type>
-      <arg name="ship" type="ship"/>
-    </type>
-    <text locale="de">"Die $ship($ship) verliert im Sturm die Orientierung."</text>
-    <text locale="en">"The crew of $ship($ship) gets lost and confused in the storm."</text>
-  </message>
   <message name="storm" section="events">
     <type>
       <arg name="ship" type="ship"/>

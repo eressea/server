@@ -236,12 +236,6 @@ static struct curse_type ct_peacezone = {
   CURSETYP_NORM, 0, NO_MERGE,
   cinfo_simple
 };
-/* erschwert geordnete Bewegungen */
-static struct curse_type ct_disorientationzone = {
-  "disorientationzone",
-  CURSETYP_NORM, CURSE_ISNEW, NO_MERGE,
-  cinfo_simple
-};
 /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur 1x
 *  pro Einheit */
 static struct curse_type ct_badmagicresistancezone = {
@@ -288,7 +282,6 @@ register_regioncurse(void)
   ct_register(&ct_astralblock);
   ct_register(&ct_generous);
   ct_register(&ct_peacezone);
-  ct_register(&ct_disorientationzone);
   ct_register(&ct_magicstreet);
   ct_register(&ct_badmagicresistancezone);
   ct_register(&ct_goodmagicresistancezone);

@@ -2111,72 +2111,6 @@ sp_drought(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Nebel der Verwirrung
- * Stufe:      14
- * Kategorie:  Region, negativ
- * Gebiet:     Gwyrrd
- * Wirkung:
- *  Alle Regionen innerhalb eines Radius von *siehe code*
- *  werden von einem verwirrenden Nebel bedeckt.  Innerhalb des Nebels
- *  können keine Himmelsrichtungen mehr erkannt werden, alle Bewegungen
- *  erfolgen in eine zufällige Richtung.
- *  Die Gwyrrd-Variante wirkt nur auf Wälder und Ozeanregionen
- * Flags:
- *  (FARCASTING | SPELLLEVEL)
- * */
-static int
-sp_fog_of_confusion(castorder *co)
-{
-  unit *u;
-  region *r = co->rt;
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  double power = co->force;
-  region_list *rl, *rl2;
-  int range = 1+(int)(power/8);
-  int duration = 2+(int)(power/6);
-
-  rl = all_in_range(r, (short)range, NULL);
-
-  for (rl2 = rl; rl2; rl2 = rl2->next) {
-    static const curse_type * ctype = NULL;
-    region * r2 = rl2->data;
-    curse * c;
-    variant effect;
-    message * m = NULL;
-
-    if (!fval(r2->terrain, SEA_REGION)
-        && !r_isforest(r2)) continue;
-
-    /* Magieresistenz jeder Region prüfen */
-    if (target_resists_magic(mage, r, TYP_REGION, 0)) {
-      report_failure(mage, co->order);
-      continue;
-    }
-
-    effect.i = cast_level*5;
-    if (!ctype) ctype = ct_find("disorientationzone");
-    c = create_curse(mage, &r2->attribs, ctype, power, duration, effect, 0);
-
-    for (u = r2->units; u; u = u->next) freset(u->faction, FFL_SELECT);
-    for (u = r2->units; u; u = u->next ) {
-      if (!fval(u->faction, FFL_SELECT) ) {
-        fset(u->faction, FFL_SELECT);
-        if (!m) m = msg_message("confusion_result", "mage", mage);
-        add_message(&u->faction->msgs, m);
-      }
-    }
-    if (!fval(mage->faction, FFL_SELECT)) {
-      if (!m) m = msg_message("confusion_result", "mage", mage);
-      add_message(&mage->faction->msgs, m);
-    }
-    if (m) msg_release(m);
-  }
-  free_regionlist(rl);
-  return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:       Bergwächter
  * Stufe:      9
  * Gebiet:     Gwyrrd
@@ -5207,55 +5141,6 @@ sp_disturbingdreams(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-int
-sp_dream_of_confusion(castorder *co)
-{
-  unit *u;
-  region_list *rl,*rl2;
-  region *r = co->rt;
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  double power = co->force;
-  int range = 1+(int)(power/8);
-  int duration = 2+(int)(power/6);
-
-  rl = all_in_range(r, (short)range, NULL);
-
-  for(rl2 = rl; rl2; rl2 = rl2->next) {
-    region * r2 = rl2->data;
-    variant effect;
-    curse * c;
-    message * m = NULL;
-
-    /* Magieresistenz jeder Region prüfen */
-    if (target_resists_magic(mage, r2, TYP_REGION, 0)) {
-      report_failure(mage, co->order);
-      continue;
-    }
-
-    effect.i = cast_level*5;
-    c = create_curse(mage, &r2->attribs,
-      ct_find("disorientationzone"), power, duration, effect, 0);
-
-    for (u = r2->units; u; u = u->next) freset(u->faction, FFL_SELECT);
-    for (u = r2->units; u; u = u->next ) {
-      if (!fval(u->faction, FFL_SELECT) ) {
-        fset(u->faction, FFL_SELECT);
-        if (!m) m = msg_message("confusion_result", "mage", mage);
-        add_message(&u->faction->msgs, m);
-      }
-    }
-    if (!fval(mage->faction, FFL_SELECT)) {
-      if (!m) m = msg_message("confusion_result", "mage", mage);
-      add_message(&u->faction->msgs, m);
-    }
-    if (m) msg_release(m);
-  }
-  free_regionlist(rl);
-  return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* ASTRAL / THEORIE / M_ASTRAL */
 /* ------------------------------------------------------------- */
 /* Name:     Magie analysieren
@@ -7314,20 +7199,6 @@ static spelldata spelldaten[] =
     (spell_f)sp_drought, NULL
   },
   {
-    SPL_FOG_OF_CONFUSION, "fogofconfusion", NULL, NULL, NULL,
-    M_DRUIDE,
-    (FARCASTING|SPELLLEVEL),
-    5, 14,
-    {
-      { "aura", 8, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_fog_of_confusion, NULL
-  },
-  {
     SPL_MAELSTROM, "maelstrom", NULL, NULL, NULL,
     M_DRUIDE,
     (OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
@@ -7956,20 +7827,6 @@ static spelldata spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_summon_alp, NULL
-  },
-  {
-    SPL_DREAM_OF_CONFUSION, "dream_of_confusion", NULL, NULL, NULL,
-    M_TRAUM,
-    (FARCASTING | SPELLLEVEL),
-    5, 16,
-    {
-      { "aura", 7, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_dream_of_confusion, NULL
   },
   /* M_BARDE */
   {
