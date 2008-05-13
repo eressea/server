@@ -3845,6 +3845,12 @@ sp_charmingsong(castorder *co)
     /* Die Einheit ist eine der unsrigen */
     cmistake(mage, co->order, 45, MSG_MAGIC);
   }
+  /* niemand mit teurem Talent */
+  if (has_limited_skills(target)) {
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+      "spellfail_noexpensives", "target", target));
+    return 0;
+  }
 
   /* Magieresistensbonus für mehr als Stufe Personen */
   if (target->number > force) {
@@ -3884,7 +3890,7 @@ sp_charmingsong(castorder *co)
   create_curse(mage, &target->attribs, ct_find("slavery"), force, duration, zero_effect, 0);
 
   /* setze Partei um und lösche langen Befehl aus Sicherheitsgründen */
-  u_setfaction(target,mage->faction);
+  u_setfaction(target, mage->faction);
   set_order(&target->thisorder, NULL);
 
   /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
@@ -4113,7 +4119,7 @@ sp_migranten(castorder *co)
     return 0;
   }
   /* niemand mit teurem Talent */
-  if (teure_talente(target)) {
+  if (has_limited_skills(target)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
       "spellfail_noexpensives", "target", target));
     return 0;

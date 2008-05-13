@@ -195,7 +195,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
         } else if (count_migrants(u2->faction) + n > count_maxmigrants(u2->faction)) {
           error = 128;
         }
-        else if (teure_talente(u) || teure_talente(u2)) {
+        else if (has_limited_skills(u) || has_limited_skills(u2)) {
           error = 154;
         } else if (u2->number!=0) {
           error = 139;
@@ -363,7 +363,7 @@ give_unit(unit * u, unit * u2, order * ord)
       cmistake(u, ord, 128, MSG_COMMERCE);
       return;
     }
-    if (teure_talente(u)) {
+    if (has_limited_skills(u)) {
       cmistake(u, ord, 154, MSG_COMMERCE);
       return;
     }

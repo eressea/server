@@ -843,18 +843,23 @@ give_cmd(unit * u, order * ord)
 static int
 forget_cmd(unit * u, order * ord)
 {
-	skill_t sk;
-	const char *s;
-  
+  skill_t sk;
+  const char *s;
+
+  if (is_cursed(u->attribs, C_SLAVE, 0)) {
+    /* charmed units shouldn't be losing their skills */
+    return 0;
+  }
+
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
 
-	if ((sk = findskill(s, u->faction->locale)) != NOSKILL) {
-		ADDMSG(&u->faction->msgs,
-			msg_message("forget", "unit skill", u, sk));
-		set_level(u, sk, 0);
-	}
+  if ((sk = findskill(s, u->faction->locale)) != NOSKILL) {
+    ADDMSG(&u->faction->msgs,
+      msg_message("forget", "unit skill", u, sk));
+    set_level(u, sk, 0);
+  }
   return 0;
 }
 

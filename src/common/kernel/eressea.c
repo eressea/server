@@ -2886,7 +2886,7 @@ lovar(double xpct_x2)
 }
 
 boolean
-teure_talente (const struct unit * u)
+has_limited_skills (const struct unit * u)
 {
   if (has_skill(u, SK_MAGIC) || has_skill(u, SK_ALCHEMY) ||
     has_skill(u, SK_TACTICS) || has_skill(u, SK_HERBALISM) ||

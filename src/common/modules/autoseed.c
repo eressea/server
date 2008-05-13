@@ -505,6 +505,27 @@ free_newfaction(newfaction * nf)
 /** create new island with up to nsize players
  * returns the number of players placed on the new island.
  */
+static void
+frame_regions(int age, terrain_t terrain)
+{
+  region * r = regions;
+  for (r=regions;r;r=r->next) {
+    direction_t d;
+    if (r->age<age) continue;
+    if (r->planep) continue;
+    if (rterrain(r)==terrain) continue;
+
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * rn = rconnect(r, d);
+      if (rn==NULL) {
+        rn = new_region(r->x+delta_x[d], r->y+delta_y[d], 0);
+        terraform(rn, terrain);
+        rn->age=r->age;
+      }
+    }
+  }
+}
+
 int
 autoseed(newfaction ** players, int nsize, boolean new_island)
 {
@@ -515,6 +536,8 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
   int isize = REGIONS_PER_FACTION; /* target size for the island */
   int psize = 0; /* players on this island */
   const terrain_type * volcano_terrain = get_terrain("volcano");
+
+  frame_regions(16, T_FIREWALL);
 
   if (listlen(*players)<MINFACTIONS) return 0;
 

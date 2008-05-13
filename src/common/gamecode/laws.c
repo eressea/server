@@ -2242,7 +2242,7 @@ promotion_cmd(unit * u, struct order * ord)
       maxheroes(u->faction), countheroes(u->faction)));
     return 0;
   }
-  if (!playerrace(u->race)) {
+  if (u->race!=u->faction->race) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_race", "race",
       u->race));
     return 0;

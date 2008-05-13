@@ -281,6 +281,8 @@ static void
 fix_firewalls(void)
 {
   region * r = regions;
+  int fixes = 0;
+
   while (r) {
     direction_t d;
     for (d=0;d!=MAXDIRECTIONS;++d) {
@@ -295,6 +297,7 @@ fix_firewalls(void)
               log_warning(("firewall between regions %s and %s was bugged. removed.\n",
                 regionname(r, NULL), regionname(r2, NULL)));
               b = get_borders(r, r2);
+              ++fixes;
             } else {
               b = b->next;
             }
@@ -306,6 +309,7 @@ fix_firewalls(void)
     }
     r = r->next;
   }
+  log_printf("fixed %u firewalls.\n", fixes);
 }
 
 static void
@@ -472,6 +476,7 @@ static void
 fix_gates(void)
 {
   region * r;
+  int fixes = 0;
   for (r=regions;r;r=r->next) {
     unit * u;
     building * b;
@@ -492,6 +497,7 @@ fix_gates(void)
         }
         remove_triggers(&u->attribs, "timer", &tt_gate);
         remove_triggers(&u->attribs, "create", &tt_unguard);
+        ++fixes;
       }
     }
     for (b=r->buildings;b;b=b->next) {
@@ -510,10 +516,12 @@ fix_gates(void)
             add_trigger(&bgate->attribs, "create", trigger_unguard(bgate));
             fset(bgate, BLD_UNGUARDED);
           }
+          ++fixes;
         }
       }
     }
   }
+  log_printf("fixed %u gates.\n", fixes);
 }
 
 static int
@@ -560,48 +568,6 @@ road_decay(void)
     }
   }
   return 0;
-}
-
-static void
-frame_regions(void)
-{
-#ifdef AGE_FIX
-  unsigned short ocean_age = (unsigned short)turn;
-#endif
-  region * r = regions;
-  for (r=regions;r;r=r->next) {
-    direction_t d;
-#ifdef AGE_FIX
-    if (rterrain(r) == T_OCEAN && r->age==0) {
-      unsigned short age = 0;
-      direction_t d;
-      for (d=0;d!=MAXDIRECTIONS;++d) {
-        region * rn = rconnect(r, d);
-        if (rn && rn->age>age) {
-          age = rn->age;
-        }
-      }
-      if (age!=0 && age < ocean_age) {
-        ocean_age = age;
-      }
-      r->age = ocean_age;
-    } else if (r->age>ocean_age) {
-      ocean_age = r->age;
-    }
-#endif
-    if (r->age<16) continue;
-    if (r->planep) continue;
-    if (rterrain(r)==T_FIREWALL) continue;
-
-    for (d=0;d!=MAXDIRECTIONS;++d) {
-      region * rn = rconnect(r, d);
-      if (rn==NULL) {
-        rn = new_region(r->x+delta_x[d], r->y+delta_y[d], 0);
-        terraform(rn, T_FIREWALL);
-        rn->age=r->age;
-      }
-    }
-  }
 }
 
 #if GLOBAL_WARMING
@@ -917,6 +883,7 @@ static void
 fix_toads(void)
 {
   region * r;
+  int fixes = 0;
   const struct race * toad = rc_find("toad");
 
   for (r=regions;r!=NULL;r=r->next) {
@@ -942,11 +909,34 @@ fix_toads(void)
         if (!found) {
           log_error(("fixed toad %s.\n", unitname(u)));
           u->race=u->faction->race;
+          ++fixes;
         }
       }
     }
   }
+  log_printf("fixed %u toads.\n", fixes);
 }
+
+#ifdef REMOVE_ILLEGAL_MIGRANT_HEROES
+static void
+fix_heroes(void)
+{
+  region * r;
+  int fixes = 0;
+
+  for (r=regions;r!=NULL;r=r->next) {
+    unit * u;
+    for (u=r->units; u; u=u->next) {
+      if (u->race!=u->faction->race) {
+        log_error(("fixed race for hero %s (%s).\n", unitname(u), u->race->_name[0]));
+        u->race=u->faction->race;
+        ++fixes;
+      }
+    }
+  }
+  log_printf("fixed %u heroes.\n", fixes);
+}
+#endif
 
 static void
 fix_groups(void)
@@ -995,7 +985,6 @@ korrektur(void)
   do_once("chgt", &fix_chaosgates);
   do_once("atrx", &fix_attribflags);
   do_once("asfi", &fix_astral_firewalls);
-  frame_regions();
 #if GLOBAL_WARMING
   if (get_gamedate(turn, NULL)->season == SEASON_SUMMER) {
     global_warming();
@@ -1005,6 +994,7 @@ korrektur(void)
   fix_firewalls();
   fix_gates();
   fix_toads();
+  /* fix_heroes(); */
   verify_owners(false);
   /* fix_herbtypes(); */
   /* In Vin 3+ können Parteien komplett übergeben werden. */

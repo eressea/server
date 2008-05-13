@@ -250,7 +250,7 @@ extern int count_all(const struct faction * f);
 extern int count_migrants (const struct faction * f);
 extern int count_maxmigrants(const struct faction * f);
 
-extern boolean teure_talente(const struct unit * u);
+extern boolean has_limited_skills(const struct unit * u);
 extern const struct race * findrace(const char *, const struct locale *);
 
 int eff_stealth(const struct unit * u, const struct region * r);

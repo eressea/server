@@ -77,7 +77,7 @@ wormhole_age(struct attrib * a)
   for (;u!=NULL && maxtransport!=0;u=u->next) {
     if (u->building==data->entry) {
       message * m = NULL;
-      if (u->number>maxtransport || teure_talente(u)) {
+      if (u->number>maxtransport || has_limited_skills(u)) {
         m = msg_message("wormhole_requirements", "unit region", u, u->region);
       } else if (data->exit!=NULL) {
         move_unit(u, data->exit->region, NULL);
