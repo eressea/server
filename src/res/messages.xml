@@ -3683,7 +3683,7 @@
     <text locale="fr">"$unit($unit) in $region($region) recruits $int($amount) $int($want) people."</text>
     <text locale="en">"$unit($unit) in $region($region) recruits $int($amount) $int($want) people."</text>
   </message>
-  <message name="siege" section="events">
+  <message name="siege_catapults" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="building" type="building"/>
@@ -3692,6 +3692,14 @@
     <text locale="de">"$unit($unit) belagert $building($building). Dabei richten die Katapulte Zerstörungen von $int($destruction) Größenpunkten an."</text>
     <text locale="fr">"$building($building) is under siege by $unit($unit). During siege, catapults caused $int($destruction) points destruction."</text>
     <text locale="en">"$building($building) is under siege by $unit($unit). During siege, catapults caused $int($destruction) points destruction."</text>
+  </message>
+  <message name="siege" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"$unit($unit) belagert $building($building)."</text>
+    <text locale="en">"$building($building) is under siege by $unit($unit)."</text>
   </message>
   <message name="drown_on_ship" section="events">
     <type>

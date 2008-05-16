@@ -192,7 +192,6 @@ static void
 siege_cmd(unit * u, order * ord)
 {
   region * r = u->region;
-  unit *u2;
   building *b;
   int d, pooled;
   int bewaffnete, katapultiere = 0;
@@ -262,23 +261,13 @@ siege_cmd(unit * u, order * ord)
   if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
     b->size -= d;
     use_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
-    d = 100 * d / b->size;
-  } else d = 0;
-
-  /* meldung fuer belagerer */
-  ADDMSG(&u->faction->msgs, msg_message("siege",
-    "unit building destruction", u, b, d));
-
-  for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FFL_SELECT);
-  fset(u->faction, FFL_SELECT);
-
-  /* Meldung fuer Burginsassen */
-  for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2->building == b && !fval(u2->faction, FFL_SELECT)) {
-      fset(u2->faction, FFL_SELECT);
-      ADDMSG(&u2->faction->msgs, msg_message("siege",
-        "unit building destruction", u, b, d));
-    }
+    /* send message to the entire region */
+    ADDMSG(&r->msgs, msg_message("siege_catapults",
+      "unit building destruction", u, b, d));
+  } else {
+    /* send message to the entire region */
+    ADDMSG(&r->msgs, msg_message("siege",
+      "unit building", u, b));
   }
 }
 
