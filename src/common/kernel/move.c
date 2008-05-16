@@ -855,6 +855,7 @@ static boolean
 is_guardian_u(unit * u2, unit *u, unsigned int mask)
 {
   if (u2->faction == u->faction) return false;
+  if ((getguard(u2) & mask) == 0) return false;
   if (alliedunit(u2, u->faction, HELP_GUARD)) return false;
   if (ucontact(u2, u)) return false;
   if (!cansee(u2->faction, u->region, u, 0)) return false;
@@ -863,10 +864,10 @@ is_guardian_u(unit * u2, unit *u, unsigned int mask)
 }
 
 static boolean
-is_guardian_r(unit * u2, unsigned int mask)
+is_guardian_r(unit * u2)
 {
-  if ((getguard(u2) & mask) == 0) return false;
   if (u2->number == 0) return false;
+  if ((u2->flags&UFL_GUARD)==0) return false;
   if (besieged(u2)) return false;
   if (!armedmen(u2) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
   return true;
@@ -912,11 +913,12 @@ is_guarded(region * r, unit * u, unsigned int mask)
    * i is the position of the first free slot in the cache */
   
   for (u2 = (u2?u2->next:r->units); u2; u2=u2->next) {
-    if (is_guardian_r(u2, mask)) {
+    if (is_guardian_r(u2)) {
       /* u2 is a guard, so worth remembering */
       if (i<MAXGUARDCACHE) guardcache[i++] = u2;
       if (is_guardian_u(u2, u, mask)) {
         /* u2 is our guard. stop processing (we might have to go further next time) */
+        lastguard = u2;
         return u2;
       }
     }
