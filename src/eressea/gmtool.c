@@ -1117,6 +1117,7 @@ run_mapper(void)
     draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 0);
     handlekey(&st, c);
   }
+  g_quit = 0;
   set_readline(NULL);
   curs_set(1);
   endwin();
