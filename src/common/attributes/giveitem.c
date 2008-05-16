@@ -59,8 +59,12 @@ a_readgive(attrib * a, struct storage * store)
   char zText[32];
 
   var.i = store->r_id(store);
-  gdata->building = findbuilding(var.i);
-  if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
+  if (var.i>0) {
+    gdata->building = findbuilding(var.i);
+    if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
+  } else {
+    gdata->building=NULL;
+  }
   for (;;) {
     int i;
     store->r_tok_buf(store, zText, sizeof(zText));

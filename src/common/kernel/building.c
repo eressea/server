@@ -377,23 +377,23 @@ resolve_building(variant id) {
 void
 write_building_reference(const struct building * b, struct storage * store)
 {
-  store->w_id(store, b?b->no:-1);
+  store->w_id(store, b?b->no:0);
 }
 
 int
 read_building_reference(struct building ** b, struct storage * store)
 {
-	variant var;
-    var.i = store->r_id(store);
-	if (var.i<=0) {
-		*b = NULL;
-		return AT_READ_FAIL;
-	}
-	else {
-		*b = findbuilding(var.i);
-		if (*b==NULL) ur_add(var, (void**)b, resolve_building);
-		return AT_READ_OK;
-	}
+  variant var;
+  var.i = store->r_id(store);
+  if (var.i<=0) {
+    *b = NULL;
+    return AT_READ_FAIL;
+  }
+  else {
+    *b = findbuilding(var.i);
+    if (*b==NULL) ur_add(var, (void**)b, resolve_building);
+    return AT_READ_OK;
+  }
 }
 
 void

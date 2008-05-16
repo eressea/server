@@ -2224,10 +2224,10 @@ resolve_familiar(variant data)
 static int
 read_familiar(attrib * a, struct storage * store)
 {
-	variant id;
+  variant id;
   id.i = store->r_id(store);
-	ur_add(id, &a->data.v, resolve_familiar);
-	return AT_READ_OK;
+  ur_add(id, &a->data.v, resolve_familiar);
+  return AT_READ_OK;
 }
 
 /* clones */
@@ -2300,10 +2300,10 @@ resolve_clone(variant data)
 static int
 read_clone(attrib * a, struct storage * store)
 {
-	variant id;
+  variant id;
   id.i = store->r_id(store);
-	ur_add(id, &a->data.v, resolve_clone);
-	return AT_READ_OK;
+  ur_add(id, &a->data.v, resolve_clone);
+  return AT_READ_OK;
 }
 
 /* mages */

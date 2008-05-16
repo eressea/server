@@ -208,7 +208,7 @@ read_faction_reference(faction ** f, struct storage * store)
 {
   variant id;
   id.i = store->r_id(store);
-  if (id.i<0) {
+  if (id.i<=0 && (store->version>=NOZEROIDS_VERSION || id.i<0))  {
     *f = NULL;
     return AT_READ_FAIL;
   }
@@ -220,7 +220,7 @@ read_faction_reference(faction ** f, struct storage * store)
 void
 write_faction_reference(const faction * f, struct storage * store)
 {
-  store->w_id(store, f?f->no:-1);
+  store->w_id(store, f?f->no:0);
 }
 
 void

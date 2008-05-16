@@ -191,7 +191,7 @@ write_groups(struct storage * store, group * g)
         store->w_int(store, a->status);
       }
     }
-    store->w_id(store, -1);
+    store->w_id(store, 0);
     a_write(store, g->attribs);
     store->w_brk(store);
     g=g->next;

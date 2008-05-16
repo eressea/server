@@ -3399,6 +3399,7 @@ sp_chaossuction(castorder *co)
     return 0;
   }
 
+  /* TODO: implement with a building */
   create_special_direction(r, rt, 2, "vortex_desc", "vortex");
   create_special_direction(rt, r, 2, "vortex_desc", "vortex");
   new_border(&bt_chaosgate, r, rt);

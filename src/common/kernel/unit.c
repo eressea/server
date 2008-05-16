@@ -597,7 +597,7 @@ free_units(void)
 void
 write_unit_reference(const unit * u, struct storage * store)
 {
-  store->w_id(store, u?u->no:-1);
+  store->w_id(store, u?u->no:0);
 }
 
 void *

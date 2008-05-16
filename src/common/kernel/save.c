@@ -241,155 +241,6 @@ fwritestr(FILE * F, const char * str)
   return nwrite + 2;
 }
 
-#if 0
-#define store->r_id(store) ri36(F)
-
-static void
-rds(struct storage * store, char **ds)
-{
-  static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
-  char *s = &buffer[0];
-  int c = getc(F);
-  while (c != '"') {
-    if (c == EOF) {
-      *s = 0;
-      fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
-      abort();
-    }
-    c = getc(F);
-  }
-
-  c = getc(F);
-
-  while (c != '"') {
-    if (c == EOF) {
-      *s = 0;
-      fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
-      abort();
-    }
-    if (s - buffer < DISPLAYSIZE) {
-      *s++ = (char)c;
-    }
-    c = getc(F);
-  }
-
-  c = getc(F);
-  *s = 0;
-  if (ds) {
-    *ds = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
-    strcpy(*ds, buffer);
-  }
-}
-
-
-static void
-xrds(struct storage * store, char **ds, int encoding)
-{
-  static char buffer[DISPLAYSIZE + 1]; /*Platz für null-char nicht vergessen!*/
-  int len = store->r_str_buf(store, buffer, sizeof(buffer));
-
-  if (len>=0) {
-    if (ds) {
-      *ds = realloc(*ds, sizeof(char) * (len + 1));
-      strcpy(*ds, buffer);
-    }
-  }
-}
-
-#define rcf(F) (getc(F));
-void
-rsf(struct storage * store, char *s, size_t len)
-{
-  char * begin = s;
-  int c;
-  do {
-    c = getc(F);;
-    if (c == EOF) {
-      puts("Die Datei bricht vorzeitig ab.");
-      abort();
-    }
-  } while (c != '"');
-
-  for (;;) {
-    c = getc(F);
-    if (c == '"') break;
-    else if (c == EOF) {
-      puts("Die Datei bricht vorzeitig ab.");
-      abort();
-    }
-    if (s-begin<(int)len-1)
-      *s++ = (char)c;
-  }
-  *s = 0;
-}
-
-static void
-rs(struct storage * store, char *s)
-{
-  boolean apos = false;
-  int c = getc(F);
-  while (isspace(c)) c = getc(F);
-  if (c=='"') {
-    apos = true;
-    c = getc(F);
-  }
-  for (;;) {
-    if (c=='"') {
-      c = getc(F);
-      break;
-    } else if (!apos && isspace(c)) break;
-    *s++ = (char)c;
-    c = getc(F);
-  }
-  *s = 0;
-}
-
-#define store->r_str_buf(store, buf, size) store->r_tok_buf(store, buf) /* should check size but doesn't */
-
-static int
-ri(struct storage * store)
-{
-  int i = 0, vz = 1;
-
-  int c = getc(F);
-  while (!xisdigit(c)) {
-    if (c == EOF) {
-      puts("Die Datei bricht vorzeitig ab.");
-      abort();
-    }
-    c = getc(F);
-  }
-
-  while (xisdigit(c)) {
-    if (c == '-')
-      vz = -1;
-    else
-      i = 10 * i + (c - '0');
-    c = getc(F);
-  }
-
-  return i * vz;
-}
-
-static int
-ri36(struct storage * store)
-{
-  char buf[16];
-  int i = 0;
-  int c = getc(F);
-  while (!isalnum(c)) c = getc(F);
-  while (isalnum(c)) {
-    if (i+1<sizeof(buf)) {
-      buf[i++]=(char)c;
-    }
-    c = getc(F);
-  }
-  buf[i]=0;
-  i = atoi36(buf);
-  return i;
-}
-#endif
-
 #ifdef ENEMIES
 static void
 read_enemies(struct storage * store, faction * f)
@@ -398,7 +249,7 @@ read_enemies(struct storage * store, faction * f)
   f->enemies = NULL;
   for (;;) {
     int fno = store->r_id(store);
-    if (fno<0) break;
+    if (fno<=0) break;
     else {
       faction_list * flist = malloc(sizeof(faction_list));
       flist->next = f->enemies;
@@ -414,7 +265,7 @@ write_enemies(struct storage * store, const faction_list * flist)
   while (flist) {
     write_faction_reference(flist->data, store);
   }
-  store->w_id(store, -1);
+  store->w_id(store, 0);
 }
 #endif
 
@@ -735,47 +586,6 @@ read_alliances(struct storage * store)
   }
 }
 
-#if 0
-#define wc(F, c) putc(c, F);
-#define wnl(F) putc('\n', F);
-#define whs(F, s) fputs(s, F); putc(' ', F)
-
-size_t
-wsn(struct storage * store, const char *s)
-{
-  size_t n = 0;
-  if (!s)
-    return 0;
-  while (*s) {
-    wc(F, *s++);
-    ++n;
-  }
-  return n;
-}
-
-size_t
-ws(struct storage * store, const char *s)
-{
-  size_t n;
-  fputc('"', F);
-  n = wsn(F, s);
-  fputs("\" ", F);
-  return n+3;
-}
-
-static int
-wi(struct storage * store, int n)
-{
-  return fprintf(F, "%d ", n);
-}
-
-static int
-wi36(struct storage * store, int n)
-{
-  return fprintf(F, "%s ", itoa36(n));
-}
-#endif
-
 void
 write_alliances(struct storage * store)
 {
@@ -850,6 +660,7 @@ readunit(struct storage * store)
   int number, n, p;
   order ** orderp;
   char obuf[1024];
+  faction * f;
 
   n = store->r_id(store);
   u = findunit(n);
@@ -865,11 +676,11 @@ readunit(struct storage * store)
     u->skill_size = 0;
     u_setfaction(u, NULL);
   }
-  {
-    int n = store->r_id(store);
-    faction * f = findfaction(n);
-    if (f!=u->faction) u_setfaction(u, f);
-  }
+
+  n = store->r_id(store);
+  f = findfaction(n);
+  if (f!=u->faction) u_setfaction(u, f);
+
   u->name = store->r_str(store);
   if (lomem) {
     store->r_str_buf(store, NULL, 0);
@@ -934,10 +745,10 @@ readunit(struct storage * store)
   set_number(u, number);
 
   n = store->r_id(store);
-  if (n>=0) u->building = findbuilding(n);
+  if (n>0) u->building = findbuilding(n);
 
   n = store->r_id(store);
-  if (n>=0) u->ship = findship(n);
+  if (n>0) u->ship = findship(n);
 
   if (store->version <= 73) {
     if (store->r_int(store)) {
@@ -1370,7 +1181,7 @@ readfaction(struct storage * store)
 
   if (alliances!=NULL) {
     int allianceid = store->r_id(store);
-    if (allianceid>=0) f->alliance = findalliance(allianceid);
+    if (allianceid>0) f->alliance = findalliance(allianceid);
     if (f->alliance) {
       faction_list * flist = malloc(sizeof(faction_list));
       flist->data = f;
@@ -1493,7 +1304,7 @@ writefaction(struct storage * store, const faction * f)
   store->w_int(store, f->subscription);
   if (alliances!=NULL) {
     if (f->alliance) store->w_id(store, f->alliance->id);
-    else store->w_id(store, -1);
+    else store->w_id(store, 0);
   }
 
   store->w_str(store, (const char *)f->name);
@@ -1540,7 +1351,7 @@ writefaction(struct storage * store, const faction * f)
       store->w_int(store, sf->status);
     }
   }
-  store->w_id(store, -1);
+  store->w_id(store, 0);
   store->w_brk(store);
   write_groups(store, f->groups);
 #ifdef ENEMIES

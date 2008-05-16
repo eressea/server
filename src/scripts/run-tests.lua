@@ -12,7 +12,7 @@ end
 test_locales()
 
 local now = os.clock()
-read_game("567.dat", "binary")
+read_game("571.new", "binary")
 --read_game("566.txt", "text")
 --write_game("566.txt", "text")
 local elapsed = os.clock() - now
@@ -23,6 +23,6 @@ print(elapsed)
 f = get_faction(0)
 
 --renumber(f, 666)
---write_game("566.dat", "binary")
+-- write_game("571.new", "binary")
 
---io.stdin:read("*line")
+io.stdin:read("*line")

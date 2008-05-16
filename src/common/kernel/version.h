@@ -55,6 +55,7 @@
 #define UID_VERSION 327 /* regions have a unique id */
 #define STORAGE_VERSION 328 /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
 #define INTPAK_VERSION 329 /* in binary, ints can get packed */
+#define NOZEROIDS_VERSION 330 /* zero is not a valid ID for anything (including factions) */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION INTPAK_VERSION /* current datafile */
+#define RELEASE_VERSION NOZEROIDS_VERSION /* current datafile */
