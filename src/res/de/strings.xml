@@ -4403,10 +4403,6 @@
       <text locale="de">Beschwörung eines Hitzeelementar</text>
       <text locale="en">Summon Fire Elemental</text>
     </string>
-    <string name="fogofconfusion">
-      <text locale="de">Nebel der Verwirrung</text>
-      <text locale="en">Fog of Confusion</text>
-    </string>
     <string name="undeadhero">
       <text locale="de">Untote Helden</text>
       <text locale="en">Undead Heroes</text>
@@ -6056,18 +6052,6 @@
         are feared in combat for they are hard to hit
         and have the ability to drain strength from
         their victims.</text>
-    </string>
-    <string name="fogofconfusion">
-      <text locale="de">Der Druide beschwört die Elementargeister des Nebels.
-        Sie werden sich für einige Zeit in in allen Wald- und Ozeanregionen 
-        der Umgebung festsetzen und sie mit
-        dichtem Nebel überziehen. Personen innerhalb des magischen Nebels
-        verlieren die Orientierung und haben große Schwierigkeiten, sich in
-        eine bestimmte Richtung zu bewegen.</text>
-      <text locale="en">The druid summons a group of water elementals that
-        cover nearby oceans and forests in thick fog. People inside this magical fog lose
-        their orientation and have great difficulties moving in a specific
-        direction.</text>
     </string>
     <string name="summonfireelemental">
       <text locale="de">Dieses Ritual beschwört wütende Elementargeister der
