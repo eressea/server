@@ -271,131 +271,6 @@ read_newfactions(const char * filename)
   return newfactions;
 }
 
-#ifdef SEED_QUALITY /* does this work? */
-typedef struct seed_t {
-  struct region * region;
-  struct newfaction * player;
-  struct seed_t * next[MAXDIRECTIONS];
-} seed_t;
-
-static double
-get_influence(struct seed_t * seed, struct seed_t * target)
-{
-	double q = 0.0;
-	direction_t d;
-	if (target==0 || seed==0) return q;
-	for (d=0;d!=MAXDIRECTIONS;++d) {
-		seed_t * s = seed->next[d];
-		if (s==target) {
-			if (target->player) {
-				if (seed->player) {
-					/* neighbours bad. */
-					q -= 4.0;
-					if (seed->player->race==target->player->race) {
-						/* don't want similar people next to each other */
-						q -= 2.0;
-					} else if (seed->player->race==new_race[RC_ELF]) {
-						if (target->player->race==new_race[RC_TROLL]) {
-							/* elf sitting next to troll: poor troll */
-							q -= 5.0;
-						}
-					}
-				}
-				else if (target->player) {
-					/* empty regions good */
-					q += 1.0;
-				}
-			}
-		}
-	}
-	return q;
-}
-
-static double
-get_quality(struct seed_t * seed)
-{
-	double q = 0.0;
-	int nterrains[T_ASTRAL];
-	direction_t d;
-
-	memset(nterrains, 0, sizeof(nterrains));
-	for (d=0;d!=MAXDIRECTIONS;++d) {
-		seed_t * ns = seed->next[d];
-    if (ns) {
-      terrain_t t = rterrain(ns->region);
-      if (t<T_ASTRAL) ++nterrains[t];
-    }
-	}
-	++nterrains[rterrain(seed->region)];
-
-	if (nterrains[T_MOUNTAIN]) {
-		/* 5 points for the first, and 2 points for every other mountain */
-		q += (3+nterrains[T_MOUNTAIN]*2);
-	} else if (seed->player->race==new_race[RC_DWARF]) {
-		/* -10 for a dwarf who isn't close to a mountain */
-		q -= 10.0;
-	}
-
-	if (nterrains[T_PLAIN]) {
-		/* 5 points for the first, and 2 points for every other plain */
-		q += (3+nterrains[T_PLAIN]*2);
-	} else if (seed->player->race==new_race[RC_ELF]) {
-		/* -10 for an elf who isn't close to a plain */
-		q -= 10.0;
-	}
-
-	if (nterrains[T_DESERT]) {
-		/* +10 points for the first if we are insects, and -2 points for every
-		 * other desert */
-		if (seed->player->race==new_race[RC_INSECT]) q += 12;
-		q -= (nterrains[T_DESERT]*2);
-	}
-
-	switch (rterrain(seed->region)) {
-	case T_DESERT:
-		q -=8.0;
-		break;
-	case T_VOLCANO:
-		q -=20.0;
-		break;
-	case T_GLACIER:
-		q -=10.0;
-		break;
-	case T_SWAMP:
-		q -= 1.0;
-		break;
-	case T_PLAIN:
-		q += 4.0;
-		break;
-	case T_MOUNTAIN:
-		q += 5.0;
-		break;
-	}
-
-	return 2.0;
-}
-
-static double
-recalc(seed_t * seeds, int nseeds, int nplayers)
-{
-	int i, p = 0;
-	double quality = 0.0, q = 0.0, *qarr = malloc(sizeof(int) * nplayers);
-	for (i=0;i!=nseeds;++i) {
-		if (seeds[i].player) {
-			double quality = get_quality(seeds+i);
-			direction_t d;
-			for (d=0;d!=MAXDIRECTIONS;++d) {
-				quality += get_influence(seeds[i].next[d], seeds+i);
-			}
-			qarr[p++] = quality;
-			q += quality;
-		}
-	}
-
-	return quality + q;
-}
-#endif
-
 extern int numnewbies;
 
 static terrain_t
@@ -412,7 +287,6 @@ preferred_terrain(const struct race * rc)
 #define PLAYERS_PER_ISLAND 20
 #define MAXISLANDSIZE 50
 #define MINFACTIONS 1
-#define MAXAGEDIFF 5
 #define VOLCANO_CHANCE 100
 
 static boolean
@@ -420,13 +294,12 @@ virgin_region(const region * r)
 {
   direction_t d;
   if (r==NULL) return true;
-  if (r->age>MAXAGEDIFF) return false;
   if (fval(r->terrain, FORBIDDEN_REGION)) return false;
   if (r->units) return false;
   for (d=0;d!=MAXDIRECTIONS;++d) {
     const region * rn = rconnect(r, d);
     if (rn) {
-      if (rn->age>MAXAGEDIFF) return false;
+      if (rn->age>r->age+1) return false;
       if (rn->units) return false;
       if (fval(rn->terrain, FORBIDDEN_REGION)) {
         /* because it kinda sucks to have islands that are adjacent to a firewall */
@@ -468,10 +341,10 @@ get_island(region * root, region_list ** rlist)
   }
 }
 
-static int
-island_size(region * r)
+static void
+get_island_info(region * r, int * size_p, int * inhabited_p, int * maxage_p)
 {
-  int size = 0;
+  int size = 0, maxage = 0, inhabited = 0;
   region_list * rlist = NULL;
   region_list * island = NULL;
   add_regionlist(&rlist, r);
@@ -480,6 +353,15 @@ island_size(region * r)
   while (rlist) {
     direction_t d;
     r = rlist->data;
+    if (r->units) {
+      unit * u;
+      for (u=r->units; u; u=u->next) {
+        if (u->faction->age > maxage) {
+          maxage = u->faction->age;
+        }
+      }
+      ++inhabited;
+    }
     ++size;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
@@ -497,7 +379,9 @@ island_size(region * r)
     freset(rlist->data, RF_MARK);
   }
   free_regionlist(island);
-  return size;
+  if (size_p) *size_p = size;
+  if (inhabited_p) *inhabited_p = inhabited;
+  if (maxage_p) *maxage_p = maxage;
 }
 
 void
@@ -532,7 +416,7 @@ frame_regions(int age, terrain_t terrain)
 }
 
 int
-autoseed(newfaction ** players, int nsize, boolean new_island)
+autoseed(newfaction ** players, int nsize, int max_agediff)
 {
   short x = 0, y = 0;
   region * r = NULL;
@@ -546,7 +430,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
 
   if (listlen(*players)<MINFACTIONS) return 0;
 
-  if (!new_island) {
+  if (max_agediff>0) {
     region * rmin = NULL;
     /* find a spot that's adjacent to the previous island, but virgin.
      * like the last land virgin ocean region adjacent to land.
@@ -559,14 +443,15 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
           region * rn = rconnect(r, d);
           if (rn && rn->land && virgin_region(rn)) {
             /* only expand islands that aren't single-islands and not too big already */
-            int n = island_size(rn);
-            if (n>2 && n<MAXISLANDSIZE) {
+            int size, inhabitants, maxage;
+            get_island_info(rn, &size, &inhabitants, &maxage);
+            if (maxage<=max_agediff && size>2 && size<MAXISLANDSIZE) {
               rmin = rn;
               break;
             }
           }
         }
-      }
+     } 
     }
     if (rmin!=NULL) {
       region_list * rlist = NULL, * rptr;
@@ -599,7 +484,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = r->planep;
-      if (rterrain(r)==T_OCEAN && p==0 && (rmin==NULL || r->age<=MAXAGEDIFF)) {
+      if (rterrain(r)==T_OCEAN && p==0 && (rmin==NULL || r->age<=max_agediff)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn  = rconnect(r, d);

@@ -32,7 +32,7 @@ typedef struct newfaction {
   struct alliance * allies;
 } newfaction;
 
-extern int autoseed(newfaction ** players, int nsize, boolean new_island);
+extern int autoseed(newfaction ** players, int nsize, int max_agediff);
 extern newfaction * read_newfactions(const char * filename);
 extern void get_island(struct region * root, struct region_list ** rlist);
 extern int fix_demand(struct region *r);

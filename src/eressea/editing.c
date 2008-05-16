@@ -29,7 +29,7 @@ seed_players(const char * filename, boolean new_island)
       int n = listlen(players);
       int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
       k = n / k;
-      n = autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
+      n = autoseed(&players, k, new_island?0:TURNS_PER_ISLAND);
       if (n==0) {
         break;
       }
