@@ -8545,11 +8545,8 @@ static spelldata spelldaten[] =
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_MOVECASTLE, "living_rock", NULL, "direction",
-    "bc",
-    M_ASTRAL,
-    (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE),
-    5, 13,
+    SPL_MOVECASTLE, "living_rock", NULL, "direction", "bc",
+    M_ASTRAL, (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE), 5, 13,
     {
       { "aura", 10, SPC_LEVEL },
       { "permaura", 1, SPC_FIX },
@@ -8560,9 +8557,8 @@ static spelldata spelldaten[] =
     (spell_f)sp_movecastle, NULL
   },
   {
-    SPL_DISRUPTASTRAL, "astral_disruption",
-        NULL, NULL, NULL,
-    M_ASTRAL, (REGIONSPELL), 4, 14,
+    SPL_DISRUPTASTRAL, "astral_disruption", NULL, NULL, NULL,
+    M_ASTRAL, (REGIONSPELL | SPELLLEVEL), 4, 14,
     {
       { "aura", 140, SPC_FIX },
       { 0, 0, 0 },
