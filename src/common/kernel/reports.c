@@ -1094,7 +1094,7 @@ view_regatta(struct seen_region ** seen, region * r, faction * f)
   int skill = 0;
   for (u=r->units; u; u=u->next) {
     if (u->faction==f) {
-      int es = effskill(u, SK_OBSERVATION);
+      int es = effskill(u, SK_PERCEPTION);
       if (es>skill) skill=es;
     }
   }

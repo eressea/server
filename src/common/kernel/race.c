@@ -202,7 +202,7 @@ unit_max_hp(const unit * u)
 	if (heal_ct==NULL) heal_ct = ct_find("healingzone");
 
 
-	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
+	p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
 	h += (int) (h * p + 0.5);
 
 #if KARMA_MODULE

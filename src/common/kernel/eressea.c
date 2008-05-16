@@ -1037,7 +1037,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   rings = invisible(u, NULL);
   while (u2) {
     if (rings<u->number || invisible(u, u2) < u->number) {
-      int observation = eff_skill(u2, SK_OBSERVATION, r);
+      int observation = eff_skill(u2, SK_PERCEPTION, r);
 
 #ifdef NIGHTEYES
       if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
@@ -1078,7 +1078,7 @@ cansee_unit(const unit * u, const unit * target, int modifier)
     if (rings && invisible(target, u) >= target->number) {
       return false;
     }
-    o = eff_skill(u, SK_OBSERVATION, target->region);
+    o = eff_skill(u, SK_PERCEPTION, target->region);
 
 #ifdef NIGHTEYES
     if (u->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
@@ -1121,7 +1121,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 
         if (rings && invisible(u, u2) >= u->number) continue;
 
-        o = eff_skill(u2, SK_OBSERVATION, r);
+        o = eff_skill(u2, SK_PERCEPTION, r);
 
 #ifdef NIGHTEYES
         if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
@@ -1853,7 +1853,7 @@ get_lighthouses(const region * r)
         if (u->building == b) {
           c = true;
           if (c > buildingcapacity(b)) break;
-          if (eff_skill(u, SK_OBSERVATION, r) >= d * 3) {
+          if (eff_skill(u, SK_PERCEPTION, r) >= d * 3) {
             unitlist_insert(&ulist, u);
           }
         } else if (c) break; /* first unit that's no longer in the house ends the search */
@@ -1878,7 +1878,7 @@ lighthouse_range(const building * b, const faction * f)
         c += u->number;
         if (c > buildingcapacity(b)) break;
         if (f==NULL || u->faction == f) {
-          int sk = eff_skill(u, SK_OBSERVATION, r) / 3;
+          int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
           d = max(d, sk);
           d = min(maxd, d);
           if (d==maxd) break;
@@ -1914,7 +1914,7 @@ check_leuchtturm(region * r, faction * f)
           if (f==NULL || u->faction == f) {
             if (!d) d = distance(r, r2);
             if (maxd < d) break;
-            if (eff_skill(u, SK_OBSERVATION, r) >= d * 3) return true;
+            if (eff_skill(u, SK_PERCEPTION, r) >= d * 3) return true;
           }
         } else if (c) break; /* first unit that's no longer in the house ends the search */
       }

@@ -333,7 +333,7 @@ b_blockfogwall(const border * b, const unit * u, const region * r)
   unused(b);
   unused(r);
   if (!u) return true;
-  return (boolean)(effskill(u, SK_OBSERVATION) > 4); /* Das ist die alte Nebelwand */
+  return (boolean)(effskill(u, SK_PERCEPTION) > 4); /* Das ist die alte Nebelwand */
 }
 
 border_type bt_fogwall = {

@@ -828,7 +828,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 	if (fval(reisender->race, RCF_ILLUSIONARY)) return NULL;
 	for (u=r->units;u && !contact;u=u->next) {
 		if (getguard(u) & GUARD_TRAVELTHRU) {
-			int sk = eff_skill(u, SK_OBSERVATION, r);
+			int sk = eff_skill(u, SK_PERCEPTION, r);
 			if (invisible(reisender, u) >= reisender->number) continue;
 			if (u->faction == reisender->faction) contact = true;
       else if (ucontact(u, reisender)) contact = true;
@@ -1813,7 +1813,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
           !alliedunit(hafenmeister, u->faction, HELP_GUARD)) {
 
 
-            if (effskill(hafenmeister, SK_OBSERVATION) > effskill(u2, SK_STEALTH)) {
+            if (effskill(hafenmeister, SK_PERCEPTION) > effskill(u2, SK_STEALTH)) {
               for (itm=u2->items; itm; itm=itm->next) {
                 const luxury_type * ltype = resource2luxury(itm->type->rtype);
                 if (ltype!=NULL && itm->number>0) {

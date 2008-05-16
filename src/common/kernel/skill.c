@@ -236,7 +236,7 @@ rc_skillmod(const struct race * rc, const region *r, skill_t sk)
   mods = skill_mod(rc, sk, r->terrain);
 #endif
 	if (rc == new_race[RC_ELF] && r_isforest(r)) switch (sk) {
-	case SK_OBSERVATION:
+	case SK_PERCEPTION:
 		++mods;
 		break;
 	case SK_STEALTH:

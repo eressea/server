@@ -645,7 +645,7 @@ learn_cmd(unit * u, order * ord)
   if (l > 0) {
     if (sk == SK_CROSSBOW || sk == SK_LONGBOW
       || sk == SK_CATAPULT || sk == SK_MELEE || sk == SK_SPEAR
-      || sk == SK_AUSDAUER || sk == SK_WEAPONLESS)
+      || sk == SK_STAMINA || sk == SK_WEAPONLESS)
     {
       teach->value += u->number * 5 * (l+1);
     } else {

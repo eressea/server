@@ -379,5 +379,26 @@
     <item name="seaserpenthead" amount="1"/>
   </set>
 
+  <!-- sets that are used by the monster-spawning code -->
+  <set name="monster_dragon">
+    <skill name="magic" level="4"/>
+    <skill name="stealth" level="1"/>
+    <skill name="stamina" level="1"/>
+    <skill name="perception" level="d3"/>
+    <item name="money" amount="d500+99"/>
+  </set>
+
+  <set name="monster_braineater">
+    <skill name="stealth" level="1"/>
+    <skill name="perception" level="1"/>
+  </set>
+
+  <set name="monster_seaserpent">
+    <skill name="magic" level="4"/>
+    <skill name="stealth" level="2"/>
+    <skill name="stamina" level="1"/>
+    <skill name="perception" level="3"/>
+  </set>
+
 </equipment>
 

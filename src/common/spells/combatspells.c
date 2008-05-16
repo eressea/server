@@ -784,7 +784,7 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
   setstatus(u, ST_FIGHT);
 
   set_level(u, SK_WEAPONLESS, (int)(power/2));
-  set_level(u, SK_AUSDAUER, (int)(power/2));
+  set_level(u, SK_STAMINA, (int)(power/2));
   u->hp = u->number * unit_max_hp(u);
 
   a = a_new(&at_unitdissolve);
@@ -814,7 +814,7 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   setstatus(u, ST_FIGHT);
 
   set_level(u, SK_WEAPONLESS, (int)(power/3));
-  set_level(u, SK_AUSDAUER, (int)(power/3));
+  set_level(u, SK_STAMINA, (int)(power/3));
   u->hp = u->number * unit_max_hp(u);
 
   if (fval(mage, UFL_PARTEITARNUNG))

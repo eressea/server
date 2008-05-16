@@ -106,7 +106,7 @@ slipthru(const region * r, const unit * u, const building * b)
 
       if (invisible(u, u2) >= u->number) continue;
 
-      o = eff_skill(u2, SK_OBSERVATION, r);
+      o = eff_skill(u2, SK_PERCEPTION, r);
 
       if (o + 2 >= n)
         return 0;   /* entdeckt! */

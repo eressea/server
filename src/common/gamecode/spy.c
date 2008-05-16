@@ -151,7 +151,7 @@ spy_cmd(unit * u, struct order * ord)
 
   /* der Spion kann identifiziert werden, wenn das Opfer bessere
   * Wahrnehmung als das Ziel Tarnung + Spionage/2 hat */
-  observe = eff_skill(target, SK_OBSERVATION, r)
+  observe = eff_skill(target, SK_PERCEPTION, r)
     - (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
 
   if (invisible(u, target) >= u->number) {
@@ -162,7 +162,7 @@ spy_cmd(unit * u, struct order * ord)
   * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
   * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
   observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
-    + (eff_skill(target, SK_OBSERVATION, r) * 0.02);
+    + (eff_skill(target, SK_PERCEPTION, r) * 0.02);
 
   if (chance(observechance)) {
     ADDMSG(&target->faction->msgs, msg_message("spydetect", 
@@ -553,7 +553,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
     }
     add_message(&f->msgs, sink_msg);
     vset_erase(&informed, f);
-    if (spy == 1 && f != saboteur->faction && faction_skill(r, f, SK_OBSERVATION) - eff_skill(saboteur, SK_STEALTH, r) > 0) {
+    if (spy == 1 && f != saboteur->faction && faction_skill(r, f, SK_PERCEPTION) - eff_skill(saboteur, SK_STEALTH, r) > 0) {
       /* the unit is discovered */
       ADDMSG(&f->msgs, msg_message("spy_discovered_msg", "unit saboteur ship", lastunit, saboteur, sh));
       if (enemy_discovers_spy_msg==NULL) {
@@ -595,7 +595,7 @@ sabotage_cmd(unit * u, struct order * ord)
       return 0;
     }
     u2 = shipowner(sh);
-    skdiff = eff_skill(u, SK_SPY, r)-crew_skill(r, u2->faction, sh, SK_OBSERVATION);
+    skdiff = eff_skill(u, SK_SPY, r)-crew_skill(r, u2->faction, sh, SK_PERCEPTION);
     if (try_destruction(u, u2, sh, skdiff)) {
         sink_ship(r, sh, buffer, 1, u);
     }

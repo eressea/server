@@ -819,7 +819,7 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     return ECUSTOM;
   }
-  if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {
+  if (effskill(u, SK_STEALTH)<=effskill(target, SK_PERCEPTION)) {
     cmistake(u, ord, 64, MSG_EVENT);
     return ECUSTOM;
   }

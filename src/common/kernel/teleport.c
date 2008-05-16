@@ -152,9 +152,8 @@ spawn_braineaters(float chance)
     /* Neues Monster ? */
     if (next-- == 0) {
       unit *u = createunit(r, f0, 1+rng_int()%10+rng_int()%10, new_race[RC_HIRNTOETER]);
+      equip_unit(u, get_equipment("monster_braineater"));
 
-      set_level(u, SK_STEALTH, 1);
-      set_level(u, SK_OBSERVATION, 1);
       next = rng_int() % (int)(chance*100);
     }
   }

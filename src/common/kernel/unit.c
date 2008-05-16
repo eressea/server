@@ -1134,7 +1134,7 @@ item_modification(const unit *u, skill_t sk, int val)
     }
   }
 #if NEWATSROI == 1
-  if(sk == SK_OBSERVATION) {
+  if(sk == SK_PERCEPTION) {
     if(get_item(u, I_AMULET_OF_TRUE_SEEING) >= u->number) {
       val += ATSBONUS;
     }
@@ -1226,7 +1226,7 @@ case SK_HERBALISM:
 case SK_MAGIC:
 case SK_SPY:
 case SK_STEALTH:
-case SK_OBSERVATION:
+case SK_PERCEPTION:
   break;
 default:
   skill -= 2;

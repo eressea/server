@@ -2085,7 +2085,7 @@ do_regenerate(fighter *af)
   ta.index = af->fighting;
 
   while(ta.index--) {
-    af->person[ta.index].hp += effskill(au, SK_AUSDAUER);
+    af->person[ta.index].hp += effskill(au, SK_STAMINA);
     af->person[ta.index].hp = min(unit_max_hp(au), af->person[ta.index].hp);
   }
 }

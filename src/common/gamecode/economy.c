@@ -265,8 +265,8 @@ add_recruits(unit * u, int number, int wanted)
         change_level(unew, SK_CROSSBOW, i);
       if (unew->race->bonus[SK_RIDING] >= 0)
         change_level(unew, SK_RIDING, i);
-      if (unew->race->bonus[SK_AUSDAUER] >= 0)
-        change_level(unew, SK_AUSDAUER, i);
+      if (unew->race->bonus[SK_STAMINA] >= 0)
+        change_level(unew, SK_STAMINA, i);
     }
 #endif /* KARMA_MODULE */
     if (unew!=u) {
@@ -2742,8 +2742,8 @@ wahrnehmung(region * r, faction * f)
 
   for (u = r->units; u; u = u->next) {
     if (u->faction == f) {
-      if (eff_skill(u, SK_OBSERVATION, r) > w) {
-        w = eff_skill(u, SK_OBSERVATION, r);
+      if (eff_skill(u, SK_PERCEPTION, r) > w) {
+        w = eff_skill(u, SK_PERCEPTION, r);
       }
     }
   }

@@ -3318,7 +3318,7 @@ sp_summonshadow(castorder *co)
   val = get_level(mage, SK_MAGIC) + get_level(mage, SK_STEALTH);
 
   set_level(u, SK_STEALTH, val);
-  set_level(u, SK_OBSERVATION, 1);
+  set_level(u, SK_PERCEPTION, 1);
 
   ADDMSG(&mage->faction->msgs, msg_message("summonshadow_effect",
     "mage number", mage, number));
@@ -3356,7 +3356,7 @@ sp_summonshadowlords(castorder *co)
 
   /* Bekommen Tarnung = Magie und Wahrnehmung 5. */
   set_level(u, SK_STEALTH, get_level(mage, SK_MAGIC));
-  set_level(u, SK_OBSERVATION, 5);
+  set_level(u, SK_PERCEPTION, 5);
 
   ADDMSG(&mage->faction->msgs, msg_message("summon_effect", "mage amount race", mage, 1, u->race));
   return cast_level;
@@ -4326,7 +4326,7 @@ sp_pump(castorder *co)
 
   u = create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/pump", NULL);
   u->age = 2;
-  set_level(u, SK_OBSERVATION, eff_skill(target, SK_OBSERVATION, u->region));
+  set_level(u, SK_PERCEPTION, eff_skill(target, SK_PERCEPTION, u->region));
 
   return cast_level;
 }
@@ -5061,7 +5061,7 @@ sp_dreamreading(castorder *co)
   u2 = create_unit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/dreamreading", NULL);
   set_number(u2, 1);
   u2->age = 2;   /* Nur für diese Runde. */
-  set_level(u2, SK_OBSERVATION, eff_skill(u, SK_OBSERVATION, u2->region));
+  set_level(u2, SK_PERCEPTION, eff_skill(u, SK_PERCEPTION, u2->region));
 
   msg = msg_message("sp_dreamreading_effect", "mage unit region", mage, u, u->region);
   r_addmessage(r, mage->faction, msg);
@@ -5868,7 +5868,7 @@ sp_viewreality(castorder *co)
     region * rt = rl2->data;
     if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
       u = create_unit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/viewreality", NULL);
-      set_level(u, SK_OBSERVATION, co->level/2);
+      set_level(u, SK_PERCEPTION, co->level/2);
       u->age = 2;
     }
   }

@@ -910,7 +910,7 @@ plan_dragon(unit * u)
   }
   if (long_order==NULL) {
     long_order = create_order(K_STUDY, u->faction->locale, "'%s'", 
-      skillname(SK_OBSERVATION, u->faction->locale));
+      skillname(SK_PERCEPTION, u->faction->locale));
   }
   return long_order;
 }
@@ -946,7 +946,7 @@ plan_monsters(void)
         /* all monsters fight */
       }
       /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-      produceexp(u, SK_OBSERVATION, u->number);
+      produceexp(u, SK_PERCEPTION, u->number);
 
       /* Befehle müssen jede Runde neu gegeben werden: */
       free_orders(&u->orders);
@@ -1069,10 +1069,7 @@ spawn_dragons(void)
     if (fval(r->terrain, SEA_REGION) && rng_int()%10000 < 1) {
       u = createunit(r, monsters, 1, new_race[RC_SEASERPENT]);
       fset(u, UFL_ISNEW|UFL_MOVED);
-      set_level(u, SK_MAGIC, 4);
-      set_level(u, SK_OBSERVATION, 3);
-      set_level(u, SK_STEALTH, 2);
-      set_level(u, SK_AUSDAUER, 1);
+      equip_unit(u, get_equipment("monster_seaserpent"));
     }
 
     if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) 
@@ -1083,12 +1080,8 @@ spawn_dragons(void)
         u = createunit(r, monsters, nrand(30, 20) + 1, new_race[RC_DRAGON]);
       }
       fset(u, UFL_ISNEW|UFL_MOVED);
+      equip_unit(u, get_equipment("monster_dragon"));
 
-      set_money(u, u->number * (rng_int() % 500 + 100));
-      set_level(u, SK_MAGIC, 4);
-      set_level(u, SK_OBSERVATION, 1+rng_int()%3);
-      set_level(u, SK_STEALTH, 1);
-      set_level(u, SK_AUSDAUER, 1);
       if (!quiet) {
         log_printf("%d %s in %s.\n", u->number,
           LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
@@ -1098,20 +1091,7 @@ spawn_dragons(void)
 
       /* add message to the region */
       ADDMSG(&r->msgs,
-        msg_message("sighting", "region race number", 
-        NULL, u->race, u->number));
-      /* create new message to add to units */
-      msg = msg_message("sighting", "region race number",
-        u->region, u->race, u->number);
-      for (u=r->units;u;u=u->next) freset(u->faction, FFL_SELECT);
-      for (u=r->units;u;u=u->next) {
-        faction * f = u->faction;
-        if (!fval(f, FFL_SELECT)) {
-          add_message(&f->msgs, msg);
-          fset(f, FFL_SELECT);
-        }
-      }
-      msg_release(msg);
+        msg_message("sighting", "region race number", r, u->race, u->number));
     }
   }
 }
