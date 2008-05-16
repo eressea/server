@@ -421,12 +421,17 @@ virgin_region(const region * r)
   direction_t d;
   if (r==NULL) return true;
   if (r->age>MAXAGEDIFF) return false;
+  if (fval(r->terrain, FORBIDDEN_REGION)) return false;
   if (r->units) return false;
   for (d=0;d!=MAXDIRECTIONS;++d) {
     const region * rn = rconnect(r, d);
     if (rn) {
       if (rn->age>MAXAGEDIFF) return false;
       if (rn->units) return false;
+      if (fval(rn->terrain, FORBIDDEN_REGION)) {
+        /* because it kinda sucks to have islands that are adjacent to a firewall */
+        return false;
+      }
     }
   }
   return true;
