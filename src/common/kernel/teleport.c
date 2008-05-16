@@ -24,6 +24,7 @@
 #include "teleport.h"
 
 /* kernel includes */
+#include "equipment.h"
 #include "unit.h"
 #include "region.h"
 #include "race.h"

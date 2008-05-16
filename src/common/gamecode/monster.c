@@ -1064,7 +1064,6 @@ spawn_dragons(void)
 
   for (r = regions; r; r = r->next) {
     unit * u;
-    message * msg;
 
     if (fval(r->terrain, SEA_REGION) && rng_int()%10000 < 1) {
       u = createunit(r, monsters, 1, new_race[RC_SEASERPENT]);
