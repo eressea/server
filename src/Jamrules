@@ -67,7 +67,7 @@ CCFLAGS += -Wwrite-strings
 #		   -Wconversion
 #		   -Wunreachable-code
                    -Werror
-                   -fno-strict-aliasing
+                   -fstrict-aliasing
 		   ;
 
 # this require the latet luabind from CVS

@@ -2678,7 +2678,7 @@ typedef struct bresvole {
   curse * self;
 } bresolve;
 
-static void * resolve_buddy(variant data);
+static void resolve_buddy(variant data, void * addr);
 
 static int
 cw_read(attrib * a, storage * store)
@@ -2693,10 +2693,10 @@ cw_read(attrib * a, storage * store)
   br->id = store->r_int(store);
 
   var.i = br->id;
-  ur_add(var, (void**)&wc->wall, resolve_borderid);
+  ur_add(var, &wc->wall, resolve_borderid);
 
   var.v = br;
-  ur_add(var, (void**)&wc->buddy, resolve_buddy);
+  ur_add(var, &wc->buddy, resolve_buddy);
   return AT_READ_OK;
 }
 
@@ -2711,11 +2711,13 @@ attrib_type at_cursewall =
   ATF_CURSE
 };
 
-static void *
-resolve_buddy(variant data)
+static void
+resolve_buddy(variant data, void * addr)
 {
+  curse * result = NULL;
   bresolve * br = (bresolve*)data.v;
   border * b = find_border(br->id);
+
   if (b && b->from && b->to) {
     attrib * a = a_find(b->from->attribs, &at_cursewall);
     while (a && a->data.v!=br->self) {
@@ -2736,10 +2738,10 @@ resolve_buddy(variant data)
     if (a && a->type==&at_cursewall) {
       curse * c = (curse*)a->data.v;
       free(br);
-      return c;
+      result = c;
     }
   }
-  return NULL;
+  *(curse**)addr = result;
 }
 
 
@@ -2779,7 +2781,7 @@ wall_read(border * b, storage * store)
     mno.i = store->r_int(store);
     fd->mage = findunit(mno.i);
     if (!fd->mage) {
-      ur_add(mno, (void**)&fd->mage, resolve_unit);
+      ur_add(mno, &fd->mage, resolve_unit);
     }
   } else {
     read_unit_reference(&fd->mage, store);
@@ -3196,7 +3198,7 @@ dc_read_compat(struct attrib * a, storage * store)
     c = create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration, effect, 0);
     c->data.v = r;
     if (u==NULL) {
-      ur_add(var, (void**)&c->magician, resolve_unit);
+      ur_add(var, &c->magician, resolve_unit);
     }
   }
   return AT_READ_FAIL; /* we don't care for the attribute. */

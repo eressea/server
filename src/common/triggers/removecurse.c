@@ -84,16 +84,18 @@ removecurse_write(const trigger * t, struct storage * store)
 static int
 removecurse_read(trigger * t, struct storage * store)
 {
-	removecurse_data * td = (removecurse_data*)t->data.v;
-    variant var;
+  removecurse_data * td = (removecurse_data*)t->data.v;
+  variant var;
 
-    read_unit_reference(&td->target, store);
+  read_unit_reference(&td->target, store);
 
-	var.i = store->r_int(store);
-	td->curse = cfindhash(var.i);
-	if (td->curse==NULL) ur_add(var, (void**)&td->curse, resolve_curse);
-
-	return AT_READ_OK;
+  var.i = store->r_int(store);
+  td->curse = cfindhash(var.i);
+  if (td->curse==NULL) {
+    ur_add(var, &td->curse, resolve_curse);
+  }
+  
+  return AT_READ_OK;
 }
 
 trigger_type tt_removecurse = {

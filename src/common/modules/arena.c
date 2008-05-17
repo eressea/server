@@ -411,33 +411,35 @@ caldera_handle(trigger * t, void * data)
 static void
 caldera_write(const trigger * t, struct storage * store)
 {
-	building *b = (building *)t->data.v;
-    write_building_reference(b, store);
+  building *b = (building *)t->data.v;
+  write_building_reference(b, store);
 }
 
 static int
 caldera_read(trigger * t, struct storage * store)
 {
-    read_building_reference((building**)&t->data.v, store);
-	return AT_READ_OK;
+  building * b;
+  read_building_reference(&b, store);
+  t->data.v = b;
+  return AT_READ_OK;
 }
 
 struct trigger_type tt_caldera = {
-	"caldera",
-	NULL,
-	NULL,
-	caldera_handle,
-	caldera_write,
-	caldera_read
+  "caldera",
+  NULL,
+  NULL,
+  caldera_handle,
+  caldera_write,
+  caldera_read
 };
 
 #ifdef ARENA_CREATION
 static trigger *
 trigger_caldera(building * b)
 {
-	trigger * t = t_new(&tt_caldera);
-	t->data.v = b;
-	return t;
+  trigger * t = t_new(&tt_caldera);
+  t->data.v = b;
+  return t;
 }
 #endif
 

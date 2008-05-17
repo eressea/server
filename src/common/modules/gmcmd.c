@@ -73,25 +73,9 @@ write_permissions(const attrib * a, struct storage * store)
 static int
 read_permissions(attrib * at, struct storage * store)
 {
-  attrib ** p_a = (attrib**)&at->data.v;
-  a_read(store, p_a);
-  /* eliminate duplicates: */
-  while (*p_a) {
-    attrib * a = (*p_a)->next;
-    while (a) {
-      attrib * nexta = a->next;
-      if (a->type == (*p_a)->type && a->data.v==(*p_a)->data.v) {
-        static int print = 0;
-        a_remove((attrib**)&at->data.v, a);
-        if (!print) {
-          log_error(("duplicated entries in permission structure\n"));
-          print = 1;
-        }
-      }
-      a = nexta;
-    }
-    p_a = &(*p_a)->next;
-  }
+  attrib * attr;
+  a_read(store, &attr);
+  at->data.v = attr;
   return AT_READ_OK;
 }
 
@@ -124,10 +108,9 @@ static int
 read_gmcreate(attrib * a, struct storage * store)
 {
   char zText[32];
-  const item_type ** p_itype = (const item_type **)&a->data.v;
   store->r_tok_buf(store, zText, sizeof(zText));
-  *p_itype = it_find(zText);
-  if (a->data.v==NULL) {
+  a->data.v = it_find(zText);
+  if (a->data.v == NULL) {
     log_error(("unknown itemtype %s in gmcreate attribute\n", zText));
     return AT_READ_FAIL;
   }
@@ -718,21 +701,22 @@ gm_addfaction(const char * email, plane * p, region * r)
 
   /* generic permissions */
   a = a_add(&f->attribs, a_new(&at_permissions));
+  if (a) {
+    attrib * ap = (attrib*)a->data.v;
+    const char* keys[] = { "gmterf", "gmtele", "gmgive", "gmskil", "gmtake", "gmmsgr", "gmmsgu", "gmgate", 0 };
+    const char ** key_p = keys;
+    while (*key_p) {
+      add_key(&ap, atoi36(*key_p));
+      ++key_p;
+    }
+    a_add(&ap, make_atgmcreate(resource2item(r_silver)));
 
-  add_key((attrib**)&a->data.v, atoi36("gmterf"));
-  add_key((attrib**)&a->data.v, atoi36("gmtele"));
-  add_key((attrib**)&a->data.v, atoi36("gmgive"));
-  add_key((attrib**)&a->data.v, atoi36("gmskil"));
-  add_key((attrib**)&a->data.v, atoi36("gmtake"));
-  add_key((attrib**)&a->data.v, atoi36("gmmsgr"));
-  add_key((attrib**)&a->data.v, atoi36("gmmsgu"));
-  add_key((attrib**)&a->data.v, atoi36("gmgate"));
-
-  a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
-
-  for (i=0;i<=I_HORSE;++i) {
-    a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
+    for (i=0;i<=I_HORSE;++i) {
+      a_add(&ap, make_atgmcreate(olditemtype[i]));
+    }
+    a->data.v = ap;
   }
+  
   /* one initial unit */
   u = create_unit(r, f, 1, new_race[RC_TEMPLATE], 1, "quest master", NULL);
   u->irace = new_race[RC_GNOME];

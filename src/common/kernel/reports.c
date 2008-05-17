@@ -1430,12 +1430,13 @@ var_copy_items(variant x)
 static void
 var_free_resources(variant x)
 {
-  resource ** rsrc = (resource**)&x.v;
-  while (*rsrc) {
-    resource * res = *rsrc;
-    *rsrc = res->next;
-    free(res);
+  resource * rsrc = (resource*)x.v;
+  while (rsrc) {
+    resource * res = rsrc->next;
+    free(rsrc);
+    rsrc = res;
   }
+  x.v = 0;
 }
 
 static variant

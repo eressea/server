@@ -502,7 +502,10 @@ a_writesiege(const attrib * a, struct storage * store)
 int
 a_readsiege(attrib * a, struct storage * store)
 {
-  return read_building_reference((struct building**)&a->data.v, store);
+  struct building * b;
+  int result = read_building_reference(&b, store);
+  a->data.v = b;
+  return result;
 }
 
 attrib_type at_siege = {
@@ -600,10 +603,11 @@ write_unit_reference(const unit * u, struct storage * store)
   store->w_id(store, u?u->no:0);
 }
 
-void *
-resolve_unit(variant id)
+void
+resolve_unit(variant id, void * address)
 {
-  return ufindhash(id.i);
+  unit * u = ufindhash(id.i);
+  *(unit**)address = u;
 }
 
 int

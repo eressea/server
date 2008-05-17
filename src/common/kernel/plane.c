@@ -232,10 +232,10 @@ rel_to_abs(const struct plane *pl, const struct faction * f, short rel, unsigned
 }
 
 
-void *
-resolve_plane(variant id)
+void
+resolve_plane(variant id, void * addr)
 {
-   return getplanebyid(id.i);
+  *(plane**)addr = getplanebyid(id.i);
 }
 
 void
@@ -247,15 +247,15 @@ write_plane_reference(const plane * u, struct storage * store)
 int
 read_plane_reference(plane ** pp, struct storage * store)
 {
-	variant id;
-	id.i = store->r_int(store);
-	if (id.i==0) {
-		*pp = NULL;
-		return AT_READ_FAIL;
-	}
-	*pp = getplanebyid(id.i);
-	if (*pp==NULL) ur_add(id, (void**)pp, resolve_plane);
-	return AT_READ_OK;
+  variant id;
+  id.i = store->r_int(store);
+  if (id.i==0) {
+    *pp = NULL;
+    return AT_READ_FAIL;
+  }
+  *pp = getplanebyid(id.i);
+  if (*pp==NULL) ur_add(id, pp, resolve_plane);
+  return AT_READ_OK;
 }
 
 boolean

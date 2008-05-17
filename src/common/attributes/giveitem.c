@@ -61,7 +61,9 @@ a_readgive(attrib * a, struct storage * store)
   var.i = store->r_id(store);
   if (var.i>0) {
     gdata->building = findbuilding(var.i);
-    if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
+    if (gdata->building==NULL) {
+      ur_add(var, &gdata->building, resolve_building);
+    }
   } else {
     gdata->building=NULL;
   }

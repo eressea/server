@@ -26,13 +26,16 @@
 static void
 write_gm(const attrib * a, struct storage * store)
 {
-	write_plane_reference((plane*)a->data.v, store);
+  write_plane_reference((plane*)a->data.v, store);
 }
 
 static int
 read_gm(attrib * a, struct storage * store)
 {
-	return read_plane_reference((plane**)&a->data.v, store);
+  plane * pl;
+  int result = read_plane_reference(&pl, store);
+  a->data.v = pl;
+  return result;
 }
 
 

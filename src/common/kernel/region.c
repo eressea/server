@@ -386,7 +386,8 @@ attrib_type at_moveblock = {
 #define coor_hashkey(x, y) (unsigned int)((x<<16) + y)
 #define RMAXHASH MAXREGIONS
 static region * regionhash[RMAXHASH];
-static region * delmarker = (region*)regionhash; /* a funny hack */
+static int dummy_data;
+static region * delmarker = (region*)&dummy_data; /* a funny hack */
 static unsigned int uidhash[MAXREGIONS];
 
 unsigned int 
@@ -1190,9 +1191,10 @@ write_region_reference(const region * r, struct storage * store)
   }
 }
 
-void *
-resolve_region(variant id) {
-  return findregion(id.sa[0], id.sa[1]);
+void
+resolve_region(variant id, void * address) {
+  region * r = findregion(id.sa[0], id.sa[1]);
+  *(region**)address = r;
 }
 
 

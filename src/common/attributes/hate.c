@@ -35,13 +35,16 @@ verify_hate(attrib * a)
 static void
 write_hate(const attrib * a, struct storage * store)
 {
-	write_unit_reference((unit*)a->data.v, store);
+  write_unit_reference((unit*)a->data.v, store);
 }
 
 static int
 read_hate(attrib * a, struct storage * store)
 {
-	return read_unit_reference((unit**)&a->data.v, store);
+  unit * u;
+  int result = read_unit_reference(&u, store);
+  a->data.v = u;
+  return result;
 }
 
 attrib_type at_hate = {

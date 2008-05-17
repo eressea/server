@@ -101,26 +101,29 @@ shock_handle(trigger * t, void * data)
 static void
 shock_write(const trigger * t, struct storage * store)
 {
-	unit * u = (unit*)t->data.v;
-	trigger * next = t->next;
-	while (next) {
-		/* make sure it is unique! */
-		if (next->type==t->type && next->data.v==t->data.v) break;
-		next=next->next;
-	}
-	if (next && u) {
-		log_error(("more than one shock-attribut for %s on a unit. FIXED.\n",
-			unitid(u)));
-		write_unit_reference(NULL, store);
-	} else {
-		write_unit_reference(u, store);
-	}
+  unit * u = (unit*)t->data.v;
+  trigger * next = t->next;
+  while (next) {
+    /* make sure it is unique! */
+    if (next->type==t->type && next->data.v==t->data.v) break;
+    next=next->next;
+  }
+  if (next && u) {
+    log_error(("more than one shock-attribut for %s on a unit. FIXED.\n",
+               unitid(u)));
+    write_unit_reference(NULL, store);
+  } else {
+    write_unit_reference(u, store);
+  }
 }
 
 static int
 shock_read(trigger * t, struct storage * store)
 {
-	return read_unit_reference((unit**)&t->data.v, store);
+  unit * u;
+  int result = read_unit_reference(&u, store);
+  t->data.v = u;
+  return result;
 }
 
 trigger_type tt_shock = {

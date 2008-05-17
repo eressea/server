@@ -89,7 +89,7 @@ extern "C" {
 
 
   extern border * find_border(unsigned int id);
-  void * resolve_borderid(variant data);
+  void resolve_borderid(variant data, void * addr);
 
   extern border * get_borders(const struct region * r1, const struct region * r2);
   /* returns the list of borders between r1 and r2 or r2 and r1 */

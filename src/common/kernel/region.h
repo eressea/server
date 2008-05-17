@@ -219,7 +219,7 @@ extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 extern const char * regionname(const struct region * r, const struct faction * f);
 extern const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
-extern void * resolve_region(variant data);
+extern void resolve_region(variant data, void * address);
 extern struct region * new_region(short x, short y, unsigned int uid);
 extern void terraform(struct region * r, terrain_t terrain);
 extern void terraform_region(struct region * r, const struct terrain_type * terrain);

@@ -21,8 +21,8 @@
 extern "C" {
 #endif
 
-  typedef void * (*resolve_fun)(variant data);
-  extern void ur_add(variant data, void ** ptrptr, resolve_fun fun);
+  typedef void (*resolve_fun)(variant data, void * address);
+  extern void ur_add(variant data, void * ptrptr, resolve_fun fun);
   extern void resolve(void);
 
 #ifdef __cplusplus

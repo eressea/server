@@ -126,7 +126,7 @@ a_readicastle(attrib * a, struct storage * store)
   data->building = findbuilding(bno.i);
   if (!data->building) {
     /* this shouldn't happen, but just in case it does: */
-    ur_add(bno, (void**)&data->building, resolve_building);
+    ur_add(bno, &data->building, resolve_building);
   }
   data->type = bt_find(token);
   return AT_READ_OK;
@@ -2207,10 +2207,11 @@ create_newfamiliar(unit * mage, unit * familiar)
   return true;
 }
 
-static void *
-resolve_familiar(variant data)
+static void
+resolve_familiar(variant data, void * addr)
 {
-  unit * familiar = resolve_unit(data);
+  unit * familiar;
+  resolve_unit(data, &familiar);
   if (familiar) {
     attrib * a = a_find(familiar->attribs, &at_familiarmage);
     if (a!=NULL && a->data.v) {
@@ -2218,7 +2219,7 @@ resolve_familiar(variant data)
       set_familiar(mage, familiar);
     }
   }
-  return familiar;
+  *(unit**)addr = familiar;
 }
 
 static int
@@ -2283,10 +2284,11 @@ has_clone(unit *mage)
 	return NULL;
 }
 
-static void *
-resolve_clone(variant data)
+static void
+resolve_clone(variant data, void * addr)
 {
-  unit * clone = resolve_unit(data);
+  unit * clone;
+  resolve_unit(data, &clone);
   if (clone) {
     attrib * a = a_find(clone->attribs, &at_clonemage);
     if (a!=NULL && a->data.v) {
@@ -2294,7 +2296,7 @@ resolve_clone(variant data)
       set_clone(mage, clone);
     }
   }
-  return clone;
+  *(unit**)addr = clone;
 }
 
 static int
@@ -2308,10 +2310,11 @@ read_clone(attrib * a, struct storage * store)
 
 /* mages */
 
-static void *
-resolve_mage(variant data)
+static void
+resolve_mage(variant data, void * addr)
 {
-  unit * mage = resolve_unit(data);
+  unit * mage;
+  resolve_unit(data, &mage);
   if (mage) {
     attrib * a = a_find(mage->attribs, &at_familiar);
     if (a!=NULL && a->data.v) {
@@ -2319,7 +2322,7 @@ resolve_mage(variant data)
       set_familiar(mage, familiar);
     }
   }
-  return mage;
+  *(unit **)addr = mage;
 }
 
 static int

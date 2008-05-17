@@ -26,9 +26,8 @@
 #include "variant.h"
 
 typedef struct unresolved {
-	void ** ptrptr;
-		/* pointer to the location where the unresolved object
-		 * should be, or NULL if special handling is required */
+	void * ptrptr;
+		/* address to pass to the resolve-function */
 	variant data;
 		/* information on how to resolve the missing object */
 	resolve_fun resolve;
@@ -41,7 +40,7 @@ static unresolved * ur_begin;
 static unresolved * ur_current;
 
 void
-ur_add(variant data, void ** ptrptr, resolve_fun fun)
+ur_add(variant data, void * ptrptr, resolve_fun fun)
 {
   if (ur_list==NULL) {
     ur_list = malloc(BLOCKSIZE*sizeof(unresolved));
@@ -72,8 +71,7 @@ resolve(void)
       ur_list = ur;
       continue;
     }
-    if (ur->ptrptr) *ur->ptrptr = ur->resolve(ur->data);
-    else ur->resolve(ur->data);
+    ur->resolve(ur->data, ur->ptrptr);
     ++ur;
   }
   ur_list = ur_begin = ur_current;

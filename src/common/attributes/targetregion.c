@@ -27,13 +27,16 @@
 static void
 write_targetregion(const attrib * a, struct storage * store)
 {
-	write_region_reference((region*)a->data.v, store);
+  write_region_reference((region*)a->data.v, store);
 }
 
 static int
 read_targetregion(attrib * a, struct storage * store)
 {
-	return read_region_reference((region**)&a->data.v, store);
+  region * r;
+  int result = read_region_reference(&r, store);
+  a->data.v = r;
+  return result;
 }
 
 attrib_type at_targetregion = {

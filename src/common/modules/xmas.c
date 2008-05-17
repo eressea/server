@@ -41,14 +41,17 @@ xmasgate_handle(trigger * t, void * data)
 static void
 xmasgate_write(const trigger * t, struct storage * store)
 {
-	building *b = (building *)t->data.v;
-	store->w_tok(store, itoa36(b->no));
+  building *b = (building *)t->data.v;
+  store->w_tok(store, itoa36(b->no));
 }
 
 static int
 xmasgate_read(trigger * t, struct storage * store)
 {
-	return read_building_reference((building**)&t->data.v, store);
+  building * b;
+  int result =read_building_reference(&b, store);
+  t->data.v = b;
+  return result;
 }
 
 struct trigger_type tt_xmasgate = {

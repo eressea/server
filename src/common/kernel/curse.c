@@ -184,7 +184,7 @@ curse_read(attrib * a, struct storage * store)
     } else {
       c->magician = findunit(mageid.i);
       if (!c->magician) {
-        ur_add(mageid, (void**)&c->magician, resolve_unit);
+        ur_add(mageid, (void*)&c->magician, resolve_unit);
       }
     }
   } else {
@@ -210,7 +210,9 @@ curse_read(attrib * a, struct storage * store)
     cc->cursedmen = store->r_int(store);
   }
   if (c->type->typ == CURSETYP_REGION) {
-    read_region_reference((region**)&c->data.v, store);
+    region * r;
+    read_region_reference(&r, store);
+    c->data.v = r;
   }
   chash(c);
 
@@ -687,10 +689,11 @@ is_cursed_with(const attrib *ap, const curse *c)
  * } curse_type;
  */
 
-void *
-resolve_curse(variant id)
+void
+resolve_curse(variant id, void * address)
 {
-   return cfindhash(id.i);
+  curse * c = cfindhash(id.i);
+  *(curse**)address = c;
 }
 
 static const char * oldnames[MAXCURSE] = {

@@ -58,14 +58,17 @@ clonedied_handle(trigger * t, void * data)
 static void
 clonedied_write(const trigger * t, struct storage * store)
 {
-	unit * u = (unit*)t->data.v;
-	write_unit_reference(u, store);
+  unit * u = (unit*)t->data.v;
+  write_unit_reference(u, store);
 }
 
 static int
 clonedied_read(trigger * t, struct storage * store)
 {
-	return read_unit_reference((unit**)&t->data.v, store);
+  unit * u;
+  int result = read_unit_reference(&u, store);
+  t->data.v = u;
+  return result;
 }
 
 trigger_type tt_clonedied = {

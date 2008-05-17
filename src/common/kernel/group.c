@@ -224,7 +224,7 @@ read_groups(struct storage * store, faction * f)
       pa = &a->next;
       a->status = store->r_int(store);
       a->faction = findfaction(fid.i);
-      if (!a->faction) ur_add(fid, (void**)&a->faction, resolve_faction);
+      if (!a->faction) ur_add(fid, &a->faction, resolve_faction);
     }
     *pa = 0;
     a_read(store, &g->attribs);

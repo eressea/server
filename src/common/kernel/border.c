@@ -62,9 +62,9 @@ find_border(unsigned int id)
   return NULL;
 }
 
-void *
-resolve_borderid(variant id) {
-   return (void*)find_border(id.i);
+void
+resolve_borderid(variant id, void * addr) {
+  *(border**)addr = find_border(id.i);
 }
 
 static border **

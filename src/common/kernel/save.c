@@ -251,10 +251,12 @@ read_enemies(struct storage * store, faction * f)
     int fno = store->r_id(store);
     if (fno<=0) break;
     else {
+      variant id;
       faction_list * flist = malloc(sizeof(faction_list));
       flist->next = f->enemies;
       f->enemies = flist;
-      ur_add((void*)fno, (void**)&flist->data, resolve_faction);
+      id.i = fno;
+      ur_add(id, &flist->data, resolve_faction);
     }
   }
 }
@@ -1147,7 +1149,7 @@ addally(const faction * f, ally ** sfp, int aid, int state)
   if (!sf->faction) {
     variant id;
     id.i = aid;
-    ur_add(id, (void**)&sf->faction, resolve_faction);
+    ur_add(id, &sf->faction, resolve_faction);
   }
   sf->status = state & HELP_ALL;
 
@@ -1438,7 +1440,7 @@ readgame(const char * filename, int mode, int backup)
         w->mode = (unsigned char)store->r_int(store);
         w->next = pl->watchers;
         pl->watchers = w;
-        ur_add(fno, (void**)&w->faction, resolve_faction);
+        ur_add(fno, &w->faction, resolve_faction);
         store->r_str_buf(store, token, sizeof(token));
       }
     }

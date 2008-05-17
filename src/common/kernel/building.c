@@ -369,9 +369,10 @@ register_buildings(void)
 #endif
 }
 
-void *
-resolve_building(variant id) {
-   return findbuilding(id.i);
+void
+resolve_building(variant id, void * address) {
+  building ** b = (building **)address;
+  *b = findbuilding(id.i);
 }
 
 void

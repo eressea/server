@@ -99,9 +99,9 @@ factionname(const faction * f)
   return ibuf;
 }
 
-void *
-resolve_faction(variant id) {
-   return findfaction(id.i);
+void
+resolve_faction(variant id, void * addr) {
+  *(faction**)addr = findfaction(id.i);
 }
 
 #define MAX_FACTION_ID (36*36*36*36)
@@ -213,7 +213,7 @@ read_faction_reference(faction ** f, struct storage * store)
     return AT_READ_FAIL;
   }
   *f = findfaction(id.i);
-  if (*f==NULL) ur_add(id, (void**)f, resolve_faction);
+  if (*f==NULL) ur_add(id, f, resolve_faction);
   return AT_READ_OK;
 }
 

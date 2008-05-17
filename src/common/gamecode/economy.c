@@ -1835,49 +1835,51 @@ make_cmd(unit * u, struct order * ord)
 static void 
 free_luxuries(struct attrib * a)
 {
-  i_freeall((item**)&a->data.v);
+  item * itm = (item*)a->data.v;
+  a->data.v = NULL;
+  i_freeall(&itm);
 }
 
 const attrib_type at_luxuries = {
-	"luxuries", NULL, free_luxuries, NULL, NULL, NULL
+  "luxuries", NULL, free_luxuries, NULL, NULL, NULL
 };
 
 static void
 expandbuying(region * r, request * buyorders)
 {
-	int max_products;
-	unit *u;
-	static struct trade {
-		const luxury_type * type;
-		int number;
-		int multi;
-	} *trades, *trade;
-	static int ntrades=0;
-	int i, j;
-	const luxury_type * ltype;
+  int max_products;
+  unit *u;
+  static struct trade {
+    const luxury_type * type;
+    int number;
+    int multi;
+  } *trades, *trade;
+  static int ntrades=0;
+  int i, j;
+  const luxury_type * ltype;
+  
+  if (ntrades==0) {
+    for (ltype=luxurytypes;ltype;ltype=ltype->next)
+        ++ntrades;
+    trades = gc_add(calloc(sizeof(struct trade), ntrades));
+    for (i=0, ltype=luxurytypes;i!=ntrades;++i, ltype=ltype->next)
+        trades[i].type = ltype;
+  }
+  for (i=0;i!=ntrades;++i) {
+    trades[i].number = 0;
+    trades[i].multi = 1;
+  }
 
-	if (ntrades==0) {
-		for (ltype=luxurytypes;ltype;ltype=ltype->next)
-			++ntrades;
-		trades = gc_add(calloc(sizeof(struct trade), ntrades));
-		for (i=0, ltype=luxurytypes;i!=ntrades;++i, ltype=ltype->next)
-			trades[i].type = ltype;
-	}
-	for (i=0;i!=ntrades;++i) {
-		trades[i].number = 0;
-		trades[i].multi = 1;
-	}
-
-	if (!buyorders) return;
-
-	/* Initialisation. multiplier ist der Multiplikator auf den
-	* Verkaufspreis. Für max_products Produkte kauft man das Produkt zum
-	* einfachen Verkaufspreis, danach erhöht sich der Multiplikator um 1.
-	* counter ist ein Zähler, der die gekauften Produkte zählt. money
-	* wird für die debug message gebraucht. */
-
-	max_products = rpeasants(r) / TRADE_FRACTION;
-
+  if (!buyorders) return;
+  
+  /* Initialisation. multiplier ist der Multiplikator auf den
+   * Verkaufspreis. Für max_products Produkte kauft man das Produkt zum
+   * einfachen Verkaufspreis, danach erhöht sich der Multiplikator um 1.
+   * counter ist ein Zähler, der die gekauften Produkte zählt. money
+   * wird für die debug message gebraucht. */
+  
+  max_products = rpeasants(r) / TRADE_FRACTION;
+  
   /* Kauf - auch so programmiert, daß er leicht erweiterbar auf mehrere
    * Güter pro Monat ist. j sind die Befehle, i der Index des
    * gehandelten Produktes. */
@@ -1895,6 +1897,7 @@ expandbuying(region * r, request * buyorders)
       
       if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT, price) >= price) {
         unit * u = oa[j].unit;
+        item * items;
         
         /* litems zählt die Güter, die verkauft wurden, u->n das Geld, das
          * verdient wurde. Dies muß gemacht werden, weil der Preis ständig sinkt,
@@ -1903,42 +1906,44 @@ expandbuying(region * r, request * buyorders)
         attrib * a = a_find(u->attribs, &at_luxuries);
         if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
 
-        i_change((item**)&a->data.v, ltype->itype, 1);
-			  i_change(&oa[j].unit->items, ltype->itype, 1);
-			  use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
-			  if (u->n < 0)
-				  u->n = 0;
-			  u->n += price;
-
-			  rsetmoney(r, rmoney(r) + price);
-
-			  /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
-			   * der Preis Multiplikator für das Produkt um den Faktor 1. Der Zähler
-			   * wird wieder auf 0 gesetzt. */
-			  if (++trade->number == max_products) {
-				  trade->number = 0;
-				  ++trade->multi;
+        items = a->data.v;
+        i_change(&items, ltype->itype, 1);
+        a->data.v = items;
+        i_change(&oa[j].unit->items, ltype->itype, 1);
+        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
+        if (u->n < 0)
+            u->n = 0;
+        u->n += price;
+        
+        rsetmoney(r, rmoney(r) + price);
+        
+        /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
+         * der Preis Multiplikator für das Produkt um den Faktor 1. Der Zähler
+         * wird wieder auf 0 gesetzt. */
+        if (++trade->number == max_products) {
+          trade->number = 0;
+          ++trade->multi;
 			  }
         fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-		  }
-	  }
-	  free(oa);
-
-	  /* Ausgabe an Einheiten */
-
-	  for (u = r->units; u; u = u->next) {
-		  attrib * a = a_find(u->attribs, &at_luxuries);
-		  item * itm;
-		  if (a==NULL) continue;
-		  ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
-		  for (itm=(item*)a->data.v; itm; itm=itm->next) {
-			  if (itm->number) {
-				  ADDMSG(&u->faction->msgs, msg_message("buyamount",
-            "unit amount resource", u, itm->number, itm->type->rtype));
-			  }
-		  }
-		  a_remove(&u->attribs, a);
-	  }
+      }
+    }
+    free(oa);
+    
+    /* Ausgabe an Einheiten */
+    
+    for (u = r->units; u; u = u->next) {
+      attrib * a = a_find(u->attribs, &at_luxuries);
+      item * itm;
+      if (a==NULL) continue;
+      ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
+      for (itm=(item*)a->data.v; itm; itm=itm->next) {
+        if (itm->number) {
+          ADDMSG(&u->faction->msgs, msg_message("buyamount",
+                                                "unit amount resource", u, itm->number, itm->type->rtype));
+        }
+      }
+      a_remove(&u->attribs, a);
+    }
   }
 }
 
@@ -2056,182 +2061,185 @@ static int tax_per_size[7] =
 static void
 expandselling(region * r, request * sellorders, int limit)
 {
-	int money, price, j, max_products;
-	/* int m, n = 0; */
-	int maxsize = 0, maxeffsize = 0;
-	int taxcollected = 0;
-	int hafencollected = 0;
-	unit *maxowner = (unit *) NULL;
-	building *maxb = (building *) NULL;
-	building *b;
-	unit *u;
-	unit *hafenowner;
-	static int *counter;
-	static int ncounter = 0;
+  int money, price, j, max_products;
+  /* int m, n = 0; */
+  int maxsize = 0, maxeffsize = 0;
+  int taxcollected = 0;
+  int hafencollected = 0;
+  unit *maxowner = (unit *) NULL;
+  building *maxb = (building *) NULL;
+  building *b;
+  unit *u;
+  unit *hafenowner;
+  static int *counter;
+  static int ncounter = 0;
 
-	if (ncounter==0) {
-		const luxury_type * ltype;
-		for (ltype=luxurytypes;ltype;ltype=ltype->next) ++ncounter;
-		counter=(int*)gc_add(calloc(sizeof(int), ncounter));
-	} else {
-		memset(counter, 0, sizeof(int)*ncounter);
-	}
-
-	if (!sellorders)	/* NEIN, denn Insekten können in	|| !r->buildings) */
-		return;					/* Sümpfen und Wüsten auch so handeln */
-
-	/* Stelle Eigentümer der größten Burg fest. Bekommt Steuern aus jedem
-	* Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
-
-	for (b = rbuildings(r); b; b = b->next) {
-		if (b->size > maxsize && buildingowner(r, b) != NULL
-			&& b->type == bt_find("castle")) {
-				maxb = b;
-				maxsize = b->size;
-				maxowner = buildingowner(r, b);
-			} else if (b->size == maxsize && b->type == bt_find("castle")) {
-				maxb = (building *) NULL;
-				maxowner = (unit *) NULL;
-			}
-	}
-
-	hafenowner = owner_buildingtyp(r, bt_find("harbour"));
-
-	if (maxb != (building *) NULL && maxowner != (unit *) NULL) {
-		maxeffsize = buildingeffsize(maxb, false);
-		if (maxeffsize == 0) {
-			maxb = (building *) NULL;
-			maxowner = (unit *) NULL;
-		}
-	}
-	/* Die Region muss genug Geld haben, um die Produkte kaufen zu können. */
-
-	money = rmoney(r);
-
-	/* max_products sind 1/100 der Bevölkerung, falls soviele Produkte
-	* verkauft werden - counter[] - sinkt die Nachfrage um 1 Punkt.
-	* multiplier speichert r->demand für die debug message ab. */
-
-	max_products = rpeasants(r) / TRADE_FRACTION;
-	if (max_products <= 0) return;
-
-	if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan"))) {
-		max_products = rpeasants(r) * 2 / TRADE_FRACTION;
-	}
-	/* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
-	* Runde erweitert werden kann. */
-
-	expandorders(r, sellorders);
-	if (!norders) return;
-
-	for (j = 0; j != norders; j++) {
-		static const luxury_type * search=NULL;
-		const luxury_type * ltype = oa[j].type.ltype;
-		int multi = r_demand(r, ltype);
-		static int i=-1;
-		int use = 0;
-		if (search!=ltype) {
-			i=0;
-			for (search=luxurytypes;search!=ltype;search=search->next) ++i;
-		}
+  if (ncounter==0) {
+    const luxury_type * ltype;
+    for (ltype=luxurytypes;ltype;ltype=ltype->next) ++ncounter;
+    counter=(int*)gc_add(calloc(sizeof(int), ncounter));
+  } else {
+    memset(counter, 0, sizeof(int)*ncounter);
+  }
+  
+  if (!sellorders) { /* NEIN, denn Insekten können in	|| !r->buildings) */
+    return;        /* Sümpfen und Wüsten auch so handeln */
+  }
+  /* Stelle Eigentümer der größten Burg fest. Bekommt Steuern aus jedem
+   * Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
+  
+  for (b = rbuildings(r); b; b = b->next) {
+    if (b->size > maxsize && buildingowner(r, b) != NULL
+        && b->type == bt_find("castle")) {
+      maxb = b;
+      maxsize = b->size;
+      maxowner = buildingowner(r, b);
+    } else if (b->size == maxsize && b->type == bt_find("castle")) {
+      maxb = (building *) NULL;
+      maxowner = (unit *) NULL;
+    }
+  }
+  
+  hafenowner = owner_buildingtyp(r, bt_find("harbour"));
+  
+  if (maxb != (building *) NULL && maxowner != (unit *) NULL) {
+    maxeffsize = buildingeffsize(maxb, false);
+    if (maxeffsize == 0) {
+      maxb = (building *) NULL;
+      maxowner = (unit *) NULL;
+    }
+  }
+  /* Die Region muss genug Geld haben, um die Produkte kaufen zu können. */
+  
+  money = rmoney(r);
+  
+  /* max_products sind 1/100 der Bevölkerung, falls soviele Produkte
+   * verkauft werden - counter[] - sinkt die Nachfrage um 1 Punkt.
+   * multiplier speichert r->demand für die debug message ab. */
+  
+  max_products = rpeasants(r) / TRADE_FRACTION;
+  if (max_products <= 0) return;
+  
+  if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan"))) {
+    max_products = rpeasants(r) * 2 / TRADE_FRACTION;
+  }
+  /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
+   * Runde erweitert werden kann. */
+  
+  expandorders(r, sellorders);
+  if (!norders) return;
+  
+  for (j = 0; j != norders; j++) {
+    static const luxury_type * search=NULL;
+    const luxury_type * ltype = oa[j].type.ltype;
+    int multi = r_demand(r, ltype);
+    static int i=-1;
+    int use = 0;
+    if (search!=ltype) {
+      i=0;
+      for (search=luxurytypes;search!=ltype;search=search->next) ++i;
+    }
     if (counter[i]>=limit) continue;
-		if (counter[i]+1 > max_products && multi > 1) --multi;
-		price = ltype->price * multi;
-
-		if (money >= price) {
-			int abgezogenhafen = 0;
-			int abgezogensteuer = 0;
-			unit * u = oa[j].unit;
-			attrib * a = a_find(u->attribs, &at_luxuries);
-			if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
-			i_change((item**)&a->data.v, ltype->itype, 1);
-			++use;
-			if (u->n < 0)
-				u->n = 0;
-
-			if (hafenowner != NULL) {
-				if (hafenowner->faction != u->faction) {
-					abgezogenhafen = price / 10;
-					hafencollected += abgezogenhafen;
-					price -= abgezogenhafen;
-					money -= abgezogenhafen;
-				}
-			}
-			if (maxb != NULL) {
-				if (maxowner->faction != u->faction) {
-					abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
-					taxcollected += abgezogensteuer;
-					price -= abgezogensteuer;
-					money -= abgezogensteuer;
-				}
-			}
-			u->n += price;
-			change_money(u, price);
+    if (counter[i]+1 > max_products && multi > 1) --multi;
+    price = ltype->price * multi;
+    
+    if (money >= price) {
+      int abgezogenhafen = 0;
+      int abgezogensteuer = 0;
+      unit * u = oa[j].unit;
+      item * itm;
+      attrib * a = a_find(u->attribs, &at_luxuries);
+      if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
+      itm = (item *)a->data.v;
+      i_change(&itm, ltype->itype, 1);
+      a->data.v = itm;
+      ++use;
+      if (u->n < 0)
+          u->n = 0;
+      
+      if (hafenowner != NULL) {
+        if (hafenowner->faction != u->faction) {
+          abgezogenhafen = price / 10;
+          hafencollected += abgezogenhafen;
+          price -= abgezogenhafen;
+          money -= abgezogenhafen;
+        }
+      }
+      if (maxb != NULL) {
+        if (maxowner->faction != u->faction) {
+          abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
+          taxcollected += abgezogensteuer;
+          price -= abgezogensteuer;
+          money -= abgezogensteuer;
+        }
+      }
+      u->n += price;
+      change_money(u, price);
       fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-
-			/* r->money -= price; --- dies wird eben nicht ausgeführt, denn die
-			* Produkte können auch als Steuern eingetrieben werden. In der Region
-			* wurden Silberstücke gegen Luxusgüter des selben Wertes eingetauscht!
-			* Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
-			* die Nachfrage für das Produkt um 1. Der Zähler wird wieder auf 0
-			* gesetzt. */
-
-			if (++counter[i] > max_products) {
-				int d = r_demand(r, ltype);
+      
+      /* r->money -= price; --- dies wird eben nicht ausgeführt, denn die
+       * Produkte können auch als Steuern eingetrieben werden. In der Region
+       * wurden Silberstücke gegen Luxusgüter des selben Wertes eingetauscht!
+       * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
+       * die Nachfrage für das Produkt um 1. Der Zähler wird wieder auf 0
+       * gesetzt. */
+      
+      if (++counter[i] > max_products) {
+        int d = r_demand(r, ltype);
         if (d > 1) {
           r_setdemand(r, ltype, d-1);
         }
-				counter[i] = 0;
-			}
-		}
-		if (use>0) {
+        counter[i] = 0;
+      }
+    }
+    if (use>0) {
 #ifdef NDEBUG
-			use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
+      use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
 #else
-			/* int i = */ use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
-			/* assert(i==use); */
+      /* int i = */ use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
+      /* assert(i==use); */
 #endif
-		}
-	}
-	free(oa);
-
-	/* Steuern. Hier werden die Steuern dem Besitzer der größten Burg gegeben. */
-
-	if (maxowner) {
-		if (taxcollected > 0) {
-			change_money(maxowner, (int) taxcollected);
-			add_income(maxowner, IC_TRADETAX, taxcollected, taxcollected);
-			/* TODO: Meldung
+    }
+  }
+  free(oa);
+  
+  /* Steuern. Hier werden die Steuern dem Besitzer der größten Burg gegeben. */
+  
+  if (maxowner) {
+    if (taxcollected > 0) {
+      change_money(maxowner, (int) taxcollected);
+      add_income(maxowner, IC_TRADETAX, taxcollected, taxcollected);
+      /* TODO: Meldung
        * "%s verdient %d Silber durch den Handel in %s.",
        * unitname(maxowner), (int) taxcollected, regionname(r)); */
-		}
-	}
-	if (hafenowner) {
-		if (hafencollected > 0) {
-			change_money(hafenowner, (int) hafencollected);
-			add_income(hafenowner, IC_TRADETAX, hafencollected, hafencollected);
-		}
-	}
-	/* Berichte an die Einheiten */
-
-	for (u = r->units; u; u = u->next) {
-
-		attrib * a = a_find(u->attribs, &at_luxuries);
-		item * itm;
-		if (a==NULL) continue;
-		for (itm=(item*)a->data.v; itm; itm=itm->next) {
-			if (itm->number) {
-				ADDMSG(&u->faction->msgs, msg_message("sellamount", 
-          "unit amount resource", u, itm->number, itm->type->rtype));
-			}
-		}
-		a_remove(&u->attribs, a);
-		add_income(u, IC_TRADE, u->n, u->n);
-	}
+    }
+  }
+  if (hafenowner) {
+    if (hafencollected > 0) {
+      change_money(hafenowner, (int) hafencollected);
+      add_income(hafenowner, IC_TRADETAX, hafencollected, hafencollected);
+    }
+  }
+  /* Berichte an die Einheiten */
+  
+  for (u = r->units; u; u = u->next) {
+    
+    attrib * a = a_find(u->attribs, &at_luxuries);
+    item * itm;
+    if (a==NULL) continue;
+    for (itm=(item*)a->data.v; itm; itm=itm->next) {
+      if (itm->number) {
+        ADDMSG(&u->faction->msgs, msg_message("sellamount", 
+                                              "unit amount resource", u, itm->number, itm->type->rtype));
+      }
+    }
+    a_remove(&u->attribs, a);
+    add_income(u, IC_TRADE, u->n, u->n);
+  }
 }
 
 static boolean
-sell(unit * u, request ** sellorders, struct order * ord)
+    sell(unit * u, request ** sellorders, struct order * ord)
 {
   boolean unlimited = true;
   const item_type * itype;
