@@ -309,7 +309,7 @@ fix_firewalls(void)
     }
     r = r->next;
   }
-  log_printf("fixed %u firewalls.\n", fixes);
+  log_printf("fixed %d firewalls.\n", fixes);
 }
 
 static void
@@ -470,58 +470,6 @@ fix_undead(void)
     }
   }
   return 0;
-}
-
-static void
-fix_gates(void)
-{
-  region * r;
-  int fixes = 0;
-  for (r=regions;r;r=r->next) {
-    unit * u;
-    building * b;
-    for (u=r->units;u;u=u->next) {
-      trigger ** triggers = get_triggers(u->attribs, "timer");
-      if (triggers) {
-        trigger * t = *triggers;
-        while (t && t->type!= &tt_gate) t=t->next;
-        if (t!=NULL) {
-          gate_data * gd = (gate_data*)t->data.v;
-          struct building * bgate = gd->gate;
-          struct region * rtarget = gd->target;
-          if (r!=bgate->region) {
-            add_trigger(&bgate->attribs, "timer", trigger_gate(bgate, rtarget));
-            add_trigger(&bgate->attribs, "create", trigger_unguard(bgate));
-            fset(bgate, BLD_UNGUARDED);
-          }
-        }
-        remove_triggers(&u->attribs, "timer", &tt_gate);
-        remove_triggers(&u->attribs, "create", &tt_unguard);
-        ++fixes;
-      }
-    }
-    for (b=r->buildings;b;b=b->next) {
-      trigger ** triggers = get_triggers(b->attribs, "timer");
-      if (triggers) {
-        trigger * t = *triggers;
-        while (t && t->type!= &tt_gate) t=t->next;
-        if (t!=NULL) {
-          gate_data * gd = (gate_data*)t->data.v;
-          struct building * bgate = gd->gate;
-          struct region * rtarget = gd->target;
-          remove_triggers(&bgate->attribs, "timer", &tt_gate);
-          remove_triggers(&bgate->attribs, "create", &tt_unguard);
-          if (r!=bgate->region) {
-            add_trigger(&bgate->attribs, "timer", trigger_gate(bgate, rtarget));
-            add_trigger(&bgate->attribs, "create", trigger_unguard(bgate));
-            fset(bgate, BLD_UNGUARDED);
-          }
-          ++fixes;
-        }
-      }
-    }
-  }
-  log_printf("fixed %u gates.\n", fixes);
 }
 
 static int
@@ -914,7 +862,7 @@ fix_toads(void)
       }
     }
   }
-  log_printf("fixed %u toads.\n", fixes);
+  log_printf("fixed %d toads.\n", fixes);
 }
 
 #ifdef REMOVE_ILLEGAL_MIGRANT_HEROES
@@ -934,7 +882,7 @@ fix_heroes(void)
       }
     }
   }
-  log_printf("fixed %u heroes.\n", fixes);
+  log_printf("fixed %d heroes.\n", fixes);
 }
 #endif
 
@@ -992,7 +940,6 @@ korrektur(void)
 #endif
   fix_astralplane();
   fix_firewalls();
-  fix_gates();
   fix_toads();
   /* fix_heroes(); */
   verify_owners(false);
