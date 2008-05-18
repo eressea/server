@@ -244,30 +244,20 @@ region_adddirection(region& r, region &rt, const char * name, const char * info)
 static void
 region_remove(region& r)
 {
+  remove_region(&regions, &r);
+}
+
+static void
+plane_remove(int plane_id)
+{
   region ** rp = &regions;
   while (*rp) {
-    if (*rp==&r) {
-      while (r.units) {
-        unit * u = r.units;
-        destroy_unit(u);
-        remove_unit(u);
-      }
-      *rp = r.next;
-#ifdef FAST_CONNECT
-      direction_t dir;
-      for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-        region * rn = r.connect[dir];
-        if (rn) {
-          direction_t reldir = reldirection(rn, &r);
-          r.connect[dir] = NULL;
-          rn->connect[reldir] = NULL;
-        }
-      }
-#endif
-      runhash(&r);
-      break;
+    region * r = *rp;
+    if (r->planep && r->planep->id==plane_id) {
+      remove_region(rp, r);
+    } else {
+      rp = &r->next;
     }
-    rp = &(*rp)->next;
   }
 }
 
@@ -342,6 +332,13 @@ region_setkey(region& r, const char * name, bool value)
   }
 }
 
+static int
+plane_getbyname(const char * str)
+{
+  plane * pl = getplanebyname(str);
+  if (pl) return pl->id;
+  return 0;
+}
 
 void
 bind_region(lua_State * L)
@@ -351,6 +348,9 @@ bind_region(lua_State * L)
     def("get_region", &findregion),
     def("terraform", &region_terraform),
     def("distance", &distance),
+    def("remove_region", &region_remove),
+    def("remove_plane", &plane_remove),
+    def("getplanebyname", &plane_getbyname),
 
     class_<struct region>("region")
     .def(tostring(self))
@@ -369,7 +369,6 @@ bind_region(lua_State * L)
     .def("get_flag", &region_getflag)
     .def("set_flag", &region_setflag)
 
-    .def("remove", &region_remove)
     .def("move", &region_move)
 
     .def("get_road", &region_getroad)

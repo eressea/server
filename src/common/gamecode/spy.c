@@ -510,8 +510,9 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
       msg_release(msg);
       if (dead == u->number) {
         /* the poor creature, she dies */
-        *ui = u->next;
-        destroy_unit(u);
+        if (remove_unit(ui, u)!=0) {
+          ui = &u->next;
+        }
       }
     }
   }

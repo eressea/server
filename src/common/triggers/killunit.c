@@ -16,6 +16,7 @@
 #include <kernel/eressea.h>
 #include "killunit.h"
 
+#include <kernel/region.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -34,17 +35,17 @@
 static int
 killunit_handle(trigger * t, void * data)
 {
-	/* call an event handler on killunit.
-	 * data.v -> ( variant event, int timer )
-	 */
-	unit * u = (unit*)t->data.v;
-	if (u!=NULL) {
-		destroy_unit(u);
+  /* call an event handler on killunit.
+  * data.v -> ( variant event, int timer )
+  */
+  unit * u = (unit*)t->data.v;
+  if (u!=NULL) {
+    remove_unit(&u->region->units, u);
   } else {
-		log_warning(("could not perform killunit::handle()\n"));
+    log_warning(("could not perform killunit::handle()\n"));
   }
-	unused(data);
-	return 0;
+  unused(data);
+  return 0;
 }
 
 static void

@@ -136,7 +136,6 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define RCF_INVISIBLE      (1<<25) /* not visible in any report */
 
 /* Economic flags */
-#define NOGIVE         (1<<0)   /* gibt niemals nix */
 #define GIVEITEM       (1<<1)   /* gibt Gegenstände weg */
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */

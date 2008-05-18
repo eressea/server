@@ -155,47 +155,99 @@ dfindhash(int no)
   return 0;
 }
 
-unit * udestroy = NULL;
+typedef struct friend {
+  struct friend * next;
+  int number;
+  faction * faction;
+  unit * unit;
+} friend;
 
-/** distributes a unit's posessions to friendly units
-* this happens when units die and no own units are in the region
-*/
-void
-distribute_items(unit * u)
+static friend *
+get_friends(const unit * u, int * numfriends)
 {
+  friend * friends = 0;
   faction * f = u->faction;
   region * r = u->region;
-  unit * au;
   int number = 0;
-  struct friend {
-    struct friend * next;
-    int number;
-    faction * faction;
-    unit * unit;
-  } * friends = NULL;
+  unit * u2;
 
-  if (u->items==NULL) return;
+  for (u2=r->units;u2;u2=u2->next) {
+    if (u2->faction!=f && u2->number>0) {
+      if (alliedunit(u, u2->faction, HELP_MONEY) && alliedunit(u2, f, HELP_GIVE)) {
+        friend * nf, ** fr = &friends;
 
-  for (au=r->units;au;au=au->next) if (au->faction!=f && au->number>0) {
-    if (alliedunit(u, au->faction, HELP_MONEY) && alliedunit(au, f, HELP_GIVE)) {
-      struct friend * nf, ** fr = &friends;
-
-      while (*fr && (*fr)->faction->no<au->faction->no) fr = &(*fr)->next;
-      nf = *fr;
-      if (nf==NULL || nf->faction!=au->faction) {
-        nf = malloc(sizeof(struct friend));
-        nf->next = *fr;
-        nf->faction = au->faction;
-        nf->unit = au;
-        nf->number = 0;
-        *fr = nf;
+        /* some units won't take stuff: */
+        if (u2->race->ec_flags & GETITEM) {
+          while (*fr && (*fr)->faction->no<u2->faction->no) fr = &(*fr)->next;
+          nf = *fr;
+          if (nf==NULL || nf->faction!=u2->faction) {
+            nf = malloc(sizeof(friend));
+            nf->next = *fr;
+            nf->faction = u2->faction;
+            nf->unit = u2;
+            nf->number = 0;
+            *fr = nf;
+          } else if (nf->faction==u2->faction && (u2->race->ec_flags & GIVEITEM)) {
+              /* we don't like to gift it to units that won't give it back */
+            if ((nf->unit->race->ec_flags & GIVEITEM) == 0) {
+              nf->unit = u2;
+            }
+          }
+          nf->number += u2->number;
+          number += u2->number;
+        }
       }
-      nf->number += au->number;
-      number += au->number;
     }
   }
+  if (numfriends) *numfriends = number;
+  return friends;
+}
 
-  if (friends) {
+/** give all items to friends or peasants.
+ * this function returns 0 on success, or 1 if there are items that
+ * could not be destroyed.
+ */
+int
+gift_items(unit * u, int flags)
+{
+  region * r = u->region;
+  item ** itm_p = &u->items;
+  int retval = 0;
+
+  if (u->items==NULL || fval(u->race, RCF_ILLUSIONARY)) return 0;
+  if ((u->race->ec_flags & GIVEITEM) == 0) return 0;
+
+  /* at first, I should try giving my crap to my own units in this region */
+  if (u->faction && (flags & GIFT_SELF)) {
+    unit * u2, * u3 = NULL;
+    for (u2 = r->units; u2; u2 = u2->next) {
+      if (u2 != u && u2->faction == u->faction && u2->number>0) {
+        /* some units won't take stuff: */
+        if (u2->race->ec_flags & GETITEM) {
+          /* we don't like to gift it to units that won't give it back */
+          if (u2->race->ec_flags & GIVEITEM) {
+            i_merge(&u2->items, &u->items);
+            u->items = NULL;
+            break;
+          } else {
+            u3 = u2;
+          }
+        }
+      }
+    }
+    if (u->items && u3) {
+      /* if nobody else takes it, we give it to a unit that has issues */
+      i_merge(&u3->items, &u->items);
+      u->items = NULL;
+    }
+    if (u->items==NULL) return 0;
+  }
+
+  /* if I have friends, I'll try to give my stuff to them */
+  if (u->faction && (flags & GIFT_FRIENDS)) {
+    int number = 0;
+    friend * friends = get_friends(u, &number);
+
     while (friends) {
       struct friend * nf = friends;
       unit * u2 = nf->unit;
@@ -215,116 +267,85 @@ distribute_items(unit * u)
       friends = nf->next;
       free(nf);
     }
-    friends = NULL;
-  }
-}
-
-void
-remove_unit(unit * u)
-{
-  region * r = u->region;
-  assert(u->number==0);
-  uunhash(u);
-  if (r) choplist(&r->units, u);
-  u->next = udestroy;
-  udestroy = u;
-}
-
-void
-destroy_unit(unit * u)
-{
-  region *r = u->region;
-  boolean zombie = false;
-#if 0
-  unit *clone;
-#endif  
-  if (!ufindhash(u->no)) return;
-
-  if (!fval(u->race, RCF_ILLUSIONARY)) {
-    item ** p_item = &u->items;
-    unit * u3;
-
-    /* u->faction->no_units--; */ /* happens in u_setfaction now */
-
-    if (r) for (u3 = r->units; u3; u3 = u3->next) {
-      if (u3 != u && u3->faction == u->faction && playerrace(u3->race)) {
-        i_merge(&u3->items, &u->items);
-        u->items = NULL;
-        break;
-      }
-    }
-    u3 = NULL;
-    while (*p_item) {
-      item * item = *p_item;
-      if (item->number && item->type->flags & ITF_NOTLOST) {
-        if (u3==NULL) {
-          u3 = r->units;
-          while (u3 && u3!=u) u3 = u3->next;
-          if (!u3) {
-            zombie = true;
-            break;
-          }
-        }
-        if (u3) {
-          i_add(&u3->items, i_remove(p_item, item));
-        }
-      }
-      if (*p_item == item) p_item=&item->next;
-    }
-    if (u->items && (u->faction==NULL || u->faction->passw[0])) {
-      distribute_items(u);
-    }
+    if (u->items==NULL) return 0;
   }
 
-  /* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
-  * Items haben, sonst Memory-Leak. */
-#if 0
-  /* broken. */
-  clone = has_clone(u);
-  if (clone && rng_int()%100 < 90) {
-    attrib *a;
-    int i;
+  /* last, but not least, give money and horses to peasants */
+  while (*itm_p) {
+    item * itm = *itm_p;
 
-    /* TODO: Messages generieren. */
-    if (u->region!=clone->region) {
-      move_unit(u, clone->region, NULL);
+    if (flags & GIFT_PEASANTS) {
+      if (!fval(u->region->terrain, SEA_REGION)) {
+        if (itm->type==olditemtype[I_HORSE]) {
+          rsethorses(r, rhorses(r) + itm->number);
+          itm->number = 0;
+        } else if (itm->type==i_silver) {
+          rsetmoney(r, rmoney(r) + itm->number);
+          itm->number = 0;
+        }
+      }
     }
-    if (fval(u->race, RCF_CANSAIL)) {
-      u->ship = clone->ship;
-    }
-    u->building = clone->building;
-    u->hp = 1;
-    i = u->no;
-    uunhash(u);
-    uunhash(clone);
-    u->no = clone->no;
-    clone->no = i;
-    uhash(u);
-    uhash(clone);
-    set_number(u, 1);
-    set_spellpoints(u, 0);
-    a = a_find(u->attribs, &at_clone);
-    if (a!=NULL) a_remove(&u->attribs, a);
-    a = a_find(clone->attribs, &at_clonemage);
-    if (a!=NULL) a_remove(&clone->attribs, a);
-    fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-    set_number(clone, 0);
-  } else 
-#endif  
-    if (zombie) {
-      u_setfaction(u, get_monsters());
-      scale_number(u, 1);
-      u->race = u->irace = new_race[RC_ZOMBIE];
+    if (itm->number>0 && (itm->type->flags & ITF_NOTLOST)) {
+      itm_p = &itm->next;
+      retval = -1;
     } else {
-      if (u->number) set_number(u, 0);
-      handle_event(u->attribs, "destroy", u);
-      if (r && !fval(r->terrain, SEA_REGION)) {
-        rsetmoney(r, rmoney(r) + get_money(u));
-      }
-      dhash(u->no, u->faction);
-      u_setfaction(u, NULL);
-      if (r) leave(r, u);
+      i_remove(itm_p, itm);
+      i_free(itm);
     }
+  }
+  return retval;
+}
+
+void
+make_zombie(unit * u)
+{
+  u_setfaction(u, get_monsters());
+  scale_number(u, 1);
+  u->race = u->irace = new_race[RC_ZOMBIE];
+}
+
+/** remove the unit from the list of active units.
+ * the unit is not actually freed, because there may still be references
+ * dangling to it (from messages, for example). To free all removed units, 
+ * call free_units().
+ * returns 0 on success, or -1 if unit could not be removed.
+ */
+
+static unit * deleted_units = NULL;
+
+int
+remove_unit(unit ** ulist, unit * u)
+{
+  int result;
+
+  assert(ufindhash(u->no));
+  handle_event(u->attribs, "destroy", u);
+
+  result = gift_items(u, GIFT_SELF|GIFT_FRIENDS|GIFT_PEASANTS);
+  if (result!=0) {
+    make_zombie(u);
+    return -1;
+  }
+  
+  if (u->number) set_number(u, 0);
+  leave(u->region, u);
+
+  uunhash(u);
+  if (ulist) {
+    while (*ulist!=u) {
+      ulist = &(*ulist)->next;
+    }
+    assert(*ulist==u);
+    *ulist = u->next;
+  }
+
+  u->next = deleted_units;
+  deleted_units = u;
+  dhash(u->no, u->faction);
+
+  u_setfaction(u, NULL);
+
+  return 0;
 }
 
 unit *
@@ -588,10 +609,10 @@ ucontact(const unit * u, const unit * u2)
 void
 free_units(void)
 {
-  while (udestroy) {
-    unit * u = udestroy;
-    udestroy = udestroy->next;
-    stripunit(u);
+  while (deleted_units) {
+    unit * u = deleted_units;
+    deleted_units = deleted_units->next;
+    free_unit(u);
     free(u);
   }
 }
@@ -1294,14 +1315,19 @@ invisible(const unit *target, const unit * viewer)
 #endif
 }
 
+/** remove the unit from memory.
+ * this frees all memory that's only accessible through the unit,
+ * and you should already have called uunhash and removed the unit from the
+ * region.
+ */
 void
-stripunit(unit * u)
+free_unit(unit * u)
 {
   free(u->name);
   free(u->display);
   free_order(u->thisorder);
   free_orders(&u->orders);
-  if(u->skills) free(u->skills);
+  if (u->skills) free(u->skills);
   while (u->items) {
     item * it = u->items->next;
     u->items->next = NULL;

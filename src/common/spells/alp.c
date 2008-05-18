@@ -142,41 +142,39 @@ sp_summon_alp(struct castorder *co)
 void
 alp_findet_opfer(unit *alp, region *r)
 {
-	curse * c;
-	attrib * a = a_find(alp->attribs, &at_alp);
-	alp_data * ad = (alp_data*)a->data.v;
-	unit *mage = ad->mage;
-	unit *opfer = ad->target;
+  curse * c;
+  attrib * a = a_find(alp->attribs, &at_alp);
+  alp_data * ad = (alp_data*)a->data.v;
+  unit *mage = ad->mage;
+  unit *opfer = ad->target;
   variant effect;
   message * msg;
 
-	assert(opfer);
-	assert(mage);
+  assert(opfer);
+  assert(mage);
 
-	/* Magier und Opfer Bescheid geben */
+  /* Magier und Opfer Bescheid geben */
   msg = msg_message("alp_success", "target", opfer);
   add_message(&mage->faction->msgs, msg);
   r_addmessage(opfer->region, opfer->faction, msg);
   msg_release(msg);
 
-	/* Relations werden in destroy_unit(alp) automatisch gelöscht.
-	 * Die Aktionen, die beim Tod des Alps ausgelöst werden sollen,
-	 * müssen jetzt aber deaktiviert werden, sonst werden sie gleich
-	 * beim destroy_unit(alp) ausgelöst.
-	 */
-	a_removeall(&alp->attribs, &at_eventhandler);
+  /* Relations werden in destroy_unit(alp) automatisch gelöscht.
+  * Die Aktionen, die beim Tod des Alps ausgelöst werden sollen,
+  * müssen jetzt aber deaktiviert werden, sonst werden sie gleich
+  * beim destroy_unit(alp) ausgelöst.
+  */
+  a_removeall(&alp->attribs, &at_eventhandler);
 
   /* Alp umwandeln in Curse */
   effect.i = -2;
-	c = create_curse(mage, &opfer->attribs, ct_find("worse"), 2, 2, effect, opfer->number);
-	/* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
-	 * auch auf normale */
-	destroy_unit(alp);
+  c = create_curse(mage, &opfer->attribs, ct_find("worse"), 2, 2, effect, opfer->number);
+  /* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
+  * auch auf normale */
+  remove_unit(&r->units, alp);
 
-	{
-		/* wenn der Magier stirbt, wird der Curse wieder vom Opfer genommen */
-		add_trigger(&mage->attribs, "destroy", trigger_removecurse(c, opfer));
-	}
+  /* wenn der Magier stirbt, wird der Curse wieder vom Opfer genommen */
+  add_trigger(&mage->attribs, "destroy", trigger_removecurse(c, opfer));
 }
 
 void

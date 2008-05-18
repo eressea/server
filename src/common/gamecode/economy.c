@@ -230,6 +230,7 @@ select_recruitment(request ** rop, int (*quantify)(const struct race*, int), int
 static void
 add_recruits(unit * u, int number, int wanted)
 {
+  region * r = u->region;
   assert(number<=wanted);
   if (number > 0) {
     unit * unew;
@@ -242,7 +243,7 @@ add_recruits(unit * u, int number, int wanted)
       u->hp = number * unit_max_hp(u);
       unew = u;
     } else {
-      unew = create_unit(u->region, u->faction, number, u->race, 0, NULL, u);
+      unew = create_unit(r, u->faction, number, u->race, 0, NULL, u);
     }
 
     if (unew->race == new_race[RC_URUK]) {
@@ -271,12 +272,12 @@ add_recruits(unit * u, int number, int wanted)
 #endif /* KARMA_MODULE */
     if (unew!=u) {
       transfermen(unew, u, unew->number);
-      destroy_unit(unew);
+      remove_unit(&r->units, unew);
     }
   }
   if (number < wanted) {
     ADDMSG(&u->faction->msgs, msg_message("recruit",
-      "unit region amount want", u, u->region, number, wanted));
+      "unit region amount want", u, r, number, wanted));
   }
 }
 
@@ -650,12 +651,6 @@ give_cmd(unit * u, order * ord)
 
   else if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
     cmistake(u, ord, 40, MSG_COMMERCE);
-    return;
-  }
-
-  else if (u2 && u->race->ec_flags & NOGIVE) {
-    ADDMSG(&u->faction->msgs,
-      msg_feedback(u, ord, "race_nogive", "race", u->race));
     return;
   }
 

@@ -335,7 +335,7 @@ age_unit(region * r, unit * u)
 {
   if (u->race == new_race[RC_SPELL]) {
     if (--u->age <= 0) {
-      destroy_unit(u);
+      remove_unit(&r->units, u);
     }
   } else {
     ++u->age;
@@ -343,24 +343,6 @@ age_unit(region * r, unit * u)
       u->race->age(u);
     }
   }
-
-#ifdef ASTRAL_ITEM_RESTRICTIONS
-  if (u->region->planep==get_astralplane()) {
-    item ** itemp = &u->items;
-    while (*itemp) {
-      item * itm = *itemp;
-      if ((itm->type->flags & ITF_NOTLOST) == 0) {
-        if (itm->type->flags & (ITF_BIG|ITF_ANIMAL|ITF_CURSED)) {
-          ADDMSG(&u->faction->msgs, msg_message("itemcrumble", "unit region item amount",
-            u, u->region, itm->type->rtype, itm->number));
-          i_free(i_remove(itemp, itm));
-          continue;
-        }
-      }
-      itemp=&itm->next;
-    }
-  }
-#endif
 }
 
 
@@ -1132,7 +1114,7 @@ ally_cmd(unit * u, struct order * ord)
   skip_token();
   f = getfaction();
 
-  if (is_monsters(f)) {
+  if (f==NULL || is_monsters(f)) {
     cmistake(u, ord, 66, MSG_EVENT);
     return 0;
   }
@@ -2908,7 +2890,7 @@ age_building(building * b)
      * find out if there's a magician in there. */
     for (u=r->units;u;u=u->next) {
       if (b==u->building && inside_building(u)) {
-        if (!(u->race->ec_flags & NOGIVE)) {
+        if (!(u->race->ec_flags & GIVEITEM)==0) {
           int n, unicorns = 0;
           for (n=0; n!=u->number; ++n) {
             if (chance(0.02)) {

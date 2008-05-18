@@ -159,7 +159,6 @@ void usetcontact(struct unit * u, const struct unit * c);
 
 struct unit * findnewunit (const struct region * r, const struct faction *f, int alias);
 
-extern struct unit * udestroy;
 extern const char * u_description(const unit * u, const struct locale * lang);
 extern struct skill * add_skill(struct unit * u, skill_t id);
 extern void remove_skill(struct unit *u, skill_t sk);
@@ -174,11 +173,13 @@ extern int eff_skill(const struct unit * u, skill_t sk, const struct region * r)
 extern int eff_skill_study(const struct unit * u, skill_t sk, const struct region * r);
 
 extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct region * r, boolean noitem);
+extern int remove_unit(struct unit ** ulist, struct unit * u);
 
-/* Einheiten werden nicht wirklich zerstört. */
-extern void destroy_unit(struct unit * u);
-extern void remove_unit(struct unit * u);
-extern void distribute_items(struct unit * u);
+#define GIFT_SELF     1<<0
+#define GIFT_FRIENDS  1<<1
+#define GIFT_PEASANTS 1<<2
+int gift_items(struct unit * u, int flags);
+void make_zombie(unit * u);
 
 /* see resolve.h */
 extern void resolve_unit(variant data, void * address);
@@ -205,7 +206,7 @@ extern void set_number(struct unit * u, int count);
 extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
 
 extern int invisible(const struct unit *target, const struct unit * viewer);
-extern void stripunit(struct unit * u);
+extern void free_unit(struct unit * u);
 
 extern void name_unit(struct unit *u);
 extern struct unit * create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);

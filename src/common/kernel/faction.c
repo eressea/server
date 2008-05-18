@@ -241,7 +241,20 @@ destroyfaction(faction * f)
 
   for (u=f->units;u;u=u->nextF) {
     region * r = u->region;
-    distribute_items(u);
+
+    /* give away your stuff, make zombies if you cannot (quest items) */
+    while (u) {
+      int result = gift_items(u, GIFT_FRIENDS|GIFT_PEASANTS);
+      if (result!=0) {
+        unit * zombie = u;
+        u = u->nextF;
+        make_zombie(zombie);
+      } else {
+        break;
+      }
+    }
+    if (u==NULL) continue;
+
     if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
       const race * rc = u->race;
       int m = rmoney(u->region);

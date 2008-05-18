@@ -335,36 +335,7 @@ game_done(void)
    * wird (temporäre Hilsstrukturen) */
 
   free_units();
-
-  while (regions) {
-    region *r = regions;
-    regions = r->next;
-
-    while (r->units) {
-      unit * u = r->units;
-      r->units = u->next;
-      stripunit(u);
-      uunhash(u);
-      free(u);
-    }
-
-    while (r->buildings) {
-      building * b = r->buildings;
-      r->buildings = b->next;
-      free(b->name);
-      free(b->display);
-      free(b);
-    }
-
-    while (r->ships) {
-      ship * s = r->ships;
-      r->ships = s->next;
-      free(s->name);
-      free(s->display);
-      free(s);
-    }
-    free_region(r);
-  }
+  free_regions();
 
   while (factions) {
     faction * f = factions;

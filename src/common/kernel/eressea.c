@@ -2392,8 +2392,7 @@ remove_empty_units_in_region(region *r)
       }
     }
     if ((u->number == 0 && u->race != new_race[RC_SPELL]) || (u->age <= 0 && u->race == new_race[RC_SPELL])) {
-      if (u->faction!=NULL) destroy_unit(u);
-      if (u->number==0) remove_unit(u);
+      remove_unit(up, u);
     }
     if (*up==u) up=&u->next;
   }

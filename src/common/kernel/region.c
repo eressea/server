@@ -35,6 +35,7 @@
 #include "region.h"
 #include "resources.h"
 #include "save.h"
+#include "ship.h"
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
@@ -859,6 +860,26 @@ new_region(short x, short y, unsigned int uid)
   return r;
 }
 
+static region * deleted_regions;
+
+void
+remove_region(region ** rlist, region * r)
+{
+
+  while (r->units) {
+    unit * u = r->units;
+    i_freeall(&u->items);
+    remove_unit(&r->units, u);
+  }
+
+  runhash(r);
+  while (*rlist && *rlist!=r) rlist=&(*rlist)->next;
+  assert(*rlist==r);
+  *rlist = r->next;
+  r->next = deleted_regions;
+  deleted_regions = r;
+}
+
 static void
 freeland(land_region * lr)
 {
@@ -874,7 +895,6 @@ freeland(land_region * lr)
 void
 free_region(region * r)
 {
-  runhash(r);
   if (last == r) last = NULL;
   free(r->display);
   if (r->land) freeland(r->land);
@@ -904,7 +924,47 @@ free_region(region * r)
     free(don);
   }
 
+  while (r->units) {
+    unit * u = r->units;
+    r->units = u->next;
+    uunhash(u);
+    free_unit(u);
+    free(u);
+  }
+
+  while (r->buildings) {
+    building * b = r->buildings;
+    r->buildings = b->next;
+    free(b->name);
+    free(b->display);
+    free(b);
+  }
+
+  while (r->ships) {
+    ship * s = r->ships;
+    r->ships = s->next;
+    free(s->name);
+    free(s->display);
+    free(s);
+  }
+
   free(r);
+}
+
+void
+free_regions(void)
+{
+  while (deleted_regions) {
+    region * r = deleted_regions;
+    deleted_regions = r->next;
+    free_region(r);
+  }
+  while (regions) {
+    region * r = regions;
+    regions = r->next;
+    runhash(r);
+    free_region(r);
+  }
 }
 
 /** creates a name for a region
