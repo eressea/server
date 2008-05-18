@@ -73,7 +73,7 @@ write_permissions(const attrib * a, struct storage * store)
 static int
 read_permissions(attrib * at, struct storage * store)
 {
-  attrib * attr;
+  attrib * attr = NULL;
   a_read(store, &attr);
   at->data.v = attr;
   return AT_READ_OK;

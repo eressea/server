@@ -1132,7 +1132,7 @@ ally_cmd(unit * u, struct order * ord)
   skip_token();
   f = getfaction();
 
-  if (f == 0 || f->no == 0) {
+  if (is_monsters(f)) {
     cmistake(u, ord, 66, MSG_EVENT);
     return 0;
   }
