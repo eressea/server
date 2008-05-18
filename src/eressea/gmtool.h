@@ -19,8 +19,8 @@ extern "C" {
   extern int gmmain(int argc, char *argv[]);
   extern int curses_readline(struct lua_State * L, const char * prompt);
 
-  extern void highlight_region(struct region *r);
-  extern void select_coordinate(struct selection * selected, int x, int y);
+  extern void highlight_region(struct region *r, int on);
+  extern void select_coordinate(struct selection * selected, int x, int y, int on);
   extern void run_mapper(void);
 
   extern int force_color;

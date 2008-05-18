@@ -536,21 +536,25 @@ region2coord(const region * r, coordinate * c)
 #endif
 
 void
-highlight_region(region *r)
+highlight_region(region *r, int toggle)
 {
-  if (r!=NULL) r->flags |= RF_MAPPER_HIGHLIGHT;
+  if (r!=NULL) {
+    if (toggle) r->flags |= RF_MAPPER_HIGHLIGHT;
+    else r->flags &= ~RF_MAPPER_HIGHLIGHT;
+  }
 }
 
 void
-select_coordinate(struct selection * selected, int x, int y)
+select_coordinate(struct selection * selected, int x, int y, int toggle)
 {
   coordinate coord = { 0 };
   coord.x = x;
   coord.y = y;
-  tag_region(selected, &coord);
+  if (toggle) tag_region(selected, &coord);
+  else untag_region(selected, &coord);
 }
 
-enum { MODE_HIGHLIGHT = 0x0, MODE_SELECT = 0x1 };
+enum { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
 
 static void
 select_regions(state * st, int selectmode)
@@ -584,6 +588,42 @@ select_regions(state * st, int selectmode)
       }
     }
   }
+  else if (findmode=='m') {
+    region * r;
+    sprintf(sbuffer, "%smonsters", status);
+    statusline(st->wnd_status->handle, sbuffer);
+    for (r=regions;r;r=r->next) {
+      unit * u = r->units;
+      for (;u;u=u->next) {
+        if (fval(u->faction, FFL_NPC)!=0) break;
+      }
+      if (u) {
+        if (selectmode&MODE_SELECT) {
+          select_coordinate(st->selected, r->x, r->y, selectmode==MODE_SELECT);
+        } else {
+          highlight_region(r, selectmode==MODE_MARK);
+        }
+      }
+    }
+  } 
+  else if (findmode=='p') {
+    region * r;
+    sprintf(sbuffer, "%splayers", status);
+    statusline(st->wnd_status->handle, sbuffer);
+    for (r=regions;r;r=r->next) {
+      unit * u = r->units;
+      for (;u;u=u->next) {
+        if (fval(u->faction, FFL_NPC)==0) break;
+      }
+      if (u) {
+        if (selectmode&MODE_SELECT) {
+          select_coordinate(st->selected, r->x, r->y, selectmode==MODE_SELECT);
+        } else {
+          highlight_region(r, selectmode==MODE_MARK);
+        }
+      }
+    }
+  } 
   else if (findmode=='u') {
     region * r;
     sprintf(sbuffer, "%sunits", status);
@@ -591,9 +631,9 @@ select_regions(state * st, int selectmode)
     for (r=regions;r;r=r->next) {
       if (r->units) {
         if (selectmode&MODE_SELECT) {
-          select_coordinate(st->selected, r->x, r->y);
+          select_coordinate(st->selected, r->x, r->y, selectmode==MODE_SELECT);
         } else {
-          highlight_region(r);
+          highlight_region(r, selectmode==MODE_MARK);
         }
       }
     }
@@ -605,9 +645,9 @@ select_regions(state * st, int selectmode)
     for (r=regions;r;r=r->next) {
       if (r->ships) {
         if (selectmode&MODE_SELECT) {
-          select_coordinate(st->selected, r->x, r->y);
+          select_coordinate(st->selected, r->x, r->y, selectmode==MODE_SELECT);
         } else {
-          highlight_region(r);
+          highlight_region(r, selectmode==MODE_MARK);
         }
       }
     }
@@ -627,9 +667,9 @@ select_regions(state * st, int selectmode)
         for (u=f->units;u;u=u->nextF) {
           region * r = u->region;
           if (selectmode&MODE_SELECT) {
-            select_coordinate(st->selected, r->x, r->y);
+            select_coordinate(st->selected, r->x, r->y, selectmode==MODE_SELECT);
           } else {
-            highlight_region(r);
+            highlight_region(r, selectmode==MODE_MARK);
           }
         }
       } else {
@@ -651,9 +691,9 @@ select_regions(state * st, int selectmode)
       for (r=regions;r;r=r->next) {
         if (r->terrain==terrain) {
           if (selectmode&MODE_SELECT) {
-            select_coordinate(st->selected, r->x, r->y);
+            select_coordinate(st->selected, r->x, r->y, selectmode==MODE_SELECT);
           } else {
-            highlight_region(r);
+            highlight_region(r, selectmode==MODE_MARK);
           }
         }
       }
@@ -859,11 +899,17 @@ handlekey(state * st, int c)
     st->wnd_status->update |= 1;
     st->wnd_map->update |= 1;
     break;
+  case 'h':
+    select_regions(st, MODE_MARK);
+    break;
   case 'H':
-    select_regions(st, MODE_HIGHLIGHT);
+    select_regions(st, MODE_UNMARK);
+    break;
+  case 't':
+    select_regions(st, MODE_SELECT);
     break;
   case 'T':
-    select_regions(st, MODE_SELECT);
+    select_regions(st, MODE_UNSELECT);
     break;
   case ';':
     statusline(st->wnd_status->handle, "tag-");
@@ -883,7 +929,6 @@ handlekey(state * st, int c)
       beep();
     }
     break;
-  case 't':
   case ' ':
     if (tagged_region(st->selected, cursor)) untag_region(st->selected, cursor);
     else tag_region(st->selected, cursor);
