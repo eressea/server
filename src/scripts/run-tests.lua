@@ -9,20 +9,13 @@ function test_locales()
 	return 0
 end
 
-test_locales()
+--test_locales()
 
 local now = os.clock()
-read_game("571.new", "binary")
---read_game("566.txt", "text")
---write_game("566.txt", "text")
+read_game("572.dat", "binary")
 local elapsed = os.clock() - now
 print(elapsed)
 -- text: 50.574
 -- bin0: 19.547
 -- bin1: 18.953
-f = get_faction(0)
-
---renumber(f, 666)
--- write_game("571.new", "binary")
-
 io.stdin:read("*line")

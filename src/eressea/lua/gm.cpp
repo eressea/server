@@ -66,15 +66,15 @@ selected_regions(void)
 }
 
 static void
-gmtool_select_coordinate(int x, int y)
+gmtool_select_coordinate(int x, int y, int select)
 {
-  select_coordinate(current_state->selected, x, y);
+  select_coordinate(current_state->selected, x, y, select);
 }
 
 static void
-gmtool_select_region(region& r)
+gmtool_select_region(region& r, int select)
 {
-  select_coordinate(current_state->selected, r.x, r.y);
+  select_coordinate(current_state->selected, r.x, r.y, select);
 }
 
 void
