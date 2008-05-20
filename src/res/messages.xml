@@ -6305,13 +6305,20 @@
     <text locale="de">"$unit($unit) wird kurz von einem magischen Licht umhüllt."</text>
     <text locale="en">"$unit($unit) is briefly surrounded by a magical light."</text>
   </message>
+  <message name="stormwinds_reduced" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="ships" type="int"/>
+      <arg name="maxships" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) konnte nur $int($ships) von $int($maxships) Schiffen verzaubern."</text>
+  </message>
   <message name="stormwinds_effect" section="events">
     <type>
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) beschwört einen magischen Wind, der die Schiffe über das Wasser treibt."</text>
     <text locale="en">"$unit($unit) calls up a magical storm that whips the ship over the waters."</text>
-    <text locale="fr">"$unit($unit) calls up a magical storm that whips the ship over the waters."</text>
   </message>
   <message name="error59" section="errors">
     <type>

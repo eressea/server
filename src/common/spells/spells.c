@@ -2232,6 +2232,10 @@ sp_stormwinds(castorder *co)
       }
     }
   }
+  if (erfolg<pa->length) {
+    ADDMSG(&mage->faction->msgs, msg_message("stormwinds_reduced", 
+      "unit ships maxships", mage, erfolg, pa->length));
+  }
   /* melden, 1x pro Partei auf Schiff und für den Magier */
   fset(mage->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
