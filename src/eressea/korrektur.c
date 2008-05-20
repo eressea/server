@@ -567,9 +567,9 @@ static int
 fix_astralplane(void)
 {
   plane * astralplane = get_astralplane();
-  region * rs;
-  region_list * rlist = NULL;
+  region ** rs_p = &regions;
   faction * monsters = get_monsters();
+  int fixes = 0;
 
   if (astralplane==NULL || monsters==NULL) return 0;
 
@@ -577,46 +577,32 @@ fix_astralplane(void)
   freset(astralplane, PFL_NOFEED);
   set_ursprung(monsters, astralplane->id, 0, 0);
 
-  for (rs=regions;rs;rs=rs->next) if (rplane(rs)==astralplane) {
-    region * ra = r_standard_to_astral(rs);
-    if (ra==NULL) continue;
-    if (rterrain(rs)!=T_FIREWALL) continue;
-    if (rterrain(ra)==T_ASTRALB) continue;
-    if (ra->units!=NULL) {
-      add_regionlist(&rlist, ra);
-    }
-    log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(rs, NULL), regionname(ra, NULL));
-    terraform(ra, T_ASTRALB);
-  }
-  while (rlist!=NULL) {
-    region_list * rnew = rlist;
-    region * r = rnew->data;
-    direction_t dir;
-    rlist = rlist->next;
-    for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-      region * rnext = rconnect(r, dir);
-      if (rnext==NULL) continue;
-      if (rterrain(rnext)!=T_ASTRAL) continue;
-      while (r->units) {
-        unit * u = r->units;
-        move_unit(u, rnext, NULL);
-        if (is_monsters(u->faction)) {
-          set_number(u, 0);
+  while (*rs_p) {
+    region * rs = *rs_p;
+    if (rterrain(rs)==T_FIREWALL && rplane(rs)==NULL) {
+      region * ra = r_standard_to_astral(rs);
+      if (ra && rterrain(ra)!=T_ASTRALB) {
+        unit * u;
+        ++fixes;
+        for (u=ra->units;u;u=u->next) {
+          if (!is_monsters(u->faction)) break;
         }
-      }
-      break;
-    }
-    if (r->units!=NULL) {
-      unit * u;
-      for (u=r->units;u;u=u->next) {
-        if (!is_monsters(u->faction)) {
-          log_error(("Einheit %s in %u, %u steckt im Nebel fest.\n",
-            unitname(u), r->x, r->y));
+        if (u) {
+          log_printf("could not fix fog in %s because of %s.\n", regionname(ra, NULL), unitname(u));
+        }
+        else {
+          while (ra->units) {
+            remove_unit(&ra->units, ra->units);
+          }
+          log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(rs, NULL), regionname(ra, NULL));
+          terraform(ra, T_ASTRALB);
         }
       }
     }
-    free(rnew);
+    rs_p = &rs->next;
   }
+
+  log_printf("fixed %d fog/firewall regions.\n", fixes);
   return 0;
 }
 
