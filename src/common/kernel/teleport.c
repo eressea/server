@@ -92,14 +92,8 @@ astralregions(const region * r, boolean (*valid)(const region *))
 region *
 r_standard_to_astral(const region *r)
 {
-  region *r2;
-
   if (rplane(r) != get_normalplane()) return NULL;
-
-  r2 = tpregion(r);
-  if (r2==NULL || fval(r2->terrain, FORBIDDEN_REGION)) return NULL;
-
-  return r2;
+  return tpregion(r);
 }
 
 region *

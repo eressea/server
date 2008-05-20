@@ -1752,7 +1752,7 @@ sp_treewalkenter(castorder *co)
   }
 
   rt = r_standard_to_astral(r);
-  if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+  if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0) || fval(rt->terrain, FORBIDDEN_REGION)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
     return 0;
   }
@@ -3396,7 +3396,7 @@ sp_chaossuction(castorder *co)
 
   rt  = r_standard_to_astral(r);
 
-  if (rt==NULL) {
+  if (rt==NULL || fval(rt->terrain, FORBIDDEN_REGION)) {
     /* Hier gibt es keine Verbindung zur astralen Welt.*/
     cmistake(mage, co->order, 216, MSG_MAGIC);
     return 0;
@@ -5338,7 +5338,7 @@ sp_enterastral(castorder *co)
     return 0;
   }
 
-  if (!rt) {
+  if (!rt || fval(rt->terrain, FORBIDDEN_REGION)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "feedback_no_astralregion", ""));
     return 0;
   }
@@ -5775,7 +5775,7 @@ sp_showastral(castorder *co)
   switch(getplaneid(r)) {
   case 0:
     rt = r_standard_to_astral(r);
-    if (!rt) {
+    if (!rt || fval(rt->terrain, FORBIDDEN_REGION)) {
       /* Hier gibt es keine Verbindung zur astralen Welt */
       cmistake(mage, co->order, 216, MSG_MAGIC);
       return 0;
@@ -5905,7 +5905,7 @@ sp_disruptastral(castorder *co)
   switch(getplaneid(r)) {
   case 0:
     rt = r_standard_to_astral(r);
-    if (!rt) {
+    if (!rt || fval(rt->terrain, FORBIDDEN_REGION)) {
       /* "Hier gibt es keine Verbindung zur astralen Welt." */
       cmistake(mage, co->order, 216, MSG_MAGIC);
       return 0;

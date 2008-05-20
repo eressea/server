@@ -2886,6 +2886,7 @@ age_building(building * b)
     region * rt = r_standard_to_astral(r);
     unit * u, * mage = NULL;
 
+    if (fval(rt->terrain, FORBIDDEN_REGION)) rt = NULL;
     /* step 1: give unicorns to people in the building,
      * find out if there's a magician in there. */
     for (u=r->units;u;u=u->next) {
