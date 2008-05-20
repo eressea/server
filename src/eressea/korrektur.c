@@ -602,6 +602,22 @@ fix_astralplane(void)
     rs_p = &rs->next;
   }
 
+  for (rs_p = &regions;*rs_p;) {
+    region * rs = *rs_p;
+    if (fval(rs->terrain, FORBIDDEN_REGION)) {
+      while (rs->units) {
+        unit * u = rs->units;
+        if (is_monsters(u->faction)) {
+          i_freeall(&u->items);
+          remove_unit(&rs->units, u);
+        } else {
+          log_error(("unit %s is stuck in %s\n", unitname(u), regionname(rs, NULL)));
+          break;
+        }
+      }
+    }
+    rs_p = &rs->next;
+  }
   log_printf("fixed %d fog/firewall regions.\n", fixes);
   return 0;
 }

@@ -182,35 +182,21 @@ create_teleport_plane(void)
   plane * aplane = get_astralplane();
 
   const terrain_type * fog = get_terrain("fog");
-  const terrain_type * thickfog = get_terrain("thickfog");
 
-  if (fog==0 || thickfog==0) {
-    log_warning(("cannot find terrain-types for astral space.\n"));
-    return;
-  }
-  /* Regionsbereich aufbauen. */
-  /* wichtig: das muß auch für neue regionen gemacht werden.
-  * Evtl. bringt man es besser in new_region() unter, und
-  * übergibt an new_region die plane mit, in der die
-  * Region gemacht wird.
-  */
+  for (r=regions;r;r=r->next) {
+    if (r->planep == NULL) {
+      region *ra = tpregion(r);
 
-  for (r=regions;r;r=r->next) if (r->planep == NULL) {
-    region *ra = tpregion(r);
-    if (ra==NULL) {
-      short x = TE_CENTER_X+real2tp(r->x);
-      short y = TE_CENTER_Y+real2tp(r->y);
-      plane * pl = findplane(x, y);
-
-      if (pl==aplane) {
-        ra = new_region(x, y, 0);
+      if (ra==NULL) {
+        short x = TE_CENTER_X+real2tp(r->x);
+        short y = TE_CENTER_Y+real2tp(r->y);
+        plane * pl = findplane(x, y);
         
-        if (fval(r->terrain, FORBIDDEN_REGION)) {
-          terraform_region(ra, thickfog);
-        } else {
+        if (pl==aplane) {
+          ra = new_region(x, y, 0);
           terraform_region(ra, fog);
+          ra->planep = aplane;
         }
-        ra->planep = aplane;
       }
     }
   }
