@@ -3898,7 +3898,6 @@ battle_flee(battle * b)
         int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
         if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) continue;
 
-        if (u->ship) continue;
         dt.fighter = fig;
 #ifndef SIMPLE_ESCAPE
         if (!fig->run.region) fig->run.region = fleeregion(u);

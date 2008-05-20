@@ -995,10 +995,10 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
   const faction_list * flist = addresses;
   while (flist!=NULL) {
     const faction * f = flist->data;
-    if (uf!=f && !is_monsters(f)) {
+    if (uf!=f) {
       fprintf(F, "PARTEI %d\n", f->no);
       fprintf(F, "\"%s\";Parteiname\n", f->name);
-      fprintf(F, "\"%s\";email\n", f->email);
+      if (f->email) fprintf(F, "\"%s\";email\n", f->email);
       fprintf(F, "\"%s\";banner\n", f->banner);
       fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
       if (f->alliance!=NULL && f->alliance==uf->alliance) {
