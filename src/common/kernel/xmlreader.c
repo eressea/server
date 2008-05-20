@@ -1667,7 +1667,8 @@ parse_terrains(xmlDocPtr doc)
     terrain->_name = strdup((const char *)propValue);
     xmlFree(propValue);
 
-    terrain->max_road = (short)xml_ivalue(node, "road", -1);
+    terrain->max_road = (short)xml_ivalue(node, "road", 0);
+    assert(terrain->max_road>=0);
     terrain->size = xml_ivalue(node, "size", 0);
 
     if (xml_bvalue(node, "forbidden", false)) terrain->flags |= FORBIDDEN_REGION;

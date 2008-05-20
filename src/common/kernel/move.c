@@ -1126,8 +1126,8 @@ roadto(const region * r, direction_t dir)
     if (get_curse(r2->attribs, roads_ct)!=NULL) return true;
   }
   
-  if (r->terrain->max_road == 0) return false;
-  if (r2->terrain->max_road == 0) return false;
+  if (r->terrain->max_road <= 0) return false;
+  if (r2->terrain->max_road <= 0) return false;
   if (rroad(r, dir) < r->terrain->max_road) return false;
   if (rroad(r2, dir_invert(dir)) < r2->terrain->max_road) return false;
   return true;

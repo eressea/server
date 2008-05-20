@@ -195,13 +195,16 @@ region_setresource(region& r, const char * type, int value)
 static void
 region_setroad(region& r, int dir, lua_Number size)
 {
-  rsetroad(&r, (direction_t)dir, (short)(r.terrain->max_road * size));
+  if (r.terrain->max_road>0) {
+    rsetroad(&r, (direction_t)dir, (short)(r.terrain->max_road * size));
+  }
 }
 
 static lua_Number
 region_getroad(region& r, int dir)
 {
   lua_Number result = rroad(&r, (direction_t)dir);
+  if (r.terrain->max_road<=0 || result<=0) return 0;
   return r.terrain->max_road / result;
 }
 
