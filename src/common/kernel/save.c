@@ -926,14 +926,12 @@ readregion(struct storage * store, short x, short y)
 
   if (store->version>=UID_VERSION) {
     uid = store->r_int(store);
-  } else {
-    uid = generate_region_id();
   }
 
   if (r==NULL) {
     r = new_region(x, y, uid);
   } else {
-    r->uid = uid;
+    assert(uid==0 || r->uid==uid);
     current_region = r;
     while (r->attribs) a_remove(&r->attribs, r->attribs);
     if (r->land) {
@@ -1336,7 +1334,7 @@ writefaction(struct storage * store, const faction * f)
   store->w_tok(store, "end");
   store->w_brk(store);
   store->w_int(store, listlen(f->ursprung));
-  for(ur = f->ursprung;ur;ur=ur->next) {
+  for (ur = f->ursprung;ur;ur=ur->next) {
     store->w_int(store, ur->id);
     store->w_int(store, ur->x);
     store->w_int(store, ur->y);

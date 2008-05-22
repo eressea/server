@@ -389,27 +389,50 @@ attrib_type at_moveblock = {
 static region * regionhash[RMAXHASH];
 static int dummy_data;
 static region * dummy_ptr = (region*)&dummy_data; /* a funny hack */
-static unsigned int uidhash[MAXREGIONS];
+
+typedef struct uidhashentry {
+  unsigned int uid;
+  region * r;
+} uidhashentry;
+static uidhashentry uidhash[MAXREGIONS];
+
+struct region *
+findregionbyid(unsigned int uid)
+{
+  int key = uid % MAXREGIONS;
+  while (uidhash[key].uid!=0 && uidhash[key].uid!=uid) ++key;
+  return uidhash[key].r;
+}
 
 #define DELMARKER dummy_ptr
 
-unsigned int 
-generate_region_id(void)
+static void
+unhash_uid(region * r)
 {
-  unsigned int uid;
+  int key = r->uid % MAXREGIONS;
+  assert(r->uid);
+  while (uidhash[key].uid!=0 && uidhash[key].uid!=r->uid) ++key;
+  assert(uidhash[key].r==r);
+  uidhash[key].r = NULL;
+}
+
+static void
+hash_uid(region * r)
+{
+  unsigned int uid = r->uid;
   for (;;) {
-    int key;
-    do {
-      uid = rng_int();
-    } while (uid==0);
-    key = uid % MAXREGIONS;
-    while (uidhash[key]!=0 && uidhash[key]!=uid) ++key;
-    if (uidhash[key]==0) {
-      uidhash[key] = uid;
-      break;
+    if (uid!=0) {
+      int key = uid % MAXREGIONS;
+      while (uidhash[key].uid!=0 && uidhash[key].uid!=uid) ++key;
+      if (uidhash[key].uid==0) {
+        uidhash[key].uid = uid;
+        uidhash[key].r = r;
+        break;
+      } 
+      assert(uidhash[key].r!=r || !"duplicate registration");
     }
+    uid = rng_int();
   }
-  return uid;
 }
 
 #define HASH_STATISTICS 1
@@ -837,11 +860,11 @@ new_region(short x, short y, unsigned int uid)
   r = calloc(1, sizeof(region));
   r->x = x;
   r->y = y;
-  if (uid==0) uid = generate_region_id();
   r->uid = uid;
   r->age = 1;
   r->planep = findplane(x, y);
   rhash(r);
+  hash_uid(r);
   if (last)
     addlist(&last, r);
   else
@@ -865,6 +888,7 @@ remove_region(region ** rlist, region * r)
   }
 
   runhash(r);
+  unhash_uid(r);
   while (*rlist && *rlist!=r) rlist=&(*rlist)->next;
   assert(*rlist==r);
   *rlist = r->next;
@@ -1217,20 +1241,44 @@ production(const region *r)
   return p;
 }
 
+static void
+resolve_region(variant id, void * address) {
+  region * r = findregion(id.sa[0], id.sa[1]);
+  *(region**)address = r;
+}
+
+static void
+resolve_regionbyid(variant id, void * address) {
+  region * r = findregionbyid((unsigned int)id.i);
+  *(region**)address = r;
+}
+
 int
 read_region_reference(region ** r, struct storage * store)
 {
-  variant coor;
-  coor.sa[0] = (short)store->r_int(store);
-  coor.sa[1] = (short)store->r_int(store);
-  if (coor.sa[0]==SHRT_MAX) {
-    *r = NULL;
-    return AT_READ_FAIL;
-  }
-  *r = findregion(coor.sa[0], coor.sa[1]);
-
-  if (*r==NULL) {
-    ur_add(coor, (void**)r, resolve_region);
+  if (store->version<UIDHASH_VERSION) {
+    variant coor;
+    coor.sa[0] = (short)store->r_int(store);
+    coor.sa[1] = (short)store->r_int(store);
+    if (coor.sa[0]==SHRT_MAX) {
+      *r = NULL;
+      return AT_READ_FAIL;
+    }
+    *r = findregion(coor.sa[0], coor.sa[1]);
+    if (*r==NULL) {
+      ur_add(coor, (void**)r, resolve_region);
+    }
+  } else {
+    variant uid;
+    uid.i = store->r_int(store);
+    if (uid.i==0) {
+      *r = NULL;
+    } else {
+      *r = findregionbyid((unsigned int)uid.i);
+      if (*r==NULL) {
+        ur_add(uid, (void**)r, resolve_regionbyid);
+      }
+    }
   }
   return AT_READ_OK;
 }
@@ -1239,21 +1287,11 @@ void
 write_region_reference(const region * r, struct storage * store)
 {
   if (r) {
-    store->w_int(store, r->x);
-    store->w_int(store, r->y);
-  }
-  else {
-    store->w_int(store, SHRT_MAX);
-    store->w_int(store, SHRT_MAX);
+    store->w_int(store, r->uid);
+  } else {
+    store->w_int(store, 0);
   }
 }
-
-void
-resolve_region(variant id, void * address) {
-  region * r = findregion(id.sa[0], id.sa[1]);
-  *(region**)address = r;
-}
-
 
 struct message_list *
 r_getmessages(const struct region * r, const struct faction * viewer)

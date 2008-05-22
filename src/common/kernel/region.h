@@ -146,6 +146,7 @@ int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;
 extern direction_t reldirection(const struct region * from, const struct region * to);
 extern struct region * findregion(short x, short y);
+extern struct region * findregionbyid(unsigned int uid);
 
 extern struct attrib_type at_direction;
 extern struct attrib_type at_moveblock;
@@ -219,7 +220,6 @@ extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 extern const char * regionname(const struct region * r, const struct faction * f);
 extern const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
-extern void resolve_region(variant data, void * address);
 extern struct region * new_region(short x, short y, unsigned int uid);
 extern void remove_region(region ** rlist, region * r);
 extern void terraform(struct region * r, terrain_t terrain);
@@ -241,8 +241,6 @@ extern struct region * r_connect(const struct region *, direction_t dir);
 #else
 # define rconnect(r, dir) r_connect(r, dir)
 #endif
-
-extern unsigned int generate_region_id(void);
 
 extern void free_regions(void);
 

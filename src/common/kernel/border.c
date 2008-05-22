@@ -520,10 +520,8 @@ write_borders(struct storage * store)
         if (b->type->valid && !b->type->valid(b)) continue;
         store->w_tok(store, b->type->__name);
         store->w_int(store, b->id);
-        store->w_int(store, b->from->x);
-        store->w_int(store, b->from->y);
-        store->w_int(store, b->to->x);
-        store->w_int(store, b->to->y);
+        store->w_int(store, b->from->uid);
+        store->w_int(store, b->to->uid);
 
         if (b->type->write) b->type->write(b, store);
         store->w_brk(store);
@@ -537,7 +535,6 @@ int
 read_borders(struct storage * store)
 {
   for (;;) {
-    short fx, fy, tx, ty;
     unsigned int bid = 0;
     char zText[32];
     border * b;
@@ -547,18 +544,19 @@ read_borders(struct storage * store)
     store->r_tok_buf(store, zText, sizeof(zText));
     if (!strcmp(zText, "end")) break;
     bid = store->r_int(store);
-    fx = (short)store->r_int(store);
-    fy = (short)store->r_int(store);
-    tx = (short)store->r_int(store);
-    ty = (short)store->r_int(store);
-
-    from = findregion(fx, fy);
-    if (from==NULL) {
-      log_error(("border for unknown region %d,%d\n", fx, fy));
-    }
-    to = findregion(tx, ty);
-    if (to==NULL)  {
-      log_error(("border for unknown region %d,%d\n", tx, ty));
+    if (store->version<UIDHASH_VERSION) {
+      short fx, fy, tx, ty;
+      fx = (short)store->r_int(store);
+      fy = (short)store->r_int(store);
+      tx = (short)store->r_int(store);
+      ty = (short)store->r_int(store);
+      from = findregion(fx, fy);
+      to = findregion(tx, ty);
+    } else {
+      unsigned int fid = (unsigned int)store->r_int(store);
+      unsigned int tid = (unsigned int)store->r_int(store);
+      from = findregionbyid(fid);
+      to = findregionbyid(tid);
     }
 
     type = find_bordertype(zText);
