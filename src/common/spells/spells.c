@@ -2766,7 +2766,9 @@ b_namefirewall(const border * b, const region * r, const faction * f, int gflags
 static void
 wall_init(border * b)
 {
-  b->data.v = calloc(sizeof(wall_data), 1);
+  wall_data * fd = (wall_data*)calloc(sizeof(wall_data), 1);
+  fd->countdown = -1; /* infinite */
+  b->data.v = fd;
 }
 
 static void
@@ -2791,6 +2793,9 @@ wall_read(border * b, storage * store)
     read_unit_reference(&fd->mage, store);
   }
   fd->force = store->r_int(store);
+  if (store->version>=NOBORDERATTRIBS_VERSION) {
+    fd->countdown = store->r_int(store);
+  }
   fd->active = true;
 }
 
@@ -2800,6 +2805,17 @@ wall_write(const border * b, storage * store)
   wall_data * fd = (wall_data*)b->data.v;
   write_unit_reference(fd->mage, store);
   store->w_int(store, fd->force);
+  store->w_int(store, fd->countdown);
+}
+
+static int
+wall_age(border * b)
+{
+  wall_data * fd = (wall_data*)b->data.v;
+  if (fd->countdown>0) {
+    if (--fd->countdown==0) return 0;
+  }
+  return fd->countdown;
 }
 
 static region *
@@ -2836,7 +2852,8 @@ border_type bt_firewall = {
   b_finvisible, /* fvisible */
   b_uinvisible, /* uvisible */
   NULL,
-  wall_move
+  wall_move,
+  wall_age
 };
 
 static int
@@ -2844,7 +2861,6 @@ sp_firewall(castorder *co)
 {
   border * b;
   wall_data * fd;
-  attrib * a;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
@@ -2877,17 +2893,11 @@ sp_firewall(castorder *co)
     fd->force = (int)(force/2+0.5);
     fd->mage = mage;
     fd->active = false;
+    fd->countdown = cast_level+1;
   } else {
     fd = (wall_data*)b->data.v;
     fd->force = (int)max(fd->force, force/2+0.5);
-  }
-
-  a = a_find(b->attribs, &at_countdown);
-  if (a==NULL) {
-    a = a_add(&b->attribs, a_new(&at_countdown));
-    a->data.i = cast_level+1;
-  } else {
-    a->data.i = max(a->data.i, cast_level+1);
+    fd->countdown = max(fd->countdown, cast_level+1);
   }
 
   /* melden, 1x pro Partei */
@@ -2997,8 +3007,7 @@ sp_wisps(castorder *co)
   fd->force = (int)(force/2+0.5);
   fd->mage = mage;
   fd->active = false;
-
-  a_add(&b->attribs, a_new(&at_countdown))->data.i = cast_level;
+  fd->countdown = cast_level+1;
 
   /* melden, 1x pro Partei */
   {

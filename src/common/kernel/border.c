@@ -20,6 +20,9 @@
 #include "save.h"
 #include "terrain.h"
 #include "unit.h"
+#include "version.h"
+
+#include <spells/spells.h> /* for backward compat reading of bt_firewall */
 
 #include <util/attrib.h>
 #include <util/log.h>
@@ -33,7 +36,8 @@
 
 unsigned int nextborder = 0;
 
-border * borders[BMAXHASH];
+#define BORDER_MAXHASH 8191
+border * borders[BORDER_MAXHASH];
 border_type * bordertypes;
 
 
@@ -41,8 +45,20 @@ void
 free_borders(void)
 {
   int i;
-  for (i=0;i!=BMAXHASH;++i) {
-    borders[i] = NULL;
+  for (i=0;i!=BORDER_MAXHASH;++i) {
+    while (borders[i]) {
+      border * b = borders[i];
+      borders[i] = b->nexthash;
+      while (b) {
+        border * bf = b;
+        b = b->next;
+        assert(b==NULL || b->nexthash==NULL);
+        if (bf->type->destroy) {
+          bf->type->destroy(bf);
+        }
+        free(bf);
+      }
+    }
   }
 }
 
@@ -50,7 +66,7 @@ border *
 find_border(unsigned int id)
 {
   int key;
-  for (key=0;key!=BMAXHASH;key++) {
+  for (key=0;key!=BORDER_MAXHASH;key++) {
     border * bhash;
     for (bhash=borders[key];bhash!=NULL;bhash=bhash->nexthash) {
       border * b;
@@ -74,7 +90,7 @@ get_borders_i(const region * r1, const region * r2)
   int key = reg_hashkey(r1);
   int k2 = reg_hashkey(r2);
 
-  key = min(k2, key) % BMAXHASH;
+  key = min(k2, key) % BORDER_MAXHASH;
   bp = &borders[key];
   while (*bp) {
     border * b = *bp;
@@ -113,10 +129,6 @@ new_border(border_type * type, region * from, region * to)
 void
 erase_border(border * b)
 {
-  attrib ** ap = &b->attribs;
-
-  while (*ap) a_remove(&b->attribs, *ap);
-
   if (b->from && b->to) {
     border ** bp = get_borders_i(b->from, b->to);
     assert(*bp!=NULL || !"error: border is not registered");
@@ -136,7 +148,9 @@ erase_border(border * b)
       *bp = b->next;
     }
   }
-  if (b->type->destroy) b->type->destroy(b);
+  if (b->type->destroy) {
+    b->type->destroy(b);
+  }
   free(b);
 }
 
@@ -210,23 +224,16 @@ boolean b_rinvisible(const border * b, const region * r) { unused(r); unused(b);
 boolean b_finvisible(const border * b, const struct faction * f, const region * r) { unused(r); unused(f); unused(b); return false; }
 boolean b_uinvisible(const border * b, const unit * u) { unused(u); unused(b); return false; }
 
-/*********************/
-/*   at_countdown   */
-/*********************/
-
-static int
-a_agecountdown(attrib * a)
-{
-  a->data.i = max(a->data.i-1, 0);
-  return a->data.i;
-}
+/**************************************/
+/* at_countdown - legacy, do not use  */
+/**************************************/
 
 attrib_type at_countdown = {
   "countdown",
   DEFAULT_INIT,
   DEFAULT_FINALIZE,
-  a_agecountdown,
-  a_writeint,
+  NULL,
+  NULL,
   a_readint
 };
 
@@ -236,25 +243,13 @@ age_borders(void)
   border_list * deleted = NULL;
   int i;
 
-  for (i=0;i!=BMAXHASH;++i) {
+  for (i=0;i!=BORDER_MAXHASH;++i) {
     border * bhash = borders[i];
     for (;bhash;bhash=bhash->nexthash) {
       border * b = bhash;
       for (;b;b=b->next) {
-        attrib ** ap = &b->attribs;
-        while (*ap) {
-          attrib * a = *ap;
-          if (a->type->age && a->type->age(a)==0) {
-            if (a->type == &at_countdown) {
-              border_list * bnew = malloc(sizeof(border_list));
-              bnew->next = deleted;
-              bnew->data = b;
-              deleted = bnew;
-              break;
-            }
-            a_remove(&b->attribs, a);
-          }
-          else ap=&a->next;
+        if (b->type->age) {
+          b->type->age(b);
         }
       }
     }
@@ -517,7 +512,7 @@ void
 write_borders(struct storage * store)
 {
   int i;
-  for (i=0;i!=BMAXHASH;++i) {
+  for (i=0;i!=BORDER_MAXHASH;++i) {
     border * bhash;
     for (bhash=borders[i];bhash;bhash=bhash->nexthash) {
       border * b;
@@ -531,7 +526,6 @@ write_borders(struct storage * store)
         store->w_int(store, b->to->y);
 
         if (b->type->write) b->type->write(b, store);
-        a_write(store, b->attribs);
         store->w_brk(store);
       }
     }
@@ -549,7 +543,6 @@ read_borders(struct storage * store)
     border * b;
     region * from, * to;
     border_type * type;
-    int result;
 
     store->r_tok_buf(store, zText, sizeof(zText));
     if (!strcmp(zText, "end")) break;
@@ -587,8 +580,18 @@ read_borders(struct storage * store)
     b->id = bid;
     assert(bid<=nextborder);
     if (type->read) type->read(b, store);
-    result = a_read(store, &b->attribs);
-    if (result<0) return result;
+    if (store->version<NOBORDERATTRIBS_VERSION) {
+      attrib * a = NULL;
+      int result = a_read(store, &a);
+      while (a) {
+        if (type==&bt_firewall && a->type==&at_countdown) {
+          wall_data * fd = (wall_data *)b->data.v;
+          fd->countdown = a->data.i;
+        }
+        a_remove(&a, a);
+      }
+      if (result<0) return result;
+    }
     if (!to || !from) {
       erase_border(b);
     }

@@ -144,11 +144,6 @@ extern "C" {
   extern boolean battledebug;
 
   extern int loadplane;
-
-  extern void debug_messagetypes(FILE * out);
-  extern void free_region(region * r);
-  extern void render_init(void);
-  extern void free_borders(void);
   extern boolean opt_cr_absolute_coords;
 
 }

@@ -33,6 +33,7 @@ extern "C" {
     struct unit * mage;
     int force;
     boolean active;
+    int countdown;
   } wall_data;
 
 #ifdef __cplusplus

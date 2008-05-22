@@ -265,42 +265,6 @@ fix_age(void)
   }
 }
 
-
-static void
-fix_firewalls(void)
-{
-  region * r = regions;
-  int fixes = 0;
-
-  while (r) {
-    direction_t d;
-    for (d=0;d!=MAXDIRECTIONS;++d) {
-      region * r2 = rconnect(r, d);
-      if (r2) {
-        border * b = get_borders(r, r2);
-        while (b) {
-          if (b->type==&bt_firewall) {
-            attrib * a = a_find(b->attribs, &at_countdown);
-            if (a==NULL || a->data.i <= 0) {
-              erase_border(b);
-              log_warning(("firewall between regions %s and %s was bugged. removed.\n",
-                regionname(r, NULL), regionname(r2, NULL)));
-              b = get_borders(r, r2);
-              ++fixes;
-            } else {
-              b = b->next;
-            }
-          } else {
-            b = b->next;
-          }
-        }
-      }
-    }
-    r = r->next;
-  }
-  log_printf("fixed %d firewalls.\n", fixes);
-}
-
 static void
 fix_otherfaction(void)
 {
@@ -613,19 +577,20 @@ fix_astralplane(void)
 
 extern border *borders[];
 
+#define BORDER_MAXHASH 8191
 static void
 fix_road_borders(void)
 {
 #define MAXDEL 10000
   border *deleted[MAXDEL];
   int hash;
-  int i = 0;
+  int fixes = 0;
 
-  for (hash=0; hash<BMAXHASH && i!=MAXDEL; hash++) {
+  for (hash=0; hash<BORDER_MAXHASH && fixes!=MAXDEL; hash++) {
     border * blist;
-    for (blist=borders[hash];blist && i!=MAXDEL;blist=blist->nexthash) {
+    for (blist=borders[hash];blist && fixes!=MAXDEL;blist=blist->nexthash) {
       border * b;
-      for (b=blist;b && i!=MAXDEL;b=b->next) {
+      for (b=blist;b && fixes!=MAXDEL;b=b->next) {
         if (b->type == &bt_road) {
           short x1, x2, y1, y2;
           region *r1, *r2;
@@ -642,16 +607,17 @@ fix_road_borders(void)
             || r1->terrain->max_road<=0
             || r2->terrain->max_road<=0)
           {
-            deleted[i++] = b;
+            deleted[fixes++] = b;
           }
         }
       }
     }
   }
 
-  while (i>0) {
-    i--;
-    erase_border(deleted[i]);
+  log_printf("fixed %d roads.\n", fixes);
+  while (fixes>0) {
+    fixes--;
+    erase_border(deleted[fixes]);
   }
 }
 
@@ -931,7 +897,6 @@ korrektur(void)
   do_once("atrx", &fix_attribflags);
   do_once("asfi", &fix_astral_firewalls);
   fix_astralplane();
-  fix_firewalls();
   fix_toads();
   /* fix_heroes(); */
   verify_owners(false);

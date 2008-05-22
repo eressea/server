@@ -1410,6 +1410,7 @@ readgame(const char * filename, int mode, int backup)
   }
   a_read(store, &global.attribs);
   global.data_turn = turn = store->r_int(store);
+  rng_init(turn);
   store->r_int(store); /* max_unique_id = */ 
   nextborder = store->r_int(store);
 

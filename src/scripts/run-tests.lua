@@ -9,10 +9,59 @@ function test_locales()
 	return 0
 end
 
+function loadscript(name)
+  local script = scriptpath .. "/" .. name
+  print("- loading " .. script)
+  if pcall(dofile, script)==0 then
+    print("Could not load " .. script)
+  end
+end
+
+function run_scripts()
+  scripts = { 
+    "spells.lua",
+    "extensions.lua",
+    "familiars.lua",
+  }
+  for index, value in pairs(scripts) do
+    loadscript(value)
+  end
+end
 --test_locales()
 
+function run_turn()
+	plan_monsters()
+	process_orders()
+	spawn_dragons()
+	spawn_undead()
+	spawn_braineaters(0.25)
+	autoseed(basepath .. "/newfactions", false)
+end
+
+
+function test_free()
+	read_game("571.dat", "binary")
+	read_orders("orders.571")
+	run_turn()
+	free_game()
+	read_game("570.dat", "binary")
+	read_orders("orders.570")
+	run_turn()
+	free_game()
+end
+
+loadscript("default.lua")
+run_scripts()
+-- go
 local now = os.clock()
-read_game("572.dat", "binary")
+-- test_free()
+read_game("571.dat", "binary")
+write_game("571.txt.1", "text")
+free_game()
+read_game("570.dat", "binary")
+free_game()
+read_game("571.dat", "binary")
+write_game("571.txt.2", "text")
 local elapsed = os.clock() - now
 print(elapsed)
 -- text: 50.574

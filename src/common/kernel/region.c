@@ -959,6 +959,8 @@ free_regions(void)
     runhash(r);
     free_region(r);
   }
+  max_index = 0;
+  last = NULL;
 }
 
 /** creates a name for a region

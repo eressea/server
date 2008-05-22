@@ -679,6 +679,11 @@ stripfaction (faction * f)
     free(bm);
   }
 
+  while (f->groups) {
+    group * g = f->groups;
+    f->groups = g->next;
+    free_group(g);
+  }
   freelist(f->allies);
 
   free(f->email);
@@ -687,7 +692,9 @@ stripfaction (faction * f)
   free(f->override);
   free(f->name);
 
-  while (f->attribs) a_remove (&f->attribs, f->attribs);
+  while (f->attribs) {
+    a_remove (&f->attribs, f->attribs);
+  }
 
   i_freeall(&f->items);
 
@@ -3005,6 +3012,7 @@ free_gamedata(void)
 {
   free_units();
   free_regions();
+  free_borders();
 
   while (factions) {
     faction * f = factions;
@@ -3018,5 +3026,9 @@ free_gamedata(void)
     planes = planes->next;
     free(pl->name);
     free(pl);
+  }
+
+  while (global.attribs) {
+    a_remove(&global.attribs, global.attribs);
   }
 }

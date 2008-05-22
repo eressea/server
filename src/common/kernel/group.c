@@ -124,13 +124,19 @@ at_group = { /* attribute for units assigned to a group */
 void
 free_group(group * g)
 {
-	while (g->allies) {
-		ally * a = g->allies;
-		g->allies = a->next;
-		free(a);
-	}
-	free(g->name);
-	free(g);
+  int index = g->gid % GMAXHASH;
+  group ** g_ptr = ghash+index;
+  while (*g_ptr && (*g_ptr)->gid!=g->gid) g_ptr = &(*g_ptr)->nexthash;
+  assert(*g_ptr==g);
+  *g_ptr = g->nexthash;
+
+  while (g->allies) {
+    ally * a = g->allies;
+    g->allies = a->next;
+    free(a);
+  }
+  free(g->name);
+  free(g);
 }
 
 void

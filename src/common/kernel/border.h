@@ -21,8 +21,6 @@
 extern "C" {
 #endif
 
-#define BMAXHASH 8191
-
   extern unsigned int nextborder;
 
   typedef struct border {
@@ -30,7 +28,6 @@ extern "C" {
     struct border * next; /* next border between these regions */
     struct border * nexthash; /* next border between these regions */
     struct region * from, * to; /* borders can be directed edges */
-    struct attrib * attribs;
     variant data;
     unsigned int id; /* unique id */
   } border;
@@ -84,12 +81,15 @@ extern "C" {
     */
     struct region * (*move)(const border *, struct unit * u, struct region * from, struct region * to, boolean routing);
     /* executed when the units traverses this border */
+    int (*age)(struct border *);
+    /* return 0 if border needs to be removed. >0 if still aging, <0 if not aging */
     struct border_type * next; /* for internal use only */
   } border_type;
 
 
   extern border * find_border(unsigned int id);
   void resolve_borderid(variant data, void * addr);
+  extern void free_borders(void);
 
   extern border * get_borders(const struct region * r1, const struct region * r2);
   /* returns the list of borders between r1 and r2 or r2 and r1 */
