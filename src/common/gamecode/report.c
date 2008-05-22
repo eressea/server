@@ -1921,14 +1921,14 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   /* static variables can cope with writing for different turns */
   static int thisseason = -1;
   static int nextseason = -1;
-  static int thisturn = -1;
-  if (thisturn!=turn) {
+  static int gamecookie = -1;
+  if (gamecookie!=global.cookie) {
     gamedate date;
     get_gamedate(turn+1, &date);
     thisseason = date.season;
     get_gamedate(turn+2, &date);
     nextseason = date.season;
-    thisturn = turn;
+    gamecookie = global.cookie;
   }
 
   if (F==NULL) {

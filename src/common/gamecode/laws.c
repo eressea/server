@@ -3746,15 +3746,6 @@ static void maintain_buildings_1(region * r) { maintain_buildings(r, false); }
 static void maintain_buildings_2(region * r) { maintain_buildings(r,true); }
 static void reset_moved(unit * u) { freset(u, UFL_MOVED); }
 
-static void reset_rng(void) {
-  rng_init(turn?turn:(int)time(0));
-}
-
-static void reset_rng_region(region * r)
-{
-  rng_init(r->index+turn);
-}
-
 /** warn about passwords that are not US ASCII.
  * even though passwords are technically UTF8 strings, the server receives
  * them as part of the Subject of an email when reports are requested.
@@ -3851,7 +3842,6 @@ init_processor(void)
   }
 
   p+=10; /* after combat, reset rng */
-  add_proc_global(p, &reset_rng, NULL);
   add_proc_region(p, &do_siege, "Belagern");
 
   p+=10; /* can't allow reserve before siege (weapons) */
@@ -3860,7 +3850,6 @@ init_processor(void)
   add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
 
   p+=10; /* rest rng again before economics */
-  add_proc_global(p, &reset_rng, NULL);
   add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
 
   p+=10;
@@ -3878,7 +3867,6 @@ init_processor(void)
     add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER|PROC_LONGORDER, "Lehren");
   }
   p+=10;
-  add_proc_region(p, &reset_rng_region, NULL);
   add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER|PROC_LONGORDER, "Lernen");
 
   p+=10;
@@ -3905,7 +3893,6 @@ init_processor(void)
   p+=10;
   add_proc_global(p, &encounters, "Zufallsbegegnungen");
   p+=10;
-  add_proc_global(p, &reset_rng, NULL);
   add_proc_unit(p, &monsters_kill_peasants, "Monster fressen und vertreiben Bauern");
 
   p+=10;

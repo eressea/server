@@ -67,7 +67,6 @@ lua_planmonsters(void)
   faction * f = get_monsters();
 
   if (f==NULL) return;
-  rng_init(turn?turn:(int)time(0));
   plan_monsters();
   for (u=f->units;u;u=u->nextF) {
     call_script(u);
@@ -207,7 +206,6 @@ readshortpwds()
 static int
 process_orders(void)
 {
-  rng_init(turn?turn:(int)time(0));
 #ifdef SHORTPWDS
   readshortpwds("passwords");
 #endif

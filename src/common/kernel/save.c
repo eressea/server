@@ -1376,7 +1376,7 @@ readgame(const char * filename, int mode, int backup)
   const struct building_type * bt_lighthouse = bt_find("lighthouse");
   storage my_store = (mode==IO_BINARY)?binary_store:text_store;
   storage * store = &my_store;
-
+  
   sprintf(path, "%s/%s", datapath(), filename);
   log_printf("- reading game data from %s\n", filename);
   if (backup) create_backup(path);
@@ -1411,6 +1411,7 @@ readgame(const char * filename, int mode, int backup)
   a_read(store, &global.attribs);
   global.data_turn = turn = store->r_int(store);
   rng_init(turn);
+  ++global.cookie;
   store->r_int(store); /* max_unique_id = */ 
   nextborder = store->r_int(store);
 

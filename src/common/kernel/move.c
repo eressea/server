@@ -880,14 +880,14 @@ is_guarded(region * r, unit * u, unsigned int mask)
   unit *u2 = NULL;
   int i;
   static unit * guardcache[MAXGUARDCACHE], * lastguard; /* STATIC_XCALL: used across calls */
-  static int thisturn = -1;
-  if (thisturn!=turn) {
-    if (thisturn>=0) {
+  static int gamecookie = -1;
+  if (gamecookie!=global.cookie) {
+    if (gamecookie>=0) {
       /* clear the previous turn's cache */
       memset(guardcache, 0, sizeof(guardcache));
       lastguard = NULL;
     }
-    thisturn = turn;
+    gamecookie = global.cookie;
   }
 
   if (!fval(r, RF_GUARDED)) {
@@ -1649,13 +1649,13 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     if (!flying_ship(sh)) {
       int stormchance;
       static int stormyness;
-      static int thisturn = -1;
+      static int gamecookie = -1;
 
-      if (thisturn != turn) {
+      if (gamecookie != global.cookie) {
         gamedate date;
         get_gamedate(turn, &date);
         stormyness = storms[date.month] * 5;
-        thisturn = turn;
+        gamecookie = global.cookie;
       }
 
       /* storms should be the first thing we do. */

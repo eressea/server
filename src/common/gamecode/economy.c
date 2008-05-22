@@ -2544,14 +2544,14 @@ breedtrees(region *r, unit *u, int raw)
 {
   int n, i, skill, planted = 0;
   const resource_type * rtype;
-  static int thisturn = -1;
+  static int gamecookie = -1;
   static int current_season;
   
-  if (thisturn!=turn) {
+  if (gamecookie!=global.cookie) {
     gamedate date;
     get_gamedate(turn, &date);
     current_season = date.season;
-    thisturn = turn;
+    gamecookie = global.cookie;
   }
   
   /* Bäume züchten geht nur im Frühling */

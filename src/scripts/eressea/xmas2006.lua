@@ -51,4 +51,4 @@ function xmas2006()
   end
 end
 
-xmas2006()
+-- xmas2006()

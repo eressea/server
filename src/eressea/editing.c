@@ -24,7 +24,6 @@ seed_players(const char * filename, boolean new_island)
 {
   newfaction * players = read_newfactions(filename);
   if (players!=NULL) {
-    rng_init(players->subscription);
     while (players) {
       int n = listlen(players);
       int k = (n+ISLANDSIZE-1)/ISLANDSIZE;

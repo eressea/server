@@ -92,7 +92,7 @@
 /* exported variables */
 region  *regions;
 faction *factions;
-settings global;
+settings global = { 0 };
 FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
@@ -2502,10 +2502,10 @@ lifestyle(const unit * u)
 {
   int need;
   static plane * astralspace;
-  static int thisturn = -1;
-  if (thisturn!=turn) {
+  static int gamecookie = -1;
+  if (gamecookie!=global.cookie) {
     astralspace = getplanebyname("Astralraum");
-    thisturn = turn;
+    gamecookie = global.cookie;
   }
 
   if (is_monsters(u->faction)) return 0;
@@ -2972,7 +2972,6 @@ kernel_init(void)
   translation_init();
 
   if (!turn) turn = lastturn();
-  rng_init(turn?turn:(int)time(0));
   if (sqlpatch) {
     sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
     sql_init(zBuffer);
@@ -3031,4 +3030,5 @@ free_gamedata(void)
   while (global.attribs) {
     a_remove(&global.attribs, global.attribs);
   }
+  ++global.cookie; /* readgame() already does this, but sjust in case */
 }

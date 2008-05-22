@@ -369,11 +369,12 @@ extern const struct race * new_race[];
 
 /* globale settings des Spieles */
 typedef struct settings {
-  const char    *gamename;
-	boolean				 unitsperalliance;
-  unsigned int   maxunits;
+  int cookie;
+  const char *gamename;
+  boolean unitsperalliance;
+  unsigned int maxunits;
   struct attrib *attribs;
-  unsigned int   data_turn;
+  unsigned int data_turn;
   boolean disabled[MAXKEYWORDS];
   struct param * parameters;
   void * vm_state;

@@ -75,6 +75,7 @@
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/resolve.h>
+#include <util/rng.h>
 #include <util/sql.h>
 #include <util/vset.h>
 
@@ -883,6 +884,7 @@ fix_groups(void)
 void
 korrektur(void)
 {
+  int i = rng_int();
 #if GLOBAL_WARMING
   gamedate date;
   get_gamedate(turn, &date);

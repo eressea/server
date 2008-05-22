@@ -164,10 +164,10 @@ plane *
 get_astralplane(void)
 {
   static plane * astralspace;
-  static int thisturn = -1;
-  if (thisturn!=turn) {
+  static int gamecookie = -1;
+  if (gamecookie!=global.cookie) {
     astralspace = getplanebyname("Astralraum");
-    thisturn = turn;
+    gamecookie = global.cookie;
   }
 
   if (astralspace==NULL) {

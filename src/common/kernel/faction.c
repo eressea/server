@@ -51,10 +51,10 @@ faction *
 get_monsters(void)
 {
   static faction * monsters;
-  static int thisturn = -1;
-  if (thisturn!=turn) {
+  static int gamecookie = -1;
+  if (gamecookie!=global.cookie) {
     monsters = NULL;
-    thisturn = turn;
+    gamecookie = global.cookie;
   }
 
   if (!monsters) {

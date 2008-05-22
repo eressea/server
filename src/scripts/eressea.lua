@@ -26,7 +26,7 @@ function change_locales()
   end
 end
 
-function run_scripts()
+function load_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
@@ -35,8 +35,8 @@ function run_scripts()
     "eressea/wedding-jadee.lua", 
     "eressea/ponnuki.lua",
     "eressea/items.lua",
-    "eressea/xmas2004.lua",
     "eressea/10years.lua",
+    "eressea/xmas2004.lua",
     "eressea/xmas2005.lua",
     "eressea/xmas2006.lua",
     "eressea/embassy.lua",
@@ -61,7 +61,7 @@ function process(orders)
   init_summary()
 
   -- kill multi-players (external script)
-  loadscript("eressea/multis.lua")
+  -- loadscript("eressea/multis.lua")
 
   -- run the turn:
   set_encoding("utf8")
@@ -69,7 +69,6 @@ function process(orders)
     print("could not read " .. orders)
     return -1
   end
-  run_scripts()
 
   plan_monsters()
 
@@ -114,6 +113,7 @@ end
 --
 
 -- orderfile: contains the name of the orders.
+load_scripts()
 if orderfile==nil then
   print "you must specify an orderfile"
 else
