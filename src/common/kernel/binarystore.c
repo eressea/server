@@ -190,7 +190,7 @@ bin_r_str_buf(struct storage * store, char * result, size_t size)
   }
 }
 
-int
+static int
 bin_open(struct storage * store, const char * filename, int mode)
 {
   const char * modes[] = { 0, "rb", "wb", "ab" };
@@ -216,7 +216,7 @@ bin_open(struct storage * store, const char * filename, int mode)
   return (F==NULL);
 }
 
-int
+static int
 bin_close(struct storage * store)
 {
   return fclose(file(store));

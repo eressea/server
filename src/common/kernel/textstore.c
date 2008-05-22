@@ -111,7 +111,7 @@ txt_r_tok_buf(struct storage * store, char * result, size_t size)
   }
 }
 
-int
+static int
 txt_w_str(struct storage * store, const char * str)
 {
   int result = fwritestr((FILE *)store->userdata, str);
@@ -119,7 +119,7 @@ txt_w_str(struct storage * store, const char * str)
   return result+1;
 }
 
-char *
+static char *
 txt_r_str(struct storage * store)
 {
   char buffer[DISPLAYSIZE];
@@ -128,13 +128,13 @@ txt_r_str(struct storage * store)
   return strdup(buffer);
 }
 
-void
+static void
 txt_r_str_buf(struct storage * store, char * result, size_t size)
 {
   freadstr((FILE *)store->userdata, store->encoding, result, size);
 }
 
-int
+static int
 txt_open(struct storage * store, const char * filename, int mode)
 {
   const char * modes[] = { 0, "rt", "wt", "at" };
@@ -167,7 +167,7 @@ txt_open(struct storage * store, const char * filename, int mode)
   return (F==NULL);
 }
 
-int
+static int
 txt_close(struct storage * store)
 {
   return fclose((FILE *)store->userdata);

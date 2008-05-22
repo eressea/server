@@ -93,6 +93,11 @@ rule iconv
   }
 }
 
+rule zlib
+{
+  LINKLIBS on $(<) += -lz ;
+}
+
 rule luabind
 {
   LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib ;
