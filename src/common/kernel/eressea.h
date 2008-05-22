@@ -410,7 +410,7 @@ extern int entertainmoney(const struct region * r);
 extern void plagues(struct region * r, boolean ismagic);
 
 extern struct attrib_type at_guard;
-
+extern void free_gamedata(void);
 #if 1 /* disable to count all units */
 # define count_unit(u) playerrace(u->race)
 #else

@@ -233,6 +233,7 @@ bind_gamecode(lua_State * L)
   module(L)[
     def("read_game", &read_game),
     def("write_game", &write_game),
+    def("free_game", &free_gamedata),
 
     def("get_encoding", &get_encoding),
     def("set_encoding", &set_encoding),

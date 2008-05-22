@@ -2493,16 +2493,17 @@ besieged(const unit * u)
 int
 lifestyle(const unit * u)
 {
-  static plane * astralspace = NULL;
   int need;
+  static plane * astralspace;
+  static int thisturn = -1;
+  if (thisturn!=turn) {
+    astralspace = getplanebyname("Astralraum");
+    thisturn = turn;
+  }
 
   if (is_monsters(u->faction)) return 0;
 
   need = maintenance_cost(u);
-
-  if (!astralspace) {
-    astralspace = getplanebyname("Astralraum");
-  }
 
   if(u->region->planep && fval(u->region->planep, PFL_NOFEED))
     return 0;
@@ -2993,4 +2994,29 @@ entertainmoney(const region *r)
   }
 
   return n;
+}
+
+/** releases all memory associated with the game state.
+ * call this function before calling read_game() to load a new game
+ * if you have a previously loaded state in memory.
+ */
+void
+free_gamedata(void)
+{
+  free_units();
+  free_regions();
+
+  while (factions) {
+    faction * f = factions;
+    factions = f->next;
+    stripfaction(f);
+    free(f);
+  }
+
+  while (planes) {
+    plane * pl = planes;
+    planes = planes->next;
+    free(pl->name);
+    free(pl);
+  }
 }

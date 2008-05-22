@@ -57,7 +57,7 @@ extern "C" {
 
 static char * strlwc(const char * s)
 {
-    static char l[ASCIILINESZ+1];
+    static char l[ASCIILINESZ+1]; /* STATIC_RETURN: used for return, not across calls */
     int i ;
 
     if (s==NULL) return NULL ;
@@ -109,7 +109,7 @@ static char * strskp(char * s)
 
 static char * strcrop(char * s)
 {
-    static char l[ASCIILINESZ+1];
+    static char l[ASCIILINESZ+1]; /* STATIC_RETURN: used for return, not across calls */
     char * last ;
 
     if (s==NULL) return NULL ;

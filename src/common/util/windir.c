@@ -22,7 +22,7 @@
 DIR *
 opendir(const char *name)
 {
-	static DIR direct;
+	static DIR direct; /* STATIC_RESULT: used for return, not across calls */
 
 	direct.first = 1;
 	_searchenv(name, "ERESSEA_PATH", direct.name);
@@ -34,8 +34,8 @@ opendir(const char *name)
 struct dirent *
 readdir(DIR * thedir)
 {
-	static struct _finddata_t ft;
-	static struct dirent de;
+	static struct _finddata_t ft; /* STATIC_RESULT: used for return, not across calls */
+	static struct dirent de; /* STATIC_RESULT: used for return, not across calls */
 	char where[_MAX_PATH];
 
 	strcat(strcpy(where, thedir->name), "/*");

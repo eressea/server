@@ -55,14 +55,14 @@ atoi36(const char * str)
 const char*
 itoab(int i, int base)
 {
-  static char **as = NULL;
+  static char **as = NULL; /* STATIC_RETURN: used for return, not across calls */
   char * s, * dst;
-  static int index = 0;
+  static int index = 0; /* STATIC_XCALL: used across calls */
   int neg = 0;
 
   if (!as) {
     int j;
-    char * x = (char*)calloc(sizeof(char), 8*4);
+    char * x = (char*)calloc(sizeof(char), 8*4); /* STATIC_LEAK: malloc in static variable */
     as = (char **)calloc(sizeof(char*), 4);
     for (j=0;j!=4;++j) as[j] = x+j*8;
   }

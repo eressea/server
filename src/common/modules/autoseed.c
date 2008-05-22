@@ -414,6 +414,37 @@ frame_regions(int age, terrain_t terrain)
     }
   }
 }
+static void
+prepare_starting_region(region * r)
+{
+  int n, t;
+  double p;
+
+  assert(r->land);
+
+  /* population between 30% and 60% of max */
+  p = rng_double();
+  n = (int)(r->terrain->size * (0.3 + p*0.3));
+  rsetpeasants(r, n);
+
+  /* trees: don't squash the peasants, and at least 5% should be forrest */
+  t = (rtrees(r, 2) + rtrees(r, 1)/2) * TREESIZE;
+  if (t < r->terrain->size/20 || t+n > r->terrain->size) {
+    double p2 = 0.05 + rng_double()*(1.0-p-0.05);
+    int maxtrees = (int)(r->terrain->size/1.25/TREESIZE); /* 1.25 = each young tree will take 1/2 the space of old trees */
+    int trees = (int)(p2 * maxtrees);
+
+    rsettrees(r, 2, trees);
+    rsettrees(r, 1, trees/2);
+    rsettrees(r, 0, trees/4);
+  }
+
+  /* horses: between 1% and 2% */
+  p = rng_double();
+  rsethorses(r, (int)(r->terrain->size * (0.01 + p*0.01)));
+
+  fix_demand(r);
+}
 
 int
 autoseed(newfaction ** players, int nsize, int max_agediff)
@@ -545,28 +576,14 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       newfaction ** nfp, * nextf = *players;
       faction * f;
       unit * u;
-      int n;
 
       isize += REGIONS_PER_FACTION;
       terraform(r, preferred_terrain(nextf->race));
-      n = rhorses(r);
-      if (n<r->terrain->size/200) {
-        n = r->terrain->size/200;
-        rsethorses(r, n);
-      }
-      n = rtrees(r, 2);
-      if (n<r->terrain->size/100) {
-        n = r->terrain->size/100;
-        rsettrees(r, 2, n);
-        rsettrees(r, 2, n/4);
-        rsettrees(r, 2, n/2);
-      }
-      n = rhorses(r);
+      prepare_starting_region(r);
       ++tsize;
       assert(r->land && r->units==0);
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                                   nextf->lang, nextf->subscription));
-      fix_demand(r);
       f = u->faction;
       fset(f, FFL_ISNEW);
 			f->alliance = nextf->allies;

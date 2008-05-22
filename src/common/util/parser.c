@@ -124,7 +124,7 @@ skip_token(void)
 const char *
 parse_token(const char ** str)
 {
-  static char lbuf[MAXTOKENSIZE];
+  static char lbuf[MAXTOKENSIZE]; /* STATIC_RESULT: used for return, not across calls */
   char * cursor = lbuf;
   char quotechar = 0;
   boolean escape = false;

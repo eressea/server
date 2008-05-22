@@ -50,7 +50,12 @@
 faction *
 get_monsters(void)
 {
-  static faction * monsters = NULL;
+  static faction * monsters;
+  static int thisturn = -1;
+  if (thisturn!=turn) {
+    monsters = NULL;
+    thisturn = turn;
+  }
 
   if (!monsters) {
     faction * f;

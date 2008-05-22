@@ -140,9 +140,9 @@ log_close(void)
 static int
 check_dupe(const char * format, const char * type) 
 {
-  static const char * last_type;
-  static char last_message[32];
-  static int dupes = 0;
+  static const char * last_type; /* STATIC_XCALL: used across calls */
+  static char last_message[32]; /* STATIC_XCALL: used across calls */
+  static int dupes = 0; /* STATIC_XCALL: used across calls */
   if (strncmp(last_message, format, sizeof(last_message))==0) {
     ++dupes;
     return 1;

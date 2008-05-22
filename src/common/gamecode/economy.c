@@ -439,11 +439,11 @@ expandrecruit(region * r, request * recruitorders)
 static void
 recruit(unit * u, struct order * ord, request ** recruitorders)
 {
-	int n;
+  int n;
   region * r = u->region;
-	plane * pl;
-	request *o;
-	int recruitcost;
+  plane * pl;
+  request *o;
+  int recruitcost;
   const faction * f = u->faction;
   const struct race * rc = f->race;
 
@@ -457,45 +457,47 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     if (rc==NULL) rc = f->race;
   }
 
-#if GUARD_DISABLES_RECRUIT == 1
-	/* this is a very special case because the recruiting unit may be empty
-	* at this point and we have to look at the creating unit instead. This
-	* is done in cansee, which is called indirectly by is_guarded(). */
-	if (is_guarded(r, u, GUARD_RECRUIT)) {
+#if GUARD_DISABLES_RECRUIT
+  /* this is a very special case because the recruiting unit may be empty
+  * at this point and we have to look at the creating unit instead. This
+  * is done in cansee, which is called indirectly by is_guarded(). */
+  if (is_guarded(r, u, GUARD_RECRUIT)) {
     cmistake(u, ord, 70, MSG_EVENT);
-		return;
-	}
+    return;
+  }
 #endif
 
-	if (rc == new_race[RC_INSECT]) {
-		if (get_gamedate(turn, 0)->season == 0 && rterrain(r) != T_DESERT) {
+  if (rc == new_race[RC_INSECT]) {
+    gamedate date;
+    get_gamedate(turn, &date);
+    if (date.season == 0 && rterrain(r) != T_DESERT) {
 #ifdef INSECT_POTION
-			boolean usepotion = false;
-			unit *u2;
+      boolean usepotion = false;
+      unit *u2;
 
-			for (u2 = r->units; u2; u2 = u2->next)
-				if (fval(u2, UFL_WARMTH)) {
-					usepotion = true;
-					break;
-				}
-				if (!usepotion)
+      for (u2 = r->units; u2; u2 = u2->next)
+        if (fval(u2, UFL_WARMTH)) {
+          usepotion = true;
+          break;
+        }
+        if (!usepotion)
 #endif
-				{
-        cmistake(u, ord, 98, MSG_EVENT);
-					return;
-				}
-		}
-		/* in Gletschern, Eisbergen gar nicht rekrutieren */
-		if (r_insectstalled(r)) {
+        {
+          cmistake(u, ord, 98, MSG_EVENT);
+          return;
+        }
+    }
+    /* in Gletschern, Eisbergen gar nicht rekrutieren */
+    if (r_insectstalled(r)) {
       cmistake(u, ord, 97, MSG_EVENT);
-			return;
-		}
-	}
-	if (is_cursed(r->attribs, C_RIOT, 0)) {
-		/* Die Region befindet sich in Aufruhr */
+      return;
+    }
+  }
+  if (is_cursed(r->attribs, C_RIOT, 0)) {
+    /* Die Region befindet sich in Aufruhr */
     cmistake(u, ord, 237, MSG_EVENT);
-		return;
-	}
+    return;
+  }
 
   if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
     if (rc != new_race[RC_URUK])
@@ -504,16 +506,16 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
       return;
     }
   }
-  
+
   recruitcost = rc->recruitcost;
   if (recruitcost) {
     pl = getplane(r);
     if (pl && fval(pl, PFL_NORECRUITS)) {
       ADDMSG(&u->faction->msgs,
-             msg_feedback(u, ord, "error_pflnorecruit", ""));
+        msg_feedback(u, ord, "error_pflnorecruit", ""));
       return;
     }
-    
+
     if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost) < recruitcost) {
       cmistake(u, ord, 142, MSG_EVENT);
       return;
@@ -524,7 +526,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     return;
   }
   /* snotlinge sollten hiermit bereits abgefangen werden, die
-   * parteirasse ist uruk oder ork*/
+  * parteirasse ist uruk oder ork*/
   if (u->race != rc) {
     if (u->number != 0) {
       cmistake(u, ord, 139, MSG_EVENT);
@@ -532,16 +534,16 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     }
     else u->race = rc;
   }
-  
+
   if (has_skill(u, SK_MAGIC)) {
     /* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
-     * grundsätzlich nur alleine! */
+    * grundsätzlich nur alleine! */
     cmistake(u, ord, 158, MSG_EVENT);
     return;
   }
   if (has_skill(u, SK_ALCHEMY)
-      && count_skill(u->faction, SK_ALCHEMY) + n >
-      max_skill(u->faction, SK_ALCHEMY))
+    && count_skill(u->faction, SK_ALCHEMY) + n >
+    max_skill(u->faction, SK_ALCHEMY))
   {
     cmistake(u, ord, 156, MSG_EVENT);
     return;
@@ -550,9 +552,9 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     int pooled = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost * n);
     n = min(n, pooled / recruitcost);
   }
-  
+
   u->wants = n;
-  
+
   if (!n) {
     cmistake(u, ord, 142, MSG_EVENT);
     return;
@@ -2542,9 +2544,15 @@ breedtrees(region *r, unit *u, int raw)
 {
   int n, i, skill, planted = 0;
   const resource_type * rtype;
-  static int current_season = -1;
+  static int thisturn = -1;
+  static int current_season;
   
-  if (current_season<0) current_season = get_gamedate(turn, NULL)->season;
+  if (thisturn!=turn) {
+    gamedate date;
+    get_gamedate(turn, &date);
+    current_season = date.season;
+    thisturn = turn;
+  }
   
   /* Bäume züchten geht nur im Frühling */
   if (current_season != SEASON_SPRING){

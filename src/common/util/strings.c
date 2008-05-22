@@ -37,7 +37,7 @@ hashstring(const char* s)
 INLINE_FUNCTION const char *
 escape_string(const char * str, char * buffer, unsigned int len)
 {
-	static char s_buffer[4096];
+	static char s_buffer[4096]; /* STATIC_RESULT: used for return, not across calls */
 	const char * p = str;
 	char * o;
 	if (buffer==NULL) {

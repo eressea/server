@@ -36,7 +36,7 @@
 double
 normalvariate(double mu, double sigma)
 {
-  static double NV_MAGICCONST = 1.7155277699214135;
+  static const double NV_MAGICCONST = 1.7155277699214135; /* STATIC_CONST: a constant */
   double z;
   for (;;) {
     double u1 = rng_double();

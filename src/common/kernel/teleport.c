@@ -163,16 +163,19 @@ get_normalplane(void)
 plane * 
 get_astralplane(void)
 {
-  static plane * astral_plane = NULL;
-  if (astral_plane==NULL) {
-    astral_plane = getplanebyid(1);
+  static plane * astralspace;
+  static int thisturn = -1;
+  if (thisturn!=turn) {
+    astralspace = getplanebyname("Astralraum");
+    thisturn = turn;
   }
-  if (astral_plane==NULL) {
-    astral_plane = create_new_plane(1, "Astralraum",
+
+  if (astralspace==NULL) {
+    astralspace = create_new_plane(1, "Astralraum",
       TE_CENTER_X-500, TE_CENTER_X+500,
       TE_CENTER_Y-500, TE_CENTER_Y+500, 0);
   }
-  return astral_plane;
+  return astralspace;
 }
 
 void

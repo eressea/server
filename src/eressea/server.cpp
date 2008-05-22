@@ -129,9 +129,6 @@
 #if defined(_MSC_VER)
 # include <crtdbg.h>
 #endif
-#if defined(USE_DMALLOC)
-# define CLEANUP_CODE
-#endif
 
 /**
 ** global variables we are importing from other modules
@@ -322,42 +319,24 @@ lua_done(lua_State * luaState)
   lua_close(luaState);
 }
 
-#ifndef CLEANUP_CODE
-# define CLEANUP_CODE
-#endif
-#ifdef CLEANUP_CODE
 static void
 game_done(void)
 {
+#ifdef CLEANUP_CODE
   /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
    * zum Debugging interessant, wenn man Leak Detection hat, und nach
    * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
    * wird (temporäre Hilsstrukturen) */
 
-  free_units();
-  free_regions();
-
-  while (factions) {
-    faction * f = factions;
-    factions = f->next;
-    stripfaction(f);
-    free(f);
-  }
-
-  while (planes) {
-    plane * pl = planes;
-    planes = planes->next;
-    free(pl->name);
-    free(pl);
-  }
+  free_game();
 
   creport_cleanup();
 #ifdef REPORT_FORMAT_NR
   report_cleanup();
 #endif
   calendar_cleanup();
-}
 #endif
+}
 
 #define CRTDBG
 #ifdef CRTDBG
@@ -657,9 +636,7 @@ main(int argc, char *argv[])
 #ifdef MSPACES
   malloc_stats();
 #endif
-#ifdef CLEANUP_CODE
   game_done();
-#endif
   kernel_done();
   lua_done(luaState);
   log_close();

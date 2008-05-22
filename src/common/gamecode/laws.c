@@ -780,8 +780,11 @@ demographics(void)
   static int current_season = -1;
 
   if (current_season<0) {
-    current_season = get_gamedate(turn, NULL)->season;
-    last_weeks_season = get_gamedate(turn-1, NULL)->season;
+    gamedate date;
+    get_gamedate(turn, &date);
+    current_season = date.season;
+    get_gamedate(turn-1, &date);
+    last_weeks_season = date.season;
   }
 
   for (r = regions; r; r = r->next) {

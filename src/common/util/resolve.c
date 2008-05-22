@@ -74,5 +74,6 @@ resolve(void)
     ur->resolve(ur->data, ur->ptrptr);
     ++ur;
   }
-  ur_list = ur_begin = ur_current;
+  free(ur_list);
+  ur_list = NULL;
 }

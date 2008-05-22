@@ -143,7 +143,7 @@ regions_in_range(struct region * start, int maxdist, boolean (*allowed)(const st
 static region **
 internal_path_find(region *start, const region *target, int maxlen, boolean (*allowed)(const region*, const region*))
 {
-	static region * path[MAXDEPTH+2];
+	static region * path[MAXDEPTH+2]; /* STATIC_RETURN: used for return, not across calls */
 	direction_t d;
 	node * root = new_node(start, 0, NULL);
 	node ** end = &root->next;

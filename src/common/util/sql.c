@@ -68,8 +68,8 @@ sqlquote(const char * str)
 {
 #define BUFFERS 4
 #define BUFSIZE 1024
-	static char sqlstring[BUFSIZE*BUFFERS];
-	static int index = 0;
+	static char sqlstring[BUFSIZE*BUFFERS]; /* STATIC_RESULT: used for return, not across calls */
+	static int index = 0; /* STATIC_XCALL: used across calls */
 	char * start = sqlstring+index*BUFSIZE;
 	char * o = start;
 	const char * i = str;

@@ -1,6 +1,8 @@
 #include <config.h>
 #include "calendar.h"
 
+#include <assert.h>
+
 int first_turn = 0;
 int first_month = 0;
 int weeks_per_month = 0;
@@ -16,11 +18,10 @@ int  seasons = 0;
 const gamedate *
 get_gamedate(int turn, gamedate * gd)
 {
-  static gamedate staticdate;
   int weeks_per_year = months_per_year * weeks_per_month;
   int t = turn - first_turn;
 
-  if (gd==NULL) gd = &staticdate;
+  assert(gd);
   if (t<0) t = turn;
 
   gd->week   = t%weeks_per_month;			/* 0 - weeks_per_month-1 */

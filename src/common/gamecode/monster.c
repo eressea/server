@@ -450,9 +450,9 @@ set_new_dragon_target(unit * u, region * r, int range)
 static order *
 make_movement_order(unit * u, const region * target, int moves, boolean (*allowed)(const region *, const region *))
 {
-	region * r = u->region;
-	region ** plan;
-	int bytes, position = 0;
+  region * r = u->region;
+  region ** plan;
+  int bytes, position = 0;
   char zOrder[128], * bufp = zOrder;
   size_t size = sizeof(zOrder) - 1;
 

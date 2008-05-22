@@ -388,8 +388,10 @@ attrib_type at_moveblock = {
 #define RMAXHASH MAXREGIONS
 static region * regionhash[RMAXHASH];
 static int dummy_data;
-static region * delmarker = (region*)&dummy_data; /* a funny hack */
+static region * dummy_ptr = (region*)&dummy_data; /* a funny hack */
 static unsigned int uidhash[MAXREGIONS];
+
+#define DELMARKER dummy_ptr
 
 unsigned int 
 generate_region_id(void)
@@ -425,7 +427,7 @@ rfindhash(short x, short y)
 #endif
   if (rid>=0) {
     int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
-    while (regionhash[key]!=NULL && (regionhash[key]==delmarker || regionhash[key]->x!=x || regionhash[key]->y!=y)) {
+    while (regionhash[key]!=NULL && (regionhash[key]==DELMARKER || regionhash[key]->x!=x || regionhash[key]->y!=y)) {
       key = (key + gk) % RMAXHASH;
 #if HASH_STATISTICS
       ++hash_misses;
@@ -441,7 +443,7 @@ rhash(region * r)
 {
   unsigned int  rid = coor_hashkey(r->x, r->y);
   int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
-  while (regionhash[key]!=NULL && regionhash[key]!=delmarker && regionhash[key]!=r) {
+  while (regionhash[key]!=NULL && regionhash[key]!=DELMARKER && regionhash[key]!=r) {
     key = (key + gk) % RMAXHASH;
   }
   assert(regionhash[key]!=r || !"trying to add the same region twice");
@@ -469,37 +471,27 @@ runhash(region * r)
     key = (key + gk) % RMAXHASH;
   }
   assert(regionhash[key]==r || !"trying to remove a unit that is not hashed");
-  regionhash[key] = delmarker;
+  regionhash[key] = DELMARKER;
 }
 
 region *
 r_connect(const region * r, direction_t dir)
 {
-  static int set = 0;
-  static region * buffer[MAXDIRECTIONS];
-  static const region * last = NULL;
-
+  region * result;
 #ifdef FAST_CONNECT
   region * rmodify = (region*)r;
   assert (dir>=0 && dir<MAXDIRECTIONS);
   if (r->connect[dir]) return r->connect[dir];
 #endif
   assert(dir<MAXDIRECTIONS);
-  if (r != last) {
-    set = 0;
-    last = r;
-  }
-  else
-    if (set & (1 << dir)) return buffer[dir];
-  buffer[dir] = rfindhash(r->x + delta_x[dir], r->y + delta_y[dir]);
-  set |= (1<<dir);
+  result = rfindhash(r->x + delta_x[dir], r->y + delta_y[dir]);
 #ifdef FAST_CONNECT
-  if (buffer[dir]) {
-    rmodify->connect[dir] = buffer[dir];
-    buffer[dir]->connect[back[dir]] = rmodify;
+  if (result) {
+    rmodify->connect[dir] = result;
+    result->connect[back[dir]] = rmodify;
   }
 #endif
-  return buffer[dir];
+  return result;
 }
 
 region *
@@ -935,6 +927,7 @@ free_region(region * r)
   while (r->buildings) {
     building * b = r->buildings;
     r->buildings = b->next;
+    bunhash(b);
     free(b->name);
     free(b->display);
     free(b);
@@ -943,6 +936,7 @@ free_region(region * r)
   while (r->ships) {
     ship * s = r->ships;
     r->ships = s->next;
+    sunhash(s);
     free(s->name);
     free(s->display);
     free(s);

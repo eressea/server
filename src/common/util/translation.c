@@ -77,7 +77,7 @@ static struct {
 char * 
 balloc(size_t size)
 {
-	static int init = 0;
+	static int init = 0; /* STATIC_XCALL: used across calls */
 	if (!init) {
 		init = 1;
 		buffer.current = buffer.begin = malloc(BUFSIZE);

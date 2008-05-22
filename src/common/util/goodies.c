@@ -80,7 +80,7 @@ spc_email_isvalid(const char *address)
 {
   int        count = 0;
   const char *c, *domain;
-  static const char *rfc822_specials = "()<>@,;:\\\"[]";
+  static const char *rfc822_specials = "()<>@,;:\\\"[]"; /* STATIC_CONST: contains a constant value */
 
   /* first we validate the name portion (name@domain) */
   for (c = address;  *c;  c++) {

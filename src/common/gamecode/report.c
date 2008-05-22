@@ -1918,6 +1918,19 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   int enc = xmlParseCharEncoding(charset);
   size_t size;
 
+  /* static variables can cope with writing for different turns */
+  static int thisseason = -1;
+  static int nextseason = -1;
+  static int thisturn = -1;
+  if (thisturn!=turn) {
+    gamedate date;
+    get_gamedate(turn+1, &date);
+    thisseason = date.season;
+    get_gamedate(turn+2, &date);
+    nextseason = date.season;
+    thisturn = turn;
+  }
+
   if (F==NULL) {
     perror(filename);
     return -1;
@@ -2033,14 +2046,10 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
 
   /* Insekten-Winter-Warnung */
   if (f->race == new_race[RC_INSECT]) {
-    static int thisseason = -1;
-    if (thisseason<0) thisseason = get_gamedate(turn+1, 0)->season;
     if (thisseason == 0) {
       centre(F, LOC(f->locale, "nr_insectwinter"), true);
       rnl(F);
     } else {
-      static int nextseason = -1;
-      if (nextseason<0) nextseason = get_gamedate(turn+2, 0)->season;
       if (nextseason == 0) {
         centre(F, LOC(f->locale, "nr_insectfall"), true);
         rnl(F);

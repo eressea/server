@@ -215,7 +215,7 @@ mkname_buf(const char * space, const char * name, char * buffer)
 const char *
 mkname(const char * space, const char * name)
 {
-  static char zBuffer[128];
+  static char zBuffer[128]; /* STATIC_RESULT: used for return, not across calls */
   return mkname_buf(space, name, zBuffer);
 }
 

@@ -128,17 +128,6 @@ curse_emptiness(void)
   return 0;
 }
 
-void
-french_testers(void)
-{
-  faction * f = factions;
-  const struct locale * french = find_locale("fr");
-  while (f!=NULL) {
-    if (f->locale==french) fset(f, FFL_NOTIMEOUT);
-    f = f->next;
-  }
-}
-
 static void
 verify_owners(boolean bOnce)
 {
@@ -928,18 +917,19 @@ fix_groups(void)
 void
 korrektur(void)
 {
+#if GLOBAL_WARMING
+  gamedate date;
+  get_gamedate(turn, &date);
+  if (date.season == SEASON_SUMMER) {
+    global_warming();
+  }
+#endif
   check_dissolve();
-  french_testers();
   do_once("rdec", &road_decay);
   do_once("unfi", &fix_undead);
   do_once("chgt", &fix_chaosgates);
   do_once("atrx", &fix_attribflags);
   do_once("asfi", &fix_astral_firewalls);
-#if GLOBAL_WARMING
-  if (get_gamedate(turn, NULL)->season == SEASON_SUMMER) {
-    global_warming();
-  }
-#endif
   fix_astralplane();
   fix_firewalls();
   fix_toads();

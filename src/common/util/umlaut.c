@@ -42,7 +42,7 @@ typedef struct tref {
 void
 addtoken(tnode * root, const char * str, variant id)
 {
-  static struct replace {
+  static const struct replace { /* STATIC_CONST: constant value */
     ucs4_t ucs;
     const char str[3];
   } replace[] = {

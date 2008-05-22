@@ -157,8 +157,8 @@ static char *
 sidename(side * s)
 {
 #define SIDENAMEBUFLEN 256
-  static int bufno;
-  static char sidename_buf[4][SIDENAMEBUFLEN];
+  static int bufno; /* STATIC_XCALL: used across calls */
+  static char sidename_buf[4][SIDENAMEBUFLEN]; /* STATIC_RESULT: used for return, not across calls */
 
   bufno = bufno % 4;
   if (s->stealthfaction) {
@@ -174,7 +174,7 @@ sidename(side * s)
 static const char *
 sideabkz(side *s, boolean truename)
 {
-  static char sideabkz_buf[8];
+  static char sideabkz_buf[8]; /* STATIC_RESULT: used for return, not across calls */
 
   if (s->stealthfaction && truename == false) {
     abkz(s->stealthfaction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);

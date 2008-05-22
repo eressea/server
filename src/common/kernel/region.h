@@ -116,7 +116,7 @@ typedef struct region {
   struct faction * owner;
 #endif
 #ifdef FAST_CONNECT
-  struct region * connect[MAXDIRECTIONS];
+  struct region * connect[MAXDIRECTIONS]; /* use rconnect(r, dir) to access */
 #endif
 } region;
 
