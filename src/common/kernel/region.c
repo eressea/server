@@ -948,6 +948,7 @@ free_region(region * r)
 void
 free_regions(void)
 {
+  memset(uidhash, 0, sizeof(uidhash));
   while (deleted_regions) {
     region * r = deleted_regions;
     deleted_regions = r->next;
