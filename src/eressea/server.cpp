@@ -160,11 +160,6 @@ static const char * luafile = NULL;
 static const char * script_path = "scripts";
 static int memdebug = 0;
 
-struct settings global = {
-  "Eressea", /* gamename */
-  1000, /* maxunits */
-};
-
 #if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
 #include <execinfo.h>
 #include <signal.h>

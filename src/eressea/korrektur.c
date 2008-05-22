@@ -884,7 +884,6 @@ fix_groups(void)
 void
 korrektur(void)
 {
-  int i = rng_int();
 #if GLOBAL_WARMING
   gamedate date;
   get_gamedate(turn, &date);

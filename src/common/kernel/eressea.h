@@ -369,7 +369,6 @@ extern const struct race * new_race[];
 
 /* globale settings des Spieles */
 typedef struct settings {
-  int cookie;
   const char *gamename;
   boolean unitsperalliance;
   unsigned int maxunits;
@@ -379,6 +378,7 @@ typedef struct settings {
   struct param * parameters;
   void * vm_state;
   float producexpchance;
+  int cookie;
 
   struct global_functions {
     int (*wage)(const struct region *r, const struct faction * f, const struct race * rc);

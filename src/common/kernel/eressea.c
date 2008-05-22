@@ -92,7 +92,10 @@
 /* exported variables */
 region  *regions;
 faction *factions;
-settings global = { 0 };
+struct settings global = {
+  "Eressea", /* gamename */
+  1000, /* maxunits */
+};
 FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
