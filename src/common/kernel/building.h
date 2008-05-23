@@ -123,7 +123,10 @@ int buildingeffsize(const building * b, boolean img);
 void bhash(struct building * b);
 void bunhash(struct building * b);
 int buildingcapacity(const struct building * b);
-void destroy_building(struct building * b);
+
+extern void remove_building(struct building * *blist, struct building * b);
+extern void free_building(struct building * b);
+extern void free_buildings(void);
 
 const struct building_type * findbuildingtype(const char * name, const struct locale * lang);
 

@@ -24,6 +24,7 @@
 #include "skill.h"
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/language.h>
@@ -162,32 +163,33 @@ captain(ship *sh, region *r)
 }
 
 /* Alte Schiffstypen: */
-
+static ship * deleted_ships;
 
 ship *
 new_ship(const ship_type * stype, const struct locale * lang, region * r)
 {
-	static char buffer[7 + IDSIZE + 1];
-	ship *sh = (ship *) calloc(1, sizeof(ship));
+  static char buffer[7 + IDSIZE + 1];
+  ship *sh = (ship *) calloc(1, sizeof(ship));
 
-	sh->no = newcontainerid();
-	sh->coast = NODIRECTION;
-	sh->type = stype;
-	sh->region = r;
+  sh->no = newcontainerid();
+  sh->coast = NODIRECTION;
+  sh->type = stype;
+  sh->region = r;
 
-	sprintf(buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
-	sh->name = strdup(buffer);
-	shash(sh);
+  sprintf(buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
+  sh->name = strdup(buffer);
+  shash(sh);
   addlist(&r->ships, sh);
-	return sh;
+  return sh;
 }
 
 void
-destroy_ship(ship * sh)
+remove_ship(ship ** slist, ship * sh)
 {
   region * r = sh->region;
   unit * u = r->units;
 
+  handle_event(sh->attribs, "destroy", sh);
   while (u) {
     if (u->ship == sh) {
       leave_ship(u);
@@ -195,8 +197,28 @@ destroy_ship(ship * sh)
     u = u->next;
   }
   sunhash(sh);
-  choplist(&r->ships, sh);
-  handle_event(sh->attribs, "destroy", sh);
+  while (*slist && *slist!=sh) slist = &(*slist)->next;
+  *slist = sh->next;
+  sh->next = deleted_ships;
+  deleted_ships = sh;
+}
+
+void
+free_ship(ship * s)
+{
+  while (s->attribs) a_remove(&s->attribs, s->attribs);
+  free(s->name);
+  free(s->display);
+  free(s);
+}
+
+void
+free_ships(void)
+{
+  while (deleted_ships) {
+    ship * s = deleted_ships;
+    deleted_ships = s->next;
+  }
 }
 
 const char *

@@ -144,17 +144,17 @@ a_writeicastle(const attrib * a, struct storage * store)
 static int
 a_ageicastle(struct attrib * a)
 {
-	icastle_data * data = (icastle_data*)a->data.v;
-	if (data->time<=0) {
-		building * b = data->building;
-		region * r = b->region;
+  icastle_data * data = (icastle_data*)a->data.v;
+  if (data->time<=0) {
+    building * b = data->building;
+    region * r = b->region;
     ADDMSG(&r->msgs, msg_message("icastle_dissolve", "building", b));
-		/* destroy_building lets units leave the building */
-		destroy_building(b);
-		return 0;
-	}
-	else data->time--;
-	return 1;
+    /* remove_building lets units leave the building */
+    remove_building(&r->buildings, b);
+    return 0;
+  }
+  else data->time--;
+  return 1;
 }
 
 static void

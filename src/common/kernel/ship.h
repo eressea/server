@@ -97,7 +97,10 @@ extern const struct ship_type * findshiptype(const char *s, const struct locale 
 extern void register_ships(void);
 extern void write_ship_reference(const struct ship * sh, struct storage * store);
 
-extern void destroy_ship(struct ship * s);
+extern void remove_ship(struct ship ** slist, struct ship * s);
+extern void free_ship(struct ship * s);
+extern void free_ships(void);
+
 
 #ifdef __cplusplus
 }

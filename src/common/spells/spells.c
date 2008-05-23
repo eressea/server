@@ -1604,7 +1604,6 @@ destroy_all_roads(region *r)
 static int
 sp_great_drought(castorder *co)
 {
-  building *b, *b2;
   unit *u;
   boolean terraform = false;
   region *r = co->rt;
@@ -1664,10 +1663,8 @@ sp_great_drought(castorder *co)
               set_number(u, 0);
             }
           }
-          for (b = r->buildings; b;) {
-            b2 = b->next;
-            destroy_building(b);
-            b = b2;
+          while (r->buildings) {
+            remove_building(&r->buildings, r->buildings);
           }
         }
         break;
@@ -2271,39 +2268,28 @@ static int
 sp_earthquake(castorder *co)
 {
   int kaputt;
-  building *burg;
-  unit *u;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   message * msg;
+  building **blist = &r->buildings;
 
-  for (burg = r->buildings; burg; burg = burg->next) {
-    if (burg->size == 0 )
-      continue;
+  while (*blist) {
+    building * burg = *blist;
 
-    /* Schutzzauber */
-    if (is_cursed(burg->attribs, C_MAGICWALLS, 0))
-      continue;
-
-    /* Magieresistenz */
-    if (target_resists_magic(mage, burg, TYP_BUILDING, 0))
-      continue;
-
-    kaputt = min(10 * cast_level, burg->size / 4);
-    kaputt = max(kaputt, 1);
-    burg->size -= kaputt;
-    if (burg->size == 0 ) {
-      /* alle Einheiten hinausbefördern */
-      for(u = r->units; u; u = u->next ) {
-        if (u->building == burg ) {
-          u->building = 0;
-          freset(u, UFL_OWNER);
+    if (burg->size != 0 && !is_cursed(burg->attribs, C_MAGICWALLS, 0)) {
+      /* Magieresistenz */
+      if (!target_resists_magic(mage, burg, TYP_BUILDING, 0)) {
+        kaputt = min(10 * cast_level, burg->size / 4);
+        kaputt = max(kaputt, 1);
+        burg->size -= kaputt;
+        if (burg->size == 0) {
+          /* TODO: sollten die Insassen nicht Schaden nehmen? */
+          remove_building(blist, burg);
         }
       }
-      /* TODO: sollten die Insassen nicht Schaden nehmen? */
-      destroy_building(burg);
     }
+    if (*blist==burg) blist=&burg->next;
   }
 
   /* melden, 1x pro Partei */
@@ -3198,11 +3184,16 @@ dc_read_compat(struct attrib * a, storage * store)
   variant var;
   int duration = store->r_int(store);
   double strength = store->r_flt(store);
+  short rx, ry;
 
   var.i = store->r_id(store);
   u = findunit(var.i);
 
-  read_region_reference(&r, store);
+  /* this only affects really old data. no need to change: */
+  rx = store->r_int(store);
+  ry = store->r_int(store);
+  r = findregion(rx, ry);
+
   if (r!=NULL) {
     variant effect;
     curse * c;

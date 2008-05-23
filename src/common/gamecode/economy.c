@@ -978,41 +978,41 @@ maintain(building * b, boolean first)
 static void
 gebaeude_stuerzt_ein(region * r, building * b)
 {
-	unit *u;
-	int n, i;
-	int opfer = 0;
-	int road = 0;
-	struct message * msg;
+  unit *u;
+  int n, i;
+  int opfer = 0;
+  int road = 0;
+  struct message * msg;
 
-	for (u = r->units; u; u = u->next) {
-		if (u->building == b) {
-			int loss = 0;
+  for (u = r->units; u; u = u->next) {
+    if (u->building == b) {
+      int loss = 0;
 
-			fset(u->faction, FFL_MARK);
-			freset(u, UFL_OWNER);
-			leave(r,u);
-			n = u->number;
-			for (i = 0; i < n; i++) {
-				if (rng_double() >= COLLAPSE_SURVIVAL) {
-					++loss;
-				}
-			}
-			scale_number(u, u->number - loss);
-			opfer += loss;
-		}
-	}
+      fset(u->faction, FFL_MARK);
+      freset(u, UFL_OWNER);
+      leave(r,u);
+      n = u->number;
+      for (i = 0; i < n; i++) {
+        if (rng_double() >= COLLAPSE_SURVIVAL) {
+          ++loss;
+        }
+      }
+      scale_number(u, u->number - loss);
+      opfer += loss;
+    }
+  }
 
-	msg = msg_message("buildingcrash", "region building opfer road", r, b, opfer, road);
-	add_message(&r->msgs, msg);
-	for (u=r->units; u; u=u->next) {
-		faction * f = u->faction;
-		if (fval(f, FFL_MARK)) {
-			freset(u->faction, FFL_MARK);
-			add_message(&f->msgs, msg);
-		}
-	}
-	msg_release(msg);
-	destroy_building(b);
+  msg = msg_message("buildingcrash", "region building opfer road", r, b, opfer, road);
+  add_message(&r->msgs, msg);
+  for (u=r->units; u; u=u->next) {
+    faction * f = u->faction;
+    if (fval(f, FFL_MARK)) {
+      freset(u->faction, FFL_MARK);
+      add_message(&f->msgs, msg);
+    }
+  }
+  msg_release(msg);
+  remove_building(&r->buildings, b);
 }
 
 void

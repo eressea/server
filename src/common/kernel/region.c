@@ -951,19 +951,15 @@ free_region(region * r)
   while (r->buildings) {
     building * b = r->buildings;
     r->buildings = b->next;
-    bunhash(b);
-    free(b->name);
-    free(b->display);
-    free(b);
+    bunhash(b); /* must be done here, because remove_building does it, and wasn't called */
+    free_building(b);
   }
 
   while (r->ships) {
     ship * s = r->ships;
     r->ships = s->next;
     sunhash(s);
-    free(s->name);
-    free(s->display);
-    free(s);
+    free_ship(s);
   }
 
   free(r);

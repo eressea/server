@@ -118,11 +118,21 @@ building_getregion(const building& b)
 }
 
 static void
-building_setregion(building& b, region& r)
+building_setregion(building& bld, region& r)
 {
-	choplist(&b.region->buildings, &b);
-  addlist(&r.buildings, &b);
-  b.region = &r;
+  building * b = &bld;
+  building ** blist = &b->region->buildings;
+  while (*blist && *blist!=b) {
+    blist = &(*blist)->next;
+  }
+  *blist = b->next;
+  b->next = NULL;
+
+  blist = &r.buildings;
+  while (*blist && *blist!=b) blist = &(*blist)->next;
+  *blist = b;
+
+  b->region = &r;
 }
 
 static std::ostream& 

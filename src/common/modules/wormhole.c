@@ -23,10 +23,12 @@
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/rng.h>
+#include <util/resolve.h>
 #include <util/storage.h>
 
 /* libc includes */
@@ -51,7 +53,7 @@ cmp_age(const void * v1, const void *v2)
 
 typedef struct wormhole_data {
   building * entry;
-  building * exit;
+  region * exit;
 } wormhole_data;
 
 static void
@@ -80,10 +82,10 @@ wormhole_age(struct attrib * a)
       if (u->number>maxtransport || has_limited_skills(u)) {
         m = msg_message("wormhole_requirements", "unit region", u, u->region);
       } else if (data->exit!=NULL) {
-        move_unit(u, data->exit->region, NULL);
+        move_unit(u, data->exit, NULL);
         maxtransport -= u->number;
-        m = msg_message("wormhole_exit", "unit region", u, data->exit->region);
-        add_message(&data->exit->region->msgs, m);
+        m = msg_message("wormhole_exit", "unit region", u, data->exit);
+        add_message(&data->exit->msgs, m);
       }
       if (m!=NULL) {
         add_message(&u->faction->msgs, m);
@@ -92,11 +94,8 @@ wormhole_age(struct attrib * a)
     }
   }
 
-  /* it's important that destroy_building doesn't change b->region, because
-   * otherwise the tunnel would no longer be bi-directional after this */
-  destroy_building(data->entry);
+  remove_building(&r->buildings, data->entry);
   ADDMSG(&r->msgs, msg_message("wormhole_dissolve", "region", r));
-  assert(data->entry->region==r);
 
   /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
   return -1;
@@ -140,8 +139,10 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
   attrib * a2 = a_add(&b2->attribs, a_new(&at_wormhole));
   wormhole_data * d1 = (wormhole_data*)a1->data.v;
   wormhole_data * d2 = (wormhole_data*)a2->data.v;
-  d1->entry = d2->exit = b1;
-  d2->entry = d1->exit = b2;
+  d1->entry = b1;
+  d2->entry = b2;
+  d1->exit = b2->region;
+  d2->exit = b1->region;
   b1->size = bt_wormhole->maxsize;
   b2->size = bt_wormhole->maxsize;
   ADDMSG(&r1->msgs, msg_message("wormhole_appear", "region", r1));

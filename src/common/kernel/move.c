@@ -481,23 +481,24 @@ static ship *
 do_maelstrom(region *r, unit *u)
 {
   int damage;
+  ship * sh = u->ship;
 
   damage = rng_int()%150 - eff_skill(u, SK_SAILING, r)*5;
 
   if (damage <= 0) {
-    return u->ship;
+    return sh;
   }
 
   damage_ship(u->ship, 0.01*damage);
 
-  if (u->ship->damage >= u->ship->size * DAMAGE_SCALE) {
+  if (sh->damage >= sh->size * DAMAGE_SCALE) {
     ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
-      "region ship damage sink", r, u->ship, damage, 1));
-    destroy_ship(u->ship);
+      "region ship damage sink", r, sh, damage, 1));
+    remove_ship(&sh->region->ships, sh);
     return NULL;
   }
   ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
-    "region ship damage sink", r, u->ship, damage, 0));
+    "region ship damage sink", r, sh, damage, 0));
   return u->ship;
 }
 
@@ -776,7 +777,7 @@ drifting_ships(region * r)
 
         damage_ship(sh, 0.02);
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
-          destroy_ship(sh);
+          remove_ship(shp, sh);
         }
       }
 
@@ -1782,7 +1783,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
 
   if (sh->damage>=sh->size * DAMAGE_SCALE) {
     ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
-    destroy_ship(sh);
+    remove_ship(&sh->region->ships, sh);
     sh = NULL;
   }
 
@@ -2322,7 +2323,7 @@ destroy_damaged_ships(void)
 		for(sh=r->ships;sh;) {
 			shn = sh->next;
 			if (sh->damage>=sh->size * DAMAGE_SCALE) {
-				destroy_ship(sh);
+				remove_ship(&sh->region->ships, sh);
 			}
 			sh = shn;
 		}

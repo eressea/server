@@ -39,7 +39,6 @@ typedef struct void_list {
 void addlist(void *l1, void *p1);
 void choplist(void * l, void * p);
 void translist(void *l1, void *l2, void *p);
-void promotelist(void *l, void *p);
 #ifndef MALLOCDBG
 void freelist(void *p1);
 void removelist(void *l, void *p);
@@ -49,7 +48,6 @@ void removelist(void *l, void *p);
 #endif
 
 unsigned int listlen(void *l);
-void invert_list(void * heap);
 #define addlist2(l, p)       (*l = p, l = &p->next)
 
 void *listelem(void *l, int n);

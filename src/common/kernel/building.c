@@ -394,7 +394,7 @@ read_building_reference(struct building ** b, struct storage * store)
     *b = findbuilding(var.i);
     if (*b==NULL) ur_add(var, (void**)b, resolve_building);
     return AT_READ_OK;
-  }
+    }
 }
 
 void
@@ -452,8 +452,13 @@ new_building(const struct building_type * btype, region * r, const struct locale
   return b;
 }
 
+static building * deleted_buildings;
+
+/** remove a building from the region.
+ * remove_building lets units leave the building
+ */
 void
-destroy_building(building * b)
+remove_building(building ** blist, building * b)
 {
   unit *u;
   direction_t d;
@@ -467,7 +472,9 @@ destroy_building(building * b)
     bt_tunnel = bt_find("tunnel");
   }
 
-  if (!bfindhash(b->no)) return;
+  assert(bfindhash(b->no));
+
+  handle_event(b->attribs, "destroy", b);
   for (u=b->region->units; u; u=u->next) {
     if (u->building == b) leave(b->region, u);
   }
@@ -486,8 +493,29 @@ destroy_building(building * b)
   }
 
   /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
-  choplist(&b->region->buildings, b);
-  handle_event(b->attribs, "destroy", b);
+  while (*blist && *blist!=b) blist = &(*blist)->next;
+  *blist = b->next;
+  b->region = NULL;
+  b->next = deleted_buildings;
+  deleted_buildings = b;
+}
+
+void
+free_building(building * b)
+{
+  while (b->attribs) a_remove (&b->attribs, b->attribs);
+  free(b->name);
+  free(b->display);
+  free(b);
+}
+
+void
+free_buildings(void)
+{
+  while (deleted_buildings) {
+    building * b = deleted_buildings;
+    deleted_buildings = b->next;
+  }
 }
 
 extern struct attrib_type at_icastle;

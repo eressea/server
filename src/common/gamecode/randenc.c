@@ -427,7 +427,6 @@ void
 chaos(region * r)
 {
   unit *u = NULL, *u2;
-  building *b, *b2;
 
   if (rng_int() % 100 < 8) {
     switch (rng_int() % 3) {
@@ -474,7 +473,9 @@ chaos(region * r)
             while (sh) {
               ship * nsh = sh->next;
               damage_ship(sh, 0.50);
-              if (sh->damage >= sh->size * DAMAGE_SCALE) destroy_ship(sh);
+              if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                remove_ship(&sh->region->ships, sh);
+              }
               sh = nsh;
             }
 
@@ -487,10 +488,8 @@ chaos(region * r)
             }
             ADDMSG(&r->msgs, msg_message("tidalwave", "region", r));
 
-            for (b = rbuildings(r); b;) {
-              b2 = b->next;
-              destroy_building(b);
-              b = b2;
+            while (r->buildings) {
+              remove_building(&r->buildings, r->buildings);
             }
             terraform(r, T_OCEAN);
           }
@@ -760,7 +759,6 @@ melt_iceberg(region *r)
 {
 	attrib *a;
 	unit *u;
-	building *b, *b2;
 
 	for (u=r->units; u; u=u->next) freset(u->faction, FFL_SELECT);
 	for (u=r->units; u; u=u->next) if (!fval(u->faction, FFL_SELECT)) {
@@ -773,10 +771,9 @@ melt_iceberg(region *r)
 	if (a) a_remove(&r->attribs, a);
 
 	/* Gebäude löschen */
-	for (b = rbuildings(r); b; b = b2) {
-		b2 = b->next;
-		destroy_building(b);
-	}
+    while (r->buildings) {
+      remove_building(&r->buildings, r->buildings);
+    }
 
 	/* in Ozean wandeln */
 	terraform(r, T_OCEAN);
@@ -875,7 +872,7 @@ move_iceberg(region *r)
               ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg_des", 
                 "ship", sh));
             }
-						destroy_ship(sh);
+            remove_ship(&sh->region->ships, sh);
           } else if (u!=NULL) {
             ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg", 
               "ship", sh));
@@ -985,7 +982,7 @@ godcurse(void)
             unit * u = shipowner(sh);
             if (u) ADDMSG(&u->faction->msgs,
               msg_message("godcurse_destroy_ship", "ship", sh));
-            destroy_ship(sh);
+            remove_ship(&sh->region->ships, sh);
           }
           sh = shn;
         }
@@ -1122,11 +1119,10 @@ void
 randomevents(void)
 {
 #if KARMA_MODULE
-	faction *f;
+  faction *f;
 #endif /* KARMA_MODULE */
-	region *r;
-	building *b, *b2;
-	unit *u;
+  region *r;
+  unit *u;
 
   icebergs();
   godcurse();
@@ -1191,14 +1187,16 @@ randomevents(void)
   /* Monumente zerfallen, Schiffe verfaulen */
 
   for (r = regions; r; r = r->next) {
-    for (b = rbuildings(r); b; b = b2) {
-      b2 = b->next;
+    building ** blist = &r->buildings;
+    while (*blist) {
+      building * b = *blist;
       if (fval(b->type, BTF_DECAY) && !buildingowner(r, b)) {
         b->size -= max(1, (b->size * 20) / 100);
         if (b->size == 0) {
-          destroy_building(b);
+          remove_building(blist, r->buildings);
         }
       }
+      if (*blist==b) blist=&b->next;
     }
   }
 
@@ -1213,7 +1211,7 @@ randomevents(void)
               "unit region", u, r));
             u_setfaction(u, get_monsters());
           }
-        }
+      }
     }
   }
 
@@ -1226,7 +1224,7 @@ randomevents(void)
         for(u = f->units; u; u=u->nextF) {
           if (rng_int()%100 < 2*level) {
             ADDMSG(&u->faction->msgs,
-                   msg_message("becomewere", "unit region", u, u->region));
+              msg_message("becomewere", "unit region", u, u->region));
             fset(u, UFL_WERE);
           }
         }
@@ -1245,16 +1243,16 @@ randomevents(void)
     if (!i) continue;
     chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
   }
-  
+
 #ifdef HERBS_ROT
   /* Kräuter verrotten */
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u=u->next) {
       item **itmp = &u->items, *hbag = *i_find(&u->items, olditemtype[I_SACK_OF_CONSERVATION]);
       int rot_chance = HERBROTCHANCE;
-      
+
       if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
-      
+
       while (*itmp) {
         item * itm = *itmp;
         int n = itm->number;
@@ -1270,7 +1268,7 @@ randomevents(void)
     }
   }
 #endif
-  
+
   dissolve_units();
   check_split();
 #if KARMA_MODULE

@@ -566,7 +566,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
   if (enemy_discovers_spy_msg) msg_release(enemy_discovers_spy_msg);
   if (sink_msg) msg_release(sink_msg);
   /* finally, get rid of the ship */
-  destroy_ship(sh);
+  remove_ship(&sh->region->ships, sh);
   vset_destroy(&informed);
   vset_destroy(&survivors);
 }

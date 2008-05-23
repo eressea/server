@@ -88,16 +88,6 @@ insertlist(void_list ** l, void_list * p)
 }
 
 void
-promotelist(void *l, void *p)
-{
-
-	/* remove entry p from list l; insert p again at the beginning of l */
-
-	choplist(l, p);
-	insertlist((void_list **)l, (void_list *)p);
-}
-
-void
 removelist(void *l, void *p)
 {
 
@@ -122,21 +112,6 @@ freelist(void *p1)
 		free(p);
 		p = p2;
 	}
-}
-
-void
-invert_list(void * heap)
-{
-	void_list * x = NULL;
-	void_list * m = *(void_list**)heap;
-	while (m)
-	{
-		void_list * d = m;
-		m = m->next;
-		d->next = x;
-		x = d;
-	}
-	*(void **)heap = x;
 }
 
 unsigned int

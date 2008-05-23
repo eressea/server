@@ -384,7 +384,7 @@ destroy_cmd(unit * u, struct order * ord)
       ADDMSG(&u->faction->msgs, msg_message("destroy",
         "building unit", b, u));
       con = b->type->construction;
-      destroy_building(b);
+      remove_building(&r->buildings, b);
     } else {
       /* partial destroy */
       b->size -= n;
@@ -411,7 +411,7 @@ destroy_cmd(unit * u, struct order * ord)
       ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
         "unit region ship", u, r, sh));
       con = sh->type->construction;
-      destroy_ship(sh);
+      remove_ship(&sh->region->ships, sh);
     } else {
       /* partial destroy */
       sh->size -= (sh->type->construction->maxsize * n)/100;

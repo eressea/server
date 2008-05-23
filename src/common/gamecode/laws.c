@@ -2485,7 +2485,7 @@ sinkships(region * r)
       damage_ship(sh, 0.05);
     }
     if (sh->damage >= sh->size * DAMAGE_SCALE) {
-      destroy_ship(sh);
+      remove_ship(shp, sh);
     }
     if (*shp==sh) shp=&sh->next;
   }

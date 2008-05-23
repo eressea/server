@@ -2572,7 +2572,7 @@ aftermath(battle * b)
       ship * sh = *sp;
       freset(sh, SF_DAMAGED);
       if (sh->damage >= sh->size * DAMAGE_SCALE) {
-        destroy_ship(sh);
+        remove_ship(sp, sh);
       }
       if (*sp==sh) sp=&sh->next;
     }
