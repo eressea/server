@@ -106,16 +106,21 @@ wormhole_write(const struct attrib * a, storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
   write_building_reference(data->entry, store);
-  write_building_reference(data->exit, store);
+  write_region_reference(data->exit, store);
 }
 
 static int
 wormhole_read(struct attrib * a, storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
-
   read_building_reference(&data->entry, store);
-  read_building_reference(&data->exit, store);
+  if (store->version<UIDHASH_VERSION) {
+    building * b;
+    read_building_reference(&b, store);
+    if (b) data->exit = b->region;
+  } else {
+    read_region_reference(&data->exit, store);
+  }
   /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
   return AT_READ_OK;
 }
