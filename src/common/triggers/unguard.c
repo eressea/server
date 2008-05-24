@@ -14,13 +14,16 @@
 #include "unguard.h"
 
 /* kernel includes */
+#include <util/attrib.h>
 #include <kernel/building.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/event.h>
 #include <util/log.h>
+#include <util/resolve.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -49,10 +52,11 @@ unguard_write(const trigger * t, struct storage * store)
 static int
 unguard_read(trigger * t, struct storage * store)
 {
-  building * b;
-  int result = read_building_reference(&b, store);
-  t->data.v = b;
-  return result;
+  int rb = read_reference(&t->data.v, store, read_building_reference, resolve_building);
+  if (rb==0 && !t->data.v) {
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 struct trigger_type tt_unguard = {

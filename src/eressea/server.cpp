@@ -41,9 +41,7 @@
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#if WORMHOLE_MODULE
 #include <modules/wormhole.h>
-#endif
 #if ARENA_MODULE
 #include <modules/arena.h>
 #endif
@@ -225,9 +223,7 @@ game_init(void)
 #if ARENA_MODULE
   register_arena();
 #endif
-#if WORMHOLE_MODULE
   register_wormholes();
-#endif
 
   register_itemtypes();
   register_xmlreader();

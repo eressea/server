@@ -125,7 +125,6 @@ typedef struct faction_list {
 
 extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
-extern void resolve_faction(variant data, void * addr);
 extern struct unit * addplayer(struct region *r, faction * f);
 extern struct faction * addfaction(const char *email, const char* password, 
                                    const struct race * frace, 
@@ -143,7 +142,8 @@ extern void remove_enemy(struct faction * f, struct faction * enemy);
 #endif
 
 extern void write_faction_reference(const struct faction * f, struct storage * store);
-extern int read_faction_reference(struct faction ** f, struct storage * store);
+extern variant read_faction_reference(struct storage * store);
+extern int resolve_faction(variant data, void * addr);
 
 extern void renumber_faction(faction * f, int no);
 

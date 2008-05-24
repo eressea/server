@@ -20,6 +20,7 @@
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/log.h>
@@ -58,10 +59,11 @@ killunit_write(const trigger * t, struct storage * store)
 static int
 killunit_read(trigger * t, struct storage * store)
 {
-  unit * u;
-  int result = read_unit_reference(&u, store);
-  t->data.v = u;
-  return result;
+  int result = read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+  if (result==0 && t->data.v==NULL) {
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 trigger_type tt_killunit = {

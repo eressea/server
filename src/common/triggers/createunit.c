@@ -21,6 +21,7 @@
 #include <kernel/unit.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -89,16 +90,18 @@ createunit_write(const trigger * t, struct storage * store)
 static int
 createunit_read(trigger * t, struct storage * store)
 {
-	createunit_data * td = (createunit_data*)t->data.v;
+  createunit_data * td = (createunit_data*)t->data.v;
 
-	int uc = read_faction_reference(&td->f, store);
-	int rc = read_region_reference(&td->r, store);
-	int ic = read_race_reference(&td->race, store);
+  int uc = read_reference(&td->f, store, read_faction_reference, resolve_faction);
+  int rc = read_reference(&td->r, store, read_region_reference, RESOLVE_REGION(store->version));
+  td->race = (const struct race*)read_race_reference(store).v;
 
-	td->number = store->r_int(store);
+  if (uc==0 && rc==0) {
+    if (!td->f || !td->r) return AT_READ_FAIL;
+  }
+  td->number = store->r_int(store);
 
-	if (uc!=AT_READ_OK || rc!=AT_READ_OK || ic!=AT_READ_OK) return AT_READ_FAIL;
-	return AT_READ_OK;
+  return AT_READ_OK;
 }
 
 trigger_type tt_createunit = {

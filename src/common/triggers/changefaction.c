@@ -78,19 +78,16 @@ changefaction_write(const trigger * t, struct storage * store)
 {
 	changefaction_data * td = (changefaction_data*)t->data.v;
 	write_unit_reference(td->unit, store);
-	write_faction_reference(td->faction, store);
+    write_faction_reference(td->faction, store);
 }
 
 static int
 changefaction_read(trigger * t, struct storage * store)
 {
-	changefaction_data * td = (changefaction_data*)t->data.v;
-
-	int u = read_unit_reference(&td->unit, store);
-	int f = read_faction_reference(&td->faction, store);
-
-	if (u!=AT_READ_OK || f!=AT_READ_OK) return AT_READ_FAIL;
-	return AT_READ_OK;
+  changefaction_data * td = (changefaction_data*)t->data.v;
+  read_reference(&td->unit, store, read_unit_reference, resolve_unit);
+  read_reference(&td->faction, store, read_faction_reference, resolve_faction);
+  return AT_READ_OK;
 }
 
 trigger_type tt_changefaction = {

@@ -86,12 +86,11 @@ changerace_write(const trigger * t, struct storage * store)
 static int
 changerace_read(trigger * t, struct storage * store)
 {
-	changerace_data * td = (changerace_data*)t->data.v;
-	int uc = read_unit_reference(&td->u, store);
-	int rc = read_race_reference(&td->race, store);
-	int ic = read_race_reference(&td->irace, store);
-	if (uc!=AT_READ_OK || rc!=AT_READ_OK || ic!=AT_READ_OK) return AT_READ_FAIL;
-	return AT_READ_OK;
+  changerace_data * td = (changerace_data*)t->data.v;
+  read_reference(&td->u, store, read_unit_reference, resolve_unit);
+  td->race = (const struct race*)read_race_reference(store).v;
+  td->irace = (const struct race*)read_race_reference(store).v;
+  return AT_READ_OK;
 }
 
 trigger_type tt_changerace = {

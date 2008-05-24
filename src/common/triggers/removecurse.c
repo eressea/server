@@ -85,15 +85,9 @@ static int
 removecurse_read(trigger * t, struct storage * store)
 {
   removecurse_data * td = (removecurse_data*)t->data.v;
-  variant var;
 
-  read_unit_reference(&td->target, store);
-
-  var.i = store->r_int(store);
-  td->curse = cfindhash(var.i);
-  if (td->curse==NULL) {
-    ur_add(var, &td->curse, resolve_curse);
-  }
+  read_reference(&td->target, store, read_unit_reference, resolve_unit);
+  read_reference(&td->curse, store, read_int, resolve_curse);
   
   return AT_READ_OK;
 }

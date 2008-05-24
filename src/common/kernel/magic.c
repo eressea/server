@@ -2207,27 +2207,29 @@ create_newfamiliar(unit * mage, unit * familiar)
   return true;
 }
 
-static void
+static int
 resolve_familiar(variant data, void * addr)
 {
   unit * familiar;
-  resolve_unit(data, &familiar);
-  if (familiar) {
+  int result = resolve_unit(data, &familiar);
+  if (result==0 && familiar) {
     attrib * a = a_find(familiar->attribs, &at_familiarmage);
     if (a!=NULL && a->data.v) {
       unit * mage = (unit *)a->data.v;
       set_familiar(mage, familiar);
     }
+    *(unit**)addr = familiar;
   }
-  *(unit**)addr = familiar;
+  return result;
 }
 
 static int
 read_familiar(attrib * a, struct storage * store)
 {
-  variant id;
-  id.i = store->r_id(store);
-  ur_add(id, &a->data.v, resolve_familiar);
+  int result = read_reference(&a->data.v, store, read_unit_reference, resolve_familiar);
+  if (result==0 && a->data.v==NULL) {
+    return AT_READ_FAIL;
+  }
   return AT_READ_OK;
 }
 
@@ -2284,54 +2286,57 @@ has_clone(unit *mage)
 	return NULL;
 }
 
-static void
+static int
 resolve_clone(variant data, void * addr)
 {
   unit * clone;
-  resolve_unit(data, &clone);
-  if (clone) {
+  int result = resolve_unit(data, &clone);
+  if (result==0 && clone) {
     attrib * a = a_find(clone->attribs, &at_clonemage);
     if (a!=NULL && a->data.v) {
       unit * mage = (unit *)a->data.v;
       set_clone(mage, clone);
     }
+    *(unit**)addr = clone;
   }
-  *(unit**)addr = clone;
+  return result;
 }
 
 static int
 read_clone(attrib * a, struct storage * store)
 {
-  variant id;
-  id.i = store->r_id(store);
-  ur_add(id, &a->data.v, resolve_clone);
+  int result = read_reference(&a->data.v, store, read_unit_reference, resolve_clone);
+  if (result==0 && a->data.v==NULL) {
+    return AT_READ_FAIL;
+  }
   return AT_READ_OK;
 }
 
 /* mages */
 
-static void
+static int
 resolve_mage(variant data, void * addr)
 {
   unit * mage;
-  resolve_unit(data, &mage);
-  if (mage) {
+  int result = resolve_unit(data, &mage);
+  if (result==0 && mage) {
     attrib * a = a_find(mage->attribs, &at_familiar);
     if (a!=NULL && a->data.v) {
       unit * familiar = (unit *)a->data.v;
       set_familiar(mage, familiar);
     }
+    *(unit **)addr = mage;
   }
-  *(unit **)addr = mage;
+  return result;
 }
 
 static int
 read_magician(attrib * a, struct storage * store)
 {
-  variant id;
-
-  id.i = store->r_id(store);
-  ur_add(id, &a->data.v, resolve_mage);
+  int result = read_reference(&a->data.v, store, read_unit_reference, resolve_mage);
+  if (result==0 && a->data.v==NULL) {
+    return AT_READ_FAIL;
+  }
   return AT_READ_OK;
 }
 

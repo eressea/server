@@ -17,10 +17,6 @@
 extern "C" {
 #endif
 
-#if WORMHOLE_MODULE == 0
-#error "must define WORMHOLE_MODULE to use this module"
-#endif
-
   extern void create_wormholes(void);
   extern void register_wormholes(void);
 

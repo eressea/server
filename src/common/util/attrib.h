@@ -77,8 +77,8 @@ extern void a_write(struct storage * store, const attrib * attribs);
 #define NO_WRITE NULL
 #define NO_READ NULL
 
-#define AT_READ_OK 4711
-#define AT_READ_FAIL -4711
+#define AT_READ_OK 0
+#define AT_READ_FAIL -1
 
 #ifdef __cplusplus
 }

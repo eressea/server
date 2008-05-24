@@ -155,18 +155,17 @@ curse_done(attrib * a) {
   destroy_curse((curse *)a->data.v);
 }
 
-/* ------------------------------------------------------------- */
-
 int
 curse_read(attrib * a, struct storage * store)
 {
   curse * c = (curse*)a->data.v;
   const curse_type * ct;
-
+  int ur;
   char cursename[64];
   unsigned int flags;
 
   c->no = store->r_int(store);
+  chash(c);
   store->r_tok_buf(store, cursename, sizeof(cursename));
   flags = store->r_int(store);
   c->duration = store->r_int(store);
@@ -177,18 +176,9 @@ curse_read(attrib * a, struct storage * store)
     c->vigour = vigour;
   }
   if (store->version<INTPAK_VERSION) {
-    variant mageid;
-    mageid.i = store->r_int(store);
-    if (mageid.i <= 0) {
-      c->magician = (unit *)NULL;
-    } else {
-      c->magician = findunit(mageid.i);
-      if (!c->magician) {
-        ur_add(mageid, (void*)&c->magician, resolve_unit);
-      }
-    }
+    ur = read_reference(&c->magician, store, read_int, resolve_unit);
   } else {
-    read_unit_reference(&c->magician, store);
+    ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
   }
   c->effect.i = store->r_int(store);
   ct = ct_find(cursename);
@@ -210,11 +200,11 @@ curse_read(attrib * a, struct storage * store)
     cc->cursedmen = store->r_int(store);
   }
   if (c->type->typ == CURSETYP_REGION) {
-    region * r;
-    read_region_reference(&r, store);
-    c->data.v = r;
+    int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
+    if (ur==0 && rr==0 && !c->data.v) {
+      return AT_READ_FAIL;
+    }
   }
-  chash(c);
 
   return AT_READ_OK;
 }
@@ -689,11 +679,18 @@ is_cursed_with(const attrib *ap, const curse *c)
  * } curse_type;
  */
 
-void
+int
 resolve_curse(variant id, void * address)
 {
-  curse * c = cfindhash(id.i);
+  curse * c = NULL;
+  if (id.i!=0) {
+    c = cfindhash(id.i);
+    if (c==NULL) {
+      return -1;
+    }
+  }
   *(curse**)address = c;
+  return 0;
 }
 
 static const char * oldnames[MAXCURSE] = {

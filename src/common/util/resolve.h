@@ -16,14 +16,20 @@
 #define RESOLVE_H
 
 #include "variant.h"
+struct storage;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  typedef void (*resolve_fun)(variant data, void * address);
-  extern void ur_add(variant data, void * ptrptr, resolve_fun fun);
+  typedef int (*resolve_fun)(variant data, void * address);
+  typedef variant (*read_fun)(struct storage* store);
+  extern int read_reference(void * address, struct storage * store, read_fun reader, resolve_fun resolver);
+
+  extern void ur_add(variant data, void * address, resolve_fun fun);
   extern void resolve(void);
+
+  extern variant read_int(struct storage * store);
 
 #ifdef __cplusplus
 }

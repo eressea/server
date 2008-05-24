@@ -23,9 +23,11 @@
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/resolve.h>
 #include <util/storage.h>
 
 /* stdc includes */
@@ -90,6 +92,7 @@ static int
 object_read(attrib *a, struct storage * store)
 {
   object_data * data = (object_data *)a->data.v;
+  int result;
 
   data->name = store->r_str(store);
   data->type = (object_type)store->r_int(store);
@@ -104,13 +107,29 @@ object_read(attrib *a, struct storage * store)
       data->data.str = store->r_str(store);
       break;
     case TBUILDING:
-      return read_building_reference(&data->data.b, store);
+      result = read_reference(&data->data.b, store, read_building_reference, resolve_building);
+      if (result==0 && !data->data.b) {
+        return AT_READ_FAIL;
+      }
+      break;
     case TUNIT:
-      return read_unit_reference(&data->data.u, store);
+      result = read_reference(&data->data.u, store, read_unit_reference, resolve_unit);
+      if (result==0 && !data->data.u) {
+        return AT_READ_FAIL;
+      }
+      break;
     case TFACTION:
-      return read_faction_reference(&data->data.f, store);
+      result = read_reference(&data->data.f, store, read_faction_reference, resolve_faction);
+      if (result==0 && !data->data.f) {
+        return AT_READ_FAIL;
+      }
+      break;
     case TREGION:
-      return read_region_reference(&data->data.r, store);
+      result = read_reference(&data->data.r, store, read_region_reference, RESOLVE_REGION(store->version));
+      if (result==0 && !data->data.r) {
+        return AT_READ_FAIL;
+      }
+      break;
     case TSHIP:
       /* return read_ship_reference(&data->data.sh, store); */
       assert(!"not implemented");

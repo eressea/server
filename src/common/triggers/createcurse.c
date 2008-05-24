@@ -97,31 +97,31 @@ createcurse_write(const trigger * t, struct storage * store)
 static int
 createcurse_read(trigger * t, struct storage * store)
 {
-	createcurse_data * td = (createcurse_data*)t->data.v;
-	char zText[128];
+  createcurse_data * td = (createcurse_data*)t->data.v;
+  char zText[128];
 
-    read_unit_reference(&td->mage, store);
-    read_unit_reference(&td->target, store);
+  read_reference(&td->mage, store, read_unit_reference, resolve_unit);
+  read_reference(&td->target, store, read_unit_reference, resolve_unit);
 
-	if (store->version<CURSETYPE_VERSION) {
-		int id1, id2;
-        id1 = store->r_int(store);
-        id2 = store->r_int(store);
-        assert(id2==0);
-        td->vigour = store->r_flt(store);
-        td->duration = store->r_int(store);
-        td->effect = store->r_int(store);
-        td->men = store->r_int(store);
-        td->type = ct_find(oldcursename(id1));
-	} else {
-      store->r_tok_buf(store, zText, sizeof(zText));
-      td->type = ct_find(zText);
-      td->vigour = store->r_flt(store);
-      td->duration = store->r_int(store);
-      td->effect = store->r_int(store);
-      td->men = store->r_int(store);
-	}
-	return AT_READ_OK;
+  if (store->version<CURSETYPE_VERSION) {
+    int id1, id2;
+    id1 = store->r_int(store);
+    id2 = store->r_int(store);
+    assert(id2==0);
+    td->vigour = store->r_flt(store);
+    td->duration = store->r_int(store);
+    td->effect = store->r_int(store);
+    td->men = store->r_int(store);
+    td->type = ct_find(oldcursename(id1));
+  } else {
+    store->r_tok_buf(store, zText, sizeof(zText));
+    td->type = ct_find(zText);
+    td->vigour = store->r_flt(store);
+    td->duration = store->r_int(store);
+    td->effect = store->r_int(store);
+    td->men = store->r_int(store);
+  }
+  return AT_READ_OK;
 }
 
 trigger_type tt_createcurse = {

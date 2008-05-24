@@ -182,9 +182,9 @@ int gift_items(struct unit * u, int flags);
 void make_zombie(unit * u);
 
 /* see resolve.h */
-extern void resolve_unit(variant data, void * address);
+extern int resolve_unit(variant data, void * address);
 extern void write_unit_reference(const struct unit * u, struct storage * store);
-extern int read_unit_reference(unit ** up, struct storage * store);
+extern variant read_unit_reference(struct storage * store);
 
 extern void leave(struct region * r, struct unit * u);
 extern void leave_ship(unit * u);

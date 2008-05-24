@@ -64,7 +64,7 @@ init_attributes(void)
 	init_iceberg();
 	init_key();
 	init_gm();
-	init_follow();
+	init_follow(); /* only for old datafiles */
 	init_targetregion();
 	init_orcification();
 	init_hate();

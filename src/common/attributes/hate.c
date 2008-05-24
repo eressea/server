@@ -41,10 +41,11 @@ write_hate(const attrib * a, struct storage * store)
 static int
 read_hate(attrib * a, struct storage * store)
 {
-  unit * u;
-  int result = read_unit_reference(&u, store);
-  a->data.v = u;
-  return result;
+  int result = read_reference(&a->data.v, store, read_unit_reference, resolve_unit);
+  if (result==0 && !a->data.v) {
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 attrib_type at_hate = {

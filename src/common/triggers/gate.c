@@ -17,11 +17,13 @@
 #include <kernel/building.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <kernel/version.h>
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/log.h>
+#include <util/resolve.h>
 #include <util/storage.h>
 
 /* libc includes */
@@ -73,10 +75,12 @@ gate_read(trigger * t, struct storage * store)
 {
 	gate_data * gd = (gate_data*)t->data.v;
 
-	int bc = read_building_reference(&gd->gate, store);
-	int rc = read_region_reference(&gd->target, store);
+	int bc = read_reference(&gd->gate, store, read_building_reference, resolve_building);
+	int rc = read_reference(&gd->target, store, read_region_reference, RESOLVE_REGION(store->version));
 
-	if (rc!=AT_READ_OK || bc!=AT_READ_OK) return AT_READ_FAIL;
+    if (bc==0 && rc==0) {
+      if (!gd->gate || !gd->target) return AT_READ_FAIL;
+    }
 	return AT_READ_OK;
 }
 

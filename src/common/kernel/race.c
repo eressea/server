@@ -310,27 +310,27 @@ write_race_reference(const race * rc, struct storage * store)
   store->w_tok(store, rc?rc->_name[0]:"none");
 }
 
-int
-read_race_reference(const struct race ** rp, struct storage * store)
+variant
+read_race_reference(struct storage * store)
 {
+  variant result;
   char zName[20];
   if (store->version<NEWRACE_VERSION) {
     int i;
     i = store->r_int(store);
     if (i>=0) {
-      *rp = new_race[i];
+      result.v = (void*)new_race[i];
     } else {
-      *rp = NULL;
-      return AT_READ_FAIL;
+      result.v = NULL;
     }
   } else {
     store->r_tok_buf(store, zName, sizeof(zName));
     if (strcmp(zName, "none")==0) {
-      *rp = NULL;
-      return AT_READ_OK;
+      result.v = NULL;
+    } else {
+      result.v = rc_find(zName);
+      assert(result.v!=NULL);
     }
-    *rp = rc_find(zName);
-    assert(*rp!=NULL);
   }
-  return AT_READ_OK;
+  return result;
 }

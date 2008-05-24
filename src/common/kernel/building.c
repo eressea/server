@@ -82,8 +82,7 @@ static int
 lc_read(struct attrib * a, struct storage * store)
 {
   building_action * data = (building_action*)a->data.v;
-
-  read_building_reference(&data->b, store);
+  int result = read_reference(&data->b, store, read_building_reference, resolve_building);
   if (store->version<UNICODE_VERSION) {
     data->fname = store->r_str(store);
   } else {
@@ -100,6 +99,9 @@ lc_read(struct attrib * a, struct storage * store)
     else data->param = strdup(lbuf);
   } else {
     data->param = strdup(NULLSTRING);
+  }
+  if (result==0 && !data->b) {
+    return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
@@ -370,31 +372,32 @@ register_buildings(void)
 }
 
 void
-resolve_building(variant id, void * address) {
-  building ** b = (building **)address;
-  *b = findbuilding(id.i);
-}
-
-void
 write_building_reference(const struct building * b, struct storage * store)
 {
   store->w_id(store, b?b->no:0);
 }
 
+
 int
-read_building_reference(struct building ** b, struct storage * store)
+resolve_building(variant id, void * address)
 {
-  variant var;
-  var.i = store->r_id(store);
-  if (var.i<=0) {
-    *b = NULL;
-    return AT_READ_FAIL;
-  }
-  else {
-    *b = findbuilding(var.i);
-    if (*b==NULL) ur_add(var, (void**)b, resolve_building);
-    return AT_READ_OK;
+  building * b = NULL;
+  if (id.i!=0) {
+    b = findbuilding(id.i);
+    if (b==NULL) {
+      return -1;
     }
+  }
+  *(building**)address = b;
+  return 0;
+}
+
+variant
+read_building_reference(struct storage * store)
+{
+  variant result;
+  result.i = store->r_id(store);
+  return result;
 }
 
 void

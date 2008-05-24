@@ -777,7 +777,7 @@ drifting_ships(region * r)
 
         damage_ship(sh, 0.02);
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
-          remove_ship(shp, sh);
+          remove_ship(&sh->region->ships, sh);
         }
       }
 

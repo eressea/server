@@ -83,17 +83,20 @@ giveitem_write(const trigger * t, struct storage * store)
 static int
 giveitem_read(trigger * t, struct storage * store)
 {
-	giveitem_data * td = (giveitem_data*)t->data.v;
-	char zText[128];
+  giveitem_data * td = (giveitem_data*)t->data.v;
+  char zText[128];
 
-    read_unit_reference(&td->u, store);
+  int result = read_reference(&td->u, store, read_unit_reference, resolve_unit);
 
-    td->number = store->r_int(store);
-    store->r_tok_buf(store, zText, sizeof(zText));
-	td->itype = it_find(zText);
-	assert(td->itype);
+  td->number = store->r_int(store);
+  store->r_tok_buf(store, zText, sizeof(zText));
+  td->itype = it_find(zText);
+  assert(td->itype);
 
-	return AT_READ_OK;
+  if (result==0 && td->u==NULL) {
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 trigger_type tt_giveitem = {

@@ -2668,7 +2668,7 @@ typedef struct bresvole {
   curse * self;
 } bresolve;
 
-static void resolve_buddy(variant data, void * addr);
+static int resolve_buddy(variant data, void * addr);
 
 static int
 cw_read(attrib * a, storage * store)
@@ -2701,39 +2701,46 @@ attrib_type at_cursewall =
   ATF_CURSE
 };
 
-static void
+static int
 resolve_buddy(variant data, void * addr)
 {
   curse * result = NULL;
   bresolve * br = (bresolve*)data.v;
-  border * b = find_border(br->id);
 
-  if (b && b->from && b->to) {
-    attrib * a = a_find(b->from->attribs, &at_cursewall);
-    while (a && a->data.v!=br->self) {
-      curse * c = (curse*)a->data.v;
-      wallcurse * wc = (wallcurse*)c->data.v;
-      if (wc->wall->id==br->id) break;
-      a = a->next;
-    }
-    if (!a || a->type!=&at_cursewall) {
-      a = a_find(b->to->attribs, &at_cursewall);
-      while (a && a->type==&at_cursewall && a->data.v!=br->self) {
+  if (br->id>=0) {
+    border * b = find_border(br->id);
+
+    if (b && b->from && b->to) {
+      attrib * a = a_find(b->from->attribs, &at_cursewall);
+      while (a && a->data.v!=br->self) {
         curse * c = (curse*)a->data.v;
         wallcurse * wc = (wallcurse*)c->data.v;
         if (wc->wall->id==br->id) break;
         a = a->next;
       }
-    }
-    if (a && a->type==&at_cursewall) {
-      curse * c = (curse*)a->data.v;
-      free(br);
-      result = c;
+      if (!a || a->type!=&at_cursewall) {
+        a = a_find(b->to->attribs, &at_cursewall);
+        while (a && a->type==&at_cursewall && a->data.v!=br->self) {
+          curse * c = (curse*)a->data.v;
+          wallcurse * wc = (wallcurse*)c->data.v;
+          if (wc->wall->id==br->id) break;
+          a = a->next;
+        }
+      }
+      if (a && a->type==&at_cursewall) {
+        curse * c = (curse*)a->data.v;
+        free(br);
+        result = c;
+      }
+    } else {
+      /* fail, object does not exist (but if you're still loading then 
+      * you may want to try again later) */
+      return -1;
     }
   }
   *(curse**)addr = result;
+  return 0;
 }
-
 
 static const char *
 b_namefirewall(const border * b, const region * r, const faction * f, int gflags)
@@ -2776,7 +2783,7 @@ wall_read(border * b, storage * store)
       ur_add(mno, &fd->mage, resolve_unit);
     }
   } else {
-    read_unit_reference(&fd->mage, store);
+    read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
   }
   fd->force = store->r_int(store);
   if (store->version>=NOBORDERATTRIBS_VERSION) {
@@ -3190,8 +3197,8 @@ dc_read_compat(struct attrib * a, storage * store)
   u = findunit(var.i);
 
   /* this only affects really old data. no need to change: */
-  rx = store->r_int(store);
-  ry = store->r_int(store);
+  rx = (short)store->r_int(store);
+  ry = (short)store->r_int(store);
   r = findregion(rx, ry);
 
   if (r!=NULL) {

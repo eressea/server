@@ -24,10 +24,12 @@
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/storage.h>
+#include <util/resolve.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -48,10 +50,11 @@ xmasgate_write(const trigger * t, struct storage * store)
 static int
 xmasgate_read(trigger * t, struct storage * store)
 {
-  building * b;
-  int result =read_building_reference(&b, store);
-  t->data.v = b;
-  return result;
+  int bc = read_reference(&t->data.v, store, read_building_reference, resolve_building);
+  if (bc==0 && !t->data.v) {
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 struct trigger_type tt_xmasgate = {

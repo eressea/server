@@ -950,6 +950,7 @@ free_region(region * r)
 
   while (r->buildings) {
     building * b = r->buildings;
+    assert(b->region==r);
     r->buildings = b->next;
     bunhash(b); /* must be done here, because remove_building does it, and wasn't called */
     free_building(b);
@@ -957,6 +958,7 @@ free_region(region * r)
 
   while (r->ships) {
     ship * s = r->ships;
+    assert(s->region==r);
     r->ships = s->next;
     sunhash(s);
     free_ship(s);
@@ -1237,46 +1239,41 @@ production(const region *r)
   return p;
 }
 
-static void
-resolve_region(variant id, void * address) {
+int
+resolve_region_coor(variant id, void * address) {
   region * r = findregion(id.sa[0], id.sa[1]);
-  *(region**)address = r;
-}
-
-static void
-resolve_regionbyid(variant id, void * address) {
-  region * r = findregionbyid((unsigned int)id.i);
-  *(region**)address = r;
+  if (r) {
+    *(region**)address = r;
+    return 0;
+  }
+  return -1;
 }
 
 int
-read_region_reference(region ** r, struct storage * store)
+resolve_region_id(variant id, void * address)
 {
-  if (store->version<UIDHASH_VERSION) {
-    variant coor;
-    coor.sa[0] = (short)store->r_int(store);
-    coor.sa[1] = (short)store->r_int(store);
-    if (coor.sa[0]==SHRT_MAX) {
-      *r = NULL;
-      return AT_READ_FAIL;
-    }
-    *r = findregion(coor.sa[0], coor.sa[1]);
-    if (*r==NULL) {
-      ur_add(coor, (void**)r, resolve_region);
-    }
-  } else {
-    variant uid;
-    uid.i = store->r_int(store);
-    if (uid.i==0) {
-      *r = NULL;
-    } else {
-      *r = findregionbyid((unsigned int)uid.i);
-      if (*r==NULL) {
-        ur_add(uid, (void**)r, resolve_regionbyid);
-      }
+  region * r = NULL;
+  if (id.i!=0) {
+    r = findregionbyid((unsigned int)id.i);
+    if (r==NULL) {
+      return -1;
     }
   }
-  return AT_READ_OK;
+  *(region**)address = r;
+  return 0;
+}
+
+variant
+read_region_reference(struct storage * store)
+{
+  variant result;
+  if (store->version<UIDHASH_VERSION) {
+    result.sa[0] = (short)store->r_int(store);
+    result.sa[1] = (short)store->r_int(store);
+  } else {
+    result.i = store->r_int(store);
+  }
+  return result;
 }
 
 void

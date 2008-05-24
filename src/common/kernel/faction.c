@@ -104,9 +104,17 @@ factionname(const faction * f)
   return ibuf;
 }
 
-void
-resolve_faction(variant id, void * addr) {
-  *(faction**)addr = findfaction(id.i);
+int
+resolve_faction(variant id, void * address) {
+  faction * f = NULL;
+  if (id.i!=0) {
+    f = findfaction(id.i);
+    if (f==NULL) {
+      return -1;
+    }
+  }
+  *(faction**)address = f;
+  return 0;
 }
 
 #define MAX_FACTION_ID (36*36*36*36)
@@ -208,18 +216,12 @@ checkpasswd(const faction * f, const char * passwd, boolean shortp)
 }
 
 
-int
-read_faction_reference(faction ** f, struct storage * store)
+variant
+read_faction_reference(struct storage * store)
 {
   variant id;
   id.i = store->r_id(store);
-  if (id.i<=0 && (store->version>=NOZEROIDS_VERSION || id.i<0))  {
-    *f = NULL;
-    return AT_READ_FAIL;
-  }
-  *f = findfaction(id.i);
-  if (*f==NULL) ur_add(id, f, resolve_faction);
-  return AT_READ_OK;
+  return id;
 }
 
 void

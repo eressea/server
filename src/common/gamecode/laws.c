@@ -25,9 +25,7 @@
 
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
-#if WORMHOLE_MODULE
 #include <modules/wormhole.h>
-#endif
 
 /* gamecode includes */
 #include "economy.h"
@@ -3933,6 +3931,7 @@ processorders (void)
 {
   static int init = 0;
   region *r;
+  const char * str;
 
   if (!init) {
     init_processor();
@@ -3947,9 +3946,11 @@ processorders (void)
   ageing();
   remove_empty_units();
 
-#if WORMHOLE_MODULE
-  create_wormholes();
-#endif
+  str = get_param(global.parameters, "modules.wormholes");
+  if (str && atoi(str)) {
+    create_wormholes();
+  }
+
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
    * Beschreibungen geändert haben */
   update_spells();

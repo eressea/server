@@ -88,7 +88,7 @@ extern "C" {
 
 
   extern border * find_border(unsigned int id);
-  void resolve_borderid(variant data, void * addr);
+  int resolve_borderid(variant data, void * addr);
   extern void free_borders(void);
 
   extern border * get_borders(const struct region * r1, const struct region * r2);

@@ -44,7 +44,6 @@
 #define SCORE_MODULE 1
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
-#define WORMHOLE_MODULE 1
 #define XECMD_MODULE 1
 #define KARMA_MODULE 0
 #define DUNGEON_MODULE 0

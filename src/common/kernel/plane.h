@@ -73,7 +73,7 @@ plane * create_new_plane(int id, const char *name, short minx, short maxx, short
 plane * getplanebyname(const char *);
 extern short rel_to_abs(const struct plane *pl, const struct faction * f, short rel, unsigned char index);
 extern boolean is_watcher(const struct plane * p, const struct faction * f);
-extern void resolve_plane(variant data, void * addr);
+extern int resolve_plane(variant data, void * addr);
 extern void write_plane_reference(const plane * p, struct storage * store);
 extern int read_plane_reference(plane ** pp, struct storage * store);
 

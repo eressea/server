@@ -12,8 +12,8 @@
 
 #include <config.h>
 #include <kernel/eressea.h>
+#include "settings.h"
 
-#if WORMHOLE_MODULE
 #include "wormhole.h"
 
 /* kernel includes */
@@ -109,19 +109,33 @@ wormhole_write(const struct attrib * a, storage * store)
   write_region_reference(data->exit, store);
 }
 
+/** conversion code, turn 573, 2008-05-23 */
+static int
+resolve_exit(variant id, void * address)
+{
+  building * b = findbuilding(id.i);
+  region ** rp = address;
+  if (b) {
+    *rp = b->region;
+    return 0;
+  }
+  return -1;
+}
+
 static int
 wormhole_read(struct attrib * a, storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
-  read_building_reference(&data->entry, store);
-  if (store->version<UIDHASH_VERSION) {
-    building * b;
-    read_building_reference(&b, store);
-    if (b) data->exit = b->region;
-  } else {
-    read_region_reference(&data->exit, store);
+  resolve_fun resolver = (store->version<UIDHASH_VERSION)?resolve_exit:resolve_region_id;
+  read_fun reader = (store->version<UIDHASH_VERSION)?read_building_reference:read_region_reference;
+
+  int rb = read_reference(&data->entry, store, read_building_reference, resolve_building);
+  int rr = read_reference(&data->exit, store, reader, resolver);
+  if (rb==0 && rr==0) {
+    if (!data->exit || !data->entry) {
+      return AT_READ_FAIL;
+    }
   }
-  /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
   return AT_READ_OK;
 }
 
@@ -204,4 +218,3 @@ register_wormholes(void)
 {
   at_register(&at_wormhole);
 }
-#endif

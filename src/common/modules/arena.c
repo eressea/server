@@ -418,9 +418,10 @@ caldera_write(const trigger * t, struct storage * store)
 static int
 caldera_read(trigger * t, struct storage * store)
 {
-  building * b;
-  read_building_reference(&b, store);
-  t->data.v = b;
+  int rb = read_reference(&t->data.v, store, read_building_reference, resolve_building);
+  if (rb==0 && !t->data.v) {
+    return AT_READ_FAIL;
+  }
   return AT_READ_OK;
 }
 

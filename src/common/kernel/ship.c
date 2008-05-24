@@ -198,9 +198,11 @@ remove_ship(ship ** slist, ship * sh)
   }
   sunhash(sh);
   while (*slist && *slist!=sh) slist = &(*slist)->next;
+  assert(*slist);
   *slist = sh->next;
   sh->next = deleted_ships;
   deleted_ships = sh;
+  sh->region = NULL;
 }
 
 void

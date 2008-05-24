@@ -229,8 +229,6 @@ extern const short delta_x[MAXDIRECTIONS];
 extern const short delta_y[MAXDIRECTIONS];
 extern direction_t dir_invert(direction_t dir);
 extern int production(const struct region *r);
-extern int read_region_reference(struct region ** r, struct storage * store);
-extern void write_region_reference(const struct region * r, struct storage * store);
 
 void region_setowner(struct region * r, struct faction * owner);
 extern struct faction * region_owner(const struct region * r);
@@ -244,6 +242,11 @@ extern struct region * r_connect(const struct region *, direction_t dir);
 
 extern void free_regions(void);
 
+extern void write_region_reference(const struct region * r, struct storage * store);
+extern variant read_region_reference(struct storage * store);
+extern int resolve_region_coor(variant id, void * address);
+extern int resolve_region_id(variant id, void * address);
+#define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
 #ifdef __cplusplus
 }
 #endif

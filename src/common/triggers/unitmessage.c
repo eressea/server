@@ -89,13 +89,16 @@ unitmessage_read(trigger * t, struct storage * store)
   unitmessage_data * td = (unitmessage_data*)t->data.v;
   char zText[256];
 
-  read_unit_reference(&td->target, store);
+  int result = read_reference(&td->target, store, read_unit_reference, resolve_unit);
 
   td->string = store->r_tok(store);
   td->type = store->r_int(store);
   td->level = store->r_int(store);
   td->string = strdup(zText);
 
+  if (result==0 && td->target==NULL) {
+    return AT_READ_FAIL;
+  }
   return AT_READ_OK;
 }
 

@@ -27,9 +27,7 @@
 #if ARENA_MODULE
 #include <modules/arena.h>
 #endif
-#if WORMHOLE_MODULE
 #include <modules/wormhole.h>
-#endif
 #if DUNGEON_MODULE
 #include <modules/dungeon.h>
 #endif

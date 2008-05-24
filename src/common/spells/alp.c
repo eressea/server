@@ -27,6 +27,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/resolve.h>
 #include <util/umlaut.h>
 #include <util/storage.h>
 
@@ -61,37 +62,40 @@ alp_done(attrib * a)
 static int
 alp_verify(attrib * a)
 {
-	alp_data * ad = (alp_data*)a->data.v;
-	if (ad->mage && ad->target) return 1;
-	return 0; /* kaputt */
+  alp_data * ad = (alp_data*)a->data.v;
+  if (ad->mage && ad->target) return 1;
+  return 0; /* remove the attribute */
 }
 
 static void
 alp_write(const attrib * a, struct storage * store)
 {
-	alp_data * ad = (alp_data*)a->data.v;
-	write_unit_reference(ad->mage, store);
-	write_unit_reference(ad->target, store);
+  alp_data * ad = (alp_data*)a->data.v;
+  write_unit_reference(ad->mage, store);
+  write_unit_reference(ad->target, store);
 }
 
 static int
 alp_read(attrib * a, struct storage * store)
 {
-	alp_data * ad = (alp_data*)a->data.v;
-	int m = read_unit_reference(&ad->mage, store);
-	int t = read_unit_reference(&ad->target, store);
-	if (m!=AT_READ_OK || t!=AT_READ_OK) return AT_READ_FAIL;
-	return AT_READ_OK;
+  alp_data * ad = (alp_data*)a->data.v;
+  int rm = read_reference(&ad->mage, store, read_unit_reference, resolve_unit);
+  int rt = read_reference(&ad->target, store, read_unit_reference, resolve_unit);
+  if (rt==0 && rm==0 && (!ad->target || !ad->mage)) {
+    /* the target or mage disappeared. */
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 static attrib_type at_alp = { 
-	"alp", 
-	alp_init, 
-	alp_done, 
-	alp_verify, 
-	alp_write, 
-	alp_read,
-	ATF_UNIQUE
+  "alp", 
+  alp_init, 
+  alp_done, 
+  alp_verify, 
+  alp_write, 
+  alp_read,
+  ATF_UNIQUE
 };
 
 int

@@ -523,10 +523,11 @@ a_writesiege(const attrib * a, struct storage * store)
 int
 a_readsiege(attrib * a, struct storage * store)
 {
-  struct building * b;
-  int result = read_building_reference(&b, store);
-  a->data.v = b;
-  return result;
+  int result = read_reference(&a->data.v, store, read_building_reference, resolve_building);
+  if (result==0 && !a->data.v) {
+    return AT_READ_FAIL;
+  }
+  return AT_READ_OK;
 }
 
 attrib_type at_siege = {
@@ -624,27 +625,26 @@ write_unit_reference(const unit * u, struct storage * store)
   store->w_id(store, u?u->no:0);
 }
 
-void
+int
 resolve_unit(variant id, void * address)
 {
-  unit * u = ufindhash(id.i);
+  unit * u = NULL;
+  if (id.i!=0) {
+    u = findunit(id.i);
+    if (u==NULL) {
+      return -1;
+    }
+  }
   *(unit**)address = u;
+  return 0;
 }
 
-int
-read_unit_reference(unit ** up, struct storage * store)
+variant
+read_unit_reference(struct storage * store)
 {
   variant var;
-
-  assert(up!=NULL);
   var.i = store->r_id(store);
-  if (var.i<=0) {
-    *up = NULL;
-    return AT_READ_FAIL;
-  }
-  *up = findunit(var.i);
-  if (*up==NULL) ur_add(var, (void**)up, resolve_unit);
-  return AT_READ_OK;
+  return var;
 }
 
 attrib_type at_stealth = {

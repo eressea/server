@@ -33,10 +33,9 @@ write_targetregion(const attrib * a, struct storage * store)
 static int
 read_targetregion(attrib * a, struct storage * store)
 {
-  region * r;
-  int result = read_region_reference(&r, store);
-  a->data.v = r;
-  return result;
+  int result = read_reference(&a->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
+  if (result==0 && !a->data.v) return AT_READ_FAIL;
+  return AT_READ_OK;
 }
 
 attrib_type at_targetregion = {
