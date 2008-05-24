@@ -307,7 +307,7 @@ shipowner(const ship * sh)
 void
 write_ship_reference(const struct ship * sh, struct storage * store)
 {
-  store->w_id(store, sh?sh->no:0);
+  store->w_id(store, (sh && sh->region)?sh->no:0);
 }
 
 void

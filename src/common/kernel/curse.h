@@ -292,7 +292,6 @@ extern struct curse * get_curse(struct attrib *ap, const curse_type * ctype);
    * oder einen NULL-pointer
    * */
 
-struct unit * get_tracingunit(struct attrib **ap, const curse_type * ct);
 int find_cursebyname(const char *c);
 const curse_type * ct_find(const char *c);
 void ct_register(const curse_type *);

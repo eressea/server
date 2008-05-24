@@ -2108,7 +2108,7 @@ sm_familiar(const unit * u, const region * r, skill_t sk, int value) /* skillmod
     int mod;
     unit * familiar = get_familiar(u);
     if (familiar==NULL) {
-      log_error(("[sm_familiar] %s has a familiar-skillmod, but no familiar\n", unitname(u)));
+      /* the familiar is dead */
       return value;
     }
     mod = eff_skill(familiar, sk, r)/2;
@@ -2391,16 +2391,22 @@ attrib_type at_clone = {
 unit *
 get_familiar(const unit *u)
 {
-	attrib * a = a_find(u->attribs, &at_familiar);
-	if (a!=NULL) return (unit*)a->data.v;
-	return NULL;
+  attrib * a = a_find(u->attribs, &at_familiar);
+  if (a!=NULL) {
+    unit * u = (unit*)a->data.v;
+    if (u->number>0) return u;
+  }
+  return NULL;
 }
 
 unit *
 get_familiar_mage(const unit *u)
 {
 	attrib * a = a_find(u->attribs, &at_familiarmage);
-	if (a!=NULL) return (unit*)a->data.v;
+    if (a!=NULL) {
+      unit * u = (unit*)a->data.v;
+      if (u->number>0) return u;
+    }
 	return NULL;
 }
 
@@ -2408,7 +2414,10 @@ unit *
 get_clone(const unit *u)
 {
 	attrib * a = a_find(u->attribs, &at_clone);
-	if (a!=NULL) return (unit*)a->data.v;
+    if (a!=NULL) {
+      unit * u = (unit*)a->data.v;
+      if (u->number>0) return u;
+    }
 	return NULL;
 }
 
@@ -2416,7 +2425,10 @@ unit *
 get_clone_mage(const unit *u)
 {
   attrib * a = a_find(u->attribs, &at_clonemage);
-  if (a!=NULL) return (unit*)a->data.v;
+  if (a!=NULL) {
+    unit * u = (unit*)a->data.v;
+    if (u->number>0) return u;
+  }
   return NULL;
 }
 

@@ -678,7 +678,7 @@ cr_output_unit(FILE * F, const region * r,
     itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
   }
 
-  assert(u);
+  assert(u && u->number);
 
 #if KARMA_MODULE
   if (fspecial(u->faction, FS_HIDDEN))

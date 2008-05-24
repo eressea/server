@@ -374,7 +374,7 @@ register_buildings(void)
 void
 write_building_reference(const struct building * b, struct storage * store)
 {
-  store->w_id(store, b?b->no:0);
+  store->w_id(store, (b && b->region)?b->no:0);
 }
 
 
