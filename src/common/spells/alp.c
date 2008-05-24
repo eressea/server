@@ -175,7 +175,7 @@ alp_findet_opfer(unit *alp, region *r)
   c = create_curse(mage, &opfer->attribs, ct_find("worse"), 2, 2, effect, opfer->number);
   /* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
   * auch auf normale */
-  remove_unit(&r->units, alp);
+  set_number(alp, 0);
 
   /* wenn der Magier stirbt, wird der Curse wieder vom Opfer genommen */
   add_trigger(&mage->attribs, "destroy", trigger_removecurse(c, opfer));

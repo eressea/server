@@ -329,6 +329,7 @@ remove_unit(unit ** ulist, unit * u)
   
   if (u->number) set_number(u, 0);
   leave(u->region, u);
+  u->region = NULL;
 
   uunhash(u);
   if (ulist) {
