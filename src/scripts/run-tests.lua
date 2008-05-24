@@ -56,12 +56,34 @@ function test_hse()
 	write_game("50.txt.1", "text")
 end
 
+function test_realloc()
+  local t1 = os.clock()
+  read_game("571.dat.2", "binary")
+  print(os.clock() - t1)
+  free_game()
+  print(os.clock() - t1)
+  -- and again
+  local t2 = os.clock()
+  read_game("571.dat.2", "binary")
+  print(os.clock() - t2)
+  free_game()
+  print(os.clock() - t2)
+end
+
+function test_bmark()
+  local t1 = os.clock()
+  read_game("566.dat", "binary")
+  print(os.clock() - t1)
+end
+
 loadscript("default.lua")
 run_scripts()
 -- go
 local now = os.clock()
-test_free()
+-- test_free()
+test_bmark()
 -- test_hse()
+-- test_realloc()
 local elapsed = os.clock() - now
 print(elapsed)
 -- text: 50.574
