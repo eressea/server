@@ -68,7 +68,6 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/cvector.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
@@ -77,7 +76,6 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/sql.h>
-#include <util/vset.h>
 
 /* libc includes */
 #include <stdio.h>

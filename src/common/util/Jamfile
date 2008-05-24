@@ -19,14 +19,12 @@ SOURCES =
  filereader.c
  functions.c
  goodies.c
- graph.c
  language.c
  lists.c
  log.c
  message.c
  nrmessage.c
  parser.c
- patricia.c
  rand.c
  resolve.c
  sql.c
@@ -34,9 +32,6 @@ SOURCES =
  translation.c
  umlaut.c
  unicode.c
- vmap.c
- vset.c
- windir.c
  xml.c
  ;
 

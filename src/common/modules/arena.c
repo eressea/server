@@ -345,9 +345,6 @@ guardian_faction(plane * pl, int id)
 		set_string(&u->name, "Igjarjuks Auge");
 		set_item(u, I_RING_OF_INVISIBILITY, 1);
 		set_order(&u->thisorder, NULL);
-#ifdef LASTORDER
-		set_order(&u->lastorder, NULL);
-#endif
 		fset(u, UFL_PARTEITARNUNG);
 		set_money(u, 1000);
 	}

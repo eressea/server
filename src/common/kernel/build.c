@@ -942,12 +942,8 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   }
 
   if (new_order) {
-#ifdef LASTORDER
-    set_order(&u->lastorder, new_order);
-#else
     replace_order(&u->orders, ord, new_order);
     free_order(new_order);
-#endif
   }
 
   b->size += built;
@@ -1031,12 +1027,8 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
   }
   fset(u, UFL_OWNER);
   new_order = create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale, parameters[P_SHIP]), sh->no);
-#ifdef LASTORDER
-  set_order(&u->lastorder, new_order);
-#else
   replace_order(&u->orders, ord, new_order);
   free_order(new_order);
-#endif
 
   build_ship(u, sh, want);
 }

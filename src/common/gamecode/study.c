@@ -437,12 +437,8 @@ teach_cmd(unit * u, struct order * ord)
       teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
     }
     new_order = create_order(K_TEACH, u->faction->locale, "%s", zOrder);
-#ifdef LASTORDER
-    set_order(&u->lastorder, new_order);
-#else
     replace_order(&u->orders, ord, new_order);
     free_order(new_order); /* parse_order & set_order have each increased the refcount */
-#endif
   }
   if (academy && sk!=NOSKILL) {
     academy = academy/30; /* anzahl gelehrter wochen, max. 10 */

@@ -826,12 +826,6 @@ cr_output_unit(FILE * F, const region * r,
     }
     /* default commands */
     fprintf(F, "COMMANDS\n");
-#ifdef LASTORDER
-    if (u->lastorder) {
-      fwriteorder(F, u->lastorder, f->locale);
-      fputc('\n', F);
-    }
-#else
     for (ord = u->old_orders; ord; ord = ord->next) {
       /* this new order will replace the old defaults */
       if (is_persistent(ord)) {
@@ -839,11 +833,7 @@ cr_output_unit(FILE * F, const region * r,
         fputc('\n', F);
       }
     }
-#endif
     for (ord = u->orders; ord; ord = ord->next) {
-#ifdef LASTORDER
-      if (ord==u->lastorder) continue;
-#endif
       if (u->old_orders && is_repeated(ord)) continue; /* unit has defaults */
       if (is_persistent(ord)) {
         fwriteorder(F, ord, f->locale);

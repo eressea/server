@@ -676,9 +676,11 @@ volcano_outbreak(region *r)
   unit *u, **up;
   faction *f;
 
-  for (u=r->units; u; u=u->next) {
-    f = u->faction;
-    freset(f, FFL_SELECT);
+  for (f=NULL,u=r->units; u; u=u->next) {
+    if (f!=u->faction) {
+      f = u->faction;
+      freset(f, FFL_SELECT);
+    }
   }
   rn = rrandneighbour(r);
 

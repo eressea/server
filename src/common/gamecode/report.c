@@ -1452,7 +1452,6 @@ report_template(const char * filename, report_context * ctx, const char * charse
         rps_nowrap(F, buf);
         rnl(F);
 
-#ifndef LASTORDER
         for (ord = u->old_orders; ord; ord = ord->next) {
           /* this new order will replace the old defaults */
           strcpy(buf, "   ");
@@ -1460,7 +1459,6 @@ report_template(const char * filename, report_context * ctx, const char * charse
           rps_nowrap(F, buf);
           rnl(F);
         }
-#endif
         for (ord = u->orders; ord; ord = ord->next) {
           if (u->old_orders && is_repeated(ord)) continue; /* unit has defaults */
           if (is_persistent(ord)) {
@@ -1473,14 +1471,6 @@ report_template(const char * filename, report_context * ctx, const char * charse
 
         /* If the lastorder begins with an @ it should have
         * been printed in the loop before. */
-#ifdef LASTORDER
-        if (u->lastorder && !is_persistent(u->lastorder)) {
-          strcpy(buf, "   ");
-          write_order(u->lastorder, u->faction->locale, buf+2, sizeof(buf)-2);
-          rps_nowrap(F, buf);
-          rnl(F);
-        }
-#endif
       }
     }
   }

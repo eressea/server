@@ -1016,12 +1016,8 @@ cycle_route(order * ord, unit *u, int gereist)
 
 	strcat(neworder, tail);
   norder = create_order(K_ROUTE, u->faction->locale, "%s", neworder);
-#ifdef LASTORDER
-	set_order(&u->lastorder, norder);
-#else
   replace_order(&u->orders, ord, norder);
   free_order(norder);
-#endif
 }
 
 static boolean 

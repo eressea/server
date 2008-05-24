@@ -102,8 +102,6 @@ extern "C" {
 #endif
 
 #ifdef WIN32
-# include <common/util/windir.h>
-# define HAVE_READDIR
 # define HAVE__MKDIR_WITHOUT_PERMISSION
 # define HAVE__SLEEP_MSEC
 #endif
@@ -116,9 +114,6 @@ extern "C" {
 # define HAVE_ACCESS
 # define HAVE_STAT
 typedef struct stat stat_type;
-# include <dirent.h>
-# define HAVE_READDIR
-# define HAVE_OPENDIR
 # include <string.h>
 # define HAVE_STRDUP
 # define HAVE_SNPRINTF

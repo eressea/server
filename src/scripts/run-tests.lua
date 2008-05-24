@@ -58,13 +58,13 @@ end
 
 function test_realloc()
   local t1 = os.clock()
-  read_game("571.dat.2", "binary")
+  read_game("571.4.dat", "binary")
   print(os.clock() - t1)
   free_game()
   print(os.clock() - t1)
   -- and again
   local t2 = os.clock()
-  read_game("571.dat.2", "binary")
+  read_game("571.4.dat", "binary")
   print(os.clock() - t2)
   free_game()
   print(os.clock() - t2)
@@ -79,14 +79,13 @@ end
 loadscript("default.lua")
 run_scripts()
 -- go
-local now = os.clock()
 -- test_free()
-test_bmark()
+-- test_bmark()
+test_realloc()
 -- test_hse()
--- test_realloc()
-local elapsed = os.clock() - now
-print(elapsed)
+io.stdin:read("*line")
 -- text: 50.574
 -- bin0: 19.547
 -- bin1: 18.953
--- io.stdin:read("*line")
+-- bin1: 18.313
+-- bin2: 17.938

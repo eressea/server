@@ -96,11 +96,7 @@ typedef struct unit {
   /* orders */
   struct order * orders;
   struct order * thisorder;
-#ifdef LASTORDER
-  struct order * lastorder;
-#else
   struct order * old_orders;
-#endif
 
   /* race and illusionary race */
   const struct race * race;

@@ -114,24 +114,13 @@ package.path = "eressea"
 package.includepaths = { "..", "../common" }
 package.files = { "gmtool.h", "gmtool.c", "editing.c", "editing.h", "curses/listbox.h", "curses/listbox.c", "lua/gm.cpp" }
 for k,v in project.configs do
-  package.config[v].objdir   = v
-  package.config[v].bindir   = v
+  package.config[v].objdir   = v .. "/" .. package.name
+  package.config[v].libdir   = v .. "/" .. package.name
   table.insert(package.config[v].buildflags, "extra-warnings")
   table.insert(package.config[v].buildflags, "no-debug-runtime")
   table.insert(package.config[v].buildflags, "singlethread-runtime")
   for index, name in c_defines do
     table.insert(package.config[v].defines, name)
-  end
-  if (windows) then
-    if target=="vs2005" then
-      if v=="Debug" then
-          package.config[v].links = { "lua5.1_d", "luabind_d" }
-      else
-        package.config[v].links = { "lua5.1", "luabind" }
-      end
-    else
-      package.config[v].links = { "lua50", "luabind" }
-    end
   end
   if v~="Debug" then
     table.insert(package.config[v].defines, "NDEBUG")

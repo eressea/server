@@ -48,7 +48,6 @@
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/vset.h>
 
 /* libc includes */
 #include <assert.h>
@@ -442,21 +441,23 @@ try_destruction(unit * u, unit * u2, const ship *sh, int skilldiff)
 }
 
 static void
-sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
+sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
 {
-  unit **ui;
+  unit **ui, *u;
   region *safety = r;
   int i;
   direction_t d;
-  unsigned int index;
   double probability = 0.0;
-  vset informed;
-  vset survivors;
   message * sink_msg = NULL;
-  message * enemy_discovers_spy_msg = NULL;
+  faction * f;
 
-  vset_init(&informed);
-  vset_init(&survivors);
+  for (f=NULL,u=r->units;u;u=u->next) {
+    /* slight optimization to avoid dereferencing u->faction each time */
+    if (f!=u->faction) {
+      f = u->faction;
+      freset(f, FFL_SELECT);
+    }
+  }
 
   /* figure out what a unit's chances of survival are: */
   if (!fval(r->terrain, SEA_REGION)) {
@@ -475,7 +476,14 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
     unit *u = *ui;
 
     /* inform this faction about the sinking ship: */
-    vset_add(&informed, u->faction);
+    if (!fval(u->faction, FFL_SELECT)) {
+      fset(u->faction, FFL_SELECT);
+      if (sink_msg==NULL) {
+        sink_msg = msg_message("sink_msg", "ship region", sh, r);
+      }
+      add_message(&f->msgs, sink_msg);
+    }
+
     if (u->ship == sh) {
       int dead = 0;
       message * msg;
@@ -485,10 +493,8 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
         if (chance(probability))
           ++dead;
 
-      if (dead != u->number)
+      if (dead != u->number) {
         /* she will live. but her items get stripped */
-      {
-        vset_add(&survivors, u);
         if (dead > 0) {
           msg = msg_message("sink_lost_msg", "dead region unit", dead, safety, u);
         } else {
@@ -516,59 +522,9 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
       }
     }
   }
-
-  /* inform everyone, and reduce money to the absolutely necessary
-  * amount: */
-  while (informed.size != 0) {
-    unit *lastunit = 0;
-    int money = 0, maintain = 0;
-    faction * f = (faction *) informed.data[0];
-
-    /* find out how much money this faction still has: */
-    for (index = 0; index != survivors.size; ++index) {
-      unit *u = (unit *) survivors.data[index];
-
-      if (u->faction == f) {
-        maintain += maintenance_cost(u);
-        money += get_money(u);
-        lastunit = u;
-      }
-    }
-    /* 'money' shall be the maintenance-surplus of the survivng
-    * units: */
-    money = money - maintain;
-    for (index = 0; money > 0; ++index) {
-      int remove;
-      unit *u = (unit *) survivors.data[index];
-
-      assert(index < survivors.size);
-      if (u->faction == f && playerrace(u->race)) {
-        remove = min(get_money(u), money);
-        money -= remove;
-        change_money(u, -remove);
-      }
-    }
-    /* finally, report to this faction that the ship sank: */
-    if (sink_msg==NULL) {
-      sink_msg = msg_message("sink_msg", "ship region", sh, r);
-    }
-    add_message(&f->msgs, sink_msg);
-    vset_erase(&informed, f);
-    if (spy == 1 && f != saboteur->faction && faction_skill(r, f, SK_PERCEPTION) - eff_skill(saboteur, SK_STEALTH, r) > 0) {
-      /* the unit is discovered */
-      ADDMSG(&f->msgs, msg_message("spy_discovered_msg", "unit saboteur ship", lastunit, saboteur, sh));
-      if (enemy_discovers_spy_msg==NULL) {
-        enemy_discovers_spy_msg = msg_message("enemy_discovers_spy_msg", "unit ship", saboteur, sh);
-      }
-      add_message(&saboteur->faction->msgs, sink_msg);
-    }
-  }
-  if (enemy_discovers_spy_msg) msg_release(enemy_discovers_spy_msg);
   if (sink_msg) msg_release(sink_msg);
   /* finally, get rid of the ship */
   remove_ship(&sh->region->ships, sh);
-  vset_destroy(&informed);
-  vset_destroy(&survivors);
 }
 
 int
@@ -598,7 +554,7 @@ sabotage_cmd(unit * u, struct order * ord)
     u2 = shipowner(sh);
     skdiff = eff_skill(u, SK_SPY, r)-crew_skill(r, u2->faction, sh, SK_PERCEPTION);
     if (try_destruction(u, u2, sh, skdiff)) {
-        sink_ship(r, sh, buffer, 1, u);
+        sink_ship(r, sh, buffer, u);
     }
     break;
   default:

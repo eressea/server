@@ -1017,9 +1017,6 @@ u_setfaction(unit * u, faction * f)
     join_group(u, NULL);
     free_orders(&u->orders);
     set_order(&u->thisorder, NULL);
-#ifdef LASTORDER
-    set_order(&u->lastorder, NULL);
-#endif
 
     iunit = &u->faction->units;
     while (*iunit && *iunit!=u) {
@@ -1409,11 +1406,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
   assert(f->alive);
   u_setfaction(u, f);
   set_order(&u->thisorder, NULL);
-#ifdef LASTORDER
-  set_order(&u->lastorder, deford);
-#else
   addlist(&u->orders, deford);
-#endif
   u_seteffstealth(u, -1);
   u->race = urace;
   u->irace = urace;

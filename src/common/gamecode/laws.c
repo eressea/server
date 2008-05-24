@@ -157,9 +157,6 @@ restart_race(unit *u, const race * rc)
       *ordp = ord->next;
       ord->next = NULL;
       if (u->thisorder == ord) set_order(&u->thisorder, NULL);
-#ifdef LASTORDER
-      if (u->lastorder == ord) set_order(&u->lastorder, NULL);
-#endif
     } else {
       ordp = &ord->next;
     }
@@ -3155,21 +3152,13 @@ setdefaults(unit *u)
     /* Hungernde Einheiten führen NUR den default-Befehl aus */
     set_order(&u->thisorder, default_order(u->faction->locale));
   }
-#ifdef LASTORDER
-  else {
-    /* by default the default long order becomes the new long order. */
-    u->thisorder = copy_order(u->lastorder);
-  }
-#endif
   /* check all orders for a potential new long order this round: */
   for (ord = u->orders; ord; ord = ord->next) {
-#ifndef LASTORDER
     if (u->old_orders && is_repeated(ord)) {
       /* this new order will replace the old defaults */
       free_orders(&u->old_orders);
       if (hunger) break;
     }
-#endif
     if (hunger) continue;
 
     if (is_exclusive(ord)) {
@@ -3223,28 +3212,6 @@ setdefaults(unit *u)
     /* fset(u, UFL_LONGACTION|UFL_NOTMOVING); */
     set_order(&u->thisorder, NULL);
   }
-  /* thisorder kopieren wir nun nach lastorder. in lastorder steht
-  * der DEFAULT befehl der einheit. da MOVE kein default werden
-  * darf, wird MOVE nicht in lastorder kopiert. MACHE TEMP wurde ja
-  * schon gar nicht erst in thisorder kopiert, so dass MACHE TEMP
-  * durch diesen code auch nicht zum default wird Ebenso soll BIETE
-  * nicht hierher, da i.A. die Einheit dann ja weg ist (und damit
-  * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
-  * den Default übernommen werden */
-
-#ifdef LASTORDER
-  switch (get_keyword(u->thisorder)) {
-    case K_MOVE:
-    case K_ATTACK:
-    case K_WEREWOLF:
-    case NOKEYWORD:
-      /* these can never be default orders */
-      break;
-
-    default:
-      set_order(&u->lastorder, copy_order(u->thisorder));
-  }
-#endif
 }
 
 static int
@@ -3391,9 +3358,7 @@ defaultorders (void)
   for (r=regions;r;r=r->next) {
     unit *u;
     for (u=r->units;u;u=u->next) {
-#ifndef LASTORDER
       boolean neworders = false;
-#endif
       order ** ordp = &u->orders;
       while (*ordp!=NULL) {
         order * ord = *ordp;
@@ -3407,9 +3372,6 @@ defaultorders (void)
           *ordp = ord->next;
           ord->next = NULL;
           free_order(ord);
-#ifdef LASTORDER
-          if (new_order) set_order(&u->lastorder, new_order);
-#else
           if (!neworders) {
             /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
             remove_exclusive(&u->orders);
@@ -3418,7 +3380,6 @@ defaultorders (void)
             ordp = &u->orders; /* we could have broken ordp */
           }
           if (new_order) addlist(&u->old_orders, new_order);
-#endif
         }
         else ordp = &ord->next;
       }

@@ -2459,9 +2459,6 @@ weight(const unit * u)
 void
 make_undead_unit(unit * u)
 {
-#ifdef LASTORDER
-  set_order(&u->lastorder, NULL);
-#endif
   free_orders(&u->orders);
   name_unit(u);
   fset(u, UFL_ISNEW);

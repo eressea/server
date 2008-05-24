@@ -816,11 +816,7 @@ recruit_dracoids(unit * dragon, int size)
   }
 
   if (new_order!=NULL) {
-#ifdef LASTORDER
-    set_order(&un->lastorder, new_order);
-#else
     addlist(&un->orders, new_order);
-#endif
   }
 }
 
@@ -1022,11 +1018,7 @@ plan_monsters(void)
       }
       if (long_order) {
         set_order(&u->thisorder, copy_order(long_order));
-#ifdef LASTORDER
-        set_order(&u->lastorder, copy_order(long_order));
-#else
         addlist(&u->orders, long_order);
-#endif
       }
     }
   }

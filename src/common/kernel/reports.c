@@ -532,12 +532,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
         }
       }
     }
-#ifdef LASTORDER
-    if (!isbattle && u->lastorder) {
-      bytes = buforder(bufp, size, u->lastorder, 0);
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    }
-#else
     if (!isbattle) {
       boolean printed = 0;
       order * ord;;
@@ -558,7 +552,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
         }
       }
     }
-#endif
   }
   i = 0;
 

@@ -619,30 +619,16 @@ write_items(struct storage * store, item *ilist)
 int
 lastturn(void)
 {
+  char zText[MAX_PATH];
   int turn = 0;
-#ifdef HAVE_READDIR
-  DIR *data_dir = NULL;
-  struct dirent *entry = NULL;
-  const char * dir = datapath();
-  data_dir = opendir(dir);
-  if (data_dir != NULL) {
-    entry = readdir(data_dir);
+  FILE * f;
+
+  sprintf(zText, "%s/turn", basepath());
+  f = cfopen(zText, "r");
+  if (f) {
+    fscanf(f, "%d\n", &turn);
+    fclose(f);
   }
-  if (data_dir != NULL && entry != NULL) {
-    turn = 0;
-    do {
-      int i = atoi(entry->d_name);
-      if (i > turn)
-        turn = i;
-      entry = readdir(data_dir);
-    } while (entry != NULL);
-#ifdef HAVE_CLOSEDIR
-    closedir(data_dir);
-#endif
-  }
-#else
-# error "requires dirent.h or an equivalent to compile!"
-#endif
   return turn;
 }
 
@@ -800,11 +786,7 @@ readunit(struct storage * store)
     store->r_str_buf(store, obuf, sizeof(obuf));
     ord = parse_order(obuf, u->faction->locale);
     if (ord!=NULL) {
-#ifdef LASTORDER
-      set_order(&u->lastorder, ord);
-#else
       addlist(&u->orders, ord);
-#endif
     }
   }
   set_order(&u->thisorder, NULL);
@@ -866,7 +848,6 @@ writeunit(struct storage * store, const unit * u)
   store->w_int(store, u->status);
   store->w_int(store, u->flags & UFL_SAVEMASK);
   store->w_brk(store);
-#ifndef LASTORDER
   for (ord = u->old_orders; ord; ord=ord->next) {
     if (++p<MAXPERSISTENT) {
       writeorder(store, ord, u->faction->locale);
@@ -875,7 +856,6 @@ writeunit(struct storage * store, const unit * u)
       break;
     }
   }
-#endif
   for (ord = u->orders; ord; ord=ord->next) {
     if (u->old_orders && is_repeated(ord)) continue; /* has new defaults */
     if (is_persistent(ord)) {
