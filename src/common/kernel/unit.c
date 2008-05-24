@@ -1050,13 +1050,15 @@ set_number(unit * u, int count)
   assert (count <= UNIT_MAXSIZE);
 
 #ifndef NDEBUG
-  assert (u->faction != NULL || u->number > 0);
+  assert(u->faction || count==0);
 #endif
 
-  if (playerrace(u->race)) {
-    u->faction->num_people += count - u->number;
+  if (u->faction) {
+    if (playerrace(u->race)) {
+      u->faction->num_people += count - u->number;
+    }
+    u->number = (unsigned short)count;
   }
-  u->number = (unsigned short)count;
 }
 
 boolean
