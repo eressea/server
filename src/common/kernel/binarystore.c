@@ -22,7 +22,7 @@ without prior permission by the authors of Eressea.
 
 #define file(store) (FILE *)((store)->userdata)
 
-#define STREAM_VERSION 1
+#define STREAM_VERSION 2
 
 INLINE_FUNCTION size_t
 pack_int(int v, char * buffer)
@@ -204,6 +204,10 @@ bin_open(struct storage * store, const char * filename, int mode)
       if (store->version>=INTPAK_VERSION) {
         stream_version = bin_r_int(store);
       }
+      if (stream_version<=1) {
+        store->r_id = bin_r_int;
+        store->w_id = bin_w_int;
+      }
       if (stream_version==0) {
         store->r_int = bin_r_int;
         store->w_int = bin_w_int;
@@ -226,7 +230,7 @@ const storage binary_store = {
   bin_w_brk, /* newline (ignore) */
   bin_w_int_pak, bin_r_int_pak, /* int storage */
   bin_w_flt, bin_r_flt, /* float storage */
-  bin_w_int, bin_r_int, /* id storage */
+  bin_w_int_pak, bin_r_int_pak, /* id storage */
   bin_w_str, bin_r_str, bin_r_str_buf, /* token storage */
   bin_w_str, bin_r_str, bin_r_str_buf, /* string storage */
   bin_open, bin_close,
