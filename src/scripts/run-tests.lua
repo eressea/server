@@ -51,9 +51,8 @@ function test_free()
 end
 
 function test_hse()
-	read_game("50", "text")
-	write_game("50.dat", "binary")
-	write_game("50.txt.1", "text")
+  read_game("50", "text")
+  write_game("50.dat", "binary")
 end
 
 function test_realloc()
@@ -76,14 +75,22 @@ function test_bmark()
   print(os.clock() - t1)
 end
 
+function test_md5()
+  read_game("571.dat", "binary")
+  -- read_orders("orders.571")
+  run_turn()
+  write_game("572.txt", "text")
+end
+
 loadscript("default.lua")
 run_scripts()
 -- go
 -- test_free()
 -- test_bmark()
-test_realloc()
+-- test_realloc()
 -- test_hse()
-io.stdin:read("*line")
+test_md5()
+-- io.stdin:read("*line")
 -- text: 50.574
 -- bin0: 19.547
 -- bin1: 18.953

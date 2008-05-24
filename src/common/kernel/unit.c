@@ -345,6 +345,7 @@ remove_unit(unit ** ulist, unit * u)
   dhash(u->no, u->faction);
 
   u_setfaction(u, NULL);
+  u->region = NULL;
 
   return 0;
 }

@@ -67,7 +67,6 @@ CCFLAGS += -Wwrite-strings
 #		   -Wconversion
 #		   -Wunreachable-code
                    -Werror
-                   -fstrict-aliasing
 		   ;
 
 # this require the latet luabind from CVS
@@ -148,7 +147,7 @@ rule TargetDirectory
         else {
             SubDirCcFlags -DNDEBUG -mtune=$(CPU) ;
             SubDirC++Flags -DNDEBUG -mtune=$(CPU) ;
-            OPTIM = -O3 ;
+            OPTIM = -O3 -fno-strict-aliasing ;
         }
 }
 

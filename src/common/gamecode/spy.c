@@ -376,21 +376,6 @@ setstealth_cmd(unit * u, struct order * ord)
 }
 
 static int
-faction_skill(region * r, faction * f, skill_t sk)
-{
-  int value = 0;
-  unit *u;
-
-  for (u=r->units; u; u=u->next) {
-    if (u->faction == f) {
-      int s = eff_skill(u, sk, r);
-      value = max(value, s);
-    }
-  }
-  return value;
-}
-
-static int
 crew_skill(region * r, faction * f, ship * sh, skill_t sk)
 {
   int value = 0;

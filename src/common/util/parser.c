@@ -20,29 +20,31 @@ typedef struct parser_state {
 static parser_state * state;
 
 static int
-eatwhitespace_c(const char ** str)
+eatwhitespace_c(const char ** str_p)
 {
-  int ret;
+  int ret = 0;
   ucs4_t ucs;
   size_t len;
+  const char * str = *str_p;
 
   /* skip over potential whitespace */
   for (;;) {
-    unsigned char utf8_character = (*(unsigned char**)str)[0];
+    unsigned char utf8_character = (unsigned char)*str;
     if (~utf8_character & 0x80) {
       if (!iswspace(utf8_character)) break;
-      ++*str;
+      ++str;
     } else {
-      ret = unicode_utf8_to_ucs4(&ucs, *str, &len);
+      ret = unicode_utf8_to_ucs4(&ucs, str, &len);
       if (ret!=0) {
-        log_warning(("illegal character sequence in UTF8 string: %s\n", *str));
-        return ret;
+        log_warning(("illegal character sequence in UTF8 string: %s\n", str));
+        break;
       }
       if (!iswspace((wint_t)ucs)) break;
-      *str+=len;
+      str+=len;
     }
   }
-  return 0;
+  *str_p = str;
+  return ret;
 }
 
 void

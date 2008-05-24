@@ -40,10 +40,9 @@ killunit_handle(trigger * t, void * data)
   * data.v -> ( variant event, int timer )
   */
   unit * u = (unit*)t->data.v;
-  if (u!=NULL) {
-    remove_unit(&u->region->units, u);
-  } else {
-    log_warning(("could not perform killunit::handle()\n"));
+  if (u) {
+    /* we can't remove_unit() here, because that's what's calling us. */
+    set_number(u, 0);
   }
   unused(data);
   return 0;
