@@ -56,21 +56,19 @@ removecurse_free(trigger * t)
 static int
 removecurse_handle(trigger * t, void * data)
 {
-	/* call an event handler on removecurse.
-	 * data.v -> ( variant event, int timer )
-	 */
-	removecurse_data * td = (removecurse_data*)t->data.v;
-	if (td->curse!=NULL && td->target!=NULL) {
-		attrib * a = a_select(td->target->attribs, td->curse, cmp_curse);
-		if (a) {
-			a_remove(&td->target->attribs, a);
-		}
-		else log_error(("could not perform removecurse::handle()\n"));
-	} else {
-		log_error(("could not perform removecurse::handle()\n"));
-	}
-	unused(data);
-	return 0;
+  /* call an event handler on removecurse.
+  * data.v -> ( variant event, int timer )
+  */
+  removecurse_data * td = (removecurse_data*)t->data.v;
+  if (td->curse && td->target) {
+    attrib * a = a_select(td->target->attribs, td->curse, cmp_curse);
+    if (a) {
+      a_remove(&td->target->attribs, a);
+    }
+    else log_error(("could not perform removecurse::handle()\n"));
+  }
+  unused(data);
+  return 0;
 }
 
 static void

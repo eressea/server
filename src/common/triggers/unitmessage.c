@@ -63,11 +63,9 @@ unitmessage_handle(trigger * t, void * data)
   * data.v -> ( variant event, int timer )
   */
   unitmessage_data * td = (unitmessage_data*)t->data.v;
-  if (td->target!=NULL) {
+  if (td->target && td->target->no) {
     struct faction * f = td->target->faction;
     addmessage(td->target->region, f, LOC(f->locale, td->string), td->type, td->level);
-  } else {
-    log_error(("could not perform unitmessage::handle()\n"));
   }
   unused(data);
   return 0;

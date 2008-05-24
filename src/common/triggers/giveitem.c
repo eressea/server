@@ -58,17 +58,17 @@ giveitem_free(trigger * t)
 static int
 giveitem_handle(trigger * t, void * data)
 {
-	/* call an event handler on giveitem.
-	 * data.v -> ( variant event, int timer )
-	 */
-	giveitem_data * td = (giveitem_data*)t->data.v;
-	if (td->u!=NULL) {
-		i_change(&td->u->items, td->itype, td->number);
+  /* call an event handler on giveitem.
+  * data.v -> ( variant event, int timer )
+  */
+  giveitem_data * td = (giveitem_data*)t->data.v;
+  if (td->u && td->u->number) {
+    i_change(&td->u->items, td->itype, td->number);
   } else {
-		log_error(("could not perform giveitem::handle()\n"));
+    log_error(("could not perform giveitem::handle()\n"));
   }
-	unused(data);
-	return 0;
+  unused(data);
+  return 0;
 }
 
 static void

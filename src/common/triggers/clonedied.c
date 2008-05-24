@@ -46,7 +46,7 @@ clonedied_handle(trigger * t, void * data)
 {
 	/* destroy the unit */
 	unit * u = (unit*)t->data.v;
-	if (u!=NULL) {
+	if (u) {
 		attrib *a = a_find(u->attribs, &at_clone);
 		if(a) a_remove(&u->attribs, a);
 	} else

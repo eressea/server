@@ -44,7 +44,7 @@ gate_handle(trigger * t, void * data)
 	struct building * b = gd->gate;
 	struct region * r = gd->target;
 
-	if (b && r) {
+	if (b && b->region && r) {
 		unit ** up = &b->region->units;
 		while (*up) {
 			unit * u = *up;

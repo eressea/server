@@ -88,15 +88,13 @@ do_shock(unit *u, const char *reason)
 static int
 shock_handle(trigger * t, void * data)
 {
-	/* destroy the unit */
-	unit * u = (unit*)t->data.v;
-	if (u!=NULL) {
-		do_shock(u, "trigger");
-  } else {
-    log_error(("could not perform shock::handle()\n"));
+  /* destroy the unit */
+  unit * u = (unit*)t->data.v;
+  if (u && u->number) {
+    do_shock(u, "trigger");
   }
-	unused(data);
-	return 0;
+  unused(data);
+  return 0;
 }
 
 static void

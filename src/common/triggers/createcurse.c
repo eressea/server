@@ -65,20 +65,20 @@ createcurse_free(trigger * t)
 static int
 createcurse_handle(trigger * t, void * data)
 {
-	/* call an event handler on createcurse.
-	 * data.v -> ( variant event, int timer )
-	 */
-	createcurse_data * td = (createcurse_data*)t->data.v;
-	if (td->mage!=NULL && td->target!=NULL) {
+  /* call an event handler on createcurse.
+  * data.v -> ( variant event, int timer )
+  */
+  createcurse_data * td = (createcurse_data*)t->data.v;
+  if (td->mage && td->target && td->mage->number && td->target->number) {
     variant var;
     var.i = td->effect;
-		create_curse(td->mage, &td->target->attribs,
-			td->type, td->vigour, td->duration, var, td->men);
-	} else {
-		log_error(("could not perform createcurse::handle()\n"));
-	}
-	unused(data);
-	return 0;
+    create_curse(td->mage, &td->target->attribs,
+      td->type, td->vigour, td->duration, var, td->men);
+  } else {
+    log_error(("could not perform createcurse::handle()\n"));
+  }
+  unused(data);
+  return 0;
 }
 
 static void
