@@ -1252,6 +1252,7 @@ randomevents(void)
     chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
   }
 
+#ifdef HERBS_ROT
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u=u->next) {
       item **itmp = &u->items, *hbag = *i_find(&u->items, olditemtype[I_SACK_OF_CONSERVATION]);
