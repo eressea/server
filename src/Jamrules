@@ -14,6 +14,7 @@ if ! $(HAVE_LUA) {
 
 if ! $(CPU) {
   CPU = pentium2 ;
+  ARCH = -march=$(CPU) -mtune=$(CPU) -mmmx -mieee-fp ;
 }
 
 if $(DISTCC_HOSTS) {
@@ -142,12 +143,15 @@ rule TargetDirectory
         if $(DEBUG) = 1 {
             SubDirCcFlags -ggdb ;
             SubDirC++Flags -ggdb ;
-            OPTIM = -O0 ;
+            OPTIM = -O0 -ffloat-store ;
         }
         else {
-            SubDirCcFlags -DNDEBUG -march=$(CPU) -mtune=$(CPU) ;
-            SubDirC++Flags -DNDEBUG -march=$(CPU) -mtune=$(CPU) ;
+            SubDirCcFlags -DNDEBUG ;
+            SubDirC++Flags -DNDEBUG ;
+            OPTIM = -Os -ffloat-store ;
         }
+        SubDirCcFlags $(ARCH) ;
+        SubDirC++Flags $(ARCH) ;
 }
 
 if ! $(DEBUG) {
