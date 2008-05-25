@@ -1138,13 +1138,44 @@ karma_update(void)
       }
     }
   }
+}
+#endif
+
+#ifdef HERBS_ROT
+static void
+rotting_herbs(void)
+{
+  region * r;
+  for (r = regions; r; r = r->next) {
+    unit * u;
+    for (u = r->units; u; u=u->next) {
+      item **itmp = &u->items, *hbag = *i_find(itmp, olditemtype[I_SACK_OF_CONSERVATION]);
+      int rot_chance = HERBROTCHANCE;
+
+      if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
+      while (*itmp) {
+        item * itm = *itmp;
+        int n = itm->number;
+        double k = n*rot_chance/100.0;
+        if (fval(itm->type, ITF_HERB)) {
+          double nv = normalvariate(k, k/4);
+          int inv = (int)nv;
+          int delta = min(n, inv);
+          if (i_change(itmp, itm->type, -delta)==NULL) {
+            continue;
+          }
+        }
+        itmp = &itm->next;
+      }
+    }
+  }
+}
 #endif
 
 void
 randomevents(void)
 {
   region *r;
-  unit *u;
   
   icebergs();
   godcurse();
@@ -1224,6 +1255,8 @@ randomevents(void)
 
   /* monster-einheiten desertieren */
   for (r = regions; r; r=r->next) {
+    unit *u;
+
     for (u=r->units; u; u=u->next) {
       if (u->faction && !is_monsters(u->faction)
         && (u->race->flags & RCF_DESERT)) {
@@ -1244,35 +1277,17 @@ randomevents(void)
   /* Chaos */
   for (r = regions; r; r = r->next) {
     int i;
+
     if (fval(r, RF_CHAOTIC)) {
       chaos(r);
     }
     i = chaoscount(r);
-    if (!i) continue;
-    chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
-  }
-
-#ifdef HERBS_ROT
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u=u->next) {
-      item **itmp = &u->items, *hbag = *i_find(&u->items, olditemtype[I_SACK_OF_CONSERVATION]);
-      int rot_chance = HERBROTCHANCE;
-
-      if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
-      while (*itmp) {
-        item * itm = *itmp;
-        int n = itm->number;
-        double k = n*rot_chance/100.0;
-        if (fval(itm->type, ITF_HERB)) {
-          double nv = normalvariate(k, k/4);
-          int inv = (int)nv;
-          int delta = min(n, inv);
-          i_change(itmp, itm->type, -delta);
-        }
-        if (itm==*itmp) itmp=&itm->next;
-      }
+    if (i) {
+      chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
     }
   }
+#ifdef HERBS_ROT
+  rotting_herbs();
 #endif
 
   dissolve_units();
