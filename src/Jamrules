@@ -145,9 +145,8 @@ rule TargetDirectory
             OPTIM = -O0 ;
         }
         else {
-            SubDirCcFlags -DNDEBUG -mtune=$(CPU) ;
-            SubDirC++Flags -DNDEBUG -mtune=$(CPU) ;
-            OPTIM = -O3 -fno-strict-aliasing ;
+            SubDirCcFlags -DNDEBUG -march=$(CPU) -mtune=$(CPU) ;
+            SubDirC++Flags -DNDEBUG -march=$(CPU) -mtune=$(CPU) ;
         }
 }
 
