@@ -22,21 +22,21 @@ extern "C" {
   /* generates a random number on [0,0xffffffff]-interval */
   extern unsigned long genrand_int32(void);
   
-  /* generates a random number on [0,1]-real-interval */
-  extern double genrand_real1(void);
+  /* generates a random number on [0,1)-real-interval */
+  extern double genrand_real2(void);
 
   /* generates a random number on [0,0x7fffffff]-interval */
   long genrand_int31(void);
 
 # define rng_init(seed) init_genrand(seed)
-# define rng_int() genrand_int31()
-# define rng_double() genrand_real1() 
+# define rng_int genrand_int31
+# define rng_double genrand_real2
 # define RNG_RAND_MAX 0x7fffffff
 #else
 # include <stdlib.h>
 # define rng_init(seed) srand(seed)
-# define rng_int() rand()
-# define rng_double() ((rand()%RAND_MAX)/(double)RAND_MAX)
+# define rng_int rand()
+# define rng_double ((rand()%RAND_MAX)/(double)RAND_MAX)
 # define RNG_RAND_MAX RAND_MAX
 #endif
 #ifdef __cplusplus
