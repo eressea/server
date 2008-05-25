@@ -47,9 +47,11 @@ function write_aliases()
   file = io.open(basepath .. "/aliases", "w")
   for faction in factions() do
     local unit
-    file:write("partei-" .. itoa36(faction.id) .. ": " .. faction.email .. "\n")
-    for unit in faction.units do
-      file:write("einheit-" .. itoa36(unit.id) .. ": " .. faction.email .. "\n")
+    if faction.email ~= "" then
+      file:write("partei-" .. itoa36(faction.id) .. ": " .. faction.email .. "\n")
+      for unit in faction.units do
+        file:write("einheit-" .. itoa36(unit.id) .. ": " .. faction.email .. "\n")
+      end
     end
   end
  

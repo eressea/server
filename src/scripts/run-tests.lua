@@ -79,7 +79,7 @@ function test_md5()
   read_game("571.dat", "binary")
   -- read_orders("orders.571")
   run_turn()
-  write_game("572.txt", "text")
+--  write_game("572.txt", "text")
 end
 
 loadscript("default.lua")
