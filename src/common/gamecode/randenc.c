@@ -1117,15 +1117,35 @@ icebergs(void)
   }
 }
 
+#if KARMA_MODULE
+static void
+karma_update(void)
+{
+  faction * f;
+  /* lycanthropen werden werwölfe */
+  for (f = factions; f; f=f->next) {
+    if (f->alive) {
+      int level = fspecial(f, FS_LYCANTROPE);
+      if (level > 0) {
+        unit * u;
+        for(u = f->units; u; u=u->nextF) {
+          if (rng_int()%100 < 2*level) {
+            ADDMSG(&u->faction->msgs,
+              msg_message("becomewere", "unit region", u, u->region));
+            fset(u, UFL_WERE);
+          }
+        }
+      }
+    }
+  }
+#endif
+
 void
 randomevents(void)
 {
-#if KARMA_MODULE
-  faction *f;
-#endif /* KARMA_MODULE */
   region *r;
   unit *u;
-
+  
   icebergs();
   godcurse();
   orc_growth();
@@ -1218,21 +1238,7 @@ randomevents(void)
   }
 
 #if KARMA_MODULE
-  /* lycanthropen werden werwölfe */
-  for (f = factions; f; f=f->next) {
-    if (f->alive) {
-      int level = fspecial(f, FS_LYCANTROPE);
-      if (level > 0) {
-        for(u = f->units; u; u=u->nextF) {
-          if (rng_int()%100 < 2*level) {
-            ADDMSG(&u->faction->msgs,
-              msg_message("becomewere", "unit region", u, u->region));
-            fset(u, UFL_WERE);
-          }
-        }
-      }
-    }
-  }
+  karma_update();
 #endif
 
   /* Chaos */
@@ -1246,15 +1252,12 @@ randomevents(void)
     chaoscounts(r, -(int) (i * ((double) (rng_int() % 10)) / 100.0));
   }
 
-#ifdef HERBS_ROT
-  /* Kräuter verrotten */
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u=u->next) {
       item **itmp = &u->items, *hbag = *i_find(&u->items, olditemtype[I_SACK_OF_CONSERVATION]);
       int rot_chance = HERBROTCHANCE;
 
       if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
-
       while (*itmp) {
         item * itm = *itmp;
         int n = itm->number;
