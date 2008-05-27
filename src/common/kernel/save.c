@@ -649,6 +649,7 @@ readunit(struct storage * store)
   order ** orderp;
   char obuf[1024];
   faction * f;
+  char rname[32];
 
   n = store->r_id(store);
   u = findunit(n);
@@ -677,41 +678,36 @@ readunit(struct storage * store)
   }
   number = store->r_int(store);
   u->age = (short)store->r_int(store);
-  if (store->version<NEWRACE_VERSION) {
-    u->race = new_race[(race_t)store->r_int(store)];
-    u->irace = new_race[(race_t)store->r_int(store)];
+  
+  if (store->version<STORAGE_VERSION) {
+    char * space;
+    store->r_str_buf(store, rname, sizeof(rname));
+    space = strchr(rname, ' ');
+    if (space!=NULL) {
+      char * inc = space+1;
+      char * outc = space;
+      do {
+        while (*inc==' ') ++inc;
+        while (*inc) {
+          *outc++ = *inc++;
+          if (*inc==' ') break;
+        }
+      } while (*inc);
+      *outc = 0;
+    }
   } else {
-    char rname[32];
-    
-    if (store->version<STORAGE_VERSION) {
-      char * space;
-      store->r_str_buf(store, rname, sizeof(rname));
-      space = strchr(rname, ' ');
-      if (space!=NULL) {
-        char * inc = space+1;
-        char * outc = space;
-        do {
-          while (*inc==' ') ++inc;
-          while (*inc) {
-            *outc++ = *inc++;
-            if (*inc==' ') break;
-          }
-        } while (*inc);
-        *outc = 0;
-      }
-    } else {
-      store->r_tok_buf(store, rname, sizeof(rname));
-    }
-    u->race = rc_find(rname);
-    assert(u->race);
-    if (store->version<STORAGE_VERSION) {
-      store->r_str_buf(store, rname, sizeof(rname));
-    } else {
-      store->r_tok_buf(store, rname, sizeof(rname));
-    }
-    if (rname[0]) u->irace = rc_find(rname);
-    else u->irace = u->race;
+    store->r_tok_buf(store, rname, sizeof(rname));
   }
+  u->race = rc_find(rname);
+  assert(u->race);
+  if (store->version<STORAGE_VERSION) {
+    store->r_str_buf(store, rname, sizeof(rname));
+  } else {
+    store->r_tok_buf(store, rname, sizeof(rname));
+  }
+  if (rname[0]) u->irace = rc_find(rname);
+  else u->irace = u->race;
+
   if (u->race->describe) {
     const char * rcdisp = u->race->describe(u, u->faction->locale);
     if (u->display && rcdisp) {
@@ -792,30 +788,13 @@ readunit(struct storage * store)
   set_order(&u->thisorder, NULL);
 
   assert(u->race);
-  if (store->version<NEWSKILL_VERSION) {
-    /* convert old data */
-    if (u->number) {
-      while ((sk = (skill_t) store->r_int(store)) != NOSKILL) {
-        int days = store->r_int(store) / u->number;
-        int lvl = level(days);
-        int weeks = lvl + 1 - (days - level_days(lvl))/30;
-        assert(weeks>0 && weeks<=lvl+1);
-        if (lvl) {
-          skill * sv = add_skill(u, sk);
-          sv->level = sv->old = (unsigned char)lvl;
-          sv->weeks = (unsigned char)weeks;
-        }
-      }
-    }
-  } else {
-    while ((sk = (skill_t) store->r_int(store)) != NOSKILL) {
-      int level = store->r_int(store);
-      int weeks = store->r_int(store);
-      if (level) {
-        skill * sv = add_skill(u, sk);
-        sv->level = sv->old = (unsigned char)level;
-        sv->weeks = (unsigned char)weeks;
-      }
+  while ((sk = (skill_t) store->r_int(store)) != NOSKILL) {
+    int level = store->r_int(store);
+    int weeks = store->r_int(store);
+    if (level) {
+      skill * sv = add_skill(u, sk);
+      sv->level = sv->old = (unsigned char)level;
+      sv->weeks = (unsigned char)weeks;
     }
   }
   read_items(store, &u->items);
@@ -955,32 +934,29 @@ readregion(struct storage * store, short x, short y)
   if (r->land) {
     int i;
     rawmaterial ** pres = &r->resources;
-    if (store->version < GROWTREE_VERSION) {
-      i = store->r_int(store);
-      rsettrees(r, 2, i);
-    } else {
-      i = store->r_int(store);
-      if (i<0) {
-        log_error(("number of trees in %s is %d.\n", 
-               regionname(r, NULL), i));
-        i=0;
-      }
-      rsettrees(r, 0, i);
-      i = store->r_int(store); 
-      if (i<0) {
-        log_error(("number of young trees in %s is %d.\n", 
-               regionname(r, NULL), i));
-        i=0;
-      }
-      rsettrees(r, 1, i);
-      i = store->r_int(store); 
-      if (i<0) {
-        log_error(("number of seeds in %s is %d.\n", 
-               regionname(r, NULL), i));
-        i=0;
-      }
-      rsettrees(r, 2, i);
+
+    i = store->r_int(store);
+    if (i<0) {
+      log_error(("number of trees in %s is %d.\n", 
+             regionname(r, NULL), i));
+      i=0;
     }
+    rsettrees(r, 0, i);
+    i = store->r_int(store); 
+    if (i<0) {
+      log_error(("number of young trees in %s is %d.\n", 
+             regionname(r, NULL), i));
+      i=0;
+    }
+    rsettrees(r, 1, i);
+    i = store->r_int(store); 
+    if (i<0) {
+      log_error(("number of seeds in %s is %d.\n", 
+             regionname(r, NULL), i));
+      i=0;
+    }
+    rsettrees(r, 2, i);
+
     i = store->r_int(store); rsethorses(r, i);
     assert(*pres==NULL);
     for (;;) {
@@ -997,20 +973,9 @@ readregion(struct storage * store, short x, short y)
       res->amount = store->r_int(store);
       res->flags = 0;
 
-      if(store->version >= RANDOMIZED_RESOURCES_VERSION) {
-        res->startlevel = store->r_int(store);
-        res->base = store->r_int(store);
-        res->divisor = store->r_int(store);
-      } else {
-        int i;
-        for (i=0;r->terrain->production[i].type;++i) {
-          if (res->type->rtype == r->terrain->production[i].type) break;
-        }
-
-        res->base = dice_rand(r->terrain->production[i].base);
-        res->divisor = dice_rand(r->terrain->production[i].divisor);
-        res->startlevel = 1;
-      }
+      res->startlevel = store->r_int(store);
+      res->base = store->r_int(store);
+      res->divisor = store->r_int(store);
 
       *pres = res;
       pres=&res->next;
@@ -1192,14 +1157,9 @@ readfaction(struct storage * store)
   f->locale = find_locale(token);
   f->lastorders = store->r_int(store);
   f->age = store->r_int(store);
-  if (store->version < NEWRACE_VERSION) {
-    race_t rc = (char) store->r_int(store);
-    f->race = new_race[rc];
-  } else {
-    store->r_str_buf(store, token, sizeof(token));
-    f->race = rc_find(token);
-    assert(f->race);
-  }
+  store->r_str_buf(store, token, sizeof(token));
+  f->race = rc_find(token);
+  assert(f->race);
   f->magiegebiet = (magic_t)store->r_int(store);
 
 #if KARMA_MODULE
@@ -1367,8 +1327,8 @@ readgame(const char * filename, int mode, int backup)
 
   assert(store->version>=MIN_VERSION || !"unsupported data format");
   assert(store->version<=RELEASE_VERSION || !"unsupported data format");
-  assert(store->version >= GROWTREE_VERSION);
-  if(store->version >= SAVEXMLNAME_VERSION) {
+
+  if (store->version >= SAVEXMLNAME_VERSION) {
     char basefile[1024];
     const char *basearg = "(null)";
 
@@ -1411,19 +1371,20 @@ readgame(const char * filename, int mode, int backup)
     pl->miny = (short)store->r_int(store);
     pl->maxy = (short)store->r_int(store);
     pl->flags = store->r_int(store);
-    if (store->version>WATCHERS_VERSION) {
+
+    /* read watchers */
+    store->r_str_buf(store, token, sizeof(token));
+    while (strcmp(token, "end")!=0) {
+      watcher * w = calloc(sizeof(watcher),1);
+      variant fno;
+      fno.i = atoi36(token);
+      w->mode = (unsigned char)store->r_int(store);
+      w->next = pl->watchers;
+      pl->watchers = w;
+      ur_add(fno, &w->faction, resolve_faction);
       store->r_str_buf(store, token, sizeof(token));
-      while (strcmp(token, "end")!=0) {
-        watcher * w = calloc(sizeof(watcher),1);
-        variant fno;
-        fno.i = atoi36(token);
-        w->mode = (unsigned char)store->r_int(store);
-        w->next = pl->watchers;
-        pl->watchers = w;
-        ur_add(fno, &w->faction, resolve_faction);
-        store->r_str_buf(store, token, sizeof(token));
-      }
     }
+
     a_read(store, &pl->attribs);
     addlist(&planes, pl);
   }

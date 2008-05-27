@@ -32,7 +32,9 @@
 #define M_PIl   3.1415926535897932384626433832795029L  /* pi */
 
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
-* den Algorithmus. mu = Mittelwert, sigma = Standardabweichung. */
+* den Algorithmus. mu = Mittelwert, sigma = Standardabweichung.
+* http://de.wikipedia.org/wiki/Standardabweichung#Diskrete_Gleichverteilung.2C_W.C3.BCrfel
+*/
 double
 normalvariate(double mu, double sigma)
 {

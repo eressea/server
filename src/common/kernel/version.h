@@ -28,15 +28,17 @@
  * 193: curse bekommen id aus struct unit-nummernraum
  */
 
+/*
 #define HEX_VERSION 81
 #define GROWTREE_VERSION 305
-#define RANDOMIZED_RESOURCES_VERSION 306 /* should be the same, but doesn't work */
+#define RANDOMIZED_RESOURCES_VERSION 306
 #define NEWRACE_VERSION 307
 #define INTERIM_VERSION 309
 #define NEWSKILL_VERSION 309
 #define WATCHERS_VERSION 310
+*/
 #define OVERRIDE_VERSION 311
-#define CURSETYPE_VERSION 312
+#define CURSETYPE_VERSION 312 /* turn 287 */
 #define ALLIANCES_VERSION 313
 #define DBLINK_VERSION 314
 #define CURSEVIGOURISFLOAT_VERSION 315

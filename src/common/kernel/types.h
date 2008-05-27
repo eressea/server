@@ -133,8 +133,8 @@ enum {
   K_DEFAULT,
   K_URSPRUNG,
   K_EMAIL,
-  K_VOTE,
-  K_MAGIEGEBIET,
+  K_VOTE, /* not in use */
+  K_MAGIEGEBIET, /* not in use */
   K_PIRACY,
   K_RESTART,
   K_GROUP,

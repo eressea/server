@@ -315,22 +315,12 @@ read_race_reference(struct storage * store)
 {
   variant result;
   char zName[20];
-  if (store->version<NEWRACE_VERSION) {
-    int i;
-    i = store->r_int(store);
-    if (i>=0) {
-      result.v = (void*)new_race[i];
-    } else {
-      result.v = NULL;
-    }
+  store->r_tok_buf(store, zName, sizeof(zName));
+  if (strcmp(zName, "none")==0) {
+    result.v = NULL;
   } else {
-    store->r_tok_buf(store, zName, sizeof(zName));
-    if (strcmp(zName, "none")==0) {
-      result.v = NULL;
-    } else {
-      result.v = rc_find(zName);
-      assert(result.v!=NULL);
-    }
+    result.v = rc_find(zName);
+    assert(result.v!=NULL);
   }
   return result;
 }
