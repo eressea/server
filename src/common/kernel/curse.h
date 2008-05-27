@@ -134,7 +134,7 @@ enum {
   C_SPARKLE,
 /* struct's vom untertyp curse_skill: */
   C_SKILL,
-  MAXCURSE
+  MAXCURSE /* OBS: when removing curses, remember to update read_ccompat() */
 };
 
 /* ------------------------------------------------------------- */

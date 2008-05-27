@@ -155,6 +155,32 @@ curse_done(attrib * a) {
   destroy_curse((curse *)a->data.v);
 }
 
+/** reads curses that have been removed from the code */
+static int
+read_ccompat(const char * cursename, struct storage * store)
+{
+  struct compat {
+    const char * name;
+    const char * tokens;
+  } * seek, old_curses[] = { {"disorientationzone", ""}, {"shipdisorientation", ""}, { NULL, NULL } } ;
+  for (seek=old_curses;seek->name;++seek) {
+    if (strcmp(seek->name, cursename)==0) {
+      const char * p;
+      for (p=seek->name;p;++p) {
+        switch (*p) {
+          case 'd': store->r_int(store); break;
+          case 's': store->r_str(store); break;
+          case 't': store->r_tok(store); break;
+          case 'i': store->r_id(store); break;
+          case 'f': store->r_flt(store); break;
+        }
+      }
+      return 0;
+    }
+  }
+  return -1;
+}
+
 int
 curse_read(attrib * a, struct storage * store)
 {
@@ -182,7 +208,13 @@ curse_read(attrib * a, struct storage * store)
   }
   c->effect.i = store->r_int(store);
   ct = ct_find(cursename);
-  assert(ct!=NULL);
+  if (ct==NULL) {
+    int result = read_ccompat(cursename, store);
+    if (result!=0) {
+      log_error(("missing curse %s, no compatibility code either.\n", cursename));
+    }
+    assert(result!=0);
+  }
   c->type = ct;
 
   if (store->version < CURSEFLAGS_VERSION) {
@@ -192,17 +224,19 @@ curse_read(attrib * a, struct storage * store)
   }
   c_clearflag(c, CURSE_ISNEW);
 
-  if (c->type->read) c->type->read(store, c);
-  else if (c->type->typ==CURSETYP_UNIT) {
-    curse_unit * cc = calloc(1, sizeof(curse_unit));
+  if (c->type) {
+    if (c->type->read) c->type->read(store, c);
+    else if (c->type->typ==CURSETYP_UNIT) {
+      curse_unit * cc = calloc(1, sizeof(curse_unit));
 
-    c->data.v = cc;
-    cc->cursedmen = store->r_int(store);
-  }
-  if (c->type->typ == CURSETYP_REGION) {
-    int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
-    if (ur==0 && rr==0 && !c->data.v) {
-      return AT_READ_FAIL;
+      c->data.v = cc;
+      cc->cursedmen = store->r_int(store);
+    }
+    if (c->type->typ == CURSETYP_REGION) {
+      int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
+      if (ur==0 && rr==0 && !c->data.v) {
+        return AT_READ_FAIL;
+      }
     }
   }
 
@@ -694,6 +728,7 @@ resolve_curse(variant id, void * address)
 }
 
 static const char * oldnames[MAXCURSE] = {
+  /* OBS: when removing curses, remember to update read_ccompat() */
   "fogtrap",
   "antimagiczone",
   "farvision",
