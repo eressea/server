@@ -32,6 +32,10 @@
     <item notlost="yes" weight="0"/>
   </resource>
 
+  <resource name="lebkuchenherz">
+    <item notlost="yes" weight="0"/>
+  </resource>
+
 <!-- ambassador rewards -->
   <resource name="seashell">
     <item cursed="true" weight="0">

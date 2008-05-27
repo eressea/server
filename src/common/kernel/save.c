@@ -555,15 +555,16 @@ read_items(struct storage * store, item **ilist)
   for (;;) {
     char ibuf[32];
     const item_type * itype;
+    int i;
     store->r_str_buf(store, ibuf, sizeof(ibuf));
     if (!strcmp("end", ibuf)) break;
     itype = it_find(ibuf);
-    assert(itype!=NULL);
-    if (itype!=NULL) {
-      int i = store->r_int(store);
-      if (i<=0) {
-        log_error(("data contains an entry with %d %s\n", i, itype->rtype->_name[1]));
-      } else {
+    i = store->r_int(store);
+    if (i<=0) {
+      log_error(("data contains an entry with %d %s\n", i, itype->rtype->_name[1]));
+    } else {
+      assert(itype!=NULL);
+      if (itype!=NULL) {
         i_change(ilist, itype, i);
       }
     }
