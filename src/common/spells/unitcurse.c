@@ -320,20 +320,24 @@ write_skill(struct storage * store, const curse * c)
 }
 
 static message *
-cinfo_skill(const void * obj, typ_t typ, const curse *c, int self)
+cinfo_skillmod(const void * obj, typ_t typ, const curse *c, int self)
 {
   unused(typ);
 
   if (self != 0) {
     unit *u = (unit *)obj;
     int sk = c->data.i;
-    return msg_message("curseinfo::skill_1", "unit skill id", u, sk, c->no);
+    if (c->effect.i>0) {
+      return msg_message("curseinfo::skill_1", "unit skill id", u, sk, c->no);
+    } else if (c->effect.i<0) {
+      return msg_message("curseinfo::skill_2", "unit skill id", u, sk, c->no);
+    }
   }
   return NULL;
 }
 
 static struct curse_type ct_skillmod = {
-  "skillmod", CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN, cinfo_skill,
+  "skillmod", CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN, cinfo_skillmod,
   NULL, read_skill, write_skill
 };
 

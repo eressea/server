@@ -329,12 +329,12 @@
     </item>
   </resource>
 
-  <resource name="peasant">
+  <resource name="peasant" pooled="false">
     <function name="change" value="lua_changeresource"/>
     <function name="get" value="lua_getresource"/>
   </resource>
 
-  <resource name="hp">
+  <resource name="hp" pooled="false">
     <function name="change" value="lua_changeresource"/>
     <function name="get" value="lua_getresource"/>
   </resource>

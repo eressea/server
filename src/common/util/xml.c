@@ -42,7 +42,7 @@ xml_bvalue(xmlNodePtr node, const char * name, boolean dflt)
   if (propValue!=NULL) {
     if (strcmp((const char*)propValue, "no")==0) result = false;
     else if (strcmp((const char*)propValue, "yes")==0) result = true;
-    else if (strcmp((const char*)propValue, "false")==0) result = true;
+    else if (strcmp((const char*)propValue, "false")==0) result = false;
     else if (strcmp((const char*)propValue, "true")==0) result = true;
     else if (strcmp((const char*)propValue, "1")==0) {
       log_warning(("boolean value is '1': %s::%s\n", node->name, name));

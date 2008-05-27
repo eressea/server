@@ -1211,7 +1211,7 @@ att_modification(const unit *u, skill_t sk)
       unit * mage = c->magician;
       /* wir suchen jeweils den größten Bonus und den größten Malus */
       if (mod>bonus) {
-        if (mage==NULL || alliedunit(mage, u->faction, HELP_GUARD)) {
+        if (mage==NULL || mage->number==0 || alliedunit(mage, u->faction, HELP_GUARD)) {
           bonus = mod;
         }
       } else if (mod < malus) {

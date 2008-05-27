@@ -311,8 +311,14 @@ ct_find(const char *c)
   unsigned int hash = tolower(c[0]);
   cursetype_list * ctl = cursetypes[hash];
   while (ctl) {
-    size_t k = min(strlen(c), strlen(ctl->type->cname));
-    if (!strncasecmp(c, ctl->type->cname, k)) return ctl->type;
+    if (strcmp(c, ctl->type->cname)==0) {
+      return ctl->type;
+    } else {
+      size_t k = min(strlen(c), strlen(ctl->type->cname));
+      if (!strncasecmp(c, ctl->type->cname, k)) {
+        return ctl->type;
+      }
+    }
     ctl = ctl->next;
   }
   return NULL;

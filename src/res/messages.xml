@@ -235,6 +235,15 @@
     <text locale="de">"$unit($unit) scheint $race($race, 0) zu mögen. ($int36($id))"</text>
     <text locale="en">"$unit($unit) seems to like $race($race, 0). ($int36($id))"</text>
   </message>
+  <message name="curseinfo::skill_2" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="skill" type="skill"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) ist ungewöhnlich ungeschickt in $skill($skill). ($int36($id))"</text>
+    <text locale="en">"$unit($unit) has some troubles with $skill($skill). ($int36($id))"</text>
+  </message>
   <message name="curseinfo::skill_1" section="events">
     <type>
       <arg name="unit" type="unit"/>

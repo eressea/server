@@ -208,6 +208,38 @@ setwere_cmd(unit *u, struct order * ord)
   return 0;
 }
 
+void
+set_factionstealth(unit * u, faction * f)
+{
+  region * lastr = NULL;
+  /* for all units mu of our faction, check all the units in the region
+  * they are in, if their visible faction is f, it's ok. use lastr to
+  * avoid testing the same region twice in a row. */
+  unit * mu = u->faction->units;
+  while (mu!=NULL) {
+    if (mu->number && mu->region!=lastr) {
+      unit * ru = mu->region->units;
+      lastr = mu->region;
+      while (ru!=NULL) {
+        if (ru->number) {
+          faction * fv = visible_faction(f, ru);
+          if (fv==f) {
+            if (cansee(f, lastr, ru, 0)) break;
+          }
+        }
+        ru = ru->next;
+      }
+      if (ru!=NULL) break;
+    }
+    mu = mu->nextF;
+  }
+  if (mu!=NULL) {
+    attrib * a = a_find(u->attribs, &at_otherfaction);
+    if (!a) a = a_add(&u->attribs, make_otherfaction(f));
+    else a->data.v = f;
+  }
+}
+
 int
 setstealth_cmd(unit * u, struct order * ord)
 {
@@ -281,34 +313,10 @@ setstealth_cmd(unit * u, struct order * ord)
         a_removeall(&u->attribs, &at_otherfaction);
       } else {
         struct faction * f = findfaction(nr);
-        if(f==NULL) {
+        if (f==NULL) {
           cmistake(u, ord, 66, MSG_EVENT);
         } else {
-          region * lastr = NULL;
-          /* for all units mu of our faction, check all the units in the region
-          * they are in, if their visible faction is f, it's ok. use lastr to
-          * avoid testing the same region twice in a row. */
-          unit * mu = u->faction->units;
-          while (mu!=NULL) {
-            unit * ru = mu->region->units;
-            if (mu->region!=lastr) {
-              lastr = mu->region;
-              while (ru!=NULL) {
-                faction * fv = visible_faction(f, ru);
-                if (fv==f) {
-                  if (cansee(f, lastr, ru, 0)) break;
-                }
-                ru = ru->next;
-              }
-              if (ru!=NULL) break;
-            }
-            mu = mu->nextF;
-          }
-          if (mu!=NULL) {
-            attrib * a = a_find(u->attribs, &at_otherfaction);
-            if (!a) a = a_add(&u->attribs, make_otherfaction(f));
-            else a->data.v = f;
-          }
+          set_factionstealth(u, f);
         }
       }
     } else {

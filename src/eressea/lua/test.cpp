@@ -19,6 +19,7 @@
 using namespace luabind;
 
 #include <util/language.h>
+#include <util/rng.h>
 #include <kernel/skill.h>
 
 static const char *
@@ -44,6 +45,7 @@ bind_test(lua_State * L)
 {
   module(L, "test")[
     def("loc_skill", &loc_getskill),
-    def("loc_keyword", &loc_getkeyword)
+    def("loc_keyword", &loc_getkeyword),
+    def("rng_int", &rng_int)
   ];
 }
