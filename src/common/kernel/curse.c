@@ -144,7 +144,7 @@ destroy_curse(curse * c)
 {
   cunhash(c);
 
-  if (c->data.v && c->type->typ == CURSETYP_UNIT) {
+  if (c->data.v && c->type && c->type->typ == CURSETYP_UNIT) {
     free(c->data.v);
   }
   free(c);
@@ -164,7 +164,7 @@ read_ccompat(const char * cursename, struct storage * store)
     const char * tokens;
   } * seek, old_curses[] = { {"disorientationzone", ""}, {"shipdisorientation", ""}, { NULL, NULL } } ;
   for (seek=old_curses;seek->name;++seek) {
-    if (strcmp(seek->name, cursename)==0) {
+    if (strcmp(seek->tokens, cursename)==0) {
       const char * p;
       for (p=seek->name;p;++p) {
         switch (*p) {
@@ -185,7 +185,6 @@ int
 curse_read(attrib * a, struct storage * store)
 {
   curse * c = (curse*)a->data.v;
-  const curse_type * ct;
   int ur;
   char cursename[64];
   unsigned int flags;
@@ -207,36 +206,33 @@ curse_read(attrib * a, struct storage * store)
     ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
   }
   c->effect.i = store->r_int(store);
-  ct = ct_find(cursename);
-  if (ct==NULL) {
+  c->type = ct_find(cursename);
+  if (c->type==NULL) {
     int result = read_ccompat(cursename, store);
     if (result!=0) {
       log_error(("missing curse %s, no compatibility code either.\n", cursename));
     }
     assert(result!=0);
+    return AT_READ_FAIL;
   }
-  c->type = ct;
-
   if (store->version < CURSEFLAGS_VERSION) {
     c_setflag(c, flags);
   } else {
     c->flags = flags;
   }
   c_clearflag(c, CURSE_ISNEW);
-
-  if (c->type) {
-    if (c->type->read) c->type->read(store, c);
-    else if (c->type->typ==CURSETYP_UNIT) {
-      curse_unit * cc = calloc(1, sizeof(curse_unit));
-
-      c->data.v = cc;
-      cc->cursedmen = store->r_int(store);
-    }
-    if (c->type->typ == CURSETYP_REGION) {
-      int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
-      if (ur==0 && rr==0 && !c->data.v) {
-        return AT_READ_FAIL;
-      }
+  
+  if (c->type->read) c->type->read(store, c);
+  else if (c->type->typ==CURSETYP_UNIT) {
+    curse_unit * cc = calloc(1, sizeof(curse_unit));
+    
+    c->data.v = cc;
+    cc->cursedmen = store->r_int(store);
+  }
+  if (c->type->typ == CURSETYP_REGION) {
+    int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
+    if (ur==0 && rr==0 && !c->data.v) {
+      return AT_READ_FAIL;
     }
   }
 
@@ -319,11 +315,6 @@ ct_find(const char *c)
     if (!strncasecmp(c, ctl->type->cname, k)) return ctl->type;
     ctl = ctl->next;
   }
-  /* disable this assert to be able to remove certain curses from the game
-   * make sure that all locations using that curse can deal with a NULL
-   * return value.
-   */
-  assert(!"unknown cursetype");
   return NULL;
 }
 

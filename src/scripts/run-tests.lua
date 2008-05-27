@@ -82,6 +82,11 @@ function test_md5()
 --  write_game("572.txt", "text")
 end
 
+function test_287()
+  read_game("287", "text")
+  write_game("287.dat", "binary")
+end
+
 loadscript("default.lua")
 run_scripts()
 -- go
@@ -89,7 +94,8 @@ run_scripts()
 -- test_bmark()
 -- test_realloc()
 -- test_hse()
-test_md5()
+-- test_md5()
+test_287()
 -- io.stdin:read("*line")
 -- text: 50.574
 -- bin0: 19.547
