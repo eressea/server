@@ -15,6 +15,8 @@ without prior permission by the authors of Eressea.
 #define ENCODE_SPECIAL 1
 #define RENDER_CRMESSAGES
 #define BUFFERSIZE 32768
+#define RESOURCECOMPAT
+
 /* modules include */
 #include <modules/score.h>
 
@@ -559,7 +561,7 @@ cr_output_messages(FILE * F, message_list *msgs, faction * f)
 
 /* prints a building */
 static void
-cr_output_buildings(FILE * F, building * b, const unit * owner, int fno, faction *f)
+cr_output_building(FILE * F, building * b, const unit * owner, int fno, faction *f)
 {
   const char * bname;
   static const struct building_type * bt_illusion;
@@ -1126,7 +1128,230 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
     }
   }
 }
+static void
+cr_output_resources(FILE * F, report_context * ctx, region * r, struct rawmaterial * res)
+{
+  faction * f = ctx->f;
+  while (res) {
+    int maxskill = 0;
+    int level = -1;
+    int visible = -1;
+    const item_type * itype = resource2item(res->type->rtype);
+    if (res->type->visible==NULL) {
+      visible = res->amount;
+      level = res->level + itype->construction->minskill - 1;
+    } else {
+      const unit * u;
+      for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
+        if (u->faction == f) {
+          int s = eff_skill(u, itype->construction->skill, r);
+          if (s>maxskill) {
+            if (s>=itype->construction->minskill) {
+              assert(itype->construction->minskill>0);
+              level = res->level + itype->construction->minskill - 1;
+            }
+            maxskill = s;
+            visible = res->type->visible(res, maxskill);
+          }
+        }
+      }
+    }
+    if (level>=0 && visible >=0) {
+      char cbuf[BUFFERSIZE], *pos = cbuf;
+      pos = report_resource(pos, res->type->name, f->locale, visible, level);
+#ifdef RESOURCECOMPAT
+      if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
+#endif
+    }
+    res = res->next;
+  }
+}
+static void
+cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
+{
+  faction * f = ctx->f;
+  region * r = sr->r;
+  const char * tname;
+  if (!r->planep) {
+    if (opt_cr_absolute_coords) {
+      fprintf(F, "REGION %d %d\n", r->x, r->x);
+    } else {
+      fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
+    }
+  } else {
+#if ENCODE_SPECIAL
+    if (r->planep->flags & PFL_NOCOORDS) fprintf(F, "SPEZIALREGION %d %d\n", encode_region(f, r), r->planep->id);
+#else
+    if (r->planep->flags & PFL_NOCOORDS) continue;
+#endif
+    else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
+  }
+  fprintf(F, "%d;id\n", r->uid);
+  if (r->land) {
+    const char * str = rname(r, f->locale);
+    if (str && str[0]) {
+      fprintf(F, "\"%s\";Name\n", str);
+    }
+  }
+  tname = terrain_name(r);
 
+  fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
+  if (sr->mode!=see_unit) fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
+
+  {
+    faction * owner = region_owner(r);
+    if (owner) {
+      fprintf(F, "%d;owner\n", owner->no);
+    }
+  }
+  if (sr->mode == see_neighbour) {
+    cr_borders(ctx->seen, r, f, sr->mode, F);
+  } else {
+    building * b;
+    ship * sh;
+    unit * u;
+    int stealthmod = stealth_modifier(sr->mode);
+    char cbuf[BUFFERSIZE], *pos = cbuf;
+#ifdef RESOURCECOMPAT
+    if (r->display && r->display[0])
+      fprintf(F, "\"%s\";Beschr\n", r->display);
+#endif
+    if (fval(r->terrain, LAND_REGION)) {
+      int trees = rtrees(r, 2);
+      int saplings = rtrees(r, 1);
+#ifdef RESOURCECOMPAT
+      if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
+      if (saplings > 0) fprintf(F, "%d;Schoesslinge\n", saplings);
+      if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
+        fprintf(F, "1;Mallorn\n");
+#endif
+      if (!fval(r, RF_MALLORN)) {
+        if (saplings) pos = report_resource(pos, "rm_sapling", f->locale, saplings, -1);
+        if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
+      } else {
+        if (saplings) pos = report_resource(pos, "rm_mallornsapling", f->locale, saplings, -1);
+        if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
+      }
+      fprintf(F, "%d;Bauern\n", rpeasants(r));
+      if(fval(r, RF_ORCIFIED)) {
+        fprintf(F, "1;Verorkt\n");
+      }
+      fprintf(F, "%d;Pferde\n", rhorses(r));
+
+      if (sr->mode>=see_unit) {
+        struct demand * dmd = r->land->demands;
+        fprintf(F, "%d;Silber\n", rmoney(r));
+        fprintf(F, "%d;Unterh\n", entertainmoney(r));
+
+        if (is_cursed(r->attribs, C_RIOT, 0)){
+          fprintf(F, "0;Rekruten\n");
+        } else {
+          fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
+        }
+        if (production(r)) {
+          fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
+        }
+
+        cr_output_resources(F, ctx, r, r->resources);
+        /* trade */
+        if (!TradeDisabled() && rpeasants(r)/TRADE_FRACTION > 0) {
+          fputs("PREISE\n", F);
+          while (dmd) {
+            const char * ch = resourcename(dmd->type->itype->rtype, 0);
+            fprintf(F, "%d;%s\n", (dmd->value
+              ? dmd->value*dmd->type->price
+              : -dmd->type->price),
+              add_translation(ch, locale_string(f->locale, ch)));
+            dmd=dmd->next;
+          }
+        }
+      }
+      if (pos!=cbuf) fputs(cbuf, F);
+    }
+    if (r->land) {
+      print_items(F, r->land->items, f->locale);
+    }
+    print_curses(F, f, r, TYP_REGION);
+    cr_borders(ctx->seen, r, f, sr->mode, F);
+    if (sr->mode==see_unit && r->planep==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
+    {
+      /* Sonderbehandlung Teleport-Ebene */
+      region_list *rl = astralregions(r, inhabitable);
+
+      if (rl) {
+        region_list *rl2 = rl;
+        while(rl2) {
+          region * r = rl2->data;
+          fprintf(F, "SCHEMEN %d %d\n", region_x(r, f), region_y(r, f));
+          fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
+          rl2 = rl2->next;
+        }
+        free_regionlist(rl);
+      }
+    }
+
+    /* describe both passed and inhabited regions */
+    show_active_spells(r);
+    if (fval(r, RF_TRAVELUNIT)) {
+      boolean seeunits = false, seeships = false;
+      const attrib * ru;
+      /* show units pulled through region */
+      for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
+        unit * u = (unit*)ru->data.v;
+        if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
+          if (!u->ship || !fval(u, UFL_OWNER)) continue;
+          if (!seeships) fprintf(F, "DURCHSCHIFFUNG\n");
+          seeships = true;
+          fprintf(F, "\"%s\"\n", shipname(u->ship));
+        }
+      }
+      for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
+        unit * u = (unit*)ru->data.v;
+        if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
+          if (u->ship) continue;
+          if (!seeunits) fprintf(F, "DURCHREISE\n");
+          seeunits = true;
+          fprintf(F, "\"%s\"\n", unitname(u));
+        }
+      }
+    }
+    cr_output_messages(F, r->msgs, f);
+    {
+      message_list * mlist = r_getmessages(r, f);
+      if (mlist) cr_output_messages(F, mlist, f);
+    }
+    /* buildings */
+    for (b = rbuildings(r); b; b = b->next) {
+      int fno = -1;
+      u = buildingowner(r, b);
+      if (u && !fval(u, UFL_PARTEITARNUNG)) {
+        const faction * sf = visible_faction(f,u);
+        fno = sf->no;
+      }
+      cr_output_building(F, b, u, fno, f);
+    }
+
+    /* ships */
+    for (sh = r->ships; sh; sh = sh->next) {
+      int fno = -1;
+      u = shipowner(sh);
+      if (u && !fval(u, UFL_PARTEITARNUNG)) {
+        const faction * sf = visible_faction(f,u);
+        fno = sf->no;
+      }
+
+      cr_output_ship(F, sh, u, fno, f, r);
+    }
+
+    /* visible units */
+    for (u = r->units; u; u = u->next) {
+
+      if (u->building || u->ship || (stealthmod>INT_MIN && cansee(f, r, u, stealthmod))) {
+        cr_output_unit(F, r, f, u, sr->mode);
+      }
+    }
+  }
+}
 /* main function of the creport. creates the header and traverses all regions */
 static int
 report_computer(const char * filename, report_context * ctx, const char * charset)
@@ -1135,9 +1360,6 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   faction * f = ctx->f;
   const char * prefix;
   region * r;
-  building *b;
-  ship *sh;
-  unit *u;
   const char * mailto = locale_string(f->locale, "mailto");
   const attrib * a;
   seen_region * sr = NULL;
@@ -1301,218 +1523,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
     sr = find_seen(ctx->seen, r);
   }
   for (;sr!=NULL;sr=sr->next) {
-    region * r = sr->r;
-    const char * tname;
-
-    if (!r->planep) {
-      if (opt_cr_absolute_coords) {
-        fprintf(F, "REGION %d %d\n", r->x, r->x);
-      } else {
-        fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
-      }
-    } else {
-#if ENCODE_SPECIAL
-      if (r->planep->flags & PFL_NOCOORDS) fprintf(F, "SPEZIALREGION %d %d\n", encode_region(f, r), r->planep->id);
-#else
-      if (r->planep->flags & PFL_NOCOORDS) continue;
-#endif
-      else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
-    }
-    fprintf(F, "%d;id\n", r->uid);
-    if (r->land) {
-      const char * str = rname(r, f->locale);
-      if (str && str[0]) {
-        fprintf(F, "\"%s\";Name\n", str);
-      }
-    }
-    tname = terrain_name(r);
-
-    fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
-    if (sr->mode!=see_unit) fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
-
-    {
-      faction * owner = region_owner(r);
-      if (owner) {
-        fprintf(F, "%d;owner\n", owner->no);
-      }
-    }
-    if (sr->mode == see_neighbour) {
-      cr_borders(ctx->seen, r, f, sr->mode, F);
-    } else {
-      int stealthmod = stealth_modifier(sr->mode);
-#define RESOURCECOMPAT
-      char cbuf[BUFFERSIZE], *pos = cbuf;
-#ifdef RESOURCECOMPAT
-      if (r->display && r->display[0])
-          fprintf(F, "\"%s\";Beschr\n", r->display);
-#endif
-      if (fval(r->terrain, LAND_REGION)) {
-        int trees = rtrees(r, 2);
-        int saplings = rtrees(r, 1);
-#ifdef RESOURCECOMPAT
-        if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
-        if (saplings > 0) fprintf(F, "%d;Schoesslinge\n", saplings);
-        if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
-            fprintf(F, "1;Mallorn\n");
-#endif
-        if (!fval(r, RF_MALLORN)) {
-          if (saplings) pos = report_resource(pos, "rm_sapling", f->locale, saplings, -1);
-          if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
-        } else {
-          if (saplings) pos = report_resource(pos, "rm_mallornsapling", f->locale, saplings, -1);
-          if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
-        }
-        fprintf(F, "%d;Bauern\n", rpeasants(r));
-        if(fval(r, RF_ORCIFIED)) {
-          fprintf(F, "1;Verorkt\n");
-        }
-        fprintf(F, "%d;Pferde\n", rhorses(r));
-
-        if (sr->mode>=see_unit) {
-          struct demand * dmd = r->land->demands;
-          struct rawmaterial * res = r->resources;
-          fprintf(F, "%d;Silber\n", rmoney(r));
-          fprintf(F, "%d;Unterh\n", entertainmoney(r));
-
-          if (is_cursed(r->attribs, C_RIOT, 0)){
-            fprintf(F, "0;Rekruten\n");
-          } else {
-            fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
-          }
-          if (production(r)) {
-            fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
-          }
-
-          while (res) {
-            int maxskill = 0;
-            int level = -1;
-            int visible = -1;
-            const item_type * itype = resource2item(res->type->rtype);
-            if (res->type->visible==NULL) {
-              visible = res->amount;
-              level = res->level + itype->construction->minskill - 1;
-            } else {
-              const unit * u;
-              for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
-                if (u->faction == f) {
-                  int s = eff_skill(u, itype->construction->skill, r);
-                  if (s>maxskill) {
-                    if (s>=itype->construction->minskill) {
-                      assert(itype->construction->minskill>0);
-                      level = res->level + itype->construction->minskill - 1;
-                    }
-                    maxskill = s;
-                    visible = res->type->visible(res, maxskill);
-                  }
-                }
-              }
-            }
-            if (level>=0 && visible >=0) {
-              pos = report_resource(pos, res->type->name, f->locale, visible, level);
-#ifdef RESOURCECOMPAT
-              if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
-#endif
-            }
-            res = res->next;
-          }
-          /* trade */
-          if (!TradeDisabled() && rpeasants(r)/TRADE_FRACTION > 0) {
-            fputs("PREISE\n", F);
-            while (dmd) {
-              const char * ch = resourcename(dmd->type->itype->rtype, 0);
-              fprintf(F, "%d;%s\n", (dmd->value
-                                     ? dmd->value*dmd->type->price
-                                     : -dmd->type->price),
-                      add_translation(ch, locale_string(f->locale, ch)));
-              dmd=dmd->next;
-            }
-          }
-        }
-        if (pos!=cbuf) fputs(cbuf, F);
-      }
-      if (r->land) {
-        print_items(F, r->land->items, f->locale);
-      }
-      print_curses(F, f, r, TYP_REGION);
-      cr_borders(ctx->seen, r, f, sr->mode, F);
-      if (sr->mode==see_unit && r->planep==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
-      {
-        /* Sonderbehandlung Teleport-Ebene */
-        region_list *rl = astralregions(r, inhabitable);
-
-        if (rl) {
-          region_list *rl2 = rl;
-          while(rl2) {
-            region * r = rl2->data;
-            fprintf(F, "SCHEMEN %d %d\n", region_x(r, f), region_y(r, f));
-            fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
-            rl2 = rl2->next;
-          }
-          free_regionlist(rl);
-        }
-      }
-
-      /* describe both passed and inhabited regions */
-      show_active_spells(r);
-      if (fval(r, RF_TRAVELUNIT)) {
-        boolean seeunits = false, seeships = false;
-        const attrib * ru;
-        /* show units pulled through region */
-        for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
-          unit * u = (unit*)ru->data.v;
-          if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
-            if (!u->ship || !fval(u, UFL_OWNER)) continue;
-            if (!seeships) fprintf(F, "DURCHSCHIFFUNG\n");
-            seeships = true;
-            fprintf(F, "\"%s\"\n", shipname(u->ship));
-          }
-        }
-        for (ru = a_find(r->attribs, &at_travelunit); ru && ru->type==&at_travelunit; ru = ru->next) {
-          unit * u = (unit*)ru->data.v;
-          if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
-            if (u->ship) continue;
-            if (!seeunits) fprintf(F, "DURCHREISE\n");
-            seeunits = true;
-            fprintf(F, "\"%s\"\n", unitname(u));
-          }
-        }
-      }
-      cr_output_messages(F, r->msgs, f);
-      {
-        message_list * mlist = r_getmessages(r, f);
-        if (mlist) cr_output_messages(F, mlist, f);
-      }
-      /* buildings */
-      for (b = rbuildings(r); b; b = b->next) {
-        int fno = -1;
-        u = buildingowner(r, b);
-        if (u && !fval(u, UFL_PARTEITARNUNG)) {
-          const faction * sf = visible_faction(f,u);
-          fno = sf->no;
-        }
-        cr_output_buildings(F, b, u, fno, f);
-      }
-
-      /* ships */
-      for (sh = r->ships; sh; sh = sh->next) {
-        int fno = -1;
-        u = shipowner(sh);
-        if (u && !fval(u, UFL_PARTEITARNUNG)) {
-          const faction * sf = visible_faction(f,u);
-          fno = sf->no;
-        }
-
-        cr_output_ship(F, sh, u, fno, f, r);
-      }
-
-      /* visible units */
-      for (u = r->units; u; u = u->next) {
-
-        if (u->building || u->ship || (stealthmod>INT_MIN && cansee(f, r, u, stealthmod))) {
-          cr_output_unit(F, r, f, u, sr->mode);
-        }
-      }
-    } /* region traversal */
+    cr_output_region(F, ctx, sr);
   }
   report_crtypes(F, f->locale);
   write_translations(F);
