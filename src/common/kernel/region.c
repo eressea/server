@@ -431,7 +431,7 @@ hash_uid(region * r)
       } 
       assert(uidhash[key].r!=r || !"duplicate registration");
     }
-    uid = rng_int();
+    r->uid = uid = rng_int();
   }
 }
 

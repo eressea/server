@@ -20,6 +20,8 @@
 #define ENCODE_SPECIAL 1
 #define RENDER_CRMESSAGES
 
+#define XML_ATL_NAMESPACE (const xmlChar *) "http://www.eressea.de/XML/2008/atlantis"
+
 /* modules include */
 #include <modules/score.h>
 
@@ -82,6 +84,12 @@
 
 #define L10N(x) x
 
+typedef struct xml_context {
+  xmlDocPtr doc;
+  xmlNsPtr ns_atl;
+  xmlNsPtr ns_xml;
+} xml_context;
+
 static const xmlChar *
 xml_s(const char * str)
 {
@@ -105,54 +113,83 @@ xml_i(double number)
 }
 
 static xmlNodePtr
+report_unit(report_context * ctx, unit * u, int mode)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "unit");
+  char unit_id[20];
+
+  sprintf(unit_id, "unit_%d", u->no);
+  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)unit_id);
+  xmlNewNsProp(node, xct->ns_atl, BAD_CAST "key", BAD_CAST itoa36(u->no));
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)u->name);
+
+  return node;
+}
+
+static xmlNodePtr
 report_faction(report_context * ctx, faction * f)
 {
-  xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "faction");
-  xmlNewProp(node, BAD_CAST "id", xml_i(f->no));
-  xmlNewProp(node, BAD_CAST "name", (const xmlChar *)f->name);
-  xmlNewProp(node, BAD_CAST "email", xml_s(f->email));
-  if (f->banner && *f->banner) xmlNewProp(node, BAD_CAST "banner", (const xmlChar *)f->banner);
-  if (f==ctx->f) {
-    const char * s;
-    xmlNewProp(node, BAD_CAST "locale", BAD_CAST locale_name(f->locale));
-    xmlNewProp(node, BAD_CAST "age", xml_i(f->age));
-    xmlNewProp(node, BAD_CAST "options", xml_i(f->options));
-    xmlNewProp(node, BAD_CAST "race", xml_s(L10N(rc_name(f->race, 0))));
-    xmlNewProp(node, BAD_CAST "magic", xml_s(L10N(magietypen[f->magiegebiet])));
-    s = get_prefix(f->attribs);;
-    if (s) {
-      xmlNewProp(node, BAD_CAST "prefix", xml_s(L10N(s)));
-    }
-  }
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "faction");
+  char faction_id[20];
+
+  sprintf(faction_id, "faction_%d", f->no);
+  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)faction_id);
+  xmlNewNsProp(node, xct->ns_atl, BAD_CAST "key", BAD_CAST itoa36(f->no));
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)f->name);
+
   return node;
 }
 
 static xmlNodePtr
 report_region(report_context * ctx, seen_region * sr)
 {
+  xml_context* xct = (xml_context*)ctx->userdata;
   const region * r = sr->r;
-  xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "region");
-  xmlNewProp(node, BAD_CAST "terrain", xml_s(L10N(terrain_name(r))));
-  xmlNewProp(node, BAD_CAST "x", xml_i(r->x));
-  xmlNewProp(node, BAD_CAST "y", xml_i(r->y));
-  xmlNewProp(node, BAD_CAST "view", xml_s(visibility[sr->mode]));
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "region");
+  xmlNodePtr child;
+  char region_id[20];
+  int stealthmod = stealth_modifier(sr->mode);
+  unit * u;
+
+  sprintf(region_id, "region_%u", r->uid);
+  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, BAD_CAST region_id);
+
+  child = xmlNewNode(xct->ns_atl, BAD_CAST "coordinate");
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "x", xml_i(r->x));
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "y", xml_i(r->y));
   if (r->planep) {
-    xmlNewProp(node, BAD_CAST "plane", xml_s(r->planep->name));
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "plane", xml_s(r->planep->name));
   }
+  xmlAddChild(node, child);
+
   if (r->land!=NULL) {
-    xmlNewProp(node, BAD_CAST "name", (const xmlChar *)r->land->name);
+    child = xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)r->land->name);
+  }
+
+  child = xmlNewNode(xct->ns_atl, BAD_CAST "terrain");
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (const xmlChar *)terrain_name(r));
+
+  for (u=r->units;u;u=u->next) {
+    if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
+      xmlAddChild(node, report_unit(ctx, u, sr->mode));
+    }
   }
   return node;
 }
 
-/* main function of the xmlreport. creates the header and traverses all regions */
-static int
-report_xml(const char * filename, report_context * ctx, const char * encoding)
+static xmlNodePtr
+report_root(report_context * ctx)
 {
-  xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
-  xmlNodePtr xmlReport = xmlNewNode(NULL, BAD_CAST "report");
   const faction_list * address;
   region * r = ctx->first, * rend = ctx->last;
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr xmlReport = xmlNewNode(NULL, BAD_CAST "atlantis");
+
+  xct->ns_xml = xmlNewNs(xmlReport, XML_XML_NAMESPACE, BAD_CAST "xml");
+  xct->ns_atl = xmlNewNs(xmlReport, XML_ATL_NAMESPACE, NULL);
+  xmlSetNs(xmlReport, xct->ns_atl);
 
   for (address=ctx->addresses;address;address=address->next) {
     xmlAddChild(xmlReport, report_faction(ctx, address->data));
@@ -162,7 +199,21 @@ report_xml(const char * filename, report_context * ctx, const char * encoding)
     seen_region * sr = find_seen(ctx->seen, r);
     if (sr!=NULL) xmlAddChild(xmlReport, report_region(ctx, sr));
   }
-  xmlDocSetRootElement(doc, xmlReport);
+  return xmlReport;
+};
+
+/* main function of the xmlreport. creates the header and traverses all regions */
+static int
+report_xml(const char * filename, report_context * ctx, const char * encoding)
+{
+  xml_context xct;
+  xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
+
+  xct.doc = doc;
+  assert(ctx->userdata==NULL);
+  ctx->userdata = &xct;
+
+  xmlDocSetRootElement(doc, report_root(ctx));
   xmlKeepBlanksDefault(0);
   xmlSaveFormatFileEnc(filename, doc, "utf-8", 1);
   xmlFreeDoc(doc);
