@@ -367,6 +367,15 @@
     <text locale="en">adamantium</text>
   </string>
 
+  <string name="diamondaxe">
+    <text locale="de">Adamantaxe</text>
+    <text locale="en">adamantium axe</text>
+  </string>
+  <string name="diamondaxe_p">
+    <text locale="de">Adamantäxte</text>
+    <text locale="en">adamantium axes</text>
+  </string>
+
   <string name="diamondplate">
     <text locale="de">Adamantrüstung</text>
     <text locale="en">adamantium plate</text>
