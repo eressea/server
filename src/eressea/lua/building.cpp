@@ -56,7 +56,10 @@ lc_age(struct attrib * a)
   if (is_function(L, fname)) {
     try {
       if (fparam) {
-        retval = luabind::call_function<int>(L, fname, *b, fparam);
+#ifdef TUNNELS /* TODO: Why does this crash? */
+        std::string param(fparam);
+        retval = luabind::call_function<int>(L, fname, *b, param);
+#endif
       } else {
         retval = luabind::call_function<int>(L, fname, *b);
       }

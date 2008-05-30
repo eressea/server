@@ -72,8 +72,7 @@
     <param name="globalreport" value="world"/>
     <param name="rules.check_overload" value="1"/>
   </game>
-  <xi:include href="eressea/de/strings.xml"/>
-  <xi:include href="eressea/en/strings.xml"/>
+  <xi:include href="eressea/strings.xml"/>
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items-hse.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
