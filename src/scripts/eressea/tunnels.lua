@@ -47,4 +47,5 @@ function tunnel_action(b, param)
       end
     end
   end
+  return 1 -- return 0 to destroy
 end
