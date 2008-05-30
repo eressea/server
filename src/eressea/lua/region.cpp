@@ -349,6 +349,7 @@ bind_region(lua_State * L)
   module(L)[
     def("regions", &get_regions, return_stl_iterator),
     def("get_region", &findregion),
+    def("get_region_by_id", &findregionbyid),
     def("terraform", &region_terraform),
     def("distance", &distance),
     def("remove_region", &region_remove),

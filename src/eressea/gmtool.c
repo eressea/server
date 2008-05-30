@@ -277,11 +277,14 @@ cursor_region(const view * v, const coordinate * c)
   coordinate relpos;
   int cx, cy;
 
-  relpos.x = c->x - v->topleft.x;
-  relpos.y = c->y - v->topleft.y;
-  cy = relpos.y;
-  cx = relpos.x + cy/2;
-  return mr_get(v, cx, cy);
+  if (c) {
+    relpos.x = c->x - v->topleft.x;
+    relpos.y = c->y - v->topleft.y;
+    cy = relpos.y;
+    cx = relpos.x + cy/2;
+    return mr_get(v, cx, cy);
+  }
+  return NULL;
 }
 
 static void
@@ -293,6 +296,8 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c, i
   map_region * mr = cursor_region(v, c);
   coordinate relpos;
   int cx, cy;
+
+  if (!mr) return;
 
   relpos.x = c->x - v->topleft.x;
   relpos.y = c->y - v->topleft.y;
@@ -790,19 +795,21 @@ handlekey(state * st, int c)
   case 0x09: /* tab = next selected*/
     if (regions!=NULL) {
       map_region * mr = cursor_region(&st->display, cursor);
-      region * first = mr->r;
-      region * cur = (first&&first->next)?first->next:regions;
-      while (cur!=first) {
-        coordinate coord;
-        region2coord(cur, &coord);
-        if (tagged_region(st->selected, &coord)) {
-          st->cursor = coord;
-          st->wnd_info->update |= 1;
-          st->wnd_status->update |= 1;
-          break;
+      if (mr) {
+        region * first = mr->r;
+        region * cur = (first&&first->next)?first->next:regions;
+        while (cur!=first) {
+          coordinate coord;
+          region2coord(cur, &coord);
+          if (tagged_region(st->selected, &coord)) {
+            st->cursor = coord;
+            st->wnd_info->update |= 1;
+            st->wnd_status->update |= 1;
+            break;
+          }
+          cur = cur->next;
+          if (!cur && first) cur = regions;
         }
-        cur = cur->next;
-        if (!cur && first) cur = regions;
       }
     }
     break;
@@ -810,7 +817,7 @@ handlekey(state * st, int c)
   case 'a':
     if (regions!=NULL) {
       map_region * mr = cursor_region(&st->display, cursor);
-      if (mr->r) {
+      if (mr && mr->r) {
         region * cur = mr->r;
         if (cur->planep==NULL) {
           cur = r_standard_to_astral(cur);
@@ -968,7 +975,7 @@ handlekey(state * st, int c)
     } else if (findmode && regions!=NULL) {
       struct faction * f = NULL;
       map_region * mr = cursor_region(&st->display, cursor);
-      region * first = (mr->r && mr->r->next)?mr->r->next:regions;
+      region * first = (mr && mr->r && mr->r->next)?mr->r->next:regions;
 
       if (findmode=='f') {
         sprintf(sbuffer, "find-faction: %s", locate);

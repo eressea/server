@@ -26,7 +26,7 @@ region *
 current_region(void)
 {
   map_region * mr = cursor_region(&current_state->display, &current_state->cursor);
-  return mr->r;
+  return mr?mr->r:NULL;
 }
 
 static tag *
