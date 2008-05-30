@@ -32,7 +32,7 @@ current_region(void)
 static tag *
 next_tag(int hash, const state * st)
 {
-  while (hash!=MAXTHASH) {
+  while (st && hash!=MAXTHASH) {
     tag * t = st->selected->tags[hash];
     if (t!=NULL) return t;
     ++hash;
