@@ -40,6 +40,7 @@ function load_scripts()
     "eressea/xmas2005.lua",
     "eressea/xmas2006.lua",
     "eressea/embassy.lua",
+    "eressea/tunnels.lua",
     "eressea/ents.lua"
   }
   for index, value in pairs(scripts) do

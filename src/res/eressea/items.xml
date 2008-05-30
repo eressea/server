@@ -173,6 +173,19 @@
     </resourcelimit>
   </resource>
 
+  <resource name="diamondaxe">
+    <item weight="100" score="500">
+      <construction skill="weaponsmithing" minskill="8" reqsize="1">
+        <requirement type="diamond" quantity="1"/>
+        <requirement type="log" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
+        <damage type="rider" value="3d4+15"/>
+        <damage type="footman" value="3d4+15"/>
+      </weapon>
+    </item>
+  </resource>
+
   <resource name="diamondplate">
     <item weight="100" score="2000">
       <construction skill="armorer" minskill="10" reqsize="1">
