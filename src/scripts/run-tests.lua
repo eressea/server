@@ -51,8 +51,11 @@ function test_free()
 end
 
 function test_hse()
-  read_game("50", "text")
-  write_game("50.dat", "binary")
+  read_game("50.dat", "binary")
+  f = get_faction(atoi36("8h7f"))
+  f.options = f.options + 8192
+  init_reports()
+  write_report(f)
 end
 
 function test_realloc()
@@ -79,7 +82,11 @@ function test_md5()
   read_game("571.dat", "binary")
   -- read_orders("orders.571")
   run_turn()
---  write_game("572.txt", "text")
+  local i = test.rng_int()
+  print(i)
+  write_game("572.txt." .. i, "text")
+  -- 648583167
+  io.stdin:read("*line")
 end
 
 function test_287()
@@ -93,9 +100,9 @@ run_scripts()
 -- test_free()
 -- test_bmark()
 -- test_realloc()
--- test_hse()
+test_hse()
 -- test_md5()
-test_287()
+-- test_287()
 -- io.stdin:read("*line")
 -- text: 50.574
 -- bin0: 19.547

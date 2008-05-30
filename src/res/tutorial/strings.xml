@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <strings>
-	<comment> report newbie info</comment>
 	<string name="newbie_info_2">
+		<text locale="de">Die ersten beiden Züge mußt du abgeben, sonst wird deine Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.</text>
 		<text locale="en">If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of zombie players in Eressea.</text>
 	</string>
 	<string name="newbie_info_3">
+		<text locale="de">Mit der ersten Auswertung bekommst du einen Computerreport, den du mit vielen der Tools auf http://eressea-pbem.de/download.html benutzen kannst. Wenn du ihn weiterhin bekommen willst, gib einer deiner Einheiten den Befehl OPTION COMPUTER.</text>
 		<text locale="en">With the first two turns, you will get a computer report (CR). It can be used with many of the tools on http://eressea-pbem.de/download.html. If you want to continue getting it after the second turn, please make one of your units give the order OPTION COMPUTER.</text>
+	</string>
+	<string name="defaultorder">
+		<text locale="de">ARBEITE</text>
+		<text locale="en">WORK</text>
 	</string>
 </strings>

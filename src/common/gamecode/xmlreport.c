@@ -237,4 +237,3 @@ xmlreport_cleanup(void)
   iconv_close(utf8);
 #endif
 }
-

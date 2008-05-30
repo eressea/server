@@ -70,8 +70,7 @@
     <param name="hunger.long" value="1"/>
     <param name="rules.check_overload" value="0"/>
   </game>
-  <xi:include href="eressea/de/strings.xml"/>
-  <xi:include href="eressea/en/strings.xml"/>
+  <xi:include href="eressea/strings.xml"/>
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/artrewards.xml"/>

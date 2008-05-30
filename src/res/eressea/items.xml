@@ -149,37 +149,6 @@
     <item cursed="yes" notlost="yes" weight="0" />
   </resource>
 
-  <resource name="greatbow">
-    <item weight="100">
-      <construction skill="weaponsmithing" minskill="5" reqsize="1">
-        <modifier function="mod_elves_only"/>
-        <requirement type="mallorn" quantity="2"/>
-      </construction>
-      <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0" magres="0.0">
-        <damage type="rider" value="2d6+4"/>
-        <damage type="footman" value="2d6+4"/>
-        <modifier type="missile_target" value="2"/>
-        <modifier type="damage" value="1">
-          <race name="elf"/>
-        </modifier>
-      </weapon>
-    </item>
-  </resource>
-
-  <resource name="halberd">
-    <item weight="200">
-      <construction skill="weaponsmithing" minskill="3" reqsize="1">
-        <requirement type="log" quantity="2"/>
-        <requirement type="iron" quantity="1"/>
-      </construction>
-      <weapon cut="true" skill="polearm" offmod="-1" defmod="2" magres="0.0">
-        <damage type="rider" value="2d6+3"/>
-        <damage type="footman" value="2d6+3"/>
-        <modifier type="skill" value="1" walking="true" against_riding="true" defensive="true"/>
-      </weapon>
-    </item>
-  </resource>
-
   <!-- christmas items: start -->
   <resource name="almond">
     <item weight="0"/>
@@ -194,5 +163,23 @@
     <item weight="0"/>
   </resource>
   <!-- christmas items: end -->
+
+  <resource name="diamond" limited="yes">
+    <item weight="200" score="200">
+      <construction skill="mining" minskill="8" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="diamondplate">
+    <item weight="100" score="2000">
+      <construction skill="armorer" minskill="10" reqsize="1">
+        <requirement type="diamond" quantity="3"/>
+      </construction>
+      <armor ac="7" penalty="0.1"/>
+    </item>
+  </resource>
 
 </resources>

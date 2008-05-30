@@ -63,11 +63,8 @@
     <param name="hunger.long" value="1"></param>
     <param name="MaxAge" value="8"></param>
   </game>
-  <xi:include href="tutorial/de/strings.xml"/>
-  <xi:include href="tutorial/en/strings.xml"/>
+  <xi:include href="tutorial/strings.xml"/>
   <xi:include href="eressea/races.xml"/>
-  <xi:include href="eressea/items.xml"/>
-  <xi:include href="eressea/dungeons.xml"/>
   <strings>
     <string name="mailto">
       <text locale="en">tutorial@eressea.de</text>

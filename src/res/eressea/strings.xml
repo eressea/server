@@ -197,6 +197,7 @@
   <string name="newbie_info_2">
     <text locale="de">Die ersten beiden Züge mußt du abgeben, sonst wird deine
     Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.</text>
+    <text locale="en">If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of inactive players in Eressea.</text>
   </string>
   <string name="newbie_info_3">
     <text locale="de">Mit der ersten Auswertung bekommst du einen
@@ -204,9 +205,11 @@
     http://eressea-pbem.de/download.html benutzen kannst. Wenn du ihn
     weiterhin bekommen willst, gib einer deiner Einheiten den Befehl OPTION
     COMPUTER.</text>
+    <text locale="en">With the first two turns, you will get a computer report (CR). It can be used with many of the tools on http://eressea-pbem.de/download.html. If you want to continue getting it after the second turn, please make one of your units give the order OPTION COMPUTER.</text>
   </string>
   <string name="defaultorder">
     <text locale="de">ARBEITE</text>
+    <text locale="en">WORK</text>
   </string>
   <string name="temple">
     <text locale="de">Tempel</text>
@@ -355,16 +358,22 @@
   </string>
   <!-- igjarjuk queste end -->
 
+  <string name="diamond">
+    <text locale="de">Adamant</text>
+    <text locale="en">adamantium</text>
+  </string>
+  <string name="diamond_p">
+    <text locale="de">Adamant</text>
+    <text locale="en">adamantium</text>
+  </string>
+
+  <string name="diamondplate">
+    <text locale="de">Adamantrüstung</text>
+    <text locale="en">adamantium plate</text>
+  </string>
+  <string name="diamondplate_p">
+    <text locale="de">Adamantrüstungen</text>
+    <text locale="en">adamantium plates</text>
+  </string>
+
 </strings>
-
-
-
-
-
-
-
-
-
-
-
-
