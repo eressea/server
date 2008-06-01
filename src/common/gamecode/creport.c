@@ -1129,43 +1129,66 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
   }
 }
 static void
-cr_output_resources(FILE * F, report_context * ctx, region * r, struct rawmaterial * res)
+cr_output_resources(FILE * F, report_context * ctx, region * r, struct rawmaterial * res, int see_mode)
 {
+  char cbuf[BUFFERSIZE], *pos = cbuf;
   faction * f = ctx->f;
-  while (res) {
-    int maxskill = 0;
-    int level = -1;
-    int visible = -1;
-    const item_type * itype = resource2item(res->type->rtype);
-    if (res->type->visible==NULL) {
-      visible = res->amount;
-      level = res->level + itype->construction->minskill - 1;
-    } else {
-      const unit * u;
-      for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
-        if (u->faction == f) {
-          int s = eff_skill(u, itype->construction->skill, r);
-          if (s>maxskill) {
-            if (s>=itype->construction->minskill) {
-              assert(itype->construction->minskill>0);
-              level = res->level + itype->construction->minskill - 1;
+
+  int trees = rtrees(r, 2);
+  int saplings = rtrees(r, 1);
+
+#ifdef RESOURCECOMPAT
+  if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
+  if (saplings > 0) fprintf(F, "%d;Schoesslinge\n", saplings);
+  if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
+    fprintf(F, "1;Mallorn\n");
+#endif
+
+  if (!fval(r, RF_MALLORN)) {
+    if (saplings) pos = report_resource(pos, "rm_sapling", f->locale, saplings, -1);
+    if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
+  } else {
+    if (saplings) pos = report_resource(pos, "rm_mallornsapling", f->locale, saplings, -1);
+    if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
+  }
+
+  if (see_mode>=see_unit) {
+    while (res) {
+      int maxskill = 0;
+      int level = -1;
+      int visible = -1;
+      const item_type * itype = resource2item(res->type->rtype);
+      if (res->type->visible==NULL) {
+        visible = res->amount;
+        level = res->level + itype->construction->minskill - 1;
+      } else {
+        const unit * u;
+        for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
+          if (u->faction == f) {
+            int s = eff_skill(u, itype->construction->skill, r);
+            if (s>maxskill) {
+              if (s>=itype->construction->minskill) {
+                assert(itype->construction->minskill>0);
+                level = res->level + itype->construction->minskill - 1;
+              }
+              maxskill = s;
+              visible = res->type->visible(res, maxskill);
             }
-            maxskill = s;
-            visible = res->type->visible(res, maxskill);
           }
         }
       }
-    }
-    if (level>=0 && visible >=0) {
-      char cbuf[BUFFERSIZE], *pos = cbuf;
-      pos = report_resource(pos, res->type->name, f->locale, visible, level);
+      if (level>=0 && visible >=0) {
+        pos = report_resource(pos, res->type->name, f->locale, visible, level);
 #ifdef RESOURCECOMPAT
-      if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
+        if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
 #endif
+      }
+      res = res->next;
     }
-    res = res->next;
   }
+  if (pos!=cbuf) fputs(cbuf, F);
 }
+
 static void
 cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 {
@@ -1211,27 +1234,10 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     ship * sh;
     unit * u;
     int stealthmod = stealth_modifier(sr->mode);
-    char cbuf[BUFFERSIZE], *pos = cbuf;
-#ifdef RESOURCECOMPAT
+
     if (r->display && r->display[0])
       fprintf(F, "\"%s\";Beschr\n", r->display);
-#endif
     if (fval(r->terrain, LAND_REGION)) {
-      int trees = rtrees(r, 2);
-      int saplings = rtrees(r, 1);
-#ifdef RESOURCECOMPAT
-      if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
-      if (saplings > 0) fprintf(F, "%d;Schoesslinge\n", saplings);
-      if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
-        fprintf(F, "1;Mallorn\n");
-#endif
-      if (!fval(r, RF_MALLORN)) {
-        if (saplings) pos = report_resource(pos, "rm_sapling", f->locale, saplings, -1);
-        if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
-      } else {
-        if (saplings) pos = report_resource(pos, "rm_mallornsapling", f->locale, saplings, -1);
-        if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
-      }
       fprintf(F, "%d;Bauern\n", rpeasants(r));
       if(fval(r, RF_ORCIFIED)) {
         fprintf(F, "1;Verorkt\n");
@@ -1239,7 +1245,6 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
       fprintf(F, "%d;Pferde\n", rhorses(r));
 
       if (sr->mode>=see_unit) {
-        struct demand * dmd = r->land->demands;
         fprintf(F, "%d;Silber\n", rmoney(r));
         fprintf(F, "%d;Unterh\n", entertainmoney(r));
 
@@ -1251,10 +1256,16 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         if (production(r)) {
           fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
         }
+      }
 
-        cr_output_resources(F, ctx, r, r->resources);
+      /* this writes both some tags (RESOURCECOMPAT) and a block.
+       * must not write any blocks before it */
+      cr_output_resources(F, ctx, r, r->resources, sr->mode);
+
+      if (sr->mode>=see_unit) {
         /* trade */
         if (!TradeDisabled() && rpeasants(r)/TRADE_FRACTION > 0) {
+          struct demand * dmd = r->land->demands;
           fputs("PREISE\n", F);
           while (dmd) {
             const char * ch = resourcename(dmd->type->itype->rtype, 0);
@@ -1266,7 +1277,6 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
           }
         }
       }
-      if (pos!=cbuf) fputs(cbuf, F);
     }
     if (r->land) {
       print_items(F, r->land->items, f->locale);
