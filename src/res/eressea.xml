@@ -19,6 +19,18 @@
   <xi:include href="dungeons.xml"/>
   <xi:include href="directions.xml"/>
 
+  <equipment>
+    <set name="first_unit">
+      <item name="conquesttoken" amount="1"/>
+      <item name="log" amount="30"/>
+      <item name="stone" amount="30"/>
+      <item name="money" amount="4200"/>
+    </set>
+    <set name="new_faction">
+      <item name="diamond" amount="4"/>
+    </set>
+  </equipment>
+
   <xi:include href="names-undead.xml"/>
   <xi:include href="names-skeletons.xml"/>
   <xi:include href="names-zombies.xml"/>

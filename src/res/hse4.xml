@@ -18,7 +18,7 @@
   <xi:include href="terrains.xml"/>
 
   <equipment>
-    <set name="new_faction">
+    <set name="first_unit">
       <item name="wood" amount="5"/>
       <item name="stone" amount="10"/>
     </set>

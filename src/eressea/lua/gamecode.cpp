@@ -170,45 +170,10 @@ write_summary()
   return -1;
 }
 
-#ifdef SHORTPWDS
-static void
-readshortpwds()
-{
-  FILE * F;
-  char zText[MAX_PATH];
-  sprintf(zText, "%s/%s.%u", basepath(), "shortpwds", turn);
-
-  F = fopen(zText, "r");
-  if (F==NULL) {
-    log_error(("could not open password file %s", zText));
-  } else {
-    while (!feof(F)) {
-      faction * f;
-      char passwd[16], faction[5], email[64];
-      fscanf(F, "%s %s %s\n", faction, passwd, email);
-      f = findfaction(atoi36(faction));
-      if (f!=NULL) {
-        shortpwd * pwd = (shortpwd*)malloc(sizeof(shortpwd));
-        if (set_email(&pwd->email, email)!=0) {
-          log_error(("Invalid email address: %s\n", email));
-        }
-        pwd->pwd = strdup(passwd);
-        pwd->used = false;
-        pwd->next = f->shortpwds;
-        f->shortpwds = pwd;
-      }
-    }
-    fclose(F);
-  }
-}
-#endif
 
 static int
 process_orders(void)
 {
-#ifdef SHORTPWDS
-  readshortpwds("passwords");
-#endif
   turn++;
   processorders();
 

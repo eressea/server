@@ -23,7 +23,7 @@
     <skill name="building" level="2"/>
   </set>
 
-  <set name="new_faction">
+  <set name="first_unit">
     <subset>
       <set name="craftsman"/>
     </subset>

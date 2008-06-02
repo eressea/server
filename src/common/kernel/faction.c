@@ -182,7 +182,8 @@ addplayer(region *r, faction * f)
   assert(f->units==NULL);
   set_ursprung(f, 0, r->x, r->y);
   u = createunit(r, f, 1, f->race);
-  equip_unit(u, get_equipment("new_faction"));
+  equip_items(&u->faction->items, get_equipment("new_faction"));
+  equip_unit(u, get_equipment("first_unit"));
   equip_unit(u, get_equipment(u->race->_name[0]));
   u->hp = unit_max_hp(u) * u->number;
   fset(u, UFL_ISNEW);
@@ -200,16 +201,6 @@ addplayer(region *r, faction * f)
 boolean
 checkpasswd(const faction * f, const char * passwd, boolean shortp)
 {
-#ifdef SHORTPWDS
-  shortpwd * slist = f->shortpwds;
-  if (shortp) while (slist) {
-    if (strcmp(slist->pwd, passwd)==0) {
-      slist->used = true;
-      return true;
-    }
-    slist = slist->next;
-  }
-#endif
   if (unicode_utf8_strcasecmp(f->passw, passwd)==0) return true;
   if (unicode_utf8_strcasecmp(f->override, passwd)==0) return true;
   return false;

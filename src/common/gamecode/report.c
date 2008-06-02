@@ -1722,18 +1722,6 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
       if (ALLIED(uf, f)) label = '*';
       else if (alliedfaction(NULL, uf, f, HELP_ALL)) label = '+';
       rparagraph(F, buf, 4, 0, label);
-#ifdef SHORTPWDS
-      if (f->shortpwds) {
-        shortpwd * spwd = f->shortpwds;
-        while (spwd) {
-          if (spwd->used) {
-            sprintf(buf, "Vertretung: %s", spwd->email);
-            rparagraph(F, buf, 6, '-');
-          }
-          spwd=spwd->next;
-        }
-      }
-#endif
 
     }
     flist = flist->next;

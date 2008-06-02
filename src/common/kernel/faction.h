@@ -25,15 +25,6 @@ struct seen_region;
    faction is in. defining this speeds up the turn by 30-40% */
 #define SMART_INTERVALS
 
-#ifdef SHORTPWDS
-typedef struct shortpwd {
-  struct shortpwd * next;
-  char * email;
-  char * pwd;
-  boolean used;
-} shortpwd;
-#endif
-
 /* faction flags */
 #define FFL_NEWID (1<<0) /* Die Partei hat bereits einmal ihre no gewechselt */  
 #define FFL_ISNEW         (1<<1)
@@ -74,9 +65,6 @@ typedef struct faction {
   char *email;
   char *passw;
   char *override;
-#ifdef SHORTPWDS
-  struct shortpwd * shortpwds;
-#endif
   const struct locale * locale;
   int lastorders;	/* enno: short? */
   int age;	/* enno: short? */

@@ -50,10 +50,6 @@ end
 
 function process(orders)
   -- initialize starting equipment for new players
-  equipment_setitem("new_faction", "conquesttoken", "1");
-  equipment_setitem("new_faction", "log", "30");
-  equipment_setitem("new_faction", "stone", "30");
-  equipment_setitem("new_faction", "money", "4200");
 
   if open_game(get_turn())~=0 then
     print("could not read game")
