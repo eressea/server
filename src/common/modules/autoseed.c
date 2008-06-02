@@ -560,11 +560,11 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
       if (rn && fval(rn, RF_MARK)) continue;
+      if (rn==NULL) {
+        rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
+        terraform(rn, T_OCEAN);
+      }
       if (virgin_region(rn)) {
-        if (rn==NULL) {
-          rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
-          terraform(rn, T_OCEAN);
-        }
         add_regionlist(&rlist, rn);
         fset(rn, RF_MARK);
         ++rsize;
