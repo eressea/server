@@ -333,9 +333,11 @@ paint_status(window * wnd, const state * st)
 {
   WINDOW * win = wnd->handle;
   const char * name = "";
+  int uid = 0;
   const char * terrain = "----";
   map_region * mr = cursor_region(&st->display, &st->cursor);
   if (mr && mr->r) {
+    uid = mr->r->uid;
     if (mr->r->land) {
       name = (const char *)mr->r->land->name;
     } else {
@@ -343,7 +345,7 @@ paint_status(window * wnd, const state * st)
     }
     terrain = mr->r->terrain->_name;
   }
-  mvwprintw(win, 0, 0, "%4d %4d | %.4s | %.20s", st->cursor.x, st->cursor.y, terrain, name);
+  mvwprintw(win, 0, 0, "%4d %4d | %.4s | %.20s (%d)", st->cursor.x, st->cursor.y, terrain, name, uid);
   wclrtoeol(win);
 }
 
