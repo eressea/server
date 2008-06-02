@@ -342,21 +342,21 @@ get_island(region * root, region_list ** rlist)
 }
 
 static void
-get_island_info(region * r, int * size_p, int * inhabited_p, int * maxage_p)
+get_island_info(region * root, int * size_p, int * inhabited_p, int * maxage_p)
 {
   int size = 0, maxage = 0, inhabited = 0;
   region_list * rlist = NULL;
   region_list * island = NULL;
-  add_regionlist(&rlist, r);
+  add_regionlist(&rlist, root);
   island = rlist;
-  fset(r, RF_MARK);
+  fset(root, RF_MARK);
   while (rlist) {
     direction_t d;
-    r = rlist->data;
+    region * r = rlist->data;
     if (r->units) {
       unit * u;
       for (u=r->units; u; u=u->next) {
-        if (u->faction->age > maxage) {
+        if (!is_monsters(u->faction) && u->faction->age > maxage) {
           maxage = u->faction->age;
         }
       }
@@ -468,15 +468,15 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = r->planep;
-      if (rterrain(r)==T_OCEAN && p==NULL && virgin_region(r)) {
+      if (r->age<=max_agediff && rterrain(r)==T_OCEAN && p==NULL && virgin_region(r)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
-          if (rn && rn->land && virgin_region(rn)) {
+          if (rn && rn->land && rn->age<=max_agediff && virgin_region(rn)) {
             /* only expand islands that aren't single-islands and not too big already */
             int size, inhabitants, maxage;
             get_island_info(rn, &size, &inhabitants, &maxage);
-            if (maxage<=max_agediff && size>2 && size<MAXISLANDSIZE) {
+            if (maxage<=max_agediff && size>=2 && size<MAXISLANDSIZE) {
               rmin = rn;
               break;
             }
