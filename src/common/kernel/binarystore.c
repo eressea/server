@@ -151,7 +151,7 @@ bin_w_str(struct storage * store, const char * tok)
   return result;
 }
 
-#define FIX_INVALID_CHARS
+#define FIX_INVALID_CHARS /* required for data pre-574 */
 static char *
 bin_r_str(struct storage * store)
 {

@@ -47,11 +47,11 @@ make_key(int key)
 attrib *
 find_key(attrib * alist, int key)
 {
-	attrib * a = a_find(alist, &at_key);
+  attrib * a = a_find(alist, &at_key);
   while (a && a->type==&at_key && a->data.i != key) {
     a = a->next;
   }
-	return a;
+  return (a && a->type==&at_key)?a:NULL;
 }
 
 void
