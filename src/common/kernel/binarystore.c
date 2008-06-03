@@ -151,6 +151,7 @@ bin_w_str(struct storage * store, const char * tok)
   return result;
 }
 
+#define FIX_INVALID_CHARS
 static char *
 bin_r_str(struct storage * store)
 {
@@ -162,6 +163,16 @@ bin_r_str(struct storage * store)
 
     fread(result, sizeof(char), len, file(store));
     result[len] = 0;
+#ifdef FIX_INVALID_CHARS
+    {
+      char * p = strpbrk(result, "\n\r");
+      while (p) {
+        log_error(("Invalid character %d in input string \"%s\".\n", *p, result));
+        strcpy(p, p+1);
+        p = strpbrk(p, "\n\r");
+      }
+    }
+#endif
     return result;
   }
   return NULL;
@@ -187,6 +198,16 @@ bin_r_str_buf(struct storage * store, char * result, size_t size)
     } else {
       result[len] = 0;
     }
+#ifdef FIX_INVALID_CHARS
+    {
+      char * p = strpbrk(result, "\n\r");
+      while (p) {
+        log_error(("Invalid character %d in input string \"%s\".\n", *p, result));
+        strcpy(p, p+1);
+        p = strpbrk(p, "\n\r");
+      }
+    }
+#endif
   }
 }
 
