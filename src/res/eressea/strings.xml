@@ -358,29 +358,29 @@
   </string>
   <!-- igjarjuk queste end -->
 
-  <string name="diamond">
+  <string name="adamantium">
     <text locale="de">Adamant</text>
     <text locale="en">adamantium</text>
   </string>
-  <string name="diamond_p">
+  <string name="adamantium_p">
     <text locale="de">Adamant</text>
     <text locale="en">adamantium</text>
   </string>
 
-  <string name="diamondaxe">
+  <string name="adamantiumaxe">
     <text locale="de">Adamantaxt</text>
     <text locale="en">adamantium axe</text>
   </string>
-  <string name="diamondaxe_p">
+  <string name="adamantiumaxe_p">
     <text locale="de">Adamantäxte</text>
     <text locale="en">adamantium axes</text>
   </string>
 
-  <string name="diamondplate">
+  <string name="adamantiumplate">
     <text locale="de">Adamantrüstung</text>
     <text locale="en">adamantium plate</text>
   </string>
-  <string name="diamondplate_p">
+  <string name="adamantiumplate_p">
     <text locale="de">Adamantrüstungen</text>
     <text locale="en">adamantium plates</text>
   </string>

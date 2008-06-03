@@ -5,11 +5,11 @@ function adamant_gifts()
   for f in factions() do
     local i = math.mod(test.rng_int(), 2)
     if i==0 then
-      f:add_item("diamond", 1)
-      f:add_item("diamondplate", 1)
+      f:add_item("adamantium", 1)
+      f:add_item("adamantiumplate", 1)
     else
-      f:add_item("diamond", 3)
-      f:add_item("diamondaxe", 1)
+      f:add_item("adamantium", 3)
+      f:add_item("adamantiumaxe", 1)
     end
   end
 end

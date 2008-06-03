@@ -164,7 +164,7 @@
   </resource>
   <!-- christmas items: end -->
 
-  <resource name="diamond" limited="yes">
+  <resource name="adamantium" limited="yes">
     <item weight="200" score="200">
       <construction skill="mining" minskill="8" reqsize="1"/>
     </item>
@@ -173,10 +173,10 @@
     </resourcelimit>
   </resource>
 
-  <resource name="diamondaxe">
+  <resource name="adamantiumaxe">
     <item weight="100" score="500">
       <construction skill="weaponsmithing" minskill="8" reqsize="1">
-        <requirement type="diamond" quantity="1"/>
+        <requirement type="adamantium" quantity="1"/>
         <requirement type="log" quantity="1"/>
       </construction>
       <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
@@ -186,10 +186,10 @@
     </item>
   </resource>
 
-  <resource name="diamondplate">
+  <resource name="adamantiumplate">
     <item weight="100" score="2000">
       <construction skill="armorer" minskill="10" reqsize="1">
-        <requirement type="diamond" quantity="3"/>
+        <requirement type="adamantium" quantity="3"/>
       </construction>
       <armor ac="7" penalty="0.1"/>
     </item>
