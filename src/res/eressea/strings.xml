@@ -359,29 +359,29 @@
   <!-- igjarjuk queste end -->
 
   <string name="adamantium">
-    <text locale="de">Adamant</text>
+    <text locale="de">Adamantium</text>
     <text locale="en">adamantium</text>
   </string>
   <string name="adamantium_p">
-    <text locale="de">Adamant</text>
+    <text locale="de">Adamantium</text>
     <text locale="en">adamantium</text>
   </string>
 
   <string name="adamantiumaxe">
-    <text locale="de">Adamantaxt</text>
+    <text locale="de">Adamantiumaxt</text>
     <text locale="en">adamantium axe</text>
   </string>
   <string name="adamantiumaxe_p">
-    <text locale="de">Adamantäxte</text>
+    <text locale="de">Adamantiumäxte</text>
     <text locale="en">adamantium axes</text>
   </string>
 
   <string name="adamantiumplate">
-    <text locale="de">Adamantrüstung</text>
+    <text locale="de">Adamantiumrüstung</text>
     <text locale="en">adamantium plate</text>
   </string>
   <string name="adamantiumplate_p">
-    <text locale="de">Adamantrüstungen</text>
+    <text locale="de">Adamantiumrüstungen</text>
     <text locale="en">adamantium plates</text>
   </string>
 
