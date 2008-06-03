@@ -45,7 +45,7 @@
 static int
 age_peaceimmune(attrib * a)
 {
-  return --a->data.i;
+  return (--a->data.i>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 static attrib_type at_peaceimmune = {

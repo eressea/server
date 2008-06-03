@@ -46,7 +46,7 @@ attrib_type at_faction_special = {
 
 int
 age_prayer_timeout(attrib *a) {
-	return --a->data.sa[0];
+  return (--a->data.sa[0]>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 attrib_type at_prayer_timeout = {

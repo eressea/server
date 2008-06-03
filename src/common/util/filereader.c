@@ -217,23 +217,29 @@ getbuf_utf8(FILE * F)
       size_t size;
       int ret;
       
+      if (!quote) {
+        while (*bp==COMMENT_CHAR) {
+          /* comment begins. we need to keep going, to look for CONTINUE_CHAR */
+          comment = true;
+          ++bp;
+        }
+      }
+
       if (*bp=='\n' || *bp=='\r') {
         /* line breaks, shmine breaks */
         break;
       }
 
-      if (*bp==COMMENT_CHAR && !quote) {
-        /* comment begins. we need to keep going, to look for CONTINUE_CHAR */
-        comment = true;
-        ++bp;
-      }
       if (*bp=='"' || *bp=='\'') {
         if (quote==*bp) {
           quote = 0;
-          if (cp<fbuf+MAXLINE) *cp++ = *bp++;
+          if (cp<fbuf+MAXLINE) *cp++ = *bp;
+          ++bp;
+          continue;
         } else if (!quote) {
           quote = *bp++;
           if (cp<fbuf+MAXLINE) *cp++ = quote;
+          continue;
         }
       }
 

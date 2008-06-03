@@ -151,10 +151,10 @@ a_ageicastle(struct attrib * a)
     ADDMSG(&r->msgs, msg_message("icastle_dissolve", "building", b));
     /* remove_building lets units leave the building */
     remove_building(&r->buildings, b);
-    return 0;
+    return AT_AGE_REMOVE;
   }
   else data->time--;
-  return 1;
+  return AT_AGE_KEEP;
 }
 
 static void
@@ -2345,7 +2345,7 @@ age_unit(attrib * a)
 /* if unit is gone or dead, remove the attribute */
 {
   unit * u = (unit*)a->data.v;
-  return (u!=NULL && u->number>0);
+  return (u!=NULL && u->number>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 attrib_type at_familiarmage = {

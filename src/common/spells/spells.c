@@ -2805,10 +2805,8 @@ static int
 wall_age(border * b)
 {
   wall_data * fd = (wall_data*)b->data.v;
-  if (fd->countdown>0) {
-    if (--fd->countdown==0) return 0;
-  }
-  return fd->countdown;
+  --fd->countdown;
+  return (fd->countdown>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 static region *
@@ -3140,7 +3138,7 @@ dc_age(struct curse * c)
   
   if (r==NULL || mage==NULL || mage->number==0) {
     /* if the mage disappears, so does the spell. */
-    return -1;
+    return AT_AGE_REMOVE;
   }
 
   up = &r->units;
@@ -3161,7 +3159,7 @@ dc_age(struct curse * c)
     if (*up==u) up=&u->next;
   }
 
-  return 0;
+  return AT_AGE_KEEP;
 }
 
 static struct curse_type ct_deathcloud = {

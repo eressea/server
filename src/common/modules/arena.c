@@ -197,7 +197,7 @@ age_hurting(attrib * a) {
 	building * b = (building *)a->data.v;
 	unit * u;
 	int active = 0;
-	if (b==NULL) return 0;
+	if (b==NULL) return AT_AGE_REMOVE;
 	for (u=b->region->units;u;u=u->next) {
 		if (u->building==b) {
 			if (u->faction->magiegebiet==M_CHAOS) {
@@ -213,7 +213,7 @@ age_hurting(attrib * a) {
 			ADDMSG(&b->region->msgs, msg_message("cryinpain", "unit", u));
 		}
 	}
-	return 1;
+	return AT_AGE_KEEP;
 }
 
 static void

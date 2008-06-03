@@ -131,8 +131,7 @@ shiptrail_age(attrib *a)
 	traveldir *t = (traveldir *)(a->data.v);
 
 	t->age--;
-	if(t->age == 0) return 0;
-	return 1;
+    return (t->age>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 static int
@@ -170,7 +169,7 @@ age_speedup(attrib *a)
   if (a->data.sa[0] > 0) {
     a->data.sa[0] = a->data.sa[0] - a->data.sa[1];
   }
-  return a->data.sa[0]>0;
+  return (a->data.sa[0]>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 attrib_type at_speedup = {

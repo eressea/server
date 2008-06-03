@@ -720,7 +720,7 @@ leftship_age(struct attrib * a)
 {
   /* must be aged, so it doesn't affect report generation (cansee) */
   unused(a);
-  return 0; /* remove me */
+  return AT_AGE_REMOVE; /* remove me */
 }
 
 static attrib_type at_leftship = {

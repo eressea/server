@@ -30,7 +30,7 @@ end
 -- export, will be called from lc_age()
 function tunnel_action(b, param)
   local r = nil
-  print("Tunnel from " .. b .. " [" .. param .. "]")
+  print("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
   if tonumber(param)~=nil then
     r = get_region_by_id(tonumber(param))
   end
@@ -43,7 +43,7 @@ function tunnel_action(b, param)
       end
       if rto~=nil then
         u.region = rto
-        print(" - teleported " .. u .. " to " .. rto)
+        print(" - teleported " .. tostring(u) .. " to " .. tostring(rto))
       end
     end
   end

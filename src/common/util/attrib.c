@@ -242,8 +242,15 @@ a_age(attrib ** p)
 	 * hat Einfluß auf den Besitzer */
 	while(*ap) {
 		attrib * a = *ap;
-		if (a->type->age && a->type->age(a)==0) a_remove(p, a);
-		else ap = &a->next;
+        if (a->type->age) {
+          int result = a->type->age(a);
+          assert(result>=0 || !"age() returned a negative value");
+          if (result==0) {
+            a_remove(p, a);
+            continue;
+          }
+        }
+		ap = &a->next;
 	}
 	return (*p!=NULL);
 }

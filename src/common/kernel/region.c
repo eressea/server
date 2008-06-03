@@ -203,11 +203,8 @@ static int
 a_agedirection(attrib *a)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
-
-  if (d->duration > 0) d->duration--;
-  else d->duration = 0;
-
-  return d->duration;
+  --d->duration;
+  return (d->duration>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 typedef struct dir_lookup {

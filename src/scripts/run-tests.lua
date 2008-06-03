@@ -94,13 +94,52 @@ function test_287()
   write_game("287.dat", "binary")
 end
 
+function tunnel_action(b, param)
+  local r = nil
+  print("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
+
+  if tonumber(param)~=nil then
+    r = get_region_by_id(tonumber(param))
+  end
+  if r~=nil then
+    local units = tunnel_travelers(b)
+    for key, u in pairs(units) do
+      local rto = r
+      if r==nil then
+        rto = get_target(param)
+      end
+      if rto~=nil then
+        u.region = rto
+        print(" - teleported " .. tostring(u) .. " to " .. tostring(rto))
+      end
+    end
+  end
+  return 1 -- return 0 to destroy
+end
+
+function action(b, param)
+  print(b)
+  print(param)
+  return 1
+end
+
+function test_tunnels()
+  r = terraform(0, 0, "glacier")
+  b = add_building(r, "portal")
+  b:add_action("tunnel_action", "tnnL")
+  r2 = terraform(5, 5, "plain")
+  r2:set_key("tnnL", true)
+  process_orders()
+end
+
 loadscript("default.lua")
 run_scripts()
 -- go
 -- test_free()
 -- test_bmark()
 -- test_realloc()
-test_hse()
+-- test_hse()
+test_tunnels()
 -- test_md5()
 -- test_287()
 -- io.stdin:read("*line")

@@ -24,7 +24,7 @@ age_reduceproduction(attrib *a)
 	int reduce = 100 - (5 * --a->data.sa[1]);
 	if (reduce < 10) reduce = 10;
 	a->data.sa[0] = (short)reduce;
-	return a->data.sa[1];
+    return (a->data.sa[1]>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 attrib_type at_reduceproduction = {

@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-  struct storage;
+struct storage;
 typedef void (*afun)(void);
 
 typedef struct attrib {
@@ -79,6 +79,9 @@ extern void a_write(struct storage * store, const attrib * attribs);
 
 #define AT_READ_OK 0
 #define AT_READ_FAIL -1
+
+#define AT_AGE_REMOVE 0 /* remove the attribute after calling age() */
+#define AT_AGE_KEEP 1 /* keep the attribute for another turn */
 
 #ifdef __cplusplus
 }

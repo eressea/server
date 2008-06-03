@@ -98,7 +98,7 @@ wormhole_age(struct attrib * a)
   ADDMSG(&r->msgs, msg_message("wormhole_dissolve", "region", r));
 
   /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
-  return -1;
+  return AT_AGE_KEEP;
 }
 
 static void

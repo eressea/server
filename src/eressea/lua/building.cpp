@@ -50,30 +50,28 @@ lc_age(struct attrib * a)
   int retval = -1;
 
   assert(b!=NULL);
-  if (fname==NULL) return -1;
-
-  lua_State * L = (lua_State *)global.vm_state;
-  if (is_function(L, fname)) {
-    try {
-      if (fparam) {
-#ifdef TUNNELS /* TODO: Why does this crash? */
-        std::string param(fparam);
-        retval = luabind::call_function<int>(L, fname, *b, param);
-#endif
-      } else {
-        retval = luabind::call_function<int>(L, fname, *b);
+  if (fname!=NULL) {
+    lua_State * L = (lua_State *)global.vm_state;
+    if (is_function(L, fname)) {
+      try {
+        if (fparam) {
+          std::string param(fparam);
+          retval = luabind::call_function<int>(L, fname, *b, param);
+        } else {
+          retval = luabind::call_function<int>(L, fname, *b);
+        }
+      }
+      catch (luabind::error& e) {
+        lua_State* L = e.state();
+        const char* error = lua_tostring(L, -1);
+        log_error(("An exception occured while %s tried to call '%s': %s.\n",
+          buildingname(b), fname, error));
+        lua_pop(L, 1);
+        /* std::terminate(); */
       }
     }
-    catch (luabind::error& e) {
-      lua_State* L = e.state();
-      const char* error = lua_tostring(L, -1);
-      log_error(("An exception occured while %s tried to call '%s': %s.\n",
-        buildingname(b), fname, error));
-      lua_pop(L, 1);
-      std::terminate();
-    }
   }
-  return retval;
+  return (retval!=0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
 static int
