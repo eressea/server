@@ -103,7 +103,7 @@ enum {
   K_GIVE,
   K_ALLY,
   K_STATUS,
-  K_COMBAT,
+  K_COMBATSPELL,
   K_BUY,
   K_CONTACT,
   K_TEACH,

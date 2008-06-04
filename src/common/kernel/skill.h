@@ -60,6 +60,7 @@ extern int skill_compare(const skill * sk, const skill * sc);
 extern void sk_set(skill * sv, int level);
 
 extern const char *skillnames[];
+extern boolean skill_enabled[];
 
 #ifdef __cplusplus
 }

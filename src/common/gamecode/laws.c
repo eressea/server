@@ -3549,11 +3549,13 @@ add_proc(int priority, const char * name, int type)
 void
 add_proc_order(int priority, keyword_t kword, int (*parser)(struct unit *, struct order *), unsigned int flags, const char * name)
 {
-  processor * proc = add_proc(priority, name, PR_ORDER);
-  if (proc) {
-    proc->data.per_order.process = parser;
-    proc->data.per_order.kword = kword;
-    proc->flags = flags;
+  if (!global.disabled[kword]) {
+    processor * proc = add_proc(priority, name, PR_ORDER);
+    if (proc) {
+      proc->data.per_order.process = parser;
+      proc->data.per_order.kword = kword;
+      proc->flags = flags;
+    }
   }
 }
 
@@ -3756,7 +3758,7 @@ init_processor(void)
   add_proc_order(p, K_PREFIX, &prefix_cmd, 0, NULL);
   add_proc_order(p, K_SETSTEALTH, &setstealth_cmd, 0, NULL);
   add_proc_order(p, K_STATUS, &status_cmd, 0, NULL);
-  add_proc_order(p, K_COMBAT, &combatspell_cmd, 0, NULL);
+  add_proc_order(p, K_COMBATSPELL, &combatspell_cmd, 0, NULL);
   add_proc_order(p, K_DISPLAY, &display_cmd, 0, NULL);
   add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
   add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
@@ -3800,8 +3802,10 @@ init_processor(void)
     add_proc_region(p, &do_battle, "Attackieren");
   }
 
-  p+=10; /* after combat, reset rng */
-  add_proc_region(p, &do_siege, "Belagern");
+  if (!global.disabled[K_BESIEGE]) {
+    p+=10;
+    add_proc_region(p, &do_siege, "Belagern");
+  }
 
   p+=10; /* can't allow reserve before siege (weapons) */
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (2. Versuch)");
@@ -3816,15 +3820,17 @@ init_processor(void)
 
   p+=10; /* QUIT fuer sich alleine */
   add_proc_global(p, &quit, "Sterben");
-  add_proc_global(p, &parse_restart, "Neustart");
-
-  p+=10;
-  add_proc_global(p, &magic, "Zaubern");
-
-  p+=10;
-  if (!global.disabled[K_TEACH]) {
-    add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER|PROC_LONGORDER, "Lehren");
+  if (!global.disabled[K_RESTART]) {
+    add_proc_global(p, &parse_restart, "Neustart");
   }
+
+  if (!global.disabled[K_CAST]) {
+    p+=10;
+    add_proc_global(p, &magic, "Zaubern");
+  }
+
+  p+=10;
+  add_proc_order(p, K_TEACH, &teach_cmd, PROC_THISORDER|PROC_LONGORDER, "Lehren");
   p+=10;
   add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER|PROC_LONGORDER, "Lernen");
 
@@ -3842,11 +3848,16 @@ init_processor(void)
   p+=10;
   add_proc_global(p, &movement, "Bewegungen");
 
+  if (get_param_int(global.parameters, "work.auto", 0)) {
+    p+=10;
+    add_proc_region(p, &auto_work, "Arbeiten (auto)");
+  }
+
   p+=10;
   add_proc_order(p, K_GUARD, &guard_on_cmd, 0, "Bewache (an)");
 #if XECMD_MODULE
   /* can do together with guard */
-  add_proc_order(p, K_LEAVE, &xecmd, 0, "Zeitung");
+  add_proc_order(p, K_XE, &xecmd, 0, "Zeitung");
 #endif
 
   p+=10;
@@ -3860,14 +3871,18 @@ init_processor(void)
   p+=10;
   add_proc_global(p, &monthly_healing, "Regeneration (HP)");
   add_proc_global(p, &regeneration_magiepunkte, "Regeneration (Aura)");
-  add_proc_global(p, &defaultorders, "Defaults setzen");
+  if (!global.disabled[K_DEFAULT]) {
+    add_proc_global(p, &defaultorders, "Defaults setzen");
+  }
   add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
   p+=10;
   add_proc_region(p, &maintain_buildings_2, "Gebaeudeunterhalt (2. Versuch)");
 
-  p+=10;
-  add_proc_global(p, &reorder, "Einheiten sortieren");
+  if (!global.disabled[K_SORT]) {
+    p+=10;
+    add_proc_global(p, &reorder, "Einheiten sortieren");
+  }
 #if KARMA_MODULE
   p+=10;
   add_proc_global(p, &karma, "Jihads setzen");
@@ -3881,10 +3896,11 @@ init_processor(void)
   add_proc_global(p, &declare_war, "Krieg & Frieden");
 #endif
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
-  add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
-
-  p+=10;
-  add_proc_global(p, &renumber_factions, "Neue Nummern");
+  if (!global.disabled[K_NUMBER]) {
+    add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");
+    p+=10;
+    add_proc_global(p, &renumber_factions, "Neue Nummern");
+  }
 }
 
 void

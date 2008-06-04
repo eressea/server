@@ -76,8 +76,7 @@ CheckOverload(void)
 {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "rules.check_overload");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "rules.check_overload", 0);
   }
   return value;
 }

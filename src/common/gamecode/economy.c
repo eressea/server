@@ -90,8 +90,6 @@ typedef struct request {
   } type;
 } request;
 
-static request workers[1024];
-static request *nextworker;
 static int working;
 
 static request entertainers[1024];
@@ -1158,8 +1156,7 @@ recruit_classic(void)
 {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "recruit.classic");
-    value = str?atoi(str):1;
+    value = get_param_int(global.parameters, "recruit.classic", 1);
   }
   return value;
 }
@@ -1169,8 +1166,7 @@ recruit_archetypes(void)
 {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "recruit.archetypes");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "recruit.archetypes", 0);
   }
   return value;
 }
@@ -2954,7 +2950,7 @@ entertain_cmd(unit * u, struct order * ord)
 
 
 static void
-expandwork(region * r)
+expandwork(region * r, request * work_begin, request * work_end)
 {
 	int n, earnings;
 	/* n: verbleibende Einnahmen */
@@ -2964,7 +2960,7 @@ expandwork(region * r)
 	int verdienst = 0;
 	request *o;
 
-	for (o = &workers[0]; o != nextworker; ++o) {
+	for (o = work_begin; o != work_end; ++o) {
 		unit * u = o->unit;
 		int workers;
 
@@ -3000,33 +2996,38 @@ expandwork(region * r)
 	rsetmoney(r, rmoney(r) + earnings);
 }
 
-static void
-work_cmd(unit * u, order * ord)
+static int
+do_work(unit * u, order * ord, request * o)
 {
-  region * r = u->region;
-	request *o;
-	int w;
+  if (playerrace(u->race)) {
+    region * r = u->region;
+    int w;
 
-	if(fval(u, UFL_WERE)) {
-		cmistake(u, ord, 313, MSG_INCOME);
-		return;
-	}
-	if (besieged(u)) {
-		cmistake(u, ord, 60, MSG_INCOME);
-		return;
-	}
-	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-		cmistake(u, ord, 69, MSG_INCOME);
-		return;
-	}
-	w = wage(r, u->faction, u->race);
-	u->wants = u->number * w;
-	o = nextworker++;
-	o->unit = u;
-	o->qty = u->number * w;
-	working += u->number;
+    if(fval(u, UFL_WERE)) {
+      cmistake(u, ord, 313, MSG_INCOME);
+      return -1;
+    }
+    if (besieged(u)) {
+      cmistake(u, ord, 60, MSG_INCOME);
+      return -1;
+    }
+    if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+      cmistake(u, ord, 69, MSG_INCOME);
+      return -1;
+    }
+    w = wage(r, u->faction, u->race);
+    u->wants = u->number * w;
+    o->unit = u;
+    o->qty = u->number * w;
+    working += u->number;
+    return 0;
+  }
+  else if (!is_monsters(u->faction)) {
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "race_cantwork", "race", u->race));
+  }
+  return -1;
 }
-/* ------------------------------------------------------------- */
 
 static void
 expandtax(region * r, request * taxorders)
@@ -3111,15 +3112,35 @@ tax_cmd(unit * u, struct order * ord, request ** taxorders)
 	addlist(taxorders, o);
 	return;
 }
-/* ------------------------------------------------------------- */
+
+void
+auto_work(region * r)
+{
+  request workers[1024];
+  request * nextworker = workers;
+  unit * u;
+
+  for (u=r->units;u;u=u->next) {
+    if (!(u->flags & UFL_LONGACTION) && !is_monsters(u->faction)) {
+      if (do_work(u, NULL, nextworker)==0) {
+        ++nextworker;
+      }
+    }
+  }
+  if (nextworker!=workers) {
+    expandwork(r, workers, nextworker);
+  }
+}
 
 void
 produce(void)
 {
+  request workers[1024];
   region *r;
   request *taxorders, *sellorders, *stealorders, *buyorders;
   unit *u;
   int todo;
+  int autowork = get_param_int(global.parameters, "work.auto", 0);
 
   /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
   * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
@@ -3133,13 +3154,13 @@ produce(void)
 
   for (r = regions; r; r = r->next) {
     boolean limited = true;
+    request * nextworker = workers;
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
 
     buyorders = 0;
     sellorders = 0;
-    nextworker = &workers[0];
     working = 0;
     nextentertainer = &entertainers[0];
     entertaining = 0;
@@ -3147,6 +3168,9 @@ produce(void)
     stealorders = 0;
 
     for (u = r->units; u; u = u->next) {
+      order * ord;
+      boolean trader = false;
+
       if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
         continue;
 
@@ -3159,31 +3183,27 @@ produce(void)
         continue;
       }
 
-      if (!TradeDisabled()) {
-        order * ord;
-        boolean trader = false;
-        for (ord = u->orders;ord;ord=ord->next) {
-          switch (get_keyword(ord)) {
-          case K_BUY:
-            buy(u, &buyorders, ord);
-            trader = true;
-            break;
-          case K_SELL:
-            /* sell returns true if the sale is not limited
-             * by the region limit */
-            limited &= !sell(u, &sellorders, ord);
-            trader = true;
-            break;
-          }
+      for (ord = u->orders;ord;ord=ord->next) {
+        switch (get_keyword(ord)) {
+        case K_BUY:
+          buy(u, &buyorders, ord);
+          trader = true;
+          break;
+        case K_SELL:
+          /* sell returns true if the sale is not limited
+           * by the region limit */
+          limited &= !sell(u, &sellorders, ord);
+          trader = true;
+          break;
         }
-        if (trader) {
-          attrib * a = a_find(u->attribs, &at_trades);
-          if (a && a->data.i) {
-            produceexp(u, SK_TRADE, u->number);
-          }
-          fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-          continue;
+      }
+      if (trader) {
+        attrib * a = a_find(u->attribs, &at_trades);
+        if (a && a->data.i) {
+          produceexp(u, SK_TRADE, u->number);
         }
+        fset(u, UFL_LONGACTION|UFL_NOTMOVING);
+        continue;
       }
 
       todo = get_keyword(u->thisorder);
@@ -3201,10 +3221,8 @@ produce(void)
           break;
 
         case K_WORK:
-          if (playerrace(u->race)) work_cmd(u, u->thisorder);
-          else if (playerrace(u->faction->race)) {
-            ADDMSG(&u->faction->msgs,
-              msg_feedback(u, u->thisorder, "race_cantwork", "race", u->race));
+          if (!autowork && do_work(u, u->thisorder, nextworker)==0) {
+            ++nextworker;
           }
           break;
 
@@ -3240,7 +3258,7 @@ produce(void)
     * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
     * auszugeben bereit sind. */
     if (entertaining) expandentertainment(r);
-    expandwork(r);
+    if (!autowork) expandwork(r, workers, nextworker);
     if (taxorders) expandtax(r, taxorders);
 
     /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um

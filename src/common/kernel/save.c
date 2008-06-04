@@ -914,6 +914,10 @@ readregion(struct storage * store, short x, short y)
   if (store->version < TERRAIN_VERSION) {
     int ter = store->r_int(store);
     terrain = newterrain((terrain_t)ter);
+    if (terrain==NULL) {
+      log_error(("while reading datafile from pre-TERRAIN_VERSION, could not find terrain #%d.\n", ter));
+      terrain = newterrain(T_PLAIN);
+    }
   } else {
     char name[64];
     store->r_str_buf(store, name, sizeof(name));

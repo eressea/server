@@ -1115,6 +1115,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
     }
   }
 }
+
 static void
 cr_output_resources(FILE * F, report_context * ctx, region * r, struct rawmaterial * res, int see_mode)
 {
@@ -1251,7 +1252,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
       if (sr->mode>=see_unit) {
         /* trade */
-        if (!TradeDisabled() && rpeasants(r)/TRADE_FRACTION > 0) {
+        if (rpeasants(r)/TRADE_FRACTION > 0) {
           struct demand * dmd = r->land->demands;
           fputs("PREISE\n", F);
           while (dmd) {

@@ -1,9 +1,9 @@
-function get_wage(r, f, race)
+function wage(r, f, race)
   return 10
 end
 
 
-function get_maintenance(u)
+function maintenance(u)
   local f = u.region.owner
   if f ~= nil then
     if f == u.faction then
@@ -14,6 +14,3 @@ function get_maintenance(u)
   end
   return 10 * u.number
 end
-
-overload("maintenance", get_maintenance)
-overload("wage", get_wage)

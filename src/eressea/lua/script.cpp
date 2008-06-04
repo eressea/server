@@ -36,7 +36,9 @@
 #pragma warning (disable: 4127)
 #endif
 #include <luabind/luabind.hpp>
-#include <luabind/object.hpp>
+#if LUABIND_BETA >= 7
+# include <luabind/operator.hpp>
+#endif
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -229,35 +231,23 @@ lua_getresource(unit * u, const struct resource_type * rtype)
   return retval;
 }
 
-struct script_interface {
-  void destroy() {
-    delete wage;
-    wage = 0;
-    delete maintenance;
-    maintenance = 0;
-  }
-  object * wage;
-  object * maintenance;
-};
-
-static script_interface interface;
-
 static int
 lua_wage(const region * r, const faction * f, const race * rc)
 {
+  const char * fname = "wage";
   int retval = -1;
+  lua_State * L = (lua_State *)global.vm_state;
 
-  assert(interface.wage);
-  try {
-    object o = interface.wage->operator()(r, f, rc);
-    retval = object_cast<int>(o);
-  }
-  catch (error& e) {
-    lua_State* L = e.state();
-    const char* error = lua_tostring(L, -1);
-    log_error(("An exception occured in interface 'wage': %s.\n", error));
-    lua_pop(L, 1);
-    std::terminate();
+  if (is_function(L, fname)) {
+    try {
+      retval = luabind::call_function<int>(L, fname, r, f, rc?rc->_name[0]:NULL);
+    }
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while calling '%s': %s.\n", fname, error));
+      lua_pop(L, 1);
+    }
   }
   return retval;
 }
@@ -265,33 +255,22 @@ lua_wage(const region * r, const faction * f, const race * rc)
 static int
 lua_maintenance(const unit * u)
 {
+  const char * fname = "maintenance";
   int retval = -1;
-  assert(interface.maintenance);
+  lua_State * L = (lua_State *)global.vm_state;
 
-  try {
-    object o = interface.maintenance->operator()(u);
-    retval = object_cast<int>(o);
-  }
-  catch (error& e) {
-    lua_State* L = e.state();
-    const char* error = lua_tostring(L, -1);
-    log_error(("An exception occured in interface 'maintenance': %s.\n", error));
-    lua_pop(L, 1);
-    std::terminate();
+  if (is_function(L, fname)) {
+    try {
+      retval = luabind::call_function<int>(L, fname, u);
+    }
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while calling '%s': %s.\n", fname, error));
+      lua_pop(L, 1);
+    }
   }
   return retval;
-}
-
-static void
-overload(const char * name, const object& f)
-{
-  if (strcmp(name, "wage")==0) {
-    global.functions.wage = &lua_wage;
-    interface.wage = new object(f);
-  } else if (strcmp(name, "maintenance")==0) {
-    global.functions.maintenance = &lua_maintenance;
-    interface.maintenance = new object(f);;
-  }
 }
 
 static void
@@ -343,8 +322,10 @@ bind_script(lua_State * L)
   register_function((pf_generic)&lua_changeresource, "lua_changeresource");
   register_function((pf_generic)&lua_equipmentcallback, "lua_equip");
 
+  register_function((pf_generic)&lua_wage, "lua_wage");
+  register_function((pf_generic)&lua_maintenance, "lua_maintenance");
+
   module(L)[
-    def("overload", &overload),
     def("set_race_brain", &race_setscript),
     def("set_unit_brain", &unit_setscript)
   ];
@@ -353,5 +334,4 @@ bind_script(lua_State * L)
 void
 reset_scripts()
 {
-  interface.destroy();
 }

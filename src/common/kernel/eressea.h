@@ -396,11 +396,11 @@ extern const char * dbrace(const struct race * rc);
 
 extern void set_param(struct param ** p, const char * name, const char * data);
 extern const char* get_param(const struct param * p, const char * name);
+extern int get_param_int(const struct param * p, const char * name, int def);
 
 extern boolean ExpensiveMigrants(void);
 extern int NMRTimeout(void);
 extern int LongHunger(const struct unit * u);
-extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
 extern int NewbieImmunity(void);
 extern int AllianceAuto(void); /* flags that allied factions get automatically */

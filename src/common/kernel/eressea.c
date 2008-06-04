@@ -117,8 +117,7 @@ int
 NewbieImmunity(void) {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "NewbieImmunity");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "NewbieImmunity", 0);
   }
   return value;
 }
@@ -127,8 +126,7 @@ static int
 MaxAge(void) {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "MaxAge");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "MaxAge", 0);
   }
   return value;
 }
@@ -151,8 +149,7 @@ ExpensiveMigrants(void)
 {
   int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "study.expensivemigrants");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "study.expensivemigrants", 0);
   }
   return value;
 }
@@ -207,8 +204,7 @@ LongHunger(const struct unit * u) {
 #endif
   }
   if (value<0) {
-    const char * str = get_param(global.parameters, "hunger.long");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "hunger.long", 0);
   }
   return value;
 }
@@ -218,18 +214,7 @@ SkillCap(skill_t sk) {
   static int value = -1;
   if (sk==SK_MAGIC) return 0; /* no caps on magic */
   if (value<0) {
-    const char * str = get_param(global.parameters, "skill.maxlevel");
-    value = str?atoi(str):0;
-  }
-  return value;
-}
-
-boolean
-TradeDisabled(void) {
-  static int value = -1;
-  if (value<0) {
-    const char * str = get_param(global.parameters, "trade.disabled");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "skill.maxlevel", 0);
   }
   return value;
 }
@@ -238,8 +223,7 @@ int
 NMRTimeout(void) {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "nmr.timeout");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "nmr.timeout", 0);
   }
   return value;
 }
@@ -470,8 +454,7 @@ allied_skilllimit(const faction * f, skill_t sk)
 {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "alliance.skilllimit");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "alliance.skilllimit", 0);
   }
   return value;
 }
@@ -2110,23 +2093,19 @@ init_locale(const struct locale * lang)
 #if PTRIES
   ptrie = get_ptrie(lang, UT_SKILLS);
   for (i=0;i!=MAXSKILLS;++i) {
-    if (i!=SK_TRADE || !TradeDisabled()) {
-      skill_t sk = (skill_t)i;
-      const char * skname = skillname(sk, lang);
-      if (skname!=NULL) {
-        ptrie_insert(ptrie, skname, &sk, sizeof(sk));
-      }
+    skill_t sk = (skill_t)i;
+    const char * skname = skillname(sk, lang);
+    if (skname!=NULL) {
+      ptrie_insert(ptrie, skname, &sk, sizeof(sk));
     }
   }
 #else
   tokens = get_translations(lang, UT_SKILLS);
   for (i=0;i!=MAXSKILLS;++i) {
-    if (i!=SK_TRADE || !TradeDisabled()) {
-      const char * skname = skillname((skill_t)i, lang);
-      if (skname!=NULL) {
-        var.i = i;
-        addtoken(tokens, skname, var);
-      }
+    const char * skname = skillname((skill_t)i, lang);
+    if (skname!=NULL) {
+      var.i = i;
+      addtoken(tokens, skname, var);
     }
   }
 #endif
@@ -2176,6 +2155,17 @@ get_param(const struct param * p, const char * key)
   }
   return NULL;
 }
+
+int
+get_param_int(const struct param * p, const char * key, int def)
+{
+  while (p!=NULL) {
+    if (strcmp(p->name, key)==0) return atoi(p->data);
+    p = p->next;
+  }
+  return def;
+}
+
 
 
 void

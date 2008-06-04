@@ -77,7 +77,7 @@ const char *skillnames[MAXSKILLS] =
 	"unarmed"
 };
 
-static boolean skill_enabled[MAXSKILLS];
+boolean skill_enabled[MAXSKILLS];
 
 const char * 
 skillname(skill_t sk, const struct locale * lang)

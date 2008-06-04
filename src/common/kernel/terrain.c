@@ -38,7 +38,7 @@
 
 #define MAXTERRAINS 20
 
-const char * terraindata[] = {
+const char * terraindata[MAXTERRAINS] = {
   "ocean",
   "plain",
   "swamp",
@@ -47,8 +47,8 @@ const char * terraindata[] = {
   "mountain",
   "glacier",
   "firewall",
-  "hell", /* dungeon module */
-  "plain",  /* former grassland */
+  NULL, /* dungeon module */
+  NULL,  /* former grassland */
   "fog",
   "thickfog",
   "volcano",
@@ -56,11 +56,10 @@ const char * terraindata[] = {
   "iceberg_sleep",
   "iceberg",
 
-  "hall1", /* museum module */
-  "corridor1", /* museum module */
-  "plain", /* former magicstorm */
-  "wall1", /* museum module */
-  NULL
+  NULL, /* museum module */
+  NULL, /* museum module */
+  NULL, /* former magicstorm */
+  NULL /* museum module */
 };
 
 static terrain_type * registered_terrains;
@@ -142,11 +141,13 @@ init_terrains(void)
   for (t=0;t!=MAXTERRAINS;++t) {
     const terrain_type * newterrain = newterrains[t];
     if (newterrain!=NULL) continue;
-    newterrain = get_terrain(terraindata[t]);
-    if (newterrain!=NULL) {
-      newterrains[t] = newterrain;
-    } else {
-      log_warning(("missing classic terrain %s\n", terraindata[t]));
+    if (terraindata[t]!=NULL) {
+      newterrain = get_terrain(terraindata[t]);
+      if (newterrain!=NULL) {
+        newterrains[t] = newterrain;
+      } else {
+        log_warning(("missing classic terrain %s\n", terraindata[t]));
+      }
     }
   }
 }

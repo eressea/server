@@ -256,7 +256,7 @@ fix_age(void)
   const race * uruk = rc_find("uruk");
   for (f=factions;f;f=f->next) {
     if (!is_monsters(f) && playerrace(f->race)) continue;
-    if (f->race==oldorc) f->race= uruk;
+    if (f->race==oldorc) f->race = uruk;
     else if (f->age!=turn) {
       log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
       f->age = turn;

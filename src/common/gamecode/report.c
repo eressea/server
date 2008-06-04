@@ -330,7 +330,7 @@ report_spell(FILE * F,  spell *sp, const struct locale * lang)
   size = sizeof(buf) - 1;
   
   if (sp->sptyp & ISCOMBATSPELL) {
-    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBAT]), size);
+    bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_COMBATSPELL]), size);
   } else {
     bytes = (int)strlcpy(bufp, LOC(lang, keywords[K_CAST]), size);
   }
@@ -1215,18 +1215,16 @@ statistics(FILE * F, const region * r, const faction * f)
     rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
 
-    if (!TradeDisabled()) {
-      if (buildingtype_exists(r, bt_find("caravan"))) {
-        m = msg_message("nr_stat_luxuries", "max",
-                        (p * 2) / TRADE_FRACTION);
-      } else {
-        m = msg_message("nr_stat_luxuries", "max",
-                        p / TRADE_FRACTION);
-      }
-      nr_render(m, f->locale, buf, sizeof(buf), f);
-      rparagraph(F, buf, 2, 2, 0);
-      msg_release(m);
+    if (buildingtype_exists(r, bt_find("caravan"))) {
+      m = msg_message("nr_stat_luxuries", "max",
+                      (p * 2) / TRADE_FRACTION);
+    } else {
+      m = msg_message("nr_stat_luxuries", "max",
+                      p / TRADE_FRACTION);
     }
+    nr_render(m, f->locale, buf, sizeof(buf), f);
+    rparagraph(F, buf, 2, 2, 0);
+    msg_release(m);
   }
   /* info about units */
 
@@ -2163,7 +2161,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     if (sr->mode==see_unit) {
       anyunits = 1;
       describe(F, r, 0, f);
-      if (!TradeDisabled() && !fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
+      if (!fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
         rnl(F);
         prices(F, r, f);
       }

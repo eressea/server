@@ -49,6 +49,7 @@ extern int income(const struct unit * u);
 
 void economics(struct region *r);
 void produce(void);
+void auto_work(struct region * r);
 
 enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC };
 void maintain_buildings(struct region * r, boolean crash);
