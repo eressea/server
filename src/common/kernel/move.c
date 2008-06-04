@@ -91,11 +91,11 @@ typedef struct follower {
   struct follower * next;
   unit * uf;
   unit * ut;
-  region_list * route_end;
+  const region_list * route_end;
 } follower;
 
 static void
-get_followers(unit * target, region * r, region_list * route_end, follower ** followers)
+get_followers(unit * target, region * r, const region_list * route_end, follower ** followers)
 {
   unit * uf;
   for (uf=r->units;uf;uf=uf->next) {
@@ -560,7 +560,7 @@ leave_trail(ship * sh, region * from, region_list *route)
 }
 
 static void
-mark_travelthru(const unit * u, region * r, region_list * route, region_list * route_end)
+mark_travelthru(const unit * u, region * r, const region_list * route, const region_list * route_end)
 {
   /* kein travelthru in der letzten region! */
   while (route!=route_end) {
@@ -1138,12 +1138,12 @@ roadto(const region * r, direction_t dir)
   return true;
 }
 
-static region_list *
-cap_route(region * r, region_list * route, region_list * route_end, int speed)
+static const region_list *
+cap_route(region * r, const region_list * route, const region_list * route_end, int speed)
 {
   region * current = r;
   int moves = speed;
-  region_list * iroute = route;
+  const region_list * iroute = route;
   while (iroute!=route_end) {
     region * next = iroute->data;
     direction_t reldir = reldirection(current, next);
@@ -1180,8 +1180,8 @@ next_region(unit * u, region * current, region * next)
   return next;
 }
 
-static region_list *
-reroute(unit * u, region_list * route, region_list * route_end)
+static const region_list *
+reroute(unit * u, const region_list * route, const region_list * route_end)
 {
   region * current = u->region;
   while (route!=route_end) {
@@ -1325,12 +1325,12 @@ enum {
   TRAVEL_RUNNING
 };
 
-static region_list *
-travel_route(unit * u, region_list * route_begin, region_list * route_end, order * ord, int mode)
+static const region_list *
+travel_route(unit * u, const region_list * route_begin, const region_list * route_end, order * ord, int mode)
 {
   region * r = u->region;
   region * current = u->region;
-  region_list * iroute = route_begin;
+  const region_list * iroute = route_begin;
   int steps = 0;
   boolean landing = false; /* aquarians have landed */
 
@@ -1453,7 +1453,6 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
   if (iroute!=route_begin) {
     /* the unit has moved at least one region */
     int walkmode;
-    region_list **rlist = &route_begin;
 
     setguard(u, GUARD_NONE);
     cycle_route(ord, u, steps);
@@ -1468,14 +1467,6 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     }
 
     /* Berichte über Durchreiseregionen */
-
-    while (*rlist!=iroute) {
-      rlist = &(*rlist)->next;
-    }
-    /* remove excess regions */
-    *rlist = NULL;
-    free_regionlist(iroute);
-    iroute = NULL;
 
     if (mode!=TRAVEL_TRANSPORTED) {
       ADDMSG(&u->faction->msgs, msg_message("travel", 
@@ -1886,8 +1877,8 @@ run_to(unit * u, region * to)
   /* weder transport noch follow */
 }
 
-static region_list *
-travel_i(unit * u, region_list * route_begin, region_list * route_end, order * ord, int mode, follower ** followers)
+static const region_list *
+travel_i(unit * u, const region_list * route_begin, const region_list * route_end, order * ord, int mode, follower ** followers)
 {
   region * r = u->region;
 
@@ -1923,7 +1914,7 @@ travel_i(unit * u, region_list * route_begin, region_list * route_end, order * o
           init_tokens(ut->thisorder);
           skip_token();
           if (getunit(u->region, ut->faction) == u) {
-            region_list * route_to = travel_route(ut, route_begin, route_end, ord, TRAVEL_TRANSPORTED);
+            const region_list * route_to = travel_route(ut, route_begin, route_end, ord, TRAVEL_TRANSPORTED);
 
             if (route_to!=route_begin) {
               get_followers(ut, r, route_to, followers);
@@ -1957,7 +1948,6 @@ static void
 travel(unit * u, region_list ** routep)
 {
   region * r = u->region;
-  region_list * route_end;
   region_list * route_begin = NULL;
   follower * followers = NULL;
 
@@ -1993,14 +1983,14 @@ travel(unit * u, region_list ** routep)
   route_begin = *routep;
 
   /* und ab die post: */
-  route_end = travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
+  travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
 
   /* followers */
   while (followers!=NULL) {
     follower * fnext = followers->next;
     unit * uf = followers->uf;
     unit * ut = followers->ut;
-    region_list * route_end = followers->route_end;
+    const region_list * route_end = followers->route_end;
     
     free(followers);
     followers = fnext;
