@@ -1432,31 +1432,6 @@ var_free_resources(variant x)
   x.v = 0;
 }
 
-static variant
-var_copy_regions(variant x)
-{
-  region_list * rsrc;
-  int size = 0;
-
-  for (rsrc = (region_list*)x.v; rsrc!=NULL; rsrc=rsrc->next) {
-    ++size;
-  }
-
-  if (size>0) {
-    arg_regions * dst = (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region*) * size);
-    dst->nregions = size;
-    dst->regions = (region**)(dst+1);
-    size = 0;
-    for (rsrc = (region_list*)x.v; rsrc!=NULL; rsrc=rsrc->next) {
-      dst->regions[size++] = rsrc->data;
-    }
-    x.v = dst;
-  } else {
-    x.v = NULL;
-  }
-  return x;
-}
-
 static void
 var_free_regions(variant x)
 {
@@ -1844,6 +1819,10 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
   size_t size = sizeof(buf) - 1;
   variant var;
   char * bufp = buf;
+#ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
+  /* stupid MS broke snprintf */
+  int eold = errno;
+#endif
 
   if (regions!=NULL) {
     end = regions->nregions-1;
@@ -1866,6 +1845,11 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
   *bufp = 0;
   var.v = strcpy(balloc(bufp-buf+1), buf);
   opush(stack, var);
+#ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
+  if (errno==ERANGE) {
+    errno = eold;
+  }
+#endif
 }
 
 static void
@@ -1929,7 +1913,7 @@ reports_init(void)
   register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
   register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
   register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
-  register_argtype("regions", var_free_regions, var_copy_regions, VAR_VOIDPTR);
+  register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
 
   /* register functions that turn message contents to readable strings */
   add_function("alliance", &eval_alliance);

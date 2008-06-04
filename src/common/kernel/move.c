@@ -38,6 +38,7 @@
 #include "race.h"
 #include "region.h"
 #include "render.h"
+#include "reports.h"
 #include "save.h"
 #include "ship.h"
 #include "skill.h"
@@ -1325,6 +1326,25 @@ enum {
   TRAVEL_RUNNING
 };
 
+static arg_regions *
+var_copy_regions(const region_list * begin, int size)
+{
+  const region_list * rsrc;
+
+  if (size>0) {
+    int i = 0;
+    arg_regions * dst = (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region*) * size);
+    dst->nregions = size;
+    dst->regions = (region**)(dst+1);
+    for (rsrc = begin; i!=size; rsrc=rsrc->next) {
+      dst->regions[i++] = rsrc->data;
+    }
+    return dst;
+  }
+  return NULL;
+}
+
+
 static const region_list *
 travel_route(unit * u, const region_list * route_begin, const region_list * route_end, order * ord, int mode)
 {
@@ -1469,8 +1489,9 @@ travel_route(unit * u, const region_list * route_begin, const region_list * rout
     /* Berichte über Durchreiseregionen */
 
     if (mode!=TRAVEL_TRANSPORTED) {
+      arg_regions * ar = var_copy_regions(route_begin, steps-1);
       ADDMSG(&u->faction->msgs, msg_message("travel", 
-        "unit mode start end regions", u, walkmode, r, current, route_begin->next?route_begin:NULL));
+        "unit mode start end regions", u, walkmode, r, current, ar));
     }
 
     mark_travelthru(u, r, route_begin, iroute);
