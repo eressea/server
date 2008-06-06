@@ -6734,6 +6734,14 @@
     <text locale="en">stones</text>
   </string>
 
+  <string name="rm_horse">
+    <text locale="de">Pferde</text>
+    <text locale="en">horses</text>
+  </string>
+  <string name="rm_peasant">
+    <text locale="de">Bauern</text>
+    <text locale="en">peasants</text>
+  </string>
   <string name="rm_laen">
     <text locale="de">Laen</text>
     <text locale="en">laen</text>
@@ -6749,7 +6757,7 @@
     <text locale="en">mallorn saplings</text>
   </string>
 
-  <string name="rm_trees">
+  <string name="rm_tree">
     <text locale="de">Bäume</text>
     <text locale="en">trees</text>
   </string>

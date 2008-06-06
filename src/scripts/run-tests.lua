@@ -50,6 +50,70 @@ function test_free()
 	free_game()
 end
 
+function test_reorder()
+  r = terraform(0, 0, "plain")
+  f = add_faction("enno@ix.de", "orc", "de")
+  s1 = add_ship(r, "boat")
+  s1.size = 1
+  s2 = add_ship(r, "boat")
+  s2.size = 2
+  s3 = add_ship(r, "boat")
+  s3.size = 3
+  b1 = add_building(r, "portal")
+  b1.size = 1
+  b2 = add_building(r, "portal")
+  b2.size = 2
+  b3 = add_building(r, "portal")
+  b3.size = 3
+  u = add_unit(f, r)
+  u.number = 1
+  u.name = "a"
+  u = add_unit(f, r)
+  u.number = 1
+  u.name = "b"
+  u.ship = s3
+  u = add_unit(f, r)
+  u.number = 1
+  u.name = "c"
+  u.building = b1
+  u = add_unit(f, r)
+  u.number = 1
+  u.name = "d"
+  u.ship = s2
+  u = add_unit(f, r)
+  u.name = "e"
+  u.number = 1
+  u.building = b1
+  u = add_unit(f, r)
+  u.name = "f"
+  u.number = 1
+  u.building = b3
+  u = add_unit(f, r)
+  u.name = "g"
+  u.number = 1
+  u.ship = s2
+  u = add_unit(f, r)
+  u.name = "h"
+  u.number = 1
+  u.building = b2
+  u = add_unit(f, r)
+  u.name = "i"
+  u.number = 1
+  u = add_unit(f, r)
+  u.name = "j"
+  u.number = 1
+  u.building = b1
+  u = add_unit(f, r)
+  u.name = "k"
+  u.number = 1
+  u.ship = s1
+  test.reorder_units(r)
+  for u in r.units do
+    print(u, u.building, u.ship)
+  end
+  io.stdin:read("*line")
+end
+
 function test_hse()
   read_game("50.dat", "binary")
   f = get_faction(atoi36("8h7f"))
@@ -138,8 +202,9 @@ run_scripts()
 -- test_free()
 -- test_bmark()
 -- test_realloc()
--- test_hse()
-test_tunnels()
+test_hse()
+-- test_reorder()
+-- test_tunnels()
 -- test_md5()
 -- test_287()
 -- io.stdin:read("*line")

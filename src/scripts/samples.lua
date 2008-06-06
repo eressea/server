@@ -49,7 +49,7 @@ function test_movement()
   -- schiffe zum abtreiben:
   ships = {}
   for i = 1, 100 do
-    ships[i] = add_ship("boat", ocean)
+    ships[i] = add_ship(ocean, "boat")
   end
 
   astra = mkunit(orcs, r0, 1)
@@ -62,7 +62,7 @@ function test_movement()
 
   watch = mkunit(orcs, w2, 1)
 
-  ship = add_ship("boat", ocean)
+  ship = add_ship(ocean, "boat")
   cptn = mkunit(aqua, ocean, 1)
   cptn.ship = ship
   cptn:add_order("NACH O")
@@ -77,7 +77,7 @@ function test_movement()
   swim:add_order("BENENNE EINHEIT Landungstruppe")
 
   -- ein schiff im landesinneren
-  ship = add_ship("boat", r0)
+  ship = add_ship(r0, "boat")
   sail = mkunit(aqua, r0, 1)
   sail.ship = ship
 
