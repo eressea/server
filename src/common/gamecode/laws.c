@@ -3917,8 +3917,6 @@ processorders (void)
   process();
   /*************************************************/
 
-  for (r = regions;r;r=r->next) reorder_owners(r);
-
   puts(" - Attribute altern");
   ageing();
   remove_empty_units();
@@ -3932,6 +3930,12 @@ processorders (void)
    * Beschreibungen geändert haben */
   update_spells();
   warn_password();
+
+  /* we reorder the owners to be at the top of the building 
+   * and also everyone in the same building/ship in sequence */
+  for (r = regions;r;r=r->next) {
+    reorder_units(r);
+  }
 }
 
 int

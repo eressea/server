@@ -2484,7 +2484,7 @@ int
 besieged(const unit * u)
 {
   /* belagert kann man in schiffen und burgen werden */
-  return (u
+  return (u && !global.disabled[K_BESIEGE]
       && u->building && u->building->besieged
       && u->building->besieged >= u->building->size * SIEGEFACTOR);
 }
@@ -2775,95 +2775,105 @@ add_income(unit * u, int type, int want, int qty)
 }
 
 void
-reorder_owners(region * r)
+reorder_units(region * r)
 {
-  unit ** up=&r->units, ** useek;
-  building * b=NULL;
-  ship * sh=NULL;
-#ifndef NDEBUG
-  size_t len = listlen(r->units);
-#endif
-  for (b = r->buildings;b;b=b->next) {
-    unit ** ubegin = up;
-    unit ** uend = up;
+  unit ** unext = &r->units;
 
-    useek = up;
-    while (*useek) {
-      unit * u = *useek;
-      if (u->building==b) {
-        unit ** insert;
-        if (fval(u, UFL_OWNER)) {
-          unit * nu = *ubegin;
-          insert = ubegin;
-          if (nu!=u && nu->building==u->building && fval(nu, UFL_OWNER)) {
-            log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", buildingname(nu->building)));
-            freset(nu, UFL_OWNER);
+  if (r->buildings) {
+    building * b = r->buildings;
+    while (*unext && b) {
+      unit ** ufirst = unext; /* where the first unit in the building should go */
+      unit ** umove = unext; /* a unit we consider moving */
+      unit * owner = NULL;
+      while (*umove) {
+        unit * u = *umove;
+        if (u->number && u->building==b) {
+          unit ** uinsert = unext;
+          if (fval(u, UFL_OWNER)) {
+            uinsert = ufirst;
+            owner = u;
           }
-        }
-        else insert = uend;
-        if (insert != useek) {
-          *useek = u->next; /* raus aus der liste */
-          u->next = *insert;
-          *insert = u;
-        }
-        if (insert==uend) uend=&u->next;
-      }
-      if (*useek==u) useek = &u->next;
-    }
-    up = uend;
-  }
-
-  useek=up;
-  while (*useek) {
-    unit * u = *useek;
-    assert(!u->building);
-    if (u->ship==NULL) {
-      if (fval(u, UFL_OWNER)) {
-        log_warning(("[reorder_owners] Einheit %s war Besitzer von nichts.\n", unitname(u)));
-        freset(u, UFL_OWNER);
-      }
-      if (useek!=up) {
-        *useek = u->next; /* raus aus der liste */
-        u->next = *up;
-        *up = u;
-      }
-      up = &u->next;
-    }
-    if (*useek==u) useek = &u->next;
-  }
-
-  for (sh = r->ships;sh;sh=sh->next) {
-    unit ** ubegin = up;
-    unit ** uend = up;
-
-    useek = up;
-    while (*useek) {
-      unit * u = *useek;
-      if (u->ship==sh) {
-        unit ** insert;
-        if (fval(u, UFL_OWNER)) {
-          unit * nu = *ubegin;
-          insert = ubegin;
-          if (nu!=u && nu->ship==u->ship && fval(nu, UFL_OWNER)) {
-            log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", shipname(nu->ship)));
-            freset(nu, UFL_OWNER);
+          if (umove!=uinsert) {
+            *umove = u->next;
+            u->next = *uinsert;
+            *uinsert = u;
+          } else {
+            /* no need to move, skip ahead */
+            umove = &u->next;
           }
+          if (unext==uinsert) {
+            /* we have a new well-placed unit. jump over it */
+            unext = &u->next;
+          }
+        } else {
+          umove = &u->next;
         }
-        else insert = uend;
-        if (insert!=useek) {
-          *useek = u->next; /* raus aus der liste */
-          u->next = *insert;
-          *insert = u;
-        }
-        if (insert==uend) uend=&u->next;
       }
-      if (*useek==u) useek = &u->next;
+      if (!owner && ufirst!=unext) {
+        owner = *ufirst;
+        fset(owner, UFL_OWNER);
+      }
+      b = b->next;
     }
-    up = uend;
   }
-#ifndef NDEBUG
-  assert(len==listlen(r->units));
-#endif
+
+  if (r->ships) {
+    ship * sh = r->ships;
+    /* first, move all units up that are not on ships */
+    unit ** umove = unext; /* a unit we consider moving */
+    while (*umove) {
+      unit * u = *umove;
+      if (u->number && !u->ship) {
+        if (umove!=unext) {
+          *umove = u->next;
+          u->next = *unext;
+          *unext = u;
+        } else {
+          /* no need to move, skip ahead */
+          umove = &u->next;
+        }
+        /* we have a new well-placed unit. jump over it */
+        unext = &u->next;
+      } else {
+        umove = &u->next;
+      }
+    }
+
+    while (*unext && sh) {
+      unit ** ufirst = unext; /* where the first unit in the building should go */
+      unit ** umove = unext; /* a unit we consider moving */
+      unit * owner = NULL;
+      while (*umove) {
+        unit * u = *umove;
+        if (u->number && u->ship==sh) {
+          unit ** uinsert = unext;
+          if (fval(u, UFL_OWNER)) {
+            uinsert = ufirst;
+            owner = u;
+          }
+          if (umove!=uinsert) {
+            *umove = u->next;
+            u->next = *uinsert;
+            *uinsert = u;
+          } else {
+            /* no need to move, skip ahead */
+            umove = &u->next;
+          }
+          if (unext==uinsert) {
+            /* we have a new well-placed unit. jump over it */
+            unext = &u->next;
+          }
+        } else {
+          umove = &u->next;
+        }
+      }
+      if (!owner && ufirst!=unext) {
+        owner = *ufirst;
+        fset(owner, UFL_OWNER);
+      }
+      sh = sh->next;
+    }
+  }
 }
 
 int

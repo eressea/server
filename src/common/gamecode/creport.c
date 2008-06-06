@@ -669,6 +669,7 @@ cr_output_unit(FILE * F, const region * r,
   boolean itemcloak = false;
   static const curse_type * itemcloak_ct = 0;
   static boolean init = false;
+  item result[MAX_INVENTORY];
 
   if (fval(u->race, RCF_INVISIBLE)) return;
 
@@ -889,29 +890,12 @@ cr_output_unit(FILE * F, const region * r,
   if (f == u->faction || omniscient(u->faction)) {
     show = u->items;
   } else if (itemcloak==false && mode>=see_unit && !(a_fshidden
-      && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
-    show = NULL;
-    for (itm=u->items;itm;itm=itm->next) {
-      item * ishow;
-      const char * ic;
-      int in;
-      report_item(u, itm, f, NULL, &ic, &in, true);
-      if (in>0 && ic && *ic) {
-        for (ishow = show; ishow; ishow=ishow->next) {
-          const char * sc;
-          int sn;
-          if (ishow->type==itm->type) sc=ic;
-          else report_item(u, ishow, f, NULL, &sc, &sn, true);
-          if (sc==ic || strcmp(sc, ic)==0) {
-            ishow->number+=itm->number;
-            break;
-          }
-        }
-        if (ishow==NULL) {
-          ishow = i_add(&show, i_new(itm->type, itm->number));
-        }
-      }
-    }
+      && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3))
+  {
+    int n = report_items(u->items, result, MAX_INVENTORY, u, f);
+    assert(n>=0);
+    if (n>0) show = result;
+    else show = NULL;
   } else {
     show = NULL;
   }
@@ -927,12 +911,6 @@ cr_output_unit(FILE * F, const region * r,
       fputs("GEGENSTAENDE\n", F);
     }
     fprintf(F, "%d;%s\n", in, add_translation(ic, locale_string(f->locale, ic)));
-  }
-  if (show!=u->items) {
-    /* free the temporary items */
-    while (show) {
-      i_free(i_remove(&show, show));
-    }
   }
 
   print_curses(F, f, u, TYP_UNIT);
@@ -1057,7 +1035,7 @@ encode_region(const faction * f, const region * r) {
 }
 
 static char *
-report_resource(char * buf, const char * name, const struct locale * loc, int amount, int level)
+cr_output_resource(char * buf, const char * name, const struct locale * loc, int amount, int level)
 {
   buf += sprintf(buf, "RESOURCE %u\n", hashstring(name));
   buf += sprintf(buf, "\"%s\";type\n", add_translation(name, LOC(loc, name)));
@@ -1117,61 +1095,32 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
 }
 
 static void
-cr_output_resources(FILE * F, report_context * ctx, region * r, struct rawmaterial * res, int see_mode)
+cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 {
   char cbuf[BUFFERSIZE], *pos = cbuf;
+  region * r = sr->r;
   faction * f = ctx->f;
+  resource_report result[MAX_RAWMATERIALS];
+  int n, size = report_resources(sr, result, MAX_RAWMATERIALS, f);
 
+#ifdef RESOURCECOMPAT
   int trees = rtrees(r, 2);
   int saplings = rtrees(r, 1);
 
-#ifdef RESOURCECOMPAT
   if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
   if (saplings > 0) fprintf(F, "%d;Schoesslinge\n", saplings);
   if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
     fprintf(F, "1;Mallorn\n");
-#endif
-
-  if (!fval(r, RF_MALLORN)) {
-    if (saplings) pos = report_resource(pos, "rm_sapling", f->locale, saplings, -1);
-    if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
-  } else {
-    if (saplings) pos = report_resource(pos, "rm_mallornsapling", f->locale, saplings, -1);
-    if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
+  for (n=0;n<size;++n) {
+    if (result[n].level>=0 && result[n].number>=0) {
+      fprintf(F, "%d;%s\n", result[n].number, crtag(result[n].name));
+    }
   }
-
-  if (see_mode>=see_unit) {
-    while (res) {
-      int maxskill = 0;
-      int level = -1;
-      int visible = -1;
-      const item_type * itype = resource2item(res->type->rtype);
-      if (res->type->visible==NULL) {
-        visible = res->amount;
-        level = res->level + itype->construction->minskill - 1;
-      } else {
-        const unit * u;
-        for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
-          if (u->faction == f) {
-            int s = eff_skill(u, itype->construction->skill, r);
-            if (s>maxskill) {
-              if (s>=itype->construction->minskill) {
-                assert(itype->construction->minskill>0);
-                level = res->level + itype->construction->minskill - 1;
-              }
-              maxskill = s;
-              visible = res->type->visible(res, maxskill);
-            }
-          }
-        }
-      }
-      if (level>=0 && visible >=0) {
-        pos = report_resource(pos, res->type->name, f->locale, visible, level);
-#ifdef RESOURCECOMPAT
-        if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
 #endif
-      }
-      res = res->next;
+
+  for (n=0;n<size;++n) {
+    if (result[n].number>=0) {
+      pos = cr_output_resource(pos, result[n].name, f->locale, result[n].number, result[n].level);
     }
   }
   if (pos!=cbuf) fputs(cbuf, F);
@@ -1248,7 +1197,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
       /* this writes both some tags (RESOURCECOMPAT) and a block.
        * must not write any blocks before it */
-      cr_output_resources(F, ctx, r, r->resources, sr->mode);
+      cr_output_resources(F, ctx, sr);
 
       if (sr->mode>=see_unit) {
         /* trade */
@@ -1350,6 +1299,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     }
   }
 }
+
 /* main function of the creport. creates the header and traverses all regions */
 static int
 report_computer(const char * filename, report_context * ctx, const char * charset)

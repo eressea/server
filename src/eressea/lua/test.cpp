@@ -21,6 +21,7 @@ using namespace luabind;
 #include <util/language.h>
 #include <util/rng.h>
 #include <kernel/skill.h>
+#include <kernel/region.h>
 
 static const char *
 loc_getskill(const char * loc, const char * locstring)
@@ -46,6 +47,7 @@ bind_test(lua_State * L)
   module(L, "test")[
     def("loc_skill", &loc_getskill),
     def("loc_keyword", &loc_getkeyword),
+    def("reorder_units", &reorder_units),
     def("rng_int", &rng_int)
   ];
 }

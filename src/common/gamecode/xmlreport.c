@@ -114,17 +114,116 @@ xml_i(double number)
 }
 
 static xmlNodePtr
-report_unit(report_context * ctx, unit * u, int mode)
+report_inventory(report_context * ctx, item * items, unit * u)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "items");
+  item * itm;
+
+  for (itm=items;itm;itm=itm->next) {
+    xmlNodePtr child = xmlNewNode(xct->ns_atl, BAD_CAST "item");
+    const char * name;
+    int n;
+
+    report_item(u, itm, ctx->f, NULL, &name, &n, true);
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "type", (xmlChar *)name);
+    xmlNodeAddContent(child, (xmlChar*)itoab(n, 10));
+    xmlAddChild(node, child);
+  }
+  return node;
+}
+
+static xmlNodePtr
+xml_unit(report_context * ctx, unit * u, int mode)
 {
   xml_context* xct = (xml_context*)ctx->userdata;
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "unit");
-  char unit_id[20];
+  char idbuffer[20];
+  static const curse_type * itemcloak_ct = 0;
+  static boolean init = false;
+  xmlNodePtr child;
 
-  sprintf(unit_id, "unit_%d", u->no);
-  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)unit_id);
+  snprintf(idbuffer, sizeof(idbuffer), "unit_%d", u->no);
+  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)idbuffer);
   xmlNewNsProp(node, xct->ns_atl, BAD_CAST "key", BAD_CAST itoa36(u->no));
   xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)u->name);
 
+  snprintf(idbuffer, sizeof(idbuffer), "faction_%d", u->faction->no);
+  child = xmlNewNode(xct->ns_atl, BAD_CAST "faction");
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (xmlChar *)idbuffer);
+  xmlAddChild(node, child);
+
+  if (!init) {
+    init = true;
+    itemcloak_ct = ct_find("itemcloak");
+  }
+
+  if (u->items) {
+    item result[MAX_INVENTORY];
+    item * show = NULL;
+
+    if (ctx->f == u->faction || omniscient(ctx->f)) {
+      show = u->items;
+    } else {
+      boolean see_items = (mode >= see_unit);
+      if (see_items) {
+        if (itemcloak_ct && !curse_active(get_curse(u->attribs, itemcloak_ct))) {
+          see_items = false;
+        } else {
+          see_items = effskill(u, SK_STEALTH) < 3;
+        }
+      }
+      if (see_items) {
+        int n = report_items(u->items, result, MAX_INVENTORY, u, ctx->f);
+        assert(n>=0);
+        if (n>0) show = result;
+        else show = NULL;
+      } else {
+        show = NULL;
+      }
+    }
+
+    if (show) {
+      xmlAddChild(node, report_inventory(ctx, show, u));
+    }
+  }
+
+  return node;
+}
+
+static xmlNodePtr
+report_link(report_context * ctx, const xmlChar * role, const xmlChar * ref)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "link");
+
+  xmlNewNsProp(node, xct->ns_atl, BAD_CAST "role", role);
+  xmlNewNsProp(node, xct->ns_atl, BAD_CAST "ref", ref);
+
+  return node;
+}
+
+static xmlNodePtr
+xml_resources(report_context * ctx, const seen_region * sr)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "resources");
+  resource_report result[MAX_RAWMATERIALS];
+  int n, size = report_resources(sr, result, MAX_RAWMATERIALS, ctx->f);
+
+  for (n=0;n<size;++n) {
+    if (result[n].number>=0) {
+      xmlNodePtr child = xmlNewNode(xct->ns_atl, BAD_CAST "resource");
+      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "type", (xmlChar*)result[n].name);
+      if (result[n].level>=0) {
+        xmlNewNsProp(child, xct->ns_atl, BAD_CAST "level", (xmlChar*)itoab(result[n].level, 10));
+      }
+      xmlNodeAddContent(child, (xmlChar*)itoab(result[n].number, 10));
+
+      /* TODO: the visibility logic from creport */
+      xmlAddChild(node, child);
+    }
+  }
   return node;
 }
 
@@ -135,11 +234,15 @@ report_faction(report_context * ctx, faction * f)
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "faction");
   char faction_id[20];
 
-  sprintf(faction_id, "faction_%d", f->no);
+  snprintf(faction_id, sizeof(faction_id), "faction_%d", f->no);
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)faction_id);
   xmlNewNsProp(node, xct->ns_atl, BAD_CAST "key", BAD_CAST itoa36(f->no));
   xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)f->name);
 
+  if (ctx->f==f) {
+    xmlAddChild(node, report_link(ctx, BAD_CAST "race", BAD_CAST f->race->_name[0]));
+    if (f->items) xmlAddChild(node, report_inventory(ctx, f->items, NULL));
+  }
   return node;
 }
 
@@ -165,16 +268,24 @@ report_region(report_context * ctx, seen_region * sr)
   }
   xmlAddChild(node, child);
 
+  child = xmlNewNode(xct->ns_atl, BAD_CAST "terrain");
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (xmlChar *)r->terrain->_name);
+  xmlAddChild(node, child);
+
   if (r->land!=NULL) {
     child = xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)r->land->name);
+    if (r->land->items) {
+      xmlAddChild(node, report_inventory(ctx, r->land->items, NULL));
+    }
   }
+  xmlAddChild(node, xml_resources(ctx, sr));
 
   child = xmlNewNode(xct->ns_atl, BAD_CAST "terrain");
   xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (const xmlChar *)terrain_name(r));
 
   for (u=r->units;u;u=u->next) {
     if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
-      xmlAddChild(node, report_unit(ctx, u, sr->mode));
+      xmlAddChild(node, xml_unit(ctx, u, sr->mode));
     }
   }
   return node;
@@ -218,6 +329,8 @@ report_xml(const char * filename, report_context * ctx, const char * encoding)
   xmlKeepBlanksDefault(0);
   xmlSaveFormatFileEnc(filename, doc, "utf-8", 1);
   xmlFreeDoc(doc);
+
+  ctx->userdata = NULL;
 
   return 0;
 }

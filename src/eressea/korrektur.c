@@ -88,8 +88,6 @@
 #undef XMAS2001
 #undef XMAS2002
 
-extern void reorder_owners(struct region * r);
-
 static int
 curse_emptiness(void)
 {
@@ -164,7 +162,7 @@ verify_owners(boolean bOnce)
         }
       }
     }
-    if (bFail) reorder_owners(r);
+    if (bFail) reorder_units(r);
   }
 }
 

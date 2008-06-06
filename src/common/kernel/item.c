@@ -203,9 +203,9 @@ new_itemtype(resource_type * rtype,
              int iflags, int weight, int capacity)
 {
   item_type * itype;
-  assert (resource2item(rtype) == NULL);
-
+  assert(resource2item(rtype) == NULL);
   assert(rtype->flags & RTF_ITEM);
+
   itype = calloc(sizeof(item_type), 1);
 
   itype->rtype = rtype;

@@ -95,9 +95,8 @@ typedef struct report_context {
 
 typedef int (*report_fun)(const char * filename, report_context * ctx, const char * charset);
 extern void register_reporttype(const char * extension, report_fun write, int flag);
-  
-extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
-extern void report_building(FILE *F, const struct region * r, const struct building * b, const struct faction * f, int mode);
+
+
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode, char * buf, size_t size);
 
 extern const char * reportpath(void);
@@ -116,9 +115,20 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
     struct region ** regions;
   } arg_regions;
 
+  typedef struct resource_report {
+    const char * name;
+    int number;
+    int level;
+  } resource_report;
+  int report_resources(const struct seen_region * sr, struct resource_report * result, int size, const struct faction * viewer);
+  int report_items(const struct item * items, struct item * result, int size, const struct unit * owner, const struct faction * viewer);
+  void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
+
   extern size_t f_regionid(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
 #define GR_PLURAL     0x01 /* grammar: plural */
+#define MAX_INVENTORY 64 /* maimum number of different items in an inventory */
+#define MAX_RAWMATERIALS 8 /* maximum kinds of raw materials in a regions */
 
 #ifdef __cplusplus
 }

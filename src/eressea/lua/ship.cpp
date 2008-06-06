@@ -45,7 +45,7 @@ operator==(const ship& a, const ship& sh)
 }
 
 static ship *
-add_ship(const char * sname, region& r)
+add_ship(region& r, const char * sname)
 {
   const ship_type * stype = st_find(sname);
   ship * sh = new_ship(stype, NULL, &r);

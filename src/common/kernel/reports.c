@@ -37,6 +37,7 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/terrain.h>
@@ -146,12 +147,12 @@ hp_status(const unit * u)
 void
 report_item(const unit * owner, const item * i, const faction * viewer, const char ** name, const char ** basename, int * number, boolean singular)
 {
-  assert(owner->number);
-  if (owner->faction == viewer) {
+  assert(!owner || owner->number);
+  if (owner && owner->faction == viewer) {
     if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, ((i->number!=1 && !singular)?GR_PLURAL:0)));
     if (basename) *basename = resourcename(i->type->rtype, 0);
     if (number) *number = i->number;
-  } else if (i->type->rtype==r_silver) {
+  } else if (owner && i->type->rtype==r_silver) {
     int pp = i->number/owner->number;
     if (number) *number = 1;
     if (pp > 50000 && dragonrace(owner->race)) {
@@ -240,6 +241,132 @@ buforder(char * bufp, size_t size, const order * ord, int mode)
   return tsize;
 }
 
+/** create a report of a list of items to a non-owner.
+ * \param result: an array of size items.
+ * \param size: maximum number of items to return
+ * \param owner: the owner of the items, or NULL for faction::items etc.
+ * \param viewer: the faction looking at the items
+ */
+int
+report_items(const item * items, item * result, int size, const unit * owner, const faction * viewer)
+{
+  const item * itm;
+  int n = 0; /* number of results */
+
+  assert(owner==NULL || viewer!=owner->faction || !"not required for owner=viewer!");
+  assert(size);
+
+  for (itm=items;itm;itm=itm->next) {
+    item * ishow;
+    const char * ic;
+
+    report_item(owner, itm, viewer, NULL, &ic, NULL, false);
+    if (ic && *ic) {
+      for (ishow = result; ishow!=result+n; ishow=ishow->next) {
+        const char * sc;
+
+        if (ishow->type==itm->type) sc = ic;
+        else report_item(owner, ishow, viewer, NULL, &sc, NULL, false);
+        if (sc==ic || strcmp(sc, ic)==0) {
+          ishow->number+=itm->number;
+          break;
+        }
+      }
+      if (ishow==result+n) {
+        if (n==size) {
+          return -1;
+        }
+        result[n].number = itm->number;
+        result[n].type = itm->type;
+        result[n].next = (n+1==size)?NULL:result+n+1;
+        ++n;
+      }
+    }
+  }
+  if (n>0) result[n-1].next = NULL;
+  return n;
+}
+
+static void
+report_resource(resource_report * result, const char * name, int number, int level)
+{
+  result->name = name;
+  result->number = number;
+  result->level = level;
+}
+
+int
+report_resources(const seen_region * sr, resource_report * result, int size, const faction * viewer)
+{
+  const region * r = sr->r;
+  int n = 0;
+
+  if (r->land) {
+    int peasants = rpeasants(r);
+    int horses = rhorses(r);
+    int trees = rtrees(r, 2);
+    int saplings = rtrees(r, 1);
+    boolean mallorn = fval(r, RF_MALLORN)!=0;
+
+    if (peasants) {
+      if (n>=size) return -1;
+      report_resource(result+n, "rm_peasant", peasants, -1);
+      ++n;
+    }
+    if (horses) {
+      if (n>=size) return -1;
+      report_resource(result+n, "rm_horse", horses, -1);
+      ++n;
+    }
+    if (saplings) {
+      if (n>=size) return -1;
+      report_resource(result+n, mallorn?"rm_mallornsapling":"rm_sapling", saplings, -1);
+      ++n;
+    }
+    if (trees) {
+      if (n>=size) return -1;
+      report_resource(result+n, mallorn?"rm_mallorn":"rm_tree", trees, -1);
+      ++n;
+    }
+  }
+
+  if (sr->mode>=see_unit) {
+    rawmaterial * res = r->resources;
+    while (res) {
+      int maxskill = 0;
+      int level = -1;
+      int visible = -1;
+      const item_type * itype = resource2item(res->type->rtype);
+      if (res->type->visible==NULL) {
+        visible = res->amount;
+        level = res->level + itype->construction->minskill - 1;
+      } else {
+        const unit * u;
+        for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
+          if (u->faction == viewer) {
+            int s = eff_skill(u, itype->construction->skill, r);
+            if (s>maxskill) {
+              if (s>=itype->construction->minskill) {
+                assert(itype->construction->minskill>0);
+                level = res->level + itype->construction->minskill - 1;
+              }
+              maxskill = s;
+              visible = res->type->visible(res, maxskill);
+            }
+          }
+        }
+      }
+      if (level>=0 && visible>=0) {
+        if (n>=size) return -1;
+        report_resource(result+n, res->type->name, visible, level);
+        n++;
+      }
+      res = res->next;
+    }
+  }
+  return n;
+}
+
 int
 bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, size_t size)
 {
@@ -258,6 +385,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
   static const curse_type * itemcloak_ct = 0;
   static boolean init = false;
   int bytes;
+  item result[MAX_INVENTORY];
 
   if (!init) {
     init = true;
@@ -425,28 +553,10 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
   } else if (!itemcloak && mode >= see_unit && !(a_fshidden
     && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) 
   {
-    show = NULL;
-    for (itm=u->items;itm;itm=itm->next) {
-      item * ishow;
-      const char * ic;
-      int in;
-      report_item(u, itm, f, NULL, &ic, &in, false);
-      if (ic && *ic && in>0) {
-        for (ishow = show; ishow; ishow=ishow->next) {
-          const char * sc;
-          int sn;
-          if (ishow->type==itm->type) sc=ic;
-          else report_item(u, ishow, f, NULL, &sc, &sn, false);
-          if (sc==ic || strcmp(sc, ic)==0) {
-            ishow->number+=itm->number;
-            break;
-          }
-        }
-        if (ishow==NULL) {
-          ishow = i_add(&show, i_new(itm->type, itm->number));
-        }
-      }
-    }
+    int n = report_items(u->items, result, MAX_INVENTORY, u, f);
+    assert(n>=0);
+    if (n>0) show = result;
+    else show = NULL;
   } else {
     show = NULL;
   }
@@ -470,7 +580,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
     }
     if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
-  if (show!=u->items) while (show) i_free(i_remove(&show, show));
 
   if (u->faction == f || telepath_see) {
     sc_mage * m = get_mage(u);

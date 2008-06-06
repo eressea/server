@@ -651,7 +651,7 @@ rps_nowrap(FILE * F, const char *s)
 }
 
 static void
-rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
+report_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 {
   attrib *a_otherfaction;
   char marker;
@@ -829,8 +829,9 @@ see_border(const border * b, const faction * f, const region * r)
 }
 
 static void
-describe(FILE * F, const region * r, int partial, faction * f)
+describe(FILE * F, const seen_region * sr, faction * f)
 {
+  const region * r = sr->r;
   int n;
   boolean dh;
   direction_t d;
@@ -885,13 +886,13 @@ describe(FILE * F, const region * r, int partial, faction * f)
   bytes = (int)f_regionid(r, f, bufp, size);
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   
-  if (partial == 1) {
+  if (sr->mode==see_travel) {
     bytes = (int)strlcpy(bufp, " (durchgereist)", size);
   }
-  else if (partial == 3) {
+  else if (sr->mode==see_neighbour) {
     bytes = (int)strlcpy(bufp, " (benachbart)", size);
   }
-  else if (partial == 2) {
+  else if (sr->mode==see_lighthouse) {
     bytes = (int)strlcpy(bufp, " (vom Turm erblickt)", size);
   } else {
     bytes = 0;
@@ -931,35 +932,14 @@ describe(FILE * F, const region * r, int partial, faction * f)
   }
 
   /* iron & stone */
-  if (partial == 0 && f != (faction *) NULL) {
-    struct rawmaterial * res;
-    for (res=r->resources;res;res=res->next) {
-      int level = -1;
-      int visible = -1;
-      int maxskill = 0;
-      const item_type * itype = resource2item(res->type->rtype);
-      if (res->type->visible==NULL) {
-        visible = res->amount;
-        level = res->level + itype->construction->minskill - 1;
-      } else {
-        const unit * u;
-        for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
-          if (u->faction == f) {
-            int s = eff_skill(u, itype->construction->skill, r);
-            if (s>maxskill) {
-              if (s>=itype->construction->minskill) {
-                level = res->level + itype->construction->minskill - 1;
-              }
-              maxskill = s;
-              visible = res->type->visible(res, maxskill);
-            }
-          }
-        }
-      }
-      if (level>=0 && visible >= 0) {
-        bytes = snprintf(bufp, size, ", %d %s/%d", visible, 
-                         LOC(f->locale, res->type->name),
-                         res->level + itype->construction->minskill - 1);
+  if (sr->mode==see_unit && f != (faction *) NULL) {
+    resource_report result[MAX_RAWMATERIALS];
+    int n, numresults = report_resources(sr, result, MAX_RAWMATERIALS, f);
+
+    for (n=0;n<numresults;++n) {
+      if (result[n].number>=0 && result[n].level>=0) {
+        bytes = snprintf(bufp, size, ", %d %s/%d", result[n].number, 
+          LOC(f->locale, result[n].name), result[n].level);
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       }
     }
@@ -983,7 +963,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
     }
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
-  if (rmoney(r) && partial == 0) {
+  if (rmoney(r) && sr->mode==see_unit) {
     bytes = snprintf(bufp, size, ", %d ", rmoney(r));
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     bytes = (int)strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)), size);
@@ -1091,7 +1071,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
   *bufp = 0;
   rparagraph(F, buf, 0, 0, 0);
 
-  if (partial==0 && rplane(r) == get_astralplane() &&
+  if (sr->mode==see_unit && rplane(r) == get_astralplane() &&
       !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
     /* Sonderbehandlung Teleport-Ebene */
     region_list *rl = astralregions(r, inhabitable);
@@ -1728,17 +1708,80 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
   rpline(F);
 }
 
-void
-report_building(FILE *F, const region * r, const building * b, const faction * f, int mode)
+static void
+report_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f, const unit * captain)
 {
+  const region * r = sr->r;
+  char buffer[8192], * bufp = buffer;
+  size_t size = sizeof(buffer) - 1;
+  int bytes;
+  char ch;
+
+  rnl(F);
+
+  if (captain && captain->faction == f) {
+    int n = 0, p = 0;
+    getshipweight(sh, &n, &p);
+    n = (n+99) / 100; /* 1 Silber = 1 GE */
+
+    bytes = snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
+      LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
+  } else {
+    bytes = snprintf(bufp, size, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
+  }
+  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+
+  assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
+  if (sh->size!=sh->type->construction->maxsize) {
+    bytes = snprintf(bufp, size, ", %s (%d/%d)",
+      LOC(f->locale, "nr_undercons"), sh->size,
+      sh->type->construction->maxsize);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  }
+  if (sh->damage) {
+    int percent = (sh->damage*100+DAMAGE_SCALE-1)/(sh->size*DAMAGE_SCALE);
+    bytes = snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  }
+  if (!fval(r->terrain, SEA_REGION)) {
+    if (sh->coast != NODIRECTION) {
+      bytes = (int)strlcpy(bufp, ", ", size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      bytes = (int)strlcpy(bufp, LOC(f->locale, coasts[sh->coast]), size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    }
+  }
+  ch = 0;
+  if (sh->display && sh->display[0]) {
+    bytes = (int)strlcpy(bufp, "; ", size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    bytes = (int)strlcpy(bufp, sh->display, size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    ch = sh->display[strlen(sh->display) - 1];
+  }
+  if (ch != '!' && ch != '?' && ch != '.') {
+    bytes = (int)strlcpy(bufp, ".", size);
+    if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  }
+  *bufp = 0;
+  rparagraph(F, buffer, 2, 0, 0);
+
+  print_curses(F, f, sh, TYP_SHIP, 4);
+}
+
+static void
+report_building(FILE *F, const seen_region * sr, const building * b, const faction * f)
+{
+  region * r = sr->r;
   int i, bytes;
-  unit *u;
   const char * bname;
   const struct locale * lang = NULL;
   const building_type * type = b->type;
   static const struct building_type * bt_illusion;
   char buffer[8192], * bufp = buffer;
   size_t size = sizeof(buffer) - 1;
+
+  rnl(F);
 
   if (!bt_illusion) bt_illusion = bt_find("illusion");
   if (f) lang = f->locale;
@@ -1770,7 +1813,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
 
-  if (b->besieged > 0 && mode>=see_lighthouse) {
+  if (b->besieged > 0 && sr->mode>=see_lighthouse) {
     bytes = (int)strlcpy(bufp, ", belagert von ", size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     bytes = (int)strlcpy(bufp, itoa10(b->besieged), size);
@@ -1852,21 +1895,9 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
   *bufp = 0;
   rparagraph(F, buffer, 2, 0, 0);
 
-  if (mode<see_lighthouse) return;
+  if (sr->mode<see_lighthouse) return;
 
   print_curses(F, f, b, TYP_BUILDING, 4);
-
-  for (u = r->units; u; u = u->next) {
-    if (u->building == b) {
-      assert(fval(u, UFL_OWNER) || !"you must call reorder_owners() first!");
-      rpunit(F, f, u, 6, mode);
-      u = u->next;
-      break;
-    }
-  }
-  for (;u!=NULL && u->building==b;u=u->next) {
-    rpunit(F, f, u, 6, mode);
-  }
 }
 
 int
@@ -1874,12 +1905,9 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
 {
   int flag = 0;
   char ch;
-  int dh;
   int anyunits;
   const struct region *r;
   faction * f = ctx->f;
-  building *b;
-  ship *sh;
   unit *u;
   char pzTime[64];
   attrib *a;
@@ -1955,7 +1983,6 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   }
 #endif
 
-  dh = 0;
   if (f->age <= 2) {
     const char * s;
     if (f->age <= 1) {
@@ -2154,13 +2181,15 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   for (;sr!=NULL;sr=sr->next) {
     region * r = sr->r;
     int stealthmod = stealth_modifier(sr->mode);
+    building * b = r->buildings;
+    ship * sh = r->ships;
 
     if (sr->mode<see_lighthouse) continue;
     /* Beschreibung */
 
     if (sr->mode==see_unit) {
       anyunits = 1;
-      describe(F, r, 0, f);
+      describe(F, sr, f);
       if (!fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
         rnl(F);
         prices(F, r, f);
@@ -2170,15 +2199,15 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     }
     else {
       if (sr->mode==see_far) {
-        describe(F, r, 3, f);
+        describe(F, sr, f);
         guards(F, r, f);
         durchreisende(F, r, f);
       }
       else if (sr->mode==see_lighthouse) {
-        describe(F, r, 2, f);
+        describe(F, sr, f);
         durchreisende(F, r, f);
       } else {
-        describe(F, r, 1, f);
+        describe(F, sr, f);
         durchreisende(F, r, f);
       }
     }
@@ -2194,106 +2223,43 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
       rp_messages(F, r->msgs, f, 0, true);
       if (mlist) rp_messages(F, mlist, f, 0, true);
     }
-    /* Burgen und ihre Einheiten */
 
-    for (b = rbuildings(r); b; b = b->next) {
-      rnl(F);
-      report_building(F, r, b, f, sr->mode);
-    }
-
-    /* Restliche Einheiten */
-
-    if (stealthmod>INT_MIN) {
-      for (u = r->units; u; u = u->next) {
-        if (!u->building && !u->ship) {
-          if (u->faction == f || cansee(f, r, u, stealthmod)) {
-            if (dh == 0 && !(rbuildings(r) || r->ships)) {
-              dh = 1;
-              /* rnl(F); */
-            }
-            rpunit(F, f, u, 4, sr->mode);
-          }
+    /* report all units. they are pre-sorted in an efficient manner */
+    u = r->units;
+    while (b) {
+      while (b && (!u || u->building!=b)) {
+        report_building(F, sr, b, f);
+        b = b->next;
+      }
+      if (b) {
+        report_building(F, sr, b, f);
+        while (u && u->building==b) {
+          report_unit(F, f, u, 6, sr->mode);
+          u = u->next;
         }
+        b = b->next;
       }
     }
-
-    /* Schiffe und ihre Einheiten */
-
-    for (sh = r->ships; sh; sh = sh->next) {
-      faction *of = NULL;
-
-      rnl(F);
-
-      /* Gewicht feststellen */
-
-      for (u = r->units; u; u = u->next) {
-        if (u->ship == sh && fval(u, UFL_OWNER)) {
-          of = u->faction;
-          break;
+    while (u && !u->ship) {
+      if (stealthmod>INT_MIN) {
+        if (u->faction == f || cansee(f, r, u, stealthmod)) {
+          report_unit(F, f, u, 4, sr->mode);
         }
       }
-      
-      bufp = buf;
-      size = sizeof(buf) - 1;
-      if (of == f) {
-        int n = 0, p = 0;
-        getshipweight(sh, &n, &p);
-        n = (n+99) / 100; /* 1 Silber = 1 GE */
-
-        bytes = snprintf(bufp, size, "%s, %s, (%d/%d)", shipname(sh),
-          LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
-      } else {
-        bytes = snprintf(bufp, size, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
+      u = u->next;
+    }
+    while (sh) {
+      while (sh && (!u || u->ship!=sh)) {
+        report_ship(F, sr, sh, f, NULL);
+        sh = sh->next;
       }
-      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-
-      assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-      if (sh->size!=sh->type->construction->maxsize) {
-        bytes = snprintf(bufp, size, ", %s (%d/%d)",
-          LOC(f->locale, "nr_undercons"), sh->size,
-          sh->type->construction->maxsize);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      }
-      if (sh->damage) {
-        int percent = (sh->damage*100+DAMAGE_SCALE-1)/(sh->size*DAMAGE_SCALE);
-        bytes = snprintf(bufp, size, ", %d%% %s", percent, LOC(f->locale, "nr_damaged"));
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      }
-      if (!fval(r->terrain, SEA_REGION)) {
-        if (sh->coast != NODIRECTION) {
-          bytes = (int)strlcpy(bufp, ", ", size);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-          bytes = (int)strlcpy(bufp, LOC(f->locale, coasts[sh->coast]), size);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+      if (sh) {
+        report_ship(F, sr, sh, f, u);
+        while (u && u->ship==sh) {
+          report_unit(F, f, u, 6, sr->mode);
+          u = u->next;
         }
-      }
-      ch = 0;
-      if (sh->display && sh->display[0]) {
-        bytes = (int)strlcpy(bufp, "; ", size);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, sh->display, size);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        ch = sh->display[strlen(sh->display) - 1];
-      }
-      if (ch != '!' && ch != '?' && ch != '.') {
-        bytes = (int)strlcpy(bufp, ".", size);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      }
-      *bufp = 0;
-      rparagraph(F, buf, 2, 0, 0);
-
-      print_curses(F, f, sh, TYP_SHIP, 4);
-
-      for (u = r->units; u; u = u->next) {
-        if (u->ship == sh && fval(u, UFL_OWNER)) {
-          rpunit(F, f, u, 6, sr->mode);
-          break;
-        }
-      }
-      for (u = r->units; u; u = u->next) {
-        if (u->ship == sh && !fval(u, UFL_OWNER)) {
-          rpunit(F, f, u, 6, sr->mode);
-        }
+        sh = sh->next;
       }
     }
 

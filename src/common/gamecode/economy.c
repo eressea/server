@@ -3003,16 +3003,16 @@ do_work(unit * u, order * ord, request * o)
     region * r = u->region;
     int w;
 
-    if(fval(u, UFL_WERE)) {
-      cmistake(u, ord, 313, MSG_INCOME);
+    if (fval(u, UFL_WERE)) {
+      if (ord) cmistake(u, ord, 313, MSG_INCOME);
       return -1;
     }
     if (besieged(u)) {
-      cmistake(u, ord, 60, MSG_INCOME);
+      if (ord) cmistake(u, ord, 60, MSG_INCOME);
       return -1;
     }
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-      cmistake(u, ord, 69, MSG_INCOME);
+      if (ord) cmistake(u, ord, 69, MSG_INCOME);
       return -1;
     }
     w = wage(r, u->faction, u->race);
@@ -3022,7 +3022,7 @@ do_work(unit * u, order * ord, request * o)
     working += u->number;
     return 0;
   }
-  else if (!is_monsters(u->faction)) {
+  else if (ord && !is_monsters(u->faction)) {
     ADDMSG(&u->faction->msgs,
       msg_feedback(u, ord, "race_cantwork", "race", u->race));
   }

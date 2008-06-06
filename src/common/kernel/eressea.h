@@ -355,7 +355,7 @@ extern const char * resourcepath(void);
 extern void kernel_init(void);
 extern void kernel_done(void);
 
-extern void reorder_owners(struct region * r);
+extern void reorder_units(struct region * r);
 
 extern const char *localenames[];
 
