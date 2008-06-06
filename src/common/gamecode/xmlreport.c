@@ -247,6 +247,36 @@ report_faction(report_context * ctx, faction * f)
 }
 
 static xmlNodePtr
+xml_building(report_context * ctx, seen_region * sr, building * b)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "building");
+  char idbuf[20];
+
+  snprintf(idbuf, sizeof(idbuf), "bldg_%d", b->no);
+  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)idbuf);
+  xmlNewNsProp(node, xct->ns_atl, BAD_CAST "key", BAD_CAST itoa36(b->no));
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)b->name);
+
+  return node;
+}
+
+static xmlNodePtr
+xml_ship(report_context * ctx, seen_region * sr, ship * sh)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "ship");
+  char idbuf[20];
+
+  snprintf(idbuf, sizeof(idbuf), "ship_%d", sh->no);
+  xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, (xmlChar *)idbuf);
+  xmlNewNsProp(node, xct->ns_atl, BAD_CAST "key", BAD_CAST itoa36(sh->no));
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)sh->name);
+
+  return node;
+}
+
+static xmlNodePtr
 report_region(report_context * ctx, seen_region * sr)
 {
   xml_context* xct = (xml_context*)ctx->userdata;
@@ -256,20 +286,22 @@ report_region(report_context * ctx, seen_region * sr)
   char region_id[20];
   int stealthmod = stealth_modifier(sr->mode);
   unit * u;
+  ship * sh = r->ships;
+  building * b = r->buildings;
 
   sprintf(region_id, "region_%u", r->uid);
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, BAD_CAST region_id);
 
   child = xmlNewNode(xct->ns_atl, BAD_CAST "coordinate");
-  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "x", xml_i(r->x));
-  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "y", xml_i(r->y));
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "x", xml_i(region_x(r, ctx->f)));
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "y", xml_i(region_y(r, ctx->f)));
   if (r->planep) {
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "plane", xml_s(r->planep->name));
   }
   xmlAddChild(node, child);
 
   child = xmlNewNode(xct->ns_atl, BAD_CAST "terrain");
-  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (xmlChar *)r->terrain->_name);
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (xmlChar *)terrain_name(r));
   xmlAddChild(node, child);
 
   if (r->land!=NULL) {
@@ -286,6 +318,49 @@ report_region(report_context * ctx, seen_region * sr)
   for (u=r->units;u;u=u->next) {
     if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
       xmlAddChild(node, xml_unit(ctx, u, sr->mode));
+    }
+  }
+
+  /* report all units. they are pre-sorted in an efficient manner */
+  u = r->units;
+  while (b) {
+    while (b && (!u || u->building!=b)) {
+      child = xml_building(ctx, sr, b);
+      xmlAddChild(node, child);
+      b = b->next;
+    }
+    if (b) {
+      child = xml_building(ctx, sr, b);
+      xmlAddChild(node, child);
+      while (u && u->building==b) {
+        xmlAddChild(child, xml_unit(ctx, u, sr->mode));
+        u = u->next;
+      }
+      b = b->next;
+    }
+  }
+  while (u && !u->ship) {
+    if (stealthmod>INT_MIN) {
+      if (u->faction == ctx->f || cansee(ctx->f, r, u, stealthmod)) {
+        xmlAddChild(node, xml_unit(ctx, u, sr->mode));
+      }
+    }
+    u = u->next;
+  }
+  while (sh) {
+    while (sh && (!u || u->ship!=sh)) {
+      child = xml_ship(ctx, sr, sh);
+      xmlAddChild(node, child);
+      sh = sh->next;
+    }
+    if (sh) {
+      child = xml_ship(ctx, sr, sh);
+      xmlAddChild(node, child);
+      while (u && u->ship==sh) {
+        xmlAddChild(child, xml_unit(ctx, u, sr->mode));
+        u = u->next;
+      }
+      sh = sh->next;
     }
   }
   return node;

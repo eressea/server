@@ -116,7 +116,15 @@ end
 
 function test_hse()
   read_game("50.dat", "binary")
-  f = get_faction(atoi36("8h7f"))
+  f = get_faction(atoi36("7scs"))
+  f.options = f.options + 8192
+  init_reports()
+  write_report(f)
+end
+
+function test_xml()
+  read_game("572.dat", "binary")
+  f = get_faction(atoi36("ioen"))
   f.options = f.options + 8192
   init_reports()
   write_report(f)
@@ -202,7 +210,8 @@ run_scripts()
 -- test_free()
 -- test_bmark()
 -- test_realloc()
-test_hse()
+test_xml()
+-- test_hse()
 -- test_reorder()
 -- test_tunnels()
 -- test_md5()
