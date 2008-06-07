@@ -124,9 +124,14 @@ end
 
 function test_xml()
   read_game("572.dat", "binary")
+  init_reports()
+
   f = get_faction(atoi36("ioen"))
   f.options = f.options + 8192
-  init_reports()
+  write_report(f)
+
+  f = get_faction(atoi36("777"))
+  f.options = f.options + 8192
   write_report(f)
 end
 

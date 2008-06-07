@@ -773,7 +773,7 @@ cr_output_unit(FILE * F, const region * r,
   if (u->ship)
     fprintf(F, "%d;Schiff\n", u->ship->no);
   if (getguard(u))
-    fprintf(F, "%d;bewacht\n", getguard(u)?1:0);
+    fprintf(F, "%d;bewacht\n", 1);
   if ((b=usiege(u))!=NULL)
     fprintf(F, "%d;belagert\n", b->no);
 

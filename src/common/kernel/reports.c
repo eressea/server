@@ -112,22 +112,24 @@ groupid(const struct group * g, const struct faction * f)
 	return buf;
 }
 
+const char * combatstatus[] = {
+  "status_aggressive", "status_front",
+  "status_rear", "status_defensive",
+  "status_avoid", "status_flee"
+};
+
 const char *
 report_kampfstatus(const unit * u, const struct locale * lang)
 {
-	static char fsbuf[64];
-	static const char * azstatus[] = {
-		"status_aggressive", "status_front",
-		"status_rear", "status_defensive",
-		"status_avoid", "status_flee" };
+  static char fsbuf[64];
 
-	strlcpy(fsbuf, LOC(lang, azstatus[u->status]), sizeof(fsbuf));
-	if (fval(u, UFL_NOAID)) {
-		strcat(fsbuf, ", ");
-		strcat(fsbuf, LOC(lang, "status_noaid"));
-	}
+  strlcpy(fsbuf, LOC(lang, combatstatus[u->status]), sizeof(fsbuf));
+  if (fval(u, UFL_NOAID)) {
+    strcat(fsbuf, ", ");
+    strcat(fsbuf, LOC(lang, "status_noaid"));
+  }
 
-	return fsbuf;
+  return fsbuf;
 }
 
 const char *
@@ -293,6 +295,26 @@ report_resource(resource_report * result, const char * name, int number, int lev
   result->name = name;
   result->number = number;
   result->level = level;
+}
+
+void
+report_race(const struct unit * u, const char ** name, const char ** illusion)
+{
+  if (illusion) {
+    if (u->irace && u->irace!=u->race) {
+      *illusion = u->irace->_name[0];
+    }
+    else {
+      *illusion = NULL;
+    }
+  }
+  if (name) {
+    *name = u->race->_name[0];
+    if (fval(u->race, RCF_SHAPESHIFTANY)) {
+      const char * str = get_racename(u->attribs);
+      if (str) *name = str;
+    }
+  }
 }
 
 void

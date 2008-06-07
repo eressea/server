@@ -124,9 +124,11 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
   int report_items(const struct item * items, struct item * result, int size, const struct unit * owner, const struct faction * viewer);
   void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
   void report_building(const struct building * b, const char ** btype, const char ** billusion);
+  void report_race(const struct unit * u, const char ** rcname, const char ** rcillusion);
 
   extern size_t f_regionid(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
+  extern const char * combatstatus[];
 #define GR_PLURAL     0x01 /* grammar: plural */
 #define MAX_INVENTORY 64 /* maimum number of different items in an inventory */
 #define MAX_RAWMATERIALS 8 /* maximum kinds of raw materials in a regions */
