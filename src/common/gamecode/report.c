@@ -214,7 +214,7 @@ rparagraph(FILE *F, const char *str, ptrdiff_t indent, int hanging_indent, char 
 }
 
 static void
-report_spell(FILE * F,  spell *sp, const struct locale * lang)
+nr_spell(FILE * F,  spell *sp, const struct locale * lang)
 {
   int bytes, k, itemanz, costtyp;
   int dh = 0;
@@ -535,7 +535,7 @@ hat_in_region(item_t it, region * r, faction * f)
 }
 
 static void
-print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int indent)
+nr_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int indent)
 {
   attrib *a = NULL;
   int self = 0;
@@ -651,7 +651,7 @@ rps_nowrap(FILE * F, const char *s)
 }
 
 static void
-report_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
+nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 {
   attrib *a_otherfaction;
   char marker;
@@ -686,7 +686,7 @@ report_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   rparagraph(F, buf, indent, 0, marker);
 
   if (!isbattle) {
-    print_curses(F, f, u, TYP_UNIT, indent);
+    nr_curses(F, f, u, TYP_UNIT, indent);
   }
 }
 
@@ -1105,7 +1105,7 @@ describe(FILE * F, const seen_region * sr, faction * f)
   n = 0;
 
   /* Wirkungen permanenter Sprüche */
-  print_curses(F, f, r, TYP_REGION,0);
+  nr_curses(F, f, r, TYP_REGION,0);
 
   /* Produktionsreduktion */
   a = a_find(r->attribs, &at_reduceproduction);
@@ -1709,7 +1709,7 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
 }
 
 static void
-report_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f, const unit * captain)
+nr_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f, const unit * captain)
 {
   const region * r = sr->r;
   char buffer[8192], * bufp = buffer;
@@ -1766,11 +1766,11 @@ report_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f
   *bufp = 0;
   rparagraph(F, buffer, 2, 0, 0);
 
-  print_curses(F, f, sh, TYP_SHIP, 4);
+  nr_curses(F, f, sh, TYP_SHIP, 4);
 }
 
 static void
-report_building(FILE *F, const seen_region * sr, const building * b, const faction * f)
+nr_building(FILE *F, const seen_region * sr, const building * b, const faction * f)
 {
   region * r = sr->r;
   int i, bytes;
@@ -1897,7 +1897,7 @@ report_building(FILE *F, const seen_region * sr, const building * b, const facti
 
   if (sr->mode<see_lighthouse) return;
 
-  print_curses(F, f, b, TYP_BUILDING, 4);
+  nr_curses(F, f, b, TYP_BUILDING, 4);
 }
 
 int
@@ -2114,7 +2114,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     centre(F, LOC(f->locale, "section_newspells"), true);
     while (a && a->type==&at_reportspell) {
       spell *sp = (spell *)a->data.v;
-      report_spell(F, sp, f->locale);
+      nr_spell(F, sp, f->locale);
       a = a->next;
     }
   }
@@ -2228,13 +2228,13 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     u = r->units;
     while (b) {
       while (b && (!u || u->building!=b)) {
-        report_building(F, sr, b, f);
+        nr_building(F, sr, b, f);
         b = b->next;
       }
       if (b) {
-        report_building(F, sr, b, f);
+        nr_building(F, sr, b, f);
         while (u && u->building==b) {
-          report_unit(F, f, u, 6, sr->mode);
+          nr_unit(F, f, u, 6, sr->mode);
           u = u->next;
         }
         b = b->next;
@@ -2243,20 +2243,20 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     while (u && !u->ship) {
       if (stealthmod>INT_MIN) {
         if (u->faction == f || cansee(f, r, u, stealthmod)) {
-          report_unit(F, f, u, 4, sr->mode);
+          nr_unit(F, f, u, 4, sr->mode);
         }
       }
       u = u->next;
     }
     while (sh) {
       while (sh && (!u || u->ship!=sh)) {
-        report_ship(F, sr, sh, f, NULL);
+        nr_ship(F, sr, sh, f, NULL);
         sh = sh->next;
       }
       if (sh) {
-        report_ship(F, sr, sh, f, u);
+        nr_ship(F, sr, sh, f, u);
         while (u && u->ship==sh) {
-          report_unit(F, f, u, 6, sr->mode);
+          nr_unit(F, f, u, 6, sr->mode);
           u = u->next;
         }
         sh = sh->next;

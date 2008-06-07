@@ -177,7 +177,7 @@ print_items(FILE * F, item * items, const struct locale * lang)
 }
 
 static void
-print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
+cr_output_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
 {
   boolean header = false;
   attrib *a = NULL;
@@ -563,26 +563,19 @@ cr_output_messages(FILE * F, message_list *msgs, faction * f)
 static void
 cr_output_building(FILE * F, building * b, const unit * owner, int fno, faction *f)
 {
-  const char * bname;
-  static const struct building_type * bt_illusion;
-  const building_type * type = b->type;
-
-  if (!bt_illusion) bt_illusion = bt_find("illusion");
+  const char * bname, * billusion;
 
   fprintf(F, "BURG %d\n", b->no);
 
-  if (b->type==bt_illusion) {
-    const attrib * a = a_findc(b->attribs, &at_icastle);
-    if (a!=NULL) {
-      type = ((icastle_data*)a->data.v)->type;
-    }
-    bname = buildingtype(b->type, b, b->size);
-    if (owner!=NULL && owner->faction==f) {
+  report_building(b, &bname, &billusion);
+  if (billusion) {
+    fprintf(F, "\"%s\";Typ\n", add_translation(billusion, LOC(f->locale, billusion)));
+    if (owner && owner->faction==f) {
       fprintf(F, "\"%s\";wahrerTyp\n", add_translation(bname, LOC(f->locale, bname)));
     }
+  } else {
+    fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
   }
-  bname = buildingtype(type, b, b->size);
-  fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
   fprintf(F, "\"%s\";Name\n", b->name);
   if (b->display && b->display[0])
     fprintf(F, "\"%s\";Beschr\n", b->display);
@@ -594,7 +587,7 @@ cr_output_building(FILE * F, building * b, const unit * owner, int fno, faction 
     fprintf(F, "%d;Partei\n", fno);
   if (b->besieged)
     fprintf(F, "%d;Belagerer\n", b->besieged);
-  print_curses(F, f, b, TYP_BUILDING);
+  cr_output_curses(F, f, b, TYP_BUILDING);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -637,7 +630,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
   if (w != NODIRECTION)
     fprintf(F, "%d;Kueste\n", w);
 
-  print_curses(F, f, sh, TYP_SHIP);
+  cr_output_curses(F, f, sh, TYP_SHIP);
 }
 
 static void
@@ -913,7 +906,7 @@ cr_output_unit(FILE * F, const region * r,
     fprintf(F, "%d;%s\n", in, add_translation(ic, locale_string(f->locale, ic)));
   }
 
-  print_curses(F, f, u, TYP_UNIT);
+  cr_output_curses(F, f, u, TYP_UNIT);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -1218,7 +1211,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     if (r->land) {
       print_items(F, r->land->items, f->locale);
     }
-    print_curses(F, f, r, TYP_REGION);
+    cr_output_curses(F, f, r, TYP_REGION);
     cr_borders(ctx->seen, r, f, sr->mode, F);
     if (sr->mode==see_unit && r->planep==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
     {

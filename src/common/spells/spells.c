@@ -108,7 +108,7 @@ attrib_type at_wdwpyramid = {
 /* ----------------------------------------------------------------------- */
 
 static void
-report_spell(unit * mage, region * r, message * msg)
+nr_spell(unit * mage, region * r, message * msg)
 {
   r_addmessage(r, NULL, msg);
   if (mage && mage->region!=r) {
@@ -1977,7 +1977,7 @@ sp_holyground(castorder *co)
   double power = co->force;
   curse * c;
   message * msg = msg_message("sp_holyground_effect", "mage region", mage, r);
-  report_spell(mage, r, msg);
+  nr_spell(mage, r, msg);
   msg_release(msg);
 
   if (!ctype) ctype = ct_find("holyground");
@@ -2082,7 +2082,7 @@ sp_drought(castorder *co)
 
   /* melden, 1x pro Partei */
   msg = msg_message("sp_drought_effect", "mage region", mage, r);
-  report_spell(mage, r, msg);
+  nr_spell(mage, r, msg);
   msg_release(msg);
 
   /* Wenn schon Duerre herrscht, dann setzen wir nur den Power-Level
@@ -4015,7 +4015,7 @@ sp_raisepeasantmob(castorder *co)
   create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, duration, anteil, 0);
 
   msg = msg_message("sp_raisepeasantmob_effect", "mage region", mage, r);
-  report_spell(mage, r, msg);
+  nr_spell(mage, r, msg);
   msg_release(msg);
 
   return cast_level;
@@ -4802,7 +4802,7 @@ sp_icastle(castorder *co)
     co->order));
 
   msg = msg_message("sp_icastle_effect", "region", r);
-  report_spell(mage, r, msg);
+  nr_spell(mage, r, msg);
   msg_release(msg);
 
   return cast_level;

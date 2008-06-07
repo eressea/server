@@ -123,6 +123,7 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
   int report_resources(const struct seen_region * sr, struct resource_report * result, int size, const struct faction * viewer);
   int report_items(const struct item * items, struct item * result, int size, const struct unit * owner, const struct faction * viewer);
   void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
+  void report_building(const struct building * b, const char ** btype, const char ** billusion);
 
   extern size_t f_regionid(const struct region * r, const struct faction * f, char * buffer, size_t size);
 

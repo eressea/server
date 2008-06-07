@@ -295,6 +295,32 @@ report_resource(resource_report * result, const char * name, int number, int lev
   result->level = level;
 }
 
+void
+report_building(const struct building * b, const char ** name, const char ** illusion)
+{
+  static int init;
+  static const struct building_type * bt_illusion;
+
+  if (name) {
+    *name = buildingtype(b->type, b, b->size);
+  }
+  if (illusion) {
+    *illusion = NULL;
+
+    if (!init) {
+      bt_illusion = bt_find("illusion");
+      init = 1;
+    }
+    if (bt_illusion && b->type==bt_illusion) {
+      const attrib * a = a_findc(b->attribs, &at_icastle);
+      if (a!=NULL) {
+        icastle_data * icastle = (icastle_data*)a->data.v;
+        *illusion = buildingtype(icastle->type, b, b->size);
+      }
+    }
+  }
+}
+
 int
 report_resources(const seen_region * sr, resource_report * result, int size, const faction * viewer)
 {
