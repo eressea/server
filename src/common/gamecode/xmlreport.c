@@ -16,10 +16,6 @@
 #include <kernel/eressea.h>
 #include "xmlreport.h"
 
-/* tweakable features */
-#define ENCODE_SPECIAL 1
-#define RENDER_CRMESSAGES
-
 #define XML_ATL_NAMESPACE (const xmlChar *) "http://www.eressea.de/XML/2008/atlantis"
 #define XML_XML_LANG (const xmlChar *) "lang"
 

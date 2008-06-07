@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#define PFL_NOCOORDS        1
+#define PFL_NOCOORDS        1 /* not in use */
 #define PFL_NORECRUITS      2
 #define PFL_NOALLIANCES     4
 #define PFL_LOWSTEALING     8

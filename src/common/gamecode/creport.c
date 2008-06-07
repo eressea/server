@@ -12,7 +12,6 @@ without prior permission by the authors of Eressea.
 #include "creport.h"
 
 /* tweakable features */
-#define ENCODE_SPECIAL 1
 #define RENDER_CRMESSAGES
 #define BUFFERSIZE 32768
 #define RESOURCECOMPAT
@@ -321,10 +320,8 @@ cr_region(variant var, char * buffer, const void * userdata)
   region * r = (region *)var.v;
   if (r) {
     plane * p = r->planep;
-    if (!p || !(p->flags & PFL_NOCOORDS)) {
-      sprintf(buffer, "%d %d %d", region_x(r, report), region_y(r, report), p?p->id:0);
-      return 0;
-    }
+    sprintf(buffer, "%d %d %d", region_x(r, report), region_y(r, report), p?p->id:0);
+    return 0;
   }
   return -1;
 }
@@ -1132,12 +1129,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
       fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
     }
   } else {
-#if ENCODE_SPECIAL
-    if (r->planep->flags & PFL_NOCOORDS) fprintf(F, "SPEZIALREGION %d %d\n", encode_region(f, r), r->planep->id);
-#else
-    if (r->planep->flags & PFL_NOCOORDS) continue;
-#endif
-    else fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
+    fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
   }
   fprintf(F, "%d;id\n", r->uid);
   if (r->land) {
@@ -1416,8 +1408,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
     for (bm=f->battles;bm;bm=bm->next) {
       if (!bm->r->planep) fprintf(F, "BATTLE %d %d\n", region_x(bm->r, f), region_y(bm->r, f));
       else {
-        if (bm->r->planep->flags & PFL_NOCOORDS) fprintf(F, "BATTLESPEC %d %d\n", encode_region(f, bm->r), bm->r->planep->id);
-        else fprintf(F, "BATTLE %d %d %d\n", region_x(bm->r, f), region_y(bm->r, f), bm->r->planep->id);
+        fprintf(F, "BATTLE %d %d %d\n", region_x(bm->r, f), region_y(bm->r, f), bm->r->planep->id);
       }
       cr_output_messages(F, bm->msgs, f);
     }

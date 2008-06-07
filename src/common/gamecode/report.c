@@ -1374,9 +1374,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
           rps_nowrap(F, "");
           rnl(F);
           pl = getplane(r);
-          if (pl && fval(pl, PFL_NOCOORDS)) {
-            sprintf(buf, "%s; %s", LOC(f->locale, parameters[P_REGION]), rname(r, f->locale));
-          } else if (pl && pl->id != 0) {
+          if (pl && pl->id != 0) {
             sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
               region_y(r,f), pl->id, rname(r, f->locale));
           } else {

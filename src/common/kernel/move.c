@@ -1643,14 +1643,8 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     assert(sh == u->ship || !"ship has sunk, but we didn't notice it");
 
     if (fval(next_point->terrain, FORBIDDEN_REGION)) {
-      plane *pl = getplane(next_point);
-      if (pl && fval(pl, PFL_NOCOORDS)) {
-        ADDMSG(&f->msgs,  msg_message("sailforbiddendir", 
-          "ship direction", sh, dir));
-      } else {
-        ADDMSG(&f->msgs, msg_message("sailforbidden", 
-          "ship region", sh, next_point));
-      }
+      ADDMSG(&f->msgs, msg_message("sailforbidden", 
+        "ship region", sh, next_point));
       break;
     }
 

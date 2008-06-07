@@ -116,13 +116,8 @@ write_regionname(const region * r, const faction * f, char * buffer, size_t size
   if (r==NULL) {
     strcpy(buf, "(null)");
   } else {
-    plane *pl = r->planep;
-    if (pl && fval(pl, PFL_NOCOORDS)) {
-      strncpy(buf, rname(r, lang), size);
-    } else {
-      snprintf(buf, size, "%s (%d,%d)", rname(r, lang),
-        region_x(r, f), region_y(r, f));
-    }
+    snprintf(buf, size, "%s (%d,%d)", rname(r, lang),
+      region_x(r, f), region_y(r, f));
   }
   buf[size-1] = 0;
   return buffer;

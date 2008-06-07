@@ -523,7 +523,6 @@ fix_astralplane(void)
 
   if (astralplane==NULL || monsters==NULL) return 0;
 
-  freset(astralplane, PFL_NOCOORDS);
   freset(astralplane, PFL_NOFEED);
   set_ursprung(monsters, astralplane->id, 0, 0);
 

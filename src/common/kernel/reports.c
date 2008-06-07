@@ -1621,9 +1621,7 @@ f_regionid(const region * r, const faction * f, char * buffer, size_t size)
     plane * pl = r->planep;
     strncpy(buffer, rname(r, f->locale), size);
     buffer[size-1]=0;
-    if (pl==NULL || !fval(pl, PFL_NOCOORDS)) {
-      sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
-    }
+    sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
   }
   return strlen(buffer);
 }
