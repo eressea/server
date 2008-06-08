@@ -376,6 +376,25 @@ growing_trees(void)
   return 0;
 }
 
+static int fix_adamantium(void)
+{
+  faction * f;
+  for (f=factions;f;f=f->next) {
+    const struct item_type * itype;
+    int o = 1;
+    int p = (f->no % 5)?1:0;
+    int a = (f->no % 5)?0:1;
+
+    itype = it_find("adamantium");
+    i_change(&f->items, itype, o-i_get(f->items, itype));
+    itype = it_find("adamantiumaxe");
+    i_change(&f->items, itype, a-i_get(f->items, itype));
+    itype = it_find("adamantiumplate");
+    i_change(&f->items, itype, p-i_get(f->items, itype));
+  }
+  return 0;
+}
+
 #include <triggers/gate.h>
 #include <triggers/unguard.h>
 typedef struct gate_data {
@@ -839,6 +858,7 @@ fix_heroes(void)
 }
 #endif
 
+
 static void
 fix_groups(void)
 {
@@ -894,6 +914,8 @@ korrektur(void)
   do_once("asfi", &fix_astral_firewalls);
   fix_astralplane();
   fix_toads();
+  do_once("admt", &fix_adamantium);
+  
   /* fix_heroes(); */
   verify_owners(false);
   /* fix_herbtypes(); */

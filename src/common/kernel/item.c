@@ -387,6 +387,9 @@ static const char * it_aliases[][2] = {
   { "p1", "goliathwater" },
   { "p5", "peasantblood" },
   { "p8", "nestwarmth" },
+  { "diamond", "adamantium" },
+  { "diamondaxe", "adamantiumaxe" },
+  { "diamondplate", "adamantiumplate" },
   { NULL, NULL },
 };
 

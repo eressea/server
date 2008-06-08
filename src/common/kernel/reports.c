@@ -359,7 +359,7 @@ report_resources(const seen_region * sr, resource_report * result, int size, con
 
     if (money) {
       if (n>=size) return -1;
-      report_resource(result+n, "rm_money", peasants, -1);
+      report_resource(result+n, "rm_money", money, -1);
       ++n;
     }
     if (peasants) {
