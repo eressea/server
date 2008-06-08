@@ -236,7 +236,6 @@ game_init(void)
   init_archetypes();
   init_attributes();
   init_itemtypes();
-  init_rawmaterials();
 
   init_gmcmd();
 #if INFOCMD_MODULE

@@ -217,7 +217,6 @@ is_function(struct lua_State * luaState, const char * fname)
     if (type(fun)==LUA_TFUNCTION) {
       return true;
     }
-    log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
     if (type(fun)!=LUA_TNIL) {
       log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
     }

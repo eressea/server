@@ -84,22 +84,6 @@ typedef struct xml_context {
   xmlNsPtr ns_xml;
 } xml_context;
 
-#if 0
-static const xmlChar *
-xml_s(const char * str)
-{
-  static xmlChar buffer[1024];
-  const char * inbuf = str;
-  char * outbuf = (char *)buffer;
-  size_t inbytes = strlen(str)+1;
-  size_t outbytes = sizeof(buffer) - 1;
-
-  unicode_latin1_to_utf8(outbuf, &outbytes, inbuf, &inbytes);
-  buffer[outbytes] = 0;
-  return buffer;
-}
-#endif
-
 static const xmlChar *
 xml_i(double number)
 {

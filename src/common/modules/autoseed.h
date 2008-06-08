@@ -38,6 +38,8 @@ extern void get_island(struct region * root, struct region_list ** rlist);
 extern int fix_demand(struct region *r);
 extern const struct terrain_type * random_terrain(boolean use_distribution);
 
+extern int seed_adamantium(struct region * r, int base);
+
 #ifdef __cplusplus
 }
 #endif

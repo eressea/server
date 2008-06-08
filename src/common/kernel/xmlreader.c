@@ -21,6 +21,7 @@ without prior permission by the authors of Eressea.
 #include "message.h"
 #include "race.h"
 #include "region.h"
+#include "resources.h"
 #include "ship.h"
 #include "terrain.h"
 #include "skill.h"
@@ -949,6 +950,13 @@ parse_resources(xmlDocPtr doc)
 
     if (name) xmlFree(name);
     if (appearance) xmlFree(appearance);
+
+    name = xmlGetProp(node, BAD_CAST "material");
+    if (name) {
+      rmt_create(rtype, (const char *)name);
+      xmlFree(name);
+    }
+
 
     if (gamecode_enabled) {
       /* reading eressea/resources/resource/function */

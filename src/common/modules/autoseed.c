@@ -18,6 +18,7 @@
 #include <kernel/alliance.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/plane.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
@@ -25,7 +26,10 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
+#include <attributes/key.h>
+
 /* util includes */
+#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/lists.h>
@@ -62,6 +66,20 @@ random_terrain(boolean distribution)
     if (n<0) break;
   }
   return terrain;
+}
+
+int
+seed_adamantium(region * r, int base)
+{
+  const resource_type * rtype = rt_find("adamantium");
+  rawmaterial * rm;
+  for (rm = r->resources;rm;rm=rm->next) {
+    if (rm->type->rtype==rtype) break;
+  }
+  if (!rm) {
+    add_resource(r, 1, base, 150, rtype);
+  }
+  return 0;
 }
 
 

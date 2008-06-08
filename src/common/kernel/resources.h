@@ -32,8 +32,7 @@ typedef struct rawmaterial {
 } rawmaterial;
 
 typedef struct rawmaterial_type {
-	const char * name;
-	item_t _itype; /* what you'll be producing. hack - needs resource_type */
+	char * name;
 	const struct resource_type * rtype;
 
 	void (*terraform) (struct rawmaterial *, const struct region *);
@@ -52,13 +51,11 @@ extern void terraform_resources(struct region * r);
 extern void read_resources(struct region * r);
 extern void write_resources(struct region * r);
 extern struct rawmaterial * rm_get(struct region *, const struct resource_type *);
-extern void init_rawmaterials(void);
 extern struct rawmaterial_type * rmt_find(const char * str);
 extern struct rawmaterial_type * rmt_get(const struct resource_type *);
 
-extern struct rawmaterial_type rm_stones;
-extern struct rawmaterial_type rm_iron;
-extern struct rawmaterial_type rm_laen;
+extern void add_resource(struct region * r, int level, int base, int divisor, const struct resource_type * rtype);
+extern struct rawmaterial_type * rmt_create(const struct resource_type * rtype, const char * name);
 
 #ifdef __cplusplus
 }

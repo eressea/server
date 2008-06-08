@@ -164,7 +164,7 @@
   </resource>
   <!-- christmas items: end -->
 
-  <resource name="adamantium" limited="yes">
+  <resource name="adamantium" limited="yes" material="rm_adamantium">
     <item weight="200" score="200">
       <construction skill="mining" minskill="8" reqsize="1"/>
     </item>
@@ -176,7 +176,8 @@
   <resource name="adamantiumaxe">
     <item weight="100" score="500">
       <construction skill="weaponsmithing" minskill="8" reqsize="1">
-        <requirement type="adamantium" quantity="2"/>
+        <requirement type="adamantium" quantity="1"/>
+        <requirement type="log" quantity="1"/>
       </construction>
       <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
         <damage type="rider" value="3d4+15"/>

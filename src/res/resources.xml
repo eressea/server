@@ -79,7 +79,7 @@
     <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes"/>
   </resource>
 
-  <resource name="iron" limited="yes">
+  <resource name="iron" limited="yes" material="rm_iron">
     <item weight="500" score="10">
       <construction skill="mining" minskill="1" reqsize="1"/>
     </item>
@@ -91,7 +91,7 @@
     </resourcelimit>
   </resource>
 
-  <resource name="laen" limited="yes">
+  <resource name="laen" limited="yes" material="rm_laen">
     <item weight="200" score="100">
       <construction skill="mining" minskill="7" reqsize="1"/>
     </item>
@@ -100,7 +100,7 @@
     </resourcelimit>
   </resource>
 
-  <resource name="stone" limited="yes">
+  <resource name="stone" limited="yes" material="rm_stone">
     <item weight="6000" score="10" big="yes">
       <construction skill="quarrying" minskill="1" reqsize="1"/>
     </item>

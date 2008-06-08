@@ -20,8 +20,10 @@ using namespace luabind;
 
 #include <util/language.h>
 #include <util/rng.h>
-#include <kernel/skill.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
+#include <kernel/terrainid.h>
+#include <modules/autoseed.h>
 
 static const char *
 loc_getskill(const char * loc, const char * locstring)
@@ -41,6 +43,22 @@ loc_getkeyword(const char * loc, const char * locstring)
   return keywords[result];
 }
 
+static void
+adamantium(region * r)
+{
+  region_list *rp, *rlist = NULL;
+  get_island(r, &rlist);
+
+  for (rp=rlist;rp;rp=rp->next) {
+    region * ri = rp->data;
+    if (ri->terrain==newterrain(T_MOUNTAIN)) {
+      int base = 1 << (rng_int() % 4);
+      seed_adamantium(r, base);
+    }
+  }
+  free_regionlist(rlist);
+}
+
 void
 bind_test(lua_State * L)
 {
@@ -48,6 +66,7 @@ bind_test(lua_State * L)
     def("loc_skill", &loc_getskill),
     def("loc_keyword", &loc_getkeyword),
     def("reorder_units", &reorder_units),
+    def("seed_adamantium", &adamantium),
     def("rng_int", &rng_int)
   ];
 }

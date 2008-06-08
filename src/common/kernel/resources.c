@@ -61,6 +61,23 @@ update_resource(struct rawmaterial * res, double modifier)
 }
 
 void
+add_resource(region * r, int level, int base, int divisor, const resource_type * rtype)
+{
+  struct rawmaterial * rm = calloc(sizeof(struct rawmaterial), 1);
+
+  rm->next = r->resources;
+  r->resources = rm;
+  rm->level      = level;
+  rm->startlevel = level;
+  rm->base       = base;
+  rm->divisor    = divisor;
+  rm->flags      = 0;
+  rm->type       = rmt_get(rtype);
+  update_resource(rm, 1.0);
+  rm->type->terraform(rm, r);
+}
+
+void
 terraform_resources(region * r)
 {
   int i;
@@ -78,18 +95,7 @@ terraform_resources(region * r)
     if (rm) continue;
     
     if (chance(production->chance)) {
-      rm = calloc(sizeof(struct rawmaterial), 1);
-      
-      rm->next = r->resources;
-      r->resources = rm;
-      rm->level      = dice_rand(production->startlevel);
-      rm->startlevel = rm->level;
-      rm->base       = dice_rand(production->base);
-      rm->divisor    = dice_rand(production->divisor);
-      rm->flags      = 0;
-      rm->type       = rmt_get(production->type);
-      update_resource(rm, 1.0);
-      rm->type->terraform(rm, r);
+      add_resource(r, dice_rand(production->startlevel), dice_rand(production->base), dice_rand(production->divisor), production->type);
     }
   }
 }
@@ -131,7 +137,7 @@ visible_default(const rawmaterial *res, int skilllevel)
 /* resources are visible, if skill equals minimum skill to mine them
  * plus current level of difficulty */
 {
-	const struct item_type * itype = olditemtype[res->type->_itype];
+	const struct item_type * itype = res->type->rtype->itype;
 	if (res->level<=1 && res->level + itype->construction->minskill <= skilllevel+1) {
 		assert (res->amount>0);
 		return res->amount;
@@ -168,33 +174,6 @@ rm_get(region * r, const struct resource_type * rtype)
 	return rm;
 }
 
-struct rawmaterial_type rm_stones = {
-	"rm_stone",
-	I_STONE, NULL,
-	terraform_default,
-	NULL,
-	use_default,
-	visible_default
-};
-
-struct rawmaterial_type rm_iron = {
-	"rm_iron",
-	I_IRON, NULL,
-	terraform_default,
-	NULL,
-	use_default,
-	visible_default
-};
-
-struct rawmaterial_type rm_laen = {
-	"rm_laen",
-	I_LAEN, NULL,
-	terraform_default,
-	NULL,
-	use_default,
-	visible_default
-};
-
 struct rawmaterial_type * rawmaterialtypes = 0;
 
 struct rawmaterial_type * 
@@ -213,18 +192,23 @@ rmt_get(const struct resource_type * rtype)
   return rmt;
 }
 
+struct rawmaterial_type * 
+rmt_create(const struct resource_type * rtype, const char * name)
+{
+  rawmaterial_type * rmtype = malloc(sizeof(rawmaterial_type));
+  rmtype->name = strdup(name);
+  rmtype->rtype = rtype;
+  rmtype->terraform = terraform_default;
+  rmtype->update = NULL;
+  rmtype->use = use_default;
+  rmtype->visible = visible_default;
+  rmtype->next = rawmaterialtypes;
+  rawmaterialtypes = rmtype;
+  return rmtype;
+}
+
 static void
 add_rawmaterial(struct rawmaterial_type * rmtype)
 {
-	rmtype->rtype = item2resource(olditemtype[rmtype->_itype]);
-	rmtype->next = rawmaterialtypes;
-	rawmaterialtypes = rmtype;
-}
-
-void
-init_rawmaterials(void)
-{
-	add_rawmaterial(&rm_stones);
-	add_rawmaterial(&rm_iron);
-	add_rawmaterial(&rm_laen);
+  rmtype->rtype = rmtype->rtype;
 }
