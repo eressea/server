@@ -3775,7 +3775,6 @@ init_processor(void)
   p+=10;
   add_proc_global(p, &age_factions, "Parteienalter++");
   add_proc_order(p, K_MAIL, &mail_cmd, 0, "Botschaften");
-  add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
 
   p+=10; /* all claims must be done before we can USE */
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
@@ -3810,6 +3809,7 @@ init_processor(void)
   p+=10; /* can't allow reserve before siege (weapons) */
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (2. Versuch)");
   add_proc_order(p, K_RESERVE, &reserve_cmd, 0, "Reservieren");
+  add_proc_order(p, K_CLAIM, &claim_cmd, 0, NULL);
   add_proc_unit(p, &follow_unit, "Folge auf Einheiten setzen");
 
   p+=10; /* rest rng again before economics */
