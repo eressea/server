@@ -1,16 +1,11 @@
 /* vi: set ts=2:
- *
- *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- */
++-------------------+  Enno Rehling <enno@eressea.de>
+| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
+| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
++-------------------+  
+This program may not be used, modified or distributed 
+without prior permission by the authors of Eressea.
+*/
 
 #include <config.h>
 #include <kernel/eressea.h>
@@ -228,9 +223,8 @@ xml_skills(report_context * ctx, unit * u)
       skill_t sk = sv->id;
       int esk = eff_skill(u, sk, u->region);
 
-      child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "skill"));
-      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "name", BAD_CAST skillnames[sk]);
-      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "value", BAD_CAST itoab(esk, 10));
+      child = xmlNewTextChild(node, xct->ns_atl, BAD_CAST "skill", BAD_CAST itoab(esk, 10));
+      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "type", BAD_CAST skillnames[sk]);
     }
   }
 
@@ -454,6 +448,27 @@ xml_resources(report_context * ctx, const seen_region * sr)
 }
 
 static xmlNodePtr
+xml_diplomacy(report_context * ctx, const struct ally * allies)
+{
+  xml_context* xct = (xml_context*)ctx->userdata;
+  xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "diplomacy");
+  const struct ally * sf;
+
+  for (sf=allies;sf;sf=sf->next) {
+    int i, status = sf->status;
+    for (i=0;helpmodes[i].name;++i) {
+      if (sf->faction && (status & helpmodes[i].status)==helpmodes[i].status) {
+        status -= helpmodes[i].status;
+        child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "status"));
+        xmlNewNsProp(child, xct->ns_xml, BAD_CAST "faction", xml_ref_faction(sf->faction));
+        xmlNewNsProp(child, xct->ns_xml, BAD_CAST "status", (xmlChar*)helpmodes[i].name);
+      }
+    }
+  }
+  return node;
+}
+
+static xmlNodePtr
 xml_groups(report_context * ctx, const group * groups)
 {
   xml_context* xct = (xml_context*)ctx->userdata;
@@ -465,6 +480,8 @@ xml_groups(report_context * ctx, const group * groups)
     child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "group"));
     xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_group(g));
     xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)g->name);
+
+    if (g->allies) xmlAddChild(child, xml_diplomacy(ctx, g->allies));
 
     child = xmlAddChild(child, xmlNewNode(xct->ns_atl, BAD_CAST "prefix"));
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_prefix(prefix));
@@ -489,6 +506,8 @@ xml_faction(report_context * ctx, faction * f)
     child = xmlNewTextChild(node, xct->ns_atl, BAD_CAST "text", (const xmlChar *)f->banner);
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "public");
   }
+
+  if (f->allies) xmlAddChild(node, xml_diplomacy(ctx, f->allies));
 
   if (ctx->f==f) {
     xmlAddChild(node, xml_link(ctx, BAD_CAST "race", BAD_CAST f->race->_name[0]));
@@ -590,13 +609,14 @@ xml_region(report_context * ctx, seen_region * sr)
   ship * sh = r->ships;
   building * b = r->buildings;
 
+  /* TODO: entertain-quota, recruits, salary, prices, curses, borders, apparitions (Schemen), spells, travelthru, messages */
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_region(r));
 
   child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "coordinate"));
   xmlNewNsProp(child, xct->ns_atl, BAD_CAST "x", xml_i(region_x(r, ctx->f)));
   xmlNewNsProp(child, xct->ns_atl, BAD_CAST "y", xml_i(region_y(r, ctx->f)));
   if (r->planep) {
-    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "plane", xml_s(r->planep->name));
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "plane", (xmlChar *)r->planep->name);
   }
 
   child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "terrain"));
@@ -670,11 +690,28 @@ report_root(report_context * ctx)
   const faction_list * address;
   region * r = ctx->first, * rend = ctx->last;
   xml_context* xct = (xml_context*)ctx->userdata;
-  xmlNodePtr xmlReport = xmlNewNode(NULL, BAD_CAST "atlantis");
+  xmlNodePtr node, child, xmlReport = xmlNewNode(NULL, BAD_CAST "atlantis");
+  const char * mailto = locale_string(ctx->f->locale, "mailto");
+  const char * mailcmd = locale_string(ctx->f->locale, "mailcmd");
+  char zText[128];
+  /* TODO: locale, age, options, messages */
 
   xct->ns_xml = xmlNewNs(xmlReport, XML_XML_NAMESPACE, BAD_CAST "xml");
   xct->ns_atl = xmlNewNs(xmlReport, XML_ATL_NAMESPACE, NULL);
   xmlSetNs(xmlReport, xct->ns_atl);
+
+  node = xmlAddChild(xmlReport, xmlNewNode(xct->ns_atl, BAD_CAST "server"));
+  if (mailto) {
+    snprintf(zText, sizeof(zText), "mailto:%s?subject=%s", mailto, mailcmd);
+    child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "delivery"));
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "method", BAD_CAST "mail");
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "href", BAD_CAST zText);
+  }
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "game", (xmlChar *)global.gamename);
+  strftime(zText, sizeof(zText), "%Y-%m-%dT%H:%M:%SZ", gmtime(&ctx->report_time));
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "time", (xmlChar *)zText);
+  xmlNewTextChild(node, xct->ns_atl, BAD_CAST "turn", (xmlChar *)itoab(turn, 10));
+
 
   for (address=ctx->addresses;address;address=address->next) {
     xmlAddChild(xmlReport, xml_faction(ctx, address->data));

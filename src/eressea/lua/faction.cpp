@@ -107,21 +107,6 @@ operator==(const faction& a, const faction&b)
   return a.no==b.no;
 }
 
-static struct helpmode {
-  const char * name;
-  int status;
-} helpmodes[] = {
-  { "money", HELP_MONEY },
-  { "fight", HELP_FIGHT },
-  { "observe", HELP_OBSERVE },
-  { "give", HELP_GIVE },
-  { "guard", HELP_GUARD },
-  { "stealth", HELP_FSTEALTH },
-  { "travel", HELP_TRAVEL },
-  { "all", HELP_ALL },
-  { NULL, 0 }
-};
-
 static int
 faction_getpolicy(const faction& a, const faction& b, const char * flag)
 {

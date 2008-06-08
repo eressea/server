@@ -6742,6 +6742,10 @@
     <text locale="de">Bauern</text>
     <text locale="en">peasants</text>
   </string>
+  <string name="rm_money">
+    <text locale="de">Silber</text>
+    <text locale="en">silver</text>
+  </string>
   <string name="rm_laen">
     <text locale="de">Laen</text>
     <text locale="en">laen</text>

@@ -12,7 +12,6 @@
  * prior permission by the authors of Eressea.
  */
 
-#define INDENT 0
 #define ECHECK_VERSION "4.01"
 
 #include <config.h>

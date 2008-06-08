@@ -409,6 +409,12 @@ extern struct order * default_order(const struct locale * lang);
 extern int entertainmoney(const struct region * r);
 
 extern void plagues(struct region * r, boolean ismagic);
+typedef struct helpmode {
+  const char * name;
+  int status;
+} helpmode;
+
+extern struct helpmode helpmodes[];
 
 extern struct attrib_type at_guard;
 extern void free_gamedata(void);

@@ -238,6 +238,18 @@ old_race(const struct race * rc)
   return NORACE;
 }
 
+helpmode helpmodes[] = {
+  { "all", HELP_ALL },
+  { "money", HELP_MONEY },
+  { "fight", HELP_FIGHT },
+  { "observe", HELP_OBSERVE },
+  { "give", HELP_GIVE },
+  { "guard", HELP_GUARD },
+  { "stealth", HELP_FSTEALTH },
+  { "travel", HELP_TRAVEL },
+  { NULL, 0 }
+};
+
 const char *directions[MAXDIRECTIONS+2] =
 {
   "northwest",

@@ -327,7 +327,6 @@ int change_money(struct unit *, int);
 int res_changeitem(struct unit * u, const resource_type * rtype, int delta);
 
 extern struct attrib_type at_showitem; /* show this potion's description */
-extern struct attrib_type at_seenitem; /* knows this potion's description, no need to reshow */
 
 extern void register_resources(void);
 extern void init_resources(void);

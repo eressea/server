@@ -351,11 +351,17 @@ report_resources(const seen_region * sr, resource_report * result, int size, con
 
   if (r->land) {
     int peasants = rpeasants(r);
+    int money = rmoney(r);
     int horses = rhorses(r);
     int trees = rtrees(r, 2);
     int saplings = rtrees(r, 1);
     boolean mallorn = fval(r, RF_MALLORN)!=0;
 
+    if (money) {
+      if (n>=size) return -1;
+      report_resource(result+n, "rm_money", peasants, -1);
+      ++n;
+    }
     if (peasants) {
       if (n>=size) return -1;
       report_resource(result+n, "rm_peasant", peasants, -1);
