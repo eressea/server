@@ -53,7 +53,7 @@ adamantium_island(region * r)
     region * ri = rp->data;
     if (ri->terrain==newterrain(T_MOUNTAIN)) {
       int base = 1 << (rng_int() % 4);
-      seed_adamantium(r, base);
+      seed_adamantium(ri, base);
     }
   }
   free_regionlist(rlist);

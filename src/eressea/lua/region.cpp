@@ -155,8 +155,8 @@ region_getresource(const region& r, const char * type)
 {
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
-    const rawmaterial * rm = r.resources;
-    while (rm) {
+    const rawmaterial * rm;
+    for (rm=r.resources;rm;rm=rm->next) {
       if (rm->type->rtype==rtype) {
         return rm->amount;
       }

@@ -17,7 +17,9 @@ end
 function adamant_seeds()
   for r in regions() do
     if r:get_key("tnnL") then
+      print("1 ", r:get_resource("adamantium"), r)
       test.adamantium_island(r)
+      print("2 ", r:get_resource("adamantium"))
     end
   end
 end
