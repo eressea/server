@@ -27,7 +27,7 @@
       <item name="money" amount="4200"/>
     </set>
     <set name="new_faction">
-      <item name="adamantium" amount="4"/>
+      <item name="adamantium" amount="1"/>
     </set>
   </equipment>
 

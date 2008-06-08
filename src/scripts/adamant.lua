@@ -14,6 +14,14 @@ function adamant_gifts()
   end
 end
 
+function adamant_seeds()
+  for r in regions() do
+    if r:get_key("tnnL") then
+      test.adamantium_island(r)
+    end
+  end
+end
+
 -- create a fixed path to a specific region
 local function create_path(from, to)
   local param = tostring(to.uid)
