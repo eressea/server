@@ -18,6 +18,14 @@
   <xi:include href="spells.xml"/>
   <xi:include href="terrains.xml"/>
 
+  <equipment>
+    <set name="first_unit">
+      <item name="log" amount="30"/>
+      <item name="stone" amount="30"/>
+      <item name="money" amount="4200"/>
+    </set>
+  </equipment>
+
   <game name="Tutorial" welcome="tutorial">
     <!-- Game specific settings -->
     <order name="EMAIL" disable="yes"></order>

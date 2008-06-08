@@ -206,9 +206,3 @@ rmt_create(const struct resource_type * rtype, const char * name)
   rawmaterialtypes = rmtype;
   return rmtype;
 }
-
-static void
-add_rawmaterial(struct rawmaterial_type * rmtype)
-{
-  rmtype->rtype = rmtype->rtype;
-}
