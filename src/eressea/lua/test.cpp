@@ -44,7 +44,7 @@ loc_getkeyword(const char * loc, const char * locstring)
 }
 
 static void
-adamantium(region * r)
+adamantium_island(region * r)
 {
   region_list *rp, *rlist = NULL;
   get_island(r, &rlist);
@@ -66,7 +66,7 @@ bind_test(lua_State * L)
     def("loc_skill", &loc_getskill),
     def("loc_keyword", &loc_getkeyword),
     def("reorder_units", &reorder_units),
-    def("seed_adamantium", &adamantium),
+    def("adamantium_island", &adamantium_island),
     def("rng_int", &rng_int)
   ];
 }
