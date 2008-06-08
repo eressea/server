@@ -1008,22 +1008,6 @@ cr_reportspell(FILE * F,  spell *sp, const struct locale * lang)
   }
 }
 
-static unsigned int
-encode_region(const faction * f, const region * r) {
-  unsigned int id;
-  char *cp, c;
-  /* obfuscation */
-  assert(sizeof(int)==sizeof(char)*4);
-  id = (((((r->x ^ f->no) % 1024) << 20) | ((r->y ^ f->no) % 1024)));
-  cp = (char*)&id;
-  c = cp[0];
-  cp[0] = cp[2];
-  cp[2] = cp[1];
-  cp[1] = cp[3];
-  cp[3] = c;
-  return id;
-}
-
 static char *
 cr_output_resource(char * buf, const char * name, const struct locale * loc, int amount, int level)
 {
