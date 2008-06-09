@@ -1013,22 +1013,19 @@ u_setfaction(unit * u, faction * f)
 
   if (u->faction==f) return;
   if (u->faction) {
-    unit ** iunit;
     set_number(u, 0);
     if (count_unit(u)) --u->faction->no_units;
     join_group(u, NULL);
     free_orders(&u->orders);
     set_order(&u->thisorder, NULL);
 
-    iunit = &u->faction->units;
-    while (*iunit && *iunit!=u) {
-      iunit=&(*iunit)->nextF;
-    }
-    assert(*iunit);
-    *iunit = u->nextF;
+    if (u->nextF) u->nextF->prevF = u->prevF;
+    if (u->prevF) u->prevF->nextF = u->nextF;
+    else f->units = u->nextF;
   }
 
   if (f!=NULL) {
+    u->prevF = NULL;
     u->nextF = f->units;
     f->units = u;
   }

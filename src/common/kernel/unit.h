@@ -72,6 +72,7 @@ extern int countheroes(const struct faction * f);
 typedef struct unit {
   struct unit *next; /* needs to be first entry, for region's unitlist */
   struct unit *nextF; /* nächste Einheit der Partei */
+  struct unit *prevF; /* vorherige Einheit der Partei */
   struct region *region;
   int no;
   int hp;
