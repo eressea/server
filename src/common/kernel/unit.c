@@ -1021,10 +1021,11 @@ u_setfaction(unit * u, faction * f)
 
     if (u->nextF) u->nextF->prevF = u->prevF;
     if (u->prevF) u->prevF->nextF = u->nextF;
-    else f->units = u->nextF;
+    else u->faction->units = u->nextF;
   }
 
   if (f!=NULL) {
+    if (f->units) f->units->prevF=u;
     u->prevF = NULL;
     u->nextF = f->units;
     f->units = u;

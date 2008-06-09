@@ -185,6 +185,7 @@ region_setresource(region& r, const char * type, int value)
         rm->amount = value;
         break;
       }
+      rm=rm->next;
     }
     if (!rm) {
       if (rtype==rt_find("money")) rsetmoney(&r, value);
