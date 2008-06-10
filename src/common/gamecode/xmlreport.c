@@ -132,7 +132,7 @@ static const xmlChar *
 xml_ref_prefix(const char * str)
 {
   static char idbuf[20];
-  snprintf(idbuf, sizeof(idbuf), "grp_%s", str);
+  snprintf(idbuf, sizeof(idbuf), "pref_%s", str);
   return (const xmlChar *)idbuf;
 }
 
@@ -174,7 +174,7 @@ xml_inventory(report_context * ctx, item * items, unit * u)
 
     child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "item"));
     report_item(u, itm, ctx->f, NULL, &name, &n, true);
-    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "type", (xmlChar *)name);
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (xmlChar *)name);
     xmlNodeAddContent(child, (xmlChar*)itoab(n, 10));
   }
   return node;
@@ -210,7 +210,7 @@ xml_skills(report_context * ctx, unit * u)
       int esk = eff_skill(u, sk, u->region);
 
       child = xmlNewTextChild(node, xct->ns_atl, BAD_CAST "skill", BAD_CAST itoab(esk, 10));
-      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "type", BAD_CAST skillnames[sk]);
+      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", BAD_CAST skillnames[sk]);
     }
   }
 
@@ -286,8 +286,10 @@ xml_unit(report_context * ctx, unit * u, int mode)
         xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_group(g));
       } else {
         const char * prefix = get_prefix(g->attribs);
-        child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "prefix"));
-        xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_prefix(prefix));
+        if (prefix) {
+          child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "prefix"));
+          xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_prefix(prefix));
+        }
       }
     }
   }
@@ -386,7 +388,7 @@ xml_unit(report_context * ctx, unit * u, int mode)
     } else {
       boolean see_items = (mode >= see_unit);
       if (see_items) {
-        if (itemcloak_ct && !curse_active(get_curse(u->attribs, itemcloak_ct))) {
+        if (itemcloak_ct && curse_active(get_curse(u->attribs, itemcloak_ct))) {
           see_items = false;
         } else {
           see_items = effskill(u, SK_STEALTH) < 3;
@@ -414,20 +416,23 @@ static xmlNodePtr
 xml_resources(report_context * ctx, const seen_region * sr)
 {
   xml_context* xct = (xml_context*)ctx->userdata;
-  xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "resources");
+  xmlNodePtr node = NULL;
   resource_report result[MAX_RAWMATERIALS];
   int n, size = report_resources(sr, result, MAX_RAWMATERIALS, ctx->f);
 
-  for (n=0;n<size;++n) {
-    if (result[n].number>=0) {
-      xmlNodePtr child;
-      
-      child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "resource"));
-      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "type", (xmlChar*)result[n].name);
-      if (result[n].level>=0) {
-        xmlNewNsProp(child, xct->ns_atl, BAD_CAST "level", (xmlChar*)itoab(result[n].level, 10));
+  if (size) {
+    node = xmlNewNode(xct->ns_atl, BAD_CAST "resources");
+    for (n=0;n<size;++n) {
+      if (result[n].number>=0) {
+        xmlNodePtr child;
+        
+        child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "resource"));
+        xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (xmlChar*)result[n].name);
+        if (result[n].level>=0) {
+          xmlNewNsProp(child, xct->ns_atl, BAD_CAST "level", (xmlChar*)itoab(result[n].level, 10));
+        }
+        xmlNodeAddContent(child, (xmlChar*)itoab(result[n].number, 10));
       }
-      xmlNodeAddContent(child, (xmlChar*)itoab(result[n].number, 10));
     }
   }
   return node;
@@ -464,13 +469,15 @@ xml_groups(report_context * ctx, const group * groups)
   for (g=groups;g;g=g->next) {
     const char * prefix = get_prefix(g->attribs);
     child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "group"));
-    xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_group(g));
-    xmlNewTextChild(node, xct->ns_atl, BAD_CAST "name", (const xmlChar *)g->name);
+    xmlNewNsProp(child, xct->ns_xml, XML_XML_ID, xml_ref_group(g));
+    xmlNewTextChild(child, xct->ns_atl, BAD_CAST "name", (const xmlChar *)g->name);
 
     if (g->allies) xmlAddChild(child, xml_diplomacy(ctx, g->allies));
 
-    child = xmlAddChild(child, xmlNewNode(xct->ns_atl, BAD_CAST "prefix"));
-    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_prefix(prefix));
+    if (prefix) {
+      child = xmlAddChild(child, xmlNewNode(xct->ns_atl, BAD_CAST "prefix"));
+      xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_prefix(prefix));
+    }
   }
   
   return node;
@@ -493,16 +500,14 @@ xml_faction(report_context * ctx, faction * f)
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "public");
   }
 
-  if (f->allies) xmlAddChild(node, xml_diplomacy(ctx, f->allies));
-
   if (ctx->f==f) {
     xmlAddChild(node, xml_link(ctx, BAD_CAST "race", BAD_CAST f->race->_name[0]));
+
     if (f->items) xmlAddChild(node, xml_inventory(ctx, f->items, NULL));
+    if (f->allies) xmlAddChild(node, xml_diplomacy(ctx, f->allies));
+    if (f->groups) xmlAddChild(node, xml_groups(ctx, f->groups));
 
     /* TODO: age, options, score, prefix, magic, immigrants, heroes, nmr, groups */
-    if (f->groups) {
-      xmlAddChild(node, xml_groups(ctx, f->groups));      
-    }
   }
   return node;
 }
@@ -618,7 +623,8 @@ xml_region(report_context * ctx, seen_region * sr)
     child = xmlNewTextChild(node, xct->ns_atl, BAD_CAST "text", (const xmlChar *)r->display);
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "public");
   }
-  xmlAddChild(node, xml_resources(ctx, sr));
+  child = xml_resources(ctx, sr);
+  if (child) xmlAddChild(node, child);
 
   child = xmlNewNode(xct->ns_atl, BAD_CAST "terrain");
   xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (const xmlChar *)terrain_name(r));
@@ -637,7 +643,7 @@ xml_region(report_context * ctx, seen_region * sr)
       b = b->next;
     }
     if (b) {
-      xmlAddChild(node, xml_building(ctx, sr, b, u));
+      child = xmlAddChild(node, xml_building(ctx, sr, b, u));
       while (u && u->building==b) {
         xmlAddChild(child, xml_unit(ctx, u, sr->mode));
         u = u->next;
@@ -659,7 +665,7 @@ xml_region(report_context * ctx, seen_region * sr)
       sh = sh->next;
     }
     if (sh) {
-      xmlAddChild(node, xml_ship(ctx, sr, sh, u));
+      child = xmlAddChild(node, xml_ship(ctx, sr, sh, u));
       while (u && u->ship==sh) {
         xmlAddChild(child, xml_unit(ctx, u, sr->mode));
         u = u->next;

@@ -130,6 +130,10 @@ function test_xml()
   f.options = f.options + 8192
   write_report(f)
 
+  f = get_faction(atoi36("a"))
+  f.options = f.options + 8192
+  write_report(f)
+
   f = get_faction(atoi36("777"))
   f.options = f.options + 8192
   write_report(f)
@@ -215,8 +219,8 @@ run_scripts()
 -- test_free()
 -- test_bmark()
 -- test_realloc()
--- test_xml()
-test_hse()
+test_xml()
+-- test_hse()
 -- test_reorder()
 -- test_tunnels()
 -- test_md5()
