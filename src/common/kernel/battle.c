@@ -3574,6 +3574,8 @@ flee(const troop dt)
   fig->run.hp += fig->person[dt.index].hp;
   ++fig->run.number;
 
+  setguard(u, GUARD_NONE);
+
   kill_troop(dt);
 }
 
