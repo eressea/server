@@ -1986,7 +1986,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
 #endif
 
   if (regions!=NULL) {
-    end = regions->nregions-1;
+    end = regions->nregions;
     for (i=begin;i<end;++i) {
       region * r = regions->regions[i];
       const char * trail = trailinto(r, report->locale);
