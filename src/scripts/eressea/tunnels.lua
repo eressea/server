@@ -19,6 +19,12 @@ local function get_target(param)
     local r
     for r in regions() do
       if r:get_key(param) then
+        if (r:get_flag(0)) then
+          r:set_flag(0, false)
+        end
+        if (r.terrain=="ocean") then
+          r = terraform(r.x, r.y, "plain")
+        end
         targets[ntargets] = r
         ntargets = ntargets + 1
         -- print("target: " .. tostring(r))
