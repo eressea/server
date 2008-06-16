@@ -643,11 +643,11 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
       freset(r, RF_ENCOUNTER);
       r->planep = p;
       if (distance(r, center)==radius) {
-        terraform(r, T_FIREWALL);
+        terraform_region(r, newterrain(T_FIREWALL));
       } else if (r==center) {
-        terraform(r, T_PLAIN);
+        terraform_region(r, newterrain(T_PLAIN));
       } else {
-        terraform(r, T_OCEAN);
+        terraform_region(r, newterrain(T_OCEAN));
       }
     }
   }
@@ -757,11 +757,11 @@ gm_addplane(short radius, unsigned int flags, const char * name)
       freset(r, RF_ENCOUNTER);
       r->planep = p;
       if (distance(r, center)==radius) {
-        terraform(r, T_FIREWALL);
+        terraform_region(r, newterrain(T_FIREWALL));
       } else if (r==center) {
-        terraform(r, T_PLAIN);
+        terraform_region(r, newterrain(T_PLAIN));
       } else {
-        terraform(r, T_OCEAN);
+        terraform_region(r, newterrain(T_OCEAN));
       }
     }
   }

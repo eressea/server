@@ -222,7 +222,6 @@ extern const char * write_regionname(const struct region * r, const struct facti
 
 extern struct region * new_region(short x, short y, unsigned int uid);
 extern void remove_region(region ** rlist, region * r);
-extern void terraform(struct region * r, terrain_t terrain);
 extern void terraform_region(struct region * r, const struct terrain_type * terrain);
 
 extern const short delta_x[MAXDIRECTIONS];

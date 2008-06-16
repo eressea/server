@@ -491,7 +491,7 @@ chaos(region * r)
             while (r->buildings) {
               remove_building(&r->buildings, r->buildings);
             }
-            terraform(r, T_OCEAN);
+            terraform_region(r, newterrain(T_OCEAN));
           }
         } else {
           direction_t dir;
@@ -778,7 +778,7 @@ melt_iceberg(region *r)
     }
 
 	/* in Ozean wandeln */
-	terraform(r, T_OCEAN);
+	terraform_region(r, newterrain(T_OCEAN));
 
 	/* Einheiten, die nicht schwimmen können oder in Schiffen sind,
 	 * ertrinken */
@@ -904,7 +904,7 @@ move_icebergs(void)
 	region *r;
 
   for (r=regions; r; r=r->next) {
-    if (rterrain(r) == T_ICEBERG && !fval(r, RF_SELECT)) {
+    if (r->terrain == newterrain(T_ICEBERG) && !fval(r, RF_SELECT)) {
       int select = rng_int() % 10;
       if (select < 4) {
         /* 4% chance */
@@ -925,7 +925,7 @@ create_icebergs(void)
 	region *r;
 
   for (r=regions; r; r=r->next) {
-    if (rterrain(r) == T_ICEBERG_SLEEP && chance(0.05)) {
+    if (r->terrain == newterrain(T_ICEBERG_SLEEP) && chance(0.05)) {
       boolean has_ocean_neighbour = false;
       direction_t dir;
       region *rc;
@@ -1216,7 +1216,7 @@ randomevents(void)
 
   /* Vulkane qualmen, brechen aus ... */
   for (r = regions; r; r = r->next) {
-    if (rterrain(r)==T_VOLCANO_SMOKING && a_find(r->attribs, &at_reduceproduction)) {
+    if (r->terrain == newterrain(T_VOLCANO_SMOKING) && a_find(r->attribs, &at_reduceproduction)) {
       ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
       rsetterrain(r, T_VOLCANO);
     } else switch(rterrain(r)) {

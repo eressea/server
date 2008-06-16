@@ -145,8 +145,6 @@ init_terrains(void)
       newterrain = get_terrain(terraindata[t]);
       if (newterrain!=NULL) {
         newterrains[t] = newterrain;
-      } else {
-        log_warning(("missing classic terrain %s\n", terraindata[t]));
       }
     }
   }

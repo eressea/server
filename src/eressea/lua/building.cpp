@@ -169,7 +169,7 @@ static eressea::list<unit *, unit *, buildingunit>
 building_units(const building& b) {
   region * r = b.region;
   unit * u = r->units;
-  while (u!=NULL && u->building!=&b) u=u->next;
+  while (u!=NULL && (!u->building || u->building->no!=b.no)) u=u->next;
   return eressea::list<unit *, unit *, buildingunit>(u);
 }
 

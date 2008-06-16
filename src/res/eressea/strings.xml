@@ -358,6 +358,10 @@
   </string>
   <!-- igjarjuk queste end -->
 
+  <string name="rm_adamantium">
+    <text locale="de">Adamantium</text>
+    <text locale="en">adamantium</text>
+  </string>
   <string name="adamantium">
     <text locale="de">Adamantium</text>
     <text locale="en">adamantium</text>

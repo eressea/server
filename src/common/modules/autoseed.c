@@ -291,14 +291,15 @@ read_newfactions(const char * filename)
 
 extern int numnewbies;
 
-static terrain_t
+static const terrain_type *
 preferred_terrain(const struct race * rc)
 {
-	if (rc==rc_find("dwarf")) return T_MOUNTAIN;
-	if (rc==rc_find("insect")) return T_DESERT;
-	if (rc==rc_find("halfling")) return T_SWAMP;
-	if (rc==rc_find("troll")) return T_MOUNTAIN;
-	return T_PLAIN;
+  terrain_t t = T_PLAIN;
+  if (rc==rc_find("dwarf")) t = T_MOUNTAIN;
+  if (rc==rc_find("insect")) t = T_DESERT;
+  if (rc==rc_find("halfling")) t = T_SWAMP;
+  if (rc==rc_find("troll")) t = T_MOUNTAIN;
+  return newterrain(t);
 }
 
 #define REGIONS_PER_FACTION 2
@@ -413,20 +414,20 @@ free_newfaction(newfaction * nf)
  * returns the number of players placed on the new island.
  */
 static void
-frame_regions(int age, terrain_t terrain)
+frame_regions(int age, const terrain_type * terrain)
 {
   region * r = regions;
   for (r=regions;r;r=r->next) {
     direction_t d;
     if (r->age<age) continue;
     if (r->planep) continue;
-    if (rterrain(r)==terrain) continue;
+    if (r->terrain == terrain) continue;
 
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
       if (rn==NULL) {
         rn = new_region(r->x+delta_x[d], r->y+delta_y[d], 0);
-        terraform(rn, terrain);
+        terraform_region(rn, terrain);
         rn->age=r->age;
       }
     }
@@ -475,7 +476,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
   int psize = 0; /* players on this island */
   const terrain_type * volcano_terrain = get_terrain("volcano");
 
-  frame_regions(16, T_FIREWALL);
+  frame_regions(16, newterrain(T_FIREWALL));
 
   if (listlen(*players)<MINFACTIONS) return 0;
 
@@ -486,7 +487,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = r->planep;
-      if (r->age<=max_agediff && rterrain(r)==T_OCEAN && p==NULL && virgin_region(r)) {
+      if (r->age<=max_agediff && r->terrain == newterrain(T_OCEAN) && p==NULL && virgin_region(r)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
@@ -533,7 +534,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = r->planep;
-      if (rterrain(r)==T_OCEAN && p==0 && (rmin==NULL || r->age<=max_agediff)) {
+      if (r->terrain == newterrain(T_OCEAN) && p==0 && (rmin==NULL || r->age<=max_agediff)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn  = rconnect(r, d);
@@ -554,7 +555,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       x = rmin->x + delta_x[dmin];
       y = rmin->y + delta_y[dmin];
       r = new_region(x, y, 0);
-      terraform(r, T_OCEAN); /* we change the terrain later */
+      terraform_region(r, newterrain(T_OCEAN));
     }
   }
   if (r!=NULL) {
@@ -580,7 +581,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       if (rn && fval(rn, RF_MARK)) continue;
       if (rn==NULL) {
         rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
-        terraform(rn, T_OCEAN);
+        terraform_region(rn, newterrain(T_OCEAN));
       }
       if (virgin_region(rn)) {
         add_regionlist(&rlist, rn);
@@ -596,7 +597,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       unit * u;
 
       isize += REGIONS_PER_FACTION;
-      terraform(r, preferred_terrain(nextf->race));
+      terraform_region(r, preferred_terrain(nextf->race));
       prepare_starting_region(r);
       ++tsize;
       assert(r->land && r->units==0);
@@ -689,7 +690,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
         if (i!=MAXFILLDIST) {
           while (--i) {
             region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d], 0);
-            terraform(rn, T_OCEAN);
+            terraform_region(rn, newterrain(T_OCEAN));
           }
         }
       }

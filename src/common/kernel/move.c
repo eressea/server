@@ -1783,8 +1783,10 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   }
 
   if (sh->damage>=sh->size * DAMAGE_SCALE) {
-    ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
-    remove_ship(&sh->region->ships, sh);
+    if (sh->region) {
+      ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
+      remove_ship(&sh->region->ships, sh);
+    }
     sh = NULL;
   }
 

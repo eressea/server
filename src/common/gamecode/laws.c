@@ -408,7 +408,7 @@ calculate_emigration(region *r)
   int rp = rpeasants(r);
   int max_immigrants = MAX_IMMIGRATION(maxp-rp);
 
-  if (rterrain(r) == T_VOLCANO || rterrain(r) == T_VOLCANO_SMOKING) {
+  if (r->terrain == newterrain(T_VOLCANO) || r->terrain == newterrain(T_VOLCANO_SMOKING)) {
     max_immigrants = max_immigrants/10;
   }
 

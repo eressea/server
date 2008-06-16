@@ -1,6 +1,9 @@
-local function tunnel_travellers(b)
-  local units = {}
+local function tunnel_travelers(b)
+  local units = nil
   for u in b.units do
+    if units==nil then
+      units = {}
+    end
     units[u] = u
   end
   return units
@@ -10,6 +13,7 @@ targets = nil
 ntargets = 0
 
 local function get_target(param)
+  -- print("finding targets: " .. param)
   if targets == nil then
     targets = {}
     local r
@@ -17,6 +21,7 @@ local function get_target(param)
       if r:get_key(param) then
         targets[ntargets] = r
         ntargets = ntargets + 1
+        -- print("target: " .. tostring(r))
       end
     end
   end
@@ -30,12 +35,12 @@ end
 -- export, will be called from lc_age()
 function tunnel_action(b, param)
   local r = nil
-  print("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
   if tonumber(param)~=nil then
     r = get_region_by_id(tonumber(param))
   end
-  if r~=nil then
-    local units = tunnel_travelers(b)
+  local units = tunnel_travelers(b)
+  if units~=nil then
+    print("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
     for key, u in pairs(units) do
       local rto = r
       if r==nil then

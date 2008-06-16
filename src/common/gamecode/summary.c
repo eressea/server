@@ -348,9 +348,9 @@ make_summary(void)
       if (fval(r, RF_ORCIFIED)) {
         s->orkifizierte_regionen++;
       }
-      if (rterrain(r) == T_VOLCANO) {
+      if (r->terrain == newterrain(T_VOLCANO)) {
         s->inactive_volcanos++;
-      } else if(rterrain(r) == T_VOLCANO_SMOKING) {
+      } else if (r->terrain == newterrain(T_VOLCANO_SMOKING)) {
         s->active_volcanos++;
       }
     }

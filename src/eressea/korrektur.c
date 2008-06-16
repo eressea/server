@@ -97,7 +97,7 @@ curse_emptiness(void)
     unit * u = r->units;
     if (r->land==NULL) continue;
     if (fval(r, RF_CHAOTIC)) continue;
-    if (rterrain(r)==T_GLACIER) continue;
+    if (r->terrain == newterrain(T_GLACIER)) continue;
     if (r->age<=200) continue;
     if (get_curse(r->attribs, ct)) continue;
     while (u && is_monsters(u->faction)) u=u->next;
@@ -440,13 +440,13 @@ road_decay(void)
         half = true;
       }
     }
-    else if (rterrain(r) == T_DESERT) {
+    else if (r->terrain == newterrain(T_DESERT)) {
       /* wenn keine Karawanserei existiert */
       if (!buildingtype_exists(r, bt_caravan)) {
         half = true;
       }
     }
-    else if (rterrain(r) == T_GLACIER) {
+    else if (r->terrain == newterrain(T_GLACIER)) {
       /* wenn kein Tunnel existiert */
       if (!buildingtype_exists(r, bt_tunnel)) {
         half = true;
@@ -484,7 +484,7 @@ iceberg(region * r)
     }
   }
   if (d==MAXDIRECTIONS) {
-    terraform(r, T_ICEBERG_SLEEP);
+    terraform_region(r, newterrain(T_ICEBERG_SLEEP));
   }
 }
 
@@ -528,9 +528,9 @@ fix_astralplane(void)
 
   while (*rs_p) {
     region * rs = *rs_p;
-    if (rterrain(rs)==T_FIREWALL && rplane(rs)==NULL) {
+    if (rs->terrain == newterrain(T_FIREWALL) && rplane(rs)==NULL) {
       region * ra = r_standard_to_astral(rs);
-      if (ra && rterrain(ra)!=T_ASTRALB) {
+      if (ra && ra->terrain != newterrain(T_ASTRALB)) {
         unit * u;
         ++fixes;
         for (u=ra->units;u;u=u->next) {
@@ -544,7 +544,7 @@ fix_astralplane(void)
             remove_unit(&ra->units, ra->units);
           }
           log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(rs, NULL), regionname(ra, NULL));
-          terraform(ra, T_ASTRALB);
+          terraform_region(ra, newterrain(T_ASTRALB));
         }
       }
     }
@@ -747,8 +747,8 @@ fix_astral_firewalls(void)
 {
   region * r;
   for (r = regions; r; r=r->next) {
-    if (r->planep==get_astralplane() && rterrain(r)==T_FIREWALL) {
-      terraform(r, T_ASTRALB);
+    if (r->planep==get_astralplane() && r->terrain == newterrain(T_FIREWALL)) {
+      terraform_region(r, newterrain(T_ASTRALB));
     }
   }
   return 0;

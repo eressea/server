@@ -3523,9 +3523,9 @@ static void
 flee(const troop dt)
 {
   fighter * fig = dt.fighter;
+  unit * u = fig->unit;
 
 #ifndef SIMPLE_ESCAPE
-  unit * u = fig->unit;
   int carry = personcapacity(u) - u->race->weight;
   int money;
 

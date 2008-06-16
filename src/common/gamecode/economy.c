@@ -468,7 +468,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   if (rc == new_race[RC_INSECT]) {
     gamedate date;
     get_gamedate(turn, &date);
-    if (date.season == 0 && rterrain(r) != T_DESERT) {
+    if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
 #ifdef INSECT_POTION
       boolean usepotion = false;
       unit *u2;
@@ -1984,7 +1984,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
 
 	if (u->race == new_race[RC_INSECT]) {
 		/* entweder man ist insekt, oder... */
-		if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT && !rbuildings(r)) {
+		if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT) && !rbuildings(r)) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
 			return;
 		}
@@ -2113,7 +2113,7 @@ expandselling(region * r, request * sellorders, int limit)
   max_products = rpeasants(r) / TRADE_FRACTION;
   if (max_products <= 0) return;
   
-  if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan"))) {
+  if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan"))) {
     max_products = rpeasants(r) * 2 / TRADE_FRACTION;
   }
   /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
@@ -2255,7 +2255,7 @@ static boolean
   if (findparam(s, u->faction->locale) == P_ANY) {
     unlimited = false;
 		n = rpeasants(r) / TRADE_FRACTION;
-		if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan")))
+		if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan")))
 			n *= 2;
 		if (n==0) {
 			cmistake(u, ord, 303, MSG_COMMERCE);
@@ -2278,7 +2278,7 @@ static boolean
 	/* In der Region muß es eine Burg geben. */
 
 	if (u->race == new_race[RC_INSECT]) {
-		if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT && !rbuildings(r)) {
+		if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT) && !rbuildings(r)) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
 			return false;
 		}
@@ -3269,7 +3269,7 @@ produce(void)
 
     if (sellorders) {
       int limit = rpeasants(r) / TRADE_FRACTION;
-      if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan")))
+      if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan")))
         limit *= 2;
       expandselling(r, sellorders, limited?limit:INT_MAX);
     }

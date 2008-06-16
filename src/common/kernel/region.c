@@ -1047,12 +1047,6 @@ setluxuries(region * r, const luxury_type * sale)
 }
 
 void
-terraform(region * r, terrain_t t)
-{
-  terraform_region(r, newterrain(t));
-}
-
-void
 terraform_region(region * r, const terrain_type * terrain)
 {
   /* Resourcen, die nicht mehr vorkommen können, löschen */

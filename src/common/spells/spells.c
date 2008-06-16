@@ -2135,7 +2135,7 @@ sp_ironkeeper(castorder *co)
   int cast_level = co->level;
   message * msg;
 
-  if (rterrain(r) != T_MOUNTAIN && rterrain(r) != T_GLACIER) {
+  if (r->terrain != newterrain(T_MOUNTAIN) && r->terrain != newterrain(T_GLACIER)) {
     report_failure(mage, co->order);
     return 0;
   }
@@ -2547,8 +2547,8 @@ sp_summondragon(castorder *co)
 
   f = get_monsters();
 
-  if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT
-      && rterrain(r) != T_GLACIER) {
+  if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
+      && r->terrain != newterrain(T_GLACIER)) {
     report_failure(mage, co->order);
     return 0;
   }

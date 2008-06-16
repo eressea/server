@@ -1063,7 +1063,7 @@ spawn_dragons(void)
       equip_unit(u, get_equipment("monster_seaserpent"));
     }
 
-    if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) 
+    if ((r->terrain == newterrain(T_GLACIER) || r->terrain == newterrain(T_SWAMP) || r->terrain == newterrain(T_DESERT)) && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) 
     {
       if (chance(0.80)) {
         u = createunit(r, monsters, nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
