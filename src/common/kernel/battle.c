@@ -67,7 +67,6 @@
 #include <sys/stat.h>
 
 static FILE *bdebug;
-#undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
 #define TACTICS_BONUS 1 /* when undefined, we have a tactics round. else this is the bonus tactics give */
 #define TACTICS_RANDOM /* undefine this to deactivate */
@@ -3579,18 +3578,6 @@ flee(const troop dt)
   kill_troop(dt);
 }
 
-#ifdef DELAYED_OFFENSE
-static boolean
-guarded_by(region * r, faction * f)
-{
-  unit * u;
-  for (u=r->units;u;u=u->next) {
-    if (u->faction == f && getguard(u)) return true;
-  }
-  return false;
-}
-#endif
-
 static boolean
 init_battle(region * r, battle **bp)
 {
@@ -3631,11 +3618,6 @@ init_battle(region * r, battle **bp)
           /**
           ** Fehlerbehandlung Angreifer
           **/
-#ifdef DELAYED_OFFENSE
-          if (get_moved(&u->attribs) && !guarded_by(r, u->faction)) {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "no_attack_after_advance", ""));
-          }
-#endif
           if (LongHunger(u)) {
             cmistake(u, ord, 225, MSG_BATTLE);
             continue;

@@ -629,48 +629,44 @@ xml_region(report_context * ctx, seen_region * sr)
   child = xmlNewNode(xct->ns_atl, BAD_CAST "terrain");
   xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", (const xmlChar *)terrain_name(r));
 
-  for (u=r->units;u;u=u->next) {
-    if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
-      xmlAddChild(node, xml_unit(ctx, u, sr->mode));
-    }
-  }
-
-  /* report all units. they are pre-sorted in an efficient manner */
-  u = r->units;
-  while (b) {
-    while (b && (!u || u->building!=b)) {
-      xmlAddChild(node, xml_building(ctx, sr, b, NULL));
-      b = b->next;
-    }
-    if (b) {
-      child = xmlAddChild(node, xml_building(ctx, sr, b, u));
-      while (u && u->building==b) {
-        xmlAddChild(child, xml_unit(ctx, u, sr->mode));
-        u = u->next;
+  if (sr->mode>see_neighbour) {
+    /* report all units. they are pre-sorted in an efficient manner */
+    u = r->units;
+    while (b) {
+      while (b && (!u || u->building!=b)) {
+        xmlAddChild(node, xml_building(ctx, sr, b, NULL));
+        b = b->next;
       }
-      b = b->next;
-    }
-  }
-  while (u && !u->ship) {
-    if (stealthmod>INT_MIN) {
-      if (u->faction == ctx->f || cansee(ctx->f, r, u, stealthmod)) {
-        xmlAddChild(node, xml_unit(ctx, u, sr->mode));
+      if (b) {
+        child = xmlAddChild(node, xml_building(ctx, sr, b, u));
+        while (u && u->building==b) {
+          xmlAddChild(child, xml_unit(ctx, u, sr->mode));
+          u = u->next;
+        }
+        b = b->next;
       }
     }
-    u = u->next;
-  }
-  while (sh) {
-    while (sh && (!u || u->ship!=sh)) {
-      xmlAddChild(node, xml_ship(ctx, sr, sh, NULL));
-      sh = sh->next;
-    }
-    if (sh) {
-      child = xmlAddChild(node, xml_ship(ctx, sr, sh, u));
-      while (u && u->ship==sh) {
-        xmlAddChild(child, xml_unit(ctx, u, sr->mode));
-        u = u->next;
+    while (u && !u->ship) {
+      if (stealthmod>INT_MIN) {
+        if (u->faction == ctx->f || cansee(ctx->f, r, u, stealthmod)) {
+          xmlAddChild(node, xml_unit(ctx, u, sr->mode));
+        }
       }
-      sh = sh->next;
+      u = u->next;
+    }
+    while (sh) {
+      while (sh && (!u || u->ship!=sh)) {
+        xmlAddChild(node, xml_ship(ctx, sr, sh, NULL));
+        sh = sh->next;
+      }
+      if (sh) {
+        child = xmlAddChild(node, xml_ship(ctx, sr, sh, u));
+        while (u && u->ship==sh) {
+          xmlAddChild(child, xml_unit(ctx, u, sr->mode));
+          u = u->next;
+        }
+        sh = sh->next;
+      }
     }
   }
   return node;
