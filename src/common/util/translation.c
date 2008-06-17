@@ -390,6 +390,9 @@ translate(const char* format, const void * userdata, const char* vars, variant a
     rv = parse_string(&stack, format, userdata);
   }
   if (rv!=NULL) {
+    if (rv[0]) {
+      log_error(("residual data after parsing: %s\n", rv));
+    }
     rv = (const char*)opop(&stack).v;
     free(stack->begin);
     free(stack);
