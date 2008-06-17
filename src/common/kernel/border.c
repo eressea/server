@@ -357,7 +357,6 @@ border_type bt_fogwall = {
 static const char *
 b_nameillusionwall(const border * b, const region * r, const struct faction * f, int gflags)
 {
-  /* TODO: UNICODE: f->locale bestimmt die Sprache */
   int fno = b->data.i;
   unused(b);
   unused(r);
@@ -394,7 +393,6 @@ boolean b_blockquestportal(const border * b, const unit * u, const region * r) {
 static const char *
 b_namequestportal(const border * b, const region * r, const struct faction * f, int gflags)
 {
-  /* TODO: UNICODE: f->locale bestimmt die Sprache */
   const char * bname;
   int lock = b->data.i;
   unused(b);

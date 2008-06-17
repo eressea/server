@@ -1279,6 +1279,7 @@ durchreisende(FILE * F, const region * r, const faction * f)
         }
       }
     }
+    /* TODO: finish localization */
     if (maxtravel == 1) {
       bytes = (int)strlcpy(bufp, " hat die Region durchquert.", size);
     } else {

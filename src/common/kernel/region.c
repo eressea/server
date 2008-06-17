@@ -979,7 +979,8 @@ free_regions(void)
 }
 
 /** creates a name for a region
- * TODO: Make this XML-configurable and allow non-ascii characters again.
+ * TODO: Make vowels XML-configurable and allow non-ascii characters again.
+ * - that will probably require a wchar_t * string to pick from.
  */
 static char *
 makename(void)
@@ -988,13 +989,11 @@ makename(void)
   size_t nk, ne, nv, ns;
   static char name[16];
   const char *kons = "bcdfghklmnprstvwz",
+    *start = "bcdgtskpvfr",
     *end = "nlrdst",
-#if 0
-    *vowels = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy",
-#else
-    *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy",
-#endif
-    *start = "bcdgtskpvfr";
+    *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
+
+  /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
 
   nk = strlen(kons);
   ne = strlen(end);

@@ -582,16 +582,16 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
     translist(&from->ships, &to->ships, sh);
     sh->region = to;
   }
+  if (!trail) {
+    leave_trail(sh, from, route);
+    trail = true;
+  }
 
   while (*iunit!=NULL) {
     unit *u = *iunit;
     assert(u->region == from);
 
     if (u->ship == sh) {
-      if (!trail) {
-        leave_trail(sh, from, route);
-        trail = true;
-      }
       if (route!=NULL) mark_travelthru(u, from, route, NULL);
       if (from!=to) {
         u->ship = NULL;		/* damit move_unit() kein leave() macht */
@@ -2521,6 +2521,7 @@ movement(void)
 
 /** Overrides long orders with a FOLLOW order if the target is moving.
  * FOLLOW SHIP is a long order, and doesn't need to be treated in here.
+ * BUGS: http://bugs.eressea.de/view.php?id=1444 (A folgt B folgt C)
  */
 void
 follow_unit(unit * u)
