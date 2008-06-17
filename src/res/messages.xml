@@ -1967,9 +1967,8 @@
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) erschuf einen heiligen Hain von $int($amount) Schößlingen."</text>
-    <text locale="fr">$if($isnull($mage),"An unknown magician ",$unit($mage)) created a holy forest of $int($amount) young trees."</text>
-    <text locale="en">$if($isnull($mage),"An unknown magician ",$unit($mage)) created a holy forest of $int($amount) young trees."</text>
+    <text locale="de">$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) erschuf einen heiligen Hain von $int($amount) Schößlingen.</text>
+    <text locale="en">$if($isnull($mage),"An unknown magician ",$unit($mage)) created a holy forest of $int($amount) young trees.</text>
   </message>
   <message name="harvest_effect" section="magic">
     <type>

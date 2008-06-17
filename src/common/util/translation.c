@@ -383,10 +383,17 @@ translate(const char* format, const void * userdata, const char* vars, variant a
     }
   }
 
-  if (parse(&stack, format, userdata)==NULL) return NULL;
-  rv = (const char*)opop(&stack).v;
-  free(stack->begin);
-  free(stack);
+  if (format[0]=='"') {
+    rv = parse(&stack, format, userdata);
+  }
+  else {
+    rv = parse_string(&stack, format, userdata);
+  }
+  if (rv!=NULL) {
+    rv = (const char*)opop(&stack).v;
+    free(stack->begin);
+    free(stack);
+  }
   return rv;
 }
 

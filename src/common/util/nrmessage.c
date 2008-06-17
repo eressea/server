@@ -131,7 +131,6 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
       c+= strlen(strcpy(c, mtype->pnames[i]));
     }
     nrt->vars = strdup(zNames);
-    /* TODO: really necessary to strdup them all? here? better to extend the caller? hash? */
   }
 }
 
