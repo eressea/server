@@ -112,7 +112,7 @@ txt_r_tok_buf(struct storage * store, char * result, size_t size)
     }
   } else {
     /* trick to skip when no result expected */
-    fscanf((FILE *)store->userdata, "%*s", format);
+    fscanf((FILE *)store->userdata, "%*s");
   }
 }
 
