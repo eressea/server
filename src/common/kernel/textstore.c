@@ -103,11 +103,16 @@ static void
 txt_r_tok_buf(struct storage * store, char * result, size_t size)
 {
   char format[16];
-  format[0]='%';
-  sprintf(format+1, "%us", size);
-  fscanf((FILE *)store->userdata, format, result);
-  if (result[0]==NULL_TOKEN) {
-    result[0] = 0;
+  if (result && size>0) {
+    format[0]='%';
+    sprintf(format+1, "%us", size);
+    fscanf((FILE *)store->userdata, format, result);
+    if (result[0]==NULL_TOKEN) {
+      result[0] = 0;
+    }
+  } else {
+    /* trick to skip when no result expected */
+    fscanf((FILE *)store->userdata, "%*s", format);
   }
 }
 
