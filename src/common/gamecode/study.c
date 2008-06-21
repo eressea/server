@@ -357,6 +357,7 @@ teach_cmd(unit * u, struct order * ord)
 
     while (!parser_end()) {
       unit * u2 = getunit(r, u->faction);
+      boolean feedback;
       ++count;
 
       /* Falls die Unit nicht gefunden wird, Fehler melden */
@@ -393,6 +394,8 @@ teach_cmd(unit * u, struct order * ord)
         continue;
       }
 
+      feedback = u->faction==u2->faction || alliedunit(u2, u->faction, HELP_GUARD);
+
       /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
        * ihre neuen Nummern übersetzt. */
       if (zOrder[0]) strcat(zOrder, " ");
@@ -419,17 +422,19 @@ teach_cmd(unit * u, struct order * ord)
 
       /* u is teacher, u2 is student */
       if (eff_skill_study(u2, sk, r) > eff_skill_study(u, sk, r)-TEACHDIFFERENCE) {
-        ADDMSG(&u->faction->msgs,
-          msg_feedback(u, ord, "teach_asgood", "student", u2));
+        if (feedback) {
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "teach_asgood", "student", u2));
+        }
         continue;
       }
       if (sk == SK_MAGIC) {
         /* ist der Magier schon spezialisiert, so versteht er nur noch
         * Lehrer seines Gebietes */
-        if (find_magetype(u2) != 0
-          && find_magetype(u) != find_magetype(u2))
+        if (find_magetype(u2) != 0 && find_magetype(u) != find_magetype(u2))
         {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_different_magic", "target", u2));
+          if (feedback) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_different_magic", "target", u2));
+          }
           continue;
         }
       }
@@ -691,11 +696,14 @@ learn_cmd(unit * u, order * ord)
       while (teach->teachers[index] && index!=MAXTEACHERS) {
         unit * teacher = teach->teachers[index++];
         if (teacher->faction != u->faction) {
+          boolean feedback = alliedunit(u, teacher->faction, HELP_GUARD);
+          if (feedback) {
+            ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
+              "teacher student skill level", teacher, u, sk,
+              effskill(u, sk)));
+          }
           ADDMSG(&u->faction->msgs, msg_message("teach_student",
             "teacher student skill", teacher, u, sk));
-          ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
-            "teacher student skill level", teacher, u, sk,
-            effskill(u, sk)));
         }
       }
     }
