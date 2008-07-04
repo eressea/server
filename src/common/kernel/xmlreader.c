@@ -644,6 +644,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   if (xml_bvalue(node, "pierce", false)) flags |= WTF_PIERCE;
   if (xml_bvalue(node, "cut", false)) flags |= WTF_CUT;
   if (xml_bvalue(node, "blunt", false)) flags |= WTF_BLUNT;
+  if (xml_bvalue(node, "siege", false)) flags |= WTF_SIEGE;
 
   propValue = xmlGetProp(node, BAD_CAST "skill");
   assert(propValue!=NULL);

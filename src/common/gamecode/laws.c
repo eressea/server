@@ -2423,7 +2423,7 @@ can_start_guarding(const unit * u)
 {
   if (u->status>=ST_FLEE) return E_GUARD_FLEEING;
   if (fval(u->race, RCF_UNARMEDGUARD)) return E_GUARD_OK;
-  if (!armedmen(u)) return E_GUARD_UNARMED;
+  if (!armedmen(u, true)) return E_GUARD_UNARMED;
   if (u->faction->age < NewbieImmunity()) return E_GUARD_NEWBIE;
   return E_GUARD_OK;
 }

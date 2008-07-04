@@ -1305,7 +1305,7 @@ can_guard(const unit * guard, const unit * u)
 {
   if (fval(guard, UFL_ISNEW)) return false;
   if (guard->number<=0 || !cansee(guard->faction, guard->region, u, 0)) return false;
-  if (besieged(guard) || !(fval(guard->race, RCF_UNARMEDGUARD) || armedmen(guard))) return false;
+  if (besieged(guard) || !(fval(guard->race, RCF_UNARMEDGUARD) || armedmen(guard, true))) return false;
 
   return !alliedunit(guard, u->faction, HELP_GUARD);
 }
@@ -3056,33 +3056,33 @@ expandtax(region * r, request * taxorders)
 void
 tax_cmd(unit * u, struct order * ord, request ** taxorders)
 {
-	/* Steuern werden noch vor der Forschung eingetrieben */
+  /* Steuern werden noch vor der Forschung eingetrieben */
   region * r = u->region;
-	unit *u2;
-	int n;
-	request *o;
-	int max;
+  unit *u2;
+  int n;
+  request *o;
+  int max;
 
-	if (!humanoidrace(u->race) && !is_monsters(u->faction)) {
-		cmistake(u, ord, 228, MSG_INCOME);
-		return;
-	}
+  if (!humanoidrace(u->race) && !is_monsters(u->faction)) {
+    cmistake(u, ord, 228, MSG_INCOME);
+    return;
+  }
 
-	if (fval(u, UFL_WERE)) {
-		cmistake(u, ord, 228, MSG_INCOME);
-		return;
-	}
+  if (fval(u, UFL_WERE)) {
+    cmistake(u, ord, 228, MSG_INCOME);
+    return;
+  }
 
-	if (besieged(u)) {
-		cmistake(u, ord, 60, MSG_INCOME);
-		return;
-	}
-	n = armedmen(u);
+  if (besieged(u)) {
+    cmistake(u, ord, 60, MSG_INCOME);
+    return;
+  }
+  n = armedmen(u, false);
 
-	if (!n) {
-		cmistake(u, ord, 48, MSG_INCOME);
-		return;
-	}
+  if (!n) {
+    cmistake(u, ord, 48, MSG_INCOME);
+    return;
+  }
 
   init_tokens(ord);
   skip_token();

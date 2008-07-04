@@ -233,7 +233,8 @@ siege_cmd(unit * u, order * ord)
     d = 0;
   }
 
-  if ((bewaffnete = armedmen(u)) == 0 && d == 0) {
+  bewaffnete = armedmen(u, true);
+  if (d == 0 && bewaffnete == 0) {
     /* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
     cmistake(u, ord, 80, MSG_EVENT);
     return;

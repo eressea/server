@@ -198,7 +198,7 @@ message_faction(battle * b, faction * f, struct message * m)
 }
 
 int
-armedmen(const unit * u)
+armedmen(const unit * u, boolean siege_weapons)
 {
   item * itm;
   int n = 0;
@@ -211,7 +211,7 @@ armedmen(const unit * u)
        * Personen minimiert */
       for (itm=u->items;itm;itm=itm->next) {
         const weapon_type * wtype = resource2weapon(itm->type->rtype);
-        if (wtype==NULL) continue;
+        if (wtype==NULL || (wtype->flags & WTF_SIEGE)) continue;
         if (effskill(u, wtype->skill) >= 1) n += itm->number;
         /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
         if (n>u->number) break;

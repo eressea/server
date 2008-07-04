@@ -170,7 +170,7 @@ extern struct faction *factions;
 
 void addstrlist(strlist ** SP, const char *s);
 
-int armedmen(const struct unit * u);
+int armedmen(const struct unit * u, boolean siege_weapons);
 
 unsigned int atoip(const char *s);
 unsigned int getuint(void);

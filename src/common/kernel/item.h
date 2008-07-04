@@ -192,6 +192,7 @@ typedef struct armor_type {
 #define WTF_PIERCE       0x04
 #define WTF_CUT          0x08
 #define WTF_BLUNT        0x10
+#define WTF_SIEGE        0x20
 #define WTF_ARMORPIERCING 0x40 /* armor has only half value */
 
 typedef struct weapon_type {

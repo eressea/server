@@ -870,7 +870,7 @@ is_guardian_r(unit * u2)
   if (u2->number == 0) return false;
   if ((u2->flags&UFL_GUARD)==0) return false;
   if (besieged(u2)) return false;
-  if (!armedmen(u2) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
+  if (!armedmen(u2, true) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
   return true;
 }
 

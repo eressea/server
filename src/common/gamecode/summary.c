@@ -379,7 +379,7 @@ make_summary(void)
           }
           s->spielerpferde += get_item(u, I_HORSE);
           s->playermoney += get_money(u);
-          s->armed_men += armedmen(u);
+          s->armed_men += armedmen(u, true);
           for (itm=u->items;itm;itm=itm->next) {
             if (itm->type->rtype->wtype) {
               s->waffen += itm->number;

@@ -439,7 +439,7 @@
       <construction skill="cartmaking" minskill="5" reqsize="1">
         <requirement type="log" quantity="10"/>
       </construction>
-      <weapon bash="true" missile="true" skill="catapult" offmod="0" defmod="0" reload="5">
+      <weapon siege="true" bash="true" missile="true" skill="catapult" offmod="0" defmod="0" reload="5">
         <damage type="rider" value="3d10+5"/>
         <damage type="footman" value="3d10+5"/>
         <modifier type="missile_target" value="4"/>
