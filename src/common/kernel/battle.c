@@ -2432,10 +2432,10 @@ aftermath(battle * b)
           scale_number(du, df->run.number);
           du->hp = df->run.hp;
           setguard(du, GUARD_NONE);
-#ifdef SIMPLE_ESCAPE
-          if (du->status<=ST_FLEE) leave(du->region, du);
-#else
+          /* must leave ships or buildings, or a stealthy hobbit 
+           * can hold castles indefinitely */
           leave(du->region, du);
+#ifndef SIMPLE_ESCAPE
           if (df->run.region) {
             run_to(du, df->run.region);
             df->run.region = du->region;
