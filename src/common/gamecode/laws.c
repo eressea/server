@@ -339,7 +339,7 @@ age_unit(region * r, unit * u)
     }
   }
 #ifdef ASTRAL_ITEM_RESTRICTIONS
-  if (u->region->planep==get_astralplane()) {
+  if (u->region && u->region->planep==get_astralplane()) {
     item ** itemp = &u->items;
     while (*itemp) {
       item * itm = *itemp;
