@@ -43,143 +43,143 @@ get_regions(void) {
 }
 
 static eressea::list<unit *>
-region_units(const region& r) {
-  return eressea::list<unit *>(r.units);
+region_units(const region * r) {
+  return eressea::list<unit *>(r->units);
 }
 
 static eressea::list<building *>
-region_buildings(const region& r) {
-  return eressea::list<building *>(r.buildings);
+region_buildings(const region * r) {
+  return eressea::list<building *>(r->buildings);
 }
 
 static eressea::list<ship *>
-region_ships(const region& r) {
-  return eressea::list<ship *>(r.ships);
+region_ships(const region * r) {
+  return eressea::list<ship *>(r->ships);
 }
 
 static void
-region_setname(region& r, const char * name) {
-  if (r.land) rsetname((&r), name);
+region_setname(region * r, const char * name) {
+  if (r->land) rsetname(r, name);
 }
 
 static const char *
-region_getterrain(const region& r) {
-  return (const char *)r.terrain->_name;
+region_getterrain(const region * r) {
+  return (const char *)r->terrain->_name;
 }
 
 static const char *
-region_getname(const region& r) {
-  if (r.land) return (const char *)r.land->name;
+region_getname(const region * r) {
+  if (r->land) return (const char *)r->land->name;
   return NULL;
 }
 
 static void
-lua_region_setowner(region& r, faction * f) {
-  region_setowner(&r, f);
+lua_region_setowner(region * r, faction * f) {
+  region_setowner(r, f);
 }
 
 static faction *
-lua_region_getowner(const region& r) {
-  return region_owner(&r);
+lua_region_getowner(const region * r) {
+  return region_owner(r);
 }
 
 static void
-region_setherbtype(region& r, const char * str) {
+region_setherbtype(region * r, const char * str) {
   const struct resource_type * rtype = rt_find(str);
   if (rtype!=NULL && rtype->itype!=NULL) {
-    rsetherbtype(&r, rtype->itype);
+    rsetherbtype(r, rtype->itype);
   }
 }
 
 static const char *
-region_getherbtype(const region& r) {
-  const struct item_type * itype = rherbtype(&r);
+region_getherbtype(const region * r) {
+  const struct item_type * itype = rherbtype(r);
   if (itype==NULL) return NULL;
   return itype->rtype->_name[0];
 }
 
 static void
-region_setinfo(region& r, const char * info)
+region_setinfo(region * r, const char * info)
 {
-  free(r.display);
-  r.display = strdup(info);
+  free(r->display);
+  r->display = strdup(info);
 }
 
 static const char *
-region_getinfo(const region& r) {
-  return (const char *)r.display;
+region_getinfo(const region * r) {
+  return (const char *)r->display;
 }
 
 static int
-region_plane(const region& r)
+region_plane(const region * r)
 {
-  if (r.planep==NULL) return 0;
-  return r.planep->id;
+  if (r->planep==NULL) return 0;
+  return r->planep->id;
 }
 
 static void
-region_addnotice(region& r, const char * str)
+region_addnotice(region * r, const char * str)
 {
-  addmessage(&r, NULL, str, MSG_MESSAGE, ML_IMPORTANT);
+  addmessage(r, NULL, str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
 static std::ostream&
 operator<<(std::ostream& stream, const region& r)
 {
-  stream << regionname(&r, NULL) << ", " << region_getterrain(r);
+  stream << regionname(&r, NULL) << ", " << (const char *)r.terrain->_name;
   return stream;
 }
 
 static bool
-operator==(const region& a, const region&b)
+operator==(const region& a, const region& b)
 {
   return a.x==b.x && a.y==b.y;
 }
 
 static bool
-region_getflag(const region& r, int bit)
+region_getflag(const region * r, int bit)
 {
-  if (r.flags & (1<<bit)) return true;
+  if (r->flags & (1<<bit)) return true;
   return false;
 }
 
 static void
-region_setflag(region& r, int bit, bool set)
+region_setflag(region * r, int bit, bool set)
 {
-  if (set) r.flags |= (1<<bit);
-  else r.flags &= ~(1<<bit);
+  if (set) r->flags |= (1<<bit);
+  else r->flags &= ~(1<<bit);
 }
 
 static int
-region_getresource(const region& r, const char * type)
+region_getresource(const region * r, const char * type)
 {
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
     const rawmaterial * rm;
-    for (rm=r.resources;rm;rm=rm->next) {
+    for (rm=r->resources;rm;rm=rm->next) {
       if (rm->type->rtype==rtype) {
         return rm->amount;
       }
     }
-    if (rtype==rt_find("money")) return rmoney(&r);
-    if (rtype==rt_find("horse")) return rhorses(&r);
-    if (rtype==rt_find("peasant")) return rpeasants(&r);
+    if (rtype==rt_find("money")) return rmoney(r);
+    if (rtype==rt_find("horse")) return rhorses(r);
+    if (rtype==rt_find("peasant")) return rpeasants(r);
   } else {
-    if (strcmp(type, "seed")==0) return rtrees(&r, 0);
-    if (strcmp(type, "sapling")==0) return rtrees(&r, 1);
-    if (strcmp(type, "tree")==0) return rtrees(&r, 2);
-    if (strcmp(type, "grave")==0) return deathcount(&r);
-    if (strcmp(type, "chaos")==0) return chaoscount(&r);
+    if (strcmp(type, "seed")==0) return rtrees(r, 0);
+    if (strcmp(type, "sapling")==0) return rtrees(r, 1);
+    if (strcmp(type, "tree")==0) return rtrees(r, 2);
+    if (strcmp(type, "grave")==0) return deathcount(r);
+    if (strcmp(type, "chaos")==0) return chaoscount(r);
   }
   return 0;
 }
 
 static void
-region_setresource(region& r, const char * type, int value)
+region_setresource(region * r, const char * type, int value)
 {
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
-    rawmaterial * rm = r.resources;
+    rawmaterial * rm = r->resources;
     while (rm) {
       if (rm->type->rtype==rtype) {
         rm->amount = value;
@@ -188,41 +188,41 @@ region_setresource(region& r, const char * type, int value)
       rm=rm->next;
     }
     if (!rm) {
-      if (rtype==rt_find("money")) rsetmoney(&r, value);
-      else if (rtype==rt_find("peasant")) rsetpeasants(&r, value);
-      else if (rtype==rt_find("horse")) rsethorses(&r, value);
+      if (rtype==rt_find("money")) rsetmoney(r, value);
+      else if (rtype==rt_find("peasant")) rsetpeasants(r, value);
+      else if (rtype==rt_find("horse")) rsethorses(r, value);
     }
   } else {
     if (strcmp(type, "seed")==0) {
-      rsettrees(&r, 0, value);
+      rsettrees(r, 0, value);
     } else if (strcmp(type, "sapling")==0) {
-      rsettrees(&r, 1, value);
+      rsettrees(r, 1, value);
     } else if (strcmp(type, "tree")==0) {
-      rsettrees(&r, 2, value);
+      rsettrees(r, 2, value);
     } else if (strcmp(type, "grave")==0) {
-      int fallen = value-deathcount(&r);
-      deathcounts(&r, fallen);
+      int fallen = value-deathcount(r);
+      deathcounts(r, fallen);
     } else if (strcmp(type, "chaos")==0) {
-      int fallen = value-chaoscount(&r);
-      chaoscounts(&r, fallen);
+      int fallen = value-chaoscount(r);
+      chaoscounts(r, fallen);
     }
   }
 }
 
 static void
-region_setroad(region& r, int dir, lua_Number size)
+region_setroad(region * r, int dir, lua_Number size)
 {
-  if (r.terrain->max_road>0) {
-    rsetroad(&r, (direction_t)dir, (short)(r.terrain->max_road * size));
+  if (r->terrain->max_road>0) {
+    rsetroad(r, (direction_t)dir, (short)(r->terrain->max_road * size));
   }
 }
 
 static lua_Number
-region_getroad(region& r, int dir)
+region_getroad(region * r, int dir)
 {
-  lua_Number result = rroad(&r, (direction_t)dir);
-  if (r.terrain->max_road<=0 || result<=0) return 0;
-  return r.terrain->max_road / result;
+  lua_Number result = rroad(r, (direction_t)dir);
+  if (r->terrain->max_road<=0 || result<=0) return 0;
+  return r->terrain->max_road / result;
 }
 
 static region *
@@ -247,24 +247,24 @@ region_terraform(short x, short y, const char * tname)
 }
 
 static region *
-region_next(const region& r, int dir)
+region_next(const region * r, int dir)
 {
   if (dir<0 || dir >=MAXDIRECTIONS) return NULL;
-  return r_connect(&r, (direction_t)dir);
+  return r_connect(r, (direction_t)dir);
 }
 
 static void
-region_adddirection(region& r, region &rt, const char * name, const char * info)
+region_adddirection(region * r, region * rt, const char * name, const char * info)
 {
-  create_special_direction(&r, &rt, -1, info, name);
-  spec_direction * sd = special_direction(&r, &rt);
+  create_special_direction(r, rt, -1, info, name);
+  spec_direction * sd = special_direction(r, rt);
   sd->active = 1;
 }
 
 static void
-region_remove(region& r)
+region_remove(region * r)
 {
-  remove_region(&regions, &r);
+  remove_region(&regions, r);
 }
 
 static void
@@ -282,7 +282,7 @@ plane_remove(int plane_id)
 }
 
 void
-region_move(region& r, short x, short y)
+region_move(region * r, short x, short y)
 {
   if (findregion(x,y)) {
     log_error(("Bei %d, %d gibt es schon eine Region.\n", x, y));
@@ -291,41 +291,41 @@ region_move(region& r, short x, short y)
 #ifdef FAST_CONNECT
   direction_t dir;
   for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-    region * rn = r.connect[dir];
+    region * rn = r->connect[dir];
     if (rn!=NULL) {
-      direction_t reldir = reldirection(rn, &r);
+      direction_t reldir = reldirection(rn, r);
       rn->connect[reldir] = NULL;
     }
     rn = findregion(x+delta_x[dir], y+delta_y[dir]);
     if (rn!=NULL) {
       direction_t reldir = (direction_t)((dir + 3) % MAXDIRECTIONS);
-      rn->connect[reldir] = &r;
+      rn->connect[reldir] = r;
     }
-    r.connect[dir] = rn;
+    r->connect[dir] = rn;
   }
 #endif
-  runhash(&r);
-  r.x = x;
-  r.y = y;
-  rhash(&r);
+  runhash(r);
+  r->x = x;
+  r->y = y;
+  rhash(r);
 }
 
 static eressea::list<std::string, item *, eressea::bind_items>
-region_items(const region& r) {
-  if (r.land) {
-    return eressea::list<std::string, item *, eressea::bind_items>(r.land->items);
+region_items(const region * r) {
+  if (r->land) {
+    return eressea::list<std::string, item *, eressea::bind_items>(r->land->items);
   } else {
     return eressea::list<std::string, item *, eressea::bind_items>(NULL);
   }
 }
 
 static int
-region_additem(region& r, const char * iname, int number)
+region_additem(region * r, const char * iname, int number)
 {
   if (iname!=NULL) {
     const item_type * itype = it_find(iname);
-    if (itype!=NULL && r.land) {
-      item * i = i_change(&r.land->items, itype, number);
+    if (itype!=NULL && r->land) {
+      item * i = i_change(&r->land->items, itype, number);
       return i?i->number:0;
     } // if (itype!=NULL)
   }
@@ -333,22 +333,22 @@ region_additem(region& r, const char * iname, int number)
 }
 
 static bool
-region_getkey(region& r, const char * name)
+region_getkey(region * r, const char * name)
 {
   int flag = atoi36(name);
-  attrib * a = find_key(r.attribs, flag);
+  attrib * a = find_key(r->attribs, flag);
   return (a!=NULL);
 }
 
 static void
-region_setkey(region& r, const char * name, bool value)
+region_setkey(region * r, const char * name, bool value)
 {
   int flag = atoi36(name);
-  attrib * a = find_key(r.attribs, flag);
+  attrib * a = find_key(r->attribs, flag);
   if (a==NULL && value) {
-    add_key(&r.attribs, flag);
+    add_key(&r->attribs, flag);
   } else if (a!=NULL && !value) {
-    a_remove(&r.attribs, a);
+    a_remove(&r->attribs, a);
   }
 }
 

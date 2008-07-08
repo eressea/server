@@ -95,21 +95,21 @@ lua_writereports(void)
 }
 
 static void
-message_unit(unit& sender, unit& target, const char * str)
+message_unit(unit * sender, unit * target, const char * str)
 {
-  deliverMail(target.faction, sender.region, &sender, str, &target);
+  deliverMail(target->faction, sender->region, sender, str, target);
 }
 
 static void
-message_faction(unit& sender, faction& target, const char * str)
+message_faction(unit * sender, faction * target, const char * str)
 {
-  deliverMail(&target, sender.region, &sender, str, NULL);
+  deliverMail(target, sender->region, sender, str, NULL);
 }
 
 static void
-message_region(unit& sender, const char * str)
+message_region(unit * sender, const char * str)
 {
-  ADDMSG(&sender.region->msgs, msg_message("mail_result", "unit message", &sender, str));
+  ADDMSG(&sender->region->msgs, msg_message("mail_result", "unit message", sender, str));
 }
 
 static void
@@ -181,9 +181,9 @@ process_orders(void)
 }
 
 static int
-levitate_ship(ship& sh, unit& mage, double power, int duration)
+levitate_ship(ship * sh, unit * mage, double power, int duration)
 {
-  curse * c = shipcurse_flyingship(&sh, &mage, power, duration);
+  curse * c = shipcurse_flyingship(sh, mage, power, duration);
   if (c) {
     return c->no;
   }

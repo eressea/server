@@ -72,7 +72,7 @@ public:
     return E_OK;
   }
 
-  int set_unit(const char * param, const unit& u) {
+  int set_unit(const char * param, const unit * u) {
     if (mtype==0) return E_INVALID_MESSAGE;
 
     int i = get_param(param);
@@ -83,12 +83,12 @@ public:
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    args[i].v = (void*)&u;
+    args[i].v = (void*)u;
 
     return E_OK;
   }
 
-  int set_region(const char * param, const region& r) {
+  int set_region(const char * param, const region * r) {
     if (mtype==0) return E_INVALID_MESSAGE;
 
     int i = get_param(param);
@@ -99,7 +99,7 @@ public:
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    args[i].v = (void*)&r;
+    args[i].v = (void*)r;
 
     return E_OK;
   }
@@ -138,21 +138,21 @@ public:
     return E_OK;
   }
 
-  int send_faction(faction& f) {
+  int send_faction(faction * f) {
     if (mtype==0) return E_INVALID_MESSAGE;
     if (msg==NULL) {
       msg = msg_create(mtype, args);
     }
-    add_message(&f.msgs, msg);
+    add_message(&f->msgs, msg);
     return E_OK;
   }
 
-  int send_region(region& r) {
+  int send_region(region * r) {
     if (mtype==0) return E_INVALID_MESSAGE;
     if (msg==NULL) {
       msg = msg_create(mtype, args);
     }
-    add_message(&r.msgs, msg);
+    add_message(&r->msgs, msg);
     return E_OK;
   }
 

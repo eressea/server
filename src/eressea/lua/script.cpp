@@ -274,10 +274,10 @@ lua_maintenance(const unit * u)
 }
 
 static void
-unit_setscript(struct unit& u, const luabind::object& f)
+unit_setscript(struct unit * u, const luabind::object& f)
 {
   luabind::object * fptr = new luabind::object(f);
-  setscript(&u.attribs, fptr);
+  setscript(&u->attribs, fptr);
 }
 
 static void

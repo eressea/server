@@ -65,33 +65,33 @@ public:
 };
 
 static eressea::list<unit *, unit *, factionunit>
-faction_units(const faction& f)
+faction_units(const faction * f)
 {
-  return eressea::list<unit *, unit *, factionunit>(f.units);
+  return eressea::list<unit *, unit *, factionunit>(f->units);
 }
 
 static void
-faction_setalliance(faction& f, alliance * team)
+faction_setalliance(faction * f, alliance * team)
 {
-  if (f.alliance==0) setalliance(&f, team);
+  if (f->alliance==0) setalliance(f, team);
 }
 
 static alliance *
-faction_getalliance(const faction& f)
+faction_getalliance(const faction * f)
 {
-  return f.alliance;
+  return f->alliance;
 }
 
 const char *
-faction_getlocale(const faction& f)
+faction_getlocale(const faction * f)
 {
-  return locale_name(f.locale);
+  return locale_name(f->locale);
 }
 
 void
-faction_setlocale(faction& f, const char * name)
+faction_setlocale(faction * f, const char * name)
 {
-  f.locale = find_locale(name);
+  f->locale = find_locale(name);
 }
 
 static std::ostream& 
@@ -108,57 +108,57 @@ operator==(const faction& a, const faction&b)
 }
 
 static int
-faction_getpolicy(const faction& a, const faction& b, const char * flag)
+faction_getpolicy(const faction * a, const faction * b, const char * flag)
 {
   int mode;
 
   for (mode=0;helpmodes[mode].name!=NULL;++mode) {
     if (strcmp(flag, helpmodes[mode].name)==0) {
-      return get_alliance(&a, &b) & mode;
+      return get_alliance(a, b) & mode;
     }
   }
   return 0;
 }
 
 static void
-faction_setpolicy(faction& a, faction& b, const char * flag, bool value)
+faction_setpolicy(faction * a, faction * b, const char * flag, bool value)
 {
   int mode;
 
   for (mode=0;helpmodes[mode].name!=NULL;++mode) {
     if (strcmp(flag, helpmodes[mode].name)==0) {
-      if (value) set_alliance(&a, &b, get_alliance(&a, &b) | helpmodes[mode].status);
-      else set_alliance(&a, &b, get_alliance(&a, &b) & ~helpmodes[mode].status);
+      if (value) set_alliance(a, b, get_alliance(a, b) | helpmodes[mode].status);
+      else set_alliance(a, b, get_alliance(a, b) & ~helpmodes[mode].status);
       break;
     }
   }
 }
 
 static const char *
-faction_get_variable(faction& f, const char *key)
+faction_get_variable(faction * f, const char *key)
 {
-	return get_variable((&f)->attribs, key);
+	return get_variable(f->attribs, key);
 }
 
 static void
-faction_set_variable(faction& f, const char *key, const char *value)
+faction_set_variable(faction * f, const char *key, const char *value)
 {
-	set_variable(&((&f)->attribs), key, value);
+	set_variable(&f->attribs, key, value);
 }
 
 static void
-faction_delete_variable(faction& f, const char *key)
+faction_delete_variable(faction * f, const char *key)
 {
-	return delete_variable(&((&f)->attribs), key);
+	return delete_variable(&f->attribs, key);
 }
 
 static int
-faction_additem(faction& f, const char * iname, int number)
+faction_additem(faction * f, const char * iname, int number)
 {
   if (iname!=NULL) {
     const item_type * itype = it_find(iname);
     if (itype!=NULL) {
-      item * i = i_change(&f.items, itype, number);
+      item * i = i_change(&f->items, itype, number);
       return i?i->number:0;
     } // if (itype!=NULL)
   }
@@ -166,78 +166,78 @@ faction_additem(faction& f, const char * iname, int number)
 }
 
 static void
-faction_addnotice(faction& f, const char * str)
+faction_addnotice(faction * f, const char * str)
 {
-  const char * loc = LOC(f.locale, str);
-  ADDMSG(&f.msgs, msg_message("msg_event", "string", loc));
+  const char * loc = LOC(f->locale, str);
+  ADDMSG(&f->msgs, msg_message("msg_event", "string", loc));
 }
 
 static const char *
-faction_getrace(const faction& f)
+faction_getrace(const faction * f)
 {
-  return f.race->_name[0];
+  return f->race->_name[0];
 }
 
 static void
-faction_setrace(faction& f, const char * rcname)
+faction_setrace(faction * f, const char * rcname)
 {
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
-    f.race = rc;
+    f->race = rc;
   }
 }
 
 static eressea::list<std::string, item *, eressea::bind_items>
-faction_items(const faction& f) {
-  return eressea::list<std::string, item *, eressea::bind_items>(f.items);
+faction_items(const faction * f) {
+  return eressea::list<std::string, item *, eressea::bind_items>(f->items);
 }
 
 void
-faction_set_passw(faction& f, const char * passw)
+faction_set_passw(faction * f, const char * passw)
 {
-  free(f.passw);
-  f.passw = strdup(passw);
+  free(f->passw);
+  f->passw = strdup(passw);
 }
 
 const char *
-faction_get_passw(const faction& f)
+faction_get_passw(const faction * f)
 {
-  return f.passw;
+  return f->passw;
 }
 
 void
-faction_set_banner(faction& f, const char * banner)
+faction_set_banner(faction * f, const char * banner)
 {
-  free(f.banner);
-  f.banner = strdup(banner);
+  free(f->banner);
+  f->banner = strdup(banner);
 }
 
 const char *
-faction_get_banner(const faction& f)
+faction_get_banner(const faction * f)
 {
-  if (f.banner) {
-    return (const char*)f.banner;
+  if (f->banner) {
+    return (const char*)f->banner;
   }
   return "";
 }
 
 void
-faction_set_email(faction& f, const char * email)
+faction_set_email(faction * f, const char * email)
 {
-  free(f.email);
-  f.email = strdup(email);
+  free(f->email);
+  f->email = strdup(email);
 }
 
 const char *
-faction_get_email(const faction& f)
+faction_get_email(const faction * f)
 {
-  return f.email;
+  return f->email;
 }
 
 void
-faction_getorigin(const faction& f, int &x, int &y)
+faction_getorigin(const faction * f, int &x, int &y)
 {
-  ursprung * origin = f.ursprung;
+  ursprung * origin = f->ursprung;
   while (origin!=NULL && origin->id!=0) {
     origin = origin->next;
   }
@@ -249,49 +249,41 @@ faction_getorigin(const faction& f, int &x, int &y)
     y = 0;
   }
 }
-
-void
-faction_setorigin(faction& f, int x, int y)
-{
-  x = 0;
-  y = 0;
-}
-
 short
-faction_getorigin_x(const faction& f) {
-  return f.ursprung->x;
+faction_getorigin_x(const faction * f) {
+  return f->ursprung->x;
 }
 void
-faction_setorigin_x(faction& f, short x) {
-  f.ursprung->x = x;
+faction_setorigin_x(faction * f, short x) {
+  f->ursprung->x = x;
 }
 
 static short
-faction_getorigin_y(const faction& f) {
-  return f.ursprung->y;
+faction_getorigin_y(const faction * f) {
+  return f->ursprung->y;
 }
 
 static void
-faction_setorigin_y(faction& f, short y) {
-  f.ursprung->y = y;
+faction_setorigin_y(faction * f, short y) {
+  f->ursprung->y = y;
 }
 
 static int
-faction_countheroes(const faction& f)
+faction_countheroes(const faction * f)
 {
-  return countheroes(&f);
+  return countheroes(f);
 }
 
 static void
-faction_renumber(faction& f, int no)
+faction_renumber(faction * f, int no)
 {
-  renumber_faction(&f, no);
+  renumber_faction(f, no);
 }
 
 static int
-faction_maxheroes(const faction& f)
+faction_maxheroes(const faction * f)
 {
-  return maxheroes(&f);
+  return maxheroes(f);
 }
 
 void
@@ -304,7 +296,7 @@ bind_faction(lua_State * L)
     def("faction_origin", &faction_getorigin, pure_out_value(_2) + pure_out_value(_3)),
 
     class_<struct faction>("faction")
-    .def(tostring(self))
+    .def(tostring(const_self))
     .def(self == faction())
     .def("set_policy", &faction_setpolicy)
     .def("get_policy", &faction_getpolicy)
@@ -331,7 +323,6 @@ bind_faction(lua_State * L)
     .property("items", &faction_items, return_stl_iterator)
     .property("x", &faction_getorigin_x, &faction_setorigin_x)
     .property("y", &faction_getorigin_y, &faction_setorigin_y)
-    //.property("origin", &faction_getorigin, &faction_setorigin, pure_out_value(_2) + pure_out_value(_3), copy)
 
     .def("renum", &faction_renumber)
     .def("add_notice", &faction_addnotice)

@@ -57,8 +57,8 @@ public:
 };
 
 static eressea::list<spell *, spell_list *, bind_spell_ptr>
-unit_spells(const unit& u) {
-  sc_mage * mage = get_mage(&u);
+unit_spells(const unit * u) {
+  sc_mage * mage = get_mage(u);
   if (mage==NULL) return eressea::list<spell *, spell_list *, bind_spell_ptr>(NULL);
   spell_list * splist = mage->spells;
   return eressea::list<spell *, spell_list *, bind_spell_ptr>(splist);
@@ -82,13 +82,13 @@ public:
 };
 
 static eressea::list<std::string, order *, bind_orders>
-unit_orders(const unit& u) {
-  return eressea::list<std::string, order *, bind_orders>(u.orders);
+unit_orders(const unit * u) {
+  return eressea::list<std::string, order *, bind_orders>(u->orders);
 }
 
 static eressea::list<std::string, item *, eressea::bind_items>
-unit_items(const unit& u) {
-  return eressea::list<std::string, item *, eressea::bind_items>(u.items);
+unit_items(const unit * u) {
+  return eressea::list<std::string, item *, eressea::bind_items>(u->items);
 }
 
 static unit *
@@ -99,84 +99,84 @@ add_unit(faction * f, region * r)
 }
 
 static void
-unit_setnumber(unit& u, int number)
+unit_setnumber(unit * u, int number)
 {
-  if (u.number==0) {
-    set_number(&u, number);
-    u.hp = unit_max_hp(&u) * number;
+  if (u->number==0) {
+    set_number(u, number);
+    u->hp = unit_max_hp(u) * number;
   } else {
-    scale_number(&u, number);
+    scale_number(u, number);
   }
 }
 
 static void
-unit_setracename(unit& u, const char * name)
+unit_setracename(unit * u, const char * name)
 {
-  set_racename(&u.attribs, name);
+  set_racename(&u->attribs, name);
 }
 
 static int
-unit_getnumber(const unit& u)
+unit_getnumber(const unit * u)
 {
-  return u.number;
+  return u->number;
 }
 
 static int
-unit_getitem(const unit& u, const char * iname)
+unit_getitem(const unit * u, const char * iname)
 {
   if (iname!=NULL) {
     const item_type * itype = it_find(iname);
     if (itype!=NULL) {
-      return i_get(u.items, itype);
+      return i_get(u->items, itype);
     }
   }
   return -1;
 }
 
 static int
-unit_additem(unit& u, const char * iname, int number)
+unit_additem(unit * u, const char * iname, int number)
 {
   if (iname!=NULL) {
     const item_type * itype = it_find(iname);
     if (itype!=NULL) {
-      item * i = i_change(&u.items, itype, number);
+      item * i = i_change(&u->items, itype, number);
       return i?i->number:0;
     } // if (itype!=NULL)
   }
   const item_type * itype = it_find(iname);
   if (itype!=NULL) {
-    item * i = i_change(&u.items, itype, number);
+    item * i = i_change(&u->items, itype, number);
     return i?i->number:0;
   }
   return -1;
 }
 
 static int
-unit_usepooled(unit& u, const char * iname, int number)
+unit_usepooled(unit * u, const char * iname, int number)
 {
   const resource_type * rtype = rt_find(iname);
   if (rtype!=NULL) {
-    return use_pooled(&u, rtype, GET_DEFAULT, number);
+    return use_pooled(u, rtype, GET_DEFAULT, number);
   }
   return -1;
 }
 
 static int
-unit_getpooled(unit& u, const char * iname)
+unit_getpooled(unit * u, const char * iname)
 {
   const resource_type * rtype = rt_find(iname);
   if (rtype!=NULL) {
-    return get_pooled(&u, rtype, GET_DEFAULT, INT_MAX);
+    return get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
   }
   return -1;
 }
 
 static int
-unit_getskill(const unit& u, const char * skname)
+unit_getskill(const unit * u, const char * skname)
 {
   skill_t sk = sk_find(skname);
   if (sk!=NOSKILL) {
-    skill * sv = get_skill(&u, sk);
+    skill * sv = get_skill(u, sk);
     if (sv==NULL) return 0;
     return sv->level;
   }
@@ -184,44 +184,44 @@ unit_getskill(const unit& u, const char * skname)
 }
 
 static int
-unit_effskill(const unit& u, const char * skname)
+unit_effskill(const unit * u, const char * skname)
 {
   skill_t sk = sk_find(skname);
   if (sk!=NOSKILL) {
-    return effskill(&u, sk);
+    return effskill(u, sk);
   }
   return -1;
 }
 
 static int
-unit_setskill(unit& u, const char * skname, int level)
+unit_setskill(unit * u, const char * skname, int level)
 {
   skill_t sk = sk_find(skname);
   if (sk!=NOSKILL) {
-    set_level(&u, sk, level);
+    set_level(u, sk, level);
     return level;
   } // if (sk!=NULL)
   return -1;
 }
 
 static const char *
-unit_getrace(const unit& u)
+unit_getrace(const unit * u)
 {
-  return u.race->_name[0];
+  return u->race->_name[0];
 }
 
 static void
-unit_setrace(unit& u, const char * rcname)
+unit_setrace(unit * u, const char * rcname)
 {
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
-    if (u.irace==u.race) u.irace = rc;
-    u.race = rc;
+    if (u->irace==u->race) u->irace = rc;
+    u->race = rc;
   }
 }
 
 static void
-unit_castspell(unit& u, const char * name)
+unit_castspell(unit * u, const char * name)
 {
   spell_list * slist = spells;
   while (slist!=NULL) {
@@ -232,10 +232,10 @@ unit_castspell(unit& u, const char * name)
       co->familiar = NULL;
       co->force = sp->level;
       co->level = sp->level;
-      co->magician.u = &u;
+      co->magician.u = u;
       co->order = NULL;
       co->par = NULL;
-      co->rt = u.region;
+      co->rt = u->region;
       co->sp = sp;
       if (sp->sp_function==NULL) {
         log_error(("spell '%s' has no function.\n", sp->sname));
@@ -250,14 +250,14 @@ unit_castspell(unit& u, const char * name)
 }
 
 static void
-unit_addspell(unit& u, const char * name)
+unit_addspell(unit * u, const char * name)
 {
   bool add = false;
   spell_list * slist = spells;
   while (slist!=NULL) {
     spell * sp = slist->data;
     if (strcmp(name, sp->sname)==0) {
-      struct sc_mage * mage = get_mage(&u);
+      struct sc_mage * mage = get_mage(u);
       if (add) log_error(("two spells are called %s.\n", name));
       add_spell(mage, sp);
       add = true;
@@ -268,9 +268,9 @@ unit_addspell(unit& u, const char * name)
 }
 
 static unit *
-unit_isfamiliar(const unit& u)
+unit_isfamiliar(const unit * u)
 {
-  attrib * a = a_find(u.attribs, &at_familiarmage);
+  attrib * a = a_find(u->attribs, &at_familiarmage);
   if (a!=NULL) {
     return (unit*)a->data.v;
   }
@@ -278,9 +278,9 @@ unit_isfamiliar(const unit& u)
 }
 
 static unit *
-unit_getfamiliar(const unit& u)
+unit_getfamiliar(const unit * u)
 {
-  attrib * a = a_find(u.attribs, &at_familiar);
+  attrib * a = a_find(u->attribs, &at_familiar);
   if (a!=NULL) {
     return (unit*)a->data.v;
   }
@@ -288,15 +288,15 @@ unit_getfamiliar(const unit& u)
 }
 
 static void
-unit_setfamiliar(unit& mage, unit& familiar)
+unit_setfamiliar(unit * mage, unit * familiar)
 {
-  create_newfamiliar(&mage, &familiar);
+  create_newfamiliar(mage, familiar);
 }
 
 static void
-unit_removespell(unit& u, const spell * sp)
+unit_removespell(unit * u, const spell * sp)
 {
-  sc_mage * mage = get_mage(&u);
+  sc_mage * mage = get_mage(u);
   if (mage!=NULL) {
     spell_list ** isptr = &mage->spells;
     while (*isptr && (*isptr)->data != sp) {
@@ -311,9 +311,9 @@ unit_removespell(unit& u, const spell * sp)
 }
 
 static int
-unit_hpmax(const unit& u)
+unit_hpmax(const unit * u)
 {
-  return unit_max_hp(&u);
+  return unit_max_hp(u);
 }
 
 static void
@@ -323,25 +323,25 @@ unit_setregion(unit * u, region * r)
 }
 
 static region *
-unit_getregion(const unit& u)
+unit_getregion(const unit * u)
 {
-  return u.region;
+  return u->region;
 }
 
 static void
-unit_setship(unit& u, const ship& s)
+unit_setship(unit * u, ship * s)
 {
-  leave(u.region, &u);
-  if (u.region!=s.region) {
-    move_unit(&u, s.region, NULL);
+  leave(u->region, u);
+  if (u->region!=s->region) {
+    move_unit(u, s->region, NULL);
   }
-  u.ship = findship(s.no);
+  u->ship = s;
 }
 
 static ship *
-unit_getship(const unit& u)
+unit_getship(const unit * u)
 {
-  return u.ship;
+  return u->ship;
 }
 
 static void
@@ -351,76 +351,75 @@ unit_setbuilding(unit * u, building * b)
   if (u->region!=b->region) {
     move_unit(u, b->region, NULL);
   }
-  assert(b==findbuilding(b->no));
   u->building = b;
 }
 
 static building *
-unit_getbuilding(const unit& u)
+unit_getbuilding(const unit * u)
 {
-  return u.building;
+  return u->building;
 }
 
 static int
-unit_getid(const unit& u)
+unit_getid(const unit * u)
 {
-  return u.no;
+  return u->no;
 }
 
 static void
-unit_setid(unit& u, int id)
+unit_setid(unit * u, int id)
 {
   unit * nu = findunit(id);
   if (nu==NULL) {
-    uunhash(&u);
-    u.no = id;
-    uhash(&u);
+    uunhash(u);
+    u->no = id;
+    uhash(u);
   }
 }
 
 static const char *
-unit_getname(const unit& u)
+unit_getname(const unit * u)
 {
-  return (const char *)u.name;
+  return (const char *)u->name;
 }
 
 static void
-unit_setname(unit& u, const char * name)
+unit_setname(unit * u, const char * name)
 {
-  free(u.name);
-  u.name = strdup(name);
+  free(u->name);
+  u->name = strdup(name);
 }
 
 static const char *
-unit_getinfo(const unit& u)
+unit_getinfo(const unit * u)
 {
-  return (const char *)u.display;
+  return (const char *)u->display;
 }
 
 static void
-unit_setinfo(unit& u, const char * info)
+unit_setinfo(unit * u, const char * info)
 {
-  free(u.display);
-  u.display = strdup(info);
+  free(u->display);
+  u->display = strdup(info);
 }
 
 static bool
-get_flag(const unit& u, const char * name)
+get_flag(const unit * u, const char * name)
 {
   int flag = atoi36(name);
-  attrib * a = find_key(u.attribs, flag);
+  attrib * a = find_key(u->attribs, flag);
   return (a!=NULL);
 }
 
 static void
-set_flag(unit& u, const char * name, bool value)
+set_flag(unit * u, const char * name, bool value)
 {
   int flag = atoi36(name);
-  attrib * a = find_key(u.attribs, flag);
+  attrib * a = find_key(u->attribs, flag);
   if (a==NULL && value) {
-    add_key(&u.attribs, flag);
+    add_key(&u->attribs, flag);
   } else if (a!=NULL && !value) {
-    a_remove(&u.attribs, a);
+    a_remove(&u->attribs, a);
   }
 }
 
@@ -434,74 +433,74 @@ operator<<(std::ostream& stream, const unit& u)
 }
 
 static bool 
-operator==(const unit& a, const unit&b)
+operator==(const unit& a, const unit &b)
 {
   return a.no==b.no;
 }
 
 static int
-unit_getaura(const unit& u)
+unit_getaura(const unit * u)
 {
-  return get_spellpoints(&u);
+  return get_spellpoints(u);
 }
 
 static void
-unit_setaura(unit& u, int points)
+unit_setaura(unit * u, int points)
 {
-  return set_spellpoints(&u, points);
+  return set_spellpoints(u, points);
 }
 
 static faction *
-unit_getfaction(const unit& u)
+unit_getfaction(const unit * u)
 {
-  return u.faction;
+  return u->faction;
 }
 
 static void
-unit_setfaction(unit& u, faction& f)
+unit_setfaction(unit * u, faction * f)
 {
-  u_setfaction(&u, &f);
+  u_setfaction(u, f);
 }
 
 static const char * 
-unit_getmagic(const unit& u)
+unit_getmagic(const unit * u)
 {
-  sc_mage * mage = get_mage(&u);
+  sc_mage * mage = get_mage(u);
   return mage?magietypen[mage->magietyp]:NULL;
 }
 
 static void
-unit_setmagic(unit& u, const char * type)
+unit_setmagic(unit * u, const char * type)
 {
-  sc_mage * mage = get_mage(&u);
+  sc_mage * mage = get_mage(u);
   magic_t mtype;
   for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
     if (strcmp(magietypen[mtype], type)==0) break;
   }
   if (mtype==MAXMAGIETYP) return;
   if (mage==NULL) {
-    mage = create_mage(&u, mtype);
+    mage = create_mage(u, mtype);
   }
 }
 
 static void
-unit_addorder(unit& u, const char * str)
+unit_addorder(unit * u, const char * str)
 {
-  order * ord = parse_order(str, u.faction->locale);
-  addlist(&u.orders, ord);
-  u.faction->lastorders = turn;
+  order * ord = parse_order(str, u->faction->locale);
+  addlist(&u->orders, ord);
+  u->faction->lastorders = turn;
 }
 
 static void
-unit_clearorders(unit& u)
+unit_clearorders(unit * u)
 {
-  free_orders(&u.orders);
+  free_orders(&u->orders);
 }
 
 static int
-unit_weight(const struct unit& u)
+unit_weight(const struct unit * u)
 {
-  return weight(&u);
+  return weight(u);
 }
 
 typedef struct fctr_data {
@@ -552,32 +551,32 @@ static struct trigger_type tt_functor = {
 };
 
 static trigger *
-trigger_functor(struct unit& u, const object& f)
+trigger_functor(struct unit * u, const object& f)
 {
   luabind::object * fptr = new luabind::object(f);
   trigger * t = t_new(&tt_functor);
   fctr_data * td = (fctr_data*)t->data.v;
-  td->target = &u;
+  td->target = u;
   td->fptr = fptr;
   return t;
 }
 
 static void
-unit_addhandler(struct unit& u, const char * event, const object& f)
+unit_addhandler(struct unit * u, const char * event, const object& f)
 {
-  add_trigger(&u.attribs, event, trigger_functor(u, f));
+  add_trigger(&u->attribs, event, trigger_functor(u, f));
 }
 
 static int
-unit_capacity(const struct unit& u)
+unit_capacity(const struct unit * u)
 {
-  return walkingcapacity(&u);
+  return walkingcapacity(u);
 }
 
 static void
-unit_addnotice(unit& u, const char * str)
+unit_addnotice(unit * u, const char * str)
 {
-  addmessage(u.region, u.faction, str, MSG_MESSAGE, ML_IMPORTANT);
+  addmessage(u->region, u->faction, str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
 void

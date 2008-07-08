@@ -45,46 +45,46 @@ operator==(const ship& a, const ship& sh)
 }
 
 static ship *
-add_ship(region& r, const char * sname)
+add_ship(region * r, const char * sname)
 {
   const ship_type * stype = st_find(sname);
-  ship * sh = new_ship(stype, NULL, &r);
+  ship * sh = new_ship(stype, NULL, r);
   sh->size = stype->construction->maxsize;
   return sh;
 }
 
 static int
-ship_maxsize(const ship& s) {
-  return s.type->construction->maxsize;
+ship_maxsize(const ship * s) {
+  return s->type->construction->maxsize;
 }
 
 const char *
-ship_gettype(const ship& s) {
-  return s.type->name[0];
+ship_gettype(const ship * s) {
+  return s->type->name[0];
 }
 
 int
-ship_getweight(const ship& s) {
+ship_getweight(const ship * s) {
   int w, c;
-  getshipweight(&s, &w, &c);
+  getshipweight(s, &w, &c);
   return w;
 }
 
 int
-ship_getcapacity(const ship& s) {
-  return shipcapacity(&s);
+ship_getcapacity(const ship * s) {
+  return shipcapacity(s);
 }
 
 static void
-ship_setregion(ship& sh, region& r)
+ship_setregion(ship * sh, region * r)
 {
-  move_ship(&sh, sh.region, &r, NULL);
+  move_ship(sh, sh->region, r, NULL);
 }
 
 static region *
-ship_getregion(const ship& sh)
+ship_getregion(const ship * sh)
 {
-  return sh.region;
+  return sh->region;
 }
 
 void

@@ -75,11 +75,11 @@ lc_age(struct attrib * a)
 }
 
 static int
-building_addaction(building& b, const char * fname, const char * param)
+building_addaction(building * b, const char * fname, const char * param)
 {
-  attrib * a = a_add(&b.attribs, a_new(&at_building_action));
+  attrib * a = a_add(&b->attribs, a_new(&at_building_action));
   building_action * data = (building_action*)a->data.v;
-  data->b = &b;
+  data->b = b;
   data->fname = strdup(fname);
   if (param) data->param = strdup(param);
 
@@ -87,41 +87,41 @@ building_addaction(building& b, const char * fname, const char * param)
 }
 
 static const char *
-building_getinfo(const building& b)
+building_getinfo(const building * b)
 {
-  return (const char*)b.display;
+  return (const char*)b->display;
 }
 
 static void
-building_setinfo(building& b, const char * info)
+building_setinfo(building * b, const char * info)
 {
-  free(b.display);
-  b.display = strdup(info);
+  free(b->display);
+  b->display = strdup(info);
 }
 
 static const char *
-building_getname(const building& b)
+building_getname(const building * b)
 {
-  return (const char *)b.name;
+  return (const char *)b->name;
 }
 
 static void
-building_setname(building& b, const char * name)
+building_setname(building * b, const char * name)
 {
-  free(b.name);
-  b.name = strdup(name);
+  free(b->name);
+  b->name = strdup(name);
 }
 
 static region *
-building_getregion(const building& b)
+building_getregion(const building * b)
 {
-  return b.region;
+  return b->region;
 }
 
 static void
-building_setregion(building& bld, region& r)
+building_setregion(building * bld, region * r)
 {
-  building * b = &bld;
+  building * b = bld;
   building ** blist = &b->region->buildings;
   while (*blist && *blist!=b) {
     blist = &(*blist)->next;
@@ -129,11 +129,11 @@ building_setregion(building& bld, region& r)
   *blist = b->next;
   b->next = NULL;
 
-  blist = &r.buildings;
+  blist = &r->buildings;
   while (*blist && *blist!=b) blist = &(*blist)->next;
   *blist = b;
 
-  b->region = &r;
+  b->region = r;
 }
 
 static std::ostream& 

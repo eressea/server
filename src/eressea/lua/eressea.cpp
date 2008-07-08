@@ -159,9 +159,9 @@ get_direction(const char * name)
 }
 
 static void
-lua_equipunit(unit& u, const char * eqname)
+lua_equipunit(unit * u, const char * eqname)
 {
-  equip_unit(&u, get_equipment(eqname));
+  equip_unit(u, get_equipment(eqname));
 }
 
 static void
@@ -199,11 +199,11 @@ update_subscriptions(void)
 }
 
 static void
-lua_learnskill(unit& u, const char * skname, float chances)
+lua_learnskill(unit * u, const char * skname, float chances)
 {
   skill_t sk = sk_find(skname);
   if (sk!=NOSKILL) {
-    learn_skill(&u, sk, chances);
+    learn_skill(u, sk, chances);
   }
 }
 
