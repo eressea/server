@@ -66,13 +66,15 @@ extern "C" {
 #define PLAGUE_HEALCHANCE  0.25F /* Wahrscheinlichkeit Heilung */
 #define PLAGUE_HEALCOST    30    /* Heilkosten */
 
-/** Monster */
+/* Chance of a monster attack */
+#define MONSTERATTACK  0.4F
 
-#define MONSTERATTACK  0.4F /* Chance für Monsterangriff */
-
-/** Gebäude */
-#define COLLAPSE_CHANCE    0.4F /* Chance für Einsturz bei unversorgtem Gebaeude */
-#define COLLAPSE_SURVIVAL  0.5F /* Soviele % überleben den Einsturz */
+/** Chance of an unmaintained building crashing */
+/* #define COLLAPSE_CHANCE 0.4F */
+#undef COLLAPSE_CHANCE
+/** chance to survive the crash of a building */
+/* #define COLLAPSE_SURVIVAL 0.5F */
+#undef COLLAPSE_SURVIVAL
 
 /* Magiesystem */
 #define NIGHT_EYE_TALENT        5

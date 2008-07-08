@@ -973,6 +973,7 @@ maintain(building * b, boolean first)
 	return true;
 }
 
+#ifdef COLLAPSE_CHANCE
 static void
 gebaeude_stuerzt_ein(region * r, building * b)
 {
@@ -990,11 +991,13 @@ gebaeude_stuerzt_ein(region * r, building * b)
       freset(u, UFL_OWNER);
       leave(r,u);
       n = u->number;
+#ifdef COLLAPSE_SURVIVAL
       for (i = 0; i < n; i++) {
         if (rng_double() >= COLLAPSE_SURVIVAL) {
           ++loss;
         }
       }
+#endif
       scale_number(u, u->number - loss);
       opfer += loss;
     }
@@ -1012,6 +1015,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
   msg_release(msg);
   remove_building(&r->buildings, b);
 }
+#endif
 
 void
 maintain_buildings(region * r, boolean crash)
@@ -1023,10 +1027,13 @@ maintain_buildings(region * r, boolean crash)
 
     /* the second time, send a message */
     if (crash) {
+#ifdef COLLAPSE_CHANCE
       if (!maintained && (rng_double() < COLLAPSE_CHANCE)) {
         gebaeude_stuerzt_ein(r, b);
         continue;
-      } else if (!fval(b, BLD_WORKING)) {
+      }
+#endif
+      if (!fval(b, BLD_WORKING)) {
         unit * u = buildingowner(r, b);
         const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
         struct message * msg = msg_message(msgtype, "building", b);

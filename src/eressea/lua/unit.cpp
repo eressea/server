@@ -317,9 +317,9 @@ unit_hpmax(const unit& u)
 }
 
 static void
-unit_setregion(unit& u, region& r)
+unit_setregion(unit * u, region * r)
 {
-  move_unit(&u, &r, NULL);
+  move_unit(u, r, NULL);
 }
 
 static region *
@@ -329,13 +329,13 @@ unit_getregion(const unit& u)
 }
 
 static void
-unit_setship(unit& u, ship& s)
+unit_setship(unit& u, const ship& s)
 {
   leave(u.region, &u);
   if (u.region!=s.region) {
-    unit_setregion(u, *s.region);
+    move_unit(&u, s.region, NULL);
   }
-  u.ship = &s;
+  u.ship = findship(s.no);
 }
 
 static ship *
@@ -345,13 +345,14 @@ unit_getship(const unit& u)
 }
 
 static void
-unit_setbuilding(unit& u, building& b)
+unit_setbuilding(unit * u, building * b)
 {
-  leave(u.region, &u);
-  if (u.region!=b.region) {
-    unit_setregion(u, *b.region);
+  leave(u->region, u);
+  if (u->region!=b->region) {
+    move_unit(u, b->region, NULL);
   }
-  u.building = &b;
+  assert(b==findbuilding(b->no));
+  u->building = b;
 }
 
 static building *

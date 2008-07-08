@@ -56,9 +56,9 @@ lc_age(struct attrib * a)
       try {
         if (fparam) {
           std::string param(fparam);
-          retval = luabind::call_function<int>(L, fname, *b, param);
+          retval = luabind::call_function<int>(L, fname, b, param);
         } else {
-          retval = luabind::call_function<int>(L, fname, *b);
+          retval = luabind::call_function<int>(L, fname, b);
         }
       }
       catch (luabind::error& e) {
@@ -166,10 +166,10 @@ public:
 
 
 static eressea::list<unit *, unit *, buildingunit>
-building_units(const building& b) {
-  region * r = b.region;
+building_units(const building * b) {
+  region * r = b->region;
   unit * u = r->units;
-  while (u!=NULL && (!u->building || u->building->no!=b.no)) u=u->next;
+  while (u!=NULL && (!u->building || u->building->no!=b->no)) u=u->next;
   return eressea::list<unit *, unit *, buildingunit>(u);
 }
 
