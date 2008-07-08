@@ -765,10 +765,14 @@ cr_output_unit(FILE * F, const region * r,
     }
   }
 
-  if (u->building)
+  if (u->building) {
+    assert(u->building->region);
     fprintf(F, "%d;Burg\n", u->building->no);
-  if (u->ship)
+  }
+  if (u->ship) {
+    assert(u->ship->region);
     fprintf(F, "%d;Schiff\n", u->ship->no);
+  }
   if (getguard(u))
     fprintf(F, "%d;bewacht\n", 1);
   if ((b=usiege(u))!=NULL)
