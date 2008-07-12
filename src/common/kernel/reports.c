@@ -330,7 +330,7 @@ report_building(const struct building * b, const char ** name, const char ** ill
     *illusion = NULL;
 
     if (!init) {
-      bt_illusion = bt_find("illusion");
+      bt_illusion = bt_find("illusioncastle");
       init = 1;
     }
     if (bt_illusion && b->type==bt_illusion) {

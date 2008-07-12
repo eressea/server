@@ -466,7 +466,7 @@ remove_building(building ** blist, building * b)
   unit *u;
   direction_t d;
   static const struct building_type * bt_caravan, * bt_dam, * bt_tunnel;
-  boolean init = false;
+  static boolean init = false;
 
   if (!init) {
     init = true;

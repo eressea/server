@@ -1772,41 +1772,33 @@ nr_building(FILE *F, const seen_region * sr, const building * b, const faction *
 {
   region * r = sr->r;
   int i, bytes;
-  const char * bname;
+  const char * name, * bname, * billusion = NULL;
   const struct locale * lang = NULL;
-  const building_type * type = b->type;
-  static const struct building_type * bt_illusion;
   char buffer[8192], * bufp = buffer;
   size_t size = sizeof(buffer) - 1;
 
   rnl(F);
 
-  if (!bt_illusion) bt_illusion = bt_find("illusion");
   if (f) lang = f->locale;
 
   bytes = snprintf(bufp, size, "%s, %s %d, ", buildingname(b), LOC(f->locale, "nr_size"), b->size);
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
-  if (b->type==bt_illusion) {
-    attrib * a = a_find(b->attribs, &at_icastle);
-    if (a!=NULL) {
-      type = ((icastle_data*)a->data.v)->type;
-    }
-  }
-  bname = LOC(lang, buildingtype(type, b, b->size));
-  bytes = (int)strlcpy(bufp, bname, size);
+  report_building(b, &bname, &billusion);
+  name = LOC(lang, billusion?billusion:bname);
+  bytes = (int)strlcpy(bufp, name, size);
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-  if (type!=b->type) {
+  if (billusion) {
     unit * owner = buildingowner(r, b);
     if (owner && owner->faction==f) {
       /* illusion. report real type */
-      bname = LOC(lang, buildingtype(b->type, b, b->size));
-      bytes = snprintf(bufp, size, " (%s)", bname);
+      name = LOC(lang, bname);
+      bytes = snprintf(bufp, size, " (%s)", name);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     }
   }
 
-  if (b->size < type->maxsize) {
+  if (b->size < b->type->maxsize) {
     bytes = (int)strlcpy(bufp, " (im Bau)", size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   }
