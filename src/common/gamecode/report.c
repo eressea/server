@@ -2236,6 +2236,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
           nr_unit(F, f, u, 4, sr->mode);
         }
       }
+      assert(!u->building);
       u = u->next;
     }
     while (sh) {
@@ -2252,6 +2253,8 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
         sh = sh->next;
       }
     }
+
+    assert(!u);
 
     rnl(F);
     rpline(F);

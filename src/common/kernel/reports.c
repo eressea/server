@@ -1275,6 +1275,8 @@ prepare_reports(void)
     unit * u;
     plane * p = r->planep;
 
+    reorder_units(r);
+
     if (p) {
       watcher * w = p->watchers;
       for (;w;w=w->next) {

@@ -3924,7 +3924,6 @@ void
 processorders (void)
 {
   static int init = 0;
-  region *r;
   const char * str;
 
   if (!init) {
@@ -3947,12 +3946,6 @@ processorders (void)
    * Beschreibungen geändert haben */
   update_spells();
   warn_password();
-
-  /* we reorder the owners to be at the top of the building 
-   * and also everyone in the same building/ship in sequence */
-  for (r = regions;r;r=r->next) {
-    reorder_units(r);
-  }
 }
 
 int
