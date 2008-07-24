@@ -2434,7 +2434,9 @@ aftermath(battle * b)
           setguard(du, GUARD_NONE);
           /* must leave ships or buildings, or a stealthy hobbit 
            * can hold castles indefinitely */
-          leave(du->region, du);
+          if (!fval(r->terrain, SEA_REGION)) {
+            leave(du->region, du);
+          }
 #ifndef SIMPLE_ESCAPE
           if (df->run.region) {
             run_to(du, df->run.region);
