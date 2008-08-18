@@ -1262,19 +1262,31 @@ durchreisende(FILE * F, const region * r, const faction * f)
             } else {
               bytes = (int)strlcpy(bufp, "die ", size);
             }
-            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+            if (wrptr(&bufp, &size, bytes)!=0) {
+              WARN_STATIC_BUFFER();
+              break;
+            }
             bytes = (int)strlcpy(bufp, shipname(u->ship), size);
           } else {
             bytes = (int)strlcpy(bufp, unitname(u), size);
           }
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+          if (wrptr(&bufp, &size, bytes)!=0) {
+            WARN_STATIC_BUFFER();
+            break;
+          }
           
           if (counter + 1 < maxtravel) {
             bytes = (int)strlcpy(bufp, ", ", size);
-            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+            if (wrptr(&bufp, &size, bytes)!=0) {
+              WARN_STATIC_BUFFER();
+              break;
+            }
           } else if (counter + 1 == maxtravel) {
             bytes = (int)strlcpy(bufp, LOC(f->locale, "list_and"), size);
-            if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+            if (wrptr(&bufp, &size, bytes)!=0) {
+              WARN_STATIC_BUFFER();
+              break;
+            }
           }
         }
       }
