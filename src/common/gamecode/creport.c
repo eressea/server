@@ -276,40 +276,32 @@ cr_output_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
 static int
 cr_unit(variant var, char * buffer, const void * userdata)
 {
-  const faction * report = (const faction*)userdata;
   unit * u = (unit *)var.v;
   sprintf(buffer, "%d", u?u->no:-1);
-  unused(report);
   return 0;
 }
 
 static int
 cr_ship(variant var, char * buffer, const void * userdata)
 {
-  const faction * report = (const faction*)userdata;
   ship * u = (ship *)var.v;
   sprintf(buffer, "%d", u?u->no:-1);
-  unused(report);
   return 0;
 }
 
 static int
 cr_building(variant var, char * buffer, const void * userdata)
 {
-  const faction * report = (const faction*)userdata;
   building * u = (building *)var.v;
   sprintf(buffer, "%d", u?u->no:-1);
-  unused(report);
   return 0;
 }
 
 static int
 cr_faction(variant var, char * buffer, const void * userdata)
 {
-  const faction * report = (const faction*)userdata;
   faction * f = (faction *)var.v;
   sprintf(buffer, "%d", f?f->no:-1);
-  unused(report);
   return 0;
 }
 

@@ -180,7 +180,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode, int c
   if ((mode & GET_SLACK) && (mode & GET_RESERVE)) use = have;
   else {
     int reserve = get_reservation(u, rtype);
-    int slack = max(0, have-reserve);
+    int slack = MAX(0, have-reserve);
     if (mode & GET_RESERVE) use = have-slack;
     else if (mode & GET_SLACK) use = slack;
   }
@@ -216,17 +216,17 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
   }
 
   if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
-    n = min(use, have);
+    n = MIN(use, have);
   } else {
     int reserve = get_reservation(u, rtype);
-    int slack = max(0, have-reserve);
+    int slack = MAX(0, have-reserve);
     if (mode & GET_RESERVE) {
       n = have-slack;
-      n = min(use, n);
+      n = MIN(use, n);
       change_reservation(u, rtype, -n);
     }
     else if (mode & GET_SLACK) {
-      n = min(use, slack);
+      n = MIN(use, slack);
     }
   }
   if (n>0) {

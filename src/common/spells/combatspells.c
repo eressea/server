@@ -286,14 +286,14 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
     if (df->alive==0) continue;
     if (force<=0) break;
 
-    /* da n min(force, x), sollte force maximal auf 0 sinken */
+    /* da n MIN(force, x), sollte force maximal auf 0 sinken */
     assert(force >= 0);
 
     if (df->weapons) {
       int w;
       for (w=0;df->weapons[w].type!=NULL;++w) {
         weapon * wp = df->weapons;
-        int n = min(force, wp->used);
+        int n = MIN(force, wp->used);
         if (n) {
           requirement * mat = wp->type->itype->construction->materials;
           boolean iron = false;
@@ -841,7 +841,7 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
   region *r = b->region;
   unit *mage = fi->unit;
   attrib *a;
-  int force = max(1, (int)get_force(power, 3));
+  int force = MAX(1, (int)get_force(power, 3));
   message * msg;
 
   unused(sp);
@@ -933,7 +933,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 
     if (df->alive==0) continue;
     if (power<=0.0) break;
-    /* force sollte wegen des max(0,x) nicht unter 0 fallen können */
+    /* force sollte wegen des MAX(0,x) nicht unter 0 fallen können */
 
     if (is_magic_resistant(mage, df->unit, 0)) continue;
 
@@ -967,7 +967,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
       }
       k+=df->alive;
     }
-    power = max(0, power-n);
+    power = MAX(0, power-n);
   }
   cv_kill(fgs);
   free(fgs);
@@ -1066,12 +1066,12 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
   switch(sp->id) {
     case SPL_HERO:
       df_bonus = (int)(power/5);
-      force = max(1, lovar(get_force(power, 4)));
+      force = MAX(1, lovar(get_force(power, 4)));
       break;
 
     default:
       df_bonus = 1;
-      force = max(1, (int)power);
+      force = MAX(1, (int)power);
   }
 
   allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
@@ -1115,7 +1115,7 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
   switch(sp->id) {
     case SPL_BERSERK:
     case SPL_BLOODTHIRST:
-      at_bonus = max(1,level/3);
+      at_bonus = MAX(1,level/3);
       df_malus = 2;
       force = (int)get_force(power,2);
       break;
@@ -1165,7 +1165,7 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
   int targets = 0;
   message * m;
 
-  at_malus = max(1,level - 4);
+  at_malus = MAX(1,level - 4);
   df_malus = 2;
   force = (int)get_force(power, 2);
 
@@ -1427,7 +1427,7 @@ sp_fumbleshield(fighter * fi, int level, double power, spell * sp)
     case SPL_CERRDOR_FUMBLESHIELD:
     case SPL_TYBIED_FUMBLESHIELD:
       duration = 100;
-      effect = max(1, 25-level);
+      effect = MAX(1, 25-level);
       break;
 
     default:
@@ -1473,7 +1473,7 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
   }
 
   healable = count_healable(b, fi);
-  healable = (int)min(k, healable);
+  healable = (int)MIN(k, healable);
   while (healable--) {
     fighter * tf = select_corpse(b, fi);
     if (tf!=NULL && tf->side->casualties > 0
@@ -1521,7 +1521,7 @@ sp_keeploot(fighter * fi, int level, double power, spell * sp)
   message_all(b, m);
   msg_release(m);
 
-  b->keeploot = (int)max(25, b->keeploot + 5*power);
+  b->keeploot = (int)MAX(25, b->keeploot + 5*power);
 
   return level;
 }
@@ -1551,10 +1551,10 @@ heal_fighters(cvector *fgs, int * power, boolean heal_monsters)
         if (rest>n) ++wound;
 
         if (wound > 0 && wound < hp) {
-          int heal = min(healhp, wound);
+          int heal = MIN(healhp, wound);
           assert(heal>=0);
           df->person[n].hp += heal;
-          healhp = max(0, healhp - heal);
+          healhp = MAX(0, healhp - heal);
           ++healed;
           if (healhp<=0) break;
         }
@@ -1678,7 +1678,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   cv_kill(fgs);
   free(fgs);
 
-  level = min(level, undead);
+  level = MIN(level, undead);
   if (undead == 0) {
     msg = msg_message("summonundead_effect_0", "mage region", mage, mage->region);
   } else {

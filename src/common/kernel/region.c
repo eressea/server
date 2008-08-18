@@ -1202,7 +1202,7 @@ terraform_region(region * r, const terrain_type * terrain)
     if (!fval(r, RF_CHAOTIC)) {
       int peasants;
       peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
-      rsetpeasants(r, max(100, peasants));
+      rsetpeasants(r, MAX(100, peasants));
       rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL)+1) + rng_int() % 5));
     }
   }

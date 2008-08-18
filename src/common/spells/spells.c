@@ -149,7 +149,7 @@ magicanalyse_region(region *r, unit *mage, double force)
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
-    mon = max(1, mon);
+    mon = MAX(1, mon);
     found = true;
 
     if (chance(probability)) { /* Analyse geglückt */
@@ -190,7 +190,7 @@ magicanalyse_unit(unit *u, unit *mage, double force)
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
-    mon = max(1,mon);
+    mon = MAX(1,mon);
 
     if (chance(probability)) { /* Analyse geglückt */
       if (c_flags(c) & CURSE_NOAGE) {
@@ -231,7 +231,7 @@ magicanalyse_building(building *b, unit *mage, double force)
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
-    mon = max(1,mon);
+    mon = MAX(1,mon);
 
     if (chance(probability)) { /* Analyse geglückt */
       if (c_flags(c) & CURSE_NOAGE) {
@@ -272,7 +272,7 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
-    mon = max(1,mon);
+    mon = MAX(1,mon);
 
     if (chance(probability)) { /* Analyse geglückt */
       if (c_flags(c) & CURSE_NOAGE) {
@@ -701,7 +701,7 @@ sp_destroy_magic(castorder *co)
       mage, mage->region, co->order));
   }
 
-  return max(succ, 1);
+  return MAX(succ, 1);
 }
 
 /* ------------------------------------------------------------- */
@@ -764,7 +764,7 @@ sp_transferaura(castorder *co)
     return 0;
   }
 
-  gain = min(aura, scm_src->spellpoints) / multi;
+  gain = MIN(aura, scm_src->spellpoints) / multi;
   scm_src->spellpoints -= gain*multi;
   scm_dst->spellpoints += gain;
 
@@ -902,7 +902,7 @@ sp_summonent(castorder *co)
     return 0;
   }
 
-  ents = (int)min(power*power, rtrees(r,2));
+  ents = (int)MIN(power*power, rtrees(r,2));
 
   u = create_unit(r, mage->faction, ents, new_race[RC_TREEMAN], 0, NULL, mage);
 
@@ -1296,7 +1296,7 @@ sp_rosthauch(castorder *co)
     for (;iweapon!=NULL;iweapon=iweapon->next) {
       item ** ip = i_find(&u->items, iweapon->type);
       if (*ip) {
-        int i = min((*ip)->number, force);
+        int i = MIN((*ip)->number, force);
         if (iweapon->chance<1.0) {
           i = (int)(i*iweapon->chance);
         }
@@ -1332,7 +1332,7 @@ sp_rosthauch(castorder *co)
    * ungünstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
    * darum wird hier nur für alle Fälle in denen noch weniger Waffen
    * betroffen wurden ein Kostennachlass gegeben */
-  return min(success, cast_level);
+  return MIN(success, cast_level);
 }
 
 
@@ -1364,7 +1364,7 @@ sp_kaelteschutz(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
-  int duration = max(cast_level, (int)force) + 1;
+  int duration = MAX(cast_level, (int)force) + 1;
   spellparameter *pa = co->par;
   variant effect;
 
@@ -2091,8 +2091,8 @@ sp_drought(castorder *co)
    */
   c = get_curse(r->attribs, ct_find("drought"));
   if (c) {
-    c->vigour = max(c->vigour, power);
-    c->duration = max(c->duration, (int)power);
+    c->vigour = MAX(c->vigour, power);
+    c->duration = MAX(c->duration, (int)power);
   } else {
     variant effect;
     /* Baeume und Pferde sterben */
@@ -2280,8 +2280,8 @@ sp_earthquake(castorder *co)
     if (burg->size != 0 && !is_cursed(burg->attribs, C_MAGICWALLS, 0)) {
       /* Magieresistenz */
       if (!target_resists_magic(mage, burg, TYP_BUILDING, 0)) {
-        kaputt = min(10 * cast_level, burg->size / 4);
-        kaputt = max(kaputt, 1);
+        kaputt = MIN(10 * cast_level, burg->size / 4);
+        kaputt = MAX(kaputt, 1);
         burg->size -= kaputt;
         if (burg->size == 0) {
           /* TODO: sollten die Insassen nicht Schaden nehmen? */
@@ -2448,7 +2448,7 @@ sp_forest_fire(castorder *co)
  *  das Zaubern. Patzer werden warscheinlicher.
  *  Jeder Zauber muss erst gegen den Wiederstand des Fluchs gezaubert
  *  werden und schwächt dessen Antimagiewiederstand um 1.
- *  Wirkt max(Stufe(Magier) - Stufe(Ziel), rand(3)) Wochen
+ *  Wirkt MAX(Stufe(Magier) - Stufe(Ziel), rand(3)) Wochen
  * Patzer:
  *  Magier wird selbst betroffen
  *
@@ -2476,7 +2476,7 @@ sp_fumblecurse(castorder *co)
 
   rx = rng_int()%3;
   sx = cast_level - effskill(target, SK_MAGIC);
-  duration = max(sx, rx) + 1;
+  duration = MAX(sx, rx) + 1;
 
   effect.i = (int)(force/2);
   c = create_curse(mage, &target->attribs, ct_find("fumble"),
@@ -2815,7 +2815,7 @@ wall_move(const border * b, struct unit * u, struct region * from, struct region
   wall_data * fd = (wall_data*)b->data.v;
   if (!routing && fd->active) {
     int hp = dice(3, fd->force) * u->number;
-    hp = min (u->hp, hp);
+    hp = MIN(u->hp, hp);
     u->hp -= hp;
     if (u->hp) {
       ADDMSG(&u->faction->msgs, msg_message("firewall_damage",
@@ -2887,8 +2887,8 @@ sp_firewall(castorder *co)
     fd->countdown = cast_level+1;
   } else {
     fd = (wall_data*)b->data.v;
-    fd->force = (int)max(fd->force, force/2+0.5);
-    fd->countdown = max(fd->countdown, cast_level+1);
+    fd->force = (int)MAX(fd->force, force/2+0.5);
+    fd->countdown = MAX(fd->countdown, cast_level+1);
   }
 
   /* melden, 1x pro Partei */
@@ -3113,7 +3113,7 @@ sp_unholypower(castorder *co)
  *   Rüstung wirkt nicht
  * Patzer:
  *   Magier gerät in den Staub und verliert zufällige Zahl von HP bis
- *   auf max(hp,2)
+ *   auf MAX(hp,2)
  * Besonderheiten:
  *   Nicht als curse implementiert, was schlecht ist - man kann dadurch
  *   kein dispell machen. Wegen fix unter Zeitdruck erstmal nicht zu
@@ -3588,7 +3588,7 @@ sp_summonundead(castorder *co)
     return 0;
   }
 
-  undead = min(deathcount(r), 2 + lovar(force));
+  undead = MIN(deathcount(r), 2 + lovar(force));
 
   if (cast_level <= 8) {
     race = new_race[RC_SKELETON];
@@ -3633,7 +3633,7 @@ sp_auraleak(castorder *co)
   int cast_level = co->level;
   message * msg;
   
-  lost = min(0.95, cast_level * 0.05);
+  lost = MIN(0.95, cast_level * 0.05);
 
   for(u = r->units; u; u = u->next) {
     if (is_mage(u)) {
@@ -3993,8 +3993,8 @@ sp_raisepeasantmob(castorder *co)
   anteil.i = 6 + (rng_int()%4);
 
   n = rpeasants(r) * anteil.i / 10;
-  n = max(0, n);
-  n = min(n, rpeasants(r));
+  n = MAX(0, n);
+  n = MIN(n, rpeasants(r));
 
   if (n <= 0) {
     report_failure(mage, co->order);
@@ -4218,12 +4218,12 @@ sp_recruit(castorder *co)
    * Bauer, nur die Kosten steigen. */
   n = (int)((pow(force, 1.6) * 100)/f->race->recruitcost);
   if (f->race==new_race[RC_URUK]) {
-    n = min(2*maxp, n);
-    n = max(n, 1);
+    n = MIN(2*maxp, n);
+    n = MAX(n, 1);
     rsetpeasants(r, maxp - (n+1) / 2);
   } else {
-    n = min(maxp, n);
-    n = max(n, 1);
+    n = MIN(maxp, n);
+    n = MAX(n, 1);
     rsetpeasants(r, maxp - n);
   }
 
@@ -4265,12 +4265,12 @@ sp_bigrecruit(castorder *co)
 
   n = (int)force + lovar((force * force * 1000)/f->race->recruitcost);
   if (f->race==new_race[RC_URUK]) {
-    n = min(2*maxp, n);
-    n = max(n, 1);
+    n = MIN(2*maxp, n);
+    n = MAX(n, 1);
     rsetpeasants(r, maxp - (n+1) / 2);
   } else {
-    n = min(maxp, n);
-    n = max(n, 1);
+    n = MIN(maxp, n);
+    n = MAX(n, 1);
     rsetpeasants(r, maxp - n);
   }
 
@@ -4351,7 +4351,7 @@ sp_pump(castorder *co)
  *  Betört eine Einheit, so das sie ihm den größten Teil ihres Bargelds
  *  und 50% ihres Besitzes schenkt. Sie behält jedoch immer soviel, wie
  *  sie zum überleben braucht. Wirkt gegen Magieresistenz.
- *  min(Stufe*1000$, u->money - maintenace)
+ *  MIN(Stufe*1000$, u->money - maintenace)
  *  Von jedem Item wird 50% abgerundet ermittelt und übergeben. Dazu
  *  kommt Itemzahl%2 mit 50% chance
  *
@@ -4387,15 +4387,15 @@ sp_seduce(castorder *co)
     item * itm = *itmp;
     int loot;
     if (itm->type==i_silver) {
-      loot = min(cast_level * 1000, get_money(target) - (maintenance_cost(target)));
-      loot = max(loot, 0);
+      loot = MIN(cast_level * 1000, get_money(target) - (maintenance_cost(target)));
+      loot = MAX(loot, 0);
     } else {
       loot = itm->number/2;
       if (itm->number % 2) {
         loot += rng_int() % 2;
       }
       if (loot > 0) {
-        loot = (int)min(loot, force * 5);
+        loot = (int)MIN(loot, force * 5);
       }
     }
     if (loot>0) {
@@ -4508,7 +4508,7 @@ sp_headache(castorder *co)
   }
   if (smax!=NULL) {
     /* wirkt auf maximal 10 Personen */
-    int change = min(10, target->number) * (rng_int()%2+1) / target->number;
+    int change = MIN(10, target->number) * (rng_int()%2+1) / target->number;
     reduce_skill(target, smax, change);
   }
   set_order(&target->thisorder, NULL);
@@ -4553,7 +4553,7 @@ sp_raisepeasants(castorder *co)
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_nopeasants", ""));
     return 0;
   }
-  bauern = (int)min(rpeasants(r), power*250);
+  bauern = (int)MIN(rpeasants(r), power*250);
   rsetpeasants(r, rpeasants(r) - bauern);
 
   u2 = create_unit(r, mage->faction, bauern, new_race[RC_PEASANT], 0, LOC(mage->faction->locale, "furious_mob"), mage);
@@ -4720,7 +4720,7 @@ sp_puttorest(castorder *co)
   message * seen = msg_message("puttorest", "mage", mage);
   message * unseen = msg_message("puttorest", "mage", NULL);
 
-  laid_to_rest = max(laid_to_rest, dead);
+  laid_to_rest = MAX(laid_to_rest, dead);
 
   deathcounts(r, -laid_to_rest);
 
@@ -4943,7 +4943,7 @@ sp_baddreams(castorder *co)
 
   /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
    * also duration+2 */
-  duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
+  duration = (int)MAX(1, power/2); /* Stufe 1 macht sonst mist */
   duration = 2 + rng_int()%duration;
 
   /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
@@ -4983,7 +4983,7 @@ sp_gooddreams(castorder *co)
 
   /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
    * also duration+2 */
-  duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
+  duration = (int)MAX(1, power/2); /* Stufe 1 macht sonst mist */
   duration = 2 + rng_int()%duration;
   effect.i = 1;
   c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
@@ -5116,7 +5116,7 @@ sp_sweetdreams(castorder *co)
       cmistake(mage, co->order, 40, MSG_EVENT);
       continue;
     }
-    men = min(opfer, u->number);
+    men = MIN(opfer, u->number);
     opfer -= men;
 
     /* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
@@ -5293,7 +5293,7 @@ sp_resist_magic_bonus(castorder *co)
       continue;
     */
 
-    m = min(u->number,victims);
+    m = MIN(u->number,victims);
     victims -= m;
 
     resistbonus.i = 20;
@@ -5310,8 +5310,8 @@ sp_resist_magic_bonus(castorder *co)
     msg_release(msg);
   }
 
-  cast_level = min(cast_level, (int)(cast_level*(victims+4)/maxvictims));
-  return max(cast_level, 1);
+  cast_level = MIN(cast_level, (int)(cast_level*(victims+4)/maxvictims));
+  return MAX(cast_level, 1);
 }
 
 /** spell 'Astraler Weg'.
@@ -6094,7 +6094,7 @@ sp_permtransfer(castorder *co)
     return 0;
   }
 
-  aura = min(get_spellpoints(mage)-spellcost(mage, sp), aura);
+  aura = MIN(get_spellpoints(mage)-spellcost(mage, sp), aura);
 
   change_maxspellpoints(mage,-aura);
   change_spellpoints(mage,-aura);
@@ -6484,7 +6484,7 @@ sp_speed2(castorder *co)
   spellparameter *pa = co->par;
 
   maxmen = 2 * cast_level * cast_level;
-  dur = max(1, cast_level/2);
+  dur = MAX(1, cast_level/2);
 
   for (n = 0; n < pa->length; n++) {
     variant effect;
@@ -6498,7 +6498,7 @@ sp_speed2(castorder *co)
 
     u = pa->param[n]->data.u;
 
-    men = min(maxmen,u->number);
+    men = MIN(maxmen,u->number);
     effect.i = 2;
     create_curse(mage, &u->attribs, ct_find("speed"), force, dur, effect, men);
     maxmen -= men;
@@ -6508,7 +6508,7 @@ sp_speed2(castorder *co)
   ADDMSG(&mage->faction->msgs, msg_message("speed_time_effect", "unit region amount", mage, mage->region, used));
   /* Effektiv benötigten cast_level (mindestens 1) zurückgeben */
   used = (int)sqrt(used/2);
-  return max(1, used);
+  return MAX(1, used);
 }
 
 /* ------------------------------------------------------------- */
@@ -6592,7 +6592,7 @@ sp_q_antimagie(castorder *co)
       "destroy_magic_noeffect", "unit region command",
       mage, mage->region, co->order));
   }
-  return max(succ, 1);
+  return MAX(succ, 1);
 }
 
 /* ------------------------------------------------------------- */
@@ -6783,7 +6783,7 @@ sp_wdwpyramid(castorder *co)
 
     ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_notfound",
       "unit region command mindist maxdist", mage, r, co->order,
-      max(1, minshowdist), maxshowdist));
+      MAX(1, minshowdist), maxshowdist));
   }
 
   return cast_level;

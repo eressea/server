@@ -190,7 +190,7 @@ bin_r_str_buf(struct storage * store, char * result, size_t size)
     result[0] = 0;
   } else {
     len = (size_t)i;
-    rd = min(len, size);
+    rd = MIN(len, size);
     fread(result, sizeof(char), rd, file(store));
     if (rd<len) {
       fseek(file(store), (long)(len-rd), SEEK_CUR);

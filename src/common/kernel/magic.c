@@ -534,7 +534,7 @@ get_combatspelllevel(const unit *u, int nr)
   assert(nr < MAXCOMBATSPELLS);
   if (m) {
     int level = eff_skill(u, SK_MAGIC, u->region);
-    return min(m->combatspells[nr].level, level);
+    return MIN(m->combatspells[nr].level, level);
   }
   return -1;
 }
@@ -664,7 +664,7 @@ change_spellpoints(unit * u, int mp)
 	if (!m) return 0;
 
 	/* verhindere negative Magiepunkte */
-	sp = max(m->spellpoints + mp, 0);
+	sp = MAX(m->spellpoints + mp, 0);
 	m->spellpoints = sp;
 
 	return sp;
@@ -723,7 +723,7 @@ max_spellpoints(const region * r, const unit * u)
 	n = get_curseeffect(u->attribs, C_AURA, 0);
 	if (n>0) msp = (msp*n)/100;
 
-	return max((int)msp, 0);
+	return MAX((int)msp, 0);
 }
 
 int
@@ -759,7 +759,7 @@ countspells(unit *u, int step)
   count = m->spellcount + step;
 
   /* negative Werte abfangen. */
-  m->spellcount = max(0,count);
+  m->spellcount = MAX(0,count);
 
   return m->spellcount;
 }
@@ -847,7 +847,7 @@ eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
          * gewünschten gebildet */
       } else if (sp->components[k].cost == SPC_LEVEL) {
         costtyp = SPC_LEVEL;
-        cast_level = min(cast_level, maxlevel);
+        cast_level = MIN(cast_level, maxlevel);
         /* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
          * sein, ansonsten schlägt der Spruch fehl */
       } else if (sp->components[k].cost == SPC_LINEAR) {
@@ -859,7 +859,7 @@ eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
 	/* Ein Spruch mit Fixkosten wird immer mit der Stufe des Spruchs und
 	 * nicht auf der Stufe des Magiers gezaubert */
 	if (costtyp == SPC_FIX) {
-		cast_level = min(cast_level, sp->level);
+		cast_level = MIN(cast_level, sp->level);
 	}
 
 	return cast_level;
@@ -1061,7 +1061,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
 
   force = force * MagicPower();
 
-  return max(force, 0);
+  return MAX(force, 0);
 }
 
 /* ------------------------------------------------------------- */
@@ -1220,8 +1220,8 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 			break;
 	}
 
-	probability = max(0.02, probability + t_bonus*0.01);
-	probability = min(0.98, probability);
+	probability = MAX(0.02, probability + t_bonus*0.01);
+	probability = MIN(0.98, probability);
 
 	/* gibt true, wenn die Zufallszahl kleiner als die chance ist und
 	 * false, wenn sie gleich oder größer ist, dh je größer die
@@ -1355,7 +1355,7 @@ do_fumble(castorder *co)
 
   case 2:
     /* temporärer Stufenverlust */
-    duration = max(rng_int()%level/2, 2);
+    duration = MAX(rng_int()%level/2, 2);
     effect.i = -(level/2);
     c = create_curse(u, &u->attribs, ct_find("skillmod"), (float)level, duration,
       effect, 1);
@@ -1469,15 +1469,15 @@ regeneration_magiepunkte(void)
 
 					/* maximal Differenz bis Maximale-Aura regenerieren
 					 * mindestens 1 Aura pro Monat */
-					reg_aura = max(1,reg_aura);
-					reg_aura = min((auramax - aura), reg_aura);
+					reg_aura = MAX(1,reg_aura);
+					reg_aura = MIN((auramax - aura), reg_aura);
 
 					aura += (int)reg_aura;
 					ADDMSG(&u->faction->msgs, msg_message(
 						"regenaura", "unit region amount",
 						u, r, (int)reg_aura));
 				}
-				set_spellpoints(u, min(aura, auramax));
+				set_spellpoints(u, MIN(aura, auramax));
 
 				/* Zum letzten Mal Spruchliste aktualisieren */
 				updatespelllist(u);
@@ -2473,7 +2473,7 @@ cast_cmd(unit * u, order * ord)
   /* für Syntax ' STUFE x REGION y z ' */
   if (findparam(s, u->faction->locale) == P_LEVEL) {
     int p = getint();
-    level = min(p, level);
+    level = MIN(p, level);
     if (level < 1) {
       /* Fehler "Das macht wenig Sinn" */
       cmistake(u, ord, 10, MSG_MAGIC);
@@ -2499,7 +2499,7 @@ cast_cmd(unit * u, order * ord)
   * hier nach REGION nochmal auf STUFE prüfen */
   if (findparam(s, u->faction->locale) == P_LEVEL) {
     int p = getint();
-    level = min(p, level);
+    level = MIN(p, level);
     if (level < 1) {
       /* Fehler "Das macht wenig Sinn" */
       cmistake(u, ord, 10, MSG_MAGIC);
@@ -2622,7 +2622,7 @@ cast_cmd(unit * u, order * ord)
       * löschen, zaubern kann er noch */
       range *= 2;
       set_order(&mage->thisorder, NULL);
-      level = min(level, eff_skill(mage, SK_MAGIC, mage->region)/2);
+      level = MIN(level, eff_skill(mage, SK_MAGIC, mage->region)/2);
       familiar = u;
     }
   }

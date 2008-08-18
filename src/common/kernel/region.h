@@ -61,6 +61,7 @@ struct message;
 struct message_list;
 struct rawmaterial;
 struct donation;
+struct item;
 
 typedef struct land_region {
   char *name;

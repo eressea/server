@@ -84,7 +84,7 @@ reduce_weight(unit * u)
   int weight = 0;
 
   if (horses > 0) {
-    horses = min(horses, (u->number*2));
+    horses = MIN(horses, (u->number*2));
     change_resource(u, oldresourcetype[R_HORSE], - horses);
   }
 
@@ -96,7 +96,7 @@ reduce_weight(unit * u)
     if (weight>capacity) {
       if (itype->weight>=10 && itype->rtype->wtype==0 && itype->rtype->atype==0) {
         if (itype->capacity < itype->weight) {
-          int reduce = min(itm->number, -((capacity-weight)/itype->weight));
+          int reduce = MIN(itm->number, -((capacity-weight)/itype->weight));
           give_item(reduce, itm->type, u, NULL, NULL);
           weight -= reduce * itype->weight;
         }
@@ -110,7 +110,7 @@ reduce_weight(unit * u)
     const item_type * itype = itm->type;
     weight += itm->number*itype->weight;
     if (itype->capacity < itype->weight) {
-      int reduce = min(itm->number, -((capacity-weight)/itype->weight));
+      int reduce = MIN(itm->number, -((capacity-weight)/itype->weight));
       give_item(reduce, itm->type, u, NULL, NULL);
       weight -= reduce * itype->weight;
     }
@@ -608,7 +608,7 @@ eaten_by_monster(unit * u)
 
 	if (n > 0) {
 		n = lovar(n);
-		n = min(rpeasants(u->region), n);
+		n = MIN(rpeasants(u->region), n);
 
 		if (n > 0) {
 			deathcounts(u->region, n);
@@ -634,7 +634,7 @@ absorbed_by_monster(unit * u)
 
 	if(n > 0) {
 		n = lovar(n);
-		n = min(rpeasants(u->region), n);
+		n = MIN(rpeasants(u->region), n);
 		if (n > 0){
 			rsetpeasants(u->region, rpeasants(u->region) - n);
 			scale_number(u, u->number + n);
@@ -650,7 +650,7 @@ scareaway(region * r, int anzahl)
 	int n, p, diff = 0, emigrants[MAXDIRECTIONS];
 	direction_t d;
 
-	anzahl = min(max(1, anzahl),rpeasants(r));
+	anzahl = MIN(MAX(1, anzahl),rpeasants(r));
 
 	/* Wandern am Ende der Woche (normal) oder wegen Monster. Die
 	 * Wanderung wird erst am Ende von demographics () ausgefuehrt.
@@ -662,7 +662,7 @@ scareaway(region * r, int anzahl)
 
 	p = rpeasants(r);
 	assert(p >= 0 && anzahl >= 0);
-	for (n = min(p, anzahl); n; n--) {
+	for (n = MIN(p, anzahl); n; n--) {
 		direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
 		region * rc = rconnect(r, dir);
 
@@ -698,7 +698,7 @@ scared_by_monster(unit * u)
 
 	if(n > 0) {
 		n = lovar(n);
-		n = min(rpeasants(u->region), n);
+		n = MIN(rpeasants(u->region), n);
 		if(n > 0) {
 			n = scareaway(u->region, n);
 			if(n > 0) {

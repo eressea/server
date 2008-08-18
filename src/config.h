@@ -238,17 +238,18 @@ extern char * strdup(const char *s);
 /****            ****
  ** min/max macros **
  ****            ****/
-
 #ifndef NOMINMAX
-#ifndef min
-# define min(a,b)            ((a) < (b) ? (a) : (b))
+#ifndef MIN
+# define MIN(a,b)            ((a) < (b) ? (a) : (b))
 #endif
-#ifndef max
-# define max(a,b)            ((a) > (b) ? (a) : (b))
+#ifndef MAX
+# define MAX(a,b)            ((a) > (b) ? (a) : (b))
 #endif
 #endif
-
-#if defined (ghs) || defined (__GNUC__) || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
+   
+#if defined (__GNUC__)
+# define unused(a) /* unused: a */
+#elif defined (ghs) || || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
 # define unused(a) do {/* null */} while (&a == 0)
 #else /* ghs || __GNUC__ || ..... */
 # define unused(a) (a)

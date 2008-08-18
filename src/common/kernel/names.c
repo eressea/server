@@ -418,9 +418,9 @@ abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
     }
 	}
 
-	/* Buchstaben pro Teilkürzel = max(1,max/AnzWort) */
+	/* Buchstaben pro Teilkürzel = MAX(1,max/AnzWort) */
 
-	bpt = max(1, maxchars / c);
+	bpt = MAX(1, maxchars / c);
 
 	/* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 

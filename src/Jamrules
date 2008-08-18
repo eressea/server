@@ -13,8 +13,9 @@ if ! $(HAVE_LUA) {
 }
 
 if ! $(CPU) {
-  CPU = pentium2 ;
-  ARCH = -march=$(CPU) -mtune=$(CPU) -mmmx -mieee-fp ;
+  CPU = prescott ;
+  ARCH = -march=$(CPU) -mmmx -mieee-fp ;
+  ARCH += -mtune=$(CPU) ;
 }
 
 if $(DISTCC_HOSTS) {

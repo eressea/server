@@ -99,7 +99,7 @@ get_borders_i(const region * r1, const region * r2)
   int key = reg_hashkey(r1);
   int k2 = reg_hashkey(r2);
 
-  key = min(k2, key) % BORDER_MAXHASH;
+  key = MIN(k2, key) % BORDER_MAXHASH;
   bp = &borders[key];
   while (*bp) {
     border * b = *bp;
@@ -452,7 +452,7 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
         return LOC(f->locale, mkname("border", "an_incomplete_road"));
       }
     } else {
-      int percent = max(1, 100*local/r->terrain->max_road);
+      int percent = MAX(1, 100*local/r->terrain->max_road);
       if (local) {
         snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border", "a_road_percent")), percent);
       } else {

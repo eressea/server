@@ -96,8 +96,8 @@ convert_resources(void)
 			rawmaterial * rmstone = rm_get(r, rm_stones.rtype);
 
 			int oldiron;
-			int oldlaen = MAXLAENPERTURN * min(r->age, 100) / 2;
-			int oldstone = terrain[rterrain(r)].quarries * max(0, r->age - INIT_STONE);
+			int oldlaen = MAXLAENPERTURN * MIN(r->age, 100) / 2;
+			int oldstone = terrain[rterrain(r)].quarries * MAX(0, r->age - INIT_STONE);
 			int iron = a->data.sa[0];
 			int laen = a->data.sa[1];
 			int stone, level;
@@ -127,7 +127,7 @@ convert_resources(void)
 
 			/** IRON **/
 			if (r_isglacier(r) || r->terrain==T_ICEBERG) {
-				oldiron = GLIRONPERTURN * min(r->age, 100) / 2;
+				oldiron = GLIRONPERTURN * MIN(r->age, 100) / 2;
 			} else {
 				oldiron = IRONPERTURN * r->age;
 			}
@@ -136,7 +136,7 @@ convert_resources(void)
 			}
 			if (terrain[r->terrain].rawmaterials[i].type) {
 				base = terrain[r->terrain].rawmaterials[i].base;
-				iron = max(0, (int)(oldiron * ironmulti - iron ));
+				iron = MAX(0, (int)(oldiron * ironmulti - iron ));
 				level = 1;
 				base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
 				while (iron >= base) {
@@ -163,7 +163,7 @@ convert_resources(void)
 					if (terrain[r->terrain].rawmaterials[i].type == &rm_laen) break;
 				}
 				if (terrain[r->terrain].rawmaterials[i].type) {
-					laen = max(0, (int)(oldlaen * laenmulti - laen));
+					laen = MAX(0, (int)(oldlaen * laenmulti - laen));
 					level = 1;
 					base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
 					while (laen >= base) {

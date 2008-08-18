@@ -223,9 +223,9 @@ siege_cmd(unit * u, order * ord)
   /* schaden durch katapulte */
 
   d = i_get(u->items, it_catapult);
-  d = min(u->number, d);
+  d = MIN(u->number, d);
   pooled = get_pooled(u, it_catapultammo->rtype, GET_DEFAULT, d);
-  d = min(pooled, d);
+  d = MIN(pooled, d);
   if (eff_skill(u, SK_CATAPULT, r) >= 1) {
     katapultiere = d;
     d *= eff_skill(u, SK_CATAPULT, r);
@@ -251,11 +251,11 @@ siege_cmd(unit * u, order * ord)
   * einheiten wieder abgesucht werden muessen! */
 
   usetsiege(u, b);
-  b->besieged += max(bewaffnete, katapultiere);
+  b->besieged += MAX(bewaffnete, katapultiere);
 
   /* definitiver schaden eingeschraenkt */
 
-  d = min(d, b->size - 1);
+  d = MIN(d, b->size - 1);
 
   /* meldung, schaden anrichten */
   if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
@@ -311,11 +311,11 @@ destroy_road(unit *u, int nmax, struct order * ord)
     cmistake(u, ord, 71, MSG_PRODUCE);
   } else {
     short road = rroad(r, d);
-    n = min(n, road);
+    n = MIN(n, road);
     if (n!=0) {
       region * r2 = rconnect(r,d);
       int willdo = eff_skill(u, SK_ROAD_BUILDING, r)*u->number;
-      willdo = min(willdo, n);
+      willdo = MIN(willdo, n);
       if (willdo==0) {
         /* TODO: error message */
       }
@@ -502,7 +502,7 @@ build_road(region * r, unit * u, int size, direction_t d)
     return;
   }
 
-  if (size>0) left = min(size, left);
+  if (size>0) left = MIN(size, left);
   /* baumaximum anhand der rohstoffe */
   if (u->race == new_race[RC_STONEGOLEM]){
     n = u->number * GOLEM_STONE;
@@ -513,14 +513,14 @@ build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   }
-  left = min(n, left);
+  left = MIN(n, left);
 
   /* n = maximum by skill. try to maximize it */
   n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
   if (n < left) {
     item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
     if (itm!=NULL && itm->number>0) {
-      int rings = min(u->number, itm->number);
+      int rings = MIN(u->number, itm->number);
       n = n * (9*rings+u->number) / u->number;
     }
   }
@@ -529,15 +529,15 @@ build_road(region * r, unit * u, int size, direction_t d)
     if (dm != 0) {
       int sk = eff_skill(u, SK_ROAD_BUILDING, r);
       int todo = (left - n + sk - 1) / sk;
-      todo = min(todo, u->number);
-      dm = min(dm, todo);
+      todo = MIN(todo, u->number);
+      dm = MIN(dm, todo);
       change_effect(u, oldpotiontype[P_DOMORE], -dm);
       n += dm * sk;
     }             /* Auswirkung Schaffenstrunk */
   }
 
   /* make minimum of possible and available: */
-  n = min(left, n);
+  n = MIN(left, n);
 
   /* n is now modified by several special effects, so we have to
    * minimize it again to make sure the road will not grow beyond
@@ -553,7 +553,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   } else {
     use_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, n);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    produceexp(u, SK_ROAD_BUILDING, min(n, u->number));
+    produceexp(u, SK_ROAD_BUILDING, MIN(n, u->number));
   }
   ADDMSG(&u->faction->msgs, msg_message("buildroad",
     "region unit size", r, u, n));
@@ -632,7 +632,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 
     if (dm != 0) {
       /* Auswirkung Schaffenstrunk */
-      dm = min(dm, u->number);
+      dm = MIN(dm, u->number);
       change_effect(u, oldpotiontype[P_DOMORE], -dm);
       skills += dm * effsk;
     }
@@ -687,17 +687,17 @@ build(unit * u, const construction * ctype, int completed, int want)
       item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
       if (itm!=NULL) i = itm->number;
       if (i>0) {
-        int rings = min(u->number, i);
+        int rings = MIN(u->number, i);
         n = n * (9*rings+u->number) / u->number;
       }
     }
 
     if (want>0) {
-      n = min(want, n);
+      n = MIN(want, n);
     }
 
     if (type->maxsize>0) {
-      n = min(type->maxsize-completed, n);
+      n = MIN(type->maxsize-completed, n);
       if (type->improvement==NULL) {
         want = n;
       }
@@ -752,7 +752,7 @@ build(unit * u, const construction * ctype, int completed, int want)
     completed = completed + n;
   }
   /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-  produceexp(u, ctype->skill, min(made, u->number));
+  produceexp(u, ctype->skill, MIN(made, u->number));
 
   return made;
 }
@@ -789,7 +789,7 @@ maxbuild(const unit * u, const construction * cons)
     if (have<need) {
       return 0;
     }
-    else maximum = min(maximum, have/need);
+    else maximum = MIN(maximum, have/need);
   }
   return maximum;
 }
@@ -977,7 +977,7 @@ build_ship(unit * u, ship * sh, int want)
   }
 
   if (sh->damage && can) {
-    int repair = min(sh->damage, can * DAMAGE_SCALE);
+    int repair = MIN(sh->damage, can * DAMAGE_SCALE);
     n += repair / DAMAGE_SCALE;
     if (repair % DAMAGE_SCALE) ++n;
     sh->damage = sh->damage - repair;
@@ -1016,7 +1016,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
     cmistake(u, ord, 88, MSG_PRODUCE);
     return;
   }
-  if (want>0) want = min(want, msize);
+  if (want>0) want = MIN(want, msize);
   else want = msize;
 
   sh = new_ship(newtype, u->faction->locale, r);
@@ -1070,7 +1070,7 @@ continue_ship(region * r, unit * u, int want)
     cmistake(u, u->thisorder, 88, MSG_PRODUCE);
     return;
   }
-  if (want > 0) want = min(want, msize);
+  if (want > 0) want = MIN(want, msize);
   else want = msize;
 
   build_ship(u, sh, want);

@@ -272,11 +272,11 @@ ridingcapacity(unit * u)
    * tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
    * von zwei Pferden gezogen wird */
 
-  animals = min(animals, effskill(u, SK_RIDING) * u->number * 2);
+  animals = MIN(animals, effskill(u, SK_RIDING) * u->number * 2);
 	if (fval(u->race, RCF_HORSE)) animals += u->number;
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
-	vehicles = min(animals / HORSESNEEDED, vehicles);
+	vehicles = MIN(animals / HORSESNEEDED, vehicles);
 
 	return vehicles * vcap + animals * acap;
 }
@@ -294,7 +294,7 @@ walkingcapacity(const struct unit * u)
   /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
 	 * die Leute tragen */
 
-  pferde_fuer_wagen = min(animals, effskill(u, SK_RIDING) * u->number * 4);
+  pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING) * u->number * 4);
 	if (fval(u->race, RCF_HORSE)) {
 		animals += u->number;
 		people = 0;
@@ -303,7 +303,7 @@ walkingcapacity(const struct unit * u)
 	}
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
-	wagen_mit_pferden = min(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+	wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
 	n = wagen_mit_pferden * vcap;
 
@@ -313,7 +313,7 @@ walkingcapacity(const struct unit * u)
 		wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
 		/* Genug Trolle, um die Restwagen zu ziehen? */
-		wagen_mit_trollen = min(u->number / 4, wagen_ohne_pferde);
+		wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
 
 		/* Wagenkapazität hinzuzählen */
 		n += wagen_mit_trollen * vcap;
@@ -331,7 +331,7 @@ walkingcapacity(const struct unit * u)
   }
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
-	n += min(people, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
+	n += MIN(people, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
 
 	return n;
 }
@@ -359,7 +359,7 @@ canwalk(unit * u)
 
 	maxwagen = effskill(u, SK_RIDING) * u->number * 2;
 	if (u->race == new_race[RC_TROLL]) {
-		maxwagen = max(maxwagen, u->number / 4);
+		maxwagen = MAX(maxwagen, u->number / 4);
 	}
 	maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
 
@@ -843,7 +843,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 	if (!contact && guard) {
 		double prob = 0.3; /* 30% base chance */
 		prob += 0.1 * (perception - eff_stealth(reisender, r));
-		prob += 0.1 * min(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
+		prob += 0.1 * MIN(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
 
 		if (chance(prob)) {
 			return guard;
@@ -1836,7 +1836,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
                 const luxury_type * ltype = resource2luxury(itm->type->rtype);
                 if (ltype!=NULL && itm->number>0) {
                   int st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
-                  st = min(itm->number, st);
+                  st = MIN(itm->number, st);
 
                   if (st > 0) {
                     i_change(&u2->items, itm->type, -st);

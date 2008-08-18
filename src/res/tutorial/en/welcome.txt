@@ -10,8 +10,8 @@ game shortly.
 The tutorial differs from Eressea in a few very important points:
 
 * Email-Address to send your turns to:
-Tutorial:  tutorial@eressea.upb.de
-Eressea:   eressea-server@eressea.upb.de
+Tutorial:  tutorial@eressea.de
+Eressea:   eressea-server@eressea.de
 
 * Frequency:
 Tutorial:  3x per Week, Monday, Wednesday and Saturday before 9 am CET.
@@ -40,7 +40,7 @@ because the translation of the human-readable report is currently a work in
 progress. That's why we recommend using the file with the .cr extension
 instead. It is a format that is understood by most Eressea-tools, notably
 the very good Magellan client. It is available at 
-http://eressea.upb.de/magellan/.
+http://magellan.log-out.net/.
 
 If you have any questions that the documentation does not answer, you can
 send them to eressea-help@eressea.kn-bremen.de, and get an answer from a

@@ -56,7 +56,7 @@ do_shock(unit *u, const char *reason)
   if (u->number > 0) {
     /* HP - Verlust */
     u->hp = (unit_max_hp(u) * u->number)/10;
-    u->hp = max(1, u->hp);
+    u->hp = MAX(1, u->hp);
   }
 
   /* Aura - Verlust */

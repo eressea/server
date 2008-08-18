@@ -87,7 +87,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
 
   assert(itype!=NULL);
   n = get_pooled(src, item2resource(itype), GET_DEFAULT, want);
-  n = min(want, n);
+  n = MIN(want, n);
   if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
     if (ord!=NULL) {
       ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",

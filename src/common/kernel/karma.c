@@ -401,7 +401,7 @@ sacrifice_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 253, MSG_EVENT);
       return 0;
     }
-    n = min(get_spellpoints(u), min(max_spellpoints(u->region, u), n));
+    n = MIN(get_spellpoints(u), min(max_spellpoints(u->region, u), n));
     if(n <= 0) {
       cmistake(u, ord, 254, MSG_EVENT);
       return 0;

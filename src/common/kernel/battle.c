@@ -216,7 +216,7 @@ armedmen(const unit * u, boolean siege_weapons)
         /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
         if (n>u->number) break;
       }
-      n = min(n, u->number);
+      n = MIN(n, u->number);
     }
   }
   return n;
@@ -442,7 +442,7 @@ get_row(const side * s, int row, const side * vs)
   /* every entry in the size[] array means someone trying to defend us.
   * 'retreat' is the number of rows falling.
   */
-  result = max(FIRST_ROW, row - retreat);
+  result = MAX(FIRST_ROW, row - retreat);
 
   return result;
 }
@@ -576,11 +576,11 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
       if(u->race == new_race[RC_URUK]) {
         int sword = effskill(u, SK_MELEE);
         int spear = effskill(u, SK_SPEAR);
-        skill = max(sword, spear) - 3;
+        skill = MAX(sword, spear) - 3;
         if (attacking) {
-          skill = max(skill, u->race->at_default);
+          skill = MAX(skill, u->race->at_default);
         } else {
-          skill = max(skill, u->race->df_default);
+          skill = MAX(skill, u->race->df_default);
         }
       } else {
         if (attacking) {
@@ -734,7 +734,7 @@ select_magicarmor(troop t)
   int geschuetzt = 0;
   int ma = 0;
 
-  geschuetzt = min(get_item(u, I_TROLLBELT), u->number);
+  geschuetzt = MIN(get_item(u, I_TROLLBELT), u->number);
 
   if (geschuetzt > t.index) /* unser Kandidat wird geschuetzt */
     ma += 1;
@@ -1016,8 +1016,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
 #endif /* KARMA_MODULE */
 
-    kritchance = max(kritchance, 0.005);
-    kritchance = min(0.9, kritchance);
+    kritchance = MAX(kritchance, 0.005);
+    kritchance = MIN(0.9, kritchance);
 
     while (chance(kritchance)) {
       if (bdebug) {
@@ -1040,7 +1040,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
 
     /* Skilldifferenzbonus */
-    da += max(0, (sk-sd)/DAMAGE_QUOTIENT);
+    da += MAX(0, (sk-sd)/DAMAGE_QUOTIENT);
   }
 
 
@@ -1063,13 +1063,13 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
 
     if (res > 0) {
-      da = (int) (max(da * res, 0));
+      da = (int) (MAX(da * res, 0));
     }
     /* gegen Magie wirkt nur natürliche und magische Rüstung */
     ar = an+am;
   }
 
-  rda = max(da - ar,0);
+  rda = MAX(da - ar,0);
 
   if ((du->race->battle_flags & BF_INV_NONMAGIC) && !magic) rda = 0;
   else {
@@ -1094,7 +1094,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
         }
         /* gibt Rüstung +effect für duration Treffer */
         if (meffect->typ == SHIELD_ARMOR) {
-          rda = max(rda - meffect->effect, 0);
+          rda = MAX(rda - meffect->effect, 0);
           meffect->duration--;
         }
       }
@@ -1294,7 +1294,7 @@ select_enemy(fighter * af, int minrow, int maxrow, int select)
     minrow = FIGHT_ROW;
     maxrow = BEHIND_ROW;
   }
-  minrow = max(minrow, FIGHT_ROW);
+  minrow = MAX(minrow, FIGHT_ROW);
 
   enemies = count_enemies(b, af, minrow, maxrow, select);
 
@@ -1367,7 +1367,7 @@ select_opponent(battle * b, troop at, int mindist, int maxdist)
     * them */
     dt = select_enemy(at.fighter, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
   } else {
-    mindist = max(mindist, FIGHT_ROW);
+    mindist = MAX(mindist, FIGHT_ROW);
     dt = select_enemy(at.fighter, mindist, maxdist, SELECT_ADVANCE);
   }
 
@@ -1479,7 +1479,7 @@ do_combatmagic(battle *b, combatmagic_t was)
         }
 
         level = eff_spelllevel(mage, sp, level, 1);
-        if (sl > 0) level = min(sl, level);
+        if (sl > 0) level = MIN(sl, level);
         if (level < 0) {
           report_failed_spell(b, mage, sp);
           free_order(ord);
@@ -1561,7 +1561,7 @@ do_combatspell(troop at)
   }
 
   level = eff_spelllevel(mage, sp, fi->magic, 1);
-  if ((sl = get_combatspelllevel(mage, 1)) > 0) level = min(level, sl);
+  if ((sl = get_combatspelllevel(mage, 1)) > 0) level = MIN(level, sl);
 
   if (fumble(r, mage, sp, sp->level) == true) {
     report_failed_spell(b, mage, sp);
@@ -1825,7 +1825,7 @@ dazzle(battle *b, troop *td)
 void
 damage_building(battle *b, building *bldg, int damage_abs)
 {
-  bldg->size = max(1, bldg->size-damage_abs);
+  bldg->size = MAX(1, bldg->size-damage_abs);
 
   /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
 
@@ -2085,7 +2085,7 @@ do_regenerate(fighter *af)
 
   while(ta.index--) {
     af->person[ta.index].hp += effskill(au, SK_STAMINA);
-    af->person[ta.index].hp = min(unit_max_hp(au), af->person[ta.index].hp);
+    af->person[ta.index].hp = MIN(unit_max_hp(au), af->person[ta.index].hp);
   }
 }
 
@@ -2118,9 +2118,9 @@ fleechance(unit * u)
 
   if (u->race == new_race[RC_HALFLING]) {
     c += 0.20;
-    c = min(c, 0.90);
+    c = MIN(c, 0.90);
   } else {
-    c = min(c, 0.75);
+    c = MIN(c, 0.75);
   }
 
   if (a!=NULL) c += a->data.flt;
@@ -2189,7 +2189,7 @@ loot_items(fighter * corpse)
     float lootfactor = dead/(float)u->number; /* only loot the dead! */
     int maxloot = (int)(itm->number*lootfactor);
     if (maxloot>0) {
-      int i = min(10, maxloot);
+      int i = MIN(10, maxloot);
       for (; i != 0; --i) {
         int loot = maxloot/i;
 
@@ -2264,7 +2264,7 @@ static void
 battle_effects(battle * b, int dead_players)
 {
   region * r = b->region;
-  int dead_peasants = min(rpeasants(r), (int)(dead_players*PopulationDamage()));
+  int dead_peasants = MIN(rpeasants(r), (int)(dead_players*PopulationDamage()));
   deathcounts(r, dead_peasants + dead_players);
   chaoscounts(r, dead_peasants / 2);
   rsetpeasants(r, rpeasants(r) - dead_peasants);
@@ -2805,7 +2805,7 @@ print_stats(battle * b)
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     if (cv_size(&s->leader.fighters)) {
-      b->max_tactics = max(b->max_tactics, s->leader.value);
+      b->max_tactics = MAX(b->max_tactics, s->leader.value);
     }
   }
 
@@ -2948,7 +2948,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   /* change_effect wird in ageing gemacht */
 
   /* Effekte von Artefakten */
-  strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
+  strongmen = MIN(fig->unit->number, get_item(u, I_TROLLBELT));
 
 #if KARMA_MODULE
   for (a = a_find(u->attribs, &at_prayer_effect); a && a->type==&at_prayer_effect; a = a->next) {
@@ -3125,7 +3125,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
         else
           p_bonus += 3;
       } while(rnd >= 97);
-      bonus = max(p_bonus, bonus);
+      bonus = MAX(p_bonus, bonus);
     }
     t += bonus;
   }
@@ -3241,7 +3241,7 @@ make_battle(region * r)
 
   for (bf=b->factions;bf;bf=bf->next) {
     faction * f = bf->faction;
-    max_fac_no = max(max_fac_no, f->no);
+    max_fac_no = MAX(max_fac_no, f->no);
     freset(f, FFL_MARK);
   }
   return b;
@@ -3284,7 +3284,7 @@ free_battle(battle * b)
     bfaction * bf = b->factions;
     faction * f = bf->faction;
     b->factions = bf->next;
-    max_fac_no = max(max_fac_no, f->no);
+    max_fac_no = MAX(max_fac_no, f->no);
     free(bf);
   }
 
@@ -3542,7 +3542,7 @@ flee(const troop dt)
       /* Regeländerung: Man muß das Tier nicht reiten können,
        * um es vom Schlachtfeld mitzunehmen, ist ja nur
        * eine Region weit. * */
-      keep = min(1, itm->number);
+      keep = MIN(1, itm->number);
       /* da ist das weight des tiers mit drin */
       carry += itype->capacity - itype->weight;
     } else if (itm->type->weight <= 0) {
@@ -3881,7 +3881,7 @@ battle_flee(battle * b)
         troop dt;
         int runners = 0;
         /* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
-        int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
+        int runhp = MIN(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
         if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) continue;
 
         dt.fighter = fig;
@@ -3918,7 +3918,7 @@ battle_flee(battle * b)
           if (fig->person[dt.index].flags & FL_PANICED) {
             ispaniced = EFFECT_PANIC_SPELL;
           }
-          if (chance(min(fleechance(u)+ispaniced, 0.90))) {
+          if (chance(MIN(fleechance(u)+ispaniced, 0.90))) {
             ++runners;
             flee(dt);
           }

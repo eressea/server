@@ -52,7 +52,7 @@ new_group(faction * f, const char * name, int gid)
 	while (*gp) gp = &(*gp)->next;
 	*gp = g;
 
-	maxgid = max(gid, maxgid);
+	maxgid = MAX(gid, maxgid);
 	g->name = strdup(name);
 	g->gid = gid;
 

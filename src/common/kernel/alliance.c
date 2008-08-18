@@ -94,7 +94,6 @@ alliance_kick(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   faction * f = findfaction(getid());
   attrib * a;
-  unused(tnext);
   
   if (f==NULL || f->alliance!=u->faction->alliance) {
     /* does not belong to our alliance */

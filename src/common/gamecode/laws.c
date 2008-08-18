@@ -202,7 +202,7 @@ get_food(region *r)
      * food from the peasants */
     if (owner!=NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
       int rm = rmoney(r);
-      int use = min(rm, need);
+      int use = MIN(rm, need);
       rsetmoney(r, rm-use);
       need -= use;
     }
@@ -214,7 +214,7 @@ get_food(region *r)
       for (v = r->units; need && v; v = v->next) {
         if (v->faction == u->faction && help_money(v)) {
           int give = get_money(v) - lifestyle(v);
-          give = min(need, give);
+          give = MIN(need, give);
           if (give>0) {
             change_money(v, -give);
             change_money(u, give);
@@ -231,7 +231,7 @@ get_food(region *r)
     int need = lifestyle(u);
     faction * f = u->faction;
 
-    need -= max(0, get_money(u));
+    need -= MAX(0, get_money(u));
 
     if (need > 0) {
       unit *v;
@@ -239,7 +239,7 @@ get_food(region *r)
       for (v = r->units; need && v; v = v->next) {
         if (v->faction != f && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
           int give = get_money(v) - lifestyle(v);
-          give = min(need, give);
+          give = MIN(need, give);
 
           if (give>0) {
             change_money(v, -give);
@@ -289,7 +289,7 @@ get_food(region *r)
           }
           if (donor != NULL) {
             int blut = get_effect(donor, pt_blood);
-            blut = min(blut, hungry);
+            blut = MIN(blut, hungry);
             change_effect(donor, pt_blood, -blut);
             hungry -= blut;
           }
@@ -320,7 +320,7 @@ get_food(region *r)
 
   /* 3. Von den überlebenden das Geld abziehen: */
   for (u = r->units; u; u = u->next) {
-    int need = min(get_money(u), lifestyle(u));
+    int need = MIN(get_money(u), lifestyle(u));
     change_money(u, -need);
   }
 }
@@ -382,7 +382,7 @@ live(region * r)
       }
       /* bestes Talent raussuchen */
       if (sb!=NULL) {
-        int weeks = min(effect, u->number);
+        int weeks = MIN(effect, u->number);
         reduce_skill(u, sb, weeks);
         ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
           "unit weeks skill", u, weeks, (skill_t)sb->id));
@@ -439,7 +439,7 @@ calculate_emigration(region *r)
       int max_emigration = MAX_EMIGRATION(rp2-maxp2);
       
       if (max_emigration>0) {
-        max_emigration = min(max_emigration, max_immigrants);
+        max_emigration = MIN(max_emigration, max_immigrants);
         r->land->newpeasants += max_emigration;
         rc->land->newpeasants -= max_emigration;
         max_immigrants -= max_emigration;
@@ -499,7 +499,7 @@ peasants(region * r)
 
   /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
 
-  satiated = min(peasants, money / maintenance_cost(NULL));
+  satiated = MIN(peasants, money / maintenance_cost(NULL));
   rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
   /* Von denjenigen, die nicht satt geworden sind, verhungert der
@@ -508,7 +508,7 @@ peasants(region * r)
 
   /* Es verhungert maximal die unterernährten Bevölkerung. */
 
-  n = min(peasants - satiated, rpeasants(r));
+  n = MIN(peasants - satiated, rpeasants(r));
     dead += (int)(0.5F + n * PEASANT_STARVATION_CHANCE);
 
   if (dead > 0) {
@@ -590,7 +590,7 @@ horses(region * r)
 
   /* Logistisches Wachstum, Optimum bei halbem Maximalbesatz. */
   maxhorses = maxworkingpeasants(r)/10;
-  maxhorses = max(0, maxhorses);
+  maxhorses = MAX(0, maxhorses);
   horses = rhorses(r);
   if (horses > 0) {
     if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
@@ -620,7 +620,7 @@ horses(region * r)
     if (r2 && fval(r2->terrain, WALK_INTO)) {
       int pt = (rhorses(r) * HORSEMOVE)/100;
       pt = (int)normalvariate(pt, pt/4.0);
-      pt = max(0, pt);
+      pt = MAX(0, pt);
       if (fval(r2, RF_MIGRATION))
         rsethorses(r2, rhorses(r2) + pt);
       else {
@@ -666,7 +666,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
     a = a_find(r->attribs, &at_germs);
     if(a && last_weeks_season == SEASON_SPRING) {
       /* ungekeimte Samen bleiben erhalten, Sprößlinge wachsen */
-      sprout = min(a->data.sa[1], rtrees(r, 1));
+      sprout = MIN(a->data.sa[1], rtrees(r, 1));
       /* aus dem gesamt Sprößlingepool abziehen */
       rsettrees(r, 1, rtrees(r, 1) - sprout);
       /* zu den Bäumen hinzufügen */
@@ -686,7 +686,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
     /* Grundchance 1.0% */
     seedchance = (int)(FORESTGROWTH * RESOURCE_QUANTITY);
     /* Jeder Elf in der Region erhöht die Chance um 0.0008%. */
-    seedchance += (min(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 8;
+    seedchance += (MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 8;
     grownup_trees = rtrees(r, 2);
     seeds = 0;
 
@@ -738,7 +738,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
 
     /* Raubbau abfangen, es dürfen nie mehr Samen wachsen, als aktuell
      * in der Region sind */
-    seeds = min(a->data.sa[0], rtrees(r, 0));
+    seeds = MIN(a->data.sa[0], rtrees(r, 0));
     sprout = 0;
 
     for(i=0;i<seeds;i++) {
@@ -757,7 +757,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
      * der Region entfernt werden können, da Jungbäume in der gleichen
      * Runde nachwachsen, wir also nicht mehr zwischen diesjährigen und
      * 'alten' Jungbäumen unterscheiden könnten */
-    sprout = min(a->data.sa[1], rtrees(r, 1));
+    sprout = MIN(a->data.sa[1], rtrees(r, 1));
     grownup_trees = 0;
 
     for(i=0;i<sprout;i++) {
@@ -844,7 +844,7 @@ demographics(void)
   for (r = regions; r; r = r->next) {
     if (r->land && r->land->newpeasants) {
       int rp = rpeasants(r) + r->land->newpeasants;
-      rsetpeasants(r, max(0, rp));
+      rsetpeasants(r, MAX(0, rp));
     }
   }
 
@@ -1089,7 +1089,7 @@ parse_restart(void)
   puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
     "gemeldet haben...");
 
-  age = calloc(max(4,turn+1), sizeof(int));
+  age = calloc(MAX(4,turn+1), sizeof(int));
   for (f = factions; f; f = f->next) if (!is_monsters(f)) {
     if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
       if (f->age>=0 && f->age <= turn) ++age[f->age];
@@ -2386,7 +2386,7 @@ combatspell_cmd(unit * u, struct order * ord)
   if (findparam(s, u->faction->locale) == P_LEVEL) {
     /* Merken, setzen kommt erst später */
     level = getint();
-    level = max(0, level);
+    level = MAX(0, level);
     s = getstrtoken();
   }
 
@@ -2943,8 +2943,8 @@ age_building(building * b)
         }
       } else if (mage!=NULL) {
         int sk = effskill(mage, SK_MAGIC);
-        c->duration = max(c->duration, sk/2);
-        c->vigour = max(c->vigour, sk);
+        c->duration = MAX(c->duration, sk/2);
+        c->vigour = MAX(c->vigour, sk);
       }
     }
   }
@@ -2969,12 +2969,12 @@ ageing(void)
       /* Goliathwasser */
       int i = get_effect(u, oldpotiontype[P_STRONG]);
       if (i > 0){
-        change_effect(u, oldpotiontype[P_STRONG], -1 * min(u->number, i));
+        change_effect(u, oldpotiontype[P_STRONG], -1 * MIN(u->number, i));
       }
       /* Berserkerblut*/
       i = get_effect(u, oldpotiontype[P_BERSERK]);
       if (i > 0){
-        change_effect(u, oldpotiontype[P_BERSERK], -1 * min(u->number, i));
+        change_effect(u, oldpotiontype[P_BERSERK], -1 * MIN(u->number, i));
       }
 
       if (is_cursed(u->attribs, C_OLDRACE, 0)){
@@ -3325,9 +3325,9 @@ monthly_healing(void)
       p *= heal_factor(u->race);
       if (u->hp < umhp) {
 #ifdef NEW_DAEMONHUNGER_RULE
-        double maxheal = max(u->number, umhp/20.0);
+        double maxheal = MAX(u->number, umhp/20.0);
 #else
-        double maxheal = max(u->number, umhp/10.0);
+        double maxheal = MAX(u->number, umhp/10.0);
 #endif
         int addhp;
         struct building * b = inside_building(u);
@@ -3344,7 +3344,7 @@ monthly_healing(void)
         if (maxheal>0.0 && chance(maxheal)) ++addhp;
 
         /* Aufaddieren der geheilten HP. */
-        u->hp = min(u->hp + addhp, umhp);
+        u->hp = MIN(u->hp + addhp, umhp);
 
         /* soll man an negativer regeneration sterben können? */
         assert(u->hp > 0);
@@ -3502,7 +3502,7 @@ claim_cmd(unit * u, struct order * ord)
   if (itype!=NULL) {
     item ** iclaim = i_find(&u->faction->items, itype);
     if (iclaim!=NULL && *iclaim!=NULL) {
-      n = min(n, (*iclaim)->number);
+      n = MIN(n, (*iclaim)->number);
       i_change(iclaim, itype, -n);
       i_change(&u->items, itype, n);
     }
