@@ -2591,10 +2591,6 @@ sp_summondragon(castorder *co)
         } else {
           a->data.v = co->rt;
         }
-#if 0
-        sprintf(buf, "Kommt aus: %s, Will nach: %s", regionname(r2, u->faction), regionname(co->rt, u->faction));
-        usetprivate(u, buf);
-#endif
       }
     }
   }
@@ -4650,8 +4646,6 @@ sp_dragonsong(castorder *co)
         } else {
           a->data.v = r;
         }
-        sprintf(buf, "Kommt aus: %s, Will nach: %s", regionname(r2, u->faction), regionname(r, u->faction));
-        usetprivate(u, buf);
       }
     }
   }

@@ -532,6 +532,7 @@ fix_astralplane(void)
       region * ra = r_standard_to_astral(rs);
       if (ra && ra->terrain != newterrain(T_ASTRALB)) {
         unit * u;
+        char name[128];
         ++fixes;
         for (u=ra->units;u;u=u->next) {
           if (!is_monsters(u->faction)) break;
@@ -543,7 +544,9 @@ fix_astralplane(void)
           while (ra->units) {
             remove_unit(&ra->units, ra->units);
           }
-          log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(rs, NULL), regionname(ra, NULL));
+          /* regionname uses an internal buffer, so we can't clal it twice (ugh) */
+          write_regionname(rs, NULL, name, sizeof(name));
+          log_printf("protecting %s by blocking astral space in %s.\n", name, regionname(ra, NULL));
           terraform_region(ra, newterrain(T_ASTRALB));
         }
       }

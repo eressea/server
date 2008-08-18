@@ -437,11 +437,6 @@ set_new_dragon_target(unit * u, region * r, int range)
 		} else {
 			a->data.v = max_region;
 		}
-#if 0
-		sprintf(buf, "Kommt aus: %s, Will nach: %s", 
-      regionname(r, u->faction), regionname(max_region, u->faction));
-		usetprivate(u, buf);
-#endif
 		return a;
 	}
 	return NULL;

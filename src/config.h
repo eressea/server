@@ -249,7 +249,7 @@ extern char * strdup(const char *s);
    
 #if defined (__GNUC__)
 # define unused(a) /* unused: a */
-#elif defined (ghs) || || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
+#elif defined (ghs) || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
 # define unused(a) do {/* null */} while (&a == 0)
 #else /* ghs || __GNUC__ || ..... */
 # define unused(a) (a)
