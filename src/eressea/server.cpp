@@ -579,6 +579,7 @@ main(int argc, char *argv[])
 
   lc_ctype = setlocale(LC_CTYPE, "");
   lc_numeric = setlocale(LC_NUMERIC, "C");
+  assert(towlower(0xC4)==0xE4);
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
   
