@@ -482,7 +482,8 @@ chaos(region * r)
 
             for (u = r->units; u;) {
               u2 = u->next;
-              if (u->race != new_race[RC_SPELL] && u->ship == 0) {
+              if (u->race != new_race[RC_SPELL] && u->ship == 0 && !canfly(u)) {
+                ADDMSG(&u->faction->msgs, msg_message("tidalwave_kill", "region unit", r, u));
                 set_number(u, 0);
               }
               u = u2;

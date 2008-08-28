@@ -7905,6 +7905,15 @@
     <text locale="en">"A tidal wave wipes out $region($region) and all who lived there."</text>
   </message>
 
+  <message name="tidalwave_kill" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"Eine gewaltige Flutwelle verschlingt $unit($unit) in $region($region)."</text>
+    <text locale="en">"A tidal wave wipes out $region($region) and kills $unit($unit)."</text>
+  </message>
+
   <message name="astralshield_activate" section="events">
     <type>
       <arg name="region" type="region"/>
