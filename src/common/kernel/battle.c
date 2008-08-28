@@ -211,7 +211,7 @@ armedmen(const unit * u, boolean siege_weapons)
        * Personen minimiert */
       for (itm=u->items;itm;itm=itm->next) {
         const weapon_type * wtype = resource2weapon(itm->type->rtype);
-        if (wtype==NULL || (wtype->flags & WTF_SIEGE)) continue;
+        if (wtype==NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE))) continue;
         if (effskill(u, wtype->skill) >= 1) n += itm->number;
         /* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
         if (n>u->number) break;

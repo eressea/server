@@ -3803,11 +3803,15 @@ init_processor(void)
   }
 
 #if INFOCMD_MODULE
-  add_proc_global(p, &infocommands, NULL);
+  if (!global.disabled[K_INFO]) {
+    add_proc_global(p, &infocommands, NULL);
+  }
 #endif
-  add_proc_global(p, &gmcommands, "GM Kommandos");
+  if (!global.disabled[K_GM]) {
+    add_proc_global(p, &gmcommands, "GM Kommandos");
+  }
 
-  p += 10; /* in case it has any effects on allincevictories */
+  p += 10; /* in case it has any effects on alliance victories */
   add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
   if (!nobattle) {
