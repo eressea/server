@@ -670,8 +670,67 @@ check_mages(void)
       int maxmages = max_skill(f, SK_MAGIC);
 
       for (u = f->units;u!=NULL;u=u->nextF) {
-        if (is_mage(u) && !is_familiar(u)) {
-          ++mages;
+        if (is_mage(u)) {
+          if (is_familiar(u)) {
+            unit * mage = get_familiar_mage(u);
+            if (mage) {
+              attrib * a = a_find(u->attribs, &at_eventhandler);
+              trigger ** triggers = NULL;
+              if (a==NULL) {
+                log_error(("%u is a familar, but has no eventhandler.\n", unitname(u)));
+              } else {
+                triggers = get_triggers(a, "destroy");
+                if (!triggers) {
+                  log_error(("%u is a familiar, but has no 'destroy' events.\n", unitname(u)));
+                } else {
+                  while (*triggers) {
+                    trigger * t = *triggers;
+                    if (t->type==&tt_shock) break;
+                    triggers = &t->next;
+                  }
+                  if (*triggers == NULL) {
+                    log_error(("%u is a familiar, but has no 'destroy/shock' event.\n", unitname(u)));
+                    triggers = NULL;
+                  }
+                }
+              }
+              if (!triggers) {
+                add_trigger(&u->attribs, "destroy", trigger_shock(mage));
+              }
+            } else {
+              log_error(("%u is a familiar, but has no mage - removing mage-attribute.\n", unitname(u)));
+              a_removeall(&u->attribs, &at_mage);
+              set_level(u, SK_MAGIC, 0);
+            }
+          } else {
+            unit * familiar = get_familiar(u);
+            if (familiar) {
+              attrib * a = a_find(u->attribs, &at_eventhandler);
+              trigger ** triggers = NULL;
+              if (a==NULL) {
+                log_error(("%u is a mage with a familiar, but has no eventhandler.\n", unitname(u)));
+              } else {
+                triggers = get_triggers(a, "destroy");
+                if (!triggers) {
+                  log_error(("%u is a mage with a familiar, but has no 'destroy' events.\n", unitname(u)));
+                } else {
+                  while (*triggers) {
+                    trigger * t = *triggers;
+                    if (t->type==&tt_killunit) break;
+                    triggers = &t->next;
+                  }
+                  if (*triggers == NULL) {
+                    log_error(("%u is a mage with a familiar, but has no 'destroy/killunit' event.\n", unitname(u)));
+                    triggers = NULL;
+                  }
+                }
+              }
+              if (!triggers) {
+                add_trigger(&u->attribs, "destroy", trigger_killunit(familiar));
+              }
+            }
+            ++mages;
+          }
         }
       }
       if (mages>maxmages) {
