@@ -284,56 +284,56 @@ ridingcapacity(unit * u)
 int
 walkingcapacity(const struct unit * u)
 {
-	int n, tmp, people, pferde_fuer_wagen;
-	int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
+  int n, tmp, people, pferde_fuer_wagen;
+  int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
   int vehicles = 0, vcap = 0;
   int animals = 0, acap = 0;
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
   /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
-	 * die Leute tragen */
+  * die Leute tragen */
 
   pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING) * u->number * 4);
-	if (fval(u->race, RCF_HORSE)) {
-		animals += u->number;
-		people = 0;
-	} else {
-		people = u->number;
-	}
+  if (fval(u->race, RCF_HORSE)) {
+    animals += u->number;
+    people = 0;
+  } else {
+    people = u->number;
+  }
 
-	/* maximal diese Pferde können zum Ziehen benutzt werden */
-	wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+  /* maximal diese Pferde können zum Ziehen benutzt werden */
+  wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
-	n = wagen_mit_pferden * vcap;
+  n = wagen_mit_pferden * vcap;
 
-	if (u->race == new_race[RC_TROLL]) {
-		/* 4 Trolle ziehen einen Wagen. */
-		/* Unbesetzte Wagen feststellen */
-		wagen_ohne_pferde = vehicles - wagen_mit_pferden;
+  if (u->race == new_race[RC_TROLL]) {
+    /* 4 Trolle ziehen einen Wagen. */
+    /* Unbesetzte Wagen feststellen */
+    wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
-		/* Genug Trolle, um die Restwagen zu ziehen? */
-		wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
+    /* Genug Trolle, um die Restwagen zu ziehen? */
+    wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
 
-		/* Wagenkapazität hinzuzählen */
-		n += wagen_mit_trollen * vcap;
-		wagen_ohne_pferde -= wagen_mit_trollen;
-	}
+    /* Wagenkapazität hinzuzählen */
+    n += wagen_mit_trollen * vcap;
+    wagen_ohne_pferde -= wagen_mit_trollen;
+  }
 
-	n += animals * acap;
-	n += people * personcapacity(u);
-	/* Goliathwasser */
+  n += animals * acap;
+  n += people * personcapacity(u);
+  /* Goliathwasser */
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
   if (tmp>0) {
     int horsecap = olditemtype[I_HORSE]->capacity;
     if (tmp>people) tmp = people;
-  	n += tmp * (horsecap - personcapacity(u));
+    n += tmp * (horsecap - personcapacity(u));
   }
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
-	n += MIN(people, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
+  n += MIN(people, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
 
-	return n;
+  return n;
 }
 
 enum {

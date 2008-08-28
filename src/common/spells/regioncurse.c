@@ -194,7 +194,7 @@ static struct curse_type ct_fogtrap = {
 static struct curse_type ct_maelstrom = {
   "maelstrom",
   CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
-  NULL
+  cinfo_simple
 };
 static struct curse_type ct_blessedharvest = {
   "blessedharvest",

@@ -78,18 +78,30 @@
 static void
 reduce_weight(unit * u)
 {
-  int horses = get_resource(u, oldresourcetype[R_HORSE]);
-  int capacity = walkingcapacity(u);
+  int capacity, weight = 0;
   item ** itmp = &u->items;
-  int weight = 0;
+  int horses = get_resource(u, oldresourcetype[R_HORSE]);
 
   if (horses > 0) {
     horses = MIN(horses, (u->number*2));
     change_resource(u, oldresourcetype[R_HORSE], - horses);
   }
 
+  /* 0. ditch any vehicles */
+  while (*itmp!=NULL) {
+    item * itm = *itmp;
+    const item_type * itype = itm->type;
+    weight += itm->number*itype->weight;
+    if (itype->flags & ITF_VEHICLE) {
+      give_item(itm->number, itm->type, u, NULL, NULL);
+    }
+    if (*itmp==itm) itmp=&itm->next;
+  }
+
+  capacity = walkingcapacity(u);
+
   /* 1. get rid of anything that isn't silver or really lightweight or helpful in combat */
-  while (capacity>0 && *itmp!=NULL) {
+  for (itmp = &u->items;*itmp && capacity>0;) {
     item * itm = *itmp;
     const item_type * itype = itm->type;
     weight += itm->number*itype->weight;
