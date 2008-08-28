@@ -40,8 +40,6 @@ extern "C" {
 
 #define TRADE_FRACTION          100
 
-extern struct attrib_type at_reduceproduction;
-
 extern int income(const struct unit * u);
 
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */

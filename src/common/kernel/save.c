@@ -1353,6 +1353,7 @@ readgame(const char * filename, int mode, int backup)
   }
   a_read(store, &global.attribs);
   global.data_turn = turn = store->r_int(store);
+  log_info((1, " - reading turn %d\n", turn));
   rng_init(turn);
   ++global.cookie;
   store->r_int(store); /* max_unique_id = */ 

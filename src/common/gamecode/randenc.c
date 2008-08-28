@@ -53,6 +53,7 @@
 
 /* attributes includes */
 #include <attributes/racename.h>
+#include <attributes/reduceproduction.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -668,47 +669,38 @@ rrandneighbour(region *r)
 	return rc;
 }
 
-void
-volcano_outbreak(region *r)
+static void
+volcano_destruction(region * volcano, region * r, region * rn, const char * damage)
 {
-  attrib *a;
-  region *rn;
-  unit *u, **up;
-  faction *f;
-
-  for (f=NULL,u=r->units; u; u=u->next) {
-    if (f!=u->faction) {
-      f = u->faction;
-      freset(f, FFL_SELECT);
-    }
-  }
-  rn = rrandneighbour(r);
-
-  /* Vulkan-Region verwüsten */
+  attrib * a;
+  unit ** up;
+  int percent = 25, time = 6 + rng_int()%12;
 
   rsettrees(r, 2, 0);
   rsettrees(r, 1, 0);
   rsettrees(r, 0, 0);
 
   a = a_find(r->attribs, &at_reduceproduction);
-  if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
-
-  /* Produktion vierteln ... */
-  a->data.sa[0] = 25;
-  /* Für 6-17 Runden */
-  a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
+  if (!a) {
+    a = make_reduceproduction(percent, time);
+  } else {
+    /* Produktion vierteln ... */
+    a->data.sa[0] = (short)percent;
+    /* Für 6-17 Runden */
+    a->data.sa[1] = (short)(a->data.sa[1] + time);
+  }
 
   /* Personen bekommen 4W10 Punkte Schaden. */
 
   for (up=&r->units; *up;) {
     unit * u = *up;
     if (u->number) {
-      int dead = damage_unit(u, "4d10", true, false);
+      int dead = damage_unit(u, damage, true, false);
       if (dead) {
         ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
-          "unit region dead", u, r, dead));
+          "unit region dead", u, volcano, dead));
       }
-      if (!fval(u->faction, FFL_SELECT)) {
+      if (r==volcano && !fval(u->faction, FFL_SELECT)) {
         fset(u->faction, FFL_SELECT);
         if (rn) {
           ADDMSG(&u->faction->msgs, msg_message("volcanooutbreak", 
@@ -723,36 +715,28 @@ volcano_outbreak(region *r)
   }
 
   remove_empty_units_in_region(r);
+}
+
+void
+volcano_outbreak(region *r)
+{
+  region *rn;
+  unit *u;
+  faction *f;
+
+  for (f=NULL,u=r->units; u; u=u->next) {
+    if (f!=u->faction) {
+      f = u->faction;
+      freset(f, FFL_SELECT);
+    }
+  }
 
   /* Zufällige Nachbarregion verwüsten */
+  rn = rrandneighbour(r);
 
+  volcano_destruction(r, r, rn, "4d10");
   if (rn) {
-
-    rsettrees(r, 2, 0);
-    rsettrees(r, 1, 0);
-    rsettrees(r, 0, 0);
-
-    a = a_find(rn->attribs, &at_reduceproduction);
-    if (!a) a = a_add(&rn->attribs, a_new(&at_reduceproduction));
-
-    /* Produktion vierteln ... */
-    a->data.sa[0] = 25;
-    /* Für 6-17 Runden */
-    a->data.sa[1] = (short)(a->data.sa[1] + 6 + rng_int()%12);
-
-    /* Personen bekommen 3W10 Punkte Schaden. */
-    for (up=&rn->units; *up;) {
-      unit * u = *up;
-      if (u->number) {
-        int dead = damage_unit(u, "3d10", true, false);
-        if (dead) {
-          ADDMSG(&u->faction->msgs, msg_message("volcano_dead", 
-            "unit region dead", u, r, dead));
-        }
-      }
-      if (u==*up) up=&u->next;
-    }
-    remove_empty_units_in_region(rn);
+    volcano_destruction(r, rn, NULL, "3d10");
   }
 }
 
@@ -1216,24 +1200,23 @@ randomevents(void)
 
   /* Vulkane qualmen, brechen aus ... */
   for (r = regions; r; r = r->next) {
-    if (r->terrain == newterrain(T_VOLCANO_SMOKING) && a_find(r->attribs, &at_reduceproduction)) {
-      ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-      rsetterrain(r, T_VOLCANO);
-    } else switch(rterrain(r)) {
-    case T_VOLCANO:
+    if (r->terrain == newterrain(T_VOLCANO_SMOKING)) {
+      if (a_find(r->attribs, &at_reduceproduction)) {
+        ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
+        rsetterrain(r, T_VOLCANO);
+      } else {
+        if (rng_int()%100 < 12) {
+          ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
+          rsetterrain(r, T_VOLCANO);
+        } else if (rng_int()%100 < 8) {
+          volcano_outbreak(r);
+        }
+      }
+    } else if (r->terrain == newterrain(T_VOLCANO)) {
       if (rng_int()%100 < 4) {
         ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
         rsetterrain(r, T_VOLCANO_SMOKING);
       }
-      break;
-    case T_VOLCANO_SMOKING:
-      if (rng_int()%100 < 12) {
-        ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-        rsetterrain(r, T_VOLCANO);
-      } else if (rng_int()%100 < 8) {
-        volcano_outbreak(r);
-      }
-      break;
     }
   }
 

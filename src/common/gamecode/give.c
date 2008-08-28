@@ -171,7 +171,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     /* werewolves can't be given to non-werewolves and vice-versa */
     error = 312;
   } else if (u2 && u2->number!=0 && u2->race != u->race) {
-    log_warning(("faction %s attempts to give %s to faction %s.\n",
+    log_warning(("faction %s attempts to give %s to %s.\n",
                  itoa36(u->faction->no), u->race->_name[0],
                  u2->race->_name[1]));
     error = 139;

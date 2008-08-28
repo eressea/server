@@ -40,12 +40,10 @@ attrib_type at_reduceproduction = {
 attrib *
 make_reduceproduction(int percent, int time)
 {
-	attrib * a = a_new(&at_reduceproduction);
-	int reduce = 100 - (5 * time);
-	if (reduce < 10) reduce = 10;
-	a->data.sa[0] = (short)reduce;
-	a->data.sa[1] = (short)time;
-	return a;
+  attrib * a = a_new(&at_reduceproduction);
+  a->data.sa[0] = (short)percent;
+  a->data.sa[1] = (short)time;
+  return a;
 }
 
 void

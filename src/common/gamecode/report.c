@@ -25,6 +25,7 @@
 #include <attributes/viewrange.h>
 #include <attributes/otherfaction.h>
 #include <attributes/alliance.h>
+#include <attributes/reduceproduction.h>
 #ifdef AT_OPTION
 # include <attributes/option.h>
 #endif

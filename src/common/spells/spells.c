@@ -3096,34 +3096,6 @@ sp_unholypower(castorder *co)
   return cast_level;
 }
 
-/* ------------------------------------------------------------- */
-/* Name:       Todeswolke
- * Stufe:      11
- * Gebiet:     Draig
- * Kategorie:  Region, negativ
- *
- * Wirkung:
- *   Personen in der Region verlieren stufe/2 Trefferpunkte pro Runde.
- *   Dauer force/2
- *   Wirkt gegen MR
- *   Rüstung wirkt nicht
- * Patzer:
- *   Magier gerät in den Staub und verliert zufällige Zahl von HP bis
- *   auf MAX(hp,2)
- * Besonderheiten:
- *   Nicht als curse implementiert, was schlecht ist - man kann dadurch
- *   kein dispell machen. Wegen fix unter Zeitdruck erstmal nicht zu
- *   ändern...
- * Missbrauchsmöglichkeit:
- *   Hat der Magier mehr HP als Rasse des Feindes (extrem: Dämon/Goblin)
- *   so kann er per Farcasting durch mehrmaliges Zaubern eine
- *   Nachbarregion auslöschen. Darum sollte dieser Spruch nur einmal auf
- *   eine Region gelegt werden können.
- *
- * Flag:
- *   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
- */
-
 static int
 dc_age(struct curse * c)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
@@ -3214,6 +3186,34 @@ attrib_type at_deathcloud_compat = {
   "zauber_todeswolke", NULL, NULL, NULL, NULL, dc_read_compat
 };
 #endif
+
+/* ------------------------------------------------------------- */
+/* Name:       Todeswolke
+* Stufe:      11
+* Gebiet:     Draig
+* Kategorie:  Region, negativ
+*
+* Wirkung:
+*   Personen in der Region verlieren stufe/2 Trefferpunkte pro Runde.
+*   Dauer force/2
+*   Wirkt gegen MR
+*   Rüstung wirkt nicht
+* Patzer:
+*   Magier gerät in den Staub und verliert zufällige Zahl von HP bis
+*   auf MAX(hp,2)
+* Besonderheiten:
+*   Nicht als curse implementiert, was schlecht ist - man kann dadurch
+*   kein dispell machen. Wegen fix unter Zeitdruck erstmal nicht zu
+*   ändern...
+* Missbrauchsmöglichkeit:
+*   Hat der Magier mehr HP als Rasse des Feindes (extrem: Dämon/Goblin)
+*   so kann er per Farcasting durch mehrmaliges Zaubern eine
+*   Nachbarregion auslöschen. Darum sollte dieser Spruch nur einmal auf
+*   eine Region gelegt werden können.
+*
+* Flag:
+*   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
+*/
 
 static int
 sp_deathcloud(castorder *co)
