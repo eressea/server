@@ -225,7 +225,7 @@ void
 destroyfaction(faction * f)
 {
   region *rc;
-  unit *u;
+  unit *u = f->units;
   faction *ff;
 
   if (!f->alive) return;
@@ -237,48 +237,43 @@ destroyfaction(faction * f)
     free(bm);
   }
 
-  for (u=f->units;u;u=u->nextF) {
-    region * r = u->region;
-
+  while (u) {
     /* give away your stuff, make zombies if you cannot (quest items) */
-    while (u) {
-      int result = gift_items(u, GIFT_FRIENDS|GIFT_PEASANTS);
-      if (result!=0) {
-        unit * zombie = u;
-        u = u->nextF;
-        make_zombie(zombie);
-      } else {
-        break;
-      }
-    }
-    if (u==NULL) continue;
+    int result = gift_items(u, GIFT_FRIENDS|GIFT_PEASANTS);
+    if (result!=0) {
+      unit * zombie = u;
+      u = u->nextF;
+      make_zombie(zombie);
+    } else {
+      region * r = u->region;
 
-    if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
-      const race * rc = u->race;
-      int m = rmoney(u->region);
+      if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
+        const race * rc = u->race;
+        int m = rmoney(r);
 
-      if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
-        int p = rpeasants(u->region);
-        int h = rhorses(u->region);
+        if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
+          int p = rpeasants(u->region);
+          int h = rhorses(u->region);
 
-        /* Personen gehen nur an die Bauern, wenn sie auch von dort
-         * stammen */
-        if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
-          h += u->number;
-        } else if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
-          p += u->number/2;
-        } else {
-          p += u->number;
+          /* Personen gehen nur an die Bauern, wenn sie auch von dort
+           * stammen */
+          if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
+            h += u->number;
+          } else if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
+            p += u->number/2;
+          } else {
+            p += u->number;
+          }
+          h += get_item(u, I_HORSE);
+          rsetpeasants(r, p);
+          rsethorses(r, h);
         }
-        h += get_item(u, I_HORSE);
-        rsetpeasants(r, p);
-        rsethorses(r, h);
+        m += get_money(u);
+        rsetmoney(r, m);
       }
-      m += get_money(u);
-      rsetmoney(r, m);
-
+      set_number(u, 0);
+      u=u->nextF;
     }
-    set_number(u, 0);
   }
   f->alive = 0;
 /* no way!  f->units = NULL; */
