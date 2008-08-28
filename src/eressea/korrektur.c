@@ -677,11 +677,11 @@ check_mages(void)
               attrib * a = a_find(u->attribs, &at_eventhandler);
               trigger ** triggers = NULL;
               if (a==NULL) {
-                log_error(("%u is a familar, but has no eventhandler.\n", unitname(u)));
+                log_error(("%s is a familar, but has no eventhandler.\n", unitname(u)));
               } else {
                 triggers = get_triggers(a, "destroy");
                 if (!triggers) {
-                  log_error(("%u is a familiar, but has no 'destroy' events.\n", unitname(u)));
+                  log_error(("%s is a familiar, but has no 'destroy' events.\n", unitname(u)));
                 } else {
                   while (*triggers) {
                     trigger * t = *triggers;
@@ -689,7 +689,7 @@ check_mages(void)
                     triggers = &t->next;
                   }
                   if (*triggers == NULL) {
-                    log_error(("%u is a familiar, but has no 'destroy/shock' event.\n", unitname(u)));
+                    log_error(("%s is a familiar, but has no 'destroy/shock' event.\n", unitname(u)));
                     triggers = NULL;
                   }
                 }
@@ -698,7 +698,7 @@ check_mages(void)
                 add_trigger(&u->attribs, "destroy", trigger_shock(mage));
               }
             } else {
-              log_error(("%u is a familiar, but has no mage - removing mage-attribute.\n", unitname(u)));
+              log_error(("%s is a familiar, but has no mage - removing mage-attribute.\n", unitname(u)));
               a_removeall(&u->attribs, &at_mage);
               set_level(u, SK_MAGIC, 0);
             }
@@ -708,11 +708,11 @@ check_mages(void)
               attrib * a = a_find(u->attribs, &at_eventhandler);
               trigger ** triggers = NULL;
               if (a==NULL) {
-                log_error(("%u is a mage with a familiar, but has no eventhandler.\n", unitname(u)));
+                log_error(("%s is a mage with a familiar, but has no eventhandler.\n", unitname(u)));
               } else {
                 triggers = get_triggers(a, "destroy");
                 if (!triggers) {
-                  log_error(("%u is a mage with a familiar, but has no 'destroy' events.\n", unitname(u)));
+                  log_error(("%s is a mage with a familiar, but has no 'destroy' events.\n", unitname(u)));
                 } else {
                   while (*triggers) {
                     trigger * t = *triggers;
@@ -720,7 +720,7 @@ check_mages(void)
                     triggers = &t->next;
                   }
                   if (*triggers == NULL) {
-                    log_error(("%u is a mage with a familiar, but has no 'destroy/killunit' event.\n", unitname(u)));
+                    log_error(("%s is a mage with a familiar, but has no 'destroy/killunit' event.\n", unitname(u)));
                     triggers = NULL;
                   }
                 }
