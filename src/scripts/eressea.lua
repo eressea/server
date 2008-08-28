@@ -13,7 +13,7 @@ loadscript("default.lua")
 
 function change_locales()
   -- local localechange = { }
-  local localechange = { de = { "bb" } }
+  local localechange = { de = { "bb" }, en = { "rtph" } }
   
   for loc, flist in pairs(localechange) do
     for index, name in pairs(flist) do
