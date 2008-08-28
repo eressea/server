@@ -427,13 +427,11 @@ chaosterrain(void)
 void
 chaos(region * r)
 {
-  unit *u = NULL, *u2;
-
   if (rng_int() % 100 < 8) {
     switch (rng_int() % 3) {
     case 0:				/* Untote */
       if (!fval(r->terrain, SEA_REGION)) {
-        u = random_unit(r);
+        unit * u = random_unit(r);
         if (u && playerrace(u->race)) {
           ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
           u_setfaction(u, get_monsters());
@@ -444,6 +442,7 @@ chaos(region * r)
     case 1:				/* Drachen */
       if (random_unit(r)) {
         int mfac = 0;
+        unit * u;
         switch (rng_int() % 3) {
         case 0:
           mfac = 100;
@@ -453,7 +452,7 @@ chaos(region * r)
           mfac = 500;
           u = createunit(r, get_monsters(), rng_int() % 4 + 1, new_race[RC_DRAGON]);
           break;
-        case 2:
+        default:
           mfac = 1000;
           u = createunit(r, get_monsters(), rng_int() % 2 + 1, new_race[RC_WYRM]);
           break;
@@ -471,6 +470,8 @@ chaos(region * r)
           }
           if (dir!=MAXDIRECTIONS) {
             ship * sh = r->ships;
+            unit ** up;
+
             while (sh) {
               ship * nsh = sh->next;
               damage_ship(sh, 0.50);
@@ -480,13 +481,13 @@ chaos(region * r)
               sh = nsh;
             }
 
-            for (u = r->units; u;) {
-              u2 = u->next;
+            for (up = &r->units; *up;) {
+              unit * u = *up;
               if (u->race != new_race[RC_SPELL] && u->ship == 0 && !canfly(u)) {
                 ADDMSG(&u->faction->msgs, msg_message("tidalwave_kill", "region unit", r, u));
-                set_number(u, 0);
+                remove_unit(up, u);
               }
-              u = u2;
+              if (*up==u) up = &u->next;
             }
             ADDMSG(&r->msgs, msg_message("tidalwave", "region", r));
 
