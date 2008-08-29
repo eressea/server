@@ -1960,97 +1960,97 @@ static void
 buy(unit * u, request ** buyorders, struct order * ord)
 {
   region * r = u->region;
-	int n, k;
-	request *o;
-	attrib * a;
-	const item_type * itype = NULL;
-	const luxury_type * ltype = NULL;
-	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-		cmistake(u, ord, 69, MSG_INCOME);
-		return;
-	}
-	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-		cmistake(u, ord, 69, MSG_INCOME);
-		return;
-	}
-	/* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
-	* schon dafür ausgerüstet, mehrere Produkte zu kaufen. */
+  int n, k;
+  request *o;
+  attrib * a;
+  const item_type * itype = NULL;
+  const luxury_type * ltype = NULL;
+  if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    cmistake(u, ord, 69, MSG_INCOME);
+    return;
+  }
+  if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    cmistake(u, ord, 69, MSG_INCOME);
+    return;
+  }
+  /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
+  * schon dafür ausgerüstet, mehrere Produkte zu kaufen. */
 
   init_tokens(ord);
   skip_token();
-	n = getuint();
-	if (!n) {
-		cmistake(u, ord, 26, MSG_COMMERCE);
-		return;
-	}
-	if (besieged(u)) {
-		/* Belagerte Einheiten können nichts kaufen. */
-		cmistake(u, ord, 60, MSG_COMMERCE);
-		return;
-	}
+  n = getuint();
+  if (!n) {
+    cmistake(u, ord, 26, MSG_COMMERCE);
+    return;
+  }
+  if (besieged(u)) {
+    /* Belagerte Einheiten können nichts kaufen. */
+    cmistake(u, ord, 60, MSG_COMMERCE);
+    return;
+  }
 
-	if (u->race == new_race[RC_INSECT]) {
-		/* entweder man ist insekt, oder... */
-		if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT) && !rbuildings(r)) {
-			cmistake(u, ord, 119, MSG_COMMERCE);
-			return;
-		}
-	} else {
-		/* ...oder in der Region muß es eine Burg geben. */
+  if (u->race == new_race[RC_INSECT]) {
+    /* entweder man ist insekt, oder... */
+    if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT) && !rbuildings(r)) {
+      cmistake(u, ord, 119, MSG_COMMERCE);
+      return;
+    }
+  } else {
+    /* ...oder in der Region muß es eine Burg geben. */
     building * b;
     static const struct building_type * bt_castle;
     if (!bt_castle) bt_castle = bt_find("castle");
     for (b=r->buildings;b;b=b->next) {
       if (b->type==bt_castle && b->size>=2) break;
     }
-		if (b==NULL) {
-			cmistake(u, ord, 119, MSG_COMMERCE);
-			return;
-		}
-	}
+    if (b==NULL) {
+      cmistake(u, ord, 119, MSG_COMMERCE);
+      return;
+    }
+  }
 
-	/* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
-	k = u->number * 10 * eff_skill(u, SK_TRADE, r);
+  /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
+  k = u->number * 10 * eff_skill(u, SK_TRADE, r);
 
-	/* hat der Händler bereits gehandelt, muss die Menge der bereits
-	* verkauften/gekauften Güter abgezogen werden */
-	a = a_find(u->attribs, &at_trades);
-	if (!a) {
-		a = a_add(&u->attribs, a_new(&at_trades));
-	} else {
-		k -= a->data.i;
-	}
+  /* hat der Händler bereits gehandelt, muss die Menge der bereits
+  * verkauften/gekauften Güter abgezogen werden */
+  a = a_find(u->attribs, &at_trades);
+  if (!a) {
+    a = a_add(&u->attribs, a_new(&at_trades));
+  } else {
+    k -= a->data.i;
+  }
 
-	n = MIN(n, k);
+  n = MIN(n, k);
 
-	if (!n) {
-		cmistake(u, ord, 102, MSG_COMMERCE);
-		return;
-	}
+  if (!n) {
+    cmistake(u, ord, 102, MSG_COMMERCE);
+    return;
+  }
 
-	assert(n>=0);
-	/* die Menge der verkauften Güter merken */
-	a->data.i += n;
+  assert(n>=0);
+  /* die Menge der verkauften Güter merken */
+  a->data.i += n;
 
-	itype = finditemtype(getstrtoken(), u->faction->locale);
-	if (itype!=NULL) {
-		ltype = resource2luxury(itype->rtype);
-		if (ltype==NULL) {
-			cmistake(u, ord, 124, MSG_COMMERCE);
-			return;
-		}
-	}
-	if (r_demand(r, ltype)) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, ord, "luxury_notsold", ""));
-		return;
-	}
-	o = (request *) calloc(1, sizeof(request));
-	o->type.ltype = ltype; /* sollte immer gleich sein */
+  itype = finditemtype(getstrtoken(), u->faction->locale);
+  if (itype!=NULL) {
+    ltype = resource2luxury(itype->rtype);
+    if (ltype==NULL) {
+      cmistake(u, ord, 124, MSG_COMMERCE);
+      return;
+    }
+  }
+  if (r_demand(r, ltype)) {
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "luxury_notsold", ""));
+    return;
+  }
+  o = (request *) calloc(1, sizeof(request));
+  o->type.ltype = ltype; /* sollte immer gleich sein */
 
-	o->unit = u;
-	o->qty = n;
-	addlist(buyorders, o);
+  o->unit = u;
+  o->qty = n;
+  addlist(buyorders, o);
 }
 /* ------------------------------------------------------------- */
 

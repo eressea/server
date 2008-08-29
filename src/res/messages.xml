@@ -5817,8 +5817,8 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann handeln."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Nobody here can trade."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren Güter handeln."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - the unit cannot trade any more goods."</text>
   </message>
   <message name="error101" section="errors">
     <type>
