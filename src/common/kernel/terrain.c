@@ -127,7 +127,7 @@ terrain_name(const struct region * r)
   if (r->terrain->name!=NULL) {
     return r->terrain->name(r);
   } else if (fval(r->terrain, SEA_REGION)) {
-    if (is_cursed(r->attribs, C_MAELSTROM, 0)) {
+    if (curse_active(get_curse(next_point->attribs, ct_find("maelstrom")))) {
       return "maelstrom";
     }
   }

@@ -483,7 +483,7 @@ do_maelstrom(region *r, unit *u)
   int damage;
   ship * sh = u->ship;
 
-  damage = rng_int()%150 - eff_skill(u, SK_SAILING, r)*5;
+  damage = rng_int()%75 + rng_int()%75 - eff_skill(u, SK_SAILING, r)*4;
 
   if (damage <= 0) {
     return sh;
@@ -1745,7 +1745,8 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
         break;
       }
 
-      if (is_cursed(next_point->attribs, C_MAELSTROM, 0)) {
+      
+      if (curse_active(get_curse(next_point->attribs, ct_find("maelstrom")))) {
         if (do_maelstrom(next_point, u) == NULL) break;
       }
 
