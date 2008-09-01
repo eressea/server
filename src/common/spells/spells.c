@@ -3238,6 +3238,7 @@ sp_deathcloud(castorder *co)
   mk_deathcloud(mage, r, co->force, co->level);
 
   /* melden, 1x pro Partei */
+  for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
     if (!fval(u->faction, FFL_SELECT) ) {
       fset(u->faction, FFL_SELECT);
@@ -3631,7 +3632,7 @@ sp_auraleak(castorder *co)
   
   lost = MIN(0.95, cast_level * 0.05);
 
-  for(u = r->units; u; u = u->next) {
+  for (u = r->units; u; u = u->next) {
     if (is_mage(u)) {
       /* Magieresistenz Einheit?  Bei gegenerischen Magiern nur sehr
        * geringe Chance auf Erfolg wg erhöhter MR, würde Spruch sinnlos
@@ -3639,7 +3640,6 @@ sp_auraleak(castorder *co)
       lost_aura = (int)(get_spellpoints(u)*lost);
       change_spellpoints(u, -lost_aura);
     }
-    freset(u->faction, FFL_SELECT);
   }
   msg = msg_message("cast_auraleak_effect", "mage region", mage, r);
   r_addmessage(r, NULL, msg);
