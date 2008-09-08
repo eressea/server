@@ -3882,7 +3882,15 @@ battle_flee(battle * b)
         int runners = 0;
         /* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
         int runhp = MIN(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
-        if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) continue;
+
+        if (u->ship && fval(u->region->terrain, SEA_REGION)) {
+          /* keine Flucht von Schiffen auf hoher See */
+          continue;
+        }
+        if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) {
+          /* Untote fliehen nicht. Warum eigentlich? */
+          continue;
+        }
 
         dt.fighter = fig;
 #ifndef SIMPLE_ESCAPE
