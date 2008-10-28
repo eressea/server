@@ -24,7 +24,7 @@ spell_getschool(const spell& sp)
 }
 
 void
-bind_spell(lua_State * L) 
+bind_spell(lua_State * L)
 {
   module(L)[
     class_<struct spell>("spell")

@@ -6,7 +6,7 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
 */
 #include <config.h>
@@ -14,6 +14,8 @@
 
 /* util includes */
 #include "log.h"
+
+#include <libxml/xmlstring.h>
 
 /* libc includes */
 #include <assert.h>

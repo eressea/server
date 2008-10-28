@@ -39,9 +39,7 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
-#if LUABIND_BETA>=7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -73,8 +71,8 @@ public:
 class bind_orders {
 public:
   static order * next(order * node) { return node->next; }
-  static std::string value(order * node) { 
-    char * cmd = (char*)getcommand(node); 
+  static std::string value(order * node) {
+    char * cmd = (char*)getcommand(node);
     std::string s(cmd);
     free(cmd);
     return s;
@@ -423,7 +421,7 @@ set_flag(unit * u, const char * name, bool value)
   }
 }
 
-static std::ostream& 
+static std::ostream&
 operator<<(std::ostream& stream, const unit& u)
 {
   const char * rcname = get_racename(u.attribs);
@@ -432,7 +430,7 @@ operator<<(std::ostream& stream, const unit& u)
   return stream;
 }
 
-static bool 
+static bool
 operator==(const unit& a, const unit &b)
 {
   return a.no==b.no;
@@ -462,7 +460,7 @@ unit_setfaction(unit * u, faction * f)
   u_setfaction(u, f);
 }
 
-static const char * 
+static const char *
 unit_getmagic(const unit * u)
 {
   sc_mage * mage = get_mage(u);
@@ -516,7 +514,7 @@ fctr_handle(struct trigger * tp, void * data)
   trigger * t = tp;
   event * evt = new event(NULL, (event_arg*)data);
   fctr_data * fd = (fctr_data*)t->data.v;
-  try {	
+  try {
     fd->fptr->operator()(fd->target, evt);
   }
   catch (luabind::error& e) {
@@ -580,14 +578,14 @@ unit_addnotice(unit * u, const char * str)
 }
 
 void
-bind_unit(lua_State * L) 
+bind_unit(lua_State * L)
 {
   module(L)[
     def("get_unit", &findunit),
     def("add_unit", &add_unit),
 
     class_<struct unit>("unit")
-    .def(tostring(self))
+    .def(tostring(const_self))
     .def(self == unit())
     .property("name", &unit_getname, &unit_setname)
     .property("info", &unit_getinfo, &unit_setinfo)

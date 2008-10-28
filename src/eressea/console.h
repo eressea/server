@@ -10,11 +10,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <lua.hpp>
 
-  extern int lua_console(lua_State * L);
-  extern int lua_do(lua_State * L);
-  
+  struct lua_State;
+
+  extern int lua_console(struct lua_State * L);
+  extern int lua_do(struct lua_State * L);
+
   typedef int (*readline)(struct lua_State *, const char *);
   extern void set_readline(readline foo);
 

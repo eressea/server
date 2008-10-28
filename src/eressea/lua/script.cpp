@@ -36,9 +36,7 @@
 #pragma warning (disable: 4127)
 #endif
 #include <luabind/luabind.hpp>
-#if LUABIND_BETA >= 7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif

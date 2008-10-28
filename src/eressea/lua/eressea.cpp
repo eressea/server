@@ -210,7 +210,6 @@ lua_learnskill(unit * u, const char * skname, float chances)
 bool
 is_function(struct lua_State * luaState, const char * fname)
 {
-#if LUABIND_BETA>7 || (LUABIND_BETA==7 && LUABIND_DEVEL>=2)
   object g = globals(luaState);
   object fun = g[fname];
   if (fun.is_valid()) {
@@ -221,18 +220,6 @@ is_function(struct lua_State * luaState, const char * fname)
       log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
     }
   }
-#else
-  object g = get_globals(luaState);
-  object fun = g[fname];
-  if (fun.is_valid()) {
-    if (fun.type()==LUA_TFUNCTION) {
-      return true;
-    }
-    if (fun.type()!=LUA_TNIL) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
-    }
-  }
-#endif
   return false;
 }
 

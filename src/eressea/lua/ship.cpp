@@ -16,9 +16,7 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
-#if LUABIND_BETA >= 7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -28,7 +26,7 @@
 #include <ostream>
 using namespace luabind;
 
-static std::ostream& 
+static std::ostream&
 operator<<(std::ostream& stream, const ship& sh)
 {
   stream << sh.name;
@@ -38,7 +36,7 @@ operator<<(std::ostream& stream, const ship& sh)
   return stream;
 }
 
-static bool 
+static bool
 operator==(const ship& a, const ship& sh)
 {
   return a.no==sh.no;
@@ -88,7 +86,7 @@ ship_getregion(const ship * sh)
 }
 
 void
-bind_ship(lua_State * L) 
+bind_ship(lua_State * L)
 {
   module(L)[
     def("get_ship", &findship),

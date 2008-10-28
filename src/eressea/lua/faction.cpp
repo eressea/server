@@ -30,9 +30,7 @@
 #include <luabind/iterator_policy.hpp>
 #include <luabind/out_value_policy.hpp>
 #include <luabind/copy_policy.hpp>
-#if LUABIND_BETA >= 7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -94,14 +92,14 @@ faction_setlocale(faction * f, const char * name)
   f->locale = find_locale(name);
 }
 
-static std::ostream& 
+static std::ostream&
 operator<<(std::ostream& stream, const faction& f)
 {
   stream << factionname(&f);
   return stream;
 }
 
-static bool 
+static bool
 operator==(const faction& a, const faction&b)
 {
   return a.no==b.no;
@@ -287,7 +285,7 @@ faction_maxheroes(const faction * f)
 }
 
 void
-bind_faction(lua_State * L) 
+bind_faction(lua_State * L)
 {
   module(L)[
     def("factions", &get_factions, return_stl_iterator),

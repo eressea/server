@@ -180,7 +180,7 @@ static int
 setup_signal_handler(void)
 {
   struct sigaction act;
-  
+
   act.sa_flags = SA_ONESHOT | SA_SIGINFO;
   act.sa_sigaction = report_segfault;
   sigfillset(&act.sa_mask);
@@ -243,7 +243,7 @@ game_init(void)
 #endif
 }
 
-static const struct { 
+static const struct {
   const char * name;
   int (*func)(lua_State *);
 } lualibs[] = {
@@ -380,22 +380,14 @@ usage(const char * prog, const char * arg)
 static void
 setLuaString(lua_State * luaState, const char * name, const char * value)
 {
-#if LUABIND_BETA<7 || (LUABIND_BETA==7 && LUABIND_DEVEL<2)
-  luabind::object g = luabind::get_globals(luaState);
-#else
   luabind::object g = luabind::globals(luaState);
-#endif
   g[name] = value;
 }
 
 static void
 setLuaNumber(lua_State * luaState, const char * name, double value)
 {
-#if LUABIND_BETA<7 || (LUABIND_BETA==7 && LUABIND_DEVEL<2)
-  luabind::object g = luabind::get_globals(luaState);
-#else
   luabind::object g = luabind::globals(luaState);
-#endif
   g[name] = value;
 }
 
@@ -582,7 +574,7 @@ main(int argc, char *argv[])
   assert(towlower(0xC4)==0xE4);
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
-  
+
   lua_State * luaState = lua_init();
   global.vm_state = luaState;
   load_inifile("eressea.ini");
@@ -609,7 +601,7 @@ main(int argc, char *argv[])
 #endif
       luabind::call_function<int>(luaState, "dofile", buf);
 #ifndef LUABIND_NO_EXCEPTIONS
-    } 
+    }
     catch (std::runtime_error& rte) {
       log_error(("%s.\n", rte.what()));
     }

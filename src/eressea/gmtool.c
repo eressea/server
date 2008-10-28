@@ -2,10 +2,10 @@
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- * | (c) 1998 - 2006   |  
+ * | (c) 1998 - 2006   |
  * |                   |  This program may not be used, modified or distributed
  * +-------------------+  without prior permission by the authors of Eressea.
- *  
+ *
  */
 
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
@@ -60,6 +60,8 @@
 
 #include <libxml/encoding.h>
 
+#include <lua.h>
+
 #include <string.h>
 #include <locale.h>
 
@@ -101,12 +103,12 @@ init_curses(void)
     short bcol = COLOR_BLACK;
     short hcol = COLOR_MAGENTA;
     start_color();
-#ifdef WIN32    
+#ifdef WIN32
     /* looks crap on putty with TERM=linux */
     if (can_change_color()) {
       init_color(COLOR_YELLOW, 1000, 1000, 0);
     }
-#endif 
+#endif
 
     for (fg=0;fg!=8;++fg) {
       for (bg=0;bg!=2;++bg) {
@@ -213,13 +215,13 @@ mr_tile(const map_region * mr, int highlight)
   if (mr!=NULL && mr->r!=NULL) {
     const region * r = mr->r;
     switch (r->terrain->_name[0]) {
-    case 'o' : 
+    case 'o' :
       return '.' | COLOR_PAIR(hl + COLOR_CYAN);
-    case 'd' : 
+    case 'd' :
       return 'D' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
-    case 't' : 
+    case 't' :
       return '%' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
-    case 'f' : 
+    case 'f' :
       if (r->terrain->_name[1]=='o') { /* fog */
         return '.' | COLOR_PAIR(hl + COLOR_YELLOW) | A_NORMAL;
       } else if (r->terrain->_name[1]=='i') { /* firewall */
@@ -229,7 +231,7 @@ mr_tile(const map_region * mr, int highlight)
       return 'H' | COLOR_PAIR(hl + COLOR_YELLOW) | A_NORMAL;
     case 'm' :
       return '^' | COLOR_PAIR(hl + COLOR_WHITE) | A_NORMAL;
-    case 'p' : 
+    case 'p' :
       if (r_isforest(r)) return '#' | COLOR_PAIR(hl + COLOR_GREEN) | A_NORMAL;
       return '+' | COLOR_PAIR(hl + COLOR_GREEN) | A_BOLD;
     case 'g' :
@@ -514,7 +516,7 @@ select_terrain(state * st, const terrain_type * default_terrain)
   st->wnd_info->update |= 1;
   st->wnd_map->update |= 1;
   st->wnd_status->update |= 1;
-  
+
   if (selected==NULL) return NULL;
   return (const terrain_type*)selected->data;
 }
@@ -610,7 +612,7 @@ select_regions(state * st, int selectmode)
         }
       }
     }
-  } 
+  }
   else if (findmode=='p') {
     region * r;
     sprintf(sbuffer, "%splayers", status);
@@ -628,7 +630,7 @@ select_regions(state * st, int selectmode)
         }
       }
     }
-  } 
+  }
   else if (findmode=='u') {
     region * r;
     sprintf(sbuffer, "%sunits", status);
@@ -642,7 +644,7 @@ select_regions(state * st, int selectmode)
         }
       }
     }
-  } 
+  }
   else if (findmode=='s') {
     region * r;
     sprintf(sbuffer, "%sships", status);
@@ -656,17 +658,17 @@ select_regions(state * st, int selectmode)
         }
       }
     }
-  } 
+  }
   else if (findmode=='f') {
     char fbuffer[12];
     sprintf(sbuffer, "%sfaction:", status);
     askstring(st->wnd_status->handle, sbuffer, fbuffer, 12);
     if (fbuffer[0]) {
       faction * f = findfaction(atoi36(fbuffer));
-      
+
       if (f!=NULL) {
         unit * u;
-       
+
         sprintf(sbuffer, "%sfaction: %s", status, itoa36(f->no));
         statusline(st->wnd_status->handle, sbuffer);
         for (u=f->units;u;u=u->nextF) {
@@ -892,7 +894,7 @@ handlekey(state * st, int c)
     if (global.vm_state) {
       move(0, 0);
       refresh();
-      lua_do((lua_State*)global.vm_state);
+      lua_do((struct lua_State*)global.vm_state);
       /* todo: do this from inside the script */
       clear();
       st->wnd_info->update |= 1;
@@ -1066,7 +1068,7 @@ update_view(view * vi)
   }
 }
 
-void 
+void
 run_mapper(void)
 {
   WINDOW * hwinstatus;
@@ -1179,7 +1181,7 @@ run_mapper(void)
 
 #define MAXINPUT 512
 int
-curses_readline(lua_State * L, const char * prompt)
+curses_readline(struct lua_State * L, const char * prompt)
 {
   static char buffer[MAXINPUT];
   askstring(hstatus, prompt, buffer, MAXINPUT);

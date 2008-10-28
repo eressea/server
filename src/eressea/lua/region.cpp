@@ -27,9 +27,7 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
-#if LUABIND_BETA >= 7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -374,7 +372,7 @@ bind_region(lua_State * L)
     def("getplanebyname", &plane_getbyname),
 
     class_<struct region>("region")
-    .def(tostring(self))
+    .def(tostring(const_self))
     .def(self == region())
     .property("name", &region_getname, &region_setname)
     .property("info", &region_getinfo, &region_setinfo)

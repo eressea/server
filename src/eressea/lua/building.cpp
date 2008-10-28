@@ -17,9 +17,7 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
-#if LUABIND_BETA >= 7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -136,7 +134,7 @@ building_setregion(building * bld, region * r)
   b->region = r;
 }
 
-static std::ostream& 
+static std::ostream&
 operator<<(std::ostream& stream, const building& b)
 {
   stream << b.name;
@@ -146,7 +144,7 @@ operator<<(std::ostream& stream, const building& b)
   return stream;
 }
 
-static bool 
+static bool
 operator==(const building& a, const building&b)
 {
   return a.no==b.no;
@@ -154,7 +152,7 @@ operator==(const building& a, const building&b)
 
 class buildingunit {
 public:
-  static unit * next(unit * node) { 
+  static unit * next(unit * node) {
     building * b = node->building;
     do {
       node = node->next;
@@ -179,7 +177,7 @@ building_gettype(const building& b) {
 }
 
 void
-bind_building(lua_State * L) 
+bind_building(lua_State * L)
 {
   at_building_action.age = lc_age;
   module(L)[

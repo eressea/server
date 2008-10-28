@@ -19,9 +19,7 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
-#if LUABIND_BETA >= 7
-# include <luabind/operator.hpp>
-#endif
+#include <luabind/operator.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -171,7 +169,7 @@ protected:
   variant * args;
 };
 
-static std::ostream& 
+static std::ostream&
 operator<<(std::ostream& stream, const lua_message& msg)
 {
   stream << "(message object)";
@@ -180,12 +178,12 @@ operator<<(std::ostream& stream, const lua_message& msg)
 
 
 void
-bind_message(lua_State * L) 
+bind_message(lua_State * L)
 {
   module(L)[
     class_<lua_message>("message")
       .def(constructor<const char *>())
-      .def(tostring(self))
+      .def(tostring(const_self))
 
       .def("set_unit", &lua_message::set_unit)
       .def("set_region", &lua_message::set_region)

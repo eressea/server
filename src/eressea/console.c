@@ -1,7 +1,9 @@
 #include "console.h"
 
 /* lua includes */
-#include <lua.hpp>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 /* libc includes */
 #include <assert.h>
@@ -20,8 +22,8 @@
 #define MAXINPUT        512
 #endif
 
-static int 
-stdin_readline(lua_State *l, const char *prompt) 
+static int
+stdin_readline(lua_State *l, const char *prompt)
 {
   static char buffer[MAXINPUT];
   if (prompt) {
@@ -57,7 +59,7 @@ set_readline(readline foo)
 #endif
 
 static const char *
-get_prompt(lua_State * L, int firstline) 
+get_prompt(lua_State * L, int firstline)
 {
   const char *p = NULL;
   lua_pushstring(L, firstline ? "_PROMPT" : "_PROMPT2");
@@ -68,8 +70,8 @@ get_prompt(lua_State * L, int firstline)
   return p;
 }
 
-static int 
-incomplete(lua_State * L, int status) 
+static int
+incomplete(lua_State * L, int status)
 {
   if (status!=LUA_ERRSYNTAX) return 0;
   if (strstr(lua_tostring(L, -1), "near `<eof>'") == NULL) return 0;
@@ -78,15 +80,15 @@ incomplete(lua_State * L, int status)
   return 1;
 }
 
-static void 
-l_message(const char *pname, const char *msg) 
+static void
+l_message(const char *pname, const char *msg)
 {
   if (pname) fprintf(stderr, "%s: ", pname);
   fprintf(stderr, "%s\n", msg);
 }
 
-static int 
-l_report(lua_State * L, int status) 
+static int
+l_report(lua_State * L, int status)
 {
   const char *msg;
   if (status) {
@@ -106,8 +108,8 @@ l_report(lua_State * L, int status)
 #define lua_saveline(L,line)    /* empty */
 #endif
 
-static int 
-load_string(lua_State * L) 
+static int
+load_string(lua_State * L)
 {
   int status;
   lua_settop(L, 0);
@@ -129,8 +131,8 @@ load_string(lua_State * L)
   return status;
 }
 
-static void 
-lstop(lua_State *l, lua_Debug *ar) 
+static void
+lstop(lua_State *l, lua_Debug *ar)
 {
   (void)ar;  /* unused arg. */
   lua_sethook(l, NULL, 0, 0);
@@ -143,8 +145,8 @@ static lua_State * state_stack[STATESTACK_MAX];
 int state_stack_top = -1;
 
 
-static void 
-laction(int i) 
+static void
+laction(int i)
 {
   signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
                       terminate process (default action) */
@@ -152,8 +154,8 @@ laction(int i)
   lua_sethook(state_stack[state_stack_top], lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
-static int 
-lcall(lua_State * L, int narg, int clear) 
+static int
+lcall(lua_State * L, int narg, int clear)
 {
   int status, pop_state = state_stack_top;
   int base = lua_gettop(L) - narg;  /* function index */
@@ -162,7 +164,7 @@ lcall(lua_State * L, int narg, int clear)
   lua_insert(L, base);  /* put it under chunk and args */
   if (state_stack_top<0 || L != state_stack[state_stack_top]) {
     assert(state_stack_top+1<STATESTACK_MAX);
-    state_stack[++state_stack_top] = L; 
+    state_stack[++state_stack_top] = L;
   }
   signal(SIGINT, laction);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);

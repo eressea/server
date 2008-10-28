@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * 
+ *
  * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -17,6 +17,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+  struct ship;
+  struct curse;
+  struct unit;
 
   extern void register_spells(void);
   extern struct curse * shipcurse_flyingship(struct ship* sh, struct unit * mage, double power, int duration);
