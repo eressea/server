@@ -78,6 +78,8 @@ extern const resource_type * findresourcetype(const char * name, const struct lo
 #define RMF_SKILL         0x01 /* int, bonus on resource production skill */
 #define RMF_SAVEMATERIAL  0x02 /* float, multiplier on resource usage */
 #define RMF_SAVERESOURCE  0x03 /* int, bonus on resource production skill */
+#define RMF_REQUIREDBUILDING 0x04 /* building, required to build */
+
 typedef struct resource_mod {
   variant value;
   const struct building_type * btype;

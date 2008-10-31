@@ -1347,19 +1347,24 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
       return;
     }
   }
-  
-  if (itype == olditemtype[I_LAEN]) {
-    struct building * b = inside_building(u);
-    const struct building_type * btype = b?b->type:NULL;
-    if (btype != bt_find("mine")) {
-      cmistake(u, u->thisorder, 104, MSG_PRODUCE);
-      return;
-    }
-  }
-  
+
   if (besieged(u)) {
     cmistake(u, u->thisorder, 60, MSG_PRODUCE);
     return;
+  }
+  
+  if (rdata->modifiers) {
+    resource_mod * mod = rdata->modifiers;
+    for (;mod->flags!=0;++mod) {
+      if (mod->flags & RMF_REQUIREDBUILDING) {
+        struct building * b = inside_building(u);
+        const struct building_type * btype = b?b->type:NULL;
+        if (mod->btype && mod->btype!=btype) {
+          cmistake(u, u->thisorder, 104, MSG_PRODUCE);
+          return;
+        }
+      }
+    }
   }
   
   if (rdata->guard!=0) {
@@ -1472,21 +1477,6 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
         }
       }
     }
-  } else if (itype==olditemtype[I_IRON]) {
-    struct building * b = inside_building(u);
-    const struct building_type * btype = b?b->type:NULL;
-    if (btype==bt_find("mine"))
-      al->save *= 0.5;
-    if (u->race == new_race[RC_DWARF]) {
-      al->save *= 0.75;
-    }
-  } else if (itype==olditemtype[I_STONE]) {
-    struct building * b = inside_building(u);
-    const struct building_type * btype = b?b->type:NULL;
-    if (btype==bt_find("quarry"))
-      al->save = al->save*0.5;
-    if (u->race == new_race[RC_TROLL])
-      al->save = al->save*0.75;
   }
 }
 

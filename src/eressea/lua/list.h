@@ -19,6 +19,7 @@ namespace eressea {
     class iterator {
     public:
       iterator(const N& index) : m_index(index) {}
+	  ~iterator() {}
       T operator*() { return nodetype::value(m_index); }
       bool operator==(const iterator& iter) {
         return iter.m_index==m_index;

@@ -96,6 +96,7 @@
       <construction skill="mining" minskill="7" reqsize="1"/>
     </item>
     <resourcelimit>
+      <modifier type="require" building="mine"/>
       <guard flag="mining"/>
     </resourcelimit>
   </resource>

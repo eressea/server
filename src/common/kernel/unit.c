@@ -1053,7 +1053,7 @@ set_number(unit * u, int count)
       u->faction->num_people += count - u->number;
     }
     u->number = (unsigned short)count;
-  } else {
+  } else if (u->number>0) {
     assert(!"why doesn't this unit have a faction? this will fuck up num_people");
   }
 }
