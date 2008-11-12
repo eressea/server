@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1.lib luabind_d.lib"
+				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1_d.lib luabind_d.lib"
 				OutputFile="$(OutDir)/eressea-lua.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=".."

@@ -29,7 +29,7 @@
 #include <stdlib.h>
 
 #define NRT_MAXHASH 1021
-static nrmessage_type * messagetypes[NRT_MAXHASH];
+static nrmessage_type * nrtypes[NRT_MAXHASH];
 
 const char *
 nrt_string(const struct nrmessage_type *type)
@@ -42,7 +42,7 @@ nrt_find(const struct locale * lang, const struct message_type * mtype)
 {
   nrmessage_type * found = NULL;
   unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
-  nrmessage_type * type = messagetypes[hash];
+  nrmessage_type * type = nrtypes[hash];
   while (type) {
     if (type->mtype==mtype) {
       if (found==NULL) found = type;
@@ -100,7 +100,7 @@ void
 nrt_register(const struct message_type * mtype, const struct locale * lang, const char * string, int level, const char * section)
 {
   unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
-  nrmessage_type * nrt = messagetypes[hash];
+  nrmessage_type * nrt = nrtypes[hash];
   while (nrt && (nrt->lang!=lang || nrt->mtype!=mtype)) {
     nrt = nrt->next;
   }
@@ -112,7 +112,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
     nrt = malloc(sizeof(nrmessage_type));
     nrt->lang = lang;
     nrt->mtype = mtype;
-    nrt->next = messagetypes[hash];
+    nrt->next = nrtypes[hash];
     nrt->level=level;
     if (section) {
       const nrsection * s = section_find(section);
@@ -122,7 +122,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
       nrt->section = s->name;
     }
     else nrt->section = NULL;
-    messagetypes[hash] = nrt;
+    nrtypes[hash] = nrt;
     assert(string && *string);
     nrt->string = strdup(string);
     *c = '\0';

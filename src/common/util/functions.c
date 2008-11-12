@@ -27,12 +27,12 @@ typedef struct function_list {
 	const char * name;
 } function_list;
 
-static function_list * functions;
+static function_list * functionlist;
 
 pf_generic
 get_function(const char * name)
 {
-	function_list * fl = functions;
+	function_list * fl = functionlist;
 	if (name==NULL) return NULL;
 	while (fl && strcmp(fl->name, name)!=0) fl=fl->next;
 	if (fl) return fl->fun;
@@ -42,7 +42,7 @@ get_function(const char * name)
 const char *
 get_functionname(pf_generic fun)
 {
-	function_list * fl = functions;
+	function_list * fl = functionlist;
 	while (fl && fl->fun!=fun) fl=fl->next;
 	if (fl) return fl->name;
 	return NULL;
@@ -52,16 +52,16 @@ void
 register_function(pf_generic fun, const char * name)
 {
 	function_list * fl = calloc(sizeof(function_list), 1);
-	fl->next = functions;
+	fl->next = functionlist;
 	fl->fun = fun;
 	fl->name = strdup(name);
-	functions = fl;
+	functionlist = fl;
 }
 
 void
 list_registered_functions(void)
 {
-  function_list * fl = functions;
+  function_list * fl = functionlist;
 
   while(fl) {
     printf("%s\n", fl->name);

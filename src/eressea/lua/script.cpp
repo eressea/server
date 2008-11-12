@@ -129,31 +129,6 @@ lua_callspell(castorder *co)
   return retval;
 }
 
-/** callback for an item-use function written in lua. */
-static int
-lua_useitem(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
-{
-  int retval = 0;
-  char fname[64];
-  snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
-
-  lua_State * L = (lua_State *)global.vm_state;
-  if (is_function(L, fname)) {
-    try {
-      retval = call_function<int>(L, fname, u, amount);
-    }
-    catch (error& e) {
-      lua_State* L = e.state();
-      const char* error = lua_tostring(L, -1);
-      log_error(("An exception occured while %s tried to call '%s': %s.\n",
-        unitname(u), fname, error));
-      lua_pop(L, 1);
-      std::terminate();
-    }
-  }
-  return retval;
-}
-
 /** callback to initialize a familiar from lua. */
 static void
 lua_initfamiliar(unit * u)
@@ -308,6 +283,31 @@ lua_equipmentcallback(const struct equipment * eq, unit * u)
       std::terminate();
     }
   }
+}
+
+/** callback for an item-use function written in lua. */
+int
+lua_useitem(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+{
+  int retval = 0;
+  char fname[64];
+  snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
+
+  lua_State * L = (lua_State *)global.vm_state;
+  if (is_function(L, fname)) {
+    try {
+      retval = luabind::call_function<int>(L, fname, u, amount);
+    }
+    catch (error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while %s tried to call '%s': %s.\n",
+        unitname(u), fname, error));
+      lua_pop(L, 1);
+      std::terminate();
+    }
+  }
+  return retval;
 }
 
 void

@@ -77,8 +77,6 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 /* imports */
-extern const char *directions[];
-extern const char *spelldata[];
 extern int quiet;
 boolean opt_cr_absolute_coords = false;
 
@@ -905,7 +903,7 @@ cr_output_unit(FILE * F, const region * r,
 
 /* prints allies */
 static void
-show_allies(FILE * F, const faction * f, const ally * sf)
+show_allies_cr(FILE * F, const faction * f, const ally * sf)
 {
   for (; sf; sf = sf->next) if (sf->faction) {
     int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
@@ -1365,7 +1363,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
 #ifdef ENEMIES
   show_enemies(F, f->enemies);
 #endif
-  show_allies(F, f, f->allies);
+  show_allies_cr(F, f, f->allies);
   {
     group * g;
     for (g=f->groups;g;g=g->next) {
@@ -1378,7 +1376,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
         fprintf(F, "\"%s\";typprefix\n",
           add_translation(prefix, LOC(f->locale, prefix)));
       }
-      show_allies(F, f, g->allies);
+      show_allies_cr(F, f, g->allies);
     }
   }
 

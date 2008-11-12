@@ -333,12 +333,11 @@ typedef struct handler_info {
   trigger * triggers;
 } handler_info;
 
-
-typedef struct timeout_data {
+typedef struct timeout_data_fix {
   trigger * triggers;
   int timer;
   variant trigger_data;
-} timeout_data;
+} timeout_data_fix;
 
 trigger *
 get_timeout(trigger * td, trigger * tfind)
@@ -346,7 +345,7 @@ get_timeout(trigger * td, trigger * tfind)
   trigger * t = td;
   while (t) {
     if (t->type==&tt_timeout) {
-      timeout_data * tdata = (timeout_data *)t->data.v;
+      timeout_data_fix * tdata = (timeout_data_fix *)t->data.v;
       trigger * tr = tdata->triggers;
       while (tr) {
         if (tr==tfind) break;
@@ -375,13 +374,6 @@ growing_trees(void)
   }
   return 0;
 }
-
-#include <triggers/gate.h>
-#include <triggers/unguard.h>
-typedef struct gate_data {
-  struct building * gate;
-  struct region * target;
-} gate_data;
 
 static int
 fix_undead(void)

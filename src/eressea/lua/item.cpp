@@ -2,6 +2,7 @@
 #include <kernel/eressea.h>
 
 #include "bindings.h"
+#include "script.h"
 
 // kernel includes
 #include <kernel/item.h>
@@ -47,34 +48,6 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order * 
       const char* error = lua_tostring(L, -1);
       log_error(("An exception occured while %s tried to call '%s': %s.\n",
         unitname(s), fname, error));
-      lua_pop(L, 1);
-      std::terminate();
-    }
-  }
-  return retval;
-}
-
-static int
-lua_useitem(struct unit * u, const struct item_type * itype,
-            int amount, struct order *ord)
-{
-  char fname[64];
-  int retval = -1;
-  const char * iname = itype->rtype->_name[0];
-
-  assert(u!=NULL);
-  strcat(strcpy(fname, iname), "_use");
-
-  lua_State * L = (lua_State *)global.vm_state;
-  if (is_function(L, fname)) {
-    try {
-      retval = luabind::call_function<int>(L, fname, u, amount);
-    }
-    catch (luabind::error& e) {
-      lua_State* L = e.state();
-      const char* error = lua_tostring(L, -1);
-      log_error(("An exception occured while %s tried to call '%s': %s.\n",
-        unitname(u), fname, error));
       lua_pop(L, 1);
       std::terminate();
     }

@@ -68,14 +68,14 @@ typedef struct crmessage_type {
 } crmessage_type;
 
 #define CRMAXHASH 63
-static crmessage_type * messagetypes[CRMAXHASH];
+static crmessage_type * crtypes[CRMAXHASH];
 
 static crmessage_type *
 crt_find(const struct message_type * mtype)
 {
   unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
   crmessage_type * found = NULL;
-  crmessage_type * type = messagetypes[hash];
+  crmessage_type * type = crtypes[hash];
   while (type) {
     if (type->mtype==mtype) found = type;
     type = type->next;
@@ -87,7 +87,7 @@ void
 crt_register(const struct message_type * mtype)
 {
   unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
-  crmessage_type * crt = messagetypes[hash];
+  crmessage_type * crt = crtypes[hash];
   while (crt && crt->mtype!=mtype) {
     crt = crt->next;
   }
@@ -95,8 +95,8 @@ crt_register(const struct message_type * mtype)
     int i;
     crt = malloc(sizeof(crmessage_type));
     crt->mtype = mtype;
-    crt->next = messagetypes[hash];
-    messagetypes[hash] = crt;
+    crt->next = crtypes[hash];
+    crtypes[hash] = crt;
     if(mtype->nparameters > 0) {
       crt->renderers = malloc(sizeof(tostring_f)*mtype->nparameters);
     } else {

@@ -66,7 +66,7 @@ opstack_push(opstack ** stackp, variant data)
  ** static buffer malloc 
  **/
 
-#define BUFSIZE 128*1024
+#define BBUFSIZE 128*1024
 static struct {
 	char * begin;
 	char * end;
@@ -80,8 +80,8 @@ balloc(size_t size)
 	static int init = 0; /* STATIC_XCALL: used across calls */
 	if (!init) {
 		init = 1;
-		buffer.current = buffer.begin = malloc(BUFSIZE);
-		buffer.end = buffer.begin + BUFSIZE;
+		buffer.current = buffer.begin = malloc(BBUFSIZE);
+		buffer.end = buffer.begin + BBUFSIZE;
 	}
 	if (buffer.current + size > buffer.end) {
 		/* out of memory! */

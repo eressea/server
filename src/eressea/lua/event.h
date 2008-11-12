@@ -1,3 +1,5 @@
+#ifndef LUA_EVENT_H
+#define LUA_EVENT_H
 class event {
 public:
   event(char * m, struct event_arg * a) : args(a), msg(m) {}
@@ -13,3 +15,4 @@ private:
   char * msg;
 };
 
+#endif

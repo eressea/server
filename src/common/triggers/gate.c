@@ -30,8 +30,8 @@
 #include <stdlib.h>
 
 typedef struct gate_data {
-	struct building * gate;
-	struct region * target;
+  struct building * gate;
+  struct region * target;
 } gate_data;
 
 static int

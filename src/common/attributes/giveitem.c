@@ -90,7 +90,7 @@ a_finalizegive(struct attrib * a)
 }
 
 static int
-give_item(attrib * a)
+a_giveitem(attrib * a)
 {
 	give_data * gdata = (give_data*)a->data.v;
 	region * r;
@@ -110,7 +110,7 @@ give_item(attrib * a)
 attrib_type at_giveitem = {
 	"giveitem",
 	a_initgive, a_finalizegive,
-	give_item,
+	a_giveitem,
 	a_writegive, a_readgive
 };
 

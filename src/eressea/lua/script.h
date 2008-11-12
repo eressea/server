@@ -16,5 +16,6 @@ extern int call_script(struct unit * u);
 extern void setscript(struct attrib ** ap, void * fptr);
 
 extern void reset_scripts();
+extern int lua_useitem(struct unit * u, const struct item_type * itype, int amount, struct order * ord);
 
 #endif
