@@ -76,7 +76,7 @@
     <param name="modules.wormholes" value="1"/>
     <param name="entertain.base" value="0"/>
     <param name="entertain.perlevel" value="20"/>
-    <param name="nmr.timeout" value="4"/>
+    <param name="nmr.timeout" value="5"/>
     <param name="nmr.removenewbie" value="10"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
