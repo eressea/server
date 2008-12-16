@@ -96,18 +96,27 @@
 #include <iniparser/iniparser.h>
 
 /* lua includes */
+#ifdef BINDINGS_TOLUA
+#include <lua.hpp>
+#include "tolua/bindings.h"
+#include "tolua/helpers.h"
+#endif // BINDINGS_TOLUA
+
+#ifdef BINDINGS_LUABIND
 #include "lua/bindings.h"
-#include "lua/script.h"
-#include <boost/version.hpp>
 #ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 4127)
-#endif
+#endif // _MSC_VER
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #ifdef _MSC_VER
 #pragma warning (pop)
-#endif
+#endif // _MSC_VER
+#endif // BINDINGS_LUABIND
+
+#include "lua/script.h"
+#include <boost/version.hpp>
 
 #include <libxml/encoding.h>
 
@@ -210,7 +219,6 @@ game_init(void)
   register_names();
   register_resources();
   register_buildings();
-  register_ships();
   register_itemfunctions();
   register_spells();
   register_gcspells();
@@ -275,6 +283,12 @@ lua_init(void)
   lua_State * L = lua_open();
 
   openlibs(L);
+#ifdef BINDINGS_TOLUA
+  register_tolua_helpers();
+  tolua_eressea_open(L);
+#endif
+
+#ifdef BINDINGS_LUABIND
   luabind::open(L);
 
   bind_objects(L);
@@ -294,13 +308,13 @@ lua_init(void)
 
   bind_gmtool(L);
   bind_test(L);
+#endif
   return L;
 }
 
 static void
 lua_done(lua_State * luaState)
 {
-  reset_scripts();
   lua_close(luaState);
 }
 
@@ -380,15 +394,25 @@ usage(const char * prog, const char * arg)
 static void
 setLuaString(lua_State * luaState, const char * name, const char * value)
 {
+#if defined(BINDINGS_LUABIND)
   luabind::object g = luabind::globals(luaState);
   g[name] = value;
+#elif defined(BINDINGS_TOLUA)
+  lua_pushstring(luaState, value);
+  lua_setglobal(luaState, name);
+#endif // BINDINGS_LUABIND
 }
 
 static void
 setLuaNumber(lua_State * luaState, const char * name, double value)
 {
+#if defined(BINDINGS_LUABIND)
   luabind::object g = luabind::globals(luaState);
   g[name] = value;
+#elif defined(BINDINGS_TOLUA)
+  lua_pushnumber(luaState, (lua_Number)value);
+  lua_setglobal(luaState, name);
+#endif // BINDINGS_LUABIND
 }
 
 static int
@@ -593,14 +617,9 @@ main(int argc, char *argv[])
     char buf[MAX_PATH];
     if (script_path) sprintf(buf, "%s/%s", script_path, luafile);
     else strcpy(buf, luafile);
-#ifdef LUABIND_NO_EXCEPTIONS
-    luabind::set_error_callback(my_lua_error);
-    luabind::set_pcall_callback(my_lua_error);
-#else
+#ifdef BINDINGS_LUABIND
     try {
-#endif
       luabind::call_function<int>(luaState, "dofile", buf);
-#ifndef LUABIND_NO_EXCEPTIONS
     }
     catch (std::runtime_error& rte) {
       log_error(("%s.\n", rte.what()));
@@ -608,6 +627,12 @@ main(int argc, char *argv[])
     catch (luabind::error& e) {
       lua_State* L = e.state();
       my_lua_error(L);
+    }
+#elif defined(BINDINGS_TOLUA)
+    lua_getglobal(luaState, "dofile");
+    lua_pushstring(luaState, buf);
+    if (lua_pcall(luaState, 1, 0, 0) != 0) {
+      my_lua_error(luaState);
     }
 #endif
   }

@@ -137,7 +137,6 @@ addfaction(const char *email, const char * password,
            int subscription)
 {
   faction * f = calloc(sizeof(faction), 1);
-  const char * pass = itoa36(rng_int());
   char buf[128];
 
   assert(frace && frace != new_race[RC_ORC]);
@@ -146,13 +145,8 @@ addfaction(const char *email, const char * password,
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
 
-  f->override = strdup(pass);
-  if (password) {
-    f->passw = strdup(password);
-  } else {
-    pass = itoa36(rng_int());
-    f->passw = strdup(pass);
-  }
+  f->override = strdup(itoa36(rng_int()));
+  faction_setpassword(f, password);
 
   f->lastorders = turn;
   f->alive = 1;
@@ -374,55 +368,50 @@ update_interval(struct faction * f, struct region * r)
 }
 #endif
 
-#ifdef ENEMIES
-boolean
-is_enemy(const struct faction * f, const struct faction * enemy)
+const char * faction_getname(const faction * self)
 {
-  struct faction_list * flist = f->enemies;
-  for (;flist!=NULL;flist=flist->next) {
-    if (flist->data==enemy) return true;
-  }
-  return false;
+  return self->name;
 }
 
-static void
-add_enemy_i(struct faction * f, struct faction * enemy)
+void faction_setname(faction * self, const char * name)
 {
-  if (!is_enemy(f, enemy)) {
-    struct faction_list * flist = malloc(sizeof(faction_list));
-    flist->next = f->enemies;
-    flist->data = enemy;
-    f->enemies = flist;
-  }
+  free(self->name);
+  if (name) self->name = strdup(name);
 }
 
-void
-add_enemy(struct faction * f, struct faction * enemy)
+const char * faction_getemail(const faction * self)
 {
-  add_enemy_i(f, enemy);
-/*  add_enemy_i(enemy, f); */
+  return self->email;
 }
 
-static void
-remove_enemy_i(struct faction * f, const struct faction * enemy)
+void faction_setemail(faction * self, const char * email)
 {
-  struct faction_list **pflist = &f->enemies;
-  while (*pflist!=NULL) {
-    struct faction_list * flist = *pflist;
-    if (flist->data==enemy) {
-      *pflist = flist->next;
-      free(flist);
-    } else {
-      pflist = &flist->next;
-    }
-  }
+  free(self->email);
+  if (email) self->email = strdup(email);
+}
+
+const char * faction_getbanner(const faction * self)
+{
+  return self->banner;
+}
+
+void faction_setbanner(faction * self, const char * banner)
+{
+  free(self->banner);
+  if (banner) self->banner = strdup(banner);
 }
 
 void
-remove_enemy(struct faction * f, struct faction * enemy)
+faction_setpassword(faction * f, const char * passw)
 {
-  remove_enemy_i(f, enemy);
-/*  remove_enemy_i(enemy, f); */
+  free(f->passw);
+  if (passw) f->passw = strdup(passw);
+  else f->passw = strdup(itoa36(rng_int()));
 }
 
-#endif
+const char *
+faction_getpassword(const faction * f)
+{
+  return f->passw;
+}
+

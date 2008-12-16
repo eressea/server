@@ -375,32 +375,6 @@ unit_setid(unit * u, int id)
   }
 }
 
-static const char *
-unit_getname(const unit * u)
-{
-  return (const char *)u->name;
-}
-
-static void
-unit_setname(unit * u, const char * name)
-{
-  free(u->name);
-  u->name = strdup(name);
-}
-
-static const char *
-unit_getinfo(const unit * u)
-{
-  return (const char *)u->display;
-}
-
-static void
-unit_setinfo(unit * u, const char * info)
-{
-  free(u->display);
-  u->display = strdup(info);
-}
-
 static bool
 get_flag(const unit * u, const char * name)
 {

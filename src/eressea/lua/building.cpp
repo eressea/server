@@ -98,7 +98,7 @@ building_setinfo(building * b, const char * info)
 }
 
 static const char *
-building_getname(const building * b)
+buildingname(const building * b)
 {
   return (const char *)b->name;
 }
@@ -187,7 +187,7 @@ bind_building(lua_State * L)
     class_<struct building>("building")
     .def(self == building())
     .def(tostring(self))
-    .property("name", &building_getname, &building_setname)
+    .property("name", &buildingname, &building_setname)
     .property("info", &building_getinfo, &building_setinfo)
     .property("units", &building_units, return_stl_iterator)
     .property("region", &building_getregion, &building_setregion)

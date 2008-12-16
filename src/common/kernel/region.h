@@ -211,14 +211,12 @@ extern boolean r_isforest(const struct region * r);
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
 extern const char * rname(const struct region * r, const struct locale * lang);
-extern void rsetname(struct region * r, const char * name);
 
 #define rplane(r) getplane(r)
 
 extern void r_setdemand(struct region * r, const struct luxury_type * ltype, int value);
 extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 
-extern const char * regionname(const struct region * r, const struct faction * f);
 extern const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
 extern struct region * new_region(short x, short y, unsigned int uid);
@@ -247,6 +245,13 @@ extern variant read_region_reference(struct storage * store);
 extern int resolve_region_coor(variant id, void * address);
 extern int resolve_region_id(variant id, void * address);
 #define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
+
+extern const char * regionname(const struct region * r, const struct faction * f);
+
+extern const char * region_getname(const struct region * self);
+extern void region_setname(struct region * self, const char * name);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -1591,28 +1591,6 @@ allies(FILE * F, const faction * f)
   }
 }
 
-#ifdef ENEMIES
-static void
-enemies(FILE * F, const faction * f)
-{
-  faction_list * flist = f->enemies;
-  if (flist!=NULL) {
-    strcpy(buf, "Wir liegen im Krieg mit ");
-    for (;flist!=NULL;flist = flist->next) {
-      const faction * enemy = flist->data;
-      scat(factionname(enemy));
-      if (flist->next) {
-        scat(", ");
-      } else {
-        scat(".");
-      }
-    }
-    rparagraph(F, buf, 0, 0, 0);
-    rnl(F);
-  }
-}
-#endif
-
 static void
 guards(FILE * F, const region * r, const faction * see)
 {
@@ -2169,9 +2147,6 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   centre(F, LOC(f->locale, "nr_alliances"), false);
   rnl(F);
 
-#ifdef ENEMIES
-  enemies(F, f);
-#endif
   allies(F, f);
 
   rpline(F);

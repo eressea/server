@@ -201,9 +201,6 @@ entrance_allowed(const struct unit * u, const struct region * r)
   faction * owner = region_owner(r);
   if (owner == NULL || u->faction == owner) return true;
   if (alliedfaction(r->planep, owner, u->faction, HELP_TRAVEL)) return true;
-#ifdef ENEMIES
-  if (is_enemy(u->faction, owner)) return true;
-#endif
   return false;
 #else
   return true;

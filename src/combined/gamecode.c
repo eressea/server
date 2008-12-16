@@ -2,6 +2,11 @@
 #include "common/config.h"
 #include "stdafx.h"
 
+#ifdef BINDINGS_TOLUA
+#include "eressea/tolua/bindings.c"
+#include "eressea/tolua/helpers.c"
+#endif
+
 #include "eressea/console.c"
 #include "eressea/editing.c"
 #include "eressea/korrektur.c"

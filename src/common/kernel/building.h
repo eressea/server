@@ -110,7 +110,6 @@ extern void add_buildinglist(building_list **bl, struct building *b);
 
 extern struct attrib_type at_building_generic_type;
 extern const char * buildingtype(const building_type * btype, const struct building * b, int bsize);
-extern const char * buildingname(const struct building * b);
 extern const char * write_buildingname(const building * b, char * ibuf, size_t size);
 extern int buildingcapacity(const struct building * b);
 extern struct building *new_building(const struct building_type * typ, struct region * r, const struct locale * lang);
@@ -152,6 +151,11 @@ typedef struct building_action {
   char * fname;
   char * param;
 } building_action;
+
+extern const char * buildingname(const struct building * b);
+
+extern const char * building_getname(const struct building * b);
+extern void building_setname(struct building * self, const char * name);
 
 #ifdef __cplusplus
 }

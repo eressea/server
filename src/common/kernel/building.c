@@ -598,3 +598,15 @@ buildingowner(const region * r, const building * b)
 		fset(first, UFL_OWNER);
 	return first;
 }
+
+const char * building_getname(const building * self)
+{
+  return self->name;
+}
+
+void building_setname(building * self, const char * name)
+{
+  free(self->name);
+  if (name) self->name = strdup(name);
+  else self->name = NULL;
+}

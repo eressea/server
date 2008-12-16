@@ -206,24 +206,24 @@ alliancejoin(void)
 void 
 setalliance(struct faction * f, alliance * al)
 {
-	if (f->alliance==al) return;
-	if (f->alliance!=NULL) {
-		faction_list ** flistp = &f->alliance->members;
-		while (*flistp) {
-			if ((*flistp)->data==f) {
-				*flistp = (*flistp)->next;
-				break;
-			}
-			flistp = &(*flistp)->next;
-		}
-	}
-	f->alliance = al;
-	if (al!=NULL) {
-		faction_list * flist = calloc(sizeof(faction_list), 1);
-		flist->next = al->members;
-		flist->data = f;
-		al->members = flist;
-	}
+  if (f->alliance==al) return;
+  if (f->alliance!=NULL) {
+    faction_list ** flistp = &f->alliance->members;
+    while (*flistp) {
+      if ((*flistp)->data==f) {
+        *flistp = (*flistp)->next;
+        break;
+      }
+      flistp = &(*flistp)->next;
+    }
+  }
+  f->alliance = al;
+  if (al!=NULL) {
+    faction_list * flist = calloc(sizeof(faction_list), 1);
+    flist->next = al->members;
+    flist->data = f;
+    al->members = flist;
+  }
 }
 
 const char *
@@ -347,4 +347,11 @@ victorycondition(const alliance * al, const char * name)
     return 0;
   }
   return -1;
+}
+
+void alliance_setname(alliance * self, const char * name)
+{
+  free(self->name);
+  if (name) self->name = strdup(name);
+  else self->name = NULL;
 }

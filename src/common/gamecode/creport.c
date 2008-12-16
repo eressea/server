@@ -915,19 +915,6 @@ show_allies_cr(FILE * F, const faction * f, const ally * sf)
   }
 }
 
-#ifdef ENEMIES
-static void
-show_enemies(FILE * F, const faction_list* flist)
-{
-  for (;flist!=NULL;flist=flist->next) {
-    if (flist->data) {
-      int fno = flist->data->no;
-      fprintf(F, "ENEMY %u\n%u;partei\n", fno, fno);
-    }
-  }
-}
-#endif
-
 /* prints all visible spells in a region */
 static void
 show_active_spells(const region * r)
@@ -1360,9 +1347,6 @@ report_computer(const char * filename, report_context * ctx, const char * charse
       f->options &= (~flag);
     }
   }
-#ifdef ENEMIES
-  show_enemies(F, f->enemies);
-#endif
   show_allies_cr(F, f, f->allies);
   {
     group * g;

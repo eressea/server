@@ -800,15 +800,6 @@ r_demand(const region * r, const luxury_type * ltype)
   return d->value;
 }
 
-void
-rsetname(struct region * r, const char * name)
-{
-  if (r->land) {
-    free(r->land->name);
-    r->land->name = strdup(name);
-  }
-}
-
 const char *
 rname(const region * r, const struct locale * lang) {
   if (r->land) {
@@ -1109,7 +1100,7 @@ terraform_region(region * r, const terrain_type * terrain)
     int mnr = 0;
 
     r->land = calloc(1, sizeof(land_region));
-    rsetname(r, makename());
+    region_setname(r, makename());
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * nr = rconnect(r, d);
       if (nr && nr->land) {
@@ -1319,4 +1310,19 @@ region_setowner(struct region * r, struct faction * owner)
   unused(r);
   unused(owner);
 #endif
+}
+
+void
+region_setname(struct region * r, const char * name)
+{
+  if (r->land) {
+    free(r->land->name);
+    r->land->name = strdup(name);
+  }
+}
+
+const char *
+region_getname(const region * r) {
+  if (r->land) return (const char *)r->land->name;
+  return NULL;
 }

@@ -272,6 +272,26 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="tolua"
+			>
+			<File
+				RelativePath=".\tolua\bindings.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bindings.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\helpers.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\helpers.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\console.c"
 			>
@@ -286,6 +306,10 @@
 		</File>
 		<File
 			RelativePath="..\scripts\eressea.lua"
+			>
+		</File>
+		<File
+			RelativePath=".\Jamfile"
 			>
 		</File>
 		<File

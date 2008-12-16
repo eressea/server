@@ -94,9 +94,6 @@ typedef struct faction {
   struct unit * units;
   struct attrib *attribs;
   struct message_list * msgs;
-#ifdef ENEMIES
-  struct faction_list * enemies;
-#endif
   struct bmsg {
     struct bmsg * next;
     struct region * r;
@@ -123,12 +120,6 @@ extern void destroyfaction(faction * f);
 extern void set_alliance(struct faction * a, struct faction * b, int status);
 extern int get_alliance(const struct faction * a, const struct faction * b);
 
-#ifdef ENEMIES
-extern boolean is_enemy(const struct faction * f, const struct faction * enemy);
-extern void add_enemy(struct faction * f, struct faction * enemy);
-extern void remove_enemy(struct faction * f, struct faction * enemy);
-#endif
-
 extern void write_faction_reference(const struct faction * f, struct storage * store);
 extern variant read_faction_reference(struct storage * store);
 extern int resolve_faction(variant data, void * addr);
@@ -138,6 +129,18 @@ extern void renumber_faction(faction * f, int no);
 #ifdef SMART_INTERVALS
 extern void update_interval(struct faction * f, struct region * r);
 #endif
+
+const char * faction_getbanner(const struct faction * self);
+void faction_setbanner(struct faction * self, const char * name);
+
+const char * faction_getname(const struct faction * self);
+void faction_setname(struct faction * self, const char * name);
+
+const char * faction_getemail(const struct faction * self);
+void faction_setemail(struct faction * self, const char * email);
+
+const char * faction_getpassword(const struct faction * self);
+void faction_setpassword(struct faction * self, const char * password);
 
 #ifdef __cplusplus
 }

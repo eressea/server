@@ -4776,8 +4776,7 @@ sp_icastle(castorder *co)
   } else {
     bname = LOC(mage->faction->locale, buildingtype(type, b, 0));
   }
-  free(b->name);
-  b->name = strdup(bname);
+  building_setname(b, bname);
 
   /* TODO: Auf timeout und action_destroy umstellen */
   a = a_add(&b->attribs, a_new(&at_icastle));
@@ -6201,6 +6200,18 @@ shipcurse_flyingship(ship* sh, unit * mage, double power, int duration)
     return create_curse(mage, &sh->attribs, ct_flyingship, power, duration, zero_effect, 0);
   }
 }
+
+int
+levitate_ship(ship * sh, unit * mage, double power, int duration)
+{
+  curse * c = shipcurse_flyingship(sh, mage, power, duration);
+  if (c) {
+    return c->no;
+  }
+  return 0;
+}
+
+
 /* ------------------------------------------------------------- */
 /* Name:       Luftschiff
  * Stufe:      6
@@ -6224,7 +6235,7 @@ sp_flying_ship(castorder *co)
   double power = co->force;
   spellparameter *pa = co->par;
   message * m = NULL;
-  curse * c;
+  int cno;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -6235,8 +6246,9 @@ sp_flying_ship(castorder *co)
   }
 
   /* Duration = 1, nur diese Runde */
-  c = shipcurse_flyingship(sh, mage, power, 1);
-  if (c==NULL) {
+    
+  cno = levitate_ship(sh, mage, power, 1);
+  if (cno==0) {
     if (is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
       /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
       cmistake(mage, co->order, 211, MSG_MAGIC);

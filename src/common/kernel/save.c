@@ -241,36 +241,6 @@ fwritestr(FILE * F, const char * str)
   return nwrite + 2;
 }
 
-#ifdef ENEMIES
-static void
-read_enemies(struct storage * store, faction * f)
-{
-  if (store->version<ENEMIES_VERSION) return;
-  f->enemies = NULL;
-  for (;;) {
-    int fno = store->r_id(store);
-    if (fno<=0) break;
-    else {
-      variant id;
-      faction_list * flist = malloc(sizeof(faction_list));
-      flist->next = f->enemies;
-      f->enemies = flist;
-      id.i = fno;
-      ur_add(id, &flist->data, resolve_faction);
-    }
-  }
-}
-
-static void
-write_enemies(struct storage * store, const faction_list * flist)
-{
-  while (flist) {
-    write_faction_reference(flist->data, store);
-  }
-  store->w_id(store, 0);
-}
-#endif
-
 static unit *
 unitorders(FILE * F, int enc, struct faction * f)
 {
@@ -1233,9 +1203,6 @@ readfaction(struct storage * store)
     }
   }
   read_groups(store, f);
-#ifdef ENEMIES
-  read_enemies(store, f);
-#endif
   return f;
 }
 
@@ -1299,9 +1266,6 @@ writefaction(struct storage * store, const faction * f)
   store->w_id(store, 0);
   store->w_brk(store);
   write_groups(store, f->groups);
-#ifdef ENEMIES
-  write_enemies(store, f->enemies);
-#endif
 }
 
 int

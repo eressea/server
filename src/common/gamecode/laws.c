@@ -2698,66 +2698,6 @@ evict(void)
 }
 #endif
 
-#ifdef ENEMIES
-static void
-declare_war(void)
-{
-  region *r;
-  for (r=regions;r;r=r->next) {
-    unit * u;
-    for (u=r->units;u;u=u->next) {
-      strlist *S;
-      faction * f = u->faction;
-      for (S = u->orders; S; S = S->next) {
-        switch (get_keyword(ord)) {
-        case K_WAR:
-          init_tokens(ord);
-          skip_token();
-          for (;;) {
-            const char * s = getstrtoken();
-            if (s[0]==0) break;
-            else {
-              faction * enemy = findfaction(atoi36(s));
-              if (enemy) {
-                if (!is_enemy(f, enemy)) {
-                  add_enemy(f, enemy);
-                  ADDMSG(&enemy->msgs, msg_message("war_notify", "enemy", f));
-                  ADDMSG(&f->msgs, msg_message("war_confirm", "enemy", enemy));
-                }
-              } else {
-                ADDMSG(&f->msgs, msg_message("error66", "unit region command", u, r, ord));
-              }
-            }
-          }
-          break;
-        case K_PEACE:
-          init_tokens(ord);
-          skip_token();
-          for (;;) {
-            const char * s = getstrtoken();
-            if (s[0]==0) break;
-            else {
-              faction * enemy = findfaction(atoi36(s));
-              if (enemy) {
-                if (is_enemy(f, enemy)) {
-                  remove_enemy(f, enemy);
-                  ADDMSG(&enemy->msgs, msg_message("peace_notify", "enemy", f));
-                  ADDMSG(&f->msgs, msg_message("peace_confirm", "enemy", enemy));
-                }
-              } else {
-                ADDMSG(&f->msgs, msg_message("error66", "unit region command", u, r, ord));
-              }
-            }
-          }
-          break;
-        default:
-          break;
-        }
-      }
-    }
-  }
-}
-#endif
 
 static int
 renumber_cmd(unit * u, order * ord)
@@ -3911,10 +3851,6 @@ init_processor(void)
 #ifdef ALLIANCEJOIN
   p+=10;
   add_proc_global(p, &alliancejoin, "Allianzen");
-#endif
-#ifdef ENEMIES
-  p+=10;
-  add_proc_global(p, &declare_war, "Krieg & Frieden");
 #endif
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
   if (!global.disabled[K_NUMBER]) {

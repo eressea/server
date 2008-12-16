@@ -180,16 +180,6 @@ process_orders(void)
   return 0;
 }
 
-static int
-levitate_ship(ship * sh, unit * mage, double power, int duration)
-{
-  curse * c = shipcurse_flyingship(sh, mage, power, duration);
-  if (c) {
-    return c->no;
-  }
-  return 0;
-}
-
 void
 bind_gamecode(lua_State * L)
 {

@@ -55,20 +55,9 @@ region_ships(const region * r) {
   return eressea::list<ship *>(r->ships);
 }
 
-static void
-region_setname(region * r, const char * name) {
-  if (r->land) rsetname(r, name);
-}
-
 static const char *
 region_getterrain(const region * r) {
   return (const char *)r->terrain->_name;
-}
-
-static const char *
-region_getname(const region * r) {
-  if (r->land) return (const char *)r->land->name;
-  return NULL;
 }
 
 static void

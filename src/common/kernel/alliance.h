@@ -42,6 +42,7 @@ extern void alliancejoin(void);
 extern void alliancekick(void);
 extern void alliancevictory(void);
 
+void alliance_setname(alliance * self, const char * name);
 extern int victorycondition(const alliance * al, const char * name);
 /* execute commands */
 

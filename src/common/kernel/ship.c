@@ -311,7 +311,15 @@ write_ship_reference(const struct ship * sh, struct storage * store)
 }
 
 void
-register_ships(void)
+ship_setname(ship * self, const char * name)
 {
+  free(self->name);
+  if (name) self->name = strdup(name);
+  else self->name = NULL;
 }
 
+const char *
+ship_getname(const ship * self)
+{
+  return self->name;
+}

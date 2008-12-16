@@ -53,3 +53,11 @@
 
 #define SIMPLE_COMBAT
 #define SIMPLE_ESCAPE
+
+#if defined(BINDINGS_LUABIND)
+# undef BINDINGS_TOLUA
+#elif defined(BINDINGS_TOLUA)
+# undef BINDINGS_LUABIND
+#else
+# define BINDINGS_LUABIND /* fallback */
+#endif

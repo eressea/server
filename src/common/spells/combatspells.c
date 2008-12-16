@@ -1649,11 +1649,11 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         unit * u = create_unit(r, mage->faction, 0, new_race[RC_UNDEAD], 0, du->name, du);
 
         /* new units gets some stats from old unit */
-        free(u->display);
+        
         if (du->display) {
-          u->display = strdup(du->display);
+          unit_setinfo(u, du->display);
         } else {
-          u->display = NULL;
+          unit_setinfo(u, NULL);
         }
         setstatus(u, du->status);
         setguard(u, GUARD_NONE);

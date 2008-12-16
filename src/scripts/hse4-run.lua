@@ -42,7 +42,6 @@ function process(orders)
   -- loadscript("eressea/multis.lua")
 
   -- run the turn:
-  set_encoding("utf8")
   if read_orders(orders) ~= 0 then
     print("could not read " .. orders)
     return -1

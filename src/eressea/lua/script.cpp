@@ -328,8 +328,3 @@ bind_script(lua_State * L)
     def("set_unit_brain", &unit_setscript)
   ];
 }
-
-void
-reset_scripts()
-{
-}

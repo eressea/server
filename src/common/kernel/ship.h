@@ -83,24 +83,25 @@ typedef struct ship {
 extern void damage_ship(ship *sh, double percent);
 extern struct unit *captain(ship *sh, struct region *r);
 extern struct unit *shipowner(const struct ship * sh);
+extern const char * shipname(const struct ship * self);
 extern int shipcapacity(const struct ship * sh);
 extern void getshipweight(const struct ship * sh, int *weight, int *cabins);
 
 extern ship *new_ship(const struct ship_type * stype, const struct locale * lang, struct region * r);
-extern const char *shipname(const struct ship * sh);
 extern const char *write_shipname(const struct ship * sh, char * buffer, size_t size);
 extern struct ship *findship(int n);
 extern struct ship *findshipr(const struct region *r, int n);
 
 extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
 
-extern void register_ships(void);
 extern void write_ship_reference(const struct ship * sh, struct storage * store);
 
 extern void remove_ship(struct ship ** slist, struct ship * s);
 extern void free_ship(struct ship * s);
 extern void free_ships(void);
 
+extern const char * ship_getname(const struct ship * self);
+extern void ship_setname(struct ship * self, const char * name);
 
 #ifdef __cplusplus
 }

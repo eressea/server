@@ -23,6 +23,7 @@
 #define H_KRNL_UNIT_H
 
 #include <util/variant.h>
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -211,6 +212,12 @@ extern struct unit * create_unit(struct region * r1, struct faction * f, int num
 extern void uhash(struct unit * u);
 extern void uunhash(struct unit * u);
 extern struct unit *ufindhash(int i);
+
+extern const char * unit_getname(const struct unit * u);
+extern void unit_setname(struct unit * u, const char * name);
+extern const char * unit_getinfo(const struct unit * u);
+extern void unit_setinfo(struct unit * u, const char * name);
+
 
 extern struct attrib_type at_creator;
 #ifdef __cplusplus

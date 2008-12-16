@@ -433,14 +433,12 @@ end
 
 -- test_moving()
 if 0==1 then
- set_encoding("ISO-8859-1")
  read_game("530")
  -- read_orders("../game/orders.530")
  plan_monsters()
  process_orders()
  write_game("531")
 else
- set_encoding("UTF-8")
  read_game("531")
  plan_monsters()
  process_orders()

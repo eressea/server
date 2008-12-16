@@ -1376,18 +1376,17 @@ createunitid(unit *u, int id)
 void
 name_unit(unit *u)
 {
-  free(u->name);
   if (u->race->generate_name) {
     const char * gen_name = u->race->generate_name(u); 
     if (gen_name) {
-      u->name = strdup(gen_name);
+      unit_setname(u, gen_name);
     } else {
-      u->name = strdup(racename(u->faction->locale, u, u->race));
+      unit_setname(u, racename(u->faction->locale, u, u->race));
     }
   } else {
     char name[16];
     sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
-    u->name = strdup(name);
+    unit_setname(u, name);
   }
 }
 
@@ -1517,5 +1516,33 @@ countheroes(const struct faction * f)
   }
 #endif
   return n;
+}
+
+const char *
+unit_getname(const unit * u)
+{
+  return (const char *)u->name;
+}
+
+void
+unit_setname(unit * u, const char * name)
+{
+  free(u->name);
+  if (name) u->name = strdup(name);
+  else u->name = NULL;
+}
+
+const char *
+unit_getinfo(const unit * u)
+{
+  return (const char *)u->display;
+}
+
+void
+unit_setinfo(unit * u, const char * info)
+{
+  free(u->display);
+  if (info) u->display = strdup(info);
+  else u->display = NULL;
 }
 
