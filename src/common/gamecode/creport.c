@@ -625,7 +625,7 @@ fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
 {
   char obuf[1024];
   fputc('"', F);
-  write_order(ord, lang, obuf, sizeof(obuf));
+  write_order(ord, obuf, sizeof(obuf));
   if (obuf[0]) fputs(obuf, F);
   fputc('"', F);
 }

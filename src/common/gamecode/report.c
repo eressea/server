@@ -1444,7 +1444,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
         for (ord = u->old_orders; ord; ord = ord->next) {
           /* this new order will replace the old defaults */
           strcpy(buf, "   ");
-          write_order(ord, u->faction->locale, buf+2, sizeof(buf)-2);
+          write_order(ord, buf+2, sizeof(buf)-2);
           rps_nowrap(F, buf);
           rnl(F);
         }
@@ -1452,7 +1452,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
           if (u->old_orders && is_repeated(ord)) continue; /* unit has defaults */
           if (is_persistent(ord)) {
             strcpy(buf, "   ");
-            write_order(ord, u->faction->locale, buf+2, sizeof(buf)-2);
+            write_order(ord, buf+2, sizeof(buf)-2);
             rps_nowrap(F, buf);
             rnl(F);
           }

@@ -192,36 +192,6 @@ set_show_item(faction *f, item_t i)
 	a->data.v = (void*)olditemtype[i];
 }
 
-int
-unit_max_hp(const unit * u)
-{
-	int h;
-	double p;
-	static const curse_type * heal_ct = NULL;
-	h = u->race->hitpoints;
-	if (heal_ct==NULL) heal_ct = ct_find("healingzone");
-
-
-	p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
-	h += (int) (h * p + 0.5);
-
-#if KARMA_MODULE
-	if (fspecial(u->faction, FS_UNDEAD)) {
-		h *= 2;
-	}
-#endif /* KARMA_MODULE */
-
-	/* der healing curse verändert die maximalen hp */
-	if (heal_ct) {
-		curse *c = get_curse(u->region->attribs, heal_ct);
-		if (c) {
-			h = (int) (h * (1.0+(curse_geteffect(c)/100)));
-		}
-	}
-
-	return h;
-}
-
 boolean
 r_insectstalled(const region * r)
 {

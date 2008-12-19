@@ -1,0 +1,61 @@
+<package name="eressea">
+	<type name="message"/>
+	<type name="unit"/>
+	<module>
+		<class name="message" ctype="struct message" base=""/>
+		<module name="message">
+			<static name="set_unit">
+				<arg name="u" type="unit"/>
+			</static>
+		</module>
+		<class name="unit" ctype="struct unit" base=""/>
+		<module name="unit">
+			<static name="create" type="unit">
+				<function expr="create_unit(r, f, 0, f-&gt;race, 0, 0, 0)" />
+				<arg name="f" type="faction"/>
+				<arg name="r" type="region"/>
+			</static>
+			<member name="add_order">
+				<function expr="unit_addorder(self, parse_order(str, self-&gt;faction-&gt;locale))" />
+				<arg name="str" type="cstring"/>
+			</member>
+			<variable name="name" type="cstring">
+				<getter name="unit_getname"/>
+				<setter name="unit_setname"/>
+			</variable>
+			<variable name="info" type="cstring">
+				<getter name="unit_getinfo"/>
+				<setter name="unit_setinfo"/>
+			</variable>
+			<variable name="magic" type="cstring">
+				<getter name="unit_getmagic"/>
+				<setter name="unit_setmagic"/>
+			</variable>
+			<variable name="flags" type="int">
+				<readwrite name="flags"/>
+			</variable>
+		</module>
+		<class name="faction" ctype="struct faction" base=""/>
+		<module name="faction">
+			<variable name="name" type="cstring">
+				<getter name="faction_getname"/>
+				<setter name="faction_setname"/>
+			</variable>
+			<variable name="heroes" type="int">
+				<getter name="countheroes"/>
+			</variable>
+			<variable name="maxheroes" type="int">
+				<getter name="maxheroes"/>
+			</variable>
+			<variable name="id" type="int">
+				<readonly name="no"/>
+			</variable>
+			<variable name="age" type="int">
+				<readonly name="age"/>
+			</variable>
+			<variable name="score" type="int">
+				<readonly name="score"/>
+			</variable>
+		</module>
+	</module>
+</package>

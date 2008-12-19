@@ -125,6 +125,7 @@ extern variant read_faction_reference(struct storage * store);
 extern int resolve_faction(variant data, void * addr);
 
 extern void renumber_faction(faction * f, int no);
+void free_faction(struct faction * f);
 
 #ifdef SMART_INTERVALS
 extern void update_interval(struct faction * f, struct region * r);

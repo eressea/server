@@ -666,41 +666,6 @@ ffindhash(int no)
 /* ----------------------------------------------------------------------- */
 
 void
-stripfaction (faction * f)
-{
-  /* TODO: inhalt auch löschen */
-  if (f->msgs) free_messagelist(f->msgs);
-  while (f->battles) {
-    struct bmsg * bm = f->battles;
-    f->battles = bm->next;
-    if (bm->msgs) free_messagelist(bm->msgs);
-    free(bm);
-  }
-
-  while (f->groups) {
-    group * g = f->groups;
-    f->groups = g->next;
-    free_group(g);
-  }
-  freelist(f->allies);
-
-  free(f->email);
-  free(f->banner);
-  free(f->passw);
-  free(f->override);
-  free(f->name);
-
-  while (f->attribs) {
-    a_remove (&f->attribs, f->attribs);
-  }
-
-  i_freeall(&f->items);
-
-  freelist(f->ursprung);
-  funhash(f);
-}
-
-void
 verify_data(void)
 {
 #ifndef NDEBUG
@@ -831,50 +796,6 @@ eff_stealth(const unit * u, const region * r)
     if (es >=0 && es < e) return es;
   }
   return e;
-}
-
-void
-scale_number (unit * u, int n)
-{
-  skill_t sk;
-  const attrib * a;
-  int remain;
-
-  if (n == u->number) return;
-  if (n && u->number>0) {
-    int full;
-    remain = ((u->hp%u->number) * (n % u->number)) % u->number;
-
-    full = u->hp/u->number; /* wieviel kriegt jede person mindestens */
-    u->hp = full * n + (u->hp-full*u->number) * n / u->number;
-    assert(u->hp>=0);
-    if ((rng_int() % u->number) < remain)
-      ++u->hp;  /* Nachkommastellen */
-  } else {
-    remain = 0;
-    u->hp = 0;
-  }
-  if (u->number>0) {
-    for (a = a_find(u->attribs, &at_effect);a && a->type==&at_effect;a=a->next) {
-      effect_data * data = (effect_data *)a->data.v;
-      int snew = data->value / u->number * n;
-      if (n) {
-        remain = data->value - snew / n * u->number;
-        snew += remain * n / u->number;
-        remain = (remain * n) % u->number;
-        if ((rng_int() % u->number) < remain)
-          ++snew; /* Nachkommastellen */
-      }
-      data->value = snew;
-    }
-  }
-  if (u->number==0 || n==0) {
-    for (sk = 0; sk < MAXSKILLS; sk++) {
-      remove_skill(u, sk);
-    }
-  }
-
-  set_number(u, n);
 }
 
 boolean
@@ -2379,6 +2300,9 @@ remove_empty_factions(boolean writedropouts)
       }
 
       *fp = f->next;
+      funhash(f);
+      free_faction(f);
+      free(f);
     }
     else fp = &(*fp)->next;
   }
@@ -3030,7 +2954,8 @@ free_gamedata(void)
   while (factions) {
     faction * f = factions;
     factions = f->next;
-    stripfaction(f);
+    funhash(f);
+    free_faction(f);
     free(f);
   }
 

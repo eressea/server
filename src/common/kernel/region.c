@@ -892,6 +892,39 @@ freeland(land_region * lr)
 }
 
 void
+region_setresource(region * r, const resource_type * rtype, int value)
+{
+  rawmaterial * rm = r->resources;
+  while (rm) {
+    if (rm->type->rtype==rtype) {
+      rm->amount = value;
+      break;
+    }
+    rm=rm->next;
+  }
+  if (!rm) {
+    if (rtype==rt_find("money")) rsetmoney(r, value);
+    else if (rtype==rt_find("peasant")) rsetpeasants(r, value);
+    else if (rtype==rt_find("horse")) rsethorses(r, value);
+  }
+}
+
+int
+region_getresource(const region * r, const resource_type * rtype)
+{
+  const rawmaterial * rm;
+  for (rm=r->resources;rm;rm=rm->next) {
+    if (rm->type->rtype==rtype) {
+      return rm->amount;
+    }
+  }
+  if (rtype==rt_find("money")) return rmoney(r);
+  if (rtype==rt_find("horse")) return rhorses(r);
+  if (rtype==rt_find("peasant")) return rpeasants(r);
+  return 0;
+}
+
+void
 free_region(region * r)
 {
   if (last == r) last = NULL;

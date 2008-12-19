@@ -47,6 +47,44 @@
 #include <string.h>
 #include <stdlib.h>
 
+/** remove the faction from memory.
+ * this frees all memory that's only accessible through the faction,
+ * but you should still call funhash and remove the faction from the
+ * global list.
+ */
+void
+free_faction (faction * f)
+{
+  if (f->msgs) free_messagelist(f->msgs);
+  while (f->battles) {
+    struct bmsg * bm = f->battles;
+    f->battles = bm->next;
+    if (bm->msgs) free_messagelist(bm->msgs);
+    free(bm);
+  }
+
+  while (f->groups) {
+    group * g = f->groups;
+    f->groups = g->next;
+    free_group(g);
+  }
+  freelist(f->allies);
+
+  free(f->email);
+  free(f->banner);
+  free(f->passw);
+  free(f->override);
+  free(f->name);
+
+  while (f->attribs) {
+    a_remove (&f->attribs, f->attribs);
+  }
+
+  i_freeall(&f->items);
+
+  freelist(f->ursprung);
+}
+
 faction *
 get_monsters(void)
 {

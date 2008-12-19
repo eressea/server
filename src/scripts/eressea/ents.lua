@@ -7,7 +7,7 @@ local function create_ents(r, number)
     u.name = "Wütende Ents"
     u:set_skill("perception", 2)
     
-    msg = message("entrise")
+    msg = message.create("entrise")
     msg:set_region("region", r)
     msg:send_region(r)
     return u

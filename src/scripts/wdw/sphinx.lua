@@ -88,7 +88,7 @@ function sphinx_handler()
     if table.getn(tokens) == 2 and string.lower(tokens[1]) == "antwort" then
       if string.lower(tokens[2]) == "999999" then
         -- Botschaft in alle Regionen
-        local m = message("msg_event")
+        local m = message.create("msg_event")
         m:set_string("string", "Das Rätsel der Sphinx ist gelöst! Die Sphinx wird sich eine neue Heimat und ein neues Rätsel suchen.")
         for r in regions() do
           m:send_region(r)

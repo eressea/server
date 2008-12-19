@@ -14,6 +14,7 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
+#include <kernel/message.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
@@ -358,23 +359,6 @@ unit_getbuilding(const unit * u)
   return u->building;
 }
 
-static int
-unit_getid(const unit * u)
-{
-  return u->no;
-}
-
-static void
-unit_setid(unit * u, int id)
-{
-  unit * nu = findunit(id);
-  if (nu==NULL) {
-    uunhash(u);
-    u->no = id;
-    uhash(u);
-  }
-}
-
 static bool
 get_flag(const unit * u, const char * name)
 {
@@ -456,15 +440,14 @@ unit_setmagic(unit * u, const char * type)
 }
 
 static void
-unit_addorder(unit * u, const char * str)
+unit_add_order(unit * u, const char * str)
 {
   order * ord = parse_order(str, u->faction->locale);
-  addlist(&u->orders, ord);
-  u->faction->lastorders = turn;
+  unit_addorder(u, ord);
 }
 
 static void
-unit_clearorders(unit * u)
+unit_clear_orders(unit * u)
 {
   free_orders(&u->orders);
 }
@@ -574,8 +557,8 @@ bind_unit(lua_State * L)
     .property("familiar", &unit_getfamiliar, &unit_setfamiliar)
 
     // orders:
-    .def("add_order", &unit_addorder)
-    .def("clear_orders", &unit_clearorders)
+    .def("add_order", &unit_add_order)
+    .def("clear_orders", &unit_clear_orders)
     .property("orders", &unit_orders, return_stl_iterator)
 
     // key-attributes for named flags:

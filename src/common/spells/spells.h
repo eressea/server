@@ -40,7 +40,7 @@ extern "C" {
     int countdown;
   } wall_data;
 
-  int levitate_ship(ship * sh, unit * mage, double power, int duration);
+  int levitate_ship(struct ship * sh, struct unit * mage, double power, int duration);
 
 #ifdef __cplusplus
 }

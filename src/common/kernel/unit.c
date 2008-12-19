@@ -1546,3 +1546,137 @@ unit_setinfo(unit * u, const char * info)
   else u->display = NULL;
 }
 
+int
+unit_getid(const unit * u)
+{
+  return u->no;
+}
+
+void
+unit_setid(unit * u, int id)
+{
+  unit * nu = findunit(id);
+  if (nu==NULL) {
+    uunhash(u);
+    u->no = id;
+    uhash(u);
+  }
+}
+
+int
+unit_gethp(const unit * u)
+{
+  return u->hp;
+}
+
+void
+unit_sethp(unit * u, int hp)
+{
+  u->hp = hp;
+}
+
+status_t
+unit_getstatus(const unit * u)
+{
+  return u->status;
+}
+
+void
+unit_setstatus(unit * u, status_t status)
+{
+  u->status = status;
+}
+
+int
+unit_getweight(const unit * u)
+{
+  return weight(u);
+}
+
+int
+unit_getcapacity(const unit * u)
+{
+  return walkingcapacity(u);
+}
+
+void
+unit_addorder(unit * u, order * ord)
+{
+  order ** ordp = &u->orders;
+  while (*ordp) ordp = &(*ordp)->next;
+  *ordp = ord;
+  u->faction->lastorders = turn;
+}
+
+int
+unit_max_hp(const unit * u)
+{
+  int h;
+  double p;
+  static const curse_type * heal_ct = NULL;
+  h = u->race->hitpoints;
+  if (heal_ct==NULL) heal_ct = ct_find("healingzone");
+
+  p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
+  h += (int) (h * p + 0.5);
+
+#if KARMA_MODULE
+  if (fspecial(u->faction, FS_UNDEAD)) {
+    h *= 2;
+  }
+#endif /* KARMA_MODULE */
+
+  /* der healing curse verändert die maximalen hp */
+  if (heal_ct) {
+    curse *c = get_curse(u->region->attribs, heal_ct);
+    if (c) {
+      h = (int) (h * (1.0+(curse_geteffect(c)/100)));
+    }
+  }
+
+  return h;
+}
+
+void
+scale_number (unit * u, int n)
+{
+  skill_t sk;
+  const attrib * a;
+  int remain;
+
+  if (n == u->number) return;
+  if (n && u->number>0) {
+    int full;
+    remain = ((u->hp%u->number) * (n % u->number)) % u->number;
+
+    full = u->hp/u->number; /* wieviel kriegt jede person mindestens */
+    u->hp = full * n + (u->hp-full*u->number) * n / u->number;
+    assert(u->hp>=0);
+    if ((rng_int() % u->number) < remain)
+      ++u->hp;  /* Nachkommastellen */
+  } else {
+    remain = 0;
+    u->hp = 0;
+  }
+  if (u->number>0) {
+    for (a = a_find(u->attribs, &at_effect);a && a->type==&at_effect;a=a->next) {
+      effect_data * data = (effect_data *)a->data.v;
+      int snew = data->value / u->number * n;
+      if (n) {
+        remain = data->value - snew / n * u->number;
+        snew += remain * n / u->number;
+        remain = (remain * n) % u->number;
+        if ((rng_int() % u->number) < remain)
+          ++snew; /* Nachkommastellen */
+      }
+      data->value = snew;
+    }
+  }
+  if (u->number==0 || n==0) {
+    for (sk = 0; sk < MAXSKILLS; sk++) {
+      remove_skill(u, sk);
+    }
+  }
+
+  set_number(u, n);
+}

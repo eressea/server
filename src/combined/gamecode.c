@@ -4,6 +4,9 @@
 
 #ifdef BINDINGS_TOLUA
 #include "eressea/tolua/bindings.c"
+#include "eressea/tolua/bind_unit.c"
+#include "eressea/tolua/bind_faction.c"
+#include "eressea/tolua/bind_message.c"
 #include "eressea/tolua/helpers.c"
 #endif
 

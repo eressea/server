@@ -1,5 +1,5 @@
 function usepotion_message(u, potion)
-  msg = message("usepotion")
+  msg = message.create("usepotion")
   msg:set_unit("unit", u)
   msg:set_resource("potion", potion)
   return msg

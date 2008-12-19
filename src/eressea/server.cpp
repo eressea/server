@@ -100,6 +100,9 @@
 #include <lua.hpp>
 #include "tolua/bindings.h"
 #include "tolua/helpers.h"
+#include "tolua/bind_unit.h"
+#include "tolua/bind_faction.h"
+#include "tolua/bind_message.h"
 #endif // BINDINGS_TOLUA
 
 #ifdef BINDINGS_LUABIND
@@ -286,6 +289,10 @@ lua_init(void)
 #ifdef BINDINGS_TOLUA
   register_tolua_helpers();
   tolua_eressea_open(L);
+  tolua_unit_open(L);
+  tolua_faction_open(L);
+  tolua_unit_open(L);
+  tolua_message_open(L);
 #endif
 
 #ifdef BINDINGS_LUABIND

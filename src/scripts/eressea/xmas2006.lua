@@ -1,7 +1,7 @@
 function use_xmastree(u, amount)
   u.region:set_key("xm06", true)
   u:use_pooled("xmastree", amount)
-  local msg = message("usepotion")
+  local msg = message.create("usepotion")
   msg:set_unit("unit", u)
   msg:set_resource("potion", "xmastree")
   msg:send_region(u.region)
@@ -13,7 +13,7 @@ function update_xmas2006()
   local season = get_season(turn)
   if season == "calendar::winter" then
     print("it is " .. season .. ", the christmas trees do their magic")
-    local msg = message("xmastree_effect")
+    local msg = message.create("xmastree_effect")
     for r in regions() do
       if r:get_key("xm06") then
         trees = r:get_resource("tree")

@@ -213,11 +213,21 @@ extern void uhash(struct unit * u);
 extern void uunhash(struct unit * u);
 extern struct unit *ufindhash(int i);
 
-extern const char * unit_getname(const struct unit * u);
-extern void unit_setname(struct unit * u, const char * name);
-extern const char * unit_getinfo(const struct unit * u);
-extern void unit_setinfo(struct unit * u, const char * name);
-
+const char * unit_getname(const struct unit * u);
+void unit_setname(struct unit * u, const char * name);
+const char * unit_getinfo(const struct unit * u);
+void unit_setinfo(struct unit * u, const char * name);
+int unit_getid(const unit * u);
+void unit_setid(unit * u, int id);
+int unit_gethp(const unit * u);
+void unit_sethp(unit * u, int id);
+status_t unit_getstatus(const unit * u);
+void unit_setstatus(unit * u, status_t status);
+int unit_getweight(const unit * u);
+int unit_getcapacity(const unit * u);
+void unit_addorder(unit * u, struct order * ord);
+int unit_max_hp(const struct unit * u);
+void scale_number(struct unit * u, int n);
 
 extern struct attrib_type at_creator;
 #ifdef __cplusplus

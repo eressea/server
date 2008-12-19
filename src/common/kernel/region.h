@@ -126,8 +126,8 @@ typedef struct region_list {
   struct region * data;
 } region_list;
 
-extern struct message_list * r_getmessages(const struct region * r, const struct faction * viewer);
-extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
+struct message_list * r_getmessages(const struct region * r, const struct faction * viewer);
+struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct spec_direction {
   short x, y;
@@ -145,13 +145,12 @@ typedef struct {
 
 int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;
-extern direction_t reldirection(const struct region * from, const struct region * to);
-extern struct region * findregion(short x, short y);
-extern struct region * findregionbyid(unsigned int uid);
+direction_t reldirection(const struct region * from, const struct region * to);
+struct region * findregion(short x, short y);
+struct region * findregionbyid(unsigned int uid);
 
 extern struct attrib_type at_direction;
 extern struct attrib_type at_moveblock;
-/* new: */
 extern struct attrib_type at_peasantluck;
 extern struct attrib_type at_horseluck;
 extern struct attrib_type at_chaoscount;
@@ -166,10 +165,10 @@ void runhash(struct region * r);
 void free_regionlist(region_list *rl);
 void add_regionlist(region_list **rl, struct region *r);
 
-extern struct region * find_special_direction(const struct region *r, const char *token, const struct locale * lang);
-extern void register_special_direction(const char * name);
-extern struct spec_direction * special_direction(const region * from, const region * to);
-extern struct attrib *create_special_direction(struct region *r, struct region *rt,
+struct region * find_special_direction(const struct region *r, const char *token, const struct locale * lang);
+void register_special_direction(const char * name);
+struct spec_direction * special_direction(const region * from, const region * to);
+struct attrib *create_special_direction(struct region *r, struct region *rt,
                                                int duration, const char *desc,
                                                const char *keyword);
 
@@ -180,7 +179,7 @@ void deathcounts(struct region * r, int delta);
 void chaoscounts(struct region * r, int delta);
 
 void setluxuries(struct region * r, const struct luxury_type * sale);
-extern int get_maxluxuries(void);
+int get_maxluxuries(void);
 
 short rroad(const struct region * r, direction_t d);
 void rsetroad(struct region * r, direction_t d, short value);
@@ -205,52 +204,53 @@ void rsethorses(const struct region * r, int value);
 #define rherbs(r) ((r)->land?(r)->land->herbs:0)
 #define rsetherbs(r, value) if ((r)->land) ((r)->land->herbs=(short)(value))
 
-extern boolean r_isforest(const struct region * r);
+boolean r_isforest(const struct region * r);
 
 #define rterrain(r) (oldterrain((r)->terrain))
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
-extern const char * rname(const struct region * r, const struct locale * lang);
+const char * rname(const struct region * r, const struct locale * lang);
 
 #define rplane(r) getplane(r)
 
-extern void r_setdemand(struct region * r, const struct luxury_type * ltype, int value);
-extern int r_demand(const struct region * r, const struct luxury_type * ltype);
+void r_setdemand(struct region * r, const struct luxury_type * ltype, int value);
+int r_demand(const struct region * r, const struct luxury_type * ltype);
 
-extern const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
+const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
-extern struct region * new_region(short x, short y, unsigned int uid);
-extern void remove_region(region ** rlist, region * r);
-extern void terraform_region(struct region * r, const struct terrain_type * terrain);
+struct region * new_region(short x, short y, unsigned int uid);
+void remove_region(region ** rlist, region * r);
+void terraform_region(struct region * r, const struct terrain_type * terrain);
 
 extern const short delta_x[MAXDIRECTIONS];
 extern const short delta_y[MAXDIRECTIONS];
-extern direction_t dir_invert(direction_t dir);
-extern int production(const struct region *r);
+direction_t dir_invert(direction_t dir);
+int production(const struct region *r);
 
 void region_setowner(struct region * r, struct faction * owner);
-extern struct faction * region_owner(const struct region * r);
+struct faction * region_owner(const struct region * r);
 
-extern struct region * r_connect(const struct region *, direction_t dir);
+struct region * r_connect(const struct region *, direction_t dir);
 #ifdef FAST_CONNECT
 # define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, dir))
 #else
 # define rconnect(r, dir) r_connect(r, dir)
 #endif
 
-extern void free_regions(void);
+void free_regions(void);
 
-extern void write_region_reference(const struct region * r, struct storage * store);
-extern variant read_region_reference(struct storage * store);
-extern int resolve_region_coor(variant id, void * address);
-extern int resolve_region_id(variant id, void * address);
+void write_region_reference(const struct region * r, struct storage * store);
+variant read_region_reference(struct storage * store);
+int resolve_region_coor(variant id, void * address);
+int resolve_region_id(variant id, void * address);
 #define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
 
-extern const char * regionname(const struct region * r, const struct faction * f);
+const char * regionname(const struct region * r, const struct faction * f);
 
-extern const char * region_getname(const struct region * self);
-extern void region_setname(struct region * self, const char * name);
-
+const char * region_getname(const struct region * self);
+void region_setname(struct region * self, const char * name);
+int region_getresource(const struct region * r, const struct resource_type * rtype);
+void region_setresource(struct region * r, const struct resource_type * rtype, int value);
 
 #ifdef __cplusplus
 }

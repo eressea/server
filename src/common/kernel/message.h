@@ -46,6 +46,7 @@ extern struct message * msg_message(const char * name, const char* sig, ...);
 extern struct message * msg_feedback(const struct unit *, struct order *cmd,
                                   const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
+void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 

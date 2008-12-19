@@ -1902,7 +1902,7 @@ eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
   size_t len;
   variant var;
 
-  write_order(ord, report->locale, buf, sizeof(buf));
+  write_order(ord, buf, sizeof(buf));
   len = strlen(buf);
   var.v = strcpy(balloc(len+1), buf);
   opush(stack, var);

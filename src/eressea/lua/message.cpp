@@ -176,6 +176,11 @@ operator<<(std::ostream& stream, const lua_message& msg)
   return stream;
 }
 
+lua_message *
+create_lua_message(const char * str)
+{
+  return new lua_message(str);
+}
 
 void
 bind_message(lua_State * L)
@@ -185,6 +190,7 @@ bind_message(lua_State * L)
       .def(constructor<const char *>())
       .def(tostring(const_self))
 
+      .def("create", create_lua_message)
       .def("set_unit", &lua_message::set_unit)
       .def("set_region", &lua_message::set_region)
       .def("set_resource", &lua_message::set_resource)

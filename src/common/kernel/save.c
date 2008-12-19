@@ -607,7 +607,7 @@ static void
 writeorder(struct storage * store, const struct order * ord, const struct locale * lang)
 {
   char obuf[1024];
-  write_order(ord, lang, obuf, sizeof(obuf));
+  write_order(ord, obuf, sizeof(obuf));
   if (obuf[0]) store->w_str(store, obuf);
 }
 
@@ -837,8 +837,8 @@ writeunit(struct storage * store, const unit * u)
   write_items(store, u->items);
   store->w_brk(store);
   if (u->hp == 0) {
-    log_error(("Einheit %s hat 0 Trefferpunkte\n", itoa36(u->no)));
-    ((unit*)u)->hp = 1;
+    log_error(("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no)));
+    ((unit*)u)->hp = u->number;
   }
   store->w_int(store, u->hp);
   store->w_brk(store);

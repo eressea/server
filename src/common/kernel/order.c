@@ -500,7 +500,7 @@ is_persistent(const order * ord)
 }
 
 char * 
-write_order(const order * ord, const struct locale * lang, char * buffer, size_t size)
+write_order(const order * ord, char * buffer, size_t size)
 {
   if (ord==0) {
     buffer[0]=0;

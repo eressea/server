@@ -256,8 +256,6 @@ extern boolean has_limited_skills(const struct unit * u);
 extern const struct race * findrace(const char *, const struct locale *);
 
 int eff_stealth(const struct unit * u, const struct region * r);
-void scale_number(struct unit * u, int n);
-int unit_max_hp(const struct unit * u);
 int ispresent(const struct faction * f, const struct region * r);
 
 int check_option(struct faction * f, int option);
@@ -267,7 +265,6 @@ extern void parse(keyword_t kword, int (*dofun)(struct unit *, struct order *), 
  * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
 void verify_data(void);
 
-void stripfaction(struct faction * f);
 void freestrlist(strlist * s);
 
 int change_hitpoints(struct unit *u, int value);
@@ -287,7 +284,6 @@ boolean unit_has_cursed_item(struct unit *u);
 
 /* simple garbage collection: */
 void * gc_add(void * p);
-void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
 
 /* grammatik-flags: */
 #define GF_NONE 0
