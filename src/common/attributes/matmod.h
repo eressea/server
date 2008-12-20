@@ -11,6 +11,8 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
+#ifndef H_ATTRIBUTE_MATMOD
+#define H_ATTRIBUTE_MATMOD
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,4 +27,6 @@ extern struct attrib * make_matmod(mm_fun function);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

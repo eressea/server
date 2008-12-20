@@ -1,0 +1,1 @@
+#include <eressea/server.cpp>

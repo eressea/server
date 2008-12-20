@@ -73,7 +73,7 @@ get_resource(const unit * u, const resource_type * rtype)
     } else if (itype==olditemtype[R_IRON] && u->race==rc_irongolem) {
       return u->number*GOLEM_IRON;
     } else {
-      const item * i = *i_find((item**)&u->items, itype);
+      const item * i = *i_findc(&u->items, itype);
       if (i) return i->number;
       return 0;
     }

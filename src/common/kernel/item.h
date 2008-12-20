@@ -227,6 +227,7 @@ extern const potion_type * resource2potion(const resource_type * i);
 extern const luxury_type * resource2luxury(const resource_type * i);
 
 extern item ** i_find(item ** pi, const item_type * it);
+extern item * const * i_findc(item * const * pi, const item_type * it);
 extern item * i_add(item ** pi, item * it);
 extern void i_merge(item ** pi, item ** si);
 extern item * i_remove(item ** pi, item * it);

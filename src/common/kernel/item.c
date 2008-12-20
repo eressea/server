@@ -432,6 +432,14 @@ i_find(item ** i, const item_type * it)
   return i;
 }
 
+item * const *
+i_findc(item * const * i, const item_type * it)
+{
+  while (*i && (*i)->type!=it) {
+    i = &(*i)->next;
+  }
+  return i;
+}
 
 int
 i_get(const item * i, const item_type * it)
@@ -621,7 +629,7 @@ int
 get_item(const unit * u, item_t it)
 {
   const item_type * type = olditemtype[it];
-  item * i = *i_find((item**)&u->items, type);
+  const item * i = *i_findc(&u->items, type);
   if (i) assert(i->number>=0);
   return i?i->number:0;
 }
