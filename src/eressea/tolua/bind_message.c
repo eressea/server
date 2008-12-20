@@ -13,7 +13,7 @@
 
 // lua includes
 #include <lua.h>
-#include <tolua++.h>
+#include <tolua.h>
 
 #define E_OK 0
 #define E_INVALID_MESSAGE 1

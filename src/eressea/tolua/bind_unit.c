@@ -44,7 +44,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 
 #include <lua.h>
-#include <tolua++.h>
+#include <tolua.h>
 
 #include <limits.h>
 

@@ -7,7 +7,7 @@
 #include <kernel/region.h>
 
 #include <lua.h>
-#include <tolua++.h>
+#include <tolua.h>
 
 static int
 tolua_run_mapper(lua_State* tolua_S)
