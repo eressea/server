@@ -40,6 +40,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/log.h>
 #include <util/nrmessage.h>
 #include <util/rand.h>

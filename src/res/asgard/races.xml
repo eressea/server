@@ -87,7 +87,6 @@
   </race>
   <race name="tiger" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="30" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -115,7 +114,6 @@
   </race>
   <race name="hellcat" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="40" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" giveitem="yes" getitem="yes" resistpierce="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="perception" modifier="1"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
@@ -143,7 +141,6 @@
   </race>
   <race name="owl" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="9" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="4" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     
     <skill name="stealth" modifier="1"/>
     <skill name="perception" modifier="5"/>
@@ -172,7 +169,6 @@
   </race>
   <race name="fairy" magres="0.800000" maxaura="1.000000" regaura="1.500000" recruitcost="50" weight="200" capacity="540" speed="1.000000" hp="6" damage="1d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="14" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="stealth" modifier="5"/>
     
     <skill name="perception" modifier="2"/>
@@ -205,9 +201,7 @@
   </race>
   <race name="dreamcat" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="10" damage="1d5" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="6" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" invinciblenonmagic="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
-    
-    
+
     <skill name="stealth" modifier="1"/>
     <skill name="perception" modifier="1"/>
     
@@ -234,7 +228,7 @@
   </race>
   <race name="imp" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="10" ac="1" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="4" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
+
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -265,7 +259,6 @@
   </race>
   <race name="ghost" magres="0.800000" maxaura="0.500000" regaura="0.100000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes" invinciblenonmagic="yes">
     <ai splitsize="5000"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -325,7 +318,6 @@
   </race>
   <race name="unicorn" magres="0.900000" maxaura="1.500000" regaura="1.500000" recruitcost="50" weight="5000" capacity="2000" speed="2.000000" hp="40" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -355,7 +347,6 @@
   </race>
   <race name="nymph" magres="0.900000" maxaura="1.000000" regaura="1.500000" recruitcost="50" weight="1000" capacity="540" speed="1.000000" hp="15" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes">
     <ai splitsize="9999"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="2"/>
     <skill name="building" modifier="-99"/>
@@ -385,7 +376,6 @@
   </race>
   <race name="songdragon" magres="0.990000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="600" speed="1.500000" hp="40" ac="1" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -416,7 +406,6 @@
   </race>
   <race name="rat" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="100" capacity="540" speed="1.000000" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     
     <skill name="stealth" modifier="4"/>
     <skill name="perception" modifier="2"/>
@@ -447,7 +436,6 @@
   </race>
   <race name="eagle" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.500000" hp="15" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="2" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -476,7 +464,6 @@
   </race>
   <race name="tunnelworm" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="30000" capacity="10000" speed="1.000000" hp="300" ac="6" damage="3d20" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="1" scarepeasants="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="99999"/>
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="10"/>
     <skill name="bow" modifier="-99"/>
@@ -537,7 +524,6 @@
     <attack type="4" damage="2d3"/>
   </race>
   <race name="direwolf" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="1.000000" hp="20" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveperson="yes">
-    <function name="initfamiliar" value="lua_initfamiliar"/>
     <ai splitsize="5000"/>
     <attack type="4" damage="2d4"/>
   </race>

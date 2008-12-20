@@ -276,11 +276,35 @@
 			Name="tolua"
 			>
 			<File
+				RelativePath=".\tolua\bind_building.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_building.h"
+				>
+			</File>
+			<File
 				RelativePath=".\tolua\bind_faction.c"
 				>
 			</File>
 			<File
 				RelativePath=".\tolua\bind_faction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_gmtool.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_gmtool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_hashtable.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_hashtable.h"
 				>
 			</File>
 			<File
@@ -292,7 +316,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tolua\bind_region.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_region.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_ship.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_ship.h"
+				>
+			</File>
+			<File
 				RelativePath=".\tolua\bind_unit.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_unit.h"
 				>
 			</File>
 			<File

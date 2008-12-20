@@ -49,6 +49,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/resolve.h>

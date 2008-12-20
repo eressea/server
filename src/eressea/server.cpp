@@ -83,6 +83,7 @@
 
 /* util includes */
 #include <util/base36.h>
+#include <util/language.h>
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/rand.h>
@@ -103,6 +104,11 @@
 #include "tolua/bind_unit.h"
 #include "tolua/bind_faction.h"
 #include "tolua/bind_message.h"
+#include "tolua/bind_hashtable.h"
+#include "tolua/bind_ship.h"
+#include "tolua/bind_building.h"
+#include "tolua/bind_region.h"
+#include "tolua/bind_gmtool.h"
 #endif // BINDINGS_TOLUA
 
 #ifdef BINDINGS_LUABIND
@@ -130,6 +136,7 @@
 
 /* libc includes */
 #include <cstdio>
+#include <cassert>
 #include <cctype>
 #include <climits>
 #include <clocale>
@@ -290,9 +297,14 @@ lua_init(void)
   register_tolua_helpers();
   tolua_eressea_open(L);
   tolua_unit_open(L);
+  tolua_building_open(L);
+  tolua_ship_open(L);
+  tolua_region_open(L);
   tolua_faction_open(L);
   tolua_unit_open(L);
   tolua_message_open(L);
+  tolua_hashtable_open(L);
+  tolua_gmtool_open(L);
 #endif
 
 #ifdef BINDINGS_LUABIND

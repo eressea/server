@@ -33,6 +33,7 @@
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/lists.h>
+#include <util/language.h>
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/rng.h>
@@ -43,6 +44,7 @@
 #include <attributes/otherfaction.h>
 
 /* libc includes */
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -408,7 +410,7 @@ update_interval(struct faction * f, struct region * r)
 
 const char * faction_getname(const faction * self)
 {
-  return self->name;
+  return self->name?self->name:"";
 }
 
 void faction_setname(faction * self, const char * name)
@@ -419,7 +421,7 @@ void faction_setname(faction * self, const char * name)
 
 const char * faction_getemail(const faction * self)
 {
-  return self->email;
+  return self->email?self->email:"";
 }
 
 void faction_setemail(faction * self, const char * email)
@@ -430,7 +432,7 @@ void faction_setemail(faction * self, const char * email)
 
 const char * faction_getbanner(const faction * self)
 {
-  return self->banner;
+  return self->banner?self->banner:"";
 }
 
 void faction_setbanner(faction * self, const char * banner)

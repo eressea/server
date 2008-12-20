@@ -12,6 +12,9 @@ without prior permission by the authors of Eressea.
 
 #include <config.h>
 
+#include "bind_unit.h"
+#include "bindings.h"
+
 // Atributes includes
 #include <attributes/racename.h>
 #include <attributes/key.h>
@@ -43,42 +46,12 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
-int tolua_spelllist_next(lua_State *tolua_S)
+static int
+tolua_unit_get_objects(lua_State* tolua_S)
 {
-  spell_list** spell_ptr = (spell_list **)lua_touserdata(tolua_S, lua_upvalueindex(1));
-  spell_list* slist = *spell_ptr;
-  if (slist != NULL) {
-    tolua_pushusertype(tolua_S, slist->data, "spell");
-    *spell_ptr = slist->next;
-    return 1;
-  }
-  else return 0;  /* no more values to return */
-}
-
-int tolua_itemlist_next(lua_State *tolua_S)
-{
-  item** item_ptr = (item **)lua_touserdata(tolua_S, lua_upvalueindex(1));
-  item* itm = *item_ptr;
-  if (itm != NULL) {
-    tolua_pushstring(tolua_S, itm->type->rtype->_name[0]);
-    *item_ptr = itm->next;
-    return 1;
-  }
-  else return 0;  /* no more values to return */
-}
-
-int tolua_orderlist_next(lua_State *tolua_S)
-{
-  order** order_ptr = (order **)lua_touserdata(tolua_S, lua_upvalueindex(1));
-  order* ord = *order_ptr;
-  if (ord != NULL) {
-    char cmd[8192];
-    write_order(ord, cmd, sizeof(cmd));
-    tolua_pushstring(tolua_S, cmd);
-    *order_ptr = ord->next;
-    return 1;
-  }
-  else return 0;  /* no more values to return */
+  unit * self = (unit *)tolua_tousertype(tolua_S, 1, 0);
+  tolua_pushusertype(tolua_S, (void*)&self->attribs, "hashtable");
+  return 1;
 }
 
 int tolua_unitlist_nextf(lua_State *tolua_S)
@@ -88,6 +61,42 @@ int tolua_unitlist_nextf(lua_State *tolua_S)
   if (u != NULL) {
     tolua_pushusertype(tolua_S, (void*)u, "unit");
     *unit_ptr = u->nextF;
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
+
+int tolua_unitlist_nextb(lua_State *tolua_S)
+{
+  unit** unit_ptr = (unit **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  unit * u = *unit_ptr;
+  if (u != NULL) {
+    unit * unext = u->next;
+    tolua_pushusertype(tolua_S, (void*)u, "unit");
+
+    while (unext && unext->building!=u->building) {
+      unext = unext->next;
+    }
+    *unit_ptr = unext;
+
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
+
+int tolua_unitlist_nexts(lua_State *tolua_S)
+{
+  unit** unit_ptr = (unit **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  unit * u = *unit_ptr;
+  if (u != NULL) {
+    unit * unext = u->next;
+    tolua_pushusertype(tolua_S, (void*)u, "unit");
+
+    while (unext && unext->ship!=u->ship) {
+      unext = unext->next;
+    }
+    *unit_ptr = unext;
+
     return 1;
   }
   else return 0;  /* no more values to return */
@@ -888,6 +897,8 @@ tolua_unit_open(lua_State * tolua_S)
       tolua_variable(tolua_S, "number", tolua_unit_get_number, tolua_unit_set_number);
       tolua_variable(tolua_S, "race", tolua_unit_get_race, tolua_unit_set_race);
       tolua_variable(tolua_S, "hp_max", tolua_unit_get_hpmax, 0);
+
+      tolua_variable(tolua_S, "objects", tolua_unit_get_objects, 0);
     }
     tolua_endmodule(tolua_S);
   }

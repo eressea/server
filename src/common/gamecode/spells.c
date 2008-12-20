@@ -25,6 +25,7 @@
 
 #include <util/functions.h>
 
+#include <assert.h>
 
 /* ------------------------------------------------------------- */
 /* Name:       Plappermaul

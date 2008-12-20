@@ -43,8 +43,8 @@ end
 
 -- make a tunnel from the cursor to the first selected region
 function mktunnel()
-  local from = gmtool.cursor()
-  local to = gmtool.selection()()
+  local from = gmtool.get_cursor()
+  local to = gmtool.get_selection()()
   if to~=nil then
     terraform(from.x, from.y, "glacier")
     create_tunnel(from, to)
@@ -55,7 +55,7 @@ end
 
 -- turn all selected regions into targets for a wonky tunnel ("tnnL")
 function mkanchors()
-  for r in gmtool.selection() do
+  for r in gmtool.get_selection() do
     if not r:get_key("tnnL") then
       r:set_key("tnnL", true)
       if r:get_flag(0) then

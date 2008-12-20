@@ -28,6 +28,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <assert.h>
 
 boolean
 allowed_swim(const region * src, const region * r)

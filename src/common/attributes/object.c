@@ -32,6 +32,7 @@
 
 /* stdc includes */
 #include <string.h>
+#include <assert.h>
 
 typedef struct object_data {
   object_type type;

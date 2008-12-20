@@ -50,6 +50,7 @@
 #include <util/functions.h>
 #include <util/translation.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 
@@ -1902,6 +1903,7 @@ eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
   size_t len;
   variant var;
 
+  unused(report);
   write_order(ord, buf, sizeof(buf));
   len = strlen(buf);
   var.v = strcpy(balloc(len+1), buf);

@@ -32,6 +32,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/rng.h>
@@ -45,6 +46,7 @@
 #include <memory.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 const terrain_type *
 random_terrain(boolean distribution)

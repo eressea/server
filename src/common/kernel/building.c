@@ -610,3 +610,16 @@ void building_setname(building * self, const char * name)
   if (name) self->name = strdup(name);
   else self->name = NULL;
 }
+
+void
+building_addaction(building * b, const char * fname, const char * param)
+{
+  attrib * a = a_add(&b->attribs, a_new(&at_building_action));
+  building_action * data = (building_action*)a->data.v;
+  data->b = b;
+  data->fname = strdup(fname);
+  if (param) {
+    data->param = strdup(param);
+  }
+}
+

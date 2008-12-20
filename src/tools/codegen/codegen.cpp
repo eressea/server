@@ -5,6 +5,7 @@
 /* libc includes */
 #include <string.h>
 
+const char * prefix = "tolua_";
 const char * tmp_includes = 
 "#include <lua.h>\n"
 "#include <tolua.h>\n"
@@ -26,14 +27,54 @@ readfile(const char * filename)
   return doc;
 }
 
-void
-parse_module(xmlXPathContextPtr xpath, FILE * out)
+static void
+open_function(xmlNodePtr node, FILE * out)
 {
-  xmlChar * name = xmlGetProp(xpath->node, BAD_CAST "name");
-  xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "module", xpath);
-  xmlNodePtr node;
+  xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+  xmlNodePtr call;
 
-  xmlXPathFreeObject(result);
+  if (fname) {
+    fprintf(out, "  tolua_function(tolua_S, \"%s\", %s);\n", name, fname);
+  }
+  xmlFree(name);
+}
+
+static void
+open_variable(xmlNodePtr node, FILE * out)
+{
+  xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+  xmlChar * getter = BAD_CAST "0";
+  xmlChar * setter = BAD_CAST "0";
+  fprintf(out, "  tolua_variable(tolua_S, \"%s\", %s%s, %s%s);\n", name, prefix, getter, prefix, setter);
+  xmlFree(name);
+}
+
+static void
+open_method(xmlNodePtr node, FILE * out)
+{
+  xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+  xmlFree(name);
+}
+
+static void
+open_class(xmlNodePtr node, FILE * out)
+{
+  xmlChar * lname = xmlGetProp(node, BAD_CAST "name");
+  xmlChar * name = xmlGetProp(node, BAD_CAST "ctype");
+  xmlChar * base = xmlGetProp(node, BAD_CAST "base");
+  const char * col = "NULL";
+  fprintf(out, "  tolua_cclass(tolua_S, \"%s\", \"%s\", \"%s\", %s);\n",
+    lname, name, base, col);
+  xmlFree(lname);
+  xmlFree(name);
+  xmlFree(base);
+}
+
+static void
+open_module(xmlNodePtr root, FILE * out)
+{
+  xmlNodePtr node;
+  xmlChar * name = xmlGetProp(root, BAD_CAST "name");
   if (name) {
     fprintf(out, "  tolua_module(tolua_S, \"%s\", 0);\n", name);
     fprintf(out, "  tolua_beginmodule(tolua_S, \"%s\");\n", name);
@@ -43,58 +84,61 @@ parse_module(xmlXPathContextPtr xpath, FILE * out)
     fputs("  tolua_beginmodule(tolua_S, 0);\n", out);
   }
 
-  for (node=xpath->node->children;node;node=node->next) {
+  for (node=root->children;node;node=node->next) {
     if (strcmp((const char *)node->name, "class")==0) {
-      xmlChar * lname = xmlGetProp(node, BAD_CAST "name");
-      xmlChar * name = xmlGetProp(node, BAD_CAST "ctype");
-      xmlChar * base = xmlGetProp(node, BAD_CAST "base");
-      const char * col = "NULL";
-      fprintf(out, "  tolua_cclass(tolua_S, \"%s\", \"%s\", \"%s\", %s);\n",
-        lname, name, base, col);
-      xmlFree(lname);
-      xmlFree(name);
-      xmlFree(base);
+      open_class(node, out);
     } else if (strcmp((const char *)node->name, "module")==0) {
-      xpath->node = node;
-      parse_module(xpath, out);
-      xpath->node = node->parent;
+      open_module(node, out);
+    } else if (strcmp((const char *)node->name, "function")==0) {
+      open_function(node, out);
+    } else if (strcmp((const char *)node->name, "method")==0) {
+      open_method(node, out);
+    } else if (strcmp((const char *)node->name, "variable")==0) {
+      open_variable(node, out);
     }
   }
   fputs("  tolua_endmodule(tolua_S);\n", out);
 }
 
-int
-writefile(xmlDocPtr doc, FILE * out)
+static void
+open_type(xmlNodePtr root, FILE * out)
 {
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "/package", xpath);
-  xmlChar * pkg_name = xmlGetProp(doc->children, BAD_CAST "name");
+  xmlChar * name = xmlGetProp(root, BAD_CAST "name");
+  fprintf(out, "  tolua_usertype(tolua_S, \"%s\");\n", name);
+  xmlFree(name);
+}
 
-  fputs(tmp_includes, out);
-  fputc('\n', out);
-  fprintf(out, "int tolua_%s_open(struct lua_State * L) {\n", pkg_name);
+void
+open_package(xmlNodePtr root, FILE * out)
+{
+  xmlNodePtr node;
+  xmlChar * pkg_name = xmlGetProp(root, BAD_CAST "name");
+  fprintf(out, "int %s%s_open(struct lua_State * L) {\n", prefix, pkg_name);
   xmlFree(pkg_name);
 
   fputs("  tolua_open(L);\n", out);
 
-  result = xmlXPathEvalExpression(BAD_CAST "/package/type", xpath);
-  if (result->nodesetval!=NULL) {
-    int i;
-    xmlNodeSetPtr nodes = result->nodesetval;
-    for (i=0;i!=nodes->nodeNr;++i) {
-      xmlChar * name = xmlGetProp(nodes->nodeTab[i], BAD_CAST "name");
-      fprintf(out, "  tolua_usertype(tolua_S, \"%s\");\n", name);
+  for (node=root->children;node;node=node->next) {
+    if (strcmp((const char *)node->name, "type")==0) {
+      open_type(node, out);
+    } else if (strcmp((const char *)node->name, "module")==0) {
+      open_module(node, out);
     }
   }
-  xmlXPathFreeObject(result);
-
-  xpath->node = doc->children;
-  parse_module(xpath, out);
-
+  fputs("  return 0;\n", out);
   fputs("}\n", out);
+}
 
-  xmlXPathFreeContext(xpath);
+int
+writefile(xmlDocPtr doc, FILE * out)
+{
+  /* includes etc. */
+  fputs(tmp_includes, out);
+  fputc('\n', out);
+  /* functions */
 
+  /* open */
+  open_package(doc->children, out);
   return 0;
 }
 

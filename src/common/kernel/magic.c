@@ -52,6 +52,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>

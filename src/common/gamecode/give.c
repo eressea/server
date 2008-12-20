@@ -42,6 +42,7 @@
 #include <util/log.h>
 
 /* libc includes */
+#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 

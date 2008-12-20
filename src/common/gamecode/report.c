@@ -71,6 +71,7 @@
 #include <util/base36.h>
 #include <util/bsdstring.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/message.h>

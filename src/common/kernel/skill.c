@@ -35,6 +35,7 @@
 
 #include <util/attrib.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
 

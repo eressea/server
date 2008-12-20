@@ -62,6 +62,7 @@
 
 #include <lua.h>
 
+#include <assert.h>
 #include <string.h>
 #include <locale.h>
 
@@ -1068,6 +1069,30 @@ update_view(view * vi)
   }
 }
 
+state *
+state_open(void)
+{
+  state * st = calloc(sizeof(state), 1);
+  st->display.plane = 0;
+  st->cursor.p = 0;
+  st->cursor.x = 0;
+  st->cursor.y = 0;
+  st->selected = calloc(1, sizeof(struct selection));
+  st->modified = 0;
+  st->info_flags = 0xFFFFFFFF;
+  st->prev = current_state;
+  current_state = st;
+  return st;
+}
+
+void
+state_close(state * st)
+{
+  assert(st==current_state);
+  current_state = st->prev;
+  free(st);
+}
+
 void
 run_mapper(void)
 {
@@ -1076,7 +1101,7 @@ run_mapper(void)
   WINDOW * hwinmap;
   int width, height, x, y;
   int split = 20, old_flags = log_flags;
-  state st;
+  state * st;
   point tl;
 
   log_flags &= ~(LOG_CPERROR|LOG_CPWARNING);
@@ -1093,70 +1118,63 @@ run_mapper(void)
   hwininfo = subwin(stdscr, getmaxy(stdscr)-1, split, y, x+getmaxx(stdscr)-split);
   hwinstatus = subwin(stdscr, 1, width, height-1, x);
 
-  st.wnd_map = win_create(hwinmap);
-  st.wnd_map->paint = &paint_map;
-  st.wnd_map->update = 1;
-  st.wnd_info = win_create(hwininfo);
-  st.wnd_info->paint = &paint_info_region;
-  st.wnd_info->handlekey = &handle_info_region;
-  st.wnd_info->update = 1;
-  st.wnd_status = win_create(hwinstatus);
-  st.wnd_status->paint = &paint_status;
-  st.wnd_status->update = 1;
-  st.display.plane = 0;
-  st.cursor.p = 0;
-  st.cursor.x = 0;
-  st.cursor.y = 0;
-  st.selected = calloc(1, sizeof(struct selection));
-  st.modified = 0;
-  st.info_flags = 0xFFFFFFFF;
+  st = state_open();
+  st->wnd_map = win_create(hwinmap);
+  st->wnd_map->paint = &paint_map;
+  st->wnd_map->update = 1;
+  st->wnd_info = win_create(hwininfo);
+  st->wnd_info->paint = &paint_info_region;
+  st->wnd_info->handlekey = &handle_info_region;
+  st->wnd_info->update = 1;
+  st->wnd_status = win_create(hwinstatus);
+  st->wnd_status->paint = &paint_status;
+  st->wnd_status->update = 1;
 
-  init_view(&st.display, hwinmap);
-  coor2point(&st.display.topleft, &tl);
+  init_view(&st->display, hwinmap);
+  coor2point(&st->display.topleft, &tl);
 
-  hstatus = st.wnd_status->handle; /* the lua console needs this */
-  current_state = &st;
+  hstatus = st->wnd_status->handle; /* the lua console needs this */
 
   while (!g_quit) {
     int c;
     point p;
     window * wnd;
-    view * vi = &st.display;
+    view * vi = &st->display;
 
     getbegyx(hwinmap, x, y);
     width = getmaxx(hwinmap)-x;
     height = getmaxy(hwinmap)-y;
-    coor2point(&st.cursor, &p);
+    coor2point(&st->cursor, &p);
 
-    if (st.cursor.p != vi->plane) {
-      vi->plane = st.cursor.p;
-      st.wnd_map->update |= 1;
+    if (st->cursor.p != vi->plane) {
+      vi->plane = st->cursor.p;
+      st->wnd_map->update |= 1;
     }
     if (p.y < tl.y) {
-      vi->topleft.y = st.cursor.y-vi->size.height/2;
-      st.wnd_map->update |= 1;
+      vi->topleft.y = st->cursor.y-vi->size.height/2;
+      st->wnd_map->update |= 1;
     }
     else if (p.y >= tl.y + vi->size.height * THEIGHT) {
-      vi->topleft.y = st.cursor.y-vi->size.height/2;
-      st.wnd_map->update |= 1;
+      vi->topleft.y = st->cursor.y-vi->size.height/2;
+      st->wnd_map->update |= 1;
     }
     if (p.x <= tl.x) {
-      vi->topleft.x = st.cursor.x+(st.cursor.y-vi->topleft.y)/2-vi->size.width / 2;
-      st.wnd_map->update |= 1;
+      vi->topleft.x = st->cursor.x+(st->cursor.y-vi->topleft.y)/2-vi->size.width / 2;
+      st->wnd_map->update |= 1;
     }
     else if (p.x >= tl.x + vi->size.width * TWIDTH-1) {
-      vi->topleft.x = st.cursor.x+(st.cursor.y-vi->topleft.y)/2-vi->size.width / 2;
-      st.wnd_map->update |= 1;
+      vi->topleft.x = st->cursor.x+(st->cursor.y-vi->topleft.y)/2-vi->size.width / 2;
+      st->wnd_map->update |= 1;
     }
 
-    if (st.wnd_map->update) {
+    if (st->wnd_map->update) {
       update_view(vi);
       coor2point(&vi->topleft, &tl);
     }
     for (wnd=wnd_last;wnd!=NULL;wnd=wnd->prev) {
       if (wnd->update && wnd->paint) {
         if (wnd->update & 1) {
-          wnd->paint(wnd, &st);
+          wnd->paint(wnd, st);
           wnoutrefresh(wnd->handle);
         }
         if (wnd->update & 2) {
@@ -1165,18 +1183,18 @@ run_mapper(void)
         wnd->update = 0;
       }
     }
-    draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 1);
+    draw_cursor(st->wnd_map->handle, st->selected, vi, &st->cursor, 1);
     doupdate();
     c = getch();
-    draw_cursor(st.wnd_map->handle, st.selected, vi, &st.cursor, 0);
-    handlekey(&st, c);
+    draw_cursor(st->wnd_map->handle, st->selected, vi, &st->cursor, 0);
+    handlekey(st, c);
   }
   g_quit = 0;
   set_readline(NULL);
   curs_set(1);
   endwin();
   log_flags = old_flags;
-  current_state = NULL;
+  state_close(st);
 }
 
 #define MAXINPUT 512

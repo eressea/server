@@ -72,18 +72,6 @@ lc_age(struct attrib * a)
   return (retval!=0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
-static int
-building_addaction(building * b, const char * fname, const char * param)
-{
-  attrib * a = a_add(&b->attribs, a_new(&at_building_action));
-  building_action * data = (building_action*)a->data.v;
-  data->b = b;
-  data->fname = strdup(fname);
-  if (param) data->param = strdup(param);
-
-  return 0;
-}
-
 static const char *
 building_getinfo(const building * b)
 {
@@ -95,19 +83,6 @@ building_setinfo(building * b, const char * info)
 {
   free(b->display);
   b->display = strdup(info);
-}
-
-static const char *
-buildingname(const building * b)
-{
-  return (const char *)b->name;
-}
-
-static void
-building_setname(building * b, const char * name)
-{
-  free(b->name);
-  b->name = strdup(name);
 }
 
 static region *
@@ -187,7 +162,7 @@ bind_building(lua_State * L)
     class_<struct building>("building")
     .def(self == building())
     .def(tostring(self))
-    .property("name", &buildingname, &building_setname)
+    .property("name", &building_getname, &building_setname)
     .property("info", &building_getinfo, &building_setinfo)
     .property("units", &building_units, return_stl_iterator)
     .property("region", &building_getregion, &building_setregion)

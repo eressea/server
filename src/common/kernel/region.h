@@ -18,8 +18,7 @@
 extern "C" {
 #endif
 
-#include <util/language.h>
-#include <assert.h>
+#include "types.h"
 
 /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
    a hash-access each time a neighbour is needed */

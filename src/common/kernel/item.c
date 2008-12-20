@@ -39,6 +39,7 @@
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/message.h>
 #include <util/umlaut.h>
 #include <util/rng.h>

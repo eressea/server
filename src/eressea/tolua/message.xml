@@ -1,8 +1,18 @@
 <package name="eressea">
 	<type name="message"/>
-	<type name="unit"/>
-	<module>
-		<class name="message" ctype="struct message" base=""/>
+  <type name="unit"/>
+  <type name="region"/>
+  <type name="faction"/>
+  <type name="ship"/>
+  <type name="building"/>
+  <type name="event"/>
+  <module>
+    <function name="atoi36" type="int">
+      <call expr="atoi36(str)" />
+      <arg name="str" type="cstring"/>
+    </function>
+
+    <class name="message" ctype="struct message" base=""/>
 		<module name="message">
 			<static name="set_unit">
 				<arg name="u" type="unit"/>
@@ -10,15 +20,15 @@
 		</module>
 		<class name="unit" ctype="struct unit" base=""/>
 		<module name="unit">
-			<static name="create" type="unit">
-				<function expr="create_unit(r, f, 0, f-&gt;race, 0, 0, 0)" />
+			<function name="create" type="unit">
+				<call expr="create_unit(r, f, 0, f-&gt;race, 0, 0, 0)" />
 				<arg name="f" type="faction"/>
 				<arg name="r" type="region"/>
-			</static>
-			<member name="add_order">
-				<function expr="unit_addorder(self, parse_order(str, self-&gt;faction-&gt;locale))" />
+			</function>
+			<method name="add_order">
+				<call expr="unit_addorder(self, parse_order(str, self-&gt;faction-&gt;locale))" />
 				<arg name="str" type="cstring"/>
-			</member>
+			</method>
 			<variable name="name" type="cstring">
 				<getter name="unit_getname"/>
 				<setter name="unit_setname"/>

@@ -14,6 +14,7 @@ without prior permission by the authors of Eressea.
 /* kernel includes */
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+#include <kernel/message.h>
 
 /* util includes */
 #include <util/attrib.h>

@@ -39,6 +39,7 @@
 /* libc includes */
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 extern const char *directions[];
 

@@ -30,6 +30,8 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
+#include <assert.h>
+
 static int
 lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order * ord)
 {
@@ -235,7 +237,7 @@ lua_initfamiliar(unit * u)
       lua_pop(L, 1);
     }
   } else {
-    log_error(("familiar(%s) calling '%s': not a function.\n",
+    log_warning(("familiar(%s) calling '%s': not a function.\n",
       unitname(u), fname));
     lua_pop(L, 1);
   }

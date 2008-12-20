@@ -5,8 +5,13 @@
 #ifdef BINDINGS_TOLUA
 #include "eressea/tolua/bindings.c"
 #include "eressea/tolua/bind_unit.c"
+#include "eressea/tolua/bind_ship.c"
+#include "eressea/tolua/bind_building.c"
+#include "eressea/tolua/bind_region.c"
 #include "eressea/tolua/bind_faction.c"
 #include "eressea/tolua/bind_message.c"
+#include "eressea/tolua/bind_hashtable.c"
+#include "eressea/tolua/bind_gmtool.c"
 #include "eressea/tolua/helpers.c"
 #endif
 

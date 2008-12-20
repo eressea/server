@@ -141,6 +141,7 @@ extern struct building *findbuilding(int n);
 extern struct unit * buildingowner(const struct region * r, const struct building * b);
 
 extern struct attrib_type at_building_action;
+void building_addaction(struct building * b, const char * fname, const char * param);
 
 #ifdef WDW_PYRAMID
 extern int wdw_pyramid_level(const struct building *b);

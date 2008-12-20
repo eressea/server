@@ -74,6 +74,7 @@
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
@@ -92,11 +93,11 @@
 #endif
 
 /* libc includes */
+#include <assert.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 

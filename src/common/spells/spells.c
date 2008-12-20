@@ -57,10 +57,11 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/umlaut.h>
+#include <util/event.h>
+#include <util/language.h>
 #include <util/message.h>
 #include <util/parser.h>
-#include <util/event.h>
+#include <util/umlaut.h>
 #include <util/functions.h>
 #include <util/lists.h>
 #include <util/rand.h>

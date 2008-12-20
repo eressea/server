@@ -32,6 +32,9 @@ typedef struct newfaction {
   struct alliance * allies;
 } newfaction;
 
+#define ISLANDSIZE 20
+#define TURNS_PER_ISLAND 5
+
 extern int autoseed(newfaction ** players, int nsize, int max_agediff);
 extern newfaction * read_newfactions(const char * filename);
 extern void get_island(struct region * root, struct region_list ** rlist);

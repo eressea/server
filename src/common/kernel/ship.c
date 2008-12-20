@@ -34,6 +34,7 @@
 #include <util/xml.h>
 
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 

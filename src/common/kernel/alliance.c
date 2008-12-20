@@ -30,6 +30,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/lists.h>
+#include <util/language.h>
 #include <util/parser.h>
 #include <util/umlaut.h>
 

@@ -82,8 +82,8 @@ bind_gmtool(lua_State * L)
 {
   module(L, "gmtool")[
     def("editor", &run_mapper),
-    def("selection", &selected_regions, return_stl_iterator),
-    def("cursor", &current_region),
+    def("get_selection", &selected_regions, return_stl_iterator),
+    def("get_cursor", &current_region),
     def("highlight", &highlight_region),
     def("select", &gmtool_select_region),
     def("select_at", &gmtool_select_coordinate)

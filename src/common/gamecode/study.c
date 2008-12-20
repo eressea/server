@@ -46,6 +46,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/language.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/umlaut.h>

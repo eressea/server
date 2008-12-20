@@ -18,6 +18,8 @@
 extern "C" {
 #endif
 
+#include "types.h"
+
 #define DAMAGE_SCALE 100 /* multiplier for sh->damage */
 
 /* ship_type::flags */

@@ -18,7 +18,7 @@ function swap_region(r, tr)
 end
 
 function move_selection(x, y)
-   for r in gmtool.selection() do
+   for r in gmtool.get_selection() do
      local tx = r.x+x
      local ty = r.y+y
      local tr = get_region(tx, ty)

@@ -82,6 +82,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #undef XMAS1999
 #undef XMAS2000

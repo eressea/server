@@ -47,6 +47,7 @@
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/functions.h>
+#include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
 #include <util/storage.h>

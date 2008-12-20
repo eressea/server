@@ -59,8 +59,7 @@ typedef struct selection {
 typedef struct state {
   coordinate cursor;
   selection * selected;
-  struct state * undo;
-  struct faction * topf;
+  struct state * prev;
   view display;
   int modified;
   unsigned int info_flags;

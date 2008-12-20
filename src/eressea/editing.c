@@ -17,8 +17,6 @@
 #include <util/rng.h>
 #include <util/lists.h>
 
-#define ISLANDSIZE 20
-#define TURNS_PER_ISLAND 4
 void
 seed_players(const char * filename, boolean new_island)
 {

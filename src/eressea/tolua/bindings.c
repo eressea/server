@@ -14,14 +14,11 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_faction.h"
+#include "bind_region.h"
 
 
 #include <kernel/eressea.h>
 
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/log.h>
-#include <util/rand.h>
 #include <kernel/alliance.h>
 #include <kernel/skill.h>
 #include <kernel/equipment.h>
@@ -34,6 +31,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/building.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/ship.h>
 #include <kernel/teleport.h>
 #include <kernel/faction.h>
@@ -44,86 +42,116 @@ without prior permission by the authors of Eressea.
 #include <gamecode/monster.h>
 
 #include <spells/spells.h>
+#include <modules/autoseed.h>
 #include <modules/score.h>
+#include <attributes/key.h>
+
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/lists.h>
+#include <util/log.h>
+#include <util/rand.h>
+#include <util/rng.h>
 
 #include <tolua.h>
 #include <lua.h>
 
 #include <time.h>
+#include <assert.h>
 
-static int tolua_get_building_name(lua_State* tolua_S)
+int tolua_orderlist_next(lua_State *tolua_S)
 {
-  building* self = (building*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, building_getname(self));
-  return 1;
-}
-
-static int tolua_set_building_name(lua_State* tolua_S)
-{
-  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
-  building_setname(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-static int
-tolua_region_get_terrain(lua_State* tolua_S)
-{
-  region* self = (region*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, self->terrain->_name);
-  return 1;
-}
-
-static int tolua_region_get_name(lua_State* tolua_S)
-{
-  region* self = (region*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, region_getname(self));
-  return 1;
-}
-
-static int tolua_region_set_units(lua_State* tolua_S)
-{
-  region* self = (region*)tolua_tousertype(tolua_S, 1, 0);
-  region_setname(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-static int tolua_get_ship_name(lua_State* tolua_S)
-{
-  ship* self = (ship*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, ship_getname(self));
-  return 1;
-}
-
-static int tolua_set_ship_name(lua_State* tolua_S)
-{
-  ship* self = (ship*)tolua_tousertype(tolua_S, 1, 0);
-  ship_setname(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-static int tolua_regionlist_next(lua_State *tolua_S)
-{
-  region** region_ptr = (region **)lua_touserdata(tolua_S, lua_upvalueindex(1));
-  region * u = *region_ptr;
-  if (u != NULL) {
-    tolua_pushusertype(tolua_S, (void*)u, "region");
-    *region_ptr = u->next;
+  order** order_ptr = (order **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  order* ord = *order_ptr;
+  if (ord != NULL) {
+    char cmd[8192];
+    write_order(ord, cmd, sizeof(cmd));
+    tolua_pushstring(tolua_S, cmd);
+    *order_ptr = ord->next;
     return 1;
   }
   else return 0;  /* no more values to return */
 }
 
-static int tolua_region_get_units(lua_State* tolua_S)
+int tolua_spelllist_next(lua_State *tolua_S)
 {
-  region * self = (region *)tolua_tousertype(tolua_S, 1, 0);
-  unit ** unit_ptr = (unit**)lua_newuserdata(tolua_S, sizeof(unit *));
+  spell_list** spell_ptr = (spell_list **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  spell_list* slist = *spell_ptr;
+  if (slist != NULL) {
+    tolua_pushusertype(tolua_S, slist->data, "spell");
+    *spell_ptr = slist->next;
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
 
-  luaL_getmetatable(tolua_S, "unit");
-  lua_setmetatable(tolua_S, -2);
+int tolua_itemlist_next(lua_State *tolua_S)
+{
+  item** item_ptr = (item **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  item* itm = *item_ptr;
+  if (itm != NULL) {
+    tolua_pushstring(tolua_S, itm->type->rtype->_name[0]);
+    *item_ptr = itm->next;
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
 
-  *unit_ptr = self->units;
+static int 
+tolua_autoseed(lua_State * tolua_S)
+{
+  const char * filename = tolua_tostring(tolua_S, 1, 0);
+  int new_island = tolua_toboolean(tolua_S, 2, 0);
+  newfaction * players = read_newfactions(filename);
 
-  lua_pushcclosure(tolua_S, tolua_unitlist_next, 1);
+  if (players!=NULL) {
+    while (players) {
+      int n = listlen(players);
+      int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+      k = n / k;
+      n = autoseed(&players, k, new_island?0:TURNS_PER_ISLAND);
+      if (n==0) {
+        break;
+      }
+    }
+  }
+  return 0;
+}
+
+
+static int
+tolua_getkey(lua_State* tolua_S)
+{
+  const char * name = tolua_tostring(tolua_S, 1, 0);
+
+  int flag = atoi36(name);
+  attrib * a = find_key(global.attribs, flag);
+  lua_pushboolean(tolua_S, a!=NULL);
+
+  return 1;
+}
+
+static int
+tolua_setkey(lua_State* tolua_S)
+{
+  const char * name = tolua_tostring(tolua_S, 1, 0);
+  int value = tolua_toboolean(tolua_S, 2, 0);
+
+  int flag = atoi36(name);
+  attrib * a = find_key(global.attribs, flag);
+  if (a==NULL && value) {
+    add_key(&global.attribs, flag);
+  } else if (a!=NULL && !value) {
+    a_remove(&global.attribs, a);
+  }
+
+  return 0;
+}
+
+static int
+tolua_rng_int(lua_State* tolua_S)
+{
+  lua_pushnumber(tolua_S, (lua_Number)rng_int());
   return 1;
 }
 
@@ -584,106 +612,6 @@ tolua_get_unit(lua_State* tolua_S)
   return 1;
 }
 
-static int tolua_region_get_flag(lua_State* tolua_S)
-{
-  region* self = (region*)tolua_tousertype(tolua_S, 1, 0);
-  int bit = (int)tolua_tonumber(tolua_S, 2, 0);
-
-  lua_pushboolean(tolua_S, (self->flags & (1<<bit)));
-  return 1;
-}
-
-static int tolua_region_set_flag(lua_State* tolua_S)
-{
-  region* self = (region*)tolua_tousertype(tolua_S, 1, 0);
-  int bit = (int)tolua_tonumber(tolua_S, 2, 0);
-  int set = tolua_toboolean(tolua_S, 3, 0);
-
-  if (set) self->flags |= (1<<bit);
-  else self->flags &= ~(1<<bit);
-  return 0;
-}
-
-static int
-tolua_region_get_resource(lua_State* tolua_S)
-{
-  region * r = (region *)tolua_tousertype(tolua_S, 1, 0);
-  const char * type = tolua_tostring(tolua_S, 2, 0);
-  const resource_type * rtype = rt_find(type);
-  int result = 0;
-
-  if (!rtype) {
-    if (strcmp(type, "seed")==0) result = rtrees(r, 0);
-    if (strcmp(type, "sapling")==0) result = rtrees(r, 1);
-    if (strcmp(type, "tree")==0) result = rtrees(r, 2);
-    if (strcmp(type, "grave")==0) result = deathcount(r);
-    if (strcmp(type, "chaos")==0) result = chaoscount(r);
-  } else {
-    result = region_getresource(r, rtype);
-  }
-
-  tolua_pushnumber(tolua_S, (lua_Number)result);
-  return 1;
-}
-
-static int
-tolua_region_set_resource(lua_State* tolua_S)
-{
-  region * r = (region *)tolua_tousertype(tolua_S, 1, 0);
-  const char * type = tolua_tostring(tolua_S, 2, 0);
-  int value = (int)tolua_tonumber(tolua_S, 3, 0);
-  const resource_type * rtype = rt_find(type);
-
-  if (rtype!=NULL) {
-    region_setresource(r, rtype, value);
-  } else {
-    if (strcmp(type, "seed")==0) {
-      rsettrees(r, 0, value);
-    } else if (strcmp(type, "sapling")==0) {
-      rsettrees(r, 1, value);
-    } else if (strcmp(type, "tree")==0) {
-      rsettrees(r, 2, value);
-    } else if (strcmp(type, "grave")==0) {
-      int fallen = value-deathcount(r);
-      deathcounts(r, fallen);
-    } else if (strcmp(type, "chaos")==0) {
-      int fallen = value-chaoscount(r);
-      chaoscounts(r, fallen);
-    }
-  }
-  return 0;
-}
-
-static int
-tolua_region_create(lua_State* tolua_S)
-{
-  short x = (short)tolua_tonumber(tolua_S, 1, 0);
-  short y = (short)tolua_tonumber(tolua_S, 2, 0);
-  const char * tname = tolua_tostring(tolua_S, 3, 0);
-
-  const terrain_type * terrain = get_terrain(tname);
-  region * r = findregion(x, y);
-  region * result = r;
-
-  if (terrain==NULL) {
-    if (r!=NULL) {
-      if (r->units!=NULL) {
-        /* TODO: error message */
-        result = NULL;
-      }
-    }
-  }
-  if (r==NULL) {
-    result = new_region(x, y, 0);
-  }
-  if (result) {
-    terraform_region(result, terrain);
-  }
-
-  tolua_pushusertype(tolua_S, result, "region");
-  return 1;
-}
-
 static int
 tolua_alliance_create(lua_State* tolua_S)
 {
@@ -739,87 +667,6 @@ tolua_get_alliance_factions(lua_State* tolua_S)
   return 1;
 }
 
-static int tolua_faction_get_password(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, faction_getpassword(self));
-  return 1;
-}
-
-static int tolua_faction_set_password(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  faction_setpassword(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-static int tolua_faction_get_email(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, faction_getemail(self));
-  return 1;
-}
-
-static int tolua_faction_set_email(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  faction_setemail(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-static int tolua_faction_get_locale(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, locale_name(self->locale));
-  return 1;
-}
-
-static int tolua_faction_set_locale(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  const char * name = tolua_tostring(tolua_S, 2, 0);
-  self->locale = find_locale(name);
-  return 0;
-}
-
-static int tolua_faction_get_race(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, self->race->_name[0]);
-  return 1;
-}
-
-static int tolua_faction_set_race(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  const char * name = tolua_tostring(tolua_S, 2, 0);
-  race * rc = rc_find(name);
-  if (rc!=NULL) {
-    self->race = rc;
-  }
-
-  return 0;
-}
-
-static int tolua_faction_get_alliance(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, self->alliance, "alliance");
-  return 1;
-}
-
-static int tolua_faction_set_alliance(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  alliance* alli = (alliance*)tolua_tousertype(tolua_S, 2, 0);
-
-  if (!self->alliance) {
-    setalliance(self, alli);
-  }
-
-  return 0;
-}
-
 static int tolua_get_alliance_id(lua_State* tolua_S)
 {
   alliance* self = (alliance*) tolua_tousertype(tolua_S, 1, 0);
@@ -841,35 +688,6 @@ static int tolua_set_alliance_name(lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_faction_get_name(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, faction_getname(self));
-  return 1;
-}
-
-static int tolua_faction_set_name(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  faction_setname(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-static int tolua_faction_get_info(lua_State* tolua_S)
-{
-  faction* self = (faction*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, faction_getbanner(self));
-  return 1;
-}
-
-static int tolua_faction_set_info(lua_State* tolua_S)
-{
-  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
-  faction_setbanner(self, tolua_tostring(tolua_S, 2, 0));
-  return 0;
-}
-
-
 int
 tolua_eressea_open(lua_State* tolua_S)
 {
@@ -882,9 +700,6 @@ tolua_eressea_open(lua_State* tolua_S)
   tolua_usertype(tolua_S, "item");
   tolua_usertype(tolua_S, "alliance");
   tolua_usertype(tolua_S, "event");
-  tolua_usertype(tolua_S, "region");
-  tolua_usertype(tolua_S, "ship");
-  tolua_usertype(tolua_S, "building");
 
   tolua_module(tolua_S, NULL, 0);
   tolua_beginmodule(tolua_S, NULL);
@@ -896,33 +711,6 @@ tolua_eressea_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "id", tolua_get_alliance_id, NULL);
       tolua_variable(tolua_S, "factions", tolua_get_alliance_factions, NULL);
       tolua_function(tolua_S, "create", tolua_alliance_create);
-    }
-    tolua_endmodule(tolua_S);
-
-    tolua_cclass(tolua_S, "region", "region", "", NULL);
-    tolua_beginmodule(tolua_S, "region");
-    {
-      tolua_variable(tolua_S, "name", tolua_region_get_name, tolua_region_set_units);
-      tolua_variable(tolua_S, "units", tolua_region_get_units, NULL);
-      tolua_variable(tolua_S, "terrain", tolua_region_get_terrain, NULL);
-      tolua_function(tolua_S, "get_resource", tolua_region_get_resource);
-      tolua_function(tolua_S, "set_resource", tolua_region_set_resource);
-      tolua_function(tolua_S, "get_flag", tolua_region_get_flag);
-      tolua_function(tolua_S, "create", tolua_region_create);
-    }
-    tolua_endmodule(tolua_S);
-
-    tolua_cclass(tolua_S, "building", "building", "", NULL);
-    tolua_beginmodule(tolua_S, "building");
-    {
-      tolua_variable(tolua_S, "name", tolua_get_building_name, tolua_set_building_name);
-    }
-    tolua_endmodule(tolua_S);
-
-    tolua_cclass(tolua_S, "ship", "ship", "", NULL);
-    tolua_beginmodule(tolua_S, "ship");
-    {
-      tolua_variable(tolua_S, "name", tolua_get_ship_name, tolua_set_ship_name);
     }
     tolua_endmodule(tolua_S);
 
@@ -988,6 +776,13 @@ tolua_eressea_open(lua_State* tolua_S)
     tolua_function(tolua_S, "update_scores", tolua_update_scores);
 
     tolua_function(tolua_S, "learn_skill", tolua_learn_skill);
+
+    tolua_function(tolua_S, "autoseed", tolua_autoseed);
+
+    tolua_function(tolua_S, "get_key", tolua_getkey);
+    tolua_function(tolua_S, "set_key", tolua_setkey);
+
+    tolua_function(tolua_S, "rng_int", tolua_rng_int);
   }
   tolua_endmodule(tolua_S);
   return 1;

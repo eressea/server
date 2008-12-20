@@ -21,6 +21,8 @@
 #include <kernel/teleport.h>
 #include <kernel/unit.h>
 
+#include <gamecode/laws.h>
+
 // lua includes
 #ifdef _MSC_VER
 #pragma warning (push)
@@ -202,6 +204,7 @@ bind_eressea(lua_State * L)
 {
   module(L)[
     def("atoi36", &atoi36),
+    def("rng_int", &rng_int),
     def("itoa36", &itoa36),
     def("dice_roll", &dice_rand),
     def("equipment_setitem", &lua_addequipment),

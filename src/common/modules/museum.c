@@ -48,6 +48,7 @@
 /* libc includes */
 #include <limits.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define PFL_MUSEUM PFL_NOMONSTERS | PFL_NORECRUITS | PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED
 

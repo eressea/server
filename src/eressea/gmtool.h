@@ -16,6 +16,8 @@ extern "C" {
 #endif
   struct lua_State;
   struct selection;
+  struct state;
+
   extern int gmmain(int argc, char *argv[]);
   extern int curses_readline(struct lua_State * L, const char * prompt);
 
@@ -24,6 +26,9 @@ extern "C" {
   extern void run_mapper(void);
 
   extern int force_color;
+
+  struct state * state_open();
+  void state_close(struct state * );
 
 #ifdef __cplusplus
 }

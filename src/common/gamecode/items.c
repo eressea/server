@@ -26,6 +26,7 @@
 #include <util/parser.h>
 #include <util/rand.h>
 
+#include <assert.h>
 #include <limits.h>
 
 /* BEGIN studypotion */

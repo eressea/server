@@ -25,6 +25,7 @@
 #include <spells/spells.h> /* for backward compat reading of bt_firewall */
 
 #include <util/attrib.h>
+#include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
 #include <util/storage.h>

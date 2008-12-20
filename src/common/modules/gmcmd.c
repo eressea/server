@@ -39,6 +39,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/umlaut.h>
@@ -50,6 +51,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <assert.h>
 
 /**
  ** at_permissions

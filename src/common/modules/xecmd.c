@@ -38,6 +38,7 @@
 /* libc includes */
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 static void
 xe_givelaen(unit *u, struct order * ord)

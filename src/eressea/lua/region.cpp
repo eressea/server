@@ -7,6 +7,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/message.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
@@ -138,19 +139,11 @@ region_setflag(region * r, int bit, bool set)
 }
 
 static int
-region_getresource(const region * r, const char * type)
+region_get_resource(const region * r, const char * type)
 {
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
-    const rawmaterial * rm;
-    for (rm=r->resources;rm;rm=rm->next) {
-      if (rm->type->rtype==rtype) {
-        return rm->amount;
-      }
-    }
-    if (rtype==rt_find("money")) return rmoney(r);
-    if (rtype==rt_find("horse")) return rhorses(r);
-    if (rtype==rt_find("peasant")) return rpeasants(r);
+    return region_getresource(r, rtype);
   } else {
     if (strcmp(type, "seed")==0) return rtrees(r, 0);
     if (strcmp(type, "sapling")==0) return rtrees(r, 1);
@@ -162,23 +155,11 @@ region_getresource(const region * r, const char * type)
 }
 
 static void
-region_setresource(region * r, const char * type, int value)
+region_set_resource(region * r, const char * type, int value)
 {
   const resource_type * rtype = rt_find(type);
   if (rtype!=NULL) {
-    rawmaterial * rm = r->resources;
-    while (rm) {
-      if (rm->type->rtype==rtype) {
-        rm->amount = value;
-        break;
-      }
-      rm=rm->next;
-    }
-    if (!rm) {
-      if (rtype==rt_find("money")) rsetmoney(r, value);
-      else if (rtype==rt_find("peasant")) rsetpeasants(r, value);
-      else if (rtype==rt_find("horse")) rsethorses(r, value);
-    }
+    region_setresource(r, rtype, value);
   } else {
     if (strcmp(type, "seed")==0) {
       rsettrees(r, 0, value);
@@ -383,8 +364,8 @@ bind_region(lua_State * L)
     .def("set_road", &region_setroad)
 
     .def("next", &region_next)
-    .def("get_resource", &region_getresource)
-    .def("set_resource", &region_setresource)
+    .def("get_resource", &region_get_resource)
+    .def("set_resource", &region_set_resource)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readonly("id", &region::uid)
