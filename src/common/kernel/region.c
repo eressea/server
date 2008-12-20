@@ -1348,7 +1348,7 @@ void
 region_setinfo(struct region * r, const char * info)
 {
   free(r->display);
-  r->display = strdup(info);
+   r->display = info?strdup(info):0;
 }
 
 const char *
@@ -1361,7 +1361,7 @@ region_setname(struct region * r, const char * name)
 {
   if (r->land) {
     free(r->land->name);
-    r->land->name = strdup(name);
+    r->land->name = name?strdup(name):0;
   }
 }
 
