@@ -33,8 +33,14 @@ static tag *
 next_tag(int hash, const state * st)
 {
   while (st && hash!=MAXTHASH) {
-    tag * t = st->selected->tags[hash];
-    if (t!=NULL) return t;
+    tag * node = st->selected->tags[hash];
+    while (node!=NULL) {
+      region * r = findregion((short)node->coord.x, (short)node->coord.y);
+      if (r) {
+	return node;
+      }
+      node = node->nexthash;
+    }
     ++hash;
   }
   return NULL;
@@ -42,15 +48,18 @@ next_tag(int hash, const state * st)
 
 class selectedregion {
 public:
-  static tag * next(tag * node) {
-    if (node->nexthash) {
-      return node->nexthash;
+  static tag * next(tag * self) {
+    tag * node = self->nexthash;
+    while (node) {
+      region * r = findregion((short)node->coord.x, (short)node->coord.y);
+      if (r) return node;
+      node = node->nexthash;
     }
-    coordinate * c = &node->coord;
+    coordinate * c = &self->coord;
     unsigned int key = ((c->x << 12) ^ c->y);
     unsigned int hash = key & (MAXTHASH-1);
 
-    return next_tag(++hash, current_state);
+    return next_tag(hash+1, current_state);
   }
 
   static region * value(tag * node) {
@@ -66,21 +75,33 @@ selected_regions(void)
 }
 
 static void
-gmtool_select_coordinate(int x, int y, int select)
+gmtool_select_coordinate(int x, int y, bool select)
 {
-  select_coordinate(current_state->selected, x, y, select);
+   select_coordinate(current_state->selected, x, y, select?1:0);
 }
 
 static void
-gmtool_select_region(region& r, int select)
+gmtool_select_region(region& r, bool select)
 {
-  select_coordinate(current_state->selected, r.x, r.y, select);
+   select_coordinate(current_state->selected, r.x, r.y, select?1:0);
+}
+
+static void gmtool_open(void) 
+{
+   state_open();
+}
+
+static void gmtool_close(void) 
+{
+   state_close(current_state);
 }
 
 void
 bind_gmtool(lua_State * L)
 {
   module(L, "gmtool")[
+    def("open", &gmtool_open),
+    def("close", &gmtool_close),
     def("editor", &run_mapper),
     def("get_selection", &selected_regions, return_stl_iterator),
     def("get_cursor", &current_region),

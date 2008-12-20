@@ -377,5 +377,8 @@ bind_region(lua_State * L)
     .property("buildings", &region_buildings, return_stl_iterator)
     .property("ships", &region_ships, return_stl_iterator)
     .property("objects", &eressea::get_objects<region>)
+    .scope [
+      def("create", &region_terraform)
+    ]
   ];
 }

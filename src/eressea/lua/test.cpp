@@ -19,6 +19,7 @@
 using namespace luabind;
 
 #include <util/language.h>
+#include <util/rng.h>
 #include <kernel/region.h>
 #include <kernel/skill.h>
 #include <kernel/terrainid.h>

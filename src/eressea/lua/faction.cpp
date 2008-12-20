@@ -332,5 +332,8 @@ bind_faction(lua_State * L)
     .property("alliance", &faction_getalliance, &faction_setalliance)
     .property("race", &faction_getrace, &faction_setrace)
     .property("objects", &eressea::get_objects<faction>)
+    .scope [
+      def("create", &add_faction)
+    ]
   ];
 }

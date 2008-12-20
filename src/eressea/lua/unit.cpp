@@ -600,5 +600,8 @@ bind_unit(lua_State * L)
     .property("race", &unit_getrace, &unit_setrace)
     .property("hp_max", &unit_hpmax)
     .property("objects", &eressea::get_objects<unit>)
+    .scope [
+      def("create", &add_unit)
+    ]
   ];
 }

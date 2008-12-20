@@ -171,5 +171,8 @@ bind_building(lua_State * L)
     .def_readwrite("size", &building::size)
     .def("add_action", &building_addaction)
     .property("objects", &eressea::get_objects<building>)
+    .scope [
+      def("create", &add_building)
+    ]
   ];
 }

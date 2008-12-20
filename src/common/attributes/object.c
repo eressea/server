@@ -193,7 +193,7 @@ object_set(attrib * a, object_type type, variant value)
   data->type = type;
   switch (type) {
     case TSTRING:
-      data->data.str = strdup(value.v);
+      data->data.str = value.v?strdup(value.v):NULL;
       break;
     case TINTEGER:
       data->data.i = value.i;

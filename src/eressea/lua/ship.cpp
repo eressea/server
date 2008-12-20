@@ -107,5 +107,8 @@ bind_ship(lua_State * L)
     .def_readwrite("size", &ship::size)
     .def_readwrite("coast", &ship::coast)
     .property("objects", &eressea::get_objects<ship>)
+    .scope [
+      def("create", &add_ship)
+    ]
   ];
 }

@@ -1897,13 +1897,12 @@ eval_race(struct opstack ** stack, const void * userdata)
 static void
 eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
 {
-  const faction * report = (const faction*)userdata;
   const struct order * ord = (const struct order *)opop(stack).v;
   static char buf[256];
   size_t len;
   variant var;
 
-  unused(report);
+  unused(userdata);
   write_order(ord, buf, sizeof(buf));
   len = strlen(buf);
   var.v = strcpy(balloc(len+1), buf);

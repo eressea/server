@@ -27,7 +27,7 @@ extern "C" {
 
   extern int force_color;
 
-  struct state * state_open();
+  struct state * state_open(void);
   void state_close(struct state * );
 
 #ifdef __cplusplus

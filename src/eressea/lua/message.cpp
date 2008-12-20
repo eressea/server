@@ -190,7 +190,6 @@ bind_message(lua_State * L)
       .def(constructor<const char *>())
       .def(tostring(const_self))
 
-      .def("create", create_lua_message)
       .def("set_unit", &lua_message::set_unit)
       .def("set_region", &lua_message::set_region)
       .def("set_resource", &lua_message::set_resource)
@@ -198,5 +197,8 @@ bind_message(lua_State * L)
       .def("set_string", &lua_message::set_string)
       .def("send_faction", &lua_message::send_faction)
       .def("send_region", &lua_message::send_region)
+      .scope [
+        def("create", &create_lua_message)
+      ]
   ];
 }

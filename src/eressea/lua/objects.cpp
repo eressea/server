@@ -52,7 +52,7 @@ namespace eressea {
             case TSHIP:
               return object(L, (ship*) val.v);
             case TSTRING:
-              return object(L, std::string((const char*) val.v));
+              return object(L, (const char*) val.v);
             default:
               assert(!"not implemented");
         }
@@ -88,7 +88,7 @@ namespace eressea {
   template<> void objects::set<const char *, TSTRING>(const char * name,
     const char * value) {
       variant val = { 0 };
-      val.v = strdup(value);
+      if (value) val.v = strdup(value);
       set_object(mAttribPtr, name, TSTRING, val);
   }
 
