@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
   struct lua_State;
+  int tolua_shiplist_next(struct lua_State *tolua_S);
   void tolua_ship_open(struct lua_State *tolua_S);
 
 #ifdef __cplusplus

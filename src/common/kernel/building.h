@@ -160,6 +160,9 @@ extern const char * buildingname(const struct building * b);
 extern const char * building_getname(const struct building * b);
 extern void building_setname(struct building * self, const char * name);
 
+struct region * building_getregion(const struct building * b);
+void building_setregion(struct building * bld, struct region * r);
+
 #ifdef __cplusplus
 }
 #endif

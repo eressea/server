@@ -86,18 +86,6 @@ region_getherbtype(const region * r) {
   return itype->rtype->_name[0];
 }
 
-static void
-region_setinfo(region * r, const char * info)
-{
-  free(r->display);
-  r->display = strdup(info);
-}
-
-static const char *
-region_getinfo(const region * r) {
-  return (const char *)r->display;
-}
-
 static int
 region_plane(const region * r)
 {

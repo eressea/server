@@ -85,30 +85,6 @@ building_setinfo(building * b, const char * info)
   b->display = strdup(info);
 }
 
-static region *
-building_getregion(const building * b)
-{
-  return b->region;
-}
-
-static void
-building_setregion(building * bld, region * r)
-{
-  building * b = bld;
-  building ** blist = &b->region->buildings;
-  while (*blist && *blist!=b) {
-    blist = &(*blist)->next;
-  }
-  *blist = b->next;
-  b->next = NULL;
-
-  blist = &r->buildings;
-  while (*blist && *blist!=b) blist = &(*blist)->next;
-  *blist = b;
-
-  b->region = r;
-}
-
 static std::ostream&
 operator<<(std::ostream& stream, const building& b)
 {

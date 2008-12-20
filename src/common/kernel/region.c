@@ -1101,8 +1101,7 @@ terraform_region(region * r, const terrain_type * terrain)
   terraform_resources(r);
 
   if (!fval(terrain, LAND_REGION)) {
-    free(r->display);
-    r->display = NULL;
+    region_setinfo(r, NULL);
     if (r->land!=NULL) {
       i_freeall(&r->land->items);
       freeland(r->land);
@@ -1343,6 +1342,18 @@ region_setowner(struct region * r, struct faction * owner)
   unused(r);
   unused(owner);
 #endif
+}
+
+void
+region_setinfo(struct region * r, const char * info)
+{
+  free(r->display);
+  r->display = strdup(info);
+}
+
+const char *
+region_getinfo(const region * r) {
+  return (const char *)r->display;
 }
 
 void

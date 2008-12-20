@@ -24,6 +24,18 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
+int tolua_shiplist_next(lua_State *tolua_S)
+{
+  ship** ship_ptr = (ship **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  ship * u = *ship_ptr;
+  if (u != NULL) {
+    tolua_pushusertype(tolua_S, (void*)u, "ship");
+    *ship_ptr = u->next;
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
+
 static int
 tolua_ship_get_id(lua_State* tolua_S)
 {

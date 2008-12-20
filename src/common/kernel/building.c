@@ -623,3 +623,26 @@ building_addaction(building * b, const char * fname, const char * param)
   }
 }
 
+region *
+building_getregion(const building * b)
+{
+  return b->region;
+}
+
+void
+building_setregion(building * b, region * r)
+{
+  building ** blist = &b->region->buildings;
+  while (*blist && *blist!=b) {
+    blist = &(*blist)->next;
+  }
+  *blist = b->next;
+  b->next = NULL;
+
+  blist = &r->buildings;
+  while (*blist && *blist!=b) blist = &(*blist)->next;
+  *blist = b;
+
+  b->region = r;
+}
+

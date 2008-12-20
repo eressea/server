@@ -248,6 +248,8 @@ const char * regionname(const struct region * r, const struct faction * f);
 
 const char * region_getname(const struct region * self);
 void region_setname(struct region * self, const char * name);
+const char * region_getinfo(const struct region * self);
+void region_setinfo(struct region * self, const char * name);
 int region_getresource(const struct region * r, const struct resource_type * rtype);
 void region_setresource(struct region * r, const struct resource_type * rtype, int value);
 

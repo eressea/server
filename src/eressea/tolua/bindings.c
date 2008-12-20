@@ -585,6 +585,16 @@ tolua_get_region(lua_State* tolua_S)
 }
 
 static int
+tolua_get_region_byid(lua_State* tolua_S)
+{
+  int uid = (int)tolua_tonumber(tolua_S, 1, 0);
+  region * r = findregionbyid(uid);
+
+  tolua_pushusertype(tolua_S, r, "region");
+  return 1;
+}
+
+static int
 tolua_get_building(lua_State* tolua_S)
 {
   int no = (int)tolua_tonumber(tolua_S, 1, 0);
@@ -725,6 +735,8 @@ tolua_eressea_open(lua_State* tolua_S)
       tolua_function(tolua_S, "create", tolua_alliance_create);
     }
     tolua_endmodule(tolua_S);
+
+    tolua_function(tolua_S, "get_region_by_id", tolua_get_region_byid);
 
     tolua_function(tolua_S, "get_faction", tolua_get_faction);
     tolua_function(tolua_S, "get_unit", tolua_get_unit);

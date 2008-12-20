@@ -879,7 +879,9 @@ readregion(struct storage * store, short x, short y)
   if (lomem) {
     store->r_str_buf(store, NULL, 0);
   } else {
-    r->display = store->r_str(store);
+    char info[DISPLAYSIZE];
+    store->r_str_buf(store, info, sizeof(info));
+    region_setinfo(r, info);
   }
   
   if (store->version < TERRAIN_VERSION) {
@@ -998,7 +1000,7 @@ void
 writeregion(struct storage * store, const region * r)
 {
   store->w_int(store, r->uid);
-  store->w_str(store, r->display?(const char *)r->display:"");
+  store->w_str(store, region_getinfo(r));
   store->w_tok(store, r->terrain->_name);
   store->w_int(store, r->flags & RF_SAVEMASK);
   store->w_int(store, r->age);

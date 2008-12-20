@@ -130,6 +130,11 @@ local function test_building()
         units = units + 1
     end
     assert(units==2)
+    local r2 = region.create(0, 1, "plain")
+    assert(b.region==r)
+    b.region = r2
+    assert(b.region==r2)
+    assert(r2.buildings()==b)
 end
 
 local function loadscript(name)
@@ -180,11 +185,18 @@ tests = {
     ["test_gmtool"] = test_gmtool
 }
 
+fail = 0
 for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
-       print("[FAIL] " .. k .. ": " .. err)
+        fail = fail + 1
+        print("[FAIL] " .. k .. ": " .. err)
     else
-       print("[OK] " .. k)
+        print("[OK] " .. k)
     end
+end
+
+if fail > 0 then
+    print(fail .. " tests failed.")
+    io.stdin:read()
 end

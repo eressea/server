@@ -21,6 +21,19 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
+int tolua_buildinglist_next(lua_State *tolua_S)
+{
+  building** building_ptr = (building **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  building * u = *building_ptr;
+  if (u != NULL) {
+    tolua_pushusertype(tolua_S, (void*)u, "building");
+    *building_ptr = u->next;
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
+
+
 static int
 tolua_building_addaction(lua_State* tolua_S)
 {
@@ -40,6 +53,21 @@ tolua_building_get_objects(lua_State* tolua_S)
   tolua_pushusertype(tolua_S, (void*)&self->attribs, "hashtable");
   return 1;
 }
+
+static int tolua_building_get_region(lua_State* tolua_S)
+{
+  building* self = (building*) tolua_tousertype(tolua_S, 1, 0);
+  tolua_pushusertype(tolua_S, building_getregion(self), "region");
+  return 1;
+}
+
+static int tolua_building_set_region(lua_State* tolua_S)
+{
+  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
+  building_setregion(self, (region*)tolua_tousertype(tolua_S, 2, 0));
+  return 0;
+}
+
 
 static int tolua_building_get_name(lua_State* tolua_S)
 {
@@ -108,6 +136,7 @@ tolua_building_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "id", tolua_building_get_id, NULL);
       tolua_variable(tolua_S, "name", tolua_building_get_name, tolua_building_set_name);
       tolua_variable(tolua_S, "units", tolua_building_get_units, NULL);
+      tolua_variable(tolua_S, "region", tolua_building_get_region, tolua_building_set_region);
       tolua_function(tolua_S, "add_action", tolua_building_addaction);
 
       tolua_variable(tolua_S, "objects", tolua_building_get_objects, 0);
