@@ -8,7 +8,12 @@ MSPACES = 1 ;
 if ! $(BINDINGS) {
   BINDINGS = TOLUA ;
 }
-  
+
+if $(BINDINGS) = LUABIND {
+  CCFLAGS += -DBINDINGS_LUABIND ;
+  C++FLAGS += -DBINDINGS_LUABIND ;
+}
+
 if ! $(LUA_VERSION) {
   LUA_VERSION = 5.0 ;
 }
