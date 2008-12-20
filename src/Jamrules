@@ -4,6 +4,11 @@ LINK = gcc ;
 
 MSPACES = 1 ;
 
+# BINDING = LUABIND ;
+if ! $(BINDING) {
+  BINDING = TOLUA ;
+}
+  
 if ! $(LUA_VERSION) {
   LUA_VERSION = 5.0 ;
 }
