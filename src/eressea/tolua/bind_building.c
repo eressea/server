@@ -147,7 +147,10 @@ tolua_building_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "units", tolua_building_get_units, NULL);
       tolua_variable(tolua_S, "region", tolua_building_get_region, tolua_building_set_region);
       tolua_function(tolua_S, "add_action", tolua_building_addaction);
-
+#ifdef TODO
+      .property("type", &building_gettype)
+      .def_readwrite("size", &building::size)
+#endif
       tolua_variable(tolua_S, "objects", tolua_building_get_objects, 0);
 
       tolua_function(tolua_S, "create", tolua_building_create);

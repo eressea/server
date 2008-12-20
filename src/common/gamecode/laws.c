@@ -66,7 +66,7 @@
 /* attributes includes */
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
-#include <attributes/variable.h>
+#include <attributes/object.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -984,8 +984,9 @@ quit_cmd(unit * u, struct order * ord)
           cmistake(u, ord, 316, MSG_EVENT);
           return 0;
         } else {
-          const char * token = itoa36(f2_id);
-          set_variable(&f->attribs, "quit", token);
+          variant var;
+          var.i = f2_id;
+          object_create("quit", TINTEGER, var);
         }
       }
     }
@@ -1006,14 +1007,21 @@ quit(void)
     faction * f = *fptr;
     if (f->flags & FFL_QUIT) {
       if (EnhancedQuit()) {
-        const char * token = get_variable(f->attribs, "quit");
-        if(token != NULL) {
-          int f2_id = atoi36(token);
-          faction *f2 = findfaction(f2_id);
+        attrib * a = a_find(f->attribs, &at_object);
+        if (a) {
+          variant var;
+          object_type type;
+          var.i = 0;
+          object_get(a, &type, &var);
+          assert(var.i && type==TINTEGER);
+          if (var.i) {
+            int f2_id = var.i;
+            faction *f2 = findfaction(f2_id);
 
-          assert(f2_id>0);
-          assert(f2!=NULL);
-          transfer_faction(f, f2);
+            assert(f2_id>0);
+            assert(f2!=NULL);
+            transfer_faction(f, f2);
+          }
         }
       }
       destroyfaction(f);

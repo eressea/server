@@ -17,9 +17,6 @@
 extern "C" {
 #endif
 
-const char *get_variable(struct attrib *a, const char *key);
-void set_variable(struct attrib **app, const char *key, const char *value);
-void delete_variable(struct attrib **app, const char *key);
 void init_variable(void);
 
 #ifdef __cplusplus

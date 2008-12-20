@@ -33,13 +33,13 @@ function test_movement()
   r3:set_road(east, 1.0)
   r4:set_road(west, 1.0)
 
-  orcs = add_faction("orcs@eressea.de", "orc", "de")
+  orcs = faction.create("orcs@eressea.de", "orc", "de")
   orcs.age = 20
 
-  aqua = add_faction("aqua@eressea.de", "aquarian", "de")
+  aqua = faction.create("aqua@eressea.de", "aquarian", "de")
   aqua.age = 20
 
-  bugs = add_faction("bugz@eressea.de", "insect", "de")
+  bugs = faction.create("bugz@eressea.de", "insect", "de")
   bugs.age = 20
 
   orc = mkunit(orcs, r0, 10)
@@ -139,7 +139,7 @@ end
 function test_sail()
   r0 = terraform(0, 0, "plain")
 
-  orcs = add_faction("enno@eressea.de", "orc", "de")
+  orcs = faction.create("enno@eressea.de", "orc", "de")
   orcs.age = 20
 
   orc = add_unit(orcs, r0)
@@ -169,7 +169,7 @@ function test_handler()
   plain = terraform(0, 0, "plain")
   skill = 8
 
-  f = add_faction("enno@eressea.de", "orc", "de")
+  f = faction.create("enno@eressea.de", "orc", "de")
   f.age = 20
 
   u = add_unit(f, plain)
@@ -180,7 +180,7 @@ function test_handler()
   u:add_handler("message", msg_handler)
   msg = "BOTSCHAFT EINHEIT " .. itoa36(u.id) .. " Du~Elf~stinken"
 
-  f = add_faction("enno@eressea.de", "elf", "de")
+  f = faction.create("enno@eressea.de", "elf", "de")
   f.age = 20
 
   u = add_unit(f, plain)
@@ -197,7 +197,7 @@ function test_combat()
   plain = terraform(0, 0, "plain")
   skill = 8
 
-  f = add_faction("enno@eressea.de", "orc", "de")
+  f = faction.create("enno@eressea.de", "orc", "de")
   f.age = 20
 
   u = add_unit(f, plain)
@@ -211,7 +211,7 @@ function test_combat()
   u:add_order("BEFÖRDERUNG")
   attack = "ATTACKIERE " .. itoa36(u.id)
 
-  f = add_faction("enno@eressea.de", "elf", "de")
+  f = faction.create("enno@eressea.de", "elf", "de")
   f.age = 20
 
   u = add_unit(f, plain)
@@ -232,7 +232,7 @@ function test_rewards()
   plain = terraform(0, 0, "plain")
   skill = 5
 
-  f = add_faction("enno@eressea.de", "human", "de")
+  f = faction.create("enno@eressea.de", "human", "de")
   f.age = 20
   u = add_unit(f, plain)
   u.number = 10
@@ -253,7 +253,7 @@ function test_rewards()
   u:add_order("MACHEN Elfenbogen")
   u:add_order("NUMMER PARTEI test")
 
-  f = add_faction("enno@eressea.de", "elf", "de")
+  f = faction.create("enno@eressea.de", "elf", "de")
   f.age = 20
   u = add_unit(f, plain)
   u.number = 7
@@ -297,7 +297,7 @@ end
 
 function test_give()
   plain = terraform(0, 0, "plain")
-  f = add_faction("enno@eressea.de", "human", "de")
+  f = faction.create("enno@eressea.de", "human", "de")
   f.age = 20
   u = add_unit(f, plain)
   u.number = 10
@@ -345,7 +345,7 @@ function test_parser()
   plain = terraform(0, 0, "plain")
   skill = 5
 
-  f = add_faction("enno@eressea.de", "human", "de")
+  f = faction.create("enno@eressea.de", "human", "de")
   f.age = 20
   u = add_unit(f, plain)
   u.number = 10
@@ -359,7 +359,7 @@ function test_fail()
   plain = terraform(0, 0, "plain")
   skill = 5
 
-  f = add_faction("enno@eressea.de", "human", "de")
+  f = faction.create("enno@eressea.de", "human", "de")
   print(f)
 end
 

@@ -7,12 +7,12 @@ function init_sphinxhints()
       hints[i] = 0
     end
     for i=0,4,1 do
-        if faction:get_variable("sphinxhint"..tostring(i)) == nil then
+        if faction.objects:get("sphinxhint"..tostring(i)) == nil then
           repeat
            hint = math.random(0,14)
           until hints[hint] = 0
           hints[hint] = 1
-          faction:set_variable("sphinxhint"..tostring(i),tostring(hint))
+          faction.objects:set("sphinxhint"..tostring(i), tostring(hint))
       end
     end
   end

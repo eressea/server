@@ -22,7 +22,7 @@ function sphinx_handler()
     hintText[14] = "Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt"
 
     for i=0,4,1 do
-      possibleHint[i] = u:faction:get_variable("sphinxhint"..tostring(i))
+      possibleHint[i] = u:faction.objects:get("sphinxhint"..tostring(i))
     end
 
     hint = math.random(0,4)
@@ -34,7 +34,7 @@ function sphinx_handler()
     str = evt:get_string(0)
     u2 = evt:get_unit(1)
     if str.lower() == "hinweis" then
-      if u2:faction:get_variable("sphinxGotHint"..itoa36(u.id) then
+      if u2:faction.objects:get("sphinxGotHint"..itoa36(u.id) then
         send_gotHint(u2)
       else
         send_hint(u2, u)

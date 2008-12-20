@@ -52,7 +52,7 @@ end
 
 function test_reorder()
   r = terraform(0, 0, "plain")
-  f = add_faction("enno@ix.de", "orc", "de")
+  f = faction.create("enno@ix.de", "orc", "de")
   s1 = add_ship(r, "boat")
   s1.size = 1
   s2 = add_ship(r, "boat")

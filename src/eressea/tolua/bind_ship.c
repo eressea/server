@@ -119,7 +119,16 @@ tolua_ship_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "id", tolua_ship_get_id, NULL);
       tolua_variable(tolua_S, "name", tolua_ship_get_name, tolua_ship_set_name);
       tolua_variable(tolua_S, "units", tolua_ship_get_units, NULL);
-
+#ifdef TODO
+      .property("type", &ship_gettype)
+      .property("weight", &ship_getweight)
+      .property("capacity", &ship_getcapacity)
+      .property("maxsize", &ship_maxsize)
+      .property("region", &ship_getregion, &ship_setregion)
+      .def_readwrite("damage", &ship::damage)
+      .def_readwrite("size", &ship::size)
+      .def_readwrite("coast", &ship::coast)
+#endif
       tolua_variable(tolua_S, "objects", tolua_ship_get_objects, 0);
 
       tolua_function(tolua_S, "create", tolua_ship_create);

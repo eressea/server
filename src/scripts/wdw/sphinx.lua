@@ -12,12 +12,12 @@ function init_sphinxhints()
       hints[i] = 0
     end
     for i=0,4,1 do
-      if f:get_variable("sphinxhint"..tostring(i)) == nil then
+      if f.objects:get("sphinxhint"..tostring(i)) == nil then
         repeat
           hint = math.random(0,14)
         until hints[hint] == 0
         hints[hint] = 1
-        f:set_variable("sphinxhint"..tostring(i),tostring(hint))
+        f.objects:set("sphinxhint" .. tostring(i), tostring(hint))
       end
     end
   end
@@ -74,7 +74,7 @@ function sphinx_handler()
     str = evt:get_string(0)
     u2 = evt:get_unit(1)
     if string.lower(str) == "hinweis" then
-      if u2.faction:get_variable("sphinxGotHint"..itoa36(u.id)) ~= nil then
+      if u2.faction.objects:get("sphinxGotHint"..itoa36(u.id)) ~= nil then
         send_gotHint(u2)
       else
         send_hint(u2, u)

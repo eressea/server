@@ -132,24 +132,6 @@ faction_setpolicy(faction * a, faction * b, const char * flag, bool value)
   }
 }
 
-static const char *
-faction_get_variable(faction * f, const char *key)
-{
-	return get_variable(f->attribs, key);
-}
-
-static void
-faction_set_variable(faction * f, const char *key, const char *value)
-{
-	set_variable(&f->attribs, key, value);
-}
-
-static void
-faction_delete_variable(faction * f, const char *key)
-{
-	return delete_variable(&f->attribs, key);
-}
-
 static int
 faction_additem(faction * f, const char * iname, int number)
 {
@@ -290,7 +272,6 @@ bind_faction(lua_State * L)
   module(L)[
     def("factions", &get_factions, return_stl_iterator),
     def("get_faction", &findfaction),
-    def("add_faction", &add_faction),
     def("faction_origin", &faction_getorigin, pure_out_value(_2) + pure_out_value(_3)),
 
     class_<struct faction>("faction")
@@ -298,11 +279,6 @@ bind_faction(lua_State * L)
     .def(self == faction())
     .def("set_policy", &faction_setpolicy)
     .def("get_policy", &faction_getpolicy)
-
-    // temporary variables
-    .def("set_variable", &faction_set_variable)
-    .def("get_variable", &faction_get_variable)
-    .def("delete_variable", &faction_delete_variable)
 
     // heroes
     .def("heroes", &faction_countheroes)

@@ -53,7 +53,7 @@ function make_faction(position, alliance, number, email, race)
   local units = (1+skillno)*6 / number -- jede allianz kriegt 168 leute
   local money = units * 5 * 10 -- jede allianz kriegt 8400 silber
   
-  local f = add_faction(email, race, "de")
+  local f = faction.create(email, race, "de")
   if f == nil then
     print("could not create " .. email .. " " .. race)
     return
