@@ -59,5 +59,5 @@
 #elif defined(BINDINGS_TOLUA)
 # undef BINDINGS_LUABIND
 #else
-# define BINDINGS_LUABIND /* fallback */
+# define BINDINGS_TOLUA /* new default */
 #endif
