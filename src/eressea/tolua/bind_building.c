@@ -19,7 +19,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/region.h>
 
 #include <lua.h>
-#include <tolua.h>
+#include <tolua++.h>
 
 int tolua_buildinglist_next(lua_State *tolua_S)
 {

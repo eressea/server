@@ -44,7 +44,7 @@
 void
 init_triggers(void)
 {
-  if (quiet<2) printf("- registering triggers\n");
+  if (verbosity>=2) printf("- registering triggers\n");
 	tt_register(&tt_changefaction);
 	tt_register(&tt_changerace);
 	tt_register(&tt_createcurse);

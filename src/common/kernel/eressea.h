@@ -143,7 +143,7 @@ typedef struct strlist {
 #define freset(u, i) ((u)->flags &= ~(i))
 
 extern int turn;
-extern int quiet;
+extern int verbosity;
 
 /* parteinummern */
 extern boolean faction_id_is_unused(int);

@@ -25,7 +25,7 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 
 #include <lua.h>
-#include <tolua.h>
+#include <tolua++.h>
 
 
 int tolua_factionlist_next(lua_State *tolua_S)
@@ -426,34 +426,12 @@ tolua_faction_open(lua_State* tolua_S)
 #ifdef TODO
       def("faction_origin", &faction_getorigin, pure_out_value(_2) + pure_out_value(_3)),
 
-      // heroes
-      .def("heroes", &faction_countheroes)
-      .def("max_heroes", &faction_maxheroes)
-
-      .def_readonly("name", &faction::name)
-      .def_readonly("score", &faction::score)
-      .def_readonly("id", &faction::no)
-      .def_readwrite("age", &faction::age)
-      .def_readwrite("options", &faction::options)
-      .def_readwrite("flags", &faction::flags)
       .def_readwrite("subscription", &faction::subscription)
-      .def_readwrite("lastturn", &faction::lastorders)
 
-      .def("add_item", &faction_additem)
-      .property("items", &faction_items, return_stl_iterator)
       .property("x", &faction_getorigin_x, &faction_setorigin_x)
       .property("y", &faction_getorigin_y, &faction_setorigin_y)
 
-      .def("renum", &faction_renumber)
       .def("add_notice", &faction_addnotice)
-      .property("password", &faction_get_passw, &faction_set_passw)
-      .property("info", &faction_get_banner, &faction_set_banner)
-      .property("email", &faction_get_email, &faction_set_email)
-      .property("locale", &faction_getlocale, &faction_setlocale)
-      .property("units", &faction_units, return_stl_iterator)
-      .property("alliance", &faction_getalliance, &faction_setalliance)
-      .property("race", &faction_getrace, &faction_setrace)
-      .property("objects", &eressea::get_objects<faction>)
 #endif
       tolua_variable(tolua_S, "objects", tolua_faction_get_objects, NULL);
     }

@@ -1,5 +1,5 @@
 function mkunit(f, r, num)
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.number = num
   u:add_item("money", num*10)
   u:clear_orders()
@@ -11,16 +11,16 @@ function test_movement()
   east = direction("east")
 
   -- im westen ohne strassen
-  ocean = terraform(-3, 0, "ocean")
-  w2 = terraform(-2, 0, "plain")
-  w1 = terraform(-1, 0, "plain")
+  ocean = region.create(-3, 0, "ocean")
+  w2 = region.create(-2, 0, "plain")
+  w1 = region.create(-1, 0, "plain")
 
   -- im osten mit strassen
-  r0 = terraform(0, 0, "plain")
-  r1 = terraform(1, 0, "desert")
-  r2 = terraform(2, 0, "glacier")
-  r3 = terraform(3, 0, "plain")
-  r4 = terraform(4, 0, "glacier")
+  r0 = region.create(0, 0, "plain")
+  r1 = region.create(1, 0, "desert")
+  r2 = region.create(2, 0, "glacier")
+  r3 = region.create(3, 0, "plain")
+  r4 = region.create(4, 0, "glacier")
 
   r0:add_direction(r4, "Wirbel", "Nimm die Abkürzung, Luke")
 
@@ -110,7 +110,7 @@ function test_movement()
   bug:add_order("GIB 0 ALLES Holz")
   bug:add_order("FAHREN " .. itoa36(orc.id))
 
-  u = add_unit(orcs, r0)
+  u = unit.create(orcs, r0)
   u.number = 1
   u:add_item("horse", u.number*3)
   u:add_item("money", u.number*10)
@@ -122,7 +122,7 @@ function test_movement()
   u:add_order("NUMMER EINHEIT foLg")
   u:add_order("BENENNE EINHEIT Verfolger")
 
-  u2 = add_unit(orcs, r0)
+  u2 = unit.create(orcs, r0)
   u2.number = 1
   u2:add_item("horse", u2.number*3)
   u2:add_item("money", u.number*10)
@@ -137,12 +137,12 @@ end
 
 
 function test_sail()
-  r0 = terraform(0, 0, "plain")
+  r0 = region.create(0, 0, "plain")
 
   orcs = faction.create("enno@eressea.de", "orc", "de")
   orcs.age = 20
 
-  orc = add_unit(orcs, r0)
+  orc = unit.create(orcs, r0)
   orc.number = 1
   orc:add_item("speedsail", orc.number)
 
@@ -166,13 +166,13 @@ function test_handler()
     message_region(u, "thanks region, i got your message: " .. str)
   end
 
-  plain = terraform(0, 0, "plain")
+  plain = region.create(0, 0, "plain")
   skill = 8
 
   f = faction.create("enno@eressea.de", "orc", "de")
   f.age = 20
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 1
   u:add_item("money", u.number*100)
   u:clear_orders()
@@ -183,7 +183,7 @@ function test_handler()
   f = faction.create("enno@eressea.de", "elf", "de")
   f.age = 20
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 1
   u:add_item("money", u.number*100)
   u:clear_orders()
@@ -194,13 +194,13 @@ end
 
 function test_combat()
 
-  plain = terraform(0, 0, "plain")
+  plain = region.create(0, 0, "plain")
   skill = 8
 
   f = faction.create("enno@eressea.de", "orc", "de")
   f.age = 20
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 100
   u:add_item("money", u.number*100)
   u:add_item("sword", u.number)
@@ -214,7 +214,7 @@ function test_combat()
   f = faction.create("enno@eressea.de", "elf", "de")
   f.age = 20
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 100
   u:add_item("money", u.number*100)
   u:add_item("sword", u.number)
@@ -229,12 +229,12 @@ end
 function test_rewards()
   -- this script tests manufacturing and fighting.
 
-  plain = terraform(0, 0, "plain")
+  plain = region.create(0, 0, "plain")
   skill = 5
 
   f = faction.create("enno@eressea.de", "human", "de")
   f.age = 20
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 10
   u:add_item("money", u.number*100)
   u:add_item("greatbow", u.number)
@@ -243,7 +243,7 @@ function test_rewards()
   u:add_order("KAEMPFE")
   attack = "ATTACKIERE " .. itoa36(u.id)
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 7
   u:add_item("money", u.number*100)
   u:add_item("mallorn", u.number*10)
@@ -255,7 +255,7 @@ function test_rewards()
 
   f = faction.create("enno@eressea.de", "elf", "de")
   f.age = 20
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 7
   u:add_item("money", u.number*100)
   u:add_item("greatbow", u.number)
@@ -264,7 +264,7 @@ function test_rewards()
   u:add_order("KAEMPFE HINTEN")
   u:add_order(attack)
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 7
   u:add_item("money", u.number*100)
   u:add_item("mallorn", u.number*10)
@@ -274,7 +274,7 @@ function test_rewards()
   u:add_order("MACHEN Elfenbogen")
   u:add_order("NUMMER PARTEI eviL")
 
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 7
   u:add_item("money", u.number*100)
   u:add_item("mallorn", u.number*10)
@@ -296,10 +296,10 @@ function test_rewards()
 end
 
 function test_give()
-  plain = terraform(0, 0, "plain")
+  plain = region.create(0, 0, "plain")
   f = faction.create("enno@eressea.de", "human", "de")
   f.age = 20
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 10
   u:add_item("money", u.number*100)
   u:clear_orders()
@@ -342,12 +342,12 @@ end
 function test_parser()
   -- this script tests the changes to quotes
 
-  plain = terraform(0, 0, "plain")
+  plain = region.create(0, 0, "plain")
   skill = 5
 
   f = faction.create("enno@eressea.de", "human", "de")
   f.age = 20
-  u = add_unit(f, plain)
+  u = unit.create(f, plain)
   u.number = 10
   u:clear_orders()
   u:add_order("Nummer Partei test")
@@ -356,7 +356,7 @@ function test_parser()
 end
 
 function test_fail()
-  plain = terraform(0, 0, "plain")
+  plain = region.create(0, 0, "plain")
   skill = 5
 
   f = faction.create("enno@eressea.de", "human", "de")

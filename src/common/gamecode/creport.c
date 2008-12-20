@@ -77,7 +77,7 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 /* imports */
-extern int quiet;
+extern int verbosity;
 boolean opt_cr_absolute_coords = false;
 
 /* globals */

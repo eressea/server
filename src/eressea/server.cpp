@@ -495,7 +495,7 @@ read_args(int argc, char **argv, lua_State * luaState)
         turn = atoi(argv[++i]);
         break;
       case 'q':
-        quiet = 1;
+        verbosity = 0;
         break;
       case 'v':
         if (i<argc) {
@@ -582,7 +582,7 @@ load_inifile(const char * filename)
     str = iniparser_getstring(d, "common:encoding", NULL);
     if (str) enc_gamedata = xmlParseCharEncoding(str);
 
-    quiet = iniparser_getint(d, "eressea:verbose", 0)?0:1;
+    verbosity = iniparser_getint(d, "eressea:verbose", 2);
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
 
     luafile = iniparser_getstring(d, "eressea:run", luafile);
@@ -608,9 +608,6 @@ main(int argc, char *argv[])
 
   sqlpatch = true;
   log_open("eressea.log");
-  printf("\n%s PBEM host\n"
-    "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
   lc_ctype = setlocale(LC_CTYPE, "");
   lc_numeric = setlocale(LC_NUMERIC, "C");
@@ -621,6 +618,11 @@ main(int argc, char *argv[])
   lua_State * luaState = lua_init();
   global.vm_state = luaState;
   load_inifile("eressea.ini");
+  if (verbosity>=4) {
+    printf("\n%s PBEM host\n"
+      "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
+      "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
+  }
   if ((i=read_args(argc, argv, luaState))!=0) return i;
 
 #ifdef CRTDBG

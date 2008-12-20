@@ -51,7 +51,7 @@ function test_free()
 end
 
 function test_reorder()
-  r = terraform(0, 0, "plain")
+  r = region.create(0, 0, "plain")
   f = faction.create("enno@ix.de", "orc", "de")
   s1 = add_ship(r, "boat")
   s1.size = 1
@@ -65,45 +65,45 @@ function test_reorder()
   b2.size = 2
   b3 = add_building(r, "portal")
   b3.size = 3
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.number = 1
   u.name = "a"
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.number = 1
   u.name = "b"
   u.ship = s3
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.number = 1
   u.name = "c"
   u.building = b1
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.number = 1
   u.name = "d"
   u.ship = s2
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "e"
   u.number = 1
   u.building = b1
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "f"
   u.number = 1
   u.building = b3
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "g"
   u.number = 1
   u.ship = s2
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "h"
   u.number = 1
   u.building = b2
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "i"
   u.number = 1
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "j"
   u.number = 1
   u.building = b1
-  u = add_unit(f, r)
+  u = unit.create(f, r)
   u.name = "k"
   u.number = 1
   u.ship = s1
@@ -205,10 +205,10 @@ function action(b, param)
 end
 
 function test_tunnels()
-  r = terraform(0, 0, "glacier")
+  r = region.create(0, 0, "glacier")
   b = add_building(r, "portal")
   b:add_action("tunnel_action", "tnnL")
-  r2 = terraform(5, 5, "plain")
+  r2 = region.create(5, 5, "plain")
   r2:set_key("tnnL", true)
   process_orders()
 end

@@ -580,7 +580,7 @@ count_skill(faction * f, skill_t sk)
   return n;
 }
 
-int quiet = 0;
+int verbosity = 0;
 
 FILE *debug;
 
@@ -675,7 +675,7 @@ verify_data(void)
   unit *u;
   int mage, alchemist;
 
-  puts(" - Überprüfe Daten auf Korrektheit...");
+  if (verbosity>=1) puts(" - Überprüfe Daten auf Korrektheit...");
 
   list_foreach(faction, factions, f) {
     mage = 0;
@@ -2260,7 +2260,7 @@ remove_empty_factions(boolean writedropouts)
     if ((f->units==NULL || f->alive == 0) && !is_monsters(f)) {
       ursprung * ur = f->ursprung;
       while (ur && ur->id!=0) ur=ur->next;
-      if (!quiet) log_stdio(stdout, "\t%s\n", factionname(f));
+      if (verbosity>=2) log_stdio(stdout, "\t%s\n", factionname(f));
 
       /* Einfach in eine Datei schreiben und später vermailen */
 

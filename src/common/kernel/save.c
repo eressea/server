@@ -380,7 +380,7 @@ readorders(const char *filename)
   if (filename) F = cfopen(filename, "rb");
   if (F==NULL) return 0;
 
-  puts(" - lese Befehlsdatei...\n");
+  if (verbosity>=1) puts(" - lese Befehlsdatei...\n");
 
   /* TODO: recognize UTF8 BOM */
   b = getbuf(F, enc_gamedata);

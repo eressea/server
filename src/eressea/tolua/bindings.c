@@ -53,7 +53,7 @@ without prior permission by the authors of Eressea.
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <tolua.h>
+#include <tolua++.h>
 #include <lua.h>
 
 #include <time.h>
@@ -172,7 +172,8 @@ tolua_message_unit(lua_State* tolua_S)
   unit * sender = (unit *)tolua_tousertype(tolua_S, 1, 0);
   unit * target = (unit *)tolua_tousertype(tolua_S, 2, 0);
   const char * str = tolua_tostring(tolua_S, 3, 0);
-
+  if (!target) tolua_error(tolua_S, "target is nil", NULL);
+  if (!sender) tolua_error(tolua_S, "sender is nil", NULL);
   deliverMail(target->faction, sender->region, sender, str, target);
   return 0;
 }
@@ -183,6 +184,8 @@ tolua_message_faction(lua_State * tolua_S)
   unit * sender = (unit *)tolua_tousertype(tolua_S, 1, 0);
   faction * target = (faction *)tolua_tousertype(tolua_S, 2, 0);
   const char * str = tolua_tostring(tolua_S, 3, 0);
+  if (!target) tolua_error(tolua_S, "target is nil", NULL);
+  if (!sender) tolua_error(tolua_S, "sender is nil", NULL);
 
   deliverMail(target, sender->region, sender, str, NULL);
   return 0;
@@ -194,6 +197,7 @@ tolua_message_region(lua_State * tolua_S)
   unit * sender = (unit *)tolua_tousertype(tolua_S, 1, 0);
   const char * str = tolua_tostring(tolua_S, 2, 0);
 
+  if (!sender) tolua_error(tolua_S, "sender is nil", NULL);
   ADDMSG(&sender->region->msgs, msg_message("mail_result", "unit message", sender, str));
 
   return 0;
@@ -220,6 +224,7 @@ call_script(lua_State * L, struct unit * u)
   const attrib * a = a_findc(u->attribs, &at_script);
   if (a==NULL) a = a_findc(u->race->attribs, &at_script);
   if (a!=NULL && a->data.i>0) {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, a->data.i);
     if (lua_pcall(L, 1, 0, 0)!=0) {
       const char* error = lua_tostring(L, -1);
       log_error(("call_script (%s): %s", unitname(u), error));

@@ -62,7 +62,7 @@ function make_faction(position, alliance, number, email, race)
   
   print("\n" .. email .. " (" .. itoa36(f.id) .. ")")
   f.alliance = alliance
-  local u = add_unit(f, position)
+  local u = unit.create(f, position)
   -- erster ist der, der die extras kriegt:
   u.number = 1
   local units = units - 1
@@ -79,7 +79,7 @@ function make_faction(position, alliance, number, email, race)
   local sk
   local skill
   for sk, skill in pairs(skills) do
-    u = add_unit(f, position)
+    u = unit.create(f, position)
 
     -- anzahl personen berechnen
     local number = math.floor(units / skillno)

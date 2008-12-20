@@ -46,7 +46,7 @@ function mktunnel()
   local from = gmtool.get_cursor()
   local to = gmtool.get_selection()()
   if to~=nil then
-    terraform(from.x, from.y, "glacier")
+    region.create(from.x, from.y, "glacier")
     create_tunnel(from, to)
     gmtool.select(to, 0)
     gmtool.highlight(to, 1)
@@ -67,12 +67,12 @@ function mkanchors()
   end
 end
 
--- terraform and prepare all hell-regions to become wonky gates
+-- region.create and prepare all hell-regions to become wonky gates
 function mkgates()
   for r in regions() do
     if r.plane_id==0 and r.terrain=="hell" then
       create_tunnel(r, "tnnL")
-      terraform(r.x, r.y, "glacier")
+      region.create(r.x, r.y, "glacier")
     end
   end
 end

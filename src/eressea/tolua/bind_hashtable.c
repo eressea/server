@@ -24,7 +24,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 
 #include <lua.h>
-#include <tolua.h>
+#include <tolua++.h>
 
 #include <assert.h>
 

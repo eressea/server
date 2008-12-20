@@ -44,7 +44,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 
 #include <lua.h>
-#include <tolua.h>
+#include <tolua++.h>
 
 #include <limits.h>
 
@@ -377,12 +377,14 @@ fctr_handle(struct trigger * tp, void * data)
   unit * u = fd->target;
   
   evt.args = (event_arg*)data;
+  lua_rawgeti(L, LUA_REGISTRYINDEX, fd->fhandle);
   tolua_pushusertype(L, u, "unit");
   tolua_pushusertype(L, &evt, "event");
   if (lua_pcall(L, 2, 0, 0)!=0) {
     const char* error = lua_tostring(L, -1);
-    log_error(("event (%s): %s", unitname(u), error));
+    log_error(("event (%s): %s\n", unitname(u), error));
     lua_pop(L, 1);
+    tolua_error(L, "event handler call failed", NULL);
   }
 
   return 0;
@@ -840,6 +842,40 @@ tolua_unit_tostring(lua_State *tolua_S)
   return 1;
 }
 
+static int
+tolua_event_gettype(lua_State *tolua_S)
+{
+  event * self = (event *)tolua_tousertype(tolua_S, 1, 0);
+  int index = (int)tolua_tonumber(tolua_S, 2, 0);
+  lua_pushstring(tolua_S, self->args[index].type);
+  return 1;
+}
+
+static int
+tolua_event_get(lua_State *tolua_S)
+{
+  struct event * self = (struct event *)tolua_tousertype(tolua_S, 1, 0);
+  int index = (int)tolua_tonumber(tolua_S, 2, 0);
+
+  event_arg * arg = self->args+index;
+
+  if (arg->type) {
+    if (strcmp(arg->type, "string")==0) {
+      tolua_pushstring(tolua_S, (const char *)arg->data.v);
+    } else if (strcmp(arg->type, "int")==0) {
+      tolua_pushnumber(tolua_S, (lua_Number)arg->data.i);
+    } else if (strcmp(arg->type, "float")==0) {
+      tolua_pushnumber(tolua_S, (lua_Number)arg->data.f);
+    } else {
+      /* this is pretty lazy */
+      tolua_pushusertype(tolua_S, (void*)arg->data.v, arg->type);
+    }
+    return 1;
+  }
+  tolua_error(tolua_S, "invalid type argument for event", NULL);
+  return 0;
+}
+
 void
 tolua_unit_open(lua_State * tolua_S)
 {
@@ -850,6 +886,14 @@ tolua_unit_open(lua_State * tolua_S)
   tolua_module(tolua_S, NULL, 0);
   tolua_beginmodule(tolua_S, NULL);
   {
+    tolua_cclass(tolua_S, "event", "event", "", NULL);
+    tolua_beginmodule(tolua_S, "event");
+    {
+      tolua_function(tolua_S, "get_type", tolua_event_gettype);
+      tolua_function(tolua_S, "get", tolua_event_get);
+    }
+    tolua_endmodule(tolua_S);
+
     tolua_cclass(tolua_S, "unit", "unit", "", NULL);
     tolua_beginmodule(tolua_S, "unit");
     {

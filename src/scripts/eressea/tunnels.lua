@@ -23,7 +23,7 @@ local function get_target(param)
           r:set_flag(0, false)
         end
         if (r.terrain=="ocean") then
-          r = terraform(r.x, r.y, "plain")
+          r = region.create(r.x, r.y, "plain")
         end
         targets[ntargets] = r
         ntargets = ntargets + 1

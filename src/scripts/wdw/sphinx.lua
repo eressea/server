@@ -93,8 +93,8 @@ function sphinx_handler()
         for r in regions() do
           m:send_region(r)
         end
-        -- Region terraformen
-        terraform(u2.region.x, u.region.y, "plain")
+        -- Region region.createen
+        region.create(u2.region.x, u.region.y, "plain")
         u2.region.set_resource(u2.region, "tree", 721)
         u2.region.set_resource(u2.region, "peasant", 2312)
         u2.add_item(u2, "trappedairelemental", 5)

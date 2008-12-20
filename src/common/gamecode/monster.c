@@ -1081,7 +1081,7 @@ spawn_dragons(void)
       fset(u, UFL_ISNEW|UFL_MOVED);
       equip_unit(u, get_equipment("monster_dragon"));
 
-      if (!quiet) {
+      if (verbosity>=2) {
         log_printf("%d %s in %s.\n", u->number,
           LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
       }
@@ -1147,7 +1147,7 @@ spawn_undead(void)
       deathcounts(r, -undead);
       name_unit(u);
 
-      if (!quiet) {
+      if (verbosity>=2) {
         log_printf("%d %s in %s.\n", u->number,
           LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
       }

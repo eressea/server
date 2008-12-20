@@ -13,7 +13,7 @@
 
 // lua includes
 #include <lua.h>
-#include <tolua.h>
+#include <tolua++.h>
 
 #define E_OK 0
 #define E_INVALID_MESSAGE 1
@@ -258,6 +258,21 @@ tolua_msg_set_region(lua_State * tolua_S)
 }
 
 static int
+tolua_msg_set(lua_State * tolua_S)
+{
+  tolua_Error err;
+  if (tolua_isnumber(tolua_S, 3, 0, &err)) {
+    return tolua_msg_set_int(tolua_S);
+  } else if (tolua_isusertype(tolua_S, 3, "region", 0, &err)) {
+    return tolua_msg_set_region(tolua_S);
+  } else if (tolua_isusertype(tolua_S, 3, "unit", 0, &err)) {
+    return tolua_msg_set_unit(tolua_S);
+  }
+  tolua_pushnumber(tolua_S, (lua_Number)-1);
+  return 1;
+}
+
+static int
 tolua_msg_send_region(lua_State * tolua_S)
 {
   lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
@@ -291,6 +306,7 @@ tolua_message_open(lua_State* tolua_S)
     tolua_cclass(tolua_S, "message", "message", "", NULL);
     tolua_beginmodule(tolua_S, "message");
     {
+      tolua_function(tolua_S, "set", tolua_msg_set);
       tolua_function(tolua_S, "set_unit", tolua_msg_set_unit);
       tolua_function(tolua_S, "set_region", tolua_msg_set_region);
       tolua_function(tolua_S, "set_resource", tolua_msg_set_resource);
@@ -300,7 +316,6 @@ tolua_message_open(lua_State* tolua_S)
       tolua_function(tolua_S, "send_region", tolua_msg_send_region);
 
       tolua_function(tolua_S, "create", tolua_msg_create);
-      // tolua_function(tolua_S, "destroy", tolua_msg_destroy);
     }
     tolua_endmodule(tolua_S);
   }

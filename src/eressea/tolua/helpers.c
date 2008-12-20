@@ -28,7 +28,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/region.h>
 
 #include <lua.h>
-#include <tolua.h>
+#include <tolua++.h>
 
 #include <assert.h>
 

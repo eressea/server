@@ -97,7 +97,7 @@
 #include <sys/stat.h>
 #endif
 
-extern int quiet;
+extern int verbosity;
 extern int *storms;
 extern int  weeks_per_month;
 extern int  months_per_year;

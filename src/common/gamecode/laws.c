@@ -170,7 +170,7 @@ checkorders(void)
 {
   faction *f;
 
-  puts(" - Warne spaete Spieler...");
+  if (verbosity>=1) puts(" - Warne spaete Spieler...");
   for (f = factions; f; f = f->next)
     if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
@@ -841,7 +841,7 @@ demographics(void)
 
   remove_empty_units();
 
-  puts(" - Einwanderung...");
+  if (verbosity>=1) puts(" - Einwanderung...");
   for (r = regions; r; r = r->next) {
     if (r->land && r->land->newpeasants) {
       int rp = rpeasants(r) + r->land->newpeasants;
@@ -1061,7 +1061,7 @@ parse_restart(void)
     }
   }
 
-  puts(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
+  if (verbosity>=1) puts(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
   for (f = factions; f; f = f->next) {
     if(fval(f, FFL_NOIDLEOUT)) f->lastorders = turn;
@@ -1095,8 +1095,10 @@ parse_restart(void)
       continue;
     }
   }
-  puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
-    "gemeldet haben...");
+  if (verbosity>=1) {
+    puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
+      "gemeldet haben...");
+  }
 
   age = calloc(MAX(4,turn+1), sizeof(int));
   for (f = factions; f; f = f->next) if (!is_monsters(f)) {
@@ -1119,7 +1121,7 @@ parse_restart(void)
   }
   /* Clear away debris of destroyed factions */
 
-  puts(" - beseitige leere Einheiten und leere Parteien...");
+  if (verbosity>=1) puts(" - beseitige leere Einheiten und leere Parteien...");
   remove_empty_units();
 }
 /* ------------------------------------------------------------- */
@@ -3573,9 +3575,9 @@ process(void)
     region *r;
     processor *pglobal = proc;
 
-    printf("- Step %u\n", prio);
+    if (verbosity>=3) printf("- Step %u\n", prio);
     while (proc && proc->priority==prio) {
-      if (proc->name) log_stdio(stdout, " - %s\n", proc->name);
+      if (proc->name && verbosity>=1) log_stdio(stdout, " - %s\n", proc->name);
       proc = proc->next;
     }
 
@@ -3652,7 +3654,7 @@ process(void)
     }
   }
 
-  if (quiet<2) printf("\n - Leere Gruppen loeschen...\n");
+  if (verbosity>=3) printf("\n - Leere Gruppen loeschen...\n");
   for (f=factions; f; f=f->next) {
     group ** gp = &f->groups;
     while (*gp) {
@@ -3882,7 +3884,7 @@ processorders (void)
   process();
   /*************************************************/
 
-  puts(" - Attribute altern");
+  if (verbosity>=1) puts(" - Attribute altern");
   ageing();
   remove_empty_units();
 
