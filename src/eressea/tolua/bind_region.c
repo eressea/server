@@ -244,6 +244,7 @@ tolua_region_open(lua_State* tolua_S)
       tolua_function(tolua_S, "get_resource", tolua_region_get_resource);
       tolua_function(tolua_S, "set_resource", tolua_region_set_resource);
       tolua_function(tolua_S, "get_flag", tolua_region_get_flag);
+      tolua_function(tolua_S, "set_flag", tolua_region_set_flag);
       tolua_function(tolua_S, "create", tolua_region_create);
 
       tolua_function(tolua_S, "get_key", tolua_region_getkey);

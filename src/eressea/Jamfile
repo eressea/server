@@ -12,7 +12,12 @@ UsingLuabind ;
 
 SEARCH_SOURCE += [ FDirName $(TOP) common iniparser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
+if $(BINDINGS) = LUABIND {
+   SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
+}
+if $(BINDINGS) = TOLUA {
+   SEARCH_SOURCE += [ FDirName $(SUBDIR) tolua ] ;
+}
 SubDirC++Flags -DHAVE_LUA ;
 
 SubDirHdrs $(XMLHDRS) ;
@@ -21,7 +26,20 @@ LUASERVER = eressea-lua ;
 
 SERVER_SOURCES = main.c korrektur.c ;
 
-SHARED_BINDINGS =
+TOLUA_SOURCES = 
+ <tolua>bindings.c
+ <tolua>helpers.c
+ <tolua>bind_unit.c
+ <tolua>bind_ship.c
+ <tolua>bind_faction.c
+ <tolua>bind_region.c
+ <tolua>bind_message.c
+ <tolua>bind_hashtable.c
+ <tolua>bind_building.c
+ <tolua>bind_gmtool.c
+;
+
+LUABIND_SOURCES =
  <lua>alliance.cpp
  <lua>building.cpp
  <lua>eressea.cpp
@@ -35,15 +53,23 @@ SHARED_BINDINGS =
  <lua>unit.cpp
  <lua>item.cpp
  <lua>test.cpp
-;
-
-Library luabindings : $(SHARED_BINDINGS) ;
-
-LUASERVER_SOURCES =
- <common!iniparser>iniparser.c
  <lua>gm.cpp
  <lua>script.cpp
  <lua>gamecode.cpp
+;
+
+if $(BINDINGS) = LUABIND {
+  Library bindings : $(LUABIND_SOURCES) ;
+  libluabind $(LUASERVER) ;
+}
+if $(BINDINGS) = TOLUA {
+  Library bindings : $(TOLUA_SOURCES) ;
+  libtolua $(LUASERVER) ;
+}
+liblua $(LUASERVER) ;
+
+LUASERVER_SOURCES =
+ <common!iniparser>iniparser.c
  <curses>listbox.c
  server.cpp
  korrektur.c
@@ -54,11 +80,10 @@ LUASERVER_SOURCES =
 
 # eressea-server with lua scripting
 LinkLibraries $(LUASERVER) :
- luabindings gamecode items spells kernel modules attributes races triggers util ;
-luabind $(LUASERVER) ;
+ bindings gamecode items spells kernel modules attributes races triggers util ;
 libxml2 $(LUASERVER) ;
-LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ -lncurses ;
-if $(DEBUG) = 1 {
-   LINKLIBS on $(LUASERVER) += -lmcheck ;
-}
+libcurses $(LUASERVER) ;
+libmcheck $(LUASERVER) ;
+
+LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
 Main $(LUASERVER) : $(LUASERVER_SOURCES) ;

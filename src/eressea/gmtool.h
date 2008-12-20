@@ -17,6 +17,7 @@ extern "C" {
   struct lua_State;
   struct selection;
   struct state;
+  struct region;
 
   extern int gmmain(int argc, char *argv[]);
   extern int curses_readline(struct lua_State * L, const char * prompt);

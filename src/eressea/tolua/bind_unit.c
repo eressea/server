@@ -46,6 +46,8 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
+#include <limits.h>
+
 static int
 tolua_unit_get_objects(lua_State* tolua_S)
 {

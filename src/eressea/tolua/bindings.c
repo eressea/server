@@ -280,9 +280,21 @@ tolua_dice_rand(lua_State * tolua_S)
 }
 
 static int
-lua_addequipment(const char * eqname, const char * iname, const char * value)
+tolua_addequipment(lua_State * tolua_S)
 {
-  return 0;
+  const char * eqname = tolua_tostring(tolua_S, 1, 0);
+  const char * iname = tolua_tostring(tolua_S, 2, 0);
+  const char * value = tolua_tostring(tolua_S, 3, 0);
+  int result = -1;
+  if (iname!=NULL) {
+    const struct item_type * itype = it_find(iname);
+    if (itype!=NULL) { 
+      equipment_setitem(create_equipment(eqname), itype, value);
+      result = 0;
+    }
+  }
+  lua_pushnumber(tolua_S, (lua_Number)result);
+  return 1;
 }
 
 static int
@@ -345,7 +357,7 @@ tolua_get_nmrs(lua_State * tolua_S)
 }
 
 static int
-tolua_lua_equipunit(lua_State * tolua_S)
+tolua_equipunit(lua_State * tolua_S)
 {
   unit * u = (unit *)tolua_tousertype(tolua_S, 1, 0);
   const char * eqname = tolua_tostring(tolua_S, 2, 0);
@@ -709,7 +721,7 @@ tolua_eressea_open(lua_State* tolua_S)
     {
       tolua_variable(tolua_S, "name", tolua_get_alliance_name, tolua_set_alliance_name);
       tolua_variable(tolua_S, "id", tolua_get_alliance_id, NULL);
-      tolua_variable(tolua_S, "factions", tolua_get_alliance_factions, NULL);
+      tolua_variable(tolua_S, "factions", &tolua_get_alliance_factions, NULL);
       tolua_function(tolua_S, "create", tolua_alliance_create);
     }
     tolua_endmodule(tolua_S);
@@ -763,7 +775,8 @@ tolua_eressea_open(lua_State* tolua_S)
     tolua_function(tolua_S, "get_season", tolua_get_season);
 
     tolua_function(tolua_S, "equipment_setitem", tolua_equipment_setitem);
-    tolua_function(tolua_S, "equip_unit", tolua_lua_equipunit);
+    tolua_function(tolua_S, "equip_unit", tolua_equipunit);
+    tolua_function(tolua_S, "add_equipment", tolua_addequipment);
 
     tolua_function(tolua_S, "atoi36", tolua_atoi36);
     tolua_function(tolua_S, "itoa36", tolua_itoa36);

@@ -52,7 +52,8 @@ msg_create_message(const char *type)
   return lmsg;
 }
 
-static void
+/*
+ static void
 msg_destroy_message(lua_message * msg)
 {
   if (msg->msg) msg_release(msg->msg);
@@ -65,7 +66,7 @@ msg_destroy_message(lua_message * msg)
     }
   }
 }
-
+*/
 int
 msg_set_resource(lua_message * msg, const char * param, const char * resname) 
 {

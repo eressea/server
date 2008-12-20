@@ -14,7 +14,9 @@
 #ifndef H_KRNL_BUILDING
 #define H_KRNL_BUILDING
 
+#include <kernel/types.h>
 #include <util/variant.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

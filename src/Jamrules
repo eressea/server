@@ -4,9 +4,9 @@ LINK = gcc ;
 
 MSPACES = 1 ;
 
-# BINDING = LUABIND ;
-if ! $(BINDING) {
-  BINDING = TOLUA ;
+# BINDINGS = LUABIND ;
+if ! $(BINDINGS) {
+  BINDINGS = TOLUA ;
 }
   
 if ! $(LUA_VERSION) {
@@ -104,20 +104,40 @@ rule zlib
   LINKLIBS on $(<) += -lz ;
 }
 
-rule luabind
+rule liblua
 {
-  LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib ;
   if $(LUA_VERSION) = 5.1 {
     LINKLIBS on $(<) += -llua5.1 ;
   } else {
     LINKLIBS on $(<) += -llua50 -llualib50 ;
   }
+}
+
+rule libluabind
+{
   LINKLIBS on $(<) += -lm -lluabind ;
 }
 
 rule libxml2
 {
   LINKLIBS on $(<) += -lxml2 ;
+}
+
+rule libtolua
+{
+  LINKLIBS on $(<) += -ltolua ;
+}
+
+rule libcurses
+{
+  LINKLIBS on $(<) += -lncurses ;
+}
+
+rule libmcheck
+{
+  if $(DEBUG) = 1 {
+    LINKLIBS on $(<) += -lmcheck ;
+  }
 }
 
 rule UsingLuabind
