@@ -288,6 +288,14 @@ tolua_region_setkey(lua_State* tolua_S)
   return 0;
 }
 
+static int
+tolua_region_tostring(lua_State *tolua_S)
+{
+  region * self = (region *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, regionname(self, NULL));
+  return 1;
+}
+
 void
 tolua_region_open(lua_State* tolua_S)
 {
@@ -301,6 +309,7 @@ tolua_region_open(lua_State* tolua_S)
     tolua_beginmodule(tolua_S, "region");
     {
       tolua_function(tolua_S, "create", tolua_region_create);
+      tolua_function(tolua_S, "__tostring", tolua_region_tostring);
 
       tolua_variable(tolua_S, "id", tolua_region_get_id, NULL);
       tolua_variable(tolua_S, "x", tolua_region_get_x, NULL);

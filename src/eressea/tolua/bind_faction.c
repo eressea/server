@@ -374,6 +374,13 @@ static int tolua_faction_get_items(lua_State* tolua_S)
   return 1;
 }
 
+static int
+tolua_faction_tostring(lua_State *tolua_S)
+{
+  faction * self = (faction *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, factionname(self));
+  return 1;
+}
 
 void
 tolua_faction_open(lua_State* tolua_S)
@@ -388,6 +395,8 @@ tolua_faction_open(lua_State* tolua_S)
     tolua_cclass(tolua_S, "faction", "faction", "", NULL);
     tolua_beginmodule(tolua_S, "faction");
     {
+      tolua_function(tolua_S, "__tostring", tolua_faction_tostring);
+
       tolua_variable(tolua_S, "name", tolua_faction_get_name, tolua_faction_set_name);
       tolua_variable(tolua_S, "info", tolua_faction_get_info, tolua_faction_set_info);
       tolua_variable(tolua_S, "units", tolua_faction_get_units, NULL);

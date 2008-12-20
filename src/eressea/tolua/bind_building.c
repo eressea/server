@@ -119,6 +119,13 @@ tolua_building_create(lua_State* tolua_S)
   return 1;
 }
 
+static int
+tolua_building_tostring(lua_State *tolua_S)
+{
+  building * self = (building *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, buildingname(self));
+  return 1;
+}
 
 void
 tolua_building_open(lua_State* tolua_S)
@@ -133,6 +140,8 @@ tolua_building_open(lua_State* tolua_S)
     tolua_cclass(tolua_S, "building", "building", "", NULL);
     tolua_beginmodule(tolua_S, "building");
     {
+      tolua_function(tolua_S, "__tostring", tolua_building_tostring);
+
       tolua_variable(tolua_S, "id", tolua_building_get_id, NULL);
       tolua_variable(tolua_S, "name", tolua_building_get_name, tolua_building_set_name);
       tolua_variable(tolua_S, "units", tolua_building_get_units, NULL);

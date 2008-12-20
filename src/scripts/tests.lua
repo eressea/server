@@ -108,6 +108,13 @@ local function test_region()
     assert(r:get_resource("horse") == 42)
     assert(r:get_resource("money") == 45)
     assert(r:get_resource("peasant") == 200)
+    r.name = nil
+    r.info = nil
+    assert(r.name=="")
+    assert(r.info=="")
+    r.name = "Alabasterheim"
+    r.info = "Hier wohnen die siebzehn Zwerge"
+    assert(tostring(r) == "Alabasterheim (0,0)")
 end
 
 local function test_building()

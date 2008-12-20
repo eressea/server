@@ -95,6 +95,14 @@ tolua_ship_create(lua_State* tolua_S)
   return 1;
 }
 
+static int
+tolua_ship_tostring(lua_State *tolua_S)
+{
+  ship * self = (ship *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, shipname(self));
+  return 1;
+}
+
 void
 tolua_ship_open(lua_State* tolua_S)
 {
@@ -107,6 +115,7 @@ tolua_ship_open(lua_State* tolua_S)
     tolua_cclass(tolua_S, "ship", "ship", "", NULL);
     tolua_beginmodule(tolua_S, "ship");
     {
+      tolua_function(tolua_S, "__tostring", tolua_ship_tostring);
       tolua_variable(tolua_S, "id", tolua_ship_get_id, NULL);
       tolua_variable(tolua_S, "name", tolua_ship_get_name, tolua_ship_set_name);
       tolua_variable(tolua_S, "units", tolua_ship_get_units, NULL);

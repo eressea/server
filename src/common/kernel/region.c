@@ -1353,7 +1353,7 @@ region_setinfo(struct region * r, const char * info)
 
 const char *
 region_getinfo(const region * r) {
-  return (const char *)r->display;
+  return r->display?r->display:"";
 }
 
 void
@@ -1367,6 +1367,8 @@ region_setname(struct region * r, const char * name)
 
 const char *
 region_getname(const region * r) {
-  if (r->land) return (const char *)r->land->name;
-  return NULL;
+  if (r->land && r->land->name) {
+    return r->land->name;
+  }
+  return "";
 }

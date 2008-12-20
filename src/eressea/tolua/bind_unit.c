@@ -832,6 +832,14 @@ tolua_unit_create(lua_State* tolua_S)
   return 1;
 }
 
+static int
+tolua_unit_tostring(lua_State *tolua_S)
+{
+  unit * self = (unit *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, unitname(self));
+  return 1;
+}
+
 void
 tolua_unit_open(lua_State * tolua_S)
 {
@@ -845,6 +853,7 @@ tolua_unit_open(lua_State * tolua_S)
     tolua_cclass(tolua_S, "unit", "unit", "", NULL);
     tolua_beginmodule(tolua_S, "unit");
     {
+      tolua_function(tolua_S, "__tostring", tolua_unit_tostring);
       tolua_function(tolua_S, "create", tolua_unit_create);
 
       tolua_variable(tolua_S, "name", tolua_unit_get_name, tolua_unit_set_name);
