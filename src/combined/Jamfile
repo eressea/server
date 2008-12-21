@@ -33,6 +33,11 @@ SERVER_SOURCES =
  main.cpp
 ;
 
+if $(MSPACES) {
+ SERVER_SOURCES += malloc.c ;
+}
+ 
+ 
 if $(BINDINGS) = LUABIND {
   SERVER_SOURCES += bindings.cpp ;
   libluabind $(SERVER) ;
