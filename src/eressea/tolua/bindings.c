@@ -159,9 +159,7 @@ static int
 tolua_read_orders(lua_State* tolua_S)
 {
   const char * filename = tolua_tostring(tolua_S, 1, 0);
-  int result;
-  ++turn;
-  result = readorders(filename);
+  int result = readorders(filename);
   lua_pushnumber(tolua_S, (lua_Number)result);
   return 1;
 }

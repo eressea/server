@@ -2144,9 +2144,9 @@ sp_ironkeeper(castorder *co)
   keeper = create_unit(r, mage->faction, 1, new_race[RC_IRONKEEPER], 0, NULL, mage);
 
   /*keeper->age = cast_level + 2;*/
+  setstatus(keeper, ST_AVOID); /* kaempft nicht */
   guard(keeper, GUARD_MINING);
   fset(keeper, UFL_ISNEW);
-  setstatus(keeper, ST_AVOID); /* kaempft nicht */
   /* Parteitarnen, damit man nicht sofort weiﬂ, wer dahinter steckt */
   fset(keeper, UFL_PARTEITARNUNG);
   {
