@@ -6,6 +6,7 @@ SubDirHdrs $(SUBDIR)/../common/gamecode ;
 SubDirHdrs $(SUBDIR)/../common/kernel ;
 SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/../tools ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 UsingLua ;
@@ -54,3 +55,5 @@ libmcheck $(SERVER) ;
 
 LINKLIBS on $(SERVER) += -lm -ldl -lstdc++ ;
 Main $(SERVER) : $(SERVER_SOURCES) ;
+
+Main atoi36 : atoi36.c ;

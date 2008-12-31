@@ -1,7 +1,7 @@
 SubDir TOP ;
 
-SubInclude TOP combined ;
-
 #SubInclude TOP common ;
 #SubInclude TOP eressea ;
-#SubInclude TOP tools ;
+
+SubInclude TOP combined ;
+# SubInclude TOP tools ;
