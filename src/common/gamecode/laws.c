@@ -837,7 +837,7 @@ demographics(void)
     free(free_migrants);
     free_migrants = m;
   };
-  putchar('\n');
+  if (verbosity>=1) putchar('\n');
 
   remove_empty_units();
 
@@ -3930,7 +3930,7 @@ update_subscriptions(void)
   strcat(strcpy(zText, basepath()), "/subscriptions");
   F = fopen(zText, "r");
   if (F==NULL) {
-    log_info((0, "could not open %s.\n", zText));
+    log_warning((0, "could not open %s.\n", zText));
     return;
   }
   for (;;) {

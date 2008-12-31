@@ -357,10 +357,6 @@ extern void reorder_units(struct region * r);
 
 extern const char *localenames[];
 
-#ifdef _MSC_VER
-#include <stdafx.h>
-#endif
-
 /** compatibility: **/
 extern race_t old_race(const struct race *);
 extern const struct race * new_race[];

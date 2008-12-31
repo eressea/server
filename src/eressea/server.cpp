@@ -122,10 +122,10 @@
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif // _MSC_VER
-#endif // BINDINGS_LUABIND
-
 #include "lua/script.h"
 #include <boost/version.hpp>
+
+#endif // BINDINGS_LUABIND
 
 #include <libxml/encoding.h>
 

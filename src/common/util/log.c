@@ -258,31 +258,31 @@ _log_info(unsigned int level, const char * format, ...)
     va_start(marker, format);
     vfprintf(logfile, format, marker);
     va_end(marker);
-  }
-  if (logfile!=stderr) {
-    if (stderr_level>=level) {
-      fprintf(stderr, "INFO[%u]: ", level);
-      va_start(marker, format);
-      if (stdio_codepage) {
-        char buffer[MAXLENGTH];
-        char converted[MAXLENGTH];
+	  if (logfile!=stderr) {
+		if (stderr_level>=level) {
+		  fprintf(stderr, "INFO[%u]: ", level);
+		  va_start(marker, format);
+		  if (stdio_codepage) {
+			char buffer[MAXLENGTH];
+			char converted[MAXLENGTH];
 
-        vsnprintf(buffer, sizeof(buffer), format, marker);
-        if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage)==0) {
-          fputs(converted, stderr);
-        } else {
-          /* fall back to non-converted output */
-          va_end(marker);
-          va_start(marker, format);
-          vfprintf(stderr, format, marker);
-        }
-      } else {
-        vfprintf(stderr, format, marker);
-      }
-      va_end(marker);
-    }
-    if (log_flags & LOG_FLUSH) {
-      log_flush();
+			vsnprintf(buffer, sizeof(buffer), format, marker);
+			if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage)==0) {
+			  fputs(converted, stderr);
+			} else {
+			  /* fall back to non-converted output */
+			  va_end(marker);
+			  va_start(marker, format);
+			  vfprintf(stderr, format, marker);
+			}
+		  } else {
+			vfprintf(stderr, format, marker);
+		  }
+		  va_end(marker);
+		}
+		if (log_flags & LOG_FLUSH) {
+		  log_flush();
+		}
     }
   }
 }

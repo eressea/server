@@ -4,7 +4,7 @@
 
 #include "eressea/server.cpp"
 
-#ifndef BINDINGS_TOLUA
+#ifdef BINDINGS_LUABIND
 #include "eressea/lua/alliance.cpp"
 #include "eressea/lua/building.cpp"
 #include "eressea/lua/eressea.cpp"
