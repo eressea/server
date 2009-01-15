@@ -70,7 +70,7 @@
       <text locale="de">Beim Barte des Proheten! Ach nein, Zwergen. Irgendetwas riecht hier ranzig.</text>
       <text locale="en">Sniff... Bleah. Don't they ever wash these?</text>
     </string>
-    <string name="aoh">
+    <string name="ao_healing">
       <text locale="de">Diese Amulett ist ein hervorragender Fokus für alle Heilzauber. Ein
         mit diesem Fokus gewirkter Heilzauber wird mit größerer
         Warscheinlichkeit Erfolgreich sein und doppelt so viele Leute heilen
@@ -1342,10 +1342,10 @@
   <string name="ao_chastity_p">
     <text locale="de">Amulette der Keuschheit</text>
   </string>
-  <string name="aoh">
+  <string name="ao_healing">
     <text locale="de">Amulett der Heilung</text>
   </string>
-  <string name="aoh_p">
+  <string name="ao_healing_p">
     <text locale="de">Amulette der Heilung</text>
   </string>
   <string name="aog">

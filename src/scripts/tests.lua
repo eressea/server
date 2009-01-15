@@ -1,3 +1,12 @@
+local function test_rename()
+    free_game()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("enno@eressea.de", "human", "de")
+    local u = unit.create(f, r)
+    u:add_item("aoh", 1)
+    assert(u:get_item("ao_healing")==1)
+end
+
 local function test_pure()
     free_game()
     local r = region.create(0, 0, "plain")
@@ -236,6 +245,21 @@ local function test_recruit()
   assert(u:get_item("money")==10)
 end
 
+local function test_produce()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r, 1)
+  u:clear_orders()
+  u:set_skill("weaponsmithing", 3)
+  u:add_item("iron", 2)
+  u:add_item("money", u.number * 10)
+  u:add_order("MACHE Schwert")
+  process_orders()
+  assert(u:get_item("iron")==1)
+  assert(u:get_item("sword")==1)
+end
+
 loadscript("extensions.lua")
 tests = {
     ["pure"] = test_pure,
@@ -248,6 +272,8 @@ tests = {
     ["hashtable"] = test_hashtable,
     ["gmtool"] = test_gmtool,
     ["events"] = test_events,
+    ["produce"] = test_produce,
+    ["rename"] = test_rename,
     ["recruit"] = test_recruit
 }
 

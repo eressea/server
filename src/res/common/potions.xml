@@ -1,0 +1,282 @@
+<?xml version="1.0"?>
+<resources>
+  <!-- this file contains potions and herbs that are part of the alchemy system -->
+
+  <!-- 21 stupidly named herbs -->
+  <resource name="h0" appearance="herbbag"><!-- Flachwurz -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h1" appearance="herbbag"><!-- Würziger Wagemut -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h2" appearance="herbbag"><!-- Eulenauge -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h3" appearance="herbbag"><!-- Grüner Spinnerich -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h4" appearance="herbbag"><!-- Blauer Baumringel -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h5" appearance="herbbag"><!-- Elfenlieb -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h6" appearance="herbbag"><!-- Gurgelkraut -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h7" appearance="herbbag"><!-- Knotiger Saugwurz -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h8" appearance="herbbag"><!-- Blasenmorchel -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h9" appearance="herbbag"><!-- Wasserfinder -->
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h10" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h11" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h12" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h13" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h14" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h15" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h16" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h17" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h18" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h19" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <resource name="h20" appearance="herbbag">
+    <item weight="0" score="10" herb="yes"/>
+  </resource>
+
+  <!-- potions -->
+  <resource name="p0" appearance="vial">
+    <item weight="0" score="30">
+      <function name="use" value="usepotion"/>
+      <potion level="1"/>
+      <construction skill="alchemy" minskill="2" reqsize="1">
+        <requirement type="h4"/>
+        <requirement type="h12"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="goliathwater" appearance="vial">
+    <item weight="0" score="30">
+      <function name="use" value="usepotion"/>
+      <potion level="1"/>
+      <construction skill="alchemy" minskill="2" reqsize="1">
+        <requirement type="h6"/>
+        <requirement type="h13"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="truthpotion" appearance="vial">
+    <item weight="0" score="30">
+      <function name="use" value="usepotion"/>
+      <potion level="1"/>
+      <construction skill="alchemy" minskill="2" reqsize="1">
+        <requirement type="h0"/>
+        <requirement type="h13"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p2" appearance="vial">
+    <item weight="0" score="30">
+      <function name="use" value="usepotion"/>
+      <potion level="1"/>
+      <construction skill="alchemy" minskill="2" reqsize="1">
+        <requirement type="h5"/>
+        <requirement type="h7"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p3" appearance="vial">
+    <item weight="0" score="60">
+      <function name="use" value="usepotion"/>
+      <potion level="2"/>
+      <construction skill="alchemy" minskill="4" reqsize="1">
+        <requirement type="h14"/>
+        <requirement type="h16"/>
+        <requirement type="h1"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p4" appearance="vial">
+    <!-- Heilwasser -->
+    <item weight="0" score="60">
+      <function name="use" value="usehealingpotion"/>
+      <potion level="2"/>
+      <construction skill="alchemy" minskill="4" reqsize="1">
+        <requirement type="h19"/>
+        <requirement type="h4"/>
+        <requirement type="h1"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="peasantblood" appearance="vial">
+    <!-- Bauernblut -->
+    <item weight="0" score="60">
+      <function name="use" value="usebloodpotion"/>
+      <potion level="2"/>
+      <construction skill="alchemy" minskill="4" reqsize="1">
+        <requirement type="h17"/>
+        <requirement type="h13"/>
+        <requirement type="h4"/>
+        <requirement type="peasant"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p6" appearance="vial">
+    <item weight="0" score="90">
+      <function name="use" value="usepotion"/>
+      <potion level="3"/>
+      <construction skill="alchemy" minskill="6" reqsize="1">
+        <requirement type="h9"/>
+        <requirement type="h15"/>
+        <requirement type="h12"/>
+        <requirement type="h6"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p7" appearance="vial">
+    <item weight="0" score="90">
+      <function name="useonother" value="usefoolpotion"/>
+      <potion level="3"/>
+      <construction skill="alchemy" minskill="6" reqsize="1">
+        <requirement type="h2"/>
+        <requirement type="h3"/>
+        <requirement type="h17"/>
+        <requirement type="h13"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="nestwarmth" appearance="vial">
+    <item weight="0" score="90">
+      <function name="use" value="usewarmthpotion"/>
+      <potion level="3"/>
+      <construction skill="alchemy" minskill="6" reqsize="1">
+        <requirement type="h18"/>
+        <requirement type="h3"/>
+        <requirement type="h16"/>
+        <requirement type="h10"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p9" appearance="vial">
+    <item weight="0" score="90">
+      <function name="use" value="usepotion"/>
+      <potion level="3"/>
+      <construction skill="alchemy" minskill="6" reqsize="1">
+        <requirement type="h4"/>
+        <requirement type="h11"/>
+        <requirement type="h10"/>
+        <requirement type="h7"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p10" appearance="vial">
+    <item weight="0" score="90">
+      <function name="use" value="usepotion"/>
+      <potion level="3"/>
+      <construction skill="alchemy" minskill="6" reqsize="1">
+        <requirement type="h19"/>
+        <requirement type="h14"/>
+        <requirement type="h0"/>
+        <requirement type="h11"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p11" appearance="vial">
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+      <construction skill="alchemy" minskill="8" reqsize="1">
+        <requirement type="h14"/>
+        <requirement type="h20"/>
+        <requirement type="h15"/>
+        <requirement type="h8"/>
+        <requirement type="h5"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p13" appearance="vial">
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+      <construction skill="alchemy" minskill="8" reqsize="1">
+        <requirement type="h5"/>
+        <requirement type="h9"/>
+        <requirement type="h12"/>
+        <requirement type="h3"/>
+        <requirement type="h8"/>
+        <requirement type="dragonblood"/>
+      </construction>
+    </item>
+  </resource>
+
+  <resource name="p14" appearance="vial">
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+      <construction skill="alchemy" minskill="8" reqsize="1">
+        <requirement type="h6"/>
+        <requirement type="h12"/>
+        <requirement type="h18"/>
+        <requirement type="h5"/>
+        <requirement type="h16"/>
+      </construction>
+    </item>
+  </resource>
+
+</resources>

@@ -459,10 +459,10 @@
   <string name="aog_p">
     <text locale="en">amulets of gathering</text>
   </string>
-  <string name="aoh">
+  <string name="ao_healing">
     <text locale="en">amulet of healing</text>
   </string>
-  <string name="aoh_p">
+  <string name="ao_healing_p">
     <text locale="en">amulets of healing</text>
   </string>
   <string name="aots">

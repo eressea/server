@@ -476,10 +476,10 @@
   <string name="aog_p">
     <text locale="fr">amulettes de rassemblement</text>
   </string>
-  <string name="aoh">
+  <string name="ao_healing">
     <text locale="fr">amulette de soin</text>
   </string>
-  <string name="aoh_p">
+  <string name="ao_healing_p">
     <text locale="fr">amulettes de soin</text>
   </string>
   <string name="aots">

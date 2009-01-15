@@ -7,7 +7,12 @@
   <xi:include href="en/strings.xml"/>
   <xi:include href="fr/strings.xml"/>
 
-  <xi:include href="resources.xml"/>
+	<xi:include href="common/items.xml" />
+	<xi:include href="common/armor.xml" />
+	<xi:include href="common/weapons.xml" />
+	<xi:include href="common/resources.xml" />
+	<xi:include href="common/luxuries.xml" />
+	<xi:include href="common/potions.xml" />
   <xi:include href="spoils.xml"/>
   <xi:include href="races.xml"/>
   <xi:include href="prefixes.xml"/>

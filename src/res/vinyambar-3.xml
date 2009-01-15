@@ -1,14 +1,14 @@
 <eressea>
-  <include href="messages.xml"></include>
+  <include href="messages.xml" />
 
   <comment>Localization</comment>
-  <include href="de/strings.xml"></include>
-  <include href="en/strings.xml"></include>
+  <include href="de/strings.xml" />
+  <include href="en/strings.xml" />
 
-  <include href="races.xml"></include>
-  <include href="resources.xml"></include>
-  <include href="ships.xml"></include>
-  <include href="buildings.xml"></include>
+  <include href="races.xml" />
+  <include href="resources.xml" />
+  <include href="ships.xml" />
+  <include href="buildings.xml" />
 
   <game name="Kreis der Macht" units="250" welcome="vinyambar">
     <comment>Game specific</comment>
@@ -27,8 +27,8 @@
     <param name="alliance.auto" value="fight"/>
     <param name="alliance.transferquit" value="true"/>
   </game>
-  <include href="vinyambar/de/strings.xml"></include>
-  <include href="vinyambar/stronghold.xml"></include>
+  <include href="vinyambar/de/strings.xml" />
+  <include href="vinyambar/stronghold.xml" />
   <strings>
     <string name="mailto">
       <text>vinyambar@eressea.amber.kn-bremen.de</text>

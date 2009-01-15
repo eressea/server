@@ -391,6 +391,7 @@ static const char * it_aliases[][2] = {
   { "diamond", "adamantium" },
   { "diamondaxe", "adamantiumaxe" },
   { "diamondplate", "adamantiumplate" },
+  { "aoh", "ao_healing" },
   { NULL, NULL },
 };
 
@@ -716,7 +717,7 @@ typedef struct t_item {
 } t_item;
 
 const char * itemnames[MAXITEMS] = {
-  "iron", "stone", "horse", "aoh",
+  "iron", "stone", "horse", "ao_healing",
   "aots", "roi", "rop", "ao_chastity",
   "laen", "fairyboot", "aoc", "pegasus",
   "elvenhorse", "dolphin", "roqf", "trollbelt",

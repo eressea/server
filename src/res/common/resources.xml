@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<resources>
+  <!-- this file contains resources that can be mined in some way (anything with a resourcelimit) -->
+  <resource name="iron" limited="yes" material="rm_iron">
+    <item weight="500" score="10">
+      <construction skill="mining" minskill="1" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier building="mine" type="skill" value="1"/>
+      <modifier building="mine" type="material" value="0.5"/>
+      <modifier race="dwarf" type="material" value="0.75"/>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="laen" limited="yes" material="rm_laen">
+    <item weight="200" score="100">
+      <construction skill="mining" minskill="7" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier type="require" building="mine"/>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="stone" limited="yes" material="rm_stone">
+    <item weight="6000" score="10" big="yes">
+      <construction skill="quarrying" minskill="1" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier building="quarry" type="skill" value="1"/>
+      <modifier building="quarry" type="material" value="0.5"/>
+      <modifier race="troll" type="material" value="0.75"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="horse" limited="yes" material="rm_horse">
+    <item big="yes" weight="5000" score="10" capacity="7000" animal="yes">
+      <construction skill="training" minskill="1" reqsize="1"/>
+      <function name="give" value="givehorses"/>
+    </item>
+    <resourcelimit>
+      <function name="produce" value="lua_produceresource"/>
+      <function name="limit" value="lua_limitresource"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="log" material="rm_tree">
+    <item weight="500" score="10">
+      <construction skill="forestry" minskill="1" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier building="sawmill" type="skill" value="1"/>
+      <modifier building="sawmill" type="material" value="0.5"/>
+      <guard flag="logging"/>
+      <function name="produce" value="lua_produceresource"/>
+      <function name="limit" value="lua_limitresource"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="mallorn" material="rm_mallorn">
+    <item weight="500" score="30">
+      <construction skill="forestry" minskill="2" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier building="sawmill" type="skill" value="1"/>
+      <modifier building="sawmill" type="material" value="0.5"/>
+      <guard flag="logging"/>
+      <function name="produce" value="lua_produceresource"/>
+      <function name="limit" value="lua_limitresource"/>
+    </resourcelimit>
+  </resource>
+
+</resources>

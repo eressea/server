@@ -6,7 +6,12 @@
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
 
-  <xi:include href="kingdoms/resources.xml"/>
+	<xi:include href="common/items.xml" />
+	<xi:include href="common/armor.xml" />
+	<xi:include href="common/weapons.xml" />
+	<xi:include href="common/resources.xml" />
+	<xi:include href="common/luxuries.xml" />
+	<xi:include href="common/potions.xml" />
   <xi:include href="kingdoms/races.xml"/>
   <xi:include href="prefixes.xml"/>
   <xi:include href="calendar.xml"/>

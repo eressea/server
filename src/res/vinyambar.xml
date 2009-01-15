@@ -1,13 +1,13 @@
 <eressea>
-	<include href="messages.xml"></include>
+	<include href="messages.xml" />
 
 	<comment>Localization</comment>
-	<include href="de/strings.xml"></include>
-	<include href="en/strings.xml"></include>
+	<include href="de/strings.xml" />
+	<include href="en/strings.xml" />
 
-	<include href="races.xml"></include>
-	<include href="resources.xml"></include>
-	<include href="ships.xml"></include>
+	<include href="races.xml" />
+	<include href="resources.xml" />
+	<include href="ships.xml" />
 
 	<game name="Vinyambar II" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>
@@ -22,8 +22,8 @@
 		<param name="database.gameid" value="2"></param>
 		<param name="hunger.long" value="0"></param>
 	</game>
-	<include href="vinyambar/races.xml"></include>
-	<include href="vinyambar/de/strings.xml"></include>
+	<include href="vinyambar/races.xml" />
+	<include href="vinyambar/de/strings.xml" />
 	<strings>
 		<string name="mailto">
 			<text>vinyambar@eressea.amber.kn-bremen.de</text>
