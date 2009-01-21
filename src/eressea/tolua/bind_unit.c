@@ -15,7 +15,7 @@ without prior permission by the authors of Eressea.
 #include "bind_unit.h"
 #include "bindings.h"
 
-// Atributes includes
+// attributes includes
 #include <attributes/racename.h>
 #include <attributes/key.h>
 

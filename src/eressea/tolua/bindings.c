@@ -543,8 +543,8 @@ tolua_write_game(lua_State* tolua_S)
   const char * filename = tolua_tostring(tolua_S, 1, 0);
   const char * mode =  tolua_tostring(tolua_S, 2, 0);
 
-  int result, m = IO_TEXT;
-  if (strcmp(mode, "text")!=0) m = IO_BINARY;
+  int result, m = IO_BINARY;
+  if (mode && strcmp(mode, "text")==0) m = IO_TEXT;
   remove_empty_factions(true);
   result = writegame(filename, m);
 
@@ -558,8 +558,8 @@ tolua_read_game(lua_State* tolua_S)
   const char * filename = tolua_tostring(tolua_S, 1, 0);
   const char * mode =  tolua_tostring(tolua_S, 2, 0);
 
-  int rv, m = IO_TEXT;
-  if (strcmp(mode, "text")!=0) m = IO_BINARY;
+  int rv, m = IO_BINARY;
+  if (mode && strcmp(mode, "text")==0) m = IO_TEXT;
   rv = readgame(filename, m, false);
 
   tolua_pushnumber(tolua_S, (lua_Number)rv);

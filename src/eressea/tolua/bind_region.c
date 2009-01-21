@@ -17,6 +17,7 @@ without prior permission by the authors of Eressea.
 #include "bind_building.h"
 
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/unit.h>
 #include <kernel/region.h>
 #include <kernel/item.h>
@@ -125,6 +126,24 @@ static int tolua_region_set_flag(lua_State* tolua_S)
 
   if (set) self->flags |= (1<<bit);
   else self->flags &= ~(1<<bit);
+  return 0;
+}
+
+static int
+tolua_region_get_resourcelevel(lua_State* tolua_S)
+{
+  region * r = (region *)tolua_tousertype(tolua_S, 1, 0);
+  const char * type = tolua_tostring(tolua_S, 2, 0);
+  const resource_type * rtype = rt_find(type);
+  if (rtype!=NULL) {
+    const rawmaterial * rm;
+    for (rm=r->resources;rm;rm=rm->next) {
+      if (rm->type->rtype==rtype) {
+        tolua_pushnumber(tolua_S, (lua_Number)rm->level);
+        return 1;
+      }
+    }
+  }
   return 0;
 }
 
@@ -320,6 +339,7 @@ tolua_region_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "ships", tolua_region_get_ships, NULL);
       tolua_variable(tolua_S, "buildings", tolua_region_get_buildings, NULL);
       tolua_variable(tolua_S, "terrain", tolua_region_get_terrain, NULL);
+      tolua_function(tolua_S, "get_resourcelevel", tolua_region_get_resourcelevel);
       tolua_function(tolua_S, "get_resource", tolua_region_get_resource);
       tolua_function(tolua_S, "set_resource", tolua_region_set_resource);
       tolua_function(tolua_S, "get_flag", tolua_region_get_flag);
