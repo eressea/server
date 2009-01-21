@@ -277,6 +277,17 @@ static int tolua_region_get_ships(lua_State* tolua_S)
   return 1;
 }
 
+static int tolua_region_get_age(lua_State* tolua_S)
+{
+  region * self = (region *)tolua_tousertype(tolua_S, 1, 0);
+
+  if (self) {
+    lua_pushnumber(tolua_S, self->age);
+    return 1;
+  }
+  return 0;
+}
+
 static int
 tolua_region_getkey(lua_State* tolua_S)
 {
@@ -337,6 +348,7 @@ tolua_region_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "info", tolua_region_get_info, tolua_region_set_info);
       tolua_variable(tolua_S, "units", tolua_region_get_units, NULL);
       tolua_variable(tolua_S, "ships", tolua_region_get_ships, NULL);
+      tolua_variable(tolua_S, "age", tolua_region_get_age, NULL);
       tolua_variable(tolua_S, "buildings", tolua_region_get_buildings, NULL);
       tolua_variable(tolua_S, "terrain", tolua_region_get_terrain, NULL);
       tolua_function(tolua_S, "get_resourcelevel", tolua_region_get_resourcelevel);
@@ -356,7 +368,6 @@ tolua_region_open(lua_State* tolua_S)
       .def("get_road", &region_getroad)
       .def("set_road", &region_setroad)
       .def("next", &region_next)
-      .def_readwrite("age", &region::age)
       .def("add_item", &region_additem)
       .property("items", &region_items, return_stl_iterator)
       .property("plane_id", &region_plane)
