@@ -34,8 +34,6 @@
   <game name="Tutorial" welcome="tutorial">
     <!-- Game specific settings -->
     <order name="EMAIL" disable="yes"></order>
-    <order name="MEINUNG" disable="yes"></order>
-    <order name="MAGIEGEBIET" disable="yes"></order>
 
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>

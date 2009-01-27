@@ -82,6 +82,10 @@ CheckOverload(void)
   return value;
 }
 
+/* test if the unit can slip through a siege undetected.
+ * returns 0 if siege is successful, or 1 if the building is either
+ * not besieged or the unit can slip through the siege due to better stealth.
+ */
 static int
 slipthru(const region * r, const unit * u, const building * b)
 {
@@ -89,28 +93,26 @@ slipthru(const region * r, const unit * u, const building * b)
   int n, o;
 
   /* b ist die burg, in die man hinein oder aus der man heraus will. */
+  if (b==NULL || b->besieged < b->size * SIEGEFACTOR) {
+    return 1;
+  }
 
-  if (!b) {
-    return 1;
-  }
-  if (b->besieged < b->size * SIEGEFACTOR) {
-    return 1;
-  }
   /* u wird am hinein- oder herausschluepfen gehindert, wenn STEALTH <=
    * OBSERVATION +2 der belagerer u2 ist */
-
   n = eff_skill(u, SK_STEALTH, r);
 
-  for (u2 = r->units; u2; u2 = u2->next)
+  for (u2 = r->units; u2; u2 = u2->next) {
     if (usiege(u2) == b) {
 
       if (invisible(u, u2) >= u->number) continue;
 
       o = eff_skill(u2, SK_PERCEPTION, r);
 
-      if (o + 2 >= n)
+      if (o + 2 >= n) {
         return 0;   /* entdeckt! */
+      }
     }
+  }
   return 1;
 }
 
@@ -683,7 +685,7 @@ build(unit * u, const construction * ctype, int completed, int want)
     }
     /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
      * Talente */
-    if (max_skill(u->faction, type->skill)==INT_MAX) {
+    if (skill_limit(u->faction, type->skill)==INT_MAX) {
       int i = 0;
       item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
       if (itm!=NULL) i = itm->number;

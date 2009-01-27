@@ -341,6 +341,7 @@ b_blockfogwall(const border * b, const unit * u, const region * r)
   return (boolean)(effskill(u, SK_PERCEPTION) > 4); /* Das ist die alte Nebelwand */
 }
 
+/** Legacy type used in old Eressea games, no longer in use. */
 border_type bt_fogwall = {
   "fogwall", VAR_INT,
   b_transparent, /* transparent */

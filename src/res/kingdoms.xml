@@ -50,8 +50,6 @@
     <order name="ZERSTOEREN" disable="yes"/>
     <order name="ZUECHTEN" disable="yes"/>
     <order name="REPORT" disable="yes"/>
-    <order name="MEINUNG" disable="yes"/>
-    <order name="MAGIEGEBIET" disable="yes"/>
     <order name="PIRATERIE" disable="yes"/>
     <order name="NEUSTART" disable="yes"/>
     <order name="OPFERE" disable="yes"/>

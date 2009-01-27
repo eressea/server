@@ -19,8 +19,6 @@
 	<game name="Kreis der Macht" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>
 		<order name="ARBEITEN" disable></order>
-		<order name="MEINUNG" disable></order>
-		<order name="MAGIEGEBIET" disable></order>
 	</game>
 	<include href="vinyambar/de/strings.xml" />
 	<include href="vinyambar/conquest.xml" />

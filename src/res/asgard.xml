@@ -52,8 +52,6 @@
     <order name="GRUPPE" disable="yes"/>
     <order name="KAMPFZAUBER" disable="yes"/>
     <order name="LEHREN" disable="yes"/>
-    <order name="MAGIEGEBIET" disable="yes"/>
-    <order name="MEINUNG" disable="yes"/>
     <order name="NEUSTART" disable="yes"/>
     <order name="NUMMER" disable="yes"/>
     <order name="OPTION" disable="yes"/>

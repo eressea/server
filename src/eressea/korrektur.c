@@ -660,7 +660,7 @@ check_mages(void)
     if (!is_monsters(f)) {
       unit * u;
       int mages = 0;
-      int maxmages = max_skill(f, SK_MAGIC);
+      int maxmages = skill_limit(f, SK_MAGIC);
 
       for (u = f->units;u!=NULL;u=u->nextF) {
         if (is_mage(u)) {

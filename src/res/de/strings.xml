@@ -2296,12 +2296,6 @@
   <string name="EMAIL">
     <text locale="de">EMAIL</text>
   </string>
-  <string name="MEINUNG">
-    <text locale="de">MEINUNG</text>
-  </string>
-  <string name="MAGIEGEBIET">
-    <text locale="de">MAGIEGEBIET</text>
-  </string>
   <string name="PIRATERIE">
     <text locale="de">PIRATERIE</text>
   </string>

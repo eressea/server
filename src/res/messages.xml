@@ -6242,6 +6242,16 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit could not be found."</text>
   </message>
 
+  <message name="feedback_give_forbidden" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Einheit kann nichts gegeben werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot give anything to this unit."</text>
+  </message>
+
   <message name="pump_effect" section="events">
     <type>
       <arg name="mage" type="unit"/>

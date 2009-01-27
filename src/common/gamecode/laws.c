@@ -3735,7 +3735,7 @@ init_processor(void)
   add_proc_order(p, K_WEREWOLF, &setwere_cmd, 0, NULL);
 #endif /* KARMA_MODULE */
 
-  if (alliances!=NULL) {
+  if (get_param_int(global.parameters, "alliance-vinyambar", 0)==1) {
     p+=10;
     add_proc_global(p, &alliancekick, NULL);
   }
@@ -3748,7 +3748,7 @@ init_processor(void)
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
   add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
-  if (alliances!=NULL) {
+  if (get_param_int(global.parameters, "alliance-vinyambar", 0)==1) {
     p+=10; /* in case USE changes it */
     add_proc_global(p, &alliancevictory, "Testen der Allianzbedingungen");
   }
@@ -3875,7 +3875,6 @@ void
 processorders (void)
 {
   static int init = 0;
-  const char * str;
 
   if (!init) {
     init_processor();
@@ -3888,8 +3887,7 @@ processorders (void)
   ageing();
   remove_empty_units();
 
-  str = get_param(global.parameters, "modules.wormholes");
-  if (str && atoi(str)) {
+  if (get_param_int(global.parameters, "modules.wormholes", 0)) {
     create_wormholes();
   }
 

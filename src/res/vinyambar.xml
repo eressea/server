@@ -12,8 +12,6 @@
 	<game name="Vinyambar II" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>
 		<order name="ARBEITEN" disable></order>
-		<order name="MEINUNG" disable></order>
-		<order name="MAGIEGEBIET" disable></order>
 		<param name="entertain.base" value="0"></param>
 		<param name="entertain.perlevel" value="20"></param>
 		<param name="nmr.timeout" value="5"></param>

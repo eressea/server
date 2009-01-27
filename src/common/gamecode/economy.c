@@ -543,7 +543,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   }
   if (has_skill(u, SK_ALCHEMY)
     && count_skill(u->faction, SK_ALCHEMY) + n >
-    max_skill(u->faction, SK_ALCHEMY))
+    skill_limit(u->faction, SK_ALCHEMY))
   {
     cmistake(u, ord, 156, MSG_EVENT);
     return;
@@ -565,7 +565,11 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   o->ord = copy_order(ord);
   addlist(recruitorders, o);
 }
-/* ------------------------------------------------------------- */
+
+#define GIVE_SELF 1
+#define GIVE_PEASANTS 2
+#define GIVE_OTHERS 4
+#define GIVE_ANY (GIVE_SELF|GIVE_PEASANTS|GIVE_OTHERS)
 
 static void
 give_cmd(unit * u, order * ord)
@@ -573,7 +577,7 @@ give_cmd(unit * u, order * ord)
   region * r = u->region;
   unit *u2;
   const char *s;
-  int i, n;
+  int i, n, rule;
   const item_type * itype;
   param_t p;
 
@@ -583,6 +587,15 @@ give_cmd(unit * u, order * ord)
 
   if (!u2 && !getunitpeasants) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+    return;
+  }
+
+  rule = get_param_int(global.parameters, "rules.give", 7);
+  if (getunitpeasants && (rule & GIVE_PEASANTS)==0) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
+    return;
+  } else if (u2 && u2->faction!=u->faction && (rule & GIVE_OTHERS)==0) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
     return;
   }
 
@@ -2741,15 +2754,15 @@ research_cmd(unit *u, struct order * ord)
 }
 
 static int
-wahrnehmung(region * r, faction * f)
+max_skill(region * r, faction * f, skill_t sk)
 {
   unit *u;
   int w = 0;
 
   for (u = r->units; u; u = u->next) {
     if (u->faction == f) {
-      if (eff_skill(u, SK_PERCEPTION, r) > w) {
-        w = eff_skill(u, SK_PERCEPTION, r);
+      if (eff_skill(u, sk, r) > w) {
+        w = eff_skill(u, sk, r);
       }
     }
   }
@@ -2820,7 +2833,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 		return;
 	}
 
-	n = eff_skill(u, SK_STEALTH, r) - wahrnehmung(r, f);
+	n = eff_skill(u, SK_STEALTH, r) - max_skill(r, f, SK_PERCEPTION);
 
 	if (n <= 0) {
 		/* Wahrnehmung == Tarnung */

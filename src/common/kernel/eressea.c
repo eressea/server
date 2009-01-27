@@ -388,8 +388,6 @@ const char *keywords[MAXKEYWORDS] =
   "DEFAULT",
   "URSPRUNG",
   "EMAIL",
-  "MEINUNG",
-  "MAGIEGEBIET",
   "PIRATERIE",
   "NEUSTART",
   "GRUPPE",
@@ -522,7 +520,7 @@ max_magicians(const faction * f)
 }
 
 int
-max_skill(faction * f, skill_t sk)
+skill_limit(faction * f, skill_t sk)
 {
   int m = INT_MAX;
   int al = allied_skilllimit(f, sk);

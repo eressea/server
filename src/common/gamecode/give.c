@@ -223,7 +223,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
 
     /* wird das Alchemistenmaximum ueberschritten ? */
 
-    if (k > max_skill(u2->faction, SK_ALCHEMY)) {
+    if (k > skill_limit(u2->faction, SK_ALCHEMY)) {
       error = 156;
     }
   }
@@ -371,7 +371,7 @@ give_unit(unit * u, unit * u2, order * ord)
   }
   if (has_skill(u, SK_MAGIC)) {
     if (count_skill(u2->faction, SK_MAGIC) + u->number >
-      max_skill(u2->faction, SK_MAGIC))
+      skill_limit(u2->faction, SK_MAGIC))
     {
       cmistake(u, ord, 155, MSG_COMMERCE);
       return;
@@ -383,7 +383,7 @@ give_unit(unit * u, unit * u2, order * ord)
   }
   if (has_skill(u, SK_ALCHEMY)
     && count_skill(u2->faction, SK_ALCHEMY) + u->number >
-    max_skill(u2->faction, SK_ALCHEMY))
+    skill_limit(u2->faction, SK_ALCHEMY))
   {
     cmistake(u, ord, 156, MSG_COMMERCE);
     return;

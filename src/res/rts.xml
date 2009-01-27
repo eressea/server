@@ -28,8 +28,6 @@
 
   <game name="Eressea RTS" learningbydoing="0.0">
     <!-- Game specific settings -->
-    <order name="MEINUNG" disable="yes"/>
-    <order name="MAGIEGEBIET" disable="yes"/>
     <order name="LEHREN" disable="yes"/>
     <order name="SPIONIEREN" disable="yes"/>
     <order name="SABOTIEREN" disable="yes"/>

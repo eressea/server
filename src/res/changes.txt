@@ -1,0 +1,44 @@
+Konzepte:
+- Astralraum abschaffen
+- Regionsbesitz und Moral
+- Allianzen
+- GIB abstellen
+  = done
+
+Talente:
+- Talentlimit 10 + Rassenbonus
+  = done
+- Ausdauer wirkt sich nicht auf Trefferpunkte aus
+- Wahrnehmung und Tarnung abschalten
+  = done
+
+Kampf:
+- Regionen belagern
+- Allianz ersetzt HELFE KAEMPFE
+- Reduktion auf 1 Kampfrunde
+- neue Trefferchanceberechnung
+- neue Beuteregelung
+
+Gegenstände:
+- Waffen mit höherem Schaden.
+- RdU und AdwS überarbeiten
+
+Diverse:
+- neue Terraintypen (weniger Bauern, knappere Ressourcen)
+- limitierte Rekrutieren von Migranten erlauben
+- Parteitarnung fällt weg
+  = done (disable TARNEN)
+- Monster entfernen
+
+Ökonomie:
+- UNTERHALTEN abstellen
+  = done (Befehl & Skill)
+- TREIBEN abstellen
+  = done (Befehl & Skill)
+- ARBEITEN abstellen
+  = done (Befehl)
+- LEHREN abstellen
+  = done (Befehl)
+- VERKAUFEN abstellen.
+  = done (Befehl)
+- Steuern für den Regionsbesitzer

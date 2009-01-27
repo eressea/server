@@ -1474,12 +1474,6 @@
   <string name="MACHEN">
     <text locale="en">MAKE</text>
   </string>
-  <string name="MAGIEGEBIET">
-    <text locale="en">SCHOOL</text>
-  </string>
-  <string name="MEINUNG">
-    <text locale="en">OPINION</text>
-  </string>
   <string name="NACH">
     <text locale="en">MOVE</text>
   </string>

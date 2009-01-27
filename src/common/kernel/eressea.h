@@ -155,7 +155,7 @@ extern struct unit_list * get_lighthouses(const struct region * r);
 extern int lighthouse_range(const struct building * b, const struct faction * f);
 
 /* skills */
-extern int max_skill(struct faction * f, skill_t sk);
+extern int skill_limit(struct faction * f, skill_t sk);
 extern int count_skill(struct faction * f, skill_t sk);
 
 /* direction, geography */

@@ -548,7 +548,7 @@ learn_cmd(unit * u, order * ord)
       mtyp = M_GRAU;
       if (!is_mage(u)) create_mage(u, mtyp);
     } else if (!has_skill(u, SK_MAGIC)) {
-      int mmax = max_skill(u->faction, SK_MAGIC);
+      int mmax = skill_limit(u->faction, SK_MAGIC);
       /* Die Einheit ist noch kein Magier */
       if (count_skill(u->faction, SK_MAGIC) + u->number > mmax)
       {
@@ -599,7 +599,7 @@ learn_cmd(unit * u, order * ord)
   if (sk == SK_ALCHEMY) {
     maxalchemy = eff_skill(u, SK_ALCHEMY, r);
     if (!has_skill(u, SK_ALCHEMY)) {
-      int amax = max_skill(u->faction, SK_ALCHEMY);
+      int amax = skill_limit(u->faction, SK_ALCHEMY);
       if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists", "amount", amax));
         return 0;

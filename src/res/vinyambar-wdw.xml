@@ -25,8 +25,6 @@
   <game name="Wettstreit der Weisen" unitsperalliance="yes" units="1000" welcome="vinyambar">
     <!-- Game specific settings -->
     <order name="ARBEITEN" disable="yes"/>
-    <order name="MEINUNG" disable="yes"/>
-    <order name="MAGIEGEBIET" disable="yes"/>
 
     <skill name="alchemy" enable="true"/>
     <skill name="crossbow" enable="true"/>
