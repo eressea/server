@@ -1612,15 +1612,21 @@ unit_addorder(unit * u, order * ord)
 int
 unit_max_hp(const unit * u)
 {
+  static int rules_stamina = -1;
   int h;
   double p;
   static const curse_type * heal_ct = NULL;
+
+  if (rules_stamina<0) {
+    rules_stamina = get_param_int(global.parameters, "rules.stamina", STAMINA_AFFECTS_HP);
+  }
   h = u->race->hitpoints;
   if (heal_ct==NULL) heal_ct = ct_find("healingzone");
 
-  p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
-  h += (int) (h * p + 0.5);
-
+  if (rules_stamina & 1) {
+    p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
+    h += (int) (h * p + 0.5);
+  }
 #if KARMA_MODULE
   if (fspecial(u->faction, FS_UNDEAD)) {
     h *= 2;

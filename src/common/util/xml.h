@@ -28,6 +28,8 @@ extern "C" {
   extern int xml_ivalue(xmlNodePtr node, const char * name, int dflt);
   extern boolean xml_bvalue(xmlNodePtr node, const char * name, boolean dflt);
 
+  const xmlChar * xml_i(double number);
+
 #ifdef __cplusplus
 }
 #endif

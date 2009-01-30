@@ -2428,10 +2428,8 @@ int
 lifestyle(const unit * u)
 {
   int need;
-  static plane * astralspace;
   static int gamecookie = -1;
   if (gamecookie!=global.cookie) {
-    astralspace = getplanebyname("Astralraum");
     gamecookie = global.cookie;
   }
 

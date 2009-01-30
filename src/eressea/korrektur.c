@@ -802,7 +802,7 @@ fix_astral_firewalls(void)
 {
   region * r;
   for (r = regions; r; r=r->next) {
-    if (r->planep==get_astralplane() && r->terrain == newterrain(T_FIREWALL)) {
+    if (is_astral(r) && r->terrain == newterrain(T_FIREWALL)) {
       terraform_region(r, newterrain(T_ASTRALB));
     }
   }

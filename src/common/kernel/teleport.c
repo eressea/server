@@ -58,7 +58,7 @@ real2tp(short rk) {
 static region *
 tpregion(const region *r) {
   region * rt = findregion(TE_CENTER_X+real2tp(r->x), TE_CENTER_Y+real2tp(r->y));
-  if (rplane(rt) != get_astralplane()) return NULL;
+  if (!is_astral(rt)) return NULL;
   return rt;
 }
 
@@ -68,8 +68,8 @@ astralregions(const region * r, boolean (*valid)(const region *))
   region_list * rlist = NULL;
   short x, y;
 
-  assert(rplane(r) == get_astralplane());
-  if (rplane(r) != get_astralplane()) {
+  assert(is_astral(r));
+  if (!is_astral(r)) {
     log_error(("astralregions was called with a non-astral region.\n"));
     return NULL;
   }
@@ -102,7 +102,7 @@ r_astral_to_standard(const region *r)
   short x, y;
   region *r2;
 
-  assert(rplane(r) == get_astralplane());
+  assert(is_astral(r));
   x = (r->x-TE_CENTER_X)*TP_DISTANCE;
   y = (r->y-TE_CENTER_Y)*TP_DISTANCE;
 
@@ -142,7 +142,7 @@ spawn_braineaters(float chance)
   if (f0==NULL) return;
 
   for (r = regions; r; r = r->next) {
-    if (rplane(r) != get_astralplane() || fval(r->terrain, FORBIDDEN_REGION)) continue;
+    if (!is_astral(r) || fval(r->terrain, FORBIDDEN_REGION)) continue;
 
     /* Neues Monster ? */
     if (next-- == 0) {
@@ -160,11 +160,25 @@ get_normalplane(void)
   return NULL;
 }
 
+boolean
+is_astral(const region * r)
+{
+  plane * pl = get_astralplane();
+  return (pl && rplane(r) == pl);
+}
+
 plane * 
 get_astralplane(void)
 {
   static plane * astralspace;
+  static int rule_astralplane = -1;
   static int gamecookie = -1;
+  if (rule_astralplane<0) {
+    rule_astralplane = get_param_int(global.parameters, "modules.astralspace", 0);
+  }
+  if (!rule_astralplane) {
+    return NULL;
+  }
   if (gamecookie!=global.cookie) {
     astralspace = getplanebyname("Astralraum");
     gamecookie = global.cookie;
@@ -195,7 +209,7 @@ create_teleport_plane(void)
         short y = TE_CENTER_Y+real2tp(r->y);
         plane * pl = findplane(x, y);
         
-        if (pl==aplane) {
+        if (aplane && pl==aplane) {
           ra = new_region(x, y, 0);
           terraform_region(ra, fog);
           ra->planep = aplane;

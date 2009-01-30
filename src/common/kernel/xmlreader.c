@@ -38,6 +38,8 @@ without prior permission by the authors of Eressea.
 #include <util/nrmessage.h>
 #include <util/xml.h>
 
+#include <spells/spells.h>
+
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -1413,27 +1415,33 @@ parse_spells(xmlDocPtr doc)
         /* reading eressea/spells/spell/function */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-        for (k=0;k!=result->nodesetval->nodeNr;++k) {
-          xmlNodePtr node = result->nodesetval->nodeTab[k];
-          pf_generic fun;
 
-          parse_function(node, &fun, &propValue);
-          if (fun==NULL) {
-            log_error(("unknown function name '%s' for spell '%s'\n",
-              (const char*)propValue, sp->sname));
+        if (result->nodesetval->nodeNr==0) {
+          /* this is an old spell that has a spelldata entry */
+          set_spelldata(sp);
+        } else {
+          for (k=0;k!=result->nodesetval->nodeNr;++k) {
+            xmlNodePtr node = result->nodesetval->nodeTab[k];
+            pf_generic fun;
+
+            parse_function(node, &fun, &propValue);
+            if (fun==NULL) {
+              log_error(("unknown function name '%s' for spell '%s'\n",
+                (const char*)propValue, sp->sname));
+              xmlFree(propValue);
+              continue;
+            }
+            assert(propValue!=NULL);
+            if (strcmp((const char*)propValue, "cast")==0) {
+              sp->sp_function = (spell_f)fun;
+            } else if (strcmp((const char*)propValue, "fumble")==0) {
+              sp->patzer = (pspell_f)fun;
+            } else {
+              log_error(("unknown function type '%s' for spell %s\n", 
+                (const char*)propValue, sp->sname));
+            }
             xmlFree(propValue);
-            continue;
           }
-          assert(propValue!=NULL);
-          if (strcmp((const char*)propValue, "cast")==0) {
-            sp->sp_function = (spell_f)fun;
-          } else if (strcmp((const char*)propValue, "fumble")==0) {
-            sp->patzer = (pspell_f)fun;
-          } else {
-            log_error(("unknown function type '%s' for spell %s\n", 
-              (const char*)propValue, sp->sname));
-          }
-          xmlFree(propValue);
         }
         xmlXPathFreeObject(result);
       }
@@ -1473,8 +1481,9 @@ parse_spells(xmlDocPtr doc)
 
   xmlXPathFreeContext(xpath);
 
-  init_spells();
-
+  if (get_param_int(global.parameters, "init_spells", 1)!=0) {
+    init_spells();
+  }
   return 0;
 }
 

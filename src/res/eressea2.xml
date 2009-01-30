@@ -88,9 +88,16 @@
     <skill name="weaponsmithing" enable="true"/>
 
     <param name="hunger.long" value="1"/>
-    <param name="rules.check_overload" value="0"/>
 
+    <param name="init_spells" value="0"/>
+
+    <param name="modules.astralspace" value="0"/>
+    <param name="modules.wormholes" value="0"/>
+
+    <param name="rules.check_overload" value="0"/>
+    <param name="rules.combat_turns" value="1"/>
     <param name="rules.give" value="3"/> <!-- only self + peasants -->
+    <param name="rules.stamina" value="0"/> <!-- does not affect hp -->
     <param name="skill.maxlevel" value="10"/>
   </game>
   <xi:include href="eressea/strings.xml"/>

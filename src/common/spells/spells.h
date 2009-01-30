@@ -41,6 +41,8 @@ extern "C" {
   } wall_data;
 
   int levitate_ship(struct ship * sh, struct unit * mage, double power, int duration);
+  void init_spells(void);
+  void set_spelldata(struct spell * sp);
 
 #ifdef __cplusplus
 }

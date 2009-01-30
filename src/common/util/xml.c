@@ -24,6 +24,14 @@
 #include <string.h>
 #include <ctype.h>
 
+const xmlChar *
+xml_i(double number)
+{
+  static char buffer[128];
+  snprintf(buffer, sizeof(buffer), "%.0lf", number);
+  return (const xmlChar *)buffer;
+}
+
 int
 xml_ivalue(xmlNodePtr node, const char * name, int dflt)
 {

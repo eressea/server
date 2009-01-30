@@ -713,6 +713,55 @@ static int tolua_set_alliance_name(lua_State* tolua_S)
   return 0;
 }
 
+#include <libxml/tree.h>
+#include <util/functions.h>
+#include <util/xml.h>
+#include <kernel/spell.h>
+
+static int
+tolua_write_spells(lua_State* tolua_S)
+{
+  spell_f fun = (spell_f)get_function("lua_castspell");
+  const char * filename = "magic.xml";
+  xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
+  xmlNodePtr root = xmlNewNode(NULL, BAD_CAST "spells");
+  spell_list * splist;
+
+  for (splist=spells; splist; splist=splist->next) {
+    spell * sp = splist->data;
+    if (sp->sp_function!=fun) {
+      xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
+      xmlNewProp(node, BAD_CAST "name", BAD_CAST sp->sname);
+      xmlNewProp(node, BAD_CAST "type", BAD_CAST magietypen[sp->magietyp]);
+      xmlNewProp(node, BAD_CAST "rank", xml_i(sp->rank));
+      xmlNewProp(node, BAD_CAST "level", xml_i(sp->level));
+      xmlNewProp(node, BAD_CAST "index", xml_i(sp->id));
+
+      if (sp->sptyp & TESTCANSEE) {
+        xmlNewProp(node, BAD_CAST "los", BAD_CAST "true");
+      }
+      if (sp->sptyp & ONSHIPCAST) {
+        xmlNewProp(node, BAD_CAST "ship", BAD_CAST "true");
+      }
+      if (sp->sptyp & OCEANCASTABLE) {
+        xmlNewProp(node, BAD_CAST "ocean", BAD_CAST "true");
+      }
+      if (sp->sptyp & FARCASTING) {
+        xmlNewProp(node, BAD_CAST "far", BAD_CAST "true");
+      }
+      if (sp->sptyp & SPELLLEVEL) {
+        xmlNewProp(node, BAD_CAST "variable", BAD_CAST "true");
+      }
+      xmlAddChild(root, node); 
+    }
+  }
+  xmlDocSetRootElement(doc, root);
+  xmlKeepBlanksDefault(0);
+  xmlSaveFormatFileEnc(filename, doc, "utf-8", 1);
+  xmlFreeDoc(doc);
+  return 0;
+}
+
 int
 tolua_eressea_open(lua_State* tolua_S)
 {
@@ -811,6 +860,8 @@ tolua_eressea_open(lua_State* tolua_S)
     tolua_function(tolua_S, "set_key", tolua_setkey);
 
     tolua_function(tolua_S, "rng_int", tolua_rng_int);
+
+    tolua_function(tolua_S, "write_spells", tolua_write_spells);
   }
   tolua_endmodule(tolua_S);
   return 1;

@@ -1072,7 +1072,7 @@ describe(FILE * F, const seen_region * sr, faction * f)
   *bufp = 0;
   rparagraph(F, buf, 0, 0, 0);
 
-  if (sr->mode==see_unit && rplane(r) == get_astralplane() &&
+  if (sr->mode==see_unit && is_astral(r) &&
       !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
     /* Sonderbehandlung Teleport-Ebene */
     region_list *rl = astralregions(r, inhabitable);

@@ -60,6 +60,7 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/message.h>
 #include <util/unicode.h>
+#include <util/xml.h>
 
 /* libxml2 includes */
 #include <libxml/tree.h>
@@ -83,14 +84,6 @@ typedef struct xml_context {
   xmlNsPtr ns_atl;
   xmlNsPtr ns_xml;
 } xml_context;
-
-static const xmlChar *
-xml_i(double number)
-{
-  static char buffer[128];
-  snprintf(buffer, sizeof(buffer), "%.0lf", number);
-  return (const xmlChar *)buffer;
-}
 
 static xmlNodePtr
 xml_link(report_context * ctx, const xmlChar * rel, const xmlChar * ref)

@@ -826,7 +826,7 @@ handlekey(state * st, int c)
         region * cur = mr->r;
         if (cur->planep==NULL) {
           cur = r_standard_to_astral(cur);
-        } else if (cur->planep==get_astralplane()) {
+        } else if (is_astral(cur)) {
           cur = r_astral_to_standard(cur);
         } else {
           cur = NULL;

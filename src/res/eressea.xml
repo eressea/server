@@ -19,7 +19,7 @@
   <xi:include href="buildings.xml"/>
   <xi:include href="eressea/calendar.xml"/>
   <xi:include href="equipment.xml"/>
-  <xi:include href="spells.xml"/>
+  <xi:include href="eressea/spells.xml"/>
   <xi:include href="terrains.xml"/>
   <xi:include href="dungeons.xml"/>
   <xi:include href="directions.xml"/>
@@ -74,6 +74,8 @@
     <skill name="taxation" enable="true"/>
     <skill name="stamina" enable="true"/>
     <skill name="unarmed" enable="true"/>
+
+    <param name="init_spells" value="0"/>
 
     <param name="NewbieImmunity" value="8"/>
     <param name="modules.wormholes" value="1"/>

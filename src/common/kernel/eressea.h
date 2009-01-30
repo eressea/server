@@ -88,6 +88,7 @@ extern "C" {
 #define BP_NORMAL 3
 #define BP_ROAD   2
 
+#define STAMINA_AFFECTS_HP 1<<0
 
 /**
  * Hier endet der Teil von eressea.h, der die defines für die

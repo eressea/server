@@ -1852,7 +1852,7 @@ sp_treewalkexit(castorder *co)
   spellparameter *pa = co->par;
   int cast_level = co->level;
 
-  if (getplane(r) != get_astralplane()) {
+  if (!is_astral(r)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralonly", ""));
     return 0;
   }
@@ -5676,7 +5676,7 @@ sp_fetchastral(castorder *co)
       /* this can happen several times if the units are from different astral
        * regions. Only possible on the intersections of schemes */
       region_list * rfind;
-      if (getplane(u->region) != get_astralplane()) {
+      if (!is_astral(u->region)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralonly", ""));
         continue;
       }
@@ -8800,6 +8800,37 @@ border_type bt_chaosgate = {
   chaosgate_move
 };
 
+static void
+set_spelldata_i(spell * sp, spelldata * data)
+{
+  int n;
+  for (n=0;n!=5 && data->components[n].name;++n);
+  sp->components = malloc(sizeof(spell_component) *(n+1));
+  sp->components[n].type = NULL;
+  while (n-->0) {
+    sp->components[n].type = rt_find(data->components[n].name);
+    sp->components[n].amount = data->components[n].amount;
+    sp->components[n].cost = data->components[n].flags;
+  }
+  sp->sp_function = data->sp_function;
+  sp->patzer = data->patzer;
+}
+
+void
+set_spelldata(spell * sp)
+{
+  int i;
+  for (i=0;spelldaten[i].id!=SPL_NOSPELL;++i) {
+    spelldata * data = spelldaten+i;
+    if (strcmp(data->sname, sp->sname)==0) {
+      set_spelldata_i(sp, data);
+      return;
+    }
+  }
+  log_error(("unknown spell %s.\n", sp->sname));
+  assert(!"there is no spell by that name");
+}
+
 void
 init_spells(void)
 {
@@ -8809,7 +8840,6 @@ init_spells(void)
   for (i=0;spelldaten[i].id!=SPL_NOSPELL;++i) {
     spelldata * data = spelldaten+i;
     spell * sp = malloc(sizeof(spell));
-    int n;
 
     sp->id = data->id;
     sp->sname = strdup(data->sname);
@@ -8822,16 +8852,7 @@ init_spells(void)
     sp->sptyp = data->sptyp;
     sp->rank = data->rank;
     sp->level = data->level;
-    for (n=0;n!=5 && data->components[n].name;++n);
-    sp->components = malloc(sizeof(spell_component) *(n+1));
-    sp->components[n].type = NULL;
-    while (n-->0) {
-      sp->components[n].type = rt_find(data->components[n].name);
-      sp->components[n].amount = data->components[n].amount;
-      sp->components[n].cost = data->components[n].flags;
-    }
-    sp->sp_function = data->sp_function;
-    sp->patzer = data->patzer;
+    set_spelldata_i(sp, data);
     register_spell(sp);
   }
   at_register(&at_cursewall);

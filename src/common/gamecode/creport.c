@@ -1170,7 +1170,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     }
     cr_output_curses(F, f, r, TYP_REGION);
     cr_borders(ctx->seen, r, f, sr->mode, F);
-    if (sr->mode==see_unit && r->planep==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
+    if (sr->mode==see_unit && is_astral(r) && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
     {
       /* Sonderbehandlung Teleport-Ebene */
       region_list *rl = astralregions(r, inhabitable);

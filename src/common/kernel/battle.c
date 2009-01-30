@@ -3943,6 +3943,7 @@ battle_flee(battle * b)
 void
 do_battle(region * r)
 {
+  static int max_turns = 0;
   battle *b = NULL;
   boolean fighting = false;
   ship * sh;
@@ -3995,7 +3996,10 @@ do_battle(region * r)
   print_stats(b); /* gibt die Kampfaufstellung aus */
   log_stdio(stdout, "%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
 
-  for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
+  if (max_turns==0) {
+    max_turns = get_param_int(global.parameters, "rules.combat_turns", COMBAT_TURNS);
+  }
+  for (;battle_report(b) && b->turn<=max_turns;++b->turn) {
     if (bdebug) {
       fprintf(bdebug, "*** Turn: %d\n", b->turn);
     }
