@@ -377,28 +377,29 @@ encounter(region * r, unit * u)
 void
 encounters(void)
 {
-	region *r;
+  region *r;
 
-	for (r = regions; r; r = r->next) {
-		if (!fval(r->terrain, SEA_REGION) && fval(r, RF_ENCOUNTER)) {
-			int c = 0;
+  for (r = regions; r; r = r->next) {
+    if (!fval(r->terrain, SEA_REGION) && fval(r, RF_ENCOUNTER)) {
+      int c = 0;
       unit * u;
-			for (u = r->units; u; u = u->next) {
-				c += u->number;
-			}
+      for (u = r->units; u; u = u->next) {
+        c += u->number;
+      }
 
-			if (c > 0) {
+      if (c > 0) {
         int i = 0;
-				int n = rng_int() % c;
+        int n = rng_int() % c;
 
         for (u = r->units; u; u = u->next) {
-					if (i+u->number>n) break;
-				}
+          if (i+u->number>n) break;
+          i+=u->number;
+        }
         assert(u && u->number);
         encounter(r, u);
-			}
-		}
-	}
+      }
+    }
+  }
 }
 
 static const terrain_type *
