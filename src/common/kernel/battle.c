@@ -115,6 +115,39 @@ static message * msg_separator;
 
 const troop no_troop = {0, 0};
 
+static int max_turns = 0;
+static int damage_rules = 0;
+
+#define DAMAGE_CRITICAL      (1<<0)
+#define DAMAGE_MELEE_BONUS   (1<<1)
+#define DAMAGE_MISSILE_BONUS (1<<2)
+#define DAMAGE_UNARMED_BONUS (1<<3)
+#define DAMAGE_SKILL_BONUS   (1<<4)
+/** initialize rules from configuration.
+ */
+static void
+static_rules(void)
+{
+  /* maximum number of combat turns */
+  max_turns = get_param_int(global.parameters, "rules.combat.turns", COMBAT_TURNS);
+  /* damage calculation */
+  if (get_param_int(global.parameters, "rules.combat.critical", 1)) {
+    damage_rules |= DAMAGE_CRITICAL;
+  }
+  if (get_param_int(global.parameters, "rules.combat.melee_bonus", 1)) {
+    damage_rules |= DAMAGE_MELEE_BONUS;
+  }
+  if (get_param_int(global.parameters, "rules.combat.missile_bonus", 1)) {
+    damage_rules |= DAMAGE_MISSILE_BONUS;
+  }
+  if (get_param_int(global.parameters, "rules.combat.unarmed_bonus", 1)) {
+    damage_rules |= DAMAGE_UNARMED_BONUS;
+  }
+  if (get_param_int(global.parameters, "rules.combat.skill_bonus", 1)) {
+    damage_rules |= DAMAGE_SKILL_BONUS;
+  }
+}
+
 static int
 army_index(side * s)
 {
@@ -698,6 +731,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 static const armor_type *
 select_armor(troop t, boolean shield)
 {
+  int type = shield?ATF_SHIELD:0;
   unit * u = t.fighter->unit;
   const armor * a = t.fighter->armors;
   int geschuetzt = 0;
@@ -712,10 +746,12 @@ select_armor(troop t, boolean shield)
   }
 
   for (;a;a=a->next) {
-    if (a->atype->flags & ATF_SHIELD) {
+    if ((a->atype->flags & ATF_SHIELD)==type) {
       geschuetzt += a->count;
-      if (geschuetzt > t.index) /* unser Kandidat wird geschuetzt */
+      if (geschuetzt > t.index) {
+        /* unser Kandidat wird geschuetzt */
         return a->atype;
+      }
     }
   }
 
@@ -999,8 +1035,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   ar += am;
 
   if (type!=AT_COMBATSPELL && type!=AT_SPELL) {
-    /* Kein Zauber, normaler Waffenschaden */
-    double kritchance = (sk * 3 - sd) / 200.0;
 #if KARMA_MODULE
     int faerie_level = fspecial(du->faction, FS_FAERIE);
 
@@ -1017,31 +1051,43 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     }
 #endif /* KARMA_MODULE */
 
-    kritchance = MAX(kritchance, 0.005);
-    kritchance = MIN(0.9, kritchance);
+    if (damage_rules&DAMAGE_CRITICAL) {
+      double kritchance = (sk * 3 - sd) / 200.0;
 
-    while (chance(kritchance)) {
-      if (bdebug) {
-        fprintf(bdebug, "%s/%d landet einen kritischen Treffer", unitid(au), at.index);
+      kritchance = MAX(kritchance, 0.005);
+      kritchance = MIN(0.9, kritchance);
+
+      while (chance(kritchance)) {
+        if (bdebug) {
+          fprintf(bdebug, "%s/%d lands a critical hit", unitid(au), at.index);
+        }
+        da += dice_rand(damage);
       }
-      da += dice_rand(damage);
     }
 
     da += rc_specialdamage(au->race, du->race, awtype);
 
     if (awtype!=NULL && fval(awtype, WTF_MISSILE)) {
-      /* Fernkampfschadenbonus */
-      da += af->person[at.index].damage_rear;
+      /* missile weapon bonus */
+      if (damage_rules&DAMAGE_MISSILE_BONUS) {
+        da += af->person[at.index].damage_rear;
+      }
     } else if (awtype==NULL) {
-      /* Waffenloser kampf, bonus von talentwert*/
-      da += effskill(au, SK_WEAPONLESS);
+      /* skill bonus for unarmed combat */
+      if (damage_rules&DAMAGE_UNARMED_BONUS) {
+        da += effskill(au, SK_WEAPONLESS);
+      }
     } else {
-      /* Nahkampfschadensbonus */
-      da += af->person[at.index].damage;
+      /* melee bonus */
+      if (damage_rules&DAMAGE_MELEE_BONUS) {
+        da += af->person[at.index].damage;
+      }
     }
 
     /* Skilldifferenzbonus */
-    da += MAX(0, (sk-sd)/DAMAGE_QUOTIENT);
+    if (damage_rules&DAMAGE_SKILL_BONUS) {
+      da += MAX(0, (sk-sd)/DAMAGE_QUOTIENT);
+    }
   }
 
 
@@ -3943,12 +3989,16 @@ battle_flee(battle * b)
 void
 do_battle(region * r)
 {
-  static int max_turns = 0;
   battle *b = NULL;
   boolean fighting = false;
   ship * sh;
   building *bu;
+  static int init_rules = 0;
 
+  if (!init_rules) {
+    static_rules();
+    init_rules = 1;
+  }
   if (msg_separator==NULL) {
     msg_separator = msg_message("battle::section", "");
   }
@@ -3996,9 +4046,6 @@ do_battle(region * r)
   print_stats(b); /* gibt die Kampfaufstellung aus */
   log_stdio(stdout, "%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
 
-  if (max_turns==0) {
-    max_turns = get_param_int(global.parameters, "rules.combat_turns", COMBAT_TURNS);
-  }
   for (;battle_report(b) && b->turn<=max_turns;++b->turn) {
     if (bdebug) {
       fprintf(bdebug, "*** Turn: %d\n", b->turn);

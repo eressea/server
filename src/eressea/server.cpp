@@ -604,6 +604,7 @@ main(int argc, char *argv[])
   char * lc_ctype;
   char * lc_numeric;
 
+  rng_init((unsigned long)time(0));
   setup_signal_handler();
 
   sqlpatch = true;

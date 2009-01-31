@@ -8855,17 +8855,18 @@ init_spells(void)
     set_spelldata_i(sp, data);
     register_spell(sp);
   }
-  at_register(&at_cursewall);
-  at_register(&at_unitdissolve);
-  at_register(&at_wdwpyramid);
-  register_bordertype(&bt_firewall);
-  register_bordertype(&bt_wisps);
-  register_bordertype(&bt_chaosgate);
 }
 
 void
 register_spells(void)
 {
+  at_register(&at_cursewall);
+  at_register(&at_unitdissolve);
+  at_register(&at_wdwpyramid);
+
+  register_bordertype(&bt_firewall);
+  register_bordertype(&bt_wisps);
+  register_bordertype(&bt_chaosgate);
   
   /* sp_summon_alp */
   register_alp();
