@@ -95,6 +95,7 @@
     <param name="modules.wormholes" value="0"/>
 
     <param name="rules.check_overload" value="0"/>
+    <param name="rules.combat.skill_formula" value="1"/>
     <param name="rules.combat.critical" value="0"/>
     <param name="rules.combat.melee_bonus" value="0"/>
     <param name="rules.combat.missile_bonus" value="0"/>
