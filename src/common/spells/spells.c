@@ -8803,15 +8803,6 @@ border_type bt_chaosgate = {
 static void
 set_spelldata_i(spell * sp, spelldata * data)
 {
-  int n;
-  for (n=0;n!=5 && data->components[n].name;++n);
-  sp->components = malloc(sizeof(spell_component) *(n+1));
-  sp->components[n].type = NULL;
-  while (n-->0) {
-    sp->components[n].type = rt_find(data->components[n].name);
-    sp->components[n].amount = data->components[n].amount;
-    sp->components[n].cost = data->components[n].flags;
-  }
   sp->sp_function = data->sp_function;
   sp->patzer = data->patzer;
 }
@@ -8838,6 +8829,7 @@ init_spells(void)
 
   /* register all the old spells in the spelldata array */
   for (i=0;spelldaten[i].id!=SPL_NOSPELL;++i) {
+    int n;
     spelldata * data = spelldaten+i;
     spell * sp = malloc(sizeof(spell));
 
@@ -8852,6 +8844,16 @@ init_spells(void)
     sp->sptyp = data->sptyp;
     sp->rank = data->rank;
     sp->level = data->level;
+
+    for (n=0;n!=5 && data->components[n].name;++n);
+    sp->components = malloc(sizeof(spell_component) *(n+1));
+    sp->components[n].type = NULL;
+    while (n-->0) {
+      sp->components[n].type = rt_find(data->components[n].name);
+      sp->components[n].amount = data->components[n].amount;
+      sp->components[n].cost = data->components[n].flags;
+    }
+
     set_spelldata_i(sp, data);
     register_spell(sp);
   }

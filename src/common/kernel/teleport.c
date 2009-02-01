@@ -174,7 +174,7 @@ get_astralplane(void)
   static int rule_astralplane = -1;
   static int gamecookie = -1;
   if (rule_astralplane<0) {
-    rule_astralplane = get_param_int(global.parameters, "modules.astralspace", 0);
+    rule_astralplane = get_param_int(global.parameters, "modules.astralspace", 1);
   }
   if (!rule_astralplane) {
     return NULL;

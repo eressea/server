@@ -75,8 +75,6 @@
     <skill name="stamina" enable="true"/>
     <skill name="unarmed" enable="true"/>
 
-    <param name="init_spells" value="0"/>
-
     <param name="NewbieImmunity" value="8"/>
     <param name="modules.wormholes" value="1"/>
     <param name="entertain.base" value="0"/>

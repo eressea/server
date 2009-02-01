@@ -736,6 +736,19 @@ tolua_write_spells(lua_State* tolua_S)
       xmlNewProp(node, BAD_CAST "rank", xml_i(sp->rank));
       xmlNewProp(node, BAD_CAST "level", xml_i(sp->level));
       xmlNewProp(node, BAD_CAST "index", xml_i(sp->id));
+      if (sp->syntax) xmlNewProp(node, BAD_CAST "syntax", BAD_CAST sp->syntax);
+      if (sp->parameter) xmlNewProp(node, BAD_CAST "parameters", BAD_CAST sp->parameter);
+      if (sp->components) {
+        spell_component * comp = sp->components;
+        for (;comp->type!=0;++comp) {
+          static const char * costs[] = { "fixed", "level", "linear" };
+          xmlNodePtr cnode = xmlNewNode(NULL, BAD_CAST "resource");
+          xmlNewProp(cnode, BAD_CAST "name", BAD_CAST comp->type->_name[0]);
+          xmlNewProp(cnode, BAD_CAST "amount", xml_i(comp->amount));
+          xmlNewProp(cnode, BAD_CAST "cost", BAD_CAST costs[comp->cost]);
+          xmlAddChild(node, cnode); 
+        }
+      }
 
       if (sp->sptyp & TESTCANSEE) {
         xmlNewProp(node, BAD_CAST "los", BAD_CAST "true");

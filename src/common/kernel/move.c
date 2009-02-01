@@ -1305,12 +1305,10 @@ movement_speed(unit * u)
 
     /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
     * Nicht kumulativ mit anderen Beschleunigungen! */
-    if (get_param_int(global.parameters, "modules.astralspace", 0) != 0) {
-      if (mp*dk <= BP_WALKING*u->race->speed && is_astral(u->region) && is_mage(u)) {
-        sc_mage * mage = get_mage(u);
-        if (mage->magietyp == M_ASTRAL || mage->magietyp == M_TRAUM) {
-          mp *= 2;
-        }
+    if (mp*dk <= BP_WALKING*u->race->speed && is_astral(u->region) && is_mage(u)) {
+      sc_mage * mage = get_mage(u);
+      if (mage->magietyp == M_ASTRAL || mage->magietyp == M_TRAUM) {
+        mp *= 2;
       }
     }
     break;

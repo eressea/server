@@ -117,6 +117,10 @@ const troop no_troop = {0, 0};
 
 static int max_turns = 0;
 static int damage_rules = 0;
+static int skill_formula = 0;
+
+#define FORMULA_ORIG 0
+#define FORMULA_NEW 1
 
 #define DAMAGE_CRITICAL      (1<<0)
 #define DAMAGE_MELEE_BONUS   (1<<1)
@@ -128,6 +132,8 @@ static int damage_rules = 0;
 static void
 static_rules(void)
 {
+  /* new formula to calculate to-hit-chance */
+  skill_formula = get_param_int(global.parameters, "rules.combat.skill_formula", FORMULA_ORIG);
   /* maximum number of combat turns */
   max_turns = get_param_int(global.parameters, "rules.combat.turns", COMBAT_TURNS);
   /* damage calculation */
@@ -536,25 +542,29 @@ reportcasualties(battle * b, fighter * fig, int dead)
 static int
 contest(int skilldiff, const armor_type * ar, const armor_type * sh)
 {
-  int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
-  double mod = 1.0;
+  if (skill_formula==FORMULA_ORIG) {
+    int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
+    double mod = 1.0;
 
-  if (ar != NULL)
-    mod *= (1 + ar->penalty);
-  if (sh != NULL)
-    mod *= (1 + sh->penalty);
-  vw = (int)(100 - ((100 - vw) * mod));
+    if (ar != NULL)
+      mod *= (1 + ar->penalty);
+    if (sh != NULL)
+      mod *= (1 + sh->penalty);
+    vw = (int)(100 - ((100 - vw) * mod));
 
-  do {
-    p = rng_int() % 100;
-    vw -= p;
+    do {
+      p = rng_int() % 100;
+      vw -= p;
+    }
+    while (vw >= 0 && p >= 90);
+    return (vw <= 0);
+  } else {
+    return 1;
   }
-  while (vw >= 0 && p >= 90);
-  return (vw <= 0);
 }
 
 static boolean
-riding(const troop t) {
+is_riding(const troop t) {
   if (t.fighter->building!=NULL) return false;
   if (t.fighter->horses + t.fighter->elvenhorses > t.index) return true;
   return false;
@@ -683,9 +693,9 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
       int m;
       unsigned int flags = WMF_SKILL|(attacking?WMF_OFFENSIVE:WMF_DEFENSIVE);
 
-      if (riding(t)) flags |= WMF_RIDING;
+      if (is_riding(t)) flags |= WMF_RIDING;
       else flags |= WMF_WALKING;
-      if (riding(enemy)) flags |= WMF_AGAINST_RIDING;
+      if (is_riding(enemy)) flags |= WMF_AGAINST_RIDING;
       else flags |= WMF_AGAINST_WALKING;
 
       for (m=0;wtype->modifiers[m].value;++m) {
@@ -705,7 +715,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
   }
 
   /* Burgenbonus, Pferdebonus */
-  if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
+  if (is_riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
     skill += 2;
     if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
   }
@@ -731,7 +741,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 static const armor_type *
 select_armor(troop t, boolean shield)
 {
-  int type = shield?ATF_SHIELD:0;
+  unsigned int type = shield?ATF_SHIELD:0;
   unit * u = t.fighter->unit;
   const armor * a = t.fighter->armors;
   int geschuetzt = 0;
@@ -1680,9 +1690,11 @@ skilldiff(troop at, troop dt, int dist)
 {
   fighter *af = at.fighter, *df = dt.fighter;
   unit *au = af->unit, *du = df->unit;
-  int is_protected = 0, skdiff = 0, sk;
+  int is_protected = 0, skdiff = 0;
   weapon * awp = select_weapon(at, true, dist>1);
-  weapon * dwp = select_weapon(dt, false, dist>1);
+
+  skdiff += af->person[at.index].attack;
+  skdiff -= df->person[dt.index].defence;
 
   if (df->person[dt.index].flags & FL_SLEEPING)
     skdiff += 2;
@@ -1707,8 +1719,6 @@ skilldiff(troop at, troop dt, int dist)
   /* TODO this should be a skillmod */
   skdiff += jihad(au->faction, du->race);
 #endif
-  skdiff += af->person[at.index].attack;
-  skdiff -= df->person[dt.index].defence;
 
   if (df->building) {
     boolean init = false;
@@ -1756,15 +1766,17 @@ skilldiff(troop at, troop dt, int dist)
       int w;
       for (w=0;awp->type->modifiers[w].value!=0;++w) {
         if (awp->type->modifiers[w].flags & WMF_MISSILE_TARGET) {
-                                  /* skill decreases by targeting difficulty (bow -2, catapult -4) */
+          /* skill decreases by targeting difficulty (bow -2, catapult -4) */
           skdiff -= awp->type->modifiers[w].value;
           break;
         }
       }
     }
   }
-  sk = weapon_effskill(dt, at, dwp, false, dist>1);
-  skdiff -= sk;
+  if (skill_formula==FORMULA_ORIG) {
+    weapon * dwp = select_weapon(dt, false, dist>1);
+    skdiff -= weapon_effskill(dt, at, dwp, false, dist>1);
+  }
   return skdiff;
 }
 
@@ -1814,7 +1826,7 @@ hits(troop at, troop dt, weapon * awp)
   df->person[dt.index].flags |= FL_HIT;
 
   if (af->person[at.index].flags & FL_STUNNED) {
-      af->person[at.index].flags &= ~FL_STUNNED;
+    af->person[at.index].flags &= ~FL_STUNNED;
     return 0;
   }
   if ((af->person[at.index].flags & FL_TIRED && rng_int()%100 < 50)
@@ -1827,7 +1839,6 @@ hits(troop at, troop dt, weapon * awp)
   }
 
   skdiff = skilldiff(at, dt, dist);
-
   /* Verteidiger bekommt eine Rüstung */
   armor = select_armor(dt, true);
   shield = select_armor(dt, false);
@@ -1987,7 +1998,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
           if (hits(ta, td, wp)) {
             const char * d;
             if (wp == NULL) d = au->race->def_damage;
-            else if (riding(ta)) d = wp->type->damage[1];
+            else if (is_riding(ta)) d = wp->type->damage[1];
             else d = wp->type->damage[0];
             terminate(td, ta, a->type, d, missile);
           }
