@@ -22,6 +22,7 @@ Kampf:
   = done (rules.combat_turns)
 - neue Trefferchanceberechnung
 - neue Beuteregelung
+- Gegnerlimits
 
 Gegenstände:
 - Waffen mit höherem Schaden.
@@ -29,7 +30,7 @@ Gegenstände:
 
 Diverse:
 - neue Terraintypen (weniger Bauern, knappere Ressourcen)
-- limitierte Rekrutieren von Migranten erlauben
+- limitiertes Rekrutieren von Migranten erlauben
 - Parteitarnung fällt weg
   = done (disable TARNEN)
 - Monster entfernen

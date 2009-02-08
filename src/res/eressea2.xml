@@ -11,6 +11,7 @@
 	<xi:include href="common/luxuries.xml" />
 	<xi:include href="common/potions.xml" />
 	<xi:include href="common/resources.xml" />
+  <xi:include href="eressea2/equipment.xml"/>
   <xi:include href="eressea2/races.xml"/>
   <xi:include href="eressea2/spells.xml"/>
   <xi:include href="eressea2/terrains.xml"/>
@@ -102,6 +103,7 @@
     <param name="rules.combat.skill_bonus" value="0"/>
     <param name="rules.combat.turns" value="1"/>
     <param name="rules.combat.unarmed_bonus" value="0"/>
+    <param name="rules.combat.populationdamage" value="0"/>
     <param name="rules.give" value="3"/> <!-- only self + peasants -->
     <param name="rules.stamina" value="0"/> <!-- does not affect hp -->
     <param name="skill.maxlevel" value="10"/>

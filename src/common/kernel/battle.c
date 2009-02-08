@@ -538,28 +538,49 @@ reportcasualties(battle * b, fighter * fig, int dead)
   msg_release(m);
 }
 
+static int
+contest_classic(int skilldiff, const armor_type * ar, const armor_type * sh)
+{
+  int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
+  double mod = 1.0;
+
+  if (ar != NULL)
+    mod *= (1 + ar->penalty);
+  if (sh != NULL)
+    mod *= (1 + sh->penalty);
+  vw = (int)(100 - ((100 - vw) * mod));
+
+  do {
+    p = rng_int() % 100;
+    vw -= p;
+  }
+  while (vw >= 0 && p >= 90);
+  return (vw <= 0);
+}
+
+/** new rule for Eressea 1.5
+ * \param skilldiff - the attack skill with every modifier applied
+ */
+static int
+contest_new(int skilldiff, const troop dt, const armor_type * ar, const armor_type * sh)
+{
+  double tohit = 0.5 + skilldiff * 0.1;
+  if (tohit<0.5) tohit = 0.5;
+  if (chance(tohit)) {
+    int defense = effskill(dt.fighter->unit, SK_STAMINA);
+    double tosave = defense * 0.05;
+    return !chance(tosave);
+  }
+  return 0;
+}
 
 static int
-contest(int skilldiff, const armor_type * ar, const armor_type * sh)
+contest(int skdiff, const troop dt, const armor_type * ar, const armor_type * sh)
 {
   if (skill_formula==FORMULA_ORIG) {
-    int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
-    double mod = 1.0;
-
-    if (ar != NULL)
-      mod *= (1 + ar->penalty);
-    if (sh != NULL)
-      mod *= (1 + sh->penalty);
-    vw = (int)(100 - ((100 - vw) * mod));
-
-    do {
-      p = rng_int() % 100;
-      vw -= p;
-    }
-    while (vw >= 0 && p >= 90);
-    return (vw <= 0);
+    return contest_classic(skdiff, ar, sh);
   } else {
-    return 1;
+    return contest_new(skdiff, dt, ar, sh);
   }
 }
 
@@ -1842,7 +1863,7 @@ hits(troop at, troop dt, weapon * awp)
   /* Verteidiger bekommt eine Rüstung */
   armor = select_armor(dt, true);
   shield = select_armor(dt, false);
-  if (contest(skdiff, armor, shield)) {
+  if (contest(skdiff, dt, armor, shield)) {
     if (bdebug) {
       debug_hit(at, awp, dt, dwp, skdiff, dist, true);
     }
@@ -2311,8 +2332,8 @@ PopulationDamage(void)
 {
   static double value = -1.0;
   if (value<0) {
-    const char * str = get_param(global.parameters, "battle.populationdamage");
-    value = str?atof(str):(BATTLE_KILLS_PEASANTS/100.0);
+    int damage = get_param_int(global.parameters, "rules.combat.populationdamage", BATTLE_KILLS_PEASANTS);
+    value = damage/100.0;
   }
   return value;
 }
@@ -2323,9 +2344,11 @@ battle_effects(battle * b, int dead_players)
 {
   region * r = b->region;
   int dead_peasants = MIN(rpeasants(r), (int)(dead_players*PopulationDamage()));
-  deathcounts(r, dead_peasants + dead_players);
-  chaoscounts(r, dead_peasants / 2);
-  rsetpeasants(r, rpeasants(r) - dead_peasants);
+  if (dead_peasants) {
+    deathcounts(r, dead_peasants + dead_players);
+    chaoscounts(r, dead_peasants / 2);
+    rsetpeasants(r, rpeasants(r) - dead_peasants);
+  }
 }
 
 static void
@@ -3402,7 +3425,7 @@ battle_report(battle * b)
     }
   }
 
-  printf(" %d", b->turn);
+  if (verbosity>0) log_stdio(stdout, " %d", b->turn);
   fflush(stdout);
 
   for (bf=b->factions;bf;bf=bf->next) {
@@ -4055,7 +4078,7 @@ do_battle(region * r)
   do_combatmagic(b, DO_PRECOMBATSPELL);
 
   print_stats(b); /* gibt die Kampfaufstellung aus */
-  log_stdio(stdout, "%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
+  if (verbosity>0) log_stdio(stdout, "%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
 
   for (;battle_report(b) && b->turn<=max_turns;++b->turn) {
     if (bdebug) {
@@ -4079,7 +4102,7 @@ do_battle(region * r)
 #endif /* KARMA_MODULE */
   }
 
-  printf("\n");
+  if (verbosity>0) log_stdio(stdout, "\n");
 
   /* Auswirkungen berechnen: */
   aftermath(b);
