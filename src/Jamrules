@@ -20,7 +20,7 @@ if $(BINDINGS) = TOLUA {
 }
 
 if ! $(LUA_VERSION) {
-  LUA_VERSION = 5.0 ;
+  LUA_VERSION = 5.1 ;
 }
 
 if ! $(HAVE_LUA) {

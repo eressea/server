@@ -1466,7 +1466,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
   }
   rps_nowrap(F, "");
   rnl(F);
-  sprintf(buf, LOC(f->locale, parameters[P_NEXT]));
+  strcpy(buf, LOC(f->locale, parameters[P_NEXT]));
   rps_nowrap(F, buf);
   rnl(F);
   fclose(F);
