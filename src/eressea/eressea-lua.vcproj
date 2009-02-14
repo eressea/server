@@ -39,6 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..;../common"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
@@ -385,7 +386,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\server.cpp"
+			RelativePath=".\server.c"
 			>
 		</File>
 	</Files>

@@ -31,7 +31,7 @@ SERVER_SOURCES =
  kernel.c
  stdafx.c
  util.c
- main.cpp
+ main.c
 ;
 
 if $(MSPACES) {

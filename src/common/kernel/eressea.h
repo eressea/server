@@ -247,7 +247,7 @@ extern char *cstring_i(char *s);
 extern const char *unitname(const struct unit * u);
 extern char * write_unitname(const struct unit * u, char * buffer, size_t size);
 
-struct building *largestbuilding(const struct region * r, boolean img);
+struct building *largestbuilding(const struct region * r, boolean imaginary);
 
 extern int count_all(const struct faction * f);
 extern int count_migrants (const struct faction * f);

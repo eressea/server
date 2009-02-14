@@ -380,9 +380,9 @@ size_t   dlmalloc_usable_size(void*);
 */
 
 #ifndef USE_DL_PREFIX
-void     malloc_stats();
+void     malloc_stats(void);
 #else
-void     dlmalloc_stats();
+void     dlmalloc_stats(void);
 #endif
 
 /*

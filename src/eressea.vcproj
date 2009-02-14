@@ -43,6 +43,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
@@ -184,19 +185,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\combined\bindings.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PrecompiledHeaderThrough="stdafx.hpp"
-						PrecompiledHeaderFile="$(IntDir)\$(TargetName)_cpp.pch"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\combined\curses.c"
 				>
 			</File>
@@ -209,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\combined\main.c"
+				>
+			</File>
+			<File
 				RelativePath=".\combined\stdafx.c"
 				>
 				<FileConfiguration
@@ -218,31 +210,6 @@
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="1"
 						PrecompiledHeaderThrough="stdafx.h"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\combined\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-						PrecompiledHeaderThrough="stdafx.hpp"
-						PrecompiledHeaderFile="$(IntDir)\$(TargetName)_cpp.pch"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 					/>
 				</FileConfiguration>
 			</File>
@@ -266,10 +233,6 @@
 			>
 			<File
 				RelativePath=".\combined\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\combined\stdafx.hpp"
 				>
 			</File>
 		</Filter>

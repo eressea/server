@@ -762,8 +762,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 static const armor_type *
 select_armor(troop t, boolean shield)
 {
-  unsigned int type = shield?ATF_SHIELD:0;
-  unit * u = t.fighter->unit;
+  unsigned int type = shield?ATF_SHIELD:0;  unit * u = t.fighter->unit;
   const armor * a = t.fighter->armors;
   int geschuetzt = 0;
 
@@ -777,16 +776,13 @@ select_armor(troop t, boolean shield)
   }
 
   for (;a;a=a->next) {
-    if ((a->atype->flags & ATF_SHIELD)==type) {
-      geschuetzt += a->count;
+    if ((a->atype->flags & ATF_SHIELD)==type) {      geschuetzt += a->count;
       if (geschuetzt > t.index) {
         /* unser Kandidat wird geschuetzt */
         return a->atype;
       }
     }
-  }
-
-  return NULL;
+  }  return NULL;
 }
 
 

@@ -1,3 +1,43 @@
+local function email_multis()
+  local multis = { 
+    ["u9bx"]="Tachlaar@web.de",
+    ["7Lwz"]="Tachlaar@web.de",
+    ["ddr"]="Tachlaar@web.de",
+    ["myrd"]="Tachlaar@web.de",
+    ["2a4v"]="Samurai_krieger@web.de",
+    ["7oiw"]="Samurai_krieger@web.de",
+    ["brud"]="Samurai_krieger@web.de",
+    ["bzcm"]="Samurai_krieger@web.de",
+    ["crow"]="Samurai_krieger@web.de",
+    ["dino"]="Samurai_krieger@web.de",
+    ["fynd"]="Samurai_krieger@web.de",
+    ["Leer"]="Samurai_krieger@web.de",
+    ["moos"]="Samurai_krieger@web.de",
+    ["ogcL"]="Samurai_krieger@web.de",
+    ["paty"]="Samurai_krieger@web.de",
+    ["rd"]="Samurai_krieger@web.de",
+    ["seee"]="Samurai_krieger@web.de",
+    ["szem"]="Samurai_krieger@web.de",
+    ["uebL"]="Samurai_krieger@web.de",
+    ["uvzp"]="Samurai_krieger@web.de",
+    ["wzLp"]="Samurai_krieger@web.de",
+    ["ziwe"]="Samurai_krieger@web.de"
+  }
+  local k
+  local v
+  for k, info in pairs(multis) do
+    local f = get_faction(atoi36(k))
+    if f~=nil then
+      print("- marking " .. tostring(f) .. " as a multi-player.")
+      f.email = v
+      f.password = ""
+      f.info = info
+    else
+      print("- could not find faction " .. k)
+    end
+  end
+end
+
 local function kill_multis()
   local multis = { 
     ["u9bx"]="Doppelspiel-Partei von Tachlaar@web.de",
@@ -39,4 +79,4 @@ local function kill_multis()
 end
 
 print("killing multi-players")
-kill_multis()
+email_multis()

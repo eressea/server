@@ -1628,7 +1628,7 @@ cstring(const char *s)
 }
 
 building *
-largestbuilding (const region * r, boolean img)
+largestbuilding (const region * r, boolean imaginary)
 {
   static const building_type * btype = NULL;
   building *b, *best = NULL;
@@ -1638,7 +1638,7 @@ largestbuilding (const region * r, boolean img)
 
   for (b = rbuildings(r); b; b = b->next) {
     if (b->type!=btype) {
-      if (img) {
+      if (imaginary) {
         const attrib * a = a_find(b->attribs, &at_icastle);
         if (!a) continue;
         if (a->data.v != btype) continue;

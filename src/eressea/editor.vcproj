@@ -39,6 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..;../common"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"

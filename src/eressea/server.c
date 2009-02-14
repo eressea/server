@@ -98,7 +98,9 @@
 
 /* lua includes */
 #ifdef BINDINGS_TOLUA
-#include <lua.hpp>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include "tolua/bindings.h"
 #include "tolua/helpers.h"
 #include "tolua/bind_unit.h"
@@ -129,19 +131,15 @@
 
 #include <libxml/encoding.h>
 
-/* stdc++ includes */
-#include <stdexcept>
-#include <string>
-#include <sstream>
-
 /* libc includes */
-#include <cstdio>
-#include <cassert>
-#include <cctype>
-#include <climits>
-#include <clocale>
-#include <cstring>
-#include <ctime>
+#include <stdio.h>
+#include <assert.h>
+#include <ctype.h>
+#include <wctype.h>
+#include <limits.h>
+#include <locale.h>
+#include <string.h>
+#include <time.h>
 
 #if defined(_MSC_VER)
 # include <crtdbg.h>
@@ -150,7 +148,6 @@
 /**
 ** global variables we are importing from other modules
 **/
-extern "C" {
   extern const char * g_reportdir;
   extern const char * g_datadir;
   extern const char * g_basedir;
@@ -163,7 +160,6 @@ extern "C" {
   extern int loadplane;
   extern boolean opt_cr_absolute_coords;
 
-}
 
 /**
 ** global variables that we are exporting
@@ -561,7 +557,7 @@ my_lua_error(lua_State * L)
 
   log_error(("A LUA error occured: %s\n", error));
   lua_pop(L, 1);
-  if (!g_ignore_errors) std::terminate();
+  if (!g_ignore_errors) abort();
   return 1;
 }
 
@@ -603,8 +599,8 @@ main(int argc, char *argv[])
   int i;
   char * lc_ctype;
   char * lc_numeric;
+  lua_State * luaState = lua_init();
 
-  rng_init((unsigned long)time(0));
   setup_signal_handler();
 
   sqlpatch = true;
@@ -616,7 +612,6 @@ main(int argc, char *argv[])
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
 
-  lua_State * luaState = lua_init();
   global.vm_state = luaState;
   load_inifile("eressea.ini");
   if (verbosity>=4) {

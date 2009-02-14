@@ -1132,6 +1132,8 @@ terraform_region(region * r, const terrain_type * terrain)
     int mnr = 0;
 
     r->land = calloc(1, sizeof(land_region));
+    r->land->morale = MORALE_DEFAULT;
+    r->land->ownership = NULL;
     region_setname(r, makename());
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * nr = rconnect(r, d);
@@ -1324,24 +1326,21 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 }
 
 struct faction *
-region_owner(const struct region * r)
+get_region_owner(const struct region * r)
 {
-#ifdef REGIONOWNERS
-  return r->owner;
-#else
+  if (r->land && r->land->ownership) {
+    return r->land->ownership->owner;
+  }
   return NULL;
-#endif
 }
 
 void
-region_setowner(struct region * r, struct faction * owner)
+set_region_owner(struct region * r, struct faction * owner, int turn)
 {
-#ifdef REGIONOWNERS
-  r->owner = owner;
-#else
-  unused(r);
-  unused(owner);
-#endif
+  if (r->land && r->land->ownership) {
+    r->land->ownership->owner = owner;
+    r->land->ownership->since_turn = turn;
+  }
 }
 
 void

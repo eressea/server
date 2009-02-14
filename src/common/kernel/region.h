@@ -62,6 +62,13 @@ struct rawmaterial;
 struct donation;
 struct item;
 
+#define MORALE_DEFAULT 2 /* Morale of peasants that have no lord */
+
+typedef struct region_owner {
+  struct faction * owner;
+  int since_turn;
+} region_owner;
+
 typedef struct land_region {
   char *name;
   /* TODO: demand kann nach Konvertierung entfernt werden. */
@@ -72,12 +79,14 @@ typedef struct land_region {
   } * demands;
   const struct item_type * herbtype;
   short herbs;
+  unsigned short morale;
   int trees[3]; /* 0 -> seeds, 1 -> shoots, 2 -> trees */
   int horses;
   int peasants;
   int newpeasants;
   int money;
   struct item * items; /* items that can be claimed */
+  struct region_owner * ownership;
 } land_region;
 
 typedef struct donation {
@@ -112,9 +121,6 @@ typedef struct region {
   struct donation * donations;
   const struct terrain_type * terrain;
   struct rawmaterial * resources;
-#ifdef REGIONOWNERS
-  struct faction * owner;
-#endif
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS]; /* use rconnect(r, dir) to access */
 #endif
@@ -226,8 +232,8 @@ extern const short delta_y[MAXDIRECTIONS];
 direction_t dir_invert(direction_t dir);
 int production(const struct region *r);
 
-void region_setowner(struct region * r, struct faction * owner);
-struct faction * region_owner(const struct region * r);
+void set_region_owner(struct region * r, struct faction * owner, int turn);
+struct faction * get_region_owner(const struct region * r);
 
 struct region * r_connect(const struct region *, direction_t dir);
 #ifdef FAST_CONNECT

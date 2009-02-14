@@ -3739,6 +3739,35 @@ sp_analysesong_unit(castorder *co)
 
   return cast_level;
 }
+
+static boolean
+can_charm(const unit * u, int maxlevel)
+{
+  const skill_t expskills[] = { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
+  skill * sv = u->skills;
+
+  if (fval(u, UFL_HERO)) return false;
+
+  for (;sv!=u->skills+u->skill_size;++sv) {
+    int l = 0, h = 5;
+    skill_t sk = sv->id;
+    assert(expskills[h]==NOSKILL);
+    while (l<h) {
+      int m = (l+h)/2;
+      if (sk==expskills[m]) {
+        if (skill_limit(u->faction, sk)!=INT_MAX) {
+          return false;
+        } else if ((int)sv->level>maxlevel) {
+          return false;
+        }
+        break;
+      }
+      else if (sk>expskills[m]) l=m+1;
+      else h=m;
+    }
+  }
+  return true;
+}
 /* ------------------------------------------------------------- */
 /* Name:     Charming
  * Stufe:   13
@@ -3789,7 +3818,7 @@ sp_charmingsong(castorder *co)
     cmistake(mage, co->order, 45, MSG_MAGIC);
   }
   /* niemand mit teurem Talent */
-  if (has_limited_skills(target)) {
+  if (!can_charm(target, cast_level/2)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
       "spellfail_noexpensives", "target", target));
     return 0;

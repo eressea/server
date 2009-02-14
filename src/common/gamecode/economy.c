@@ -2958,54 +2958,49 @@ entertain_cmd(unit * u, struct order * ord)
   entertaining += o->qty;
 }
 
-/* ------------------------------------------------------------- */
-
-
+/**
+ * \return number of working spaces taken by players 
+ */
 static void
-expandwork(region * r, request * work_begin, request * work_end)
+expandwork(region * r, request * work_begin, request * work_end, int maxwork)
 {
-	int n, earnings;
-	/* n: verbleibende Einnahmen */
-	/* m: maximale Arbeiter */
-	int m = maxworkingpeasants(r);
-	int p_wage = wage(r, NULL, NULL);
-	int verdienst = 0;
-	request *o;
+  int earnings;
+  /* n: verbleibende Einnahmen */
+  /* m: maximale Arbeiter */
+  int jobs = maxwork;
+  int p_wage = wage(r, NULL, NULL);
+  request *o;
 
-	for (o = work_begin; o != work_end; ++o) {
-		unit * u = o->unit;
-		int workers;
+  for (o = work_begin; o != work_end; ++o) {
+    unit * u = o->unit;
+    int workers;
 
-		if (u->number == 0) continue;
+    if (u->number == 0) continue;
 
-		if (m>=working) workers = u->number;
-		else {
-			workers = u->number * m / working;
-			if (rng_int() % working < (u->number * m) % working) workers++;
-		}
+    if (jobs>=working) workers = u->number;
+    else {
+      workers = u->number * jobs / working;
+      if (rng_int() % working < (u->number * jobs) % working) workers++;
+    }
 
-		assert(workers>=0);
+    assert(workers>=0);
 
-		u->n = workers * wage(u->region, u->faction, u->race);
+    u->n = workers * wage(u->region, u->faction, u->race);
 
-		m -= workers;
-		assert(m>=0);
+    jobs -= workers;
+    assert(jobs>=0);
 
-		change_money(u, u->n);
-		working -= o->unit->number;
-		add_income(u, IC_WORK, o->qty, u->n);
+    change_money(u, u->n);
+    working -= o->unit->number;
+    add_income(u, IC_WORK, o->qty, u->n);
     fset(u, UFL_LONGACTION|UFL_NOTMOVING);
   }
 
-	n = m * p_wage;
-
-	/* Der Rest wird von den Bauern verdient. n ist das uebriggebliebene
-	* Geld. */
- 
-	earnings = MIN(n, rpeasants(r) * p_wage) + verdienst;
-	/* Mehr oder weniger durch Trank "Riesengrass" oder "Faulobstschnaps" */
-
-	rsetmoney(r, rmoney(r) + earnings);
+  if (jobs>rpeasants(r)) {
+    jobs = rpeasants(r);
+  }
+  earnings = jobs * p_wage;
+  rsetmoney(r, rmoney(r) + earnings);
 }
 
 static int
@@ -3044,25 +3039,25 @@ do_work(unit * u, order * ord, request * o)
 static void
 expandtax(region * r, request * taxorders)
 {
-	unit *u;
-	int i;
+  unit *u;
+  int i;
 
-	expandorders(r, taxorders);
-	if (!norders) return;
+  expandorders(r, taxorders);
+  if (!norders) return;
 
-	for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
-		change_money(oa[i].unit, TAXFRACTION);
-		oa[i].unit->n += TAXFRACTION;
-		rsetmoney(r, rmoney(r) -TAXFRACTION);
-	}
-	free(oa);
+  for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
+    change_money(oa[i].unit, TAXFRACTION);
+    oa[i].unit->n += TAXFRACTION;
+    rsetmoney(r, rmoney(r) -TAXFRACTION);
+  }
+  free(oa);
 
   for (u = r->units; u; u = u->next) {
     if (u->n >= 0) {
       add_income(u, IC_TAX, u->wants, u->n);
       fset(u, UFL_LONGACTION|UFL_NOTMOVING);
     }
-	}
+  }
 }
 
 void
@@ -3140,7 +3135,42 @@ auto_work(region * r)
     }
   }
   if (nextworker!=workers) {
-    expandwork(r, workers, nextworker);
+    expandwork(r, workers, nextworker, maxworkingpeasants(r));
+  }
+}
+
+static void
+peasant_taxes(region * r)
+{
+  faction * f;
+  unit * u;
+  building * b;
+  int money;
+  int maxsize;
+ 
+  f = get_region_owner(r);
+  if (f==NULL) return;
+
+  money = rmoney(r);
+  if (money<=0) return;
+
+  b = largestbuilding(r, false);
+  if (b==NULL) return;
+
+  u = buildingowner(r, b);
+  if (u==NULL || u->faction!=f) return;
+
+  maxsize = buildingeffsize(b, false);
+  if (maxsize > r->land->morale) {
+    maxsize = r->land->morale;
+  }
+
+  if (maxsize>0) {
+    int taxmoney = (money * maxsize) / 100;
+    change_money(u, taxmoney);
+    rsetmoney(r, money - taxmoney);
+    ADDMSG(&u->faction->msgs, msg_message("income_tax", 
+      "unit region amount", u, r, taxmoney));
   }
 }
 
@@ -3152,7 +3182,8 @@ produce(void)
   request *taxorders, *sellorders, *stealorders, *buyorders;
   unit *u;
   int todo;
-  int autowork = get_param_int(global.parameters, "work.auto", 0);
+  int rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", 0);
+  int rule_autowork = get_param_int(global.parameters, "work.auto", 0);
 
   /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
   * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
@@ -3233,7 +3264,7 @@ produce(void)
           break;
 
         case K_WORK:
-          if (!autowork && do_work(u, u->thisorder, nextworker)==0) {
+          if (!rule_autowork && do_work(u, u->thisorder, nextworker)==0) {
             ++nextworker;
           }
           break;
@@ -3270,7 +3301,9 @@ produce(void)
     * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
     * auszugeben bereit sind. */
     if (entertaining) expandentertainment(r);
-    if (!autowork) expandwork(r, workers, nextworker);
+    if (!rule_autowork) {
+      expandwork(r, workers, nextworker, maxworkingpeasants(r));
+    }
     if (taxorders) expandtax(r, taxorders);
 
     /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
@@ -3294,5 +3327,9 @@ produce(void)
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
 
+    if (r->land && rule_taxation==1) {
+      /* new taxation rules, region owners make money based on morale and building */
+      peasant_taxes(r);
+    }
   }
 }

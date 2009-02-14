@@ -187,7 +187,7 @@ get_food(region *r)
 {
   unit *u;
   int peasantfood = rpeasants(r)*10;
-  faction * owner = region_owner(r);
+  faction * owner = get_region_owner(r);
 
   /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
