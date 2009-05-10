@@ -555,7 +555,7 @@ my_lua_error(lua_State * L)
 {
   const char* error = lua_tostring(L, -1);
 
-  log_error(("A LUA error occured: %s\n", error));
+  log_error(("A LUA error occurred: %s\n", error));
   lua_pop(L, 1);
   if (!g_ignore_errors) abort();
   return 1;
