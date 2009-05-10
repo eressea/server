@@ -657,11 +657,12 @@ extern struct attrib_type at_germs;
 static void
 trees(region * r, const int current_season, const int last_weeks_season)
 {
-  int growth, grownup_trees, i, seeds, sprout, seedchance;
+  int growth, grownup_trees, i, seeds, sprout;
   direction_t d;
   attrib *a;
 
   if(current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
+    double seedchance = 0.01F * RESOURCE_QUANTITY;
     int elves = count_race(r,new_race[RC_ELF]);
 
     a = a_find(r->attribs, &at_germs);
@@ -685,16 +686,23 @@ trees(region * r, const int current_season, const int last_weeks_season)
     if (production(r) <= 0) return;
 
     /* Grundchance 1.0% */
-    seedchance = (int)(FORESTGROWTH * RESOURCE_QUANTITY);
     /* Jeder Elf in der Region erhöht die Chance um 0.0008%. */
-    seedchance += (MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 8;
+    seedchance += (MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 0.0008;
     grownup_trees = rtrees(r, 2);
     seeds = 0;
 
     if (grownup_trees>0) {
-      seeds += (int)(seedchance*0.000001F*grownup_trees);
+      double remainder = seedchance*grownup_trees;
+      seeds = (int)(remainder);
+      remainder -= seeds;
+      if (chance(remainder)) {
+        ++seeds;
+      }
+      if (seeds>0) {
+        seeds += rtrees(r, 0);
+        rsettrees(r, 0, seeds);
+      }
     }
-    rsettrees(r, 0, rtrees(r, 0) + seeds);
 
     /* Bäume breiten sich in Nachbarregionen aus. */
 
