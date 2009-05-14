@@ -54,7 +54,6 @@ void maintain_buildings(struct region * r, boolean crash);
 extern void add_spende(struct faction * f1, struct faction * f2, int betrag, struct region * r);
 extern int make_cmd(struct unit * u, struct order * ord);
 extern void split_allocations(struct region * r);
-extern int recruit_classic(void);
 extern int recruit_archetypes(void);
 
 #ifdef __cplusplus

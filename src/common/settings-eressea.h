@@ -61,3 +61,5 @@
 #else
 # define BINDINGS_TOLUA /* new default */
 #endif
+
+#undef REGIONOWNERS /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */

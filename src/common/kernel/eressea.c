@@ -583,7 +583,7 @@ int verbosity = 0;
 FILE *debug;
 
 int
-shipspeed (const ship * sh, const unit * u)
+shipspeed(const ship * sh, const unit * u)
 {
   int k = sh->type->range;
   static const curse_type * stormwind_ct, * nodrift_ct;
@@ -606,9 +606,11 @@ shipspeed (const ship * sh, const unit * u)
   if( curse_active(get_curse(sh->attribs, nodrift_ct)))
       k += 1;
 
-  if (u->faction->race == new_race[RC_AQUARIAN]
-      && u->race == new_race[RC_AQUARIAN]) {
-    k += 1;
+  if (u->faction->race == u->race) {
+    /* race bonus for this faction? */
+    if (u->race == new_race[RC_AQUARIAN]) {
+      k += 1;
+    }
   }
 
   a = a_find(sh->attribs, &at_speedup);
@@ -2097,8 +2099,6 @@ get_param_int(const struct param * p, const char * key, int def)
   }
   return def;
 }
-
-
 
 void
 set_param(struct param ** p, const char * key, const char * data)

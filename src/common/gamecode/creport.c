@@ -1109,7 +1109,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
   if (sr->mode!=see_unit) fprintf(F, "\"%s\";visibility\n", visibility[sr->mode]);
 
   {
-    faction * owner = get_region_owner(r);
+    faction * owner = region_get_owner(r);
     if (owner) {
       fprintf(F, "%d;owner\n", owner->no);
     }

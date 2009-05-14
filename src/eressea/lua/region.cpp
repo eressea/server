@@ -63,12 +63,12 @@ region_getterrain(const region * r) {
 
 static void
 lua_region_setowner(region * r, faction * f) {
-  set_region_owner(r, f, turn);
+  region_set_owner(r, f, turn);
 }
 
 static faction *
 lua_region_getowner(const region * r) {
-  return get_region_owner(r);
+  return region_get_owner(r);
 }
 
 static void

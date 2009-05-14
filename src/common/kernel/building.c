@@ -523,33 +523,36 @@ free_buildings(void)
 
 extern struct attrib_type at_icastle;
 
+/** returns the building's build stage (NOT size in people).
+ * only makes sense for castles or similar buildings with multiple
+ * stages */
 int
 buildingeffsize(const building * b, boolean img)
 {
-	int i = b->size, n = 0;
-	const construction * cons;
-	static const struct building_type * bt_castle;
-	if (!bt_castle) bt_castle = bt_find("castle");
-	assert(bt_castle);
+  int i = b->size, n = 0;
+  const construction * cons;
+  static const struct building_type * bt_castle;
+  if (!bt_castle) bt_castle = bt_find("castle");
+  assert(bt_castle);
 
-	if (b==NULL) return 0;
+  if (b==NULL) return 0;
 
-	if (b->type!=bt_castle) {
-		if (img) {
-			const attrib * a = a_find(b->attribs, &at_icastle);
-			if (!a || a->data.v != bt_castle) return 0;
-		} else return 0;
-	}
-	cons = bt_castle->construction;
-	assert(cons);
+  if (b->type!=bt_castle) {
+    if (img) {
+      const attrib * a = a_find(b->attribs, &at_icastle);
+      if (!a || a->data.v != bt_castle) return 0;
+    } else return 0;
+  }
+  cons = bt_castle->construction;
+  assert(cons);
 
-	while (cons && cons->maxsize != -1 && i>=cons->maxsize) {
-		i-=cons->maxsize;
-		cons = cons->improvement;
-		++n;
-	}
+  while (cons && cons->maxsize != -1 && i>=cons->maxsize) {
+    i-=cons->maxsize;
+    cons = cons->improvement;
+    ++n;
+  }
 
-	return n;
+  return n;
 }
 
 const char *

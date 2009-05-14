@@ -23,6 +23,8 @@ extern "C" {
     char * value;
   } rule;
 
+  typedef int (*archetype_function)(struct unit * u, const struct archetype *, int);
+
   typedef struct archetype {
     struct archetype * next;
     char * name[2];
@@ -31,6 +33,7 @@ extern "C" {
     struct equipment * equip;
     struct construction * ctype;
     struct rule * rules;
+    archetype_function exec;
   } archetype;
 
   extern const struct archetype * find_archetype(const char * s, const struct locale * lang);

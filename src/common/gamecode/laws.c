@@ -187,7 +187,7 @@ get_food(region *r)
 {
   unit *u;
   int peasantfood = rpeasants(r)*10;
-  faction * owner = get_region_owner(r);
+  faction * owner = region_get_owner(r);
 
   /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
@@ -2914,9 +2914,16 @@ age_building(building * b)
   return b;
 }
 
+static void age_region(region * r) 
+{
+  a_age(&r->attribs);
+  handle_event(r->attribs, "timer", r);
+}
+
 static void
 ageing(void)
 {
+  const building_type * bt_castle = bt_find("castle");
   faction *f;
   region *r;
 
@@ -2960,9 +2967,9 @@ ageing(void)
     building ** bp;
     unit ** up;
     ship ** sp;
+    building * blargest = NULL;
 
-    a_age(&r->attribs);
-    handle_event(r->attribs, "timer", r);
+    age_region(r);
 
     /* Einheiten */
     for (up=&r->units;*up;) {
@@ -2985,7 +2992,24 @@ ageing(void)
       building * b = *bp;
       b = age_building(b);
 
-      if (b==*bp) bp = &(*bp)->next;
+      if (b==*bp) {
+        if (b->type==bt_castle) {
+          if (blargest==NULL || b->size>blargest->size) {
+            blargest = b;
+          }
+        }
+        bp = &(*bp)->next;
+      }
+      if (blargest) {
+        /* region owners update? */
+        faction * f = region_get_owner(r);
+        unit * u = buildingowner(r, blargest);
+        if (u==NULL) {
+          region_set_owner(r, NULL, turn);
+        } else if (u->faction!=f) {
+          region_set_owner(r, f, turn);
+        }
+      }
     }
   }
 }

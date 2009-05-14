@@ -27,6 +27,8 @@ without prior permission by the authors of Eressea.
 #include <kernel/item.h>
 #include <kernel/region.h>
 
+#include <gamecode/archetype.h>
+
 #include <lua.h>
 #include <tolua.h>
 
@@ -435,11 +437,43 @@ lua_useitem(struct unit * u, const struct item_type * itype, int amount, struct 
   return result;
 }
 
+static int
+lua_recruit(struct unit * u, const struct archetype * arch, int amount)
+{
+  lua_State * L = (lua_State *)global.vm_state;
+  int result = 0;
+  char fname[64];
+  snprintf(fname, sizeof(fname), "recruit_%s", arch->name[0]);
+
+  lua_pushstring(L, fname);
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  if (lua_isfunction(L, 1)) {
+    tolua_pushusertype(L, (void *)u, "unit");
+    tolua_pushnumber(L, (lua_Number)amount);
+
+    if (lua_pcall(L, 2, 1, 0)!=0) {
+      const char* error = lua_tostring(L, -1);
+      log_error(("use(%s) calling '%s': %s.\n",
+        unitname(u), fname, error));
+      lua_pop(L, 1);
+    } else {
+      result = (int)lua_tonumber(L, -1);
+      lua_pop(L, 1);
+    }
+  } else {
+    log_error(("use(%s) calling '%s': not a function.\n",
+      unitname(u), fname));
+    lua_pop(L, 1);
+  }
+  return result;
+}
+
 void
 register_tolua_helpers(void)
 {
   at_building_action.age = lc_age;
 
+  register_function((pf_generic)&lua_recruit, "lua_recruit");
   register_function((pf_generic)&lua_callspell, "lua_castspell");
   register_function((pf_generic)&lua_initfamiliar, "lua_initfamiliar");
   register_item_use(&lua_useitem, "lua_useitem");

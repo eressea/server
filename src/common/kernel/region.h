@@ -79,7 +79,7 @@ typedef struct land_region {
   } * demands;
   const struct item_type * herbtype;
   short herbs;
-  unsigned short morale;
+  short morale;
   int trees[3]; /* 0 -> seeds, 1 -> shoots, 2 -> trees */
   int horses;
   int peasants;
@@ -232,8 +232,8 @@ extern const short delta_y[MAXDIRECTIONS];
 direction_t dir_invert(direction_t dir);
 int production(const struct region *r);
 
-void set_region_owner(struct region * r, struct faction * owner, int turn);
-struct faction * get_region_owner(const struct region * r);
+void region_set_owner(struct region * r, struct faction * owner, int turn);
+struct faction * region_get_owner(const struct region * r);
 
 struct region * r_connect(const struct region *, direction_t dir);
 #ifdef FAST_CONNECT
@@ -243,6 +243,8 @@ struct region * r_connect(const struct region *, direction_t dir);
 #endif
 
 void free_regions(void);
+
+int region_get_morale(const region * r);
 
 void write_region_reference(const struct region * r, struct storage * store);
 variant read_region_reference(struct storage * store);

@@ -436,6 +436,20 @@ expandrecruit(region * r, request * recruitorders)
   assert(recruitorders==NULL);
 }
 
+static int
+recruit_cost(const faction * f, const race * rc)
+{
+  if (is_monsters(f) || f->race==rc) {
+    return rc->recruitcost;
+  } else {
+    const char * str = get_param(f->race->parameters, "other_race");
+    if (str && strcmp(rc->_name[0], str)==0) {
+      return get_param_int(f->race->parameters, "other_cost", -1);
+    }
+  }
+  return -1;
+}
+
 static void
 recruit(unit * u, struct order * ord, request ** recruitorders)
 {
@@ -446,16 +460,26 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   int recruitcost;
   const faction * f = u->faction;
   const struct race * rc = f->race;
+  const char * str;
 
   init_tokens(ord);
   skip_token();
   n = getuint();
-  if (is_monsters(f)) {
-    /* Monster dürfen REKRUTIERE 15 dracoid machen */
-    const char * str = getstrtoken();
+
+  str = getstrtoken();
+  if (str) {
+    /* Monster dürfen REKRUTIERE 15 dracoid machen
+     * also: secondary race */
     rc = findrace(str, f->locale);
-    if (rc==NULL) rc = f->race;
+    recruitcost = recruit_cost(f, rc);
+    if ((u->number!=0 && rc!=f->race) || rc==NULL || recruitcost<0) {
+      rc = f->race;
+      recruitcost = recruit_cost(f, f->race);
+    }
+  } else {
+    recruitcost = recruit_cost(f, f->race);
   }
+  assert(recruitcost>=0);
 
 #if GUARD_DISABLES_RECRUIT
   /* this is a very special case because the recruiting unit may be empty
@@ -507,7 +531,6 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     }
   }
 
-  recruitcost = rc->recruitcost;
   if (recruitcost) {
     pl = getplane(r);
     if (pl && fval(pl, PFL_NORECRUITS)) {
@@ -1066,11 +1089,30 @@ maintain_buildings(region * r, boolean crash)
   }
 }
 
+#define RECRUIT_MERGE 1
+#define RECRUIT_CLASSIC 2
+#define RECRUIT_ARCHETYPES 4
+static int rules_recruit = -1;
+
 static int
 recruit_archetype(unit * u, order * ord)
 {
+  boolean merge = (u->number>0);
   int want;
   const char * s;
+
+  if (rules_recruit<0) {
+    rules_recruit = 0;
+    if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
+      rules_recruit |= RECRUIT_MERGE;
+    }
+    if (get_param_int(global.parameters, "recruit.classic", 1)) {
+      rules_recruit |= RECRUIT_CLASSIC;
+    }
+    if (get_param_int(global.parameters, "recruit.archetype", 0)) {
+      rules_recruit |= RECRUIT_ARCHETYPES;
+    }
+  }
 
   init_tokens(ord);
   skip_token();
@@ -1081,7 +1123,7 @@ recruit_archetype(unit * u, order * ord)
     const archetype * arch = find_archetype(s, u->faction->locale);
     attrib * a = NULL;
 
-    if (u->number>0) {
+    if ((rules_recruit&RECRUIT_MERGE)==0 && merge) {
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_new", ""));
       /* TODO: error message */
       return 0;
@@ -1146,15 +1188,29 @@ recruit_archetype(unit * u, order * ord)
 
     n = build(u, arch->ctype, 0, n);
     if (n>0) {
-      set_number(u, n);
-      equip_unit(u, arch->equip);
-      u->hp = n * unit_max_hp(u);
-      if (arch->size) {
-        if (a==NULL) a = a_add(&u->building->attribs, a_new(&at_recruit));
-        a->data.i += n*arch->size;
+      unit * u2;
+      if (merge) {
+        u2 = create_unit(u->region, u->faction, 0, u->race, 0, 0, u);
+      } else {
+        u2 = u;
+      }
+      if (arch->exec) {
+        n = arch->exec(u2, arch, n);
+      }
+      else {
+        set_number(u2, n);
+        equip_unit(u2, arch->equip);
+        u2->hp = n * unit_max_hp(u2);
+        if (arch->size) {
+          if (a==NULL) a = a_add(&u->building->attribs, a_new(&at_recruit));
+          a->data.i += n*arch->size;
+        }
       }
       ADDMSG(&u->faction->msgs, msg_message("recruit_archetype", 
         "unit amount archetype", u, n, arch->name[n==1]));
+      if (u!=u2 && u->race==u2->race) {
+        transfermen(u2, u, u2->number);
+      }
       return n;
     } else switch(n) {
       case ENOMATERIALS:
@@ -1173,24 +1229,20 @@ recruit_archetype(unit * u, order * ord)
   return -1;
 }
 
-int
-recruit_classic(void)
+static void recruit_init(void)
 {
-  static int value = -1;
-  if (value<0) {
-    value = get_param_int(global.parameters, "recruit.classic", 1);
+  if (rules_recruit<0) {
+    rules_recruit = 0;
+    if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
+      rules_recruit |= RECRUIT_MERGE;
+    }
   }
-  return value;
 }
 
-int
-recruit_archetypes(void)
+int recruit_archetypes(void)
 {
-  static int value = -1;
-  if (value<0) {
-    value = get_param_int(global.parameters, "recruit.archetypes", 0);
-  }
-  return value;
+  if (rules_recruit<0) recruit_init();
+  return (rules_recruit&RECRUIT_ARCHETYPES)!=0;
 }
 
 void
@@ -1232,22 +1284,23 @@ economics(region *r)
   }
   /* RECRUIT orders */
 
+  if (rules_recruit<0) recruit_init();
   for (u = r->units; u; u = u->next) {
     order * ord;
-    if (!recruit_classic()) {
-      if (u->number>0) continue;
-    }
-    for (ord = u->orders; ord; ord = ord->next) {
-      if (get_keyword(ord) == K_RECRUIT) {
-        if (recruit_archetypes()) {
-          if (recruit_archetype(u, ord)>=0) {
-            continue;
+
+    if ((rules_recruit&RECRUIT_MERGE) || u->number==0) {
+      for (ord = u->orders; ord; ord = ord->next) {
+        if (get_keyword(ord) == K_RECRUIT) {
+          if (rules_recruit&RECRUIT_ARCHETYPES) {
+            if (recruit_archetype(u, ord)>=0) {
+              continue;
+            }
           }
+          if (rules_recruit&RECRUIT_CLASSIC) {
+            recruit(u, ord, &recruitorders);
+          }
+          break;
         }
-        if (recruit_classic()) {
-          recruit(u, ord, &recruitorders);
-        }
-        break;
       }
     }
   }
@@ -3147,8 +3200,9 @@ peasant_taxes(region * r)
   building * b;
   int money;
   int maxsize;
+  int morale;
  
-  f = get_region_owner(r);
+  f = region_get_owner(r);
   if (f==NULL) return;
 
   money = rmoney(r);
@@ -3161,8 +3215,9 @@ peasant_taxes(region * r)
   if (u==NULL || u->faction!=f) return;
 
   maxsize = buildingeffsize(b, false);
-  if (maxsize > r->land->morale) {
-    maxsize = r->land->morale;
+  morale = region_get_morale(r);
+  if (maxsize > morale) {
+    maxsize = morale;
   }
 
   if (maxsize>0) {

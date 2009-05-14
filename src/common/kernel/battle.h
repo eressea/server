@@ -231,17 +231,20 @@ extern "C" {
 
   extern void do_battle(struct region * r);
 
-  /* for combar spells and special attacks */
+  /* for combat spells and special attacks */
   enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
+  enum { ALLY_SELF, ALLY_ANY };
 
   extern troop select_enemy(struct fighter * af, int minrow, int maxrow, int select);
+  extern troop select_ally(struct fighter * af, int minrow, int maxrow, int allytype);
+
   extern int count_enemies(struct battle * b, const struct fighter * af, int minrow, int maxrow, int select);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
   extern void message_all(battle * b, struct message * m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
   extern struct cvector * fighters(struct battle *b, const struct side * vs, int minrow, int maxrow, int mask);
-  extern int count_allies(const struct side * as, int minrow, int maxrow, int select);
+  extern int count_allies(const struct side * as, int minrow, int maxrow, int select, int allytype);
   extern int get_unitrow(const struct fighter * af, const struct side * vs);
   extern boolean helping(const struct side * as, const struct side * ds);
   extern void rmfighter(fighter *df, int i);

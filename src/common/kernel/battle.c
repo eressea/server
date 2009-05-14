@@ -117,10 +117,15 @@ const troop no_troop = {0, 0};
 
 static int max_turns = 0;
 static int damage_rules = 0;
+static int loot_rules = 0;
 static int skill_formula = 0;
 
 #define FORMULA_ORIG 0
 #define FORMULA_NEW 1
+
+#define LOOT_MONSTERS      (1<<0)
+#define LOOT_SELF          (1<<1) /* code is mutually exclusive with LOOT_OTHERS */
+#define LOOT_OTHERS        (1<<2)
 
 #define DAMAGE_CRITICAL      (1<<0)
 #define DAMAGE_MELEE_BONUS   (1<<1)
@@ -132,6 +137,7 @@ static int skill_formula = 0;
 static void
 static_rules(void)
 {
+  loot_rules = get_param_int(global.parameters, "rules.combat.loot", LOOT_MONSTERS|LOOT_OTHERS);
   /* new formula to calculate to-hit-chance */
   skill_formula = get_param_int(global.parameters, "rules.combat.skill_formula", FORMULA_ORIG);
   /* maximum number of combat turns */
@@ -1279,16 +1285,17 @@ count_side(const side * s, const side * vs, int minrow, int maxrow, int select)
 * troops that are still alive, not those that are still fighting although
 * dead. */
 int
-count_allies(const side * as, int minrow, int maxrow, int select)
+count_allies(const side * as, int minrow, int maxrow, int select, int allytype)
 {
   battle *b = as->battle;
-  side *s;
+  side *ds;
   int count = 0;
 
-  for (s=b->sides;s!=b->sides+b->nsides;++s) {
-    if (!helping(as, s)) continue;
-    count += count_side(s, NULL, minrow, maxrow, select);
-    if (count>0 && (select&SELECT_FIND)) break;
+  for (ds=b->sides;ds!=b->sides+b->nsides;++ds) {
+    if ((allytype==ALLY_ANY && helping(as, ds)) || (allytype==ALLY_SELF && as->faction==ds->faction)) {
+      count += count_side(ds, NULL, minrow, maxrow, select);
+      if (count>0 && (select&SELECT_FIND)) break;
+    }
   }
   return count;
 }
@@ -1933,12 +1940,14 @@ attacks_per_round(troop t)
   return t.fighter->person[t.index].speed;
 }
 
-
-#define HERO_SPEED 10
 static void
 make_heroes(battle * b)
 {
   side * s;
+  static int hero_speed = 0;
+  if (hero_speed==0) {
+    hero_speed = get_param_int(global.parameters, "rules.combat.herospeed", 10);
+  }
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter * fig;
     for (fig=s->fighters;fig;fig=fig->next) {
@@ -1947,7 +1956,7 @@ make_heroes(battle * b)
         int i;
         assert(playerrace(u->race));
         for (i=0;i!=u->number;++i) {
-          fig->person[i].speed += (HERO_SPEED-1);
+          fig->person[i].speed += (hero_speed-1);
         }
       }
     }
@@ -2252,7 +2261,42 @@ make_side(battle * b, const faction * f, const group * g, unsigned int flags, co
   return s1;
 }
 
-void
+troop
+select_ally(fighter * af, int minrow, int maxrow, int allytype)
+{
+  side *as = af->side;
+  battle *b = as->battle;
+  side * ds;
+  int allies = count_allies(as, minrow, maxrow, SELECT_ADVANCE, allytype);
+
+  if (!allies) {
+    return no_troop;
+  }
+  allies = rng_int() % allies;
+
+  for (ds=b->sides;ds!=b->sides+b->nsides;++ds) {
+    if ((allytype==ALLY_ANY && helping(as, ds)) || (allytype==ALLY_SELF && as->faction==ds->faction)) {
+      fighter * df;
+      for (df=ds->fighters; df; df=df->next) {
+        int dr = get_unitrow(df, NULL);
+        if (dr >= minrow && dr <= maxrow) {
+          if (df->alive - df->removed > allies) {
+            troop dt;
+            assert(allies>=0);
+            dt.index = allies;
+            dt.fighter = df;
+            return dt;
+          }
+          allies -= df->alive;
+        }
+      }
+    }
+  }
+  assert(!"we should never have gotten here");
+  return no_troop;
+}
+
+static void
 loot_items(fighter * corpse)
 {
   unit * u = corpse->unit;
@@ -2271,26 +2315,54 @@ loot_items(fighter * corpse)
         int loot = maxloot/i;
 
         if (loot>0) {
-          int maxrow = BEHIND_ROW;
-          int lootchance = 50 + b->keeploot;
+          fighter *fig = NULL;
+          int looting = 0;
+          int maxrow = 0;
 
-          if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) maxrow = LAST_ROW;
           itm->number -= loot;
           maxloot -= loot;
 
-          if (maxrow == LAST_ROW || rng_int() % 100 < lootchance) {
-            fighter *fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
-            if (fig) {
-              item * l = fig->loot;
-              while (l && l->type!=itm->type) l=l->next;
-              if (!l) {
-                l = calloc(sizeof(item), 1);
-                l->next = fig->loot;
-                fig->loot = l;
-                l->type = itm->type;
+          if (is_monsters(u->faction) && (loot_rules & LOOT_MONSTERS)) {
+            looting = 1;
+          } else if (loot_rules&LOOT_OTHERS) {
+            looting = 1;
+          } else if (loot_rules&LOOT_SELF) {
+            looting = 2;
+          }
+          if (looting) {
+            if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) {
+              maxrow = LAST_ROW;
+            } else {
+              int lootchance = 50 + b->keeploot;
+              if (rng_int() % 100 < lootchance) {
+                maxrow = BEHIND_ROW;
               }
-              l->number += loot;
             }
+          }
+          if (maxrow>0) {
+            if (looting==1) {
+              fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
+            } else if (looting==2) {
+              fig = select_ally(corpse, FIGHT_ROW, LAST_ROW, ALLY_SELF).fighter;
+            } else if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) {
+              /* we absolutely, positively must have somebody loot this thing */
+              fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
+              if (!fig) {
+                fig = select_ally(corpse, FIGHT_ROW, LAST_ROW, ALLY_SELF).fighter;
+              }
+            }
+          }
+
+          if (fig) {
+            item * l = fig->loot;
+            while (l && l->type!=itm->type) l=l->next;
+            if (!l) {
+              l = calloc(sizeof(item), 1);
+              l->next = fig->loot;
+              fig->loot = l;
+              l->type = itm->type;
+            }
+            l->number += loot;
           }
         }
       }

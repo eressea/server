@@ -60,6 +60,7 @@
 #define NOZEROIDS_VERSION 330 /* zero is not a valid ID for anything (including factions) */
 #define NOBORDERATTRIBS_VERSION 331 /* border::attribs has been moved to userdata */
 #define UIDHASH_VERSION 332 /* borders use the region.uid to store */
+#define REGIONOWNER_VERSION 333 /* regions have owners and morale */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION UIDHASH_VERSION /* current datafile */
+#define RELEASE_VERSION REGIONOWNER_VERSION /* current datafile */

@@ -588,6 +588,31 @@ write_items(struct storage * store, item *ilist)
   store->w_tok(store, "end");
 }
 
+static void
+write_owner(struct storage * store, region_owner *owner)
+{
+  if (owner) {
+    store->w_int(store, owner->since_turn);
+    write_faction_reference(owner->owner, store);
+  } else {
+    store->w_int(store, -1);
+  }
+}
+
+static void
+read_owner(struct storage * store, region_owner **powner)
+{
+  int since_turn = store->r_int(store);
+  if (since_turn>=0) {
+    region_owner * owner = malloc(sizeof(region_owner));
+    owner->since_turn = since_turn;
+    read_reference(&owner->owner, store, read_faction_reference, resolve_faction);
+    *powner = owner;
+  } else {
+    *powner = 0;
+  }
+}
+
 int
 lastturn(void)
 {
@@ -990,6 +1015,10 @@ readregion(struct storage * store, short x, short y)
     if (store->version>=REGIONITEMS_VERSION) {
       read_items(store, &r->land->items);
     }
+    if (store->version>=REGIONOWNER_VERSION) {
+      r->land->morale = (short)store->r_int(store);
+      read_owner(store, &r->land->ownership);
+    }
   }
   a_read(store, &r->attribs);
 
@@ -1045,6 +1074,11 @@ writeregion(struct storage * store, const region * r)
     store->w_tok(store, "end");
 #if RELEASE_VERSION>=REGIONITEMS_VERSION
     write_items(store, r->land->items);
+    store->w_brk(store);
+#endif
+#if RELEASE_VERSION>=REGIONOWNER_VERSION
+    store->w_int(store, r->land->morale);
+    write_owner(store, r->land->ownership);
     store->w_brk(store);
 #endif
   }

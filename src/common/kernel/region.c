@@ -1326,7 +1326,7 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 }
 
 struct faction *
-get_region_owner(const struct region * r)
+region_get_owner(const struct region * r)
 {
   if (r->land && r->land->ownership) {
     return r->land->ownership->owner;
@@ -1335,7 +1335,7 @@ get_region_owner(const struct region * r)
 }
 
 void
-set_region_owner(struct region * r, struct faction * owner, int turn)
+region_set_owner(struct region * r, struct faction * owner, int turn)
 {
   if (r->land && r->land->ownership) {
     r->land->ownership->owner = owner;
@@ -1370,4 +1370,9 @@ region_getname(const region * r) {
     return r->land->name;
   }
   return "";
+}
+
+int region_get_morale(const region * r)
+{
+  return r->land->morale;
 }

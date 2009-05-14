@@ -50,44 +50,47 @@ typedef struct att {
 	int flags;
 } att;
 
+struct param;
+
 typedef struct race {
-	const char *_name[4]; /* neu: name[4]völker */
-	float magres;
-	float maxaura; /* Faktor auf Maximale Aura */
-	float regaura; /* Faktor auf Regeneration */
-	int recruitcost;
-	int maintenance;
-	int splitsize;
-	int weight;
-	int capacity;
-	float speed;
+  struct param * parameters;
+  const char *_name[4]; /* neu: name[4]völker */
+  float magres;
+  float maxaura; /* Faktor auf Maximale Aura */
+  float regaura; /* Faktor auf Regeneration */
+  int recruitcost;
+  int maintenance;
+  int splitsize;
+  int weight;
+  int capacity;
+  float speed;
   float aggression; /* chance that a monster will attack */
-	int hitpoints;
-	const char *def_damage;
-	char armor;
-	char at_default; /* Angriffsskill Unbewaffnet (default: -2)*/
-	char df_default; /* Verteidigungsskill Unbewaffnet (default: -2)*/
-	char at_bonus;   /* Verändert den Angriffsskill (default: 0)*/
-	char df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
-	const spell * precombatspell;
-	struct att attack[10];
-	char bonus[MAXSKILLS];
-	boolean __remove_me_nonplayer;
-	int flags;
-	int battle_flags;
-	int ec_flags;
-	race_t oldfamiliars[MAXMAGIETYP];
+  int hitpoints;
+  const char *def_damage;
+  char armor;
+  char at_default; /* Angriffsskill Unbewaffnet (default: -2)*/
+  char df_default; /* Verteidigungsskill Unbewaffnet (default: -2)*/
+  char at_bonus;   /* Verändert den Angriffsskill (default: 0)*/
+  char df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
+  const spell * precombatspell;
+  struct att attack[10];
+  char bonus[MAXSKILLS];
+  boolean __remove_me_nonplayer;
+  int flags;
+  int battle_flags;
+  int ec_flags;
+  race_t oldfamiliars[MAXMAGIETYP];
 
-	const char *(*generate_name) (const struct unit *);
-	const char *(*describe) (const struct unit *, const struct locale *);
-	void (*age)(struct unit *u);
-	boolean (*move_allowed)(const struct region *, const struct region *);
-	struct item * (*itemdrop)(const struct race *, int size);
-	void (*init_familiar)(struct unit *);
+  const char *(*generate_name) (const struct unit *);
+  const char *(*describe) (const struct unit *, const struct locale *);
+  void (*age)(struct unit *u);
+  boolean (*move_allowed)(const struct region *, const struct region *);
+  struct item * (*itemdrop)(const struct race *, int size);
+  void (*init_familiar)(struct unit *);
 
-	const struct race * familiars[MAXMAGIETYP];
-	struct attrib * attribs;
-	struct race * next;
+  const struct race * familiars[MAXMAGIETYP];
+  struct attrib * attribs;
+  struct race * next;
 } race;
 
 typedef struct race_list {

@@ -293,7 +293,7 @@ parse_buildings(xmlDocPtr doc)
           }
           assert(propValue!=NULL);
           if (strcmp((const char*)propValue, "name")==0) {
-            btype->name = (const char * (*)(const struct building_type*, int size))fun;
+            btype->name = (const char * (*)(const struct building_type*, int))fun;
           } else if (strcmp((const char*)propValue, "init")==0) {
             btype->init = (void (*)(struct building_type*))fun;
           } else {
@@ -1487,6 +1487,28 @@ parse_spells(xmlDocPtr doc)
   return 0;
 }
 
+static void
+parse_param(struct param ** params, xmlNodePtr node) 
+{
+  xmlChar * propName = xmlGetProp(node, BAD_CAST "name");
+  xmlChar * propValue = xmlGetProp(node, BAD_CAST "value");
+
+  set_param(params, (const char*)propName, (const char*)propValue);
+
+  xmlFree(propName);
+  xmlFree(propValue);
+}
+
+static void
+parse_ai(race * rc, xmlNodePtr node) 
+{
+  rc->splitsize = xml_ivalue(node, "splitsize", 0);
+  rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
+  if (xml_bvalue(node, "killpeasants", false)) rc->flags |= RCF_KILLPEASANTS;
+  if (xml_bvalue(node, "moverandom", false)) rc->flags |= RCF_MOVERANDOM;
+  if (xml_bvalue(node, "learn", false)) rc->flags |= RCF_LEARN;
+}
+
 static int
 parse_races(xmlDocPtr doc)
 {
@@ -1500,6 +1522,7 @@ parse_races(xmlDocPtr doc)
   nodes = races->nodesetval;
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
+    xmlNodePtr child;
     xmlChar * propValue;
     race * rc;
     xmlXPathObjectPtr result;
@@ -1573,19 +1596,13 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "resistpierce", false)) rc->battle_flags |= BF_RES_PIERCE;
     if (xml_bvalue(node, "canattack", true)) rc->battle_flags |= BF_CANATTACK;
 
-    /* reading eressea/races/race/ai */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "ai", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-
-      rc->splitsize = xml_ivalue(node, "splitsize", 0);
-      rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
-      if (xml_bvalue(node, "killpeasants", false)) rc->flags |= RCF_KILLPEASANTS;
-      if (xml_bvalue(node, "moverandom", false)) rc->flags |= RCF_MOVERANDOM;
-      if (xml_bvalue(node, "learn", false)) rc->flags |= RCF_LEARN;
+    for (child=node->children;child;child=child->next) {
+      if (strcmp((const char *)child->name, "ai")==0) {
+        parse_ai(rc, child);
+      } else if (strcmp((const char *)child->name, "param")==0) {
+        parse_param(&rc->parameters, child);
+      }
     }
-    xmlXPathFreeObject(result);
 
     /* reading eressea/races/race/skill */
     xpath->node = node;
@@ -2043,13 +2060,7 @@ parse_main(xmlDocPtr doc)
     nodes = result->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-      xmlChar * propName = xmlGetProp(node, BAD_CAST "name");
-      xmlChar * propValue = xmlGetProp(node, BAD_CAST "value");
-
-      set_param(&global.parameters, (const char*)propName, (const char*)propValue);
-
-      xmlFree(propName);
-      xmlFree(propValue);
+      parse_param(&global.parameters, node);
     }
 
     xmlXPathFreeObject(result);

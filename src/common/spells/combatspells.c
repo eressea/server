@@ -385,41 +385,6 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
 }
 
 
-static troop
-select_ally(fighter * af, int minrow, int maxrow)
-{
-  side *as = af->side;
-  battle *b = as->battle;
-  side * ds;
-  int allies = count_allies(as, minrow, maxrow, SELECT_ADVANCE);
-
-  if (!allies) {
-    return no_troop;
-  }
-  allies = rng_int() % allies;
-
-  for (ds=b->sides;ds!=b->sides+b->nsides;++ds) {
-    if (helping(as, ds)) {
-      fighter * df;
-      for (df=ds->fighters; df; df=df->next) {
-        int dr = get_unitrow(df, NULL);
-        if (dr >= minrow && dr <= maxrow) {
-          if (df->alive - df->removed > allies) {
-            troop dt;
-            assert(allies>=0);
-            dt.index = allies;
-            dt.fighter = df;
-            return dt;
-          }
-          allies -= df->alive;
-        }
-      }
-    }
-  }
-  assert(!"we should never have gotten here");
-  return no_troop;
-}
-
 int
 sp_speed(fighter * fi, int level, double power, spell * sp)
 {
@@ -431,13 +396,13 @@ sp_speed(fighter * fi, int level, double power, spell * sp)
 
   force = lovar(power * power * 5);
 
-  allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+  allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
   /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
    * die Gefahr eine Endlosschleife*/
   allies *= 2;
 
   while (force && allies) {
-    troop dt = select_ally(fi, FIGHT_ROW, BEHIND_ROW);
+    troop dt = select_ally(fi, FIGHT_ROW, BEHIND_ROW, ALLY_ANY);
     fighter *df = dt.fighter;
     --allies;
 
@@ -1074,13 +1039,13 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
       force = MAX(1, (int)power);
   }
 
-  allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+  allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
   /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
    * die Gefahr eine Endlosschleife*/
   allies *= 2;
 
   while (force && allies) {
-    troop dt = select_ally(fi, FIGHT_ROW, BEHIND_ROW);
+    troop dt = select_ally(fi, FIGHT_ROW, BEHIND_ROW, ALLY_ANY);
     fighter *df = dt.fighter;
     --allies;
 
@@ -1126,13 +1091,13 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
       force = (int)power;
   }
 
-  allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
+  allies = count_allies(fi->side, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE, ALLY_ANY);
   /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestände
    * die Gefahr eine Endlosschleife*/
   allies *= 2;
 
   while (force && allies) {
-    troop dt = select_ally(fi, FIGHT_ROW, BEHIND_ROW-1);
+    troop dt = select_ally(fi, FIGHT_ROW, BEHIND_ROW-1, ALLY_ANY);
     fighter *df = dt.fighter;
     --allies;
 

@@ -13,6 +13,7 @@
 #include <util/umlaut.h>
 #include <util/language.h>
 #include <util/xml.h>
+#include <util/functions.h>
 
 /* libxml includes */
 #include <libxml/tree.h>
@@ -83,6 +84,7 @@ parse_archetypes(xmlDocPtr doc)
     int i;
     for (i=0;i!=nodes->nodeNr;++i) {
       xmlNodePtr node = nodes->nodeTab[i];
+      xmlNodePtr child;
       archetype * arch = calloc(1, sizeof(archetype));
       xmlXPathObjectPtr sub;
 
@@ -109,6 +111,18 @@ parse_archetypes(xmlDocPtr doc)
 
       arch->size = xml_ivalue(node, "cost", 0);
 
+      for (child=node->children;child;child=child->next) {
+        if (strcmp((const char *)child->name, "function")==0) {
+          xmlChar * propName = xmlGetProp(child, BAD_CAST "name");
+          xmlChar * propValue = xmlGetProp(child, BAD_CAST "value");
+          if (strcmp((const char *)propName, "create")) {
+            pf_generic foo = get_function((const char *)propValue);
+            arch->exec = (archetype_function)foo;
+          }
+          xmlFree(propValue);
+          xmlFree(propName);
+        }
+      }
       xpath->node = node;
       sub = xmlXPathEvalExpression(BAD_CAST "allow|deny", xpath);
       if (sub->nodesetval && sub->nodesetval->nodeNr) {
