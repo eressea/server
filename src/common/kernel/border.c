@@ -259,7 +259,12 @@ age_borders(void)
       border * b = bhash;
       for (;b;b=b->next) {
         if (b->type->age) {
-          b->type->age(b);
+          if (b->type->age(b)==AT_AGE_REMOVE) {
+            border_list * kill = malloc(sizeof(border_list));
+            kill->data = b;
+            kill->next = deleted;
+            deleted = kill;
+          }
         }
       }
     }
