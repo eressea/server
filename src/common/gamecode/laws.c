@@ -1242,6 +1242,8 @@ ally_cmd(unit * u, struct order * ord)
     break;
   }
 
+  sf->status &= HelpMask();
+
   if (sf->status == 0) {    /* Alle HELPs geloescht */
     removelist(sfp, sf);
   }

@@ -1096,6 +1096,7 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 #ifndef REGIONOWNERS
   state &= ~HELP_TRAVEL;
 #endif
+  state &= HelpMask();
 
   if (state==0) return sfp;
 

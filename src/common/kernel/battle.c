@@ -12,6 +12,8 @@
  * prior permission by the authors of Eressea.
  */
 
+#pragma region includes
+
 #include <config.h>
 #include <kernel/eressea.h>
 #include "battle.h"
@@ -66,6 +68,8 @@
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
+
+#pragma endregion
 
 static FILE *bdebug;
 

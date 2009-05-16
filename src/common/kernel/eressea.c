@@ -132,16 +132,16 @@ MaxAge(void) {
   return value;
 }
 
-
 static int
 ally_flag(const char * s)
 {
-  if (strcmp(s, "money")==0) return HELP_MONEY;
-  if (strcmp(s, "fight")==0) return HELP_FIGHT;
-  if (strcmp(s, "give")==0) return HELP_GIVE;
-  if (strcmp(s, "guard")==0) return HELP_GUARD;
-  if (strcmp(s, "stealth")==0) return HELP_FSTEALTH;
-  if (strcmp(s, "travel")==0) return HELP_TRAVEL;
+  int help_mask = HelpMask();
+  if ((help_mask&HELP_MONEY) && strcmp(s, "money")==0) return HELP_MONEY;
+  if ((help_mask&HELP_FIGHT) && strcmp(s, "fight")==0) return HELP_FIGHT;
+  if ((help_mask&HELP_GIVE) && strcmp(s, "give")==0) return HELP_GIVE;
+  if ((help_mask&HELP_GUARD) && strcmp(s, "guard")==0) return HELP_GUARD;
+  if ((help_mask&HELP_FSTEALTH) && strcmp(s, "stealth")==0) return HELP_FSTEALTH;
+  if ((help_mask&HELP_TRAVEL) && strcmp(s, "travel")==0) return HELP_TRAVEL;
   return 0;
 }
 
@@ -173,6 +173,17 @@ AllianceAuto(void)
     }
   }
   return value;
+}
+
+int
+HelpMask(void)
+{
+  static int help_mask = 0;
+
+  if (help_mask==0) {
+    help_mask = get_param_int(global.parameters, "rules.help.mask", HELP_ALL);
+  }
+  return help_mask;
 }
 
 int
