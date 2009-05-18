@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<strings>
+  <!--
+    _d: dativ (wir erklären allen /Trollen/ den Krieg)
+    _p: plural (13 /Trolle/)
+    _x: preposition (15 /Troll/schwerter)
+    _a: including article (ein Troll, a troll)
+   -->
+  <!--Fort-Ausbaustufen -->
+  <string name="guardhouse">
+    <text locale="de">Wachstube</text>
+    <text locale="en">guard house</text>
+  </string>
+  <string name="guardtower">
+    <text locale="de">Wachturm</text>
+    <text locale="en">guard tower</text>
+  </string>
+  <string name="watch">
+    <text locale="de">Wache</text>
+    <text locale="en">watch</text>
+  </string>
+</string>

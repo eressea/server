@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<resources>
+  <!-- this file contains a lot of weapons -->
+  <resource name="halberd">
+    <item weight="200">
+      <construction skill="weaponsmithing" minskill="3" reqsize="1">
+        <requirement type="log" quantity="2"/>
+        <requirement type="iron" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="polearm" offmod="-1" defmod="2" magres="0.0" horse="false">
+        <damage type="rider" value="2d6+3"/>
+        <damage type="footman" value="2d6+3"/>
+        <modifier type="skill" value="1" walking="true" against_riding="true" defensive="true"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="rustyhalberd">
+    <item weight="200" score="20">
+      <construction skill="weaponsmithing" minskill="3" reqsize="1">
+        <requirement type="iron" quantity="1"/>
+        <requirement type="log" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="polearm" offmod="-2" defmod="-1" horse="false">
+        <damage type="rider" value="2d6"/>
+        <damage type="footman" value="2d6"/>
+      </weapon>
+    </item>
+  </resource>
+
+</resources>
