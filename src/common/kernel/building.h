@@ -43,6 +43,7 @@ typedef struct maintenance {
 #define BTF_MAGIC          0x40 /* magical effect */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
+#define BTF_TAXES         0x200 /* automatic taxes */
 
 typedef struct building_type {
 	const char * _name;

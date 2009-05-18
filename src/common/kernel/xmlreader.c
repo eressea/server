@@ -269,6 +269,7 @@ parse_buildings(xmlDocPtr doc)
       if (xml_bvalue(node, "decay", false)) btype->flags |= BTF_DECAY;
       if (xml_bvalue(node, "magic", false)) btype->flags |= BTF_MAGIC;
       if (xml_bvalue(node, "protection", false)) btype->flags |= BTF_PROTECTION;
+      if (xml_bvalue(node, "taxes", false)) btype->flags |= BTF_TAXES;
 
       /* reading eressea/buildings/building/construction */
       xpath->node = node;
@@ -645,6 +646,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   if (xml_bvalue(node, "cut", false)) flags |= WTF_CUT;
   if (xml_bvalue(node, "blunt", false)) flags |= WTF_BLUNT;
   if (xml_bvalue(node, "siege", false)) flags |= WTF_SIEGE;
+  if (xml_bvalue(node, "horse", (flags&WTF_MISSILE)==0)) flags |= WTF_HORSEBONUS;
 
   propValue = xmlGetProp(node, BAD_CAST "skill");
   assert(propValue!=NULL);
@@ -1579,6 +1581,7 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "illusionary", false)) rc->flags |= RCF_ILLUSIONARY;
     if (xml_bvalue(node, "undead", false)) rc->flags |= RCF_UNDEAD;
     if (xml_bvalue(node, "dragon", false)) rc->flags |= RCF_DRAGON;
+    if (xml_bvalue(node, "shipspeed", false)) rc->flags |= RCF_SHIPSPEED;
 
     if (xml_bvalue(node, "giveitem", false)) rc->ec_flags |= GIVEITEM;
     if (xml_bvalue(node, "giveperson", false)) rc->ec_flags |= GIVEPERSON;

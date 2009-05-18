@@ -188,14 +188,15 @@ typedef struct armor_type {
   unsigned int flags;
 } armor_type;
 
-#define WTF_NONE         0x00
-#define WTF_MISSILE      0x01
-#define WTF_MAGICAL      0x02
-#define WTF_PIERCE       0x04
-#define WTF_CUT          0x08
-#define WTF_BLUNT        0x10
-#define WTF_SIEGE        0x20
+#define WTF_NONE          0x00
+#define WTF_MISSILE       0x01
+#define WTF_MAGICAL       0x02
+#define WTF_PIERCE        0x04
+#define WTF_CUT           0x08
+#define WTF_BLUNT         0x10
+#define WTF_SIEGE         0x20
 #define WTF_ARMORPIERCING 0x40 /* armor has only half value */
+#define WTF_HORSEBONUS    0x80
 
 typedef struct weapon_type {
   const item_type * itype;

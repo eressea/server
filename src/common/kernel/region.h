@@ -62,7 +62,9 @@ struct rawmaterial;
 struct donation;
 struct item;
 
-#define MORALE_DEFAULT 2 /* Morale of peasants that have no lord */
+#define MORALE_MAX 4 /* Maximum morale allowed */
+#define MORALE_DEFAULT 2 /* Morale of peasants when they are conquered for the first time */
+#define MORALE_TAKEOVER 0 /* Morale of peasants after they lose their lord */
 
 typedef struct region_owner {
   struct faction * owner;

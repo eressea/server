@@ -746,7 +746,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
   }
 
   /* Burgenbonus, Pferdebonus */
-  if (is_riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
+  if (is_riding(t) && (wtype==NULL || (fval(wtype, WTF_HORSEBONUS) && !fval(wtype, WTF_MISSILE)))) {
     skill += 2;
     if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
   }

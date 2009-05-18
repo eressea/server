@@ -154,7 +154,10 @@ ExpensiveMigrants(void)
   }
   return value;
 }
-
+/** Specifies automatic alliance modes.
+ * If this returns a value then the bits set are immutable between alliance
+ * partners (faction::alliance) and cannot be changed with the HELP command.
+ */
 int
 AllianceAuto(void)
 {
@@ -172,20 +175,41 @@ AllianceAuto(void)
       free(sstr);
     }
   }
-  return value;
+  return value | ~HelpMask();
 }
 
+/** Limits the available help modes
+ * The bitfield returned by this function specifies the available help modes
+ * in this game (so you can, for example, disable HELP GIVE globally).
+ * Disabling a status will disable the command sequence entirely (order parsing
+ * uses this function).
+ */
 int
 HelpMask(void)
 {
-  static int help_mask = 0;
-
-  if (help_mask==0) {
-    help_mask = get_param_int(global.parameters, "rules.help.mask", HELP_ALL);
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "rules.help.mask");
+    value = 0;
+    if (str!=NULL) {
+      char * sstr = strdup(str);
+      char * tok = strtok(sstr, " ");
+      while (tok) {
+        value |= ally_flag(tok);
+        tok = strtok(NULL, " ");
+      }
+      free(sstr);
+    } else {
+      value = HELP_ALL;
+    }
   }
-  return help_mask;
+  return value;
 }
 
+/** specifies modes that are restricted to members of the same alliance.
+ * if this returns a non-zero value, then you cannot give those modes to a
+ * faction unless they are in the same alliance.
+ */
 int
 AllianceRestricted(void)
 {
@@ -593,6 +617,20 @@ int verbosity = 0;
 
 FILE *debug;
 
+static int
+ShipSpeedBonus(const unit * u)
+{
+  static int level = -1;
+  if (level==-1) {
+    level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
+  }
+  if (level>0) {
+    int skl = effskill(u, SK_SAILING);
+    return skl/level;
+  }
+  return 0;
+}
+
 int
 shipspeed(const ship * sh, const unit * u)
 {
@@ -619,10 +657,12 @@ shipspeed(const ship * sh, const unit * u)
 
   if (u->faction->race == u->race) {
     /* race bonus for this faction? */
-    if (u->race == new_race[RC_AQUARIAN]) {
+    if (fval(u->race, RCF_SHIPSPEED)) {
       k += 1;
     }
   }
+
+  k += ShipSpeedBonus(u);
 
   a = a_find(sh->attribs, &at_speedup);
   while (a != NULL && a->type==&at_speedup) {
@@ -837,9 +877,11 @@ static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
   static boolean init = false;
+  static int automode;
   if (!init) {
     init_gms();
     init = true;
+    automode = ~HelpMask();
   }
   if (pl && (pl->flags & PFL_FRIENDLY)) return HELP_ALL;
   /* if f2 is a gm in this plane, everyone has an auto-help to it */
@@ -857,7 +899,7 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
     if (sf->alliance==f2->alliance) return AllianceAuto();
   }
 
-  return 0;
+  return automode;
 }
 
 static int
@@ -1641,11 +1683,10 @@ cstring(const char *s)
 }
 
 building *
-largestbuilding (const region * r, boolean imaginary)
+largestbuilding (const region * r, boolean (*eval)(const struct building *), boolean imaginary)
 {
   static const building_type * btype = NULL;
   building *b, *best = NULL;
-  if (!btype) btype = bt_find("castle"); /* TODO: parameter der funktion? */
   /* durch die verw. von '>' statt '>=' werden die aelteren burgen
    * bevorzugt. */
 
@@ -1654,7 +1695,7 @@ largestbuilding (const region * r, boolean imaginary)
       if (imaginary) {
         const attrib * a = a_find(b->attribs, &at_icastle);
         if (!a) continue;
-        if (a->data.v != btype) continue;
+        if (eval && !eval(b)) continue;
       } else continue;
     }
     if (best==NULL || b->size > best->size)
@@ -2548,10 +2589,26 @@ static const int wagetable[7][4] = {
   {15, 13, 16,  2}      /* Zitadelle */
 };
 
+boolean
+is_castle(const struct building * b)
+{
+  static const struct building_type * bt_castle;
+  if (!bt_castle) bt_castle = bt_find("castle");
+  return (b->type==bt_castle);
+}
+
+boolean is_tax_building(const building * b)
+{
+  if (b->type->flags&BTF_TAXES) {
+    return true;
+  }
+  return false;
+}
+
 static int
 default_wage(const region *r, const faction * f, const race * rc)
 {
-  building *b = largestbuilding(r, false);
+  building *b = largestbuilding(r, &is_castle, false);
   int      esize = 0;
   curse * c;
   int      wage;

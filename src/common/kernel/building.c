@@ -266,24 +266,44 @@ init_smithy(struct building_type * bt)
 static const char *
 castle_name(const struct building_type* btype, int bsize)
 {
-	const char * fname[MAXBUILDINGS] = {
-	  "site",
-		"tradepost",
-	  "fortification",
-	  "tower",
-	  "castle",
-	  "fortress",
-	  "citadel" };
-	const construction * ctype;
-	int i = 0;
+  const char * fname[MAXBUILDINGS] = {
+    "site",
+    "tradepost",
+    "fortification",
+    "tower",
+    "castle",
+    "fortress",
+    "citadel"
+  };
+  const construction * ctype;
+  int i = 0;
 
-	ctype = btype->construction;
-	while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
-		bsize-=ctype->maxsize;
-		ctype=ctype->improvement;
-		++i;
-	}
-	return fname[i];
+  ctype = btype->construction;
+  while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
+    bsize-=ctype->maxsize;
+    ctype=ctype->improvement;
+    ++i;
+  }
+  return fname[i];
+}
+
+static const char *
+fort_name(const struct building_type* btype, int bsize)
+{
+  const char * fname[MAXBUILDINGS] = {
+    "guardhouse",
+    "guardtower",
+  };
+  const construction * ctype;
+  int i = 0;
+
+  ctype = btype->construction;
+  while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
+    bsize-=ctype->maxsize;
+    ctype=ctype->improvement;
+    ++i;
+  }
+  return fname[i];
 }
 
 #ifdef WDW_PYRAMID
@@ -364,10 +384,11 @@ findbuildingtype(const char * name, const struct locale * lang)
 void
 register_buildings(void)
 {
-	register_function((pf_generic)init_smithy, "init_smithy");
-	register_function((pf_generic)castle_name, "castle_name");
+	register_function((pf_generic)&init_smithy, "init_smithy");
+    register_function((pf_generic)&castle_name, "castle_name");
+    register_function((pf_generic)&fort_name, "fort_name");
 #ifdef WDW_PYRAMID
-	register_function((pf_generic)pyramid_name, "pyramid_name");
+	register_function((pf_generic)&pyramid_name, "pyramid_name");
 #endif
 }
 

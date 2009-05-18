@@ -1404,7 +1404,7 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r,false)) {
+    if (b != largestbuilding(r, &is_castle, false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -1639,7 +1639,7 @@ name_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r,false)) {
+    if (b != largestbuilding(r, &is_castle, false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -2920,12 +2920,22 @@ static void age_region(region * r)
 {
   a_age(&r->attribs);
   handle_event(r->attribs, "timer", r);
+
+  if (r->land && r->land->ownership) {
+    int stability = r->land->ownership->since_turn;
+    int morale = MORALE_TAKEOVER + stability/10;
+    if (r->land->ownership->owner && r->land->morale<MORALE_MAX) {
+      r->land->morale = MIN(morale, MORALE_MAX);
+    }
+    if (!r->land->ownership->owner && r->land->morale<MORALE_DEFAULT) {
+      r->land->morale = MIN(morale, MORALE_DEFAULT);
+    }
+  }
 }
 
 static void
 ageing(void)
 {
-  const building_type * bt_castle = bt_find("castle");
   faction *f;
   region *r;
 
@@ -2993,24 +3003,17 @@ ageing(void)
     for (bp=&r->buildings;*bp;) {
       building * b = *bp;
       b = age_building(b);
+    }
 
-      if (b==*bp) {
-        if (b->type==bt_castle) {
-          if (blargest==NULL || b->size>blargest->size) {
-            blargest = b;
-          }
-        }
-        bp = &(*bp)->next;
-      }
-      if (blargest) {
-        /* region owners update? */
-        faction * f = region_get_owner(r);
-        unit * u = buildingowner(r, blargest);
-        if (u==NULL) {
-          region_set_owner(r, NULL, turn);
-        } else if (u->faction!=f) {
-          region_set_owner(r, f, turn);
-        }
+    blargest = largestbuilding(r, &is_tax_building, false);
+    if (blargest) {
+      /* region owners update? */
+      faction * f = region_get_owner(r);
+      unit * u = buildingowner(r, blargest);
+      if (u==NULL) {
+        region_set_owner(r, NULL, turn);
+      } else if (u->faction!=f) {
+        region_set_owner(r, f, turn);
       }
     }
   }

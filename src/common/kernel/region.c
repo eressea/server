@@ -1337,7 +1337,13 @@ region_get_owner(const struct region * r)
 void
 region_set_owner(struct region * r, struct faction * owner, int turn)
 {
-  if (r->land && r->land->ownership) {
+  if (r->land) {
+    if (!r->land->ownership) {
+      r->land->ownership = malloc(sizeof(region_owner));
+      r->land->morale = MORALE_DEFAULT;
+    } else if (r->land->ownership->owner) {
+      r->land->morale = MORALE_TAKEOVER;
+    }
     r->land->ownership->owner = owner;
     r->land->ownership->since_turn = turn;
   }
