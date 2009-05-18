@@ -6968,6 +6968,16 @@
     <text locale="fr">"'$order($command)' - $race($race,0) are peace-loving and will not attack anyone."</text>
     <text locale="en">"'$order($command)' - $race($race,0) are peace-loving and will not attack anyone."</text>
   </message>
+  <message name="building_needed" section="production">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="building" type="name"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit steht nicht im benötigten Gebäude, $localize($building)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit must be in a  $localize($building) to produce this."</text>
+  </message>
   <message name="skill_needed" section="production">
     <type>
       <arg name="unit" type="unit"/>

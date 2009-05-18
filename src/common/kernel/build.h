@@ -35,29 +35,32 @@ extern "C" {
 struct xml_tag;
 
 typedef struct requirement {
-	const struct resource_type * rtype;
-	int number;
-	double recycle; /* recycling quota */
+  const struct resource_type * rtype;
+  int number;
+  double recycle; /* recycling quota */
 } requirement;
 
 typedef struct construction {
-	skill_t skill; /* skill req'd per point of size */
-	int minskill;  /* skill req'd per point of size */
+  skill_t skill; /* skill req'd per point of size */
+  int minskill;  /* skill req'd per point of size */
 
-	int maxsize;   /* maximum size of this type */
-	int reqsize;   /* size of object using up 1 set of requirement. */
-	requirement * materials; /* material req'd to build one object */
+  int maxsize;   /* maximum size of this type */
+  int reqsize;   /* size of object using up 1 set of requirement. */
+  requirement * materials; /* material req'd to build one object */
+  const struct building_type * btype;
+  /* building type required to make this thing */
 
-	struct construction * improvement;
-		/* next level, if upgradable. if more than one of these items
-		 * can be built (weapons, armour) per turn, must not be NULL,
-		 * but point to the same type again:
-		 *   const_sword.improvement = &const_sword
-		 * last level of a building points to NULL, as do objects of
-		 * an unlimited size.
-		 */
-	struct attrib * attribs;
-		/* stores skill modifiers and other attributes */
+  struct construction * improvement;
+  /* next level, if upgradable. if more than one of these items
+  * can be built (weapons, armour) per turn, must not be NULL,
+  * but point to the same type again:
+  *   const_sword.improvement = &const_sword
+  * last level of a building points to NULL, as do objects of
+  * an unlimited size.
+  */
+  struct attrib * attribs;
+  /* stores skill modifiers and other attributes */
+
 } construction;
 
 extern int destroy_cmd(struct unit * u, struct order * ord);
@@ -88,6 +91,7 @@ extern struct message * msg_materials_required(struct unit * u, struct order * o
 #define ENEEDSKILL -2
 #define ECOMPLETE -3
 #define ENOMATERIALS -4
+#define EBUILDINGREQ -5
 
 #ifdef __cplusplus
 }

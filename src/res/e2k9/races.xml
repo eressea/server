@@ -38,6 +38,7 @@
     <skill name="magic" modifier="-1"/>
     <skill name="mining" modifier="1"/>
     <skill name="quarrying" modifier="1"/>
+    <skill name="riding" modifier="-99"/>
     <skill name="sailing" modifier="-1"/>
     <skill name="shipcraft" modifier="-1"/>
     <skill name="tactics" modifier="1"/>

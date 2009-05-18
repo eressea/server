@@ -53,6 +53,20 @@ without prior permission by the authors of Eressea.
 
 static boolean gamecode_enabled = false;
 
+static building_type * bt_get_or_create(const char * name)
+{
+  if (name!=NULL) {
+    building_type * btype = bt_find(name);
+    if (btype==NULL) {
+      btype = calloc(sizeof(building_type), 1);
+      btype->_name = strdup(name);
+      bt_register(btype);
+    }
+    return btype;
+  }
+  return NULL;
+}
+
 void
 enable_xml_gamecode(void)
 {
@@ -180,6 +194,12 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, constructi
     con->maxsize = xml_ivalue(node, "maxsize", -1);
     con->minskill = xml_ivalue(node, "minskill", -1);
     con->reqsize = xml_ivalue(node, "reqsize", -1);
+    
+    propValue = xmlGetProp(node, BAD_CAST "building");
+    if (propValue!=NULL) {
+      con->btype = bt_get_or_create((const char*)propValue);
+      xmlFree(propValue);
+    }
 
     /* read construction/requirement */
     xpath->node = node;
@@ -244,12 +264,7 @@ parse_buildings(xmlDocPtr doc)
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue!=NULL);
-      btype = bt_find((const char*)propValue);
-      if (btype==NULL) {
-        btype = calloc(sizeof(building_type), 1);
-        btype->_name = strdup((const char *)propValue);
-        bt_register(btype);
-      }
+      btype = bt_get_or_create((const char*)propValue);
       xmlFree(propValue);
 
       btype->capacity = xml_ivalue(node, "capacity", -1);
@@ -1026,12 +1041,7 @@ parse_resources(xmlDocPtr doc)
 
           propValue = xmlGetProp(node, BAD_CAST "building");
           if (propValue!=NULL) {
-            btype = bt_find((const char*)propValue);
-            if (btype==NULL) {
-              btype = calloc(sizeof(building_type), 1);
-              btype->_name = strdup((const char *)propValue);
-              bt_register(btype);
-            }
+            btype = bt_get_or_create((const char*)propValue);
             xmlFree(propValue);
           }
           rdata->modifiers[k].btype = btype;
@@ -1050,12 +1060,7 @@ parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "require")==0) {
             xmlChar * propBldg = xmlGetProp(node, BAD_CAST "building");
             if (propBldg!=NULL) {
-              btype = bt_find((const char*)propBldg);
-              if (btype==NULL) {
-                btype = calloc(sizeof(building_type), 1);
-                btype->_name = strdup((const char *)propBldg);
-                bt_register(btype);
-              }
+              btype = bt_get_or_create((const char*)propBldg);
               rdata->modifiers[k].btype = btype;
               rdata->modifiers[k].flags = RMF_REQUIREDBUILDING;
               xmlFree(propBldg);

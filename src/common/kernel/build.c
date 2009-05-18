@@ -608,6 +608,14 @@ build(unit * u, const construction * ctype, int completed, int want)
   if (type==NULL) return 0;
   if (type->improvement==NULL && completed==type->maxsize)
     return ECOMPLETE;
+  if (type->btype!=NULL) {
+    building * b;
+    if (!u->building || u->building->type!=type->btype) {
+      return EBUILDINGREQ;
+    }
+    b = inside_building(u);
+    if (b==NULL) return EBUILDINGREQ;
+  }
 
   if (type->skill!=NOSKILL) {
     int effsk;

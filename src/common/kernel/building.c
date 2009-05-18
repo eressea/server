@@ -384,11 +384,11 @@ findbuildingtype(const char * name, const struct locale * lang)
 void
 register_buildings(void)
 {
-	register_function((pf_generic)&init_smithy, "init_smithy");
-    register_function((pf_generic)&castle_name, "castle_name");
-    register_function((pf_generic)&fort_name, "fort_name");
+  register_function((pf_generic)&init_smithy, "init_smithy");
+  register_function((pf_generic)&castle_name, "castle_name");
+  register_function((pf_generic)&fort_name, "fort_name");
 #ifdef WDW_PYRAMID
-	register_function((pf_generic)&pyramid_name, "pyramid_name");
+  register_function((pf_generic)&pyramid_name, "pyramid_name");
 #endif
 }
 

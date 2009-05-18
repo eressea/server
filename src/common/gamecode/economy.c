@@ -1221,6 +1221,10 @@ recruit_archetype(unit * u, order * ord)
         /* no skill, or not enough skill points to build */
         cmistake(u, ord, 50, MSG_PRODUCE);
         break;
+      case EBUILDINGREQ:
+        ADDMSG(&u->faction->msgs,
+          msg_feedback(u, u->thisorder, "building_needed", "building", arch->ctype->btype->_name));
+        break;
       default:
         assert(!"unhandled return value from build() in recruit_archetype");
     }
@@ -1337,6 +1341,10 @@ manufacture(unit * u, const item_type * itype, int want)
     case ENEEDSKILL:
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
+      return;
+    case EBUILDINGREQ:
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, u->thisorder, "building_needed", "building", itype->construction->btype->_name));
       return;
     case ELOWSKILL:
       ADDMSG(&u->faction->msgs,
@@ -1735,6 +1743,10 @@ create_potion(unit * u, const potion_type * ptype, int want)
     case ENEEDSKILL:
       /* no skill, or not enough skill points to build */
       cmistake(u, u->thisorder, 50, MSG_PRODUCE);
+      break;
+    case EBUILDINGREQ:
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, u->thisorder, "building_needed", "building", ptype->itype->construction->btype->_name));
       break;
     case ECOMPLETE:
       assert(0);
