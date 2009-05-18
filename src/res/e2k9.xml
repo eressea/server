@@ -26,6 +26,7 @@
   <xi:include href="e2k9/strings.xml"/>
   <xi:include href="e2k9/races.xml"/>
   <xi:include href="e2k9/buildings.xml"/>
+  <xi:include href="e2k9/equipment.xml"/>
   <xi:include href="e2k9/spells.xml"/>
 
   <equipment>
@@ -108,11 +109,14 @@
     <param name="nmr.removenewbie" value="10"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
+    <param name="hunger.damage" value="1d9+9"/>
     <param name="recruit.allow_merge" value="1"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.skill_bonus" value="0"/>
     <param name="rules.combat.loot" value="3"/> <!-- only self + monsters -->
+	<param name="rules.cavalry.skill" value="4"/>
+	<param name="rules.cavalry.mode" value="1"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.give" value="3"/> <!-- only self + peasants -->
     <param name="rules.help.mask" value="fight guard stealth money"/>

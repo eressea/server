@@ -234,6 +234,8 @@ add_recruits(unit * u, int number, int wanted)
   assert(number<=wanted);
   if (number > 0) {
     unit * unew;
+    char equipment[64];
+
 #if KARMA_MODULE
     int i = fspecial(u->faction, FS_MILITIA);
 #endif /* KARMA_MODULE */
@@ -246,10 +248,10 @@ add_recruits(unit * u, int number, int wanted)
       unew = create_unit(r, u->faction, number, u->race, 0, NULL, u);
     }
 
-    if (unew->race == new_race[RC_URUK]) {
-      change_level(unew, SK_MELEE, 1);
-      change_level(unew, SK_SPEAR, 1);
-    }
+    snprintf(equipment, sizeof(equipment), "new_%s_unit", u->race->_name[0]);
+    equip_unit(unew, get_equipment(equipment));
+
+
     if (unew->race->ec_flags & ECF_REC_HORSES) {
       change_level(unew, SK_RIDING, 1);
     }

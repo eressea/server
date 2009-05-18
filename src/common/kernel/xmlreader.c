@@ -1332,22 +1332,27 @@ parse_equipment(xmlDocPtr doc)
         xpath->node = node;
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "callback", xpath);
+        assert(!eq->callback);
         add_callbacks(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
+        assert(!eq->items);
         add_items(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "spell", xpath);
+        assert(!eq->spells);
         add_spells(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+        assert(!eq->skills);
         add_skills(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "subset", xpath);
+        assert(!eq->subsets);
         add_subsets(doc, eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 

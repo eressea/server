@@ -19,4 +19,13 @@
     <text locale="de">Wache</text>
     <text locale="en">watch</text>
   </string>
+
+  <string name="charger">
+    <text locale="de">Streitross</text>
+    <text locale="en">charger</text>
+  </string>
+  <string name="charger_p">
+    <text locale="de">Streitrösser</text>
+    <text locale="en">chargers</text>
+  </string>
 </string>

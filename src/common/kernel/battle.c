@@ -699,6 +699,34 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
   return skill;
 }
 
+static int CavalrySkill(void)
+{
+  static int skill = -1;
+
+  if (skill<0) {
+    skill = get_param_int(global.parameters, "rules.cavalry.skill", 2);
+  }
+  return skill;
+}
+
+static int
+CavalryBonus(const unit * u)
+{
+  static int mode = -1;
+  if (mode<0) {
+    mode = get_param_int(global.parameters, "rules.cavalry.mode", 1);
+  }
+  if (mode==0) {
+    /* old rule, Eressea 1.0 compat */
+    return 2;
+  } else {
+    /* new rule, chargers in Eressea 1.1 */
+    int skl = effskill(u, SK_RIDING);
+    skl = skl*3/2-3;
+    return MAX(skl, 0);
+  }
+}
+
 static int
 weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boolean missile)
   /* effektiver Waffenskill während des Kampfes */
@@ -747,7 +775,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 
   /* Burgenbonus, Pferdebonus */
   if (is_riding(t) && (wtype==NULL || (fval(wtype, WTF_HORSEBONUS) && !fval(wtype, WTF_MISSILE)))) {
-    skill += 2;
+    skill += CavalryBonus(tu);
     if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
   }
 
@@ -2191,6 +2219,37 @@ add_tactics(tactics * ta, fighter * fig, int value)
   ta->value = value;
 }
 
+static double horsebonus(const unit * u)
+{
+  static const item_type * it_horse = 0;
+  static const item_type * it_elvenhorse = 0;
+  static const item_type * it_charger = 0;
+  region * r = u->region;
+  int n1 = 0, n2 = 0, n3 = 0;
+  item * itm = u->items;
+  int skl = eff_skill(u, SK_RIDING, r);
+
+  if (skl<1) return 0.0;
+
+  if (it_horse==0) {
+    it_horse = it_find("horse");
+    it_elvenhorse = it_find("elvenhorse");
+    it_charger = it_find("charger");
+  }
+
+  while (itm) {
+    if (itm->type->flags&ITF_ANIMAL) {
+      if (itm->type==it_elvenhorse) n3 +=itm->number;
+      else if (itm->type==it_charger) n2 +=itm->number;
+      else if (itm->type==it_horse) n1 +=itm->number;
+    }
+  }
+  if (skl >= 5 && n3>=u->number) return 0.30;
+  if (skl >= 3 && n2+n3>=u->number) return 0.20;
+  if (skl >= 1 && n1+n2+n3>=u->number) return 0.10;
+  return 0.0F;
+}
+
 double
 fleechance(unit * u)
 {
@@ -2200,11 +2259,7 @@ fleechance(unit * u)
   /* Einheit u versucht, dem Getümmel zu entkommen */
 
   c += (eff_skill(u, SK_STEALTH, r) * 0.05);
-
-  if (get_item(u, I_ELVENHORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 5)
-    c += 0.30;
-  else if (get_item(u, I_HORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 1)
-    c += 0.10;
+  c += horsebonus(u);
 
   if (u->race == new_race[RC_HALFLING]) {
     c += 0.20;
@@ -3214,7 +3269,14 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     fig->horses = fig->unit->number;
     fig->elvenhorses = 0;
   } else {
-    fig->horses = get_item(u, I_HORSE);
+    static const item_type * it_charger = 0;
+    if (it_charger==0) {
+      it_charger = it_find("charger");
+      if (!it_charger) {
+        it_charger = it_find("horse");
+      }
+    }
+    fig->horses = i_get(u->items, it_charger);
     fig->elvenhorses = get_item(u, I_ELVENHORSE);
   }
 
@@ -3244,7 +3306,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 
   if (fig->horses) {
     if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
-      || eff_skill(u, SK_RIDING, r) < 2 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
+      || eff_skill(u, SK_RIDING, r) < CavalrySkill() || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
       fig->horses = 0;
   }
 

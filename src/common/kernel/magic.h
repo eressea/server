@@ -171,7 +171,7 @@ typedef struct spell {
 
 typedef struct spell_list {
   struct spell_list * next;
-  spell * data;
+  spell * data; /* TODO: should be const */
 } spell_list;
 
 extern void spelllist_add(spell_list ** lspells, struct spell * sp);

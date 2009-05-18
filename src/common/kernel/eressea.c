@@ -63,6 +63,7 @@
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/parser.h>
+#include <util/rand.h>
 #include <util/rng.h>
 #include <util/sql.h>
 #include <util/translation.h>
@@ -2509,9 +2510,21 @@ hunger(int number, unit * u)
   region * r = u->region;
   int dead = 0, hpsub = 0;
   int hp = u->hp / u->number;
+  static const char * damage = 0;
+  static const char * rcdamage = 0;
+  static const race * rc = 0;
+
+  if (!damage) {
+    damage = get_param(global.parameters, "hunger.damage");
+    if (damage==NULL) damage = "1d12+12";
+  }
+  if (rc!=u->race) {
+    rcdamage = get_param(u->race->parameters, "hunger.damage");
+    rc = u->race;
+  }
 
   while (number--) {
-    int dam = u->race==new_race[RC_HALFLING]?15+rng_int()%14:(13+rng_int()%12);
+    int dam = dice_rand(rcdamage?rcdamage:damage);
     if (dam >= hp) {
       ++dead;
     } else {
