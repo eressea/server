@@ -1124,7 +1124,7 @@ leave_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 11, MSG_MOVE);
       return 0;
     }
-    if(get_item(u, I_HORSE)) {
+    if (has_horses(u)) {
       cmistake(u, ord, 231, MSG_MOVE);
       return 0;
     }

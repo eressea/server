@@ -288,6 +288,7 @@ destroyfaction(faction * f)
         if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
           int p = rpeasants(u->region);
           int h = rhorses(u->region);
+          item * itm;
 
           /* Personen gehen nur an die Bauern, wenn sie auch von dort
            * stammen */
@@ -298,7 +299,11 @@ destroyfaction(faction * f)
           } else {
             p += u->number;
           }
-          h += get_item(u, I_HORSE);
+          for (itm=u->items;itm;itm=itm->next) {
+            if (itm->type->flags&ITF_ANIMAL) {
+              h += itm->number;
+            }
+          }
           rsetpeasants(r, p);
           rsethorses(r, h);
         }

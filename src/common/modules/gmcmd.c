@@ -669,7 +669,6 @@ gm_addfaction(const char * email, plane * p, region * r)
 {
   attrib * a;
   unit * u;
-  int i;
   faction * f = calloc(1, sizeof(faction));
 
   assert(p!=NULL);
@@ -713,9 +712,6 @@ gm_addfaction(const char * email, plane * p, region * r)
     }
     a_add(&ap, make_atgmcreate(resource2item(r_silver)));
 
-    for (i=0;i<=I_HORSE;++i) {
-      a_add(&ap, make_atgmcreate(olditemtype[i]));
-    }
     a->data.v = ap;
   }
   

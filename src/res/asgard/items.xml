@@ -113,7 +113,7 @@
   </resource>
 
   <resource name="horse" limited="yes">
-    <item big="yes" weight="5000" score="10" capacity="7000" animal="yes">
+    <item big="yes" weight="5000" score="10" capacity="7000" animal="yes" ride="yes">
       <construction skill="training" minskill="1" reqsize="1"/>
       <function name="give" value="givehorses"/>
     </item>

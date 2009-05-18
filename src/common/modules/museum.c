@@ -357,7 +357,7 @@ use_museumticket(unit *u, const struct item_type *itype, int amount, order * ord
     cmistake(u, ord, 267, MSG_MAGIC);
     return 0;
   }
-  if(get_item(u, I_HORSE)) {
+  if (has_horses(u)) {
     cmistake(u, ord, 272, MSG_MAGIC);
     return 0;
   }

@@ -594,40 +594,40 @@ monster_attacks(unit * u)
 static void
 eaten_by_monster(unit * u)
 {
-	int n = 0;
-	int horse = 0;
+  int n = 0;
+  int horse = 0;
 
-	switch (old_race(u->race)) {
-	case RC_FIREDRAGON:
-		n = rng_int()%80 * u->number;
-		horse = get_item(u, I_HORSE);
-		break;
-	case RC_DRAGON:
-		n = rng_int()%200 * u->number;
-		horse = get_item(u, I_HORSE);
-		break;
-	case RC_WYRM:
-		n = rng_int()%500 * u->number;
-		horse = get_item(u, I_HORSE);
-		break;
-	default:
-		n = rng_int()%(u->number/20+1);
-	}
+  switch (old_race(u->race)) {
+    case RC_FIREDRAGON:
+      n = rng_int()%80 * u->number;
+      horse = get_item(u, I_HORSE);
+      break;
+    case RC_DRAGON:
+      n = rng_int()%200 * u->number;
+      horse = get_item(u, I_HORSE);
+      break;
+    case RC_WYRM:
+      n = rng_int()%500 * u->number;
+      horse = get_item(u, I_HORSE);
+      break;
+    default:
+      n = rng_int()%(u->number/20+1);
+  }
 
-	if (n > 0) {
-		n = lovar(n);
-		n = MIN(rpeasants(u->region), n);
+  if (n > 0) {
+    n = lovar(n);
+    n = MIN(rpeasants(u->region), n);
 
-		if (n > 0) {
-			deathcounts(u->region, n);
-			rsetpeasants(u->region, rpeasants(u->region) - n);
-			ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
-		}
-	}
-	if (horse > 0) {
-		set_item(u, I_HORSE, 0);
+    if (n > 0) {
+      deathcounts(u->region, n);
+      rsetpeasants(u->region, rpeasants(u->region) - n);
+      ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+    }
+  }
+  if (horse > 0) {
+    set_item(u, I_HORSE, 0);
     ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
-	}
+  }
 }
 
 static void

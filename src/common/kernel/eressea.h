@@ -335,6 +335,7 @@ extern boolean hunger(int number, struct unit * u);
 extern int lifestyle(const struct unit*);
 extern int besieged(const struct unit * u);
 extern int maxworkingpeasants(const struct region * r);
+extern boolean has_horses(const struct unit * u);
 
 extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
 extern int maintenance_cost(const struct unit * u);

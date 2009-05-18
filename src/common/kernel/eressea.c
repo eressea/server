@@ -2504,6 +2504,15 @@ lifestyle(const unit * u)
   return need;
 }
 
+boolean has_horses(const struct unit * u)
+{
+  item * itm = u->items;
+  for (;itm;itm=itm->next) {
+    if (itm->type->flags&ITF_ANIMAL) return true;
+  }
+  return false;
+}
+
 boolean
 hunger(int number, unit * u)
 {

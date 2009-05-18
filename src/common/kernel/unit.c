@@ -827,7 +827,7 @@ can_survive(const unit *u, const region *r)
   {
     static const curse_type * ctype = NULL;
 
-    if (get_item(u, I_HORSE) && !fval(r->terrain, WALK_INTO))
+    if (has_horses(u) && !fval(r->terrain, WALK_INTO))
       return false;
 
     if (!ctype) ctype = ct_find("holyground");

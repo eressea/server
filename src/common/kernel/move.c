@@ -416,22 +416,38 @@ canswim(unit *u)
 static int
 canride(unit * u)
 {
-  int pferde, maxpferde, unicorns, maxunicorns;
+  int horses = 0, maxhorses, unicorns = 0, maxunicorns;
   int skill = effskill(u, SK_RIDING);
+  item * itm;
+  static const item_type * it_horse = 0;
+  static const item_type * it_elvenhorse = 0;
+  static const item_type * it_charger = 0;
 
-  unicorns = get_item(u, I_ELVENHORSE);
-  pferde = get_item(u, I_HORSE);
+  if (it_horse==0) {
+    it_horse = it_find("horse");
+    it_elvenhorse = it_find("elvenhorse");
+    it_charger = it_find("charger");
+  }
+
+  for (itm=u->items;itm;itm=itm->next) {
+    if (itm->type==it_horse || itm->type==it_charger) {
+      horses += itm->number;
+    } else if (itm->type==it_elvenhorse) {
+      unicorns += itm->number;
+    }
+  }
+
   maxunicorns = (skill/5) * u->number;
-  maxpferde = skill * u->number * 2;
+  maxhorses = skill * u->number * 2;
 
   if(!(u->race->flags & RCF_HORSE)
-    && ((pferde == 0 && unicorns == 0)
-    || pferde > maxpferde || unicorns > maxunicorns)) {
+    && ((horses == 0 && unicorns == 0)
+    || horses > maxhorses || unicorns > maxunicorns)) {
       return 0;
   }
 
   if (ridingcapacity(u) - eff_weight(u) >= 0) {
-    if(pferde == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
+    if (horses == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
       return 2;
     }
     return 1;
@@ -1403,7 +1419,7 @@ travel_route(unit * u, const region_list * route_begin, const region_list * rout
 
       if (fval(current->terrain, SEA_REGION) || fval(next->terrain, SEA_REGION)) {
         /* trying to enter or exit ocean with horses, are we? */
-        if (get_item(u, I_HORSE) > 0 || get_item(u, I_ELVENHORSE) > 0) {
+        if (has_horses(u)) {
           /* tries to do it with horses */
           if (ord!=NULL) cmistake(u, ord, 67, MSG_MOVE);
           break;
