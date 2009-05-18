@@ -23,6 +23,7 @@ extern "C" {
     char * value;
   } rule;
 
+  struct archetype;
   typedef int (*archetype_function)(struct unit * u, const struct archetype *, int);
 
   typedef struct archetype {

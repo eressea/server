@@ -70,7 +70,7 @@ if $(PROFILE) = 1 {
   LINKFLAGS += -pg -ggdb ;
 }
 
-CCFLAGS += -Wall ;
+CCFLAGS += -Wall -Wno-unknown-pragmas ;
 
 CCFLAGS += -Wwrite-strings 
 		   -Wundef
