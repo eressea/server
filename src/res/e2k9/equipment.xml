@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<equipment>
+
+  <!-- equipment given to new units -->
+  <set name="new_demon_unit">
+    <skill name="stamina" level="6"/>
+  </set>
+
+  <set name="new_troll_unit">
+    <skill name="stamina" level="2"/>
+  </set>
+
+</equipment>
