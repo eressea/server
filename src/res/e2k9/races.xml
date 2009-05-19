@@ -13,7 +13,7 @@
     <skill name="building" modifier="1"/>
     <skill name="cartmaking" modifier="-1"/>
     <skill name="catapult" modifier="1"/>
-    <skill name="magic" modifier="-1"/>
+    <skill name="magic" modifier="-99"/>
     <skill name="mining" modifier="1"/>
     <skill name="roadwork" modifier="-2"/>
     <skill name="sailing" modifier="-2"/>
@@ -36,7 +36,6 @@
     <skill name="cartmaking" modifier="-1"/>
     <skill name="forestry" modifier="1"/>
     <skill name="herbalism" modifier="-2"/>
-    <skill name="magic" modifier="-1"/>
     <skill name="mining" modifier="1"/>
     <skill name="quarrying" modifier="1"/>
     <skill name="riding" modifier="-99"/>
@@ -44,6 +43,7 @@
     <skill name="shipcraft" modifier="-1"/>
     <skill name="tactics" modifier="1"/>
     <skill name="training" modifier="-1"/>
+    <skill name="magic" modifier="-99"/>
     <skill name="unarmed" modifier="-99"/>
     <skill name="weaponsmithing" modifier="2"/>
     <attack type="1" damage="1d5"/>
@@ -59,6 +59,7 @@
     <skill name="herbalism" modifier="-1"/>
     <skill name="shipcraft" modifier="3"/>
     <skill name="sailing" modifier="3"/>
+    <skill name="magic" modifier="-99"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
     <familiar race="dolphin" default="yes"/>
@@ -84,6 +85,7 @@
     <skill name="sailing" modifier="-2"/>
     <skill name="shipcraft" modifier="-1"/>
     <skill name="training" modifier="-1"/>
+    <skill name="magic" modifier="-99"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
     <familiar race="eagle" default="yes"/>

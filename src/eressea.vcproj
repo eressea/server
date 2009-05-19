@@ -67,7 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1_d.lib tolua++.lib luabind_d.lib"
+				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1_d.lib tolua++.lib"
 				OutputFile="$(OutDir)\eressea.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -124,6 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories=".;common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -142,6 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1.lib tolua++.lib"
 				OutputFile="$(OutDir)\eressea.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
@@ -210,6 +212,14 @@
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="1"
 						PrecompiledHeaderThrough="stdafx.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
 			</File>

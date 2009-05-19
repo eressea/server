@@ -19,6 +19,8 @@
 * permission from the authors.
 */
 
+#pragma region includes
+
 #include <config.h>
 #include <kernel/eressea.h>
 #include "economy.h"
@@ -79,6 +81,7 @@
 #include <assert.h>
 #include <limits.h>
 
+#pragma endregion
 
 typedef struct request {
   struct request * next;
@@ -100,6 +103,27 @@ static int entertaining;
 
 static int norders;
 static request *oa;
+
+#define RECRUIT_MERGE 1
+#define RECRUIT_CLASSIC 2
+#define RECRUIT_ARCHETYPES 4
+static int rules_recruit = -1;
+
+static void recruit_init(void)
+{
+  if (rules_recruit<0) {
+    rules_recruit = 0;
+    if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
+      rules_recruit |= RECRUIT_MERGE;
+    }
+    if (get_param_int(global.parameters, "recruit.classic", 1)) {
+      rules_recruit |= RECRUIT_CLASSIC;
+    }
+    if (get_param_int(global.parameters, "recruit.archetype", 0)) {
+      rules_recruit |= RECRUIT_ARCHETYPES;
+    }
+  }
+}
 
 int
 income(const unit * u)
@@ -1091,11 +1115,6 @@ maintain_buildings(region * r, boolean crash)
   }
 }
 
-#define RECRUIT_MERGE 1
-#define RECRUIT_CLASSIC 2
-#define RECRUIT_ARCHETYPES 4
-static int rules_recruit = -1;
-
 static int
 recruit_archetype(unit * u, order * ord)
 {
@@ -1103,18 +1122,7 @@ recruit_archetype(unit * u, order * ord)
   int want;
   const char * s;
 
-  if (rules_recruit<0) {
-    rules_recruit = 0;
-    if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
-      rules_recruit |= RECRUIT_MERGE;
-    }
-    if (get_param_int(global.parameters, "recruit.classic", 1)) {
-      rules_recruit |= RECRUIT_CLASSIC;
-    }
-    if (get_param_int(global.parameters, "recruit.archetype", 0)) {
-      rules_recruit |= RECRUIT_ARCHETYPES;
-    }
-  }
+  if (rules_recruit<0) recruit_init();
 
   init_tokens(ord);
   skip_token();
@@ -1233,16 +1241,6 @@ recruit_archetype(unit * u, order * ord)
     return 0;
   }
   return -1;
-}
-
-static void recruit_init(void)
-{
-  if (rules_recruit<0) {
-    rules_recruit = 0;
-    if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
-      rules_recruit |= RECRUIT_MERGE;
-    }
-  }
 }
 
 int recruit_archetypes(void)

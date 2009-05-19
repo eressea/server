@@ -2925,10 +2925,10 @@ static void age_region(region * r)
     int stability = r->land->ownership->since_turn;
     int morale = MORALE_TAKEOVER + stability/10;
     if (r->land->ownership->owner && r->land->morale<MORALE_MAX) {
-      r->land->morale = MIN(morale, MORALE_MAX);
+      r->land->morale = (short)MIN(morale, MORALE_MAX);
     }
     if (!r->land->ownership->owner && r->land->morale<MORALE_DEFAULT) {
-      r->land->morale = MIN(morale, MORALE_DEFAULT);
+      r->land->morale = (short)MIN(morale, MORALE_DEFAULT);
     }
   }
 }

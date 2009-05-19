@@ -593,6 +593,27 @@ load_inifile(const char * filename)
   inifile = d;
 }
 
+static void
+write_spells(void)
+{
+  const resource_type * rt_water = rt_find("p2");
+  struct locale * loc = find_locale("de");
+  FILE * F = fopen("spells.txt", "w");
+  spell_list * spl = spells;
+  for (;spl;spl=spl->next) {
+    const spell * sp = spl->data;
+    spell_component * spc = sp->components;
+    char components[128];
+    components[0]=0;
+    for (;spc->type;++spc) {
+      strcat(components, LOC(loc, spc->type->_name[0]));
+      strcat(components, ",");
+    }
+    fprintf(F, "%s;%d;%s;%s\n", LOC(loc, mkname("spell", sp->sname)), sp->level, LOC(loc, mkname("school", magietypen[sp->magietyp])), components);
+  }
+  fclose(F);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -628,7 +649,9 @@ main(int argc, char *argv[])
   kernel_init();
   game_init();
 
-  // run the main script
+  /* write_spells(); */
+
+  /* run the main script */
   if (luafile==NULL) lua_console(luaState);
   else {
     char buf[MAX_PATH];

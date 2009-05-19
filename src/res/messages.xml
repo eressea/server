@@ -6973,7 +6973,7 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="building" type="name"/>
+      <arg name="building" type="string"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit steht nicht im benötigten Gebäude, $localize($building)."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit must be in a  $localize($building) to produce this."</text>

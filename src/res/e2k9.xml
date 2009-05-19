@@ -49,6 +49,8 @@
 
   <game name="Aragon" units="500">
     <!-- Game specific settings -->
+    <param name="database.gameid" value="7"></param>
+
     <order name="ARBEITEN" disable="yes"/>
     <order name="BETEN" disable="yes"/>
     <order name="FRIEDEN" disable="yes"/>
@@ -67,7 +69,6 @@
     <order name="WERWESEN" disable="yes"/>
     <order name="XONTORMIA" disable="yes"/>
 
-    <skill name="alchemy" enable="true"/>
     <skill name="armorer" enable="true"/>
     <skill name="bow" enable="true"/>
     <skill name="building" enable="true"/>
@@ -91,6 +92,7 @@
     <skill name="unarmed" enable="true"/>
     <skill name="weaponsmithing" enable="true"/>
 
+    <skill name="alchemy" enable="false"/>
     <skill name="entertainment" enable="false"/>
     <skill name="espionage" enable="false"/>
     <skill name="perception" enable="false"/>
@@ -103,14 +105,16 @@
     <param name="modules.astralspace" value="0"/>
     <param name="modules.wormholes" value="0"/>
 
+    <param name="skills.cost" value="500"/>
     <param name="entertain.base" value="0"/>
     <param name="entertain.perlevel" value="20"/>
     <param name="nmr.timeout" value="5"/>
     <param name="nmr.removenewbie" value="10"/>
     <param name="GiveRestriction" value="3"/>
-    <param name="hunger.long" value="1"/>
+    <param name="hunger.long" value="0"/>
     <param name="hunger.damage" value="1d9+9"/>
     <param name="recruit.allow_merge" value="1"/>
+    <param name="study.expensivemigrants" value="1"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.skill_bonus" value="0"/>
@@ -119,8 +123,10 @@
 	<param name="rules.cavalry.mode" value="1"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.give" value="3"/> <!-- only self + peasants -->
-    <param name="rules.help.mask" value="fight guard stealth money"/>
+    <param name="rules.help.mask" value="fight guard money"/>
 	<param name="movement.shipspeed.skillbonus" value="7"/>
+    <param name="alliance.auto" value="fight"/>
+	<!--param name="alliance.restricted" value="fight"/-->
   </game>
   <xi:include href="eressea/strings.xml"/>
   <xi:include href="eressea/races.xml"/>

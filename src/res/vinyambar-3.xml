@@ -11,7 +11,7 @@
   <include href="buildings.xml" />
 
   <game name="Kreis der Macht" units="250" welcome="vinyambar">
-    <comment>Game specific</comment>
+    <!-- Game specific -->
     <order name="ARBEITEN" disable></order>
     <param name="entertain.base" value="15"></param>
     <param name="entertain.perlevel" value="5"></param>

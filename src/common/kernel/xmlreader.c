@@ -1347,7 +1347,6 @@ parse_equipment(xmlDocPtr doc)
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-        assert(!eq->skills);
         add_skills(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 

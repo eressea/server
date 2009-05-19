@@ -107,24 +107,28 @@ magic_lowskill(unit *u)
 int
 study_cost(unit *u, skill_t sk)
 {
-	int stufe, k = 50;
+  static int cost = 0;
+  int stufe, k = 50;
 
-	switch (sk) {
-		case SK_SPY:
-			return 100;
-			break;
-		case SK_TACTICS:
-		case SK_HERBALISM:
-		case SK_ALCHEMY:
-			return 200;
-			break;
-		case SK_MAGIC:	/* Die Magiekosten betragen 50+Summe(50*Stufe) */
-				/* 'Stufe' ist dabei die nächste zu erreichende Stufe */
-			stufe = 1 + get_level(u, SK_MAGIC);
-			return k*(1+((stufe+1)*stufe/2));
-			break;
-	}
-	return 0;
+  if (cost==0) {
+    cost = get_param_int(global.parameters, "skills.cost", 200);
+  }
+  switch (sk) {
+    case SK_SPY:
+      return 100;
+      break;
+    case SK_TACTICS:
+    case SK_HERBALISM:
+    case SK_ALCHEMY:
+      return 200;
+      break;
+    case SK_MAGIC:	/* Die Magiekosten betragen 50+Summe(50*Stufe) */
+      /* 'Stufe' ist dabei die nächste zu erreichende Stufe */
+      stufe = 1 + get_level(u, SK_MAGIC);
+      return k*(1+((stufe+1)*stufe/2));
+      break;
+  }
+  return 0;
 }
 
 /* ------------------------------------------------------------- */
