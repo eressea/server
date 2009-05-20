@@ -116,6 +116,7 @@
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
     <param name="rules.check_overload" value="0"/>
+    <param name="rules.alliances" value="1"/>
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.skill_bonus" value="0"/>
     <param name="rules.combat.loot" value="3"/> <!-- only self + monsters -->

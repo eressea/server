@@ -6719,7 +6719,23 @@
     <text locale="de">AUSSTOSSEN</text>
     <text locale="en">KICK</text>
   </string>
+  <string name="new">
+    <text locale="de">NEU</text>
+    <text locale="en">NEW</text>
+  </string>
+  <string name="command">
+    <text locale="de">KOMMANDO</text>
+    <text locale="en">COMMAND</text>
+  </string>
+  <string name="leave">
+    <text locale="de">VERLASSEN</text>
+    <text locale="en">LEAVE</text>
+  </string>
   <string name="join">
+    <text locale="de">BEITRETEN</text>
+    <text locale="en">JOIN</text>
+  </string>
+  <string name="invite">
     <text locale="de">AUFNEHEMEN</text>
     <text locale="en">JOIN</text>
   </string>

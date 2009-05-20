@@ -554,8 +554,12 @@ read_alliances(struct storage * store)
   store->r_str_buf(store, pbuf, sizeof(pbuf));
   while (strcmp(pbuf, "end")!=0) {
     char aname[128];
+    alliance * al;
     store->r_str_buf(store, aname, sizeof(aname));
-    makealliance(atoi36(pbuf), aname);
+    al = makealliance(atoi36(pbuf), aname);
+    if (store->version>=ALLIANCELEADER_VERSION) {
+      read_reference(&al->leader, store, read_faction_reference, resolve_faction);
+    }
     store->r_str_buf(store, pbuf, sizeof(pbuf));
   }
 }
@@ -565,8 +569,13 @@ write_alliances(struct storage * store)
 {
   alliance * al = alliances;
   while (al) {
-    store->w_id(store, al->id);
-    store->w_tok(store, al->name);
+    if (al->leader) {
+      store->w_id(store, al->id);
+      store->w_tok(store, al->name);
+      if (store->version>=ALLIANCELEADER_VERSION) {
+        write_faction_reference(al->leader, store);
+      }
+    }
     al = al->next;
     store->w_brk(store);
   }

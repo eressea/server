@@ -61,6 +61,7 @@
 #define NOBORDERATTRIBS_VERSION 331 /* border::attribs has been moved to userdata */
 #define UIDHASH_VERSION 332 /* borders use the region.uid to store */
 #define REGIONOWNER_VERSION 333 /* regions have owners and morale */
+#define ALLIANCELEADER_VERSION 333 /* alliances have a leader */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
 #define RELEASE_VERSION REGIONOWNER_VERSION /* current datafile */

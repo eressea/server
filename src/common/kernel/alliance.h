@@ -24,12 +24,20 @@ struct faction;
 struct region;
 struct faction_list;
 
+struct alliance_transaction;
+
+enum {
+  ALLIANCE_KICK, ALLIANCE_LEAVE, ALLIANCE_TRANSFER, ALLIANCE_NEW, ALLIANCE_INVITE, ALLIANCE_JOIN, ALLIANCE_MAX
+};
+
 typedef struct alliance {
-	struct alliance * next;
-	struct faction_list * members;
-	unsigned int flags;
-	int id;
-	char * name;
+  struct alliance * next;
+  struct faction * leader;
+  struct faction_list * members;
+  struct alliance_transaction * transactions[ALLIANCE_MAX];
+  unsigned int flags;
+  int id;
+  char * name;
 } alliance;
 
 extern alliance * alliances;
@@ -38,12 +46,9 @@ extern alliance * makealliance(int id, const char * name);
 extern const char * alliancename(const struct alliance * al);
 extern void setalliance(struct faction * f, alliance * al);
 
-extern void alliancejoin(void);
-extern void alliancekick(void);
-extern void alliancevictory(void);
+extern void alliance_cmd(void);
 
 void alliance_setname(alliance * self, const char * name);
-extern int victorycondition(const alliance * al, const char * name);
 /* execute commands */
 
 #ifdef __cplusplus

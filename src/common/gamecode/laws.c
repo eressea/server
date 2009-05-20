@@ -3772,9 +3772,9 @@ init_processor(void)
   add_proc_order(p, K_WEREWOLF, &setwere_cmd, 0, NULL);
 #endif /* KARMA_MODULE */
 
-  if (get_param_int(global.parameters, "alliance-vinyambar", 0)==1) {
+  if (get_param_int(global.parameters, "rules.alliances", 0)==1) {
     p+=10;
-    add_proc_global(p, &alliancekick, NULL);
+    add_proc_global(p, &alliance_cmd, NULL);
   }
 
   p+=10;
@@ -3784,11 +3784,6 @@ init_processor(void)
   p+=10; /* all claims must be done before we can USE */
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
   add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
-
-  if (get_param_int(global.parameters, "alliance-vinyambar", 0)==1) {
-    p+=10; /* in case USE changes it */
-    add_proc_global(p, &alliancevictory, "Testen der Allianzbedingungen");
-  }
 
 #if INFOCMD_MODULE
   if (!global.disabled[K_INFO]) {
@@ -3895,10 +3890,6 @@ init_processor(void)
 #if KARMA_MODULE
   p+=10;
   add_proc_global(p, &karma, "Jihads setzen");
-#endif
-#ifdef ALLIANCEJOIN
-  p+=10;
-  add_proc_global(p, &alliancejoin, "Allianzen");
 #endif
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
   if (!global.disabled[K_NUMBER]) {
