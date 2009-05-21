@@ -6736,8 +6736,8 @@
     <text locale="en">JOIN</text>
   </string>
   <string name="invite">
-    <text locale="de">AUFNEHEMEN</text>
-    <text locale="en">JOIN</text>
+    <text locale="de">EINLADEN</text>
+    <text locale="en">INVITE</text>
   </string>
   <string name="rm_stone">
     <text locale="de">Steine</text>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<resource name="greatsword">
+  <item weight="200" score="30">
+    <construction skill="weaponsmithing" minskill="4" reqsize="1">
+      <requirement type="iron" quantity="2"/>
+    </construction>
+    <weapon cut="true" skill="melee" offmod="-1" defmod="-2">
+      <damage type="rider" value="2d8+3"/>
+      <damage type="footman" value="2d8+3"/>
+    </weapon>
+  </item>
+</resource>

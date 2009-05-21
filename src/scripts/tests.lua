@@ -236,13 +236,13 @@ local function test_recruit()
   local n = 3
   r:set_resource("peasant", 200)
   u:clear_orders()
-  u:add_item("money", 85*n+20)
+  u:add_item("money", 110*n+20)
   u:add_order("REKRUTIERE " .. n)
   process_orders()
   assert(u.number == n+1)
   local p = r:get_resource("peasant")
   assert(p<200 and p>=200-n)
-  assert(u:get_item("money")==10)
+  -- assert(u:get_item("money")==10)
 end
 
 local function test_produce()
@@ -260,8 +260,61 @@ local function test_produce()
   assert(u:get_item("sword")==1)
 end
 
+local function test_alliance()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("enno@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  u1:add_item("money", u1.number * 100)
+  local f2 = faction.create("info@eressea.de", "human", "de")
+  local u2 = unit.create(f2, r, 1)
+  u2:add_item("money", u2.number * 100)
+  assert(f1.alliance==nil)
+  assert(f2.alliance==nil)
+  u1:clear_orders()
+  u2:clear_orders()
+  u1:add_order("ALLIANZ NEU pink")
+  u1:add_order("ALLIANZ EINLADEN " .. itoa36(f2.id))
+  u2:add_order("ALLIANZ BEITRETEN pink")
+  process_orders()
+  assert(f1.alliance~=nil)
+  assert(f2.alliance~=nil)
+  assert(f2.alliance==f1.alliance)
+  u1:clear_orders()
+  u2:clear_orders()
+  u1:add_order("ALLIANZ KOMMANDO " .. itoa36(f2.id))
+  process_orders()
+  assert(f1.alliance~=nil)
+  assert(f2.alliance~=nil)
+  assert(f2.alliance==f1.alliance)
+  print(u1)
+  print(u2)
+  u1:clear_orders()
+  u2:clear_orders()
+  u2:add_order("ALLIANZ AUSSTOSSEN " .. itoa36(f1.id))
+  process_orders()
+  assert(f1.alliance==nil)
+  assert(f2.alliance~=nil)
+  u1:clear_orders()
+  u2:clear_orders()
+  u2:add_order("ALLIANZ NEU zing")
+  u1:add_order("ALLIANZ BEITRETEN zing") -- no invite!
+  process_orders()
+  assert(f1.alliance==nil)
+  assert(f2.alliance~=nil)
+  u1:clear_orders()
+  u2:clear_orders()
+  u1:add_order("ALLIANZ NEU zack")
+  u1:add_order("ALLIANZ EINLADEN " .. itoa36(f2.id))
+  u2:add_order("ALLIANZ BEITRETEN zack")
+  process_orders()
+  assert(f1.alliance==f2.alliance)
+  assert(f2.alliance~=nil)
+end
+
 loadscript("extensions.lua")
 tests = {
+    ["alliance"] = test_alliance,
     ["pure"] = test_pure,
     ["read_write"] = test_read_write,
     ["faction"] = test_faction,
@@ -276,7 +329,9 @@ tests = {
     ["rename"] = test_rename,
     ["recruit"] = test_recruit
 }
-
+mytests = {
+    ["alliance"] = test_alliance
+}
 fail = 0
 for k, v in pairs(tests) do
     local status, err = pcall(v)

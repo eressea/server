@@ -829,10 +829,12 @@ tolua_unit_create(lua_State* tolua_S)
   faction * f = (faction *)tolua_tousertype(tolua_S, 1, 0);
   region * r = (region *)tolua_tousertype(tolua_S, 2, 0);
   int num = (int)tolua_tonumber(tolua_S, 3, 0);
-  unit * u = create_unit(r, f, num, f->race, 0, NULL, NULL);
-
-  tolua_pushusertype(tolua_S, u, "unit");
-  return 1;
+  if (f && r) {
+    unit * u = create_unit(r, f, num, f->race, 0, NULL, NULL);
+    tolua_pushusertype(tolua_S, u, "unit");
+    return 1;
+  }
+  return 0;
 }
 
 static int

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<resource name="mallornlance">
+  <item weight="100">
+    <construction skill="weaponsmithing" minskill="5" reqsize="1">
+      <requirement type="mallorn" quantity="2"/>
+    </construction>
+    <weapon pierce="true" skill="polearm" minskill="5" offmod="0" defmod="0" magres="0.15">
+      <damage type="footman" value="1d5+1"/>
+      <damage type="rider" value="2d6+6"/>
+    </weapon>
+  </item>
+</resource>

@@ -493,7 +493,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   n = getuint();
 
   str = getstrtoken();
-  if (str) {
+  if (str && str[0]) {
     /* Monster dürfen REKRUTIERE 15 dracoid machen
      * also: secondary race */
     rc = findrace(str, f->locale);

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<equipment>
+
+  <set name="new_uruk_unit">
+    <skill name="polearm" level="1"/>
+    <skill name="melee" level="1"/>
+  </set>
+
+  <set name="new_centaur_unit">
+    <skill name="polearm" level="1"/>
+    <skill name="melee" level="1"/>
+  </set>
+
+</equipment>

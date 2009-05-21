@@ -19,6 +19,8 @@
  * permission from the authors.
  */
 
+#pragma region includes
+
 #include <config.h>
 #include <kernel/eressea.h>
 #include "laws.h"
@@ -103,6 +105,8 @@
 
 #include <attributes/otherfaction.h>
 
+#pragma endregion
+
 /* chance that a peasant dies of starvation: */
 #define PEASANT_STARVATION_CHANCE 0.9F
 /* Pferdevermehrung */
@@ -127,8 +131,7 @@ static int
 RemoveNMRNewbie(void) {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "nmr.removenewbie");
-    value = str?atoi(str):0;
+    value = get_param_int(global.parameters, "nmr.removenewbie", 0);
   }
   return value;
 }

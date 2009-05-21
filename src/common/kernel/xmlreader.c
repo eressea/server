@@ -177,20 +177,21 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, constructi
     construction * con;
     xmlXPathObjectPtr req;
     int m;
-
-    assert(*consPtr==NULL);
-    *consPtr = con = calloc(sizeof(construction), 1);
-    consPtr = &con->improvement;
+    skill_t sk = NOSKILL;
 
     propValue = xmlGetProp(node, BAD_CAST "skill");
     if (propValue!=NULL) {
-      con->skill = sk_find((const char*)propValue);
-      assert(con->skill!=NOSKILL);
+      sk = sk_find((const char*)propValue);
+      assert(sk!=NOSKILL);
       xmlFree(propValue);
-    } else {
-      con->skill = NOSKILL;
     }
 
+    assert(*consPtr==NULL);
+
+    *consPtr = con = calloc(sizeof(construction), 1);
+    consPtr = &con->improvement;
+
+    con->skill = sk;
     con->maxsize = xml_ivalue(node, "maxsize", -1);
     con->minskill = xml_ivalue(node, "minskill", -1);
     con->reqsize = xml_ivalue(node, "reqsize", -1);
@@ -1686,9 +1687,9 @@ parse_races(xmlDocPtr doc)
       assert(propValue!=NULL);
       frc = rc_find((const char *)propValue);
       if (frc == NULL) {
-        log_error(("%s not registered, is familiar for %s\n",
-          (const char*)propValue, rc->_name[0]));
-        assert(frc!=NULL);
+//         log_error(("%s not registered, is familiar for %s\n",
+//           (const char*)propValue, rc->_name[0]));
+//         assert(frc!=NULL);
         frc = rc_add(rc_new((const char*)propValue));
       }
       if (xml_bvalue(node, "default", false)) {

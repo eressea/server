@@ -545,22 +545,21 @@ read_items(struct storage * store, item **ilist)
 static void
 read_alliances(struct storage * store)
 {
-  char pbuf[32];
-
+  int id;
   if (store->version<SAVEALLIANCE_VERSION) {
     if (!AllianceRestricted() && !AllianceAuto()) return;
   }
 
-  store->r_str_buf(store, pbuf, sizeof(pbuf));
-  while (strcmp(pbuf, "end")!=0) {
+  id = store->r_id(store);
+  while (id!=0) {
     char aname[128];
     alliance * al;
     store->r_str_buf(store, aname, sizeof(aname));
-    al = makealliance(atoi36(pbuf), aname);
+    al = makealliance(id, aname);
     if (store->version>=ALLIANCELEADER_VERSION) {
       read_reference(&al->leader, store, read_faction_reference, resolve_faction);
     }
-    store->r_str_buf(store, pbuf, sizeof(pbuf));
+    id = store->r_id(store);
   }
 }
 
@@ -571,15 +570,15 @@ write_alliances(struct storage * store)
   while (al) {
     if (al->leader) {
       store->w_id(store, al->id);
-      store->w_tok(store, al->name);
+      store->w_str(store, al->name);
       if (store->version>=ALLIANCELEADER_VERSION) {
         write_faction_reference(al->leader, store);
       }
+      store->w_brk(store);
     }
     al = al->next;
-    store->w_brk(store);
   }
-  store->w_tok(store, "end");
+  store->w_id(store, 0);
   store->w_brk(store);
 }
 
@@ -1593,6 +1592,7 @@ writegame(const char *filename, int mode)
   char path[MAX_PATH];
   storage my_store = (mode==IO_BINARY)?binary_store:text_store;
   storage * store = &my_store;
+  store->version = RELEASE_VERSION;
 
   sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H

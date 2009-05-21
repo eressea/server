@@ -558,6 +558,7 @@
     <attack type="4" damage="2d4"/>
     <attack type="6" spell="fiery_dragonbreath"/>
   </race>
+
   <race name="rat" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="100" capacity="540" speed="1.000000" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
     <function name="initfamiliar" value="oldfamiliars"/>
@@ -996,34 +997,12 @@
     <attack type="1" damage="1d7"/>
   </race>
 
-  <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <skill name="crossbow" modifier="1"/>
-    <skill name="mining" modifier="-3"/>
-    <skill name="bow" modifier="1"/>
-    <skill name="building" modifier="-2"/>
-    <skill name="catapult" modifier="-2"/>
-    <skill name="herbalism" modifier="1"/>
-    <skill name="training" modifier="4"/>
-    <skill name="armorer" modifier="-1"/>
-    <skill name="shipcraft" modifier="-4"/>
-    <skill name="sailing" modifier="-4"/>
-    <skill name="polearm" modifier="1"/>
-    <skill name="quarrying" modifier="-1"/>
-    <skill name="weaponsmithing" modifier="1"/>
-    <skill name="cartmaking" modifier="1"/>
-    <attack type="1" damage="2d5"/>
-    <familiar race="eagle" default="yes"/>
-    <familiar race="fairy"/>
-    <familiar race="owl"/>
-    <familiar race="unicorn"/>
-    <familiar race="nymph"/>
-    <familiar race="imp"/>
-  </race>
   <race name="shadowknight" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="1000" capacity="540" speed="1.000000" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noblock="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <function name="name" value="namegeneric"/>
     <attack type="1" damage="1d1"/>
   </race>
+
   <race name="seaserpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namegeneric"/>
@@ -1078,4 +1057,4 @@
     <attack type="2" damage="2d60"/>
   </race>
 
-  </races>
+</races>

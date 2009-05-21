@@ -24,17 +24,20 @@ struct faction;
 struct region;
 struct faction_list;
 
-struct alliance_transaction;
-
 enum {
-  ALLIANCE_KICK, ALLIANCE_LEAVE, ALLIANCE_TRANSFER, ALLIANCE_NEW, ALLIANCE_INVITE, ALLIANCE_JOIN, ALLIANCE_MAX
+  ALLIANCE_KICK,
+  ALLIANCE_LEAVE,
+  ALLIANCE_TRANSFER,
+  ALLIANCE_NEW,
+  ALLIANCE_INVITE,
+  ALLIANCE_JOIN,
+  ALLIANCE_MAX
 };
 
 typedef struct alliance {
   struct alliance * next;
   struct faction * leader;
   struct faction_list * members;
-  struct alliance_transaction * transactions[ALLIANCE_MAX];
   unsigned int flags;
   int id;
   char * name;

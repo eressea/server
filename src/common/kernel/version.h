@@ -64,4 +64,4 @@
 #define ALLIANCELEADER_VERSION 333 /* alliances have a leader */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION REGIONOWNER_VERSION /* current datafile */
+#define RELEASE_VERSION ALLIANCELEADER_VERSION /* current datafile */

@@ -69,153 +69,121 @@ findalliance(int id)
 typedef struct alliance_transaction {
   struct alliance_transaction * next;
   unit * u;
-  variant userdata;
   order * ord;
+//   alliance * al;
+//   variant userdata;
 } alliance_transaction;
+
+static struct alliance_transaction * transactions[ALLIANCE_MAX];
+
 
 static faction * alliance_leader(const alliance * al)
 {
   return al->leader;
 }
 
-static alliance_transaction **
-get_transaction(alliance * al, const variant * userdata, int type)
-{
-  alliance_transaction ** tap=al->transactions+type;
-  while (*tap) {
-    alliance_transaction * ta = *tap;
-    if (userdata==NULL || memcmp(&ta->userdata, userdata, sizeof(variant))==0) {
-      return tap;
-    }
-    tap = &ta->next;
-  }
-  return NULL;
-}
+// static alliance_transaction **
+// get_transaction(const variant * userdata, int type)
+// {
+//   alliance_transaction ** tap=transactions+type;
+//   while (*tap) {
+//     alliance_transaction * ta = *tap;
+//     if (userdata==NULL || memcmp(&ta->userdata, userdata, sizeof(variant))==0) {
+//       return tap;
+//     }
+//     tap = &ta->next;
+//   }
+//   return NULL;
+// }
 
 static void
-create_transaction(alliance * al, int type, const variant * userdata, unit * u, order * ord)
+create_transaction(int type, unit * u, order * ord)
 {
-  alliance_transaction * tr = malloc(sizeof(alliance_transaction));
-  memcpy(&tr->userdata, userdata, sizeof(variant));
+  alliance_transaction * tr = calloc(1, sizeof(alliance_transaction));
+//   if (userdata) {
+//     memcpy(&tr->userdata, userdata, sizeof(variant));
+//   }
+//   tr->al = al;
   tr->ord = ord;
-  tr->next = al->transactions[type];
-  al->transactions[type] = tr;
+  tr->u = u;
+  tr->next = transactions[type];
+  transactions[type] = tr;
 }
 
 static void
 cmd_kick(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  alliance * al = u->faction->alliance;
-  faction * f = findfaction(getid());
-  unused(tnext);
-
-  if (f && al && u->faction==alliance_leader(al)) {
-    static variant var;
-    var.v = f;
-    create_transaction(al, ALLIANCE_KICK, &var, u, ord);
-  }
+  create_transaction(ALLIANCE_KICK, (unit*)data, ord);
 }
 
 static void
 cmd_leave(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  alliance * al = u->faction->alliance;
-  unused(tnext);
-
-  if (al) {
-    create_transaction(al, ALLIANCE_LEAVE, NULL, u, ord);
-  }
+  create_transaction(ALLIANCE_LEAVE, (unit*)data, ord);
 }
 
 static void
 cmd_transfer(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  alliance * al = u->faction->alliance;
-  faction * f = findfaction(getid());
-  unused(tnext);
-
-  if (f && al && f->alliance==al && u->faction==alliance_leader(al)) {
-    static variant var;
-    var.v = f;
-    create_transaction(al, ALLIANCE_TRANSFER, &var, u, ord);
-  }
+  create_transaction(ALLIANCE_TRANSFER, (unit*)data, ord);
 }
 
 static void
 cmd_new(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  alliance * al = u->faction->alliance;
-  unused(tnext);
-
-  if (al && u->faction==alliance_leader(al)) {
-    static variant var;
-    const char * str = getstrtoken();
-
-    var.i = str?atoi36(str):0;
-    create_transaction(al, ALLIANCE_NEW, &var, u, ord);
-  }
+  create_transaction(ALLIANCE_NEW, (unit*)data, ord);
 }
 
 static void
 cmd_invite(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  alliance * al = u->faction->alliance;
-  faction * f = findfaction(getid());
-  unused(tnext);
-
-  if (f==NULL || al==NULL) {
-    /* TODO: error message */
-    return;
-  } else {
-    static variant var;
-    var.v = f;
-    create_transaction(al, ALLIANCE_INVITE, &var, u, ord);
-  }
+  create_transaction(ALLIANCE_INVITE, (unit*)data, ord);
 }
 
 static void
 cmd_join(const tnode * tnext, void * data, struct order * ord)
 {
-  unit * u = (unit*)data;
-  alliance * al = findalliance(getid());
-  unused(tnext);
-
-  if (u->faction->alliance==al || al==NULL) {
-    /* TODO: error message */
-    return;
-  }
-
-  create_transaction(al, ALLIANCE_JOIN, NULL, u, ord);
+  create_transaction(ALLIANCE_JOIN, (unit*)data, ord);
 }
 
 static void
-perform_kick(alliance * al)
+perform_kick()
 {
-  alliance_transaction ** tap = al->transactions+ALLIANCE_KICK;
+  alliance_transaction ** tap = transactions+ALLIANCE_KICK;
   while (*tap) {
     alliance_transaction * ta = *tap;
-    faction * f = ta->u->faction;
-    setalliance(f, NULL);
+    alliance * al = ta->u->faction->alliance;
+
+    if (al && alliance_leader(al)==ta->u->faction) {
+      faction * f;
+      init_tokens(ta->ord);
+      skip_token();
+      skip_token();
+      f = getfaction();
+      if (f && f->alliance==al) {
+        setalliance(f, NULL);
+      }
+    }
     *tap = ta->next;
     free(ta);
   }
 }
 
 static void
-perform_new(alliance * al)
+perform_new(void)
 {
-  alliance_transaction ** tap = al->transactions+ALLIANCE_LEAVE;
+  alliance_transaction ** tap = transactions+ALLIANCE_NEW;
   while (*tap) {
-    alliance * al;
     alliance_transaction * ta = *tap;
+    alliance * al;
+    int id;
     faction * f = ta->u->faction;
-    int id = ta->userdata.i;
-    
+
+    init_tokens(ta->ord);
+    skip_token();
+    skip_token();
+    id = getid();
+
     do {
       id = id?id:(1 + (rng_int() % MAX_UNIT_NR));
       for (al=alliances;al;al=al->next) {
@@ -226,20 +194,18 @@ perform_new(alliance * al)
       }
     } while (id==0);
 
-    al = calloc(1, sizeof(alliance));
-    al->id = id;
+    al = makealliance(id, itoa36(id));
     setalliance(f, al);
 
     *tap = ta->next;
     free(ta);
   }
-
 }
 
 static void
-perform_leave(alliance * al)
+perform_leave(void)
 {
-  alliance_transaction ** tap = al->transactions+ALLIANCE_LEAVE;
+  alliance_transaction ** tap = transactions+ALLIANCE_LEAVE;
   while (*tap) {
     alliance_transaction * ta = *tap;
     faction * f = ta->u->faction;
@@ -249,54 +215,76 @@ perform_leave(alliance * al)
     *tap = ta->next;
     free(ta);
   }
-
 }
 
 static void
-perform_transfer(alliance * al)
+perform_transfer(void)
 {
-  alliance_transaction ** tap = al->transactions+ALLIANCE_LEAVE;
+  alliance_transaction ** tap = transactions+ALLIANCE_TRANSFER;
   while (*tap) {
     alliance_transaction * ta = *tap;
-    faction * f = (faction *)ta->userdata.v;
+    alliance * al = ta->u->faction->alliance;
 
-    assert(f->alliance==al);
-
-    al->leader = f;
-
-    *tap = ta->next;
-    free(ta);
-  }
-
-}
-
-static void
-perform_join(alliance * al)
-{
-  alliance_transaction ** tap = al->transactions+ALLIANCE_JOIN;
-  while (*tap) {
-    alliance_transaction * ta = *tap;
-    faction * f = ta->u->faction;
-    if (f->alliance!=al) {
-      alliance_transaction ** tip = al->transactions+ALLIANCE_INVITE;
-      alliance_transaction * ti = *tip;
-      while (ti) {
-        if (ti->userdata.v==f) break;
-        tip = &ti->next;
-        ti = *tip;
-      }
-      if (ti) {
-        setalliance(f, al);
-        *tip = ti->next;
-        free(ti);
-      } else {
-        /* TODO: error message */
+    if (al && alliance_leader(al)==ta->u->faction) {
+      faction * f;
+      init_tokens(ta->ord);
+      skip_token();
+      skip_token();
+      f = getfaction();
+      if (f && f->alliance==al) {
+        al->leader = f;
       }
     }
     *tap = ta->next;
     free(ta);
   }
+}
 
+static void
+perform_join(void)
+{
+  alliance_transaction ** tap = transactions+ALLIANCE_JOIN;
+  while (*tap) {
+    alliance_transaction * ta = *tap;
+    faction * fj = ta->u->faction;
+    int aid;
+
+    init_tokens(ta->ord);
+    skip_token();
+    skip_token();
+    aid = getid();
+    if (aid) {
+      alliance * al = findalliance(aid);
+      if (al && fj->alliance!=al) {
+        alliance_transaction ** tip = transactions+ALLIANCE_INVITE;
+        alliance_transaction * ti = *tip;
+        while (ti) {
+          faction * fi = ti->u->faction;
+          if (fi->alliance==al) {
+            int fid;
+            init_tokens(ti->ord);
+            skip_token();
+            skip_token();
+            fid = getid();
+            if (fid==fj->no) {
+              break;
+            }
+          }
+          tip = &ti->next;
+          ti = *tip;
+        }
+        if (ti) {
+          setalliance(fj, al);
+          *tip = ti->next;
+          free(ti);
+        } else {
+          /* TODO: error message */
+        }
+      }
+    }
+    *tap = ta->next;
+    free(ta);
+  }
 }
 
 static void
@@ -325,22 +313,11 @@ execute(const struct syntaxtree * syntax, keyword_t kwd)
   }
 
   if (run) {
-    alliance * al;
-    for (al=alliances;al;al=al->next) {
-      perform_kick(al);
-    }
-    for (al=alliances;al;al=al->next) {
-      perform_leave(al);
-    }
-    for (al=alliances;al;al=al->next) {
-      perform_transfer(al);
-    }
-    for (al=alliances;al;al=al->next) {
-      perform_new(al);
-    }
-    for (al=alliances;al;al=al->next) {
-      perform_join(al);
-    }
+    perform_kick();
+    perform_leave();
+    perform_transfer();
+    perform_new();
+    perform_join();
   }
 }
 
@@ -351,15 +328,16 @@ alliance_cmd(void)
   if (stree==NULL) {
     syntaxtree * slang = stree = stree_create();
     while (slang) {
-      struct tnode * root = calloc(sizeof(tnode), 1);
+      // struct tnode * root = calloc(sizeof(tnode), 1);
       struct tnode * leaf = calloc(sizeof(tnode), 1);
-      add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
+      // add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
       add_command(leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
       add_command(leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
       add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
       add_command(leaf, NULL, LOC(slang->lang, "kick"), &cmd_kick);
       add_command(leaf, NULL, LOC(slang->lang, "leave"), &cmd_new);
       add_command(leaf, NULL, LOC(slang->lang, "command"), &cmd_transfer);
+      slang->root = leaf;
       slang = slang->next;
     }
   }
@@ -423,6 +401,7 @@ setalliance(struct faction * f, alliance * al)
     if (al->leader==NULL) {
       al->leader = f;
     }
+    flist = NULL;
   }
   free(flist);
 }
