@@ -391,6 +391,24 @@ tolua_faction_tostring(lua_State *tolua_S)
   return 1;
 }
 
+static int tolua_faction_get_spells(lua_State* tolua_S)
+{
+  faction* self = (faction*)tolua_tousertype(tolua_S, 1, 0);
+  spell_list * slist = self->spellbook;
+  if (slist) {
+    spell_list ** spell_ptr = (spell_list **)lua_newuserdata(tolua_S, sizeof(spell_list *));
+    luaL_getmetatable(tolua_S, "spell_list");
+    lua_setmetatable(tolua_S, -2);
+
+    *spell_ptr = slist;
+    lua_pushcclosure(tolua_S, tolua_spelllist_next, 1);
+    return 1;
+  }
+
+  lua_pushnil(tolua_S);
+  return 1;
+}
+
 void
 tolua_faction_open(lua_State* tolua_S)
 {
@@ -410,6 +428,7 @@ tolua_faction_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "info", tolua_faction_get_info, tolua_faction_set_info);
       tolua_variable(tolua_S, "units", tolua_faction_get_units, NULL);
       tolua_variable(tolua_S, "heroes", tolua_faction_get_heroes, NULL);
+      tolua_variable(tolua_S, "spells", tolua_faction_get_spells, 0);
       tolua_variable(tolua_S, "maxheroes", tolua_faction_get_maxheroes, NULL);
       tolua_variable(tolua_S, "password", tolua_faction_get_password, tolua_faction_set_password);
       tolua_variable(tolua_S, "email", tolua_faction_get_email, tolua_faction_set_email);

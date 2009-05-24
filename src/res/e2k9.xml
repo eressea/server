@@ -114,6 +114,7 @@
     <param name="nmr.removenewbie" value="0"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="0"/>
+    <param name="init_spells" value="0"/>
     <param name="hunger.damage" value="1d9+9"/>
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
@@ -124,6 +125,7 @@
     <param name="rules.combat.loot" value="3"/> <!-- only self + monsters -->
 	<param name="rules.cavalry.skill" value="4"/>
 	<param name="rules.cavalry.mode" value="1"/>
+    <param name="rules.magic.factionlist" value="1"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.give" value="3"/> <!-- only self + peasants -->
     <param name="rules.help.mask" value="fight guard money"/>

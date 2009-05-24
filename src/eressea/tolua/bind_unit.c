@@ -489,12 +489,13 @@ unit_addspell(unit * u, const char * name)
 {
   int add = 0;
   spell_list * slist = spells;
+  spell_list ** starget = NULL;
   while (slist!=NULL) {
     spell * sp = slist->data;
     if (strcmp(name, sp->sname)==0) {
-      struct sc_mage * mage = get_mage(u);
+      starget = get_spelllist(get_mage(u), u->faction);
       if (add) log_error(("two spells are called %s.\n", name));
-      add_spell(mage, sp);
+      add_spell(starget, sp);
       add = 1;
     }
     slist=slist->next;
@@ -514,17 +515,16 @@ tolua_unit_addspell(lua_State* tolua_S)
 static void
 unit_removespell(unit * u, const spell * sp)
 {
-  sc_mage * mage = get_mage(u);
-  if (mage!=NULL) {
-    spell_list ** isptr = &mage->spells;
-    while (*isptr && (*isptr)->data != sp) {
-      isptr = &(*isptr)->next;
-    }
-    if (*isptr) {
-      spell_list * sptr = *isptr;
-      *isptr = sptr->next;
-      free(sptr);
-    }
+  spell_list ** isptr;
+  isptr = get_spelllist(get_mage(u), u->faction);
+
+  while (*isptr && (*isptr)->data != sp) {
+    isptr = &(*isptr)->next;
+  }
+  if (*isptr) {
+    spell_list * sptr = *isptr;
+    *isptr = sptr->next;
+    free(sptr);
   }
 }
 
@@ -719,18 +719,23 @@ static int tolua_unit_get_items(lua_State* tolua_S)
 static int tolua_unit_get_spells(lua_State* tolua_S)
 {
   unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  sc_mage * mage;
-  spell_list ** spell_ptr = (spell_list **)lua_newuserdata(tolua_S, sizeof(spell_list *));
+  sc_mage * mage = get_mage(self);
 
-  luaL_getmetatable(tolua_S, "spell_list");
-  lua_setmetatable(tolua_S, -2);
+  if (mage) {
+    spell_list ** slist = get_spelllist(mage, self->faction);
+    assert(slist);
+    if (slist) {
+      spell_list ** spell_ptr = (spell_list **)lua_newuserdata(tolua_S, sizeof(spell_list *));
+      luaL_getmetatable(tolua_S, "spell_list");
+      lua_setmetatable(tolua_S, -2);
 
-  mage = get_mage(self);
+      *spell_ptr = *slist;
+      lua_pushcclosure(tolua_S, tolua_spelllist_next, 1);
+      return 1;
+    }
+  }
 
-  *spell_ptr = mage?mage->spells:0;
-
-  lua_pushcclosure(tolua_S, tolua_spelllist_next, 1);
-
+  lua_pushnil(tolua_S);
   return 1;
 }
 

@@ -48,6 +48,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/rand.h>
@@ -775,6 +776,55 @@ tolua_write_spells(lua_State* tolua_S)
   return 0;
 }
 
+static int
+tolua_get_spell_text(lua_State *tolua_S)
+{
+  const struct locale * loc = find_locale("en");
+  spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, spell_info(self, loc));
+  return 1;
+}
+
+static int
+tolua_get_spell_school(lua_State *tolua_S)
+{
+  spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, magietypen[self->magietyp]);
+  return 1;
+}
+
+static int
+tolua_get_spell_level(lua_State *tolua_S)
+{
+  spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushnumber(tolua_S, self->level);
+  return 1;
+}
+
+static int
+tolua_get_spell_name(lua_State *tolua_S)
+{
+  spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
+  lua_pushstring(tolua_S, self->sname);
+  return 1;
+}
+
+static int tolua_get_spells(lua_State* tolua_S)
+{
+  spell_list * slist = spells;
+  if (slist) {
+    spell_list ** spell_ptr = (spell_list **)lua_newuserdata(tolua_S, sizeof(spell_list *));
+    luaL_getmetatable(tolua_S, "spell_list");
+    lua_setmetatable(tolua_S, -2);
+
+    *spell_ptr = slist;
+    lua_pushcclosure(tolua_S, tolua_spelllist_next, 1);
+    return 1;
+  }
+
+  lua_pushnil(tolua_S);
+  return 1;
+}
 int
 tolua_eressea_open(lua_State* tolua_S)
 {
@@ -798,6 +848,17 @@ tolua_eressea_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "id", tolua_get_alliance_id, NULL);
       tolua_variable(tolua_S, "factions", &tolua_get_alliance_factions, NULL);
       tolua_function(tolua_S, "create", tolua_alliance_create);
+    }
+    tolua_endmodule(tolua_S);
+
+    tolua_cclass(tolua_S, "spell", "spell", "", NULL);
+    tolua_beginmodule(tolua_S, "spell");
+    {
+      tolua_function(tolua_S, "__tostring", tolua_get_spell_name);
+      tolua_variable(tolua_S, "name", tolua_get_spell_name, 0);
+      tolua_variable(tolua_S, "school", tolua_get_spell_school, 0);
+      tolua_variable(tolua_S, "level", tolua_get_spell_level, 0);
+      tolua_variable(tolua_S, "text", tolua_get_spell_text, 0);
     }
     tolua_endmodule(tolua_S);
 
@@ -874,6 +935,7 @@ tolua_eressea_open(lua_State* tolua_S)
 
     tolua_function(tolua_S, "rng_int", tolua_rng_int);
 
+    tolua_function(tolua_S, "spells", tolua_get_spells);
     tolua_function(tolua_S, "write_spells", tolua_write_spells);
   }
   tolua_endmodule(tolua_S);

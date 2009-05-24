@@ -630,6 +630,20 @@ fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
   fputc('"', F);
 }
 
+static void cr_output_spells(FILE * F, spell_list * slist, const faction * f, int maxlevel)
+{
+  if (slist) {
+    fprintf(F, "SPRUECHE\n");
+    for (;slist; slist = slist->next) {
+      spell * sp = slist->data;
+      if (sp->level <= maxlevel) {
+        const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+        fprintf(F, "\"%s\"\n", name);
+      }
+    }
+  }
+}
+
 /* prints all that belongs to a unit */
 static void
 cr_output_unit(FILE * F, const region * r,
@@ -845,26 +859,18 @@ cr_output_unit(FILE * F, const region * r,
     /* spells */
     if (is_mage(u)) {
       sc_mage * mage = get_mage(u);
-      spell_list * slist = mage->spells;
-      if (slist) {
-        int i;
-        int t = effskill(u, SK_MAGIC);
-        fprintf(F, "SPRUECHE\n");
-        for (;slist; slist = slist->next) {
-          spell * sp = slist->data;
-          if (sp->level <= t) {
-            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
-            fprintf(F, "\"%s\"\n", name);
-          }
-        }
-        for (i=0;i!=MAXCOMBATSPELLS;++i) {
-          const spell * sp = mage->combatspells[i].sp;
-          if (sp) {
-            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
-            fprintf(F, "KAMPFZAUBER %d\n", i);
-            fprintf(F, "\"%s\";name\n", name);
-            fprintf(F, "%d;level\n", mage->combatspells[i].level);
-          }
+      spell_list ** slistp = get_spelllist(mage, u->faction);
+      int i, maxlevel = effskill(u, SK_MAGIC);
+
+      cr_output_spells(F, *slistp, f, maxlevel);
+
+      for (i=0;i!=MAXCOMBATSPELLS;++i) {
+        const spell * sp = mage->combatspells[i].sp;
+        if (sp) {
+          const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+          fprintf(F, "KAMPFZAUBER %d\n", i);
+          fprintf(F, "\"%s\";name\n", name);
+          fprintf(F, "%d;level\n", mage->combatspells[i].level);
         }
       }
     }

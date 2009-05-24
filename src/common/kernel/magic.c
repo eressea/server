@@ -201,6 +201,36 @@ free_mage(attrib * a)
   free(mage);
 }
 
+int FactionSpells(void)
+{
+  static int rules_factionspells = -1;
+  if (rules_factionspells<0) {
+    rules_factionspells = get_param_int(global.parameters, "rules.magic.factionlist", 0);
+  }
+  return rules_factionspells;
+}
+
+void read_spellist(struct spell_list ** slistp, struct storage * store)
+{
+  for (;;) {
+    spell * sp;
+    char spname[64];
+
+    if (store->version<SPELLNAME_VERSION) {
+      int i = store->r_int(store);
+      if (i < 0) break;
+      sp = find_spellbyid(M_GRAU, (spellid_t)i);
+    } else {
+      store->r_tok_buf(store, spname, sizeof(spname));
+      if (strcmp(spname, "end")==0) break;
+      sp = find_spell(M_GRAU, spname);
+    }
+    if (sp!=NULL) {
+      add_spell(slistp, sp);
+    }
+  }
+}
+
 static int
 read_mage(attrib * a, struct storage * store)
 {
@@ -241,27 +271,18 @@ read_mage(attrib * a, struct storage * store)
       }
     }
   }
-
-  for (;;) {
-    spell * sp;
-
-    if (store->version<SPELLNAME_VERSION) {
-      i = store->r_int(store);
-      if (i < 0) break;
-      sp = find_spellbyid(mage->magietyp, (spellid_t)i);
-    } else {
-      store->r_tok_buf(store, spname, sizeof(spname));
-      if (strcmp(spname, "end")==0) break;
-      sp = find_spell(mage->magietyp, spname);
-    }
-    if (sp==NULL) {
-      /* flag upstream to show that updatespellist() is necessary (hackish) */
-      mage->spellcount = -1;
-      continue;
-    }
-    add_spell(mage, sp);
-  }
+  read_spellist(&mage->spells, store);
   return AT_READ_OK;
+}
+
+void write_spelllist(const spell_list * slist, struct storage * store)
+{
+  while (slist!=NULL) {
+    spell * sp = slist->data;
+    store->w_tok(store, sp->sname);
+    slist = slist->next;
+  }
+  store->w_tok(store, "end");
 }
 
 static void
@@ -269,7 +290,7 @@ write_mage(const attrib * a, struct storage * store)
 {
   int i;
   sc_mage *mage = (sc_mage*)a->data.v;
-  spell_list *slist = mage->spells;
+
   store->w_int(store, mage->magietyp);
   store->w_int(store, mage->spellpoints);
   store->w_int(store, mage->spchange);
@@ -277,12 +298,7 @@ write_mage(const attrib * a, struct storage * store)
     store->w_tok(store, mage->combatspells[i].sp?mage->combatspells[i].sp->sname:"none");
     store->w_int(store, mage->combatspells[i].level);
   }
-  while (slist!=NULL) {
-    spell * sp = slist->data;
-    store->w_tok(store, sp->sname);
-    slist = slist->next;
-  }
-  store->w_tok(store, "end");
+  write_spelllist(mage->spells, store);
 }
 
 attrib_type at_mage = {
@@ -326,58 +342,12 @@ find_magetype(const unit * u)
 }
 
 /* ------------------------------------------------------------- */
-/* ein 'neuer' Magier bekommt von Anfang an alle Sprüche seines
-* Magiegebietes mit einer Stufe kleiner oder gleich seinem Magietalent
-* in seine List-of-known-spells. Ausgenommen mtyp 0 (M_GRAU) */
-
-static void
-createspelllist(unit *u, magic_t mtyp)
-{
-  spell_list * slist;
-  int sk;
-
-  if (mtyp == M_GRAU) return;
-
-  sk = effskill(u, SK_MAGIC);
-  if (sk == 0) return;
-
-  for (slist=spells;slist!=NULL;slist=slist->next) {
-    spell * sp = slist->data;
-    if (sp->magietyp == mtyp && sp->level <= sk) {
-      if (!has_spell(u, sp)) {
-        add_spell(get_mage(u), sp);
-      }
-    }
-  }
-}
-
-/* ------------------------------------------------------------- */
-/* Erzeugen eines neuen Magiers */
-sc_mage *
-create_mage(unit * u, magic_t mtyp)
-{
-  sc_mage *mage;
-  attrib *a;
-
-  a = a_find(u->attribs, &at_mage);
-  if (a!=NULL) {
-    a_remove(&u->attribs, a);
-  }
-  a = a_add(&u->attribs, a_new(&at_mage));
-  mage = a->data.v;
-
-  mage->magietyp = mtyp;
-  createspelllist(u, mtyp);
-  return mage;
-}
-
-/* ------------------------------------------------------------- */
 /* Ausgabe der Spruchbeschreibungen
- * Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
- * kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
- * werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
- * Spruch zu seiner List-of-known-spells hinzugefügt werden.
- */
+* Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
+* kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
+* werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
+* Spruch zu seiner List-of-known-spells hinzugefügt werden.
+*/
 
 
 static int
@@ -427,24 +397,65 @@ already_seen(const faction * f, const spell * sp)
   return false;
 }
 
-void
-updatespelllist(unit * u)
-{
-  int sk = eff_skill(u, SK_MAGIC, u->region);
-  spell_list * slist;
-  spell * sp;
-  struct sc_mage * mage = get_mage(u);
-  magic_t gebiet = find_magetype(u);
-  boolean ismonster = is_monsters(u->faction);
+#define GRAYSPELLS 2 /* number of new gray spells per level */
+#define MAXSPELLS 256
 
-  /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
-  sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);
+/** update the spellbook with a new level
+* Written for Eressea 1.1
+*/
+void
+update_spellbook(faction * f, int level)
+{
+  spell * grayspells[MAXSPELLS];
+  int numspells = 0;
+  spell_list * slist;
+
+  for (slist=spells;slist!=NULL;slist=slist->next) {
+    spell * sp = slist->data;
+    if (sp->magietyp == M_GRAU && level<f->max_spelllevel && sp->level<=level) {
+      grayspells[numspells++] = sp;
+    } else {
+      if (sp->magietyp == f->magiegebiet && sp->level <= level) {
+        if (!has_spell(f->spellbook, sp)) {
+          add_spell(&f->spellbook, sp);
+        }
+      }
+    }
+  }
+  while (numspells>0 && level>f->max_spelllevel) {
+    int i;
+    for (i=0;i!=GRAYSPELLS;++i) {
+      int maxspell = numspells;
+      int spellno = -1;
+      spell * sp;
+      do {
+        if (spellno==maxspell) {
+          --maxspell;
+        }
+        spellno = rng_int() % maxspell;
+        sp = grayspells[spellno];
+      }
+      while (maxspell>0 && sp && sp->level<=f->max_spelllevel);
+
+      if (sp) {
+        add_spell(&f->spellbook, sp);
+        grayspells[spellno] = 0;
+      }
+    }
+    ++f->max_spelllevel;
+  }
+}
 
 #if KARMA_MODULE
+void wyrm_update(unit * u, struct sc_mage * mage, int sk) 
+{
+  spell_list * slist, ** slistp;
+  /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
+  spell * sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);
+
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
     add_spell(mage, find_spellbyid(M_GRAU, SPL_BECOMEWYRM));
   }
-#endif /* KARMA_MODULE */
 
   /* Transformierte Wyrm-Magier bekommen Drachenodem */
   if (dragonrace(u->race)) {
@@ -453,36 +464,55 @@ updatespelllist(unit * u)
       /* keine breaks! Wyrme sollen alle drei Zauber können.*/
     case RC_WYRM:
       sp = find_spellbyid(M_GRAU, SPL_WYRMODEM);
-      if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
-        add_spell(mage, sp);
+      slistp = get_spelllist(mage, u->faction);
+      if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
+        add_spell(slistp, sp);
       }
     case RC_DRAGON:
       sp = find_spellbyid(M_GRAU, SPL_DRAGONODEM);
-      if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
-        add_spell(mage, sp);
+      slistp = get_spelllist(mage, u->faction);
+      if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
+        add_spell(slistp, sp);
       }
     case RC_FIREDRAGON:
       sp = find_spellbyid(M_GRAU, SPL_FIREDRAGONODEM);
-      if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
-        add_spell(mage, sp);
+      slistp = get_spelllist(mage, u->faction);
+      if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
+        add_spell(slistp, sp);
       }
       break;
     }
   }
+  return slistp;
+}
+#endif
+
+void
+updatespelllist(unit * u)
+{
+  int sk = eff_skill(u, SK_MAGIC, u->region);
+  spell_list * slist = spells;
+  struct sc_mage * mage = get_mage(u);
+  magic_t gebiet = find_magetype(u);
+  boolean ismonster = is_monsters(u->faction);
 
   /* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
   * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
   * Drachen, die noch den Skill Magie haben */
 
-  for (slist=spells;slist!=NULL;slist=slist->next) {
+  if (FactionSpells()) {
+    spells = u->faction->spellbook;
+  }
+
+  for (;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
     if (sp->level<=sk) {
-      boolean know = has_spell(u, sp);
+      boolean know = u_hasspell(u, sp);
 
       if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet)) {
         faction * f = u->faction;
 
-        if (!know) add_spell(mage, sp);
+        if (!know) add_spell(get_spelllist(mage, u->faction), sp);
         if (!ismonster && !already_seen(u->faction, sp)) {
           a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
           a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
@@ -490,18 +520,41 @@ updatespelllist(unit * u)
       }
     }
   }
+
+#if KARMA_MODULE
+  wyrm_update(u, mage, sk);
+#endif /* KARMA_MODULE */
+}
+
+/* ------------------------------------------------------------- */
+/* Erzeugen eines neuen Magiers */
+sc_mage *
+create_mage(unit * u, magic_t mtyp)
+{
+  sc_mage *mage;
+  attrib *a;
+
+  a = a_find(u->attribs, &at_mage);
+  if (a!=NULL) {
+    a_remove(&u->attribs, a);
+  }
+  a = a_add(&u->attribs, a_new(&at_mage));
+  mage = a->data.v;
+
+  mage->magietyp = mtyp;
+  return mage;
 }
 
 /* ------------------------------------------------------------- */
 /* Funktionen für die Bearbeitung der List-of-known-spells */
 
 void
-add_spell(sc_mage* m, spell * sp)
+add_spell(spell_list ** slistp, spell * sp)
 {
-  if (m==NULL) {
+  if (slistp==NULL) {
     log_error(("add_spell: unit is not a mage.\n"));
   } else {
-    spell_list ** slist = spelllist_find(&m->spells, sp);
+    spell_list ** slist = spelllist_find(slistp, sp);
     if (*slist) {
       spell * psp = (*slist)->data;
       if (psp==sp) {
@@ -514,13 +567,20 @@ add_spell(sc_mage* m, spell * sp)
 }
 
 boolean
-has_spell(const unit *u, const spell * sp)
+has_spell(spell_list * slist, const spell * sp)
 {
-  sc_mage * m = get_mage(u);
-  if (m!=NULL) {
-    spell_list * sfind = *spelllist_find(&m->spells, sp);
+  if (slist!=NULL) {
+    spell_list * sfind = *spelllist_find(&slist, sp);
     return sfind!=NULL && sfind->data==sp;
   }
+  return false;
+}
+
+boolean 
+u_hasspell(const struct unit *u, const struct spell * sp)
+{
+  sc_mage * mage = get_mage(u);
+  if (mage) return has_spell(mage->spells, sp);
   return false;
 }
 
@@ -572,7 +632,7 @@ set_combatspell(unit *u, spell *sp, struct order * ord, int level)
     cmistake(u, ord, 173, MSG_MAGIC);
     return;
   }
-  if (!has_spell(u, sp)) {
+  if (!u_hasspell(u, sp)) {
     /* Diesen Zauber kennt die Einheit nicht */
     cmistake(u, ord, 169, MSG_MAGIC);
     return;
@@ -917,7 +977,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 		return false;
 	}
 	/* steht der Spruch in der Spruchliste? */
-	if (!has_spell(u, sp)) {
+	if (!u_hasspell(u, sp)) {
 		/* ist der Spruch aus einem anderen Magiegebiet? */
 		if (find_magetype(u) != sp->magietyp) {
 			return false;
@@ -1439,52 +1499,52 @@ regeneration(unit * u)
 void
 regeneration_magiepunkte(void)
 {
-	region *r;
-	unit *u;
-	int aura, auramax;
-	double reg_aura;
-	int n;
+  region *r;
+  unit *u;
+  int aura, auramax;
+  double reg_aura;
+  int n;
 
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			if (u->number && is_mage(u)) {
-				aura = get_spellpoints(u);
-				auramax = max_spellpoints(r, u);
-				if (aura < auramax) {
-					struct building * b = inside_building(u);
-					const struct building_type * btype = b?b->type:NULL;
-					reg_aura = (double)regeneration(u);
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u = u->next) {
+      if (u->number && is_mage(u)) {
+        aura = get_spellpoints(u);
+        auramax = max_spellpoints(r, u);
+        if (aura < auramax) {
+          struct building * b = inside_building(u);
+          const struct building_type * btype = b?b->type:NULL;
+          reg_aura = (double)regeneration(u);
 
-					/* Magierturm erhöht die Regeneration um 75% */
-					/* Steinkreis erhöht die Regeneration um 50% */
-					if (btype) reg_aura *= btype->auraregen;
+          /* Magierturm erhöht die Regeneration um 75% */
+          /* Steinkreis erhöht die Regeneration um 50% */
+          if (btype) reg_aura *= btype->auraregen;
 
-					/* Bonus/Malus durch Zauber */
-					n = get_curseeffect(u->attribs, C_AURA, 0);
-					if (n>0) {
-						reg_aura = (reg_aura*n)/100;
-					}
+          /* Bonus/Malus durch Zauber */
+          n = get_curseeffect(u->attribs, C_AURA, 0);
+          if (n>0) {
+            reg_aura = (reg_aura*n)/100;
+          }
 
-					/* Einfluss von Artefakten */
-					/* TODO (noch gibs keine)*/
+          /* Einfluss von Artefakten */
+          /* TODO (noch gibs keine)*/
 
-					/* maximal Differenz bis Maximale-Aura regenerieren
-					 * mindestens 1 Aura pro Monat */
-					reg_aura = MAX(1,reg_aura);
-					reg_aura = MIN((auramax - aura), reg_aura);
+          /* maximal Differenz bis Maximale-Aura regenerieren
+          * mindestens 1 Aura pro Monat */
+          reg_aura = MAX(1,reg_aura);
+          reg_aura = MIN((auramax - aura), reg_aura);
 
-					aura += (int)reg_aura;
-					ADDMSG(&u->faction->msgs, msg_message(
-						"regenaura", "unit region amount",
-						u, r, (int)reg_aura));
-				}
-				set_spellpoints(u, MIN(aura, auramax));
+          aura += (int)reg_aura;
+          ADDMSG(&u->faction->msgs, msg_message(
+            "regenaura", "unit region amount",
+            u, r, (int)reg_aura));
+        }
+        set_spellpoints(u, MIN(aura, auramax));
 
-				/* Zum letzten Mal Spruchliste aktualisieren */
-				updatespelllist(u);
-			}
-		}
-	}
+        /* Zum letzten Mal Spruchliste aktualisieren */
+        /*updatespelllist(u);*/
+      }
+    }
+  }
 }
 
 static boolean
@@ -2870,4 +2930,12 @@ spelllist_find(spell_list ** lspells, const spell * sp)
     lspells = &slist->next;
   }
   return lspells;
+}
+
+extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f)
+{
+  if (mage) {
+    return &mage->spells;
+  }
+  return NULL;
 }

@@ -587,7 +587,7 @@ learn_cmd(unit * u, order * ord)
       if (!is_mage(u)) create_mage(u, mtyp);
     } else {
       /* ist schon ein Magier und kein Vertrauter */
-      if(u->faction->magiegebiet == 0){
+      if (u->faction->magiegebiet == 0) {
         /* die Partei hat noch kein Magiegebiet gewählt. */
         mtyp = getmagicskill(u->faction->locale);
         if (mtyp == M_NONE){
@@ -737,5 +737,17 @@ learn_cmd(unit * u, order * ord)
       }
     }
   }
+  else if (sk==SK_MAGIC) {
+    sc_mage * mage = get_mage(u);
+    int level = eff_skill(u, SK_MAGIC, r);
+    if (FactionSpells() && level>u->faction->max_spelllevel) {
+      update_spellbook(u->faction, level);
+    }
+    if (!mage) {
+      mage = create_mage(u, u->faction->magiegebiet);
+    }
+    updatespelllist(u);
+  }
+
   return 0;
 }

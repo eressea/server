@@ -258,7 +258,7 @@ unit_addspell(unit * u, const char * name)
     if (strcmp(name, sp->sname)==0) {
       struct sc_mage * mage = get_mage(u);
       if (add) log_error(("two spells are called %s.\n", name));
-      add_spell(mage, sp);
+      add_spell(get_spelllist(mage, u->faction), sp);
       add = true;
     }
     slist=slist->next;

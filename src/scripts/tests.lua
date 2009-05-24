@@ -1,45 +1,45 @@
 local function test_rename()
-    free_game()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("enno@eressea.de", "human", "de")
-    local u = unit.create(f, r)
-    u:add_item("aoh", 1)
-    assert(u:get_item("ao_healing")==1)
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r)
+  u:add_item("aoh", 1)
+  assert(u:get_item("ao_healing")==1)
 end
 
 local function test_pure()
-    free_game()
-    local r = region.create(0, 0, "plain")
+  free_game()
+  local r = region.create(0, 0, "plain")
 end
 
 local function test_read_write()
-    free_game()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("enno@eressea.de", "human", "de")
-    local u = unit.create(f, r)
-    u.number = 2
-    local fno = f.id
-    local uno = u.id
-    local result = 0
-    assert(r.terrain=="plain")
-    result = write_game("test_read_write.dat", "binary")
-    assert(result==0)
-    assert(get_region(0, 0)~=nil)
-    assert(get_faction(fno)~=nil)
-    assert(get_unit(uno)~=nil)
-    r = nil
-    f = nil
-    u = nil
-    free_game()
-    assert(get_region(0, 0)==nil)
-    assert(get_faction(fno)==nil)
-    assert(get_unit(uno)==nil)
-    result = read_game("test_read_write.dat", "binary")
-    assert(result==0)
-    assert(get_region(0, 0)~=nil)
-    assert(get_faction(fno)~=nil)
-    assert(get_unit(uno)~=nil)
-    free_game()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r)
+  u.number = 2
+  local fno = f.id
+  local uno = u.id
+  local result = 0
+  assert(r.terrain=="plain")
+  result = write_game("test_read_write.dat", "binary")
+  assert(result==0)
+  assert(get_region(0, 0)~=nil)
+  assert(get_faction(fno)~=nil)
+  assert(get_unit(uno)~=nil)
+  r = nil
+  f = nil
+  u = nil
+  free_game()
+  assert(get_region(0, 0)==nil)
+  assert(get_faction(fno)==nil)
+  assert(get_unit(uno)==nil)
+  result = read_game("test_read_write.dat", "binary")
+  assert(result==0)
+  assert(get_region(0, 0)~=nil)
+  assert(get_faction(fno)~=nil)
+  assert(get_unit(uno)~=nil)
+  free_game()
 end
 
 local function test_gmtool()
@@ -245,6 +245,31 @@ local function test_recruit()
   -- assert(u:get_item("money")==10)
 end
 
+local function test_spells()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r)
+  u.race = "elf"
+  u.number = 1
+  u:clear_orders()
+  u:add_item("money", 10000)
+  u:set_skill("magic", 5)
+  u:add_order("LERNE MAGIE Tybied")
+  process_orders()
+  local sp
+  local nums = 0
+  if f.spells~=nil then
+    for sp in f.spells do
+    nums = nums + 1
+    end
+  end
+  for sp in u.spells do
+  nums = nums - 1
+  end
+  assert(nums==0)
+end
+
 local function test_produce()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -327,10 +352,11 @@ tests = {
     ["events"] = test_events,
     ["produce"] = test_produce,
     ["rename"] = test_rename,
-    ["recruit"] = test_recruit
+    ["recruit"] = test_recruit,
+    ["spells"] = test_spells
 }
 mytests = {
-    ["alliance"] = test_alliance
+    ["spells"] = test_spells
 }
 fail = 0
 for k, v in pairs(tests) do

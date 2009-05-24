@@ -279,10 +279,13 @@ void set_combatspell(struct unit *u, spell *sp, struct order * ord, int level);
 	/* 	setzt Kampfzauber */
 void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
-void add_spell(struct sc_mage *mage, spell *sp);
+void add_spell(spell_list ** slistp, spell *sp);
 	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-boolean has_spell(const struct unit *u, const struct spell * sp);
+boolean has_spell(struct spell_list *slist, const struct spell * sp);
 	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
+boolean u_hasspell(const struct unit * u, const struct spell * sp);
+    /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
+void update_spellbook(struct faction * f, int level);
 void updatespelllist(struct unit *u);
 	/* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner
 	 * als das aktuelle Magietalent ist, in die Spruchliste der Einheit
@@ -376,7 +379,11 @@ extern const char * spell_name(const struct spell * sp, const struct locale * la
 extern const char * curse_name(const struct curse_type * ctype, const struct locale * lang);
 
 extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
+extern int FactionSpells();
+extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f);
 
+extern void write_spelllist(const struct spell_list * slist, struct storage * store);
+extern void read_spellist(struct spell_list ** slistp, struct storage * store);
 #ifdef __cplusplus
 }
 #endif

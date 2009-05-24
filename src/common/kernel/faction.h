@@ -65,6 +65,8 @@ typedef struct faction {
   char *email;
   char *passw;
   char *override;
+  int max_spelllevel;
+  struct spell_list * spellbook;
   const struct locale * locale;
   int lastorders;	/* enno: short? */
   int age;	/* enno: short? */

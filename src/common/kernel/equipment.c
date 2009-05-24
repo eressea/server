@@ -141,7 +141,7 @@ equip_unit(struct unit * u, const struct equipment * eq)
         assert(!"trying to equip spells on a non-mage!");
       } else {
         while (sp) {
-          add_spell(m, sp->data);
+          add_spell(get_spelllist(m, u->faction), sp->data);
           sp = sp->next;
         }
       }

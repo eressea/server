@@ -174,21 +174,6 @@
   </spell>
 
   <!-- gray magic -->
-  <spell name="create_runesword" type="gray" ship="true" rank="5" level="6" index="135">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-    <resource name="money" amount="1000" cost="fixed"/>
-    <resource name="laensword" amount="1" cost="fixed"/>
-  </spell>
-
-  <spell name="create_chastitybelt" type="gray" ship="true" rank="5" level="7" index="134">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-  </spell>
-
   <spell name="create_focus" type="gray" ship="true" rank="5" level="9" index="2">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="100" cost="fixed"/>

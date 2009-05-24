@@ -264,6 +264,8 @@ destroyfaction(faction * f)
 
   if (!f->alive) return;
 
+  freelist(f->spellbook);
+
   while (f->battles) {
     struct bmsg * bm = f->battles;
     f->battles = bm->next;

@@ -1249,6 +1249,7 @@ readfaction(struct storage * store)
     }
   }
   read_groups(store, f);
+  read_spellist(&f->spellbook, store);
   return f;
 }
 
@@ -1312,6 +1313,7 @@ writefaction(struct storage * store, const faction * f)
   store->w_id(store, 0);
   store->w_brk(store);
   write_groups(store, f->groups);
+  write_spelllist(f->spellbook, store);
 }
 
 int
