@@ -596,7 +596,6 @@ load_inifile(const char * filename)
 static void
 write_spells(void)
 {
-  const resource_type * rt_water = rt_find("p2");
   struct locale * loc = find_locale("de");
   FILE * F = fopen("spells.txt", "w");
   spell_list * spl = spells;
@@ -649,7 +648,8 @@ main(int argc, char *argv[])
   kernel_init();
   game_init();
 
-  /* write_spells(); */
+  if (0)
+    write_spells();
 
   /* run the main script */
   if (luafile==NULL) lua_console(luaState);

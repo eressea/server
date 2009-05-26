@@ -379,7 +379,7 @@ extern const char * spell_name(const struct spell * sp, const struct locale * la
 extern const char * curse_name(const struct curse_type * ctype, const struct locale * lang);
 
 extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
-extern int FactionSpells();
+extern int FactionSpells(void);
 extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f);
 
 extern void write_spelllist(const struct spell_list * slist, struct storage * store);

@@ -147,7 +147,7 @@ cmd_join(const tnode * tnext, void * data, struct order * ord)
 }
 
 static void
-perform_kick()
+perform_kick(void)
 {
   alliance_transaction ** tap = transactions+ALLIANCE_KICK;
   while (*tap) {
@@ -335,7 +335,7 @@ alliance_cmd(void)
       add_command(leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
       add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
       add_command(leaf, NULL, LOC(slang->lang, "kick"), &cmd_kick);
-      add_command(leaf, NULL, LOC(slang->lang, "leave"), &cmd_new);
+      add_command(leaf, NULL, LOC(slang->lang, "leave"), &cmd_leave);
       add_command(leaf, NULL, LOC(slang->lang, "command"), &cmd_transfer);
       slang->root = leaf;
       slang = slang->next;
