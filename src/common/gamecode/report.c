@@ -1936,7 +1936,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   rnl(F);
   sprintf(buf, "%s, %s/%s (%s)", factionname(f),
       LOC(f->locale, rc_name(f->race, 1)),
-      LOC(f->locale, mkname("school", magietypen[f->magiegebiet])),
+      LOC(f->locale, mkname("school", magic_school[f->magiegebiet])),
       f->email);
   centre(F, buf, true);
   if (f->alliance!=NULL) {

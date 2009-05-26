@@ -74,14 +74,15 @@
 
 /* ------------------------------------------------------------- */
 
-const char *magietypen[MAXMAGIETYP] =
+const char *magic_school[MAXMAGIETYP] =
 {
 	"gray",
 	"illaun",
 	"tybied",
 	"cerddor",
 	"gwyrrd",
-	"draig"
+	"draig",
+    "common"
 };
 
 attrib_type at_reportspell = {
@@ -219,11 +220,11 @@ void read_spellist(struct spell_list ** slistp, struct storage * store)
     if (store->version<SPELLNAME_VERSION) {
       int i = store->r_int(store);
       if (i < 0) break;
-      sp = find_spellbyid(M_GRAU, (spellid_t)i);
+      sp = find_spellbyid(M_NONE, (spellid_t)i);
     } else {
       store->r_tok_buf(store, spname, sizeof(spname));
       if (strcmp(spname, "end")==0) break;
-      sp = find_spell(M_GRAU, spname);
+      sp = find_spell(M_NONE, spname);
     }
     if (sp!=NULL) {
       add_spell(slistp, sp);
@@ -327,20 +328,6 @@ get_mage(const unit * u)
   return (sc_mage *) NULL;
 }
 
-magic_t
-find_magetype(const unit * u)
-{
-	sc_mage *m;
-
-	/* Null abfangen! */
-	m = get_mage(u);
-
-	if (!m)
-		return 0;
-
-	return m->magietyp;
-}
-
 /* ------------------------------------------------------------- */
 /* Ausgabe der Spruchbeschreibungen
 * Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
@@ -360,7 +347,7 @@ read_seenspell(attrib * a, struct storage * store)
   store->r_tok_buf(store, token, sizeof(token));
   i = atoi(token);
   if (i!=0) {
-    sp = find_spellbyid(M_GRAU, (spellid_t)i);
+    sp = find_spellbyid(M_NONE, (spellid_t)i);
   } else {
     int mtype;
     mtype = store->r_int(store);
@@ -397,7 +384,23 @@ already_seen(const faction * f, const spell * sp)
   return false;
 }
 
-#define GRAYSPELLS 2 /* number of new gray spells per level */
+static boolean know_school(const faction * f, magic_t school)
+{
+  static int common = MAXMAGIETYP;
+  if (f->magiegebiet==school) return true;
+  if (common==MAXMAGIETYP) {
+    const char * school = get_param(global.parameters, "rules.magic.common");
+    for (common=0;common!=MAXMAGIETYP;++common) {
+      if (strcmp(school, magic_school[common])==0) break;
+    }
+    if (common==MAXMAGIETYP) {
+      common = M_NONE;
+    }
+  }
+  return school==common;
+}
+
+#define COMMONSPELLS 1 /* number of new common spells per level */
 #define MAXSPELLS 256
 
 /** update the spellbook with a new level
@@ -406,16 +409,16 @@ already_seen(const faction * f, const spell * sp)
 void
 update_spellbook(faction * f, int level)
 {
-  spell * grayspells[MAXSPELLS];
+  spell * commonspells[MAXSPELLS];
   int numspells = 0;
   spell_list * slist;
 
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
-    if (sp->magietyp == M_GRAU && level<f->max_spelllevel && sp->level<=level) {
-      grayspells[numspells++] = sp;
+    if (sp->magietyp == M_COMMON && level<f->max_spelllevel && sp->level<=level) {
+      commonspells[numspells++] = sp;
     } else {
-      if (sp->magietyp == f->magiegebiet && sp->level <= level) {
+      if (know_school(f, sp->magietyp) && sp->level <= level) {
         if (!has_spell(f->spellbook, sp)) {
           add_spell(&f->spellbook, sp);
         }
@@ -424,7 +427,7 @@ update_spellbook(faction * f, int level)
   }
   while (numspells>0 && level>f->max_spelllevel) {
     int i;
-    for (i=0;i!=GRAYSPELLS;++i) {
+    for (i=0;i!=COMMONSPELLS;++i) {
       int maxspell = numspells;
       int spellno = -1;
       spell * sp;
@@ -433,13 +436,13 @@ update_spellbook(faction * f, int level)
           --maxspell;
         }
         spellno = rng_int() % maxspell;
-        sp = grayspells[spellno];
+        sp = commonspells[spellno];
       }
       while (maxspell>0 && sp && sp->level<=f->max_spelllevel);
 
       if (sp) {
         add_spell(&f->spellbook, sp);
-        grayspells[spellno] = 0;
+        commonspells[spellno] = 0;
       }
     }
     ++f->max_spelllevel;
@@ -451,10 +454,10 @@ void wyrm_update(unit * u, struct sc_mage * mage, int sk)
 {
   spell_list * slist, ** slistp;
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
-  spell * sp = find_spellbyid(M_GRAU, SPL_BECOMEWYRM);
+  spell * sp = find_spellbyid(M_GRAY, SPL_BECOMEWYRM);
 
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
-    add_spell(mage, find_spellbyid(M_GRAU, SPL_BECOMEWYRM));
+    add_spell(mage, find_spellbyid(M_GRAY, SPL_BECOMEWYRM));
   }
 
   /* Transformierte Wyrm-Magier bekommen Drachenodem */
@@ -463,19 +466,19 @@ void wyrm_update(unit * u, struct sc_mage * mage, int sk)
     switch (urc) {
       /* keine breaks! Wyrme sollen alle drei Zauber können.*/
     case RC_WYRM:
-      sp = find_spellbyid(M_GRAU, SPL_WYRMODEM);
+      sp = find_spellbyid(M_GRAY, SPL_WYRMODEM);
       slistp = get_spelllist(mage, u->faction);
       if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
         add_spell(slistp, sp);
       }
     case RC_DRAGON:
-      sp = find_spellbyid(M_GRAU, SPL_DRAGONODEM);
+      sp = find_spellbyid(M_GRAY, SPL_DRAGONODEM);
       slistp = get_spelllist(mage, u->faction);
       if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
         add_spell(slistp, sp);
       }
     case RC_FIREDRAGON:
-      sp = find_spellbyid(M_GRAU, SPL_FIREDRAGONODEM);
+      sp = find_spellbyid(M_GRAY, SPL_FIREDRAGONODEM);
       slistp = get_spelllist(mage, u->faction);
       if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
         add_spell(slistp, sp);
@@ -493,15 +496,14 @@ updatespelllist(unit * u)
   int sk = eff_skill(u, SK_MAGIC, u->region);
   spell_list * slist = spells;
   struct sc_mage * mage = get_mage(u);
-  magic_t gebiet = find_magetype(u);
   boolean ismonster = is_monsters(u->faction);
 
-  /* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
+  /* Magier mit keinem bzw M_GRAY bekommen weder Sprüche angezeigt noch
   * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
   * Drachen, die noch den Skill Magie haben */
 
   if (FactionSpells()) {
-    spells = u->faction->spellbook;
+    slist = u->faction->spellbook;
   }
 
   for (;slist!=NULL;slist=slist->next) {
@@ -509,7 +511,7 @@ updatespelllist(unit * u)
     if (sp->level<=sk) {
       boolean know = u_hasspell(u, sp);
 
-      if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet)) {
+      if (know || know_school(u->faction, sp->magietyp)) {
         faction * f = u->faction;
 
         if (!know) add_spell(get_spelllist(mage, u->faction), sp);
@@ -966,31 +968,33 @@ pay_spell(unit * u, const spell * sp, int cast_level, int range)
 boolean
 knowsspell(const region * r, const unit * u, const spell * sp)
 {
-	/* Ist überhaupt ein gültiger Spruch angegeben? */
-	if (!sp || (sp->id == SPL_NOSPELL)) {
-		return false;
-	}
-	/* Magier? */
-	if (get_mage(u) == NULL) {
-		log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n",
-				unitname(u)));
-		return false;
-	}
-	/* steht der Spruch in der Spruchliste? */
-	if (!u_hasspell(u, sp)) {
-		/* ist der Spruch aus einem anderen Magiegebiet? */
-		if (find_magetype(u) != sp->magietyp) {
-			return false;
-		}
-		if (eff_skill(u, SK_MAGIC, u->region) >= sp->level) {
-			log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n",
-				unitname(u), spell_name(sp, default_locale)));
-		}
-		return false;
-	}
+  sc_mage * mage;
+  /* Ist überhaupt ein gültiger Spruch angegeben? */
+  if (!sp || (sp->id == SPL_NOSPELL)) {
+    return false;
+  }
+  /* Magier? */
+  mage = get_mage(u);
+  if (mage == NULL) {
+    log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n",
+      unitname(u)));
+    return false;
+  }
+  /* steht der Spruch in der Spruchliste? */
+  if (!u_hasspell(u, sp)) {
+    /* ist der Spruch aus einem anderen Magiegebiet? */
+    if (know_school(u->faction, sp->magietyp)) {
+      return false;
+    }
+    if (eff_skill(u, SK_MAGIC, u->region) >= sp->level) {
+      log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n",
+        unitname(u), spell_name(sp, default_locale)));
+    }
+    return false;
+  }
 
-	/* hier sollten alle potentiellen Fehler abgefangen sein */
-	return true;
+  /* hier sollten alle potentiellen Fehler abgefangen sein */
+  return true;
 }
 
 /* Um einen Spruch zu beherrschen, muss der Magier die Stufe des
@@ -1326,7 +1330,7 @@ fumble(region * r, unit * u, const spell * sp, int cast_grade)
 
 	if (btype) patzer -= btype->fumblebonus;
 	/* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
-	if (sp->magietyp == M_CHAOS) {
+	if (sp->magietyp == M_DRAIG) {
 		patzer += CHAOSPATZERCHANCE;
 	}
 	if (is_cursed(u->attribs, C_MBOOST, 0) == true) {

@@ -1204,13 +1204,13 @@ add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
     for (i=0;i!=nsetItems->nodeNr;++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
       xmlChar * propValue;
-      magic_t mtype = M_GRAU;
+      magic_t mtype = M_NONE;
       struct spell * sp;
 
       propValue = xmlGetProp(node, BAD_CAST "school");
       if (propValue!=NULL) {
         for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
-          if (strcmp((const char*)propValue, magietypen[mtype])==0) break;
+          if (strcmp((const char*)propValue, magic_school[mtype])==0) break;
         }
         assert(mtype!=MAXMAGIETYP);
         xmlFree(propValue);
@@ -1408,7 +1408,7 @@ parse_spells(xmlDocPtr doc)
       propValue = xmlGetProp(node, BAD_CAST "type");
       assert(propValue!=NULL);
       for (sp->magietyp=0;sp->magietyp!=MAXMAGIETYP;++sp->magietyp) {
-        if (strcmp(magietypen[sp->magietyp], (const char *)propValue)==0) break;
+        if (strcmp(magic_school[sp->magietyp], (const char *)propValue)==0) break;
       }
       assert(sp->magietyp!=MAXMAGIETYP);
       xmlFree(propValue);

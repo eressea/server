@@ -422,7 +422,7 @@ static const char *
 unit_getmagic(const unit * u)
 {
   sc_mage * mage = get_mage(u);
-  return mage?magietypen[mage->magietyp]:NULL;
+  return mage?magic_school[mage->magietyp]:NULL;
 }
 
 static void
@@ -431,7 +431,7 @@ unit_setmagic(unit * u, const char * type)
   sc_mage * mage = get_mage(u);
   magic_t mtype;
   for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
-    if (strcmp(magietypen[mtype], type)==0) break;
+    if (strcmp(magic_school[mtype], type)==0) break;
   }
   if (mtype==MAXMAGIETYP) return;
   if (mage==NULL) {

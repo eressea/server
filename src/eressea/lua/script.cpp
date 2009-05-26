@@ -152,7 +152,7 @@ lua_initfamiliar(unit * u)
   }
 
   snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
-  create_mage(u, M_GRAU);
+  create_mage(u, M_GRAY);
   equip_unit(u, get_equipment(fname));
 }
 

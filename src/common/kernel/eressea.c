@@ -2057,9 +2057,25 @@ init_locale(const struct locale * lang)
 #endif
 
   tokens = get_translations(lang, UT_MAGIC);
-  for (i=0;i!=MAXMAGIETYP;++i) {
-    var.i = i;
-    addtoken(tokens, LOC(lang, mkname("school", magietypen[i])), var);
+  if (tokens) {
+    const char * str = get_param(global.parameters, "rules.magic.playerschools");
+    char * sstr, * tok;
+    if (str==NULL) {
+      str = "gwyrrd illaun draig cerddor tybied";
+    }
+
+    sstr = strdup(str);
+    tok = strtok(sstr, " ");
+    while (tok) {
+      for (i=0;i!=MAXMAGIETYP;++i) {
+        if (strcmp(tok, magic_school[i])==0) break;
+      }
+      assert(i!=MAXMAGIETYP);
+      var.i = i;
+      addtoken(tokens, LOC(lang, mkname("school", tok)), var);
+      tok = strtok(NULL, " ");
+    }
+    free(sstr);
   }
 
   tokens = get_translations(lang, UT_DIRECTIONS);

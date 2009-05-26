@@ -370,13 +370,15 @@ give_unit(unit * u, unit * u2, order * ord)
     }
   }
   if (has_skill(u, SK_MAGIC)) {
+    sc_mage * mage;
     if (count_skill(u2->faction, SK_MAGIC) + u->number >
       skill_limit(u2->faction, SK_MAGIC))
     {
       cmistake(u, ord, 155, MSG_COMMERCE);
       return;
     }
-    if (u2->faction->magiegebiet != find_magetype(u)) {
+    mage = get_mage(u);
+    if (!mage || u2->faction->magiegebiet != mage->magietyp) {
       cmistake(u, ord, 157, MSG_COMMERCE);
       return;
     }

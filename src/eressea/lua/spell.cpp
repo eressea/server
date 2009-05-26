@@ -20,7 +20,7 @@ using namespace luabind;
 static const char *
 spell_getschool(const spell& sp)
 {
-  return magietypen[sp.magietyp];
+  return magic_school[sp.magietyp];
 }
 
 void

@@ -63,7 +63,7 @@ find_spell(magic_t mtype, const char * name)
   while (slist) {
     spell * sp = slist->data;
     if (strcmp(name, sp->sname)==0) {
-      if (sp->magietyp==mtype) return sp;
+      if (mtype==M_NONE || sp->magietyp==mtype) return sp;
       spx = sp;
     }
     slist = slist->next;
@@ -180,7 +180,7 @@ find_spellbyid(magic_t mtype, spellid_t id)
     spell* sp = slist->data;
     unsigned int hashid = hashstring(sp->sname);
     if (hashid==id) {
-      if (sp->magietyp==mtype || mtype==M_GRAU) {
+      if (sp->magietyp==mtype || mtype==M_NONE) {
         return sp;
       }
     }

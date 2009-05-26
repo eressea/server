@@ -1323,7 +1323,7 @@ movement_speed(unit * u)
     * Nicht kumulativ mit anderen Beschleunigungen! */
     if (mp*dk <= BP_WALKING*u->race->speed && is_astral(u->region) && is_mage(u)) {
       sc_mage * mage = get_mage(u);
-      if (mage->magietyp == M_ASTRAL || mage->magietyp == M_TRAUM) {
+      if (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN) {
         mp *= 2;
       }
     }

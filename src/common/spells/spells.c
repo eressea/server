@@ -749,9 +749,9 @@ sp_transferaura(castorder *co)
     /* "Zu dieser Einheit kann ich keine Aura übertragen." */
     cmistake(mage, co->order, 207, MSG_MAGIC);
     return 0;
-  } else if (scm_src->magietyp==M_ASTRAL) {
+  } else if (scm_src->magietyp==M_TYBIED) {
     if (scm_src->magietyp != scm_dst->magietyp) multi = 3;
-  } else if (scm_src->magietyp==M_GRAU) {
+  } else if (scm_src->magietyp==M_GRAY) {
     if (scm_src->magietyp != scm_dst->magietyp) multi = 4;
   } else if (scm_dst->magietyp!=scm_src->magietyp) {
     /* "Zu dieser Einheit kann ich keine Aura übertragen." */
@@ -2302,7 +2302,7 @@ sp_earthquake(castorder *co)
 
 
 /* ------------------------------------------------------------- */
-/* CHAOS / M_CHAOS / Draig */
+/* CHAOS / M_DRAIG / Draig */
 /* ------------------------------------------------------------- */
 void
 patzer_peasantmob(castorder *co)
@@ -5177,7 +5177,7 @@ sp_disturbingdreams(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* ASTRAL / THEORIE / M_ASTRAL */
+/* ASTRAL / THEORIE / M_TYBIED */
 /* ------------------------------------------------------------- */
 /* Name:     Magie analysieren
  * Stufe:   1
@@ -6767,7 +6767,7 @@ sp_becomewyrm(castorder *co)
   }
 
   u->race = new_race[RC_WYRM];
-  add_spell(get_mage(u), find_spellbyid(M_GRAU, SPL_WYRMODEM));
+  add_spell(get_mage(u), find_spellbyid(M_GRAY, SPL_WYRMODEM));
 
   ADDMSG(&u->faction->msgs, msg_message("becomewyrm", "u", u));
 
@@ -6846,10 +6846,10 @@ typedef struct spelldata {
 
 static spelldata spelldaten[] =
 {
-  /* M_DRUIDE */
+  /* M_GWYRRD */
   {
     SPL_BLESSEDHARVEST, "blessedharvest", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
     5, 1,
     {
@@ -6863,7 +6863,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_STONEGOLEM, "stonegolem", NULL, NULL, NULL,
-    M_DRUIDE, (SPELLLEVEL), 4, 1,
+    M_GWYRRD, (SPELLLEVEL), 4, 1,
     {
       { "aura", 2, SPC_LEVEL },
       { "stone", 1, SPC_LEVEL },
@@ -6875,7 +6875,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_IRONGOLEM, "irongolem", NULL, NULL, NULL,
-    M_DRUIDE, (SPELLLEVEL), 4, 2,
+    M_GWYRRD, (SPELLLEVEL), 4, 2,
     {
       { "aura", 2, SPC_LEVEL },
       { "iron", 1, SPC_LEVEL },
@@ -6887,7 +6887,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TREEGROW, "treegrow", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     5, 2,
     {
@@ -6902,7 +6902,7 @@ static spelldata spelldaten[] =
   {
     SPL_RUSTWEAPON, "rustweapon", NULL, NULL,
     "u+",
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE),
     5, 3,
     {
@@ -6917,7 +6917,7 @@ static spelldata spelldaten[] =
   {
     SPL_KAELTESCHUTZ, "cold_protection", NULL, NULL,
     "u+",
-    M_DRUIDE,
+    M_GWYRRD,
     (UNITSPELL | SPELLLEVEL | TESTCANSEE | ONSHIPCAST),
     5, 3,
     {
@@ -6931,7 +6931,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_HAGEL, "hail", NULL, NULL, NULL,
-    M_DRUIDE, (COMBATSPELL|SPELLLEVEL), 5, 3,
+    M_GWYRRD, (COMBATSPELL|SPELLLEVEL), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -6943,7 +6943,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_IRONKEEPER, "ironkeeper", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     5, 3,
     {
@@ -6957,7 +6957,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MAGICSTREET, "magicstreet", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | ONSHIPCAST | TESTRESISTANCE),
     5, 4,
     {
@@ -6971,7 +6971,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_WINDSHIELD, "windshield", NULL, NULL, NULL,
-    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
+    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -6983,7 +6983,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MALLORNTREEGROW, "mallorntreegrow", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     5, 4,
     {
@@ -6997,7 +6997,7 @@ static spelldata spelldaten[] =
   },
   { SPL_GOODWINDS, "goodwinds", NULL, NULL,
     "s",
-    M_DRUIDE,
+    M_GWYRRD,
     (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|TESTRESISTANCE),
     5, 4,
     {
@@ -7011,7 +7011,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_HEALING, "healing", NULL, NULL, NULL,
-    M_DRUIDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 5,
+    M_GWYRRD, (POSTCOMBATSPELL | SPELLLEVEL), 5, 5,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7023,7 +7023,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_REELING_ARROWS, "reelingarrows", NULL, NULL, NULL,
-    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 5,
+    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 5, 5,
     {
       { "aura", 15, SPC_FIX },
       { 0, 0, 0 },
@@ -7035,7 +7035,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_GWYRRD_FUMBLESHIELD, "gwyrrdfumbleshield", NULL, NULL, NULL,
-    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
+    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7047,7 +7047,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL, "aura", "ui",
-    M_DRUIDE, (UNITSPELL|ONSHIPCAST), 1, 6,
+    M_GWYRRD, (UNITSPELL|ONSHIPCAST), 1, 6,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7059,7 +7059,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_EARTHQUAKE, "earthquake", NULL, NULL, NULL,
-    M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 6,
+    M_GWYRRD, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 6,
     {
       { "aura", 25, SPC_FIX },
       { "laen", 2, SPC_FIX },
@@ -7072,7 +7072,7 @@ static spelldata spelldaten[] =
   {
     SPL_STORMWINDS, "stormwinds", NULL, NULL,
     "s+",
-    M_DRUIDE,
+    M_GWYRRD,
     (SHIPSPELL | ONSHIPCAST | OCEANCASTABLE | TESTRESISTANCE | SPELLLEVEL),
     5, 6,
     {
@@ -7086,7 +7086,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_HOMESTONE, "homestone", NULL, NULL, NULL,
-    M_DRUIDE, (0), 5, 7,
+    M_GWYRRD, (0), 5, 7,
     {
       { "aura", 50, SPC_FIX },
       { "permaura", 1, SPC_FIX },
@@ -7098,7 +7098,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_WOLFHOWL, "wolfhowl", NULL, NULL, NULL,
-    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 7,
+    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL ), 5, 7,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7110,7 +7110,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_VERSTEINERN, "versteinern", NULL, NULL, NULL,
-    M_DRUIDE, (COMBATSPELL | SPELLLEVEL), 5, 8,
+    M_GWYRRD, (COMBATSPELL | SPELLLEVEL), 5, 8,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7122,7 +7122,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_STRONG_WALL, "strongwall", NULL, NULL, NULL,
-    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
+    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7135,7 +7135,7 @@ static spelldata spelldaten[] =
   {
     SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL, NULL,
     "kc?",
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 8,
     {
@@ -7150,7 +7150,7 @@ static spelldata spelldaten[] =
   {
     SPL_TREEWALKENTER, "treewalkenter", NULL, NULL,
     "u+",
-    M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
+    M_GWYRRD, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7163,7 +7163,7 @@ static spelldata spelldaten[] =
   {
     SPL_TREEWALKEXIT, "treewalkexit", NULL, NULL,
     "ru+",
-    M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
+    M_GWYRRD, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7175,7 +7175,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_HOLYGROUND, "holyground", NULL, NULL, NULL,
-    M_DRUIDE, (0), 5, 9,
+    M_GWYRRD, (0), 5, 9,
     {
       { "aura", 80, SPC_FIX },
       { "permaura", 3, SPC_FIX },
@@ -7187,7 +7187,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SUMMONENT, "summonent", NULL, NULL, NULL,
-    M_DRUIDE, (SPELLLEVEL), 5, 10,
+    M_GWYRRD, (SPELLLEVEL), 5, 10,
     {
       { "aura", 6, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7199,7 +7199,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_GWYRRD_FAMILIAR, "gwyrrdfamiliar", NULL, NULL, NULL,
-    M_DRUIDE, (NOTFAMILIARCAST), 5, 10,
+    M_GWYRRD, (NOTFAMILIARCAST), 5, 10,
     {
       { "aura", 100, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -7212,7 +7212,7 @@ static spelldata spelldaten[] =
   {
     SPL_BLESSSTONECIRCLE, "blessstonecircle", NULL, NULL,
     "b",
-    M_DRUIDE, (BUILDINGSPELL), 5, 11,
+    M_GWYRRD, (BUILDINGSPELL), 5, 11,
     {
       { "aura", 350, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -7224,7 +7224,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_GWYRRD_ARMORSHIELD, "barkskin", NULL, NULL, NULL,
-    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
+    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
     {
       { "aura", 4, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7236,7 +7236,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DROUGHT, "summonfireelemental", NULL, NULL, NULL,
-    M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 13,
+    M_GWYRRD, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 13,
     {
       { "aura", 600, SPC_FIX },
       { 0, 0, 0 },
@@ -7248,7 +7248,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MAELSTROM, "maelstrom", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
     5, 15,
     {
@@ -7262,7 +7262,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MALLORN, "magic_roots", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE),
     5, 16,
     {
@@ -7276,7 +7276,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_GREAT_DROUGHT, "great_drought", NULL, NULL, NULL,
-    M_DRUIDE,
+    M_GWYRRD,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE),
     5, 17,
     {
@@ -7288,11 +7288,11 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_great_drought, NULL
   },
-  /* M_CHAOS */
+  /* M_DRAIG */
   {
     SPL_SPARKLE_CHAOS, "sparklechaos", NULL, NULL,
     "u",
-    M_CHAOS, (UNITSPELL | TESTCANSEE | SPELLLEVEL), 5, 1,
+    M_DRAIG, (UNITSPELL | TESTCANSEE | SPELLLEVEL), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7304,7 +7304,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FIREBALL, "fireball", NULL, NULL, NULL,
-    M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 2,
+    M_DRAIG, (COMBATSPELL | SPELLLEVEL), 5, 2,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7316,7 +7316,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MAGICBOOST, "magicboost", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST), 3, 3,
+    M_DRAIG, (ONSHIPCAST), 3, 3,
     {
       { "aura", 2, SPC_LINEAR },
       { 0, 0, 0 },
@@ -7328,7 +7328,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_BLOODSACRIFICE, "bloodsacrifice", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST), 1, 4,
+    M_DRAIG, (ONSHIPCAST), 1, 4,
     {
       { "hp", 4, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7340,7 +7340,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_BERSERK, "berserk", NULL, NULL, NULL,
-    M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
+    M_DRAIG, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
     {
       { "aura", 5, SPC_LEVEL },
       { "peasant", 1, SPC_FIX },
@@ -7353,7 +7353,7 @@ static spelldata spelldaten[] =
   {
     SPL_FUMBLECURSE, "fumblecurse", NULL, NULL,
     "u",
-    M_CHAOS,
+    M_DRAIG,
     (UNITSPELL | SPELLLEVEL | TESTCANSEE | TESTRESISTANCE),
     4, 5,
     {
@@ -7367,7 +7367,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SUMMONUNDEAD, "summonundead", NULL, NULL, NULL,
-    M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
+    M_DRAIG, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
     5, 6,
     {
       { "aura", 5, SPC_LEVEL },
@@ -7380,7 +7380,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_COMBATRUST, "combatrust", NULL, NULL, NULL,
-    M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 6,
+    M_DRAIG, (COMBATSPELL | SPELLLEVEL), 5, 6,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7392,7 +7392,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL, "aura", "ui",
-    M_CHAOS, (UNITSPELL|ONSHIPCAST), 1, 7,
+    M_DRAIG, (UNITSPELL|ONSHIPCAST), 1, 7,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7406,7 +7406,7 @@ static spelldata spelldaten[] =
     SPL_FIREWALL, "firewall", NULL,
     "direction",
     "c",
-    M_CHAOS, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
+    M_DRAIG, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
     {
       { "aura", 6, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7418,7 +7418,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_PLAGUE, "plague", NULL, NULL, NULL,
-    M_CHAOS,
+    M_DRAIG,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE),
     5, 7,
     {
@@ -7432,7 +7432,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_CHAOSROW, "chaosrow", NULL, NULL, NULL,
-    M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
+    M_DRAIG, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
     {
       { "aura", 3, SPC_LEVEL },
       { "peasant", 10, SPC_FIX },
@@ -7444,7 +7444,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SUMMONSHADOW, "summonshadow", NULL, NULL, NULL,
-    M_CHAOS, (SPELLLEVEL), 5, 8,
+    M_DRAIG, (SPELLLEVEL), 5, 8,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7456,7 +7456,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_UNDEADHERO, "undeadhero", NULL, NULL, NULL,
-    M_CHAOS, (POSTCOMBATSPELL | SPELLLEVEL), 5, 9,
+    M_DRAIG, (POSTCOMBATSPELL | SPELLLEVEL), 5, 9,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7468,7 +7468,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_AURALEAK, "auraleak", NULL, NULL, NULL,
-    M_CHAOS, (REGIONSPELL | TESTRESISTANCE), 3, 9,
+    M_DRAIG, (REGIONSPELL | TESTRESISTANCE), 3, 9,
     {
       { "aura", 35, SPC_FIX },
       { "dragonblood", 1, SPC_FIX },
@@ -7480,7 +7480,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DRAIG_FUMBLESHIELD, "draigfumbleshield", NULL, NULL, NULL,
-    M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 2, 9,
+    M_DRAIG, (PRECOMBATSPELL | SPELLLEVEL), 2, 9,
     {
       { "aura", 6, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7492,7 +7492,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FOREST_FIRE, "forestfire", NULL, NULL, NULL,
-    M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
+    M_DRAIG, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
     {
       { "aura", 50, SPC_FIX },
       { "oil", 1, SPC_FIX },
@@ -7505,7 +7505,7 @@ static spelldata spelldaten[] =
   {
     SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL, NULL,
     "kc?",
-    M_CHAOS,
+    M_DRAIG,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 10,
     {
@@ -7520,7 +7520,7 @@ static spelldata spelldaten[] =
   {
     SPL_UNHOLYPOWER, "unholypower", NULL, NULL,
     "u+",
-    M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 14,
+    M_DRAIG, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 14,
     {
       { "aura", 10, SPC_LEVEL },
       { "peasant", 5, SPC_LEVEL },
@@ -7532,7 +7532,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DEATHCLOUD, "deathcloud", NULL, NULL, NULL,
-    M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
+    M_DRAIG, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
     {
       { "aura", 40, SPC_FIX },
       { "hp", 15, SPC_FIX },
@@ -7544,7 +7544,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SUMMONDRAGON, "summondragon", NULL, NULL, NULL,
-    M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
+    M_DRAIG, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
     {
       { "aura", 80, SPC_FIX },
       { "dragonhead", 1, SPC_FIX },
@@ -7556,7 +7556,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SUMMONSHADOWLORDS, "summonshadowlords", NULL, NULL, NULL,
-    M_CHAOS, (SPELLLEVEL), 5, 12,
+    M_DRAIG, (SPELLLEVEL), 5, 12,
     {
       { "aura", 7, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7568,7 +7568,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DRAIG_FAMILIAR, "draigfamiliar", NULL, NULL, NULL,
-    M_CHAOS, (NOTFAMILIARCAST), 5, 13,
+    M_DRAIG, (NOTFAMILIARCAST), 5, 13,
     {
       { "aura", 100, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -7580,7 +7580,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_CHAOSSUCTION, "chaossuction", NULL, NULL, NULL,
-    M_CHAOS, (0), 5, 14,
+    M_DRAIG, (0), 5, 14,
     {
       { "aura", 150, SPC_FIX },
       { "peasant", 200, SPC_FIX },
@@ -7590,11 +7590,11 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_chaossuction, patzer_peasantmob
   },
-  /* M_TRAUM */
+  /* M_ILLAUN */
   {
     SPL_SPARKLE_DREAM, "sparkledream", NULL, NULL,
     "u",
-    M_TRAUM,
+    M_ILLAUN,
     (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONSHIPCAST),
     5, 1,
     {
@@ -7608,7 +7608,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SHADOWKNIGHTS, "shadowknights", NULL, NULL, NULL,
-    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 4, 1,
+    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 4, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7620,7 +7620,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FLEE, "flee", NULL, NULL, NULL,
-    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 2,
+    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 5, 2,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7632,7 +7632,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_PUTTOREST, "puttorest", NULL, NULL, NULL,
-    M_TRAUM, (SPELLLEVEL), 5, 2,
+    M_ILLAUN, (SPELLLEVEL), 5, 2,
     {
       { "aura", 3, SPC_LEVEL },
       { "p2", 1, SPC_FIX },
@@ -7646,7 +7646,7 @@ static spelldata spelldaten[] =
     SPL_ICASTLE, "icastle", NULL,
     "buildingtype",
     "c",
-    M_TRAUM, (0), 5, 3,
+    M_ILLAUN, (0), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7658,7 +7658,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL, "aura", "ui",
-    M_TRAUM, (UNITSPELL|ONSHIPCAST), 1, 3,
+    M_ILLAUN, (UNITSPELL|ONSHIPCAST), 1, 3,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7672,7 +7672,7 @@ static spelldata spelldaten[] =
     SPL_ILL_SHAPESHIFT, "shapeshift", NULL,
     "race",
     "uc",
-    M_TRAUM, (UNITSPELL|SPELLLEVEL), 5, 3,
+    M_ILLAUN, (UNITSPELL|SPELLLEVEL), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7685,7 +7685,7 @@ static spelldata spelldaten[] =
   {
     SPL_DREAMREADING, "dreamreading", NULL, NULL,
     "u",
-    M_TRAUM, (FARCASTING | UNITSPELL | TESTRESISTANCE), 5, 4,
+    M_ILLAUN, (FARCASTING | UNITSPELL | TESTRESISTANCE), 5, 4,
     {
       { "aura", 8, SPC_FIX },
       { 0, 0, 0 },
@@ -7697,7 +7697,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TIREDSOLDIERS, "tiredsoldiers", NULL, NULL, NULL,
-    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
+    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
     {
       { "aura", 4, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7709,7 +7709,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_REANIMATE, "reanimate", NULL, NULL, NULL,
-    M_TRAUM, (POSTCOMBATSPELL | SPELLLEVEL), 4, 5,
+    M_ILLAUN, (POSTCOMBATSPELL | SPELLLEVEL), 4, 5,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7722,7 +7722,7 @@ static spelldata spelldaten[] =
   {
     SPL_ANALYSEDREAM, "analysedream", NULL, NULL,
     "u",
-    M_TRAUM, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 5,
+    M_ILLAUN, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 5,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7734,7 +7734,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DISTURBINGDREAMS, "disturbingdreams", NULL, NULL, NULL,
-    M_TRAUM, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 6,
+    M_ILLAUN, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 6,
     {
       { "aura", 18, SPC_FIX },
       { 0, 0, 0 },
@@ -7746,7 +7746,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SLEEP, "sleep", NULL, NULL, NULL,
-    M_TRAUM, (COMBATSPELL | SPELLLEVEL ), 5, 7,
+    M_ILLAUN, (COMBATSPELL | SPELLLEVEL ), 5, 7,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7760,7 +7760,7 @@ static spelldata spelldaten[] =
     SPL_WISPS, "wisps", NULL,
     "direction",
     "c",
-    M_TRAUM, (SPELLLEVEL | FARCASTING), 5, 7,
+    M_ILLAUN, (SPELLLEVEL | FARCASTING), 5, 7,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7772,7 +7772,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_GOODDREAMS, "gooddreams", NULL, NULL, NULL,
-    M_TRAUM,
+    M_ILLAUN,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE),
     5, 8,
     {
@@ -7787,7 +7787,7 @@ static spelldata spelldaten[] =
   {
     SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL, NULL,
     "kc?",
-    M_TRAUM,
+    M_ILLAUN,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 8,
     {
@@ -7801,7 +7801,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ILLAUN_FAMILIAR, "illaunfamiliar", NULL, NULL, NULL,
-    M_TRAUM, (NOTFAMILIARCAST), 5, 9,
+    M_ILLAUN, (NOTFAMILIARCAST), 5, 9,
     {
       { "aura", 100, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -7813,7 +7813,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_CLONECOPY, "clone", NULL, NULL, NULL,
-    M_TRAUM, (NOTFAMILIARCAST), 5, 9,
+    M_ILLAUN, (NOTFAMILIARCAST), 5, 9,
     {
       { "aura", 100, SPC_FIX },
       { "permaura", 20, SPC_FIX },
@@ -7825,7 +7825,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_BADDREAMS, "bad_dreams", NULL, NULL, NULL,
-    M_TRAUM,
+    M_ILLAUN,
     (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
     {
       { "aura", 90, SPC_FIX },
@@ -7838,7 +7838,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MINDBLAST, "mindblast", NULL, NULL, NULL,
-    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 11,
+    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 5, 11,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7851,7 +7851,7 @@ static spelldata spelldaten[] =
   {
     SPL_ORKDREAM, "orkdream", NULL, NULL,
     "u+",
-    M_TRAUM,
+    M_ILLAUN,
     (UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
     {
       { "aura", 5, SPC_LEVEL },
@@ -7864,7 +7864,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
-    M_TRAUM,
+    M_ILLAUN,
     (UNITSPELL | SEARCHGLOBAL | TESTRESISTANCE),
     5, 15,
     {
@@ -7876,10 +7876,10 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_summon_alp, NULL
   },
-  /* M_BARDE */
+  /* M_CERDDOR */
   {
     SPL_DENYATTACK, "appeasement", NULL, NULL, NULL,
-    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 1,
+    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL ), 5, 1,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7891,7 +7891,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_HEALINGSONG, "song_of_healing", NULL, NULL, NULL,
-    M_BARDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 2,
+    M_CERDDOR, (POSTCOMBATSPELL | SPELLLEVEL), 5, 2,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7903,7 +7903,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_GENEROUS, "generous", NULL, NULL, NULL,
-    M_BARDE,
+    M_CERDDOR,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
     5, 2,
     {
@@ -7917,7 +7917,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_RAINDANCE, "raindance", NULL, NULL, NULL,
-    M_BARDE,
+    M_CERDDOR,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
     5, 3,
     {
@@ -7931,7 +7931,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SONG_OF_FEAR, "song_of_fear", NULL, NULL, NULL,
-    M_BARDE, (COMBATSPELL | SPELLLEVEL), 5, 3,
+    M_CERDDOR, (COMBATSPELL | SPELLLEVEL), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7943,7 +7943,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_RECRUIT, "courting", NULL, NULL, NULL,
-    M_BARDE, (SPELLLEVEL), 5, 4,
+    M_CERDDOR, (SPELLLEVEL), 5, 4,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7955,7 +7955,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SONG_OF_CONFUSION, "song_of_confusion", NULL, NULL, NULL,
-    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
+    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7967,7 +7967,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_HERO, "heroic_song", NULL, NULL, NULL,
-    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
+    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -7979,7 +7979,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, "aura", "ui",
-    M_BARDE, (UNITSPELL|ONSHIPCAST), 1, 5,
+    M_CERDDOR, (UNITSPELL|ONSHIPCAST), 1, 5,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -7992,7 +7992,7 @@ static spelldata spelldaten[] =
   {
     SPL_UNIT_ANALYSESONG, "analysesong_unit", NULL, NULL,
     "u",
-    M_BARDE,
+    M_CERDDOR,
     (UNITSPELL | ONSHIPCAST | TESTCANSEE),
     5, 5,
     {
@@ -8006,7 +8006,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_CERRDOR_FUMBLESHIELD, "cerrdorfumbleshield", NULL, NULL, NULL,
-    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
+    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8018,7 +8018,7 @@ static spelldata spelldaten[] =
   },
   { SPL_CALM_MONSTER, "calm_monster", NULL, NULL,
     "u",
-    M_BARDE,
+    M_CERDDOR,
     (UNITSPELL | ONSHIPCAST | TESTRESISTANCE | TESTCANSEE),
     5, 6,
     {
@@ -8032,7 +8032,7 @@ static spelldata spelldaten[] =
   },
   { SPL_SEDUCE, "seduction", NULL, NULL,
     "u",
-    M_BARDE,
+    M_CERDDOR,
     (UNITSPELL | TESTRESISTANCE | TESTCANSEE),
     5, 6,
     {
@@ -8047,7 +8047,7 @@ static spelldata spelldaten[] =
   {
     SPL_HEADACHE, "headache", NULL, NULL,
     "u",
-    M_BARDE,
+    M_CERDDOR,
     (UNITSPELL | TESTRESISTANCE | TESTCANSEE),
     5, 7,
     {
@@ -8062,7 +8062,7 @@ static spelldata spelldaten[] =
   { SPL_PUMP, "sound_out", NULL,
     NULL,
     "ur",
-    M_BARDE, (UNITSPELL | TESTCANSEE), 5, 7,
+    M_CERDDOR, (UNITSPELL | TESTCANSEE), 5, 7,
     {
       { "aura", 4, SPC_FIX },
       { "money", 100, SPC_FIX },
@@ -8074,7 +8074,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_BLOODTHIRST, "bloodthirst", NULL, NULL, NULL,
-    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 7,
+    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 4, 7,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8086,7 +8086,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FRIGHTEN, "frighten", NULL, NULL, NULL,
-    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
+    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8099,7 +8099,7 @@ static spelldata spelldaten[] =
   {
     SPL_OBJ_ANALYSESONG, "analyse_object", NULL, NULL,
     "kc?",
-    M_BARDE, (SPELLLEVEL | ONSHIPCAST | REGIONSPELL | BUILDINGSPELL | SHIPSPELL), 5, 8,
+    M_CERDDOR, (SPELLLEVEL | ONSHIPCAST | REGIONSPELL | BUILDINGSPELL | SHIPSPELL), 5, 8,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8112,7 +8112,7 @@ static spelldata spelldaten[] =
   {
     SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic", NULL, NULL,
     "kc?",
-    M_BARDE,
+    M_CERDDOR,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 8,
     {
@@ -8127,7 +8127,7 @@ static spelldata spelldaten[] =
   {
     SPL_MIGRANT, "migration", NULL, NULL,
     "u",
-    M_BARDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 9,
+    M_CERDDOR, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 9,
     {
       { "aura", 3, SPC_LEVEL },
       { "permaura", 1, SPC_LEVEL },
@@ -8139,7 +8139,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_CERDDOR_FAMILIAR, "summon_familiar", NULL, NULL, NULL,
-    M_BARDE, (NOTFAMILIARCAST), 5, 9,
+    M_CERDDOR, (NOTFAMILIARCAST), 5, 9,
     {
       { "aura", 100, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -8151,7 +8151,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_RAISEPEASANTS, "raise_mob", NULL, NULL, NULL,
-    M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
+    M_CERDDOR, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
     {
       { "aura", 4, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8164,7 +8164,7 @@ static spelldata spelldaten[] =
   {
     SPL_SONG_RESISTMAGIC, "song_resist_magic",
     NULL, NULL, NULL,
-    M_BARDE,
+    M_CERDDOR,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     2, 10,
     {
@@ -8178,7 +8178,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DEPRESSION, "melancholy", NULL, NULL, NULL,
-    M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
+    M_CERDDOR, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
     {
       { "aura", 40, SPC_FIX },
       { 0, 0, 0 },
@@ -8190,7 +8190,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SONG_SUSCEPTMAGIC, "song_suscept_magic", NULL, NULL, NULL,
-    M_BARDE,
+    M_CERDDOR,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     2, 12,
     {
@@ -8204,7 +8204,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SONG_OF_PEACE, "song_of_peace", NULL, NULL, NULL,
-    M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 12,
+    M_CERDDOR, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 12,
     {
       { "aura", 20, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8217,7 +8217,7 @@ static spelldata spelldaten[] =
   {
     SPL_SONG_OF_ENSLAVE, "song_of_slavery", NULL, NULL,
     "u",
-    M_BARDE, (UNITSPELL | TESTCANSEE), 5, 13,
+    M_CERDDOR, (UNITSPELL | TESTCANSEE), 5, 13,
     {
       { "aura", 40, SPC_FIX },
       { 0, 0, 0 },
@@ -8229,7 +8229,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_BIGRECRUIT, "big_recruit", NULL, NULL, NULL,
-    M_BARDE, (SPELLLEVEL), 5, 14,
+    M_CERDDOR, (SPELLLEVEL), 5, 14,
     {
       { "aura", 20, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8241,7 +8241,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_RALLYPEASANTMOB, "calm_riot", NULL, NULL, NULL,
-    M_BARDE, (FARCASTING), 5, 15,
+    M_CERDDOR, (FARCASTING), 5, 15,
     {
       { "aura", 30, SPC_FIX },
       { 0, 0, 0 },
@@ -8254,7 +8254,7 @@ static spelldata spelldaten[] =
   {
     SPL_RAISEPEASANTMOB, "incite_riot",
         NULL, NULL, NULL,
-    M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 16,
+    M_CERDDOR, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 16,
     {
       { "aura", 40, SPC_FIX },
       { 0, 0, 0 },
@@ -8264,11 +8264,11 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_raisepeasantmob, NULL
   },
-  /* M_ASTRAL */
+  /* M_TYBIED */
   {
     SPL_ANALYSEMAGIC, "analyze_magic", NULL, NULL,
     "kc?",
-    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 5, 1,
+    M_TYBIED, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8281,7 +8281,7 @@ static spelldata spelldaten[] =
   {
     SPL_ITEMCLOAK, "concealing_aura", NULL, NULL,
     "u",
-    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST), 5, 1,
+    M_TYBIED, (SPELLLEVEL | UNITSPELL | ONSHIPCAST), 5, 1,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8293,7 +8293,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TYBIED_FUMBLESHIELD, "tybiedfumbleshield", NULL, NULL, NULL,
-    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 2,
+    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 2, 2,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8307,7 +8307,7 @@ static spelldata spelldaten[] =
   {
     SPL_SHOWASTRAL, "show_astral",
         NULL, NULL, NULL,
-    M_ASTRAL, (SPELLLEVEL), 5, 2,
+    M_TYBIED, (SPELLLEVEL), 5, 2,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8320,7 +8320,7 @@ static spelldata spelldaten[] =
 #endif
   {
     SPL_RESISTMAGICBONUS, "resist_magic", NULL, NULL, "u+",
-    M_ASTRAL,
+    M_TYBIED,
     (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE),
     2, 3,
     {
@@ -8334,7 +8334,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_KEEPLOOT, "keeploot", NULL, NULL, NULL,
-    M_ASTRAL, ( POSTCOMBATSPELL | SPELLLEVEL ), 5, 3,
+    M_TYBIED, ( POSTCOMBATSPELL | SPELLLEVEL ), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8346,7 +8346,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ENTERASTRAL, "enterastral", 0, 0, "u+",
-    M_ASTRAL, (UNITSPELL|SPELLLEVEL), 7, 4,
+    M_TYBIED, (UNITSPELL|SPELLLEVEL), 7, 4,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8359,7 +8359,7 @@ static spelldata spelldaten[] =
   {
     SPL_LEAVEASTRAL, "leaveastral", NULL, NULL,
     "ru+",
-    M_ASTRAL, (UNITSPELL |SPELLLEVEL), 7, 4,
+    M_TYBIED, (UNITSPELL |SPELLLEVEL), 7, 4,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8371,7 +8371,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_TRANSFERAURA_ASTRAL, "auratransfer", NULL, "aura", "ui",
-    M_ASTRAL, (UNITSPELL|ONSHIPCAST), 1, 5,
+    M_TYBIED, (UNITSPELL|ONSHIPCAST), 1, 5,
     {
       { "aura", 1, SPC_FIX },
       { 0, 0, 0 },
@@ -8383,7 +8383,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SHOCKWAVE, "shockwave", NULL, NULL, NULL,
-    M_ASTRAL, (COMBATSPELL|SPELLLEVEL), 5, 5,
+    M_TYBIED, (COMBATSPELL|SPELLLEVEL), 5, 5,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8395,7 +8395,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ANTIMAGICZONE, "antimagiczone", NULL, NULL, NULL,
-    M_ASTRAL, (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    M_TYBIED, (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     2, 5,
     {
       { "aura", 3, SPC_LEVEL },
@@ -8409,7 +8409,7 @@ static spelldata spelldaten[] =
   {
     SPL_TYBIED_DESTROY_MAGIC, "destroy_magic", NULL, NULL,
     "kc?",
-    M_ASTRAL,
+    M_TYBIED,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
     2, 5,
     {
@@ -8424,7 +8424,7 @@ static spelldata spelldaten[] =
   {
     SPL_PULLASTRAL, "pull_astral", NULL, NULL,
     "ru+",
-    M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
+    M_TYBIED, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8437,7 +8437,7 @@ static spelldata spelldaten[] =
 
   {
     SPL_FETCHASTRAL, "fetch_astral", NULL, NULL, "u+",
-    M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
+    M_TYBIED, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8449,7 +8449,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_STEALAURA, "steal_aura", NULL, NULL, "u",
-    M_ASTRAL,
+    M_TYBIED,
     (FARCASTING | SPELLLEVEL | UNITSPELL | TESTRESISTANCE | TESTCANSEE),
     3, 6,
     {
@@ -8463,7 +8463,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_FLYING_SHIP, "airship", NULL, NULL, "s",
-    M_ASTRAL, (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE), 5, 6,
+    M_TYBIED, (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE), 5, 6,
     {
       { "aura", 10, SPC_FIX },
       { "h12", 1, SPC_FIX },
@@ -8476,7 +8476,7 @@ static spelldata spelldaten[] =
   {
     SPL_DESTROY_MAGIC, "break_curse", NULL, "spellid",
     "kcc?",
-    M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 3, 7,
+    M_TYBIED, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 3, 7,
     {
       { "aura", 3, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8488,7 +8488,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_ETERNIZEWALL, "eternal_walls", NULL, NULL, "b",
-    M_ASTRAL,
+    M_TYBIED,
     (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE | ONSHIPCAST),
     5, 7,
     {
@@ -8502,7 +8502,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_SCHILDRUNEN, "protective_runes", NULL, NULL, "kc",
-    M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE | BUILDINGSPELL | SHIPSPELL), 2, 8,
+    M_TYBIED, (ONSHIPCAST | TESTRESISTANCE | BUILDINGSPELL | SHIPSPELL), 2, 8,
     {
       { "aura", 20, SPC_FIX },
       { 0, 0, 0 },
@@ -8516,7 +8516,7 @@ static spelldata spelldaten[] =
   {
     SPL_REDUCESHIELD, "fish_shield",
     NULL, NULL, NULL,
-    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 8,
+    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 2, 8,
     {
       { "aura", 4, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8529,7 +8529,7 @@ static spelldata spelldaten[] =
   {
     SPL_SPEED, "combat_speed",
     NULL, NULL, NULL,
-    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 5, 9,
+    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 5, 9,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8542,7 +8542,7 @@ static spelldata spelldaten[] =
   {
     SPL_VIEWREALITY, "view_reality",
     NULL, NULL, NULL,
-    M_ASTRAL, (0), 5, 10,
+    M_TYBIED, (0), 5, 10,
     {
       { "aura", 40, SPC_FIX },
       { 0, 0, 0 },
@@ -8555,7 +8555,7 @@ static spelldata spelldaten[] =
   {
     SPL_SPEED2, "double_time", NULL, NULL,
     "u+",
-    M_ASTRAL, (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 5, 11,
+    M_TYBIED, (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 5, 11,
     {
       { "aura", 5, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8568,7 +8568,7 @@ static spelldata spelldaten[] =
   {
     SPL_ARMORSHIELD, "armor_shield",
         NULL, NULL, NULL,
-    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
+    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
     {
       { "aura", 4, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8581,7 +8581,7 @@ static spelldata spelldaten[] =
   {
     SPL_TYBIED_FAMILIAR, "summon_familiar",
         NULL, NULL, NULL,
-    M_ASTRAL, (NOTFAMILIARCAST), 5, 12,
+    M_TYBIED, (NOTFAMILIARCAST), 5, 12,
     {
       { "aura", 100, SPC_FIX },
       { "permaura", 5, SPC_FIX },
@@ -8593,7 +8593,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_MOVECASTLE, "living_rock", NULL, "direction", "bc",
-    M_ASTRAL, (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE), 5, 13,
+    M_TYBIED, (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE), 5, 13,
     {
       { "aura", 10, SPC_LEVEL },
       { "permaura", 1, SPC_FIX },
@@ -8605,7 +8605,7 @@ static spelldata spelldaten[] =
   },
   {
     SPL_DISRUPTASTRAL, "astral_disruption", NULL, NULL, NULL,
-    M_ASTRAL, (REGIONSPELL | SPELLLEVEL), 4, 14,
+    M_TYBIED, (REGIONSPELL | SPELLLEVEL), 4, 14,
     {
       { "aura", 140, SPC_FIX },
       { 0, 0, 0 },
@@ -8618,7 +8618,7 @@ static spelldata spelldaten[] =
   {
     SPL_PERMTRANSFER, "sacrifice_strength", NULL,
     "aura", "ui",
-    M_ASTRAL, (UNITSPELL), 1, 15,
+    M_TYBIED, (UNITSPELL), 1, 15,
     {
       { "aura", 100, SPC_FIX },
       { 0, 0, 0 },
@@ -8628,12 +8628,12 @@ static spelldata spelldaten[] =
     },
     (spell_f)sp_permtransfer, NULL
   },
-  /* M_GRAU */
+  /* M_GRAY */
   /*  Definitionen von Create_Artefaktsprüchen    */
   {
     SPL_METEORRAIN, "meteor_rain",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL | SPELLLEVEL), 5, 3,
+    M_GRAY, (COMBATSPELL | SPELLLEVEL), 5, 3,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8646,7 +8646,7 @@ static spelldata spelldaten[] =
   {
     SPL_BECOMEWYRM, "wyrm_transformation",
     NULL, NULL, NULL,
-    M_GRAU, 0, 5, 1,
+    M_GRAY, 0, 5, 1,
     {
       { "aura", 1, SPC_FIX },
       { "permaura", 1, SPC_FIX },
@@ -8659,7 +8659,7 @@ static spelldata spelldaten[] =
   /* Monstersprüche */
   { SPL_FIREDRAGONODEM, "fiery_dragonbreath",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 3,
+    M_GRAY, (COMBATSPELL), 5, 3,
     {
       { "aura", 1, SPC_FIX },
       { 0, 0, 0 },
@@ -8671,7 +8671,7 @@ static spelldata spelldaten[] =
   },
   { SPL_DRAGONODEM, "icy_dragonbreath",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 6,
+    M_GRAY, (COMBATSPELL), 5, 6,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -8683,7 +8683,7 @@ static spelldata spelldaten[] =
   },
   { SPL_WYRMODEM, "powerful_dragonbreath",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 12,
+    M_GRAY, (COMBATSPELL), 5, 12,
     {
       { "aura", 3, SPC_FIX },
       { 0, 0, 0 },
@@ -8695,7 +8695,7 @@ static spelldata spelldaten[] =
   },
   { SPL_DRAINODEM, "drain_skills",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 12,
+    M_GRAY, (COMBATSPELL), 5, 12,
     {
       { "aura", 4, SPC_FIX },
       { 0, 0, 0 },
@@ -8708,7 +8708,7 @@ static spelldata spelldaten[] =
   {
     SPL_AURA_OF_FEAR, "aura_of_fear",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 12,
+    M_GRAY, (COMBATSPELL), 5, 12,
     {
       { "aura", 1, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8721,7 +8721,7 @@ static spelldata spelldaten[] =
   {
     SPL_SHADOWCALL, "shadowcall",
     NULL, NULL, NULL,
-    M_GRAU, (PRECOMBATSPELL), 5, 12,
+    M_GRAY, (PRECOMBATSPELL), 5, 12,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8734,7 +8734,7 @@ static spelldata spelldaten[] =
   {
     SPL_IMMOLATION, "immolation",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 12,
+    M_GRAY, (COMBATSPELL), 5, 12,
     {
       { "aura", 2, SPC_LEVEL },
       { 0, 0, 0 },
@@ -8746,7 +8746,7 @@ static spelldata spelldaten[] =
   },
   { SPL_FIREODEM, "firestorm",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 8,
+    M_GRAY, (COMBATSPELL), 5, 8,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -8758,7 +8758,7 @@ static spelldata spelldaten[] =
   },
   { SPL_ICEODEM, "coldfront",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 8,
+    M_GRAY, (COMBATSPELL), 5, 8,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -8770,7 +8770,7 @@ static spelldata spelldaten[] =
   },
   { SPL_ACIDODEM, "acidrain",
     NULL, NULL, NULL,
-    M_GRAU, (COMBATSPELL), 5, 8,
+    M_GRAY, (COMBATSPELL), 5, 8,
     {
       { "aura", 2, SPC_FIX },
       { 0, 0, 0 },
@@ -8912,4 +8912,5 @@ register_spells(void)
   register_shipcurse();
   register_buildingcurse();
   register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
+  register_function((pf_generic)&sp_summon_familiar, "cast_familiar");
 }

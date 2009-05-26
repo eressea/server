@@ -93,12 +93,12 @@ out_faction(FILE *file, const struct faction *f)
   if (alliances!=NULL) {
     fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
-      LOC(default_locale, rc_name(f->race, 0)), magietypen[f->magiegebiet],
+      LOC(default_locale, rc_name(f->race, 0)), magic_school[f->magiegebiet],
       f->no_units, f->num_total, f->money, turn - f->lastorders);
   } else {
     fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
       factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-      magietypen[f->magiegebiet], f->no_units, f->num_total, f->money,
+      magic_school[f->magiegebiet], f->no_units, f->num_total, f->money,
       turn - f->lastorders);
   }
 }

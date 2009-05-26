@@ -67,10 +67,10 @@ spy_message(int spy, const unit *u, const unit *target)
 
   ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u, target, str));
   if (spy > 20) {
-    sc_mage * m = get_mage(target);
+    sc_mage * mage = get_mage(target);
     /* bei Magiern Zaubersprüche und Magiegebiet */
-    if (m) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type", target, magietypen[find_magetype(target)]));
+    if (mage) {
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type", target, magic_school[mage->magietyp]));
     }
   }
   if (spy > 6) {

@@ -801,8 +801,9 @@ spskill(char * buffer, size_t size, const struct locale * lang, const struct uni
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   
   if (sv->id == SK_MAGIC){
-    if (find_magetype(u) != M_GRAU){
-      bytes = (int)strlcpy(bufp, LOC(lang, mkname("school", magietypen[find_magetype(u)])), size);
+    sc_mage * mage = get_mage(u);
+    if (mage && mage->magietyp != M_GRAY) {
+      bytes = (int)strlcpy(bufp, LOC(lang, mkname("school", magic_school[mage->magietyp])), size);
       tsize += bytes;
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 

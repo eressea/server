@@ -1324,7 +1324,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   }
   fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
   fprintf(F, "%d;Anzahl Personen\n", count_all(f));
-  fprintf(F, "\"%s\";Magiegebiet\n", magietypen[f->magiegebiet]);
+  fprintf(F, "\"%s\";Magiegebiet\n", magic_school[f->magiegebiet]);
 
   if (f->race == new_race[RC_HUMAN]) {
     fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));

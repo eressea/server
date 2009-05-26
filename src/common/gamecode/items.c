@@ -108,7 +108,7 @@ use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struc
   for (i=0;i!=amount;++i) {
     int effect, duration = 2;
     double force;
-    spell *sp = find_spell(M_GRAU, "antimagiczone");
+    spell *sp = find_spell(M_NONE, "antimagiczone");
     attrib ** ap = &r->attribs;
     unused(ord);
     assert(sp);

@@ -733,7 +733,7 @@ tolua_write_spells(lua_State* tolua_S)
     if (sp->sp_function!=fun) {
       xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
       xmlNewProp(node, BAD_CAST "name", BAD_CAST sp->sname);
-      xmlNewProp(node, BAD_CAST "type", BAD_CAST magietypen[sp->magietyp]);
+      xmlNewProp(node, BAD_CAST "type", BAD_CAST magic_school[sp->magietyp]);
       xmlNewProp(node, BAD_CAST "rank", xml_i(sp->rank));
       xmlNewProp(node, BAD_CAST "level", xml_i(sp->level));
       xmlNewProp(node, BAD_CAST "index", xml_i(sp->id));
@@ -779,7 +779,7 @@ tolua_write_spells(lua_State* tolua_S)
 static int
 tolua_get_spell_text(lua_State *tolua_S)
 {
-  const struct locale * loc = find_locale("en");
+  const struct locale * loc = default_locale;
   spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
   lua_pushstring(tolua_S, spell_info(self, loc));
   return 1;
@@ -789,7 +789,7 @@ static int
 tolua_get_spell_school(lua_State *tolua_S)
 {
   spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
-  lua_pushstring(tolua_S, magietypen[self->magietyp]);
+  lua_pushstring(tolua_S, magic_school[self->magietyp]);
   return 1;
 }
 
@@ -804,8 +804,9 @@ tolua_get_spell_level(lua_State *tolua_S)
 static int
 tolua_get_spell_name(lua_State *tolua_S)
 {
+  const struct locale * lang = default_locale;
   spell * self = (spell *)tolua_tousertype(tolua_S, 1, 0);
-  lua_pushstring(tolua_S, self->sname);
+  lua_pushstring(tolua_S, spell_name(self, lang));
   return 1;
 }
 

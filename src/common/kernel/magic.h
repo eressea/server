@@ -83,16 +83,18 @@ typedef struct strarray {
 
 /* typedef unsigned char magic_t; */
 enum {
-	M_GRAU,       /* none */
-	M_TRAUM,      /* Illaun */
-	M_ASTRAL,     /* Tybied */
-	M_BARDE,      /* Cerddor */
-	M_DRUIDE,     /* Gwyrrd */
-	M_CHAOS,      /* Draig */
-	MAXMAGIETYP,
-	M_NONE = (magic_t) -1
+  M_GRAY = 0,       /* Gray */
+  M_ILLAUN = 1,      /* Illaun */
+  M_TYBIED = 2,     /* Tybied */
+  M_CERDDOR = 3,      /* Cerddor */
+  M_GWYRRD = 4,     /* Gwyrrd */
+  M_DRAIG = 5,      /* Draig */
+  M_COMMON = 6,     /* common spells */
+  MAXMAGIETYP,
+  /* this enum is stored in the datafile, so do not change the numbers around */
+  M_NONE = (magic_t) -1
 };
-extern const char *magietypen[MAXMAGIETYP];
+extern const char *magic_school[MAXMAGIETYP];
 
 /* ------------------------------------------------------------- */
 /* Magier:
@@ -262,8 +264,6 @@ sc_mage * create_mage(struct unit *u, magic_t mtyp);
 	 *	und	initialisiert den Magiertypus mit mtyp.  */
 sc_mage * get_mage(const struct unit *u);
 	/*	gibt u->mage zurück, bei nicht-Magiern *NULL */
-magic_t find_magetype(const struct unit *u);
-	/*	gibt den Magietyp der struct unit zurück, bei nicht-Magiern 0 */
 boolean is_mage(const struct unit *u);
 	/*	gibt true, wenn u->mage gesetzt.  */
 boolean is_familiar(const struct unit *u);

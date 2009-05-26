@@ -3409,7 +3409,7 @@ update_spells(void)
       if (u->faction!=NULL && u->number>0) {
         sc_mage *m = get_mage(u);
         if (!is_monsters(u->faction) && m != NULL) {
-          if (m->magietyp == M_GRAU) continue;
+          if (m->magietyp == M_GRAY) continue;
           updatespelllist(u);
         }
       }

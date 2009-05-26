@@ -123,9 +123,11 @@
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.skill_bonus" value="0"/>
     <param name="rules.combat.loot" value="3"/> <!-- only self + monsters -->
-	<param name="rules.cavalry.skill" value="4"/>
-	<param name="rules.cavalry.mode" value="1"/>
+    <param name="rules.cavalry.skill" value="4"/>
+    <param name="rules.cavalry.mode" value="1"/>
     <param name="rules.magic.factionlist" value="1"/>
+    <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
+    <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.give" value="3"/> <!-- only self + peasants -->
     <param name="rules.help.mask" value="fight guard money"/>

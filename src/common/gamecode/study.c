@@ -435,8 +435,9 @@ teach_cmd(unit * u, struct order * ord)
       if (sk == SK_MAGIC) {
         /* ist der Magier schon spezialisiert, so versteht er nur noch
         * Lehrer seines Gebietes */
-        if (find_magetype(u2) != 0 && find_magetype(u) != find_magetype(u2))
-        {
+        sc_mage * mage1 = get_mage(u);
+        sc_mage * mage2 = get_mage(u2);
+        if (!mage2 || !mage1 || mage1->magietyp!=mage2->magietyp) {
           if (feedback) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_different_magic", "target", u2));
           }
@@ -549,7 +550,7 @@ learn_cmd(unit * u, order * ord)
     if (is_familiar(u)){
       /* Vertraute zählen nicht zu den Magiern einer Partei,
       * können aber nur Graue Magie lernen */
-      mtyp = M_GRAU;
+      mtyp = M_GRAY;
       if (!is_mage(u)) create_mage(u, mtyp);
     } else if (!has_skill(u, SK_MAGIC)) {
       int mmax = skill_limit(u->faction, SK_MAGIC);
@@ -560,7 +561,7 @@ learn_cmd(unit * u, order * ord)
         return 0;
       }
       mtyp = getmagicskill(u->faction->locale);
-      if (mtyp == M_NONE || mtyp == M_GRAU) {
+      if (mtyp == M_NONE || mtyp == M_GRAY) {
         /* wurde kein Magiegebiet angegeben, wird davon
         * ausgegangen, daß das normal gelernt werden soll */
         if(u->faction->magiegebiet != 0) {

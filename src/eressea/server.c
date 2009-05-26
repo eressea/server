@@ -609,7 +609,7 @@ write_spells(void)
       strcat(components, LOC(loc, spc->type->_name[0]));
       strcat(components, ",");
     }
-    fprintf(F, "%s;%d;%s;%s\n", LOC(loc, mkname("spell", sp->sname)), sp->level, LOC(loc, mkname("school", magietypen[sp->magietyp])), components);
+    fprintf(F, "%s;%d;%s;%s\n", LOC(loc, mkname("spell", sp->sname)), sp->level, LOC(loc, mkname("school", magic_school[sp->magietyp])), components);
   }
   fclose(F);
 }

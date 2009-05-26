@@ -4493,7 +4493,7 @@
     </string>
     <string name="reanimate">
       <text locale="de">Wiederbelebung</text>
-      <text locale="en">Ressurection</text>
+      <text locale="en">Resurrection</text>
     </string>
     <string name="analysedream">
       <text locale="de">Traumbilder analysieren</text>
@@ -4665,11 +4665,10 @@
       </text>
     </string>
     <string name="song_of_slavery">
-      <text locale="de">
-      Dieser mächtige Bann raubt dem Opfer seinen freien Willen und
-      unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer
+      <text locale="de">Dieser mächtige Bann raubt dem Opfer seinen freien Willen
+      und unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer
       sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden
-      zugehörig fühlen."
+      zugehörig fühlen.
       </text>
     </string>
     <string name="song_of_peace">
@@ -6668,6 +6667,10 @@
   </namespace>
 
   <namespace name="school">
+    <string name="common">
+      <text locale="de">Gemein</text>
+      <text locale="en">common</text>
+    </string>
     <string name="nomagic">
       <text locale="de">Kein Magiegebiet</text>
       <text locale="en">no magic school yet</text>

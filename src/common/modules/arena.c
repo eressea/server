@@ -200,7 +200,7 @@ age_hurting(attrib * a) {
 	if (b==NULL) return AT_AGE_REMOVE;
 	for (u=b->region->units;u;u=u->next) {
 		if (u->building==b) {
-			if (u->faction->magiegebiet==M_CHAOS) {
+			if (u->faction->magiegebiet==M_DRAIG) {
 				active ++;
 				ADDMSG(&b->region->msgs, msg_message("praytoigjarjuk", "unit", u));
 			}
@@ -208,7 +208,7 @@ age_hurting(attrib * a) {
 	}
 	if (active) for (u=b->region->units;u;u=u->next) if (playerrace(u->faction->race)) {
 		int i;
-		if (u->faction->magiegebiet!=M_CHAOS) {
+		if (u->faction->magiegebiet!=M_DRAIG) {
 			for (i=0;i!=active;++i) u->hp = (u->hp+1) / 2; /* make them suffer, but not die */
 			ADDMSG(&b->region->msgs, msg_message("cryinpain", "unit", u));
 		}
@@ -282,7 +282,7 @@ tower_init(void)
 				b->size = 10;
         if (i!=0) {
           sprintf(buf, "Turm des %s", 
-            LOC(default_locale, mkname("school", magietypen[i])));
+            LOC(default_locale, mkname("school", magic_school[i])));
         }
 				else sprintf(buf, "Turm der Ahnungslosen");
 				set_string(&b->name, buf);

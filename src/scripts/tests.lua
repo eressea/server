@@ -255,7 +255,7 @@ local function test_spells()
   u:clear_orders()
   u:add_item("money", 10000)
   u:set_skill("magic", 5)
-  u:add_order("LERNE MAGIE Tybied")
+  u:add_order("LERNE MAGIE Illaun")
   process_orders()
   local sp
   local nums = 0
@@ -264,8 +264,9 @@ local function test_spells()
     nums = nums + 1
     end
   end
+  assert(nums>0)
   for sp in u.spells do
-  nums = nums - 1
+    nums = nums - 1
   end
   assert(nums==0)
 end
@@ -312,8 +313,6 @@ local function test_alliance()
   assert(f1.alliance~=nil)
   assert(f2.alliance~=nil)
   assert(f2.alliance==f1.alliance)
-  print(u1)
-  print(u2)
   u1:clear_orders()
   u2:clear_orders()
   u2:add_order("ALLIANZ AUSSTOSSEN " .. itoa36(f1.id))
@@ -337,6 +336,15 @@ local function test_alliance()
   assert(f2.alliance~=nil)
 end
 
+local function spells_csv()
+  local f = io.open("spells.csv", "w")
+  for sp in spells() do
+    f:write('"' .. sp.name .. '",' .. sp.level .. ',' .. sp.school .. ',"' .. sp.text .. '"\n')
+  end
+  f:close()
+  fail = 1
+end
+
 loadscript("extensions.lua")
 tests = {
     ["alliance"] = test_alliance,
@@ -356,7 +364,6 @@ tests = {
     ["spells"] = test_spells
 }
 mytests = {
-    ["spells"] = test_spells
 }
 fail = 0
 for k, v in pairs(tests) do
@@ -368,6 +375,8 @@ for k, v in pairs(tests) do
         print("[OK] " .. k)
     end
 end
+
+-- spells_csv()
 
 if fail > 0 then
     print(fail .. " tests failed.")
