@@ -1069,10 +1069,26 @@ demon_skillchanges(void)
     for (u = r->units; u; u = u->next) {
       if (u->race == new_race[RC_DAEMON]) {
         skill * sv = u->skills;
+        int upchance = 15;
+        int downchance = 10;
+
+        if (fval(u, UFL_HUNGER)) {
+          /* hungry demons only go down, never up in skill */
+          static int rule_hunger = -1;
+          if (rule_hunger<0) {
+            rule_hunger = get_param_int(global.parameters, "hunger.demon.skill", 0);
+          }
+          if (rule_hunger) {
+            upchance = 0;
+            downchance = 15;
+          }
+        }
+
         while (sv!=u->skills+u->skill_size) {
-          if (sv->level>0 && rng_int() % 100 < 25) {
+          int roll = rng_int() % 100;
+          if (sv->level>0 && roll < upchance+downchance) {
             int weeks = 1+rng_int()%3;
-            if (rng_int() % 100 < 40) {
+            if (roll < downchance) {
               reduce_skill(u, sv, weeks);
             } else {
               while (weeks--) learn_skill(u, sv->id, 1.0);
@@ -1133,14 +1149,21 @@ karma_update(void)
 static void
 rotting_herbs(void)
 {
+  static int rule_rot = -1;
   region * r;
+
+  if (rule_rot<0) {
+    rule_rot = get_param_int(global.parameters, "rules.economy.herbrot", HERBROTCHANCE);
+  }
+  if (rule_rot==0) return;
+
   for (r = regions; r; r = r->next) {
     unit * u;
     for (u = r->units; u; u=u->next) {
       item **itmp = &u->items, *hbag = *i_find(itmp, olditemtype[I_SACK_OF_CONSERVATION]);
-      int rot_chance = HERBROTCHANCE;
+      int rot_chance = rule_rot;
 
-      if (hbag) rot_chance = (HERBROTCHANCE*2)/5;
+      if (hbag) rot_chance = (rot_chance*2)/5;
       while (*itmp) {
         item * itm = *itmp;
         int n = itm->number;

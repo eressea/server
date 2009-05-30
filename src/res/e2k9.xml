@@ -116,6 +116,7 @@
     <param name="nmr.removenewbie" value="0"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="0"/>
+    <param name="hunger.demon.skill" value="1"/>
     <param name="init_spells" value="0"/>
     <param name="hunger.damage" value="1d9+9"/>
     <param name="recruit.allow_merge" value="1"/>
@@ -132,6 +133,7 @@
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
+    <param name="rules.economy.herbrot" value="0"/>
     <param name="rules.give" value="11"/> <!-- only self + peasants + ondeath -->
     <param name="rules.help.mask" value="fight guard money"/>
 	<param name="movement.shipspeed.skillbonus" value="7"/>
