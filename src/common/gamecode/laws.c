@@ -35,6 +35,7 @@
 #include "randenc.h"
 #include "spy.h"
 #include "study.h"
+#include "market.h"
 
 /* kernel includes */
 #include <kernel/alchemy.h>
@@ -997,7 +998,7 @@ quit_cmd(unit * u, struct order * ord)
         } else {
           variant var;
           var.i = f2_id;
-          object_create("quit", TINTEGER, var);
+          a_add(&f->attribs, object_create("quit", TINTEGER, var));
         }
       }
     }
@@ -1018,6 +1019,7 @@ quit(void)
     faction * f = *fptr;
     if (f->flags & FFL_QUIT) {
       if (EnhancedQuit()) {
+        /* this doesn't work well (use object_name()) */
         attrib * a = a_find(f->attribs, &at_object);
         if (a) {
           variant var;
@@ -2916,6 +2918,10 @@ age_building(building * b)
   a_age(&b->attribs);
   handle_event(b->attribs, "timer", b);
 
+  if (b->type->age) {
+    b->type->age(b);
+  }
+
   return b;
 }
 
@@ -3005,7 +3011,8 @@ ageing(void)
     /* Gebäude */
     for (bp=&r->buildings;*bp;) {
       building * b = *bp;
-      b = age_building(b);
+      age_building(b);
+      if (b==*bp) bp = &b->next;
     }
 
     blargest = largestbuilding(r, &is_tax_building, false);
@@ -3920,6 +3927,10 @@ processorders (void)
 
   if (get_param_int(global.parameters, "modules.wormholes", 0)) {
     create_wormholes();
+  }
+
+  if (get_param_int(global.parameters, "modules.markets", 0)) {
+    do_markets();
   }
 
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich

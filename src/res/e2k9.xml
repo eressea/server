@@ -55,6 +55,7 @@
 
     <order name="ARBEITEN" disable="yes"/>
     <order name="BETEN" disable="yes"/>
+    <order name="BELAGERE" disable="yes"/>
     <order name="FRIEDEN" disable="yes"/>
     <order name="GM" disable="yes"/>
     <order name="JIHAD" disable="yes"/>
@@ -106,6 +107,7 @@
 
     <param name="modules.astralspace" value="0"/>
     <param name="modules.wormholes" value="0"/>
+    <param name="modules.markets" value="1/>
 
     <param name="skills.cost" value="500"/>
     <param name="entertain.base" value="0"/>
@@ -129,7 +131,8 @@
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
     <param name="rules.economy.taxation" value="1"/>
-    <param name="rules.give" value="3"/> <!-- only self + peasants -->
+    <param name="rules.economy.roqf" value="5"/>
+    <param name="rules.give" value="11"/> <!-- only self + peasants + ondeath -->
     <param name="rules.help.mask" value="fight guard money"/>
 	<param name="movement.shipspeed.skillbonus" value="7"/>
     <param name="alliance.auto" value="fight"/>

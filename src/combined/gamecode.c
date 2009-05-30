@@ -27,6 +27,7 @@
 #include "common/gamecode/items.c"
 #include "common/gamecode/laws.c"
 #include "common/gamecode/luck.c"
+#include "common/gamecode/market.c"
 #include "common/gamecode/monster.c"
 #include "common/gamecode/randenc.c"
 #include "common/gamecode/report.c"

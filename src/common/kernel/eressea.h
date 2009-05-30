@@ -415,6 +415,14 @@ typedef struct helpmode {
 
 extern struct helpmode helpmodes[];
 
+extern int rule_give(void);
+
+#define GIVE_SELF 1
+#define GIVE_PEASANTS 2
+#define GIVE_OTHERS 4
+#define GIVE_ONDEATH 8
+#define GIVE_ANY (GIVE_SELF|GIVE_PEASANTS|GIVE_OTHERS)
+
 extern struct attrib_type at_guard;
 extern void free_gamedata(void);
 #if 1 /* disable to count all units */

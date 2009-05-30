@@ -313,6 +313,8 @@ parse_buildings(xmlDocPtr doc)
             btype->name = (const char * (*)(const struct building_type*, int))fun;
           } else if (strcmp((const char*)propValue, "init")==0) {
             btype->init = (void (*)(struct building_type*))fun;
+          } else if (strcmp((const char*)propValue, "age")==0) {
+            btype->age = (void (*)(struct building*))fun;
           } else {
             log_error(("unknown function type '%s' for building %s\n",
               (const char*)propValue, btype->_name));

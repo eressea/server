@@ -524,7 +524,7 @@ build_road(region * r, unit * u, int size, direction_t d)
     item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
     if (itm!=NULL && itm->number>0) {
       int rings = MIN(u->number, itm->number);
-      n = n * (9*rings+u->number) / u->number;
+      n = n * ((roqf_factor()-1)*rings+u->number) / u->number;
     }
   }
   if (n < left) {
@@ -587,6 +587,15 @@ matmod(const attrib * a, const unit * u, const resource_type * material, int val
     mm_fun fun = (mm_fun)a->data.f;
     value = fun(u, material, value);
     if (value<0) return value; /* pass errors to caller */
+  }
+  return value;
+}
+
+int roqf_factor(void)
+{
+  int value = -1;
+  if (value<0) {
+    value = get_param_int(global.parameters, "rules.economy.roqf", 10);
   }
   return value;
 }
@@ -699,7 +708,7 @@ build(unit * u, const construction * ctype, int completed, int want)
       if (itm!=NULL) i = itm->number;
       if (i>0) {
         int rings = MIN(u->number, i);
-        n = n * (9*rings+u->number) / u->number;
+        n = n * ((roqf_factor()-1)*rings+u->number) / u->number;
       }
     }
 

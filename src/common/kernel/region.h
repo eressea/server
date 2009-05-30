@@ -239,9 +239,9 @@ struct faction * region_get_owner(const struct region * r);
 
 struct region * r_connect(const struct region *, direction_t dir);
 #ifdef FAST_CONNECT
-# define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, dir))
+# define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, (direction_t)dir))
 #else
-# define rconnect(r, dir) r_connect(r, dir)
+# define rconnect(r, dir) r_connect(r, (direction_t)dir)
 #endif
 
 void free_regions(void);

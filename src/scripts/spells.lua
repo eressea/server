@@ -6,12 +6,55 @@ function creation_message(mage, type)
   return msg
 end
 
--- Erschaffe ein Flammenschwert
-local function create_item(mage, level, name)
+local function create_item(mage, level, name, count)
   local msg = creation_message(mage, name)
   msg:send_faction(mage.faction)
-  mage:add_item(name, 1);
+  if count==nil then
+    mage:add_item(name, 1);
+  else
+    mage:add_item(name, count);
+  end
   return level
+end
+
+-- Wasser des Lebens
+function create_potion_p2(r, mage, level, force)
+  return create_item(mage, level, "p2", level/2)
+end
+
+-- Siebenmeilentee
+function create_potion_p0(r, mage, level, force)
+  return create_item(mage, level, "p0", level/2)
+end
+
+-- Wundsalbe
+function create_potion_ointment(r, mage, level, force)
+  return create_item(mage, level, "ointment", level/2)
+end
+
+-- Bauernblut
+function create_potion_peasantblood(r, mage, level, force)
+  return create_item(mage, level, "peasantblood", level/2)
+end
+
+-- Pferdeglück
+function create_potion_p9(r, mage, level, force)
+  return create_item(mage, level, "p9", level/2)
+end
+
+-- Schaffenstrunk
+function create_potion_p3(r, mage, level, force)
+  return create_item(mage, level, "p3", level/2)
+end
+
+-- Heiltrank
+function create_potion_p14(r, mage, level, force)
+  return create_item(mage, level, "p14", level/2)
+end
+
+-- Elixier der Macht
+function create_potion_p13(r, mage, level, force)
+  return create_item(mage, level, "p13", level/2)
 end
 
 -- Erschaffe ein Flammenschwert

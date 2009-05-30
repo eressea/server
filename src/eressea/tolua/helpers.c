@@ -345,6 +345,32 @@ lua_wage(const region * r, const faction * f, const race * rc)
   return result;
 }
 
+static void
+lua_agebuilding(building * b)
+{
+  lua_State * L = (lua_State *)global.vm_state;
+  char fname[64];
+
+  snprintf(fname, sizeof(fname), "age_%s", b->type->_name);
+
+  lua_pushstring(L, fname);
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  if (lua_isfunction(L, 1)) {
+    tolua_pushusertype(L, (void *)b, "building");
+
+    if (lua_pcall(L, 1, 0, 0)!=0) {
+      const char* error = lua_tostring(L, -1);
+      log_error(("agebuilding(%s) calling '%s': %s.\n",
+        buildingname(b), fname, error));
+      lua_pop(L, 1);
+    }
+  } else {
+    log_error(("agebuilding(%s) calling '%s': not a function.\n",
+      buildingname(b), fname));
+    lua_pop(L, 1);
+  }
+}
+
 static int
 lua_maintenance(const unit * u)
 {
@@ -473,6 +499,7 @@ register_tolua_helpers(void)
 {
   at_building_action.age = lc_age;
 
+  register_function((pf_generic)&lua_agebuilding, "lua_agebuilding");
   register_function((pf_generic)&lua_recruit, "lua_recruit");
   register_function((pf_generic)&lua_callspell, "lua_castspell");
   register_function((pf_generic)&lua_initfamiliar, "lua_initfamiliar");

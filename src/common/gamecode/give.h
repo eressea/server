@@ -10,8 +10,8 @@
  without prior permission by the authors of Eressea.
 
  */
-#ifndef H_KRNL_GIVE
-#define H_KRNL_GIVE
+#ifndef H_GC_GIVE
+#define H_GC_GIVE
 #ifdef __cplusplus
 extern "C" {
 #endif

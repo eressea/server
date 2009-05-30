@@ -263,6 +263,7 @@ destroyfaction(faction * f)
   faction *ff;
 
   if (!f->alive) return;
+  fset(f, FFL_QUIT);
 
   freelist(f->spellbook);
 

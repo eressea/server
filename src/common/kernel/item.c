@@ -386,6 +386,7 @@ static const char * it_aliases[][2] = {
   { "Runenschwert", "runesword" },
   { "p12", "truthpotion" },
   { "p1", "goliathwater" },
+  { "p4", "ointment" },
   { "p5", "peasantblood" },
   { "p8", "nestwarmth" },
   { "diamond", "adamantium" },
@@ -927,7 +928,7 @@ static void
 init_oldpotions(void)
 {
   const char * potionnames[MAX_POTIONS] = {
-    "p0", "goliathwater", "p2", "p3", "p4", "peasantblood", "p6",
+    "p0", "goliathwater", "p2", "p3", "ointment", "peasantblood", "p6",
     "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13",  "p14"
   };
   int p;

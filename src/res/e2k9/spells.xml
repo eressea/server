@@ -364,6 +364,78 @@
   <!-- end gwyrrd -->
 
   <!-- new tybied - spells known to all schools -->
+  <spell name="create_potion_p2" type="tybied" ship="true" rank="5" level="2">
+    <!-- Wasser des Lebens -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="2" cost="linear"/>
+    <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
+    <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
+  </spell>
+  <spell name="create_potion_p0" type="tybied" ship="true" rank="5" level="3">
+    <!-- Siebenmeilentee -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="2" cost="linear"/>
+    <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
+    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+  </spell>
+  <spell name="create_potion_p9" type="tybied" ship="true" rank="5" level="4">
+    <!-- Pferdeglück -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="3" cost="linear"/>
+    <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
+    <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
+    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+  </spell>
+  <spell name="create_potion_peasantblood" type="tybied" ship="true" rank="5" level="5">
+    <!-- Bauernblut -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="3" cost="linear"/>
+    <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
+    <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
+    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="peasant" amount="1" cost="fixed"/><!-- Bauer -->
+  </spell>
+
+  <spell name="create_potion_ointment" type="tybied" ship="true" rank="5" level="6">
+    <!-- Wundsalbe -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="4" cost="linear"/>
+    <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
+    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
+    <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
+  </spell>
+  <spell name="create_potion_p3" type="tybied" ship="true" rank="5" level="7>
+    <!-- Schaffenstrunk -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="4" cost="linear"/>
+    <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
+    <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
+    <resource name="h20" amount="1" cost="linear"/><!-- Schneekristall -->
+    <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
+  </spell>
+  <spell name="create_potion_p14" type="tybied" ship="true" rank="5" level="8">
+    <!-- Heiltrank -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="5" cost="linear"/>
+    <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
+    <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
+    <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
+    <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
+    <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
+  </spell>
+  <spell name="create_potion_p13" type="tybied" ship="true" rank="5" level="9>
+    <!-- Elixier der Macht -->
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="5" cost="linear"/>
+    <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
+    <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
+    <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
+    <resource name="h20" amount="1" cost="linear"/><!-- Schneekristall -->
+    <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
+    <resource name="dragonblood" amount="1" cost="fixed"/><!-- Drachenblut -->
+  </spell>
+
   <spell name="create_roi" type="tybied" ship="true" rank="5" level="6" index="130">
     <!-- Erschaffe einen Ring der Unsichtbarkeit -->
     <function name="cast" value="lua_castspell"/>

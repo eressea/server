@@ -615,18 +615,13 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   addlist(recruitorders, o);
 }
 
-#define GIVE_SELF 1
-#define GIVE_PEASANTS 2
-#define GIVE_OTHERS 4
-#define GIVE_ANY (GIVE_SELF|GIVE_PEASANTS|GIVE_OTHERS)
-
 static void
 give_cmd(unit * u, order * ord)
 {
   region * r = u->region;
   unit *u2;
   const char *s;
-  int i, n, rule;
+  int i, n, rule = rule_give();
   const item_type * itype;
   param_t p;
 
@@ -639,7 +634,6 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  rule = get_param_int(global.parameters, "rules.give", 7);
   if (getunitpeasants && (rule & GIVE_PEASANTS)==0) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
     return;
@@ -1508,7 +1502,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
   /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
   
   /* mit Flinkfingerring verzehnfacht sich die Produktion */
-  amount += skill * MIN(u->number, get_item(u,I_RING_OF_NIMBLEFINGER)) * 9;
+  amount += skill * MIN(u->number, get_item(u, I_RING_OF_NIMBLEFINGER)) * (roqf_factor()-1);
   
   /* Schaffenstrunk: */
   if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
@@ -2918,9 +2912,9 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 		}
 	}
 
-	i = MIN(u->number, get_item(u,I_RING_OF_NIMBLEFINGER));
+	i = MIN(u->number, get_item(u, I_RING_OF_NIMBLEFINGER));
 	if (i > 0) {
-		n *= STEALINCOME * (u->number + i * 9);
+		n *= STEALINCOME * (u->number + i * (roqf_factor()-1));
 	} else {
 		n *= u->number * STEALINCOME;
 	}

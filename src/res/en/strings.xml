@@ -1086,10 +1086,10 @@
   <string name="p3_p">
     <text locale="en">busybeers</text>
   </string>
-  <string name="p4">
+  <string name="ointment">
     <text locale="en">ointment</text>
   </string>
-  <string name="p4_p">
+  <string name="ointment_p">
     <text locale="en">ointments</text>
   </string>
   <string name="peasantblood">

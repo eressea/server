@@ -289,6 +289,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gamecode\market.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\market.h"
+				>
+			</File>
+			<File
 				RelativePath=".\gamecode\monster.c"
 				>
 			</File>
