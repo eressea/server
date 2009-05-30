@@ -61,9 +61,9 @@ free_market(attrib * a)
 
 const item_type * r_luxury(region * r)
 {
-  const luxury_type * ltype;
-  for (ltype = luxurytypes;ltype;ltype=ltype->next) {
-    if (r_demand(r, ltype)<0) return ltype->itype;
+  struct demand * dmd;
+  for (dmd=r->land->demands;dmd;dmd=dmd->next) {
+    if (dmd->value==0) return dmd->type->itype;
   }
   return NULL;
 }

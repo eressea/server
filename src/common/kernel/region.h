@@ -71,14 +71,16 @@ typedef struct region_owner {
   int since_turn;
 } region_owner;
 
+typedef struct demand {
+  struct demand * next;
+  const struct luxury_type * type;
+  int value;
+} demand;
+
 typedef struct land_region {
   char *name;
   /* TODO: demand kann nach Konvertierung entfernt werden. */
-  struct demand {
-    struct demand * next;
-    const struct luxury_type * type;
-    int value;
-  } * demands;
+  demand * demands;
   const struct item_type * herbtype;
   short herbs;
   short morale;

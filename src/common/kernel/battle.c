@@ -1899,7 +1899,7 @@ hits(troop at, troop dt, weapon * awp)
   skdiff = skilldiff(at, dt, dist);
   /* Verteidiger bekommt eine Rüstung */
   armor = select_armor(dt, true);
-  if (weapon->type->flags & WTF_USESHIELD) {
+  if (dwp->type->flags & WTF_USESHIELD) {
     shield = select_armor(dt, false);
   }
   if (contest(skdiff, dt, armor, shield)) {
