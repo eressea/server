@@ -10,7 +10,7 @@
   <xi:include href="common/armor.xml" />
   <!-- xi:include href="common/weapons.xml" /-->
   <xi:include href="common/resources.xml" />
-  <xi:include href="common/luxuries.xml" />
+  <!--xi:include href="common/luxuries.xml" /-->
 	<xi:include href="common/herbs.xml" />
   <!-- xi:include href="common/potions.xml" /-->
   <xi:include href="spoils.xml"/>
@@ -23,6 +23,7 @@
   <xi:include href="dungeons.xml"/>
   <xi:include href="directions.xml"/>
 
+  <xi:include href="e2k9/luxuries.xml" />
   <xi:include href="e2k9/weapons.xml" />
   <xi:include href="e2k9/items.xml" />
   <xi:include href="e2k9/strings.xml"/>
@@ -119,8 +120,10 @@
     <param name="hunger.demon.skill" value="1"/>
     <param name="init_spells" value="0"/>
     <param name="hunger.damage" value="1d9+9"/>
+    <param name="hunger.demons" value="1"/>
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
+    <param name="study.speedup" value="1"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.alliances" value="1"/>
     <param name="rules.combat.herospeed" value="3"/>

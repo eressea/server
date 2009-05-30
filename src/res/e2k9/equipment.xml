@@ -10,4 +10,9 @@
     <skill name="stamina" level="2"/>
   </set>
 
-</equipment>
+  <set name="seaserpent_spoils">
+    <item name="dragonblood" amount="2"/>
+    <item name="seaserpenthead" amount="1"/>
+  </set>
+
+  </equipment>

@@ -11,4 +11,9 @@
     <skill name="melee" level="1"/>
   </set>
 
+  <set name="seaserpent_spoils">
+    <item name="dragonblood" amount="6"/>
+    <item name="seaserpenthead" amount="1"/>
+  </set>
+
 </equipment>

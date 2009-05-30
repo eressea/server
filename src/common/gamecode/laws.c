@@ -309,14 +309,23 @@ get_food(region *r)
           peasantfood = 0;
         }
         if (hungry > 0) {
-          /* nicht gefütterte dämonen hungern */
+          static int demon_hunger = -1;
+          if (demon_hunger<0) {
+            demon_hunger = get_param_int(global.parameters, "hunger.demons", 0);
+          }
+          if (demon_hunger==0) {
+            /* nicht gefütterte dämonen hungern */
 #ifdef PEASANT_HUNGRY_DAEMONS_HAVE_FULL_SKILLS
-          /* wdw special rule */
-          hunger(hungry, u);
+            /* wdw special rule */
+            hunger(hungry, u);
 #else
-          if (hunger(hungry, u)) fset(u, UFL_HUNGER);
+            if (hunger(hungry, u)) fset(u, UFL_HUNGER);
 #endif
           /* used to be: hunger(hungry, u); */
+          } else {
+            /* no damage, but set the hungry-flag */
+            fset(u, UFL_HUNGER);
+          }
         }
       }
     }

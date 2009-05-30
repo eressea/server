@@ -1871,7 +1871,7 @@ int
 hits(troop at, troop dt, weapon * awp)
 {
   fighter *af = at.fighter, *df = dt.fighter;
-  const armor_type * armor, * shield;
+  const armor_type * armor, * shield = 0;
   int skdiff = 0;
   int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
   weapon * dwp = select_weapon(dt, false, dist>1);
@@ -1899,7 +1899,9 @@ hits(troop at, troop dt, weapon * awp)
   skdiff = skilldiff(at, dt, dist);
   /* Verteidiger bekommt eine Rüstung */
   armor = select_armor(dt, true);
-  shield = select_armor(dt, false);
+  if (weapon->type->flags & WTF_USESHIELD) {
+    shield = select_armor(dt, false);
+  }
   if (contest(skdiff, dt, armor, shield)) {
     if (bdebug) {
       debug_hit(at, awp, dt, dwp, skdiff, dist, true);

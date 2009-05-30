@@ -7,7 +7,7 @@
     <construction skill="weaponsmithing" minskill="4" reqsize="1">
       <requirement type="iron" quantity="2"/>
     </construction>
-    <weapon cut="true" skill="melee" offmod="-1" defmod="-2" horse="false">
+    <weapon useshield="false" cut="true" skill="melee" offmod="-1" defmod="-2" horse="false">
       <damage type="rider" value="2d8+3"/>
       <damage type="footman" value="2d8+3"/>
     </weapon>

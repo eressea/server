@@ -197,6 +197,7 @@ typedef struct armor_type {
 #define WTF_SIEGE         0x20
 #define WTF_ARMORPIERCING 0x40 /* armor has only half value */
 #define WTF_HORSEBONUS    0x80
+#define WTF_USESHIELD     0x100
 
 typedef struct weapon_type {
   const item_type * itype;

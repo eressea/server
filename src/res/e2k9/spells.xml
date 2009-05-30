@@ -21,7 +21,7 @@
   <spell name="puttorest" type="illaun" rank="5" level="2" index="168" variable="true">
     <!-- Seelenfrieden -->
     <resource name="aura" amount="3" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="balm" amount="10" cost="fixed"/>
   </spell>
   <spell name="shapeshift" type="illaun" rank="5" level="3" index="93" syntax="race" parameters="uc" variable="true">
     <!-- Gestaltwandlung -->
@@ -70,7 +70,7 @@
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="20" cost="fixed"/>
     <resource name="dragonblood" amount="5" cost="fixed"/>
-    <resource name="p2" amount="5" cost="fixed"/>
+    <resource name="silk" amount="20" cost="fixed"/>
   </spell>
   <spell name="bad_dreams" type="illaun" rank="5" level="10" index="11" far="true">
     <!-- Schlechte Träume -->
@@ -166,7 +166,7 @@
     <!-- Erschaffe ein Flammenschwert -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="p10" amount="1" cost="fixed"/>
+    <resource name="oil" amount="10" cost="fixed"/>
     <resource name="sword" amount="1" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
@@ -289,13 +289,13 @@
     <!-- Erschaffe Steingolems -->
     <resource name="aura" amount="2" cost="level"/>
     <resource name="stone" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="jewel" amount="10" cost="fixed"/>
   </spell>
   <spell name="treegrow" type="gwyrrd" rank="5" level="2" index="8" far="true" variable="true">
     <!-- Hainzauber -->
     <resource name="aura" amount="4" cost="level"/>
     <resource name="log" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="myrrh" amount="10" cost="fixed"/>
   </spell>
   <spell name="hail" type="gwyrrd" rank="5" level="3" index="5" variable="true">
     <!-- Hagel -->
@@ -436,7 +436,7 @@
     <resource name="dragonblood" amount="1" cost="fixed"/><!-- Drachenblut -->
   </spell>
 
-  <spell name="create_roi" type="tybied" ship="true" rank="5" level="6" index="130">
+  <spell name="create_roi" type="tybied" ship="true" rank="5" level="7" index="130">
     <!-- Erschaffe einen Ring der Unsichtbarkeit -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
@@ -506,9 +506,10 @@
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="irongolem" type="common" rank="4" level="2" index="33" variable="true">
+    <!-- Eisengolem -->
     <resource name="aura" amount="2" cost="level"/>
     <resource name="iron" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="incense" amount="1" cost="fixed"/>
   </spell>
   <spell name="reelingarrows" type="common" rank="5" level="5" index="36" variable="true">
     <!-- Wirbelwind -->
@@ -533,7 +534,7 @@
   </spell>
   <spell name="forestfire" type="common" rank="5" level="10" index="47" far="true">
     <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="oil" amount="1" cost="fixed"/>
+    <resource name="oil" amount="5" cost="fixed"/>
   </spell>
   <spell name="disturbingdreams" type="common" rank="5" level="6" index="50" far="true">
     <resource name="aura" amount="18" cost="fixed"/>

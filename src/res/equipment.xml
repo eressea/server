@@ -374,11 +374,6 @@
     <item name="dragonhead" amount="1"/>
   </set>
 
-  <set name="seaserpent_spoils">
-    <item name="dragonblood" amount="6"/>
-    <item name="seaserpenthead" amount="1"/>
-  </set>
-
   <!-- sets that are used by the monster-spawning code -->
   <set name="monster_dragon">
     <skill name="magic" level="4"/>

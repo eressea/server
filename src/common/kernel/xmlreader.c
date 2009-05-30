@@ -665,6 +665,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   if (xml_bvalue(node, "blunt", false)) flags |= WTF_BLUNT;
   if (xml_bvalue(node, "siege", false)) flags |= WTF_SIEGE;
   if (xml_bvalue(node, "horse", (flags&WTF_MISSILE)==0)) flags |= WTF_HORSEBONUS;
+  if (xml_bvalue(node, "useshield", true)) flags |= WTF_USESHIELD;
 
   propValue = xmlGetProp(node, BAD_CAST "skill");
   assert(propValue!=NULL);
