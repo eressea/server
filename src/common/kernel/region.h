@@ -265,6 +265,8 @@ void region_setinfo(struct region * self, const char * name);
 int region_getresource(const struct region * r, const struct resource_type * rtype);
 void region_setresource(struct region * r, const struct resource_type * rtype, int value);
 
+extern const struct item_type * r_luxury(struct region * r);
+
 #ifdef __cplusplus
 }
 #endif

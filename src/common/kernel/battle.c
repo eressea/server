@@ -822,7 +822,8 @@ select_armor(troop t, boolean shield)
         return a->atype;
       }
     }
-  }  return NULL;
+  }
+  return NULL;
 }
 
 

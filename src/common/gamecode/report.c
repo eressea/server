@@ -1882,6 +1882,19 @@ nr_building(FILE *F, const seen_region * sr, const building * b, const faction *
   nr_curses(F, f, b, TYP_BUILDING, 4);
 }
 
+static void nr_paragraph(FILE * F, message * m, faction * f) 
+{
+  int bytes;
+  char buf[4096], * bufp = buf;
+  size_t size = sizeof(buf) - 1;
+
+  bytes = (int)nr_render(m, f->locale, bufp, size, f);
+  if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+  msg_release(m);
+
+  rparagraph(F, buf, 0, 0, 0);
+}
+
 int
 report_plaintext(const char * filename, report_context * ctx, const char * charset)
 {
@@ -2169,9 +2182,20 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     if (sr->mode==see_unit) {
       anyunits = 1;
       describe(F, sr, f);
-      if (!fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
+      if (markets_module() && r->land) {
+        const item_type * lux = r_luxury(r);
+        const item_type * herb = r->land->herbtype;
+        message * m = msg_message("nr_market_info", "product herb",
+          lux->rtype, herb?herb->rtype:0);
+
         rnl(F);
-        prices(F, r, f);
+        nr_paragraph(F, m, f);
+        //
+      } else {
+        if (!fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
+          rnl(F);
+          prices(F, r, f);
+        }
       }
       guards(F, r, f);
       durchreisende(F, r, f);

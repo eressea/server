@@ -1157,7 +1157,21 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
       if (sr->mode>=see_unit) {
         /* trade */
-        if (rpeasants(r)/TRADE_FRACTION > 0) {
+        if (markets_module() && r->land) {
+          const item_type * lux = r_luxury(r);
+          const item_type * herb = r->land->herbtype;
+          if (lux || herb) {
+            fputs("PREISE\n", F);
+            if (lux) {
+              const char * ch = resourcename(lux->rtype, 0);
+              fprintf(F, "%d;%s\n", 1, add_translation(ch, locale_string(f->locale, ch)));
+            }
+            if (herb) {
+              const char * ch = resourcename(herb->rtype, 0);
+              fprintf(F, "%d;%s\n", 1, add_translation(ch, locale_string(f->locale, ch)));
+            }
+          }
+        } else if (rpeasants(r)/TRADE_FRACTION > 0) {
           struct demand * dmd = r->land->demands;
           fputs("PREISE\n", F);
           while (dmd) {

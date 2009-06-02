@@ -3052,6 +3052,15 @@ int rule_give(void)
   return value;
 }
 
+int markets_module(void)
+{
+  static int value = -1;
+  if (value<0) {
+    value = get_param_int(global.parameters, "modules.markets", 0);
+  }
+  return value;
+}
+
 /** releases all memory associated with the game state.
  * call this function before calling read_game() to load a new game
  * if you have a previously loaded state in memory.

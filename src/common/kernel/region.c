@@ -791,6 +791,16 @@ r_setdemand(region * r, const luxury_type * ltype, int value)
   d->value = value;
 }
 
+const item_type *
+r_luxury(region * r)
+{
+  struct demand * dmd;
+  for (dmd=r->land->demands;dmd;dmd=dmd->next) {
+    if (dmd->value==0) return dmd->type->itype;
+  }
+  return NULL;
+}
+
 int
 r_demand(const region * r, const luxury_type * ltype)
 {

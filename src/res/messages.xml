@@ -862,6 +862,14 @@
     <text locale="fr">"Le marché local offre la $resource($product,0) au prix de $int($price) écus."</text>
     <text locale="en">"The local market offers $resource($product,0) at a price of $int($price) silver."</text>
   </message>
+  <message name="nr_market_info" section="nr">
+    <type>
+      <arg name="product" type="resource"/>
+      <arg name="herb" type="resource"/>
+    </type>
+    <text locale="de">"Auf dem Markt werden $resource($product,0) und $resource($herb,0) feilgeboten."</text>
+    <text locale="de">"The local market offers $resource($product,0) and $resource($herb,0)."</text>
+  </message>
   <message name="newbie_password" section="events">
     <type>
       <arg name="password" type="string"/>

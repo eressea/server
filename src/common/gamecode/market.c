@@ -59,15 +59,6 @@ free_market(attrib * a)
   a->data.v = 0;
 }
 
-const item_type * r_luxury(region * r)
-{
-  struct demand * dmd;
-  for (dmd=r->land->demands;dmd;dmd=dmd->next) {
-    if (dmd->value==0) return dmd->type->itype;
-  }
-  return NULL;
-}
-
 attrib_type at_market = {
   "script",
   NULL, free_market, NULL,
