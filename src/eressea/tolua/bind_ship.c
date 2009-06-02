@@ -51,6 +51,26 @@ static int tolua_ship_get_name(lua_State* tolua_S)
   return 1;
 }
 
+static int tolua_ship_get_region(lua_State* tolua_S)
+{
+  ship* self = (ship*) tolua_tousertype(tolua_S, 1, 0);
+  if (self) {
+    tolua_pushusertype(tolua_S, self->region, "region");
+    return 1;
+  }
+  return 0;
+}
+
+static int tolua_ship_set_region(lua_State* tolua_S)
+{
+  ship* self = (ship*) tolua_tousertype(tolua_S, 1, 0);
+  region * r = (region*) tolua_tousertype(tolua_S, 1, 0);
+  if (self) {
+    move_ship(self, self->region, r, NULL);
+  }
+  return 0;
+}
+
 static int tolua_ship_set_name(lua_State* tolua_S)
 {
   ship* self = (ship*)tolua_tousertype(tolua_S, 1, 0);
@@ -119,6 +139,7 @@ tolua_ship_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "id", tolua_ship_get_id, NULL);
       tolua_variable(tolua_S, "name", tolua_ship_get_name, tolua_ship_set_name);
       tolua_variable(tolua_S, "units", tolua_ship_get_units, NULL);
+      tolua_variable(tolua_S, "region", tolua_ship_get_region, tolua_ship_set_region);
 #ifdef TODO
       .property("type", &ship_gettype)
       .property("weight", &ship_getweight)

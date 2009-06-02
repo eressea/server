@@ -1427,7 +1427,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 
   /* zuerst in die Region setzen, da zb Drachennamen den Regionsnamen
   * enthalten */
-  move_unit(u, r, NULL);
+  if (r) move_unit(u, r, NULL);
 
   /* u->race muss bereits gesetzt sein, wird für default-hp gebraucht */
   /* u->region auch */

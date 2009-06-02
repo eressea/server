@@ -646,7 +646,7 @@ writeorder(struct storage * store, const struct order * ord, const struct locale
 }
 
 unit *
-readunit(struct storage * store)
+read_unit(struct storage * store)
 {
   skill_t sk;
   unit * u;
@@ -815,7 +815,7 @@ readunit(struct storage * store)
 }
 
 void
-writeunit(struct storage * store, const unit * u)
+write_unit(struct storage * store, const unit * u)
 {
   order * ord;
   int i, p = 0;
@@ -1521,7 +1521,7 @@ readgame(const char * filename, int mode, int backup)
     up = &r->units;
 
     while (--p >= 0) {
-      unit * u = readunit(store);
+      unit * u = read_unit(store);
       sc_mage * mage;
 
       assert(u->region==NULL);
@@ -1718,7 +1718,7 @@ writegame(const char *filename, int mode)
     store->w_int(store, listlen(r->units));
     store->w_brk(store);
     for (u = r->units; u; u = u->next) {
-      writeunit(store, u);
+      write_unit(store, u);
     }
   }
   store->w_brk(store);

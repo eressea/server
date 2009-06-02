@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <resources>
 
+  <resource name="towershield">
+    <item weight="200" score="60">
+      <construction skill="armorer" minskill="6" reqsize="1">
+        <modifier function="mod_dwarves_only"/>
+        <requirement type="iron" quantity="2"/>
+      </construction>
+      <armor ac="2" penalty="-0.20" magres="0.0" shield="yes" />
+    </item>
+  </resource>
+
   <resource name="p2" appearance="vial">
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>

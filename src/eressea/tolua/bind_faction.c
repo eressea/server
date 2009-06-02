@@ -117,6 +117,20 @@ tolua_faction_get_id(lua_State* tolua_S)
 }
 
 static int
+tolua_faction_set_id(lua_State* tolua_S)
+{
+  faction * self = (faction *)tolua_tousertype(tolua_S, 1, 0);
+  int id = (int)tolua_tonumber(tolua_S, 2, 0);
+  if (findfaction(id)==NULL) {
+    renumber_faction(self, id);
+    lua_pushboolean(tolua_S, 1);
+  } else {
+    lua_pushboolean(tolua_S, 0);
+  }
+  return 1;
+}
+
+static int
 tolua_faction_get_age(lua_State* tolua_S)
 {
   faction * self = (faction *)tolua_tousertype(tolua_S, 1, 0);
@@ -436,7 +450,7 @@ tolua_faction_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "race", tolua_faction_get_race, tolua_faction_set_race);
       tolua_variable(tolua_S, "alliance", tolua_faction_get_alliance, tolua_faction_set_alliance);
       tolua_variable(tolua_S, "score", tolua_faction_get_score, NULL);
-      tolua_variable(tolua_S, "id", tolua_faction_get_id, NULL);
+      tolua_variable(tolua_S, "id", tolua_faction_get_id, tolua_faction_set_id);
       tolua_variable(tolua_S, "age", tolua_faction_get_age, tolua_faction_set_age);
       tolua_variable(tolua_S, "options", tolua_faction_get_options, NULL);
       tolua_variable(tolua_S, "flags", tolua_faction_get_flags, NULL);

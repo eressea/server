@@ -2159,7 +2159,7 @@ is_familiar(const unit *u)
 }
 
 static void
-write_unit(const attrib * a, struct storage * store)
+a_write_unit(const attrib * a, struct storage * store)
 {
   unit * u = (unit*)a->data.v;
   write_unit_reference(u, store);
@@ -2418,7 +2418,7 @@ attrib_type at_familiarmage = {
   NULL,
   NULL,
   age_unit,
-  write_unit,
+  a_write_unit,
   read_magician,
   ATF_UNIQUE
 };
@@ -2428,7 +2428,7 @@ attrib_type at_familiar = {
   NULL,
   NULL,
   age_unit,
-  write_unit,
+  a_write_unit,
   read_familiar,
   ATF_UNIQUE
 };
@@ -2438,7 +2438,7 @@ attrib_type at_clonemage = {
 	NULL,
 	NULL,
 	age_unit,
-	write_unit,
+	a_write_unit,
 	read_magician,
 	ATF_UNIQUE
 };
@@ -2448,7 +2448,7 @@ attrib_type at_clone = {
 	NULL,
 	NULL,
 	age_unit,
-	write_unit,
+	a_write_unit,
 	read_clone,
 	ATF_UNIQUE
 };

@@ -345,6 +345,30 @@ local function spells_csv()
   fail = 1
 end
 
+function test_storage()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  f.id = 42
+  local u = unit.create(f, r, 1)
+  u:add_item("money", u.number * 100)
+  store = storage.create("test.unit.dat", "wb")
+  assert(store)
+  store:write_unit(u)
+  store:close()
+  free_game()
+  -- recreate world:
+  r = region.create(0, 0, "plain")
+  f = faction.create("enno@eressea.de", "human", "de")
+  f.id = 42
+  store = storage.create("test.unit.dat", "rb")
+  assert(store)
+  u = store:read_unit()
+  store:close()
+  assert(u)
+  assert(u:get_item("money") == u.number * 100)
+end
+
 loadscript("extensions.lua")
 tests = {
     ["alliance"] = test_alliance,
@@ -364,9 +388,10 @@ tests = {
     ["spells"] = test_spells
 }
 mytests = {
+    ["storage"] = test_storage
 }
 fail = 0
-for k, v in pairs(tests) do
+for k, v in pairs(mytests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

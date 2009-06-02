@@ -12,6 +12,7 @@
 #include "eressea/tolua/bind_message.c"
 #include "eressea/tolua/bind_hashtable.c"
 #include "eressea/tolua/bind_gmtool.c"
+#include "eressea/tolua/bind_storage.c"
 #include "eressea/tolua/helpers.c"
 #endif
 

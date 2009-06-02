@@ -53,6 +53,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/storage.h>
 
 #include <tolua.h>
 #include <lua.h>

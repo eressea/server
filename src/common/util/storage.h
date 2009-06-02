@@ -33,6 +33,12 @@ typedef struct storage {
   void * userdata;
 } storage;
 
+#define IO_READ 0x01
+#define IO_WRITE 0x02
+#define IO_BINARY 0x04
+#define IO_TEXT 0x08
+#define IO_DEFAULT IO_BINARY
+
 #ifdef __cplusplus
 }
 #endif

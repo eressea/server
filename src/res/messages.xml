@@ -868,7 +868,7 @@
       <arg name="herb" type="resource"/>
     </type>
     <text locale="de">"Auf dem Markt werden $resource($product,0) und $resource($herb,0) feilgeboten."</text>
-    <text locale="de">"The local market offers $resource($product,0) and $resource($herb,0)."</text>
+    <text locale="en">"The local market offers $resource($product,0) and $resource($herb,0)."</text>
   </message>
   <message name="newbie_password" section="events">
     <type>

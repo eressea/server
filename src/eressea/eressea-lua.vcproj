@@ -333,6 +333,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tolua\bind_storage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_storage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\tolua\bind_unit.c"
 				>
 			</File>

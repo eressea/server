@@ -111,6 +111,7 @@
 #include "tolua/bind_building.h"
 #include "tolua/bind_region.h"
 #include "tolua/bind_gmtool.h"
+#include "tolua/bind_storage.h"
 #endif // BINDINGS_TOLUA
 
 #ifdef BINDINGS_LUABIND
@@ -301,6 +302,7 @@ lua_init(void)
   tolua_message_open(L);
   tolua_hashtable_open(L);
   tolua_gmtool_open(L);
+  tolua_storage_open(L);
 #endif
 
 #ifdef BINDINGS_LUABIND

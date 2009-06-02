@@ -57,6 +57,7 @@
 
 #include <util/log.h>
 #include <util/base36.h>
+#include <util/storage.h>
 
 #include <libxml/encoding.h>
 

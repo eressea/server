@@ -41,13 +41,6 @@ int writegame(const char *filename, int mode);
 
 extern void rsf(FILE * F, char *s, size_t len);
 
-#define IO_READ 0x01
-#define IO_WRITE 0x02
-#define IO_BINARY 0x04
-#define IO_TEXT 0x08
-
-#define IO_DEFAULT IO_BINARY
-
 /* Versionsänderungen: */
 extern int data_version;
 extern const char *xmlfile;
@@ -58,6 +51,9 @@ extern int lastturn(void);
 
 extern void read_items(struct storage * store, struct item **it);
 extern void write_items(struct storage * store, struct item *it);
+
+extern void write_unit(struct storage * store, const struct unit * u);
+extern struct unit * read_unit(struct storage * store);
 
 extern const char * datapath(void);
 
