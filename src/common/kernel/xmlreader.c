@@ -1565,6 +1565,7 @@ parse_races(xmlDocPtr doc)
     rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
     rc->hitpoints = xml_ivalue(node, "hp", 0);
     rc->armor = (char)xml_ivalue(node, "ac", 0);
+    rc->study_speed_base = xml_ivalue(node, "studyspeed", 0);
 
     rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
     rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
@@ -1626,17 +1627,21 @@ parse_races(xmlDocPtr doc)
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       int mod = xml_ivalue(node, "modifier", 0);
+      int speed = xml_ivalue(node, "speed", 0);
+      skill_t sk;
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue!=NULL);
-      if (mod!=0) {
-        skill_t sk = sk_find((const char*)propValue);
-        if (sk!=NOSKILL) {
-          rc->bonus[sk] = (char)mod;
-        } else {
-          log_error(("unknown skill '%s' in race '%s'\n",
-            (const char*)propValue, rc->_name[0]));
+      sk = sk_find((const char*)propValue);
+      if (sk!=NOSKILL) {
+        rc->bonus[sk] = (char)mod;
+        if (speed) {
+          if (!rc->study_speed) rc->study_speed = calloc(1, MAXSKILLS);
+          rc->study_speed[sk] = speed;
         }
+      } else {
+        log_error(("unknown skill '%s' in race '%s'\n",
+          (const char*)propValue, rc->_name[0]));
       }
       xmlFree(propValue);
     }

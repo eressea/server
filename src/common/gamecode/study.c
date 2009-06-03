@@ -152,6 +152,14 @@ const attrib_type at_learning = {
 };
 
 static int
+study_days(unit * student, skill_t sk)
+{
+  int speed = 30 + student->race->study_speed_base;
+  if (student->race->study_speed) speed += student->race->study_speed[sk];
+  return student->number * speed;
+}
+
+static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk, 
 			  boolean report, int * academy)
 {
@@ -171,7 +179,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     return 0;
   }
 
-  n = student->number * 30;
+  n = study_days(student, sk);
   a = a_find(student->attribs, &at_learning);
   if (a!=NULL) {
     teach = (teaching_info*)a->data.v;

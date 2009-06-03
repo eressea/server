@@ -75,6 +75,8 @@ typedef struct race {
   const spell * precombatspell;
   struct att attack[10];
   char bonus[MAXSKILLS];
+  char study_speed_base;
+  signed char * study_speed; /* study-speed-bonus in points/turn (0=30 Tage) */
   boolean __remove_me_nonplayer;
   int flags;
   int battle_flags;

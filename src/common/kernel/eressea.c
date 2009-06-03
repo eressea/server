@@ -207,21 +207,6 @@ HelpMask(void)
   return value;
 }
 
-/** specifies modes that are restricted to members of the same alliance.
- * if this returns a non-zero value, then you cannot give those modes to a
- * faction unless they are in the same alliance.
- */
-int
-HelpMask(void)
-{
-  static int help_mask = 0;
-
-  if (help_mask==0) {
-    help_mask = get_param_int(global.parameters, "rules.help.mask", HELP_ALL);
-  }
-  return help_mask;
-}
-
 int
 AllianceRestricted(void)
 {

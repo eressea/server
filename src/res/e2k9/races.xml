@@ -27,8 +27,8 @@
   <race name="uruk" magres="-0.05" maxaura="1.0" regaura="1.0" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
-	<param name="other_race" value="troll"/>
-	<param name="other_cost" value="500"/>
+    <param name="other_race" value="troll"/>
+    <param name="other_cost" value="500"/>
     <skill name="armorer" modifier="1"/>
     <skill name="building" modifier="1"/>
     <skill name="cartmaking" modifier="-1"/>
