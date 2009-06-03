@@ -108,7 +108,7 @@
 
     <param name="modules.astralspace" value="0"/>
     <param name="modules.wormholes" value="0"/>
-    <param name="modules.markets" value="1/>
+    <param name="modules.markets" value="1"/>
 
     <param name="skills.cost" value="500"/>
     <param name="entertain.base" value="0"/>
@@ -139,7 +139,7 @@
     <param name="rules.economy.herbrot" value="0"/>
     <param name="rules.give" value="11"/> <!-- only self + peasants + ondeath -->
     <param name="rules.help.mask" value="fight guard money"/>
-	<param name="movement.shipspeed.skillbonus" value="7"/>
+    <param name="movement.shipspeed.skillbonus" value="7"/>
     <param name="alliance.auto" value="fight"/>
 	<!--param name="alliance.restricted" value="fight"/-->
   </game>

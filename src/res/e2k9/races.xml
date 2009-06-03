@@ -42,6 +42,7 @@
     <skill name="quarrying" modifier="1"/>
     <skill name="riding" modifier="-99"/>
     <skill name="sailing" modifier="-1"/>
+    <skill name="spear" speed="+5"/>
     <skill name="stamina" speed="0"/>
     <skill name="shipcraft" modifier="-1"/>
     <skill name="tactics" modifier="1"/>
