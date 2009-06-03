@@ -185,6 +185,7 @@ typedef struct armor_type {
   double penalty;
   double magres;
   int prot;
+  float projectile; /* chance, dass ein projektil abprallt */
   unsigned int flags;
 } armor_type;
 

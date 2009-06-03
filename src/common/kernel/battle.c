@@ -1068,8 +1068,18 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   sd = weapon_effskill(dt, at, weapon, false, false);
   if (weapon!=NULL) dwtype=weapon->type;
 
-  if (armor) ar += armor->prot;
-  if (shield) ar += shield->prot;
+  if (armor) {
+    ar += armor->prot;
+    if (armor->projectile>0 && chance(armor->projectile)) {
+      return false;
+    }
+  }
+  if (shield) {
+    ar += shield->prot;
+    if (shield->projectile>0 && chance(shield->projectile)) {
+      return false;
+    }
+  }
 
   /* natürliche Rüstung */
   an = du->race->armor;

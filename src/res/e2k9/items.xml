@@ -7,7 +7,7 @@
         <modifier function="mod_dwarves_only"/>
         <requirement type="iron" quantity="2"/>
       </construction>
-      <armor ac="2" penalty="-0.20" magres="0.0" shield="yes" />
+      <armor ac="2" projectile="0.30" penalty="-0.10" magres="0.0" shield="yes" />
     </item>
   </resource>
 
