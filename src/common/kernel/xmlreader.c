@@ -1541,7 +1541,7 @@ parse_races(xmlDocPtr doc)
     xmlChar * propValue;
     race * rc;
     xmlXPathObjectPtr result;
-    int k;
+    int k, study_speed_base;
     struct att * attack;
 
     propValue = xmlGetProp(node, BAD_CAST "name");
@@ -1565,7 +1565,7 @@ parse_races(xmlDocPtr doc)
     rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
     rc->hitpoints = xml_ivalue(node, "hp", 0);
     rc->armor = (char)xml_ivalue(node, "ac", 0);
-    rc->study_speed_base = xml_ivalue(node, "studyspeed", 0);
+    study_speed_base = xml_ivalue(node, "studyspeed", 0);
 
     rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
     rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
@@ -1627,7 +1627,7 @@ parse_races(xmlDocPtr doc)
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       int mod = xml_ivalue(node, "modifier", 0);
-      int speed = xml_ivalue(node, "speed", 0);
+      int speed = xml_ivalue(node, "speed", study_speed_base);
       skill_t sk;
 
       propValue = xmlGetProp(node, BAD_CAST "name");

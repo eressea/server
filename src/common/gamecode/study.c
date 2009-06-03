@@ -154,14 +154,20 @@ const attrib_type at_learning = {
 static int
 study_days(unit * student, skill_t sk)
 {
-  int speed = 30 + student->race->study_speed_base;
-  if (student->race->study_speed) speed += student->race->study_speed[sk];
+  int speed = 30;
+  if (student->race->study_speed) {
+    speed += student->race->study_speed[sk];
+  }
+  if (speed<30) {
+    skill * sv = get_skill(student, sk);
+    if (sv==0) return 30;
+  }
   return student->number * speed;
 }
 
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk, 
-			  boolean report, int * academy)
+           boolean report, int * academy)
 {
   teaching_info * teach = NULL;
   attrib * a;
@@ -179,7 +185,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     return 0;
   }
 
-  n = study_days(student, sk);
+  n = 30;
   a = a_find(student->attribs, &at_learning);
   if (a!=NULL) {
     teach = (teaching_info*)a->data.v;
@@ -487,6 +493,7 @@ study_speedup(unit * u)
   }
   return 1.0;
 }
+
 int
 learn_cmd(unit * u, order * ord)
 {
@@ -703,8 +710,8 @@ learn_cmd(unit * u, order * ord)
   }
 
   multi *= study_speedup(u);
-
-  days = (int)((u->number * 30 + teach->value) * multi);
+  days = study_days(u, sk);
+  days = (int)((days + teach->value) * multi);
 
   /* the artacademy currently improves the learning of entertainment
   of all units in the region, to be able to make it cumulative with
