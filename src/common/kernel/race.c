@@ -126,7 +126,6 @@ rc_new(const char * zName)
   rc->attack[0].type = AT_COMBATSPELL;
   rc->attack[1].type = AT_NONE;
   rc->speed = 0;
-  rc->study_speed_base = 0;
   return rc;
 }
 
