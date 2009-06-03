@@ -636,6 +636,14 @@ select_weapon(const troop t, boolean attacking, boolean ismissile)
   return preferred_weapon(t, attacking);
 }
 
+static boolean can_use(const unit * u, const weapon_type * wtype)
+{
+  if (wtype->itype->canuse) {
+    return wtype->itype->canuse(u, wtype->itype);
+  }
+  return true;
+}
+
 static int
 weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
   /* the 'pure' skill when using this weapon to attack or defend.
@@ -648,7 +656,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
     skill = effskill(u, SK_WEAPONLESS);
     if (skill<=0) {
       /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-      if(u->race == new_race[RC_URUK]) {
+      if (u->race == new_race[RC_URUK]) {
         int sword = effskill(u, SK_MELEE);
         int spear = effskill(u, SK_SPEAR);
         skill = MAX(sword, spear) - 3;
@@ -680,10 +688,11 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
     }
   } else {
     /* changed: if we own a weapon, we have at least a skill of 0 */
+    if (!can_use(u, wtype)) return -1;
     skill = effskill(u, wtype->skill);
     if (skill < wtype->minskill) skill = 0;
     if (skill > 0) {
-      if(attacking) {
+      if (attacking) {
         skill += u->race->at_bonus;
       } else {
         skill += u->race->df_bonus;
@@ -3220,10 +3229,12 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
       if (wtype==NULL || itm->number==0) continue;
       weapons[w].attackskill = weapon_skill(wtype, u, true);
       weapons[w].defenseskill = weapon_skill(wtype, u, false);
-      weapons[w].type = wtype;
-      weapons[w].used = 0;
-      weapons[w].count = itm->number;
-      ++w;
+      if (weapons[w].attackskill>=0 || weapons[w].defenseskill>=0) {
+        weapons[w].type = wtype;
+        weapons[w].used = 0;
+        weapons[w].count = itm->number;
+        ++w;
+      }
       assert(w!=WMAX);
     }
     fig->weapons = calloc(sizeof(weapon), w+1);

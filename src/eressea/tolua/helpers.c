@@ -314,6 +314,37 @@ lua_getresource(unit * u, const struct resource_type * rtype)
 }
 
 static int
+lua_canuse_item(const unit * u, const struct item_type * itype)
+{
+  lua_State * L = (lua_State *)global.vm_state;
+  int result = -1;
+  const char * fname = "item_canuse";
+
+  lua_pushstring(L, fname);
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  if (lua_isfunction(L, 1)) {
+    tolua_pushusertype(L, (void *)u, "unit");
+    tolua_pushstring(L, itype->rtype->_name[0]);
+
+    if (lua_pcall(L, 2, 1, 0)!=0) {
+      const char* error = lua_tostring(L, -1);
+      log_error(("get(%s) calling '%s': %s.\n",
+        unitname(u), fname, error));
+      lua_pop(L, 1);
+    } else {
+      result = lua_toboolean(L, -1);
+      lua_pop(L, 1);
+    }
+  } else {
+    log_error(("get(%s) calling '%s': not a function.\n",
+      unitname(u), fname));
+    lua_pop(L, 1);
+  }
+
+  return result;
+}
+
+static int
 lua_wage(const region * r, const faction * f, const race * rc)
 {
   lua_State * L = (lua_State *)global.vm_state;
@@ -505,6 +536,7 @@ register_tolua_helpers(void)
   register_function((pf_generic)&lua_initfamiliar, "lua_initfamiliar");
   register_item_use(&lua_useitem, "lua_useitem");
   register_function((pf_generic)&lua_getresource, "lua_getresource");
+  register_function((pf_generic)&lua_canuse_item, "lua_canuse_item");
   register_function((pf_generic)&lua_changeresource, "lua_changeresource");
   register_function((pf_generic)&lua_equipmentcallback, "lua_equip");
 
