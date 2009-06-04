@@ -1287,7 +1287,9 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   unused(power);
 
   /* Fliehende Einheiten verlassen auf jeden Fall Gebäude und Schiffe. */
-  leave(r, mage);
+  if (!fval(r->terrain, SEA_REGION)) {
+    leave(r, mage);
+  }
   /* und bewachen nicht */
   setguard(mage, GUARD_NONE);
   /* irgendwie den langen befehl sperren */
