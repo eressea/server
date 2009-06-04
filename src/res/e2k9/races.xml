@@ -78,7 +78,7 @@
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="dwarf"/>
     <param name="other_cost" value="500"/>
-    <param name="popularity" value="5"/>
+    <param name="morale" value="5"/>
     <skill name="bow" modifier="-1"/>
     <skill name="building" modifier="1"/>
     <skill name="cartmaking" modifier="2"/>
