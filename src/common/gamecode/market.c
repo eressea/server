@@ -23,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
@@ -65,6 +66,22 @@ attrib_type at_market = {
   NULL, NULL, ATF_UNIQUE
 };
 
+static int rc_luxury_trade(const struct race * rc)
+{
+  if (rc) {
+    return get_param_int(rc->parameters, "luxury_trade", 1000);
+  }
+  return 1000;
+}
+
+static int rc_herb_trade(const struct race * rc)
+{
+  if (rc) {
+    return get_param_int(rc->parameters, "herb_trade", 500);
+  }
+  return 500;
+}
+
 #define MAX_MARKETS 128
 void do_markets(void)
 {
@@ -73,9 +90,12 @@ void do_markets(void)
   region * r;
   for (r=regions;r;r=r->next) {
     if (r->land) {
+      faction * f = region_get_owner(r);
+      const struct race * rc = f?f->race:NULL;
       int p = rpeasants(r);
-      int numlux = p/1000;
-      int numherbs = p/500;
+      int numlux, numherbs;
+      numlux = p/rc_luxury_trade(rc);
+      numherbs = p/rc_herb_trade(rc);
       if (numlux>0 || numherbs>0) {
         int d, nmarkets = 0;
         const item_type * lux = r_luxury(r);
