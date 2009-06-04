@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<resources xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- this file contains resources that can be mined in some way (anything with a resourcelimit) -->
+
+  <xi:include href="../resources/iron.xml"/>
+  <xi:include href="../resources/stone-2.xml"/>
+  <xi:include href="../resources/laen.xml"/>
+  <xi:include href="../resources/horse.xml"/>
+  <xi:include href="../resources/mallorn.xml"/>
+  <xi:include href="../resources/log.xml"/>
+
+</resources>

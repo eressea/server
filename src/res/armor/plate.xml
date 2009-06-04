@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<resource name="plate">
+  <item weight="400" score="150">
+    <construction skill="armorer" minskill="4" reqsize="1">
+      <requirement type="iron" quantity="5"/>
+    </construction>
+    <armor ac="5" penalty="0.30" magres="0.0"/>
+  </item>
+</resource>
