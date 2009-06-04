@@ -2165,6 +2165,16 @@ get_param_int(const struct param * p, const char * key, int def)
   return def;
 }
 
+float
+get_param_flt(const struct param * p, const char * key, float def)
+{
+  while (p!=NULL) {
+    if (strcmp(p->name, key)==0) return (float)atof(p->data);
+    p = p->next;
+  }
+  return def;
+}
+
 void
 set_param(struct param ** p, const char * key, const char * data)
 {

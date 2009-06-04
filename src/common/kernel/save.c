@@ -601,6 +601,7 @@ write_owner(struct storage * store, region_owner *owner)
 {
   if (owner) {
     store->w_int(store, owner->since_turn);
+    store->w_int(store, owner->morale_turn);
     write_faction_reference(owner->owner, store);
   } else {
     store->w_int(store, -1);
@@ -614,6 +615,7 @@ read_owner(struct storage * store, region_owner **powner)
   if (since_turn>=0) {
     region_owner * owner = malloc(sizeof(region_owner));
     owner->since_turn = since_turn;
+    owner->morale_turn = store->r_int(store);
     read_reference(&owner->owner, store, read_faction_reference, resolve_faction);
     *powner = owner;
   } else {

@@ -377,11 +377,10 @@ do_recruiting(recruitment * recruits, int available)
     for (req=rec->requests;req;req=req->next) {
       unit * u = req->unit;
       const race * rc = u->faction->race;
-      int number, multi = 2;
+      int number, dec;
+      float multi = 2.0F * rc->recruit_multi;
 
-      if (rc==new_race[RC_URUK]) multi = 1;
-
-      number = MIN(req->qty, get / multi);
+      number = MIN(req->qty, (int)(get / multi));
       if (rc->recruitcost) {
         int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, number*rc->recruitcost) / rc->recruitcost;
         number = MIN(number, afford);
@@ -393,11 +392,12 @@ do_recruiting(recruitment * recruits, int available)
         assert(number>=0);
       }
       add_recruits(u, number, req->qty);
+      dec = (int)(number * multi);
       if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
-        recruited += number * multi;
+        recruited += dec;
       }
 
-      get -= number * multi;
+      get -= dec;
     }
   }
   return recruited;

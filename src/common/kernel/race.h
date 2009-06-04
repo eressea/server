@@ -58,6 +58,7 @@ typedef struct race {
   float magres;
   float maxaura; /* Faktor auf Maximale Aura */
   float regaura; /* Faktor auf Regeneration */
+  float recruit_multi; /* Faktor für Bauernverbrauch */
   int recruitcost;
   int maintenance;
   int splitsize;

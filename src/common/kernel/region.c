@@ -1356,6 +1356,7 @@ region_set_owner(struct region * r, struct faction * owner, int turn)
     }
     r->land->ownership->owner = owner;
     r->land->ownership->since_turn = turn;
+    r->land->ownership->morale_turn = turn;
   }
 }
 

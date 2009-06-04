@@ -2934,19 +2934,30 @@ age_building(building * b)
   return b;
 }
 
+static double rc_popularity(const struct race * rc)
+{
+  int pop = get_param_int(rc->parameters, "morale", 10);
+  return 1.0/(pop-MORALE_COOLDOWN); /* 10 turns average */
+}
+
 static void age_region(region * r) 
 {
   a_age(&r->attribs);
   handle_event(r->attribs, "timer", r);
 
-  if (r->land && r->land->ownership) {
-    int stability = r->land->ownership->since_turn;
-    int morale = MORALE_TAKEOVER + stability/10;
-    if (r->land->ownership->owner && r->land->morale<MORALE_MAX) {
-      r->land->morale = (short)MIN(morale, MORALE_MAX);
-    }
-    if (!r->land->ownership->owner && r->land->morale<MORALE_DEFAULT) {
-      r->land->morale = (short)MIN(morale, MORALE_DEFAULT);
+  if (r->land && r->land->ownership && r->land->ownership->owner) {
+    int stability = turn - r->land->ownership->morale_turn;
+    if (stability>MORALE_COOLDOWN) {
+      if (r->land->ownership->owner && r->land->morale<MORALE_MAX) {
+        double ch = rc_popularity(r->land->ownership->owner->race);
+        if (chance(ch)) {
+          ++r->land->morale;
+          r->land->ownership->morale_turn = turn;
+        }
+      }
+      if (!r->land->ownership->owner && r->land->morale<MORALE_DEFAULT) {
+        r->land->morale = (short)MIN(r->land->morale, MORALE_DEFAULT);
+      }
     }
   }
 }

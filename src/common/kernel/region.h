@@ -65,10 +65,12 @@ struct item;
 #define MORALE_MAX 4 /* Maximum morale allowed */
 #define MORALE_DEFAULT 2 /* Morale of peasants when they are conquered for the first time */
 #define MORALE_TAKEOVER 0 /* Morale of peasants after they lose their lord */
+#define MORALE_COOLDOWN 2 /* minimum cooldown before a morale change occurs */
 
 typedef struct region_owner {
   struct faction * owner;
-  int since_turn;
+  int since_turn; /* turn the region changed owners */
+  int morale_turn; /* turn when morale has changed most recently */
 } region_owner;
 
 typedef struct demand {

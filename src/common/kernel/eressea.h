@@ -394,6 +394,7 @@ extern const char * dbrace(const struct race * rc);
 extern void set_param(struct param ** p, const char * name, const char * data);
 extern const char* get_param(const struct param * p, const char * name);
 extern int get_param_int(const struct param * p, const char * name, int def);
+extern float get_param_flt(const struct param * p, const char * name, float def);
 
 extern boolean ExpensiveMigrants(void);
 extern int NMRTimeout(void);

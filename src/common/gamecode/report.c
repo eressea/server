@@ -671,19 +671,18 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 
   if (u->faction == f) {
     marker = '*';
+  } else if (u->faction->alliance == f->alliance && f->alliance) {
+    marker = 'o';
+  } else if (a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
+    && !fval(u, UFL_PARTEITARNUNG)) {
+    marker = '!';
   } else {
-    if (a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
-        && !fval(u, UFL_PARTEITARNUNG)) {
-      marker = '!';
+    if (dh && !fval(u, UFL_PARTEITARNUNG)) {
+      marker = '+';
     } else {
-      if (dh && !fval(u, UFL_PARTEITARNUNG)) {
-        marker = '+';
-      } else {
-        marker = '-';
-      }
+      marker = '-';
     }
   }
-
   rparagraph(F, buf, indent, 0, marker);
 
   if (!isbattle) {

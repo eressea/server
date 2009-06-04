@@ -636,10 +636,11 @@ select_weapon(const troop t, boolean attacking, boolean ismissile)
   return preferred_weapon(t, attacking);
 }
 
-static boolean can_use(const unit * u, const weapon_type * wtype)
+static boolean
+i_canuse(const unit * u, const item_type * itype)
 {
-  if (wtype->itype->canuse) {
-    return wtype->itype->canuse(u, wtype->itype);
+  if (itype->canuse) {
+    return itype->canuse(u, itype);
   }
   return true;
 }
@@ -688,7 +689,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
     }
   } else {
     /* changed: if we own a weapon, we have at least a skill of 0 */
-    if (!can_use(u, wtype)) return -1;
+    if (!i_canuse(u, wtype->itype)) return -1;
     skill = effskill(u, wtype->skill);
     if (skill < wtype->minskill) skill = 0;
     if (skill > 0) {
@@ -719,7 +720,7 @@ static int CavalrySkill(void)
 }
 
 static int
-CavalryBonus(const unit * u)
+CavalryBonus(const unit * u, troop enemy)
 {
   static int mode = -1;
   if (mode<0) {
@@ -731,7 +732,12 @@ CavalryBonus(const unit * u)
   } else {
     /* new rule, chargers in Eressea 1.1 */
     int skl = effskill(u, SK_RIDING);
-    skl = skl*3/2-3;
+    /* only half against trolls */
+    if (enemy.fighter->unit->race==new_race[RC_TROLL]) {
+      skl = (skl-2)*3/4;
+    } else {
+      skl = (skl-2)*3/2;
+    }
     return MAX(skl, 0);
   }
 }
@@ -784,7 +790,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 
   /* Burgenbonus, Pferdebonus */
   if (is_riding(t) && (wtype==NULL || (fval(wtype, WTF_HORSEBONUS) && !fval(wtype, WTF_MISSILE)))) {
-    skill += CavalryBonus(tu);
+    skill += CavalryBonus(tu, enemy);
     if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
   }
 
@@ -3307,14 +3313,16 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   if (u->race->battle_flags & BF_EQUIPMENT) {
     for (itm=u->items; itm; itm=itm->next) {
       if (itm->type->rtype->atype) {
-        struct armor * adata = malloc(sizeof(armor)), **aptr;
-        adata->atype = itm->type->rtype->atype;
-        adata->count = itm->number;
-        for (aptr=&fig->armors;*aptr;aptr=&(*aptr)->next) {
-          if (adata->atype->prot > (*aptr)->atype->prot) break;
+        if (i_canuse(u, itm->type)) {
+          struct armor * adata = malloc(sizeof(armor)), **aptr;
+          adata->atype = itm->type->rtype->atype;
+          adata->count = itm->number;
+          for (aptr=&fig->armors;*aptr;aptr=&(*aptr)->next) {
+            if (adata->atype->prot > (*aptr)->atype->prot) break;
+          }
+          adata->next = *aptr;
+          *aptr = adata;
         }
-        adata->next = *aptr;
-        *aptr = adata;
       }
     }
   }

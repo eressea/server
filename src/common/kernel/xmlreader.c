@@ -1623,6 +1623,7 @@ parse_races(xmlDocPtr doc)
         parse_param(&rc->parameters, child);
       }
     }
+    rc->recruit_multi = get_param_flt(rc->parameters, "recruit_multi", 1.0);
 
     /* reading eressea/races/race/skill */
     xpath->node = node;
