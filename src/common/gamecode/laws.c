@@ -3282,14 +3282,21 @@ use_item(unit * u, const item_type * itype, int amount, struct order * ord)
 
 
 static double
-heal_factor(const race *rc)
+heal_factor(const unit * u)
 {
-  switch(old_race(rc)) {
+  static float elf_regen = -1;
+  switch(old_race(u->race)) {
     case RC_TROLL:
     case RC_DAEMON:
       return 1.5;
     case RC_GOBLIN:
       return 2.0;
+    case RC_ELF:
+      if (elf_regen<0) elf_regen = get_param_flt(u->race->parameters, "regen.forest", 1.0F);
+      if (elf_regen!=1.0 && r_isforest(u->region)) {
+        return elf_regen;
+      }
+      return 1.0;
   }
   return 1.0;
 }
@@ -3340,7 +3347,7 @@ monthly_healing(void)
       }
 #endif /* KARMA_MODULE */
 
-      p *= heal_factor(u->race);
+      p *= heal_factor(u);
       if (u->hp < umhp) {
 #ifdef NEW_DAEMONHUNGER_RULE
         double maxheal = MAX(u->number, umhp/20.0);
