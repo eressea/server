@@ -1022,6 +1022,41 @@ rel_dam(int dam, int hp)
   return "eine kleine Wunde";
 }
 
+static void vampirism(troop at, int damage)
+{
+  static int vampire = -1;
+  if (vampire<0) vampire = get_param_int(global.parameters, "rules.combat.demon_vampire", 0);
+  if (vampire>0) {
+    int gain = damage/vampire;
+    int chance = damage - vampire * gain;
+    if (chance>0 && (rng_int() % vampire < chance)) ++gain;
+    if (gain>0) {
+      int maxhp = unit_max_hp(at.fighter->unit);
+      at.fighter->person[at.index].hp = MIN(gain+at.fighter->person[at.index].hp, maxhp);
+    }
+  }
+}
+
+static int
+natural_armor(unit * du)
+{
+  static int * bonus = 0;
+  int an = du->race->armor;
+  if (bonus==0) {
+    bonus = calloc(sizeof(int), num_races);
+  }
+  if (bonus[du->race->index]==0) {
+    bonus[du->race->index] = get_param_int(du->race->parameters, "armor.stamina", -1);
+    if (bonus[du->race->index]==0) bonus[du->race->index] = -1;
+  }
+  if (bonus[du->race->index]>0) {
+    int sk = effskill(du, SK_STAMINA);
+    sk /= bonus[du->race->index];
+    an += sk;
+  }
+  return an;
+}
+
 boolean
 terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 {
@@ -1097,7 +1132,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
 
   /* natürliche Rüstung */
-  an = du->race->armor;
+  an = natural_armor(du);
 
   /* magische Rüstung durch Artefakte oder Sprüche */
   /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
@@ -1243,6 +1278,9 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
   assert(dt.index<du->number);
   df->person[dt.index].hp -= rda;
+  if (au->race==new_race[RC_DAEMON]) {
+    vampirism(at, rda);
+  }
 
   if (df->person[dt.index].hp > 0) {  /* Hat überlebt */
     if (bdebug) {

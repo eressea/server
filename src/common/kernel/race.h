@@ -52,6 +52,8 @@ typedef struct att {
 
 struct param;
 
+extern int num_races;
+
 typedef struct race {
   struct param * parameters;
   const char *_name[4]; /* neu: name[4]völker */
@@ -59,6 +61,7 @@ typedef struct race {
   float maxaura; /* Faktor auf Maximale Aura */
   float regaura; /* Faktor auf Regeneration */
   float recruit_multi; /* Faktor für Bauernverbrauch */
+  int index;
   int recruitcost;
   int maintenance;
   int splitsize;

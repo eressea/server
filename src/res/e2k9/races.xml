@@ -84,7 +84,7 @@
     <skill name="building" modifier="1"/>
     <skill name="cartmaking" modifier="2"/>
     <skill name="catapult" modifier="-1"/>
-    <skill name="crossbow" modifier="1"/>
+    <skill name="crossbow" modifier="2"/>
     <skill name="herbalism" modifier="2"/>
     <skill name="melee" modifier="-1"/>
     <skill name="mining" modifier="1"/>
@@ -151,6 +151,7 @@
   <race name="troll" magres="0.100000" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="2000" capacity="1080" speed="1.0" hp="20" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
+    <param name="armor.stamina" value="3"/> <!-- +1 natural armor per X levels stamina -->
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-2"/>
     <skill name="building" modifier="2"/>

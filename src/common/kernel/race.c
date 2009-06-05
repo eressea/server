@@ -64,6 +64,7 @@
 
 /** external variables **/
 race * races;
+int num_races = 0;
 
 race_list * 
 get_familiarraces(void)
@@ -131,6 +132,7 @@ rc_new(const char * zName)
 race *
 rc_add(race * rc)
 {
+  rc->index = num_races++;
   rc->next = races;
   return races = rc;
 }
