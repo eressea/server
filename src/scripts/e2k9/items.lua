@@ -1,5 +1,11 @@
--- used internally to check greatbow and towershield
+-- when appending to this, make sure the item has a canuse-function!
+local goblin_denied = " plate lance mallornlance greatbow axe greatsword halberd rustyaxe rustyhalberd towershield "
 function item_canuse(u, iname)
+  if u.race=="goblin" then
+    if string.find(goblin_denied, " " .. iname .. " ") then
+      return false
+    end
+  end
   if iname=="towershield" then
     -- only dwarves allowed to use towershield
     return u.race=="dwarf"

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <resource name="mallornlance">
   <item weight="100">
+    <function name="canuse" value="lua_canuse_item"/>
     <construction skill="weaponsmithing" minskill="5" reqsize="1">
       <requirement type="mallorn" quantity="2"/>
     </construction>
