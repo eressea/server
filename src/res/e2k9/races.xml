@@ -40,10 +40,9 @@
     <skill name="herbalism" modifier="-2"/>
     <skill name="melee" speed="+5"/>
     <skill name="mining" modifier="1"/>
+    <skill name="polearm" speed="+5"/>
     <skill name="quarrying" modifier="1"/>
-    <skill name="riding" modifier="-99"/>
     <skill name="sailing" modifier="-1"/>
-    <skill name="spear" speed="+5"/>
     <skill name="stamina" speed="0"/>
     <skill name="shipcraft" modifier="-1"/>
     <skill name="tactics" modifier="1"/>
@@ -159,7 +158,7 @@
     <skill name="melee" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="quarrying" modifier="2"/>
-    <skill name="riding" modifier="-2"/>
+    <skill name="riding" modifier="-99"/>
     <skill name="roadwork" modifier="2"/>
     <skill name="sailing" modifier="-1"/>
     <skill name="shipcraft" modifier="-1"/>

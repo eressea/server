@@ -405,7 +405,7 @@
     <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
     <resource name="h11" amount="1" cost="linear"/><!-- Sandfäule -->
   </spell>
-  <spell name="create_potion_p3" type="tybied" ship="true" rank="5" level="7>
+  <spell name="create_potion_p3" type="tybied" ship="true" rank="5" level="7">
     <!-- Schaffenstrunk -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="4" cost="linear"/>
@@ -424,7 +424,7 @@
     <resource name="h18" amount="1" cost="linear"/><!-- Eisblume -->
     <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
   </spell>
-  <spell name="create_potion_p13" type="tybied" ship="true" rank="5" level="9>
+  <spell name="create_potion_p13" type="tybied" ship="true" rank="5" level="9">
     <!-- Elixier der Macht -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="5" cost="linear"/>

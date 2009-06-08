@@ -6,7 +6,7 @@ function item_canuse(u, iname)
       return false
     end
   end
-  if iname=="towershield" then
+  if iname=="towershield" or iname=="rep_crossbow" then
     -- only dwarves allowed to use towershield
     return u.race=="dwarf"
   end

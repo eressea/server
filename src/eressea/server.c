@@ -599,7 +599,7 @@ static void
 write_spells(void)
 {
   struct locale * loc = find_locale("de");
-  FILE * F = fopen("spells.txt", "w");
+  FILE * F = fopen("spells.csv", "w");
   spell_list * spl = spells;
   for (;spl;spl=spl->next) {
     const spell * sp = spl->data;
@@ -615,6 +615,37 @@ write_spells(void)
   fclose(F);
 }
 
+static void
+write_skills(void)
+{
+  struct locale * loc = find_locale("de");
+  FILE * F = fopen("skills.csv", "w");
+  race * rc;
+  skill_t sk;
+  fputs("\"Rasse\",", F);
+  for (rc=races;rc;rc = rc->next) {
+    if (playerrace(rc)) {
+      fprintf(F, "\"%s\",", LOC(loc, rc->_name[0]));
+    }
+  }
+  fputc('\n', F);
+
+  for (sk=0;sk!=MAXSKILLS;++sk) {
+    const char * str = skillname(sk, loc);
+    if (str) {
+      fprintf(F, "\"%s\",", str);
+      for (rc=races;rc;rc = rc->next) {
+        if (playerrace(rc)) {
+          if (rc->bonus[sk]) fprintf(F, "%d,", rc->bonus[sk]);
+          else fputc(',', F);
+        }
+      }
+      fputc('\n', F);
+    }
+  }
+  fclose(F);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -622,6 +653,7 @@ main(int argc, char *argv[])
   char * lc_ctype;
   char * lc_numeric;
   lua_State * luaState = lua_init();
+  static int write_csv = 1;
 
   setup_signal_handler();
 
@@ -650,9 +682,10 @@ main(int argc, char *argv[])
   kernel_init();
   game_init();
 
-  if (0)
+  if (write_csv) {
+    write_skills();
     write_spells();
-
+  }
   /* run the main script */
   if (luafile==NULL) lua_console(luaState);
   else {

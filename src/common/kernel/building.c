@@ -454,6 +454,7 @@ new_building(const struct building_type * btype, region * r, const struct locale
     init_lighthouse = true;
   }
 
+  b->flags = BLD_WORKING|BLD_MAINTAINED;
   b->no  = newcontainerid();
   bhash(b);
   

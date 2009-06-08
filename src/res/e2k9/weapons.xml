@@ -4,6 +4,7 @@
   <xi:include href="../weapons/bow.xml"/>
   <xi:include href="../weapons/catapult.xml"/>
   <xi:include href="../weapons/crossbow.xml"/>
+  <xi:include href="../weapons/rep_crossbow.xml"/>
   <xi:include href="../weapons/firesword.xml"/>
   <xi:include href="../weapons/greatbow-2.xml"/>
   <xi:include href="../weapons/greatsword-2.xml"/>

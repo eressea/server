@@ -345,6 +345,32 @@ local function spells_csv()
   fail = 1
 end
 
+function test_market()
+  free_game()
+  local r
+  for x = -1, 1 do for y = -1, 1 do
+    r = region.create(x, y, "plain")
+    r.peasants = 5000
+  end end
+  r = get_region(0, 0)
+  local b = building.create(r, "market")
+  b.size = 10
+  local f = faction.create("enno@eressea.de", "human", "de")
+  f.id = 42
+  local u = unit.create(f, r, 1)
+  u.building = b
+  u:add_item("money", u.number * 10000)
+  for i = 0, 5 do
+    local rn = r:next(i)
+  end
+  process_orders()
+  local len = 0
+  for i in u.items do
+    len = len + 1
+  end
+  assert(len>1)
+end
+
 function test_storage()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -385,10 +411,11 @@ tests = {
     ["produce"] = test_produce,
     ["rename"] = test_rename,
     ["recruit"] = test_recruit,
-    ["spells"] = test_spells
+    ["spells"] = test_spells,
+    ["storage"] = test_storage
 }
 mytests = {
-    ["storage"] = test_storage
+    ["market"] = test_market
 }
 fail = 0
 for k, v in pairs(mytests) do
@@ -403,7 +430,7 @@ end
 
 -- spells_csv()
 
-if fail > 0 then
+if true or fail > 0 then
     print(fail .. " tests failed.")
     io.stdin:read()
 end

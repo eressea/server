@@ -118,6 +118,15 @@ static int tolua_region_get_flag(lua_State* tolua_S)
   return 1;
 }
 
+static int tolua_region_get_adj(lua_State* tolua_S)
+{
+  region* self = (region*)tolua_tousertype(tolua_S, 1, 0);
+  direction_t dir = (direction_t)tolua_tonumber(tolua_S, 2, 0);
+
+  tolua_pushusertype(tolua_S, (void*)r_connect(self, dir), "region");
+  return 1;
+}
+
 static int tolua_region_set_flag(lua_State* tolua_S)
 {
   region* self = (region*)tolua_tousertype(tolua_S, 1, 0);
@@ -230,6 +239,7 @@ tolua_region_create(lua_State* tolua_S)
   if (result) {
     terraform_region(result, terrain);
   }
+  fix_demand(result);
 
   tolua_pushusertype(tolua_S, result, "region");
   return 1;
@@ -356,6 +366,7 @@ tolua_region_open(lua_State* tolua_S)
       tolua_function(tolua_S, "set_resource", tolua_region_set_resource);
       tolua_function(tolua_S, "get_flag", tolua_region_get_flag);
       tolua_function(tolua_S, "set_flag", tolua_region_set_flag);
+      tolua_function(tolua_S, "next", tolua_region_get_adj);
 
       tolua_function(tolua_S, "get_key", tolua_region_getkey);
       tolua_function(tolua_S, "set_key", tolua_region_setkey);

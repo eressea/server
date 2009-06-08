@@ -105,42 +105,44 @@ void do_markets(void)
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * r2 = rconnect(r, d);
           if (r2 && r2->buildings) {
-            nmarkets += get_markets(r, markets+nmarkets, MAX_MARKETS-nmarkets);
+            nmarkets += get_markets(r2, markets+nmarkets, MAX_MARKETS-nmarkets);
           }
         }
-        while (lux && numlux--) {
-          int n = rng_int() % nmarkets;
-          unit * u = markets[n];
-          item * items;
-          attrib * a = a_find(u->attribs, &at_market);
-          if (a==NULL) {
-            unit_list * ulist = malloc(sizeof(unit_list));
-            a = a_add(&u->attribs, a_new(&at_market));
-            ulist->next = traders;
-            ulist->data = u;
-            traders = ulist;
+        if (nmarkets) {
+          while (lux && numlux--) {
+            int n = rng_int() % nmarkets;
+            unit * u = markets[n];
+            item * items;
+            attrib * a = a_find(u->attribs, &at_market);
+            if (a==NULL) {
+              unit_list * ulist = malloc(sizeof(unit_list));
+              a = a_add(&u->attribs, a_new(&at_market));
+              ulist->next = traders;
+              ulist->data = u;
+              traders = ulist;
+            }
+            items = (item *)a->data.v;
+            i_change(&items, lux, 1);
+            a->data.v = items;
+            /* give 1 luxury */
           }
-          items = (item *)a->data.v;
-          i_change(&items, lux, 1);
-          a->data.v = items;
-          /* give 1 luxury */
-        }
-        while (herb && numherbs--) {
-          int n = rng_int() % nmarkets;
-          unit * u = markets[n];
-          item * items;
-          attrib * a = a_find(u->attribs, &at_market);
-          if (a==NULL) {
-            unit_list * ulist = malloc(sizeof(unit_list));
-            a = a_add(&u->attribs, a_new(&at_market));
-            ulist->next = traders;
-            ulist->data = u;
-            traders = ulist;
+          while (herb && numherbs--) {
+            int n = rng_int() % nmarkets;
+            unit * u = markets[n];
+            item * items;
+            attrib * a = a_find(u->attribs, &at_market);
+            if (a==NULL) {
+              unit_list * ulist = malloc(sizeof(unit_list));
+              a = a_add(&u->attribs, a_new(&at_market));
+              ulist->next = traders;
+              ulist->data = u;
+              traders = ulist;
+            }
+            items = (item *)a->data.v;
+            i_change(&items, herb, 1);
+            a->data.v = items;
+            /* give 1 luxury */
           }
-          items = (item *)a->data.v;
-          i_change(&items, herb, 1);
-          a->data.v = items;
-          /* give 1 luxury */
         }
       }
     }
@@ -152,6 +154,7 @@ void do_markets(void)
     attrib * a = a_find(u->attribs, &at_market);
     item * items = a->data.v;
 
+    a->data.v = NULL;
     while (items) {
       item * itm = items;
       items = itm->next;
@@ -159,7 +162,10 @@ void do_markets(void)
       if (itm->number) {
         ADDMSG(&u->faction->msgs, msg_message("buyamount",
           "unit amount resource", u, itm->number, itm->type->rtype));
+        itm->next = NULL;
         i_add(&u->items, itm);
+      } else {
+        i_free(itm);
       }
     }
 
