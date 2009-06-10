@@ -7,7 +7,7 @@
     _a: including article (ein Troll, a troll)
    -->
   <!--Fort-Ausbaustufen -->
-  <string name="thirdage">
+  <string name="calendar::thirdage">
     <text locale="de">des dritten Zeitalters</text>
     <text locale="en">the third age</text>
   </string>

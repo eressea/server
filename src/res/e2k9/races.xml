@@ -13,6 +13,7 @@
     <skill name="building" modifier="1"/>
     <skill name="cartmaking" modifier="-1"/>
     <skill name="catapult" modifier="1"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="-99"/>
     <skill name="mining" modifier="1"/>
     <skill name="roadwork" modifier="-2"/>
@@ -37,6 +38,7 @@
     <skill name="catapult" speed="+5"/>
     <skill name="crossbow" speed="+5"/>
     <skill name="forestry" modifier="1"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="melee" speed="+5"/>
     <skill name="mining" modifier="1"/>
     <skill name="polearm" speed="+5"/>
@@ -59,6 +61,7 @@
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="elf"/>
     <param name="other_cost" value="500"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="riding" modifier="+2"/>
     <skill name="shipcraft" modifier="2"/>
     <skill name="sailing" modifier="2"/>
@@ -81,6 +84,7 @@
     <skill name="cartmaking" modifier="2"/>
     <skill name="catapult" modifier="-1"/>
     <skill name="crossbow" modifier="2"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="melee" modifier="-1"/>
     <skill name="mining" modifier="1"/>
     <skill name="polearm" modifier="-1"/>
@@ -103,6 +107,7 @@
     <function name="itemdrop" value="defaultdrops"/>
     <skill name="cartmaking" modifier="-2"/>
     <skill name="forestry" modifier="1"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="1"/>
     <skill name="melee" modifier="1"/>
     <skill name="polearm" modifier="1"/>
@@ -127,6 +132,7 @@
     <skill name="bow" modifier="2"/>
     <skill name="building" modifier="-1"/>
     <skill name="catapult" modifier="-2"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="1"/>
     <skill name="mining" modifier="-2"/>
     <skill name="quarrying" modifier="-1"/>
@@ -148,6 +154,7 @@
     <skill name="bow" modifier="-2"/>
     <skill name="building" modifier="2"/>
     <skill name="catapult" modifier="2"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="melee" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="quarrying" modifier="2"/>
@@ -171,6 +178,7 @@
     <skill name="building" modifier="2"/>
     <skill name="catapult" modifier="2"/>
     <skill name="forestry" modifier="-1"/>
+    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="-2"/>
     <skill name="melee" modifier="1"/>
     <skill name="mining" modifier="2"/>
@@ -179,7 +187,6 @@
     <skill name="roadwork" modifier="2"/>
     <skill name="sailing" modifier="-2"/>
     <skill name="shipcraft" modifier="-1"/>
-    <skill name="tactics" modifier="1"/>
     <skill name="training" modifier="-2"/>
     <skill name="weaponsmithing" modifier="2"/>
     <skill name="unarmed" modifier="-99"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<resources>
+<resources xmlns:xi="http://www.w3.org/2001/XInclude">
   <!-- this file contains a lot of armor -->
 
   <xi:include href="../armor/plate.xml"/>

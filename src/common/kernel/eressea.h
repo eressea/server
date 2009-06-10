@@ -404,7 +404,6 @@ extern int NewbieImmunity(void);
 extern int AllianceAuto(void); /* flags that allied factions get automatically */
 extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern int HelpMask(void); /* flags restricted to allied factions */
-extern int HelpMask(void); /* flags restricted to allied factions */
 extern struct order * default_order(const struct locale * lang);
 extern int entertainmoney(const struct region * r);
 

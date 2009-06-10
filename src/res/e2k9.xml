@@ -56,7 +56,7 @@
     <!-- Game specific settings -->
     <param name="database.gameid" value="7"></param>
 
-    <order name="ARBEITEN" disable="yes"/>
+    <!--order name="ARBEITEN" disable="yes"/-->
     <order name="BETEN" disable="yes"/>
     <order name="BELAGERE" disable="yes"/>
     <order name="FRIEDEN" disable="yes"/>
@@ -96,11 +96,11 @@
     <skill name="training" enable="true"/>
     <skill name="unarmed" enable="true"/>
     <skill name="weaponsmithing" enable="true"/>
+    <skill name="herbalism" enable="true"/>
 
     <skill name="alchemy" enable="false"/>
     <skill name="entertainment" enable="false"/>
     <skill name="espionage" enable="false"/>
-    <skill name="herbalism" enable="false"/>
     <skill name="perception" enable="false"/>
     <skill name="stealth" enable="false"/>
     <skill name="taxation" enable="false"/>
@@ -138,13 +138,14 @@
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
     <param name="rules.economy.taxation" value="1"/>
+    <param name="rules.economy.wages" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>
     <param name="rules.give" value="11"/> <!-- only self + peasants + ondeath -->
     <param name="rules.help.mask" value="fight guard money"/>
     <param name="movement.shipspeed.skillbonus" value="7"/>
     <param name="alliance.auto" value="fight"/>
-	<!--param name="alliance.restricted" value="fight"/-->
+	  <param name="alliance.restricted" value="fight"/>
   </game>
   <xi:include href="eressea/strings.xml"/>
   <xi:include href="eressea/races.xml"/>

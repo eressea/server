@@ -15,4 +15,48 @@
     <item name="seaserpenthead" amount="1"/>
   </set>
 
-  </equipment>
+  <set name="dwarf_0">
+    <skill name="melee" level="7"/>
+    <skill name="stamina" level="3"/>
+    <item name="sword" amount="1"/>
+    <item name="shield" amount="1"/>
+    <item name="plate" amount="1"/>
+  </set>
+
+  <set name="halfling_0">
+    <skill name="crossbow" level="7"/>
+    <skill name="stamina" level="3"/>
+    <item name="crossbow" amount="1"/>
+    <item name="shield" amount="1"/>
+  </set>
+
+  <set name="dwarf_1">
+    <skill name="melee" level="7"/>
+    <skill name="stamina" level="3"/>
+    <item name="sword" amount="1"/>
+    <item name="towershield" amount="1"/>
+    <item name="plate" amount="1"/>
+  </set>
+
+  <set name="halfling_1">
+    <skill name="crossbow" level="7"/>
+    <skill name="stamina" level="3"/>
+    <item name="crossbow" amount="1"/>
+    <item name="shield" amount="1"/>
+  </set>
+
+  <set name="dwarf_2">
+    <skill name="melee" level="7"/>
+    <skill name="stamina" level="3"/>
+    <item name="sword" amount="1"/>
+    <item name="shield" amount="1"/>
+    <item name="plate" amount="1"/>
+  </set>
+
+  <set name="halfling_2">
+    <skill name="crossbow" level="7"/>
+    <skill name="stamina" level="3"/>
+    <item name="rep_crossbow" amount="1"/>
+  </set>
+
+</equipment>

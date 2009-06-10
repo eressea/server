@@ -1,14 +1,64 @@
-<?xml version="1.0"?>
+ï»¿<?xml version="1.0" encoding="iso-8859-1" ?>
 <resources>
 
-  <resource name="p2" appearance="vial">
+  <resource name="ointment" appearance="vial">
+    <!-- Wundsalbe -->
+    <item weight="0" score="60">
+      <function name="use" value="usehealingpotion"/>
+      <potion level="2"/>
+    </item>
+  </resource>
+
+  <resource name="p13" appearance="vial">
+    <!-- Elixier der Macht -->
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+    </item>
+  </resource>
+
+  <resource name="p3" appearance="vial">
+    <!-- Schaffenstrunk -->
+    <item weight="0" score="60">
+      <function name="use" value="usepotion"/>
+      <potion level="2"/>
+    </item>
+  </resource>
+
+  <resource name="p14" appearance="vial">
+    <!-- Heiltrank -->
+    <item weight="0" score="120">
+      <function name="use" value="usepotion"/>
+      <potion level="4"/>
+    </item>
+  </resource>
+
+  <resource name="p0" appearance="vial">
+    <!-- Siebenmeilentee -->
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
     </item>
   </resource>
 
-  <resource name="p10" appearance="vial">
+  <resource name="p2" appearance="vial">
+    <!-- Wasser des Lebens -->
+    <item weight="0" score="30">
+      <function name="use" value="usepotion"/>
+      <potion level="1"/>
+    </item>
+  </resource>
+
+  <resource name="peasantblood" appearance="vial">
+    <!-- Bauernblut -->
+    <item weight="0" score="60">
+      <function name="use" value="usebloodpotion"/>
+      <potion level="2"/>
+    </item>
+  </resource>
+
+  <resource name="p9" appearance="vial">
+    <!-- Pferdeglück -->
     <item weight="0" score="90">
       <function name="use" value="usepotion"/>
       <potion level="3"/>

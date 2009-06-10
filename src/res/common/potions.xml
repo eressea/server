@@ -59,8 +59,8 @@
     </item>
   </resource>
 
-  <resource name="p4" appearance="vial">
-    <!-- Heilwasser -->
+  <resource name="ointment" appearance="vial">
+    <!-- Wundsalbe -->
     <item weight="0" score="60">
       <function name="use" value="usehealingpotion"/>
       <potion level="2"/>

@@ -134,9 +134,8 @@ MaxAge(void) {
 }
 
 static int
-ally_flag(const char * s)
+ally_flag(const char * s, int help_mask)
 {
-  int help_mask = HelpMask();
   if ((help_mask&HELP_MONEY) && strcmp(s, "money")==0) return HELP_MONEY;
   if ((help_mask&HELP_FIGHT) && strcmp(s, "fight")==0) return HELP_FIGHT;
   if ((help_mask&HELP_GIVE) && strcmp(s, "give")==0) return HELP_GIVE;
@@ -170,13 +169,13 @@ AllianceAuto(void)
     char * sstr = strdup(str);
       char * tok = strtok(sstr, " ");
       while (tok) {
-        value |= ally_flag(tok);
+        value |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
       }
       free(sstr);
     }
   }
-  return value | ~HelpMask();
+  return value & HelpMask();
 }
 
 /** Limits the available help modes
@@ -196,7 +195,7 @@ HelpMask(void)
       char * sstr = strdup(str);
       char * tok = strtok(sstr, " ");
       while (tok) {
-        value |= ally_flag(tok);
+        value |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
       }
       free(sstr);
@@ -218,11 +217,12 @@ AllianceRestricted(void)
     char * sstr = strdup(str);
       char * tok = strtok(sstr, " ");
       while (tok) {
-        value |= ally_flag(tok);
+        value |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
       }
       free(sstr);
     }
+    value &= HelpMask();
   }
   return value;
 }
@@ -878,7 +878,6 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
   if (!init) {
     init_gms();
     init = true;
-    automode = ~HelpMask();
   }
   if (pl && (pl->flags & PFL_FRIENDLY)) return HELP_ALL;
   /* if f2 is a gm in this plane, everyone has an auto-help to it */
@@ -896,7 +895,7 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
     if (sf->alliance==f2->alliance) return AllianceAuto();
   }
 
-  return automode;
+  return 0;
 }
 
 static int

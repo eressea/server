@@ -47,6 +47,7 @@ without prior permission by the authors of Eressea.
 #include <tolua.h>
 
 #include <limits.h>
+#include <assert.h>
 
 static int
 tolua_unit_get_objects(lua_State* tolua_S)
@@ -835,9 +836,14 @@ tolua_unit_create(lua_State* tolua_S)
   region * r = (region *)tolua_tousertype(tolua_S, 2, 0);
   int num = (int)tolua_tonumber(tolua_S, 3, 0);
   if (f && r) {
-    unit * u = create_unit(r, f, num, f->race, 0, NULL, NULL);
-    tolua_pushusertype(tolua_S, u, "unit");
-    return 1;
+    const race * rc = f->race;
+    const char * rcname = tolua_tostring(tolua_S, 4, NULL);
+    if (rcname) rc = rc_find(rcname);
+    if (rc) {
+      unit * u = create_unit(r, f, num, rc, 0, NULL, NULL);
+      tolua_pushusertype(tolua_S, u, "unit");
+      return 1;
+    }
   }
   return 0;
 }
