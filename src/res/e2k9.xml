@@ -82,7 +82,6 @@
     <skill name="catapult" enable="true"/>
     <skill name="crossbow" enable="true"/>
     <skill name="forestry" enable="true"/>
-    <skill name="herbalism" enable="true"/>
     <skill name="magic" enable="true"/>
     <skill name="melee" enable="true"/>
     <skill name="mining" enable="true"/>
@@ -101,6 +100,7 @@
     <skill name="alchemy" enable="false"/>
     <skill name="entertainment" enable="false"/>
     <skill name="espionage" enable="false"/>
+    <skill name="herbalism" enable="false"/>
     <skill name="perception" enable="false"/>
     <skill name="stealth" enable="false"/>
     <skill name="taxation" enable="false"/>
