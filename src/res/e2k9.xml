@@ -96,7 +96,8 @@
     <skill name="training" enable="true"/>
     <skill name="unarmed" enable="true"/>
     <skill name="weaponsmithing" enable="true"/>
-    <skill name="herbalism" enable="true"/>
+
+    <skill name="herbalism" enable="false"/>
 
     <skill name="alchemy" enable="false"/>
     <skill name="entertainment" enable="false"/>

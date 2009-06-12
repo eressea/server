@@ -182,7 +182,11 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, constructi
     propValue = xmlGetProp(node, BAD_CAST "skill");
     if (propValue!=NULL) {
       sk = sk_find((const char*)propValue);
-      assert(sk!=NOSKILL);
+      if (sk==NOSKILL) {
+        log_error(("construction requires skill '%s' that does not exist.", (const char *)propValue));
+        xmlFree(propValue);
+        continue;
+      }
       xmlFree(propValue);
     }
 
