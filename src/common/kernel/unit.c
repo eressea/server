@@ -664,30 +664,34 @@ attrib_type at_stealth = {
 void
 u_seteffstealth(unit * u, int value)
 {
-  attrib * a = NULL;
-  if (fval(u, UFL_STEALTH)) {
-    a = a_find(u->attribs, &at_stealth);
-  }
-  if (value<0) {
-    if (a!=NULL) {
-      freset(u, UFL_STEALTH);
-      a_remove(&u->attribs, a);
+  if (skill_enabled[SK_STEALTH]) {
+    attrib * a = NULL;
+    if (fval(u, UFL_STEALTH)) {
+      a = a_find(u->attribs, &at_stealth);
     }
-    return;
+    if (value<0) {
+      if (a!=NULL) {
+        freset(u, UFL_STEALTH);
+        a_remove(&u->attribs, a);
+      }
+      return;
+    }
+    if (a==NULL) {
+      a = a_add(&u->attribs, a_new(&at_stealth));
+      fset(u, UFL_STEALTH);
+    }
+    a->data.i = value;
   }
-  if (a==NULL) {
-    a = a_add(&u->attribs, a_new(&at_stealth));
-    fset(u, UFL_STEALTH);
-  }
-  a->data.i = value;
 }
 
 int
 u_geteffstealth(const struct unit * u)
 {
-  if (fval(u, UFL_STEALTH)) {
-    attrib * a = a_find(u->attribs, &at_stealth);
-    if (a!=NULL) return a->data.i;
+  if (skill_enabled[SK_STEALTH]) {
+    if (fval(u, UFL_STEALTH)) {
+      attrib * a = a_find(u->attribs, &at_stealth);
+      if (a!=NULL) return a->data.i;
+    }
   }
   return -1;
 }
@@ -695,12 +699,14 @@ u_geteffstealth(const struct unit * u)
 int
 get_level(const unit * u, skill_t id)
 {
-  skill * sv = u->skills;
-  while (sv != u->skills + u->skill_size) {
-    if (sv->id == id) {
-      return sv->level;
+  if (skill_enabled[id]) {
+    skill * sv = u->skills;
+    while (sv != u->skills + u->skill_size) {
+      if (sv->id == id) {
+        return sv->level;
+      }
+      ++sv;
     }
-    ++sv;
   }
   return 0;
 }
@@ -709,6 +715,9 @@ void
 set_level(unit * u, skill_t sk, int value)
 {
   skill * sv = u->skills;
+
+  if (!skill_enabled[sk]) return;
+
   if (value==0) {
     remove_skill(u, sk);
     return;
@@ -1276,16 +1285,18 @@ default:
 int
 eff_skill(const unit * u, skill_t sk, const region * r)
 {
-  int level = get_level(u, sk);
-  if (level>0) {
-    int mlevel = level + get_modifier(u, sk, level, r, false);
+  if (skill_enabled[sk]) {
+    int level = get_level(u, sk);
+    if (level>0) {
+      int mlevel = level + get_modifier(u, sk, level, r, false);
 
-    if (mlevel>0) {
-      int skillcap = SkillCap(sk);
-      if (skillcap && mlevel>skillcap) {
-        return skillcap;
+      if (mlevel>0) {
+        int skillcap = SkillCap(sk);
+        if (skillcap && mlevel>skillcap) {
+          return skillcap;
+        }
+        return mlevel;
       }
-      return mlevel;
     }
   }
   return 0;

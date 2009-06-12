@@ -833,16 +833,16 @@ effskill(const unit * u, skill_t sk)
 int
 eff_stealth(const unit * u, const region * r)
 {
-  int e;
+  int e = 0;
 
   /* Auf Schiffen keine Tarnung! */
-  if (u->ship) return 0;
+  if (!u->ship && skill_enabled[SK_STEALTH]) {
+    e = eff_skill (u, SK_STEALTH, r);
 
-  e = eff_skill (u, SK_STEALTH, r);
-
-  if (fval(u, UFL_STEALTH)) {
-    int es = u_geteffstealth(u);
-    if (es >=0 && es < e) return es;
+    if (fval(u, UFL_STEALTH)) {
+      int es = u_geteffstealth(u);
+      if (es >=0 && es < e) return es;
+    }
   }
   return e;
 }
@@ -1010,18 +1010,18 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
     return true;
   }
 
+  rings = invisible(u, NULL);
   stealth = eff_stealth(u, r) - modifier;
 
-  rings = invisible(u, NULL);
   while (u2) {
     if (rings<u->number || invisible(u, u2) < u->number) {
-      int observation = eff_skill(u2, SK_PERCEPTION, r);
+      if (skill_enabled[SK_PERCEPTION]) {
+        int observation = eff_skill(u2, SK_PERCEPTION, r);
 
-#ifdef NIGHTEYES
-      if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
-        observation = NIGHT_EYE_TALENT;
-#endif
-      if (observation >= stealth) {
+        if (observation >= stealth) {
+          return true;
+        }
+      } else {
         return true;
       }
     }
@@ -1056,13 +1056,12 @@ cansee_unit(const unit * u, const unit * target, int modifier)
     if (rings && invisible(target, u) >= target->number) {
       return false;
     }
-    o = eff_skill(u, SK_PERCEPTION, target->region);
-
-#ifdef NIGHTEYES
-    if (u->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
-      o = NIGHT_EYE_TALENT;
-#endif
-    if (o >= n) {
+    if (skill_enabled[SK_PERCEPTION]) {
+      o = eff_skill(u, SK_PERCEPTION, target->region);
+      if (o >= n) {
+        return true;
+      }
+    } else {
       return true;
     }
   }
@@ -1101,10 +1100,6 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 
         o = eff_skill(u2, SK_PERCEPTION, r);
 
-#ifdef NIGHTEYES
-        if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
-          o = NIGHT_EYE_TALENT;
-#endif
         if (o >= n) {
           return true;
         }
@@ -1806,61 +1801,32 @@ maxworkingpeasants(const struct region * r)
   return MAX(i, 0);
 }
 
-unit_list *
-get_lighthouses(const region * r)
-{
-  attrib * a;
-  unit_list * ulist = NULL;
-
-  if (!fval(r->terrain, SEA_REGION)) return NULL;
-
-  for (a = a_find(r->attribs, &at_lighthouse);a && a->type==&at_lighthouse;a=a->next) {
-    building *b = (building *)a->data.v;
-    region *r2 = b->region;
-
-    if (fval(b, BLD_WORKING) && b->size >= 10) {
-      boolean c = false;
-      unit *u;
-      int d = distance(r, r2);
-      int maxd = (int)log10(b->size) + 1;
-
-      if (maxd < d) break;
-
-      for (u = r2->units; u; u = u->next) {
-        if (u->building == b) {
-          c = true;
-          if (c > buildingcapacity(b)) break;
-          if (eff_skill(u, SK_PERCEPTION, r) >= d * 3) {
-            unitlist_insert(&ulist, u);
-          }
-        } else if (c) break; /* first unit that's no longer in the house ends the search */
-      }
-    }
-  }
-  return ulist;
-}
-
 int
 lighthouse_range(const building * b, const faction * f)
 {
   int d = 0;
   if (fval(b, BLD_WORKING) && b->size >= 10) {
-    region * r = b->region;
-    unit *u;
     int maxd = (int)log10(b->size) + 1;
-    int c = 0;
 
-    for (u = r->units; u; u = u->next) {
-      if (u->building == b) {
-        c += u->number;
-        if (c > buildingcapacity(b)) break;
-        if (f==NULL || u->faction == f) {
-          int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
-          d = MAX(d, sk);
-          d = MIN(maxd, d);
-          if (d==maxd) break;
-        }
-      } else if (c) break; /* first unit that's no longer in the house ends the search */
+    if (skill_enabled[SK_PERCEPTION]) {
+      region * r = b->region;
+      int c = 0;
+      unit *u;
+      for (u = r->units; u; u = u->next) {
+        if (u->building == b) {
+          c += u->number;
+          if (c > buildingcapacity(b)) break;
+          if (f==NULL || u->faction == f) {
+            int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
+            d = MAX(d, sk);
+            d = MIN(maxd, d);
+            if (d==maxd) break;
+          }
+        } else if (c) break; /* first unit that's no longer in the house ends the search */
+      }
+    } else {
+      /* E3A rule: no perception req'd */
+      return maxd;
     }
   }
   return d;
@@ -1875,25 +1841,31 @@ check_leuchtturm(region * r, faction * f)
 
   for (a = a_find(r->attribs, &at_lighthouse);a && a->type==&at_lighthouse;a=a->next) {
     building *b = (building *)a->data.v;
-    region *r2 = b->region;
 
     assert(b->type == bt_find("lighthouse"));
     if (fval(b, BLD_WORKING) && b->size >= 10) {
-      int c = 0;
-      unit *u;
-      int d = 0;
       int maxd = (int)log10(b->size) + 1;
 
-      for (u = r2->units; u; u = u->next) {
-        if (u->building == b) {
-          c += u->number;
-          if (c > buildingcapacity(b)) break;
-          if (f==NULL || u->faction == f) {
-            if (!d) d = distance(r, r2);
-            if (maxd < d) break;
-            if (eff_skill(u, SK_PERCEPTION, r) >= d * 3) return true;
-          }
-        } else if (c) break; /* first unit that's no longer in the house ends the search */
+      if (skill_enabled[SK_PERCEPTION]) {
+        region *r2 = b->region;
+        unit *u;
+        int c = 0;
+        int d = 0;
+
+        for (u = r2->units; u; u = u->next) {
+          if (u->building == b) {
+            c += u->number;
+            if (c > buildingcapacity(b)) break;
+            if (f==NULL || u->faction == f) {
+              if (!d) d = distance(r, r2);
+              if (maxd < d) break;
+              if (eff_skill(u, SK_PERCEPTION, r) >= d * 3) return true;
+            }
+          } else if (c) break; /* first unit that's no longer in the house ends the search */
+        }
+      } else {
+        /* E3A rule: no perception req'd */
+        return maxd;
       }
     }
   }

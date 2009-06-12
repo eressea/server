@@ -291,7 +291,7 @@ get_allies(region * r, unit * u)
 		break;
 
 	case T_SWAMP:
-		if (eff_skill(u, SK_PERCEPTION, r) <= 3) {
+		if (eff_skill(u, SK_MELEE, r) <= 1) {
 			return;
 		}
     name = "random_swamp_men";

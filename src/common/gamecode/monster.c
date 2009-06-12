@@ -913,8 +913,13 @@ plan_dragon(unit * u)
     }
   }
   if (long_order==NULL) {
+    skill_t sk = SK_PERCEPTION;
+    /* study perception (or a random useful skill) */
+    while (!skill_enabled[sk] || u->race->bonus[sk]<-5) {
+      sk = (skill_t)(rng_int() % MAXSKILLS);
+    }
     long_order = create_order(K_STUDY, u->faction->locale, "'%s'", 
-      skillname(SK_PERCEPTION, u->faction->locale));
+      skillname(sk, u->faction->locale));
   }
   return long_order;
 }
@@ -949,8 +954,10 @@ plan_monsters(void)
         setstatus(u, ST_FIGHT);
         /* all monsters fight */
       }
-      /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-      produceexp(u, SK_PERCEPTION, u->number);
+      if (skill_enabled[SK_PERCEPTION]) {
+        /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
+        produceexp(u, SK_PERCEPTION, u->number);
+      }
 
       /* Befehle müssen jede Runde neu gegeben werden: */
       free_orders(&u->orders);

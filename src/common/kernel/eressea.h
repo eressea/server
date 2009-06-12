@@ -76,9 +76,6 @@ extern "C" {
 /* #define COLLAPSE_SURVIVAL 0.5F */
 #undef COLLAPSE_SURVIVAL
 
-/* Magiesystem */
-#define NIGHT_EYE_TALENT        5
-
 /* Bewegungsweiten: */
 #define BP_WALKING 4
 #define BP_RIDING  6
@@ -152,7 +149,6 @@ extern boolean faction_id_is_unused(int);
 /* leuchtturm */
 extern boolean check_leuchtturm(struct region * r, struct faction * f);
 extern void update_lighthouse(struct building * lh);
-extern struct unit_list * get_lighthouses(const struct region * r);
 extern int lighthouse_range(const struct building * b, const struct faction * f);
 
 /* skills */

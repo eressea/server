@@ -2839,6 +2839,8 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
   region * r = u->region;
   faction * f = NULL;
 
+  assert(skill_enabled[SK_PERCEPTION] && skill_enabled[SK_STEALTH]);
+
   if (!fval(u->race, RCF_CANSTEAL)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race", u->race));
     return;
