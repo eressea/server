@@ -74,7 +74,6 @@
 static FILE *bdebug;
 
 #define TACTICS_BONUS 1 /* when undefined, we have a tactics round. else this is the bonus tactics give */
-#define TACTICS_RANDOM /* undefine this to deactivate */
 #define TACTICS_MODIFIER 1 /* modifier for generals in the fromt/rear */
 
 #define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rng_int() % INITIAL */
@@ -1535,6 +1534,23 @@ select_enemy(fighter * af, int minrow, int maxrow, int select)
 #endif
 }
 
+static int
+get_tactics(side * s)
+{
+  battle * b = s->battle;
+  side *stac;
+  int result = 0;
+
+  if (b->max_tactics > 0) {
+    for (stac=b->sides;stac!=b->sides+b->nsides;++stac) {
+      if (stac->leader.value >result && helping(stac, s)) {
+        result = stac->leader.value;
+      }
+    }
+  }
+  return result;
+}
+
 static troop
 select_opponent(battle * b, troop at, int mindist, int maxdist)
 {
@@ -1548,6 +1564,22 @@ select_opponent(battle * b, troop at, int mindist, int maxdist)
   } else {
     mindist = MAX(mindist, FIGHT_ROW);
     dt = select_enemy(at.fighter, mindist, maxdist, SELECT_ADVANCE);
+  }
+
+  if (b->turn==0 && dt.fighter) {
+    int tactics_formula = -1;
+
+    if (tactics_formula<0) {
+      tactics_formula = get_param_int(global.parameters, "rules.tactics.formula", 0);
+    }
+    if (tactics_formula==1) {
+      int tactics = get_tactics(dt.fighter->side);
+      /* percentage chance to get this attack */
+      double tacch = 0.1 * (b->max_tactics - tactics);
+      if (!chance(tacch)) {
+        dt.fighter = NULL;
+      }
+    }
   }
 
   return dt;
@@ -3129,7 +3161,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   region *r = b->region;
   item * itm;
   fighter *fig = NULL;
-  int i, t = eff_skill(u, SK_TACTICS, r);
+  int i, tactics = eff_skill(u, SK_TACTICS, r);
   side *s2;
   int h;
   int berserk;
@@ -3390,17 +3422,17 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   }
 
   /* Schauen, wie gut wir in Taktik sind. */
-  if (t > 0 && u->race == new_race[RC_INSECT])
-    t -= 1 - (int) log10(fig->side->size[SUM_ROW]);
+  if (tactics > 0 && u->race == new_race[RC_INSECT])
+    tactics -= 1 - (int) log10(fig->side->size[SUM_ROW]);
 #ifdef TACTICS_MODIFIER
-  if (t > 0 && statusrow(fig->status) == FIGHT_ROW)
-    t += TACTICS_MODIFIER;
-  if (t > 0 && statusrow(fig->status) > BEHIND_ROW) {
-    t -= TACTICS_MODIFIER;
+  if (tactics > 0 && statusrow(fig->status) == FIGHT_ROW)
+    tactics += TACTICS_MODIFIER;
+  if (tactics > 0 && statusrow(fig->status) > BEHIND_ROW) {
+    tactics -= TACTICS_MODIFIER;
   }
 #endif
-#ifdef TACTICS_RANDOM
-  if (t > 0) {
+
+  if (tactics > 0) {
     int bonus = 0;
 
     for (i = 0; i < fig->alive; i++) {
@@ -3418,10 +3450,10 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
       } while(rnd >= 97);
       bonus = MAX(p_bonus, bonus);
     }
-    t += bonus;
+    tactics += bonus;
   }
-#endif
-  add_tactics(&fig->side->leader, fig, t);
+
+  add_tactics(&fig->side->leader, fig, tactics);
   ++b->nfighters;
   return fig;
 }
@@ -3504,7 +3536,7 @@ make_battle(region * r)
     else {
       const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
       fwrite(utf8_bom, 1, 3, bdebug);
-      fprintf(bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL));
+      fprintf(bdebug, "In %s findet ein Kampf stattactics:\n", rname(r, NULL));
     }
     obs_count++;
   }
@@ -3837,7 +3869,7 @@ flee(const troop dt)
       /* da ist das weight des tiers mit drin */
       carry += itype->capacity - itype->weight;
     } else if (itm->type->weight <= 0) {
-      /* if it doesn't weigh anything, it won't slow us down */
+      /* if it doesn'tactics weigh anything, it won'tactics slow us down */
       keep = itm->number;
     }
     /* jeder troop nimmt seinen eigenen Teil der Sachen mit */
@@ -4112,16 +4144,9 @@ battle_attacks(battle * b)
 
     /* Taktikrunde: */
     if (b->turn == 0) {
-      side *stac;
-
-      for (stac=b->sides;stac!=b->sides+b->nsides;++stac) {
-        if (b->max_tactics > 0 && stac->leader.value == b->max_tactics && helping(stac, s)) {
-          break;
-        }
-      }
-      if (stac==b->sides+b->nsides) {
-        /* could not find a side that is helping us and won the tactics round */
-        continue;
+      int tactics = get_tactics(s);
+      if (b->max_tactics > 0 && tactics == b->max_tactics) {
+        break;
       }
     }
 
