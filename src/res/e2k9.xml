@@ -128,6 +128,7 @@
     <param name="study.expensivemigrants" value="1"/>
     <param name="study.speedup" value="1"/>
     <param name="rules.check_overload" value="0"/>
+    <param name="rules.combat.goblinbonus" value="3"/>
     <param name="rules.alliances" value="1"/>
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->

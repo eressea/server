@@ -1833,9 +1833,13 @@ skilldiff(troop at, troop dt, int dist)
   }
 #endif /* KARMA_MODULE */
 
-  if (au->race == new_race[RC_GOBLIN] &&
-      af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * 10)
-    skdiff += 1;
+  if (au->race == new_race[RC_GOBLIN]) {
+    static int goblin_bonus = -1;
+    if (goblin_bonus<0) goblin_bonus = get_param_int(global.parameters, "rules.combat.goblinbonus", 10);
+    if (af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * goblin_bonus) {
+      skdiff += 1;
+    }
+  }
 
 #if KARMA_MODULE
   /* TODO this should be a skillmod */

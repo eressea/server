@@ -981,11 +981,7 @@ transfermen(unit * u, unit * u2, int n)
         rsethorses(r, h);
       } else {
         int p = rpeasants(r);
-        if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
-          p += n/2;
-        } else {
-          p += n;
-        }
+        p += (int)(n * rc->recruit_multi);
         rsetpeasants(r, p);
       }
     }

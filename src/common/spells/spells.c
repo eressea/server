@@ -4227,11 +4227,13 @@ sp_recruit(castorder *co)
 {
   unit *u;
   region *r = co->rt;
-  int n, maxp = rpeasants(r);
+  int num, maxp = rpeasants(r);
+  double n;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   faction *f = mage->faction;
+  const struct race * rc = f->race;
 
   if (maxp == 0) {
     report_failure(mage, co->order);
@@ -4243,21 +4245,23 @@ sp_recruit(castorder *co)
    * ist das Verhältniss von ausgegebene Aura pro Bauer bei Stufe 2
    * ein mehrfaches von Stufe 1, denn in beiden Fällen gibt es nur 1
    * Bauer, nur die Kosten steigen. */
-  n = (int)((pow(force, 1.6) * 100)/f->race->recruitcost);
-  if (f->race==new_race[RC_URUK]) {
-    n = MIN(2*maxp, n);
+  n = (pow(force, 1.6) * 100)/f->race->recruitcost;
+  if (rc->recruit_multi!=0) {
+    double multp = maxp/rc->recruit_multi;
+    n = MIN(multp, n);
     n = MAX(n, 1);
-    rsetpeasants(r, maxp - (n+1) / 2);
+    rsetpeasants(r, maxp - (int)(n * rc->recruit_multi));
   } else {
     n = MIN(maxp, n);
     n = MAX(n, 1);
-    rsetpeasants(r, maxp - n);
+    rsetpeasants(r, maxp - (int)n);
   }
 
-  u = create_unit(r, f, n, f->race, 0, LOC(f->locale,(n == 1 ? "peasant" : "peasant_p")), mage);
+  num = (int)n;
+  u = create_unit(r, f, num, f->race, 0, LOC(f->locale,(num == 1 ? "peasant" : "peasant_p")), mage);
   set_order(&u->thisorder, default_order(f->locale));
 
-  ADDMSG(&mage->faction->msgs, msg_message("recruit_effect", "mage amount", mage, n));
+  ADDMSG(&mage->faction->msgs, msg_message("recruit_effect", "mage amount", mage, num));
 
   return cast_level;
 }

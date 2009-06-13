@@ -297,10 +297,8 @@ destroyfaction(faction * f)
            * stammen */
           if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
             h += u->number;
-          } else if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
-            p += u->number/2;
-          } else {
-            p += u->number;
+          } else { /* Orks zählen nur zur Hälfte */
+            p += (int)(u->number * rc->recruit_multi);
           }
           for (itm=u->items;itm;itm=itm->next) {
             if (itm->type->flags&ITF_ANIMAL) {

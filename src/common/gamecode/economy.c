@@ -310,8 +310,7 @@ add_recruits(unit * u, int number, int wanted)
 static int
 any_recruiters(const struct race * rc, int qty)
 {
-  if (rc==new_race[RC_URUK]) return qty;
-  return qty * 2;
+  return (int)(qty * 2 * rc->recruit_multi);
 }
 
 static int
@@ -319,15 +318,14 @@ peasant_recruiters(const struct race * rc, int qty)
 {
   if (rc->ec_flags & ECF_REC_ETHEREAL) return -1;
   if (rc->ec_flags & ECF_REC_HORSES) return -1;
-  if (rc==new_race[RC_URUK]) return qty;
-  return qty * 2;
+  return (int)(qty * 2 * rc->recruit_multi);
 }
 
 static int
 horse_recruiters(const struct race * rc, int qty)
 {
   if (rc->ec_flags & ECF_REC_ETHEREAL) return -1;
-  if (rc->ec_flags & ECF_REC_HORSES) return qty * 2;
+  if (rc->ec_flags & ECF_REC_HORSES) return (int)(qty * 2 * rc->recruit_multi);
   return -1;
 }
 
