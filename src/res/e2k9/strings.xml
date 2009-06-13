@@ -46,6 +46,14 @@
     <text locale="de">Streitrösser</text>
     <text locale="en">chargers</text>
   </string>
+  <string name="towershield">
+    <text locale="de">Turmschild</text>
+    <text locale="en">tower shield</text>
+  </string>
+  <string name="towershield_p">
+    <text locale="de">Turmschilde</text>
+    <text locale="en">tower shields</text>
+  </string>
 
   <string name="create_potion_p0">
     <text locale="de">Siebenmeilentee</text>

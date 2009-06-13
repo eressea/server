@@ -30,7 +30,7 @@ function load_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
-    "e2k9/items.lua"
+    "e2k9/rules.lua"
   }
   for index, value in pairs(scripts) do
     loadscript(value)
@@ -70,19 +70,17 @@ function process(orders)
   -- create new monsters:
   spawn_dragons()
   spawn_undead()
-  spawn_braineaters(0.25)
+  -- spawn_braineaters(0.25)
   spawn_ents()
 
   -- post-turn updates:
-  update_xmas2006()
-  update_embassies()
   update_guards()
   update_scores()
 
   change_locales()
 
   -- use newfactions file to place out new players
-  autoseed(basepath .. "/newfactions", false)
+  -- autoseed(basepath .. "/newfactions", false)
 
   write_files(locales)
 

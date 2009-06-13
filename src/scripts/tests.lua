@@ -371,6 +371,20 @@ function test_market()
   assert(len>1)
 end
 
+function test_work()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  f.id = 42
+  local u = unit.create(f, r, 1)
+  u:add_item("money", u.number * 10) -- humans cost 10
+  u:set_skill("herbalism", 5)
+  u:clear_orders()
+  u:add_order("ARBEITEN")
+  process_orders()
+  assert(u:get_item("money")>=10)
+end
+
 function test_herbalism()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -427,9 +441,11 @@ tests = {
     ["spells"] = test_spells,
     ["herbalism"] = test_herbalism,
     ["storage"] = test_storage,
+    ["work"] = test_work,
     ["market"] = test_market
 }
 mytests = {
+    ["work"] = test_work,
     ["herbalism"] = test_herbalism
 }
 fail = 0

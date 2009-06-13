@@ -13,7 +13,6 @@
     <skill name="building" modifier="1"/>
     <skill name="cartmaking" modifier="-1"/>
     <skill name="catapult" modifier="1"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="-99"/>
     <skill name="mining" modifier="1"/>
     <skill name="roadwork" modifier="-2"/>
@@ -38,7 +37,6 @@
     <skill name="catapult" speed="+5"/>
     <skill name="crossbow" speed="+5"/>
     <skill name="forestry" modifier="1"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="melee" speed="+5"/>
     <skill name="mining" modifier="1"/>
     <skill name="polearm" speed="+5"/>
@@ -61,7 +59,6 @@
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="elf"/>
     <param name="other_cost" value="500"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="riding" modifier="+2"/>
     <skill name="shipcraft" modifier="2"/>
     <skill name="sailing" modifier="2"/>
@@ -84,7 +81,6 @@
     <skill name="cartmaking" modifier="2"/>
     <skill name="catapult" modifier="-1"/>
     <skill name="crossbow" modifier="2"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="melee" modifier="-1"/>
     <skill name="mining" modifier="1"/>
     <skill name="polearm" modifier="-1"/>
@@ -107,7 +103,6 @@
     <function name="itemdrop" value="defaultdrops"/>
     <skill name="cartmaking" modifier="-2"/>
     <skill name="forestry" modifier="1"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="1"/>
     <skill name="melee" modifier="1"/>
     <skill name="polearm" modifier="1"/>
@@ -132,7 +127,6 @@
     <skill name="bow" modifier="2"/>
     <skill name="building" modifier="-1"/>
     <skill name="catapult" modifier="-2"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="1"/>
     <skill name="mining" modifier="-2"/>
     <skill name="quarrying" modifier="-1"/>
@@ -154,7 +148,6 @@
     <skill name="bow" modifier="-2"/>
     <skill name="building" modifier="2"/>
     <skill name="catapult" modifier="2"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="melee" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="quarrying" modifier="2"/>
@@ -178,7 +171,6 @@
     <skill name="building" modifier="2"/>
     <skill name="catapult" modifier="2"/>
     <skill name="forestry" modifier="-1"/>
-    <skill name="herbalism" modifier="-99"/>
     <skill name="magic" modifier="-2"/>
     <skill name="melee" modifier="1"/>
     <skill name="mining" modifier="2"/>
@@ -744,6 +736,7 @@
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>
   </race>
+
   <race name="dracoid" magres="0.000000" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveitem="yes" giveperson="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="name" value="namedracoid"/>
@@ -751,19 +744,14 @@
     <attack type="4" damage="1d6"/>
     <attack type="1" damage="1d5"/>
   </race>
-  <race name="catdragon" magres="0.900000" maxaura="1.0" regaura="1.0" weight="20000" capacity="10000" speed="1.0" hp="20" damage="2d40" unarmedattack="0" unarmeddefense="0" defensemodifier="50" fly="yes" walk="yes" teach="no" shapeshift="yes" giveitem="yes" giveperson="yes" getitem="yes">
-    <ai splitsize="1"/>
-    <attack type="4" damage="2d40"/>
-    <attack type="4" damage="2d40"/>
-    <attack type="4" damage="2d40"/>
-    <attack type="4" damage="2d40"/>
-  </race>
+
   <race name="ent" magres="0.250000" maxaura="1.0" regaura="0.500000" weight="5000" capacity="2500" speed="1.0" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" scarepeasants="yes" walk="yes" teach="no">
     <ai splitsize="1000" moverandom="yes" learn="yes"/>
     <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
+
   <race name="wyrm" magres="0.900000" maxaura="1.0" regaura="3.000000" weight="18000" capacity="1000000" speed="1.0" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
@@ -775,7 +763,9 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="powerful_dragonbreath"/>
   </race>
-  <race name="dragon" magres="0.700000" maxaura="1.0" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" giveitem="yes" resistbash="yes">
+
+  <race name="dragon" magres="0.700000" maxaura="1.0" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac=
+"6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" giveitem="yes" resistbash="yes">
     <ai splitsize="2" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agedragon"/>
@@ -787,6 +777,7 @@
     <attack type="4" damage="3d30"/>
     <attack type="6" spell="icy_dragonbreath"/>
   </race>
+
   <race name="youngdragon" magres="0.500000" maxaura="1.0" regaura="1.0" weight="20000" capacity="10000" speed="1.0" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
@@ -799,12 +790,14 @@
     <attack type="4" damage="1d30"/>
     <attack type="6" spell="fiery_dragonbreath"/>
   </race>
+
   <race name="illusion" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="0" capacity="0" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" walk="yes" canlearn="no" teach="no" noweapons="yes" illusionary="yes">
     <ai splitsize="999999"/>
     <function name="age" value="ageillusion"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d1"/>
   </race>
+
   <race name="undead" magres="0.000000" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <function name="name" value="nameundead"/>
@@ -838,30 +831,7 @@
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="0d0"/>
   </race>
-  <race name="template" magres="1.0" maxaura="0.000000" regaura="0.000000" weight="0" capacity="1000" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <attack type="1" damage="1d4"/>
-  </race>
-  <race name="gnome" magres="1.0" maxaura="0.000000" regaura="0.000000" weight="1000" capacity="540" speed="1.0" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
-    <ai splitsize="10000"/>
-    <skill name="tactics" modifier="1"/>
-    <skill name="stamina" modifier="1"/>
-    <skill name="unarmed" modifier="1"/>
-    <attack type="1" damage="1d4"/>
-  </race>
-  <race name="museumghost" magres="1.0" maxaura="0.000000" regaura="0.000000" weight="1000" capacity="540" speed="1.0" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
-    <ai splitsize="10000"/>
-    <skill name="tactics" modifier="1"/>
-    <skill name="stamina" modifier="1"/>
-    <skill name="unarmed" modifier="1"/>
-    <attack type="2" damage="5d600"/>
-    <attack type="3" damage="5d5"/>
-    <attack type="2" damage="5d600"/>
-    <attack type="2" damage="5d600"/>
-    <attack type="3" damage="5d5"/>
-    <attack type="2" damage="5d600"/>
-    <attack type="1" damage="1d4"/>
-  </race>
+
   <race name="ghast" magres="0.600000" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameghoul"/>
@@ -880,6 +850,7 @@
     <attack type="2" damage="1d30"/>
     <attack type="2" damage="1d30"/>
   </race>
+
   <race name="ghoul" magres="0.300000" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameghoul"/>
@@ -982,20 +953,7 @@
     <attack type="8" damage="1d10"/>
   </race>
 
-  <race name="shadowdragon" magres="0.950000" maxaura="1.0" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.0" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
-    <ai splitsize="1" killpeasants="yes" learn="yes"/>
-    <function name="name" value="namedragon"/>
-    <function name="move" value="movedragon"/>
-    <skill name="tactics" modifier="20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="6" spell="drain_skills"/>
-    <attack type="6" spell="aura_of_fear"/>
-    <precombatspell spell="shadowcall"/>
-  </race>
-
+  <!-- for the shadowcall spell -->
   <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="500" capacity="540" speed="1.0" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
     <function name="name" value="namegeneric"/>
@@ -1003,6 +961,7 @@
     <attack type="3" damage="1d1"/>
   </race>
 
+  <!-- for the shadowcall spell -->
   <race name="nightmare" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="100" capacity="540" speed="1.0" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes"/>
     <function name="name" value="namegeneric"/>
@@ -1013,6 +972,7 @@
     <attack type="2" damage="1d10"/>
   </race>
 
+  <!-- for the shadowcall spell -->
   <race name="vampunicorn" magres="1.0" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="5000" capacity="2000" speed="1.0" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" killpeasants="yes"/>
     <function name="name" value="namegeneric"/>

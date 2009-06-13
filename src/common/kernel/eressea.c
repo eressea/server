@@ -2689,6 +2689,15 @@ default_wage(const region *r, const faction * f, const race * rc)
   return wage;
 }
 
+static int
+minimum_wage(const region *r, const faction * f, const race * rc)
+{
+  if (f && rc) {
+    return rc->maintenance;
+  }
+  return default_wage(r, f, rc);
+}
+
 /* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
 * die Bauern wenn f == NULL. */
 int
@@ -2972,6 +2981,8 @@ attrib_init(void)
   register_bordertype(&bt_illusionwall);
   register_bordertype(&bt_road);
   register_bordertype(&bt_questportal);
+
+  register_function((pf_generic)&minimum_wage, "minimum_wage");
 
   at_register(&at_germs);
 #if XECMD_MODULE
