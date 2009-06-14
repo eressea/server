@@ -553,23 +553,24 @@ buildingeffsize(const building * b, boolean img)
 {
   int i = b->size, n = 0;
   const construction * cons;
-  static const struct building_type * bt_castle;
-  if (!bt_castle) bt_castle = bt_find("castle");
-  assert(bt_castle);
+  const struct building_type * btype = NULL;
 
   if (b==NULL) return 0;
 
-  if (b->type!=bt_castle) {
-    if (img) {
-      const attrib * a = a_find(b->attribs, &at_icastle);
-      if (!a || a->data.v != bt_castle) return 0;
-    } else return 0;
+  btype = b->type;
+  if (img) {
+    const attrib * a = a_find(b->attribs, &at_icastle);
+    if (a) {
+      btype = (const struct building_type *)a->data.v;
+    }
   }
-  cons = bt_castle->construction;
-  assert(cons);
+  cons = btype->construction;
+  if (!cons || !cons->improvement) {
+    return 0;
+  }
 
   while (cons && cons->maxsize != -1 && i>=cons->maxsize) {
-    i-=cons->maxsize;
+    i -= cons->maxsize;
     cons = cons->improvement;
     ++n;
   }

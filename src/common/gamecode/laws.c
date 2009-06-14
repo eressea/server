@@ -199,17 +199,24 @@ get_food(region *r)
 
   for (u = r->units; u; u = u->next) {
     int need = lifestyle(u);
+    static int food_rules = -1;
+
+    if (food_rules<0) {
+      food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
+    }
 
     /* Erstmal zurücksetzen */
     freset(u, UFL_HUNGER);
 
-    /* if the region is owned, and the owner is nice, then we'll get 
-     * food from the peasants */
-    if (owner!=NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
-      int rm = rmoney(r);
-      int use = MIN(rm, need);
-      rsetmoney(r, rm-use);
-      need -= use;
+    if (food_rules&1) {
+      /* if the region is owned, and the owner is nice, then we'll get 
+       * food from the peasants */
+      if (owner!=NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
+        int rm = rmoney(r);
+        int use = MIN(rm, need);
+        rsetmoney(r, rm-use);
+        need -= use;
+      }
     }
 
     need -= get_money(u);
@@ -2940,6 +2947,22 @@ static double rc_popularity(const struct race * rc)
   return 1.0/(pop-MORALE_COOLDOWN); /* 10 turns average */
 }
 
+void update_owners(region * r)
+{
+  building * blargest = NULL;
+  blargest = largestbuilding(r, &is_tax_building, false);
+  if (blargest) {
+    /* region owners update? */
+    faction * f = region_get_owner(r);
+    unit * u = buildingowner(r, blargest);
+    if (u==NULL) {
+      region_set_owner(r, NULL, turn);
+    } else if (u->faction!=f) {
+      region_set_owner(r, u->faction, turn);
+    }
+  }
+}
+
 static void age_region(region * r) 
 {
   a_age(&r->attribs);
@@ -3008,7 +3031,6 @@ ageing(void)
     building ** bp;
     unit ** up;
     ship ** sp;
-    building * blargest = NULL;
 
     age_region(r);
 
@@ -3035,17 +3057,7 @@ ageing(void)
       if (b==*bp) bp = &b->next;
     }
 
-    blargest = largestbuilding(r, &is_tax_building, false);
-    if (blargest) {
-      /* region owners update? */
-      faction * f = region_get_owner(r);
-      unit * u = buildingowner(r, blargest);
-      if (u==NULL) {
-        region_set_owner(r, NULL, turn);
-      } else if (u->faction!=f) {
-        region_set_owner(r, f, turn);
-      }
-    }
+    update_owners(r);
   }
 }
 

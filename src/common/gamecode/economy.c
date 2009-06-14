@@ -3263,6 +3263,11 @@ produce(void)
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
 
+    if (r->land && rule_taxation==1) {
+      /* new taxation rules, region owners make money based on morale and building */
+      peasant_taxes(r);
+    }
+
     buyorders = 0;
     sellorders = 0;
     working = 0;
@@ -3387,10 +3392,5 @@ produce(void)
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
-
-    if (r->land && rule_taxation==1) {
-      /* new taxation rules, region owners make money based on morale and building */
-      peasant_taxes(r);
-    }
   }
 }

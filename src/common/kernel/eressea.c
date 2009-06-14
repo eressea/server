@@ -1674,23 +1674,21 @@ cstring(const char *s)
 }
 
 building *
-largestbuilding (const region * r, boolean (*eval)(const struct building *), boolean imaginary)
+largestbuilding(const region * r, boolean (*eval)(const struct building *), boolean imaginary)
 {
-  static const building_type * btype = NULL;
   building *b, *best = NULL;
   /* durch die verw. von '>' statt '>=' werden die aelteren burgen
    * bevorzugt. */
 
   for (b = rbuildings(r); b; b = b->next) {
-    if (b->type!=btype) {
-      if (imaginary) {
-        const attrib * a = a_find(b->attribs, &at_icastle);
-        if (!a) continue;
-        if (eval && !eval(b)) continue;
-      } else continue;
+    if (eval && !eval(b)) continue;
+    if (!imaginary) {
+      const attrib * a = a_find(b->attribs, &at_icastle);
+      if (a) continue;
     }
-    if (best==NULL || b->size > best->size)
+    if (best==NULL || b->size > best->size) {
       best = b;
+    }
   }
   return best;
 }

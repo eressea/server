@@ -345,6 +345,24 @@ local function spells_csv()
   fail = 1
 end
 
+function test_taxes()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  r.peasants = 1000
+  r:set_resource("money", 5000)
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r, 1)
+  u:add_item("money", u.number * 10)
+  u:clear_orders()
+  u:add_order("LERNE Wahrnehmung")
+  local b = building.create(r, "watch")
+  b.size = 4
+  u.building = b
+  update_owners()
+  process_orders()
+  assert(u:get_item("money")==50)
+end
+
 function test_market()
   free_game()
   local r
@@ -383,6 +401,19 @@ function test_work()
   u:add_order("ARBEITEN")
   process_orders()
   assert(u:get_item("money")>=10)
+end
+
+function test_upkeep()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  f.id = 42
+  local u = unit.create(f, r, 5)
+  u:add_item("money", u.number * 11)
+  u:clear_orders()
+  u:add_order("LERNE Waffenbau")
+  process_orders()
+  assert(u:get_item("money")==u.number)
 end
 
 function test_herbalism()
@@ -441,12 +472,14 @@ tests = {
     ["spells"] = test_spells,
     ["herbalism"] = test_herbalism,
     ["storage"] = test_storage,
+    ["taxes"] = test_taxes,
+    ["upkeep"] = test_upkeep,
     ["work"] = test_work,
     ["market"] = test_market
 }
 mytests = {
-    ["work"] = test_work,
-    ["herbalism"] = test_herbalism
+    ["upkeep"] = test_upkeep,
+    ["taxes"] = test_taxes
 }
 fail = 0
 for k, v in pairs(mytests) do

@@ -333,6 +333,16 @@ tolua_update_scores(lua_State * tolua_S)
 }
 
 static int
+tolua_update_owners(lua_State * tolua_S)
+{
+  region * r;
+  for (r=regions;r;r=r->next) {
+    update_owners(r);
+  }
+  return 0;
+}
+
+static int
 tolua_update_subscriptions(lua_State * tolua_S)
 {
   update_subscriptions();
@@ -927,6 +937,7 @@ tolua_eressea_open(lua_State* tolua_S)
 
     tolua_function(tolua_S, "update_subscriptions", tolua_update_subscriptions);
     tolua_function(tolua_S, "update_scores", tolua_update_scores);
+    tolua_function(tolua_S, "update_owners", tolua_update_owners);
 
     tolua_function(tolua_S, "learn_skill", tolua_learn_skill);
 

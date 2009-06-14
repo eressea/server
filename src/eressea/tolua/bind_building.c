@@ -83,6 +83,20 @@ static int tolua_building_set_name(lua_State* tolua_S)
   return 0;
 }
 
+static int tolua_building_get_size(lua_State* tolua_S)
+{
+  building* self = (building*) tolua_tousertype(tolua_S, 1, 0);
+  tolua_pushnumber(tolua_S, self->size);
+  return 1;
+}
+
+static int tolua_building_set_size(lua_State* tolua_S)
+{
+  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
+  self->size = (int)tolua_tonumber(tolua_S, 2, 0);
+  return 0;
+}
+
 static int 
 tolua_building_get_units(lua_State* tolua_S)
 {
@@ -146,6 +160,7 @@ tolua_building_open(lua_State* tolua_S)
       tolua_variable(tolua_S, "name", tolua_building_get_name, tolua_building_set_name);
       tolua_variable(tolua_S, "units", tolua_building_get_units, NULL);
       tolua_variable(tolua_S, "region", tolua_building_get_region, tolua_building_set_region);
+      tolua_variable(tolua_S, "size", tolua_building_get_size, tolua_building_set_size);
       tolua_function(tolua_S, "add_action", tolua_building_addaction);
 #ifdef TODO
       .property("type", &building_gettype)
