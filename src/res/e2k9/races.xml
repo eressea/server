@@ -25,7 +25,7 @@
     <familiar race="imp"/>
   </race>
 
-  <race name="uruk" studyspeed="-5" magres="-0.05" maxaura="1.0" regaura="1.0" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="uruk" studyspeed="-5" magres="-0.05" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="troll"/>
@@ -98,7 +98,7 @@
   
   <!-- begin secondary races -->
 
-  <race name="demon" magres="0.150000" maxaura="1.0" regaura="1.1" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
+  <race name="demon" magres="0.150000" maxaura="1.0" regaura="1.1" recruitcost="360" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <skill name="cartmaking" modifier="-2"/>
@@ -119,7 +119,7 @@
     <familiar race="ghost"/>
   </race>
 
-  <race name="elf" magres="0.100000" maxaura="1.0" regaura="1.1" recruitcost="130" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="elf" magres="0.100000" maxaura="1.0" regaura="1.1" recruitcost="200" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <param name="regen.forest" value="2.0"/>
@@ -140,7 +140,7 @@
     <familiar race="unicorn"/>
   </race>
 
-  <race name="troll" magres="0.100000" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="2000" capacity="1080" speed="1.0" hp="20" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="troll" magres="0.100000" maxaura="1.0" regaura="1.0" recruitcost="260" maintenance="10" weight="2000" capacity="1080" speed="1.0" hp="20" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <param name="armor.stamina" value="3"/> <!-- +1 natural armor per X levels stamina -->
@@ -163,7 +163,7 @@
     <familiar race="rat"/>
   </race>
 
-  <race name="dwarf" magres="0.05" maxaura="1.0" regaura="0.9" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="dwarf" magres="0.05" maxaura="1.0" regaura="0.9" recruitcost="240" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <skill name="armorer" modifier="2"/>
