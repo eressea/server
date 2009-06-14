@@ -138,6 +138,7 @@
     <param name="rules.cavalry.mode" value="1"/>
     <param name="rules.magic.factionlist" value="1"/>
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
+    <param name="rules.magic.elfpower" value="1"/> <!-- elves get ring-of-power bonus in a forest -->
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.economy.wages" value="1"/>

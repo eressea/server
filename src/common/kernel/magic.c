@@ -1081,6 +1081,8 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
 {
   curse * c;
   double force = cast_level;
+  int elf_power = -1;
+
   if (sp==NULL) {
     return 0;
   } else {
@@ -1091,6 +1093,12 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
   }
 
   if (get_item(u, I_RING_OF_POWER) > 0) ++force;
+  if (elf_power<0) {
+    elf_power = get_param_int(global.parameters, "rules.magic.elfpower", 0);
+  }
+  if (elf_power && u->race==new_race[RC_ELF] && r_isforest(r)) {
+    ++force;
+  }
 
   /* Antimagie in der Zielregion */
   c = get_curse(r->attribs, ct_find("antimagiczone"));

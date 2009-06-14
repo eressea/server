@@ -722,6 +722,7 @@ static int
 CavalryBonus(const unit * u, troop enemy)
 {
   static int mode = -1;
+
   if (mode<0) {
     mode = get_param_int(global.parameters, "rules.cavalry.mode", 1);
   }
