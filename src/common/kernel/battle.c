@@ -718,8 +718,10 @@ static int CavalrySkill(void)
   return skill;
 }
 
+#define BONUS_SKILL 1
+#define BONUS_DAMAGE 2
 static int
-CavalryBonus(const unit * u, troop enemy)
+CavalryBonus(const unit * u, troop enemy, int type)
 {
   static int mode = -1;
 
@@ -728,15 +730,15 @@ CavalryBonus(const unit * u, troop enemy)
   }
   if (mode==0) {
     /* old rule, Eressea 1.0 compat */
-    return 2;
+    return (type==BONUS_SKILL)?2:0;
   } else {
     /* new rule, chargers in Eressea 1.1 */
     int skl = effskill(u, SK_RIDING);
     /* only half against trolls */
     if (enemy.fighter->unit->race==new_race[RC_TROLL]) {
-      skl = (skl-2)*3/4;
+      skl = skl/4;
     } else {
-      skl = (skl-2)*3/2;
+      skl = skl/2;
     }
     return MAX(skl, 0);
   }
@@ -790,7 +792,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 
   /* Burgenbonus, Pferdebonus */
   if (is_riding(t) && (wtype==NULL || (fval(wtype, WTF_HORSEBONUS) && !fval(wtype, WTF_MISSILE)))) {
-    skill += CavalryBonus(tu, enemy);
+    skill += CavalryBonus(tu, enemy, BONUS_SKILL);
     if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
   }
 
@@ -1117,6 +1119,10 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   weapon = select_weapon(dt, false, true); /* missile=true to get the unmodified best weapon she has */
   sd = weapon_effskill(dt, at, weapon, false, false);
   if (weapon!=NULL) dwtype=weapon->type;
+
+  if (is_riding(at) && (awtype==NULL || (fval(awtype, WTF_HORSEBONUS) && !fval(awtype, WTF_MISSILE)))) {
+    da += CavalryBonus(au, dt, BONUS_DAMAGE);
+  }
 
   if (armor) {
     ar += armor->prot;

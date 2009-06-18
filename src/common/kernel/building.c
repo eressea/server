@@ -230,18 +230,6 @@ findbuilding(int i)
 /* ** old building types ** */
 
 
-/** Building: Fortification */
-enum {
-	B_SITE,
-	B_TRADEPOST,
-	B_FORTIFICATION,
-	B_TOWER,
-	B_CASTLE,
-	B_FORTRESS,
-	B_CITADEL,
-	MAXBUILDINGS
-};
-
 static int
 sm_smithy(const unit * u, const region * r, skill_t sk, int value) /* skillmod */
 {
@@ -266,7 +254,7 @@ init_smithy(struct building_type * bt)
 static const char *
 castle_name(const struct building_type* btype, int bsize)
 {
-  const char * fname[MAXBUILDINGS] = {
+  const char * fname[] = {
     "site",
     "tradepost",
     "fortification",
@@ -290,7 +278,8 @@ castle_name(const struct building_type* btype, int bsize)
 static const char *
 fort_name(const struct building_type* btype, int bsize)
 {
-  const char * fname[MAXBUILDINGS] = {
+  const char * fname[] = {
+    "scaffolding",
     "guardhouse",
     "guardtower",
   };

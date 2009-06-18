@@ -134,7 +134,7 @@
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
     <param name="rules.combat.skill_bonus" value="0"/>
     <param name="rules.combat.loot" value="3"/> <!-- only self + monsters -->
-    <param name="rules.cavalry.skill" value="4"/>
+    <param name="rules.cavalry.skill" value="2"/>
     <param name="rules.cavalry.mode" value="1"/>
     <param name="rules.magic.factionlist" value="1"/>
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->

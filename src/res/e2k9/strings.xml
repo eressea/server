@@ -21,6 +21,10 @@
     <text locale="en">repeating crossbows</text>
   </string>
 
+  <string name="scaffolding">
+    <text locale="de">Gerüst</text>
+    <text locale="en">scaffolding</text>
+  </string>
   <string name="guardhouse">
     <text locale="de">Wachstube</text>
     <text locale="en">guard house</text>

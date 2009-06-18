@@ -606,6 +606,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 
     fprintf(F, "%d;cargo\n", n);
     fprintf(F, "%d;capacity\n", c);
+    fprintf(F, "%d;speed\n", shipspeed(sh, u));
 
     n = (n+99) / 100; /* 1 Silber = 1 GE */
     fprintf(F, "%d;Ladung\n", n);
