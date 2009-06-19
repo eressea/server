@@ -740,7 +740,7 @@ CavalryBonus(const unit * u, troop enemy, int type)
     } else {
       skl = skl/2;
     }
-    return MAX(skl, 0);
+    return MIN(skl, 4);
   }
 }
 
