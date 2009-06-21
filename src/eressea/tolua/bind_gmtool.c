@@ -10,36 +10,36 @@
 #include <tolua.h>
 
 static int
-tolua_run_mapper(lua_State* tolua_S)
+tolua_run_mapper(lua_State* L)
 {
   run_mapper();
   return 0;
 }
 
 static int
-tolua_highlight_region(lua_State* tolua_S)
+tolua_highlight_region(lua_State* L)
 {
-  region * r = tolua_tousertype(tolua_S, 1, 0);
-  int select = tolua_toboolean(tolua_S, 2, 0);
+  region * r = tolua_tousertype(L, 1, 0);
+  int select = tolua_toboolean(L, 2, 0);
   highlight_region(r, select);
   return 0;
 }
 
 static int
-tolua_current_region(lua_State* tolua_S)
+tolua_current_region(lua_State* L)
 {
   map_region * mr = cursor_region(&current_state->display, &current_state->cursor);
-  tolua_pushusertype(tolua_S, mr?mr->r:NULL, "region");
+  tolua_pushusertype(L, mr?mr->r:NULL, "region");
   return 1;
 }
 
 
 static int
-tolua_select_coordinate(lua_State* tolua_S)
+tolua_select_coordinate(lua_State* L)
 {
-  int x = (int)tolua_tonumber(tolua_S, 1, 0);
-  int y = (int)tolua_tonumber(tolua_S, 2, 0);
-  int select = tolua_toboolean(tolua_S, 3, 0);
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
+  int select = tolua_toboolean(L, 3, 0);
   if (current_state) {
     select_coordinate(current_state->selected, x, y, select);
   }
@@ -47,10 +47,10 @@ tolua_select_coordinate(lua_State* tolua_S)
 }
 
 static int
-tolua_select_region(lua_State* tolua_S)
+tolua_select_region(lua_State* L)
 {
-  region * r = tolua_tousertype(tolua_S, 1, 0);
-  int select = tolua_toboolean(tolua_S, 2, 0);
+  region * r = tolua_tousertype(L, 1, 0);
+  int select = tolua_toboolean(L, 2, 0);
   if (current_state) {
     select_coordinate(current_state->selected, r->x, r->y, select);
   }
@@ -105,11 +105,11 @@ tag_rewind(tag_iterator * iter)
 }
 
 static int 
-tolua_tags_next(lua_State *tolua_S)
+tolua_tags_next(lua_State *L)
 {
-  tag_iterator * iter = (tag_iterator *)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  tag_iterator * iter = (tag_iterator *)lua_touserdata(L, lua_upvalueindex(1));
   if (iter->node) {
-    tolua_pushusertype(tolua_S, (void*)iter->r, "region");
+    tolua_pushusertype(L, (void*)iter->r, "region");
     tag_advance(iter);
     return 1;
   }
@@ -119,59 +119,59 @@ tolua_tags_next(lua_State *tolua_S)
 }
 
 static int
-tolua_selected_regions(lua_State* tolua_S)
+tolua_selected_regions(lua_State* L)
 {
-  tag_iterator * iter = (tag_iterator*)lua_newuserdata(tolua_S, sizeof(tag_iterator));
+  tag_iterator * iter = (tag_iterator*)lua_newuserdata(L, sizeof(tag_iterator));
 
-  luaL_getmetatable(tolua_S, "tag_iterator");
-  lua_setmetatable(tolua_S, -2);
+  luaL_getmetatable(L, "tag_iterator");
+  lua_setmetatable(L, -2);
 
   iter->list = current_state->selected;
   tag_rewind(iter);
 
-  lua_pushcclosure(tolua_S, tolua_tags_next, 1);
+  lua_pushcclosure(L, tolua_tags_next, 1);
   return 1;
 }
 
 static int
-tolua_state_open(lua_State* tolua_S)
+tolua_state_open(lua_State* L)
 {
-  unused(tolua_S);
+  unused(L);
   state_open();
   return 0;
 }
 
 static int
-tolua_state_close(lua_State* tolua_S)
+tolua_state_close(lua_State* L)
 {
-  unused(tolua_S);
+  unused(L);
   state_close(current_state);
   return 0;
 }
 
 void
-tolua_gmtool_open(lua_State* tolua_S)
+tolua_gmtool_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(tolua_S, "tag_iterator");
+  tolua_usertype(L, "tag_iterator");
 
-  tolua_module(tolua_S, NULL, 0);
-  tolua_beginmodule(tolua_S, NULL);
+  tolua_module(L, NULL, 0);
+  tolua_beginmodule(L, NULL);
   {
-    tolua_module(tolua_S, "gmtool", 0);
-    tolua_beginmodule(tolua_S, "gmtool");
+    tolua_module(L, "gmtool", 0);
+    tolua_beginmodule(L, "gmtool");
     {
-      tolua_function(tolua_S, "open", tolua_state_open);
-      tolua_function(tolua_S, "close", tolua_state_close);
+      tolua_function(L, "open", tolua_state_open);
+      tolua_function(L, "close", tolua_state_close);
 
-      tolua_function(tolua_S, "editor", tolua_run_mapper);
-      tolua_function(tolua_S, "get_selection", tolua_selected_regions);
-      tolua_function(tolua_S, "get_cursor", tolua_current_region);
-      tolua_function(tolua_S, "highlight", tolua_highlight_region);
-      tolua_function(tolua_S, "select", tolua_select_region);
-      tolua_function(tolua_S, "select_at", tolua_select_coordinate);
+      tolua_function(L, "editor", tolua_run_mapper);
+      tolua_function(L, "get_selection", tolua_selected_regions);
+      tolua_function(L, "get_cursor", tolua_current_region);
+      tolua_function(L, "highlight", tolua_highlight_region);
+      tolua_function(L, "select", tolua_select_region);
+      tolua_function(L, "select_at", tolua_select_coordinate);
     }
-    tolua_endmodule(tolua_S);
+    tolua_endmodule(L);
   }
-  tolua_endmodule(tolua_S);
+  tolua_endmodule(L);
 }

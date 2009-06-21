@@ -15,7 +15,7 @@ extern "C" {
 #endif
   
   void register_tolua_helpers(void);
-  int tolua_toid(struct lua_State* tolua_S, int idx, int def);
+  int tolua_toid(struct lua_State* L, int idx, int def);
 
 #ifdef __cplusplus
 }

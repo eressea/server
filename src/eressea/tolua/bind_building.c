@@ -21,12 +21,12 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
-int tolua_buildinglist_next(lua_State *tolua_S)
+int tolua_buildinglist_next(lua_State *L)
 {
-  building** building_ptr = (building **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  building** building_ptr = (building **)lua_touserdata(L, lua_upvalueindex(1));
   building * u = *building_ptr;
   if (u != NULL) {
-    tolua_pushusertype(tolua_S, (void*)u, "building");
+    tolua_pushusertype(L, (void*)u, "building");
     *building_ptr = u->next;
     return 1;
   }
@@ -35,11 +35,11 @@ int tolua_buildinglist_next(lua_State *tolua_S)
 
 
 static int
-tolua_building_addaction(lua_State* tolua_S)
+tolua_building_addaction(lua_State* L)
 {
-  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
-  const char * fname = tolua_tostring(tolua_S, 2, 0);
-  const char * param = tolua_tostring(tolua_S, 3, 0);
+  building* self = (building*)tolua_tousertype(L, 1, 0);
+  const char * fname = tolua_tostring(L, 2, 0);
+  const char * param = tolua_tostring(L, 3, 0);
 
   building_addaction(self, fname, param);
 
@@ -47,133 +47,133 @@ tolua_building_addaction(lua_State* tolua_S)
 }
 
 static int
-tolua_building_get_objects(lua_State* tolua_S)
+tolua_building_get_objects(lua_State* L)
 {
-  building * self = (building *)tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, (void*)&self->attribs, "hashtable");
+  building * self = (building *)tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, (void*)&self->attribs, "hashtable");
   return 1;
 }
 
-static int tolua_building_get_region(lua_State* tolua_S)
+static int tolua_building_get_region(lua_State* L)
 {
-  building* self = (building*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, building_getregion(self), "region");
+  building* self = (building*) tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, building_getregion(self), "region");
   return 1;
 }
 
-static int tolua_building_set_region(lua_State* tolua_S)
+static int tolua_building_set_region(lua_State* L)
 {
-  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
-  building_setregion(self, (region*)tolua_tousertype(tolua_S, 2, 0));
+  building* self = (building*)tolua_tousertype(L, 1, 0);
+  building_setregion(self, (region*)tolua_tousertype(L, 2, 0));
   return 0;
 }
 
 
-static int tolua_building_get_name(lua_State* tolua_S)
+static int tolua_building_get_name(lua_State* L)
 {
-  building* self = (building*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, building_getname(self));
+  building* self = (building*) tolua_tousertype(L, 1, 0);
+  tolua_pushstring(L, building_getname(self));
   return 1;
 }
 
-static int tolua_building_set_name(lua_State* tolua_S)
+static int tolua_building_set_name(lua_State* L)
 {
-  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
-  building_setname(self, tolua_tostring(tolua_S, 2, 0));
+  building* self = (building*)tolua_tousertype(L, 1, 0);
+  building_setname(self, tolua_tostring(L, 2, 0));
   return 0;
 }
 
-static int tolua_building_get_size(lua_State* tolua_S)
+static int tolua_building_get_size(lua_State* L)
 {
-  building* self = (building*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, self->size);
+  building* self = (building*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, self->size);
   return 1;
 }
 
-static int tolua_building_set_size(lua_State* tolua_S)
+static int tolua_building_set_size(lua_State* L)
 {
-  building* self = (building*)tolua_tousertype(tolua_S, 1, 0);
-  self->size = (int)tolua_tonumber(tolua_S, 2, 0);
+  building* self = (building*)tolua_tousertype(L, 1, 0);
+  self->size = (int)tolua_tonumber(L, 2, 0);
   return 0;
 }
 
 static int 
-tolua_building_get_units(lua_State* tolua_S)
+tolua_building_get_units(lua_State* L)
 {
-  building * self = (building *)tolua_tousertype(tolua_S, 1, 0);
-  unit ** unit_ptr = (unit**)lua_newuserdata(tolua_S, sizeof(unit *));
+  building * self = (building *)tolua_tousertype(L, 1, 0);
+  unit ** unit_ptr = (unit**)lua_newuserdata(L, sizeof(unit *));
   unit * u = self->region->units;
 
   while (u && u->building!=self) u = u->next;
-  luaL_getmetatable(tolua_S, "unit");
-  lua_setmetatable(tolua_S, -2);
+  luaL_getmetatable(L, "unit");
+  lua_setmetatable(L, -2);
 
   *unit_ptr = u;
 
-  lua_pushcclosure(tolua_S, tolua_unitlist_nextb, 1);
+  lua_pushcclosure(L, tolua_unitlist_nextb, 1);
   return 1;
 }
 
 static int
-tolua_building_get_id(lua_State* tolua_S)
+tolua_building_get_id(lua_State* L)
 {
-  building * self = (building *)tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)self->no);
+  building * self = (building *)tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)self->no);
   return 1;
 }
 
 static int
-tolua_building_create(lua_State* tolua_S)
+tolua_building_create(lua_State* L)
 {
-  region * r = (region *)tolua_tousertype(tolua_S, 1, 0);
-  const char * bname = tolua_tostring(tolua_S, 2, 0);
+  region * r = (region *)tolua_tousertype(L, 1, 0);
+  const char * bname = tolua_tostring(L, 2, 0);
   if (bname) {
     const building_type * btype = bt_find(bname);
     building * b = new_building(btype, r, NULL);
-    tolua_pushusertype(tolua_S, (void*)b, "building");
+    tolua_pushusertype(L, (void*)b, "building");
     return 1;
   }
   return 0;
 }
 
 static int
-tolua_building_tostring(lua_State *tolua_S)
+tolua_building_tostring(lua_State *L)
 {
-  building * self = (building *)tolua_tousertype(tolua_S, 1, 0);
-  lua_pushstring(tolua_S, buildingname(self));
+  building * self = (building *)tolua_tousertype(L, 1, 0);
+  lua_pushstring(L, buildingname(self));
   return 1;
 }
 
 void
-tolua_building_open(lua_State* tolua_S)
+tolua_building_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(tolua_S, "building");
-  tolua_usertype(tolua_S, "building_list");
+  tolua_usertype(L, "building");
+  tolua_usertype(L, "building_list");
 
-  tolua_module(tolua_S, NULL, 0);
-  tolua_beginmodule(tolua_S, NULL);
+  tolua_module(L, NULL, 0);
+  tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(tolua_S, "building", "building", "", NULL);
-    tolua_beginmodule(tolua_S, "building");
+    tolua_cclass(L, "building", "building", "", NULL);
+    tolua_beginmodule(L, "building");
     {
-      tolua_function(tolua_S, "__tostring", tolua_building_tostring);
+      tolua_function(L, "__tostring", tolua_building_tostring);
 
-      tolua_variable(tolua_S, "id", tolua_building_get_id, NULL);
-      tolua_variable(tolua_S, "name", tolua_building_get_name, tolua_building_set_name);
-      tolua_variable(tolua_S, "units", tolua_building_get_units, NULL);
-      tolua_variable(tolua_S, "region", tolua_building_get_region, tolua_building_set_region);
-      tolua_variable(tolua_S, "size", tolua_building_get_size, tolua_building_set_size);
-      tolua_function(tolua_S, "add_action", tolua_building_addaction);
+      tolua_variable(L, "id", tolua_building_get_id, NULL);
+      tolua_variable(L, "name", tolua_building_get_name, tolua_building_set_name);
+      tolua_variable(L, "units", tolua_building_get_units, NULL);
+      tolua_variable(L, "region", tolua_building_get_region, tolua_building_set_region);
+      tolua_variable(L, "size", tolua_building_get_size, tolua_building_set_size);
+      tolua_function(L, "add_action", tolua_building_addaction);
 #ifdef TODO
       .property("type", &building_gettype)
       .def_readwrite("size", &building::size)
 #endif
-      tolua_variable(tolua_S, "objects", tolua_building_get_objects, 0);
+      tolua_variable(L, "objects", tolua_building_get_objects, 0);
 
-      tolua_function(tolua_S, "create", tolua_building_create);
+      tolua_function(L, "create", tolua_building_create);
     }
-    tolua_endmodule(tolua_S);
+    tolua_endmodule(L);
   }
-  tolua_endmodule(tolua_S);
+  tolua_endmodule(L);
 }

@@ -15,8 +15,8 @@ extern "C" {
 #endif
 
   struct lua_State;
-  void tolua_region_open(struct lua_State *tolua_S);
-  int tolua_regionlist_next(struct lua_State *tolua_S);
+  void tolua_region_open(struct lua_State *L);
+  int tolua_regionlist_next(struct lua_State *L);
 
 #ifdef __cplusplus
 }

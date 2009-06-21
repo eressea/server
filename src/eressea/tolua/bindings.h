@@ -15,10 +15,10 @@ extern "C" {
 #endif
 
   struct lua_State;
-  int tolua_eressea_open(struct lua_State* tolua_S);
-  int tolua_spelllist_next(struct lua_State *tolua_S);
-  int tolua_itemlist_next(struct lua_State *tolua_S);
-  int tolua_orderlist_next(struct lua_State *tolua_S);
+  int tolua_eressea_open(struct lua_State* L);
+  int tolua_spelllist_next(struct lua_State *L);
+  int tolua_itemlist_next(struct lua_State *L);
+  int tolua_orderlist_next(struct lua_State *L);
 
 #ifdef __cplusplus
 }

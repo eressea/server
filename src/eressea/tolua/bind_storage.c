@@ -25,10 +25,10 @@ without prior permission by the authors of Eressea.
 
 
 static int
-tolua_storage_create(lua_State* tolua_S)
+tolua_storage_create(lua_State* L)
 {
-  const char * filename = tolua_tostring(tolua_S, 1, 0);
-  const char * type = tolua_tostring(tolua_S, 2, "rb");
+  const char * filename = tolua_tostring(L, 1, 0);
+  const char * type = tolua_tostring(L, 2, "rb");
   storage * store = 0;
   int mode = IO_READ;
   if (strchr(type, 't')) {
@@ -41,53 +41,53 @@ tolua_storage_create(lua_State* tolua_S)
   if (strchr(type, 'r')) mode = IO_READ;
   if (strchr(type, 'w')) mode = IO_WRITE;
   store->open(store, filename, mode);
-  tolua_pushusertype(tolua_S, (void*)store, "storage");
+  tolua_pushusertype(L, (void*)store, "storage");
   return 1;
 }
 
 static int
-tolua_storage_read_unit(lua_State *tolua_S)
+tolua_storage_read_unit(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
   struct unit * u = read_unit(self);
-  tolua_pushusertype(tolua_S, (void*)u, "unit");
+  tolua_pushusertype(L, (void*)u, "unit");
   return 1;
 }
 
 static int
-tolua_storage_write_unit(lua_State *tolua_S)
+tolua_storage_write_unit(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
-  struct unit * u = (struct unit *)tolua_tousertype(tolua_S, 2, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
+  struct unit * u = (struct unit *)tolua_tousertype(L, 2, 0);
   write_unit(self, u);
   return 0;
 }
 
 
 static int
-tolua_storage_read_float(lua_State *tolua_S)
+tolua_storage_read_float(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
   float num = self->r_flt(self);
-  tolua_pushnumber(tolua_S, (lua_Number)num);
+  tolua_pushnumber(L, (lua_Number)num);
   return 1;
 }
 
 static int
-tolua_storage_read_int(lua_State *tolua_S)
+tolua_storage_read_int(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
   int num = self->r_int(self);
-  tolua_pushnumber(tolua_S, (lua_Number)num);
+  tolua_pushnumber(L, (lua_Number)num);
   return 1;
 }
 
 static int
-tolua_storage_write(lua_State *tolua_S)
+tolua_storage_write(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
-  if (tolua_isnumber(tolua_S, 2, 0, 0)) {
-    lua_Number num = tolua_tonumber(tolua_S, 2, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
+  if (tolua_isnumber(L, 2, 0, 0)) {
+    lua_Number num = tolua_tonumber(L, 2, 0);
     double n;
     if (modf(num, &n)==0.0) {
       self->w_int(self, (int)num);
@@ -99,45 +99,45 @@ tolua_storage_write(lua_State *tolua_S)
 }
 
 static int
-tolua_storage_tostring(lua_State *tolua_S)
+tolua_storage_tostring(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
   char name[64];
   snprintf(name, sizeof(name), "<storage enc=%d ver=%d>", self->encoding, self->version);
-  lua_pushstring(tolua_S, name);
+  lua_pushstring(L, name);
   return 1;
 }
 
 static int
-tolua_storage_close(lua_State *tolua_S)
+tolua_storage_close(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(tolua_S, 1, 0);
+  storage * self = (storage *)tolua_tousertype(L, 1, 0);
   self->close(self);
   return 0;
 }
 
 void
-tolua_storage_open(lua_State* tolua_S)
+tolua_storage_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(tolua_S, "storage");
+  tolua_usertype(L, "storage");
 
-  tolua_module(tolua_S, NULL, 0);
-  tolua_beginmodule(tolua_S, NULL);
+  tolua_module(L, NULL, 0);
+  tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(tolua_S, "storage", "storage", "", NULL);
-    tolua_beginmodule(tolua_S, "storage");
+    tolua_cclass(L, "storage", "storage", "", NULL);
+    tolua_beginmodule(L, "storage");
     {
-      tolua_function(tolua_S, "__tostring", tolua_storage_tostring);
-      tolua_function(tolua_S, "write", tolua_storage_write);
-      tolua_function(tolua_S, "read_int", tolua_storage_read_int);
-      tolua_function(tolua_S, "read_float", tolua_storage_read_float);
-      tolua_function(tolua_S, "write_unit", tolua_storage_write_unit);
-      tolua_function(tolua_S, "read_unit", tolua_storage_read_unit);
-      tolua_function(tolua_S, "close", tolua_storage_close);
-      tolua_function(tolua_S, "create", tolua_storage_create);
+      tolua_function(L, "__tostring", tolua_storage_tostring);
+      tolua_function(L, "write", tolua_storage_write);
+      tolua_function(L, "read_int", tolua_storage_read_int);
+      tolua_function(L, "read_float", tolua_storage_read_float);
+      tolua_function(L, "write_unit", tolua_storage_write_unit);
+      tolua_function(L, "read_unit", tolua_storage_read_unit);
+      tolua_function(L, "close", tolua_storage_close);
+      tolua_function(L, "create", tolua_storage_create);
     }
-    tolua_endmodule(tolua_S);
+    tolua_endmodule(L);
   }
-  tolua_endmodule(tolua_S);
+  tolua_endmodule(L);
 }

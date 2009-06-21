@@ -195,129 +195,129 @@ msg_send_region(lua_message * lmsg, region * r)
 
 
 static int
-tolua_msg_create(lua_State * tolua_S)
+tolua_msg_create(lua_State * L)
 {
-  const char * type = tolua_tostring(tolua_S, 1, 0);
+  const char * type = tolua_tostring(L, 1, 0);
   lua_message * lmsg = msg_create_message(type);
-  tolua_pushusertype(tolua_S, (void*)lmsg, "message");
+  tolua_pushusertype(L, (void*)lmsg, "message");
   return 1;
 }
 static int
-tolua_msg_set_string(lua_State * tolua_S)
+tolua_msg_set_string(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  const char * param = tolua_tostring(tolua_S, 2, 0);
-  const char * value = tolua_tostring(tolua_S, 3, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  const char * param = tolua_tostring(L, 2, 0);
+  const char * value = tolua_tostring(L, 3, 0);
   int result = msg_set_string(lmsg, param, value);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_msg_set_int(lua_State * tolua_S)
+tolua_msg_set_int(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  const char * param = tolua_tostring(tolua_S, 2, 0);
-  int value = (int)tolua_tonumber(tolua_S, 3, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  const char * param = tolua_tostring(L, 2, 0);
+  int value = (int)tolua_tonumber(L, 3, 0);
   int result = msg_set_int(lmsg, param, value);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_msg_set_resource(lua_State * tolua_S)
+tolua_msg_set_resource(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  const char * param = tolua_tostring(tolua_S, 2, 0);
-  const char * value = tolua_tostring(tolua_S, 3, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  const char * param = tolua_tostring(L, 2, 0);
+  const char * value = tolua_tostring(L, 3, 0);
   int result = msg_set_resource(lmsg, param, value);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_msg_set_unit(lua_State * tolua_S)
+tolua_msg_set_unit(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  const char * param = tolua_tostring(tolua_S, 2, 0);
-  unit * value = (unit *)tolua_tousertype(tolua_S, 3, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  const char * param = tolua_tostring(L, 2, 0);
+  unit * value = (unit *)tolua_tousertype(L, 3, 0);
   int result = msg_set_unit(lmsg, param, value);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_msg_set_region(lua_State * tolua_S)
+tolua_msg_set_region(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  const char * param = tolua_tostring(tolua_S, 2, 0);
-  region * value = (region *)tolua_tousertype(tolua_S, 3, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  const char * param = tolua_tostring(L, 2, 0);
+  region * value = (region *)tolua_tousertype(L, 3, 0);
   int result = msg_set_region(lmsg, param, value);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_msg_set(lua_State * tolua_S)
+tolua_msg_set(lua_State * L)
 {
   tolua_Error err;
-  if (tolua_isnumber(tolua_S, 3, 0, &err)) {
-    return tolua_msg_set_int(tolua_S);
-  } else if (tolua_isusertype(tolua_S, 3, "region", 0, &err)) {
-    return tolua_msg_set_region(tolua_S);
-  } else if (tolua_isusertype(tolua_S, 3, "unit", 0, &err)) {
-    return tolua_msg_set_unit(tolua_S);
+  if (tolua_isnumber(L, 3, 0, &err)) {
+    return tolua_msg_set_int(L);
+  } else if (tolua_isusertype(L, 3, "region", 0, &err)) {
+    return tolua_msg_set_region(L);
+  } else if (tolua_isusertype(L, 3, "unit", 0, &err)) {
+    return tolua_msg_set_unit(L);
   }
-  tolua_pushnumber(tolua_S, (lua_Number)-1);
+  tolua_pushnumber(L, (lua_Number)-1);
   return 1;
 }
 
 static int
-tolua_msg_send_region(lua_State * tolua_S)
+tolua_msg_send_region(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  region * r = (region *)tolua_tousertype(tolua_S, 2, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  region * r = (region *)tolua_tousertype(L, 2, 0);
   int result = msg_send_region(lmsg, r);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_msg_send_faction(lua_State * tolua_S)
+tolua_msg_send_faction(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(tolua_S, 1, 0);
-  faction * f = (faction *)tolua_tousertype(tolua_S, 2, 0);
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  faction * f = (faction *)tolua_tousertype(L, 2, 0);
   int result = msg_send_faction(lmsg, f);
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 void
-tolua_message_open(lua_State* tolua_S)
+tolua_message_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(tolua_S, "message");
+  tolua_usertype(L, "message");
 
-  tolua_module(tolua_S, NULL, 0);
-  tolua_beginmodule(tolua_S, NULL);
+  tolua_module(L, NULL, 0);
+  tolua_beginmodule(L, NULL);
   {
-    tolua_function(tolua_S, "message", tolua_msg_create);
+    tolua_function(L, "message", tolua_msg_create);
 
-    tolua_cclass(tolua_S, "message", "message", "", NULL);
-    tolua_beginmodule(tolua_S, "message");
+    tolua_cclass(L, "message", "message", "", NULL);
+    tolua_beginmodule(L, "message");
     {
-      tolua_function(tolua_S, "set", tolua_msg_set);
-      tolua_function(tolua_S, "set_unit", tolua_msg_set_unit);
-      tolua_function(tolua_S, "set_region", tolua_msg_set_region);
-      tolua_function(tolua_S, "set_resource", tolua_msg_set_resource);
-      tolua_function(tolua_S, "set_int", tolua_msg_set_int);
-      tolua_function(tolua_S, "set_string", tolua_msg_set_string);
-      tolua_function(tolua_S, "send_faction", tolua_msg_send_faction);
-      tolua_function(tolua_S, "send_region", tolua_msg_send_region);
+      tolua_function(L, "set", tolua_msg_set);
+      tolua_function(L, "set_unit", tolua_msg_set_unit);
+      tolua_function(L, "set_region", tolua_msg_set_region);
+      tolua_function(L, "set_resource", tolua_msg_set_resource);
+      tolua_function(L, "set_int", tolua_msg_set_int);
+      tolua_function(L, "set_string", tolua_msg_set_string);
+      tolua_function(L, "send_faction", tolua_msg_send_faction);
+      tolua_function(L, "send_region", tolua_msg_send_region);
 
-      tolua_function(tolua_S, "create", tolua_msg_create);
+      tolua_function(L, "create", tolua_msg_create);
     }
-    tolua_endmodule(tolua_S);
+    tolua_endmodule(L);
   }
-  tolua_endmodule(tolua_S);
+  tolua_endmodule(L);
 }

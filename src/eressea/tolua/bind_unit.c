@@ -50,32 +50,32 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 
 static int
-tolua_unit_get_objects(lua_State* tolua_S)
+tolua_unit_get_objects(lua_State* L)
 {
-  unit * self = (unit *)tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, (void*)&self->attribs, "hashtable");
+  unit * self = (unit *)tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, (void*)&self->attribs, "hashtable");
   return 1;
 }
 
-int tolua_unitlist_nextf(lua_State *tolua_S)
+int tolua_unitlist_nextf(lua_State *L)
 {
-  unit** unit_ptr = (unit **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  unit** unit_ptr = (unit **)lua_touserdata(L, lua_upvalueindex(1));
   unit * u = *unit_ptr;
   if (u != NULL) {
-    tolua_pushusertype(tolua_S, (void*)u, "unit");
+    tolua_pushusertype(L, (void*)u, "unit");
     *unit_ptr = u->nextF;
     return 1;
   }
   else return 0;  /* no more values to return */
 }
 
-int tolua_unitlist_nextb(lua_State *tolua_S)
+int tolua_unitlist_nextb(lua_State *L)
 {
-  unit** unit_ptr = (unit **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  unit** unit_ptr = (unit **)lua_touserdata(L, lua_upvalueindex(1));
   unit * u = *unit_ptr;
   if (u != NULL) {
     unit * unext = u->next;
-    tolua_pushusertype(tolua_S, (void*)u, "unit");
+    tolua_pushusertype(L, (void*)u, "unit");
 
     while (unext && unext->building!=u->building) {
       unext = unext->next;
@@ -87,13 +87,13 @@ int tolua_unitlist_nextb(lua_State *tolua_S)
   else return 0;  /* no more values to return */
 }
 
-int tolua_unitlist_nexts(lua_State *tolua_S)
+int tolua_unitlist_nexts(lua_State *L)
 {
-  unit** unit_ptr = (unit **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  unit** unit_ptr = (unit **)lua_touserdata(L, lua_upvalueindex(1));
   unit * u = *unit_ptr;
   if (u != NULL) {
     unit * unext = u->next;
-    tolua_pushusertype(tolua_S, (void*)u, "unit");
+    tolua_pushusertype(L, (void*)u, "unit");
 
     while (unext && unext->ship!=u->ship) {
       unext = unext->next;
@@ -105,12 +105,12 @@ int tolua_unitlist_nexts(lua_State *tolua_S)
   else return 0;  /* no more values to return */
 }
 
-int tolua_unitlist_next(lua_State *tolua_S)
+int tolua_unitlist_next(lua_State *L)
 {
-  unit** unit_ptr = (unit **)lua_touserdata(tolua_S, lua_upvalueindex(1));
+  unit** unit_ptr = (unit **)lua_touserdata(L, lua_upvalueindex(1));
   unit * u = *unit_ptr;
   if (u != NULL) {
-    tolua_pushusertype(tolua_S, (void*)u, "unit");
+    tolua_pushusertype(L, (void*)u, "unit");
     *unit_ptr = u->next;
     return 1;
   }
@@ -118,80 +118,80 @@ int tolua_unitlist_next(lua_State *tolua_S)
 }
 
 
-static int tolua_unit_get_name(lua_State* tolua_S)
+static int tolua_unit_get_name(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, self->name);
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushstring(L, self->name);
   return 1;
 }
 
-static int tolua_unit_set_name(lua_State* tolua_S)
+static int tolua_unit_set_name(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setname(self, tolua_tostring(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setname(self, tolua_tostring(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_info(lua_State* tolua_S)
+static int tolua_unit_get_info(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, unit_getinfo(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushstring(L, unit_getinfo(self));
   return 1;
 }
 
-static int tolua_unit_set_info(lua_State* tolua_S)
+static int tolua_unit_set_info(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setinfo(self, tolua_tostring(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setinfo(self, tolua_tostring(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_id(lua_State* tolua_S)
+static int tolua_unit_get_id(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)unit_getid(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)unit_getid(self));
   return 1;
 }
 
-static int tolua_unit_set_id(lua_State* tolua_S)
+static int tolua_unit_set_id(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setid(self, (int)tolua_tonumber(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setid(self, (int)tolua_tonumber(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_hpmax(lua_State* tolua_S)
+static int tolua_unit_get_hpmax(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)unit_max_hp(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)unit_max_hp(self));
   return 1;
 }
 
-static int tolua_unit_get_hp(lua_State* tolua_S)
+static int tolua_unit_get_hp(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)unit_gethp(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)unit_gethp(self));
   return 1;
 }
 
-static int tolua_unit_set_hp(lua_State* tolua_S)
+static int tolua_unit_set_hp(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_sethp(self, (int)tolua_tonumber(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_sethp(self, (int)tolua_tonumber(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_number(lua_State* tolua_S)
+static int tolua_unit_get_number(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)self->number);
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)self->number);
   return 1;
 }
 
-static int tolua_unit_set_number(lua_State* tolua_S)
+static int tolua_unit_set_number(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  int number = (int)tolua_tonumber(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  int number = (int)tolua_tonumber(L, 2, 0);
   if (self->number==0) {
     set_number(self, number);
     self->hp = unit_max_hp(self) * number;
@@ -201,17 +201,17 @@ static int tolua_unit_set_number(lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_unit_get_flags(lua_State* tolua_S)
+static int tolua_unit_get_flags(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)self->flags);
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)self->flags);
   return 1;
 }
 
-static int tolua_unit_set_flags(lua_State* tolua_S)
+static int tolua_unit_set_flags(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  self->flags = (int)tolua_tonumber(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  self->flags = (int)tolua_tonumber(L, 2, 0);
   return 0;
 }
 
@@ -222,10 +222,10 @@ unit_getmagic(const unit * u)
   return mage?magic_school[mage->magietyp]:NULL;
 }
 
-static int tolua_unit_get_magic(lua_State* tolua_S)
+static int tolua_unit_get_magic(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  lua_pushstring(tolua_S, unit_getmagic(self));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  lua_pushstring(L, unit_getmagic(self));
   return 1;
 }
 
@@ -243,61 +243,61 @@ unit_setmagic(unit * u, const char * type)
   }
 }
 
-static int tolua_unit_set_magic(lua_State* tolua_S)
+static int tolua_unit_set_magic(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * type = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * type = tolua_tostring(L, 2, 0);
   unit_setmagic(self, type);
   return 0;
 }
 
-static int tolua_unit_get_aura(lua_State* tolua_S)
+static int tolua_unit_get_aura(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)get_spellpoints(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)get_spellpoints(self));
   return 1;
 }
 
-static int tolua_unit_set_aura(lua_State* tolua_S)
+static int tolua_unit_set_aura(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  set_spellpoints(self, (int)tolua_tonumber(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  set_spellpoints(self, (int)tolua_tonumber(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_age(lua_State* tolua_S)
+static int tolua_unit_get_age(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)self->age);
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)self->age);
   return 1;
 }
 
-static int tolua_unit_set_age(lua_State* tolua_S)
+static int tolua_unit_set_age(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  self->age = (short)tolua_tonumber(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  self->age = (short)tolua_tonumber(L, 2, 0);
   return 0;
 }
 
-static int tolua_unit_get_status(lua_State* tolua_S)
+static int tolua_unit_get_status(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)unit_getstatus(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)unit_getstatus(self));
   return 1;
 }
 
-static int tolua_unit_set_status(lua_State* tolua_S)
+static int tolua_unit_set_status(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setstatus(self, (status_t)tolua_tonumber(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setstatus(self, (status_t)tolua_tonumber(L, 2, 0));
   return 0;
 }
 
 static int
-tolua_unit_get_item(lua_State* tolua_S)
+tolua_unit_get_item(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * iname = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * iname = tolua_tostring(L, 2, 0);
   int result = -1;
 
   if (iname!=NULL) {
@@ -306,16 +306,16 @@ tolua_unit_get_item(lua_State* tolua_S)
       result = i_get(self->items, itype);
     }
   }
-  tolua_pushnumber(tolua_S, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_unit_add_item(lua_State* tolua_S)
+tolua_unit_add_item(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * iname = tolua_tostring(tolua_S, 2, 0);
-  int number = (int)tolua_tonumber(tolua_S, 3, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * iname = tolua_tostring(L, 2, 0);
+  int number = (int)tolua_tonumber(L, 3, 0);
   int result = -1;
 
   if (iname!=NULL) {
@@ -325,15 +325,15 @@ tolua_unit_add_item(lua_State* tolua_S)
       result = i?i->number:0;
     }
   }
-  lua_pushnumber(tolua_S, (lua_Number)result);
+  lua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_unit_getskill(lua_State* tolua_S)
+tolua_unit_getskill(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * skname = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * skname = tolua_tostring(L, 2, 0);
   skill_t sk = sk_find(skname);
   int value = -1;
   if (sk!=NOSKILL) {
@@ -343,18 +343,18 @@ tolua_unit_getskill(lua_State* tolua_S)
     }
     else value = 0;
   }
-  lua_pushnumber(tolua_S, (lua_Number)value);
+  lua_pushnumber(L, (lua_Number)value);
   return 1;
 }
 
 static int
-tolua_unit_effskill(lua_State* tolua_S)
+tolua_unit_effskill(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * skname = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * skname = tolua_tostring(L, 2, 0);
   skill_t sk = sk_find(skname);
   int value = (sk==NOSKILL)?-1:eff_skill(self, sk, self->region);
-  lua_pushnumber(tolua_S, (lua_Number)value);
+  lua_pushnumber(L, (lua_Number)value);
   return 1;
 }
 
@@ -424,24 +424,24 @@ trigger_lua(struct unit * u, int handle)
 }
 
 static int
-tolua_unit_addhandler(lua_State* tolua_S)
+tolua_unit_addhandler(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * ename = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * ename = tolua_tostring(L, 2, 0);
   int handle;
 
-  lua_pushvalue(tolua_S, 3);
-  handle = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+  lua_pushvalue(L, 3);
+  handle = luaL_ref(L, LUA_REGISTRYINDEX);
   add_trigger(&self->attribs, ename, trigger_lua(self, handle));
 
   return 0;
 }
 
 static int
-tolua_unit_addnotice(lua_State* tolua_S)
+tolua_unit_addnotice(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * str = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * str = tolua_tostring(L, 2, 0);
 
   addmessage(self->region, self->faction, str, MSG_MESSAGE, ML_IMPORTANT);
   return 0;
@@ -477,10 +477,10 @@ unit_castspell(unit * u, const char * name)
 }
 
 static int
-tolua_unit_castspell(lua_State* tolua_S)
+tolua_unit_castspell(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * str = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * str = tolua_tostring(L, 2, 0);
   unit_castspell(self, str);
   return 0;
 }
@@ -505,10 +505,10 @@ unit_addspell(unit * u, const char * name)
 }
 
 static int
-tolua_unit_addspell(lua_State* tolua_S)
+tolua_unit_addspell(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * str = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * str = tolua_tostring(L, 2, 0);
   unit_addspell(self, str);
   return 0;
 }
@@ -530,66 +530,66 @@ unit_removespell(unit * u, const spell * sp)
 }
 
 static int
-tolua_unit_removespell(lua_State* tolua_S)
+tolua_unit_removespell(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  spell * sp = (spell*)tolua_tousertype(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  spell * sp = (spell*)tolua_tousertype(L, 2, 0);
   unit_removespell(self, sp);
   return 0;
 }
 
 static int
-tolua_unit_setracename(lua_State* tolua_S)
+tolua_unit_setracename(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * str = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * str = tolua_tostring(L, 2, 0);
 
   set_racename(&self->attribs, str);
   return 0;
 }
 
 static int
-tolua_unit_setskill(lua_State* tolua_S)
+tolua_unit_setskill(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * skname = tolua_tostring(tolua_S, 2, 0);
-  int level = (int)tolua_tonumber(tolua_S, 3, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * skname = tolua_tostring(L, 2, 0);
+  int level = (int)tolua_tonumber(L, 3, 0);
   skill_t sk = sk_find(skname);
   if (sk!=NOSKILL) {
     set_level(self, sk, level);
   } else {
     level = -1;
   }
-  lua_pushnumber(tolua_S, (lua_Number)level);
+  lua_pushnumber(L, (lua_Number)level);
   return 1;
 }
 
 static int
-tolua_unit_use_pooled(lua_State* tolua_S)
+tolua_unit_use_pooled(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * iname = tolua_tostring(tolua_S, 2, 0);
-  int number = (int)tolua_tonumber(tolua_S, 3, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * iname = tolua_tostring(L, 2, 0);
+  int number = (int)tolua_tonumber(L, 3, 0);
   const resource_type * rtype = rt_find(iname);
   int result = -1;
   if (rtype!=NULL) {
     result = use_pooled(self, rtype, GET_DEFAULT, number);
   }
-  lua_pushnumber(tolua_S, (lua_Number)result);
+  lua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
 static int
-tolua_unit_get_pooled(lua_State* tolua_S)
+tolua_unit_get_pooled(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * iname = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * iname = tolua_tostring(L, 2, 0);
   const resource_type * rtype = rt_find(iname);
   int result = -1;
   if (rtype!=NULL) {
     result = get_pooled(self, rtype, GET_DEFAULT, INT_MAX);
   }
-  lua_pushnumber(tolua_S, (lua_Number)result);
+  lua_pushnumber(L, (lua_Number)result);
   return 1;
 }
 
@@ -603,24 +603,24 @@ unit_getfamiliar(const unit * u)
   return NULL;
 }
 
-static int tolua_unit_get_familiar(lua_State* tolua_S)
+static int tolua_unit_get_familiar(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, unit_getfamiliar(self), "unit");
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, unit_getfamiliar(self), "unit");
   return 1;
 }
 
-static int tolua_unit_set_familiar(lua_State* tolua_S)
+static int tolua_unit_set_familiar(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  create_newfamiliar(self, (unit *)tolua_tousertype(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  create_newfamiliar(self, (unit *)tolua_tousertype(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_building(lua_State* tolua_S)
+static int tolua_unit_get_building(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, self->building, "building");
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, self->building, "building");
   return 1;
 }
 
@@ -634,17 +634,17 @@ unit_setbuilding(unit * u, building * b)
   u->building = b;
 }
 
-static int tolua_unit_set_building(lua_State* tolua_S)
+static int tolua_unit_set_building(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setbuilding(self, (building *)tolua_tousertype(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setbuilding(self, (building *)tolua_tousertype(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_ship(lua_State* tolua_S)
+static int tolua_unit_get_ship(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, self->ship, "ship");
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, self->ship, "ship");
   return 1;
 }
 
@@ -658,17 +658,17 @@ unit_setship(unit * u, ship * s)
   u->ship = s;
 }
 
-static int tolua_unit_set_ship(lua_State* tolua_S)
+static int tolua_unit_set_ship(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setship(self, (ship *)tolua_tousertype(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setship(self, (ship *)tolua_tousertype(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_get_region(lua_State* tolua_S)
+static int tolua_unit_get_region(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, self->region, "region");
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, self->region, "region");
   return 1;
 }
 
@@ -678,99 +678,99 @@ unit_setregion(unit * u, region * r)
   move_unit(u, r, NULL);
 }
 
-static int tolua_unit_set_region(lua_State* tolua_S)
+static int tolua_unit_set_region(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  unit_setregion(self, (region *)tolua_tousertype(tolua_S, 2, 0));
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  unit_setregion(self, (region *)tolua_tousertype(L, 2, 0));
   return 0;
 }
 
-static int tolua_unit_add_order(lua_State* tolua_S)
+static int tolua_unit_add_order(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * str = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * str = tolua_tostring(L, 2, 0);
   order * ord = parse_order(str, self->faction->locale);
   unit_addorder(self, ord);
   return 0;
 }
 
-static int tolua_unit_clear_orders(lua_State* tolua_S)
+static int tolua_unit_clear_orders(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
   free_orders(&self->orders);
   return 0;
 }
 
-static int tolua_unit_get_items(lua_State* tolua_S)
+static int tolua_unit_get_items(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
 
-  item ** item_ptr = (item **)lua_newuserdata(tolua_S, sizeof(item *));
+  item ** item_ptr = (item **)lua_newuserdata(L, sizeof(item *));
 
-  luaL_getmetatable(tolua_S, "item");
-  lua_setmetatable(tolua_S, -2);
+  luaL_getmetatable(L, "item");
+  lua_setmetatable(L, -2);
 
   *item_ptr = self->items;
 
-  lua_pushcclosure(tolua_S, tolua_itemlist_next, 1);
+  lua_pushcclosure(L, tolua_itemlist_next, 1);
 
   return 1;
 }
 
-static int tolua_unit_get_spells(lua_State* tolua_S)
+static int tolua_unit_get_spells(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
   sc_mage * mage = get_mage(self);
 
   if (mage) {
     spell_list ** slist = get_spelllist(mage, self->faction);
     assert(slist);
     if (slist) {
-      spell_list ** spell_ptr = (spell_list **)lua_newuserdata(tolua_S, sizeof(spell_list *));
-      luaL_getmetatable(tolua_S, "spell_list");
-      lua_setmetatable(tolua_S, -2);
+      spell_list ** spell_ptr = (spell_list **)lua_newuserdata(L, sizeof(spell_list *));
+      luaL_getmetatable(L, "spell_list");
+      lua_setmetatable(L, -2);
 
       *spell_ptr = *slist;
-      lua_pushcclosure(tolua_S, tolua_spelllist_next, 1);
+      lua_pushcclosure(L, tolua_spelllist_next, 1);
       return 1;
     }
   }
 
-  lua_pushnil(tolua_S);
+  lua_pushnil(L);
   return 1;
 }
 
-static int tolua_unit_get_orders(lua_State* tolua_S)
+static int tolua_unit_get_orders(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
 
-  order ** order_ptr = (order **)lua_newuserdata(tolua_S, sizeof(order *));
+  order ** order_ptr = (order **)lua_newuserdata(L, sizeof(order *));
 
-  luaL_getmetatable(tolua_S, "order");
-  lua_setmetatable(tolua_S, -2);
+  luaL_getmetatable(L, "order");
+  lua_setmetatable(L, -2);
 
   *order_ptr = self->orders;
 
-  lua_pushcclosure(tolua_S, tolua_orderlist_next, 1);
+  lua_pushcclosure(L, tolua_orderlist_next, 1);
 
   return 1;
 }
 
-static int tolua_unit_get_flag(lua_State* tolua_S)
+static int tolua_unit_get_flag(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * name = tolua_tostring(tolua_S, 2, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * name = tolua_tostring(L, 2, 0);
   int flag = atoi36(name);
   attrib * a = find_key(self->attribs, flag);
-  lua_pushboolean(tolua_S, (a!=NULL));
+  lua_pushboolean(L, (a!=NULL));
   return 1;
 }
 
-static int tolua_unit_set_flag(lua_State* tolua_S)
+static int tolua_unit_set_flag(lua_State* L)
 {
-  unit* self = (unit*)tolua_tousertype(tolua_S, 1, 0);
-  const char * name = tolua_tostring(tolua_S, 2, 0);
-  int value = (int)tolua_tonumber(tolua_S, 3, 0);
+  unit* self = (unit*)tolua_tousertype(L, 1, 0);
+  const char * name = tolua_tostring(L, 2, 0);
+  int value = (int)tolua_tonumber(L, 3, 0);
   int flag = atoi36(name);
   attrib * a = find_key(self->attribs, flag);
   if (a==NULL && value) {
@@ -781,46 +781,46 @@ static int tolua_unit_set_flag(lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_unit_get_weight(lua_State* tolua_S)
+static int tolua_unit_get_weight(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)unit_getweight(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)unit_getweight(self));
   return 1;
 }
 
-static int tolua_unit_get_capacity(lua_State* tolua_S)
+static int tolua_unit_get_capacity(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushnumber(tolua_S, (lua_Number)unit_getcapacity(self));
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)unit_getcapacity(self));
   return 1;
 }
 
-static int tolua_unit_get_faction(lua_State* tolua_S)
+static int tolua_unit_get_faction(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushusertype(tolua_S, (void*)self->faction, "faction");
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, (void*)self->faction, "faction");
   return 1;
 }
 
-static int tolua_unit_set_faction(lua_State* tolua_S)
+static int tolua_unit_set_faction(lua_State* L)
 {
-  unit * self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  faction * f = (faction *)tolua_tousertype(tolua_S, 2, 0);
+  unit * self = (unit*) tolua_tousertype(L, 1, 0);
+  faction * f = (faction *)tolua_tousertype(L, 2, 0);
   u_setfaction(self, f);
   return 0;
 }
 
-static int tolua_unit_get_race(lua_State* tolua_S)
+static int tolua_unit_get_race(lua_State* L)
 {
-  unit* self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  tolua_pushstring(tolua_S, self->race->_name[0]);
+  unit* self = (unit*) tolua_tousertype(L, 1, 0);
+  tolua_pushstring(L, self->race->_name[0]);
   return 1;
 }
 
-static int tolua_unit_set_race(lua_State* tolua_S)
+static int tolua_unit_set_race(lua_State* L)
 {
-  unit * self = (unit*) tolua_tousertype(tolua_S, 1, 0);
-  const char * rcname = tolua_tostring(tolua_S, 2, 0);
+  unit * self = (unit*) tolua_tousertype(L, 1, 0);
+  const char * rcname = tolua_tostring(L, 2, 0);
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
     if (self->irace==self->race) self->irace = rc;
@@ -830,18 +830,18 @@ static int tolua_unit_set_race(lua_State* tolua_S)
 }
 
 static int
-tolua_unit_create(lua_State* tolua_S)
+tolua_unit_create(lua_State* L)
 {
-  faction * f = (faction *)tolua_tousertype(tolua_S, 1, 0);
-  region * r = (region *)tolua_tousertype(tolua_S, 2, 0);
-  int num = (int)tolua_tonumber(tolua_S, 3, 0);
+  faction * f = (faction *)tolua_tousertype(L, 1, 0);
+  region * r = (region *)tolua_tousertype(L, 2, 0);
+  int num = (int)tolua_tonumber(L, 3, 0);
   if (f && r) {
     const race * rc = f->race;
-    const char * rcname = tolua_tostring(tolua_S, 4, NULL);
+    const char * rcname = tolua_tostring(L, 4, NULL);
     if (rcname) rc = rc_find(rcname);
     if (rc) {
       unit * u = create_unit(r, f, num, rc, 0, NULL, NULL);
-      tolua_pushusertype(tolua_S, u, "unit");
+      tolua_pushusertype(L, u, "unit");
       return 1;
     }
   }
@@ -849,127 +849,127 @@ tolua_unit_create(lua_State* tolua_S)
 }
 
 static int
-tolua_unit_tostring(lua_State *tolua_S)
+tolua_unit_tostring(lua_State *L)
 {
-  unit * self = (unit *)tolua_tousertype(tolua_S, 1, 0);
-  lua_pushstring(tolua_S, unitname(self));
+  unit * self = (unit *)tolua_tousertype(L, 1, 0);
+  lua_pushstring(L, unitname(self));
   return 1;
 }
 
 static int
-tolua_event_gettype(lua_State *tolua_S)
+tolua_event_gettype(lua_State *L)
 {
-  event * self = (event *)tolua_tousertype(tolua_S, 1, 0);
-  int index = (int)tolua_tonumber(tolua_S, 2, 0);
-  lua_pushstring(tolua_S, self->args[index].type);
+  event * self = (event *)tolua_tousertype(L, 1, 0);
+  int index = (int)tolua_tonumber(L, 2, 0);
+  lua_pushstring(L, self->args[index].type);
   return 1;
 }
 
 static int
-tolua_event_get(lua_State *tolua_S)
+tolua_event_get(lua_State *L)
 {
-  struct event * self = (struct event *)tolua_tousertype(tolua_S, 1, 0);
-  int index = (int)tolua_tonumber(tolua_S, 2, 0);
+  struct event * self = (struct event *)tolua_tousertype(L, 1, 0);
+  int index = (int)tolua_tonumber(L, 2, 0);
 
   event_arg * arg = self->args+index;
 
   if (arg->type) {
     if (strcmp(arg->type, "string")==0) {
-      tolua_pushstring(tolua_S, (const char *)arg->data.v);
+      tolua_pushstring(L, (const char *)arg->data.v);
     } else if (strcmp(arg->type, "int")==0) {
-      tolua_pushnumber(tolua_S, (lua_Number)arg->data.i);
+      tolua_pushnumber(L, (lua_Number)arg->data.i);
     } else if (strcmp(arg->type, "float")==0) {
-      tolua_pushnumber(tolua_S, (lua_Number)arg->data.f);
+      tolua_pushnumber(L, (lua_Number)arg->data.f);
     } else {
       /* this is pretty lazy */
-      tolua_pushusertype(tolua_S, (void*)arg->data.v, arg->type);
+      tolua_pushusertype(L, (void*)arg->data.v, arg->type);
     }
     return 1;
   }
-  tolua_error(tolua_S, "invalid type argument for event", NULL);
+  tolua_error(L, "invalid type argument for event", NULL);
   return 0;
 }
 
 void
-tolua_unit_open(lua_State * tolua_S)
+tolua_unit_open(lua_State * L)
 {
   /* register user types */
-  tolua_usertype(tolua_S, "unit");
-  tolua_usertype(tolua_S, "unit_list");
+  tolua_usertype(L, "unit");
+  tolua_usertype(L, "unit_list");
 
-  tolua_module(tolua_S, NULL, 0);
-  tolua_beginmodule(tolua_S, NULL);
+  tolua_module(L, NULL, 0);
+  tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(tolua_S, "event", "event", "", NULL);
-    tolua_beginmodule(tolua_S, "event");
+    tolua_cclass(L, "event", "event", "", NULL);
+    tolua_beginmodule(L, "event");
     {
-      tolua_function(tolua_S, "get_type", tolua_event_gettype);
-      tolua_function(tolua_S, "get", tolua_event_get);
+      tolua_function(L, "get_type", tolua_event_gettype);
+      tolua_function(L, "get", tolua_event_get);
     }
-    tolua_endmodule(tolua_S);
+    tolua_endmodule(L);
 
-    tolua_cclass(tolua_S, "unit", "unit", "", NULL);
-    tolua_beginmodule(tolua_S, "unit");
+    tolua_cclass(L, "unit", "unit", "", NULL);
+    tolua_beginmodule(L, "unit");
     {
-      tolua_function(tolua_S, "__tostring", tolua_unit_tostring);
-      tolua_function(tolua_S, "create", tolua_unit_create);
+      tolua_function(L, "__tostring", tolua_unit_tostring);
+      tolua_function(L, "create", tolua_unit_create);
 
-      tolua_variable(tolua_S, "name", tolua_unit_get_name, tolua_unit_set_name);
-      tolua_variable(tolua_S, "faction", tolua_unit_get_faction, tolua_unit_set_faction);
-      tolua_variable(tolua_S, "id", tolua_unit_get_id, tolua_unit_set_id);
-      tolua_variable(tolua_S, "info", tolua_unit_get_info, tolua_unit_set_info);
-      tolua_variable(tolua_S, "hp", tolua_unit_get_hp, tolua_unit_set_hp);
-      tolua_variable(tolua_S, "status", tolua_unit_get_status, tolua_unit_set_status);
-      tolua_variable(tolua_S, "familiar", tolua_unit_get_familiar, tolua_unit_set_familiar);
+      tolua_variable(L, "name", tolua_unit_get_name, tolua_unit_set_name);
+      tolua_variable(L, "faction", tolua_unit_get_faction, tolua_unit_set_faction);
+      tolua_variable(L, "id", tolua_unit_get_id, tolua_unit_set_id);
+      tolua_variable(L, "info", tolua_unit_get_info, tolua_unit_set_info);
+      tolua_variable(L, "hp", tolua_unit_get_hp, tolua_unit_set_hp);
+      tolua_variable(L, "status", tolua_unit_get_status, tolua_unit_set_status);
+      tolua_variable(L, "familiar", tolua_unit_get_familiar, tolua_unit_set_familiar);
 
-      tolua_variable(tolua_S, "weight", tolua_unit_get_weight, 0);
-      tolua_variable(tolua_S, "capacity", tolua_unit_get_capacity, 0);
+      tolua_variable(L, "weight", tolua_unit_get_weight, 0);
+      tolua_variable(L, "capacity", tolua_unit_get_capacity, 0);
 
-      tolua_function(tolua_S, "add_order", tolua_unit_add_order);
-      tolua_function(tolua_S, "clear_orders", tolua_unit_clear_orders);
-      tolua_variable(tolua_S, "orders", tolua_unit_get_orders, 0);
+      tolua_function(L, "add_order", tolua_unit_add_order);
+      tolua_function(L, "clear_orders", tolua_unit_clear_orders);
+      tolua_variable(L, "orders", tolua_unit_get_orders, 0);
 
       // key-attributes for named flags:
-      tolua_function(tolua_S, "set_flag", tolua_unit_set_flag);
-      tolua_function(tolua_S, "get_flag", tolua_unit_get_flag);
-      tolua_variable(tolua_S, "flags", tolua_unit_get_flags, tolua_unit_set_flags);
-      tolua_variable(tolua_S, "age", tolua_unit_get_age, tolua_unit_set_age);
+      tolua_function(L, "set_flag", tolua_unit_set_flag);
+      tolua_function(L, "get_flag", tolua_unit_get_flag);
+      tolua_variable(L, "flags", tolua_unit_get_flags, tolua_unit_set_flags);
+      tolua_variable(L, "age", tolua_unit_get_age, tolua_unit_set_age);
 
       // items:
-      tolua_function(tolua_S, "get_item", tolua_unit_get_item);
-      tolua_function(tolua_S, "add_item", tolua_unit_add_item);
-      tolua_variable(tolua_S, "items", tolua_unit_get_items, 0);
-      tolua_function(tolua_S, "get_pooled", tolua_unit_get_pooled);
-      tolua_function(tolua_S, "use_pooled", tolua_unit_use_pooled);
+      tolua_function(L, "get_item", tolua_unit_get_item);
+      tolua_function(L, "add_item", tolua_unit_add_item);
+      tolua_variable(L, "items", tolua_unit_get_items, 0);
+      tolua_function(L, "get_pooled", tolua_unit_get_pooled);
+      tolua_function(L, "use_pooled", tolua_unit_use_pooled);
 
       // skills:
-      tolua_function(tolua_S, "get_skill", tolua_unit_getskill);
-      tolua_function(tolua_S, "eff_skill", tolua_unit_effskill);
-      tolua_function(tolua_S, "set_skill", tolua_unit_setskill);
+      tolua_function(L, "get_skill", tolua_unit_getskill);
+      tolua_function(L, "eff_skill", tolua_unit_effskill);
+      tolua_function(L, "set_skill", tolua_unit_setskill);
 
-      tolua_function(tolua_S, "add_notice", tolua_unit_addnotice);
+      tolua_function(L, "add_notice", tolua_unit_addnotice);
 
       // npc logic:
-      tolua_function(tolua_S, "add_handler", tolua_unit_addhandler);
+      tolua_function(L, "add_handler", tolua_unit_addhandler);
 
-      tolua_function(tolua_S, "set_racename", tolua_unit_setracename);
-      tolua_function(tolua_S, "add_spell", tolua_unit_addspell);
-      tolua_function(tolua_S, "remove_spell", tolua_unit_removespell);
-      tolua_function(tolua_S, "cast_spell", tolua_unit_castspell);
+      tolua_function(L, "set_racename", tolua_unit_setracename);
+      tolua_function(L, "add_spell", tolua_unit_addspell);
+      tolua_function(L, "remove_spell", tolua_unit_removespell);
+      tolua_function(L, "cast_spell", tolua_unit_castspell);
 
-      tolua_variable(tolua_S, "magic", tolua_unit_get_magic, tolua_unit_set_magic);
-      tolua_variable(tolua_S, "aura", tolua_unit_get_aura, tolua_unit_set_aura);
-      tolua_variable(tolua_S, "building", tolua_unit_get_building, tolua_unit_set_building);
-      tolua_variable(tolua_S, "ship", tolua_unit_get_ship, tolua_unit_set_ship);
-      tolua_variable(tolua_S, "region", tolua_unit_get_region, tolua_unit_set_region);
-      tolua_variable(tolua_S, "spells", tolua_unit_get_spells, 0);
-      tolua_variable(tolua_S, "number", tolua_unit_get_number, tolua_unit_set_number);
-      tolua_variable(tolua_S, "race", tolua_unit_get_race, tolua_unit_set_race);
-      tolua_variable(tolua_S, "hp_max", tolua_unit_get_hpmax, 0);
+      tolua_variable(L, "magic", tolua_unit_get_magic, tolua_unit_set_magic);
+      tolua_variable(L, "aura", tolua_unit_get_aura, tolua_unit_set_aura);
+      tolua_variable(L, "building", tolua_unit_get_building, tolua_unit_set_building);
+      tolua_variable(L, "ship", tolua_unit_get_ship, tolua_unit_set_ship);
+      tolua_variable(L, "region", tolua_unit_get_region, tolua_unit_set_region);
+      tolua_variable(L, "spells", tolua_unit_get_spells, 0);
+      tolua_variable(L, "number", tolua_unit_get_number, tolua_unit_set_number);
+      tolua_variable(L, "race", tolua_unit_get_race, tolua_unit_set_race);
+      tolua_variable(L, "hp_max", tolua_unit_get_hpmax, 0);
 
-      tolua_variable(tolua_S, "objects", tolua_unit_get_objects, 0);
+      tolua_variable(L, "objects", tolua_unit_get_objects, 0);
     }
-    tolua_endmodule(tolua_S);
+    tolua_endmodule(L);
   }
-  tolua_endmodule(tolua_S);
+  tolua_endmodule(L);
 }
