@@ -529,6 +529,20 @@ lua_recruit(struct unit * u, const struct archetype * arch, int amount)
   return result;
 }
 
+int
+tolua_toid(lua_State* tolua_S, int idx, int def)
+{
+  int no = 0;
+  int type = lua_type(tolua_S, idx);
+  if (type==LUA_TNUMBER) {
+    no = (int)tolua_tonumber(tolua_S, idx, def);
+  } else {
+    const char * str = tolua_tostring(tolua_S, idx, NULL);
+    no = str?atoi36(str):def;
+  }
+  return no;
+}
+
 void
 register_tolua_helpers(void)
 {

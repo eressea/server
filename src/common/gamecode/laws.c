@@ -675,7 +675,7 @@ count_race(const region *r, const race *rc)
 extern struct attrib_type at_germs;
 
 static void
-trees(region * r, const int current_season, const int last_weeks_season)
+growing_trees(region * r, const int current_season, const int last_weeks_season)
 {
   int growth, grownup_trees, i, seeds, sprout;
   direction_t d;
@@ -852,7 +852,7 @@ demographics(void)
         plagues(r, false);
         horses(r);
         if (current_season != SEASON_WINTER) {
-          trees(r, current_season, last_weeks_season);
+          growing_trees(r, current_season, last_weeks_season);
         }
       }
 

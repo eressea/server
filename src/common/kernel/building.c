@@ -124,6 +124,7 @@ building_type *
 bt_find(const char* name)
 {
   const struct building_typelist * btl = buildingtypes;
+  assert(name);
   while (btl && strcmp(btl->type->_name, name)) btl = btl->next;
   if (btl==NULL) {
     return NULL;

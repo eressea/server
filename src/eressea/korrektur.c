@@ -362,20 +362,6 @@ get_timeout(trigger * td, trigger * tfind)
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
 
-int
-growing_trees(void)
-{
-  region *r;
-
-  for(r=regions; r; r=r->next) {
-    if(rtrees(r, 2)) {
-      rsettrees(r, 1, rtrees(r, 2)/4);
-      rsettrees(r, 0, rtrees(r, 2)/2);
-    }
-  }
-  return 0;
-}
-
 static int
 fix_undead(void)
 {

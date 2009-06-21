@@ -127,10 +127,13 @@ tolua_building_create(lua_State* tolua_S)
 {
   region * r = (region *)tolua_tousertype(tolua_S, 1, 0);
   const char * bname = tolua_tostring(tolua_S, 2, 0);
-  const building_type * btype = bt_find(bname);
-  building * b = new_building(btype, r, NULL);
-  tolua_pushusertype(tolua_S, (void*)b, "building");
-  return 1;
+  if (bname) {
+    const building_type * btype = bt_find(bname);
+    building * b = new_building(btype, r, NULL);
+    tolua_pushusertype(tolua_S, (void*)b, "building");
+    return 1;
+  }
+  return 0;
 }
 
 static int

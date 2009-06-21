@@ -108,11 +108,16 @@ tolua_ship_create(lua_State* tolua_S)
 {
   region * r = (region *)tolua_tousertype(tolua_S, 1, 0);
   const char * sname = tolua_tostring(tolua_S, 2, 0);
-  const ship_type * stype = st_find(sname);
-  ship * sh = new_ship(stype, NULL, r);
-  sh->size = stype->construction->maxsize;
-  tolua_pushusertype(tolua_S, (void*)sh, "ship");
-  return 1;
+  if (sname) {
+    const ship_type * stype = st_find(sname);
+    if (stype) {
+      ship * sh = new_ship(stype, NULL, r);
+      sh->size = stype->construction->maxsize;
+      tolua_pushusertype(tolua_S, (void*)sh, "ship");
+      return 1;
+    }
+  }
+  return 0;
 }
 
 static int

@@ -416,6 +416,35 @@ function test_upkeep()
   assert(u:get_item("money")==u.number)
 end
 
+function test_id()
+  free_game()
+  local r = region.create(0, 0, "plain")
+
+  local f = faction.create("enno@eressea.de", "human", "de")
+  f.id = atoi36("42")
+  assert(get_faction(42)~=f)
+  assert(get_faction("42")==f)
+  assert(get_faction(atoi36("42"))==f)
+
+  local u = unit.create(f, r, 1)
+  u.id = atoi36("42")
+  assert(get_unit(42)~=u)
+  assert(get_unit("42")==u)
+  assert(get_unit(atoi36("42"))==u)
+
+  local b = building.create(r, "castle")
+  -- <not working> b.id = atoi36("42")
+  local fortytwo = itoa36(b.id)
+  assert(get_building(fortytwo)==b)
+  assert(get_building(atoi36(fortytwo))==b)
+
+  local s = ship.create(r, "boat")
+  -- <not working> s.id = atoi36("42")
+  local fortytwo = itoa36(s.id)
+  assert(get_ship(fortytwo)==s)
+  assert(get_ship(atoi36(fortytwo))==s)
+end
+
 function test_herbalism()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -474,10 +503,12 @@ tests = {
     ["storage"] = test_storage,
     ["taxes"] = test_taxes,
     ["upkeep"] = test_upkeep,
+    ["id"] = test_id,
     ["work"] = test_work,
     ["market"] = test_market
 }
 mytests = {
+    ["id"] = test_id,
     ["upkeep"] = test_upkeep,
     ["taxes"] = test_taxes
 }

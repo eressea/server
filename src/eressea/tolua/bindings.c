@@ -15,7 +15,7 @@ without prior permission by the authors of Eressea.
 #include "bind_unit.h"
 #include "bind_faction.h"
 #include "bind_region.h"
-
+#include "helpers.h"
 
 #include <kernel/eressea.h>
 
@@ -581,7 +581,7 @@ tolua_read_game(lua_State* tolua_S)
 static int
 tolua_get_faction(lua_State* tolua_S)
 {
-  int no = (int)tolua_tonumber(tolua_S, 1, 0);
+  int no = tolua_toid(tolua_S, 1, 0);
   faction * f = findfaction(no);
 
   tolua_pushusertype(tolua_S, f, "faction");
@@ -612,7 +612,7 @@ tolua_get_region_byid(lua_State* tolua_S)
 static int
 tolua_get_building(lua_State* tolua_S)
 {
-  int no = (int)tolua_tonumber(tolua_S, 1, 0);
+  int no = tolua_toid(tolua_S, 1, 0);
   building * b = findbuilding(no);
 
   tolua_pushusertype(tolua_S, b, "building");
@@ -622,7 +622,7 @@ tolua_get_building(lua_State* tolua_S)
 static int
 tolua_get_ship(lua_State* tolua_S)
 {
-  int no = (int)tolua_tonumber(tolua_S, 1, 0);
+  int no = tolua_toid(tolua_S, 1, 0);
   ship * sh = findship(no);
 
   tolua_pushusertype(tolua_S, sh, "ship");
@@ -632,7 +632,7 @@ tolua_get_ship(lua_State* tolua_S)
 static int
 tolua_get_alliance(lua_State* tolua_S)
 {
-  int no = (int)tolua_tonumber(tolua_S, 1, 0);
+  int no = tolua_toid(tolua_S, 1, 0);
   alliance * f = findalliance(no);
 
   tolua_pushusertype(tolua_S, f, "alliance");
@@ -642,7 +642,7 @@ tolua_get_alliance(lua_State* tolua_S)
 static int
 tolua_get_unit(lua_State* tolua_S)
 {
-  int no = (int)tolua_tonumber(tolua_S, 1, 0);
+  int no = tolua_toid(tolua_S, 1, 0);
   unit * u = findunit(no);
 
   tolua_pushusertype(tolua_S, u, "unit");
