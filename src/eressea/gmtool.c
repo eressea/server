@@ -28,6 +28,7 @@
 #include <modules/arena.h>
 #endif
 #include <modules/wormhole.h>
+#include <modules/autoseed.h>
 #if DUNGEON_MODULE
 #include <modules/dungeon.h>
 #endif
@@ -56,6 +57,7 @@
 #include <items/itemtypes.h>
 
 #include <util/log.h>
+#include <util/rng.h>
 #include <util/base36.h>
 #include <util/storage.h>
 
@@ -727,6 +729,7 @@ handlekey(state * st, int c)
   region *r;
   char sbuffer[80];
   static char kbuffer[80];
+  int n;
 
   switch(c) {
   case FAST_RIGHT:
@@ -785,7 +788,11 @@ handlekey(state * st, int c)
     }
     break;
   case 'B':
+    /*
     make_block((short)st->cursor.x, (short)st->cursor.y, 6, select_terrain(st, NULL));
+    */
+    n = rng_int() % 8 + 8;
+    build_island_e3((short)st->cursor.x, (short)st->cursor.y, n, n*4);
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;

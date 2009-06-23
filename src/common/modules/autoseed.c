@@ -49,23 +49,30 @@
 #include <assert.h>
 
 const terrain_type *
-random_terrain(boolean distribution)
+random_terrain(const terrain_type * terrains[], int distribution[], int size)
 {
-  static int nterrains;
-  static int ndistribution;
+  int ndistribution = size;
   const terrain_type * terrain;
   int n;
-  if (nterrains==0) {
-    for (terrain=terrains();terrain;terrain=terrain->next) {
-      ndistribution += terrain->distribution;
-      ++nterrains;
+
+  if (distribution) {
+    ndistribution = 0;
+    for (n=0;n!=size;++n) {
+      ndistribution += distribution[n];
     }
   }
 
-  n = rng_int() % (distribution?ndistribution:nterrains);
-  for (terrain=terrains();terrain;terrain=terrain->next) {
-    n -= distribution?terrain->distribution:1;
-    if (n<0) break;
+  n = rng_int() % ndistribution;
+  if (distribution) {
+    int i;
+    for (i=0;i!=size;++i) {
+      n -= distribution[i];
+      if (n<0) break;
+    }
+    assert(i<size);
+    terrain = terrains[i];
+  } else {
+    terrain = terrains[n];
   }
   return terrain;
 }
@@ -412,9 +419,7 @@ free_newfaction(newfaction * nf)
   free(nf->password);
   free(nf);
 }
-/** create new island with up to nsize players
- * returns the number of players placed on the new island.
- */
+
 static void
 frame_regions(int age, const terrain_type * terrain)
 {
@@ -435,6 +440,7 @@ frame_regions(int age, const terrain_type * terrain)
     }
   }
 }
+
 static void
 prepare_starting_region(region * r)
 {
@@ -467,6 +473,9 @@ prepare_starting_region(region * r)
   fix_demand(r);
 }
 
+/** create new island with up to nsize players
+ * returns the number of players placed on the new island.
+ */
 int
 autoseed(newfaction ** players, int nsize, int max_agediff)
 {
@@ -477,7 +486,27 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
   int isize = REGIONS_PER_FACTION; /* target size for the island */
   int psize = 0; /* players on this island */
   const terrain_type * volcano_terrain = get_terrain("volcano");
+  static int nterrains = -1;
+  static const terrain_type ** terrainarr = 0;
+  static int * distribution;
 
+  if (nterrains<0) {
+    int n = 0;
+    const terrain_type * terrain = terrains();
+    for (nterrains=0;terrain;terrain=terrain->next) {
+      if (terrain->distribution) {
+        ++nterrains;
+      }
+    }
+    terrainarr = malloc(sizeof(terrain_type *) * nterrains);
+    distribution = malloc(sizeof(int) * nterrains);
+    for (terrain = terrains();terrain;terrain = terrain->next) {
+      if (terrain->distribution) {
+        terrainarr[n] = terrain;
+        distribution[n++] = terrain->distribution;
+      }
+    }
+  }
   frame_regions(16, newterrain(T_FIREWALL));
 
   if (listlen(*players)<MINFACTIONS) return 0;
@@ -633,7 +662,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       --isize;
       if (psize>=PLAYERS_PER_ISLAND) break;
     } else {
-      terraform_region(r, random_terrain(true));
+      terraform_region(r, random_terrain(terrainarr, distribution, nterrains));
       --isize;
     }
   }
@@ -664,7 +693,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
             const struct terrain_type * terrain = newterrain(T_OCEAN);
             rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
             if (rng_int() % SPECIALCHANCE < special) {
-              terrain = random_terrain(true);
+              terrain = random_terrain(terrainarr, distribution, nterrains);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
             } else {
               special = 1;
@@ -705,4 +734,158 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
     }
   }
   return tsize;
+}
+
+static void get_neighbours(const region * r, region ** list)
+{
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    list[dir] = rconnect(r, dir);
+  }
+}
+
+region_list * regionqueue_push(region_list ** rlist, region * r)
+{
+  region_list * rnew = malloc(sizeof(region_list));
+  rnew->data = r;
+  rnew->next = 0;
+  while (*rlist) { rlist = &(*rlist)->next; }
+  *rlist = rnew;
+  return rnew;
+}
+
+region * regionqueue_pop(region_list ** rlist)
+{
+  if (*rlist) {
+    region * r = (*rlist)->data;
+    region_list * rpop = *rlist;
+    *rlist = rpop->next;
+    free(rpop);
+    return r;
+  }
+  return 0;
+}
+
+#define GEOMAX 8
+static struct geo { 
+  int distribution;
+  terrain_t type;
+} geography_e3[GEOMAX] = {
+  { 8, T_OCEAN },
+  { 3, T_SWAMP },
+  { 1, T_VOLCANO },
+  { 3, T_DESERT },
+  { 3, T_HIGHLAND },
+  { 3, T_MOUNTAIN },
+  { 2, T_GLACIER },
+  { 1, T_PLAIN }
+};
+
+const terrain_type * random_terrain_e3(direction_t dir)
+{
+  static const terrain_type ** terrainarr = 0;
+  static int * distribution = 0;
+
+  if (!distribution) {
+    int n = 0;
+    
+    terrainarr = malloc(GEOMAX * sizeof(const terrain_type *));
+    distribution = malloc(GEOMAX * sizeof(int));
+    for (n=0;n!=GEOMAX;++n) {
+      terrainarr[n] = newterrain(geography_e3[n].type);
+      distribution[n] = geography_e3[n].distribution;
+    }
+  }
+  return random_terrain(terrainarr, distribution, GEOMAX);
+}
+
+int
+random_neighbours(region * r, region_list ** rlist, const terrain_type *(*terraformer)(direction_t))
+{
+  int nsize = 0;
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    region * rn = rconnect(r, dir);
+    if (rn==NULL) {
+      const terrain_type * terrain = terraformer(dir);
+      rn = new_region(r->x+delta_x[dir], r->y+delta_y[dir], 0);
+      terraform_region(rn, terrain);
+      if (rn->land) {
+        regionqueue_push(rlist, rn);
+        ++nsize;
+      }
+    }
+  }
+  return nsize;
+}
+
+const terrain_type * get_ocean(direction_t dir)
+{
+  return newterrain(T_OCEAN);
+}
+
+int region_quality(const region * r)
+{
+  region * rn[MAXDIRECTIONS];
+  int n, result = 0;
+  get_neighbours(r, rn);
+  for (n=0;n!=MAXDIRECTIONS;++n) {
+    if (rn[n] && rn[n]->land) {
+      result += rn[n]->land->peasants;
+    }
+  }
+//  result += r->land->peasants * 2;
+  return result;
+}
+
+/* E3A island generation */
+int
+build_island_e3(short x, short y, int numfactions, int minsize)
+{
+  int nfactions = 0;
+  region_list * rlist = NULL;
+  region_list * island = NULL;
+  region * r = new_region(x, y, 0);
+  int nsize = 1;
+  int q, maxq = INT_MIN, minq = INT_MAX;
+ 
+  terraform_region(r, random_terrain_e3(NODIRECTION));
+
+  while (r) {
+    if (r->land) {
+      fset(r, RF_MARK);
+      regionqueue_push(&island, r);
+    }
+    if (nsize<minsize) {
+      nsize += random_neighbours(r, &rlist, &random_terrain_e3);
+    } else {
+      nsize += random_neighbours(r, &rlist, &get_ocean);
+    }
+    r = regionqueue_pop(&rlist);
+  }
+  for (rlist=island;rlist;rlist=rlist->next) {
+    r = rlist->data;
+    if (fval(r, RF_MARK)) {
+      region *rn[MAXDIRECTIONS];
+      int n;
+      unit * u;
+
+      freset(r, RF_MARK);
+      get_neighbours(r, rn);
+      for (n=0;n!=MAXDIRECTIONS;++n) {
+        freset(rn[n], RF_MARK);
+      }
+      q = region_quality(r);
+      if (q>1500 && nfactions<numfactions) {
+        terraform_region(r, newterrain(T_PLAIN));
+        minq = MIN(minq, q);
+        maxq = MAX(maxq, q);
+        prepare_starting_region(r);
+        u = addplayer(r, addfaction("enno@eressea.de", itoa36(rng_int()), races,
+          default_locale, 0));
+        ++nfactions;
+      }
+    }
+  }
+  return nfactions;
 }
