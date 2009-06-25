@@ -2955,6 +2955,7 @@ attrib_init(void)
   /* neue UNIT-Attribute */
   at_register(&at_siege);
   at_register(&at_effect);
+  at_register(&at_potiondelay);
   at_register(&at_private);
 
   at_register(&at_icastle);

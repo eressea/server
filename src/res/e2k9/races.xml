@@ -59,7 +59,7 @@
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="elf"/>
     <param name="other_cost" value="500"/>
-    <skill name="riding" modifier="+2"/>
+    <skill name="riding" modifier="+1"/>
     <skill name="shipcraft" modifier="2"/>
     <skill name="sailing" modifier="2"/>
     <skill name="magic" modifier="-99"/>

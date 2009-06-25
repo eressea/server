@@ -85,6 +85,7 @@ extern "C" {
 #define BP_NORMAL 3
 #define BP_ROAD   2
 
+#define PERSON_WEIGHT 1000 /* weight of a "normal" human unit */
 #define STAMINA_AFFECTS_HP 1<<0
 
 /**

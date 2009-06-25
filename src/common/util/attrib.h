@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -22,20 +22,20 @@ struct storage;
 typedef void (*afun)(void);
 
 typedef struct attrib {
-	const struct attrib_type * type;
-	union {
-		afun f;
-		void * v;
-		int i;
-		float flt;
-		char c;
-		short s;
-		short sa[2];
-		char ca[4];
-	} data;
-	/* internal data, do not modify: */
-	struct attrib * next; /* next attribute in the list */
-	struct attrib * nexttype; /* skip to attribute of a different type */
+  const struct attrib_type * type;
+  union {
+    afun f;
+    void * v;
+    int i;
+    float flt;
+    char c;
+    short s;
+    short sa[2];
+    char ca[4];
+  } data;
+  /* internal data, do not modify: */
+  struct attrib * next; /* next attribute in the list */
+  struct attrib * nexttype; /* skip to attribute of a different type */
 } attrib;
 
 #define ATF_UNIQUE   (1<<0) /* only one per attribute-list */
@@ -43,17 +43,17 @@ typedef struct attrib {
 #define ATF_USER_DEFINED (1<<2) /* use this to make udf */
 
 typedef struct attrib_type {
-	const char* name;
-	void (*initialize)(struct attrib *);
-	void (*finalize)(struct attrib *);
-	int  (*age)(struct attrib *);
-	/* age returns 0 if the attribute needs to be removed, !=0 otherwise */
-	void (*write)(const struct attrib *, struct storage *);
-	int  (*read)(struct attrib *, struct storage *); /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
-	unsigned int flags;
-	/* ---- internal data, do not modify: ---- */
-	struct attrib_type * nexthash;
-	unsigned int hashkey;
+  const char* name;
+  void (*initialize)(struct attrib *);
+  void (*finalize)(struct attrib *);
+  int  (*age)(struct attrib *);
+  /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
+  void (*write)(const struct attrib *, struct storage *);
+  int  (*read)(struct attrib *, struct storage *); /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+  unsigned int flags;
+  /* ---- internal data, do not modify: ---- */
+  struct attrib_type * nexthash;
+  unsigned int hashkey;
 } attrib_type;
 
 extern void at_register(attrib_type * at);

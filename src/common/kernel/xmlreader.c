@@ -513,7 +513,7 @@ parse_ships(xmlDocPtr doc)
   if (ships->nodesetval!=NULL) {
     xmlNodeSetPtr nodes = ships->nodesetval;
     for (i=0;i!=nodes->nodeNr;++i) {
-      xmlNodePtr node = nodes->nodeTab[i];
+      xmlNodePtr child, node = nodes->nodeTab[i];
       xmlChar * propValue;
       ship_type * st = calloc(sizeof(ship_type), 1);
       xmlXPathObjectPtr result;
@@ -537,13 +537,23 @@ parse_ships(xmlDocPtr doc)
       st->storm = xml_fvalue(node, "storm", 1.0);
       st->sumskill = xml_ivalue(node, "sumskill", 0);
 
-	  /* reading eressea/ships/ship/construction */
+      /* reading eressea/ships/ship/construction */
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
       xml_readconstruction(xpath, result->nodesetval, &st->construction);
       xmlXPathFreeObject(result);
 
-	  /* reading eressea/ships/ship/coast */
+      for (child=node->children;child;child=child->next) {
+        if (strcmp((const char *)child->name, "modifier")==0) {
+          double value = xml_fvalue(child, "value", 0.0);
+          propValue = xmlGetProp(child, BAD_CAST "type");
+          if (strcmp((const char *)propValue, "tactics")==0) st->tac_bonus = (float)value;
+          else if (strcmp((const char *)propValue, "attack")==0) st->at_bonus = (int)value;
+          else if (strcmp((const char *)propValue, "defense")==0) st->df_bonus = (int)value;
+          xmlFree(propValue);
+        }
+      }
+      /* reading eressea/ships/ship/coast */
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "coast", xpath);
       for (c=0,k=0;k!=result->nodesetval->nodeNr;++k) {
@@ -1567,7 +1577,7 @@ parse_races(xmlDocPtr doc)
     rc->regaura = (float)xml_fvalue(node, "regaura", 1.0);
     rc->recruitcost = xml_ivalue(node, "recruitcost", 0);
     rc->maintenance = xml_ivalue(node, "maintenance", 0);
-    rc->weight = xml_ivalue(node, "weight", 0);
+    rc->weight = xml_ivalue(node, "weight", PERSON_WEIGHT);
     rc->capacity = xml_ivalue(node, "capacity", 540);
     rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
     rc->hitpoints = xml_ivalue(node, "hp", 0);
@@ -1645,7 +1655,7 @@ parse_races(xmlDocPtr doc)
         rc->bonus[sk] = (char)mod;
         if (speed) {
           if (!rc->study_speed) rc->study_speed = calloc(1, MAXSKILLS);
-          rc->study_speed[sk] = speed;
+          rc->study_speed[sk] = (char)speed;
         }
       } else {
         log_error(("unknown skill '%s' in race '%s'\n",

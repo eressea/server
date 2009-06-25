@@ -50,7 +50,7 @@
     <item weight="0" score="10" herb="yes"/>
   </resource>
 
-  <resource name="h12" appearance="herbbag">
+  <resource name="h12" appearance="herbbag"><!-- Windbeutel -->
     <item weight="0" score="10" herb="yes"/>
   </resource>
 
@@ -58,7 +58,7 @@
     <item weight="0" score="10" herb="yes"/>
   </resource>
 
-  <resource name="h14" appearance="herbbag">
+  <resource name="h14" appearance="herbbag"><!-- Alraune -->
     <item weight="0" score="10" herb="yes"/>
   </resource>
 

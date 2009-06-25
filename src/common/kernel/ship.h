@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -27,30 +27,34 @@ extern "C" {
 #define SFL_FLY     0x02
 
 typedef struct ship_type {
-	const char * name[2];
+  const char * name[2];
 
-	int range;  /* range in regions */
-	int flags;  /* flags */
-	int combat; /* modifier for combat */
+  int range;  /* range in regions */
+  int flags;  /* flags */
+  int combat; /* modifier for combat */
 
-	double storm; /* multiplier for chance to drift in storm */
-	double damage; /* multiplier for damage taken by the ship */
+  double storm; /* multiplier for chance to drift in storm */
+  double damage; /* multiplier for damage taken by the ship */
 
-	int cabins;   /* max. cabins (people) */
-	int cargo;    /* max. cargo (weight) */
+  int cabins;   /* max. cabins (people) */
+  int cargo;    /* max. cargo (weight) */
 
-	int cptskill; /* min. skill of captain */
-	int minskill; /* min. skill to sail this (crew) */
-	int sumskill; /* min. sum of crew+captain */
+  int cptskill; /* min. skill of captain */
+  int minskill; /* min. skill to sail this (crew) */
+  int sumskill; /* min. sum of crew+captain */
 
-	const struct terrain_type ** coasts; /* coast that this ship can land on */
+  int at_bonus;   /* Verändert den Angriffsskill (default: 0)*/
+  int df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
+  float tac_bonus;
 
-	struct construction * construction; /* how to build a ship */
+  const struct terrain_type ** coasts; /* coast that this ship can land on */
+
+  struct construction * construction; /* how to build a ship */
 } ship_type;
 
 typedef struct ship_typelist {
-	struct ship_typelist * next;
-	const ship_type * type;
+  struct ship_typelist * next;
+  const ship_type * type;
 } ship_typelist;
 
 extern ship_typelist *shiptypes;
@@ -68,18 +72,18 @@ extern void st_register(const ship_type * type);
 #define SF_SELECT  1<<3 /* previously FL_DH */
 
 typedef struct ship {
-	struct ship *next;
-	struct ship *nexthash;
-	int no;
-	struct region *region;
-	char *name;
-	char *display;
-	struct attrib * attribs;
-	int size;
-	int damage; /* damage in 100th of a point of size */
-	unsigned int flags;
-	const struct ship_type * type;
-	direction_t coast;
+  struct ship *next;
+  struct ship *nexthash;
+  int no;
+  struct region *region;
+  char *name;
+  char *display;
+  struct attrib * attribs;
+  int size;
+  int damage; /* damage in 100th of a point of size */
+  unsigned int flags;
+  const struct ship_type * type;
+  direction_t coast;
 } ship;
 
 extern void damage_ship(ship *sh, double percent);

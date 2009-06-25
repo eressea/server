@@ -1170,13 +1170,27 @@ enter_ship(unit * u, struct order * ord, int id, boolean report)
     return false;
   }
   if (CheckOverload()) {
+    static int rule_capacity = -1;
     int sweight, scabins;
     int mweight = shipcapacity(sh);
     int mcabins = sh->type->cabins;
+    
+    if (rule_capacity<0) {
+      rule_capacity = get_param_int(global.parameters, "rules.ship.capacity", 0);
+    }
+    if (rule_capacity!=0) {
+      mcabins *= PERSON_WEIGHT;
+    }
     if (mweight>0 && mcabins>0) {
       getshipweight(sh, &sweight, &scabins);
       sweight += weight(u);
-      scabins += u->number;
+      if (rule_capacity==0) {
+        scabins += u->number;
+      } else {
+        /* weight goes into number of cabins, not cargo */
+        scabins += u->number * u->race->weight;
+        sweight -= u->number * u->race->weight;
+      }
 
       if (sweight > mweight || scabins > mcabins) {
         if (report) cmistake(u, ord, 34, MSG_MOVE);

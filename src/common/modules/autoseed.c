@@ -775,7 +775,7 @@ static struct geo {
   { 3, T_SWAMP },
   { 1, T_VOLCANO },
   { 3, T_DESERT },
-  { 3, T_HIGHLAND },
+  { 4, T_HIGHLAND },
   { 3, T_MOUNTAIN },
   { 2, T_GLACIER },
   { 1, T_PLAIN }
@@ -831,11 +831,59 @@ int region_quality(const region * r)
   get_neighbours(r, rn);
   for (n=0;n!=MAXDIRECTIONS;++n) {
     if (rn[n] && rn[n]->land) {
+      if (rn[n]->terrain==newterrain(T_VOLCANO)) {
+        /* nobody likes volcanoes */
+        result -= 2000;
+      }
       result += rn[n]->land->peasants;
     }
   }
-//  result += r->land->peasants * 2;
   return result;
+}
+
+static void smooth_island(region_list * island)
+{
+  region * rn[MAXDIRECTIONS];
+  region_list * rlist = NULL;
+  for (rlist=island;rlist;rlist=rlist->next) {
+    region * r = rlist->data;
+    int n, nland = 0;
+    
+    assert(r->land);
+    get_neighbours(r, rn);
+    for (n=0;n!=MAXDIRECTIONS && nland<=1;++n) {
+      if (rn[n]->land) {
+        ++nland;
+        r = rn[n];
+      }
+    }
+
+    if (nland==1) {
+      get_neighbours(r, rn);
+      for (n=0;n!=MAXDIRECTIONS;++n) {
+        int n1 = (n+1)%MAXDIRECTIONS;
+        int n2 = (n+1+MAXDIRECTIONS)%MAXDIRECTIONS;
+        if (!rn[n]->land && rn[n1]!=r && rn[n2]!=r) {
+          r = rlist->data;
+          runhash(r);
+          runhash(rn[n]);
+          SWAP(short, r->x, rn[n]->x);
+          SWAP(short, r->y, rn[n]->y);
+          rhash(r);
+          rhash(rn[n]);
+          rlist->data = r;
+          for (n=0;n!=MAXDIRECTIONS;++n) {
+            region * rx = rconnect(r, n);
+            if (rx==NULL) {
+              rx = new_region(r->x+delta_x[n], r->y+delta_y[n], 0);
+              terraform_region(rx, newterrain(T_OCEAN));
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
 }
 
 /* E3A island generation */
@@ -863,6 +911,9 @@ build_island_e3(short x, short y, int numfactions, int minsize)
     }
     r = regionqueue_pop(&rlist);
   }
+
+  smooth_island(island);
+
   for (rlist=island;rlist;rlist=rlist->next) {
     r = rlist->data;
     if (fval(r, RF_MARK)) {
@@ -876,11 +927,12 @@ build_island_e3(short x, short y, int numfactions, int minsize)
         freset(rn[n], RF_MARK);
       }
       q = region_quality(r);
-      if (q>1500 && nfactions<numfactions) {
+      if (q>=1000 && nfactions<numfactions) {
         terraform_region(r, newterrain(T_PLAIN));
         minq = MIN(minq, q);
         maxq = MAX(maxq, q);
         prepare_starting_region(r);
+        r->land->money = 50 * 1000; /* 2% = 1000 silver */
         u = addplayer(r, addfaction("enno@eressea.de", itoa36(rng_int()), races,
           default_locale, 0));
         ++nfactions;

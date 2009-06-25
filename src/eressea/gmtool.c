@@ -792,7 +792,7 @@ handlekey(state * st, int c)
     make_block((short)st->cursor.x, (short)st->cursor.y, 6, select_terrain(st, NULL));
     */
     n = rng_int() % 8 + 8;
-    build_island_e3((short)st->cursor.x, (short)st->cursor.y, n, n*4);
+    build_island_e3((short)st->cursor.x, (short)st->cursor.y, n, n*3);
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;

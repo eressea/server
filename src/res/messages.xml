@@ -6764,7 +6764,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist schon fertig."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship is already completed."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is already completed."</text>
   </message>
   <message name="error15" section="errors">
@@ -6774,7 +6773,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist noch nicht fertig gebaut."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship has not yet been completed."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship has not yet been completed."</text>
   </message>
   <message name="error14" section="errors">
@@ -6784,7 +6782,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist auf hoher See."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship is off shore."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is off shore."</text>
   </message>
   <message name="error13" section="errors">
@@ -6794,8 +6791,16 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff hat sich bereits bewegt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship has moved already."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship has moved already."</text>
+  </message>
+  <message name="error150" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Besitzer muss das Boot zuerst verlassen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The owner must first LEAVE the building."</text>
   </message>
   <message name="error12" section="errors">
     <type>
@@ -6804,7 +6809,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff gehört uns nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship is not ours."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is not ours."</text>
   </message>
   <message name="error11" section="errors">
@@ -6814,7 +6818,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff befindet sich auf hoher See."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The ship is still off shore."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is still off shore."</text>
   </message>
   <message name="error10" section="errors">
@@ -6824,7 +6827,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das macht wenig Sinn."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - That does not make much sense."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - That does not make much sense."</text>
   </message>
   <message name="error9" section="errors">
@@ -6834,7 +6836,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das kann man nicht sabotieren."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - That cannot be sabotaged."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - That cannot be sabotaged."</text>
   </message>
   <message name="error8" section="errors">
@@ -6844,7 +6845,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das ist sinnlos."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - That is useless."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - That is useless."</text>
   </message>
   <message name="error7" section="errors">
@@ -6854,8 +6854,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das geht nicht mehr."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This is not possible any longer."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This is not possible any longer."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This is no longer possible."</text>
   </message>
   <message name="error6" section="errors">
     <type>
@@ -6864,7 +6863,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Gebäude wurde nicht gefunden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Building could not be found."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Building could not be found."</text>
   </message>
   <message name="error5" section="errors">

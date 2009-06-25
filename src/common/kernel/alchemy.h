@@ -58,11 +58,12 @@ extern void init_potions(void);
 extern int get_effect(const struct unit * u, const struct potion_type * effect);
 extern int change_effect(struct unit * u, const struct potion_type * effect, int value);
 extern struct attrib_type at_effect;
+extern struct attrib_type at_potiondelay;
 
 /* rausnehmen, sobald man attribute splitten kann: */
 typedef struct effect_data {
-	const struct potion_type * type;
-	int value;
+  const struct potion_type * type;
+  int value;
 } effect_data;
 
 #ifdef __cplusplus

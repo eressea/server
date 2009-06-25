@@ -1677,7 +1677,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
       stormchance = stormyness / shipspeed(sh, u);
       if (check_leuchtturm(next_point, NULL)) stormchance /= 3;
 
-      if (rng_int()%10000 < stormchance && fval(current_point->terrain, SEA_REGION)) {
+      if (rng_int()%10000 < stormchance*sh->type->storm && fval(current_point->terrain, SEA_REGION)) {
         if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
           region * rnext = NULL;
           boolean storm = true;
@@ -1987,6 +1987,16 @@ travel(unit * u, region_list ** routep)
   /* a few pre-checks that need not be done for each step: */
   if (!fval(r->terrain, SEA_REGION)) {
     ship * sh = u->ship;
+    static int rule_leave = -1;
+
+    if (rule_leave<0) {
+      rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
+    }
+    if (rule_leave && u->building && u==buildingowner(u->region, u->building)) {
+      cmistake(u, u->thisorder, 150, MSG_MOVE);
+      return;
+    }
+
     /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
     if (sh == NULL) {
       sh = leftship(u);

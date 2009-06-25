@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -90,20 +90,41 @@ herbsearch(region * r, unit * u, int max)
   }
 }
 
-int
-use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
+static int
+begin_potion(unit * u, const potion_type * ptype, struct order *ord)
 {
-  const potion_type * ptype = resource2potion(itype->rtype);
-  const potion_type * use = ugetpotionuse(u);
+  static int rule_multipotion = -1;
   assert(ptype!=NULL);
-  
-  if (use != NULL && use!=ptype) {
-    ADDMSG(&u->faction->msgs,
-           msg_message("errusingpotion", "unit using command",
-                       u, use->itype->rtype, ord));
-    return ECUSTOM;
+
+  if (rule_multipotion<0) {
+    /* should we allow multiple different potions to be used the same turn? */
+    rule_multipotion = get_param_int(global.parameters, "rules.magic.multipotion", 0);
   }
+  if (!rule_multipotion) {
+    const potion_type * use = ugetpotionuse(u);
+    if (use != NULL && use!=ptype) {
+      ADDMSG(&u->faction->msgs,
+             msg_message("errusingpotion", "unit using command",
+                         u, use->itype->rtype, ord));
+      return ECUSTOM;
+    }
+  }
+  return 0;
+}
+
+static void
+end_potion(unit * u, const potion_type * ptype, int amount)
+{
+  use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  usetpotionuse(u, ptype);
   
+  ADDMSG(&u->faction->msgs, msg_message("usepotion",
+    "unit potion", u, ptype->itype->rtype));
+}
+
+void
+do_potion(unit * u, const potion_type * ptype, int amount)
+{
   if (ptype==oldpotiontype[P_LIFE]) {
     region * r = u->region;
     int holz = 0;
@@ -125,8 +146,6 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
     rsettrees(r, 1, rtrees(r, 1) + holz);
     ADDMSG(&u->faction->msgs, msg_message("growtree_effect", 
       "mage amount", u, holz));
-  } else if (ptype==oldpotiontype[P_HEAL]) {
-    return EUNUSABLE;
   } else if (ptype==oldpotiontype[P_HEILWASSER]) {
     u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
   } else if (ptype==oldpotiontype[P_PEOPLE]) {
@@ -148,11 +167,72 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
   } else {
     change_effect(u, ptype, 10*amount);
   }
-  use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
-  usetpotionuse(u, ptype);
-  
-  ADDMSG(&u->faction->msgs, msg_message("usepotion",
-    "unit potion", u, ptype->itype->rtype));
+}
+
+int
+use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
+{
+  const potion_type * ptype = resource2potion(itype->rtype);
+
+  if (ptype==oldpotiontype[P_HEAL]) {
+    return EUNUSABLE;
+  } else {
+    int result = begin_potion(u, ptype, ord);
+    if (result) return result;
+    do_potion(u, ptype, amount);
+    end_potion(u, ptype, amount);
+  }
+  return 0;
+}
+
+typedef struct potiondelay {
+  unit * u;
+  const potion_type * ptype;
+  int amount;
+} potiondelay;
+
+static void init_potiondelay(attrib * a) {
+  a->data.v = malloc(sizeof(potiondelay));
+}
+
+static void free_potiondelay(attrib * a) {
+  free(a->data.v);
+}
+
+static int age_potiondelay(attrib * a) {
+  potiondelay * pd = (potiondelay *)a->data.v;
+  do_potion(pd->u, pd->ptype, pd->amount); 
+  return AT_AGE_REMOVE;
+}
+
+attrib_type at_potiondelay = {
+  "eventhandler",
+  init_potiondelay,
+  free_potiondelay,
+  age_potiondelay, 0, 0
+};
+
+static attrib *
+make_potiondelay(unit * u, const potion_type* ptype, int amount)
+{
+  attrib * a = a_new(&at_potiondelay);
+  potiondelay * pd = (potiondelay *)a->data.v;
+  pd->u = u;
+  pd->ptype = ptype;
+  pd->amount = amount;
+  return a;
+}
+
+static int
+use_wateroflife_delayed(unit * u, const item_type * itype, int amount, struct order *ord)
+{
+  const potion_type * ptype = resource2potion(itype->rtype);
+  int result = begin_potion(u, ptype, ord);
+  if (result) return result;
+
+  a_add(&u->attribs, make_potiondelay(u, ptype, amount));
+
+  end_potion(u, ptype, amount);
   return 0;
 }
 
@@ -163,21 +243,21 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 static void
 a_initeffect(attrib *a)
 {
-	a->data.v = calloc(sizeof(effect_data), 1);
+  a->data.v = calloc(sizeof(effect_data), 1);
 }
 
 static void
 a_finalizeeffect(attrib * a)
 {
-	free(a->data.v);
+  free(a->data.v);
 }
 
 static void
 a_writeeffect(const attrib *a, storage * store)
 {
-	effect_data * edata = (effect_data*)a->data.v;
+  effect_data * edata = (effect_data*)a->data.v;
     store->w_tok(store, resourcename(edata->type->itype->rtype, 0));
-	store->w_int(store, edata->value);
+  store->w_int(store, edata->value);
 }
 
 static int
@@ -201,23 +281,23 @@ a_readeffect(attrib *a, storage * store)
 }
 
 attrib_type at_effect = {
-	"effect",
-	a_initeffect,
-	a_finalizeeffect,
-	DEFAULT_AGE,
-	a_writeeffect,
-	a_readeffect,
+  "effect",
+  a_initeffect,
+  a_finalizeeffect,
+  DEFAULT_AGE,
+  a_writeeffect,
+  a_readeffect,
 };
 
 int
 get_effect(const unit * u, const potion_type * effect)
 {
-	const attrib * a;
-	for (a=a_find(u->attribs, &at_effect); a!=NULL && a->type==&at_effect; a=a->next) {
-		const effect_data * data = (const effect_data *)a->data.v;
-		if (data->type==effect) return data->value;
-	}
-	return 0;
+  const attrib * a;
+  for (a=a_find(u->attribs, &at_effect); a!=NULL && a->type==&at_effect; a=a->next) {
+    const effect_data * data = (const effect_data *)a->data.v;
+    if (data->type==effect) return data->value;
+  }
+  return 0;
 }
 
 int

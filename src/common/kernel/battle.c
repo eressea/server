@@ -683,8 +683,10 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
     }
     if (attacking) {
       skill += u->race->at_bonus;
+      if (u->ship) skill += u->ship->type->at_bonus;
     } else {
       skill += u->race->df_bonus;
+      if (u->ship) skill += u->ship->type->df_bonus;
     }
   } else {
     /* changed: if we own a weapon, we have at least a skill of 0 */
@@ -1583,6 +1585,8 @@ select_opponent(battle * b, troop at, int mindist, int maxdist)
       int tactics = get_tactics(dt.fighter->side);
       /* percentage chance to get this attack */
       double tacch = 0.1 * (b->max_tactics - tactics);
+      ship * sh = at.fighter->unit->ship;
+      if (sh) tacch *= sh->type->tac_bonus;
       if (!chance(tacch)) {
         dt.fighter = NULL;
       }
