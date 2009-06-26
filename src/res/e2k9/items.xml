@@ -44,7 +44,7 @@
   <resource name="p2" appearance="vial">
     <!-- Wasser des Lebens -->
     <item weight="0" score="30">
-      <function name="use" value="usepotion"/>
+      <function name="use" value="usepotion_delayed"/>
       <potion level="1"/>
     </item>
   </resource>
