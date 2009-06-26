@@ -683,10 +683,10 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
     }
     if (attacking) {
       skill += u->race->at_bonus;
-      if (u->ship) skill += u->ship->type->at_bonus;
+      if (fval(u->region->terrain, SEA_REGION) && u->ship) skill += u->ship->type->at_bonus;
     } else {
       skill += u->race->df_bonus;
-      if (u->ship) skill += u->ship->type->df_bonus;
+      if (fval(u->region->terrain, SEA_REGION) && u->ship) skill += u->ship->type->df_bonus;
     }
   } else {
     /* changed: if we own a weapon, we have at least a skill of 0 */
@@ -734,16 +734,20 @@ CavalryBonus(const unit * u, troop enemy, int type)
     /* old rule, Eressea 1.0 compat */
     return (type==BONUS_SKILL)?2:0;
   } else {
-    /* new rule, chargers in Eressea 1.1 */
-    int skl = effskill(u, SK_RIDING);
-    /* only half against trolls */
-    if (enemy.fighter->unit->race==new_race[RC_TROLL]) {
-      skl = skl/4;
-    } else {
-      skl = skl/2;
+    if (type==BONUS_DAMAGE) {
+      /* new rule, chargers in Eressea 1.1 */
+      int skl = effskill(u, SK_RIDING);
+      /* only half against trolls */
+      if (skl>0) {
+        int dmg = 1+rng_int() % skl;
+        if (enemy.fighter->unit->race==new_race[RC_TROLL]) {
+          dmg = dmg/2;
+        }
+        return dmg;
+      }
     }
-    return MIN(skl, 4);
   }
+  return 0;
 }
 
 static int
@@ -1071,6 +1075,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   unit *du = df->unit;
   battle *b = df->side->battle;
   int heiltrank = 0;
+  static int rule_armor = -1;
 
   /* Schild */
   void **si;
@@ -1162,11 +1167,19 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
 #endif
 
-  /* natürliche Rüstung ist halbkumulativ */
-  if (ar>0) {
-    ar += an/2;
+  if (rule_armor<0) {
+    rule_armor = get_param_int(global.parameters, "rules.combat.nat_armor", 0);
+  }
+  if (rule_armor==0) {
+    /* natürliche Rüstung ist halbkumulativ */
+    if (ar>0) {
+      ar += an/2;
+    } else {
+      ar = an;
+    }
   } else {
-    ar = an;
+    /* use the higher value, add half the other value */
+    ar = (ar>an)?(ar+an/2):(an+ar/2);
   }
   ar += am;
 
@@ -1585,8 +1598,10 @@ select_opponent(battle * b, troop at, int mindist, int maxdist)
       int tactics = get_tactics(dt.fighter->side);
       /* percentage chance to get this attack */
       double tacch = 0.1 * (b->max_tactics - tactics);
-      ship * sh = at.fighter->unit->ship;
-      if (sh) tacch *= sh->type->tac_bonus;
+      if (fval(b->region->terrain, SEA_REGION)) {
+        ship * sh = at.fighter->unit->ship;
+        if (sh) tacch *= sh->type->tac_bonus;
+      }
       if (!chance(tacch)) {
         dt.fighter = NULL;
       }

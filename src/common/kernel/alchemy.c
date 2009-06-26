@@ -128,22 +128,27 @@ do_potion(unit * u, const potion_type * ptype, int amount)
   if (ptype==oldpotiontype[P_LIFE]) {
     region * r = u->region;
     int holz = 0;
-    
+    static int tree_type = -1;
+    static int tree_count = -1;
+    if (tree_type<0) {
+      tree_type = get_param_int(global.parameters, "rules.magic.wol_type", 1);
+      tree_count = get_param_int(global.parameters, "rules.magic.wol_effect", 10);
+    }
     /* mallorn is required to make mallorn forests, wood for regular ones */
     if (fval(r, RF_MALLORN)) {
       holz = use_pooled(u, rt_find("mallorn"), 
-                        GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
+                        GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, tree_count*amount);
     } else {
       holz = use_pooled(u, rt_find("log"), 
-                        GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
+                        GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, tree_count*amount);
     }
-    if (r->land==0) holz=0;
-    if (holz<10*amount) {
-      int x = holz/10;
-      if (holz%10) ++x;
+    if (r->land==0) holz = 0;
+    if (holz<tree_count*amount) {
+      int x = holz/tree_count;
+      if (holz%tree_count) ++x;
       if (x<amount) amount = x;
     }
-    rsettrees(r, 1, rtrees(r, 1) + holz);
+    rsettrees(r, tree_type, rtrees(r, tree_type) + holz);
     ADDMSG(&u->faction->msgs, msg_message("growtree_effect", 
       "mage amount", u, holz));
   } else if (ptype==oldpotiontype[P_HEILWASSER]) {
@@ -205,8 +210,12 @@ static int age_potiondelay(attrib * a) {
   return AT_AGE_REMOVE;
 }
 
+/* TODO:
+ * - this should be a more general item_delay
+ * - it should not just happen in age(), but be done with eventhandling
+ */
 attrib_type at_potiondelay = {
-  "eventhandler",
+  "potiondelay",
   init_potiondelay,
   free_potiondelay,
   age_potiondelay, 0, 0
@@ -223,8 +232,8 @@ make_potiondelay(unit * u, const potion_type* ptype, int amount)
   return a;
 }
 
-static int
-use_wateroflife_delayed(unit * u, const item_type * itype, int amount, struct order *ord)
+int
+use_potion_delayed(unit * u, const item_type * itype, int amount, struct order *ord)
 {
   const potion_type * ptype = resource2potion(itype->rtype);
   int result = begin_potion(u, ptype, ord);

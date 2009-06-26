@@ -53,6 +53,7 @@ enum {
 
 extern void herbsearch(struct region * r, struct unit * u, int max);
 extern int use_potion(struct unit * u, const struct item_type * itype, int amount, struct order *);
+extern int use_potion_delayed(struct unit * u, const struct item_type * itype, int amount, struct order *);
 extern void init_potions(void);
 
 extern int get_effect(const struct unit * u, const struct potion_type * effect);

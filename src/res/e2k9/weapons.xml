@@ -3,7 +3,7 @@
   <xi:include href="../weapons/axe.xml"/>
   <xi:include href="../weapons/bow.xml"/>
   <xi:include href="../weapons/catapult.xml"/>
-  <xi:include href="../weapons/crossbow.xml"/>
+  <xi:include href="../weapons/crossbow-2.xml"/>
   <xi:include href="../weapons/rep_crossbow.xml"/>
   <xi:include href="../weapons/firesword.xml"/>
   <xi:include href="../weapons/greatbow-2.xml"/>
@@ -12,7 +12,7 @@
   <xi:include href="../weapons/laensword-2.xml"/>
   <xi:include href="../weapons/lance.xml"/>
   <xi:include href="../weapons/mallornbow.xml"/>
-  <xi:include href="../weapons/mallorncrossbow.xml"/>
+  <xi:include href="../weapons/mallorncrossbow-2.xml"/>
   <xi:include href="../weapons/mallornlance.xml"/>
   <xi:include href="../weapons/mallornspear.xml"/>
   <xi:include href="../weapons/runesword.xml"/>

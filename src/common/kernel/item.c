@@ -1176,6 +1176,7 @@ register_resources(void)
   register_function((pf_generic)res_changeaura, "changeaura");
 
   register_item_use(use_potion, "usepotion");
+  register_item_use(use_potion_delayed, "usepotion_delayed");
   register_item_use(use_tacticcrystal, "use_tacticcrystal");
   register_item_use(use_birthdayamulet, "use_birthdayamulet");
   register_item_use(use_warmthpotion, "usewarmthpotion");

@@ -133,7 +133,9 @@
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.goblinbonus" value="3"/>
     <param name="rules.ship.capacity" value="1"/> <!-- -->
+    <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
     <param name="rules.alliances" value="1"/>
+    <param name="rules.combat.nat_armor" value="1"/>
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
     <param name="rules.combat.skill_bonus" value="0"/>
@@ -143,6 +145,7 @@
     <param name="rules.cavalry.mode" value="1"/>
     <param name="rules.magic.multipotion" value="1"/>
     <param name="rules.magic.wol_effect" value="5"/>
+    <param name="rules.magic.wol_type" value="2"/>
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
     <param name="rules.magic.elfpower" value="1"/> <!-- elves get ring-of-power bonus in a forest -->
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>

@@ -3,11 +3,11 @@
 
   <!-- equipment given to new units -->
   <set name="new_demon_unit">
-    <skill name="stamina" level="6"/>
+    <!--skill name="stamina" level="6"/-->
   </set>
 
   <set name="new_troll_unit">
-    <skill name="stamina" level="2"/>
+    <!--skill name="stamina" level="2"/-->
   </set>
 
   <set name="seaserpent_spoils">
