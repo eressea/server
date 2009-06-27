@@ -112,7 +112,7 @@ typedef struct region {
      which a faction has its units. See the implementations of firstregion 
      and lastregion */
   unsigned int uid; /* a unique id */
-  short x, y;
+  int x, y;
   struct plane *planep;
   char *display;
   unsigned int flags;
@@ -141,7 +141,7 @@ struct message_list * r_getmessages(const struct region * r, const struct factio
 struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct spec_direction {
-  short x, y;
+  int x, y;
   int  duration;
   boolean active;
   char *desc;
@@ -157,7 +157,7 @@ typedef struct {
 int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;
 direction_t reldirection(const struct region * from, const struct region * to);
-struct region * findregion(short x, short y);
+struct region * findregion(int x, int y);
 struct region * findregionbyid(unsigned int uid);
 
 extern struct attrib_type at_direction;
@@ -229,12 +229,12 @@ int r_demand(const struct region * r, const struct luxury_type * ltype);
 
 const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
-struct region * new_region(short x, short y, unsigned int uid);
+struct region * new_region(int x, int y, unsigned int uid);
 void remove_region(region ** rlist, region * r);
 void terraform_region(struct region * r, const struct terrain_type * terrain);
 
-extern const short delta_x[MAXDIRECTIONS];
-extern const short delta_y[MAXDIRECTIONS];
+extern const int delta_x[MAXDIRECTIONS];
+extern const int delta_y[MAXDIRECTIONS];
 direction_t dir_invert(direction_t dir);
 int production(const struct region *r);
 

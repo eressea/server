@@ -91,6 +91,9 @@
 #include <util/patricia.h>
 #endif
 
+int world_width = -1;
+int world_height = -1;
+
 /* exported variables */
 region  *regions;
 faction *factions;
@@ -1149,15 +1152,15 @@ update_lighthouse(building * lh)
 
   if (lh->type==bt_lighthouse) {
     region * r = lh->region;
-    short d = (short)log10(lh->size) + 1;
-    short x;
+    int d = (int)log10(lh->size) + 1;
+    int x;
 
     if (lh->size>0) {
       r->flags |= RF_LIGHTHOUSE;
     }
 
     for (x=-d;x<=d;++x) {
-      short y;
+      int y;
       for (y=-d;y<=d;++y) {
         attrib * a;
         region * r2 = findregion(x+r->x, y+r->y);
@@ -2928,9 +2931,12 @@ has_limited_skills (const struct unit * u)
     return false;
   }
 }
+
 void
 attrib_init(void)
 {
+  world_width = get_param_int(global.parameters, "world.width", 0);
+  world_height = get_param_int(global.parameters, "world.height", 0);
   /* Alle speicherbaren Attribute müssen hier registriert werden */
   at_register(&at_shiptrail);
   at_register(&at_familiar);

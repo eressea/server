@@ -176,8 +176,8 @@ gm_gate(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
   int id = getid();
-  short x = rel_to_abs(p, u->faction, (short)getint(), 0);
-  short y = rel_to_abs(p, u->faction, (short)getint(), 1);
+  int x = rel_to_abs(p, u->faction, getint(), 0);
+  int y = rel_to_abs(p, u->faction, getint(), 1);
   region * r = findregion(x, y);
   building * b = findbuilding(id);
   if (b==NULL || r==NULL || p!=rplane(b->region) || p!=rplane(r)) {
@@ -208,8 +208,8 @@ gm_terraform(const tnode * tnext, void * data, struct order * ord)
 {
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
-  short x = rel_to_abs(p, u->faction, (short)getint(), 0);
-  short y = rel_to_abs(p, u->faction, (short)getint(), 1);
+  int x = rel_to_abs(p, u->faction, getint(), 0);
+  int y = rel_to_abs(p, u->faction, getint(), 1);
   const char * c = getstrtoken();
   region * r = findregion(x, y);
   variant token;
@@ -240,8 +240,8 @@ gm_teleport(const tnode * tnext, void * data, struct order * ord)
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
   unit * to = findunit(getid());
-  short x = rel_to_abs(p, u->faction, (short)getint(), 0);
-  short y = rel_to_abs(p, u->faction, (short)getint(), 1);
+  int x = rel_to_abs(p, u->faction, getint(), 0);
+  int y = rel_to_abs(p, u->faction, getint(), 1);
   region * r = findregion(x, y);
 
   if (r==NULL || p!=rplane(r)) {
@@ -334,8 +334,8 @@ gm_messageregion(const tnode * tnext, void * data, struct order * ord)
 {
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
-  short x = rel_to_abs(p, u->faction, (short)getint(), 0);
-  short y = rel_to_abs(p, u->faction, (short)getint(), 1);
+  int x = rel_to_abs(p, u->faction, getint(), 0);
+  int y = rel_to_abs(p, u->faction, getint(), 1);
   const char * msg = getstrtoken();
   region * r = findregion(x, y);
 
@@ -611,22 +611,22 @@ gmcommands(void)
 #define EXTENSION 10000
 
 faction *
-gm_addquest(const char * email, const char * name, short radius, unsigned int flags)
+gm_addquest(const char * email, const char * name, int radius, unsigned int flags)
 {
   plane * p;
   watcher * w = calloc(sizeof(watcher), 1);
   region * center;
   boolean invalid = false;
-  short minx, miny, maxx, maxy, cx, cy;
-  short x;
+  int minx, miny, maxx, maxy, cx, cy;
+  int x;
   faction * f;
 
   /* GM playfield */
   do {
-    minx = (short)((rng_int() % (2*EXTENSION)) - EXTENSION);
-    miny = (short)((rng_int() % (2*EXTENSION)) - EXTENSION);
+    minx = ((rng_int() % (2*EXTENSION)) - EXTENSION);
+    miny = ((rng_int() % (2*EXTENSION)) - EXTENSION);
     for (x=0;!invalid && x<=radius*2;++x) {
-      short y;
+      int y;
       for (y=0;!invalid && y<=radius*2;++y) {
         region * r = findregion(minx+x, miny+y);
         if (r) invalid = true;
@@ -638,7 +638,7 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
   p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
   center = new_region(cx, cy, 0);
   for (x=0;x<=2*radius;++x) {
-    short y;
+    int y;
     for (y=0;y<=2*radius;++y) {
       region * r = findregion(minx+x, miny+y);
       if (!r) r = new_region(minx+x, miny+y, 0);
@@ -723,20 +723,20 @@ gm_addfaction(const char * email, plane * p, region * r)
 }
 
 plane *
-gm_addplane(short radius, unsigned int flags, const char * name)
+gm_addplane(int radius, unsigned int flags, const char * name)
 {
   region * center;
   plane * p;
   boolean invalid = false;
-  short minx, miny, maxx, maxy, cx, cy;
-  short x;
+  int minx, miny, maxx, maxy, cx, cy;
+  int x;
 
   /* GM playfield */
   do {
-    minx = (short)(rng_int() % (2*EXTENSION)) - EXTENSION;
-    miny = (short)(rng_int() % (2*EXTENSION)) - EXTENSION;
+    minx = (rng_int() % (2*EXTENSION)) - EXTENSION;
+    miny = (rng_int() % (2*EXTENSION)) - EXTENSION;
     for (x=0;!invalid && x<=radius*2;++x) {
-      short y;
+      int y;
       for (y=0;!invalid && y<=radius*2;++y) {
         region * r = findregion(minx+x, miny+y);
         if (r) invalid = true;
@@ -748,7 +748,7 @@ gm_addplane(short radius, unsigned int flags, const char * name)
   p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
   center = new_region(cx, cy, 0);
   for (x=0;x<=2*radius;++x) {
-    short y;
+    int y;
     for (y=0;y<=2*radius;++y) {
       region * r = findregion(minx+x, miny+y);
       if (!r) r = new_region(minx+x, miny+y, 0);

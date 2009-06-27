@@ -229,22 +229,22 @@ faction_getorigin(const faction * f, int &x, int &y)
     y = 0;
   }
 }
-short
+int
 faction_getorigin_x(const faction * f) {
   return f->ursprung->x;
 }
 void
-faction_setorigin_x(faction * f, short x) {
+faction_setorigin_x(faction * f, int x) {
   f->ursprung->x = x;
 }
 
-static short
+static int
 faction_getorigin_y(const faction * f) {
   return f->ursprung->y;
 }
 
 static void
-faction_setorigin_y(faction * f, short y) {
+faction_setorigin_y(faction * f, int y) {
   f->ursprung->y = y;
 }
 

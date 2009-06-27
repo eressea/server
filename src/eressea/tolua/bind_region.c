@@ -217,8 +217,8 @@ tolua_region_get_objects(lua_State* L)
 static int
 tolua_region_create(lua_State* L)
 {
-  short x = (short)tolua_tonumber(L, 1, 0);
-  short y = (short)tolua_tonumber(L, 2, 0);
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
   const char * tname = tolua_tostring(L, 3, 0);
 
   const terrain_type * terrain = get_terrain(tname);

@@ -449,7 +449,7 @@ static void
 terraform_at(coordinate * c, const terrain_type *terrain)
 {
   if (terrain!=NULL) {
-    short x = (short)c->x, y = (short)c->y;
+    int x = c->x, y = c->y;
     region * r = findregion(x, y);
     if (r==NULL) r = new_region(x, y, 0);
     terraform_region(r, terrain);
@@ -466,7 +466,7 @@ terraform_selection(selection * selected, const terrain_type *terrain)
     tag ** tp = &selected->tags[i];
     while (*tp) {
       tag * t = *tp;
-      short x = (short)t->coord.x, y = (short)t->coord.y;
+      int x = t->coord.x, y = t->coord.y;
       region * r = findregion(x, y);
       if (r==NULL) r = new_region(x, y, 0);
       terraform_region(r, terrain);
@@ -789,17 +789,17 @@ handlekey(state * st, int c)
     break;
   case 'B':
     /*
-    make_block((short)st->cursor.x, (short)st->cursor.y, 6, select_terrain(st, NULL));
+    make_block(st->cursor.x, st->cursor.y, 6, select_terrain(st, NULL));
     */
     n = rng_int() % 8 + 8;
-    build_island_e3((short)st->cursor.x, (short)st->cursor.y, n, n*3);
+    build_island_e3(st->cursor.x, st->cursor.y, n, n*3);
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
     st->wnd_map->update |= 1;
     break;
   case 0x02: /* CTRL+b */
-    make_block((short)st->cursor.x, (short)st->cursor.y, 6, newterrain(T_OCEAN));
+    make_block(st->cursor.x, st->cursor.y, 6, newterrain(T_OCEAN));
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
@@ -1072,7 +1072,7 @@ update_view(view * vi)
       mr->coord.x = vi->topleft.x + i - j/2;
       mr->coord.y = vi->topleft.y + j;
       mr->coord.p = vi->plane;
-      mr->r = findregion((short)mr->coord.x, (short)mr->coord.y);
+      mr->r = findregion(mr->coord.x, mr->coord.y);
     }
   }
 }

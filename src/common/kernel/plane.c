@@ -72,7 +72,7 @@ getplanebyname(const char * name)
 }
 
 plane *
-findplane(short x, short y)
+findplane(int x, int y)
 {
 	plane *pl;
 
@@ -103,7 +103,7 @@ getplaneid(const region *r)
 	return 0;
 }
 
-static short
+static int
 ursprung_x(const faction *f, const plane *pl, const region * rdefault)
 {
 	ursprung *ur;
@@ -124,7 +124,7 @@ ursprung_x(const faction *f, const plane *pl, const region * rdefault)
 	return rdefault->x - plane_center_x(pl);
 }
 
-static short
+static int
 ursprung_y(const faction *f, const plane *pl, const region * rdefault)
 {
 	ursprung *ur;
@@ -145,7 +145,7 @@ ursprung_y(const faction *f, const plane *pl, const region * rdefault)
 	return rdefault->y - plane_center_y(pl);
 }
 
-short 
+int 
 plane_center_x(const plane *pl)
 {
 	if(pl == NULL)
@@ -154,7 +154,7 @@ plane_center_x(const plane *pl)
 	return(pl->minx + pl->maxx)/2;
 }
 
-short 
+int 
 plane_center_y(const plane *pl)
 {
 	if(pl == NULL)
@@ -163,14 +163,14 @@ plane_center_y(const plane *pl)
 	return(pl->miny + pl->maxy)/2;
 }
 
-short
+int
 region_x(const region *r, const faction *f)
 {
   plane *pl = r->planep;
   return r->x - ursprung_x(f, pl, r) - plane_center_x(pl);
 }
 
-short
+int
 region_y(const region *r, const faction *f)
 {
   plane *pl = r->planep;
@@ -178,7 +178,7 @@ region_y(const region *r, const faction *f)
 }
 
 void
-set_ursprung(faction *f, int id, short x, short y)
+set_ursprung(faction *f, int id, int x, int y)
 {
 	ursprung *ur;
 	assert(f!=NULL);
@@ -199,7 +199,7 @@ set_ursprung(faction *f, int id, short x, short y)
 }
 
 plane *
-create_new_plane(int id, const char *name, short minx, short maxx, short miny, short maxy, int flags)
+create_new_plane(int id, const char *name, int minx, int maxx, int miny, int maxy, int flags)
 {
 	plane *pl = getplanebyid(id);
 
@@ -220,8 +220,8 @@ create_new_plane(int id, const char *name, short minx, short maxx, short miny, s
 }
 
 /* Umrechnung Relative-Absolute-Koordinaten */
-short 
-rel_to_abs(const struct plane *pl, const struct faction * f, short rel, unsigned char index)
+int 
+rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned char index)
 {
 	assert(index == 0 || index == 1);
 

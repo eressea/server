@@ -3,8 +3,11 @@
 #include "bind_gmtool.h"
 #include "../gmtool.h"
 #include "../gmtool_structs.h"
+#include "../editing.h"
 
 #include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <modules/autoseed.h>
 
 #include <lua.h>
 #include <tolua.h>
@@ -77,7 +80,7 @@ tag_advance(tag_iterator * iter)
       }
     }
     if (iter->node) {
-      iter->r = findregion((short)iter->node->coord.x, (short)iter->node->coord.y);
+      iter->r = findregion(iter->node->coord.x, iter->node->coord.y);
       if (iter->r) {
         break;
       }
@@ -93,7 +96,7 @@ tag_rewind(tag_iterator * iter)
     iter->node = iter->list->tags[0];
     iter->hash = 0;
     if (iter->node) {
-      iter->r = findregion((short)iter->node->coord.x, (short)iter->node->coord.y);
+      iter->r = findregion(iter->node->coord.x, iter->node->coord.y);
     }
     if (!iter->r) {
       tag_advance(iter);
@@ -149,6 +152,29 @@ tolua_state_close(lua_State* L)
   return 0;
 }
 
+static int
+tolua_make_island(lua_State * L)
+{
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
+  int n = (int)tolua_tonumber(L, 3, 0);
+  n = build_island_e3(x, y, n, n*3);
+  tolua_pushnumber(L, n);
+  return 1;
+}
+
+static int
+tolua_make_block(lua_State * L)
+{
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
+  int r = (int)tolua_tonumber(L, 3, 6);
+  const char * str = tolua_tostring(L, 4, "ocean");
+  const struct terrain_type * ter = get_terrain(str);
+  make_block(x, y, r, ter);
+  return 0;
+}
+
 void
 tolua_gmtool_open(lua_State* L)
 {
@@ -170,6 +196,9 @@ tolua_gmtool_open(lua_State* L)
       tolua_function(L, "highlight", tolua_highlight_region);
       tolua_function(L, "select", tolua_select_region);
       tolua_function(L, "select_at", tolua_select_coordinate);
+
+      tolua_function(L, "make_block", &tolua_make_block);
+      tolua_function(L, "make_island", &tolua_make_island);
     }
     tolua_endmodule(L);
   }

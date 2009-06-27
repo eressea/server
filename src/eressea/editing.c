@@ -35,9 +35,9 @@ seed_players(const char * filename, boolean new_island)
 }
 
 void
-make_block(short x, short y, short radius, const struct terrain_type * terrain)
+make_block(int x, int y, int radius, const struct terrain_type * terrain)
 {
-  short cx, cy;
+  int cx, cy;
   region *r;
 
   if (terrain==NULL) return;
@@ -55,7 +55,7 @@ make_block(short x, short y, short radius, const struct terrain_type * terrain)
 }
 
 void
-make_island(short x, short y, int size)
+make_island(int x, int y, int size)
 {
   /* region_list * island; */
 }

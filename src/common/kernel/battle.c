@@ -734,16 +734,21 @@ CavalryBonus(const unit * u, troop enemy, int type)
     /* old rule, Eressea 1.0 compat */
     return (type==BONUS_SKILL)?2:0;
   } else {
-    if (type==BONUS_DAMAGE) {
-      /* new rule, chargers in Eressea 1.1 */
-      int skl = effskill(u, SK_RIDING);
-      /* only half against trolls */
-      if (skl>0) {
-        int dmg = 1+rng_int() % skl;
+    /* new rule, chargers in Eressea 1.1 */
+    int skl = effskill(u, SK_RIDING);
+    /* only half against trolls */
+    if (skl>0) {
+      if (type==BONUS_DAMAGE) {
+        int dmg = MIN(skl, 8);
         if (enemy.fighter->unit->race==new_race[RC_TROLL]) {
+          dmg = dmg/4;
+        } else {
           dmg = dmg/2;
         }
         return dmg;
+      } else {
+        skl = skl/2;
+        return MIN(skl, 4);
       }
     }
   }

@@ -37,6 +37,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/faction.h>
 #include <kernel/save.h>
 
+#include <gamecode/creport.h>
 #include <gamecode/summary.h>
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
@@ -550,6 +551,14 @@ tolua_free_game(lua_State* L)
 }
 
 static int
+tolua_write_map(lua_State* L)
+{
+  const char * filename = tolua_tostring(L, 1, 0);
+  crwritemap(filename);
+  return 0;
+}
+
+static int
 tolua_write_game(lua_State* L)
 {
   const char * filename = tolua_tostring(L, 1, 0);
@@ -591,8 +600,8 @@ tolua_get_faction(lua_State* L)
 static int
 tolua_get_region(lua_State* L)
 {
-  short x = (short)tolua_tonumber(L, 1, 0);
-  short y = (short)tolua_tonumber(L, 2, 0);
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
   region * r = findregion(x, y);
 
   tolua_pushusertype(L, r, "region");
@@ -891,6 +900,7 @@ tolua_eressea_open(lua_State* L)
     tolua_function(L, "read_game", tolua_read_game);
     tolua_function(L, "write_game", tolua_write_game);
     tolua_function(L, "free_game", tolua_free_game);
+    tolua_function(L, "write_map", &tolua_write_map);
 
     tolua_function(L, "read_orders", tolua_read_orders);
     tolua_function(L, "process_orders", tolua_process_orders);

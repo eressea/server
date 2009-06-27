@@ -883,7 +883,7 @@ write_unit(struct storage * store, const unit * u)
 }
 
 static region *
-readregion(struct storage * store, short x, short y)
+readregion(struct storage * store, int x, int y)
 {
   region * r = findregion(x, y);
   const terrain_type * terrain;
@@ -1210,8 +1210,8 @@ readfaction(struct storage * store)
   planes = store->r_int(store);
   while(--planes >= 0) {
     int id = store->r_int(store);
-    short ux = (short)store->r_int(store);
-    short uy = (short)store->r_int(store);
+    int ux = store->r_int(store);
+    int uy = store->r_int(store);
     set_ursprung(f, id, ux, uy);
   }
   f->newbies = 0;
@@ -1386,10 +1386,10 @@ readgame(const char * filename, int mode, int backup)
     }
     pl->id = id;
     pl->name = store->r_str(store);
-    pl->minx = (short)store->r_int(store);
-    pl->maxx = (short)store->r_int(store);
-    pl->miny = (short)store->r_int(store);
-    pl->maxy = (short)store->r_int(store);
+    pl->minx = store->r_int(store);
+    pl->maxx = store->r_int(store);
+    pl->miny = store->r_int(store);
+    pl->maxy = store->r_int(store);
     pl->flags = store->r_int(store);
 
     /* read watchers */
@@ -1443,8 +1443,8 @@ readgame(const char * filename, int mode, int backup)
   log_info((1, " - Einzulesende Regionen: %d/%d\r", rmax, n));
   while (--n >= 0) {
     unit **up;
-    short x = (short)store->r_int(store);
-    short y = (short)store->r_int(store);
+    int x = store->r_int(store);
+    int y = store->r_int(store);
 
     if ((n & 0x3FF) == 0) {  /* das spart extrem Zeit */
       log_info((2, " - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, n, x, y));

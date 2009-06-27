@@ -683,7 +683,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
   if(current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
     double seedchance = 0.01F * RESOURCE_QUANTITY;
-    int elves = count_race(r,new_race[RC_ELF]);
+    int elves = count_race(r, new_race[RC_ELF]);
 
     a = a_find(r->attribs, &at_germs);
     if(a && last_weeks_season == SEASON_SPRING) {

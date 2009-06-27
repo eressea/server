@@ -42,7 +42,7 @@ extern int fix_demand(struct region *r);
 extern const struct terrain_type * random_terrain(const struct terrain_type * terrains[], int distribution[], int size);
 
 extern int seed_adamantium(struct region * r, int base);
-extern int build_island_e3(short x, short y, int numfactions, int minsize);
+extern int build_island_e3(int x, int y, int numfactions, int minsize);
 
 #ifdef __cplusplus
 }

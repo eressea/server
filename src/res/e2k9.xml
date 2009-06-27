@@ -55,7 +55,7 @@
   <xi:include href="names-ghouls.xml"/>
   <xi:include href="names-dragons.xml"/>
 
-  <game name="Aragon" units="500">
+  <game name="E3" units="500">
     <!-- Game specific settings -->
     <param name="database.gameid" value="7"></param>
 

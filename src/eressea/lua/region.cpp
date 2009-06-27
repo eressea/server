@@ -182,7 +182,7 @@ region_getroad(region * r, int dir)
 }
 
 static region *
-region_terraform(short x, short y, const char * tname)
+region_terraform(int x, int y, const char * tname)
 {
   const terrain_type * terrain = get_terrain(tname);
   region * r = findregion(x, y);
@@ -238,7 +238,7 @@ plane_remove(int plane_id)
 }
 
 void
-region_move(region * r, short x, short y)
+region_move(region * r, int x, int y)
 {
   if (findregion(x,y)) {
     log_error(("Bei %d, %d gibt es schon eine Region.\n", x, y));

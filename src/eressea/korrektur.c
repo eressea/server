@@ -570,7 +570,7 @@ fix_road_borders(void)
       border * b;
       for (b=blist;b && fixes!=MAXDEL;b=b->next) {
         if (b->type == &bt_road) {
-          short x1, x2, y1, y2;
+          int x1, x2, y1, y2;
           region *r1, *r2;
 
           x1 = b->from->x;

@@ -115,6 +115,9 @@ extern const char *parameters[MAXPARAMS];
 #define want(option) (1<<option)
 extern const char *options[MAXOPTIONS];
 
+extern int world_width;
+extern int world_height;
+
 /* ------------------------------------------------------------- */
 
 extern int shipspeed(const struct ship * sh, const struct unit * u);

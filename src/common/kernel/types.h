@@ -74,7 +74,7 @@ struct weapon_type;
 typedef struct ursprung {
   struct ursprung *next;
   int id;
-  short x, y;
+  int x, y;
 } ursprung;
 
 /* ----------------- Befehle ----------------------------------- */

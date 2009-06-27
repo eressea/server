@@ -479,7 +479,7 @@ prepare_starting_region(region * r)
 int
 autoseed(newfaction ** players, int nsize, int max_agediff)
 {
-  short x = 0, y = 0;
+  int x = 0, y = 0;
   region * r = NULL;
   region_list * rlist = NULL;
   int rsize = 0, tsize = 0;
@@ -712,7 +712,7 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       direction_t d;
       rbegin=&(*rbegin)->next;
       for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {
-        short i;
+        int i;
         for (i=1;i!=MAXFILLDIST;++i) {
           if (findregion(r->x + i*delta_x[d], r->y + i*delta_y[d]))
             break;
@@ -881,8 +881,8 @@ smooth_island(region_list * island)
             r = rlist->data;
             runhash(r);
             runhash(rn[n]);
-            SWAP(short, r->x, rn[n]->x);
-            SWAP(short, r->y, rn[n]->y);
+            SWAP(int, r->x, rn[n]->x);
+            SWAP(int, r->y, rn[n]->y);
             rhash(r);
             rhash(rn[n]);
             rlist->data = r;
@@ -901,6 +901,7 @@ starting_region(region * r, region * rn[])
   unit * u;
   int n;
 
+  oceans_around(r, rn);
   freset(r, RF_MARK);
   for (n=0;n!=MAXDIRECTIONS;++n) {
     freset(rn[n], RF_MARK);
@@ -913,7 +914,7 @@ starting_region(region * r, region * rn[])
 }
 /* E3A island generation */
 int
-build_island_e3(short x, short y, int numfactions, int minsize)
+build_island_e3(int x, int y, int numfactions, int minsize)
 {
 #define MIN_QUALITY 1000
   int nfactions = 0;
@@ -923,7 +924,9 @@ build_island_e3(short x, short y, int numfactions, int minsize)
   int nsize = 1;
   int q, maxq = INT_MIN, minq = INT_MAX;
  
-  terraform_region(r, random_terrain_e3(NODIRECTION));
+  do {
+    terraform_region(r, random_terrain_e3(NODIRECTION));
+  } while (!r->land);
 
   while (r) {
     fset(r, RF_MARK);
@@ -963,7 +966,6 @@ build_island_e3(short x, short y, int numfactions, int minsize)
       get_neighbours(r, rn);
       q = region_quality(r, rn);
       if (q>=MIN_QUALITY*4/3 && nfactions<numfactions) {
-        oceans_around(r, rn);
         starting_region(r, rn);
         minq = MIN(minq, q);
         maxq = MAX(maxq, q);

@@ -355,9 +355,9 @@ guardian_faction(plane * pl, int id)
 
 #ifdef ARENA_CREATION
 static void 
-block_create(short x1, short y1, char terrain)
+block_create(int x1, int y1, char terrain)
 {
-	short x, y;
+	int x, y;
 	for (x=0;x!=BLOCKSIZE;++x) {
 		for (y=0;y!=BLOCKSIZE;++y) {
 			region * r = new_region(x1 + x, y1 + y, 0);
@@ -464,7 +464,7 @@ init_volcano(void)
 void
 create_arena(void)
 {
-	short x;
+	int x;
 	arena_id = hashstring("arena");
 	arena = getplanebyid(arena_id);
 	if (arena!=NULL) return;
@@ -477,7 +477,7 @@ create_arena(void)
 		block_create(arena->minx, arena->miny, T_OCEAN);
 		arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
 		for (x=0;x!=BLOCKSIZE;++x) {
-			short y;
+			int y;
 			for (y=0;y!=BLOCKSIZE;++y) {
 				region * r = findregion(arena->minx+x, arena->miny+y);
 				freset(r, RF_ENCOUNTER);

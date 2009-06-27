@@ -45,8 +45,8 @@
 #define TP_RADIUS 2
 #define TP_DISTANCE 4
 
-static short
-real2tp(short rk) {
+static int
+real2tp(int rk) {
   /* in C:
   * -4 / 5 = 0;
   * +4 / 5 = 0;
@@ -66,7 +66,7 @@ region_list *
 astralregions(const region * r, boolean (*valid)(const region *))
 {
   region_list * rlist = NULL;
-  short x, y;
+  int x, y;
 
   assert(is_astral(r));
   if (!is_astral(r)) {
@@ -99,7 +99,7 @@ r_standard_to_astral(const region *r)
 region *
 r_astral_to_standard(const region *r)
 {
-  short x, y;
+  int x, y;
   region *r2;
 
   assert(is_astral(r));
@@ -113,9 +113,9 @@ r_astral_to_standard(const region *r)
 }
 
 region_list *
-all_in_range(const region *r, short n, boolean (*valid)(const region *))
+all_in_range(const region *r, int n, boolean (*valid)(const region *))
 {
-  short x, y;
+  int x, y;
   region_list *rlist = NULL;
 
   if (r == NULL) return NULL;
@@ -205,8 +205,8 @@ create_teleport_plane(void)
       region *ra = tpregion(r);
 
       if (ra==NULL) {
-        short x = TE_CENTER_X+real2tp(r->x);
-        short y = TE_CENTER_Y+real2tp(r->y);
+        int x = TE_CENTER_X+real2tp(r->x);
+        int y = TE_CENTER_Y+real2tp(r->y);
         plane * pl = findplane(x, y);
         
         if (aplane && pl==aplane) {

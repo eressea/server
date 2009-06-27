@@ -1913,8 +1913,8 @@ addparam_region(const char * const param[], spllprm ** spobjp, const unit * u, o
     return -1;
   } else {
     int tx = atoi((const char*)param[0]), ty = atoi((const char*)param[1]);
-    short x = rel_to_abs(0, u->faction, (short)tx, 0);
-    short y = rel_to_abs(0, u->faction, (short)ty, 1);
+    int x = rel_to_abs(0, u->faction, tx, 0);
+    int y = rel_to_abs(0, u->faction, ty, 1);
     region *rt = findregion(x,y);
 
     if (rt!=NULL) {

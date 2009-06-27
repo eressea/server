@@ -73,12 +73,12 @@ get_maxluxuries()
   }
   return maxluxuries;
 }
-const short delta_x[MAXDIRECTIONS] =
+const int delta_x[MAXDIRECTIONS] =
 {
   -1, 0, 1, 1, 0, -1
 };
 
-const short delta_y[MAXDIRECTIONS] =
+const int delta_y[MAXDIRECTIONS] =
 {
   1, 1, 0, -1, -1, 0
 };
@@ -433,8 +433,24 @@ static int hash_requests;
 static int hash_misses;
 #endif
 
+void cnormalize(int * x, int * y)
+{
+  if (world_width && x) {
+    if (*x<0) {
+      *x = world_width - abs(*x) % world_width;
+    }
+    *x = *x % world_width; 
+  }
+  if (world_height && y) {
+    if (*y<0) {
+      *y = world_height - abs(*y) % world_height;
+    }
+    *y = *y % world_height; 
+  }
+}
+
 static region *
-rfindhash(short x, short y)
+rfindhash(int x, int y)
 {
   unsigned int rid = coor_hashkey(x, y);
 #if HASH_STATISTICS
@@ -510,7 +526,7 @@ r_connect(const region * r, direction_t dir)
 }
 
 region *
-findregion(short x, short y)
+findregion(int x, int y)
 {
   return rfindhash(x, y);
 }
@@ -840,7 +856,7 @@ static region *last;
 static unsigned int max_index = 0;
 
 region *
-new_region(short x, short y, unsigned int uid)
+new_region(int x, int y, unsigned int uid)
 {
   region *r = rfindhash(x, y);
 

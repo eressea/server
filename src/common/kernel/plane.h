@@ -52,7 +52,7 @@ typedef struct plane {
 	struct watcher * watchers;
 	int id;
 	char *name;
-	short minx, maxx, miny, maxy;
+	int minx, maxx, miny, maxy;
 	unsigned int flags;
 	struct attrib *attribs;
 } plane;
@@ -60,18 +60,18 @@ typedef struct plane {
 extern struct plane *planes;
 
 struct plane *getplane(const struct region *r);
-struct plane *findplane(short x, short y);
+struct plane *findplane(int x, int y);
 void init_planes(void);
 int getplaneid(const struct region *r);
 struct plane * getplanebyid(int id);
-short region_x(const struct region *r, const struct faction *f);
-short region_y(const struct region *r, const struct faction *f);
-short plane_center_x(const struct plane *pl);
-short plane_center_y(const struct plane *pl);
-void set_ursprung(struct faction *f, int id, short x, short y);
-plane * create_new_plane(int id, const char *name, short minx, short maxx, short miny, short maxy, int flags);
+int region_x(const struct region *r, const struct faction *f);
+int region_y(const struct region *r, const struct faction *f);
+int plane_center_x(const struct plane *pl);
+int plane_center_y(const struct plane *pl);
+void set_ursprung(struct faction *f, int id, int x, int y);
+plane * create_new_plane(int id, const char *name, int minx, int maxx, int miny, int maxy, int flags);
 plane * getplanebyname(const char *);
-extern short rel_to_abs(const struct plane *pl, const struct faction * f, short rel, unsigned char index);
+extern int rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned char index);
 extern boolean is_watcher(const struct plane * p, const struct faction * f);
 extern int resolve_plane(variant data, void * addr);
 extern void write_plane_reference(const plane * p, struct storage * store);
