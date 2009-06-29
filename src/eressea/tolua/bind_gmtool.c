@@ -43,8 +43,6 @@ tolua_select_coordinate(lua_State* L)
   int nx = (int)tolua_tonumber(L, 1, 0);
   int ny = (int)tolua_tonumber(L, 2, 0);
   int select = tolua_toboolean(L, 3, 0);
-  plane * pl = findplane(nx, ny);
-  pnormalize(&nx, &ny, pl);
   if (current_state) {
     select_coordinate(current_state->selected, nx, ny, select);
   }
@@ -157,12 +155,11 @@ tolua_state_close(lua_State* L)
 static int
 tolua_make_island(lua_State * L)
 {
-  plane * pl = (plane *)tolua_tousertype(L, 1, 0);
-  int x = (int)tolua_tonumber(L, 2, 0);
-  int y = (int)tolua_tonumber(L, 3, 0);
-  int s = (int)tolua_tonumber(L, 4, 0);
-  int n = (int)tolua_tonumber(L, 5, s / 3);
-  if (pl) pnormalize(&x, &y, pl);
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
+  int s = (int)tolua_tonumber(L, 3, 0);
+  int n = (int)tolua_tonumber(L, 4, s / 3);
+
   n = build_island_e3(x, y, n, s);
   tolua_pushnumber(L, n);
   return 1;
@@ -171,13 +168,12 @@ tolua_make_island(lua_State * L)
 static int
 tolua_make_block(lua_State * L)
 {
-  plane * pl = (plane *)tolua_tousertype(L, 1, 0);
-  int x = (int)tolua_tonumber(L, 2, 0);
-  int y = (int)tolua_tonumber(L, 3, 0);
-  int r = (int)tolua_tonumber(L, 4, 6);
-  const char * str = tolua_tostring(L, 5, "ocean");
+  int x = (int)tolua_tonumber(L, 1, 0);
+  int y = (int)tolua_tonumber(L, 2, 0);
+  int r = (int)tolua_tonumber(L, 3, 6);
+  const char * str = tolua_tostring(L, 4, "ocean");
   const struct terrain_type * ter = get_terrain(str);
-  if (pl) pnormalize(&x, &y, pl);
+
   make_block(x, y, r, ter);
   return 0;
 }

@@ -61,7 +61,7 @@ static plane * home_plane = NULL;
 plane *
 get_homeplane(void)
 {
-  return home_plane;
+  return getplanebyid(0);
 }
 
 

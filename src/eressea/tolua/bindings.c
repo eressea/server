@@ -605,10 +605,9 @@ tolua_get_region(lua_State* L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
   int y = (int)tolua_tonumber(L, 2, 0);
-  struct plane * pl = (struct plane *)tolua_tousertype(L, 3, 0);
+  struct plane * pl = findplane(x, y);
   region * r;
-  if (!pl) pl = findplane(x, y);
-  pnormalize(&x, &y, pl);
+  assert(!pnormalize(&x, &y, pl));
   r = findregion(x, y);
 
   tolua_pushusertype(L, r, "region");

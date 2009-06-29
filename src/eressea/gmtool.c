@@ -859,7 +859,7 @@ handlekey(state * st, int c)
         while (pl && pl!=cursor->pl) {
           pl = pl->next;
         }
-        if (pl->next) {
+        if (pl && pl->next) {
           cursor->pl = pl->next;
         } else {
           cursor->pl = get_homeplane();

@@ -39,10 +39,10 @@ without prior permission by the authors of Eressea.
 int tolua_regionlist_next(lua_State *L)
 {
   region** region_ptr = (region **)lua_touserdata(L, lua_upvalueindex(1));
-  region * u = *region_ptr;
-  if (u != NULL) {
-    tolua_pushusertype(L, (void*)u, "region");
-    *region_ptr = u->next;
+  region * r = *region_ptr;
+  if (r != NULL) {
+    tolua_pushusertype(L, (void*)r, "region");
+    *region_ptr = r->next;
     return 1;
   }
   else return 0;  /* no more values to return */
@@ -216,17 +216,24 @@ tolua_region_get_objects(lua_State* L)
 }
 
 static int
+tolua_region_destroy(lua_State* L)
+{
+  region * self = (region *)tolua_tousertype(L, 1, 0);
+  remove_region(&regions, self);
+  return 0;
+}
+
+static int
 tolua_region_create(lua_State* L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
   int y = (int)tolua_tonumber(L, 2, 0);
   const char * tname = tolua_tostring(L, 3, 0);
-  plane * pl = (plane *)tolua_tousertype(L, 4, 0);
+  plane * pl = findplane(x, y);
   const terrain_type * terrain = get_terrain(tname);
   region * r, * result;
 
-  if (!pl) pl = findplane(x, y);
-  pnormalize(&x, &y, pl);
+  assert(!pnormalize(&x, &y, pl));
   r = result = findregion(x, y);
 
   if (terrain==NULL) {
@@ -393,6 +400,18 @@ tolua_plane_get_id(lua_State* L)
 }
 
 static int
+tolua_plane_normalize(lua_State* L)
+{
+  plane * self = (plane *)tolua_tousertype(L, 1, 0);
+  int x = (int)tolua_tonumber(L, 2, 0);
+  int y = (int)tolua_tonumber(L, 3, 0);
+  pnormalize(&x, &y, self);
+  tolua_pushnumber(L, (lua_Number)x);
+  tolua_pushnumber(L, (lua_Number)y);
+  return 2;
+}
+
+static int
 tolua_plane_tostring(lua_State *L)
 {
   plane * self = (plane *)tolua_tousertype(L, 1, 0);
@@ -434,6 +453,7 @@ tolua_region_open(lua_State* L)
     tolua_beginmodule(L, "region");
     {
       tolua_function(L, "create", tolua_region_create);
+      tolua_function(L, "destroy", tolua_region_destroy);
       tolua_function(L, "__tostring", tolua_region_tostring);
 
       tolua_variable(L, "id", tolua_region_get_id, NULL);
@@ -480,6 +500,7 @@ tolua_region_open(lua_State* L)
       tolua_function(L, "__tostring", tolua_plane_tostring);
 
       tolua_variable(L, "id", tolua_plane_get_id, NULL);
+      tolua_function(L, "normalize", tolua_plane_normalize);
       tolua_variable(L, "name", tolua_plane_get_name, tolua_plane_set_name);
     }
     tolua_endmodule(L);
