@@ -46,6 +46,18 @@ without prior permission by the authors of Eressea.
 
 alliance * alliances = NULL;
 
+void
+free_alliance(alliance * al)
+{
+  free(al->name);
+  while (al->members) {
+    faction_list * m = al->members;
+    al->members = m->next;
+    free(m);
+  }
+  free(al);
+}
+
 alliance *
 makealliance(int id, const char * name)
 {

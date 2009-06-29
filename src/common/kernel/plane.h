@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -42,20 +42,22 @@ extern "C" {
 #define PFL_SEESPECIAL  32768  /* far seeing */
 
 typedef struct watcher {
-	struct watcher * next;
-	struct faction * faction;
-	unsigned char mode;
+  struct watcher * next;
+  struct faction * faction;
+  unsigned char mode;
 } watcher;
 
 typedef struct plane {
-	struct plane *next;
-	struct watcher * watchers;
-	int id;
-	char *name;
-	int minx, maxx, miny, maxy;
-	unsigned int flags;
-	struct attrib *attribs;
+  struct plane *next;
+  struct watcher * watchers;
+  int id;
+  char *name;
+  int minx, maxx, miny, maxy;
+  unsigned int flags;
+  struct attrib *attribs;
 } plane;
+
+#define plane_id(pl) ( (pl) ? (pl)->id : 0 )
 
 extern struct plane *planes;
 
@@ -69,14 +71,16 @@ int region_y(const struct region *r, const struct faction *f);
 int plane_center_x(const struct plane *pl);
 int plane_center_y(const struct plane *pl);
 void set_ursprung(struct faction *f, int id, int x, int y);
-plane * create_new_plane(int id, const char *name, int minx, int maxx, int miny, int maxy, int flags);
-plane * getplanebyname(const char *);
+struct plane * create_new_plane(int id, const char *name, int minx, int maxx, int miny, int maxy, int flags);
+struct plane * getplanebyname(const char *);
+struct plane * get_homeplane(void);
 extern int rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned char index);
 extern boolean is_watcher(const struct plane * p, const struct faction * f);
 extern int resolve_plane(variant data, void * addr);
 extern void write_plane_reference(const plane * p, struct storage * store);
 extern int read_plane_reference(plane ** pp, struct storage * store);
-
+extern int plane_width(const plane * pl);
+extern int plane_height(const plane * pl);
 #ifdef __cplusplus
 }
 #endif

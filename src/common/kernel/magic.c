@@ -1915,7 +1915,10 @@ addparam_region(const char * const param[], spllprm ** spobjp, const unit * u, o
     int tx = atoi((const char*)param[0]), ty = atoi((const char*)param[1]);
     int x = rel_to_abs(0, u->faction, tx, 0);
     int y = rel_to_abs(0, u->faction, ty, 1);
-    region *rt = findregion(x,y);
+    region *rt;
+
+    pnormalize(&x, &y, rplane(u->region));
+    rt = findregion(x,y);
 
     if (rt!=NULL) {
       spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
@@ -2528,13 +2531,15 @@ cast_cmd(unit * u, order * ord)
   unit *familiar = NULL, *mage = u;
   const char * s;
   spell * sp;
+  plane * pl;
   spellparameter *args = NULL;
 
   if (LongHunger(u)) {
     cmistake(u, ord, 224, MSG_MAGIC);
     return 0;
   }
-  if (r->planep && fval(r->planep, PFL_NOMAGIC)) {
+  pl = rplane(r);
+  if (pl && fval(pl, PFL_NOMAGIC)) {
     cmistake(u, ord, 269, MSG_MAGIC);
     return 0;
   }
@@ -2555,10 +2560,12 @@ cast_cmd(unit * u, order * ord)
     s = getstrtoken();
   }
   if (findparam(s, u->faction->locale) == P_REGION) {
-    short t_x = (short)getint();
-    short t_y = (short)getint();
-    t_x = rel_to_abs(getplane(u->region),u->faction,t_x,0);
-    t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
+    int t_x = getint();
+    int t_y = getint();
+    plane * pl = getplane(u->region);
+    t_x = rel_to_abs(pl, u->faction, t_x,0);
+    t_y = rel_to_abs(pl, u->faction, t_y,1);
+    pnormalize(&t_x, &t_y, pl);
     target_r = findregion(t_x, t_y);
     if (!target_r) {
       /* Fehler "Die Region konnte nicht verzaubert werden" */

@@ -56,8 +56,11 @@ public:
       node = node->nexthash;
     }
     coordinate * c = &self->coord;
-    unsigned int key = ((c->x << 12) ^ c->y);
-    unsigned int hash = key & (MAXTHASH-1);
+    unsigned int hash;
+    int nx, ny;
+
+    cnormalize(c, &nx, &ny);
+    hash = ((nx << 12) ^ ny) & (MAXTHASH-1);
 
     return next_tag(hash+1, current_state);
   }
@@ -77,13 +80,16 @@ selected_regions(void)
 static void
 gmtool_select_coordinate(int x, int y, bool select)
 {
-   select_coordinate(current_state->selected, x, y, select?1:0);
+  int nx = x, ny = y;
+  plane * pl = findplane(x, y);
+  pnormalize(&nx, &ny, pl);
+  select_coordinate(current_state->selected, nx, ny, select?1:0);
 }
 
 static void
 gmtool_select_region(region& r, bool select)
 {
-   select_coordinate(current_state->selected, r.x, r.y, select?1:0);
+  select_coordinate(current_state->selected, r.x, r.y, select?1:0);
 }
 
 static void gmtool_open(void) 

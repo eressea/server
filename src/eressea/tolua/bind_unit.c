@@ -834,7 +834,7 @@ tolua_unit_create(lua_State* L)
 {
   faction * f = (faction *)tolua_tousertype(L, 1, 0);
   region * r = (region *)tolua_tousertype(L, 2, 0);
-  int num = (int)tolua_tonumber(L, 3, 0);
+  int num = (int)tolua_tonumber(L, 3, 1);
   if (f && r) {
     const race * rc = f->race;
     const char * rcname = tolua_tostring(L, 4, NULL);

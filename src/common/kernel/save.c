@@ -895,7 +895,8 @@ readregion(struct storage * store, int x, int y)
   }
 
   if (r==NULL) {
-    r = new_region(x, y, uid);
+    plane * pl = findplane(x, y);
+    r = new_region(x, y, pl, uid);
   } else {
     assert(uid==0 || r->uid==uid);
     current_region = r;

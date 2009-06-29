@@ -1332,7 +1332,6 @@ report_template(const char * filename, report_context * ctx, const char * charse
 {
   faction * f = ctx->f;
   region *r;
-  plane *pl;
   FILE * F = fopen(filename, "wt");
   seen_region * sr = NULL;
   char buf[8192], * bufp;
@@ -1384,15 +1383,16 @@ report_template(const char * filename, report_context * ctx, const char * charse
       if (u->faction == f && !fval(u->race, RCF_INVISIBLE)) {
         order * ord;
         if (!dh) {
+          plane * pl = getplane(r);
+          int nx = region_x(r, f), ny = region_y(r, f);
           rps_nowrap(F, "");
           rnl(F);
-          pl = getplane(r);
           if (pl && pl->id != 0) {
-            sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
-              region_y(r,f), pl->id, rname(r, f->locale));
+            sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale, parameters[P_REGION]), 
+              nx, ny, pl->id, rname(r, f->locale));
           } else {
-            sprintf(buf, "%s %d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
-              region_y(r,f), rname(r, f->locale));
+            sprintf(buf, "%s %d,%d ; %s", LOC(f->locale, parameters[P_REGION]), 
+              nx, ny, rname(r, f->locale));
           }
           rps_nowrap(F, buf);
           rnl(F);

@@ -189,6 +189,7 @@ help_money(const unit * u)
 static void
 get_food(region *r)
 {
+  plane * pl = rplane(r);
   unit *u;
   int peasantfood = rpeasants(r)*10;
   faction * owner = region_get_owner(r);
@@ -307,7 +308,7 @@ get_food(region *r)
           }
         }
       }
-      if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
+      if (pl == NULL || !fval(pl, PFL_NOFEED)) {
         if (peasantfood>=hungry) {
           peasantfood -= hungry;
           hungry = 0;

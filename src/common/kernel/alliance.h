@@ -48,6 +48,7 @@ extern alliance * findalliance(int id);
 extern alliance * makealliance(int id, const char * name);
 extern const char * alliancename(const struct alliance * al);
 extern void setalliance(struct faction * f, alliance * al);
+void free_alliance(struct alliance * al);
 
 extern void alliance_cmd(void);
 

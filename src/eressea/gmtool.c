@@ -134,6 +134,13 @@ init_curses(void)
   refresh();
 }
 
+void cnormalize(const coordinate * c, int * x, int * y)
+{
+  *x = c->x;
+  *y = c->y;
+  pnormalize(x, y, c->pl);
+}
+
 map_region *
 mr_get(const view * vi, int xofs, int yofs)
 {
@@ -168,14 +175,14 @@ win_create(WINDOW * hwin)
 }
 
 static void
-untag_region(selection * s, const coordinate * c)
+untag_region(selection * s, int nx, int ny)
 {
-  unsigned int key = ((c->x << 12) ^ c->y);
+  unsigned int key = ((nx << 12) ^ ny);
   tag ** tp = &s->tags[key & (MAXTHASH-1)];
   tag * t = NULL;
   while (*tp) {
     t = *tp;
-    if (t->coord.p==c->p && t->coord.x==c->x && t->coord.y==c->y) break;
+    if (t->coord.x==nx && t->coord.y==ny) break;
     tp=&t->nexthash;
   }
   if (!*tp) return;
@@ -185,28 +192,30 @@ untag_region(selection * s, const coordinate * c)
 }
 
 static void
-tag_region(selection * s, const coordinate * c)
+tag_region(selection * s, int nx, int ny)
 {
-  unsigned int key = ((c->x << 12) ^ c->y);
+  unsigned int key = ((nx << 12) ^ ny);
   tag ** tp = &s->tags[key & (MAXTHASH-1)];
   while (*tp) {
     tag * t = *tp;
-    if (t->coord.p==c->p && t->coord.x==c->x && t->coord.y==c->y) return;
+    if (t->coord.x==nx && t->coord.y==ny) return;
     tp=&t->nexthash;
   }
   *tp = calloc(1, sizeof(tag));
-  (*tp)->coord = *c;
+  (*tp)->coord.x = nx;
+  (*tp)->coord.y = ny;
+  (*tp)->coord.pl = findplane(nx, ny);
   return;
 }
 
 static int
-tagged_region(selection * s, const coordinate * c)
+tagged_region(selection * s, int nx, int ny)
 {
-  unsigned int key = ((c->x << 12) ^ c->y);
+  unsigned int key = ((nx << 12) ^ ny);
   tag ** tp = &s->tags[key & (MAXTHASH-1)];
   while (*tp) {
     tag * t = *tp;
-    if (t->coord.x==c->x && t->coord.p==c->p && t->coord.y==c->y) return 1;
+    if (t->coord.x==nx && t->coord.y==ny) return 1;
     tp=&t->nexthash;
   }
   return 0;
@@ -254,22 +263,25 @@ paint_map(window * wnd, const state * st)
   WINDOW * win = wnd->handle;
   int lines = getmaxy(win);
   int cols = getmaxx(win);
-  int x, y;
+  int vx, vy;
 
   lines = lines/THEIGHT;
   cols = cols/TWIDTH;
-  for (y = 0; y!=lines; ++y) {
-    int yp = (lines - y - 1) * THEIGHT;
-    for (x = 0; x!=cols; ++x) {
+  for (vy = 0; vy!=lines; ++vy) {
+    int yp = (lines - vy - 1) * THEIGHT;
+    for (vx = 0; vx!=cols; ++vx) {
+      map_region * mr = mr_get(&st->display, vx, vy);
       int attr = 0;
       int hl = 0;
-      int xp = x * TWIDTH + (y & 1) * TWIDTH/2;
-      map_region * mr = mr_get(&st->display, x, y);
-
-      if (mr && st && tagged_region(st->selected, &mr->coord)) {
-        attr |= A_REVERSE;
-      }
+      int xp = vx * TWIDTH + (vy & 1) * TWIDTH/2;
+      int nx, ny;
       if (mr) {
+        if (st) {
+          cnormalize(&mr->coord, &nx, &ny);
+          if (tagged_region(st->selected, nx, ny)) {
+            attr |= A_REVERSE;
+          }
+        }
         if (mr->r && mr->r->flags & RF_MAPPER_HIGHLIGHT) hl = 1;
         mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
       }
@@ -297,7 +309,7 @@ static void
 draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c, int show)
 {
   int lines = getmaxy(win)/THEIGHT;
-  int xp, yp;
+  int xp, yp, nx, ny;
   int attr = 0;
   map_region * mr = cursor_region(v, c);
   coordinate relpos;
@@ -312,7 +324,8 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c, i
 
   yp = (lines - cy - 1) * THEIGHT;
   xp = cx * TWIDTH + (cy & 1) * TWIDTH/2;
-  if (s && tagged_region(s, &mr->coord)) attr = A_REVERSE;
+  cnormalize(&mr->coord, &nx, &ny);
+  if (s && tagged_region(s, nx, ny)) attr = A_REVERSE;
   if (mr->r) {
     int hl = 0;
     if (mr->r->flags & RF_MAPPER_HIGHLIGHT) hl = 1;
@@ -339,7 +352,7 @@ paint_status(window * wnd, const state * st)
 {
   WINDOW * win = wnd->handle;
   const char * name = "";
-  int uid = 0;
+  int nx, ny, uid = 0;
   const char * terrain = "----";
   map_region * mr = cursor_region(&st->display, &st->cursor);
   if (mr && mr->r) {
@@ -351,7 +364,8 @@ paint_status(window * wnd, const state * st)
     }
     terrain = mr->r->terrain->_name;
   }
-  mvwprintw(win, 0, 0, "%4d %4d | %.4s | %.20s (%d)", st->cursor.x, st->cursor.y, terrain, name, uid);
+  cnormalize(&st->cursor, &nx, &ny);
+  mvwprintw(win, 0, 0, "%4d %4d | %.4s | %.20s (%d)", nx, ny, terrain, name, uid);
   wclrtoeol(win);
 }
 
@@ -449,9 +463,13 @@ static void
 terraform_at(coordinate * c, const terrain_type *terrain)
 {
   if (terrain!=NULL) {
-    int x = c->x, y = c->y;
-    region * r = findregion(x, y);
-    if (r==NULL) r = new_region(x, y, 0);
+    region * r;
+    int nx = c->x, ny = c->y;
+    pnormalize(&nx, &ny, c->pl);
+    r = findregion(nx, ny);
+    if (r==NULL) {
+      r = new_region(nx, ny, c->pl, 0);
+    }
     terraform_region(r, terrain);
   }
 }
@@ -465,10 +483,16 @@ terraform_selection(selection * selected, const terrain_type *terrain)
   for (i=0;i!=MAXTHASH;++i) {
     tag ** tp = &selected->tags[i];
     while (*tp) {
+      region * r;
       tag * t = *tp;
-      int x = t->coord.x, y = t->coord.y;
-      region * r = findregion(x, y);
-      if (r==NULL) r = new_region(x, y, 0);
+      int nx = t->coord.x, ny = t->coord.y;
+      plane * pl = t->coord.pl;
+      
+      pnormalize(&nx, &ny, pl);
+      r = findregion(nx, ny);
+      if (r==NULL) {
+        r = new_region(nx, ny, pl, 0);
+      }
       terraform_region(r, terrain);
       tp = &t->nexthash;
     }
@@ -530,7 +554,7 @@ region2coord(const region * r, coordinate * c)
 {
   c->x = r->x;
   c->y = r->y;
-  c->p = r->planep?r->planep->id:0;
+  c->pl = rplane(r);
   return c;
 }
 
@@ -556,13 +580,10 @@ highlight_region(region *r, int toggle)
 }
 
 void
-select_coordinate(struct selection * selected, int x, int y, int toggle)
+select_coordinate(struct selection * selected, int nx, int ny, int toggle)
 {
-  coordinate coord = { 0 };
-  coord.x = x;
-  coord.y = y;
-  if (toggle) tag_region(selected, &coord);
-  else untag_region(selected, &coord);
+  if (toggle) tag_region(selected, nx, ny);
+  else untag_region(selected, nx, ny);
 }
 
 enum { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
@@ -729,7 +750,7 @@ handlekey(state * st, int c)
   region *r;
   char sbuffer[80];
   static char kbuffer[80];
-  int n;
+  int n, nx, ny;
 
   switch(c) {
   case FAST_RIGHT:
@@ -791,15 +812,17 @@ handlekey(state * st, int c)
     /*
     make_block(st->cursor.x, st->cursor.y, 6, select_terrain(st, NULL));
     */
+    cnormalize(&st->cursor, &nx, &ny);
     n = rng_int() % 8 + 8;
-    build_island_e3(st->cursor.x, st->cursor.y, n, n*3);
+    build_island_e3(nx, ny, n, n*3);
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
     st->wnd_map->update |= 1;
     break;
   case 0x02: /* CTRL+b */
-    make_block(st->cursor.x, st->cursor.y, 6, newterrain(T_OCEAN));
+    cnormalize(&st->cursor, &nx, &ny);
+    make_block(nx, ny, 6, newterrain(T_OCEAN));
     st->modified = 1;
     st->wnd_info->update |= 1;
     st->wnd_status->update |= 1;
@@ -811,10 +834,12 @@ handlekey(state * st, int c)
       if (mr) {
         region * first = mr->r;
         region * cur = (first&&first->next)?first->next:regions;
+
         while (cur!=first) {
           coordinate coord;
           region2coord(cur, &coord);
-          if (tagged_region(st->selected, &coord)) {
+          cnormalize(&coord, &nx, &ny);
+          if (tagged_region(st->selected, nx, ny)) {
             st->cursor = coord;
             st->wnd_info->update |= 1;
             st->wnd_status->update |= 1;
@@ -827,12 +852,31 @@ handlekey(state * st, int c)
     }
     break;
 
+  case 'p':
+    if (planes) {
+      plane * pl = planes;
+      if (cursor->pl) {
+        while (pl && pl!=cursor->pl) {
+          pl = pl->next;
+        }
+        if (pl->next) {
+          cursor->pl = pl->next;
+        } else {
+          cursor->pl = get_homeplane();
+        }
+      } else {
+        cursor->pl = planes;
+      }
+    }
+    break;
+
   case 'a':
     if (regions!=NULL) {
       map_region * mr = cursor_region(&st->display, cursor);
       if (mr && mr->r) {
         region * cur = mr->r;
-        if (cur->planep==NULL) {
+        plane * pl = rplane(cur);
+        if (pl==NULL) {
           cur = r_standard_to_astral(cur);
         } else if (is_astral(cur)) {
           cur = r_astral_to_standard(cur);
@@ -948,8 +992,9 @@ handlekey(state * st, int c)
     }
     break;
   case ' ':
-    if (tagged_region(st->selected, cursor)) untag_region(st->selected, cursor);
-    else tag_region(st->selected, cursor);
+    cnormalize(cursor, &nx, &ny);
+    if (tagged_region(st->selected, nx, ny)) untag_region(st->selected, nx, ny);
+    else tag_region(st->selected, nx, ny);
     break;
   case 'A':
     sprintf(sbuffer, "%s/newfactions", basepath());
@@ -1055,8 +1100,8 @@ init_view(view * display, WINDOW * win)
 {
   display->topleft.x = 1;
   display->topleft.y = 1;
-  display->topleft.p = 0;
-  display->plane = 0;
+  display->topleft.pl = get_homeplane();
+  display->pl = get_homeplane();
   display->size.width = getmaxx(win)/TWIDTH;
   display->size.height = getmaxy(win)/THEIGHT;
   display->regions = calloc(display->size.height * display->size.width, sizeof(map_region));
@@ -1071,7 +1116,8 @@ update_view(view * vi)
       map_region * mr = mr_get(vi, i, j);
       mr->coord.x = vi->topleft.x + i - j/2;
       mr->coord.y = vi->topleft.y + j;
-      mr->coord.p = vi->plane;
+      mr->coord.pl = vi->pl;
+      pnormalize(&mr->coord.x, &mr->coord.y, mr->coord.pl);
       mr->r = findregion(mr->coord.x, mr->coord.y);
     }
   }
@@ -1081,8 +1127,8 @@ state *
 state_open(void)
 {
   state * st = calloc(sizeof(state), 1);
-  st->display.plane = 0;
-  st->cursor.p = 0;
+  st->display.pl = get_homeplane();
+  st->cursor.pl = get_homeplane();
   st->cursor.x = 0;
   st->cursor.y = 0;
   st->selected = calloc(1, sizeof(struct selection));
@@ -1154,8 +1200,8 @@ run_mapper(void)
     height = getmaxy(hwinmap)-y;
     coor2point(&st->cursor, &p);
 
-    if (st->cursor.p != vi->plane) {
-      vi->plane = st->cursor.p;
+    if (st->cursor.pl != vi->pl) {
+      vi->pl = st->cursor.pl;
       st->wnd_map->update |= 1;
     }
     if (p.y < tl.y) {

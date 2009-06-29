@@ -174,13 +174,16 @@ static void
 gm_gate(const tnode * tnext, void * data, struct order * ord)
 {
   unit * u = (unit*)data;
-  const struct plane * p = rplane(u->region);
+  const struct plane * pl = rplane(u->region);
   int id = getid();
-  int x = rel_to_abs(p, u->faction, getint(), 0);
-  int y = rel_to_abs(p, u->faction, getint(), 1);
-  region * r = findregion(x, y);
+  int x = rel_to_abs(pl, u->faction, getint(), 0);
+  int y = rel_to_abs(pl, u->faction, getint(), 1);
   building * b = findbuilding(id);
-  if (b==NULL || r==NULL || p!=rplane(b->region) || p!=rplane(r)) {
+  region * r;
+
+  pnormalize(&x, &y, pl);
+  r = findregion(x, y);
+  if (b==NULL || r==NULL || pl!=rplane(b->region) || pl!=rplane(r)) {
     mistake(u, ord, "the unit cannot transform this building.");
     return;
   } else {
@@ -211,9 +214,11 @@ gm_terraform(const tnode * tnext, void * data, struct order * ord)
   int x = rel_to_abs(p, u->faction, getint(), 0);
   int y = rel_to_abs(p, u->faction, getint(), 1);
   const char * c = getstrtoken();
-  region * r = findregion(x, y);
   variant token;
   tnode * tokens = get_translations(u->faction->locale, UT_TERRAINS);
+  region * r;
+  pnormalize(&x, &y, p);
+  r = findregion(x, y);
 
   if (r==NULL || p!=rplane(r)) {
     mistake(u, ord, "region is in another plane.");
@@ -613,7 +618,7 @@ gmcommands(void)
 faction *
 gm_addquest(const char * email, const char * name, int radius, unsigned int flags)
 {
-  plane * p;
+  plane * pl;
   watcher * w = calloc(sizeof(watcher), 1);
   region * center;
   boolean invalid = false;
@@ -635,15 +640,16 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
   } while (invalid);
   maxx = minx+2*radius; cx = minx+radius;
   maxy = miny+2*radius; cy = miny+radius;
-  p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
-  center = new_region(cx, cy, 0);
+  pl = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
+  center = new_region(cx, cy, pl, 0);
   for (x=0;x<=2*radius;++x) {
     int y;
     for (y=0;y<=2*radius;++y) {
       region * r = findregion(minx+x, miny+y);
-      if (!r) r = new_region(minx+x, miny+y, 0);
+      if (!r) {
+        r = new_region(minx+x, miny+y, pl, 0);
+      }
       freset(r, RF_ENCOUNTER);
-      r->planep = p;
       if (distance(r, center)==radius) {
         terraform_region(r, newterrain(T_FIREWALL));
       } else if (r==center) {
@@ -655,11 +661,11 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
   }
 
   /* watcher: */
-  f = gm_addfaction(email, p, center);
+  f = gm_addfaction(email, pl, center);
   w->faction = f;
   w->mode = see_unit;
-  w->next = p->watchers;
-  p->watchers = w;
+  w->next = pl->watchers;
+  pl->watchers = w;
 
   return f;
 }
@@ -726,7 +732,7 @@ plane *
 gm_addplane(int radius, unsigned int flags, const char * name)
 {
   region * center;
-  plane * p;
+  plane * pl;
   boolean invalid = false;
   int minx, miny, maxx, maxy, cx, cy;
   int x;
@@ -745,15 +751,14 @@ gm_addplane(int radius, unsigned int flags, const char * name)
   } while (invalid);
   maxx = minx+2*radius; cx = minx+radius;
   maxy = miny+2*radius; cy = miny+radius;
-  p = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
-  center = new_region(cx, cy, 0);
+  pl = create_new_plane(rng_int(), name, minx, maxx, miny, maxy, flags);
+  center = new_region(cx, cy, pl, 0);
   for (x=0;x<=2*radius;++x) {
     int y;
     for (y=0;y<=2*radius;++y) {
       region * r = findregion(minx+x, miny+y);
-      if (!r) r = new_region(minx+x, miny+y, 0);
+      if (!r) r = new_region(minx+x, miny+y, pl, 0);
       freset(r, RF_ENCOUNTER);
-      r->planep = p;
       if (distance(r, center)==radius) {
         terraform_region(r, newterrain(T_FIREWALL));
       } else if (r==center) {
@@ -763,5 +768,5 @@ gm_addplane(int radius, unsigned int flags, const char * name)
       }
     }
   }
-  return p;
+  return pl;
 }

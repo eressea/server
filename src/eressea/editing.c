@@ -39,14 +39,17 @@ make_block(int x, int y, int radius, const struct terrain_type * terrain)
 {
   int cx, cy;
   region *r;
+  plane * pl = findplane(x, y);
 
   if (terrain==NULL) return;
 
   for (cx = x - radius; cx != x+radius; ++cx) {
     for (cy = y - radius; cy != y+radius; ++cy) {
-      if (koor_distance(cx, cy, x, y) < radius) {
-        if (!findregion(cx, cy)) {
-          r = new_region(cx, cy, 0);
+      int nx = cx, ny = cy;
+      pnormalize(&nx, &ny, pl);
+      if (koor_distance(nx, ny, x, y) < radius) {
+        if (!findregion(nx, ny)) {
+          r = new_region(nx, ny, pl, 0);
           terraform_region(r, terrain);
         }
       }

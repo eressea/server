@@ -24,8 +24,9 @@ without prior permission by the authors of Eressea.
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/ship.h>
+#include <kernel/plane.h>
 #include <kernel/terrain.h>
-
+#include <modules/autoseed.h>
 #include <attributes/key.h>
 
 #include <util/attrib.h>
@@ -220,10 +221,13 @@ tolua_region_create(lua_State* L)
   int x = (int)tolua_tonumber(L, 1, 0);
   int y = (int)tolua_tonumber(L, 2, 0);
   const char * tname = tolua_tostring(L, 3, 0);
-
+  plane * pl = (plane *)tolua_tousertype(L, 4, 0);
   const terrain_type * terrain = get_terrain(tname);
-  region * r = findregion(x, y);
-  region * result = r;
+  region * r, * result;
+
+  if (!pl) pl = findplane(x, y);
+  pnormalize(&x, &y, pl);
+  r = result = findregion(x, y);
 
   if (terrain==NULL) {
     if (r!=NULL) {
@@ -234,7 +238,7 @@ tolua_region_create(lua_State* L)
     }
   }
   if (r==NULL) {
-    result = new_region(x, y, 0);
+    result = new_region(x, y, pl, 0);
   }
   if (result) {
     terraform_region(result, terrain);
@@ -336,15 +340,96 @@ tolua_region_tostring(lua_State *L)
   return 1;
 }
 
+static int
+tolua_plane_get(lua_State* L)
+{
+  int id = (int)tolua_tonumber(L, 1, 0);
+  plane * pl = getplanebyid(id);
+
+  tolua_pushusertype(L, pl, "plane");
+  return 1;
+}
+
+static int
+tolua_plane_create(lua_State* L)
+{
+  int id = (int)tolua_tonumber(L, 1, 0);
+  int x = (int)tolua_tonumber(L, 2, 0);
+  int y = (int)tolua_tonumber(L, 3, 0);
+  int width = (int)tolua_tonumber(L, 4, 0);
+  int height = (int)tolua_tonumber(L, 5, 0);
+  const char * name = tolua_tostring(L, 6, 0);
+  plane * pl;
+
+  pl = create_new_plane(id, name, x, x+width-1, y, y+height-1, 0);
+
+  tolua_pushusertype(L, pl, "plane");
+  return 1;
+}
+
+static int tolua_plane_get_name(lua_State* L)
+{
+  plane* self = (plane*) tolua_tousertype(L, 1, 0);
+  tolua_pushstring(L, self->name);
+  return 1;
+}
+
+static int tolua_plane_set_name(lua_State* L)
+{
+  plane* self = (plane*)tolua_tousertype(L, 1, 0);
+  const char * str = tolua_tostring(L, 2, 0);
+  free(self->name);
+  if (str) self->name = strdup(str);
+  else self->name = 0;
+  return 0;
+}
+
+static int
+tolua_plane_get_id(lua_State* L)
+{
+  plane * self = (plane *)tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)self->id);
+  return 1;
+}
+
+static int
+tolua_plane_tostring(lua_State *L)
+{
+  plane * self = (plane *)tolua_tousertype(L, 1, 0);
+  lua_pushstring(L, self->name);
+  return 1;
+}
+
+static int
+tolua_distance(lua_State *L)
+{
+  int x1 = (int)tolua_tonumber(L, 1, 0);
+  int y1 = (int)tolua_tonumber(L, 2, 0);
+  int x2 = (int)tolua_tonumber(L, 3, 0);
+  int y2 = (int)tolua_tonumber(L, 4, 0);
+  plane * pl = (plane *)tolua_tousertype(L, 5, 0);
+  int result;
+  
+  if (!pl) pl = get_homeplane();
+  pnormalize(&x1, &y1, pl);
+  pnormalize(&x2, &y2, pl);
+  result = koor_distance(x1, y1, x2, y2);
+  lua_pushnumber(L, result);
+  return 1;
+}
+
 void
 tolua_region_open(lua_State* L)
 {
   /* register user types */
   tolua_usertype(L, "region");
+  tolua_usertype(L, "plane");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
+    tolua_function(L, "distance", tolua_distance);
+
     tolua_cclass(L, "region", "region", "", NULL);
     tolua_beginmodule(L, "region");
     {
@@ -384,6 +469,18 @@ tolua_region_open(lua_State* L)
       .property("plane_id", &region_plane)
 #endif
       tolua_variable(L, "objects", tolua_region_get_objects, 0);
+    }
+    tolua_endmodule(L);
+
+    tolua_cclass(L, "plane", "plane", "", NULL);
+    tolua_beginmodule(L, "plane");
+    {
+      tolua_function(L, "create", tolua_plane_create);
+      tolua_function(L, "get", tolua_plane_get);
+      tolua_function(L, "__tostring", tolua_plane_tostring);
+
+      tolua_variable(L, "id", tolua_plane_get_id, NULL);
+      tolua_variable(L, "name", tolua_plane_get_name, tolua_plane_set_name);
     }
     tolua_endmodule(L);
   }

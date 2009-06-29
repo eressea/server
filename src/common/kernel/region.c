@@ -116,8 +116,9 @@ write_regionname(const region * r, const faction * f, char * buffer, size_t size
   if (r==NULL) {
     strcpy(buf, "(null)");
   } else {
-    snprintf(buf, size, "%s (%d,%d)", rname(r, lang),
-      region_x(r, f), region_y(r, f));
+    plane * pl = rplane(r);
+    int nx = region_x(r, f), ny = region_y(r, f);
+    snprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
   }
   buf[size-1] = 0;
   return buffer;
@@ -357,7 +358,7 @@ int
 a_readmoveblock(attrib *a, storage * store)
 {
   moveblock *m = (moveblock *)(a->data.v);
-  int       i;
+  int i;
 
   i = store->r_int(store);
   m->dir = (direction_t)i;
@@ -374,7 +375,6 @@ a_writemoveblock(const attrib *a, storage * store)
 attrib_type at_moveblock = {
   "moveblock", a_initmoveblock, NULL, NULL, a_writemoveblock, a_readmoveblock
 };
-
 
 #define coor_hashkey(x, y) (unsigned int)((x<<16) + y)
 #define RMAXHASH MAXREGIONS
@@ -433,26 +433,31 @@ static int hash_requests;
 static int hash_misses;
 #endif
 
-void cnormalize(int * x, int * y)
+boolean pnormalize(int * x, int * y, const plane * pl)
 {
-  if (world_width && x) {
-    if (*x<0) {
-      *x = world_width - abs(*x) % world_width;
+  if (pl) {
+    if (x) {
+      int width = pl->maxx - pl->minx + 1;
+      int nx = *x - pl->minx;
+      nx = (nx>0)?nx:(width-(-nx)%width);
+      *x = nx % width+ pl->minx;
     }
-    *x = *x % world_width; 
-  }
-  if (world_height && y) {
-    if (*y<0) {
-      *y = world_height - abs(*y) % world_height;
+    if (y) {
+      int height = pl->maxy - pl->miny + 1;
+      int ny = *y - pl->miny;
+      ny = (ny>0)?ny:(height-(-ny)%height);
+      *y = ny % height + pl->miny;
     }
-    *y = *y % world_height; 
   }
+  return false; /* TBD */
 }
 
 static region *
 rfindhash(int x, int y)
 {
-  unsigned int rid = coor_hashkey(x, y);
+  unsigned int rid;
+
+  rid = coor_hashkey(x, y);
 #if HASH_STATISTICS
   ++hash_requests;
 #endif
@@ -509,13 +514,17 @@ region *
 r_connect(const region * r, direction_t dir)
 {
   region * result;
+  int x, y;
 #ifdef FAST_CONNECT
   region * rmodify = (region*)r;
   assert (dir>=0 && dir<MAXDIRECTIONS);
   if (r->connect[dir]) return r->connect[dir];
 #endif
   assert(dir<MAXDIRECTIONS);
-  result = rfindhash(r->x + delta_x[dir], r->y + delta_y[dir]);
+  x = r->x + delta_x[dir];
+  y = r->y + delta_y[dir];
+  pnormalize(&x, &y, rplane(r));
+  result = rfindhash(x, y);
 #ifdef FAST_CONNECT
   if (result) {
     rmodify->connect[dir] = result;
@@ -531,20 +540,19 @@ findregion(int x, int y)
   return rfindhash(x, y);
 }
 
-int
-koor_distance(int x1, int y1, int x2, int y2)
+/* Contributed by Hubert Mackenberg. Thanks.
+ * x und y Abstand zwischen x1 und x2 berechnen
+ */
+static int
+koor_distance_orig(int x1, int y1, int x2, int y2)
 {
-  /* Contributed by Hubert Mackenberg. Thanks.
-   * x und y Abstand zwischen x1 und x2 berechnen
-   */
   int dx = x1 - x2;
   int dy = y1 - y2;
 
   /* Bei negativem dy am Ursprung spiegeln, das veraendert
    * den Abstand nicht
    */
-  if ( dy < 0 )
-  {
+  if ( dy < 0 ) {
     dy = -dy;
     dx = -dx;
   }
@@ -552,9 +560,71 @@ koor_distance(int x1, int y1, int x2, int y2)
   /*
    * dy ist jetzt >=0, fuer dx sind 3 Faelle zu untescheiden
    */
-  if      ( dx >= 0 ) return dx + dy;
-  else if (-dx >= dy) return -dx;
-  else                return dy;
+  if ( dx >= 0 ) {
+    int result = dx + dy;
+    return result;
+  }
+  else if (-dx >= dy) {
+    int result = -dx;
+    return result;
+  }
+  else {
+    return dy;
+  }
+}
+
+static int
+koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
+{
+  int dx = x1 - x2;
+  int dy = y1 - y2;
+  int result, dist;
+  int mindist = MIN(width, height) >> 1;
+
+  /* Bei negativem dy am Ursprung spiegeln, das veraendert
+   * den Abstand nicht
+   */
+  if ( dy < 0 ) {
+    dy = -dy;
+    dx = -dx;
+  }
+  if (dx<0) {
+    dx = width + dx;
+  }
+  /* dx,dy is now pointing northeast */
+  result = dx + dy;
+  if (result<=mindist) return result;
+
+  dist = (width-dx) + (height-dy); /* southwest */
+  if (dist>=0 && dist<result) {
+    result = dist;
+    if (result<=mindist) return result;
+  }
+  dist = MAX(dx, height-dy);
+  if (dist>=0 && dist<result) {
+    result = dist;
+    if (result<=mindist) return result;
+  }
+  dist = MAX(width-dx, dy);
+  if (dist>=0 && dist<result) result = dist;
+  return result;
+}
+
+int
+koor_distance(int x1, int y1, int x2, int y2)
+{
+  const plane * p1 = findplane(x1, y1);
+  const plane * p2 = findplane(x2, y2);
+  if (p1!=p2) return INT_MAX;
+  else {
+    int width = plane_width(p1);
+    int height = plane_height(p1);
+    if (width && height) {
+      return koor_distance_wrap_xy(x1, y1, x2, y2, width, height);
+    } else {
+      return koor_distance_orig(x1, y1, x2, y2);
+    }
+  }
 }
 
 int
@@ -564,11 +634,14 @@ distance(const region * r1, const region * r2)
 }
 
 static direction_t
-koor_reldirection(int ax, int ay, int bx, int by)
+koor_reldirection(int ax, int ay, int bx, int by, const struct plane * pl)
 {
   direction_t dir;
   for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-    if (bx-ax == delta_x[dir] && by-ay == delta_y[dir]) return dir;
+    int x = ax + delta_x[dir];
+    int y = ay + delta_y[dir];
+    pnormalize(&x, &y, pl);
+    if (bx == x && by == y) return dir;
   }
   return NODIRECTION;
 }
@@ -589,13 +662,17 @@ special_direction(const region * from, const region * to)
 direction_t
 reldirection(const region * from, const region * to)
 {
-  direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y);
+  plane * pl = rplane(from);
+  if (pl == rplane(to)) {
+    direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y, pl);
 
-  if (dir==NODIRECTION) {
-    spec_direction *sd = special_direction(from, to);
-    if (sd!=NULL && sd->active) return D_SPECIAL;
+    if (dir==NODIRECTION) {
+      spec_direction *sd = special_direction(from, to);
+      if (sd!=NULL && sd->active) return D_SPECIAL;
+    }
+    return dir;
   }
-  return dir;
+  return NODIRECTION;
 }
 
 void
@@ -856,9 +933,12 @@ static region *last;
 static unsigned int max_index = 0;
 
 region *
-new_region(int x, int y, unsigned int uid)
+new_region(int x, int y, struct plane * pl, unsigned int uid)
 {
-  region *r = rfindhash(x, y);
+  region *r;
+  
+  pnormalize(&x, &y, pl);
+  r = rfindhash(x, y);
 
   if (r) {
     log_error(("duplicate region discovered: %s(%d,%d)\n", regionname(r, NULL), x, y));
@@ -871,7 +951,7 @@ new_region(int x, int y, unsigned int uid)
   r->y = y;
   r->uid = uid;
   r->age = 1;
-  r->planep = findplane(x, y);
+  r->_plane = pl;
   rhash(r);
   hash_uid(r);
   if (last)

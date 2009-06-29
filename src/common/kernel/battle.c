@@ -3865,10 +3865,11 @@ join_allies(battle * b)
     }
 
     for (sa=s+1;sa!=b->sides+b->nsides;++sa) {
+      plane * pl = rplane(r);
       if (enemy(s, sa)) continue;
       if (friendly(s, sa)) continue;
-      if (!alliedgroup(r->planep, f, sa->faction, f->allies, HELP_FIGHT)) continue;
-      if (!alliedgroup(r->planep, sa->faction, f, sa->faction->allies, HELP_FIGHT)) continue;
+      if (!alliedgroup(pl, f, sa->faction, f->allies, HELP_FIGHT)) continue;
+      if (!alliedgroup(pl, sa->faction, f, sa->faction->allies, HELP_FIGHT)) continue;
 
       set_friendly(s, sa);
     }
@@ -3961,8 +3962,9 @@ init_battle(region * r, battle **bp)
           unit *u2;
           fighter *c1, *c2;
           ship * lsh = NULL;
+          plane * pl = rplane(r);
 
-          if (r->planep && fval(r->planep, PFL_NOATTACK)) {
+          if (pl && fval(pl, PFL_NOATTACK)) {
             cmistake(u, ord, 271, MSG_BATTLE);
             continue;
           }

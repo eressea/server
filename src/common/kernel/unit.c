@@ -1243,9 +1243,12 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
   int bskill = level;
   int skill = bskill;
 
-  if (r->planep && sk == SK_STEALTH && fval(r->planep, PFL_NOSTEALTH)) return 0;
-
   assert(r);
+  if (sk == SK_STEALTH) {
+    plane * pl = rplane(r);
+    if (pl &&fval(pl, PFL_NOSTEALTH)) return 0;
+  }
+
   skill += rc_skillmod(u->race, r, sk);
   skill += att_modification(u, sk);
 

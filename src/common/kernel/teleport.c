@@ -80,9 +80,11 @@ astralregions(const region * r, boolean (*valid)(const region *))
     for (y=-TP_RADIUS;y<=+TP_RADIUS;++y) {
       region * rn;
       int dist = koor_distance(0, 0, x, y);
+      int nx = r->x+x, ny = r->y+y;
 
       if (dist > TP_RADIUS) continue;
-      rn = findregion(r->x+x, r->y+y);
+      pnormalize(&nx, &ny, rplane(r));
+      rn = findregion(nx, ny);
       if (rn!=NULL && (valid==NULL || valid(rn))) add_regionlist(&rlist, rn);
     }
   }
@@ -105,8 +107,8 @@ r_astral_to_standard(const region *r)
   assert(is_astral(r));
   x = (r->x-TE_CENTER_X)*TP_DISTANCE;
   y = (r->y-TE_CENTER_Y)*TP_DISTANCE;
-
-  r2 = findregion(x,y);
+  pnormalize(&x, &y, rplane(r));
+  r2 = findregion(x, y);
   if (r2==NULL || rplane(r2)!=get_normalplane()) return NULL;
 
   return r2;
@@ -117,13 +119,17 @@ all_in_range(const region *r, int n, boolean (*valid)(const region *))
 {
   int x, y;
   region_list *rlist = NULL;
+  plane * pl = rplane(r);
 
   if (r == NULL) return NULL;
 
   for (x = r->x-n; x <= r->x+n; x++) {
     for (y = r->y-n; y <= r->y+n; y++) {
       if (koor_distance(r->x, r->y, x, y) <= n) {
-        region * r2 = findregion(x, y);
+        region * r2;
+        int nx = x, ny = y;
+        pnormalize(&nx, &ny, pl);
+        r2 = findregion(nx, ny);
         if (r2!=NULL && (valid==NULL || valid(r2))) add_regionlist(&rlist, r2);
       }
     }
@@ -196,24 +202,23 @@ void
 create_teleport_plane(void)
 {
   region *r;
+  plane * hplane = get_homeplane();
   plane * aplane = get_astralplane();
 
   const terrain_type * fog = get_terrain("fog");
 
   for (r=regions;r;r=r->next) {
-    if (r->planep == NULL) {
+    plane * pl = rplane(r);
+    if (pl == hplane) {
       region *ra = tpregion(r);
 
       if (ra==NULL) {
         int x = TE_CENTER_X+real2tp(r->x);
         int y = TE_CENTER_Y+real2tp(r->y);
-        plane * pl = findplane(x, y);
+        pnormalize(&x, &y, aplane);
         
-        if (aplane && pl==aplane) {
-          ra = new_region(x, y, 0);
-          terraform_region(ra, fog);
-          ra->planep = aplane;
-        }
+        ra = new_region(x, y, aplane, 0);
+        terraform_region(ra, fog);
       }
     }
   }

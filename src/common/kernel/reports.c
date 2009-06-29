@@ -747,7 +747,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
 
   dh=0;
   if (!getarnt && f) {
-    if (alliedfaction(u->region->planep, f, fv, HELP_ALL)) {
+    if (alliedfaction(rplane(u->region), f, fv, HELP_ALL)) {
       dh = 1;
     }
   }
@@ -1275,7 +1275,7 @@ prepare_reports(void)
   for (r = regions; r ; r = r->next) {
     attrib *ru;
     unit * u;
-    plane * p = r->planep;
+    plane * p = rplane(r);
 
     reorder_units(r);
 
@@ -1351,7 +1351,7 @@ prepare_report(faction * f)
   for (;sr!=NULL;sr=sr->next) {
     if (sr->mode>see_neighbour) {
       region * r = sr->r;
-      plane * p = r->planep;
+      plane * p = rplane(r);
 
       void (*view)(struct seen_region **, region *, faction *) = view_default;
       if (p && fval(p, PFL_SEESPECIAL)) {
@@ -1624,14 +1624,15 @@ trailinto(const region * r, const struct locale * lang)
 size_t
 f_regionid(const region * r, const faction * f, char * buffer, size_t size)
 {
-
   if (!r) {
     strncpy(buffer, "(Chaos)", size);
   } else {
-    plane * pl = r->planep;
+    plane * pl = rplane(r);
+    const char * name = pl?pl->name:0;
+    int nx = region_x(r, f), ny = region_y(r, f);
     strncpy(buffer, rname(r, f->locale), size);
     buffer[size-1]=0;
-    sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
+    sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", nx, ny, name?",":"", (name)?name:"");
   }
   return strlen(buffer);
 }

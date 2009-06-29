@@ -130,6 +130,7 @@
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
     <param name="study.speedup" value="1"/>
+    <param name="world.era" value="3"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.goblinbonus" value="3"/>
     <param name="rules.ship.capacity" value="1"/> <!-- -->
@@ -145,6 +146,7 @@
     <param name="rules.cavalry.mode" value="1"/>
     <param name="rules.magic.multipotion" value="1"/>
     <param name="rules.magic.wol_effect" value="5"/>
+    <param name="rules.magic.factionlist" value="0"/>
     <param name="rules.magic.wol_type" value="2"/>
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
     <param name="rules.magic.elfpower" value="1"/> <!-- elves get ring-of-power bonus in a forest -->

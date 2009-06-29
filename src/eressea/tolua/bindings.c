@@ -29,6 +29,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/building.h>
+#include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
@@ -554,7 +555,9 @@ static int
 tolua_write_map(lua_State* L)
 {
   const char * filename = tolua_tostring(L, 1, 0);
-  crwritemap(filename);
+  if (filename) {
+    crwritemap(filename);
+  }
   return 0;
 }
 
@@ -602,7 +605,11 @@ tolua_get_region(lua_State* L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
   int y = (int)tolua_tonumber(L, 2, 0);
-  region * r = findregion(x, y);
+  struct plane * pl = (struct plane *)tolua_tousertype(L, 3, 0);
+  region * r;
+  if (!pl) pl = findplane(x, y);
+  pnormalize(&x, &y, pl);
+  r = findregion(x, y);
 
   tolua_pushusertype(L, r, "region");
   return 1;

@@ -265,7 +265,7 @@ int
 teach_cmd(unit * u, struct order * ord)
 {
   static const curse_type * gbdream_ct = NULL;
-
+  plane * pl;
   region * r = u->region;
   int teaching, i, j, count, academy=0;
   unit *u2;
@@ -285,7 +285,8 @@ teach_cmd(unit * u, struct order * ord)
     return 0;
   }
 
-  if (r->planep && fval(r->planep, PFL_NOTEACH)) {
+  pl = rplane(r);
+  if (pl && fval(pl, PFL_NOTEACH)) {
     cmistake(u, ord, 273, MSG_EVENT);
     return 0;
   }

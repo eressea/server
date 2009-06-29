@@ -426,10 +426,13 @@ set_new_dragon_target(unit * u, region * r, int range)
 
   free_regionlist(rlist);
 #else
-  int x, y;
-  for (x = r->x - range; x < r->x + range; x++) {
-		for (y = r->y - range; y < r->y + range; y++) {
-      region * r2 = findregion(x, y);
+  int tx, ty;
+  for (tx = r->x - range; tx < r->x + range; tx++) {
+		for (ty = r->y - range; ty < r->y + range; ty++) {
+      region * r2;
+      int x = tx, y = ty;
+      pnormalize(&x, &y, r->planep);
+      r2 = findregion(x, y);
       if (r2!=NULL) {
         int affinity = dragon_affinity_value(r2, u);
         if (affinity > max_affinity) {

@@ -592,15 +592,18 @@ xml_region(report_context * ctx, seen_region * sr)
   unit * u;
   ship * sh = r->ships;
   building * b = r->buildings;
+  plane * pl = rplane(r);
+  int nx = region_x(r, ctx->f), ny = region_y(r, ctx->f);
+  pnormalize(&nx, &ny, pl);
 
   /* TODO: entertain-quota, recruits, salary, prices, curses, borders, apparitions (Schemen), spells, travelthru, messages */
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_region(r));
 
   child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "coordinate"));
-  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "x", xml_i(region_x(r, ctx->f)));
-  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "y", xml_i(region_y(r, ctx->f)));
-  if (r->planep) {
-    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "plane", (xmlChar *)r->planep->name);
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "x", xml_i(nx));
+  xmlNewNsProp(child, xct->ns_atl, BAD_CAST "y", xml_i(ny));
+  if (pl && pl->name) {
+    xmlNewNsProp(child, xct->ns_atl, BAD_CAST "plane", (xmlChar *)pl->name);
   }
 
   child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "terrain"));

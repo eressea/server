@@ -113,7 +113,7 @@ typedef struct region {
      and lastregion */
   unsigned int uid; /* a unique id */
   int x, y;
-  struct plane *planep;
+  struct plane * _plane; /* to access, use rplane(r) */
   char *display;
   unsigned int flags;
   unsigned short age;
@@ -229,9 +229,10 @@ int r_demand(const struct region * r, const struct luxury_type * ltype);
 
 const char * write_regionname(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
-struct region * new_region(int x, int y, unsigned int uid);
+struct region * new_region(int x, int y, struct plane * pl, unsigned int uid);
 void remove_region(region ** rlist, region * r);
 void terraform_region(struct region * r, const struct terrain_type * terrain);
+boolean pnormalize(int * x, int * y, const struct plane * pl);
 
 extern const int delta_x[MAXDIRECTIONS];
 extern const int delta_y[MAXDIRECTIONS];

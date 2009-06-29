@@ -91,9 +91,6 @@
 #include <util/patricia.h>
 #endif
 
-int world_width = -1;
-int world_height = -1;
-
 /* exported variables */
 region  *regions;
 faction *factions;
@@ -948,7 +945,7 @@ alliedunit(const unit * u, const faction * f2, int mode)
   assert(u->region); /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
   if (u->faction == f2) return mode;
   if (u->faction != NULL && f2!=NULL) {
-    plane * pl = u->region->planep;
+    plane * pl = rplane(u->region);
     automode = mode & autoalliance(pl, u->faction, f2);
 
     if (pl!=NULL && (pl->flags & PFL_NOALLIANCES))
@@ -1163,7 +1160,10 @@ update_lighthouse(building * lh)
       int y;
       for (y=-d;y<=d;++y) {
         attrib * a;
-        region * r2 = findregion(x+r->x, y+r->y);
+        region * r2;
+        int px = r->x+x, py = r->y+y;
+        pnormalize(&px, &py, rplane(r));
+        r2 = findregion(px, py);
         if (r2==NULL) continue;
         if (!fval(r2->terrain, SEA_REGION)) continue;
         if (distance(r, r2) > d) continue;
@@ -2475,6 +2475,7 @@ int
 lifestyle(const unit * u)
 {
   int need;
+  plane * pl;
   static int gamecookie = -1;
   if (gamecookie!=global.cookie) {
     gamecookie = global.cookie;
@@ -2484,7 +2485,8 @@ lifestyle(const unit * u)
 
   need = maintenance_cost(u);
 
-  if(u->region->planep && fval(u->region->planep, PFL_NOFEED))
+  pl = rplane(u->region);
+  if (pl && fval(pl, PFL_NOFEED))
     return 0;
 
 #if KARMA_MODULE
@@ -2935,8 +2937,6 @@ has_limited_skills (const struct unit * u)
 void
 attrib_init(void)
 {
-  world_width = get_param_int(global.parameters, "world.width", 0);
-  world_height = get_param_int(global.parameters, "world.height", 0);
   /* Alle speicherbaren Attribute müssen hier registriert werden */
   at_register(&at_shiptrail);
   at_register(&at_familiar);
@@ -3064,6 +3064,11 @@ free_gamedata(void)
   free_regions();
   free_borders();
 
+  while (alliances) {
+    alliance * al = alliances;
+    alliances = al->next;
+    free_alliance(al);
+  }
   while (factions) {
     faction * f = factions;
     factions = f->next;

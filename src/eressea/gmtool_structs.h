@@ -29,8 +29,9 @@ typedef struct point {
 } point;
 
 typedef struct coordinate {
-  /* Eine Koordinate in der Welt */
-  int x, y, p;
+  /* Eine Koordinate im Editor, nicht normalisiert */
+  int x, y;
+  struct plane * pl;
 } coordinate;
 
 typedef struct map_region {
@@ -40,7 +41,7 @@ typedef struct map_region {
 
 typedef struct view {
   struct map_region * regions;
-  int plane;
+  struct plane * pl;
   coordinate topleft; /* upper left corner in map. */
   extent size; /* dimensions. */
 } view;
@@ -69,6 +70,7 @@ typedef struct state {
 } state;
 
 extern map_region * cursor_region(const view * v, const coordinate * c);
+extern void cnormalize(const coordinate * c, int * x, int * y);
 extern state * current_state;
 
 #define TWIDTH  2 /* width of tile */

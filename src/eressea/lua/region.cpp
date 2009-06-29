@@ -89,8 +89,8 @@ region_getherbtype(const region * r) {
 static int
 region_plane(const region * r)
 {
-  if (r->planep==NULL) return 0;
-  return r->planep->id;
+  plane * pl = rplane(r);
+  return plane_id(pl);
 }
 
 static void
@@ -197,7 +197,10 @@ region_terraform(int x, int y, const char * tname)
     }
     return NULL;
   }
-  if (r==NULL) r = new_region(x, y, 0);
+  if (r==NULL) {
+    struct plane * pl = findplane(x, y);
+    r = new_region(x, y, pl, 0);
+  }
   terraform_region(r, terrain);
   return r;
 }
@@ -224,12 +227,13 @@ region_remove(region * r)
 }
 
 static void
-plane_remove(int plane_id)
+plane_remove(int plid)
 {
   region ** rp = &regions;
   while (*rp) {
     region * r = *rp;
-    if (r->planep && r->planep->id==plane_id) {
+    plane * pl = rplane(r);
+    if (pl && pl->id==plid) {
       remove_region(rp, r);
     } else {
       rp = &r->next;
@@ -240,19 +244,23 @@ plane_remove(int plane_id)
 void
 region_move(region * r, int x, int y)
 {
-  if (findregion(x,y)) {
+  if (findregion(x, y)) {
     log_error(("Bei %d, %d gibt es schon eine Region.\n", x, y));
     return;
   }
 #ifdef FAST_CONNECT
   direction_t dir;
+  plane * pl = rplane(r);
   for (dir=0;dir!=MAXDIRECTIONS;++dir) {
     region * rn = r->connect[dir];
+    int nx = x + delta_x[dir];
+    int ny = y + delta_y[dir];
+    pnormalize(&nx, &ny, pl);
     if (rn!=NULL) {
       direction_t reldir = reldirection(rn, r);
       rn->connect[reldir] = NULL;
     }
-    rn = findregion(x+delta_x[dir], y+delta_y[dir]);
+    rn = findregion(nx, ny);
     if (rn!=NULL) {
       direction_t reldir = (direction_t)((dir + 3) % MAXDIRECTIONS);
       rn->connect[reldir] = r;

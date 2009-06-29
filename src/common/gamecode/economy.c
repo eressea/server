@@ -622,6 +622,7 @@ give_cmd(unit * u, order * ord)
   int i, n, rule = rule_give();
   const item_type * itype;
   param_t p;
+  plane * pl;
 
   init_tokens(ord);
   skip_token();
@@ -652,7 +653,8 @@ give_cmd(unit * u, order * ord)
 
   /* UFL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
   * wirklich einfach. */
-  if (r->planep && fval(r->planep, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
+  pl = rplane(r);
+  if (pl && fval(pl, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
     cmistake(u, ord, 268, MSG_COMMERCE);
     return;
   }
@@ -1811,15 +1813,12 @@ make_cmd(unit * u, struct order * ord)
   * aufruf von make geeicht */
 
   if (p == P_ROAD) {
-    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+    plane * pl = rplane(r);
+    if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 275, MSG_PRODUCE);
     } else {
       direction_t d = finddirection(getstrtoken(), u->faction->locale);
       if (d!=NODIRECTION) {
-        if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-          cmistake(u, ord, 94, MSG_PRODUCE);
-          return 0;
-        }
         build_road(r, u, m, d);
       } else {
         /* Die Richtung wurde nicht erkannt */
@@ -1828,7 +1827,8 @@ make_cmd(unit * u, struct order * ord)
     }
     return 0;
   } else if (p == P_SHIP) {
-    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+    plane * pl = rplane(r);
+    if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 276, MSG_PRODUCE);
     } else {
       continue_ship(r, u, m);
@@ -1872,13 +1872,15 @@ make_cmd(unit * u, struct order * ord)
   }
 
   if (stype != NOSHIP) {
-    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+    plane * pl = rplane(r);
+    if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 276, MSG_PRODUCE);
     } else {
       create_ship(r, u, stype, m, ord);
     }
-  } else	if (btype != NOBUILDING) {
-    if(r->planep && fval(r->planep, PFL_NOBUILD)) {
+  } else if (btype != NOBUILDING) {
+    plane * pl = rplane(r);
+    if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 94, MSG_PRODUCE);
     } else {
       build_building(u, btype, m, ord);
@@ -2836,6 +2838,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
   unit * u2 = NULL;
   region * r = u->region;
   faction * f = NULL;
+  plane * pl;
 
   assert(skill_enabled[SK_PERCEPTION] && skill_enabled[SK_STEALTH]);
 
@@ -2849,7 +2852,8 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
     return;
   }
 
-  if (r->planep && fval(r->planep, PFL_NOATTACK)) {
+  pl = rplane(r);
+  if (pl && fval(pl, PFL_NOATTACK)) {
     cmistake(u, ord, 270, MSG_INCOME);
     return;
   }

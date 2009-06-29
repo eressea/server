@@ -81,7 +81,7 @@ extern int verbosity;
 boolean opt_cr_absolute_coords = false;
 
 /* globals */
-#define C_REPORT_VERSION 64
+#define C_REPORT_VERSION 65
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
@@ -309,8 +309,9 @@ cr_region(variant var, char * buffer, const void * userdata)
   const faction * report = (const faction*)userdata;
   region * r = (region *)var.v;
   if (r) {
-    plane * p = r->planep;
-    sprintf(buffer, "%d %d %d", region_x(r, report), region_y(r, report), p?p->id:0);
+    plane * pl = rplane(r);
+    int nx = region_x(r, report), ny = region_y(r, report);
+    sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
     return 0;
   }
   return -1;
@@ -419,14 +420,17 @@ cr_regions(variant var, char * buffer, const void * userdata)
 
   if (rdata!=NULL && rdata->nregions>0) {
     region * r = rdata->regions[0];
-    int i, z = r->planep?r->planep->id:0;
+    plane * pl = rplane(r);
+    int i, z = plane_id(pl);
     char * wp = buffer;
+    int nx = region_x(r, f), ny = region_y(r, f);
 
-    wp += sprintf(wp, "\"%d %d %d", region_x(r, f), region_y(r, f), z);
+    wp += sprintf(wp, "\"%d %d %d", nx, ny, z);
     for (i=1;i!=rdata->nregions;++i) {
       r = rdata->regions[i];
-      z = r->planep?r->planep->id:0;
-      wp += sprintf(wp, ", %d %d %d", region_x(r, f), region_y(r, f), z);
+      pl = rplane(r);
+      z = plane_id(pl);
+      wp += sprintf(wp, ", %d %d %d", nx, ny, z);
     }
     strcat(wp, "\"");
   } else {
@@ -1093,17 +1097,25 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 {
   faction * f = ctx->f;
   region * r = sr->r;
+  plane * pl = rplane(r);
+  int plid = plane_id(pl), nx, ny;
   const char * tname;
-  if (!r->planep) {
-    if (opt_cr_absolute_coords) {
-      fprintf(F, "REGION %d %d\n", r->x, r->x);
-    } else {
-      fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
-    }
+
+  if (opt_cr_absolute_coords) {
+    nx = r->x;
+    ny = r->y;
   } else {
-    fprintf(F, "REGION %d %d %d\n", region_x(r, f), region_y(r, f), r->planep->id);
+    nx = region_x(r, f);
+    ny = region_y(r, f);
+  }
+
+  if (plid==0) {
+    fprintf(F, "REGION %d %d\n", nx, ny);
+  } else {
+    fprintf(F, "REGION %d %d %d\n", nx, ny, plid);
   }
   fprintf(F, "%d;id\n", r->uid);
+
   if (r->land) {
     const char * str = rname(r, f->locale);
     if (str && str[0]) {
@@ -1200,7 +1212,9 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         region_list *rl2 = rl;
         while(rl2) {
           region * r = rl2->data;
-          fprintf(F, "SCHEMEN %d %d\n", region_x(r, f), region_y(r, f));
+          plane * pl = rplane(r);
+          int nx = region_x(r, f), ny = region_y(r, f);
+          fprintf(F, "SCHEMEN %d %d\n", nx, ny);
           fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
           rl2 = rl2->next;
         }
@@ -1275,6 +1289,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 static int
 report_computer(const char * filename, report_context * ctx, const char * charset)
 {
+  static int era = -1;
   int i;
   faction * f = ctx->f;
   const char * prefix;
@@ -1288,6 +1303,9 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   int enc = xmlParseCharEncoding(charset);
   FILE * F = fopen(filename, "wt");
 
+  if (era<0) {
+    era = get_param_int(global.parameters, "world.era", 2);
+  }
   if (F==NULL) {
     perror(filename);
     return -1;
@@ -1310,7 +1328,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   fprintf(F, "\"%s\";Koordinaten\n", "Hex");
   fprintf(F, "%d;Basis\n", 36);
   fprintf(F, "%d;Runde\n", turn);
-  fputs("2;Zeitalter\n", F);
+  fprintf(F, "%d;Zeitalter\n", era);
   if (mailto!=NULL) {
     fprintf(F, "\"%s\";mailto\n", mailto);
     fprintf(F, "\"%s\";mailcmd\n", locale_string(f->locale, "mailcmd"));
@@ -1389,9 +1407,12 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   {
     struct bmsg * bm;
     for (bm=f->battles;bm;bm=bm->next) {
-      if (!bm->r->planep) fprintf(F, "BATTLE %d %d\n", region_x(bm->r, f), region_y(bm->r, f));
+      plane * pl = rplane(bm->r);
+      int plid = plane_id(pl);
+      int nx = region_x(bm->r, f), ny = region_y(bm->r, f);
+      if (!plid) fprintf(F, "BATTLE %d %d\n", nx, ny);
       else {
-        fprintf(F, "BATTLE %d %d %d\n", region_x(bm->r, f), region_y(bm->r, f), bm->r->planep->id);
+        fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
       }
       cr_output_messages(F, bm->msgs, f);
     }
@@ -1452,9 +1473,18 @@ crwritemap(const char * filename)
 {
   FILE * F = fopen(filename, "w+");
   region * r;
+
+  fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+  fputs("\"UTF-8\";charset\n", F);
+
   for (r=regions;r;r=r->next) {
-    plane * p = r->planep;
-    fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
+    plane * pl = rplane(r);
+    int plid = plane_id(pl);
+    if (plid) {
+      fprintf(F, "REGION %d %d %d\n", r->x, r->y, plid);
+    } else {
+      fprintf(F, "REGION %d %d\n", r->x, r->y);
+    }
     fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain_name(r)));
   }
   fclose(F);

@@ -249,9 +249,8 @@ local function test_spells()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("enno@eressea.de", "human", "de")
-  local u = unit.create(f, r)
+  local u = unit.create(f, r, 1)
   u.race = "elf"
-  u.number = 1
   u:clear_orders()
   u:add_item("money", 10000)
   u:set_skill("magic", 5)
@@ -261,14 +260,19 @@ local function test_spells()
   local nums = 0
   if f.spells~=nil then
     for sp in f.spells do
-    nums = nums + 1
+      nums = nums + 1
     end
+    assert(nums>0)
+    for sp in u.spells do
+      nums = nums - 1
+    end
+    assert(nums==0)
+  else
+    for sp in u.spells do
+      nums = nums + 1
+    end
+    assert(nums>0)
   end
-  assert(nums>0)
-  for sp in u.spells do
-    nums = nums - 1
-  end
-  assert(nums==0)
 end
 
 local function test_produce()
@@ -438,7 +442,10 @@ function test_id()
   assert(get_building(fortytwo)==b)
   assert(get_building(atoi36(fortytwo))==b)
 
-  local s = ship.create(r, "boat")
+  local s = ship.create(r, "canoe")
+  if (s==nil) then
+    s = ship.create(r, "boat")
+  end
   -- <not working> s.id = atoi36("42")
   local fortytwo = itoa36(s.id)
   assert(get_ship(fortytwo)==s)
@@ -513,7 +520,7 @@ mytests = {
     ["taxes"] = test_taxes
 }
 fail = 0
-for k, v in pairs(mytests) do
+for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

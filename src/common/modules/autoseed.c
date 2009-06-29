@@ -423,17 +423,22 @@ free_newfaction(newfaction * nf)
 static void
 frame_regions(int age, const terrain_type * terrain)
 {
+  plane * hplane = get_homeplane();
   region * r = regions;
   for (r=regions;r;r=r->next) {
+    plane * pl = rplane(r);
     direction_t d;
     if (r->age<age) continue;
-    if (r->planep) continue;
+    if (pl!=hplane) continue; /* only do this on the main world */
     if (r->terrain == terrain) continue;
 
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
       if (rn==NULL) {
-        rn = new_region(r->x+delta_x[d], r->y+delta_y[d], 0);
+        int x = r->x + delta_x[d];
+        int y = r->y + delta_y[d];
+        pnormalize(&x, &y, pl);
+        rn = new_region(x, y, pl, 0);
         terraform_region(rn, terrain);
         rn->age=r->age;
       }
@@ -513,12 +518,13 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
 
   if (max_agediff>0) {
     region * rmin = NULL;
+    plane * hplane = get_homeplane();
     /* find a spot that's adjacent to the previous island, but virgin.
      * like the last land virgin ocean region adjacent to land.
      */
     for (r=regions;r;r=r->next) {
-      struct plane * p = r->planep;
-      if (r->age<=max_agediff && r->terrain == newterrain(T_OCEAN) && p==NULL && virgin_region(r)) {
+      struct plane * pl = rplane(r);
+      if (r->age<=max_agediff && r->terrain == newterrain(T_OCEAN) && pl==hplane && virgin_region(r)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
@@ -559,13 +565,14 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
   if (r==NULL) {
     region * rmin = NULL;
     direction_t dmin = MAXDIRECTIONS;
+    plane * hplane = get_homeplane();
     /* find an empty spot.
      * rmin = the youngest ocean region that has a missing neighbour 
      * dmin = direction in which it's empty
      */
     for (r=regions;r;r=r->next) {
-      struct plane * p = r->planep;
-      if (r->terrain == newterrain(T_OCEAN) && p==0 && (rmin==NULL || r->age<=max_agediff)) {
+      struct plane * pl = rplane(r);
+      if (r->terrain == newterrain(T_OCEAN) && pl==hplane && (rmin==NULL || r->age<=max_agediff)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn  = rconnect(r, d);
@@ -582,10 +589,12 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
     * in our island. island regions are kept in rlist, so only new regions can 
     * get populated, and old regions are not overwritten */
     if (rmin!=NULL) {
+      plane * pl = rplane(rmin);
+      int x = rmin->x + delta_x[dmin];
+      int y = rmin->y + delta_y[dmin];
+      pnormalize(&x, &y, pl);
       assert(virgin_region(rconnect(rmin, dmin)));
-      x = rmin->x + delta_x[dmin];
-      y = rmin->y + delta_y[dmin];
-      r = new_region(x, y, 0);
+      r = new_region(x, y, pl, 0);
       terraform_region(r, newterrain(T_OCEAN));
     }
   }
@@ -611,7 +620,11 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
       region * rn = rconnect(r, d);
       if (rn && fval(rn, RF_MARK)) continue;
       if (rn==NULL) {
-        rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
+        plane * pl = rplane(r);
+        int x = r->x + delta_x[d];
+        int y = r->y + delta_y[d];
+        pnormalize(&x, &y, pl);
+        rn = new_region(x, y, pl, 0);
         terraform_region(rn, newterrain(T_OCEAN));
       }
       if (virgin_region(rn)) {
@@ -691,7 +704,11 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
           region * rn = rconnect(r, d);
           if (rn==NULL) {
             const struct terrain_type * terrain = newterrain(T_OCEAN);
-            rn = new_region(r->x + delta_x[d], r->y + delta_y[d], 0);
+            plane * pl = rplane(r);
+            int x = r->x + delta_x[d];
+            int y = r->y + delta_y[d];
+            pnormalize(&x, &y, pl);
+            rn = new_region(x, y, pl, 0);
             if (rng_int() % SPECIALCHANCE < special) {
               terrain = random_terrain(terrainarr, distribution, nterrains);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
@@ -709,18 +726,26 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
     }
     while (*rbegin) {
       region * r = (*rbegin)->data;
+      plane * pl = rplane(r);
       direction_t d;
       rbegin=&(*rbegin)->next;
       for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {
         int i;
         for (i=1;i!=MAXFILLDIST;++i) {
-          if (findregion(r->x + i*delta_x[d], r->y + i*delta_y[d]))
+          int x = r->x + delta_x[d]*i;
+          int y = r->y + delta_y[d]*i;
+          pnormalize(&x, &y, pl);
+          if (findregion(x, y)) {
             break;
-          
+          }
         }
         if (i!=MAXFILLDIST) {
           while (--i) {
-            region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d], 0);
+            region * rn;
+            int x = r->x + delta_x[d]*i;
+            int y = r->y + delta_y[d]*i;
+            pnormalize(&x, &y, pl);
+            rn = new_region(x, y, pl, 0);
             terraform_region(rn, newterrain(T_OCEAN));
           }
         }
@@ -808,7 +833,11 @@ random_neighbours(region * r, region_list ** rlist, const terrain_type *(*terraf
     region * rn = rconnect(r, dir);
     if (rn==NULL) {
       const terrain_type * terrain = terraformer(dir);
-      rn = new_region(r->x+delta_x[dir], r->y+delta_y[dir], 0);
+      plane * pl = rplane(r);
+      int x = r->x + delta_x[dir];
+      int y = r->y + delta_y[dir];
+      pnormalize(&x, &y, pl);
+      rn = new_region(x, y, pl, 0);
       terraform_region(rn, terrain);
       regionqueue_push(rlist, rn);
       if (rn->land) {
@@ -847,7 +876,11 @@ oceans_around(region * r, region * rn[])
   for (n=0;n!=MAXDIRECTIONS;++n) {
     region * rx = rn[n];
     if (rx==NULL) {
-      rx = new_region(r->x+delta_x[n], r->y+delta_y[n], 0);
+      plane * pl = rplane(r);
+      int x = r->x + delta_x[n];
+      int y = r->y + delta_y[n];
+      pnormalize(&x, &y, pl);
+      rx = new_region(x, y, pl, 0);
       terraform_region(rx, newterrain(T_OCEAN));
       rn[n] = rx;
     }
@@ -874,6 +907,7 @@ smooth_island(region_list * island)
 
       if (nland==1) {
         get_neighbours(r, rn);
+        oceans_around(r, rn);
         for (n=0;n!=MAXDIRECTIONS;++n) {
           int n1 = (n+1)%MAXDIRECTIONS;
           int n2 = (n+1+MAXDIRECTIONS)%MAXDIRECTIONS;
@@ -920,7 +954,8 @@ build_island_e3(int x, int y, int numfactions, int minsize)
   int nfactions = 0;
   region_list * rlist = NULL;
   region_list * island = NULL;
-  region * r = new_region(x, y, 0);
+  plane * pl = findplane(x, y);
+  region * r = new_region(x, y, pl, 0);
   int nsize = 1;
   int q, maxq = INT_MIN, minq = INT_MAX;
  
@@ -943,33 +978,35 @@ build_island_e3(int x, int y, int numfactions, int minsize)
 
   smooth_island(island);
 
-  for (rlist=island;rlist;rlist=rlist->next) {
-    r = rlist->data;
-    if (r->land && fval(r, RF_MARK)) {
-      region *rn[MAXDIRECTIONS];
+  if (nsize>minsize/2) {
+    for (rlist=island;rlist;rlist=rlist->next) {
+      r = rlist->data;
+      if (r->land && fval(r, RF_MARK)) {
+        region *rn[MAXDIRECTIONS];
 
-      get_neighbours(r, rn);
-      q = region_quality(r,rn);
-      if (q>=MIN_QUALITY && nfactions<numfactions) {
-        starting_region(r, rn);
-        minq = MIN(minq, q);
-        maxq = MAX(maxq, q);
-        ++nfactions;
+        get_neighbours(r, rn);
+        q = region_quality(r,rn);
+        if (q>=MIN_QUALITY && nfactions<numfactions) {
+          starting_region(r, rn);
+          minq = MIN(minq, q);
+          maxq = MAX(maxq, q);
+          ++nfactions;
+        }
       }
     }
-  }
 
-  for (rlist=island;rlist && nfactions<numfactions;rlist=rlist->next) {
-    r = rlist->data;
-    if (!r->land && fval(r, RF_MARK)) {
-      region *rn[MAXDIRECTIONS];
-      get_neighbours(r, rn);
-      q = region_quality(r, rn);
-      if (q>=MIN_QUALITY*4/3 && nfactions<numfactions) {
-        starting_region(r, rn);
-        minq = MIN(minq, q);
-        maxq = MAX(maxq, q);
-        ++nfactions;
+    for (rlist=island;rlist && nfactions<numfactions;rlist=rlist->next) {
+      r = rlist->data;
+      if (!r->land && fval(r, RF_MARK)) {
+        region *rn[MAXDIRECTIONS];
+        get_neighbours(r, rn);
+        q = region_quality(r, rn);
+        if (q>=MIN_QUALITY*4/3 && nfactions<numfactions) {
+          starting_region(r, rn);
+          minq = MIN(minq, q);
+          maxq = MAX(maxq, q);
+          ++nfactions;
+        }
       }
     }
   }

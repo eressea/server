@@ -200,7 +200,7 @@ entrance_allowed(const struct unit * u, const struct region * r)
 #ifdef REGIONOWNERS
   faction * owner = region_get_owner(r);
   if (owner == NULL || u->faction == owner) return true;
-  if (alliedfaction(r->planep, owner, u->faction, HELP_TRAVEL)) return true;
+  if (alliedfaction(rplane(r), owner, u->faction, HELP_TRAVEL)) return true;
   return false;
 #else
   return true;

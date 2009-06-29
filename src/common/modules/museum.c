@@ -345,11 +345,12 @@ use_museumticket(unit *u, const struct item_type *itype, int amount, order * ord
 {
   attrib *a;
   region *r = u->region;
+  plane * pl = rplane(r);
 
   unused(amount);
 
   /* Prüfen ob in normaler Plane und nur eine Person */
-  if(r->planep != NULL) {
+  if (pl != get_homeplane()) {
     cmistake(u, ord, 265, MSG_MAGIC);
     return 0;
   }
