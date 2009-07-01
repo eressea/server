@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <spells>
 <!-- new illaun -->
-  <spell name="shadowknights" type="illaun" rank="4" level="1" index="147" variable="true">
+  <spell name="shadowknights" type="illaun" rank="4" level="1" index="147" variable="true" combat="1">
     <!-- Schattenritter -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -14,7 +14,7 @@
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="flee" type="illaun" rank="5" level="2" index="20" variable="true">
+  <spell name="flee" type="illaun" rank="5" level="2" index="20" variable="true" combat="1">
     <!-- Grauen der Schlacht -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -35,11 +35,11 @@
     <!-- Traumlesen -->
     <resource name="aura" amount="8" cost="fixed"/>
   </spell>
-  <spell name="tiredsoldiers" type="illaun" rank="5" level="4" index="15" variable="true">
+  <spell name="tiredsoldiers" type="illaun" rank="5" level="4" index="15" variable="true" combat="1">
     <!-- Schwere Glieder -->
     <resource name="aura" amount="4" cost="level"/>
   </spell>
-  <spell name="reanimate" type="illaun" rank="4" level="5" index="85" variable="true">
+  <spell name="reanimate" type="illaun" rank="4" level="5" index="85" variable="true" combat="3">
     <!-- Wiederbelebung -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -47,7 +47,7 @@
     <!-- Schlechter Schlaf -->
     <resource name="aura" amount="18" cost="fixed"/>
   </spell>
-  <spell name="sleep" type="illaun" rank="5" level="7" index="52" variable="true">
+  <spell name="sleep" type="illaun" rank="5" level="7" index="52" variable="true" combat="2">
     <!-- Schlaf -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -76,7 +76,7 @@
     <!-- Schlechte Träume -->
     <resource name="aura" amount="90" cost="fixed"/>
   </spell>
-  <spell name="mindblast" type="illaun" rank="5" level="11" index="78" variable="true">
+  <spell name="mindblast" type="illaun" rank="5" level="11" index="78" variable="true" combat="1">
     <!-- Tod des Geistes -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
@@ -98,7 +98,7 @@
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true">
+  <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true" combat="2">
     <!-- Feuerball -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -110,7 +110,7 @@
     <!-- Kleines Blutopfer -->
     <resource name="hp" amount="4" cost="level"/>
   </spell>
-  <spell name="berserk" type="draig" rank="4" level="5" index="22" variable="true">
+  <spell name="berserk" type="draig" rank="4" level="5" index="22" variable="true" combat="1">
     <!-- Blutrausch -->
     <resource name="aura" amount="5" cost="level"/>
     <resource name="peasant" amount="1" cost="fixed"/>
@@ -119,7 +119,7 @@
     <!-- Chaosfluch -->
     <resource name="aura" amount="4" cost="level"/>
   </spell>
-  <spell name="combatrust" type="draig" rank="5" level="6" index="7" variable="true">
+  <spell name="combatrust" type="draig" rank="5" level="6" index="7" variable="true" combat="2">
     <!-- Rosthauch -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
@@ -131,7 +131,7 @@
     <!-- Feuerwand -->
     <resource name="aura" amount="6" cost="level"/>
   </spell>
-  <spell name="chaosrow" type="draig" rank="5" level="8" index="18" variable="true">
+  <spell name="chaosrow" type="draig" rank="5" level="8" index="18" variable="true" combat="1">
     <!-- Wahnsinn des Krieges -->
     <resource name="aura" amount="3" cost="level"/>
     <resource name="peasant" amount="10" cost="fixed"/>
@@ -140,7 +140,7 @@
     <!-- Beschwöre Schattendämonen -->
     <resource name="aura" amount="3" cost="level"/>
   </spell>
-  <spell name="undeadhero" type="draig" rank="5" level="9" index="164" variable="true">
+  <spell name="undeadhero" type="draig" rank="5" level="9" index="164" variable="true" combat="3">
     <!-- Untote Helden -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -183,7 +183,7 @@
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="song_of_healing" type="cerddor" rank="5" level="2" index="10" variable="true">
+  <spell name="song_of_healing" type="cerddor" rank="5" level="2" index="10" variable="true" combat="3">
     <!-- Lied der Heilung -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -191,11 +191,11 @@
     <!-- Hohes Lied der Gaukelei -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="song_of_fear" type="cerddor" rank="5" level="3" index="21" variable="true">
+  <spell name="song_of_fear" type="cerddor" rank="5" level="3" index="21" variable="true" combat="2">
     <!-- Gesang der Furcht -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="song_of_confusion" type="cerddor" rank="5" level="4" index="19" variable="true">
+  <spell name="song_of_confusion" type="cerddor" rank="5" level="4" index="19" variable="true" combat="1">
     <!-- Gesang der Verwirrung -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
@@ -205,7 +205,7 @@
     <resource name="aura" amount="10" cost="fixed"/>
     <!-- missing syntactical info: ONETARGET | UNITSPELL -->
   </spell>
-  <spell name="heroic_song" type="cerddor" rank="4" level="5" index="76" variable="true">
+  <spell name="heroic_song" type="cerddor" rank="4" level="5" index="76" variable="true" combat="1">
     <!-- Heldengesang -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
@@ -217,7 +217,7 @@
     <!-- Monster friedlich stimmen -->
     <resource name="aura" amount="15" cost="fixed"/>
   </spell>
-  <spell name="bloodthirst" type="cerddor" rank="4" level="7" index="23" variable="true">
+  <spell name="bloodthirst" type="cerddor" rank="4" level="7" index="23" variable="true" combat="1">
     <!-- Kriegsgesang -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
@@ -297,7 +297,7 @@
     <resource name="log" amount="1" cost="level"/>
     <resource name="myrrh" amount="10" cost="fixed"/>
   </spell>
-  <spell name="hail" type="gwyrrd" rank="5" level="3" index="5" variable="true">
+  <spell name="hail" type="gwyrrd" rank="5" level="3" index="5" variable="true" combat="2">
     <!-- Hagel -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -305,11 +305,11 @@
     <!-- Beschwörung eines Wasserelementares -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="windshield" type="gwyrrd" rank="5" level="4" index="59" variable="true">
+  <spell name="windshield" type="gwyrrd" rank="5" level="4" index="59" variable="true" combat="1">
     <!-- Windschild -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="healing" type="gwyrrd" rank="5" level="5" index="9" variable="true">
+  <spell name="healing" type="gwyrrd" rank="5" level="5" index="9" variable="true" combat="3">
     <!-- Heilung -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -322,11 +322,11 @@
     <!-- Beschwöre einen Sturmelementar -->
     <resource name="aura" amount="6" cost="level"/>
   </spell>
-  <spell name="wolfhowl" type="gwyrrd" rank="5" level="7" index="94" variable="true">
+  <spell name="wolfhowl" type="gwyrrd" rank="5" level="7" index="94" variable="true" combat="1">
     <!-- Wolfsgeheul -->
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="versteinern" type="gwyrrd" rank="5" level="8" index="67" variable="true">
+  <spell name="versteinern" type="gwyrrd" rank="5" level="8" index="67" variable="true" combat="2">
     <!-- Blick des Basilisken -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -348,7 +348,7 @@
     <resource name="aura" amount="350" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
-  <spell name="barkskin" type="gwyrrd" rank="2" level="12" index="142" variable="true">
+  <spell name="barkskin" type="gwyrrd" rank="2" level="12" index="142" variable="true" combat="1">
     <!-- Rindenhaut -->
     <resource name="aura" amount="4" cost="level"/>
   </spell>
@@ -511,7 +511,7 @@
     <resource name="iron" amount="1" cost="level"/>
     <resource name="incense" amount="1" cost="fixed"/>
   </spell>
-  <spell name="reelingarrows" type="common" rank="5" level="5" index="36" variable="true">
+  <spell name="reelingarrows" type="common" rank="5" level="5" index="36" variable="true" combat="1">
     <!-- Wirbelwind -->
     <resource name="aura" amount="15" cost="fixed"/>
   </spell>
@@ -525,7 +525,7 @@
     <resource name="aura" amount="35" cost="fixed"/>
     <resource name="dragonblood" amount="1" cost="fixed"/>
   </spell>
-  <spell name="strongwall" type="common" rank="5" level="8" index="44" variable="true">
+  <spell name="strongwall" type="common" rank="5" level="8" index="44" variable="true" combat="1">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="homestone" type="common" rank="5" level="7" index="45">
@@ -539,7 +539,7 @@
   <spell name="disturbingdreams" type="common" rank="5" level="6" index="50" far="true">
     <resource name="aura" amount="18" cost="fixed"/>
   </spell>
-  <spell name="appeasement" type="common" rank="5" level="1" index="51" variable="true">
+  <spell name="appeasement" type="common" rank="5" level="1" index="51" variable="true" combat="1">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
   <spell name="ironkeeper" type="common" rank="5" level="3" index="54" far="true" variable="true">
@@ -554,19 +554,19 @@
     <resource name="aura" amount="4" cost="fixed"/>
     <resource name="money" amount="100" cost="fixed"/>
   </spell>
-  <spell name="combat_speed" type="common" rank="5" level="9" index="79" variable="true">
+  <spell name="combat_speed" type="common" rank="5" level="9" index="79" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
   <spell name="double_time" type="common" rank="5" level="11" index="80" parameters="u+" los="true" ship="true" variable="true">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="fiery_dragonbreath" type="common" rank="5" level="3" index="81">
+  <spell name="fiery_dragonbreath" type="common" rank="5" level="3" index="81" combat="2">
     <resource name="aura" amount="1" cost="fixed"/>
   </spell>
-  <spell name="icy_dragonbreath" type="common" rank="5" level="6" index="82">
+  <spell name="icy_dragonbreath" type="common" rank="5" level="6" index="82" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
-  <spell name="powerful_dragonbreath" type="common" rank="5" level="12" index="83">
+  <spell name="powerful_dragonbreath" type="common" rank="5" level="12" index="83" combat="2">
     <resource name="aura" amount="3" cost="fixed"/>
   </spell>
   <spell name="magicstreet" type="common" rank="5" level="4" index="84" ship="true" far="true" variable="true">
@@ -592,13 +592,13 @@
   <spell name="break_curse" type="common" rank="3" level="7" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="3" cost="level"/>
   </spell>
-  <spell name="meteor_rain" type="common" rank="5" level="3" index="108" variable="true">
+  <spell name="meteor_rain" type="common" rank="5" level="3" index="108" variable="true" combat="2">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="fish_shield" type="common" rank="2" level="8" index="109" variable="true">
+  <spell name="fish_shield" type="common" rank="2" level="8" index="109" variable="true" combat="1">
     <resource name="aura" amount="4" cost="level"/>
   </spell>
-  <spell name="armor_shield" type="common" rank="2" level="12" index="110" variable="true">
+  <spell name="armor_shield" type="common" rank="2" level="12" index="110" variable="true" combat="1">
     <resource name="aura" amount="4" cost="level"/>
   </spell>
   <spell name="living_rock" type="common" rank="5" level="13" index="116" syntax="direction" parameters="bc" variable="true">
@@ -627,22 +627,22 @@
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
-  <spell name="draigfumbleshield" type="common" rank="2" level="9" index="143" variable="true">
+  <spell name="draigfumbleshield" type="common" rank="2" level="9" index="143" variable="true" combat="1">
     <resource name="aura" amount="6" cost="level"/>
   </spell>
-  <spell name="gwyrrdfumbleshield" type="common" rank="2" level="5" index="144" variable="true">
+  <spell name="gwyrrdfumbleshield" type="common" rank="2" level="5" index="144" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="cerrdorfumbleshield" type="common" rank="2" level="5" index="145" variable="true">
+  <spell name="cerrdorfumbleshield" type="common" rank="2" level="5" index="145" variable="true" combat="1">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="tybiedfumbleshield" type="common" rank="2" level="2" index="146" variable="true">
+  <spell name="tybiedfumbleshield" type="common" rank="2" level="2" index="146" variable="true" combat="1">
     <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="concealing_aura" type="common" rank="5" level="1" index="150" parameters="u" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="shockwave" type="common" rank="5" level="5" index="163" variable="true">
+  <spell name="shockwave" type="common" rank="5" level="5" index="163" variable="true" combat="2">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="wyrm_transformation" type="common" rank="5" level="1" index="166">
@@ -653,25 +653,25 @@
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
-  <spell name="drain_skills" type="common" rank="5" level="12" index="174">
+  <spell name="drain_skills" type="common" rank="5" level="12" index="174" combat="2">
     <resource name="aura" amount="4" cost="fixed"/>
   </spell>
-  <spell name="aura_of_fear" type="common" rank="5" level="12" index="175">
+  <spell name="aura_of_fear" type="common" rank="5" level="12" index="175" combat="2">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="shadowcall" type="common" rank="5" level="12" index="176">
+  <spell name="shadowcall" type="common" rank="5" level="12" index="176" combat="1">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="immolation" type="common" rank="5" level="12" index="180">
+  <spell name="immolation" type="common" rank="5" level="12" index="180" combat="2">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="firestorm" type="common" rank="5" level="8" index="181">
+  <spell name="firestorm" type="common" rank="5" level="8" index="181" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
-  <spell name="coldfront" type="common" rank="5" level="8" index="182">
+  <spell name="coldfront" type="common" rank="5" level="8" index="182" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
-  <spell name="acidrain" type="common" rank="5" level="8" index="183">
+  <spell name="acidrain" type="common" rank="5" level="8" index="183" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
   <!-- end common spells -->

@@ -1405,6 +1405,7 @@ parse_spells(xmlDocPtr doc)
       xmlChar * propValue;
       int k;
       spell * sp = calloc(1, sizeof(spell));
+      static int modes[] = { 0, PRECOMBATSPELL, COMBATSPELL, POSTCOMBATSPELL };
 
       /* spellname */
       propValue = xmlGetProp(node, BAD_CAST "name");
@@ -1442,6 +1443,8 @@ parse_spells(xmlDocPtr doc)
       if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
       if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
       if (xml_bvalue(node, "variable", false)) sp->sptyp |= SPELLLEVEL;
+      k = xml_ivalue(node, "combat", 0);
+      if (k>=0 && k<=3) sp->sptyp |= modes[k];
 
       if (gamecode_enabled) {
         /* reading eressea/spells/spell/function */
