@@ -12,6 +12,19 @@
     <text locale="en">the third age</text>
   </string>
 
+  <string name="rpg_item_1">
+    <text locale="de">Pandoras Urkunde für Halbling ehrenhalber, weiblich</text>
+    <text locale="en">Pandora's Certificate</text>
+  </string>
+  <string name="rpg_item_2">
+    <text locale="de">Heilige Nußhälfte</text>
+    <text locale="en">piece of a holy nut</text>
+  </string>
+  <string name="rpg_item_3">
+    <text locale="de">Flaschengeist Zhardamon</text>
+    <text locale="en">bottle demon Zhardamon</text>
+  </string>
+
   <string name="rep_crossbow">
     <text locale="de">Repetierarmbrust</text>
     <text locale="en">repeating crossbow</text>

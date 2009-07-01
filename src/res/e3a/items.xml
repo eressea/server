@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
 
+  <resource name="rpg_item_1"><item weight="10"/></resource>
+  <resource name="rpg_item_2"><item weight="1"/></resource>
+  <resource name="rpg_item_3"><item weight="100"/></resource>
+  
   <resource name="ointment" appearance="vial">
     <!-- Wundsalbe -->
     <item weight="0" score="60">

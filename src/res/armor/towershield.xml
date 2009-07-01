@@ -6,8 +6,8 @@
       <modifier function="mod_dwarves_only"/>
       <requirement type="iron" quantity="2"/>
     </construction>
-    <armor ac="2" projectile="0.30" penalty="-0.10" magres="0.0" shield="yes">
-      <modifier type="canuse" function="mod_elves_only"/>
+    <armor ac="0" penalty="-0.15" projectile="0.25" magres="0.0" shield="yes">
+      <modifier type="canuse" function="mod_dwarves_only"/>
     </armor>
   </item>
 </resource>

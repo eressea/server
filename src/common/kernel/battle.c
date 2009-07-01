@@ -1213,7 +1213,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
       while (chance(kritchance)) {
         if (bdebug) {
-          fprintf(bdebug, "%s/%d lands a critical hit", unitid(au), at.index);
+          fprintf(bdebug, "%s/%d lands a critical hit\n", unitid(au), at.index);
         }
         da += dice_rand(damage);
       }
@@ -2193,7 +2193,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
         if (reload && wp && wp->type->reload && !getreload(ta)) {
           int i = setreload(ta);
           if (bdebug) {
-            fprintf(bdebug, " reloading %d turns\n", i);
+            fprintf(bdebug, "%s/%d reloading %d turns\n", unitid(au), ta.index, i);
           }
         }
       }
