@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<strings>
+  <!--
+    _d: dativ (wir erklären allen /Trollen/ den Krieg)
+    _p: plural (13 /Trolle/)
+    _x: preposition (15 /Troll/schwerter)
+    _a: including article (ein Troll, a troll)
+   -->
+  <!--Fort-Ausbaustufen -->
+  <string name="calendar::thirdage">
+    <text locale="de">des dritten Zeitalters</text>
+    <text locale="en">the third age</text>
+  </string>
+
+  <string name="rep_crossbow">
+    <text locale="de">Repetierarmbrust</text>
+    <text locale="en">repeating crossbow</text>
+  </string>
+  <string name="rep_crossbow_p">
+    <text locale="de">Repetierarmbrüste</text>
+    <text locale="en">repeating crossbows</text>
+  </string>
+
+  <string name="scaffolding">
+    <text locale="de">Gerüst</text>
+    <text locale="en">scaffolding</text>
+  </string>
+  <string name="guardhouse">
+    <text locale="de">Wachstube</text>
+    <text locale="en">guard house</text>
+  </string>
+  <string name="guardtower">
+    <text locale="de">Wachturm</text>
+    <text locale="en">guard tower</text>
+  </string>
+  <string name="watch">
+    <text locale="de">Wache</text>
+    <text locale="en">watch</text>
+  </string>
+  <string name="market">
+    <text locale="de">Marktplatz</text>
+    <text locale="en">marketplace</text>
+  </string>
+
+  <namespace name="morale">
+    <string name="0">
+      <text locale="de">aufständische</text>
+      <text locale="en">rebellious</text>
+    </string>
+    <string name="1">
+      <text locale="de">zornige</text>
+      <text locale="en">angry</text>
+    </string>
+    <string name="2">
+      <text locale="de">zufriedene</text>
+      <text locale="en">content</text>
+    </string>
+    <string name="3">
+      <text locale="de">glückliche</text>
+      <text locale="en">happy</text>
+    </string>
+    <string name="4">
+      <text locale="de">treue</text>
+      <text locale="en">loyal</text>
+    </string>
+    <string name="5">
+      <text locale="de">ergebene</text>
+      <text locale="en">devoted</text>
+    </string>
+  </namespace>
+  <string name="charger">
+    <text locale="de">Streitross</text>
+    <text locale="en">charger</text>
+  </string>
+  <string name="charger_p">
+    <text locale="de">Streitrösser</text>
+    <text locale="en">chargers</text>
+  </string>
+  <string name="towershield">
+    <text locale="de">Turmschild</text>
+    <text locale="en">tower shield</text>
+  </string>
+  <string name="towershield_p">
+    <text locale="de">Turmschilde</text>
+    <text locale="en">tower shields</text>
+  </string>
+
+  <namespace name="spell">
+    <string name="create_potion_p0">
+      <text locale="de">Braue Siebenmeilentee</text>
+      <text locale="en">brew seven mile tea</text>
+    </string>
+    <string name="create_potion_p2">
+      <text locale="de">Braue Wasser des Lebens</text>
+      <text locale="en">brew water of life</text>
+    </string>
+    <string name="create_potion_p3">
+      <text locale="de">Braue Schaffenstrunk</text>
+      <text locale="en">brew busy beer</text>
+    </string>
+    <string name="create_potion_ointment">
+      <text locale="de">Braue Wundsalbe</text>
+      <text locale="en">brew ointment</text>
+    </string>
+    <string name="create_potion_peasantblood">
+      <text locale="de">Braue Bauernblut</text>
+      <text locale="en">brew peasant blood</text>
+    </string>
+    <string name="create_potion_p9">
+      <text locale="de">Braue Pferdeglück</text>
+      <text locale="en">brew horsepower potion</text>
+    </string>
+    <string name="create_potion_p13">
+      <text locale="de">Braue Elixier der Macht</text>
+      <text locale="en">brew elixir of power</text>
+    </string>
+    <string name="create_potion_p14">
+      <text locale="de">Braue Heiltrank</text>
+      <text locale="en">brew healing potion</text>
+    </string>
+  </namespace>
+  
+  <namespace name="spellinfo">
+    <string name="create_potion_p0">
+      <text locale="en">For Seven Mile Tea, boil up a Cobalt Fungus and pour the resulting brew into a Windbag. Catch and filter the liquid that drips out and administer it. This tea allows up to ten men to move as fast as a horse.</text>
+      <text locale="de">Für den Siebenmeilentee koche man einen Blauen Baumringel auf und gieße dieses Gebräu in einen Windbeutel. Das heraustropfende Wasser fange man auf, filtere es und verabreiche es alsdann. Durch diesen Tee können bis zu zehn Menschen schnell wie ein Pferd laufen.</text>
+    </string>
+    <string name="create_potion_p2">
+      <text locale="en">The Water of Life allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
+      <text locale="de">Das Wasser des Lebens ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so daß man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
+    </string>
+    <string name="create_potion_p3">
+      <text locale="en">Allow a Tangy Temerity to simmer for three hours in a litre of water, then add a grated Mandrake, and sprinkle in a Gapgrowth harvested at full moon. The whole brew should then be allowed to stew for three days in a warm place. This potion increases the strength and endurance of ten men so that they can achieve twice as much in a week.</text>
+      <text locale="de">Man lasse einen Würzigen Wagemut drei Stunden lang in einem Liter Wasser köcheln. Dann gebe man eine geriebene Alraune dazu und bestreue das ganze mit bei Vollmond geerntetem Spaltwachs. Nun lasse man den Sud drei Tage an einem dunklen und warmen Ort ziehen und seie dann die Flüssigkeit ab. Dieser Schaffenstrunk erhöht die Kraft und Ausdauer von zehn Männern, so daß sie doppelt soviel schaffen können wie sonst.</text>
+    </string>
+    <string name="create_potion_ointment">
+      <text locale="en">When one is severely wounded after a hard battle it is advisable to have some Ointment to hand. Applied to wounds, this magical paste closes them in the blink of an eye. For the preparation the alchemist requires a cobalt fungus, tangy temerity, and white hemlock. A dose of the potion heals up to 400 hitpoints.</text>
+      <text locale="de">Ist man nach einem einem harten Kampf schwer verwundet, ist es ratsam, etwas Wundsalbe parat zu haben. Streicht man diese magische Paste auf die Wunden, schließen sich diese augenblicklich. Für die Herstellung benötigt der Alchemist nebst einem Blauen Baumringel einen Würzigen Wagemut und einen Weißen Wüterich. Eine solche Portion heilt bis zu 400 Lebenspunkte.</text>
+    </string>
+    <string name="create_potion_peasantblood">
+      <text locale="en">Knowledge of this potion is amongst the most dangerous and secret wisdom of the alchemist. Snatched from the darkest hells, the knowledge of this formula enables the production of an elixer which serves Demons as nourishment. If used by normal beings it leads to a swift death and eternal undeath. The creation requires Fjord Fungus together with some Cave Lichen and Cobalt Fungus, and an unfortunate peasant from the region, who is killed in the bloody days-long ritual. One vial of the potion satisfies the hunger of 100 Demons for a week.</text>
+      <text locale="de">Zu den gefährlichsten und geheimsten Wissen der Alchemisten zählt die Kenntnis um diesen Trank. Den finstersten Höllen entrissen, ermöglicht die Kenntnis dieser Formel die Herstellung eines Elixiers, welches Dämonen als Nahrung dient. Von normalen Lebewesen eingenommen, führt es zu schnellem Tod und ewigen Nichtleben. Die Herstellung benötigt nebst Fjordwuchs, etwas Höhlenglimm und einem Blauen Baumringel auch einen Bauern aus der Region, welcher in einem tagelangen blutigen Ritual getötet wird. Ein Fläschchen des Tranks kann den Hunger von 100 Dämonen für eine Woche stillen.</text>
+    </string>
+    <string name="create_potion_p9">
+      <text locale="en">To make a horsepower potion, chop a peyote, a cobalt fungus and some knotroot, and boil it in a bucketful of water. Then add some sand reeker and let the mixture steep for three days. Finally one gives this to the horses to drink, to double their procreation.</text>
+      <text locale="de">Für das Pferdeglück zerhacke man einen Kakteenschwitz, einen blauen Baumringel und etwas knotigen Saugwurz und koche das ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es den Pferden zu trinken, auf daß sie sich doppelt so schnell vermehren.</text>
+    </string>
+    <string name="create_potion_p13">
+      <text locale="en">One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood. </text>
+      <text locale="de">Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. Der Trank erhöht die Lebensenergie von maximal zehn Personen auf das fünffache. Die Wirkung ist direkt nach der Einnahme am stärksten und klingt danach langsam ab. Zur Herstellung benötigt der Alchemist ein Elfenlieb, einen Windbeutel, ein Stück Wasserfinder und einen Grünen Spinnerich. Über dieses Mischung streue er schließlich einen zerriebenen Blasenmorchel und rühre dieses Pulver unter etwas Drachenblut.</text>
+    </string>
+    <string name="create_potion_p14">
+      <text locale="en">For a healing potion one takes the peel of a windbag and some bugleweed, stirr in some chopped elvendear and sprinkle it with the blossoms of an ice begonia. This has to cook through for four days, while a gapgrowth has to be added on the second day. Then one carefully scoops off the top layer of liquid. One such potion gives four men (or one man four times) a 50% chance to survive otherwise lethal wounds. The potion is automatically used in case of injury.</text>
+      <text locale="de">Für einen Heiltrank nehme man die Schale eines Windbeutels und etwas Gurgelkraut, rühre eine kleingehacktes Elfenlieb dazu und bestreue alles mit den Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern (oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
+    </string>
+  </namespace>
+  <namespace name="spell">
+    <string name="commonfamiliar">
+      <text locale="de">Vertrauten binden</text>
+      <text locale="en">Bind Familiar</text>
+    </string>
+  </namespace>
+  <namespace name="spellinfo">
+    <string name="commonfamiliar">
+      <text locale="de">Einem erfahrenen Magier wird
+        irgendwann auf seinen Wanderungen ein
+        ungewöhnliches Exemplar einer Gattung begegnen,
+        welches sich dem Magier anschließen wird.</text>
+      <text locale="en">During their travel, seasoned
+        magicians will occasionally befriend an extraordinary
+        creature of an unusual species that will join them.</text>
+    </string>
+  </namespace>
+  
+</strings>

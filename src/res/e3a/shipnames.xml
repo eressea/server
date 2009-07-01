@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<strings>
+  <string name="canoe">
+    <text locale="de">Einbaum</text>
+    <text locale="en">canoe</text>
+  </string>
+  <string name="raft">
+    <text locale="de">Floß</text>
+    <text locale="en">raft</text>
+  </string>
+  <string name="cutter">
+    <text locale="de">Kutter</text>
+    <text locale="en">cutter</text>
+  </string>
+  <string name="barge">
+    <text locale="de">Barke</text>
+    <text locale="en">barge</text>
+  </string>
+  
+  <string name="royalbarge">
+    <text locale="de">Königsbarke</text>
+    <text locale="en">royal barge</text>
+  </string>
+  <string name="catamaran">
+    <text locale="de">Katamaran</text>
+    <text locale="en">catamaran</text>
+  </string>
+  
+  <string name="cog">
+    <text locale="de">Kogge</text>
+    <text locale="en">cog</text>
+  </string>
+  <string name="caravel">
+    <text locale="de">Karavelle</text>
+    <text locale="en">caravel</text>
+  </string>
+
+  <string name="frigate">
+    <text locale="de">Fregatte</text>
+    <text locale="en">frigate</text>
+  </string>
+  <string name="galleon">
+    <text locale="de">Galeone</text>
+    <text locale="en">galleon</text>
+  </string>
+
+  <string name="dragonship">
+    <text locale="de">Drachenschiff</text>
+    <text locale="en">dragonship</text>
+  </string>
+  <string name="trireme">
+    <text locale="de">Trireme</text>
+    <text locale="en">trireme</text>
+  </string>
+</strings>
