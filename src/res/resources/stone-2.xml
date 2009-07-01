@@ -6,6 +6,6 @@
   <resourcelimit>
     <modifier building="quarry" type="skill" value="1"/>
     <modifier building="quarry" type="material" value="0.5"/>
-    <modifier race="dwarf" type="material" value="0.75"/>
+    <modifier race="dwarf" type="material" value="0.60"/>
   </resourcelimit>
 </resource>

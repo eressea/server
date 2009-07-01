@@ -16,26 +16,26 @@
   <xi:include href="spoils.xml"/>
   <xi:include href="prefixes.xml"/>
   <!--xi:include href="ships.xml"/-->
-  <xi:include href="buildings.xml"/>
+  <xi:include href="common/buildings.xml"/>
   <xi:include href="equipment.xml"/>
   <!--xi:include href="terrains.xml"/-->
   <xi:include href="dungeons.xml"/>
   <xi:include href="directions.xml"/>
 
-  <xi:include href="e2k9/ships.xml"/>
-  <xi:include href="e2k9/shipnames.xml"/>
-  <xi:include href="e2k9/terrains.xml"/>
-  <xi:include href="e2k9/calendar.xml"/>
-  <xi:include href="e2k9/items.xml" />
-  <xi:include href="e2k9/strings.xml"/>
-  <xi:include href="e2k9/races.xml"/>
-  <xi:include href="e2k9/buildings.xml"/>
-  <xi:include href="e2k9/equipment.xml"/>
-  <xi:include href="e2k9/spells.xml"/>
-  <xi:include href="e2k9/luxuries.xml" />
-  <xi:include href="e2k9/weapons.xml" />
-  <xi:include href="e2k9/armor.xml" />
-  <xi:include href="e2k9/resources.xml" />
+  <xi:include href="e3a/ships.xml"/>
+  <xi:include href="e3a/shipnames.xml"/>
+  <xi:include href="e3a/terrains.xml"/>
+  <xi:include href="e3a/calendar.xml"/>
+  <xi:include href="e3a/items.xml" />
+  <xi:include href="e3a/strings.xml"/>
+  <xi:include href="e3a/races.xml"/>
+  <xi:include href="e3a/buildings.xml"/>
+  <xi:include href="e3a/equipment.xml"/>
+  <xi:include href="e3a/spells.xml"/>
+  <xi:include href="e3a/luxuries.xml" />
+  <xi:include href="e3a/weapons.xml" />
+  <xi:include href="e3a/armor.xml" />
+  <xi:include href="e3a/resources.xml" />
 
   <equipment>
     <set name="first_unit">
