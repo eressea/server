@@ -3231,11 +3231,13 @@ peasant_taxes(region * r)
   }
 
   if (maxsize>0) {
-    int taxmoney = (money * maxsize) / 100;
-    change_money(u, taxmoney);
-    rsetmoney(r, money - taxmoney);
-    ADDMSG(&u->faction->msgs, msg_message("income_tax", 
-      "unit region amount", u, r, taxmoney));
+    int taxmoney = (int)((money * maxsize) * b->type->taxes(b));
+    if (taxmoney>0) {
+      change_money(u, taxmoney);
+      rsetmoney(r, money - taxmoney);
+      ADDMSG(&u->faction->msgs, msg_message("income_tax", 
+        "unit region amount", u, r, taxmoney));
+    }
   }
 }
 

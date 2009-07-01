@@ -1426,7 +1426,7 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r, &is_castle, false)) {
+    if (b != largestbuilding(r, &is_tax_building, false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -1661,7 +1661,7 @@ name_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r, &is_castle, false)) {
+    if (b != largestbuilding(r, &is_tax_building, false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }

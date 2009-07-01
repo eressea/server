@@ -16,7 +16,7 @@
   <xi:include href="races.xml"/>
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>
-  <xi:include href="buildings.xml"/>
+  <xi:include href="common/buildings.xml"/>
   <xi:include href="calendar.xml"/>
   <xi:include href="equipment.xml"/>
   <xi:include href="spells.xml"/>
@@ -79,7 +79,7 @@
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items-hse.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
-  <xi:include href="eressea/temple.xml"/>
+  <xi:include href="eressea/buildings.xml"/>
   <strings>
     <string name="newbie_info_1">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an hse-server@eressea.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>

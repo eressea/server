@@ -253,6 +253,35 @@ init_smithy(struct building_type * bt)
 }
 
 static const char *
+castle_name_i(const struct building_type* btype, int bsize, const char * fname[])
+{
+  const construction * ctype;
+  int i = 0;
+
+  ctype = btype->construction;
+  while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
+    bsize-=ctype->maxsize;
+    ctype=ctype->improvement;
+    ++i;
+  }
+  return fname[i];
+}
+
+static const char *
+castle_name_2(const struct building_type* btype, int bsize)
+{
+  const char * fname[] = {
+    "site",
+    "fortification",
+    "tower",
+    "castle",
+    "fortress",
+    "citadel"
+  };
+  return castle_name_i(btype, bsize, fname);
+}
+
+static const char *
 castle_name(const struct building_type* btype, int bsize)
 {
   const char * fname[] = {
@@ -264,16 +293,7 @@ castle_name(const struct building_type* btype, int bsize)
     "fortress",
     "citadel"
   };
-  const construction * ctype;
-  int i = 0;
-
-  ctype = btype->construction;
-  while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
-    bsize-=ctype->maxsize;
-    ctype=ctype->improvement;
-    ++i;
-  }
-  return fname[i];
+  return castle_name_i(btype, bsize, fname);
 }
 
 static const char *
@@ -370,12 +390,27 @@ findbuildingtype(const char * name, const struct locale * lang)
 	return (const building_type*)type.v;
 }
 
+static int eressea_building_protection(building * b, unit * u)
+{
+  int beff = buildingeffsize(b, false)-1;
+  /* -1 because the tradepost has no protection value */
+
+#if KARMA_MODULE
+  if (fspecial(u->faction, FS_SAPPER)) {
+    /* Halbe Schutzwirkung, aufgerundet */
+    beff = (beff+1)/2;
+  }
+#endif /* KARMA_MODULE */
+  return beff;
+}
 
 void
 register_buildings(void)
 {
+  register_function((pf_generic)&eressea_building_protection, "eressea_building_protection");
   register_function((pf_generic)&init_smithy, "init_smithy");
   register_function((pf_generic)&castle_name, "castle_name");
+  register_function((pf_generic)&castle_name_2, "castle_name_2");
   register_function((pf_generic)&fort_name, "fort_name");
 #ifdef WDW_PYRAMID
   register_function((pf_generic)&pyramid_name, "pyramid_name");

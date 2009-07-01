@@ -93,7 +93,6 @@
   <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/artrewards.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
-  <xi:include href="eressea/temple.xml"/>
   <strings>
     <string name="mailto">
       <text locale="de">eressea-server@eressea.de</text>

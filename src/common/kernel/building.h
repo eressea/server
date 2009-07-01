@@ -39,11 +39,9 @@ typedef struct maintenance {
 #define BTF_UNIQUE         0x04 /* only one per struct region (harbour) */
 #define BTF_DECAY          0x08 /* decays when not occupied */
 #define BTF_DYNAMIC        0x10 /* dynamic type, needs bt_write */
-#define BTF_PROTECTION     0x20 /* protection in combat */
 #define BTF_MAGIC          0x40 /* magical effect */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
-#define BTF_TAXES         0x200 /* automatic taxes */
 
 typedef struct building_type {
 	const char * _name;
@@ -62,6 +60,8 @@ typedef struct building_type {
 	const char * (*name)(const struct building_type*, int size);
 	void (*init)(struct building_type*);
     void (*age)(struct building *);
+    int (*protection)(struct building *, struct unit *);
+    float (*taxes)(struct building *);
 	struct attrib * attribs;
 } building_type;
 

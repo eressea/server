@@ -407,6 +407,63 @@ lua_agebuilding(building * b)
 }
 
 static int
+lua_building_protection(building * b, unit * u)
+{
+  lua_State * L = (lua_State *)global.vm_state;
+  const char * fname = "building_protection";
+  int result = 0;
+
+  lua_pushstring(L, fname);
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  if (lua_isfunction(L, 1)) {
+    tolua_pushusertype(L, (void *)b, "building");
+    tolua_pushusertype(L, (void *)u, "unit");
+
+    if (lua_pcall(L, 2, 1, 0)!=0) {
+      const char* error = lua_tostring(L, -1);
+      log_error(("building_protection(%s, %s) calling '%s': %s.\n",
+        buildingname(b), unitname(u), fname, error));
+      lua_pop(L, 1);
+    } else {
+      result = (int)lua_tonumber(L, -1);
+    }
+  } else {
+    log_error(("building_protection(%s, %s) calling '%s': not a function.\n",
+      buildingname(b), unitname(u), fname));
+    lua_pop(L, 1);
+  }
+  return result;
+}
+
+static float
+lua_building_taxes(building * b)
+{
+  lua_State * L = (lua_State *)global.vm_state;
+  const char * fname = "building_taxes";
+  float result = 0.0F;
+
+  lua_pushstring(L, fname);
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  if (lua_isfunction(L, 1)) {
+    tolua_pushusertype(L, (void *)b, "building");
+
+    if (lua_pcall(L, 1, 1, 0)!=0) {
+      const char* error = lua_tostring(L, -1);
+      log_error(("building_taxes(%s) calling '%s': %s.\n",
+        buildingname(b), fname, error));
+      lua_pop(L, 1);
+    } else {
+      result = (float)lua_tonumber(L, -1);
+    }
+  } else {
+    log_error(("building_taxes(%s) calling '%s': not a function.\n",
+      buildingname(b), fname));
+    lua_pop(L, 1);
+  }
+  return result;
+}
+
+static int
 lua_maintenance(const unit * u)
 {
   lua_State * L = (lua_State *)global.vm_state;
@@ -548,6 +605,8 @@ register_tolua_helpers(void)
 {
   at_building_action.age = lc_age;
 
+  register_function((pf_generic)&lua_building_protection, "lua_building_protection");
+  register_function((pf_generic)&lua_building_taxes, "lua_building_taxes");
   register_function((pf_generic)&lua_agebuilding, "lua_agebuilding");
   register_function((pf_generic)&lua_recruit, "lua_recruit");
   register_function((pf_generic)&lua_callspell, "lua_castspell");

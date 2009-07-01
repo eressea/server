@@ -8,7 +8,8 @@
   <include href="races.xml" />
   <include href="resources.xml" />
   <include href="ships.xml" />
-  <include href="buildings.xml" />
+  <include href="common/buildings.xml" />
+  <xi:include href="eressea/buildings.xml"/>
 
   <game name="Kreis der Macht" units="250" welcome="vinyambar">
     <!-- Game specific -->

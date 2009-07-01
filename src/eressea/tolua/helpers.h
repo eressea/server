@@ -14,6 +14,7 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
   
+  struct lua_State;
   void register_tolua_helpers(void);
   int tolua_toid(struct lua_State* L, int idx, int def);
 

@@ -1910,7 +1910,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
 {
   int flag = 0;
   char ch;
-  int anyunits;
+  int anyunits, no_units, no_people;
   const struct region *r;
   faction * f = ctx->f;
   unit *u;
@@ -2023,7 +2023,27 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     centre(F, buf, true);
   }
 #endif
-  m = msg_message("nr_population", "population units", count_all(f), f->no_units);
+#ifdef COUNT_AGAIN
+  no_units = 0;
+  no_people = 0;
+  for (u=f->units;u;u=u->nextF) {
+    if (playerrace(u->race)) {
+      ++no_people;
+      no_units += u->number;
+      assert(f==u->faction);
+    }
+  }
+  if (no_units!=f->no_units) {
+    f->no_units = no_units;
+  }
+  if (no_people!=f->num_people) {
+    f->num_people = no_people;
+  }
+#else
+  no_units = f->no_units;
+  no_people = f->num_people;
+#endif
+  m = msg_message("nr_population", "population units", no_people, no_units);
   nr_render(m, f->locale, buf, sizeof(buf), f);
   msg_release(m);
   centre(F, buf, true);

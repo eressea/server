@@ -30,7 +30,7 @@ function load_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
-    "e2k9/rules.lua"
+    "e3a/rules.lua"
   }
   for index, value in pairs(scripts) do
     loadscript(value)

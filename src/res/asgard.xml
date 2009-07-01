@@ -21,7 +21,6 @@
   <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/artrewards.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
-  <xi:include href="eressea/temple.xml"/>
 
   <equipment>
     <set name="first_unit">

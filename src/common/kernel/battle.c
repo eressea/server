@@ -1917,18 +1917,12 @@ skilldiff(troop at, troop dt, int dist)
       magicwalls_ct = ct_find("magicwalls");
       init=true;
     }
-    if (df->building->type->flags & BTF_PROTECTION) {
-      int beff = buildingeffsize(df->building, false)-1;
-      /* -1 because the tradepost has no protection value */
-
-#if KARMA_MODULE
-      if (fspecial(au->faction, FS_SAPPER)) {
-        /* Halbe Schutzwirkung, aufgerundet */
-        beff = (beff+1)/2;
+    if (df->building->type->protection) {
+      int beff = df->building->type->protection(df->building, du);
+      if (beff) {
+        skdiff -= beff;
+        is_protected = 2;
       }
-#endif /* KARMA_MODULE */
-      skdiff -= beff;
-      is_protected = 2;
     }
     if (strongwall_ct) {
       curse * c = get_curse(df->building->attribs, strongwall_ct);
@@ -2078,7 +2072,7 @@ damage_building(battle *b, building *bldg, int damage_abs)
 
   /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
 
-  if (bldg->type->flags & BTF_PROTECTION) {
+  if (bldg->type->protection) {
     side * s;
 
     bldg->sizeleft = bldg->size;

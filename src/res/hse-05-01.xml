@@ -76,7 +76,7 @@
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items-hse05.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
-  <xi:include href="eressea/temple.xml"/>
+  <xi:include href="eressea/buildings.xml"/>
   <strings>
     <string name="mailto">
       <text locale="de">hse-server@eressea.de</text>

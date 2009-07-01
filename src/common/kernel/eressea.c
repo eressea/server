@@ -1186,7 +1186,7 @@ int
 count_all(const faction * f)
 {
 #ifndef NDEBUG
-  int n = 0;
+  int n = 0, nunits = 0;
   unit *u;
   for (u=f->units;u;u=u->nextF) {
     if (playerrace(u->race)) {
@@ -1197,7 +1197,6 @@ count_all(const faction * f)
   if (f->num_people != n) {
     log_error(("# of people in %s is != num_people: %d should be %d.\n",
       factionid(f), f->num_people, n));
-    return n;
   }
 #endif
   return f->num_people;
@@ -2617,7 +2616,7 @@ is_castle(const struct building * b)
 
 boolean is_tax_building(const building * b)
 {
-  if (b->type->flags&BTF_TAXES) {
+  if (b->type->taxes) {
     return true;
   }
   return false;
