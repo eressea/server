@@ -40,13 +40,13 @@
   <equipment>
     <set name="first_unit">
       <item name="conquesttoken" amount="1"/>
-      <item name="log" amount="30"/>
-      <item name="stone" amount="30"/>
-      <item name="money" amount="4200"/>
+      <item name="log" amount="10"/>
+      <item name="stone" amount="10"/>
+      <item name="money" amount="5000"/>
     </set>
-    <set name="new_faction">
+    <!--set name="new_faction">
       <item name="adamantium" amount="1"/>
-    </set>
+    </set-->
   </equipment>
 
   <xi:include href="names-undead.xml"/>
@@ -178,13 +178,13 @@
     </string>
     <string name="newbie_info_1">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
-      ERESSEA BEFEHLE an eressea-server@eressea.de zu senden.</text>
+      E3 BEFEHLE an eressea-server@eressea.de zu senden.</text>
       <text locale="en">Remember to send your orders to
-      eressea-server@eressea.de with the subject ERESSEA ORDERS.</text>
+      eressea-server@eressea.de with the subject E3 ORDERS.</text>
     </string>
     <string name="mailcmd">
-      <text locale="de">ERESSEA BEFEHLE</text>
-      <text locale="en">ERESSEA ORDERS</text>
+      <text locale="de">E3 BEFEHLE</text>
+      <text locale="en">E3 ORDERS</text>
     </string>
   </strings>
 </eressea>

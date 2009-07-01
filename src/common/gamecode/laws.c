@@ -708,7 +708,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
     /* Grundchance 1.0% */
     /* Jeder Elf in der Region erhöht die Chance um 0.0008%. */
-    seedchance += (MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 0.0008;
+    seedchance += (MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 0.0008 * RESOURCE_QUANTITY;
     grownup_trees = rtrees(r, 2);
     seeds = 0;
 
@@ -2974,6 +2974,9 @@ static void age_region(region * r)
     if (stability>MORALE_COOLDOWN) {
       if (r->land->ownership->owner && r->land->morale<MORALE_MAX) {
         double ch = rc_popularity(r->land->ownership->owner->race);
+        if (is_cursed(r->attribs, C_GENEROUS, 0)) {
+          ch *= 1.2; /* 20% improvement */
+        }
         if (chance(ch)) {
           ++r->land->morale;
           r->land->ownership->morale_turn = turn;

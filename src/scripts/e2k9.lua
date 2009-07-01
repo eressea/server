@@ -71,7 +71,7 @@ function process(orders)
   spawn_dragons()
   spawn_undead()
   -- spawn_braineaters(0.25)
-  spawn_ents()
+  -- spawn_ents()
 
   -- post-turn updates:
   update_guards()

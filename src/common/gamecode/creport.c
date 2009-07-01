@@ -1152,15 +1152,23 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 
       if (sr->mode>=see_unit) {
         fprintf(F, "%d;Silber\n", rmoney(r));
-        fprintf(F, "%d;Unterh\n", entertainmoney(r));
-
+        if (skill_enabled[SK_ENTERTAINMENT]) {
+          fprintf(F, "%d;Unterh\n", entertainmoney(r));
+        }
         if (is_cursed(r->attribs, C_RIOT, 0)){
           fprintf(F, "0;Rekruten\n");
         } else {
           fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
         }
         if (production(r)) {
-          fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
+          if (markets_module()) { /* hack */
+            fprintf(F, "%d;Lohn\n", wage(r, NULL, NULL));
+          } else {
+            fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
+          }
+        }
+        if (r->land->ownership) {
+          fprintf(F, "%d;morale\n", r->land->morale);
         }
       }
 

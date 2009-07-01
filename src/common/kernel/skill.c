@@ -226,7 +226,7 @@ rc_skillmod(const struct race * rc, const region *r, skill_t sk)
 {
   int mods;
 
-  if (!skill_enabled[SK_PERCEPTION]) return 0;
+  if (!skill_enabled[sk]) return 0;
 #ifdef FASTER_SKILLMOD
   unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
   struct skillmods **imods = &modhash[index];

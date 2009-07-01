@@ -542,6 +542,11 @@ read_args(int argc, char **argv, lua_State * luaState)
   }
 
   /* add some more variables to the lua globals */
+  if (script_path) {
+    char str[512];
+    sprintf(str, "?;?.lua;%s/?.lua;%s/?", script_path, script_path);
+    setLuaString(luaState, "LUA_PATH", str);
+  }
   setLuaString(luaState, "datapath", datapath());
   setLuaString(luaState, "scriptpath", script_path);
   setLuaString(luaState, "basepath", basepath());
@@ -625,7 +630,7 @@ write_skills(void)
   fputs("\"Rasse\",", F);
   for (rc=races;rc;rc = rc->next) {
     if (playerrace(rc)) {
-      fprintf(F, "\"%s\",", LOC(loc, rc->_name[0]));
+      fprintf(F, "\"%s\",", LOC(loc, mkname("race", rc->_name[0])));
     }
   }
   fputc('\n', F);
@@ -690,7 +695,9 @@ main(int argc, char *argv[])
   if (luafile==NULL) lua_console(luaState);
   else {
     char buf[MAX_PATH];
-    if (script_path) sprintf(buf, "%s/%s", script_path, luafile);
+    if (script_path) {
+      sprintf(buf, "%s/%s", script_path, luafile);
+    }
     else strcpy(buf, luafile);
 #ifdef BINDINGS_LUABIND
     try {

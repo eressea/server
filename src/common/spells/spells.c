@@ -4199,10 +4199,10 @@ sp_generous(castorder *co)
       message * m = NULL;
       fset(u->faction, FFL_SELECT);
       if (cansee(u->faction, r, mage, 0)) {
-        if (msg[0]==NULL) msg[0] = msg_message("song_of_peace_effect_0", "mage", mage);
+        if (msg[0]==NULL) msg[0] = msg_message("generous_effect_0", "mage", mage);
         m = msg[0];
       } else {
-        if (msg[1]==NULL) msg[1] = msg_message("song_of_peace_effect_1", "");
+        if (msg[1]==NULL) msg[1] = msg_message("generous_effect_1", "");
         m = msg[1];
       }
       r_addmessage(r, u->faction, m);

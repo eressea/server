@@ -476,20 +476,24 @@ teach_cmd(unit * u, struct order * ord)
 static double
 study_speedup(unit * u)
 {
-  static int rule = -1;
-  if (rule<0) {
-    rule = get_param_int(global.parameters, "study.speedup", 0);
-  }
-  if (rule==1) {
-    double age = 0;
-    int i;
-    for (i=0;i!=u->skill_size;++i) {
-      skill * sv = u->skills+i;
-      double time = sv->level*(sv->level+1)/2.0;
-      age += time;
+#define MINTURN 5 /* 5 */
+#define OFSTURN 2 /* 2 */
+  if (turn>MINTURN) {
+    static int rule = -1;
+    if (rule<0) {
+      rule = get_param_int(global.parameters, "study.speedup", 0);
     }
-    if (age < turn) {
-      return 2.0-age/turn;
+    if (rule==1) {
+      double age = OFSTURN;
+      int i;
+      for (i=0;i!=u->skill_size;++i) {
+        skill * sv = u->skills+i;
+        double time = sv->level*(sv->level+1)/2.0;
+        age += time;
+      }
+      if (age < turn) {
+        return 2.0-age/turn;
+      }
     }
   }
   return 1.0;

@@ -800,7 +800,13 @@
     </type>
     <text locale="de">"Lohn für Arbeit: $int($max) Silber"</text>
     <text locale="en">"Worker's salary: $int($max) silver"</text>
-    <text locale="fr">"Worker's salary: $int($max) silver"</text>
+  </message>
+  <message name="nr_stat_salary_new" section="nr">
+    <type>
+      <arg name="max" type="int"/>
+    </type>
+    <text locale="de">"Bauerneinnahmen: $int($max) Silber"</text>
+    <text locale="en">"Peasant wages: $int($max) silver"</text>
   </message>
   <message name="nr_stat_people" section="nr">
     <type>
@@ -6799,7 +6805,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Besitzer muss das Boot zuerst verlassen."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Besitzer muss das Gebäude zuerst verlassen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The owner must first LEAVE the building."</text>
   </message>
   <message name="error12" section="errors">

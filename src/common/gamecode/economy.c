@@ -579,7 +579,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
       cmistake(u, ord, 139, MSG_EVENT);
       return;
     }
-    else u->race = rc;
+    else u->irace = u->race = rc;
   }
 
   if (has_skill(u, SK_MAGIC)) {

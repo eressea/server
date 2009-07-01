@@ -42,6 +42,32 @@
     <text locale="en">marketplace</text>
   </string>
 
+  <namespace name="morale">
+    <string name="0">
+      <text locale="de">aufständische</text>
+      <text locale="en">rebellious</text>
+    </string>
+    <string name="1">
+      <text locale="de">zornige</text>
+      <text locale="en">angry</text>
+    </string>
+    <string name="2">
+      <text locale="de">zufriedene</text>
+      <text locale="en">content</text>
+    </string>
+    <string name="3">
+      <text locale="de">glückliche</text>
+      <text locale="en">happy</text>
+    </string>
+    <string name="4">
+      <text locale="de">treue</text>
+      <text locale="en">loyal</text>
+    </string>
+    <string name="5">
+      <text locale="de">ergebene</text>
+      <text locale="en">devoted</text>
+    </string>
+  </namespace>
   <string name="charger">
     <text locale="de">Streitross</text>
     <text locale="en">charger</text>
@@ -59,23 +85,49 @@
     <text locale="en">tower shields</text>
   </string>
 
-  <string name="create_potion_p0">
-    <text locale="de">Siebenmeilentee</text>
-    <text locale="en">seven mile tea</text>
-  </string>
-  <string name="create_potion_p2">
-    <text locale="de">Wasser des Lebens</text>
-    <text locale="en">water of life</text>
-  </string>
-  
   <namespace name="spell">
+    <string name="create_potion_p0">
+      <text locale="de">Braue Siebenmeilentee</text>
+      <text locale="en">brew seven mile tea</text>
+    </string>
+    <string name="create_potion_p2">
+      <text locale="de">Braue Wasser des Lebens</text>
+      <text locale="en">brew water of life</text>
+    </string>
+    <string name="create_potion_p3">
+      <text locale="de">Braue Schaffenstrunk</text>
+      <text locale="en">brew busy beer</text>
+    </string>
+    <string name="create_potion_ointment">
+      <text locale="de">Braue Wundsalbe</text>
+      <text locale="en">brew ointment</text>
+    </string>
+    <string name="create_potion_peasantblood">
+      <text locale="de">Braue Bauernblut</text>
+      <text locale="en">brew peasant blood</text>
+    </string>
+    <string name="create_potion_p9">
+      <text locale="de">Braue Pferdeglück</text>
+      <text locale="en">brew horsepower potion</text>
+    </string>
+    <string name="create_potion_p13">
+      <text locale="de">Braue Elixier der Macht</text>
+      <text locale="en">brew elixir of power</text>
+    </string>
+    <string name="create_potion_p14">
+      <text locale="de">Braue Heiltrank</text>
+      <text locale="en">brew healing potion</text>
+    </string>
+  </namespace>
+  
+  <namespace name="spellinfo">
     <string name="create_potion_p0">
       <text locale="en">For Seven Mile Tea, boil up a Cobalt Fungus and pour the resulting brew into a Windbag. Catch and filter the liquid that drips out and administer it. This tea allows up to ten men to move as fast as a horse.</text>
       <text locale="de">Für den Siebenmeilentee koche man einen Blauen Baumringel auf und gieße dieses Gebräu in einen Windbeutel. Das heraustropfende Wasser fange man auf, filtere es und verabreiche es alsdann. Durch diesen Tee können bis zu zehn Menschen schnell wie ein Pferd laufen.</text>
     </string>
     <string name="create_potion_p2">
-      <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
-      <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so daß man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
+      <text locale="en">The Water of Life allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
+      <text locale="de">Das Wasser des Lebens ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so daß man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
     </string>
     <string name="create_potion_p3">
       <text locale="en">Allow a Tangy Temerity to simmer for three hours in a litre of water, then add a grated Mandrake, and sprinkle in a Gapgrowth harvested at full moon. The whole brew should then be allowed to stew for three days in a warm place. This potion increases the strength and endurance of ten men so that they can achieve twice as much in a week.</text>
@@ -102,5 +154,22 @@
       <text locale="de">Für einen Heiltrank nehme man die Schale eines Windbeutels und etwas Gurgelkraut, rühre eine kleingehacktes Elfenlieb dazu und bestreue alles mit den Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern (oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
     </string>
   </namespace>
-
+  <namespace name="spell">
+    <string name="commonfamiliar">
+      <text locale="de">Vertrauten binden</text>
+      <text locale="en">Bind Familiar</text>
+    </string>
+  </namespace>
+  <namespace name="spellinfo">
+    <string name="commonfamiliar">
+      <text locale="de">Einem erfahrenen Magier wird
+        irgendwann auf seinen Wanderungen ein
+        ungewöhnliches Exemplar einer Gattung begegnen,
+        welches sich dem Magier anschließen wird.</text>
+      <text locale="en">During their travel, seasoned
+        magicians will occasionally befriend an extraordinary
+        creature of an unusual species that will join them.</text>
+    </string>
+  </namespace>
+  
 </strings>

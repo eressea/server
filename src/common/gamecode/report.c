@@ -951,6 +951,11 @@ describe(FILE * F, const seen_region * sr, faction * f)
     bytes = snprintf(bufp, size, ", %d", n);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     
+    if (r->land->ownership) {
+      const char * str = locale_string(f->locale, mkname("morale", itoa10(r->land->morale)));
+      bytes = snprintf(bufp, size, " %s", str);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    }
     if (fval(r, RF_ORCIFIED)) {
       bytes = (int)strlcpy(bufp, " ", size);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
@@ -1177,14 +1182,18 @@ statistics(FILE * F, const region * r, const faction * f)
   rnl(F);
 
   /* Region */
-  if (fval(r->terrain, LAND_REGION) && rmoney(r)) {
+  if (skill_enabled[SK_ENTERTAINMENT] && fval(r->terrain, LAND_REGION) && rmoney(r)) {
     m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
     nr_render(m, f->locale, buf, sizeof(buf), f);
     rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
   }
   if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
-    m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
+    if (markets_module()) { /* hack */
+      m = msg_message("nr_stat_salary_new", "max", wage(r, NULL, NULL));
+    } else {
+      m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
+    }
     nr_render(m, f->locale, buf, sizeof(buf), f);
     rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
@@ -1195,16 +1204,18 @@ statistics(FILE * F, const region * r, const faction * f)
     rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
 
-    if (buildingtype_exists(r, bt_find("caravan"))) {
-      m = msg_message("nr_stat_luxuries", "max",
-                      (p * 2) / TRADE_FRACTION);
-    } else {
-      m = msg_message("nr_stat_luxuries", "max",
-                      p / TRADE_FRACTION);
+    if (!markets_module()) {
+      if (buildingtype_exists(r, bt_find("caravan"))) {
+        m = msg_message("nr_stat_luxuries", "max",
+                        (p * 2) / TRADE_FRACTION);
+      } else {
+        m = msg_message("nr_stat_luxuries", "max",
+                        p / TRADE_FRACTION);
+      }
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      rparagraph(F, buf, 2, 2, 0);
+      msg_release(m);
     }
-    nr_render(m, f->locale, buf, sizeof(buf), f);
-    rparagraph(F, buf, 2, 2, 0);
-    msg_release(m);
   }
   /* info about units */
 
@@ -2185,7 +2196,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
         const item_type * lux = r_luxury(r);
         const item_type * herb = r->land->herbtype;
         message * m = msg_message("nr_market_info", "product herb",
-          lux->rtype, herb?herb->rtype:0);
+          lux?lux->rtype:0, herb?herb->rtype:0);
 
         rnl(F);
         nr_paragraph(F, m, f);

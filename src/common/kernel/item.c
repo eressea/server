@@ -151,13 +151,16 @@ resourcename(const resource_type * rtype, int flags)
 {
   int i = 0;
 
-  if (rtype->name) return rtype->name(rtype, flags);
+  if (rtype) {
+    if (rtype->name) return rtype->name(rtype, flags);
 
-  if (flags & NMF_PLURAL) i = 1;
-  if (flags & NMF_APPEARANCE && rtype->_appearance[i]) {
-    return rtype->_appearance[i];
+    if (flags & NMF_PLURAL) i = 1;
+    if (flags & NMF_APPEARANCE && rtype->_appearance[i]) {
+      return rtype->_appearance[i];
+    }
+    return rtype->_name[i];
   }
-  return rtype->_name[i];
+  return "none";
 }
 
 resource_type *

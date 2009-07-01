@@ -823,8 +823,10 @@ static int tolua_unit_set_race(lua_State* L)
   const char * rcname = tolua_tostring(L, 2, 0);
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
+    if (count_unit(self)) --self->faction->no_units;
     if (self->irace==self->race) self->irace = rc;
     self->race = rc;
+    if (count_unit(self)) --self->faction->no_units;
   }
   return 0;
 }

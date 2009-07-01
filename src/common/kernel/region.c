@@ -53,6 +53,8 @@
 #include <util/rng.h>
 #include <util/storage.h>
 
+#include <modules/autoseed.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -888,6 +890,10 @@ const item_type *
 r_luxury(region * r)
 {
   struct demand * dmd;
+  if (!r->land->demands) {
+    fix_demand(r);
+    assert(r->land->demands);
+  }
   for (dmd=r->land->demands;dmd;dmd=dmd->next) {
     if (dmd->value==0) return dmd->type->itype;
   }
