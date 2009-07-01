@@ -2698,7 +2698,6 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($unit) klaut in $region($region) $int($amount) Silber."</text>
-    <text locale="fr">"$unit($unit) steals $int($amount) silver in $region($region)."</text>
     <text locale="en">"$unit($unit) steals $int($amount) silver in $region($region)."</text>
   </message>
   <message name="income_tax_reduced" section="economy">
@@ -2708,9 +2707,8 @@
       <arg name="amount" type="int"/>
       <arg name="wanted" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) treibt in $region($region) $int($amount)$if($eq($wanted,$amount),""," statt $int($wanted)") Steuern ein."</text>
-    <text locale="fr">"$unit($unit) collects only $int($amount) taxes instead of$if($eq($wanted,$amount),""," of$if($eq($wanted,$amount),""," of $int($wanted)") ") in $region($region)."</text>
-    <text locale="en">"$unit($unit) collects only $int($amount) taxes instead of$if($eq($wanted,$amount),""," of$if($eq($wanted,$amount),""," of $int($wanted)") ") in $region($region)."</text>
+    <text locale="de">"$unit($unit) treibt Steuern in Höhe von in $region($region) $int($amount)$if($eq($wanted,$amount),""," statt $int($wanted)") Silber ein."</text>
+    <text locale="en">"$unit($unit) collects taxes of only $int($amount) instead of$if($eq($wanted,$amount),""," of$if($eq($wanted,$amount),""," of $int($wanted)") ") silver in $region($region)."</text>
   </message>
   <message name="income_tax" section="economy">
     <type>
@@ -2718,9 +2716,8 @@
       <arg name="region" type="region"/>
       <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) treibt in $region($region) $int($amount) Steuern ein."</text>
-    <text locale="fr">"$unit($unit) collects $int($amount) taxes in $region($region)."</text>
-    <text locale="en">"$unit($unit) collects $int($amount) taxes in $region($region)."</text>
+    <text locale="de">"$unit($unit) treibt Steuern in Höhe von $region($region) $int($amount) Silber ein."</text>
+    <text locale="en">"$unit($unit) collects taxes of $int($amount) silver in $region($region)."</text>
   </message>
   <message name="income" section="economy">
     <type>
