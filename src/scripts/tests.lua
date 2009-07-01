@@ -360,7 +360,7 @@ function test_taxes()
   u:clear_orders()
   u:add_order("LERNE Wahrnehmung")
   local b = building.create(r, "watch")
-  b.size = 4
+  b.size = 10
   u.building = b
   update_owners()
   process_orders()

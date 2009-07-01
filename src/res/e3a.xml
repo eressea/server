@@ -116,6 +116,11 @@
     <param name="modules.wormholes" value="0"/>
     <param name="modules.markets" value="1"/>
 
+    <!-- resource limitations -->
+    <param name="magic.regeneration" value="0.5"/>
+    <param name="magic.power" value="0.5"/>
+    <param name="resource.factor" value="0.25"/>
+
     <param name="skills.cost" value="500"/>
     <param name="entertain.base" value="0"/>
     <param name="entertain.perlevel" value="20"/>

@@ -9,8 +9,6 @@ function loadscript(name)
   end
 end
 
-loadscript("default.lua")
-
 function change_locales()
   -- local localechange = { }
   local localechange = { de = { "rtph" } }
@@ -30,7 +28,6 @@ function load_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
-    "e3a/rules.lua"
   }
   for index, value in pairs(scripts) do
     loadscript(value)

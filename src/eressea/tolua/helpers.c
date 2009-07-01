@@ -435,12 +435,12 @@ lua_building_protection(building * b, unit * u)
   return result;
 }
 
-static float
+static double
 lua_building_taxes(building * b)
 {
   lua_State * L = (lua_State *)global.vm_state;
   const char * fname = "building_taxes";
-  float result = 0.0F;
+  double result = 0.0F;
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
@@ -453,7 +453,7 @@ lua_building_taxes(building * b)
         buildingname(b), fname, error));
       lua_pop(L, 1);
     } else {
-      result = (float)lua_tonumber(L, -1);
+      result = (double)lua_tonumber(L, -1);
     }
   } else {
     log_error(("building_taxes(%s) calling '%s': not a function.\n",

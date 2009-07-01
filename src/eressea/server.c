@@ -171,6 +171,7 @@ static boolean g_writemap = false;
 static boolean g_ignore_errors = false;
 static boolean opt_reportonly = false;
 static const char * luafile = NULL;
+static const char * preload = NULL;
 static const char * script_path = "scripts";
 static int memdebug = 0;
 
@@ -267,6 +268,10 @@ static const struct {
   {LUA_IOLIBNAME,     luaopen_io},
   {LUA_STRLIBNAME,    luaopen_string},
   {LUA_MATHLIBNAME,   luaopen_math},
+/*
+  {LUA_LOADLIBNAME,   luaopen_package},
+  {LUA_DBLIBNAME,     luaopen_debug},
+*/
 #if LUA_VERSION_NUM>=501
   {LUA_OSLIBNAME,     luaopen_os},
 #endif
@@ -588,6 +593,7 @@ load_inifile(const char * filename)
     verbosity = iniparser_getint(d, "eressea:verbose", 2);
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
 
+    preload = iniparser_getstring(d, "eressea:preload", preload);
     luafile = iniparser_getstring(d, "eressea:run", luafile);
     g_reportdir = iniparser_getstring(d, "eressea:report", g_reportdir);
 
@@ -657,7 +663,7 @@ main(int argc, char *argv[])
   int i;
   char * lc_ctype;
   char * lc_numeric;
-  lua_State * luaState = lua_init();
+  lua_State * L = lua_init();
   static int write_csv = 1;
 
   setup_signal_handler();
@@ -671,14 +677,14 @@ main(int argc, char *argv[])
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
 
-  global.vm_state = luaState;
+  global.vm_state = L;
   load_inifile("eressea.ini");
   if (verbosity>=4) {
     printf("\n%s PBEM host\n"
       "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
       "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
   }
-  if ((i=read_args(argc, argv, luaState))!=0) return i;
+  if ((i=read_args(argc, argv, L))!=0) return i;
 
 #ifdef CRTDBG
   init_crtdbg();
@@ -692,7 +698,24 @@ main(int argc, char *argv[])
     write_spells();
   }
   /* run the main script */
-  if (luafile==NULL) lua_console(luaState);
+  if (preload!=NULL) {
+    char * tokens = strdup(preload);
+    char * filename = strtok(tokens, ":");
+    while (filename) {
+      char buf[MAX_PATH];
+      if (script_path) {
+        sprintf(buf, "%s/%s", script_path, filename);
+      }
+      else strcpy(buf, filename);
+      lua_getglobal(L, "dofile");
+      lua_pushstring(L, buf);
+      if (lua_pcall(L, 1, 0, 0) != 0) {
+        my_lua_error(L);
+      }
+      filename = strtok(NULL, ":");
+    }
+  }
+  if (luafile==NULL) lua_console(L);
   else {
     char buf[MAX_PATH];
     if (script_path) {
@@ -701,7 +724,7 @@ main(int argc, char *argv[])
     else strcpy(buf, luafile);
 #ifdef BINDINGS_LUABIND
     try {
-      luabind::call_function<int>(luaState, "dofile", buf);
+      luabind::call_function<int>(L, "dofile", buf);
     }
     catch (std::runtime_error& rte) {
       log_error(("%s.\n", rte.what()));
@@ -711,10 +734,10 @@ main(int argc, char *argv[])
       my_lua_error(L);
     }
 #elif defined(BINDINGS_TOLUA)
-    lua_getglobal(luaState, "dofile");
-    lua_pushstring(luaState, buf);
-    if (lua_pcall(luaState, 1, 0, 0) != 0) {
-      my_lua_error(luaState);
+    lua_getglobal(L, "dofile");
+    lua_pushstring(L, buf);
+    if (lua_pcall(L, 1, 0, 0) != 0) {
+      my_lua_error(L);
     }
 #endif
   }
@@ -723,7 +746,7 @@ main(int argc, char *argv[])
 #endif
   game_done();
   kernel_done();
-  lua_done(luaState);
+  lua_done(L);
   log_close();
 
   setlocale(LC_CTYPE, lc_ctype);
