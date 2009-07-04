@@ -118,7 +118,6 @@ write_regionname(const region * r, const faction * f, char * buffer, size_t size
   if (r==NULL) {
     strcpy(buf, "(null)");
   } else {
-    plane * pl = rplane(r);
     int nx = region_x(r, f), ny = region_y(r, f);
     snprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
   }

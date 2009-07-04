@@ -874,7 +874,6 @@ static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
   static boolean init = false;
-  static int automode;
   if (!init) {
     init_gms();
     init = true;
@@ -1186,7 +1185,7 @@ int
 count_all(const faction * f)
 {
 #ifndef NDEBUG
-  int n = 0, nunits = 0;
+  int n = 0;
   unit *u;
   for (u=f->units;u;u=u->nextF) {
     if (playerrace(u->race)) {

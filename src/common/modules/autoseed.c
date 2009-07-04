@@ -484,7 +484,6 @@ prepare_starting_region(region * r)
 int
 autoseed(newfaction ** players, int nsize, int max_agediff)
 {
-  int x = 0, y = 0;
   region * r = NULL;
   region_list * rlist = NULL;
   int rsize = 0, tsize = 0;

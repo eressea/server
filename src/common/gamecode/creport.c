@@ -1220,7 +1220,6 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         region_list *rl2 = rl;
         while(rl2) {
           region * r = rl2->data;
-          plane * pl = rplane(r);
           int nx = region_x(r, f), ny = region_y(r, f);
           fprintf(F, "SCHEMEN %d %d\n", nx, ny);
           fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
