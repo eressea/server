@@ -622,8 +622,10 @@ ShipSpeedBonus(const unit * u)
     level = get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
   }
   if (level>0) {
+    ship * sh = u->ship;
     int skl = effskill(u, SK_SAILING);
-    return skl/level;
+    int minsk = (sh->type->cptskill+1)/2;
+    return (skl-minsk)/level;
   }
   return 0;
 }

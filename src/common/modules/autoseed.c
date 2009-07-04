@@ -941,7 +941,6 @@ starting_region(region * r, region * rn[])
   }
   terraform_region(r, newterrain(T_PLAIN));
   prepare_starting_region(r);
-  r->land->money = 50 * 1000; /* 2% = 1000 silver */
   u = addplayer(r, addfaction("enno@eressea.de", itoa36(rng_int()), races,
     default_locale, 0));
 }
@@ -954,10 +953,12 @@ build_island_e3(int x, int y, int numfactions, int minsize)
   region_list * rlist = NULL;
   region_list * island = NULL;
   plane * pl = findplane(x, y);
-  region * r = new_region(x, y, pl, 0);
+  region * r = findregion(x, y);
   int nsize = 1;
   int q, maxq = INT_MIN, minq = INT_MAX;
  
+  if (!r) r = new_region(x, y, pl, 0);
+  assert(!r->units);
   do {
     terraform_region(r, random_terrain_e3(NODIRECTION));
   } while (!r->land);
@@ -1007,6 +1008,22 @@ build_island_e3(int x, int y, int numfactions, int minsize)
           ++nfactions;
         }
       }
+    }
+  }
+
+  for (rlist=island;rlist;rlist=rlist->next) {
+    r = rlist->data;
+    if (r->units) {
+      region *rn[MAXDIRECTIONS];
+      get_neighbours(r, rn);
+      q = region_quality(r, rn);
+      if (q-minq > (maxq-minq)*2/3) {
+        terraform_region(r, newterrain(T_HIGHLAND));
+        prepare_starting_region(r);
+      }
+      r->land->money = 50000; /* 2% = 1000 silver */
+    } else {
+      r->land->money *= 4;
     }
   }
   return nfactions;

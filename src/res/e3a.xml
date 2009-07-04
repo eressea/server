@@ -163,7 +163,7 @@
     <param name="rules.economy.herbrot" value="0"/>
     <param name="rules.tactics.formula" value="1"/> <!-- 10% per skilldiff -->
     <param name="rules.help.mask" value="fight guard money"/>
-    <param name="movement.shipspeed.skillbonus" value="7"/>
+    <param name="movement.shipspeed.skillbonus" value="6"/>
     <param name="alliance.auto" value="fight"/>
 	  <param name="alliance.restricted" value="fight"/>
   </game>
