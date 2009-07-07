@@ -845,7 +845,7 @@ leave(unit * u, boolean force)
 {
 
   if (!force) {
-    if (!can_leave(u)) return true;
+    if (!can_leave(u)) return false;
   }
   if (u->building) leave_building(u);
   else if (u->ship) leave_ship(u);

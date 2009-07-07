@@ -62,10 +62,12 @@
     <!--order name="ARBEITEN" disable="yes"/-->
     <order name="BETEN" disable="yes"/>
     <order name="BELAGERE" disable="yes"/>
+    <order name="BEKLAUEN" disable="yes"/>
     <order name="FRIEDEN" disable="yes"/>
     <order name="GM" disable="yes"/>
     <order name="JIHAD" disable="yes"/>
     <order name="KRIEG" disable="yes"/>
+    <order name="KAUFEN" disable="yes"/>
     <order name="LEHREN" disable="yes"/>
     <order name="LIEFERE" disable="yes"/>
     <order name="OPFERE" disable="yes"/>

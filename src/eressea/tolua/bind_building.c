@@ -152,6 +152,14 @@ tolua_building_tostring(lua_State *L)
   return 1;
 }
 
+static int
+tolua_building_destroy(lua_State *L)
+{
+  building * self = (building *)tolua_tousertype(L, 1, 0);
+  remove_building(&self->region->buildings, self);
+  return 0;
+}
+
 void
 tolua_building_open(lua_State* L)
 {
@@ -165,6 +173,8 @@ tolua_building_open(lua_State* L)
     tolua_cclass(L, "building", "building", "", NULL);
     tolua_beginmodule(L, "building");
     {
+      tolua_function(L, "create", tolua_building_create);
+      tolua_function(L, "destroy", tolua_building_destroy);
       tolua_function(L, "__tostring", tolua_building_tostring);
 
       tolua_variable(L, "id", tolua_building_get_id, NULL);
@@ -180,7 +190,6 @@ tolua_building_open(lua_State* L)
 #endif
       tolua_variable(L, "objects", tolua_building_get_objects, 0);
 
-      tolua_function(L, "create", tolua_building_create);
     }
     tolua_endmodule(L);
   }

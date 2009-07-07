@@ -465,6 +465,25 @@ function test_herbalism()
   process_orders()
 end
 
+function test_leave()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  f.id = 42
+  local b1 = building.create(r, "castle")
+  b1.size = 10
+  local b2 = building.create(r, "lighthouse")
+  b2.size = 10
+  local u = unit.create(f, r, 1)
+  u.building = b1
+  u:add_item("money", u.number * 100)
+  u:clear_orders()
+  u:add_order("BETRETE BURG " .. itoa36(b2.id))
+  update_owners()
+  process_orders()
+  assert(u.building==b1)
+end
+
 function test_storage()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -501,6 +520,7 @@ tests = {
     ["message"] = test_message,
     ["hashtable"] = test_hashtable,
     ["gmtool"] = test_gmtool,
+    ["leave"] = test_leave,
     ["events"] = test_events,
     ["produce"] = test_produce,
     ["rename"] = test_rename,
@@ -515,12 +535,12 @@ tests = {
     ["market"] = test_market
 }
 mytests = {
-    ["id"] = test_id,
-    ["upkeep"] = test_upkeep,
-    ["taxes"] = test_taxes
+    ["leave"] = test_leave,
+    ["taxes"] = test_taxes,
+    ["market"] = test_market
 }
 fail = 0
-for k, v in pairs(tests) do
+for k, v in pairs(mytests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

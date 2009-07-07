@@ -640,7 +640,7 @@ static void
 unit_setbuilding(unit * u, building * b)
 {
   leave(u, true);
-  if (u->region!=b->region) {
+  if (b && u->region!=b->region) {
     move_unit(u, b->region, NULL);
   }
   u->building = b;
