@@ -31,6 +31,7 @@ TOLUA_SOURCES =
  <tolua>helpers.c
  <tolua>bind_unit.c
  <tolua>bind_ship.c
+ <tolua>bind_storage.c
  <tolua>bind_faction.c
  <tolua>bind_region.c
  <tolua>bind_message.c
@@ -71,7 +72,7 @@ liblua $(LUASERVER) ;
 LUASERVER_SOURCES =
  <common!iniparser>iniparser.c
  <curses>listbox.c
- server.cpp
+ server.c
  korrektur.c
  console.c
  editing.c

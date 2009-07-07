@@ -11,6 +11,7 @@
 #ifndef GM_EDITING
 #define GM_EDITING
 
+struct terrain_type;
 extern void make_block(int x, int y, int radius, const struct terrain_type * terrain);
 extern void make_island(int x, int y, int size);
 extern void seed_players(const char * filename, boolean new_island);

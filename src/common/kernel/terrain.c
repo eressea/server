@@ -21,6 +21,7 @@
 
 #include <config.h>
 #include <kernel/eressea.h>
+#include <attributes/racename.h>
 #include "terrain.h"
 #include "terrainid.h"
 
@@ -30,6 +31,7 @@
 #include "resources.h"
 
 #include <util/log.h>
+#include <util/attrib.h>
 
 /* libc includes */
 #include <assert.h>

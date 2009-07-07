@@ -11,6 +11,7 @@ without prior permission by the authors of Eressea.
 */
 
 #include <config.h>
+#include <kernel/types.h>
 #include "bind_storage.h"
 
 #include <util/storage.h>
@@ -41,7 +42,7 @@ tolua_storage_create(lua_State* L)
   if (strchr(type, 'r')) mode = IO_READ;
   if (strchr(type, 'w')) mode = IO_WRITE;
   store->open(store, filename, mode);
-  tolua_pushusertype(L, (void*)store, "storage");
+  tolua_pushusertype(L, (void*)store, TOLUA_CAST "storage");
   return 1;
 }
 
@@ -50,7 +51,7 @@ tolua_storage_read_unit(lua_State *L)
 {
   storage * self = (storage *)tolua_tousertype(L, 1, 0);
   struct unit * u = read_unit(self);
-  tolua_pushusertype(L, (void*)u, "unit");
+  tolua_pushusertype(L, (void*)u, TOLUA_CAST "unit");
   return 1;
 }
 
@@ -120,22 +121,22 @@ void
 tolua_storage_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(L, "storage");
+  tolua_usertype(L, TOLUA_CAST "storage");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, "storage", "storage", "", NULL);
-    tolua_beginmodule(L, "storage");
+    tolua_cclass(L, TOLUA_CAST "storage", TOLUA_CAST "storage", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "storage");
     {
-      tolua_function(L, "__tostring", tolua_storage_tostring);
-      tolua_function(L, "write", tolua_storage_write);
-      tolua_function(L, "read_int", tolua_storage_read_int);
-      tolua_function(L, "read_float", tolua_storage_read_float);
-      tolua_function(L, "write_unit", tolua_storage_write_unit);
-      tolua_function(L, "read_unit", tolua_storage_read_unit);
-      tolua_function(L, "close", tolua_storage_close);
-      tolua_function(L, "create", tolua_storage_create);
+      tolua_function(L, TOLUA_CAST "__tostring", tolua_storage_tostring);
+      tolua_function(L, TOLUA_CAST "write", tolua_storage_write);
+      tolua_function(L, TOLUA_CAST "read_int", tolua_storage_read_int);
+      tolua_function(L, TOLUA_CAST "read_float", tolua_storage_read_float);
+      tolua_function(L, TOLUA_CAST "write_unit", tolua_storage_write_unit);
+      tolua_function(L, TOLUA_CAST "read_unit", tolua_storage_read_unit);
+      tolua_function(L, TOLUA_CAST "close", tolua_storage_close);
+      tolua_function(L, TOLUA_CAST "create", tolua_storage_create);
     }
     tolua_endmodule(L);
   }

@@ -3251,7 +3251,7 @@ static void fishing(region * r) {
         int cap = shipcapacity(sh);
         getshipweight(sh, &weight, &cabins);
         if (cap>weight) {
-          int fishes = min(cap-weight, sh->type->fishing*i_silver->weight);
+          int fishes = MIN(cap-weight, sh->type->fishing*i_silver->weight);
           fishes /= i_silver->weight;
           i_change(&u->items, i_silver, fishes);
           ADDMSG(&u->faction->msgs, msg_message("income_fishing", 

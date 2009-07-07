@@ -275,5 +275,6 @@ extern char * strdup(const char *s);
 # define INLINE_FUNCTION
 #endif
 
+#define TOLUA_CAST (char*)
 #endif
 

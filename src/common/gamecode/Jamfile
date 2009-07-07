@@ -16,6 +16,7 @@ SOURCES =
  items.c
  laws.c
  luck.c
+ market.c
  monster.c
  randenc.c
  report.c

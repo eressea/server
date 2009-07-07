@@ -82,7 +82,7 @@ int tolua_spelllist_next(lua_State *L)
   spell_list** spell_ptr = (spell_list **)lua_touserdata(L, lua_upvalueindex(1));
   spell_list* slist = *spell_ptr;
   if (slist != NULL) {
-    tolua_pushusertype(L, slist->data, "spell");
+    tolua_pushusertype(L, slist->data, TOLUA_CAST "spell");
     *spell_ptr = slist->next;
     return 1;
   }
@@ -174,8 +174,8 @@ tolua_message_unit(lua_State* L)
   unit * sender = (unit *)tolua_tousertype(L, 1, 0);
   unit * target = (unit *)tolua_tousertype(L, 2, 0);
   const char * str = tolua_tostring(L, 3, 0);
-  if (!target) tolua_error(L, "target is nil", NULL);
-  if (!sender) tolua_error(L, "sender is nil", NULL);
+  if (!target) tolua_error(L, TOLUA_CAST "target is nil", NULL);
+  if (!sender) tolua_error(L, TOLUA_CAST "sender is nil", NULL);
   deliverMail(target->faction, sender->region, sender, str, target);
   return 0;
 }
@@ -186,8 +186,8 @@ tolua_message_faction(lua_State * L)
   unit * sender = (unit *)tolua_tousertype(L, 1, 0);
   faction * target = (faction *)tolua_tousertype(L, 2, 0);
   const char * str = tolua_tostring(L, 3, 0);
-  if (!target) tolua_error(L, "target is nil", NULL);
-  if (!sender) tolua_error(L, "sender is nil", NULL);
+  if (!target) tolua_error(L, TOLUA_CAST "target is nil", NULL);
+  if (!sender) tolua_error(L, TOLUA_CAST "sender is nil", NULL);
 
   deliverMail(target, sender->region, sender, str, NULL);
   return 0;
@@ -199,7 +199,7 @@ tolua_message_region(lua_State * L)
   unit * sender = (unit *)tolua_tousertype(L, 1, 0);
   const char * str = tolua_tostring(L, 2, 0);
 
-  if (!sender) tolua_error(L, "sender is nil", NULL);
+  if (!sender) tolua_error(L, TOLUA_CAST "sender is nil", NULL);
   ADDMSG(&sender->region->msgs, msg_message("mail_result", "unit message", sender, str));
 
   return 0;
@@ -596,7 +596,7 @@ tolua_get_faction(lua_State* L)
   int no = tolua_toid(L, 1, 0);
   faction * f = findfaction(no);
 
-  tolua_pushusertype(L, f, "faction");
+  tolua_pushusertype(L, f, TOLUA_CAST "faction");
   return 1;
 }
 
@@ -610,7 +610,7 @@ tolua_get_region(lua_State* L)
   assert(!pnormalize(&x, &y, pl));
   r = findregion(x, y);
 
-  tolua_pushusertype(L, r, "region");
+  tolua_pushusertype(L, r, TOLUA_CAST "region");
   return 1;
 }
 
@@ -620,7 +620,7 @@ tolua_get_region_byid(lua_State* L)
   int uid = (int)tolua_tonumber(L, 1, 0);
   region * r = findregionbyid(uid);
 
-  tolua_pushusertype(L, r, "region");
+  tolua_pushusertype(L, r, TOLUA_CAST "region");
   return 1;
 }
 
@@ -630,7 +630,7 @@ tolua_get_building(lua_State* L)
   int no = tolua_toid(L, 1, 0);
   building * b = findbuilding(no);
 
-  tolua_pushusertype(L, b, "building");
+  tolua_pushusertype(L, b, TOLUA_CAST "building");
   return 1;
 }
 
@@ -640,7 +640,7 @@ tolua_get_ship(lua_State* L)
   int no = tolua_toid(L, 1, 0);
   ship * sh = findship(no);
 
-  tolua_pushusertype(L, sh, "ship");
+  tolua_pushusertype(L, sh, TOLUA_CAST "ship");
   return 1;
 }
 
@@ -650,7 +650,7 @@ tolua_get_alliance(lua_State* L)
   int no = tolua_toid(L, 1, 0);
   alliance * f = findalliance(no);
 
-  tolua_pushusertype(L, f, "alliance");
+  tolua_pushusertype(L, f, TOLUA_CAST "alliance");
   return 1;
 }
 
@@ -660,7 +660,7 @@ tolua_get_unit(lua_State* L)
   int no = tolua_toid(L, 1, 0);
   unit * u = findunit(no);
 
-  tolua_pushusertype(L, u, "unit");
+  tolua_pushusertype(L, u, TOLUA_CAST "unit");
   return 1;
 }
 
@@ -672,7 +672,7 @@ tolua_alliance_create(lua_State* L)
 
   alliance * alli = makealliance(id, name);
 
-  tolua_pushusertype(L, alli, "alliance");
+  tolua_pushusertype(L, alli, TOLUA_CAST "alliance");
   return 1;
 }
 
@@ -858,114 +858,114 @@ tolua_eressea_open(lua_State* L)
   tolua_open(L);
 
   /* register user types */
-  tolua_usertype(L, "spell");
-  tolua_usertype(L, "spell_list");
-  tolua_usertype(L, "order");
-  tolua_usertype(L, "item");
-  tolua_usertype(L, "alliance");
-  tolua_usertype(L, "event");
+  tolua_usertype(L, TOLUA_CAST "spell");
+  tolua_usertype(L, TOLUA_CAST "spell_list");
+  tolua_usertype(L, TOLUA_CAST "order");
+  tolua_usertype(L, TOLUA_CAST "item");
+  tolua_usertype(L, TOLUA_CAST "alliance");
+  tolua_usertype(L, TOLUA_CAST "event");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, "alliance", "alliance", "", NULL);
-    tolua_beginmodule(L, "alliance");
+    tolua_cclass(L, TOLUA_CAST "alliance", TOLUA_CAST "alliance", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "alliance");
     {
-      tolua_variable(L, "name", tolua_get_alliance_name, tolua_set_alliance_name);
-      tolua_variable(L, "id", tolua_get_alliance_id, NULL);
-      tolua_variable(L, "factions", &tolua_get_alliance_factions, NULL);
-      tolua_function(L, "create", tolua_alliance_create);
+      tolua_variable(L, TOLUA_CAST "name", tolua_get_alliance_name, tolua_set_alliance_name);
+      tolua_variable(L, TOLUA_CAST "id", tolua_get_alliance_id, NULL);
+      tolua_variable(L, TOLUA_CAST "factions", &tolua_get_alliance_factions, NULL);
+      tolua_function(L, TOLUA_CAST "create", tolua_alliance_create);
     }
     tolua_endmodule(L);
 
-    tolua_cclass(L, "spell", "spell", "", NULL);
-    tolua_beginmodule(L, "spell");
+    tolua_cclass(L, TOLUA_CAST "spell", TOLUA_CAST "spell", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "spell");
     {
-      tolua_function(L, "__tostring", tolua_get_spell_name);
-      tolua_variable(L, "name", tolua_get_spell_name, 0);
-      tolua_variable(L, "school", tolua_get_spell_school, 0);
-      tolua_variable(L, "level", tolua_get_spell_level, 0);
-      tolua_variable(L, "text", tolua_get_spell_text, 0);
+      tolua_function(L, TOLUA_CAST "__tostring", tolua_get_spell_name);
+      tolua_variable(L, TOLUA_CAST "name", tolua_get_spell_name, 0);
+      tolua_variable(L, TOLUA_CAST "school", tolua_get_spell_school, 0);
+      tolua_variable(L, TOLUA_CAST "level", tolua_get_spell_level, 0);
+      tolua_variable(L, TOLUA_CAST "text", tolua_get_spell_text, 0);
     }
     tolua_endmodule(L);
 
-    tolua_function(L, "get_region_by_id", tolua_get_region_byid);
+    tolua_function(L, TOLUA_CAST "get_region_by_id", tolua_get_region_byid);
 
-    tolua_function(L, "get_faction", tolua_get_faction);
-    tolua_function(L, "get_unit", tolua_get_unit);
-    tolua_function(L, "get_alliance", tolua_get_alliance);
-    tolua_function(L, "get_ship", tolua_get_ship),
-    tolua_function(L, "get_building", tolua_get_building),
-    tolua_function(L, "get_region", tolua_get_region),
+    tolua_function(L, TOLUA_CAST "get_faction", tolua_get_faction);
+    tolua_function(L, TOLUA_CAST "get_unit", tolua_get_unit);
+    tolua_function(L, TOLUA_CAST "get_alliance", tolua_get_alliance);
+    tolua_function(L, TOLUA_CAST "get_ship", tolua_get_ship),
+    tolua_function(L, TOLUA_CAST "get_building", tolua_get_building),
+    tolua_function(L, TOLUA_CAST "get_region", tolua_get_region),
 
-    // deprecated_function(L, "add_faction");
-    // deprecated_function(L, "faction_origin");
-    tolua_function(L, "factions", tolua_get_factions);
-    tolua_function(L, "regions", tolua_get_regions);
+    // deprecated_function(L, TOLUA_CAST "add_faction");
+    // deprecated_function(L, TOLUA_CAST "faction_origin");
+    tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
+    tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
 
-    tolua_function(L, "read_game", tolua_read_game);
-    tolua_function(L, "write_game", tolua_write_game);
-    tolua_function(L, "free_game", tolua_free_game);
-    tolua_function(L, "write_map", &tolua_write_map);
+    tolua_function(L, TOLUA_CAST "read_game", tolua_read_game);
+    tolua_function(L, TOLUA_CAST "write_game", tolua_write_game);
+    tolua_function(L, TOLUA_CAST "free_game", tolua_free_game);
+    tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
 
-    tolua_function(L, "read_orders", tolua_read_orders);
-    tolua_function(L, "process_orders", tolua_process_orders);
+    tolua_function(L, TOLUA_CAST "read_orders", tolua_read_orders);
+    tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);
 
-    tolua_function(L, "init_reports", tolua_init_reports);
-    tolua_function(L, "write_reports", tolua_write_reports);
-    tolua_function(L, "write_report", tolua_write_report);
+    tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);
+    tolua_function(L, TOLUA_CAST "write_reports", tolua_write_reports);
+    tolua_function(L, TOLUA_CAST "write_report", tolua_write_report);
 
-    tolua_function(L, "init_summary", tolua_init_summary);
-    tolua_function(L, "write_summary", tolua_write_summary);
-    tolua_function(L, "write_passwords", tolua_write_passwords),
+    tolua_function(L, TOLUA_CAST "init_summary", tolua_init_summary);
+    tolua_function(L, TOLUA_CAST "write_summary", tolua_write_summary);
+    tolua_function(L, TOLUA_CAST "write_passwords", tolua_write_passwords),
 
-    tolua_function(L, "message_unit", tolua_message_unit);
-    tolua_function(L, "message_faction", tolua_message_faction);
-    tolua_function(L, "message_region", tolua_message_region);
+    tolua_function(L, TOLUA_CAST "message_unit", tolua_message_unit);
+    tolua_function(L, TOLUA_CAST "message_faction", tolua_message_faction);
+    tolua_function(L, TOLUA_CAST "message_region", tolua_message_region);
 
     /* scripted monsters */
-    tolua_function(L, "plan_monsters", tolua_planmonsters);
-    tolua_function(L, "spawn_braineaters", tolua_spawn_braineaters);
-    tolua_function(L, "spawn_undead", tolua_spawn_undead);
-    tolua_function(L, "spawn_dragons", tolua_spawn_dragons);
+    tolua_function(L, TOLUA_CAST "plan_monsters", tolua_planmonsters);
+    tolua_function(L, TOLUA_CAST "spawn_braineaters", tolua_spawn_braineaters);
+    tolua_function(L, TOLUA_CAST "spawn_undead", tolua_spawn_undead);
+    tolua_function(L, TOLUA_CAST "spawn_dragons", tolua_spawn_dragons);
 
-    tolua_function(L, "set_race_brain", tolua_set_racescript);
-    tolua_function(L, "set_unit_brain", tolua_set_unitscript);
+    tolua_function(L, TOLUA_CAST "set_race_brain", tolua_set_racescript);
+    tolua_function(L, TOLUA_CAST "set_unit_brain", tolua_set_unitscript);
 
     /* spells and stuff */
-    tolua_function(L, "levitate_ship", tolua_levitate_ship);
+    tolua_function(L, TOLUA_CAST "levitate_ship", tolua_levitate_ship);
 
-    tolua_function(L, "update_guards", tolua_update_guards);
+    tolua_function(L, TOLUA_CAST "update_guards", tolua_update_guards);
 
-    tolua_function(L, "get_turn", tolua_get_turn);
-    tolua_function(L, "get_season", tolua_get_season);
+    tolua_function(L, TOLUA_CAST "get_turn", tolua_get_turn);
+    tolua_function(L, TOLUA_CAST "get_season", tolua_get_season);
 
-    tolua_function(L, "equipment_setitem", tolua_equipment_setitem);
-    tolua_function(L, "equip_unit", tolua_equipunit);
-    tolua_function(L, "add_equipment", tolua_addequipment);
+    tolua_function(L, TOLUA_CAST "equipment_setitem", tolua_equipment_setitem);
+    tolua_function(L, TOLUA_CAST "equip_unit", tolua_equipunit);
+    tolua_function(L, TOLUA_CAST "add_equipment", tolua_addequipment);
 
-    tolua_function(L, "atoi36", tolua_atoi36);
-    tolua_function(L, "itoa36", tolua_itoa36);
-    tolua_function(L, "dice_roll", tolua_dice_rand);
+    tolua_function(L, TOLUA_CAST "atoi36", tolua_atoi36);
+    tolua_function(L, TOLUA_CAST "itoa36", tolua_itoa36);
+    tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
 
-    tolua_function(L, "get_nmrs", tolua_get_nmrs);
-    tolua_function(L, "remove_empty_units", tolua_remove_empty_units);
+    tolua_function(L, TOLUA_CAST "get_nmrs", tolua_get_nmrs);
+    tolua_function(L, TOLUA_CAST "remove_empty_units", tolua_remove_empty_units);
 
-    tolua_function(L, "update_subscriptions", tolua_update_subscriptions);
-    tolua_function(L, "update_scores", tolua_update_scores);
-    tolua_function(L, "update_owners", tolua_update_owners);
+    tolua_function(L, TOLUA_CAST "update_subscriptions", tolua_update_subscriptions);
+    tolua_function(L, TOLUA_CAST "update_scores", tolua_update_scores);
+    tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
 
-    tolua_function(L, "learn_skill", tolua_learn_skill);
+    tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
 
-    tolua_function(L, "autoseed", tolua_autoseed);
+    tolua_function(L, TOLUA_CAST "autoseed", tolua_autoseed);
 
-    tolua_function(L, "get_key", tolua_getkey);
-    tolua_function(L, "set_key", tolua_setkey);
+    tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
+    tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
 
-    tolua_function(L, "rng_int", tolua_rng_int);
+    tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
 
-    tolua_function(L, "spells", tolua_get_spells);
-    tolua_function(L, "write_spells", tolua_write_spells);
+    tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
+    tolua_function(L, TOLUA_CAST "write_spells", tolua_write_spells);
   }
   tolua_endmodule(L);
   return 1;

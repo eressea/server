@@ -29,6 +29,7 @@
 #include <kernel/spellid.h>
 #include <kernel/race.h>
 #include <kernel/skill.h>
+#include <kernel/terrain.h>
 
 /* util includes */
 #include <util/attrib.h>

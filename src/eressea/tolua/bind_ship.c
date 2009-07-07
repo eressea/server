@@ -16,6 +16,7 @@ without prior permission by the authors of Eressea.
 
 #include <kernel/region.h>
 #include <kernel/unit.h>
+#include <kernel/move.h>
 #include <kernel/ship.h>
 #include <kernel/build.h>
 
@@ -29,7 +30,7 @@ int tolua_shiplist_next(lua_State *L)
   ship** ship_ptr = (ship **)lua_touserdata(L, lua_upvalueindex(1));
   ship * u = *ship_ptr;
   if (u != NULL) {
-    tolua_pushusertype(L, (void*)u, "ship");
+    tolua_pushusertype(L, (void*)u, TOLUA_CAST "ship");
     *ship_ptr = u->next;
     return 1;
   }
@@ -55,7 +56,7 @@ static int tolua_ship_get_region(lua_State* L)
 {
   ship* self = (ship*) tolua_tousertype(L, 1, 0);
   if (self) {
-    tolua_pushusertype(L, self->region, "region");
+    tolua_pushusertype(L, self->region, TOLUA_CAST "region");
     return 1;
   }
   return 0;
@@ -86,7 +87,7 @@ tolua_ship_get_units(lua_State* L)
   unit * u = self->region->units;
 
   while (u && u->ship!=self) u = u->next;
-  luaL_getmetatable(L, "unit");
+  luaL_getmetatable(L, TOLUA_CAST "unit");
   lua_setmetatable(L, -2);
 
   *unit_ptr = u;
@@ -99,7 +100,7 @@ static int
 tolua_ship_get_objects(lua_State* L)
 {
   ship * self = (ship *)tolua_tousertype(L, 1, 0);
-  tolua_pushusertype(L, (void*)&self->attribs, "hashtable");
+  tolua_pushusertype(L, (void*)&self->attribs, TOLUA_CAST "hashtable");
   return 1;
 }
 
@@ -113,7 +114,7 @@ tolua_ship_create(lua_State* L)
     if (stype) {
       ship * sh = new_ship(stype, NULL, r);
       sh->size = stype->construction->maxsize;
-      tolua_pushusertype(L, (void*)sh, "ship");
+      tolua_pushusertype(L, (void*)sh, TOLUA_CAST "ship");
       return 1;
     }
   }
@@ -133,19 +134,19 @@ void
 tolua_ship_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(L, "ship");
+  tolua_usertype(L, TOLUA_CAST "ship");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, "ship", "ship", "", NULL);
-    tolua_beginmodule(L, "ship");
+    tolua_cclass(L, TOLUA_CAST "ship", TOLUA_CAST "ship", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "ship");
     {
-      tolua_function(L, "__tostring", tolua_ship_tostring);
-      tolua_variable(L, "id", tolua_ship_get_id, NULL);
-      tolua_variable(L, "name", tolua_ship_get_name, tolua_ship_set_name);
-      tolua_variable(L, "units", tolua_ship_get_units, NULL);
-      tolua_variable(L, "region", tolua_ship_get_region, tolua_ship_set_region);
+      tolua_function(L, TOLUA_CAST "__tostring", tolua_ship_tostring);
+      tolua_variable(L, TOLUA_CAST "id", tolua_ship_get_id, NULL);
+      tolua_variable(L, TOLUA_CAST "name", tolua_ship_get_name, tolua_ship_set_name);
+      tolua_variable(L, TOLUA_CAST "units", tolua_ship_get_units, NULL);
+      tolua_variable(L, TOLUA_CAST "region", tolua_ship_get_region, tolua_ship_set_region);
 #ifdef TODO
       .property("type", &ship_gettype)
       .property("weight", &ship_getweight)
@@ -156,9 +157,9 @@ tolua_ship_open(lua_State* L)
       .def_readwrite("size", &ship::size)
       .def_readwrite("coast", &ship::coast)
 #endif
-      tolua_variable(L, "objects", tolua_ship_get_objects, 0);
+      tolua_variable(L, TOLUA_CAST "objects", tolua_ship_get_objects, 0);
 
-      tolua_function(L, "create", tolua_ship_create);
+      tolua_function(L, TOLUA_CAST "create", tolua_ship_create);
     }
     tolua_endmodule(L);
   }

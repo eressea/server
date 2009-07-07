@@ -45,7 +45,7 @@ int tolua_regionlist_next(lua_State *L)
   region** region_ptr = (region **)lua_touserdata(L, lua_upvalueindex(1));
   region * r = *region_ptr;
   if (r != NULL) {
-    tolua_pushusertype(L, (void*)r, "region");
+    tolua_pushusertype(L, (void*)r, TOLUA_CAST "region");
     *region_ptr = r->next;
     return 1;
   }
@@ -153,7 +153,7 @@ static int tolua_region_get_adj(lua_State* L)
   region* self = (region*)tolua_tousertype(L, 1, 0);
   direction_t dir = (direction_t)tolua_tonumber(L, 2, 0);
 
-  tolua_pushusertype(L, (void*)r_connect(self, dir), "region");
+  tolua_pushusertype(L, (void*)r_connect(self, dir), TOLUA_CAST "region");
   return 1;
 }
 
@@ -240,7 +240,7 @@ static int
 tolua_region_get_objects(lua_State* L)
 {
   region * self = (region *)tolua_tousertype(L, 1, 0);
-  tolua_pushusertype(L, (void*)&self->attribs, "hashtable");
+  tolua_pushusertype(L, (void*)&self->attribs, TOLUA_CAST "hashtable");
   return 1;
 }
 
@@ -281,7 +281,7 @@ tolua_region_create(lua_State* L)
   }
   fix_demand(result);
 
-  tolua_pushusertype(L, result, "region");
+  tolua_pushusertype(L, result, TOLUA_CAST "region");
   return 1;
 }
 
@@ -382,7 +382,7 @@ tolua_plane_get(lua_State* L)
   int id = (int)tolua_tonumber(L, 1, 0);
   plane * pl = getplanebyid(id);
 
-  tolua_pushusertype(L, pl, "plane");
+  tolua_pushusertype(L, pl, TOLUA_CAST "plane");
   return 1;
 }
 
@@ -399,7 +399,7 @@ tolua_plane_create(lua_State* L)
 
   pl = create_new_plane(id, name, x, x+width-1, y, y+height-1, 0);
 
-  tolua_pushusertype(L, pl, "plane");
+  tolua_pushusertype(L, pl, TOLUA_CAST "plane");
   return 1;
 }
 
@@ -470,42 +470,42 @@ void
 tolua_region_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(L, "region");
-  tolua_usertype(L, "plane");
+  tolua_usertype(L, TOLUA_CAST "region");
+  tolua_usertype(L, TOLUA_CAST "plane");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_function(L, "distance", tolua_distance);
+    tolua_function(L, TOLUA_CAST "distance", tolua_distance);
 
-    tolua_cclass(L, "region", "region", "", NULL);
-    tolua_beginmodule(L, "region");
+    tolua_cclass(L, TOLUA_CAST "region", TOLUA_CAST "region", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "region");
     {
-      tolua_function(L, "create", tolua_region_create);
-      tolua_function(L, "destroy", tolua_region_destroy);
-      tolua_function(L, "__tostring", tolua_region_tostring);
+      tolua_function(L, TOLUA_CAST "create", tolua_region_create);
+      tolua_function(L, TOLUA_CAST "destroy", tolua_region_destroy);
+      tolua_function(L, TOLUA_CAST "__tostring", tolua_region_tostring);
 
-      tolua_variable(L, "id", tolua_region_get_id, NULL);
-      tolua_variable(L, "x", tolua_region_get_x, NULL);
-      tolua_variable(L, "y", tolua_region_get_y, NULL);
-      tolua_variable(L, "name", tolua_region_get_name, tolua_region_set_name);
-      tolua_variable(L, "info", tolua_region_get_info, tolua_region_set_info);
-      tolua_variable(L, "units", tolua_region_get_units, NULL);
-      tolua_variable(L, "ships", tolua_region_get_ships, NULL);
-      tolua_variable(L, "age", tolua_region_get_age, NULL);
-      tolua_variable(L, "buildings", tolua_region_get_buildings, NULL);
-      tolua_variable(L, "terrain", tolua_region_get_terrain, NULL);
-      tolua_function(L, "get_resourcelevel", tolua_region_get_resourcelevel);
-      tolua_function(L, "get_resource", tolua_region_get_resource);
-      tolua_function(L, "set_resource", tolua_region_set_resource);
-      tolua_function(L, "get_flag", tolua_region_get_flag);
-      tolua_function(L, "set_flag", tolua_region_set_flag);
-      tolua_function(L, "next", tolua_region_get_adj);
+      tolua_variable(L, TOLUA_CAST "id", tolua_region_get_id, NULL);
+      tolua_variable(L, TOLUA_CAST "x", tolua_region_get_x, NULL);
+      tolua_variable(L, TOLUA_CAST "y", tolua_region_get_y, NULL);
+      tolua_variable(L, TOLUA_CAST "name", tolua_region_get_name, tolua_region_set_name);
+      tolua_variable(L, TOLUA_CAST "info", tolua_region_get_info, tolua_region_set_info);
+      tolua_variable(L, TOLUA_CAST "units", tolua_region_get_units, NULL);
+      tolua_variable(L, TOLUA_CAST "ships", tolua_region_get_ships, NULL);
+      tolua_variable(L, TOLUA_CAST "age", tolua_region_get_age, NULL);
+      tolua_variable(L, TOLUA_CAST "buildings", tolua_region_get_buildings, NULL);
+      tolua_variable(L, TOLUA_CAST "terrain", tolua_region_get_terrain, NULL);
+      tolua_function(L, TOLUA_CAST "get_resourcelevel", tolua_region_get_resourcelevel);
+      tolua_function(L, TOLUA_CAST "get_resource", tolua_region_get_resource);
+      tolua_function(L, TOLUA_CAST "set_resource", tolua_region_set_resource);
+      tolua_function(L, TOLUA_CAST "get_flag", tolua_region_get_flag);
+      tolua_function(L, TOLUA_CAST "set_flag", tolua_region_set_flag);
+      tolua_function(L, TOLUA_CAST "next", tolua_region_get_adj);
 
-      tolua_variable(L, "terrain_name", &tolua_region_get_terrainname, &tolua_region_set_terrainname);
+      tolua_variable(L, TOLUA_CAST "terrain_name", &tolua_region_get_terrainname, &tolua_region_set_terrainname);
 
-      tolua_function(L, "get_key", tolua_region_getkey);
-      tolua_function(L, "set_key", tolua_region_setkey);
+      tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
+      tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);
 #if 0
       .property("owner", &lua_region_getowner, &lua_region_setowner)
       .property("herbtype", &region_getherbtype, &region_setherbtype)
@@ -519,20 +519,20 @@ tolua_region_open(lua_State* L)
       .property("items", &region_items, return_stl_iterator)
       .property("plane_id", &region_plane)
 #endif
-      tolua_variable(L, "objects", tolua_region_get_objects, 0);
+      tolua_variable(L, TOLUA_CAST "objects", tolua_region_get_objects, 0);
     }
     tolua_endmodule(L);
 
-    tolua_cclass(L, "plane", "plane", "", NULL);
-    tolua_beginmodule(L, "plane");
+    tolua_cclass(L, TOLUA_CAST "plane", TOLUA_CAST "plane", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "plane");
     {
-      tolua_function(L, "create", tolua_plane_create);
-      tolua_function(L, "get", tolua_plane_get);
-      tolua_function(L, "__tostring", tolua_plane_tostring);
+      tolua_function(L, TOLUA_CAST "create", tolua_plane_create);
+      tolua_function(L, TOLUA_CAST "get", tolua_plane_get);
+      tolua_function(L, TOLUA_CAST "__tostring", tolua_plane_tostring);
 
-      tolua_variable(L, "id", tolua_plane_get_id, NULL);
-      tolua_function(L, "normalize", tolua_plane_normalize);
-      tolua_variable(L, "name", tolua_plane_get_name, tolua_plane_set_name);
+      tolua_variable(L, TOLUA_CAST "id", tolua_plane_get_id, NULL);
+      tolua_function(L, TOLUA_CAST "normalize", tolua_plane_normalize);
+      tolua_variable(L, TOLUA_CAST "name", tolua_plane_get_name, tolua_plane_set_name);
     }
     tolua_endmodule(L);
   }

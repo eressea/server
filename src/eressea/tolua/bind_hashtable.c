@@ -53,16 +53,16 @@ tolua_hashtable_get(lua_State* L)
           lua_pushnumber(L, (lua_Number)val.f);
           break;
         case TREGION:
-          tolua_pushusertype(L, val.v, "region");
+          tolua_pushusertype(L, val.v, TOLUA_CAST "region");
           break;
         case TBUILDING:
-          tolua_pushusertype(L, val.v, "building");
+          tolua_pushusertype(L, val.v, TOLUA_CAST "building");
           break;
         case TUNIT:
-          tolua_pushusertype(L, val.v, "unit");
+          tolua_pushusertype(L, val.v, TOLUA_CAST "unit");
           break;
         case TSHIP:
-          tolua_pushusertype(L, val.v, "ship");
+          tolua_pushusertype(L, val.v, TOLUA_CAST "ship");
           break;
         case TSTRING:
           tolua_pushstring(L, (const char*) val.v);
@@ -150,15 +150,15 @@ tolua_hashtable_set(lua_State* L)
   tolua_Error tolua_err;
   if (tolua_isnumber(L, 3, 0, &tolua_err)) {
     return tolua_hashtable_set_number(L);
-  } else if (tolua_isusertype(L, 3, "unit", 0, &tolua_err)) {
+  } else if (tolua_isusertype(L, 3, TOLUA_CAST "unit", 0, &tolua_err)) {
     return tolua_hashtable_set_usertype(L, TUNIT);
-  } else if (tolua_isusertype(L, 3, "faction", 0, &tolua_err)) {
+  } else if (tolua_isusertype(L, 3, TOLUA_CAST "faction", 0, &tolua_err)) {
     return tolua_hashtable_set_usertype(L, TFACTION);
-  } else if (tolua_isusertype(L, 3, "ship", 0, &tolua_err)) {
+  } else if (tolua_isusertype(L, 3, TOLUA_CAST "ship", 0, &tolua_err)) {
     return tolua_hashtable_set_usertype(L, TSHIP);
-  } else if (tolua_isusertype(L, 3, "building", 0, &tolua_err)) {
+  } else if (tolua_isusertype(L, 3, TOLUA_CAST "building", 0, &tolua_err)) {
     return tolua_hashtable_set_usertype(L, TBUILDING);
-  } else if (tolua_isusertype(L, 3, "region", 0, &tolua_err)) {
+  } else if (tolua_isusertype(L, 3, TOLUA_CAST "region", 0, &tolua_err)) {
     return tolua_hashtable_set_usertype(L, TREGION);
   }
   return tolua_hashtable_set_string(L);
@@ -170,16 +170,16 @@ void
 tolua_hashtable_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(L, "hashtable");
+  tolua_usertype(L, TOLUA_CAST "hashtable");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, "hashtable", "hashtable", "", NULL);
-    tolua_beginmodule(L, "hashtable");
+    tolua_cclass(L, TOLUA_CAST "hashtable", TOLUA_CAST "hashtable", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "hashtable");
     {
-      tolua_function(L, "get", tolua_hashtable_get);
-      tolua_function(L, "set", tolua_hashtable_set);
+      tolua_function(L, TOLUA_CAST "get", tolua_hashtable_get);
+      tolua_function(L, TOLUA_CAST "set", tolua_hashtable_set);
     }
     tolua_endmodule(L);
   }

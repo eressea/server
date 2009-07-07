@@ -13,6 +13,7 @@
 #include "editing.h"
 
 #include <kernel/region.h>
+#include <kernel/plane.h>
 #include <modules/autoseed.h>
 #include <util/rng.h>
 #include <util/lists.h>

@@ -26,7 +26,7 @@ int tolua_buildinglist_next(lua_State *L)
   building** building_ptr = (building **)lua_touserdata(L, lua_upvalueindex(1));
   building * u = *building_ptr;
   if (u != NULL) {
-    tolua_pushusertype(L, (void*)u, "building");
+    tolua_pushusertype(L, (void*)u, TOLUA_CAST "building");
     *building_ptr = u->next;
     return 1;
   }
@@ -50,14 +50,14 @@ static int
 tolua_building_get_objects(lua_State* L)
 {
   building * self = (building *)tolua_tousertype(L, 1, 0);
-  tolua_pushusertype(L, (void*)&self->attribs, "hashtable");
+  tolua_pushusertype(L, (void*)&self->attribs, TOLUA_CAST "hashtable");
   return 1;
 }
 
 static int tolua_building_get_region(lua_State* L)
 {
   building* self = (building*) tolua_tousertype(L, 1, 0);
-  tolua_pushusertype(L, building_getregion(self), "region");
+  tolua_pushusertype(L, building_getregion(self), TOLUA_CAST "region");
   return 1;
 }
 
@@ -138,7 +138,7 @@ tolua_building_create(lua_State* L)
   if (bname) {
     const building_type * btype = bt_find(bname);
     building * b = new_building(btype, r, NULL);
-    tolua_pushusertype(L, (void*)b, "building");
+    tolua_pushusertype(L, (void*)b, TOLUA_CAST "building");
     return 1;
   }
   return 0;
@@ -164,31 +164,31 @@ void
 tolua_building_open(lua_State* L)
 {
   /* register user types */
-  tolua_usertype(L, "building");
-  tolua_usertype(L, "building_list");
+  tolua_usertype(L, TOLUA_CAST "building");
+  tolua_usertype(L, TOLUA_CAST "building_list");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, "building", "building", "", NULL);
-    tolua_beginmodule(L, "building");
+    tolua_cclass(L, TOLUA_CAST "building", TOLUA_CAST "building", TOLUA_CAST "", NULL);
+    tolua_beginmodule(L, TOLUA_CAST "building");
     {
-      tolua_function(L, "create", tolua_building_create);
-      tolua_function(L, "destroy", tolua_building_destroy);
-      tolua_function(L, "__tostring", tolua_building_tostring);
+      tolua_function(L, TOLUA_CAST "create", tolua_building_create);
+      tolua_function(L, TOLUA_CAST "destroy", tolua_building_destroy);
+      tolua_function(L, TOLUA_CAST "__tostring", tolua_building_tostring);
 
-      tolua_variable(L, "id", tolua_building_get_id, NULL);
-      tolua_variable(L, "type", tolua_building_get_type, NULL);
-      tolua_variable(L, "name", tolua_building_get_name, tolua_building_set_name);
-      tolua_variable(L, "units", tolua_building_get_units, NULL);
-      tolua_variable(L, "region", tolua_building_get_region, tolua_building_set_region);
-      tolua_variable(L, "size", tolua_building_get_size, tolua_building_set_size);
-      tolua_function(L, "add_action", tolua_building_addaction);
+      tolua_variable(L, TOLUA_CAST "id", tolua_building_get_id, NULL);
+      tolua_variable(L, TOLUA_CAST "type", tolua_building_get_type, NULL);
+      tolua_variable(L, TOLUA_CAST "name", tolua_building_get_name, tolua_building_set_name);
+      tolua_variable(L, TOLUA_CAST "units", tolua_building_get_units, NULL);
+      tolua_variable(L, TOLUA_CAST "region", tolua_building_get_region, tolua_building_set_region);
+      tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size, tolua_building_set_size);
+      tolua_function(L, TOLUA_CAST "add_action", tolua_building_addaction);
 #ifdef TODO
       .property("type", &building_gettype)
       .def_readwrite("size", &building::size)
 #endif
-      tolua_variable(L, "objects", tolua_building_get_objects, 0);
+      tolua_variable(L, TOLUA_CAST "objects", tolua_building_get_objects, 0);
 
     }
     tolua_endmodule(L);
