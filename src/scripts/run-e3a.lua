@@ -1,5 +1,22 @@
 -- the locales that this gameworld supports.
 local locales = { "de", "en" }
+local multis = { 
+   "agve", "dbgi", "7jfa", "qbki",
+   "gu8y", "wgxe", "iwp0", "r8vz",
+   "78xt", "34fu", "z33r", "fLkr",
+   "yuok"
+}
+
+function kill_multis()
+  if multi~=nil and multis~=nil then
+    for idx, fno in ipairs(multis) do
+      local f = get_faction(fno)
+      if f~=nil and f.email~="doppelspieler@eressea.de" then
+        multi(f)
+      end
+    end
+  end
+end
 
 function loadscript(name)
   local script = scriptpath .. "/" .. name
@@ -28,6 +45,7 @@ function load_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
+    "e3a/multi.lua",
   }
   for index, value in pairs(scripts) do
     loadscript(value)
@@ -70,6 +88,7 @@ function process(orders)
   -- spawn_braineaters(0.25)
   -- spawn_ents()
 
+  kill_multis()
   -- post-turn updates:
   update_guards()
   update_scores()
