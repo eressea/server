@@ -12,6 +12,18 @@
     <text locale="en">the third age</text>
   </string>
 
+  <string name="rpg_item_1_p">
+    <text locale="de">Urkunden</text>
+    <text locale="en">Certificates</text>
+  </string>
+  <string name="rpg_item_2_p">
+    <text locale="de">Nußhälften</text>
+    <text locale="en">nut halves</text>
+  </string>
+  <string name="rpg_item_3_p">
+    <text locale="de">Flaschengeister</text>
+    <text locale="en">bottle demons</text>
+  </string>
   <string name="rpg_item_1">
     <text locale="de">Pandoras Urkunde für Halbling ehrenhalber, weiblich</text>
     <text locale="en">Pandora's Certificate</text>

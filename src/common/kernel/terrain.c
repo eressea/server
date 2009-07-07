@@ -124,6 +124,13 @@ oldterrain(const struct terrain_type * terrain)
 const char *
 terrain_name(const struct region * r)
 {
+  if (r->attribs) {
+    attrib * a = a_find(r->attribs, &at_racename);
+    if (a) {
+      return get_racename(a);
+    }
+  }
+
   if (r->terrain->name!=NULL) {
     return r->terrain->name(r);
   } else if (fval(r->terrain, SEA_REGION)) {

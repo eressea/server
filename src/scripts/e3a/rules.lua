@@ -1,3 +1,4 @@
+print("loaded rules.lua")
 -- when appending to this, make sure the item has a canuse-function!
 local goblin_denied = " plate lance mallornlance greatbow axe greatsword halberd rustyaxe rustyhalberd towershield "
 function item_canuse(u, iname)

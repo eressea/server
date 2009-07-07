@@ -43,6 +43,8 @@ typedef struct ship_type {
   int minskill; /* min. skill to sail this (crew) */
   int sumskill; /* min. sum of crew+captain */
 
+  int fishing;    /* weekly income from fishing */
+
   int at_bonus;   /* Verändert den Angriffsskill (default: 0)*/
   int df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
   float tac_bonus;
@@ -87,7 +89,7 @@ typedef struct ship {
 } ship;
 
 extern void damage_ship(ship *sh, double percent);
-extern struct unit *captain(ship *sh, struct region *r);
+extern struct unit *captain(ship *sh);
 extern struct unit *shipowner(const struct ship * sh);
 extern const char * shipname(const struct ship * self);
 extern int shipcapacity(const struct ship * sh);

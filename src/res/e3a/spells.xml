@@ -285,7 +285,7 @@
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="stonegolem" type="gwyrrd" rank="4" level="1" index="32" variable="true">
+  <spell name="stonegolem" type="gwyrrd" rank="4" level="20" index="32" variable="true">
     <!-- Erschaffe Steingolems -->
     <resource name="aura" amount="2" cost="level"/>
     <resource name="stone" amount="1" cost="level"/>
@@ -503,6 +503,7 @@
     <resource name="peasant" amount="50" cost="fixed"/>
   </spell>
   <spell name="raindance" type="common" rank="5" level="3" index="26" ship="true" far="true" variable="true">
+    <!-- Regentanz -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="irongolem" type="common" rank="4" level="2" index="33" variable="true">

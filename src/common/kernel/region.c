@@ -909,7 +909,8 @@ r_demand(const region * r, const luxury_type * ltype)
 }
 
 const char *
-rname(const region * r, const struct locale * lang) {
+rname(const region * r, const struct locale * lang)
+{
   if (r->land) {
     return r->land->name;
   }

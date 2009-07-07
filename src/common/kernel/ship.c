@@ -153,11 +153,11 @@ damage_ship(ship * sh, double percent)
 }
 
 unit *
-captain(ship *sh, region *r)
+captain(ship *sh)
 {
 	unit *u;
 
-	for(u = r->units; u; u = u->next)
+	for(u = sh->region->units; u; u = u->next)
 		if(u->ship == sh && fval(u, UFL_OWNER)) return u;
 
 	return NULL;

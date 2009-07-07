@@ -1464,7 +1464,7 @@ travel_route(unit * u, const region_list * route_begin, const region_list * rout
     }
 
     /* terrain is marked as forbidden (curse, etc) */
-    if (fval(next->terrain, FORBIDDEN_REGION)) {
+    if (fval(next, RF_BLOCKED) || fval(next->terrain, FORBIDDEN_REGION)) {
       ADDMSG(&u->faction->msgs, msg_message("detectforbidden", 
         "unit region", u, next));
       break;

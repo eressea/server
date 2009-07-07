@@ -24,36 +24,36 @@
 #include <string.h>
 
 attrib_type at_racename = {
-	"racename", NULL, a_finalizestring, NULL, a_writestring, a_readstring
+  "racename", NULL, a_finalizestring, NULL, a_writestring, a_readstring
 };
 
 const char * 
 get_racename(attrib * alist)
 {
-	attrib * a = a_find(alist, &at_racename);
-	if (a) return (const char *)a->data.v;
-	return NULL;
+  attrib * a = a_find(alist, &at_racename);
+  if (a) return (const char *)a->data.v;
+  return NULL;
 }
 
 void
 set_racename(attrib ** palist, const char * name)
 {
-	attrib * a = a_find(*palist, &at_racename);
-	if (!a && name) {
-		a = a_add(palist, a_new(&at_racename));
-		a->data.v = strdup(name);
-	} else if (a && !name) {
-		a_remove(palist, a);
-	} else if (a) {
-		if (strcmp(a->data.v, name)!=0) {
-			free(a->data.v);
-			a->data.v = strdup(name);
-		}
-	}
+  attrib * a = a_find(*palist, &at_racename);
+  if (!a && name) {
+    a = a_add(palist, a_new(&at_racename));
+    a->data.v = strdup(name);
+  } else if (a && !name) {
+    a_remove(palist, a);
+  } else if (a) {
+    if (strcmp(a->data.v, name)!=0) {
+      free(a->data.v);
+      a->data.v = strdup(name);
+    }
+  }
 }
 
 void
 init_racename(void)
 {
-	at_register(&at_racename);
+  at_register(&at_racename);
 }

@@ -856,7 +856,7 @@ move_iceberg(region *r)
 			for (sh = r->ships; sh;) {
 				shn = sh->next;
 				if (fval(sh, SF_SELECT)) {
-					u = captain(sh, r);
+					u = captain(sh);
 					if (sh->damage>=sh->size * DAMAGE_SCALE) {
             if (u!=NULL) {
               ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg_des", 

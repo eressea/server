@@ -16,6 +16,7 @@ without prior permission by the authors of Eressea.
 #include "bind_ship.h"
 #include "bind_building.h"
 
+#include <kernel/eressea.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/unit.h>
@@ -28,6 +29,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/terrain.h>
 #include <modules/autoseed.h>
 #include <attributes/key.h>
+#include <attributes/racename.h>
 
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -35,6 +37,8 @@ without prior permission by the authors of Eressea.
 
 #include <lua.h>
 #include <tolua.h>
+
+#include <assert.h>
 
 int tolua_regionlist_next(lua_State *L)
 {
@@ -78,6 +82,31 @@ tolua_region_get_terrain(lua_State* L)
   region* self = (region*) tolua_tousertype(L, 1, 0);
   tolua_pushstring(L, self->terrain->_name);
   return 1;
+}
+
+static int
+tolua_region_get_terrainname(lua_State* L)
+{
+  region* self = (region*) tolua_tousertype(L, 1, 0);
+  attrib * a = a_find(self->attribs, &at_racename);
+  if (a) {
+    tolua_pushstring(L, get_racename(a));
+    return 1;
+  }
+  return 0;
+}
+
+static int
+tolua_region_set_terrainname(lua_State* L)
+{
+  region* self = (region*) tolua_tousertype(L, 1, 0);
+  const char * name = tolua_tostring(L, 2, 0);
+  if (name==NULL) {
+    a_removeall(&self->attribs, &at_racename);
+  } else {
+    set_racename(&self->attribs, name);
+  }
+  return 0;
 }
 
 static int tolua_region_get_info(lua_State* L)
@@ -132,7 +161,7 @@ static int tolua_region_set_flag(lua_State* L)
 {
   region* self = (region*)tolua_tousertype(L, 1, 0);
   int bit = (int)tolua_tonumber(L, 2, 0);
-  int set = tolua_toboolean(L, 3, 0);
+  int set = tolua_toboolean(L, 3, 1);
 
   if (set) self->flags |= (1<<bit);
   else self->flags &= ~(1<<bit);
@@ -472,6 +501,8 @@ tolua_region_open(lua_State* L)
       tolua_function(L, "get_flag", tolua_region_get_flag);
       tolua_function(L, "set_flag", tolua_region_set_flag);
       tolua_function(L, "next", tolua_region_get_adj);
+
+      tolua_variable(L, "terrain_name", &tolua_region_get_terrainname, &tolua_region_set_terrainname);
 
       tolua_function(L, "get_key", tolua_region_getkey);
       tolua_function(L, "set_key", tolua_region_setkey);

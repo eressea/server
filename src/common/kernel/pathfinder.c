@@ -33,22 +33,22 @@
 boolean
 allowed_swim(const region * src, const region * r)
 {
-	if (fval(r->terrain, SWIM_INTO)) return true;
-	return false;
+  if (fval(r->terrain, SWIM_INTO)) return true;
+  return false;
 }
 
 boolean
 allowed_walk(const region * src, const region * r)
 {
-	if (fval(r->terrain, WALK_INTO)) return true;
-	return false;
+  if (fval(r->terrain, WALK_INTO)) return true;
+  return false;
 }
 
 boolean
 allowed_fly(const region * src, const region * r)
 {
-	if (fval(r->terrain, FLY_INTO)) return true;
-	return false;
+  if (fval(r->terrain, FLY_INTO)) return true;
+  return false;
 }
 
 typedef struct node {
