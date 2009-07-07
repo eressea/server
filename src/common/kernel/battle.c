@@ -2772,7 +2772,7 @@ aftermath(battle * b)
           /* must leave ships or buildings, or a stealthy hobbit 
            * can hold castles indefinitely */
           if (!fval(r->terrain, SEA_REGION)) {
-            leave(du->region, du);
+            leave(du, true); /* even region owners have to flee */
           }
 #ifndef SIMPLE_ESCAPE
           if (df->run.region) {

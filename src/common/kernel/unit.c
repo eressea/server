@@ -336,7 +336,7 @@ remove_unit(unit ** ulist, unit * u)
   }
   
   if (u->number) set_number(u, 0);
-  leave(u->region, u);
+  leave(u, true);
   u->region = NULL;
 
   uunhash(u);
@@ -820,12 +820,36 @@ leave_building(unit * u)
   }
 }
 
-void
-leave(struct region * r, unit * u)
+boolean
+can_leave(unit * u)
 {
+  static int rule_leave = -1;
+
+  if (!u->building) {
+    return true;
+  }
+  if (rule_leave<0) {
+    rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
+  }
+  if (rule_leave && u->building && u==buildingowner(u->region, u->building)) {
+    building * b = largestbuilding(u->region, &is_tax_building, false);
+    if (b==u->building) {
+      return false;
+    }
+  }
+  return true;
+}
+
+boolean
+leave(unit * u, boolean force)
+{
+
+  if (!force) {
+    if (!can_leave(u)) return true;
+  }
   if (u->building) leave_building(u);
   else if (u->ship) leave_ship(u);
-  unused(r);
+  return true;
 }
 
 const struct race * 
@@ -867,7 +891,7 @@ move_unit(unit * u, region * r, unit ** ulist)
   if (u->region) {
     setguard(u, GUARD_NONE);
     fset(u, UFL_MOVED);
-    if (u->ship || u->building) leave(u->region, u);
+    if (u->ship || u->building) leave(u, true);
     translist(&u->region->units, ulist, u);
   } else {
     addlist(ulist, u);
@@ -881,7 +905,7 @@ move_unit(unit * u, region * r, unit ** ulist)
   /* if (maxhp>0) u->hp = u->hp * unit_max_hp(u) / maxhp; */
 }
 
-/* ist mist, aber wegen nicht skalierender attirbute notwendig: */
+/* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
 void

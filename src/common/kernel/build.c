@@ -924,9 +924,10 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     fset(b, BLD_MAINTAINED);
 
     /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
-    leave(r, u);
-    u->building = b;
-    fset(u, UFL_OWNER);
+    if (leave(u, false)) {
+      u->building = b;
+      fset(u, UFL_OWNER);
+    }
 
 #ifdef WDW_PYRAMID
     if(b->type == bt_find("pyramid") && u->faction->alliance != NULL) {
@@ -1041,11 +1042,12 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
 
   sh = new_ship(newtype, u->faction->locale, r);
 
-  leave(r, u);
-  if (fval(u->race, RCF_CANSAIL)) {
-    u->ship = sh;
+  if (leave(u, false)) {
+    if (fval(u->race, RCF_CANSAIL)) {
+      u->ship = sh;
+      fset(u, UFL_OWNER);
+    }
   }
-  fset(u, UFL_OWNER);
   new_order = create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale, parameters[P_SHIP]), sh->no);
   replace_order(&u->orders, ord, new_order);
   free_order(new_order);
@@ -1141,7 +1143,7 @@ leave_cmd(unit * u, struct order * ord)
   if (!slipthru(r, u, u->building)) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged", "building", u->building));
   } else {
-    leave(r, u);
+    leave(u, true);
   }
   return 0;
 }
@@ -1199,13 +1201,14 @@ enter_ship(unit * u, struct order * ord, int id, boolean report)
     }
   }
 
-  leave(u->region, u);
-  u->ship = sh;
+  if (leave(u, false)) {
+    u->ship = sh;
 
-  if (shipowner(sh) == NULL) {
-    fset(u, UFL_OWNER);
+    if (shipowner(sh) == NULL) {
+      fset(u, UFL_OWNER);
+    }
+    fset(u, UFL_ENTER);
   }
-  fset(u, UFL_ENTER);
   return true;
 }
 
@@ -1246,12 +1249,13 @@ enter_building(unit * u, order * ord, int id, boolean report)
     return false;
   }
 
-  leave(r, u);
-  u->building = b;
-  if (buildingowner(r, b) == 0) {
-    fset(u, UFL_OWNER);
+  if (leave(u, false)) {
+    u->building = b;
+    if (buildingowner(r, b) == 0) {
+      fset(u, UFL_OWNER);
+    }
+    fset(u, UFL_ENTER);
   }
-  fset(u, UFL_ENTER);
   return true;
 }
 

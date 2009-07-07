@@ -184,7 +184,9 @@ extern int resolve_unit(variant data, void * address);
 extern void write_unit_reference(const struct unit * u, struct storage * store);
 extern variant read_unit_reference(struct storage * store);
 
-extern void leave(struct region * r, struct unit * u);
+extern boolean leave(struct unit * u, boolean force);
+extern boolean can_leave(struct unit * u);
+
 extern void leave_ship(unit * u);
 extern void leave_building(unit * u);
 

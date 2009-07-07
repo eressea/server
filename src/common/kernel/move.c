@@ -1997,12 +1997,8 @@ travel(unit * u, region_list ** routep)
   /* a few pre-checks that need not be done for each step: */
   if (!fval(r->terrain, SEA_REGION)) {
     ship * sh = u->ship;
-    static int rule_leave = -1;
 
-    if (rule_leave<0) {
-      rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
-    }
-    if (rule_leave && u->building && u==buildingowner(u->region, u->building)) {
+    if (!can_leave(u)) {
       cmistake(u, u->thisorder, 150, MSG_MOVE);
       return;
     }

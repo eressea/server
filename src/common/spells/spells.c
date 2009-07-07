@@ -4821,8 +4821,9 @@ sp_icastle(castorder *co)
   data->time = 2+(rng_int()%(int)(power)+1)*(rng_int()%(int)(power)+1);
 
   if (mage->region == r) {
-    leave(r, mage);
-    mage->building = b;
+    if (leave(mage, false)) {
+      mage->building = b;
+    }
   }
 
   ADDMSG(&mage->faction->msgs, msg_message(

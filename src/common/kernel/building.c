@@ -526,7 +526,7 @@ remove_building(building ** blist, building * b)
 
   handle_event(b->attribs, "destroy", b);
   for (u=b->region->units; u; u=u->next) {
-    if (u->building == b) leave(b->region, u);
+    if (u->building == b) leave(u, true);
   }
   
   b->size = 0;

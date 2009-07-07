@@ -330,7 +330,7 @@ unit_getregion(const unit * u)
 static void
 unit_setship(unit * u, ship * s)
 {
-  leave(u->region, u);
+  leave(u, true);
   if (u->region!=s->region) {
     move_unit(u, s->region, NULL);
   }
@@ -346,7 +346,7 @@ unit_getship(const unit * u)
 static void
 unit_setbuilding(unit * u, building * b)
 {
-  leave(u->region, u);
+  leave(u, true);
   if (u->region!=b->region) {
     move_unit(u, b->region, NULL);
   }
