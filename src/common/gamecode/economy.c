@@ -1762,7 +1762,7 @@ create_potion(unit * u, const potion_type * ptype, int want)
 static void
 create_item(unit * u, const item_type * itype, int want)
 {
-  if (fval(itype->rtype, RTF_LIMITED)) {
+  if (itype->construction && fval(itype->rtype, RTF_LIMITED)) {
 #if GUARD_DISABLES_PRODUCTION == 1
     if(is_guarded(u->region, u, GUARD_PRODUCE)) {
       cmistake(u, u->thisorder, 70, MSG_EVENT);

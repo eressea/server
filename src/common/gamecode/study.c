@@ -107,12 +107,16 @@ magic_lowskill(unit *u)
 int
 study_cost(unit *u, skill_t sk)
 {
-  static int cost = 0;
+  static int cost[MAXSKILLS];
   int stufe, k = 50;
 
-  if (cost==0) {
-    cost = get_param_int(global.parameters, "skills.cost", 200);
+  if (cost[sk]==0) {
+    char buffer[256];
+    sprintf(buffer, "skills.cost.%s", skillnames[sk]);
+    cost[sk] = get_param_int(global.parameters, buffer, -1);
   }
+  if (cost[sk]>=0) return cost[sk];
+
   switch (sk) {
     case SK_SPY:
       return 100;
