@@ -9,7 +9,7 @@
     <!-- Traumsenden -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="earn_silver#illaun" type="illaun" ship="true" variable="true" rank="5" level="1" index="159">
+  <spell name="earn_25_silver#illaun" type="illaun" ship="true" variable="true" rank="5" level="1" index="159">
     <!-- Wahrsagen -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
@@ -93,7 +93,7 @@
     <!-- Verwünschung -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="earn_silver#draig" type="draig" ship="true" variable="true" rank="5" level="1" index="159">
+  <spell name="earn_25_silver#draig" type="draig" ship="true" variable="true" rank="5" level="1" index="159">
     <!-- Kleine Flüche -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
@@ -178,7 +178,7 @@
   <!-- end draig -->
 
   <!-- new cerddor -->
-  <spell name="earn_silver#cerddor" type="cerddor" ship="true" variable="true" rank="5" level="1" index="159">
+  <spell name="earn_25_silver#cerddor" type="cerddor" ship="true" variable="true" rank="5" level="1" index="159">
     <!-- Gaukeleien -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
@@ -280,7 +280,7 @@
     <!-- Segen der Erde -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="earn_silver#gwyrrd" type="gwyrrd" ship="true" variable="true" rank="5" level="1" index="159">
+  <spell name="earn_25_silver#gwyrrd" type="gwyrrd" ship="true" variable="true" rank="5" level="1" index="159">
     <!-- Viehheilung -->
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
