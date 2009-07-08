@@ -1630,6 +1630,7 @@ f_regionid(const region * r, const faction * f, char * buffer, size_t size)
     plane * pl = rplane(r);
     const char * name = pl?pl->name:0;
     int nx = region_x(r, f), ny = region_y(r, f);
+    pnormalize(&nx, &ny, pl);
     strncpy(buffer, rname(r, f->locale), size);
     buffer[size-1]=0;
     sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", nx, ny, name?",":"", (name)?name:"");

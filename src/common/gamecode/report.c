@@ -1396,6 +1396,8 @@ report_template(const char * filename, report_context * ctx, const char * charse
         if (!dh) {
           plane * pl = getplane(r);
           int nx = region_x(r, f), ny = region_y(r, f);
+
+          pnormalize(&nx, &ny, pl);
           rps_nowrap(F, "");
           rnl(F);
           if (pl && pl->id != 0) {

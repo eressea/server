@@ -311,6 +311,7 @@ cr_region(variant var, char * buffer, const void * userdata)
   if (r) {
     plane * pl = rplane(r);
     int nx = region_x(r, report), ny = region_y(r, report);
+    pnormalize(&nx, &ny, pl);
     sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
     return 0;
   }
@@ -425,6 +426,7 @@ cr_regions(variant var, char * buffer, const void * userdata)
     char * wp = buffer;
     int nx = region_x(r, f), ny = region_y(r, f);
 
+    pnormalize(&nx, &ny, pl);
     wp += sprintf(wp, "\"%d %d %d", nx, ny, z);
     for (i=1;i!=rdata->nregions;++i) {
       r = rdata->regions[i];
@@ -1107,6 +1109,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
   } else {
     nx = region_x(r, f);
     ny = region_y(r, f);
+    pnormalize(&nx, &ny, pl);
   }
 
   if (plid==0) {
@@ -1221,6 +1224,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         while(rl2) {
           region * r = rl2->data;
           int nx = region_x(r, f), ny = region_y(r, f);
+          pnormalize(&nx, &ny, pl);
           fprintf(F, "SCHEMEN %d %d\n", nx, ny);
           fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
           rl2 = rl2->next;
@@ -1417,6 +1421,8 @@ report_computer(const char * filename, report_context * ctx, const char * charse
       plane * pl = rplane(bm->r);
       int plid = plane_id(pl);
       int nx = region_x(bm->r, f), ny = region_y(bm->r, f);
+
+      pnormalize(&nx, &ny, pl);
       if (!plid) fprintf(F, "BATTLE %d %d\n", nx, ny);
       else {
         fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
