@@ -146,7 +146,7 @@
   </namespace>
   
    <namespace name="spellinfo">
-    <string name="earn_25_silver#draig">
+    <string name="earn_silver#draig">
       <text locale="de">In den dunkleren Gassen gibt es sie,
         die Flüche und Verhexungen auf Bestellung. Aber
         auch Gegenzauber hat der Jünger des Draigs
@@ -166,7 +166,7 @@
         services, the sorcerer charges 25 silver pieces.
         per level.</text>
     </string>
-    <string name="earn_25_silver#illaun">
+    <string name="earn_silver#illaun">
       <text locale="fr">Personne n'interprète aussi bien les
         rêves que les mages d'Illaun. Ils sont également
         versés dans l'utilisation des objets utilisés
@@ -188,7 +188,7 @@
         pieces per level and week for offering these
         services to peasants.</text>
     </string>
-    <string name="earn_25_silver#tybied">
+    <string name="earn_silver#tybied">
       <text locale="de">Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
       gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen
       alles, was man sonst nicht bekommen kann. Ob nun die kryptische
@@ -205,7 +205,7 @@
       to fill his purse. In one week he can earn 25 silver per level that
       way.</text>
     </string>
-    <string name="earn_25_silver#cerddor">
+    <string name="earn_silver#cerddor">
       <text locale="de">Cerddormagier sind _die_ Gaukler unter
       den Magiern, sie lieben es das Volk zu unterhalten und
       im Mittelpunkt zu stehen. Schon Anfänger lernen die
@@ -222,7 +222,7 @@
       the end of the week, the bard will have earned 25 silver
       per level. </text>
     </string>
-    <string name="earn_25_silver#gwyrrd">
+    <string name="earn_silver#gwyrrd">
       <text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
       der Viehzucht und Heilung sind bei den Bauern sehr
       begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr

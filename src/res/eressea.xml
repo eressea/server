@@ -5,6 +5,7 @@
   <!-- Localization -->
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
+	<xi:include href="common/spellinfo.xml" />
 
 	<xi:include href="common/items.xml" />
 	<xi:include href="common/armor.xml" />
