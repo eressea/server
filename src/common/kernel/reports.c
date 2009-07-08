@@ -1471,7 +1471,7 @@ write_script(FILE * F, const faction * f)
   report_type * rtype;
   char buf[1024];
 
-  fprintf(F, "faction=%s:email=%s", factionid(f), f->email);
+  fprintf(F, "faction=%s:email=%s:lang=%s", factionid(f), f->email, locale_name(f->locale));
   if (f->options & (1<<O_BZIP2)) fputs(":compression=bz2", F);
   else fputs(":compression=zip", F);
 

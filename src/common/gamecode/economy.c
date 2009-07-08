@@ -468,7 +468,8 @@ recruit_cost(const faction * f, const race * rc)
   } else {
     const char * str = get_param(f->race->parameters, "other_race");
     if (str && strcmp(rc->_name[0], str)==0) {
-      return get_param_int(f->race->parameters, "other_cost", -1);
+      return rc->recruitcost;
+/*      return get_param_int(f->race->parameters, "other_cost", -1); */
     }
   }
   return -1;
@@ -497,7 +498,9 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     /* Monster dürfen REKRUTIERE 15 dracoid machen
      * also: secondary race */
     rc = findrace(str, f->locale);
-    recruitcost = recruit_cost(f, rc);
+    if (rc!=NULL) {
+      recruitcost = recruit_cost(f, rc);
+    }
     if ((u->number!=0 && rc!=f->race) || rc==NULL || recruitcost<0) {
       rc = f->race;
       recruitcost = recruit_cost(f, f->race);
