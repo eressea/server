@@ -225,7 +225,7 @@ select_recruitment(request ** rop, int (*quantify)(const struct race*, int), int
     recruitment * rec = recruits;
     request * ro = *rop;
     unit * u = ro->unit;
-    const race * rc = u->number?u->race:u->faction->race;
+    const race * rc = u->race;
     int qty = quantify(rc, ro->qty);
 
     if (qty<0) {
