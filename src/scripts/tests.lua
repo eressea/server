@@ -227,6 +227,23 @@ function test_events()
   assert(fail==0)
 end
 
+local function test_recruit2()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r)
+  u.number = 1
+  u:add_item("money", 2000)
+  u:clear_orders()
+  u:add_order("MACHE TEMP 1")
+  u:add_order("REKRUTIERE 1 Elf")
+  u:add_order("REKRUTIERE 1 mensch")
+  u:add_order("REKRUTIERE 1")
+  process_orders()
+  print(u:get_item("money"))
+  print(u.number)
+end
+
 local function test_recruit()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -525,6 +542,7 @@ tests = {
     ["produce"] = test_produce,
     ["rename"] = test_rename,
     ["recruit"] = test_recruit,
+    ["recruit2"] = test_recruit2,
     ["spells"] = test_spells,
     ["herbalism"] = test_herbalism,
     ["storage"] = test_storage,
@@ -535,12 +553,10 @@ tests = {
     ["market"] = test_market
 }
 mytests = {
-    ["leave"] = test_leave,
-    ["taxes"] = test_taxes,
-    ["market"] = test_market
+    ["recruit2"] = test_recruit2
 }
 fail = 0
-for k, v in pairs(tests) do
+for k, v in pairs(mytests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

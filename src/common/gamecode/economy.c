@@ -374,7 +374,7 @@ do_recruiting(recruitment * recruits, int available)
 
     for (req=rec->requests;req;req=req->next) {
       unit * u = req->unit;
-      const race * rc = u->faction->race;
+      const race * rc = u->race; /* race is set in recruit() */
       int number, dec;
       float multi = 2.0F * rc->recruit_multi;
 
@@ -486,6 +486,8 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   const struct race * rc = f->race;
   const char * str;
 
+  if (fval(u, UFL_RECRUITING)) rc = u->race;
+
   init_tokens(ord);
   skip_token();
   n = getuint();
@@ -575,7 +577,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   /* snotlinge sollten hiermit bereits abgefangen werden, die
   * parteirasse ist uruk oder ork*/
   if (u->race != rc) {
-    if (u->number != 0) {
+    if (fval(u, UFL_RECRUITING) || u->number>0) {
       cmistake(u, ord, 139, MSG_EVENT);
       return;
     }
@@ -606,6 +608,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     cmistake(u, ord, 142, MSG_EVENT);
     return;
   }
+  fset(u, UFL_RECRUITING);
   o = (request *) calloc(1, sizeof(request));
   o->qty = n;
   o->unit = u;
