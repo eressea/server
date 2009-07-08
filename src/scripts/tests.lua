@@ -540,7 +540,7 @@ mytests = {
     ["market"] = test_market
 }
 fail = 0
-for k, v in pairs(mytests) do
+for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

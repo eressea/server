@@ -181,6 +181,16 @@ tolua_faction_get_lastturn(lua_State* L)
 }
 
 static int
+tolua_faction_set_lastturn(lua_State* L)
+{
+  faction * self = (faction *)tolua_tousertype(L, 1, 0);
+  if (self) {
+    self->lastorders = (int)tolua_tonumber(L, 2, self->lastorders);
+  }
+  return 0;
+}
+
+static int
 tolua_faction_renumber(lua_State* L)
 {
   faction * self = (faction *)tolua_tousertype(L, 1, 0);
@@ -463,7 +473,7 @@ tolua_faction_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "age", tolua_faction_get_age, tolua_faction_set_age);
       tolua_variable(L, TOLUA_CAST "options", tolua_faction_get_options, tolua_faction_set_options);
       tolua_variable(L, TOLUA_CAST "flags", tolua_faction_get_flags, NULL);
-      tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn, NULL);
+      tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn, tolua_faction_set_lastturn);
  
       tolua_function(L, TOLUA_CAST "set_policy", tolua_faction_set_policy);
       tolua_function(L, TOLUA_CAST "get_policy", tolua_faction_get_policy);
