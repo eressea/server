@@ -146,6 +146,97 @@
   </namespace>
   
    <namespace name="spellinfo">
+    <string name="earn_silver#draig">
+      <text locale="de">In den dunkleren Gassen gibt es sie,
+        die Flüche und Verhexungen auf Bestellung. Aber
+        auch Gegenzauber hat der Jünger des Draigs
+        natürlich im Angebot. Ob nun der Sohn des
+        Nachbarn in einen Liebesbann gezogen werden soll
+        oder die Nebenbuhlerin Pickel und Warzen
+        bekommen soll, niemand gibt gerne zu, zu solchen
+        Mitteln gegriffen zu haben.  Für diese
+        Dienstleistung streicht der Magier 25 Silber pro
+        Stufe ein.</text>
+      <text locale="en">In the dark alleys you can find those
+        who sell curses and hexes on demand - but you
+        can buy the apropriate counterspells from the
+        followers of Draig as well. May it be a love
+        spell for the son of a neighbour or a wart in
+        the face of a rival. For offering these
+        services, the sorcerer charges 25 silver pieces.
+        per level.</text>
+    </string>
+    <string name="earn_silver#illaun">
+      <text locale="fr">Personne n'interprète aussi bien les
+        rêves que les mages d'Illaun. Ils sont également
+        versés dans l'utilisation des objets utilisés
+        pour prédire le futur comme les boules de
+        cristal, les cartes de tarot ou les lignes de la
+        main. Un  mentaliste peut gagner 25 écus par
+        niveau et par semaine en proposant ses services
+        aux paysans.</text>
+      <text locale="de">Niemand kann so gut die Träume deuten
+        wie ein Magier des Illaun. Auch die Kunst der
+        Wahrsagerei, des Kartenlegens und des Handlesens
+        sind ihm geläufig. Dafür zahlen ihm die Bauern
+        25 Silber pro Stufe.</text>
+      <text locale="en">No one can read dreams as well as the
+        mages of Illaun. Furthermore, they are also
+        familiar with all other common means of
+        foretelling the future like crystal balls, tarot
+        cards or palms. A mentalist can earn 25 silver
+        pieces per level and week for offering these
+        services to peasants.</text>
+    </string>
+    <string name="earn_silver#tybied">
+      <text locale="de">Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
+      gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen
+      alles, was man sonst nicht bekommen kann. Ob nun die kryptische
+      Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen
+      hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen.
+      Dem Magier hilft es auf jeden Fall... beim Füllen seines
+      Geldbeutels. 25 Silber pro Stufe lassen sich so in einer Woche
+      verdienen.</text>
+      <text locale="en">If the local alchemist could not help you, you should visit a
+      scholar of Tybied. His potions and tinctures may help when nothing
+      else does. If the cryptic formula under the wooden shoes of the
+      unfaithful husband really helped? - well, the peasant, who isn't
+      capable of reading, will never know. At least it helped the magician...
+      to fill his purse. In one week he can earn 25 silver per level that
+      way.</text>
+    </string>
+    <string name="earn_silver#cerddor">
+      <text locale="de">Cerddormagier sind _die_ Gaukler unter
+      den Magiern, sie lieben es das Volk zu unterhalten und
+      im Mittelpunkt zu stehen. Schon Anfänger lernen die
+      kleinen Kunststücke und magischen Tricks, mit denen man
+      das Volk locken und verführen kann, den Geldbeutel ganz
+      weit zu öffnen, und am Ende der Woche wird der Gaukler
+      25 Silber pro Stufe verdient haben.</text>
+      <text locale="en">The mages of Cerddor truly are the
+      bards of the wizards; they love to use their sorcery to
+      entertain the crowds and to be the center of attention.
+      Even the apprentices study those little magic tricks,
+      which attract and fascinate the people and thus ensnare
+      them into leaving a few coins or more for the artist. By
+      the end of the week, the bard will have earned 25 silver
+      per level. </text>
+    </string>
+    <string name="earn_silver#gwyrrd">
+      <text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
+      der Viehzucht und Heilung sind bei den Bauern sehr
+      begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr
+      gefragt. Manch einer mag auch sein Talent dazu nutzen,
+      ein Tier für einen besseren Preis zu verkaufen. Pro
+      Stufe kann der Magier so 25 Silber verdienen.</text>
+      <text locale="en">The abilities of the mages of Gwyrrd
+      concerning the breeding and healing of cattle are highly
+      appreciated among the peasants. Especially at the
+      markets, their services are demanded frequently. Some of
+      them also use their talents to sell an animal at a
+      higher price. A magician can earn 25 silver pieces per level
+      in this way.</text>
+    </string>
     <string name="create_potion_p0">
       <text locale="en">Time is one of the first mysteries every magician tries to solve. If he succeeds, he can focus all his energies on his magical studies as the ways between dormatory, library and magician tower now pass much faster. To keep his heart in tune the magician uses a special self made tey. Some mages even share it with up to 10 people</text>
       <text locale="de">Die Zeit ist eines der ersten Geheimnisse, die jeder Magier zu erkunden versucht. Gelingt ihm dies, kann er alle seine Energie auf das Studium der Magie verwenden, die Wege zwischen Dormitorium, Bibliothek und Magierturm schafft er nun viel schneller. Um sein Herz im Takt zu halten verwendet er einen speziellen selbstgemachten Tee. Manche Magier teilen diesen Tee mit bis zu 10 Personen. </text>
