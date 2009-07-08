@@ -161,10 +161,12 @@ study_days(unit * student, skill_t sk)
   int speed = 30;
   if (student->race->study_speed) {
     speed += student->race->study_speed[sk];
-  }
-  if (speed<30) {
-    skill * sv = get_skill(student, sk);
-    if (sv==0) return 30;
+    if (speed<30) {
+      skill * sv = get_skill(student, sk);
+      if (sv==0) {
+        speed = 30;
+      }
+    }
   }
   return student->number * speed;
 }
