@@ -949,26 +949,26 @@ static boolean
 maintain(building * b, boolean first)
 /* first==false -> take money from wherever you can */
 {
-	int c;
-	region * r = b->region;
-	boolean paid = true, work = first;
-	unit * u;
-	if (fval(b, BLD_MAINTAINED) || b->type==NULL || b->type->maintenance==NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
-		fset(b, BLD_MAINTAINED);
-		fset(b, BLD_WORKING);
-		return true;
-	}
+  int c;
+  region * r = b->region;
+  boolean paid = true, work = first;
+  unit * u;
+  if (fval(b, BLD_MAINTAINED) || b->type==NULL || b->type->maintenance==NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
+    fset(b, BLD_MAINTAINED);
+    fset(b, BLD_WORKING);
+    return true;
+  }
   u = buildingowner(r, b);
   if (u==NULL) return false;
   for (c=0;b->type->maintenance[c].number;++c) {
     const maintenance * m = b->type->maintenance+c;
     int need = m->number;
-    
+
     if (fval(m, MTF_VARIABLE)) need = need * b->size;
     if (u) {
       /* first ist im ersten versuch true, im zweiten aber false! Das
-       * bedeutet, das in der Runde in die Region geschafften Resourcen
-       * nicht genutzt werden können, weil die reserviert sind! */
+      * bedeutet, das in der Runde in die Region geschafften Resourcen
+      * nicht genutzt werden können, weil die reserviert sind! */
       if (!first) need -= get_pooled(u, m->rtype, GET_ALL, need);
       else need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
       if (!first && need > 0) {
@@ -995,46 +995,46 @@ maintain(building * b, boolean first)
   if (paid && c>0) {
     /* TODO: wieviel von was wurde bezahlt */
     if (first) {
-			ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-		} else {
-			ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
-		}
-		fset(b, BLD_MAINTAINED);
+      ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
+    } else {
+      ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
+    }
+    fset(b, BLD_MAINTAINED);
     if (work) {
       fset(b, BLD_WORKING);
     }
-		for (c=0;b->type->maintenance[c].number;++c) {
-			const maintenance * m = b->type->maintenance+c;
-			int cost = m->number;
+    for (c=0;b->type->maintenance[c].number;++c) {
+      const maintenance * m = b->type->maintenance+c;
+      int cost = m->number;
 
-			if (!fval(m, MTF_VITAL) && !work) continue;
-			if (fval(m, MTF_VARIABLE)) cost = cost * b->size;
+      if (!fval(m, MTF_VITAL) && !work) continue;
+      if (fval(m, MTF_VARIABLE)) cost = cost * b->size;
 
-			if (!first) cost -= use_pooled(u, m->rtype, GET_ALL, cost);
-			else cost -= use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
-			if (!first && cost > 0) {
-				unit * ua;
-				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FFL_SELECT);
-				fset(u->faction, FFL_SELECT); /* hat schon */
-				for (ua=r->units;ua;ua=ua->next) {
-					if (!fval(ua->faction, FFL_SELECT) && alliedunit(ua, u->faction, HELP_MONEY)) {
-						int give = use_pooled(ua, m->rtype, GET_ALL, cost);
-						if (!give) continue;
-						cost -= give;
-						fset(ua->faction, FFL_SELECT);
-						if (m->rtype==r_silver) add_spende(ua->faction, u->faction, give, r);
-						if (cost<=0) break;
-					}
-				}
-			}
-			assert(cost==0);
-		}
-	} else {
-		ADDMSG(&u->faction->msgs,
-			msg_message("maintenancefail", "unit building", u, b));
-		return false;
-	}
-	return true;
+      if (!first) cost -= use_pooled(u, m->rtype, GET_ALL, cost);
+      else cost -= use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
+      if (!first && cost > 0) {
+        unit * ua;
+        for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FFL_SELECT);
+        fset(u->faction, FFL_SELECT); /* hat schon */
+        for (ua=r->units;ua;ua=ua->next) {
+          if (!fval(ua->faction, FFL_SELECT) && alliedunit(ua, u->faction, HELP_MONEY)) {
+            int give = use_pooled(ua, m->rtype, GET_ALL, cost);
+            if (!give) continue;
+            cost -= give;
+            fset(ua->faction, FFL_SELECT);
+            if (m->rtype==r_silver) add_spende(ua->faction, u->faction, give, r);
+            if (cost<=0) break;
+          }
+        }
+      }
+      assert(cost==0);
+    }
+  } else {
+    ADDMSG(&u->faction->msgs,
+      msg_message("maintenancefail", "unit building", u, b));
+    return false;
+  }
+  return true;
 }
 
 #ifdef COLLAPSE_CHANCE
