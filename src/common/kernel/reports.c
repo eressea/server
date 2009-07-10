@@ -944,6 +944,13 @@ get_addresses(report_context * ctx)
   
   flist->data = ctx->f;
 
+  if (ctx->f->alliance) {
+    faction_list * member = ctx->f->alliance->members;
+    for (;member;member=member->next) {
+      add_faction(&flist, member->data);
+    }
+  }
+
   for (r=ctx->first;sr==NULL && r!=ctx->last;r=r->next) {
     sr = find_seen(ctx->seen, r);
   }

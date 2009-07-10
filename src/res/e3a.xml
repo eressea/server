@@ -138,6 +138,7 @@
     <param name="study.expensivemigrants" value="1"/>
     <param name="study.speedup" value="1"/>
     <param name="world.era" value="3"/>
+    <param name="rules.migrants" value="0"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.goblinbonus" value="3"/>
     <param name="rules.ship.capacity" value="1"/> <!-- -->

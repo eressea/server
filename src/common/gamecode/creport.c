@@ -928,6 +928,20 @@ show_allies_cr(FILE * F, const faction * f, const ally * sf)
   }
 }
 
+/* prints allies */
+static void
+show_alliances_cr(FILE * F, const faction * f)
+{
+  if (f->alliance) {
+    alliance * al = f->alliance;
+    assert(al->leader);
+    fprintf(F, "ALLIANCE %d\n", al->id);
+    fprintf(F, "\"%s\";name\n", al->name);
+    fprintf(F, "%d;leader\n", al->leader->no);
+    fprintf(F, "%d;leader\n", al->leader->no);
+  }
+}
+
 /* prints all visible spells in a region */
 static void
 show_active_spells(const region * r)
@@ -957,7 +971,6 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
       fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
       if (f->alliance!=NULL && f->alliance==uf->alliance) {
         fprintf(F, "%d;alliance\n", f->alliance->id);
-        fprintf(F, "\"%s\";alliancename\n", f->alliance->name);
       }
     }
     flist = flist->next;
@@ -1344,8 +1357,14 @@ report_computer(const char * filename, report_context * ctx, const char * charse
     fprintf(F, "\"%s\";mailto\n", mailto);
     fprintf(F, "\"%s\";mailcmd\n", locale_string(f->locale, "mailcmd"));
   }
+
+  show_alliances_cr(F, f);
+
   fprintf(F, "PARTEI %d\n", f->no);
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+  if (f->alliance) {
+    fprintf(F, "%d;alliance\n", f->alliance->id);
+  }
   fprintf(F, "%d;age\n", f->age);
   fprintf(F, "%d;Optionen\n", f->options);
 #if SCORE_MODULE

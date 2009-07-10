@@ -1223,15 +1223,23 @@ count_migrants (const faction * f)
 int
 count_maxmigrants(const faction * f)
 {
-  int x = 0;
-  if (f->race == new_race[RC_HUMAN]) {
-    int nsize = count_all(f);
-    if (nsize>0) {
-      x = (int)(log10(nsize / 50.0) * 20);
-      if (x < 0) x = 0;
-    }
+  static int migrants = -1;
+
+  if (migrants<0) {
+    migrants = get_param_int(global.parameters, "rules.migrants", INT_MAX);
   }
-  return x;
+  if (migrants==INT_MAX) {
+    int x = 0;
+    if (f->race == new_race[RC_HUMAN]) {
+      int nsize = count_all(f);
+      if (nsize>0) {
+        x = (int)(log10(nsize / 50.0) * 20);
+        if (x < 0) x = 0;
+      }
+    }
+    return x;
+  }
+  return migrants;
 }
 
 void

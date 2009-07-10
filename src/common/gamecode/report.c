@@ -2051,10 +2051,12 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   centre(F, buf, true);
   if (f->race == new_race[RC_HUMAN]) {
     int maxmig = count_maxmigrants(f);
-    m = msg_message("nr_migrants", "units maxunits", count_migrants(f), maxmig);
-    nr_render(m, f->locale, buf, sizeof(buf), f);
-    msg_release(m);
-    centre(F, buf, true);
+    if (maxmig>0) {
+      m = msg_message("nr_migrants", "units maxunits", count_migrants(f), maxmig);
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      msg_release(m);
+      centre(F, buf, true);
+    }
   }
   {
     int maxh = maxheroes(f);
