@@ -160,6 +160,7 @@
     <param name="rules.magic.elfpower" value="1"/> <!-- elves get ring-of-power bonus in a forest -->
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
     <param name="rules.economy.taxation" value="1"/>
+    <param name="rules.economy.food" value="2"/>
     <param name="rules.economy.wages" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>

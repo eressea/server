@@ -179,11 +179,28 @@ checkorders(void)
     if (!is_monsters(f) && turn - f->lastorders == NMRTimeout() - 1)
       ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
+
 static boolean
 help_money(const unit * u)
 {
   if (u->race->ec_flags & GIVEITEM) return true;
   return false;
+}
+
+static void
+help_feed(unit * donor, unit * u, int * need_p)
+{
+  int need = *need_p;
+  int give = get_money(donor) - lifestyle(donor);
+  give = MIN(need, give);
+
+  if (give>0) {
+    change_money(donor, -give);
+    change_money(u, give);
+    need -= give;
+    add_spende(donor->faction, u->faction, give, donor->region);
+  }
+  *need_p = need;
 }
 
 static void
@@ -193,6 +210,11 @@ get_food(region *r)
   unit *u;
   int peasantfood = rpeasants(r)*10;
   faction * owner = region_get_owner(r);
+  static int food_rules = -1;
+
+  if (food_rules<0) {
+    food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
+  }
 
   /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
@@ -200,18 +222,13 @@ get_food(region *r)
 
   for (u = r->units; u; u = u->next) {
     int need = lifestyle(u);
-    static int food_rules = -1;
-
-    if (food_rules<0) {
-      food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
-    }
 
     /* Erstmal zurücksetzen */
     freset(u, UFL_HUNGER);
 
     if (food_rules&1) {
       /* if the region is owned, and the owner is nice, then we'll get 
-       * food from the peasants */
+       * food from the peasants - should not be used with WORK */
       if (owner!=NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
         int rm = rmoney(r);
         int use = MIN(rm, need);
@@ -249,17 +266,23 @@ get_food(region *r)
     if (need > 0) {
       unit *v;
 
+      if (food_rules&2) {
+        /* the owner of the region is the first faction to help out when you're hungry */
+        if (r->land->ownership) {
+          faction * owner = r->land->ownership->owner;
+          if (owner && owner!=u->faction) {
+            for (v=r->units;v;v=v->next) {
+              if (v->faction==owner) break;
+            }
+            if (v) {
+              help_feed(v, u, &need);
+            }
+          }
+        }
+      }
       for (v = r->units; need && v; v = v->next) {
         if (v->faction != f && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
-          int give = get_money(v) - lifestyle(v);
-          give = MIN(need, give);
-
-          if (give>0) {
-            change_money(v, -give);
-            change_money(u, give);
-            need -= give;
-            add_spende(v->faction, u->faction, give, r);
-          }
+          help_feed(v, u, &need);
         }
       }
 
