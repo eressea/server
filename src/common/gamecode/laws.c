@@ -1484,6 +1484,14 @@ name_cmd(unit * u, struct order * ord)
   }
 
   switch (p) {
+  case P_ALLIANCE:
+    if (foreign==false && u->faction->alliance) {
+      alliance * al = u->faction->alliance;
+      if (al->leader==u->faction) {
+        s = &al->name;
+      }
+    }
+    break;
   case P_BUILDING:
   case P_GEBAEUDE:
     if (foreign == true) {

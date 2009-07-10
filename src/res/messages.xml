@@ -753,6 +753,15 @@
     <text locale="de">"Deine Partei hat $int($units) Migranten und kann maximal $int($maxunits) Migranten aufnehmen."</text>
     <text locale="en">"Your faction has $int($units) migrants out of a possible total of $int($maxunits)."</text>
   </message>
+  <message name="nr_alliance" section="nr">
+    <type>
+      <arg name="leader" type="faction"/>
+      <arg name="name" type="string"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Mitglied der Allianz '$name ($int36($id))', angeführt von $faction($leader)."</text>
+    <text locale="en">"Member of '$name ($int36($id))', led by $faction($leader)."</text>
+  </message>
   <message name="nr_heroes" section="nr">
     <type>
       <arg name="units" type="int"/>

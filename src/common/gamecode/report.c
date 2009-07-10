@@ -2058,6 +2058,12 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
       centre(F, buf, true);
     }
   }
+  if (f->alliance) {
+    m = msg_message("nr_alliance", "leader name id", f->alliance->leader, f->alliance->name, f->alliance->id);
+    nr_render(m, f->locale, buf, sizeof(buf), f);
+    msg_release(m);
+    centre(F, buf, true);
+  }
   {
     int maxh = maxheroes(f);
     if (maxh) {

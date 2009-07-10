@@ -362,7 +362,8 @@ const char *parameters[MAXPARAMS] =
   "BAEUME",
   "XEPOTION",
   "XEBALLOON",
-  "XELAEN"
+  "XELAEN",
+  "ALLIANZ"
 };
 
 

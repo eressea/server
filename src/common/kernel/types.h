@@ -218,6 +218,7 @@ enum {
   P_XEPOTION,
   P_XEBALLOON,
   P_XELAEN,
+  P_ALLIANCE,
   MAXPARAMS,
   NOPARAM = (param_t) - 1
 };
