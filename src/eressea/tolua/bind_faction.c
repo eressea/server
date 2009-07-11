@@ -275,6 +275,14 @@ tolua_faction_get_origin(lua_State* L)
 }
 
 static int
+tolua_faction_destroy(lua_State* L)
+{
+  faction* f = (faction*) tolua_tousertype(L, 1, 0);
+  destroyfaction(f);
+  return 0;
+}
+
+static int
 tolua_faction_create(lua_State* L)
 {
   const char * email = tolua_tostring(L, 1, 0);
@@ -482,8 +490,9 @@ tolua_faction_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "add_item", tolua_faction_add_item);
       tolua_variable(L, TOLUA_CAST "items", tolua_faction_get_items, NULL);
 
-      tolua_function(L, TOLUA_CAST "renumber", tolua_faction_renumber);
-      tolua_function(L, TOLUA_CAST "create", tolua_faction_create);
+      tolua_function(L, TOLUA_CAST "renumber", &tolua_faction_renumber);
+      tolua_function(L, TOLUA_CAST "create", &tolua_faction_create);
+      tolua_function(L, TOLUA_CAST "destroy", &tolua_faction_destroy);
 #ifdef TODO
       def("faction_origin", &faction_getorigin, pure_out_value(_2) + pure_out_value(_3)),
 

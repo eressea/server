@@ -85,6 +85,20 @@ tolua_region_get_terrain(lua_State* L)
 }
 
 static int
+tolua_region_set_terrain(lua_State* L)
+{
+  region* r = (region*) tolua_tousertype(L, 1, 0);
+  const char * tname = tolua_tostring(L, 2, 0);
+  if (tname) {
+    const terrain_type * terrain = get_terrain(tname);
+    if (terrain) {
+      terraform_region(r, terrain);
+    }
+  }
+  return 0;
+}
+
+static int
 tolua_region_get_terrainname(lua_State* L)
 {
   region* self = (region*) tolua_tousertype(L, 1, 0);
@@ -494,7 +508,7 @@ tolua_region_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "ships", tolua_region_get_ships, NULL);
       tolua_variable(L, TOLUA_CAST "age", tolua_region_get_age, NULL);
       tolua_variable(L, TOLUA_CAST "buildings", tolua_region_get_buildings, NULL);
-      tolua_variable(L, TOLUA_CAST "terrain", tolua_region_get_terrain, NULL);
+      tolua_variable(L, TOLUA_CAST "terrain", tolua_region_get_terrain, tolua_region_set_terrain);
       tolua_function(L, TOLUA_CAST "get_resourcelevel", tolua_region_get_resourcelevel);
       tolua_function(L, TOLUA_CAST "get_resource", tolua_region_get_resource);
       tolua_function(L, TOLUA_CAST "set_resource", tolua_region_set_resource);

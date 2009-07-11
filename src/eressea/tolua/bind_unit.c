@@ -844,6 +844,16 @@ static int tolua_unit_set_race(lua_State* L)
 }
 
 static int
+tolua_unit_destroy(lua_State* L)
+{
+  unit * self = (unit *)tolua_tousertype(L, 1, 0);
+  if (self) {
+    remove_unit(&self->region->units, self);
+  }
+  return 0;
+}
+
+static int
 tolua_unit_create(lua_State* L)
 {
   faction * f = (faction *)tolua_tousertype(L, 1, 0);
@@ -927,6 +937,7 @@ tolua_unit_open(lua_State * L)
     {
       tolua_function(L, TOLUA_CAST "__tostring", &tolua_unit_tostring);
       tolua_function(L, TOLUA_CAST "create", &tolua_unit_create);
+      tolua_function(L, TOLUA_CAST "destroy", &tolua_unit_destroy);
 
       tolua_variable(L, TOLUA_CAST "name", &tolua_unit_get_name, tolua_unit_set_name);
       tolua_variable(L, TOLUA_CAST "faction", &tolua_unit_get_faction, tolua_unit_set_faction);

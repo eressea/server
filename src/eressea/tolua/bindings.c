@@ -363,11 +363,11 @@ tolua_get_nmrs(lua_State * L)
 {
   int result = -1;
   int n = (int)tolua_tonumber(L, 1, 0);
-  if (n<=NMRTimeout()) {
+  if (n>=0 && n<=NMRTimeout()) {
     if (nmrs==NULL) {
       update_nmrs();
-      result = nmrs[n];
     }
+    result = nmrs[n];
   }
   tolua_pushnumber(L, (lua_Number)result);
   return 1;

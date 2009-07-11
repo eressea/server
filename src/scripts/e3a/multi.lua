@@ -1,4 +1,4 @@
-function multi(f)
+function mark_multi(f)
   f.password = "doppelspieler"
   f.email = "doppelspieler@eressea.de"
   f.banner = "Diese Partei steht wegen vermuteten Doppelspiels unter Beobachtung."

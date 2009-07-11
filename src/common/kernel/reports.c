@@ -200,7 +200,7 @@ update_nmrs(void)
   for (f = factions; f; f = f->next) {
     if (fval(f, FFL_ISNEW)) {
       ++newplayers;
-    } else if (!is_monsters(f)) {
+    } else if (!is_monsters(f) && f->alive) {
       int nmr = turn-f->lastorders+1;
       if (nmr<0 || nmr>NMRTimeout()) {
         log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
