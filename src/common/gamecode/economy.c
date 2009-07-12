@@ -482,33 +482,32 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   region * r = u->region;
   plane * pl;
   request *o;
-  int recruitcost;
+  int recruitcost = -1;
   const faction * f = u->faction;
-  const struct race * rc = f->race;
+  const struct race * rc = u->race;
   const char * str;
-
-  if (fval(u, UFL_RECRUITING)) rc = u->race;
 
   init_tokens(ord);
   skip_token();
   n = getuint();
 
-  str = getstrtoken();
-  if (str && str[0]) {
-    /* Monster dürfen REKRUTIERE 15 dracoid machen
-     * also: secondary race */
-    rc = findrace(str, f->locale);
-    if (rc!=NULL) {
-      recruitcost = recruit_cost(f, rc);
+  if (u->number==0) {
+    str = getstrtoken();
+    if (str && str[0]) {
+      /* Monster dürfen REKRUTIERE 15 dracoid machen
+       * also: secondary race */
+      rc = findrace(str, f->locale);
+      if (rc!=NULL) {
+        recruitcost = recruit_cost(f, rc);
+      }
     }
-    if ((u->number!=0 && rc!=f->race) || rc==NULL || recruitcost<0) {
-      rc = f->race;
-      recruitcost = recruit_cost(f, f->race);
-    }
-  } else {
-    recruitcost = recruit_cost(f, f->race);
   }
-  assert(recruitcost>=0);
+  if (recruitcost<0) {
+    rc = u->race;
+    recruitcost = recruit_cost(f, rc);
+  }
+  u->race = rc;
+  assert(rc && recruitcost>=0);
 
 #if GUARD_DISABLES_RECRUIT
   /* this is a very special case because the recruiting unit may be empty
@@ -573,18 +572,9 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
       return;
     }
   }
-  if (!playerrace(u->race) || idle(u->faction)) {
+  if (!playerrace(rc) || idle(u->faction)) {
     cmistake(u, ord, 139, MSG_EVENT);
     return;
-  }
-  /* snotlinge sollten hiermit bereits abgefangen werden, die
-  * parteirasse ist uruk oder ork*/
-  if (u->race != rc) {
-    if (fval(u, UFL_RECRUITING) || u->number>0) {
-      cmistake(u, ord, 139, MSG_EVENT);
-      return;
-    }
-    else u->irace = u->race = rc;
   }
 
   if (has_skill(u, SK_MAGIC)) {
@@ -611,7 +601,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     cmistake(u, ord, 142, MSG_EVENT);
     return;
   }
-  fset(u, UFL_RECRUITING);
+
   o = (request *) calloc(1, sizeof(request));
   o->qty = n;
   o->unit = u;

@@ -272,10 +272,10 @@ get_food(region *r)
           faction * owner = r->land->ownership->owner;
           if (owner && owner!=u->faction) {
             for (v=r->units;v;v=v->next) {
-              if (v->faction==owner) break;
-            }
-            if (v) {
-              help_feed(v, u, &need);
+              if (v->faction==owner && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
+                help_feed(v, u, &need);
+                break;
+              }
             }
           }
         }

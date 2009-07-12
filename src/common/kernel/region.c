@@ -1329,14 +1329,14 @@ terraform_region(region * r, const terrain_type * terrain)
       rsethorses(r, rng_int() % (terrain->size / 50));
       if(rng_int()%100 < 40) {
         rsettrees(r, 2, terrain->size * (30+rng_int()%40)/1000);
-        rsettrees(r, 1, rtrees(r, 2)/4);
-        rsettrees(r, 0, rtrees(r, 2)/2);
       }
     } else if (chance(0.2)) {
       rsettrees(r, 2, terrain->size * (30 + rng_int() % 40) / 1000);
-      rsettrees(r, 1, rtrees(r, 2)/4);
-      rsettrees(r, 0, rtrees(r, 2)/2);
+    } else {
+      rsettrees(r, 2, 0);
     }
+    rsettrees(r, 1, rtrees(r, 2)/4);
+    rsettrees(r, 0, rtrees(r, 2)/8);
 
     if (!fval(r, RF_CHAOTIC)) {
       int peasants;
