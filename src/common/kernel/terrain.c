@@ -129,7 +129,8 @@ terrain_name(const struct region * r)
   if (r->attribs) {
     attrib * a = a_find(r->attribs, &at_racename);
     if (a) {
-      return get_racename(a);
+      const char * str = get_racename(a);
+      if (str) return str;
     }
   }
 

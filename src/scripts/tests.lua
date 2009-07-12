@@ -501,6 +501,42 @@ function test_leave()
   assert(u.building==b1)
 end
 
+function test_mallorn()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  r:set_flag(1, false) -- not mallorn
+  r:set_resource("tree", 100)
+  assert(r:get_resource("tree")==100)
+  local m = region.create(0, 0, "plain")
+  m:set_flag(1, true) -- not mallorn
+  m:set_resource("tree", 100)
+  assert(m:get_resource("tree")==100)
+  
+  local f = faction.create("enno@eressea.de", "human", "de")
+
+  local u1 = unit.create(f, r, 1)
+  u1:add_item("money", u1.number * 100)
+  u1:set_skill("forestry", 2)
+  u1:clear_orders()
+  u1:add_order("MACHE HOLZ")
+
+  local u2 = unit.create(f, m, 1)
+  u2:add_item("money", u2.number * 100)
+  u2:set_skill("forestry", 2)
+  u2:clear_orders()
+  u2:add_order("MACHE HOLZ")
+
+  local u3 = unit.create(f, m, 1)
+  u3:add_item("money", u3.number * 100)
+  u3:set_skill("forestry", 2)
+  u3:clear_orders()
+  u3:add_order("MACHE Mallorn")
+  process_orders()
+  assert(u1:get_item("log")==2)
+  assert(u2:get_item("log")==2)
+  assert(u3:get_item("mallorn")==1)
+end
+
 function test_storage()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -547,12 +583,14 @@ tests = {
     ["herbalism"] = test_herbalism,
     ["storage"] = test_storage,
     ["taxes"] = test_taxes,
+    ["mallorn"] = test_mallorn,
     ["upkeep"] = test_upkeep,
     ["id"] = test_id,
     ["work"] = test_work,
     ["market"] = test_market
 }
 mytests = {
+    ["mallorn"] = test_mallorn,
     ["recruit2"] = test_recruit2
 }
 fail = 0

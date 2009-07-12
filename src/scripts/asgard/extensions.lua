@@ -48,9 +48,9 @@ function horse_produce(r, n)
 end
 
 function log_limit(r)
-  if r:get_flag(1) then -- RF_MALLORN
-    return 0
-  end
+--  if r:get_flag(1) then -- RF_MALLORN
+--    return 0
+--  end
   return r:get_resource("tree") + r:get_resource("sapling")
 end
 
