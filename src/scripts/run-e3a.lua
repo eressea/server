@@ -9,16 +9,51 @@ local confirmed_multis = {
 local suspected_multis = { 
 }
 
+function num_oceans(r)
+  local oceans = 0
+  local p = r:next(5)
+  for d = 0,5 do
+    local n = r:next(d)
+    if p.terrain~="ocean" and n.terrain=="ocean" then
+      oceans = oceans +1
+    end
+    p = n
+  end
+  return oceans
+end
+
 -- destroy a faction and all of its buildings.
 -- destroy the home region, too
 function kill_faction(f)
   for u in f.units do
-    if u.building~=nil then
-      building.destroy(u.building)
-      u.region.terrain = "firewall"
-      u.region.terrain_name = nil
-    end
+    local r = u.region
+    local b = u.building
     unit.destroy(u)
+    if b~=nil then
+      building.destroy(b)
+      local nuke = true
+      for v in r.units do
+        if v.faction.id~=f.id then
+          -- print("cannot nuke: " .. tostring(v.faction))
+          nuke = false
+          break
+        end
+      end
+      r.terrain_name = nil
+      if nuke and num_oceans(r)<=1 then
+        -- print("nuke!")
+        r.terrain = "ocean"
+      else
+        -- print("cannot nuke: > 1 oceans")
+        r.terrain = "glacier"
+        r.peasants = 10
+        r:set_resource("money", 100)
+        b = building.create(r, "monument")
+        b.size = 1
+        b.name = "Memento Mori"
+        b.info = "Eine kleine " .. translate("race::" .. f.race .."_x") .. "-Statue erinnert hier an ein verschwundenes Volk"
+      end
+    end
   end
   faction.destroy(f)
 end
@@ -26,7 +61,6 @@ end
 function kill_nonstarters()
   for f in factions() do
     if f.lastturn==1 then
-      print(f, f.lastturn)
       kill_faction(f)
     end
   end
@@ -133,7 +167,6 @@ function process(orders)
     return -1
   end
 
-  kill_nonstarters()
   kill_multis(confirmed_multis)
   plan_monsters()
 
@@ -154,6 +187,7 @@ function process(orders)
   -- spawn_braineaters(0.25)
   -- spawn_ents()
 
+  kill_nonstarters()
   mark_multis(suspected_multis)
   -- post-turn updates:
   update_guards()

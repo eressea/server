@@ -873,7 +873,9 @@ demographics(void)
 
         calculate_emigration(r);
         peasants(r);
-        plagues(r, false);
+        if (r->age>20) {
+          plagues(r, false);
+        }
         horses(r);
         if (current_season != SEASON_WINTER) {
           growing_trees(r, current_season, last_weeks_season);

@@ -105,6 +105,11 @@ get_monsters(void)
       }
     }
   }
+  if (monsters==NULL) {
+    /* shit! */
+    monsters = findfaction(666);
+    if (monsters) fset(monsters, FFL_NPC);
+  }
   return monsters;
 }
 

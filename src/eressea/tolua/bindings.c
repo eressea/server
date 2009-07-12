@@ -136,6 +136,20 @@ tolua_getkey(lua_State* L)
 }
 
 static int
+tolua_translate(lua_State* L)
+{
+  const char * str = tolua_tostring(L, 1, 0);
+  const char * lang = tolua_tostring(L, 2, 0);
+  struct locale * loc = lang?find_locale(lang):default_locale;
+  if (loc) {
+    str = locale_string(loc, str);
+    tolua_pushstring(L, str);
+    return 1;
+  }
+  return 0;
+}
+
+static int
 tolua_setkey(lua_State* L)
 {
   const char * name = tolua_tostring(L, 1, 0);
@@ -961,6 +975,8 @@ tolua_eressea_open(lua_State* L)
 
     tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
     tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
+
+    tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
 
     tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
 
