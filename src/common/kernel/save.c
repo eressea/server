@@ -659,6 +659,7 @@ read_unit(struct storage * store)
   char rname[32];
 
   n = store->r_id(store);
+  if (n<=0) return NULL;
   u = findunit(n);
   if (u==NULL) {
     u = calloc(sizeof(unit), 1);
@@ -731,7 +732,7 @@ read_unit(struct storage * store)
     set_number(u, 0);
   }
 
-  if (count_unit(u)) u->faction->no_units++;
+  if (count_unit(u) && u->faction) u->faction->no_units++;
 
   set_number(u, number);
 

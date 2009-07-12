@@ -1235,7 +1235,7 @@ randomevents(void)
         if (rng_int()%100 < 12) {
           ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
           rsetterrain(r, T_VOLCANO);
-        } else if (rng_int()%100 < 8) {
+        } else if (r->age>20 && rng_int()%100 < 8) {
           volcano_outbreak(r);
         }
       }
