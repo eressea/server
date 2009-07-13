@@ -1882,9 +1882,10 @@ static void
 eval_resource(struct opstack ** stack, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
+  const struct locale * lang = report?report->locale:default_locale;
   int j = opop(stack).i;
   const struct resource_type * res = (const struct resource_type *)opop(stack).v;
-  const char * c = LOC(report->locale, resourcename(res, j!=1));
+  const char * c = LOC(lang, resourcename(res, j!=1));
   size_t len = strlen(c);
   variant var;
 
@@ -1896,9 +1897,10 @@ static void
 eval_race(struct opstack ** stack, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
+  const struct locale * lang = report?report->locale:default_locale;
   int j = opop(stack).i;
   const race * r = (const race *)opop(stack).v;
-  const char * c = LOC(report->locale, rc_name(r, j!=1));
+  const char * c = LOC(lang, rc_name(r, j!=1));
   size_t len = strlen(c);
   variant var;
 
@@ -1925,6 +1927,7 @@ static void
 eval_resources(struct opstack ** stack, const void * userdata) /* order -> string */
 {
   const faction * report = (const faction*)userdata;
+  const struct locale * lang = report?report->locale:default_locale;
   const struct resource * res = (const struct resource *)opop(stack).v;
   static char buf[1024]; /* but we only use about half of this */
   size_t size = sizeof(buf) - 1;
@@ -1933,7 +1936,7 @@ eval_resources(struct opstack ** stack, const void * userdata) /* order -> strin
   char * bufp = buf;
   while (res!=NULL && size > 4) {
     const char * rname = resourcename(res->type, (res->number!=1)?NMF_PLURAL:0);
-    int bytes = snprintf(bufp, size, "%d %s", res->number, LOC(report->locale, rname));
+    int bytes = snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
     if (bytes<0 || wrptr(&bufp, &size, bytes)!=0 || size<sizeof(buf)/2) {
       WARN_STATIC_BUFFER();
       break;
@@ -1989,6 +1992,7 @@ static void
 eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
 {
   const faction * report = (const faction*)userdata;
+  const struct locale * lang = report?report->locale:default_locale;
   int i, end = 0, begin = 0;
   const arg_regions * regions = (const arg_regions *)opop(stack).v;
   static char buf[512];
@@ -2004,7 +2008,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
     end = regions->nregions;
     for (i=begin;i<end;++i) {
       region * r = regions->regions[i];
-      const char * trail = trailinto(r, report->locale);
+      const char * trail = trailinto(r, lang);
       const char * rn = f_regionid_s(r, report);
       int bytes = snprintf(bufp, size, trail, rn);
       if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
@@ -2012,7 +2016,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* order -> string */
       if (i+2<end) {
         bytes = (int)strlcpy(bufp, ", ", size);
       } else if (i+1<end) {
-        bytes = (int)strlcpy(bufp, LOC(report->locale, "list_and"), size);
+        bytes = (int)strlcpy(bufp, LOC(lang, "list_and"), size);
       } else bytes = 0;
 
       if (bytes && wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
@@ -2032,8 +2036,9 @@ static void
 eval_direction(struct opstack ** stack, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
+  const struct locale * lang = report?report->locale:default_locale;
   int i = opop(stack).i;
-  const char * c = LOC(report->locale, (i>=0)?directions[i]:"unknown_direction");
+  const char * c = LOC(lang, (i>=0)?directions[i]:"unknown_direction");
   size_t len = strlen(c);
   variant var;
 
@@ -2045,8 +2050,9 @@ static void
 eval_skill(struct opstack ** stack, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
+  const struct locale * lang = report?report->locale:default_locale;
   skill_t sk = (skill_t)opop(stack).i;
-  const char * c = skillname(sk, report->locale);
+  const char * c = skillname(sk, lang);
   size_t len = strlen(c);
   variant var;
 
@@ -2067,6 +2073,20 @@ eval_int36(struct opstack ** stack, const void * userdata)
   unused(userdata);
 }
 /*** END MESSAGE RENDERING ***/
+
+#include <util/nrmessage.h>
+
+static void log_orders(const struct message * msg)
+{
+  char buffer[4096];
+  int i;
+  for (i=0;i!=msg->type->nparameters;++i) {
+    if (msg->type->types[i]->copy==&var_copy_order) {
+      nr_render(msg, default_locale, buffer, sizeof(buffer), NULL);
+      log_warning(("meep - %s\n", buffer));
+    }
+  }
+}
 
 void
 reports_init(void)
@@ -2090,6 +2110,9 @@ reports_init(void)
   register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
   register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
   register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
+
+
+  msg_log_create = &log_orders;
 
   /* register functions that turn message contents to readable strings */
   add_function("alliance", &eval_alliance);

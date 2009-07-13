@@ -63,6 +63,8 @@ extern const struct message_type * mt_find(const char *);
 extern void register_argtype(const char * name, void(*free_arg)(variant), variant (*copy_arg)(variant), variant_type);
 extern const struct arg_type * find_argtype(const char * name);
 
+extern void (*msg_log_create)(const struct message * msg);
+
 #ifdef __cplusplus
 }
 #endif

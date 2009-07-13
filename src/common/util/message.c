@@ -24,6 +24,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+void (*msg_log_create)(const struct message * msg) = 0;
+
 const char *
 mt_name(const message_type* mtype)
 {
@@ -147,6 +149,7 @@ msg_create(const struct message_type * mtype, variant args[])
   for (i=0;i!=mtype->nparameters;++i) {
     msg->parameters[i] = copy_arg(mtype->types[i], args[i]);
   }
+  if (msg_log_create) msg_log_create(msg);
   return msg;
 }
 

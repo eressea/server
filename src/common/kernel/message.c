@@ -77,36 +77,36 @@ arg_set(variant args[], const message_type * mtype, const char * buffer, variant
 struct message * 
 msg_feedback(const struct unit * u, struct order * ord, const char * name, const char* sig, ...)
 {
-	va_list marker;
-	const message_type * mtype = mt_find(name);
-	char paramname[64];
-	const char *ic = sig;
-	variant args[16];
+  va_list marker;
+  const message_type * mtype = mt_find(name);
+  char paramname[64];
+  const char *ic = sig;
+  variant args[16];
   variant var;
-	memset(args, 0, sizeof(args));
+  memset(args, 0, sizeof(args));
 
-	if (ord==NULL) ord = u->thisorder;
+  if (ord==NULL) ord = u->thisorder;
 
-	if (!mtype) {
-		log_error(("trying to create message of unknown type \"%s\"\n", name));
+  if (!mtype) {
+    log_error(("trying to create message of unknown type \"%s\"\n", name));
     return msg_message("missing_feedback", "unit region command name", u, u->region, ord, name);
-	}
+  }
 
   var.v = (void*)u;
-	arg_set(args, mtype, "unit", var);
+  arg_set(args, mtype, "unit", var);
   var.v = (void*)u->region;
-	arg_set(args, mtype, "region", var);
+  arg_set(args, mtype, "region", var);
   var.v = (void*)ord;
-	arg_set(args, mtype, "command", var);
+  arg_set(args, mtype, "command", var);
 
-	va_start(marker, sig);
-	while (*ic && !isalnum(*ic)) ic++;
-	while (*ic) {
-		char * oc = paramname;
+  va_start(marker, sig);
+  while (*ic && !isalnum(*ic)) ic++;
+  while (*ic) {
+    char * oc = paramname;
     int i;
 
     while (isalnum(*ic)) *oc++ = *ic++;
-		*oc = '\0';
+    *oc = '\0';
 
     for (i=0;i!=mtype->nparameters;++i) {
       if (!strcmp(paramname, mtype->pnames[i])) break;
@@ -124,10 +124,10 @@ msg_feedback(const struct unit * u, struct order * ord, const char * name, const
       assert(!"program aborted.");
     }
     while (*ic && !isalnum(*ic)) ic++;
-	}
-	va_end(marker);
+  }
+  va_end(marker);
 
-	return msg_create(mtype, args);
+  return msg_create(mtype, args);
 }
 
 message * 
@@ -239,13 +239,12 @@ addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 void
 cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
-	static char ebuf[20];
+  static char msgname[20];
   unused(mtype);
 
-	if (is_monsters(u->faction)) return;
-	sprintf(ebuf, "error%d", mno);
-	ADDMSG(&u->faction->msgs, msg_message(ebuf, 
-		"command unit region", ord, u, u->region));
+  if (is_monsters(u->faction)) return;
+  sprintf(msgname, "error%d", mno);
+  ADDMSG(&u->faction->msgs, msg_feedback(u, ord, msgname, ""));
 }
 
 extern unsigned int new_hashstring(const char* s);

@@ -615,8 +615,11 @@ learn_cmd(unit * u, order * ord)
         } else {
           /* Es wurde kein Magiegebiet angegeben und die Partei
           * hat noch keins gewählt. */
-          cmistake(u, ord, 178, MSG_MAGIC);
-          return 0;
+          mtyp = getmagicskill(u->faction->locale);
+          if (mtyp==M_NONE) {
+            cmistake(u, ord, 178, MSG_MAGIC);
+            return 0;
+          }
         }
       }
       if (mtyp != u->faction->magiegebiet){
@@ -638,12 +641,14 @@ learn_cmd(unit * u, order * ord)
         /* die Partei hat noch kein Magiegebiet gewählt. */
         mtyp = getmagicskill(u->faction->locale);
         if (mtyp == M_NONE){
-          cmistake(u, ord, 178, MSG_MAGIC);
-          return 0;
-        } else {
-          /* Legt damit das Magiegebiet der Partei fest */
-          u->faction->magiegebiet = mtyp;
+          mtyp = getmagicskill(u->faction->locale);
+          if (mtyp==M_NONE) {
+            cmistake(u, ord, 178, MSG_MAGIC);
+            return 0;
+          }
         }
+        /* Legt damit das Magiegebiet der Partei fest */
+        u->faction->magiegebiet = mtyp;
       }
     }
   }

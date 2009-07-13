@@ -3169,15 +3169,13 @@ new_units (void)
             order ** newordersp;
 
             if (!checkunitnumber(u->faction, 1)) {
-							if (global.unitsperalliance) {
-                ADDMSG(&u->faction->msgs, msg_message("too_many_units_in_alliance",
-                  "command unit region allowed",
-                  makeord, u, r, maxunits(u->faction)));
-							} else {
-                ADDMSG(&u->faction->msgs, msg_message("too_many_units_in_faction",
-                  "command unit region allowed",
-                  makeord, u, r, maxunits(u->faction)));
-							}
+              if (global.unitsperalliance) {
+                ADDMSG(&u->faction->msgs, msg_feedback(u, makeord,
+                  "too_many_units_in_alliance", "allowed", maxunits(u->faction)));
+              } else {
+                ADDMSG(&u->faction->msgs, msg_feedback(u, makeord,
+                  "too_many_units_in_faction", "allowed", maxunits(u->faction)));
+              }
               ordp = &makeord->next;
 
               while (*ordp) {

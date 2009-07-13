@@ -88,11 +88,10 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
   }
 
   if(regionsPacified > 0) {
-    ADDMSG(&u->faction->msgs, msg_message("hornofpeace_u_success",
-      "unit region command pacified", u, u->region, ord, regionsPacified));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "hornofpeace_u_success",
+      "pacified", regionsPacified));
   } else {
-    ADDMSG(&u->faction->msgs, msg_message("hornofpeace_u_nosuccess",
-      "unit region command", u, u->region, ord));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "hornofpeace_u_nosuccess", ""));
   }
 
   return 0;

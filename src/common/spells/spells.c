@@ -1780,8 +1780,8 @@ sp_treewalkenter(castorder *co)
 
       w = weight(u);
       if (remaining_cap - w < 0) {
-        ADDMSG(&mage->faction->msgs, msg_message("fail_tooheavy",
-          "command region unit target", co->order, r, mage, u));
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "fail_tooheavy",
+          "target", u));
         continue;
       }
       remaining_cap = remaining_cap - w;
@@ -5698,8 +5698,7 @@ sp_fetchastral(castorder *co)
   region * ro = NULL; /* region in which the target is */
 
   if (rplane(rt)!=get_normalplane()) {
-    ADDMSG(&mage->faction->msgs, msg_message("error190",
-      "command region unit", co->order, rt, mage));
+    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error190", ""));
     return 0;
   }
 
@@ -5726,15 +5725,16 @@ sp_fetchastral(castorder *co)
       }
       if (rfind==NULL) {
         /* the region r is not in the schemes of rt */
-        ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance",
-          "command region unit target", co->order, mage->region, mage, u));
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+          "spellfail_distance", "target", u));
         continue;
       }
       ro = u->region;
     }
 
     if (is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
-      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_astralblock", ""));
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+        "spellfail_astralblock", ""));
       continue;
     }
 
@@ -5745,8 +5745,8 @@ sp_fetchastral(castorder *co)
 
     w = weight(u);
     if (remaining_cap - w < 0) {
-      ADDMSG(&mage->faction->msgs, msg_message("fail_tooheavy",
-        "command region unit target", co->order, mage->region, mage, u));
+      ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+        "fail_tooheavy", "target", u));
       continue;
     }
 
