@@ -465,12 +465,9 @@ recruit_cost(const faction * f, const race * rc)
 {
   if (is_monsters(f) || f->race==rc) {
     return rc->recruitcost;
-  } else {
-    const char * str = get_param(f->race->parameters, "other_race");
-    if (str && strcmp(rc->_name[0], str)==0) {
-      return rc->recruitcost;
+  } else if (valid_race(f, rc)) {
+    return rc->recruitcost;
 /*      return get_param_int(f->race->parameters, "other_cost", -1); */
-    }
   }
   return -1;
 }
