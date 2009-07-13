@@ -793,14 +793,9 @@ learn_cmd(unit * u, order * ord)
   }
   else if (sk==SK_MAGIC) {
     sc_mage * mage = get_mage(u);
-    int level = eff_skill(u, SK_MAGIC, r);
-    if (FactionSpells() && level>u->faction->max_spelllevel) {
-      update_spellbook(u->faction, level);
-    }
     if (!mage) {
       mage = create_mage(u, u->faction->magiegebiet);
     }
-    updatespelllist(u);
   }
 
   return 0;

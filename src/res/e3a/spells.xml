@@ -276,7 +276,7 @@
   <!-- end cerddor -->
 
   <!-- new gwyrrd -->
-  <spell name="blessedharvest" type="gwyrrd" rank="5" level="20" index="25" ship="true" far="true" variable="true">
+  <spell name="blessedharvest" type="gray" rank="5" level="1" index="25" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -561,15 +561,6 @@
   <spell name="double_time" type="common" rank="5" level="11" index="80" parameters="u+" los="true" ship="true" variable="true">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="fiery_dragonbreath" type="common" rank="5" level="3" index="81" combat="2">
-    <resource name="aura" amount="1" cost="fixed"/>
-  </spell>
-  <spell name="icy_dragonbreath" type="common" rank="5" level="6" index="82" combat="2">
-    <resource name="aura" amount="2" cost="fixed"/>
-  </spell>
-  <spell name="powerful_dragonbreath" type="common" rank="5" level="12" index="83" combat="2">
-    <resource name="aura" amount="3" cost="fixed"/>
-  </spell>
   <spell name="magicstreet" type="common" rank="5" level="4" index="84" ship="true" far="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
     <resource name="stone" amount="1" cost="fixed"/>
@@ -592,9 +583,6 @@
   </spell>
   <spell name="break_curse" type="common" rank="3" level="7" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="3" cost="level"/>
-  </spell>
-  <spell name="meteor_rain" type="common" rank="5" level="3" index="108" variable="true" combat="2">
-    <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="fish_shield" type="common" rank="2" level="8" index="109" variable="true" combat="1">
     <resource name="aura" amount="4" cost="level"/>
@@ -646,40 +634,52 @@
   <spell name="shockwave" type="common" rank="5" level="5" index="163" variable="true" combat="2">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="wyrm_transformation" type="common" rank="5" level="1" index="166">
-    <resource name="aura" amount="1" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
   <spell name="eternal_walls" type="common" rank="5" level="7" index="167" parameters="b" ship="true" variable="true">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
-  <spell name="drain_skills" type="common" rank="5" level="12" index="174" combat="2">
-    <resource name="aura" amount="4" cost="fixed"/>
-  </spell>
-  <spell name="aura_of_fear" type="common" rank="5" level="12" index="175" combat="2">
-    <resource name="aura" amount="1" cost="level"/>
-  </spell>
-  <spell name="shadowcall" type="common" rank="5" level="12" index="176" combat="1">
-    <resource name="aura" amount="2" cost="level"/>
-  </spell>
-  <spell name="immolation" type="common" rank="5" level="12" index="180" combat="2">
-    <resource name="aura" amount="2" cost="level"/>
-  </spell>
-  <spell name="firestorm" type="common" rank="5" level="8" index="181" combat="2">
-    <resource name="aura" amount="2" cost="fixed"/>
-  </spell>
-  <spell name="coldfront" type="common" rank="5" level="8" index="182" combat="2">
-    <resource name="aura" amount="2" cost="fixed"/>
-  </spell>
-  <spell name="acidrain" type="common" rank="5" level="8" index="183" combat="2">
-    <resource name="aura" amount="2" cost="fixed"/>
-  </spell>
   <!-- end common spells -->
 
-  <!-- gray spells: given to individuals -->
+  <!-- gray spells: given to individuals or monsters -->
+  <spell name="fiery_dragonbreath" type="gray" rank="5" level="3" index="81" combat="2">
+    <resource name="aura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="icy_dragonbreath" type="gray" rank="5" level="6" index="82" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="powerful_dragonbreath" type="gray" rank="5" level="12" index="83" combat="2">
+    <resource name="aura" amount="3" cost="fixed"/>
+  </spell>
+  <spell name="meteor_rain" type="gray" rank="5" level="3" index="108" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="wyrm_transformation" type="gray" rank="5" level="1" index="166">
+    <resource name="aura" amount="1" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
   <spell name="transferauratraum" type="gray" rank="1" level="3" index="30" syntax="aura" parameters="ui" ship="true">
     <!-- Traum der Magie -->
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="drain_skills" type="gray" rank="5" level="12" index="174" combat="2">
+    <resource name="aura" amount="4" cost="fixed"/>
+  </spell>
+  <spell name="aura_of_fear" type="gray" rank="5" level="12" index="175" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="shadowcall" type="gray" rank="5" level="12" index="176" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="immolation" type="gray" rank="5" level="12" index="180" combat="2">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="firestorm" type="gray" rank="5" level="8" index="181" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="coldfront" type="gray" rank="5" level="8" index="182" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="acidrain" type="gray" rank="5" level="8" index="183" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
   <!-- end gray spells -->

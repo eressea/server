@@ -3481,20 +3481,41 @@ defaultorders (void)
 static void
 update_spells(void)
 {
-  region *r;
-  for(r=regions; r; r=r->next) {
-    unit *u;
-    for(u=r->units;u;u=u->next) {
-      if (u->faction!=NULL && u->number>0) {
-        sc_mage *m = get_mage(u);
-        if (!is_monsters(u->faction) && m != NULL) {
-          if (m->magietyp == M_GRAY) continue;
-          updatespelllist(u);
+  faction * f;
+
+  for (f=factions;f;f=f->next) {
+    if (f->magiegebiet!=M_NONE && !is_monsters(f)) {
+      unit * mages[MAXMAGICIANS];
+      unit *u;
+      int maxlevel = 0, n = 0, i;
+ 
+      for (u=f->units;u && n<MAXMAGICIANS;u=u->nextF) {
+        if (u->number>0) {
+          sc_mage *mage = get_mage(u);
+          if (mage) {
+            int level = eff_skill(u, SK_MAGIC, u->region);
+            if (level>maxlevel) maxlevel = level;
+            mages[n++] = u;
+          }
         }
+      }
+
+      if (FactionSpells() && maxlevel>f->max_spelllevel) {
+        update_spellbook(f, maxlevel);
+        for (i=0;i!=n;++i) {
+          sc_mage *mage = get_mage(mages[i]);
+          while (mage->spells) {
+            spell_list * slist = mage->spells;
+            mage->spells = slist->next;
+            free(slist);
+          }
+        }
+      }
+      for (i=0;i!=n;++i) {
+        updatespelllist(mages[i]);
       }
     }
   }
-
 }
 
 static void

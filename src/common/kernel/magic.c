@@ -415,7 +415,7 @@ update_spellbook(faction * f, int level)
 
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
-    if (sp->magietyp == M_COMMON && level<f->max_spelllevel && sp->level<=level) {
+    if (sp->magietyp == M_COMMON && level>f->max_spelllevel && sp->level<=level) {
       commonspells[numspells++] = sp;
     } else {
       if (know_school(f, sp->magietyp) && sp->level <= level) {
@@ -511,7 +511,7 @@ updatespelllist(unit * u)
     if (sp->level<=sk) {
       boolean know = u_hasspell(u, sp);
 
-      if (know || know_school(u->faction, sp->magietyp)) {
+      if (know || sp->magietyp==M_COMMON || know_school(u->faction, sp->magietyp)) {
         faction * f = u->faction;
 
         if (!know) add_spell(get_spelllist(mage, u->faction), sp);
