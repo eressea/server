@@ -461,6 +461,15 @@ faction_setpassword(faction * f, const char * passw)
   else f->passw = strdup(itoa36(rng_int()));
 }
 
+boolean valid_race(const struct faction * f, const struct race * rc)
+{
+  if (f->race==rc) return true;
+  else {
+    const char * str = get_param(f->race->parameters, "other_race");
+    return (str?rc_find(str)==rc:false);
+  }
+}
+
 const char *
 faction_getpassword(const faction * f)
 {

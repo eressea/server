@@ -144,6 +144,7 @@ void faction_setemail(struct faction * self, const char * email);
 
 const char * faction_getpassword(const struct faction * self);
 void faction_setpassword(struct faction * self, const char * password);
+boolean valid_race(const struct faction * f, const struct race * rc);
 
 #ifdef __cplusplus
 }

@@ -77,6 +77,14 @@ tolua_region_get_y(lua_State* L)
 }
 
 static int
+tolua_region_get_plane(lua_State* L)
+{
+  region * r = (region *)tolua_tousertype(L, 1, 0);
+  tolua_pushusertype(L, rplane(r), TOLUA_CAST "plane");
+  return 1;
+}
+
+static int
 tolua_region_get_terrain(lua_State* L)
 {
   region* self = (region*) tolua_tousertype(L, 1, 0);
@@ -463,6 +471,15 @@ tolua_plane_tostring(lua_State *L)
 }
 
 static int
+tolua_plane_get_size(lua_State *L)
+{
+  plane * pl = (plane *)tolua_tousertype(L, 1, 0);
+  lua_pushnumber(L, plane_width(pl));
+  lua_pushnumber(L, plane_height(pl));
+  return 2;
+}
+
+static int
 tolua_distance(lua_State *L)
 {
   int x1 = (int)tolua_tonumber(L, 1, 0);
@@ -502,6 +519,7 @@ tolua_region_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "id", tolua_region_get_id, NULL);
       tolua_variable(L, TOLUA_CAST "x", tolua_region_get_x, NULL);
       tolua_variable(L, TOLUA_CAST "y", tolua_region_get_y, NULL);
+      tolua_variable(L, TOLUA_CAST "plane", tolua_region_get_plane, NULL);
       tolua_variable(L, TOLUA_CAST "name", tolua_region_get_name, tolua_region_set_name);
       tolua_variable(L, TOLUA_CAST "info", tolua_region_get_info, tolua_region_set_info);
       tolua_variable(L, TOLUA_CAST "units", tolua_region_get_units, NULL);
@@ -544,6 +562,7 @@ tolua_region_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "get", tolua_plane_get);
       tolua_function(L, TOLUA_CAST "__tostring", tolua_plane_tostring);
 
+      tolua_function(L, TOLUA_CAST "size", tolua_plane_get_size);
       tolua_variable(L, TOLUA_CAST "id", tolua_plane_get_id, NULL);
       tolua_function(L, TOLUA_CAST "normalize", tolua_plane_normalize);
       tolua_variable(L, TOLUA_CAST "name", tolua_plane_get_name, tolua_plane_set_name);
