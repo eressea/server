@@ -390,11 +390,15 @@
 			>
 		</File>
 		<File
-			RelativePath="..\scripts\run-tests.lua"
+			RelativePath="..\scripts\run-e3a.lua"
 			>
 		</File>
 		<File
 			RelativePath=".\server.c"
+			>
+		</File>
+		<File
+			RelativePath="..\scripts\tests.lua"
 			>
 		</File>
 	</Files>

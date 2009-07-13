@@ -134,7 +134,7 @@ extern struct attrib_type at_stealth;
 
 void u_seteffstealth(struct unit * u, int value);
 int u_geteffstealth(const struct unit * u);
-
+const struct race * u_irace(const struct unit * u);
 struct building * usiege(const struct unit * u);
 void usetsiege(struct unit * u, const struct building * b);
 

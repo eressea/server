@@ -713,8 +713,8 @@ read_unit(struct storage * store)
   } else {
     store->r_tok_buf(store, rname, sizeof(rname));
   }
-  if (rname[0]) u->irace = rc_find(rname);
-  else u->irace = u->race;
+  if (rname[0] && skill_enabled[SK_STEALTH]) u->irace = rc_find(rname);
+  else u->irace = NULL;
 
   if (u->race->describe) {
     const char * rcdisp = u->race->describe(u, u->faction->locale);
@@ -822,6 +822,7 @@ write_unit(struct storage * store, const unit * u)
 {
   order * ord;
   int i, p = 0;
+  const race * irace = u_irace(u);
   write_unit_reference(u, store);
   write_faction_reference(u->faction, store);
   store->w_str(store, (const char *)u->name);
@@ -829,7 +830,7 @@ write_unit(struct storage * store, const unit * u)
   store->w_int(store, u->number);
   store->w_int(store, u->age);
   store->w_tok(store, u->race->_name[0]);
-  store->w_tok(store, u->irace!=u->race?u->irace->_name[0]:"");
+  store->w_tok(store, irace!=u->race?u->irace->_name[0]:"");
   write_building_reference(u->building, store);
   write_ship_reference(u->ship, store);
   store->w_int(store, u->status);
@@ -1536,9 +1537,17 @@ readgame(const char * filename, int mode, int backup)
 
       update_interval(u->faction, u->region);
       mage = get_mage(u);
-      if (mage && mage->spellcount<0) {
-        mage->spellcount = 0;
-        updatespelllist(u);
+      if (mage) {
+        faction * f = u->faction;
+        if (!is_monsters(f) && f->magiegebiet==M_GRAY) {
+          log_error(("faction %s had magic=gray, fixing (%s)\n", 
+            factionname(f), magic_school[mage->magietyp]));
+          f->magiegebiet = mage->magietyp;
+        }
+        if (mage->spellcount<0) {
+          mage->spellcount = 0;
+          updatespelllist(u);
+        }
       }
     }
   }

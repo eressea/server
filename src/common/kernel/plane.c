@@ -279,15 +279,16 @@ rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned c
 int
 resolve_plane(variant id, void * addr)
 {
+  int result = 0;
   plane * pl = NULL;
   if (id.i!=0) {
     pl = getplanebyid(id.i);
     if (pl==NULL) {
-      return -1;
+      result = -1;
     }
   }
   *(plane**)addr = pl;
-  return 0;
+  return result;
 }
 
 void

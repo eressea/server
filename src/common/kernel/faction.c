@@ -151,15 +151,16 @@ factionname(const faction * f)
 
 int
 resolve_faction(variant id, void * address) {
+  int result = 0;
   faction * f = NULL;
   if (id.i!=0) {
     f = findfaction(id.i);
     if (f==NULL) {
-      return -1;
+      result = -1;
     }
   }
   *(faction**)address = f;
-  return 0;
+  return result;
 }
 
 #define MAX_FACTION_ID (36*36*36*36)

@@ -1400,7 +1400,7 @@ do_fumble(castorder *co)
 
   case 1:
     /* Kröte */
-    if (u->irace == u->race) {
+    {
       /* one or two things will happen: the toad changes her race back,
       * and may or may not get toadslime.
       * The list of things to happen are attached to a timeout
@@ -1419,7 +1419,7 @@ do_fumble(castorder *co)
       if (duration<2) duration = 2;
       add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
       u->race = new_race[RC_TOAD];
-      u->irace = new_race[RC_TOAD];
+      u->irace = NULL;
       ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell",
         u, r, sp));
       break;
@@ -2294,8 +2294,8 @@ resolve_familiar(variant data, void * addr)
       unit * mage = (unit *)a->data.v;
       set_familiar(mage, familiar);
     }
-    *(unit**)addr = familiar;
   }
+  *(unit**)addr = familiar;
   return result;
 }
 
@@ -2373,8 +2373,8 @@ resolve_clone(variant data, void * addr)
       unit * mage = (unit *)a->data.v;
       set_clone(mage, clone);
     }
-    *(unit**)addr = clone;
   }
+  *(unit**)addr = clone;
   return result;
 }
 
@@ -2401,8 +2401,8 @@ resolve_mage(variant data, void * addr)
       unit * familiar = (unit *)a->data.v;
       set_familiar(mage, familiar);
     }
-    *(unit **)addr = mage;
   }
+  *(unit **)addr = mage;
   return result;
 }
 

@@ -2732,6 +2732,7 @@ resolve_buddy(variant data, void * addr)
     } else {
       /* fail, object does not exist (but if you're still loading then 
       * you may want to try again later) */
+      *(curse**)addr = NULL;
       return -1;
     }
   }
@@ -3065,7 +3066,8 @@ sp_unholypower(castorder *co)
 
     if (u->number <= n) {
       n -= u->number;
-      u->race = u->irace = target_race;
+      u->irace = NULL;
+      u->race = target_race;
       u->hp = unit_max_hp(u)*u->number - wounds;
       ADDMSG(&co->rt->msgs, msg_message("unholypower_effect",
         "mage target race", mage, u, target_race));
@@ -4858,6 +4860,7 @@ sp_illusionary_shapeshift(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
+  const race * irace;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4879,8 +4882,9 @@ sp_illusionary_shapeshift(castorder *co)
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_shapeshift_fail", "target race", u, rc));
     return 0;
   }
-  if (u->irace == u->race) {
-    trigger * trestore = trigger_changerace(u, NULL, u->irace);
+  irace = u_irace(u);
+  if (irace == u->race) {
+    trigger * trestore = trigger_changerace(u, NULL, irace);
     add_trigger(&u->attribs, "timer", trigger_timeout((int)power+2, trestore));
     u->irace = rc;
   }

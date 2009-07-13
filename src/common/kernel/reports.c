@@ -302,8 +302,9 @@ void
 report_race(const struct unit * u, const char ** name, const char ** illusion)
 {
   if (illusion) {
-    if (u->irace && u->irace!=u->race) {
-      *illusion = u->irace->_name[0];
+    const race * irace = u_irace(u);
+    if (irace!=u->race) {
+      *illusion = irace->_name[0];
     }
     else {
       *illusion = NULL;
@@ -533,9 +534,10 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
       }
     }
   } else {
-    bytes = (int)strlcpy(bufp, racename(f->locale, u, u->irace), size);
+    const race * irace = u_irace(u);
+    bytes = (int)strlcpy(bufp, racename(f->locale, u, irace), size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    if (u->faction==f && u->irace!=u->race) {
+    if (u->faction==f && irace!=u->race) {
       bytes = (int)strlcpy(bufp, " (", size);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       bytes = (int)strlcpy(bufp, racename(f->locale, u, u->race), size);

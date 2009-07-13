@@ -309,7 +309,8 @@ make_zombie(unit * u)
 {
   u_setfaction(u, get_monsters());
   scale_number(u, 1);
-  u->race = u->irace = new_race[RC_ZOMBIE];
+  u->race = new_race[RC_ZOMBIE];
+  u->irace = NULL;
 }
 
 /** remove the unit from the list of active units.
@@ -642,6 +643,7 @@ resolve_unit(variant id, void * address)
   if (id.i!=0) {
     u = findunit(id.i);
     if (u==NULL) {
+      *(unit**)address = NULL;
       return -1;
     }
   }
@@ -1451,7 +1453,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
   addlist(&u->orders, deford);
   u_seteffstealth(u, -1);
   u->race = urace;
-  u->irace = urace;
+  u->irace = NULL;
 
   set_number(u, number);
 
@@ -1727,4 +1729,12 @@ scale_number (unit * u, int n)
   }
 
   set_number(u, n);
+}
+
+const struct race * u_irace(const struct unit * u)
+{
+  if (skill_enabled[SK_STEALTH]) {
+    return u->irace;
+  }
+  return u->race;
 }

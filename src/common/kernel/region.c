@@ -1370,6 +1370,7 @@ resolve_region_coor(variant id, void * address) {
     *(region**)address = r;
     return 0;
   }
+  *(region**)address = NULL;
   return -1;
 }
 
@@ -1380,6 +1381,7 @@ resolve_region_id(variant id, void * address)
   if (id.i!=0) {
     r = findregionbyid((unsigned int)id.i);
     if (r==NULL) {
+      *(region**)address = NULL;
       return -1;
     }
   }

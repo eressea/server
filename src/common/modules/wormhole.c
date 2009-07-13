@@ -119,6 +119,7 @@ resolve_exit(variant id, void * address)
     *rp = b->region;
     return 0;
   }
+  *rp = NULL;
   return -1;
 }
 

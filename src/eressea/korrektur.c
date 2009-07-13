@@ -236,7 +236,7 @@ no_teurefremde(boolean convert)
           log_warning(("Teurer Migrant: %s, Partei %s\n", unitname(u), factionname(f)));
           if (convert) {
             u->race = f->race;
-            u->irace = f->race;
+            u->irace = NULL;
             ADDMSG(&u->faction->msgs, msg_message("migrant_conversion", "unit", u));
           }
         }

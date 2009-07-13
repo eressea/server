@@ -64,7 +64,7 @@ age_skeleton(unit *u)
     int n = MAX(1,u->number/2);
     double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
     u->race = new_race[RC_SKELETON_LORD];
-    u->irace = new_race[RC_SKELETON_LORD];
+    u->irace = NULL;
     scale_number(u,n);
     u->hp = (int) (unit_max_hp(u) * u->number * q);
   }
@@ -77,7 +77,7 @@ age_zombie(unit *u)
     int n = MAX(1,u->number/2);
     double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
     u->race = new_race[RC_ZOMBIE_LORD];
-    u->irace = new_race[RC_ZOMBIE_LORD];
+    u->irace = NULL;
     scale_number(u,n);
     u->hp = (int) (unit_max_hp(u) * u->number * q);
   }
@@ -90,7 +90,7 @@ age_ghoul(unit *u)
     int n = MAX(1,u->number/2);
     double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
     u->race = new_race[RC_GHOUL_LORD];
-    u->irace = new_race[RC_GHOUL_LORD];
+    u->irace = NULL;
     scale_number(u,n);
     u->hp = (int) (unit_max_hp(u) * u->number * q);
   }

@@ -766,10 +766,12 @@ cr_output_unit(FILE * F, const region * r,
         add_translation(zRace, locale_string(f->locale, zRace)));
     }
   } else {
-    const char * zRace = rc_name(u->irace, 1);
+    const race * irace = u_irace(u);
+    const char * zRace = rc_name(irace, 1);
     fprintf(F, "\"%s\";Typ\n",
       add_translation(zRace, locale_string(f->locale, zRace)));
-    if (u->faction==f && u->irace!=u->race) {
+    if (u->faction==f && irace!=u->race) {
+      assert(skill_enabled[SK_STEALTH] || !"we're resetting this on load, so.. ircase should never be used");
       zRace = rc_name(u->race, 1);
       fprintf(F, "\"%s\";wahrerTyp\n",
         add_translation(zRace, locale_string(f->locale, zRace)));

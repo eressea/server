@@ -82,15 +82,16 @@ find_border(unsigned int id)
 int
 resolve_borderid(variant id, void * addr)
 {
+  int result = 0;
   border * b = NULL;
   if (id.i!=0) {
     b = find_border(id.i);
     if (b==NULL) {
-      return -1;
+      result = -1;
     }
   }
   *(border**)addr = b;
-  return 0;
+  return result;
 }
 
 static border **

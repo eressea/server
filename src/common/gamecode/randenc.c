@@ -344,8 +344,8 @@ get_allies(region * r, unit * u)
 
 	u_setfaction(newunit, u->faction);
 	set_racename(&newunit->attribs, get_racename(u->attribs));
-	if(u->race->flags & RCF_SHAPESHIFT) {
-		newunit->irace = u->irace;
+	if (u->race->flags & RCF_SHAPESHIFT) {
+      newunit->irace = u->irace;
 	}
 	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
 	fset(newunit, UFL_ISNEW);

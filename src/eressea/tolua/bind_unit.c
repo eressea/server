@@ -836,7 +836,7 @@ static int tolua_unit_set_race(lua_State* L)
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
     if (count_unit(self)) --self->faction->no_units;
-    if (self->irace==self->race) self->irace = rc;
+    if (self->irace==self->race) self->irace = NULL;
     self->race = rc;
     if (count_unit(self)) --self->faction->no_units;
   }

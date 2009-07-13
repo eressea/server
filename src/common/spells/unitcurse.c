@@ -109,7 +109,7 @@ cinfo_calm(const void * obj, typ_t typ, const curse *c, int self)
     unit *u = (unit *)obj;
 
     if (f==NULL || self == 0) {
-      const struct race * rc = c->magician->irace;
+      const struct race * rc = u_irace(c->magician);
       return msg_message("curseinfo::calm_0", "unit race id", u, rc, c->no);
     }
     return msg_message("curseinfo::calm_1", "unit faction id", u, f, c->no);

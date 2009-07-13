@@ -861,19 +861,23 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
 {
   if (u->race == new_race[RC_DAEMON]) {
     change_effect(u, itype->rtype->ptype, 100*amount);
-  } else if (u->irace == u->race) {
-    static race * rcfailure;
-    if (!rcfailure) {
-      rcfailure = rc_find("smurf");
-      if (!rcfailure) rcfailure = rc_find("toad");
-    }
-    if (rcfailure) {
-      trigger * trestore = trigger_changerace(u, u->race, u->irace);
-      if (trestore) {
-        int duration = 2 + rng_int() % 8;
+  } else {
+    const race * irace = u_irace(u);
+    if (irace == u->race) {
+      static race * rcfailure;
+      if (!rcfailure) {
+        rcfailure = rc_find("smurf");
+        if (!rcfailure) rcfailure = rc_find("toad");
+      }
+      if (rcfailure) {
+        trigger * trestore = trigger_changerace(u, u->race, irace);
+        if (trestore) {
+          int duration = 2 + rng_int() % 8;
 
-        add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-        u->irace = u->race = rcfailure;
+          add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+          u->irace = NULL;
+          u->race = rcfailure;
+        }
       }
     }
   }

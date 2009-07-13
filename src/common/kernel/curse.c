@@ -714,15 +714,16 @@ is_cursed_with(const attrib *ap, const curse *c)
 int
 resolve_curse(variant id, void * address)
 {
+  int result = 0;
   curse * c = NULL;
   if (id.i!=0) {
     c = cfindhash(id.i);
     if (c==NULL) {
-      return -1;
+      result = -1;
     }
   }
   *(curse**)address = c;
-  return 0;
+  return result;
 }
 
 static const char * oldnames[MAXCURSE] = {

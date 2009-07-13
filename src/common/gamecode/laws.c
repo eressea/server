@@ -268,14 +268,12 @@ get_food(region *r)
 
       if (food_rules&2) {
         /* the owner of the region is the first faction to help out when you're hungry */
-        if (r->land->ownership) {
-          faction * owner = r->land->ownership->owner;
-          if (owner && owner!=u->faction) {
-            for (v=r->units;v;v=v->next) {
-              if (v->faction==owner && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
-                help_feed(v, u, &need);
-                break;
-              }
+        faction * owner = region_get_owner(r);
+        if (owner && owner!=u->faction) {
+          for (v=r->units;v;v=v->next) {
+            if (v->faction==owner && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
+              help_feed(v, u, &need);
+              break;
             }
           }
         }
@@ -3048,7 +3046,7 @@ ageing(void)
         curse *c = get_curse(u->attribs, ct_find("oldrace"));
         if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
           u->race = new_race[curse_geteffect(c)];
-          u->irace = new_race[curse_geteffect(c)];
+          u->irace = NULL;
         }
       }
     }

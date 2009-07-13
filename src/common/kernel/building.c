@@ -427,15 +427,16 @@ write_building_reference(const struct building * b, struct storage * store)
 int
 resolve_building(variant id, void * address)
 {
+  int result = 0;
   building * b = NULL;
   if (id.i!=0) {
     b = findbuilding(id.i);
     if (b==NULL) {
-      return -1;
+      result = -1;
     }
   }
   *(building**)address = b;
-  return 0;
+  return result;
 }
 
 variant
