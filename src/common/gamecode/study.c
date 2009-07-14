@@ -540,19 +540,19 @@ learn_cmd(unit * u, order * ord)
     return 0;
   }
   if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {
-	  cmistake(u, ord, 77, MSG_EVENT);
+	  cmistake(u, ord, 771, MSG_EVENT);
     return 0;
   }
   /* Hack: Talente mit Malus -99 können nicht gelernt werden */
   if (u->race->bonus[sk] == -99) {
-    cmistake(u, ord, 77, MSG_EVENT);
+    cmistake(u, ord, 771, MSG_EVENT);
     return 0;
   }
   if (learn_newskills==0) {
     skill * sv = get_skill(u, sk);
     if (sv==NULL) {
       /* we can only learn skills we already have */
-      cmistake(u, ord, 77, MSG_EVENT);
+      cmistake(u, ord, 771, MSG_EVENT);
       return 0;
     }
   }

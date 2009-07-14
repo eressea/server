@@ -6070,7 +6070,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ein Fluch verhindert die Übergabe."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - A curse prevented the transfer from happening."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - A curse prevented the transfer from happening."</text>
   </message>
   <message name="error77" section="errors">
@@ -6080,8 +6079,16 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieses Talent wurde nicht erkannt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The skill could not be recognized."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The skill could not be recognized."</text>
+  </message>
+  <message name="error771" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieses Talent kann die Einheit nicht lernen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot learn this skill."</text>
   </message>
   <message name="error76" section="errors">
     <type>
@@ -6090,7 +6097,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Gegenstand kann man nicht benutzen."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This item cannot be used."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This item cannot be used."</text>
   </message>
   <message name="error75" section="errors">
@@ -6100,7 +6106,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit nimmt niemanden an."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit does not take anybody."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit does not take anybody."</text>
   </message>
   <message name="error73" section="errors">
@@ -6110,7 +6115,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine hungernde Einheit kann niemanden weggeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Hungry units cannot give anybody away."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Hungry units cannot give anybody away."</text>
   </message>
   <message name="error74" section="errors">
@@ -6120,7 +6124,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kann niemanden weggeben."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give anybody away."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit cannot give anybody away."</text>
   </message>
 
@@ -6153,7 +6156,6 @@
       <arg name="target" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen und widersteht dem Zauber."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, and resists the spell."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, and resists the spell."</text>
   </message>
   <message name="feedback_no_contact_no_resist" section="errors">
@@ -6164,7 +6166,6 @@
       <arg name="target" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen, aber widersteht dem Zauber nicht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, but cannot resist the spell."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) did not contact us, but cannot resist the spell."</text>
   </message>
   <message name="error71" section="errors">
@@ -6174,7 +6175,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Richtung wurde nicht erkannt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Direction was not recognized."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Direction was not recognized."</text>
   </message>
   <message name="unknowndirection" section="errors">
@@ -6185,7 +6185,6 @@
       <arg name="dirname" type="string"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Richtung '$dirname' wurde nicht erkannt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Direction '$dirname' was not recognized."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Direction '$dirname' was not recognized."</text>
   </message>
   <message name="error70" section="errors">
@@ -6195,7 +6194,6 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Region wird von Nichtalliierten bewacht."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - This region is guarded by a non allied faction."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This region is guarded by a non allied faction."</text>
   </message>
   <message name="region_guarded" section="errors">
