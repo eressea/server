@@ -33,7 +33,7 @@ eatwhite(const char * ptr, size_t * total_size)
     size_t size = 0;
     ret = unicode_utf8_to_ucs4(&ucs, ptr, &size);
     if (ret!=0) break;
-    if (!iswspace((wint_t)ucs)) break;
+    if (!iswxspace((wint_t)ucs)) break;
     *total_size += size;
     ptr += size;
   }
@@ -54,7 +54,7 @@ getbuf_latin1(FILE * F)
     const char * bp = fgets(lbuf, MAXLINE, F);
 
     if (bp==NULL) return NULL;
-    while (*bp && isspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
+    while (*bp && isxspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
 
     comment = (boolean)(comment && cont);
 
@@ -108,14 +108,14 @@ getbuf_latin1(FILE * F)
 
       if (iscntrl(c)) {
         if (!comment && cp<fbuf+MAXLINE) {
-          *cp++ = isspace(c)?' ':'?';
+          *cp++ = isxspace(c)?' ':'?';
         }
         ++bp;
         continue;
-      } else if (isspace(c)) {
+      } else if (isxspace(c)) {
         if (!quote) {
           ++bp;
-          while (*bp && isspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
+          while (*bp && isxspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
           if (!comment && *bp && *bp!=COMMENT_CHAR && cp<fbuf+MAXLINE) *(cp++) = ' ';
         }
         else if (!comment && cp+1<=fbuf+MAXLINE) {
@@ -126,7 +126,7 @@ getbuf_latin1(FILE * F)
         continue;
       } else if (c==CONTINUE_CHAR) {
         const char * end = ++bp;
-        while (*end && isspace(*(unsigned char*)end)) ++end; /* eatwhite */
+        while (*end && isxspace(*(unsigned char*)end)) ++end; /* eatwhite */
         if (*end == '\0') {
           bp = end;
           cont = true;
@@ -250,7 +250,7 @@ getbuf_utf8(FILE * F)
         break;
       }
 
-      if (iswspace((wint_t)ucs)) {
+      if (iswxspace((wint_t)ucs)) {
         if (!quote) {
           bp += size;
           ret = eatwhite(bp, &size);

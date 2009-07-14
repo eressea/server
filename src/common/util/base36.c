@@ -35,7 +35,7 @@ atoi36(const char * str)
   assert(s);
   if(!(*s)) return 0;
 
-  while(isspace(*(unsigned char*)s)) ++s;
+  while(isxspace(*(unsigned char*)s)) ++s;
   if (*s == '-') {
     sign = -1;
     ++s;

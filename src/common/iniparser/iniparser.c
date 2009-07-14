@@ -86,7 +86,7 @@ static char * strskp(char * s)
 {
     char * skip = s;
     if (s==NULL) return NULL ;
-    while (isspace((int)*skip) && *skip) skip++;
+    while (isxspace((int)*skip) && *skip) skip++;
     return skip ;
 }
 
@@ -117,7 +117,7 @@ static char * strcrop(char * s)
     strcpy(l, s);
     last = l + strlen(l);
     while (last > l) {
-        if (!isspace((int)*(last-1)))
+        if (!isxspace((int)*(last-1)))
             break ;
         last -- ;
     }

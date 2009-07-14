@@ -3530,11 +3530,11 @@ simplename(region * r)
   const char * cp = rname(r, NULL);
   for (i=0;*cp && i!=16;++i, ++cp) {
     int c = *(unsigned char *)cp;
-    while (c && !isalpha(c) && !isspace(c)) {
+    while (c && !isalpha(c) && !isxspace(c)) {
       ++cp;
       c = *(unsigned char*)cp;
     }
-    if (isspace(c)) name[i] = '_';
+    if (isxspace(c)) name[i] = '_';
     else name[i] = *cp;
     if (c==0) break;
   }

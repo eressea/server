@@ -275,6 +275,9 @@ extern char * strdup(const char *s);
 # define INLINE_FUNCTION
 #endif
 
+#define iswxspace(c) (c==160 || iswspace(c))
+#define isxspace(c) (c==160 || isspace(c))
+
 #define TOLUA_CAST (char*)
 #endif
 

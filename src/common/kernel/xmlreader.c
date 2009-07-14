@@ -108,8 +108,8 @@ xml_cleanup_string(xmlChar * str)
 
   while (*read) {
     /* eat leading whitespace */
-    if (*read && isspace(*read)) {
-      while (*read && isspace(*read)) {
+    if (*read && isxspace(*read)) {
+      while (*read && isxspace(*read)) {
         ++read;
       }
       *write++ = ' ';

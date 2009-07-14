@@ -31,7 +31,7 @@ eatwhitespace_c(const char ** str_p)
   for (;;) {
     unsigned char utf8_character = (unsigned char)*str;
     if (~utf8_character & 0x80) {
-      if (!iswspace(utf8_character)) break;
+      if (!iswxspace(utf8_character)) break;
       ++str;
     } else {
       ret = unicode_utf8_to_ucs4(&ucs, str, &len);
@@ -39,7 +39,7 @@ eatwhitespace_c(const char ** str_p)
         log_warning(("illegal character sequence in UTF8 string: %s\n", str));
         break;
       }
-      if (!iswspace((wint_t)ucs)) break;
+      if (!iswxspace((wint_t)ucs)) break;
       str+=len;
     }
   }
@@ -106,7 +106,7 @@ skip_token(void)
         log_warning(("illegal character sequence in UTF8 string: %s\n", state->current_token));
       }
     }
-    if (iswspace((wint_t)ucs) && quotechar==0) {
+    if (iswxspace((wint_t)ucs) && quotechar==0) {
       return;
     } else {
       switch(utf8_character) {
@@ -154,7 +154,7 @@ parse_token(const char ** str)
     if (escape) {
       copy = true;
       escape = false;
-    } else if (iswspace((wint_t)ucs)) {
+    } else if (iswxspace((wint_t)ucs)) {
       if (quotechar==0) break;
       copy = true;
     } else if (utf8_character=='"' || utf8_character=='\'') {

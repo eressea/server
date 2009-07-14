@@ -137,7 +137,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
   for (;;) {
     int c = fgetc(F);
 
-    if (isspace(c)) {
+    if (isxspace(c)) {
       if (str==start) {
         continue;
       }

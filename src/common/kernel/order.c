@@ -353,7 +353,7 @@ parse_order(const char * s, const struct locale * lang)
     sptr = s;
     kwd = findkeyword(parse_token(&sptr), lang);
     if (kwd!=NOKEYWORD) {
-      while (isspace(*(unsigned char*)sptr)) ++sptr;
+      while (isxspace(*(unsigned char*)sptr)) ++sptr;
       s = sptr;
     }
     return create_order_i(kwd, s, persistent, lang);

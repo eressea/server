@@ -1645,7 +1645,7 @@ estring_i(char *ibuf)
   char *p = ibuf;
 
   while (*p) {
-    if (isspace(*(unsigned*)p) == ' ') {
+    if (isxspace(*(unsigned*)p) == ' ') {
       *p = '~';
     }
     ++p;
