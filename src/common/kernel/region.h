@@ -252,6 +252,7 @@ struct region * r_connect(const struct region *, direction_t dir);
 void free_regions(void);
 
 int region_get_morale(const region * r);
+void region_set_morale(region * r, int morale);
 
 void write_region_reference(const struct region * r, struct storage * store);
 variant read_region_reference(struct storage * store);

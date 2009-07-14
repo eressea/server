@@ -161,6 +161,20 @@ static int tolua_region_set_name(lua_State* L)
 }
 
 
+static int tolua_region_get_morale(lua_State* L)
+{
+  region* r = (region*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, region_get_morale(r));
+  return 1;
+}
+
+static int tolua_region_set_morale(lua_State* L)
+{
+  region* r = (region*)tolua_tousertype(L, 1, 0);
+  region_set_morale(r, (int)tolua_tonumber(L, 2, 0));
+  return 0;
+}
+
 static int tolua_region_get_flag(lua_State* L)
 {
   region* self = (region*)tolua_tousertype(L, 1, 0);
@@ -175,8 +189,11 @@ static int tolua_region_get_adj(lua_State* L)
   region* self = (region*)tolua_tousertype(L, 1, 0);
   direction_t dir = (direction_t)tolua_tonumber(L, 2, 0);
 
-  tolua_pushusertype(L, (void*)r_connect(self, dir), TOLUA_CAST "region");
-  return 1;
+  if (dir>=0 && dir<MAXDIRECTIONS) {
+    tolua_pushusertype(L, (void*)r_connect(self, dir), TOLUA_CAST "region");
+    return 1;
+  }
+  return 0;
 }
 
 static int tolua_region_set_flag(lua_State* L)
@@ -521,6 +538,7 @@ tolua_region_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "y", tolua_region_get_y, NULL);
       tolua_variable(L, TOLUA_CAST "plane", tolua_region_get_plane, NULL);
       tolua_variable(L, TOLUA_CAST "name", tolua_region_get_name, tolua_region_set_name);
+      tolua_variable(L, TOLUA_CAST "morale", tolua_region_get_morale, tolua_region_set_morale);
       tolua_variable(L, TOLUA_CAST "info", tolua_region_get_info, tolua_region_set_info);
       tolua_variable(L, TOLUA_CAST "units", tolua_region_get_units, NULL);
       tolua_variable(L, TOLUA_CAST "ships", tolua_region_get_ships, NULL);
