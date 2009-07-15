@@ -67,7 +67,8 @@ typedef struct building_type {
 
 extern building_type * bt_find(const char* name);
 extern void register_buildings(void);
-extern void bt_register(building_type * type);
+extern void bt_register(struct building_type * type);
+extern int bt_effsize(const struct building_type * btype, int bsize);
 
 /* buildingt => building_type
  * Name => locale_string(name)

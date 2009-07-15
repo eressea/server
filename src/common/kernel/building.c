@@ -255,15 +255,8 @@ init_smithy(struct building_type * bt)
 static const char *
 castle_name_i(const struct building_type* btype, int bsize, const char * fname[])
 {
-  const construction * ctype;
-  int i = 0;
+  int i = bt_effsize(btype, bsize);
 
-  ctype = btype->construction;
-  while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
-    bsize-=ctype->maxsize;
-    ctype=ctype->improvement;
-    ++i;
-  }
   return fname[i];
 }
 
@@ -304,16 +297,7 @@ fort_name(const struct building_type* btype, int bsize)
     "guardhouse",
     "guardtower",
   };
-  const construction * ctype;
-  int i = 0;
-
-  ctype = btype->construction;
-  while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
-    bsize-=ctype->maxsize;
-    ctype=ctype->improvement;
-    ++i;
-  }
-  return fname[i];
+  return castle_name_i(btype, bsize, fname);
 }
 
 #ifdef WDW_PYRAMID
@@ -577,8 +561,6 @@ extern struct attrib_type at_icastle;
 int
 buildingeffsize(const building * b, boolean img)
 {
-  int i = b->size, n = 0;
-  const construction * cons;
   const struct building_type * btype = NULL;
 
   if (b==NULL) return 0;
@@ -590,7 +572,14 @@ buildingeffsize(const building * b, boolean img)
       btype = (const struct building_type *)a->data.v;
     }
   }
-  cons = btype->construction;
+  return bt_effsize(btype, b->size);
+}
+
+int bt_effsize(const building_type * btype, int bsize)
+{
+  int i = bsize, n = 0;
+  const construction * cons = btype->construction;
+
   if (!cons || !cons->improvement) {
     return 0;
   }
