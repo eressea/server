@@ -233,12 +233,12 @@ getbuf_utf8(FILE * F)
       if (*bp=='"' || *bp=='\'') {
         if (quote==*bp) {
           quote = 0;
-          if (cp<fbuf+MAXLINE) *cp++ = *bp;
+          if (!comment && cp<fbuf+MAXLINE) *cp++ = *bp;
           ++bp;
           continue;
         } else if (!quote) {
           quote = *bp++;
-          if (cp<fbuf+MAXLINE) *cp++ = quote;
+          if (!comment && cp<fbuf+MAXLINE) *cp++ = quote;
           continue;
         }
       }
