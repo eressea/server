@@ -3,7 +3,7 @@
   <item weight="400" score="150">
     <function name="canuse" value="lua_canuse_item"/>
     <construction skill="armorer" minskill="4" reqsize="1">
-      <requirement type="iron" quantity="5"/>
+      <requirement type="iron" quantity="4"/>
     </construction>
     <armor ac="3" penalty="0.15" projectile="0.10" magres="0.0"/>
   </item>
