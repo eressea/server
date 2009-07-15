@@ -20,6 +20,7 @@
 #include "build.h"
 #include "unit.h"
 #include "item.h"
+#include "race.h"
 #include "region.h"
 #include "skill.h"
 
@@ -267,14 +268,27 @@ shipcapacity (const ship * sh)
 void
 getshipweight(const ship * sh, int *sweight, int *scabins)
 {
-	unit * u;
-	*sweight = 0;
-	*scabins = 0;
-	for (u = sh->region->units; u; u = u->next)
-	if (u->ship == sh) {
-		*sweight += weight(u);
-		*scabins += u->number;
-	}
+  static int rule_capacity = -1;
+  unit * u;
+
+  *sweight = 0;
+  *scabins = 0;
+
+  if (rule_capacity<0) {
+    rule_capacity = get_param_int(global.parameters, "rules.ship.capacity", 0);
+  }
+  for (u = sh->region->units; u; u = u->next) {
+    if (u->ship == sh) {
+      *sweight += weight(u);
+      if (rule_capacity==0) {
+        *scabins += u->number;
+      } else {
+        /* weight goes into number of cabins, not cargo */
+        scabins += u->number * u->race->weight;
+        sweight -= u->number * u->race->weight;
+      }
+    }
+  }
 }
 
 unit *

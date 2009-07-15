@@ -607,16 +607,19 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 
   /* calculate cargo */
   if (u && (u->faction == f || omniscient(f))) {
-    int n = 0, p = 0, c = shipcapacity(sh);
+    static int rule_capacity = -1;
+    int n = 0, p = 0;
+    int mweight = shipcapacity(sh);
+    int mcabins = sh->type->cabins;
     getshipweight(sh, &n, &p);
 
     fprintf(F, "%d;cargo\n", n);
-    fprintf(F, "%d;capacity\n", c);
+    fprintf(F, "%d;capacity\n", mcabins);
     fprintf(F, "%d;speed\n", shipspeed(sh, u));
 
     n = (n+99) / 100; /* 1 Silber = 1 GE */
     fprintf(F, "%d;Ladung\n", n);
-    fprintf(F, "%d;MaxLadung\n", c / 100);
+    fprintf(F, "%d;MaxLadung\n", mweight / 100);
   }
   /* shore */
   w = NODIRECTION;

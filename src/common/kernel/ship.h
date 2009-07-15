@@ -72,6 +72,7 @@ extern void st_register(const ship_type * type);
 #define SF_MOVED   1<<1
 #define SF_DAMAGED 1<<2 /* for use in combat */
 #define SF_SELECT  1<<3 /* previously FL_DH */
+#define SF_FISHING 1<<4 /* was on an ocean, can fish */
 
 typedef struct ship {
   struct ship *next;

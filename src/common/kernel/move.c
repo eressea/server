@@ -459,19 +459,29 @@ canride(unit * u)
 static boolean
 cansail(const region * r, ship * sh)
 {
-	int n = 0, p = 0;
+  /* sonst ist construction:: size nicht ship_type::maxsize */
+  assert(!sh->type->construction || sh->type->construction->improvement == NULL);
 
-	 /* sonst ist construction:: size nicht ship_type::maxsize */
-	assert(!sh->type->construction || sh->type->construction->improvement == NULL);
+  if (sh->type->construction && sh->size!=sh->type->construction->maxsize) {
+    return false;
+  } else {
+    static int rule_capacity = -1;
+    int n = 0, p = 0;
+    int mweight = shipcapacity(sh);
+    int mcabins = sh->type->cabins;
 
-	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
-	  return false;
-	getshipweight(sh, &n, &p);
+    if (rule_capacity<0) {
+      rule_capacity = get_param_int(global.parameters, "rules.ship.capacity", 0);
+    }
+    if (rule_capacity!=0) {
+      mcabins *= PERSON_WEIGHT;
+    }
+    getshipweight(sh, &n, &p);
 
-	if (n > shipcapacity(sh)) return false;
-	if (p > sh->type->cabins) return false;
-
-	return true;
+    if (n > mweight) return false;
+    if (p > mcabins) return false;
+  }
+  return true;
 }
 
 int
@@ -729,6 +739,10 @@ drifting_ships(region * r)
       unit *firstu = NULL, *captain;
       int d_offset;
       direction_t dir = 0;
+
+      if (sh->type->fishing>0) {
+        sh->flags |= SF_FISHING;
+      }
 
       /* Schiff schon abgetrieben oder durch Zauber geschützt? */
       if (fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {

@@ -221,10 +221,30 @@ get_food(region *r)
    * jede Einheit genug Silber für ihren Unterhalt hat. */
 
   for (u = r->units; u; u = u->next) {
-    int need = lifestyle(u);
+    int style = lifestyle(u);
+    int need = style;
 
     /* Erstmal zurücksetzen */
     freset(u, UFL_HUNGER);
+
+    if (u->ship && (u->ship->flags&SF_FISHING)) {
+      unit * v;
+      int c = 2;
+      for (v=r->units;c>0 && v;v=v->next) {
+        if (v->ship==u->ship) {
+          if (u==v) {
+            if (u->number==c) {
+              need = 0;
+            } else {
+              int x = MIN(c, u->number);
+              int save = (style * x) / u->number;
+              need -= save;
+            }
+          }
+          c -= v->number;
+        }
+      }
+    }
 
     if (food_rules&1) {
       /* if the region is owned, and the owner is nice, then we'll get 
