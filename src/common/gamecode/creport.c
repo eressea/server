@@ -631,12 +631,17 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 }
 
 static void
-fwriteorder(FILE * F, const struct order * ord, const struct locale * lang)
+fwriteorder(FILE * F, const struct order * ord, const struct locale * lang, boolean escape)
 {
+  char ebuf[1024];
   char obuf[1024];
+  const char * str = obuf;
   fputc('"', F);
   write_order(ord, obuf, sizeof(obuf));
-  if (obuf[0]) fputs(obuf, F);
+  if (escape) {
+    str = escape_string(obuf, ebuf, sizeof(ebuf));
+  }
+  if (str[0]) fputs(str, F);
   fputc('"', F);
 }
 
@@ -842,14 +847,14 @@ cr_output_unit(FILE * F, const region * r,
     for (ord = u->old_orders; ord; ord = ord->next) {
       /* this new order will replace the old defaults */
       if (is_persistent(ord)) {
-        fwriteorder(F, ord, f->locale);
+        fwriteorder(F, ord, f->locale, true);
         fputc('\n', F);
       }
     }
     for (ord = u->orders; ord; ord = ord->next) {
       if (u->old_orders && is_repeated(ord)) continue; /* unit has defaults */
       if (is_persistent(ord)) {
-        fwriteorder(F, ord, f->locale);
+        fwriteorder(F, ord, f->locale, true);
         fputc('\n', F);
       }
     }

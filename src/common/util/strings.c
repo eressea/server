@@ -34,26 +34,82 @@ hashstring(const char* s)
   return key & 0x7FFFFFFF;
 }
 
+/*
+static const char *
+escape_string_inplace(char * buffer, unsigned int len, unsigned int offset)
+{
+#define MAXQUOTES 32
+  char * o;
+  char * d[MAXQUOTES+1];
+  int i = 0;
+
+  o = strchr(buffer, '"');
+  if (!o) {
+    return buffer;
+  }
+
+  while (*o && i<MAXQUOTES) {
+    char * next = strchr(o, '"');
+    d[i++] = o;
+    o = next?next:(o+strlen(o));
+  }
+  d[i] = o;
+  if (i<MAXQUOTES) {
+    // more than 32 hits! must go recursive
+    char * start = d[i];
+    unsigned int nlen = len - (start-buffer) - MAXQUOTES;
+    escape_string_inplace(start, nlen, MAXQUOTES);
+  }
+
+  o[i] = '\0';
+  while (--i>0) {
+    const char * src = d[i];
+    char * dst = d[i] + i + offset;
+    size_t mlen = d[i+1] - d[i];
+    memmove(dst--, src, mlen);
+    *dst = '\\';
+  }
+  return buffer;
+}
+*/
+
 INLINE_FUNCTION const char *
 escape_string(const char * str, char * buffer, unsigned int len)
 {
-	static char s_buffer[4096]; /* STATIC_RESULT: used for return, not across calls */
-	const char * p = str;
-	char * o;
-	if (buffer==NULL) {
-		buffer = s_buffer;
-		len = sizeof(s_buffer);
-	}
-	o = buffer;
-	do {
-		switch (*p) {
-		case '\"':
-		case '\\':
-			(*o++) = '\\';
-		}
-		(*o++) = (*p);
-	} while (*p++);
-	return buffer;
+  const char * start = strchr(str, '\"');
+  if (start) {
+    static char s_buffer[4096]; /* STATIC_RESULT: used for return, not across calls */
+    const char * p;
+    char * o;
+    size_t skip = start-str;
+
+    if (buffer==NULL) {
+      buffer = s_buffer;
+      len = sizeof(s_buffer);
+    }
+    memcpy(buffer, str, skip);
+    o = buffer + skip;
+    p = str + skip;
+    do {
+      if (*p == '\"') {
+        if (len<2) {
+          *o = '\0';
+          break;
+        }
+        (*o++) = '\\';
+        len -= 2;
+      } else {
+        if (len<1) {
+          *o = '\0';
+          break;
+        }
+        --len;
+      }
+      (*o++) = (*p);
+    } while (*p++);
+    return buffer;
+  }
+  return str;
 }
 
 INLINE_FUNCTION unsigned int jenkins_hash(unsigned int a)
