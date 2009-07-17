@@ -1539,10 +1539,14 @@ readgame(const char * filename, int mode, int backup)
       mage = get_mage(u);
       if (mage) {
         faction * f = u->faction;
+        int skl = effskill(u, SK_MAGIC);
         if (!is_monsters(f) && f->magiegebiet==M_GRAY) {
           log_error(("faction %s had magic=gray, fixing (%s)\n", 
             factionname(f), magic_school[mage->magietyp]));
           f->magiegebiet = mage->magietyp;
+        }
+        if (f->max_spelllevel<skl) {
+          f->max_spelllevel = skl;
         }
         if (mage->spellcount<0) {
           mage->spellcount = 0;
