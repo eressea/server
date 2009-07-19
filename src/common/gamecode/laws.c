@@ -735,33 +735,36 @@ growing_trees_e3(region * r, const int current_season, const int last_weeks_seas
     int src = rtrees(r, src_type);
     int dst = rtrees(r, dst_type);
     int grow = src/transform[current_season][2];
-    rsettrees(r, src_type, src-grow);
-    rsettrees(r, dst_type, dst+grow);
-
-    if (dst_type==TREE_SEED && r->terrain->size) {
-      region * rn[MAXDIRECTIONS];
-      int d, total_size = 0;
-      get_neighbours(r, rn);
-      for (d=0;d!=MAXDIRECTIONS;++d) {
-        if (rn[d] && rn[d]->land) {
-          total_size += rn[d]->terrain->size;
-        }
+    if (grow>0) {
+      if (src_type!=TREE_TREE) {
+        rsettrees(r, src_type, src-grow);
       }
-      if (total_size>0) {
-        double scale = 1.0;
-        if (total_size<r->terrain->size) {
-          scale = total_size/(double)r->terrain->size;
-        }
+      rsettrees(r, dst_type, dst+grow);
+
+      if (dst_type==TREE_SEED && r->terrain->size) {
+        region * rn[MAXDIRECTIONS];
+        int d;
+        double fgrow = grow/(double)MAXDIRECTIONS;
+
+        get_neighbours(r, rn);
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rx = rn[d];
           if (rx && rx->land) {
-            int size = rx->terrain->size;
-            int d = rtrees(rx, dst_type);
-            double fg = grow * scale * size / MAXDIRECTIONS / total_size;
-            int g = (int)fg;
-            double ch = fg - g;
+            double scale = 1.0;
+            int g;
+            double fg, ch;
+            int seeds = rtrees(rx, dst_type);
+
+            if (r->terrain->size>rx->terrain->size) {
+              scale = (scale * rx->terrain->size)/r->terrain->size;
+            }
+            fg = scale * fgrow;
+            g = (int)fg;
+            ch = fg - g;
             if (chance(ch)) ++g;
-            rsettrees(rx, dst_type, d + g);
+            if (g>0) {
+              rsettrees(rx, dst_type, seeds + g);
+            }
           }
         }
       }
