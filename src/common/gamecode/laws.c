@@ -233,12 +233,15 @@ get_food(region *r)
       for (v=r->units;c>0 && v;v=v->next) {
         if (v->ship==u->ship) {
           if (u==v) {
+            int get = 0;
             if (u->number==c) {
-              need = 0;
+              get = need;
             } else {
               int x = MIN(c, u->number);
-              int save = (style * x) / u->number;
-              need -= save;
+              get = (style * x) / u->number;
+            }
+            if (get) {
+              change_money(u, get);
             }
           }
           c -= v->number;
@@ -306,7 +309,7 @@ get_food(region *r)
 
       /* Die Einheit hat nicht genug Geld zusammengekratzt und
        * nimmt Schaden: */
-      if (need) {
+      if (need > 0) {
         int lspp = lifestyle(u)/u->number;
         if (lspp > 0) {
           int number = (need+lspp-1)/lspp;

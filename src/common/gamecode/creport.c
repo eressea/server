@@ -1413,6 +1413,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   fprintf(F, "\"%s\";Parteiname\n", f->name);
   fprintf(F, "\"%s\";email\n", f->email);
   if (f->banner) fprintf(F, "\"%s\";banner\n", f->banner);
+  }
   print_items(F, f->items, f->locale);
   fputs("OPTIONEN\n", F);
   for (i=0;i!=MAXOPTIONS;++i) {
