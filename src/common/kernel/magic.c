@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -76,17 +76,17 @@
 
 const char *magic_school[MAXMAGIETYP] =
 {
-	"gray",
-	"illaun",
-	"tybied",
-	"cerddor",
-	"gwyrrd",
-	"draig",
+  "gray",
+  "illaun",
+  "tybied",
+  "cerddor",
+  "gwyrrd",
+  "draig",
     "common"
 };
 
 attrib_type at_reportspell = {
-	"reportspell", NULL, NULL, NULL, NO_WRITE, NO_READ
+  "reportspell", NULL, NULL, NULL, NO_WRITE, NO_READ
 };
 
 /**
@@ -162,22 +162,22 @@ a_ageicastle(struct attrib * a)
 static void
 a_initicastle(struct attrib * a)
 {
-	a->data.v = calloc(sizeof(icastle_data), 1);
+  a->data.v = calloc(sizeof(icastle_data), 1);
 }
 
 static void
 a_finalizeicastle(struct attrib * a)
 {
-	free(a->data.v);
+  free(a->data.v);
 }
 
 attrib_type at_icastle = {
-	"zauber_icastle",
-	a_initicastle,
-	a_finalizeicastle,
-	a_ageicastle,
-	a_writeicastle,
-	a_readicastle
+  "zauber_icastle",
+  a_initicastle,
+  a_finalizeicastle,
+  a_ageicastle,
+  a_writeicastle,
+  a_readicastle
 };
 
 /* ------------------------------------------------------------- */
@@ -370,7 +370,7 @@ write_seenspell(const attrib * a, struct storage * store)
 }
 
 attrib_type at_seenspell = {
-	"seenspell", NULL, NULL, NULL, write_seenspell, read_seenspell
+  "seenspell", NULL, NULL, NULL, write_seenspell, read_seenspell
 };
 
 static boolean
@@ -657,35 +657,35 @@ set_combatspell(unit *u, spell *sp, struct order * ord, int level)
 void
 unset_combatspell(unit *u, spell *sp)
 {
-	sc_mage *m;
-	int nr = 0;
-	int i;
+  sc_mage *m;
+  int nr = 0;
+  int i;
 
-	m = get_mage(u);
-	if (!m) return;
+  m = get_mage(u);
+  if (!m) return;
 
-	if (!sp) {
-		for (i=0;i<MAXCOMBATSPELLS;i++) {
-			m->combatspells[i].sp = NULL;
-		}
-	}
-	else if (sp->sptyp & PRECOMBATSPELL) {
-		if (sp != get_combatspell(u,0))
-			return;
-	} else if (sp->sptyp & COMBATSPELL) {
-		if (sp != get_combatspell(u,1)) {
-			return;
-		}
+  if (!sp) {
+    for (i=0;i<MAXCOMBATSPELLS;i++) {
+      m->combatspells[i].sp = NULL;
+    }
+  }
+  else if (sp->sptyp & PRECOMBATSPELL) {
+    if (sp != get_combatspell(u,0))
+      return;
+  } else if (sp->sptyp & COMBATSPELL) {
+    if (sp != get_combatspell(u,1)) {
+      return;
+    }
     nr = 1;
-	} else if (sp->sptyp & POSTCOMBATSPELL) {
-		if (sp != get_combatspell(u,2)) {
-			return;
-		}
+  } else if (sp->sptyp & POSTCOMBATSPELL) {
+    if (sp != get_combatspell(u,2)) {
+      return;
+    }
     nr = 2;
-	}
-	m->combatspells[nr].sp = NULL;
-	m->combatspells[nr].level = 0;
-	return;
+  }
+  m->combatspells[nr].sp = NULL;
+  m->combatspells[nr].level = 0;
+  return;
 }
 
 /* ------------------------------------------------------------- */
@@ -693,25 +693,25 @@ unset_combatspell(unit *u, spell *sp)
 int
 get_spellpoints(const unit * u)
 {
-	sc_mage *m;
+  sc_mage *m;
 
-	m = get_mage(u);
-	if (!m) return 0;
+  m = get_mage(u);
+  if (!m) return 0;
 
-	return m->spellpoints;
+  return m->spellpoints;
 }
 
 void
 set_spellpoints(unit * u, int sp)
 {
-	sc_mage *m;
+  sc_mage *m;
 
-	m = get_mage(u);
-	if (!m) return;
+  m = get_mage(u);
+  if (!m) return;
 
-	m->spellpoints = sp;
+  m->spellpoints = sp;
 
-	return;
+  return;
 }
 
 /*
@@ -720,17 +720,17 @@ set_spellpoints(unit * u, int sp)
 int
 change_spellpoints(unit * u, int mp)
 {
-	sc_mage *m;
-	int sp;
+  sc_mage *m;
+  int sp;
 
-	m = get_mage(u);
-	if (!m) return 0;
+  m = get_mage(u);
+  if (!m) return 0;
 
-	/* verhindere negative Magiepunkte */
-	sp = MAX(m->spellpoints + mp, 0);
-	m->spellpoints = sp;
+  /* verhindere negative Magiepunkte */
+  sp = MAX(m->spellpoints + mp, 0);
+  m->spellpoints = sp;
 
-	return sp;
+  return sp;
 }
 
 /* bietet die Möglichkeit, die maximale Anzahl der Magiepunkte mit
@@ -739,12 +739,12 @@ change_spellpoints(unit * u, int mp)
 static int
 get_spchange(const unit * u)
 {
-	sc_mage *m;
+  sc_mage *m;
 
-	m = get_mage(u);
-	if (!m) return 0;
+  m = get_mage(u);
+  if (!m) return 0;
 
-	return m->spchange;
+  return m->spchange;
 }
 
 /* ein Magier kann normalerweise maximal Stufe^2.1/1.2+1 Magiepunkte
@@ -761,44 +761,44 @@ get_spchange(const unit * u)
 static int
 use_item_aura(const region * r, const unit * u)
 {
-	int sk, n;
+  int sk, n;
 
-	sk = eff_skill(u, SK_MAGIC, r);
-	n = (int)(sk * sk * u->race->maxaura / 4);
+  sk = eff_skill(u, SK_MAGIC, r);
+  n = (int)(sk * sk * u->race->maxaura / 4);
 
-	return n;
+  return n;
 }
 
 int
 max_spellpoints(const region * r, const unit * u)
 {
-	int sk, n;
-	double msp;
-	double potenz = 2.1;
-	double divisor = 1.2;
+  int sk, n;
+  double msp;
+  double potenz = 2.1;
+  double divisor = 1.2;
 
-	sk = eff_skill(u, SK_MAGIC, r);
-	msp = u->race->maxaura*(pow(sk, potenz)/divisor+1) + get_spchange(u);
+  sk = eff_skill(u, SK_MAGIC, r);
+  msp = u->race->maxaura*(pow(sk, potenz)/divisor+1) + get_spchange(u);
 
-	if (get_item(u, I_AURAKULUM) > 0) {
-		msp += use_item_aura(r, u);
-	}
-	n = get_curseeffect(u->attribs, C_AURA, 0);
-	if (n>0) msp = (msp*n)/100;
+  if (get_item(u, I_AURAKULUM) > 0) {
+    msp += use_item_aura(r, u);
+  }
+  n = get_curseeffect(u->attribs, C_AURA, 0);
+  if (n>0) msp = (msp*n)/100;
 
-	return MAX((int)msp, 0);
+  return MAX((int)msp, 0);
 }
 
 int
 change_maxspellpoints(unit * u, int csp)
 {
-	sc_mage *m;
+  sc_mage *m;
 
-	m = get_mage(u);
-	if (!m) return 0;
+  m = get_mage(u);
+  if (!m) return 0;
 
-	m->spchange += csp;
-	return max_spellpoints(u->region, u);
+  m->spchange += csp;
+  return max_spellpoints(u->region, u);
 }
 
 /* ------------------------------------------------------------- */
@@ -835,16 +835,16 @@ countspells(unit *u, int step)
 int
 spellcost(unit *u, const spell * sp)
 {
-	int k, aura = 0;
-	int count = countspells(u, 0);
+  int k, aura = 0;
+  int count = countspells(u, 0);
 
-	for (k = 0; sp->components[k].type; k++) {
-		if (sp->components[k].type == r_aura) {
-			aura = sp->components[k].amount;
+  for (k = 0; sp->components[k].type; k++) {
+    if (sp->components[k].type == r_aura) {
+      aura = sp->components[k].amount;
     }
-	}
-	aura *= (1<<count);
-	return aura;
+  }
+  aura *= (1<<count);
+  return aura;
 }
 
 /* ------------------------------------------------------------- */
@@ -857,22 +857,22 @@ spellcost(unit *u, const spell * sp)
 static int
 spl_costtyp(const spell * sp)
 {
-	int k;
-	int costtyp = SPC_FIX;
+  int k;
+  int costtyp = SPC_FIX;
 
-	for (k = 0; sp->components[k].type; k++) {
-		if (costtyp == SPC_LINEAR) return SPC_LINEAR;
+  for (k = 0; sp->components[k].type; k++) {
+    if (costtyp == SPC_LINEAR) return SPC_LINEAR;
 
-		if (sp->components[k].cost == SPC_LINEAR) {
-			return SPC_LINEAR;
-		}
+    if (sp->components[k].cost == SPC_LINEAR) {
+      return SPC_LINEAR;
+    }
 
-		/* wenn keine Fixkosten, Typ übernehmen */
-		if (sp->components[k].cost != SPC_FIX) {
-			costtyp = sp->components[k].cost;
-		}
-	}
-	return costtyp;
+    /* wenn keine Fixkosten, Typ übernehmen */
+    if (sp->components[k].cost != SPC_FIX) {
+      costtyp = sp->components[k].cost;
+    }
+  }
+  return costtyp;
 }
 
 /* ------------------------------------------------------------- */
@@ -919,13 +919,13 @@ eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
       }
     }
   }
-	/* Ein Spruch mit Fixkosten wird immer mit der Stufe des Spruchs und
-	 * nicht auf der Stufe des Magiers gezaubert */
-	if (costtyp == SPC_FIX) {
-		cast_level = MIN(cast_level, sp->level);
-	}
+  /* Ein Spruch mit Fixkosten wird immer mit der Stufe des Spruchs und
+   * nicht auf der Stufe des Magiers gezaubert */
+  if (costtyp == SPC_FIX) {
+    cast_level = MIN(cast_level, sp->level);
+  }
 
-	return cast_level;
+  return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -938,24 +938,24 @@ eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
 void
 pay_spell(unit * u, const spell * sp, int cast_level, int range)
 {
-	int k;
-	int resuse;
+  int k;
+  int resuse;
 
-	for (k = 0; sp->components[k].type; k++) {
-		if (sp->components[k].type == r_aura) {
-			resuse = spellcost(u, sp) * range;
-		} else {
-			resuse = sp->components[k].amount * range;
-		}
+  for (k = 0; sp->components[k].type; k++) {
+    if (sp->components[k].type == r_aura) {
+      resuse = spellcost(u, sp) * range;
+    } else {
+      resuse = sp->components[k].amount * range;
+    }
 
-		if (sp->components[k].cost == SPC_LINEAR
-				|| sp->components[k].cost == SPC_LEVEL)
-		{
-			resuse *= cast_level;
-		}
+    if (sp->components[k].cost == SPC_LINEAR
+        || sp->components[k].cost == SPC_LEVEL)
+    {
+      resuse *= cast_level;
+    }
 
-		use_pooled(u, sp->components[k].type, GET_DEFAULT, resuse);
-	}
+    use_pooled(u, sp->components[k].type, GET_DEFAULT, resuse);
+  }
 }
 
 
@@ -1143,23 +1143,23 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
 static int
 farcasting(unit *magician, region *r)
 {
-	int dist;
-	int mult;
+  int dist;
+  int mult;
 
-	if (!r) {
-		return INT_MAX;
-	}
+  if (!r) {
+    return INT_MAX;
+  }
 
-	dist = koor_distance(r->x, r->y, magician->region->x, magician->region->y);
+  dist = koor_distance(r->x, r->y, magician->region->x, magician->region->y);
 
-	if (dist > 24) return INT_MAX;
+  if (dist > 24) return INT_MAX;
 
-	mult = 1 << dist;
-	if (dist > 1) {
-		if (!path_exists(magician->region, r, dist*2, allowed_fly)) mult = INT_MAX;
-	}
+  mult = 1 << dist;
+  if (dist > 1) {
+    if (!path_exists(magician->region, r, dist*2, allowed_fly)) mult = INT_MAX;
+  }
 
-	return mult;
+  return mult;
 }
 
 
@@ -1273,33 +1273,33 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
         break;
       }
 
-		case TYP_REGION:
-			/* Bonus durch Zauber */
-			probability += 0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0);
-			break;
+    case TYP_REGION:
+      /* Bonus durch Zauber */
+      probability += 0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0);
+      break;
 
-		case TYP_BUILDING:
-			/* Bonus durch Zauber */
-			probability += 0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
+    case TYP_BUILDING:
+      /* Bonus durch Zauber */
+      probability += 0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
 
-			/* Bonus durch Typ */
-			probability += 0.01 * ((building *)obj)->type->magres;
+      /* Bonus durch Typ */
+      probability += 0.01 * ((building *)obj)->type->magres;
 
-			break;
+      break;
 
-		case TYP_SHIP:
-			/* Bonus durch Zauber */
-			probability += 0.01 * get_curseeffect(((ship *)obj)->attribs, C_RESIST_MAGIC, 0);
-			break;
-	}
+    case TYP_SHIP:
+      /* Bonus durch Zauber */
+      probability += 0.01 * get_curseeffect(((ship *)obj)->attribs, C_RESIST_MAGIC, 0);
+      break;
+  }
 
-	probability = MAX(0.02, probability + t_bonus*0.01);
-	probability = MIN(0.98, probability);
+  probability = MAX(0.02, probability + t_bonus*0.01);
+  probability = MIN(0.98, probability);
 
-	/* gibt true, wenn die Zufallszahl kleiner als die chance ist und
-	 * false, wenn sie gleich oder größer ist, dh je größer die
-	 * Magieresistenz (chance) desto eher gibt die Funktion true zurück */
-	return chance(probability);
+  /* gibt true, wenn die Zufallszahl kleiner als die chance ist und
+   * false, wenn sie gleich oder größer ist, dh je größer die
+   * Magieresistenz (chance) desto eher gibt die Funktion true zurück */
+  return chance(probability);
 }
 
 /* ------------------------------------------------------------- */
@@ -1307,7 +1307,7 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 boolean
 is_magic_resistant(unit *magician, unit *target, int resist_bonus)
 {
-	return (boolean)target_resists_magic(magician, target, TYP_UNIT, resist_bonus);
+  return (boolean)target_resists_magic(magician, target, TYP_UNIT, resist_bonus);
 }
 
 /* ------------------------------------------------------------- */
@@ -1330,36 +1330,36 @@ fumble(region * r, unit * u, const spell * sp, int cast_grade)
  * 20% Warscheinlichkeit nicht
  * */
 
-	int rnd = 0;
-	double x = (double) cast_grade / (double) eff_skill(u, SK_MAGIC, r);
-	int patzer = (int) (((double) x * 40.0) - 20.0);
-	struct building * b = inside_building(u);
-	const struct building_type * btype = b?b->type:NULL;
+  int rnd = 0;
+  double x = (double) cast_grade / (double) eff_skill(u, SK_MAGIC, r);
+  int patzer = (int) (((double) x * 40.0) - 20.0);
+  struct building * b = inside_building(u);
+  const struct building_type * btype = b?b->type:NULL;
 
-	if (btype) patzer -= btype->fumblebonus;
-	/* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
-	if (sp->magietyp == M_DRAIG) {
-		patzer += CHAOSPATZERCHANCE;
-	}
-	if (is_cursed(u->attribs, C_MBOOST, 0) == true) {
-		patzer += CHAOSPATZERCHANCE;
-	}
-	if (is_cursed(u->attribs, C_FUMBLE, 0) == true) {
-		patzer += CHAOSPATZERCHANCE;
-	}
+  if (btype) patzer -= btype->fumblebonus;
+  /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
+  if (sp->magietyp == M_DRAIG) {
+    patzer += CHAOSPATZERCHANCE;
+  }
+  if (is_cursed(u->attribs, C_MBOOST, 0) == true) {
+    patzer += CHAOSPATZERCHANCE;
+  }
+  if (is_cursed(u->attribs, C_FUMBLE, 0) == true) {
+    patzer += CHAOSPATZERCHANCE;
+  }
 
-	/* wenn die Chance kleiner als 0 ist, können wir gleich false
-	 * zurückgeben */
-	if (patzer <= 0) {
-		return false;
-	}
-	rnd = rng_int()%100;
+  /* wenn die Chance kleiner als 0 ist, können wir gleich false
+   * zurückgeben */
+  if (patzer <= 0) {
+    return false;
+  }
+  rnd = rng_int()%100;
 
-	if (rnd > patzer) {
-		/* Glück gehabt, kein Patzer */
-		return false;
-	}
-	return true;
+  if (rnd > patzer) {
+    /* Glück gehabt, kein Patzer */
+    return false;
+  }
+  return true;
 }
 
 /* ------------------------------------------------------------- */
@@ -1481,31 +1481,32 @@ do_fumble(castorder *co)
 /* Ein Magier regeneriert pro Woche W(Stufe^1.5/2+1), mindestens 1
  * Zwerge nur die Hälfte
  */
-static int
+static double
 regeneration(unit * u)
 {
-	int sk, aura, d;
-	double potenz = 1.5;
-	double divisor = 2.0;
+  int sk;
+  double aura, d;
+  double potenz = 1.5;
+  double divisor = 2.0;
 
 #if KARMA_MODULE
-	if (fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
+  if (fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
 #endif /* KARMA_MODULE */
 
   sk = effskill(u, SK_MAGIC);
-	/* Rassenbonus/-malus */
-	d = (int)(pow(sk, potenz) * u->race->regaura / divisor);
-	d++;
+  /* Rassenbonus/-malus */
+  d = pow(sk, potenz) * u->race->regaura / divisor;
+  d++;
 
-	/* Einfluss von Artefakten */
-	/* TODO (noch gibs keine)*/
+  /* Einfluss von Artefakten */
+  /* TODO (noch gibs keine)*/
 
-	/* Würfeln */
-	aura = (rng_int() % d + rng_int() % d)/2 + 1;
+  /* Würfeln */
+  aura = (rng_double() * d + rng_double() * d)/2 + 1;
 
-	aura = (int)(aura * MagicRegeneration());
+  aura *= MagicRegeneration();
 
-	return aura;
+  return aura;
 }
 
 void
@@ -1515,6 +1516,7 @@ regeneration_magiepunkte(void)
   unit *u;
   int aura, auramax;
   double reg_aura;
+  int regen;
   int n;
 
   for (r = regions; r; r = r->next) {
@@ -1525,7 +1527,7 @@ regeneration_magiepunkte(void)
         if (aura < auramax) {
           struct building * b = inside_building(u);
           const struct building_type * btype = b?b->type:NULL;
-          reg_aura = (double)regeneration(u);
+          reg_aura = regeneration(u);
 
           /* Magierturm erhöht die Regeneration um 75% */
           /* Steinkreis erhöht die Regeneration um 50% */
@@ -1542,13 +1544,16 @@ regeneration_magiepunkte(void)
 
           /* maximal Differenz bis Maximale-Aura regenerieren
           * mindestens 1 Aura pro Monat */
-          reg_aura = MAX(1,reg_aura);
-          reg_aura = MIN((auramax - aura), reg_aura);
+          regen = (int)reg_aura;
+          reg_aura -= regen;
+          if (chance(reg_aura)) ++regen;
+          regen = MAX(1, regen);
+          regen = MIN((auramax - aura), regen);
 
-          aura += (int)reg_aura;
+          aura += regen;
           ADDMSG(&u->faction->msgs, msg_message(
             "regenaura", "unit region amount",
-            u, r, (int)reg_aura));
+            u, r, regen));
         }
         set_spellpoints(u, MIN(aura, auramax));
 
@@ -1835,24 +1840,24 @@ verify_targets(castorder *co, int * invalid, int * resist, int * success)
 static void
 free_spellparameter(spellparameter *pa)
 {
-	int i;
+  int i;
 
-	/* Elemente free'en */
-	for (i=0; i < pa->length; i++) {
+  /* Elemente free'en */
+  for (i=0; i < pa->length; i++) {
 
-		switch(pa->param[i]->typ) {
-			case SPP_STRING:
-				free(pa->param[i]->data.s);
-				break;
-			default:
-				break;
-		}
-		free(pa->param[i]);
-	}
+    switch(pa->param[i]->typ) {
+      case SPP_STRING:
+        free(pa->param[i]->data.s);
+        break;
+      default:
+        break;
+    }
+    free(pa->param[i]);
+  }
 
-	if (pa->param) free(pa->param);
-	/* struct free'en */
-	free(pa);
+  if (pa->param) free(pa->param);
+  /* struct free'en */
+  free(pa);
 }
 
 static int
@@ -1973,11 +1978,11 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, const char * c
   int minlen = 0;
 
   for (c=syntax;*c!=0;++c) {
-		/* this makes sure that:
-		 *  minlen("kc?") = 0
-		 *  minlen("kc+") = 1
-		 *  minlen("cccc+c?") = 4
-		 */
+    /* this makes sure that:
+     *  minlen("kc?") = 0
+     *  minlen("kc+") = 1
+     *  minlen("cccc+c?") = 4
+     */
     if (*c=='?') --minlen;
     else if (*c!='+' && *c!='k') ++minlen;
   }
@@ -2000,85 +2005,85 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, const char * c
     param_t pword;
     int j = -1;
     switch (*c) {
-		case '?':
-			/* tja. das sollte moeglichst nur am Ende passieren, 
-			 * weil sonst die kacke dampft. */
-			j = 0;
-			++c;
-			assert(*c==0);
-			break;
-		case '+':
-			/* das vorhergehende Element kommt ein oder mehrmals vor, wir
-			 * springen zum key zurück */
-			j = 0;
-			--c;
-			break;
-		case 'u':
-			/* Parameter ist eine Einheit, evtl. TEMP */
-			j = addparam_unit(param+i, &spobj, u, ord);
-			++c;
-			break;
-		case 'r':
-			/* Parameter sind zwei Regionskoordinaten */
-			j = addparam_region(param+i, &spobj, u, ord);
-			++c;
-			break;
-		case 'b':
-			/* Parameter ist eine Burgnummer */
-			j = addparam_building(param+i, &spobj);
-			++c;
-			break;
-		case 's':
-			j = addparam_ship(param+i, &spobj);
-			++c;
-			break;
-		case 'c': 
-			/* Text, wird im Spruch ausgewertet */
-			j = addparam_string(param+i, &spobj);
-			++c;
-			break;
-		case 'i': /* Zahl */
-			j = addparam_int(param+i, &spobj);
-			++c;
-			break;
-		case 'k':
-			++c;
-			pword = findparam(param[i++], u->faction->locale);
-			switch (pword) {
-			case P_REGION:
-				spobj = malloc(sizeof(spllprm));
-				spobj->flag = 0;
-				spobj->typ = SPP_REGION;
-				spobj->data.r = u->region;
-				j = 0;
-				++c;
-				break;
-			case P_UNIT:
-				if (i<size) {
-					j = addparam_unit(param+i, &spobj, u, ord);
-					++c;
-				}
-				break;
-			case P_BUILDING:
-			case P_GEBAEUDE:
-				if (i<size) {
-					j = addparam_building(param+i, &spobj);
-					++c;
-				}
-				break;
-			case P_SHIP:
-				if (i<size) {
-					j = addparam_ship(param+i, &spobj);
-					++c;
-				}
-				break;
-			default:
-				j = -1;
-				break;
-			}
-			break;
-		default:
-			j = -1;
+    case '?':
+      /* tja. das sollte moeglichst nur am Ende passieren, 
+       * weil sonst die kacke dampft. */
+      j = 0;
+      ++c;
+      assert(*c==0);
+      break;
+    case '+':
+      /* das vorhergehende Element kommt ein oder mehrmals vor, wir
+       * springen zum key zurück */
+      j = 0;
+      --c;
+      break;
+    case 'u':
+      /* Parameter ist eine Einheit, evtl. TEMP */
+      j = addparam_unit(param+i, &spobj, u, ord);
+      ++c;
+      break;
+    case 'r':
+      /* Parameter sind zwei Regionskoordinaten */
+      j = addparam_region(param+i, &spobj, u, ord);
+      ++c;
+      break;
+    case 'b':
+      /* Parameter ist eine Burgnummer */
+      j = addparam_building(param+i, &spobj);
+      ++c;
+      break;
+    case 's':
+      j = addparam_ship(param+i, &spobj);
+      ++c;
+      break;
+    case 'c': 
+      /* Text, wird im Spruch ausgewertet */
+      j = addparam_string(param+i, &spobj);
+      ++c;
+      break;
+    case 'i': /* Zahl */
+      j = addparam_int(param+i, &spobj);
+      ++c;
+      break;
+    case 'k':
+      ++c;
+      pword = findparam(param[i++], u->faction->locale);
+      switch (pword) {
+      case P_REGION:
+        spobj = malloc(sizeof(spllprm));
+        spobj->flag = 0;
+        spobj->typ = SPP_REGION;
+        spobj->data.r = u->region;
+        j = 0;
+        ++c;
+        break;
+      case P_UNIT:
+        if (i<size) {
+          j = addparam_unit(param+i, &spobj, u, ord);
+          ++c;
+        }
+        break;
+      case P_BUILDING:
+      case P_GEBAEUDE:
+        if (i<size) {
+          j = addparam_building(param+i, &spobj);
+          ++c;
+        }
+        break;
+      case P_SHIP:
+        if (i<size) {
+          j = addparam_ship(param+i, &spobj);
+          ++c;
+        }
+        break;
+      default:
+        j = -1;
+        break;
+      }
+      break;
+    default:
+      j = -1;
         break;
     }
     if (j<0) fail = true;
@@ -2086,7 +2091,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, const char * c
       if (spobj!=NULL) par->param[p++] = spobj;
       i += j;
     }
-	}
+  }
 
   /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
   par->length = p;
@@ -2096,7 +2101,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, const char * c
     return NULL;
   }
 
-	return par;
+  return par;
 }
 
 /* ------------------------------------------------------------- */
@@ -2198,51 +2203,51 @@ sm_familiar(const unit * u, const region * r, skill_t sk, int value) /* skillmod
 static void
 set_familiar(unit * mage, unit * familiar)
 {
-	/* if the skill modifier for the mage does not yet exist, add it */
-	attrib * a = a_find(mage->attribs, &at_skillmod);
-	while (a && a->type==&at_skillmod) {
-		skillmod_data * smd = (skillmod_data *)a->data.v;
-		if (smd->special==sm_familiar) break;
-		a = a->next;
-	}
-	if (a==NULL) {
-		attrib * an = a_add(&mage->attribs, a_new(&at_skillmod));
-		skillmod_data * smd = (skillmod_data *)an->data.v;
-		smd->special = sm_familiar;
-		smd->skill=NOSKILL;
-	}
+  /* if the skill modifier for the mage does not yet exist, add it */
+  attrib * a = a_find(mage->attribs, &at_skillmod);
+  while (a && a->type==&at_skillmod) {
+    skillmod_data * smd = (skillmod_data *)a->data.v;
+    if (smd->special==sm_familiar) break;
+    a = a->next;
+  }
+  if (a==NULL) {
+    attrib * an = a_add(&mage->attribs, a_new(&at_skillmod));
+    skillmod_data * smd = (skillmod_data *)an->data.v;
+    smd->special = sm_familiar;
+    smd->skill=NOSKILL;
+  }
 
-	a = a_find(mage->attribs, &at_familiar);
-	if (a==NULL) {
-		a = a_add(&mage->attribs, a_new(&at_familiar));
-		a->data.v = familiar;
-	} else assert(!a->data.v || a->data.v == familiar);
-	/* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+  a = a_find(mage->attribs, &at_familiar);
+  if (a==NULL) {
+    a = a_add(&mage->attribs, a_new(&at_familiar));
+    a->data.v = familiar;
+  } else assert(!a->data.v || a->data.v == familiar);
+  /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
 
-	a = a_find(familiar->attribs, &at_familiarmage);
-	if (a==NULL) {
-		a = a_add(&familiar->attribs, a_new(&at_familiarmage));
-		a->data.v = mage;
-	} else assert(!a->data.v || a->data.v == mage);
+  a = a_find(familiar->attribs, &at_familiarmage);
+  if (a==NULL) {
+    a = a_add(&familiar->attribs, a_new(&at_familiarmage));
+    a->data.v = mage;
+  } else assert(!a->data.v || a->data.v == mage);
 }
 
 void
 remove_familiar(unit *mage)
 {
-	attrib *a = a_find(mage->attribs, &at_familiar);
-	attrib *an;
-	skillmod_data *smd;
+  attrib *a = a_find(mage->attribs, &at_familiar);
+  attrib *an;
+  skillmod_data *smd;
 
   if (a!=NULL) {
     a_remove(&mage->attribs, a);
   }
   a = a_find(mage->attribs, &at_skillmod);
   while (a && a->type==&at_skillmod) {
-		an = a->next;
-		smd = (skillmod_data *)a->data.v;
-	  if (smd->special==sm_familiar) a_remove(&mage->attribs, a);
-		a = an;
-	}
+    an = a->next;
+    smd = (skillmod_data *)a->data.v;
+    if (smd->special==sm_familiar) a_remove(&mage->attribs, a);
+    a = an;
+  }
 }
 
 boolean
@@ -2314,52 +2319,52 @@ read_familiar(attrib * a, struct storage * store)
 void
 create_newclone(unit * mage, unit * clone)
 {
-	attrib *a;
+  attrib *a;
 
-	a = a_find(mage->attribs, &at_clone);
-	if (a == NULL) {
-		a = a_add(&mage->attribs, a_new(&at_clone));
-		a->data.v = clone;
-	} else assert(!a->data.v || a->data.v == clone);
-	/* TODO: Diese Attribute beim Tod des Klons entfernen: */
+  a = a_find(mage->attribs, &at_clone);
+  if (a == NULL) {
+    a = a_add(&mage->attribs, a_new(&at_clone));
+    a->data.v = clone;
+  } else assert(!a->data.v || a->data.v == clone);
+  /* TODO: Diese Attribute beim Tod des Klons entfernen: */
 
-	a = a_find(clone->attribs, &at_clonemage);
-	if (a == NULL) {
-		a = a_add(&clone->attribs, a_new(&at_clonemage));
-		a->data.v = mage;
-	} else assert(!a->data.v || a->data.v == mage);
+  a = a_find(clone->attribs, &at_clonemage);
+  if (a == NULL) {
+    a = a_add(&clone->attribs, a_new(&at_clonemage));
+    a->data.v = mage;
+  } else assert(!a->data.v || a->data.v == mage);
 
-	/* Wenn der Magier stirbt, wird das in destroy_unit abgefangen.
-	 * Kein Trigger, zu kompliziert. */
+  /* Wenn der Magier stirbt, wird das in destroy_unit abgefangen.
+   * Kein Trigger, zu kompliziert. */
 
-	/* Wenn der Klon stirbt, dann bekommt der Magier einen Schock */
-	add_trigger(&clone->attribs, "destroy", trigger_clonedied(mage));
+  /* Wenn der Klon stirbt, dann bekommt der Magier einen Schock */
+  add_trigger(&clone->attribs, "destroy", trigger_clonedied(mage));
 }
 
 static void
 set_clone(unit * mage, unit * clone)
 {
-	attrib *a;
+  attrib *a;
 
-	a = a_find(mage->attribs, &at_clone);
-	if (a==NULL) {
-		a = a_add(&mage->attribs, a_new(&at_clone));
-		a->data.v = clone;
-	} else assert(!a->data.v || a->data.v == clone);
+  a = a_find(mage->attribs, &at_clone);
+  if (a==NULL) {
+    a = a_add(&mage->attribs, a_new(&at_clone));
+    a->data.v = clone;
+  } else assert(!a->data.v || a->data.v == clone);
 
-	a = a_find(clone->attribs, &at_clonemage);
-	if (a==NULL) {
-		a = a_add(&clone->attribs, a_new(&at_clonemage));
-		a->data.v = mage;
-	} else assert(!a->data.v || a->data.v == mage);
+  a = a_find(clone->attribs, &at_clonemage);
+  if (a==NULL) {
+    a = a_add(&clone->attribs, a_new(&at_clonemage));
+    a->data.v = mage;
+  } else assert(!a->data.v || a->data.v == mage);
 }
 
 unit *
 has_clone(unit *mage)
 {
-	attrib *a = a_find(mage->attribs, &at_clone);
-	if(a) return (unit *)a->data.v;
-	return NULL;
+  attrib *a = a_find(mage->attribs, &at_clone);
+  if(a) return (unit *)a->data.v;
+  return NULL;
 }
 
 static int
@@ -2445,23 +2450,23 @@ attrib_type at_familiar = {
 };
 
 attrib_type at_clonemage = {
-	"clonemage",
-	NULL,
-	NULL,
-	age_unit,
-	a_write_unit,
-	read_magician,
-	ATF_UNIQUE
+  "clonemage",
+  NULL,
+  NULL,
+  age_unit,
+  a_write_unit,
+  read_magician,
+  ATF_UNIQUE
 };
 
 attrib_type at_clone = {
-	"clone",
-	NULL,
-	NULL,
-	age_unit,
-	a_write_unit,
-	read_clone,
-	ATF_UNIQUE
+  "clone",
+  NULL,
+  NULL,
+  age_unit,
+  a_write_unit,
+  read_clone,
+  ATF_UNIQUE
 };
 
 unit *
@@ -2478,23 +2483,23 @@ get_familiar(const unit *u)
 unit *
 get_familiar_mage(const unit *u)
 {
-	attrib * a = a_find(u->attribs, &at_familiarmage);
+  attrib * a = a_find(u->attribs, &at_familiarmage);
     if (a!=NULL) {
       unit * u = (unit*)a->data.v;
       if (u->number>0) return u;
     }
-	return NULL;
+  return NULL;
 }
 
 unit *
 get_clone(const unit *u)
 {
-	attrib * a = a_find(u->attribs, &at_clone);
+  attrib * a = a_find(u->attribs, &at_clone);
     if (a!=NULL) {
       unit * u = (unit*)a->data.v;
       if (u->number>0) return u;
     }
-	return NULL;
+  return NULL;
 }
 
 unit *
