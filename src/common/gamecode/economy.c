@@ -3211,7 +3211,7 @@ peasant_taxes(region * r)
   money = rmoney(r);
   if (money<=0) return;
 
-  b = largestbuilding(r, &is_tax_building, false);
+  b = largestbuilding(r, &is_owner_building, false);
   if (b==NULL) return;
 
   u = buildingowner(r, b);

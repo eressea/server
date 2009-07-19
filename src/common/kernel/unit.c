@@ -834,10 +834,7 @@ can_leave(unit * u)
     rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
   }
   if (rule_leave && u->building && u==buildingowner(u->region, u->building)) {
-    building * b = largestbuilding(u->region, &is_tax_building, false);
-    if (b==u->building) {
-      return false;
-    }
+    return false;
   }
   return true;
 }

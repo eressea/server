@@ -2621,6 +2621,16 @@ is_castle(const struct building * b)
   return (b->type==bt_castle);
 }
 
+boolean is_owner_building(const struct building * b)
+{
+  region * r = b->region;
+  if (b->type->taxes && r->land && r->land->ownership) {
+    unit * u = buildingowner(r, b);
+    return u && u->faction == r->land->ownership->owner;
+  }
+  return false;
+}
+
 boolean is_tax_building(const building * b)
 {
   if (b->type->taxes) {
