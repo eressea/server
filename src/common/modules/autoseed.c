@@ -1022,7 +1022,7 @@ build_island_e3(int x, int y, int numfactions, int minsize)
         prepare_starting_region(r);
       }
       r->land->money = 50000; /* 2% = 1000 silver */
-    } else {
+    } else if (r->land) {
       r->land->money *= 4;
     }
   }

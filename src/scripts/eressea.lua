@@ -50,6 +50,10 @@ end
 
 function process(orders)
   -- initialize starting equipment for new players
+  if open_game==nil then
+    print("did you load default.lua?")
+    return -1
+  end
 
   if open_game(get_turn())~=0 then
     print("could not read game")
