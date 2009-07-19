@@ -198,6 +198,12 @@ void rsetroad(struct region * r, direction_t d, short value);
 int is_coastregion(struct region *r);
 
 int rtrees(const struct region * r, int ageclass);
+enum {
+  TREE_SEED = 0,
+  TREE_SAPLING = 1,
+  TREE_TREE = 2
+};
+
 int rsettrees(const struct region *r, int ageclass, int value);
 
 int rpeasants(const struct region * r);

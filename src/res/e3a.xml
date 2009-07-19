@@ -144,7 +144,6 @@
     <param name="rules.ship.capacity" value="1"/> <!-- -->
     <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
     <param name="rules.alliances" value="1"/>
-    <param name="rules.combat.nat_armor" value="1"/>
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
     <param name="rules.combat.skill_bonus" value="0"/>
@@ -164,7 +163,7 @@
     <param name="rules.economy.wages" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>
-    <param name="rules.economy.herbrot" value="0"/>
+    <param name="rules.economy.grow" value="1"/>
     <param name="rules.tactics.formula" value="1"/> <!-- 10% per skilldiff -->
     <param name="rules.help.mask" value="fight guard money"/>
     <param name="movement.shipspeed.skillbonus" value="6"/>

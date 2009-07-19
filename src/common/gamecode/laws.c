@@ -720,6 +720,27 @@ count_race(const region *r, const race *rc)
 extern struct attrib_type at_germs;
 
 static void
+growing_trees_e3(region * r, const int current_season, const int last_weeks_season)
+{
+  const int transform[4][3] = { 
+    { -1, -1, 0 },
+    { TREE_SEED, TREE_SAPLING, 2 },
+    { TREE_SAPLING, TREE_TREE, 2 },
+    { TREE_TREE, TREE_SEED, 2 }
+  };
+
+  if (current_season!=last_weeks_season && transform[current_season][2]) {
+    int src_type = transform[current_season][0];
+    int dst_type = transform[current_season][1];
+    int src = rtrees(r, src_type);
+    int dst = rtrees(r, dst_type);
+    int grow = src/transform[current_season][2];
+    rsettrees(r, src_type, src-grow);
+    rsettrees(r, dst_type, dst+grow);
+  }
+}
+
+static void
 growing_trees(region * r, const int current_season, const int last_weeks_season)
 {
   int growth, grownup_trees, i, seeds, sprout;
@@ -844,15 +865,18 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
     /* zu den Bäumen hinzufügen */
     rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
   }
+}
 
+static void
+growing_herbs(region * r, const int current_season, const int last_weeks_season)
+{
   /* Jetzt die Kräutervermehrung. Vermehrt wird logistisch:
    *
    * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
    * Kräuter))% sich zu vermehren. */
-  if(current_season == SEASON_SPRING || current_season == SEASON_SUMMER
-      || current_season == SEASON_AUTUMN)
-  {
-    for(i = rherbs(r); i > 0; i--) {
+  if (current_season != SEASON_WINTER) {
+    int i;
+    for (i = rherbs(r); i > 0; i--) {
       if (rng_int()%100 < (100-rherbs(r))) rsetherbs(r, (short)(rherbs(r)+1));
     }
   }
@@ -882,6 +906,11 @@ demographics(void)
       /* die Nachfrage nach Produkten steigt. */
       struct demand * dmd;
       if (r->land) {
+        static int plant_rules = -1;
+
+        if (plant_rules<0) {
+          plant_rules = get_param_int(global.parameters, "rules.economy.grow", 0);
+        }
         for (dmd=r->land->demands;dmd;dmd=dmd->next) {
           if (dmd->value>0 && dmd->value < MAXDEMAND) {
             float rise = DMRISE;
@@ -898,8 +927,11 @@ demographics(void)
           plagues(r, false);
         }
         horses(r);
-        if (current_season != SEASON_WINTER) {
+        if (plant_rules==0) { /* E1 */
           growing_trees(r, current_season, last_weeks_season);
+          growing_herbs(r, current_season, last_weeks_season);
+        } else { /* E3 */
+          growing_trees_e3(r, current_season, last_weeks_season);
         }
       }
 
