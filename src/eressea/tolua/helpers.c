@@ -448,9 +448,11 @@ lua_building_taxes(building * b)
   lua_rawget(L, LUA_GLOBALSINDEX);
   type=lua_type(L, 1);
   if (lua_isfunction(L, 1)) {
+    int level = buildingeffsize(b, false);
     tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
+    tolua_pushnumber(L, level);
 
-    if (lua_pcall(L, 1, 1, 0)!=0) {
+    if (lua_pcall(L, 2, 1, 0)!=0) {
       const char* error = lua_tostring(L, -1);
       log_error(("building_taxes(%s) calling '%s': %s.\n",
         buildingname(b), fname, error));

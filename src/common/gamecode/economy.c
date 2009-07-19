@@ -3219,12 +3219,11 @@ peasant_taxes(region * r)
 
   maxsize = buildingeffsize(b, false);
   morale = region_get_morale(r);
-  if (maxsize > morale) {
+  if (morale<maxsize) {
     maxsize = morale;
   }
-
-  if (maxsize>0) {
-    int taxmoney = (int)((money * maxsize) * b->type->taxes(b));
+  if (maxsize>0 && morale>0) {
+    int taxmoney = (int)(money * b->type->taxes(b, maxsize));
     if (taxmoney>0) {
       change_money(u, taxmoney);
       rsetmoney(r, money - taxmoney);
@@ -3235,15 +3234,16 @@ peasant_taxes(region * r)
 }
 
 void
-produce(void)
+produce(struct region *r)
 {
   request workers[1024];
-  region *r;
   request *taxorders, *sellorders, *stealorders, *buyorders;
   unit *u;
   int todo;
-  int rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", 0);
-  int rule_autowork = get_param_int(global.parameters, "work.auto", 0);
+  static int rule_taxation = -1;
+  static int rule_autowork = -1;
+    boolean limited = true;
+    request * nextworker = workers;
 
   /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
   * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
@@ -3255,141 +3255,141 @@ produce(void)
   *
   * lehren vor lernen. */
 
-  for (r = regions; r; r = r->next) {
-    boolean limited = true;
-    request * nextworker = workers;
-
-    assert(rmoney(r) >= 0);
-    assert(rpeasants(r) >= 0);
-
-    if (r->land && rule_taxation==1) {
-      /* new taxation rules, region owners make money based on morale and building */
-      peasant_taxes(r);
-    }
-
-    buyorders = 0;
-    sellorders = 0;
-    working = 0;
-    nextentertainer = &entertainers[0];
-    entertaining = 0;
-    taxorders = 0;
-    stealorders = 0;
-
-    for (u = r->units; u; u = u->next) {
-      order * ord;
-      boolean trader = false;
-
-      if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
-        continue;
-
-      if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
-        !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
-        continue;
-
-      if (fval(u, UFL_LONGACTION) && u->thisorder==NULL) {
-        cmistake(u, u->thisorder, 52, MSG_PRODUCE);
-        continue;
-      }
-
-      for (ord = u->orders;ord;ord=ord->next) {
-        switch (get_keyword(ord)) {
-        case K_BUY:
-          buy(u, &buyorders, ord);
-          trader = true;
-          break;
-        case K_SELL:
-          /* sell returns true if the sale is not limited
-           * by the region limit */
-          limited &= !sell(u, &sellorders, ord);
-          trader = true;
-          break;
-        }
-      }
-      if (trader) {
-        attrib * a = a_find(u->attribs, &at_trades);
-        if (a && a->data.i) {
-          produceexp(u, SK_TRADE, u->number);
-        }
-        fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-        continue;
-      }
-
-      todo = get_keyword(u->thisorder);
-      if (todo == NOKEYWORD) continue;
-
-      if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]
-      && !(u->race->flags & RCF_SWIM)
-        && todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
-        continue;
-
-      switch (todo) {
-
-        case K_ENTERTAIN:
-          entertain_cmd(u, u->thisorder);
-          break;
-
-        case K_WORK:
-          if (!rule_autowork && do_work(u, u->thisorder, nextworker)==0) {
-            ++nextworker;
-          }
-          break;
-
-        case K_TAX:
-          tax_cmd(u, u->thisorder, &taxorders);
-          break;
-
-        case K_STEAL:
-          steal_cmd(u, u->thisorder, &stealorders);
-          break;
-
-        case K_SPY:
-          spy_cmd(u, u->thisorder);
-          break;
-
-        case K_SABOTAGE:
-          sabotage_cmd(u, u->thisorder);
-          break;
-
-        case K_PLANT:
-        case K_BREED:
-          breed_cmd(u, u->thisorder);
-          break;
-
-        case K_RESEARCH:
-          research_cmd(u, u->thisorder);
-          break;
-      }
-    }
-
-    /* Entertainment (expandentertainment) und Besteuerung (expandtax) vor den
-    * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
-    * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
-    * auszugeben bereit sind. */
-    if (entertaining) expandentertainment(r);
-    if (!rule_autowork) {
-      expandwork(r, workers, nextworker, maxworkingpeasants(r));
-    }
-    if (taxorders) expandtax(r, taxorders);
-
-    /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
-    * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
-    * können. */
-
-    if (buyorders) expandbuying(r, buyorders);
-
-    if (sellorders) {
-      int limit = rpeasants(r) / TRADE_FRACTION;
-      if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan")))
-        limit *= 2;
-      expandselling(r, sellorders, limited?limit:INT_MAX);
-    }
-
-    /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
-    * (expandstealing). */
-
-    if (stealorders) expandstealing(r, stealorders);
-
-    assert(rmoney(r) >= 0);
-    assert(rpeasants(r) >= 0);
+  if (rule_taxation<0) {
+    rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", 0);
+    rule_autowork = get_param_int(global.parameters, "work.auto", 0);
   }
+  
+  assert(rmoney(r) >= 0);
+  assert(rpeasants(r) >= 0);
+
+  if (r->land && rule_taxation==1) {
+    /* new taxation rules, region owners make money based on morale and building */
+    peasant_taxes(r);
+  }
+
+  buyorders = 0;
+  sellorders = 0;
+  working = 0;
+  nextentertainer = &entertainers[0];
+  entertaining = 0;
+  taxorders = 0;
+  stealorders = 0;
+
+  for (u = r->units; u; u = u->next) {
+    order * ord;
+    boolean trader = false;
+
+    if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
+      continue;
+
+    if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
+      !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
+      continue;
+
+    if (fval(u, UFL_LONGACTION) && u->thisorder==NULL) {
+      cmistake(u, u->thisorder, 52, MSG_PRODUCE);
+      continue;
+    }
+
+    for (ord = u->orders;ord;ord=ord->next) {
+      switch (get_keyword(ord)) {
+      case K_BUY:
+        buy(u, &buyorders, ord);
+        trader = true;
+        break;
+      case K_SELL:
+        /* sell returns true if the sale is not limited
+         * by the region limit */
+        limited &= !sell(u, &sellorders, ord);
+        trader = true;
+        break;
+      }
+    }
+    if (trader) {
+      attrib * a = a_find(u->attribs, &at_trades);
+      if (a && a->data.i) {
+        produceexp(u, SK_TRADE, u->number);
+      }
+      fset(u, UFL_LONGACTION|UFL_NOTMOVING);
+      continue;
+    }
+
+    todo = get_keyword(u->thisorder);
+    if (todo == NOKEYWORD) continue;
+
+    if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]
+    && !(u->race->flags & RCF_SWIM)
+      && todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
+      continue;
+
+    switch (todo) {
+
+      case K_ENTERTAIN:
+        entertain_cmd(u, u->thisorder);
+        break;
+
+      case K_WORK:
+        if (!rule_autowork && do_work(u, u->thisorder, nextworker)==0) {
+          ++nextworker;
+        }
+        break;
+
+      case K_TAX:
+        tax_cmd(u, u->thisorder, &taxorders);
+        break;
+
+      case K_STEAL:
+        steal_cmd(u, u->thisorder, &stealorders);
+        break;
+
+      case K_SPY:
+        spy_cmd(u, u->thisorder);
+        break;
+
+      case K_SABOTAGE:
+        sabotage_cmd(u, u->thisorder);
+        break;
+
+      case K_PLANT:
+      case K_BREED:
+        breed_cmd(u, u->thisorder);
+        break;
+
+      case K_RESEARCH:
+        research_cmd(u, u->thisorder);
+        break;
+    }
+  }
+
+  /* Entertainment (expandentertainment) und Besteuerung (expandtax) vor den
+  * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
+  * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
+  * auszugeben bereit sind. */
+  if (entertaining) expandentertainment(r);
+  if (!rule_autowork) {
+    expandwork(r, workers, nextworker, maxworkingpeasants(r));
+  }
+  if (taxorders) expandtax(r, taxorders);
+
+  /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
+  * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
+  * können. */
+
+  if (buyorders) expandbuying(r, buyorders);
+
+  if (sellorders) {
+    int limit = rpeasants(r) / TRADE_FRACTION;
+    if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan")))
+      limit *= 2;
+    expandselling(r, sellorders, limited?limit:INT_MAX);
+  }
+
+  /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
+  * (expandstealing). */
+
+  if (stealorders) expandstealing(r, stealorders);
+
+  assert(rmoney(r) >= 0);
+  assert(rpeasants(r) >= 0);
 }

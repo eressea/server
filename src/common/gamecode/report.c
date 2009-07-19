@@ -1698,7 +1698,7 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
       char buf[8192];
       char label = '-';
 
-      sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
+      sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner?f->banner:"");
       if (ALLIED(uf, f)) label = '*';
       else if (alliedfaction(NULL, uf, f, HELP_ALL)) label = '+';
       rparagraph(F, buf, 4, 0, label);

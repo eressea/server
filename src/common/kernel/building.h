@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -23,8 +23,8 @@ extern "C" {
 
 /* maintenance::flags */
 #define MTF_NONE     0x00
-#define MTF_VARIABLE 0x01	/* resource usage scales with size */
-#define MTF_VITAL    0x02	/* if resource missing, building may crash */
+#define MTF_VARIABLE 0x01  /* resource usage scales with size */
+#define MTF_VITAL    0x02  /* if resource missing, building may crash */
 
 typedef struct maintenance {
   const struct resource_type * rtype; /* type of resource required */
@@ -44,25 +44,25 @@ typedef struct maintenance {
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
 
 typedef struct building_type {
-	const char * _name;
+  const char * _name;
 
-	int flags;  /* flags */
-	int capacity; /* Kapazität pro Größenpunkt */
-	int maxcapacity;  /* Max. Kapazität */
-	int maxsize;      /* how big can it get, with all the extensions? */
-	int magres;       /* how well it resists against spells */
-	int magresbonus;  /* bonus it gives the target against spells */
-	int fumblebonus;  /* bonus that reduces fumbling */
-	double auraregen; /* modifier for aura regeneration inside building */
-	struct maintenance * maintenance; /* array of requirements */
-	struct construction * construction; /* construction of 1 building-level */
+  int flags;  /* flags */
+  int capacity; /* Kapazität pro Größenpunkt */
+  int maxcapacity;  /* Max. Kapazität */
+  int maxsize;      /* how big can it get, with all the extensions? */
+  int magres;       /* how well it resists against spells */
+  int magresbonus;  /* bonus it gives the target against spells */
+  int fumblebonus;  /* bonus that reduces fumbling */
+  double auraregen; /* modifier for aura regeneration inside building */
+  struct maintenance * maintenance; /* array of requirements */
+  struct construction * construction; /* construction of 1 building-level */
 
-	const char * (*name)(const struct building_type*, int size);
-	void (*init)(struct building_type*);
-    void (*age)(struct building *);
-    int (*protection)(struct building *, struct unit *);
-    double (*taxes)(struct building *);
-	struct attrib * attribs;
+  const char * (*name)(const struct building_type*, int size);
+  void (*init)(struct building_type*);
+  void (*age)(struct building *);
+  int (*protection)(struct building *, struct unit *);
+  double (*taxes)(struct building *, int size);
+  struct attrib * attribs;
 } building_type;
 
 extern building_type * bt_find(const char* name);
@@ -90,19 +90,19 @@ extern int bt_effsize(const struct building_type * btype, int bsize);
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 
 typedef struct building {
-	struct building *next;
-	struct building *nexthash;
+  struct building *next;
+  struct building *nexthash;
 
-	const struct building_type * type;
-	struct region *region;
-	char *name;
-	char *display;
-	struct attrib * attribs;
-	int no;
-	int size;
-	int sizeleft;	/* is only used during battle. should be a temporary attribute */
-	int besieged;	/* should be an attribute */
-	unsigned int flags;
+  const struct building_type * type;
+  struct region *region;
+  char *name;
+  char *display;
+  struct attrib * attribs;
+  int no;
+  int size;
+  int sizeleft;  /* is only used during battle. should be a temporary attribute */
+  int besieged;  /* should be an attribute */
+  unsigned int flags;
 } building;
 
 typedef struct building_list {

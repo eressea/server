@@ -74,8 +74,18 @@ getmagicskill(const struct locale * lang)
   variant token;
   const char * s = getstrtoken();
 
-  if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
-    return (magic_t)token.i;
+  if (s && s[0]) {
+    if (findtoken(tokens, s, &token)==E_TOK_SUCCESS) {
+      return (magic_t)token.i;
+    } else {
+      char buffer[3];
+      buffer[0] = s[0];
+      buffer[1] = s[1];
+      buffer[2] = '\0';
+      if (findtoken(tokens, buffer, &token)==E_TOK_SUCCESS) {
+        return (magic_t)token.i;
+      }
+    }
   }
   return M_NONE;
 }

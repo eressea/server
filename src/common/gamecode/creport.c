@@ -977,7 +977,7 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
       fprintf(F, "PARTEI %d\n", f->no);
       fprintf(F, "\"%s\";Parteiname\n", f->name);
       if (f->email) fprintf(F, "\"%s\";email\n", f->email);
-      fprintf(F, "\"%s\";banner\n", f->banner);
+      if (f->banner) fprintf(F, "\"%s\";banner\n", f->banner);
       fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
       if (f->alliance!=NULL && f->alliance==uf->alliance) {
         fprintf(F, "%d;alliance\n", f->alliance->id);
@@ -1412,7 +1412,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
 
   fprintf(F, "\"%s\";Parteiname\n", f->name);
   fprintf(F, "\"%s\";email\n", f->email);
-  fprintf(F, "\"%s\";banner\n", f->banner);
+  if (f->banner) fprintf(F, "\"%s\";banner\n", f->banner);
   print_items(F, f->items, f->locale);
   fputs("OPTIONEN\n", F);
   for (i=0;i!=MAXOPTIONS;++i) {
