@@ -3962,8 +3962,10 @@ init_processor(void)
   add_proc_order(p, K_STUDY, &learn_cmd, PROC_THISORDER|PROC_LONGORDER, "Lernen");
 
   p+=10;
-  add_proc_global(p, &produce, "Arbeiten, Handel, Rekruten");
+
   add_proc_order(p, K_MAKE, &make_cmd, PROC_THISORDER|PROC_LONGORDER, "Produktion");
+  p+=10;
+  add_proc_global(p, &produce, "Arbeiten, Handel, Rekruten");
   add_proc_postregion(p, &split_allocations, "Produktion II");
 
   p+=10;
