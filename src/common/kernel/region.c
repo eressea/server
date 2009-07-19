@@ -1503,6 +1503,15 @@ int region_get_morale(const region * r)
 void region_set_morale(region * r, int morale)
 {
   if (r->land) {
-    r->land->morale = morale;
+    r->land->morale = (short)morale;
   }
 }
+
+void get_neighbours(const region * r, region ** list)
+{
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    list[dir] = rconnect(r, dir);
+  }
+}
+

@@ -760,14 +760,6 @@ autoseed(newfaction ** players, int nsize, int max_agediff)
   return tsize;
 }
 
-static void get_neighbours(const region * r, region ** list)
-{
-  direction_t dir;
-  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-    list[dir] = rconnect(r, dir);
-  }
-}
-
 region_list * regionqueue_push(region_list ** rlist, region * r)
 {
   region_list * rnew = malloc(sizeof(region_list));

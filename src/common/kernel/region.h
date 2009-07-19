@@ -276,7 +276,7 @@ int region_getresource(const struct region * r, const struct resource_type * rty
 void region_setresource(struct region * r, const struct resource_type * rtype, int value);
 
 extern const struct item_type * r_luxury(struct region * r);
-
+extern void get_neighbours(const struct region * r, struct region ** list);
 #ifdef __cplusplus
 }
 #endif
