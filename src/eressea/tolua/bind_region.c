@@ -119,6 +119,29 @@ tolua_region_get_terrainname(lua_State* L)
 }
 
 static int
+tolua_region_set_owner(lua_State* L)
+{
+  region* r = (region*) tolua_tousertype(L, 1, 0);
+  struct faction* f = (struct faction*) tolua_tousertype(L, 2, 0);
+  if (r) {
+    region_set_owner(r, f, turn);
+  }
+  return 0;
+}
+
+static int
+tolua_region_get_owner(lua_State* L)
+{
+  region* r = (region*) tolua_tousertype(L, 1, 0);
+  if (r) {
+    struct faction * f = region_get_owner(r);
+    tolua_pushusertype(L, f, "faction");
+    return 1;
+  }
+  return 0;
+}
+
+static int
 tolua_region_set_terrainname(lua_State* L)
 {
   region* self = (region*) tolua_tousertype(L, 1, 0);
@@ -553,6 +576,7 @@ tolua_region_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "next", tolua_region_get_adj);
 
       tolua_variable(L, TOLUA_CAST "terrain_name", &tolua_region_get_terrainname, &tolua_region_set_terrainname);
+      tolua_variable(L, TOLUA_CAST "owner", &tolua_region_get_owner, &tolua_region_set_owner);
 
       tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
       tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);

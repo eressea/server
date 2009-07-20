@@ -3068,16 +3068,18 @@ static double rc_popularity(const struct race * rc)
 
 void update_owners(region * r)
 {
-  building * blargest = NULL;
-  blargest = largestbuilding(r, &is_tax_building, false);
+  building * bowner = largestbuilding(r, &is_owner_building, false);
+  building * blargest = largestbuilding(r, &is_tax_building, false);
   if (blargest) {
-    /* region owners update? */
-    faction * f = region_get_owner(r);
-    unit * u = buildingowner(r, blargest);
-    if (u==NULL) {
-      region_set_owner(r, NULL, turn);
-    } else if (u->faction!=f) {
-      region_set_owner(r, u->faction, turn);
+    if (!bowner || bowner->size<blargest->size) {
+      /* region owners update? */
+      faction *  f = region_get_owner(r);
+      unit * u = buildingowner(r, blargest);
+      if (u==NULL) {
+        region_set_owner(r, NULL, turn);
+      } else if (u->faction!=f) {
+        region_set_owner(r, u->faction, turn);
+      }
     }
   }
 }

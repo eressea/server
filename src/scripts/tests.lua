@@ -244,6 +244,36 @@ local function test_recruit2()
   print(u.number)
 end
 
+local function test_owners()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("enno@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  local f2 = faction.create("enno@eressea.de", "human", "de")
+  local u2 = unit.create(f2, r, 1)
+  local u3 = unit.create(f2, r, 1)
+
+  local b3 = building.create(r, "castle")
+  b3.size = 2
+  u3.building = b3
+  local b1 = building.create(r, "castle")
+  b1.size = 1
+  u1.building = b1
+  local b2 = building.create(r, "castle")
+  b2.size = 2
+  u2.building = b2
+  
+  update_owners()
+  assert(r.owner==u3.faction)
+  b1.size=3
+  b2.size=3
+  update_owners()
+  assert(r.owner==u2.faction)
+  b1.size=4
+  update_owners()
+  assert(r.owner==u1.faction)
+end
+
 local function test_recruit()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -587,9 +617,11 @@ tests = {
     ["upkeep"] = test_upkeep,
     ["id"] = test_id,
     ["work"] = test_work,
+    ["owners"] = test_owners,
     ["market"] = test_market
 }
 mytests = {
+    ["owners"] = test_owners,
     ["mallorn"] = test_mallorn,
     ["recruit2"] = test_recruit2
 }
