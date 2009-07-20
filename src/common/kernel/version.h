@@ -58,7 +58,7 @@
 #define STORAGE_VERSION 328 /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
 #define INTPAK_VERSION 329 /* in binary, ints can get packed */
 #define NOZEROIDS_VERSION 330 /* zero is not a valid ID for anything (including factions) */
-#define NOBORDERATTRIBS_VERSION 331 /* border::attribs has been moved to userdata */
+#define NOBORDERATTRIBS_VERSION 331 /* connection::attribs has been moved to userdata */
 #define UIDHASH_VERSION 332 /* borders use the region.uid to store */
 #define REGIONOWNER_VERSION 333 /* regions have owners and morale */
 #define ALLIANCELEADER_VERSION 333 /* alliances have a leader */

@@ -59,7 +59,7 @@
 #include <gamecode/xmlreport.h>
 
 /* kernel includes */
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>

@@ -24,7 +24,7 @@
 #include "region.h"
 
 /* kernel includes */
-#include "border.h"
+#include "connection.h"
 #include "building.h"
 #include "curse.h"
 #include "equipment.h"
@@ -780,7 +780,7 @@ attrib_type at_travelunit = {
 void
 rsetroad(region * r, direction_t d, short val)
 {
-  border * b;
+  connection * b;
   region * r2 = rconnect(r, d);
 
   if (!r2) return;
@@ -795,7 +795,7 @@ short
 rroad(const region * r, direction_t d)
 {
   int rval;
-  border * b;
+  connection * b;
   region * r2 = rconnect(r, d);
 
   if (!r2) return 0;

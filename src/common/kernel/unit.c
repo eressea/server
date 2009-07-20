@@ -27,7 +27,7 @@
 #include "faction.h"
 #include "group.h"
 #include "karma.h"
-#include "border.h"
+#include "connection.h"
 #include "item.h"
 #include "move.h"
 #include "order.h"

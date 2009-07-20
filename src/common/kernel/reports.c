@@ -23,7 +23,7 @@
 
 /* kernel includes */
 #include <kernel/alliance.h>
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -1183,7 +1183,7 @@ view_default(struct seen_region ** seen, region *r, faction *f)
   for (dir=0;dir!=MAXDIRECTIONS;++dir) {
     region * r2 = rconnect(r, dir);
     if (r2) {
-      border * b = get_borders(r, r2);
+      connection * b = get_borders(r, r2);
       while (b) {
         if (!b->type->transparent(b, f)) break;
         b = b->next;
@@ -1200,7 +1200,7 @@ view_neighbours(struct seen_region ** seen, region * r, faction * f)
   for (dir=0;dir!=MAXDIRECTIONS;++dir) {
     region * r2 = rconnect(r, dir);
     if (r2) {
-      border * b = get_borders(r, r2);
+      connection * b = get_borders(r, r2);
       while (b) {
         if (!b->type->transparent(b, f)) break;
         b = b->next;
@@ -1212,7 +1212,7 @@ view_neighbours(struct seen_region ** seen, region * r, faction * f)
             for (dir=0;dir!=MAXDIRECTIONS;++dir) {
               region * r3 = rconnect(r2, dir);
               if (r3) {
-                border * b = get_borders(r2, r3);
+                connection * b = get_borders(r2, r3);
                 while (b) {
                   if (!b->type->transparent(b, f)) break;
                   b = b->next;
@@ -1237,7 +1237,7 @@ recurse_regatta(struct seen_region ** seen, region *center, region *r, faction *
     if (r2) {
       int ndist = distance(center, r2);
       if (ndist>dist && fval(r2->terrain, SEA_REGION)) {
-        border * b = get_borders(r, r2);
+        connection * b = get_borders(r, r2);
         while (b) {
           if (!b->type->transparent(b, f)) break;
           b = b->next;

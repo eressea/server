@@ -38,7 +38,7 @@
 
 /* kernel includes */
 #include <kernel/alchemy.h>
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
@@ -809,7 +809,7 @@ prices(FILE * F, const region * r, const faction * f)
 }
 
 boolean
-see_border(const border * b, const faction * f, const region * r)
+see_border(const connection * b, const faction * f, const region * r)
 {
   boolean cs = b->type->fvisible(b, f, r);
   if (!cs) {
@@ -856,7 +856,7 @@ describe(FILE * F, const seen_region * sr, faction * f)
   for (d = 0; d != MAXDIRECTIONS; d++) {
     /* Nachbarregionen, die gesehen werden, ermitteln */
     region *r2 = rconnect(r, d);
-    border *b;
+    connection *b;
     see[d] = true;
     if (!r2) continue;
     for (b=get_borders(r, r2);b;) {

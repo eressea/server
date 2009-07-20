@@ -26,7 +26,7 @@
 /* kernel includes */
 #include <kernel/curse.h>
 #include <kernel/battle.h> /* für lovar */
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/spellid.h>
@@ -2622,7 +2622,7 @@ sp_summondragon(castorder *co)
 
 typedef struct wallcurse {
   curse * buddy;
-  border * wall;
+  connection * wall;
 } wallcurse;
 
 void
@@ -2655,7 +2655,7 @@ cw_init(attrib * a) {
 
 void
 cw_write(const attrib * a, storage * store) {
-  border * b = ((wallcurse*)((curse*)a->data.v)->data.v)->wall;
+  connection * b = ((wallcurse*)((curse*)a->data.v)->data.v)->wall;
   curse_write(a, store);
   store->w_int(store, b->id);
 }
@@ -2705,7 +2705,7 @@ resolve_buddy(variant data, void * addr)
   bresolve * br = (bresolve*)data.v;
 
   if (br->id>=0) {
-    border * b = find_border(br->id);
+    connection * b = find_border(br->id);
 
     if (b && b->from && b->to) {
       attrib * a = a_find(b->from->attribs, &at_cursewall);
@@ -2741,7 +2741,7 @@ resolve_buddy(variant data, void * addr)
 }
 
 static const char *
-b_namefirewall(const border * b, const region * r, const faction * f, int gflags)
+b_namefirewall(const connection * b, const region * r, const faction * f, int gflags)
 {
   const char * bname;
   unused(f);
@@ -2751,11 +2751,11 @@ b_namefirewall(const border * b, const region * r, const faction * f, int gflags
   else bname = "firewall";
 
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("border", bname));
+  return LOC(f->locale, mkname("connection", bname));
 }
 
 static void
-wall_init(border * b)
+wall_init(connection * b)
 {
   wall_data * fd = (wall_data*)calloc(sizeof(wall_data), 1);
   fd->countdown = -1; /* infinite */
@@ -2763,13 +2763,13 @@ wall_init(border * b)
 }
 
 static void
-wall_destroy(border * b)
+wall_destroy(connection * b)
 {
   free(b->data.v);
 }
 
 static void
-wall_read(border * b, storage * store)
+wall_read(connection * b, storage * store)
 {
   wall_data * fd = (wall_data*)b->data.v;
   variant mno;
@@ -2791,7 +2791,7 @@ wall_read(border * b, storage * store)
 }
 
 static void
-wall_write(const border * b, storage * store)
+wall_write(const connection * b, storage * store)
 {
   wall_data * fd = (wall_data*)b->data.v;
   write_unit_reference(fd->mage, store);
@@ -2800,7 +2800,7 @@ wall_write(const border * b, storage * store)
 }
 
 static int
-wall_age(border * b)
+wall_age(connection * b)
 {
   wall_data * fd = (wall_data*)b->data.v;
   --fd->countdown;
@@ -2808,7 +2808,7 @@ wall_age(border * b)
 }
 
 static region *
-wall_move(const border * b, struct unit * u, struct region * from, struct region * to, boolean routing)
+wall_move(const connection * b, struct unit * u, struct region * from, struct region * to, boolean routing)
 {
   wall_data * fd = (wall_data*)b->data.v;
   if (!routing && fd->active) {
@@ -2848,7 +2848,7 @@ border_type bt_firewall = {
 static int
 sp_firewall(castorder *co)
 {
-  border * b;
+  connection * b;
   wall_data * fd;
   region *r = co->rt;
   unit *mage = co->magician.u;
@@ -2904,7 +2904,7 @@ sp_firewall(castorder *co)
 /* ------------------------------------------------------------- */
 
 static const char *
-wisps_name(const border * b, const region * r, const faction * f, int gflags)
+wisps_name(const connection * b, const region * r, const faction * f, int gflags)
 {
   const char * bname;
   unused(f);
@@ -2916,7 +2916,7 @@ wisps_name(const border * b, const region * r, const faction * f, int gflags)
     bname = "wisps";
   }
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("border", bname));
+  return LOC(f->locale, mkname("connection", bname));
 }
 
 typedef struct wisps_data {
@@ -2925,7 +2925,7 @@ typedef struct wisps_data {
 } wisps_data;
 
 static region *
-wisps_move(const border * b, struct unit * u, struct region * from, struct region * next, boolean routing)
+wisps_move(const connection * b, struct unit * u, struct region * from, struct region * next, boolean routing)
 {
   direction_t reldir = reldirection(from, next);
   wisps_data * wd = (wisps_data*)b->data.v;
@@ -2946,7 +2946,7 @@ wisps_move(const border * b, struct unit * u, struct region * from, struct regio
 }
 
 static void
-wisps_init(border * b)
+wisps_init(connection * b)
 {
   wisps_data * wd = (wisps_data*)calloc(sizeof(wisps_data), 1);
 
@@ -2973,7 +2973,7 @@ border_type bt_wisps = {
 static int
 sp_wisps(castorder *co)
 {
-  border * b;
+  connection * b;
   wall_data * fd;
   region * r2;
   direction_t dir;
@@ -8804,7 +8804,7 @@ static spelldata spelldaten[] =
 };
 
 static boolean
-chaosgate_valid(const border * b)
+chaosgate_valid(const connection * b)
 {
   const attrib * a = a_findc(b->from->attribs, &at_direction);
   if (!a) a = a_findc(b->to->attribs, &at_direction);
@@ -8813,7 +8813,7 @@ chaosgate_valid(const border * b)
 }
 
 struct region *
-chaosgate_move(const border * b, struct unit * u, struct region * from, struct region * to, boolean routing)
+chaosgate_move(const connection * b, struct unit * u, struct region * from, struct region * to, boolean routing)
 {
   if (!routing) {
     int maxhp = u->hp / 4;

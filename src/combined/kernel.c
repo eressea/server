@@ -6,7 +6,7 @@
 #include "common/kernel/alliance.c"
 #include "common/kernel/battle.c"
 #include "common/kernel/binarystore.c"
-#include "common/kernel/border.c"
+#include "common/kernel/connection.c"
 #include "common/kernel/build.c"
 #include "common/kernel/building.c"
 #include "common/kernel/calendar.c"

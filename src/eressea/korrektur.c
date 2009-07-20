@@ -37,7 +37,7 @@
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/equipment.h>
@@ -553,21 +553,21 @@ fix_astralplane(void)
   return 0;
 }
 
-extern border *borders[];
+extern connection *borders[];
 
 #define BORDER_MAXHASH 8191
 static void
 fix_road_borders(void)
 {
 #define MAXDEL 10000
-  border *deleted[MAXDEL];
+  connection *deleted[MAXDEL];
   int hash;
   int fixes = 0;
 
   for (hash=0; hash<BORDER_MAXHASH && fixes!=MAXDEL; hash++) {
-    border * blist;
+    connection * blist;
     for (blist=borders[hash];blist && fixes!=MAXDEL;blist=blist->nexthash) {
-      border * b;
+      connection * b;
       for (b=blist;b && fixes!=MAXDEL;b=b->next) {
         if (b->type == &bt_road) {
           int x1, x2, y1, y2;
@@ -806,7 +806,7 @@ fix_chaosgates(void)
       spec_direction * sd = (spec_direction *)a->data.v;
       region * r2 = findregion(sd->x, sd->y);
       if (r2!=NULL) {
-        border * b = get_borders(r, r2);
+        connection * b = get_borders(r, r2);
         while (b) {
           if (b->type==&bt_chaosgate) break;
           b = b->next;

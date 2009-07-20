@@ -1,4 +1,5 @@
 #include <config.h>
+#include <curses.h>
 
 #include "bind_gmtool.h"
 #include "../gmtool.h"
@@ -8,6 +9,7 @@
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <modules/autoseed.h>
+#include <util/log.h>
 
 #include <lua.h>
 #include <tolua.h>
@@ -165,6 +167,59 @@ tolua_make_island(lua_State * L)
   return 1;
 }
 
+static int paint_handle;
+static struct lua_State * paint_state;
+
+static void
+lua_paint_info(struct window * wnd, const struct state * st)
+{
+  struct lua_State * L = paint_state;
+  lua_rawgeti(L, LUA_REGISTRYINDEX, paint_handle);
+  tolua_pushnumber(L, st->cursor.x);
+  tolua_pushnumber(L, st->cursor.y);
+  if (lua_pcall(L, 2, 1, 0)!=0) {
+    const char* error = lua_tostring(L, -1);
+    log_error(("paint function failed: %s\n", error));
+    lua_pop(L, 1);
+    tolua_error(L, TOLUA_CAST "event handler call failed", NULL);
+  } else {
+    const char* result = lua_tostring(L, -1);
+    WINDOW * win = wnd->handle;
+    int size = getmaxx(win)-2;
+    int line = 0, maxline = getmaxy(win)-2;
+    const char * str = result;
+    wxborder(win);
+
+    while (*str && line<maxline) {
+      const char * end = strchr(str, '\n');
+      if (!end) break;
+      else {
+        size_t len = end-str;
+        int bytes = MIN((int)len, size);
+        mvwaddnstr(win, line++, 1, str, bytes);
+        wclrtoeol(win);
+        str = end + 1;
+      }
+    }
+  }
+}
+
+static int
+tolua_set_display(lua_State * L)
+{
+  int type = lua_type(L, 1);
+  if (type==LUA_TFUNCTION) {
+    lua_pushvalue(L, 1);
+    paint_handle = luaL_ref(L, LUA_REGISTRYINDEX);
+    paint_state = L;
+
+    set_info_function(&lua_paint_info);
+  } else {
+    set_info_function(NULL);
+  }
+  return 0;
+}
+
 static int
 tolua_make_block(lua_State * L)
 {
@@ -190,15 +245,16 @@ tolua_gmtool_open(lua_State* L)
     tolua_module(L, TOLUA_CAST "gmtool", 0);
     tolua_beginmodule(L, TOLUA_CAST "gmtool");
     {
-      tolua_function(L, TOLUA_CAST "open", tolua_state_open);
-      tolua_function(L, TOLUA_CAST "close", tolua_state_close);
+      tolua_function(L, TOLUA_CAST "open", &tolua_state_open);
+      tolua_function(L, TOLUA_CAST "close", &tolua_state_close);
 
-      tolua_function(L, TOLUA_CAST "editor", tolua_run_mapper);
-      tolua_function(L, TOLUA_CAST "get_selection", tolua_selected_regions);
-      tolua_function(L, TOLUA_CAST "get_cursor", tolua_current_region);
-      tolua_function(L, TOLUA_CAST "highlight", tolua_highlight_region);
-      tolua_function(L, TOLUA_CAST "select", tolua_select_region);
-      tolua_function(L, TOLUA_CAST "select_at", tolua_select_coordinate);
+      tolua_function(L, TOLUA_CAST "editor", &tolua_run_mapper);
+      tolua_function(L, TOLUA_CAST "get_selection", &tolua_selected_regions);
+      tolua_function(L, TOLUA_CAST "get_cursor", &tolua_current_region);
+      tolua_function(L, TOLUA_CAST "highlight", &tolua_highlight_region);
+      tolua_function(L, TOLUA_CAST "select", &tolua_select_region);
+      tolua_function(L, TOLUA_CAST "select_at", &tolua_select_coordinate);
+      tolua_function(L, TOLUA_CAST "set_display", &tolua_set_display);
 
       tolua_function(L, TOLUA_CAST "make_block", &tolua_make_block);
       tolua_function(L, TOLUA_CAST "make_island", &tolua_make_island);

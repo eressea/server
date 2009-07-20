@@ -33,7 +33,7 @@ without prior permission by the authors of Eressea.
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
@@ -1045,7 +1045,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
   for (d = 0; d != MAXDIRECTIONS; d++)
   { /* Nachbarregionen, die gesehen werden, ermitteln */
     const region * r2 = rconnect(r, d);
-    const border * b;
+    const connection * b;
     if (!r2) continue;
     if (seemode==see_neighbour) {
       seen_region * sr = find_seen(seen, r2);
@@ -1069,7 +1069,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
         }
       }
       if (cs) {
-        const char * bname = mkname("border", b->type->name(b, r, f, GF_PURE));
+        const char * bname = mkname("connection", b->type->name(b, r, f, GF_PURE));
         fprintf(F, "GRENZE %d\n", ++g);
         fprintf(F, "\"%s\";typ\n", LOC(default_locale, bname));
         fprintf(F, "%d;richtung\n", d);

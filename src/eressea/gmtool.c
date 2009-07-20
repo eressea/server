@@ -69,17 +69,6 @@
 #include <string.h>
 #include <locale.h>
 
-typedef struct window {
-  boolean (*handlekey)(struct window * win, struct state * st, int key);
-  void (*paint)(struct window * win, const struct state * st);
-
-  WINDOW * handle;
-  struct window * next;
-  struct window * prev;
-  boolean initialized;
-  int update;
-} window;
-
 extern const char * g_reportdir;
 extern const char * g_datadir;
 extern const char * g_basedir;
@@ -385,7 +374,7 @@ paint_info_region(window * wnd, const state * st)
 
   unused(st);
   werase(win);
-  wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+  wxborder(win);
   if (mr && mr->r) {
     const region * r = mr->r;
     if (r->land) {
@@ -437,6 +426,20 @@ paint_info_region(window * wnd, const state * st)
       }
     }
   }
+}
+
+static void (*paint_info)(struct window * wnd, const struct state * st);
+
+static void
+paint_info_default(window * wnd, const state * st)
+{
+  if (paint_info) paint_info(wnd, st);
+  else paint_info_region(wnd, st);
+}
+
+void set_info_function(void (*callback)(struct window *, const struct state *))
+{
+  paint_info = callback;
 }
 
 static char *
@@ -1177,7 +1180,7 @@ run_mapper(void)
   st->wnd_map->paint = &paint_map;
   st->wnd_map->update = 1;
   st->wnd_info = win_create(hwininfo);
-  st->wnd_info->paint = &paint_info_region;
+  st->wnd_info->paint = &paint_info_default;
   st->wnd_info->handlekey = &handle_info_region;
   st->wnd_info->update = 1;
   st->wnd_status = win_create(hwinstatus);

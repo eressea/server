@@ -14,7 +14,7 @@
 
 #include <config.h>
 #include <kernel/eressea.h>
-#include "border.h"
+#include "connection.h"
 
 #include "region.h"
 #include "save.h"
@@ -38,7 +38,7 @@
 unsigned int nextborder = 0;
 
 #define BORDER_MAXHASH 8191
-border * borders[BORDER_MAXHASH];
+connection * borders[BORDER_MAXHASH];
 border_type * bordertypes;
 
 
@@ -48,10 +48,10 @@ free_borders(void)
   int i;
   for (i=0;i!=BORDER_MAXHASH;++i) {
     while (borders[i]) {
-      border * b = borders[i];
+      connection * b = borders[i];
       borders[i] = b->nexthash;
       while (b) {
-        border * bf = b;
+        connection * bf = b;
         b = b->next;
         assert(b==NULL || b->nexthash==NULL);
         if (bf->type->destroy) {
@@ -63,14 +63,14 @@ free_borders(void)
   }
 }
 
-border *
+connection *
 find_border(unsigned int id)
 {
   int key;
   for (key=0;key!=BORDER_MAXHASH;key++) {
-    border * bhash;
+    connection * bhash;
     for (bhash=borders[key];bhash!=NULL;bhash=bhash->nexthash) {
-      border * b;
+      connection * b;
       for (b=bhash;b;b=b->next) {
         if (b->id==id) return b;
       }
@@ -83,48 +83,48 @@ int
 resolve_borderid(variant id, void * addr)
 {
   int result = 0;
-  border * b = NULL;
+  connection * b = NULL;
   if (id.i!=0) {
     b = find_border(id.i);
     if (b==NULL) {
       result = -1;
     }
   }
-  *(border**)addr = b;
+  *(connection**)addr = b;
   return result;
 }
 
-static border **
+static connection **
 get_borders_i(const region * r1, const region * r2)
 {
-  border ** bp;
+  connection ** bp;
   int key = reg_hashkey(r1);
   int k2 = reg_hashkey(r2);
 
   key = MIN(k2, key) % BORDER_MAXHASH;
   bp = &borders[key];
   while (*bp) {
-    border * b = *bp;
+    connection * b = *bp;
     if ((b->from==r1 && b->to==r2) || (b->from==r2 && b->to==r1)) break;
     bp = &b->nexthash;
   }
   return bp;
 }
 
-border *
+connection *
 get_borders(const region * r1, const region * r2)
 {
-  border ** bp = get_borders_i(r1, r2);
+  connection ** bp = get_borders_i(r1, r2);
   return *bp;
 }
 
-border *
+connection *
 new_border(border_type * type, region * from, region * to)
 {
-  border * b = calloc(1, sizeof(struct border));
+  connection * b = calloc(1, sizeof(struct connection));
 
   if (from && to) {
-    border ** bp = get_borders_i(from, to);
+    connection ** bp = get_borders_i(from, to);
     while (*bp) bp = &(*bp)->next;
     *bp = b;
   }
@@ -138,11 +138,11 @@ new_border(border_type * type, region * from, region * to)
 }
 
 void
-erase_border(border * b)
+erase_border(connection * b)
 {
   if (b->from && b->to) {
-    border ** bp = get_borders_i(b->from, b->to);
-    assert(*bp!=NULL || !"error: border is not registered");
+    connection ** bp = get_borders_i(b->from, b->to);
+    assert(*bp!=NULL || !"error: connection is not registered");
     if (*bp==b) {
       /* it is the first in the list, so it is in the nexthash list */
       if (b->next) {
@@ -155,7 +155,7 @@ erase_border(border * b)
       while (*bp && *bp != b) {
         bp = &(*bp)->next;
       }
-      assert(*bp==b || !"error: border is not registered");
+      assert(*bp==b || !"error: connection is not registered");
       *bp = b->next;
     }
   }
@@ -186,7 +186,7 @@ find_bordertype(const char * name)
 }
 
 void
-b_read(border * b, storage * store)
+b_read(connection * b, storage * store)
 {
   int result = 0;
   switch (b->type->datatype) {
@@ -200,14 +200,14 @@ b_read(border * b, storage * store)
       break;
     case VAR_VOIDPTR:
     default:
-      assert(!"invalid variant type in border");
+      assert(!"invalid variant type in connection");
       result = 0;
   }
   assert(result>=0 || "EOF encountered?");
 }
 
 void
-b_write(const border * b, storage * store)
+b_write(const connection * b, storage * store)
 {
   switch (b->type->datatype) {
     case VAR_NONE:
@@ -220,20 +220,20 @@ b_write(const border * b, storage * store)
       break;
     case VAR_VOIDPTR:
     default:
-      assert(!"invalid variant type in border");
+      assert(!"invalid variant type in connection");
   }
 }
 
-boolean b_transparent(const border * b, const struct faction * f) { unused(b); unused(f); return true; }
-boolean b_opaque(const border * b, const struct faction * f) { unused(b); unused(f); return false; }
-boolean b_blockall(const border * b, const unit * u, const region * r) { unused(u); unused(r); unused(b); return true; }
-boolean b_blocknone(const border * b, const unit * u, const region * r) { unused(u); unused(r); unused(b); return false; }
-boolean b_rvisible(const border * b, const region * r) { return (boolean)(b->to==r || b->from==r); }
-boolean b_fvisible(const border * b, const struct faction * f, const region * r) { unused(r); unused(f); unused(b); return true; }
-boolean b_uvisible(const border * b, const unit * u)  { unused(u); unused(b); return true; }
-boolean b_rinvisible(const border * b, const region * r) { unused(r); unused(b); return false; }
-boolean b_finvisible(const border * b, const struct faction * f, const region * r) { unused(r); unused(f); unused(b); return false; }
-boolean b_uinvisible(const border * b, const unit * u) { unused(u); unused(b); return false; }
+boolean b_transparent(const connection * b, const struct faction * f) { unused(b); unused(f); return true; }
+boolean b_opaque(const connection * b, const struct faction * f) { unused(b); unused(f); return false; }
+boolean b_blockall(const connection * b, const unit * u, const region * r) { unused(u); unused(r); unused(b); return true; }
+boolean b_blocknone(const connection * b, const unit * u, const region * r) { unused(u); unused(r); unused(b); return false; }
+boolean b_rvisible(const connection * b, const region * r) { return (boolean)(b->to==r || b->from==r); }
+boolean b_fvisible(const connection * b, const struct faction * f, const region * r) { unused(r); unused(f); unused(b); return true; }
+boolean b_uvisible(const connection * b, const unit * u)  { unused(u); unused(b); return true; }
+boolean b_rinvisible(const connection * b, const region * r) { unused(r); unused(b); return false; }
+boolean b_finvisible(const connection * b, const struct faction * f, const region * r) { unused(r); unused(f); unused(b); return false; }
+boolean b_uinvisible(const connection * b, const unit * u) { unused(u); unused(b); return false; }
 
 /**************************************/
 /* at_countdown - legacy, do not use  */
@@ -255,9 +255,9 @@ age_borders(void)
   int i;
 
   for (i=0;i!=BORDER_MAXHASH;++i) {
-    border * bhash = borders[i];
+    connection * bhash = borders[i];
     for (;bhash;bhash=bhash->nexthash) {
-      border * b = bhash;
+      connection * b = bhash;
       for (;b;b=b->next) {
         if (b->type->age) {
           if (b->type->age(b)==AT_AGE_REMOVE) {
@@ -272,7 +272,7 @@ age_borders(void)
   }
   while (deleted) {
     border_list * blist = deleted->next;
-    border * b = deleted->data;
+    connection * b = deleted->data;
     erase_border(b);
     free(deleted);
     deleted = blist;
@@ -287,7 +287,7 @@ age_borders(void)
 #include "faction.h"
 
 static const char *
-b_namewall(const border * b, const region * r, const struct faction * f, int gflags)
+b_namewall(const connection * b, const region * r, const struct faction * f, int gflags)
 {
   const char * bname = "wall";
 
@@ -296,7 +296,7 @@ b_namewall(const border * b, const region * r, const struct faction * f, int gfl
   unused(b);
   if (gflags & GF_ARTICLE) bname = "a_wall";
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("border", bname));
+  return LOC(f->locale, mkname("connection", bname));
 }
 
 border_type bt_wall = {
@@ -328,18 +328,18 @@ border_type bt_noway = {
 };
 
 static const char *
-b_namefogwall(const border * b, const region * r, const struct faction * f, int gflags)
+b_namefogwall(const connection * b, const region * r, const struct faction * f, int gflags)
 {
   unused(f);
   unused(b);
   unused(r);
   if (gflags & GF_PURE) return "fogwall";
-  if (gflags & GF_ARTICLE) return LOC(f->locale, mkname("border", "a_fogwall"));
-  return LOC(f->locale, mkname("border", "fogwall"));
+  if (gflags & GF_ARTICLE) return LOC(f->locale, mkname("connection", "a_fogwall"));
+  return LOC(f->locale, mkname("connection", "fogwall"));
 }
 
 static boolean
-b_blockfogwall(const border * b, const unit * u, const region * r)
+b_blockfogwall(const connection * b, const unit * u, const region * r)
 {
   unused(b);
   unused(r);
@@ -363,16 +363,16 @@ border_type bt_fogwall = {
 };
 
 static const char *
-b_nameillusionwall(const border * b, const region * r, const struct faction * f, int gflags)
+b_nameillusionwall(const connection * b, const region * r, const struct faction * f, int gflags)
 {
   int fno = b->data.i;
   unused(b);
   unused(r);
   if (gflags & GF_PURE) return (f && fno==f->no)?"illusionwall":"wall";
   if (gflags & GF_ARTICLE) {
-    return LOC(f->locale, mkname("border", (f && fno==f->subscription)?"an_illusionwall":"a_wall"));
+    return LOC(f->locale, mkname("connection", (f && fno==f->subscription)?"an_illusionwall":"a_wall"));
   }
-  return LOC(f->locale, mkname("border", (f && fno==f->no)?"illusionwall":"wall"));
+  return LOC(f->locale, mkname("connection", (f && fno==f->no)?"illusionwall":"wall"));
 }
 
 border_type bt_illusionwall = {
@@ -393,13 +393,13 @@ border_type bt_illusionwall = {
  * special quest door
  ***/
 
-boolean b_blockquestportal(const border * b, const unit * u, const region * r) {
+boolean b_blockquestportal(const connection * b, const unit * u, const region * r) {
   if(b->data.i > 0) return true;
   return false;
 }
 
 static const char *
-b_namequestportal(const border * b, const region * r, const struct faction * f, int gflags)
+b_namequestportal(const connection * b, const region * r, const struct faction * f, int gflags)
 {
   const char * bname;
   int lock = b->data.i;
@@ -420,7 +420,7 @@ b_namequestportal(const border * b, const region * r, const struct faction * f, 
     }
   }
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("border", bname));
+  return LOC(f->locale, mkname("connection", bname));
 }
 
 border_type bt_questportal = {
@@ -442,7 +442,7 @@ border_type bt_questportal = {
  ***/
 
 static const char *
-b_nameroad(const border * b, const region * r, const struct faction * f, int gflags)
+b_nameroad(const connection * b, const region * r, const struct faction * f, int gflags)
 {
   region * r2 = (r==b->to)?b->from:b->to;
   int local = (r==b->from)?b->data.sa[0]:b->data.sa[1];
@@ -451,51 +451,51 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
   unused(f);
   if (gflags & GF_PURE) return "road";
   if (gflags & GF_ARTICLE) {
-    if (!(gflags & GF_DETAILED)) return LOC(f->locale, mkname("border", "a_road"));
+    if (!(gflags & GF_DETAILED)) return LOC(f->locale, mkname("connection", "a_road"));
     else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
       if (r2->terrain->max_road<=remote) {
-        return LOC(f->locale, mkname("border", "a_road"));
+        return LOC(f->locale, mkname("connection", "a_road"));
       } else {
-        return LOC(f->locale, mkname("border", "an_incomplete_road"));
+        return LOC(f->locale, mkname("connection", "an_incomplete_road"));
       }
     } else {
       int percent = MAX(1, 100*local/r->terrain->max_road);
       if (local) {
-        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border", "a_road_percent")), percent);
+        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("connection", "a_road_percent")), percent);
       } else {
-        return LOC(f->locale, mkname("border", "a_road_connection"));
+        return LOC(f->locale, mkname("connection", "a_road_connection"));
       }
     }
   }
-  else if (gflags & GF_PLURAL) return LOC(f->locale, mkname("border", "roads"));
-  else return LOC(f->locale, mkname("border", "road"));
+  else if (gflags & GF_PLURAL) return LOC(f->locale, mkname("connection", "roads"));
+  else return LOC(f->locale, mkname("connection", "road"));
   return buffer;
 }
 
 static void
-b_readroad(border * b, storage * store)
+b_readroad(connection * b, storage * store)
 {
   b->data.sa[0] = (short)store->r_int(store);
   b->data.sa[1] = (short)store->r_int(store);
 }
 
 static void
-b_writeroad(const border * b, storage * store)
+b_writeroad(const connection * b, storage * store)
 {
   store->w_int(store, b->data.sa[0]);
   store->w_int(store, b->data.sa[1]);
 }
 
 static boolean
-b_validroad(const border * b)
+b_validroad(const connection * b)
 {
   if (b->data.sa[0]==SHRT_MAX) return false;
   return true;
 }
 
 static boolean
-b_rvisibleroad(const border * b, const region * r)
+b_rvisibleroad(const connection * b, const region * r)
 {
   int x = b->data.i;
   x = (r==b->from)?b->data.sa[0]:b->data.sa[1];
@@ -528,9 +528,9 @@ write_borders(struct storage * store)
 {
   int i;
   for (i=0;i!=BORDER_MAXHASH;++i) {
-    border * bhash;
+    connection * bhash;
     for (bhash=borders[i];bhash;bhash=bhash->nexthash) {
-      border * b;
+      connection * b;
       for (b=bhash;b!=NULL;b=b->next) {
         if (b->type->valid && !b->type->valid(b)) continue;
         store->w_tok(store, b->type->__name);
@@ -552,7 +552,7 @@ read_borders(struct storage * store)
   for (;;) {
     unsigned int bid = 0;
     char zText[32];
-    border * b;
+    connection * b;
     region * from, * to;
     border_type * type;
 
@@ -576,9 +576,9 @@ read_borders(struct storage * store)
 
     type = find_bordertype(zText);
     if (type==NULL) {
-      log_error(("[read_borders] unknown border type %s in %s\n", zText, 
+      log_error(("[read_borders] unknown connection type %s in %s\n", zText, 
         regionname(from, NULL)));
-      assert(type || !"border type not registered");
+      assert(type || !"connection type not registered");
     }
 
     if (to==from && type && from) {

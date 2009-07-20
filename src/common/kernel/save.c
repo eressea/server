@@ -24,7 +24,7 @@
 
 #include "alchemy.h"
 #include "alliance.h"
-#include "border.h"
+#include "connection.h"
 #include "building.h"
 #include "faction.h"
 #include "group.h"

@@ -23,7 +23,7 @@
 #include "move.h"
 
 #include "alchemy.h"
-#include "border.h"
+#include "connection.h"
 #include "build.h"
 #include "building.h"
 #include "calendar.h"
@@ -1199,7 +1199,7 @@ cap_route(region * r, const region_list * route, const region_list * route_end, 
 static region *
 next_region(unit * u, region * current, region * next)
 {
-  border * b;
+  connection * b;
 
   b = get_borders(current, next);
   while (b!=NULL) {
@@ -1394,7 +1394,7 @@ travel_route(unit * u, const region_list * route_begin, const region_list * rout
   while (iroute && iroute!=route_end) {
     region * next = iroute->data;
     direction_t reldir = reldirection(current, next);
-    border * b = get_borders(current, next);
+    connection * b = get_borders(current, next);
 
     /* check if we are caught by guarding units */
     if (iroute!=route_begin && mode!=TRAVEL_RUNNING && mode!=TRAVEL_TRANSPORTED) {

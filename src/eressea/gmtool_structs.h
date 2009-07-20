@@ -69,12 +69,31 @@ typedef struct state {
   struct window * wnd_status;
 } state;
 
+typedef struct window {
+  boolean (*handlekey)(struct window * win, struct state * st, int key);
+  void (*paint)(struct window * win, const struct state * st);
+
+  WINDOW * handle;
+  struct window * next;
+  struct window * prev;
+  boolean initialized;
+  int update;
+} window;
+
 extern map_region * cursor_region(const view * v, const coordinate * c);
 extern void cnormalize(const coordinate * c, int * x, int * y);
 extern state * current_state;
 
+extern void set_info_function(void (*callback)(struct window *, const struct state *));
+
 #define TWIDTH  2 /* width of tile */
 #define THEIGHT 1 /* height of tile */
+
+#if WIN32
+#define wxborder(win) wborder(win, 0, 0, 0, 0, 0, 0, 0, 0)
+#else
+#define wxborder(win) wborder(win, '|', '|', '-', '-', '+', '+', '+', '+')
+#endif
 
 #ifdef __cplusplus
 }

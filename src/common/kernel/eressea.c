@@ -29,7 +29,7 @@
 #include "alliance.h"
 #include "alchemy.h"
 #include "battle.h"
-#include "border.h"
+#include "connection.h"
 #include "building.h"
 #include "calendar.h"
 #include "curse.h"
@@ -2793,7 +2793,7 @@ movewhere(const unit *u, const char * token, region * r, region** resultp)
 boolean
 move_blocked(const unit * u, const region *r, const region *r2)
 {
-  border * b;
+  connection * b;
   curse * c;
   static const curse_type * fogtrap_ct = NULL;
 
@@ -2994,7 +2994,7 @@ attrib_init(void)
   at_register(&at_maxmagicians);
   at_register(&at_npcfaction);
 
-  /* border-typen */
+  /* connection-typen */
   register_bordertype(&bt_noway);
   register_bordertype(&bt_fogwall);
   register_bordertype(&bt_wall);

@@ -345,7 +345,7 @@ extern void add_income(struct unit * u, int type, int want, int qty);
 enum {
   E_MOVE_OK = 0,   /* possible to move */
   E_MOVE_NOREGION, /* no region exists in this direction */
-  E_MOVE_BLOCKED   /* cannot see this region, there is a blocking border. */
+  E_MOVE_BLOCKED   /* cannot see this region, there is a blocking connection. */
 };
 extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 

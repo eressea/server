@@ -25,7 +25,7 @@
 /* kernel includes */
 #include "alchemy.h"
 #include "alliance.h"
-#include "border.h"
+#include "connection.h"
 #include "building.h"
 #include "curse.h"
 #include "faction.h"

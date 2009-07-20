@@ -257,14 +257,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\kernel\border.c"
-				>
-			</File>
-			<File
-				RelativePath=".\kernel\border.h"
-				>
-			</File>
-			<File
 				RelativePath=".\kernel\build.c"
 				>
 			</File>
@@ -294,6 +286,14 @@
 			</File>
 			<File
 				RelativePath=".\kernel\command.h"
+				>
+			</File>
+			<File
+				RelativePath=".\kernel\connection.c"
+				>
+			</File>
+			<File
+				RelativePath=".\kernel\connection.h"
 				>
 			</File>
 			<File

@@ -41,7 +41,7 @@
 #include <kernel/alchemy.h>
 #include <kernel/alliance.h>
 #include <kernel/battle.h>
-#include <kernel/border.h>
+#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
