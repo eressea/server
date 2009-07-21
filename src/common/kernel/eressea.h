@@ -248,6 +248,11 @@ struct building *largestbuilding(const struct region * r, boolean (*eval)(const 
 boolean is_castle(const struct building * b);
 boolean is_tax_building(const struct building * b);
 boolean is_owner_building(const struct building * b);
+
+#define TAX_ORDER 0x00
+#define TAX_OWNER 0x01
+int rule_auto_taxation(void);
+
 extern int count_all(const struct faction * f);
 extern int count_migrants (const struct faction * f);
 extern int count_maxmigrants(const struct faction * f);

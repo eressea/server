@@ -7,6 +7,34 @@ local function test_rename()
   assert(u:get_item("ao_healing")==1)
 end
 
+local function test_blessed()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("enno@eressea.de", "human", "de")
+  local u = unit.create(f, r)
+  r:set_resource("peasant", 100)
+  r:set_resource("money", 0)
+  u:add_item("money", 1000)
+  u.magic = "gwyrrd"
+  u.race = "elf"
+  u:set_skill("magic", 20)
+  u.aura = 200
+  u:add_spell("raindance")
+  u:add_spell("blessedharvest")
+  u:clear_orders()
+  u:add_order("ZAUBERE STUFE 3 Regentanz")
+  print(r:get_resource("money"))
+
+  process_orders()
+  print(r:get_resource("money"))
+  u:clear_orders()
+  u:add_order("ARBEITEN")
+  for i=1,3 do
+    process_orders()
+    print(r:get_resource("money"))
+  end
+end
+
 local function test_pure()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -621,9 +649,7 @@ tests = {
     ["market"] = test_market
 }
 mytests = {
-    ["owners"] = test_owners,
-    ["mallorn"] = test_mallorn,
-    ["recruit2"] = test_recruit2
+--    ["blessed"] = test_blessed -- foiled by peasantgrowth
 }
 fail = 0
 for k, v in pairs(mytests) do

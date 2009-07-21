@@ -53,6 +53,8 @@
 #include "terrain.h"
 #include "unit.h"
 
+#include <spells/regioncurse.h>
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -2639,6 +2641,13 @@ boolean is_tax_building(const building * b)
   return false;
 }
 
+int rule_auto_taxation(void)
+{
+  static int rule_taxation = -1;
+  rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
+  return rule_taxation;
+}
+
 static int
 default_wage(const region *r, const faction * f, const race * rc)
 {
@@ -2681,7 +2690,10 @@ default_wage(const region *r, const faction * f, const race * rc)
     } else {
       wage = wagetable[esize][2];
     }
-    wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+    if (rule_blessed_harvest()==HARVEST_WORK) {
+      /* E1 rules */
+      wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+    }
   }
 
   /* Artsculpture: Income +5 */

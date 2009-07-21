@@ -56,6 +56,8 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
+#include <spells/regioncurse.h>
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -3025,6 +3027,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
   /* fishes: maximale Arbeiter */
   int jobs = maxwork;
   int p_wage = wage(r, NULL, NULL);
+  int money = rmoney(r);
   request *o;
 
   for (o = work_begin; o != work_end; ++o) {
@@ -3056,7 +3059,19 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
     jobs = rpeasants(r);
   }
   earnings = jobs * p_wage;
-  rsetmoney(r, rmoney(r) + earnings);
+  if (rule_blessed_harvest()==HARVEST_TAXES) {
+    /* E3 rules */
+    static const curse_type * blessedharvest_ct;
+    if (!blessedharvest_ct) {
+      blessedharvest_ct = ct_find("blessedharvest");
+    }
+    if (blessedharvest_ct) {
+      int happy = curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+      happy = MIN(happy, jobs);
+      earnings += happy;
+    }
+  }
+  rsetmoney(r, money + earnings);
 }
 
 static int
@@ -3240,10 +3255,9 @@ produce(struct region *r)
   request *taxorders, *sellorders, *stealorders, *buyorders;
   unit *u;
   int todo;
-  static int rule_taxation = -1;
   static int rule_autowork = -1;
-    boolean limited = true;
-    request * nextworker = workers;
+  boolean limited = true;
+  request * nextworker = workers;
 
   /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
   * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
@@ -3255,15 +3269,14 @@ produce(struct region *r)
   *
   * lehren vor lernen. */
 
-  if (rule_taxation<0) {
-    rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", 0);
+  if (rule_autowork<0) {
     rule_autowork = get_param_int(global.parameters, "work.auto", 0);
   }
   
   assert(rmoney(r) >= 0);
   assert(rpeasants(r) >= 0);
 
-  if (r->land && rule_taxation==1) {
+  if (r->land && rule_auto_taxation()) {
     /* new taxation rules, region owners make money based on morale and building */
     peasant_taxes(r);
   }

@@ -276,7 +276,7 @@
   <!-- end cerddor -->
 
   <!-- new gwyrrd -->
-  <spell name="blessedharvest" type="gray" rank="5" level="1" index="25" ship="true" far="true" variable="true">
+  <spell name="blessedharvest" type="gwyrrd" rank="5" level="3" index="25" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -301,7 +301,7 @@
     <!-- Hagel -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="goodwinds" type="gwyrrd" rank="5" level="4" index="56" parameters="s" ship="true" variable="true">
+  <spell name="goodwinds" type="common" rank="5" level="4" index="56" parameters="s" ship="true" variable="true">
     <!-- Beschwörung eines Wasserelementares -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
@@ -502,7 +502,7 @@
     <resource name="aura" amount="30" cost="fixed"/>
     <resource name="peasant" amount="50" cost="fixed"/>
   </spell>
-  <spell name="raindance" type="common" rank="5" level="3" index="26" ship="true" far="true" variable="true">
+  <spell name="raindance" type="common" rank="5" level="2" index="26" ship="true" far="true" variable="true">
     <!-- Regentanz -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>

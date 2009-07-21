@@ -1069,7 +1069,7 @@ sp_mallorn(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Segen der Erde
+/* Name:       Segen der Erde / Regentanz
  * Stufe:      1
  * Kategorie:  Region, positiv
  * Gebiet:     Gwyrrd
@@ -1087,14 +1087,34 @@ sp_blessedharvest(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  int duration = (int)power+1;
   variant effect;
-
+  int rule = rule_blessed_harvest();
   /* Attribut auf Region.
    * Existiert schon ein curse, so wird dieser verstärkt
    * (Max(Dauer), Max(Stärke))*/
-  effect.i = 1;
-  create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
+  if (rule==HARVEST_WORK) {
+    int duration = (int)power+1;
+    effect.i = 1;
+    create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
+  } else if (rule==HARVEST_TAXES) {
+    int duration = (int)(power*2);
+    if (co->sp->id!=SPL_BLESSEDHARVEST) {
+      effect.i = (int)(100 * power);
+      create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
+    } else {
+      int d;
+      region * rn[MAXDIRECTIONS];
+      get_neighbours(r, rn);
+      effect.i = (int)(50 * power);
+      for (d=0;d!=MAXDIRECTIONS;++d) {
+        region * rx = rn[d];
+        if (rx && rx->land) {
+          create_curse(mage, &rx->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
+       }
+      }
+      create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
+    }
+  }
   {
     message * seen = msg_message("harvest_effect", "mage", mage);
     message * unseen = msg_message("harvest_effect", "mage", NULL);
