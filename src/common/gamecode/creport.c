@@ -607,7 +607,6 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 
   /* calculate cargo */
   if (u && (u->faction == f || omniscient(f))) {
-    static int rule_capacity = -1;
     int n = 0, p = 0;
     int mweight = shipcapacity(sh);
     int mcabins = sh->type->cabins;

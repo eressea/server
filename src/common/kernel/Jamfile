@@ -10,12 +10,12 @@ SOURCES =
  alchemy.c
  alliance.c
  battle.c
- border.c
  build.c
  building.c
  calendar.c
- curse.c
  command.c
+ connection.c
+ curse.c
  eressea.c
  equipment.c
  faction.c

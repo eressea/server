@@ -135,7 +135,7 @@ tolua_region_get_owner(lua_State* L)
   region* r = (region*) tolua_tousertype(L, 1, 0);
   if (r) {
     struct faction * f = region_get_owner(r);
-    tolua_pushusertype(L, f, "faction");
+    tolua_pushusertype(L, f, TOLUA_CAST "faction");
     return 1;
   }
   return 0;

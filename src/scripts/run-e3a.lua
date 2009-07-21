@@ -1,10 +1,6 @@
 -- the locales that this gameworld supports.
 local locales = { "de", "en" }
 local confirmed_multis = { 
-   "agve", "dbgi", "7jfa", "qbki",
-   "gu8y", "wgxe", "iwp0", "r8vz",
-   "78xt", "34fu", "z33r", "fLkr",
-   "yuok"
 }
 local suspected_multis = { 
 }
@@ -168,11 +164,15 @@ function process(orders)
   end
 
   kill_multis(confirmed_multis)
-  plan_monsters()
+  -- plan_monsters()
 
   local nmrs = get_nmrs(1)
-  if nmrs >= 80 then
-    print("Shit. More than 80 factions with 1 NMR (" .. nmrs .. ")")
+  --  nmrs = 0
+  if maxnmrs == nil then
+      maxnmrs = 30
+  end
+  if nmrs >= maxnmrs then
+    print("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
     write_summary()
     write_game("aborted.dat")
     return -1

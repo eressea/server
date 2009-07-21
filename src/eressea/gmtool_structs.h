@@ -89,7 +89,7 @@ extern void set_info_function(void (*callback)(struct window *, const struct sta
 #define TWIDTH  2 /* width of tile */
 #define THEIGHT 1 /* height of tile */
 
-#if WIN32
+#ifdef WIN32
 #define wxborder(win) wborder(win, 0, 0, 0, 0, 0, 0, 0, 0)
 #else
 #define wxborder(win) wborder(win, '|', '|', '-', '-', '+', '+', '+', '+')
