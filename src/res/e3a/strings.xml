@@ -147,14 +147,22 @@
   
    <namespace name="spellinfo">
     <string name="raindance">
-      <text locale="de">Durch dieses uralte Tanzritual ruft der Zauberkundige die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden Regenfälle begünstigen das Wachstum und erhöhen die Ernteerträge einiger Bauern der Region bis der Regen wieder nachlässt.</text>
+      <text locale="de">Durch dieses uralte Tanzritual ruft der Zauberkundige 
+        die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden
+        Regenfälle begünstigen das Wachstum und erhöhen die Ernteerträge 
+        einiger Bauern der Region bis der Regen wieder nachlässt.</text>
       <text locale="en">This ancient rite calls upon the
       forces of life and fertility. For the next few weeks,
       the peasant's harvest will be extraordinary good.
       (OBS: this spell has been changed and needs a new translation).</text>
     </string>
     <string name="blessedharvest">
-      <text locale="de">Für dieses Ernteritual sendet der Zauberwirker seine Arkane Energie entlang der Astralen Kraftlinien der gesamten Umgebung um selbst Naturgeister zu erreichen die weit von Ihm entfernt sind. Das Beeinflussen dieser Naturgeister ist eine hohe Kunst die höchste Konzentration und vor allem viel Erfahrung benötigt. Die Bauern werden nach und nach von den besseren Ernten profitieren und ihre Ersparnisse steigern können..</text>
+      <text locale="de">Für dieses Ernteritual sendet der Druide seine arkane Energie entlang
+        der astralen Kraftlinien der gesamten Umgebung, um selbst weit entfernte
+        Naturgeister zu erreichen. Die Beschwörung dieser Naturgeister ist eine
+        hohe Kunst, die höchste Konzentration und vor allem viel Erfahrung
+        erfordert. Die Bauern werden nach und nach von den besseren Ernten
+        profitieren und ihre Ersparnisse steigern können.</text>
       <text locale="en">This ritual increases the output of the local farms.
       Peasants in the region produce an extra silverpiece. The stronger the
       druid's spell is, the longer the effect will last.
