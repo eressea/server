@@ -5170,15 +5170,6 @@
       wounds, mend fractured bones and even regenerate lost
       lims. </text>
     </string>
-    <string name="raindance">
-      <text locale="de">Dieses uralte Tanzritual ruft die
-      Kräfte des Lebens und der Fruchtbarkeit. Die Erträge der
-      Bauern werden für einige Wochen deutlich besser
-      ausfallen.</text>
-      <text locale="en">This ancient rite calls upon the
-      forces of life and fertility. For the next few weeks,
-      the peasant's harvest will be extraordinary good.</text>
-    </string>
     <string name="song_of_fear">
       <text locale="de">Ein gar machtvoller Gesang aus den
       Überlieferungen der Katzen, der tief in die Herzen der
@@ -5192,14 +5183,6 @@
       and bodies will be ruled by panic. Shivering with fear,
       they will flee from the dreadful chants and try to make
       their escape.</text>
-    </string>
-    <string name="blessedharvest">
-      <text locale="de">Dieses Ernteritual verbessert die Erträge der
-      arbeitenden Bauern in der Region um ein Silberstück. Je mehr Kraft der
-      Druide investiert, desto länger wirkt der Zauber.</text>
-      <text locale="en">This ritual increases the output of the local farms.
-      Peasants in the region produce an extra silverpiece. The stronger the
-      druid's spell is, the longer the effect will last.</text>
     </string>
     <string name="song_of_confusion">
       <text locale="de">Aus den uralten Gesängen der Katzen
