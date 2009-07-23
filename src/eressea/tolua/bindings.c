@@ -336,16 +336,16 @@ tolua_create_curse(lua_State * L)
   attrib ** ap = NULL;
 
   if (tolua_isusertype(L, 2, TOLUA_CAST "unit", 0, &tolua_err)) {
-    unit * target = (unit *)tolua_tousertype(L, 1, 0);
+    unit * target = (unit *)tolua_tousertype(L, 2, 0);
     if (target) ap = &target->attribs;
   } else if (tolua_isusertype(L, 2, TOLUA_CAST "region", 0, &tolua_err)) {
-    region * target = (region *)tolua_tousertype(L, 1, 0);
+    region * target = (region *)tolua_tousertype(L, 2, 0);
     if (target) ap = &target->attribs;
   } else if (tolua_isusertype(L, 2, TOLUA_CAST "ship", 0, &tolua_err)) {
-    ship * target = (ship *)tolua_tousertype(L, 1, 0);
+    ship * target = (ship *)tolua_tousertype(L, 2, 0);
     if (target) ap = &target->attribs;
   } else if (tolua_isusertype(L, 2, TOLUA_CAST "building", 0, &tolua_err)) {
-    building * target = (building *)tolua_tousertype(L, 1, 0);
+    building * target = (building *)tolua_tousertype(L, 2, 0);
     if (target) ap = &target->attribs;
   }
   if (ap) {
