@@ -90,9 +90,8 @@ msg_set_resource(lua_message * msg, const char * param, const char * resname)
 int
 msg_set_unit(lua_message * msg, const char * param, const unit * u)
 {
-  int i = mtype_get_param(msg->mtype, param);
-
   if (msg->mtype) {
+    int i = mtype_get_param(msg->mtype, param);
 
     if (i==msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
@@ -111,8 +110,8 @@ msg_set_unit(lua_message * msg, const char * param, const unit * u)
 int
 msg_set_region(lua_message * msg, const char * param, const region * r)
 {
-  int i = mtype_get_param(msg->mtype, param);
   if (msg->mtype) {
+    int i = mtype_get_param(msg->mtype, param);
 
     if (i==msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
@@ -131,9 +130,10 @@ msg_set_region(lua_message * msg, const char * param, const region * r)
 int
 msg_set_string(lua_message * msg, const char * param, const char * value)
 {
-  int i = mtype_get_param(msg->mtype, param);
   if (msg->mtype) {
+    int i = mtype_get_param(msg->mtype, param);
     variant var;
+
     if (i==msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
