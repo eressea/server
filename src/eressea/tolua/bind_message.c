@@ -289,8 +289,11 @@ tolua_msg_report_action(lua_State * L)
   lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
   region * r = (region *)tolua_tousertype(L, 2, 0);
   unit * u = (unit *)tolua_tousertype(L, 3, 0);
-  int flags = (int)tolua_tonumber(L, 4, 0);
-  int result = report_action(r, u, lmsg->msg, flags);
+  int result, flags = (int)tolua_tonumber(L, 4, 0);
+  if (lmsg->msg==NULL) {
+    lmsg->msg = msg_create(lmsg->mtype, lmsg->args);
+  }
+  result = report_action(r, u, lmsg->msg, flags);
   tolua_pushnumber(L, (lua_Number)result);
   return 1;
 }
