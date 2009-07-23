@@ -243,7 +243,7 @@ cinfo_sparkle(const void * obj, typ_t typ, const curse *c, int self)
   while (effects[end]!=NULL) ++end;
   if (end==begin) return NULL;
   else {
-    int index = begin + curse_geteffect(c) % (end-begin);
+    int index = begin + curse_geteffect_int(c) % (end-begin);
     return msg_message(mkname("curseinfo", effects[index]), "unit id", u, c->no);
   }
 }
@@ -327,9 +327,9 @@ cinfo_skillmod(const void * obj, typ_t typ, const curse *c, int self)
   if (self != 0) {
     unit *u = (unit *)obj;
     int sk = c->data.i;
-    if (c->effect.i>0) {
+    if (c->effect>0) {
       return msg_message("curseinfo::skill_1", "unit skill id", u, sk, c->no);
-    } else if (c->effect.i<0) {
+    } else if (c->effect<0) {
       return msg_message("curseinfo::skill_2", "unit skill id", u, sk, c->no);
     }
   }

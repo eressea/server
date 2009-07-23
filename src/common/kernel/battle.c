@@ -1928,7 +1928,7 @@ skilldiff(troop at, troop dt, int dist)
       curse * c = get_curse(df->building->attribs, strongwall_ct);
       if (curse_active(c)) {
         /* wirkt auf alle Gebäude */
-        skdiff -= curse_geteffect(c);
+        skdiff -= curse_geteffect_int(c);
         is_protected = 2;
       }
     }
@@ -3275,7 +3275,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
       curse *c = get_curse(u->attribs, speed_ct);
       if (c) {
         speeded = get_cursedmen(u, c);
-        speed   = curse_geteffect(c);
+        speed   = curse_geteffect_int(c);
       }
     }
   }

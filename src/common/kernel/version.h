@@ -62,6 +62,7 @@
 #define UIDHASH_VERSION 332 /* borders use the region.uid to store */
 #define REGIONOWNER_VERSION 333 /* regions have owners and morale */
 #define ALLIANCELEADER_VERSION 333 /* alliances have a leader */
+#define CURSEFLOAT_VERSION 334 /* all curse-effects are float */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION ALLIANCELEADER_VERSION /* current datafile */
+#define RELEASE_VERSION CURSEFLOAT_VERSION /* current datafile */

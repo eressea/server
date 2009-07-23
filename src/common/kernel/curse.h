@@ -191,7 +191,7 @@ typedef struct curse {
   int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
   double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
   struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
-  variant effect;
+  double effect;
   variant data;        /* pointer auf spezielle curse-unterstructs*/
 } curse;
 
@@ -240,7 +240,7 @@ extern int curse_read(struct attrib * a, struct storage * store);
 */
 
 curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type * ctype,
-    double vigour, int duration, variant ceffect, int men);
+    double vigour, int duration, double ceffect, int men);
   /* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
    * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
    * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
@@ -257,7 +257,8 @@ extern void remove_curse(struct attrib **ap, const struct curse * c);
   /* löscht einen konkreten Spruch auf einem Objekt.
    */
 
-extern int curse_geteffect(const struct curse * c);
+extern int curse_geteffect_int(const struct curse * c);
+extern double curse_geteffect(const struct curse * c);
   /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
    * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
    * gespeichert. Wird automatisch beim Anlegen eines neuen curse

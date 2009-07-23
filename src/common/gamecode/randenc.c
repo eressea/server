@@ -1038,10 +1038,10 @@ orc_growth(void)
         int n;
         int increase = 0;
         int num  = get_cursedmen(u, c);
-        int prob = curse_geteffect(c);
+        double prob = curse_geteffect(c);
 
         for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
-          if (rng_int() % 100 < prob) {
+          if (chance(prob)) {
             ++increase;
           }
         }

@@ -67,11 +67,9 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
     if(distance(u->region, r) < HORNRANGE) {
       if(a_find(r->attribs, &at_peaceimmune) == NULL) {
         attrib *a;
-        variant effect;
 
-        effect.i = 1;
         create_curse(u, &r->attribs, ct_find("peacezone"),
-          20, HORNDURATION, effect, 0);
+          20, HORNDURATION, 1.0, 0);
 
         a = a_add(&r->attribs, a_new(&at_peaceimmune));
         a->data.i = HORNIMMUNITY;
@@ -107,7 +105,6 @@ useonother_trappedairelemental(struct unit * u, int shipId,
 {
   curse  *c;
   ship   *sh;
-  variant effect;
 
   if (shipId <= 0) {
     cmistake(u, ord, 20, MSG_MOVE);
@@ -120,8 +117,7 @@ useonother_trappedairelemental(struct unit * u, int shipId,
     return -1;
   }
 
-  effect.i = SPEEDUP;
-  c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect, 0);
+  c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, SPEEDUP, 0);
   c_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",

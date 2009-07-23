@@ -115,9 +115,8 @@ curse_emptiness(void)
         }
       }
       if (d!=MAXDIRECTIONS) {
-        variant effect;
+        double effect = 0.0;
         curse * c;
-        effect.i = 0;
         c = create_curse(NULL, &r->attribs, ct, 100, 100, effect, 0);
       }
       freset(r, RF_MARK);

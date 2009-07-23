@@ -841,7 +841,7 @@ sp_strong_wall(fighter * fi, int level, double power, spell * sp)
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   building *burg;
-  variant effect;
+  double effect;
   static boolean init = false;
   message * msg;
   static const curse_type * strongwall_ct;
@@ -854,9 +854,7 @@ sp_strong_wall(fighter * fi, int level, double power, spell * sp)
   }
   burg = mage->building;
 
-  effect.i = (int)(power/4);
-  if (chance(power-effect.i)) ++effect.i;
-
+  effect = power*0.25;
   create_curse(mage, &burg->attribs, strongwall_ct, power, 1, effect, 0);
 
   msg = msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);

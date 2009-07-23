@@ -152,7 +152,7 @@ alp_findet_opfer(unit *alp, region *r)
   alp_data * ad = (alp_data*)a->data.v;
   unit *mage = ad->mage;
   unit *opfer = ad->target;
-  variant effect;
+  double effect;
   message * msg;
 
   assert(opfer);
@@ -172,7 +172,7 @@ alp_findet_opfer(unit *alp, region *r)
   a_removeall(&alp->attribs, &at_eventhandler);
 
   /* Alp umwandeln in Curse */
-  effect.i = -2;
+  effect = -2;
   c = create_curse(mage, &opfer->attribs, ct_find("worse"), 2, 2, effect, opfer->number);
   /* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
   * auch auf normale */

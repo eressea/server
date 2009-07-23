@@ -636,7 +636,7 @@ ShipSpeedBonus(const unit * u)
 int
 shipspeed(const ship * sh, const unit * u)
 {
-  int k = sh->type->range;
+  double k = sh->type->range;
   static const curse_type * stormwind_ct, * nodrift_ct;
   static boolean init;
   attrib *a;
@@ -686,7 +686,7 @@ shipspeed(const ship * sh, const unit * u)
   if (sh->damage) k = (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE- 1) / (sh->size*DAMAGE_SCALE);
 #endif
 
-  return k;
+  return (int)k;
 }
 
 #define FMAXHASH 2039
@@ -2654,7 +2654,7 @@ default_wage(const region *r, const faction * f, const race * rc)
   building *b = largestbuilding(r, &is_castle, false);
   int      esize = 0;
   curse * c;
-  int      wage;
+  double wage;
   attrib   *a;
   const building_type *artsculpture_type = bt_find("artsculpture");
   static const curse_type * drought_ct, * blessedharvest_ct;
@@ -2717,7 +2717,7 @@ default_wage(const region *r, const faction * f, const race * rc)
   a = a_find(r->attribs, &at_reduceproduction);
   if (a) wage = (wage * a->data.sa[0])/100;
 
-  return wage;
+  return (int)wage;
 }
 
 static int
@@ -3048,7 +3048,7 @@ default_order(const struct locale * lang)
 int
 entertainmoney(const region *r)
 {
-  int n;
+  double n;
 
   if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
     return 0;
@@ -3060,7 +3060,7 @@ entertainmoney(const region *r)
     n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
   }
 
-  return n;
+  return (int)n;
 }
 
 int rule_give(void)

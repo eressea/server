@@ -3066,7 +3066,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
       blessedharvest_ct = ct_find("blessedharvest");
     }
     if (blessedharvest_ct) {
-      int happy = curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+      int happy = (int)curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
       happy = MIN(happy, jobs);
       earnings += happy;
     }

@@ -693,9 +693,9 @@ use_tacticcrystal(unit * u, const struct item_type * itype, int amount, struct o
                       Fall egal, da der curse für den Kampf gelten soll,
                       der vor den Antimagiezaubern passiert */
     curse * c;
-    variant effect;
+    double effect;
 
-    effect.i = rng_int()%6 - 1;
+    effect = rng_int()%6 - 1;
     c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
       duration, effect, u->number);
     c->data.i = SK_TACTICS;

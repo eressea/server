@@ -772,8 +772,8 @@ use_item_aura(const region * r, const unit * u)
 int
 max_spellpoints(const region * r, const unit * u)
 {
-  int sk, n;
-  double msp;
+  int sk;
+  double n, msp;
   double potenz = 2.1;
   double divisor = 1.2;
 
@@ -1387,7 +1387,7 @@ do_fumble(castorder *co)
   const spell *sp = co->sp;
   int level = co->level;
   int duration;
-  variant effect;
+  double effect;
 
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
     u, r, sp));
@@ -1429,7 +1429,7 @@ do_fumble(castorder *co)
   case 2:
     /* temporärer Stufenverlust */
     duration = MAX(rng_int()%level/2, 2);
-    effect.i = -(level/2);
+    effect = -0.5*level;
     c = create_curse(u, &u->attribs, ct_find("skillmod"), (float)level, duration,
       effect, 1);
     c->data.i = SK_MAGIC;
@@ -1517,7 +1517,7 @@ regeneration_magiepunkte(void)
   int aura, auramax;
   double reg_aura;
   int regen;
-  int n;
+  double mod;
 
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u = u->next) {
@@ -1534,9 +1534,9 @@ regeneration_magiepunkte(void)
           if (btype) reg_aura *= btype->auraregen;
 
           /* Bonus/Malus durch Zauber */
-          n = get_curseeffect(u->attribs, C_AURA, 0);
-          if (n>0) {
-            reg_aura = (reg_aura*n)/100;
+          mod = get_curseeffect(u->attribs, C_AURA, 0);
+          if (mod>0) {
+            reg_aura = (reg_aura*mod)/100.0;
           }
 
           /* Einfluss von Artefakten */

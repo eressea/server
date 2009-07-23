@@ -96,7 +96,7 @@
 #include <attributes/hate.h>
 /* ----------------------------------------------------------------------- */
 
-static variant zero_effect = { 0 };
+static double zero_effect = 0.0;
 
 attrib_type at_unitdissolve = {
   "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
@@ -996,7 +996,7 @@ sp_maelstrom(castorder *co)
   int cast_level = co->level;
   curse * c;
   double power = co->force;
-  variant effect;
+  double effect = co->force;
   int duration = (int)power+1;
 
   if (!fval(r->terrain, SEA_REGION)) {
@@ -1008,7 +1008,6 @@ sp_maelstrom(castorder *co)
   /* Attribut auf Region.
    * Existiert schon ein curse, so wird dieser verstärkt
    * (Max(Dauer), Max(Stärke))*/
-  effect.i = (int)power;
   c = create_curse(mage, &r->attribs, ct_find("maelstrom"), power, duration, effect, 0);
 
   /* melden, 1x pro Partei */
@@ -1087,25 +1086,25 @@ sp_blessedharvest(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  variant effect;
+  double effect;
   int rule = rule_blessed_harvest();
   /* Attribut auf Region.
    * Existiert schon ein curse, so wird dieser verstärkt
    * (Max(Dauer), Max(Stärke))*/
   if (rule==HARVEST_WORK) {
     int duration = (int)power+1;
-    effect.i = 1;
+    effect = 1;
     create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
   } else if (rule==HARVEST_TAXES) {
     int duration = (int)(power*2);
     if (co->sp->id!=SPL_BLESSEDHARVEST) {
-      effect.i = (int)(100 * power);
+      effect = (int)(100 * power);
       create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
     } else {
       int d;
       region * rn[MAXDIRECTIONS];
       get_neighbours(r, rn);
-      effect.i = (int)(50 * power);
+      effect = (int)(50 * power);
       for (d=0;d!=MAXDIRECTIONS;++d) {
         region * rx = rn[d];
         if (rx && rx->land) {
@@ -1387,7 +1386,7 @@ sp_kaelteschutz(castorder *co)
   double force = co->force;
   int duration = MAX(cast_level, (int)force) + 1;
   spellparameter *pa = co->par;
-  variant effect;
+  double effect;
 
   force*=10;  /* 10 Personen pro Force-Punkt */
 
@@ -1408,7 +1407,7 @@ sp_kaelteschutz(castorder *co)
       men = u->number;
     }
 
-    effect.i = 1;
+    effect = 1;
     create_curse(mage, &u->attribs, ct_find("insectfur"), cast_level,
         duration, effect, men);
 
@@ -1447,7 +1446,7 @@ sp_sparkle(castorder *co)
   int cast_level = co->level;
   spellparameter *pa = co->par;
   int duration = cast_level+1;
-  variant effect;
+  double effect;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -1457,7 +1456,7 @@ sp_sparkle(castorder *co)
   if (pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
   u = pa->param[0]->data.u;
-  effect.i = rng_int();
+  effect = rng_int() % 0xffffff;
   create_curse(mage, &u->attribs, ct_find("sparkle"), cast_level,
       duration, effect, u->number);
 
@@ -1632,7 +1631,7 @@ sp_great_drought(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   int duration = 2;
-  variant effect;
+  double effect;
 
   if (fval(r->terrain, SEA_REGION) ) {
     cmistake(mage, co->order, 189, MSG_MAGIC);
@@ -1648,7 +1647,7 @@ sp_great_drought(castorder *co)
   rsethorses(r, rhorses(r)/2);
 
   /* Arbeitslohn = 1/4 */
-  effect.i = 4;
+  effect = 4.0; /* curses: higher is stronger */
   create_curse(mage, &r->attribs, ct_find("drought"), force, duration, effect, 0);
 
   /* terraforming */
@@ -2031,7 +2030,7 @@ sp_homestone(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
-  variant effect;
+  double effect;
   message * msg;
   if (!mage->building || mage->building->type != bt_find("castle")) {
     cmistake(mage, co->order, 197, MSG_MAGIC);
@@ -2048,7 +2047,7 @@ sp_homestone(castorder *co)
   c_setflag(c, CURSE_NOAGE|CURSE_ONLYONE);
 
   /* Magieresistenz der Burg erhöht sich um 50% */
-  effect.i = 50;
+  effect = 50;
   c = create_curse(mage,  &mage->building->attribs,
     ct_find("magicresistance"), force*force, 1, effect, 0);
   c_setflag(c, CURSE_NOAGE);
@@ -2115,14 +2114,14 @@ sp_drought(castorder *co)
     c->vigour = MAX(c->vigour, power);
     c->duration = MAX(c->duration, (int)power);
   } else {
-    variant effect;
+    double effect;
     /* Baeume und Pferde sterben */
     rsettrees(r, 2, rtrees(r,2)/2);
     rsettrees(r, 1, rtrees(r,1)/2);
     rsettrees(r, 0, rtrees(r,0)/2);
     rsethorses(r, rhorses(r)/2);
 
-    effect.i = 4;
+    effect = 4.0;
     create_curse(mage, &r->attribs, ct_find("drought"), power, duration, effect, 0);
   }
   return cast_level;
@@ -2486,7 +2485,7 @@ sp_fumblecurse(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
-  variant effect;
+  double effect;
   curse * c;
   spellparameter *pa = co->par;
 
@@ -2499,7 +2498,7 @@ sp_fumblecurse(castorder *co)
   sx = cast_level - effskill(target, SK_MAGIC);
   duration = MAX(sx, rx) + 1;
 
-  effect.i = (int)(force/2);
+  effect = force*0.5;
   c = create_curse(mage, &target->attribs, ct_find("fumble"),
     force, duration, effect, 0);
   if (c == NULL) {
@@ -2520,10 +2519,10 @@ patzer_fumblecurse(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   int duration = (cast_level/2)+1;
-  variant effect;
+  double effect;
   curse * c;
 
-  effect.i = (int)(force/2);
+  effect = force*0.5;
   c = create_curse(mage, &mage->attribs, ct_find("fumble"), force,
         duration, effect, 0);
   if (c!=NULL) {
@@ -3135,7 +3134,7 @@ dc_age(struct curse * c)
   up = &r->units;
   if (curse_active(c)) while (*up!=NULL) {
     unit * u = *up;
-    double damage = c->effect.f * u->number;
+    double damage = c->effect * u->number;
 
     freset(u->faction, FFL_SELECT);
     if (u->number<=0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
@@ -3160,10 +3159,10 @@ static struct curse_type ct_deathcloud = {
 static curse *
 mk_deathcloud(unit * mage, region * r, double force, int duration)
 {
-  variant effect;
+  double effect;
   curse * c;
 
-  effect.f = (float)force/2;
+  effect = force * 0.5;
   c = create_curse(mage, &r->attribs, &ct_deathcloud, force, duration, effect, 0);
   c->data.v = r;
   return c;
@@ -3191,10 +3190,10 @@ dc_read_compat(struct attrib * a, storage * store)
   r = findregion(rx, ry);
 
   if (r!=NULL) {
-    variant effect;
+    double effect;
     curse * c;
 
-    effect.f = (float)strength;
+    effect = strength;
     c = create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration, effect, 0);
     c->data.v = r;
     if (u==NULL) {
@@ -3469,7 +3468,7 @@ sp_magicboost(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  variant effect;
+  double effect;
   trigger * tsummon;
   static const curse_type * ct_auraboost;
   static const curse_type * ct_magicboost;
@@ -3486,11 +3485,11 @@ sp_magicboost(castorder *co)
     return 0;
   }
 
-  effect.i = 6;
+  effect = 6;
   c = create_curse(mage, &mage->attribs, ct_magicboost, power, 10, effect, 1);
 
   /* one aura boost with 200% aura now: */
-  effect.i = 200;
+  effect = 200;
   c = create_curse(mage, &mage->attribs, ct_auraboost, power, 4, effect, 1);
 
   /* and one aura boost with 50% aura in 5 weeks: */
@@ -3912,16 +3911,14 @@ sp_charmingsong(castorder *co)
 static int
 sp_song_resistmagic(castorder *co)
 {
-  variant mr_bonus;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
 
-  mr_bonus.i = 15;
   create_curse(mage, &r->attribs, ct_find("goodmagicresistancezone"),
-      force, duration, mr_bonus, 0);
+      force, duration, 15, 0);
 
   /* Erfolg melden */
   ADDMSG(&mage->faction->msgs, msg_message(
@@ -3944,16 +3941,14 @@ sp_song_resistmagic(castorder *co)
 static int
 sp_song_susceptmagic(castorder *co)
 {
-  variant mr_malus;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
 
-  mr_malus.i = 15;
   create_curse(mage, &r->attribs, ct_find("badmagicresistancezone"),
-      force, duration, mr_malus, 0);
+      force, duration, 15, 0);
 
   ADDMSG(&mage->faction->msgs, msg_message(
         "regionmagic_effect", "unit region command", mage,
@@ -4030,7 +4025,7 @@ sp_raisepeasantmob(castorder *co)
   unit *u;
   attrib *a;
   int n;
-  variant anteil;
+  int anteil;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
@@ -4039,9 +4034,9 @@ sp_raisepeasantmob(castorder *co)
   faction * monsters = get_monsters();
   message * msg;
 
-  anteil.i = 6 + (rng_int()%4);
+  anteil = 6 + (rng_int()%4);
 
-  n = rpeasants(r) * anteil.i / 10;
+  n = rpeasants(r) * anteil / 10;
   n = MAX(0, n);
   n = MIN(n, rpeasants(r));
 
@@ -4061,7 +4056,7 @@ sp_raisepeasantmob(castorder *co)
   a->data.ca[1] = 15; /* 15% */
   a_add(&u->attribs, a);
 
-  create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, duration, anteil, 0);
+  create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, duration, (double)anteil, 0);
 
   msg = msg_message("sp_raisepeasantmob_effect", "mage region", mage, r);
   report_spell(mage, r, msg);
@@ -4204,7 +4199,7 @@ sp_generous(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   int duration = (int)force+1;
-  variant effect;
+  double effect;
   message * msg[2] = { NULL, NULL };
 
   if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
@@ -4212,7 +4207,7 @@ sp_generous(castorder *co)
     return 0;
   }
 
-  effect.i = 2;
+  effect = 2;
   create_curse(mage,&r->attribs, ct_find("generous"), force, duration, effect, 0);
 
   for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
@@ -4491,7 +4486,7 @@ sp_calm_monster(castorder *co)
   spellparameter *pa = co->par;
   int cast_level = co->level;
   double force = co->force;
-  variant effect;
+  double effect;
   message * msg;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -4505,7 +4500,7 @@ sp_calm_monster(castorder *co)
     return 0;
   }
 
-  effect.i = mage->faction->subscription;
+  effect = mage->faction->subscription;
   c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force,
     (int)force, effect, 0);
   if (c==NULL) {
@@ -4992,7 +4987,7 @@ sp_baddreams(castorder *co)
   double power = co->force;
   region *r = co->rt;
   curse * c;
-  variant effect;
+  double effect;
 
   /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
    * also duration+2 */
@@ -5000,7 +4995,7 @@ sp_baddreams(castorder *co)
   duration = 2 + rng_int()%duration;
 
   /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
-  effect.i = -1;
+  effect = -1;
   c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
 
   /* Erfolg melden*/
@@ -5032,13 +5027,13 @@ sp_gooddreams(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  variant effect;
+  double effect;
 
   /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
    * also duration+2 */
   duration = (int)MAX(1, power/2); /* Stufe 1 macht sonst mist */
   duration = 2 + rng_int()%duration;
-  effect.i = 1;
+  effect = 1;
   c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
 
   /* Erfolg melden*/
@@ -5153,7 +5148,7 @@ sp_sweetdreams(castorder *co)
   for (n = 0; n < pa->length; n++) {
     curse * c;
     unit *u;
-    variant effect;
+    double effect;
     message * msg;
     /* sollte nie negativ werden */
     if (opfer < 1) break;
@@ -5173,7 +5168,7 @@ sp_sweetdreams(castorder *co)
     opfer -= men;
 
     /* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
-    effect.i = 5;
+    effect = 0.05;
     c = create_curse(mage,&u->attribs, ct_find("orcish"), power, duration, effect, men);
 
     msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
@@ -5195,10 +5190,10 @@ sp_disturbingdreams(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   int duration = 1 + (int)(power/6);
-  variant effect;
+  double effect;
   curse * c;
 
-  effect.i = 10;
+  effect = 10;
   c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, effect, 0);
 
   ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect", "mage region", mage, r));
@@ -5317,7 +5312,6 @@ sp_resist_magic_bonus(castorder *co)
 {
   unit *u;
   int n, m;
-  variant resistbonus;
   int duration = 6;
   unit *mage = co->magician.u;
   int cast_level = co->level;
@@ -5349,9 +5343,8 @@ sp_resist_magic_bonus(castorder *co)
     m = MIN(u->number,victims);
     victims -= m;
 
-    resistbonus.i = 20;
     create_curse(mage, &u->attribs, ct_find("magicresistance"),
-      power, duration, resistbonus, m);
+      power, duration, 20, m);
 
     msg = msg_message("magicresistance_effect", "unit", u);
     add_message(&u->faction->msgs, msg);
@@ -5982,7 +5975,7 @@ sp_disruptastral(castorder *co)
 
   for (rl2=rl; rl2!=NULL; rl2=rl2->next) {
     attrib *a;
-    variant effect;
+    double effect;
     region * r2 = rl2->data;
     spec_direction *sd;
     int inhab_regions = 0;
@@ -6034,7 +6027,7 @@ sp_disruptastral(castorder *co)
     }
 
     /* Kontakt unterbinden */
-    effect.i = 100;
+    effect = 100;
     create_curse(mage, &rl2->data->attribs, ct_find("astralblock"),
       power, duration, effect, 0);
   }
@@ -6422,7 +6415,7 @@ int
 sp_antimagiczone(castorder *co)
 {
   double power;
-  variant effect;
+  double effect;
   region *r = co->rt;
   unit *mage = co->magician.u;
   int cast_level = co->level;
@@ -6435,7 +6428,7 @@ sp_antimagiczone(castorder *co)
   power = force * 10;
 
   /* Reduziert die Stärke jedes Spruchs um effect */
-  effect.i = cast_level;
+  effect = cast_level;
 
   create_curse(mage, &r->attribs, ct_find("antimagiczone"), power, duration,
       effect, 0);
@@ -6487,10 +6480,10 @@ sp_magicrunes(castorder *co)
   int cast_level = co->level;
   double force = co->force;
   spellparameter *pa = co->par;
-  variant effect;
+  double effect;
 
   duration = 3 + rng_int()%cast_level;
-  effect.i = 20;
+  effect = 20;
 
   switch(pa->param[0]->typ) {
     case SPP_BUILDING:
@@ -6553,7 +6546,7 @@ sp_speed2(castorder *co)
   dur = MAX(1, cast_level/2);
 
   for (n = 0; n < pa->length; n++) {
-    variant effect;
+    double effect;
     /* sollte nie negativ werden */
     if (maxmen < 1)
       break;
@@ -6565,7 +6558,7 @@ sp_speed2(castorder *co)
     u = pa->param[n]->data.u;
 
     men = MIN(maxmen,u->number);
-    effect.i = 2;
+    effect = 2;
     create_curse(mage, &u->attribs, ct_find("speed"), force, dur, effect, men);
     maxmen -= men;
     used += men;

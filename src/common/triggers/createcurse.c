@@ -46,7 +46,7 @@ typedef struct createcurse_data {
 	const curse_type * type;
 	double vigour;
 	int duration;
-	int effect;
+	double effect;
 	int men;
 } createcurse_data;
 
@@ -70,10 +70,8 @@ createcurse_handle(trigger * t, void * data)
   */
   createcurse_data * td = (createcurse_data*)t->data.v;
   if (td->mage && td->target && td->mage->number && td->target->number) {
-    variant var;
-    var.i = td->effect;
     create_curse(td->mage, &td->target->attribs,
-      td->type, td->vigour, td->duration, var, td->men);
+      td->type, td->vigour, td->duration, td->effect, td->men);
   } else {
     log_error(("could not perform createcurse::handle()\n"));
   }
@@ -90,7 +88,7 @@ createcurse_write(const trigger * t, struct storage * store)
   store->w_tok(store, td->type->cname);
   store->w_flt(store, (float)td->vigour);
   store->w_int(store, td->duration);
-  store->w_int(store, td->effect);
+  store->w_flt(store, (float)td->effect);
   store->w_int(store, td->men);
 }
 
@@ -118,7 +116,11 @@ createcurse_read(trigger * t, struct storage * store)
     td->type = ct_find(zText);
     td->vigour = store->r_flt(store);
     td->duration = store->r_int(store);
-    td->effect = store->r_int(store);
+    if (store->version<CURSEFLOAT_VERSION) {
+      td->effect = (double)store->r_int(store);
+    } else {
+      td->effect = store->r_flt(store);
+    }
     td->men = store->r_int(store);
   }
   return AT_READ_OK;
@@ -136,7 +138,7 @@ trigger_type tt_createcurse = {
 trigger *
 trigger_createcurse(struct unit * mage, struct unit * target,
 					const curse_type * ct, double vigour, int duration,
-					int effect, int men)
+					double effect, int men)
 {
 	trigger * t = t_new(&tt_createcurse);
 	createcurse_data * td = (createcurse_data*)t->data.v;

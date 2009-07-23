@@ -73,14 +73,14 @@ static int
 use_speedsail(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
   curse  *c;
-  variant effect;
+  double effect;
   ship * sh = u->ship;
   if (!sh) {
     cmistake(u, ord, 20, MSG_MOVE);
     return -1;
   }
 
-  effect.i = SPEEDSAIL_EFFECT;
+  effect = SPEEDSAIL_EFFECT;
   c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect, 0);
   c_setflag(c, CURSE_NOAGE);
 
@@ -145,9 +145,7 @@ use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struc
     }
 
     if (force > 0) {
-      variant var ;
-      var.i = effect;
-      create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
+      create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration, effect, 0);
     }
   }
   use_pooled(u, rt_crystal, GET_DEFAULT, amount);
@@ -208,7 +206,6 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
                   int amount, struct order * ord)
 {
   int money;
-  variant effect;
 
   if (get_curse(u->region->attribs, ct_find("depression"))) {
     cmistake(u, ord, 58, MSG_MAGIC);
@@ -219,9 +216,8 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
   change_money(u, money);
   rsetmoney(u->region, rmoney(u->region) - money);
 
-  effect.i = 0;
   create_curse(u, &u->region->attribs, ct_find("depression"),
-    20, BAGPIPEDURATION, effect, 0);
+    20, BAGPIPEDURATION, 0.0, 0);
 
   ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
     "unit region command money", u, u->region, ord, money));

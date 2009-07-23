@@ -3034,8 +3034,8 @@ age_building(building * b)
       if (c==NULL) {
         if (mage!=NULL) {
           int sk = effskill(mage, SK_MAGIC);
-          variant effect;
-          effect.i = 100;
+          double effect;
+          effect = 100;
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
             (float)sk, sk/2, effect, 0);
@@ -3134,7 +3134,7 @@ ageing(void)
       if (is_cursed(u->attribs, C_OLDRACE, 0)){
         curse *c = get_curse(u->attribs, ct_find("oldrace"));
         if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
-          u->race = new_race[curse_geteffect(c)];
+          u->race = new_race[curse_geteffect_int(c)];
           u->irace = NULL;
         }
       }
@@ -3444,7 +3444,7 @@ monthly_healing(void)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-    int healingcurse = 0;
+    double healingcurse = 0;
 
     if (heal_ct!=NULL) {
       /* bonus zurücksetzen */

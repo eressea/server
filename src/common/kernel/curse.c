@@ -206,7 +206,11 @@ curse_read(attrib * a, struct storage * store)
   } else {
     ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
   }
-  c->effect.i = store->r_int(store);
+  if (store->version<CURSEFLOAT_VERSION) {
+    c->effect = (double)store->r_int(store);
+  } else {
+    c->effect = store->r_flt(store);
+  }
   c->type = ct_find(cursename);
   if (c->type==NULL) {
     int result = read_ccompat(cursename, store);
@@ -257,7 +261,7 @@ curse_write(const attrib * a, struct storage * store)
   store->w_int(store, c->duration);
   store->w_flt(store, (float)c->vigour);
   write_unit_reference(mage, store);
-  store->w_int(store, c->effect.i);
+  store->w_flt(store, (float)c->effect);
 
   if (c->type->write) c->type->write(store, c);
   else if (c->type->typ == CURSETYP_UNIT) {
@@ -435,12 +439,20 @@ curse_changevigour(attrib **ap, curse *c, double vigour)
 
 /* ------------------------------------------------------------- */
 
-int
+double
 curse_geteffect(const curse *c)
 {
   if (c==NULL) return 0;
   if (c_flags(c) & CURSE_ISNEW) return 0;
-  return c->effect.i;
+  return c->effect;
+}
+
+int
+curse_geteffect_int(const curse *c)
+{
+  double effect = curse_geteffect(c);
+  assert(effect-(int)effect == 0);
+  return (int)effect;
 }
 
 /* ------------------------------------------------------------- */
@@ -491,7 +503,7 @@ set_cursedmen(curse *c, int cursedmen)
  */
 static curse *
 make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
-    int duration, variant effect, int men)
+    int duration, double effect, int men)
 {
   curse *c;
   attrib * a;
@@ -532,7 +544,7 @@ make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
  */
 curse *
 create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
-    int duration, variant effect, int men)
+    int duration, double effect, int men)
 {
   curse *c;
 
@@ -555,10 +567,10 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
       c->duration += duration;
     }
     if(ct->mergeflags & M_SUMEFFECT){
-      c->effect.i += effect.i;
+      c->effect += effect;
     }
     if(ct->mergeflags & M_MAXEFFECT){
-      c->effect.i = MAX(c->effect.i, effect.i);
+      c->effect = MAX(c->effect, effect);
     }
     if(ct->mergeflags & M_VIGOUR){
       c->vigour = MAX(vigour, c->vigour);
