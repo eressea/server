@@ -1,5 +1,5 @@
 function creation_message(mage, type)
-  msg = message.create("item_create_spell")
+  local msg = message.create("item_create_spell")
   msg:set_unit("mage", mage)
   msg:set_int("number", 1)
   msg:set_resource("item", type)

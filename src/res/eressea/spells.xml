@@ -35,6 +35,12 @@
   </spell>
 
   <!-- gwyrrd spells -->
+  <spell name="blessedharvest" type="gwyrrd" rank="5" level="1" index="25" ship="true" far="true" variable="true">
+    <!-- Segen der Erde -->
+    <function name="cast" value="cast_blessedharvest"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+
   <spell name="create_roi" type="gwyrrd" ship="true" rank="5" level="6" index="129">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
@@ -95,6 +101,11 @@
   </spell>
 
   <!-- cerddor spells -->
+  <spell name="raindance" type="cerddor" rank="5" level="3" index="26" ship="true" far="true" variable="true">
+    <!-- Segen der Erde -->
+    <function name="cast" value="cast_blessedharvest"/>
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
   <spell name="create_roi" type="cerddor" ship="true" rank="5" level="6" index="132">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>

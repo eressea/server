@@ -28,6 +28,7 @@
   <xi:include href="e3a/calendar.xml"/>
   <xi:include href="e3a/items.xml" />
   <xi:include href="e3a/strings.xml"/>
+  <xi:include href="e3a/messages.xml"/>
   <xi:include href="e3a/races.xml"/>
   <xi:include href="e3a/buildings.xml"/>
   <xi:include href="e3a/equipment.xml"/>

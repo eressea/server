@@ -1205,9 +1205,9 @@ item_modification(const unit *u, skill_t sk, int val)
 static int
 att_modification(const unit *u, skill_t sk)
 {
-  int bonus = 0, malus = 0;
+  double bonus = 0, malus = 0;
   attrib * a;
-  int result = 0;
+  double result = 0;
   static boolean init = false;
   static const curse_type * skillmod_ct, * gbdream_ct, * worse_ct;
   curse * c;
@@ -1240,7 +1240,7 @@ att_modification(const unit *u, skill_t sk)
   while (a && a->type==&at_curse) {
     curse * c = (curse*)a->data.v;
     if (curse_active(c) && c->type==gbdream_ct) {
-      int mod = curse_geteffect(c);
+      double mod = curse_geteffect(c);
       unit * mage = c->magician;
       /* wir suchen jeweils den größten Bonus und den größten Malus */
       if (mod>bonus) {
@@ -1257,7 +1257,7 @@ att_modification(const unit *u, skill_t sk)
   }
   result = result + bonus + malus;
 
-  return result;
+  return (int)result;
 }
 
 int

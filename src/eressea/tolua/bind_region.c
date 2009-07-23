@@ -209,6 +209,23 @@ static int tolua_region_get_flag(lua_State* L)
 
 static int tolua_region_get_adj(lua_State* L)
 {
+  region* r = (region*)tolua_tousertype(L, 1, 0);
+  region* rn[MAXDIRECTIONS];
+  int d, idx;
+  get_neighbours(r, rn);
+
+  lua_createtable(L, MAXDIRECTIONS, 0);
+  for (d=0,idx=0;d!=MAXDIRECTIONS;++d) {
+    if (rn[d]) {
+      tolua_pushusertype(L, rn[d], TOLUA_CAST "region");
+      lua_rawseti(L, -2, ++idx);
+    }
+  }
+  return 1;
+}
+
+static int tolua_region_get_next(lua_State* L)
+{
   region* self = (region*)tolua_tousertype(L, 1, 0);
   direction_t dir = (direction_t)tolua_tonumber(L, 2, 0);
 
@@ -573,7 +590,8 @@ tolua_region_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "set_resource", tolua_region_set_resource);
       tolua_function(L, TOLUA_CAST "get_flag", tolua_region_get_flag);
       tolua_function(L, TOLUA_CAST "set_flag", tolua_region_set_flag);
-      tolua_function(L, TOLUA_CAST "next", tolua_region_get_adj);
+      tolua_function(L, TOLUA_CAST "next", tolua_region_get_next);
+      tolua_variable(L, TOLUA_CAST "adj", tolua_region_get_adj, NULL);
 
       tolua_variable(L, TOLUA_CAST "terrain_name", &tolua_region_get_terrainname, &tolua_region_set_terrainname);
       tolua_variable(L, TOLUA_CAST "owner", &tolua_region_get_owner, &tolua_region_set_owner);

@@ -329,6 +329,46 @@ tolua_get_season(lua_State * L)
 }
 
 static int
+tolua_create_curse(lua_State * L)
+{
+  unit * u = (unit *)tolua_tousertype(L, 1, 0);
+  tolua_Error tolua_err;
+  attrib ** ap = NULL;
+
+  if (tolua_isusertype(L, 2, TOLUA_CAST "unit", 0, &tolua_err)) {
+    unit * target = (unit *)tolua_tousertype(L, 1, 0);
+    if (target) ap = &target->attribs;
+  } else if (tolua_isusertype(L, 2, TOLUA_CAST "region", 0, &tolua_err)) {
+    region * target = (region *)tolua_tousertype(L, 1, 0);
+    if (target) ap = &target->attribs;
+  } else if (tolua_isusertype(L, 2, TOLUA_CAST "ship", 0, &tolua_err)) {
+    ship * target = (ship *)tolua_tousertype(L, 1, 0);
+    if (target) ap = &target->attribs;
+  } else if (tolua_isusertype(L, 2, TOLUA_CAST "building", 0, &tolua_err)) {
+    building * target = (building *)tolua_tousertype(L, 1, 0);
+    if (target) ap = &target->attribs;
+  }
+  if (ap) {
+    const char * cname = tolua_tostring(L, 3, 0);
+    const curse_type * ctype = ct_find(cname);
+    if (ctype) {
+      double vigour = tolua_tonumber(L, 4, 0);
+      int duration = (int)tolua_tonumber(L, 5, 0);
+      double effect = tolua_tonumber(L, 6, 0);
+      int men = (int)tolua_tonumber(L, 7, 0); /* optional */
+      curse * c = create_curse(u, ap, ctype, vigour, duration, effect, men);
+
+      if (c) {
+        tolua_pushboolean(L, true);
+        return 1;
+      }
+    }
+  }
+  tolua_pushboolean(L, false);
+  return 1;
+}
+
+static int
 tolua_learn_skill(lua_State * L)
 {
   unit * u = (unit *)tolua_tousertype(L, 1, 0);
@@ -970,6 +1010,7 @@ tolua_eressea_open(lua_State* L)
     tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
 
     tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
+    tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
 
     tolua_function(L, TOLUA_CAST "autoseed", tolua_autoseed);
 

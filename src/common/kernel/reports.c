@@ -2088,6 +2088,50 @@ static void log_orders(const struct message * msg)
   }
 }
 
+int
+report_action(region * r, unit * actor, message * msg, int flags)
+{
+  int result = 0;
+  unit * u;
+  int view = flags&(ACTION_CANSEE|ACTION_CANNOTSEE);
+
+  /* melden, 1x pro Partei */
+  if (flags&ACTION_RESET) {
+    freset(actor->faction, FFL_SELECT);
+    for (u = r->units; u; u = u->next ) freset(u->faction, FFL_SELECT);
+  }
+  if (view) {
+    for (u = r->units; u; u = u->next ) {
+      if (!fval(u->faction, FFL_SELECT) ) {
+        boolean show = u->faction == actor->faction;
+        fset(u->faction, FFL_SELECT);
+        if (view==ACTION_CANSEE) {
+          /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
+          show = show || (r==actor->region && cansee(u->faction, r, actor, 0));
+        } else if (view==ACTION_CANNOTSEE) {
+          show = !show && !(r==actor->region && cansee(u->faction, r, actor, 0));
+        } else {
+          /* the unliely (or lazy) case */
+          show = true;
+        }
+
+        if (show) {
+          r_addmessage(r, u->faction, msg);
+        } else { /* Partei des Magiers, sieht diesen immer */
+          result = 1;
+        }
+      }
+    }
+    /* Ist niemand von der Partei des Magiers in der Region, dem Magier
+    * nochmal gesondert melden */
+    if ((flags&ACTION_CANSEE) && !fval(actor->faction, FFL_SELECT)) {
+      add_message(&actor->faction->msgs, msg);
+    }
+  }
+  return result;
+}
+
+
 void
 reports_init(void)
 {

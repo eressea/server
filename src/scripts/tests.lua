@@ -433,7 +433,7 @@ function test_taxes()
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 10)
   u:clear_orders()
-  u:add_order("LERNE Wahrnehmung")
+  u:add_order("LERNE Holzfällen") -- do not work
   local b = building.create(r, "watch")
   b.size = 10
   u.building = b
@@ -652,7 +652,7 @@ mytests = {
 --    ["blessed"] = test_blessed -- foiled by peasantgrowth
 }
 fail = 0
-for k, v in pairs(mytests) do
+for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

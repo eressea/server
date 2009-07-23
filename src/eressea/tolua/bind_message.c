@@ -5,6 +5,7 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
+#include <kernel/reports.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
@@ -283,6 +284,18 @@ tolua_msg_send_region(lua_State * L)
 }
 
 static int
+tolua_msg_report_action(lua_State * L)
+{
+  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
+  region * r = (region *)tolua_tousertype(L, 2, 0);
+  unit * u = (unit *)tolua_tousertype(L, 3, 0);
+  int flags = (int)tolua_tonumber(L, 4, 0);
+  int result = report_action(r, u, lmsg->msg, flags);
+  tolua_pushnumber(L, (lua_Number)result);
+  return 1;
+}
+
+static int
 tolua_msg_send_faction(lua_State * L)
 {
   lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
@@ -314,6 +327,7 @@ tolua_message_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "set_string", tolua_msg_set_string);
       tolua_function(L, TOLUA_CAST "send_faction", tolua_msg_send_faction);
       tolua_function(L, TOLUA_CAST "send_region", tolua_msg_send_region);
+      tolua_function(L, TOLUA_CAST "report_action", tolua_msg_report_action);
 
       tolua_function(L, TOLUA_CAST "create", tolua_msg_create);
     }

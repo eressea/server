@@ -31,6 +31,7 @@
 #include <kernel/curse.h>
 #include <kernel/spellid.h>
 #include <kernel/faction.h>
+#include <kernel/reports.h>
 #include <kernel/item.h>
 #include <kernel/karma.h>
 #include <kernel/magic.h>
@@ -380,9 +381,11 @@ break_curse(attrib **alist, int cast_level, double force, curse * c)
 /* ------------------------------------------------------------- */
 /* Report a spell's effect to the units in the region.
 */
+
 static void
 report_effect(region * r, unit * mage, message * seen, message * unseen)
 {
+#if 0
   unit * u;
 
   /* melden, 1x pro Partei */
@@ -415,6 +418,12 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   if (!fval(mage->faction, FFL_SELECT)) {
     add_message(&mage->faction->msgs, seen);
   }
+#else
+  int err = report_action(r, mage, seen, ACTION_RESET|ACTION_CANSEE);
+  if (err) {
+    report_action(r, mage, seen, ACTION_CANNOTSEE);
+  }
+#endif
 }
 
 /* ------------------------------------------------------------- */
@@ -1086,40 +1095,17 @@ sp_blessedharvest(castorder *co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  double effect;
-  int rule = rule_blessed_harvest();
+  int duration = (int)power+1;
   /* Attribut auf Region.
    * Existiert schon ein curse, so wird dieser verstärkt
    * (Max(Dauer), Max(Stärke))*/
-  if (rule==HARVEST_WORK) {
-    int duration = (int)power+1;
-    effect = 1;
-    create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
-  } else if (rule==HARVEST_TAXES) {
-    int duration = (int)(power*2);
-    if (co->sp->id!=SPL_BLESSEDHARVEST) {
-      effect = (int)(100 * power);
-      create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
-    } else {
-      int d;
-      region * rn[MAXDIRECTIONS];
-      get_neighbours(r, rn);
-      effect = (int)(50 * power);
-      for (d=0;d!=MAXDIRECTIONS;++d) {
-        region * rx = rn[d];
-        if (rx && rx->land) {
-          create_curse(mage, &rx->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
-       }
-      }
-      create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, effect, 0);
-    }
-  }
-  {
-    message * seen = msg_message("harvest_effect", "mage", mage);
-    message * unseen = msg_message("harvest_effect", "mage", NULL);
-    report_effect(r, mage, seen, unseen);
-    msg_release(seen);
-    msg_release(unseen);
+
+  if (create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, 1.0, 0)) {
+     message * seen = msg_message("harvest_effect", "mage", mage);
+     message * unseen = msg_message("harvest_effect", "mage", NULL);
+     report_effect(r, mage, seen, unseen);
+     msg_release(seen);
+     msg_release(unseen);
   }
 
   return cast_level;
@@ -6870,20 +6856,6 @@ static spelldata spelldaten[] =
 {
   /* M_GWYRRD */
   {
-    SPL_BLESSEDHARVEST, "blessedharvest", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
-    5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_blessedharvest, NULL
-  },
-  {
     SPL_STONEGOLEM, "stonegolem", NULL, NULL, NULL,
     M_GWYRRD, (SPELLLEVEL), 4, 1,
     {
@@ -7938,20 +7910,6 @@ static spelldata spelldaten[] =
     (spell_f)sp_generous, NULL
   },
   {
-    SPL_RAINDANCE, "raindance", NULL, NULL, NULL,
-    M_CERDDOR,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
-    5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_blessedharvest, NULL
-  },
-  {
     SPL_SONG_OF_FEAR, "song_of_fear", NULL, NULL, NULL,
     M_CERDDOR, (COMBATSPELL | SPELLLEVEL), 5, 3,
     {
@@ -8933,6 +8891,7 @@ register_spells(void)
   register_regioncurse();
   register_shipcurse();
   register_buildingcurse();
+  register_function((pf_generic)&sp_blessedharvest, "cast_blessedharvest");
   register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
   register_function((pf_generic)&sp_summon_familiar, "cast_familiar");
 }

@@ -1497,7 +1497,7 @@ region_getname(const region * r) {
 
 int region_get_morale(const region * r)
 {
-  return r->land?r->land->morale:0;
+  return r->land?r->land->morale:-1;
 }
 
 void region_set_morale(region * r, int morale)

@@ -126,6 +126,11 @@ extern const char * report_kampfstatus(const struct unit * u, const struct local
   void report_building(const struct building * b, const char ** btype, const char ** billusion);
   void report_race(const struct unit * u, const char ** rcname, const char ** rcillusion);
 
+#define ACTION_RESET      0x01 /* reset the one-time-flag FFL_SELECT (on first pass) */
+#define ACTION_CANSEE     0x02 /* to people who can see the actor */
+#define ACTION_CANNOTSEE  0x04 /* to people who can not see the actor */
+extern int report_action(struct region * r, struct unit * actor, struct message * msg, int flags);
+
   extern size_t f_regionid(const struct region * r, const struct faction * f, char * buffer, size_t size);
 
   extern const char * combatstatus[];
