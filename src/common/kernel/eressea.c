@@ -3067,7 +3067,7 @@ int rule_give(void)
 {
   static int value = -1;
   if (value<0) {
-    value = get_param_int(global.parameters, "rules.give", 7);
+    value = get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
   }
   return value;
 }

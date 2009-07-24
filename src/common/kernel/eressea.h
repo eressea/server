@@ -422,9 +422,12 @@ extern int rule_give(void);
 
 #define GIVE_SELF 1
 #define GIVE_PEASANTS 2
-#define GIVE_OTHERS 4
-#define GIVE_ONDEATH 8
-#define GIVE_ANY (GIVE_SELF|GIVE_PEASANTS|GIVE_OTHERS)
+#define GIVE_LUXURIES 4
+#define GIVE_HERBS 8
+#define GIVE_GOODS 16
+#define GIVE_ONDEATH 32
+#define GIVE_ALLITEMS (GIVE_GOODS|GIVE_HERBS|GIVE_LUXURIES)
+#define GIVE_DEFAULT (GIVE_SELF|GIVE_PEASANTS|GIVE_LUXURIES|GIVE_HERBS|GIVE_GOODS)
 
 extern struct attrib_type at_guard;
 extern void free_gamedata(void);

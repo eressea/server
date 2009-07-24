@@ -217,7 +217,7 @@ gift_items(unit * u, int flags)
   int rule = rule_give();
 
   if ((u->faction->flags&FFL_QUIT)==0 || (rule&GIVE_ONDEATH)==0) {
-    if ((rule&GIVE_OTHERS)==0 && (flags&GIFT_FRIENDS)) flags-=GIFT_FRIENDS;
+    if ((rule&GIVE_ALLITEMS)==0 && (flags&GIFT_FRIENDS)) flags-=GIFT_FRIENDS;
     if ((rule&GIVE_PEASANTS)==0 && (flags&GIFT_PEASANTS)) flags-=GIFT_PEASANTS;
     if ((rule&GIVE_SELF)==0 && (flags&GIFT_SELF)) flags-=GIFT_SELF;
   }

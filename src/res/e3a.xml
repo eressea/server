@@ -165,9 +165,10 @@
     <param name="rules.economy.wages" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>
+    <param name="rules.give" value="15"/> <!-- self + peasants + herbs + lux - goods -->
     <param name="rules.economy.grow" value="1"/>
     <param name="rules.tactics.formula" value="1"/> <!-- 10% per skilldiff -->
-    <param name="rules.help.mask" value="fight guard money"/>
+    <param name="rules.help.mask" value="fight guard money give"/>
     <param name="movement.shipspeed.skillbonus" value="6"/>
     <param name="alliance.auto" value="fight"/>
 	  <param name="alliance.restricted" value="fight"/>

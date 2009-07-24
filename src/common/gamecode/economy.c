@@ -403,6 +403,32 @@ do_recruiting(recruitment * recruits, int available)
   return recruited;
 }
 
+static void
+feedback_give_not_allowed(unit * u, order * ord)
+{
+  ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
+}
+
+static boolean check_give(unit * u, unit * u2, const item_type * itype, int mask)
+{
+  if (u2) {
+    if (u->faction!=u2->faction) {
+      int rule = rule_give();
+      if (itype) {
+        assert(mask==0);
+        if (itype->rtype->ltype) mask |= GIVE_LUXURIES;
+        else if (fval(itype, ITF_HERB)) mask |= GIVE_HERBS;
+        else mask |= GIVE_GOODS;
+      }
+      return (rule&mask)!=0;
+    }
+  } else {
+    int rule = rule_give();
+    return (rule & GIVE_PEASANTS)!=0;
+  }
+  return true;
+}
+
 void
 free_recruitments(recruitment * recruits)
 {
@@ -614,7 +640,7 @@ give_cmd(unit * u, order * ord)
   region * r = u->region;
   unit *u2;
   const char *s;
-  int i, n, rule = rule_give();
+  int i, n;
   const item_type * itype;
   param_t p;
   plane * pl;
@@ -628,11 +654,8 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (getunitpeasants && (rule & GIVE_PEASANTS)==0) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
-    return;
-  } else if (u2 && u2->faction!=u->faction && (rule & GIVE_OTHERS)==0) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
+  if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
+    feedback_give_not_allowed(u, ord);
     return;
   }
 
@@ -714,6 +737,10 @@ give_cmd(unit * u, order * ord)
         msg_feedback(u, ord, "race_nogive", "race", u->race));
       return;
     }
+    if (!check_give(u, u2, NULL, GIVE_HERBS)) {
+      feedback_give_not_allowed(u, ord);
+      return;
+    }
     if (u2 && !(u2->race->ec_flags & GETITEM)) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "race_notake", "race", u2->race));
@@ -765,6 +792,10 @@ give_cmd(unit * u, order * ord)
   else if (p==P_ANY) {
     const char * s = getstrtoken();
 
+    if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
+      feedback_give_not_allowed(u, ord);
+      return;
+    }
     if (*s == 0) { /* Alle Gegenstände übergeben */
 
       /* do these checks once, not for each item we have: */
@@ -826,8 +857,12 @@ give_cmd(unit * u, order * ord)
       if (itype!=NULL) {
         item * i = *i_find(&u->items, itype);
         if (i!=NULL) {
-          n = i->number - get_reservation(u, itype->rtype);
-          give_item(n, itype, u, u2, ord);
+          if (check_give(u, u2, itype, 0)) {
+            n = i->number - get_reservation(u, itype->rtype);
+            give_item(n, itype, u, u2, ord);
+          } else {
+            feedback_give_not_allowed(u, ord);
+          }
           return;
         }
       }
@@ -852,10 +887,6 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-    cmistake(u, ord, 40, MSG_COMMERCE);
-    return;
-  }
   i = findparam(s, u->faction->locale);
   if (i == P_PERSON) {
     if (!(u->race->ec_flags & GIVEPERSON)) {
@@ -882,7 +913,11 @@ give_cmd(unit * u, order * ord)
 
   itype = finditemtype(s, u->faction->locale);
   if (itype!=NULL) {
-    give_item(n, itype, u, u2, ord);
+    if (check_give(u, u2, itype, 0)) {
+      give_item(n, itype, u, u2, ord);
+    } else {
+      feedback_give_not_allowed(u, ord);
+    }
     return;
   }
   cmistake(u, ord, 123, MSG_COMMERCE);
