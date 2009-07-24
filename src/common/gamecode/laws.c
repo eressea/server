@@ -3098,12 +3098,14 @@ static void age_region(region * r)
           ch *= 1.2; /* 20% improvement */
         }
         if (chance(ch)) {
-          ++r->land->morale;
-          r->land->ownership->morale_turn = turn;
+          region_set_morale(r, r->land->morale+1, turn);
         }
       }
       if (!r->land->ownership->owner && r->land->morale<MORALE_DEFAULT) {
-        r->land->morale = (short)MIN(r->land->morale, MORALE_DEFAULT);
+        short m = (short)MIN(r->land->morale, MORALE_DEFAULT);
+        if (m!=r->land->morale) {
+          region_set_morale(r, m, turn);
+        }
       }
     }
   }

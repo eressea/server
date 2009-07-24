@@ -1246,8 +1246,8 @@ terraform_region(region * r, const terrain_type * terrain)
     int mnr = 0;
 
     r->land = calloc(1, sizeof(land_region));
-    r->land->morale = MORALE_DEFAULT;
     r->land->ownership = NULL;
+    region_set_morale(r, MORALE_DEFAULT, -1);
     region_setname(r, makename());
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * nr = rconnect(r, d);
@@ -1456,13 +1456,12 @@ region_set_owner(struct region * r, struct faction * owner, int turn)
   if (r->land) {
     if (!r->land->ownership) {
       r->land->ownership = malloc(sizeof(region_owner));
-      r->land->morale = MORALE_DEFAULT;
+      region_set_morale(r, MORALE_DEFAULT, turn);
     } else if (r->land->ownership->owner) {
-      r->land->morale = MORALE_TAKEOVER;
+      region_set_morale(r, MORALE_TAKEOVER, turn);
     }
     r->land->ownership->owner = owner;
     r->land->ownership->since_turn = turn;
-    r->land->ownership->morale_turn = turn;
   }
 }
 
@@ -1500,10 +1499,13 @@ int region_get_morale(const region * r)
   return r->land?r->land->morale:-1;
 }
 
-void region_set_morale(region * r, int morale)
+void region_set_morale(region * r, int morale, int turn)
 {
   if (r->land) {
     r->land->morale = (short)morale;
+    if (turn>=0 && r->land->ownership) {
+      r->land->ownership->morale_turn = turn;
+    }
   }
 }
 

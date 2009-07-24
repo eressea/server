@@ -194,7 +194,7 @@ static int tolua_region_get_morale(lua_State* L)
 static int tolua_region_set_morale(lua_State* L)
 {
   region* r = (region*)tolua_tousertype(L, 1, 0);
-  region_set_morale(r, (int)tolua_tonumber(L, 2, 0));
+  region_set_morale(r, (int)tolua_tonumber(L, 2, 0), turn);
   return 0;
 }
 

@@ -635,6 +635,27 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 }
 
 static void
+give_control(unit * u, unit * u2)
+{
+  if (u->building && u->faction!=u2->faction) {
+    region * r = u->region;
+    faction * f = region_get_owner(r);
+    if (f==u->faction) {
+      building * b = largestbuilding(r, &is_owner_building, false);
+      if (b==u->building) {
+        int morale = region_get_morale(r);
+        region_set_owner(r, u2->faction, turn);
+        if (morale>0) {
+          region_set_morale(r, morale-1, turn);
+        }
+      }
+    }
+  }
+  freset(u, UFL_OWNER);
+  fset(u2, UFL_OWNER);
+}
+
+static void
 give_cmd(unit * u, order * ord)
 {
   region * r = u->region;
@@ -704,12 +725,7 @@ give_cmd(unit * u, order * ord)
       cmistake(u, ord, 49, MSG_EVENT);
       return;
     }
-    if (!alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-      cmistake(u, ord, 40, MSG_EVENT);
-      return;
-    }
-    freset(u, UFL_OWNER);
-    fset(u2, UFL_OWNER);
+    give_control(u, u2);
 
     msg = msg_message("givecommand", "unit recipient", u, u2);
     add_message(&u->faction->msgs, msg);

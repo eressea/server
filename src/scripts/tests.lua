@@ -302,6 +302,34 @@ local function test_owners()
   assert(r.owner==u1.faction)
 end
 
+local function test_morale()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("enno@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 1)
+  local f2 = faction.create("enno@eressea.de", "human", "de")
+  local u2 = unit.create(f2, r, 1)
+
+  local b = building.create(r, "castle")
+  b.size = 10
+  u1.building = b
+  u2.building = b
+  update_owners()
+  assert(r.morale==2)
+  r.morale = 5
+  assert(r.owner==u1.faction)
+  u1:clear_orders()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
+  process_orders()
+  u1:clear_orders()
+  assert(r.owner==u2.faction)
+  assert(r.morale==4)
+  u2.building = nil
+  update_owners()
+  assert(r.owner==u1.faction)
+  assert(r.morale==0)
+end
+
 local function test_recruit()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -645,14 +673,16 @@ tests = {
     ["upkeep"] = test_upkeep,
     ["id"] = test_id,
     ["work"] = test_work,
+    ["morale"] = test_morale,
     ["owners"] = test_owners,
     ["market"] = test_market
 }
 mytests = {
 --    ["blessed"] = test_blessed -- foiled by peasantgrowth
+    ["morale"] = test_morale
 }
 fail = 0
-for k, v in pairs(tests) do
+for k, v in pairs(mytests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1
