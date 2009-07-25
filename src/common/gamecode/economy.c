@@ -3299,8 +3299,9 @@ peasant_taxes(region * r)
   int morale;
 
   f = region_get_owner(r);
-  if (f==NULL) return;
-
+  if (f==NULL || is_mourning(r, turn)) {
+    return;
+  }
   money = rmoney(r);
   if (money<=0) return;
 
