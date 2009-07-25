@@ -137,7 +137,7 @@
     <param name="hunger.demons" value="1"/>
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
-    <param name="study.speedup" value="1"/>
+    <param name="study.speedup" value="0"/>
     <param name="world.era" value="3"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.check_overload" value="0"/>
