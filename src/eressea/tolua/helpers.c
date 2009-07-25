@@ -349,7 +349,7 @@ lua_canuse_item(const unit * u, const struct item_type * itype)
 }
 
 static int
-lua_wage(const region * r, const faction * f, const race * rc)
+lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
   lua_State * L = (lua_State *)global.vm_state;
   const char * fname = "wage";
@@ -361,6 +361,7 @@ lua_wage(const region * r, const faction * f, const race * rc)
     tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
     tolua_pushusertype(L, (void *)f, TOLUA_CAST "faction");
     tolua_pushstring(L, rc?rc->_name[0]:0);
+    tolua_pushnumber(L, (lua_Number)in_turn);
 
     if (lua_pcall(L, 3, 1, 0)!=0) {
       const char* error = lua_tostring(L, -1);

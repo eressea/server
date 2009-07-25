@@ -1342,7 +1342,7 @@ terraform_region(region * r, const terrain_type * terrain)
       int peasants;
       peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
       rsetpeasants(r, MAX(100, peasants));
-      rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL)+1) + rng_int() % 5));
+      rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL, INT_MAX)+1) + rng_int() % 5));
     }
   }
 }
@@ -1457,11 +1457,16 @@ region_set_owner(struct region * r, struct faction * owner, int turn)
     if (!r->land->ownership) {
       r->land->ownership = malloc(sizeof(region_owner));
       region_set_morale(r, MORALE_DEFAULT, turn);
+      r->land->ownership->since_turn = -turn;
+      r->land->ownership->owner = NULL;
     } else if (r->land->ownership->owner) {
       region_set_morale(r, MORALE_TAKEOVER, turn);
+      r->land->ownership->since_turn = turn;
+    } else {
+      r->land->ownership->since_turn = -turn;
     }
+    assert(r->land->ownership->owner != owner);
     r->land->ownership->owner = owner;
-    r->land->ownership->since_turn = turn;
   }
 }
 
@@ -1517,3 +1522,10 @@ void get_neighbours(const region * r, region ** list)
   }
 }
 
+int owner_change(const region * r)
+{
+  if (r->land && r->land->ownership) {
+    return r->land->ownership->since_turn;
+  }
+  return -1;
+}

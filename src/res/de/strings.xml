@@ -306,6 +306,10 @@
     <text locale="fr">beaucoup de</text>
   </string>
 
+  <string name="nr_mourning">
+    <text locale="de"> (trauernd)</text>
+    <text locale="en"> (in mourning)</text>
+  </string>
   <string name="nr_spell_description">
     <text locale="de">Beschreibung:</text>
     <text locale="en">Description:</text>

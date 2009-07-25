@@ -1178,15 +1178,15 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
           fprintf(F, "%d;Unterh\n", entertainmoney(r));
         }
         if (is_cursed(r->attribs, C_RIOT, 0)){
-          fprintf(F, "0;Rekruten\n");
+          fputs("0;Rekruten\n", F);
         } else {
           fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
         }
         if (production(r)) {
-          if (markets_module()) { /* hack */
-            fprintf(F, "%d;Lohn\n", wage(r, NULL, NULL));
-          } else {
-            fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
+          int p_wage = wage(r, NULL, NULL, turn+1);
+          fprintf(F, "%d;Lohn\n", p_wage);
+          if (owner_change(r)==turn) {
+            fputs("1;mourning\n", F);
           }
         }
         if (r->land->ownership) {

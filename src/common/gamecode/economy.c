@@ -3077,7 +3077,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
   /* n: verbleibende Einnahmen */
   /* fishes: maximale Arbeiter */
   int jobs = maxwork;
-  int p_wage = wage(r, NULL, NULL);
+  int p_wage = wage(r, NULL, NULL, turn);
   int money = rmoney(r);
   request *o;
 
@@ -3095,7 +3095,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
 
     assert(workers>=0);
 
-    u->n = workers * wage(u->region, u->faction, u->race);
+    u->n = workers * wage(u->region, u->faction, u->race, turn);
 
     jobs -= workers;
     assert(jobs>=0);
@@ -3144,7 +3144,7 @@ do_work(unit * u, order * ord, request * o)
       if (ord) cmistake(u, ord, 69, MSG_INCOME);
       return -1;
     }
-    w = wage(r, u->faction, u->race);
+    w = wage(r, u->faction, u->race, turn);
     u->wants = u->number * w;
     o->unit = u;
     o->qty = u->number * w;

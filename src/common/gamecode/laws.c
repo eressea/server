@@ -3076,7 +3076,7 @@ void update_owners(region * r)
       faction *  f = region_get_owner(r);
       unit * u = buildingowner(r, blargest);
       if (u==NULL) {
-        region_set_owner(r, NULL, turn);
+        if (f) region_set_owner(r, NULL, turn);
       } else if (u->faction!=f) {
         region_set_owner(r, u->faction, turn);
       }

@@ -967,6 +967,10 @@ describe(FILE * F, const seen_region * sr, faction * f)
       bytes = (int)strlcpy(bufp, LOC(f->locale, n==1?"peasant":"peasant_p"), size);
     }
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    if (owner_change(r)==turn) {
+      bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_mourning"), size);
+      if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+    }
   }
   if (rmoney(r) && sr->mode==see_unit) {
     bytes = snprintf(bufp, size, ", %d ", rmoney(r));
@@ -1190,9 +1194,9 @@ statistics(FILE * F, const region * r, const faction * f)
   }
   if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
     if (markets_module()) { /* hack */
-      m = msg_message("nr_stat_salary_new", "max", wage(r, NULL, NULL));
+      m = msg_message("nr_stat_salary_new", "max", wage(r, NULL, NULL, turn+1));
     } else {
-      m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
+      m = msg_message("nr_stat_salary", "max", wage(r, f, f->race, turn+1));
     }
     nr_render(m, f->locale, buf, sizeof(buf), f);
     rparagraph(F, buf, 2, 2, 0);
@@ -1409,7 +1413,7 @@ report_template(const char * filename, report_context * ctx, const char * charse
           }
           rps_nowrap(F, buf);
           rnl(F);
-          sprintf(buf,"; ECheck Lohn %d", wage(r, f, f->race));
+          sprintf(buf,"; ECheck Lohn %d", wage(r, f, f->race, turn+1));
           rps_nowrap(F, buf);
           rnl(F);
           rps_nowrap(F, "");

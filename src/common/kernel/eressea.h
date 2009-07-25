@@ -340,7 +340,7 @@ extern int besieged(const struct unit * u);
 extern int maxworkingpeasants(const struct region * r);
 extern boolean has_horses(const struct unit * u);
 extern int markets_module(void);
-extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
+extern int wage(const struct region *r, const struct faction *f, const struct race * rc, int in_turn);
 extern int maintenance_cost(const struct unit * u);
 extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
@@ -381,7 +381,7 @@ typedef struct settings {
   int cookie;
 
   struct global_functions {
-    int (*wage)(const struct region *r, const struct faction * f, const struct race * rc);
+    int (*wage)(const struct region *r, const struct faction * f, const struct race * rc, int in_turn);
     int (*maintenance)(const struct unit * u);
   } functions;
 } settings;

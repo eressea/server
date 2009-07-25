@@ -2578,7 +2578,7 @@ plagues(region * r, boolean ismagic)
 
   if (!ismagic) {
     double mwp = MAX(maxworkingpeasants(r), 1);
-    double prob = pow(rpeasants(r) / (mwp * wage(r, NULL, NULL) * 0.13), 4.0)
+    double prob = pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
         * PLAGUE_CHANCE;
 
     if (rng_double() >= prob) return;
@@ -2649,7 +2649,7 @@ int rule_auto_taxation(void)
 }
 
 static int
-default_wage(const region *r, const faction * f, const race * rc)
+default_wage(const region *r, const faction * f, const race * rc, int in_turn)
 {
   building *b = largestbuilding(r, &is_castle, false);
   int      esize = 0;
@@ -2683,7 +2683,9 @@ default_wage(const region *r, const faction * f, const race * rc)
     }
 #endif /* KARMA_MODULE */
   } else {
-    if (fval(r->terrain, SEA_REGION)) {
+    if (owner_change(r) == in_turn-1) {
+      wage = 10;
+    } else if (fval(r->terrain, SEA_REGION)) {
       wage = 11;
     } else if (fval(r, RF_ORCIFIED)) {
       wage = wagetable[esize][1];
@@ -2721,23 +2723,23 @@ default_wage(const region *r, const faction * f, const race * rc)
 }
 
 static int
-minimum_wage(const region *r, const faction * f, const race * rc)
+minimum_wage(const region *r, const faction * f, const race * rc, int in_turn)
 {
   if (f && rc) {
     return rc->maintenance;
   }
-  return default_wage(r, f, rc);
+  return default_wage(r, f, rc, in_turn);
 }
 
 /* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
 * die Bauern wenn f == NULL. */
 int
-wage(const region *r, const faction * f, const race * rc)
+wage(const region *r, const faction * f, const race * rc, int in_turn)
 {
   if (global.functions.wage) {
-    return global.functions.wage(r, f, rc);
+    return global.functions.wage(r, f, rc, in_turn);
   }
-  return default_wage(r, f, rc);
+  return default_wage(r, f, rc, in_turn);
 }
 
 

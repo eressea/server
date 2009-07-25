@@ -922,7 +922,7 @@ parse_rules(xmlDocPtr doc)
     }
     assert(propValue!=NULL);
     if (strcmp((const char*)propValue, "wage")==0) {
-      global.functions.wage = (int (*)(const struct region*, const struct faction*, const struct race*))fun;
+      global.functions.wage = (int (*)(const struct region*, const struct faction*, const struct race*, int))fun;
     } else if (strcmp((const char*)propValue, "maintenance")==0) {
       global.functions.maintenance = (int (*)(const struct unit*))fun;
     } else {
