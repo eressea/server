@@ -174,9 +174,11 @@ static void
 lua_paint_info(struct window * wnd, const struct state * st)
 {
   struct lua_State * L = paint_state;
+  int nx = st->cursor.x, ny = st->cursor.y;
+  pnormalize(&nx, &ny, st->cursor.pl);
   lua_rawgeti(L, LUA_REGISTRYINDEX, paint_handle);
-  tolua_pushnumber(L, st->cursor.x);
-  tolua_pushnumber(L, st->cursor.y);
+  tolua_pushnumber(L, nx);
+  tolua_pushnumber(L, ny);
   if (lua_pcall(L, 2, 1, 0)!=0) {
     const char* error = lua_tostring(L, -1);
     log_error(("paint function failed: %s\n", error));

@@ -261,6 +261,7 @@
     <!-- Gesang der Versklavung -->
     <resource name="aura" amount="40" cost="fixed"/>
   </spell>
+<!-- TODO: exploitable (transfers items) -->
   <spell name="big_recruit" type="cerddor" rank="5" level="14" index="179" variable="true">
     <!-- Hohe Kunst der Überzeugung -->
     <resource name="aura" amount="20" cost="level"/>

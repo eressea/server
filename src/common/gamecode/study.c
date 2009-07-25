@@ -495,20 +495,20 @@ study_speedup(unit * u)
 #define MINTURN 5 /* 5 */
 #define OFSTURN 2 /* 2 */
   if (turn>MINTURN) {
-    static int rule = -1;
-    if (rule<0) {
-      rule = get_param_int(global.parameters, "study.speedup", 0);
+    static int speed_rule = -1;
+    if (speed_rule<0) {
+      speed_rule = get_param_int(global.parameters, "study.speedup", 0);
     }
-    if (rule==1) {
-      double age = OFSTURN;
+    if (speed_rule==1) {
+      double learn_age = OFSTURN;
       int i;
       for (i=0;i!=u->skill_size;++i) {
         skill * sv = u->skills+i;
-        double time = sv->level*(sv->level+1)/2.0;
-        age += time;
+        double learn_time = sv->level*(sv->level+1)/2.0;
+        learn_age += learn_time;
       }
-      if (age < turn) {
-        return 2.0-age/turn;
+      if (learn_age < turn) {
+        return 2.0-learn_age/turn;
       }
     }
   }
