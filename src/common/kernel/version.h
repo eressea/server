@@ -63,6 +63,7 @@
 #define REGIONOWNER_VERSION 333 /* regions have owners and morale */
 #define ALLIANCELEADER_VERSION 333 /* alliances have a leader */
 #define CURSEFLOAT_VERSION 334 /* all curse-effects are float */
+#define MOURNING_VERSION 335 /* mourning peasants */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
 #define RELEASE_VERSION CURSEFLOAT_VERSION /* current datafile */

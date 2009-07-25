@@ -67,10 +67,12 @@ struct item;
 #define MORALE_TAKEOVER 0 /* Morale of peasants after they lose their lord */
 #define MORALE_COOLDOWN 2 /* minimum cooldown before a morale change occurs */
 
+#define OWNER_MOURNING 0x01
 typedef struct region_owner {
   struct faction * owner;
   int since_turn; /* turn the region changed owners */
   int morale_turn; /* turn when morale has changed most recently */
+  unsigned int flags;
 } region_owner;
 
 typedef struct demand {
@@ -275,6 +277,7 @@ void region_setinfo(struct region * self, const char * name);
 int region_getresource(const struct region * r, const struct resource_type * rtype);
 void region_setresource(struct region * r, const struct resource_type * rtype, int value);
 int owner_change(const region * r);
+boolean is_mourning(const region * r, int in_turn);
 extern const struct item_type * r_luxury(struct region * r);
 extern void get_neighbours(const struct region * r, struct region ** list);
 #ifdef __cplusplus

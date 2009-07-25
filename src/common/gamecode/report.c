@@ -967,7 +967,7 @@ describe(FILE * F, const seen_region * sr, faction * f)
       bytes = (int)strlcpy(bufp, LOC(f->locale, n==1?"peasant":"peasant_p"), size);
     }
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-    if (owner_change(r)==turn) {
+    if (is_mourning(r, turn+1)) {
       bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_mourning"), size);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     }

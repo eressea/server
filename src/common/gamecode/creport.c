@@ -1185,7 +1185,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         if (production(r)) {
           int p_wage = wage(r, NULL, NULL, turn+1);
           fprintf(F, "%d;Lohn\n", p_wage);
-          if (owner_change(r)==turn) {
+          if (is_mourning(r, turn+1)) {
             fputs("1;mourning\n", F);
           }
         }

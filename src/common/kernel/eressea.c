@@ -2683,7 +2683,7 @@ default_wage(const region *r, const faction * f, const race * rc, int in_turn)
     }
 #endif /* KARMA_MODULE */
   } else {
-    if (owner_change(r) == in_turn-1) {
+    if (is_mourning(r, in_turn)) {
       wage = 10;
     } else if (fval(r->terrain, SEA_REGION)) {
       wage = 11;

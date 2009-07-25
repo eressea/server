@@ -1457,14 +1457,15 @@ region_set_owner(struct region * r, struct faction * owner, int turn)
     if (!r->land->ownership) {
       r->land->ownership = malloc(sizeof(region_owner));
       region_set_morale(r, MORALE_DEFAULT, turn);
-      r->land->ownership->since_turn = -turn;
       r->land->ownership->owner = NULL;
+      r->land->ownership->flags = 0;
     } else if (r->land->ownership->owner) {
       region_set_morale(r, MORALE_TAKEOVER, turn);
-      r->land->ownership->since_turn = turn;
+      r->land->ownership->flags |= OWNER_MOURNING;
     } else {
-      r->land->ownership->since_turn = -turn;
+      r->land->ownership->flags &= ~OWNER_MOURNING;
     }
+    r->land->ownership->since_turn = turn;
     assert(r->land->ownership->owner != owner);
     r->land->ownership->owner = owner;
   }
@@ -1528,4 +1529,10 @@ int owner_change(const region * r)
     return r->land->ownership->since_turn;
   }
   return -1;
+}
+
+boolean is_mourning(const region * r, int in_turn)
+{
+  int change = owner_change(r);
+  return (change==in_turn-1 && (r->land->ownership->flags&OWNER_MOURNING));
 }
