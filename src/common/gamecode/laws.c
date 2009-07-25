@@ -1174,6 +1174,21 @@ int dropouts[2];
 int * age = NULL;
 
 static void
+nmr_death(faction * f)
+{
+  static int rule = -1;
+  if (rule<0) rule = get_param_int(global.parameters, "rules.nmr.destroy", 0);
+  if (rule) {
+    unit * u;
+    for (u=f->units;u;u=u->nextF) {
+      if (u->building && fval(u, UFL_OWNER)) {
+        remove_building(&u->region->buildings, u->building);
+      }
+    }
+  }
+}
+
+static void
 parse_restart(void)
 {
   region *r;
@@ -1206,6 +1221,7 @@ parse_restart(void)
   for (f = factions; f; f = f->next) {
     if(fval(f, FFL_NOIDLEOUT)) f->lastorders = turn;
     if (NMRTimeout()>0 && turn - f->lastorders >= NMRTimeout()) {
+      nmr_death(f);
       destroyfaction(f);
       continue;
     }
