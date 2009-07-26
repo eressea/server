@@ -296,7 +296,7 @@ b_namewall(const connection * b, const region * r, const struct faction * f, int
   unused(b);
   if (gflags & GF_ARTICLE) bname = "a_wall";
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("connection", bname));
+  return LOC(f->locale, mkname("border", bname));
 }
 
 border_type bt_wall = {
@@ -334,8 +334,8 @@ b_namefogwall(const connection * b, const region * r, const struct faction * f, 
   unused(b);
   unused(r);
   if (gflags & GF_PURE) return "fogwall";
-  if (gflags & GF_ARTICLE) return LOC(f->locale, mkname("connection", "a_fogwall"));
-  return LOC(f->locale, mkname("connection", "fogwall"));
+  if (gflags & GF_ARTICLE) return LOC(f->locale, mkname("border", "a_fogwall"));
+  return LOC(f->locale, mkname("border", "fogwall"));
 }
 
 static boolean
@@ -370,9 +370,9 @@ b_nameillusionwall(const connection * b, const region * r, const struct faction 
   unused(r);
   if (gflags & GF_PURE) return (f && fno==f->no)?"illusionwall":"wall";
   if (gflags & GF_ARTICLE) {
-    return LOC(f->locale, mkname("connection", (f && fno==f->subscription)?"an_illusionwall":"a_wall"));
+    return LOC(f->locale, mkname("border", (f && fno==f->subscription)?"an_illusionwall":"a_wall"));
   }
-  return LOC(f->locale, mkname("connection", (f && fno==f->no)?"illusionwall":"wall"));
+  return LOC(f->locale, mkname("border", (f && fno==f->no)?"illusionwall":"wall"));
 }
 
 border_type bt_illusionwall = {
@@ -420,7 +420,7 @@ b_namequestportal(const connection * b, const region * r, const struct faction *
     }
   }
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("connection", bname));
+  return LOC(f->locale, mkname("border", bname));
 }
 
 border_type bt_questportal = {
@@ -451,25 +451,25 @@ b_nameroad(const connection * b, const region * r, const struct faction * f, int
   unused(f);
   if (gflags & GF_PURE) return "road";
   if (gflags & GF_ARTICLE) {
-    if (!(gflags & GF_DETAILED)) return LOC(f->locale, mkname("connection", "a_road"));
+    if (!(gflags & GF_DETAILED)) return LOC(f->locale, mkname("border", "a_road"));
     else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
       if (r2->terrain->max_road<=remote) {
-        return LOC(f->locale, mkname("connection", "a_road"));
+        return LOC(f->locale, mkname("border", "a_road"));
       } else {
-        return LOC(f->locale, mkname("connection", "an_incomplete_road"));
+        return LOC(f->locale, mkname("border", "an_incomplete_road"));
       }
     } else {
       int percent = MAX(1, 100*local/r->terrain->max_road);
       if (local) {
-        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("connection", "a_road_percent")), percent);
+        snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border", "a_road_percent")), percent);
       } else {
-        return LOC(f->locale, mkname("connection", "a_road_connection"));
+        return LOC(f->locale, mkname("border", "a_road_connection"));
       }
     }
   }
-  else if (gflags & GF_PLURAL) return LOC(f->locale, mkname("connection", "roads"));
-  else return LOC(f->locale, mkname("connection", "road"));
+  else if (gflags & GF_PLURAL) return LOC(f->locale, mkname("border", "roads"));
+  else return LOC(f->locale, mkname("border", "road"));
   return buffer;
 }
 

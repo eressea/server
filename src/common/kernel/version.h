@@ -66,4 +66,4 @@
 #define MOURNING_VERSION 335 /* mourning peasants */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION CURSEFLOAT_VERSION /* current datafile */
+#define RELEASE_VERSION MOURNING_VERSION /* current datafile */

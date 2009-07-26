@@ -2756,7 +2756,7 @@ b_namefirewall(const connection * b, const region * r, const faction * f, int gf
   else bname = "firewall";
 
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("connection", bname));
+  return LOC(f->locale, mkname("border", bname));
 }
 
 static void
@@ -2921,7 +2921,7 @@ wisps_name(const connection * b, const region * r, const faction * f, int gflags
     bname = "wisps";
   }
   if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("connection", bname));
+  return LOC(f->locale, mkname("border", bname));
 }
 
 typedef struct wisps_data {
