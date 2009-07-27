@@ -2215,6 +2215,10 @@
     <text locale="de">BEFÖRDERUNG</text>
     <text locale="en">PROMOTION</text>
   </string>
+  <string name="BEZAHLEN">
+    <text locale="de">BEZAHLEN</text>
+    <text locale="en">PAY</text>
+  </string>
   <string name="PFLANZEN">
     <text locale="de">PFLANZEN</text>
   </string>

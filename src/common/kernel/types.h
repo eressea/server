@@ -149,6 +149,7 @@ enum {
   K_ALLIANCE,
   K_CLAIM,
   K_PROMOTION,
+  K_PAY,
   MAXKEYWORDS,
   NOKEYWORD = (keyword_t) - 1
 };

@@ -1,7 +1,7 @@
 local function test_rename()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   u:add_item("aoh", 1)
   assert(u:get_item("ao_healing")==1)
@@ -10,7 +10,7 @@ end
 local function test_blessed()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   r:set_resource("peasant", 100)
   r:set_resource("money", 0)
@@ -43,7 +43,7 @@ end
 local function test_read_write()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   u.number = 2
   local fno = f.id
@@ -98,7 +98,7 @@ end
 local function test_faction()
     free_game()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("enno@eressea.de", "human", "de")
+    local f = faction.create("noreply@eressea.de", "human", "de")
     assert(f)
     f.info = "Spazz"
     assert(f.info=="Spazz")
@@ -122,7 +122,7 @@ end
 local function test_unit()
     free_game()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("enno@eressea.de", "human", "de")
+    local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r)
     u.number = 20
     u.name = "Enno"
@@ -157,7 +157,7 @@ end
 local function test_building()
   free_game()
   local u
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local r = region.create(0, 0, "plain")
   local b = building.create(r, "castle")
   u = unit.create(f, r)
@@ -192,7 +192,7 @@ end
 local function test_message()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   local msg = message.create("item_create_spell")
   msg:set_unit("mage", u)
@@ -206,7 +206,7 @@ end
 
 local function test_hashtable()
   free_game()
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.objects:set("enno", "smart guy")
   f.objects:set("age", 10)
   assert(f.objects:get("jesus") == nil)
@@ -232,7 +232,7 @@ function test_events()
   plain = region.create(0, 0, "plain")
   skill = 8
 
-  f = faction.create("enno@eressea.de", "orc", "de")
+  f = faction.create("noreply@eressea.de", "orc", "de")
   f.age = 20
 
   u = unit.create(f, plain)
@@ -242,7 +242,7 @@ function test_events()
   u:add_order("NUMMER PARTEI test")
   u:add_handler("message", msg_handler)
   msg = "BOTSCHAFT EINHEIT " .. itoa36(u.id) .. " Du~Elf~stinken"
-  f = faction.create("enno@eressea.de", "elf", "de")
+  f = faction.create("noreply@eressea.de", "elf", "de")
   f.age = 20
 
   u = unit.create(f, plain)
@@ -258,7 +258,7 @@ end
 local function test_recruit2()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   u.number = 1
   u:add_item("money", 2000)
@@ -275,9 +275,9 @@ end
 local function test_owners()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("enno@eressea.de", "human", "de")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("enno@eressea.de", "human", "de")
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
   local u2 = unit.create(f2, r, 1)
   local u3 = unit.create(f2, r, 1)
 
@@ -305,9 +305,9 @@ end
 local function test_morale()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("enno@eressea.de", "human", "de")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("enno@eressea.de", "human", "de")
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
   local u2 = unit.create(f2, r, 1)
 
   local b = building.create(r, "castle")
@@ -333,7 +333,7 @@ end
 local function test_recruit()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   u.number = 1
   local n = 3
@@ -351,7 +351,7 @@ end
 local function test_spells()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
   u.race = "elf"
   u:clear_orders()
@@ -381,7 +381,7 @@ end
 local function test_produce()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
   u:clear_orders()
   u:set_skill("weaponsmithing", 3)
@@ -396,7 +396,7 @@ end
 local function test_alliance()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("enno@eressea.de", "human", "de")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
   u1:add_item("money", u1.number * 100)
   local f2 = faction.create("info@eressea.de", "human", "de")
@@ -457,7 +457,7 @@ function test_taxes()
   local r = region.create(0, 0, "plain")
   r.peasants = 1000
   r:set_resource("money", 5000)
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 10)
   u:clear_orders()
@@ -480,7 +480,7 @@ function test_market()
   r = get_region(0, 0)
   local b = building.create(r, "market")
   b.size = 10
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   local u = unit.create(f, r, 1)
   u.building = b
@@ -499,7 +499,7 @@ end
 function test_work()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 10) -- humans cost 10
@@ -513,7 +513,7 @@ end
 function test_upkeep()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   local u = unit.create(f, r, 5)
   u:add_item("money", u.number * 11)
@@ -527,7 +527,7 @@ function test_id()
   free_game()
   local r = region.create(0, 0, "plain")
 
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = atoi36("42")
   assert(get_faction(42)~=f)
   assert(get_faction("42")==f)
@@ -558,7 +558,7 @@ end
 function test_herbalism()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
@@ -571,7 +571,7 @@ end
 function test_leave()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   local b1 = building.create(r, "castle")
   b1.size = 10
@@ -598,7 +598,7 @@ function test_mallorn()
   m:set_resource("tree", 100)
   assert(m:get_resource("tree")==100)
   
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
 
   local u1 = unit.create(f, r, 1)
   u1:add_item("money", u1.number * 100)
@@ -626,7 +626,7 @@ end
 function test_storage()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("enno@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
@@ -637,7 +637,7 @@ function test_storage()
   free_game()
   -- recreate world:
   r = region.create(0, 0, "plain")
-  f = faction.create("enno@eressea.de", "human", "de")
+  f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
   store = storage.create("test.unit.dat", "rb")
   assert(store)

@@ -998,6 +998,9 @@ maintain(building * b, boolean first)
     fset(b, BLD_WORKING);
     return true;
   }
+  if (fval(b, BLD_DONTPAY)) {
+    return false;
+  }
   u = buildingowner(r, b);
   if (u==NULL) return false;
   for (c=0;b->type->maintenance[c].number;++c) {

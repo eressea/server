@@ -376,6 +376,20 @@ static int tolua_faction_set_name(lua_State* L)
   return 0;
 }
 
+static int tolua_faction_get_uid(lua_State* L)
+{
+  faction* f = (faction*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, f->subscription);
+  return 1;
+}
+
+static int tolua_faction_set_uid(lua_State* L)
+{
+  faction* f = (faction*)tolua_tousertype(L, 1, 0);
+  f->subscription = (int)tolua_tonumber(L, 2, 0);
+  return 0;
+}
+
 static int tolua_faction_get_info(lua_State* L)
 {
   faction* self = (faction*) tolua_tousertype(L, 1, 0);
@@ -465,8 +479,9 @@ tolua_faction_open(lua_State* L)
     {
       tolua_function(L, TOLUA_CAST "__tostring", tolua_faction_tostring);
 
-      tolua_variable(L, TOLUA_CAST "name", tolua_faction_get_name, tolua_faction_set_name);
-      tolua_variable(L, TOLUA_CAST "info", tolua_faction_get_info, tolua_faction_set_info);
+      tolua_variable(L, TOLUA_CAST "name", &tolua_faction_get_name, &tolua_faction_set_name);
+      tolua_variable(L, TOLUA_CAST "uid", &tolua_faction_get_uid, &tolua_faction_set_uid);
+      tolua_variable(L, TOLUA_CAST "info", &tolua_faction_get_info, &tolua_faction_set_info);
       tolua_variable(L, TOLUA_CAST "units", tolua_faction_get_units, NULL);
       tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
       tolua_variable(L, TOLUA_CAST "spells", tolua_faction_get_spells, 0);

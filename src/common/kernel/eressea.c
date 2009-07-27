@@ -439,6 +439,7 @@ const char *keywords[MAXKEYWORDS] =
   "ALLIANZ",
   "BEANSPRUCHEN",
   "PROMOTION",
+  "BEZAHLEN",
 };
 
 const char *report_options[MAX_MSG] =

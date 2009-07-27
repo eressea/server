@@ -3679,6 +3679,28 @@ use_cmd(unit * u, struct order * ord)
 }
 
 static int
+pay_cmd(unit * u, struct order * ord)
+{
+  if (!u->building) {
+    cmistake(u, ord, 6, MSG_EVENT);
+  } else {
+    param_t p;
+    init_tokens(ord);
+    skip_token();
+    p = getparam(u->faction->locale);
+    if (p==P_NOT) {
+      unit * owner = buildingowner(u->building->region, u->building);
+      if (owner->faction!=u->faction) {
+        cmistake(u, ord, 1222, MSG_EVENT);
+      } else {
+        u->building->flags |= BLD_DONTPAY;
+      }
+    }
+  }
+  return 0;
+}
+
+static int
 claim_cmd(unit * u, struct order * ord)
 {
   const char * t;
@@ -4030,7 +4052,10 @@ init_processor(void)
   add_proc_region(p, &economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
 
   p+=10;
-  add_proc_region(p, &maintain_buildings_1, "Gebaeudeunterhalt (1. Versuch)");
+  if (!global.disabled[K_PAY]) {
+    add_proc_order(p, K_PAY, &pay_cmd, 0, "Gebaeudeunterhalt (disable)");
+  }
+  add_proc_postregion(p, &maintain_buildings_1, "Gebaeudeunterhalt (1. Versuch)");
 
   p+=10; /* QUIT fuer sich alleine */
   add_proc_global(p, &quit, "Sterben");
@@ -4083,6 +4108,7 @@ init_processor(void)
   add_proc_global(p, &randomevents, "Zufallsereignisse");
 
   p+=10;
+
   add_proc_global(p, &monthly_healing, "Regeneration (HP)");
   add_proc_global(p, &regeneration_magiepunkte, "Regeneration (Aura)");
   if (!global.disabled[K_DEFAULT]) {
@@ -4090,8 +4116,10 @@ init_processor(void)
   }
   add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
 
+#ifdef COLLAPSE_CHANCE
   p+=10;
   add_proc_region(p, &maintain_buildings_2, "Gebaeudeunterhalt (2. Versuch)");
+#endif
 
   if (!global.disabled[K_SORT]) {
     p+=10;

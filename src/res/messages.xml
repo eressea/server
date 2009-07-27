@@ -6828,6 +6828,15 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Schiff gehört uns nicht."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The ship is not ours."</text>
   </message>
+  <message name="error1222" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The building is not ours."</text>
+  </message>
   <message name="error11" section="errors">
     <type>
       <arg name="unit" type="unit"/>

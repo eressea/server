@@ -227,7 +227,9 @@ extern char * strdup(const char *s);
 
 #if !defined(MAX_PATH)
 # ifdef WIN32
-#  define MAX_PATH _MAX_PATH
+#  define VC_EXTRALEAN
+#  include <Windows.h>
+#  undef MOUSE_MOVED
 # elif defined(PATH_MAX)
 #  define MAX_PATH PATH_MAX
 # else
@@ -258,8 +260,10 @@ extern char * strdup(const char *s);
 /****                      ****
  ** The Eressea boolean type **
  ****                      ****/
-#if defined(WIN32) && defined(USE_MYSQL)
+#if defined(WIN32)
   typedef unsigned char boolean;
+#elif defined(BOOLEAN)
+# define boolean BOOLEAN
 #else
   typedef int boolean; /* not bool! wrong size. */
 #endif

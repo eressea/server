@@ -882,7 +882,7 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
       } else if (strcmp((const char*)propValue, "use")==0) {
         itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
       } else if (strcmp((const char*)propValue, "canuse")==0) {
-        itype->canuse = (int (*)(const struct unit *, const struct item_type *))fun;
+        itype->canuse = (boolean (*)(const struct unit *, const struct item_type *))fun;
       } else if (strcmp((const char*)propValue, "useonother")==0) {
         itype->useonother = (int (*)(struct unit *, int, const struct item_type *, int, struct order *))fun;
       } else {
