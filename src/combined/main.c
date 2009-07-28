@@ -4,3 +4,4 @@
 
 #include <eressea/server.c>
 #include <external/sqlite3.c>
+#include <external/md5.c>

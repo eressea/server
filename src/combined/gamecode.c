@@ -4,6 +4,7 @@
 
 #ifdef BINDINGS_TOLUA
 #include "eressea/tolua/bindings.c"
+#include "eressea/tolua/bind_sqlite.c"
 #include "eressea/tolua/bind_unit.c"
 #include "eressea/tolua/bind_ship.c"
 #include "eressea/tolua/bind_building.c"

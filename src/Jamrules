@@ -70,9 +70,10 @@ if $(PROFILE) = 1 {
   LINKFLAGS += -pg -ggdb ;
 }
 
-CCFLAGS += -Wall -Wno-unknown-pragmas ;
+CCFLAGS += -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes 
+        -Wpointer-arith -Wno-char-subscripts ;
 
-CCFLAGS += -Wwrite-strings 
+CCFLAGS on foo += -Wwrite-strings
 		   -Wundef
 		   -Wstrict-prototypes
 		   -Werror-implicit-function-declaration

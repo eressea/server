@@ -7,6 +7,7 @@ SubDirHdrs $(SUBDIR)/../common/kernel ;
 SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
 SubDirHdrs $(SUBDIR)/../tools ;
+SubDirHdrs $(SUBDIR)/../external ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 UsingLua ;
@@ -33,6 +34,8 @@ SERVER_SOURCES =
  util.c
  main.c
 ;
+
+CCFLAGS += -DSQLITE_THREADSAFE=0 ;
 
 if $(MSPACES) {
  SERVER_SOURCES += malloc.c ;

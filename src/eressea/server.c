@@ -298,6 +298,7 @@ lua_init(void)
 #ifdef BINDINGS_TOLUA
   register_tolua_helpers();
   tolua_eressea_open(L);
+  tolua_sqlite_open(L);
   tolua_unit_open(L);
   tolua_building_open(L);
   tolua_ship_open(L);

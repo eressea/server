@@ -3941,7 +3941,9 @@ process(void)
 static void enter_1(region * r) { do_misc(r, false); }
 static void enter_2(region * r) { do_misc(r, true); }
 static void maintain_buildings_1(region * r) { maintain_buildings(r, false); }
+#ifdef COLLAPSE_CHANCE
 static void maintain_buildings_2(region * r) { maintain_buildings(r,true); }
+#endif
 static void reset_moved(unit * u) { freset(u, UFL_MOVED); }
 
 /** warn about passwords that are not US ASCII.

@@ -5,6 +5,7 @@ SubDirHdrs $(SUBDIR)/../common/gamecode ;
 SubDirHdrs $(SUBDIR)/../common/kernel ;
 SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/../external ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 UsingLua ;
@@ -29,6 +30,7 @@ SERVER_SOURCES = main.c korrektur.c ;
 TOLUA_SOURCES = 
  <tolua>bindings.c
  <tolua>helpers.c
+ <tolua>bind_sqlite.c
  <tolua>bind_unit.c
  <tolua>bind_ship.c
  <tolua>bind_storage.c

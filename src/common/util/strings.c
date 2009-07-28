@@ -91,7 +91,7 @@ escape_string(const char * str, char * buffer, unsigned int len)
     o = buffer + skip;
     p = str + skip;
     do {
-      if (*p == '\"') {
+      if (*p == '\"' || *p=='\\') {
         if (len<2) {
           *o = '\0';
           break;

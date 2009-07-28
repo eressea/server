@@ -40,6 +40,7 @@
 #include "common/kernel/textstore.c"
 #include "common/kernel/unit.c"
 #include "common/kernel/xmlreader.c"
+#include "common/kernel/sqlite.c"
 
 #include "common/modules/arena.c"
 #include "common/modules/autoseed.c"
