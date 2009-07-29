@@ -284,8 +284,8 @@ getshipweight(const ship * sh, int *sweight, int *scabins)
         *scabins += u->number;
       } else {
         /* weight goes into number of cabins, not cargo */
-        scabins += u->number * u->race->weight;
-        sweight -= u->number * u->race->weight;
+        *scabins += u->number * u->race->weight;
+        *sweight -= u->number * u->race->weight;
       }
     }
   }
