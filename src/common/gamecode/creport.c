@@ -947,7 +947,6 @@ show_alliances_cr(FILE * F, const faction * f)
     fprintf(F, "ALLIANCE %d\n", al->id);
     fprintf(F, "\"%s\";name\n", al->name);
     fprintf(F, "%d;leader\n", al->leader->no);
-    fprintf(F, "%d;leader\n", al->leader->no);
   }
 }
 

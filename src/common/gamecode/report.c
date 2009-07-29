@@ -671,7 +671,7 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 
   if (u->faction == f) {
     marker = '*';
-  } else if (u->faction->alliance == f->alliance && f->alliance) {
+  } else if ALLIED(u->faction, f) {
     marker = 'o';
   } else if (a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
     && !fval(u, UFL_PARTEITARNUNG)) {
@@ -1703,7 +1703,8 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
       char label = '-';
 
       sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner?f->banner:"");
-      if (ALLIED(uf, f)) label = '*';
+      if (uf==f) label = '*';
+      else if (ALLIED(uf, f)) label = 'o';
       else if (alliedfaction(NULL, uf, f, HELP_ALL)) label = '+';
       rparagraph(F, buf, 4, 0, label);
 
