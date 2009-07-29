@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;."
+				AdditionalIncludeDirectories="..;../common;../external"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -176,7 +176,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories="..;."
+				AdditionalIncludeDirectories="..;../common;../external"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -498,6 +498,10 @@
 			</File>
 			<File
 				RelativePath=".\kernel\spellid.h"
+				>
+			</File>
+			<File
+				RelativePath=".\kernel\sqlite.c"
 				>
 			</File>
 			<File

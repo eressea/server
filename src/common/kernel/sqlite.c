@@ -4,6 +4,7 @@
 #include <util/unicode.h>
 #include <sqlite3.h>
 #include <md5.h>
+#include <assert.h>
 
 faction * get_faction_by_id(int uid)
 {
@@ -28,7 +29,7 @@ db_update_factions(sqlite3 * db)
       "INSERT OR IGNORE email (email,md5) VALUES (?,?)";
   const char * sql_select_email =
       "SELECT id FROM email WHERE md5=?";
-  const char * sql_update_faction = 
+  const char sql_update_faction[] = 
       "UPDATE faction SET email_id=?, lastturn=?, no=? WHERE id=?";
 
   faction * f;
@@ -38,13 +39,13 @@ db_update_factions(sqlite3 * db)
   sqlite3_stmt *stmt_select;
   int res;
   
-  res = sqlite3_prepare_v2(db, sql_select_email, strlen(sql_select_email)+1, &stmt_select_email, NULL);
+  res = sqlite3_prepare_v2(db, sql_select_email, (int)strlen(sql_select_email)+1, &stmt_select_email, NULL);
   if (res!=SQLITE_OK) return res;
-  res = sqlite3_prepare_v2(db, sql_insert_email, strlen(sql_insert_email)+1, &stmt_insert_email, NULL);
+  res = sqlite3_prepare_v2(db, sql_insert_email, (int)strlen(sql_insert_email)+1, &stmt_insert_email, NULL);
   if (res!=SQLITE_OK) return res;
-  res = sqlite3_prepare_v2(db, sql_select, strlen(sql_select)+1, &stmt_select, NULL);
+  res = sqlite3_prepare_v2(db, sql_select, (int)strlen(sql_select)+1, &stmt_select, NULL);
   if (res!=SQLITE_OK) return res;
-  res = sqlite3_prepare_v2(db, sql_update_faction, strlen(sql_update_faction)+1, &stmt_update_faction, NULL);
+  res = sqlite3_prepare_v2(db, sql_update_faction, sizeof(sql_update_faction), &stmt_update_faction, NULL);
   if (res!=SQLITE_OK) return res;
 
   res = sqlite3_bind_int(stmt_select, 1, game_id);
@@ -75,7 +76,7 @@ db_update_factions(sqlite3 * db)
           int i;
 
           md5_init(&ms);
-          md5_append(&ms, (md5_byte_t*)lower, strlen(lower));
+          md5_append(&ms, (md5_byte_t*)lower, (int)strlen(lower));
           md5_finish(&ms, digest);
           for (i=0;i!=16;++i) sprintf(md5hash+2*i, "%.02x", digest[i]);
 

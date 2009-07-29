@@ -599,7 +599,6 @@ tolua_region_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
       tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);
 #if 0
-      .property("owner", &lua_region_getowner, &lua_region_setowner)
       .property("herbtype", &region_getherbtype, &region_setherbtype)
       .def("add_notice", &region_addnotice)
       .def("add_direction", &region_adddirection)

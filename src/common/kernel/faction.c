@@ -92,6 +92,7 @@ get_monsters(void)
 {
   static faction * monsters;
   static int gamecookie = -1;
+
   if (gamecookie!=global.cookie) {
     monsters = NULL;
     gamecookie = global.cookie;
@@ -104,11 +105,13 @@ get_monsters(void)
         return monsters=f;
       }
     }
-  }
-  if (monsters==NULL) {
-    /* shit! */
-    monsters = findfaction(666);
-    if (monsters) fset(monsters, FFL_NPC);
+    if (!monsters) {
+      /* shit! */
+      monsters = findfaction(666);
+    }
+    if (monsters) {
+      fset(monsters, FFL_NPC|FFL_NOIDLEOUT);
+    }
   }
   return monsters;
 }
@@ -272,6 +275,7 @@ destroyfaction(faction * f)
   fset(f, FFL_QUIT);
 
   freelist(f->spellbook);
+  f->spellbook = NULL;
 
   while (f->battles) {
     struct bmsg * bm = f->battles;
@@ -466,7 +470,8 @@ boolean valid_race(const struct faction * f, const struct race * rc)
   if (f->race==rc) return true;
   else {
     const char * str = get_param(f->race->parameters, "other_race");
-    return (str?rc_find(str)==rc:false);
+    if (str) return (boolean)(rc_find(str)==rc);
+    return false;
   }
 }
 
