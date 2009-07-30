@@ -2637,7 +2637,8 @@ boolean is_owner_building(const struct building * b)
 boolean is_tax_building(const building * b)
 {
   if (b->type->taxes) {
-    return true;
+    unit * u = buildingowner(b->region, b);
+    return u!=NULL;
   }
   return false;
 }
