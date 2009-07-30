@@ -4151,16 +4151,17 @@ processorders (void)
   process();
   /*************************************************/
 
+  if (get_param_int(global.parameters, "modules.markets", 0)) {
+    do_markets();
+  }
+
   if (verbosity>=1) puts(" - Attribute altern");
   ageing();
   remove_empty_units();
 
+  /* must happen AFTER age, because that would destroy them right away */
   if (get_param_int(global.parameters, "modules.wormholes", 0)) {
     create_wormholes();
-  }
-
-  if (get_param_int(global.parameters, "modules.markets", 0)) {
-    do_markets();
   }
 
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich

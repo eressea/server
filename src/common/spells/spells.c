@@ -5260,10 +5260,10 @@ sp_itemcloak(castorder *co)
 {
   unit *target;
   unit *mage = co->magician.u;
+  spellparameter *pa = co->par;
   int cast_level = co->level;
   double power = co->force;
-  int duration = (int)power+1;
-  spellparameter *pa = co->par;
+  int duration = (int)MAX(2.0, power+1); /* works in the report, and ageing this round would kill it if it's <=1 */
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
