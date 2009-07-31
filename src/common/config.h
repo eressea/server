@@ -23,6 +23,10 @@
 #define CONFIG_H
 
 #ifdef _MSC_VER
+# define VC_EXTRALEAN
+# define WIN32_LEAN_AND_MEAN
+# include <Windows.h>
+# undef MOUSE_MOVED
 # define STDIO_CP 1252 /* log.c, convert to console character set */
 # pragma warning (disable: 4201 4214 4514 4115 4711)
 # pragma warning(disable: 4056)
@@ -226,11 +230,7 @@ extern char * strdup(const char *s);
 #endif
 
 #if !defined(MAX_PATH)
-# ifdef WIN32
-#  define VC_EXTRALEAN
-#  include <Windows.h>
-#  undef MOUSE_MOVED
-# elif defined(PATH_MAX)
+# if defined(PATH_MAX)
 #  define MAX_PATH PATH_MAX
 # else
 #  define MAX_PATH 1024
@@ -242,10 +242,10 @@ extern char * strdup(const char *s);
  ****            ****/
 #ifndef NOMINMAX
 #ifndef MIN
-# define MIN(a,b)            ((a) < (b) ? (a) : (b))
+# define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 #ifndef MAX
-# define MAX(a,b)            ((a) > (b) ? (a) : (b))
+# define MAX(a,b) ((a) > (b) ? (a) : (b))
 #endif
 #endif
    
@@ -260,9 +260,7 @@ extern char * strdup(const char *s);
 /****                      ****
  ** The Eressea boolean type **
  ****                      ****/
-#if defined(WIN32)
-  typedef unsigned char boolean;
-#elif defined(BOOLEAN)
+#if defined(BOOLEAN)
 # define boolean BOOLEAN
 #else
   typedef int boolean; /* not bool! wrong size. */

@@ -2293,18 +2293,9 @@ strdup(const char *s)
 #endif
 
 void
-remove_empty_factions(boolean writedropouts)
+remove_empty_factions(void)
 {
   faction **fp, *f3;
-  FILE *dofp = NULL;
-  char zText[MAX_PATH];
-  sprintf(zText, "%s/dropouts.%d", basepath(), turn);
-
-  if (writedropouts) dofp = fopen(zText, "w");
-  if (dofp) {
-    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
-    fwrite(utf8_bom, 1, 3, dofp);
-  }
 
   for (fp = &factions; *fp;) {
     faction * f = *fp;
@@ -2318,11 +2309,6 @@ remove_empty_factions(boolean writedropouts)
 
       /* Einfach in eine Datei schreiben und später vermailen */
 
-      if (dofp) {
-        fprintf(dofp, "%3d %s %s %s\n",
-          f->age, LOC(default_locale, rc_name(f->race, 0)), f->email,
-          factionname(f));
-      }
       if (updatelog) fprintf(updatelog, "dropout %s\n", itoa36(f->no));
 
       for (f3 = factions; f3; f3 = f3->next) {
@@ -2361,8 +2347,6 @@ remove_empty_factions(boolean writedropouts)
     }
     else fp = &(*fp)->next;
   }
-
-  if (dofp) fclose(dofp);
 }
 
 void

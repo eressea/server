@@ -623,7 +623,7 @@ tolua_write_game(lua_State* L)
 
   int result, m = IO_BINARY;
   if (mode && strcmp(mode, "text")==0) m = IO_TEXT;
-  remove_empty_factions(true);
+  remove_empty_factions();
   result = writegame(filename, m);
 
   tolua_pushnumber(L, (lua_Number)result);

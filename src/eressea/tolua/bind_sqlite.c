@@ -21,12 +21,12 @@ without prior permission by the authors of Eressea.
 
 #define LTYPE_DB TOLUA_CAST "db"
 
-extern int db_update_factions(sqlite3 * db);
+extern int db_update_factions(sqlite3 * db, boolean force);
 static int
 tolua_db_update_factions(lua_State* L)
 {  
   sqlite3 * db = (sqlite3 *)tolua_tousertype(L, 1, 0);
-  db_update_factions(db);
+  db_update_factions(db, tolua_toboolean(L, 2, 0));
   return 0;
 }
 

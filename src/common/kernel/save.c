@@ -1598,7 +1598,7 @@ readgame(const char * filename, int mode, int backup)
     }
   }
   if (loadplane || maxregions>=0) {
-    remove_empty_factions(false);
+    remove_empty_factions();
   }
   log_info((1, "Done loading turn %d.\n", turn));
   return 0;
