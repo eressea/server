@@ -30,6 +30,27 @@ tolua_db_update_factions(lua_State* L)
   return 0;
 }
 
+extern int db_update_scores(sqlite3 * db, boolean force);
+static int
+tolua_db_update_scores(lua_State* L)
+{  
+  sqlite3 * db = (sqlite3 *)tolua_tousertype(L, 1, 0);
+  db_update_scores(db, tolua_toboolean(L, 2, 0));
+  return 0;
+}
+
+static int
+tolua_db_execute(lua_State* L)
+{  
+  sqlite3 * db = (sqlite3 *)tolua_tousertype(L, 1, 0);
+  const char * sql = tolua_tostring(L, 2, 0);
+
+  int res = sqlite3_exec(db, sql, 0, 0, 0);
+
+  tolua_pushnumber(L, (LUA_NUMBER)res);
+  return 1;
+}
+
 static int
 tolua_db_close(lua_State* L)
 {  
@@ -68,6 +89,8 @@ tolua_sqlite_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "close", &tolua_db_close);
 
       tolua_function(L, TOLUA_CAST "update_factions", &tolua_db_update_factions);
+      tolua_function(L, TOLUA_CAST "update_scores", &tolua_db_update_scores);
+      tolua_function(L, TOLUA_CAST "execute", &tolua_db_execute);
     }
     tolua_endmodule(L);
 

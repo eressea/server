@@ -592,6 +592,7 @@ load_inifile(const char * filename)
     if (str) enc_gamedata = xmlParseCharEncoding(str);
 
     verbosity = iniparser_getint(d, "eressea:verbose", 2);
+    sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
 
     preload = iniparser_getstring(d, "eressea:preload", preload);
@@ -665,11 +666,10 @@ main(int argc, char *argv[])
   char * lc_ctype;
   char * lc_numeric;
   lua_State * L = lua_init();
-  static int write_csv = 1;
+  static int write_csv = 0;
 
   setup_signal_handler();
 
-  sqlpatch = true;
   log_open("eressea.log");
 
   lc_ctype = setlocale(LC_CTYPE, "");
@@ -716,7 +716,7 @@ main(int argc, char *argv[])
       filename = strtok(NULL, ":");
     }
   }
-  if (luafile==NULL) lua_console(L);
+  if (luafile==NULL || turn==0) lua_console(L);
   else {
     char buf[MAX_PATH];
     if (script_path) {

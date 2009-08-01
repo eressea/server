@@ -34,6 +34,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/log.h>
 
 #include <lua.h>
 #include <tolua.h>
@@ -265,13 +266,20 @@ tolua_region_get_resourcelevel(lua_State* L)
   return 0;
 }
 
+#define LUA_ASSERT(c, s) if (!(c)) { log_error(("%s(%d): %s\n", __FILE__, __LINE__, (s))); return 0; }
 static int
 tolua_region_get_resource(lua_State* L)
 {
-  region * r = (region *)tolua_tousertype(L, 1, 0);
-  const char * type = tolua_tostring(L, 2, 0);
-  const resource_type * rtype = rt_find(type);
+  region * r;
+  const char * type;
+  const resource_type * rtype;
   int result = 0;
+
+  r = (region *)tolua_tousertype(L, 1, 0);
+  LUA_ASSERT(r!=NULL, "invalid parameter");
+  type = tolua_tostring(L, 2, 0);
+  LUA_ASSERT(type!=NULL, "invalid parameter");
+  rtype = rt_find(type);
 
   if (!rtype) {
     if (strcmp(type, "seed")==0) result = rtrees(r, 0);

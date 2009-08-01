@@ -61,8 +61,26 @@ end
 function write_files(locales)
   write_passwords()
   write_reports()
-  write_emails(locales)
-  write_aliases()
   write_summary()
-  write_addresses()
+  -- write_emails(locales)
+  -- write_aliases()
+  -- write_addresses()
+end
+
+function write_scores()
+  scores = {}
+  for r in regions() do
+    f = r.owner
+    if f~=nil then
+      value = scores[f.id]
+      if value==nil then value=0 end
+      value = value + r:get_resource("money")/100
+      scores[f.id] = value
+    end
+  end
+  for f in factions() do
+    score=scores[f.id]
+    if score==nil then score=0 end
+    print(math.floor(score)..":"..f.name..":"..itoa36(f.id))
+  end
 end

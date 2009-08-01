@@ -55,13 +55,11 @@ stmt_cache_get(sqlite3 * db, const char * sql)
     }
     i = cache_insert;
     res = sqlite3_finalize(cache[i].stmt);
-    SQL_EXPECT(res, SQLITE_OK);
   }
   cache[i].inuse = 1;
   cache[i].db = db;
   cache[i].sql = sql;
   res = sqlite3_prepare_v2(db, sql, -1, &cache[i].stmt, NULL);
-  SQL_EXPECT(res, SQLITE_OK);
   return cache[i].stmt;
 }
 
@@ -226,6 +224,33 @@ db_update_factions(sqlite3 * db, boolean force)
     } else {
       freset(f, FFL_MARK);
     }
+  }
+  return SQLITE_OK;
+}
+
+int
+db_update_scores(sqlite3 * db, boolean force)
+{
+  const char * sql_ins = "INSERT OR FAIL INTO score (value,faction_id,turn) VALUES (?,?,?)";
+  sqlite3_stmt * stmt_ins = stmt_cache_get(db, sql_ins);
+  const char * sql_upd = "UPDATE score set value=? WHERE faction_id=? AND turn=?";
+  sqlite3_stmt * stmt_upd = stmt_cache_get(db, sql_upd);
+  faction * f;
+  for (f=factions;f;f=f->next) {
+    int res;
+    sqlite3_bind_int(stmt_ins, 1, f->score);
+    sqlite3_bind_int64(stmt_ins, 2, f->subscription);
+    sqlite3_bind_int(stmt_ins, 3, turn);
+    res = sqlite3_step(stmt_ins);
+    if (res==SQLITE_CONSTRAINT) {
+      sqlite3_bind_int(stmt_upd, 1, f->score);
+      sqlite3_bind_int64(stmt_upd, 2, f->subscription);
+      sqlite3_bind_int(stmt_upd, 3, turn);
+      res = sqlite3_step(stmt_upd);
+      sqlite3_reset(stmt_upd);
+    }
+    SQL_EXPECT(res, SQLITE_DONE);
+    sqlite3_reset(stmt_ins);
   }
   return SQLITE_OK;
 }

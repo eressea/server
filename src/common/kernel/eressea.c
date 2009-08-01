@@ -104,7 +104,7 @@ FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
-int turn;
+int turn = 0;
 
 #if XECMD_MODULE
 attrib_type at_xontormiaexpress = {
@@ -2203,7 +2203,9 @@ init_data(const char * filename)
   l = read_xml(zText);
   if (l) return l;
 
-  if (turn<first_turn) turn = first_turn;
+  if (turn<0) {
+    turn = first_turn;
+  }
   return 0;
 }
 
@@ -3020,7 +3022,7 @@ kernel_init(void)
   attrib_init();
   translation_init();
 
-  if (!turn) turn = lastturn();
+  if (turn<0) turn = lastturn();
   if (sqlpatch) {
     sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
     sql_init(zBuffer);

@@ -479,8 +479,9 @@ tolua_faction_open(lua_State* L)
     {
       tolua_function(L, TOLUA_CAST "__tostring", tolua_faction_tostring);
 
-      tolua_variable(L, TOLUA_CAST "name", &tolua_faction_get_name, &tolua_faction_set_name);
+      tolua_variable(L, TOLUA_CAST "id", tolua_faction_get_id, tolua_faction_set_id);
       tolua_variable(L, TOLUA_CAST "uid", &tolua_faction_get_uid, &tolua_faction_set_uid);
+      tolua_variable(L, TOLUA_CAST "name", &tolua_faction_get_name, &tolua_faction_set_name);
       tolua_variable(L, TOLUA_CAST "info", &tolua_faction_get_info, &tolua_faction_set_info);
       tolua_variable(L, TOLUA_CAST "units", tolua_faction_get_units, NULL);
       tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
@@ -492,7 +493,6 @@ tolua_faction_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "race", tolua_faction_get_race, tolua_faction_set_race);
       tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliance, tolua_faction_set_alliance);
       tolua_variable(L, TOLUA_CAST "score", tolua_faction_get_score, NULL);
-      tolua_variable(L, TOLUA_CAST "id", tolua_faction_get_id, tolua_faction_set_id);
       tolua_variable(L, TOLUA_CAST "age", tolua_faction_get_age, tolua_faction_set_age);
       tolua_variable(L, TOLUA_CAST "options", tolua_faction_get_options, tolua_faction_set_options);
       tolua_variable(L, TOLUA_CAST "flags", tolua_faction_get_flags, NULL);
