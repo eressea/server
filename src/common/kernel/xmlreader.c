@@ -378,8 +378,7 @@ parse_calendar(xmlDocPtr doc)
   xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
   nsetCalendars = xpathCalendars->nodesetval;
   if (nsetCalendars==NULL || nsetCalendars->nodeNr!=1) {
-    log_error(("invalid or missing calendar data in %s\n", doc->name));
-    rv = -1;
+    /* rv = -1; */
   } else {
     xmlNodePtr calendar = nsetCalendars->nodeTab[0];
     xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
@@ -1650,6 +1649,7 @@ parse_races(xmlDocPtr doc)
     /* reading eressea/races/race/skill */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+    memset(rc->bonus, 0, sizeof(rc->bonus));
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       int mod = xml_ivalue(node, "modifier", 0);

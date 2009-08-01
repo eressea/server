@@ -124,7 +124,9 @@ read_xml(const char * filename)
 
   while (reader!=NULL) {
     int i = reader->callback(doc);
-    if (i!=0) return i;
+    if (i!=0) {
+      return i;
+    }
     reader = reader->next;
   }
   xmlFreeDoc(doc);

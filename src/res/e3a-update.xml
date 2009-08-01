@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <races>
+    <xi:include href="races/goblin-e3a.xml"/>
+  </races>
+</eressea>

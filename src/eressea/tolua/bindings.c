@@ -906,6 +906,15 @@ static int tolua_get_spells(lua_State* L)
   lua_pushnil(L);
   return 1;
 }
+
+int
+tolua_read_xml(lua_State* L)
+{
+  const char * filename = tolua_tostring(L, 1, 0);
+  read_xml(filename);
+  return 0;
+}
+
 int
 tolua_eressea_open(lua_State* L)
 {
@@ -1023,6 +1032,9 @@ tolua_eressea_open(lua_State* L)
 
     tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
     tolua_function(L, TOLUA_CAST "write_spells", tolua_write_spells);
+
+    tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
+    
   }
   tolua_endmodule(L);
   return 1;
