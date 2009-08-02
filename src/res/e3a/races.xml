@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<races>
+<races xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <!-- begin main races -->
 
-  <xi:include href="races/goblin-3.xml"/>
+  <xi:include href="../races/goblin-3.xml"/>
 
   <race name="uruk" studyspeed="-5" magres="-0.05" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
