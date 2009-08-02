@@ -113,7 +113,7 @@
     <skill name="taxation" enable="false"/>
     <skill name="trade" enable="false"/>
 
-    <param name="NewbieImmunity" value="8"/>
+    <param name="NewbieImmunity" value="9"/> <!-- ends after turn 9 -->
 
     <param name="modules.astralspace" value="0"/>
     <param name="modules.wormholes" value="0"/>

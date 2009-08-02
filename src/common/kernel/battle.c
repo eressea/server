@@ -2364,7 +2364,7 @@ static double horsebonus(const unit * u)
     it_charger = it_find("charger");
   }
 
-  while (itm) {
+  for (;itm;itm=itm->next) {
     if (itm->type->flags&ITF_ANIMAL) {
       if (itm->type==it_elvenhorse) n3 +=itm->number;
       else if (itm->type==it_charger) n2 +=itm->number;

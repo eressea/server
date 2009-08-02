@@ -236,6 +236,7 @@ db_update_scores(sqlite3 * db, boolean force)
   const char * sql_upd = "UPDATE score set value=? WHERE faction_id=? AND turn=?";
   sqlite3_stmt * stmt_upd = stmt_cache_get(db, sql_upd);
   faction * f;
+  sqlite3_exec(db, "BEGIN", 0, 0, 0);
   for (f=factions;f;f=f->next) {
     int res;
     sqlite3_bind_int(stmt_ins, 1, f->score);
@@ -249,8 +250,8 @@ db_update_scores(sqlite3 * db, boolean force)
       res = sqlite3_step(stmt_upd);
       sqlite3_reset(stmt_upd);
     }
-    SQL_EXPECT(res, SQLITE_DONE);
     sqlite3_reset(stmt_ins);
   }
+  sqlite3_exec(db, "COMMIT", 0, 0, 0);
   return SQLITE_OK;
 }

@@ -197,6 +197,7 @@ function process(orders)
 
   -- use newfactions file to place out new players
   -- autoseed(basepath .. "/newfactions", false)
+  read_xml(resourcepath.."/e3a-update.xml")
 
   write_files(locales)
   write_statistics()
@@ -211,6 +212,11 @@ end
 --
 -- main body of script
 --
+function dbupdate()
+  edb = db.open(basepath.."/eressea.db")
+  edb:update_factions()
+  edb:update_scores()
+end
 
 -- orderfile: contains the name of the orders.
 load_scripts()
@@ -218,4 +224,5 @@ if orderfile==nil then
   print "you must specify an orderfile"
 else
   process(orderfile)
+  dbupdate()
 end

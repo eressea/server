@@ -3632,9 +3632,9 @@ age_factions(void)
 
   for (f = factions; f; f = f->next) {
     ++f->age;
-    if (f->age < NewbieImmunity()) {
+    if (f->age+1 < NewbieImmunity()) {
       ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns", 
-        NewbieImmunity() - f->age));
+        NewbieImmunity() - f->age - 1));
     }
   }
 }
