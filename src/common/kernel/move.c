@@ -260,22 +260,22 @@ get_transporters(const item * itm, int * p_animals, int *p_acap, int * p_vehicle
 static int
 ridingcapacity(unit * u)
 {
-	int vehicles = 0, vcap = 0;
+  int vehicles = 0, vcap = 0;
   int animals = 0, acap = 0;
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
   /* Man trägt sein eigenes Gewicht plus seine Kapazität! Die Menschen
-   * tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
-   * von zwei Pferden gezogen wird */
+  ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
+  ** von zwei Pferden gezogen wird */
 
   animals = MIN(animals, effskill(u, SK_RIDING) * u->number * 2);
-	if (fval(u->race, RCF_HORSE)) animals += u->number;
+  if (fval(u->race, RCF_HORSE)) animals += u->number;
 
-	/* maximal diese Pferde können zum Ziehen benutzt werden */
-	vehicles = MIN(animals / HORSESNEEDED, vehicles);
+  /* maximal diese Pferde können zum Ziehen benutzt werden */
+  vehicles = MIN(animals / HORSESNEEDED, vehicles);
 
-	return vehicles * vcap + animals * acap;
+  return vehicles * vcap + animals * acap;
 }
 
 int

@@ -197,7 +197,7 @@ function process(orders)
 
   -- use newfactions file to place out new players
   -- autoseed(basepath .. "/newfactions", false)
-  read_xml(resourcepath.."/e3a-update.xml")
+  -- read_xml(resourcepath.."/e3a-update.xml")
 
   write_files(locales)
   write_statistics()

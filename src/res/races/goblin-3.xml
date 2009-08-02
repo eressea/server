@@ -6,7 +6,6 @@
   <param name="other_race" value="demon"/>
   <param name="other_cost" value="500"/>
   <param name="recruit_multi" value="0.5"/>
-  <skill name="building" modifier="1"/>
   <skill name="cartmaking" modifier="-1"/>
   <skill name="catapult" modifier="1"/>
   <skill name="magic" modifier="-99"/>
@@ -16,6 +15,7 @@
   <skill name="shipcraft" modifier="-2"/>
   <skill name="tactics" modifier="-2"/>
   <skill name="unarmed" modifier="-99"/>
+  <skill name="weaponsmithing" modifier="-1"/>
   <attack type="1" damage="1d5"/>
   <familiar race="rat" default="yes"/>
   <familiar race="imp"/>
