@@ -882,14 +882,16 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     }
     n = 1;
   }
-  if (rule_other<0) {
-    rule_other = get_param_int(global.parameters, "rules.build.other_buildings", 1);
-  }
-  if (!rule_other) {
-    unit * owner = buildingowner(r, b);
-    if (!owner || owner->faction!=u->faction) {
-      cmistake(u, ord, 1222, MSG_PRODUCE);
-      return;
+  if (b) {
+    if (rule_other<0) {
+      rule_other = get_param_int(global.parameters, "rules.build.other_buildings", 1);
+    }
+    if (!rule_other) {
+      unit * owner = buildingowner(r, b);
+      if (!owner || owner->faction!=u->faction) {
+        cmistake(u, ord, 1222, MSG_PRODUCE);
+        return;
+      }
     }
   }
 
