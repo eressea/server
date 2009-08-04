@@ -827,6 +827,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   const char * btname;
   order * new_order = NULL;
   const struct locale * lang = u->faction->locale;
+  static int rule_other = -1;
 
   assert(u->number);
   if (eff_skill(u, SK_BUILDING, r) == 0) {
@@ -880,6 +881,16 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       return;
     }
     n = 1;
+  }
+  if (rule_other<0) {
+    rule_other = get_param_int(global.parameters, "rules.build.other_buildings", 1);
+  }
+  if (!rule_other) {
+    unit * owner = buildingowner(r, b);
+    if (!owner || owner->faction!=u->faction) {
+      cmistake(u, ord, 1222, MSG_PRODUCE);
+      return;
+    }
   }
 
   if (b) built = b->size;
