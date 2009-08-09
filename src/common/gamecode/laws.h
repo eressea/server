@@ -32,9 +32,8 @@ void demographics(void);
 void last_orders(void);
 void find_address(void);
 void update_guards(void);
-void update_owners(struct region * r);
 void update_subscriptions(void);
-  extern void deliverMail(struct faction * f, struct region * r, struct unit * u, const char *s, struct unit * receiver);
+void deliverMail(struct faction * f, struct region * r, struct unit * u, const char *s, struct unit * receiver);
 
 /* eressea-specific. put somewhere else, please. */
 void processorders(void);

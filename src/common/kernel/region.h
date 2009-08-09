@@ -278,8 +278,11 @@ int region_getresource(const struct region * r, const struct resource_type * rty
 void region_setresource(struct region * r, const struct resource_type * rtype, int value);
 int owner_change(const region * r);
 boolean is_mourning(const region * r, int in_turn);
-extern const struct item_type * r_luxury(struct region * r);
-extern void get_neighbours(const struct region * r, struct region ** list);
+const struct item_type * r_luxury(struct region * r);
+void get_neighbours(const struct region * r, struct region ** list);
+
+void update_owners(struct region * r);
+
 #ifdef __cplusplus
 }
 #endif

@@ -3082,24 +3082,6 @@ static double rc_popularity(const struct race * rc)
   return 1.0/(pop-MORALE_COOLDOWN); /* 10 turns average */
 }
 
-void update_owners(region * r)
-{
-  building * bowner = largestbuilding(r, &is_owner_building, false);
-  building * blargest = largestbuilding(r, &is_tax_building, false);
-  if (blargest) {
-    if (!bowner || bowner->size<blargest->size) {
-      /* region owners update? */
-      faction *  f = region_get_owner(r);
-      unit * u = buildingowner(r, blargest);
-      if (u==NULL) {
-        if (f) region_set_owner(r, NULL, turn);
-      } else if (u->faction!=f) {
-        region_set_owner(r, u->faction, turn);
-      }
-    }
-  }
-}
-
 static void age_region(region * r) 
 {
   a_age(&r->attribs);

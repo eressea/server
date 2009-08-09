@@ -609,6 +609,23 @@ write_owner(struct storage * store, region_owner *owner)
   }
 }
 
+
+static int
+resolve_owner(variant id, void * address)
+{
+  int result = 0;
+  faction * f = NULL;
+  if (id.i!=0) {
+    f = findfaction(id.i);
+    if (f==NULL) {
+      log_error(("region has an invalid owner (%s)\n", itoa36(id.i)));
+      f = get_monsters();
+    }
+  }
+  *(faction**)address = f;
+  return result;
+}
+
 static void
 read_owner(struct storage * store, region_owner **powner)
 {
@@ -622,7 +639,7 @@ read_owner(struct storage * store, region_owner **powner)
     } else {
       owner->flags = 0;
     }
-    read_reference(&owner->owner, store, read_faction_reference, resolve_faction);
+    read_reference(&owner->owner, store, &read_faction_reference, &resolve_owner);
     *powner = owner;
   } else {
     *powner = 0;
@@ -1037,6 +1054,9 @@ readregion(struct storage * store, int x, int y)
     if (store->version>=REGIONOWNER_VERSION) {
       r->land->morale = (short)store->r_int(store);
       read_owner(store, &r->land->ownership);
+      if (r->land->ownership && r->land->ownership->owner==get_monsters()) {
+        update_owners(r);
+      }
     }
   }
   a_read(store, &r->attribs);
