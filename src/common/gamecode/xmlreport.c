@@ -239,7 +239,7 @@ xml_unit(report_context * ctx, unit * u, int mode)
   }
 
   /* possible <guard/> info */
-  if (getguard(u)) {
+  if (is_guard(u, GUARD_ALL)!=0) {
     xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "guard"));
   }
 

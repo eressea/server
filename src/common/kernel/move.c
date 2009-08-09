@@ -865,7 +865,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 
 	if (fval(reisender->race, RCF_ILLUSIONARY)) return NULL;
 	for (u=r->units;u && !contact;u=u->next) {
-		if (getguard(u) & GUARD_TRAVELTHRU) {
+		if (is_guard(u, GUARD_TRAVELTHRU)) {
 			int sk = eff_skill(u, SK_PERCEPTION, r);
 			if (invisible(reisender, u) >= reisender->number) continue;
 			if (u->faction == reisender->faction) contact = true;
@@ -890,28 +890,44 @@ bewegung_blockiert_von(unit * reisender, region * r)
 }
 
 static boolean
-is_guardian_u(unit * u2, unit *u, unsigned int mask)
+is_guardian_u(const unit * guard, unit *u, unsigned int mask)
 {
-  if (u2->faction == u->faction) return false;
-  if ((getguard(u2) & mask) == 0) return false;
-  if (alliedunit(u2, u->faction, HELP_GUARD)) return false;
-  if (ucontact(u2, u)) return false;
-  if (!cansee(u2->faction, u->region, u, 0)) return false;
+  if (guard->faction == u->faction) return false;
+  if (is_guard(guard, mask) == 0) return false;
+  if (alliedunit(guard, u->faction, HELP_GUARD)) return false;
+  if (ucontact(guard, u)) return false;
+  if (!cansee(guard->faction, u->region, u, 0)) return false;
   
   return true;
 }
 
 static boolean
-is_guardian_r(unit * u2)
+is_guardian_r(const unit * guard)
 {
-  if (u2->number == 0) return false;
-  if ((u2->flags&UFL_GUARD)==0) return false;
-  if (besieged(u2)) return false;
-  if (!armedmen(u2, true) && !fval(u2->race, RCF_UNARMEDGUARD)) return false;
+  if (guard->number == 0) return false;
+  if (besieged(guard)) return false;
+  if (guard->building && fval(guard, UFL_OWNER)) {
+    faction * owner = region_get_owner(guard->region);
+    if (owner==guard->faction) {
+      building * bowner = largestbuilding(guard->region, &is_owner_building, false);
+      if (bowner==guard->building) {
+        return true;
+      }
+    }
+  }
+  if ((guard->flags&UFL_GUARD)==0) return false;
+  if (!armedmen(guard, true) && !fval(guard->race, RCF_UNARMEDGUARD)) return false;
   return true;
 }
 
+boolean is_guard(const struct unit * u, int mask)
+{
+  return is_guardian_r(u) && (getguard(u) & mask)!=0;
+}
+
 #define MAXGUARDCACHE 16
+/** returns the guard which prevents 'u' from doing 'mask' actions in 'r'.
+*/
 unit *
 is_guarded(region * r, unit * u, unsigned int mask)
 {
@@ -919,6 +935,7 @@ is_guarded(region * r, unit * u, unsigned int mask)
   int i;
   static unit * guardcache[MAXGUARDCACHE], * lastguard; /* STATIC_XCALL: used across calls */
   static int gamecookie = -1;
+
   if (gamecookie!=global.cookie) {
     if (gamecookie>=0) {
       /* clear the previous turn's cache */

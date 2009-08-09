@@ -281,7 +281,7 @@ boolean is_mourning(const region * r, int in_turn);
 const struct item_type * r_luxury(struct region * r);
 void get_neighbours(const struct region * r, struct region ** list);
 
-void update_owners(struct region * r);
+struct faction * update_owners(struct region * r);
 
 #ifdef __cplusplus
 }

@@ -1054,8 +1054,14 @@ readregion(struct storage * store, int x, int y)
     if (store->version>=REGIONOWNER_VERSION) {
       r->land->morale = (short)store->r_int(store);
       read_owner(store, &r->land->ownership);
-      if (r->land->ownership && r->land->ownership->owner==get_monsters()) {
-        update_owners(r);
+      if (r->land->ownership && r->land->ownership->owner) {
+        faction * owner = r->land->ownership->owner;
+        if (owner==get_monsters()) {
+          owner = update_owners(r);
+        }
+        if (owner) {
+          fset(r, RF_GUARDED);
+        }
       }
     }
   }

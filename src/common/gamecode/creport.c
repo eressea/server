@@ -793,11 +793,12 @@ cr_output_unit(FILE * F, const region * r,
     assert(u->ship->region);
     fprintf(F, "%d;Schiff\n", u->ship->no);
   }
-  if (getguard(u))
+  if (is_guard(u, GUARD_ALL)!=0) {
     fprintf(F, "%d;bewacht\n", 1);
-  if ((b=usiege(u))!=NULL)
+  }
+  if ((b=usiege(u))!=NULL) {
     fprintf(F, "%d;belagert\n", b->no);
-
+  }
   /* additional information for own units */
   if (u->faction == f || omniscient(f)) {
     order * ord;

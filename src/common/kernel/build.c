@@ -243,7 +243,7 @@ siege_cmd(unit * u, order * ord)
     return;
   }
 
-  if (!(getguard(u) & GUARD_TRAVELTHRU)) {
+  if (!is_guard(u, GUARD_TRAVELTHRU)) {
     /* abbruch, wenn die einheit nicht vorher die region bewacht - als
     * warnung fuer alle anderen! */
     cmistake(u, ord, 81, MSG_EVENT);
@@ -301,7 +301,7 @@ destroy_road(unit *u, int nmax, struct order * ord)
   else if (nmax<0) n = 0;
 
   for (u2=r->units;u2;u2=u2->next) {
-    if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX
+    if (u2->faction!=u->faction && is_guard(u2, GUARD_TAX)
       && cansee(u2->faction, u->region, u, 0)
       && !alliedunit(u, u2->faction, HELP_GUARD)) {
       cmistake(u, ord, 70, MSG_EVENT);

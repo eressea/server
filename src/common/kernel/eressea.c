@@ -1011,7 +1011,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   if (u2==NULL) return false;
 
   /* simple visibility, just gotta have a unit in the region to see 'em */
-  if (getguard(u) || usiege(u) || u->building || u->ship) {
+  if (is_guard(u, GUARD_ALL)!=0 || usiege(u) || u->building || u->ship) {
     return true;
   }
 
@@ -1048,7 +1048,7 @@ cansee_unit(const unit * u, const unit * target, int modifier)
   else {
     int n, rings, o;
 
-    if (getguard(target) || usiege(target) || target->building || target->ship) {
+    if (is_guard(target, GUARD_ALL)!=0 || usiege(target) || target->building || target->ship) {
       return true;
     }
 
@@ -1087,7 +1087,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
   else {
     int rings;
 
-    if (getguard(u) || usiege(u) || u->building || u->ship) {
+    if (is_guard(u, GUARD_ALL)!=0 || usiege(u) || u->building || u->ship) {
       return true;
     }
 
@@ -2271,19 +2271,25 @@ setguard(unit * u, unsigned int flags)
   }
   fset(u, UFL_GUARD);
   fset(u->region, RF_GUARDED);
-  if (!a) a = a_add(&u->attribs, a_new(&at_guard));
-  a->data.i = (int)flags;
+  if ((int)flags==guard_flags(u)) {
+    if (a) a_remove(&u->attribs, a);
+  } else {
+    if (!a) a = a_add(&u->attribs, a_new(&at_guard));
+    a->data.i = (int)flags;
+  }
 }
 
 unsigned int
 getguard(const unit * u)
 {
-  if (fval(u->region->terrain, SEA_REGION)) return GUARD_NONE;
-  if (fval(u, UFL_GUARD)) {
-    attrib * a = a_find(u->attribs, &at_guard);
-    if (a) return (unsigned int)a->data.i;
+  attrib * a;
+  
+  assert((u->building && fval(u, UFL_OWNER)) || fval(u, UFL_GUARD) || !"you're doing it wrong! check is_guard first");
+  a = a_find(u->attribs, &at_guard);
+  if (a) {
+    return (unsigned int)a->data.i;
   }
-  return GUARD_NONE;
+  return guard_flags(u);
 }
 
 #ifndef HAVE_STRDUP
@@ -2433,10 +2439,9 @@ make_undead_unit(unit * u)
   fset(u, UFL_ISNEW);
 }
 
-void
-guard(unit * u, unsigned int mask)
+unsigned int guard_flags(const unit * u) 
 {
-  int flags = GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
+  unsigned int flags = GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
 #if GUARD_DISABLES_PRODUCTION == 1
   flags |= GUARD_PRODUCE;
 #endif
@@ -2454,6 +2459,13 @@ guard(unit * u, unsigned int mask)
     flags = GUARD_MINING;
     break;
   }
+  return flags;
+}
+
+void
+guard(unit * u, unsigned int mask)
+{
+  unsigned int flags = guard_flags(u);
   setguard(u, flags & mask);
 }
 

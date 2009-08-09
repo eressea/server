@@ -581,7 +581,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
       }
     }
   }
-  if (getguard(u)) {
+  if (is_guard(u, GUARD_ALL)!=0) {
     bytes = (int)strlcpy(bufp, ", ", size);
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     bytes = (int)strlcpy(bufp, LOC(f->locale, "unit_guards"), size);

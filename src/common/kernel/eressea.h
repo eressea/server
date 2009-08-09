@@ -333,6 +333,7 @@ extern void guard(struct unit * u, unsigned int mask);
 	/* Einheit setzt "BEWACHE", rassenspezifzisch.
 	 * 'mask' kann einzelne flags zusätzlich und-maskieren.
 	 */
+unsigned int guard_flags(const struct unit * u);
 
 extern boolean hunger(int number, struct unit * u);
 extern int lifestyle(const struct unit*);

@@ -1625,7 +1625,7 @@ guards(FILE * F, const region * r, const faction * see)
   /* Bewachung */
 
   for (u = r->units; u; u = u->next) {
-    if (getguard(u)) {
+    if (is_guard(u, GUARD_ALL)!=0) {
       faction *f  = u->faction;
       faction *fv = visible_faction(see, u);
 

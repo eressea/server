@@ -2613,8 +2613,16 @@ update_guards(void)
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      if (can_start_guarding(u)!=E_GUARD_OK) {
-        setguard(u, GUARD_NONE);
+      if (fval(u, UFL_GUARD)) {
+        if (can_start_guarding(u)!=E_GUARD_OK) {
+          setguard(u, GUARD_NONE);
+        } else {
+          attrib * a = a_find(u->attribs, &at_guard);
+          if (a && a->data.i==(int)guard_flags(u)) {
+            /* this is really rather not necessary */
+            a_remove(&u->attribs, a);
+          }
+        }
       }
     }
   }

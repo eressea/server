@@ -1489,7 +1489,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
   if (rdata->guard!=0) {
     unit * u2;
     for (u2 = r->units; u2; u2 = u2->next) {
-      if ((getguard(u2) & rdata->guard) && can_guard(u2, u)) {
+      if (is_guard(u2, rdata->guard)!=0 && can_guard(u2, u)) {
         ADDMSG(&u->faction->msgs,
                msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
         return;
@@ -1504,7 +1504,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
   if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN]) {
     unit * u2;
     for (u2 = r->units; u2; u2 = u2->next ) {
-      if (getguard(u) & GUARD_MINING
+      if (is_guard(u, GUARD_MINING)
           && !fval(u2, UFL_ISNEW)
           && u2->number
           && !alliedunit(u2, u->faction, HELP_GUARD))

@@ -158,7 +158,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
 
 	/* attackiere bewachende einheiten */
   for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2 != u && getguard(u2)&GUARD_TAX) {
+    if (u2 != u && is_guard(u2, GUARD_TAX)) {
       order * ord = monster_attack(u, u2);
       if (ord) addlist(&u->orders, ord);
     }
@@ -177,7 +177,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
   for (u2 = r->units; u2; u2 = u2->next) {
     if (u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
       int m = get_money(u2);
-      if (m==0 || (getguard(u2) & GUARD_TAX)) continue;
+      if (m==0 || is_guard(u2, GUARD_TAX)) continue;
       else {
         order * ord = monster_attack(u, u2);
         if (ord) {

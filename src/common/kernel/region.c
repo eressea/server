@@ -1472,26 +1472,33 @@ region_set_owner(struct region * r, struct faction * owner, int turn)
 }
 
 
-void update_owners(region * r)
+faction * update_owners(region * r)
 {
+  faction * f = NULL;
   if (r->land) {
     building * bowner = largestbuilding(r, &is_owner_building, false);
     building * blargest = largestbuilding(r, &is_tax_building, false);
     if (blargest) {
       if (!bowner || bowner->size<blargest->size) {
         /* region owners update? */
-        faction *  f = region_get_owner(r);
         unit * u = buildingowner(r, blargest);
+        f = region_get_owner(r);
         if (u==NULL) {
-          if (f) region_set_owner(r, NULL, turn);
+          if (f) {
+            region_set_owner(r, NULL, turn);
+            f = NULL;
+          }
         } else if (u->faction!=f) {
           region_set_owner(r, u->faction, turn);
+          f = u->faction;
         }
       }
     } else if (r->land->ownership && r->land->ownership->owner) {
       region_set_owner(r, NULL, turn);
+      f = NULL;
     }
   }
+  return f;
 }
 
 void
