@@ -1358,8 +1358,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 #endif
 
   if (bdebug) {
-    fprintf(bdebug, "Damage %d, armor %d: %d -> %d HP, tot.\n",
-      da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
+    fprintf(bdebug, "Damage %d, armor %d, type %d: %d -> %d HP, tot.\n",
+      da, ar, type, df->person[dt.index].hp + rda, df->person[dt.index].hp);
   }
   for (pitm=&du->items; *pitm; pitm=&(*pitm)->next) {
     const item_type * itype = (*pitm)->type;

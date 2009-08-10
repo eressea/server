@@ -1131,9 +1131,11 @@ quit_cmd(unit * u, struct order * ord)
     }
     fset(f, FFL_QUIT);
   } else {
+    char buffer[64];
+    write_order(ord, buffer, sizeof(buffer));
     cmistake(u, ord, 86, MSG_EVENT);
-    log_warning(("STIRB mit falschem Passwort für Partei %s: %s\n",
-      factionid(f), passwd));
+    log_warning(("QUIT with illegal password for faction %s: %s\n",
+      factionid(f), buffer));
   }
   return 0;
 }
