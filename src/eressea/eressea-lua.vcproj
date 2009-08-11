@@ -378,14 +378,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\scripts\default.lua"
-			>
-		</File>
-		<File
-			RelativePath="..\scripts\eressea.lua"
-			>
-		</File>
-		<File
 			RelativePath=".\Jamfile"
 			>
 		</File>
@@ -394,15 +386,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\scripts\run-e3a.lua"
-			>
-		</File>
-		<File
 			RelativePath=".\server.c"
-			>
-		</File>
-		<File
-			RelativePath="..\scripts\tests.lua"
 			>
 		</File>
 	</Files>

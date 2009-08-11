@@ -1202,6 +1202,7 @@ statistics(FILE * F, const region * r, const faction * f)
     rparagraph(F, buf, 2, 2, 0);
     msg_release(m);
   }
+
   if (p) {
     m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
     nr_render(m, f->locale, buf, sizeof(buf), f);
@@ -1220,6 +1221,15 @@ statistics(FILE * F, const region * r, const faction * f)
       rparagraph(F, buf, 2, 2, 0);
       msg_release(m);
     }
+
+    if (r->land->ownership) {
+      m = msg_message("nr_stat_morale", "morale", r->land->morale);
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      rparagraph(F, buf, 2, 2, 0);
+      msg_release(m);
+    }
+
+
   }
   /* info about units */
 

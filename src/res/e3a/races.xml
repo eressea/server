@@ -54,7 +54,7 @@
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="dwarf"/>
     <param name="other_cost" value="500"/>
-    <param name="morale" value="8"/>
+    <param name="morale" value="3"/>
     <param name="luxury_trade" value="600"/>
     <skill name="bow" modifier="-1"/>
     <skill name="building" modifier="1"/>

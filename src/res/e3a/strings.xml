@@ -73,24 +73,44 @@
       <text locale="en">rebellious</text>
     </string>
     <string name="1">
+      <text locale="de">wütende</text>
+      <text locale="en">mad</text>
+    </string>
+    <string name="2">
       <text locale="de">zornige</text>
       <text locale="en">angry</text>
     </string>
-    <string name="2">
+    <string name="3">
+      <text locale="de">unruhige</text>
+      <text locale="en">agitated</text>
+    </string>
+    <string name="4">
+      <text locale="de">gleichgültige</text>
+      <text locale="en">indifferent</text>
+    </string>
+    <string name="5">
+      <text locale="de">entspannte</text>
+      <text locale="en">relaxed</text>
+    </string>
+    <string name="6">
       <text locale="de">zufriedene</text>
       <text locale="en">content</text>
     </string>
-    <string name="3">
+    <string name="7">
       <text locale="de">glückliche</text>
       <text locale="en">happy</text>
     </string>
-    <string name="4">
+    <string name="8">
       <text locale="de">treue</text>
       <text locale="en">loyal</text>
     </string>
-    <string name="5">
+    <string name="9">
       <text locale="de">ergebene</text>
       <text locale="en">devoted</text>
+    </string>
+    <string name="10">
+      <text locale="de">unterwürfige</text>
+      <text locale="en">subservient</text>
     </string>
   </namespace>
   <string name="charger">

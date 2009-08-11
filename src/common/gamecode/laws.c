@@ -3088,7 +3088,7 @@ age_building(building * b)
 
 static double rc_popularity(const struct race * rc)
 {
-  int pop = get_param_int(rc->parameters, "morale", 10);
+  int pop = get_param_int(rc->parameters, "morale", MORALE_AVERAGE);
   return 1.0/(pop-MORALE_COOLDOWN); /* 10 turns average */
 }
 

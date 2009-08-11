@@ -646,7 +646,7 @@ give_control(unit * u, unit * u2)
         int morale = region_get_morale(r);
         region_set_owner(r, u2->faction, turn);
         if (morale>0) {
-          region_set_morale(r, morale-1, turn);
+          region_set_morale(r, morale-MORALE_TRANSFER, turn);
         }
       }
     }
@@ -3299,7 +3299,6 @@ peasant_taxes(region * r)
   building * b;
   int money;
   int maxsize;
-  int morale;
 
   f = region_get_owner(r);
   if (f==NULL || is_mourning(r, turn)) {
@@ -3315,13 +3314,12 @@ peasant_taxes(region * r)
   if (u==NULL || u->faction!=f) return;
 
   maxsize = buildingeffsize(b, false);
-  morale = region_get_morale(r);
-  if (morale<maxsize) {
-    maxsize = morale;
-  }
-  if (maxsize>0 && morale>0) {
-    int taxmoney = (int)(money * b->type->taxes(b, maxsize));
-    if (taxmoney>0) {
+  if (maxsize>0) {
+    double taxfactor = money * b->type->taxes(b, maxsize);
+    double morale = money * region_get_morale(r) * MORALE_TAX_FACTOR;
+    if (taxfactor>morale) taxfactor = morale;
+    if (taxfactor>0) {
+      int taxmoney = (int)taxfactor;
       change_money(u, taxmoney);
       rsetmoney(r, money - taxmoney);
       ADDMSG(&u->faction->msgs, msg_message("income_tax", 

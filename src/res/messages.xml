@@ -776,7 +776,6 @@
       <arg name="units" type="int"/>
     </type>
     <text locale="de">"Deine Partei hat $int($population) Personen in $int($units) Einheiten."</text>
-    <text locale="fr">"Your faction has $int($population) people in $int($units) units."</text>
     <text locale="en">"Your faction has $int($population) people in $int($units) units."</text>
   </message>
   <message name="nr_stat_header" section="nr">
@@ -785,7 +784,6 @@
     </type>
     <text locale="de">"Statistik für $region($region):"</text>
     <text locale="en">"Statistics for $region($region):"</text>
-    <text locale="fr">"Statistics for $region($region):"</text>
   </message>
   <message name="nr_stat_maxentertainment" section="nr">
     <type>
@@ -793,7 +791,13 @@
     </type>
     <text locale="de">"Unterhaltung: max. $int($max) Silber"</text>
     <text locale="en">"Entertainment: max. $int($max) silver"</text>
-    <text locale="fr">"Entertainment: max. $int($max) silver"</text>
+  </message>
+  <message name="nr_stat_morale" section="nr">
+    <type>
+      <arg name="morale" type="int"/>
+    </type>
+    <text locale="de">"Moral der Bauern: $int($morale)"</text>
+    <text locale="en">"Peasant morale: $int($morale)"</text>
   </message>
   <message name="nr_stat_luxuries" section="nr">
     <type>
@@ -801,14 +805,13 @@
     </type>
     <text locale="de">"Luxusgüter zum angegebenen Preis: $int($max)"</text>
     <text locale="en">"Luxury goods at this price: $int($max)"</text>
-    <text locale="fr">"Luxury goods at this price: $int($max)"</text>
   </message>
   <message name="nr_stat_salary" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
     <text locale="de">"Lohn für Arbeit: $int($max) Silber"</text>
-    <text locale="en">"Worker's salary: $int($max) silver"</text>
+    <text locale="en">"Worker salary: $int($max) silver"</text>
   </message>
   <message name="nr_stat_salary_new" section="nr">
     <type>
