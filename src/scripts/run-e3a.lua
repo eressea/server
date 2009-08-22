@@ -165,6 +165,10 @@ function process(orders)
 
   kill_multis(confirmed_multis)
   -- plan_monsters()
+  local mon = get_faction(666)
+  if mon ~= nil then
+    mon.lastturn = get_turn()
+  end
 
   local nmrs = get_nmrs(1)
   --  nmrs = 0

@@ -323,7 +323,7 @@ local function test_morale()
   process_orders()
   u1:clear_orders()
   assert(r.owner==u2.faction)
-  assert(r.morale==4)
+  assert(r.morale==3) --  5-MORALE_TRANSFER
   u2.building = nil
   update_owners()
   assert(r.owner==u1.faction)
@@ -461,7 +461,7 @@ function test_taxes()
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 10)
   u:clear_orders()
-  u:add_order("LERNE Holzfällen") -- do not work
+  u:add_order("LERNE Holzfaellen") -- do not work
   local b = building.create(r, "watch")
   b.size = 10
   u.building = b
@@ -682,7 +682,7 @@ mytests = {
     ["morale"] = test_morale
 }
 fail = 0
-for k, v in pairs(mytests) do
+for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1
@@ -694,7 +694,7 @@ end
 
 -- spells_csv()
 
-if true or fail > 0 then
+if fail > 0 then
     print(fail .. " tests failed.")
     io.stdin:read()
 end
