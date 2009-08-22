@@ -3279,7 +3279,7 @@ taxbuilding(const region * r)
         if (!a) {
           int maxsize = buildingeffsize(b, false);
           double money = b->type->taxes(b, maxsize);
-          if (money>0 && (best==NULL || money > maxmoney)) {
+          if (money>0 && (best==NULL || money > maxmoney || (money == maxmoney && b->size>best->size))) {
             maxmoney = money;
             best = b;
           }

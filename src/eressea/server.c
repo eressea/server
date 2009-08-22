@@ -169,7 +169,6 @@ static char * orders = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_ignore_errors = false;
-static boolean opt_reportonly = false;
 static const char * luafile = NULL;
 static const char * preload = NULL;
 static const char * script_path = "scripts";
@@ -388,17 +387,16 @@ usage(const char * prog, const char * arg)
     fprintf(stderr, "unknown argument: %s\n\n", arg);
   }
   fprintf(stderr, "Usage: %s [options]\n"
-    "-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
+    "-o befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
     "-q               : be less verbose\n"
     "-d datadir       : gibt das datenverzeichnis an\n"
     "-b basedir       : gibt das basisverzeichnis an\n"
     "-r resdir        : gibt das resourceverzeichnis an\n"
     "-t turn          : read this datafile, not the most current one\n"
-    "-o reportdir     : gibt das reportverzeichnis an\n"
+    "-R reportdir     : gibt das reportverzeichnis an\n"
     "-l path          : specify the base script directory\n"
     "-C               : run in interactive mode\n"
     "-e script        : main lua script\n"
-    "-R               : erstellt nur die Reports neu\n"
     "--lomem          : keine Messages (RAM sparen)\n"
     "--nobattle       : keine Kämpfe\n"
     "--ignore-errors  : ignore errors in scripts (please don\'t)\n"
@@ -478,7 +476,7 @@ read_args(int argc, char **argv, lua_State * luaState)
         g_console = 1;
         luafile=NULL;
         break;
-      case 'o':
+      case 'R':
         g_reportdir = argv[++i];
         break;
       case 'e':
@@ -504,12 +502,15 @@ read_args(int argc, char **argv, lua_State * luaState)
       case 'q':
         verbosity = 0;
         break;
-      case 'v':
+      case 'o':
         if (i<argc) {
           orders = argv[++i];
         } else {
           return usage(argv[0], argv[i]);
         }
+        break;
+      case 'v':
+        verbosity = atoi(argv[++i]);
         break;
       case 'p':
         loadplane = atoi(argv[++i]);
@@ -535,9 +536,6 @@ read_args(int argc, char **argv, lua_State * luaState)
         break;
       case 'w':
         g_writemap = true;
-        break;
-      case 'R':
-        opt_reportonly = true;
         break;
       default:
         usage(argv[0], argv[i]);
