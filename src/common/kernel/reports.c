@@ -1394,9 +1394,6 @@ write_reports(faction * f, time_t ltime)
   get_seen_interval(&ctx);
   get_addresses(&ctx);
 
-  if (verbosity>=1) {
-    log_stdio(stdout, "Writing reports for turn %d:", turn);
-  }
   do {
     report_type * rtype = report_types;
 
@@ -1528,6 +1525,9 @@ reports(void)
   int retval = 0;
   char path[MAX_PATH];
 
+  if (verbosity>=1) {
+    log_stdio(stdout, "Writing reports for turn %d:", turn);
+  }
   nmr_warnings();
   report_donations();
   remove_empty_units();
