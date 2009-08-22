@@ -1421,7 +1421,7 @@ write_reports(faction * f, time_t ltime)
         backup *= 2;
       }
     }
-    else {
+    else if (verbosity>=2) {
       puts(" DONE");
     }
   } while (errno);
