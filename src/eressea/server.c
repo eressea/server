@@ -174,7 +174,7 @@ static const char * luafile = NULL;
 static const char * preload = NULL;
 static const char * script_path = "scripts";
 static int memdebug = 0;
-
+static int g_console = 1;
 #if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
 #include <execinfo.h>
 #include <signal.h>
@@ -475,12 +475,14 @@ read_args(int argc, char **argv, lua_State * luaState)
         return usage(argv[0], argv[i]);
     } else switch(argv[i][1]) {
       case 'C':
+        g_console = 1;
         luafile=NULL;
         break;
       case 'o':
         g_reportdir = argv[++i];
         break;
       case 'e':
+        g_console = 0;
         luafile = argv[++i];
         break;
       case 'd':
@@ -496,6 +498,7 @@ read_args(int argc, char **argv, lua_State * luaState)
         xmlfile = argv[++i];
         break;
       case 't':
+        g_console = 0;
         turn = atoi(argv[++i]);
         break;
       case 'q':
@@ -716,8 +719,8 @@ main(int argc, char *argv[])
       filename = strtok(NULL, ":");
     }
   }
-  if (luafile==NULL || turn==0) lua_console(L);
-  else {
+  if (g_console) lua_console(L);
+  else if (luafile) {
     char buf[MAX_PATH];
     if (script_path) {
       sprintf(buf, "%s/%s", script_path, luafile);
