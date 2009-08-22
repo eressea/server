@@ -1394,13 +1394,16 @@ write_reports(faction * f, time_t ltime)
   get_seen_interval(&ctx);
   get_addresses(&ctx);
 
+  if (verbosity>=1) {
+    log_stdio(stdout, "Writing reports for turn %d:", turn);
+  }
   do {
     report_type * rtype = report_types;
 
     errno = 0;
-    log_stdio(stdout, "Reports for %s:", factionname(f));
-    fflush(stdout);
-
+    if (verbosity>=2) {
+      log_stdio(stdout, "Reports for %s:", factionname(f));
+    }
     for (;rtype!=NULL;rtype=rtype->next) {
       if (f->options & rtype->flag) {
         char filename[MAX_PATH];
