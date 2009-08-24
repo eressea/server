@@ -3264,33 +3264,6 @@ auto_work(region * r)
   }
 }
 
-static building *
-taxbuilding(const region * r)
-{
-  building *b, *best = NULL;
-  double maxmoney = 0;
-  /* durch die verw. von '>' statt '>=' werden die aelteren burgen
-  * bevorzugt. */
-
-  if (r->land && r->land->ownership) {
-    for (b = rbuildings(r); b; b = b->next) {
-      if (b->type->taxes && r->land->ownership) {
-        const attrib * a = a_find(b->attribs, &at_icastle);
-        if (!a) {
-          int maxsize = buildingeffsize(b, false);
-          double money = b->type->taxes(b, maxsize);
-          if (money>0 && (best==NULL || money > maxmoney || (money == maxmoney && b->size>best->size))) {
-            maxmoney = money;
-            best = b;
-          }
-        }
-      }
-    }
-  }
-  return best;
-}
-
-
 static void
 peasant_taxes(region * r)
 {
@@ -3307,7 +3280,7 @@ peasant_taxes(region * r)
   money = rmoney(r);
   if (money<=0) return;
 
-  b = taxbuilding(r);
+  b = largestbuilding(r, cmp_taxes, false);
   if (b==NULL) return;
 
   u = buildingowner(r, b);
