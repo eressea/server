@@ -641,7 +641,7 @@ give_control(unit * u, unit * u2)
     region * r = u->region;
     faction * f = region_get_owner(r);
     if (f==u->faction) {
-      building * b = largestbuilding(r, &is_owner_building, false);
+      building * b = largestbuilding(r, &cmp_current_owner, false);
       if (b==u->building) {
         int morale = region_get_morale(r);
         region_set_owner(r, u2->faction, turn);

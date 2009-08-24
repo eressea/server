@@ -320,7 +320,7 @@ parse_buildings(xmlDocPtr doc)
           } else if (strcmp((const char*)propValue, "protection")==0) {
             btype->protection = (int (*)(struct building*, struct unit *))fun;
           } else if (strcmp((const char*)propValue, "taxes")==0) {
-            btype->taxes = (double (*)(struct building*, int))fun;
+            btype->taxes = (double (*)(const struct building*, int))fun;
           } else if (strcmp((const char*)propValue, "age")==0) {
             btype->age = (void (*)(struct building*))fun;
           } else {

@@ -1689,21 +1689,17 @@ cstring(const char *s)
 }
 
 building *
-largestbuilding(const region * r, boolean (*eval)(const struct building *), boolean imaginary)
+largestbuilding(const region * r, int (*cmp_gt)(const struct building *, const struct building *), boolean imaginary)
 {
   building *b, *best = NULL;
-  /* durch die verw. von '>' statt '>=' werden die aelteren burgen
-   * bevorzugt. */
 
   for (b = rbuildings(r); b; b = b->next) {
-    if (eval && !eval(b)) continue;
+    if (cmp_gt(b, best)<=0) continue;
     if (!imaginary) {
       const attrib * a = a_find(b->attribs, &at_icastle);
       if (a) continue;
     }
-    if (best==NULL || b->size > best->size) {
-      best = b;
-    }
+    best = b;
   }
   return best;
 }
@@ -2614,12 +2610,17 @@ static const int wagetable[7][4] = {
   {15, 13, 16,  2}      /* Zitadelle */
 };
 
-boolean
-is_castle(const struct building * b)
+int
+cmp_wage(const struct building * b, const building * a)
 {
   static const struct building_type * bt_castle;
   if (!bt_castle) bt_castle = bt_find("castle");
-  return (b->type==bt_castle);
+  if (b->type==bt_castle) {
+    if (!a) return 1;
+    if (b->size>a->size) return 1;
+    if (b->size==a->size) return 0;
+  }
+  return -1;
 }
 
 boolean is_owner_building(const struct building * b)
@@ -2632,13 +2633,57 @@ boolean is_owner_building(const struct building * b)
   return false;
 }
 
-boolean is_tax_building(const building * b)
+int
+cmp_taxes(const building * b, const building * a)
 {
+  faction * f = region_get_owner(b->region);
   if (b->type->taxes) {
-    unit * u = buildingowner(b->region, b);
-    return u!=NULL;
+    if (a) {
+      int newsize = buildingeffsize(b, false);
+      double newtaxes = b->type->taxes(b, newsize);
+      int oldsize = buildingeffsize(a, false);
+      double oldtaxes = a->type->taxes(a, oldsize);
+
+      if (newtaxes<oldtaxes) return -1;
+      else if (newtaxes>oldtaxes) return 1;
+      else if (b->size<a->size) return -1;
+      else if (b->size>a->size) return 1;
+      else {
+        unit * u = buildingowner(b->region, b);
+        if (u && u->faction==f) {
+          u = buildingowner(a->region, a);
+          if (u && u->faction==f) return -1;
+          return 1;
+        }
+      }
+    } else {
+      return 1;
+    }
   }
-  return false;
+  return -1;
+}
+
+int
+cmp_current_owner(const building * b, const building * a)
+{
+  faction * f = region_get_owner(b->region);
+  if (f && b->type->taxes) {
+    unit * u = buildingowner(b->region, b);
+    if (!u || u->faction!=f) return -1;
+    if (a) {
+      int newsize = buildingeffsize(b, false);
+      double newtaxes = b->type->taxes(b, newsize);
+      int oldsize = buildingeffsize(a, false);
+      double oldtaxes = a->type->taxes(a, oldsize);
+
+      if (newtaxes<oldtaxes) return -1;
+      else if (newtaxes>oldtaxes) return 1;
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+  return -1;
 }
 
 int rule_auto_taxation(void)
@@ -2651,7 +2696,7 @@ int rule_auto_taxation(void)
 static int
 default_wage(const region *r, const faction * f, const race * rc, int in_turn)
 {
-  building *b = largestbuilding(r, &is_castle, false);
+  building *b = largestbuilding(r, &cmp_wage, false);
   int      esize = 0;
   curse * c;
   double wage;

@@ -61,7 +61,7 @@ typedef struct building_type {
   void (*init)(struct building_type*);
   void (*age)(struct building *);
   int (*protection)(struct building *, struct unit *);
-  double (*taxes)(struct building *, int size);
+  double (*taxes)(const struct building *, int size);
   struct attrib * attribs;
 } building_type;
 

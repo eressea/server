@@ -909,7 +909,7 @@ is_guardian_r(const unit * guard)
   if (guard->building && fval(guard, UFL_OWNER)) {
     faction * owner = region_get_owner(guard->region);
     if (owner==guard->faction) {
-      building * bowner = largestbuilding(guard->region, &is_owner_building, false);
+      building * bowner = largestbuilding(guard->region, &cmp_taxes, false);
       if (bowner==guard->building) {
         return true;
       }

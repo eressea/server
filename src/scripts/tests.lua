@@ -268,8 +268,6 @@ local function test_recruit2()
   u:add_order("REKRUTIERE 1 mensch")
   u:add_order("REKRUTIERE 1")
   process_orders()
-  print(u:get_item("money"))
-  print(u.number)
 end
 
 local function test_owners()
@@ -678,8 +676,9 @@ tests = {
     ["market"] = test_market
 }
 mytests = {
---    ["blessed"] = test_blessed -- foiled by peasantgrowth
-    ["morale"] = test_morale
+    ["morale"] = test_morale,
+    ["taxes"] = test_taxes,
+    ["owners"] = test_owners
 }
 fail = 0
 for k, v in pairs(tests) do
