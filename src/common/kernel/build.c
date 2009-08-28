@@ -1263,13 +1263,14 @@ enter_building(unit * u, order * ord, int id, boolean report)
   }
 
   if (leave(u, false)) {
-    u->building = b;
     if (buildingowner(r, b) == 0) {
       fset(u, UFL_OWNER);
     }
     fset(u, UFL_ENTER);
+    u->building = b;
+    return true;
   }
-  return true;
+  return false;
 }
 
 void
