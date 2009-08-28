@@ -2927,7 +2927,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 		return;
 	}
 
-	if (u2->faction->age < NewbieImmunity()) {
+	if (IsImmune(u2->faction)) {
 		ADDMSG(&u->faction->msgs,
 			msg_feedback(u, ord, "newbie_immunity_error",
 			"turns", NewbieImmunity()));

@@ -405,6 +405,7 @@ extern int NMRTimeout(void);
 extern int LongHunger(const struct unit * u);
 extern int SkillCap(skill_t sk);
 extern int NewbieImmunity(void);
+extern boolean IsImmune(const struct faction * f);
 extern int AllianceAuto(void); /* flags that allied factions get automatically */
 extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern int HelpMask(void); /* flags restricted to allied factions */

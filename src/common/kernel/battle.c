@@ -4028,7 +4028,7 @@ init_battle(region * r, battle **bp)
             cmistake(u, ord, 47, MSG_BATTLE);
             continue;
           }
-          if (u2->faction->age < NewbieImmunity()) {
+          if (IsImmune(u2->faction)) {
             add_message(&u->faction->msgs,
               msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns", NewbieImmunity()));
             continue;

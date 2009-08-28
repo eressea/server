@@ -1,7 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "common\util.vcproj", "{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel", "common\kernel.vcproj", "{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamecode", "common\gamecode.vcproj", "{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
@@ -21,10 +19,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Profile|Win32.ActiveCfg = Profile|Win32
-		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Profile|Win32.Build.0 = Profile|Win32
-		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Release|Win32.ActiveCfg = Release|Win32
 		{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}.Profile|Win32.ActiveCfg = Profile|Win32
 		{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}.Profile|Win32.Build.0 = Profile|Win32

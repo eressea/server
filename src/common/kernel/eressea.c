@@ -117,6 +117,7 @@ attrib_type at_xontormiaexpress = {
   ATF_UNIQUE
 };
 #endif
+
 int
 NewbieImmunity(void) {
   static int value = -1;
@@ -124,6 +125,12 @@ NewbieImmunity(void) {
     value = get_param_int(global.parameters, "NewbieImmunity", 0);
   }
   return value;
+}
+
+boolean
+IsImmune(const faction * f)
+{
+  return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
 }
 
 static int
