@@ -44,7 +44,7 @@
     </construction>
   </ship>
 
-  <ship name="barge" range="3" fishing="20" storm="1.00" damage="1.00" cabins="10" cargo="5000" cptskill="2" minskill="1" sumskill="5" opensea="no">
+  <ship name="barge" range="3" fishing="20" storm="1.00" damage="1.00" cabins="11" cargo="5000" cptskill="2" minskill="1" sumskill="5" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
@@ -62,7 +62,7 @@
   </ship>
 
 
-  <ship name="royalbarge" range="5" storm="0.25" damage="1.00" cabins="10" cargo="5000" cptskill="5" minskill="1" sumskill="10" opensea="no">
+  <ship name="royalbarge" range="5" storm="0.25" damage="1.00" cabins="11" cargo="5000" cptskill="5" minskill="1" sumskill="10" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
@@ -80,7 +80,7 @@
     </construction>
   </ship>
 
-  <ship name="catamaran" range="7" storm="0.25" damage="1.00" cabins="20" cargo="10000" cptskill="7" minskill="1" sumskill="20" opensea="yes">
+  <ship name="catamaran" range="7" storm="0.25" damage="1.00" cabins="22" cargo="10000" cptskill="7" minskill="1" sumskill="20" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <construction skill="shipcraft" minskill="8" maxsize="30" reqsize="1">
