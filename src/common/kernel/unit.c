@@ -890,7 +890,11 @@ move_unit(unit * u, region * r, unit ** ulist)
   if (u->region) {
     setguard(u, GUARD_NONE);
     fset(u, UFL_MOVED);
-    if (u->ship || u->building) leave(u, true);
+    if (u->ship || u->building) {
+      /* can_leave must be checked in travel_i */
+      boolean result = leave(u, false);
+      assert(result);
+    }
     translist(&u->region->units, ulist, u);
   } else {
     addlist(ulist, u);

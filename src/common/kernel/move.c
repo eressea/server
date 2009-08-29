@@ -1980,31 +1980,37 @@ travel_i(unit * u, const region_list * route_begin, const region_list * route_en
     skip_token();
     ut = getunit(r, u->faction);
     if (ut!=NULL) {
-      boolean found = false;
-      if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut)) {
-        if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
-          init_tokens(ut->thisorder);
-          skip_token();
-          if (getunit(u->region, ut->faction) == u) {
-            const region_list * route_to = travel_route(ut, route_begin, route_end, ord, TRAVEL_TRANSPORTED);
+      if (get_keyword(ut->thisorder) == K_DRIVE) {
+        if (ut->building && !can_leave(ut)) {
+          cmistake(ut, ut->thisorder, 150, MSG_MOVE);
+          cmistake(u, ord, 99, MSG_MOVE);
+        } else if (!can_move(ut)) {
+          cmistake(u, ord, 99, MSG_MOVE);
+        } else {
+          boolean found = false;
 
-            if (route_to!=route_begin) {
-              get_followers(ut, r, route_to, followers);
+          if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
+            init_tokens(ut->thisorder);
+            skip_token();
+            if (getunit(u->region, ut->faction) == u) {
+              const region_list * route_to = travel_route(ut, route_begin, route_end, ord, TRAVEL_TRANSPORTED);
+
+              if (route_to!=route_begin) {
+                get_followers(ut, r, route_to, followers);
+              }
+              ADDMSG(&ut->faction->msgs, msg_message("transport", 
+                "unit target start end", u, ut, r, ut->region));
+              found = true;
             }
-            ADDMSG(&ut->faction->msgs, msg_message("transport", 
-              "unit target start end", u, ut, r, ut->region));
-            found = true;
+          }
+          if (!found) {
+            if (cansee(u->faction, u->region, ut, 0)) {
+              cmistake(u, ord, 90, MSG_MOVE);
+            } else {
+              ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+            }
           }
         }
-        if (!found) {
-          if (cansee(u->faction, u->region, ut, 0)) {
-            cmistake(u, ord, 90, MSG_MOVE);
-          } else {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-          }
-        }
-      } else {
-        cmistake(u, ord, 99, MSG_MOVE);
       }
     } else {
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
