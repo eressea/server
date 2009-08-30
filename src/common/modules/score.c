@@ -78,42 +78,28 @@ score(void)
     unit * u;
     building * b;
     ship * s;
+    
+    fc = region_get_owner(r);
+    if (fc) fc->score += 10;
 
     for (b = r->buildings; b; b = b->next) {
       u = buildingowner(r, b);
       if (u!=NULL) {
-        unit * u2;
         faction * fbo = u->faction;
-        int c = b->size - u->number;
 
         if (fbo) {
-          if (u->number <= b->size)
-            fbo->score += u->number * 5;
-
-          fbo->score += b->size;
-        }
-
-        for (u2 = r->units; u2 && c > 0; u2 = u2->next) {
-          if (u2->building == b && u2 != u && u2->number <= c) {
-            c -= u2->number;
-
-            if (u2->faction) {
-              if (u2->faction == fbo) {
-                u2->faction->score += u2->number * 5;
-              } else {
-                u2->faction->score += u2->number * 3;
-              }
-            }
-          }
+          fbo->score += b->size * 5;
         }
       }
     }
+
     for (s = r->ships; s; s = s->next) {
       unit * cap = shipowner(s);
       if (cap && cap->faction) {
         cap->faction->score += s->size * 2;
       }
     }
+    
     for (u = r->units; u; u = u->next) {
       item * itm;
       int itemscore = 0;
