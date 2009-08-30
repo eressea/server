@@ -223,12 +223,14 @@ static const char *
 sideabkz(side *s, boolean truename)
 {
   static char sideabkz_buf[8]; /* STATIC_RESULT: used for return, not across calls */
+  faction * f = (s->stealthfaction && !truename)?s->stealthfaction:s->faction;
 
-  if (s->stealthfaction && truename == false) {
-    abkz(s->stealthfaction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
-  } else {
-    abkz(s->faction->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
-  }
+#undef SIDE_ABKZ
+#ifdef SIDE_ABKZ
+  abkz(f->name, sideabkz_buf, sizeof(sideabkz_buf), 3);
+#else
+  strcpy(sideabkz_buf, itoa36(f->no));
+#endif
   return sideabkz_buf;
 }
 
