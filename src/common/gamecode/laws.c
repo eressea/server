@@ -804,8 +804,11 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
     if (production(r) <= 0) return;
 
     /* Grundchance 1.0% */
-    /* Jeder Elf in der Region erhöht die Chance um 0.0008%. */
-    seedchance += (MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 0.0008 * RESOURCE_QUANTITY;
+    /* Jeder Elf in der Region erhöht die Chance marginal */
+    elves = MIN(elves, (production(r)*MAXPEASANTS_PER_AREA)/8);
+    if (elves) {
+      seedchance += 1.0-pow(0.99999, elves * RESOURCE_QUANTITY);
+    }
     grownup_trees = rtrees(r, 2);
     seeds = 0;
 
@@ -4019,6 +4022,9 @@ init_processor(void)
   if (!global.disabled[K_GM]) {
     add_proc_global(p, &gmcommands, "GM Kommandos");
   }
+
+  p += 10; /* in case it has any effects on alliance victories */
+  add_proc_order(p, K_GIVE, &give_control_cmd, 0, "GIB KOMMANDO");
 
   p += 10; /* in case it has any effects on alliance victories */
   add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");

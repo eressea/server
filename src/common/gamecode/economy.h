@@ -55,6 +55,7 @@ extern void add_spende(struct faction * f1, struct faction * f2, int betrag, str
 extern int make_cmd(struct unit * u, struct order * ord);
 extern void split_allocations(struct region * r);
 extern int recruit_archetypes(void);
+extern int give_control_cmd(struct unit * u, struct order * ord);
 
 #ifdef __cplusplus
 }

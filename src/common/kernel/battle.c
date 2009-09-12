@@ -223,7 +223,7 @@ static const char *
 sideabkz(side *s, boolean truename)
 {
   static char sideabkz_buf[8]; /* STATIC_RESULT: used for return, not across calls */
-  faction * f = (s->stealthfaction && !truename)?s->stealthfaction:s->faction;
+  const faction * f = (s->stealthfaction && !truename)?s->stealthfaction:s->faction;
 
 #undef SIDE_ABKZ
 #ifdef SIDE_ABKZ

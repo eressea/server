@@ -148,6 +148,16 @@ tolua_building_get_type(lua_State* L)
 }
 
 static int
+tolua_building_get_owner(lua_State* L)
+{
+  building* b = (building*) tolua_tousertype(L, 1, 0);
+  unit * u = b?buildingowner(b->region, b):NULL;
+  tolua_pushusertype(L, u, TOLUA_CAST "unit");
+  return 1;
+}
+
+
+static int
 tolua_building_create(lua_State* L)
 {
   region * r = (region *)tolua_tousertype(L, 1, 0);
@@ -195,6 +205,7 @@ tolua_building_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "__tostring", tolua_building_tostring);
 
       tolua_variable(L, TOLUA_CAST "id", tolua_building_get_id, NULL);
+      tolua_variable(L, TOLUA_CAST "owner", tolua_building_get_owner, NULL);
       tolua_variable(L, TOLUA_CAST "type", tolua_building_get_type, NULL);
       tolua_variable(L, TOLUA_CAST "name", tolua_building_get_name, tolua_building_set_name);
       tolua_variable(L, TOLUA_CAST "info", tolua_building_get_info, tolua_building_set_info);

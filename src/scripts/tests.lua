@@ -621,6 +621,37 @@ function test_mallorn()
   assert(u3:get_item("mallorn")==1)
 end
 
+local function two_units(r, f1, f2)
+  local u1, u2
+  u1 = unit.create(f1, r, 1)
+  u2 = unit.create(f2, r, 1)
+  u1:add_item("money", u1.number * 100)
+  u2:add_item("money", u2.number * 100)
+  return u1, u2
+end
+
+function two_factions()
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  f1.id = 1
+  local f2 = faction.create("noreply@eressea.de", "orc", "de")
+  f2.id = 2
+  return f1, f2
+end
+
+function test_control()
+  free_game()
+  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
+  local r = u1.region
+  local b = building.create(r, "castle")
+  u1.building = b
+  u2.building = b
+  update_owners()
+  u1:clear_orders()
+  u1:add_order()
+  process_orders()
+  
+end
+
 function test_storage()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -650,6 +681,7 @@ tests = {
     ["alliance"] = test_alliance,
     ["pure"] = test_pure,
     ["read_write"] = test_read_write,
+    ["control"] = test_control,
     ["faction"] = test_faction,
     ["region"] = test_region,
     ["building"] = test_building,
