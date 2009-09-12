@@ -646,10 +646,12 @@ function test_control()
   u1.building = b
   u2.building = b
   update_owners()
+  assert(b.owner==u1)
   u1:clear_orders()
-  u1:add_order()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
+  u1:add_order("VERLASSE")
   process_orders()
-  
+  assert(b.owner==u2)
 end
 
 function test_storage()
@@ -709,6 +711,7 @@ tests = {
 }
 mytests = {
     ["morale"] = test_morale,
+    ["control"] = test_control,
     ["taxes"] = test_taxes,
     ["owners"] = test_owners
 }
