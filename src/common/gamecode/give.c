@@ -80,6 +80,31 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
   }
 }
 
+int give_quota(const unit * src, const unit * dst, const item_type * type, int n)
+{
+  static float divisor = -1;
+  if (dst && src && src->faction!=dst->faction) {
+    if (divisor<0) {
+      divisor = get_param_flt(global.parameters, "rules.items.give_divisor", 1);
+      assert(divisor==0 || divisor>=1);
+    }
+    if (divisor>=1) {
+      /* predictable > correct: */
+#if 0
+      double r = n / divisor;
+      int x = (int)r;
+
+      r = r - x;
+      if (chance(r)) ++x;
+#else
+      int x = (int)(n/divisor);
+#endif
+      return x;
+    }
+  }
+  return n;
+}
+
 int
 give_item(int want, const item_type * itype, unit * src, unit * dest, struct order * ord)
 {

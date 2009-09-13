@@ -129,6 +129,7 @@ static int skill_formula = 0;
 #define LOOT_MONSTERS      (1<<0)
 #define LOOT_SELF          (1<<1) /* code is mutually exclusive with LOOT_OTHERS */
 #define LOOT_OTHERS        (1<<2)
+#define LOOT_KEEPLOOT      (1<<4)
 
 #define DAMAGE_CRITICAL      (1<<0)
 #define DAMAGE_MELEE_BONUS   (1<<1)
@@ -140,7 +141,7 @@ static int skill_formula = 0;
 static void
 static_rules(void)
 {
-  loot_rules = get_param_int(global.parameters, "rules.combat.loot", LOOT_MONSTERS|LOOT_OTHERS);
+  loot_rules = get_param_int(global.parameters, "rules.combat.loot", LOOT_MONSTERS|LOOT_OTHERS|LOOT_KEEPLOOT);
   /* new formula to calculate to-hit-chance */
   skill_formula = get_param_int(global.parameters, "rules.combat.skill_formula", FORMULA_ORIG);
   /* maximum number of combat turns */
@@ -2484,6 +2485,28 @@ select_ally(fighter * af, int minrow, int maxrow, int allytype)
   return no_troop;
 }
 
+
+static int loot_quota(const unit * src, const unit * dst, const item_type * type, int n)
+{
+  static float divisor = -1;
+  if (dst && src && src->faction!=dst->faction) {
+    if (divisor<0) {
+      divisor = get_param_flt(global.parameters, "rules.items.loot_divisor", 1);
+      assert(divisor==0 || divisor>=1);
+    }
+    if (divisor>=1) {
+      double r = n / divisor;
+      int x = (int)r;
+
+      r = r - x;
+      if (chance(r)) ++x;
+
+      return x;
+    }
+  }
+  return n;
+}
+
 static void
 loot_items(fighter * corpse)
 {
@@ -2506,6 +2529,8 @@ loot_items(fighter * corpse)
           fighter *fig = NULL;
           int looting = 0;
           int maxrow = 0;
+          /* mustloot: we absolutely, positively must have somebody loot this thing */
+          int mustloot = itm->type->flags & (ITF_CURSED|ITF_NOTLOST);
 
           itm->number -= loot;
           maxloot -= loot;
@@ -2518,39 +2543,41 @@ loot_items(fighter * corpse)
             looting = 2;
           }
           if (looting) {
-            if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) {
+            if (mustloot) {
               maxrow = LAST_ROW;
-            } else {
+            } else if (loot_rules&LOOT_KEEPLOOT) {
               int lootchance = 50 + b->keeploot;
               if (rng_int() % 100 < lootchance) {
                 maxrow = BEHIND_ROW;
               }
+            } else {
+              maxrow = LAST_ROW;
             }
           }
           if (maxrow>0) {
             if (looting==1) {
+              /* enemies get dibs */
               fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
-            } else if (looting==2) {
+            }
+            if (!fig) {
+              /* self and allies get second pick */
               fig = select_ally(corpse, FIGHT_ROW, LAST_ROW, ALLY_SELF).fighter;
-            } else if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) {
-              /* we absolutely, positively must have somebody loot this thing */
-              fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
-              if (!fig) {
-                fig = select_ally(corpse, FIGHT_ROW, LAST_ROW, ALLY_SELF).fighter;
-              }
             }
           }
 
           if (fig) {
-            item * l = fig->loot;
-            while (l && l->type!=itm->type) l=l->next;
-            if (!l) {
-              l = calloc(sizeof(item), 1);
-              l->next = fig->loot;
-              fig->loot = l;
-              l->type = itm->type;
+            int trueloot = mustloot?loot:loot_quota(corpse->unit, fig->unit, itm->type, loot);
+            if (trueloot>0) {
+              item * l = fig->loot;
+              while (l && l->type!=itm->type) l=l->next;
+              if (!l) {
+                l = calloc(sizeof(item), 1);
+                l->next = fig->loot;
+                fig->loot = l;
+                l->type = itm->type;
+              }
+              l->number += trueloot; 
             }
-            l->number += loot;
           }
         }
       }
