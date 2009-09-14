@@ -475,7 +475,9 @@ prepare_starting_region(region * r)
   p = rng_double();
   rsethorses(r, (int)(r->terrain->size * (0.01 + p*0.01)));
 
-  fix_demand(r);
+  if (!markets_module()) {
+    fix_demand(r);
+  }
 }
 
 /** create new island with up to nsize players
