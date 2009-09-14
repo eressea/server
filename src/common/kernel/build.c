@@ -954,10 +954,10 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
   btname = LOC(lang, btype->_name);
 
-  if (n-built <= 0) {
+  if (want-built <= 0) {
     /* gebäude fertig */
     new_order = default_order(lang);
-  } else if (n!=INT_MAX) {
+  } else if (want!=INT_MAX) {
     /* reduzierte restgröße */
     const char * hasspace = strchr(btname, ' ');
     if (hasspace) {

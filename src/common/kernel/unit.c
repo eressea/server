@@ -842,7 +842,6 @@ can_leave(unit * u)
 boolean
 leave(unit * u, boolean force)
 {
-
   if (!force) {
     if (!can_leave(u)) return false;
   }
