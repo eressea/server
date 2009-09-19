@@ -64,7 +64,7 @@ struct item;
 
 #define MORALE_TAX_FACTOR 0.005 /* 0.5% tax per point of morale */
 #define MORALE_MAX 10 /* Maximum morale allowed */
-#define MORALE_DEFAULT 2 /* Morale of peasants when they are conquered for the first time */
+#define MORALE_DEFAULT 1 /* Morale of peasants when they are conquered for the first time */
 #define MORALE_TAKEOVER 0 /* Morale of peasants after they lose their lord */
 #define MORALE_COOLDOWN 2 /* minimum cooldown before a morale change occurs */
 #define MORALE_AVERAGE 6 /* default average time for morale to change */
