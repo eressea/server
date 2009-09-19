@@ -630,12 +630,33 @@ local function two_units(r, f1, f2)
   return u1, u2
 end
 
-function two_factions()
+local function two_factions()
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   f1.id = 1
   local f2 = faction.create("noreply@eressea.de", "orc", "de")
   f2.id = 2
   return f1, f2
+end
+
+function test_canoe()
+  free_game()
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local src = region.create(0, 0, "ocean")
+  local land = region.create(1, 0, "plain")
+  region.create(2, 0, "ocean")
+  local dst = region.create(3, 0, "ocean")
+  local sh = ship.create(src, "canoe")
+  local u1, u2 = two_units(src, f, f)
+  u1.ship = sh
+  u2.ship = sh
+  u1:set_skill("sailing", 10)
+  u1:clear_orders()
+  u1:add_order("NACH O O O")
+  process_orders()
+  assert(u2.region.id==land.id)
+  u1:add_order("NACH O O O")
+  process_orders()
+  assert(u2.region.id==dst.id)
 end
 
 function test_control()
@@ -707,16 +728,15 @@ tests = {
     ["work"] = test_work,
     ["morale"] = test_morale,
     ["owners"] = test_owners,
+    ["canoe"] = test_canoe,
     ["market"] = test_market
 }
 mytests = {
-    ["morale"] = test_morale,
-    ["control"] = test_control,
-    ["taxes"] = test_taxes,
+    ["canoe"] = test_canoe,
     ["owners"] = test_owners
 }
 fail = 0
-for k, v in pairs(tests) do
+for k, v in pairs(mytests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

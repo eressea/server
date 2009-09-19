@@ -533,6 +533,7 @@ parse_ships(xmlDocPtr doc)
       st->combat = xml_ivalue(node, "combat", 0);
       st->cptskill = xml_ivalue(node, "cptskill", 0);
       st->damage = xml_fvalue(node, "damage", 0.0);
+      if (xml_bvalue(node, "nocoast", false)) st->flags |= SFL_NOCOAST;
       if (xml_bvalue(node, "fly", false)) st->flags |= SFL_FLY;
       if (xml_bvalue(node, "opensea", false)) st->flags |= SFL_OPENSEA;
       st->fishing = xml_ivalue(node, "fishing", 0);

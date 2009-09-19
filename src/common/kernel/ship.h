@@ -25,6 +25,7 @@ extern "C" {
 /* ship_type::flags */
 #define SFL_OPENSEA 0x01
 #define SFL_FLY     0x02
+#define SFL_NOCOAST 0x04
 
 typedef struct ship_type {
   const char * name[2];

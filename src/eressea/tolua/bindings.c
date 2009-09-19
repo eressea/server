@@ -562,10 +562,32 @@ tolua_write_reports(lua_State* L)
   return 1;
 }
 
+static void
+reset_game(void)
+{
+  region * r;
+  faction * f;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    building * b;
+    r->flags &= RF_SAVEMASK;
+    for (u=r->units;u;u=u->next) {
+      u->flags &= UFL_SAVEMASK;
+    }
+    for (b=r->buildings;b;b=b->next) {
+      b->flags &= BLD_SAVEMASK;
+    }
+  }
+  for (f=factions;f;f=f->next) {
+    f->flags &= FFL_SAVEMASK;
+  }
+}
+
 static int
 tolua_process_orders(lua_State* L)
 {
   ++turn;
+  reset_game();
   processorders();
   return 0;
 }

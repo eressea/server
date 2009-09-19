@@ -707,7 +707,9 @@ flying_ship(const ship * sh)
 static void
 set_coast(ship * sh, region * r, region * rnext)
 {
-  if (!fval(rnext->terrain, SEA_REGION) && !flying_ship(sh)) {
+  if (sh->type->flags & SFL_NOCOAST) {
+    sh->coast = NODIRECTION;
+  } else if (!fval(rnext->terrain, SEA_REGION) && !flying_ship(sh)) {
     sh->coast = reldirection(rnext, r);
     assert(fval(r->terrain, SEA_REGION));
   } else {
@@ -1777,7 +1779,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
           
           for (d=0;d!=MAXDIRECTIONS;++d) {
             region * rc = rconnect(next_point, d);
-            if (!fval(rc->terrain, SEA_REGION)) break;
+            if (rc==NULL || !fval(rc->terrain, SEA_REGION)) break;
           }
           if (d == MAXDIRECTIONS) {
             /* Schiff kann nicht aufs offene Meer */

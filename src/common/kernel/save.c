@@ -1548,6 +1548,9 @@ readgame(const char * filename, int mode, int backup)
       /* Attribute rekursiv einlesen */
 
       sh->coast = (direction_t)store->r_int(store);
+      if (sh->type->flags & SFL_NOCOAST) {
+        sh->coast = NODIRECTION;
+      }
       a_read(store, &sh->attribs);
     }
 
@@ -1759,6 +1762,7 @@ writegame(const char *filename, int mode)
       store->w_tok(store, sh->type->name[0]);
       store->w_int(store, sh->size);
       store->w_int(store, sh->damage);
+      assert((sh->type->flags & SFL_NOCOAST)==0 || sh->coast == NODIRECTION);
       store->w_int(store, sh->coast);
       store->w_brk(store);
       a_write(store, sh->attribs);

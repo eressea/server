@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ships>
-  <ship name="canoe" range="3" fishing="20" storm="1.00" damage="1.00" cabins="2" cargo="2000" cptskill="1" minskill="1" sumskill="2" opensea="no">
+  <ship name="canoe" nocoast="true" range="3" fishing="20" storm="1.00" damage="1.00" cabins="2" cargo="2000" cptskill="1" minskill="1" sumskill="2" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
