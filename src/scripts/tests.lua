@@ -303,6 +303,7 @@ end
 local function test_morale()
   free_game()
   local r = region.create(0, 0, "plain")
+  assert(r.morale==1)
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
   local f2 = faction.create("noreply@eressea.de", "human", "de")
@@ -313,7 +314,7 @@ local function test_morale()
   u1.building = b
   u2.building = b
   update_owners()
-  assert(r.morale==2)
+  assert(r.morale==1)
   r.morale = 5
   assert(r.owner==u1.faction)
   u1:clear_orders()
@@ -465,7 +466,8 @@ function test_taxes()
   u.building = b
   update_owners()
   process_orders()
-  assert(u:get_item("money")==50)
+  assert(r.morale==1)
+  assert(u:get_item("money")==25)
 end
 
 function test_market()
@@ -736,7 +738,7 @@ mytests = {
     ["owners"] = test_owners
 }
 fail = 0
-for k, v in pairs(mytests) do
+for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1
