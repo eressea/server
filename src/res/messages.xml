@@ -2796,7 +2796,7 @@
     <text locale="de">"Die Laenader in $region($region) ist erschöpft."</text>
     <text locale="en">"There is no more laen in $region($region)."</text>
   </message>
-  <message name="produce_lowskill" section="production">
+  <message name="produce_lowskill" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
