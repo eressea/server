@@ -13,7 +13,7 @@
   <xi:include href="../weapons/lance.xml"/>
   <xi:include href="../weapons/mallornbow.xml"/>
   <xi:include href="../weapons/mallorncrossbow-2.xml"/>
-  <xi:include href="../weapons/mallornlance.xml"/>
+  <xi:include href="../weapons/mallornlance-2.xml"/>
   <xi:include href="../weapons/mallornspear.xml"/>
   <xi:include href="../weapons/runesword.xml"/>
   <xi:include href="../weapons/rustyaxe.xml"/>
