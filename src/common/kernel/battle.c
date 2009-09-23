@@ -1565,20 +1565,26 @@ select_enemy(fighter * af, int minrow, int maxrow, int select)
 }
 
 static int
-get_tactics(side * s)
+get_tactics(const side * as, const side * ds)
 {
-  battle * b = s->battle;
+  battle * b = as->battle;
   side *stac;
   int result = 0;
+  int defense = 0;
 
   if (b->max_tactics > 0) {
     for (stac=b->sides;stac!=b->sides+b->nsides;++stac) {
-      if (stac->leader.value >result && helping(stac, s)) {
+      if (stac->leader.value > result && helping(stac, as)) {
+        assert(ds==NULL || !helping(stac, ds));
         result = stac->leader.value;
+      }
+      if (ds && stac->leader.value > defense && helping(stac, ds)) {
+        assert(!helping(stac, as));
+        defense = stac->leader.value;
       }
     }
   }
-  return result;
+  return result - defense;
 }
 
 static troop
@@ -1603,14 +1609,19 @@ select_opponent(battle * b, troop at, int mindist, int maxdist)
       tactics_formula = get_param_int(global.parameters, "rules.tactics.formula", 0);
     }
     if (tactics_formula==1) {
-      int tactics = get_tactics(dt.fighter->side);
+      int tactics = get_tactics(at.fighter->side, dt.fighter->side);
+      
       /* percentage chance to get this attack */
-      double tacch = 0.1 * (b->max_tactics - tactics);
-      if (fval(b->region->terrain, SEA_REGION)) {
-        ship * sh = at.fighter->unit->ship;
-        if (sh) tacch *= sh->type->tac_bonus;
-      }
-      if (!chance(tacch)) {
+      if (tactics>0) {
+        double tacch = 0.1 * tactics;
+        if (fval(b->region->terrain, SEA_REGION)) {
+          ship * sh = at.fighter->unit->ship;
+          if (sh) tacch *= sh->type->tac_bonus;
+        }
+        if (!chance(tacch)) {
+          dt.fighter = NULL;
+        }
+      } else {
         dt.fighter = NULL;
       }
     }
@@ -4200,7 +4211,7 @@ battle_attacks(battle * b)
 
     /* Taktikrunde: */
     if (b->turn == 0) {
-      int tactics = get_tactics(s);
+      int tactics = get_tactics(s, NULL);
       if (b->max_tactics > 0 && tactics == b->max_tactics) {
         break;
       }

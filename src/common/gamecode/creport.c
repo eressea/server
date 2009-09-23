@@ -1509,7 +1509,7 @@ report_computer(const char * filename, report_context * ctx, const char * charse
 int
 crwritemap(const char * filename)
 {
-  FILE * F = fopen(filename, "w+");
+  FILE * F = fopen(filename, "w");
   region * r;
 
   fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
