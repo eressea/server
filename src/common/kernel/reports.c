@@ -2085,8 +2085,9 @@ static void log_orders(const struct message * msg)
   int i;
   for (i=0;i!=msg->type->nparameters;++i) {
     if (msg->type->types[i]->copy==&var_copy_order) {
+      const char * section = nr_section(msg);
       nr_render(msg, default_locale, buffer, sizeof(buffer), NULL);
-      log_warning(("meep - %s\n", buffer));
+      log_printf(("MESSAGE [%s]: %s\n", section, buffer));
     }
   }
 }
