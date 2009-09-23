@@ -7013,7 +7013,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit steht nicht im benötigten Gebäude, $localize($building)."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit must be in a  $localize($building) to produce this."</text>
   </message>
-  <message name="skill_needed" section="production">
+  <message name="skill_needed" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -7036,7 +7036,7 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - At least $skill($skill) $int($minskill) is needed for planting $resource($product,0)."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - At least $skill($skill) $int($minskill) is needed for planting $resource($product,0)."</text>
   </message>
-  <message name="manufacture_skills" section="production">
+  <message name="manufacture_skills" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
