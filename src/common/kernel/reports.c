@@ -2087,7 +2087,7 @@ static void log_orders(const struct message * msg)
     if (msg->type->types[i]->copy==&var_copy_order) {
       const char * section = nr_section(msg);
       nr_render(msg, default_locale, buffer, sizeof(buffer), NULL);
-      log_printf(("MESSAGE [%s]: %s\n", section, buffer));
+      log_printf("MESSAGE [%s]: %s\n", section, buffer);
     }
   }
 }
