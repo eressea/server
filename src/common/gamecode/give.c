@@ -83,6 +83,11 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
 int give_quota(const unit * src, const unit * dst, const item_type * type, int n)
 {
   static float divisor = -1;
+
+  /* luxuries and herbs are traded 1:1 */
+  if (fval(type, ITF_HERB) || type->rtype->ltype) {
+    return n;
+  }
   if (dst && src && src->faction!=dst->faction) {
     if (divisor<0) {
       divisor = get_param_flt(global.parameters, "rules.items.give_divisor", 1);
