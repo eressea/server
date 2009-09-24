@@ -1,3 +1,20 @@
+local function test_plane()
+  free_game()
+  local pl = plane.create(0, -3, -3, 7, 7)
+  local nx, ny = plane.normalize(pl, 4, 4)
+  assert(nx==-3 and ny==-3)
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  f.id = atoi36("tpla")
+  local r, x, y
+  for x = -3, 3 do for y = -3, 3 do
+    r = region.create(x, y, "plain")
+    if (x==y) then
+	  local u = unit.create(f, r, 1)
+    end
+  end end
+  write_reports()
+end
+
 local function test_rename()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -760,11 +777,13 @@ tests = {
     ["morale"] = test_morale,
     ["owners"] = test_owners,
     ["canoe"] = test_canoe,
+    ["plane"] = test_plane,
     ["guard"] = test_guard,
     ["market"] = test_market
 }
 mytests = {
     ["guard"] = test_guard,
+    ["plane"] = test_plane,
     ["owners"] = test_owners
 }
 fail = 0

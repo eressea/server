@@ -254,18 +254,54 @@
 			<File
 				RelativePath=".\scripts\default.lua"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						Outputs="$(IntDir)/$(InputName).luac"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\scripts\eressea.lua"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						Outputs="$(IntDir)/$(InputName).luac"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\scripts\run-e3a.lua"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						Outputs="$(IntDir)/$(InputName).luac"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\scripts\tests.lua"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						Outputs="$(IntDir)/$(InputName).luac"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
