@@ -1090,6 +1090,10 @@ demon_skillchanges(void)
             int weeks = 1+rng_int()%3;
             if (roll < downchance) {
               reduce_skill(u, sv, weeks);
+              if (sv->level<1) {
+                /* demons should never forget below 1 */
+                set_level(u, sv->id, 1);
+              }
             } else {
               while (weeks--) learn_skill(u, sv->id, 1.0);
             }
