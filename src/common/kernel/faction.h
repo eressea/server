@@ -30,6 +30,7 @@ struct seen_region;
 #define FFL_ISNEW         (1<<1)
 #define FFL_RESTART       (1<<2)
 #define FFL_QUIT          (1<<3)
+#define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18) /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21) /* Hilfsflag Kampf */
 #define FFL_MARK          (1<<23) /* für markierende algorithmen, die das 
@@ -43,7 +44,7 @@ struct seen_region;
 #define FFL_GM            (1<<30) /* eine Partei mit Sonderrechten */
 #define FFL_NPC           (1<<31) /* eine Partei mit Monstern */
 
-#define FFL_SAVEMASK (FFL_NEWID|FFL_GM|FFL_NPC|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_GM|FFL_NPC|FFL_NOTIMEOUT|FFL_DBENTRY|FFL_NOTIMEOUT)
 
 struct faction * get_monsters(void);
 #define is_monsters(f) ((f)->flags&FFL_NPC)

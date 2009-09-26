@@ -41,6 +41,7 @@ struct item;
 #define UFL_HERO          (1<<7)
 #define UFL_MOVED         (1<<8)
 #define UFL_NOTMOVING     (1<<9)  /* Die Einheit kann sich wg. langen Kampfes nicht bewegen */
+#define UFL_DEFENDER      (1<<10)
 #define UFL_HUNGER        (1<<11) /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
 #define UFL_SIEGE         (1<<12) /* speedup: belagert eine burg, siehe attribut */
 #define UFL_TARGET        (1<<13) /* speedup: hat ein target, siehe attribut */
@@ -64,7 +65,7 @@ struct item;
 #define UFL_GROUP         (1<<28)
 
 /* Flags, die gespeichert werden sollen: */
-#define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_STEALTH | UFL_GROUP | UFL_HERO)
+#define UFL_SAVEMASK (UFL_DEFENDER|UFL_MOVED|UFL_NOAID|UFL_OWNER|UFL_PARTEITARNUNG|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
 #define UNIT_MAXSIZE 50000
 extern int maxheroes(const struct faction * f);

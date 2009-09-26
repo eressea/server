@@ -957,7 +957,19 @@ alliedunit(const unit * u, const faction * f2, int mode)
   assert(u->region); /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
   if (u->faction == f2) return mode;
   if (u->faction != NULL && f2!=NULL) {
-    plane * pl = rplane(u->region);
+    plane * pl;
+    
+    if (mode&HELP_FIGHT) {
+      if ((u->flags&UFL_DEFENDER) || (u->faction->flags&FFL_DEFENDER)) {
+        faction * owner = region_get_owner(u->region);
+        /* helps the owner of the region */
+        if (owner==f2) {
+          return HELP_FIGHT;
+        }
+      }
+    }
+
+    pl = rplane(u->region);
     automode = mode & autoalliance(pl, u->faction, f2);
 
     if (pl!=NULL && (pl->flags & PFL_NOALLIANCES))
