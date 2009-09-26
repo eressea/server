@@ -1117,6 +1117,17 @@ cr_output_resources(FILE * F, report_context * ctx, seen_region * sr)
 }
 
 static void
+cr_region_header(FILE * F, int plid, int nx, int ny, unsigned int uid)
+{
+  if (plid==0) {
+    fprintf(F, "REGION %d %d\n", nx, ny);
+  } else {
+    fprintf(F, "REGION %d %d %d\n", nx, ny, plid);
+  }
+  fprintf(F, "%d;id\n", uid);
+}
+
+static void
 cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
 {
   faction * f = ctx->f;
@@ -1124,6 +1135,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
   plane * pl = rplane(r);
   int plid = plane_id(pl), nx, ny;
   const char * tname;
+  int oc[4][2], o = 0;
 
   if (opt_cr_absolute_coords) {
     nx = r->x;
@@ -1134,12 +1146,28 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     pnormalize(&nx, &ny, pl);
   }
 
-  if (plid==0) {
-    fprintf(F, "REGION %d %d\n", nx, ny);
-  } else {
-    fprintf(F, "REGION %d %d %d\n", nx, ny, plid);
+  if (ny==pl->maxy) {
+    oc[o][0] = nx;
+    oc[o++][1] = pl->miny-1;
   }
-  fprintf(F, "%d;id\n", r->uid);
+  if (nx==pl->maxx) {
+    oc[o][0] = pl->minx-1;
+    oc[o++][1] = ny;
+  }
+  if (ny==pl->miny) {
+    oc[o][0] = nx;
+    oc[o++][1] = pl->maxy+1;
+  }
+  if (nx==pl->minx) {
+    oc[o][0] = pl->maxx+1;
+    oc[o++][1] = ny;
+  }
+  while (o--) {
+    cr_region_header(F, plid, oc[o][0], oc[o][1], r->uid);
+    fputs("\"wrap\";visibility\n", F);
+  }
+
+  cr_region_header(F, plid, nx, ny, r->uid);
 
   if (r->land) {
     const char * str = rname(r, f->locale);
