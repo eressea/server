@@ -598,9 +598,13 @@ static void
 eaten_by_monster(unit * u)
 {
   /* adjustment for smaller worlds */
-  double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
+  static double multi = 0.0;
   int n = 0;
   int horse = 0;
+
+  if (multi==0.0) {
+    multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
+  }
 
   switch (old_race(u->race)) {
     case RC_FIREDRAGON:
