@@ -597,6 +597,8 @@ monster_attacks(unit * u)
 static void
 eaten_by_monster(unit * u)
 {
+  /* adjustment for smaller worlds */
+  double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
   int n = 0;
   int horse = 0;
 
@@ -617,6 +619,7 @@ eaten_by_monster(unit * u)
       n = rng_int()%(u->number/20+1);
   }
 
+  n = (int)(n * multi);
   if (n > 0) {
     n = lovar(n);
     n = MIN(rpeasants(u->region), n);
