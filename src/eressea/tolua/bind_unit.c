@@ -664,7 +664,7 @@ static void
 unit_setship(unit * u, ship * s)
 {
   leave(u, true);
-  if (u->region!=s->region) {
+  if (s && u->region!=s->region) {
     move_unit(u, s->region, NULL);
   }
   u->ship = s;

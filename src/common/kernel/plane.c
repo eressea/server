@@ -93,7 +93,7 @@ getplanebyname(const char * name)
   plane *p;
 
   for (p=planes; p; p=p->next)
-    if (!strcmp(p->name, name))
+    if (p->name && !strcmp(p->name, name))
       return p;
   return NULL;
 }

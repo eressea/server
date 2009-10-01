@@ -204,7 +204,7 @@ r_insectstalled(const region * r)
 const char *
 rc_name(const race * rc, int n)
 {
-  return mkname("race", rc->_name[n]);
+  return rc?mkname("race", rc->_name[n]):NULL;
 }
 
 const char *

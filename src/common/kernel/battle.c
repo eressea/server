@@ -1872,7 +1872,6 @@ do_extra_spell(troop at, const att *a)
 {
   const spell *sp = a->data.sp;
   fighter *fi = at.fighter;
-  unit *au = fi->unit;
   double power;
 
   power = sp->level * MagicPower();

@@ -303,7 +303,7 @@ report_race(const struct unit * u, const char ** name, const char ** illusion)
 {
   if (illusion) {
     const race * irace = u_irace(u);
-    if (irace!=u->race) {
+    if (irace && irace!=u->race) {
       *illusion = irace->_name[0];
     }
     else {

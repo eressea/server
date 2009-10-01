@@ -164,9 +164,11 @@ tolua_building_create(lua_State* L)
   const char * bname = tolua_tostring(L, 2, 0);
   if (bname) {
     const building_type * btype = bt_find(bname);
-    building * b = new_building(btype, r, NULL);
-    tolua_pushusertype(L, (void*)b, TOLUA_CAST "building");
-    return 1;
+    if (btype) {
+      building * b = new_building(btype, r, NULL);
+      tolua_pushusertype(L, (void*)b, TOLUA_CAST "building");
+      return 1;
+    }
   }
   return 0;
 }

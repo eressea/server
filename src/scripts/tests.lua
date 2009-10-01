@@ -625,12 +625,13 @@ function test_leave()
   b2.size = 10
   local u = unit.create(f, r, 1)
   u.building = b1
+  assert(u.building~=nil)
   u:add_item("money", u.number * 100)
   u:clear_orders()
   u:add_order("BETRETE BURG " .. itoa36(b2.id))
   update_owners()
   process_orders()
-  assert(u.building==b1)
+  assert(u.building.id==b1.id) -- region owners may not leave
 end
 
 function test_mallorn()
@@ -787,7 +788,7 @@ mytests = {
     ["owners"] = test_owners
 }
 fail = 0
-for k, v in pairs(mytests) do
+for k, v in pairs(tests) do
     local status, err = pcall(v)
     if not status then
         fail = fail + 1

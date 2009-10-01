@@ -1733,7 +1733,7 @@ scale_number (unit * u, int n)
 
 const struct race * u_irace(const struct unit * u)
 {
-  if (skill_enabled[SK_STEALTH]) {
+  if (u->irace && skill_enabled[SK_STEALTH]) {
     return u->irace;
   }
   return u->race;

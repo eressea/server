@@ -853,7 +853,7 @@ write_unit(struct storage * store, const unit * u)
   store->w_int(store, u->number);
   store->w_int(store, u->age);
   store->w_tok(store, u->race->_name[0]);
-  store->w_tok(store, irace!=u->race?u->irace->_name[0]:"");
+  store->w_tok(store, (irace && irace!=u->race)?irace->_name[0]:"");
   write_building_reference(u->building, store);
   write_ship_reference(u->ship, store);
   store->w_int(store, u->status);
