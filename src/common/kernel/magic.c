@@ -105,7 +105,7 @@ MagicRegeneration(void)
   return value;
 }
 
-static double
+double
 MagicPower(void)
 {
   static double value = -1.0;

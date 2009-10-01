@@ -1146,21 +1146,23 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     pnormalize(&nx, &ny, pl);
   }
 
-  if (ny==pl->maxy) {
-    oc[o][0] = nx;
-    oc[o++][1] = pl->miny-1;
-  }
-  if (nx==pl->maxx) {
-    oc[o][0] = pl->minx-1;
-    oc[o++][1] = ny;
-  }
-  if (ny==pl->miny) {
-    oc[o][0] = nx;
-    oc[o++][1] = pl->maxy+1;
-  }
-  if (nx==pl->minx) {
-    oc[o][0] = pl->maxx+1;
-    oc[o++][1] = ny;
+  if (pl) {
+    if (ny==pl->maxy) {
+      oc[o][0] = nx;
+      oc[o++][1] = pl->miny-1;
+    }
+    if (nx==pl->maxx) {
+      oc[o][0] = pl->minx-1;
+      oc[o++][1] = ny;
+    }
+    if (ny==pl->miny) {
+      oc[o][0] = nx;
+      oc[o++][1] = pl->maxy+1;
+    }
+    if (nx==pl->minx) {
+      oc[o][0] = pl->maxx+1;
+      oc[o++][1] = ny;
+    }
   }
   while (o--) {
     cr_region_header(F, plid, oc[o][0], oc[o][1], r->uid);

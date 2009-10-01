@@ -601,7 +601,7 @@ sp_dragonodem(fighter * fi, int level, double power, spell * sp)
   /* 11-26 HP */
   damage = spell_damage(4);
   /* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
-  force = lovar(get_force(level,6));
+  force = lovar(get_force(power, 6));
 
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
 
@@ -697,7 +697,7 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
   /* 11-26 HP */
   damage = spell_damage(4);
   /* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
-  force = lovar(get_force(level,6));
+  force = lovar(get_force(power, 6));
 
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW-1, SELECT_ADVANCE);
 

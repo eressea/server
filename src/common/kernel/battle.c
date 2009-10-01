@@ -1873,10 +1873,9 @@ do_extra_spell(troop at, const att *a)
   const spell *sp = a->data.sp;
   fighter *fi = at.fighter;
   unit *au = fi->unit;
-  int power;
+  double power;
 
-  /* nur bei Monstern können mehrere 'Magier' in einer Einheit sein */
-  power = sp->level * au->number;
+  power = sp->level * MagicPower();
   if (sp->sp_function==NULL) {
     log_error(("spell '%s' has no function.\n", sp->sname));
   } else {
