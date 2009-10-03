@@ -545,21 +545,30 @@ read_items(struct storage * store, item **ilist)
 static void
 read_alliances(struct storage * store)
 {
-  int id;
+  char pbuf[8];
+  int id, terminator = 0;
   if (store->version<SAVEALLIANCE_VERSION) {
     if (!AllianceRestricted() && !AllianceAuto()) return;
   }
-
-  id = store->r_id(store);
-  while (id!=0) {
+  if (store->version<ALLIANCELEADER_VERSION) {
+    terminator = atoi36("end");
+    store->r_str_buf(store, pbuf, sizeof(pbuf));
+    id = atoi36(pbuf);
+  } else {
+    id = store->r_id(store);
+  }
+  while (id!=terminator) {
     char aname[128];
     alliance * al;
     store->r_str_buf(store, aname, sizeof(aname));
     al = makealliance(id, aname);
     if (store->version>=ALLIANCELEADER_VERSION) {
       read_reference(&al->leader, store, read_faction_reference, resolve_faction);
+      id = store->r_id(store);
+    } else{
+      store->r_str_buf(store, pbuf, sizeof(pbuf));
+      id = atoi36(pbuf);
     }
-    id = store->r_id(store);
   }
 }
 
