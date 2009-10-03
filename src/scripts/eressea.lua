@@ -9,8 +9,6 @@ function loadscript(name)
   end
 end
 
-loadscript("default.lua")
-
 function change_locales()
   -- local localechange = { }
   local localechange = { de = { "rtph" } }
