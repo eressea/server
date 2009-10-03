@@ -389,12 +389,16 @@ static boolean know_school(const faction * f, magic_t school)
   static int common = MAXMAGIETYP;
   if (f->magiegebiet==school) return true;
   if (common==MAXMAGIETYP) {
-    const char * school = get_param(global.parameters, "rules.magic.common");
-    for (common=0;common!=MAXMAGIETYP;++common) {
-      if (strcmp(school, magic_school[common])==0) break;
-    }
-    if (common==MAXMAGIETYP) {
-      common = M_NONE;
+    const char * common_school = get_param(global.parameters, "rules.magic.common");
+    if (common_school) {
+      for (common=0;common!=MAXMAGIETYP;++common) {
+        if (strcmp(common_school, magic_school[common])==0) break;
+      }
+      if (common==MAXMAGIETYP) {
+        common = M_NONE;
+      }
+    } else {
+      return false;
     }
   }
   return school==common;
