@@ -139,20 +139,21 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
     int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
     if (use<n) use += use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
     if (dest) {
-      i_change(&dest->items, itype, n);
+      int q = give_quota(src, dest, itype, n);
+      i_change(&dest->items, itype, q);
 #ifdef RESERVE_GIVE
 #ifdef RESERVE_DONATIONS
-      change_reservation(dest, item2resource(itype), n);
+      change_reservation(dest, item2resource(itype), q);
 #else
       if (src->faction==dest->faction) {
-        change_reservation(dest, item2resource(itype), n);
+        change_reservation(dest, item2resource(itype), q);
       }
 #endif
 #endif
 #if MUSEUM_MODULE && defined(TODO)
       /* TODO: use a trigger for the museum warden! */
       if (a_find(dest->attribs, &at_warden)) {
-        warden_add_give(src, dest, itype, n);
+        warden_add_give(src, dest, itype, q);
       }
 #endif
       handle_event(dest->attribs, "receive", src);

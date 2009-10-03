@@ -1124,7 +1124,7 @@ cr_region_header(FILE * F, int plid, int nx, int ny, unsigned int uid)
   } else {
     fprintf(F, "REGION %d %d %d\n", nx, ny, plid);
   }
-  fprintf(F, "%d;id\n", uid);
+  if (uid) fprintf(F, "%d;id\n", uid);
 }
 
 static void
@@ -1136,6 +1136,11 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
   int plid = plane_id(pl), nx, ny;
   const char * tname;
   int oc[4][2], o = 0;
+  int uid = r->uid;
+
+  if (sr->mode<=see_neighbour && !r->land) {
+    uid = 0;
+  }
 
   if (opt_cr_absolute_coords) {
     nx = r->x;
@@ -1165,11 +1170,11 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     }
   }
   while (o--) {
-    cr_region_header(F, plid, oc[o][0], oc[o][1], r->uid);
+    cr_region_header(F, plid, oc[o][0], oc[o][1], uid);
     fputs("\"wrap\";visibility\n", F);
   }
 
-  cr_region_header(F, plid, nx, ny, r->uid);
+  cr_region_header(F, plid, nx, ny, uid);
 
   if (r->land) {
     const char * str = rname(r, f->locale);

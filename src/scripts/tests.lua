@@ -727,13 +727,25 @@ end
 function test_give()
   free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  u1:clear_orders()
+  u1.faction.age = 10
+  u2.faction.age = 10
   u1:add_item("money", 500)
   local m1, m2 = u1:get_item("money"), u2:get_item("money")
-  u1:add_order("GIB " .. itoa36(u2.no) .. " 332 Silber")
+  u1:clear_orders()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
+  u2:clear_orders()
+  u2:add_order("LERNEN Hiebwaffen")
+  process_orders()
+  assert(u1:get_item("money")==m1-10*u1.number)
+  assert(u2:get_item("money")==m2-10*u2.number)
+
+  m1, m2 = u1:get_item("money"), u2:get_item("money")
+  u1:clear_orders()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
+  u2:clear_orders()
+  u2:add_order("HELFE " .. itoa36(u1.faction.id) .. " GIB")
   process_orders()
   assert(u1:get_item("money")==m1-332-10*u1.number)
-  print(u2:get_item("money"), m2)
   assert(u2:get_item("money")==m2+110-10*u2.number)
 end
 
