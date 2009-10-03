@@ -749,8 +749,18 @@ function test_storage()
 end
 
 loadscript("extensions.lua")
-tests = {
+e3only = {    
+    ["canoe"] = test_canoe,
+    ["morale"] = test_morale,
+    ["owners"] = test_owners,
+    ["taxes"] = test_taxes,
+    ["spells"] = test_spells,
     ["alliance"] = test_alliance,
+    ["leave"] = test_leave,
+    ["market"] = test_market
+}
+
+tests = {
     ["pure"] = test_pure,
     ["read_write"] = test_read_write,
     ["control"] = test_control,
@@ -761,42 +771,52 @@ tests = {
     ["message"] = test_message,
     ["hashtable"] = test_hashtable,
     ["gmtool"] = test_gmtool,
-    ["leave"] = test_leave,
     ["events"] = test_events,
     ["produce"] = test_produce,
     ["rename"] = test_rename,
     ["recruit"] = test_recruit,
     ["recruit2"] = test_recruit2,
-    ["spells"] = test_spells,
     ["herbalism"] = test_herbalism,
     ["storage"] = test_storage,
-    ["taxes"] = test_taxes,
     ["mallorn"] = test_mallorn,
     ["upkeep"] = test_upkeep,
     ["id"] = test_id,
     ["work"] = test_work,
-    ["morale"] = test_morale,
-    ["owners"] = test_owners,
-    ["canoe"] = test_canoe,
     ["plane"] = test_plane,
-    ["guard"] = test_guard,
-    ["market"] = test_market
+    ["guard"] = test_guard
 }
+
 mytests = {
     ["guard"] = test_guard,
     ["plane"] = test_plane,
     ["owners"] = test_owners
 }
+
 fail = 0
-for k, v in pairs(tests) do
-    local status, err = pcall(v)
-    if not status then
-        fail = fail + 1
-        print("[FAIL] " .. k .. ": " .. err)
-    else
-        print("[OK] " .. k)
+
+thetests = tests
+
+function test(tests)
+    for k, v in pairs(tests) do
+        local status, err = pcall(v)
+        if not status then
+            fail = fail + 1
+            print("[FAIL] " .. k .. ": " .. err)
+        else
+            print("[OK] " .. k)
+        end
     end
 end
+
+function is_e3()
+    free_game()
+    r = region.create(0, 0, "plain")
+    b = building.create(r, "market")
+    return b~=nil
+end
+
+test(tests)
+if is_e3() then test(e3only) end
 
 -- spells_csv()
 

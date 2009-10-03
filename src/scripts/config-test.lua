@@ -1,1 +1,1 @@
-maxnmrs = 500
+maxnmrs = 1000
