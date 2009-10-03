@@ -724,6 +724,19 @@ function test_control()
   assert(b.owner==u2)
 end
 
+function test_give()
+  free_game()
+  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
+  u1:clear_orders()
+  u1:add_item("money", 500)
+  local m1, m2 = u1:get_item("money"), u2:get_item("money")
+  u1:add_order("GIB " .. itoa36(u2.no) .. " 332 Silber")
+  process_orders()
+  assert(u1:get_item("money")==m1-332-10*u1.number)
+  print(u2:get_item("money"), m2)
+  assert(u2:get_item("money")==m2+110-10*u2.number)
+end
+
 function test_storage()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -750,6 +763,7 @@ end
 
 loadscript("extensions.lua")
 e3only = {    
+    ["give"] = test_give,
     ["canoe"] = test_canoe,
     ["morale"] = test_morale,
     ["owners"] = test_owners,
