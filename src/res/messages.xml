@@ -6358,6 +6358,7 @@
       <arg name="maxships" type="int"/>
     </type>
     <text locale="de">"$unit($unit) konnte nur $int($ships) von $int($maxships) Schiffen verzaubern."</text>
+    <text locale="en">"$unit($unit) could only enchant $int($ships) of $int($maxships) ships."</text>
   </message>
   <message name="stormwinds_effect" section="events">
     <type>
@@ -7429,6 +7430,7 @@
       <arg name="mage" type="unit"/>
     </type>
     <text locale="de">"$unit($mage) beschwört Trugbilder herauf."</text>
+    <text locale="en">"$unit($mage) summons a mirage."</text>
   </message>
   
   <message name="sp_chaosrow_effect_0" section="battle">
