@@ -27,7 +27,7 @@
     </construction>
   </ship>
 
-  <ship name="cutter" range="2" fishing="20" storm="1.00" damage="1.00" cabins="5" cargo="5000" cptskill="2" minskill="1" sumskill="5" opensea="yes">
+  <ship name="cutter" range="2" fishing="20" storm="1.00" damage="1.00" cabins="5" cargo="5500" cptskill="2" minskill="1" sumskill="5" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
