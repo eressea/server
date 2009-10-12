@@ -246,23 +246,20 @@ shipname(const ship * sh)
 int
 shipcapacity (const ship * sh)
 {
-	int i;
+  int i = sh->type->cargo;
 
-	/* sonst ist construction:: size nicht ship_type::maxsize */
-	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
+  /* sonst ist construction:: size nicht ship_type::maxsize */
+  assert(!sh->type->construction || sh->type->construction->improvement==NULL);
 
-	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
-		return 0;
+  if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
+    return 0;
 
 #ifdef SHIPDAMAGE
-	i = ((sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE)
-		* sh->type->cargo / sh->size;
-	i += ((sh->size * DAMAGE_SCALE - sh->damage) % DAMAGE_SCALE)
-		* sh->type->cargo / (sh->size*DAMAGE_SCALE);
-#else
-	i = sh->type->cargo;
+  if (sh->damage) {
+    i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+  }
 #endif
-	return i;
+  return i;
 }
 
 void
