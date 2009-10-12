@@ -972,7 +972,7 @@ describe(FILE * F, const seen_region * sr, faction * f)
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     }
   }
-  if (rmoney(r) && sr->mode==see_unit) {
+  if (rmoney(r) && sr->mode>=see_travel) {
     bytes = snprintf(bufp, size, ", %d ", rmoney(r));
     if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
     bytes = (int)strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)), size);
