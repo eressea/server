@@ -46,7 +46,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-/* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
+/* Wieviel Fremde eine Partei pro Woche aufnehmen kangiven */
 #define MAXNEWBIES								5
 #define RESERVE_DONATIONS /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE /* reserve anything that's given from one unit to another? */
@@ -63,7 +63,7 @@ GiveRestriction(void) {
 }
 
 static void
-add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order * ord, int error)
+add_give(unit * u, unit * u2, int given, int received, const resource_type * rtype, struct order * ord, int error)
 {
   if (error) {
     cmistake(u, ord, error, MSG_COMMERCE);
@@ -71,10 +71,15 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
   else if (u2==NULL) {
     ADDMSG(&u->faction->msgs,
       msg_message("give_peasants", "unit resource amount",
-      u, rtype, n));
+      u, rtype, given));
   } else if (u2->faction!=u->faction) {
-    message * msg = msg_message("give", "unit target resource amount", u, u2, rtype, n);
+    message * msg;
+    
+    msg = msg_message("give", "unit target resource amount", u, u2, rtype, given);
     add_message(&u->faction->msgs, msg);
+    msg_release(msg);
+
+    msg = msg_message("receive", "unit target resource amount", u, u2, rtype, received);
     add_message(&u2->faction->msgs, msg);
     msg_release(msg);
   }
@@ -114,11 +119,12 @@ int
 give_item(int want, const item_type * itype, unit * src, unit * dest, struct order * ord)
 {
   short error = 0;
-  int n;
+  int n, r;
 
   assert(itype!=NULL);
   n = get_pooled(src, item2resource(itype), GET_DEFAULT, want);
   n = MIN(want, n);
+  r = n;
   if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
     if (ord!=NULL) {
       ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
@@ -139,28 +145,28 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
     int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
     if (use<n) use += use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
     if (dest) {
-      int q = give_quota(src, dest, itype, n);
-      i_change(&dest->items, itype, q);
+      r = give_quota(src, dest, itype, n);
+      i_change(&dest->items, itype, r);
 #ifdef RESERVE_GIVE
 #ifdef RESERVE_DONATIONS
-      change_reservation(dest, item2resource(itype), q);
+      change_reservation(dest, item2resource(itype), r);
 #else
       if (src->faction==dest->faction) {
-        change_reservation(dest, item2resource(itype), q);
+        change_reservation(dest, item2resource(itype), r);
       }
 #endif
 #endif
 #if MUSEUM_MODULE && defined(TODO)
       /* TODO: use a trigger for the museum warden! */
       if (a_find(dest->attribs, &at_warden)) {
-        warden_add_give(src, dest, itype, q);
+        warden_add_give(src, dest, itype, r);
       }
 #endif
       handle_event(dest->attribs, "receive", src);
     }
     handle_event(src->attribs, "give", dest);
   }
-  add_give(src, dest, n, item2resource(itype), ord, error);
+  add_give(src, dest, n, r, item2resource(itype), ord, error);
   if (error) return -1;
   return 0;
 }
@@ -421,7 +427,7 @@ give_unit(unit * u, unit * u2, order * ord)
     cmistake(u, ord, 156, MSG_COMMERCE);
     return;
   }
-  add_give(u, u2, 1, r_unit, ord, 0);
+  add_give(u, u2, 1, 1, r_unit, ord, 0);
   u_setfaction(u, u2->faction);
   u2->faction->newbies += n;
 }

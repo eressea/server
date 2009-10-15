@@ -7089,7 +7089,18 @@
     </type>
     <text locale="de">"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an $unit($target)."</text>
     <text locale="en">"$unit($unit) gives $int($amount) $resource($resource,$amount) to $unit($target)."</text>
-</message>
+  </message>
+
+  <message name="receive" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="resource" type="resource"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($target) erhält $int($amount) $resource($resource,$amount) von $unit($unit)."</text>
+    <text locale="en">"$unit($target) receives $int($amount) $resource($resource,$amount) from $unit($unit)."</text>
+  </message>
 
   <message name="give_person_peasants" section="economy">
     <type>
