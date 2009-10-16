@@ -727,6 +727,7 @@ end
 function test_give()
   free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
+  local r = u2.region
   u1.faction.age = 10
   u2.faction.age = 10
   u1:add_item("money", 500)
