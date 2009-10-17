@@ -7,7 +7,7 @@ function mark_multi(f)
     if u.building~=nil then
       local found = False
       for u2 in u.region.units do
-        if u2.faction~=u.faction then
+        if u2.faction.id~=u.faction.id then
           found = true
           break
         end

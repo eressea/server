@@ -3,6 +3,7 @@ local locales = { "de", "en" }
 local confirmed_multis = { 
 }
 local suspected_multis = { 
+"odin"
 }
 
 function num_oceans(r)
@@ -72,10 +73,11 @@ function kill_multis(multis)
 end
 
 function mark_multis(multis)
-  if multi~=nil and multis~=nil then
+  if multis~=nil then
     for idx, fno in ipairs(multis) do
       local f = get_faction(fno)
       if f~=nil and f.email~="doppelspieler@eressea.de" then
+        print("* multi-player " .. tostring(f))
         mark_multi(f)
       end
     end
@@ -147,7 +149,7 @@ end
 
 function process(orders)
   -- initialize starting equipment for new players
-
+  print(orders)
   if open_game(get_turn())~=0 then
     print("could not read game")
     return -1
@@ -156,6 +158,8 @@ function process(orders)
 
   -- kill multi-players (external script)
   -- loadscript("eressea/multis.lua")
+  kill_multis(confirmed_multis)
+  mark_multis(suspected_multis)
 
   -- run the turn:
   if read_orders(orders) ~= 0 then
@@ -163,7 +167,6 @@ function process(orders)
     return -1
   end
 
-  kill_multis(confirmed_multis)
   -- plan_monsters()
   local mon = get_faction(666)
   if mon ~= nil then
@@ -192,7 +195,6 @@ function process(orders)
   -- spawn_ents()
 
   kill_nonstarters()
-  mark_multis(suspected_multis)
   -- post-turn updates:
   update_guards()
   update_scores()

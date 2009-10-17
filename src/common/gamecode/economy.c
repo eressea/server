@@ -646,7 +646,8 @@ give_control(unit * u, unit * u2)
         int morale = region_get_morale(r);
         region_set_owner(r, u2->faction, turn);
         if (morale>0) {
-          region_set_morale(r, morale-MORALE_TRANSFER, turn);
+          morale = MAX(0, morale-MORALE_TRANSFER);
+          region_set_morale(r, morale, turn);
         }
       }
     }

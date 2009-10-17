@@ -1062,6 +1062,7 @@ readregion(struct storage * store, int x, int y)
     }
     if (store->version>=REGIONOWNER_VERSION) {
       r->land->morale = (short)store->r_int(store);
+      if (r->land->morale<0) r->land->morale = 0;
       read_owner(store, &r->land->ownership);
       if (r->land->ownership && r->land->ownership->owner) {
         faction * owner = r->land->ownership->owner;

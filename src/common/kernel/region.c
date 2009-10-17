@@ -1532,7 +1532,11 @@ region_getname(const region * r) {
 
 int region_get_morale(const region * r)
 {
-  return r->land?r->land->morale:-1;
+  if (r->land) {
+    assert(r->land->morale>=0 && r->land->morale<=MORALE_MAX);
+    return r->land->morale;
+  }
+  return -1;
 }
 
 void region_set_morale(region * r, int morale, int turn)
@@ -1542,6 +1546,7 @@ void region_set_morale(region * r, int morale, int turn)
     if (turn>=0 && r->land->ownership) {
       r->land->ownership->morale_turn = turn;
     }
+    assert(r->land->morale>=0 && r->land->morale<=MORALE_MAX);
   }
 }
 
