@@ -149,7 +149,7 @@ findshipr(const region *r, int n)
 void
 damage_ship(ship * sh, double percent)
 {
-	double damage = DAMAGE_SCALE * percent * sh->size + sh->damage;
+	double damage = DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
 	sh->damage = (int)damage;
 }
 
