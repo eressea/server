@@ -929,37 +929,44 @@ transfermen(unit * u, unit * u2, int n)
     assert(u2->number+n>0);
 
     for (sk=0; sk!=MAXSKILLS; ++sk) {
-      double dlevel = 0.0;
       int weeks, level = 0;
 
       sv = get_skill(u, sk);
       sn = get_skill(u2, sk);
 
       if (sv==NULL && sn==NULL) continue;
-      if (sv && sv->level) {
-        dlevel += (sv->level + 1 - sv->weeks/(sv->level+1.0)) * n;
-        level += sv->level * n;
-      }
-      if (sn && sn->level) {
-        dlevel += (sn->level + 1 - sn->weeks/(sn->level+1.0)) * u2->number;
-        level += sn->level * u2->number;
-      }
-
-      dlevel = dlevel / (n + u2->number);
-      level = level / (n + u2->number);
-      if (level<=dlevel) {
-        /* apply the remaining fraction to the number of weeks to go.
-        * subtract the according number of weeks, getting closer to the
-        * next level */
-        level = (int)dlevel;
-        weeks = (level+1) - (int)((dlevel - level) * (level+1));
+      if (sn==NULL && u2->number==0) {
+        /* new unit, easy to solve */
+        level = sv->level;
+        weeks = sv->weeks;
       } else {
-        /* make it harder to reach the next level. 
-        * weeks+level is the max difficulty, 1 - the fraction between
-        * level and dlevel applied to the number of weeks between this
-        * and the previous level is the added difficutly */
-        level = (int)dlevel+1;
-        weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
+        double dlevel = 0.0;
+
+        if (sv && sv->level) {
+          dlevel += (sv->level + 1 - sv->weeks/(sv->level+1.0)) * n;
+          level += sv->level * n;
+        }
+        if (sn && sn->level) {
+          dlevel += (sn->level + 1 - sn->weeks/(sn->level+1.0)) * u2->number;
+          level += sn->level * u2->number;
+        }
+
+        dlevel = dlevel / (n + u2->number);
+        level = level / (n + u2->number);
+        if (level<=dlevel) {
+          /* apply the remaining fraction to the number of weeks to go.
+          * subtract the according number of weeks, getting closer to the
+          * next level */
+          level = (int)dlevel;
+          weeks = (level+1) - (int)((dlevel - level) * (level+1));
+        } else {
+          /* make it harder to reach the next level. 
+          * weeks+level is the max difficulty, 1 - the fraction between
+          * level and dlevel applied to the number of weeks between this
+          * and the previous level is the added difficutly */
+          level = (int)dlevel+1;
+          weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
+        }
       }
       if (level) {
         if (sn==NULL) sn = add_skill(u2, sk);
