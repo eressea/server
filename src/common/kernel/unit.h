@@ -50,6 +50,7 @@ struct item;
 
 /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
+#define UFL_FLEEING       (1<<17) /* unit was in a battle, fleeing. */
 #define UFL_STORM         (1<<19) /* Kapitän war in einem Sturm */
 #define UFL_FOLLOWING     (1<<20)
 #define UFL_FOLLOWED      (1<<21)

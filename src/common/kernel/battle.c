@@ -2646,6 +2646,31 @@ battle_effects(battle * b, int dead_players)
 }
 
 static void
+reorder_fleeing(region * r)
+{
+  unit **usrc = &r->units;
+  unit **udst = &r->units;
+  unit *ufirst = NULL;
+  unit *u;
+
+  for (;*udst;udst=&u->next) {
+    u = *udst;
+  }
+
+  for (u=*usrc;u!=ufirst;u=*usrc) {
+    if (u->next && fval(u, UFL_FLEEING)) {
+      *usrc = u->next;
+      *udst = u;
+      udst = &u->next;
+      if (!ufirst) ufirst = u;
+    } else {
+      usrc = &u->next;
+    }
+  }
+  *udst = NULL;
+}
+
+static void
 aftermath(battle * b)
 {
   int i;
@@ -2819,6 +2844,7 @@ aftermath(battle * b)
           }
           fset(du, UFL_LONGACTION|UFL_NOTMOVING);
 #endif /* SIMPLE_ESCAPE */
+          fset(du, UFL_FLEEING);
         } else {
           /* nur teilweise geflohene Einheiten mergen sich wieder */
           df->alive += df->run.number;
@@ -2956,6 +2982,8 @@ aftermath(battle * b)
 #ifdef TROLLSAVE
   free(trollsave);
 #endif
+
+  reorder_fleeing(r);
 
   if (bdebug) {
     fprintf(bdebug, "The battle lasted %d turns, %s and %s.\n",
