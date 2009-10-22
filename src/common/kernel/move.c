@@ -1043,8 +1043,10 @@ cycle_route(order * ord, unit *u, int gereist)
 			assert(!pause);
       if (!pause) {
         const char * loc = LOC(lang, shortdirections[d]);
-        bytes = (int)strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        if (bufp!=tail) {
+          bytes = (int)strlcpy(bufp, " ", size);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        }
         bytes = (int)strlcpy(bufp, loc, size);
         if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       }
