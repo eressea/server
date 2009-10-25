@@ -1072,8 +1072,11 @@ cycle_route(order * ord, unit *u, int gereist)
 		}
 	}
 
-	strcat(neworder, tail);
-  norder = create_order(K_ROUTE, u->faction->locale, "%s", neworder);
+  if (neworder[0]) {
+    norder = create_order(K_ROUTE, u->faction->locale, "%s %s", neworder, tail);
+  } else {
+    norder = create_order(K_ROUTE, u->faction->locale, "%s", tail);
+  }
   replace_order(&u->orders, ord, norder);
   free_order(norder);
 }

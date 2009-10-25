@@ -977,6 +977,7 @@ transfermen(unit * u, unit * u2, int n)
         remove_skill(u2, sk);
         sn = NULL;
       }
+      assert(u2->number!=0 || (sn->level==sv->level && sn->weeks==sv->weeks));
     }
     a = a_find(u->attribs, &at_effect);
     while (a && a->type==&at_effect) {
