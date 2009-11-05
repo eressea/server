@@ -89,9 +89,15 @@ typedef struct alliance_transaction {
 static struct alliance_transaction * transactions[ALLIANCE_MAX];
 
 
-static faction * alliance_leader(const alliance * al)
+faction *
+alliance_get_leader(alliance * al)
 {
-  return al->leader;
+  if (!al->_leader) {
+    if (al->members) {
+      al->_leader = al->members->data;
+    }
+  }
+  return al->_leader;
 }
 
 // static alliance_transaction **
@@ -166,7 +172,7 @@ perform_kick(void)
     alliance_transaction * ta = *tap;
     alliance * al = ta->u->faction->alliance;
 
-    if (al && alliance_leader(al)==ta->u->faction) {
+    if (al && alliance_get_leader(al)==ta->u->faction) {
       faction * f;
       init_tokens(ta->ord);
       skip_token();
@@ -237,14 +243,14 @@ perform_transfer(void)
     alliance_transaction * ta = *tap;
     alliance * al = ta->u->faction->alliance;
 
-    if (al && alliance_leader(al)==ta->u->faction) {
+    if (al && alliance_get_leader(al)==ta->u->faction) {
       faction * f;
       init_tokens(ta->ord);
       skip_token();
       skip_token();
       f = getfaction();
       if (f && f->alliance==al) {
-        al->leader = f;
+        al->_leader = f;
       }
     }
     *tap = ta->next;
@@ -390,11 +396,11 @@ setalliance(struct faction * f, alliance * al)
       flistp = &flist->next;
     }
 
-    if (f->alliance->leader==f) {
+    if (f->alliance->_leader==f) {
       if (f->alliance->members) {
-        f->alliance->leader = f->alliance->members->data;
+        f->alliance->_leader = f->alliance->members->data;
       } else {
-        f->alliance->leader = NULL;
+        f->alliance->_leader = NULL;
       }
     }
   }
@@ -410,8 +416,8 @@ setalliance(struct faction * f, alliance * al)
     }
     *flistp = flist;
     flist->next = NULL;
-    if (al->leader==NULL) {
-      al->leader = f;
+    if (al->_leader==NULL) {
+      al->_leader = f;
     }
     flist = NULL;
   }

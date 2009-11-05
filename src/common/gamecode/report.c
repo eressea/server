@@ -2074,7 +2074,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     }
   }
   if (f->alliance) {
-    m = msg_message("nr_alliance", "leader name id", f->alliance->leader, f->alliance->name, f->alliance->id);
+    m = msg_message("nr_alliance", "leader name id", alliance_get_leader(f->alliance), f->alliance->name, f->alliance->id);
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
     centre(F, buf, true);

@@ -944,10 +944,11 @@ show_alliances_cr(FILE * F, const faction * f)
 {
   if (f->alliance) {
     alliance * al = f->alliance;
-    assert(al->leader);
+    faction * lead = alliance_get_leader(al);
+    assert(lead);
     fprintf(F, "ALLIANCE %d\n", al->id);
     fprintf(F, "\"%s\";name\n", al->name);
-    fprintf(F, "%d;leader\n", al->leader->no);
+    fprintf(F, "%d;leader\n", lead->no);
   }
 }
 

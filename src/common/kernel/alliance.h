@@ -36,7 +36,7 @@ enum {
 
 typedef struct alliance {
   struct alliance * next;
-  struct faction * leader;
+  struct faction * _leader;
   struct faction_list * members;
   unsigned int flags;
   int id;
@@ -49,7 +49,7 @@ extern alliance * makealliance(int id, const char * name);
 extern const char * alliancename(const struct alliance * al);
 extern void setalliance(struct faction * f, alliance * al);
 void free_alliance(struct alliance * al);
-
+extern struct faction * alliance_get_leader(struct alliance * al);
 extern void alliance_cmd(void);
 
 void alliance_setname(alliance * self, const char * name);

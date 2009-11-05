@@ -1618,7 +1618,8 @@ name_cmd(unit * u, struct order * ord)
   case P_ALLIANCE:
     if (foreign==false && u->faction->alliance) {
       alliance * al = u->faction->alliance;
-      if (al->leader==u->faction) {
+      faction * lead = alliance_get_leader(al);
+      if (lead==u->faction) {
         s = &al->name;
       }
     }

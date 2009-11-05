@@ -563,7 +563,7 @@ read_alliances(struct storage * store)
     store->r_str_buf(store, aname, sizeof(aname));
     al = makealliance(id, aname);
     if (store->version>=ALLIANCELEADER_VERSION) {
-      read_reference(&al->leader, store, read_faction_reference, resolve_faction);
+      read_reference(&al->_leader, store, read_faction_reference, resolve_faction);
       id = store->r_id(store);
     } else{
       store->r_str_buf(store, pbuf, sizeof(pbuf));
@@ -577,11 +577,11 @@ write_alliances(struct storage * store)
 {
   alliance * al = alliances;
   while (al) {
-    if (al->leader) {
+    if (al->_leader) {
       store->w_id(store, al->id);
       store->w_str(store, al->name);
       if (store->version>=ALLIANCELEADER_VERSION) {
-        write_faction_reference(al->leader, store);
+        write_faction_reference(al->_leader, store);
       }
       store->w_brk(store);
     }
