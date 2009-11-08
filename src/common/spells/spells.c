@@ -1288,8 +1288,9 @@ sp_rosthauch(castorder *co)
 #endif
   }
 
-  force = rng_int()%((int)(force * 10)) + force;
-
+  if (force>0) {
+    force = rng_int()%((int)(force * 10)) + force;
+  }
   /* fuer jede Einheit */
   for (n = 0; n < pa->length; n++) {
     unit *u = pa->param[n]->data.u;
