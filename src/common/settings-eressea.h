@@ -49,7 +49,7 @@
 #define DUNGEON_MODULE 0
 #define INFOCMD_MODULE 0
 #define CHANGED_CROSSBOWS 0 /* use the WTF_ARMORPIERCING flag */
-#define GLOBAL_WARMING 200 /* number of turns before global warming sets in */
+#undef GLOBAL_WARMING /* number of turns before global warming sets in */
 
 #define SIMPLE_COMBAT
 #define SIMPLE_ESCAPE

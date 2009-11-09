@@ -171,6 +171,7 @@ static boolean g_writemap = false;
 static boolean g_ignore_errors = false;
 static const char * luafile = NULL;
 static const char * preload = NULL;
+static const char * lua_path = NULL;
 static const char * script_path = "scripts";
 static int memdebug = 0;
 static int g_console = 1;
@@ -267,8 +268,8 @@ static const struct {
   {LUA_IOLIBNAME,     luaopen_io},
   {LUA_STRLIBNAME,    luaopen_string},
   {LUA_MATHLIBNAME,   luaopen_math},
-/*
   {LUA_LOADLIBNAME,   luaopen_package},
+/*
   {LUA_DBLIBNAME,     luaopen_debug},
 */
 #if LUA_VERSION_NUM>=501
@@ -554,6 +555,22 @@ read_args(int argc, char **argv, lua_State * luaState)
     sprintf(str, "?;?.lua;%s/?.lua;%s/?", script_path, script_path);
     setLuaString(luaState, "LUA_PATH", str);
   }
+  if (lua_path) {
+    char buffer[512];
+    const char * str;
+    int t;
+    lua_getglobal(luaState, "package");
+    t = lua_type(luaState, -1);
+    lua_pushstring(luaState, "path");
+    lua_gettable(luaState, -2);
+    t = lua_type(luaState, -1);
+    str = lua_tostring(luaState, -1);
+    lua_pop(luaState, 1);
+    sprintf(buffer, "%s;%s", str, lua_path);
+    lua_pushstring(luaState, "path");
+    lua_pushstring(luaState, buffer);
+    lua_settable(luaState, -3);
+  }
   setLuaString(luaState, "datapath", datapath());
   setLuaString(luaState, "scriptpath", script_path);
   setLuaString(luaState, "basepath", basepath());
@@ -588,6 +605,8 @@ load_inifile(const char * filename)
     script_path = iniparser_getstring(d, "common:scripts", script_path);
     lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
     memdebug = iniparser_getint(d, "common:memcheck", memdebug);
+
+    lua_path = iniparser_getstring(d, "common:luapath", lua_path);
 
     str = iniparser_getstring(d, "common:encoding", NULL);
     if (str) enc_gamedata = xmlParseCharEncoding(str);
