@@ -356,7 +356,6 @@ enum {
 extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 
 extern const char * basepath(void);
-extern const char * resourcepath(void);
 extern void kernel_init(void);
 extern void kernel_done(void);
 

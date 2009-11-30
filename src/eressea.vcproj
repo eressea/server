@@ -259,7 +259,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath)&#x0D;&#x0A;"
 						Outputs="$(IntDir)/$(InputName).luac"
 					/>
 				</FileConfiguration>
@@ -272,7 +272,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath)&#x0D;&#x0A;"
 						Outputs="$(IntDir)/$(InputName).luac"
 					/>
 				</FileConfiguration>
@@ -285,20 +285,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
-						Outputs="$(IntDir)/$(InputName).luac"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\scripts\tests.lua"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath) "
+						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath)&#x0D;&#x0A;"
 						Outputs="$(IntDir)/$(InputName).luac"
 					/>
 				</FileConfiguration>

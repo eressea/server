@@ -89,7 +89,7 @@
 #define MAXPERSISTENT 128
 
 /* exported symbols symbols */
-const char * xmlfile = "eressea.xml";
+const char * game_name = "eressea";
 const char * g_datadir;
 int firstx = 0, firsty = 0;
 int enc_gamedata = 0;
@@ -346,7 +346,7 @@ factionorders(void)
     /* Die Partei hat sich zumindest gemeldet, so daß sie noch
      * nicht als untätig gilt */
     
-    /* TODO: +1 ist ein Workaround, weil turn erst in process_orders
+    /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
      * incrementiert wird. */
     f->lastorders = global.data_turn+1;
     
@@ -656,19 +656,19 @@ read_owner(struct storage * store, region_owner **powner)
 }
 
 int
-lastturn(void)
+current_turn(void)
 {
   char zText[MAX_PATH];
-  int turn = 0;
+  int cturn = 0;
   FILE * f;
 
   sprintf(zText, "%s/turn", basepath());
   f = cfopen(zText, "r");
   if (f) {
-    fscanf(f, "%d\n", &turn);
+    fscanf(f, "%d\n", &cturn);
     fclose(f);
   }
-  return turn;
+  return cturn;
 }
 
 static void
@@ -1397,20 +1397,16 @@ readgame(const char * filename, int mode, int backup)
 
   if (store->version >= SAVEXMLNAME_VERSION) {
     char basefile[1024];
-    const char *basearg = "(null)";
 
     store->r_str_buf(store, basefile, sizeof(basefile));
-    assert(xmlfile != NULL);
-    basearg = strrchr(xmlfile, '/');
-    if (basearg==NULL) {
-      basearg = xmlfile;
-    } else {
-      ++basearg;
-    }
-    if (strcmp(basearg, basefile)!=0) {
-      log_warning(("xmlfile mismatch: datafile contains %s, argument/default is %s\n", basefile, basearg));
-      printf("WARNING: any key to continue, Ctrl-C to stop\n");
-      getchar();
+    if (strcmp(game_name, basefile)!=0) {
+      char buffer[64];
+      snprintf(buffer, sizeof(buffer), "%s.xml", game_name);
+      if (strcmp(basefile, buffer)!=0) {
+        log_warning(("game mismatch: datafile contains %s, game is %s\n", basefile, game_name));
+        printf("WARNING: any key to continue, Ctrl-C to stop\n");
+        getchar();
+      }
     }
   }
   a_read(store, &global.attribs);
@@ -1676,11 +1672,11 @@ writegame(const char *filename, int mode)
 
   /* globale Variablen */
 
-  base = strrchr(xmlfile, '/');
+  base = strrchr(game_name, '/');
   if (base) {
     store->w_str(store, base+1);
   } else {
-    store->w_str(store, xmlfile);
+    store->w_str(store, game_name);
   }
   store->w_brk(store);
 

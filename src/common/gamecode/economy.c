@@ -3137,7 +3137,7 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
     if (!blessedharvest_ct) {
       blessedharvest_ct = ct_find("blessedharvest");
     }
-    if (blessedharvest_ct) {
+    if (blessedharvest_ct && r->attribs) {
       int happy = (int)curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
       happy = MIN(happy, jobs);
       earnings += happy;

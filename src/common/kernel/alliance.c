@@ -278,7 +278,7 @@ perform_join(void)
         alliance_transaction * ti = *tip;
         while (ti) {
           faction * fi = ti->u->faction;
-          if (fi->alliance==al) {
+          if (fi && fi->alliance==al) {
             int fid;
             init_tokens(ti->ord);
             skip_token();

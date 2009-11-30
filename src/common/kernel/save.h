@@ -43,11 +43,11 @@ extern void rsf(FILE * F, char *s, size_t len);
 
 /* Versionsänderungen: */
 extern int data_version;
-extern const char *xmlfile;
+extern const char *game_name;
 extern int enc_gamedata;
 
 extern void init_locales(void);
-extern int lastturn(void);
+extern int current_turn(void);
 
 extern void read_items(struct storage * store, struct item **it);
 extern void write_items(struct storage * store, struct item *it);

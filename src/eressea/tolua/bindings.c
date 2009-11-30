@@ -270,6 +270,13 @@ tolua_update_guards(lua_State * L)
 }
 
 static int
+tolua_set_turn(lua_State * L)
+{
+  turn = (int)tolua_tonumber(L, 1, 0);
+  return 0;
+}
+
+static int
 tolua_get_turn(lua_State * L)
 {
   tolua_pushnumber(L, (lua_Number)turn);
@@ -591,6 +598,7 @@ tolua_process_orders(lua_State* L)
   processorders();
   return 0;
 }
+
 static int
 tolua_write_passwords(lua_State* L)
 {
@@ -663,6 +671,14 @@ tolua_read_game(lua_State* L)
   rv = readgame(filename, m, false);
 
   tolua_pushnumber(L, (lua_Number)rv);
+  return 1;
+}
+
+static int
+tolua_read_turn(lua_State* L)
+{
+  int cturn = current_turn();
+  tolua_pushnumber(L, (lua_Number)cturn);
   return 1;
 }
 
@@ -933,7 +949,7 @@ int
 tolua_read_xml(lua_State* L)
 {
   const char * filename = tolua_tostring(L, 1, 0);
-  read_xml(filename);
+  init_data(filename);
   return 0;
 }
 
@@ -988,6 +1004,7 @@ tolua_eressea_open(lua_State* L)
     tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
     tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
 
+    tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
     tolua_function(L, TOLUA_CAST "read_game", tolua_read_game);
     tolua_function(L, TOLUA_CAST "write_game", tolua_write_game);
     tolua_function(L, TOLUA_CAST "free_game", tolua_free_game);
@@ -1022,7 +1039,8 @@ tolua_eressea_open(lua_State* L)
 
     tolua_function(L, TOLUA_CAST "update_guards", tolua_update_guards);
 
-    tolua_function(L, TOLUA_CAST "get_turn", tolua_get_turn);
+    tolua_function(L, TOLUA_CAST "set_turn", &tolua_set_turn);
+    tolua_function(L, TOLUA_CAST "get_turn", &tolua_get_turn);
     tolua_function(L, TOLUA_CAST "get_season", tolua_get_season);
 
     tolua_function(L, TOLUA_CAST "equipment_setitem", tolua_equipment_setitem);

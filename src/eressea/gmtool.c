@@ -72,7 +72,6 @@
 extern const char * g_reportdir;
 extern const char * g_datadir;
 extern const char * g_basedir;
-extern const char * g_resourcedir;
 
 static int g_quit;
 int force_color = 0;
@@ -1254,16 +1253,10 @@ run_mapper(void)
   state_close(st);
 }
 
-#define MAXINPUT 512
 int
-curses_readline(struct lua_State * L, const char * prompt)
+curses_readline(struct lua_State * L, char * buffer, size_t size, const char * prompt)
 {
-  static char buffer[MAXINPUT];
-  askstring(hstatus, prompt, buffer, MAXINPUT);
-  if (buffer[0]==0) {
-    return 0;  /* read fails */
-  } else {
-    lua_pushstring(L, buffer);
-    return 1;
-  }
+  unused(L);
+  askstring(hstatus, prompt, buffer, size);
+  return buffer[0]!=0;
 }

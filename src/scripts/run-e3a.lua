@@ -1,11 +1,3 @@
--- the locales that this gameworld supports.
-local locales = { "de", "en" }
-local confirmed_multis = { 
-}
-local suspected_multis = { 
-"odin"
-}
-
 function num_oceans(r)
   local oceans = 0
   local p = r:next(5)
@@ -107,17 +99,6 @@ function change_locales()
   end
 end
 
-function load_scripts()
-  scripts = { 
-    "spells.lua",
-    "extensions.lua",
-    "e3a/multi.lua",
-  }
-  for index, value in pairs(scripts) do
-    loadscript(value)
-  end
-end
-
 function best_scores(n)
   local f, numf, top
 
@@ -147,7 +128,7 @@ end
 function write_statistics()
 end
 
-function process(orders)
+function process(orders, confirmed_multis, suspected_multis, locales)
   -- initialize starting equipment for new players
   print(orders)
   if open_game(get_turn())~=0 then
@@ -175,9 +156,7 @@ function process(orders)
 
   local nmrs = get_nmrs(1)
   --  nmrs = 0
-  if maxnmrs == nil then
-      maxnmrs = 30
-  end
+  maxnmrs = maxnmrs or 30
   if nmrs >= maxnmrs then
     print("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
     write_summary()
@@ -203,7 +182,6 @@ function process(orders)
 
   -- use newfactions file to place out new players
   -- autoseed(basepath .. "/newfactions", false)
-  -- read_xml(resourcepath.."/e3a-update.xml")
 
   write_files(locales)
   write_statistics()
@@ -222,13 +200,4 @@ function dbupdate()
   edb = db.open(basepath.."/eressea.db")
   edb:update_factions()
   edb:update_scores()
-end
-
--- orderfile: contains the name of the orders.
-load_scripts()
-if orderfile==nil then
-  print "you must specify an orderfile"
-else
-  process(orderfile)
-  dbupdate()
 end

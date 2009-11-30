@@ -72,9 +72,7 @@ function process(orders)
 
   local nmrs = get_nmrs(1)
   --  nmrs = 0
-  if maxnmrs == nil then
-      maxnmrs = 80
-  end
+  maxnmrs = maxnmrs or 80
   if nmrs >= maxnmrs then
     print("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
     write_summary()

@@ -353,6 +353,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\external\lunit\lunit.lua"
+				>
+			</File>
+			<File
 				RelativePath=".\kernel\magic.c"
 				>
 			</File>

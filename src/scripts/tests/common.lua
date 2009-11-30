@@ -1,8 +1,56 @@
-local function test_plane()
+require "lunit"
+
+function one_unit(r, f)
+  local u = unit.create(f, r, 1)
+  u:add_item("money", u.number * 100)
+  u:clear_orders()
+  return u
+end
+
+function two_units(r, f1, f2)
+  return one_unit(r, f1), one_unit(r, f2)
+end
+
+function two_factions()
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  f1.id = 1
+  local f2 = faction.create("noreply@eressea.de", "orc", "de")
+  f2.id = 2
+  return f1, f2
+end
+
+module( "common", package.seeall, lunit.testcase )
+
+function test_fleeing_units_can_be_transported()
+  free_game()
+  local r = region.create(0, 0, "plain")
+  local r1 = region.create(1, 0, "plain")
+  local f1, f2 = two_factions()
+  local u1, u2 = two_units(r, f1, f2)
+  local u3 = one_unit(r, f2)
+  u1.number = 100
+  u1:add_order("ATTACKIEREN " .. itoa36(u2.id))
+  u2.number = 100
+  u2:add_order("FAHREN " .. itoa36(u3.id))
+  u3.number = 100
+  u3:add_order("KAEMPFE FLIEHE")
+  u3:add_order("TRANSPORT " .. itoa36(u2.id))
+  u3:add_order("NACH O ")
+  u3:set_skill("riding", 2)
+  u3:add_item("horse", u2.number)
+  u3:add_order("KAEMPFE FLIEHE")
+  process_orders()
+  write_reports()
+  assert_equal(u3.region.id, r1.id, "transporter did not move")
+  assert_equal(u2.region.id, r1.id, "transported unit did not move")
+end
+
+function test_plane()
   free_game()
   local pl = plane.create(0, -3, -3, 7, 7)
   local nx, ny = plane.normalize(pl, 4, 4)
-  assert(nx==-3 and ny==-3)
+  assert_equal(nx, -3, "normalization failed")
+  assert_equal(ny, -3, "normalization failed")
   local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = atoi36("tpla")
   local r, x, y
@@ -12,19 +60,18 @@ local function test_plane()
 	  local u = unit.create(f, r, 1)
     end
   end end
-  write_reports()
 end
 
-local function test_rename()
+function test_rename()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
   u:add_item("aoh", 1)
-  assert(u:get_item("ao_healing")==1)
+  assert_equal(u:get_item("ao_healing"), 1)
 end
 
-local function test_blessed()
+function test_blessed()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -40,24 +87,22 @@ local function test_blessed()
   u:add_spell("blessedharvest")
   u:clear_orders()
   u:add_order("ZAUBERE STUFE 3 Regentanz")
-  print(r:get_resource("money"))
+  assert_equal(0, r:get_resource("money"), 0)
 
   process_orders()
-  print(r:get_resource("money"))
+  assert_equal(200, r:get_resource("money"))
   u:clear_orders()
   u:add_order("ARBEITEN")
-  for i=1,3 do
-    process_orders()
-    print(r:get_resource("money"))
-  end
+  process_orders()
+  assert_equal(400, r:get_resource("money"))
 end
 
-local function test_pure()
+function test_pure()
   free_game()
   local r = region.create(0, 0, "plain")
 end
 
-local function test_read_write()
+function test_read_write()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -66,28 +111,28 @@ local function test_read_write()
   local fno = f.id
   local uno = u.id
   local result = 0
-  assert(r.terrain=="plain")
+  assert_equal(r.terrain, "plain")
   result = write_game("test_read_write.dat", "binary")
-  assert(result==0)
-  assert(get_region(0, 0)~=nil)
-  assert(get_faction(fno)~=nil)
-  assert(get_unit(uno)~=nil)
+  assert_equal(result, 0)
+  assert_not_equal(get_region(0, 0), nil)
+  assert_not_equal(get_faction(fno), nil)
+  assert_not_equal(get_unit(uno), nil)
   r = nil
   f = nil
   u = nil
   free_game()
-  assert(get_region(0, 0)==nil)
-  assert(get_faction(fno)==nil)
-  assert(get_unit(uno)==nil)
+  assert_equal(get_region(0, 0), nil)
+  assert_equal(nil, get_faction(fno))
+  assert_equal(nil, get_unit(uno))
   result = read_game("test_read_write.dat", "binary")
-  assert(result==0)
-  assert(get_region(0, 0)~=nil)
-  assert(get_faction(fno)~=nil)
-  assert(get_unit(uno)~=nil)
+  assert_equal(0, result)
+  assert_not_equal(nil, get_region(0, 0))
+  assert_not_equal(nil, get_faction(fno))
+  assert_not_equal(nil, get_unit(uno))
   free_game()
 end
 
-local function test_gmtool()
+function test_gmtool()
     free_game()
     local r1 = region.create(1, 0, "plain")
     local r2 = region.create(1, 1, "plain")
@@ -106,13 +151,13 @@ local function test_gmtool()
     for r in gmtool.get_selection() do
         selections=selections+1
     end
-    assert(selections==2)
-    assert(gmtool.get_cursor()==nil)
+    assert_equal(2, selections)
+    assert_equal(nil, gmtool.get_cursor())
 
     gmtool.close()
 end
 
-local function test_faction()
+function test_faction()
     free_game()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
@@ -136,7 +181,7 @@ local function test_faction()
     assert(units==2)
 end
 
-local function test_unit()
+function test_unit()
     free_game()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
@@ -153,7 +198,7 @@ local function test_unit()
     assert(u:get_item("sword")==2)
 end
 
-local function test_region()
+function test_region()
   free_game()
   local r = region.create(0, 0, "plain")
   r:set_resource("horse", 42)
@@ -171,7 +216,7 @@ local function test_region()
   assert(tostring(r) == "Alabasterheim (0,0)")
 end
 
-local function test_building()
+function test_building()
   free_game()
   local u
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -198,15 +243,7 @@ local function test_building()
   assert(r2.buildings()==b)
 end
 
-local function loadscript(name)
-  local script = scriptpath .. "/" .. name
-  print("- loading " .. script)
-  if pcall(dofile, script)==0 then
-    print("Could not load " .. script)
-  end
-end
-
-local function test_message()
+function test_message()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -221,7 +258,7 @@ local function test_message()
   return msg
 end
 
-local function test_hashtable()
+function test_hashtable()
   free_game()
   local f = faction.create("noreply@eressea.de", "human", "de")
   f.objects:set("enno", "smart guy")
@@ -272,7 +309,7 @@ function test_events()
   assert(fail==0)
 end
 
-local function test_recruit2()
+function test_recruit2()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -287,7 +324,7 @@ local function test_recruit2()
   process_orders()
 end
 
-local function test_guard()
+function test_guard()
   free_game()
   region.create(1, 0, "plain")
   local r = region.create(0, 0, "plain")
@@ -316,66 +353,7 @@ local function test_guard()
   assert(u1.region==r)
 end
 
-local function test_owners()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
-  local u2 = unit.create(f2, r, 1)
-  local u3 = unit.create(f2, r, 1)
-
-  local b3 = building.create(r, "castle")
-  b3.size = 2
-  u3.building = b3
-  local b1 = building.create(r, "castle")
-  b1.size = 1
-  u1.building = b1
-  local b2 = building.create(r, "castle")
-  b2.size = 2
-  u2.building = b2
-  
-  update_owners()
-  assert(r.owner==u3.faction)
-  b1.size=3
-  b2.size=3
-  update_owners()
-  assert(r.owner==u2.faction)
-  b1.size=4
-  update_owners()
-  assert(r.owner==u1.faction)
-end
-
-local function test_morale()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  assert(r.morale==1)
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
-  local u2 = unit.create(f2, r, 1)
-
-  local b = building.create(r, "castle")
-  b.size = 10
-  u1.building = b
-  u2.building = b
-  update_owners()
-  assert(r.morale==1)
-  r.morale = 5
-  assert(r.owner==u1.faction)
-  u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
-  process_orders()
-  u1:clear_orders()
-  assert(r.owner==u2.faction)
-  assert(r.morale==3) --  5-MORALE_TRANSFER
-  u2.building = nil
-  update_owners()
-  assert(r.owner==u1.faction)
-  assert(r.morale==0)
-end
-
-local function test_recruit()
+function test_recruit()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -393,37 +371,7 @@ local function test_recruit()
   -- assert(u:get_item("money")==10)
 end
 
-local function test_spells()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r, 1)
-  u.race = "elf"
-  u:clear_orders()
-  u:add_item("money", 10000)
-  u:set_skill("magic", 5)
-  u:add_order("LERNE MAGIE Illaun")
-  process_orders()
-  local sp
-  local nums = 0
-  if f.spells~=nil then
-    for sp in f.spells do
-      nums = nums + 1
-    end
-    assert(nums>0)
-    for sp in u.spells do
-      nums = nums - 1
-    end
-    assert(nums==0)
-  else
-    for sp in u.spells do
-      nums = nums + 1
-    end
-    assert(nums>0)
-  end
-end
-
-local function test_produce()
+function test_produce()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -436,110 +384,6 @@ local function test_produce()
   process_orders()
   assert(u:get_item("iron")==1)
   assert(u:get_item("sword")==1)
-end
-
-local function test_alliance()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  u1:add_item("money", u1.number * 100)
-  local f2 = faction.create("info@eressea.de", "human", "de")
-  local u2 = unit.create(f2, r, 1)
-  u2:add_item("money", u2.number * 100)
-  assert(f1.alliance==nil)
-  assert(f2.alliance==nil)
-  u1:clear_orders()
-  u2:clear_orders()
-  u1:add_order("ALLIANZ NEU pink")
-  u1:add_order("ALLIANZ EINLADEN " .. itoa36(f2.id))
-  u2:add_order("ALLIANZ BEITRETEN pink")
-  process_orders()
-  assert(f1.alliance~=nil)
-  assert(f2.alliance~=nil)
-  assert(f2.alliance==f1.alliance)
-  u1:clear_orders()
-  u2:clear_orders()
-  u1:add_order("ALLIANZ KOMMANDO " .. itoa36(f2.id))
-  process_orders()
-  assert(f1.alliance~=nil)
-  assert(f2.alliance~=nil)
-  assert(f2.alliance==f1.alliance)
-  u1:clear_orders()
-  u2:clear_orders()
-  u2:add_order("ALLIANZ AUSSTOSSEN " .. itoa36(f1.id))
-  process_orders()
-  assert(f1.alliance==nil)
-  assert(f2.alliance~=nil)
-  u1:clear_orders()
-  u2:clear_orders()
-  u2:add_order("ALLIANZ NEU zing")
-  u1:add_order("ALLIANZ BEITRETEN zing") -- no invite!
-  process_orders()
-  assert(f1.alliance==nil)
-  assert(f2.alliance~=nil)
-  u1:clear_orders()
-  u2:clear_orders()
-  u1:add_order("ALLIANZ NEU zack")
-  u1:add_order("ALLIANZ EINLADEN " .. itoa36(f2.id))
-  u2:add_order("ALLIANZ BEITRETEN zack")
-  process_orders()
-  assert(f1.alliance==f2.alliance)
-  assert(f2.alliance~=nil)
-end
-
-local function spells_csv()
-  local f = io.open("spells.csv", "w")
-  for sp in spells() do
-    f:write('"' .. sp.name .. '",' .. sp.level .. ',' .. sp.school .. ',"' .. sp.text .. '"\n')
-  end
-  f:close()
-  fail = 1
-end
-
-function test_taxes()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  r.peasants = 1000
-  r:set_resource("money", 5000)
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r, 1)
-  u:add_item("money", u.number * 10)
-  u:clear_orders()
-  u:add_order("LERNE Holzfaellen") -- do not work
-  local b = building.create(r, "watch")
-  b.size = 10
-  u.building = b
-  update_owners()
-  process_orders()
-  assert(r.morale==1)
-  assert(u:get_item("money")==25)
-end
-
-function test_market()
-  free_game()
-  local r
-  for x = -1, 1 do for y = -1, 1 do
-    r = region.create(x, y, "plain")
-    r.peasants = 5000
-  end end
-  r = get_region(0, 0)
-  local b = building.create(r, "market")
-  b.size = 10
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
-  local u = unit.create(f, r, 1)
-  u.building = b
-  u:add_item("money", u.number * 10000)
-  for i = 0, 5 do
-    local rn = r:next(i)
-  end
-  process_orders()
-  local len = 0
-  for i in u.items do
-    len = len + 1
-  end
-  assert(len>1)
 end
 
 function test_work()
@@ -614,26 +458,6 @@ function test_herbalism()
   process_orders()
 end
 
-function test_leave()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
-  local b1 = building.create(r, "castle")
-  b1.size = 10
-  local b2 = building.create(r, "lighthouse")
-  b2.size = 10
-  local u = unit.create(f, r, 1)
-  u.building = b1
-  assert(u.building~=nil)
-  u:add_item("money", u.number * 100)
-  u:clear_orders()
-  u:add_order("BETRETE BURG " .. itoa36(b2.id))
-  update_owners()
-  process_orders()
-  assert(u.building.id==b1.id) -- region owners may not leave
-end
-
 function test_mallorn()
   free_game()
   local r = region.create(0, 0, "plain")
@@ -670,44 +494,6 @@ function test_mallorn()
   assert(u3:get_item("mallorn")==1)
 end
 
-local function two_units(r, f1, f2)
-  local u1, u2
-  u1 = unit.create(f1, r, 1)
-  u2 = unit.create(f2, r, 1)
-  u1:add_item("money", u1.number * 100)
-  u2:add_item("money", u2.number * 100)
-  return u1, u2
-end
-
-local function two_factions()
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  f1.id = 1
-  local f2 = faction.create("noreply@eressea.de", "orc", "de")
-  f2.id = 2
-  return f1, f2
-end
-
-function test_canoe()
-  free_game()
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local src = region.create(0, 0, "ocean")
-  local land = region.create(1, 0, "plain")
-  region.create(2, 0, "ocean")
-  local dst = region.create(3, 0, "ocean")
-  local sh = ship.create(src, "canoe")
-  local u1, u2 = two_units(src, f, f)
-  u1.ship = sh
-  u2.ship = sh
-  u1:set_skill("sailing", 10)
-  u1:clear_orders()
-  u1:add_order("NACH O O O")
-  process_orders()
-  assert(u2.region.id==land.id)
-  u1:add_order("NACH O O O")
-  process_orders()
-  assert(u2.region.id==dst.id)
-end
-
 function test_control()
   free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
@@ -716,42 +502,12 @@ function test_control()
   u1.building = b
   u2.building = b
   update_owners()
-  assert(b.owner==u1)
+  assert_equal(u1, b.owner)
   u1:clear_orders()
   u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
   u1:add_order("VERLASSE")
   process_orders()
-  assert(b.owner==u2)
-end
-
-function test_give()
-  free_game()
-  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  local r = u2.region
-  u1.faction.age = 10
-  u2.faction.age = 10
-  u1:add_item("money", 500)
-  local m1, m2 = u1:get_item("money"), u2:get_item("money")
-  u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
-  u2:clear_orders()
-  u2:add_order("LERNEN Hiebwaffen")
-  process_orders()
-  assert(u1:get_item("money")==m1-10*u1.number)
-  assert(u2:get_item("money")==m2-10*u2.number)
-
-  m1, m2 = u1:get_item("money"), u2:get_item("money")
-  u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
-  u2:clear_orders()
-  u2:add_order("HELFE " .. itoa36(u1.faction.id) .. " GIB")
-  u2:add_item("horse", 100)
-  u2:add_order("GIB 0 ALLES PFERD")
-  local h = r:get_resource("horse")
-  process_orders()
-  assert(r:get_resource("horse")>=h+100)
-  assert(u1:get_item("money")==m1-332-10*u1.number)
-  assert(u2:get_item("money")==m2+110-10*u2.number)
+  assert_equal(u2, b.owner)
 end
 
 function test_storage()
@@ -762,7 +518,7 @@ function test_storage()
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
   store = storage.create("test.unit.dat", "wb")
-  assert(store)
+  assert_not_equal(store, nil)
   store:write_unit(u)
   store:close()
   free_game()
@@ -776,82 +532,4 @@ function test_storage()
   store:close()
   assert(u)
   assert(u:get_item("money") == u.number * 100)
-end
-
-loadscript("extensions.lua")
-e3only = {    
-    ["give"] = test_give,
-    ["canoe"] = test_canoe,
-    ["morale"] = test_morale,
-    ["owners"] = test_owners,
-    ["taxes"] = test_taxes,
-    ["spells"] = test_spells,
-    ["alliance"] = test_alliance,
-    ["leave"] = test_leave,
-    ["market"] = test_market
-}
-
-tests = {
-    ["pure"] = test_pure,
-    ["read_write"] = test_read_write,
-    ["control"] = test_control,
-    ["faction"] = test_faction,
-    ["region"] = test_region,
-    ["building"] = test_building,
-    ["unit"] = test_unit,
-    ["message"] = test_message,
-    ["hashtable"] = test_hashtable,
-    ["gmtool"] = test_gmtool,
-    ["events"] = test_events,
-    ["produce"] = test_produce,
-    ["rename"] = test_rename,
-    ["recruit"] = test_recruit,
-    ["recruit2"] = test_recruit2,
-    ["herbalism"] = test_herbalism,
-    ["storage"] = test_storage,
-    ["mallorn"] = test_mallorn,
-    ["upkeep"] = test_upkeep,
-    ["id"] = test_id,
-    ["work"] = test_work,
-    ["plane"] = test_plane,
-    ["guard"] = test_guard
-}
-
-mytests = {
-    ["guard"] = test_guard,
-    ["plane"] = test_plane,
-    ["owners"] = test_owners
-}
-
-fail = 0
-
-thetests = tests
-
-function test(tests)
-    for k, v in pairs(tests) do
-        local status, err = pcall(v)
-        if not status then
-            fail = fail + 1
-            print("[FAIL] " .. k .. ": " .. err)
-        else
-            print("[OK] " .. k)
-        end
-    end
-end
-
-function is_e3()
-    free_game()
-    r = region.create(0, 0, "plain")
-    b = building.create(r, "market")
-    return b~=nil
-end
-
-test(tests)
-if is_e3() then test(e3only) end
-
--- spells_csv()
-
-if fail > 0 then
-    print(fail .. " tests failed.")
-    io.stdin:read()
 end

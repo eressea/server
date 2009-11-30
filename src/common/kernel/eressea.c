@@ -590,21 +590,12 @@ skill_limit(faction * f, skill_t sk)
 }
 
 char * g_basedir;
-char * g_resourcedir;
 
 const char *
 basepath(void)
 {
   if (g_basedir) return g_basedir;
   return ".";
-}
-
-const char *
-resourcepath(void)
-{
-  static char zText[MAX_PATH];
-  if (g_resourcedir) return g_resourcedir;
-  return strcat(strcpy(zText, basepath()), "/res");
 }
 
 int
@@ -2212,11 +2203,11 @@ int
 init_data(const char * filename)
 {
   int l;
-  char zText[80];
 
-  sprintf(zText, "%s/%s", resourcepath(), filename);
-  l = read_xml(zText);
+  l = read_xml(filename);
   if (l) return l;
+
+  init_locales();
 
   if (turn<0) {
     turn = first_turn;
@@ -3098,7 +3089,6 @@ kernel_init(void)
   attrib_init();
   translation_init();
 
-  if (turn<0) turn = lastturn();
   if (sqlpatch) {
     sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
     sql_init(zBuffer);

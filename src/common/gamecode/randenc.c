@@ -246,14 +246,15 @@ find_manual(region * r, unit * u)
 static void
 get_villagers(region * r, unit * u)
 {
-	unit *newunit;
+  unit *newunit;
   message * msg = msg_message("encounter_villagers", "unit", u);
   const char * name = LOC(u->faction->locale, "villagers");
 
   r_addmessage(r, u->faction, msg);
   msg_release(msg);
 
-	newunit = create_unit(r, u->faction, rng_int() % 20 + 3, u->faction->race, 0, name, u);
+  newunit = create_unit(r, u->faction, rng_int() % 20 + 3, u->faction->race, 0, name, u);
+  leave(newunit, true);
   fset(newunit, UFL_ISNEW|UFL_MOVED);
   equip_unit(newunit, get_equipment("random_villagers"));
 }

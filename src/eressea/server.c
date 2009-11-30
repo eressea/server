@@ -152,7 +152,6 @@
   extern const char * g_reportdir;
   extern const char * g_datadir;
   extern const char * g_basedir;
-  extern const char * g_resourcedir;
 
   extern boolean nobattle;
   extern boolean nomonsters;
@@ -169,10 +168,8 @@ static char * orders = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_ignore_errors = false;
-static const char * luafile = NULL;
-static const char * preload = NULL;
-static const char * lua_path = NULL;
-static const char * script_path = "scripts";
+static const char * luafile = "init.lua";
+static const char * entry_point = NULL;
 static int memdebug = 0;
 static int g_console = 1;
 #if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
@@ -246,9 +243,8 @@ game_init(void)
   register_archetypes();
   enable_xml_gamecode();
 
-  init_data(xmlfile);
+  /* init_data(game_name); */
 
-  init_locales();
   init_archetypes();
   init_attributes();
   init_itemtypes();
@@ -269,9 +265,7 @@ static const struct {
   {LUA_STRLIBNAME,    luaopen_string},
   {LUA_MATHLIBNAME,   luaopen_math},
   {LUA_LOADLIBNAME,   luaopen_package},
-/*
   {LUA_DBLIBNAME,     luaopen_debug},
-*/
 #if LUA_VERSION_NUM>=501
   {LUA_OSLIBNAME,     luaopen_os},
 #endif
@@ -453,20 +447,18 @@ read_args(int argc, char **argv, lua_State * luaState)
         nocr = true;
         nocr = true;
       }
-      else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
+      else if (strcmp(argv[i]+2, "xml")==0) game_name = argv[++i];
       else if (strcmp(argv[i]+2, "ignore-errors")==0) g_ignore_errors = true;
       else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
       else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
       else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
       else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
       else if (strcmp(argv[i]+2, "nodebug")==0) battledebug = false;
-      else if (strcmp(argv[i]+2, "console")==0) luafile=NULL;
+      else if (strcmp(argv[i]+2, "console")==0) entry_point=NULL;
       else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
       else if (strcmp(argv[i]+2, "color")==0) {
         /* force the editor to have colors */
         force_color = 1;
-      } else if (strcmp(argv[i]+2, "current")==0) {
-        turn = -1;
       }
       else if (strcmp(argv[i]+2, "help")==0)
         return usage(argv[0], NULL);
@@ -475,26 +467,23 @@ read_args(int argc, char **argv, lua_State * luaState)
     } else switch(argv[i][1]) {
       case 'C':
         g_console = 1;
-        luafile=NULL;
+        entry_point = NULL;
         break;
       case 'R':
         g_reportdir = argv[++i];
         break;
       case 'e':
         g_console = 0;
-        luafile = argv[++i];
+        entry_point = argv[++i];
         break;
       case 'd':
         g_datadir = argv[++i];
-        break;
-      case 'r':
-        g_resourcedir = argv[++i];
         break;
       case 'b':
         g_basedir = argv[++i];
         break;
       case 'i':
-        xmlfile = argv[++i];
+        game_name = argv[++i];
         break;
       case 't':
         g_console = 0;
@@ -532,9 +521,6 @@ read_args(int argc, char **argv, lua_State * luaState)
           setLuaNumber(luaState, argv[i], atof(c));
         }
         break;
-      case 'l':
-        script_path = argv[++i];
-        break;
       case 'w':
         g_writemap = true;
         break;
@@ -543,40 +529,12 @@ read_args(int argc, char **argv, lua_State * luaState)
     }
   }
 
-  if (orders==NULL) {
-    static char orderfile[MAX_PATH];
-    sprintf(orderfile, "%s/orders.%d", basepath(), turn);
-    orders = orderfile;
+  if (orders!=NULL) {
+    setLuaString(luaState, "orderfile", orders);
   }
 
-  /* add some more variables to the lua globals */
-  if (script_path) {
-    char str[512];
-    sprintf(str, "?;?.lua;%s/?.lua;%s/?", script_path, script_path);
-    setLuaString(luaState, "LUA_PATH", str);
-  }
-  if (lua_path) {
-    char buffer[512];
-    const char * str;
-    int t;
-    lua_getglobal(luaState, "package");
-    t = lua_type(luaState, -1);
-    lua_pushstring(luaState, "path");
-    lua_gettable(luaState, -2);
-    t = lua_type(luaState, -1);
-    str = lua_tostring(luaState, -1);
-    lua_pop(luaState, 1);
-    sprintf(buffer, "%s;%s", str, lua_path);
-    lua_pushstring(luaState, "path");
-    lua_pushstring(luaState, buffer);
-    lua_settable(luaState, -3);
-  }
-  setLuaString(luaState, "datapath", datapath());
-  setLuaString(luaState, "scriptpath", script_path);
   setLuaString(luaState, "basepath", basepath());
   setLuaString(luaState, "reportpath", reportpath());
-  setLuaString(luaState, "resourcepath", resourcepath());
-  setLuaString(luaState, "orderfile", orders);
 
   return 0;
 }
@@ -599,30 +557,26 @@ load_inifile(const char * filename)
   dictionary * d = iniparser_new(filename);
   if (d) {
     const char * str;
-    g_basedir = iniparser_getstring(d, "common:base", g_basedir);
-    g_resourcedir = iniparser_getstring(d, "common:res", g_resourcedir);
-    xmlfile = iniparser_getstring(d, "common:xml", xmlfile);
-    script_path = iniparser_getstring(d, "common:scripts", script_path);
-    lomem = iniparser_getint(d, "common:lomem", lomem)?1:0;
-    memdebug = iniparser_getint(d, "common:memcheck", memdebug);
+    g_basedir = iniparser_getstring(d, "eressea:base", g_basedir);
+    game_name = iniparser_getstring(d, "eressea:game", game_name);
+    lomem = iniparser_getint(d, "eressea:lomem", lomem)?1:0;
+    memdebug = iniparser_getint(d, "eressea:memcheck", memdebug);
 
-    lua_path = iniparser_getstring(d, "common:luapath", lua_path);
-
-    str = iniparser_getstring(d, "common:encoding", NULL);
+    str = iniparser_getstring(d, "eressea:encoding", NULL);
     if (str) enc_gamedata = xmlParseCharEncoding(str);
 
     verbosity = iniparser_getint(d, "eressea:verbose", 2);
     sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);
     battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
 
-    preload = iniparser_getstring(d, "eressea:preload", preload);
-    luafile = iniparser_getstring(d, "eressea:run", luafile);
+    entry_point = iniparser_getstring(d, "eressea:run", entry_point);
+    luafile = iniparser_getstring(d, "eressea:load", luafile);
     g_reportdir = iniparser_getstring(d, "eressea:report", g_reportdir);
 
     /* editor settings */
     force_color = iniparser_getint(d, "editor:color", force_color);
 
-    str = iniparser_getstring(d, "common:locales", "de,en");
+    str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
   }
   inifile = d;
@@ -719,48 +673,22 @@ main(int argc, char *argv[])
     write_spells();
   }
   /* run the main script */
-  if (preload!=NULL) {
-    char * tokens = strdup(preload);
-    char * filename = strtok(tokens, ":");
-    while (filename) {
-      char buf[MAX_PATH];
-      if (script_path) {
-        sprintf(buf, "%s/%s", script_path, filename);
-      }
-      else strcpy(buf, filename);
-      lua_getglobal(L, "dofile");
-      lua_pushstring(L, buf);
-      if (lua_pcall(L, 1, 0, 0) != 0) {
-        my_lua_error(L);
-      }
-      filename = strtok(NULL, ":");
-    }
-  }
-  if (g_console) lua_console(L);
-  else if (luafile) {
+  if (luafile) {
     char buf[MAX_PATH];
-    if (script_path) {
-      sprintf(buf, "%s/%s", script_path, luafile);
-    }
-    else strcpy(buf, luafile);
-#ifdef BINDINGS_LUABIND
-    try {
-      luabind::call_function<int>(L, "dofile", buf);
-    }
-    catch (std::runtime_error& rte) {
-      log_error(("%s.\n", rte.what()));
-    }
-    catch (luabind::error& e) {
-      lua_State* L = e.state();
-      my_lua_error(L);
-    }
-#elif defined(BINDINGS_TOLUA)
+    strcpy(buf, luafile);
     lua_getglobal(L, "dofile");
     lua_pushstring(L, buf);
     if (lua_pcall(L, 1, 0, 0) != 0) {
       my_lua_error(L);
     }
-#endif
+  }
+  if (entry_point) {
+    lua_getglobal(L, entry_point);
+    if (lua_pcall(L, 0, 1, 0) != 0) {
+      my_lua_error(L);
+    }
+  } else {
+    lua_console(L);
   }
 #ifdef MSPACES
   malloc_stats();

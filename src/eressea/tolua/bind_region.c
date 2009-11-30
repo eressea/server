@@ -352,15 +352,10 @@ tolua_region_create(lua_State* L)
   assert(!pnormalize(&x, &y, pl));
   r = result = findregion(x, y);
 
-  if (terrain==NULL) {
-    if (r!=NULL) {
-      if (r->units!=NULL) {
-        /* TODO: error message */
-        result = NULL;
-      }
-    }
-  }
-  if (r==NULL) {
+  if (terrain==NULL && r!=NULL && r->units!=NULL) {
+    /* TODO: error message */
+    result = NULL;
+  } else if (r==NULL) {
     result = new_region(x, y, pl, 0);
   }
   if (result) {
