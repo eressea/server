@@ -891,12 +891,14 @@ const item_type *
 r_luxury(region * r)
 {
   struct demand * dmd;
-  if (!r->land->demands) {
-    fix_demand(r);
-    assert(r->land->demands);
-  }
-  for (dmd=r->land->demands;dmd;dmd=dmd->next) {
-    if (dmd->value==0) return dmd->type->itype;
+  if (r->land) {
+    if (!r->land->demands) {
+      fix_demand(r);
+      assert(r->land->demands);
+    }
+    for (dmd=r->land->demands;dmd;dmd=dmd->next) {
+      if (dmd->value==0) return dmd->type->itype;
+    }
   }
   return NULL;
 }

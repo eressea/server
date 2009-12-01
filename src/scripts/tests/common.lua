@@ -71,7 +71,7 @@ function test_rename()
   assert_equal(u:get_item("ao_healing"), 1)
 end
 
-function test_blessed()
+function test_blessedharvest_lasts_n_turn()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -86,15 +86,28 @@ function test_blessed()
   u:add_spell("raindance")
   u:add_spell("blessedharvest")
   u:clear_orders()
-  u:add_order("ZAUBERE STUFE 3 Regentanz")
+  local level = 5
+  u:add_order("ZAUBERE STUFE " .. level .. " Regentanz")
   assert_equal(0, r:get_resource("money"), 0)
 
-  process_orders()
-  assert_equal(200, r:get_resource("money"))
-  u:clear_orders()
-  u:add_order("ARBEITEN")
-  process_orders()
-  assert_equal(400, r:get_resource("money"))
+  local m = 0
+  local p = 100
+  for i=1,level+1 do
+    process_orders()
+    local income = p * 12
+    p = r:get_resource("peasant")
+    income = income - p * 10
+    m = m + income
+    -- print(i, m, p, r:get_resource("money"))
+    if (i>level) then
+      assert_not_equal(m, r:get_resource("money"))
+    else
+      assert_equal(m, r:get_resource("money"))
+    end
+    u:clear_orders()
+    u:add_order("ARBEITEN")
+--    u:add_spell("raindance")
+  end
 end
 
 function test_pure()

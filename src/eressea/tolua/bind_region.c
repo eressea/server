@@ -225,6 +225,44 @@ static int tolua_region_get_adj(lua_State* L)
   return 1;
 }
 
+static int tolua_region_get_luxury(lua_State* L)
+{
+  region* r = (region*)tolua_tousertype(L, 1, 0);
+  if (r->land) {
+    const item_type * lux = r_luxury(r);
+    if (lux) {
+      const char * name = lux->rtype->_name[0];
+      tolua_pushstring(L, name);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int tolua_region_set_herb(lua_State* L)
+{
+  region* r = (region*)tolua_tousertype(L, 1, 0);
+  if (r->land) {
+    const char * name = tolua_tostring(L, 2, 0);
+    const item_type * itype = it_find(name);
+    if (itype && (itype->flags&ITF_HERB)) {
+      r->land->herbtype = itype;
+    }
+  }
+  return 0;
+}
+
+static int tolua_region_get_herb(lua_State* L)
+{
+  region* r = (region*)tolua_tousertype(L, 1, 0);
+  if (r->land && r->land->herbtype) {
+    const char * name = r->land->herbtype->rtype->_name[0];
+    tolua_pushstring(L, name);
+    return 1;
+  }
+  return 0;
+}
+
 static int tolua_region_get_next(lua_State* L)
 {
   region* self = (region*)tolua_tousertype(L, 1, 0);
@@ -596,13 +634,15 @@ tolua_region_open(lua_State* L)
       tolua_function(L, TOLUA_CAST "next", tolua_region_get_next);
       tolua_variable(L, TOLUA_CAST "adj", tolua_region_get_adj, NULL);
 
+      tolua_variable(L, TOLUA_CAST "luxury", &tolua_region_get_luxury, NULL);
+      tolua_variable(L, TOLUA_CAST "herb", &tolua_region_get_herb, &tolua_region_set_herb);
+
       tolua_variable(L, TOLUA_CAST "terrain_name", &tolua_region_get_terrainname, &tolua_region_set_terrainname);
       tolua_variable(L, TOLUA_CAST "owner", &tolua_region_get_owner, &tolua_region_set_owner);
 
       tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
       tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);
 #if 0
-      .property("herbtype", &region_getherbtype, &region_setherbtype)
       .def("add_notice", &region_addnotice)
       .def("add_direction", &region_adddirection)
       .def("move", &region_move)

@@ -39,9 +39,11 @@ without prior permission by the authors of Eressea.
 #include <kernel/save.h>
 
 #include <gamecode/creport.h>
+#include <gamecode/economy.h>
 #include <gamecode/summary.h>
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
+#include <gamecode/market.h>
 
 #include <spells/spells.h>
 #include <modules/autoseed.h>
@@ -953,6 +955,19 @@ tolua_read_xml(lua_State* L)
   return 0;
 }
 
+int tolua_process_markets(lua_State* L) {
+  do_markets();
+  return 0;
+}
+
+int tolua_process_produce(lua_State* L) {
+  region * r;
+  for (r=regions;r;r=r->next) {
+    produce(r);
+  }
+  return 0;
+}
+
 int
 tolua_eressea_open(lua_State* L)
 {
@@ -969,6 +984,14 @@ tolua_eressea_open(lua_State* L)
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
+    tolua_module(L, "process", 0);
+    tolua_beginmodule(L, "process");
+    {
+      tolua_function(L, "markets", &tolua_process_markets);
+      tolua_function(L, "produce", &tolua_process_produce);
+    }
+    tolua_endmodule(L);
+
     tolua_cclass(L, TOLUA_CAST "alliance", TOLUA_CAST "alliance", TOLUA_CAST "", NULL);
     tolua_beginmodule(L, TOLUA_CAST "alliance");
     {

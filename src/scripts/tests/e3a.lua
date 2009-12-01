@@ -35,7 +35,7 @@ end
 function test_taxes()
   free_game()
   local r = region.create(0, 0, "plain")
-  r.peasants = 1000
+  r:set_resource("peasant", 1000)
   r:set_resource("money", 5000)
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
@@ -72,11 +72,50 @@ function test_leave()
 end
 
 function test_market()
+  -- if i am the only trader around, i should be getting all the herbs from all 7 regions
+  local herb_multi = 500 -- from rc_herb_trade()
+  free_game()
+  local r, idx
+  local herbnames = { 'h0', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8' }
+  idx = 1
+  for x = -1, 1 do for y = -1, 1 do
+    r = region.create(x, y, "plain")
+    r:set_resource("peasant", herb_multi * 10) -- 10 herbs per region
+    r.herb = herbnames[idx]
+    idx = idx+1
+  end end
+  r = get_region(0, 0)
+  local b = building.create(r, "market")
+  b.size = 10
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  f.id = 42
+  local u = unit.create(f, r, 1)
+  u.building = b
+  u:add_item("money", u.number * 10000)
+  for i = 0, 5 do
+    local rn = r:next(i)
+  end
+  process.markets()
+  u:add_item("money", -u:get_item("money")) -- now we only have herbs
+  local len = 0
+  for i in u.items do
+    len = len + 1
+  end
+  assert_not_equal(0, len, "trader did not get any herbs")
+  for idx, name in pairs(herbnames) do
+    local n = u:get_item(name)
+    if n>0 then
+      assert_equal(10, n, 'trader did not get exaxtly 10 herbs')
+    end
+  end
+end
+
+function jest_market_gives_items()
   free_game()
   local r
   for x = -1, 1 do for y = -1, 1 do
     r = region.create(x, y, "plain")
-    r.peasants = 5000
+    r:set_resource("peasant", 5000) 
   end end
   r = get_region(0, 0)
   local b = building.create(r, "market")

@@ -141,7 +141,7 @@ void do_markets(void)
             items = (item *)a->data.v;
             i_change(&items, herb, 1);
             a->data.v = items;
-            /* give 1 luxury */
+            /* give 1 herb */
           }
         }
       }
