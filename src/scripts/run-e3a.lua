@@ -197,6 +197,7 @@ end
 -- main body of script
 --
 function dbupdate()
+  update_scores()
   edb = db.open(basepath.."/eressea.db")
   edb:update_factions()
   edb:update_scores()
