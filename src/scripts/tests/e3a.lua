@@ -11,6 +11,7 @@ function test_capacity()
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
     local f = faction.create("noreply@eressea.de", "human", "de")
+    local f2 = faction.create("noreply@eressea.de", "goblin", "de")
 
     -- u1 is at the limit and moves
     local s1 = ship.create(r, "cutter")
@@ -29,6 +30,15 @@ function test_capacity()
     u2:clear_orders()
     u2:add_order("NACH O O")
 
+    -- u3 has goblins, they weigh 40% less
+    local s3 = ship.create(r, "cutter")
+    local u3 = unit.create(f2, r, 8)
+    u3.ship = s3
+    u3:set_skill("sailing", 10)
+    u3:add_item("sword", 55)
+    u3:clear_orders()
+    u3:add_order("NACH O O")
+
     -- u4 has too much stuff
     local s4 = ship.create(r, "cutter")
     local u4 = unit.create(f, r, 5)
@@ -43,6 +53,7 @@ function test_capacity()
 --    print(s.region, u.region, r2)
     assert_equal(r2.id, u1.region.id)
     assert_not_equal(r2.id, u2.region.id)
+    assert_equal(r2.id, u3.region.id)
     assert_not_equal(r2.id, u4.region.id)
 end
     
