@@ -11,14 +11,17 @@ function test_capacity()
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
     local f = faction.create("noreply@eressea.de", "human", "de")
-    
+
+    -- u1 is at the limit and moves
     local s1 = ship.create(r, "cutter")
     local u1 = unit.create(f, r, 5)
     u1.ship = s1
     u1:set_skill("sailing", 10)
+    u1:add_item("sword", 55)
     u1:clear_orders()
     u1:add_order("NACH O O")
-    
+
+    -- u2 has too many people
     local s2 = ship.create(r, "cutter")
     local u2 = unit.create(f, r, 6)
     u2.ship = s2
@@ -26,11 +29,21 @@ function test_capacity()
     u2:clear_orders()
     u2:add_order("NACH O O")
 
+    -- u4 has too much stuff
+    local s4 = ship.create(r, "cutter")
+    local u4 = unit.create(f, r, 5)
+    u4.ship = s4
+    u4:set_skill("sailing", 10)
+    u4:add_item("sword", 56)
+    u4:clear_orders()
+    u4:add_order("NACH O O")
+
     update_owners()
     process_orders()
 --    print(s.region, u.region, r2)
     assert_equal(r2.id, u1.region.id)
     assert_not_equal(r2.id, u2.region.id)
+    assert_not_equal(r2.id, u4.region.id)
 end
     
 function test_owners()
