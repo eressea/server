@@ -191,6 +191,7 @@ function process(orders, confirmed_multis, suspected_multis, locales)
     print("could not write game")
     return -1
   end
+  return 0
 end
 
 --

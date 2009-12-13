@@ -1020,7 +1020,7 @@ get_addresses(report_context * ctx)
   ctx->addresses = flist;
 }
 
-#define MAXSEEHASH 0x3000
+#define MAXSEEHASH 0x1000
 seen_region * reuse;
 
 seen_region **

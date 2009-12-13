@@ -8,7 +8,8 @@ end
 
 function test_capacity()
     local r = region.create(0,0, "ocean")
-    local r2 = region.create(1,0, "ocean")
+    region.create(1,0, "ocean")
+    local r2 = region.create(2,0, "ocean")
     local f = faction.create("noreply@eressea.de", "human", "de")
     
     local s1 = ship.create(r, "cutter")
@@ -16,20 +17,20 @@ function test_capacity()
     u1.ship = s1
     u1:set_skill("sailing", 10)
     u1:clear_orders()
-    u1:add_order("NACH O")
+    u1:add_order("NACH O O")
     
     local s2 = ship.create(r, "cutter")
     local u2 = unit.create(f, r, 6)
     u2.ship = s2
     u2:set_skill("sailing", 10)
     u2:clear_orders()
-    u2:add_order("NACH O")
+    u2:add_order("NACH O O")
 
     update_owners()
     process_orders()
 --    print(s.region, u.region, r2)
     assert_equal(r2.id, u1.region.id)
-    assert_equal(r.id, u2.region.id)
+    assert_not_equal(r2.id, u2.region.id)
 end
     
 function test_owners()
