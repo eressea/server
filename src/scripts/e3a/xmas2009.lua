@@ -1,15 +1,15 @@
 function xmas2009()
   if not get_key("xm09") then
-    print("Es weihnachtet sehr (2009)")
+--    print("Es weihnachtet sehr (2009)")
     set_key("xm09", true)
     for f in factions() do
       f:add_item("xmastree", 1)
       local msg = message.create("msg_event")
-      msg:set_string("string", "santa2006")
+      msg:set_string("string", translate("santa2006"))
       msg:send_faction(f)
-      return 0
     end
   end
+  return 0
 end
 
 function use_xmastree(u, amount)
