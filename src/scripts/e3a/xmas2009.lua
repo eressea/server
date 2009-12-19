@@ -4,7 +4,10 @@ function xmas2009()
     set_key("xm09", true)
     for f in factions() do
       f:add_item("xmastree", 1)
-      f:add_notice("santa2006")
+      local msg = message.create("msg_event")
+      msg:set_string("string", "santa2006")
+      msg:send_faction(f)
+      return 0
     end
   end
 end

@@ -18,6 +18,15 @@ local function use_tree(terrain)
   return r
 end
 
+function test_xmas2009()
+  local r = region.create(0,0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f, r, 1)
+  process_orders()
+  xmas2009()
+  assert_equal("xmastree", f.items())
+end
+
 function test_xmastree()
   local r
   r = use_tree("ocean")
