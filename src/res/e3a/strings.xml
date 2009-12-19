@@ -5,7 +5,8 @@
     _p: plural (13 /Trolle/)
     _x: preposition (15 /Troll/schwerter)
     _a: including article (ein Troll, a troll)
-   -->
+  -->
+
   <!--Fort-Ausbaustufen -->
   <string name="calendar::thirdage">
     <text locale="de">des dritten Zeitalters</text>

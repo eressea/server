@@ -278,6 +278,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\scripts\init-e3a.lua"
+				>
+			</File>
+			<File
+				RelativePath=".\external\lunit\lunit.lua"
+				>
+			</File>
+			<File
 				RelativePath=".\scripts\run-e3a.lua"
 				>
 				<FileConfiguration

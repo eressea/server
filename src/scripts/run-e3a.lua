@@ -166,6 +166,9 @@ function process(orders, confirmed_multis, suspected_multis, locales)
   print (nmrs .. " Factions with 1 NMR")
 
   process_orders()
+  if xmas2009~=nil then
+    xmas2009()
+  end
 
   -- create new monsters:
   spawn_dragons()

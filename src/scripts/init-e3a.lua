@@ -1,3 +1,4 @@
+require "e3a.xmas2009"
 require "e3a.rules"
 require "e3a.multi"
 require "default"
