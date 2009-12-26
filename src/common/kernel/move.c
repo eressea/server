@@ -1961,6 +1961,10 @@ travel_i(unit * u, const region_list * route_begin, const region_list * route_en
 {
   region * r = u->region;
 
+  if (u->building && !can_leave(u)) {
+    cmistake(u, u->thisorder, 150, MSG_MOVE);
+    return route_begin;
+  }
   switch (canwalk(u)) {
     case E_CANWALK_TOOHEAVY:
       cmistake(u, ord, 57, MSG_MOVE);
