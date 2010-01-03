@@ -1,6 +1,4 @@
-require "e3a.xmas2009"
-require "e3a.rules"
-require "e3a.multi"
+require(config.game .. ".modules")
 require "default"
 require "spells"
 require "extensions"
@@ -28,16 +26,8 @@ function run_tests()
 end
 
 function run_turn()
-  require "run-e3a"
+  require(config.game .. ".main")
 
-  -- the locales that this gameworld supports.
-  local locales = { "de", "en" }
-  local confirmed_multis = { 
-  }
-  local suspected_multis = { 
-  "odin"
-  }
-  
   local turn = get_turn()
   if turn==0 then
     turn = read_turn()
@@ -46,7 +36,7 @@ function run_turn()
 
   orderfile = orderfile or basepath .. '/orders.' .. turn
   print("executing turn " .. get_turn() .. " with " .. orderfile)
-  local result = process(orderfile, confirmed_multis, suspected_multis, locales)
+  local result = process(orderfile)
   if result==0 then
     dbupdate()
   end

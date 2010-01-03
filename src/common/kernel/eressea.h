@@ -379,6 +379,7 @@ typedef struct settings {
   void * vm_state;
   float producexpchance;
   int cookie;
+  struct _dictionary_ * inifile;
 
   struct global_functions {
     int (*wage)(const struct region *r, const struct faction * f, const struct race * rc, int in_turn);

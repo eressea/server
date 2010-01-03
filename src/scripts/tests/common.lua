@@ -92,14 +92,14 @@ function test_blessedharvest_lasts_n_turn()
 
   local m = 0
   local p = 100
-  for i=1,level+1 do
+  for i=1,level+2 do
     process_orders()
     local income = p * 12
     p = r:get_resource("peasant")
     income = income - p * 10
     m = m + income
-    -- print(i, m, p, r:get_resource("money"))
-    if (i>level) then
+    print(i, m, p, r:get_resource("money"))
+    if (i>level+1) then
       assert_not_equal(m, r:get_resource("money"))
     else
       assert_equal(m, r:get_resource("money"))

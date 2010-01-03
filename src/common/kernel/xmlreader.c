@@ -1170,6 +1170,7 @@ parse_resources(xmlDocPtr doc)
 
   /* make sure old items (used in requirements) are available */
   init_resources();
+  init_itemtypes();
 
   return 0;
 }

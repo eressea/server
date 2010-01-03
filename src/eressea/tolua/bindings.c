@@ -59,6 +59,7 @@ without prior permission by the authors of Eressea.
 #include <util/rng.h>
 #include <util/storage.h>
 
+#include <iniparser/iniparser.h>
 #include <tolua.h>
 #include <lua.h>
 
@@ -897,6 +898,22 @@ tolua_write_spells(lua_State* L)
 }
 
 static int
+tolua_get_locales(lua_State *L)
+{
+  const struct locale * lang;
+  int i = 0, n = 0;
+
+  for (lang = locales;lang;lang = nextlocale(lang)) ++n;
+  lua_createtable(L, n, 0);
+
+  for (lang = locales;lang;lang = nextlocale(lang)) {
+    tolua_pushstring(L, TOLUA_CAST locale_name(lang));
+    lua_rawseti(L, -2, ++i);
+  }
+  return 1;
+}
+
+static int
 tolua_get_spell_text(lua_State *L)
 {
   const struct locale * loc = default_locale;
@@ -968,6 +985,29 @@ int tolua_process_produce(lua_State* L) {
   return 0;
 }
 
+static void
+parse_inifile(lua_State* L, dictionary * d, const char * section)
+{
+  int i;
+  size_t len = strlen(section);
+  for (i=0;i!=d->n;++i) {
+    const char * key = d->key[i];
+
+    if (strncmp(section, key, len)==0 && key[len]==':') {
+      const char * str_value = d->val[i];
+      char * endp;
+      double num_value = strtod(str_value, &endp);
+      lua_pushstring(L, key + len + 1);
+      if (*endp) {
+        tolua_pushstring(L, str_value);
+      } else {
+        tolua_pushnumber(L, num_value);
+      }
+      lua_rawset(L,-3);
+    }
+  }
+}
+
 int
 tolua_eressea_open(lua_State* L)
 {
@@ -1013,8 +1053,15 @@ tolua_eressea_open(lua_State* L)
     }
     tolua_endmodule(L);
 
-    tolua_function(L, TOLUA_CAST "get_region_by_id", tolua_get_region_byid);
+    tolua_module(L, TOLUA_CAST "config", 1);
+    tolua_beginmodule(L, TOLUA_CAST "config");
+    {
+      parse_inifile(L, global.inifile, "config");
+      tolua_variable(L, TOLUA_CAST "locales", &tolua_get_locales, 0);
+    }
+    tolua_endmodule(L);
 
+    tolua_function(L, TOLUA_CAST "get_region_by_id", tolua_get_region_byid);
     tolua_function(L, TOLUA_CAST "get_faction", tolua_get_faction);
     tolua_function(L, TOLUA_CAST "get_unit", tolua_get_unit);
     tolua_function(L, TOLUA_CAST "get_alliance", tolua_get_alliance);

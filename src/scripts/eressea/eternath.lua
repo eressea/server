@@ -1,6 +1,4 @@
-if gate_travel==nil then
-  loadscript("gates.lua")
-end
+require "gates"
 
 local function eternath_exchange(b1, b2, size)
   local units1 = gate_units(b1, size)

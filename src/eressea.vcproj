@@ -277,27 +277,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\scripts\init-e3a.lua"
-				>
-			</File>
-			<File
-				RelativePath=".\external\lunit\lunit.lua"
-				>
-			</File>
-			<File
-				RelativePath=".\scripts\run-e3a.lua"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath)&#x0D;&#x0A;"
-						Outputs="$(IntDir)/$(InputName).luac"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

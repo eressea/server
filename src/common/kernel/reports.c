@@ -265,7 +265,7 @@ report_items(const item * items, item * result, int size, const unit * owner, co
 
     report_item(owner, itm, viewer, NULL, &ic, NULL, false);
     if (ic && *ic) {
-      for (ishow = result; ishow!=result+n; ishow=ishow->next) {
+      for (ishow = result; ishow!=result+n; ++ishow) {
         const char * sc;
 
         if (ishow->type==itm->type) sc = ic;
@@ -277,6 +277,7 @@ report_items(const item * items, item * result, int size, const unit * owner, co
       }
       if (ishow==result+n) {
         if (n==size) {
+          log_error(("too many items to report, increase buffer size.\n"));
           return -1;
         }
         result[n].number = itm->number;

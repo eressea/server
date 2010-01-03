@@ -247,7 +247,6 @@ game_init(void)
 
   init_archetypes();
   init_attributes();
-  init_itemtypes();
 
   init_gmcmd();
 #if INFOCMD_MODULE
@@ -550,15 +549,14 @@ my_lua_error(lua_State * L)
   return 1;
 }
 
-static dictionary * inifile;
 static void
 load_inifile(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
     const char * str;
+
     g_basedir = iniparser_getstring(d, "eressea:base", g_basedir);
-    game_name = iniparser_getstring(d, "eressea:game", game_name);
     lomem = iniparser_getint(d, "eressea:lomem", lomem)?1:0;
     memdebug = iniparser_getint(d, "eressea:memcheck", memdebug);
 
@@ -573,13 +571,16 @@ load_inifile(const char * filename)
     luafile = iniparser_getstring(d, "eressea:load", luafile);
     g_reportdir = iniparser_getstring(d, "eressea:report", g_reportdir);
 
-    /* editor settings */
-    force_color = iniparser_getint(d, "editor:color", force_color);
-
     str = iniparser_getstring(d, "eressea:locales", "de,en");
     make_locales(str);
+
+    /* only one value in the [editor] section */
+    force_color = iniparser_getint(d, "editor:color", force_color);
+
+    /* excerpt from [config] (the rest is used in bindings.c) */
+    game_name = iniparser_getstring(d, "config:game", game_name);
   }
-  inifile = d;
+  global.inifile = d;
 }
 
 static void
@@ -639,7 +640,7 @@ main(int argc, char *argv[])
   int i;
   char * lc_ctype;
   char * lc_numeric;
-  lua_State * L = lua_init();
+  lua_State * L;
   static int write_csv = 0;
 
   setup_signal_handler();
@@ -652,8 +653,9 @@ main(int argc, char *argv[])
   if (lc_ctype) lc_ctype = strdup(lc_ctype);
   if (lc_numeric) lc_numeric = strdup(lc_numeric);
 
-  global.vm_state = L;
   load_inifile("eressea.ini");
+  L = lua_init();
+  global.vm_state = L;
   if (verbosity>=4) {
     printf("\n%s PBEM host\n"
       "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
@@ -703,7 +705,7 @@ main(int argc, char *argv[])
   free(lc_ctype);
   free(lc_numeric);
 
-  if (inifile) iniparser_free(inifile);
+  if (global.inifile) iniparser_free(global.inifile);
 
   return 0;
 }

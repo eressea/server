@@ -1,3 +1,38 @@
+function change_locales(localechange)
+  for loc, flist in pairs(localechange) do
+    for index, name in pairs(flist) do
+      f = get_faction(atoi36(name))
+      if f ~= nil then
+        f.locale = loc
+        print("LOCALECHANGE ", f, loc)
+      end
+    end
+  end
+end
+
+function dbupdate()
+  update_scores()
+  edb = db.open(basepath.."/eressea.db")
+  if edb~=nil then
+    edb:update_factions()
+    edb:update_scores()
+  else
+    print("could no open "..basepath.."/eressea.db")
+  end
+end
+
+function nmr_check(maxnmrs)
+  local nmrs = get_nmrs(1)
+  if nmrs >= maxnmrs then
+    print("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
+    write_summary()
+    write_game("aborted.dat")
+    return -1
+  end
+  print (nmrs .. " Factions with 1 NMR")
+  return 0
+end
+
 function open_game(turn)
   file = "" .. get_turn()
   if read_game(file .. ".dat", "binary")~=0 then

@@ -135,7 +135,7 @@ extern int report_action(struct region * r, struct unit * actor, struct message 
 
   extern const char * combatstatus[];
 #define GR_PLURAL     0x01 /* grammar: plural */
-#define MAX_INVENTORY 64 /* maimum number of different items in an inventory */
+#define MAX_INVENTORY 128 /* maimum number of different items in an inventory */
 #define MAX_RAWMATERIALS 8 /* maximum kinds of raw materials in a regions */
 
 #ifdef __cplusplus
