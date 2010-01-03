@@ -12,5 +12,4 @@ end
 
 read_xml(srcpath .. '/res/' .. config.game .. '.xml')
 
-require "config-test"
 require "init"

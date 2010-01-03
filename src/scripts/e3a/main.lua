@@ -26,7 +26,7 @@ function process(orders)
     mon.lastturn = get_turn()
   end
 
-  if nmr_check(maxnmrs or 30)~=0 then
+  if nmr_check(config.maxnmrs or 30)~=0 then
     return -1
   end
 

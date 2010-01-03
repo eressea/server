@@ -42,7 +42,7 @@ end
 
 -- the "raindance" spell
 function raindance(r, mage, level, force)
-  if (create_curse(mage, r, "blessedharvest", force, force*2, 100 * force)) then
+  if (create_curse(mage, r, "blessedharvest", force, 1+force*2, 100 * force)) then
     -- slightly crooked way of reporting an action to everyone in the region
     local msg = message.create("raindance_effect")
     msg:set_unit("mage", mage)
@@ -57,7 +57,7 @@ end
 
 -- the "blessed harvest" spell
 function blessedharvest(r, mage, level, force)
-  if create_curse(mage, r, "blessedharvest", force, force*2, 50 * force) then
+  if create_curse(mage, r, "blessedharvest", force, 1+force*2, 50 * force) then
     -- slightly crooked way of reporting an action to everyone in the region
     local msg = message.create("harvest_effect")
     msg:set_unit("mage", mage)

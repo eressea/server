@@ -22,7 +22,7 @@ function process(orders)
 
   plan_monsters()
 
-  if nmr_check(maxnmrs or 80)~=0 then
+  if nmr_check(config.maxnmrs or 80)~=0 then
     return -1
   end
 
