@@ -1641,6 +1641,16 @@ readgame(const char * filename, int mode, int backup)
   return 0;
 }
 
+static void
+clear_monster_orders(void)
+{
+  faction * f = get_monsters();
+  unit * u;
+  for (u=f->units;u;u=u->nextF) {
+    free_orders(&u->orders);
+  }
+}
+
 int
 writegame(const char *filename, int mode)
 {
@@ -1657,6 +1667,7 @@ writegame(const char *filename, int mode)
   storage * store = &my_store;
   store->version = RELEASE_VERSION;
 
+  clear_monster_orders();
   sprintf(path, "%s/%s", datapath(), filename);
 #ifdef HAVE_UNISTD_H
   if (access(path, R_OK) == 0) {
