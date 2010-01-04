@@ -98,7 +98,7 @@ function test_blessedharvest_lasts_n_turn()
     p = r:get_resource("peasant")
     income = income - p * 10
     m = m + income
-    print(i, m, p, r:get_resource("money"))
+    -- print(i, m, p, r:get_resource("money"))
     if (i>level+1) then
       assert_not_equal(m, r:get_resource("money"))
     else
