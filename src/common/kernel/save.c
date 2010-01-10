@@ -1645,9 +1645,11 @@ static void
 clear_monster_orders(void)
 {
   faction * f = get_monsters();
-  unit * u;
-  for (u=f->units;u;u=u->nextF) {
-    free_orders(&u->orders);
+  if (f) {
+    unit * u;
+    for (u=f->units;u;u=u->nextF) {
+      free_orders(&u->orders);
+    }
   }
 }
 
