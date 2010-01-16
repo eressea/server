@@ -966,6 +966,7 @@ plan_monsters(void)
       }
       if (skill_enabled[SK_PERCEPTION]) {
         /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
+        /* TODO: this only works for playerrace */
         produceexp(u, SK_PERCEPTION, u->number);
       }
 

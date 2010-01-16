@@ -7,5 +7,6 @@
   <xi:include href="../armor/rustychainmail-2.xml"/>
   <xi:include href="../armor/rustyshield-2.xml"/>
   <xi:include href="../armor/shield-2.xml"/>
+  <xi:include href="../armor/scale.xml"/>
   <xi:include href="../armor/towershield.xml"/>
 </resources>
