@@ -1152,6 +1152,12 @@
   <string name="chainmail_p">
     <text locale="de">Kettenhemden</text>
   </string>
+  <string name="scale">
+    <text locale="de">Schuppenpanzer</text>
+  </string>
+  <string name="scale_p">
+    <text locale="de">Schuppenpanzer</text>
+  </string>
   <string name="plate">
     <text locale="de">Plattenpanzer</text>
   </string>

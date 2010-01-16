@@ -738,6 +738,12 @@
   <string name="plate_p">
     <text locale="en">platemails</text>
   </string>
+  <string name="scale">
+    <text locale="en">pangolin</text>
+  </string>
+  <string name="scale_p">
+    <text locale="en">pangolins</text>
+  </string>
   <string name="presspass">
     <text locale="en">presspass</text>
   </string>
