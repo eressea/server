@@ -46,7 +46,7 @@
   <xi:include href="names-ghouls.xml"/>
   <xi:include href="names-dragons.xml"/>
 
-  <game name="Eressea" units="1000">
+  <game name="Eressea" units="1500">
     <!-- Game specific settings -->
 
     <order name="BEZAHLEN" disable="yes"/>
