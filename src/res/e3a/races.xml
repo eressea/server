@@ -4,7 +4,10 @@
   <!-- begin main races -->
 
   <xi:include href="../races/goblin-3.xml"/>
-
+  <xi:include href="../races/wyrm.xml"/>
+  <xi:include href="../races/dragon.xml"/>
+  <xi:include href="../races/youngdragon.xml"/>
+  
   <race name="uruk" studyspeed="-5" magres="-0.05" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
@@ -727,45 +730,6 @@
     <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
-  </race>
-
-  <race name="wyrm" magres="0.900000" maxaura="1.0" regaura="3.000000" weight="18000" capacity="1000000" speed="1.0" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
-    <ai splitsize="1" killpeasants="yes" learn="yes"/>
-    <function name="name" value="namedragon"/>
-    <function name="move" value="movedragon"/>
-    <skill name="magic" modifier="12"/>
-    <skill name="tactics" modifier="12"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="3d20"/>
-    <attack type="4" damage="5d30"/>
-    <attack type="6" spell="powerful_dragonbreath"/>
-  </race>
-
-  <race name="dragon" magres="0.700000" maxaura="1.0" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac=
-"6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" giveitem="yes" resistbash="yes">
-    <ai splitsize="2" killpeasants="yes" learn="yes"/>
-    <function name="name" value="namedragon"/>
-    <function name="age" value="agedragon"/>
-    <function name="move" value="movedragon"/>
-    <skill name="magic" modifier="8"/>
-    <skill name="tactics" modifier="8"/>
-    <attack type="4" damage="2d20"/>
-    <attack type="4" damage="2d20"/>
-    <attack type="4" damage="3d30"/>
-    <attack type="6" spell="icy_dragonbreath"/>
-  </race>
-
-  <race name="youngdragon" magres="0.500000" maxaura="1.0" regaura="1.0" weight="20000" capacity="10000" speed="1.0" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
-    <ai splitsize="6" killpeasants="yes" learn="yes"/>
-    <function name="name" value="namedragon"/>
-    <function name="age" value="agefiredragon"/>
-    <function name="move" value="movedragon"/>
-    <skill name="magic" modifier="4"/>
-    <skill name="tactics" modifier="4"/>
-    <attack type="4" damage="1d30"/>
-    <attack type="4" damage="1d30"/>
-    <attack type="4" damage="1d30"/>
-    <attack type="6" spell="fiery_dragonbreath"/>
   </race>
 
   <race name="illusion" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="0" capacity="0" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" walk="yes" canlearn="no" teach="no" noweapons="yes" illusionary="yes">
