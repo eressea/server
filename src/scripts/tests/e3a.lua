@@ -36,6 +36,30 @@ function test_xmastree()
   assert_equal(10, r:get_resource("tree"))
 end
 
+function test_fishing()
+    local r = region.create(0,0, "ocean")
+    local r2 = region.create(1,0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local s1 = ship.create(r, "cutter")
+    local u1 = unit.create(f, r, 3)
+    u1.ship = s1
+    u1:set_skill("sailing", 10)
+    u1:add_item("money", 100)
+    u1:clear_orders()
+    u1:add_order("NACH O")
+    update_owners()
+
+    process_orders()
+    assert_equal(r2.id, u1.region.id)
+    assert_equal(90, u1:get_item("money"))
+
+    u1:clear_orders()
+    u1:add_order("NACH W")
+
+    process_orders()
+    assert_equal(60, u1:get_item("money"))
+end
+
 function test_capacity()
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
@@ -352,7 +376,7 @@ function test_canoe_passes_through_land()
   assert_equal(u2.region.id, dst.id, "canoe could not leave coast")
 end
 
-function test_give_only_a_third_of_items()
+function pull_give_only_a_third_of_items()
   free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
   local r = u2.region
@@ -380,4 +404,34 @@ function test_give_only_a_third_of_items()
   assert(r:get_resource("horse")>=h+100)
   assert_equal(m1-332-10*u1.number, u1:get_item("money"))
   assert_equal(m2+110-10*u2.number, u2:get_item("money"))
+end
+
+function test_give_100_percent_of_items()
+  free_game()
+  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
+  local r = u2.region
+  u1.faction.age = 10
+  u2.faction.age = 10
+  u1:add_item("money", 500)
+  local m1, m2 = u1:get_item("money"), u2:get_item("money")
+  u1:clear_orders()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
+  u2:clear_orders()
+  u2:add_order("LERNEN Hiebwaffen")
+  process_orders()
+  assert(u1:get_item("money")==m1-10*u1.number)
+  assert(u2:get_item("money")==m2-10*u2.number)
+
+  m1, m2 = u1:get_item("money"), u2:get_item("money")
+  u1:clear_orders()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
+  u2:clear_orders()
+  u2:add_order("HELFE " .. itoa36(u1.faction.id) .. " GIB")
+  u2:add_item("horse", 100)
+  u2:add_order("GIB 0 ALLES PFERD")
+  local h = r:get_resource("horse")
+  process_orders()
+  assert(r:get_resource("horse")>=h+100)
+  assert_equal(m1-332-10*u1.number, u1:get_item("money"))
+  assert_equal(m2+332-10*u2.number, u2:get_item("money"))
 end

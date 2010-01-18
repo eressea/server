@@ -247,6 +247,7 @@ get_food(region *r)
           c -= v->number;
         }
       }
+      u->ship->flags -= SF_FISHING;
     }
 
     if (food_rules&1) {

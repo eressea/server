@@ -383,26 +383,29 @@ tolua_region_create(lua_State* L)
   int x = (int)tolua_tonumber(L, 1, 0);
   int y = (int)tolua_tonumber(L, 2, 0);
   const char * tname = tolua_tostring(L, 3, 0);
-  plane * pl = findplane(x, y);
-  const terrain_type * terrain = get_terrain(tname);
-  region * r, * result;
+  if (tname) {
+    plane * pl = findplane(x, y);
+    const terrain_type * terrain = get_terrain(tname);
+    region * r, * result;
 
-  assert(!pnormalize(&x, &y, pl));
-  r = result = findregion(x, y);
+    assert(!pnormalize(&x, &y, pl));
+    r = result = findregion(x, y);
 
-  if (terrain==NULL && r!=NULL && r->units!=NULL) {
-    /* TODO: error message */
-    result = NULL;
-  } else if (r==NULL) {
-    result = new_region(x, y, pl, 0);
+    if (terrain==NULL && r!=NULL && r->units!=NULL) {
+      /* TODO: error message */
+      result = NULL;
+    } else if (r==NULL) {
+      result = new_region(x, y, pl, 0);
+    }
+    if (result) {
+      terraform_region(result, terrain);
+    }
+    fix_demand(result);
+
+    tolua_pushusertype(L, result, TOLUA_CAST "region");
+    return 1;
   }
-  if (result) {
-    terraform_region(result, terrain);
-  }
-  fix_demand(result);
-
-  tolua_pushusertype(L, result, TOLUA_CAST "region");
-  return 1;
+  return 0;
 }
 
 static int tolua_region_get_units(lua_State* L)

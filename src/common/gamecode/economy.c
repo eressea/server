@@ -3263,16 +3263,18 @@ tax_cmd(unit * u, struct order * ord, request ** taxorders)
 	return;
 }
 
+#define MAX_WORKERS 2048
 void
 auto_work(region * r)
 {
-  request workers[1024];
+  request workers[MAX_WORKERS];
   request * nextworker = workers;
   unit * u;
 
   for (u=r->units;u;u=u->next) {
     if (!(u->flags & UFL_LONGACTION) && !is_monsters(u->faction)) {
       if (do_work(u, NULL, nextworker)==0) {
+        assert(nextworker-workers<MAX_WORKERS);
         ++nextworker;
       }
     }
@@ -3322,13 +3324,14 @@ peasant_taxes(region * r)
 void
 produce(struct region *r)
 {
-  request workers[1024];
+  request workers[MAX_WORKERS];
   request *taxorders, *sellorders, *stealorders, *buyorders;
   unit *u;
   int todo;
   static int rule_autowork = -1;
   boolean limited = true;
   request * nextworker = workers;
+  assert(r);
 
   /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
   * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
@@ -3415,6 +3418,7 @@ produce(struct region *r)
 
       case K_WORK:
         if (!rule_autowork && do_work(u, u->thisorder, nextworker)==0) {
+          assert(nextworker-workers<MAX_WORKERS);
           ++nextworker;
         }
         break;
