@@ -40,7 +40,6 @@ function test_fleeing_units_can_be_transported()
   u3:add_item("horse", u2.number)
   u3:add_order("KAEMPFE FLIEHE")
   process_orders()
-  write_reports()
   assert_equal(u3.region.id, r1.id, "transporter did not move")
   assert_equal(u2.region.id, r1.id, "transported unit did not move")
 end
@@ -545,4 +544,25 @@ function test_storage()
   store:close()
   assert(u)
   assert(u:get_item("money") == u.number * 100)
+end
+
+function test_building_other()
+  local r = region.create(0,0, "plain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local b = building.create(r, "castle")
+  b.size = 10
+  local u1 = unit.create(f1, r, 3)
+  u1.building = b
+  u1:add_item("money", 100)
+
+  local u2 = unit.create(f2, r, 3)
+  u2:set_skill("building", 10)
+  u2:add_item("money", 100)
+  u2:add_item("stone", 100)
+  u2:clear_orders()
+  u2:add_order("MACHEN BURG " .. itoa36(b.id))
+  update_owners()
+  process_orders()
+  assert_not_equal(10, b.size)
 end

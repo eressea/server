@@ -372,7 +372,6 @@ function test_canoe_passes_through_land()
   assert_equal(u2.region.id, land.id, "canoe did not stop at coast")
   u1:add_order("NACH O O O")
   process_orders()
-  write_reports()
   assert_equal(u2.region.id, dst.id, "canoe could not leave coast")
 end
 
