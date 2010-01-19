@@ -383,7 +383,7 @@ extern int FactionSpells(void);
 extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f);
 
 extern void write_spelllist(const struct spell_list * slist, struct storage * store);
-extern void read_spellist(struct spell_list ** slistp, struct storage * store);
+extern void read_spellist(struct spell_list ** slistp, magic_t mtype, struct storage * store);
 extern double MagicPower(void);
 
 #ifdef __cplusplus

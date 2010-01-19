@@ -1298,7 +1298,7 @@ readfaction(struct storage * store)
   read_groups(store, f);
   f->spellbook = NULL;
   if (store->version>=REGIONOWNER_VERSION) {
-    read_spellist(&f->spellbook, store);
+    read_spellist(&f->spellbook, f->magiegebiet, store);
   }
   return f;
 }

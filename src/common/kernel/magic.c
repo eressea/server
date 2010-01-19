@@ -211,7 +211,7 @@ int FactionSpells(void)
   return rules_factionspells;
 }
 
-void read_spellist(struct spell_list ** slistp, struct storage * store)
+void read_spellist(struct spell_list ** slistp, magic_t mtype, struct storage * store)
 {
   for (;;) {
     spell * sp;
@@ -224,7 +224,7 @@ void read_spellist(struct spell_list ** slistp, struct storage * store)
     } else {
       store->r_tok_buf(store, spname, sizeof(spname));
       if (strcmp(spname, "end")==0) break;
-      sp = find_spell(M_NONE, spname);
+      sp = find_spell(mtype, spname);
     }
     if (sp!=NULL) {
       add_spell(slistp, sp);
@@ -272,7 +272,7 @@ read_mage(attrib * a, struct storage * store)
       }
     }
   }
-  read_spellist(&mage->spells, store);
+  read_spellist(&mage->spells, mage->magietyp, store);
   return AT_READ_OK;
 }
 

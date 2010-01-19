@@ -975,11 +975,11 @@ transfermen(unit * u, unit * u2, int n)
         sn->level = (unsigned char)level;
         sn->weeks = (unsigned char)weeks;
         assert(sn->weeks>0 && sn->weeks<=sn->level*2+1);
+        assert(u2->number!=0 || (sn->level==sv->level && sn->weeks==sv->weeks));
       } else if (sn) {
         remove_skill(u2, sk);
         sn = NULL;
       }
-      assert(u2->number!=0 || (sn->level==sv->level && sn->weeks==sv->weeks));
     }
     a = a_find(u->attribs, &at_effect);
     while (a && a->type==&at_effect) {
