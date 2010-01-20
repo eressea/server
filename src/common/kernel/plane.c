@@ -219,6 +219,26 @@ region_y(const region *r, const faction *f)
 }
 
 void
+adjust_coordinates(const faction *f, int *x, int *y, const plane * pl, const region * r)
+{
+  int nx = *x - plane_center_x(pl);
+  int ny = *y - plane_center_y(pl);
+  if (f) {
+    int width = plane_width(pl);
+    int height = plane_height(pl);
+    int width_2 = width/2;
+    int height_2 = height/2;
+
+    nx -= ursprung_x(f, pl, r);
+    if (nx>width_2) nx -= width;
+    ny -= ursprung_y(f, pl, r);
+    if (ny>height_2) ny -= height;
+  }
+  *x = nx;
+  *y = ny;
+}
+
+void
 set_ursprung(faction *f, int id, int x, int y)
 {
   ursprung *ur;

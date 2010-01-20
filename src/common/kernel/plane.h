@@ -81,6 +81,7 @@ extern void write_plane_reference(const plane * p, struct storage * store);
 extern int read_plane_reference(plane ** pp, struct storage * store);
 extern int plane_width(const plane * pl);
 extern int plane_height(const plane * pl);
+void adjust_coordinates(const struct faction *f, int *x, int *y, const struct plane * pl, const struct region * r);
 #ifdef __cplusplus
 }
 #endif
