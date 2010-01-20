@@ -107,7 +107,7 @@ r_astral_to_standard(const region *r)
   assert(is_astral(r));
   x = (r->x-TE_CENTER_X)*TP_DISTANCE;
   y = (r->y-TE_CENTER_Y)*TP_DISTANCE;
-  pnormalize(&x, &y, rplane(r));
+  pnormalize(&x, &y, get_normalplane());
   r2 = findregion(x, y);
   if (r2==NULL || rplane(r2)!=get_normalplane()) return NULL;
 
