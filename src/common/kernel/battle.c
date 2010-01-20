@@ -4239,17 +4239,15 @@ battle_attacks(battle * b)
     if (b->turn == 0) {
       int tactics = get_tactics(s, NULL);
       if (b->max_tactics > 0 && tactics == b->max_tactics) {
-        break;
+        for (fig=s->fighters;fig;fig=fig->next) {
+
+          /* ist in dieser Einheit noch jemand handlungsfähig? */
+          if (fig->fighting <= 0) continue;
+
+          /* Handle the unit's attack on someone */
+          do_attack(fig);
+        }
       }
-    }
-
-    for (fig=s->fighters;fig;fig=fig->next) {
-
-      /* ist in dieser Einheit noch jemand handlungsfähig? */
-      if (fig->fighting <= 0) continue;
-
-      /* Handle the unit's attack on someone */
-      do_attack(fig);
     }
   }
 }
