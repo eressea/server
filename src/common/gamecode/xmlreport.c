@@ -593,8 +593,10 @@ xml_region(report_context * ctx, seen_region * sr)
   ship * sh = r->ships;
   building * b = r->buildings;
   plane * pl = rplane(r);
-  int nx = region_x(r, ctx->f), ny = region_y(r, ctx->f);
+  int nx = r->x, ny = r->y;
+
   pnormalize(&nx, &ny, pl);
+  adjust_coordinates(ctx->f, &nx, &ny, pl, r);
 
   /* TODO: entertain-quota, recruits, salary, prices, curses, borders, apparitions (Schemen), spells, travelthru, messages */
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_region(r));

@@ -190,34 +190,6 @@ plane_center_y(const plane *pl)
   return(pl->miny + pl->maxy)/2;
 }
 
-int
-region_x(const region *r, const faction *f)
-{
-  plane *pl = rplane(r);
-  int x = r->x - plane_center_x(pl);
-  if (f) {
-    int width = plane_width(pl);
-    int width_2 = width/2;
-    x -= ursprung_x(f, pl, r);
-    if (x>width_2) x -= width;
-  }
-  return x;
-}
-
-int
-region_y(const region *r, const faction *f)
-{
-  plane *pl = rplane(r);
-  int y = r->y - plane_center_y(pl);
-  if (f) {
-    int height = plane_height(pl);
-    int height_2 = height/2;
-    y -= ursprung_y(f, pl, r);
-    if (y>height_2) y -= height;
-  }
-  return y;
-}
-
 void
 adjust_coordinates(const faction *f, int *x, int *y, const plane * pl, const region * r)
 {

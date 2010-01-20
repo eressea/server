@@ -119,8 +119,9 @@ write_regionname(const region * r, const faction * f, char * buffer, size_t size
     strcpy(buf, "(null)");
   } else {
     plane * pl = rplane(r);
-    int nx = region_x(r, f), ny = region_y(r, f);
+    int nx = r->x, ny = r->y;
     pnormalize(&nx, &ny, pl);
+    adjust_coordinates(f, &nx, &ny, pl, r);
     snprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
   }
   buf[size-1] = 0;

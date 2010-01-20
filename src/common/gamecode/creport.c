@@ -310,8 +310,9 @@ cr_region(variant var, char * buffer, const void * userdata)
   region * r = (region *)var.v;
   if (r) {
     plane * pl = rplane(r);
-    int nx = region_x(r, report), ny = region_y(r, report);
+    int nx = r->x, ny = r->y;
     pnormalize(&nx, &ny, pl);
+    adjust_coordinates(report, &nx, &ny, pl, r);
     sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
     return 0;
   }
@@ -424,9 +425,10 @@ cr_regions(variant var, char * buffer, const void * userdata)
     plane * pl = rplane(r);
     int i, z = plane_id(pl);
     char * wp = buffer;
-    int nx = region_x(r, f), ny = region_y(r, f);
+    int nx = r->x, ny = r->y;
 
     pnormalize(&nx, &ny, pl);
+    adjust_coordinates(f, &nx, &ny, pl, r);
     wp += sprintf(wp, "\"%d %d %d", nx, ny, z);
     for (i=1;i!=rdata->nregions;++i) {
       r = rdata->regions[i];
@@ -1147,9 +1149,9 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     nx = r->x;
     ny = r->y;
   } else {
-    nx = region_x(r, f);
-    ny = region_y(r, f);
+    nx = r->x, ny = r->y;
     pnormalize(&nx, &ny, pl);
+    adjust_coordinates(f, &nx, &ny, pl, r);
   }
 
   if (pl) {
@@ -1278,8 +1280,10 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         region_list *rl2 = rl;
         while(rl2) {
           region * r = rl2->data;
-          int nx = region_x(r, f), ny = region_y(r, f);
+          int nx = r->x, ny = r->y;
+
           pnormalize(&nx, &ny, pl);
+          adjust_coordinates(f, &nx, &ny, pl, r);
           fprintf(F, "SCHEMEN %d %d\n", nx, ny);
           fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
           rl2 = rl2->next;
@@ -1481,9 +1485,11 @@ report_computer(const char * filename, report_context * ctx, const char * charse
     for (bm=f->battles;bm;bm=bm->next) {
       plane * pl = rplane(bm->r);
       int plid = plane_id(pl);
-      int nx = region_x(bm->r, f), ny = region_y(bm->r, f);
+      region * r = bm->r;
+      int nx = r->x, ny = r->y;
 
       pnormalize(&nx, &ny, pl);
+      adjust_coordinates(f, &nx, &ny, pl, r);
       if (!plid) fprintf(F, "BATTLE %d %d\n", nx, ny);
       else {
         fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);

@@ -66,8 +66,6 @@ struct plane *findplane(int x, int y);
 void init_planes(void);
 int getplaneid(const struct region *r);
 struct plane * getplanebyid(int id);
-int region_x(const struct region *r, const struct faction *f);
-int region_y(const struct region *r, const struct faction *f);
 int plane_center_x(const struct plane *pl);
 int plane_center_y(const struct plane *pl);
 void set_ursprung(struct faction *f, int id, int x, int y);
