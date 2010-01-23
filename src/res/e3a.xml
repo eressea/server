@@ -148,9 +148,9 @@
     <param name="rules.combat.herospeed" value="3"/>
     <param name="rules.combat.demon_vampire" value="5"/> <!-- regen 1 hp per X points of damage done -->
     <param name="rules.combat.skill_bonus" value="0"/>
-    <!--param name="rules.combat.loot" value="5"/--> <!-- only self + others - keeploot -->
-    <param name="rules.items.loot_divisor" value="2"/> <!-- damage skims off 1/2 of goods transfers -->
-    <!--param name="rules.items.give_divisor" value="3"/--> <!-- corruption skims off 2/3 of goods transfers -->
+    <param name="rules.combat.loot" value="5"/> <!-- only self + others - keeploot -->
+    <param name="rules.items.loot_divisor" value="4"/> <!-- damage skims off 3/4 of goods transfers -->
+    <param name="rules.items.give_divisor" value="3"/> <!-- corruption skims off 2/3 of goods transfers -->
     <param name="rules.move.owner_leave" value="1"/> <!-- owner must leave before moving -->
     <param name="rules.cavalry.skill" value="2"/>
     <param name="rules.cavalry.mode" value="1"/>
@@ -162,7 +162,7 @@
     <param name="rules.magic.common" value="tybied"/> <!-- tybied spells can be cast by anyone -->
     <param name="rules.magic.elfpower" value="1"/> <!-- elves get ring-of-power bonus in a forest -->
     <param name="rules.magic.playerschools" value="gwyrrd illaun draig cerddor"/>
-    <param name="rules.build.other_buildings" value="1"/>
+    <param name="rules.build.other_buildings" value="0"/>
     <param name="rules.economy.taxation" value="1"/>
     <param name="rules.economy.food" value="2"/>
     <param name="rules.economy.wages" value="1"/>
