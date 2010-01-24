@@ -528,7 +528,7 @@ parse_ships(xmlDocPtr doc)
       st->name[1] = strcat(strcpy(malloc(strlen(st->name[0])+3), st->name[0]),"_a");
       xmlFree(propValue);
 
-      st->cabins = xml_ivalue(node, "cabins", 0);
+      st->cabins = xml_ivalue(node, "cabins", 0) * PERSON_WEIGHT;
       st->cargo = xml_ivalue(node, "cargo", 0);
       st->combat = xml_ivalue(node, "combat", 0);
       st->cptskill = xml_ivalue(node, "cptskill", 0);

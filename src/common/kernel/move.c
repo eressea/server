@@ -465,21 +465,14 @@ cansail(const region * r, ship * sh)
   if (sh->type->construction && sh->size!=sh->type->construction->maxsize) {
     return false;
   } else {
-    static int rule_capacity = -1;
     int n = 0, p = 0;
     int mweight = shipcapacity(sh);
     int mcabins = sh->type->cabins;
 
-    if (rule_capacity<0) {
-      rule_capacity = get_param_int(global.parameters, "rules.ship.capacity", 0);
-    }
-    if (rule_capacity!=0) {
-      mcabins *= PERSON_WEIGHT;
-    }
     getshipweight(sh, &n, &p);
 
     if (n > mweight) return false;
-    if (p > mcabins) return false;
+    if (mcabins && p > mcabins) return false;
   }
   return true;
 }

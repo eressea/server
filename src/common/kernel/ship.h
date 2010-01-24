@@ -37,7 +37,7 @@ typedef struct ship_type {
   double storm; /* multiplier for chance to drift in storm */
   double damage; /* multiplier for damage taken by the ship */
 
-  int cabins;   /* max. cabins (people) */
+  int cabins;   /* max. cabins (weight) */
   int cargo;    /* max. cargo (weight) */
 
   int cptskill; /* min. skill of captain */

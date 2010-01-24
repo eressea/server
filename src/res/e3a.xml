@@ -142,7 +142,6 @@
     <param name="rules.migrants" value="0"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.goblinbonus" value="3"/>
-    <param name="rules.ship.capacity" value="1"/> <!-- -->
     <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
     <param name="rules.alliances" value="1"/>
     <param name="rules.combat.herospeed" value="3"/>
