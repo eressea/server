@@ -4235,18 +4235,14 @@ battle_attacks(battle * b)
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
 
-    /* Taktikrunde: */
-    if (b->turn == 0) {
-      int tactics = get_tactics(s, NULL);
-      if (b->max_tactics > 0 && tactics == b->max_tactics) {
-        for (fig=s->fighters;fig;fig=fig->next) {
+    if (b->turn!=0 || (b->max_tactics > 0 && get_tactics(s, NULL) == b->max_tactics)) {
+      for (fig=s->fighters;fig;fig=fig->next) {
 
-          /* ist in dieser Einheit noch jemand handlungsfähig? */
-          if (fig->fighting <= 0) continue;
+        /* ist in dieser Einheit noch jemand handlungsfähig? */
+        if (fig->fighting <= 0) continue;
 
-          /* Handle the unit's attack on someone */
-          do_attack(fig);
-        }
+        /* Handle the unit's attack on someone */
+        do_attack(fig);
       }
     }
   }
