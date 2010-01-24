@@ -613,8 +613,8 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
     int mweight = shipcapacity(sh);
     getshipweight(sh, &n, &p);
 
-    fprintf(F, "%d;capacity\n", n);
-    fprintf(F, "%d;cargo\n", mweight);
+    fprintf(F, "%d;capacity\n", mweight);
+    fprintf(F, "%d;cargo\n", n);
     if (sh->type->cabins) {
       fprintf(F, "%d;cabins\n", sh->type->cabins);
     }
