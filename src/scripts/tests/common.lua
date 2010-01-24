@@ -1,5 +1,9 @@
 require "lunit"
 
+function setup()
+    free_game()
+end
+
 function one_unit(r, f)
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
@@ -45,7 +49,6 @@ function test_fleeing_units_can_be_transported()
 end
 
 function test_plane()
-  free_game()
   local pl = plane.create(0, -3, -3, 7, 7)
   local nx, ny = plane.normalize(pl, 4, 4)
   assert_equal(nx, -3, "normalization failed")
@@ -505,6 +508,40 @@ function test_mallorn()
   assert(u1:get_item("log")==2)
   assert(u2:get_item("log")==2)
   assert(u3:get_item("mallorn")==1)
+end
+
+function test_coordinate_translation()
+  local pl = plane.create(1, 500, 500, 1001, 1001) -- astralraum
+  local pe = plane.create(1, -8761, 3620, 23, 23) -- eternath
+  local r = region.create(1000, 1000, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  assert_not_equal(nil, r)
+  assert_equal(r.x, 1000)
+  assert_equal(r.y, 1000)
+  local nx, ny = plane.normalize(pl, r.x, r.y)
+  assert_equal(nx, 1000)
+  assert_equal(ny, 1000)
+  local r1 = region.create(500, 500, "plain")
+  f:set_origin(r1)
+  nx, ny = f:normalize(r1)
+  assert_equal(0, nx)
+  assert_equal(0, ny)
+  local r0 = region.create(0, 0, "plain")
+  nx, ny = f:normalize(r0)
+  assert_equal(0, nx)
+  assert_equal(0, ny)
+  nx, ny = f:normalize(r)
+  assert_equal(500, nx)
+  assert_equal(500, ny)
+  local rn = region.create(1010, 1010, "plain")
+  nx, ny = f:normalize(rn)
+  assert_equal(-491, nx)
+  assert_equal(-491, ny)
+
+  local re = region.create(-8760, 3541, "plain") -- eternath
+  nx, ny = f:normalize(rn)
+  assert_equal(-491, nx)
+  assert_equal(-491, ny)
 end
 
 function test_control()

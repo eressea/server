@@ -219,7 +219,7 @@ function test_market()
   end
 end
 
-function jest_market_gives_items()
+function test_market_gives_items()
   free_game()
   local r
   for x = -1, 1 do for y = -1, 1 do
@@ -326,7 +326,6 @@ function test_alliance()
 end
 
 function test_morale()
-  free_game()
   local r = region.create(0, 0, "plain")
   assert_equal(1, r.morale)
   local f1 = faction.create("noreply@eressea.de", "human", "de")
@@ -355,7 +354,6 @@ function test_morale()
 end
 
 function test_canoe_passes_through_land()
-  free_game()
   local f = faction.create("noreply@eressea.de", "human", "de")
   local src = region.create(0, 0, "ocean")
   local land = region.create(1, 0, "plain")
@@ -376,7 +374,6 @@ function test_canoe_passes_through_land()
 end
 
 function test_give_only_a_third_of_items()
-  free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
   local r = u2.region
   u1.faction.age = 10

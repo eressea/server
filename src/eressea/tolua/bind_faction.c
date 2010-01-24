@@ -20,7 +20,9 @@ without prior permission by the authors of Eressea.
 #include <kernel/unit.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
+#include <kernel/plane.h>
 #include <kernel/race.h>
+#include <kernel/region.h>
 
 #include <util/language.h>
 
@@ -248,6 +250,35 @@ tolua_faction_set_policy(lua_State* L)
     }
   }
 
+  return 0;
+}
+
+static int
+tolua_faction_normalize(lua_State* L)
+{
+  faction * f = (faction *)tolua_tousertype(L, 1, 0);
+  region * r = (region * )tolua_tousertype(L, 2, 0);
+  if (r) {
+    plane * pl = rplane(r);
+    int nx = r->x, ny = r->y;
+    pnormalize(&nx, &ny, pl);
+    adjust_coordinates(f, &nx, &ny, pl, r);
+    tolua_pushnumber(L, (lua_Number)nx);
+    tolua_pushnumber(L, (lua_Number)ny);
+    return 2;
+  }
+  return 0;
+}
+
+static int
+tolua_faction_set_origin(lua_State* L)
+{
+  faction * f = (faction *)tolua_tousertype(L, 1, 0);
+  region * r = (region *)tolua_tousertype(L, 2, 0);
+  plane * pl = rplane(r);
+  int id = pl?pl->id:0;
+  
+  set_ursprung(f, id, r->x - plane_center_x(pl), r->y - plane_center_y(pl));
   return 0;
 }
 
@@ -498,9 +529,11 @@ tolua_faction_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "flags", tolua_faction_get_flags, NULL);
       tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn, tolua_faction_set_lastturn);
  
-      tolua_function(L, TOLUA_CAST "set_policy", tolua_faction_set_policy);
-      tolua_function(L, TOLUA_CAST "get_policy", tolua_faction_get_policy);
-      tolua_function(L, TOLUA_CAST "get_origin", tolua_faction_get_origin);
+      tolua_function(L, TOLUA_CAST "set_policy", &tolua_faction_set_policy);
+      tolua_function(L, TOLUA_CAST "get_policy", &tolua_faction_get_policy);
+      tolua_function(L, TOLUA_CAST "get_origin", &tolua_faction_get_origin);
+      tolua_function(L, TOLUA_CAST "set_origin", &tolua_faction_set_origin);
+      tolua_function(L, TOLUA_CAST "normalize", &tolua_faction_normalize);
 
       tolua_function(L, TOLUA_CAST "add_item", tolua_faction_add_item);
       tolua_variable(L, TOLUA_CAST "items", tolua_faction_get_items, NULL);

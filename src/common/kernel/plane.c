@@ -193,19 +193,34 @@ plane_center_y(const plane *pl)
 void
 adjust_coordinates(const faction *f, int *x, int *y, const plane * pl, const region * r)
 {
-  int nx = *x - plane_center_x(pl);
-  int ny = *y - plane_center_y(pl);
+  int nx = *x;
+  int ny = *y;
   if (f) {
+    nx -= ursprung_x(f, pl, r);
+    ny -= ursprung_y(f, pl, r);
+  } 
+  if (pl) {
+    nx -= plane_center_x(pl);
+    ny -= plane_center_y(pl);
+  }
+
+  if (pl) {
     int width = plane_width(pl);
     int height = plane_height(pl);
     int width_2 = width/2;
     int height_2 = height/2;
 
-    nx -= ursprung_x(f, pl, r);
+    if (nx<0) nx = (width-(-nx)%width);
     if (nx>width_2) nx -= width;
-    ny -= ursprung_y(f, pl, r);
+    if (ny<0) ny = (height-(-ny)%height);
     if (ny>height_2) ny -= height;
   }
+
+  assert(!pl || nx<=pl->maxx - plane_center_x(pl));
+  assert(!pl || nx>=pl->minx - plane_center_x(pl));
+  assert(!pl || ny<=pl->maxy - plane_center_y(pl));
+  assert(!pl || ny>=pl->miny - plane_center_y(pl));
+
   *x = nx;
   *y = ny;
 }
