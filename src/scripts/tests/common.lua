@@ -73,13 +73,13 @@ end
 function test_blessedharvest_lasts_n_turn()
   free_game()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "halfling", "de")
   local u = unit.create(f, r)
   r:set_resource("peasant", 100)
   r:set_resource("money", 0)
   u:add_item("money", 1000)
   u.magic = "gwyrrd"
-  u.race = "elf"
+  u.race = "dwarf"
   u:set_skill("magic", 20)
   u.aura = 200
   u:add_spell("raindance")
@@ -344,6 +344,7 @@ function test_guard()
   f1.age = 20
   local u1 = unit.create(f1, r, 1)
   u1:add_item("sword", 10)
+  u1:add_item("money", 10)
   u1:set_skill("melee", 10)
   u1:clear_orders()
   u1:add_order("NACH O")
@@ -362,7 +363,7 @@ function test_guard()
   u2:add_item("money", 100)
   u3:add_item("money", 100)
   process_orders()
-  assert(u1.region==r)
+  assert_equal(r.id, u1.region.id, "unit may not move after combat")
 end
 
 function test_recruit()

@@ -60,7 +60,7 @@ function test_fishing()
     assert_equal(60, u1:get_item("money"))
 end
 
-function test_capacity()
+function test_ship_capacity()
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
