@@ -1276,9 +1276,10 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         while(rl2) {
           region * r = rl2->data;
           int nx = r->x, ny = r->y;
+          plane * plx = rplane(r);
 
-          pnormalize(&nx, &ny, pl);
-          adjust_coordinates(f, &nx, &ny, pl, r);
+          pnormalize(&nx, &ny, plx);
+          adjust_coordinates(f, &nx, &ny, plx, r);
           fprintf(F, "SCHEMEN %d %d\n", nx, ny);
           fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
           rl2 = rl2->next;
