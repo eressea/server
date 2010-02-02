@@ -174,7 +174,14 @@ get_friends(const unit * u, int * numfriends)
 
   for (u2=r->units;u2;u2=u2->next) {
     if (u2->faction!=f && u2->number>0) {
-      if (alliedunit(u, u2->faction, HELP_MONEY) && alliedunit(u2, f, HELP_GIVE)) {
+      int allied = 0;
+      if (get_param_int(global.parameters, "rules.alliances", 0)!=0) {
+        allied = (f->alliance && f->alliance==u2->faction->alliance);
+      }
+      else if (alliedunit(u, u2->faction, HELP_MONEY) && alliedunit(u2, f, HELP_GIVE)) {
+        allied = 1;
+      }
+      if (allied) {
         friend * nf, ** fr = &friends;
 
         /* some units won't take stuff: */
@@ -226,7 +233,7 @@ gift_items(unit * u, int flags)
   if ((u->race->ec_flags & GIVEITEM) == 0) return 0;
 
   /* at first, I should try giving my crap to my own units in this region */
-  if (u->faction && (flags & GIFT_SELF)) {
+  if (u->faction && (u->faction->flags&FFL_QUIT)==0 && (flags & GIFT_SELF)) {
     unit * u2, * u3 = NULL;
     for (u2 = r->units; u2; u2 = u2->next) {
       if (u2 != u && u2->faction == u->faction && u2->number>0) {

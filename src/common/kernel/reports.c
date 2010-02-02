@@ -1443,7 +1443,15 @@ nmr_warnings(void)
     if (!is_monsters(f) && (turn-f->lastorders) >= 2) {
       message * msg = NULL;
       for (fa=factions;fa;fa=fa->next) {
-        if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
+        int warn = 0;
+        if (get_param_int(global.parameters, "rules.alliances", 0)!=0) {
+          if (f->alliance && f->alliance==fa->alliance) {
+            warn = 1;
+          }
+        } else if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
+          warn = 1;
+        }
+        if (warn) {
           if (msg==NULL) {
             msg = msg_message("warn_dropout", "faction", f);
           }
