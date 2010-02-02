@@ -1453,7 +1453,7 @@ nmr_warnings(void)
         }
         if (warn) {
           if (msg==NULL) {
-            msg = msg_message("warn_dropout", "faction", f);
+            msg = msg_message("warn_dropout", "faction turns", f, turn - f->lastorders);
           }
           add_message(&fa->msgs, msg);
         }

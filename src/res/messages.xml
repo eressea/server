@@ -8485,12 +8485,13 @@
   <message name="warn_dropout" section="errors">
     <type>
       <arg name="faction" type="faction"/>
+      <arg name="turns" type="int"/>
     </type>
-    <text locale="de">"Achtung: $faction($faction) hat einige Zeit keine
+    <text locale="de">"Achtung: $faction($faction) hat seit $int($turns) Wochen keine
     Züge eingeschickt und könnte dadurch in Kürze aus dem Spiel
     ausscheiden."</text>
     <text locale="en">"Warning: $faction($faction) has not been sending in
-    orders for some time and may be leaving the game soon."</text>
+    orders for $int($weeks) turns and may be leaving the game soon."</text>
   </message>
 
 </messages>
