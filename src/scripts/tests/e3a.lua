@@ -6,6 +6,42 @@ function setup()
     free_game()
 end
 
+function test_seecast()
+    local r = region.create(0,0, "plain")
+    for i = 1,10 do
+      region.create(i, 0, "ocean")
+    end
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local s1 = ship.create(r, "cutter")
+    local u1 = unit.create(f, r, 2)
+    u1:set_skill("sailing", 3)
+    u1:add_item("money", 1000)
+    u1.ship = s1
+    local u2 = unit.create(f, r, 1)
+    u2.race = "elf"
+    u2:set_skill("magic", 6)
+    u2.magic = "gwyrrd"
+    u2.aura = 60
+    u2.ship = s1
+    u2:add_spell("stormwinds")
+    update_owners()
+    u2:clear_orders()
+    u2:add_order("Zaubere stufe 2 'Beschwoere einen Sturmelementar' " .. itoa36(s1.id))
+    u1:clear_orders()
+    u1:add_order("NACH O O O O")
+    process_orders()
+    assert_equal(4, u2.region.x)
+
+    u2:clear_orders()
+    u2:add_spell("stormwinds")
+    u2:add_order("Zaubere stufe 2 'Beschwoere einen Sturmelementar' " .. itoa36(s1.id))
+    u1:clear_orders()
+    u1:add_order("NACH O O O O")
+    process_orders()
+    write_reports()
+    assert_equal(8, u2.region.x)
+end
+
 local function use_tree(terrain)
   local r = region.create(0,0, terrain)
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -104,7 +140,6 @@ function test_ship_capacity()
 
     update_owners()
     process_orders()
---    print(s.region, u.region, r2)
     assert_equal(r2.id, u1.region.id)
     assert_not_equal(r2.id, u2.region.id)
     assert_equal(r2.id, u3.region.id)
@@ -347,7 +382,11 @@ function test_morale()
   u1:clear_orders()
   assert_equal(u2.faction, r.owner)
   assert_equal(3, r.morale) --  5-MORALE_TRANSFER
-  u2.building = nil
+  for u in r.units do
+    if u.faction.id==u2.faction.id then
+      u.building = nil
+    end
+  end
   update_owners()
   assert_equal(r.owner, u1.faction)
   assert_equal(0, r.morale)
