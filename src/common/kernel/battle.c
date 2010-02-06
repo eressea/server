@@ -1364,11 +1364,17 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     fprintf(bdebug, "Damage %d, armor %d, type %d: %d -> %d HP, tot.\n",
       da, ar, type, df->person[dt.index].hp + rda, df->person[dt.index].hp);
   }
-  for (pitm=&du->items; *pitm; pitm=&(*pitm)->next) {
-    const item_type * itype = (*pitm)->type;
-    if (!(itype->flags & ITF_CURSED) && dt.index < (*pitm)->number) {
+  for (pitm=&du->items; *pitm; ) {
+    item * itm = *pitm;
+    const item_type * itype = itm->type;
+    if (!(itype->flags & ITF_CURSED) && dt.index < itm->number) {
       /* 25% Grundchance, das ein Item kaputtgeht. */
-      if (rng_int() % 4 < 1) i_change(pitm, itype, -1);
+      if (rng_int() % 4 < 1) {
+        i_change(pitm, itype, -1);
+      }
+    }
+    if (*pitm==itm) {
+      pitm = &itm->next;
     }
   }
   kill_troop(dt);
