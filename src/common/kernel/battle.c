@@ -1366,7 +1366,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
   for (pitm=&du->items; *pitm; pitm=&(*pitm)->next) {
     const item_type * itype = (*pitm)->type;
-    if (!itype->flags & ITF_CURSED && dt.index < (*pitm)->number) {
+    if (!(itype->flags & ITF_CURSED) && dt.index < (*pitm)->number) {
       /* 25% Grundchance, das ein Item kaputtgeht. */
       if (rng_int() % 4 < 1) i_change(pitm, itype, -1);
     }
