@@ -120,7 +120,7 @@
     <param name="modules.markets" value="1"/>
 
     <!-- resource limitations -->
-    <param name="magic.regeneration" value="1.0"/>
+    <param name="magic.regeneration" value="0.75"/>
     <param name="magic.power" value="0.5"/>
     <param name="resource.factor" value="0.25"/>
 
