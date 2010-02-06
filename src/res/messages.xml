@@ -8491,7 +8491,7 @@
     Züge eingeschickt und könnte dadurch in Kürze aus dem Spiel
     ausscheiden."</text>
     <text locale="en">"Warning: $faction($faction) has not been sending in
-    orders for $int($weeks) turns and may be leaving the game soon."</text>
+    orders for $int($turns) turns and may be leaving the game soon."</text>
   </message>
 
 </messages>
