@@ -6837,18 +6837,6 @@ sp_wdwpyramid(castorder *co)
 typedef struct spelldata {
   spellid_t id;
   const char *sname;
-  const char *info;
-  const char *syntax;
-  const char *parameter;
-  magic_t magietyp;
-  int sptyp;
-  char rank;  /* Reihenfolge der Zauber */
-  int level;  /* Stufe des Zaubers */
-  struct component {
-    const char * name;
-    int amount;
-    int flags;
-  } components[5];
   spell_f sp_function;
   void (*patzer) (castorder*);
 } spelldata;
@@ -6857,1920 +6845,600 @@ static spelldata spelldaten[] =
 {
   /* M_GWYRRD */
   {
-    SPL_STONEGOLEM, "stonegolem", NULL, NULL, NULL,
-    M_GWYRRD, (SPELLLEVEL), 4, 1,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { "stone", 1, SPC_LEVEL },
-      { "p2", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_STONEGOLEM, "stonegolem",
     (spell_f)sp_create_stonegolem, NULL
   },
   {
-    SPL_IRONGOLEM, "irongolem", NULL, NULL, NULL,
-    M_GWYRRD, (SPELLLEVEL), 4, 2,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { "iron", 1, SPC_LEVEL },
-      { "p2", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_IRONGOLEM, "irongolem",
     (spell_f)sp_create_irongolem, NULL
   },
   {
-    SPL_TREEGROW, "treegrow", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-    5, 2,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { "log", 1, SPC_LEVEL },
-      { "p2", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TREEGROW, "treegrow",
     (spell_f)sp_hain, patzer_ents
   },
   {
-    SPL_RUSTWEAPON, "rustweapon", NULL, NULL,
-    "u+",
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE),
-    5, 3,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_RUSTWEAPON, "rustweapon",
     (spell_f)sp_rosthauch, NULL
   },
   {
-    SPL_KAELTESCHUTZ, "cold_protection", NULL, NULL,
-    "u+",
-    M_GWYRRD,
-    (UNITSPELL | SPELLLEVEL | TESTCANSEE | ONSHIPCAST),
-    5, 3,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_KAELTESCHUTZ, "cold_protection",
     (spell_f)sp_kaelteschutz, NULL
   },
   {
-    SPL_HAGEL, "hail", NULL, NULL, NULL,
-    M_GWYRRD, (COMBATSPELL|SPELLLEVEL), 5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HAGEL, "hail",
     (spell_f)sp_kampfzauber, NULL
   },
   {
-    SPL_IRONKEEPER, "ironkeeper", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-    5, 3,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_IRONKEEPER, "ironkeeper",
     (spell_f)sp_ironkeeper, NULL
   },
   {
-    SPL_MAGICSTREET, "magicstreet", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | REGIONSPELL | ONSHIPCAST | TESTRESISTANCE),
-    5, 4,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { "stone", 1, SPC_FIX },
-      { "log", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MAGICSTREET, "magicstreet",
     (spell_f)sp_magicstreet, NULL
   },
   {
-    SPL_WINDSHIELD, "windshield", NULL, NULL, NULL,
-    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_WINDSHIELD, "windshield",
     (spell_f)sp_windshield, NULL
   },
   {
-    SPL_MALLORNTREEGROW, "mallorntreegrow", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-    5, 4,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { "mallorn", 1, SPC_LEVEL },
-      { "p2", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MALLORNTREEGROW, "mallorntreegrow", 
     (spell_f)sp_mallornhain, patzer_ents
   },
-  { SPL_GOODWINDS, "goodwinds", NULL, NULL,
-    "s",
-    M_GWYRRD,
-    (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|TESTRESISTANCE),
-    5, 4,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+  { SPL_GOODWINDS, "goodwinds",
     (spell_f)sp_goodwinds, NULL
   },
   {
-    SPL_HEALING, "healing", NULL, NULL, NULL,
-    M_GWYRRD, (POSTCOMBATSPELL | SPELLLEVEL), 5, 5,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HEALING, "healing", 
     (spell_f)sp_healing, NULL
   },
   {
-    SPL_REELING_ARROWS, "reelingarrows", NULL, NULL, NULL,
-    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 5, 5,
-    {
-      { "aura", 15, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_REELING_ARROWS, "reelingarrows", 
     (spell_f)sp_reeling_arrows, NULL
   },
   {
-    SPL_GWYRRD_FUMBLESHIELD, "gwyrrdfumbleshield", NULL, NULL, NULL,
-    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GWYRRD_FUMBLESHIELD, "gwyrrdfumbleshield", 
     (spell_f)sp_fumbleshield, NULL
   },
   {
-    SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL, "aura", "ui",
-    M_GWYRRD, (UNITSPELL|ONSHIPCAST), 1, 6,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TRANSFERAURA_DRUIDE, "transferauradruide",
     (spell_f)sp_transferaura, NULL
   },
   {
-    SPL_EARTHQUAKE, "earthquake", NULL, NULL, NULL,
-    M_GWYRRD, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 6,
-    {
-      { "aura", 25, SPC_FIX },
-      { "laen", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_EARTHQUAKE, "earthquake", 
     (spell_f)sp_earthquake, NULL
   },
   {
-    SPL_STORMWINDS, "stormwinds", NULL, NULL,
-    "s+",
-    M_GWYRRD,
-    (SHIPSPELL | ONSHIPCAST | OCEANCASTABLE | TESTRESISTANCE | SPELLLEVEL),
-    5, 6,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_STORMWINDS, "stormwinds", 
     (spell_f)sp_stormwinds, NULL
   },
   {
-    SPL_HOMESTONE, "homestone", NULL, NULL, NULL,
-    M_GWYRRD, (0), 5, 7,
-    {
-      { "aura", 50, SPC_FIX },
-      { "permaura", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HOMESTONE, "homestone", 
     (spell_f)sp_homestone, NULL
   },
   {
-    SPL_WOLFHOWL, "wolfhowl", NULL, NULL, NULL,
-    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL ), 5, 7,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_WOLFHOWL, "wolfhowl", 
     (spell_f)sp_wolfhowl, NULL
   },
   {
-    SPL_VERSTEINERN, "versteinern", NULL, NULL, NULL,
-    M_GWYRRD, (COMBATSPELL | SPELLLEVEL), 5, 8,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_VERSTEINERN, "versteinern", 
     (spell_f)sp_petrify, NULL
   },
   {
-    SPL_STRONG_WALL, "strongwall", NULL, NULL, NULL,
-    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_STRONG_WALL, "strongwall", 
     (spell_f)sp_strong_wall, NULL
   },
   {
-    SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL, NULL,
-    "kc?",
-    M_GWYRRD,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
-    2, 8,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", 
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_TREEWALKENTER, "treewalkenter", NULL, NULL,
-    "u+",
-    M_GWYRRD, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TREEWALKENTER, "treewalkenter",
     (spell_f)sp_treewalkenter, NULL
   },
   {
-    SPL_TREEWALKEXIT, "treewalkexit", NULL, NULL,
-    "ru+",
-    M_GWYRRD, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TREEWALKEXIT, "treewalkexit",
     (spell_f)sp_treewalkexit, NULL
   },
   {
-    SPL_HOLYGROUND, "holyground", NULL, NULL, NULL,
-    M_GWYRRD, (0), 5, 9,
-    {
-      { "aura", 80, SPC_FIX },
-      { "permaura", 3, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HOLYGROUND, "holyground",
     (spell_f)sp_holyground, NULL
   },
   {
-    SPL_SUMMONENT, "summonent", NULL, NULL, NULL,
-    M_GWYRRD, (SPELLLEVEL), 5, 10,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SUMMONENT, "summonent", 
     (spell_f)sp_summonent, NULL
   },
   {
-    SPL_GWYRRD_FAMILIAR, "gwyrrdfamiliar", NULL, NULL, NULL,
-    M_GWYRRD, (NOTFAMILIARCAST), 5, 10,
-    {
-      { "aura", 100, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GWYRRD_FAMILIAR, "gwyrrdfamiliar", 
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_BLESSSTONECIRCLE, "blessstonecircle", NULL, NULL,
-    "b",
-    M_GWYRRD, (BUILDINGSPELL), 5, 11,
-    {
-      { "aura", 350, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_BLESSSTONECIRCLE, "blessstonecircle", 
     (spell_f)sp_blessstonecircle, NULL
   },
   {
-    SPL_GWYRRD_ARMORSHIELD, "barkskin", NULL, NULL, NULL,
-    M_GWYRRD, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GWYRRD_ARMORSHIELD, "barkskin",
     (spell_f)sp_armorshield, NULL
   },
   {
-    SPL_DROUGHT, "summonfireelemental", NULL, NULL, NULL,
-    M_GWYRRD, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 13,
-    {
-      { "aura", 600, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DROUGHT, "summonfireelemental", 
     (spell_f)sp_drought, NULL
   },
   {
-    SPL_MAELSTROM, "maelstrom", NULL, NULL, NULL,
-    M_GWYRRD,
-    (OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
-    5, 15,
-    {
-      { "aura", 200, SPC_FIX },
-      { "seaserpenthead", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MAELSTROM, "maelstrom",
     (spell_f)sp_maelstrom, NULL
   },
   {
-    SPL_MALLORN, "magic_roots", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
-    5, 16,
-    {
-      { "aura", 250, SPC_FIX },
-      { "permaura", 10, SPC_FIX },
-      { "toadslime", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MALLORN, "magic_roots",
     (spell_f)sp_mallorn, NULL
   },
   {
-    SPL_GREAT_DROUGHT, "great_drought", NULL, NULL, NULL,
-    M_GWYRRD,
-    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
-    5, 17,
-    {
-      { "aura", 800, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GREAT_DROUGHT, "great_drought", 
     (spell_f)sp_great_drought, NULL
   },
   /* M_DRAIG */
   {
-    SPL_SPARKLE_CHAOS, "sparklechaos", NULL, NULL,
-    "u",
-    M_DRAIG, (UNITSPELL | TESTCANSEE | SPELLLEVEL), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SPARKLE_CHAOS, "sparklechaos", 
     (spell_f)sp_sparkle, NULL
   },
   {
-    SPL_FIREBALL, "fireball", NULL, NULL, NULL,
-    M_DRAIG, (COMBATSPELL | SPELLLEVEL), 5, 2,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FIREBALL, "fireball", 
     (spell_f)sp_kampfzauber, NULL
   },
   {
-    SPL_MAGICBOOST, "magicboost", NULL, NULL, NULL,
-    M_DRAIG, (ONSHIPCAST), 3, 3,
-    {
-      { "aura", 2, SPC_LINEAR },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MAGICBOOST, "magicboost", 
     (spell_f)sp_magicboost, NULL
   },
   {
-    SPL_BLOODSACRIFICE, "bloodsacrifice", NULL, NULL, NULL,
-    M_DRAIG, (ONSHIPCAST), 1, 4,
-    {
-      { "hp", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_BLOODSACRIFICE, "bloodsacrifice",
     (spell_f)sp_bloodsacrifice, NULL
   },
   {
-    SPL_BERSERK, "berserk", NULL, NULL, NULL,
-    M_DRAIG, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { "peasant", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_BERSERK, "berserk", 
     (spell_f)sp_berserk, NULL
   },
   {
-    SPL_FUMBLECURSE, "fumblecurse", NULL, NULL,
-    "u",
-    M_DRAIG,
-    (UNITSPELL | SPELLLEVEL | TESTCANSEE | TESTRESISTANCE),
-    4, 5,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FUMBLECURSE, "fumblecurse",
     (spell_f)sp_fumblecurse, patzer_fumblecurse
   },
   {
-    SPL_SUMMONUNDEAD, "summonundead", NULL, NULL, NULL,
-    M_DRAIG, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
-    5, 6,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SUMMONUNDEAD, "summonundead", 
     (spell_f)sp_summonundead, patzer_peasantmob
   },
   {
-    SPL_COMBATRUST, "combatrust", NULL, NULL, NULL,
-    M_DRAIG, (COMBATSPELL | SPELLLEVEL), 5, 6,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_COMBATRUST, "combatrust", 
     (spell_f)sp_combatrosthauch, NULL
   },
   {
-    SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL, "aura", "ui",
-    M_DRAIG, (UNITSPELL|ONSHIPCAST), 1, 7,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TRANSFERAURA_CHAOS, "transferaurachaos", 
     (spell_f)sp_transferaura, NULL
   },
   {
-    SPL_FIREWALL, "firewall", NULL,
-    "direction",
-    "c",
-    M_DRAIG, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FIREWALL, "firewall",
     (spell_f)sp_firewall, patzer_peasantmob
   },
   {
-    SPL_PLAGUE, "plague", NULL, NULL, NULL,
-    M_DRAIG,
-    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
-    5, 7,
-    {
-      { "aura", 30, SPC_FIX },
-      { "peasant", 50, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_PLAGUE, "plague",
     (spell_f)sp_plague, patzer_peasantmob
   },
   {
-    SPL_CHAOSROW, "chaosrow", NULL, NULL, NULL,
-    M_DRAIG, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { "peasant", 10, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_CHAOSROW, "chaosrow",
     (spell_f)sp_chaosrow, NULL
   },
   {
-    SPL_SUMMONSHADOW, "summonshadow", NULL, NULL, NULL,
-    M_DRAIG, (SPELLLEVEL), 5, 8,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SUMMONSHADOW, "summonshadow",
     (spell_f)sp_summonshadow, patzer_peasantmob
   },
   {
-    SPL_UNDEADHERO, "undeadhero", NULL, NULL, NULL,
-    M_DRAIG, (POSTCOMBATSPELL | SPELLLEVEL), 5, 9,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_UNDEADHERO, "undeadhero",
     (spell_f)sp_undeadhero, NULL
   },
   {
-    SPL_AURALEAK, "auraleak", NULL, NULL, NULL,
-    M_DRAIG, (REGIONSPELL | TESTRESISTANCE), 3, 9,
-    {
-      { "aura", 35, SPC_FIX },
-      { "dragonblood", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_AURALEAK, "auraleak", 
     (spell_f)sp_auraleak, NULL
   },
   {
-    SPL_DRAIG_FUMBLESHIELD, "draigfumbleshield", NULL, NULL, NULL,
-    M_DRAIG, (PRECOMBATSPELL | SPELLLEVEL), 2, 9,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DRAIG_FUMBLESHIELD, "draigfumbleshield",
     (spell_f)sp_fumbleshield, NULL
   },
   {
-    SPL_FOREST_FIRE, "forestfire", NULL, NULL, NULL,
-    M_DRAIG, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
-    {
-      { "aura", 50, SPC_FIX },
-      { "oil", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FOREST_FIRE, "forestfire",
     (spell_f)sp_forest_fire, patzer_peasantmob
   },
   {
-    SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL, NULL,
-    "kc?",
-    M_DRAIG,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
-    2, 10,
-    {
-      { "aura", 10, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic",
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_UNHOLYPOWER, "unholypower", NULL, NULL,
-    "u+",
-    M_DRAIG, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 14,
-    {
-      { "aura", 10, SPC_LEVEL },
-      { "peasant", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_UNHOLYPOWER, "unholypower",
     (spell_f)sp_unholypower, NULL
   },
   {
-    SPL_DEATHCLOUD, "deathcloud", NULL, NULL, NULL,
-    M_DRAIG, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
-    {
-      { "aura", 40, SPC_FIX },
-      { "hp", 15, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DEATHCLOUD, "deathcloud",
     (spell_f)sp_deathcloud, patzer_peasantmob
   },
   {
-    SPL_SUMMONDRAGON, "summondragon", NULL, NULL, NULL,
-    M_DRAIG, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
-    {
-      { "aura", 80, SPC_FIX },
-      { "dragonhead", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SUMMONDRAGON, "summondragon",
     (spell_f)sp_summondragon, patzer_peasantmob
   },
   {
-    SPL_SUMMONSHADOWLORDS, "summonshadowlords", NULL, NULL, NULL,
-    M_DRAIG, (SPELLLEVEL), 5, 12,
-    {
-      { "aura", 7, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SUMMONSHADOWLORDS, "summonshadowlords",
     (spell_f)sp_summonshadowlords, patzer_peasantmob
   },
   {
-    SPL_DRAIG_FAMILIAR, "draigfamiliar", NULL, NULL, NULL,
-    M_DRAIG, (NOTFAMILIARCAST), 5, 13,
-    {
-      { "aura", 100, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DRAIG_FAMILIAR, "draigfamiliar",
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_CHAOSSUCTION, "chaossuction", NULL, NULL, NULL,
-    M_DRAIG, (0), 5, 14,
-    {
-      { "aura", 150, SPC_FIX },
-      { "peasant", 200, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_CHAOSSUCTION, "chaossuction",
     (spell_f)sp_chaossuction, patzer_peasantmob
   },
   /* M_ILLAUN */
   {
-    SPL_SPARKLE_DREAM, "sparkledream", NULL, NULL,
-    "u",
-    M_ILLAUN,
-    (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONSHIPCAST),
-    5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SPARKLE_DREAM, "sparkledream",
     (spell_f)sp_sparkle, NULL
   },
   {
-    SPL_SHADOWKNIGHTS, "shadowknights", NULL, NULL, NULL,
-    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 4, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SHADOWKNIGHTS, "shadowknights",
     (spell_f)sp_shadowknights, NULL
   },
   {
-    SPL_FLEE, "flee", NULL, NULL, NULL,
-    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 5, 2,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FLEE, "flee",
     (spell_f)sp_flee, NULL
   },
   {
-    SPL_PUTTOREST, "puttorest", NULL, NULL, NULL,
-    M_ILLAUN, (SPELLLEVEL), 5, 2,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { "p2", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_PUTTOREST, "puttorest",
     (spell_f)sp_puttorest, NULL
   },
   {
-    SPL_ICASTLE, "icastle", NULL,
-    "buildingtype",
-    "c",
-    M_ILLAUN, (0), 5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ICASTLE, "icastle",
     (spell_f)sp_icastle, NULL
   },
   {
-    SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL, "aura", "ui",
-    M_ILLAUN, (UNITSPELL|ONSHIPCAST), 1, 3,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TRANSFERAURA_TRAUM, "transferauratraum",
     (spell_f)sp_transferaura, NULL
   },
   {
-    SPL_ILL_SHAPESHIFT, "shapeshift", NULL,
-    "race",
-    "uc",
-    M_ILLAUN, (UNITSPELL|SPELLLEVEL), 5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ILL_SHAPESHIFT, "shapeshift",
     (spell_f)sp_illusionary_shapeshift, NULL
   },
   {
-    SPL_DREAMREADING, "dreamreading", NULL, NULL,
-    "u",
-    M_ILLAUN, (FARCASTING | UNITSPELL | TESTRESISTANCE), 5, 4,
-    {
-      { "aura", 8, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DREAMREADING, "dreamreading",
     (spell_f)sp_dreamreading, NULL
   },
   {
-    SPL_TIREDSOLDIERS, "tiredsoldiers", NULL, NULL, NULL,
-    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TIREDSOLDIERS, "tiredsoldiers",
     (spell_f)sp_tiredsoldiers, NULL
   },
   {
-    SPL_REANIMATE, "reanimate", NULL, NULL, NULL,
-    M_ILLAUN, (POSTCOMBATSPELL | SPELLLEVEL), 4, 5,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_REANIMATE, "reanimate",
     (spell_f)sp_reanimate, NULL
   },
   {
-    SPL_ANALYSEDREAM, "analysedream", NULL, NULL,
-    "u",
-    M_ILLAUN, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 5,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ANALYSEDREAM, "analysedream",
     (spell_f)sp_analysedream, NULL
   },
   {
-    SPL_DISTURBINGDREAMS, "disturbingdreams", NULL, NULL, NULL,
-    M_ILLAUN, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 6,
-    {
-      { "aura", 18, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DISTURBINGDREAMS, "disturbingdreams",
     (spell_f)sp_disturbingdreams, NULL
   },
   {
-    SPL_SLEEP, "sleep", NULL, NULL, NULL,
-    M_ILLAUN, (COMBATSPELL | SPELLLEVEL ), 5, 7,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SLEEP, "sleep",
     (spell_f)sp_sleep, NULL
   },
   {
-    SPL_WISPS, "wisps", NULL,
-    "direction",
-    "c",
-    M_ILLAUN, (SPELLLEVEL | FARCASTING), 5, 7,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_WISPS, "wisps",
     (spell_f)sp_wisps, NULL
   },
   {
-    SPL_GOODDREAMS, "gooddreams", NULL, NULL, NULL,
-    M_ILLAUN,
-    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
-    5, 8,
-    {
-      { "aura", 80, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GOODDREAMS, "gooddreams",
     (spell_f)sp_gooddreams, NULL
   },
   {
-    SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL, NULL,
-    "kc?",
-    M_ILLAUN,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
-    2, 8,
-    {
-      { "aura", 6, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic",
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_ILLAUN_FAMILIAR, "illaunfamiliar", NULL, NULL, NULL,
-    M_ILLAUN, (NOTFAMILIARCAST), 5, 9,
-    {
-      { "aura", 100, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ILLAUN_FAMILIAR, "illaunfamiliar",
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_CLONECOPY, "clone", NULL, NULL, NULL,
-    M_ILLAUN, (NOTFAMILIARCAST), 5, 9,
-    {
-      { "aura", 100, SPC_FIX },
-      { "permaura", 20, SPC_FIX },
-      { "dragonblood", 5, SPC_FIX },
-      { "p2", 5, SPC_FIX },
-      { 0, 0, 0 }
-    },
+    SPL_CLONECOPY, "clone",
     (spell_f)sp_clonecopy, NULL
   },
   {
-    SPL_BADDREAMS, "bad_dreams", NULL, NULL, NULL,
-    M_ILLAUN,
-    (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
-    {
-      { "aura", 90, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_BADDREAMS, "bad_dreams",
     (spell_f)sp_baddreams, NULL
   },
   {
-    SPL_MINDBLAST, "mindblast", NULL, NULL, NULL,
-    M_ILLAUN, (PRECOMBATSPELL | SPELLLEVEL), 5, 11,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MINDBLAST, "mindblast",
     (spell_f)sp_mindblast_temp, NULL
   },
   {
-    SPL_ORKDREAM, "orkdream", NULL, NULL,
-    "u+",
-    M_ILLAUN,
-    (UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ORKDREAM, "orkdream",
     (spell_f)sp_sweetdreams, NULL
   },
   {
-    SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
-    M_ILLAUN,
-    (UNITSPELL | SEARCHGLOBAL | TESTRESISTANCE),
-    5, 15,
-    {
-      { "aura", 350, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { "h8", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SUMMON_ALP, "summon_alp",
     (spell_f)sp_summon_alp, NULL
   },
   /* M_CERDDOR */
   {
-    SPL_DENYATTACK, "appeasement", NULL, NULL, NULL,
-    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL ), 5, 1,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DENYATTACK, "appeasement",
     (spell_f)sp_denyattack, NULL
   },
   {
-    SPL_HEALINGSONG, "song_of_healing", NULL, NULL, NULL,
-    M_CERDDOR, (POSTCOMBATSPELL | SPELLLEVEL), 5, 2,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HEALINGSONG, "song_of_healing",
     (spell_f)sp_healing, NULL
   },
   {
-    SPL_GENEROUS, "generous", NULL, NULL, NULL,
-    M_CERDDOR,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
-    5, 2,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_GENEROUS, "generous",
     (spell_f)sp_generous, NULL
   },
   {
-    SPL_SONG_OF_FEAR, "song_of_fear", NULL, NULL, NULL,
-    M_CERDDOR, (COMBATSPELL | SPELLLEVEL), 5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SONG_OF_FEAR, "song_of_fear",
     (spell_f)sp_flee, NULL
   },
   {
-    SPL_RECRUIT, "courting", NULL, NULL, NULL,
-    M_CERDDOR, (SPELLLEVEL), 5, 4,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_RECRUIT, "courting",
     (spell_f)sp_recruit, NULL
   },
   {
-    SPL_SONG_OF_CONFUSION, "song_of_confusion", NULL, NULL, NULL,
-    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SONG_OF_CONFUSION, "song_of_confusion",
     (spell_f)sp_chaosrow, NULL
   },
   {
-    SPL_HERO, "heroic_song", NULL, NULL, NULL,
-    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HERO, "heroic_song",
     (spell_f)sp_hero, NULL
   },
   {
-    SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, "aura", "ui",
-    M_CERDDOR, (UNITSPELL|ONSHIPCAST), 1, 5,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TRANSFERAURA_BARDE, "transfer_aura_song",
     (spell_f)sp_transferaura, NULL
   },
   {
-    SPL_UNIT_ANALYSESONG, "analysesong_unit", NULL, NULL,
-    "u",
-    M_CERDDOR,
-    (UNITSPELL | ONSHIPCAST | TESTCANSEE),
-    5, 5,
-    {
-      { "aura", 10, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_UNIT_ANALYSESONG, "analysesong_unit",
     (spell_f)sp_analysesong_unit, NULL
   },
   {
-    SPL_CERRDOR_FUMBLESHIELD, "cerrdorfumbleshield", NULL, NULL, NULL,
-    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_CERRDOR_FUMBLESHIELD, "cerrdorfumbleshield",
     (spell_f)sp_fumbleshield, NULL
   },
-  { SPL_CALM_MONSTER, "calm_monster", NULL, NULL,
-    "u",
-    M_CERDDOR,
-    (UNITSPELL | ONSHIPCAST | TESTRESISTANCE | TESTCANSEE),
-    5, 6,
-    {
-      { "aura", 15, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+  { SPL_CALM_MONSTER, "calm_monster",
     (spell_f)sp_calm_monster, NULL
   },
-  { SPL_SEDUCE, "seduction", NULL, NULL,
-    "u",
-    M_CERDDOR,
-    (UNITSPELL | TESTRESISTANCE | TESTCANSEE),
-    5, 6,
-    {
-      { "aura", 12, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+  { SPL_SEDUCE, "seduction",
     (spell_f)sp_seduce, NULL
   },
   {
-    SPL_HEADACHE, "headache", NULL, NULL,
-    "u",
-    M_CERDDOR,
-    (UNITSPELL | TESTRESISTANCE | TESTCANSEE),
-    5, 7,
-    {
-      { "aura", 4, SPC_LINEAR },
-      { "h7", 3, SPC_FIX },
-      { "money", 50, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_HEADACHE, "headache",
     (spell_f)sp_headache, NULL
   },
-  { SPL_PUMP, "sound_out", NULL,
-    NULL,
-    "ur",
-    M_CERDDOR, (UNITSPELL | TESTCANSEE), 5, 7,
-    {
-      { "aura", 4, SPC_FIX },
-      { "money", 100, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+  { SPL_PUMP, "sound_out",
     (spell_f)sp_pump, NULL
   },
   {
-    SPL_BLOODTHIRST, "bloodthirst", NULL, NULL, NULL,
-    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 4, 7,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_BLOODTHIRST, "bloodthirst",
     (spell_f)sp_berserk, NULL
   },
   {
-    SPL_FRIGHTEN, "frighten", NULL, NULL, NULL,
-    M_CERDDOR, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FRIGHTEN, "frighten",
     (spell_f)sp_frighten, NULL
   },
   {
-    SPL_OBJ_ANALYSESONG, "analyse_object", NULL, NULL,
-    "kc?",
-    M_CERDDOR, (SPELLLEVEL | ONSHIPCAST | REGIONSPELL | BUILDINGSPELL | SHIPSPELL), 5, 8,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_OBJ_ANALYSESONG, "analyse_object",
     (spell_f)sp_analysesong_obj, NULL
   },
   {
-    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic", NULL, NULL,
-    "kc?",
-    M_CERDDOR,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
-    2, 8,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic",
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_MIGRANT, "migration", NULL, NULL,
-    "u",
-    M_CERDDOR, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 9,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { "permaura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MIGRANT, "migration",
     (spell_f)sp_migranten, NULL
   },
   {
-    SPL_CERDDOR_FAMILIAR, "summon_familiar", NULL, NULL, NULL,
-    M_CERDDOR, (NOTFAMILIARCAST), 5, 9,
-    {
-      { "aura", 100, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_CERDDOR_FAMILIAR, "summon_familiar",
     (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_RAISEPEASANTS, "raise_mob", NULL, NULL, NULL,
-    M_CERDDOR, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_RAISEPEASANTS, "raise_mob",
     (spell_f)sp_raisepeasants, NULL
   },
   {
     SPL_SONG_RESISTMAGIC, "song_resist_magic",
-    NULL, NULL, NULL,
-    M_CERDDOR,
-    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-    2, 10,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_song_resistmagic, NULL
   },
   {
-    SPL_DEPRESSION, "melancholy", NULL, NULL, NULL,
-    M_CERDDOR, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
-    {
-      { "aura", 40, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DEPRESSION, "melancholy",
     (spell_f)sp_depression, NULL
   },
   {
-    SPL_SONG_SUSCEPTMAGIC, "song_suscept_magic", NULL, NULL, NULL,
-    M_CERDDOR,
-    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-    2, 12,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SONG_SUSCEPTMAGIC, "song_suscept_magic",
     (spell_f)sp_song_susceptmagic, NULL
   },
   {
-    SPL_SONG_OF_PEACE, "song_of_peace", NULL, NULL, NULL,
-    M_CERDDOR, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 12,
-    {
-      { "aura", 20, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SONG_OF_PEACE, "song_of_peace",
     (spell_f)sp_song_of_peace, NULL
   },
   {
-    SPL_SONG_OF_ENSLAVE, "song_of_slavery", NULL, NULL,
-    "u",
-    M_CERDDOR, (UNITSPELL | TESTCANSEE), 5, 13,
-    {
-      { "aura", 40, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SONG_OF_ENSLAVE, "song_of_slavery",
     (spell_f)sp_charmingsong, NULL
   },
   {
-    SPL_BIGRECRUIT, "big_recruit", NULL, NULL, NULL,
-    M_CERDDOR, (SPELLLEVEL), 5, 14,
-    {
-      { "aura", 20, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_BIGRECRUIT, "big_recruit",
     (spell_f)sp_bigrecruit, NULL
   },
   {
-    SPL_RALLYPEASANTMOB, "calm_riot", NULL, NULL, NULL,
-    M_CERDDOR, (FARCASTING), 5, 15,
-    {
-      { "aura", 30, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_RALLYPEASANTMOB, "calm_riot",
     (spell_f)sp_rallypeasantmob, NULL
   },
   {
     SPL_RAISEPEASANTMOB, "incite_riot",
-        NULL, NULL, NULL,
-    M_CERDDOR, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 16,
-    {
-      { "aura", 40, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_raisepeasantmob, NULL
+        (spell_f)sp_raisepeasantmob, NULL
   },
   /* M_TYBIED */
   {
-    SPL_ANALYSEMAGIC, "analyze_magic", NULL, NULL,
-    "kc?",
-    M_TYBIED, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ANALYSEMAGIC, "analyze_magic",
     (spell_f)sp_analysemagic, NULL
   },
   {
-    SPL_ITEMCLOAK, "concealing_aura", NULL, NULL,
-    "u",
-    M_TYBIED, (SPELLLEVEL | UNITSPELL | ONSHIPCAST), 5, 1,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ITEMCLOAK, "concealing_aura",
     (spell_f)sp_itemcloak, NULL
   },
   {
-    SPL_TYBIED_FUMBLESHIELD, "tybiedfumbleshield", NULL, NULL, NULL,
-    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 2, 2,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TYBIED_FUMBLESHIELD, "tybiedfumbleshield",
     (spell_f)sp_fumbleshield, NULL
   },
 #ifdef SHOWASTRAL_NOT_BORKED
   {
     SPL_SHOWASTRAL, "show_astral",
-        NULL, NULL, NULL,
-    M_TYBIED, (SPELLLEVEL), 5, 2,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_showastral, NULL
+        (spell_f)sp_showastral, NULL
   },
 #endif
   {
-    SPL_RESISTMAGICBONUS, "resist_magic", NULL, NULL, "u+",
-    M_TYBIED,
-    (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE),
-    2, 3,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_RESISTMAGICBONUS, "resist_magic",
     (spell_f)sp_resist_magic_bonus, NULL
   },
   {
-    SPL_KEEPLOOT, "keeploot", NULL, NULL, NULL,
-    M_TYBIED, ( POSTCOMBATSPELL | SPELLLEVEL ), 5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_KEEPLOOT, "keeploot",
     (spell_f)sp_keeploot, NULL
   },
   {
-    SPL_ENTERASTRAL, "enterastral", 0, 0, "u+",
-    M_TYBIED, (UNITSPELL|SPELLLEVEL), 7, 4,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ENTERASTRAL, "enterastral",
     (spell_f)sp_enterastral, NULL
   },
   {
-    SPL_LEAVEASTRAL, "leaveastral", NULL, NULL,
-    "ru+",
-    M_TYBIED, (UNITSPELL |SPELLLEVEL), 7, 4,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_LEAVEASTRAL, "leaveastral",
     (spell_f)sp_leaveastral, NULL
   },
   {
-    SPL_TRANSFERAURA_ASTRAL, "auratransfer", NULL, "aura", "ui",
-    M_TYBIED, (UNITSPELL|ONSHIPCAST), 1, 5,
-    {
-      { "aura", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TRANSFERAURA_ASTRAL, "auratransfer",
     (spell_f)sp_transferaura, NULL
   },
   {
-    SPL_SHOCKWAVE, "shockwave", NULL, NULL, NULL,
-    M_TYBIED, (COMBATSPELL|SPELLLEVEL), 5, 5,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SHOCKWAVE, "shockwave",
     (spell_f)sp_stun, NULL
   },
   {
-    SPL_ANTIMAGICZONE, "antimagiczone", NULL, NULL, NULL,
-    M_TYBIED, (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-    2, 5,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ANTIMAGICZONE, "antimagiczone",
     (spell_f)sp_antimagiczone, NULL
   },
   {
-    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic", NULL, NULL,
-    "kc?",
-    M_TYBIED,
-    (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET),
-    2, 5,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic",
     (spell_f)sp_destroy_magic, NULL
   },
   {
-    SPL_PULLASTRAL, "pull_astral", NULL, NULL,
-    "ru+",
-    M_TYBIED, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_PULLASTRAL, "pull_astral",
     (spell_f)sp_pullastral, NULL
   },
 
   {
-    SPL_FETCHASTRAL, "fetch_astral", NULL, NULL, "u+",
-    M_TYBIED, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FETCHASTRAL, "fetch_astral",
     (spell_f)sp_fetchastral, NULL
   },
   {
-    SPL_STEALAURA, "steal_aura", NULL, NULL, "u",
-    M_TYBIED,
-    (FARCASTING | SPELLLEVEL | UNITSPELL | TESTRESISTANCE | TESTCANSEE),
-    3, 6,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_STEALAURA, "steal_aura",
     (spell_f)sp_stealaura, NULL
   },
   {
-    SPL_FLYING_SHIP, "airship", NULL, NULL, "s",
-    M_TYBIED, (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE), 5, 6,
-    {
-      { "aura", 10, SPC_FIX },
-      { "h12", 1, SPC_FIX },
-      { "h20", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_FLYING_SHIP, "airship",
     (spell_f)sp_flying_ship, NULL
   },
   {
-    SPL_DESTROY_MAGIC, "break_curse", NULL, "spellid",
-    "kcc?",
-    M_TYBIED, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE | ANYTARGET), 3, 7,
-    {
-      { "aura", 3, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DESTROY_MAGIC, "break_curse",
     (spell_f)sp_break_curse, NULL
   },
   {
-    SPL_ETERNIZEWALL, "eternal_walls", NULL, NULL, "b",
-    M_TYBIED,
-    (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE | ONSHIPCAST),
-    5, 7,
-    {
-      { "aura", 50, SPC_FIX },
-      { "permaura", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_ETERNIZEWALL, "eternal_walls",
     (spell_f)sp_eternizewall, NULL
   },
   {
-    SPL_SCHILDRUNEN, "protective_runes", NULL, NULL, "kc",
-    M_TYBIED, (ONSHIPCAST | TESTRESISTANCE | BUILDINGSPELL | SHIPSPELL), 2, 8,
-    {
-      { "aura", 20, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SCHILDRUNEN, "protective_runes",
     (spell_f)sp_magicrunes, NULL
   },
 
   {
     SPL_REDUCESHIELD, "fish_shield",
-    NULL, NULL, NULL,
-    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 2, 8,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_reduceshield, NULL
   },
   {
     SPL_SPEED, "combat_speed",
-    NULL, NULL, NULL,
-    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 5, 9,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_speed, NULL
   },
   {
     SPL_VIEWREALITY, "view_reality",
-    NULL, NULL, NULL,
-    M_TYBIED, (0), 5, 10,
-    {
-      { "aura", 40, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_viewreality, NULL
   },
   {
-    SPL_SPEED2, "double_time", NULL, NULL,
-    "u+",
-    M_TYBIED, (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 5, 11,
-    {
-      { "aura", 5, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_SPEED2, "double_time",
     (spell_f)sp_speed2, NULL
   },
   {
     SPL_ARMORSHIELD, "armor_shield",
-        NULL, NULL, NULL,
-    M_TYBIED, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
-    {
-      { "aura", 4, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_armorshield, NULL
+        (spell_f)sp_armorshield, NULL
   },
   {
     SPL_TYBIED_FAMILIAR, "summon_familiar",
-        NULL, NULL, NULL,
-    M_TYBIED, (NOTFAMILIARCAST), 5, 12,
-    {
-      { "aura", 100, SPC_FIX },
-      { "permaura", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_summon_familiar, NULL
+        (spell_f)sp_summon_familiar, NULL
   },
   {
-    SPL_MOVECASTLE, "living_rock", NULL, "direction", "bc",
-    M_TYBIED, (SPELLLEVEL | BUILDINGSPELL | TESTRESISTANCE), 5, 13,
-    {
-      { "aura", 10, SPC_LEVEL },
-      { "permaura", 1, SPC_FIX },
-      { "laen", 5, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_MOVECASTLE, "living_rock",
     (spell_f)sp_movecastle, NULL
   },
   {
-    SPL_DISRUPTASTRAL, "astral_disruption", NULL, NULL, NULL,
-    M_TYBIED, (REGIONSPELL | SPELLLEVEL), 4, 14,
-    {
-      { "aura", 140, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_DISRUPTASTRAL, "astral_disruption",
     (spell_f)sp_disruptastral, NULL
   },
   {
-    SPL_PERMTRANSFER, "sacrifice_strength", NULL,
-    "aura", "ui",
-    M_TYBIED, (UNITSPELL), 1, 15,
-    {
-      { "aura", 100, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_PERMTRANSFER, "sacrifice_strength",
     (spell_f)sp_permtransfer, NULL
   },
   /* M_GRAY */
   /*  Definitionen von Create_Artefaktsprüchen    */
   {
     SPL_METEORRAIN, "meteor_rain",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL | SPELLLEVEL), 5, 3,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_kampfzauber, NULL
   },
   {
     SPL_BECOMEWYRM, "wyrm_transformation",
-    NULL, NULL, NULL,
-    M_GRAY, 0, 5, 1,
-    {
-      { "aura", 1, SPC_FIX },
-      { "permaura", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_becomewyrm, NULL
   },
   /* Monstersprüche */
   { SPL_FIREDRAGONODEM, "fiery_dragonbreath",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 3,
-    {
-      { "aura", 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_dragonodem, NULL
   },
   { SPL_DRAGONODEM, "icy_dragonbreath",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 6,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_dragonodem, NULL
   },
   { SPL_WYRMODEM, "powerful_dragonbreath",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 12,
-    {
-      { "aura", 3, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_dragonodem, NULL
   },
   { SPL_DRAINODEM, "drain_skills",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 12,
-    {
-      { "aura", 4, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_dragonodem, NULL
   },
   {
     SPL_AURA_OF_FEAR, "aura_of_fear",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 12,
-    {
-      { "aura", 1, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_flee, NULL
   },
   {
     SPL_SHADOWCALL, "shadowcall",
-    NULL, NULL, NULL,
-    M_GRAY, (PRECOMBATSPELL), 5, 12,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_shadowcall, NULL
   },
   {
     SPL_IMMOLATION, "immolation",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 12,
-    {
-      { "aura", 2, SPC_LEVEL },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_immolation, NULL
   },
   { SPL_FIREODEM, "firestorm",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 8,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_immolation, NULL
   },
   { SPL_ICEODEM, "coldfront",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 8,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_immolation, NULL
   },
   { SPL_ACIDODEM, "acidrain",
-    NULL, NULL, NULL,
-    M_GRAY, (COMBATSPELL), 5, 8,
-    {
-      { "aura", 2, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
     (spell_f)sp_immolation, NULL
   },
   /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
   {
-    SPL_NOSPELL, "no spell", NULL, NULL, NULL, 0, 0, 0, 0,
-    {
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
+    SPL_NOSPELL, "no spell",
     NULL, NULL
   }
 };
@@ -8831,43 +7499,6 @@ set_spelldata(spell * sp)
   }
   log_error(("unknown spell %s.\n", sp->sname));
   assert(!"there is no spell by that name");
-}
-
-void
-init_spells(void)
-{
-  int i;
-
-  /* register all the old spells in the spelldata array */
-  for (i=0;spelldaten[i].id!=SPL_NOSPELL;++i) {
-    int n;
-    spelldata * data = spelldaten+i;
-    spell * sp = malloc(sizeof(spell));
-
-    sp->id = data->id;
-    sp->sname = strdup(data->sname);
-    if (data->info) {
-      locale_setstring(default_locale, mkname("spellinfo", data->sname), data->info);
-    }
-    sp->parameter = data->parameter?strdup(data->parameter):0;
-    sp->syntax = data->syntax?strdup(data->syntax):0;
-    sp->magietyp = data->magietyp;
-    sp->sptyp = data->sptyp;
-    sp->rank = data->rank;
-    sp->level = data->level;
-
-    for (n=0;n!=5 && data->components[n].name;++n);
-    sp->components = malloc(sizeof(spell_component) *(n+1));
-    sp->components[n].type = NULL;
-    while (n-->0) {
-      sp->components[n].type = rt_find(data->components[n].name);
-      sp->components[n].amount = data->components[n].amount;
-      sp->components[n].cost = data->components[n].flags;
-    }
-
-    set_spelldata_i(sp, data);
-    register_spell(sp);
-  }
 }
 
 void

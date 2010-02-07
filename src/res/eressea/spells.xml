@@ -1,5 +1,494 @@
 <?xml version="1.0"?>
 <spells>
+  <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="hail" type="gwyrrd" rank="5" level="3" index="5" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="rustweapon" type="gwyrrd" rank="5" level="3" index="6" parameters="u+" los="true" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="combatrust" type="draig" rank="5" level="6" index="7" variable="true" combat="2">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="treegrow" type="gwyrrd" rank="5" level="2" index="8" far="true" variable="true">
+    <resource name="aura" amount="4" cost="level"/>
+    <resource name="log" amount="1" cost="level"/>
+    <resource name="p2" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="healing" type="gwyrrd" rank="5" level="5" index="9" variable="true" combat="3">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="song_of_healing" type="cerddor" rank="5" level="2" index="10" variable="true" combat="3">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="bad_dreams" type="illaun" rank="5" level="10" index="11" far="true">
+    <resource name="aura" amount="90" cost="fixed"/>
+  </spell>
+  <spell name="gooddreams" type="illaun" rank="5" level="8" index="12" far="true">
+    <resource name="aura" amount="80" cost="fixed"/>
+  </spell>
+  <spell name="dreamreading" type="illaun" rank="5" level="4" index="13" parameters="u" far="true">
+    <resource name="aura" amount="8" cost="fixed"/>
+  </spell>
+  <spell name="tiredsoldiers" type="illaun" rank="5" level="4" index="15" variable="true" combat="1">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="plague" type="draig" rank="5" level="7" index="16" far="true">
+    <resource name="aura" amount="30" cost="fixed"/>
+    <resource name="peasant" amount="50" cost="fixed"/>
+  </spell>
+  <spell name="magicboost" type="draig" rank="3" level="3" index="17" ship="true">
+    <resource name="aura" amount="2" cost="linear"/>
+  </spell>
+  <spell name="chaosrow" type="draig" rank="5" level="8" index="18" variable="true" combat="1">
+    <resource name="aura" amount="3" cost="level"/>
+    <resource name="peasant" amount="10" cost="fixed"/>
+  </spell>
+  <spell name="song_of_confusion" type="cerddor" rank="5" level="4" index="19" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="flee" type="illaun" rank="5" level="2" index="20" variable="true" combat="1">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="song_of_fear" type="cerddor" rank="5" level="3" index="21" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="berserk" type="draig" rank="4" level="5" index="22" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+    <resource name="peasant" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="bloodthirst" type="cerddor" rank="4" level="7" index="23" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="maelstrom" type="gwyrrd" rank="5" level="15" index="24" ship="true" ocean="true">
+    <resource name="aura" amount="200" cost="fixed"/>
+    <resource name="seaserpenthead" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="transferauradruide" type="gwyrrd" rank="1" level="6" index="27" syntax="aura" parameters="ui" ship="true">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="transfer_aura_song" type="cerddor" rank="1" level="5" index="28" syntax="aura" parameters="ui" ship="true">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="transferaurachaos" type="draig" rank="1" level="7" index="29" syntax="aura" parameters="ui" ship="true">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="transferauratraum" type="illaun" rank="1" level="3" index="30" syntax="aura" parameters="ui" ship="true">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="auratransfer" type="tybied" rank="1" level="5" index="31" syntax="aura" parameters="ui" ship="true">
+    <resource name="aura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="stonegolem" type="gwyrrd" rank="4" level="1" index="32" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+    <resource name="stone" amount="1" cost="level"/>
+    <resource name="p2" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="irongolem" type="gwyrrd" rank="4" level="2" index="33" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+    <resource name="iron" amount="1" cost="level"/>
+    <resource name="p2" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="summonshadow" type="draig" rank="5" level="8" index="34" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="summonshadowlords" type="draig" rank="5" level="12" index="35" variable="true">
+    <resource name="aura" amount="7" cost="level"/>
+  </spell>
+  <spell name="reelingarrows" type="gwyrrd" rank="5" level="5" index="36" variable="true" combat="1">
+    <resource name="aura" amount="15" cost="fixed"/>
+  </spell>
+  <spell name="antimagiczone" type="tybied" rank="2" level="5" index="37" far="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="cold_protection" type="gwyrrd" rank="5" level="3" index="39" parameters="u+" los="true" ship="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="steal_aura" type="tybied" rank="3" level="6" index="40" parameters="u" los="true" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="summonundead" type="draig" rank="5" level="6" index="41" ship="true" far="true" variable="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="auraleak" type="draig" rank="3" level="9" index="42">
+    <resource name="aura" amount="35" cost="fixed"/>
+    <resource name="dragonblood" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="great_drought" type="gwyrrd" rank="5" level="17" index="43" far="true">
+    <resource name="aura" amount="800" cost="fixed"/>
+  </spell>
+  <spell name="strongwall" type="gwyrrd" rank="5" level="8" index="44" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="homestone" type="gwyrrd" rank="5" level="7" index="45">
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="summonfireelemental" type="gwyrrd" rank="5" level="13" index="46" far="true">
+    <resource name="aura" amount="600" cost="fixed"/>
+  </spell>
+  <spell name="forestfire" type="draig" rank="5" level="10" index="47" far="true">
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="oil" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="summonent" type="gwyrrd" rank="5" level="10" index="49" variable="true">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="disturbingdreams" type="illaun" rank="5" level="6" index="50" far="true">
+    <resource name="aura" amount="18" cost="fixed"/>
+  </spell>
+  <spell name="appeasement" type="cerddor" rank="5" level="1" index="51" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="sleep" type="illaun" rank="5" level="7" index="52" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="earthquake" type="gwyrrd" rank="5" level="6" index="53" far="true">
+    <resource name="aura" amount="25" cost="fixed"/>
+    <resource name="laen" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="ironkeeper" type="gwyrrd" rank="5" level="3" index="54" far="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="stormwinds" type="gwyrrd" rank="5" level="6" index="55" parameters="s+" ship="true" ocean="true" variable="true">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="goodwinds" type="gwyrrd" rank="5" level="4" index="56" parameters="s" ship="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="airship" type="tybied" rank="5" level="6" index="57" parameters="s" ship="true">
+    <resource name="aura" amount="10" cost="fixed"/>
+    <resource name="h12" amount="1" cost="fixed"/>
+    <resource name="h20" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="summon_alp" type="illaun" rank="5" level="15" index="58" parameters="u">
+    <resource name="aura" amount="350" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+    <resource name="h8" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="windshield" type="gwyrrd" rank="5" level="4" index="59" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="raise_mob" type="cerddor" rank="5" level="10" index="60" variable="true">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="melancholy" type="cerddor" rank="5" level="11" index="61" far="true">
+    <resource name="aura" amount="40" cost="fixed"/>
+  </spell>
+  <spell name="headache" type="cerddor" rank="5" level="7" index="62" parameters="u" los="true">
+    <resource name="aura" amount="4" cost="linear"/>
+    <resource name="h7" amount="3" cost="fixed"/>
+    <resource name="money" amount="50" cost="fixed"/>
+  </spell>
+  <spell name="enterastral" type="tybied" rank="7" level="4" index="64" parameters="u+" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="leaveastral" type="tybied" rank="7" level="4" index="65" parameters="ru+" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="versteinern" type="gwyrrd" rank="5" level="8" index="67" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="treewalkenter" type="gwyrrd" rank="7" level="9" index="68" parameters="u+" los="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="treewalkexit" type="gwyrrd" rank="7" level="9" index="69" parameters="ru+" los="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="chaossuction" type="draig" rank="5" level="14" index="70">
+    <resource name="aura" amount="150" cost="fixed"/>
+    <resource name="peasant" amount="200" cost="fixed"/>
+  </spell>
+  <spell name="view_reality" type="tybied" rank="5" level="10" index="71">
+    <resource name="aura" amount="40" cost="fixed"/>
+  </spell>
+  <spell name="astral_disruption" type="tybied" rank="4" level="14" index="72" variable="true">
+    <resource name="aura" amount="140" cost="fixed"/>
+  </spell>
+  <spell name="seduction" type="cerddor" rank="5" level="6" index="73" parameters="u" los="true">
+    <resource name="aura" amount="12" cost="fixed"/>
+  </spell>
+  <spell name="sound_out" type="cerddor" rank="5" level="7" index="74" parameters="ur" los="true">
+    <resource name="aura" amount="4" cost="fixed"/>
+    <resource name="money" amount="100" cost="fixed"/>
+  </spell>
+  <spell name="calm_monster" type="cerddor" rank="5" level="6" index="75" parameters="u" los="true" ship="true">
+    <resource name="aura" amount="15" cost="fixed"/>
+  </spell>
+  <spell name="heroic_song" type="cerddor" rank="4" level="5" index="76" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="frighten" type="cerddor" rank="5" level="8" index="77" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="mindblast" type="illaun" rank="5" level="11" index="78" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="combat_speed" type="tybied" rank="5" level="9" index="79" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="double_time" type="tybied" rank="5" level="11" index="80" parameters="u+" los="true" ship="true" variable="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="fiery_dragonbreath" type="gray" rank="5" level="3" index="81" combat="2">
+    <resource name="aura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="icy_dragonbreath" type="gray" rank="5" level="6" index="82" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="powerful_dragonbreath" type="gray" rank="5" level="12" index="83" combat="2">
+    <resource name="aura" amount="3" cost="fixed"/>
+  </spell>
+  <spell name="magicstreet" type="gwyrrd" rank="5" level="4" index="84" ship="true" far="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+    <resource name="stone" amount="1" cost="fixed"/>
+    <resource name="log" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="reanimate" type="illaun" rank="4" level="5" index="85" variable="true" combat="3">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="courting" type="cerddor" rank="5" level="4" index="86" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="generous" type="cerddor" rank="5" level="2" index="87" ship="true" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="sacrifice_strength" type="tybied" rank="1" level="15" index="88" syntax="aura" parameters="ui">
+    <resource name="aura" amount="100" cost="fixed"/>
+  </spell>
+  <spell name="song_of_peace" type="cerddor" rank="5" level="12" index="89" variable="true">
+    <resource name="aura" amount="20" cost="level"/>
+  </spell>
+  <spell name="migration" type="cerddor" rank="5" level="9" index="90" parameters="u" los="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+    <resource name="permaura" amount="1" cost="level"/>
+  </spell>
+  <spell name="calm_riot" type="cerddor" rank="5" level="15" index="91" far="true">
+    <resource name="aura" amount="30" cost="fixed"/>
+  </spell>
+  <spell name="incite_riot" type="cerddor" rank="5" level="16" index="92" far="true">
+    <resource name="aura" amount="40" cost="fixed"/>
+  </spell>
+  <spell name="shapeshift" type="illaun" rank="5" level="3" index="93" syntax="race" parameters="uc" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="wolfhowl" type="gwyrrd" rank="5" level="7" index="94" variable="true" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="resist_magic" type="tybied" rank="2" level="3" index="97" parameters="u+" los="true" ship="true" variable="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="keeploot" type="tybied" rank="5" level="3" index="98" variable="true" combat="3">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="protective_runes" type="tybied" rank="2" level="8" index="99" parameters="kc" ship="true">
+    <resource name="aura" amount="20" cost="fixed"/>
+  </spell>
+  <spell name="song_resist_magic" type="cerddor" rank="2" level="10" index="100" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="song_suscept_magic" type="cerddor" rank="2" level="12" index="101" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="analyze_magic" type="tybied" rank="5" level="1" index="102" parameters="kc?" los="true" ship="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="analysedream" type="illaun" rank="5" level="5" index="103" parameters="u" los="true" ship="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="analysesong_unit" type="cerddor" rank="5" level="5" index="104" parameters="u" los="true" ship="true">
+    <resource name="aura" amount="10" cost="fixed"/>
+  </spell>
+  <spell name="analyse_object" type="cerddor" rank="5" level="8" index="105" parameters="kc?" ship="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="destroy_magic" type="tybied" rank="2" level="5" index="106" parameters="kc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="break_curse" type="tybied" rank="3" level="7" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="meteor_rain" type="gray" rank="5" level="3" index="108" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="fish_shield" type="tybied" rank="2" level="8" index="109" variable="true" combat="1">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="armor_shield" type="tybied" rank="2" level="12" index="110" variable="true" combat="1">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="deathcloud" type="draig" rank="5" level="11" index="111" far="true">
+    <resource name="aura" amount="40" cost="fixed"/>
+    <resource name="hp" amount="15" cost="fixed"/>
+  </spell>
+  <spell name="orkdream" type="illaun" rank="5" level="12" index="112" parameters="u+" los="true" variable="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="summondragon" type="draig" rank="5" level="11" index="113" far="true">
+    <resource name="aura" amount="80" cost="fixed"/>
+    <resource name="dragonhead" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="living_rock" type="tybied" rank="5" level="13" index="116" syntax="direction" parameters="bc" variable="true">
+    <resource name="aura" amount="10" cost="level"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="laen" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="blessstonecircle" type="gwyrrd" rank="5" level="11" index="117" parameters="b">
+    <resource name="aura" amount="350" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="illaunfamiliar" type="illaun" rank="5" level="9" index="118">
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="gwyrrdfamiliar" type="gwyrrd" rank="5" level="10" index="119">
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="draigfamiliar" type="draig" rank="5" level="13" index="120">
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="summon_familiar" type="cerddor" rank="5" level="9" index="121">
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="summon_familiar" type="tybied" rank="5" level="12" index="122">
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="song_of_slavery" type="cerddor" rank="5" level="13" index="123" parameters="u" los="true">
+    <resource name="aura" amount="40" cost="fixed"/>
+  </spell>
+  <spell name="fumblecurse" type="draig" rank="4" level="5" index="136" parameters="u" los="true" variable="true">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="icastle" type="illaun" rank="5" level="3" index="137" syntax="buildingtype" parameters="c">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="gwyrrddestroymagic" type="gwyrrd" rank="2" level="8" index="138" parameters="kc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="draigdestroymagic" type="draig" rank="2" level="10" index="139" parameters="kc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="10" cost="level"/>
+  </spell>
+  <spell name="illaundestroymagic" type="illaun" rank="2" level="8" index="140" parameters="kc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="cerddor_destroymagic" type="cerddor" rank="2" level="8" index="141" parameters="kc?" los="true" ship="true" far="true" variable="true">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="barkskin" type="gwyrrd" rank="2" level="12" index="142" variable="true" combat="1">
+    <resource name="aura" amount="4" cost="level"/>
+  </spell>
+  <spell name="draigfumbleshield" type="draig" rank="2" level="9" index="143" variable="true" combat="1">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="gwyrrdfumbleshield" type="gwyrrd" rank="2" level="5" index="144" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="cerrdorfumbleshield" type="cerddor" rank="2" level="5" index="145" variable="true" combat="1">
+    <resource name="aura" amount="5" cost="level"/>
+  </spell>
+  <spell name="tybiedfumbleshield" type="tybied" rank="2" level="2" index="146" variable="true" combat="1">
+    <resource name="aura" amount="3" cost="level"/>
+  </spell>
+  <spell name="shadowknights" type="illaun" rank="4" level="1" index="147" variable="true" combat="1">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="concealing_aura" type="tybied" rank="5" level="1" index="150" parameters="u" ship="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="firewall" type="draig" rank="4" level="7" index="151" syntax="direction" parameters="c" variable="true">
+    <resource name="aura" amount="6" cost="level"/>
+  </spell>
+  <spell name="wisps" type="illaun" rank="5" level="7" index="152" syntax="direction" parameters="c" far="true" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="sparklechaos" type="draig" rank="5" level="1" index="153" parameters="u" los="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="sparkledream" type="illaun" rank="5" level="1" index="154" parameters="u" los="true" ship="true" variable="true">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="pull_astral" type="tybied" rank="7" level="6" index="156" parameters="ru+" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="fetch_astral" type="tybied" rank="7" level="6" index="157" parameters="u+" variable="true">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="shockwave" type="tybied" rank="5" level="5" index="163" variable="true" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="undeadhero" type="draig" rank="5" level="9" index="164" variable="true" combat="3">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="wyrm_transformation" type="gray" rank="5" level="1" index="166">
+    <resource name="aura" amount="1" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="eternal_walls" type="tybied" rank="5" level="7" index="167" parameters="b" ship="true" variable="true">
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="puttorest" type="illaun" rank="5" level="2" index="168" variable="true">
+    <resource name="aura" amount="3" cost="level"/>
+    <resource name="p2" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="unholypower" type="draig" rank="5" level="14" index="169" parameters="u+" los="true" variable="true">
+    <resource name="aura" amount="10" cost="level"/>
+    <resource name="peasant" amount="5" cost="level"/>
+  </spell>
+  <spell name="holyground" type="gwyrrd" rank="5" level="9" index="170">
+    <resource name="aura" amount="80" cost="fixed"/>
+    <resource name="permaura" amount="3" cost="fixed"/>
+  </spell>
+  <spell name="bloodsacrifice" type="draig" rank="1" level="4" index="171" ship="true">
+    <resource name="hp" amount="4" cost="level"/>
+  </spell>
+  <spell name="magic_roots" type="gwyrrd" rank="5" level="16" index="172" far="true">
+    <resource name="aura" amount="250" cost="fixed"/>
+    <resource name="permaura" amount="10" cost="fixed"/>
+    <resource name="toadslime" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="clone" type="illaun" rank="5" level="9" index="173">
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="20" cost="fixed"/>
+    <resource name="dragonblood" amount="5" cost="fixed"/>
+    <resource name="p2" amount="5" cost="fixed"/>
+  </spell>
+  <spell name="drain_skills" type="gray" rank="5" level="12" index="174" combat="2">
+    <resource name="aura" amount="4" cost="fixed"/>
+  </spell>
+  <spell name="aura_of_fear" type="gray" rank="5" level="12" index="175" combat="2">
+    <resource name="aura" amount="1" cost="level"/>
+  </spell>
+  <spell name="shadowcall" type="gray" rank="5" level="12" index="176" combat="1">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="mallorntreegrow" type="gwyrrd" rank="5" level="4" index="177" far="true" variable="true">
+    <resource name="aura" amount="6" cost="level"/>
+    <resource name="mallorn" amount="1" cost="level"/>
+    <resource name="p2" amount="1" cost="fixed"/>
+  </spell>
+  <spell name="big_recruit" type="cerddor" rank="5" level="14" index="179" variable="true">
+    <resource name="aura" amount="20" cost="level"/>
+  </spell>
+  <spell name="immolation" type="gray" rank="5" level="12" index="180" combat="2">
+    <resource name="aura" amount="2" cost="level"/>
+  </spell>
+  <spell name="firestorm" type="gray" rank="5" level="8" index="181" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="coldfront" type="gray" rank="5" level="8" index="182" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+  <spell name="acidrain" type="gray" rank="5" level="8" index="183" combat="2">
+    <resource name="aura" amount="2" cost="fixed"/>
+  </spell>
+
   <!-- draig spells -->
   <spell name="create_roi" type="draig" ship="true" rank="5" level="6" index="130">
     <function name="cast" value="lua_castspell"/>

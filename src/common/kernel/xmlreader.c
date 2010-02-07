@@ -1522,9 +1522,6 @@ parse_spells(xmlDocPtr doc)
 
   xmlXPathFreeContext(xpath);
 
-  if (get_param_int(global.parameters, "init_spells", 1)!=0) {
-    init_spells();
-  }
   return 0;
 }
 
