@@ -852,6 +852,7 @@ tolua_write_spells(lua_State* L)
   for (splist=spells; splist; splist=splist->next) {
     spell * sp = splist->data;
     if (sp->sp_function!=fun) {
+      int combat = 0;
       xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
       xmlNewProp(node, BAD_CAST "name", BAD_CAST sp->sname);
       xmlNewProp(node, BAD_CAST "type", BAD_CAST magic_school[sp->magietyp]);
@@ -886,6 +887,13 @@ tolua_write_spells(lua_State* L)
       }
       if (sp->sptyp & SPELLLEVEL) {
         xmlNewProp(node, BAD_CAST "variable", BAD_CAST "true");
+      }
+
+      if (sp->sptyp & POSTCOMBATSPELL) combat = 3;
+      else if (sp->sptyp & COMBATSPELL) combat = 2;
+      else if (sp->sptyp & PRECOMBATSPELL) combat = 1;
+      if (combat) {
+        xmlNewProp(node, BAD_CAST "combat", xml_i(combat));
       }
       xmlAddChild(root, node); 
     }
