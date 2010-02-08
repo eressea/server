@@ -75,7 +75,6 @@ LUASERVER_SOURCES =
  <common!iniparser>iniparser.c
  <curses>listbox.c
  server.c
- korrektur.c
  console.c
  editing.c
  gmtool.c

@@ -19,7 +19,6 @@
 
 #include "eressea/console.c"
 #include "eressea/editing.c"
-#include "eressea/korrektur.c"
 
 #include "common/gamecode/archetype.c"
 #include "common/gamecode/creation.c"
