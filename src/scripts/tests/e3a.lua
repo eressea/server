@@ -412,7 +412,7 @@ function test_canoe_passes_through_land()
   assert_equal(u2.region.id, dst.id, "canoe could not leave coast")
 end
 
-function test_give_only_a_third_of_items()
+function test_give_50_percent_of_money()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
   local r = u2.region
   u1.faction.age = 10
@@ -420,7 +420,7 @@ function test_give_only_a_third_of_items()
   u1:add_item("money", 500)
   local m1, m2 = u1:get_item("money"), u2:get_item("money")
   u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 221 Silber")
   u2:clear_orders()
   u2:add_order("LERNEN Hiebwaffen")
   process_orders()
@@ -429,14 +429,33 @@ function test_give_only_a_third_of_items()
 
   m1, m2 = u1:get_item("money"), u2:get_item("money")
   u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Silber")
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 221 Silber")
   u2:clear_orders()
-  u2:add_order("HELFE " .. itoa36(u1.faction.id) .. " GIB")
+  u2:add_order("HELFEN " .. itoa36(u1.faction.id) .. " GIB")
   u2:add_item("horse", 100)
   u2:add_order("GIB 0 ALLES PFERD")
   local h = r:get_resource("horse")
   process_orders()
   assert(r:get_resource("horse")>=h+100)
-  assert_equal(m1-332-10*u1.number, u1:get_item("money"))
+  assert_equal(m1-221-10*u1.number, u1:get_item("money"))
   assert_equal(m2+110-10*u2.number, u2:get_item("money"))
+end
+
+function test_give_100_percent_of_items()
+  free_game()
+  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
+  local r = u2.region
+  u1.faction.age = 10
+  u2.faction.age = 10
+  u1:add_item("money", 500)
+  u1:add_item("log", 500)
+  local m1, m2 = u1:get_item("log"), u2:get_item("log")
+  u1:clear_orders()
+  u1:add_order("GIB " .. itoa36(u2.id) .. " 332 Holz")
+  u2:clear_orders()
+  u2:add_order("LERNEN Hiebwaffen")
+  u2:add_order("HELFEN " .. itoa36(u1.faction.id) .. " GIB")
+  process_orders()
+  assert_equal(m1-332, u1:get_item("log"))
+  assert_equal(m2+332, u2:get_item("log"))
 end

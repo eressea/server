@@ -85,12 +85,18 @@ add_give(unit * u, unit * u2, int given, int received, const resource_type * rty
   }
 }
 
+static boolean
+limited_give(const item_type * type)
+{
+  /* trade only money 2:1, if at all */
+  return (type == i_silver);
+}
+
 int give_quota(const unit * src, const unit * dst, const item_type * type, int n)
 {
   static float divisor = -1;
 
-  /* luxuries and herbs are traded 1:1 */
-  if (fval(type, ITF_HERB) || type->rtype->ltype) {
+  if (divisor==0 || !limited_give(type)) {
     return n;
   }
   if (dst && src && src->faction!=dst->faction) {
@@ -100,15 +106,7 @@ int give_quota(const unit * src, const unit * dst, const item_type * type, int n
     }
     if (divisor>=1) {
       /* predictable > correct: */
-#if 0
-      double r = n / divisor;
-      int x = (int)r;
-
-      r = r - x;
-      if (chance(r)) ++x;
-#else
       int x = (int)(n/divisor);
-#endif
       return x;
     }
   }
