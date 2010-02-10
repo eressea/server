@@ -252,6 +252,7 @@ int cmp_current_owner(const struct building * b, const struct building * bother)
 #define TAX_ORDER 0x00
 #define TAX_OWNER 0x01
 int rule_auto_taxation(void);
+int rule_region_owners(void);
 
 extern int count_all(const struct faction * f);
 extern int count_migrants (const struct faction * f);

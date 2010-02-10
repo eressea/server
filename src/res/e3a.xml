@@ -151,6 +151,7 @@
     <param name="rules.items.loot_divisor" value="2"/> <!-- damage skims off 1/2 of goods transfers -->
     <param name="rules.items.give_divisor" value="2"/> <!-- corruption skims off 1/2 of goods transfers -->
     <param name="rules.move.owner_leave" value="1"/> <!-- owner must leave before moving -->
+    <param name="rules.region_owners" value="1">
     <param name="rules.cavalry.skill" value="2"/>
     <param name="rules.cavalry.mode" value="1"/>
     <param name="rules.magic.multipotion" value="1"/>

@@ -1447,6 +1447,7 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 struct faction *
 region_get_owner(const struct region * r)
 {
+  assert(rule_region_owners());
   if (r->land && r->land->ownership) {
     return r->land->ownership->owner;
   }
@@ -1456,6 +1457,7 @@ region_get_owner(const struct region * r)
 void
 region_set_owner(struct region * r, struct faction * owner, int turn)
 {
+  assert(rule_region_owners());
   if (r->land) {
     if (!r->land->ownership) {
       r->land->ownership = malloc(sizeof(region_owner));
@@ -1478,6 +1480,7 @@ region_set_owner(struct region * r, struct faction * owner, int turn)
 faction * update_owners(region * r)
 {
   faction * f = NULL;
+  assert(rule_region_owners());
   if (r->land) {
     building * bowner = largestbuilding(r, &cmp_current_owner, false);
     building * blargest = largestbuilding(r, &cmp_taxes, false);

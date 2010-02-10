@@ -1556,7 +1556,7 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r, &cmp_current_owner, false)) {
+    if (b != largestbuilding(r, rule_region_owners()?&cmp_current_owner:&cmp_wage, false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -1800,7 +1800,8 @@ name_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r, &cmp_current_owner, false)) {
+    
+    if (b != largestbuilding(r, rule_region_owners()?&cmp_current_owner:&cmp_wage, false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }

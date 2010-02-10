@@ -2677,6 +2677,8 @@ int
 cmp_current_owner(const building * b, const building * a)
 {
   faction * f = region_get_owner(b->region);
+
+  assert(rule_region_owners());
   if (f && b->type->taxes) {
     unit * u = buildingowner(b->region, b);
     if (!u || u->faction!=f) return -1;
@@ -2696,10 +2698,21 @@ cmp_current_owner(const building * b, const building * a)
   return -1;
 }
 
+int rule_region_owners(void)
+{
+  static int rule_owners = -1;
+  if (rule_owners<0) {
+    rule_owners = get_param_int(global.parameters, "rules.region_owners", 0);
+  }
+  return rule_owners;
+}
+
 int rule_auto_taxation(void)
 {
   static int rule_taxation = -1;
-  rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
+  if (rule_taxation<0) {
+    rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
+  }
   return rule_taxation;
 }
 
