@@ -221,7 +221,7 @@ get_food(region *r)
    * jede Einheit genug Silber für ihren Unterhalt hat. */
 
   for (u = r->units; u; u = u->next) {
-    int style = lifestyle(u);
+    int style = INCOME_FISHING;
     int need = style;
 
     /* Erstmal zurücksetzen */
@@ -230,22 +230,20 @@ get_food(region *r)
     if (u->ship && (u->ship->flags&SF_FISHING)) {
       unit * v;
       int c = 2;
-      for (v=r->units;c>0 && v;v=v->next) {
+      for (v=u;c>0 && v;v=v->next) {
         if (v->ship==u->ship) {
-          if (u==v) {
-            int get = 0;
-            if (u->number==c) {
-              get = need;
-            } else {
-              int x = MIN(c, u->number);
-              get = (style * x) / u->number;
-            }
-            if (get) {
-              change_money(u, get);
-            }
+          int get = 0;
+          if (v->number==c) {
+            get = need;
+          } else {
+            int x = MIN(c, v->number);
+            get = (style * x) / v->number;
           }
-          c -= v->number;
+          if (get) {
+            change_money(v, get);
+          }
         }
+        c -= v->number;
       }
       u->ship->flags -= SF_FISHING;
     }

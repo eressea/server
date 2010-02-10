@@ -75,6 +75,8 @@ extern void st_register(const ship_type * type);
 #define SF_SELECT  1<<3 /* previously FL_DH */
 #define SF_FISHING 1<<4 /* was on an ocean, can fish */
 
+#define INCOME_FISHING 10
+
 typedef struct ship {
   struct ship *next;
   struct ship *nexthash;
