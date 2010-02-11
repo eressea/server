@@ -220,8 +220,7 @@ get_food(region *r)
    * jede Einheit genug Silber für ihren Unterhalt hat. */
 
   for (u = r->units; u; u = u->next) {
-    int style = INCOME_FISHING;
-    int need = style;
+    int need = lifestyle(u);
 
     /* Erstmal zurücksetzen */
     freset(u, UFL_HUNGER);
@@ -236,7 +235,7 @@ get_food(region *r)
             get = need;
           } else {
             int x = MIN(c, v->number);
-            get = (style * x) / v->number;
+            get = INCOME_FISHING * x;
           }
           if (get) {
             change_money(v, get);
