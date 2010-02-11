@@ -901,6 +901,8 @@ is_guardian_r(const unit * guard)
 {
   if (guard->number == 0) return false;
   if (besieged(guard)) return false;
+
+  /* if region_owners exist then they may be guardians: */
   if (guard->building && rule_region_owners() && fval(guard, UFL_OWNER)) {
     faction * owner = region_get_owner(guard->region);
     if (owner==guard->faction) {
@@ -910,6 +912,7 @@ is_guardian_r(const unit * guard)
       }
     }
   }
+
   if ((guard->flags&UFL_GUARD)==0) return false;
   if (!armedmen(guard, true) && !fval(guard->race, RCF_UNARMEDGUARD)) return false;
   return true;

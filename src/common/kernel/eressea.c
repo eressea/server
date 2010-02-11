@@ -1699,7 +1699,7 @@ cstring(const char *s)
 }
 
 building *
-largestbuilding(const region * r, int (*cmp_gt)(const struct building *, const struct building *), boolean imaginary)
+largestbuilding(const region * r, cmp_building_cb cmp_gt, boolean imaginary)
 {
   building *b, *best = NULL;
 

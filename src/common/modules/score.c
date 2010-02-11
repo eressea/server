@@ -78,9 +78,11 @@ score(void)
     unit * u;
     building * b;
     ship * s;
-    
-    fc = region_get_owner(r);
-    if (fc) fc->score += 10;
+
+    if (rule_region_owners()) {
+      fc = region_get_owner(r);
+      if (fc) fc->score += 10;
+    }
 
     for (b = r->buildings; b; b = b->next) {
       u = buildingowner(r, b);

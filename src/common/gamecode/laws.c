@@ -209,7 +209,6 @@ get_food(region *r)
   plane * pl = rplane(r);
   unit *u;
   int peasantfood = rpeasants(r)*10;
-  faction * owner = region_get_owner(r);
   static int food_rules = -1;
 
   if (food_rules<0) {
@@ -249,6 +248,7 @@ get_food(region *r)
     }
 
     if (food_rules&1) {
+      faction * owner = region_get_owner(r);
       /* if the region is owned, and the owner is nice, then we'll get 
        * food from the peasants - should not be used with WORK */
       if (owner!=NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
@@ -1492,6 +1492,17 @@ prefix_cmd(unit * u, struct order * ord)
   return 0;
 }
 
+
+static cmp_building_cb
+get_cmp_region_owner()
+{
+  if (rule_region_owners()) {
+    return &cmp_current_owner;
+  } else {
+    return &cmp_wage;
+  }
+}
+
 static int
 display_cmd(unit * u, struct order * ord)
 {
@@ -1556,7 +1567,7 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r, rule_region_owners()?&cmp_current_owner:&cmp_wage, false)) {
+    if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -1801,7 +1812,7 @@ name_cmd(unit * u, struct order * ord)
       break;
     }
     
-    if (b != largestbuilding(r, rule_region_owners()?&cmp_current_owner:&cmp_wage, false)) {
+    if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -3068,7 +3079,7 @@ age_building(building * b)
           effect = 100;
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
-            (float)sk, sk/2, effect, 0);
+            (float)MAX(1, sk), MAX(1, sk/2), effect, 0);
           ADDMSG(&r->msgs, msg_message("astralshield_activate", 
             "region unit", r, mage));
         }
@@ -3195,7 +3206,9 @@ ageing(void)
       if (b==*bp) bp = &b->next;
     }
 
-    update_owners(r);
+    if (rule_region_owners()) {
+      update_owners(r);
+    }
   }
 }
 

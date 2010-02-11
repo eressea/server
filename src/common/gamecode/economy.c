@@ -634,21 +634,26 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   addlist(recruitorders, o);
 }
 
+static void apply_owner_change(region * r, faction * f)
+{
+  int morale = region_get_morale(r);
+  region_set_owner(r, f, turn);
+  if (morale>0) {
+    morale = MAX(0, morale-MORALE_TRANSFER);
+    region_set_morale(r, morale, turn);
+  }
+}
+
 static void
 give_control(unit * u, unit * u2)
 {
-  if (u->building && u->faction!=u2->faction) {
+  if (u->building && u->faction!=u2->faction && rule_region_owners()) {
     region * r = u->region;
     faction * f = region_get_owner(r);
     if (f==u->faction) {
       building * b = largestbuilding(r, &cmp_current_owner, false);
       if (b==u->building) {
-        int morale = region_get_morale(r);
-        region_set_owner(r, u2->faction, turn);
-        if (morale>0) {
-          morale = MAX(0, morale-MORALE_TRANSFER);
-          region_set_morale(r, morale, turn);
-        }
+        apply_owner_change(r, u2->faction);
       }
     }
   }

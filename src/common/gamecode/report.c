@@ -1003,7 +1003,7 @@ describe(FILE * F, const seen_region * sr, faction * f)
     }
   }
 
-  {
+  if (rule_region_owners()) {
     const faction * owner = region_get_owner(r);
     if (owner!=NULL) {
       bytes = snprintf(bufp, size, " Die Region ist im Besitz von %s.",

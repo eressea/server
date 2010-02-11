@@ -244,7 +244,8 @@ extern char *cstring_i(char *s);
 extern const char *unitname(const struct unit * u);
 extern char * write_unitname(const struct unit * u, char * buffer, size_t size);
 
-struct building *largestbuilding(const struct region * r, int (*eval_gt)(const struct building *,const struct building *), boolean imaginary);
+typedef int (*cmp_building_cb)(const struct building * b, const struct building * a);
+struct building *largestbuilding(const struct region * r, cmp_building_cb, boolean imaginary);
 int cmp_wage(const struct building * b, const struct building * bother);
 int cmp_taxes(const struct building * b, const struct building * bother);
 int cmp_current_owner(const struct building * b, const struct building * bother);

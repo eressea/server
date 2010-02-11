@@ -1202,9 +1202,11 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
       fprintf(F, "%d;Pferde\n", rhorses(r));
 
       if (sr->mode>=see_unit) {
-        faction * owner = region_get_owner(r);
-        if (owner) {
-          fprintf(F, "%d;owner\n", owner->no);
+        if (rule_region_owners()) {
+          faction * owner = region_get_owner(r);
+          if (owner) {
+            fprintf(F, "%d;owner\n", owner->no);
+          }
         }
         fprintf(F, "%d;Silber\n", rmoney(r));
         if (skill_enabled[SK_ENTERTAINMENT]) {
