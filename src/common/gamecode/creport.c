@@ -1505,12 +1505,10 @@ report_computer(const char * filename, report_context * ctx, const char * charse
   }
   for (a=a_find(f->attribs, &at_showitem);a && a->type==&at_showitem;a=a->next) {
     const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
-    requirement * m;
     const char * ch;
     const char * description = NULL;
 
     if (ptype==NULL) continue;
-    m = ptype->itype->construction->materials;
     ch = resourcename(ptype->itype->rtype, 0);
     fprintf(F, "TRANK %d\n", hashstring(ch));
     fprintf(F, "\"%s\";Name\n", add_translation(ch, locale_string(f->locale, ch)));
@@ -1523,12 +1521,16 @@ report_computer(const char * filename, report_context * ctx, const char * charse
     }
 
     fprintf(F, "\"%s\";Beschr\n", description);
-    fprintf(F, "ZUTATEN\n");
+    if (ptype->itype->construction) {
+      requirement * m = ptype->itype->construction->materials;
 
-    while (m->number) {
-      ch = resourcename(m->rtype, 0);
-      fprintf(F, "\"%s\"\n", add_translation(ch, locale_string(f->locale, ch)));
-      m++;
+      fprintf(F, "ZUTATEN\n");
+
+      while (m->number) {
+        ch = resourcename(m->rtype, 0);
+        fprintf(F, "\"%s\"\n", add_translation(ch, locale_string(f->locale, ch)));
+        m++;
+      }
     }
   }
 

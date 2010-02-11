@@ -2174,11 +2174,9 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   for (a=a_find(f->attribs, &at_showitem);a && a->type==&at_showitem;a=a->next) {
     const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
     const char * description = NULL;
-    requirement * m;
     if (ptype!=NULL) {
       const char * pname = resourcename(ptype->itype->rtype, 0);
 
-      m = ptype->itype->construction->materials;
       if (ch==0) {
         rnl(F);
         centre(F, LOC(f->locale, "section_newpotions"), true);
@@ -2195,13 +2193,17 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
       size = sizeof(buf) - 1;
       bytes = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-      while (m->number) {
-        bytes = (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        ++m;
-        if (m->number)
-        bytes = (int)strlcpy(bufp, ", ", size);
-        if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+
+      if (ptype->itype->construction) {
+        requirement * m = ptype->itype->construction->materials;
+        while (m->number) {
+          bytes = (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+          ++m;
+          if (m->number)
+              bytes = (int)strlcpy(bufp, ", ", size);
+          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
+        }
       }
       *bufp = 0;
       centre(F, buf, true);
