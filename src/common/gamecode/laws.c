@@ -1494,7 +1494,7 @@ prefix_cmd(unit * u, struct order * ord)
 
 
 static cmp_building_cb
-get_cmp_region_owner()
+get_cmp_region_owner(void)
 {
   if (rule_region_owners()) {
     return &cmp_current_owner;
