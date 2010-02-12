@@ -3272,7 +3272,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   unsigned int flags = 0;
 
   assert(u->number);
-  if (fval(u, UFL_PARTEITARNUNG)!=0) flags |= SIDE_STEALTH;
+  if (fval(u, UFL_ANON_FACTION)!=0) flags |= SIDE_STEALTH;
 
   if (fval(u, UFL_GROUP)) {
     const attrib * agroup = a_find(u->attribs, &at_group);

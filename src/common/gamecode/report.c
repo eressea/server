@@ -674,10 +674,10 @@ nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
   } else if ALLIED(u->faction, f) {
     marker = 'o';
   } else if (a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
-    && !fval(u, UFL_PARTEITARNUNG)) {
+    && !fval(u, UFL_ANON_FACTION)) {
     marker = '!';
   } else {
-    if (dh && !fval(u, UFL_PARTEITARNUNG)) {
+    if (dh && !fval(u, UFL_ANON_FACTION)) {
       marker = '+';
     } else {
       marker = '-';
@@ -1644,7 +1644,7 @@ guards(FILE * F, const region * r, const faction * see)
         f = fv;
       }
 
-      if (f != see && fval(u, UFL_PARTEITARNUNG)) {
+      if (f != see && fval(u, UFL_ANON_FACTION)) {
         tarned=true;
       } else {
         for (i=0;i!=nextguard;++i) if (guardians[i]==f) break;

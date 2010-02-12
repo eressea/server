@@ -979,7 +979,7 @@ alliedunit(const unit * u, const faction * f2, int mode)
 boolean
 seefaction(const faction * f, const region * r, const unit * u, int modifier)
 {
-  if (((f == u->faction) || !fval(u, UFL_PARTEITARNUNG)) && cansee(f, r, u, modifier))
+  if (((f == u->faction) || !fval(u, UFL_ANON_FACTION)) && cansee(f, r, u, modifier))
     return true;
   return false;
 }
@@ -2698,6 +2698,15 @@ cmp_current_owner(const building * b, const building * a)
     }
   }
   return -1;
+}
+
+int rule_stealth_faction(void)
+{
+  static int rule = -1;
+  if (rule<0) {
+    rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
+  }
+  return rule;
 }
 
 int rule_region_owners(void)

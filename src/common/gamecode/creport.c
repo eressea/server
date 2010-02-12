@@ -717,8 +717,8 @@ cr_output_unit(FILE * F, const region * r,
       }
       fprintf(F, "%d;Partei\n", u->faction->no);
       if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
-      if (fval(u, UFL_PARTEITARNUNG))
-        fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_PARTEITARNUNG)));
+      if (fval(u, UFL_ANON_FACTION))
+        fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
       if (otherfaction) {
         if (otherfaction!=u->faction) {
           fprintf(F, "%d;Anderepartei\n", otherfaction->no);
@@ -729,9 +729,9 @@ cr_output_unit(FILE * F, const region * r,
         fprintf(F, "%u;familiarmage\n", mage->no);
       }
     } else {
-      if (fval(u, UFL_PARTEITARNUNG)) {
+      if (fval(u, UFL_ANON_FACTION)) {
         /* faction info is hidden */
-        fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_PARTEITARNUNG)));
+        fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
       } else {
         const attrib * a_otherfaction = a_find(u->attribs, &at_otherfaction);
         const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
@@ -1324,7 +1324,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     for (b = rbuildings(r); b; b = b->next) {
       int fno = -1;
       u = building_owner(b);
-      if (u && !fval(u, UFL_PARTEITARNUNG)) {
+      if (u && !fval(u, UFL_ANON_FACTION)) {
         const faction * sf = visible_faction(f,u);
         fno = sf->no;
       }
@@ -1335,7 +1335,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     for (sh = r->ships; sh; sh = sh->next) {
       int fno = -1;
       u = shipowner(sh);
-      if (u && !fval(u, UFL_PARTEITARNUNG)) {
+      if (u && !fval(u, UFL_ANON_FACTION)) {
         const faction * sf = visible_faction(f,u);
         fno = sf->no;
       }

@@ -352,7 +352,7 @@ xml_unit(report_context * ctx, unit * u, int mode)
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "true");
     xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_faction(u->faction));
 
-    if (fval(u, UFL_PARTEITARNUNG)) {
+    if (fval(u, UFL_ANON_FACTION)) {
       const faction * sf = visible_faction(NULL, u);
       child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "faction"));
       xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "stealth");

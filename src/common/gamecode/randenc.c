@@ -348,7 +348,7 @@ get_allies(region * r, unit * u)
 	if (u->race->flags & RCF_SHAPESHIFT) {
       newunit->irace = u->irace;
 	}
-	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
+	if (fval(u, UFL_ANON_FACTION)) fset(newunit, UFL_ANON_FACTION);
 	fset(newunit, UFL_ISNEW);
 
   msg = msg_message("encounter_allies", "unit name", u, name);

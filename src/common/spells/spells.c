@@ -2154,7 +2154,10 @@ sp_ironkeeper(castorder *co)
   guard(keeper, GUARD_MINING);
   fset(keeper, UFL_ISNEW);
   /* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
-  fset(keeper, UFL_PARTEITARNUNG);
+  if (rule_stealth_faction()) {
+    fset(keeper, UFL_ANON_FACTION);
+  }
+
   {
     trigger * tkill = trigger_killunit(keeper);
     add_trigger(&keeper->attribs, "timer", trigger_timeout(cast_level+2, tkill));
@@ -3876,7 +3879,9 @@ sp_charmingsong(castorder *co)
 
   /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
    * steckt */
-  fset(target, UFL_PARTEITARNUNG);
+  if (rule_stealth_faction()) {
+    fset(target, UFL_ANON_FACTION);
+  }
 
   ADDMSG(&mage->faction->msgs, msg_message("charming_effect", "mage unit duration", mage, target, duration));
 
@@ -4594,7 +4599,9 @@ sp_raisepeasants(castorder *co)
   u2 = create_unit(r, mage->faction, bauern, new_race[RC_PEASANT], 0, LOC(mage->faction->locale, "furious_mob"), mage);
 
   fset(u2, UFL_LOCKED);
-  fset(u2, UFL_PARTEITARNUNG);
+  if (rule_stealth_faction()) {
+    fset(u2, UFL_ANON_FACTION);
+  }
 
   a = a_new(&at_unitdissolve);
   a->data.ca[0] = 1;  /* An rpeasants(r). */
@@ -5859,7 +5866,7 @@ sp_showastral(castorder *co)
             c++;
             scat(unitname(u));
             scat(" (");
-            if (!fval(u, UFL_PARTEITARNUNG)) {
+            if (!fval(u, UFL_ANON_FACTION)) {
               scat(factionname(u->faction));
               scat(", ");
             }

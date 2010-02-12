@@ -1518,8 +1518,8 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     }
 
     /* Temps von parteigetarnten Einheiten sind wieder parteigetarnt */
-    if (fval(creator, UFL_PARTEITARNUNG)) {
-      fset(u, UFL_PARTEITARNUNG);
+    if (fval(creator, UFL_ANON_FACTION)) {
+      fset(u, UFL_ANON_FACTION);
     }
     /* Daemonentarnung */
     set_racename(&u->attribs, get_racename(creator->attribs));
@@ -1543,8 +1543,6 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
     a = a_add(&u->attribs, a_new(&at_creator));
     a->data.v = creator;
   }
-  /* Monster sind grundsätzlich parteigetarnt */
-  if (f->no <= 0) fset(u, UFL_PARTEITARNUNG);
 
   return u;
 }

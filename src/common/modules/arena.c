@@ -156,7 +156,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
   use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE, 1);
   use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee);
   set_money(u, 109);
-  fset(u, UFL_PARTEITARNUNG);
+  fset(u, UFL_ANON_FACTION);
   move_unit(u, start_region[rng_int() % 6], NULL);
   return 0;
 }
@@ -345,7 +345,7 @@ guardian_faction(plane * pl, int id)
 		set_string(&u->name, "Igjarjuks Auge");
 		set_item(u, I_RING_OF_INVISIBILITY, 1);
 		set_order(&u->thisorder, NULL);
-		fset(u, UFL_PARTEITARNUNG);
+		fset(u, UFL_ANON_FACTION);
 		set_money(u, 1000);
 	}
 }

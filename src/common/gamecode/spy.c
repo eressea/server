@@ -299,11 +299,12 @@ setstealth_cmd(unit * u, struct order * ord)
   switch(findparam(s, u->faction->locale)) {
   case P_FACTION:
     /* TARNE PARTEI [NICHT|NUMMER abcd] */
+    if (!rule_stealth_faction()) break;
     s = getstrtoken();
     if(!s || *s == 0) {
-      fset(u, UFL_PARTEITARNUNG);
+      fset(u, UFL_ANON_FACTION);
     } else if (findparam(s, u->faction->locale) == P_NOT) {
-      freset(u, UFL_PARTEITARNUNG);
+      freset(u, UFL_ANON_FACTION);
     } else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
       const char *s2 = (const char *)getstrtoken();
       int nr = -1;

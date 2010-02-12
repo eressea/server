@@ -424,7 +424,7 @@ int
 bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, size_t size)
 {
   int i, dh;
-  int getarnt = fval(u, UFL_PARTEITARNUNG);
+  int getarnt = fval(u, UFL_ANON_FACTION);
   const char *pzTmp, *str;
   building * b;
   boolean isbattle = (boolean)(mode == see_battle);
@@ -995,7 +995,7 @@ get_addresses(report_context * ctx)
         if (u->faction!=ctx->f) {
           faction * sf = visible_faction(ctx->f, u);
           boolean ballied = sf && sf!=ctx->f && sf!=lastf
-            && !fval(u, UFL_PARTEITARNUNG) && cansee(ctx->f, r, u, stealthmod);
+            && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
           if (ballied || ALLIED(ctx->f, sf)) {
             add_faction(&flist, sf);
             lastf = sf;

@@ -789,8 +789,13 @@ read_unit(struct storage * store)
       guard(u, GUARD_NONE);
     }
   } else {
-    u->flags = store->r_int(store) & ~UFL_DEBUG;
+    u->flags = store->r_int(store);
     u->flags &= UFL_SAVEMASK;
+    if ((u->flags&UFL_ANON_FACTION) && !rule_stealth_faction()) {
+      /* if this rule is broken, then fix broken units */
+      u->flags -= UFL_ANON_FACTION;
+      log_warning(("%s was anonymous.\n", unitname(u)));
+    }
   }
   /* Persistente Befehle einlesen */
   free_orders(&u->orders);

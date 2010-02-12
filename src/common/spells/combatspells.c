@@ -783,8 +783,9 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   set_level(u, SK_STAMINA, (int)(power/3));
   u->hp = u->number * unit_max_hp(u);
 
-  if (fval(mage, UFL_PARTEITARNUNG))
-    fset(u, UFL_PARTEITARNUNG);
+  if (fval(mage, UFL_ANON_FACTION)) {
+    fset(u, UFL_ANON_FACTION);
+  }
 
   a = a_new(&at_unitdissolve);
   a->data.ca[0] = 0;
@@ -818,8 +819,9 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
 
   u->hp = u->number * unit_max_hp(u);
 
-  if (fval(mage, UFL_PARTEITARNUNG))
-    fset(u, UFL_PARTEITARNUNG);
+  if (fval(mage, UFL_ANON_FACTION)) {
+    fset(u, UFL_ANON_FACTION);
+  }
 
   a = a_new(&at_unitdissolve);
   a->data.ca[0] = 0;
@@ -1625,8 +1627,8 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         setguard(u, GUARD_NONE);
 
         /* inherit stealth from magician */
-        if (fval(mage, UFL_PARTEITARNUNG)) {
-          fset(u, UFL_PARTEITARNUNG);
+        if (fval(mage, UFL_ANON_FACTION)) {
+          fset(u, UFL_ANON_FACTION);
         }
 
         /* transfer dead people to new unit, set hitpoints to those of old unit */

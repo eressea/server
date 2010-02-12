@@ -35,7 +35,7 @@ struct item;
 #define UFL_ISNEW         (1<<1)	/* 2 */
 #define UFL_LONGACTION    (1<<2)	/* 4 */
 #define UFL_OWNER         (1<<3)	/* 8 */
-#define UFL_PARTEITARNUNG (1<<4)	/* 16 */
+#define UFL_ANON_FACTION  (1<<4)	/* 16 */
 #define UFL_DISBELIEVES   (1<<5)	/* 32 */
 #define UFL_WARMTH        (1<<6)	/* 64 */
 #define UFL_HERO          (1<<7)
@@ -66,7 +66,7 @@ struct item;
 #define UFL_GROUP         (1<<28)
 
 /* Flags, die gespeichert werden sollen: */
-#define UFL_SAVEMASK (UFL_DEFENDER|UFL_MOVED|UFL_NOAID|UFL_OWNER|UFL_PARTEITARNUNG|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
+#define UFL_SAVEMASK (UFL_DEFENDER|UFL_MOVED|UFL_NOAID|UFL_OWNER|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
 #define UNIT_MAXSIZE 50000
 extern int maxheroes(const struct faction * f);
