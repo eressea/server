@@ -8415,7 +8415,7 @@
       <arg name="command" type="order"/>
       <arg name="target" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) versteht unsere Art von Mague nicht."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) versteht unsere Art von Magie nicht."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) does not understand our kind of magic."</text>
   </message>
 
