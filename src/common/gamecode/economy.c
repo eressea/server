@@ -634,7 +634,8 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   addlist(recruitorders, o);
 }
 
-static void apply_owner_change(region * r, faction * f)
+static void
+friendly_takeover(region * r, faction * f)
 {
   int morale = region_get_morale(r);
   region_set_owner(r, f, turn);
@@ -653,7 +654,7 @@ give_control(unit * u, unit * u2)
     if (f==u->faction) {
       building * b = largestbuilding(r, &cmp_current_owner, false);
       if (b==u->building) {
-        apply_owner_change(r, u2->faction);
+        friendly_takeover(r, u2->faction);
       }
     }
   }

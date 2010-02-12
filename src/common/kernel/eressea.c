@@ -2688,7 +2688,7 @@ cmp_current_owner(const building * b, const building * a)
       int oldsize = buildingeffsize(a, false);
       double oldtaxes = a->type->taxes(a, oldsize);
 
-      if (newtaxes!=oldtaxes) return (int)(newtaxes-oldtaxes);
+      if (newtaxes!=oldtaxes) return (newtaxes>oldtaxes)?1:-1;
       if (newsize!=oldsize) return newsize-oldsize;
       return (b->size-a->size);
     } else {
