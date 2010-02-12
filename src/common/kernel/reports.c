@@ -391,9 +391,9 @@ report_resources(const seen_region * sr, resource_report * result, int size, con
     rawmaterial * res = r->resources;
     while (res) {
       int maxskill = 0;
-      int level = -1;
-      int visible = -1;
       const item_type * itype = resource2item(res->type->rtype);
+      int level = res->level + itype->construction->minskill - 1;
+      int visible = -1;
       if (res->type->visible==NULL) {
         visible = res->amount;
         level = res->level + itype->construction->minskill - 1;
@@ -403,10 +403,6 @@ report_resources(const seen_region * sr, resource_report * result, int size, con
           if (u->faction == viewer) {
             int s = eff_skill(u, itype->construction->skill, r);
             if (s>maxskill) {
-              if (s>=itype->construction->minskill) {
-                assert(itype->construction->minskill>0);
-                level = res->level + itype->construction->minskill - 1;
-              }
               maxskill = s;
               visible = res->type->visible(res, maxskill);
             }
