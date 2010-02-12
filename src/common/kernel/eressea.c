@@ -2637,7 +2637,7 @@ boolean is_owner_building(const struct building * b)
 {
   region * r = b->region;
   if (b->type->taxes && r->land && r->land->ownership) {
-    unit * u = buildingowner(r, b);
+    unit * u = building_owner(b);
     return u && u->faction == r->land->ownership->owner;
   }
   return false;
@@ -2648,7 +2648,10 @@ cmp_taxes(const building * b, const building * a)
 {
   faction * f = region_get_owner(b->region);
   if (b->type->taxes) {
-    if (a) {
+    unit * u = building_owner(b);
+    if (!u) {
+      return -1;
+    } else if (a) {
       int newsize = buildingeffsize(b, false);
       double newtaxes = b->type->taxes(b, newsize);
       int oldsize = buildingeffsize(a, false);
@@ -2659,9 +2662,8 @@ cmp_taxes(const building * b, const building * a)
       else if (b->size<a->size) return -1;
       else if (b->size>a->size) return 1;
       else {
-        unit * u = buildingowner(b->region, b);
         if (u && u->faction==f) {
-          u = buildingowner(a->region, a);
+          u = building_owner(a);
           if (u && u->faction==f) return -1;
           return 1;
         }
@@ -2680,7 +2682,7 @@ cmp_current_owner(const building * b, const building * a)
 
   assert(rule_region_owners());
   if (f && b->type->taxes) {
-    unit * u = buildingowner(b->region, b);
+    unit * u = building_owner(b);
     if (!u || u->faction!=f) return -1;
     if (a) {
       int newsize = buildingeffsize(b, false);

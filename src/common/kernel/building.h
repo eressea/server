@@ -143,7 +143,7 @@ extern variant read_building_reference(struct storage * store);
 
 extern struct building *findbuilding(int n);
 
-extern struct unit * buildingowner(const struct region * r, const struct building * b);
+extern struct unit * building_owner(const struct building * b);
 
 extern struct attrib_type at_building_action;
 void building_addaction(struct building * b, const char * fname, const char * param);

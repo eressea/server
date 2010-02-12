@@ -1599,7 +1599,7 @@ owner_buildingtyp(const region * r, const building_type * bt)
 	unit *owner;
 
 	for (b = rbuildings(r); b; b = b->next) {
-		owner = buildingowner(r, b);
+		owner = building_owner(b);
 		if (b->type == bt && owner != NULL) {
 			if (b->size >= bt->maxsize) {
 				return owner;

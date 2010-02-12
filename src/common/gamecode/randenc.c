@@ -1258,7 +1258,7 @@ randomevents(void)
     building ** blist = &r->buildings;
     while (*blist) {
       building * b = *blist;
-      if (fval(b->type, BTF_DECAY) && !buildingowner(r, b)) {
+      if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
         b->size -= MAX(1, (b->size * 20) / 100);
         if (b->size == 0) {
           remove_building(blist, r->buildings);

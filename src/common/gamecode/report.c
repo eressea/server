@@ -570,7 +570,7 @@ nr_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int inden
     unit * owner;
     a = b->attribs;
     r = b->region;
-    if ((owner = buildingowner(r,b)) != NULL){
+    if ((owner = building_owner(b)) != NULL){
       if (owner->faction == viewer){
         self = 2;
       } else { /* steht eine Person der Partei in der Burg? */
@@ -1809,7 +1809,7 @@ nr_building(FILE *F, const seen_region * sr, const building * b, const faction *
   bytes = (int)strlcpy(bufp, name, size);
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
   if (billusion) {
-    unit * owner = buildingowner(r, b);
+    unit * owner = building_owner(b);
     if (owner && owner->faction==f) {
       /* illusion. report real type */
       name = LOC(lang, bname);
@@ -1851,7 +1851,7 @@ nr_building(FILE *F, const seen_region * sr, const building * b, const faction *
   }
 
   if (b->type == bt_find("pyramid")) {
-    unit * owner = buildingowner(r, b);
+    unit * owner = building_owner(b);
     scat("Größenstufe ");
     icat(wdw_pyramid_level(b));
     scat(".");

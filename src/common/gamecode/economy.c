@@ -1025,7 +1025,7 @@ maintain(building * b, boolean first)
   if (fval(b, BLD_DONTPAY)) {
     return false;
   }
-  u = buildingowner(r, b);
+  u = building_owner(b);
   if (u==NULL) return false;
   for (c=0;b->type->maintenance[c].number;++c) {
     const maintenance * m = b->type->maintenance+c;
@@ -1165,7 +1165,7 @@ maintain_buildings(region * r, boolean crash)
       }
 #endif
       if (!fval(b, BLD_WORKING)) {
-        unit * u = buildingowner(r, b);
+        unit * u = building_owner(b);
         const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
         struct message * msg = msg_message(msgtype, "building", b);
 
@@ -2226,11 +2226,11 @@ expandselling(region * r, request * sellorders, int limit)
    * Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
   
   for (b = rbuildings(r); b; b = b->next) {
-    if (b->size > maxsize && buildingowner(r, b) != NULL
+    if (b->size > maxsize && building_owner(b) != NULL
         && b->type == bt_find("castle")) {
       maxb = b;
       maxsize = b->size;
-      maxowner = buildingowner(r, b);
+      maxowner = building_owner(b);
     } else if (b->size == maxsize && b->type == bt_find("castle")) {
       maxb = (building *) NULL;
       maxowner = (unit *) NULL;
@@ -3309,7 +3309,7 @@ peasant_taxes(region * r)
   b = largestbuilding(r, cmp_taxes, false);
   if (b==NULL) return;
 
-  u = buildingowner(r, b);
+  u = building_owner(b);
   if (u==NULL || u->faction!=f) return;
 
   maxsize = buildingeffsize(b, false);

@@ -97,7 +97,7 @@ a_giveitem(attrib * a)
 	unit * u;
 	if (gdata->building==NULL || gdata->items==NULL) return 0;
 	r = gdata->building->region;
-	u = buildingowner(r, gdata->building);
+	u = building_owner(gdata->building);
 	if (u==NULL) return 1;
 	while (gdata->items) {
 		item * itm = gdata->items;

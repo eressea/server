@@ -887,7 +887,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       rule_other = get_param_int(global.parameters, "rules.build.other_buildings", 1);
     }
     if (!rule_other) {
-      unit * owner = buildingowner(r, b);
+      unit * owner = building_owner(b);
       if (!owner || owner->faction!=u->faction) {
         cmistake(u, ord, 1222, MSG_PRODUCE);
         return;
@@ -1117,7 +1117,7 @@ mayenter(region * r, unit * u, building * b)
 {
   unit *u2;
   if (fval(b, BLD_UNGUARDED)) return true;
-  u2 = buildingowner(r, b);
+  u2 = building_owner(b);
 
   if (u2==NULL || ucontact(u2, u)
     || alliedunit(u2, u->faction, HELP_GUARD)) return true;
@@ -1255,7 +1255,7 @@ enter_building(unit * u, order * ord, int id, boolean report)
   }
 
   if (leave(u, false)) {
-    if (buildingowner(r, b) == 0) {
+    if (building_owner(b) == 0) {
       fset(u, UFL_OWNER);
     }
     fset(u, UFL_ENTER);

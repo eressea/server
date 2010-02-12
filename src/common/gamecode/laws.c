@@ -1654,7 +1654,7 @@ name_cmd(unit * u, struct order * ord)
         }
       }
 
-      uo = buildingowner(r, b);
+      uo = building_owner(b);
       if (uo) {
         if (cansee(uo->faction, r, u, 0)) {
           ADDMSG(&uo->faction->msgs, msg_message("renamed_building_seen", 
@@ -3697,7 +3697,7 @@ pay_cmd(unit * u, struct order * ord)
     skip_token();
     p = getparam(u->faction->locale);
     if (p==P_NOT) {
-      unit * owner = buildingowner(u->building->region, u->building);
+      unit * owner = building_owner(u->building);
       if (owner->faction!=u->faction) {
         cmistake(u, ord, 1222, MSG_EVENT);
       } else {

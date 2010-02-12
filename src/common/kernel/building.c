@@ -612,32 +612,30 @@ buildingname(const building * b)
 }
 
 unit *
-buildingowner(const region * r, const building * b)
+building_owner(const building * b)
 {
-	unit *u = NULL;
-	unit *first = NULL;
-#ifndef BROKEN_OWNERS
-	assert(r == b->region);
-#endif
-	/* Prüfen ob Eigentümer am leben. */
+  unit *u = NULL;
+  unit *first = NULL;
+  region * r = b->region;
+  /* Prüfen ob Eigentümer am leben. */
 
-	for (u = r->units; u; u = u->next) {
-		if (u->building == b) {
-			if (!first && u->number > 0)
-				first = u;
-			if (fval(u, UFL_OWNER) && u->number > 0)
-				return u;
-			if (u->number == 0)
-				freset(u, UFL_OWNER);
-		}
-	}
+  for (u = r->units; u; u = u->next) {
+    if (u->building == b) {
+      if (!first && u->number > 0)
+        first = u;
+      if (fval(u, UFL_OWNER) && u->number > 0)
+        return u;
+      if (u->number == 0)
+        freset(u, UFL_OWNER);
+    }
+  }
 
-	/* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
-	 * nehmen. */
+  /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+  * nehmen. */
 
-	if (first)
-		fset(first, UFL_OWNER);
-	return first;
+  if (first)
+    fset(first, UFL_OWNER);
+  return first;
 }
 
 const char * building_getname(const building * self)

@@ -37,7 +37,7 @@ get_markets(region * r, unit ** results, size_t size)
   if (!btype) return 0;
   for (b=r->buildings;n<size && b;b=b->next) {
     if (b->type==btype && (b->flags&BLD_WORKING) && b->size>=b->type->maxsize) {
-      unit * u = buildingowner(r, b);
+      unit * u = building_owner(b);
       unsigned int i;
       for (i=0;u && i!=n;++i) {
         /* only one market per faction */

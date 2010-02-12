@@ -453,7 +453,7 @@ alliancevictory(void)
     building * b = r->buildings;
     while (b!=NULL) {
       if (b->type==btype) {
-        unit * u = buildingowner(r, b);
+        unit * u = building_owner(b);
         if (u) {
           fset(u->faction->alliance, FFL_MARK);
         }

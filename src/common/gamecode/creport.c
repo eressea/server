@@ -206,10 +206,10 @@ cr_output_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
     }
   } else if (typ == TYP_BUILDING) {
     building * b = (building*)obj;
-    unit * owner;
+    unit * owner = building_owner(b);
     a = b->attribs;
     r = b->region;
-    if((owner = buildingowner(r,b)) != NULL){
+    if (owner != NULL){
       if (owner->faction == viewer){
         self = 2;
       } else { /* steht eine Person der Partei in der Burg? */
@@ -1323,7 +1323,7 @@ cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     /* buildings */
     for (b = rbuildings(r); b; b = b->next) {
       int fno = -1;
-      u = buildingowner(r, b);
+      u = building_owner(b);
       if (u && !fval(u, UFL_PARTEITARNUNG)) {
         const faction * sf = visible_faction(f,u);
         fno = sf->no;

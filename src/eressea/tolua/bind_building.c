@@ -151,7 +151,7 @@ static int
 tolua_building_get_owner(lua_State* L)
 {
   building* b = (building*) tolua_tousertype(L, 1, 0);
-  unit * u = b?buildingowner(b->region, b):NULL;
+  unit * u = b?building_owner(b):NULL;
   tolua_pushusertype(L, u, TOLUA_CAST "unit");
   return 1;
 }

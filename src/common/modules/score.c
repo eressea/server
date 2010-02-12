@@ -85,7 +85,7 @@ score(void)
     }
 
     for (b = r->buildings; b; b = b->next) {
-      u = buildingowner(r, b);
+      u = building_owner(b);
       if (u!=NULL) {
         faction * fbo = u->faction;
 

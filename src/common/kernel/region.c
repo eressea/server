@@ -1482,7 +1482,7 @@ faction * update_owners(region * r)
     if (blargest) {
       if (!bowner || bowner->size<blargest->size) {
         /* region owners update? */
-        unit * u = buildingowner(r, blargest);
+        unit * u = building_owner(blargest);
         f = region_get_owner(r);
         if (u==NULL) {
           if (f) {

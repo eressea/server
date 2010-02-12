@@ -840,7 +840,7 @@ can_leave(unit * u)
   if (rule_leave<0) {
     rule_leave = get_param_int(global.parameters, "rules.move.owner_leave", 0);
   }
-  if (rule_leave && u->building && u==buildingowner(u->region, u->building)) {
+  if (rule_leave && u->building && u==building_owner(u->building)) {
     return false;
   }
   return true;
