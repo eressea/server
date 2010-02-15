@@ -45,9 +45,9 @@ typedef struct {
 typedef struct {
     char * buf;
     char * cur;
-    int bufSize;
+    size_t bufSize;
     bson_bool_t finished;
-    int stack[32];
+    ptrdiff_t stack[32];
     int stackPos;
 } bson_buffer;
 
@@ -143,7 +143,7 @@ time_t bson_oid_generated_time(bson_oid_t* oid); /* Gives the time the OID was c
    ------------------------------ */
 
 bson_buffer * bson_buffer_init( bson_buffer * b );
-bson_buffer * bson_ensure_space( bson_buffer * b , const int bytesNeeded );
+bson_buffer * bson_ensure_space( bson_buffer * b , const size_t bytesNeeded );
 
 /**
  * @return the raw data.  you either should free this OR call bson_destroy not both

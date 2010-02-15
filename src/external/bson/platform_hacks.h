@@ -7,6 +7,9 @@
 
 #ifdef __GNUC__
 #define MONGO_INLINE static __inline__
+#elif defined(_MSC_VER)
+#define MONGO_USE__INT64
+#define MONGO_INLINE __inline
 #else
 #define MONGO_INLINE static
 #endif
@@ -26,23 +29,12 @@
 #include <unistd.h>
 #elif defined(MONGO_USE__INT64)
 typedef __int64 int64_t;
+typedef __int32 int32_t;
 #elif defined(MONGO_USE_LONG_LONG_INT)
 typedef long long int int64_t;
+typedef int int32_t;
 #else
 #error must have a 64bit int type
-#endif
-
-/* big endian is only used for OID generation. little is used everywhere else */
-#ifdef MONGO_BIG_ENDIAN
-#define bson_little_endian64(out, in) ( bson_swap_endian64(out, in) )
-#define bson_little_endian32(out, in) ( bson_swap_endian32(out, in) )
-#define bson_big_endian64(out, in) ( memcpy(out, in, 8) )
-#define bson_big_endian32(out, in) ( memcpy(out, in, 4) )
-#else
-#define bson_little_endian64(out, in) ( memcpy(out, in, 8) )
-#define bson_little_endian32(out, in) ( memcpy(out, in, 4) )
-#define bson_big_endian64(out, in) ( bson_swap_endian64(out, in) )
-#define bson_big_endian32(out, in) ( bson_swap_endian32(out, in) )
 #endif
 
 MONGO_EXTERN_C_START
@@ -70,6 +62,27 @@ MONGO_INLINE void bson_swap_endian32(void* outp, const void* inp){
     out[2] = in[1];
     out[3] = in[0];
 }
+
+/* big endian is only used for OID generation. little is used everywhere else */
+#ifdef MONGO_BIG_ENDIAN
+#define bson_little_endian64(out, in) ( bson_swap_endian64(out, &in) )
+#define bson_little_endian32(out, in) ( bson_swap_endian32(out, &in) )
+#define bson_big_endian64(out, in) ( memcpy(out, &in, 8) )
+#define bson_big_endian32(out, in) ( memcpy(out, &in, 4) )
+#else
+#ifdef NDEBUG
+#define bson_little_endian64(out, in) ( memcpy(out, &in, 8) )
+#define bson_little_endian32(out, in) ( memcpy(out, &in, 4) )
+#define bson_big_endian64(out, in) ( bson_swap_endian64(out, &in) )
+#define bson_big_endian32(out, in) ( bson_swap_endian32(out, &in) )
+#else
+#include <memory.h>
+MONGO_INLINE void bson_little_endian64(void * out, const int64_t in) { memcpy(out, &in, 8); }
+MONGO_INLINE void bson_little_endian32(void * out, const int32_t in) { memcpy(out, &in, 4); }
+MONGO_INLINE void bson_big_endian64(void * out, const int64_t in) { bson_swap_endian64(out, &in); }
+MONGO_INLINE void bson_big_endian32(void * out, const int32_t in) { bson_swap_endian32(out, &in); }
+#endif
+#endif
 
 MONGO_EXTERN_C_END
 

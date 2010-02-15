@@ -40,7 +40,7 @@ int bson_size(const bson * b ){
     int i;
     if ( ! b || ! b->data )
         return 0;
-    bson_little_endian32(&i, b->data);
+    bson_little_endian32(&i, *(int32_t*)b->data);
     return i;
 }
 void bson_destroy( bson * b ){
@@ -97,7 +97,7 @@ void bson_oid_gen(bson_oid_t* oid){
     static int incr = 0;
     static int fuzz = 0;
     int i = incr++; /*TODO make atomic*/
-    int t = time(NULL);
+    unsigned int t = (unsigned int)time(NULL);
 
     /* TODO rand sucks. find something better */
     if (!fuzz){
@@ -105,14 +105,14 @@ void bson_oid_gen(bson_oid_t* oid){
         fuzz = rand();
     }
     
-    bson_big_endian32(&oid->ints[0], &t);
+    bson_big_endian32(&oid->ints[0], t);
     oid->ints[1] = fuzz;
-    bson_big_endian32(&oid->ints[2], &i);
+    bson_big_endian32(&oid->ints[2], i);
 }
 
 time_t bson_oid_generated_time(bson_oid_t* oid){
     time_t out;
-    bson_big_endian32(&out, &oid->ints[0]);
+    bson_big_endian32(&out, oid->ints[0]);
     return out;
 }
 
@@ -178,7 +178,7 @@ bson_bool_t bson_iterator_more( const bson_iterator * i ){
 }
 
 bson_type bson_iterator_next( bson_iterator * i ){
-    int ds;
+    ptrdiff_t ds;
 
     if ( i->first ){
         i->first = 0;
@@ -244,17 +244,17 @@ const char * bson_iterator_value( const bson_iterator * i ){
 
 int bson_iterator_int_raw( const bson_iterator * i ){
     int out;
-    bson_little_endian32(&out, bson_iterator_value( i ));
+    bson_little_endian32(&out, *(int32_t*)bson_iterator_value( i ));
     return out;
 }
 double bson_iterator_double_raw( const bson_iterator * i ){
     double out;
-    bson_little_endian64(&out, bson_iterator_value( i ));
+    bson_little_endian64(&out, *(int64_t*)bson_iterator_value( i ));
     return out;
 }
 int64_t bson_iterator_long_raw( const bson_iterator * i ){
     int64_t out;
-    bson_little_endian64(&out, bson_iterator_value( i ));
+    bson_little_endian64(&out, *(int64_t*)bson_iterator_value( i ));
     return out;
 }
 
@@ -269,15 +269,15 @@ bson_oid_t * bson_iterator_oid( const bson_iterator * i ){
 int bson_iterator_int( const bson_iterator * i ){
     switch (bson_iterator_type(i)){
         case bson_int: return bson_iterator_int_raw(i);
-        case bson_long: return bson_iterator_long_raw(i);
-        case bson_double: return bson_iterator_double_raw(i);
+        case bson_long: return (int)bson_iterator_long_raw(i);
+        case bson_double: return (int)bson_iterator_double_raw(i);
         default: return 0;
     }
 }
 double bson_iterator_double( const bson_iterator * i ){
     switch (bson_iterator_type(i)){
         case bson_int: return bson_iterator_int_raw(i);
-        case bson_long: return bson_iterator_long_raw(i);
+        case bson_long: return (double)bson_iterator_long_raw(i);
         case bson_double: return bson_iterator_double_raw(i);
         default: return 0;
     }
@@ -286,7 +286,7 @@ int64_t bson_iterator_long( const bson_iterator * i ){
     switch (bson_iterator_type(i)){
         case bson_int: return bson_iterator_int_raw(i);
         case bson_long: return bson_iterator_long_raw(i);
-        case bson_double: return bson_iterator_double_raw(i);
+        case bson_double: return (int64_t)bson_iterator_double_raw(i);
         default: return 0;
     }
 }
@@ -322,7 +322,7 @@ const char * bson_iterator_code( const bson_iterator * i ){
 void bson_iterator_code_scope(const bson_iterator * i, bson * scope){
     if (bson_iterator_type(i) == bson_codewscope){
         int code_len;
-        bson_little_endian32(&code_len, bson_iterator_value(i)+4);
+        bson_little_endian32(&code_len, *(int32_t*)(bson_iterator_value(i)+4));
         bson_init(scope, (void*)(bson_iterator_value(i)+8+code_len), 0);
     }else{
         bson_empty(scope);
@@ -381,23 +381,23 @@ void bson_append_byte( bson_buffer * b , char c ){
     b->cur[0] = c;
     b->cur++;
 }
-void bson_append( bson_buffer * b , const void * data , int len ){
+void bson_append( bson_buffer * b , const void * data , size_t len ){
     memcpy( b->cur , data , len );
     b->cur += len;
 }
 void bson_append32(bson_buffer * b, const void * data){
-    bson_little_endian32(b->cur, data);
+    bson_little_endian32(b->cur, *(int32_t*)data);
     b->cur += 4;
 }
 void bson_append64(bson_buffer * b, const void * data){
-    bson_little_endian64(b->cur, data);
+    bson_little_endian64(b->cur, *(int64_t*)data);
     b->cur += 8;
 }
 
-bson_buffer * bson_ensure_space( bson_buffer * b , const int bytesNeeded ){
-    int pos = b->cur - b->buf;
+bson_buffer * bson_ensure_space( bson_buffer * b , const size_t bytesNeeded ){
+    ptrdiff_t pos = b->cur - b->buf;
     char * orig = b->buf;
-    int new_size;
+    size_t new_size;
 
     if (b->finished)
         bson_fatal_msg(!!b->buf, "trying to append to finished buffer");
@@ -405,7 +405,7 @@ bson_buffer * bson_ensure_space( bson_buffer * b , const int bytesNeeded ){
     if (pos + bytesNeeded <= b->bufSize)
         return b;
 
-    new_size = 1.5 * (b->bufSize + bytesNeeded);
+    new_size = 3 * (b->bufSize + bytesNeeded) / 2;
     b->buf = realloc(b->buf, new_size);
     if (!b->buf)
         bson_fatal_msg(!!b->buf, "realloc() failed");
@@ -417,12 +417,12 @@ bson_buffer * bson_ensure_space( bson_buffer * b , const int bytesNeeded ){
 }
 
 char * bson_buffer_finish( bson_buffer * b ){
-    int i;
+    ptrdiff_t i;
     if ( ! b->finished ){
         if ( ! bson_ensure_space( b , 1 ) ) return 0;
         bson_append_byte( b , 0 );
         i = b->cur - b->buf;
-        bson_little_endian32(b->buf, &i);
+        bson_little_endian32(b->buf, (int32_t)i);
         b->finished = 1;
     }
     return b->buf;
@@ -435,8 +435,8 @@ void bson_buffer_destroy( bson_buffer * b ){
     b->finished = 1;
 }
 
-static bson_buffer * bson_append_estart( bson_buffer * b , int type , const char * name , const int dataSize ){
-    const int sl = strlen(name) + 1;
+static bson_buffer * bson_append_estart( bson_buffer * b , int type , const char * name , const size_t dataSize ){
+    const int sl = (int)(strlen(name) + 1);
     if ( ! bson_ensure_space( b , 1 + sl + dataSize ) )
         return 0;
     bson_append_byte( b , (char)type );
@@ -465,7 +465,7 @@ bson_buffer * bson_append_double( bson_buffer * b , const char * name , const do
 }
 bson_buffer * bson_append_bool( bson_buffer * b , const char * name , const bson_bool_t i ){
     if ( ! bson_append_estart( b , bson_bool , name , 1 ) ) return 0;
-    bson_append_byte( b , i != 0 );
+    bson_append_byte( b , i?1:0 );
     return b;
 }
 bson_buffer * bson_append_null( bson_buffer * b , const char * name ){
@@ -477,7 +477,7 @@ bson_buffer * bson_append_undefined( bson_buffer * b , const char * name ){
     return b;
 }
 bson_buffer * bson_append_string_base( bson_buffer * b , const char * name , const char * value , bson_type type){
-    int sl = strlen( value ) + 1;
+    int sl = (int)(strlen( value ) + 1);
     if ( ! bson_append_estart( b , type , name , 4 + sl ) ) return 0;
     bson_append32( b , &sl);
     bson_append( b , value , sl );
@@ -494,7 +494,7 @@ bson_buffer * bson_append_code( bson_buffer * b , const char * name , const char
 }
 
 bson_buffer * bson_append_code_w_scope( bson_buffer * b , const char * name , const char * code , const bson * scope){
-    int sl = strlen(code) + 1;
+    int sl = (int)(strlen(code) + 1);
     int size = 4 + 4 + sl + bson_size(scope);
     if (!bson_append_estart(b, bson_codewscope, name, size)) return 0;
     bson_append32(b, &size);
@@ -523,11 +523,11 @@ bson_buffer * bson_append_new_oid( bson_buffer * b , const char * name ){
 }
 
 bson_buffer * bson_append_regex( bson_buffer * b , const char * name , const char * pattern, const char * opts ){
-    const int plen = strlen(pattern)+1;
-    const int olen = strlen(opts)+1;
-    if ( ! bson_append_estart( b , bson_regex , name , plen + olen ) ) return 0;
-    bson_append( b , pattern , plen );
-    bson_append( b , opts , olen );
+    const size_t plen = strlen(pattern)+1;
+    const size_t olen = strlen(opts)+1;
+    if ( ! bson_append_estart( b , bson_regex , name , (int)(plen + olen) ) ) return 0;
+    bson_append( b , pattern , (int)plen );
+    bson_append( b , opts , (int)olen );
     return b;
 }
 
@@ -542,13 +542,13 @@ bson_buffer * bson_append_element( bson_buffer * b, const char * name_or_null, c
     int size;
 
     bson_iterator_next(&next);
-    size = next.cur - elem->cur;
+    size = (int)(next.cur - elem->cur);
 
     if (name_or_null == NULL){
         bson_ensure_space(b, size);
         bson_append(b, elem->cur, size);
     }else{
-        int data_size = size - 1 - strlen(bson_iterator_key(elem));
+        size_t data_size = size - 1 - strlen(bson_iterator_key(elem));
         bson_append_estart(b, elem->cur[0], name_or_null, data_size);
         bson_append(b, name_or_null, strlen(name_or_null));
         bson_append(b, bson_iterator_value(elem), data_size);
@@ -583,13 +583,13 @@ bson_buffer * bson_append_start_array( bson_buffer * b , const char * name ){
 
 bson_buffer * bson_append_finish_object( bson_buffer * b ){
     char * start;
-    int i;
+    ptrdiff_t i;
     if ( ! bson_ensure_space( b , 1 ) ) return 0;
     bson_append_byte( b , 0 );
     
     start = b->buf + b->stack[ --b->stackPos ];
     i = b->cur - start;
-    bson_little_endian32(start, &i);
+    bson_little_endian32(start, (int32_t)i);
 
     return b;
 }
