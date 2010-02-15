@@ -7,6 +7,7 @@
 
 #ifdef __GNUC__
 #define MONGO_INLINE static __inline__
+#define MONGO_HAVE_STDINT
 #elif defined(_MSC_VER)
 #define MONGO_USE__INT64
 #define MONGO_INLINE __inline
@@ -71,8 +72,8 @@ MONGO_INLINE void bson_swap_endian32(void* outp, const void* inp){
 #define bson_big_endian32(out, in) ( memcpy(out, &in, 4) )
 #else
 #ifdef NDEBUG
-#define bson_little_endian64(out, in) ( memcpy(out, &in, 8) )
-#define bson_little_endian32(out, in) ( memcpy(out, &in, 4) )
+#define bson_little_endian64(out, in) { *(int64_t*)out = in; }
+#define bson_little_endian32(out, in) { *(int32_t*)out = in; }
 #define bson_big_endian64(out, in) ( bson_swap_endian64(out, &in) )
 #define bson_big_endian32(out, in) ( bson_swap_endian32(out, &in) )
 #else

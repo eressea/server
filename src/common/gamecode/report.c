@@ -1790,7 +1790,6 @@ nr_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f, co
 static void
 nr_building(FILE *F, const seen_region * sr, const building * b, const faction * f)
 {
-  region * r = sr->r;
   int i, bytes;
   const char * name, * bname, * billusion = NULL;
   const struct locale * lang = NULL;
