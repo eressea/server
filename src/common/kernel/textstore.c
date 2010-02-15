@@ -173,6 +173,19 @@ txt_open(struct storage * store, const char * filename, int mode)
 }
 
 static int
+txt_w_bin(struct storage * store, void * arg, size_t size)
+{
+  assert(!"not implemented!");
+  return 0;
+}
+
+static void 
+txt_r_bin(struct storage * store, void * result, size_t size)
+{
+  assert(!"not implemented!");
+}
+
+static int
 txt_close(struct storage * store)
 {
   return fclose((FILE *)store->userdata);
@@ -185,6 +198,7 @@ const storage text_store = {
   txt_w_id, txt_r_id,
   txt_w_tok, txt_r_tok, txt_r_tok_buf,
   txt_w_str, txt_r_str, txt_r_str_buf,
+  txt_w_bin, txt_r_bin, 
   txt_open, txt_close,
   0, 0, NULL
 };

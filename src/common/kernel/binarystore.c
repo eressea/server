@@ -212,6 +212,34 @@ bin_r_str_buf(struct storage * store, char * result, size_t size)
 }
 
 static int
+bin_w_bin(struct storage * store, void * arg, size_t size)
+{
+  int result;
+  int len = (int)size;
+
+  result = store->w_int(store, len);
+  if (len>0) {
+    result += (int)fwrite(arg, len, 1, file(store));
+  }
+  return result;
+}
+
+static void
+bin_r_bin(struct storage * store, void * result, size_t size)
+{
+  int len = store->r_int(store);
+  if (len>0) {
+    if ((size_t)len>size) {
+      log_error(("destination buffer too small %d %u.\n", len, size));
+      fseek(file(store), len, SEEK_CUR);
+    } else {
+      fread(result, len, 1, file(store));
+    }
+  }
+}
+
+
+static int
 bin_open(struct storage * store, const char * filename, int mode)
 {
   const char * modes[] = { 0, "rb", "wb", "ab" };
@@ -254,6 +282,7 @@ const storage binary_store = {
   bin_w_int_pak, bin_r_int_pak, /* id storage */
   bin_w_str, bin_r_str, bin_r_str_buf, /* token storage */
   bin_w_str, bin_r_str, bin_r_str_buf, /* string storage */
+  bin_w_bin, bin_r_bin, /* binary storage */
   bin_open, bin_close,
   0, 0, NULL
 };

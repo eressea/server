@@ -103,15 +103,16 @@
 #include <lauxlib.h>
 #include "tolua/bindings.h"
 #include "tolua/helpers.h"
-#include "tolua/bind_unit.h"
-#include "tolua/bind_faction.h"
-#include "tolua/bind_message.h"
-#include "tolua/bind_hashtable.h"
-#include "tolua/bind_ship.h"
+#include "tolua/bind_attrib.h"
 #include "tolua/bind_building.h"
-#include "tolua/bind_region.h"
+#include "tolua/bind_faction.h"
 #include "tolua/bind_gmtool.h"
+#include "tolua/bind_hashtable.h"
+#include "tolua/bind_message.h"
+#include "tolua/bind_region.h"
+#include "tolua/bind_ship.h"
 #include "tolua/bind_storage.h"
+#include "tolua/bind_unit.h"
 #endif // BINDINGS_TOLUA
 
 #ifdef BINDINGS_LUABIND
@@ -297,6 +298,7 @@ lua_init(void)
   tolua_ship_open(L);
   tolua_region_open(L);
   tolua_faction_open(L);
+  tolua_attrib_open(L);
   tolua_unit_open(L);
   tolua_message_open(L);
   tolua_hashtable_open(L);

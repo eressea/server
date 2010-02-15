@@ -277,6 +277,14 @@
 			Name="tolua"
 			>
 			<File
+				RelativePath=".\tolua\bind_attrib.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tolua\bind_attrib.h"
+				>
+			</File>
+			<File
 				RelativePath=".\tolua\bind_building.c"
 				>
 			</File>
@@ -366,6 +374,46 @@
 			</File>
 			<File
 				RelativePath=".\tolua\helpers.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="external"
+			>
+			<File
+				RelativePath="..\external\bson\bson.c"
+				>
+			</File>
+			<File
+				RelativePath="..\external\bson\bson.h"
+				>
+			</File>
+			<File
+				RelativePath="..\external\md5.c"
+				>
+			</File>
+			<File
+				RelativePath="..\external\md5.h"
+				>
+			</File>
+			<File
+				RelativePath="..\external\bson\numbers.c"
+				>
+			</File>
+			<File
+				RelativePath="..\external\bson\platform_hacks.h"
+				>
+			</File>
+			<File
+				RelativePath="..\external\sqlite3.c"
+				>
+			</File>
+			<File
+				RelativePath="..\external\sqlite3.h"
+				>
+			</File>
+			<File
+				RelativePath="..\external\sqlite3ext.h"
 				>
 			</File>
 		</Filter>

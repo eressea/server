@@ -24,6 +24,9 @@ typedef struct storage {
   int (*w_str)(struct storage *, const char * tok);
   char * (*r_str)(struct storage *);
   void (*r_str_buf)(struct storage *, char * result, size_t size);
+  /* binary data: */
+  int (*w_bin)(struct storage *, void * arg, size_t size);
+  void (*r_bin)(struct storage *, void * result, size_t size);
 
   int (*open)(struct storage *, const char * filename, int mode);
   int (*close)(struct storage *);
