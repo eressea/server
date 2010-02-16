@@ -13,24 +13,6 @@ function has_attrib(u, value)
     return false
 end
 
-function test_ror()
-    local r = region.create(0,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u.race = "elf"
-    u:set_skill("magic", 10)
-    u:add_item("money", 3010)
-    u.magic = "gwyrrd"
-    u.aura = 200
-    u.ship = s1
-    u:add_spell("create_roi")
-    u:clear_orders()
-    u:add_order("ZAUBERE 'Erschaffe einen Ring der Unsichtbarkeit'")
-    process_orders()
-    write_reports()
-    assert_equal(1, u:get_item("roi"))
-end
-
 function test_attrib()
     local r = region.create(0,0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")

@@ -169,6 +169,18 @@ lc_age(struct attrib * a)
   return (result!=0)?AT_AGE_KEEP:AT_AGE_REMOVE;
 }
 
+static void push_param(lua_State * L, char c, spllprm * param)
+{
+  if (c=='u') tolua_pushusertype(L, param->data.u, "unit");
+  else if (c=='b') tolua_pushusertype(L, param->data.b, "building");
+  else if (c=='s') tolua_pushusertype(L, param->data.sh, "ship");
+  else if (c=='r') tolua_pushusertype(L, param->data.sh, "region");
+  else if (c=='c') tolua_pushstring(L, param->data.s);
+  else {
+    log_error(("unsupported syntax %c.\n", c));
+    lua_pushnil(L);
+  }
+}
 
 /** callback to use lua for spell functions */
 static int
@@ -192,12 +204,30 @@ lua_callspell(castorder *co)
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
   if (lua_isfunction(L, 1)) {
+    int nparam = 4;
     tolua_pushusertype(L, co->rt, TOLUA_CAST "region");
     tolua_pushusertype(L, mage, TOLUA_CAST "unit");
     tolua_pushnumber(L, (lua_Number)co->level);
     tolua_pushnumber(L, (lua_Number)co->force);
+    if (co->sp->parameter && co->par->length) {
+      const char * synp = co->sp->parameter;
+      int i = 0;
+      ++nparam;
+      lua_newtable(L);
+      while (*synp&&i<co->par->length) {
+        spllprm * param = co->par->param[i];
+        char c = *synp;
+        if (c=='+') {
+          push_param(L, *(synp-1), param);
+        } else {
+          push_param(L, c, param);
+          ++synp;
+        }
+        lua_rawseti(L, -2, ++i);
+      }
+    }
 
-    if (lua_pcall(L, 4, 1, 0)!=0) {
+    if (lua_pcall(L, nparam, 1, 0)!=0) {
       const char* error = lua_tostring(L, -1);
       log_error(("spell(%s) calling '%s': %s.\n",
         unitname(mage), fname, error));

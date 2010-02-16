@@ -507,19 +507,22 @@ static void
 unit_addspell(unit * u, const char * name)
 {
   int add = 0;
+  sc_mage * m = get_mage(u);
   spell_list * slist = spells;
   spell_list ** starget = NULL;
+  spell * spadd = NULL;
   while (slist!=NULL) {
     spell * sp = slist->data;
     if (strcmp(name, sp->sname)==0) {
-      starget = get_spelllist(get_mage(u), u->faction);
-      if (add) log_error(("two spells are called %s.\n", name));
-      add_spell(starget, sp);
+      starget = get_spelllist(m, u->faction);
+      if (m->magietyp==sp->magietyp) spadd = sp;
+      else if (!spadd) spadd = sp;
       add = 1;
     }
     slist=slist->next;
   }
-  if (!add) log_error(("spell %s could not be found\n", name));
+  if (!spadd) log_error(("spell %s could not be found\n", name));
+  else add_spell(starget, spadd);
 }
 
 static int

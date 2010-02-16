@@ -1,4 +1,5 @@
 require "gates"
+require "eressea.alp"
 require "eressea.eternath"
 require "eressea.wedding-jadee" 
 require "eressea.ponnuki"

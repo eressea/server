@@ -1690,7 +1690,7 @@ verify_targets(castorder *co, int * invalid, int * resist, int * success)
   *resist = 0;
   *success = 0;
 
-  if (sa) {
+  if (sa && sa->length) {
     /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
     * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
     * gar nicht global hätte suchen dürften, setzen wir das Objekt
@@ -1994,7 +1994,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, const char * c
 
   /* mindestens ein Ziel (Ziellose Zauber werden nicht
    * geparst) */
-  if (size==0) {
+  if (minlen && size==0) {
     /* Fehler: Ziel vergessen */
     cmistake(u, ord, 203, MSG_MAGIC);
     return 0;
@@ -2002,6 +2002,10 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, const char * c
 
   par = malloc(sizeof(spellparameter));
   par->length = size;
+  if (!size) {
+    par->param = NULL;
+    return par;
+  }
   par->param = malloc(size * sizeof(spllprm *));
 
   while (!fail && *c && i<size && param[i]!=NULL) {

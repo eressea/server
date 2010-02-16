@@ -360,7 +360,6 @@ function test_guard()
   b.size = 10
   u2.building = b
   u3.building = b
-  update_owners()
   u2:clear_orders()
   u2:add_order("ATTACKIEREN " .. itoa36(u1.id)) -- you will die...
   u2:add_item("money", 100)
@@ -551,7 +550,6 @@ function test_control()
   local b = building.create(r, "castle")
   u1.building = b
   u2.building = b
-  update_owners()
   assert_equal(u1, b.owner)
   u1:clear_orders()
   u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
@@ -600,7 +598,24 @@ function test_building_other()
   u2:add_item("stone", 100)
   u2:clear_orders()
   u2:add_order("MACHEN BURG " .. itoa36(b.id))
-  update_owners()
   process_orders()
   assert_not_equal(10, b.size)
+end
+
+function test_roi()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u.race = "elf"
+    u:set_skill("magic", 10)
+    u:add_item("money", 3010)
+    u.magic = "tybied"
+    u.aura = 200
+    u.ship = s1
+    u:add_spell("create_roi")
+    u:clear_orders()
+    u:add_order("ZAUBERE 'Erschaffe einen Ring der Unsichtbarkeit' ")
+    process_orders()
+    write_reports()
+    assert_equal(1, u:get_item("roi"))
 end
