@@ -1,0 +1,18 @@
+SubDir TOP common races ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../gamecode ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(XMLHDRS) ;
+
+SOURCES =
+ dragons.c
+ illusion.c
+ races.c
+ zombies.c
+ ;
+
+Library races : $(SOURCES) ;

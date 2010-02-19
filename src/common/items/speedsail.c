@@ -1,0 +1,69 @@
+/* vi: set ts=2:
+ *
+ *
+ * Eressea PB(E)M host Copyright (C) 1998-2003
+ *      Christian Schlittchen (corwin@amber.kn-bremen.de)
+ *      Katja Zedel (katze@felidae.kn-bremen.de)
+ *      Henning Peters (faroul@beyond.kn-bremen.de)
+ *      Enno Rehling (enno@eressea.de)
+ *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
+ *
+ * This program may not be used, modified or distributed without
+ * prior permission by the authors of Eressea.
+ */
+
+#include <config.h>
+#include <kernel/eressea.h>
+#include "speedsail.h"
+
+/* kernel includes */
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/move.h>
+#include <kernel/plane.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/unit.h>
+
+/* util includes */
+#include <util/attrib.h>
+#include <util/log.h>
+
+/* libc includes */
+#include <assert.h>
+
+static int
+use_speedsail(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+{
+  struct plane * p = rplane(u->region);
+  unused(amount);
+  unused(itype);
+  if (p!=NULL) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
+  } else {
+    if (u->ship) {
+      attrib * a = a_find(u->ship->attribs, &at_speedup);
+      if (a==NULL) {
+        a = a_add(&u->ship->attribs, a_new(&at_speedup));
+        a->data.sa[0] = 50; /* speed */
+        a->data.sa[1] = 50; /* decay */
+        ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit", u));
+        /* Ticket abziehen */
+        i_change(&u->items, itype, -1);
+        return 0;
+      } else {
+        cmistake(u, ord, 211, MSG_EVENT);
+      }
+    } else {
+      cmistake(u, ord, 144, MSG_EVENT);
+    }
+  }
+  return EUNUSABLE;
+}
+
+void
+register_speedsail(void)
+{
+  register_item_use(use_speedsail, "use_speedsail");
+}

@@ -1,0 +1,185 @@
+Stufe, Name, Kosten, Auswirkung
+Kosten: *L = pro Level, P = Permanente Aura, M = Materialien (zB Holz),
+        B = Bauern, $ = Silber, H = Hitpoints
+(K) = Kampfzauber, (+K) = Prekampfzauber, (K+) = Postkampfzauber
+
+
+Druide/Gwyrrd (38 Sprüche):
+---------------------------
+ 1  Segen der Erde             1*L     Bauern verdienen 1 Silber mehr
+ 1  Viehheilung                1*L     Magier verdient 50$*L
+ 1  Erschaffe Steingolems      2*L,M   Magische Strassen/Burgenbauer
+ 2  Erschaffe Eisengolems      2*L,M   Magische Rüstungsbauer
+ 2  Hainzauber                 2*L,$   Erschafft Bäume
+ 3  Rostregen                  2*L     Vernichtet Eisenwaffen
+ 3  Firuns Fell                2*L     Insekten können auf Gletscher
+ 3  Hagel (K)                  1*L     verursacht leichten Schaden
+ 3  Bergwächter                3*L     Verhindert Eisenabbau
+ 4  Magischer Pfad             1*L,M   Magische Strasse
+ 4  Windschild (+K)            2*L     behindert Schützen
+ 4  B... Wasserelementar       1*L     Schiffe +1 Bewegung und keine Abdrift
+ 5  Heilung (K+)               1*L     heilt bis zu 11 Personen pro Stufe
+ 5  Wirbelwind (+K)            15      behindert alle Schützen zu 50%
+ 5  Astralschutzgeister (+K)   5*L     behindert Kampfzauber
+ 5  E... magischen Kräuterb.   30,1P,M Artefakt
+ 6  Meditation                 2       überträgt Aura
+ 6  B... einen Erdelementar    25,M    Beschädigt alle Gebäude einer Region
+ 6  B... Sturmelementar        6*L     verdoppelt Schiffsbewegung
+ 6  E... des wahren Sehens     50,$    Artefakt
+ 6  E... der Unsichtbarkeit    50,$    Artefakt
+ 7  Heimstein                  50,1P   verbessert Burg dauerhaft
+ 7  Wolfsgeheul (+K)           2*L     ruft Wölfe für den Kampf
+ 8  Blick des Basilisken (K)   1*L     entfernt Gegner aus Kampf
+ 8  Starkes Tor und ... (+K)   2*L     verbessert Schutz der Burg
+ 8  Geister bannen             6*L     Antimagie
+ 9  Weg der Bäume              3*L     Stufe*5 GE aus Wald in Astralebene
+ 9  Sog des Lebens             2*L     Stufe*5 GE aus Astralebene in Wald
+ 9  Heiliger Boden             80,3P   
+10  Erwecke Ents               6*L     Erschafft Einheit
+10  Vertrauten binden          100,5P  Vertrauter
+11  Segne Steinkreis           350,5P  Wandelt Steinkreis zum gesegneten St.
+12  Rindenhaut (+K)            4*L     Verbessert Rüstung
+13  B... Hitzeelementar        600     halbiert Fruchtbarkeit der Region
+14  Nebel der Verwirrung       8*L     Bewegung wird zufällig (nur Wald+Ozean)
+15  Mahlstrom                  200,M   Ozeanfeld beschädigt Schiffe schwer
+16  Wurzeln der Magie          250,10P,M   Wald wird permanent Mallornwald
+17  T... die Ebene der Hitze   800     stärker als L13, kann Region wandeln
+
+
+Chaos/Draig (27 Sprüche):
+-------------------------
+ 1  Verwünschung               1*L     nur Showeffekt
+ 1  Kleine Flüche              1*L     Magier verdient 50$*L
+ 2  Feuerball (K)              1*L     Schaden
+ 3  Gabe des Chaos             2*L     Magicboost
+ 4  Mächte des Todes           5*L     Erschafft Untote
+ 5  Blutrausch (+K)            5*L,B   Verbessert Kampfkraft
+ 5  Chaosfluch                 4*L     behindert Zauberer
+ 6  Rosthauch (K)              2*L     zerstört Eisenwaffen
+ 6  E... des wahren Sehens     50,$    Artefakt
+ 6  E... der Unsichtbarkeit    50,$    Artefakt
+ 7  Machtübertragung           2       überträgt Aura
+ 7  Feuerwand                  6*L     Wall, macht Schaden
+ 7  Fluch der Pestilenz        30,B    erzeugt Pest
+ 8  Wahnsinn des Krieges (+K)  3*L,B   verwirbelt gegnerische Reihen
+ 8  Beschwöre Schattendämonen  3*L     erzeugt Einheit
+ 9  E... der Trollstärke       20,1P   Artefakt
+ 9  Astraler Riss              35,M    Magier der Region verlieren Aura
+ 9  Astrales Chaos (+K)        6*L     behindert Kampfzauber
+10  Feuerteufel                50,M    vernichtet Wälder
+10  Pentagramm                 10*L    Antimagie
+10  Unheilige Kraft            8*L,M   Transformiert Untote
+11  Todeswolke                 40,H    alle Personen der Region verlieren HP
+11  Drachenruf                 80,M    lockt Drachen an
+12  Beschwöre Schattenmeister  7*L     erzeugt Einheit
+12  E... ein Flammenschwert    150,M   Artefakt
+13  Vertrauten rufen           100,5P  Vertrauter
+14  Chaossog                   150,B   nächste Runde Tor zur Astralebene
+
+
+Traum/Illaun (27 Sprüche):
+--------------------------
+ 1  Traumsenden                1*L     nur Showeffekt
+ 1  Wahrsagen                  1*L     Magier verdient 50$*L
+ 1  Schattenritter (+K)        1*L     Illusionen, fangen Angriffe ab
+ 2  Grauen der Schlacht (+K)   1*L     verleitet Gegner zur Flucht
+ 2  Seelenfrieden              3*L,M   reduziert deathcount der Region
+ 3  Traumschlößchen            1*L     Illusion einer Burg
+ 3  Traum der Magie            2       Auratransfer
+ 3  Gestaltwandlung            1*L     Einheit erscheint als andere Rasse
+ 4  Traumlesen                 8       Magier erhält Regionsbericht
+ 4  Schwere Glieder (+K)       4*L     -2 Def, 50% Chance dass keine Att
+ 5  Wiederbelebung (K+)        1*L     holt Tote zurück
+ 5  Traumbilder analysieren    5*L     analysiert Sprüche auf Einheiten
+ 6  Schlechter Schlaf          18      vermindert Lernrate in einer Region
+ 6  E... des wahren Sehens     50,$    Artefakt
+ 6  E... der Unsichtbarkeit    50,$    Artefakt
+ 7  Schlaf (K)                 1*L     -2 Def, kein Att, solange bis getroffen
+ 7  Irrlichter                 2*L     Bewegung wird zufällig?
+ 7  Traumdeuten                20      spioniert Einheit aus
+ 8  Schöne Träume              8*L     zeitweilig Bonus auf alle Talente
+ 8  Traumbilder entwirren      6*L     Antimagie
+ 9  Vertrauten rufen           100,5P  Vertrauter
+ 9  Seelenkopie                100,20P+ Reserveklon
+10  Schlechte Träume           9*L     zeitweilig -L/4 Talentstufen
+11  Tod des Geistes (K)        2*L     vermindert Talente, töten bei 0 Tagen
+12  Süße Träume                30      Vermehrung wie bei Orks
+14  Erschaffe ein Traumauge    10P,M   Artefakt
+15  Alp                        350,5P,M  Monster, sucht Opfer => -2 auf Talente
+16  Schleier der Verwirrung    7*L     mehrere Regionen: Bewegung wird zufällig
+
+
+Barde/Cerddor (33 Sprüche):
+---------------------------
+ 1 	Friedenslied (+K)          2       Magier kann vor Angriff fliehen
+ 1	Gaukelleien                1*L     Magier verdient 50$*L
+ 2  Lied der Heilung (K+)      1*L     heilt Verwundete
+ 2	Hohes Lied der Gaukelei    2*L     Unterhaltungsmaximum zeitweilig doppelt
+ 3	Regentanz                  1*L     Bauern verdienen 1 Silber mehr
+ 3  Gesang der Furcht (K)      1*L     Gegner versuchen zu fliehen
+ 4	Gesang des Werbens         2*L     rekrutiert Bauern
+ 4  Gesang der Verwirrung (+K) 2*L     verwirbelt gegnerische Reihen
+ 4	Plappermaul                10      spioniert Einheit aus 
+ 5	Heldengesang (+K)          2*L     Krieger widerstehen einigen Effekten
+ 5  Gesang des Auratransfers   2       überträgt Aura
+ 5	G... Lebens analysieren    10      analysiert Zauber auf Einheit
+ 5	Bannlied (+K)              5*L     behindert Kampfzauber
+ 6 	Monster friedlich stimmen  15      verhindert Monsterangriffe
+ 6	Lied der Verführung        12      Einheit schenkt Magier 50% Besitz
+ 6  E... des wahren Sehens     50,$    Artefakt
+ 6	E... der Unsichtbarkeit    50,$    Artefakt
+ 7  Schaler Wein               4*L,M,$ Opfer vergißt bis 60 Talenttage
+ 7 	Aushorchen                 4,$     Magier erhält Regionsbericht
+ 7 	Kriegsgesang (+K)          5*L     verbessert Kampfkraft
+ 8	Gesang der Angst           5*L     Malus auf Att und Def
+ 8	L... Ortes analysieren     3*L     analysiert Zauber auf Objekten/Regionen
+ 8 	Lebenslied festigen        5*L     Antimagie
+ 9  Ritual der Aufnahme        3*L,1P*L  L Personen können Partei wechseln
+ 9  Vertrauten rufen           100,5P  Vertrauter
+10  Mob aufwiegeln             4*L     Erzeugt Einheit
+10 	Gesang des wachen Geistes  2*L     verbessert Magieresistenz in Region
+11 	Gesang der Melancholie     40      kein Unterhaltunssilber verfügbar
+11  Miriams flinke Finger      20,1P,$  Artefakt
+12  G... schwachen Geistes     2*L     vermindert Magieresistenz in Region
+12  G... der Friedfertigkeit   20*L    verhindert Kämpfe
+13	Gesang der Versklavung     40      Opfer wechselt zeitweilig Partei
+15	Aufruhr beschwichtigen     30      Löst Mob (L10) auf
+
+
+Astral/Tybied (32 Sprüche):
+---------------------------
+ 1 	Magie analysieren          1*L     analysiert Zauber
+ 1	Schleieraura               1*L     verbirgt Ausrüstung einer Einheit
+ 1  Wunderdoktor               1*L     Magier verdient 50$*L
+ 2  Schutz vor Magie (+K)      3*L     behindert Kampfzauber
+ 2	Astraler Blick             1*L     sieht Einheiten in Astralebene
+ 3	Schutzzauber               5*L     verbessert Magieresistenz einer Einheit
+ 3	Beute bewahren (K+)        1*L     vermindert Zerstörung von Gegenständen
+ 4	Astraler Weg               2*L     schiebt (L-3)*15 GE in Astralebene
+ 4	Astraler Ausgang           2*L     schiebt (L-3)*15 GE in Realität
+ 5	Auratransfer               1       transferiert Aura, auch andere Gebiete
+ 5	Schockwelle (K)            1*L     verhindert nächste Attacke
+ 5	Astrale Schwächezone       3*L     Antimagiezone
+ 5	E... des wahren Sehens     50,$    Artefakt
+ 6 	Astraler Ruf               2*L     zieht (L-3)*15 GE in Astralebene
+ 6	Ruf der Realität           2*L     zieht (L-3)*15 GE in Realität
+ 6	Stehle Aura                2*L     entzieht anderem Magier Aura
+ 6	Luftschiff                 10,M    läßt Boot/Langboot fliegen
+ 6	E... der Unsichtbarkeit    50,$    Artefakt
+ 7	E... Antimagiekristall     50,$    Item, das Antimagiezone erzeugt
+ 7	Magiefresser               3*L     Antimagie
+ 8	Runen des Schutzes         20      +20% Magieresistenz bei Burgen/Schiffen
+ 8	Schild des Fisches (+K)    4*L     vermindert Schaden
+ 9  Beschleunigung (+K)        5*L     verdoppelt Attacken
+ 9 	E... einen Ring der Macht  100,$   Artefakt
+10	Blick in die Realität      40      sieht Region aus Astralebene
+10	E... Negativen Gewichts    30,1P,$ Artefakt
+11 	Zeitdehnung                5*L     Doppelte Bewegung und Angriffe
+12 	Rüstschild (+K)            4*L     verbessert Rüstung
+12	Vertrauten rufen           100,5P  Vertrauter
+13	Belebtes Gestein           10,5P,M Versetzt Burg samt Besatzung
+14	Störe Astrale Integrität   140     
+15	Opfere Kraft               100     transferiert permanente Aura
+
+
+ 

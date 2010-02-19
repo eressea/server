@@ -1,0 +1,10 @@
+# we want this region:
+add region 1023 999
+# everything within 2 of (985,1035):
+add area 985 1035 2
+# but not the center itself:
+del region 985 1035
+# that's all folks.
+end
+# will not be executed:
+del all

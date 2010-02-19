@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="messages.xml"/>
+
+  <!-- Localization -->
+  <xi:include href="de/strings.xml"/>
+  <xi:include href="en/strings.xml"/>
+
+	<xi:include href="common/armor.xml" />
+	<xi:include href="common/items.xml" />
+	<xi:include href="common/luxuries.xml" />
+	<xi:include href="common/potions.xml" />
+	<xi:include href="common/resources.xml" />
+  <xi:include href="eressea2/equipment.xml"/>
+  <xi:include href="eressea2/races.xml"/>
+  <xi:include href="eressea2/spells.xml"/>
+  <xi:include href="eressea2/terrains.xml"/>
+	<xi:include href="eressea2/weapons.xml" />
+  <xi:include href="spoils.xml"/>
+  <xi:include href="prefixes.xml"/>
+  <xi:include href="ships.xml"/>
+  <xi:include href="common/buildings.xml"/>
+  <xi:include href="eressea/calendar.xml"/>
+  <xi:include href="equipment.xml"/>
+  <xi:include href="dungeons.xml"/>
+  <xi:include href="directions.xml"/>
+
+  <equipment>
+    <set name="first_unit">
+      <item name="conquesttoken" amount="1"/>
+      <item name="log" amount="30"/>
+      <item name="stone" amount="30"/>
+      <item name="money" amount="4200"/>
+    </set>
+    <set name="new_faction">
+      <item name="adamantium" amount="1"/>
+    </set>
+  </equipment>
+
+  <xi:include href="names-undead.xml"/>
+  <xi:include href="names-skeletons.xml"/>
+  <xi:include href="names-zombies.xml"/>
+  <xi:include href="names-ghouls.xml"/>
+  <xi:include href="names-dragons.xml"/>
+
+  <game name="Eressea" units="1000">
+    <!-- Game specific settings -->
+    <order name="ARBEITEN" disable="yes"/>
+    <order name="BETEN" disable="yes"/>
+    <order name="FRIEDEN" disable="yes"/>
+    <order name="GM" disable="yes"/>
+    <order name="JIHAD" disable="yes"/>
+    <order name="KRIEG" disable="yes"/>
+    <order name="LEHREN" disable="yes"/>
+    <order name="LIEFERE" disable="yes"/>
+    <order name="OPFERE" disable="yes"/>
+    <order name="SABOTIEREN" disable="yes"/>
+    <order name="SPIONIEREN" disable="yes"/>
+    <order name="TARNEN" disable="yes"/>
+    <order name="TREIBEN" disable="yes"/>
+    <order name="UNTERHALTEN" disable="yes"/>
+    <order name="VERKAUFEN" disable="yes"/>
+    <order name="WERWESEN" disable="yes"/>
+    <order name="XONTORMIA" disable="yes"/>
+
+    <skill name="alchemy" enable="true"/>
+    <skill name="armorer" enable="true"/>
+    <skill name="bow" enable="true"/>
+    <skill name="building" enable="true"/>
+    <skill name="cartmaking" enable="true"/>
+    <skill name="catapult" enable="true"/>
+    <skill name="crossbow" enable="true"/>
+    <skill name="forestry" enable="true"/>
+    <skill name="herbalism" enable="true"/>
+    <skill name="magic" enable="true"/>
+    <skill name="melee" enable="true"/>
+    <skill name="mining" enable="true"/>
+    <skill name="polearm" enable="true"/>
+    <skill name="quarrying" enable="true"/>
+    <skill name="riding" enable="true"/>
+    <skill name="roadwork" enable="true"/>
+    <skill name="sailing" enable="true"/>
+    <skill name="shipcraft" enable="true"/>
+    <skill name="stamina" enable="true"/>
+    <skill name="tactics" enable="true"/>
+    <skill name="trade" enable="true"/>
+    <skill name="training" enable="true"/>
+    <skill name="unarmed" enable="true"/>
+    <skill name="weaponsmithing" enable="true"/>
+
+    <param name="hunger.long" value="1"/>
+
+    <param name="init_spells" value="0"/>
+
+    <param name="modules.astralspace" value="0"/>
+    <param name="modules.wormholes" value="0"/>
+
+    <param name="rules.check_overload" value="0"/>
+    <param name="rules.combat.skill_formula" value="1"/>
+    <param name="rules.combat.critical" value="0"/>
+    <param name="rules.combat.melee_bonus" value="0"/>
+    <param name="rules.combat.missile_bonus" value="0"/>
+    <param name="rules.combat.skill_bonus" value="0"/>
+    <param name="rules.combat.turns" value="1"/>
+    <param name="rules.combat.unarmed_bonus" value="0"/>
+    <param name="rules.combat.populationdamage" value="0"/>
+
+    <param name="rules.economy.taxation" value="1"/>
+
+    <param name="rules.give" value="3"/> <!-- only self + peasants -->
+    <param name="rules.stamina" value="0"/> <!-- does not affect hp -->
+    <param name="skill.maxlevel" value="10"/>
+  </game>
+  <xi:include href="eressea/strings.xml"/>
+  <xi:include href="eressea/races.xml"/>
+  <xi:include href="eressea/items.xml"/>
+  <xi:include href="eressea/artrewards.xml"/>
+  <xi:include href="eressea/dungeons.xml"/>
+  <xi:include href="eressea/buildings.xml"/>
+  <strings>
+    <string name="mailto">
+      <text locale="de">eressea-server@eressea.de</text>
+      <text locale="en">eressea-server@eressea.de</text>
+    </string>
+    <string name="newbie_info_1">
+      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
+      ERESSEA BEFEHLE an eressea-server@eressea.de zu senden.</text>
+      <text locale="en">Remember to send your orders to
+      eressea-server@eressea.de with the subject ERESSEA ORDERS.</text>
+    </string>
+    <string name="mailcmd">
+      <text locale="de">ERESSEA BEFEHLE</text>
+      <text locale="en">ERESSEA ORDERS</text>
+    </string>
+  </strings>
+</eressea>

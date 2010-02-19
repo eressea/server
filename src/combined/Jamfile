@@ -1,0 +1,62 @@
+SubDir TOP combined ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../eressea ;
+SubDirHdrs $(SUBDIR)/../common/gamecode ;
+SubDirHdrs $(SUBDIR)/../common/kernel ;
+SubDirHdrs $(SUBDIR)/../common/util ;
+SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/../tools ;
+SubDirHdrs $(SUBDIR)/../external ;
+SubDirHdrs $(SUBDIR)/.. ;
+
+UsingLua ;
+
+SEARCH_SOURCE += [ FDirName $(TOP) common iniparser ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
+if $(BINDINGS) = LUABIND {
+   SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
+}
+if $(BINDINGS) = TOLUA {
+   SEARCH_SOURCE += [ FDirName $(SUBDIR) tolua ] ;
+}
+SubDirC++Flags -DHAVE_LUA ;
+
+SubDirHdrs $(XMLHDRS) ;
+
+SERVER = eressea ;
+
+SERVER_SOURCES =
+ curses.c
+ gamecode.c
+ kernel.c
+ stdafx.c
+ util.c
+ main.c
+;
+
+CCFLAGS += -DSQLITE_THREADSAFE=0 ;
+
+if $(MSPACES) {
+ SERVER_SOURCES += malloc.c ;
+}
+ 
+ 
+if $(BINDINGS) = LUABIND {
+  SERVER_SOURCES += bindings.cpp ;
+  libluabind $(SERVER) ;
+}
+if $(BINDINGS) = TOLUA {
+  libtolua $(SERVER) ;
+}
+liblua $(SERVER) ;
+
+# eressea-server with lua scripting
+libxml2 $(SERVER) ;
+libcurses $(SERVER) ;
+libmcheck $(SERVER) ;
+
+LINKLIBS on $(SERVER) += -lm -ldl -lstdc++ ;
+Main $(SERVER) : $(SERVER_SOURCES) ;
+
+Main atoi36 : atoi36.c ;

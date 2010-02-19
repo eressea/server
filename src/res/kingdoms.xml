@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="messages.xml"/>
+
+  <!-- Localization -->
+  <xi:include href="de/strings.xml"/>
+  <xi:include href="en/strings.xml"/>
+
+	<xi:include href="common/items.xml" />
+	<xi:include href="common/armor.xml" />
+	<xi:include href="common/weapons.xml" />
+	<xi:include href="common/resources.xml" />
+	<xi:include href="common/luxuries.xml" />
+	<xi:include href="common/potions.xml" />
+  <xi:include href="kingdoms/races.xml"/>
+  <xi:include href="prefixes.xml"/>
+  <xi:include href="calendar.xml"/>
+  <xi:include href="kingdoms/terrains.xml"/>
+  <xi:include href="kingdoms/equipment.xml"/>
+  <xi:include href="kingdoms/buildings.xml"/>
+
+  <equipment>
+    <set name="first_unit">
+      <item name="wood" amount="5"/>
+      <item name="stone" amount="10"/>
+    </set>
+  </equipment>
+
+  <game name="kingdoms" welcome="kingdoms">
+    <!-- Game specific settings -->
+    <order name="ARBEITEN" disable="yes"/>
+    <order name="BEKLAUEN" disable="yes"/>
+    <order name="BELAGERE" disable="yes"/>
+    <order name="BEWACHEN" disable="yes"/>
+    <order name="FAHREN" disable="yes"/>
+    <order name="KRIEG" disable="yes"/>
+    <order name="FRIEDEN" disable="yes"/>
+    <order name="FORSCHEN" disable="yes"/>
+    <order name="KAUFEN" disable="yes"/>
+    <order name="LEHREN" disable="yes"/>
+    <order name="LIEFERE" disable="yes"/>
+    <order name="REKRUTIEREN" disable="yes"/>
+    <order name="SABOTIEREN" disable="yes"/>
+    <order name="SPIONIEREN" disable="yes"/>
+    <order name="TARNEN" disable="yes"/>
+    <order name="TRANSPORTIEREN" disable="yes"/>
+    <order name="TREIBEN" disable="yes"/>
+    <order name="UNTERHALTEN" disable="yes"/>
+    <order name="VERKAUFEN" disable="yes"/>
+    <order name="ZERSTOEREN" disable="yes"/>
+    <order name="ZUECHTEN" disable="yes"/>
+    <order name="REPORT" disable="yes"/>
+    <order name="PIRATERIE" disable="yes"/>
+    <order name="NEUSTART" disable="yes"/>
+    <order name="OPFERE" disable="yes"/>
+    <order name="BETEN" disable="yes"/>
+    <order name="JIHAD" disable="yes"/>
+    <order name="GM" disable="yes"/>
+    <order name="INFO" disable="yes"/>
+    <order name="SYNONYM" disable="yes"/>
+    <order name="PFLANZEN" disable="yes"/>
+    <order name="WERWESEN" disable="yes"/>
+    <order name="XONTORMIA" disable="yes"/>
+    <order name="ALLIANZ" disable="yes"/>
+    <order name="PROMOTION" disable="yes"/>
+
+    <skill name="alchemy" enable="false"/>
+    <skill name="crossbow" enable="false"/>
+    <skill name="mining" enable="false"/>
+    <skill name="bow" enable="false"/>
+    <skill name="building" enable="false"/>
+    <skill name="trade" enable="false"/>
+    <skill name="forestry" enable="false"/>
+    <skill name="catapult" enable="false"/>
+    <skill name="herbalism" enable="false"/>
+    <skill name="magic" enable="false"/>
+    <skill name="training" enable="false"/>
+    <skill name="riding" enable="false"/>
+    <skill name="armorer" enable="false"/>
+    <skill name="shipcraft" enable="false"/>
+    <skill name="melee" enable="false"/>
+    <skill name="sailing" enable="false"/>
+    <skill name="polearm" enable="false"/>
+    <skill name="espionage" enable="false"/>
+    <skill name="quarrying" enable="false"/>
+    <skill name="roadwork" enable="false"/>
+    <skill name="tactics" enable="false"/>
+    <skill name="stealth" enable="false"/>
+    <skill name="entertainment" enable="false"/>
+    <skill name="weaponsmithing" enable="false"/>
+    <skill name="cartmaking" enable="false"/>
+    <skill name="perception" enable="false"/>
+    <skill name="taxation" enable="false"/>
+    <skill name="stamina" enable="false"/>
+    <skill name="unarmed" enable="false"/>
+
+
+    <param name="nmr.timeout" value="20"/>
+    <param name="nmr.removenewbie" value="0"/>
+    <param name="GiveRestriction" value="3"/>
+    <param name="NewbieImmunity" value="4"/>
+    <param name="hunger.long" value="1"/>
+    <param name="rules.check_overload" value="0"/>
+    <param name="rules.combat.populationdamage" value="0"/>
+
+    <param name="functions.wage" value="get_wage"/>
+    <param name="functions.maintenance" value="get_maintenance"/>
+  </game>
+  <strings>
+    <string name="newbie_info_1">
+      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an kingdoms-server@eressea.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
+      <text locale="en">Remember to send your orders to kingdoms-server@eressea.de with the subject ERESSEA ORDERS.</text>
+    </string>
+    <string name="mailto">
+      <text locale="de">kingdoms-server@eressea.de</text>
+      <text locale="en">kingdoms-server@eressea.de</text>
+    </string>
+    <string name="mailcmd">
+      <text locale="de">ERESSEA BEFEHLE</text>
+      <text locale="en">ERESSEA ORDERS</text>
+    </string>
+  </strings>
+</eressea>

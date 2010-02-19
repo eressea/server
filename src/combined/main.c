@@ -1,0 +1,9 @@
+#include "common/settings.h"
+#include "common/config.h"
+#include "stdafx.h"
+
+#include <eressea/server.c>
+#include <external/sqlite3.c>
+#include <external/md5.c>
+#include <external/bson/bson.c>
+#include <external/bson/numbers.c>

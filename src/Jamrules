@@ -1,0 +1,222 @@
+C++ = g++ ;
+CC = gcc ;
+LINK = gcc ;
+
+MSPACES = 1 ;
+
+# BINDINGS = LUABIND ;
+if ! $(BINDINGS) {
+  BINDINGS = TOLUA ;
+}
+
+if $(BINDINGS) = LUABIND {
+  CCFLAGS += -DBINDINGS_LUABIND ;
+  C++FLAGS += -DBINDINGS_LUABIND ;
+}
+
+if $(BINDINGS) = TOLUA {
+  CCFLAGS += -DBINDINGS_TOLUA ;
+  C++FLAGS += -DBINDINGS_TOLUA ;
+}
+
+if ! $(LUA_VERSION) {
+  LUA_VERSION = 5.1 ;
+}
+
+if ! $(HAVE_LUA) {
+  HAVE_LUA = 1 ;
+}
+
+if ! $(CPU) {
+  CPU = prescott ;
+  ARCH = -march=$(CPU) -mmmx -mieee-fp ;
+  ARCH += -mtune=$(CPU) ;
+}
+
+if $(DISTCC_HOSTS) {
+  DISTCC = 1 ;
+}
+
+if $(DISTCC) {
+  CC = distcc $(CC) ;
+  C++ = distcc $(C++) ;
+  Echo Compiling with distcc ;
+}
+
+if ! $(CCACHE_DIR) {
+} else {
+  CC = ccache $(CC) ;
+  C++ = ccache $(C++) ;
+  Echo Compiling with ccache ;
+}
+
+if $(DMALLOC) {
+  Echo Compiling with dmalloc ;
+  CCFLAGS += -DUSE_DMALLOC ;
+  C++FLAGS += -DUSE_DMALLOC ;
+  LINKFLAGS += -ldmalloc ;
+}
+
+if $(COVERAGE) = 1 {
+  Echo Compiling with gcov info ;
+  CCFLAGS += -fprofile-arcs -ftest-coverage ;
+  C++FLAGS += -fprofile-arcs -ftest-coverage ;
+  LINKFLAGS += -fprofile-arcs -ftest-coverage ;
+}
+
+if $(PROFILE) = 1 {
+  Echo Compiling with profiler ;
+  CCFLAGS += -pg -ggdb ;
+  LINKFLAGS += -pg -ggdb ;
+}
+
+CCFLAGS += -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes 
+        -Wpointer-arith -Wno-char-subscripts ;
+
+CCFLAGS on foo += -Wwrite-strings
+		   -Wundef
+		   -Wstrict-prototypes
+		   -Werror-implicit-function-declaration
+		   -Wno-char-subscripts
+		   -Wpointer-arith
+#		   -Wshadow
+#		   -Wcast-qual
+		   -Wcast-align
+#		   -Wconversion
+#		   -Wunreachable-code
+                   -Werror
+		   ;
+
+# this require the latet luabind from CVS
+if ! $(LUABIND) {
+  LUABIND = "B7" ;
+}
+
+C++FLAGS += -DHAVE_LUABIND_$(LUABIND) ;
+if $(LOCAL_USR) {
+  XMLHDRS = $(LOCAL_USR)/include/libxml2 ;
+  C++FLAGS += -I$(LOCAL_USR)/include ;
+  CFLAGS += -I$(LOCAL_USR)/include ;
+  LINKLIBS += -L$(LOCAL_USR)/lib ;
+} else {
+  XMLHDRS = /usr/include/libxml2 ;
+}
+C++FLAGS += -DHAVE_LUABIND_$(LUABIND) ;
+
+rule iconv
+{
+  if $(LINK_ICONV) {
+    LINKLIBS on $(<) += -liconv ;
+  }
+}
+
+rule zlib
+{
+  LINKLIBS on $(<) += -lz ;
+}
+
+rule liblua
+{
+  if $(LUA_VERSION) = 5.1 {
+    LINKLIBS on $(<) += -llua5.1 ;
+  } else {
+    LINKLIBS on $(<) += -llua50 -llualib50 ;
+  }
+}
+
+rule libluabind
+{
+  LINKLIBS on $(<) += -lm -lluabind ;
+}
+
+rule libxml2
+{
+  LINKLIBS on $(<) += -lxml2 ;
+}
+
+rule libtolua
+{
+  LINKLIBS on $(<) += -ltolua ;
+}
+
+rule libcurses
+{
+  LINKLIBS on $(<) += -lncurses ;
+}
+
+rule libmcheck
+{
+  if $(DEBUG) = 1 {
+    LINKLIBS on $(<) += -lmcheck ;
+  }
+}
+
+rule UsingLuabind
+{
+   SubDirHdrs $(LUABIND_ROOT)/include ;
+}
+
+rule UsingLua
+{
+  if $(LUA_VERSION) = 5.1 {
+    SubDirHdrs /usr/include/lua5.1 ;
+  } else {
+    SubDirHdrs /usr/include/lua50 ;
+  }
+}
+
+rule TargetDirectory
+{
+        # Now set up SEARCH_SOURCE, LOCATE_TARGET, SOURCE_GRIST
+        # These can be reset if needed.  For example, if the source
+        # directory should not hold object files, LOCATE_TARGET can
+        # subsequently be redefined.
+
+        local path = [ FDirName $(SUBDIR) $(TARGET_PREFIX) ] ;
+        SEARCH_SOURCE = $(SUBDIR) ;
+        LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(path) ;
+        LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(path) ;
+        SOURCE_GRIST = $(path) ;
+        if $(DEBUG) = 1 {
+            SubDirCcFlags -ggdb ;
+            SubDirC++Flags -ggdb ;
+            OPTIM = -O0 -ffloat-store ;
+        }
+        else {
+            SubDirCcFlags -DNDEBUG ;
+            SubDirC++Flags -DNDEBUG ;
+            OPTIM = -Os -ffloat-store ;
+        }
+        SubDirCcFlags $(ARCH) ;
+        SubDirC++Flags $(ARCH) ;
+}
+
+if ! $(DEBUG) {
+   ECHO Assuming DEBUG=1 ;
+   DEBUG = 1 ;
+}
+
+if $(MSPACES) {
+  CCFLAGS += -DMSPACES -DDL_DEBUG=0 ;
+  C++FLAGS += -DMSPACES -DDL_DEBUG=0 ;
+}
+
+if $(WITHOUT_LUA) {
+   ECHO Compiling without LUA ;
+}
+
+if $(DEBUG) = 0 {
+  TARGET_PREFIX = Release ;
+}
+else {
+  TARGET_PREFIX = Debug ;
+}
+if $(PROFILE) = 1 {
+   TARGET_PREFIX = Profile ;
+}
+if $(COVERAGE) = 1 {
+   TARGET_PREFIX = Coverage ;
+}
+
+
+

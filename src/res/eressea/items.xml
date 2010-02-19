@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<resources>
+
+<!-- xmas gimmicks -->
+  <resource name="snowball">
+    <item notlost="yes" weight="0">
+      <weapon bash="true" missile="true" skill="unarmed" offmod="0" defmod="0" reload="0" magres="0.0">
+        <damage type="rider" value="3d8+8"/>
+        <damage type="footman" value="3d8+8"/>
+        <modifier type="missile_target" value="2"/>
+        <modifier type="skill" value="-90"/>
+        <modifier type="skill" value="100">
+          <race name="snowman"/>
+        </modifier>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="snowman">
+    <item notlost="yes" weight="1">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+  <resource name="ring_of_levitation" appearance="ring">
+    <item notlost="yes" weight="0" cursed="true">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+  <resource name="birthdaycake">
+    <item notlost="yes" weight="0"/>
+  </resource>
+
+  <resource name="lebkuchenherz">
+    <item notlost="yes" weight="0"/>
+  </resource>
+
+<!-- ambassador rewards -->
+  <resource name="seashell">
+    <item cursed="true" weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+<!-- xmas 2005 -->
+  <resource name="stardust" appearance="vial">
+    <item weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+<!-- xmas 2006 -->
+  <resource name="xmastree">
+    <item weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+<!-- art rewards -->
+  <resource name="trappedairelemental">
+    <item weight="0">
+      <function name="use" value="use_trappedairelemental"/>
+    </item>
+  </resource>
+
+  <resource name="hornofdancing">
+    <item weight="0">
+      <function name="use" value="use_hornofdancing"/>
+    </item>
+  </resource>
+
+<!-- museum items -->
+  <resource name="museumexitticket">
+    <!-- you get your stuff back when leaving the museum -->
+    <item notlost="yes" weight="0">
+      <function name="use" value="use_museumexitticket"/>
+    </item>
+  </resource>
+
+  <resource name="museumticket">
+    <!-- you get your stuff back when leaving the museum -->
+    <item weight="0">
+      <function name="use" value="use_museumticket"/>
+    </item>
+  </resource>
+
+<!-- gimmicks, etc. -->
+  <resource name="aog">
+    <!-- Amulett des Treffens -->
+    <item notlost="yes" cursed="true" weight="0"/>
+  </resource>
+
+  <resource name="ao_daemon">
+    <!-- summons igjarjuk -->
+    <item weight="0" score="6000" notlost="true" cursed="true">
+      <function name="use" value="useigjarjuk"/>
+      <function name="give" value="giveigjarjuk"/>
+    </item>
+  </resource>
+
+  <resource name="griphonwing">
+    <!-- this lets you leave the arena -->
+    <item weight="0" score="6000" notlost="true" cursed="true">
+      <function name="use" value="leave_arena"/>
+      <function name="give" value="giveigjarjuk"/>
+    </item>
+  </resource>
+
+  <resource name="eyeofdragon">
+    <!-- the arena gate, for one-time entry -->
+    <item weight="0" score="0">
+      <function name="use" value="enter_arena"/>
+    </item>
+  </resource>
+
+  <resource name="questkey1" appearance="key">
+    <!-- Key for an old quest. placeholder item -->
+    <item notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="questkey2" appearance="key">
+    <!-- Key for an old quest. placeholder item -->
+    <item notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="jadee_ring" appearance="ring">
+    <!-- Wedding ring for Jadee -->
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="wente_ring" appearance="ring">
+    <!-- Wedding ring for Wildente -->
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="jadee_dress">
+    <!-- Wedding dress for Jadee -->
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="wente_dress">
+    <!-- Wedding dress for Wildente -->
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="lmsreward">
+    <!-- LMS reward -->
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <!-- christmas items: start -->
+  <resource name="almond">
+    <item weight="0"/>
+  </resource>
+  <resource name="apple">
+    <item weight="0"/>
+  </resource>
+  <resource name="nut">
+    <item weight="0"/>
+  </resource>
+  <resource name="cookie">
+    <item weight="0"/>
+  </resource>
+  <!-- christmas items: end -->
+
+  <resource name="adamantium" limited="yes" material="rm_adamantium">
+    <item weight="200" score="200">
+      <construction skill="mining" minskill="8" reqsize="1"/>
+    </item>
+    <resourcelimit>
+      <modifier type="require" building="mine"/>
+      <guard flag="mining"/>
+    </resourcelimit>
+  </resource>
+
+  <resource name="adamantiumaxe">
+    <item weight="100" score="500">
+      <construction skill="weaponsmithing" minskill="8" reqsize="1">
+        <requirement type="adamantium" quantity="1"/>
+        <requirement type="log" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
+        <damage type="rider" value="3d4+15"/>
+        <damage type="footman" value="3d4+15"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="adamantiumplate">
+    <item weight="100" score="2000">
+      <construction skill="armorer" minskill="10" reqsize="1">
+        <requirement type="adamantium" quantity="3"/>
+      </construction>
+      <armor ac="7" penalty="0.1"/>
+    </item>
+  </resource>
+
+</resources>

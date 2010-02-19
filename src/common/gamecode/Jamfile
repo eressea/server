@@ -1,0 +1,30 @@
+SubDir TOP common gamecode ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(XMLHDRS) ;
+
+SOURCES =
+ archetype.c
+ creation.c
+ creport.c
+ economy.c
+ give.c
+ items.c
+ laws.c
+ luck.c
+ market.c
+ monster.c
+ randenc.c
+ report.c
+ spells.c
+ spy.c
+ study.c
+ summary.c
+ xmlreport.c
+ ;
+
+Library gamecode : $(SOURCES) ;

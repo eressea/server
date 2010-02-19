@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="messages.xml"/>
+
+  <!-- Localization -->
+  <xi:include href="de/strings.xml"/>
+  <xi:include href="en/strings.xml"/>
+
+	<xi:include href="common/items.xml" />
+	<xi:include href="common/armor.xml" />
+	<xi:include href="common/weapons.xml" />
+	<xi:include href="common/resources.xml" />
+	<xi:include href="common/luxuries.xml" />
+	<xi:include href="common/potions.xml" />
+  <xi:include href="spoils.xml"/>
+  <xi:include href="races.xml"/>
+  <xi:include href="prefixes.xml"/>
+  <xi:include href="ships.xml"/>
+  <xi:include href="buildings.xml"/>
+  <xi:include href="terrains.xml"/>
+  <xi:include href="alchemy.xml"/>
+  <xi:include href="technologies.xml"/>
+  <xi:include href="skills.xml"/>
+  <equipment>
+    <item name="wood" amount="5"/>
+    <item name="stone" amount="10"/>
+  </equipment>
+
+  <game name="HSE" welcome="eressea">
+    <comment>Game specific</comment>
+    <order name="MEINUNG" disable="yes"/>
+
+    <skill name="alchemy" enable="true"/>
+    <skill name="crossbow" enable="true"/>
+    <skill name="mining" enable="true"/>
+    <skill name="bow" enable="true"/>
+    <skill name="building" enable="true"/>
+    <skill name="trade" enable="true"/>
+    <skill name="forestry" enable="true"/>
+    <skill name="catapult" enable="true"/>
+    <skill name="herbalism" enable="true"/>
+    <skill name="magic" enable="true"/>
+    <skill name="training" enable="true"/>
+    <skill name="riding" enable="true"/>
+    <skill name="armorer" enable="true"/>
+    <skill name="shipcraft" enable="true"/>
+    <skill name="melee" enable="true"/>
+    <skill name="sailing" enable="true"/>
+    <skill name="polearm" enable="true"/>
+    <skill name="espionage" enable="true"/>
+    <skill name="quarrying" enable="true"/>
+    <skill name="roadwork" enable="true"/>
+    <skill name="tactics" enable="true"/>
+    <skill name="stealth" enable="true"/>
+    <skill name="entertainment" enable="true"/>
+    <skill name="weaponsmithing" enable="true"/>
+    <skill name="cartmaking" enable="true"/>
+    <skill name="perception" enable="true"/>
+    <skill name="taxation" enable="true"/>
+    <skill name="stamina" enable="true"/>
+    <skill name="unarmed" enable="true"/>
+
+    <param name="entertain.base" value="15"/>
+    <param name="entertain.perlevel" value="5"/>
+    <param name="nmr.timeout" value="20"/>
+    <param name="nmr.removenewbie" value="0"/>
+    <param name="GiveRestriction" value="3"/>
+    <param name="NewbieImmunity" value="4"/>
+    <param name="hunger.long" value="1"/>
+    <param name="database.gameid" value="3"/>
+    <param name="globalreport" value="world"/>
+    <param name="rules.check_overload" value="1"/>
+  </game>
+  <xi:include href="eressea/de/strings.xml"/>
+  <xi:include href="eressea/en/strings.xml"/>
+  <xi:include href="eressea/races.xml"/>
+  <xi:include href="eressea/items-hse05.xml"/>
+  <xi:include href="eressea/dungeons.xml"/>
+  <xi:include href="eressea/buildings.xml"/>
+  <strings>
+    <string name="mailto">
+      <text locale="de">hse-server@eressea.de</text>
+      <text locale="en">hse-server@eressea.de</text>
+    </string>
+    <string name="mailcmd">
+      <text locale="de">ERESSEA BEFEHLE</text>
+      <text locale="en">ERESSEA ORDERS</text>
+    </string>
+  </strings>
+</eressea>

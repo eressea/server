@@ -1,0 +1,27 @@
+SubDir TOP common triggers ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../gamecode ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ changefaction.c
+ changerace.c
+ clonedied.c
+ createcurse.c
+ createunit.c
+ gate.c
+ giveitem.c
+ killunit.c
+ removecurse.c
+ shock.c
+ timeout.c
+ triggers.c
+ unguard.c
+ unitmessage.c
+ ;
+
+Library triggers : $(SOURCES) ;

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<archetypes>
+
+  <archetype name="swordsman" building="barracks" cost="10">
+    <construction reqsize="1">
+      <requirement type="money" quantity="100"/>
+    </construction>
+  </archetype>
+
+  <archetype name="pikeman" building="barracks" cost="10">
+    <construction reqsize="1"><!-- 1 requirement makes 1 recruit -->
+      <requirement type="money" quantity="100"/>
+    </construction>
+  </archetype>
+
+  <archetype name="knight" building="barracks" cost="100">
+    <construction reqsize="1">
+      <requirement type="money" quantity="1000"/>
+      <requirement type="laen" quantity="1"/>
+    </construction>
+  </archetype>
+
+  <archetype name="craftsman" building="castle" cost="10">
+    <construction reqsize="1">
+      <requirement type="money" quantity="100"/>
+    </construction>
+  </archetype>
+
+  <archetype name="gamedesigner" building="castle" cost="1">
+    <allow property="race" value="human"/>
+    <deny property="race" value="*"/>
+    <construction reqsize="1">
+      <requirement type="laen" quantity="100"/>
+      <requirement type="mallorn" quantity="100"/>
+    </construction>
+  </archetype>
+
+</archetypes>
+

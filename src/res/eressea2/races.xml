@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<races>
+
+  <!-- races for shadowcall: shadowbat, nightmare, vampunicorn -->
+  <race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="500" capacity="540" speed="1.000000" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
+    <ai splitsize="5000" killpeasants="yes"/>
+    <function name="name" value="namegeneric"/>
+    <attack type="4" damage="1d6"/>
+    <attack type="3" damage="1d1"/>
+  </race>
+
+  <race name="nightmare" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="100" capacity="540" speed="1.000000" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" invinciblenonmagic="yes">
+    <ai splitsize="500" killpeasants="yes"/>
+    <function name="name" value="namegeneric"/>
+    <attack type="4" damage="1d4"/>
+    <attack type="4" damage="1d4"/>
+    <attack type="4" damage="1d4"/>
+    <attack type="3" damage="1d4"/>
+    <attack type="2" damage="1d10"/>
+  </race>
+
+  <race name="vampunicorn" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="500" weight="5000" capacity="2000" speed="1.000000" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
+    <ai splitsize="5000" killpeasants="yes"/>
+    <function name="name" value="namegeneric"/>
+    <attack type="4" damage="2d10"/>
+    <attack type="3" damage="1d4"/>
+    <attack type="3" damage="1d4"/>
+    <attack type="3" damage="1d4"/>
+    <attack type="3" damage="1d4"/>
+    <attack type="2" damage="2d60"/>
+  </race>
+  
+  <!-- races used by spells and magic -->
+  <race name="toad" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="100" capacity="540" speed="1.000000" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
+    <ai splitsize="1" learn="yes"/>
+    <skill name="crossbow" modifier="-10"/>
+    <skill name="mining" modifier="-10"/>
+    <skill name="bow" modifier="-10"/>
+    <skill name="building" modifier="-10"/>
+    <skill name="trade" modifier="-10"/>
+    <skill name="forestry" modifier="-10"/>
+    <skill name="catapult" modifier="-10"/>
+    <skill name="training" modifier="-10"/>
+    <skill name="riding" modifier="-10"/>
+    <skill name="armorer" modifier="-10"/>
+    <skill name="shipcraft" modifier="-10"/>
+    <skill name="melee" modifier="-10"/>
+    <skill name="sailing" modifier="-10"/>
+    <skill name="polearm" modifier="-10"/>
+    <skill name="quarrying" modifier="-10"/>
+    <skill name="roadwork" modifier="-10"/>
+    <skill name="tactics" modifier="-10"/>
+    <skill name="weaponsmithing" modifier="-10"/>
+    <skill name="cartmaking" modifier="-10"/>
+    <skill name="stamina" modifier="-10"/>
+    <attack type="4" damage="1d2"/>
+  </race>
+
+  <race name="alp" magres="0.950000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="0" capacity="0" speed="1.500000" hp="20" ac="2" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="20" fly="yes" walk="yes" canlearn="no" canteach="no">
+    <ai splitsize="1"/>
+    <function name="name" value="namegeneric"/>
+    <attack type="1" damage="1d4"/>
+  </race>
+
+  <race name="mountainguard" unarmedguard="yes" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" canlearn="no" teach="no" noweapons="yes" giveitem="yes">
+    <ai splitsize="1"/>
+    <function name="name" value="namegeneric"/>
+    <attack type="4" damage="2d40"/>
+  </race>
+
+  <race name="shadowmaster" cansail="no" cansteal="no" canlearn="no" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes">
+    <ai splitsize="50" killpeasants="yes" moverandom="yes" learn="yes"/>
+    <function name="name" value="namegeneric"/>
+    <attack type="4" damage="2d4"/>
+    <attack type="2" damage="2d30"/>
+    <attack type="3" damage="1d2"/>
+  </race>
+
+  <race name="stonegolem" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
+    <ai splitsize="50"/>
+    <skill name="building" modifier="14"/>
+    <skill name="roadwork" modifier="14"/>
+    <attack type="4" damage="2d10+4"/>
+  </race>
+
+  <race name="irongolem" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
+    <ai splitsize="50"/>
+    <function name="name" value="namegeneric"/>
+    <skill name="armorer" modifier="14"/>
+    <skill name="weaponsmithing" modifier="14"/>
+    <attack type="4" damage="2d8+4"/>
+  </race>
+
+  <race name="spell" magres="0.000000" maxaura="1.000000" regaura="0.100000" recruitcost="0" weight="0" capacity="0" speed="0.000000" hp="1" damage="1d4" unarmedattack="-2" unarmeddefense="-2" canlearn="no" noheal="yes" noweapons="yes" illusionary="yes" invisible="yes" fly="yes" swim="yes" walk="yes">
+    <ai splitsize="1"/>
+    <attack type="1" damage="1d4"/>
+  </race>
+
+  <!-- races for player factions -->
+  <race name="aquarian" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" coastal="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="mining" modifier="-2"/>
+    <skill name="building" modifier="-1"/>
+    <skill name="trade" modifier="2"/>
+    <skill name="armorer" modifier="-1"/>
+    <skill name="shipcraft" modifier="3"/>
+    <skill name="sailing" modifier="3"/>
+    <skill name="roadwork" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="cat" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" defensemodifier="1" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="mining" modifier="-2"/>
+    <skill name="building" modifier="-1"/>
+    <skill name="catapult" modifier="-1"/>
+    <skill name="armorer" modifier="-1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="sailing" modifier="-2"/>
+    <skill name="quarrying" modifier="-1"/>
+    <skill name="roadwork" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="crossbow" modifier="1"/>
+    <skill name="mining" modifier="1"/>
+    <skill name="bow" modifier="-1"/>
+    <skill name="building" modifier="1"/>
+    <skill name="trade" modifier="2"/>
+    <skill name="catapult" modifier="-1"/>
+    <skill name="training" modifier="-1"/>
+    <skill name="riding" modifier="-1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="melee" modifier="-1"/>
+    <skill name="sailing" modifier="-2"/>
+    <skill name="polearm" modifier="-1"/>
+    <skill name="roadwork" modifier="1"/>
+    <skill name="cartmaking" modifier="2"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="insect" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="crossbow" modifier="1"/>
+    <skill name="mining" modifier="1"/>
+    <skill name="bow" modifier="-2"/>
+    <skill name="building" modifier="2"/>
+    <skill name="trade" modifier="-1"/>
+    <skill name="forestry" modifier="1"/>
+    <skill name="training" modifier="-3"/>
+    <skill name="riding" modifier="-3"/>
+    <skill name="armorer" modifier="2"/>
+    <skill name="melee" modifier="-1"/>
+    <skill name="polearm" modifier="1"/>
+    <skill name="roadwork" modifier="-1"/>
+    <skill name="tactics" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="demon" magres="0.150000" maxaura="1.000000" regaura="1.250000" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="initfamiliar" value="oldfamiliars"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="trade" modifier="-3"/>
+    <skill name="forestry" modifier="1"/>
+    <skill name="training" modifier="-3"/>
+    <skill name="riding" modifier="-1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="melee" modifier="1"/>
+    <skill name="sailing" modifier="-1"/>
+    <skill name="polearm" modifier="1"/>
+    <skill name="tactics" modifier="-1"/>
+    <skill name="weaponsmithing" modifier="1"/>
+    <skill name="cartmaking" modifier="-2"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+    <attack type="5"/>
+  </race>
+
+  <race name="troll" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="2000" capacity="1080" speed="1.000000" hp="30" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="mining" modifier="2"/>
+    <skill name="bow" modifier="-2"/>
+    <skill name="building" modifier="2"/>
+    <skill name="catapult" modifier="2"/>
+    <skill name="training" modifier="-1"/>
+    <skill name="riding" modifier="-2"/>
+    <skill name="armorer" modifier="2"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="melee" modifier="1"/>
+    <skill name="sailing" modifier="-1"/>
+    <skill name="quarrying" modifier="2"/>
+    <skill name="roadwork" modifier="2"/>
+    <skill name="tactics" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5+3"/>
+  </race>
+
+  <race name="human" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="trade" modifier="1"/>
+    <skill name="shipcraft" modifier="1"/>
+    <skill name="sailing" modifier="1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="600" capacity="440" speed="1.000000" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="initfamiliar" value="oldfamiliars"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="mining" modifier="1"/>
+    <skill name="building" modifier="1"/>
+    <skill name="trade" modifier="-1"/>
+    <skill name="catapult" modifier="1"/>
+    <skill name="shipcraft" modifier="-2"/>
+    <skill name="sailing" modifier="-2"/>
+    <skill name="roadwork" modifier="-2"/>
+    <skill name="tactics" modifier="-2"/>
+    <skill name="cartmaking" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="uruk" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <skill name="alchemy" modifier="1"/>
+    <skill name="mining" modifier="1"/>
+    <skill name="building" modifier="1"/>
+    <skill name="trade" modifier="-3"/>
+    <skill name="forestry" modifier="1"/>
+    <skill name="herbalism" modifier="-2"/>
+    <skill name="magic" modifier="-1"/>
+    <skill name="training" modifier="-1"/>
+    <skill name="armorer" modifier="1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="sailing" modifier="-1"/>
+    <skill name="quarrying" modifier="1"/>
+    <skill name="tactics" modifier="1"/>
+    <skill name="weaponsmithing" modifier="2"/>
+    <skill name="cartmaking" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="elf" magres="0.100000" maxaura="1.000000" regaura="1.250000" recruitcost="130" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="mining" modifier="-2"/>
+    <skill name="bow" modifier="2"/>
+    <skill name="building" modifier="-1"/>
+    <skill name="catapult" modifier="-2"/>
+    <skill name="training" modifier="1"/>
+    <skill name="armorer" modifier="-1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="sailing" modifier="-1"/>
+    <skill name="quarrying" modifier="-1"/>
+    <skill name="roadwork" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+  <race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="mining" modifier="2"/>
+    <skill name="bow" modifier="-1"/>
+    <skill name="building" modifier="2"/>
+    <skill name="trade" modifier="1"/>
+    <skill name="forestry" modifier="-1"/>
+    <skill name="catapult" modifier="2"/>
+    <skill name="training" modifier="-2"/>
+    <skill name="riding" modifier="-2"/>
+    <skill name="armorer" modifier="2"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="melee" modifier="1"/>
+    <skill name="sailing" modifier="-2"/>
+    <skill name="quarrying" modifier="2"/>
+    <skill name="roadwork" modifier="2"/>
+    <skill name="weaponsmithing" modifier="2"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+  </race>
+
+</races>

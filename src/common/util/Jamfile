@@ -1,0 +1,44 @@
+SubDir TOP common util ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(XMLHDRS) ;
+
+SEARCH_SOURCE +=
+ [ FDirName $(SUBDIR) dl ] ;
+
+SOURCES =
+ attrib.c
+ base36.c
+ bsdstring.c
+ crmessage.c
+ cvector.c
+ dice.c
+ event.c
+ filereader.c
+ functions.c
+ goodies.c
+ language.c
+ lists.c
+ log.c
+ message.c
+ nrmessage.c
+ parser.c
+ rand.c
+ resolve.c
+ sql.c
+ strncpy.c
+ translation.c
+ umlaut.c
+ unicode.c
+ xml.c
+ ;
+
+SOURCES += mt19937ar.c  ;
+
+if $(MSPACES) {
+ SOURCES += <dl>malloc.c ;
+}
+
+Library util : $(SOURCES) ;

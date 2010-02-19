@@ -1,0 +1,54 @@
+TODO:
+
+Eressea:
+- AI: Nicht mehr als n Wyrme in die gleiche region. Keine 12 auf jeden Fall.
+- Gletscherauflösung 4./5. welt
+- new ITF_NOLOOT für sonnensegel
+- Deathcloud: Magieresistenz des Magiers in das attribut, nicht auflösen wenn magier tot.
+
+Code cleanup:
+- curse type should contain effect-type
+- mehr itemtypes auslagern
+- getstrtoken() - das static loswerden?
+- readline implementieren
+- Make asserts into release-mode fails.
+- unterschiede in vin3 + wdw per config statt defines?
+- age branch (store birthdate instead of age)
+- give monsters name with lua
+- allocators aus economy nach XML
+- reporting units: http://eressea.upb.de/mantis/view.php?id=781
+- wdw pyramid spell could be written in lua (replace attrib with a flag)
+
+Larger Features:
+- eressea (b/g)zip reports?
+- ZERSTÖRE - Man sollte alle Materialien zurückkriegen können:
+
+Scripts, etc:
+- format=flowed annahme, eressea
+- english registration confirmation is deutsch!
+- XUL for Eressea
+
+Old Terrain still needed:
+- random people encounters (get_allies)
+- creating dragons
+- drought curse
+- volcanoes
+- glacier logic
+- make_summary, volcano-count
+- save.c, conversion
+- terraform, old syntax
+- terraform, more horses in plains
+- dragon name
+- arena-module
+- build.c, Strassenbau
+- monster.c, ent movement
+- economy.c, insekten
+
+unterschiede in vin3 + wdw per config statt defines?
+
+  #define NEWATSROI 1
+  #define ATSBONUS 2
+  #define ROIBONUS 4
+
+  #define ARENA_MODULE
+  #define WORMHOLE_MODULE

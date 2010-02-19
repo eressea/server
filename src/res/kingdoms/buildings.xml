@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<buildings>
+
+  <building name="castle" capacity="1">
+    <construction skill="building" minskill="1" reqsize="1">
+      <requirement type="stone" quantity="1" recycle="0.5"/>
+    </construction>
+  </building>
+
+</buildings>

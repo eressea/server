@@ -1,0 +1,39 @@
+<eressea>
+  <include href="messages.xml" />
+
+  <comment>Localization</comment>
+  <include href="de/strings.xml" />
+  <include href="en/strings.xml" />
+
+  <include href="races.xml" />
+  <include href="resources.xml" />
+  <include href="ships.xml" />
+  <include href="common/buildings.xml" />
+  <xi:include href="eressea/buildings.xml"/>
+
+  <game name="Kreis der Macht" units="250" welcome="vinyambar">
+    <!-- Game specific -->
+    <order name="ARBEITEN" disable></order>
+    <param name="entertain.base" value="15"></param>
+    <param name="entertain.perlevel" value="5"></param>
+    <param name="nmr.timeout" value="5"></param>
+    <param name="nmr.removenewbie" value="0"></param>
+    <param name="GiveRestriction" value="0"></param>
+    <param name="database.gameid" value="3"></param>
+    <param name="hunger.long" value="0"></param>
+    <param name="study.expensivemigrants" value="1"/>
+    <param name="alliance.restricted" value="fight guard stealth money"/>
+    <param name="alliance.auto" value="fight"/>
+    <param name="alliance.transferquit" value="true"/>
+  </game>
+  <include href="vinyambar/de/strings.xml" />
+  <include href="vinyambar/stronghold.xml" />
+  <strings>
+    <string name="mailto">
+      <text>vinyambar@eressea.amber.kn-bremen.de</text>
+    </string>
+    <string name="mailcmd">
+      <text>VIN3 BEFEHLE</text>
+    </string>
+  </strings>
+</eressea>

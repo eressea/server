@@ -1,0 +1,53 @@
+Welcome to the Eressea Tutorial game.
+
+The report in this mail is NOT for your future Eressea faction. It is the
+faction you will play during a quick five-turn tutorial, to make sure you
+understand the basic rules, and to give you a chance to get acquainted with
+the game before the real fun starts. If you manage to survive these 5 turns
+and send in orders for your faction, you will be joining the real Eressea
+game shortly.
+
+The tutorial differs from Eressea in a few very important points:
+
+* Email-Address to send your turns to:
+Tutorial:  tutorial@eressea.de
+Eressea:   eressea-server@eressea.de
+
+* Frequency:
+Tutorial:  3x per Week, Monday, Wednesday and Saturday before 9 am CET.
+Eressea:   1x per Week, Sunday before 9 am CET.
+
+* Duration:
+Tutorial:  5 turns required. Faction is deleted after 10 turns.
+Eressea:   open-ended
+
+
+Eressea is a complex game with a lot of rules. Unlike other games, you will
+not get very far if you haven't read the rules. Really. So if you haven't
+done it yet, head over to http://eressea.upb.de/rules/en/ and read them. If
+you want to talk to some other Eressea playes, visit our forums at
+http://eressea.upb.de/forum/
+
+Eressea is a text-based game. In these days when all games are 3D, a game
+that relies mostly on text may seem like an anachronism, but most of the
+game hapens in your head and in that of your opponents - and of course, in
+the diplomatic emails between you and your future neighbours.
+
+The two other files in this email contain your report. The file with the .nr
+extendion is a normal textfile, in human-readable form. You can read it with
+any text editor, for example Notepad. The english in there is not always good,
+because the translation of the human-readable report is currently a work in
+progress. That's why we recommend using the file with the .cr extension
+instead. It is a format that is understood by most Eressea-tools, notably
+the very good Magellan client. It is available at 
+http://magellan.log-out.net/.
+
+If you have any questions that the documentation does not answer, you can
+send them to eressea-help@eressea.kn-bremen.de, and get an answer from a
+human being. Please try to find an answer in the rules first - helping new
+players takes a lot of time and energy, and we would like to limit this to
+the really tough questions. It's not meant as a way for you to get around
+reading the rules.
+
+Enjoy your time on Eressea, and good luck with the first turns,
+your Eressea-Team.

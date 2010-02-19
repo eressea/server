@@ -1,0 +1,49 @@
+Konzepte:
+- Astralraum abschaffen
+  = done (modules.astralspace).
+  = done (Zauber entfernt).
+- Regionsbesitz und Moral
+- Allianzen
+- GIB abstellen
+  = done
+
+Talente:
+- Talentlimit 10 + Rassenbonus
+  = done
+- Ausdauer wirkt sich nicht auf Trefferpunkte aus
+  = done (rules.stamina)
+- Wahrnehmung und Tarnung abschalten
+  = done
+
+Kampf:
+- Regionen belagern
+- Allianz ersetzt HELFE KAEMPFE
+- Reduktion auf 1 Kampfrunde
+  = done (rules.combat_turns)
+- neue Trefferchanceberechnung
+- neue Beuteregelung
+- Gegnerlimits
+
+Gegenstände:
+- Waffen mit höherem Schaden.
+- RdU und AdwS überarbeiten
+
+Diverse:
+- neue Terraintypen (weniger Bauern, knappere Ressourcen)
+- limitiertes Rekrutieren von Migranten erlauben
+- Parteitarnung fällt weg
+  = done (disable TARNEN)
+- Monster entfernen
+
+Ökonomie:
+- UNTERHALTEN abstellen
+  = done (Befehl & Skill)
+- TREIBEN abstellen
+  = done (Befehl & Skill)
+- ARBEITEN abstellen
+  = done (Befehl)
+- LEHREN abstellen
+  = done (Befehl)
+- VERKAUFEN abstellen.
+  = done (Befehl)
+- Steuern für den Regionsbesitzer
