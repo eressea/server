@@ -309,6 +309,8 @@ extern int curse_age(struct attrib * a);
 extern boolean cmp_curse(const struct attrib * a, const void * data);
 extern boolean cmp_cursetype(const struct attrib * a, const void * data);
 
+extern double destr_curse(struct curse* c, int cast_level, double force);
+
 extern int resolve_curse(variant data, void * address);
 extern boolean is_cursed_with(const struct attrib *ap, const struct curse *c);
 
@@ -317,7 +319,6 @@ extern boolean curse_active(const struct curse * c);
 
 /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
 extern const char * oldcursename(int id);
-extern void register_curses(void);
 extern struct message * cinfo_simple(const void * obj, typ_t typ, const struct curse *c, int self);
 
 #define is_cursed(a, id, id2) \

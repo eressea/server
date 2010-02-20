@@ -4,14 +4,14 @@ LINK = gcc ;
 
 MSPACES = 1 ;
 
-# BINDINGS = LUABIND ;
+# BINDINGS can only be TOLUA (we dropped both NONE and LUABIND at some point)
 if ! $(BINDINGS) {
   BINDINGS = TOLUA ;
 }
 
-if $(BINDINGS) = LUABIND {
-  CCFLAGS += -DBINDINGS_LUABIND ;
-  C++FLAGS += -DBINDINGS_LUABIND ;
+# BUILDTYPE can be REGULAR or UNITY
+if ! $(BUILDTYPE) {
+  BUILDTYPE = UNITY ;
 }
 
 if $(BINDINGS) = TOLUA {
@@ -87,12 +87,6 @@ CCFLAGS on foo += -Wwrite-strings
                    -Werror
 		   ;
 
-# this require the latet luabind from CVS
-if ! $(LUABIND) {
-  LUABIND = "B7" ;
-}
-
-C++FLAGS += -DHAVE_LUABIND_$(LUABIND) ;
 if $(LOCAL_USR) {
   XMLHDRS = $(LOCAL_USR)/include/libxml2 ;
   C++FLAGS += -I$(LOCAL_USR)/include ;
@@ -101,7 +95,6 @@ if $(LOCAL_USR) {
 } else {
   XMLHDRS = /usr/include/libxml2 ;
 }
-C++FLAGS += -DHAVE_LUABIND_$(LUABIND) ;
 
 rule iconv
 {
@@ -124,11 +117,6 @@ rule liblua
   }
 }
 
-rule libluabind
-{
-  LINKLIBS on $(<) += -lm -lluabind ;
-}
-
 rule libxml2
 {
   LINKLIBS on $(<) += -lxml2 ;
@@ -149,11 +137,6 @@ rule libmcheck
   if $(DEBUG) = 1 {
     LINKLIBS on $(<) += -lmcheck ;
   }
-}
-
-rule UsingLuabind
-{
-   SubDirHdrs $(LUABIND_ROOT)/include ;
 }
 
 rule UsingLua

@@ -53,14 +53,14 @@
 #define REGIONITEMS_VERSION 323 /* regions have items */
 #define ATTRIBREAD_VERSION 324 /* remove a_readint */
 #define CURSEFLAGS_VERSION 325 /* remove a_readint */
-#define UNICODE_VERSION 326 /* everything is stored as UTF8 */
+#define UNICODE_VERSION 326 /* 2007-06-27 everything is stored as UTF8 */
 #define UID_VERSION 327 /* regions have a unique id */
 #define STORAGE_VERSION 328 /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
 #define INTPAK_VERSION 329 /* in binary, ints can get packed */
-#define NOZEROIDS_VERSION 330 /* zero is not a valid ID for anything (including factions) */
-#define NOBORDERATTRIBS_VERSION 331 /* connection::attribs has been moved to userdata */
-#define UIDHASH_VERSION 332 /* borders use the region.uid to store */
-#define REGIONOWNER_VERSION 333 /* regions have owners and morale */
+#define NOZEROIDS_VERSION 330 /* 2008-05-16 zero is not a valid ID for anything (including factions) */
+#define NOBORDERATTRIBS_VERSION 331 /* 2008-05-17 connection::attribs has been moved to userdata */
+#define UIDHASH_VERSION 332 /* 2008-05-22 borders use the region.uid to store */
+#define REGIONOWNER_VERSION 333 /* 2009-05-14 regions have owners and morale */
 #define ALLIANCELEADER_VERSION 333 /* alliances have a leader */
 #define CURSEFLOAT_VERSION 334 /* all curse-effects are float */
 #define MOURNING_VERSION 335 /* mourning peasants */

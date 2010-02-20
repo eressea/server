@@ -44,6 +44,7 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
+#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/building.h>
 
@@ -54,10 +55,15 @@
  * library initialization
  */
 
+attrib_type at_unitdissolve = {
+  "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
+};
+
 void
 init_attributes(void)
 {
   at_register(&at_object);
+  at_register(&at_unitdissolve);
 	at_register(&at_overrideroads);
 	at_register(&at_raceprefix);
 

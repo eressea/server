@@ -1064,7 +1064,7 @@ parse_inifile(lua_State* L, dictionary * d, const char * section)
 {
   int i;
   size_t len = strlen(section);
-  for (i=0;i!=d->n;++i) {
+  for (i=0;d && i!=d->n;++i) {
     const char * key = d->key[i];
 
     if (strncmp(section, key, len)==0 && key[len]==':') {

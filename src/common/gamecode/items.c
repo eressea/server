@@ -3,6 +3,7 @@
 #include "items.h"
 
 #include "study.h"
+#include "curses.h"
 
 #include <kernel/curse.h>
 #include <kernel/building.h>

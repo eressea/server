@@ -95,6 +95,7 @@
     <param name="nmr.removenewbie" value="10"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
+    <param name="init_spells" value="0"/>
     <param name="rules.check_overload" value="0"/>
   </game>
   <xi:include href="eressea/strings.xml"/>

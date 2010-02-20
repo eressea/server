@@ -28,8 +28,6 @@
 
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
-#include <spells/spells.h>
-#include <gamecode/spells.h>
 #include <triggers/triggers.h>
 #include <items/itemtypes.h>
 #include <races/races.h>
@@ -51,6 +49,7 @@
 
 /* gamecode includes */
 #include <gamecode/archetype.h>
+#include <gamecode/curses.h>
 #include <gamecode/economy.h>
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
@@ -227,8 +226,11 @@ game_init(void)
   register_resources();
   register_buildings();
   register_itemfunctions();
+#ifdef TODO
+  register_curses();
   register_spells();
   register_gcspells();
+#endif
 #if DUNGEON_MODULE
   register_dungeon();
 #endif

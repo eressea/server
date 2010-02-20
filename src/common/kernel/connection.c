@@ -22,8 +22,6 @@
 #include "unit.h"
 #include "version.h"
 
-#include <spells/spells.h> /* for backward compat reading of bt_firewall */
-
 #include <util/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
@@ -41,6 +39,7 @@ unsigned int nextborder = 0;
 connection * borders[BORDER_MAXHASH];
 border_type * bordertypes;
 
+void (*border_convert_cb)(struct connection * con, struct attrib * attr) = 0;
 
 void
 free_borders(void)
@@ -596,11 +595,8 @@ read_borders(struct storage * store)
     if (store->version<NOBORDERATTRIBS_VERSION) {
       attrib * a = NULL;
       int result = a_read(store, &a);
+      if (border_convert_cb) border_convert_cb(b, a);
       while (a) {
-        if (type==&bt_firewall && a->type==&at_countdown) {
-          wall_data * fd = (wall_data *)b->data.v;
-          fd->countdown = a->data.i;
-        }
         a_remove(&a, a);
       }
       if (result<0) return result;

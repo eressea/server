@@ -1,5 +1,3 @@
-callbacks = {}
-
 function change_locales(localechange)
   for loc, flist in pairs(localechange) do
     for index, name in pairs(flist) do

@@ -49,7 +49,6 @@
 #include <kernel/xmlreader.h>
 #include <kernel/version.h>
 
-#include <spells/spells.h>
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
 #include <items/itemtypes.h>

@@ -132,9 +132,9 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="0"/>
     <param name="hunger.demon.skill" value="1"/>
-    <param name="init_spells" value="0"/>
     <param name="hunger.damage" value="1d9+9"/>
     <param name="hunger.demons" value="1"/>
+    <param name="init_spells" value="0"/>
     <param name="recruit.allow_merge" value="1"/>
     <param name="study.expensivemigrants" value="1"/>
     <param name="study.speedup" value="0"/>

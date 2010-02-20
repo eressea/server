@@ -803,3 +803,43 @@ cinfo_simple(const void * obj, typ_t typ, const struct curse *c, int self)
   }
   return msg;
 }
+
+
+/* ------------------------------------------------------------- */
+/* Antimagie - curse auflösen */
+/* ------------------------------------------------------------- */
+
+/* Wenn der Curse schwächer ist als der cast_level, dann wird er
+* aufgelöst, bzw seine Kraft (vigour) auf 0 gesetzt.
+* Ist der cast_level zu gering, hat die Antimagie nur mit einer Chance
+* von 100-20*Stufenunterschied % eine Wirkung auf den Curse. Dann wird
+* die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
+* Zurückgegeben wird der noch unverbrauchte Rest von force.
+*/
+double
+destr_curse(curse* c, int cast_level, double force)
+{
+  if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
+    double probability = 0.1 + (cast_level - c->vigour)*0.2;
+    /* pro Stufe Unterschied -20% */
+    if (chance(probability)) {
+      force -= c->vigour;
+      if (c->type->change_vigour) {
+        c->type->change_vigour(c, -(cast_level+1/2));
+      } else {
+        c->vigour -= cast_level+1/2;
+      }
+    }
+  } else { /* Zauber ist stärker als curse */
+    if (force >= c->vigour) { /* reicht die Kraft noch aus? */
+      force -= c->vigour;
+      if (c->type->change_vigour) {
+        c->type->change_vigour(c, -c->vigour);
+      } else {
+        c->vigour = 0;
+      }
+
+    }
+  }
+  return force;
+}

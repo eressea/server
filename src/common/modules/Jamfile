@@ -23,4 +23,6 @@ SOURCES =
  ;
 
 
+if $(BUILDTYPE) = REGULAR {
 Library modules : $(SOURCES) ;
+}

@@ -33,4 +33,6 @@ SOURCES =
  variable.c
  ;
 
+if $(BUILDTYPE) = REGULAR {
 Library attributes : $(SOURCES) ;
+}

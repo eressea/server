@@ -25,7 +25,6 @@
 
 /* kernel includes */
 #include "magic.h"
-#include "spellid.h"
 #include "unit.h"
 
 /* libc includes */
@@ -167,11 +166,7 @@ find_spellbyid(magic_t mtype, spellid_t id)
   spell_list * slist;
 
   assert(id>=0);
-#ifndef SHOWASTRAL_NOT_BORKED
-  /* disabled spells */
-  if (id==SPL_SHOWASTRAL) return NULL;
-#endif
-  if (id==SPL_NOSPELL) return NULL;
+  if (id==0) return NULL;
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
     if (sp->id == id) return sp;

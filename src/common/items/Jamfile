@@ -18,4 +18,6 @@ SOURCES =
  xerewards.c
  ;
 
+if $(BUILDTYPE) = REGULAR {
 Library items : $(SOURCES) ;
+}

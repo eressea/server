@@ -24,4 +24,6 @@ SOURCES =
  unitmessage.c
  ;
 
+if $(BUILDTYPE) = REGULAR {
 Library triggers : $(SOURCES) ;
+}

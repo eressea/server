@@ -128,6 +128,9 @@ extern "C" {
 
   extern struct attrib_type at_countdown;
 
+  /* game-specific callbacks */
+  extern void (*border_convert_cb)(struct connection * con, struct attrib * attr);
+
 #ifdef __cplusplus
 }
 #endif
