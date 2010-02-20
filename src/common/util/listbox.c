@@ -8,8 +8,8 @@
 *  
 */
 
-/* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
-#include <config.h>
+/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#include <platform.h>
 #include <curses.h>
 
 #include "listbox.h"

@@ -7,7 +7,7 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "xmlreport.h"
 

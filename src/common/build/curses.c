@@ -1,6 +1,7 @@
 #include "common/settings.h"
-#include "common/config.h"
+#include <platform.h>
 #include "stdafx.h"
 
-#include "eressea/curses/listbox.c"
-#include "eressea/gmtool.c"
+#include <util/listbox.c>
+#include <gmtool.c>
+#include <editing.c>

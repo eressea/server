@@ -10,7 +10,7 @@
  without prior permission by the authors of Eressea.
 */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 
 #if DUNGEON_MODULE

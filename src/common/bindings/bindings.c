@@ -10,7 +10,7 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <config.h>
+#include <platform.h>
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_faction.h"
@@ -52,6 +52,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/eventbus.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -1005,11 +1006,13 @@ static void args_free(void * udata)
 }
 
 static void event_cb(void * sender, const char * event, void * udata) {
+  lua_State * L = (lua_State *)global.vm_state;
   event_args * args = (event_args *)udata;
   int nargs = 2;
+
   lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
   if (sender && args->sendertype) {
-    tolua_pushusertype(L, sender, args->sendertype);
+    tolua_pushusertype(L, sender, TOLUA_CAST args->sendertype);
   } else {
     lua_pushnil(L);
   }
@@ -1052,7 +1055,8 @@ tolua_eventbus_fire(lua_State * L)
 {
   void * sender = tolua_tousertype(L, 1, 0);
   const char * event = tolua_tostring(L, 2, 0);
-  eventbus_fire(sender, event, args);
+/*  eventbus_fire(sender, event, args); */
+  return 0;
 }
 
 static void

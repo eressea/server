@@ -32,7 +32,7 @@ SERVER_SOURCES =
  kernel.c
  stdafx.c
  util.c
- main.c
+ external.c
 ;
 
 CCFLAGS += -DSQLITE_THREADSAFE=0 ;

@@ -25,7 +25,7 @@
 
 #ifdef WEATHER
 
-#include <config.h>
+#include <platform.h>
 #include <eressea.h>
 #include "weather.h"
 

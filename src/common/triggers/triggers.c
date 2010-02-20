@@ -17,7 +17,7 @@
  * world.
  */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 
 /* triggers includes */

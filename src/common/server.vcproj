@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="editor"
+	Name="server"
 	ProjectGUID="{D893D6B3-805D-9848-8EA4-CDA1B79151F6}"
-	RootNamespace="editor"
+	RootNamespace="server"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug/editor"
-			IntermediateDirectory="Debug/editor"
+			OutputDirectory="Debug/server"
+			IntermediateDirectory="Debug/server"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -66,74 +66,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/editor.lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Profile|Win32"
-			OutputDirectory="Profile/editor"
-			IntermediateDirectory="Profile/editor"
-			ConfigurationType="4"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..;../common"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				AdditionalIncludeDirectories="..;../common"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/editor.lib"
+				OutputFile="$(OutDir)/server.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -153,8 +86,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release/editor"
-			IntermediateDirectory="Release/editor"
+			OutputDirectory="Release/server"
+			IntermediateDirectory="Release/server"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -199,7 +132,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/editor.lib"
+				OutputFile="$(OutDir)/server.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -222,33 +155,63 @@
 	</References>
 	<Files>
 		<Filter
-			Name="curses"
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			>
 			<File
-				RelativePath=".\curses\listbox.c"
+				RelativePath=".\config.h"
 				>
 			</File>
 			<File
-				RelativePath=".\curses\listbox.h"
+				RelativePath=".\util\console.h"
+				>
+			</File>
+			<File
+				RelativePath=".\editing.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gmtool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gmtool_structs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\listbox.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lua.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\settings.h"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\editing.c"
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			>
-		</File>
-		<File
-			RelativePath=".\editing.h"
-			>
-		</File>
-		<File
-			RelativePath=".\gmtool.c"
-			>
-		</File>
-		<File
-			RelativePath=".\gmtool.h"
-			>
-		</File>
+			<File
+				RelativePath=".\util\console.c"
+				>
+			</File>
+			<File
+				RelativePath=".\editing.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gmtool.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\listbox.c"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

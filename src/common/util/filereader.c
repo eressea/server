@@ -1,4 +1,4 @@
-#include <config.h>
+#include <platform.h>
 #include "filereader.h"
 
 #include <util/log.h>

@@ -20,11 +20,11 @@
 */
 
 /* config includes */
-#include <config.h>
+#include <platform.h>
+#include "stdafx.h"
 #include <kernel/eressea.h>
 
-#include "console.h"
-#include "gmtool.h"
+#include <gmtool.h>
 
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
@@ -83,6 +83,7 @@
 
 /* util includes */
 #include <util/base36.h>
+#include <util/console.h>
 #include <util/language.h>
 #include <util/goodies.h>
 #include <util/log.h>
@@ -101,18 +102,18 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include "tolua/bindings.h"
-#include "tolua/helpers.h"
-#include "tolua/bind_attrib.h"
-#include "tolua/bind_building.h"
-#include "tolua/bind_faction.h"
-#include "tolua/bind_gmtool.h"
-#include "tolua/bind_hashtable.h"
-#include "tolua/bind_message.h"
-#include "tolua/bind_region.h"
-#include "tolua/bind_ship.h"
-#include "tolua/bind_storage.h"
-#include "tolua/bind_unit.h"
+#include <bindings/bindings.h>
+#include <bindings/helpers.h>
+#include <bindings/bind_attrib.h>
+#include <bindings/bind_building.h>
+#include <bindings/bind_faction.h>
+#include <bindings/bind_gmtool.h>
+#include <bindings/bind_hashtable.h>
+#include <bindings/bind_message.h>
+#include <bindings/bind_region.h>
+#include <bindings/bind_ship.h>
+#include <bindings/bind_storage.h>
+#include <bindings/bind_unit.h>
 #endif // BINDINGS_TOLUA
 
 #ifdef BINDINGS_LUABIND

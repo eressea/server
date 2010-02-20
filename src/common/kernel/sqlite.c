@@ -1,4 +1,4 @@
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include <kernel/faction.h>
 #include <util/unicode.h>

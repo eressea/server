@@ -19,7 +19,7 @@
  * permission from the authors.
  */
 
-#include <config.h>
+#include <platform.h>
 #include "base36.h"
 
 #include <stdlib.h>

@@ -28,7 +28,7 @@
  */
 
 
-#include <config.h>
+#include <platform.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

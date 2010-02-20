@@ -12,7 +12,7 @@
  */
 
 /* TODO: enum auf fst_ umstellen. Pointer auf Display-Routine */
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 
 #include "karma.h"

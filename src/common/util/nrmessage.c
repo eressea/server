@@ -11,7 +11,7 @@
 
 */
 
-#include <config.h>
+#include <platform.h>
 #include "nrmessage.h"
 #include "nrmessage_struct.h"
 

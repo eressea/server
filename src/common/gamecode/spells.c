@@ -11,7 +11,7 @@
  * because it's so much work to get them out of the big array.
  */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "spy.h"
 

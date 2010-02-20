@@ -17,7 +17,7 @@
  * authors.
  */
 
-#include <config.h>
+#include <platform.h>
 #include "rng.h"
 
 #include <assert.h>

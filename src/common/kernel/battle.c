@@ -14,7 +14,7 @@
 
 #pragma region includes
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "battle.h"
 

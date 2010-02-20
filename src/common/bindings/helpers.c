@@ -11,7 +11,7 @@ without prior permission by the authors of Eressea.
 */
 
 #include "helpers.h"
-#include <config.h>
+#include <platform.h>
 
 #include <util/functions.h>
 #include <util/log.h>

@@ -12,7 +12,7 @@
  * prior permission by the authors of Eressea.
  */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "timeout.h"
 

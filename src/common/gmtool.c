@@ -8,16 +8,14 @@
  *
  */
 
-/* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
-#include <config.h>
+/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#include <platform.h>
 #include <curses.h>
 #include <kernel/eressea.h>
 
 #include "gmtool.h"
 #include "gmtool_structs.h"
 #include "editing.h"
-#include "console.h"
-#include "curses/listbox.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -59,6 +57,8 @@
 #include <util/log.h>
 #include <util/rng.h>
 #include <util/base36.h>
+#include <util/console.h>
+#include <util/listbox.h>
 #include <util/storage.h>
 
 #include <libxml/encoding.h>
