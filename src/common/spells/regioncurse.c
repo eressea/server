@@ -203,15 +203,6 @@ static struct curse_type ct_blessedharvest = {
   cinfo_simple
 };
 
-int rule_blessed_harvest(void)
-{
-  static int rule = -1;
-  if (rule<0) {
-    rule = get_param_int(global.parameters, "rules.magic.blessed_harvest", HARVEST_WORK);
-  }
-  return rule;
-}
-
 static struct curse_type ct_drought = {
   "drought",
   CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),

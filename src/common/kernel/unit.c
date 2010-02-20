@@ -900,8 +900,12 @@ move_unit(unit * u, region * r, unit ** ulist)
     fset(u, UFL_MOVED);
     if (u->ship || u->building) {
       /* can_leave must be checked in travel_i */
+#ifndef NDEBUG
       boolean result = leave(u, false);
       assert(result);
+#else
+      leave(u, false);
+#endif
     }
     translist(&u->region->units, ulist, u);
   } else {
