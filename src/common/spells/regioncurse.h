@@ -24,7 +24,6 @@ extern void register_regioncurse(void);
 
 #define HARVEST_WORK  0x00
 #define HARVEST_TAXES 0x01
-int rule_blessed_harvest(void);
 
 #ifdef __cplusplus
 }

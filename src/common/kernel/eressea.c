@@ -53,8 +53,6 @@
 #include "terrain.h"
 #include "unit.h"
 
-#include <spells/regioncurse.h>
-
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -2725,6 +2723,15 @@ int rule_auto_taxation(void)
     rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
   }
   return rule_taxation;
+}
+
+int rule_blessed_harvest(void)
+{
+  static int rule = -1;
+  if (rule<0) {
+    rule = get_param_int(global.parameters, "rules.magic.blessed_harvest", HARVEST_WORK);
+  }
+  return rule;
 }
 
 static int
