@@ -1,5 +1,0 @@
-
-Dies ist eine sichere Implementation der #include - Funktionalit‰t
-der C-Pr‰prozessors. Er l‰ﬂt keine absoluten Pfade oder .. in den
-Filenamen zu, und durchsucht nur die mit -I angegebenen Directories.
-

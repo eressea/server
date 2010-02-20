@@ -1,7 +1,0 @@
-#!/bin/sh
-
-sed -e 's/^ *[Ll][Ee][rR].*[Ss][Cc][Hh][Ww].*$/LERNE HIEBWAFFEN/g' | \
-sed -e 's/^ *[Ll][Ee][rR].*[Ss][Pp].*$/LERNE STANGENWAFFEN/g' | \
-sed -e 's/^ *[Ss][Ee][Nn][Dd][Ee] /OPTION /g'
-
-
