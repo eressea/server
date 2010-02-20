@@ -993,6 +993,68 @@ int tolua_process_produce(lua_State* L) {
   return 0;
 }
 
+typedef struct event_args {
+  int hfunction;
+  int hargs;
+  const char * sendertype;
+} event_args;
+
+static void args_free(void * udata)
+{
+  free(udata);
+}
+
+static void event_cb(void * sender, const char * event, void * udata) {
+  event_args * args = (event_args *)udata;
+  int nargs = 2;
+  lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
+  if (sender && args->sendertype) {
+    tolua_pushusertype(L, sender, args->sendertype);
+  } else {
+    lua_pushnil(L);
+  }
+  tolua_pushstring(L, event);
+  if (args->hargs) {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
+    ++nargs;
+  }
+  lua_pcall(L, nargs, 0, 0);
+}
+
+static int
+tolua_eventbus_register(lua_State * L)
+{
+  /* parameters:
+  **  1: sender (usertype)
+  **  2: event (string)
+  **  3: handler (function)
+  **  4: arguments (any, *optional*)
+  */
+  void * sender = tolua_tousertype(L, 1, 0);
+  const char * event = tolua_tostring(L, 2, 0);
+  event_args * args = malloc(sizeof(event_args));
+
+  args->sendertype = sender?tolua_typename(L, 1):NULL;
+  lua_pushvalue(L, 3);
+  args->hfunction = luaL_ref(L, LUA_REGISTRYINDEX);
+  if (lua_type(L, 4)!=LUA_TNONE) {
+    lua_pushvalue(L, 4);
+    args->hargs = luaL_ref(L, LUA_REGISTRYINDEX);
+  } else {
+    args->hargs = 0;
+  }
+  eventbus_register(sender, event, &event_cb, &args_free, args);
+  return 0;
+}
+
+static int
+tolua_eventbus_fire(lua_State * L)
+{
+  void * sender = tolua_tousertype(L, 1, 0);
+  const char * event = tolua_tostring(L, 2, 0);
+  eventbus_fire(sender, event, args);
+}
+
 static void
 parse_inifile(lua_State* L, dictionary * d, const char * section)
 {
@@ -1058,6 +1120,14 @@ tolua_eressea_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "school", tolua_get_spell_school, 0);
       tolua_variable(L, TOLUA_CAST "level", tolua_get_spell_level, 0);
       tolua_variable(L, TOLUA_CAST "text", tolua_get_spell_text, 0);
+    }
+    tolua_endmodule(L);
+
+    tolua_module(L, TOLUA_CAST "eventbus", 1);
+    tolua_beginmodule(L, TOLUA_CAST "eventbus");
+    {
+      tolua_function(L, TOLUA_CAST "register", &tolua_eventbus_register);
+      tolua_function(L, TOLUA_CAST "fire", &tolua_eventbus_fire);
     }
     tolua_endmodule(L);
 

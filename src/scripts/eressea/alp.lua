@@ -1,21 +1,37 @@
+require "callbacks"
+require "dumptable"
+
+local function trigger_alp_destroyed(alp, event)
+    m = message.create("alp_destroyed")
+    m:set_region("region", alp.region)
+    m:send_faction(alp.faction)
+end
+
+local function trigger_alp_dissolve(u, event, attr)
+    local alp = attr.alp
+    attr.alp.number = 0 -- kills the alp
+end
+
+local function init_alp(attr)
+    -- dumptable(attr)
+    eventbus.register(attr.alp, "destroy", trigger_alp_destroyed)
+    eventbus.register(attr.mage, "destroy", trigger_alp_dissolve, attr)
+    eventbus.register(attr.target, "destroy", trigger_alp_dissolve, attr)
+end
+
+callbacks["init_alp"] = init_alp
+
+-- Spell: summon alp
 function summon_alp(r, mage, level, force, params)
-  local alp = unit.create(mage.faction, r, 1, "alp")
-  local target = params[1]
-  alp:set_skill("stealth", 7)
-  alp.status = 5 -- FLEE
-  a = attrib.create(alp, { type='alp', target=target })
-
-
-  {
-    /* Wenn der Alp stirbt, den Magier nachrichtigen */
-    add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, 
-      "trigger_alp_destroy", MSG_EVENT, ML_INFO));
-    /* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
-    add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
-    add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
-  }
-  msg = msg_message("summon_alp_effect", "mage alp target", mage, alp, opfer);
-  r_addmessage(r, mage->faction, msg);
-  msg_release(msg);
-  
+    local alp = unit.create(mage.faction, r, 1, "alp")
+    local target = params[1]
+    alp:set_skill("stealth", 7)
+    alp.status = 5 -- FLEE
+    attr = attrib.create(alp, { ['name'] = 'alp', ['target'] = target, ['alp'] = alp, ['mage'] = mage })
+    init_alp(attr)
+    msg = message.create("summon_alp_effect")
+    m:set_unit("mage", mage)
+    m:set_unit("alp", alp)
+    m:set_unit("target", target)
+    m:send_faction(mage.faction)
 end
