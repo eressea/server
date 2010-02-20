@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="eressea"
+	Name="build"
 	ProjectGUID="{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
-	RootNamespace="eressealump"
+	RootNamespace="build"
 	SccProjectName="Svn"
 	SccAuxPath="Svn"
 	SccLocalPath="Svn"
@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;common;external"
+				AdditionalIncludeDirectories="..;../common;../external"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -124,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;common;external"
+				AdditionalIncludeDirectories="..;../common;../external"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -187,23 +187,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\combined\curses.c"
+				RelativePath="..\common\build\curses.c"
 				>
 			</File>
 			<File
-				RelativePath=".\combined\gamecode.c"
+				RelativePath="..\common\build\external.c"
 				>
 			</File>
 			<File
-				RelativePath=".\combined\kernel.c"
+				RelativePath="..\common\build\gamecode.c"
 				>
 			</File>
 			<File
-				RelativePath=".\combined\main.c"
+				RelativePath="..\common\build\kernel.c"
 				>
 			</File>
 			<File
-				RelativePath=".\combined\stdafx.c"
+				RelativePath=".\server.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\build\stdafx.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -224,7 +228,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\combined\util.c"
+				RelativePath="..\common\build\util.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -242,40 +246,8 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\combined\stdafx.h"
+				RelativePath="..\common\build\stdafx.h"
 				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\scripts\default.lua"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath)&#x0D;&#x0A;"
-						Outputs="$(IntDir)/$(InputName).luac"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\scripts\eressea.lua"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="luac -o $(IntDir)/$(InputName).luac $(InputPath)&#x0D;&#x0A;"
-						Outputs="$(IntDir)/$(InputName).luac"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

@@ -1,4 +1,4 @@
-#include <config.h>
+#include <platform.h>
 #include "console.h"
 
 /* lua includes */

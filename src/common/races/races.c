@@ -8,7 +8,7 @@
  *
  */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "races.h"
 

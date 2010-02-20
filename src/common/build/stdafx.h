@@ -1,2 +1,2 @@
 #include "common/settings.h"
-#include "common/config.h"
+#include <platform.h>

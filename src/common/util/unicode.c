@@ -8,7 +8,7 @@
  *  
  */
 
-#include <config.h>
+#include <platform.h>
 #include "unicode.h"
 
 #include <errno.h>

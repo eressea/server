@@ -22,7 +22,7 @@
 #define TEACH_ALL 1
 #define TEACH_FRIENDS
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "study.h"
 

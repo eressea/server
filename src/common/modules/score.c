@@ -19,7 +19,7 @@
  * permission from the authors.
  */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #if SCORE_MODULE
 #include "score.h"

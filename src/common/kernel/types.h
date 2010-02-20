@@ -27,7 +27,7 @@
  * and write #include <settings-eressea.h> (or whatever settings you want
  * your game to use) in there.
  * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
- * settings.h should always be the first thing you include (after config.h).
+ * settings.h should always be the first thing you include (after platform.h).
  */
 #include <settings.h>
 #include <util/variant.h>

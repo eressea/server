@@ -1,4 +1,4 @@
-#include <config.h>
+#include <platform.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>

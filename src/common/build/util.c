@@ -1,38 +1,40 @@
-#include "common/settings.h"
-#include "common/config.h"
+#include <settings.h>
+#include <platform.h>
 #include "stdafx.h"
 
-#include "common/iniparser/iniparser.c"
-#include "common/util/attrib.c"
-#include "common/util/argstack.c"
-#include "common/util/base36.c"
-#include "common/util/crmessage.c"
-#include "common/util/cvector.c"
-#include "common/util/dice.c"
-#include "common/util/event.c"
-#include "common/util/eventbus.c"
-#include "common/util/filereader.c"
-#include "common/util/functions.c"
-#include "common/util/goodies.c"
-#include "common/util/language.c"
-#include "common/util/lists.c"
-#include "common/util/log.c"
-#include "common/util/message.c"
-#include "common/util/mt19937ar.c"
-#include "common/util/nrmessage.c"
-#include "common/util/parser.c"
-#include "common/util/rand.c"
-#include "common/util/resolve.c"
-#include "common/util/sql.c"
-#include "common/util/translation.c"
-#include "common/util/umlaut.c"
-#include "common/util/unicode.c"
-#include "common/util/xml.c"
+#include <external/iniparser/iniparser.c>
+#include <external/mt19937ar.c>
+
+#include <util/console.c>
+#include <util/attrib.c>
+#include <util/argstack.c>
+#include <util/base36.c>
+#include <util/crmessage.c>
+#include <util/cvector.c>
+#include <util/dice.c>
+#include <util/event.c>
+#include <util/eventbus.c>
+#include <util/filereader.c>
+#include <util/functions.c>
+#include <util/goodies.c>
+#include <util/language.c>
+#include <util/lists.c>
+#include <util/log.c>
+#include <util/message.c>
+#include <util/nrmessage.c>
+#include <util/parser.c>
+#include <util/rand.c>
+#include <util/resolve.c>
+#include <util/sql.c>
+#include <util/translation.c>
+#include <util/umlaut.c>
+#include <util/unicode.c>
+#include <util/xml.c>
 
 #ifndef HAVE_INLINE
-#include "common/util/bsdstring.c"
+#include <util/bsdstring.c>
 #endif
 
 #ifdef __GNUC__
-#include "common/util/strncpy.c"
+#include <util/strncpy.c>
 #endif

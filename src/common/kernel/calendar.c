@@ -1,4 +1,4 @@
-#include <config.h>
+#include <platform.h>
 #include "calendar.h"
 
 #include <assert.h>

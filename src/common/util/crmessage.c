@@ -11,7 +11,7 @@
 
 */
 
-#include <config.h>
+#include <platform.h>
 #include "crmessage.h"
 
 #include "message.h"

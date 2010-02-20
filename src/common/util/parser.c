@@ -1,4 +1,4 @@
-#include <config.h>
+#include <platform.h>
 #include "parser.h"
 #include "unicode.h"
 #include "log.h"

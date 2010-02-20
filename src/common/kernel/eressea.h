@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
- /* this should always be the first thing included after config.h */
+ /* this should always be the first thing included after platform.h */
 #include "types.h"
 
   /* experimental gameplay features (that don't affect the savefile) */

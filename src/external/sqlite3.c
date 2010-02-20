@@ -75,7 +75,7 @@
 ** autoconf-based build
 */
 #ifdef _HAVE_SQLITE_CONFIG_H
-#include "config.h"
+#include "platform.h"
 #endif
 
 /************** Include sqliteLimit.h in the middle of sqliteInt.h ***********/

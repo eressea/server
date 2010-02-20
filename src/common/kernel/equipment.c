@@ -17,7 +17,7 @@
  * This program may not be sold or used commercially without prior written
  * permission from the authors.
  */
-#include <config.h>
+#include <platform.h>
 #include <kernel/eressea.h>
 #include "equipment.h"
 

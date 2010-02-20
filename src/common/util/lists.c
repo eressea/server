@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <config.h>
+#include <platform.h>
 #include "lists.h"
 
 void

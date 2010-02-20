@@ -9,7 +9,7 @@
  * prior permission by the authors of Eressea.
  */
 
-#include <config.h>
+#include <platform.h>
 #include <kernel/types.h>
 #include "alliance.h"
 
