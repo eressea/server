@@ -23,22 +23,6 @@ extern "C" {
   struct unit;
 
   extern void register_spells(void);
-  extern struct curse * shipcurse_flyingship(struct ship* sh, struct unit * mage, double power, int duration);
-
-
-  /* für Feuerwände: in movement muß das noch explizit getestet werden.
-  * besser wäre eine blcok_type::move() routine, die den effekt
-  * der Bewegung auf eine struct unit anwendet.
-  */
-  extern struct border_type bt_chaosgate;
-  extern struct border_type bt_firewall;
-
-  typedef struct wall_data {
-    struct unit * mage;
-    int force;
-    boolean active;
-    int countdown;
-  } wall_data;
 
   int levitate_ship(struct ship * sh, struct unit * mage, double power, int duration);
   void set_spelldata(struct spell * sp);

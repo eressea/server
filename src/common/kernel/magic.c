@@ -38,7 +38,6 @@
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
-#include "spellid.h"
 #include "terrain.h"
 #include "unit.h"
 #include "version.h"
@@ -974,7 +973,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 {
   sc_mage * mage;
   /* Ist überhaupt ein gültiger Spruch angegeben? */
-  if (!sp || (sp->id == SPL_NOSPELL)) {
+  if (!sp || sp->id == 0) {
     return false;
   }
   /* Magier? */

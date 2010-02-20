@@ -32,7 +32,6 @@ extern "C" {
   int use_item_regeneration(struct region * r, struct unit * u);
   void showspells(struct region *r, struct unit *u);
   int sp_antimagiczone(struct castorder *co);
-  extern double destr_curse(struct curse* c, int cast_level, double force);
 
   /* ------------------------------------------------------------- */
 

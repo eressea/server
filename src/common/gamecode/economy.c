@@ -56,8 +56,6 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <spells/regioncurse.h>
-
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>

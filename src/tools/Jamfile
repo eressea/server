@@ -9,10 +9,7 @@ SubDirHdrs $(SUBDIR)/.. ;
 
 SubDirHdrs $(XMLHDRS) ;
 
+if $(BUILDTYPE) = REGULAR {
+  LinkLibraries atoi36 : util ;
 Main atoi36 : atoi36.c ;
-LinkLibraries atoi36 :
- util ;
-
-#iconv mapper ;
-#libxml2 mapper ;
-#LINKLIBS on mapper += -L$(LUABIND_ROOT)/lib -lm -lncurses ;
+}

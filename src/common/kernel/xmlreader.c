@@ -38,7 +38,6 @@ without prior permission by the authors of Eressea.
 #include <util/nrmessage.h>
 #include <util/xml.h>
 
-#include <spells/spells.h>
 
 /* libxml includes */
 #include <libxml/tree.h>
@@ -53,6 +52,7 @@ without prior permission by the authors of Eressea.
 
 static boolean gamecode_enabled = false;
 
+void (*set_spelldata_cb)(struct spell * sp) = 0;
 static building_type * bt_get_or_create(const char * name)
 {
   if (name!=NULL) {
@@ -1458,8 +1458,8 @@ parse_spells(xmlDocPtr doc)
         result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
 
         if (result->nodesetval->nodeNr==0) {
-          /* this is an old spell that has a spelldata entry */
-          set_spelldata(sp);
+          /* deprecated style: this spell gets its' function from a callback */
+          if (set_spelldata_cb) set_spelldata_cb(sp);
         } else {
           for (k=0;k!=result->nodesetval->nodeNr;++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];

@@ -1,7 +1,9 @@
 SubDir TOP ;
 
 SubInclude TOP common ;
-SubInclude TOP eressea ;
 
-SubInclude TOP combined ;
+if $(BUILDTYPE) = REGULAR {
+SubInclude TOP common ;
+SubInclude TOP eressea ;
 SubInclude TOP tools ;
+}

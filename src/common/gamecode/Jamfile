@@ -27,4 +27,6 @@ SOURCES =
  xmlreport.c
  ;
 
+if $(BUILDTYPE) = REGULAR {
 Library gamecode : $(SOURCES) ;
+}

@@ -17,6 +17,9 @@ extern "C" {
 #endif
   extern void register_xmlreader(void);
   extern void enable_xml_gamecode(void);
+
+  /* game-specific callbacks */
+  extern void (*set_spelldata_cb)(struct spell * sp);
 #ifdef __cplusplus
 }
 #endif

@@ -20,8 +20,6 @@
 #include "regioncurse.h"
 #include "unitcurse.h"
 #include "shipcurse.h"
-#include "alp.h"
-#include "combatspells.h"
 
 /* kernel includes */
 #include <kernel/curse.h>
@@ -50,6 +48,7 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
+#include <kernel/xmlreader.h>
 #include <kernel/version.h>
 
 /* spells includes */
@@ -98,10 +97,6 @@
 /* ----------------------------------------------------------------------- */
 
 static double zero_effect = 0.0;
-
-attrib_type at_unitdissolve = {
-  "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
-};
 
 attrib_type at_wdwpyramid = {
   "wdwpyramid", NULL, NULL, NULL, a_writevoid, a_readvoid
@@ -297,45 +292,6 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
       "analyse_ship_nospell", "mage ship", mage, sh));
   }
 
-}
-
-/* ------------------------------------------------------------- */
-/* Antimagie - curse auflösen */
-/* ------------------------------------------------------------- */
-
-/* Wenn der Curse schwächer ist als der cast_level, dann wird er
- * aufgelöst, bzw seine Kraft (vigour) auf 0 gesetzt.
- * Ist der cast_level zu gering, hat die Antimagie nur mit einer Chance
- * von 100-20*Stufenunterschied % eine Wirkung auf den Curse. Dann wird
- * die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
- * Zurückgegeben wird der noch unverbrauchte Rest von force.
- */
-double
-destr_curse(curse* c, int cast_level, double force)
-{
-  if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-    double probability = 0.1 + (cast_level - c->vigour)*0.2;
-    /* pro Stufe Unterschied -20% */
-    if (chance(probability)) {
-      force -= c->vigour;
-      if (c->type->change_vigour) {
-        c->type->change_vigour(c, -(cast_level+1/2));
-      } else {
-        c->vigour -= cast_level+1/2;
-      }
-    }
-  } else { /* Zauber ist stärker als curse */
-    if (force >= c->vigour) { /* reicht die Kraft noch aus? */
-      force -= c->vigour;
-      if (c->type->change_vigour) {
-        c->type->change_vigour(c, -c->vigour);
-      } else {
-        c->vigour = 0;
-      }
-
-    }
-  }
-  return force;
 }
 
 int
@@ -2629,11 +2585,6 @@ sp_summondragon(castorder *co)
  *   Was für eine Wirkung hat die?
  */
 
-typedef struct wallcurse {
-  curse * buddy;
-  connection * wall;
-} wallcurse;
-
 void
 wall_vigour(curse* c, double delta)
 {
@@ -2652,206 +2603,6 @@ const curse_type ct_firewall = {
   CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
   NULL, /* curseinfo */
   wall_vigour /* change_vigour */
-};
-
-void
-cw_init(attrib * a) {
-  curse * c;
-  curse_init(a);
-  c = (curse*)a->data.v;
-  c->data.v = calloc(sizeof(wallcurse), 1);
-}
-
-void
-cw_write(const attrib * a, storage * store) {
-  connection * b = ((wallcurse*)((curse*)a->data.v)->data.v)->wall;
-  curse_write(a, store);
-  store->w_int(store, b->id);
-}
-
-typedef struct bresvole {
-  unsigned int id;
-  curse * self;
-} bresolve;
-
-static int resolve_buddy(variant data, void * addr);
-
-static int
-cw_read(attrib * a, storage * store)
-{
-  bresolve * br = calloc(sizeof(bresolve), 1);
-  curse * c = (curse*)a->data.v;
-  wallcurse * wc = (wallcurse*)c->data.v;
-  variant var;
-
-  curse_read(a, store);
-  br->self = c;
-  br->id = store->r_int(store);
-
-  var.i = br->id;
-  ur_add(var, &wc->wall, resolve_borderid);
-
-  var.v = br;
-  ur_add(var, &wc->buddy, resolve_buddy);
-  return AT_READ_OK;
-}
-
-attrib_type at_cursewall =
-{
-  "cursewall",
-  cw_init,
-  curse_done,
-  curse_age,
-  cw_write,
-  cw_read,
-  ATF_CURSE
-};
-
-static int
-resolve_buddy(variant data, void * addr)
-{
-  curse * result = NULL;
-  bresolve * br = (bresolve*)data.v;
-
-  if (br->id>=0) {
-    connection * b = find_border(br->id);
-
-    if (b && b->from && b->to) {
-      attrib * a = a_find(b->from->attribs, &at_cursewall);
-      while (a && a->data.v!=br->self) {
-        curse * c = (curse*)a->data.v;
-        wallcurse * wc = (wallcurse*)c->data.v;
-        if (wc->wall->id==br->id) break;
-        a = a->next;
-      }
-      if (!a || a->type!=&at_cursewall) {
-        a = a_find(b->to->attribs, &at_cursewall);
-        while (a && a->type==&at_cursewall && a->data.v!=br->self) {
-          curse * c = (curse*)a->data.v;
-          wallcurse * wc = (wallcurse*)c->data.v;
-          if (wc->wall->id==br->id) break;
-          a = a->next;
-        }
-      }
-      if (a && a->type==&at_cursewall) {
-        curse * c = (curse*)a->data.v;
-        free(br);
-        result = c;
-      }
-    } else {
-      /* fail, object does not exist (but if you're still loading then 
-      * you may want to try again later) */
-      *(curse**)addr = NULL;
-      return -1;
-    }
-  }
-  *(curse**)addr = result;
-  return 0;
-}
-
-static const char *
-b_namefirewall(const connection * b, const region * r, const faction * f, int gflags)
-{
-  const char * bname;
-  unused(f);
-  unused(r);
-  unused(b);
-  if (gflags & GF_ARTICLE) bname = "a_firewall";
-  else bname = "firewall";
-
-  if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("border", bname));
-}
-
-static void
-wall_init(connection * b)
-{
-  wall_data * fd = (wall_data*)calloc(sizeof(wall_data), 1);
-  fd->countdown = -1; /* infinite */
-  b->data.v = fd;
-}
-
-static void
-wall_destroy(connection * b)
-{
-  free(b->data.v);
-}
-
-static void
-wall_read(connection * b, storage * store)
-{
-  wall_data * fd = (wall_data*)b->data.v;
-  variant mno;
-  assert(fd);
-  if (store->version<STORAGE_VERSION) {
-    mno.i = store->r_int(store);
-    fd->mage = findunit(mno.i);
-    if (!fd->mage) {
-      ur_add(mno, &fd->mage, resolve_unit);
-    }
-  } else {
-    read_reference(&fd->mage, store, read_unit_reference, resolve_unit);
-  }
-  fd->force = store->r_int(store);
-  if (store->version>=NOBORDERATTRIBS_VERSION) {
-    fd->countdown = store->r_int(store);
-  }
-  fd->active = true;
-}
-
-static void
-wall_write(const connection * b, storage * store)
-{
-  wall_data * fd = (wall_data*)b->data.v;
-  write_unit_reference(fd->mage, store);
-  store->w_int(store, fd->force);
-  store->w_int(store, fd->countdown);
-}
-
-static int
-wall_age(connection * b)
-{
-  wall_data * fd = (wall_data*)b->data.v;
-  --fd->countdown;
-  return (fd->countdown>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
-}
-
-static region *
-wall_move(const connection * b, struct unit * u, struct region * from, struct region * to, boolean routing)
-{
-  wall_data * fd = (wall_data*)b->data.v;
-  if (!routing && fd->active) {
-    int hp = dice(3, fd->force) * u->number;
-    hp = MIN(u->hp, hp);
-    u->hp -= hp;
-    if (u->hp) {
-      ADDMSG(&u->faction->msgs, msg_message("firewall_damage",
-        "region unit", from, u));
-    }
-    else ADDMSG(&u->faction->msgs, msg_message("firewall_death", "region unit", from, u));
-    if (u->number>u->hp) {
-      scale_number(u, u->hp);
-      u->hp = u->number;
-    }
-  }
-  return to;
-}
-
-border_type bt_firewall = {
-  "firewall", VAR_VOIDPTR,
-  b_transparent, /* transparent */
-  wall_init, /* init */
-  wall_destroy, /* destroy */
-  wall_read, /* read */
-  wall_write, /* write */
-  b_blocknone, /* block */
-  b_namefirewall, /* name */
-  b_rvisible, /* rvisible */
-  b_finvisible, /* fvisible */
-  b_uinvisible, /* uvisible */
-  NULL,
-  wall_move,
-  wall_age
 };
 
 static int
@@ -2911,73 +2662,6 @@ sp_firewall(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-
-static const char *
-wisps_name(const connection * b, const region * r, const faction * f, int gflags)
-{
-  const char * bname;
-  unused(f);
-  unused(r);
-  unused(b);
-  if (gflags & GF_ARTICLE) {
-    bname = "a_wisps";
-  } else {
-    bname = "wisps";
-  }
-  if (gflags & GF_PURE) return bname;
-  return LOC(f->locale, mkname("border", bname));
-}
-
-typedef struct wisps_data {
-  wall_data wall;
-  int rnd;
-} wisps_data;
-
-static region *
-wisps_move(const connection * b, struct unit * u, struct region * from, struct region * next, boolean routing)
-{
-  direction_t reldir = reldirection(from, next);
-  wisps_data * wd = (wisps_data*)b->data.v;
-  assert(reldir!=D_SPECIAL);
-
-  if (routing && wd->wall.active) {
-    region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
-    region * rr = rconnect(from, (direction_t)((reldir+1)%MAXDIRECTIONS));
-    /* pick left and right region: */
-    if (wd->rnd<0) {
-      wd->rnd = rng_int() % 3;
-    }
-
-    if (wd->rnd == 1 && rl && fval(rl->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rl;
-    if (wd->rnd == 2 && rr && fval(rr->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rr;
-  }
-  return next;
-}
-
-static void
-wisps_init(connection * b)
-{
-  wisps_data * wd = (wisps_data*)calloc(sizeof(wisps_data), 1);
-
-  b->data.v = wd;
-  wd->rnd = -1;
-}
-
-border_type bt_wisps = {
-  "wisps", VAR_VOIDPTR,
-  b_transparent, /* transparent */
-  wisps_init, /* init */
-  wall_destroy, /* destroy */
-  wall_read, /* read */
-  wall_write, /* write */
-  b_blocknone, /* block */
-  wisps_name, /* name */
-  b_rvisible, /* rvisible */
-  b_fvisible, /* fvisible */
-  b_uvisible, /* uvisible */
-  NULL, /* visible */
-  wisps_move
-};
 
 static int
 sp_wisps(castorder *co)
@@ -6230,35 +5914,6 @@ sp_movecastle(castorder *co)
   return cast_level;
 }
 
-curse *
-shipcurse_flyingship(ship* sh, unit * mage, double power, int duration)
-{
-  static const curse_type * ct_flyingship = NULL;
-  if (!ct_flyingship) {
-    ct_flyingship = ct_find("flyingship");
-    assert(ct_flyingship);
-  }
-  if (curse_active(get_curse(sh->attribs, ct_flyingship))) {
-    return NULL;
-  } else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
-    return NULL;
-  } else {
-    /* mit C_SHIP_NODRIFT haben wir kein Problem */
-    return create_curse(mage, &sh->attribs, ct_flyingship, power, duration, zero_effect, 0);
-  }
-}
-
-int
-levitate_ship(ship * sh, unit * mage, double power, int duration)
-{
-  curse * c = shipcurse_flyingship(sh, mage, power, duration);
-  if (c) {
-    return c->no;
-  }
-  return 0;
-}
-
-
 /* ------------------------------------------------------------- */
 /* Name:       Luftschiff
  * Stufe:      6
@@ -7511,25 +7166,12 @@ set_spelldata(spell * sp)
 void
 register_spells(void)
 {
-  at_register(&at_cursewall);
-  at_register(&at_unitdissolve);
+  set_spelldata_cb = &set_spelldata;
   at_register(&at_wdwpyramid);
 
-  register_bordertype(&bt_firewall);
-  register_bordertype(&bt_wisps);
-  register_bordertype(&bt_chaosgate);
-  
   /* sp_summon_alp */
   register_alp();
-  /* init_firewall(); */
-  ct_register(&ct_firewall);
-  ct_register(&ct_deathcloud);
 
-  at_register(&at_deathcloud_compat);
-  register_unitcurse();
-  register_regioncurse();
-  register_shipcurse();
-  register_buildingcurse();
   register_function((pf_generic)&sp_blessedharvest, "cast_blessedharvest");
   register_function((pf_generic)&sp_wdwpyramid, "wdwpyramid");
   register_function((pf_generic)&sp_summon_familiar, "cast_familiar");

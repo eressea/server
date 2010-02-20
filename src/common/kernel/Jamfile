@@ -4,6 +4,7 @@ TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../util ;
 SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(SUBDIR)/../../external ;
 SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
@@ -39,6 +40,7 @@ SOURCES =
  ship.c
  skill.c
  spell.c
+ sqlite.c
  teleport.c
  terrain.c
  unit.c
@@ -47,4 +49,6 @@ SOURCES =
  binarystore.c
  ;
 
+if $(BUILDTYPE) = REGULAR {
 Library kernel : $(SOURCES) ;
+}

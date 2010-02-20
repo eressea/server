@@ -17,8 +17,9 @@
 
 /* kernel includes */
 #include <kernel/message.h>
-#include <kernel/ship.h>
 #include <kernel/objtypes.h>
+#include <kernel/ship.h>
+#include <kernel/unit.h>
 #include <kernel/curse.h>
 
 /* util includes */
@@ -82,6 +83,34 @@ static struct curse_type ct_nodrift = { "nodrift",
 static struct curse_type ct_shipspeedup = { "shipspeedup",
   CURSETYP_NORM, 0, 0, cinfo_ship
 };
+
+curse *
+shipcurse_flyingship(ship* sh, unit * mage, double power, int duration)
+{
+  static const curse_type * ct_flyingship = NULL;
+  if (!ct_flyingship) {
+    ct_flyingship = ct_find("flyingship");
+    assert(ct_flyingship);
+  }
+  if (curse_active(get_curse(sh->attribs, ct_flyingship))) {
+    return NULL;
+  } else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
+    return NULL;
+  } else {
+    /* mit C_SHIP_NODRIFT haben wir kein Problem */
+    return create_curse(mage, &sh->attribs, ct_flyingship, power, duration, 0.0, 0);
+  }
+}
+
+int
+levitate_ship(ship * sh, unit * mage, double power, int duration)
+{
+  curse * c = shipcurse_flyingship(sh, mage, power, duration);
+  if (c) {
+    return c->no;
+  }
+  return 0;
+}
 
 void
 register_shipcurse(void)

@@ -15,4 +15,6 @@ SOURCES =
  zombies.c
  ;
 
+if $(BUILDTYPE) = REGULAR {
 Library races : $(SOURCES) ;
+}

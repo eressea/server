@@ -21,6 +21,8 @@ struct locale;
 struct message;
 extern struct message * cinfo_ship(const void * obj, typ_t typ, const struct curse *c, int self);
 extern void register_shipcurse(void);
+extern struct curse * shipcurse_flyingship(struct ship* sh, struct unit * mage, double power, int duration);
+int levitate_ship(struct ship * sh, struct unit * mage, double power, int duration);
 	
 #ifdef __cplusplus
 }

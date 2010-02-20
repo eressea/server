@@ -492,6 +492,7 @@ make_movement_order(unit * u, const region * target, int moves, boolean (*allowe
 	return parse_order(zOrder, u->faction->locale);
 }
 
+#ifdef TODO_ALP
 static order *
 monster_seeks_target(region *r, unit *u)
 {
@@ -549,6 +550,7 @@ monster_seeks_target(region *r, unit *u)
   
   return create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale, directions[d]));
 }
+#endif
 
 unit *
 random_unit(const region * r)
@@ -1023,13 +1025,19 @@ plan_monsters(void)
       if (long_order==NULL) {
         /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 
+        if (!u->orders) {
+          handle_event(u->attribs, "ai_move", u);
+        }
+
         switch (old_race(u->race)) {
           case RC_SEASERPENT:
             long_order = create_order(K_PIRACY, f->locale, NULL);
             break;
+#ifdef TODO_ALP
           case RC_ALP:
             long_order = monster_seeks_target(r, u);
             break;
+#endif
           case RC_FIREDRAGON:
           case RC_DRAGON:
           case RC_WYRM:
@@ -1043,7 +1051,6 @@ plan_monsters(void)
         }
       }
       if (long_order) {
-        set_order(&u->thisorder, copy_order(long_order));
         addlist(&u->orders, long_order);
       }
     }
