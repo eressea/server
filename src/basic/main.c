@@ -30,6 +30,7 @@ int main(int argc, char ** argv)
 {
   int err;
 
+  log_open("eressea.log");
   load_config("eressea.ini");
 
   err = eressea_init();

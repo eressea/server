@@ -2226,7 +2226,6 @@ kernel_done(void)
    * calling it is optional, e.g. a release server will most likely not do it.
    */
   translation_done();
-  skill_done();
   gc_done();
   sql_done();
 }
@@ -3163,7 +3162,6 @@ void
 kernel_init(void)
 {
   char zBuffer[MAX_PATH];
-  skill_init();
   attrib_init();
   translation_init();
 

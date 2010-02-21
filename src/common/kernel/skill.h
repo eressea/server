@@ -42,8 +42,6 @@ typedef struct skillmod_data {
 extern struct attrib_type at_skillmod;
 extern int rc_skillmod(const struct race * rc, const struct region *r, skill_t sk);
 extern int skillmod(const struct attrib * a, const struct unit * u, const struct region * r, skill_t sk, int value, int flags);
-extern void skill_init(void);
-extern void skill_done(void);
 extern struct attrib * make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special, double multiplier, int bonus);
 
 extern const char * skillname(skill_t, const struct locale *);

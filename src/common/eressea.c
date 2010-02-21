@@ -193,10 +193,10 @@ void eressea_done(void)
 static int
 log_lua_error(lua_State * L)
 {
-  static int s_abort_on_errors = 0;
+  static int s_abort_on_errors = 1;
   const char* error = lua_tostring(L, -1);
 
-  log_error(("A LUA error occurred: %s\n", error));
+  log_error(("LUA call failed.\n%s\n", error));
   lua_pop(L, 1);
 
   if (s_abort_on_errors) {
@@ -207,22 +207,27 @@ log_lua_error(lua_State * L)
 
 int eressea_run(const char * luafile, const char * entry_point)
 {
+  int err;
   lua_State * L = (lua_State *)global.vm_state;
   /* run the main script */
   if (luafile) {
     lua_getglobal(L, "dofile");
     lua_pushstring(L, luafile);
-    if (lua_pcall(L, 1, 0, 0) != 0) {
+    err = lua_pcall(L, 1, 0, 0);
+    if (err != 0) {
       log_lua_error(L);
+      return err;
     }
   }
   if (entry_point) {
     lua_getglobal(L, entry_point);
-    if (lua_pcall(L, 0, 1, 0) != 0) {
+    err = lua_pcall(L, 0, 1, 0);
+    if (err != 0) {
       log_lua_error(L);
+      return err;
     }
   } else {
-    lua_console(L);
+    err = lua_console(L);
   }
-  return 0;
+  return err;
 }
