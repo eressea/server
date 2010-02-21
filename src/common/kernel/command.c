@@ -11,7 +11,7 @@
  
  */
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "command.h"
 
 #include <kernel/order.h>

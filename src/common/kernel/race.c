@@ -18,7 +18,7 @@
  * permission from the authors.
  */
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "race.h"
 
 #include <races/zombies.h>

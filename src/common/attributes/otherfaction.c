@@ -12,7 +12,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "otherfaction.h"
 
 #include <kernel/faction.h>

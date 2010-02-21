@@ -14,7 +14,7 @@
 
 #include <platform.h>
 #include "giveitem.h"
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 /* kernel includes */
 #include <kernel/building.h>

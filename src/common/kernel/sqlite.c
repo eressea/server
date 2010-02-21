@@ -1,5 +1,5 @@
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <util/unicode.h>
 #include <util/base36.h>

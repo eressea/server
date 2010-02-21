@@ -26,7 +26,7 @@
 #ifdef WEATHER
 
 #include <platform.h>
-#include <eressea.h>
+#include <config.h>
 #include "weather.h"
 
 /* libc includes */

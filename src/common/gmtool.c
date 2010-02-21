@@ -11,7 +11,7 @@
 /* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <platform.h>
 #include <curses.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #include "gmtool.h"
 #include "gmtool_structs.h"

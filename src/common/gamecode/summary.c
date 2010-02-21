@@ -10,7 +10,7 @@
 
 /* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #include "summary.h"
 

@@ -22,7 +22,7 @@
 #pragma region includes
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "laws.h"
 
 #include <modules/gmcmd.h>
@@ -2705,7 +2705,7 @@ sinkships(region * r)
 }
 
 /* The following functions do not really belong here: */
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/build.h>
 
 static attrib_type at_number = {

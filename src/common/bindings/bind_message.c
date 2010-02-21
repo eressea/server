@@ -1,5 +1,5 @@
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 // kernel includes
 #include <kernel/faction.h>

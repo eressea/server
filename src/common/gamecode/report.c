@@ -15,7 +15,7 @@
 #define ECHECK_VERSION "4.01"
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 /* modules includes */
 #include <modules/score.h>

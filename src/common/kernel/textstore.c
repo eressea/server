@@ -7,7 +7,7 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 #include <platform.h>
-#include "eressea.h"
+#include "config.h"
 #include "textstore.h"
 
 #include "save.h"

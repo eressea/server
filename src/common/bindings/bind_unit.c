@@ -22,7 +22,7 @@ without prior permission by the authors of Eressea.
 
 // kernel includes
 #include <kernel/building.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>

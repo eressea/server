@@ -20,7 +20,7 @@
 */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "unit.h"
 
 #include "building.h"

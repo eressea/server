@@ -11,7 +11,7 @@
 */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "order.h"
 
 #include "skill.h"

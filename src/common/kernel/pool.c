@@ -20,7 +20,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "pool.h"
 
 #include "faction.h"
