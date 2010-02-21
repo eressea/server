@@ -46,7 +46,7 @@
   <xi:include href="names-ghouls.xml"/>
   <xi:include href="names-dragons.xml"/>
 
-  <game name="Eressea" units="1500">
+  <game name="Eressea">
     <!-- Game specific settings -->
 
     <order name="BEZAHLEN" disable="yes"/>
@@ -97,6 +97,7 @@
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
     <param name="rules.check_overload" value="0"/>
+    <param name="rules.limit.faction" value="1500"/>
   </game>
   <xi:include href="eressea/strings.xml"/>
   <xi:include href="eressea/races.xml"/>

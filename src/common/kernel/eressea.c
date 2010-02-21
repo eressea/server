@@ -587,7 +587,7 @@ skill_limit(faction * f, skill_t sk)
   return m;
 }
 
-char * g_basedir;
+const char * g_basedir;
 
 const char *
 basepath(void)
@@ -2703,6 +2703,7 @@ int rule_stealth_faction(void)
   static int rule = -1;
   if (rule<0) {
     rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
+    assert(rule>=0);
   }
   return rule;
 }
@@ -2712,6 +2713,7 @@ int rule_region_owners(void)
   static int rule_owners = -1;
   if (rule_owners<0) {
     rule_owners = get_param_int(global.parameters, "rules.region_owners", 0);
+    assert(rule>=0);
   }
   return rule_owners;
 }
@@ -2721,6 +2723,7 @@ int rule_auto_taxation(void)
   static int rule_taxation = -1;
   if (rule_taxation<0) {
     rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
+    assert(rule>=0);
   }
   return rule_taxation;
 }
@@ -2730,6 +2733,27 @@ int rule_blessed_harvest(void)
   static int rule = -1;
   if (rule<0) {
     rule = get_param_int(global.parameters, "rules.magic.blessed_harvest", HARVEST_WORK);
+    assert(rule>=0);
+  }
+  return rule;
+}
+
+int rule_alliance_limit(void)
+{
+  static int rule = -1;
+  if (rule<0) {
+    rule = get_param_int(global.parameters, "rules.limit.alliance", 0);
+    assert(rule>=0);
+  }
+  return rule;
+}
+
+int rule_faction_limit(void)
+{
+  static int rule = -1;
+  if (rule<0) {
+    rule = get_param_int(global.parameters, "rules.limit.faction", 0);
+    assert(rule>=0);
   }
   return rule;
 }

@@ -22,7 +22,7 @@
   <xi:include href="spells.xml"/>
   <xi:include href="terrains.xml"/>
 
-  <game name="Wettstreit der Weisen" unitsperalliance="yes" units="1000" welcome="vinyambar">
+  <game name="Wettstreit der Weisen" welcome="vinyambar">
     <!-- Game specific settings -->
     <order name="ARBEITEN" disable="yes"/>
 
@@ -72,6 +72,7 @@
     <param name="alliance.restricted" value="fight guard stealth money"/>
     <param name="alliance.auto" value="fight guard stealth money "/>
     <param name="alliance.transferquit" value="true"/>
+    <param name="rules.limit.alliance" value="1000"/>
   </game>
 
   <xi:include href="vinyambar/de/strings.xml"/>

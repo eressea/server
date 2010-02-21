@@ -9,7 +9,7 @@
 	<include href="resources.xml" />
 	<include href="ships.xml" />
 
-	<game name="Vinyambar I" units="250" welcome="vinyambar">
+	<game name="Vinyambar I" welcome="vinyambar">
 		<comment>Game specific</comment>
 		<param name="entertain.base" value="0"></param>
 		<param name="entertain.perlevel" value="20"></param>
@@ -18,6 +18,7 @@
 		<param name="GiveRestriction" value="3"></param>
 		<param name="database.gameid" value="1"></param>
 		<param name="hunger.long" value="1"></param>
+        <param name="rules.limit.faction" value="250"/>
 	</game>
 	<include href="vinyambar/races.xml" />
 	<include href="vinyambar/de/strings-classic.xml" />

@@ -406,6 +406,11 @@ read_args(int argc, char **argv, lua_State * luaState)
         nocr = true;
         nocr = true;
       }
+      else if (strcmp(argv[i]+2, "version")==0) {
+        printf("\n%s PBEM host\n"
+          "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
+          "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
+      }
       else if (strcmp(argv[i]+2, "xml")==0) game_name = argv[++i];
       else if (strcmp(argv[i]+2, "ignore-errors")==0) g_ignore_errors = true;
       else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
@@ -594,33 +599,36 @@ write_skills(void)
   fclose(F);
 }
 
+void locale_init(void)
+{
+  char * lc_ctype;
+  char * lc_numeric;
+
+  lc_ctype = setlocale(LC_CTYPE, "");
+  lc_numeric = setlocale(LC_NUMERIC, "C");
+  assert(towlower(0xC4)==0xE4); /* &Auml; => &auml; */
+  if (lc_ctype) {
+    lc_ctype = strdup(lc_ctype);
+  }
+  if (lc_numeric) {
+    lc_numeric = strdup(lc_numeric);
+  }
+}
+
 int
 main(int argc, char *argv[])
 {
   int i;
-  char * lc_ctype;
-  char * lc_numeric;
   lua_State * L;
   static int write_csv = 0;
 
   setup_signal_handler();
 
   log_open("eressea.log");
-
-  lc_ctype = setlocale(LC_CTYPE, "");
-  lc_numeric = setlocale(LC_NUMERIC, "C");
-  assert(towlower(0xC4)==0xE4);
-  if (lc_ctype) lc_ctype = strdup(lc_ctype);
-  if (lc_numeric) lc_numeric = strdup(lc_numeric);
-
+  locale_init();
   load_inifile("eressea.ini");
   L = lua_init();
   global.vm_state = L;
-  if (verbosity>=4) {
-    printf("\n%s PBEM host\n"
-      "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-      "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
-  }
   if ((i=read_args(argc, argv, L))!=0) return i;
 
 #ifdef CRTDBG
