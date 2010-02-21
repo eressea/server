@@ -566,7 +566,7 @@ static tnode g_tell;
 static tnode g_kill;
 
 void
-init_gmcmd(void)
+register_gmcmd(void)
 {
   at_register(&at_gmcreate);
   at_register(&at_permissions);

@@ -21,7 +21,6 @@ extern "C" {
 extern struct attrib_type at_iceberg;
 
 extern struct attrib * make_iceberg(direction_t dir);
-extern void init_iceberg(void);
 
 #ifdef __cplusplus
 }

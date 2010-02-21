@@ -57,9 +57,3 @@ set_moved(attrib ** alist)
 	if (a==NULL) a = a_add(alist, a_new(&at_moved));
 	a->data.i = 2;
 }
-
-void
-init_moved(void)
-{
-	at_register(&at_moved);
-}

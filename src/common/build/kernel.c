@@ -11,9 +11,9 @@
 #include <kernel/building.c>
 #include <kernel/calendar.c>
 #include <kernel/command.c>
+#include <kernel/config.c>
 #include <kernel/curse.c>
 #include <kernel/equipment.c>
-#include <kernel/eressea.c>
 #include <kernel/faction.c>
 #include <kernel/group.c>
 #include <kernel/item.c>
@@ -46,7 +46,6 @@
 #include <modules/autoseed.c>
 #include <modules/dungeon.c>
 #include <modules/gmcmd.c>
-#include <modules/infocmd.c>
 #include <modules/museum.c>
 #include <modules/score.c>
 #include <modules/weather.c>

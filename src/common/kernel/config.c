@@ -96,7 +96,6 @@ region  *regions;
 faction *factions;
 struct settings global = {
   "Eressea", /* gamename */
-  1000, /* maxunits */
 };
 FILE    *logfile;
 FILE    *updatelog;
@@ -2197,22 +2196,6 @@ const char * localenames[] = {
   NULL
 };
 
-int
-init_data(const char * filename)
-{
-  int l;
-
-  l = read_xml(filename);
-  if (l) return l;
-
-  init_locales();
-
-  if (turn<0) {
-    turn = first_turn;
-  }
-  return 0;
-}
-
 void
 init_locales(void)
 {
@@ -2713,7 +2696,7 @@ int rule_region_owners(void)
   static int rule_owners = -1;
   if (rule_owners<0) {
     rule_owners = get_param_int(global.parameters, "rules.region_owners", 0);
-    assert(rule>=0);
+    assert(rule_owners>=0);
   }
   return rule_owners;
 }
@@ -2723,7 +2706,7 @@ int rule_auto_taxation(void)
   static int rule_taxation = -1;
   if (rule_taxation<0) {
     rule_taxation = get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
-    assert(rule>=0);
+    assert(rule_taxation>=0);
   }
   return rule_taxation;
 }

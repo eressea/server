@@ -18,7 +18,6 @@ extern "C" {
 extern struct attrib_type at_orcification;
 
 extern struct attrib * make_orcification(int orcification);
-extern void init_orcification(void);
 
 #ifdef __cplusplus
 }

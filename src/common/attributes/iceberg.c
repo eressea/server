@@ -36,9 +36,3 @@ make_iceberg(direction_t dir)
 	a->data.i = (int)dir;
 	return a;
 }
-
-void
-init_iceberg(void)
-{
-	at_register(&at_iceberg);
-}

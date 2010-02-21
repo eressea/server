@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-extern void init_attributes(void);
+extern void register_attributes(void);
 
 #ifdef __cplusplus
 }

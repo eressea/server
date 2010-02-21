@@ -54,7 +54,6 @@
 #include <attributes/movement.c>
 #include <attributes/moved.c>
 #include <attributes/object.c>
-#include <attributes/option.c>
 #include <attributes/orcification.c>
 #include <attributes/otherfaction.c>
 #include <attributes/overrideroads.c>
@@ -63,7 +62,6 @@
 #include <attributes/reduceproduction.c>
 #include <attributes/targetregion.c>
 #include <attributes/viewrange.c>
-#include <attributes/variable.c>
 
 #include <items/artrewards.c>
 #include <items/demonseye.c>

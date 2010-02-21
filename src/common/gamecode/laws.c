@@ -26,7 +26,6 @@
 #include "laws.h"
 
 #include <modules/gmcmd.h>
-#include <modules/infocmd.h>
 #include <modules/wormhole.h>
 
 /* gamecode includes */
@@ -89,11 +88,6 @@
 #include <util/rng.h>
 
 #include <modules/xecmd.h>
-
-#ifdef AT_OPTION
-/* attributes includes */
-#include <attributes/option.h>
-#endif
 
 /* libc includes */
 #include <assert.h>
@@ -2149,29 +2143,7 @@ send_cmd(unit * u, struct order * ord)
   s = getstrtoken();
 
   option = findoption(s, u->faction->locale);
-#ifdef AT_OPTION
-  /* Sonderbehandlung Zeitungsoption */
-  if (option == O_NEWS) {
-    attrib *a = a_find(u->faction->attribs, &at_option_news);
-    if(a) a->data.i = 0;
 
-    while((s = getstrtoken())) {
-      if(findparam(s) == P_NOT) {
-        a_removeall(&u->faction->attribs, &at_option_news);
-        u->faction->options = u->faction->options & ~O_NEWS;
-        break;
-      } else {
-        int sec = atoi(s);
-        if(sec != 0) {
-          if(!a) a_add(&u->faction->attribs, a_new(&at_option_news));
-          a->data.i = a->data.i & (1<<(sec-1));
-          u->faction->options = u->faction->options | O_NEWS;
-        }
-      }
-    }
-    return 0;
-  }
-#endif
   if (option == -1) {
     cmistake(u, ord, 135, MSG_EVENT);
   } else {
@@ -4027,11 +3999,6 @@ init_processor(void)
   add_proc_region(p, &enter_1, "Kontaktieren & Betreten (1. Versuch)");
   add_proc_order(p, K_USE, &use_cmd, 0, "Benutzen");
 
-#if INFOCMD_MODULE
-  if (!global.disabled[K_INFO]) {
-    add_proc_global(p, &infocommands, NULL);
-  }
-#endif
   if (!global.disabled[K_GM]) {
     add_proc_global(p, &gmcommands, "GM Kommandos");
   }
@@ -4235,4 +4202,21 @@ update_subscriptions(void)
       dbrace(f->race), f->lastorders);
   }
   fclose(F);
+}
+
+int
+init_data(const char * filename)
+{
+  int l;
+
+  l = read_xml(filename);
+  if (l) return l;
+
+  init_locales();
+  init_archetypes();
+
+  if (turn<0) {
+    turn = first_turn;
+  }
+  return 0;
 }

@@ -34,9 +34,3 @@ make_orcification(int orcification)
 	a->data.i = orcification;
 	return a;
 }
-
-void
-init_orcification(void)
-{
-	at_register(&at_orcification);
-}

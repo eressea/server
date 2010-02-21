@@ -23,7 +23,6 @@ extern struct attrib_type at_key;
 extern struct attrib * make_key(int key);
 extern struct attrib * find_key(struct attrib * alist, int key);
 extern struct attrib * add_key(struct attrib ** alist, int key);
-extern void init_key(void);
 
 #ifdef __cplusplus
 }

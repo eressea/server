@@ -4,3 +4,4 @@
 
 #include <util/listbox.c>
 #include <gmtool.c>
+#include <eressea.c>

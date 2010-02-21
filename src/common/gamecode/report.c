@@ -26,9 +26,6 @@
 #include <attributes/otherfaction.h>
 #include <attributes/alliance.h>
 #include <attributes/reduceproduction.h>
-#ifdef AT_OPTION
-# include <attributes/option.h>
-#endif
 
 /* gamecode includes */
 #include "creport.h"
@@ -2120,33 +2117,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
       bytes = (int)strlcpy(bufp, LOC(f->locale, options[op]), size);
       if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-#ifdef AT_OPTION
-      if(op == O_NEWS) {
-        attrib *a = a_find(f->attribs, &at_option_news);
-        if(!a) {
-          /* Zur Altlastenbeseitigung */
-          f->options = f->options & ~op;
-        } else {
-          int sec = a->data.i;
-          int i;
-          bytes = (int)strlcpy(bufp, "(", size);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-          for (i=1; sec != 0; i *= 2) {
-            if(sec & i) {
-              bytes = (int)strlcpy(bufp, itoa10(i), size);
-              if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-              sec = sec & ~i;
-              if (sec) {
-                bytes = (int)strlcpy(bufp, ",", size);
-                if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-              }
-            }
-          }
-          bytes = (int)strlcpy(bufp, ")", size);
-          if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
-        }
-      }
-#endif
+
       flag++;
     }
   }

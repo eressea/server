@@ -34,6 +34,7 @@ void find_address(void);
 void update_guards(void);
 void update_subscriptions(void);
 void deliverMail(struct faction * f, struct region * r, struct unit * u, const char *s, struct unit * receiver);
+int init_data(const char * filename);
 
 /* eressea-specific. put somewhere else, please. */
 void processorders(void);

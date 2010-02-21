@@ -45,9 +45,3 @@ make_reduceproduction(int percent, int time)
   a->data.sa[1] = (short)time;
   return a;
 }
-
-void
-init_reduceproduction(void)
-{
-	at_register(&at_reduceproduction);
-}

@@ -64,9 +64,3 @@ make_hate(struct unit * u)
 	a->data.v = u;
 	return a;
 }
-
-void
-init_hate(void)
-{
-	at_register(&at_hate);
-}
