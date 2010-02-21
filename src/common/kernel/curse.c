@@ -217,7 +217,7 @@ curse_read(attrib * a, struct storage * store)
     if (result!=0) {
       log_error(("missing curse %s, no compatibility code either.\n", cursename));
     }
-    assert(result!=0);
+    assert(result==0);
     return AT_READ_FAIL;
   }
   if (store->version < CURSEFLAGS_VERSION) {

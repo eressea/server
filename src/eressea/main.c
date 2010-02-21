@@ -154,7 +154,6 @@ static boolean g_ignore_errors = false;
 static const char * luafile = "init.lua";
 static const char * entry_point = NULL;
 static int memdebug = 0;
-static int g_console = 1;
 #if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
 #include <execinfo.h>
 #include <signal.h>
@@ -302,14 +301,12 @@ read_args(int argc, char **argv, lua_State * luaState)
         return usage(argv[0], argv[i]);
     } else switch(argv[i][1]) {
       case 'C':
-        g_console = 1;
         entry_point = NULL;
         break;
       case 'R':
         g_reportdir = argv[++i];
         break;
       case 'e':
-        g_console = 0;
         entry_point = argv[++i];
         break;
       case 'd':
@@ -322,7 +319,6 @@ read_args(int argc, char **argv, lua_State * luaState)
         game_name = argv[++i];
         break;
       case 't':
-        g_console = 0;
         turn = atoi(argv[++i]);
         break;
       case 'q':
