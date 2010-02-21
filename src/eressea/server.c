@@ -115,22 +115,6 @@
 #include <bindings/bind_unit.h>
 #endif // BINDINGS_TOLUA
 
-#ifdef BINDINGS_LUABIND
-#include "lua/bindings.h"
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable: 4127)
-#endif // _MSC_VER
-#include <lua.hpp>
-#include <luabind/luabind.hpp>
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif // _MSC_VER
-#include "lua/script.h"
-#include <boost/version.hpp>
-
-#endif // BINDINGS_LUABIND
-
 #include <libxml/encoding.h>
 
 /* libc includes */
@@ -308,28 +292,6 @@ lua_init(void)
   tolua_gmtool_open(L);
   tolua_storage_open(L);
 #endif
-
-#ifdef BINDINGS_LUABIND
-  luabind::open(L);
-
-  bind_objects(L);
-  bind_eressea(L);
-  bind_script(L);
-  bind_spell(L);
-  bind_alliance(L);
-  bind_region(L);
-  bind_item(L);
-  bind_faction(L);
-  bind_unit(L);
-  bind_ship(L);
-  bind_building(L);
-  bind_event(L);
-  bind_message(L);
-  bind_gamecode(L);
-
-  bind_gmtool(L);
-  bind_test(L);
-#endif
   return L;
 }
 
@@ -414,25 +376,19 @@ usage(const char * prog, const char * arg)
 static void
 setLuaString(lua_State * luaState, const char * name, const char * value)
 {
-#if defined(BINDINGS_LUABIND)
-  luabind::object g = luabind::globals(luaState);
-  g[name] = value;
-#elif defined(BINDINGS_TOLUA)
+#if defined(BINDINGS_TOLUA)
   lua_pushstring(luaState, value);
   lua_setglobal(luaState, name);
-#endif // BINDINGS_LUABIND
+#endif
 }
 
 static void
 setLuaNumber(lua_State * luaState, const char * name, double value)
 {
-#if defined(BINDINGS_LUABIND)
-  luabind::object g = luabind::globals(luaState);
-  g[name] = value;
-#elif defined(BINDINGS_TOLUA)
+#if defined(BINDINGS_TOLUA)
   lua_pushnumber(luaState, (lua_Number)value);
   lua_setglobal(luaState, name);
-#endif // BINDINGS_LUABIND
+#endif
 }
 
 static int
