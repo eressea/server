@@ -330,6 +330,26 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\gmtool.c"
+			>
+		</File>
+		<File
+			RelativePath=".\gmtool.h"
+			>
+		</File>
+		<File
+			RelativePath=".\gmtool_structs.h"
+			>
+		</File>
+		<File
+			RelativePath=".\lua.hpp"
+			>
+		</File>
+		<File
+			RelativePath=".\settings.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
