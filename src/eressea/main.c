@@ -21,7 +21,6 @@
 
 /* config includes */
 #include <platform.h>
-#include "stdafx.h"
 #include <kernel/eressea.h>
 
 #include <gmtool.h>
