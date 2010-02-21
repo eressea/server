@@ -25,6 +25,31 @@
 #include <bindings/bind_unit.h>
 #endif // BINDINGS_TOLUA
 
+#if MUSEUM_MODULE
+#include <modules/museum.h>
+#endif
+#if ARENA_MODULE
+#include <modules/arena.h>
+#endif
+#include <triggers/triggers.h>
+#include <util/language.h>
+#include <kernel/xmlreader.h>
+#include <kernel/reports.h>
+#include <kernel/item.h>
+#include <kernel/names.h>
+#include <kernel/reports.h>
+#include <kernel/building.h>
+#include <modules/wormhole.h>
+#include <modules/gmcmd.h>
+#include <modules/xmas.h>
+#include <gamecode/archetype.h>
+#include <gamecode/report.h>
+#include <gamecode/items.h>
+#include <gamecode/creport.h>
+#include <gamecode/xmlreport.h>
+#include <races/races.h>
+#include <items/itemtypes.h>
+#include <attributes/attributes.h>
 
 
 static const struct {
@@ -108,13 +133,13 @@ game_done(void)
 static void
 game_init(void)
 {
-  init_triggers();
-  init_xmas();
+  register_triggers();
+  register_xmas();
 
-  reports_init();
-  report_init();
-  creport_init();
-  xmlreport_init();
+  register_reports();
+  register_nr();
+  register_cr();
+  register_xr();
 
   debug_language("locales.log");
   register_races();

@@ -75,7 +75,7 @@ trigger_xmasgate(building * b)
 }
 
 void
-init_xmas(void)
+register_xmas(void)
 {
 	tt_register(&tt_xmasgate);
 }

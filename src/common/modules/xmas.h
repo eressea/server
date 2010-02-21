@@ -21,7 +21,7 @@ struct unit;
 
 extern struct trigger *trigger_xmasgate(struct building * b);
 
-extern void init_xmas(void);
+extern void register_xmas(void);
 
 #ifdef __cplusplus
 }

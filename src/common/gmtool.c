@@ -68,10 +68,6 @@
 #include <string.h>
 #include <locale.h>
 
-extern const char * g_reportdir;
-extern const char * g_datadir;
-extern const char * g_basedir;
-
 static int g_quit;
 int force_color = 0;
 

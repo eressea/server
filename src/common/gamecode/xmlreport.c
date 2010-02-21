@@ -732,7 +732,7 @@ report_xml(const char * filename, report_context * ctx, const char * encoding)
 }
 
 void
-xmlreport_init(void)
+register_xr(void)
 {
   register_reporttype("xml", &report_xml, 1<<O_XML);
 #ifdef USE_ICONV

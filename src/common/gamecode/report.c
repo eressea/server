@@ -2426,7 +2426,7 @@ kann_finden(faction * f1, faction * f2)
 /******* end summary ******/
 
 void
-report_init(void)
+register_nr(void)
 {
   if (!nocr) register_reporttype("nr", &report_plaintext, 1<<O_REPORT);
   if (!nonr) register_reporttype("txt", &report_template, 1<<O_ZUGVORLAGE);

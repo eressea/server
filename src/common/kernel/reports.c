@@ -73,7 +73,6 @@ boolean nocr = false;
 boolean nonr = false;
 boolean noreports = false;
 
-const char * g_reportdir;
 const char * visibility[] = {
   "none",
   "neighbour",
@@ -93,14 +92,6 @@ const char *coasts[MAXDIRECTIONS] =
 	"coast::sw",
 	"coast::w"
 };
-
-const char *
-reportpath(void)
-{
-  static char zText[MAX_PATH];
-  if (g_reportdir) return g_reportdir;
-  return strcat(strcpy(zText, basepath()), "/reports");
-}
 
 static char *
 groupid(const struct group * g, const struct faction * f)
@@ -2143,7 +2134,7 @@ report_action(region * r, unit * actor, message * msg, int flags)
 
 
 void
-reports_init(void)
+register_reports(void)
 {
   /* register datatypes for the different message objects */
   register_argtype("alliance", NULL, NULL, VAR_VOIDPTR);
