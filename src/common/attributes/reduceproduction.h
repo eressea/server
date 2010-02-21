@@ -20,7 +20,6 @@ extern "C" {
 
 extern struct attrib * make_reduceproduction(int percent, int time);
 extern struct attrib_type at_reduceproduction;
-extern void init_reduceproduction(void);
 
 #ifdef __cplusplus
 }

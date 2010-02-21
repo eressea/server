@@ -51,9 +51,3 @@ set_racename(attrib ** palist, const char * name)
     }
   }
 }
-
-void
-init_racename(void)
-{
-  at_register(&at_racename);
-}

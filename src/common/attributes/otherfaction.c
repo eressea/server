@@ -60,12 +60,6 @@ struct attrib *
   return a;
 }
 
-void
-init_otherfaction(void)
-{
-  at_register(&at_otherfaction);
-}
-
 faction *
 visible_faction(const faction *f, const unit * u)
 {

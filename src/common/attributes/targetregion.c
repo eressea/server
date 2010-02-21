@@ -55,9 +55,3 @@ make_targetregion(struct region * r)
 	a->data.v = r;
 	return a;
 }
-
-void
-init_targetregion(void)
-{
-	at_register(&at_targetregion);
-}

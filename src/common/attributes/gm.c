@@ -55,9 +55,3 @@ make_gm(const struct plane * pl)
 	a->data.v = (void*)pl;
 	return a;
 }
-
-void
-init_gm(void)
-{
-	at_register(&at_gm);
-}

@@ -53,9 +53,3 @@ set_movement(attrib ** alist, int type)
 	if (a==NULL) a = a_add(alist, a_new(&at_movement));
 	a->data.i |= type;
 }
-
-void
-init_movement(void)
-{
-	at_register(&at_movement);
-}

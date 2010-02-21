@@ -25,9 +25,3 @@ attrib_type at_alliance = {
 	a_readint,
 	ATF_UNIQUE
 };
-
-void
-init_alliance(void)
-{
-	at_register(&at_alliance);
-}

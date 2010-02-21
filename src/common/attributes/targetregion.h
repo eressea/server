@@ -22,7 +22,6 @@ extern struct attrib_type at_targetregion;
 
 struct region;
 extern struct attrib * make_targetregion(struct region *);
-extern void init_targetregion(void);
 
 #ifdef __cplusplus
 }

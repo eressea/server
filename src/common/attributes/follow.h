@@ -23,7 +23,6 @@ extern struct attrib_type at_follow;
 struct unit;
 
 extern struct attrib * make_follow(struct unit * u);
-extern void init_follow(void);
 
 #ifdef __cplusplus
 }

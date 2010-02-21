@@ -40,9 +40,3 @@ make_follow(struct unit * u)
   a->data.v = u;
   return a;
 }
-
-void
-init_follow(void)
-{
-  at_register(&at_follow);
-}

@@ -17,7 +17,6 @@ extern "C" {
 #endif
 
 extern struct attrib_type at_alliance;
-extern void init_alliance(void);
 
 #ifdef __cplusplus
 }

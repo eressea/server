@@ -53,9 +53,3 @@ find_key(attrib * alist, int key)
   }
   return (a && a->type==&at_key)?a:NULL;
 }
-
-void
-init_key(void)
-{
-	at_register(&at_key);
-}

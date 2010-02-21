@@ -23,7 +23,6 @@ struct attrib;
 
 extern void set_racename(struct attrib ** palist, const char * name);
 extern const char * get_racename(struct attrib * alist);
-extern void init_racename(void);
 
 extern struct attrib_type at_racename;
 

@@ -24,7 +24,7 @@ struct unit;
 struct faction;
 struct region;
 
-extern void init_gmcmd(void);
+extern void register_gmcmd(void);
 /* initialize this module */
 
 extern void gmcommands(void);

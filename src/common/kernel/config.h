@@ -118,7 +118,6 @@ extern const char *options[MAXOPTIONS];
 /* ------------------------------------------------------------- */
 
 extern int shipspeed(const struct ship * sh, const struct unit * u);
-extern int init_data(const char * filename);
 
 #define i2b(i) ((boolean)((i)?(true):(false)))
 

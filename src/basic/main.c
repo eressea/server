@@ -1,62 +1,9 @@
 #include <platform.h>
 #include <util/log.h>
-#include <kernel/eressea.h>
 
-int eressea_init(void)
-{
-  global.vm_state = lua_init();
-  kernel_init();
-  game_init();
-
-  return 0;
-}
-
-void eressea_done(void)
-{
-  game_done();
-  kernel_done();
-  lua_done((lua_State *)global.vm_state);
-  log_close();
-}
-
-static int
-log_lua_error(lua_State * L)
-{
-  static int s_abort_on_errors = 0;
-  const char* error = lua_tostring(L, -1);
-
-  log_error(("A LUA error occurred: %s\n", error));
-  lua_pop(L, 1);
-
-  if (s_abort_on_errors) {
-    abort();
-  }
-  return 1;
-}
-
-int eressea_run(const char * luafile, const char * entry_point)
-{
-  lua_State * L = (lua_State *)global.vm_state;
-  /* run the main script */
-  if (luafile) {
-    char buf[MAX_PATH];
-    strcpy(buf, luafile);
-    lua_getglobal(L, "dofile");
-    lua_pushstring(L, buf);
-    if (lua_pcall(L, 1, 0, 0) != 0) {
-      log_lua_error(L);
-    }
-  }
-  if (entry_point) {
-    lua_getglobal(L, entry_point);
-    if (lua_pcall(L, 0, 1, 0) != 0) {
-      log_lua_error(L);
-    }
-  } else {
-    lua_console(L);
-  }
-  return 0;
-}
+#include <eressea.h>
+#include <kernel/config.h>
+#include <iniparser/iniparser.h>
 
 static void
 load_inifile(const char * filename)
@@ -104,7 +51,7 @@ int main(int argc, char ** argv)
     return err;
   }
 
-  err = eressea_run(luafile);
+  err = eressea_run(luafile, entry_point);
   if (err) {
     log_error(("server execution failed with code %d\n", err));
     return err;

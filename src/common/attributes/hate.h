@@ -23,7 +23,6 @@ extern struct attrib_type at_hate;
 struct unit;
 
 extern struct attrib * make_hate(struct unit * u);
-extern void init_hate(void);
 
 #ifdef __cplusplus
 }

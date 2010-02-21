@@ -32,10 +32,6 @@
 #include "raceprefix.h"
 #include "reduceproduction.h"
 #include "targetregion.h"
-#include "variable.h"
-#ifdef AT_OPTION
-# include "option.h"
-#endif
 #ifdef WDW_PYRAMID
 # include "alliance.h"
 #endif
@@ -51,40 +47,31 @@
 /* util includes */
 #include <util/attrib.h>
 
-/*
- * library initialization
- */
-
 attrib_type at_unitdissolve = {
   "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
 void
-init_attributes(void)
+register_attributes(void)
 {
   at_register(&at_object);
   at_register(&at_unitdissolve);
-	at_register(&at_overrideroads);
-	at_register(&at_raceprefix);
+  at_register(&at_overrideroads);
+  at_register(&at_raceprefix);
+  at_register(&at_iceberg);
+  at_register(&at_key);
+  at_register(&at_gm);
+  at_register(&at_follow);
+  at_register(&at_targetregion);
+  at_register(&at_orcification);
+  at_register(&at_hate);
+  at_register(&at_reduceproduction);
+  at_register(&at_otherfaction);
+  at_register(&at_racename);
+  at_register(&at_movement);
+  at_register(&at_moved);
 
-	init_iceberg();
-	init_key();
-	init_gm();
-	init_follow(); /* only for old datafiles */
-	init_targetregion();
-	init_orcification();
-	init_hate();
-	init_reduceproduction();
-	init_otherfaction();
-	init_racename();
-	init_movement();
-
-	init_moved();
-#ifdef AT_OPTION
-	init_option();
-#endif
-	init_variable();
 #ifdef WDW_PYRAMID
-  init_alliance();
-#endif
+  at_register(&at_alliance);
+#endif /* WDW_PYRAMID */
 }

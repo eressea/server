@@ -774,14 +774,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\modules\infocmd.c"
-				>
-			</File>
-			<File
-				RelativePath=".\modules\infocmd.h"
-				>
-			</File>
-			<File
 				RelativePath=".\modules\museum.c"
 				>
 			</File>
@@ -950,14 +942,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\attributes\option.c"
-				>
-			</File>
-			<File
-				RelativePath=".\attributes\option.h"
-				>
-			</File>
-			<File
 				RelativePath=".\attributes\orcification.c"
 				>
 			</File>
@@ -1011,14 +995,6 @@
 			</File>
 			<File
 				RelativePath=".\attributes\targetregion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\attributes\variable.c"
-				>
-			</File>
-			<File
-				RelativePath=".\attributes\variable.h"
 				>
 			</File>
 			<File

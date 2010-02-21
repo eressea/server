@@ -24,7 +24,6 @@ struct plane;
 extern struct attrib_type at_gm;
 
 extern struct attrib * make_gm(const struct plane *pl);
-extern void init_gm(void);
 
 #ifdef __cplusplus
 }

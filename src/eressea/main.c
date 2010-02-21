@@ -21,9 +21,10 @@
 
 /* config includes */
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #include <gmtool.h>
+#include <eressea.h>
 
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
@@ -34,7 +35,6 @@
 /* modules includes */
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
-#include <modules/infocmd.h>
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
@@ -191,133 +191,6 @@ setup_signal_handler(void)
   return 0;
 }
 #endif
-
-static void
-game_init(void)
-{
-  init_triggers();
-  init_xmas();
-
-  reports_init();
-  report_init();
-  creport_init();
-  xmlreport_init();
-
-  debug_language("locales.log");
-  register_races();
-  register_names();
-  register_resources();
-  register_buildings();
-  register_itemfunctions();
-#ifdef TODO
-  register_curses();
-  register_spells();
-  register_gcspells();
-#endif
-#if DUNGEON_MODULE
-  register_dungeon();
-#endif
-#if MUSEUM_MODULE
-  register_museum();
-#endif
-#if ARENA_MODULE
-  register_arena();
-#endif
-  register_wormholes();
-
-  register_itemtypes();
-  register_xmlreader();
-  register_archetypes();
-  enable_xml_gamecode();
-
-  /* init_data(game_name); */
-
-  init_archetypes();
-  init_attributes();
-
-  init_gmcmd();
-#if INFOCMD_MODULE
-  init_info();
-#endif
-}
-
-static const struct {
-  const char * name;
-  int (*func)(lua_State *);
-} lualibs[] = {
-  {"",                luaopen_base},
-  {LUA_TABLIBNAME,    luaopen_table},
-  {LUA_IOLIBNAME,     luaopen_io},
-  {LUA_STRLIBNAME,    luaopen_string},
-  {LUA_MATHLIBNAME,   luaopen_math},
-  {LUA_LOADLIBNAME,   luaopen_package},
-  {LUA_DBLIBNAME,     luaopen_debug},
-#if LUA_VERSION_NUM>=501
-  {LUA_OSLIBNAME,     luaopen_os},
-#endif
-  { NULL, NULL }
-};
-
-static void
-openlibs(lua_State * L)
-{
-  int i;
-  for (i=0;lualibs[i].func;++i) {
-    lua_pushcfunction(L, lualibs[i].func);
-    lua_pushstring(L, lualibs[i].name);
-    lua_call(L, 1, 0);
-  }
-}
-
-static lua_State *
-lua_init(void)
-{
-  lua_State * L = lua_open();
-
-  openlibs(L);
-#ifdef BINDINGS_TOLUA
-  register_tolua_helpers();
-  tolua_eressea_open(L);
-  tolua_sqlite_open(L);
-  tolua_unit_open(L);
-  tolua_building_open(L);
-  tolua_ship_open(L);
-  tolua_region_open(L);
-  tolua_faction_open(L);
-  tolua_attrib_open(L);
-  tolua_unit_open(L);
-  tolua_message_open(L);
-  tolua_hashtable_open(L);
-  tolua_gmtool_open(L);
-  tolua_storage_open(L);
-#endif
-  return L;
-}
-
-static void
-lua_done(lua_State * luaState)
-{
-  lua_close(luaState);
-}
-
-static void
-game_done(void)
-{
-#ifdef CLEANUP_CODE
-  /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
-   * zum Debugging interessant, wenn man Leak Detection hat, und nach
-   * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
-   * wird (temporäre Hilsstrukturen) */
-
-  free_game();
-
-  creport_cleanup();
-#ifdef REPORT_FORMAT_NR
-  report_cleanup();
-#endif
-  calendar_cleanup();
-#endif
-}
 
 #define CRTDBG
 #ifdef CRTDBG
@@ -601,18 +474,9 @@ write_skills(void)
 
 void locale_init(void)
 {
-  char * lc_ctype;
-  char * lc_numeric;
-
-  lc_ctype = setlocale(LC_CTYPE, "");
-  lc_numeric = setlocale(LC_NUMERIC, "C");
+  setlocale(LC_CTYPE, "");
+  setlocale(LC_NUMERIC, "C");
   assert(towlower(0xC4)==0xE4); /* &Auml; => &auml; */
-  if (lc_ctype) {
-    lc_ctype = strdup(lc_ctype);
-  }
-  if (lc_numeric) {
-    lc_numeric = strdup(lc_numeric);
-  }
 }
 
 int
@@ -667,11 +531,6 @@ main(int argc, char *argv[])
   kernel_done();
   lua_done(L);
   log_close();
-
-  setlocale(LC_CTYPE, lc_ctype);
-  setlocale(LC_NUMERIC, lc_numeric);
-  free(lc_ctype);
-  free(lc_numeric);
 
   if (global.inifile) iniparser_free(global.inifile);
 
