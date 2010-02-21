@@ -9,9 +9,9 @@
 	<include href="resources.xml" />
 	<include href="ships.xml" />
 
-	<game name="Vinyambar II" units="250" welcome="vinyambar">
+	<game name="Vinyambar II" welcome="vinyambar">
 		<comment>Game specific</comment>
-		<order name="ARBEITEN" disable></order>
+		<order name="ARBEITEN" disable="true"></order>
 		<param name="entertain.base" value="0"></param>
 		<param name="entertain.perlevel" value="20"></param>
 		<param name="nmr.timeout" value="5"></param>
@@ -19,6 +19,7 @@
 		<param name="GiveRestriction" value="3"></param>
 		<param name="database.gameid" value="2"></param>
 		<param name="hunger.long" value="0"></param>
+        <param name="rules.limit.faction" value="250"/>
 	</game>
 	<include href="vinyambar/races.xml" />
 	<include href="vinyambar/de/strings.xml" />

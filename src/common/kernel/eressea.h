@@ -258,6 +258,9 @@ int rule_stealth_faction(void);
 #define HARVEST_WORK  0x00
 #define HARVEST_TAXES 0x01
 int rule_blessed_harvest(void);
+extern int rule_give(void);
+extern int rule_alliance_limit(void);
+extern int rule_faction_limit(void);
 
 extern int count_all(const struct faction * f);
 extern int count_migrants (const struct faction * f);
@@ -376,8 +379,6 @@ extern const struct race * new_race[];
 /* globale settings des Spieles */
 typedef struct settings {
   const char *gamename;
-  boolean unitsperalliance;
-  unsigned int maxunits;
   struct attrib *attribs;
   unsigned int data_turn;
   boolean disabled[MAXKEYWORDS];
@@ -425,8 +426,6 @@ typedef struct helpmode {
 } helpmode;
 
 extern struct helpmode helpmodes[];
-
-extern int rule_give(void);
 
 #define GIVE_SELF 1
 #define GIVE_PEASANTS 2

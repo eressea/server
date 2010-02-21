@@ -3214,48 +3214,47 @@ ageing(void)
 static int
 maxunits(const faction *f)
 {
-  if (global.unitsperalliance == true) {
-    float mult = 1.0;
-
-#if KARMA_MODULE
-    faction *f2;
-    for (f2 = factions; f2; f2 = f2->next) {
-      if (f2->alliance == f->alliance) {
-        mult += 0.4f * fspecial(f2, FS_ADMINISTRATOR);
-      }
-    }
-#endif /* KARMA_MODULE */
-    return (int) (global.maxunits * mult);
+  int flimit = rule_faction_limit();
+  int alimit = rule_alliance_limit();
+  if (alimit==0) {
+    return flimit;
   }
-#if KARMA_MODULE
-  return (int) (global.maxunits * (1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
-#else
-  return global.maxunits;
-#endif /* KARMA_MODULE */
+  if (flimit==0) {
+    return alimit;
+  }
+  return MIN(alimit, flimit);
 }
 
-static boolean
+static int
 checkunitnumber(const faction *f, int add)
 {
-  if (global.maxunits==0) return true;
-  if (global.unitsperalliance == true) {
+  int alimit, flimit;
+
+  alimit = rule_alliance_limit();
+  if (alimit) {
     /* if unitsperalliance is true, maxunits returns the
     number of units allowed in an alliance */
     faction *f2;
     int unitsinalliance = add;
-    int maxu = maxunits(f);
 
     for (f2 = factions; f2; f2 = f2->next) {
       if (f->alliance == f2->alliance) {
         unitsinalliance += f2->no_units;
       }
-      if (unitsinalliance > maxu) return false;
+      if (unitsinalliance > alimit) {
+        return 1;
+      }
     }
-
-    return true;
   }
 
-  return (f->no_units + add < maxunits(f));
+  flimit = rule_alliance_limit();
+  if (flimit) {
+    if (f->no_units + add < flimit) {
+      return 2;
+    }
+  }
+
+  return 0;
 }
 
 static void
@@ -3282,9 +3281,10 @@ new_units (void)
             int alias;
             ship * sh;
             order ** newordersp;
+            int err = checkunitnumber(u->faction, 1);
 
-            if (!checkunitnumber(u->faction, 1)) {
-              if (global.unitsperalliance) {
+            if (err) {
+              if (err==1) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, makeord,
                   "too_many_units_in_alliance", "allowed", maxunits(u->faction)));
               } else {

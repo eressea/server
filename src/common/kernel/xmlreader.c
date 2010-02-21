@@ -2088,9 +2088,7 @@ parse_main(xmlDocPtr doc)
   if (nodes->nodeNr>0) {
     xmlNodePtr node = nodes->nodeTab[0];
 
-    global.unitsperalliance = xml_bvalue(node, "unitsperalliance", false);
     global.producexpchance = (float)xml_fvalue(node, "learningbydoing", 1.0/3);
-    global.maxunits = xml_ivalue(node, "units", INT_MAX);
 
     propValue = xmlGetProp(node, BAD_CAST "name");
     if (propValue!=NULL) {

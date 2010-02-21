@@ -11,9 +11,9 @@
   <include href="common/buildings.xml" />
   <xi:include href="eressea/buildings.xml"/>
 
-  <game name="Kreis der Macht" units="250" welcome="vinyambar">
+  <game name="Kreis der Macht" welcome="vinyambar">
     <!-- Game specific -->
-    <order name="ARBEITEN" disable></order>
+    <order name="ARBEITEN" disable="true" />
     <param name="entertain.base" value="15"></param>
     <param name="entertain.perlevel" value="5"></param>
     <param name="nmr.timeout" value="5"></param>
@@ -25,6 +25,7 @@
     <param name="alliance.restricted" value="fight guard stealth money"/>
     <param name="alliance.auto" value="fight"/>
     <param name="alliance.transferquit" value="true"/>
+    <param name="rules.limit.faction" value="250"/>
   </game>
   <include href="vinyambar/de/strings.xml" />
   <include href="vinyambar/stronghold.xml" />

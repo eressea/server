@@ -56,7 +56,7 @@
   <xi:include href="names-ghouls.xml"/>
   <xi:include href="names-dragons.xml"/>
 
-  <game name="E3" units="250">
+  <game name="E3">
     <!-- Game specific settings -->
     <param name="database.gameid" value="7"></param>
 
@@ -170,13 +170,14 @@
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>
     <param name="rules.nmr.destroy" value="1"/>
+    <param name="rules.limit.faction" value="250"/>
     <!--param name="rules.give" value="15"/ --> <!-- self + peasants + herbs + lux - goods -->
     <param name="rules.economy.grow" value="1"/>
     <param name="rules.tactics.formula" value="1"/> <!-- 10% per skilldiff -->
     <param name="rules.help.mask" value="fight guard money give"/>
     <param name="movement.shipspeed.skillbonus" value="6"/>
     <param name="alliance.auto" value="fight"/>
-	  <param name="alliance.restricted" value="fight"/>
+    <param name="alliance.restricted" value="fight"/>
   </game>
   <rules>
     <function name="wage" value="minimum_wage"/>
