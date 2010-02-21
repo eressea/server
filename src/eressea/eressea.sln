@@ -1,18 +1,16 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel", "common\kernel.vcproj", "{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel", "..\common\kernel.vcproj", "{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamecode", "common\gamecode.vcproj", "{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamecode", "..\common\gamecode.vcproj", "{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "common\server.vcproj", "{D893D6B3-805D-9848-8EA4-CDA1B79151F6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "..\common\util.vcproj", "{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "common\util.vcproj", "{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua-bindings", "..\common\lua-bindings.vcproj", "{75501170-51C2-E641-BA8B-EDC008184192}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua-bindings", "common\lua-bindings.vcproj", "{75501170-51C2-E641-BA8B-EDC008184192}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "external", "..\external\external.vcproj", "{F9AE4586-8F65-486B-9666-744839E40A54}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "external", "external\external.vcproj", "{F9AE4586-8F65-486B-9666-744839E40A54}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "build", "eressea\build.vcproj", "{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "build", "build.vcproj", "{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
