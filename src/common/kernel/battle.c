@@ -96,9 +96,6 @@ typedef enum combatmagic {
   DO_POSTCOMBATSPELL
 } combatmagic_t;
 
-/* external variables */
-boolean battledebug = true;
-
 /* globals */
 static int obs_count = 0;
 

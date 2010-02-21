@@ -16,7 +16,7 @@ extern "C" {
 #include <time.h>
 
 extern void xmlreport_cleanup(void);
-extern void xmlreport_init(void);
+extern void register_xr(void);
 
 extern int crwritemap(const char * filename);
 

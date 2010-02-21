@@ -99,11 +99,10 @@ extern void register_reporttype(const char * extension, report_fun write, int fl
 
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode, char * buf, size_t size);
 
-extern const char * reportpath(void);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 extern const char * report_kampfstatus(const struct unit * u, const struct locale * lang);
 
-  extern void reports_init(void);
+  extern void register_reports(void);
 
   extern int update_nmrs(void);
   extern int * nmrs;

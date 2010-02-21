@@ -90,7 +90,6 @@
 
 /* exported symbols symbols */
 const char * game_name = "eressea";
-const char * g_datadir;
 int firstx = 0, firsty = 0;
 int enc_gamedata = 0;
 
@@ -510,14 +509,6 @@ create_backup(char *file)
   } while(access(bfile, R_OK) == 0);
   link(file, bfile);
 #endif
-}
-
-const char *
-datapath(void)
-{
-  static char zText[MAX_PATH];
-  if (g_datadir) return g_datadir;
-  return strcat(strcpy(zText, basepath()), "/data");
 }
 
 void

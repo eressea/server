@@ -28,6 +28,8 @@ extern "C" {
  /* this should always be the first thing included after platform.h */
 #include "types.h"
 
+typedef struct _dictionary_ dictionary;
+
   /* experimental gameplay features (that don't affect the savefile) */
   /* TODO: move these settings to settings.h or into configuration files */
 #define GOBLINKILL /* Goblin-Spezialklau kann tödlich enden */
@@ -363,7 +365,16 @@ enum {
 };
 extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 
+extern const char * datapath(void);
+extern void set_datapath(const char * path);
+
 extern const char * basepath(void);
+extern void set_basepath(const char *);
+void load_inifile(dictionary * d);
+
+extern const char * reportpath(void);
+extern void set_reportpath(const char *);
+
 extern void kernel_init(void);
 extern void kernel_done(void);
 
@@ -385,7 +396,7 @@ typedef struct settings {
   void * vm_state;
   float producexpchance;
   int cookie;
-  struct _dictionary_ * inifile;
+  dictionary * inifile;
 
   struct global_functions {
     int (*wage)(const struct region *r, const struct faction * f, const struct race * rc, int in_turn);
@@ -396,6 +407,7 @@ extern settings global;
 
 extern int produceexp(struct unit * u, skill_t sk, int n);
 
+extern boolean battledebug;
 extern boolean sqlpatch;
 extern boolean lomem; /* save memory */
 

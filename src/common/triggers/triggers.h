@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-void init_triggers(void);
+void register_triggers(void);
 
 #ifdef __cplusplus
 }

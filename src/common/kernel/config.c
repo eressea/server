@@ -76,6 +76,8 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 
+#include <iniparser/iniparser.h>
+
 /* libc includes */
 #include <stdio.h>
 #include <string.h>
@@ -101,6 +103,7 @@ FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
+boolean battledebug = false;
 int turn = 0;
 
 #if XECMD_MODULE
@@ -584,15 +587,6 @@ skill_limit(faction * f, skill_t sk)
     break;
   }
   return m;
-}
-
-const char * g_basedir;
-
-const char *
-basepath(void)
-{
-  if (g_basedir) return g_basedir;
-  return ".";
 }
 
 int
@@ -2152,6 +2146,52 @@ get_param_int(const struct param * p, const char * key, int def)
   return def;
 }
 
+static const char * g_datadir;
+const char *
+datapath(void)
+{
+  static char zText[MAX_PATH];
+  if (g_datadir) return g_datadir;
+  return strcat(strcpy(zText, basepath()), "/data");
+}
+
+void
+set_datapath(const char * path)
+{
+  g_datadir = path;
+}
+
+
+static const char * g_reportdir;
+const char *
+reportpath(void)
+{
+  static char zText[MAX_PATH];
+  if (g_reportdir) return g_reportdir;
+  return strcat(strcpy(zText, basepath()), "/reports");
+}
+
+void
+set_reportpath(const char * path)
+{
+  g_reportdir = path;
+}
+
+static const char * g_basedir;
+const char *
+basepath(void)
+{
+  if (g_basedir) return g_basedir;
+  return ".";
+}
+
+
+void
+set_basepath(const char * path)
+{
+  g_basedir = path;
+}
+
 float
 get_param_flt(const struct param * p, const char * key, float def)
 {
@@ -3210,4 +3250,40 @@ free_gamedata(void)
     a_remove(&global.attribs, global.attribs);
   }
   ++global.cookie; /* readgame() already does this, but sjust in case */
+}
+
+
+void
+load_inifile(dictionary * d)
+{
+  const char * reportdir = reportpath();
+  const char * datadir = datapath();
+  const char * basedir = basepath();
+  const char * str;
+
+  assert(d);
+
+  str = iniparser_getstring(d, "eressea:base", basedir);
+  if (str!=basedir) set_basepath(str);
+  str = iniparser_getstring(d, "eressea:report", reportdir);
+  if (str!=reportdir) set_reportpath(str);
+  str = iniparser_getstring(d, "eressea:data", datadir);
+  if (str!=datadir) set_datapath(str);
+
+  lomem = iniparser_getint(d, "eressea:lomem", lomem)?1:0;
+
+  str = iniparser_getstring(d, "eressea:encoding", NULL);
+  if (str) enc_gamedata = xmlParseCharEncoding(str);
+
+  verbosity = iniparser_getint(d, "eressea:verbose", 2);
+  sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);
+  battledebug = iniparser_getint(d, "eressea:debug", battledebug)?1:0;
+
+  str = iniparser_getstring(d, "eressea:locales", "de,en");
+  make_locales(str);
+
+  /* excerpt from [config] (the rest is used in bindings.c) */
+  game_name = iniparser_getstring(d, "config:game", game_name);
+
+  global.inifile = d;
 }

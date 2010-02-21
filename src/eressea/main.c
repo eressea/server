@@ -28,7 +28,6 @@
 
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
-#include <triggers/triggers.h>
 #include <items/itemtypes.h>
 #include <races/races.h>
 

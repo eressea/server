@@ -1572,7 +1572,7 @@ crwritemap(const char * filename)
 }
 
 void
-creport_init(void)
+register_cr(void)
 {
   tsf_register("report", &cr_ignore);
   tsf_register("string", &cr_string);

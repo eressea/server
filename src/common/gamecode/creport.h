@@ -18,7 +18,7 @@ extern "C" {
 #include <time.h>
 
 extern void creport_cleanup(void);
-extern void creport_init(void);
+extern void register_cr(void);
 
 extern int crwritemap(const char * filename);
 

@@ -55,8 +55,6 @@ extern void write_items(struct storage * store, struct item *it);
 extern void write_unit(struct storage * store, const struct unit * u);
 extern struct unit * read_unit(struct storage * store);
 
-extern const char * datapath(void);
-
 extern int a_readint(struct attrib * a, struct storage * store);
 extern void a_writeint(const struct attrib * a, struct storage * store);
 extern int a_readshorts(struct attrib * a, struct storage * store);

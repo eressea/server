@@ -42,7 +42,7 @@
 #include <stdio.h>
 
 void
-init_triggers(void)
+register_triggers(void)
 {
   if (verbosity>=2) printf("- registering triggers\n");
 	tt_register(&tt_changefaction);
