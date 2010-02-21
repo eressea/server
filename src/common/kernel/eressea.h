@@ -255,6 +255,8 @@ int cmp_current_owner(const struct building * b, const struct building * bother)
 int rule_auto_taxation(void);
 int rule_region_owners(void);
 int rule_stealth_faction(void);
+#define HARVEST_WORK  0x00
+#define HARVEST_TAXES 0x01
 int rule_blessed_harvest(void);
 
 extern int count_all(const struct faction * f);
