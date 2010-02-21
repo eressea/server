@@ -19,7 +19,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "move.h"
 
 #include "alchemy.h"

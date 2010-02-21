@@ -15,7 +15,7 @@
 #include <platform.h>
 #include "targetregion.h"
 
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/version.h>

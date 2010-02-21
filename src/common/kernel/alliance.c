@@ -13,7 +13,7 @@ without prior permission by the authors of Eressea.
 #pragma region includes
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "alliance.h"
 
 #include <attributes/key.h>

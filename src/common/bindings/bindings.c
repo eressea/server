@@ -17,7 +17,7 @@ without prior permission by the authors of Eressea.
 #include "bind_region.h"
 #include "helpers.h"
 
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #include <kernel/alliance.h>
 #include <kernel/skill.h>

@@ -12,7 +12,7 @@
 */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "artrewards.h"
 
 /* kernel includes */

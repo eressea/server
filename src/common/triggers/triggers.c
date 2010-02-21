@@ -18,7 +18,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 /* triggers includes */
 #include <triggers/changefaction.h>

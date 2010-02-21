@@ -11,7 +11,7 @@
 */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #if XECMD_MODULE
 #include "xecmd.h"

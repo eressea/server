@@ -12,7 +12,7 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include "bind_attrib.h"
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #include <kernel/unit.h>
 #include <kernel/ship.h>

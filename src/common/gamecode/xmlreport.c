@@ -8,7 +8,7 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "xmlreport.h"
 
 #define XML_ATL_NAMESPACE (const xmlChar *) "http://www.eressea.de/XML/2008/atlantis"

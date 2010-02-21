@@ -13,7 +13,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "attributes.h"
 
 /* attributes includes */

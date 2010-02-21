@@ -12,10 +12,10 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "alp.h"
 
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>

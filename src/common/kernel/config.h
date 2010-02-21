@@ -89,7 +89,7 @@ extern "C" {
 #define STAMINA_AFFECTS_HP 1<<0
 
 /**
- * Hier endet der Teil von eressea.h, der die defines für die
+ * Hier endet der Teil von config.h, der die defines für die
  * Spielwelt Eressea enthält, und beginnen die allgemeinen Routinen
  */
 

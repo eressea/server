@@ -16,7 +16,7 @@ without prior permission by the authors of Eressea.
 #include "bindings.h"
 
 #include <kernel/alliance.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>

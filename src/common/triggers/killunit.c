@@ -13,7 +13,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "killunit.h"
 
 #include <kernel/region.h>

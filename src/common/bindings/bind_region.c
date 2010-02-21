@@ -16,7 +16,7 @@ without prior permission by the authors of Eressea.
 #include "bind_ship.h"
 #include "bind_building.h"
 
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/unit.h>

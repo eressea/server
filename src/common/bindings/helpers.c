@@ -17,7 +17,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/attrib.h>
 
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>

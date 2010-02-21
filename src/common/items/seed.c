@@ -11,13 +11,13 @@
 */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 
 #include "seed.h"
 
 /* kernel includes */
 #include <kernel/build.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 

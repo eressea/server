@@ -13,7 +13,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "key.h"
 
 #include <kernel/save.h>

@@ -22,7 +22,7 @@
 #pragma region includes
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #include "economy.h"
 
 /* gamecode includes */

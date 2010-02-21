@@ -20,7 +20,7 @@
  */
 
 #include <platform.h>
-#include <kernel/eressea.h>
+#include <kernel/config.h>
 #if SCORE_MODULE
 #include "score.h"
 
