@@ -4,13 +4,14 @@
 #include <eressea.h>
 #include <gmtool.h>
 #include <kernel/config.h>
+#include <kernel/save.h>
 #include <iniparser/iniparser.h>
 
 static const char * luafile = "init.lua";
 static const char * entry_point = NULL;
 static int memdebug = 0;
 
-static void load_config(const char * filename)
+static void parse_config(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
@@ -26,12 +27,84 @@ static void load_config(const char * filename)
   global.inifile = d;
 }
 
+static int
+usage(const char * prog, const char * arg)
+{
+  if (arg) {
+    fprintf(stderr, "unknown argument: %s\n\n", arg);
+  }
+  fprintf(stderr, "Usage: %s [options]\n"
+    "-t <turn>        : read this datafile, not the most current one\n"
+    "-q               : be quite (same as -v 0)\n"
+    "-v <level>       : verbosity level\n"
+    "-C               : run in interactive mode\n"
+    "--color          : force curses to use colors even when not detected\n"
+    "--help           : help\n", prog);
+  return -1;
+}
+
+static int
+parse_args(int argc, char **argv)
+{
+  int i;
+
+  for (i=1;i!=argc;++i) {
+    if (argv[i][0]!='-') {
+      return usage(argv[0], argv[i]);
+    } else if (argv[i][1]=='-') { /* long format */
+      if (strcmp(argv[i]+2, "version")==0) {
+        printf("\n%s PBEM host\n"
+          "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
+          "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
+      }
+      else if (strcmp(argv[i]+2, "color")==0) {
+        /* force the editor to have colors */
+        force_color = 1;
+      }
+      else if (strcmp(argv[i]+2, "help")==0) {
+        return usage(argv[0], NULL);
+      }
+      else {
+        return usage(argv[0], argv[i]);
+      }
+    } else switch(argv[i][1]) {
+      case 'C':
+        entry_point = NULL;
+        break;
+      case 'e':
+        entry_point = argv[++i];
+        break;
+      case 't':
+        turn = atoi(argv[++i]);
+        break;
+      case 'q':
+        verbosity = 0;
+        break;
+      case 'v':
+        verbosity = atoi(argv[++i]);
+        break;
+      case 'h':
+        return usage(argv[0], NULL);
+      default:
+        return usage(argv[0], argv[i]);
+    }
+  }
+
+  return 0;
+}
+
+
 int main(int argc, char ** argv)
 {
   int err;
 
   log_open("eressea.log");
-  load_config("eressea.ini");
+  parse_config("eressea.ini");
+
+  err = parse_args(argc, argv);
+  if (err) {
+    return err;
+  }
 
   err = eressea_init();
   if (err) {
@@ -46,5 +119,6 @@ int main(int argc, char ** argv)
   }
 
   eressea_done();
+  log_close();
   return 0;
 }

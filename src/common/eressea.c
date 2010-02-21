@@ -187,7 +187,6 @@ void eressea_done(void)
   game_done();
   kernel_done();
   lua_done((lua_State *)global.vm_state);
-  log_close();
 }
 
 static int
