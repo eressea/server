@@ -253,26 +253,6 @@ rc_skillmod(const struct race * rc, const region *r, skill_t sk)
   return mods;
 }
 
-void
-skill_init(void)
-{
-}
-
-void
-skill_done(void)
-{
-#ifdef FASTER_SKILLMOD
-	int i;
-	for (i = 0;i!=RCMODMAXHASH;++i) {
-		while (modhash[i]) {
-			struct skillmods * mods = modhash[i];
-			modhash[i] = mods->next;
-			free(mods);
-		}
-	}
-#endif
-}
-
 int
 level_days(int level)
 {
