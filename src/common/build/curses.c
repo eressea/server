@@ -4,4 +4,3 @@
 
 #include <util/listbox.c>
 #include <gmtool.c>
-#include <editing.c>

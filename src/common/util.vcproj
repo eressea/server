@@ -175,6 +175,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\util\console.h"
+				>
+			</File>
+			<File
 				RelativePath=".\util\crmessage.h"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath=".\util\language_struct.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\listbox.h"
 				>
 			</File>
 			<File
@@ -300,6 +308,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\util\console.c"
+				>
+			</File>
+			<File
 				RelativePath=".\util\crmessage.c"
 				>
 			</File>
@@ -333,6 +345,10 @@
 			</File>
 			<File
 				RelativePath=".\util\language.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\listbox.c"
 				>
 			</File>
 			<File

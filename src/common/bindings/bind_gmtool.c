@@ -4,7 +4,6 @@
 #include "bind_gmtool.h"
 #include "../gmtool.h"
 #include "../gmtool_structs.h"
-#include <editing.h>
 
 #include <kernel/region.h>
 #include <kernel/terrain.h>

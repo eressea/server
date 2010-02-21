@@ -15,7 +15,6 @@
 
 #include "gmtool.h"
 #include "gmtool_structs.h"
-#include "editing.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -54,6 +53,7 @@
 #include <items/itemtypes.h>
 
 #include <util/log.h>
+#include <util/lists.h>
 #include <util/rng.h>
 #include <util/base36.h>
 #include <util/console.h>
@@ -1258,4 +1258,45 @@ curses_readline(struct lua_State * L, char * buffer, size_t size, const char * p
   unused(L);
   askstring(hstatus, prompt, buffer, size);
   return buffer[0]!=0;
+}
+
+
+void
+seed_players(const char * filename, boolean new_island)
+{
+  newfaction * players = read_newfactions(filename);
+  if (players!=NULL) {
+    while (players) {
+      int n = listlen(players);
+      int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+      k = n / k;
+      n = autoseed(&players, k, new_island?0:TURNS_PER_ISLAND);
+      if (n==0) {
+        break;
+      }
+    }
+  }
+}
+
+void
+make_block(int x, int y, int radius, const struct terrain_type * terrain)
+{
+  int cx, cy;
+  region *r;
+  plane * pl = findplane(x, y);
+
+  if (terrain==NULL) return;
+
+  for (cx = x - radius; cx != x+radius; ++cx) {
+    for (cy = y - radius; cy != y+radius; ++cy) {
+      int nx = cx, ny = cy;
+      pnormalize(&nx, &ny, pl);
+      if (koor_distance(nx, ny, x, y) < radius) {
+        if (!findregion(nx, ny)) {
+          r = new_region(nx, ny, pl, 0);
+          terraform_region(r, terrain);
+        }
+      }
+    }
+  }
 }

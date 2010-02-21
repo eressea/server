@@ -19,17 +19,20 @@ extern "C" {
   struct state;
   struct region;
 
-  extern int gmmain(int argc, char *argv[]);
-  extern int curses_readline(struct lua_State * L, char * buffer, size_t size, const char * prompt);
+  int gmmain(int argc, char *argv[]);
+  int curses_readline(struct lua_State * L, char * buffer, size_t size, const char * prompt);
 
-  extern void highlight_region(struct region *r, int on);
-  extern void select_coordinate(struct selection * selected, int x, int y, int on);
-  extern void run_mapper(void);
+  void highlight_region(struct region *r, int on);
+  void select_coordinate(struct selection * selected, int x, int y, int on);
+  void run_mapper(void);
 
-  extern int force_color;
+  int force_color;
 
   struct state * state_open(void);
   void state_close(struct state * );
+
+  void make_block(int x, int y, int radius, const struct terrain_type * terrain);
+  void seed_players(const char * filename, boolean new_island);
 
 #ifdef __cplusplus
 }

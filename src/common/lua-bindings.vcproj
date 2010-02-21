@@ -17,9 +17,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
-			ConfigurationType="1"
+			OutputDirectory="Debug/lua-bindings"
+			IntermediateDirectory="Debug/lua-bindings"
+			ConfigurationType="4"
 			CharacterSet="2"
 			>
 			<Tool
@@ -65,22 +65,11 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1_d.lib luabind_d.lib"
-				OutputFile="$(OutDir)/eressea-lua.exe"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories=".."
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/eressea-lua.pdb"
-				SubSystem="1"
-				EntryPointSymbol="mainCRTStartup"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/lua-bindings.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -92,20 +81,14 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
-			ConfigurationType="1"
+			OutputDirectory="Release/lua-bindings"
+			IntermediateDirectory="Release/lua-bindings"
+			ConfigurationType="4"
 			CharacterSet="2"
 			>
 			<Tool
@@ -148,23 +131,11 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="../common/Release/util/util.lib ../common/Release/kernel/kernel.lib ../common/Release/gamecode/gamecode.lib lua/Release/bindings/bindings.lib Release/editor/editor.lib libxml2.lib pdcurses.lib lua5.1.lib luabind.lib"
-				OutputFile="$(OutDir)/eressea-lua.exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories=".."
-				GenerateDebugInformation="false"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				EntryPointSymbol="mainCRTStartup"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/lua-bindings.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -174,12 +145,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

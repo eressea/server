@@ -2,9 +2,13 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="external"
-	ProjectGUID="{F9AE4586-8F65-486B-9666-744839E40A54}"
-	RootNamespace="external"
+	Name="build"
+	ProjectGUID="{4A17DAEE-2261-4E2C-96F6-BA4132A09551}"
+	RootNamespace="build"
+	SccProjectName="Svn"
+	SccAuxPath="Svn"
+	SccLocalPath="Svn"
+	SccProvider="SubversionScc"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,10 +21,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug/external"
-			IntermediateDirectory="Debug/external"
-			ConfigurationType="4"
-			CharacterSet="2"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -42,14 +46,13 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..;../common;../external"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="4"
-				WarnAsError="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="stdafx.h"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
@@ -58,18 +61,24 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
-				AdditionalIncludeDirectories="..;../common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/external.lib"
+				Name="VCLinkerTool"
+				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1_d.lib tolua.lib"
+				OutputFile="$(OutDir)\eressea.exe"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -81,15 +90,22 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release/external"
-			IntermediateDirectory="Release/external"
-			ConfigurationType="4"
-			CharacterSet="2"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -108,34 +124,39 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
 				AdditionalIncludeDirectories="..;../common;../external"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				StringPooling="true"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="4"
+				UsePrecompiledHeader="2"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				AdditionalIncludeDirectories="..;../common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/external.lib"
+				Name="VCLinkerTool"
+				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1.lib tolua.lib"
+				OutputFile="$(OutDir)\eressea.exe"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -145,6 +166,12 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -157,17 +184,26 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\external\bson\bson.c"
+				RelativePath="..\common\build\curses.c"
 				>
 			</File>
 			<File
-				RelativePath=".\iniparser\iniparser.c"
+				RelativePath="..\common\build\external.c"
 				>
 			</File>
 			<File
-				RelativePath=".\dlmalloc\malloc.c"
+				RelativePath="..\common\build\gamecode.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\build\kernel.c"
+				>
+			</File>
+			<File
+				RelativePath=".\main.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -187,52 +223,50 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\external\md5.c"
+				RelativePath=".\server.c"
 				>
 			</File>
 			<File
-				RelativePath=".\mt19937ar.c"
+				RelativePath="..\common\build\stdafx.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+						PrecompiledHeaderThrough="stdafx.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\external\bson\numbers.c"
+				RelativePath="..\common\build\util.c"
 				>
-			</File>
-			<File
-				RelativePath="..\external\sqlite3.c"
-				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="common/util"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\external\bson\bson.h"
-				>
-			</File>
-			<File
-				RelativePath=".\iniparser\iniparser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\dlmalloc\malloc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\external\md5.h"
-				>
-			</File>
-			<File
-				RelativePath="..\external\bson\platform_hacks.h"
-				>
-			</File>
-			<File
-				RelativePath="..\external\sqlite3.h"
-				>
-			</File>
-			<File
-				RelativePath="..\external\sqlite3ext.h"
+				RelativePath="..\common\build\stdafx.h"
 				>
 			</File>
 		</Filter>
