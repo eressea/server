@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+	<param name="hunger.damage" value="1d14+14"/>
+    <skill name="crossbow" modifier="1"/>
+    <skill name="mining" modifier="1"/>
+    <skill name="bow" modifier="-1"/>
+    <skill name="building" modifier="1"/>
+    <skill name="trade" modifier="2"/>
+    <skill name="catapult" modifier="-1"/>
+    <skill name="herbalism" modifier="2"/>
+    <skill name="training" modifier="-1"/>
+    <skill name="riding" modifier="-1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="melee" modifier="-1"/>
+    <skill name="sailing" modifier="-2"/>
+    <skill name="polearm" modifier="-1"/>
+    <skill name="espionage" modifier="1"/>
+    <skill name="roadwork" modifier="1"/>
+    <skill name="stealth" modifier="1"/>
+    <skill name="entertainment" modifier="1"/>
+    <skill name="cartmaking" modifier="2"/>
+    <skill name="perception" modifier="1"/>
+    <skill name="taxation" modifier="-1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+    <familiar race="owl" default="yes"/>
+    <familiar race="rat"/>
+    <familiar race="eagle"/>
+    <familiar race="songdragon"/>
+    <familiar race="eagle"/>
+    <familiar race="rat"/>
+</race>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<rules>
- <function name="wage" value="lua_wage"/>
-</rules>

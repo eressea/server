@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<race name="elf" magres="0.100000" maxaura="1.000000" regaura="1.250000" recruitcost="130" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="alchemy" modifier="-1"/>
+    <skill name="mining" modifier="-2"/>
+    <skill name="bow" modifier="2"/>
+    <skill name="building" modifier="-1"/>
+    <skill name="catapult" modifier="-2"/>
+    <skill name="herbalism" modifier="2"/>
+    <skill name="magic" modifier="1"/>
+    <skill name="training" modifier="1"/>
+    <skill name="armorer" modifier="-1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="sailing" modifier="-1"/>
+    <skill name="quarrying" modifier="-1"/>
+    <skill name="roadwork" modifier="-1"/>
+    <skill name="stealth" modifier="1"/>
+    <skill name="perception" modifier="1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+    <familiar race="lynx" default="yes"/>
+    <familiar race="fairy"/>
+    <familiar race="owl"/>
+    <familiar race="nymph"/>
+    <familiar race="unicorn"/>
+    <familiar race="imp"/>
+</race>
+  

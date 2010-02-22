@@ -40,22 +40,6 @@
 #define TODO_POOL
 #undef TODO_RESOURCES
 
-static const race * rc_stonegolem;
-static const race * rc_irongolem;
-
-static void
-init_static(void)
-{
-  static boolean init = false;
-  if (!init) {
-    init = true;
-    rc_stonegolem = rc_find("stonegolem");
-    if (rc_stonegolem==NULL) log_error(("Could not find race: stonegolem\n"));
-    rc_irongolem = rc_find("irongolem");
-    if (rc_irongolem==NULL) log_error(("Could not find race: irongolem\n"));
-  }
-}
-
 int
 get_resource(const unit * u, const resource_type * rtype)
 {
@@ -67,10 +51,9 @@ get_resource(const unit * u, const resource_type * rtype)
     if (i>=0) return i;
   }
   if (itype!=NULL) {
-    if (!rc_stonegolem) init_static();
-    if (itype == olditemtype[R_STONE] && u->race==rc_stonegolem) {
+    if (itype == olditemtype[R_STONE] && (u->race->flags&RCF_STONEGOLEM)) {
       return u->number*GOLEM_STONE;
-    } else if (itype==olditemtype[R_IRON] && u->race==rc_irongolem) {
+    } else if (itype==olditemtype[R_IRON] && (u->race->flags&RCF_IRONGOLEM)) {
       return u->number*GOLEM_IRON;
     } else {
       const item * i = *i_findc(&u->items, itype);
@@ -108,11 +91,9 @@ get_reservation(const unit * u, const resource_type * rtype)
 {
   struct reservation * res = u->reservations;
 
-  if (!rc_stonegolem) init_static();
-
-  if (rtype==oldresourcetype[R_STONE] && u->race==rc_stonegolem)
+  if (rtype==oldresourcetype[R_STONE] && (u->race->flags&RCF_STONEGOLEM))
     return (u->number * GOLEM_STONE);
-  if (rtype==oldresourcetype[R_IRON] && u->race==rc_irongolem)
+  if (rtype==oldresourcetype[R_IRON] && (u->race->flags&RCF_IRONGOLEM))
     return (u->number * GOLEM_IRON);
   while (res && res->type!=rtype) res=res->next;
   if (res) return res->value;

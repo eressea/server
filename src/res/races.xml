@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<races>
+<races xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <race name="human" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <skill name="trade" modifier="1"/>
+    <skill name="herbalism" modifier="-1"/>
+    <skill name="shipcraft" modifier="1"/>
+    <skill name="sailing" modifier="1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+    <familiar race="wolf" default="yes"/>
+    <familiar race="dreamcat"/>
+    <familiar race="owl"/>
+    <familiar race="owl"/>
+    <familiar race="eagle"/>
+    <familiar race="imp"/>
+  </race>
   <race name="kraken" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="540" speed="2.000000" hp="300" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" coastal="yes" swim="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
     <function name="initfamiliar" value="oldfamiliars"/>
@@ -807,7 +824,7 @@
   <race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
-	<param name="hunger.damage" value="1d14+14"/>
+    <param name="hunger.damage" value="1d14+14"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="bow" modifier="-1"/>
@@ -928,22 +945,6 @@
     <familiar race="eagle"/>
     <familiar race="tunnelworm"/>
     <familiar race="wolf"/>
-  </race>
-  <race name="human" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
-    <skill name="trade" modifier="1"/>
-    <skill name="herbalism" modifier="-1"/>
-    <skill name="shipcraft" modifier="1"/>
-    <skill name="sailing" modifier="1"/>
-    <skill name="unarmed" modifier="-99"/>
-    <attack type="1" damage="1d5"/>
-    <familiar race="wolf" default="yes"/>
-    <familiar race="dreamcat"/>
-    <familiar race="owl"/>
-    <familiar race="owl"/>
-    <familiar race="eagle"/>
-    <familiar race="imp"/>
   </race>
   <race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="600" capacity="440" speed="1.000000" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>

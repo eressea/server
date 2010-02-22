@@ -19,7 +19,6 @@
   <xi:include href="common/buildings.xml"/>
   <xi:include href="equipment.xml"/>
   <!--xi:include href="terrains.xml"/-->
-  <xi:include href="dungeons.xml"/>
   <xi:include href="directions.xml"/>
 
   <xi:include href="e3a/ships.xml"/>
@@ -186,7 +185,6 @@
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/artrewards.xml"/>
-  <xi:include href="eressea/dungeons.xml"/>
   <strings>
     <string name="mailto">
       <text locale="de">eressea-server@eressea.de</text>

@@ -143,6 +143,8 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define RCF_CANSAIL        (1<<24) /* Einheit darf Schiffe betreten */
 #define RCF_INVISIBLE      (1<<25) /* not visible in any report */
 #define RCF_SHIPSPEED      (1<<26) /* race gets +1 on shipspeed */
+#define RCF_STONEGOLEM     (1<<27) /* race gets stonegolem properties */
+#define RCF_IRONGOLEM      (1<<28) /* race gets irongolem properties */
 
 /* Economic flags */
 #define GIVEITEM       (1<<1)   /* gibt Gegenstände weg */

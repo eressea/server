@@ -3676,20 +3676,20 @@
     </string>
 
     <string name="orc">
-      <text locale="de">Altork</text>
-      <text locale="en">oldorc</text>
+      <text locale="de">Ork</text>
+      <text locale="en">orc</text>
     </string>
     <string name="orc_p">
-      <text locale="de">Altorks</text>
-      <text locale="en">oldorcs</text>
+      <text locale="de">Orks</text>
+      <text locale="en">orcs</text>
     </string>
     <string name="orc_d">
-      <text locale="de">Altorks</text>
-      <text locale="en">oldorcs</text>
+      <text locale="de">Orks</text>
+      <text locale="en">orcs</text>
     </string>
     <string name="orc_x">
-      <text locale="de">Altork</text>
-      <text locale="en">oldorc</text>
+      <text locale="de">Ork</text>
+      <text locale="en">orc</text>
     </string>
 
     <string name="snotling">
