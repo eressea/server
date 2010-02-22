@@ -383,12 +383,13 @@ my_lua_error(lua_State * L)
 }
 
 static void
-load_inifile(const char * filename)
+parse_config(const char * filename)
 {
   dictionary * d = iniparser_new(filename);
   if (d) {
     const char * str;
 
+    load_inifile(d);
     g_basedir = iniparser_getstring(d, "eressea:base", g_basedir);
     lomem = iniparser_getint(d, "eressea:lomem", lomem)?1:0;
     memdebug = iniparser_getint(d, "eressea:memcheck", memdebug);
@@ -485,7 +486,7 @@ main(int argc, char *argv[])
 
   log_open("eressea.log");
   locale_init();
-  load_inifile("eressea.ini");
+  parse_config("eressea.ini");
   L = lua_init();
   global.vm_state = L;
   if ((i=read_args(argc, argv, L))!=0) return i;
