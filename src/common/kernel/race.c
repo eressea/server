@@ -289,11 +289,15 @@ read_race_reference(struct storage * store)
   variant result;
   char zName[20];
   store->r_tok_buf(store, zName, sizeof(zName));
-  if (strcmp(zName, "none")==0) {
+
+  if (store->version<FOSS_VERSION && strcmp(zName, "uruk")==0) {
+    result.v = rc_find("orc");
+  } else if (strcmp(zName, "none")==0) {
     result.v = NULL;
+    return result;
   } else {
     result.v = rc_find(zName);
-    assert(result.v!=NULL);
   }
+  assert(result.v!=NULL);
   return result;
 }

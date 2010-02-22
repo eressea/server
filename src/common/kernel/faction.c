@@ -188,7 +188,7 @@ addfaction(const char *email, const char * password,
   faction * f = calloc(sizeof(faction), 1);
   char buf[128];
 
-  assert(frace && frace != new_race[RC_ORC]);
+  assert(frace);
 
   if (set_email(&f->email, email)!=0) {
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));

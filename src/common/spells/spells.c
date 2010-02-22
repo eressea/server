@@ -3988,7 +3988,7 @@ sp_bigrecruit(castorder *co)
    * Rekrutierungskosten mit einfliessen lassen. */
 
   n = (int)force + lovar((force * force * 1000)/f->race->recruitcost);
-  if (f->race==new_race[RC_URUK]) {
+  if (f->race==new_race[RC_ORC]) {
     n = MIN(2*maxp, n);
     n = MAX(n, 1);
     rsetpeasants(r, maxp - (n+1) / 2);
