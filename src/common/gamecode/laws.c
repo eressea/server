@@ -46,7 +46,6 @@
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
@@ -3472,15 +3471,6 @@ monthly_healing(void)
         continue;
       }
 
-#if KARMA_MODULE
-      if (fspecial(u->faction, FS_UNDEAD)) continue;
-
-      if(fspecial(u->faction, FS_REGENERATION)) {
-        u->hp = umhp;
-        continue;
-      }
-#endif /* KARMA_MODULE */
-
       p *= heal_factor(u);
       if (u->hp < umhp) {
 #ifdef NEW_DAEMONHUNGER_RULE
@@ -3984,9 +3974,6 @@ init_processor(void)
   add_proc_order(p, K_NAME, &name_cmd, 0, NULL);
   add_proc_order(p, K_GUARD, &guard_off_cmd, 0, NULL);
   add_proc_order(p, K_RESHOW, &reshow_cmd, 0, NULL);
-#if KARMA_MODULE
-  add_proc_order(p, K_WEREWOLF, &setwere_cmd, 0, NULL);
-#endif /* KARMA_MODULE */
 
   if (get_param_int(global.parameters, "rules.alliances", 0)==1) {
     p+=10;
@@ -4012,10 +3999,6 @@ init_processor(void)
   add_proc_order(p, K_LEAVE, &leave_cmd, 0, "Verlassen");
 
   if (!nobattle) {
-#if KARMA_MODULE
-    p+=10;
-    add_proc_global(p, &jihad_attacks, "Jihad-Angriffe");
-#endif
     add_proc_region(p, &do_battle, "Attackieren");
   }
 
@@ -4107,10 +4090,6 @@ init_processor(void)
     p+=10;
     add_proc_global(p, &reorder, "Einheiten sortieren");
   }
-#if KARMA_MODULE
-  p+=10;
-  add_proc_global(p, &karma, "Jihads setzen");
-#endif
   add_proc_order(p, K_PROMOTION, &promotion_cmd, 0, "Heldenbefoerderung");
   if (!global.disabled[K_NUMBER]) {
     add_proc_order(p, K_NUMBER, &renumber_cmd, 0, "Neue Nummern (Einheiten)");

@@ -29,7 +29,6 @@ struct unit;
 struct region;
 struct strlist;
 
-extern int setwere_cmd(struct unit * u, struct order * ord);
 extern int setstealth_cmd(struct unit * u, struct order * ord);
 extern int spy_cmd(struct unit * u, struct order * ord);
 extern int sabotage_cmd(struct unit * u, struct order * ord);

@@ -45,7 +45,6 @@
 #define MUSEUM_MODULE 1
 #define ARENA_MODULE 1
 #define XECMD_MODULE 1
-#define KARMA_MODULE 0
 #define DUNGEON_MODULE 0
 #define CHANGED_CROSSBOWS 0 /* use the WTF_ARMORPIERCING flag */
 #undef GLOBAL_WARMING /* number of turns before global warming sets in */

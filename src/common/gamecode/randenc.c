@@ -24,7 +24,6 @@
 #include "randenc.h"
 
 #include "economy.h"
-#include "luck.h"
 #include "monster.h"
 
 /* kernel includes */
@@ -35,7 +34,6 @@
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
@@ -618,11 +616,7 @@ drown(region *r)
     unit ** up = up=&r->units;
     while (*up) {
       unit *u = *up;
-#if KARMA_MODULE
-      int amphibian_level = fspecial(u->faction, FS_AMPHIBIAN);
-#else
       int amphibian_level = 0;
-#endif
       if (u->ship || u->race == new_race[RC_SPELL] || u->number==0) {
         up=&u->next;
         continue;
@@ -1127,30 +1121,6 @@ icebergs(void)
   }
 }
 
-#if KARMA_MODULE
-static void
-karma_update(void)
-{
-  faction * f;
-  /* lycanthropen werden werwölfe */
-  for (f = factions; f; f=f->next) {
-    if (f->alive) {
-      int level = fspecial(f, FS_LYCANTROPE);
-      if (level > 0) {
-        unit * u;
-        for(u = f->units; u; u=u->nextF) {
-          if (rng_int()%100 < 2*level) {
-            ADDMSG(&u->faction->msgs,
-              msg_message("becomewere", "unit region", u, u->region));
-            fset(u, UFL_WERE);
-          }
-        }
-      }
-    }
-  }
-}
-#endif
-
 #ifdef HERBS_ROT
 static void
 rotting_herbs(void)
@@ -1286,10 +1256,6 @@ randomevents(void)
     }
   }
 
-#if KARMA_MODULE
-  karma_update();
-#endif
-
   /* Chaos */
   for (r = regions; r; r = r->next) {
     int i;
@@ -1308,7 +1274,4 @@ randomevents(void)
 
   dissolve_units();
   check_split();
-#if KARMA_MODULE
-  check_luck();
-#endif /* KARMA_MODULE */
 }

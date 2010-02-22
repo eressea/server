@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="build"
+	Name="amalgamation-basic"
 	ProjectGUID="{4A17DAEE-2261-4E2C-96F6-BA4132A09551}"
 	RootNamespace="build"
 	SccProjectName="Svn"

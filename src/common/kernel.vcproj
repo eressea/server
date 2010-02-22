@@ -278,14 +278,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\kernel\karma.c"
-				>
-			</File>
-			<File
-				RelativePath=".\kernel\karma.h"
-				>
-			</File>
-			<File
 				RelativePath=".\kernel\magic.c"
 				>
 			</File>

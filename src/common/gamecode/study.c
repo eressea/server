@@ -30,7 +30,6 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
@@ -707,21 +706,6 @@ learn_cmd(unit * u, order * ord)
     teach->value -= l * 30;
     change_effect(u, oldpotiontype[P_FOOL], -l);
   }
-
-  #if KARMA_MODULE
-  l = fspecial(u->faction, FS_WARRIOR);
-  if (l > 0) {
-    if (sk == SK_CROSSBOW || sk == SK_LONGBOW
-      || sk == SK_CATAPULT || sk == SK_MELEE || sk == SK_SPEAR
-      || sk == SK_STAMINA || sk == SK_WEAPONLESS)
-    {
-      teach->value += u->number * 5 * (l+1);
-    } else {
-      teach->value -= u->number * 5 * (l+1);
-      teach->value = MAX(0, teach->value);
-    }
-  }
-  #endif /* KARMA_MODULE */
 
   if (p != studycost) {
     /* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */

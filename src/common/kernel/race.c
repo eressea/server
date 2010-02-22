@@ -32,7 +32,6 @@
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "karma.h"
 #include "magic.h"
 #include "names.h"
 #include "pathfinder.h"

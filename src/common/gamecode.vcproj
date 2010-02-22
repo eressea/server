@@ -214,14 +214,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\luck.c"
-				>
-			</File>
-			<File
-				RelativePath=".\gamecode\luck.h"
-				>
-			</File>
-			<File
 				RelativePath=".\gamecode\market.c"
 				>
 			</File>

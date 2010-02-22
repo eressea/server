@@ -36,7 +36,6 @@
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "karma.h"
 #include "magic.h"
 #include "message.h"
 #include "move.h"
@@ -556,9 +555,6 @@ max_magicians(const faction * f)
     m = a->data.i;
   }
   if (f->race == new_race[RC_ELF]) ++m;
-#if KARMA_MODULE
-  m += fspecial(f, FS_MAGOCRACY) * 2;
-#endif /* KARMA_MODULE */
   return m;
 }
 
@@ -2429,7 +2425,6 @@ int
 weight(const unit * u)
 {
   int w, n = 0, in_bag = 0;
-  int faerie_level = 0;
 
   item * itm;
   for (itm=u->items;itm;itm=itm->next) {
@@ -2439,15 +2434,7 @@ weight(const unit * u)
       in_bag += w;
   }
 
-#if KARMA_MODULE
-  faerie_level = fspecial(u->faction, FS_FAERIE);
-#endif /* KARMA_MODULE */
-
-  if (faerie_level) {
-    n += (u->number * u->race->weight)/(1+faerie_level);
-  } else {
-    n += u->number * u->race->weight;
-  }
+  n += u->number * u->race->weight;
 
   w = get_item(u, I_BAG_OF_HOLDING) * BAGCAPACITY;
   if( w > in_bag )
@@ -2522,14 +2509,6 @@ lifestyle(const unit * u)
   if (pl && fval(pl, PFL_NOFEED))
     return 0;
 
-#if KARMA_MODULE
-  if(fspecial(u->faction, FS_REGENERATION))
-    need += 1;
-  if(fspecial(u->faction, FS_ADMINISTRATOR))
-    need += 1;
-  if(fspecial(u->faction, FS_WYRM) && u->race == new_race[RC_WYRM])
-    need *= 500;
-#endif /* KARMA_MODULE */
   return need;
 }
 
@@ -2809,11 +2788,6 @@ default_wage(const region *r, const faction * f, const race * rc, int in_turn)
       index = 1;
     }
     wage = wagetable[esize][index];
-#if KARMA_MODULE
-    if (fspecial(f, FS_URBAN)) {
-      wage += wagetable[esize][3];
-    }
-#endif /* KARMA_MODULE */
   } else {
     if (is_mourning(r, in_turn)) {
       wage = 10;
@@ -3128,13 +3102,6 @@ attrib_init(void)
   at_register(&at_icastle);
   at_register(&at_guard);
   at_register(&at_group);
-
-#if KARMA_MODULE
-  at_register(&at_faction_special);
-  at_register(&at_prayer_timeout);
-  at_register(&at_wyrm);
-  at_register(&at_jihad);
-#endif /* KARMA_MODULE */
 
   at_register(&at_building_generic_type);
   at_register(&at_maxmagicians);
