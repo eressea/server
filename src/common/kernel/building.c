@@ -379,12 +379,6 @@ static int eressea_building_protection(building * b, unit * u)
   int beff = buildingeffsize(b, false)-1;
   /* -1 because the tradepost has no protection value */
 
-#if KARMA_MODULE
-  if (fspecial(u->faction, FS_SAPPER)) {
-    /* Halbe Schutzwirkung, aufgerundet */
-    beff = (beff+1)/2;
-  }
-#endif /* KARMA_MODULE */
   return beff;
 }
 

@@ -27,7 +27,6 @@
 #include <kernel/build.h>
 #include <kernel/reports.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/faction.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
@@ -170,44 +169,6 @@ spy_cmd(unit * u, struct order * ord)
   return 0;
 }
 
-int
-setwere_cmd(unit *u, struct order * ord)
-{
-#if KARMA_MODULE
-  int level = fspecial(u->faction, FS_LYCANTROPE);
-  const char *s;
-
-  if (!level) {
-    cmistake(u, ord, 311, MSG_EVENT);
-    return 0;
-  }
-
-  init_tokens(ord);
-  skip_token();
-  s = getstrtoken();
-
-  if (s == NULL || *s == '\0') {
-    if(fval(u, UFL_WERE)) {
-      cmistake(u, ord, 309, MSG_EVENT);
-    } else if(rng_int()%100 < 35+(level-1)*20) { /* 35, 55, 75, 95% */
-      fset(u, UFL_WERE);
-    } else {
-      cmistake(u, ord, 311, MSG_EVENT);
-    }
-  } else if (findparam(s, u->faction->locale) == P_NOT) {
-    if(fval(u, UFL_WERE)) {
-      cmistake(u, ord, 310, MSG_EVENT);
-    } else if(rng_int()%100 < 90-level*20) {	/* 70, 50, 30, 10% */
-      freset(u, UFL_WERE);
-    } else {
-      cmistake(u, ord, 311, MSG_EVENT);
-    }
-
-  }
-#endif /* KARMA_MODULE */
-  return 0;
-}
-
 void
 set_factionstealth(unit * u, faction * f)
 {
@@ -328,43 +289,6 @@ setstealth_cmd(unit * u, struct order * ord)
     /* TARNE ALLES (was nicht so alles geht?) */
     u_seteffstealth(u, -1);
     break;
-#if KARMA_MODULE
-  case P_NUMBER:
-    /* TARNE ANZAHL [NICHT] */
-    if (!fspecial(u->faction, FS_HIDDEN)) {
-      cmistake(u, ord, 277, MSG_EVENT);
-      return 0;
-    }
-    s = getstrtoken();
-    if (findparam(s, u->faction->locale) == P_NOT) {
-      attrib * a = a_find(u->attribs, &at_fshidden);
-      if (a==NULL) a->data.ca[0] = 0;
-      if (a->data.i == 0) a_remove(&u->attribs, a);
-    } else {
-      attrib * a = a_find(u->attribs, &at_fshidden);
-      if (a!=NULL) a = a_add(&u->attribs, a_new(&at_fshidden));
-      a->data.ca[0] = 1;
-    }
-    break;
-#endif /* KARMA_MODULE */
-#if KARMA_MODULE
-  case P_ITEMS:
-    /* TARNE GEGENSTÄNDE [NICHT] */
-    if(!fspecial(u->faction, FS_HIDDEN)) {
-      cmistake(u, ord, 277, MSG_EVENT);
-      return 0;
-    }
-    if (findparam(s, u->faction->locale) == P_NOT) {
-      attrib * a = a_find(u->attribs, &at_fshidden);
-      if (a!=NULL) a->data.ca[1] = 0;
-      if (a->data.i == 0) a_remove(&u->attribs, a);
-    } else {
-      attrib * a = a_find(u->attribs, &at_fshidden);
-      if (a==NULL) a = a_add(&u->attribs, a_new(&at_fshidden));
-      a->data.ca[1] = 1;
-    }
-    break;
-#endif /* KARMA_MODULE */
   case P_NOT:
     u_seteffstealth(u, -1);
     break;

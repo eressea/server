@@ -39,7 +39,6 @@
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
@@ -260,10 +259,6 @@ add_recruits(unit * u, int number, int wanted)
     unit * unew;
     char equipment[64];
 
-#if KARMA_MODULE
-    int i = fspecial(u->faction, FS_MILITIA);
-#endif /* KARMA_MODULE */
-
     if (u->number==0) {
       set_number(u, number);
       u->hp = number * unit_max_hp(u);
@@ -280,22 +275,6 @@ add_recruits(unit * u, int number, int wanted)
       change_level(unew, SK_RIDING, 1);
     }
 
-#if KARMA_MODULE
-    if (i > 0) {
-      if (unew->race->bonus[SK_SPEAR] >= 0)
-        change_level(unew, SK_SPEAR, i);
-      if (unew->race->bonus[SK_MELEE] >= 0)
-        change_level(unew, SK_MELEE, i);
-      if (unew->race->bonus[SK_LONGBOW] >= 0)
-        change_level(unew, SK_LONGBOW, i);
-      if (unew->race->bonus[SK_CROSSBOW] >= 0)
-        change_level(unew, SK_CROSSBOW, i);
-      if (unew->race->bonus[SK_RIDING] >= 0)
-        change_level(unew, SK_RIDING, i);
-      if (unew->race->bonus[SK_STAMINA] >= 0)
-        change_level(unew, SK_STAMINA, i);
-    }
-#endif /* KARMA_MODULE */
     if (unew!=u) {
       transfermen(unew, u, unew->number);
       remove_unit(&r->units, unew);

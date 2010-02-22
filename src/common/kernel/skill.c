@@ -24,7 +24,6 @@
 #include "skill.h"
 
 #include "curse.h"
-#include "karma.h"
 #include "item.h"
 #include "magic.h"
 #include "race.h"

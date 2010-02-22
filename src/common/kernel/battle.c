@@ -27,7 +27,6 @@
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "karma.h"
 #include "magic.h"
 #include "message.h"
 #include "move.h"
@@ -1104,13 +1103,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   ++at.fighter->hits;
 #endif
 
-#if KARMA_MODULE
-  if (fval(au, UFL_WERE)) {
-    int level = fspecial(du->faction, FS_LYCANTROPE);
-    da += level;
-  }
-#endif /* KARMA_MODULE */
-
   switch (type) {
   case AT_STANDARD:
     weapon = select_weapon(at, true, missile);
@@ -1156,14 +1148,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
   am = select_magicarmor(dt);
 
-#if KARMA_MODULE
-  if(fval(du, UFL_WERE)) {
-    /* this counts as magical armor */
-    int level = fspecial(du->faction, FS_LYCANTROPE);
-    am += level;
-  }
-#endif /* KARMA_MODULE */
-
 #if CHANGED_CROSSBOWS
   if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
     /* crossbows */
@@ -1189,22 +1173,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   ar += am;
 
   if (type!=AT_COMBATSPELL && type!=AT_SPELL) {
-#if KARMA_MODULE
-    int faerie_level = fspecial(du->faction, FS_FAERIE);
-
-    da += jihad(au->faction, du->race);
-    if (type == AT_STANDARD && faerie_level) {
-      int c;
-
-      for (c=0;weapon->type->itype->construction->materials[c].number; c++) {
-        if(weapon->type->itype->construction->materials[c].rtype == oldresourcetype[R_IRON]) {
-          da += faerie_level;
-          break;
-        }
-      }
-    }
-#endif /* KARMA_MODULE */
-
     if (damage_rules&DAMAGE_CRITICAL) {
       double kritchance = (sk * 3 - sd) / 200.0;
 
@@ -1905,13 +1873,6 @@ skilldiff(troop at, troop dt, int dist)
     skdiff += 5;
   }
 
-#if KARMA_MODULE
-  /* Werwolf */
-  if(fval(au, UFL_WERE)) {
-    skdiff += fspecial(au->faction, FS_LYCANTROPE);
-  }
-#endif /* KARMA_MODULE */
-
   if (au->race == new_race[RC_GOBLIN]) {
     static int goblin_bonus = -1;
     if (goblin_bonus<0) goblin_bonus = get_param_int(global.parameters, "rules.combat.goblinbonus", 10);
@@ -1919,11 +1880,6 @@ skilldiff(troop at, troop dt, int dist)
       skdiff += 1;
     }
   }
-
-#if KARMA_MODULE
-  /* TODO this should be a skillmod */
-  skdiff += jihad(au->faction, du->race);
-#endif
 
   if (df->building) {
     boolean init = false;
@@ -2695,16 +2651,6 @@ aftermath(battle * b)
       unit *du = df->unit;
       int dead = dead_fighters(df);
       int pr_mercy = 0;
-#if KARMA_MODULE
-      const attrib *a= a_find(du->attribs, &at_prayer_effect);
-
-      while (a && a->type==&at_prayer_effect) {
-        if (a->data.sa[0] == PR_MERCY) {
-          pr_mercy = a->data.sa[1];
-        }
-        a = a->next;
-      }
-#endif /* KARMA_MODULE */
 
 #ifdef TROLLSAVE
       /* Trolle können regenerieren */
@@ -3356,15 +3302,6 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 
   /* Effekte von Artefakten */
   strongmen = MIN(fig->unit->number, get_item(u, I_TROLLBELT));
-
-#if KARMA_MODULE
-  for (a = a_find(u->attribs, &at_prayer_effect); a && a->type==&at_prayer_effect; a = a->next) {
-    if (a->data.sa[0] == PR_AID) {
-      pr_aid = true;
-      break;
-    }
-  }
-#endif /* KARMA_MODULE */
 
   /* Hitpoints, Attack- und Defence-Boni für alle Personen */
   for (i = 0; i < fig->alive; i++) {
@@ -4414,18 +4351,6 @@ do_battle(region * r)
     battle_update(b);
     battle_attacks(b);
 
-#if KARMA_MODULE
-    /* Regeneration */
-    for (fi=0;fi!=b->nfighters;++fi) {
-      fighter *fig = b->fighters[fi];
-
-      if (fspecial(fig->unit->faction, FS_REGENERATION)) {
-        fig->fighting = fig->alive - fig->removed;
-        if (fig->fighting == 0) continue;
-        do_regenerate(fig);
-      }
-    }
-#endif /* KARMA_MODULE */
   }
 
   if (verbosity>0) log_stdio(stdout, "\n");

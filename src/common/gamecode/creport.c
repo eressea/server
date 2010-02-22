@@ -38,7 +38,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
@@ -687,11 +686,6 @@ cr_output_unit(FILE * F, const region * r,
   }
 
   assert(u && u->number);
-
-#if KARMA_MODULE
-  if (fspecial(u->faction, FS_HIDDEN))
-    a_fshidden = a_find(u->attribs, &at_fshidden);
-#endif /* KARMA_MODULE */
 
   fprintf(F, "EINHEIT %d\n", u->no);
   fprintf(F, "\"%s\";Name\n", u->name);

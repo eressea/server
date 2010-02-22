@@ -29,7 +29,6 @@
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "karma.h"
 #include "magic.h"
 #include "message.h"
 #include "move.h"
@@ -1226,12 +1225,10 @@ readfaction(struct storage * store)
   assert(f->race);
   f->magiegebiet = (magic_t)store->r_int(store);
 
-#if KARMA_MODULE
-  f->karma = store->r_int(store);
-#else
-  /* ignore karma */
-  store->r_int(store);
-#endif /* KARMA_MODULE */
+  if (store->version<FOSS_VERSION) {
+    /* ignore karma */
+    store->r_int(store);
+  }
 
   f->flags = store->r_int(store);
   if (f->no==0) {
@@ -1323,11 +1320,6 @@ writefaction(struct storage * store, const faction * f)
   store->w_tok(store, f->race->_name[0]);
   store->w_brk(store);
   store->w_int(store, f->magiegebiet);
-#if KARMA_MODULE
-  store->w_int(store, f->karma);
-#else
-  store->w_int(store, 0);
-#endif /* KARMA_MODULE */
 
   store->w_int(store, f->flags&FFL_SAVEMASK);
   a_write(store, f->attribs);

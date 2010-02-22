@@ -26,7 +26,6 @@
 #include "curse.h"
 #include "faction.h"
 #include "item.h"
-#include "karma.h"
 #include "message.h"
 #include "objtypes.h"
 #include "order.h"
@@ -452,47 +451,6 @@ update_spellbook(faction * f, int level)
   }
 }
 
-#if KARMA_MODULE
-void wyrm_update(unit * u, struct sc_mage * mage, int sk) 
-{
-  spell_list * slist, ** slistp;
-  /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
-  spell * sp = find_spellbyid(M_GRAY, SPL_BECOMEWYRM);
-
-  if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
-    add_spell(mage, find_spellbyid(M_GRAY, SPL_BECOMEWYRM));
-  }
-
-  /* Transformierte Wyrm-Magier bekommen Drachenodem */
-  if (dragonrace(u->race)) {
-    race_t urc = old_race(u->race);
-    switch (urc) {
-      /* keine breaks! Wyrme sollen alle drei Zauber können.*/
-    case RC_WYRM:
-      sp = find_spellbyid(M_GRAY, SPL_WYRMODEM);
-      slistp = get_spelllist(mage, u->faction);
-      if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
-        add_spell(slistp, sp);
-      }
-    case RC_DRAGON:
-      sp = find_spellbyid(M_GRAY, SPL_DRAGONODEM);
-      slistp = get_spelllist(mage, u->faction);
-      if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
-        add_spell(slistp, sp);
-      }
-    case RC_FIREDRAGON:
-      sp = find_spellbyid(M_GRAY, SPL_FIREDRAGONODEM);
-      slistp = get_spelllist(mage, u->faction);
-      if (sp!=NULL && !has_spell(*slistp, sp) && sp->level<=sk) {
-        add_spell(slistp, sp);
-      }
-      break;
-    }
-  }
-  return slistp;
-}
-#endif
-
 void
 updatespelllist(unit * u)
 {
@@ -526,9 +484,6 @@ updatespelllist(unit * u)
     }
   }
 
-#if KARMA_MODULE
-  wyrm_update(u, mage, sk);
-#endif /* KARMA_MODULE */
 }
 
 /* ------------------------------------------------------------- */
@@ -1259,9 +1214,6 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
         skill * sv;
         unit * u = (unit*)obj;
 
-#if KARMA_MODULE
-        if (fspecial(u->faction, FS_MAGICIMMUNE)) return true;
-#endif /* KARMA_MODULE */
         at = effskill(magician, SK_MAGIC);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
@@ -1491,10 +1443,6 @@ regeneration(unit * u)
   double aura, d;
   double potenz = 1.5;
   double divisor = 2.0;
-
-#if KARMA_MODULE
-  if (fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
-#endif /* KARMA_MODULE */
 
   sk = effskill(u, SK_MAGIC);
   /* Rassenbonus/-malus */

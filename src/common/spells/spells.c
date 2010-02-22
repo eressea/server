@@ -31,7 +31,6 @@
 #include <kernel/faction.h>
 #include <kernel/reports.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/objtypes.h>
@@ -6415,37 +6414,7 @@ sp_break_curse(castorder *co)
 int
 sp_becomewyrm(castorder *co)
 {
-#if KARMA_MODULE
-  unit *u = co->magician.u;
-  int wyrms_already_created = 0;
-  int wyrms_allowed = 0;
-  attrib *a;
-
-  wyrms_allowed = fspecial(u->faction, FS_WYRM);
-  a = a_find(u->faction->attribs, &at_wyrm);
-  if (a) wyrms_already_created = a->data.i;
-
-  if (wyrms_already_created >= wyrms_allowed) {
-    cmistake(u, co->order, 262, MSG_MAGIC);
-    return 0;
-  }
-
-  if (!a) {
-    a_add(&u->faction->attribs, a_new(&at_wyrm));
-    a->data.i = 1;
-  } else {
-    a->data.i++;
-  }
-
-  u->race = new_race[RC_WYRM];
-  add_spell(get_mage(u), find_spellbyid(M_GRAY, SPL_WYRMODEM));
-
-  ADDMSG(&u->faction->msgs, msg_message("becomewyrm", "u", u));
-
-  return co->level;
-#else
   return 0;
-#endif /* KARMA_MODULE */
 }
 
 /* ------------------------------------------------------------- */

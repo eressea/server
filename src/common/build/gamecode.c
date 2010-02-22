@@ -25,7 +25,6 @@
 #include <gamecode/give.c>
 #include <gamecode/items.c>
 #include <gamecode/laws.c>
-#include <gamecode/luck.c>
 #include <gamecode/market.c>
 #include <gamecode/monster.c>
 #include <gamecode/randenc.c>

@@ -42,7 +42,6 @@
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
 #include <kernel/objtypes.h>
@@ -1979,28 +1978,6 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   if (f->alliance!=NULL) {
     centre(F, alliancename(f->alliance), true);
   }
-
-#if KARMA_MODULE
-  buf[0] = 0;
-  dh = 0;
-  for (a=a_find(f->attribs, &at_faction_special); a && a->type==&at_faction_special; a=a->next) {
-    char buf2[80];
-    dh++;
-    if (fspecials[a->data.sa[0]].maxlevel != 100) {
-      sprintf(buf2, "%s (%d)", fspecials[a->data.sa[0]].name, a->data.sa[1]);
-    } else {
-      sprintf(buf2, "%s", fspecials[a->data.sa[0]].name);
-    }
-    if(dh > 1) strcat(buf, ", ");
-    strcat(buf, buf2);
-  }
-  if(dh > 0) centre(F, buf, true);
-
-  if (f->karma > 0) {
-    sprintf(buf, "Deine Partei hat %d Karma.", f->karma);
-    centre(F, buf, true);
-  }
-#endif
 
   if (f->age <= 2) {
     const char * s;

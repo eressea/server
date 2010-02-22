@@ -17,7 +17,6 @@
 #include <kernel/faction.c>
 #include <kernel/group.c>
 #include <kernel/item.c>
-#include <kernel/karma.c>
 #include <kernel/magic.c>
 #include <kernel/message.c>
 #include <kernel/move.c>

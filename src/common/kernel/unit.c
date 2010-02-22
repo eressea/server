@@ -26,7 +26,6 @@
 #include "building.h"
 #include "faction.h"
 #include "group.h"
-#include "karma.h"
 #include "connection.h"
 #include "item.h"
 #include "move.h"
@@ -1304,22 +1303,6 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
   }
   skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
-#if KARMA_MODULE
-  if (fspecial(u->faction, FS_TELEPATHY)) {
-    switch(sk) {
-case SK_ALCHEMY:
-case SK_HERBALISM:
-case SK_MAGIC:
-case SK_SPY:
-case SK_STEALTH:
-case SK_PERCEPTION:
-  break;
-default:
-  skill -= 2;
-    }
-  }
-#endif
-
 #ifdef HUNGER_REDUCES_SKILL
   if (fval(u, UFL_HUNGER)) {
     skill = skill/2;
@@ -1689,12 +1672,6 @@ unit_max_hp(const unit * u)
     p = pow(effskill(u, SK_STAMINA) / 2.0, 1.5) * 0.2;
     h += (int) (h * p + 0.5);
   }
-#if KARMA_MODULE
-  if (fspecial(u->faction, FS_UNDEAD)) {
-    h *= 2;
-  }
-#endif /* KARMA_MODULE */
-
   /* der healing curse verändert die maximalen hp */
   if (heal_ct) {
     curse *c = get_curse(u->region->attribs, heal_ct);

@@ -87,9 +87,6 @@ typedef struct faction {
 #if SCORE_MODULE
   int score;
 #endif
-#if KARMA_MODULE
-  int karma;
-#endif
   struct alliance * alliance;
 #ifdef VICTORY_DELAY
   unsigned char victory_delay;

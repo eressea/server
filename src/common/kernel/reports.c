@@ -29,7 +29,6 @@
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/karma.h>
 #include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
@@ -438,13 +437,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
   if (itemcloak_ct!=NULL) {
     itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
   }
-
-#if KARMA_MODULE
-  if (fspecial(u->faction, FS_HIDDEN)) {
-    a_fshidden = a_find(u->attribs, &at_fshidden);
-  }
-  telepath_see = fspecial(f, FS_TELEPATHY);
-#endif /* KARMA_MODULE */
 
   bytes = (int)strlcpy(bufp, unitname(u), size);
   if (wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
