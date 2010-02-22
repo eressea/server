@@ -582,20 +582,21 @@ damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
       }
 
       /* Heiltrank */
-      if (get_effect(u, oldpotiontype[P_HEAL]) > 0) {
-        change_effect(u, oldpotiontype[P_HEAL], -1);
-        heiltrank = 1;
-      } else if (i_get(u->items, oldpotiontype[P_HEAL]->itype) > 0) {
-        i_change(&u->items, oldpotiontype[P_HEAL]->itype, -1);
-        change_effect(u, oldpotiontype[P_HEAL], 3);
-        heiltrank = 1;
+      if (oldpotiontype[P_HEAL]) {
+        if (get_effect(u, oldpotiontype[P_HEAL]) > 0) {
+          change_effect(u, oldpotiontype[P_HEAL], -1);
+          heiltrank = 1;
+        } else if (i_get(u->items, oldpotiontype[P_HEAL]->itype) > 0) {
+          i_change(&u->items, oldpotiontype[P_HEAL]->itype, -1);
+          change_effect(u, oldpotiontype[P_HEAL], 3);
+          heiltrank = 1;
+        }
+        if (heiltrank && (chance(0.50))) {
+          hp[i] = u->hp/u->number;
+          hp_rem += hp[i];
+          continue;
+        }
       }
-      if (heiltrank && (chance(0.50))) {
-        hp[i] = u->hp/u->number;
-        hp_rem += hp[i];
-        continue;
-      }
-
       dead++;
     }	else {
       hp_rem += hp[i];

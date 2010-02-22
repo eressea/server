@@ -310,7 +310,6 @@ enum {
 enum {
   RC_DWARF,    /* 0 - Zwerg */
   RC_ELF,
-  RC_ORC,
   RC_GOBLIN,
   RC_HUMAN,
 
@@ -321,7 +320,7 @@ enum {
   RC_CAT,
 
   RC_AQUARIAN,
-  RC_URUK,
+  RC_ORC,
   RC_SNOTLING,
   RC_UNDEAD,
   RC_ILLUSION,

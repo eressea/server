@@ -305,7 +305,7 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     } else {
       if (getunitpeasants) {
 #ifdef ORCIFICATION
-        if (u->race == new_race[RC_ORC] && !fval(u->region, RF_ORCIFIED)) {
+        if (u->race == new_race[RC_SNOTLING] && !fval(u->region, RF_ORCIFIED)) {
           attrib *a = a_find(u->region->attribs, &at_orcification);
           if (!a) a = a_add(&u->region->attribs, a_new(&at_orcification));
           a->data.i += n;

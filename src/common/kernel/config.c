@@ -2805,7 +2805,7 @@ default_wage(const region *r, const faction * f, const race * rc, int in_turn)
 
   if (f!=NULL) {
     int index = 0;
-    if (rc==new_race[RC_ORC] || rc==new_race[RC_URUK] || rc==new_race[RC_SNOTLING]) {
+    if (rc==new_race[RC_ORC] || rc==new_race[RC_SNOTLING]) {
       index = 1;
     }
     wage = wagetable[esize][index];

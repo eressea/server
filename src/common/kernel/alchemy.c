@@ -179,7 +179,7 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
   const potion_type * ptype = resource2potion(itype->rtype);
 
-  if (ptype==oldpotiontype[P_HEAL]) {
+  if (oldpotiontype[P_HEAL] && ptype==oldpotiontype[P_HEAL]) {
     return EUNUSABLE;
   } else {
     int result = begin_potion(u, ptype, ord);

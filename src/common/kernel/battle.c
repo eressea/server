@@ -656,7 +656,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
     skill = effskill(u, SK_WEAPONLESS);
     if (skill<=0) {
       /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-      if (u->race == new_race[RC_URUK]) {
+      if (u->race == new_race[RC_ORC]) {
         int sword = effskill(u, SK_MELEE);
         int spear = effskill(u, SK_SPEAR);
         skill = MAX(sword, spear) - 3;
@@ -1334,25 +1334,26 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
 
   /* Heiltrank schluerfen und hoffen */
-  if (get_effect(du, oldpotiontype[P_HEAL]) > 0) {
-    change_effect(du, oldpotiontype[P_HEAL], -1);
-    heiltrank = 1;
-  } else if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
-    i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
-    change_effect(du, oldpotiontype[P_HEAL], 3);
-    heiltrank = 1;
-  }
-  if (heiltrank && (chance(0.50))) {
-    {
-      message * m = msg_message("battle::potionsave", "unit", du);
-      message_faction(b, du->faction, m);
-      msg_release(m);
+  if (oldpotiontype[P_HEAL]) {
+    if (get_effect(du, oldpotiontype[P_HEAL]) > 0) {
+      change_effect(du, oldpotiontype[P_HEAL], -1);
+      heiltrank = 1;
+    } else if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
+      i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
+      change_effect(du, oldpotiontype[P_HEAL], 3);
+      heiltrank = 1;
     }
-    assert(dt.index>=0 && dt.index<du->number);
-    df->person[dt.index].hp = du->race->hitpoints;
-    return false;
+    if (heiltrank && (chance(0.50))) {
+      {
+        message * m = msg_message("battle::potionsave", "unit", du);
+        message_faction(b, du->faction, m);
+        msg_release(m);
+      }
+      assert(dt.index>=0 && dt.index<du->number);
+      df->person[dt.index].hp = du->race->hitpoints;
+      return false;
+    }
   }
-
 #ifdef SHOW_KILLS
   ++at.fighter->kills;
 #endif

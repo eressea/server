@@ -575,7 +575,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   }
 
   if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
-    if (rc != new_race[RC_URUK])
+    if (rc != new_race[RC_ORC])
     {
       cmistake(u, ord, 238, MSG_EVENT);
       return;
