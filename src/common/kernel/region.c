@@ -1191,8 +1191,10 @@ terraform_region(region * r, const terrain_type * terrain)
 {
   /* Resourcen, die nicht mehr vorkommen können, löschen */
   const terrain_type * oldterrain = r->terrain;
-
   rawmaterial  **lrm = &r->resources;
+
+  assert(terrain);
+
   while (*lrm) {
     rawmaterial *rm = *lrm;
     const resource_type * rtype = NULL;

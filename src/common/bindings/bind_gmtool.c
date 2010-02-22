@@ -55,7 +55,7 @@ tolua_select_region(lua_State* L)
 {
   region * r = tolua_tousertype(L, 1, 0);
   int select = tolua_toboolean(L, 2, 0);
-  if (current_state) {
+  if (current_state && r) {
     select_coordinate(current_state->selected, r->x, r->y, select);
   }
   return 0;

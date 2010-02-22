@@ -15,6 +15,7 @@
 /* util includes */
 #include "log.h"
 
+#include <libxml/catalog.h>
 #include <libxml/xmlstring.h>
 
 /* libc includes */
@@ -105,11 +106,14 @@ xml_register_callback(xml_callback callback)
 }
 
 int
-read_xml(const char * filename)
+read_xml(const char * filename, const char * catalog)
 {
   xml_reader * reader = xmlReaders;
   xmlDocPtr doc;
 
+  if (catalog) {
+    xmlLoadCatalog(catalog);
+  }
 #ifdef XML_PARSE_XINCLUDE
   doc = xmlReadFile(filename, NULL, XML_PARSE_XINCLUDE);
 #else
