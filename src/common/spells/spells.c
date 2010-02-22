@@ -1457,7 +1457,7 @@ sp_create_irongolem(castorder *co)
     return 0;
   }
 
-  u2 = create_unit(r, mage->faction, number, new_race[RC_IRONGOLEM], 0, NULL, mage);
+  u2 = create_unit(r, mage->faction, number, rc_find("irongolem"), 0, NULL, mage);
 
   set_level(u2, SK_ARMORER, 1);
   set_level(u2, SK_WEAPONSMITH, 1);
@@ -1470,7 +1470,7 @@ sp_create_irongolem(castorder *co)
   ADDMSG(&mage->faction->msgs,
     msg_message("magiccreate_effect", "region command unit amount object",
     mage->region, co->order, mage, number,
-    LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1))));
+    LOC(mage->faction->locale, rc_name(rc_find("irongolem"), 1))));
 
   return cast_level;
 }
@@ -1518,7 +1518,7 @@ sp_create_stonegolem(castorder *co)
     return 0;
   }
 
-  u2 = create_unit(r, mage->faction, number, new_race[RC_STONEGOLEM], 0, NULL, mage);
+  u2 = create_unit(r, mage->faction, number, rc_find("stonegolem"), 0, NULL, mage);
   set_level(u2, SK_ROAD_BUILDING, 1);
   set_level(u2, SK_BUILDING, 1);
 
@@ -1530,7 +1530,7 @@ sp_create_stonegolem(castorder *co)
   ADDMSG(&mage->faction->msgs,
     msg_message("magiccreate_effect", "region command unit amount object",
     mage->region, co->order, mage, number,
-    LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1))));
+    LOC(mage->faction->locale, rc_name(rc_find("stonegolem"), 1))));
 
   return cast_level;
 }

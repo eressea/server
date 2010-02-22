@@ -8,6 +8,21 @@
   <xi:include href="../races/dragon.xml"/>
   <xi:include href="../races/youngdragon.xml"/>
   
+  <race name="human" magres="0.000000" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <function name="itemdrop" value="defaultdrops"/>
+    <param name="other_race" value="elf"/>
+    <param name="other_cost" value="500"/>
+    <skill name="riding" modifier="+1"/>
+    <skill name="shipcraft" modifier="2"/>
+    <skill name="sailing" modifier="2"/>
+    <skill name="magic" modifier="-99"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+    <familiar race="dolphin" default="yes"/>
+    <familiar race="giantturtle"/>
+  </race>
+
   <race name="uruk" studyspeed="-5" magres="-0.05" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
@@ -35,21 +50,6 @@
     <attack type="1" damage="1d5"/>
     <familiar race="wolf" default="yes"/>
     <familiar race="ghost"/>
-  </race>
-
-  <race name="human" magres="0.000000" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
-    <param name="other_race" value="elf"/>
-    <param name="other_cost" value="500"/>
-    <skill name="riding" modifier="+1"/>
-    <skill name="shipcraft" modifier="2"/>
-    <skill name="sailing" modifier="2"/>
-    <skill name="magic" modifier="-99"/>
-    <skill name="unarmed" modifier="-99"/>
-    <attack type="1" damage="1d5"/>
-    <familiar race="dolphin" default="yes"/>
-    <familiar race="giantturtle"/>
   </race>
 
   <race name="halfling" defensemodifier="1" magres="0.05" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">

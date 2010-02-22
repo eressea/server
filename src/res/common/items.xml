@@ -153,16 +153,6 @@
     </item>
   </resource>
 
-  <resource name="peasant" pooled="false">
-    <function name="change" value="lua_changeresource"/>
-    <function name="get" value="lua_getresource"/>
-  </resource>
-
-  <resource name="hp" pooled="false">
-    <function name="change" value="lua_changeresource"/>
-    <function name="get" value="lua_getresource"/>
-  </resource>
-
   <resource name="catapultammo">
     <item weight="1000">
       <construction skill="quarrying" minskill="3" reqsize="1">

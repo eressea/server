@@ -70,61 +70,16 @@ function test_plane()
   for x = -3, 3 do for y = -3, 3 do
     r = region.create(x, y, "plain")
     if (x==y) then
-	  local u = unit.create(f, r, 1)
+      local u = unit.create(f, r, 1)
     end
   end end
-end
-
-function test_rename()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r)
-  u:add_item("aoh", 1)
-  assert_equal(u:get_item("ao_healing"), 1)
-end
-
-function test_blessedharvest_lasts_n_turn()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "halfling", "de")
-  local u = unit.create(f, r)
-  r:set_resource("peasant", 100)
-  r:set_resource("money", 0)
-  u:add_item("money", 1000)
-  u.magic = "gwyrrd"
-  u.race = "dwarf"
-  u:set_skill("magic", 20)
-  u.aura = 200
-  u:add_spell("raindance")
-  u:add_spell("blessedharvest")
-  u:clear_orders()
-  local level = 5
-  u:add_order("ZAUBERE STUFE " .. level .. " Regentanz")
-  assert_equal(0, r:get_resource("money"), 0)
-
-  local m = 0
-  local p = 100
-  for i=1,level+2 do
-    process_orders()
-    local income = p * 12
-    p = r:get_resource("peasant")
-    income = income - p * 10
-    m = m + income
-    -- print(i, m, p, r:get_resource("money"))
-    if (i>level+1) then
-      assert_not_equal(m, r:get_resource("money"))
-    else
-      assert_equal(m, r:get_resource("money"))
-    end
-    u:clear_orders()
-    u:add_order("ARBEITEN")
---    u:add_spell("raindance")
-  end
 end
 
 function test_pure()
   free_game()
   local r = region.create(0, 0, "plain")
+  assert_not_equal(nil, r)
+  assert_equal(r, get_region(0, 0))
 end
 
 function test_read_write()
@@ -610,22 +565,4 @@ function test_building_other()
   u2:add_order("MACHEN BURG " .. itoa36(b.id))
   process_orders()
   assert_not_equal(10, b.size)
-end
-
-function test_roi()
-    local r = region.create(0,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u.race = "elf"
-    u:set_skill("magic", 10)
-    u:add_item("money", 3010)
-    u.magic = "tybied"
-    u.aura = 200
-    u.ship = s1
-    u:add_spell("create_roi")
-    u:clear_orders()
-    u:add_order("ZAUBERE 'Erschaffe einen Ring der Unsichtbarkeit' ")
-    process_orders()
-    write_reports()
-    assert_equal(1, u:get_item("roi"))
 end

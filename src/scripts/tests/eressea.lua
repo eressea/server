@@ -6,6 +6,14 @@ function setup()
     free_game()
 end
 
+function test_rename()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r)
+  u:add_item("aoh", 1)
+  assert_equal(u:get_item("ao_healing"), 1)
+end
+
 function DISABLE_test_alp()
     local r = region.create(0,0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")

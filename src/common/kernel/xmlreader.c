@@ -1619,6 +1619,8 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "undead", false)) rc->flags |= RCF_UNDEAD;
     if (xml_bvalue(node, "dragon", false)) rc->flags |= RCF_DRAGON;
     if (xml_bvalue(node, "shipspeed", false)) rc->flags |= RCF_SHIPSPEED;
+    if (xml_bvalue(node, "stonegolem", false)) rc->flags |= RCF_STONEGOLEM;
+    if (xml_bvalue(node, "irongolem", false)) rc->flags |= RCF_IRONGOLEM;
 
     if (xml_bvalue(node, "giveitem", false)) rc->ec_flags |= GIVEITEM;
     if (xml_bvalue(node, "giveperson", false)) rc->ec_flags |= GIVEPERSON;

@@ -1,7 +1,6 @@
 require(config.game .. ".modules")
 require "default"
-require "spells"
-require "extensions"
+require "resources"
 
 function run_editor()
     local turn = get_turn()
