@@ -761,10 +761,10 @@ init_olditems(void)
     /* item is defined in XML file, but IT_XYZ enum still in use */
     const item_type * itype = it_find(itemnames[i]);
 
-    assert(itype);
-    olditemtype[i] = itype;
-    oldresourcetype[i] = itype->rtype;
-    continue;
+    if (itype) {
+      olditemtype[i] = itype;
+      oldresourcetype[i] = itype->rtype;
+    }
   }
 }
 

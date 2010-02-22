@@ -327,6 +327,9 @@ tolua_faction_create(lua_State* L)
   if (frace!=NULL) {
     f = addfaction(email, NULL, frace, loc, 0);
   }
+  if (!f) {
+    log_error(("faction.create(%s, %s, %s)\n", email, racename, lang));
+  }
   tolua_pushusertype(L, f, TOLUA_CAST "faction");
   return 1;
 }

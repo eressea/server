@@ -171,6 +171,9 @@ msg_set_int(lua_message * msg, const char * param, int value)
 int 
 msg_send_faction(lua_message * msg, faction * f)
 {
+  assert(f);
+  assert(msg);
+
   if (msg->mtype) {
     if (msg->msg==NULL) {
       msg->msg = msg_create(msg->mtype, msg->args);
@@ -303,9 +306,12 @@ tolua_msg_send_faction(lua_State * L)
 {
   lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
   faction * f = (faction *)tolua_tousertype(L, 2, 0);
-  int result = msg_send_faction(lmsg, f);
-  tolua_pushnumber(L, (lua_Number)result);
-  return 1;
+  if (f && lmsg) {
+    int result = msg_send_faction(lmsg, f);
+    tolua_pushnumber(L, (lua_Number)result);
+    return 1;
+  }
+  return 0;
 }
 
 void

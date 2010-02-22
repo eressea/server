@@ -1007,16 +1007,18 @@ inactivefaction(faction * f)
   FILE *inactiveFILE;
   char zText[128];
 
-  sprintf(zText, "%s/%s", datapath(), "/inactive");
+  sprintf(zText, "%s/%s", datapath(), "inactive");
   inactiveFILE = fopen(zText, "a");
 
-  fprintf(inactiveFILE, "%s:%s:%d:%d\n",
-    factionid(f),
-    LOC(default_locale, rc_name(f->race, 1)),
-    modify(count_all(f)),
-    turn - f->lastorders);
+  if (inactiveFILE) {
+    fprintf(inactiveFILE, "%s:%s:%d:%d\n",
+      factionid(f),
+      LOC(default_locale, rc_name(f->race, 1)),
+      modify(count_all(f)),
+      turn - f->lastorders);
 
-  fclose(inactiveFILE);
+    fclose(inactiveFILE);
+  }
 }
 
 static void
@@ -4205,11 +4207,11 @@ update_subscriptions(void)
 }
 
 int
-init_data(const char * filename)
+init_data(const char * filename, const char * catalog)
 {
   int l;
 
-  l = read_xml(filename);
+  l = read_xml(filename, catalog);
   if (l) return l;
 
   init_locales();

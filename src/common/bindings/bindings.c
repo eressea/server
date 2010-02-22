@@ -977,7 +977,8 @@ int
 tolua_read_xml(lua_State* L)
 {
   const char * filename = tolua_tostring(L, 1, 0);
-  init_data(filename);
+  const char * catalog = tolua_tostring(L, 2, 0);
+  init_data(filename, catalog);
   return 0;
 }
 

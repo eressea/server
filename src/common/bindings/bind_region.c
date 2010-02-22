@@ -387,6 +387,9 @@ tolua_region_create(lua_State* L)
     plane * pl = findplane(x, y);
     const terrain_type * terrain = get_terrain(tname);
     region * r, * result;
+    if (!terrain) {
+      return 0;
+    }
 
     assert(!pnormalize(&x, &y, pl));
     r = result = findregion(x, y);

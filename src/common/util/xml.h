@@ -23,7 +23,7 @@ extern "C" {
 
   typedef int (*xml_callback)(xmlDocPtr);
   extern void xml_register_callback(xml_callback callback);
-  extern int read_xml(const char * filename);
+  extern int read_xml(const char * filename, const char * catalog);
   extern double xml_fvalue(xmlNodePtr node, const char * name, double dflt);
   extern int xml_ivalue(xmlNodePtr node, const char * name, int dflt);
   extern boolean xml_bvalue(xmlNodePtr node, const char * name, boolean dflt);
