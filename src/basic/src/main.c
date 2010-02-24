@@ -7,6 +7,9 @@
 #include <kernel/save.h>
 #include <iniparser/iniparser.h>
 
+#include <assert.h>
+#include <locale.h>
+
 static const char * luafile = "init.lua";
 static const char * entry_point = NULL;
 static int memdebug = 0;
@@ -94,11 +97,19 @@ parse_args(int argc, char **argv)
 }
 
 
+void locale_init(void)
+{
+  setlocale(LC_CTYPE, "");
+  setlocale(LC_NUMERIC, "C");
+  assert(towlower(0xC4)==0xE4); /* &Auml; => &auml; */
+}
+
 int main(int argc, char ** argv)
 {
   int err;
 
   log_open("eressea.log");
+  locale_init();
   parse_config("eressea.ini");
 
   err = parse_args(argc, argv);
