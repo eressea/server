@@ -372,22 +372,24 @@ parse_calendar(xmlDocPtr doc)
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr xpathCalendars;
   xmlNodeSetPtr nsetCalendars;
-  int rv = 0;
+  int c, rv = 0;
 
   /* reading eressea/buildings/building */
   xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
   nsetCalendars = xpathCalendars->nodesetval;
-  if (nsetCalendars==NULL || nsetCalendars->nodeNr!=1) {
-    /* rv = -1; */
-  } else {
-    xmlNodePtr calendar = nsetCalendars->nodeTab[0];
+  months_per_year = 0;
+  if (nsetCalendars==NULL || nsetCalendars->nodeNr==0) {
+    rv = -1;
+  } else for (c=0;c!=nsetCalendars->nodeNr;++c) {
+    xmlNodePtr calendar = nsetCalendars->nodeTab[c];
     xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
     xmlNodeSetPtr nsetWeeks, nsetMonths, nsetSeasons;
     xmlChar * propValue = xmlGetProp(calendar, BAD_CAST "name");
     xmlChar * newyear = xmlGetProp(calendar, BAD_CAST "newyear");
 
-    first_turn = xml_ivalue(calendar, "start", 0);
+    first_turn = xml_ivalue(calendar, "start", first_turn);
     if (propValue) {
+      free(agename);
       agename = strdup(mkname("calendar", (const char*)propValue));
       xmlFree(propValue);
     }
@@ -395,10 +397,11 @@ parse_calendar(xmlDocPtr doc)
     xpath->node = calendar;
     xpathWeeks = xmlXPathEvalExpression(BAD_CAST "week", xpath);
     nsetWeeks = xpathWeeks->nodesetval;
-    if (nsetWeeks!=NULL) {
+    if (nsetWeeks!=NULL && nsetWeeks->nodeNr) {
       int i;
 
       weeks_per_month = nsetWeeks->nodeNr;
+      assert(!weeknames);
       weeknames = malloc(sizeof(char *) * weeks_per_month);
       weeknames2 = malloc(sizeof(char *) * weeks_per_month);
       for (i=0;i!=nsetWeeks->nodeNr;++i) {
@@ -414,13 +417,13 @@ parse_calendar(xmlDocPtr doc)
     }
     xmlXPathFreeObject(xpathWeeks);
 
-    months_per_year = 0;
     xpathSeasons = xmlXPathEvalExpression(BAD_CAST "season", xpath);
     nsetSeasons = xpathSeasons->nodesetval;
-    if (nsetSeasons!=NULL) {
+    if (nsetSeasons!=NULL && nsetSeasons->nodeNr) {
       int i;
 
       seasons = nsetSeasons->nodeNr;
+      assert(!seasonnames);
       seasonnames = malloc(sizeof(char *) * seasons);
 
       for (i=0;i!=nsetSeasons->nodeNr;++i) {
@@ -435,10 +438,11 @@ parse_calendar(xmlDocPtr doc)
 
     xpathMonths = xmlXPathEvalExpression(BAD_CAST "season/month", xpath);
     nsetMonths = xpathMonths->nodesetval;
-    if (nsetMonths!=NULL) {
+    if (nsetMonths!=NULL && nsetMonths->nodeNr) {
       int i;
 
       months_per_year = nsetMonths->nodeNr;
+      assert(!monthnames);
       monthnames = malloc(sizeof(char *) * months_per_year);
       month_season = malloc(sizeof(int) * months_per_year);
       storms = malloc(sizeof(int) * months_per_year);

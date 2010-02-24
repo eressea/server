@@ -110,7 +110,7 @@ gamedate_season(const struct locale * lang)
     LOC(lang, weeknames[gd.week]),
     LOC(lang, monthnames[gd.month]),
     gd.year,
-    LOC(lang, agename),
+    agename?LOC(lang, agename):"",
     LOC(lang, seasonnames[gd.season]));
 
   return buf;

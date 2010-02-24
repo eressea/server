@@ -114,7 +114,7 @@ gamedate2(const struct locale * lang)
     LOC(lang, weeknames2[gd.week]),
     LOC(lang, monthnames[gd.month]),
     gd.year,
-    LOC(lang, agename));
+    agename?LOC(lang, agename):"");
   return buf;
 }
 

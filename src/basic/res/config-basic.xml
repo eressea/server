@@ -7,6 +7,7 @@
   <xi:include href="eressea:///core/en/strings.xml"/>
   <xi:include href="eressea:///core/prefixes.xml"/>
   <xi:include href="eressea:///core/calendar.xml"/>
+  <calendar name="thirdage" newyear="month_1" start="0" />
   <xi:include href="eressea:///core/common/resources.xml"/>
   <xi:include href="armor.xml" />
   <xi:include href="weapons.xml" />
@@ -29,12 +30,6 @@
       <item name="adamantium" amount="1"/>
     </set>
   </equipment>
-
-  <xi:include href="eressea:///core/names-undead.xml"/>
-  <xi:include href="eressea:///core/names-skeletons.xml"/>
-  <xi:include href="eressea:///core/names-zombies.xml"/>
-  <xi:include href="eressea:///core/names-ghouls.xml"/>
-  <xi:include href="eressea:///core/names-dragons.xml"/>
 
   <game name="Demonstration">
     <!-- Game specific settings -->
