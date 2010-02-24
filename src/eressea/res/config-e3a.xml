@@ -24,7 +24,8 @@
   <xi:include href="e3a/ships.xml"/>
   <xi:include href="e3a/shipnames.xml"/>
   <xi:include href="e3a/terrains.xml"/>
-  <xi:include href="e3a/calendar.xml"/>
+  <xi:include href="eressea:///core/calendar.xml"/>
+  <calendar name="thirdage" newyear="month_1" start="1"/>
   <xi:include href="e3a/items.xml" />
   <xi:include href="e3a/strings.xml"/>
   <xi:include href="e3a/messages.xml"/>

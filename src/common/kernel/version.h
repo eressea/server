@@ -67,4 +67,4 @@
 #define FOSS_VERSION 336 /* the open source release */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION MOURNING_VERSION /* current datafile */
+#define RELEASE_VERSION FOSS_VERSION /* current datafile */

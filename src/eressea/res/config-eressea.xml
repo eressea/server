@@ -25,7 +25,8 @@
   <xi:include href="eressea:///core/directions.xml"/>
   <xi:include href="artrewards.xml"/>
   <xi:include href="buildings.xml"/>
-  <xi:include href="calendar.xml"/>
+  <xi:include href="eressea:///core/calendar.xml"/>
+  <calendar name="secondage" newyear="month_1" start="184"/>
   <xi:include href="equipment.xml"/>
   <xi:include href="items.xml"/>
   <xi:include href="races.xml"/>
