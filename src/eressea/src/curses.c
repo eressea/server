@@ -129,10 +129,6 @@ resolve_buddy(variant data, void * addr)
   return 0;
 }
 
-attrib_type at_unitdissolve = {
-  "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
-};
-
 static void
 wall_init(connection * b)
 {

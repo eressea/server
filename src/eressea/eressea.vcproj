@@ -187,7 +187,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\spells\alp.c"
+				RelativePath=".\src\spells\alp.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -207,7 +207,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\spells\buildingcurse.c"
+				RelativePath=".\src\spells\buildingcurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -227,7 +227,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\spells\combatspells.c"
+				RelativePath=".\src\spells\combatspells.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -247,7 +247,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\curses.c"
+				RelativePath=".\src\curses.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -267,7 +267,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\main.c"
+				RelativePath=".\src\main.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -287,7 +287,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\spells\regioncurse.c"
+				RelativePath=".\src\spells\regioncurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -307,7 +307,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\spells\shipcurse.c"
+				RelativePath=".\src\spells\shipcurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -327,7 +327,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\spells\spells.c"
+				RelativePath=".\src\spells\spells.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -347,7 +347,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\spells\unitcurse.c"
+				RelativePath=".\src\spells\unitcurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -373,31 +373,31 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\spells\alp.h"
+				RelativePath=".\src\spells\alp.h"
 				>
 			</File>
 			<File
-				RelativePath=".\spells\buildingcurse.h"
+				RelativePath=".\src\spells\buildingcurse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\spells\combatspells.h"
+				RelativePath=".\src\spells\combatspells.h"
 				>
 			</File>
 			<File
-				RelativePath=".\curses.h"
+				RelativePath=".\src\curses.h"
 				>
 			</File>
 			<File
-				RelativePath=".\spells\regioncurse.h"
+				RelativePath=".\src\spells\regioncurse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\spells\shipcurse.h"
+				RelativePath=".\src\spells\shipcurse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\spells\spells.h"
+				RelativePath=".\src\spells\spells.h"
 				>
 			</File>
 			<File
@@ -405,7 +405,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\spells\unitcurse.h"
+				RelativePath=".\src\spells\unitcurse.h"
 				>
 			</File>
 		</Filter>
@@ -429,7 +429,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server.c"
+				RelativePath=".\src\server.c"
 				>
 			</File>
 			<File
@@ -467,7 +467,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\spells\Jamfile"
+			RelativePath=".\src\spells\Jamfile"
 			>
 		</File>
 	</Files>
