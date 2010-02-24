@@ -47,7 +47,6 @@
 
 /* gamecode includes */
 #include <gamecode/archetype.h>
-#include <gamecode/curses.h>
 #include <gamecode/economy.h>
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
@@ -497,6 +496,8 @@ main(int argc, char *argv[])
 
   kernel_init();
   game_init();
+  register_curses();
+  register_spells();
 
   if (write_csv) {
     write_skills();
