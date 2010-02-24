@@ -15,7 +15,8 @@
   <xi:include href="eressea:///core/common/herbs.xml" />
   <xi:include href="eressea:///core/common/potions.xml" />
   <xi:include href="eressea:///core/spoils.xml"/>
-  <xi:include href="eressea:///core/races.xml"/>
+  <xi:include href="races.xml"/>
+  <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea:///core/prefixes.xml"/>
   <xi:include href="eressea:///core/ships.xml"/>
   <xi:include href="eressea:///core/common/buildings.xml"/>
