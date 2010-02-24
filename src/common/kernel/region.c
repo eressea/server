@@ -246,7 +246,7 @@ register_special_direction(const char * name)
 }
 
 static int
-a_readdirection(attrib *a, storage * store)
+a_readdirection(attrib *a, void * owner, struct storage * store)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
 
@@ -283,7 +283,7 @@ a_readdirection(attrib *a, storage * store)
 }
 
 static void
-a_writedirection(const attrib *a, storage * store)
+a_writedirection(const attrib * a, const void * owner, struct storage * store)
 {
   spec_direction *d = (spec_direction *)(a->data.v);
 
@@ -359,7 +359,7 @@ a_initmoveblock(attrib *a)
 }
 
 int
-a_readmoveblock(attrib *a, storage * store)
+a_readmoveblock(attrib *a, void * owner, struct storage * store)
 {
   moveblock *m = (moveblock *)(a->data.v);
   int i;
@@ -370,7 +370,7 @@ a_readmoveblock(attrib *a, storage * store)
 }
 
 void
-a_writemoveblock(const attrib *a, storage * store)
+a_writemoveblock(const attrib * a, const void * owner, struct storage * store)
 {
   moveblock *m = (moveblock *)(a->data.v);
   store->w_int(store, (int)m->dir);

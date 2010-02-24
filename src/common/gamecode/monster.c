@@ -34,9 +34,6 @@
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 
-/* spezialmonster */
-#include <spells/alp.h>
-
 /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/equipment.h>

@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -101,8 +101,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -187,22 +187,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\common\build\curses.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\build\external.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\build\gamecode.c"
-				>
-			</File>
-			<File
-				RelativePath="..\common\build\kernel.c"
-				>
-			</File>
-			<File
 				RelativePath=".\main.c"
 				>
 				<FileConfiguration
@@ -221,6 +205,36 @@
 						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath="..\common\build\stdafx.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Unity Build"
+			>
+			<File
+				RelativePath="..\common\build\external.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\build\gamecode.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\build\kernel.c"
+				>
+			</File>
+			<File
+				RelativePath="..\common\build\lib.c"
+				>
 			</File>
 			<File
 				RelativePath=".\server.c"
@@ -258,16 +272,6 @@
 						AdditionalIncludeDirectories="common/util"
 					/>
 				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath="..\common\build\stdafx.h"
-				>
 			</File>
 		</Filter>
 	</Files>

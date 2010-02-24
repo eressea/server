@@ -55,16 +55,16 @@ extern void write_items(struct storage * store, struct item *it);
 extern void write_unit(struct storage * store, const struct unit * u);
 extern struct unit * read_unit(struct storage * store);
 
-extern int a_readint(struct attrib * a, struct storage * store);
-extern void a_writeint(const struct attrib * a, struct storage * store);
-extern int a_readshorts(struct attrib * a, struct storage * store);
-extern void a_writeshorts(const struct attrib * a, struct storage * store);
-extern int a_readchars(struct attrib * a, struct storage * store);
-extern void a_writechars(const struct attrib * a, struct storage * store);
-extern int a_readvoid(struct attrib * a, struct storage * store);
-extern void a_writevoid(const struct attrib * a, struct storage * store);
-extern int a_readstring(struct attrib * a, struct storage * store);
-extern void a_writestring(const struct attrib * a, struct storage * store);
+extern int a_readint(struct attrib * a, void * owner, struct storage * store);
+extern void a_writeint(const struct attrib * a, const void * owner, struct storage * store);
+extern int a_readshorts(struct attrib * a, void * owner, struct storage * store);
+extern void a_writeshorts(const struct attrib * a, const void * owner, struct storage * store);
+extern int a_readchars(struct attrib * a, void * owner, struct storage * store);
+extern void a_writechars(const struct attrib * a, const void * owner, struct storage * store);
+extern int a_readvoid(struct attrib * a, void * owner, struct storage * store);
+extern void a_writevoid(const struct attrib * a, const void * owner, struct storage * store);
+extern int a_readstring(struct attrib * a, void * owner, struct storage * store);
+extern void a_writestring(const struct attrib * a, const void * owner, struct storage * store);
 extern void a_finalizestring(struct attrib * a);
 
 extern int freadstr(FILE * F, int encoding, char * str, size_t size);

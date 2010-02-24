@@ -50,7 +50,7 @@ typedef struct object_data {
 } object_data;
 
 static void
-object_write(const attrib *a, struct storage * store)
+object_write(const attrib * a, const void * owner, struct storage * store)
 {
   const object_data * data = (object_data *)a->data.v;
   int type = (int)data->type;
@@ -90,7 +90,7 @@ object_write(const attrib *a, struct storage * store)
 }
 
 static int
-object_read(attrib *a, struct storage * store)
+object_read(attrib *a, void * owner, struct storage * store)
 {
   object_data * data = (object_data *)a->data.v;
   int result;

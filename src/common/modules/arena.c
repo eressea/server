@@ -217,13 +217,13 @@ age_hurting(attrib * a) {
 }
 
 static void
-write_hurting(const attrib * a, struct storage * store) {
+write_hurting(const attrib * a, const void * owner, struct storage * store) {
 	building * b = a->data.v;
 	store->w_int(store, b->no);
 }
 
 static int
-read_hurting(attrib * a, struct storage * store) {
+read_hurting(attrib * a, void * owner, struct storage * store) {
 	int i;
 	i = store->r_int(store);
 	a->data.v = (void*)findbuilding(i);

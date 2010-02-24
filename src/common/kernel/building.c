@@ -66,7 +66,7 @@ lc_done(struct attrib *a)
 }
 
 static void 
-lc_write(const struct attrib * a, struct storage * store)
+lc_write(const struct attrib * a, const void * owner, struct storage * store)
 {
   building_action * data = (building_action*)a->data.v;
   const char * fname = data->fname;
@@ -79,7 +79,7 @@ lc_write(const struct attrib * a, struct storage * store)
 }
 
 static int
-lc_read(struct attrib * a, struct storage * store)
+lc_read(struct attrib * a, void * owner, struct storage * store)
 {
   building_action * data = (building_action*)a->data.v;
   int result = read_reference(&data->b, store, read_building_reference, resolve_building);

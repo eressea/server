@@ -91,7 +91,7 @@ find_group(int gid)
 }
 
 static int
-read_group(attrib * a, struct storage * store)
+read_group(attrib * a, void * owner, struct storage * store)
 {
   group * g;
   int gid = store->r_int(store);
@@ -104,7 +104,7 @@ read_group(attrib * a, struct storage * store)
 }
 
 static void
-write_group(const attrib * a, struct storage * store)
+write_group(const attrib * a, const void * owner, struct storage * store)
 {
   group * g = (group*)a->data.v;
   store->w_int(store, g->gid);
@@ -198,7 +198,7 @@ write_groups(struct storage * store, group * g)
       }
     }
     store->w_id(store, 0);
-    a_write(store, g->attribs);
+    a_write(store, g->attribs, g);
     store->w_brk(store);
     g=g->next;
   }
@@ -234,6 +234,6 @@ read_groups(struct storage * store, faction * f)
       if (!a->faction) ur_add(fid, &a->faction, resolve_faction);
     }
     *pa = 0;
-    a_read(store, &g->attribs);
+    a_read(store, &g->attribs, g);
   }
 }

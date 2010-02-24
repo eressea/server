@@ -840,7 +840,7 @@ read_unit(struct storage * store)
     u->hp=u->number;
   }
 
-  a_read(store, &u->attribs);
+  a_read(store, &u->attribs, u);
   return u;
 }
 
@@ -907,7 +907,7 @@ write_unit(struct storage * store, const unit * u)
   }
   store->w_int(store, u->hp);
   store->w_brk(store);
-  a_write(store, u->attribs);
+  a_write(store, u->attribs, u);
   store->w_brk(store);
 }
 
@@ -1070,7 +1070,7 @@ readregion(struct storage * store, int x, int y)
       }
     }
   }
-  a_read(store, &r->attribs);
+  a_read(store, &r->attribs, r);
 
   return r;
 }
@@ -1132,7 +1132,7 @@ writeregion(struct storage * store, const region * r)
     store->w_brk(store);
 #endif
   }
-  a_write(store, r->attribs);
+  a_write(store, r->attribs, r);
   store->w_brk(store);
 }
 
@@ -1235,7 +1235,7 @@ readfaction(struct storage * store)
     f->flags |= FFL_NPC;
   }
 
-  a_read(store, &f->attribs);
+  a_read(store, &f->attribs, f);
   if (store->version>=CLAIM_VERSION) {
     read_items(store, &f->items);
   }
@@ -1322,7 +1322,7 @@ writefaction(struct storage * store, const faction * f)
   store->w_int(store, f->magiegebiet);
 
   store->w_int(store, f->flags&FFL_SAVEMASK);
-  a_write(store, f->attribs);
+  a_write(store, f->attribs, f);
   store->w_brk(store);
 #if RELEASE_VERSION>=CLAIM_VERSION
   write_items(store, f->items);
@@ -1397,7 +1397,7 @@ readgame(const char * filename, int mode, int backup)
       }
     }
   }
-  a_read(store, &global.attribs);
+  a_read(store, &global.attribs, NULL);
   global.data_turn = turn = store->r_int(store);
   log_info((1, " - reading turn %d\n", turn));
   rng_init(turn);
@@ -1437,7 +1437,7 @@ readgame(const char * filename, int mode, int backup)
       store->r_str_buf(store, token, sizeof(token));
     }
 
-    a_read(store, &pl->attribs);
+    a_read(store, &pl->attribs, pl);
     addlist(&planes, pl);
   }
 
@@ -1507,7 +1507,7 @@ readgame(const char * filename, int mode, int backup)
       store->r_str_buf(store, token, sizeof(token));
       b->type = bt_find(token);
       b->region = r;
-      a_read(store, &b->attribs);
+      a_read(store, &b->attribs, b);
       if (b->type==bt_lighthouse) {
         r->flags |= RF_LIGHTHOUSE;
       }
@@ -1540,6 +1540,9 @@ readgame(const char * filename, int mode, int backup)
       assert(sh->type || !"ship_type not registered!");
       sh->size = store->r_int(store);
       sh->damage = store->r_int(store);
+      if (store->version>=FOSS_VERSION) {
+        sh->flags = store->r_int(store);
+      }
 
       /* Attribute rekursiv einlesen */
 
@@ -1547,7 +1550,7 @@ readgame(const char * filename, int mode, int backup)
       if (sh->type->flags & SFL_NOCOAST) {
         sh->coast = NODIRECTION;
       }
-      a_read(store, &sh->attribs);
+      a_read(store, &sh->attribs, sh);
     }
 
     *shp = 0;
@@ -1681,7 +1684,7 @@ writegame(const char *filename, int mode)
   }
   store->w_brk(store);
 
-  a_write(store, global.attribs);
+  a_write(store, global.attribs, NULL);
   store->w_brk(store);
 
   store->w_int(store, turn);
@@ -1711,7 +1714,7 @@ writegame(const char *filename, int mode)
       w = w->next;
     }
     store->w_tok(store, "end");
-    a_write(store, pl->attribs);
+    a_write(store, pl->attribs, pl);
     store->w_brk(store);
   }
 
@@ -1757,7 +1760,7 @@ writegame(const char *filename, int mode)
       store->w_int(store, b->size);
       store->w_tok(store, b->type->_name);
       store->w_brk(store);
-      a_write(store, b->attribs);
+      a_write(store, b->attribs, b);
       store->w_brk(store);
     }
 
@@ -1771,10 +1774,11 @@ writegame(const char *filename, int mode)
       store->w_tok(store, sh->type->name[0]);
       store->w_int(store, sh->size);
       store->w_int(store, sh->damage);
+      store->w_int(store, sh->flags & SFL_SAVEMASK);
       assert((sh->type->flags & SFL_NOCOAST)==0 || sh->coast == NODIRECTION);
       store->w_int(store, sh->coast);
       store->w_brk(store);
-      a_write(store, sh->attribs);
+      a_write(store, sh->attribs, sh);
       store->w_brk(store);
     }
 
@@ -1795,7 +1799,7 @@ writegame(const char *filename, int mode)
 }
 
 int
-a_readint(attrib * a, struct storage * store)
+a_readint(attrib * a, void * owner, struct storage * store)
 {
   /*  assert(sizeof(int)==sizeof(a->data)); */
   a->data.i = store->r_int(store);
@@ -1803,16 +1807,16 @@ a_readint(attrib * a, struct storage * store)
 }
 
 void
-a_writeint(const attrib * a, struct storage * store)
+a_writeint(const attrib * a, const void * owner, struct storage * store)
 {
   store->w_int(store, a->data.i);
 }
 
 int
-a_readshorts(attrib * a, struct storage * store)
+a_readshorts(attrib * a, void * owner, struct storage * store)
 {
   if (store->version<ATTRIBREAD_VERSION) {
-    return a_readint(a, store);
+    return a_readint(a, store, owner);
   }
   a->data.sa[0] = (short)store->r_int(store);
   a->data.sa[1] = (short)store->r_int(store);
@@ -1820,18 +1824,18 @@ a_readshorts(attrib * a, struct storage * store)
 }
 
 void
-a_writeshorts(const attrib * a, struct storage * store)
+a_writeshorts(const attrib * a, const void * owner, struct storage * store)
 {
   store->w_int(store, a->data.sa[0]);
   store->w_int(store, a->data.sa[1]);
 }
 
 int
-a_readchars(attrib * a, struct storage * store)
+a_readchars(attrib * a, void * owner, struct storage * store)
 {
   int i;
   if (store->version<ATTRIBREAD_VERSION) {
-    return a_readint(a, store);
+    return a_readint(a, store, owner);
   }
   for (i=0;i!=4;++i) {
     a->data.ca[i] = (char)store->r_int(store);
@@ -1840,7 +1844,7 @@ a_readchars(attrib * a, struct storage * store)
 }
 
 void
-a_writechars(const attrib * a, struct storage * store)
+a_writechars(const attrib * a, const void * owner, struct storage * store)
 {
   int i;
   
@@ -1850,28 +1854,28 @@ a_writechars(const attrib * a, struct storage * store)
 }
 
 int
-a_readvoid(attrib * a, struct storage * store)
+a_readvoid(attrib * a, void * owner, struct storage * store)
 {
   if (store->version<ATTRIBREAD_VERSION) {
-    return a_readint(a, store);
+    return a_readint(a, store, owner);
   }
   return AT_READ_OK;
 }
 
 void
-a_writevoid(const attrib * a, struct storage * store)
+a_writevoid(const attrib * a, const void * owner, struct storage * store)
 {
 }
 
 int
-a_readstring(attrib * a, struct storage * store)
+a_readstring(attrib * a, void * owner, struct storage * store)
 {
   a->data.v = store->r_str(store);
   return AT_READ_OK;
 }
 
 void
-a_writestring(const attrib * a, struct storage * store)
+a_writestring(const attrib * a, const void * owner, struct storage * store)
 {
   assert(a->data.v);
   store->w_str(store, (const char *)a->data.v);

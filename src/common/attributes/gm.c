@@ -24,13 +24,13 @@
 #include <util/storage.h>
 
 static void
-write_gm(const attrib * a, struct storage * store)
+write_gm(const attrib * a, const void * owner, struct storage * store)
 {
   write_plane_reference((plane*)a->data.v, store);
 }
 
 static int
-read_gm(attrib * a, struct storage * store)
+read_gm(attrib * a, void * owner, struct storage * store)
 {
   plane * pl;
   int result = read_plane_reference(&pl, store);

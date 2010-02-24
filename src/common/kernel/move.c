@@ -135,7 +135,7 @@ shiptrail_age(attrib *a)
 }
 
 static int
-shiptrail_read(attrib *a, storage * store)
+shiptrail_read(attrib *a, void * owner, struct storage * store)
 {
 	traveldir *t = (traveldir *)(a->data.v);
 
@@ -146,7 +146,7 @@ shiptrail_read(attrib *a, storage * store)
 }
 
 static void
-shiptrail_write(const attrib *a, storage * store)
+shiptrail_write(const attrib * a, const void * owner, struct storage * store)
 {
   traveldir *t = (traveldir *)(a->data.v);
   store->w_int(store, t->no);
@@ -681,12 +681,7 @@ flying_ship(const ship * sh)
   static const curse_type * ct_flyingship;
 
   if (sh->type->flags & SFL_FLY) return true;
-  if (!init) {
-    ct_flyingship = ct_find("flyingship");
-    init = 1;
-  }
-  if (!ct_flyingship) return false;
-  if (curse_active(get_curse(sh->attribs, ct_flyingship))) return true;
+  if (sh->flags & SF_FLYING) return true;
   return false;
 }
 

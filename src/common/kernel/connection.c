@@ -594,7 +594,7 @@ read_borders(struct storage * store)
     if (type->read) type->read(b, store);
     if (store->version<NOBORDERATTRIBS_VERSION) {
       attrib * a = NULL;
-      int result = a_read(store, &a);
+      int result = a_read(store, &a, b);
       if (border_convert_cb) border_convert_cb(b, a);
       while (a) {
         a_remove(&a, a);

@@ -246,14 +246,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\spells.c"
-				>
-			</File>
-			<File
-				RelativePath=".\gamecode\spells.h"
-				>
-			</File>
-			<File
 				RelativePath=".\gamecode\spy.c"
 				>
 			</File>

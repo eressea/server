@@ -130,6 +130,21 @@ tolua_ship_tostring(lua_State *L)
   return 1;
 }
 
+static int tolua_ship_get_flags(lua_State* L)
+{
+  ship* self = (ship*) tolua_tousertype(L, 1, 0);
+  tolua_pushnumber(L, (lua_Number)self->flags);
+  return 1;
+}
+
+static int tolua_ship_set_flags(lua_State* L)
+{
+  ship* self = (ship*)tolua_tousertype(L, 1, 0);
+  self->flags = (int)tolua_tonumber(L, 2, 0);
+  return 0;
+}
+
+
 void
 tolua_ship_open(lua_State* L)
 {
@@ -146,13 +161,13 @@ tolua_ship_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "id", tolua_ship_get_id, NULL);
       tolua_variable(L, TOLUA_CAST "name", tolua_ship_get_name, tolua_ship_set_name);
       tolua_variable(L, TOLUA_CAST "units", tolua_ship_get_units, NULL);
+      tolua_variable(L, TOLUA_CAST "flags", &tolua_ship_get_flags, tolua_ship_set_flags);
       tolua_variable(L, TOLUA_CAST "region", tolua_ship_get_region, tolua_ship_set_region);
 #ifdef TODO
       .property("type", &ship_gettype)
       .property("weight", &ship_getweight)
       .property("capacity", &ship_getcapacity)
       .property("maxsize", &ship_maxsize)
-      .property("region", &ship_getregion, &ship_setregion)
       .def_readwrite("damage", &ship::damage)
       .def_readwrite("size", &ship::size)
       .def_readwrite("coast", &ship::coast)

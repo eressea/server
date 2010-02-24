@@ -23,7 +23,7 @@
 #include <util/variant.h>
 
 static int
-read_follow(attrib * a, struct storage * store)
+read_follow(attrib * a, void * owner, struct storage * store)
 {
   read_unit_reference(store); /* skip it */
   return AT_READ_FAIL;

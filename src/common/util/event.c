@@ -133,7 +133,7 @@ free_handler(attrib * a) {
 }
 
 static void
-write_handler(const attrib * a, struct storage * store)
+write_handler(const attrib * a, const void * owner, struct storage * store)
 {
 	handler_info *hi = (handler_info*)a->data.v;
 	store->w_tok(store, hi->event);
@@ -141,7 +141,7 @@ write_handler(const attrib * a, struct storage * store)
 }
 
 static int
-read_handler(attrib * a, struct storage * store)
+read_handler(attrib * a, void * owner, struct storage * store)
 {
 	char zText[128];
 	handler_info *hi = (handler_info*)a->data.v;

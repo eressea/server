@@ -256,7 +256,7 @@ a_age(attrib ** p)
 }
 
 int
-a_read(struct storage * store, attrib ** attribs)
+a_read(struct storage * store, attrib ** attribs, void * owner)
 {
   int key, retval = AT_READ_OK;
   char zText[128];
@@ -275,7 +275,7 @@ a_read(struct storage * store, attrib ** attribs)
     }
     if (at->read) {
       attrib * na = a_new(at);
-      int i = at->read(na, store);
+      int i = at->read(na, owner, store);
       switch (i) {
         case AT_READ_OK:
           a_add(attribs, na);
@@ -300,7 +300,7 @@ a_read(struct storage * store, attrib ** attribs)
 }
 
 void
-a_write(struct storage * store, const attrib * attribs)
+a_write(struct storage * store, const attrib * attribs, const void * owner)
 {
   const attrib * na = attribs;
 
@@ -308,7 +308,7 @@ a_write(struct storage * store, const attrib * attribs)
     if (na->type->write) {
       assert(na->type->hashkey || !"attribute not registered");
       store->w_tok(store, na->type->name);
-      na->type->write(na, store);
+      na->type->write(na, owner, store);
       na = na->next;
     } else {
       na = na->nexttype;

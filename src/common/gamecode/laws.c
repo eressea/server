@@ -30,6 +30,7 @@
 
 /* gamecode includes */
 #include "economy.h"
+#include "archetype.h"
 #include "monster.h"
 #include "randenc.h"
 #include "spy.h"
@@ -85,6 +86,7 @@
 #include <util/umlaut.h>
 #include <util/message.h>
 #include <util/rng.h>
+#include <util/xml.h>
 
 #include <modules/xecmd.h>
 

@@ -85,3 +85,16 @@ function test_ship_capacity()
     assert_not_equal(r2.id, u4.region.id, "boat with too much cargo has moved")
 end
     
+function test_levitate()
+  local r = region.create(0,0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r, 2)
+  local s = ship.create(r, "boat")
+  u.ship = s
+  u:set_skill("sailing", 5)
+  u:add_item("money", 100)
+  levitate_ship(u.ship, u, 2, 1)
+  assert_equal(32, u.ship.flags)
+  process_orders()
+  assert_equal(0, u.ship.flags)
+end
