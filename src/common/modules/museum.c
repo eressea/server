@@ -69,7 +69,7 @@ a_finalizemuseumgivebackcookie(attrib *a)
 }
 
 static void
-a_writemuseumgivebackcookie(const attrib *a, storage * store)
+a_writemuseumgivebackcookie(const attrib * a, const void * owner, struct storage * store)
 {
   museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
   store->w_int(store, gbc->warden_no);
@@ -77,7 +77,7 @@ a_writemuseumgivebackcookie(const attrib *a, storage * store)
 }
 
 static int
-a_readmuseumgivebackcookie(attrib *a, storage * store)
+a_readmuseumgivebackcookie(attrib *a, void * owner, struct storage * store)
 {
   museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
   gbc->warden_no = store->r_int(store);
@@ -113,7 +113,7 @@ a_finalizemuseumgiveback(attrib *a)
 }
 
 static void
-a_writemuseumgiveback(const attrib *a, storage * store)
+a_writemuseumgiveback(const attrib * a, const void * owner, struct storage * store)
 {
 	museumgiveback *gb = (museumgiveback *)a->data.v;
 	store->w_int(store, gb->cookie);
@@ -121,7 +121,7 @@ a_writemuseumgiveback(const attrib *a, storage * store)
 }
 
 static int
-a_readmuseumgiveback(attrib *a, storage * store)
+a_readmuseumgiveback(attrib *a, void * owner, struct storage * store)
 {
 	museumgiveback *gb = (museumgiveback *)a->data.v;
 	gb->cookie = store->r_int(store);

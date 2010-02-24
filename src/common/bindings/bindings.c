@@ -45,7 +45,6 @@ without prior permission by the authors of Eressea.
 #include <gamecode/monster.h>
 #include <gamecode/market.h>
 
-#include <spells/spells.h>
 #include <modules/autoseed.h>
 #include <modules/score.h>
 #include <attributes/key.h>
@@ -467,6 +466,7 @@ tolua_equipment_setitem(lua_State * L)
   return 1;
 }
 
+#ifdef TODO_FOSS
 static int
 tolua_levitate_ship(lua_State * L)
 {
@@ -478,6 +478,7 @@ tolua_levitate_ship(lua_State * L)
   tolua_pushnumber(L, (lua_Number)cno);
   return 1;
 }
+#endif
 
 static int
 tolua_set_unitscript(lua_State * L)
@@ -1056,7 +1057,8 @@ tolua_eventbus_fire(lua_State * L)
 {
   void * sender = tolua_tousertype(L, 1, 0);
   const char * event = tolua_tostring(L, 2, 0);
-/*  eventbus_fire(sender, event, args); */
+  void * args = NULL;
+  eventbus_fire(sender, event, args);
   return 0;
 }
 
@@ -1187,8 +1189,10 @@ tolua_eressea_open(lua_State* L)
     tolua_function(L, TOLUA_CAST "set_race_brain", tolua_set_racescript);
     tolua_function(L, TOLUA_CAST "set_unit_brain", tolua_set_unitscript);
 
+#ifdef TODO_FOSS
     /* spells and stuff */
     tolua_function(L, TOLUA_CAST "levitate_ship", tolua_levitate_ship);
+#endif
 
     tolua_function(L, TOLUA_CAST "update_guards", tolua_update_guards);
 

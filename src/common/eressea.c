@@ -147,11 +147,6 @@ game_init(void)
   register_resources();
   register_buildings();
   register_itemfunctions();
-#ifdef TODO
-  register_curses();
-  register_spells();
-  register_gcspells();
-#endif
 #if DUNGEON_MODULE
   register_dungeon();
 #endif

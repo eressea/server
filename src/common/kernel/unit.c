@@ -408,7 +408,7 @@ ualias(const unit * u)
 }
 
 int
-a_readprivate(attrib * a, struct storage * store)
+a_readprivate(attrib * a, void * owner, struct storage * store)
 {
   a->data.v = store->r_str(store);
   if (a->data.v) return AT_READ_OK;
@@ -531,14 +531,14 @@ usettarget(unit * u, const unit * t)
 /*********************/
 
 void
-a_writesiege(const attrib * a, struct storage * store)
+a_writesiege(const attrib * a, const void * owner, struct storage * store)
 {
   struct building * b = (struct building*)a->data.v;
   write_building_reference(b, store);
 }
 
 int
-a_readsiege(attrib * a, struct storage * store)
+a_readsiege(attrib * a, void * owner, struct storage * store)
 {
   int result = read_reference(&a->data.v, store, read_building_reference, resolve_building);
   if (result==0 && !a->data.v) {

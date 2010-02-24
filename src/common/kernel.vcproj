@@ -603,66 +603,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="spells"
-			>
-			<File
-				RelativePath=".\spells\alp.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\alp.h"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\buildingcurse.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\buildingcurse.h"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\combatspells.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\combatspells.h"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\regioncurse.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\regioncurse.h"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\shipcurse.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\shipcurse.h"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\spells.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\spells.h"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\unitcurse.c"
-				>
-			</File>
-			<File
-				RelativePath=".\spells\unitcurse.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="items"
 			>
 			<File

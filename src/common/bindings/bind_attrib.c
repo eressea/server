@@ -152,7 +152,7 @@ write_ext_i(lua_State * L, const char * name, bson_buffer * bb)
 }
 
 static void
-write_ext(const attrib * a, struct storage * store) {
+write_ext(const attrib * a, const void * owner, struct storage * store) {
   lua_State * L = (lua_State *)global.vm_state;
   if (a->data.i>0) {
     int handle = a->data.i;
@@ -279,7 +279,7 @@ resolve_bson(variant data, void * address)
 }
 
 static int
-read_ext(attrib * a, struct storage * store) {
+read_ext(attrib * a, void * owner, struct storage * store) {
   variant data;
   int len = store->r_int(store);
   data.v = bson_malloc(len);

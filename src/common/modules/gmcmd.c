@@ -67,17 +67,17 @@ mistake(const unit * u, struct order * ord, const char *comment)
 }
 
 static void
-write_permissions(const attrib * a, struct storage * store)
+write_permissions(const attrib * a, const void * owner, struct storage * store)
 {
-  a_write(store, (attrib*)a->data.v);
+  a_write(store, (attrib*)a->data.v, owner);
 }
 
 static int
-read_permissions(attrib * at, struct storage * store)
+read_permissions(attrib * a, void * owner, struct storage * store)
 {
   attrib * attr = NULL;
-  a_read(store, &attr);
-  at->data.v = attr;
+  a_read(store, &attr, NULL);
+  a->data.v = attr;
   return AT_READ_OK;
 }
 
@@ -99,7 +99,7 @@ make_atpermissions(void)
  **/
 
 static void
-write_gmcreate(const attrib * a, struct storage * store)
+write_gmcreate(const attrib * a, const void * owner, struct storage * store)
 {
   const item_type * itype = (const item_type *)a->data.v;
   assert(itype);
@@ -107,7 +107,7 @@ write_gmcreate(const attrib * a, struct storage * store)
 }
 
 static int
-read_gmcreate(attrib * a, struct storage * store)
+read_gmcreate(attrib * a, void * owner, struct storage * store)
 {
   char zText[32];
   store->r_tok_buf(store, zText, sizeof(zText));

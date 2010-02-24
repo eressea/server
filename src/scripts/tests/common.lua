@@ -566,3 +566,4 @@ function test_building_other()
   process_orders()
   assert_not_equal(10, b.size)
 end
+

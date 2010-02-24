@@ -115,7 +115,7 @@ MagicPower(void)
 }
 
 static int
-a_readicastle(attrib * a, struct storage * store)
+a_readicastle(attrib * a, void * owner, struct storage * store)
 {
   icastle_data * data = (icastle_data*)a->data.v;
   variant bno;
@@ -133,7 +133,7 @@ a_readicastle(attrib * a, struct storage * store)
 }
 
 static void
-a_writeicastle(const attrib * a, struct storage * store)
+a_writeicastle(const attrib * a, const void * owner, struct storage * store)
 {
   icastle_data * data = (icastle_data*)a->data.v;
   store->w_tok(store, data->type->_name);
@@ -231,7 +231,7 @@ void read_spellist(struct spell_list ** slistp, magic_t mtype, struct storage * 
 }
 
 static int
-read_mage(attrib * a, struct storage * store)
+read_mage(attrib * a, void * owner, struct storage * store)
 {
   int i, mtype;
   sc_mage * mage = (sc_mage*)a->data.v;
@@ -285,7 +285,7 @@ void write_spelllist(const spell_list * slist, struct storage * store)
 }
 
 static void
-write_mage(const attrib * a, struct storage * store)
+write_mage(const attrib * a, const void * owner, struct storage * store)
 {
   int i;
   sc_mage *mage = (sc_mage*)a->data.v;
@@ -336,7 +336,7 @@ get_mage(const unit * u)
 
 
 static int
-read_seenspell(attrib * a, struct storage * store)
+read_seenspell(attrib * a, void * owner, struct storage * store)
 {
   int i;
   spell * sp = NULL;
@@ -360,7 +360,7 @@ read_seenspell(attrib * a, struct storage * store)
 }
 
 static void
-write_seenspell(const attrib * a, struct storage * store)
+write_seenspell(const attrib * a, const void * owner, struct storage * store)
 {
   const spell * sp = (const spell*)a->data.v;
   store->w_tok(store, sp->sname);
@@ -2130,7 +2130,7 @@ is_familiar(const unit *u)
 }
 
 static void
-a_write_unit(const attrib * a, struct storage * store)
+a_write_unit(const attrib * a, const void * owner, struct storage * store)
 {
   unit * u = (unit*)a->data.v;
   write_unit_reference(u, store);
@@ -2260,7 +2260,7 @@ resolve_familiar(variant data, void * addr)
 }
 
 static int
-read_familiar(attrib * a, struct storage * store)
+read_familiar(attrib * a, void * owner, struct storage * store)
 {
   int result = read_reference(&a->data.v, store, read_unit_reference, resolve_familiar);
   if (result==0 && a->data.v==NULL) {
@@ -2339,7 +2339,7 @@ resolve_clone(variant data, void * addr)
 }
 
 static int
-read_clone(attrib * a, struct storage * store)
+read_clone(attrib * a, void * owner, struct storage * store)
 {
   int result = read_reference(&a->data.v, store, read_unit_reference, resolve_clone);
   if (result==0 && a->data.v==NULL) {
@@ -2367,7 +2367,7 @@ resolve_mage(variant data, void * addr)
 }
 
 static int
-read_magician(attrib * a, struct storage * store)
+read_magician(attrib * a, void * owner, struct storage * store)
 {
   int result = read_reference(&a->data.v, store, read_unit_reference, resolve_mage);
   if (result==0 && a->data.v==NULL) {

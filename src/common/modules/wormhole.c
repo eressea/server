@@ -102,7 +102,7 @@ wormhole_age(struct attrib * a)
 }
 
 static void
-wormhole_write(const struct attrib * a, storage * store)
+wormhole_write(const struct attrib * a, const void * owner, struct storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
   write_building_reference(data->entry, store);
@@ -124,7 +124,7 @@ resolve_exit(variant id, void * address)
 }
 
 static int
-wormhole_read(struct attrib * a, storage * store)
+wormhole_read(struct attrib * a, void * owner, struct storage * store)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
   resolve_fun resolver = (store->version<UIDHASH_VERSION)?resolve_exit:resolve_region_id;

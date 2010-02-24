@@ -27,14 +27,14 @@
 
 
 void 
-write_of(const struct attrib * a, struct storage * store)
+write_of(const struct attrib * a, const void * owner, struct storage * store)
 {
   const faction * f = (faction*)a->data.v;
   store->w_int(store, f->no);
 }
 
 int
-read_of(struct attrib * a, struct storage * store) /* return 1 on success, 0 if attrib needs removal */
+read_of(struct attrib * a, void * owner, struct storage * store) /* return 1 on success, 0 if attrib needs removal */
 {
   int of = store->r_int(store);
   a->data.v = findfaction(of);

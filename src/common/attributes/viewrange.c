@@ -24,14 +24,14 @@
 #include <assert.h>
 
 static void 
-a_writefunction(const struct attrib * a, storage * store)
+a_writefunction(const struct attrib * a, const void * owner, struct storage * store)
 {
   const char * str = get_functionname((pf_generic)a->data.f);
   store->w_tok(store, str);
 }
 
 static int 
-a_readfunction(struct attrib *a, storage * store)
+a_readfunction(struct attrib *a, void * owner, struct storage * store)
 /* return 1 on success, 0 if attrib needs removal */
 {
 	char buf[64];

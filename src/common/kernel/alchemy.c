@@ -262,7 +262,7 @@ a_finalizeeffect(attrib * a)
 }
 
 static void
-a_writeeffect(const attrib *a, storage * store)
+a_writeeffect(const attrib * a, const void * owner, struct storage * store)
 {
   effect_data * edata = (effect_data*)a->data.v;
     store->w_tok(store, resourcename(edata->type->itype->rtype, 0));
@@ -270,7 +270,7 @@ a_writeeffect(const attrib *a, storage * store)
 }
 
 static int
-a_readeffect(attrib *a, storage * store)
+a_readeffect(attrib *a, void * owner, struct storage * store)
 {
   int power;
   const item_type * itype;

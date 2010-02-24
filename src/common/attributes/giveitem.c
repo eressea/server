@@ -39,7 +39,7 @@ typedef struct give_data {
 } give_data;
 
 static void
-a_writegive(const attrib * a, struct storage * store)
+a_writegive(const attrib * a, const void * owner, struct storage * store)
 {
 	give_data * gdata = (give_data*)a->data.v;
 	item * itm;
@@ -52,7 +52,7 @@ a_writegive(const attrib * a, struct storage * store)
 }
 
 static int
-a_readgive(attrib * a, struct storage * store)
+a_readgive(attrib * a, void * owner, struct storage * store)
 {
   give_data * gdata = (give_data*)a->data.v;
   variant var;

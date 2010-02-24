@@ -20,13 +20,13 @@
 #include <util/storage.h>
 
 static void
-write_movement(const attrib * a, struct storage * store)
+write_movement(const attrib * a, const void * owner, struct storage * store)
 {
 	store->w_int(store, a->data.i);
 }
 
 static int
-read_movement(attrib * a, struct storage * store)
+read_movement(attrib * a, void * owner, struct storage * store)
 {
   a->data.i = store->r_int(store);
   if (a->data.i !=0 ) return AT_READ_OK;

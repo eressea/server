@@ -197,16 +197,6 @@ typedef struct curse {
 
 #define c_flags(c) ((c)->type->flags ^ (c)->flags)
 
-/* Die Unterattribute curse->data: */
-/* Einheitenzauber:
- * auf Einzelpersonen in einer Einheit bezogene Zauber. Für Zauber, die
- * nicht immer auf ganze Einheiten wirken brauchen
- */
-typedef struct curse_unit {
-  int cursedmen;        /* verzauberte Personen in der Einheit */
-} curse_unit;
-
-
 /* ------------------------------------------------------------- */
 
 typedef struct curse_type {
@@ -216,15 +206,15 @@ typedef struct curse_type {
   unsigned int mergeflags;
   struct message * (*curseinfo)(const void*, typ_t, const struct curse*, int);
   void (*change_vigour)(curse*, double);
-  int (*read)(struct storage * store, curse * c);
-  int (*write)(struct storage * store, const struct curse * c);
+  int (*read)(struct storage * store, curse * c, void * target);
+  int (*write)(struct storage * store, const struct curse * c, const void * target);
   int (*cansee)(const struct faction*, const void*, typ_t, const struct curse *, int);
   int (*age)(curse *);
 } curse_type;
 
 extern struct attrib_type at_curse;
-extern void curse_write(const struct attrib * a, struct storage * store);
-extern int curse_read(struct attrib * a, struct storage * store);
+void curse_write(const struct attrib * a, const void * owner, struct storage * store);
+int curse_read(struct attrib * a, void * owner, struct storage * store);
 
 
 /* ------------------------------------------------------------- */
@@ -269,7 +259,7 @@ extern double curse_geteffect(const struct curse * c);
 extern double curse_changevigour(struct attrib **ap, curse * c, double i);
   /* verändert die Stärke der Verzauberung um i */
 
-extern int get_cursedmen(struct unit *u, struct curse *c);
+extern int get_cursedmen(struct unit *u, const struct curse *c);
   /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
    * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 

@@ -127,13 +127,14 @@ curse_age(attrib * a)
   curse * c = (curse*)a->data.v;
   int result = 0;
 
+  if (c_flags(c) & CURSE_NOAGE) {
+    c->duration = INT_MAX;
+  }
   if (c->type->age) {
     result = c->type->age(c);
   }
   if (result!=0) {
     c->duration = 0;
-  } else if (c_flags(c) & CURSE_NOAGE) {
-    c->duration = 1;
   } else if (c->duration!=INT_MAX) {
     c->duration = MAX(0, c->duration-1);
   }
@@ -183,7 +184,7 @@ read_ccompat(const char * cursename, struct storage * store)
 }
 
 int
-curse_read(attrib * a, struct storage * store)
+curse_read(attrib * a, void * owner, struct storage * store)
 {
   curse * c = (curse*)a->data.v;
   int ur;
@@ -227,12 +228,9 @@ curse_read(attrib * a, struct storage * store)
   }
   c_clearflag(c, CURSE_ISNEW);
   
-  if (c->type->read) c->type->read(store, c);
+  if (c->type->read) c->type->read(store, c, owner);
   else if (c->type->typ==CURSETYP_UNIT) {
-    curse_unit * cc = calloc(1, sizeof(curse_unit));
-    
-    c->data.v = cc;
-    cc->cursedmen = store->r_int(store);
+    c->data.i = store->r_int(store);
   }
   if (c->type->typ == CURSETYP_REGION) {
     int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
@@ -245,7 +243,7 @@ curse_read(attrib * a, struct storage * store)
 }
 
 void
-curse_write(const attrib * a, struct storage * store)
+curse_write(const attrib * a, const void * owner, struct storage * store)
 {
   unsigned int flags;
   curse * c = (curse*)a->data.v;
@@ -263,10 +261,9 @@ curse_write(const attrib * a, struct storage * store)
   write_unit_reference(mage, store);
   store->w_flt(store, (float)c->effect);
 
-  if (c->type->write) c->type->write(store, c);
+  if (c->type->write) c->type->write(store, c, owner);
   else if (c->type->typ == CURSETYP_UNIT) {
-    curse_unit * cc = (curse_unit*)c->data.v;
-    store->w_int(store, cc->cursedmen);
+    store->w_int(store, c->data.i);
   }
   if (c->type->typ == CURSETYP_REGION) {
     write_region_reference((region*)c->data.v, store);
@@ -469,7 +466,7 @@ set_curseingmagician(struct unit *magician, struct attrib *ap_target, const curs
 /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
  * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 int
-get_cursedmen(unit *u, curse *c)
+get_cursedmen(unit *u, const curse *c)
 {
   int cursedmen = u->number;
 
@@ -477,8 +474,7 @@ get_cursedmen(unit *u, curse *c)
 
   /* je nach curse_type andere data struct */
   if (c->type->typ == CURSETYP_UNIT) {
-    curse_unit * cc = (curse_unit*)c->data.v;
-    cursedmen = cc->cursedmen;
+    cursedmen = c->data.i;
   }
 
   return MIN(u->number, cursedmen);
@@ -492,8 +488,7 @@ set_cursedmen(curse *c, int cursedmen)
 
   /* je nach curse_type andere data struct */
   if (c->type->typ == CURSETYP_UNIT) {
-    curse_unit * cc = (curse_unit*)c->data.v;
-    cc->cursedmen = cursedmen;
+    c->data.i = cursedmen;
   }
 }
 
@@ -528,9 +523,7 @@ make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
 
     case CURSETYP_UNIT:
     {
-      curse_unit *cc = calloc(1, sizeof(curse_unit));
-      cc->cursedmen += men;
-      c->data.v = cc;
+      c->data.i = men;
       break;
     }
 
@@ -582,8 +575,7 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
       switch (ct->typ) {
         case CURSETYP_UNIT:
         {
-          curse_unit * cc = (curse_unit*)c->data.v;
-          cc->cursedmen += men;
+          c->data.i += men;
         }
       }
     }
@@ -602,20 +594,9 @@ static void
 do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 {
   int cursedmen = 0;
-  int men = 0;
+  int men = get_cursedmen(u, c);
   boolean dogive = false;
   const curse_type *ct = c->type;
-
-  switch (ct->typ) {
-    case CURSETYP_UNIT:
-    {
-      curse_unit * cc = (curse_unit*)c->data.v;
-      men = cc->cursedmen;
-      break;
-    }
-    default:
-      cursedmen = u->number;
-  }
 
   switch ((ct->flags | c->flags) & CURSE_SPREADMASK) {
     case CURSE_SPREADALWAYS:

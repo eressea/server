@@ -29,7 +29,6 @@
 #include <gamecode/monster.c>
 #include <gamecode/randenc.c>
 #include <gamecode/report.c>
-// #include <gamecode/spells.c>
 #include <gamecode/spy.c>
 #include <gamecode/study.c>
 #include <gamecode/summary.c>
@@ -69,14 +68,6 @@
 #include <items/seed.c>
 #include <items/weapons.c>
 #include <items/xerewards.c>
-
-#include <spells/alp.c>
-#include <spells/buildingcurse.c>
-// #include <spells/combatspells.c>
-#include <spells/regioncurse.c>
-#include <spells/shipcurse.c>
-// #include <spells/spells.c>
-#include <spells/unitcurse.c>
 
 #include <triggers/changefaction.c>
 #include <triggers/changerace.c>

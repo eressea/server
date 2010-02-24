@@ -16,6 +16,8 @@
 #include <lua.h>
 #include <tolua.h>
 
+#include <assert.h>
+
 #define E_OK 0
 #define E_INVALID_MESSAGE 1
 #define E_INVALID_PARAMETER_NAME 2
