@@ -297,7 +297,7 @@ static struct curse_type ct_magicresistance = {
  */
 
 static int
-read_skill(struct storage * store, void * target, curse * c)
+read_skill(struct storage * store, curse * c, void * target)
 {
   int skill;
   if (store->version<CURSETYPE_VERSION) {
@@ -312,7 +312,7 @@ read_skill(struct storage * store, void * target, curse * c)
 }
 
 static int
-write_skill(struct storage * store, const void * target, const curse * c)
+write_skill(struct storage * store, const curse * c, const void * target)
 {
   store->w_int(store, c->data.i);
   return 0;
