@@ -567,3 +567,7 @@ function test_building_other()
   assert_not_equal(10, b.size)
 end
 
+function test_config()
+  assert_not_equal(nil, config.basepath)
+  assert_not_equal(nil, config.locales)
+end

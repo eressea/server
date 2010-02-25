@@ -33,7 +33,7 @@ function run_turn()
     set_turn(turn)
   end
 
-  orderfile = orderfile or basepath .. '/orders.' .. turn
+  orderfile = orderfile or config.basepath .. '/orders.' .. turn
   print("executing turn " .. get_turn() .. " with " .. orderfile)
   local result = process(orderfile)
   if result==0 then

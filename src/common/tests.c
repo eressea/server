@@ -1,13 +1,15 @@
 #include <external/cutest/CuTest.h>
 #include <stdio.h>
 
-CuSuite* get_base36_suite();
+CuSuite* get_base36_suite(void);
+CuSuite* get_curse_suite(void);
 
 void RunAllTests(void) {
   CuString *output = CuStringNew();
   CuSuite* suite = CuSuiteNew();
 
   CuSuiteAddSuite(suite, get_base36_suite());
+  CuSuiteAddSuite(suite, get_curse_suite());
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);

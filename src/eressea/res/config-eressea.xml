@@ -22,6 +22,7 @@
   <xi:include href="eressea:///core/common/buildings.xml"/>
   <xi:include href="eressea:///core/equipment.xml"/>
   <xi:include href="eressea:///core/terrains.xml"/>
+  <xi:include href="eressea/terrains.xml"/>
   <xi:include href="directions.xml"/>
   <xi:include href="artrewards.xml"/>
   <xi:include href="buildings.xml"/>

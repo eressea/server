@@ -1083,6 +1083,10 @@ parse_inifile(lua_State* L, dictionary * d, const char * section)
       lua_rawset(L,-3);
     }
   }
+  /* special case */
+  lua_pushstring(L, "basepath");
+  lua_pushstring(L, basepath());
+  lua_rawset(L,-3);
 }
 
 int

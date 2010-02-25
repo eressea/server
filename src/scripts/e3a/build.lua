@@ -123,7 +123,7 @@ function fill(pl, w, h)
 end
 
 function seed()
-  local input = io.open(basepath .. "/parteien.txt")
+  local input = io.open(config.basepath .. "/parteien.txt")
   for f in factions() do
     if f.race=="vampunicorn" then
       local str = input:read("*line")

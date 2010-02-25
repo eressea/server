@@ -310,7 +310,7 @@ enum {
 enum {
   RC_DWARF,    /* 0 - Zwerg */
   RC_ELF,
-  RC_GOBLIN,
+  RC_GOBLIN = 3,
   RC_HUMAN,
 
   RC_TROLL,

@@ -46,7 +46,7 @@ function process(orders)
   change_locales()
 
   -- use newfactions file to place out new players
-  autoseed(basepath .. "/newfactions", false)
+  autoseed(config.basepath .. "/newfactions", false)
 
   write_files(locales)
 
