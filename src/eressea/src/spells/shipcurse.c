@@ -97,9 +97,9 @@ static int flyingship_age(curse * c) {
   ship * sh = (ship *)c->data.v;
   if (sh && c->duration==1) {
     freset(sh, SF_FLYING);
-    return AT_AGE_REMOVE;
+    return 1;
   }
-  return AT_AGE_KEEP;
+  return 0;
 }
 
 static struct curse_type ct_flyingship = { "flyingship",
@@ -127,6 +127,7 @@ shipcurse_flyingship(ship* sh, unit * mage, double power, int duration)
   } else {
     /* mit C_SHIP_NODRIFT haben wir kein Problem */
     curse * c = create_curse(mage, &sh->attribs, ct_flyingship, power, duration, 0.0, 0);
+    c->data.v = sh;
     if (c && c->duration>0) {
       sh->flags |= SF_FLYING;
     }

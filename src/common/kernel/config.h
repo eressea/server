@@ -187,7 +187,6 @@ extern keyword_t findkeyword(const char *s, const struct locale * lang);
 extern param_t findparam(const char *s, const struct locale * lang);
 extern param_t getparam(const struct locale * lang);
 
-extern int atoi36(const char * s);
 extern int getid(void);
 #define unitid(x) itoa36((x)->no)
 

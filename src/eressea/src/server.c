@@ -11,3 +11,4 @@
 #include "spells/unitcurse.c"
 
 #include "main.c"
+#include "bindings.c"
