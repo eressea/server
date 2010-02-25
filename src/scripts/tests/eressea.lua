@@ -101,3 +101,19 @@ function test_levitate()
   process_orders()
   assert_equal(0, u.ship.flags)
 end
+
+function test_terrains()
+  local terrains = { "hell", "wall1", "corridor1" }
+  for k,v in ipairs(terrains) do
+    local r = region.create(k, k, v)
+    assert_not_equal(nil, r)
+  end
+end
+
+function test_races()
+  local races = { "wolf", "orc", "human", "demon" }
+  for k,v in ipairs(races) do
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    assert_not_equal(nil, f)
+  end
+end

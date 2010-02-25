@@ -1,6 +1,7 @@
+#include <platform.h>
 #include <external/cutest/CuTest.h>
 
-#include "base36.c"
+#include "base36.h"
 
 static void test_atoi36(CuTest * tc) {
   CuAssertIntEquals(tc, 0, atoi36("0"));
@@ -20,7 +21,7 @@ static void test_itoa36(CuTest * tc) {
   CuAssertStrEquals(tc, itoa36(666), "ii");
 }
 
-CuSuite* get_base36_suite()
+CuSuite* get_base36_suite(void)
 {
   CuSuite* suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_itoa36);

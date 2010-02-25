@@ -81,8 +81,4 @@
         <resource name="stone" chance="0.5" level="1" base="100" div="100" />
         <resource name="laen" chance="0.075" level="1" base="4" div="100" />
     </terrain>
-    <!-- used for the museum only -->
-    <terrain name="hall1" fly="no" size="0" />
-    <terrain name="corridor1" fly="no" size="0" />
-    <terrain name="wall1" sail="no" walk="no" fly="no" forbidden="yes" size="0" />
 </terrains>

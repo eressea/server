@@ -145,10 +145,6 @@ void
 destroy_curse(curse * c)
 {
   cunhash(c);
-
-  if (c->data.v && c->type && c->type->typ == CURSETYP_UNIT) {
-    free(c->data.v);
-  }
   free(c);
 }
 

@@ -12,12 +12,12 @@ end
 
 function dbupdate()
   update_scores()
-  edb = db.open(basepath.."/eressea.db")
+  edb = db.open(config.basepath.."/eressea.db")
   if edb~=nil then
     edb:update_factions()
     edb:update_scores()
   else
-    print("could no open "..basepath.."/eressea.db")
+    print("could no open "..config.basepath.."/eressea.db")
   end
 end
 
@@ -47,7 +47,7 @@ function write_emails(locales)
   local locale
   local file
   for key, locale in pairs(locales) do
-    files[locale] = io.open(basepath .. "/emails." .. locale, "w")
+    files[locale] = io.open(config.basepath .. "/emails." .. locale, "w")
   end
 
   local faction
@@ -66,7 +66,7 @@ function write_addresses()
   local file
   local faction
 
-  file = io.open(basepath .. "/adressen", "w")
+  file = io.open(config.basepath .. "/adressen", "w")
   for faction in factions() do
     -- print(faction.id .. " - " .. faction.locale)
     file:write(tostring(faction) .. ":" .. faction.email .. ":" .. faction.info .. "\n")
@@ -79,7 +79,7 @@ function write_aliases()
   local file
   local faction
 
-  file = io.open(basepath .. "/aliases", "w")
+  file = io.open(config.basepath .. "/aliases", "w")
   for faction in factions() do
     local unit
     if faction.email ~= "" then
