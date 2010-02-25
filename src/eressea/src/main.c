@@ -216,6 +216,8 @@ void locale_init(void)
   assert(towlower(0xC4)==0xE4); /* &Auml; => &auml; */
 }
 
+extern void bind_eressea(struct lua_State * L);
+
 int main(int argc, char ** argv)
 {
   static int write_csv = 0;
@@ -243,6 +245,7 @@ int main(int argc, char ** argv)
   }
   register_curses();
   register_spells();
+  bind_eressea((struct lua_State *)global.vm_state);
 
   if (write_csv) {
     write_skills();

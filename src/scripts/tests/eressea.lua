@@ -91,8 +91,11 @@ function test_levitate()
   local u = unit.create(f, r, 2)
   local s = ship.create(r, "boat")
   u.ship = s
+  u.age = 20
   u:set_skill("sailing", 5)
   u:add_item("money", 100)
+  u:clear_orders()
+  u:add_order("ARBEITE")
   levitate_ship(u.ship, u, 2, 1)
   assert_equal(32, u.ship.flags)
   process_orders()

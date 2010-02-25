@@ -25,7 +25,7 @@ end
 
 module( "common", package.seeall, lunit.testcase )
 
-function test_eventbus_fire()
+function DISABLE_test_eventbus_fire()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)

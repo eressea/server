@@ -1,17 +1,20 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "kernel", "common\kernel.vcproj", "{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel", "common\kernel.vcproj", "{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}"
 EndProject
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "gamecode", "common\gamecode.vcproj", "{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamecode", "common\gamecode.vcproj", "{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
 EndProject
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "util", "common\util.vcproj", "{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "common\util.vcproj", "{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}"
 EndProject
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "lua-bindings", "common\lua-bindings.vcproj", "{75501170-51C2-E641-BA8B-EDC008184192}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua-bindings", "common\lua-bindings.vcproj", "{75501170-51C2-E641-BA8B-EDC008184192}"
 EndProject
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "external", "external\external.vcproj", "{F9AE4586-8F65-486B-9666-744839E40A54}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "external", "external\external.vcproj", "{F9AE4586-8F65-486B-9666-744839E40A54}"
 EndProject
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "amalgamation-eressea", "eressea\eressea.vcproj", "{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
-Project("{228B8781-480F-4608-BA14-1EB82581EADE}") = "amalgamation-basic", "basic\basic.vcproj", "{4A17DAEE-2261-4E2C-96F6-BA4132A09551}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "amalgamation-eressea", "eressea\eressea.vcproj", "{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "amalgamation-basic", "basic\basic.vcproj", "{4A17DAEE-2261-4E2C-96F6-BA4132A09551}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "common\tests.vcproj", "{228B8781-480F-4608-BA14-1EB82581EADE}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
@@ -29,9 +32,6 @@ Global
 		{1E8BFF9E-3044-0742-992F-C5765B80FE65}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1E8BFF9E-3044-0742-992F-C5765B80FE65}.Release|Win32.ActiveCfg = Release|Win32
 		{1E8BFF9E-3044-0742-992F-C5765B80FE65}.Release|Win32.Build.0 = Release|Win32
-		{D893D6B3-805D-9848-8EA4-CDA1B79151F6}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D893D6B3-805D-9848-8EA4-CDA1B79151F6}.Release|Win32.ActiveCfg = Release|Win32
-		{D893D6B3-805D-9848-8EA4-CDA1B79151F6}.Release|Win32.Build.0 = Release|Win32
 		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Release|Win32.ActiveCfg = Release|Win32
 		{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}.Release|Win32.Build.0 = Release|Win32
@@ -47,6 +47,10 @@ Global
 		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.Build.0 = Debug|Win32
 		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Release|Win32.ActiveCfg = Release|Win32
+		{228B8781-480F-4608-BA14-1EB82581EADE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{228B8781-480F-4608-BA14-1EB82581EADE}.Debug|Win32.Build.0 = Debug|Win32
+		{228B8781-480F-4608-BA14-1EB82581EADE}.Release|Win32.ActiveCfg = Release|Win32
+		{228B8781-480F-4608-BA14-1EB82581EADE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

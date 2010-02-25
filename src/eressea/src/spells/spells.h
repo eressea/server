@@ -24,7 +24,6 @@ extern "C" {
 
   extern void register_spells(void);
 
-  int levitate_ship(struct ship * sh, struct unit * mage, double power, int duration);
   void set_spelldata(struct spell * sp);
 
 #ifdef __cplusplus

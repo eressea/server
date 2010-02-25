@@ -183,7 +183,6 @@
     <function name="wage" value="minimum_wage"/>
   </rules>
   <xi:include href="eressea/strings.xml"/>
-  <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/artrewards.xml"/>
   <strings>
