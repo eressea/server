@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <resources xmlns:xi="http://www.w3.org/2001/XInclude">
-  <!-- this file contains a lot of weapons -->
   <xi:include href="../weapons/axe.xml"/>
   <xi:include href="../weapons/bow.xml"/>
   <xi:include href="../weapons/catapult.xml"/>
