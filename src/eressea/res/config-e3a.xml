@@ -6,6 +6,7 @@
   <xi:include href="eressea:///core/de/strings.xml"/>
   <xi:include href="eressea:///core/en/strings.xml"/>
 
+  <xi:include href="eressea:///core/common/items.xml"/>
   <xi:include href="eressea:///core/common/herbs.xml" />
   <xi:include href="eressea:///core/spoils.xml"/>
   <xi:include href="eressea:///core/prefixes.xml"/>
@@ -174,8 +175,6 @@
   <rules>
     <function name="wage" value="minimum_wage"/>
   </rules>
-  <xi:include href="eressea/strings.xml"/>
-  <xi:include href="eressea/items.xml"/>
   <strings>
     <string name="mailto">
       <text locale="de">eressea-server@eressea.de</text>

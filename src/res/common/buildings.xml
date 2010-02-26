@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <buildings>
-  <building name="temple" maxsize="50" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes" auraregen="1.00" />
   <building name="wormhole" maxsize="4" capacity="1" maxcapacity="4" nobuild="yes" nodestroy="yes" unique="yes" />
-  <building name="portal" maxsize="2" capacity="1" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes" />
-  <building name="pavilion" maxsize="2" capacity="1" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes" />
   <building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild="yes"/>
   <building name="xmas_exit" maxsize="10" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes"/>
   <building name="caldera" capacity="1" nodestroy="yes" nobuild="yes"/>

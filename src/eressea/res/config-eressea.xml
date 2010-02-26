@@ -5,7 +5,7 @@
   <!-- Localization -->
   <xi:include href="eressea:///core/de/strings.xml"/>
   <xi:include href="eressea:///core/en/strings.xml"/>
-  <xi:include href="spellinfo.xml" />
+  <xi:include href="eressea/spellinfo.xml" />
 
   <xi:include href="eressea:///core/common/items.xml" />
   <xi:include href="eressea:///core/common/armor.xml" />
@@ -15,7 +15,6 @@
   <xi:include href="eressea:///core/common/herbs.xml" />
   <xi:include href="eressea:///core/common/potions.xml" />
   <xi:include href="eressea:///core/spoils.xml"/>
-  <xi:include href="races.xml"/>
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea:///core/prefixes.xml"/>
   <xi:include href="eressea:///core/ships.xml"/>
@@ -24,14 +23,14 @@
   <xi:include href="eressea:///core/terrains.xml"/>
   <xi:include href="eressea/terrains.xml"/>
   <xi:include href="directions.xml"/>
-  <xi:include href="artrewards.xml"/>
-  <xi:include href="buildings.xml"/>
+  <xi:include href="eressea/artrewards.xml"/>
+  <xi:include href="eressea/buildings.xml"/>
   <xi:include href="eressea:///core/calendar.xml"/>
   <calendar name="secondage" newyear="month_1" start="184"/>
-  <xi:include href="equipment.xml"/>
-  <xi:include href="items.xml"/>
-  <xi:include href="spells.xml"/>
-  <xi:include href="strings.xml"/>
+  <xi:include href="eressea/equipment.xml"/>
+  <xi:include href="eressea/items.xml"/>
+  <xi:include href="eressea/spells.xml"/>
+  <xi:include href="eressea/strings.xml"/>
   <equipment>
     <set name="first_unit">
       <item name="conquesttoken" amount="1"/>

@@ -91,18 +91,6 @@
     <item weight="500" score="300"/>
   </resource>
 
-  <resource name="seed" limited="yes">
-    <item weight="10" score="50">
-      <construction skill="herbalism" minskill="3" reqsize="1"/>
-    </item>
-  </resource>
-
-  <resource name="mallornseed" limited="yes">
-    <item weight="10" score="100">
-      <construction skill="herbalism" minskill="4" reqsize="1"/>
-    </item>
-  </resource>
-
 <!-- XE items -->
   <resource name="skillpotion">
     <!-- gives user one free learning attempt -->
