@@ -13,9 +13,10 @@ without prior permission by the authors of Eressea.
 #include "helpers.h"
 #include <platform.h>
 
+#include <util/attrib.h>
+#include <util/base36.h>
 #include <util/functions.h>
 #include <util/log.h>
-#include <util/attrib.h>
 
 #include <kernel/config.h>
 #include <kernel/equipment.h>

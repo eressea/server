@@ -2,8 +2,8 @@
 #include <platform.h>
 #include "stdafx.h"
 
-#include <external/iniparser/iniparser.c>
-#include <external/mt19937ar.c>
+#include <iniparser/iniparser.c>
+#include <mt19937ar.c>
 
 #include <util/console.c>
 #include <util/attrib.c>

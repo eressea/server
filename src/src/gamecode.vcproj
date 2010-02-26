@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="lua-bindings"
-	ProjectGUID="{75501170-51C2-E641-BA8B-EDC008184192}"
-	RootNamespace="lua-bindings"
+	Name="gamecode"
+	ProjectGUID="{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
+	RootNamespace="gamecode"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug/lua-bindings"
-			IntermediateDirectory="Debug/lua-bindings"
+			OutputDirectory="Debug/gamecode"
+			IntermediateDirectory="Debug/gamecode"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;../common;../external"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -59,14 +59,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
-				AdditionalIncludeDirectories="..;../common"
+				AdditionalIncludeDirectories="..;."
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/lua-bindings.lib"
+				OutputFile="$(OutDir)/gamecode.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -86,8 +86,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release/lua-bindings"
-			IntermediateDirectory="Release/lua-bindings"
+			OutputDirectory="Release/gamecode"
+			IntermediateDirectory="Release/gamecode"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -109,7 +109,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories="..;../common;../external"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -125,14 +125,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				AdditionalIncludeDirectories="..;../common"
+				AdditionalIncludeDirectories="..;."
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/lua-bindings.lib"
+				OutputFile="$(OutDir)/gamecode.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -155,117 +155,191 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			Name="gamecode"
 			>
 			<File
-				RelativePath=".\bindings\bind_attrib.c"
+				RelativePath=".\gamecode\archetype.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_building.c"
+				RelativePath=".\gamecode\archetype.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_faction.c"
+				RelativePath=".\gamecode\creation.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_gmtool.c"
+				RelativePath=".\gamecode\creation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_hashtable.c"
+				RelativePath=".\gamecode\creport.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_message.c"
+				RelativePath=".\gamecode\creport.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_region.c"
+				RelativePath=".\gamecode\economy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_ship.c"
+				RelativePath=".\gamecode\economy.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_sqlite.c"
+				RelativePath=".\gamecode\give.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_storage.c"
+				RelativePath=".\gamecode\give.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_unit.c"
+				RelativePath=".\gamecode\items.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bindings.c"
+				RelativePath=".\gamecode\items.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\helpers.c"
+				RelativePath=".\gamecode\laws.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\laws.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\market.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\market.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\monster.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\monster.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\randenc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\randenc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\report.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\report.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\spy.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\spy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\study.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\study.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\summary.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\summary.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\xmlreport.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gamecode\xmlreport.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			Name="races"
 			>
 			<File
-				RelativePath=".\bindings\bind_attrib.h"
+				RelativePath=".\races\dragons.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_building.h"
+				RelativePath=".\races\dragons.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_faction.h"
+				RelativePath=".\races\illusion.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_gmtool.h"
+				RelativePath=".\races\illusion.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_hashtable.h"
+				RelativePath=".\races\races.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_message.h"
+				RelativePath=".\races\races.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_region.h"
+				RelativePath=".\races\zombies.c"
 				>
 			</File>
 			<File
-				RelativePath=".\bindings\bind_ship.h"
-				>
-			</File>
-			<File
-				RelativePath=".\bindings\bind_storage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\bindings\bind_unit.h"
-				>
-			</File>
-			<File
-				RelativePath=".\bindings\bindings.h"
-				>
-			</File>
-			<File
-				RelativePath=".\bindings\helpers.h"
+				RelativePath=".\races\zombies.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Jamfile"
+			RelativePath=".\eressea.c"
+			>
+		</File>
+		<File
+			RelativePath=".\eressea.h"
+			>
+		</File>
+		<File
+			RelativePath=".\gmtool.c"
+			>
+		</File>
+		<File
+			RelativePath=".\gmtool.h"
+			>
+		</File>
+		<File
+			RelativePath=".\gmtool_structs.h"
+			>
+		</File>
+		<File
+			RelativePath=".\lua.hpp"
+			>
+		</File>
+		<File
+			RelativePath=".\settings.h"
 			>
 		</File>
 	</Files>

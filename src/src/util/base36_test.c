@@ -1,5 +1,5 @@
 #include <platform.h>
-#include <external/cutest/CuTest.h>
+#include <cutest/CuTest.h>
 
 #include "base36.h"
 

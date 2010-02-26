@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;../common;../external"
+				AdditionalIncludeDirectories="../src;../external"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -124,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..;../common;../external"
+				AdditionalIncludeDirectories="../src;../external"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -213,7 +213,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\common\build\stdafx.h"
+				RelativePath="..\src\build\stdafx.h"
 				>
 			</File>
 		</Filter>
@@ -221,19 +221,19 @@
 			Name="Unity Build"
 			>
 			<File
-				RelativePath="..\common\build\external.c"
+				RelativePath="..\src\build\external.c"
 				>
 			</File>
 			<File
-				RelativePath="..\common\build\gamecode.c"
+				RelativePath="..\src\build\gamecode.c"
 				>
 			</File>
 			<File
-				RelativePath="..\common\build\kernel.c"
+				RelativePath="..\src\build\kernel.c"
 				>
 			</File>
 			<File
-				RelativePath="..\common\build\lib.c"
+				RelativePath="..\src\build\lib.c"
 				>
 			</File>
 			<File
@@ -241,7 +241,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\build\stdafx.c"
+				RelativePath="..\src\build\stdafx.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -262,14 +262,14 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\common\build\util.c"
+				RelativePath="..\src\build\util.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="common/util"
+						AdditionalIncludeDirectories="src/util"
 					/>
 				</FileConfiguration>
 			</File>

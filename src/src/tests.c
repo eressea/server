@@ -1,4 +1,4 @@
-#include <external/cutest/CuTest.h>
+#include <cutest/CuTest.h>
 #include <stdio.h>
 
 CuSuite* get_base36_suite(void);
