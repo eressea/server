@@ -1,4 +1,4 @@
-SubDir TOP common kernel ;
+SubDir TOP src kernel ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../util ;

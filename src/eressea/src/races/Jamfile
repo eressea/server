@@ -1,4 +1,4 @@
-SubDir TOP common races ;
+SubDir TOP src races ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../gamecode ;

@@ -1,10 +1,11 @@
 SubDir TOP ;
 
-SubInclude TOP src ;
+if $(BUILDTYPE) = UNITY {
 SubInclude TOP eressea ;
+}
 
 if $(BUILDTYPE) = REGULAR {
-SubInclude TOP common ;
+SubInclude TOP src ;
 SubInclude TOP eressea ;
 SubInclude TOP tools ;
 }

@@ -1,4 +1,4 @@
-SubDir TOP common gamecode ;
+SubDir TOP src gamecode ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../kernel ;

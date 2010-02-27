@@ -1,4 +1,4 @@
-SubDir TOP common spells ;
+SubDir TOP src spells ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../gamecode ;

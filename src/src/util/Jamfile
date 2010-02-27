@@ -1,4 +1,4 @@
-SubDir TOP common util ;
+SubDir TOP src util ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/.. ;

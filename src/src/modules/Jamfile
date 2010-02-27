@@ -1,4 +1,4 @@
-SubDir TOP common modules ;
+SubDir TOP src modules ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../gamecode ;

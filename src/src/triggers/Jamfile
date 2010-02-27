@@ -1,4 +1,4 @@
-SubDir TOP common triggers ;
+SubDir TOP src triggers ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../gamecode ;
