@@ -1,6 +1,7 @@
 SubDir TOP ;
 
-SubInclude TOP common ;
+SubInclude TOP src ;
+SubInclude TOP eressea ;
 
 if $(BUILDTYPE) = REGULAR {
 SubInclude TOP common ;
