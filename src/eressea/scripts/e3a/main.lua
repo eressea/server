@@ -1,7 +1,7 @@
 require "multis"
 
 function process(orders)
-  local confirmed_multis = { "odin" }
+  local confirmed_multis = { }
   local suspected_multis = { }
   
   if open_game(get_turn())~=0 then

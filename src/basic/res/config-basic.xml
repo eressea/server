@@ -27,7 +27,7 @@
     </set>
     <set name="new_faction">
       <!-- this goes into the faction's global pool -->
-      <item name="adamantium" amount="1"/>
+      <item name="sword" amount="1"/>
     </set>
   </equipment>
 
