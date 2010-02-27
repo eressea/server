@@ -21,10 +21,6 @@
 #include <kernel/config.h>
 #include "race.h"
 
-#include <races/zombies.h>
-#include <races/dragons.h>
-#include <races/illusion.h>
-
 #include "alchemy.h"
 #include "build.h"
 #include "building.h"

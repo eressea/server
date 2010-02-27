@@ -34,11 +34,6 @@
 #include <gamecode/summary.c>
 #include <gamecode/xmlreport.c>
 
-#include <races/dragons.c>
-#include <races/illusion.c>
-#include <races/races.c>
-#include <races/zombies.c>
-
 #include <attributes/alliance.c>
 #include <attributes/attributes.c>
 #include <attributes/fleechance.c>

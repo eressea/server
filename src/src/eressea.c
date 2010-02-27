@@ -47,7 +47,6 @@
 #include <gamecode/items.h>
 #include <gamecode/creport.h>
 #include <gamecode/xmlreport.h>
-#include <races/races.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
 
@@ -142,7 +141,6 @@ game_init(void)
   register_xr();
 
   debug_language("locales.log");
-  register_races();
   register_names();
   register_resources();
   register_buildings();

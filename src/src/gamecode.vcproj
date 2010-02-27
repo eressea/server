@@ -278,42 +278,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="races"
-			>
-			<File
-				RelativePath=".\races\dragons.c"
-				>
-			</File>
-			<File
-				RelativePath=".\races\dragons.h"
-				>
-			</File>
-			<File
-				RelativePath=".\races\illusion.c"
-				>
-			</File>
-			<File
-				RelativePath=".\races\illusion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\races\races.c"
-				>
-			</File>
-			<File
-				RelativePath=".\races\races.h"
-				>
-			</File>
-			<File
-				RelativePath=".\races\zombies.c"
-				>
-			</File>
-			<File
-				RelativePath=".\races\zombies.h"
-				>
-			</File>
-		</Filter>
 		<File
 			RelativePath=".\eressea.c"
 			>
