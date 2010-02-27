@@ -137,6 +137,8 @@ typedef struct region {
 #endif
 } region;
 
+extern struct region *regions;
+
 typedef struct region_list {
   struct region_list * next;
   struct region * data;

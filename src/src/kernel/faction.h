@@ -103,6 +103,8 @@ typedef struct faction {
   struct seen_region ** seen;
 } faction;
 
+extern struct faction *factions;
+
 typedef struct faction_list {
 	struct faction_list * next;
 	struct faction * data;

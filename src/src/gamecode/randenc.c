@@ -425,6 +425,37 @@ chaosterrain(void)
   return types[rng_int() % numtypes];
 }
 
+
+static unit *
+random_unit(const region * r)
+{
+  int c = 0;
+  int n;
+  unit *u;
+
+  for (u = r->units; u; u = u->next) {
+    if (u->race != new_race[RC_SPELL]) {
+      c += u->number;
+    }
+  }
+
+  if (c == 0) {
+    return NULL;
+  }
+  n = rng_int() % c;
+  c = 0;
+  u = r->units;
+
+  while (u && c < n) {
+    if (u->race != new_race[RC_SPELL]) {
+      c += u->number;
+    }
+    u = u->next;
+  }
+
+  return u;
+}
+
 void
 chaos(region * r)
 {
@@ -978,38 +1009,6 @@ godcurse(void)
 
 }
 
-static unit *
-split_unit(region * r, unit *u)
-{
-  unit *u2 = create_unit(r, u->faction, 0, u->race, 0, u->name, u);
-  int newsize = u->number/2;
-
-  if (u->display) {
-    free(u2->display);
-    u2->display = strdup(u->display);
-  }
-  transfermen(u, u2, newsize);
-  return u2;
-}
-
-static void
-check_split(void)
-{
-  region *r;
-  unit *u;
-
-  for(r=regions;r;r=r->next) {
-    for(u=r->units;u;u=u->next) {
-      if(is_monsters(u->faction)) {
-        if(u->number > u->race->splitsize) {
-          unit * u2 = split_unit(r, u);
-          fset(u2, UFL_ISNEW|UFL_MOVED);
-        }
-      }
-    }
-  }
-}
-
 /** handles the "orcish" curse that makes units grow like old orks
  * This would probably be better handled in an age-function for the curse,
  * but it's now being called by randomevents()
@@ -1273,5 +1272,4 @@ randomevents(void)
 #endif
 
   dissolve_units();
-  check_split();
 }

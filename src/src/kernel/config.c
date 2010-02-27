@@ -92,9 +92,6 @@
 #include <util/patricia.h>
 #endif
 
-/* exported variables */
-region  *regions;
-faction *factions;
 struct settings global = {
   "Eressea", /* gamename */
 };

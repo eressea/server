@@ -4069,7 +4069,7 @@ init_processor(void)
   p+=10;
   add_proc_global(p, &encounters, "Zufallsbegegnungen");
   p+=10;
-  add_proc_unit(p, &monsters_kill_peasants, "Monster fressen und vertreiben Bauern");
+  add_proc_unit(p, &monster_kills_peasants, "Monster fressen und vertreiben Bauern");
 
   p+=10;
   add_proc_global(p, &randomevents, "Zufallsereignisse");
