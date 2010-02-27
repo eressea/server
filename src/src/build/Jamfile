@@ -1,18 +1,18 @@
-SubDir TOP combined ;
+SubDir TOP src build ;
 
 TargetDirectory ;
-SubDirHdrs $(SUBDIR)/../eressea ;
-SubDirHdrs $(SUBDIR)/../common/gamecode ;
-SubDirHdrs $(SUBDIR)/../common/kernel ;
-SubDirHdrs $(SUBDIR)/../common/util ;
-SubDirHdrs $(SUBDIR)/../common ;
-SubDirHdrs $(SUBDIR)/../tools ;
-SubDirHdrs $(SUBDIR)/../external ;
+SubDirHdrs $(SUBDIR)/../../eressea ;
+SubDirHdrs $(SUBDIR)/../../src/gamecode ;
+SubDirHdrs $(SUBDIR)/../../src/kernel ;
+SubDirHdrs $(SUBDIR)/../../src/util ;
+SubDirHdrs $(SUBDIR)/../../src ;
+SubDirHdrs $(SUBDIR)/../../tools ;
+SubDirHdrs $(SUBDIR)/../../external ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 UsingLua ;
 
-SEARCH_SOURCE += [ FDirName $(TOP) common iniparser ] ;
+SEARCH_SOURCE += [ FDirName $(TOP) src iniparser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
 if $(BINDINGS) = LUABIND {
    SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;

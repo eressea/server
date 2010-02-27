@@ -1,11 +1,16 @@
-SubDir TOP common ;
+SubDir TOP src ;
 
-SubInclude TOP common kernel ;
-SubInclude TOP common gamecode ;
-SubInclude TOP common spells ;
-SubInclude TOP common races ;
-SubInclude TOP common triggers ;
-SubInclude TOP common util ;
-SubInclude TOP common attributes ;
-SubInclude TOP common modules ;
-SubInclude TOP common items ;
+if $(BUILDTYPE) = REGULAR {
+SubInclude TOP src kernel ;
+SubInclude TOP src gamecode ;
+SubInclude TOP src spells ;
+SubInclude TOP src races ;
+SubInclude TOP src triggers ;
+SubInclude TOP src util ;
+SubInclude TOP src attributes ;
+SubInclude TOP src modules ;
+SubInclude TOP src items ;
+} else {
+# UNITY build
+SubInclude TOP src build ;
+}

@@ -1,7 +1,7 @@
 SubDir TOP eressea ;
 
 TargetDirectory ;
-SubDirHdrs $(SUBDIR)/../src/gamecode ;
+SubDirHdrs $(SUBDIR)/../src/build ;
 SubDirHdrs $(SUBDIR)/../src/kernel ;
 SubDirHdrs $(SUBDIR)/../src/util ;
 SubDirHdrs $(SUBDIR)/../src ;
@@ -9,83 +9,30 @@ SubDirHdrs $(SUBDIR)/../external ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 UsingLua ;
-UsingLuabind ;
 
-SEARCH_SOURCE += [ FDirName $(TOP) src iniparser ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
-if $(BINDINGS) = LUABIND {
-   SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
-}
-if $(BINDINGS) = TOLUA {
-   SEARCH_SOURCE += [ FDirName $(SUBDIR) tolua ] ;
-}
+SEARCH_SOURCE += [ FDirName $(TOP) src build ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
 SubDirC++Flags -DHAVE_LUA ;
 
 SubDirHdrs $(XMLHDRS) ;
 
-LUASERVER = eressea-lua ;
+SERVER = eressea ;
 
-SERVER_SOURCES = main.c korrektur.c ;
-
-TOLUA_SOURCES = 
- <tolua>bindings.c
- <tolua>helpers.c
- <tolua>bind_sqlite.c
- <tolua>bind_unit.c
- <tolua>bind_ship.c
- <tolua>bind_storage.c
- <tolua>bind_faction.c
- <tolua>bind_region.c
- <tolua>bind_message.c
- <tolua>bind_hashtable.c
- <tolua>bind_building.c
- <tolua>bind_gmtool.c
-;
-
-LUABIND_SOURCES =
- <lua>alliance.cpp
- <lua>building.cpp
- <lua>eressea.cpp
- <lua>event.cpp
- <lua>faction.cpp
- <lua>message.cpp
- <lua>objects.cpp
- <lua>region.cpp
- <lua>ship.cpp
- <lua>spell.cpp
- <lua>unit.cpp
- <lua>item.cpp
- <lua>test.cpp
- <lua>gm.cpp
- <lua>script.cpp
- <lua>gamecode.cpp
-;
-
-if $(BINDINGS) = LUABIND {
-  Library bindings : $(LUABIND_SOURCES) ;
-  libluabind $(LUASERVER) ;
-}
-if $(BINDINGS) = TOLUA {
-  Library bindings : $(TOLUA_SOURCES) ;
-  libtolua $(LUASERVER) ;
-}
-liblua $(LUASERVER) ;
-
-LUASERVER_SOURCES =
- <src!iniparser>iniparser.c
- <curses>listbox.c
- server.c
- console.c
- editing.c
- gmtool.c
+SERVER_SOURCES = 
+ <build!external.c>
+ <build!gamecode.c>
+ <build!kernel.c>
+ <build!lib.c>
+ <build!util.c>
+ <src!server.c>
  ;
 
-# eressea-server with lua scripting
-LinkLibraries $(LUASERVER) :
- bindings gamecode items spells kernel modules attributes races triggers util ;
-libxml2 $(LUASERVER) ;
-libcurses $(LUASERVER) ;
-libmcheck $(LUASERVER) ;
+libtolua $(SERVER) ;
+liblua $(SERVER) ;
 
-LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
-Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
+# eressea-server with lua scripting
+libxml2 $(SERVER) ;
+libcurses $(SERVER) ;
+
+LINKLIBS on $(SERVER) += -lm -ldl -lstdc++ ;
+Main $(SERVER) : $(SERVER_SOURCES) ;

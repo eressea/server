@@ -1,10 +1,10 @@
 SubDir TOP tools ;
 
 TargetDirectory ;
-SubDirHdrs $(SUBDIR)/../common/gamecode ;
-SubDirHdrs $(SUBDIR)/../common/kernel ;
-SubDirHdrs $(SUBDIR)/../common/util ;
-SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/../src/gamecode ;
+SubDirHdrs $(SUBDIR)/../src/kernel ;
+SubDirHdrs $(SUBDIR)/../src/util ;
+SubDirHdrs $(SUBDIR)/../src ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 SubDirHdrs $(XMLHDRS) ;

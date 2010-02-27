@@ -1,4 +1,4 @@
-SubDir TOP common attributes ;
+SubDir TOP src attributes ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../gamecode ;

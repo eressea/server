@@ -1,4 +1,4 @@
-SubDir TOP common items ;
+SubDir TOP src items ;
 
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../gamecode ;
