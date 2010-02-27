@@ -222,49 +222,6 @@ tolua_message_region(lua_State * L)
   return 0;
 }
 
-static void
-free_script(attrib * a)
-{
-  lua_State * L = (lua_State *)global.vm_state;
-  if (a->data.i>0) {
-    luaL_unref(L, LUA_REGISTRYINDEX, a->data.i);
-  }
-}
-
-attrib_type at_script = {
-  "script",
-  NULL, free_script, NULL,
-  NULL, NULL, ATF_UNIQUE
-};
-
-static int
-call_script(lua_State * L, struct unit * u)
-{
-  const attrib * a = a_findc(u->attribs, &at_script);
-  if (a==NULL) a = a_findc(u->race->attribs, &at_script);
-  if (a!=NULL && a->data.i>0) {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, a->data.i);
-    if (lua_pcall(L, 1, 0, 0)!=0) {
-      const char* error = lua_tostring(L, -1);
-      log_error(("call_script (%s): %s", unitname(u), error));
-      lua_pop(L, 1);
-    }
-  }
-  return -1;
-}
-
-static void
-setscript(lua_State * L, struct attrib ** ap)
-{
-  attrib * a = a_find(*ap, &at_script);
-  if (a == NULL) {
-    a = a_add(ap, a_new(&at_script));
-  } else if (a->data.i>0) {
-    luaL_unref(L, LUA_REGISTRYINDEX, a->data.i);
-  }
-  a->data.i = luaL_ref(L, LUA_REGISTRYINDEX);
-}
-
 static int
 tolua_update_guards(lua_State * L)
 {
@@ -481,66 +438,10 @@ tolua_levitate_ship(lua_State * L)
 #endif
 
 static int
-tolua_set_unitscript(lua_State * L)
-{
-  struct unit * u = (struct unit *)tolua_tousertype(L, 1, 0);
-  if (u) {
-    lua_pushvalue(L, 2);
-    setscript(L, &u->attribs);
-    lua_pop(L, 1);
-  }
-  return 0;
-}
-
-static int
-tolua_set_racescript(lua_State * L)
-{
-  const char * rcname = tolua_tostring(L, 1, 0);
-  race * rc = rc_find(rcname);
-
-  if (rc!=NULL) {
-    lua_pushvalue(L, 2);
-    setscript(L, &rc->attribs);
-    lua_pop(L, 1);
-  }
-  return 0;
-}
-
-static int
-tolua_spawn_dragons(lua_State * L)
-{
-  spawn_dragons();
-  return 0;
-}
-
-static int
-tolua_spawn_undead(lua_State * L)
-{
-  spawn_undead();
-  return 0;
-}
-
-static int
 tolua_spawn_braineaters(lua_State * L)
 {
   float chance = (float)tolua_tonumber(L, 1, 0);
   spawn_braineaters(chance);
-  return 0;
-}
-
-static int
-tolua_planmonsters(lua_State * L)
-{
-  faction * f = get_monsters();
-
-  if (f!=NULL) {
-    unit * u;
-    plan_monsters();
-    for (u=f->units;u;u=u->nextF) {
-      call_script(L, u);
-    }
-  }
-
   return 0;
 }
 
@@ -1185,13 +1086,7 @@ tolua_eressea_open(lua_State* L)
     tolua_function(L, TOLUA_CAST "message_region", tolua_message_region);
 
     /* scripted monsters */
-    tolua_function(L, TOLUA_CAST "plan_monsters", tolua_planmonsters);
     tolua_function(L, TOLUA_CAST "spawn_braineaters", tolua_spawn_braineaters);
-    tolua_function(L, TOLUA_CAST "spawn_undead", tolua_spawn_undead);
-    tolua_function(L, TOLUA_CAST "spawn_dragons", tolua_spawn_dragons);
-
-    tolua_function(L, TOLUA_CAST "set_race_brain", tolua_set_racescript);
-    tolua_function(L, TOLUA_CAST "set_unit_brain", tolua_set_unitscript);
 
 #ifdef TODO_FOSS
     /* spells and stuff */

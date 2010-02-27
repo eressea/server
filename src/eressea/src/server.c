@@ -12,3 +12,4 @@
 
 #include "main.c"
 #include "bindings.c"
+#include "monsters.c"

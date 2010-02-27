@@ -1,9 +1,10 @@
 #include <platform.h>
-
+#include <kernel/types.h>
 #include "spells/shipcurse.h"
 
 #include <kernel/ship.h>
 #include <kernel/unit.h>
+#include <kernel/faction.h>
 
 #include <tolua.h>
 
@@ -19,6 +20,37 @@ tolua_levitate_ship(lua_State * L)
   return 1;
 }
 
+
+extern void spawn_undead(void);
+extern void spawn_dragons(void);
+extern void plan_monsters(struct faction * f);
+
+
+static int
+tolua_planmonsters(lua_State * L)
+{
+  faction * f = (faction *)tolua_tousertype(L, 1, get_monsters());
+  if (f) {
+    plan_monsters(f);
+  }
+
+  return 0;
+}
+
+static int
+tolua_spawn_dragons(lua_State * L)
+{
+  spawn_dragons();
+  return 0;
+}
+
+static int
+tolua_spawn_undead(lua_State * L)
+{
+  spawn_undead();
+  return 0;
+}
+
 void
 bind_eressea(struct lua_State * L)
 {
@@ -26,6 +58,9 @@ bind_eressea(struct lua_State * L)
   tolua_beginmodule(L, NULL);
   {
     tolua_function(L, TOLUA_CAST "levitate_ship", tolua_levitate_ship);
+    tolua_function(L, TOLUA_CAST "plan_monsters", tolua_planmonsters);
+    tolua_function(L, TOLUA_CAST "spawn_undead", tolua_spawn_undead);
+    tolua_function(L, TOLUA_CAST "spawn_dragons", tolua_spawn_dragons);
   }
   tolua_endmodule(L);
 }

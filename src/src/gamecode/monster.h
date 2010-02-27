@@ -25,16 +25,8 @@
 extern "C" {
 #endif
 
-#define DRAGON_RANGE 20 /* Max. Distanz zum nächsten Drachenziel */
-
-void age_illusion(struct unit *u);
-
-void monsters_kill_peasants(struct unit * u);
-void plan_monsters(void);
-struct unit *random_unit(const struct region * r);
-
-extern void spawn_undead(void);
-extern void spawn_dragons(void);
+void monster_kills_peasants(struct unit * u);
+boolean monster_is_waiting(const struct unit * u);
 
 #ifdef __cplusplus
 }

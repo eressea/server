@@ -49,6 +49,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+faction *factions;
+
 /** remove the faction from memory.
  * this frees all memory that's only accessible through the faction,
  * but you should still call funhash and remove the faction from the

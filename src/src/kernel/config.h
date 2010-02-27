@@ -166,9 +166,6 @@ extern int findoption(const char *s, const struct locale * lang);
 /* special units */
 void make_undead_unit(struct unit *);
 
-extern struct region *regions;
-extern struct faction *factions;
-
 void addstrlist(strlist ** SP, const char *s);
 
 int armedmen(const struct unit * u, boolean siege_weapons);

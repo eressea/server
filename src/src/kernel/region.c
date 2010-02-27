@@ -64,6 +64,8 @@
 
 extern int dice_rand(const char *s);
 
+region  *regions;
+
 int
 get_maxluxuries()
 {
