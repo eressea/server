@@ -677,9 +677,6 @@ ship_allowed(const struct ship * sh, const region * r)
 static boolean
 flying_ship(const ship * sh)
 {
-  static int init = 0;
-  static const curse_type * ct_flyingship;
-
   if (sh->type->flags & SFL_FLY) return true;
   if (sh->flags & SF_FLYING) return true;
   return false;

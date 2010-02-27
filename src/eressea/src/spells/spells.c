@@ -2846,7 +2846,7 @@ mk_deathcloud(unit * mage, region * r, double force, int duration)
 #define COMPAT_DEATHCLOUD
 #ifdef COMPAT_DEATHCLOUD
 static int
-dc_read_compat(struct attrib * a, const void * target, storage * store)
+dc_read_compat(struct attrib * a, void * target, storage * store)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
   region * r = NULL;

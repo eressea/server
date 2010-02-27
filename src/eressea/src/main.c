@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <locale.h>
+#include <wctype.h>
 
 static const char * luafile = "init.lua";
 static const char * entry_point = NULL;
