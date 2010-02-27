@@ -1,17 +1,17 @@
 SubDir TOP eressea ;
 
 TargetDirectory ;
-SubDirHdrs $(SUBDIR)/../common/gamecode ;
-SubDirHdrs $(SUBDIR)/../common/kernel ;
-SubDirHdrs $(SUBDIR)/../common/util ;
-SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/../src/gamecode ;
+SubDirHdrs $(SUBDIR)/../src/kernel ;
+SubDirHdrs $(SUBDIR)/../src/util ;
+SubDirHdrs $(SUBDIR)/../src ;
 SubDirHdrs $(SUBDIR)/../external ;
 SubDirHdrs $(SUBDIR)/.. ;
 
 UsingLua ;
 UsingLuabind ;
 
-SEARCH_SOURCE += [ FDirName $(TOP) common iniparser ] ;
+SEARCH_SOURCE += [ FDirName $(TOP) src iniparser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) curses ] ;
 if $(BINDINGS) = LUABIND {
    SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
@@ -72,7 +72,7 @@ if $(BINDINGS) = TOLUA {
 liblua $(LUASERVER) ;
 
 LUASERVER_SOURCES =
- <common!iniparser>iniparser.c
+ <src!iniparser>iniparser.c
  <curses>listbox.c
  server.c
  console.c
