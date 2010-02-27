@@ -26,7 +26,6 @@ set (ERESSEA_SRCS
 )
 
 add_executable (eressea ${LIB_SRCS} ${ERESSEA_SRCS})
-target_link_libraries (eressea tolua xml2 ncurses lua5.1 pthread)
 if (WIN32)
 else (WIN32)
   target_link_libraries (eressea tolua xml2 ncurses lua5.1 pthread)
