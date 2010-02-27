@@ -38,9 +38,6 @@
       <item name="stone" amount="10"/>
       <item name="money" amount="5000"/>
     </set>
-    <!--set name="new_faction">
-      <item name="adamantium" amount="1"/>
-    </set-->
   </equipment>
 
   <xi:include href="names-undead.xml"/>
