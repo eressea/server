@@ -6,6 +6,7 @@
 #include <kernel/config.h>
 #include <kernel/save.h>
 #include <iniparser/iniparser.h>
+#include "races/races.h"
 
 #include <assert.h>
 #include <locale.h>
@@ -243,6 +244,7 @@ int main(int argc, char ** argv)
     log_error(("initialization failed with code %d\n", err));
     return err;
   }
+  register_races();
   register_curses();
   register_spells();
   bind_eressea((struct lua_State *)global.vm_state);

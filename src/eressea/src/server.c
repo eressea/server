@@ -10,6 +10,12 @@
 #include "spells/spells.c"
 #include "spells/unitcurse.c"
 
-#include "main.c"
+#include "races/dragons.c"
+#include "races/illusion.c"
+#include "races/races.c"
+#include "races/zombies.c"
+
 #include "bindings.c"
 #include "monsters.c"
+#include "main.c"
+
