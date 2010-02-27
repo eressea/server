@@ -7,6 +7,8 @@
  * prior permission by the authors of Eressea.
  **/
 
+#ifndef H_LUA_CONSOLE
+#define H_LUA_CONSOLE
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,3 +25,4 @@ extern "C" {
 }
 #endif
 
+#endif

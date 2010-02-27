@@ -28,7 +28,7 @@ extern "C" {
  /* this should always be the first thing included after platform.h */
 #include "types.h"
 
-typedef struct _dictionary_ dictionary;
+struct _dictionary_;
 
   /* experimental gameplay features (that don't affect the savefile) */
   /* TODO: move these settings to settings.h or into configuration files */
@@ -366,7 +366,7 @@ extern void set_datapath(const char * path);
 
 extern const char * basepath(void);
 extern void set_basepath(const char *);
-void load_inifile(dictionary * d);
+void load_inifile(struct _dictionary_ * d);
 
 extern const char * reportpath(void);
 extern void set_reportpath(const char *);
@@ -392,7 +392,7 @@ typedef struct settings {
   void * vm_state;
   float producexpchance;
   int cookie;
-  dictionary * inifile;
+  struct _dictionary_ * inifile;
 
   struct global_functions {
     int (*wage)(const struct region *r, const struct faction * f, const struct race * rc, int in_turn);

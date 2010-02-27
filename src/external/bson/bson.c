@@ -1,5 +1,6 @@
 /* bson.c */
 
+#include <stddef.h>
 #include "bson.h"
 #include <stdlib.h>
 #include <string.h>
