@@ -17,7 +17,10 @@ void RunAllTests(void) {
   printf("%s\n", output->buffer);
 }
 
+#pragma warning (push)
+#pragma warning (disable: 4100)
 int main(int argc, char **argv) {
   RunAllTests();
   return 0;
 }
+#pragma warning (pop)
