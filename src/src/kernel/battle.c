@@ -832,7 +832,7 @@ select_armor(troop t, boolean shield)
   const armor * a = t.fighter->armors;
   int geschuetzt = 0;
 
-  /* dragons do not use armor */
+  /* some monsters should not use armor (dragons in chainmail? ha!) */
   if (!(u->race->battle_flags & BF_EQUIPMENT))
     return NULL;
 
