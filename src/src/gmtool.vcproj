@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				AdditionalIncludeDirectories=".;kernel"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -57,14 +57,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
-				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				AdditionalIncludeDirectories=".;kernel"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../common/Debug/util/util.lib ../common/Debug/kernel/kernel.lib lua/Debug/bindings/bindings.lib libxml2.lib curses.lib lua5.1_d.lib luabind_d.lib"
+				AdditionalDependencies="Debug/util/util.lib Debug/kernel/kernel.lib lua/Debug/bindings/bindings.lib libxml2.lib curses.lib lua5.1_d.lib luabind_d.lib"
 				OutputFile="$(OutDir)/gmtool.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=".."
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				AdditionalIncludeDirectories=".;kernel"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -141,14 +141,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				AdditionalIncludeDirectories=".;kernel"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../common/Profile/util/util.lib ../common/Profile/kernel/kernel.lib lua/Profile/bindings/bindings.lib libxml2.lib curses.lib lua5.1.lib luabind.lib"
+				AdditionalDependencies="Profile/util/util.lib Profile/kernel/kernel.lib lua/Profile/bindings/bindings.lib libxml2.lib curses.lib lua5.1.lib luabind.lib"
 				OutputFile="$(OutDir)/gmtool.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=".."
@@ -208,7 +208,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				AdditionalIncludeDirectories=".;kernel"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -224,14 +224,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				AdditionalIncludeDirectories="..;../common;../common/kernel"
+				AdditionalIncludeDirectories=".;kernel"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../common/Release/util/util.lib ../common/Release/kernel/kernel.lib lua/Release/bindings/bindings.lib libxml2.lib curses.lib lua5.1.lib luabind.lib"
+				AdditionalDependencies="Release/util/util.lib Release/kernel/kernel.lib lua/Release/bindings/bindings.lib libxml2.lib curses.lib lua5.1.lib luabind.lib"
 				OutputFile="$(OutDir)/gmtool.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=".."

@@ -1,4 +1,4 @@
-#include "common/settings.h"
+#include <settings.h>
 #include <platform.h>
 #include "stdafx.h"
 

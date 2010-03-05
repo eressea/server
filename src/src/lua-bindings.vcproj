@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="external"
-	ProjectGUID="{F9AE4586-8F65-486B-9666-744839E40A54}"
-	RootNamespace="external"
+	Name="lua-bindings"
+	ProjectGUID="{75501170-51C2-E641-BA8B-EDC008184192}"
+	RootNamespace="lua-bindings"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug/external"
-			IntermediateDirectory="Debug/external"
+			OutputDirectory="Debug/lua-bindings"
+			IntermediateDirectory="Debug/lua-bindings"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../src"
+				AdditionalIncludeDirectories=".;../external"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -59,14 +59,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
-				AdditionalIncludeDirectories="..;../common"
+				AdditionalIncludeDirectories="."
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/external.lib"
+				OutputFile="$(OutDir)/lua-bindings.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -86,8 +86,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release/external"
-			IntermediateDirectory="Release/external"
+			OutputDirectory="Release/lua-bindings"
+			IntermediateDirectory="Release/lua-bindings"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -109,7 +109,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories=".;../src"
+				AdditionalIncludeDirectories=".;../external"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -125,14 +125,14 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
-				AdditionalIncludeDirectories="..;../common"
+				AdditionalIncludeDirectories="."
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/external.lib"
+				OutputFile="$(OutDir)/lua-bindings.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -159,56 +159,56 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			>
 			<File
-				RelativePath="..\external\bson\bson.c"
+				RelativePath=".\bindings\bind_attrib.c"
 				>
 			</File>
 			<File
-				RelativePath=".\iniparser\iniparser.c"
+				RelativePath=".\bindings\bind_building.c"
 				>
 			</File>
 			<File
-				RelativePath=".\dlmalloc\malloc.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\external\md5.c"
+				RelativePath=".\bindings\bind_faction.c"
 				>
 			</File>
 			<File
-				RelativePath=".\mt19937ar.c"
+				RelativePath=".\bindings\bind_gmtool.c"
 				>
 			</File>
 			<File
-				RelativePath="..\external\bson\numbers.c"
+				RelativePath=".\bindings\bind_hashtable.c"
 				>
 			</File>
 			<File
-				RelativePath="..\external\sqlite3.c"
+				RelativePath=".\bindings\bind_message.c"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						WarningLevel="3"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_region.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_ship.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_sqlite.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_storage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_unit.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bindings.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\helpers.c"
+				>
 			</File>
 		</Filter>
 		<Filter
@@ -216,34 +216,58 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			>
 			<File
-				RelativePath="..\external\bson\bson.h"
+				RelativePath=".\bindings\bind_attrib.h"
 				>
 			</File>
 			<File
-				RelativePath=".\iniparser\iniparser.h"
+				RelativePath=".\bindings\bind_building.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dlmalloc\malloc.h"
+				RelativePath=".\bindings\bind_faction.h"
 				>
 			</File>
 			<File
-				RelativePath="..\external\md5.h"
+				RelativePath=".\bindings\bind_gmtool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\external\bson\platform_hacks.h"
+				RelativePath=".\bindings\bind_hashtable.h"
 				>
 			</File>
 			<File
-				RelativePath="..\external\sqlite3.h"
+				RelativePath=".\bindings\bind_message.h"
 				>
 			</File>
 			<File
-				RelativePath="..\external\sqlite3ext.h"
+				RelativePath=".\bindings\bind_region.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_ship.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_storage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bind_unit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\bindings.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bindings\helpers.h"
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Jamfile"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

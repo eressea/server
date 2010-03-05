@@ -41,6 +41,7 @@
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/base36.h>
 #include <util/functions.h>
 #include <util/goodies.h>
 #include <util/storage.h>

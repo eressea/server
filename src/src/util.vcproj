@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="gamecode"
-	ProjectGUID="{1E8BFF9E-3044-0742-992F-C5765B80FE65}"
-	RootNamespace="gamecode"
+	Name="util"
+	ProjectGUID="{F70CFB27-8A2F-E447-B452-4E1C590EDA6D}"
+	RootNamespace="util"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug/gamecode"
-			IntermediateDirectory="Debug/gamecode"
+			OutputDirectory="Debug/util"
+			IntermediateDirectory="Debug/util"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;."
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -66,7 +66,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/gamecode.lib"
+				OutputFile="$(OutDir)/util.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -86,8 +86,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release/gamecode"
-			IntermediateDirectory="Release/gamecode"
+			OutputDirectory="Release/util"
+			IntermediateDirectory="Release/util"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -109,7 +109,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories="..;."
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -132,7 +132,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/gamecode.lib"
+				OutputFile="$(OutDir)/util.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -155,193 +155,259 @@
 	</References>
 	<Files>
 		<Filter
-			Name="gamecode"
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			>
 			<File
-				RelativePath=".\gamecode\archetype.c"
+				RelativePath=".\util\argstack.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\archetype.h"
+				RelativePath=".\util\attrib.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\creation.c"
+				RelativePath=".\util\base36.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\creation.h"
+				RelativePath=".\util\bsdstring.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\creport.c"
+				RelativePath=".\util\console.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\creport.h"
+				RelativePath=".\util\crmessage.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\economy.c"
+				RelativePath=".\util\cvector.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\economy.h"
+				RelativePath=".\util\event.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\give.c"
+				RelativePath=".\util\eventbus.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\give.h"
+				RelativePath=".\util\filereader.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\items.c"
+				RelativePath=".\util\functions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\items.h"
+				RelativePath=".\util\goodies.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\laws.c"
+				RelativePath=".\util\language.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\laws.h"
+				RelativePath=".\util\language_struct.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\market.c"
+				RelativePath=".\util\listbox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\market.h"
+				RelativePath=".\util\lists.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\monster.c"
+				RelativePath=".\util\log.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\monster.h"
+				RelativePath=".\util\message.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\randenc.c"
+				RelativePath=".\util\nrmessage.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\randenc.h"
+				RelativePath=".\util\nrmessage_struct.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\report.c"
+				RelativePath=".\util\parser.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\report.h"
+				RelativePath=".\util\patricia.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\spy.c"
+				RelativePath=".\util\rand.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\spy.h"
+				RelativePath=".\util\resolve.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\study.c"
+				RelativePath=".\util\rng.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\study.h"
+				RelativePath=".\util\sql.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\summary.c"
+				RelativePath=".\util\storage.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\summary.h"
+				RelativePath=".\util\translation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\xmlreport.c"
+				RelativePath=".\util\umlaut.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gamecode\xmlreport.h"
+				RelativePath=".\util\unicode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\variant.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\xml.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="races"
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			>
 			<File
-				RelativePath=".\races\dragons.c"
+				RelativePath=".\util\argstack.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\dragons.h"
+				RelativePath=".\util\attrib.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\illusion.c"
+				RelativePath=".\util\base36.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\illusion.h"
+				RelativePath=".\util\bsdstring.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\races.c"
+				RelativePath=".\util\console.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\races.h"
+				RelativePath=".\util\crmessage.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\zombies.c"
+				RelativePath=".\util\cvector.c"
 				>
 			</File>
 			<File
-				RelativePath=".\races\zombies.h"
+				RelativePath=".\util\dice.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\event.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\eventbus.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\filereader.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\functions.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\goodies.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\language.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\listbox.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\lists.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\log.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\message.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\nrmessage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\parser.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\patricia.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\rand.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\resolve.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\sql.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\strings.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\translation.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\umlaut.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\unicode.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\xml.c"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\eressea.c"
-			>
-		</File>
-		<File
-			RelativePath=".\eressea.h"
-			>
-		</File>
-		<File
-			RelativePath=".\gmtool.c"
-			>
-		</File>
-		<File
-			RelativePath=".\gmtool.h"
-			>
-		</File>
-		<File
-			RelativePath=".\gmtool_structs.h"
-			>
-		</File>
-		<File
-			RelativePath=".\lua.hpp"
-			>
-		</File>
-		<File
-			RelativePath=".\settings.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
