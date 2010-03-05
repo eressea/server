@@ -1,0 +1,20 @@
+Hello <FIRSTNAME>,
+
+You are now entered into the waiting list of <GAME>, at position <POSITION>. 
+To confirm your subscription, please go to the following URL and enter your
+Customer-ID and confirmation key.
+
+	 http://eressea-pbem.de/en/confirm.html
+	 Customer ID: <CUSTID>
+	 Key:         <PASSWORD>
+	 
+To make sure that only those players interested in playing remain on the
+list, you need to repeat this procedure once every week. We will send you this
+reminder by mail, in which you'll also see your updated position on the
+waiting list.
+
+If you do not enter the key before sunday morning 9:00 CET, your
+registration will be considered cancelled, and you will receive no further
+email from us.
+
+The Eressea Team
