@@ -225,6 +225,14 @@
 			Name="util"
 			>
 			<File
+				RelativePath=".\util\argstack.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\argstack.h"
+				>
+			</File>
+			<File
 				RelativePath=".\util\attrib.c"
 				>
 			</File>
@@ -274,6 +282,14 @@
 			</File>
 			<File
 				RelativePath=".\util\event.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\eventbus.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util\eventbus.h"
 				>
 			</File>
 			<File

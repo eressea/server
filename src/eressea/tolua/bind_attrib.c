@@ -32,6 +32,21 @@ without prior permission by the authors of Eressea.
 
 static void 
 init_ext(attrib * a) {
+  lua_State * L = (lua_State *)global.vm_state;
+
+  lua_pushstring(L, "callbacks");
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  if (lua_istable(L, -1)) {
+    lua_pushstring(L, "attrib_init");
+    lua_rawget(L, LUA_GLOBALSINDEX);
+    if (lua_isfunction(L, -1)) {
+      lua_rawgeti(L, LUA_REGISTRYINDEX, a->data.i);
+      if (lua_pcall(L, 1, 0, 0)!=0) {
+        const char* error = lua_tostring(L, -1);
+        log_error(("attrib_init '%d': %s.\n", a->data.i, error));
+      }
+    }
+  }
 }
 
 static void 

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <messages>
+  <message name="alp_destroyed" section="events">
+    <type>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">Ein Alp starb in $region($region), ohne sein Ziel zu erreichen.</text>
+    <text locale="en">An alp died in $region($region) before reaching its target.</text>
+  </message>
   <message name="nr_claims" section="nr">
     <type>
       <arg name="items" type="items"/>
