@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;../external"
+				AdditionalIncludeDirectories="../../server/src;../../external"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -124,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../src;../external"
+				AdditionalIncludeDirectories="../../server/src;../../external"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -187,7 +187,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\spells\alp.c"
+				RelativePath=".\spells\alp.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -207,7 +207,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\bindings.c"
+				RelativePath=".\bindings.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -227,7 +227,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\spells\buildingcurse.c"
+				RelativePath=".\spells\buildingcurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -247,7 +247,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\spells\combatspells.c"
+				RelativePath=".\spells\combatspells.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -267,7 +267,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\curses.c"
+				RelativePath=".\curses.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -287,7 +287,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\races\dragons.c"
+				RelativePath=".\races\dragons.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -307,7 +307,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\races\illusion.c"
+				RelativePath=".\races\illusion.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -327,7 +327,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\main.c"
+				RelativePath=".\main.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -347,7 +347,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\monsters.c"
+				RelativePath=".\monsters.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -367,7 +367,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\races\races.c"
+				RelativePath=".\races\races.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -387,7 +387,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\races\races.h"
+				RelativePath=".\races\races.h"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -407,7 +407,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\spells\regioncurse.c"
+				RelativePath=".\spells\regioncurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -427,7 +427,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\spells\shipcurse.c"
+				RelativePath=".\spells\shipcurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -447,7 +447,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\spells\spells.c"
+				RelativePath=".\spells\spells.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -467,7 +467,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\spells\unitcurse.c"
+				RelativePath=".\spells\unitcurse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -487,7 +487,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\races\zombies.c"
+				RelativePath=".\races\zombies.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -513,39 +513,39 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\src\spells\alp.h"
+				RelativePath=".\spells\alp.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\spells\buildingcurse.h"
+				RelativePath=".\spells\buildingcurse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\spells\combatspells.h"
+				RelativePath=".\spells\combatspells.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\curses.h"
+				RelativePath=".\curses.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\spells\regioncurse.h"
+				RelativePath=".\spells\regioncurse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\spells\shipcurse.h"
+				RelativePath=".\spells\shipcurse.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\spells\spells.h"
+				RelativePath=".\spells\spells.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\build\stdafx.h"
+				RelativePath="..\..\server\src\build\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\spells\unitcurse.h"
+				RelativePath=".\spells\unitcurse.h"
 				>
 			</File>
 		</Filter>
@@ -553,27 +553,27 @@
 			Name="Unity Build"
 			>
 			<File
-				RelativePath="..\src\build\external.c"
+				RelativePath="..\..\server\src\build\external.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\build\gamecode.c"
+				RelativePath="..\..\server\src\build\gamecode.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\build\kernel.c"
+				RelativePath="..\..\server\src\build\kernel.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\build\lib.c"
+				RelativePath="..\..\server\src\build\lib.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\server.c"
+				RelativePath=".\server.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\build\stdafx.c"
+				RelativePath="..\..\server\src\build\stdafx.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -594,7 +594,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\src\build\util.c"
+				RelativePath="..\..\server\src\build\util.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -607,7 +607,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\src\spells\Jamfile"
+			RelativePath=".\spells\Jamfile"
 			>
 		</File>
 	</Files>
