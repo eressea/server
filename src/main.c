@@ -215,7 +215,9 @@ void locale_init(void)
 {
   setlocale(LC_CTYPE, "");
   setlocale(LC_NUMERIC, "C");
-  assert(towlower(0xC4)==0xE4); /* &Auml; => &auml; */
+  if (towlower(0xC4)!=0xE4) { /* &Auml; => &auml; */
+    log_error(("Umlaut conversion is not working properly. Wrong locale? LANG=%s\n", getenv("LANG")));
+  }
 }
 
 extern void bind_eressea(struct lua_State * L);
