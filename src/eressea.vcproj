@@ -5,10 +5,6 @@
 	Name="amalgamation-eressea"
 	ProjectGUID="{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
 	RootNamespace="build"
-	SccProjectName="Svn"
-	SccAuxPath="Svn"
-	SccLocalPath="Svn"
-	SccProvider="SubversionScc"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
