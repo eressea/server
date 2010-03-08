@@ -4,10 +4,10 @@ project (eressea)
 if (WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
 else (WIN32)
-  include_directories (src /usr/include/lua5.1/ /usr/include/libxml2)
+  include_directories (/usr/include/lua5.1/ /usr/include/libxml2)
   set(CMAKE_C_FLAGS "-g -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts")
 endif (WIN32)
-include_directories (../external)
+include_directories (../external ../server/src)
 
 set (LIB_SRCS
  ../external/sqlite3.c
