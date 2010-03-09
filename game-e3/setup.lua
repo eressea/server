@@ -1,5 +1,5 @@
 local srcpath = config.source_dir
-local respath = srcpath .. '/example/res'
+local respath = srcpath .. '/eressea/res'
 local paths = {
   'eressea/scripts/?.lua',
   'server/scripts/?.lua',
