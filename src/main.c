@@ -12,8 +12,9 @@
 #include <locale.h>
 #include <wctype.h>
 
-static const char * luafile = "init.lua";
+static const char * luafile = "setup.lua";
 static const char * entry_point = NULL;
+static const char * inifile = "eressea.ini";
 static int memdebug = 0;
 
 static void parse_config(const char * filename)
@@ -231,7 +232,7 @@ int main(int argc, char ** argv)
 
   log_open("eressea.log");
   locale_init();
-  parse_config("eressea.ini");
+  parse_config(inifile);
 
   err = parse_args(argc, argv);
   if (err) {
