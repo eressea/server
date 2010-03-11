@@ -84,7 +84,7 @@ function test_ship_capacity()
     assert_not_equal(r2.id, u2.region.id, "boat with too many people has moved")
     assert_not_equal(r2.id, u4.region.id, "boat with too much cargo has moved")
 end
-    
+
 function test_levitate()
   local r = region.create(0,0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -116,4 +116,23 @@ function test_races()
     local f = faction.create("noreply@eressea.de", "human", "de")
     assert_not_equal(nil, f)
   end
+end
+
+function test_can_give_person()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 10)
+  local u2 = unit.create(f2, r, 10)
+  u1.faction.age = 10
+  u2.faction.age = 10
+  u1:add_item("money", 500)
+  u2:add_item("money", 500)
+  u2:clear_orders()
+  u2:add_order("GIB ".. itoa36(u1.id) .. " 1 PERSON")
+  u2:add_order("HELFE ".. itoa36(f1.id) .. " GIB")
+  u1:add_order("HELFE ".. itoa36(f2.id) .. " GIB")
+  process_orders()
+  assert_equal(9, u2.number)
+  assert_equal(11, u1.number)
 end

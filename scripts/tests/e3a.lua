@@ -189,7 +189,6 @@ function test_ship_capacity()
 end
     
 function test_owners()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
@@ -219,7 +218,6 @@ function test_owners()
 end
 
 function test_taxes()
-  free_game()
   local r = region.create(0, 0, "plain")
   r:set_resource("peasant", 1000)
   r:set_resource("money", 5000)
@@ -238,7 +236,6 @@ function test_taxes()
 end
 
 function test_leave()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   f.id = 42
@@ -260,7 +257,6 @@ end
 function test_market()
   -- if i am the only trader around, i should be getting all the herbs from all 7 regions
   local herb_multi = 500 -- from rc_herb_trade()
-  free_game()
   local r, idx
   local herbnames = { 'h0', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8' }
   idx = 1
@@ -297,7 +293,6 @@ function test_market()
 end
 
 function test_market_gives_items()
-  free_game()
   local r
   for x = -1, 1 do for y = -1, 1 do
     r = region.create(x, y, "plain")
@@ -323,7 +318,6 @@ function test_market_gives_items()
 end
 
 function test_spells()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
@@ -353,7 +347,6 @@ function test_spells()
 end
 
 function test_alliance()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
@@ -484,7 +477,6 @@ function test_give_50_percent_of_money()
 end
 
 function test_give_100_percent_of_items()
-  free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
   local r = u2.region
   u1.faction.age = 10
@@ -500,4 +492,41 @@ function test_give_100_percent_of_items()
   process_orders()
   assert_equal(m1-332, u1:get_item("log"))
   assert_equal(m2+332, u2:get_item("log"))
+end
+
+function test_cannot_give_person()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 10)
+  local u2 = unit.create(f2, r, 10)
+  u1.faction.age = 10
+  u2.faction.age = 10
+  u1:add_item("money", 500)
+  u2:add_item("money", 500)
+  u2:clear_orders()
+  u2:add_order("GIB ".. itoa36(u1.id) .. " 1 PERSON")
+  u2:add_order("HELFE ".. itoa36(f1.id) .. " GIB")
+  u1:add_order("HELFE ".. itoa36(f2.id) .. " GIB")
+  process_orders()
+  assert_equal(10, u2.number)
+  assert_equal(10, u1.number)
+end
+
+function test_cannot_give_unit()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local u1 = unit.create(f1, r, 10)
+  local u2 = unit.create(f2, r, 10)
+  u1.faction.age = 10
+  u2.faction.age = 10
+  u1:add_item("money", 500)
+  u2:add_item("money", 500)
+  u2:clear_orders()
+  u2:add_order("GIB ".. itoa36(u1.id) .. " EINHEIT")
+  u2:add_order("HELFE ".. itoa36(f1.id) .. " GIB")
+  u1:add_order("HELFE ".. itoa36(f2.id) .. " GIB")
+  process_orders()
+  assert_not_equal(u2.faction.id, u1.faction.id)
 end
