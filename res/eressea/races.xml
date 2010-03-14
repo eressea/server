@@ -692,13 +692,13 @@
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="stonegolem" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
+  <race name="stonegolem" stonegolem="true" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
     <ai splitsize="50"/>
     <skill name="building" modifier="14"/>
     <skill name="roadwork" modifier="14"/>
     <attack type="4" damage="2d10+4"/>
   </race>
-  <race name="irongolem" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
+  <race name="irongolem" irongolem="true" magres="0.250000" maxaura="1.000000" regaura="0.100000" recruitcost="5000" weight="10000" capacity="2000" speed="1.000000" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no" giveitem="yes">
     <ai splitsize="50"/>
     <function name="name" value="namegeneric"/>
     <skill name="armorer" modifier="14"/>
