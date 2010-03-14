@@ -4906,6 +4906,9 @@ sp_analysemagic(castorder *co)
   int cast_level = co->level;
   spellparameter *pa = co->par;
 
+  if (!pa->param) {
+    return 0;
+  }
   /* Objekt ermitteln */
   obj = pa->param[0]->typ;
 
