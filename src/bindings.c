@@ -51,6 +51,37 @@ tolua_spawn_undead(lua_State * L)
   return 0;
 }
 
+static int
+fix_familiars(struct lua_State * L)
+{
+  faction * f;
+  for (f=factions;f;f=f->next) {
+    unit * u;
+    for (u=f->units;u;u=u->nextF) {
+      struct sc_mage * mage = get_mage(u);
+      if (mage && is_familiar(u)) {
+        if (mage->spells && mage->magietyp==M_GRAY) {
+          equipment * eq;
+          char buffer[64];
+
+          while (mage->spells) {
+            spell_list * slist = mage->spells;
+            mage->spells = mage->spells->next;
+            free(slist);
+          }
+
+          snprintf(buffer, sizeof(buffer), "%s_familiar", u->race->_name[0]);
+          eq = get_equipment(buffer);
+          if (eq) {
+            equip_unit_mask(u, eq, EQUIP_SPELLS);
+          }
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 void
 bind_eressea(struct lua_State * L)
 {
@@ -61,6 +92,7 @@ bind_eressea(struct lua_State * L)
     tolua_function(L, TOLUA_CAST "plan_monsters", tolua_planmonsters);
     tolua_function(L, TOLUA_CAST "spawn_undead", tolua_spawn_undead);
     tolua_function(L, TOLUA_CAST "spawn_dragons", tolua_spawn_dragons);
+    tolua_function(L, TOLUA_CAST "fix_familiars", &fix_familiars);
   }
   tolua_endmodule(L);
 }

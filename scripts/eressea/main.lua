@@ -1,5 +1,13 @@
 require "multis"
 
+function apply_fixes()
+  local turn = get_turn()
+  if config.game=="eressea" and turn>654 and turn<662 then
+    print("Fixing familiars")
+    fix_familiars()
+  end
+end
+
 function process(orders)
   local confirmed_multis = { }
   local suspected_multis = { }
@@ -8,6 +16,7 @@ function process(orders)
     print("could not read game")
     return -1
   end
+  apply_fixes()
   init_summary()
 
   -- kill multi-players (external script)
