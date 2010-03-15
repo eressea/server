@@ -160,7 +160,7 @@
     <param name="rules.economy.wages" value="1"/>
     <param name="rules.economy.roqf" value="5"/>
     <param name="rules.economy.herbrot" value="0"/>
-    <param name="rules.nmr.destroy" value="1"/>
+    <!-- param name="rules.nmr.destroy" value="1"/ -->
     <param name="rules.limit.faction" value="250"/>
     <!--param name="rules.give" value="15"/ --> <!-- self + peasants + herbs + lux - goods -->
     <param name="rules.economy.grow" value="1"/>
