@@ -14,17 +14,20 @@ function test_when_owner_returns_morale_drops_only_2()
   u1:add_item("money", 10000)
   local b = building.create(r, "castle")
   b.size = 50
-
+  
   set_turn(get_turn()+10)
+  f1.lastturn=get_turn()
   u1.building = b
   update_owners()
   r.morale = 6
   u1.building = nil
-  update_owners()
-  assert_equal(6, r.morale)
+  process_orders()
+  assert_equal(5, r.morale) -- no owner, fall by 1
   u1.building = b
   update_owners()
-  assert_equal(4, r.morale)
+  set_key("test", 42)
+  process_orders()
+  assert_equal(3, r.morale) -- new owner, fall by 2
 end
 
 function test_morale_alliance()
@@ -36,6 +39,9 @@ function test_morale_alliance()
   local f2 = faction.create("noreply@eressea.de", "human", "de")
   local u2 = unit.create(f2, r, 1)
   u2:add_item("money", 10000)
+  local f3 = faction.create("noreply@eressea.de", "human", "de")
+  local u3 = unit.create(f3, r, 1)
+  u3:add_item("money", 10000)
 
   local al = alliance.create(42, "Die Antwoord")
   f1.alliance = al;
@@ -45,6 +51,7 @@ function test_morale_alliance()
   b.size = 50
   u1.building = b
   u2.building = b
+  u3.building = b
   update_owners()
   r.morale = 6
 
@@ -52,27 +59,22 @@ function test_morale_alliance()
     process_orders()
     f1.lastturn=get_turn()
     f2.lastturn=get_turn()
+    f3.lastturn=get_turn()
   end
   
   -- just checking everything's okay after setup.
   run_a_turn()
   assert_equal(6, r.morale)
   
-  -- change owner, same alliance as before, but has new owner hasn't been 10 weeks in the alliance yet.
+  -- change owner, new owner is in the same alliance
   u1.building = nil
-  update_owners()
-  assert_equal(0, r.morale)
-
-  -- change owner, this time the alliance is 10 weeks old
-  r.morale = 6
-  u1.building = b
-  for i=1,10 do
-    run_a_turn()
-  end
-  assert_equal(6, r.morale)
-  u2.building = nil
-  update_owners()
+  run_a_turn()
   assert_equal(4, r.morale)
+  
+  -- change owner, new owner is not in the same alliance
+  u2.building = nil
+  run_a_turn()
+  assert_equal(0, r.morale)
 end
 
 function test_morale_change()

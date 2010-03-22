@@ -51,6 +51,10 @@ end
 function test_seecast()
     local r = region.create(0,0, "plain")
     for i = 1,10 do
+      -- this prevents storms (only high seas have storms)
+      region.create(i, 1, "plain")
+    end
+    for i = 1,10 do
       region.create(i, 0, "ocean")
     end
     local f = faction.create("noreply@eressea.de", "human", "de")
@@ -218,7 +222,6 @@ function test_owners()
 end
 
 function test_taxes()
-  set_key("test", 42)
   local r = region.create(0, 0, "plain")
   r:set_resource("peasant", 1000)
   r:set_resource("money", 5000)
