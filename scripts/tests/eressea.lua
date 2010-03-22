@@ -136,3 +136,8 @@ function test_can_give_person()
   assert_equal(9, u2.number)
   assert_equal(11, u1.number)
 end
+
+function test_no_uruk()
+  local f1 = faction.create("noreply@eressea.de", "uruk", "de")
+  assert_equal(f1.race, "orc")
+end

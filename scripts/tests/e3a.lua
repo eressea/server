@@ -218,6 +218,7 @@ function test_owners()
 end
 
 function test_taxes()
+  set_key("test", 42)
   local r = region.create(0, 0, "plain")
   r:set_resource("peasant", 1000)
   r:set_resource("money", 5000)
@@ -230,6 +231,7 @@ function test_taxes()
   b.size = 10
   u.building = b
   update_owners()
+  assert_equal(1, r.morale)
   process_orders()
   assert_equal(1, r.morale)
   assert_equal(25, u:get_item("money"))
@@ -393,38 +395,6 @@ function test_alliance()
   process_orders()
   assert(f1.alliance==f2.alliance)
   assert(f2.alliance~=nil)
-end
-
-function test_morale()
-  local r = region.create(0, 0, "plain")
-  assert_equal(1, r.morale)
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
-  local u2 = unit.create(f2, r, 1)
-
-  local b = building.create(r, "castle")
-  b.size = 10
-  u1.building = b
-  u2.building = b
-  update_owners()
-  assert_equal(1, r.morale)
-  r.morale = 5
-  assert_equal(r.owner, u1.faction)
-  u1:clear_orders()
-  u1:add_order("GIB " .. itoa36(u2.id) .. " KOMMANDO")
-  process_orders()
-  u1:clear_orders()
-  assert_equal(u2.faction, r.owner)
-  assert_equal(3, r.morale) --  5-MORALE_TRANSFER
-  for u in r.units do
-    if u.faction.id==u2.faction.id then
-      u.building = nil
-    end
-  end
-  update_owners()
-  assert_equal(r.owner, u1.faction)
-  assert_equal(0, r.morale)
 end
 
 function test_canoe_passes_through_land()

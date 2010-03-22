@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <equipment>
 
-  <set name="new_uruk_unit">
+  <set name="new_orc_unit">
     <skill name="polearm" level="1"/>
     <skill name="melee" level="1"/>
   </set>
