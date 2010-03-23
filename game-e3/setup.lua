@@ -6,11 +6,6 @@ local paths = {
   'external/lunit/?.lua'
 }
 
-tests = {
-  srcpath .. '/server/scripts/tests/common.lua', 
-  srcpath .. '/eressea/scripts/tests/e3a.lua', 
-}
-
 for idx, path in pairs(paths) do
   package.path = srcpath .. '/' .. path .. ';' .. package.path
 end

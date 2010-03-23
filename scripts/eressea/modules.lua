@@ -13,3 +13,9 @@ require "eressea.xmas2006"
 require "eressea.embassy"
 require "eressea.tunnels"
 require "eressea.ents"
+
+local srcpath = config.source_dir
+tests = {
+  srcpath .. '/server/scripts/tests/common.lua', 
+  srcpath .. '/eressea/scripts/tests/eressea.lua', 
+}
