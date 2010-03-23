@@ -163,7 +163,7 @@
     <resource name="h12" amount="1" cost="fixed"/>
     <resource name="h20" amount="1" cost="fixed"/>
   </spell>
-  <spell name="summon_alp" type="illaun" rank="5" level="15" index="58" parameters="u">
+  <spell name="summon_alp" type="illaun" rank="5" level="15" index="58" parameters="u" target_global="true">
     <resource name="aura" amount="350" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
     <resource name="h8" amount="1" cost="fixed"/>
@@ -413,10 +413,10 @@
   <spell name="sparkledream" type="illaun" rank="5" level="1" index="154" parameters="u" los="true" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="pull_astral" type="tybied" rank="7" level="6" index="156" parameters="ru+" variable="true">
+  <spell name="pull_astral" type="tybied" rank="7" level="6" index="156" parameters="ru+" variable="true" target_global="true">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="fetch_astral" type="tybied" rank="7" level="6" index="157" parameters="u+" variable="true">
+  <spell name="fetch_astral" type="tybied" rank="7" level="6" index="157" parameters="u+" variable="true" target_global="true">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="shockwave" type="tybied" rank="5" level="5" index="163" variable="true" combat="2">
