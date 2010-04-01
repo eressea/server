@@ -503,3 +503,28 @@ function test_cannot_give_unit()
   process_orders()
   assert_not_equal(u2.faction.id, u1.faction.id)
 end
+
+function test_guard_by_owners()
+  -- http://bugs.eressea.de/view.php?id=1756
+  local r = region.create(0,0, "mountain")
+  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  f1.age=20
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  f2.age=20
+  local u1 = unit.create(f1, r, 1)
+  local b = building.create(r, "castle")
+  b.size = 10
+  u1.building = b
+  u1:add_item("money", 100)
+  
+  local u2 = unit.create(f2, r, 1)
+  u2:add_item("money", 100)
+  u2:set_skill("mining", 3)
+  u2:clear_orders()
+  u2:add_order("MACHEN EISEN")
+ 
+  process_orders()
+  local iron = u2:get_item("iron")
+  process_orders()
+  assert_equal(iron, u2:get_item("iron"))
+end
