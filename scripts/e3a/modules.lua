@@ -1,6 +1,7 @@
 require "spells"
 require "e3a.xmas2009"
 require "e3a.rules"
+require "e3a.markets"
 
 local srcpath = config.source_dir
 tests = {
