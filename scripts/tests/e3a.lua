@@ -267,7 +267,7 @@ function test_market()
   idx = 1
   for x = -1, 1 do for y = -1, 1 do
     r = region.create(x, y, "plain")
-    r:set_resource("peasant", herb_multi * 10) -- 10 herbs per region
+    r:set_resource("peasant", herb_multi * 9 + 50) -- 10 herbs per region
     r.herb = herbnames[idx]
     idx = idx+1
   end end
@@ -528,3 +528,68 @@ function test_guard_by_owners()
   process_orders()
   assert_equal(iron, u2:get_item("iron"))
 end
+
+function test_market_action()
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local x, y, r
+  for x=0,2 do
+    for y=0,2 do
+      r = region.create(x, y, "plain")
+      r.luxury = "balm"
+      r.herb = "h2"
+      r:set_resource("peasant", 5000)
+    end
+  end
+  r = get_region(1, 1)
+  local u = unit.create(f, r, 1)
+  b = building.create(r, "market")
+  b.size = 10
+  u.building = b
+  update_owners()
+  for r in regions() do
+    market_action(r)
+  end
+  assert_equal(35, u:get_item("balm"))
+  assert_equal(70, u:get_item("h2"))
+end
+
+-- function test_process_execute()
+  -- local i = 0
+  -- local f = faction.create("noreply@eressea.de", "human", "de")
+  -- local r = region.create(0, 0, "plain")
+  -- local u = unit.create(f, r, 1)
+  -- local r1, u1
+
+  -- function a() i = 2 end
+  -- function b() i = i * 2 end
+  -- function c(r) r1 = r  i = i + 1 end
+  -- function d(u) u1 = u  i = i * 3 end
+  -- process.execute({a, b}, {c}, {d})
+  -- assert_equal(15, i)
+  -- assert_equal(r, r1)
+  -- assert_equal(u, u1)
+-- end
+
+-- function test_new_orders()
+  -- local i = 0
+  -- local f = faction.create("noreply@eressea.de", "human", "de")
+  -- local r = region.create(0, 0, "plain")
+  -- local u = unit.create(f, r, 1)
+  -- local r1, u1
+
+  -- function a() i = 2 end
+  -- function b() i = i * 2 end
+  -- function c(r) r1 = r  i = i + 1 end
+  -- function d(u) u1 = u  i = i * 3 end
+
+  -- process.setup()
+  -- process.push(a)
+  -- process.push(b)
+  -- process.push(c, "region")
+  -- process.push(d, "unit")
+  -- process.start()
+
+  -- assert_equal(15, i)
+  -- assert_equal(r, r1)
+  -- assert_equal(u, u1)
+-- end
