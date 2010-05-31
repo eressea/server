@@ -221,7 +221,7 @@
     <!-- Kriegsgesang -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="frighten" type="cerddor" rank="5" level="8" index="77" variable="true">
+  <spell name="frighten" type="cerddor" rank="5" level="8" index="77" variable="true" combat="1">
     <!-- Gesang der Angst -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
