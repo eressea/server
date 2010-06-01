@@ -774,9 +774,10 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   attrib *a;
   message * msg;
   int force = (int)(get_force(power, 3)/2);
-  unit *u = create_unit(r, mage->faction, force, new_race[RC_WOLF], 0, NULL, mage);
+  unit * u = create_unit(r, mage->faction, force, new_race[RC_WOLF], 0, NULL, mage);
   unused(sp);
 
+  leave(u, true);
   setstatus(u, ST_FIGHT);
 
   set_level(u, SK_WEAPONLESS, (int)(power/3));
