@@ -111,6 +111,7 @@ parse_args(int argc, char **argv, int *exitcode)
   }
 
   if (run_tests) {
+    init_resources();
     *exitcode = RunAllTests();
     return 1;
   }
