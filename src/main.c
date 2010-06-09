@@ -111,7 +111,6 @@ parse_args(int argc, char **argv, int *exitcode)
   }
 
   if (run_tests) {
-    init_resources();
     *exitcode = RunAllTests();
     return 1;
   }
@@ -247,14 +246,15 @@ int main(int argc, char ** argv)
 
   setup_signal_handler();
 
-  log_open("eressea.log");
-  locale_init();
   parse_config(inifile);
 
   err = parse_args(argc, argv, &result);
   if (err) {
     return result;
   }
+
+  log_open("eressea.log");
+  locale_init();
 
 #ifdef CRTDBG
   init_crtdbg();
