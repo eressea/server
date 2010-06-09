@@ -15,6 +15,7 @@ set (LIB_SRCS
  ../external/bson/bson.c
  ../external/bson/numbers.c
  ../external/dlmalloc/malloc.c
+ ../external/cutest/CuTest.c
  ../server/src/build/gamecode.c
  ../server/src/build/kernel.c
  ../server/src/build/lib.c
