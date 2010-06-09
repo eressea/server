@@ -12,6 +12,8 @@
 #include <locale.h>
 #include <wctype.h>
 
+#include <tests.h>
+
 static const char * luafile = "setup.lua";
 static const char * entry_point = NULL;
 static const char * inifile = "eressea.ini";
@@ -48,14 +50,16 @@ usage(const char * prog, const char * arg)
     "-v <level>       : verbosity level\n"
     "-C               : run in interactive mode\n"
     "--color          : force curses to use colors even when not detected\n"
+    "--tests          : run testsuite\n"
     "--help           : help\n", prog);
   return -1;
 }
 
 static int
-parse_args(int argc, char **argv)
+parse_args(int argc, char **argv, int *exitcode)
 {
   int i;
+  int run_tests = 0;
 
   for (i=1;i!=argc;++i) {
     if (argv[i][0]!='-') {
@@ -69,6 +73,10 @@ parse_args(int argc, char **argv)
       else if (strcmp(argv[i]+2, "color")==0) {
         /* force the editor to have colors */
         force_color = 1;
+      }
+      else if (strcmp(argv[i]+2, "tests")==0) {
+        /* force the editor to have colors */
+        run_tests = 1;
       }
       else if (strcmp(argv[i]+2, "help")==0) {
         return usage(argv[0], NULL);
@@ -93,10 +101,18 @@ parse_args(int argc, char **argv)
         verbosity = atoi(argv[++i]);
         break;
       case 'h':
-        return usage(argv[0], NULL);
+        usage(argv[0], NULL);
+        return 1;
       default:
-        return usage(argv[0], argv[i]);
+        *exitcode = -1;
+        usage(argv[0], argv[i]);
+        return 1;
     }
+  }
+
+  if (run_tests) {
+    *exitcode = RunAllTests();
+    return 1;
   }
 
   return 0;
@@ -226,7 +242,7 @@ extern void bind_eressea(struct lua_State * L);
 int main(int argc, char ** argv)
 {
   static int write_csv = 0;
-  int err;
+  int err, result = 0;
 
   setup_signal_handler();
 
@@ -234,9 +250,9 @@ int main(int argc, char ** argv)
   locale_init();
   parse_config(inifile);
 
-  err = parse_args(argc, argv);
+  err = parse_args(argc, argv, &result);
   if (err) {
-    return err;
+    return result;
   }
 
 #ifdef CRTDBG

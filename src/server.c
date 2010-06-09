@@ -18,4 +18,4 @@
 #include "bindings.c"
 #include "monsters.c"
 #include "main.c"
-
+#include "tests.c"

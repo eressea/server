@@ -463,6 +463,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\server\src\tests.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\spells\unitcurse.c"
 				>
 				<FileConfiguration
@@ -538,6 +558,10 @@
 			</File>
 			<File
 				RelativePath="..\..\server\src\build\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\server\src\tests.h"
 				>
 			</File>
 			<File

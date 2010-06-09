@@ -32,12 +32,3 @@ else (WIN32)
 endif (WIN32)
 
 add_definitions(-DUNITY_BUILD)
-set (TESTS_SRCS
- ../server/src/tests.c
- ../external/cutest/CuTest.c
-)
-add_executable (tests ${LIB_SRCS} ${TESTS_SRCS})
-if (WIN32)
-else (WIN32)
-  target_link_libraries (tests tolua xml2 ncurses lua5.1 pthread)
-endif (WIN32)
