@@ -287,7 +287,7 @@ static struct curse_type ct_oldrace = {
 };
 
 static struct curse_type ct_magicresistance = {
-  "magicresistance", CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_unit
+  "magicresistance", CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_simple
 };
 
 
