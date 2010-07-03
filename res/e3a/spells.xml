@@ -61,7 +61,7 @@
     <!-- Schöne Träume -->
     <resource name="aura" amount="80" cost="fixed"/>
   </spell>
-  <spell name="illaundestroymagic" type="illaun" rank="2" level="8" index="140" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="illaundestroymagic" type="illaun" rank="2" level="8" index="140" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <!-- Traumbilder entwirren -->
     <resource name="aura" amount="6" cost="level"/>
   </spell>
@@ -144,7 +144,7 @@
     <!-- Untote Helden -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="draigdestroymagic" type="draig" rank="2" level="10" index="139" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="draigdestroymagic" type="draig" rank="2" level="10" index="139" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <!-- Pentagramm -->
     <resource name="aura" amount="10" cost="level"/>
   </spell>
@@ -225,7 +225,7 @@
     <!-- Gesang der Angst -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
-  <spell name="cerddor_destroymagic" type="cerddor" rank="2" level="8" index="141" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="cerddor_destroymagic" type="cerddor" rank="2" level="8" index="141" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <!-- Lebenslied festigen -->
     <resource name="aura" amount="5" cost="level"/>
   </spell>
@@ -332,7 +332,7 @@
     <!-- Blick des Basilisken -->
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="gwyrrddestroymagic" type="gwyrrd" rank="2" level="8" index="138" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="gwyrrddestroymagic" type="gwyrrd" rank="2" level="8" index="138" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <!-- Geister bannen -->
     <resource name="aura" amount="6" cost="level"/>
   </spell>
@@ -582,7 +582,7 @@
   <spell name="analyze_magic" type="common" rank="5" level="1" index="102" parameters="kc?" los="true" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="destroy_magic" type="common" rank="2" level="5" index="106" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="destroy_magic" type="common" rank="2" level="5" index="106" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>
   </spell>
   <spell name="break_curse" type="common" rank="3" level="7" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
