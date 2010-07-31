@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.4)
-project (eressea)
+project (eressea C)
 
 if (WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
