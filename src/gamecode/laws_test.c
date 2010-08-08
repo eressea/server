@@ -6,10 +6,12 @@
 static void test_new_building_can_be_renamed(CuTest * tc) {
   region * r;
   building * b;
-  building_type * btype = bt_find("castle");
+  building_type * btype;
 
   test_cleanup();
   test_create_world();
+
+  btype = bt_find("castle");
   r = findregion(-1, 0);
 
   b = new_building(btype, r, default_locale);
