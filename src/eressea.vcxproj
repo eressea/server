@@ -59,11 +59,11 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libxml2.lib;pdcurses.lib;lua5.1_d.lib;tolua.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)eressea.exe</OutputFile>
+      <AdditionalDependencies>libxml2.lib;pdcurses.lib;lua.lib;tolua.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>..\..\external\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -76,13 +76,13 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libxml2.lib;pdcurses.lib;lua5.1.lib;tolua.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)eressea.exe</OutputFile>
+      <AdditionalDependencies>libxml2.lib;pdcurses.lib;lua.lib;tolua.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>..\..\external\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
