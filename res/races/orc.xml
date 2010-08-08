@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<race name="orc" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <param name="recruit_multi" value="0.5"/>
+    <skill name="alchemy" modifier="1"/>
+    <skill name="mining" modifier="1"/>
+    <skill name="building" modifier="1"/>
+    <skill name="trade" modifier="-3"/>
+    <skill name="forestry" modifier="1"/>
+    <skill name="herbalism" modifier="-2"/>
+    <skill name="magic" modifier="-1"/>
+    <skill name="training" modifier="-1"/>
+    <skill name="armorer" modifier="1"/>
+    <skill name="shipcraft" modifier="-1"/>
+    <skill name="sailing" modifier="-1"/>
+    <skill name="espionage" modifier="-1"/>
+    <skill name="quarrying" modifier="1"/>
+    <skill name="tactics" modifier="1"/>
+    <skill name="entertainment" modifier="-2"/>
+    <skill name="weaponsmithing" modifier="2"/>
+    <skill name="cartmaking" modifier="-1"/>
+    <skill name="taxation" modifier="1"/>
+    <skill name="unarmed" modifier="-99"/>
+    <attack type="1" damage="1d5"/>
+    <familiar race="goblin" default="yes"/>
+    <familiar race="ghost"/>
+    <familiar race="imp"/>
+    <familiar race="rat"/>
+    <familiar race="wolf"/>
+    <familiar race="demon"/>
+</race>
