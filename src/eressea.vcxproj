@@ -49,7 +49,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../server/src;../../external;../../external/lua/src;../../external/tolua/include;../../external/pdcurses;..\..\external\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../shared/src;../../external;../../external/lua/src;../../external/tolua/include;../../external/pdcurses;..\..\external\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LIBXML_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -68,7 +68,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../server/src;../../external;../../external/lua/src;../../external/tolua/include;../../external/pdcurses;..\..\external\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../shared/src;../../external;../../external/lua/src;../../external/tolua/include;../../external/pdcurses;..\..\external\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LIBXML_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -138,7 +138,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\server\src\tests.c">
+    <ClCompile Include="..\..\shared\src\tests.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -150,17 +150,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\server\src\build\external.c" />
-    <ClCompile Include="..\..\server\src\build\gamecode.c" />
-    <ClCompile Include="..\..\server\src\build\kernel.c" />
-    <ClCompile Include="..\..\server\src\build\lib.c" />
+    <ClCompile Include="..\..\shared\src\build\external.c" />
+    <ClCompile Include="..\..\shared\src\build\gamecode.c" />
+    <ClCompile Include="..\..\shared\src\build\kernel.c" />
+    <ClCompile Include="..\..\shared\src\build\lib.c" />
     <ClCompile Include="server.c" />
-    <ClCompile Include="..\..\server\src\build\stdafx.c">
+    <ClCompile Include="..\..\shared\src\build\stdafx.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\server\src\build\util.c">
+    <ClCompile Include="..\..\shared\src\build\util.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">src/util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemGroup>
@@ -176,8 +176,8 @@
     <ClInclude Include="spells\regioncurse.h" />
     <ClInclude Include="spells\shipcurse.h" />
     <ClInclude Include="spells\spells.h" />
-    <ClInclude Include="..\..\server\src\build\stdafx.h" />
-    <ClInclude Include="..\..\server\src\tests.h" />
+    <ClInclude Include="..\..\shared\src\build\stdafx.h" />
+    <ClInclude Include="..\..\shared\src\tests.h" />
     <ClInclude Include="spells\unitcurse.h" />
   </ItemGroup>
   <ItemGroup>
