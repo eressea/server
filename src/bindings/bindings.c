@@ -760,7 +760,9 @@ static int tolua_set_alliance_name(lua_State* L)
   return 0;
 }
 
+#ifdef HAVE_LIBXML
 #include <libxml/tree.h>
+#endif
 #include <util/functions.h>
 #include <util/xml.h>
 #include <kernel/spell.h>
@@ -768,6 +770,7 @@ static int tolua_set_alliance_name(lua_State* L)
 static int
 tolua_write_spells(lua_State* L)
 {
+#ifdef HAVE_LIBXML
   spell_f fun = (spell_f)get_function("lua_castspell");
   const char * filename = "magic.xml";
   xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
@@ -827,6 +830,7 @@ tolua_write_spells(lua_State* L)
   xmlKeepBlanksDefault(0);
   xmlSaveFormatFileEnc(filename, doc, "utf-8", 1);
   xmlFreeDoc(doc);
+#endif
   return 0;
 }
 
@@ -1149,9 +1153,9 @@ tolua_eressea_open(lua_State* L)
     tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
 
     tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
-    tolua_function(L, TOLUA_CAST "write_spells", tolua_write_spells);
+	tolua_function(L, TOLUA_CAST "write_spells", tolua_write_spells);
 
-    tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
+	tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
     
   }
   tolua_endmodule(L);

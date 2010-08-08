@@ -55,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/encoding.h>
 #include <util/event.h>
 #include <util/filereader.h>
 #include <util/goodies.h>
@@ -69,8 +70,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/storage.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
-
-#include <libxml/encoding.h>
 
 /* libc includes */
 #include <string.h>
@@ -168,7 +167,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
         break;
       default:
         if ((size_t)(str-start+1)<size) {
-          if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
+          if (encoding == ENCODING_8859_1 && c&0x80) {
             char inbuf = (char)c;
             size_t inbytes = 1;
             size_t outbytes = size-(str-start);
@@ -176,7 +175,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
             if (ret>0) str+=ret;
             else {
               log_error(("input data was not iso-8859-1! assuming utf-8\n"));
-              encoding = XML_CHAR_ENCODING_ERROR;
+              encoding = ENCODING_ERROR;
               *str++ = (char)c;
             }
           } else {
@@ -187,7 +186,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
         break;
       default:
         if ((size_t)(str-start+1)<size) {
-          if (encoding == XML_CHAR_ENCODING_8859_1 && c&0x80) {
+          if (encoding == ENCODING_8859_1 && c&0x80) {
             char inbuf = (char)c;
             size_t inbytes = 1;
             size_t outbytes = size-(str-start);
@@ -195,7 +194,7 @@ freadstr(FILE * F, int encoding, char * start, size_t size)
             if (ret>0) str+=ret;
             else {
               log_error(("input data was not iso-8859-1! assuming utf-8\n"));
-              encoding = XML_CHAR_ENCODING_ERROR;
+              encoding = ENCODING_ERROR;
               *str++ = (char)c;
             }
           } else {

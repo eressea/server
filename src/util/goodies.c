@@ -126,3 +126,29 @@ set_email(char** pemail, const char *newmail)
   }
   return 0;
 }
+
+#include "encoding.h"
+#include <string.h>
+
+static struct {
+  int encoding;
+  const char * names;
+} encodings[] = {
+  { ENCODING_UTF8, " utf8 utf-8 UTF8 UTF-8 "},
+  { ENCODING_8859_1, " iso8859-1 latin1 latin-1 iso-8859-1 ISO8859-1 LATIN1 LATIN-1 ISO-8859-1 "},
+  { ENCODING_NONE, 0 }
+};
+
+int
+get_encoding_by_name(const char * name)
+{
+  char str[32];
+  int i;
+  snprintf(str, 32, " %s ", name);
+  for (i=0;encodings[i].encoding!=ENCODING_NONE;++i) {
+    if (strstr(encodings[i].names, str)) {
+      return encodings[i].encoding;
+    }
+  }
+  return ENCODING_NONE;
+}

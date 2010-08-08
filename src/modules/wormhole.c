@@ -30,6 +30,7 @@
 #include <util/rng.h>
 #include <util/resolve.h>
 #include <util/storage.h>
+#include <util/language.h>
 
 /* libc includes */
 #include <assert.h>

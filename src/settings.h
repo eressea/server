@@ -52,12 +52,4 @@
 #define SIMPLE_COMBAT
 #define SIMPLE_ESCAPE
 
-#if defined(BINDINGS_LUABIND)
-# undef BINDINGS_TOLUA
-#elif defined(BINDINGS_TOLUA)
-# undef BINDINGS_LUABIND
-#else
-# define BINDINGS_TOLUA /* new default */
-#endif
-
 #undef REGIONOWNERS /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */

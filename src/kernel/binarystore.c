@@ -13,12 +13,15 @@ without prior permission by the authors of Eressea.
 #include "save.h"
 #include "version.h"
 #include <util/base36.h>
+#include <util/encoding.h>
 #include <util/log.h>
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef HAVE_LIBXML
 #include <libxml/encoding.h>
+#endif
 
 #define file(store) (FILE *)((store)->userdata)
 
@@ -247,7 +250,7 @@ bin_open(struct storage * store, const char * filename, int mode)
   const char * modes[] = { 0, "rb", "wb", "ab" };
   FILE * F = fopen(filename, modes[mode]);
   store->userdata = F;
-  store->encoding=XML_CHAR_ENCODING_UTF8; /* always utf8 it is */
+  store->encoding = ENCODING_UTF8; /* always utf8 it is */
   if (F) {
     if (mode==IO_READ) {
       int stream_version = 0;
@@ -263,7 +266,7 @@ bin_open(struct storage * store, const char * filename, int mode)
         store->r_int = bin_r_int;
         store->w_int = bin_w_int;
       }
-    } else if (store->encoding==XML_CHAR_ENCODING_UTF8) {
+    } else if (store->encoding==ENCODING_UTF8) {
       bin_w_int(store, RELEASE_VERSION);
       bin_w_int(store, STREAM_VERSION);
     }

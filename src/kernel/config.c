@@ -54,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
+#include <util/encoding.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/language.h>
@@ -65,13 +66,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/sql.h>
 #include <util/translation.h>
 #include <util/umlaut.h>
-#include <util/xml.h>
 #include <util/bsdstring.h>
 #include <util/unicode.h>
-
-/* libxml includes */
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
 
 #include <iniparser/iniparser.h>
 
@@ -3259,7 +3255,7 @@ load_inifile(dictionary * d)
   lomem = iniparser_getint(d, "eressea:lomem", lomem)?1:0;
 
   str = iniparser_getstring(d, "eressea:encoding", NULL);
-  if (str) enc_gamedata = xmlParseCharEncoding(str);
+  if (str) enc_gamedata = get_encoding_by_name(str);
 
   verbosity = iniparser_getint(d, "eressea:verbose", 2);
   sqlpatch = iniparser_getint(d, "eressea:sqlpatch", false);

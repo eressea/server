@@ -39,8 +39,6 @@
 #include <util/sql.h>
 #include <util/unicode.h>
 
-#include <libxml/encoding.h>
-
 /* libc includes */
 #include <limits.h>
 #include <memory.h>

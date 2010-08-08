@@ -2,7 +2,6 @@
 #include <platform.h>
 #include "stdafx.h"
 
-#ifdef BINDINGS_TOLUA
 #include <bindings/bindings.c>
 #include <bindings/bind_attrib.c>
 #include <bindings/bind_sqlite.c>
@@ -13,10 +12,12 @@
 #include <bindings/bind_faction.c>
 #include <bindings/bind_message.c>
 #include <bindings/bind_hashtable.c>
-#include <bindings/bind_gmtool.c>
 #include <bindings/bind_storage.c>
 #include <bindings/helpers.c>
+#ifdef HAVE_CURSES
+#include <bindings/bind_gmtool.c>
 #endif
+
 
 #include <gamecode/archetype.c>
 #include <gamecode/creation.c>
@@ -32,7 +33,6 @@
 #include <gamecode/spy.c>
 #include <gamecode/study.c>
 #include <gamecode/summary.c>
-#include <gamecode/xmlreport.c>
 
 #include <attributes/alliance.c>
 #include <attributes/attributes.c>
