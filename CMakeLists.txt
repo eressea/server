@@ -7,7 +7,7 @@ else (WIN32)
   include_directories (/usr/include/lua5.1/ /usr/include/libxml2)
   set(CMAKE_C_FLAGS "-g -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts")
 endif (WIN32)
-include_directories (../external ../server/src)
+include_directories (../external ../shared/src)
 
 set (LIB_SRCS
  ../external/sqlite3.c
@@ -16,10 +16,10 @@ set (LIB_SRCS
  ../external/bson/numbers.c
  ../external/dlmalloc/malloc.c
  ../external/cutest/CuTest.c
- ../server/src/build/gamecode.c
- ../server/src/build/kernel.c
- ../server/src/build/lib.c
- ../server/src/build/util.c
+ ../shared/src/build/gamecode.c
+ ../shared/src/build/kernel.c
+ ../shared/src/build/lib.c
+ ../shared/src/build/util.c
 )
 
 set (ERESSEA_SRCS
