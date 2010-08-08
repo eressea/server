@@ -38,13 +38,8 @@
 #include <kernel/terrain.c>
 #include <kernel/textstore.c>
 #include <kernel/unit.c>
-#include <kernel/sqlite.c>
-#ifdef HAVE_LIBXML
 #include <kernel/xmlreader.c>
-#else
-void register_xmlreader(void) {}
-void enable_xml_gamecode(void) {}
-#endif
+#include <kernel/sqlite.c>
 
 #include <modules/arena.c>
 #include <modules/autoseed.c>

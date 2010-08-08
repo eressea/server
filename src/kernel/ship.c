@@ -36,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/umlaut.h>
 #include <util/storage.h>
+#include <util/xml.h>
 
 /* libc includes */
 #include <assert.h>

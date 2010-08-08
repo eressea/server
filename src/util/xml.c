@@ -15,10 +15,8 @@
 /* util includes */
 #include "log.h"
 
-#ifdef HAVE_LIBXML
 #include <libxml/catalog.h>
 #include <libxml/xmlstring.h>
-#endif
 
 /* libc includes */
 #include <assert.h>
@@ -27,7 +25,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef HAVE_LIBXML
 const xmlChar *
 xml_i(double number)
 {
@@ -107,12 +104,10 @@ xml_register_callback(xml_callback callback)
   while (*insert) insert = &(*insert)->next;
   *insert = reader;
 }
-#endif
 
 int
 read_xml(const char * filename, const char * catalog)
 {
-#ifdef HAVE_LIBXML
   xml_reader * reader = xmlReaders;
   xmlDocPtr doc;
 
@@ -139,7 +134,6 @@ read_xml(const char * filename, const char * catalog)
     reader = reader->next;
   }
   xmlFreeDoc(doc);
-#endif
   return 0;
 }
 

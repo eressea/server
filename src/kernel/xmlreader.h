@@ -12,7 +12,6 @@ without prior permission by the authors of Eressea.
 
 #ifndef H_KRNL_XMLREADER_H
 #define H_KRNL_XMLREADER_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif

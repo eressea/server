@@ -17,18 +17,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifdef HAVE_LIBXML
+  
+  /* new xml functions: */
 #include <libxml/tree.h>
+
   typedef int (*xml_callback)(xmlDocPtr);
   extern void xml_register_callback(xml_callback callback);
+  extern int read_xml(const char * filename, const char * catalog);
   extern double xml_fvalue(xmlNodePtr node, const char * name, double dflt);
   extern int xml_ivalue(xmlNodePtr node, const char * name, int dflt);
   extern boolean xml_bvalue(xmlNodePtr node, const char * name, boolean dflt);
-  const xmlChar * xml_i(double number);
-#endif
 
-  extern int read_xml(const char * filename, const char * catalog);
+  const xmlChar * xml_i(double number);
 
 #ifdef __cplusplus
 }

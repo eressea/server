@@ -17,11 +17,9 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-#ifdef HAVE_LIBXML
 #include <libxml/xpath.h>
 
 extern void xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, struct construction ** consPtr);
-#endif
 
 #ifdef __cplusplus
 }

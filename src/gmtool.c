@@ -60,6 +60,8 @@
 #include <util/listbox.h>
 #include <util/storage.h>
 
+#include <libxml/encoding.h>
+
 #include <lua.h>
 
 #include <assert.h>

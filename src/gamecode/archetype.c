@@ -15,12 +15,10 @@
 #include <util/xml.h>
 #include <util/functions.h>
 
-#ifdef HAVE_LIBXML
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/encoding.h>
-#endif
 
 /* libc includes */
 #include <string.h>
@@ -73,7 +71,6 @@ init_archetypes(void)
   }
 }
 
-#ifdef HAVE_LIBXML
 static int
 parse_archetypes(xmlDocPtr doc)
 {
@@ -160,12 +157,9 @@ parse_archetypes(xmlDocPtr doc)
   xmlXPathFreeContext(xpath);
   return 0;
 }
-#endif
 
 void
 register_archetypes(void)
 {
-#ifdef HAVE_LIBXML
   xml_register_callback(parse_archetypes);
-#endif
 }

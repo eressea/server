@@ -70,7 +70,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <util/encoding.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -78,6 +77,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <util/rng.h>
+
+#include <libxml/encoding.h>
 
 /* libc includes */
 #include <assert.h>
@@ -1362,14 +1363,14 @@ report_template(const char * filename, report_context * ctx, const char * charse
   size_t size;
   int bytes;
   
-  int enc = get_encoding_by_name(charset);
+  int enc = xmlParseCharEncoding(charset);
 
   if (F==NULL) {
     perror(filename);
     return -1;
   }
 
-  if (enc==ENCODING_UTF8) {
+  if (enc==XML_CHAR_ENCODING_UTF8) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
     fwrite(utf8_bom, 1, 3, F);
   }
@@ -1940,7 +1941,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
   seen_region * sr = NULL;
   char buf[8192];
   char * bufp;
-  int enc = get_encoding_by_name(charset);
+  int enc = xmlParseCharEncoding(charset);
   size_t size;
 
   /* static variables can cope with writing for different turns */
@@ -1960,7 +1961,7 @@ report_plaintext(const char * filename, report_context * ctx, const char * chars
     perror(filename);
     return -1;
   }
-  if (enc==ENCODING_UTF8) {
+  if (enc==XML_CHAR_ENCODING_UTF8) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
     fwrite(utf8_bom, 1, 3, F);
   }

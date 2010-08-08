@@ -7,6 +7,7 @@
 #include <util/log.h>
 
 /* lua includes */
+#ifdef BINDINGS_TOLUA
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -15,15 +16,14 @@
 #include <bindings/bind_attrib.h>
 #include <bindings/bind_building.h>
 #include <bindings/bind_faction.h>
+#include <bindings/bind_gmtool.h>
 #include <bindings/bind_hashtable.h>
 #include <bindings/bind_message.h>
 #include <bindings/bind_region.h>
 #include <bindings/bind_ship.h>
 #include <bindings/bind_storage.h>
 #include <bindings/bind_unit.h>
-#ifdef HAVE_CURSES
-#include <bindings/bind_gmtool.h>
-#endif
+#endif // BINDINGS_TOLUA
 
 #if MUSEUM_MODULE
 #include <modules/museum.h>
@@ -33,9 +33,7 @@
 #endif
 #include <triggers/triggers.h>
 #include <util/language.h>
-#ifdef HAVE_LIBXML
 #include <kernel/xmlreader.h>
-#endif
 #include <kernel/reports.h>
 #include <kernel/item.h>
 #include <kernel/names.h>
@@ -48,6 +46,7 @@
 #include <gamecode/report.h>
 #include <gamecode/items.h>
 #include <gamecode/creport.h>
+#include <gamecode/xmlreport.h>
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
 
@@ -92,6 +91,7 @@ lua_init(void)
   lua_State * L = lua_open();
 
   openlibs(L);
+#ifdef BINDINGS_TOLUA
   register_tolua_helpers();
   tolua_eressea_open(L);
   tolua_sqlite_open(L);
@@ -104,10 +104,9 @@ lua_init(void)
   tolua_unit_open(L);
   tolua_message_open(L);
   tolua_hashtable_open(L);
-#ifdef HAVE_CURSES
   tolua_gmtool_open(L);
-#endif
   tolua_storage_open(L);
+#endif
   return L;
 }
 
@@ -139,6 +138,7 @@ game_init(void)
   register_reports();
   register_nr();
   register_cr();
+  register_xr();
 
   debug_language("locales.log");
   register_names();
@@ -160,6 +160,7 @@ game_init(void)
   register_xmlreader();
   register_archetypes();
   enable_xml_gamecode();
+
   register_attributes();
   register_gmcmd();
 

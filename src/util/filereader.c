@@ -4,7 +4,7 @@
 #include <util/log.h>
 #include <util/unicode.h>
 
-#include <util/encoding.h>
+#include <libxml/encoding.h>
 
 #include <ctype.h>
 #include <wctype.h>
@@ -309,6 +309,6 @@ getbuf_utf8(FILE * F)
 const char *
 getbuf(FILE * F, int encoding)
 {
-  if (encoding==ENCODING_UTF8) return getbuf_utf8(F);
+  if (encoding==XML_CHAR_ENCODING_UTF8) return getbuf_utf8(F);
   return getbuf_latin1(F);
 }

@@ -13,15 +13,12 @@ without prior permission by the authors of Eressea.
 #include "save.h"
 #include "version.h"
 #include <util/base36.h>
-#include <util/encoding.h>
 #include <util/log.h>
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_LIBXML
 #include <libxml/encoding.h>
-#endif
 
 #define NULL_TOKEN '@'
 
@@ -155,19 +152,19 @@ txt_open(struct storage * store, const char * filename, int mode)
       /* recognize UTF8 BOM */
       store->r_tok_buf(store, token, sizeof(token));
       if (memcmp(token, utf8_bom, 3)==0) {
-        if (enc_gamedata!=ENCODING_UTF8) {
+        if (enc_gamedata!=XML_CHAR_ENCODING_UTF8) {
           log_warning(("Found UTF-8 BOM, assuming unicode game data.\n"));
-          store->encoding = ENCODING_UTF8;
+          store->encoding = XML_CHAR_ENCODING_UTF8;
         }
         store->version = atoi(token+3);
       } else {
-        if (store->encoding==ENCODING_NONE) {
-          store->encoding = ENCODING_8859_1;
+        if (store->encoding==XML_CHAR_ENCODING_NONE) {
+          store->encoding = XML_CHAR_ENCODING_8859_1;
           log_warning(("No BOM, assuming 8859-1 game data.\n"));
         }
         store->version = atoi(token);
       }
-    } else if (store->encoding==ENCODING_UTF8) {
+    } else if (store->encoding==XML_CHAR_ENCODING_UTF8) {
       fputs(utf8_bom, F);
       fprintf(F, "%d\n", RELEASE_VERSION);
     }
