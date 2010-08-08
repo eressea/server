@@ -16,6 +16,6 @@ require "eressea.ents"
 
 local srcpath = config.source_dir
 tests = {
-  srcpath .. '/server/scripts/tests/common.lua', 
+  srcpath .. '/shared/scripts/tests/common.lua', 
   srcpath .. '/eressea/scripts/tests/eressea.lua', 
 }

@@ -7,6 +7,6 @@ local srcpath = config.source_dir
 tests = {
   srcpath .. '/eressea/scripts/tests/castles.lua', 
   srcpath .. '/eressea/scripts/tests/morale.lua', 
-  srcpath .. '/server/scripts/tests/common.lua', 
+  srcpath .. '/shared/scripts/tests/common.lua', 
   srcpath .. '/eressea/scripts/tests/e3a.lua', 
 }
