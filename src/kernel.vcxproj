@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}</ProjectGuid>
+    <RootNamespace>kernel</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)kernel.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <AdditionalIncludeDirectories>.;../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)kernel.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="kernel\alchemy.c" />
+    <ClCompile Include="kernel\alliance.c" />
+    <ClCompile Include="kernel\battle.c" />
+    <ClCompile Include="kernel\binarystore.c" />
+    <ClCompile Include="kernel\build.c" />
+    <ClCompile Include="kernel\building.c" />
+    <ClCompile Include="kernel\calendar.c" />
+    <ClCompile Include="kernel\command.c" />
+    <ClCompile Include="kernel\config.c" />
+    <ClCompile Include="kernel\connection.c" />
+    <ClCompile Include="kernel\curse.c" />
+    <ClCompile Include="kernel\equipment.c" />
+    <ClCompile Include="kernel\faction.c" />
+    <ClCompile Include="kernel\group.c" />
+    <ClCompile Include="kernel\item.c" />
+    <ClCompile Include="kernel\magic.c" />
+    <ClCompile Include="kernel\message.c" />
+    <ClCompile Include="kernel\move.c" />
+    <ClCompile Include="kernel\names.c" />
+    <ClCompile Include="kernel\order.c" />
+    <ClCompile Include="kernel\pathfinder.c" />
+    <ClCompile Include="kernel\plane.c" />
+    <ClCompile Include="kernel\player.c" />
+    <ClCompile Include="kernel\pool.c" />
+    <ClCompile Include="kernel\race.c" />
+    <ClCompile Include="kernel\region.c" />
+    <ClCompile Include="kernel\reports.c" />
+    <ClCompile Include="kernel\resources.c" />
+    <ClCompile Include="kernel\save.c" />
+    <ClCompile Include="kernel\ship.c" />
+    <ClCompile Include="kernel\skill.c" />
+    <ClCompile Include="kernel\spell.c" />
+    <ClCompile Include="kernel\sqlite.c" />
+    <ClCompile Include="kernel\teleport.c" />
+    <ClCompile Include="kernel\terrain.c" />
+    <ClCompile Include="kernel\textstore.c" />
+    <ClCompile Include="kernel\unit.c" />
+    <ClCompile Include="kernel\xmlreader.c" />
+    <ClCompile Include="triggers\changefaction.c" />
+    <ClCompile Include="triggers\changerace.c" />
+    <ClCompile Include="triggers\clonedied.c" />
+    <ClCompile Include="triggers\createcurse.c" />
+    <ClCompile Include="triggers\createunit.c" />
+    <ClCompile Include="triggers\gate.c" />
+    <ClCompile Include="triggers\giveitem.c" />
+    <ClCompile Include="triggers\killunit.c" />
+    <ClCompile Include="triggers\removecurse.c" />
+    <ClCompile Include="triggers\shock.c" />
+    <ClCompile Include="triggers\timeout.c" />
+    <ClCompile Include="triggers\triggers.c" />
+    <ClCompile Include="triggers\unguard.c" />
+    <ClCompile Include="triggers\unitmessage.c" />
+    <ClCompile Include="items\artrewards.c" />
+    <ClCompile Include="items\demonseye.c" />
+    <ClCompile Include="items\itemtypes.c" />
+    <ClCompile Include="items\phoenixcompass.c" />
+    <ClCompile Include="items\seed.c" />
+    <ClCompile Include="items\speedsail.c" />
+    <ClCompile Include="items\weapons.c" />
+    <ClCompile Include="items\xerewards.c" />
+    <ClCompile Include="modules\arena.c" />
+    <ClCompile Include="modules\autoseed.c" />
+    <ClCompile Include="modules\dungeon.c" />
+    <ClCompile Include="modules\gmcmd.c" />
+    <ClCompile Include="modules\museum.c" />
+    <ClCompile Include="modules\oceannames.c" />
+    <ClCompile Include="modules\score.c" />
+    <ClCompile Include="modules\weather.c" />
+    <ClCompile Include="modules\wormhole.c" />
+    <ClCompile Include="modules\xecmd.c" />
+    <ClCompile Include="modules\xmas.c" />
+    <ClCompile Include="attributes\alliance.c" />
+    <ClCompile Include="attributes\attributes.c" />
+    <ClCompile Include="attributes\fleechance.c" />
+    <ClCompile Include="attributes\follow.c" />
+    <ClCompile Include="attributes\giveitem.c" />
+    <ClCompile Include="attributes\gm.c" />
+    <ClCompile Include="attributes\hate.c" />
+    <ClCompile Include="attributes\iceberg.c" />
+    <ClCompile Include="attributes\key.c" />
+    <ClCompile Include="attributes\matmod.c" />
+    <ClCompile Include="attributes\moved.c" />
+    <ClCompile Include="attributes\movement.c" />
+    <ClCompile Include="attributes\object.c" />
+    <ClCompile Include="attributes\orcification.c" />
+    <ClCompile Include="attributes\otherfaction.c" />
+    <ClCompile Include="attributes\overrideroads.c" />
+    <ClCompile Include="attributes\racename.c" />
+    <ClCompile Include="attributes\raceprefix.c" />
+    <ClCompile Include="attributes\reduceproduction.c" />
+    <ClCompile Include="attributes\targetregion.c" />
+    <ClCompile Include="attributes\viewrange.c" />
+    <ClCompile Include="kernel\curse_test.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="kernel\alchemy.h" />
+    <ClInclude Include="kernel\alliance.h" />
+    <ClInclude Include="kernel\battle.h" />
+    <ClInclude Include="kernel\binarystore.h" />
+    <ClInclude Include="kernel\build.h" />
+    <ClInclude Include="kernel\building.h" />
+    <ClInclude Include="kernel\calendar.h" />
+    <ClInclude Include="kernel\command.h" />
+    <ClInclude Include="kernel\config.h" />
+    <ClInclude Include="kernel\connection.h" />
+    <ClInclude Include="kernel\curse.h" />
+    <ClInclude Include="kernel\equipment.h" />
+    <ClInclude Include="kernel\faction.h" />
+    <ClInclude Include="kernel\group.h" />
+    <ClInclude Include="kernel\item.h" />
+    <ClInclude Include="kernel\magic.h" />
+    <ClInclude Include="kernel\message.h" />
+    <ClInclude Include="kernel\move.h" />
+    <ClInclude Include="kernel\names.h" />
+    <ClInclude Include="kernel\objtypes.h" />
+    <ClInclude Include="kernel\order.h" />
+    <ClInclude Include="kernel\pathfinder.h" />
+    <ClInclude Include="kernel\plane.h" />
+    <ClInclude Include="kernel\player.h" />
+    <ClInclude Include="kernel\pool.h" />
+    <ClInclude Include="kernel\race.h" />
+    <ClInclude Include="kernel\region.h" />
+    <ClInclude Include="kernel\render.h" />
+    <ClInclude Include="kernel\reports.h" />
+    <ClInclude Include="kernel\resources.h" />
+    <ClInclude Include="kernel\save.h" />
+    <ClInclude Include="kernel\ship.h" />
+    <ClInclude Include="kernel\skill.h" />
+    <ClInclude Include="kernel\spell.h" />
+    <ClInclude Include="kernel\spellid.h" />
+    <ClInclude Include="kernel\teleport.h" />
+    <ClInclude Include="kernel\terrain.h" />
+    <ClInclude Include="kernel\terrainid.h" />
+    <ClInclude Include="kernel\textstore.h" />
+    <ClInclude Include="kernel\types.h" />
+    <ClInclude Include="kernel\unit.h" />
+    <ClInclude Include="kernel\version.h" />
+    <ClInclude Include="kernel\xmlkernel.h" />
+    <ClInclude Include="kernel\xmlreader.h" />
+    <ClInclude Include="triggers\changefaction.h" />
+    <ClInclude Include="triggers\changerace.h" />
+    <ClInclude Include="triggers\clonedied.h" />
+    <ClInclude Include="triggers\createcurse.h" />
+    <ClInclude Include="triggers\createunit.h" />
+    <ClInclude Include="triggers\gate.h" />
+    <ClInclude Include="triggers\giveitem.h" />
+    <ClInclude Include="triggers\killunit.h" />
+    <ClInclude Include="triggers\removecurse.h" />
+    <ClInclude Include="triggers\shock.h" />
+    <ClInclude Include="triggers\timeout.h" />
+    <ClInclude Include="triggers\triggers.h" />
+    <ClInclude Include="triggers\unguard.h" />
+    <ClInclude Include="triggers\unitmessage.h" />
+    <ClInclude Include="items\artrewards.h" />
+    <ClInclude Include="items\demonseye.h" />
+    <ClInclude Include="items\itemtypes.h" />
+    <ClInclude Include="items\phoenixcompass.h" />
+    <ClInclude Include="items\seed.h" />
+    <ClInclude Include="items\speedsail.h" />
+    <ClInclude Include="items\weapons.h" />
+    <ClInclude Include="items\xerewards.h" />
+    <ClInclude Include="modules\arena.h" />
+    <ClInclude Include="modules\autoseed.h" />
+    <ClInclude Include="modules\dungeon.h" />
+    <ClInclude Include="modules\gmcmd.h" />
+    <ClInclude Include="modules\museum.h" />
+    <ClInclude Include="modules\oceannames.h" />
+    <ClInclude Include="modules\score.h" />
+    <ClInclude Include="modules\weather.h" />
+    <ClInclude Include="modules\wormhole.h" />
+    <ClInclude Include="modules\xecmd.h" />
+    <ClInclude Include="modules\xmas.h" />
+    <ClInclude Include="attributes\aggressive.h" />
+    <ClInclude Include="attributes\alliance.h" />
+    <ClInclude Include="attributes\attributes.h" />
+    <ClInclude Include="attributes\fleechance.h" />
+    <ClInclude Include="attributes\follow.h" />
+    <ClInclude Include="attributes\giveitem.h" />
+    <ClInclude Include="attributes\gm.h" />
+    <ClInclude Include="attributes\hate.h" />
+    <ClInclude Include="attributes\iceberg.h" />
+    <ClInclude Include="attributes\key.h" />
+    <ClInclude Include="attributes\matmod.h" />
+    <ClInclude Include="attributes\moved.h" />
+    <ClInclude Include="attributes\movement.h" />
+    <ClInclude Include="attributes\object.h" />
+    <ClInclude Include="attributes\orcification.h" />
+    <ClInclude Include="attributes\otherfaction.h" />
+    <ClInclude Include="attributes\overrideroads.h" />
+    <ClInclude Include="attributes\racename.h" />
+    <ClInclude Include="attributes\raceprefix.h" />
+    <ClInclude Include="attributes\reduceproduction.h" />
+    <ClInclude Include="attributes\targetregion.h" />
+    <ClInclude Include="attributes\viewrange.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

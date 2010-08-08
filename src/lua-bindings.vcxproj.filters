@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1a17299b-610f-40df-864f-84b37b67ebe7}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{5135c52b-b087-4aab-8d89-2b06da54e8e7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bindings\bind_attrib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_building.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_faction.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_gmtool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_hashtable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_message.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_region.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_ship.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_sqlite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_storage.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bind_unit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\bindings.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bindings\helpers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bindings\bind_attrib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_building.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_faction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_gmtool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_hashtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_region.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_ship.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bind_unit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\bindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bindings\helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Jamfile" />
+  </ItemGroup>
+</Project>

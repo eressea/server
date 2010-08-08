@@ -1,0 +1,395 @@
+/*
+Copyright (c) 1998-2010, Enno Rehling <enno@eressea.de>
+                         Katja Zedel <katze@felidae.kn-bremen.de
+                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+**/
+
+#ifndef H_KRNL_MAGIC
+#define H_KRNL_MAGIC
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "curse.h"
+struct fighter;
+struct building;
+
+/* ------------------------------------------------------------- */
+
+#define MAXCOMBATSPELLS 3    /* PRECOMBAT COMBAT POSTCOMBAT */
+#define MAX_SPELLRANK 9      /* Standard-Rank 5 */
+#define MAXINGREDIENT	5      /* bis zu 5 Komponenten pro Zauber */
+#define CHAOSPATZERCHANCE 10 /* +10% Chance zu Patzern */
+
+/* ------------------------------------------------------------- */
+
+#define IRONGOLEM_CRUMBLE   15  /* monatlich Chance zu zerfallen */
+#define STONEGOLEM_CRUMBLE  10  /* monatlich Chance zu zerfallen */
+
+/* ------------------------------------------------------------- */
+/* Spruchparameter
+ * Wir suchen beim Parsen des Befehls erstmal nach lokalen Objekten,
+ * erst in verify_targets wird dann global gesucht, da in den meisten
+ * Fällen das Zielobjekt lokal sein dürfte */
+
+/* siehe auch typ_t in objtypes.h */
+typedef enum {
+	SPP_REGION,   /* "r" : findregion(x,y) -> *region */
+	SPP_UNIT,     /*  -  : atoi36() -> int */
+  SPP_TEMP,     /*  -  : temp einheit */
+	SPP_BUILDING, /*  -  : atoi() -> int */
+	SPP_SHIP,     /*  -  : atoi() -> int */
+	SPP_STRING,   /* "c" */
+	SPP_INT,      /* "i" : atoi() -> int */
+} sppobj_t;
+
+typedef struct spllprm{
+	sppobj_t typ;
+	int flag;
+	union {
+		struct region *r;
+		struct unit *u;
+		struct building *b;
+		struct ship *sh;
+		char *s;
+    char * xs;
+		int i;
+	} data;
+} spllprm;
+
+typedef struct spellparameter{
+	int length;     /* Anzahl der Elemente */
+	struct spllprm **param;
+} spellparameter;
+
+typedef struct strarray {
+	int length;     /* Anzahl der Elemente */
+	char **strings;
+} strarray;
+
+#define TARGET_RESISTS (1<<0)
+#define TARGET_NOTFOUND (1<<1)
+
+/* ------------------------------------------------------------- */
+/* Magierichtungen */
+
+/* typedef unsigned char magic_t; */
+enum {
+  M_GRAY = 0,       /* Gray */
+  M_ILLAUN = 1,      /* Illaun */
+  M_TYBIED = 2,     /* Tybied */
+  M_CERDDOR = 3,      /* Cerddor */
+  M_GWYRRD = 4,     /* Gwyrrd */
+  M_DRAIG = 5,      /* Draig */
+  M_COMMON = 6,     /* common spells */
+  MAXMAGIETYP,
+  /* this enum is stored in the datafile, so do not change the numbers around */
+  M_NONE = (magic_t) -1
+};
+extern const char *magic_school[MAXMAGIETYP];
+
+/* ------------------------------------------------------------- */
+/* Magier:
+ * - Magierichtung
+ * - Magiepunkte derzeit
+ * - Malus (neg. Wert)/ Bonus (pos. Wert) auf maximale Magiepunkte
+ *   (können sich durch Questen absolut verändern und durch Gegenstände
+ *   temporär). Auch für Artefakt benötigt man permanente MP
+ * - Anzahl bereits gezauberte Sprüche diese Runde
+ * - Kampfzauber (3) (vor/während/nach)
+ * - Spruchliste
+ */
+
+typedef struct combatspell {
+  int level;
+  const struct spell * sp;
+} combatspell;
+
+typedef struct sc_mage {
+  magic_t magietyp;
+  int spellpoints;
+  int spchange;
+  int spellcount;
+  combatspell combatspells[MAXCOMBATSPELLS];
+  struct spell_list * spells;
+} sc_mage;
+
+/* ------------------------------------------------------------- */
+/* Zauberliste */
+
+typedef struct castorder {
+  struct castorder *next;
+  union {
+    struct unit * u;
+    struct fighter * fig;
+  } magician; /* Magier (kann vom Typ struct unit oder fighter sein) */
+  struct unit *familiar; /* Vertrauter, gesetzt, wenn der Spruch durch
+                         den Vertrauten gezaubert wird */
+  const struct spell *sp; /* Spruch */
+  int level;             /* gewünschte Stufe oder Stufe des Magiers */
+  double force;          /* Stärke des Zaubers */
+  struct region *rt;     /* Zielregion des Spruchs */
+  int distance;          /* Entfernung zur Zielregion */
+  struct order * order;           /* Befehl */
+  struct spellparameter *par;  /* für weitere Parameter */
+} castorder;
+
+/* irgendwelche zauber: */
+typedef void (*spell_f) (void*);
+/* normale zauber: */
+typedef int (*nspell_f)(castorder*);
+/* kampfzauber: */
+typedef int (*cspell_f) (struct fighter*, int, double, const struct spell * sp);
+/* zauber-patzer: */
+typedef void (*pspell_f) (castorder *);
+
+typedef struct spell_component {
+  const struct resource_type * type;
+  int amount;
+  int cost;
+} spell_component;
+
+typedef struct spell {
+  spellid_t id;
+  char *sname;
+  char *syntax;
+  char *parameter;
+  magic_t magietyp;
+  int sptyp;
+  int rank;  /* Reihenfolge der Zauber */
+  int level;  /* Stufe des Zaubers */
+  struct spell_component * components;
+  spell_f sp_function;
+  void (*patzer) (castorder*);
+} spell;
+
+typedef struct spell_list {
+  struct spell_list * next;
+  spell * data; /* TODO: should be const */
+} spell_list;
+
+extern void spelllist_add(spell_list ** lspells, struct spell * sp);
+extern spell_list ** spelllist_find(spell_list ** lspells, const struct spell * sp);
+/* ------------------------------------------------------------- */
+
+/* besondere Spruchtypen */
+#define FARCASTING      (1<<0)	/* ZAUBER [struct region x y] */
+#define SPELLLEVEL      (1<<1)	/* ZAUBER [STUFE x] */
+
+/* ID's können zu drei unterschiedlichen Entitäten gehören: Einheiten,
+ * Gebäuden und Schiffen. */
+#define UNITSPELL       (1<<2)	/* ZAUBER .. <Einheit-Nr> [<Einheit-Nr> ..] */
+#define SHIPSPELL       (1<<3)	/* ZAUBER .. <Schiff-Nr> [<Schiff-Nr> ..] */
+#define BUILDINGSPELL   (1<<4)	/* ZAUBER .. <Gebaeude-Nr> [<Gebaeude-Nr> ..] */
+#define REGIONSPELL     (1<<5)  /* wirkt auf struct region */
+
+#define PRECOMBATSPELL	(1<<7)	/* PRÄKAMPFZAUBER .. */
+#define COMBATSPELL     (1<<8)	/* KAMPFZAUBER .. */
+#define POSTCOMBATSPELL	(1<<9)	/* POSTKAMPFZAUBER .. */
+#define ISCOMBATSPELL   (PRECOMBATSPELL|COMBATSPELL|POSTCOMBATSPELL)
+
+#define OCEANCASTABLE   (1<<10)	/* Können auch nicht-Meermenschen auf
+																	 hoher See zaubern */
+#define ONSHIPCAST      (1<<11) /* kann auch auf von Land ablegenden
+																	 Schiffen stehend gezaubert werden */
+/*  */
+#define NOTFAMILIARCAST (1<<12)
+#define TESTRESISTANCE  (1<<13) /* alle Zielobjekte (u, s, b, r) auf
+																	 Magieresistenz prüfen */
+#define SEARCHLOCAL     (1<<14) /* Ziel muss in der target_region sein */
+#define TESTCANSEE      (1<<15) /* alle Zielunits auf cansee prüfen */
+#define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
+
+/* Flag Spruchkostenberechnung: */
+enum{
+	SPC_FIX,      /* Fixkosten */
+	SPC_LEVEL,    /* Komponenten pro Level */
+	SPC_LINEAR    /* Komponenten pro Level und müssen vorhanden sein */
+};
+
+enum {
+	RS_DUMMY,
+	RS_FARVISION,
+	MAX_REGIONSPELLS
+};
+
+/* ------------------------------------------------------------- */
+/* Prototypen */
+
+void magic(void);
+
+void regeneration_magiepunkte(void);
+
+extern struct attrib_type at_seenspell;
+extern struct attrib_type at_mage;
+extern struct attrib_type at_familiarmage;
+extern struct attrib_type at_familiar;
+extern struct attrib_type at_clonemage;
+extern struct attrib_type at_clone;
+extern struct attrib_type at_reportspell;
+extern struct attrib_type at_icastle;
+
+typedef struct icastle_data {
+	const struct building_type * type;
+	struct building * building; /* reverse pointer to dissolve the object */
+	int time;
+} icastle_data;
+
+
+/* ------------------------------------------------------------- */
+/* Kommentare:
+ *
+ * Spruchzauberrei und Gegenstandszauberrei werden getrennt behandelt.
+ * Das macht u.a. bestimmte Fehlermeldungen einfacher, das
+ * identifizieren der Komponennten über den Missversuch ist nicht
+ * möglich
+ * Spruchzauberrei: 'ZAUBER [struct region x y] [STUFE a] "Spruchname" [Ziel]'
+ * Gegenstandszauberrei: 'BENUTZE "Gegenstand" [Ziel]'
+ *
+ * Die Funktionen:
+ */
+
+/* Magier */
+sc_mage * create_mage(struct unit *u, magic_t mtyp);
+	/*	macht die struct unit zu einem neuen Magier: legt die struct u->mage an
+	 *	und	initialisiert den Magiertypus mit mtyp.  */
+sc_mage * get_mage(const struct unit *u);
+	/*	gibt u->mage zurück, bei nicht-Magiern *NULL */
+boolean is_mage(const struct unit *u);
+	/*	gibt true, wenn u->mage gesetzt.  */
+boolean is_familiar(const struct unit *u);
+	/*	gibt true, wenn eine Familiar-Relation besteht.  */
+
+/* Sprüche */
+int get_combatspelllevel(const struct unit *u, int nr);
+	/*  versucht, eine eingestellte maximale Kampfzauberstufe
+	 *  zurückzugeben. 0 = Maximum, -1 u ist kein Magier. */
+const spell *get_combatspell(const struct unit *u, int nr);
+	/*	gibt den Kampfzauber nr [pre/kampf/post] oder NULL zurück */
+void set_combatspell(struct unit *u, spell *sp, struct order * ord, int level);
+	/* 	setzt Kampfzauber */
+void unset_combatspell(struct unit *u, spell *sp);
+	/* 	löscht Kampfzauber */
+void add_spell(spell_list ** slistp, spell *sp);
+	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
+boolean has_spell(struct spell_list *slist, const struct spell * sp);
+	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
+boolean u_hasspell(const struct unit * u, const struct spell * sp);
+    /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
+void update_spellbook(struct faction * f, int level);
+void updatespelllist(struct unit *u);
+	/* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner
+	 * als das aktuelle Magietalent ist, in die Spruchliste der Einheit
+	 * ein */
+boolean knowsspell(const struct region * r, const struct unit * u, const spell * sp);
+	/* prüft, ob die Einheit diesen Spruch gerade beherrscht, dh
+	 * mindestens die erforderliche Stufe hat. Hier können auch Abfragen
+	 * auf spezielle Antimagiezauber auf Regionen oder Einheiten eingefügt
+	 * werden
+	 */
+
+
+/* Magiepunkte */
+int get_spellpoints(const struct unit *u);
+	/*	Gibt die aktuelle Anzahl der Magiepunkte der Einheit zurück */
+void set_spellpoints(struct unit * u, int sp);
+	/* setzt die Magiepunkte auf sp */
+int change_spellpoints(struct unit *u, int mp);
+	/*	verändert die Anzahl der Magiepunkte der Einheit um +mp */
+int max_spellpoints(const struct region *r, const struct unit *u);
+	/*	gibt die aktuell maximal möglichen Magiepunkte der Einheit zurück */
+int change_maxspellpoints(struct unit * u, int csp);
+   /* verändert die maximalen Magiepunkte einer Einheit */
+
+/* Zaubern */
+extern double spellpower(struct region *r, struct unit *u, const spell *sp, int cast_level, struct order * ord);
+	/*	ermittelt die Stärke eines Spruchs */
+boolean fumble (struct region *r, struct unit *u, const spell *sp, int cast_level);
+	/*	true, wenn der Zauber misslingt, bei false gelingt der Zauber */
+
+
+typedef struct spellrank {
+  struct castorder * begin;
+  struct castorder ** end;
+} spellrank;
+
+castorder *new_castorder(void *u, struct unit *familiar, const spell *sp, struct region *r,
+		int lev, double force, int distance, struct order * ord, spellparameter *p);
+	/* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
+void add_castorder(struct spellrank *cll, struct castorder *co);
+	/* Hänge c-order co an die letze c-order von cll an */
+void free_castorders(struct castorder *co);
+	/* Speicher wieder freigeben */
+
+/* Prüfroutinen für Zaubern */
+int countspells(struct unit *u, int step);
+	/*	erhöht den Counter für Zaubersprüche um 'step' und gibt die neue
+	 *	Anzahl der gezauberten Sprüche zurück. */
+int spellcost(struct unit *u, const spell *sp);
+	/*	gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
+	 *	geringstmöglichen Stufe zurück, schon um den Faktor der bereits
+	 *	zuvor gezauberten Sprüche erhöht */
+boolean cancast (struct unit *u, const spell *spruch, int eff_stufe, int distance, struct order * ord);
+	/*	true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
+	 *	geringstmögliche Stufe hat und den Spruch beherrscht */
+void pay_spell(struct unit *u, const spell *sp, int eff_stufe, int distance);
+	/*	zieht die Komponenten des Zaubers aus dem Inventory der Einheit
+	 *	ab. Die effektive Stufe des gezauberten Spruchs ist wichtig für
+	 *	die korrekte Bestimmung der Magiepunktkosten */
+int eff_spelllevel(struct unit *u, const spell * sp, int cast_level, int distance);
+	/*	ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
+	 *	die gewünschte maximale Stufe (im Normalfall Stufe des Magiers,
+	 *	bei Farcasting Stufe*2^Entfernung) */
+boolean is_magic_resistant(struct unit *magician, struct unit *target, int
+	resist_bonus);
+	/*	Mapperfunktion für target_resists_magic() vom Typ struct unit. */
+extern double magic_resistance(struct unit *target);
+	/*	gibt die Chance an, mit der einem Zauber widerstanden wird. Je
+	 *	größer, desto resistenter ist da Opfer */
+boolean target_resists_magic(struct unit *magician, void *obj, int objtyp,
+		int resist_bonus);
+	/*	gibt false zurück, wenn der Zauber gelingt, true, wenn das Ziel
+	 *	widersteht */
+
+
+/* Sprüche in der struct region */
+   /* (sind in curse)*/
+extern struct unit * get_familiar(const struct unit *u);
+extern struct unit * get_familiar_mage(const struct unit *u);
+extern struct unit * get_clone(const struct unit *u);
+extern struct unit * get_clone_mage(const struct unit *u);
+extern struct attrib_type at_familiar;
+extern struct attrib_type at_familiarmage;
+extern void remove_familiar(struct unit * mage);
+extern boolean create_newfamiliar(struct unit * mage, struct unit * familiar);
+extern void create_newclone(struct unit * mage, struct unit * familiar);
+extern struct unit * has_clone(struct unit * mage);
+
+extern const char * spell_info(const struct spell * sp, const struct locale * lang);
+extern const char * spell_name(const struct spell * sp, const struct locale * lang);
+extern const char * curse_name(const struct curse_type * ctype, const struct locale * lang);
+
+extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
+extern int FactionSpells(void);
+extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f);
+
+extern void write_spelllist(const struct spell_list * slist, struct storage * store);
+extern void read_spellist(struct spell_list ** slistp, magic_t mtype, struct storage * store);
+extern double MagicPower(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

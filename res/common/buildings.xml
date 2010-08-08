@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<buildings>
+  <building name="wormhole" maxsize="4" capacity="1" maxcapacity="4" nobuild="yes" nodestroy="yes" unique="yes" />
+  <building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild="yes"/>
+  <building name="xmas_exit" maxsize="10" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes"/>
+  <building name="caldera" capacity="1" nodestroy="yes" nobuild="yes"/>
+  <building name="genericbuilding" namechange="no" maxsize="1" nobuild="yes"/>
+  <building name="artacademy" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes"/>
+  <building name="artsculpture" namechange="no" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes"/>
+
+  <building name="blessedstonecircle" maxcapacity="3" maxsize="100" nobuild="yes" magic="yes" magres="60" magresbonus="30" auraregen="1.50">
+    <construction skill="building" minskill="2" reqsize="100" maxsize="100">
+      <requirement type="log" quantity="500"/>
+      <requirement type="stone" quantity="500"/>
+    </construction>
+  </building>
+
+  <building name="stonecircle" maxsize="100">
+    <construction skill="building" minskill="2" reqsize="100" maxsize="100">
+      <requirement type="log" quantity="500"/>
+      <requirement type="stone" quantity="500"/>
+    </construction>
+  </building>
+
+  <building name="inn" capacity="1">
+    <maintenance type="money" amount="5" variable="yes" vital="yes"/>
+    <construction skill="building" minskill="2" reqsize="10">
+      <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="30"/>
+      <requirement type="stone" quantity="40"/>
+      <requirement type="money" quantity="2000"/>
+    </construction>
+  </building>
+
+  <building name="tunnel" capacity="1" maxsize="100">
+    <maintenance type="stone" amount="2"/>
+    <maintenance type="money" amount="100" vital="yes"/>
+    <construction skill="building" minskill="6" reqsize="100" maxsize="100">
+      <requirement type="iron" quantity="100"/>
+      <requirement type="log" quantity="500"/>
+      <requirement type="stone" quantity="1000"/>
+      <requirement type="money" quantity="30000"/>
+    </construction>
+  </building>
+
+  <building name="caravan" capacity="1" maxsize="10">
+    <maintenance type="horse" amount="2"/>
+    <maintenance type="money" amount="3000" vital="yes"/>
+    <construction skill="building" minskill="2" reqsize="10" maxsize="10">
+      <requirement type="iron" quantity="10"/>
+      <requirement type="log" quantity="50"/>
+      <requirement type="stone" quantity="10"/>
+      <requirement type="money" quantity="5000"/>
+    </construction>
+  </building>
+
+  <building name="dam" capacity="1" maxsize="50">
+    <maintenance type="log" amount="3"/>
+    <maintenance type="money" amount="1000" vital="yes"/>
+    <construction skill="building" minskill="4" reqsize="50" maxsize="50">
+      <requirement type="iron" quantity="50"/>
+      <requirement type="log" quantity="500"/>
+      <requirement type="stone" quantity="250"/>
+      <requirement type="money" quantity="25000"/>
+    </construction>
+  </building>
+
+  <building name="monument" namechange="no" capacity="1">
+    <construction skill="building" minskill="4" reqsize="1">
+      <requirement type="log" quantity="1"/>
+      <requirement type="stone" quantity="1"/>
+      <requirement type="iron" quantity="1"/>
+      <requirement type="money" quantity="400"/>
+    </construction>
+  </building>
+
+  <building name="stables" capacity="1">
+    <maintenance type="money" amount="150" vital="yes"/>
+    <construction skill="building" minskill="2" reqsize="1">
+      <requirement type="log" quantity="4"/>
+      <requirement type="stone" quantity="2"/>
+      <requirement type="iron" quantity="1"/>
+      <requirement type="money" quantity="100"/>
+    </construction>
+  </building>
+
+  <building name="sawmill" capacity="1">
+    <maintenance type="money" amount="250" vital="yes"/>
+    <construction skill="building" minskill="3" reqsize="1">
+      <requirement type="log" quantity="5"/>
+      <requirement type="stone" quantity="5"/>
+      <requirement type="iron" quantity="3"/>
+      <requirement type="money" quantity="200"/>
+    </construction>
+  </building>
+
+  <building name="smithy" capacity="1">
+    <function name="init" value="init_smithy"/>
+    <maintenance type="money" amount="300" vital="yes"/>
+    <maintenance type="log" amount="1"/>
+    <construction skill="building" minskill="3" reqsize="1">
+      <requirement type="log" quantity="5"/>
+      <requirement type="stone" quantity="5"/>
+      <requirement type="iron" quantity="2"/>
+      <requirement type="money" quantity="200"/>
+    </construction>
+  </building>
+
+  <building name="magictower" maxcapacity="2" maxsize="50" magic="yes" magres="40" fumblebonus="10" auraregen="1.75">
+    <maintenance type="money" amount="1000" vital="yes"/>
+    <construction skill="building" minskill="5" reqsize="50" maxsize="50">
+      <requirement type="log" quantity="150"/>
+      <requirement type="stone" quantity="250"/>
+      <requirement type="mallorn" quantity="100"/>
+      <requirement type="iron" quantity="150"/>
+      <requirement type="laen" quantity="100"/>
+      <requirement type="money" quantity="25000"/>
+    </construction>
+  </building>
+
+  <building name="academy" maxcapacity="25" maxsize="25">
+    <maintenance type="money" amount="1000" vital="yes"/>
+    <construction skill="building" minskill="3" reqsize="25" maxsize="25">
+      <requirement type="log" quantity="125"/>
+      <requirement type="stone" quantity="125"/>
+      <requirement type="iron" quantity="25"/>
+      <requirement type="money" quantity="12500"/>
+    </construction>
+  </building>
+
+  <building name="harbour" capacity="1" maxcapacity="25" maxsize="25">
+    <maintenance type="money" amount="250" vital="yes"/>
+    <construction skill="building" minskill="3" reqsize="25" maxsize="25">
+      <requirement type="log" quantity="125"/>
+      <requirement type="stone" quantity="125"/>
+      <requirement type="money" quantity="6250"/>
+    </construction>
+  </building>
+
+  <building name="quarry" capacity="1">
+    <maintenance type="money" amount="250" vital="yes"/>
+    <construction skill="building" minskill="2" reqsize="1">
+      <requirement type="iron" quantity="1"/>
+      <requirement type="log" quantity="5"/>
+      <requirement type="stone" quantity="1"/>
+      <requirement type="money" quantity="250"/>
+    </construction>
+  </building>
+
+  <building name="mine" capacity="1">
+    <maintenance type="money" amount="500" vital="yes"/>
+    <construction skill="building" minskill="4" reqsize="1">
+      <requirement type="iron" quantity="1"/>
+      <requirement type="log" quantity="10"/>
+      <requirement type="stone" quantity="5"/>
+      <requirement type="money" quantity="250"/>
+    </construction>
+  </building>
+
+  <building name="lighthouse" capacity="1" maxcapacity="4">
+    <maintenance type="money" amount="100" vital="yes"/>
+    <construction skill="building" minskill="3" reqsize="1">
+      <requirement type="iron" quantity="1"/>
+      <requirement type="log" quantity="1"/>
+      <requirement type="stone" quantity="2"/>
+      <requirement type="money" quantity="100"/>
+    </construction>
+  </building>
+
+</buildings>
+
