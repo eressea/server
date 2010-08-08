@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../shared/src;../../external"
+				AdditionalIncludeDirectories="../../server/src;../../external"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../shared/src;../../external"
+				AdditionalIncludeDirectories="../../server/src;../../external"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -463,7 +463,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\tests.c"
+				RelativePath="..\..\server\src\tests.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -557,11 +557,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\build\stdafx.h"
+				RelativePath="..\..\server\src\build\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\tests.h"
+				RelativePath="..\..\server\src\tests.h"
 				>
 			</File>
 			<File
@@ -573,19 +573,19 @@
 			Name="Unity Build"
 			>
 			<File
-				RelativePath="..\..\shared\src\build\external.c"
+				RelativePath="..\..\server\src\build\external.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\build\gamecode.c"
+				RelativePath="..\..\server\src\build\gamecode.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\build\kernel.c"
+				RelativePath="..\..\server\src\build\kernel.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\build\lib.c"
+				RelativePath="..\..\server\src\build\lib.c"
 				>
 			</File>
 			<File
@@ -593,7 +593,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\build\stdafx.c"
+				RelativePath="..\..\server\src\build\stdafx.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -614,7 +614,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\shared\src\build\util.c"
+				RelativePath="..\..\server\src\build\util.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
