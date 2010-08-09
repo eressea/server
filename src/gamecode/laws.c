@@ -3596,14 +3596,6 @@ update_spells(void)
 
       if (FactionSpells() && maxlevel>f->max_spelllevel) {
         update_spellbook(f, maxlevel);
-        for (i=0;i!=n;++i) {
-          sc_mage *mage = get_mage(mages[i]);
-          while (mage->spells) {
-            spell_list * slist = mage->spells;
-            mage->spells = slist->next;
-            free(slist);
-          }
-        }
       }
       for (i=0;i!=n;++i) {
         updatespelllist(mages[i]);

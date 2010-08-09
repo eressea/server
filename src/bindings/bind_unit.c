@@ -522,7 +522,9 @@ unit_addspell(unit * u, const char * name)
     slist=slist->next;
   }
   if (!spadd) log_error(("spell %s could not be found\n", name));
-  else add_spell(starget, spadd);
+  else {
+    add_spell(starget, spadd);
+  }
 }
 
 static int
