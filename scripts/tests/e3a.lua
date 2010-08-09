@@ -79,7 +79,6 @@ function test_seecast()
     assert_equal(4, u2.region.x)
 
     u2:clear_orders()
-    u2:add_spell("stormwinds")
     u2:add_order("Zaubere stufe 2 'Beschwoere einen Sturmelementar' " .. itoa36(s1.id))
     u1:clear_orders()
     u1:add_order("NACH O O O O")
