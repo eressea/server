@@ -18,6 +18,29 @@ static void test_new_building_can_be_renamed(CuTest * tc) {
   CuAssertTrue(tc, !renamed_building(b));
 }
 
+static void test_rename_building(CuTest * tc) {
+  region * r;
+  building * b;
+  unit * u;
+  faction * f;
+  building_type * btype;
+
+  test_cleanup();
+  test_create_world();
+
+  btype = bt_find("castle");
+
+  r = findregion(-1, 0);
+  b = new_building(btype, r, default_locale);
+  f = test_create_faction(rc_find("human"));
+  u = test_create_unit(f, r);
+  u->building = b;
+  fset(u, UFL_OWNER);
+
+  rename_building(u, NULL, b, "Villa Nagel");
+  CuAssertStrEquals(tc, "Villa Nagel", b->name);
+}
+
 static void test_fishing_feeds_2_people(CuTest * tc) {
   region * r;
   faction * f;
@@ -141,6 +164,7 @@ CuSuite* get_laws_suite(void)
 {
   CuSuite* suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, &test_new_building_can_be_renamed);
+  SUITE_ADD_TEST(suite, &test_rename_building);
   SUITE_ADD_TEST(suite, &test_fishing_feeds_2_people);
   SUITE_ADD_TEST(suite, &test_fishing_does_not_give_goblins_money);
   SUITE_ADD_TEST(suite, &test_fishing_gets_reset);

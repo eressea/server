@@ -1627,20 +1627,17 @@ rename_building(unit * u, order * ord, building * b, const char * name) {
   }
 
   if (foreign) {
-    unit *uo;
-
    if (renamed_building(b)) {
       cmistake(u, ord, 246, MSG_EVENT);
       return -1;
     }
 
-    uo = building_owner(b);
-    if (uo) {
-      if (cansee(uo->faction, u->region, u, 0)) {
-        ADDMSG(&uo->faction->msgs, msg_message("renamed_building_seen", 
+    if (owner) {
+      if (cansee(owner->faction, u->region, u, 0)) {
+        ADDMSG(&owner->faction->msgs, msg_message("renamed_building_seen", 
           "building renamer region", b, u, u->region));
       } else {
-        ADDMSG(&uo->faction->msgs, msg_message("renamed_building_notseen", 
+        ADDMSG(&owner->faction->msgs, msg_message("renamed_building_notseen", 
           "building region", b, u->region));
       }
     }
@@ -1651,7 +1648,7 @@ rename_building(unit * u, order * ord, building * b, const char * name) {
     }
   }
 
-  return rename_cmd(u, ord, &b->name, getstrtoken());
+  return rename_cmd(u, ord, &b->name, name);
 }
 
 static int
