@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="amalgamation-eressea"
 	ProjectGUID="{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
 	RootNamespace="build"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -41,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../shared/src;../../external"
+				AdditionalIncludeDirectories="..\..\shared/src;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include;..\..\external\pdcurses"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,11 +64,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1_d.lib tolua.lib"
+				AdditionalDependencies="ws2_32.lib libxml2.lib pdcurses.lib lua.lib tolua.lib"
 				OutputFile="$(OutDir)\eressea.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\external\$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -87,9 +91,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -142,10 +143,13 @@
 				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1.lib tolua.lib"
 				OutputFile="$(OutDir)\eressea.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\external\$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -165,9 +169,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
