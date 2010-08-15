@@ -44,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
+#include <util/log.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/umlaut.h>

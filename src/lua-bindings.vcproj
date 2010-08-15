@@ -42,16 +42,14 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include"
+				AdditionalIncludeDirectories=".;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include;..\..\external\pdcurses"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE"
-				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -110,14 +108,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories=".;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include"
+				AdditionalIncludeDirectories=".;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include;..\..\external\pdcurses"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool

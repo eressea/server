@@ -29,6 +29,7 @@
 #include <util/attrib.h>
 #include <util/rng.h>
 #include <util/resolve.h>
+#include <util/language.h>
 #include <util/storage.h>
 
 /* libc includes */

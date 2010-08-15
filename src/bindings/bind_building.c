@@ -14,9 +14,12 @@ without prior permission by the authors of Eressea.
 #include "bind_building.h"
 #include "bind_unit.h"
 
+#include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/building.h>
 #include <kernel/region.h>
+
+#include <util/language.h>
 
 #include <lua.h>
 #include <tolua.h>
