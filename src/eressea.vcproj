@@ -42,15 +42,13 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\shared/src;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include;..\..\external\pdcurses"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
-				MinimalRebuild="true"
+				AdditionalIncludeDirectories="..\..\shared\src;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include;..\..\external\pdcurses"
+				PreprocessorDefinitions="LIBXML_STATIC;WIN32;_DEBUG;_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -121,12 +119,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../shared/src;../../external"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="..\..\shared\src;..\..\external;..\..\external\lua\src;..\..\external\tolua\include;..\..\external\libxml2\include;..\..\external\pdcurses"
+				PreprocessorDefinitions="LIBXML_STATIC;WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -140,7 +137,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libxml2.lib pdcurses.lib lua5.1.lib tolua.lib"
+				AdditionalDependencies="ws2_32.lib libxml2.lib pdcurses.lib lua.lib tolua.lib"
 				OutputFile="$(OutDir)\eressea.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\external\$(ConfigurationName)"
