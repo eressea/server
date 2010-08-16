@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>amalgamation-example</ProjectName>
+    <ProjectName>example</ProjectName>
     <ProjectGuid>{4A17DAEE-2261-4E2C-96F6-BA4132A09551}</ProjectGuid>
     <RootNamespace>build</RootNamespace>
     <Keyword>Win32Proj</Keyword>

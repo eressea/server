@@ -17,30 +17,30 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\server\src\build\external.c">
-      <Filter>Unity Build</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\server\src\build\gamecode.c">
-      <Filter>Unity Build</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\server\src\build\kernel.c">
-      <Filter>Unity Build</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\server\src\build\lib.c">
-      <Filter>Unity Build</Filter>
-    </ClCompile>
     <ClCompile Include="server.c">
       <Filter>Unity Build</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\server\src\build\stdafx.c">
-      <Filter>Unity Build</Filter>
+    <ClCompile Include="..\..\shared\src\build\external.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\server\src\build\util.c">
-      <Filter>Unity Build</Filter>
+    <ClCompile Include="..\..\shared\src\build\gamecode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\src\build\kernel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\src\build\lib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\src\build\stdafx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\src\build\util.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\server\src\build\stdafx.h">
+    <ClInclude Include="..\..\shared\src\build\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
