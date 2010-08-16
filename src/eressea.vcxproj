@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>amalgamation-eressea</ProjectName>
+    <ProjectName>eressea</ProjectName>
     <ProjectGuid>{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}</ProjectGuid>
     <RootNamespace>build</RootNamespace>
     <Keyword>Win32Proj</Keyword>
