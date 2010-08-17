@@ -1414,7 +1414,8 @@ parse_spells(xmlDocPtr doc)
       xmlNodePtr node = nodes->nodeTab[i];
       xmlChar * propValue;
       int k;
-      spell * sp = calloc(1, sizeof(spell));
+      spell_component * component;
+      spell * sp = (spell *)calloc(1, sizeof(spell));
       static int modes[] = { 0, PRECOMBATSPELL, COMBATSPELL, POSTCOMBATSPELL };
 
       /* spellname */
@@ -1496,27 +1497,34 @@ parse_spells(xmlDocPtr doc)
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
       if (result->nodesetval->nodeNr) {
-        sp->components = malloc(sizeof(spell_component)*(result->nodesetval->nodeNr+1));
+        sp->components = (spell_component *)malloc(sizeof(spell_component)*(result->nodesetval->nodeNr+1));
         sp->components[result->nodesetval->nodeNr].type = 0;
       }
-      for (k=0;k!=result->nodesetval->nodeNr;++k) {
+      for (component=sp->components,k=0;k!=result->nodesetval->nodeNr;++k) {
+        const resource_type * rtype;
         xmlNodePtr node = result->nodesetval->nodeTab[k];
         propValue = xmlGetProp(node, BAD_CAST "name");
         assert(propValue);
-        sp->components[k].type = rt_find((const char *)propValue);
-        assert(sp->components[k].type);
+        rtype = rt_find((const char *)propValue);
+        if (!rtype) {
+          log_error(("spell %s uses unknown component %s.\n", sp->sname, (const char*)propValue));
+          xmlFree(propValue);
+          continue;
+        }
+        component->type = rtype;
         xmlFree(propValue);
-        sp->components[k].amount = xml_ivalue(node, "amount", 1);
-        sp->components[k].cost = SPC_FIX;
+        component->amount = xml_ivalue(node, "amount", 1);
+        component->cost = SPC_FIX;
         propValue = xmlGetProp(node, BAD_CAST "cost");
         if (propValue!=NULL) {
           if (strcmp((const char *)propValue, "linear")==0) {
-            sp->components[k].cost = SPC_LINEAR;
+            component->cost = SPC_LINEAR;
           } else if (strcmp((const char *)propValue, "level")==0) {
-            sp->components[k].cost = SPC_LEVEL;
+            component->cost = SPC_LEVEL;
           }
           xmlFree(propValue);
         }
+        component++;
       }
       xmlXPathFreeObject(result);
       register_spell(sp);
