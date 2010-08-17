@@ -641,3 +641,15 @@ function test_hero_normal_transfer()
   assert_true(is_flag_set(u1.flags, 128), "unit is not a hero?")
   assert_false(is_flag_set(u2.flags, 128), "unit turned into a hero")
 end
+
+function test_expensive_skills_cost_money()
+  local r = region.create(0,0, "mountain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r, 1)
+  u:add_item("money", 10000)
+  u:clear_orders()
+  u:add_order("LERNEN MAGIE Gwyrrd")
+  process_orders()
+  assert_equal(9890, u:get_item("money"))
+  assert_equal(1, u:get_skill("magic"))
+end
