@@ -3336,7 +3336,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     }
   }
 
-  /* Für alle Waffengattungne wird bestimmt, wie viele der Personen mit
+  /* Für alle Waffengattungen wird bestimmt, wie viele der Personen mit
    * ihr kämpfen könnten, und was ihr Wert darin ist. */
   if (u->race->battle_flags & BF_EQUIPMENT) {
     int oi=0, di=0;
@@ -3353,7 +3353,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
       }
       assert(w!=WMAX);
     }
-    fig->weapons = calloc(sizeof(weapon), w+1);
+    fig->weapons = (weapon *)calloc(sizeof(weapon), w+1);
     memcpy(fig->weapons, weapons, w*sizeof(weapon));
 
     for (i=0; i!=w; ++i) {
