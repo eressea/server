@@ -1614,7 +1614,7 @@ rename_cmd(unit * u, order * ord, char **s, const char * s2)
 static int 
 rename_building(unit * u, order * ord, building * b, const char * name) {
   unit * owner = b?building_owner(b):0;
-  boolean foreign = owner && owner->faction==u->faction;
+  boolean foreign = !(owner && owner->faction==u->faction);
 
   if (!b) {
     cmistake(u, ord, u->building?6:145, MSG_EVENT);

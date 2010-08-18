@@ -116,6 +116,7 @@ void test_create_world(void)
   rc_human->maintenance = 10;
 
   btype = calloc(sizeof(building_type), 1);
+  btype->flags = BTF_NAMECHANGE;
   btype->_name = strdup("castle");
   bt_register(btype);
 
