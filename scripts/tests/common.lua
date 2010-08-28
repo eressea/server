@@ -644,7 +644,7 @@ end
 
 function test_expensive_skills_cost_money()
   local r = region.create(0,0, "mountain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
+  local f = faction.create("noreply@eressea.de", "elf", "de")
   local u = unit.create(f, r, 1)
   u:add_item("money", 10000)
   u:clear_orders()
