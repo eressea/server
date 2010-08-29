@@ -985,6 +985,34 @@ tolua_eventbus_fire(lua_State * L)
   return 0;
 }
 
+static int
+tolua_report_unit(lua_State* L)
+{
+  char buffer[512];
+  unit * u =  (unit *)tolua_tousertype(L, 1, 0);
+  faction * f =  (faction *)tolua_tousertype(L, 2, 0);
+  bufunit(f, u, 0, see_unit, buffer, sizeof(buffer));
+  tolua_pushstring(L, buffer);
+  return 1;
+}
+
+static int
+tolua_settings_get(lua_State* L)
+{
+  const char * name = tolua_tostring(L, 1, 0);
+  tolua_pushstring(L, get_param(global.parameters, name));
+  return 1;
+}
+
+static int
+tolua_settings_set(lua_State* L)
+{
+  const char * name = tolua_tostring(L, 1, 0);
+  const char * value = tolua_tostring(L, 2, 0);
+  set_param(&global.parameters, name, value);
+  return 0;
+}
+
 static void
 parse_inifile(lua_State* L, dictionary * d, const char * section)
 {
@@ -1062,6 +1090,21 @@ tolua_eressea_open(lua_State* L)
     {
       tolua_function(L, TOLUA_CAST "register", &tolua_eventbus_register);
       tolua_function(L, TOLUA_CAST "fire", &tolua_eventbus_fire);
+    }
+    tolua_endmodule(L);
+
+    tolua_module(L, TOLUA_CAST "settings", 1);
+    tolua_beginmodule(L, TOLUA_CAST "settings");
+    {
+      tolua_function(L, TOLUA_CAST "set", &tolua_settings_set);
+      tolua_function(L, TOLUA_CAST "get", &tolua_settings_get);
+    }
+    tolua_endmodule(L);
+
+    tolua_module(L, TOLUA_CAST "report", 1);
+    tolua_beginmodule(L, TOLUA_CAST "report");
+    {
+      tolua_function(L, TOLUA_CAST "report_unit", &tolua_report_unit);
     }
     tolua_endmodule(L);
 
