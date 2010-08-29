@@ -3218,10 +3218,16 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   const attrib *a = a_find(u->attribs, &at_otherfaction);
   const faction *stealthfaction = a?get_otherfaction(a):NULL;
   unsigned int flags = 0;
+  static int rule_anon_battle = -1;
 
   assert(u->number);
-  if (fval(u, UFL_ANON_FACTION)!=0) flags |= SIDE_STEALTH;
 
+  if (rule_anon_battle<0) {
+    rule_anon_battle = get_param_int(global.parameters, "rules.stealth.anon_battle", 1);
+  }
+  if (rule_anon_battle) {
+    if (fval(u, UFL_ANON_FACTION)!=0) flags |= SIDE_STEALTH;
+  }
   if (!(AllianceAuto() & HELP_FIGHT) && fval(u, UFL_GROUP)) {
     const attrib * agroup = a_find(u->attribs, &at_group);
     if (agroup!=NULL) g = (const group*)agroup->data.v;
