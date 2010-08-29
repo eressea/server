@@ -48,6 +48,19 @@ function test_attrib()
     end
 end
 
+function test_no_stealth()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    u:set_skill("stealth", 1)
+    assert_equal(-1, u:get_skill("stealth"))
+    u:clear_orders()
+    u:add_order("LERNEN TARNUNG")
+    process_orders()
+    assert_equal(-1, u:get_skill("stealth"))
+end
+
 function test_seecast()
     local r = region.create(0,0, "plain")
     for i = 1,10 do
