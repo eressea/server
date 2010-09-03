@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include <attributes/racename.h>
+#include <attributes/otherfaction.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -51,8 +52,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <attributes/otherfaction.h>
 
 /* in spy steht der Unterschied zwischen Wahrnehmung des Opfers und
 * Spionage des Spions */
@@ -202,7 +201,7 @@ int
 setstealth_cmd(unit * u, struct order * ord)
 {
   const char *s;
-  int level;
+  int level, rule;
   const race * trace;
 
   init_tokens(ord);
@@ -257,7 +256,8 @@ setstealth_cmd(unit * u, struct order * ord)
   switch(findparam(s, u->faction->locale)) {
   case P_FACTION:
     /* TARNE PARTEI [NICHT|NUMMER abcd] */
-    if (!rule_stealth_faction()) break;
+    rule = rule_stealth_faction();
+    if (!rule) break;
     s = getstrtoken();
     if(!s || *s == 0) {
       fset(u, UFL_ANON_FACTION);
@@ -283,10 +283,8 @@ setstealth_cmd(unit * u, struct order * ord)
     }
     break;
   case P_ANY:
-    /* TARNE ALLES (was nicht so alles geht?) */
-    u_seteffstealth(u, -1);
-    break;
   case P_NOT:
+    /* TARNE ALLES (was nicht so alles geht?) */
     u_seteffstealth(u, -1);
     break;
   default:
@@ -479,4 +477,3 @@ sabotage_cmd(unit * u, struct order * ord)
 
   return 0;
 }
-
