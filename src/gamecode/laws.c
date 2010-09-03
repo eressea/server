@@ -2659,12 +2659,15 @@ sinkships(region * r)
 
   while (*shp) {
     ship * sh = *shp;
-    if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
-      /* Schiff nicht seetüchtig */
-      damage_ship(sh, 0.30);
-    }
-    if (shipowner(sh)==NULL) {
-      damage_ship(sh, 0.05);
+
+    if (!sh->type->construction || sh->size>=sh->type->construction->maxsize) {
+      if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
+        /* Schiff nicht seetüchtig */
+        damage_ship(sh, 0.30);
+      }
+      if (shipowner(sh)==NULL) {
+        damage_ship(sh, 0.05);
+      }
     }
     if (sh->damage >= sh->size * DAMAGE_SCALE) {
       remove_ship(shp, sh);
