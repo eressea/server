@@ -22,6 +22,8 @@
     <coast terrain="plain"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="1" maxsize="10" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -83,6 +85,8 @@
   <ship name="catamaran" range="7" storm="0.25" damage="1.00" cabins="22" cargo="10000" cptskill="7" minskill="1" sumskill="20" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="8" maxsize="30" reqsize="1">
       <requirement type="mallorn" quantity="1"/>
       <requirement type="money" quantity="100"/>
@@ -93,6 +97,8 @@
   <ship name="cog" range="4" storm="0.50" damage="1.00" cabins="50" cargo="200000" cptskill="4" minskill="1" sumskill="20" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="4" maxsize="100" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -101,6 +107,8 @@
   <ship name="caravel" range="4" storm="0.50" damage="1.00" cabins="150" cargo="600000" cptskill="6" minskill="1" sumskill="30" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="6" maxsize="300" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -111,6 +119,8 @@
     <modifier type="defense" value="+2"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="5" maxsize="100" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
@@ -121,6 +131,8 @@
     <modifier type="defense" value="+2"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="7" maxsize="300" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
@@ -133,6 +145,8 @@
     <modifier type="tactics" factor="2.00"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="5" maxsize="100" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
@@ -144,6 +158,8 @@
     <modifier type="tactics" factor="2.00"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="iceberg_sleep"/>
+    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="7" maxsize="300" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
