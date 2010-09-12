@@ -915,7 +915,7 @@ r_demand(const region * r, const luxury_type * ltype)
 const char *
 rname(const region * r, const struct locale * lang)
 {
-  if (r->land) {
+  if (r->land && r->land->name) {
     return r->land->name;
   }
   return LOC(lang, terrain_name(r));
