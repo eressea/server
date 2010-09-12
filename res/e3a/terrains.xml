@@ -44,7 +44,7 @@
         <resource name="stone" chance="1.0" level="1" base="2" div="100" />
         <resource name="laen" chance="0.05" level="1" base="4" div="100" />
     </terrain>
-    <terrain name="packice" arctic="yes" swim="yes"/>
+    <terrain name="packice" land="no" arctic="yes" swim="yes"/>
     <terrain name="firewall" road="250" land="no" walk="no" sail="no" fly="no" forbidden="yes" />
     <terrain name="fog" sail="no" land="no" />
     <terrain name="thickfog" forbidden="yes" sail="no" walk="no" fly="no" land="no" />
