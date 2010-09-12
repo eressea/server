@@ -6,3 +6,6 @@ bin/
 *.suo
 *.sdf
 *.bak
+*.opensdf
+ipch/
+*.log

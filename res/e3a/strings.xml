@@ -13,6 +13,15 @@
     <text locale="en">the third age</text>
   </string>
 
+  <string name="packice">
+    <text locale="de">Packeis</text>
+    <text locale="en">fast ice</text>
+  </string>
+  <string name="packice_trail">
+    <text locale="de">%s</text>
+    <text locale="en">%s</text>
+  </string>
+
   <string name="rpg_item_1_p">
     <text locale="de">Urkunden</text>
     <text locale="en">Certificates</text>
