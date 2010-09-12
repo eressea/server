@@ -565,43 +565,65 @@ function test_market_action()
   assert_equal(70, u:get_item("h2"))
 end
 
--- function test_process_execute()
-  -- local i = 0
-  -- local f = faction.create("noreply@eressea.de", "human", "de")
-  -- local r = region.create(0, 0, "plain")
-  -- local u = unit.create(f, r, 1)
-  -- local r1, u1
+local function setup_packice(x, onfoot)
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local plain = region.create(0,0, "plain")
+    local ice = region.create(1,0, "packice")
+    local ocean = region.create(2,0, "ocean")
+    local u = unit.create(f, get_region(x, 0), 2)
+    if not onfoot then
+        local s = ship.create(u.region, "cutter")
+        u:set_skill("sailing", 3)
+        u.ship = s
+    end
+    u:add_item("money", 400)
 
-  -- function a() i = 2 end
-  -- function b() i = i * 2 end
-  -- function c(r) r1 = r  i = i + 1 end
-  -- function d(u) u1 = u  i = i * 3 end
-  -- process.execute({a, b}, {c}, {d})
-  -- assert_equal(15, i)
-  -- assert_equal(r, r1)
-  -- assert_equal(u, u1)
--- end
+    return u
+end
 
--- function test_new_orders()
-  -- local i = 0
-  -- local f = faction.create("noreply@eressea.de", "human", "de")
-  -- local r = region.create(0, 0, "plain")
-  -- local u = unit.create(f, r, 1)
-  -- local r1, u1
+function test_no_sailing_through_packice()
+    local u = setup_packice(0)
+    u:clear_orders()
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(0, u.region.x)
+end
 
-  -- function a() i = 2 end
-  -- function b() i = i * 2 end
-  -- function c(r) r1 = r  i = i + 1 end
-  -- function d(u) u1 = u  i = i * 3 end
+function test_can_sail_from_packice_to_ocean()
+    local u = setup_packice(1)
 
-  -- process.setup()
-  -- process.push(a)
-  -- process.push(b)
-  -- process.push(c, "region")
-  -- process.push(d, "unit")
-  -- process.start()
+    u:clear_orders()
+    u:add_order("NACH W")
+    process_orders()
+    assert_equal(1, u.region.x)
 
-  -- assert_equal(15, i)
-  -- assert_equal(r, r1)
-  -- assert_equal(u, u1)
--- end
+    u:clear_orders()
+    u:add_order("NACH O")
+    process_orders()
+    assert_equal(2, u.region.x)
+end
+
+function test_can_sail_into_packice()
+    local u = setup_packice(2)
+    u:clear_orders()
+    u:add_order("NACH W W")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+
+function test_can_walk_into_packice()
+    local u = setup_packice(0, true)
+    u:clear_orders()
+    u:add_order("NACH O")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+
+function test_cannot_walk_into_ocean()
+    local u = setup_packice(1, true)
+    u:clear_orders()
+    u:add_order("NACH O")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+
