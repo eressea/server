@@ -232,7 +232,7 @@ mr_tile(const map_region * mr, int highlight)
       if (r->terrain->_name[1]=='l') { /* plain */
         if (r_isforest(r)) return '#' | COLOR_PAIR(hl + COLOR_GREEN) | A_NORMAL;
         return '+' | COLOR_PAIR(hl + COLOR_GREEN) | A_BOLD;
-      } else if (r->terrain->_name[1]=='l') { /* packice */
+      } else if (r->terrain->_name[1]=='a') { /* packice */
         return ':' | COLOR_PAIR(hl + COLOR_WHITE) | A_BOLD;
       }
       break;
