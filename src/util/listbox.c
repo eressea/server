@@ -13,6 +13,7 @@
 #include <curses.h>
 
 #include "listbox.h"
+#include "gmtool_structs.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -94,7 +95,7 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
         waddnstr(wn, s->str, -1);
         wclrtoeol(wn);
       }
-      wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
+      wxborder(wn);
       mvwprintw(wn, 0, 2, "[ %s ]", title);
       update = false;
     }

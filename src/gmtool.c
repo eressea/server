@@ -223,13 +223,19 @@ mr_tile(const map_region * mr, int highlight)
       } else if (r->terrain->_name[1]=='i') { /* firewall */
         return '%' | COLOR_PAIR(hl + COLOR_RED) | A_BOLD;
       }
+      break;
     case 'h' :
       return 'H' | COLOR_PAIR(hl + COLOR_YELLOW) | A_NORMAL;
     case 'm' :
       return '^' | COLOR_PAIR(hl + COLOR_WHITE) | A_NORMAL;
     case 'p' :
-      if (r_isforest(r)) return '#' | COLOR_PAIR(hl + COLOR_GREEN) | A_NORMAL;
-      return '+' | COLOR_PAIR(hl + COLOR_GREEN) | A_BOLD;
+      if (r->terrain->_name[1]=='l') { /* plain */
+        if (r_isforest(r)) return '#' | COLOR_PAIR(hl + COLOR_GREEN) | A_NORMAL;
+        return '+' | COLOR_PAIR(hl + COLOR_GREEN) | A_BOLD;
+      } else if (r->terrain->_name[1]=='l') { /* packice */
+        return ':' | COLOR_PAIR(hl + COLOR_WHITE) | A_BOLD;
+      }
+      break;
     case 'g' :
       return '*' | COLOR_PAIR(hl + COLOR_WHITE) | A_BOLD;
     case 's' :
