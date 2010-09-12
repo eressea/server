@@ -873,6 +873,11 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     cmistake(u, ord, 221, MSG_PRODUCE);
     return;
   }
+  if (r->terrain->max_road<=0) {
+    /* special terrain, cannot build */
+    cmistake(u, ord, 221, MSG_PRODUCE);
+    return;
+  }
   if (btype->flags & BTF_ONEPERTURN) {
     if(b && fval(b, BLD_EXPANDED)) {
       cmistake(u, ord, 318, MSG_PRODUCE);

@@ -4759,8 +4759,8 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht bauen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot build such a thing."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - So etwas kann man hier nicht bauen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - You cannot build this here."</text>
   </message>
   <message name="error220" section="errors">
     <type>
@@ -4769,7 +4769,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Im astralen Nebel konnte niemand entdeckt werden."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Noone could be seen in th astral fog."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Noone could be seen in the astral fog."</text>
   </message>
   <message name="gbdream_noteach" section="errors">
     <type>

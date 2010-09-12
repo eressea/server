@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 /* diverse Flags */
-/* Strassen können gebaut werden, wenn max_road > 0 */
+/* Strassen und Gebäude können gebaut werden, wenn max_road > 0 */
 #define LAND_REGION      (1<<0)		/* Standard-Land-struct region */
 #define SEA_REGION       (1<<1)		/* hier braucht man ein Boot */
 #define FOREST_REGION    (1<<2)		/* Elfen- und Kampfvorteil durch Bäume */
