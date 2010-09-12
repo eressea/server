@@ -1,5 +1,4 @@
 require "multis"
-require "e3a.frost"
 
 function apply_fixes()
   local turn = get_turn()
@@ -49,7 +48,6 @@ function process(orders)
   update_embassies()
   update_guards()
   update_scores()
-  frost.update()
 
   local localechange = { de = { "ii" } }
   change_locales(localechange)
