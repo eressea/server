@@ -3225,18 +3225,16 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
   if (rule_anon_battle<0) {
     rule_anon_battle = get_param_int(global.parameters, "rules.stealth.anon_battle", 1);
   }
-  if (rule_anon_battle) {
-    if (fval(u, UFL_ANON_FACTION)!=0) flags |= SIDE_STEALTH;
-  }
+  if (fval(u, UFL_ANON_FACTION)!=0) flags |= SIDE_STEALTH;
   if (!(AllianceAuto() & HELP_FIGHT) && fval(u, UFL_GROUP)) {
     const attrib * agroup = a_find(u->attribs, &at_group);
     if (agroup!=NULL) g = (const group*)agroup->data.v;
   }
 
   /* Illusionen und Zauber kaempfen nicht */
-  if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction) || u->number==0)
+  if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction) || u->number==0) {
     return NULL;
-
+  }
   if (s1==NULL) {
     for (s2=b->sides;s2!=b->sides+b->nsides;++s2) {
       if (s2->faction == u->faction && s2->group==g) {
@@ -3247,7 +3245,10 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
         int s1flags = flags;
         int s2flags = s2->flags;
 #endif
-        if (s1flags==s2flags && s2->stealthfaction==stealthfaction) {
+        if (rule_anon_battle && s2->stealthfaction!=stealthfaction) {
+          continue;
+        }
+        if (s1flags==s2flags) {
           s1 = s2;
           break;
         }
@@ -3257,6 +3258,8 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     /* aliances are moved out of make_fighter and will be handled later */
     if (!s1) {
       s1 = make_side(b, u->faction, g, flags, stealthfaction);
+    } else if (!stealthfaction) {
+      s1->stealthfaction = NULL;
     }
     /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
     * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
