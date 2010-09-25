@@ -2089,7 +2089,9 @@ make_heroes(battle * b)
       unit * u = fig->unit;
       if (fval(u, UFL_HERO)) {
         int i;
-        assert(playerrace(u->race));
+        if (!playerrace(u->race)) {
+          log_error(("Hero %s is a %s.\n", unitname(u), u->race->_name[0]));
+        }
         for (i=0;i!=u->number;++i) {
           fig->person[i].speed += (hero_speed-1);
         }
