@@ -292,7 +292,7 @@
   <spell name="song_suscept_magic" type="cerddor" rank="2" level="12" index="101" far="true" variable="true">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="analyze_magic" type="tybied" rank="5" level="1" index="102" parameters="kc?" los="true" ship="true" variable="true">
+  <spell name="analyze_magic" type="tybied" rank="5" level="1" index="102" parameters="kc+" los="true" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="analysedream" type="illaun" rank="5" level="5" index="103" parameters="u" los="true" ship="true">
@@ -301,10 +301,10 @@
   <spell name="analysesong_unit" type="cerddor" rank="5" level="5" index="104" parameters="u" los="true" ship="true">
     <resource name="aura" amount="10" cost="fixed"/>
   </spell>
-  <spell name="analyse_object" type="cerddor" rank="5" level="8" index="105" parameters="kc?" ship="true" variable="true">
+  <spell name="analyse_object" type="cerddor" rank="5" level="8" index="105" parameters="kc+" ship="true" variable="true">
     <resource name="aura" amount="3" cost="level"/>
   </spell>
-  <spell name="destroy_magic" type="tybied" rank="2" level="5" index="106" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="destroy_magic" type="tybied" rank="2" level="5" index="106" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>
   </spell>
   <spell name="break_curse" type="tybied" rank="3" level="7" index="107" syntax="spellid" parameters="kcc?" los="true" ship="true" far="true" variable="true">
@@ -368,16 +368,16 @@
   <spell name="icastle" type="illaun" rank="5" level="3" index="137" syntax="buildingtype" parameters="c">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="gwyrrddestroymagic" type="gwyrrd" rank="2" level="8" index="138" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="gwyrrddestroymagic" type="gwyrrd" rank="2" level="8" index="138" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="6" cost="level"/>
   </spell>
-  <spell name="draigdestroymagic" type="draig" rank="2" level="10" index="139" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="draigdestroymagic" type="draig" rank="2" level="10" index="139" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="10" cost="level"/>
   </spell>
-  <spell name="illaundestroymagic" type="illaun" rank="2" level="8" index="140" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="illaundestroymagic" type="illaun" rank="2" level="8" index="140" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="6" cost="level"/>
   </spell>
-  <spell name="cerddor_destroymagic" type="cerddor" rank="2" level="8" index="141" parameters="kc?" los="true" ship="true" far="true" variable="true">
+  <spell name="cerddor_destroymagic" type="cerddor" rank="2" level="8" index="141" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="5" cost="level"/>
   </spell>
   <spell name="barkskin" type="gwyrrd" rank="2" level="12" index="142" variable="true" combat="1">
