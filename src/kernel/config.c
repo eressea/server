@@ -543,7 +543,7 @@ static attrib_type at_npcfaction = {
 int
 max_magicians(const faction * f)
 {
-  int m = MAXMAGICIANS;
+  int m = get_param_int(global.parameters, "rules.maxskills.magic", MAXMAGICIANS);
   attrib * a;
   
   if ((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
@@ -574,7 +574,7 @@ skill_limit(faction * f, skill_t sk)
     m = max_magicians(f);
     break;
   case SK_ALCHEMY:
-    m = MAXALCHEMISTS;
+    m = get_param_int(global.parameters, "rules.maxskills.alchemy", MAXALCHEMISTS);
     break;
   }
   return m;
