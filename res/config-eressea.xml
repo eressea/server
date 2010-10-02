@@ -100,7 +100,8 @@
     <param name="hunger.long" value="1"/>
     <param name="init_spells" value="0"/>
     <param name="rules.check_overload" value="0"/>
-    <param name="rules.limit.faction" value="1500"/>
+    <param name="rules.limit.faction" value="2500"/>
+    <param name="rules.maxskills.magic" value="5"/>
   </game>
   <strings>
     <string name="mailto">
