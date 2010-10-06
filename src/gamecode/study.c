@@ -197,7 +197,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     return 0;
   }
 
-  n = 30;
+  n = 30 * student->number;
   a = a_find(student->attribs, &at_learning);
   if (a!=NULL) {
     teach = (teaching_info*)a->data.v;
