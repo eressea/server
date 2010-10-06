@@ -6,6 +6,42 @@ function setup()
     free_game()
 end
 
+function test_learn()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  f.age = 20
+  local u = unit.create(f, r)
+  u:add_item("money", 1000)
+  u:clear_orders()
+  u:add_order("@LERNEN Reiten")
+  process_orders()
+  assert_equal(1, u:get_skill("riding"))
+  process_orders()
+  process_orders()
+  process_orders()
+  process_orders()
+  assert_true(2<=u:get_skill("riding"))
+end
+
+function test_teach()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  f.age = 20
+  local u = unit.create(f, r, 10)
+  local u2 = unit.create(f, r)
+  u:add_item("money", 1000)
+  u:clear_orders()
+  u:add_order("@LERNEN reiten")
+  u2:clear_orders()
+  u2:add_order("LEHREN " .. itoa36(u.id))
+  u2:set_skill("riding", 4)
+  process_orders()
+  assert_equal(1, u:get_skill("riding"))
+  process_orders()
+  process_orders()
+  assert_true(2<=u:get_skill("riding"))
+end
+
 function test_rename()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
