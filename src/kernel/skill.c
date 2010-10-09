@@ -277,16 +277,24 @@ sk_set(skill * sv, int level)
 	sv->level = (unsigned char)level;
 }
 
+static int
+rule_random_progress(void) {
+  return get_param_int(global.parameters, "study.random_progress", 1);
+}
+
 int
 skill_weeks(int level)
 /* how many weeks must i study to get from level to level+1 */
 {
-	int coins = 2*level;
-	int heads = 1;
-	while (coins--) {
-		heads += rng_int() % 2;
-	}
-	return heads;
+  if (rule_random_progress()) {
+    int coins = 2*level;
+    int heads = 1;
+    while (coins--) {
+      heads += rng_int() % 2;
+    }
+    return heads;
+  }
+  return level+1;
 }
 
 void 

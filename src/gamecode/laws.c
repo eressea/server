@@ -196,6 +196,12 @@ help_feed(unit * donor, unit * u, int * need_p)
   *need_p = need;
 }
 
+enum {
+  FOOD_FROM_PEASANTS = 1,
+  FOOD_FROM_OWNER = 2,
+  FOOD_IS_FREE = 4
+};
+
 static void
 get_food(region *r)
 {
@@ -203,11 +209,16 @@ get_food(region *r)
   unit *u;
   int peasantfood = rpeasants(r)*10;
   static int food_rules = -1;
+  static int gamecookie = -1;
 
-  if (food_rules<0) {
+  if (food_rules<0  || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
     food_rules = get_param_int(global.parameters, "rules.economy.food", 0);
   }
 
+  if (food_rules&FOOD_IS_FREE) {
+    return;
+  }
   /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
    * jede Einheit genug Silber für ihren Unterhalt hat. */
@@ -238,7 +249,7 @@ get_food(region *r)
       u->ship->flags -= SF_FISHING;
     }
 
-    if (food_rules&1) {
+    if (food_rules&FOOD_FROM_PEASANTS) {
       faction * owner = region_get_owner(r);
       /* if the region is owned, and the owner is nice, then we'll get 
        * food from the peasants - should not be used with WORK */
@@ -279,7 +290,7 @@ get_food(region *r)
     if (need > 0) {
       unit *v;
 
-      if (food_rules&2) {
+      if (food_rules&FOOD_FROM_OWNER) {
         /* the owner of the region is the first faction to help out when you're hungry */
         faction * owner = region_get_owner(r);
         if (owner && owner!=u->faction) {

@@ -115,7 +115,9 @@ attrib_type at_xontormiaexpress = {
 int
 NewbieImmunity(void) {
   static int value = -1;
-  if (value<0) {
+  static int gamecookie = -1;
+  if (value<0 || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
     value = get_param_int(global.parameters, "NewbieImmunity", 0);
   }
   return value;
@@ -130,7 +132,9 @@ IsImmune(const faction * f)
 static int
 MaxAge(void) {
   static int value = -1;
-  if (value<0) {
+  static int gamecookie = -1;
+  if (value<0 || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
     value = get_param_int(global.parameters, "MaxAge", 0);
   }
   return value;
@@ -151,8 +155,10 @@ ally_flag(const char * s, int help_mask)
 boolean
 ExpensiveMigrants(void)
 {
-  int value = -1;
-  if (value<0) {
+  static int value = -1;
+  static int gamecookie = -1;
+  if (value<0 || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
     value = get_param_int(global.parameters, "study.expensivemigrants", 0);
   }
   return value;
@@ -165,8 +171,10 @@ int
 AllianceAuto(void)
 {
   static int value = -1;
-  if (value<0) {
+  static int gamecookie = -1;
+  if (value<0 || gamecookie!=global.cookie) {
     const char * str = get_param(global.parameters, "alliance.auto");
+    gamecookie = global.cookie;
     value = 0;
     if (str!=NULL) {
     char * sstr = strdup(str);
@@ -190,78 +198,88 @@ AllianceAuto(void)
 int
 HelpMask(void)
 {
-  static int value = -1;
-  if (value<0) {
+  static int rule = -1;
+  static int gamecookie = -1;
+  if (rule<0 || gamecookie!=global.cookie) {
     const char * str = get_param(global.parameters, "rules.help.mask");
-    value = 0;
+    gamecookie = global.cookie;
+    rule = 0;
     if (str!=NULL) {
       char * sstr = strdup(str);
       char * tok = strtok(sstr, " ");
       while (tok) {
-        value |= ally_flag(tok, -1);
+        rule |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
       }
       free(sstr);
     } else {
-      value = HELP_ALL;
+      rule = HELP_ALL;
     }
   }
-  return value;
+  return rule;
 }
 
 int
 AllianceRestricted(void)
 {
-  static int value = -1;
-  if (value<0) {
+  static int rule = -1;
+  static int gamecookie = -1;
+  if (rule<0 || gamecookie!=global.cookie) {
     const char * str = get_param(global.parameters, "alliance.restricted");
-    value = 0;
+    gamecookie = global.cookie;
+    rule = 0;
     if (str!=NULL) {
     char * sstr = strdup(str);
       char * tok = strtok(sstr, " ");
       while (tok) {
-        value |= ally_flag(tok, -1);
+        rule |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
       }
       free(sstr);
     }
-    value &= HelpMask();
+    rule &= HelpMask();
   }
-  return value;
+  return rule;
 }
 
 int
 LongHunger(const struct unit * u) {
-  static int value = -1;
+  static int gamecookie = -1;
+  static int rule = -1;
   if (u!=NULL) {
     if (!fval(u, UFL_HUNGER)) return false;
 #ifdef NEW_DAEMONHUNGER_RULE
     if (u->race==new_race[RC_DAEMON]) return false;
 #endif
   }
-  if (value<0) {
-    value = get_param_int(global.parameters, "hunger.long", 0);
+  if (rule<0 || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
+    rule = get_param_int(global.parameters, "hunger.long", 0);
   }
-  return value;
+  return rule;
 }
 
 int
 SkillCap(skill_t sk) {
-  static int value = -1;
+  static int gamecookie = -1;
+  static int rule = -1;
   if (sk==SK_MAGIC) return 0; /* no caps on magic */
-  if (value<0) {
-    value = get_param_int(global.parameters, "skill.maxlevel", 0);
+  if (rule<0 || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
+    rule = get_param_int(global.parameters, "skill.maxlevel", 0);
   }
-  return value;
+  return rule;
 }
 
 int
 NMRTimeout(void) {
-  static int value = -1;
-  if (value<0) {
-    value = get_param_int(global.parameters, "nmr.timeout", 0);
+  static int gamecookie = -1;
+  static int rule = -1;
+  if (rule<0 || gamecookie!=global.cookie) {
+    gamecookie = global.cookie;
+    rule = get_param_int(global.parameters, "nmr.timeout", 0);
   }
-  return value;
+  return rule;
 }
 
 race_t

@@ -2,6 +2,7 @@ require "lunit"
 
 function setup()
     free_game()
+    settings.set("rules.economy.food", "4")
 end
 
 function one_unit(r, f)
@@ -650,6 +651,30 @@ function test_expensive_skills_cost_money()
   u:clear_orders()
   u:add_order("LERNEN MAGIE Gwyrrd")
   process_orders()
-  assert_equal(9890, u:get_item("money"))
+  assert_equal(9900, u:get_item("money"))
   assert_equal(1, u:get_skill("magic"))
+end
+
+function test_food_is_consumed()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r, 1)
+  u:add_item("money", 100)
+  u:clear_orders()
+  u:add_order("LERNEN Reiten") -- don't work
+  settings.set("rules.economy.food", "4")
+  process_orders()
+  assert_equal(100, u:get_item("money"))
+end
+
+function test_food_can_override()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r, 1)
+  u:add_item("money", 100)
+  u:clear_orders()
+  u:add_order("LERNEN Reiten") -- don't work
+  settings.set("rules.economy.food", "0")
+  process_orders()
+  assert_equal(90, u:get_item("money"))
 end
