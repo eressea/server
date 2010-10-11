@@ -543,7 +543,7 @@ monster_attacks(unit * u)
   unit * u2;
 
   for (u2=r->units;u2;u2=u2->next) {
-    if (u2->faction!=u->faction && chance(0.75)) {
+    if (cansee(u->faction, r, u2, 0) && u2->faction!=u->faction && chance(0.75)) {
       order * ord = monster_attack(u, u2);
       if (ord) addlist(&u->orders, ord);
     }
