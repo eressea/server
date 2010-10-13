@@ -73,6 +73,7 @@ spy_message(int spy, const unit *u, const unit *target)
     if (fv && fv!=target->faction) {
       /* wahre Partei */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction", "target faction", target, target->faction));
+      flist_add(&u->faction->seen_factions, target->faction);
     }
   }
   if (spy > 0) {

@@ -108,6 +108,7 @@ typedef struct faction {
   } * battles;
   struct item * items; /* items this faction can claim */
   struct seen_region ** seen;
+  struct faction_list * seen_factions;
 } faction;
 
 extern struct faction *factions;
@@ -117,6 +118,7 @@ typedef struct faction_list {
 	struct faction * data;
 } faction_list;
 
+void flist_add(struct faction_list ** flist, struct faction * sf);
 extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
 extern struct unit * addplayer(struct region *r, faction * f);

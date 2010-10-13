@@ -883,21 +883,6 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
   return x;
 }
 
-static void
-add_faction(faction_list ** flist, faction * sf)
-{
-  faction_list ** fnew = flist;
-  while (*fnew && (*fnew)->data->no < sf->no) {
-    fnew =&(*fnew)->next;
-  }
-  if ((*fnew==NULL) || (*fnew)->data!=sf) {
-    faction_list * finsert = malloc(sizeof(faction_list));
-    finsert->next = *fnew;
-    *fnew = finsert;
-    finsert->data = sf;
-  }
-}
-
 int
 stealth_modifier(int seen_mode)
 {
@@ -921,14 +906,15 @@ get_addresses(report_context * ctx)
   seen_region * sr = NULL;
   region *r;
   const faction * lastf = NULL;
-  faction_list * flist = calloc(1, sizeof(faction_list));
-  
-  flist->data = ctx->f;
+  faction_list * flist = ctx->f->seen_factions;
+
+  ctx->f->seen_factions = NULL; /* do not delete it twice */
+  flist_add(&flist, ctx->f);
 
   if (f_get_alliance(ctx->f)) {
     faction_list * member = ctx->f->alliance->members;
     for (;member;member=member->next) {
-      add_faction(&flist, member->data);
+      flist_add(&flist, member->data);
     }
   }
 
@@ -945,7 +931,7 @@ get_addresses(report_context * ctx)
         faction * sf = visible_faction(ctx->f, u);
         if (lastf!=sf) {
           if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
-            add_faction(&flist, sf);
+            flist_add(&flist, sf);
             lastf = sf;
           }
         }
@@ -961,7 +947,7 @@ get_addresses(report_context * ctx)
             unit * u2 = (unit*)a->data.v;
             if (u2->faction==ctx->f) {
               if (cansee_unit(u2, u, stealthmod)) {
-                add_faction(&flist, sf);
+                flist_add(&flist, sf);
                 lastf = sf;
                 break;
               }
@@ -979,7 +965,7 @@ get_addresses(report_context * ctx)
           boolean ballied = sf && sf!=ctx->f && sf!=lastf
             && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
           if (ballied || ALLIED(ctx->f, sf)) {
-            add_faction(&flist, sf);
+            flist_add(&flist, sf);
             lastf = sf;
           }
         }
@@ -992,7 +978,7 @@ get_addresses(report_context * ctx)
     faction *f2;
     for (f2 = factions; f2; f2 = f2->next) {
       if (f2->alliance == ctx->f->alliance) {
-        add_faction(&flist, f2);
+        flist_add(&flist, f2);
       }
     }
   }
