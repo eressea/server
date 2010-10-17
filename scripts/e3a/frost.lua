@@ -16,6 +16,9 @@ end
 
 local function thaw(r)
     r.terrain = "ocean"
+    for s in r.ships do
+        s.coast = nil
+    end
 end
 
 function update()
