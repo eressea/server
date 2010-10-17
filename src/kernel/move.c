@@ -1830,7 +1830,9 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
     cycle_route(ord, u, step);
     set_order(&u->thisorder, NULL);
-    set_coast(sh, last_point, current_point);
+    if (!move_on_land) {
+      set_coast(sh, last_point, current_point);
+    }
 
     if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
       ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh, starting_point, current_point));
