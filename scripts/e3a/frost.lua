@@ -5,19 +5,26 @@ local function is_winter(turn)
     return season == "calendar::winter"
 end
 
-local function freeze(r)
+local function is_spring(turn)
+    local season = get_season(turn)
+    return season == "calendar::spring"
+end
+
+local function freeze(r, chance)
     for i, rn in ipairs(r.adj) do
         -- each region has a chance to freeze
-        if rn.terrain=="ocean" and math.mod(rng_int(), 100)<20 then
+        if rn.terrain=="ocean" and (chance>=100 or math.mod(rng_int(), 100)<chance) then
             rn.terrain = "packice"
         end
     end
 end
 
-local function thaw(r)
-    r.terrain = "ocean"
-    for s in r.ships do
-        s.coast = nil
+local function thaw(r, chance)
+    if chance>=100 or math.mod(rng_int(), 100)<chance then
+        r.terrain = "ocean"
+        for s in r.ships do
+            s.coast = nil
+        end
     end
 end
 
@@ -26,13 +33,19 @@ function update()
     if is_winter(turn) then
         for r in regions() do
             if r.terrain=="glacier" then
-                freeze(r)
+                freeze(r, 20)
             end
         end
-    elseif is_winter(turn-1) then
+    elseif is_spring(turn) then
         for r in regions() do
             if r.terrain=="packice" then
-                thaw(r)
+                thaw(r, 20)
+            end
+        end
+    elseif is_spring(turn-1) then
+        for r in regions() do
+            if r.terrain=="packice" then
+                thaw(r, 100)
             end
         end
     end
