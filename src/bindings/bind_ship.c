@@ -144,6 +144,27 @@ static int tolua_ship_set_flags(lua_State* L)
   return 0;
 }
 
+static int tolua_ship_set_coast(lua_State* L)
+{
+  ship* self = (ship*)tolua_tousertype(L, 1, 0);
+  if (lua_isnil(L, 2)) {
+    self->coast = NODIRECTION;
+  } else if (lua_isnumber(L, 2)) {
+    self->coast = (direction_t)tolua_tonumber(L, 2, 0);
+  }
+  return 0;
+}
+
+static int tolua_ship_get_coast(lua_State* L)
+{
+  ship* self = (ship*)tolua_tousertype(L, 1, 0);
+  if (self->coast) {
+    tolua_pushnumber(L, self->coast);
+    return 1;
+  }
+  return 0;
+}
+
 
 void
 tolua_ship_open(lua_State* L)
@@ -163,6 +184,7 @@ tolua_ship_open(lua_State* L)
       tolua_variable(L, TOLUA_CAST "units", tolua_ship_get_units, NULL);
       tolua_variable(L, TOLUA_CAST "flags", &tolua_ship_get_flags, tolua_ship_set_flags);
       tolua_variable(L, TOLUA_CAST "region", tolua_ship_get_region, tolua_ship_set_region);
+      tolua_variable(L, TOLUA_CAST "coast", tolua_ship_get_coast, tolua_ship_set_coast);
 #ifdef TODO
       .property("type", &ship_gettype)
       .property("weight", &ship_getweight)
