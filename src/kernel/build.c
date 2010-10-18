@@ -373,7 +373,10 @@ destroy_cmd(unit * u, struct order * ord)
   if (u->building) {
     building *b = u->building;
 
-    if (n >= b->size) {
+    if (fval(b->type, BTF_INDESTRUCTIBLE)) {
+      cmistake(u, ord, 138, MSG_PRODUCE);
+      return 0;
+    } if (n >= b->size) {
       /* destroy completly */
       /* all units leave the building */
       for (u2 = r->units; u2; u2 = u2->next) {
