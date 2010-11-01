@@ -8,31 +8,31 @@ local function _test_create_ship(r)
     return s
 end
 
-function setup()
-    free_game()
-    settings.set("nmr.removenewbie", "0")
-    settings.set("nmr.timeout", "0")
-    settings.set("rules.economy.food", "4")
-end
-
-function one_unit(r, f)
+local function one_unit(r, f)
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
   u:clear_orders()
   return u
 end
 
-function two_units(r, f1, f2)
+local function two_units(r, f1, f2)
   return one_unit(r, f1), one_unit(r, f2)
 end
 
-function two_factions()
+local function two_factions()
   local f1 = faction.create("noreply@eressea.de", "human", "de")
   local f2 = faction.create("noreply@eressea.de", "orc", "de")
   return f1, f2
 end
 
 module( "common", package.seeall, lunit.testcase )
+
+function setup()
+    free_game()
+    settings.set("nmr.removenewbie", "0")
+    settings.set("nmr.timeout", "0")
+    settings.set("rules.economy.food", "4")
+end
 
 function DISABLE_test_eventbus_fire()
   local r = region.create(0, 0, "plain")
@@ -85,14 +85,12 @@ function test_plane()
 end
 
 function test_pure()
-  free_game()
   local r = region.create(0, 0, "plain")
   assert_not_equal(nil, r)
   assert_equal(r, get_region(0, 0))
 end
 
 function test_read_write()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
@@ -118,11 +116,9 @@ function test_read_write()
   assert_not_equal(nil, get_region(0, 0))
   assert_not_equal(nil, get_faction(fno))
   assert_not_equal(nil, get_unit(uno))
-  free_game()
 end
 
 function test_gmtool()
-    free_game()
     local r1 = region.create(1, 0, "plain")
     local r2 = region.create(1, 1, "plain")
     local r3 = region.create(1, 2, "plain")
@@ -147,7 +143,6 @@ function test_gmtool()
 end
 
 function test_faction()
-    free_game()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     assert(f)
@@ -171,7 +166,6 @@ function test_faction()
 end
 
 function test_unit()
-    free_game()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r)
@@ -188,7 +182,6 @@ function test_unit()
 end
 
 function test_region()
-  free_game()
   local r = region.create(0, 0, "plain")
   r:set_resource("horse", 42)
   r:set_resource("money", 45)
@@ -206,7 +199,6 @@ function test_region()
 end
 
 function test_building()
-  free_game()
   local u
   local f = faction.create("noreply@eressea.de", "human", "de")
   local r = region.create(0, 0, "plain")
@@ -233,7 +225,6 @@ function test_building()
 end
 
 function test_message()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
@@ -248,7 +239,6 @@ function test_message()
 end
 
 function test_hashtable()
-  free_game()
   local f = faction.create("noreply@eressea.de", "human", "de")
   f.objects:set("enno", "smart guy")
   f.objects:set("age", 10)
@@ -299,7 +289,6 @@ function test_events()
 end
 
 function test_recruit2()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
@@ -314,7 +303,6 @@ function test_recruit2()
 end
 
 function test_guard()
-  free_game()
   region.create(1, 0, "plain")
   local r = region.create(0, 0, "plain")
   local f1 = faction.create("noreply@eressea.de", "human", "de")
@@ -343,7 +331,6 @@ function test_guard()
 end
 
 function test_recruit()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r)
@@ -361,7 +348,6 @@ function test_recruit()
 end
 
 function test_produce()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
@@ -376,7 +362,6 @@ function test_produce()
 end
 
 function test_work()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
@@ -389,19 +374,18 @@ function test_work()
 end
 
 function test_upkeep()
-  free_game()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r, 5)
-  u:add_item("money", u.number * 11)
-  u:clear_orders()
-  u:add_order("LERNE Waffenbau")
-  process_orders()
-  assert(u:get_item("money")==u.number)
+    settings.set("rules.economy.food", "0")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 5)
+    u:add_item("money", u.number * 11)
+    u:clear_orders()
+    u:add_order("LERNE Waffenbau")
+    process_orders()
+    assert(u:get_item("money")==u.number)
 end
 
 function test_id()
-  free_game()
   local r = region.create(0, 0, "plain")
 
   local f = faction.create("noreply@eressea.de", "human", "de")
@@ -430,7 +414,6 @@ function test_id()
 end
 
 function test_herbalism()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
@@ -442,7 +425,6 @@ function test_herbalism()
 end
 
 function test_mallorn()
-  free_game()
   local r = region.create(0, 0, "plain")
   r:set_flag(1, false) -- not mallorn
   r:set_resource("tree", 100)
@@ -512,7 +494,6 @@ function test_coordinate_translation()
 end
 
 function test_control()
-  free_game()
   local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
   local r = u1.region
   local b = building.create(r, "castle")
@@ -527,7 +508,6 @@ function test_control()
 end
 
 function test_store_unit()
-  free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
@@ -686,8 +666,6 @@ function test_swim_and_survive()
     local f = faction.create("noreply@eressea.de", "human", "de")
     f.nam = "chaos"
     local u = unit.create(f, r, 1)
-    f.age = 20
-    u:add_item("money", 100)
     process_orders()
     r.terrain = "ocean"
     local s = _test_create_ship(r)
@@ -702,11 +680,82 @@ function test_swim_and_die()
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     local uid = u.id
-    u:add_item("money", 100)
     process_orders()
     r.terrain = "ocean"
     u = get_unit(uid)
     assert_not_equal(get_unit(uid), nil)
     process_orders()
     assert_equal(get_unit(uid), nil)
+end
+
+function test_ride_with_horse()
+    region.create(1, 0, "plain")
+    region.create(2, 0, "plain")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("horse", 1)
+    u:add_item("sword", 10)
+    u:set_skill("riding", 2)
+
+    u:clear_orders()
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(u.region.x, 2)
+
+    u:add_item("sword", 1)
+    u:clear_orders()
+    u:add_order("NACH W W")
+    process_orders()
+    assert_equal(u.region.x, 1)
+end
+
+function test_ride_with_horses_and_cart()
+    region.create(1, 0, "plain")
+    region.create(2, 0, "plain")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("cart", 1)
+    u:add_item("horse", 2)
+    u:add_item("sword", 120)
+    u:set_skill("riding", 3)
+
+    -- ride
+    u:clear_orders()
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(2, u.region.x)
+
+    -- walk
+    u:add_item("sword", 20)
+    r:get_key("eviL")
+    u:clear_orders()
+    u:add_order("NACH W W")
+    process_orders()
+    assert_equal(1, u.region.x)
+    
+    -- too heavy
+
+    u:add_item("sword", 10)
+    r:get_key("eviL")
+    u:clear_orders()
+    u:add_order("NACH W W")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+
+function test_walk_and_carry_the_cart()
+    region.create(1, 0, "plain")
+    local r = region.create(2, 0, "plain")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 10)
+    u:add_item("cart", 1)
+
+    -- walk
+    u:clear_orders()
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(1, u.region.x)
 end
