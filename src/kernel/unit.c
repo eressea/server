@@ -152,17 +152,17 @@ dfindhash(int no)
   return 0;
 }
 
-typedef struct friend {
-  struct friend * next;
+typedef struct buddy {
+  struct buddy * next;
   int number;
   faction * faction;
   unit * unit;
-} friend;
+} buddy;
 
-static friend *
+static buddy *
 get_friends(const unit * u, int * numfriends)
 {
-  friend * friends = 0;
+  buddy * friends = 0;
   faction * f = u->faction;
   region * r = u->region;
   int number = 0;
@@ -178,14 +178,14 @@ get_friends(const unit * u, int * numfriends)
         allied = 1;
       }
       if (allied) {
-        friend * nf, ** fr = &friends;
+        buddy * nf, ** fr = &friends;
 
         /* some units won't take stuff: */
         if (u2->race->ec_flags & GETITEM) {
           while (*fr && (*fr)->faction->no<u2->faction->no) fr = &(*fr)->next;
           nf = *fr;
           if (nf==NULL || nf->faction!=u2->faction) {
-            nf = malloc(sizeof(friend));
+            nf = malloc(sizeof(buddy));
             nf->next = *fr;
             nf->faction = u2->faction;
             nf->unit = u2;
@@ -218,6 +218,8 @@ gift_items(unit * u, int flags)
   item ** itm_p = &u->items;
   int retval = 0;
   int rule = rule_give();
+
+  assert(u->region);
 
   if ((u->faction->flags&FFL_QUIT)==0 || (rule&GIVE_ONDEATH)==0) {
     if ((rule&GIVE_ALLITEMS)==0 && (flags&GIFT_FRIENDS)) flags-=GIFT_FRIENDS;
@@ -257,10 +259,10 @@ gift_items(unit * u, int flags)
   /* if I have friends, I'll try to give my stuff to them */
   if (u->faction && (flags & GIFT_FRIENDS)) {
     int number = 0;
-    friend * friends = get_friends(u, &number);
+    buddy * friends = get_friends(u, &number);
 
     while (friends) {
-      struct friend * nf = friends;
+      struct buddy * nf = friends;
       unit * u2 = nf->unit;
       item * itm = u->items;
       while (itm!=NULL) {
