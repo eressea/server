@@ -2,6 +2,8 @@ require "lunit"
 
 function setup()
     free_game()
+    settings.set("nmr.removenewbie", "0")
+    settings.set("nmr.timeout", "0")
     settings.set("rules.economy.food", "4")
 end
 
@@ -18,9 +20,7 @@ end
 
 function two_factions()
   local f1 = faction.create("noreply@eressea.de", "human", "de")
-  f1.id = 1
   local f2 = faction.create("noreply@eressea.de", "orc", "de")
-  f2.id = 2
   return f1, f2
 end
 
@@ -371,7 +371,6 @@ function test_work()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 10) -- humans cost 10
   u:set_skill("herbalism", 5)
@@ -385,7 +384,6 @@ function test_upkeep()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
   local u = unit.create(f, r, 5)
   u:add_item("money", u.number * 11)
   u:clear_orders()
@@ -430,7 +428,6 @@ function test_herbalism()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
   u:set_skill("herbalism", 5)
@@ -524,12 +521,12 @@ function test_control()
   assert_equal(u2, b.owner)
 end
 
-function test_storage()
+function test_store_unit()
   free_game()
   local r = region.create(0, 0, "plain")
   local f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
   local u = unit.create(f, r, 1)
+  local fid = f.id
   u:add_item("money", u.number * 100)
   store = storage.create("test.unit.dat", "wb")
   assert_not_equal(store, nil)
@@ -539,7 +536,7 @@ function test_storage()
   -- recreate world:
   r = region.create(0, 0, "plain")
   f = faction.create("noreply@eressea.de", "human", "de")
-  f.id = 42
+  f.id = fid
   store = storage.create("test.unit.dat", "rb")
   assert(store)
   u = store:read_unit()
@@ -677,4 +674,34 @@ function test_food_can_override()
   settings.set("rules.economy.food", "0")
   process_orders()
   assert_equal(90, u:get_item("money"))
+end
+
+function test_swim_and_survive()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    f.nam = "chaos"
+    local u = unit.create(f, r, 1)
+    f.age = 20
+    u:add_item("money", 100)
+    process_orders()
+    r.terrain = "ocean"
+    local s = ship.create(r, "boat")
+    u:clear_orders()
+    u:add_order("BETRETE SCHIFF " .. itoa36(s.id))
+    process_orders()
+    assert_equal(u.number, 1)
+end
+
+function test_swim_and_die()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local uid = u.id
+    u:add_item("money", 100)
+    process_orders()
+    r.terrain = "ocean"
+    u = get_unit(uid)
+    assert_not_equal(get_unit(uid), nil)
+    process_orders()
+    assert_equal(get_unit(uid), nil)
 end
