@@ -199,15 +199,6 @@ static int tolua_region_set_morale(lua_State* L)
   return 0;
 }
 
-static int tolua_region_get_flag(lua_State* L)
-{
-  region* self = (region*)tolua_tousertype(L, 1, 0);
-  int bit = (int)tolua_tonumber(L, 2, 0);
-
-  lua_pushboolean(L, (self->flags & (1<<bit)));
-  return 1;
-}
-
 static int tolua_region_get_adj(lua_State* L)
 {
   region* r = (region*)tolua_tousertype(L, 1, 0);
@@ -288,6 +279,15 @@ static int tolua_region_get_next(lua_State* L)
     return 1;
   }
   return 0;
+}
+
+static int tolua_region_get_flag(lua_State* L)
+{
+  region* self = (region*)tolua_tousertype(L, 1, 0);
+  int bit = (int)tolua_tonumber(L, 2, 0);
+
+  lua_pushboolean(L, (self->flags & (1<<bit)));
+  return 1;
 }
 
 static int tolua_region_set_flag(lua_State* L)
