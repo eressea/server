@@ -179,6 +179,7 @@ new_ship(const ship_type * stype, const struct locale * lang, region * r)
   ship *sh = (ship *) calloc(1, sizeof(ship));
 
   assert(stype);
+  assert(r);
   sh->no = newcontainerid();
   sh->coast = NODIRECTION;
   sh->type = stype;

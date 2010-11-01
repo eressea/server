@@ -1,5 +1,13 @@
 require "lunit"
 
+local function _test_create_ship(r)
+    local s = ship.create(r, "canoe")
+    if (s==nil) then
+        s = ship.create(r, "boat")
+    end
+    return s
+end
+
 function setup()
     free_game()
     settings.set("nmr.removenewbie", "0")
@@ -414,10 +422,7 @@ function test_id()
   assert(get_building(fortytwo)==b)
   assert(get_building(atoi36(fortytwo))==b)
 
-  local s = ship.create(r, "canoe")
-  if (s==nil) then
-    s = ship.create(r, "boat")
-  end
+  local s = _test_create_ship(r)
   -- <not working> s.id = atoi36("42")
   local fortytwo = itoa36(s.id)
   assert(get_ship(fortytwo)==s)
@@ -685,7 +690,7 @@ function test_swim_and_survive()
     u:add_item("money", 100)
     process_orders()
     r.terrain = "ocean"
-    local s = ship.create(r, "boat")
+    local s = _test_create_ship(r)
     u:clear_orders()
     u:add_order("BETRETE SCHIFF " .. itoa36(s.id))
     process_orders()
