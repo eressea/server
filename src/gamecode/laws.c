@@ -124,8 +124,11 @@ boolean nomonsters = false;
 static int
 RemoveNMRNewbie(void) {
   static int value = -1;
-  if (value<0) {
+  static int gamecookie = -1;
+
+  if (value<0 || gamecookie!=global.cookie) {
     value = get_param_int(global.parameters, "nmr.removenewbie", 0);
+    gamecookie = global.cookie;
   }
   return value;
 }
