@@ -4,6 +4,7 @@ module( "e3", package.seeall, lunit.testcase )
 
 function setup()
     free_game()
+    settings.set("rules.economy.food", "0")
 end
 
 function has_attrib(u, value)
@@ -419,7 +420,8 @@ function test_canoe_passes_through_land()
   region.create(2, 0, "ocean")
   local dst = region.create(3, 0, "ocean")
   local sh = ship.create(src, "canoe")
-  local u1, u2 = two_units(src, f, f)
+  local u1 = unit.create(f, src, 1)
+  local u2 = unit.create(f, src, 1)
   u1.ship = sh
   u2.ship = sh
   u1:set_skill("sailing", 10)
@@ -433,19 +435,22 @@ function test_canoe_passes_through_land()
 end
 
 function test_give_50_percent_of_money()
-  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  local r = u2.region
+  settings.set("rules.economy.food", "4")
+  local r = region.create(0, 0, "plain")
+  local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
+  local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
   u1.faction.age = 10
   u2.faction.age = 10
   u1:add_item("money", 500)
+  u2:add_item("money", 500)
   local m1, m2 = u1:get_item("money"), u2:get_item("money")
   u1:clear_orders()
   u1:add_order("GIB " .. itoa36(u2.id) .. " 221 Silber")
   u2:clear_orders()
   u2:add_order("LERNEN Hiebwaffen")
   process_orders()
-  assert(u1:get_item("money")==m1-10*u1.number)
-  assert(u2:get_item("money")==m2-10*u2.number)
+  assert_equal(m1, u1:get_item("money"))
+  assert_equal(m2, u2:get_item("money"))
 
   m1, m2 = u1:get_item("money"), u2:get_item("money")
   u1:clear_orders()
@@ -456,14 +461,15 @@ function test_give_50_percent_of_money()
   u2:add_order("GIB 0 ALLES PFERD")
   local h = r:get_resource("horse")
   process_orders()
-  assert(r:get_resource("horse")>=h+100)
-  assert_equal(m1-221-10*u1.number, u1:get_item("money"))
-  assert_equal(m2+110-10*u2.number, u2:get_item("money"))
+  assert_true(r:get_resource("horse")>=h+100)
+  assert_equal(m1-221, u1:get_item("money"))
+  assert_equal(m2+110, u2:get_item("money"))
 end
 
 function test_give_100_percent_of_items()
-  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  local r = u2.region
+  r = region.create(0, 0, "plain")
+  local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
+  local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
   u1.faction.age = 10
   u2.faction.age = 10
   u1:add_item("money", 500)
