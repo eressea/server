@@ -1752,15 +1752,9 @@ split_allocations(region * r)
         fset(r, RF_SELECT);
       }
       if (al->want==INT_MAX) al->want = al->get;
-      if (fval(al, AFL_LOWSKILL)) {
-        ADDMSG(&al->unit->faction->msgs,
-          msg_message("produce_lowskill", "unit region resource",
-          al->unit, al->unit->region, rtype));
-      } else {
-        ADDMSG(&al->unit->faction->msgs, msg_message("produce", 
-          "unit region amount wanted resource",
-          al->unit, al->unit->region, al->get, al->want, rtype));
-      }
+      ADDMSG(&al->unit->faction->msgs, msg_message("produce", 
+        "unit region amount wanted resource",
+        al->unit, al->unit->region, al->get, al->want, rtype));
       *p_al=al->next;
       free_allocation(al);
     }
