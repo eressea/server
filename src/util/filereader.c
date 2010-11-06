@@ -57,6 +57,7 @@ getbuf_latin1(FILE * F)
     while (*bp && isxspace(*(unsigned char*)bp)) ++bp; /* eatwhite */
 
     comment = (boolean)(comment && cont);
+    quote = (boolean)(quote && cont);
 
     if (tail[1]==0) {
       /* we read he maximum number of bytes! */
@@ -189,9 +190,10 @@ getbuf_utf8(FILE * F)
     bp += white;
 
     comment = (boolean)(comment && cont);
+    quote = (boolean)(quote && cont);
 
     if (tail[1]==0) {
-      /* we read he maximum number of bytes! */
+      /* we read the maximum number of bytes! */
       if (tail[0]!='\n') {
         /* it wasn't enough space to finish the line, eat the rest */
         for (;;) {

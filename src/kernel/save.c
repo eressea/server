@@ -443,7 +443,7 @@ readorders(const char *filename)
   }
 
   fclose(F);
-  puts("\n");
+  if (verbosity>=1) puts("\n");
   log_printf("   %d Befehlsdateien gelesen\n", nfactions);
   return 0;
 }

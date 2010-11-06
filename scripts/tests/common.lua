@@ -769,17 +769,24 @@ function setup()
     settings.set("rules.economy.food", "4")
 end
 
-local function assert_in_report(f, pattern)
+local function find_in_report(f, pattern, extension)
+    extension = extension or "nr"
     write_report(f)
-    local filename = config.basepath .. "/reports/" .. get_turn() .. "-" .. itoa36(f.id) .. ".nr"
+    local filename = config.basepath .. "/reports/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
     local report = io.open(filename, 'rt');
     t = report:read("*all")
-    if string.find(t, pattern) == nil then
-        print(t, pattern)
-    end
-    assert_not_equal(nil, string.find(t, pattern))
     report:close()
+
+    local start, _ = string.find(t, pattern)
 --    posix.unlink(filename)
+    return start~=nil
+end
+
+local function assert_in_report(f, pattern, extension)
+    assert_not_equal(nil, find_in_report(f, pattern, extension))
+end
+local function assert_not_in_report(f, pattern, extension)
+    assert_equal(nil, find_in_report(f, pattern, extension))
 end
 
 function test_coordinates_no_plane()
@@ -815,4 +822,47 @@ function test_coordinates_noname_plane()
     local u = unit.create(f, r, 1)
     init_reports()
     assert_in_report(f, r.name .. " %(0,0%), Berg")
+end
+
+module( "parser", package.seeall, lunit.testcase )
+
+function setup()
+    free_game()
+end
+
+function test_parser()
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local filename = "1814.txt"
+    
+    local file = io.open(filename, "w+")
+    file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
+    file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
+    file:write("LERNEN Hiebwaffen\n")
+    file:close()
+    
+    read_orders(filename)
+    process_orders()
+    assert_not_equal(0, u:get_skill("melee"))
+end
+
+function test_bug_1814()
+    -- see http://bugs.eressea.de/view.php?id=1814
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local filename = "1814.txt"
+    
+    local file = io.open(filename, "w+")
+    file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
+    file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
+    file:write("; parse error follows: '\n")
+    file:write("; ARBEITE\n")
+    file:close()
+    
+    read_orders(filename)
+    process_orders()
+    init_reports()
+    assert_false(find_in_report(f, "Der Befehl wurde nicht erkannt", "cr"))
 end
