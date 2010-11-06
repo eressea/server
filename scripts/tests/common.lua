@@ -759,3 +759,60 @@ function test_walk_and_carry_the_cart()
     process_orders()
     assert_equal(1, u.region.x)
 end
+
+module( "report", package.seeall, lunit.testcase )
+
+function setup()
+    free_game()
+    settings.set("nmr.removenewbie", "0")
+    settings.set("nmr.timeout", "0")
+    settings.set("rules.economy.food", "4")
+end
+
+local function assert_in_report(f, pattern)
+    write_report(f)
+    local filename = config.basepath .. "/reports/" .. get_turn() .. "-" .. itoa36(f.id) .. ".nr"
+    local report = io.open(filename, 'rt');
+    t = report:read("*all")
+    if string.find(t, pattern) == nil then
+        print(t, pattern)
+    end
+    assert_not_equal(nil, string.find(t, pattern))
+    report:close()
+--    posix.unlink(filename)
+end
+
+function test_coordinates_no_plane()
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    init_reports()
+    assert_in_report(f, r.name .. " %(0,0%), Berg")
+end
+
+function test_coordinates_named_plane()
+    local p = plane.create(0, -3, -3, 7, 7, "Hell")
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    init_reports()
+    assert_in_report(f, r.name .. " %(0,0,Hell%), Berg")
+end
+
+function test_coordinates_unnamed_plane()
+    local p = plane.create(0, -3, -3, 7, 7)
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    init_reports()
+    assert_in_report(f, r.name .. " %(0,0%), Berg")
+end
+
+function test_coordinates_noname_plane()
+    local p = plane.create(0, -3, -3, 7, 7, "")
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    init_reports()
+    assert_in_report(f, r.name .. " %(0,0%), Berg")
+end

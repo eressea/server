@@ -1615,11 +1615,12 @@ f_regionid(const region * r, const faction * f, char * buffer, size_t size)
     plane * pl = rplane(r);
     const char * name = pl?pl->name:0;
     int nx = r->x, ny = r->y;
+    int named = (name && name[0]);
     pnormalize(&nx, &ny, pl);
     adjust_coordinates(f, &nx, &ny, pl, r);
     strncpy(buffer, rname(r, f->locale), size);
     buffer[size-1]=0;
-    sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", nx, ny, name?",":"", (name)?name:"");
+    sprintf(buffer+strlen(buffer), " (%d,%d%s%s)", nx, ny, named?",":"", (named)?name:"");
   }
   return strlen(buffer);
 }

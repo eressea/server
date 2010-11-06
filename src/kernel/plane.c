@@ -53,8 +53,6 @@ int plane_height(const plane * pl)
   return 0;
 }
 
-static plane * home_plane = NULL;
-
 plane *
 get_homeplane(void)
 {
@@ -261,9 +259,6 @@ create_new_plane(int id, const char *name, int minx, int maxx, int miny, int max
   pl->flags = flags;
 
   addlist(&planes, pl);
-  if (id==0) {
-    home_plane = pl;
-  }
   return pl;
 }
 
