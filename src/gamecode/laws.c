@@ -3335,6 +3335,48 @@ new_units(void)
   }
 }
 
+/** Checks for two long orders and issues a warning if necessary.
+ */
+void check_long_orders(unit *u) {
+  order *ord;
+  keyword_t otherorder = MAXKEYWORDS;
+
+  for (ord = u->orders; ord; ord = ord->next) {
+    if (get_keyword(ord) == NOKEYWORD) {
+      cmistake(u, ord, 22, MSG_EVENT);
+    } else if (is_long(ord)) {
+      keyword_t longorder = get_keyword(ord);
+      if (otherorder != MAXKEYWORDS) {
+        switch (longorder) {
+        case K_CAST:
+          if (otherorder!=longorder) {
+            cmistake(u, ord, 52, MSG_EVENT);
+          }
+          break;
+        case K_BUY:
+          if (otherorder==K_SELL) {
+            otherorder=K_BUY;
+          } else {
+            cmistake(u, ord, 52, MSG_EVENT);
+          }
+          break;
+        case K_SELL:
+          if (otherorder!=K_SELL && otherorder!=K_BUY) {
+            cmistake(u, ord, 52, MSG_EVENT);
+          }
+          break;
+        case K_WEREWOLF:
+          /* don't know what WEREWOLF does... */
+        default:
+          cmistake(u, ord, 52, MSG_EVENT);
+        }
+      } else {
+        otherorder = longorder;
+      }
+    }
+  }
+}
+
 static void
 setdefaults(unit *u)
 {
@@ -3346,9 +3388,14 @@ setdefaults(unit *u)
   if (hunger) {
     /* Hungernde Einheiten führen NUR den default-Befehl aus */
     set_order(&u->thisorder, default_order(u->faction->locale));
+  } else {
+    check_long_orders(u);
   }
   /* check all orders for a potential new long order this round: */
   for (ord = u->orders; ord; ord = ord->next) {
+    if (get_keyword(ord) == NOKEYWORD)
+      continue;
+
     if (u->old_orders && is_repeated(ord)) {
       /* this new order will replace the old defaults */
       free_orders(&u->old_orders);
@@ -3371,9 +3418,6 @@ setdefaults(unit *u)
         * werden. Da Handel erst nach anderen langen Befehlen kommt,
         * muß das vorher abgefangen werden. Wir merken uns also
         * hier, ob die Einheit handelt. */
-      case NOKEYWORD:
-        cmistake(u, ord, 22, MSG_EVENT);
-        break;
       case K_BUY:
       case K_SELL:
         /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
@@ -3872,7 +3916,8 @@ process(void)
           porder = punit;
           while (porder && porder->priority==prio && porder->type==PR_ORDER) {
             order ** ordp = &u->orders;
-            if (porder->flags & PROC_THISORDER) ordp = &u->thisorder;
+            if (porder->flags & PROC_THISORDER)
+            	ordp = &u->thisorder;
             while (*ordp) {
               order * ord = *ordp;
               if (get_keyword(ord) == porder->data.per_order.kword) {
@@ -3885,7 +3930,9 @@ process(void)
                     cmistake(u, ord, 224, MSG_MAGIC);
                     ord = NULL;
                   } else if (fval(u, UFL_LONGACTION)) {
+                    /* this message was already given in laws.setdefaults
                     cmistake(u, ord, 52, MSG_PRODUCE);
+                    */
                     ord = NULL;
                   } else if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
                     /* error message disabled by popular demand */

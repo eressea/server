@@ -361,6 +361,14 @@ parse_order(const char * s, const struct locale * lang)
   return NULL;
 }
 
+/**
+ * Returns true if the order qualifies as "repeated". An order is repeated if it will overwrite the
+ * old default order. K_BUY is in this category, but not K_MOVE.
+ *
+ * \param ord An order.
+ * \return true if the order is long
+ * \sa is_exclusive(), is_repeated(), is_persistent()
+ */
 boolean
 is_repeated(const order * ord)
 {
@@ -420,6 +428,14 @@ is_repeated(const order * ord)
   return false;
 }
 
+/**
+ * Returns true if the order qualifies as "exclusive". An order is exclusive if it makes all other
+ * long orders illegal. K_MOVE is in this category, but not K_BUY.
+ *
+ * \param ord An order.
+ * \return true if the order is long
+ * \sa is_exclusive(), is_repeated(), is_persistent()
+ */
 boolean
 is_exclusive(const order * ord)
 {
@@ -479,6 +495,84 @@ is_exclusive(const order * ord)
   return false;
 }
 
+/**
+ * Returns true if the order qualifies as "long". An order is long if it excludes most other long
+ * orders.
+ *
+ * \param ord An order.
+ * \return true if the order is long
+ * \sa is_exclusive(), is_repeated(), is_persistent()
+ */
+boolean
+is_long(const order * ord)
+{
+  keyword_t kwd = ORD_KEYWORD(ord);
+  const struct locale * lang = ORD_LOCALE(ord);
+  param_t param;
+
+  switch (kwd) {
+    case K_CAST:
+    case K_BUY:
+    case K_SELL:
+    case K_MOVE:
+    case K_WEREWOLF:
+    case K_ROUTE:
+    case K_DRIVE:
+    case K_WORK:
+    case K_BESIEGE:
+    case K_ENTERTAIN:
+    case K_TAX:
+    case K_RESEARCH:
+    case K_SPY:
+    case K_STEAL:
+    case K_SABOTAGE:
+    case K_STUDY:
+    case K_TEACH:
+    case K_BREED:
+    case K_PIRACY:
+      return true;
+
+    case K_PLANT:
+      return true;
+
+    case K_FOLLOW:
+      /* FOLLOW is only a long order if we are following a ship. */
+      parser_pushstate();
+      init_tokens(ord);
+      skip_token();
+      param = getparam(lang);
+      parser_popstate();
+
+      if (param == P_SHIP) return true;
+      break;
+
+    case K_MAKE:
+      /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+       * Arten von MACHE zaehlen aber als neue defaults und werden
+       * behandelt wie die anderen (deswegen kein break nach case
+       * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+       * abgespeichert). */
+      parser_pushstate();
+      init_tokens(ord); /* initialize token-parser */
+      skip_token();
+      param = getparam(lang);
+      parser_popstate();
+
+      if (param != P_TEMP) return true;
+      break;
+  }
+  return false;
+}
+
+/**
+ * Returns true if the order qualifies as "persistent". An order is persistent if it will be
+ * included in the template orders. @-orders, comments and most long orders are in this category,
+ * but not K_MOVE.
+ *
+ * \param ord An order.
+ * \return true if the order is persistent
+ * \sa is_exclusive(), is_repeated(), is_persistent()
+ */
 boolean
 is_persistent(const order * ord)
 {

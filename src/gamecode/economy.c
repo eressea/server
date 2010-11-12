@@ -3349,7 +3349,9 @@ produce(struct region *r)
       continue;
 
     if (fval(u, UFL_LONGACTION) && u->thisorder==NULL) {
+      /* this message was already given in laws.setdefaults
       cmistake(u, u->thisorder, 52, MSG_PRODUCE);
+      */
       continue;
     }
 

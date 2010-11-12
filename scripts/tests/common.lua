@@ -771,7 +771,6 @@ end
 
 local function find_in_report(f, pattern, extension)
     extension = extension or "nr"
-    write_report(f)
     local filename = config.basepath .. "/reports/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
     local report = io.open(filename, 'rt');
     t = report:read("*all")
@@ -782,19 +781,13 @@ local function find_in_report(f, pattern, extension)
     return start~=nil
 end
 
-local function assert_in_report(f, pattern, extension)
-    assert_not_equal(nil, find_in_report(f, pattern, extension))
-end
-local function assert_not_in_report(f, pattern, extension)
-    assert_equal(nil, find_in_report(f, pattern, extension))
-end
-
 function test_coordinates_no_plane()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     init_reports()
-    assert_in_report(f, r.name .. " %(0,0%), Berg")
+    write_report(f)
+    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
 end
 
 function test_coordinates_named_plane()
@@ -803,7 +796,8 @@ function test_coordinates_named_plane()
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     init_reports()
-    assert_in_report(f, r.name .. " %(0,0,Hell%), Berg")
+    write_report(f)
+    assert_true(find_in_report(f, r.name .. " %(0,0,Hell%), Berg"))
 end
 
 function test_coordinates_unnamed_plane()
@@ -812,7 +806,8 @@ function test_coordinates_unnamed_plane()
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     init_reports()
-    assert_in_report(f, r.name .. " %(0,0%), Berg")
+    write_report(f)
+    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
 end
 
 function test_coordinates_noname_plane()
@@ -821,7 +816,8 @@ function test_coordinates_noname_plane()
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     init_reports()
-    assert_in_report(f, r.name .. " %(0,0%), Berg")
+    write_report(f)
+    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
 end
 
 module( "parser", package.seeall, lunit.testcase )
@@ -864,5 +860,28 @@ function test_bug_1814()
     read_orders(filename)
     process_orders()
     init_reports()
+    write_report(f)
     assert_false(find_in_report(f, "Der Befehl wurde nicht erkannt", "cr"))
+end
+
+function test_bug_1679()
+    -- see http://bugs.eressea.de/view.php?id=1679
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local filename = "1814.txt"
+    
+    local file = io.open(filename, "w+")
+    file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
+    file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
+    file:write("NACH W\n")
+    file:write("ARBEITEN\n")
+    file:close()
+    
+    read_orders(filename)
+    process_orders()
+    init_reports()
+    write_report(f)
+    assert_true(find_in_report(f, "Die Einheit kann keine weiteren langen Befehle", "cr"))
+    assert_true(find_in_report(f, "entdeckt, dass es keinen Weg nach Westen gibt"))
 end

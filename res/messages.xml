@@ -3800,7 +3800,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Das Gebäude kann nur einmal pro Runde erweitert werden."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Thhe building can be expanded only once per turn."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The building can be expanded only once per turn."</text>
   </message>
 
   <message name="error317" section="events">
@@ -6460,7 +6460,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren langen Befehle ausführen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit is exhausted from battle."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit cannot execute more long orders."</text>
   </message>
   <message name="error51" section="errors">
     <type>

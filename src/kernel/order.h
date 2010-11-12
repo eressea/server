@@ -51,6 +51,7 @@ extern char * getcommand(const order * ord);
 extern boolean is_persistent(const order *ord);
 extern boolean is_exclusive(const order *ord);
 extern boolean is_repeated(const order * ord);
+extern boolean is_long(const order *ord);
 
 extern char * write_order(const order * ord, char * buffer, size_t size);
 
