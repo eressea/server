@@ -7151,7 +7151,7 @@
     <text locale="fr">"$unit($unit) pays the maintenance for $building($building)."</text>
     <text locale="en">"$unit($unit) pays the maintenance for $building($building)."</text>
   </message>
-  <message name="maintenancespecialfail" section="economy">
+  <message name="maintenancespecialfail" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="item" type="resource"/>
@@ -7160,7 +7160,7 @@
     <text locale="de">"$unit($unit) fehlen $resource($item,0) für den Betrieb von $building($building)."</text>
     <text locale="en">"$unit($unit) lacks $resource($item,0) to operate $building($building)."</text>
   </message>
-  <message name="maintenancefail" section="economy">
+  <message name="maintenancefail" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="building" type="building"/>
@@ -7169,7 +7169,7 @@
     <text locale="fr">"$unit($unit) cannot pay the maintenance for $building($building)."</text>
     <text locale="en">"$unit($unit) cannot pay the maintenance for $building($building)."</text>
   </message>
-  <message name="maintenance_late" section="economy">
+  <message name="maintenance_late" section="errors">
     <type>
       <arg name="building" type="building"/>
     </type>
