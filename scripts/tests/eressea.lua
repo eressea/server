@@ -182,3 +182,21 @@ function test_no_uruk()
   local f1 = faction.create("noreply@eressea.de", "uruk", "de")
   assert_equal(f1.race, "orc")
 end
+
+function test_snowman()
+    local r = region.create(0, 0, "glacier")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("snowman", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Schneemann")
+    process_orders()
+    for u2 in r.units do
+        if u2~=u then
+            assert_equal(u2.race, "snowman")
+            u = nil
+            break
+        end
+    end
+    assert_equal(nil, u)
+end
