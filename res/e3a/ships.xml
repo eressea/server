@@ -3,6 +3,7 @@
   <ship name="canoe" nocoast="true" range="3" fishing="20" storm="1.00" damage="1.00" cabins="2" cargo="2000" cptskill="1" minskill="1" sumskill="2" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
     <coast terrain="highland"/>
@@ -10,8 +11,6 @@
     <coast terrain="glacier"/>
     <coast terrain="volcano"/>
     <coast terrain="activevolcano"/>
-    <coast terrain="iceberg_sleep"/>
-    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="1" maxsize="3" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -20,6 +19,7 @@
   <ship name="raft" range="1" fishing="20" storm="1.00" damage="1.00" cabins="5" cargo="50000" cptskill="1" minskill="1" sumskill="5" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
     <construction skill="shipcraft" minskill="1" maxsize="10" reqsize="1">
@@ -30,6 +30,7 @@
   <ship name="cutter" range="2" fishing="20" storm="1.00" damage="1.00" cabins="5" cargo="5500" cptskill="2" minskill="1" sumskill="5" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
     <coast terrain="highland"/>
@@ -37,8 +38,6 @@
     <coast terrain="glacier"/>
     <coast terrain="volcano"/>
     <coast terrain="activevolcano"/>
-    <coast terrain="iceberg_sleep"/>
-    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="2" maxsize="10" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -47,6 +46,7 @@
   <ship name="barge" range="3" fishing="20" storm="1.00" damage="1.00" cabins="11" cargo="5000" cptskill="2" minskill="1" sumskill="5" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
     <coast terrain="highland"/>
@@ -54,8 +54,6 @@
     <coast terrain="glacier"/>
     <coast terrain="volcano"/>
     <coast terrain="activevolcano"/>
-    <coast terrain="iceberg_sleep"/>
-    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="2" maxsize="10" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -65,6 +63,7 @@
   <ship name="royalbarge" range="5" storm="0.25" damage="1.00" cabins="11" cargo="5000" cptskill="5" minskill="1" sumskill="10" opensea="no">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <coast terrain="swamp"/>
     <coast terrain="desert"/>
     <coast terrain="highland"/>
@@ -72,8 +71,6 @@
     <coast terrain="glacier"/>
     <coast terrain="volcano"/>
     <coast terrain="activevolcano"/>
-    <coast terrain="iceberg_sleep"/>
-    <coast terrain="iceberg"/>
     <construction skill="shipcraft" minskill="6" maxsize="10" reqsize="1">
       <requirement type="mallorn" quantity="1"/>
       <requirement type="money" quantity="100"/>
@@ -83,6 +80,7 @@
   <ship name="catamaran" range="7" storm="0.25" damage="1.00" cabins="22" cargo="10000" cptskill="7" minskill="1" sumskill="20" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="8" maxsize="30" reqsize="1">
       <requirement type="mallorn" quantity="1"/>
       <requirement type="money" quantity="100"/>
@@ -93,6 +91,7 @@
   <ship name="cog" range="4" storm="0.50" damage="1.00" cabins="50" cargo="200000" cptskill="4" minskill="1" sumskill="20" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="4" maxsize="100" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -101,6 +100,7 @@
   <ship name="caravel" range="4" storm="0.50" damage="1.00" cabins="150" cargo="600000" cptskill="6" minskill="1" sumskill="30" opensea="yes">
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="6" maxsize="300" reqsize="1">
       <requirement type="log" quantity="1"/>
     </construction>
@@ -111,6 +111,7 @@
     <modifier type="defense" value="+2"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="5" maxsize="100" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
@@ -121,6 +122,7 @@
     <modifier type="defense" value="+2"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="7" maxsize="300" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
@@ -133,6 +135,7 @@
     <modifier type="tactics" factor="2.00"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="5" maxsize="100" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>
@@ -144,6 +147,7 @@
     <modifier type="tactics" factor="2.00"/>
     <coast terrain="ocean"/>
     <coast terrain="plain"/>
+    <coast terrain="packice"/>
     <construction skill="shipcraft" minskill="7" maxsize="300" reqsize="1">
       <requirement type="log" quantity="1"/>
       <requirement type="money" quantity="10"/>

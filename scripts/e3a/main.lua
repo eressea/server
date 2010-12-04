@@ -1,4 +1,5 @@
 require "multis"
+require "e3a.frost"
 
 function process(orders)
   local confirmed_multis = { }
@@ -45,6 +46,7 @@ function process(orders)
   -- post-turn updates:
   update_guards()
   update_scores()
+  frost.update()
 
   local localechange = { de = { "ii" } }
   change_locales(localechange)

@@ -4,6 +4,7 @@ module( "e3", package.seeall, lunit.testcase )
 
 function setup()
     free_game()
+    settings.set("rules.economy.food", "0")
 end
 
 function has_attrib(u, value)
@@ -46,6 +47,19 @@ function test_attrib()
             break
         end
     end
+end
+
+function test_no_stealth()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    u:set_skill("stealth", 1)
+    assert_equal(-1, u:get_skill("stealth"))
+    u:clear_orders()
+    u:add_order("LERNEN TARNUNG")
+    process_orders()
+    assert_equal(-1, u:get_skill("stealth"))
 end
 
 function test_seecast()
@@ -406,7 +420,8 @@ function test_canoe_passes_through_land()
   region.create(2, 0, "ocean")
   local dst = region.create(3, 0, "ocean")
   local sh = ship.create(src, "canoe")
-  local u1, u2 = two_units(src, f, f)
+  local u1 = unit.create(f, src, 1)
+  local u2 = unit.create(f, src, 1)
   u1.ship = sh
   u2.ship = sh
   u1:set_skill("sailing", 10)
@@ -420,19 +435,22 @@ function test_canoe_passes_through_land()
 end
 
 function test_give_50_percent_of_money()
-  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  local r = u2.region
+  settings.set("rules.economy.food", "4")
+  local r = region.create(0, 0, "plain")
+  local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
+  local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
   u1.faction.age = 10
   u2.faction.age = 10
   u1:add_item("money", 500)
+  u2:add_item("money", 500)
   local m1, m2 = u1:get_item("money"), u2:get_item("money")
   u1:clear_orders()
   u1:add_order("GIB " .. itoa36(u2.id) .. " 221 Silber")
   u2:clear_orders()
   u2:add_order("LERNEN Hiebwaffen")
   process_orders()
-  assert(u1:get_item("money")==m1-10*u1.number)
-  assert(u2:get_item("money")==m2-10*u2.number)
+  assert_equal(m1, u1:get_item("money"))
+  assert_equal(m2, u2:get_item("money"))
 
   m1, m2 = u1:get_item("money"), u2:get_item("money")
   u1:clear_orders()
@@ -443,14 +461,15 @@ function test_give_50_percent_of_money()
   u2:add_order("GIB 0 ALLES PFERD")
   local h = r:get_resource("horse")
   process_orders()
-  assert(r:get_resource("horse")>=h+100)
-  assert_equal(m1-221-10*u1.number, u1:get_item("money"))
-  assert_equal(m2+110-10*u2.number, u2:get_item("money"))
+  assert_true(r:get_resource("horse")>=h+100)
+  assert_equal(m1-221, u1:get_item("money"))
+  assert_equal(m2+110, u2:get_item("money"))
 end
 
 function test_give_100_percent_of_items()
-  local u1, u2 = two_units(region.create(0, 0, "plain"), two_factions())
-  local r = u2.region
+  r = region.create(0, 0, "plain")
+  local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
+  local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
   u1.faction.age = 10
   u2.faction.age = 10
   u1:add_item("money", 500)
@@ -552,43 +571,65 @@ function test_market_action()
   assert_equal(70, u:get_item("h2"))
 end
 
--- function test_process_execute()
-  -- local i = 0
-  -- local f = faction.create("noreply@eressea.de", "human", "de")
-  -- local r = region.create(0, 0, "plain")
-  -- local u = unit.create(f, r, 1)
-  -- local r1, u1
+local function setup_packice(x, onfoot)
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local plain = region.create(0,0, "plain")
+    local ice = region.create(1,0, "packice")
+    local ocean = region.create(2,0, "ocean")
+    local u = unit.create(f, get_region(x, 0), 2)
+    if not onfoot then
+        local s = ship.create(u.region, "cutter")
+        u:set_skill("sailing", 3)
+        u.ship = s
+    end
+    u:add_item("money", 400)
 
-  -- function a() i = 2 end
-  -- function b() i = i * 2 end
-  -- function c(r) r1 = r  i = i + 1 end
-  -- function d(u) u1 = u  i = i * 3 end
-  -- process.execute({a, b}, {c}, {d})
-  -- assert_equal(15, i)
-  -- assert_equal(r, r1)
-  -- assert_equal(u, u1)
--- end
+    return u
+end
 
--- function test_new_orders()
-  -- local i = 0
-  -- local f = faction.create("noreply@eressea.de", "human", "de")
-  -- local r = region.create(0, 0, "plain")
-  -- local u = unit.create(f, r, 1)
-  -- local r1, u1
+function test_no_sailing_through_packice()
+    local u = setup_packice(0)
+    u:clear_orders()
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(0, u.region.x)
+end
 
-  -- function a() i = 2 end
-  -- function b() i = i * 2 end
-  -- function c(r) r1 = r  i = i + 1 end
-  -- function d(u) u1 = u  i = i * 3 end
+function test_can_sail_from_packice_to_ocean()
+    local u = setup_packice(1)
 
-  -- process.setup()
-  -- process.push(a)
-  -- process.push(b)
-  -- process.push(c, "region")
-  -- process.push(d, "unit")
-  -- process.start()
+    u:clear_orders()
+    u:add_order("NACH W")
+    process_orders()
+    assert_equal(1, u.region.x)
 
-  -- assert_equal(15, i)
-  -- assert_equal(r, r1)
-  -- assert_equal(u, u1)
--- end
+    u:clear_orders()
+    u:add_order("NACH O")
+    process_orders()
+    assert_equal(2, u.region.x)
+end
+
+function test_can_sail_into_packice()
+    local u = setup_packice(2)
+    u:clear_orders()
+    u:add_order("NACH W W")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+
+function test_can_walk_into_packice()
+    local u = setup_packice(0, true)
+    u:clear_orders()
+    u:add_order("NACH O")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+
+function test_cannot_walk_into_ocean()
+    local u = setup_packice(1, true)
+    u:clear_orders()
+    u:add_order("NACH O")
+    process_orders()
+    assert_equal(1, u.region.x)
+end
+

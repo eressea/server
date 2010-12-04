@@ -4,6 +4,45 @@ module( "e2", package.seeall, lunit.testcase )
 
 function setup()
     free_game()
+    settings.set("nmr.timeout", "0")
+    settings.set("rules.economy.food", "4")
+end
+
+function test_learn()
+    settings.set("study.random_progress", "0")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    f.age = 20
+    local u = unit.create(f, r)
+    u:clear_orders()
+    u:add_order("@LERNEN Reiten")
+    process_orders()
+    assert_equal(1, u:get_skill("riding"))
+    process_orders()
+    process_orders()
+    assert_equal(2, u:get_skill("riding"))
+    process_orders()
+    process_orders()
+    process_orders()
+    assert_equal(3, u:get_skill("riding"))
+end
+
+function test_teach()
+    settings.set("study.random_progress", "0")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    f.age = 20
+    local u = unit.create(f, r, 10)
+    local u2 = unit.create(f, r)
+    u:clear_orders()
+    u:add_order("@LERNEN reiten")
+    u2:clear_orders()
+    u2:add_order("LEHREN " .. itoa36(u.id))
+    u2:set_skill("riding", 4)
+    process_orders()
+    assert_equal(1, u:get_skill("riding"))
+    process_orders()
+    assert_equal(2, u:get_skill("riding"))
 end
 
 function test_rename()
@@ -79,6 +118,7 @@ function test_ship_capacity()
     u4:add_order("NACH O O")
 
     process_orders()
+
 --    print(s.region, u.region, r2)
     assert_equal(r2.id, u1.region.id, "boat with 5 humans did not move")
     assert_not_equal(r2.id, u2.region.id, "boat with too many people has moved")
@@ -141,4 +181,22 @@ end
 function test_no_uruk()
   local f1 = faction.create("noreply@eressea.de", "uruk", "de")
   assert_equal(f1.race, "orc")
+end
+
+function test_snowman()
+    local r = region.create(0, 0, "glacier")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("snowman", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Schneemann")
+    process_orders()
+    for u2 in r.units do
+        if u2~=u then
+            assert_equal(u2.race, "snowman")
+            u = nil
+            break
+        end
+    end
+    assert_equal(nil, u)
 end

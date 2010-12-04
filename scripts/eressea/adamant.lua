@@ -27,7 +27,7 @@ end
 -- create a fixed path to a specific region
 local function create_path(from, to)
   local param = tostring(to.uid)
-  local b = add_building(from, "portal")
+  local b = building.create(from, "portal")
   b.name = "Weltentor"
   b.size = 1
   b:add_action("tunnel_action", param)
@@ -35,7 +35,7 @@ end
 
 -- create a wonky tunnel wth more than one exit
 local function create_tunnel(from, param)
-  local b = add_building(from, "portal")
+  local b = building.create(from, "portal")
   b.name = "Weltentor"
   b.size = 1
   b:add_action("tunnel_action", param)
@@ -59,8 +59,8 @@ function mkanchors()
     if not r:get_key("tnnL") then
       r:set_key("tnnL", true)
       if r:get_flag(0) then
-        -- RF_CHAOTIC
-        r:set_flag(0, true)
+        -- RF_CHAOTIC gets removed
+        r:set_flag(0, false)
       end
       r:set_resource("peasant", r:get_resource("peasant") + 1)
     end

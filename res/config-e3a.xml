@@ -64,7 +64,6 @@
     <order name="OPFERE" disable="yes"/>
     <order name="SABOTIEREN" disable="yes"/>
     <order name="SPIONIEREN" disable="yes"/>
-    <order name="TARNEN" disable="yes"/>
     <order name="TREIBEN" disable="yes"/>
     <order name="UNTERHALTEN" disable="yes"/>
     <order name="VERKAUFEN" disable="yes"/>
@@ -131,7 +130,8 @@
     <param name="world.era" value="3"/>
     <param name="rules.migrants" value="0"/>
     <param name="rules.transfermen" value="0"/>
-    <param name="rules.stealth.faction" value="0"/>
+    <param name="rules.stealth.faction" value="1"/>
+    <param name="rules.stealth.anon_battle" value="0"/>
     <param name="rules.check_overload" value="0"/>
     <param name="rules.combat.goblinbonus" value="3"/>
     <param name="rules.ship.damage_drift" value="0.00"/> <!-- percent damage from drifting-->
