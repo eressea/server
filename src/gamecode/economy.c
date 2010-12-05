@@ -654,7 +654,7 @@ give_control_cmd(unit * u, order * ord)
   if (p == P_CONTROL) {
     message * msg;
 
-    if (!u2) {
+    if (!u2 || u2->number==0) {
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
     }
     else if (!u->building && !u->ship) {
