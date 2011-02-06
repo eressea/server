@@ -366,6 +366,20 @@ tolua_attriblist_next(lua_State *L)
   else return 0;  /* no more values to return */
 }
 
+int
+tolua_attrib_get(lua_State * L) {
+  attrib ** ap = get_attribs(L, 1);
+  if (ap) {
+    attrib * a = tolua_get_lua_ext(*ap);
+    attrib ** attrib_ptr = (attrib**)lua_newuserdata(L, sizeof(attrib *));
+    luaL_getmetatable(L, "attrib");
+    lua_setmetatable(L, -2);
+    *attrib_ptr = a;
+    lua_pushcclosure(L, tolua_attriblist_next, 1);
+    return 1;
+  }
+  else return 0;
+}
 
 void
 tolua_attrib_open(lua_State* L)
@@ -381,6 +395,7 @@ tolua_attrib_open(lua_State* L)
     tolua_beginmodule(L, TOLUA_CAST "attrib");
     {
       tolua_function(L, TOLUA_CAST "create", &tolua_attrib_create);
+      tolua_function(L, TOLUA_CAST "get", &tolua_attrib_get);
       tolua_variable(L, TOLUA_CAST "data", &tolua_attrib_data, NULL);
     }
     tolua_endmodule(L);
