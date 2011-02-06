@@ -293,16 +293,33 @@ attrib_type at_lua_ext = {
   "lua", init_ext, free_ext, age_ext, write_ext, read_ext
 };
 
-static int
-tolua_attrib_create(lua_State* L)
-{
+static attrib **
+get_attribs(lua_State * L, int idx) {
   attrib ** ap = NULL;
   tolua_Error tolua_err;
 
-  if (tolua_isusertype(L, 1, TOLUA_CAST "unit", 0, &tolua_err)) {
-    unit * u = (unit *)tolua_tousertype(L, 1, 0);
+  if (tolua_isusertype(L, idx, TOLUA_CAST "unit", 0, &tolua_err)) {
+    unit * u = (unit *)tolua_tousertype(L, idx, 0);
     ap = &u->attribs;
+  } else if (tolua_isusertype(L, idx, TOLUA_CAST "region", 0, &tolua_err)) {
+    region * r = (region *)tolua_tousertype(L, idx, 0);
+    ap = &r->attribs;
+  } else if (tolua_isusertype(L, idx, TOLUA_CAST "faction", 0, &tolua_err)) {
+    faction * f = (faction *)tolua_tousertype(L, idx, 0);
+    ap = &f->attribs;
+  } else if (lua_isstring(L, idx)) {
+    const char * str = tolua_tostring(L, idx, NULL);
+    if (str && strcmp(str, "global")==0) {
+      ap = &global.attribs;
+    }
   }
+  return ap;
+}
+
+static int
+tolua_attrib_create(lua_State* L)
+{
+  attrib ** ap = get_attribs(L, 1);
   if (ap) {
     attrib * a = a_new(&at_lua_ext);
     int handle;
