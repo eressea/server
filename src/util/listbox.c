@@ -11,9 +11,12 @@
 /* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <platform.h>
 #include <curses.h>
+#include <kernel/config.h>
 
 #include "listbox.h"
 #include "gmtool_structs.h"
+
+#include <util/log.h>
 
 #include <string.h>
 #include <ctype.h>
@@ -63,8 +66,8 @@ push_selection(list_selection ** p_sel, char * str, void * payload)
   return p_sel;
 }
 
-#define SX (stdscr->_maxx)
-#define SY (stdscr->_maxy)
+#define SX (getmaxx(stdscr))
+#define SY (getmaxy(stdscr))
 
 list_selection *
 do_selection(list_selection * sel, const char * title, void (*perform)(list_selection *, void *), void * data)
@@ -79,10 +82,15 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
   for (s=sel;s;s=s->next) {
     if ((int)strlen(s->str)>width) width = (int)strlen(s->str);
     ++height;
+    if (verbosity>=5)
+      log_info((1, "s %s w %d h %d\n", s->str, width, height));
   }
   if (height==0 || width==0) return NULL;
   if (width+3>SX) width=SX-4;
   if (height+2>SY) height=SY-2;
+
+  if (verbosity>=5)
+    log_info((1, "w %d h %d\n", width, height));
 
   wn = newwin(height+2, width+4, (SY - height - 2) / 2, (SX - width - 4) / 2);
 
@@ -95,6 +103,7 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
         waddnstr(wn, s->str, -1);
         wclrtoeol(wn);
       }
+      wclrtobot(wn);
       wxborder(wn);
       mvwprintw(wn, 0, 2, "[ %s ]", title);
       update = false;
@@ -104,7 +113,7 @@ do_selection(list_selection * sel, const char * title, void (*perform)(list_sele
     wmove(wn, i + 1, 2);
     waddstr(wn, "->");
     wmove(wn, i + 1, 4);
-    waddnstr(wn, current->str, -1);
+    waddnstr(wn, current->str, width-2);
     wattroff(wn, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
 
     wrefresh(wn);
