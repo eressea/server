@@ -244,7 +244,7 @@ read_ext_i(lua_State * L, bson_iterator * it, bson_type type)
           else lua_pushnil(L);
         }
         else {
-          log_error(("unknown oid %d %d %d\n", oid->ints[0], oid->ints[3], oid->ints[2]));
+          log_error(("unknown oid %d %d %d\n", oid->ints[0], oid->ints[1], oid->ints[2]));
           lua_pushnil(L);
         }
       }
