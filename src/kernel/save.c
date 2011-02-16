@@ -1413,7 +1413,9 @@ readgame(const char * filename, int mode, int backup)
   n = store->r_int(store);
   while(--n >= 0) {
     int id = store->r_int(store);
+    variant fno;
     plane *pl = getplanebyid(id);
+
     if (pl==NULL) {
       pl = calloc(1, sizeof(plane));
     } else {
@@ -1428,18 +1430,28 @@ readgame(const char * filename, int mode, int backup)
     pl->flags = store->r_int(store);
 
     /* read watchers */
-    store->r_str_buf(store, token, sizeof(token));
-    while (strcmp(token, "end")!=0) {
-      watcher * w = calloc(sizeof(watcher),1);
-      variant fno;
-      fno.i = atoi36(token);
-      w->mode = (unsigned char)store->r_int(store);
-      w->next = pl->watchers;
-      pl->watchers = w;
-      ur_add(fno, &w->faction, resolve_faction);
-      store->r_str_buf(store, token, sizeof(token));
+    if (store->version<FIX_WATCHERS_VERSION) {
+      char rname[64];
+      /* before this version, watcher storage was pretty broken. we are incompatible and don't read them */
+      for (;;) {
+        store->r_tok_buf(store, rname, sizeof(rname));
+        if (strcmp(rname, "end")==0) {
+          break; /* this is most likely the end of the list */
+        } else {
+          log_error(("This datafile contains watchers, but we are unable to read them\n"));
+        }
+      }
+    } else {
+      fno = read_faction_reference(store);
+      while (fno.i) {
+        watcher * w = (watcher *)malloc(sizeof(watcher));
+        ur_add(fno, &w->faction, resolve_faction);
+        w->mode = (unsigned char)store->r_int(store);
+        w->next = pl->watchers;
+        pl->watchers = w;
+        fno = read_faction_reference(store);
+      }
     }
-
     a_read(store, &pl->attribs, pl);
     addlist(&planes, pl);
   }
@@ -1715,7 +1727,7 @@ writegame(const char *filename, int mode)
       }
       w = w->next;
     }
-    store->w_tok(store, "end");
+    write_faction_reference(NULL, store); /* mark the end of the list */
     a_write(store, pl->attribs, pl);
     store->w_brk(store);
   }

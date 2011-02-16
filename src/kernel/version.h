@@ -66,6 +66,7 @@
 #define MOURNING_VERSION 335 /* mourning peasants */
 #define FOSS_VERSION 336 /* the open source release */
 #define OWNER_2_VERSION 337 /* region owners contain an alliance */
+#define FIX_WATCHERS_VERSION 338 /* fixed storage of watchers */
 
 #define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION OWNER_2_VERSION /* current datafile */
+#define RELEASE_VERSION FIX_WATCHERS_VERSION /* current datafile */
