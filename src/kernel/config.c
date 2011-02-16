@@ -2608,7 +2608,6 @@ plagues(region * r, boolean ismagic)
   for (i = dead; i != 0; i--) {
     if (rng_double() < PLAGUE_HEALCHANCE && rmoney(r) >= PLAGUE_HEALCOST) {
       rsetmoney(r, rmoney(r) - PLAGUE_HEALCOST);
-    } else {
       --dead;
     }
   }
