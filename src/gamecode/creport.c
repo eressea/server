@@ -885,7 +885,7 @@ cr_output_unit(FILE * F, const region * r,
   }
   /* items */
   pr = 0;
-  if (f == u->faction || omniscient(u->faction)) {
+  if (f == u->faction || omniscient(f)) {
     show = u->items;
   } else if (itemcloak==false && mode>=see_unit && !(a_fshidden
       && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3))
