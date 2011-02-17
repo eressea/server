@@ -1074,6 +1074,8 @@ handlekey(state * st, int c)
     }
     if (r!=NULL) {
       region2coord(r, &st->cursor);
+      st->wnd_info->update |=1;
+      st->wnd_status->update |=1;
     }
     break;
   case 'Q':
