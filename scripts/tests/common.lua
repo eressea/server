@@ -25,7 +25,7 @@ local function two_factions()
   return f1, f2
 end
 
-module( "common", package.seeall, lunit.testcase )
+module("tests.common", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
@@ -760,7 +760,7 @@ function test_walk_and_carry_the_cart()
     assert_equal(1, u.region.x)
 end
 
-module( "report", package.seeall, lunit.testcase )
+module("tests.report", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
@@ -820,7 +820,7 @@ function test_coordinates_noname_plane()
     assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
 end
 
-module( "parser", package.seeall, lunit.testcase )
+module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
@@ -890,6 +890,9 @@ function test_bson()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
+    assert_not_equal(nil, u)
+    assert_not_equal(nil, r)
+    assert_not_equal(nil, f)
     attrib.create(r, 1)
     assert_equal(attrib.get(r)().data, 1)
     attrib.create(u, 3)

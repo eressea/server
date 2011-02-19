@@ -300,13 +300,13 @@ get_attribs(lua_State * L, int idx) {
 
   if (tolua_isusertype(L, idx, TOLUA_CAST "unit", 0, &tolua_err)) {
     unit * u = (unit *)tolua_tousertype(L, idx, 0);
-    ap = &u->attribs;
+    if (u) ap = &u->attribs;
   } else if (tolua_isusertype(L, idx, TOLUA_CAST "region", 0, &tolua_err)) {
     region * r = (region *)tolua_tousertype(L, idx, 0);
-    ap = &r->attribs;
+    if (r) ap = &r->attribs;
   } else if (tolua_isusertype(L, idx, TOLUA_CAST "faction", 0, &tolua_err)) {
     faction * f = (faction *)tolua_tousertype(L, idx, 0);
-    ap = &f->attribs;
+    if (f) ap = &f->attribs;
   } else if (lua_isstring(L, idx)) {
     const char * str = tolua_tostring(L, idx, NULL);
     if (str && strcmp(str, "global")==0) {

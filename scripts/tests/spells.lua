@@ -1,6 +1,6 @@
 require "lunit"
 
-module( "spells", package.seeall, lunit.testcase )
+module("tests.spells", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
