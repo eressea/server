@@ -10,4 +10,5 @@ tests = {
   srcpath .. '/shared/scripts/tests/common.lua', 
   srcpath .. '/eressea/scripts/tests/e3a.lua', 
   srcpath .. '/eressea/scripts/tests/stealth.lua', 
+  srcpath .. '/eressea/scripts/tests/bson.lua', 
 }

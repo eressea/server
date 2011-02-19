@@ -1,6 +1,6 @@
 require "lunit"
 
-module( "e3", package.seeall, lunit.testcase )
+module("e3", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
@@ -12,6 +12,13 @@ function has_attrib(u, value)
         if (a.data==value) then return true end
     end
     return false
+end
+
+function test_attrib_global()
+    a = attrib.create('global', {})
+    write_game('attrib.dat')
+    free_game()
+    read_game('attrib.dat')
 end
 
 function test_attrib()
@@ -61,6 +68,25 @@ function test_no_stealth()
     process_orders()
     assert_equal(-1, u:get_skill("stealth"))
 end
+
+--[[
+function test_analyze_magic()
+    local r1 = region.create(0,0, "plain")
+    local r2 = region.create(1,0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+
+    local u = unit.create(f, r2, 1)
+
+    u.race = "elf"
+    u:set_skill("magic", 6)
+    u.magic = "gwyrrd"
+    u.aura = 60
+    u:add_spell("analyze_magic")
+    u:clear_orders()
+    u:add_order("Zaubere stufe 2 'Magie analysieren' REGION 1,0")
+    process_orders()
+end
+]]--
 
 function test_seecast()
     local r = region.create(0,0, "plain")
