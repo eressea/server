@@ -14,6 +14,13 @@ function test_bson_create()
     end
 end
 
+function test_illegal_arg()
+    local a = attrib.create(nil, 42)
+    assert_equal(nil, a)
+    a = attrib.create("fred", 42)
+    assert_equal(nil, a)
+end
+
 function test_bson_readwrite()
     local r = region.create(0, 0, "mountain")
     attrib.create(r, 42)
