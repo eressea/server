@@ -58,7 +58,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/bsdstring.h>
 #include <util/cvector.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
@@ -4175,7 +4174,11 @@ battle_stats(FILE * F, battle * b)
     for (stat=stats;stat!=NULL;stat=stat->next) {
       fprintf(F, "%s %u : %u\n", stat->wtype?stat->wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
     }
-    freelist(stats);
+    while(stats) {
+		stat_info * stat = stats;
+		stats = stat->next;
+		free(stat);
+	}
   }
 }
 

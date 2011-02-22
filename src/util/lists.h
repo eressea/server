@@ -24,17 +24,7 @@ extern "C" {
 
 #include <stddef.h>
 
-typedef struct void_list {
-  struct void_list * next;
-  void * data;
-} void_list;
-
-#define list_foreach(type, list, item) item=list; while (item!=NULL) { type* __next__=item->next;
-#define list_continue(item) { item=__next__; continue; }
-#define list_next(item) item=__next__; }
-
 void addlist(void *l1, void *p1);
-void choplist(void * l, void * p);
 void translist(void *l1, void *l2, void *p);
 #ifndef MALLOCDBG
 void freelist(void *p1);
@@ -45,9 +35,6 @@ void removelist(void *l, void *p);
 #endif
 
 unsigned int listlen(void *l);
-#define addlist2(l, p)       (*l = p, l = &p->next)
-
-void *listelem(void *l, int n);
 
 #ifdef __cplusplus
 }

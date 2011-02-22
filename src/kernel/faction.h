@@ -75,13 +75,13 @@ typedef struct faction {
   int max_spelllevel;
   struct spell_list * spellbook;
   const struct locale * locale;
-  int lastorders;	/* enno: short? */
-  int age;	/* enno: short? */
+  int lastorders;
+  int age;
   struct ursprung *ursprung;
   const struct race * race;
   magic_t magiegebiet;
   int newbies;
-  int num_people;				/* Anzahl Personen ohne Monster */
+  int num_people;       /* Anzahl Personen ohne Monster */
   int num_total;        /* Anzahl Personen mit Monstern */
   int options;
   int no_units;
@@ -114,8 +114,8 @@ typedef struct faction {
 extern struct faction *factions;
 
 typedef struct faction_list {
-	struct faction_list * next;
-	struct faction * data;
+  struct faction_list * next;
+  struct faction * data;
 } faction_list;
 
 void flist_add(struct faction_list ** flist, struct faction * sf);

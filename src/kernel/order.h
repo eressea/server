@@ -44,6 +44,8 @@ extern order * copy_order(const order * ord);
 extern void free_order(order * ord);
 extern void free_orders(order ** olist);
 
+extern void push_order(struct order ** olist, struct order * ord);
+
 /* access functions for orders */
 extern keyword_t get_keyword(const order * ord);
 extern void set_order(order ** destp, order * src);

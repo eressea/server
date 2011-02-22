@@ -729,7 +729,7 @@ verify_data(void)
 
   if (verbosity>=1) puts(" - Überprüfe Daten auf Korrektheit...");
 
-  list_foreach(faction, factions, f) {
+  for (f=factions; f; f=f->next) {
     mage = 0;
     alchemist = 0;
     for (u=f->units;u;u=u->nextF) {
@@ -751,7 +751,6 @@ verify_data(void)
     if (alchemist > 3)
       log_error(("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist));
   }
-  list_next(f);
 #endif
 }
 

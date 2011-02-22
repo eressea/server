@@ -609,3 +609,8 @@ write_order(const order * ord, char * buffer, size_t size)
   }
   return buffer;
 }
+
+void push_order(order ** ordp, order * ord) {
+  while (*ordp) ordp=&(*ordp)->next;
+  *ordp = ord;
+}

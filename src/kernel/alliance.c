@@ -31,7 +31,6 @@ without prior permission by the authors of Eressea.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/lists.h>
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/rng.h>

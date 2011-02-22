@@ -38,7 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>
 #include <util/storage.h>
@@ -454,6 +453,7 @@ add_buildinglist(building_list **blist, building *b)
 building *
 new_building(const struct building_type * btype, region * r, const struct locale * lang)
 {
+  building ** bptr = &r->buildings;
   building *b = (building *) calloc(1, sizeof(building));
   static boolean init_lighthouse = false;
   static const struct building_type * bt_lighthouse = 0;
@@ -469,7 +469,8 @@ new_building(const struct building_type * btype, region * r, const struct locale
   
   b->type = btype;
   b->region = r;
-  addlist(&r->buildings, b);
+  while (*bptr) bptr=&(*bptr)->next;
+  *bptr = b;
   
   if (b->type==bt_lighthouse) {
     r->flags |= RF_LIGHTHOUSE;
