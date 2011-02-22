@@ -41,12 +41,9 @@ Global
 		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.Build.0 = Debug|Win32
 		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Release|Win32.ActiveCfg = Release|Win32
+		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal

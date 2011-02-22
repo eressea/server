@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="amalgamation-eressea"
+	Name="eressea"
 	ProjectGUID="{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}"
 	RootNamespace="build"
 	Keyword="Win32Proj"
