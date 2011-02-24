@@ -205,5 +205,8 @@
     <ClCompile Include="util\quicklist.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="util\quicklist_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

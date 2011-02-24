@@ -125,9 +125,7 @@
     <ClCompile Include="util\argstack.c" />
     <ClCompile Include="util\attrib.c" />
     <ClCompile Include="util\base36.c" />
-    <ClCompile Include="util\base36_test.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="util\base36_test.c" />
     <ClCompile Include="util\bsdstring.c" />
     <ClCompile Include="util\console.c" />
     <ClCompile Include="util\crmessage.c" />
@@ -147,6 +145,7 @@
     <ClCompile Include="util\parser.c" />
     <ClCompile Include="util\patricia.c" />
     <ClCompile Include="util\quicklist.c" />
+    <ClCompile Include="util\quicklist_test.c" />
     <ClCompile Include="util\rand.c" />
     <ClCompile Include="util\resolve.c" />
     <ClCompile Include="util\sql.c" />

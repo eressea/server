@@ -17,6 +17,7 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 
 #include <util/attrib.h>
+#include <util/quicklist.h>
 #include <util/rng.h>
 
 #include <kernel/building.h>
@@ -89,7 +90,7 @@ static int rc_herb_trade(const struct race * rc)
 
 void do_markets(void)
 {
-  unit_list * traders = 0;
+  quicklist * traders = 0;
   unit * markets[MAX_MARKETS];
   region * r;
   for (r=regions;r;r=r->next) {
@@ -119,11 +120,8 @@ void do_markets(void)
             item * items;
             attrib * a = a_find(u->attribs, &at_market);
             if (a==NULL) {
-              unit_list * ulist = malloc(sizeof(unit_list));
               a = a_add(&u->attribs, a_new(&at_market));
-              ulist->next = traders;
-              ulist->data = u;
-              traders = ulist;
+              ql_push(&traders, u);
             }
             items = (item *)a->data.v;
             i_change(&items, lux, 1);
@@ -136,11 +134,8 @@ void do_markets(void)
             item * items;
             attrib * a = a_find(u->attribs, &at_market);
             if (a==NULL) {
-              unit_list * ulist = malloc(sizeof(unit_list));
               a = a_add(&u->attribs, a_new(&at_market));
-              ulist->next = traders;
-              ulist->data = u;
-              traders = ulist;
+              ql_push(&traders, u);
             }
             items = (item *)a->data.v;
             i_change(&items, herb, 1);
@@ -152,33 +147,35 @@ void do_markets(void)
     }
   }
 
-  while (traders) {
-    unit_list * trade = traders;
-    unit * u = trade->data;
-    attrib * a = a_find(u->attribs, &at_market);
-    item * items = a->data.v;
+  if (traders) {
+    quicklist * qliter = traders;
+    int qli = 0;
+    for (qli=0;qliter;ql_advance(&qliter, &qli, 1)) {
+      unit * u = (unit *)ql_get(qliter, qli);
+      attrib * a = a_find(u->attribs, &at_market);
+      item * items = (item *)a->data.v;
 
-    a->data.v = NULL;
-    while (items) {
-      item * itm = items;
-      items = itm->next;
+      a->data.v = NULL;
+      while (items) {
+        item * itm = items;
+        items = itm->next;
 
-      if (itm->number) {
-        ADDMSG(&u->faction->msgs, msg_message("buyamount",
-          "unit amount resource", u, itm->number, itm->type->rtype));
-        itm->next = NULL;
-        i_add(&u->items, itm);
-      } else {
-        i_free(itm);
+        if (itm->number) {
+          ADDMSG(&u->faction->msgs, msg_message("buyamount",
+            "unit amount resource", u, itm->number, itm->type->rtype));
+          itm->next = NULL;
+          i_add(&u->items, itm);
+        } else {
+          i_free(itm);
+        }
       }
+
+      a_remove(&u->attribs, a);
     }
-
-    traders = trade->next;
-
-    a_remove(&u->attribs, a);
-    free(trade);
+    ql_free(traders);
   }
 }
+
 #ifndef DISABLE_TESTS
 #include "market_test.c"
 #endif

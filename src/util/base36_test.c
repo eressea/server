@@ -1,4 +1,7 @@
 #include <cutest/CuTest.h>
+#include "base36.h"
+#include <stdlib.h>
+#include <limits.h>
 
 static void test_atoi36(CuTest * tc) {
   CuAssertIntEquals(tc, 0, atoi36("0"));

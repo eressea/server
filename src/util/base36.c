@@ -109,7 +109,3 @@ i10toi36(int i)
   }
   return r;
 }
-
-#ifndef DISABLE_TESTS
-#include "base36_test.c"
-#endif

@@ -4,7 +4,9 @@
 #include <platform.h>
 #include "tests.h"
 
-CuSuite* get_base36_suite(void);
+#include <util/base36_test.c>
+#include <util/quicklist_test.c>
+
 CuSuite* get_curse_suite(void);
 CuSuite* get_market_suite(void);
 CuSuite* get_laws_suite(void);
@@ -26,6 +28,7 @@ int RunAllTests(void) {
   init_resources();
 
   CuSuiteAddSuite(suite, get_base36_suite());
+  CuSuiteAddSuite(suite, get_quicklist_suite());
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
