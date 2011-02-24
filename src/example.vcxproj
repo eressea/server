@@ -107,6 +107,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\shared\src\build\stdafx.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\CMakeLists.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
