@@ -117,11 +117,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="spells\Jamfile" />
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuildStep Include="races\races.h">
       <Filter>Source Files</Filter>
     </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\CMakeLists.txt" />
   </ItemGroup>
 </Project>
