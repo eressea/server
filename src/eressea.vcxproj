@@ -181,7 +181,7 @@
     <ClInclude Include="spells\unitcurse.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="spells\Jamfile" />
+    <None Include="..\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
