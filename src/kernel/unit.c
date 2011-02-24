@@ -1393,29 +1393,6 @@ free_unit(unit * u)
   }
 }
 
-
-void 
-unitlist_clear(struct unit_list **ul)
-{
-  while (*ul) {
-    unit_list * rl2 = (*ul)->next;
-    free(*ul);
-    *ul = rl2;
-  }
-}
-
-void 
-unitlist_insert(struct unit_list **ul, struct unit *u)
-{
-  unit_list *rl2 = (unit_list*)malloc(sizeof(unit_list));
-
-  rl2->data = u;
-  rl2->next = *ul;
-
-  *ul = rl2;
-}
-
-
 static void
 createunitid(unit *u, int id)
 {

@@ -66,7 +66,6 @@ struct storage;
 struct strlist;
 struct terrain_type;
 struct unit;
-struct unit_list;
 struct weapon_type;
 
 typedef struct ursprung {

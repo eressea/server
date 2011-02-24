@@ -946,7 +946,6 @@ tolua_unit_open(lua_State * L)
 {
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "unit");
-  tolua_usertype(L, TOLUA_CAST "unit_list");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
