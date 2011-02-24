@@ -19,6 +19,7 @@
 #include <util/goodies.c>
 #include <util/language.c>
 #include <util/lists.c>
+#include <util/quicklist.c>
 #include <util/log.c>
 #include <util/message.c>
 #include <util/nrmessage.c>

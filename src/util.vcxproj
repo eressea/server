@@ -109,6 +109,7 @@
     <ClInclude Include="util\nrmessage_struct.h" />
     <ClInclude Include="util\parser.h" />
     <ClInclude Include="util\patricia.h" />
+    <ClInclude Include="util\quicklist.h" />
     <ClInclude Include="util\rand.h" />
     <ClInclude Include="util\resolve.h" />
     <ClInclude Include="util\rng.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="util\nrmessage.c" />
     <ClCompile Include="util\parser.c" />
     <ClCompile Include="util\patricia.c" />
+    <ClCompile Include="util\quicklist.c" />
     <ClCompile Include="util\rand.c" />
     <ClCompile Include="util\resolve.c" />
     <ClCompile Include="util\sql.c" />
