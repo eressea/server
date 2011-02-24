@@ -22,11 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define QL_MAXSIZE 14 /* total struct is 64 bytes */
 #define QL_LIMIT 8
 
-typedef struct quicklist {
+struct quicklist {
   struct quicklist * next;
   int num_elements;
   void * elements[QL_MAXSIZE];
-} quicklist;
+};
 
 
 void * ql_get(quicklist * ql, int index) {
