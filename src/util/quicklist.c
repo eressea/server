@@ -99,7 +99,7 @@ int ql_insert(quicklist ** qlp, int index, void * data) {
       ql->next = qn;
       qn->num_elements = QL_LIMIT;
       ql->num_elements -= QL_LIMIT;
-      memcpy(qn->elements, ql->elements+ql->num_elements-QL_LIMIT, QL_LIMIT*sizeof(void*));
+      memcpy(qn->elements, ql->elements+ql->num_elements, QL_LIMIT*sizeof(void*));
       if (index<=ql->num_elements) {
         return ql_insert(qlp, index, data);
       } else {
@@ -112,4 +112,36 @@ int ql_insert(quicklist ** qlp, int index, void * data) {
     return EINVAL;
   }
   return 0;
+}
+
+void ql_foreach(struct quicklist * ql, void (*cb)(void *))
+{
+  for (;ql;ql=ql->next) {
+    int i;
+    for (i=0;i!=ql->num_elements;++i) {
+      cb(ql->elements[i]);
+    }
+  }
+}
+
+int ql_advance(struct quicklist ** iterator, int * index, int stride)
+{
+  quicklist * ql = *iterator;
+  int i = *index;
+  if (!ql || i<0 || stride<0) {
+    return ERANGE;
+  } else if (i + stride<ql->num_elements) {
+    *index = i + stride;
+    return 0;
+  } else {
+    *index = i - ql->num_elements + stride;
+    *iterator = ql->next;
+    return ql_advance(iterator, index, 0);
+  }
+}
+
+void ql_free(struct quicklist * ql)
+{
+  if (ql->next) ql_free(ql->next);
+  free(ql);
 }
