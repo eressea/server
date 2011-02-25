@@ -16,6 +16,7 @@
 
 #include "goodies.h"
 #include "log.h"
+#include "quicklist.h"
 
 /* libc includes */
 #include <assert.h>
@@ -29,7 +30,7 @@ void (*msg_log_create)(const struct message * msg) = 0;
 const char *
 mt_name(const message_type* mtype)
 {
-	return mtype->name;
+  return mtype->name;
 }
 
 message_type *
@@ -78,18 +79,18 @@ mt_new(const char * name, const char * args[])
 message_type *
 mt_new_va(const char * name, ...)
 {
-	const char * args[16];
-	int i = 0;
-	va_list marker;
+  const char * args[16];
+  int i = 0;
+  va_list marker;
 
-	va_start(marker, name);
-	for (;;) {
-		const char * c = va_arg(marker, const char*);
-		args[i++] = c;
-		if (c==NULL) break;
-	}
-	va_end(marker);
-	return mt_new(name, args);
+  va_start(marker, name);
+  for (;;) {
+    const char * c = va_arg(marker, const char*);
+    args[i++] = c;
+    if (c==NULL) break;
+  }
+  va_end(marker);
+  return mt_new(name, args);
 }
 
 arg_type * argtypes = NULL;
@@ -153,28 +154,23 @@ msg_create(const struct message_type * mtype, variant args[])
   return msg;
 }
 
-typedef struct messagetype_list {
-	struct messagetype_list * next;
-	const struct message_type * data;
-} messagetype_list;
-
 #define MT_MAXHASH 1021
-static messagetype_list * messagetypes[MT_MAXHASH];
+static quicklist * messagetypes[MT_MAXHASH];
 
 const message_type *
 mt_find(const char * name)
 {
-  const struct message_type * found = NULL;
   unsigned int hash = hashstring(name) % MT_MAXHASH;
-  messagetype_list * type = messagetypes[hash];
-  while (type) {
-    if (strcmp(type->data->name, name)==0) {
-      if (found==NULL) found = type->data;
-      break;
+  quicklist * ql = messagetypes[hash];
+  int qi;
+
+  for (qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    message_type * data = (message_type *)ql_get(ql, qi);
+    if (strcmp(data->name, name)==0) {
+      return data;
     }
-    type = type->next;
   }
-  return found;
+  return 0;
 }
 
 static unsigned int
@@ -194,14 +190,9 @@ const message_type *
 mt_register(message_type * type)
 {
   unsigned int hash = hashstring(type->name) % MT_MAXHASH;
-  messagetype_list * mtl = messagetypes[hash];
+  quicklist ** qlp = messagetypes+hash;
 
-  while (mtl && mtl->data!=type) mtl=mtl->next;
-  if (mtl==NULL) {
-    mtl = (messagetype_list*)malloc(sizeof(messagetype_list));
-    mtl->data = type;
-    mtl->next = messagetypes[hash];
-    messagetypes[hash] = mtl;
+  if (ql_set_insert(qlp, type)==0) {
     type->key = mt_id(type);
   }
   return type;
