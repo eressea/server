@@ -275,44 +275,37 @@ attrib_type at_curse =
 /* Spruch identifizieren */
 
 #include <util/umlaut.h>
+#include <util/quicklist.h>
 
-typedef struct cursetype_list {
-  struct cursetype_list * next;
-  const curse_type * type;
-} cursetype_list;
-
-cursetype_list * cursetypes[256];
+static quicklist * cursetypes[256];
 
 void
 ct_register(const curse_type * ct)
 {
   unsigned int hash = tolower(ct->cname[0]);
-  cursetype_list ** ctlp = &cursetypes[hash];
+  quicklist ** ctlp = &cursetypes[hash];
 
-  while (*ctlp) {
-    cursetype_list * ctl = *ctlp;
-    if (ctl->type==ct) return;
-    ctlp=&ctl->next;
-  }
-  *ctlp = calloc(1, sizeof(cursetype_list));
-  (*ctlp)->type = ct;
+  ql_set_insert(ctlp, (void *)ct);
 }
 
 const curse_type *
 ct_find(const char *c)
 {
   unsigned int hash = tolower(c[0]);
-  cursetype_list * ctl = cursetypes[hash];
-  while (ctl) {
-    if (strcmp(c, ctl->type->cname)==0) {
-      return ctl->type;
+  quicklist * ctl = cursetypes[hash];
+  int qi;
+
+  for (qi=0;ctl;ql_advance(&ctl, &qi, 1)) {
+    curse_type * type = (curse_type*)ql_get(ctl, qi);
+
+    if (strcmp(c, type->cname)==0) {
+      return type;
     } else {
-      size_t k = MIN(strlen(c), strlen(ctl->type->cname));
-      if (!strncasecmp(c, ctl->type->cname, k)) {
-        return ctl->type;
+      size_t k = MIN(strlen(c), strlen(type->cname));
+      if (!strncasecmp(c, type->cname, k)) {
+        return type;
       }
     }
-    ctl = ctl->next;
   }
   return NULL;
 }
