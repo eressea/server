@@ -48,7 +48,7 @@ function process(orders)
   update_scores()
   frost.update()
 
-  local localechange = { de = { "ii" } }
+  local localechange = { en = { "L46o" } }
   change_locales(localechange)
 
   -- use newfactions file to place out new players

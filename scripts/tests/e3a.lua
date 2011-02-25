@@ -417,7 +417,7 @@ function test_alliance()
   assert(f2.alliance~=nil)
   assert(f2.alliance==f1.alliance)
   for f in f1.alliance.factions do
-    assert_true(f==f1 or f==f2)
+    assert_true(f.id==f1.id or f.id==f2.id)
   end
   u1:clear_orders()
   u2:clear_orders()
