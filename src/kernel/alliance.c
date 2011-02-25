@@ -33,6 +33,7 @@ without prior permission by the authors of Eressea.
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
 
@@ -49,11 +50,7 @@ void
 free_alliance(alliance * al)
 {
   free(al->name);
-  while (al->members) {
-    faction_list * m = al->members;
-    al->members = m->next;
-    free(m);
-  }
+  if (al->members) ql_free(al->members);
   free(al);
 }
 
@@ -111,7 +108,7 @@ alliance_get_leader(alliance * al)
 {
   if (!al->_leader) {
     if (al->members) {
-      al->_leader = al->members->data;
+      al->_leader = (faction *)ql_get(al->members, 0);
     }
   }
   return al->_leader;
@@ -120,7 +117,7 @@ alliance_get_leader(alliance * al)
 static void
 create_transaction(int type, unit * u, order * ord)
 {
-  alliance_transaction * tr = calloc(1, sizeof(alliance_transaction));
+  alliance_transaction * tr = (alliance_transaction *)calloc(1, sizeof(alliance_transaction));
   tr->ord = ord;
   tr->u = u;
   tr->next = transactions[type];
@@ -372,24 +369,24 @@ alliancejoin(void)
 }
 
 void 
-setalliance(struct faction * f, alliance * al)
+setalliance(faction * f, alliance * al)
 {
-  faction_list * flist = NULL;
   if (f->alliance==al) return;
   if (f->alliance!=NULL) {
-    faction_list ** flistp = &f->alliance->members;
-    while (*flistp) {
-      faction_list * flist = *flistp;
-      if ((*flistp)->data==f) {
-        *flistp = flist->next;
+    int qi;
+    quicklist ** flistp = &f->alliance->members;
+
+    for (qi=0;*flistp;ql_advance(flistp, &qi, 1)) {
+      faction * data = (faction *)ql_get(*flistp, qi);
+      if (data==f) {
+        ql_delete(flistp, qi);
         break;
       }
-      flistp = &flist->next;
     }
 
     if (f->alliance->_leader==f) {
       if (f->alliance->members) {
-        f->alliance->_leader = f->alliance->members->data;
+        f->alliance->_leader = (faction *)ql_get(f->alliance->members, 0);
       } else {
         f->alliance->_leader = NULL;
       }
@@ -398,22 +395,11 @@ setalliance(struct faction * f, alliance * al)
   f->alliance = al;
   f->alliance_joindate = turn;
   if (al!=NULL) {
-    faction_list ** flistp = &al->members;
-    while (*flistp) {
-      flistp = &(*flistp)->next;
-    }
-    if (flist==NULL) {
-      flist = malloc(sizeof(faction_list));
-      flist->data = f;
-    }
-    *flistp = flist;
-    flist->next = NULL;
+    ql_push(&al->members, f);
     if (al->_leader==NULL) {
       al->_leader = f;
     }
-    flist = NULL;
   }
-  free(flist);
 }
 
 const char *
@@ -456,15 +442,15 @@ alliancevictory(void)
   }
   while (al!=NULL) {
     if (!fval(al, FFL_MARK)) {
-      faction_list * flist = al->members;
-      while (flist!=0) {
-        faction * f = flist->data;
+      int qi;
+      quicklist * flist = al->members;
+      for (qi=0;flist;ql_advance(&flist, &qi, 1)) {
+        faction * f = (faction *)ql_get(flist, qi);
         if (f->alliance==al) {
           ADDMSG(&f->msgs, msg_message("alliance::lost", 
             "alliance", al));
           destroyfaction(f);
         }
-        flist = flist->next;
       }
     } else {
       freset(al, FFL_MARK);
@@ -478,18 +464,20 @@ victorycondition(const alliance * al, const char * name)
 {
   const char * gems[] = { "opal", "diamond", "zaphire", "topaz", "beryl", "agate", "garnet", "emerald", NULL };
   if (strcmp(name, "gems")==0) {
-    const char ** igem = gems;
+    const char ** igem;
 
-    for (;*igem;++igem) {
+    for (igem=gems;*igem;++igem) {
       const struct item_type * itype = it_find(*igem);
-      faction_list * flist = al->members;
+      quicklist * flist = al->members;
+      int qi;
       boolean found = false;
 
       assert(itype!=NULL);
-      for (;flist && !found;flist=flist->next) {
-        unit * u = flist->data->units;
+      for (qi=0;flist && !found;ql_advance(&flist, &qi, 1)) {
+        faction * f = (faction *)ql_get(flist, 0);
+        unit * u;
 
-        for (;u;u=u->nextF) {
+        for (u=f->units;u;u=u->nextF) {
           if (i_get(u->items, itype)>0) {
             found = true;
             break;
@@ -501,9 +489,11 @@ victorycondition(const alliance * al, const char * name)
     return 1;
 
   } else if (strcmp(name, "phoenix")==0) {
-    faction_list * flist = al->members;
-    for (;flist;flist=flist->next) {
-      faction * f = flist->data;
+    quicklist * flist = al->members;
+    int qi;
+
+    for (qi=0;flist;ql_advance(&flist, &qi, 1)) {
+      faction * f = (faction *)ql_get(flist, qi);
       if (find_key(f->attribs, atoi36("phnx"))) {
         return 1;
       }
@@ -527,9 +517,11 @@ victorycondition(const alliance * al, const char * name)
     *   }
     */
 
-    faction_list * flist = al->members;
-    for (;flist;flist=flist->next) {
-      faction * f = flist->data;
+    quicklist * flist = al->members;
+    int qi;
+
+    for (qi=0;flist;ql_advance(&flist, &qi, 1)) {
+      faction * f = (faction *)ql_get(flist, qi);
       if (find_key(f->attribs, atoi36("pyra"))) {
         return 1;
       }

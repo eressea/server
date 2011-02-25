@@ -62,6 +62,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
@@ -1178,13 +1179,10 @@ readfaction(struct storage * store)
     if (allianceid>0) f->alliance = findalliance(allianceid);
     if (f->alliance) {
       alliance * al = f->alliance;
-      faction_list * flist = (faction_list *)malloc(sizeof(faction_list));
       if (al->flags&ALF_NON_ALLIED) {
         assert(!al->members || !"non-allied dummy-alliance has more than one member");
       }
-      flist->data = f;
-      flist->next = al->members;
-      al->members = flist;
+      ql_push(&al->members, f);
     } else if (rule_region_owners()){
       /* compat fix for non-allied factions */
       alliance * al = makealliance(0, NULL);

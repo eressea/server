@@ -16,7 +16,6 @@ extern "C" {
 
   struct lua_State;
   int tolua_factionlist_next(struct lua_State *L);
-  int tolua_factionlist_iter(struct lua_State *L);
   void tolua_faction_open(struct lua_State *L);
 
 #ifdef __cplusplus

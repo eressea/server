@@ -44,7 +44,7 @@ enum {
 typedef struct alliance {
   struct alliance * next;
   struct faction * _leader;
-  struct faction_list * members;
+  struct quicklist * members;
   unsigned int flags;
   int id;
   char * name;

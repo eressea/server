@@ -142,6 +142,7 @@ int ql_advance(struct quicklist ** iterator, int * index, int stride)
 
 void ql_free(struct quicklist * ql)
 {
+  if (!ql) return;
   if (ql->next) ql_free(ql->next);
   free(ql);
 }

@@ -924,9 +924,10 @@ get_addresses(report_context * ctx)
   ql_push(&flist, ctx->f);
 
   if (f_get_alliance(ctx->f)) {
-    faction_list * member = ctx->f->alliance->members;
-    for (;member;member=member->next) {
-      ql_set_insert(&flist, member->data);
+    quicklist * ql = ctx->f->alliance->members;
+    int qi;
+    for (qi=0;ql;ql_advance(&ql, &qi, 1)) {
+      ql_set_insert(&flist, ql_get(ql, qi));
     }
   }
 

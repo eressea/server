@@ -53,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/functions.h>
@@ -60,14 +61,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/sql.h>
 #include <util/translation.h>
+#include <util/unicode.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
-#include <util/bsdstring.h>
-#include <util/unicode.h>
 
 /* libxml includes */
 #include <libxml/tree.h>
@@ -507,10 +508,12 @@ allied_skillcount(const faction * f, skill_t sk)
 {
   int num = 0;
   alliance * a = f_get_alliance(f);
-  faction_list * members = a->members;
-  while (members!=NULL) {
-    num += count_skill(members->data, sk);
-    members=members->next;
+  quicklist * members = a->members;
+  int qi;
+
+  for (qi=0;members;ql_advance(&members, &qi, 1)) {
+    faction * m = (faction *)ql_get(members, qi);
+    num += count_skill(m, sk);
   }
   return num;
 }

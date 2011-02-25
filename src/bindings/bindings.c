@@ -55,6 +55,7 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/storage.h>
@@ -86,6 +87,24 @@ int tolua_orderlist_next(lua_State *L)
     write_order(ord, cmd, sizeof(cmd));
     tolua_pushstring(L, cmd);
     *order_ptr = ord->next;
+    return 1;
+  }
+  else return 0;  /* no more values to return */
+}
+
+int tolua_quicklist_iter(lua_State *L)
+{
+  quicklist** qlp = (quicklist **)lua_touserdata(L, lua_upvalueindex(1));
+  quicklist* ql = *qlp;
+  if (ql != NULL) {
+    int index = lua_tointeger(L, lua_upvalueindex(2));
+    const char * type = lua_tostring(L, lua_upvalueindex(3));
+    void * data = ql_get(ql, index);
+    tolua_pushusertype(L, data, TOLUA_CAST type);
+    ql_advance(qlp, &index, 1);
+
+    tolua_pushnumber(L, index);
+    lua_replace(L, lua_upvalueindex(2));
     return 1;
   }
   else return 0;  /* no more values to return */
@@ -728,14 +747,17 @@ static int
 tolua_get_alliance_factions(lua_State* L)
 {
   alliance * self = (alliance *)tolua_tousertype(L, 1, 0);
-  faction_list ** faction_ptr = (faction_list**)lua_newuserdata(L, sizeof(faction_list *));
+  quicklist ** faction_ptr = (quicklist**)lua_newuserdata(L, sizeof(quicklist *));
 
   luaL_getmetatable(L, "faction_list");
   lua_setmetatable(L, -2);
 
+  lua_pushnumber(L, 0);
+
   *faction_ptr = self->members;
 
-  lua_pushcclosure(L, tolua_factionlist_iter, 1);
+  lua_pushstring(L, "faction");
+  lua_pushcclosure(L, tolua_quicklist_iter, 3); /* OBS: this closure has multiple upvalues (list, index, type_name) */
   return 1;
 }
 
@@ -1052,6 +1074,7 @@ tolua_eressea_open(lua_State* L)
   tolua_usertype(L, TOLUA_CAST "item");
   tolua_usertype(L, TOLUA_CAST "alliance");
   tolua_usertype(L, TOLUA_CAST "event");
+  tolua_usertype(L, TOLUA_CAST "faction_list");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);

@@ -26,6 +26,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/language.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 
 #include <lua.h>
 #include <tolua.h>
@@ -38,18 +39,6 @@ int tolua_factionlist_next(lua_State *L)
   if (f != NULL) {
     tolua_pushusertype(L, (void*)f, TOLUA_CAST "faction");
     *faction_ptr = f->next;
-    return 1;
-  }
-  else return 0;  /* no more values to return */
-}
-
-int tolua_factionlist_iter(lua_State *L)
-{
-  faction_list** faction_ptr = (faction_list **)lua_touserdata(L, lua_upvalueindex(1));
-  faction_list* flist = *faction_ptr;
-  if (flist != NULL) {
-    tolua_pushusertype(L, (void*)flist->data, TOLUA_CAST "faction");
-    *faction_ptr = flist->next;
     return 1;
   }
   else return 0;  /* no more values to return */
