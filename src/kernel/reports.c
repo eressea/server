@@ -900,13 +900,11 @@ stealth_modifier(int seen_mode)
   }
 }
 
-void transfer_seen(quicklist ** dst, faction_list ** src) {
-  while (*src) {
-    faction_list * flist = *src;
-    ql_set_insert(dst, flist->data);
-    free(flist);
-    *src = flist->next;
-  }
+void transfer_seen(quicklist ** dst, quicklist ** src)
+{
+  assert(!*dst);
+  *dst = *src;
+  *src = NULL;
 }
 
 static void

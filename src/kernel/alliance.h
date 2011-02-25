@@ -27,7 +27,6 @@ struct attrib;
 struct unit;
 struct faction;
 struct region;
-struct faction_list;
 
 enum {
   ALLIANCE_KICK,

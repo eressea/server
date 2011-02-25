@@ -505,19 +505,3 @@ f_get_alliance(const struct faction * f)
   }
   return NULL;
 }
-
-void
-flist_add(faction_list ** flist, faction * sf)
-{
-  faction_list ** fnew = flist;
-  while (*fnew && (*fnew)->data->no < sf->no) {
-    fnew =&(*fnew)->next;
-  }
-  if ((*fnew==NULL) || (*fnew)->data!=sf) {
-    faction_list * finsert = malloc(sizeof(faction_list));
-    finsert->next = *fnew;
-    *fnew = finsert;
-    finsert->data = sf;
-  }
-}
-

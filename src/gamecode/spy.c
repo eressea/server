@@ -43,6 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -73,7 +74,7 @@ spy_message(int spy, const unit *u, const unit *target)
     if (fv && fv!=target->faction) {
       /* wahre Partei */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction", "target faction", target, target->faction));
-      flist_add(&u->faction->seen_factions, target->faction);
+      ql_set_insert(&u->faction->seen_factions, target->faction);
     }
   }
   if (spy > 0) {
