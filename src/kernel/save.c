@@ -1178,7 +1178,7 @@ readfaction(struct storage * store)
     if (allianceid>0) f->alliance = findalliance(allianceid);
     if (f->alliance) {
       alliance * al = f->alliance;
-      faction_list * flist = malloc(sizeof(faction_list));
+      faction_list * flist = (faction_list *)malloc(sizeof(faction_list));
       if (al->flags&ALF_NON_ALLIED) {
         assert(!al->members || !"non-allied dummy-alliance has more than one member");
       }

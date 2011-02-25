@@ -213,9 +213,6 @@
     <ClCompile Include="modules\museum.c">
       <Filter>modules</Filter>
     </ClCompile>
-    <ClCompile Include="modules\oceannames.c">
-      <Filter>modules</Filter>
-    </ClCompile>
     <ClCompile Include="modules\score.c">
       <Filter>modules</Filter>
     </ClCompile>
@@ -508,9 +505,6 @@
       <Filter>modules</Filter>
     </ClInclude>
     <ClInclude Include="modules\museum.h">
-      <Filter>modules</Filter>
-    </ClInclude>
-    <ClInclude Include="modules\oceannames.h">
       <Filter>modules</Filter>
     </ClInclude>
     <ClInclude Include="modules\score.h">

@@ -712,14 +712,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\modules\oceannames.c"
-				>
-			</File>
-			<File
-				RelativePath=".\modules\oceannames.h"
-				>
-			</File>
-			<File
 				RelativePath=".\modules\score.c"
 				>
 			</File>

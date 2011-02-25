@@ -152,7 +152,6 @@
     <ClCompile Include="modules\dungeon.c" />
     <ClCompile Include="modules\gmcmd.c" />
     <ClCompile Include="modules\museum.c" />
-    <ClCompile Include="modules\oceannames.c" />
     <ClCompile Include="modules\score.c" />
     <ClCompile Include="modules\weather.c" />
     <ClCompile Include="modules\wormhole.c" />
@@ -256,7 +255,6 @@
     <ClInclude Include="modules\dungeon.h" />
     <ClInclude Include="modules\gmcmd.h" />
     <ClInclude Include="modules\museum.h" />
-    <ClInclude Include="modules\oceannames.h" />
     <ClInclude Include="modules\score.h" />
     <ClInclude Include="modules\weather.h" />
     <ClInclude Include="modules\wormhole.h" />
