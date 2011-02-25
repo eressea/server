@@ -36,11 +36,6 @@ extern "C" {
     unsigned int id; /* unique id */
   } connection;
 
-  typedef struct border_list {
-    struct border_list * next;
-    struct connection * data;
-  } border_list;
-
   typedef struct border_type {
     const char* __name; /* internal use only */
     variant_type datatype;

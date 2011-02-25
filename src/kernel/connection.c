@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 #include <util/rng.h>
 #include <util/storage.h>
 
@@ -254,7 +255,7 @@ attrib_type at_countdown = {
 void
 age_borders(void)
 {
-  border_list * deleted = NULL;
+  quicklist * deleted = NULL, *ql;
   int i;
 
   for (i=0;i!=BORDER_MAXHASH;++i) {
@@ -264,22 +265,17 @@ age_borders(void)
       for (;b;b=b->next) {
         if (b->type->age) {
           if (b->type->age(b)==AT_AGE_REMOVE) {
-            border_list * kill = malloc(sizeof(border_list));
-            kill->data = b;
-            kill->next = deleted;
-            deleted = kill;
+            ql_push(&deleted, b);
           }
         }
       }
     }
   }
-  while (deleted) {
-    border_list * blist = deleted->next;
-    connection * b = deleted->data;
+  for (ql=deleted,i=0;ql;ql_advance(&ql, &i, 1)) {
+    connection * b = (connection *)ql_get(ql, i);
     erase_border(b);
-    free(deleted);
-    deleted = blist;
   }
+  ql_free(deleted);
 }
 
 /********
