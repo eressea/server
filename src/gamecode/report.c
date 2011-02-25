@@ -76,6 +76,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/quicklist.h>
 #include <util/rng.h>
 
 #include <libxml/encoding.h>
@@ -1700,15 +1701,16 @@ rpline(FILE * F)
 }
 
 static void
-list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
+list_address(FILE * F, const faction * uf, quicklist * seenfactions)
 {
-  const faction_list *flist = seenfactions;
+  int qi = 0;
+  quicklist * flist = seenfactions;
 
   centre(F, LOC(uf->locale, "nr_addresses"), false);
   rnl(F);
 
   while (flist!=NULL) {
-    const faction * f = flist->data;
+    const faction * f = (const faction *)ql_get(flist, qi);
     if (!is_monsters(f)) {
       char buf[8192];
       char label = '-';
@@ -1720,7 +1722,7 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
       rparagraph(F, buf, 4, 0, label);
 
     }
-    flist = flist->next;
+    ql_advance(&flist, &qi, 1);
   }
   rnl(F);
   rpline(F);

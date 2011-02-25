@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 
 /* libc includes */
 #include <sys/stat.h>
@@ -899,6 +900,15 @@ stealth_modifier(int seen_mode)
   }
 }
 
+void transfer_seen(quicklist ** dst, faction_list ** src) {
+  while (*src) {
+    faction_list * flist = *src;
+    ql_set_insert(dst, flist->data);
+    free(flist);
+    *src = flist->next;
+  }
+}
+
 static void
 get_addresses(report_context * ctx)
 {
@@ -906,18 +916,21 @@ get_addresses(report_context * ctx)
   seen_region * sr = NULL;
   region *r;
   const faction * lastf = NULL;
-  faction_list * flist = ctx->f->seen_factions;
+  quicklist * flist = 0;
+  
+  transfer_seen(&flist, &ctx->f->seen_factions);
 
   ctx->f->seen_factions = NULL; /* do not delete it twice */
-  flist_add(&flist, ctx->f);
+  ql_push(&flist, ctx->f);
 
   if (f_get_alliance(ctx->f)) {
     faction_list * member = ctx->f->alliance->members;
     for (;member;member=member->next) {
-      flist_add(&flist, member->data);
+      ql_set_insert(&flist, member->data);
     }
   }
 
+  /* find the first region that this faction can see */
   for (r=ctx->first;sr==NULL && r!=ctx->last;r=r->next) {
     sr = find_seen(ctx->seen, r);
   }
@@ -931,7 +944,7 @@ get_addresses(report_context * ctx)
         faction * sf = visible_faction(ctx->f, u);
         if (lastf!=sf) {
           if (u->building || u->ship || (stealthmod>INT_MIN && cansee(ctx->f, r, u, stealthmod))) {
-            flist_add(&flist, sf);
+            ql_set_insert(&flist, sf);
             lastf = sf;
           }
         }
@@ -947,7 +960,7 @@ get_addresses(report_context * ctx)
             unit * u2 = (unit*)a->data.v;
             if (u2->faction==ctx->f) {
               if (cansee_unit(u2, u, stealthmod)) {
-                flist_add(&flist, sf);
+                ql_set_insert(&flist, sf);
                 lastf = sf;
                 break;
               }
@@ -965,7 +978,7 @@ get_addresses(report_context * ctx)
           boolean ballied = sf && sf!=ctx->f && sf!=lastf
             && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
           if (ballied || ALLIED(ctx->f, sf)) {
-            flist_add(&flist, sf);
+            ql_set_insert(&flist, sf);
             lastf = sf;
           }
         }
@@ -978,7 +991,7 @@ get_addresses(report_context * ctx)
     faction *f2;
     for (f2 = factions; f2; f2 = f2->next) {
       if (f2->alliance == ctx->f->alliance) {
-        flist_add(&flist, f2);
+        ql_set_insert(&flist, f2);
       }
     }
   }
@@ -1393,7 +1406,7 @@ write_reports(faction * f, time_t ltime)
   if (!gotit) {
     log_warning(("No report for faction %s!\n", factionid(f)));
   }
-  freelist(ctx.addresses);
+  ql_free(ctx.addresses);
   seen_done(ctx.seen);
   return 0;
 }

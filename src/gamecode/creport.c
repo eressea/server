@@ -63,6 +63,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/quicklist.h>
 
 #include <libxml/encoding.h>
 
@@ -959,11 +960,12 @@ show_active_spells(const region * r)
 
 /* this is a copy of laws.c->find_address output changed. */
 static void
-cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
+cr_find_address(FILE * F, const faction * uf, quicklist * addresses)
 {
-  const faction_list * flist = addresses;
-  while (flist!=NULL) {
-    const faction * f = flist->data;
+  int i = 0;
+  quicklist * flist = addresses;
+  while (flist) {
+    const faction * f = (const faction *)ql_get(flist, i);
     if (uf!=f) {
       fprintf(F, "PARTEI %d\n", f->no);
       fprintf(F, "\"%s\";Parteiname\n", f->name);
@@ -974,7 +976,7 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
         fprintf(F, "%d;alliance\n", f->alliance->id);
       }
     }
-    flist = flist->next;
+    ql_advance(&flist, &i, 1);
   }
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */

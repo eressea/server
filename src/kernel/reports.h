@@ -83,7 +83,7 @@ extern const char * visibility[];
 
 typedef struct report_context {
   struct faction * f;
-  struct faction_list * addresses;
+  struct quicklist * addresses;
   struct seen_region ** seen;
   struct region * first, * last;
   void * userdata;

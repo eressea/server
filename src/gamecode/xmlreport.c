@@ -672,7 +672,8 @@ xml_region(report_context * ctx, seen_region * sr)
 static xmlNodePtr
 report_root(report_context * ctx)
 {
-  const faction_list * address;
+  int qi;
+  quicklist * address;
   region * r = ctx->first, * rend = ctx->last;
   xml_context* xct = (xml_context*)ctx->userdata;
   xmlNodePtr node, child, xmlReport = xmlNewNode(NULL, BAD_CAST "atlantis");
@@ -697,9 +698,9 @@ report_root(report_context * ctx)
   xmlNewTextChild(node, xct->ns_atl, BAD_CAST "time", (xmlChar *)zText);
   xmlNewTextChild(node, xct->ns_atl, BAD_CAST "turn", (xmlChar *)itoab(turn, 10));
 
-
-  for (address=ctx->addresses;address;address=address->next) {
-    xmlAddChild(xmlReport, xml_faction(ctx, address->data));
+  for (qi=0,address=ctx->addresses;address;ql_advance(&address, &qi, 1)) {
+    faction * f = (faction *)ql_get(address, qi);
+    xmlAddChild(xmlReport, xml_faction(ctx, f));
   }
 
   for (;r!=rend;r=r->next) {
