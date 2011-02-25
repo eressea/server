@@ -223,7 +223,6 @@ tolua_building_open(lua_State* L)
 {
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "building");
-  tolua_usertype(L, TOLUA_CAST "building_list");
 
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);

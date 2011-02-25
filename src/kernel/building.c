@@ -429,27 +429,6 @@ read_building_reference(struct storage * store)
   return result;
 }
 
-void
-free_buildinglist(building_list *blist)
-{
-  while (blist) {
-    building_list * rl2 = blist->next;
-    free(blist);
-    blist = rl2;
-  }
-}
-
-void
-add_buildinglist(building_list **blist, building *b)
-{
-  building_list *rl2 = (building_list*)malloc(sizeof(building_list));
-
-  rl2->data = b;
-  rl2->next = *blist;
-
-  *blist = rl2;
-}
-
 building *
 new_building(const struct building_type * btype, region * r, const struct locale * lang)
 {
