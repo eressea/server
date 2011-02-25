@@ -57,6 +57,7 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libxml2.lib;pdcurses.lib;lua.lib;tolua.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -74,6 +75,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libxml2.lib;pdcurses.lib;lua.lib;tolua.lib;%(AdditionalDependencies)</AdditionalDependencies>

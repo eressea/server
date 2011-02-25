@@ -416,6 +416,9 @@ function test_alliance()
   assert(f1.alliance~=nil)
   assert(f2.alliance~=nil)
   assert(f2.alliance==f1.alliance)
+  for f in f1.alliance.factions do
+    assert_true(f==f1 or f==f2)
+  end
   u1:clear_orders()
   u2:clear_orders()
   u2:add_order("ALLIANZ AUSSTOSSEN " .. itoa36(f1.id))
