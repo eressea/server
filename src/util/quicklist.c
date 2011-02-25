@@ -29,7 +29,7 @@ struct quicklist {
 };
 
 
-void * ql_get(quicklist * ql, int index) {
+void * ql_get(const quicklist * ql, int index) {
   return (ql && index<ql->num_elements)?ql->elements[index]:ql_get(ql->next, index-ql->num_elements);
 }
 
@@ -43,7 +43,7 @@ void ql_push(quicklist ** qlp, void * data) {
     qlp = &(*qlp)->next;
   }
   if (!*qlp) {
-    ql = malloc(sizeof(quicklist));
+    ql = (quicklist *)malloc(sizeof(quicklist));
     ql->num_elements = 0;
     ql->next = 0;
     *qlp = ql;
@@ -94,7 +94,7 @@ int ql_insert(quicklist ** qlp, int index, void * data) {
       ql->elements[index]=data;
       ++ql->num_elements;
     } else {
-      quicklist * qn = malloc(sizeof(quicklist));
+      quicklist * qn = (quicklist *)malloc(sizeof(quicklist));
       qn->next = ql->next;
       ql->next = qn;
       qn->num_elements = QL_LIMIT;
@@ -144,4 +144,33 @@ void ql_free(struct quicklist * ql)
 {
   if (ql->next) ql_free(ql->next);
   free(ql);
+}
+
+int ql_set_insert(struct quicklist ** qlp, void * data)
+{
+  if (*qlp) {
+    quicklist * ql = *qlp;
+    if (ql->num_elements>0 && ql->elements[ql->num_elements-1] < data) {
+      if (ql->num_elements==QL_MAXSIZE || (ql->next && ql->next->elements[0]<=data)) {
+        return ql_set_insert(&ql->next, data);
+      } else {
+        ql->elements[ql->num_elements++] = data;
+      }
+      return 0;
+    } else {
+      int i;
+      /* TODO: OPT | binary search */
+      for (i=0;i!=ql->num_elements;++i) {
+        if (data < ql->elements[i]) {
+          ql_insert(qlp, i, data);
+          return 0;
+        }
+        if (data == ql->elements[i]) {
+          return 1;
+        }
+      }
+    }
+  }
+  ql_push(qlp, data);
+  return 0;
 }

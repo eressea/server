@@ -17,6 +17,33 @@ static void test_insert(CuTest * tc) {
   }
 }
 
+static void test_insert_delete_gives_null(CuTest * tc) {
+  struct quicklist * ql = NULL;
+  ql_push(&ql, (void*)42);
+  ql_delete(&ql, 0);
+  CuAssertPtrEquals(tc, 0, ql);
+}
+
+static void test_set_insert(CuTest * tc) {
+  struct quicklist * ql = NULL;
+  int a;
+  a = ql_set_insert(&ql, (void*)42);
+  CuAssertIntEquals(tc, 1, ql_length(ql));
+  CuAssertIntEquals(tc, 0, a);
+  a = ql_set_insert(&ql, (void*)43);
+  CuAssertIntEquals(tc, 2, ql_length(ql));
+  CuAssertIntEquals(tc, 0, a);
+  a = ql_set_insert(&ql, (void*)42);
+  CuAssertIntEquals(tc, 2, ql_length(ql));
+  CuAssertIntEquals(tc, 1, a);
+  a = ql_set_insert(&ql, (void*)41);
+  CuAssertIntEquals(tc, 0, a);
+  CuAssertIntEquals(tc, 3, ql_length(ql));
+  CuAssertIntEquals(tc, 41, (int)ql_get(ql, 0));
+  CuAssertIntEquals(tc, 42, (int)ql_get(ql, 1));
+  CuAssertIntEquals(tc, 43, (int)ql_get(ql, 2));
+}
+
 static void test_advance(CuTest * tc) {
   struct quicklist * ql = NULL, *qli;
   int i, n = 31;
@@ -84,8 +111,10 @@ CuSuite* get_quicklist_suite(void)
   SUITE_ADD_TEST(suite, test_advance);
   SUITE_ADD_TEST(suite, test_push);
   SUITE_ADD_TEST(suite, test_insert);
+  SUITE_ADD_TEST(suite, test_insert_delete_gives_null);
   SUITE_ADD_TEST(suite, test_insert_many);
   SUITE_ADD_TEST(suite, test_delete_rand);
   SUITE_ADD_TEST(suite, test_delete_edgecases);
+  SUITE_ADD_TEST(suite, test_set_insert);
   return suite;
 }
