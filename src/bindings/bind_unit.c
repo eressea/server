@@ -509,7 +509,7 @@ static void
 unit_addspell(unit * u, const char * name)
 {
   sc_mage * m = get_mage(u);
-  spell * spadd = find_spell(M_NONE, name);
+  spell * spadd = find_spell(m->magietyp, name);
 
   if (!spadd) log_error(("spell %s could not be found\n", name));
   else {
