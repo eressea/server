@@ -26,7 +26,7 @@ extern "C" {
   void select_coordinate(struct selection * selected, int x, int y, int on);
   void run_mapper(void);
 
-  int force_color;
+  extern int force_color;
 
   struct state * state_open(void);
   void state_close(struct state * );

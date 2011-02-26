@@ -34,6 +34,7 @@
 
 #ifndef HAVE_INLINE
 #include <util/bsdstring.c>
+#include <util/strings.c>
 #endif
 
 #ifdef __GNUC__

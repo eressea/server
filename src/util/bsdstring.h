@@ -9,10 +9,6 @@
   extern int wrptr(char ** ptr, size_t * size, int bytes);
 #endif
 
-#if !defined(HAVE_STRLCPY)
-# define HAVE_STRLCPY
-#endif
-
 #define WARN_STATIC_BUFFER() log_warning(("static buffer too small in %s:%d\n", __FILE__, __LINE__))
 
 #if !defined(HAVE_STRLPRINTF)

@@ -133,6 +133,12 @@ typedef struct stat stat_type;
 # define HAVE_MKDIR_WITH_PERMISSION
 #endif
 
+/* TinyCC */
+#ifdef TINYCC
+# undef HAVE_INLINE
+# define INLINE_FUNCTION  
+#endif
+  
 /* lcc-win32 */
 #ifdef __LCC__
 # include <string.h>
