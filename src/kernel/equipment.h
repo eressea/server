@@ -43,7 +43,7 @@ extern "C" {
     char * name;
     struct itemdata * items;
     char * skills[MAXSKILLS];
-    struct spell_list * spells;
+    struct quicklist * spells;
     struct subset * subsets;
     struct equipment * next;
     void (*callback)(const struct equipment *, struct unit *);

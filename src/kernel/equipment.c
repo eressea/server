@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "race.h"
 
 /* util includes */
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -89,7 +90,7 @@ void
 equipment_addspell(equipment * eq, spell * sp)
 {
   if (eq!=NULL) {
-    spelllist_add(&eq->spells, sp);
+    ql_set_insert(&eq->spells, sp);
   }
 }
 
@@ -103,7 +104,7 @@ equipment_setitem(equipment * eq, const item_type * itype, const char * value)
         idata = idata->next;
       }
       if (idata==NULL) {
-        idata = malloc(sizeof(itemdata));
+        idata = (itemdata *)malloc(sizeof(itemdata));
         idata->itype = itype;
         idata->value = strdup(value);
         idata->next = eq->items;
@@ -141,15 +142,16 @@ equip_unit_mask(struct unit * u, const struct equipment * eq, int mask)
     }
 
     if (mask&EQUIP_SPELLS) {
-      spell_list * sp = eq->spells;
-      if (sp!=NULL) {
+      quicklist * ql = eq->spells;
+      if (ql) {
         sc_mage * m = get_mage(u);
         if (m==NULL) {
           assert(!"trying to equip spells on a non-mage!");
         } else {
-          while (sp) {
-            add_spell(get_spelllist(m, u->faction), sp->data);
-            sp = sp->next;
+          int qi;
+          for (qi=0;ql;ql_advance(&ql, &qi, 1)) {
+            spell * sp = (spell *)ql_get(ql, qi);
+            add_spell(get_spelllist(m, u->faction), sp);
           }
         }
       }
