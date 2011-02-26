@@ -6,6 +6,8 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 
+#include <util/quicklist.h>
+
 #include <tolua.h>
 
 static int
@@ -64,11 +66,7 @@ fix_familiars(struct lua_State * L)
           equipment * eq;
           char buffer[64];
 
-          while (mage->spells) {
-            spell_list * slist = mage->spells;
-            mage->spells = mage->spells->next;
-            free(slist);
-          }
+          ql_free(mage->spells);
 
           snprintf(buffer, sizeof(buffer), "%s_familiar", u->race->_name[0]);
           eq = get_equipment(buffer);

@@ -178,13 +178,15 @@ init_crtdbg(void)
 
 
 static void
-write_spells(void)
+dump_spells(void)
 {
   struct locale * loc = find_locale("de");
   FILE * F = fopen("spells.csv", "w");
-  spell_list * spl = spells;
-  for (;spl;spl=spl->next) {
-    const spell * sp = spl->data;
+  quicklist * ql;
+  int qi;
+
+  for (ql=spells,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
     spell_component * spc = sp->components;
     char components[128];
     components[0]=0;
@@ -198,7 +200,7 @@ write_spells(void)
 }
 
 static void
-write_skills(void)
+dump_skills(void)
 {
   struct locale * loc = find_locale("de");
   FILE * F = fopen("skills.csv", "w");
@@ -271,8 +273,8 @@ int main(int argc, char ** argv)
   bind_eressea((struct lua_State *)global.vm_state);
 
   if (write_csv) {
-    write_skills();
-    write_spells();
+    dump_skills();
+    dump_spells();
   }
 
   err = eressea_run(luafile, entry_point);
