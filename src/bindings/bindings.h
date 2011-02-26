@@ -15,6 +15,8 @@ extern "C" {
 #endif
 
   struct lua_State;
+  struct quicklist;
+  
   int tolua_sqlite_open(struct lua_State * L);
   int tolua_eressea_open(struct lua_State* L);
   int tolua_spelllist_next(struct lua_State *L);
