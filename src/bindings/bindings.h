@@ -20,6 +20,7 @@ extern "C" {
   int tolua_spelllist_next(struct lua_State *L);
   int tolua_itemlist_next(struct lua_State *L);
   int tolua_orderlist_next(struct lua_State *L);
+  int tolua_quicklist_push(struct lua_State *L, const char * list_type, const char * elem_type, struct quicklist * list);
 
   int log_lua_error(struct lua_State * L);
 #ifdef __cplusplus

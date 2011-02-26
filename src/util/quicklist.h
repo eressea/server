@@ -34,6 +34,9 @@ void ql_free(struct quicklist * ql);
 
 /* you can use it as a set (sorted pointers)*/
 int ql_set_insert(struct quicklist ** qlp, void * data);
+int ql_set_find(struct quicklist ** qlp, int * qip, const void * data);
+int ql_set_remove(struct quicklist ** qlp, void * data);
+
 #ifdef __cplusplus
 }
 #endif

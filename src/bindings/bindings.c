@@ -92,7 +92,7 @@ int tolua_orderlist_next(lua_State *L)
   else return 0;  /* no more values to return */
 }
 
-int tolua_quicklist_iter(lua_State *L)
+static int tolua_quicklist_iter(lua_State *L)
 {
   quicklist** qlp = (quicklist **)lua_touserdata(L, lua_upvalueindex(1));
   quicklist* ql = *qlp;
@@ -110,16 +110,21 @@ int tolua_quicklist_iter(lua_State *L)
   else return 0;  /* no more values to return */
 }
 
-int tolua_spelllist_next(lua_State *L)
+int tolua_quicklist_push(struct lua_State *L, const char * list_type, const char * elem_type, struct quicklist * list)
 {
-  spell_list** spell_ptr = (spell_list **)lua_touserdata(L, lua_upvalueindex(1));
-  spell_list* slist = *spell_ptr;
-  if (slist != NULL) {
-    tolua_pushusertype(L, slist->data, TOLUA_CAST "spell");
-    *spell_ptr = slist->next;
-    return 1;
+  if (list) {
+    quicklist ** qlist_ptr = (quicklist**)lua_newuserdata(L, sizeof(quicklist *));
+    *qlist_ptr = list;
+
+    luaL_getmetatable(L, list_type);
+    lua_setmetatable(L, -2);
+    lua_pushnumber(L, 0);
+    lua_pushstring(L, elem_type);
+    lua_pushcclosure(L, tolua_quicklist_iter, 3); /* OBS: this closure has multiple upvalues (list, index, type_name) */
+  } else {
+    lua_pushnil(L);
   }
-  else return 0;  /* no more values to return */
+  return 1;
 }
 
 int tolua_itemlist_next(lua_State *L)
@@ -747,18 +752,7 @@ static int
 tolua_get_alliance_factions(lua_State* L)
 {
   alliance * self = (alliance *)tolua_tousertype(L, 1, 0);
-  quicklist ** faction_ptr = (quicklist**)lua_newuserdata(L, sizeof(quicklist *));
-
-  luaL_getmetatable(L, "faction_list");
-  lua_setmetatable(L, -2);
-
-  lua_pushnumber(L, 0);
-
-  *faction_ptr = self->members;
-
-  lua_pushstring(L, "faction");
-  lua_pushcclosure(L, tolua_quicklist_iter, 3); /* OBS: this closure has multiple upvalues (list, index, type_name) */
-  return 1;
+  return tolua_quicklist_push(L, "faction_list", "faction", self->members);
 }
 
 static int tolua_get_alliance_id(lua_State* L)
@@ -794,10 +788,11 @@ tolua_write_spells(lua_State* L)
   const char * filename = "magic.xml";
   xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
   xmlNodePtr root = xmlNewNode(NULL, BAD_CAST "spells");
-  spell_list * splist;
+  quicklist * ql;
+  int qi;
 
-  for (splist=spells; splist; splist=splist->next) {
-    spell * sp = splist->data;
+  for (ql=spells,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
     if (sp->sp_function!=fun) {
       int combat = 0;
       xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
@@ -904,19 +899,7 @@ tolua_get_spell_name(lua_State *L)
 
 static int tolua_get_spells(lua_State* L)
 {
-  spell_list * slist = spells;
-  if (slist) {
-    spell_list ** spell_ptr = (spell_list **)lua_newuserdata(L, sizeof(spell_list *));
-    luaL_getmetatable(L, "spell_list");
-    lua_setmetatable(L, -2);
-
-    *spell_ptr = slist;
-    lua_pushcclosure(L, tolua_spelllist_next, 1);
-    return 1;
-  }
-
-  lua_pushnil(L);
-  return 1;
+  return tolua_quicklist_push(L, "spell_list", "spell", spells);
 }
 
 int

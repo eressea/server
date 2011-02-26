@@ -43,6 +43,7 @@ without prior permission by the authors of Eressea.
 #include <util/event.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 
 #include <lua.h>
 #include <tolua.h>
@@ -468,9 +469,11 @@ tolua_unit_addnotice(lua_State* L)
 static void
 unit_castspell(unit * u, const char * name)
 {
-  spell_list * slist = spells;
-  while (slist!=NULL) {
-    spell * sp = slist->data;
+  quicklist * ql = spells;
+  int qi;
+
+  for (ql=spells,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
     if (strcmp(name, sp->sname)==0) {
       castorder * co = (castorder*)malloc(sizeof(castorder));
       co->distance = 0;
@@ -490,7 +493,6 @@ unit_castspell(unit * u, const char * name)
       }
       free(co);
     }
-    slist=slist->next;
   }
 }
 
@@ -506,23 +508,12 @@ tolua_unit_castspell(lua_State* L)
 static void
 unit_addspell(unit * u, const char * name)
 {
-  int add = 0;
   sc_mage * m = get_mage(u);
-  spell_list * slist = spells;
-  spell_list ** starget = NULL;
-  spell * spadd = NULL;
-  while (slist!=NULL) {
-    spell * sp = slist->data;
-    if (strcmp(name, sp->sname)==0) {
-      starget = get_spelllist(m, u->faction);
-      if (m->magietyp==sp->magietyp) spadd = sp;
-      else if (!spadd) spadd = sp;
-      add = 1;
-    }
-    slist=slist->next;
-  }
+  spell * spadd = find_spell(M_NONE, name);
+
   if (!spadd) log_error(("spell %s could not be found\n", name));
   else {
+    quicklist ** starget = get_spelllist(m, u->faction);
     add_spell(starget, spadd);
   }
 }
@@ -537,19 +528,12 @@ tolua_unit_addspell(lua_State* L)
 }
 
 static void
-unit_removespell(unit * u, const spell * sp)
+unit_removespell(unit * u, spell * sp)
 {
-  spell_list ** isptr;
-  isptr = get_spelllist(get_mage(u), u->faction);
+  quicklist ** isptr;
 
-  while (*isptr && (*isptr)->data != sp) {
-    isptr = &(*isptr)->next;
-  }
-  if (*isptr) {
-    spell_list * sptr = *isptr;
-    *isptr = sptr->next;
-    free(sptr);
-  }
+  isptr = get_spelllist(get_mage(u), u->faction);
+  ql_set_remove(isptr, sp);
 }
 
 static int
@@ -760,23 +744,16 @@ static int tolua_unit_get_spells(lua_State* L)
 {
   unit* self = (unit*)tolua_tousertype(L, 1, 0);
   sc_mage * mage = get_mage(self);
+  quicklist * slist = 0;
 
   if (mage) {
-    spell_list ** slist = get_spelllist(mage, self->faction);
-    assert(slist);
-    if (slist) {
-      spell_list ** spell_ptr = (spell_list **)lua_newuserdata(L, sizeof(spell_list *));
-      luaL_getmetatable(L, TOLUA_CAST "spell_list");
-      lua_setmetatable(L, -2);
-
-      *spell_ptr = *slist;
-      lua_pushcclosure(L, tolua_spelllist_next, 1);
-      return 1;
+    quicklist ** slist_ptr = get_spelllist(mage, self->faction);
+    if (slist_ptr) {
+      slist = *slist_ptr;
     }
   }
 
-  lua_pushnil(L);
-  return 1;
+  return tolua_quicklist_push(L, "spell_list", "spell", slist);
 }
 
 static int tolua_unit_get_orders(lua_State* L)

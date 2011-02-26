@@ -26,7 +26,7 @@ static void test_insert_delete_gives_null(CuTest * tc) {
 
 static void test_set_insert(CuTest * tc) {
   struct quicklist * ql = NULL;
-  int a;
+  int a, qi;
   a = ql_set_insert(&ql, (void*)42);
   CuAssertIntEquals(tc, 1, ql_length(ql));
   CuAssertIntEquals(tc, 0, a);
@@ -42,6 +42,64 @@ static void test_set_insert(CuTest * tc) {
   CuAssertIntEquals(tc, 41, (int)ql_get(ql, 0));
   CuAssertIntEquals(tc, 42, (int)ql_get(ql, 1));
   CuAssertIntEquals(tc, 43, (int)ql_get(ql, 2));
+
+  a = ql_set_find(&ql, &qi, (void *)49);
+  CuAssertIntEquals(tc, 0, a);
+  a = ql_set_find(&ql, &qi, (void *)42);
+  CuAssertIntEquals(tc, 1, a);
+  CuAssertIntEquals(tc, 42, (int)ql_get(ql, qi));
+}
+
+static void test_set_remove(CuTest * tc) {
+  struct quicklist * ql = NULL, * q2;
+  int a;
+
+  ql_set_insert(&ql, (void*)41);
+  ql_set_insert(&ql, (void*)42);
+  ql_set_insert(&ql, (void*)43);
+
+  q2 = ql;
+
+  a = ql_set_remove(&ql, (void*)42);
+  CuAssertPtrEquals(tc, q2, ql);
+  CuAssertIntEquals(tc, 1, a);
+  CuAssertIntEquals(tc, 41, (int)ql_get(ql, 0));
+  CuAssertIntEquals(tc, 43, (int)ql_get(ql, 1));
+  CuAssertIntEquals(tc, 2, ql_length(ql));
+
+  a = ql_set_remove(&ql, (void*)42);
+  CuAssertPtrEquals(tc, q2, ql);
+  CuAssertIntEquals(tc, 0, a);
+
+  ql_set_remove(&ql, (void*)41);
+  ql_set_remove(&ql, (void*)43);
+  CuAssertPtrEquals(tc, 0, ql);
+}
+
+static void test_set_find(CuTest * tc) {
+  struct quicklist * ql = NULL, * q2;
+  int a, qi;
+
+  for (a=0;a!=32;++a) {
+    ql_set_insert(&ql, (void *)a);
+  }
+
+  q2 = ql;
+  a = ql_set_find(&q2, 0, (void *)31);
+  CuAssertIntEquals(tc, 1, a);
+  CuAssertPtrEquals(tc, ql, q2);
+
+  q2 = ql;
+  a = ql_set_find(&ql, &qi, (void *)0);
+  CuAssertIntEquals(tc, 1, a);
+  CuAssertIntEquals(tc, 0, qi);
+  CuAssertPtrEquals(tc, ql, q2);
+
+  q2 = ql;
+  a = ql_set_find(&ql, &qi, (void *)31);
+  CuAssertIntEquals(tc, 1, a);
+  CuAssertIntEquals(tc, 31, (int)ql_get(ql, qi));
+  CuAssertTrue(tc, ql!=q2);
 }
 
 static void test_advance(CuTest * tc) {
@@ -111,6 +169,8 @@ CuSuite* get_quicklist_suite(void)
   SUITE_ADD_TEST(suite, test_advance);
   SUITE_ADD_TEST(suite, test_push);
   SUITE_ADD_TEST(suite, test_insert);
+  SUITE_ADD_TEST(suite, test_set_remove);
+  SUITE_ADD_TEST(suite, test_set_find);
   SUITE_ADD_TEST(suite, test_insert_delete_gives_null);
   SUITE_ADD_TEST(suite, test_insert_many);
   SUITE_ADD_TEST(suite, test_delete_rand);

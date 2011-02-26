@@ -58,6 +58,7 @@ without prior permission by the authors of Eressea.
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/quicklist.h>
 #include <util/unicode.h>
 #include <util/xml.h>
 
@@ -173,13 +174,15 @@ xml_inventory(report_context * ctx, item * items, unit * u)
 }
 
 static xmlNodePtr
-xml_spells(report_context * ctx, spell_list * slist, int maxlevel)
+xml_spells(report_context * ctx, quicklist * slist, int maxlevel)
 {
   xml_context* xct = (xml_context*)ctx->userdata;
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "spells");
+  quicklist * ql;
+  int qi;
 
-  for (;slist; slist = slist->next) {
-    spell * sp = slist->data;
+  for (ql=slist,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
 
     if (sp->level <= maxlevel) {
       child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "spell"));
@@ -338,7 +341,7 @@ xml_unit(report_context * ctx, unit * u, int mode)
     /* spells */
     if (is_mage(u)) {
       sc_mage * mage = get_mage(u);
-      spell_list * slist = mage->spells;
+      quicklist * slist = mage->spells;
       if (slist) {
         xmlAddChild(node, xml_spells(ctx, slist, effskill(u, SK_MAGIC)));
       }

@@ -53,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -208,7 +209,7 @@ int FactionSpells(void)
   return rules_factionspells;
 }
 
-void read_spellist(struct spell_list ** slistp, magic_t mtype, struct storage * store)
+void read_spells(struct quicklist ** slistp, magic_t mtype, struct storage * store)
 {
   for (;;) {
     spell * sp;
@@ -269,16 +270,18 @@ read_mage(attrib * a, void * owner, struct storage * store)
       }
     }
   }
-  read_spellist(&mage->spells, mage->magietyp, store);
+  read_spells(&mage->spells, mage->magietyp, store);
   return AT_READ_OK;
 }
 
-void write_spelllist(const spell_list * slist, struct storage * store)
+void write_spells(struct quicklist * slist, struct storage * store)
 {
-  while (slist!=NULL) {
-    spell * sp = slist->data;
+  quicklist * ql;
+  int qi;
+
+  for (ql=slist,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
     store->w_tok(store, sp->sname);
-    slist = slist->next;
   }
   store->w_tok(store, "end");
 }
@@ -296,7 +299,7 @@ write_mage(const attrib * a, const void * owner, struct storage * store)
     store->w_tok(store, mage->combatspells[i].sp?mage->combatspells[i].sp->sname:"none");
     store->w_int(store, mage->combatspells[i].level);
   }
-  write_spelllist(mage->spells, store);
+  write_spells(mage->spells, store);
 }
 
 attrib_type at_mage = {
@@ -404,6 +407,13 @@ static boolean know_school(const faction * f, magic_t school)
 #define COMMONSPELLS 1 /* number of new common spells per level */
 #define MAXSPELLS 256
 
+static boolean
+has_spell(quicklist * ql, const spell * sp)
+{
+  int qi;
+  return ql_set_find(&ql, &qi, sp)!=0;
+}
+
 /** update the spellbook with a new level
 * Written for Eressea 1.1
 */
@@ -411,18 +421,16 @@ void
 update_spellbook(faction * f, int level)
 {
   spell * commonspells[MAXSPELLS];
-  int numspells = 0;
-  spell_list * slist;
+  int qi, numspells = 0;
+  quicklist * ql;
 
-  for (slist=spells;slist!=NULL;slist=slist->next) {
-    spell * sp = slist->data;
+  for (qi=0,ql=spells;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
     if (sp->magietyp == M_COMMON && level>f->max_spelllevel && sp->level<=level) {
       commonspells[numspells++] = sp;
     } else {
       if (know_school(f, sp->magietyp) && sp->level <= level) {
-        if (!has_spell(f->spellbook, sp)) {
-          add_spell(&f->spellbook, sp);
-        }
+        add_spell(&f->spellbook, sp);
       }
     }
   }
@@ -442,7 +450,7 @@ update_spellbook(faction * f, int level)
       while (maxspell>0 && sp && sp->level<=f->max_spelllevel && !has_spell(f->spellbook, sp));
 
       if (sp) {
-        add_spell(&f->spellbook, sp);
+        ql_set_insert(&f->spellbook, sp);
         commonspells[spellno] = 0;
       }
     }
@@ -454,9 +462,11 @@ void
 updatespelllist(unit * u)
 {
   int sk = eff_skill(u, SK_MAGIC, u->region);
-  spell_list * slist = spells;
+  quicklist * ql = spells;
+  int qi;
   struct sc_mage * mage = get_mage(u);
   boolean ismonster = is_monsters(u->faction);
+  quicklist ** dst;
 
   if (mage->magietyp==M_GRAY) {
     /* Magier mit M_GRAY bekommen weder Sprüche angezeigt noch
@@ -466,18 +476,19 @@ updatespelllist(unit * u)
   }
 
   if (FactionSpells()) {
-    slist = u->faction->spellbook;
+    ql = u->faction->spellbook;
   }
+  dst = get_spelllist(mage, u->faction);
 
-  for (;slist!=NULL;slist=slist->next) {
-    spell * sp = slist->data;
+  for (qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    spell * sp = (spell *)ql_get(ql, qi);
     if (sp->level<=sk) {
       boolean know = u_hasspell(u, sp);
 
       if (know || sp->magietyp==M_COMMON || know_school(u->faction, sp->magietyp)) {
         faction * f = u->faction;
 
-        if (!know) add_spell(get_spelllist(mage, u->faction), sp);
+        if (!know) add_spell(dst, sp);
         if (!ismonster && !already_seen(u->faction, sp)) {
           a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
           a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
@@ -511,39 +522,24 @@ create_mage(unit * u, magic_t mtyp)
 /* Funktionen für die Bearbeitung der List-of-known-spells */
 
 void
-add_spell(spell_list ** slistp, spell * sp)
+add_spell(struct quicklist ** slistp, spell * sp)
 {
-  if (slistp==NULL) {
-    log_error(("add_spell: unit is not a mage.\n"));
-  } else {
-    spell_list ** slist = spelllist_find(slistp, sp);
-    if (*slist) {
-      spell * psp = (*slist)->data;
-      if (psp==sp) {
-        log_error(("add_spell: unit already has spell '%s'.\n", sp->sname));
-        return;
-      }
-    }
-    spelllist_add(slist, sp);
-  }
-}
+  quicklist * ql = *slistp;
+  int qi;
 
-boolean
-has_spell(spell_list * slist, const spell * sp)
-{
-  if (slist!=NULL) {
-    spell_list * sfind = *spelllist_find(&slist, sp);
-    return sfind!=NULL && sfind->data==sp;
+  if (ql_set_find(&ql, &qi, sp)) {
+    log_error(("add_spell: the list already contains the spell '%s'.\n", sp->sname));
+  } else {
+    ql_set_insert(slistp, sp);
   }
-  return false;
 }
 
 boolean 
 u_hasspell(const struct unit *u, const struct spell * sp)
 {
   sc_mage * mage = get_mage(u);
-  if (mage) return has_spell(mage->spells, sp);
-  return false;
+  
+  return (mage)?has_spell(mage->spells, sp):false;
 }
 
 /* ------------------------------------------------------------- */
@@ -2881,40 +2877,7 @@ curse_name(const curse_type * ctype, const struct locale * lang)
   return LOC(lang, mkname("spell", ctype->cname));
 }
 
-void
-spelllist_add(spell_list ** lspells, spell * sp)
-{
-  spell_list * entry;
-
-  while (*lspells) {
-    spell_list * slist = *lspells;
-    if (slist->data->id==sp->id) {
-      if (slist->data==sp) {
-        log_error(("trying to add spell '%s' to a list twice.\n", sp->sname));
-        return;
-      }
-    }
-    if (slist->data->id>sp->id) break;
-    lspells = &slist->next;
-  }
-  entry = malloc(sizeof(spell_list));
-  entry->data = sp;
-  entry->next = *lspells;
-  *lspells = entry;
-}
-
-spell_list ** 
-spelllist_find(spell_list ** lspells, const spell * sp)
-{
-  while (*lspells) {
-    spell_list * slist = *lspells;
-    if (slist->data->id>=sp->id) break;
-    lspells = &slist->next;
-  }
-  return lspells;
-}
-
-extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f)
+struct quicklist ** get_spelllist(struct sc_mage * mage, struct faction * f)
 {
   if (mage) {
     return &mage->spells;

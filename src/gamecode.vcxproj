@@ -93,6 +93,7 @@
     <ClCompile Include="gamecode\economy.c" />
     <ClCompile Include="eressea.c" />
     <ClCompile Include="gamecode\give.c" />
+    <ClCompile Include="gamecode\xmlreport.c" />
     <ClCompile Include="gmtool.c" />
     <ClCompile Include="gamecode\items.c" />
     <ClCompile Include="gamecode\laws.c" />
@@ -119,6 +120,7 @@
     <ClInclude Include="gamecode\economy.h" />
     <ClInclude Include="eressea.h" />
     <ClInclude Include="gamecode\give.h" />
+    <ClInclude Include="gamecode\xmlreport.h" />
     <ClInclude Include="gmtool.h" />
     <ClInclude Include="gmtool_structs.h" />
     <ClInclude Include="gamecode\items.h" />

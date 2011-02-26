@@ -641,12 +641,15 @@ fwriteorder(FILE * F, const struct order * ord, const struct locale * lang, bool
   fputc('"', F);
 }
 
-static void cr_output_spells(FILE * F, spell_list * slist, const faction * f, int maxlevel)
+static void cr_output_spells(FILE * F, quicklist * slist, const faction * f, int maxlevel)
 {
   if (slist) {
+    quicklist * ql;
+    int qi;
     fprintf(F, "SPRUECHE\n");
-    for (;slist; slist = slist->next) {
-      spell * sp = slist->data;
+
+    for (ql=slist,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+      spell * sp = (spell *)ql_get(ql, qi);
       if (sp->level <= maxlevel) {
         const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
         fprintf(F, "\"%s\"\n", name);
@@ -868,7 +871,7 @@ cr_output_unit(FILE * F, const region * r,
     /* spells */
     if (is_mage(u)) {
       sc_mage * mage = get_mage(u);
-      spell_list ** slistp = get_spelllist(mage, u->faction);
+      quicklist ** slistp = get_spelllist(mage, u->faction);
       int i, maxlevel = effskill(u, SK_MAGIC);
 
       cr_output_spells(F, *slistp, f, maxlevel);

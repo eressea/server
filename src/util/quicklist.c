@@ -147,6 +147,22 @@ void ql_free(struct quicklist * ql)
   free(ql);
 }
 
+int ql_set_remove(struct quicklist ** qlp, void * data)
+{
+  int qi;
+  quicklist * ql = *qlp;
+
+  if (!ql) return 0;
+
+  for (qi=0;qi!=ql->num_elements;++qi) {
+    void * qd = ql_get(ql, qi);
+    if (qd==data) {
+      return ql_delete(qlp, qi)==0;
+    }
+  }
+  return ql_set_remove(&ql->next, data);
+}
+
 int ql_set_insert(struct quicklist ** qlp, void * data)
 {
   if (*qlp) {
@@ -173,5 +189,32 @@ int ql_set_insert(struct quicklist ** qlp, void * data)
     }
   }
   ql_push(qlp, data);
+  return 0;
+}
+
+int ql_set_find(struct quicklist ** qlp, int * qip, const void * data)
+{
+  quicklist * ql = *qlp;
+  int qi;
+
+  while (ql && ql->elements[ql->num_elements-1]<data) {
+    ql=ql->next;
+  }
+  
+  if (!ql) return 0;
+
+  /* TODO: OPT | binary search */
+  for (qi=0;qi!=ql->num_elements;++qi) {
+    if (ql->elements[qi]>data) {
+      return 0;
+    }
+    if (ql->elements[qi]==data) {
+      if (qip) {
+        *qip = qi;
+        *qlp = ql;
+      }
+      return 1;
+    }
+  }
   return 0;
 }

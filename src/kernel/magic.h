@@ -25,6 +25,7 @@ extern "C" {
 #include "curse.h"
 struct fighter;
 struct building;
+struct quicklist;
 
 /* ------------------------------------------------------------- */
 
@@ -123,7 +124,7 @@ typedef struct sc_mage {
   int spchange;
   int spellcount;
   combatspell combatspells[MAXCOMBATSPELLS];
-  struct spell_list * spells;
+  struct quicklist * spells;
 } sc_mage;
 
 /* ------------------------------------------------------------- */
@@ -175,13 +176,6 @@ typedef struct spell {
   void (*patzer) (castorder*);
 } spell;
 
-typedef struct spell_list {
-  struct spell_list * next;
-  spell * data; /* TODO: should be const */
-} spell_list;
-
-extern void spelllist_add(spell_list ** lspells, struct spell * sp);
-extern spell_list ** spelllist_find(spell_list ** lspells, const struct spell * sp);
 /* ------------------------------------------------------------- */
 
 /* besondere Spruchtypen */
@@ -282,10 +276,8 @@ void set_combatspell(struct unit *u, spell *sp, struct order * ord, int level);
 	/* 	setzt Kampfzauber */
 void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
-void add_spell(spell_list ** slistp, spell *sp);
+void add_spell(struct quicklist ** slistp, spell *sp);
 	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-boolean has_spell(struct spell_list *slist, const struct spell * sp);
-	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
 boolean u_hasspell(const struct unit * u, const struct spell * sp);
     /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
 void update_spellbook(struct faction * f, int level);
@@ -383,10 +375,10 @@ extern const char * curse_name(const struct curse_type * ctype, const struct loc
 
 extern struct message * msg_unitnotfound(const struct unit * mage, struct order * ord, const struct spllprm * spobj);
 extern int FactionSpells(void);
-extern struct spell_list ** get_spelllist(struct sc_mage * mage, struct faction * f);
+extern struct quicklist ** get_spelllist(struct sc_mage * mage, struct faction * f);
 
-extern void write_spelllist(const struct spell_list * slist, struct storage * store);
-extern void read_spellist(struct spell_list ** slistp, magic_t mtype, struct storage * store);
+extern void write_spells(struct quicklist * slist, struct storage * store);
+extern void read_spells(struct quicklist ** slistp, magic_t mtype, struct storage * store);
 extern double MagicPower(void);
 
 #ifdef __cplusplus

@@ -73,7 +73,7 @@ typedef struct faction {
   char *passw;
   char *override;
   int max_spelllevel;
-  struct spell_list * spellbook;
+  struct quicklist * spellbook;
   const struct locale * locale;
   int lastorders;
   int age;

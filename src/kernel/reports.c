@@ -622,13 +622,13 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char * buf, siz
     sc_mage * m = get_mage(u);
 
     if (m!=NULL) {
-      spell_list *slist = m->spells;
-      int t = effskill(u, SK_MAGIC);
+      quicklist * ql = m->spells;
+      int qi, t = effskill(u, SK_MAGIC);
       int bytes = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region,u));
       if (bytes<0 || wrptr(&bufp, &size, bytes)!=0) WARN_STATIC_BUFFER();
 
-      for (dh=0; slist; slist=slist->next) {
-        spell * sp = slist->data;
+      for (dh=0,qi=0; ql; ql_advance(&ql, &qi, 1)) {
+        spell * sp = (spell *)ql_get(ql, qi);
         if (sp->level > t) continue;
         if (!dh) {
           bytes = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));

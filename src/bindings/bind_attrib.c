@@ -15,6 +15,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 
 #include <kernel/unit.h>
+#include <kernel/faction.h>
 #include <kernel/ship.h>
 #include <kernel/building.h>
 #include <kernel/region.h>

@@ -65,6 +65,9 @@
     <ClCompile Include="gamecode\summary.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gamecode\xmlreport.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gamecode\archetype.h">
@@ -119,6 +122,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gamecode\summary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamecode\xmlreport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

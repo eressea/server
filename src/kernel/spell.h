@@ -42,7 +42,7 @@ extern "C" {
   extern struct attrib_type at_unitdissolve;
   extern struct attrib_type at_wdwpyramid;
 
-  extern struct spell_list * spells;
+  extern struct quicklist * spells;
   extern void register_spell(struct spell * sp);
   extern struct spell * find_spell(magic_t mtype, const char * name);
   extern struct spell * find_spellbyid(magic_t mtype, spellid_t i);

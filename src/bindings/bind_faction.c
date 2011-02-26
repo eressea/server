@@ -471,19 +471,7 @@ tolua_faction_tostring(lua_State *L)
 static int tolua_faction_get_spells(lua_State* L)
 {
   faction* self = (faction*)tolua_tousertype(L, 1, 0);
-  spell_list * slist = self->spellbook;
-  if (slist) {
-    spell_list ** spell_ptr = (spell_list **)lua_newuserdata(L, sizeof(spell_list *));
-    luaL_getmetatable(L, TOLUA_CAST "spell_list");
-    lua_setmetatable(L, -2);
-
-    *spell_ptr = slist;
-    lua_pushcclosure(L, tolua_spelllist_next, 1);
-    return 1;
-  }
-
-  lua_pushnil(L);
-  return 1;
+  return tolua_quicklist_push(L, "spell_list", "spell", self->spellbook);
 }
 
 void
