@@ -1,11 +1,19 @@
 cmake_minimum_required(VERSION 2.4)
 project (eressea C)
 
+if (${CMAKE_C_COMPILER} MATCHES ".*tcc")
+  set(CMAKE_C_FLAGS "-Wall -g")
+  add_definitions(-DTINYCC)
+endif(${CMAKE_C_COMPILER} MATCHES ".*tcc")
+
+if (${CMAKE_C_COMPILER} MATCHES ".*gcc")
+  set(CMAKE_C_FLAGS "-g -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts")
+endif(${CMAKE_C_COMPILER} MATCHES ".*gcc")
+
 if (WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
 else (WIN32)
   include_directories (/usr/include/lua5.1/ /usr/include/libxml2)
-  set(CMAKE_C_FLAGS "-g -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts")
 endif (WIN32)
 include_directories (../external ../shared/src)
 
