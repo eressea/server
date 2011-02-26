@@ -23,7 +23,7 @@
 
 /* kernel includes */
 #include <kernel/curse.h>
-#include <kernel/battle.h> /* für lovar */
+#include <kernel/battle.h> /* fuer lovar */
 #include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -116,7 +116,7 @@ report_spell(unit * mage, region * r, message * msg)
 
 static void
 report_failure(unit * mage, struct order * ord) {
-  /* Fehler: "Der Zauber schlägt fehl" */
+  /* Fehler: "Der Zauber schlaegt fehl" */
   cmistake(mage, ord, 180, MSG_MAGIC);
 }
 
@@ -143,14 +143,14 @@ magicanalyse_region(region *r, unit *mage, double force)
 
     if (!fval(a->type, ATF_CURSE)) continue;
 
-    /* ist der curse schwächer als der Analysezauber, so ergibt sich
+    /* ist der curse schwaecher als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
     mon = MAX(1, mon);
     found = true;
 
-    if (chance(probability)) { /* Analyse geglückt */
+    if (chance(probability)) { /* Analyse geglueckt */
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_region_noage", "mage region curse",
@@ -184,13 +184,13 @@ magicanalyse_unit(unit *u, unit *mage, double force)
     if (!fval(a->type, ATF_CURSE)) continue;
 
     c = (curse*)a->data.v;
-    /* ist der curse schwächer als der Analysezauber, so ergibt sich
+    /* ist der curse schwaecher als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
     mon = MAX(1,mon);
 
-    if (chance(probability)) { /* Analyse geglückt */
+    if (chance(probability)) { /* Analyse geglueckt */
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_unit_noage", "mage unit curse",
@@ -225,13 +225,13 @@ magicanalyse_building(building *b, unit *mage, double force)
     if (!fval(a->type, ATF_CURSE)) continue;
 
     c = (curse*)a->data.v;
-    /* ist der curse schwächer als der Analysezauber, so ergibt sich
+    /* ist der curse schwaecher als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
     mon = MAX(1,mon);
 
-    if (chance(probability)) { /* Analyse geglückt */
+    if (chance(probability)) { /* Analyse geglueckt */
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_building_age", "mage building curse",
@@ -266,13 +266,13 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
     if (!fval(a->type, ATF_CURSE)) continue;
 
     c = (curse*)a->data.v;
-    /* ist der curse schwächer als der Analysezauber, so ergibt sich
+    /* ist der curse schwaecher als der Analysezauber, so ergibt sich
      * mehr als 100% probability und damit immer ein Erfolg. */
     probability = curse_chance(c, force);
     mon = c->duration + (rng_int()%10) - 5;
     mon = MAX(1,mon);
 
-    if (chance(probability)) { /* Analyse geglückt */
+    if (chance(probability)) { /* Analyse geglueckt */
       if (c_flags(c) & CURSE_NOAGE) {
         ADDMSG(&mage->faction->msgs, msg_message(
           "analyse_ship_noage", "mage ship curse",
@@ -311,14 +311,14 @@ break_curse(attrib **alist, int cast_level, double force, curse * c)
     }
     c1 = (curse*)a->data.v;
 
-    /* Immunität prüfen */
+    /* Immunitaet pruefen */
     if (c_flags(c1) & CURSE_IMMUNE) {
       do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
       continue;
     }
 
     /* Wenn kein spezieller cursetyp angegeben ist, soll die Antimagie
-     * auf alle Verzauberungen wirken. Ansonsten prüfe, ob der Curse vom
+     * auf alle Verzauberungen wirken. Ansonsten pruefe, ob der Curse vom
      * richtigen Typ ist. */
     if (!c || c==c1) {
       double remain = destr_curse(c1, cast_level, force);
@@ -355,7 +355,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
       /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
       if (u->faction != mage->faction) {
         if (r == mage->region) {
-          /* kein Fernzauber, prüfe, ob der Magier überhaupt gesehen
+          /* kein Fernzauber, pruefe, ob der Magier ueberhaupt gesehen
           * wird */
           if (cansee(u->faction, r, mage, 0)) {
             r_addmessage(r, u->faction, seen);
@@ -405,10 +405,10 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
     report_effect(r, mage, seen, unseen);
   }
 
- * Meldungen an den Magier über Erfolg sollten, wenn sie nicht als
+ * Meldungen an den Magier ueber Erfolg sollten, wenn sie nicht als
  * Regionsereigniss auftauchen, als MSG_MAGIC level ML_INFO unter
  * Zauberwirkungen gemeldet werden. Direkt dem Magier zuordnen (wie
- * Botschaft an Einheit) ist derzeit nicht möglich.
+ * Botschaft an Einheit) ist derzeit nicht moeglich.
  * ACHTUNG! r muss nicht die Region des Magier sein! (FARCASTING)
  *
  * Parameter:
@@ -422,15 +422,15 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * Stufe:   10
  *
  * Wirkung:
- * Der Magier beschwört einen Vertrauten, ein kleines Tier, welches
+ * Der Magier beschwoert einen Vertrauten, ein kleines Tier, welches
  * dem Magier zu Diensten ist.  Der Magier kann durch die Augen des
  * Vertrauten sehen, und durch den Vertrauten zaubern, allerdings nur
- * mit seiner halben Stufe. Je nach Vertrautem erhält der Magier
+ * mit seiner halben Stufe. Je nach Vertrautem erhaelt der Magier
  * evtl diverse Skillmodifikationen.  Der Typ des Vertrauten ist
- * zufällig bestimmt, wird aber durch Magiegebiet und Rasse beeinflußt.
+ * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflußt.
  * "Tierische" Vertraute brauchen keinen Unterhalt.
  *
- * Ein paar Möglichkeiten:
+ * Ein paar Moeglichkeiten:
  *       Magieg.  Rasse Besonderheiten
  * Eule   Tybied  -/-   fliegt, Auraregeneration
  * Rabe  Ilaun  -/-   fliegt
@@ -438,18 +438,18 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * Fuchs  Gwyrrd  -/-   Wahrnehmung
  * ????   Cerddor -/-   ???? (Singvogel?, Papagei?)
  * Adler  -/-   -/-   fliegt, +Wahrnehmung, =^=Adlerauge-Spruch?
- * Krähe  -/-   -/-   fliegt, +Tarnung (weil unauffällig)
+ * Kraehe  -/-   -/-   fliegt, +Tarnung (weil unauffaellig)
  * Delphin  -/-   Meerm.  schwimmt
  * Wolf   -/-   Ork
- * Hund   -/-   Mensch  kann evtl BEWACHE ausführen
+ * Hund   -/-   Mensch  kann evtl BEWACHE ausfuehren
  * Ratte  -/-   Goblin
  * Albatros -/-   -/-   fliegt, kann auf Ozean "landen"
- * Affe   -/-   -/-   kann evtl BEKLAUE ausführen
+ * Affe   -/-   -/-   kann evtl BEKLAUE ausfuehren
  * Goblin -/-   !Goblin normale Einheit
  * Katze  -/-   !Katze  normale Einheit
- * Dämon  -/-   !Dämon  normale Einheit
+ * Daemon  -/-   !Daemon  normale Einheit
  *
- * Spezielle V. für Katzen, Trolle, Elfen, Dämonen, Insekten, Zwerge?
+ * Spezielle V. fuer Katzen, Trolle, Elfen, Daemonen, Insekten, Zwerge?
  */
 
 static const race *
@@ -560,11 +560,11 @@ sp_summon_familiar(castorder *co)
   dh = 0;
   dh1 = 0;
   for (sk=0;sk<MAXSKILLS;sk++) {
-    if (rc->bonus[sk] > -5) dh++;
+    if (skill_enabled[sk] && rc->bonus[sk] > -5) dh++;
   }
 
   for (sk=0;sk<MAXSKILLS;sk++) {
-    if (rc->bonus[sk] > -5) {
+    if (skill_enabled[sk] && rc->bonus[sk] > -5) {
       dh--;
       if (dh1 == 0) {
         dh1 = 1;
@@ -586,14 +586,14 @@ sp_summon_familiar(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:     Zerstöre Magie
+/* Name:     Zerstoere Magie
  * Wirkung:
- *  Zerstört alle Zauberwirkungen auf dem Objekt. Jeder gebrochene
+ *  Zerstoert alle Zauberwirkungen auf dem Objekt. Jeder gebrochene
  *  Zauber verbraucht c->vigour an Zauberkraft. Wird der Spruch auf
  *  einer geringeren Stufe gezaubert, als der Zielzauber an c->vigour
- *  hat, so schlägt die Auflösung mit einer von der Differenz abhängigen
+ *  hat, so schlaegt die Aufloesung mit einer von der Differenz abhaengigen
  *  Chance fehl.  Auch dann wird force verbraucht, der Zauber jedoch nur
- *  abgeschwächt.
+ *  abgeschwaecht.
  *
  * Flag:
  *  (FARCASTING|SPELLLEVEL|ONSHIPCAST|TESTCANSEE)
@@ -612,7 +612,7 @@ sp_destroy_magic(castorder *co)
   int succ;
 
   /* da jeder Zauber force verbraucht und der Zauber auf alles und nicht
-   * nur einen Spruch wirken soll, wird die Wirkung hier verstärkt */
+   * nur einen Spruch wirken soll, wird die Wirkung hier verstaerkt */
   force *= 4;
 
   /* Objekt ermitteln */
@@ -677,10 +677,10 @@ sp_destroy_magic(castorder *co)
  * Gebiet:  alle
  * Kategorie:     Einheit, positiv
  * Wirkung:
- *   Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis
+ *   Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhaeltnis
  *   2:1 auf einen anderen Magier des gleichen Magiegebietes oder (nur
- *   bei Tybied) im Verhältnis 3:1 auf einen Magier eines anderen
- *   Magiegebietes übertragen.
+ *   bei Tybied) im Verhaeltnis 3:1 auf einen Magier eines anderen
+ *   Magiegebietes uebertragen.
  *
  * Syntax:
  *  "ZAUBERE <spruchname> <Einheit-Nr> <investierte Aura>"
@@ -712,7 +712,7 @@ sp_transferaura(castorder *co)
   scm_dst = get_mage(u);
 
   if (scm_dst==NULL) {
-    /* "Zu dieser Einheit kann ich keine Aura übertragen." */
+    /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
     cmistake(mage, co->order, 207, MSG_MAGIC);
     return 0;
   } else if (scm_src->magietyp==M_TYBIED) {
@@ -720,7 +720,7 @@ sp_transferaura(castorder *co)
   } else if (scm_src->magietyp==M_GRAY) {
     if (scm_src->magietyp != scm_dst->magietyp) multi = 4;
   } else if (scm_dst->magietyp!=scm_src->magietyp) {
-    /* "Zu dieser Einheit kann ich keine Aura übertragen." */
+    /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
     cmistake(mage, co->order, 207, MSG_MAGIC);
     return 0;
   }
@@ -745,11 +745,11 @@ sp_transferaura(castorder *co)
 /* ------------------------------------------------------------- */
 /* DRUIDE */
 /* ------------------------------------------------------------- */
-/* Name:       Günstige Winde
+/* Name:       Guenstige Winde
  * Stufe:      4
  * Gebiet:     Gwyrrd
  * Wirkung:
- * Schiffsbewegung +1, kein Abtreiben.  Hält (Stufe) Runden an.
+ * Schiffsbewegung +1, kein Abtreiben.  Haelt (Stufe) Runden an.
  * Kombinierbar mit "Sturmwind" (das +1 wird dadurch aber nicht
  * verdoppelt), und "Luftschiff".
  *
@@ -804,9 +804,9 @@ sp_goodwinds(castorder *co)
  * Stufe:      4
  * Gebiet:     Gwyrrd
  * Wirkung:
- *   für Stufe Runden wird eine (magische) Strasse erzeugt, die wie eine
+ *   fuer Stufe Runden wird eine (magische) Strasse erzeugt, die wie eine
  *   normale Strasse wirkt.
- *   Im Ozean schlägt der Spruch fehl
+ *   Im Ozean schlaegt der Spruch fehl
  *
  * Flags:
  * (FARCASTING|SPELLLEVEL|REGIONSPELL|ONSHIPCAST|TESTRESISTANCE)
@@ -840,12 +840,12 @@ sp_magicstreet(castorder *co)
 /* ------------------------------------------------------------- */
 /* Name:       Erwecke Ents
  * Stufe:      10
- * Kategorie:  Beschwörung, positiv
+ * Kategorie:  Beschwoerung, positiv
  * Gebiet:     Gwyrrd
  * Wirkung:
- *  Verwandelt (Stufe) Bäume in eine Gruppe von Ents, die sich für Stufe
+ *  Verwandelt (Stufe) Baeume in eine Gruppe von Ents, die sich fuer Stufe
  *  Runden der Partei des Druiden anschliessen und danach wieder zu
- *  Bäumen werden
+ *  Baeumen werden
  * Patzer:
  *  Monster-Ents entstehen
  *
@@ -865,7 +865,7 @@ sp_summonent(castorder *co)
 
   if (rtrees(r,2) == 0) {
     cmistake(mage, co->order, 204, MSG_EVENT);
-    /* nicht ohne bäume */
+    /* nicht ohne baeume */
     return 0;
   }
 
@@ -898,7 +898,7 @@ sp_summonent(castorder *co)
  * Kategorie:  Artefakt
  * Gebiet:     Gwyrrd
  * Wirkung:
- *  Es werden zwei neue Gebäude eingeführt: Steinkreis und Steinkreis
+ *  Es werden zwei neue Gebaeude eingefuehrt: Steinkreis und Steinkreis
  *  (gesegnet). Ersteres kann man bauen, letzteres wird aus einem
  *  fertigen Steinkreis mittels des Zaubers erschaffen.
  *
@@ -946,7 +946,7 @@ sp_blessstonecircle(castorder *co)
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
  * Wirkung:
- *  Erzeugt auf See einen Mahlstrom für Stufe-Wochen. Jedes Schiff, das
+ *  Erzeugt auf See einen Mahlstrom fuer Stufe-Wochen. Jedes Schiff, das
  *  durch den Mahlstrom segelt, nimmt 0-150% Schaden. (D.h.  es hat auch
  *  eine 1/3-Chance, ohne Federlesens zu sinken.  Der Mahlstrom sollte
  *  aus den Nachbarregionen sichtbar sein.
@@ -972,8 +972,8 @@ sp_maelstrom(castorder *co)
   }
 
   /* Attribut auf Region.
-   * Existiert schon ein curse, so wird dieser verstärkt
-   * (Max(Dauer), Max(Stärke))*/
+   * Existiert schon ein curse, so wird dieser verstaerkt
+   * (Max(Dauer), Max(Staerke))*/
   c = create_curse(mage, &r->attribs, ct_find("maelstrom"), power, duration, effect, 0);
 
   /* melden, 1x pro Partei */
@@ -1054,8 +1054,8 @@ sp_blessedharvest(castorder *co)
   double power = co->force;
   int duration = (int)power+1;
   /* Attribut auf Region.
-   * Existiert schon ein curse, so wird dieser verstärkt
-   * (Max(Dauer), Max(Stärke))*/
+   * Existiert schon ein curse, so wird dieser verstaerkt
+   * (Max(Dauer), Max(Staerke))*/
 
   if (create_curse(mage, &r->attribs, ct_find("blessedharvest"), power, duration, 1.0, 0)) {
      message * seen = msg_message("harvest_effect", "mage", mage);
@@ -1075,7 +1075,7 @@ sp_blessedharvest(castorder *co)
  * Gebiet:     Gwyrrd
  * Syntax:     ZAUBER [REGION x y] [STUFE 2] "Hain"
  * Wirkung:
- *     Erschafft Stufe-10*Stufe Jungbäume
+ *     Erschafft Stufe-10*Stufe Jungbaeume
  *
  * Flag:
  * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
@@ -1120,7 +1120,7 @@ sp_hain(castorder *co)
  * Gebiet:     Gwyrrd
  * Syntax:     ZAUBER [REGION x y] [STUFE 4] "Segne Mallornstecken"
  * Wirkung:
- *     Erschafft Stufe-10*Stufe Jungbäume
+ *     Erschafft Stufe-10*Stufe Jungbaeume
  *
  * Flag:
  * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
@@ -1196,7 +1196,7 @@ patzer_ents(castorder *co)
  * Kategorie:  Einheit, negativ
  * Gebiet:     Gwyrrd
  * Wirkung:
- *  Zerstört zwischen Stufe und Stufe*10 Eisenwaffen
+ *  Zerstoert zwischen Stufe und Stufe*10 Eisenwaffen
  *
  * Flag:
  * (FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE)
@@ -1292,31 +1292,31 @@ sp_rosthauch(castorder *co)
         "rust_fail", "mage target", mage, u));
     }
   }
-  /* in success stehen nun die insgesamt zerstörten Waffen. Im
-   * ungünstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
-   * darum wird hier nur für alle Fälle in denen noch weniger Waffen
+  /* in success stehen nun die insgesamt zerstoerten Waffen. Im
+   * unguenstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
+   * darum wird hier nur fuer alle Faelle in denen noch weniger Waffen
    * betroffen wurden ein Kostennachlass gegeben */
   return MIN(success, cast_level);
 }
 
 
 /* ------------------------------------------------------------- */
-/* Name:       Kälteschutz
+/* Name:       Kaelteschutz
  * Stufe:      3
  * Kategorie:  Einheit, positiv
  * Gebiet:     Gwyrrd
  *
  * Wirkung:
- *  schützt ein bis mehrere Einheiten mit bis zu Stufe*10 Insekten vor
- *  den Auswirkungen der Kälte. Sie können Gletscher betreten und dort
- *  ganz normal alles machen. Die Wirkung hält Stufe Wochen an
+ *  schuetzt ein bis mehrere Einheiten mit bis zu Stufe*10 Insekten vor
+ *  den Auswirkungen der Kaelte. Sie koennen Gletscher betreten und dort
+ *  ganz normal alles machen. Die Wirkung haelt Stufe Wochen an
  *  Insekten haben in Gletschern den selben Malus wie in Bergen. Zu
- *  lange drin, nicht mehr ändern
+ *  lange drin, nicht mehr aendern
  *
  * Flag:
  * (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
  */
-/* Syntax: ZAUBER [STUFE n] "Kälteschutz" eh1 [eh2 [eh3 [...]]] */
+/* Syntax: ZAUBER [STUFE n] "Kaelteschutz" eh1 [eh2 [eh3 [...]]] */
 
 static int
 sp_kaelteschutz(castorder *co)
@@ -1334,7 +1334,7 @@ sp_kaelteschutz(castorder *co)
 
   force*=10;  /* 10 Personen pro Force-Punkt */
 
-  /* für jede Einheit in der Kommandozeile */
+  /* fuer jede Einheit in der Kommandozeile */
   for (n = 0; n < pa->length; n++) {
     if (force < 1)
       break;
@@ -1368,7 +1368,7 @@ sp_kaelteschutz(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Verwünschung, Funkenregen, Naturfreund, ...
+/* Name:       Verwuenschung, Funkenregen, Naturfreund, ...
  * Stufe:      1
  * Kategorie:  Einheit, rein visuell
  * Gebiet:     Alle
@@ -1417,19 +1417,19 @@ sp_sparkle(castorder *co)
 /* ------------------------------------------------------------- */
 /* Name:       Eisengolem
  * Stufe:      2
- * Kategorie:  Beschwörung, positiv
+ * Kategorie:  Beschwoerung, positiv
  * Gebiet:     Gwyrrd
  * Wirkung:
  *   Erschafft eine Einheit Eisengolems mit Stufe*8 Golems.  Jeder Golem
  *   hat jede Runde eine Chance von 15% zu Staub zu zerfallen.  Gibt man
- *   den Golems den Befehl 'mache Schwert/Bihänder' oder 'mache
+ *   den Golems den Befehl 'mache Schwert/Bihaender' oder 'mache
  *   Schild/Kettenhemd/Plattenpanzer', so werden pro Golem 5 Eisenbarren
- *   verbaut und der Golem löst sich auf.
+ *   verbaut und der Golem loest sich auf.
  *
  *   Golems sind zu langsam um wirklich im Kampf von Nutzen zu sein.
- *   Jedoch fangen sie eine Menge Schaden auf und sollten sie zufällig
- *   treffen, so ist der Schaden fast immer tödlich.  (Eisengolem: HP
- *   50, AT 4, PA 2, Rüstung 2(KH), 2d10+4 TP, Magieresistenz 0.25)
+ *   Jedoch fangen sie eine Menge Schaden auf und sollten sie zufaellig
+ *   treffen, so ist der Schaden fast immer toedlich.  (Eisengolem: HP
+ *   50, AT 4, PA 2, Ruestung 2(KH), 2d10+4 TP, Magieresistenz 0.25)
  *
  *   Golems nehmen nix an und geben nix.  Sie bewegen sich immer nur 1
  *   Region weit und ziehen aus Strassen keinen Nutzen.  Ein Golem wiegt
@@ -1479,18 +1479,18 @@ sp_create_irongolem(castorder *co)
 /* ------------------------------------------------------------- */
 /* Name:       Steingolem
  * Stufe:      1
- * Kategorie:  Beschwörung, positiv
+ * Kategorie:  Beschwoerung, positiv
  * Gebiet:     Gwyrrd
  * Wirkung:
  *  Erschafft eine Einheit Steingolems mit Stufe*5 Golems. Jeder Golem
  *  hat jede Runde eine Chance von 10% zu Staub zu zerfallen.  Gibt man
  *  den Golems den Befehl 'mache Burg' oder 'mache Strasse', so werden
- *  pro Golem 10 Steine verbaut und der Golem löst sich auf.
+ *  pro Golem 10 Steine verbaut und der Golem loest sich auf.
  *
  *  Golems sind zu langsam um wirklich im Kampf von Nutzen zu sein.
- *  Jedoch fangen sie eine Menge Schaden auf und sollten sie zufällig
- *  treffen, so ist der Schaden fast immer tödlich.  (Steingolem: HP 60,
- *  AT 4, PA 2, Rüstung 4(PP), 2d12+6 TP)
+ *  Jedoch fangen sie eine Menge Schaden auf und sollten sie zufaellig
+ *  treffen, so ist der Schaden fast immer toedlich.  (Steingolem: HP 60,
+ *  AT 4, PA 2, Ruestung 4(PP), 2d12+6 TP)
  *
  *  Golems nehmen nix an und geben nix. Sie bewegen sich immer nur 1
  *  Region weit und ziehen aus Strassen keinen Nutzen. Ein Golem wiegt
@@ -1537,19 +1537,19 @@ sp_create_stonegolem(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Große Dürre
+/* Name:       Große Duerre
  * Stufe:      17
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
  *
  * Wirkung:
- *   50% alle Bauern, Pferde, Bäume sterben.
+ *   50% alle Bauern, Pferde, Baeume sterben.
  *   Zu 25% terraform: Gletscher wird mit 50% zu Sumpf, sonst Ozean,
- *   Sumpf wird zu Steppe, Ebene zur Steppe, Steppe zur Wüste.
+ *   Sumpf wird zu Steppe, Ebene zur Steppe, Steppe zur Wueste.
  * Besonderheiten:
  *  neuer Terraintyp Steppe:
- *  5000 Felder, 500 Bäume, Strasse: 250 Steine. Anlegen wie in Ebene
- *  möglich
+ *  5000 Felder, 500 Baeume, Strasse: 250 Steine. Anlegen wie in Ebene
+ *  moeglich
  *
  * Flags:
  * (FARCASTING | REGIONSPELL | TESTRESISTANCE)
@@ -1621,7 +1621,7 @@ sp_great_drought(castorder *co)
         } else {   /* Ozean */
           destroy_all_roads(r);
           rsetterrain(r, T_OCEAN);
-          /* Einheiten dürfen hier auf keinen Fall gelöscht werden! */
+          /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
           for (u = r->units; u; u = u->next) {
             if (u->race != new_race[RC_SPELL] && u->ship == 0) {
               set_number(u, 0);
@@ -1674,7 +1674,7 @@ sp_great_drought(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       'Weg der Bäume'
+/* Name:       'Weg der Baeume'
  * Stufe:      9
  * Kategorie:  Teleport
  * Gebiet:     Gwyrrd
@@ -1682,9 +1682,9 @@ sp_great_drought(castorder *co)
  *  Der Druide kann 5*Stufe GE in die astrale Ebene schicken.
  *  Der Druide wird nicht mitteleportiert, es sei denn, er gibt sich
  *  selbst mit an.
- *  Der Zauber funktioniert nur in Wäldern.
+ *  Der Zauber funktioniert nur in Waeldern.
  *
- * Syntax: Zauber "Weg der Bäume" <Einheit> ...
+ * Syntax: Zauber "Weg der Baeume" <Einheit> ...
  *
  * Flags:
  * (UNITSPELL | SPELLLEVEL | TESTCANSEE)
@@ -1831,8 +1831,8 @@ sp_treewalkexit(castorder *co)
     return 0;
   }
 
-  /* Koordinaten setzen und Region löschen für Überprüfung auf
-  * Gültigkeit */
+  /* Koordinaten setzen und Region loeschen fuer Überpruefung auf
+  * Gueltigkeit */
   rt  = pa->param[0]->data.r;
   tax = rt->x;
   tay = rt->y;
@@ -1861,7 +1861,7 @@ sp_treewalkexit(castorder *co)
     return 0;
   }
 
-  /* für jede Einheit in der Kommandozeile */
+  /* fuer jede Einheit in der Kommandozeile */
   for (n = 1; n < pa->length; n++) {
     if (pa->param[n]->flag == TARGET_RESISTS
       || pa->param[n]->flag == TARGET_NOTFOUND)
@@ -1959,8 +1959,8 @@ sp_holyground(castorder *co)
  * Gebiet:     Gwyrrd
  * Wirkung:
  * Die Burg kann nicht mehr durch Donnerbeben oder andere
- * Gebäudezerstörenden Sprüche kaputt gemacht werden. Auch
- * schützt der Zauber vor Belagerungskatapulten.
+ * Gebaeudezerstoerenden Sprueche kaputt gemacht werden. Auch
+ * schuetzt der Zauber vor Belagerungskatapulten.
  *
  * ZAUBER Heimstein
  * Flags: (0)
@@ -1990,7 +1990,7 @@ sp_homestone(castorder *co)
   }
   c_setflag(c, CURSE_NOAGE|CURSE_ONLYONE);
 
-  /* Magieresistenz der Burg erhöht sich um 50% */
+  /* Magieresistenz der Burg erhoeht sich um 50% */
   effect = 50;
   c = create_curse(mage,  &mage->building->attribs,
     ct_find("magicresistance"), force*force, 1, effect, 0);
@@ -2014,14 +2014,14 @@ sp_homestone(castorder *co)
 
 
 /* ------------------------------------------------------------- */
-/* Name:       Dürre
+/* Name:       Duerre
  * Stufe:      13
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
  * Wirkung:
- *  temporär verändert sich das Baummaximum und die maximalen Felder in
- *  einer Region auf die Hälfte des normalen.
- *  Die Hälfte der Bäume verdorren und Pferde verdursten.
+ *  temporaer veraendert sich das Baummaximum und die maximalen Felder in
+ *  einer Region auf die Haelfte des normalen.
+ *  Die Haelfte der Baeume verdorren und Pferde verdursten.
  *  Arbeiten bringt nur noch 1/4 des normalen Verdienstes
  *
  * Flags:
@@ -2072,21 +2072,21 @@ sp_drought(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Bergwächter
+/* Name:       Bergwaechter
  * Stufe:      9
  * Gebiet:     Gwyrrd
- * Kategorie:  Beschwörung, negativ
+ * Kategorie:  Beschwoerung, negativ
  *
  * Wirkung:
- * Erschafft in Bergen oder Gletschern einen Wächter, der durch bewachen
- * den Eisen/Laen-Abbau für nicht-Allierte verhindert.  Bergwächter
+ * Erschafft in Bergen oder Gletschern einen Waechter, der durch bewachen
+ * den Eisen/Laen-Abbau fuer nicht-Allierte verhindert.  Bergwaechter
  * verhindern auch Abbau durch getarnte/unsichtbare Einheiten und lassen
  * sich auch durch Belagerungen nicht aufhalten.
  *
  * (Ansonsten in economic.c:manufacture() entsprechend anpassen).
  *
- * Fähigkeiten (factypes.c): 50% Magieresistenz, 25 HP, 4d4 Schaden,
- *   4 Rüstung (=PP)
+ * Faehigkeiten (factypes.c): 50% Magieresistenz, 25 HP, 4d4 Schaden,
+ *   4 Ruestung (=PP)
  * Flags:
  * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
  */
@@ -2128,18 +2128,18 @@ sp_ironkeeper(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Sturmwind - Beschwöre einen Sturmelementar
+/* Name:       Sturmwind - Beschwoere einen Sturmelementar
  * Stufe:      6
  * Gebiet:     Gwyrrd
  *
  * Wirkung:
  * Verdoppelt Geschwindigkeit aller angegebener Schiffe fuer diese
- * Runde.  Kombinierbar mit "Günstige Winde", aber nicht mit
+ * Runde.  Kombinierbar mit "Guenstige Winde", aber nicht mit
  * "Luftschiff".
  *
  * Anstelle des alten ship->enchanted benutzen wir einen kurzfristigen
  * Curse.  Das ist zwar ein wenig aufwendiger, aber weitaus flexibler
- * und erlaubt es zB, die Dauer später problemlos zu verändern.
+ * und erlaubt es zB, die Dauer spaeter problemlos zu veraendern.
  *
  * Flags:
  *  (SHIPSPELL|ONSHIPCAST|OCEANCASTABLE|TESTRESISTANCE)
@@ -2200,7 +2200,7 @@ sp_stormwinds(castorder *co)
     ADDMSG(&mage->faction->msgs, msg_message("stormwinds_reduced", 
       "unit ships maxships", mage, erfolg, pa->length));
   }
-  /* melden, 1x pro Partei auf Schiff und für den Magier */
+  /* melden, 1x pro Partei auf Schiff und fuer den Magier */
   fset(mage->faction, FFL_SELECT);
   for (u = r->units; u; u = u->next ) {
     if (fval(u->faction, FFL_SELECT)) {
@@ -2224,8 +2224,8 @@ sp_stormwinds(castorder *co)
  * Gebiet:     Gwyrrd
  *
  * Wirkung:
- * Zerstört Stufe*10 "Steineinheiten" aller Gebäude der Region, aber nie
- * mehr als 25% des gesamten Gebäudes (aber natürlich mindestens ein
+ * Zerstoert Stufe*10 "Steineinheiten" aller Gebaeude der Region, aber nie
+ * mehr als 25% des gesamten Gebaeudes (aber natuerlich mindestens ein
  * Stein).
  *
  * Flags:
@@ -2297,7 +2297,7 @@ patzer_peasantmob(castorder *co)
 
     u = create_unit(r, f, n, new_race[RC_PEASANT], 0, LOC(f->locale, "angry_mob"), NULL);
     fset(u, UFL_ISNEW);
-    /* guard(u, GUARD_ALL);  hier zu früh! Befehl BEWACHE setzten */
+    /* guard(u, GUARD_ALL);  hier zu frueh! Befehl BEWACHE setzten */
     addlist(&u->orders, create_order(K_GUARD, lang, NULL));
     set_order(&u->thisorder, default_order(lang));
     a = a_new(&at_unitdissolve);
@@ -2321,7 +2321,7 @@ patzer_peasantmob(castorder *co)
  * Gebiet:     Draig
  * Wirkung:
  * Vernichtet 10-80% aller Baeume in der Region.  Kann sich auf benachbarte
- * Regionen ausbreiten, wenn diese (stark) bewaldet sind.  Für jeweils
+ * Regionen ausbreiten, wenn diese (stark) bewaldet sind.  Fuer jeweils
  * 10 verbrannte Baeume in der Startregion gibts es eine 1%-Chance, dass
  * sich das Feuer auf stark bewaldete Nachbarregionen ausdehnt, auf
  * bewaldeten mit halb so hoher Wahrscheinlichkeit.  Dort verbrennen
@@ -2414,7 +2414,7 @@ sp_forest_fire(castorder *co)
  *  Auf einen Magier gezaubert verhindert/erschwert dieser Chaosfluch
  *  das Zaubern. Patzer werden warscheinlicher.
  *  Jeder Zauber muss erst gegen den Wiederstand des Fluchs gezaubert
- *  werden und schwächt dessen Antimagiewiederstand um 1.
+ *  werden und schwaecht dessen Antimagiewiederstand um 1.
  *  Wirkt MAX(Stufe(Magier) - Stufe(Ziel), rand(3)) Wochen
  * Patzer:
  *  Magier wird selbst betroffen
@@ -2484,11 +2484,11 @@ patzer_fumblecurse(castorder *co)
 /* Name:       Drachenruf
  * Stufe:      11
  * Gebiet:     Draig
- * Kategorie:  Monster, Beschwörung, negativ
+ * Kategorie:  Monster, Beschwoerung, negativ
  *
  * Wirkung:
- *  In einer Wüste, Sumpf oder Gletscher gezaubert kann innerhalb der
- *  nächsten 6 Runden ein bis 6 Dracheneinheiten bis Größe Wyrm
+ *  In einer Wueste, Sumpf oder Gletscher gezaubert kann innerhalb der
+ *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groeße Wyrm
  *  entstehen.
  *
  *  Mit Stufe 12-15 erscheinen Jung- oder normaler Drachen, mit Stufe
@@ -2583,7 +2583,7 @@ sp_summondragon(castorder *co)
  * Wirkung:
  *   eine Wand aus Feuer entsteht in der angegebenen Richtung
  *
- *   Was für eine Wirkung hat die?
+ *   Was fuer eine Wirkung hat die?
  */
 
 void
@@ -2711,7 +2711,7 @@ sp_wisps(castorder *co)
  * Kategorie:  Untote Einheit, positiv
  *
  * Wirkung:
- *  transformiert (Stufe)W10 Untote in ihre stärkere Form
+ *  transformiert (Stufe)W10 Untote in ihre staerkere Form
  *
  *
  * Flag:
@@ -2771,7 +2771,7 @@ sp_unholypower(castorder *co)
       /* Wird hoffentlich niemals vorkommen. Es gibt im Source
        * vermutlich eine ganze Reihe von Stellen, wo das nicht
        * korrekt abgefangen wird. Besser (aber nicht gerade einfach)
-       * wäre es, eine solche Konstruktion irgendwie zu kapseln. */
+       * waere es, eine solche Konstruktion irgendwie zu kapseln. */
       if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)
           || is_cursed(u->attribs, C_SLAVE, 0)) {
         cmistake(mage, co->order, 74, MSG_MAGIC);
@@ -2894,19 +2894,19 @@ attrib_type at_deathcloud_compat = {
 *   Personen in der Region verlieren stufe/2 Trefferpunkte pro Runde.
 *   Dauer force/2
 *   Wirkt gegen MR
-*   Rüstung wirkt nicht
+*   Ruestung wirkt nicht
 * Patzer:
-*   Magier gerät in den Staub und verliert zufällige Zahl von HP bis
+*   Magier geraet in den Staub und verliert zufaellige Zahl von HP bis
 *   auf MAX(hp,2)
 * Besonderheiten:
 *   Nicht als curse implementiert, was schlecht ist - man kann dadurch
 *   kein dispell machen. Wegen fix unter Zeitdruck erstmal nicht zu
-*   ändern...
-* Missbrauchsmöglichkeit:
-*   Hat der Magier mehr HP als Rasse des Feindes (extrem: Dämon/Goblin)
+*   aendern...
+* Missbrauchsmoeglichkeit:
+*   Hat der Magier mehr HP als Rasse des Feindes (extrem: Daemon/Goblin)
 *   so kann er per Farcasting durch mehrmaliges Zaubern eine
-*   Nachbarregion auslöschen. Darum sollte dieser Spruch nur einmal auf
-*   eine Region gelegt werden können.
+*   Nachbarregion ausloeschen. Darum sollte dieser Spruch nur einmal auf
+*   eine Region gelegt werden koennen.
 *
 * Flag:
 *   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
@@ -2992,18 +2992,18 @@ sp_plague(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Beschwöre Schattendämon
+/* Name:       Beschwoere Schattendaemon
  * Stufe:      8
  * Gebiet:     Draig
- * Kategorie:  Beschwörung, positiv
+ * Kategorie:  Beschwoerung, positiv
  * Wirkung:
- *  Der Magier beschwört Stufe^2 Schattendämonen.
- *  Schattendämonen haben Tarnung = (Magie_Magier+ Tarnung_Magier)/2 und
+ *  Der Magier beschwoert Stufe^2 Schattendaemonen.
+ *  Schattendaemonen haben Tarnung = (Magie_Magier+ Tarnung_Magier)/2 und
  *  Wahrnehmung 1. Sie haben einen Attacke-Bonus von 8, einen
  *  Verteidigungsbonus von 11 und machen 2d3 Schaden.  Sie entziehen bei
  *  einem Treffer dem Getroffenen einen Attacke- oder
  *  Verteidigungspunkt.  (50% Chance.) Sie haben 25 Hitpoints und
- *  Rüstungsschutz 3.
+ *  Ruestungsschutz 3.
  * Flag:
  *  (SPELLLEVEL)
  */
@@ -3032,18 +3032,18 @@ sp_summonshadow(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Beschwöre Schattenmeister
+/* Name:       Beschwoere Schattenmeister
  * Stufe:      12
  * Gebiet:     Draig
- * Kategorie:  Beschwörung, positiv
+ * Kategorie:  Beschwoerung, positiv
  * Wirkung:
- *  Diese höheren Schattendämonen sind erheblich gefährlicher als die
- *  einfachen Schattendämonen.  Sie haben Tarnung entsprechend dem
- *  Magietalent des Beschwörer-1 und Wahrnehmung 5, 75 HP,
- *  Rüstungsschutz 4, Attacke-Bonus 11 und Verteidigungsbonus 13, machen
- *  bei einem Treffer 2d4 Schaden, entziehen einen Stärkepunkt und
- *  entziehen 5 Talenttage in einem zufälligen Talent.
- *  Stufe^2 Dämonen.
+ *  Diese hoeheren Schattendaemonen sind erheblich gefaehrlicher als die
+ *  einfachen Schattendaemonen.  Sie haben Tarnung entsprechend dem
+ *  Magietalent des Beschwoerer-1 und Wahrnehmung 5, 75 HP,
+ *  Ruestungsschutz 4, Attacke-Bonus 11 und Verteidigungsbonus 13, machen
+ *  bei einem Treffer 2d4 Schaden, entziehen einen Staerkepunkt und
+ *  entziehen 5 Talenttage in einem zufaelligen Talent.
+ *  Stufe^2 Daemonen.
  *
  * Flag:
  *  (SPELLLEVEL)
@@ -3075,8 +3075,8 @@ sp_summonshadowlords(castorder *co)
  * Kategorie:  Teleport
  * Wirkung:
  *  Durch das Opfern von 200 Bauern kann der Chaosmagier ein Tor zur
- *  astralen Welt öffnen. Das Tor kann im Folgemonat verwendet werden,
- *  es löst sich am Ende des Folgemonats auf.
+ *  astralen Welt oeffnen. Das Tor kann im Folgemonat verwendet werden,
+ *  es loest sich am Ende des Folgemonats auf.
  *
  * Flag:  (0)
  */
@@ -3122,14 +3122,14 @@ sp_chaossuction(castorder *co)
  * Kategorie:  Einheit, positiv
  *
  * Wirkung:
- *   Erhöht die maximalen Magiepunkte und die monatliche Regeneration auf
- *   das doppelte. Dauer: 4 Wochen Danach sinkt beides auf die Hälfte des
+ *   Erhoeht die maximalen Magiepunkte und die monatliche Regeneration auf
+ *   das doppelte. Dauer: 4 Wochen Danach sinkt beides auf die Haelfte des
  *   normalen ab.
  * Dauer: 6 Wochen
  * Patzer:
  *   permanenter Stufen- (Talenttage), Regenerations- oder maxMP-Verlust
  * Besonderheiten:
- *   Patzer können während der Zauberdauer häufiger auftreten derzeit
+ *   Patzer koennen waehrend der Zauberdauer haeufiger auftreten derzeit
  *   +10%
  *
  * Flag:
@@ -3256,13 +3256,13 @@ skill_summoned(unit * u, int level)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Totenruf - Mächte des Todes
+/* Name:       Totenruf - Maechte des Todes
  * Stufe:      6
  * Gebiet:     Draig
- * Kategorie:  Beschwörung, positiv
+ * Kategorie:  Beschwoerung, positiv
  * Flag:       FARCASTING
  * Wirkung:
- *   Untote aus deathcounther ziehen, bis Stufe*10 Stück
+ *   Untote aus deathcounther ziehen, bis Stufe*10 Stueck
  *
  * Patzer:
  *   Erzeugt Monsteruntote
@@ -3333,7 +3333,7 @@ sp_auraleak(castorder *co)
   for (u = r->units; u; u = u->next) {
     if (is_mage(u)) {
       /* Magieresistenz Einheit?  Bei gegenerischen Magiern nur sehr
-       * geringe Chance auf Erfolg wg erhöhter MR, würde Spruch sinnlos
+       * geringe Chance auf Erfolg wg erhoehter MR, wuerde Spruch sinnlos
        * machen */
       lost_aura = (int)(get_spellpoints(u)*lost);
       change_spellpoints(u, -lost_aura);
@@ -3349,14 +3349,14 @@ sp_auraleak(castorder *co)
 /* BARDE  - CERDDOR*/
 /* ------------------------------------------------------------- */
 /* ------------------------------------------------------------- */
-/* Name:       Magie analysieren - Gebäude, Schiffe, Region
+/* Name:       Magie analysieren - Gebaeude, Schiffe, Region
  * Name:       Lied des Ortes analysieren
  * Stufe:      8
  * Gebiet:     Cerddor
  *
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  *
@@ -3407,7 +3407,7 @@ sp_analysesong_obj(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  *
@@ -3471,21 +3471,21 @@ can_charm(const unit * u, int maxlevel)
  * Gebiet:   Cerddor
  * Flag:     UNITSPELL
  * Wirkung:
- *   bezauberte Einheit wechselt 'virtuell' die Partei und führt fremde
+ *   bezauberte Einheit wechselt 'virtuell' die Partei und fuehrt fremde
  *   Befehle aus.
  *   Dauer: 3 - force+2 Wochen
  *   Wirkt gegen Magieresistenz
  *
- *   wirkt auf eine Einheit mit maximal Talent Personen normal. Für jede
- *   zusätzliche Person gibt es einen Bonus auf Magieresistenz, also auf
+ *   wirkt auf eine Einheit mit maximal Talent Personen normal. Fuer jede
+ *   zusaetzliche Person gibt es einen Bonus auf Magieresistenz, also auf
  *   nichtgelingen, von 10%.
  *
- *   Das höchste Talent der Einheit darf maximal so hoch sein wie das
- *   Magietalent des Magiers. Für jeden Talentpunkt mehr gibt es einen
- *   Bonus auf Magieresistenz von 15%, was dazu führt, das bei +2 Stufen
+ *   Das hoechste Talent der Einheit darf maximal so hoch sein wie das
+ *   Magietalent des Magiers. Fuer jeden Talentpunkt mehr gibt es einen
+ *   Bonus auf Magieresistenz von 15%, was dazu fuehrt, das bei +2 Stufen
  *   die Magiersistenz bei 90% liegt.
  *
- *   Migrantenzählung muss Einheit überspringen
+ *   Migrantenzaehlung muss Einheit ueberspringen
  *
  *   Attackiere verbieten
  * Flags:
@@ -3521,11 +3521,11 @@ sp_charmingsong(castorder *co)
     return 0;
   }
 
-  /* Magieresistensbonus für mehr als Stufe Personen */
+  /* Magieresistensbonus fuer mehr als Stufe Personen */
   if (target->number > force) {
     resist_bonus += (int)((target->number - force) * 10);
   }
-  /* Magieresistensbonus für höhere Talentwerte */
+  /* Magieresistensbonus fuer hoehere Talentwerte */
   for(i = 0; i < MAXSKILLS; i++) {
     int sk = effskill(target, i);
     if (tb < sk) tb = sk;
@@ -3538,7 +3538,7 @@ sp_charmingsong(castorder *co)
   if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)) {
     report_failure(mage, co->order);
 #if 0
-    sprintf(buf, "%s fühlt sich einen Moment lang benommen und desorientiert.",
+    sprintf(buf, "%s fuehlt sich einen Moment lang benommen und desorientiert.",
         unitname(target));
     addmessage(target->region, target->faction, buf, MSG_EVENT, ML_WARN);
 #endif
@@ -3548,17 +3548,17 @@ sp_charmingsong(castorder *co)
   duration = 3 + rng_int()%(int)force;
   {
     trigger * trestore = trigger_changefaction(target, target->faction);
-    /* läuft die Dauer ab, setze Partei zurück */
+    /* laeuft die Dauer ab, setze Partei zurueck */
     add_trigger(&target->attribs, "timer", trigger_timeout(duration, trestore));
-    /* wird die alte Partei von Target aufgelöst, dann auch diese Einheit */
+    /* wird die alte Partei von Target aufgeloest, dann auch diese Einheit */
     add_trigger(&target->faction->attribs, "destroy", trigger_killunit(target));
-    /* wird die neue Partei von Target aufgelöst, dann auch diese Einheit */
+    /* wird die neue Partei von Target aufgeloest, dann auch diese Einheit */
     add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
   }
-  /* sperre ATTACKIERE, GIB PERSON und überspringe Migranten */
+  /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
   create_curse(mage, &target->attribs, ct_find("slavery"), force, duration, zero_effect, 0);
 
-  /* setze Partei um und lösche langen Befehl aus Sicherheitsgründen */
+  /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
   u_setfaction(target, mage->faction);
   set_order(&target->thisorder, NULL);
 
@@ -3684,15 +3684,15 @@ sp_rallypeasantmob(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Wiegelt 60% bis 90% der Bauern einer Region auf.  Bauern werden ein
- *  großer Mob, der zur Monsterpartei gehört und die Region bewacht.
+ *  großer Mob, der zur Monsterpartei gehoert und die Region bewacht.
  *  Regionssilber sollte auch nicht durch Unterhaltung gewonnen werden
- *  können.
+ *  koennen.
  *
- *   Fehlt: Triggeraktion: löste Bauernmob auf und gib alles an Region,
- *   dann können die Bauernmobs ihr Silber mitnehmen und bleiben x
+ *   Fehlt: Triggeraktion: loeste Bauernmob auf und gib alles an Region,
+ *   dann koennen die Bauernmobs ihr Silber mitnehmen und bleiben x
  *   Wochen bestehen
  *
- *  alternativ: Lösen sich langsam wieder auf
+ *  alternativ: Loesen sich langsam wieder auf
  * Flag:
  *   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
@@ -3747,7 +3747,7 @@ sp_raisepeasantmob(castorder *co)
  * Stufe:   9
  * Gebiet:   Cerddor
  * Wirkung:
- *  Bis zu Stufe Personen fremder Rasse können angeworben werden. Die
+ *  Bis zu Stufe Personen fremder Rasse koennen angeworben werden. Die
  *  angeworbene Einheit muss kontaktieren. Keine teuren Talente
  *
  * Flag:
@@ -3767,9 +3767,9 @@ sp_migranten(castorder *co)
 
   target = pa->param[0]->data.u; /* Zieleinheit */
 
-  /* Personen unserer Rasse können problemlos normal übergeben werden */
+  /* Personen unserer Rasse koennen problemlos normal uebergeben werden */
   if (target->race == mage->faction->race) {
-    /* u ist von unserer Art, das Ritual wäre verschwendete Aura. */
+    /* u ist von unserer Art, das Ritual waere verschwendete Aura. */
     ADDMSG(&mage->faction->msgs, msg_message(
       "sp_migranten_fail1", "unit region command target", mage,
       mage->region, co->order, target));
@@ -3800,7 +3800,7 @@ sp_migranten(castorder *co)
     return 0;
   }
 
-  /* Kontakt prüfen (aus alter Teleportroutine übernommen) */
+  /* Kontakt pruefen (aus alter Teleportroutine uebernommen) */
   if (!ucontact(target, mage)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
       "spellfail::contact", "target", target));
@@ -3821,7 +3821,7 @@ sp_migranten(castorder *co)
  * Stufe:   12
  * Gebiet:   Cerddor
  * Wirkung:
- *   verhindert jede Attacke für lovar(Stufe/2) Runden
+ *   verhindert jede Attacke fuer lovar(Stufe/2) Runden
  */
 
 static int
@@ -3864,7 +3864,7 @@ sp_song_of_peace(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *   Das Unterhaltungsmaximum steigt von 20% auf 40% des
- *   Regionsvermögens. Der Spruch hält Stufe Wochen an
+ *   Regionsvermoegens. Der Spruch haelt Stufe Wochen an
  */
 
 static int
@@ -3913,7 +3913,7 @@ sp_generous(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *   Bauern schliessen sich der eigenen Partei an
- *   ist zusätzlich zur Rekrutierungsmenge in der Region
+ *   ist zusaetzlich zur Rekrutierungsmenge in der Region
  * */
 
 static int
@@ -3934,10 +3934,10 @@ sp_recruit(castorder *co)
     return 0;
   }
   /* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
-   * mit einfliessen lassen und dafür den Exponenten etwas größer.
-   * Wenn die Rekrutierungskosten deutlich höher sind als der Faktor,
-   * ist das Verhältniss von ausgegebene Aura pro Bauer bei Stufe 2
-   * ein mehrfaches von Stufe 1, denn in beiden Fällen gibt es nur 1
+   * mit einfliessen lassen und dafuer den Exponenten etwas groeßer.
+   * Wenn die Rekrutierungskosten deutlich hoeher sind als der Faktor,
+   * ist das Verhaeltniss von ausgegebene Aura pro Bauer bei Stufe 2
+   * ein mehrfaches von Stufe 1, denn in beiden Faellen gibt es nur 1
    * Bauer, nur die Kosten steigen. */
   n = (pow(force, 1.6) * 100)/f->race->recruitcost;
   if (rc->recruit_multi!=0) {
@@ -3966,7 +3966,7 @@ sp_recruit(castorder *co)
  * Gebiet:  Cerddor
  * Wirkung:
  *   Bauern schliessen sich der eigenen Partei an
- *   ist zusätzlich zur Rekrutierungsmenge in der Region
+ *   ist zusaetzlich zur Rekrutierungsmenge in der Region
  * */
 
 static int
@@ -3985,7 +3985,7 @@ sp_bigrecruit(castorder *co)
     report_failure(mage, co->order);
     return 0;
   }
-  /* Für vergleichbare Erfolge bei unterschiedlichen Rassen die
+  /* Fuer vergleichbare Erfolge bei unterschiedlichen Rassen die
    * Rekrutierungskosten mit einfliessen lassen. */
 
   n = (int)force + lovar((force * force * 1000)/f->race->recruitcost);
@@ -4015,14 +4015,14 @@ sp_bigrecruit(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Erliegt die Einheit dem Zauber, so wird sie dem Magier alles
- *  erzählen, was sie über die gefragte Region weiß. Ist in der Region
+ *  erzaehlen, was sie ueber die gefragte Region weiß. Ist in der Region
  *  niemand ihrer Partei, so weiß sie nichts zu berichten.  Auch kann
- *  sie nur das erzählen, was sie selber sehen könnte.
+ *  sie nur das erzaehlen, was sie selber sehen koennte.
  * Flags:
  *   (UNITSPELL | TESTCANSEE)
  */
 
-/* restistenz der einheit prüfen */
+/* restistenz der einheit pruefen */
 static int
 sp_pump(castorder *co)
 {
@@ -4069,15 +4069,15 @@ sp_pump(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:     Verführung
+/* Name:     Verfuehrung
  * Stufe:   6
  * Gebiet:   Cerddor
  * Wirkung:
- *  Betört eine Einheit, so das sie ihm den größten Teil ihres Bargelds
- *  und 50% ihres Besitzes schenkt. Sie behält jedoch immer soviel, wie
- *  sie zum überleben braucht. Wirkt gegen Magieresistenz.
+ *  Betoert eine Einheit, so das sie ihm den groeßten Teil ihres Bargelds
+ *  und 50% ihres Besitzes schenkt. Sie behaelt jedoch immer soviel, wie
+ *  sie zum ueberleben braucht. Wirkt gegen Magieresistenz.
  *  MIN(Stufe*1000$, u->money - maintenace)
- *  Von jedem Item wird 50% abgerundet ermittelt und übergeben. Dazu
+ *  Von jedem Item wird 50% abgerundet ermittelt und uebergeben. Dazu
  *  kommt Itemzahl%2 mit 50% chance
  *
  * Flags:
@@ -4144,11 +4144,11 @@ sp_seduce(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  verhindert Angriffe des bezauberten Monsters auf die Partei des
- *  Barden für Stufe Wochen. Nicht übertragbar, dh Verbündete werden vom
- *  Monster natürlich noch angegriffen. Wirkt nicht gegen Untote
+ *  Barden fuer Stufe Wochen. Nicht uebertragbar, dh Verbuendete werden vom
+ *  Monster natuerlich noch angegriffen. Wirkt nicht gegen Untote
  *  Jede Einheit kann maximal unter einem Beherrschungszauber dieser Art
  *  stehen, dh wird auf die selbe Einheit dieser Zauber von einem
- *  anderen Magier nochmal gezaubert, schlägt der Zauber fehl.
+ *  anderen Magier nochmal gezaubert, schlaegt der Zauber fehl.
  *
  * Flags:
  * (UNITSPELL | ONSHIPCAST | TESTRESISTANCE | TESTCANSEE)
@@ -4197,7 +4197,7 @@ sp_calm_monster(castorder *co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  wird gegen Magieresistenz gezaubert Das Opfer vergisst bis zu
- *  Talenttage seines höchsten Talentes und tut die Woche nix.
+ *  Talenttage seines hoechsten Talentes und tut die Woche nix.
  *  Nachfolgende Zauber sind erschwert.
  *  Wirkt auf bis zu 10 Personen in der Einheit
  *
@@ -4224,7 +4224,7 @@ sp_headache(castorder *co)
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if (target->number==0 || pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
-  /* finde das größte Talent: */
+  /* finde das groeßte Talent: */
   for (i=0;i!=target->skill_size;++i) {
     skill * sv = target->skills+i;
     if (smax==NULL || skill_compare(sv, smax)>0) {
@@ -4257,7 +4257,7 @@ sp_headache(castorder *co)
  * Wirkung:
  *   Wiegelt Stufe*250 Bauern zu einem Mob auf, der sich der Partei des
  *   Magier anschliesst Pro Woche beruhigen sich etwa 15% wieder und
- *   kehren auf ihre Felder zurück
+ *   kehren auf ihre Felder zurueck
  *
  * Flags:
  * (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
@@ -4304,11 +4304,11 @@ sp_raisepeasants(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Trübsal
+/* Name:       Truebsal
  * Stufe:      11
  * Kategorie:  Region, negativ
  * Wirkung:
- *  in der Region kann für einige Wochen durch Unterhaltung kein Geld
+ *  in der Region kann fuer einige Wochen durch Unterhaltung kein Geld
  *  mehr verdient werden
  *
  * Flag:
@@ -4340,10 +4340,10 @@ sp_depression(castorder *co)
 /* Name:       Hoher Gesang der Drachen
  * Stufe:      14
  * Gebiet:     Cerddor
- * Kategorie:  Monster, Beschwörung, positiv
+ * Kategorie:  Monster, Beschwoerung, positiv
  *
  * Wirkung:
- *  Erhöht HP-Regeneration in der Region und lockt drachenartige (Wyrm,
+ *  Erhoeht HP-Regeneration in der Region und lockt drachenartige (Wyrm,
  *  Drache, Jungdrache, Seeschlange, ...) aus der Umgebung an
  *
  * Flag:
@@ -4393,7 +4393,7 @@ sp_dragonsong(castorder *co)
 /* Name:       Hoher Gesang der Verlockung
  * Stufe:      17
  * Gebiet:     Cerddor
- * Kategorie:  Monster, Beschwörung, positiv
+ * Kategorie:  Monster, Beschwoerung, positiv
  *
  * Wirkung:
  *  Lockt Bauern aus den umliegenden Regionen her
@@ -4455,14 +4455,14 @@ sp_puttorest(castorder *co)
   return co->level;
 }
 
-/* Name:       Traumschlößchen
+/* Name:       Traumschloeßchen
  * Stufe:      3
- * Kategorie:  Region, Gebäude, positiv
+ * Kategorie:  Region, Gebaeude, positiv
  * Gebiet:     Illaun
  * Wirkung:
  *  Mit Hilfe dieses Zaubers kann der Traumweber die Illusion eines
- *  beliebigen Gebäudes erzeugen. Die Illusion kann betreten werden, ist
- *  aber ansonsten funktionslos und benötigt auch keinen Unterhalt
+ *  beliebigen Gebaeudes erzeugen. Die Illusion kann betreten werden, ist
+ *  aber ansonsten funktionslos und benoetigt auch keinen Unterhalt
  * Flag: (0)
  */
 
@@ -4493,7 +4493,7 @@ sp_icastle(castorder *co)
 
   b = new_building(bt_illusion, r, mage->faction->locale);
 
-  /* Größe festlegen. */
+  /* Groeße festlegen. */
   if (type == bt_illusion) {
     b->size = (rng_int()%(int)((power*power)+1)*10);
   } else if (type->maxsize == -1) {
@@ -4538,8 +4538,8 @@ sp_icastle(castorder *co)
  * Stufe:   3
  * Gebiet:  Illaun
  * Wirkung:
- *  Zieleinheit erscheint für (Stufe) Wochen als eine andere Gestalt
- *  (wie bei dämonischer Rassetarnung).
+ *  Zieleinheit erscheint fuer (Stufe) Wochen als eine andere Gestalt
+ *  (wie bei daemonischer Rassetarnung).
  * Syntax: ZAUBERE "Gestaltwandlung"  <einheit>     <rasse>
  * Flags:
  *  (UNITSPELL | SPELLLEVEL)
@@ -4571,7 +4571,7 @@ sp_illusionary_shapeshift(castorder *co)
     return 0;
   }
 
-  /* ähnlich wie in laws.c:setealth() */
+  /* aehnlich wie in laws.c:setealth() */
   if (!playerrace(rc)) {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_shapeshift_fail", "target race", u, rc));
     return 0;
@@ -4595,7 +4595,7 @@ sp_illusionary_shapeshift(castorder *co)
  * Kosten:   SPC_FIX
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  */
@@ -4619,7 +4619,7 @@ sp_analyseregionsdream(castorder *co)
  * Kosten:   SPC_FIX
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  */
@@ -4645,14 +4645,14 @@ sp_analysedream(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Schlechte Träume
+/* Name:       Schlechte Traeume
  * Stufe:      10
  * Kategorie:  Region, negativ
  * Wirkung:
- *   Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller
+ *   Dieser Zauber ermoeglicht es dem Traeumer, den Schlaf aller
  *   nichtaliierten Einheiten (HELFE BEWACHE) in der Region so starkzu
- *   stören, das sie 1 Talentstufe in allen Talenten
- *   vorübergehend verlieren. Der Zauber wirkt erst im Folgemonat.
+ *   stoeren, das sie 1 Talentstufe in allen Talenten
+ *   voruebergehend verlieren. Der Zauber wirkt erst im Folgemonat.
  *
  * Flags:
  * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
@@ -4686,12 +4686,12 @@ sp_baddreams(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Schöne Träume
+/* Name:       Schoene Traeume
  * Stufe:      8
  * Kategorie:
  * Wirkung:
- *   Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller aliierten
- *   Einheiten in der Region so zu beeinflussen, daß sie für einige Zeit
+ *   Dieser Zauber ermoeglicht es dem Traeumer, den Schlaf aller aliierten
+ *   Einheiten in der Region so zu beeinflussen, daß sie fuer einige Zeit
  *   einen Bonus von 1 Talentstufe in allen Talenten
  *   bekommen. Der Zauber wirkt erst im Folgemonat.
  * Flags:
@@ -4799,7 +4799,7 @@ sp_dreamreading(castorder *co)
 
   u2 = create_unit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL], 0, "spell/dreamreading", NULL);
   set_number(u2, 1);
-  u2->age = 2;   /* Nur für diese Runde. */
+  u2->age = 2;   /* Nur fuer diese Runde. */
   set_level(u2, SK_PERCEPTION, eff_skill(u, SK_PERCEPTION, u2->region));
 
   msg = msg_message("sp_dreamreading_effect", "mage unit region", mage, u, u->region);
@@ -4823,7 +4823,7 @@ sp_sweetdreams(castorder *co)
   int duration = (int)(power/2)+1;
   int opfer = (int)(power*power);
 
-  /* Schleife über alle angegebenen Einheiten */
+  /* Schleife ueber alle angegebenen Einheiten */
   for (n = 0; n < pa->length; n++) {
     curse * c;
     unit *u;
@@ -4890,7 +4890,7 @@ sp_disturbingdreams(castorder *co)
  *
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  *
@@ -4975,16 +4975,16 @@ sp_itemcloak(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:     Magieresistenz erhöhen
+/* Name:     Magieresistenz erhoehen
  * Stufe:   3
  * Aura:     5 MP
  * Kosten:   SPC_LEVEL
  * Komponenten:
  *
  * Wirkung:
- *   erhöht die Magierestistenz der Personen um 20 Punkte für 6 Wochen
+ *   erhoeht die Magierestistenz der Personen um 20 Punkte fuer 6 Wochen
  *   Wirkt auf Stufe*5 Personen kann auf mehrere Einheiten gezaubert
- *   werden, bis die Zahl der möglichen Personen erschöpft ist
+ *   werden, bis die Zahl der moeglichen Personen erschoepft ist
  *
  * Flags:
  *   UNITSPELL
@@ -4999,11 +4999,11 @@ sp_resist_magic_bonus(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
-  /* Pro Stufe können bis zu 5 Personen verzaubert werden */
+  /* Pro Stufe koennen bis zu 5 Personen verzaubert werden */
   double maxvictims = 5;
   int victims = (int)maxvictims;
 
-  /* Schleife über alle angegebenen Einheiten */
+  /* Schleife ueber alle angegebenen Einheiten */
   for (n = 0; n < pa->length; n++) {
     message * msg;
     /* sollte nie negativ werden */
@@ -5083,7 +5083,7 @@ sp_enterastral(castorder *co)
 
   remaining_cap = (int)((power-3) * 1500);
 
-  /* für jede Einheit in der Kommandozeile */
+  /* fuer jede Einheit in der Kommandozeile */
   for (n = 0; n < pa->length; n++) {
     if (pa->param[n]->flag == TARGET_NOTFOUND) continue;
     u = pa->param[n]->data.u;
@@ -5193,7 +5193,7 @@ sp_pullastral(castorder *co)
 
   remaining_cap = (int)((power-3) * 1500);
 
-  /* für jede Einheit in der Kommandozeile */
+  /* fuer jede Einheit in der Kommandozeile */
   for (n = 1; n < pa->length; n++) {
     spllprm * spobj = pa->param[n];
     if (spobj->flag == TARGET_NOTFOUND) continue;
@@ -5316,7 +5316,7 @@ sp_leaveastral(castorder *co)
 
   remaining_cap = (int)((power-3) * 1500);
 
-  /* für jede Einheit in der Kommandozeile */
+  /* fuer jede Einheit in der Kommandozeile */
   for (n = 1; n < pa->length; n++) {
     if (pa->param[n]->flag == TARGET_NOTFOUND) continue;
 
@@ -5397,7 +5397,7 @@ sp_fetchastral(castorder *co)
     return 0;
   }
 
-  /* für jede Einheit in der Kommandozeile */
+  /* fuer jede Einheit in der Kommandozeile */
   for (n=0; n!=pa->length; ++n) {
     unit * u2, * u = pa->param[n]->data.u;
     int w;
@@ -5525,7 +5525,7 @@ sp_showastral(castorder *co)
 
   rl = all_in_range(rt,power/5);
 
-  /* Erst Einheiten zählen, für die Grammatik. */
+  /* Erst Einheiten zaehlen, fuer die Grammatik. */
 
   for (rl2=rl; rl2; rl2=rl2->next) {
     region * r2 = rl2->data;
@@ -5672,7 +5672,7 @@ sp_disruptastral(castorder *co)
       for (trl2 = trl; trl2; trl2 = trl2->next) ++inhab_regions;
     }
 
-    /* Nicht-Permanente Tore zerstören */
+    /* Nicht-Permanente Tore zerstoeren */
     a = a_find(r->attribs, &at_direction);
 
     while (a!=NULL && a->type==&at_direction) {
@@ -5691,7 +5691,7 @@ sp_disruptastral(castorder *co)
           region *tr;
           int c = rng_int() % inhab_regions;
 
-          /* Zufällige Zielregion suchen */
+          /* Zufaellige Zielregion suchen */
           while (c--!=0) trl2 = trl2->next;
           tr = trl2->data;
 
@@ -5724,9 +5724,9 @@ sp_disruptastral(castorder *co)
  * Kategorie:  Artefakt
  * Gebiet:     Tybied
  * Wirkung:
- * Das Gebäude kostet keinen Unterhalt mehr
+ * Das Gebaeude kostet keinen Unterhalt mehr
  *
- * ZAUBER "Mauern der Ewigkeit" <gebäude-nummer>
+ * ZAUBER "Mauern der Ewigkeit" <gebaeude-nummer>
  * Flags: (0)
  */
 static int
@@ -5783,9 +5783,9 @@ sp_eternizewall(castorder *co)
  * Kategorie:  Einheit, positiv
  * Wirkung:
  *   Mit Hilfe dieses Zaubers kann der Magier einen Teil seiner
- *   magischen Kraft permanent auf einen anderen Magier übertragen. Auf
- *   einen Tybied-Magier kann er die Hälfte der eingesetzten Kraft
- *   übertragen, auf einen Magier eines anderen Gebietes ein Drittel.
+ *   magischen Kraft permanent auf einen anderen Magier uebertragen. Auf
+ *   einen Tybied-Magier kann er die Haelfte der eingesetzten Kraft
+ *   uebertragen, auf einen Magier eines anderen Gebietes ein Drittel.
  *
  * Flags:
  * (UNITSPELL)
@@ -5908,7 +5908,7 @@ sp_movecastle(castorder *co)
         damage = true;
       }
     }
-/*    if (damage) strcat(buf, " Die Straßen der Region wurden beschädigt."); */
+/*    if (damage) strcat(buf, " Die Straßen der Region wurden beschaedigt."); */
   }
 
   msg = msg_message("sp_movecastle_effect", "building direction", b, dir);
@@ -5923,9 +5923,9 @@ sp_movecastle(castorder *co)
  * Stufe:      6
  *
  * Wirkung:
- * Läßt ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote und
+ * Laeßt ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote und
  * Langboote.
- * Kombinierbar mit "Günstige Winde", aber nicht mit "Sturmwind".
+ * Kombinierbar mit "Guenstige Winde", aber nicht mit "Sturmwind".
  *
  * Flag:
  *  (ONSHIPCAST | SHIPSPELL | TESTRESISTANCE)
@@ -5959,7 +5959,7 @@ sp_flying_ship(castorder *co)
       /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
       cmistake(mage, co->order, 211, MSG_MAGIC);
     } else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0) ) {
-      /* Es ist zu gefährlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
+      /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
       cmistake(mage, co->order, 210, MSG_MAGIC);
     }
     return 0;
@@ -5969,7 +5969,7 @@ sp_flying_ship(castorder *co)
   /* melden, 1x pro Partei */
   for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
   for(u = r->units; u; u = u->next ) {
-    /* das sehen natürlich auch die Leute an Land */
+    /* das sehen natuerlich auch die Leute an Land */
     if (!fval(u->faction, FFL_SELECT) ) {
       fset(u->faction, FFL_SELECT);
       if (!m) m = msg_message("flying_ship_result", "mage ship", mage, sh);
@@ -5988,7 +5988,7 @@ sp_flying_ship(castorder *co)
  * Wirkung:
  *     Mit Hilfe dieses Zaubers kann der Magier einem anderen Magier
  *     seine Aura gegen dessen Willen entziehen und sich selber
- *     zuführen.
+ *     zufuehren.
  *
  * Flags:
  * (FARCASTING | SPELLLEVEL | UNITSPELL | TESTRESISTANCE |
@@ -6027,7 +6027,7 @@ sp_stealaura(castorder *co)
       taura); */
     ADDMSG(&mage->faction->msgs, msg_message(
       "stealaura_success", "mage target aura", mage, u, taura));
-/*    sprintf(buf, "%s fühlt seine magischen Kräfte schwinden und verliert %d "
+/*    sprintf(buf, "%s fuehlt seine magischen Kraefte schwinden und verliert %d "
       "Aura.", unitname(u), taura); */
     ADDMSG(&u->faction->msgs, msg_message(
       "stealaura_detect", "unit aura", u, taura));
@@ -6041,23 +6041,23 @@ sp_stealaura(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Astrale Schwächezone
+/* Name:       Astrale Schwaechezone
  * Stufe:      5
  * Kategorie:
  * Wirkung:
- *    Reduziert die Stärke jedes Spruch in der Region um Level Hält
- *    Sprüche bis zu einem Gesammtlevel von Stärke*10 aus, danach ist
+ *    Reduziert die Staerke jedes Spruch in der Region um Level Haelt
+ *    Sprueche bis zu einem Gesammtlevel von Staerke*10 aus, danach ist
  *    sie verbraucht.
- *    leibt bis zu Stärke Wochen aktiv.
- *    Ein Ring der Macht erhöht die Stärke um 1, in einem Magierturm
- *    gezaubert gibt nochmal +1 auf Stärke. (force)
+ *    leibt bis zu Staerke Wochen aktiv.
+ *    Ein Ring der Macht erhoeht die Staerke um 1, in einem Magierturm
+ *    gezaubert gibt nochmal +1 auf Staerke. (force)
  *
  *    Beispiel:
- *    Eine Antimagiezone Stufe 7 hält bis zu 7 Wochen an oder Sprüche mit
- *    einem Gesammtlevel bis zu 70 auf. Also zB 7 Stufe 10 Sprüche, 10
- *    Stufe 7 Sprüche oder 35 Stufe 2 Sprüche.  Sie reduziert die Stärke
+ *    Eine Antimagiezone Stufe 7 haelt bis zu 7 Wochen an oder Sprueche mit
+ *    einem Gesammtlevel bis zu 70 auf. Also zB 7 Stufe 10 Sprueche, 10
+ *    Stufe 7 Sprueche oder 35 Stufe 2 Sprueche.  Sie reduziert die Staerke
  *    (level+boni) jedes Spruchs, der in der Region gezaubert wird, um
- *    7. Alle Sprüche mit einer Stärke kleiner als 7 schlagen fehl
+ *    7. Alle Sprueche mit einer Staerke kleiner als 7 schlagen fehl
  *    (power = 0).
  *
  * Flags:
@@ -6075,12 +6075,12 @@ sp_antimagiczone(castorder *co)
   double force = co->force;
   int duration = (int)force+1;
 
-  /* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
+  /* Haelt Sprueche bis zu einem summierten Gesamtlevel von power aus.
    * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
    * um seine Stufe */
   power = force * 10;
 
-  /* Reduziert die Stärke jedes Spruchs um effect */
+  /* Reduziert die Staerke jedes Spruchs um effect */
   effect = cast_level;
 
   create_curse(mage, &r->attribs, ct_find("antimagiczone"), power, duration,
@@ -6100,12 +6100,12 @@ sp_antimagiczone(castorder *co)
  * Kosten:   SPC_FIX
  *
  * Wirkung:
- *   Gibt Gebäuden einen Bonus auf Magieresistenz von +20%. Der Zauber
+ *   Gibt Gebaeuden einen Bonus auf Magieresistenz von +20%. Der Zauber
  *   dauert 3+rng_int()%Level Wochen an, also im Extremfall bis zu 2 Jahre
  *   bei Stufe 20
  *
- *   Es können mehrere Zauber übereinander gelegt werden, der Effekt
- *   summiert sich, jedoch wird die Dauer dadurch nicht verlängert.
+ *   Es koennen mehrere Zauber uebereinander gelegt werden, der Effekt
+ *   summiert sich, jedoch wird die Dauer dadurch nicht verlaengert.
  *
  * oder:
  *
@@ -6113,8 +6113,8 @@ sp_antimagiczone(castorder *co)
  *   dauert 3+rng_int()%Level Wochen an, also im Extremfall bis zu 2 Jahre
  *   bei Stufe 20
  *
- *   Es können mehrere Zauber übereinander gelegt werden, der Effekt
- *   summiert sich, jedoch wird die Dauer dadurch nicht verlängert.
+ *   Es koennen mehrere Zauber uebereinander gelegt werden, der Effekt
+ *   summiert sich, jedoch wird die Dauer dadurch nicht verlaengert.
  *
  * Flags:
  * (ONSHIPCAST | TESTRESISTANCE)
@@ -6144,7 +6144,7 @@ sp_magicrunes(castorder *co)
       building *b;
       b = pa->param[0]->data.b;
 
-      /* Magieresistenz der Burg erhöht sich um 20% */
+      /* Magieresistenz der Burg erhoeht sich um 20% */
       create_curse(mage, &b->attribs, ct_find("magicrunes"), force,
           duration, effect, 0);
 
@@ -6158,7 +6158,7 @@ sp_magicrunes(castorder *co)
     {
       ship *sh;
       sh = pa->param[0]->data.sh;
-      /* Magieresistenz des Schiffs erhöht sich um 20% */
+      /* Magieresistenz des Schiffs erhoeht sich um 20% */
       create_curse(mage, &sh->attribs, ct_find("magicrunes"), force,
           duration, effect, 0);
 
@@ -6218,7 +6218,7 @@ sp_speed2(castorder *co)
   }
 
   ADDMSG(&mage->faction->msgs, msg_message("speed_time_effect", "unit region amount", mage, mage->region, used));
-  /* Effektiv benötigten cast_level (mindestens 1) zurückgeben */
+  /* Effektiv benoetigten cast_level (mindestens 1) zurueckgeben */
   used = (int)sqrt(used/2);
   return MAX(1, used);
 }
@@ -6229,8 +6229,8 @@ sp_speed2(castorder *co)
  * Kosten:   SPC_LEVEL
  *
  * Wirkung:
- *   Kann eine bestimmte Verzauberung angreifen und auflösen. Die Stärke
- *   des Zaubers muss stärker sein als die der Verzauberung.
+ *   Kann eine bestimmte Verzauberung angreifen und aufloesen. Die Staerke
+ *   des Zaubers muss staerker sein als die der Verzauberung.
  * Syntax:
  *  ZAUBERE \"Magiefresser\" REGION
  *  ZAUBERE \"Magiefresser\" EINHEIT <Einheit-Nr>
@@ -6313,8 +6313,8 @@ sp_q_antimagie(castorder *co)
  * Kosten:   SPC_LEVEL
  *
  * Wirkung:
- *   Kann eine bestimmte Verzauberung angreifen und auflösen. Die Stärke
- *   des Zaubers muss stärker sein als die der Verzauberung.
+ *   Kann eine bestimmte Verzauberung angreifen und aufloesen. Die Staerke
+ *   des Zaubers muss staerker sein als die der Verzauberung.
  * Syntax:
  *  ZAUBERE \"Fluch brechen\" REGION <Zauber-id>
  *  ZAUBERE \"Fluch brechen\" EINHEIT <Einheit-Nr> <Zauber-id>
@@ -6386,7 +6386,7 @@ sp_break_curse(castorder *co)
       return 0;
     }
 
-    /* überprüfung, ob curse zu diesem objekt gehört */
+    /* ueberpruefung, ob curse zu diesem objekt gehoert */
     if (!is_cursed_with(*ap, c)) {
       /* Es wurde kein Ziel gefunden */
       ADDMSG(&mage->faction->msgs,
@@ -6395,7 +6395,7 @@ sp_break_curse(castorder *co)
                   mage, mage->region, co->order));
     }
 
-    /* curse auflösen, wenn zauber stärker (force > vigour)*/
+    /* curse aufloesen, wenn zauber staerker (force > vigour)*/
     c->vigour -= force;
 
     if (c->vigour <= 0.0) {
@@ -7029,7 +7029,7 @@ static spelldata spelldaten[] =
     (spell_f)sp_permtransfer, NULL
   },
   /* M_GRAY */
-  /*  Definitionen von Create_Artefaktsprüchen    */
+  /*  Definitionen von Create_Artefaktspruechen    */
   {
     SPL_METEORRAIN, "meteor_rain",
     (spell_f)sp_kampfzauber, NULL
@@ -7038,7 +7038,7 @@ static spelldata spelldaten[] =
     SPL_BECOMEWYRM, "wyrm_transformation",
     (spell_f)sp_becomewyrm, NULL
   },
-  /* Monstersprüche */
+  /* Monstersprueche */
   { SPL_FIREDRAGONODEM, "fiery_dragonbreath",
     (spell_f)sp_dragonodem, NULL
   },
@@ -7146,7 +7146,7 @@ set_spelldata(spell * sp)
 * Wirkung:
 *  Einheit ausspionieren. Gibt auch Zauber und Kampfstatus aus.  Wirkt
 *  gegen Magieresistenz. Ist diese zu hoch, so wird der Zauber entdeckt
-*  (Meldung) und der Zauberer erhält nur die Talente, nicht die Werte
+*  (Meldung) und der Zauberer erhaelt nur die Talente, nicht die Werte
 *  der Einheit und auch keine Zauber.
 *
 * Flag:
@@ -7192,9 +7192,9 @@ sp_babbler(castorder *co)
 *
 * Wirkung:
 *  Wirkt gegen Magieresistenz.  Spioniert die Einheit aus. Gibt alle
-*  Gegenstände, Talente mit Stufe, Zauber und Kampfstatus an.
+*  Gegenstaende, Talente mit Stufe, Zauber und Kampfstatus an.
 *
-*  Magieresistenz hier prüfen, wegen Fehlermeldung
+*  Magieresistenz hier pruefen, wegen Fehlermeldung
 *
 * Flag:
 * (UNITSPELL)
@@ -7220,7 +7220,7 @@ sp_readmind(castorder *co)
   /* Magieresistenz Unit */
   if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
     cmistake(mage, co->order, 180, MSG_MAGIC);
-    /* "Fühlt sich beobachtet"*/
+    /* "Fuehlt sich beobachtet"*/
     ADDMSG(&target->faction->msgs, msg_message("stealdetect", "unit", target));
     return 0;
   }
