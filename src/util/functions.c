@@ -55,11 +55,11 @@ get_functionname(pf_generic fun)
 void
 register_function(pf_generic fun, const char * name)
 {
-	function_list * fl = calloc(sizeof(function_list), 1);
-	fl->next = functionlist;
-	fl->fun = fun;
-	fl->name = strdup(name);
-	functionlist = fl;
+  function_list * fl = (function_list *)malloc(sizeof(function_list));
+  fl->next = functionlist;
+  fl->fun = fun;
+  fl->name = strdup(name);
+  functionlist = fl;
 }
 
 void
