@@ -34,6 +34,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -253,20 +254,30 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-/* ------------------------------------------------------------- */
-/* Für Sprüche 'get_scrambled_list_of_enemys_in_row', so daß man diese
- * Liste nur noch einmal durchlaufen muss, um Flächenzauberwirkungen
- * abzuarbeiten */
+/** randomly shuffle an array
+ * for correctness, see Donald E. Knuth, The Art of Computer Programming
+ */
+static void
+scramble_fighters(quicklist * ql)
+{
+  int qi, qlen = ql_length(ql);
+
+  for (qi=0;qi!=qlen;++qi) {
+    int qj = qi + (rng_int() % (qlen-qi));
+    void * a = ql_get(ql, qi);
+    void * b = ql_replace(ql, qj, a);
+    ql_replace(ql, qi, b);
+  }
+}
 
 /* Rosthauch */
 int
 sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
-  cvector *fgs;
-  void **fig;
+  quicklist *ql, *fgs;
   int force = lovar(power * 15);
-  int k = 0;
+  int qi, k = 0;
 
   /* Immer aus der ersten Reihe nehmen */
   unused(sp);
@@ -279,10 +290,10 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
   }
 
   fgs = fighters(b, fi->side, FIGHT_ROW, BEHIND_ROW-1, FS_ENEMY);
-  v_scramble(fgs->begin, fgs->end);
+  scramble_fighters(fgs);
 
-  for (fig = fgs->begin; fig != fgs->end; ++fig) {
-    fighter *df = *fig;
+  for (qi=0,ql=fgs; ql; ql_advance(&ql, &qi, 1)) {
+    fighter *df = (fighter *)ql_get(ql, qi);
 
     if (df->alive==0) continue;
     if (force<=0) break;
@@ -328,8 +339,7 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
       }
     }
   }
-  cv_kill(fgs);
-  free(fgs);
+  ql_free(fgs);
 
   if (k == 0) {
     /* keine Waffen mehr da, die zerstört werden könnten */
@@ -637,11 +647,9 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
   troop at;
-  int force;
-  int killed = 0;
+  int force, qi, killed = 0;
   const char *damage;
-  cvector *fgs;
-  void **fig;
+  quicklist *fgs, *ql;
   message * m;
 
   /* 2d4 HP */
@@ -660,8 +668,8 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
   at.index = 0;
 
   fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
-  for (fig = fgs->begin; fig != fgs->end; ++fig) {
-    fighter *df = *fig;
+  for (qi=0,ql=fgs; ql; ql_advance(&ql, &qi, 1)) {
+    fighter *df = (fighter *)ql_get(ql, qi);
     int n = df->alive-df->removed;
     troop dt;
 
@@ -673,8 +681,7 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
     }
     if (force==0) break;
   }
-  cv_kill(fgs);
-  free(fgs);
+  ql_free(fgs);
 
   m = msg_message("battle::combatspell", "mage spell killed", fi->unit, sp, killed);
   message_all(b, m);
@@ -875,11 +882,10 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
-  cvector *fgs;
-  void **fig;
+  quicklist *fgs, *ql;
   message * m;
   const char * mtype;
-  int k = 0;
+  int qi, k = 0;
 
   if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE|SELECT_FIND)) {
     m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
@@ -892,10 +898,10 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
   else power = get_force(power, 5);
 
   fgs = fighters(b, fi->side, FIGHT_ROW, NUMROWS, FS_ENEMY);
-  v_scramble(fgs->begin, fgs->end);
+  scramble_fighters(fgs);
 
-  for (fig = fgs->begin; fig != fgs->end; ++fig) {
-    fighter *df = *fig;
+  for (qi=0,ql=fgs; ql; ql_advance(&ql, &qi, 1)) {
+    fighter *df = (fighter *)ql_get(ql, qi);
     int n = df->unit->number;
 
     if (df->alive==0) continue;
@@ -936,8 +942,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
     }
     power = MAX(0, power-n);
   }
-  cv_kill(fgs);
-  free(fgs);
+  ql_free(fgs);
 
   if (sp->id==SPL_CHAOSROW) {
     mtype = (k>0) ? "sp_chaosrow_effect_1" : "sp_chaosrow_effect_0";
@@ -958,9 +963,8 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
 {
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
-  cvector *fgs;
-  void **fig;
-  int force, n;
+  quicklist *fgs, *ql;
+  int force, n, qi;
   int panik = 0;
   message * msg;
 
@@ -986,10 +990,11 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
   }
 
   fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
-  v_scramble(fgs->begin, fgs->end);
+  scramble_fighters(fgs);
 
-  for (fig = fgs->begin; fig != fgs->end; ++fig) {
-    fighter *df = *fig;
+  for (qi=0,ql=fgs; ql; ql_advance(&ql, &qi, 1)) {
+    fighter *df = (fighter *)ql_get(ql, qi);
+
     for (n=0; n!=df->alive; ++n) {
       if (force < 0)
         break;
@@ -1009,8 +1014,7 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
       }
     }
   }
-  cv_kill(fgs);
-  free(fgs);
+  ql_free(fgs);
 
   msg = msg_message("sp_flee_effect_1", "mage spell amount", mage, sp, panik);
   message_all(b, msg);
@@ -1496,14 +1500,13 @@ sp_keeploot(fighter * fi, int level, double power, spell * sp)
 }
 
 static int
-heal_fighters(cvector *fgs, int * power, boolean heal_monsters)
+heal_fighters(quicklist *fgs, int * power, boolean heal_monsters)
 {
-  int healhp = *power;
-  int healed = 0;
-  void **fig;
+  int healhp = *power, healed = 0, qi;
+  quicklist *ql;
 
-  for (fig = fgs->begin; fig != fgs->end; ++fig) {
-    fighter *df = *fig;
+  for (qi=0,ql=fgs; ql; ql_advance(&ql, &qi, 1)) {
+    fighter *df = (fighter *)ql_get(ql, qi);
 
     if (healhp<=0) break;
 
@@ -1542,7 +1545,7 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
   unit *mage = fi->unit;
   int j = 0;
   int healhp = (int)power * 200;
-  cvector *fgs;
+  quicklist *fgs;
   message * msg;
   boolean use_item = get_item(mage, I_AMULET_OF_HEALING) > 0;
 
@@ -1557,11 +1560,10 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
   * bis zu verteilende HP aufgebraucht sind */
 
   fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
-  v_scramble(fgs->begin, fgs->end);
+  scramble_fighters(fgs);
   j += heal_fighters(fgs, &healhp, false);
   j += heal_fighters(fgs, &healhp, true);
-  cv_kill(fgs);
-  free(fgs);
+  ql_free(fgs);
 
   if (j <= 0) {
     level = j;
@@ -1583,19 +1585,18 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   region *r = b->region;
-  cvector *fgs;
-  void **fig;
-  int n, undead = 0;
+  quicklist *fgs, *ql;
+  int qi, n, undead = 0;
   message * msg;
   int force = (int)get_force(power,0);
   double c = 0.50 + 0.02 * power;
 
   /* Liste aus allen Kämpfern */
   fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY | FS_HELP );
-  v_scramble(fgs->begin, fgs->end);
+  scramble_fighters(fgs);
 
-  for (fig = fgs->begin; fig != fgs->end; ++fig) {
-    fighter *df = *fig;
+  for (qi=0,ql=fgs; ql; ql_advance(&ql, &qi, 1)) {
+    fighter *df = (fighter *)ql_get(ql, qi);
     unit *du = df->unit;
 
     if (force<=0) break;
@@ -1644,8 +1645,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
       }
     }
   }
-  cv_kill(fgs);
-  free(fgs);
+  ql_free(fgs);
 
   level = MIN(level, undead);
   if (undead == 0) {
