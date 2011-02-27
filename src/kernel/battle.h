@@ -101,9 +101,9 @@ extern "C" {
     int nfighters;
     side sides[MAXSIDES];
     int nsides;
-    cvector meffects;
-    int		max_tactics;
-    int		turn;
+    struct quicklist *meffects;
+    int	max_tactics;
+    int	turn;
     boolean has_tactics_turn;
     int     keeploot;
     boolean reelarrow;

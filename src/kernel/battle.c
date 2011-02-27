@@ -1087,7 +1087,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   static int rule_armor = -1;
 
   /* Schild */
-  void **si;
   side *ds = df->side;
   int hp;
 
@@ -1247,7 +1246,10 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
   if ((du->race->battle_flags & BF_INV_NONMAGIC) && !magic) rda = 0;
   else {
+    int qi;
+    quicklist * ql;
     unsigned int i = 0;
+
     if (du->race->battle_flags & BF_RES_PIERCE) i |= WTF_PIERCE;
     if (du->race->battle_flags & BF_RES_CUT) i |= WTF_CUT;
     if (du->race->battle_flags & BF_RES_BASH) i |= WTF_BLUNT;
@@ -1255,21 +1257,21 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     if (i && awtype && fval(awtype, i)) rda /= 2;
 
     /* Schilde */
-    for (si = b->meffects.begin; si != b->meffects.end; ++si) {
-      meffect *meffect = *si;
-      if (meffect_protection(b, meffect, ds) != 0) {
+    for (qi=0,ql=b->meffects;ql;ql_advance(&ql, &qi, 1)) {
+      meffect *me = (meffect *)ql_get(ql, qi);
+      if (meffect_protection(b, me, ds) != 0) {
         assert(0 <= rda); /* rda sollte hier immer mindestens 0 sein */
         /* jeder Schaden wird um effect% reduziert bis der Schild duration
         * Trefferpunkte aufgefangen hat */
-        if (meffect->typ == SHIELD_REDUCE) {
-          hp = rda * (meffect->effect/100);
+        if (me->typ == SHIELD_REDUCE) {
+          hp = rda * (me->effect/100);
           rda -= hp;
-          meffect->duration -= hp;
+          me->duration -= hp;
         }
         /* gibt Rüstung +effect für duration Treffer */
-        if (meffect->typ == SHIELD_ARMOR) {
-          rda = MAX(rda - meffect->effect, 0);
-          meffect->duration--;
+        if (me->typ == SHIELD_ARMOR) {
+          rda = MAX(rda - me->effect, 0);
+          me->duration--;
         }
       }
     }
@@ -1756,10 +1758,10 @@ do_combatspell(troop at)
   unit *mage = fi->unit;
   battle *b = fi->side->battle;
   region *r = b->region;
-  int level;
+  quicklist * ql;
+  int level, qi;
   double power;
   int fumblechance = 0;
-  void **mg;
   order * ord;
   int sl;
   const struct locale * lang = mage->faction->locale;
@@ -1784,8 +1786,8 @@ do_combatspell(troop at)
     return;
   }
 
-  for (mg = b->meffects.begin; mg != b->meffects.end; ++mg) {
-    meffect *mblock = *mg;
+  for (qi=0,ql=b->meffects;ql;ql_advance(&ql, &qi, 1)) {
+    meffect *mblock = (meffect *)ql_get(ql, qi);
     if (mblock->typ == SHIELD_BLOCK) {
       if (meffect_blocked(b, mblock, fi->side) != 0) {
         fumblechance += mblock->duration;
@@ -3607,7 +3609,6 @@ static void
 free_battle(battle * b)
 {
   side *s;
-  meffect *meffect;
   int max_fac_no = 0;
 
   if (bdebug) {
@@ -3633,11 +3634,8 @@ free_battle(battle * b)
     free_side(s);
   }
   ql_free(b->leaders);
-  cv_foreach(meffect, b->meffects) {
-    free(meffect);
-  }
-  cv_next(meffect);
-  cv_kill(&b->meffects);
+  ql_foreach(b->meffects, free);
+  ql_free(b->meffects);
 }
 
 static int *
