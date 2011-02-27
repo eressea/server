@@ -58,7 +58,7 @@ extern "C" {
   } bfaction;
 
   typedef struct tactics {
-    cvector fighters;
+    struct quicklist * fighters;
     int value;
   } tactics;
 
@@ -93,7 +93,7 @@ extern "C" {
   } side;
 
   typedef struct battle {
-    cvector leaders;
+    struct quicklist * leaders;
     struct region *region;
     struct plane  *plane;
     bfaction * factions;

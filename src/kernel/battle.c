@@ -2301,9 +2301,9 @@ add_tactics(tactics * ta, fighter * fig, int value)
   if (value == 0 || value < ta->value)
     return;
   if (value > ta->value)
-    cv_kill(&ta->fighters);
-  cv_pushback(&ta->fighters, fig);
-  cv_pushback(&fig->side->battle->leaders, fig);
+    ql_free(ta->fighters);
+  ql_push(&ta->fighters, fig);
+  ql_push(&fig->side->battle->leaders, fig);
   ta->value = value;
 }
 
@@ -2630,10 +2630,6 @@ aftermath(battle * b)
   bfaction * bf;
   boolean ships_damaged = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2); /* only used for ship damage! */
 
-#ifdef TROLLSAVE
-  int *trollsave = calloc(2 * cv_size(&b->factions), sizeof(int));
-#endif
-
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter * df;
     for (df = s->fighters; df; df=df->next) {
@@ -2641,21 +2637,6 @@ aftermath(battle * b)
       int dead = dead_fighters(df);
       int pr_mercy = 0;
 
-#ifdef TROLLSAVE
-      /* Trolle können regenerieren */
-      if (df->alive > 0 && dead>0 && du->race == new_race[RC_TROLL]) {
-        for (i = 0; i != dead; ++i) {
-          if (chance(TROLL_REGENERATION)) {
-            ++df->alive;
-            ++s->alive;
-            ++s->battle->alive;
-            ++trollsave[s->index];
-            /* do not change dead here, or loop will not terminate! recalculate later */
-          }
-        }
-        dead = dead_fighters(df);
-      }
-#endif
       /* Regeneration durch PR_MERCY */
       if (dead>0 && pr_mercy) {
         for (i = 0; i != dead; ++i) {
@@ -2918,9 +2899,6 @@ aftermath(battle * b)
       if (*sp==sh) sp=&sh->next;
     }
   }
-#ifdef TROLLSAVE
-  free(trollsave);
-#endif
 
   reorder_fleeing(r);
 
@@ -3146,7 +3124,7 @@ print_stats(battle * b)
   b->max_tactics = 0;
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
-    if (cv_size(&s->leader.fighters)) {
+    if (!ql_empty(s->leader.fighters)) {
       b->max_tactics = MAX(b->max_tactics, s->leader.value);
     }
   }
@@ -3154,8 +3132,11 @@ print_stats(battle * b)
   if (b->max_tactics > 0) {
     for (s=b->sides;s!=b->sides+b->nsides;++s) {
       if (s->leader.value == b->max_tactics) {
-        fighter *tf;
-        cv_foreach(tf, s->leader.fighters) {
+        quicklist *ql;
+        int qi;
+
+        for (qi=0,ql=s->leader.fighters;ql;ql_advance(&ql, &qi, 1)) {
+          fighter *tf = (fighter *)ql_get(ql, qi);
           unit *u = tf->unit;
           message * m = NULL;
           if (!is_attacker(tf)) {
@@ -3165,7 +3146,7 @@ print_stats(battle * b)
           }
           message_all(b, m);
           msg_release(m);
-        } cv_next(tf);
+        }
       }
     }
   }
@@ -3603,7 +3584,7 @@ make_battle(region * r)
 static void
 free_side(side * si)
 {
-  cv_kill(&si->leader.fighters);
+  ql_free(si->leader.fighters);
 }
 
 static void
@@ -3651,7 +3632,7 @@ free_battle(battle * b)
     }
     free_side(s);
   }
-  cv_kill(&b->leaders);
+  ql_free(b->leaders);
   cv_foreach(meffect, b->meffects) {
     free(meffect);
   }
@@ -4329,7 +4310,7 @@ do_battle(region * r)
   for (sh=r->ships; sh; sh=sh->next) freset(sh, SF_DAMAGED);
 
   /* Gibt es eine Taktikrunde ? */
-  if (cv_size(&b->leaders)) {
+  if (!ql_empty(b->leaders)) {
     b->turn = 0;
     b->has_tactics_turn = true;
   } else {

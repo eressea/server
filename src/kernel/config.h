@@ -35,7 +35,6 @@ struct _dictionary_;
 #define SHIPDAMAGE /* Schiffsbeschädigungen */
 #define INSECT_POTION /* Spezialtrank für Insekten */
 #define ORCIFICATION /* giving snotlings to the peasants gets counted */
-#undef TROLLSAVE /* saving throw for dead trolls */  
   
 #define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
