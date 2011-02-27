@@ -2,7 +2,7 @@
 
 #if defined(WIN32)
 #include <direct.h>
-#elif defined(__GCC__)
+#else
 #include <sys/stat.h>
 #endif
 
