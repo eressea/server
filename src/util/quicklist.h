@@ -25,6 +25,7 @@ extern "C" {
 typedef struct quicklist quicklist;
 void * ql_get(const struct quicklist * ql, int index);
 int ql_length(const struct quicklist * ql);
+int ql_empty(const struct quicklist * ql);
 void ql_push(struct quicklist ** qlp, void * data);
 int ql_delete(struct quicklist ** qlp, int index);
 int ql_insert(struct quicklist ** qlp, int index, void * data);

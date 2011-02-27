@@ -19,7 +19,9 @@ static void test_insert(CuTest * tc) {
 
 static void test_insert_delete_gives_null(CuTest * tc) {
   struct quicklist * ql = NULL;
+  CuAssertIntEquals(tc, 1, ql_empty(ql));
   ql_push(&ql, (void*)42);
+  CuAssertIntEquals(tc, 0, ql_empty(ql));
   ql_delete(&ql, 0);
   CuAssertPtrEquals(tc, 0, ql);
 }

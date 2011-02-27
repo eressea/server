@@ -47,6 +47,10 @@ int ql_length(const quicklist * ql) {
   return ql?ql->num_elements+ql_length(ql->next):0;
 }
 
+int ql_empty(const quicklist * ql) {
+  return !ql;
+}
+
 void ql_push(quicklist ** qlp, void * data) {
   quicklist * ql = 0;
   while(*qlp && ((*qlp)->next || (*qlp)->num_elements==QL_MAXSIZE)) {
