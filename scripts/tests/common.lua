@@ -29,6 +29,7 @@ module("tests.common", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
+    write_game("free.dat")
     settings.set("nmr.removenewbie", "0")
     settings.set("nmr.timeout", "0")
     settings.set("rules.economy.food", "4")
@@ -513,7 +514,8 @@ function test_store_unit()
   local u = unit.create(f, r, 1)
   local fid = f.id
   u:add_item("money", u.number * 100)
-  store = storage.create("test.unit.dat", "wb")
+  local filename = config.basepath .. "/data/test.unit.dat"
+  store = storage.create(filename, "wb")
   assert_not_equal(store, nil)
   store:write_unit(u)
   store:close()
@@ -522,8 +524,8 @@ function test_store_unit()
   r = region.create(0, 0, "plain")
   f = faction.create("noreply@eressea.de", "human", "de")
   f.id = fid
-  store = storage.create("test.unit.dat", "rb")
-  assert(store)
+  store = storage.create(filename, "rb")
+  assert_not_nil(store)
   u = store:read_unit()
   store:close()
   assert(u)
@@ -776,6 +778,7 @@ local function find_in_report(f, pattern, extension)
     extension = extension or "nr"
     local filename = config.basepath .. "/reports/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
     local report = io.open(filename, 'rt');
+    assert_not_nil(report)
     t = report:read("*all")
     report:close()
 
@@ -827,6 +830,7 @@ module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
+    write_game("free.dat")
     settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
 end
 
@@ -834,9 +838,10 @@ function test_parser()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local filename = "1814.txt"
+    local filename = config.basepath .. "/data/orders.txt"
     
     local file = io.open(filename, "w+")
+    assert_not_nil(file)
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
     file:write("LERNEN Hiebwaffen\n")
@@ -852,7 +857,7 @@ function test_bug_1814()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local filename = "1814.txt"
+    local filename = config.basepath .. "/data/1814.txt"
     
     local file = io.open(filename, "w+")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
@@ -873,7 +878,7 @@ function test_bug_1679()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local filename = "1814.txt"
+    local filename = config.basepath .. "/data/1679.txt"
     
     local file = io.open(filename, "w+")
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "' .. f.password .. '"\n')
