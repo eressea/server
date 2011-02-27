@@ -19,11 +19,12 @@
 #include <util/goodies.c>
 #include <util/language.c>
 #include <util/lists.c>
-#include <util/quicklist.c>
 #include <util/log.c>
 #include <util/message.c>
 #include <util/nrmessage.c>
+#include <util/os.c>
 #include <util/parser.c>
+#include <util/quicklist.c>
 #include <util/rand.c>
 #include <util/resolve.c>
 #include <util/sql.c>

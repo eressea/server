@@ -51,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/os.h>
 #include <util/quicklist.h>
 
 /* libc includes */
@@ -1491,7 +1492,7 @@ init_reports(void)
     if (stat(reportpath(), &st)==0) return 0;
   }
 #endif
-  if (makedir(reportpath(), 0700)!=0) {
+  if (os_mkdir(reportpath(), 0700)!=0) {
     if (errno!=EEXIST) {
       perror("could not create reportpath");
       return -1;

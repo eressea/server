@@ -59,6 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/cvector.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/os.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -3575,7 +3576,7 @@ make_battle(region * r)
     char zText[MAX_PATH];
     char zFilename[MAX_PATH];
     sprintf(zText, "%s/battles", basepath());
-    makedir(zText, 0700);
+    os_mkdir(zText, 0700);
     sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
     bdebug = fopen(zFilename, "w");
     if (!bdebug) log_error(("battles cannot be debugged\n"));

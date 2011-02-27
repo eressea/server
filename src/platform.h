@@ -120,17 +120,10 @@ typedef struct stat stat_type;
 # define HAVE_SNPRINTF
 #ifdef _POSIX_SOURCE /* MINGW doesn't seem to have these */
 # define HAVE_EXECINFO
-# define HAVE_MKDIR_WITH_PERMISSION
 # define HAVE_SIGACTION
 # define HAVE_LINK
 # define HAVE_SLEEP
 #endif
-#endif
-
-/* egcpp 4 dos */
-#ifdef MSDOS
-# include <dir.h>
-# define HAVE_MKDIR_WITH_PERMISSION
 #endif
 
 /* TinyCC */
@@ -209,15 +202,6 @@ typedef struct _stat stat_type;
 # elif defined(HAVE__STRNICMP)
 #  define strncasecmp _strnicmp
 # endif
-#endif
-
-#ifdef HAVE_MKDIR_WITH_PERMISSION
-# define makedir(d, p) mkdir(d, p)
-#elif defined(HAVE_MKDIR_WITHOUT_PERMISSION)
-# define makedir(d, p) mkdir(d)
-#elif defined(HAVE__MKDIR_WITHOUT_PERMISSION)
-_CRTIMP int __cdecl _mkdir(const char *);
-# define makedir(d, p) _mkdir(d)
 #endif
 
 #ifndef HAVE_STRDUP

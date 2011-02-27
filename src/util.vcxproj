@@ -107,6 +107,7 @@
     <ClInclude Include="util\message.h" />
     <ClInclude Include="util\nrmessage.h" />
     <ClInclude Include="util\nrmessage_struct.h" />
+    <ClInclude Include="util\os.h" />
     <ClInclude Include="util\parser.h" />
     <ClInclude Include="util\patricia.h" />
     <ClInclude Include="util\quicklist.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="util\log.c" />
     <ClCompile Include="util\message.c" />
     <ClCompile Include="util\nrmessage.c" />
+    <ClCompile Include="util\os.c" />
     <ClCompile Include="util\parser.c" />
     <ClCompile Include="util\patricia.c" />
     <ClCompile Include="util\quicklist.c" />

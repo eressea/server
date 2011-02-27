@@ -110,6 +110,9 @@
     <ClInclude Include="util\quicklist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="util\os.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="util\argstack.c">
@@ -206,6 +209,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util\quicklist_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util\os.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

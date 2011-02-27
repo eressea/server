@@ -589,7 +589,7 @@ learn_cmd(unit * u, order * ord)
     struct building * b = inside_building(u);
     const struct building_type * btype = b?b->type:NULL;
 
-    if (btype == bt_find("academy")) {
+    if (btype && btype == bt_find("academy")) {
       studycost = MAX(50, studycost * 2);
     }
   }

@@ -61,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/os.h>
 #include <util/parser.h>
 #include <util/quicklist.h>
 #include <util/rand.h>
@@ -1683,7 +1684,11 @@ writegame(const char *filename, int mode)
 
   store->encoding = enc_gamedata;
   if (store->open(store, path, IO_WRITE)!=0) {
-    return -1;
+    int err = os_mkdir(datapath(), 0700);
+    if (err) return err;
+    if (store->open(store, path, IO_WRITE)!=0) {
+      return -1;
+    }
   }
 
   /* globale Variablen */
