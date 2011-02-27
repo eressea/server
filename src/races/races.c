@@ -94,24 +94,6 @@ equip_newunits(const struct equipment * eq, struct unit *u)
   }
 }
 
-static item *
-default_spoil(const struct race * rc, int size)
-{
-  item * itm = NULL;
-
-  if (rng_int()%100 < RACESPOILCHANCE) {
-    char spoilname[32];
-    const item_type * itype;
-
-    sprintf(spoilname,  "%sspoil", rc->_name[0]);
-    itype = it_find(spoilname);
-    if (itype!=NULL) {
-      i_add(&itm, i_new(itype, size));
-    }
-  }
-  return itm;
-}
-
 /* Die Funktionen werden über den hier registrierten Namen in races.xml
  * in die jeweilige Rassendefiniton eingebunden */
 void
@@ -138,6 +120,5 @@ register_races(void)
   /* function itemdrop
   * to generate battle spoils
   * race->itemdrop() */
-  register_function((pf_generic)default_spoil, "defaultdrops");
   register_function((pf_generic)equip_newunits, "equip_newunits");
 }
