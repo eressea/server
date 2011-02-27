@@ -86,11 +86,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <time.h>
 #include <errno.h>
 
-#define PTRIES 0 /* it turns out they are slow :-( */
-#if PTRIES
-#include <util/patricia.h>
-#endif
-
 struct settings global = {
   "Eressea", /* gamename */
 };

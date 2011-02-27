@@ -7,7 +7,6 @@
 
 #include <util/console.c>
 #include <util/attrib.c>
-#include <util/argstack.c>
 #include <util/base36.c>
 #include <util/crmessage.c>
 #include <util/cvector.c>

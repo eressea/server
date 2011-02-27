@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="util\argstack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="util\attrib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -74,9 +71,6 @@
     <ClInclude Include="util\parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\patricia.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="util\rand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -115,9 +109,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="util\argstack.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="util\attrib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -176,9 +167,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util\parser.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="util\patricia.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util\rand.c">
