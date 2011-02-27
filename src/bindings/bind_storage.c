@@ -58,9 +58,11 @@ tolua_storage_read_unit(lua_State *L)
 static int
 tolua_storage_write_unit(lua_State *L)
 {
-  storage * self = (storage *)tolua_tousertype(L, 1, 0);
+  storage * store = (storage *)tolua_tousertype(L, 1, 0);
   struct unit * u = (struct unit *)tolua_tousertype(L, 2, 0);
-  write_unit(self, u);
+  if (store->version) {
+    write_unit(store, u);
+  }
   return 0;
 }
 
@@ -87,7 +89,7 @@ static int
 tolua_storage_write(lua_State *L)
 {
   storage * self = (storage *)tolua_tousertype(L, 1, 0);
-  if (tolua_isnumber(L, 2, 0, 0)) {
+  if (self->version && tolua_isnumber(L, 2, 0, 0)) {
     lua_Number num = tolua_tonumber(L, 2, 0);
     double n;
     if (modf(num, &n)==0.0) {

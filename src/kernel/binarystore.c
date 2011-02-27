@@ -264,6 +264,7 @@ bin_open(struct storage * store, const char * filename, int mode)
         store->w_int = bin_w_int;
       }
     } else if (store->encoding==XML_CHAR_ENCODING_UTF8) {
+      store->version = RELEASE_VERSION;
       bin_w_int(store, RELEASE_VERSION);
       bin_w_int(store, STREAM_VERSION);
     }
