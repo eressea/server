@@ -24,7 +24,9 @@ CuSuite* get_laws_suite(void);
 int RunAllTests(void) {
   CuString *output = CuStringNew();
   CuSuite* suite = CuSuiteNew();
+  int flags = log_flags;
 
+  log_flags = LOG_FLUSH|LOG_CPERROR;
   init_resources();
 
   CuSuiteAddSuite(suite, get_base36_suite());
@@ -37,6 +39,8 @@ int RunAllTests(void) {
   CuSuiteSummary(suite, output);
   CuSuiteDetails(suite, output);
   printf("%s\n", output->buffer);
+
+  log_flags = flags;
   return suite->failCount;
 }
 

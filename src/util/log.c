@@ -161,19 +161,19 @@ check_dupe(const char * format, const char * type)
 void 
 _log_warn(const char * format, ...)
 {
-  int dupe = check_dupe(format, "WARNING");
+  if (log_flags & LOG_CPWARNING) {
+    int dupe = check_dupe(format, "WARNING");
 
-  fflush(stdout);
-  if (!logfile) logfile = stderr;
-  if (logfile!=stderr) {
-    va_list marker;
-    fputs("WARNING: ", logfile);
-    va_start(marker, format);
-    vfprintf(logfile, format, marker);
-    va_end(marker);
-  }
-  if (!dupe) {
-    if (log_flags & LOG_CPWARNING) {
+    fflush(stdout);
+    if (!logfile) logfile = stderr;
+    if (logfile!=stderr) {
+      va_list marker;
+      fputs("WARNING: ", logfile);
+      va_start(marker, format);
+      vfprintf(logfile, format, marker);
+      va_end(marker);
+    }
+    if (!dupe) {
       va_list marker;
       fputs("WARNING: ", stderr);
       va_start(marker, format);
