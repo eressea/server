@@ -21,7 +21,7 @@ end
 
 local function two_factions()
   local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local f2 = faction.create("noreply@eressea.de", "orc", "de")
+  local f2 = faction.create("noreply@eressea.de", "elf", "de")
   return f1, f2
 end
 
@@ -266,7 +266,7 @@ function test_events()
   plain = region.create(0, 0, "plain")
   skill = 8
 
-  f = faction.create("noreply@eressea.de", "orc", "de")
+  f = faction.create("noreply@eressea.de", "elf", "de")
   f.age = 20
 
   u = unit.create(f, plain)
