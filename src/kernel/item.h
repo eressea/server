@@ -119,11 +119,6 @@ typedef struct resource_limit {
 #define ENOSKILL  -3;
 #define EUNUSABLE -4;
 
-typedef struct itemtype_list {
-  struct itemtype_list * next;
-  const struct item_type * type;
-} itemtype_list;
-
 typedef struct item_type {
   resource_type * rtype;
   /* --- constants --- */

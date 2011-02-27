@@ -61,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/os.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -1606,31 +1607,13 @@ select_opponent(battle * b, troop at, int mindist, int maxdist)
   return dt;
 }
 
-/*
- * Abfrage mit
- *
- * cvector *fgs=fighters(b,af,FIGHT_ROW,BEHIND_ROW, FS_HELP|FS_ENEMY);
- * fighter *fig;
- *
- * Optional: Verwirbeln. Vorsicht: Aufwändig!
- * v_scramble(fgs->begin, fgs->end);
- *
- * for (fig = fgs->begin; fig != fgs->end; ++fig) {
- *     fighter *df = *fig;
- *
- * }
- *
- * cv_kill(fgs); free(fgs); Nicht vergessen
- */
-
-cvector *
+quicklist *
 fighters(battle *b, const side * vs, int minrow, int maxrow, int mask)
 {
   side * s;
-  cvector *fightervp = malloc(sizeof(cvector));
+  quicklist *fightervp = 0;
 
   assert(vs!=NULL);
-  cv_init(fightervp);
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
     fighter *fig;
@@ -1647,7 +1630,7 @@ fighters(battle *b, const side * vs, int minrow, int maxrow, int mask)
     for (fig = s->fighters; fig; fig = fig->next) {
       int row = get_unitrow(fig, vs);
       if (row >= minrow && row <= maxrow) {
-        cv_pushback(fightervp, fig);
+        ql_push(&fightervp, fig);
       }
     }
   }

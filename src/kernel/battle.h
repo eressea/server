@@ -248,7 +248,7 @@ extern "C" {
   extern void message_all(battle * b, struct message * m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
-  extern struct cvector * fighters(struct battle *b, const struct side * vs, int minrow, int maxrow, int mask);
+  extern struct quicklist * fighters(struct battle *b, const struct side * vs, int minrow, int maxrow, int mask);
   extern int count_allies(const struct side * as, int minrow, int maxrow, int select, int allytype);
   extern int get_unitrow(const struct fighter * af, const struct side * vs);
   extern boolean helping(const struct side * as, const struct side * ds);
