@@ -121,14 +121,6 @@
   </resource>
 
 <!-- items -->
-  <resource name="cart" big="true">
-    <item capacity="14000" weight="4000" score="60" vehicle="yes">
-      <construction skill="cartmaking" minskill="1" reqsize="1">
-        <requirement type="log" quantity="5"/>
-      </construction>
-    </item>
-  </resource>
-
   <resource name="antimagic" appearance="amulet">
     <item weight="0" score="2000">
       <function name="use" value="use_antimagiccrystal"/>

@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <resources xmlns:xi="http://www.w3.org/2001/XInclude">
-  <!-- this file contains resources that can be mined in some way (anything with a resourcelimit) -->
+  <!--
+  this file contains the most important items and resources any game will
+  want to use. Or maybe you just have to roll your own file.
+  -->
 
+  <xi:include href="../resources/cart.xml"/>
   <xi:include href="../resources/horse.xml"/>
   <xi:include href="../resources/hp.xml"/>
   <xi:include href="../resources/iron.xml"/>

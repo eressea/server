@@ -717,8 +717,11 @@ function test_ride_with_horses_and_cart()
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     u:add_item("cart", 1)
+    assert_equal(1, u:get_item("cart")) -- every game has a cart, right? right?
     u:add_item("horse", 2)
+    assert_equal(2, u:get_item("horse")) -- every game has a horse, right? right?
     u:add_item("sword", 120)
+    assert_equal(120, u:get_item("sword")) -- every game has a sword, right? and it weighs 1 unit?
     u:set_skill("riding", 3)
 
     -- ride
@@ -824,6 +827,7 @@ module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
+    settings.set("rules.economy.food", "4") -- FOOD_IS_FREE
 end
 
 function test_parser()

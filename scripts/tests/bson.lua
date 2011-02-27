@@ -22,13 +22,15 @@ function test_illegal_arg()
 end
 
 function test_bson_readwrite()
-    local r = region.create(0, 0, "mountain")
+    local i, r = region.create(0, 0, "mountain")
     attrib.create(r, 42)
-    write_game("test_read_write.dat")
+    i = write_game("test_read_write.dat")
+    assert_equal(0, i)
     free_game()
     r = get_region(0, 0)
     assert_equal(nil, r)
-    read_game("test_read_write.dat")
+    i = read_game("test_read_write.dat")
+    assert_equal(0, i)
     r = get_region(0, 0)
     assert_not_equal(nil, r)
     for a in attrib.get(r) do
