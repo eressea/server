@@ -24,6 +24,15 @@ static void test_insert_delete_gives_null(CuTest * tc) {
   CuAssertPtrEquals(tc, 0, ql);
 }
 
+static void test_replace(CuTest * tc) {
+  struct quicklist * ql = NULL;
+  int a;
+  ql_push(&ql, (void*)42);
+  a = (int)ql_replace(ql, 0, (void *)43);
+  CuAssertIntEquals(tc, 42, a);
+  CuAssertIntEquals(tc, 43, (int)ql_get(ql, 0));
+}
+
 static void test_set_insert(CuTest * tc) {
   struct quicklist * ql = NULL;
   int a, qi;
@@ -167,6 +176,7 @@ CuSuite* get_quicklist_suite(void)
 {
   CuSuite* suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_advance);
+  SUITE_ADD_TEST(suite, test_replace);
   SUITE_ADD_TEST(suite, test_push);
   SUITE_ADD_TEST(suite, test_insert);
   SUITE_ADD_TEST(suite, test_set_remove);

@@ -33,6 +33,16 @@ void * ql_get(const quicklist * ql, int index) {
   return (ql && index<ql->num_elements)?ql->elements[index]:ql_get(ql->next, index-ql->num_elements);
 }
 
+void * ql_replace(quicklist * ql, int index, void * data) {
+  if (ql && index<ql->num_elements) {
+    void * orig = ql->elements[index];
+    ql->elements[index] = data;
+    return orig;
+  } else {
+    return ql_replace(ql->next, index-ql->num_elements, data);
+  }
+}
+
 int ql_length(const quicklist * ql) {
   return ql?ql->num_elements+ql_length(ql->next):0;
 }

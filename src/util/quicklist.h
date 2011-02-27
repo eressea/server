@@ -31,6 +31,7 @@ int ql_insert(struct quicklist ** qlp, int index, void * data);
 void ql_foreach(struct quicklist * ql, void (*cb)(void *));
 int ql_advance(struct quicklist ** iterator, int * index, int stride);
 void ql_free(struct quicklist * ql);
+void * ql_replace(struct quicklist * ql, int index, void * data);
 
 /* you can use it as a set (sorted pointers)*/
 int ql_set_insert(struct quicklist ** qlp, void * data);
