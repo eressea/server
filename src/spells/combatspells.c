@@ -1319,12 +1319,12 @@ static void
 do_meffect(fighter * af, int typ, int effect, int duration)
 {
   battle *b = af->side->battle;
-  meffect *meffect = calloc(1, sizeof(struct meffect));
-  cv_pushback(&b->meffects, meffect);
-  meffect->magician = af;
-  meffect->typ = typ;
-  meffect->effect = effect;
-  meffect->duration = duration;
+  meffect *me = (meffect *)malloc(sizeof(struct meffect));
+  ql_push(&b->meffects, me);
+  me->magician = af;
+  me->typ = typ;
+  me->effect = effect;
+  me->duration = duration;
 }
 
 int
