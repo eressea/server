@@ -92,7 +92,6 @@
     <ClInclude Include="util\bsdstring.h" />
     <ClInclude Include="util\console.h" />
     <ClInclude Include="util\crmessage.h" />
-    <ClInclude Include="util\cvector.h" />
     <ClInclude Include="util\event.h" />
     <ClInclude Include="util\eventbus.h" />
     <ClInclude Include="util\filereader.h" />
@@ -127,7 +126,6 @@
     <ClCompile Include="util\bsdstring.c" />
     <ClCompile Include="util\console.c" />
     <ClCompile Include="util\crmessage.c" />
-    <ClCompile Include="util\cvector.c" />
     <ClCompile Include="util\dice.c" />
     <ClCompile Include="util\event.c" />
     <ClCompile Include="util\eventbus.c" />

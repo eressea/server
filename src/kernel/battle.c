@@ -56,7 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <util/cvector.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/os.h>

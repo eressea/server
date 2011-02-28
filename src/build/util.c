@@ -9,7 +9,6 @@
 #include <util/attrib.c>
 #include <util/base36.c>
 #include <util/crmessage.c>
-#include <util/cvector.c>
 #include <util/dice.c>
 #include <util/event.c>
 #include <util/eventbus.c>
