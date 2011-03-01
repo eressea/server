@@ -2301,8 +2301,10 @@ add_tactics(tactics * ta, fighter * fig, int value)
 {
   if (value == 0 || value < ta->value)
     return;
-  if (value > ta->value)
+  if (value > ta->value) {
     ql_free(ta->fighters);
+    ta->fighters = 0;
+  }
   ql_push(&ta->fighters, fig);
   ql_push(&fig->side->battle->leaders, fig);
   ta->value = value;
