@@ -430,7 +430,7 @@ update_spellbook(faction * f, int level)
       commonspells[numspells++] = sp;
     } else {
       if (know_school(f, sp->magietyp) && sp->level <= level) {
-        add_spell(&f->spellbook, sp);
+        ql_set_insert(&f->spellbook, sp);
       }
     }
   }
@@ -524,13 +524,8 @@ create_mage(unit * u, magic_t mtyp)
 void
 add_spell(struct quicklist ** slistp, spell * sp)
 {
-  quicklist * ql = *slistp;
-  int qi;
-
-  if (ql_set_find(&ql, &qi, sp)) {
+  if (ql_set_insert(slistp, sp)!=0) {
     log_error(("add_spell: the list already contains the spell '%s'.\n", sp->sname));
-  } else {
-    ql_set_insert(slistp, sp);
   }
 }
 
