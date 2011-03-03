@@ -271,7 +271,7 @@ paint_map(window * wnd, const state * st)
             attr |= A_REVERSE;
           }
         }
-        if (mr->r && mr->r->flags & RF_MAPPER_HIGHLIGHT) hl = 1;
+        if (mr->r && (mr->r->flags & RF_MAPPER_HIGHLIGHT)) hl = 1;
         mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
       }
     }
