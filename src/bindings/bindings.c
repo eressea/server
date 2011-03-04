@@ -1018,6 +1018,22 @@ tolua_settings_set(lua_State* L)
   return 0;
 }
 
+/*
+ * Paramter: item name
+ * Returns true if the item type is known in the game
+ */
+static int
+tolua_has_item(lua_State* L)
+{
+  const char * iname = tolua_tostring(L, 1, 0);
+  const item_type * itype = NULL;
+  if (iname!=NULL) {
+    itype = it_find(iname);
+  }
+  lua_pushboolean(L, itype!=NULL);
+  return 1;
+}
+
 static void
 parse_inifile(lua_State* L, dictionary * d, const char * section)
 {
@@ -1202,6 +1218,9 @@ tolua_eressea_open(lua_State* L)
 
     tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
     
+    /* test helpers */
+    tolua_function(L, TOLUA_CAST "has_item", tolua_has_item);
+
   }
   tolua_endmodule(L);
   return 1;
