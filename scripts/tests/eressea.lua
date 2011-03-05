@@ -192,7 +192,7 @@ function test_snowman()
     u:add_order("BENUTZEN 1 Schneemann")
     process_orders()
     for u2 in r.units do
-        if u2~=u then
+        if u2.id~=u.id then
             assert_equal(u2.race, "snowman")
             u = nil
             break
