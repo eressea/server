@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.4)
-project (eressea C)
+project(eressea C)
 
 if (${CMAKE_C_COMPILER} MATCHES ".*tcc")
   set(CMAKE_C_FLAGS "-Wall -g")
