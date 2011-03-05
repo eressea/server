@@ -16,6 +16,7 @@
 extern "C" {
 #endif
 
+/* FIXME where is this defined?? */
 extern signed char skill_bonus(struct unit * u, struct region * r);
 
 /* skillmod_data::flags -- wann gilt der modifier? */
@@ -24,7 +25,7 @@ extern signed char skill_bonus(struct unit * u, struct region * r);
 #define SMF_RIDING     (1<<2) /* Bonus für berittene - an der rasse*/
 
 typedef struct skill {
-	unsigned char id;
+	skill_t id;
 	unsigned int level : 8;
 	unsigned int weeks : 8;
 	unsigned int old : 8;
