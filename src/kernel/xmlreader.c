@@ -1271,13 +1271,12 @@ add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue!=NULL);
       sk = sk_find((const char*)propValue);
+      assert(sk!=NOSKILL);
       xmlFree(propValue);
-      if (sk!=NOSKILL) {
-        propValue = xmlGetProp(node, BAD_CAST "level");
-        if (propValue!=NULL) {
-          equipment_setskill(eq, sk, (const char*)propValue);
-          xmlFree(propValue);
-        } 
+      propValue = xmlGetProp(node, BAD_CAST "level");
+      if (propValue!=NULL) {
+        equipment_setskill(eq, sk, (const char*)propValue);
+        xmlFree(propValue);
       }
     }
   }
