@@ -1897,7 +1897,7 @@ get_captain(const ship * sh)
   unit *u;
 
   for (u = r->units; u; u = u->next) {
-    if (u->ship == sh && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
+    if (u->ship == sh && u->number && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
       return u;
   }
 
