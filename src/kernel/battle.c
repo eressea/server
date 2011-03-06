@@ -2634,6 +2634,7 @@ aftermath(battle * b)
   boolean ships_damaged = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2); /* only used for ship damage! */
 
   for (s=b->sides;s!=b->sides+b->nsides;++s) {
+    s->dead=0;
     fighter * df;
     for (df = s->fighters; df; df=df->next) {
       unit *du = df->unit;
@@ -2882,7 +2883,8 @@ aftermath(battle * b)
         if (sh && fval(sh, SF_DAMAGED)) {
           int n = b->turn - 2;
           if (n>0) {
-            damage_ship(sh, 0.05 * n);
+            float dmg = get_param_flt(global.parameters, "rules.ship.damage.battleround", 0.05);
+            damage_ship(sh, dmg * n);
             freset(sh, SF_DAMAGED);
           }
         }

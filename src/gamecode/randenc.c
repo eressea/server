@@ -503,7 +503,8 @@ chaos(region * r)
 
             while (sh) {
               ship * nsh = sh->next;
-              damage_ship(sh, 0.50);
+              float dmg = get_param_flt(global.parameters, "rules.ship.damage.atlantis", 0.50);
+              damage_ship(sh, dmg);
               if (sh->damage >= sh->size * DAMAGE_SCALE) {
                 remove_ship(&sh->region->ships, sh);
               }
@@ -854,7 +855,8 @@ move_iceberg(region *r)
 
 			for (sh = r->ships; sh; sh = sh->next) {
 				/* Meldung an Kapitän */
-				damage_ship(sh, 0.10);
+			    float dmg = get_param_flt(global.parameters, "rules.ship.damage.intoiceberg", 0.10);
+			    damage_ship(sh, dmg);
 				fset(sh, SF_SELECT);
 			}
 
@@ -865,7 +867,8 @@ move_iceberg(region *r)
 			}
 			while (rc->ships) {
 				fset(rc->ships, SF_SELECT);
-				damage_ship(rc->ships, 0.10);
+				float dmg = get_param_flt(global.parameters, "rules.ship.damage.withiceberg", 0.10);
+				damage_ship(rc->ships, dmg);
 				move_ship(rc->ships, rc, r, NULL);
 			}
 			while (rc->units) {
@@ -991,7 +994,8 @@ godcurse(void)
         ship *sh;
         for (sh = r->ships; sh;) {
           ship *shn = sh->next;
-          damage_ship(sh, 0.10);
+          float dmg = get_param_flt(global.parameters, "rules.ship.damage.godcurse", 0.10);
+          damage_ship(sh, dmg);
           if (sh->damage>=sh->size * DAMAGE_SCALE) {
             unit * u = shipowner(sh);
             if (u) ADDMSG(&u->faction->msgs,

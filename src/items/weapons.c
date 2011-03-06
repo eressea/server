@@ -136,9 +136,11 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 			d += terminate(dt, *at, AT_STANDARD, wp->type->damage[0], true);
 #ifdef CATAPULT_STRUCTURAL_DAMAGE
 			if (dt.fighter->unit->building && rng_int()%100 < 5) {
-				damage_building(b, dt.fighter->unit->building, 1);
+              float dmg = get_param_flt(global.parameters, "rules.building.damage.catapult", 1);
+              damage_building(b, dt.fighter->unit->building, dmg);
 			} else if (dt.fighter->unit->ship && rng_int()%100 < 5) {
-				dt.fighter->unit->ship->damage+=DAMAGE_SCALE;
+	          float dmg = get_param_flt(global.parameters, "rules.ship.damage.catapult", 0.01);
+	          damage_ship(dt.fighter->unit->ship, dmg)
 			}
 #endif
 		}

@@ -2677,10 +2677,12 @@ sinkships(region * r)
     if (!sh->type->construction || sh->size>=sh->type->construction->maxsize) {
       if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
         /* Schiff nicht seetüchtig */
-        damage_ship(sh, 0.30);
+        float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrewocean", 0.30);
+        damage_ship(sh, dmg);
       }
       if (shipowner(sh)==NULL) {
-        damage_ship(sh, 0.05);
+        float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05);
+        damage_ship(sh, dmg);
       }
     }
     if (sh->damage >= sh->size * DAMAGE_SCALE) {

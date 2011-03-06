@@ -1276,7 +1276,7 @@ make_route(unit * u, order * ord, region_list ** routep)
  *
  * Berechnet wird das mit BPs. Zu Fuß hat man 4 BPs, zu Pferd 6.
  * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
- * Außerdem: Wenn Einheit transportiert, nur halbe BP 
+ * Außerdem: Wenn Einheit transportiert, nur halbe BP
  */
 static int 
 movement_speed(unit * u)
@@ -1766,7 +1766,8 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
           ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
         } else {
           ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh, next_point));
-          damage_ship(sh, 0.10);
+          float dmg = get_param_flt(global.parameters, "rules.ship.damage.nolanding", 0.10);
+          damage_ship(sh, dmg);
           /* we handle destruction at the end */
         }
         break;
