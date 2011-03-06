@@ -2224,6 +2224,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
       combat_action(ta.fighter, b->turn);
     }
     if (td.fighter->unit->ship) {
+      /* FIXME should use damage_ship here? */
       td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
     } else if (td.fighter->unit->building) {
       damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
