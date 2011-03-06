@@ -1,10 +1,7 @@
 require "lunit"
 
 local function _test_create_ship(r)
-    local s = ship.create(r, "canoe")
-    if (s==nil) then
-        s = ship.create(r, "boat")
-    end
+    local s = ship.create(r, test.shipname)
     return s
 end
 
@@ -408,6 +405,7 @@ function test_id()
   assert(get_building(atoi36(fortytwo))==b)
 
   local s = _test_create_ship(r)
+  assert_not_nil(s)
   -- <not working> s.id = atoi36("42")
   local fortytwo = itoa36(s.id)
   assert(get_ship(fortytwo)==s)
