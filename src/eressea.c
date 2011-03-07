@@ -23,7 +23,7 @@
 #include <bindings/bind_ship.h>
 #include <bindings/bind_storage.h>
 #include <bindings/bind_unit.h>
-#endif // BINDINGS_TOLUA
+#endif /*  BINDINGS_TOLUA */
 
 #if MUSEUM_MODULE
 #include <modules/museum.h>

@@ -296,7 +296,7 @@ static int read_ext(attrib * a, void *owner, struct storage *store)
   a->data.v = 0;
   ur_add(data, a, resolve_bson);
   return AT_READ_OK;
-};
+}
 
 attrib_type at_lua_ext = {
   "lua", init_ext, free_ext, age_ext, write_ext, read_ext

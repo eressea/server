@@ -754,7 +754,7 @@ static xmlNodePtr report_root(report_context * ctx)
       xmlAddChild(xmlReport, xml_region(ctx, sr));
   }
   return xmlReport;
-};
+}
 
 /* main function of the xmlreport. creates the header and traverses all regions */
 static int

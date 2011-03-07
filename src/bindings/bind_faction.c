@@ -69,7 +69,7 @@ int tolua_faction_add_item(lua_State * L)
     if (itype != NULL) {
       item *i = i_change(&self->items, itype, number);
       result = i ? i->number : 0;
-    }                           // if (itype!=NULL)
+    }                           /* if (itype!=NULL) */
   }
   lua_pushnumber(L, result);
   return 1;

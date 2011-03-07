@@ -16,11 +16,11 @@ without prior permission by the authors of Eressea.
 #include "bind_attrib.h"
 #include "bindings.h"
 
-// attributes includes
+/*  attributes includes */
 #include <attributes/racename.h>
 #include <attributes/key.h>
 
-// kernel includes
+/*  kernel includes */
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
@@ -37,7 +37,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
-// util includes
+/*  util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
@@ -937,7 +937,7 @@ void tolua_unit_open(lua_State * L)
       tolua_function(L, TOLUA_CAST "clear_orders", &tolua_unit_clear_orders);
       tolua_variable(L, TOLUA_CAST "orders", &tolua_unit_get_orders, 0);
 
-      // key-attributes for named flags:
+      /*  key-attributes for named flags: */
       tolua_function(L, TOLUA_CAST "set_flag", &tolua_unit_set_flag);
       tolua_function(L, TOLUA_CAST "get_flag", &tolua_unit_get_flag);
       tolua_variable(L, TOLUA_CAST "flags", &tolua_unit_get_flags,
@@ -945,21 +945,21 @@ void tolua_unit_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "age", &tolua_unit_get_age,
         tolua_unit_set_age);
 
-      // items:
+      /*  items: */
       tolua_function(L, TOLUA_CAST "get_item", &tolua_unit_get_item);
       tolua_function(L, TOLUA_CAST "add_item", &tolua_unit_add_item);
       tolua_variable(L, TOLUA_CAST "items", &tolua_unit_get_items, 0);
       tolua_function(L, TOLUA_CAST "get_pooled", &tolua_unit_get_pooled);
       tolua_function(L, TOLUA_CAST "use_pooled", &tolua_unit_use_pooled);
 
-      // skills:
+      /*  skills: */
       tolua_function(L, TOLUA_CAST "get_skill", &tolua_unit_getskill);
       tolua_function(L, TOLUA_CAST "eff_skill", &tolua_unit_effskill);
       tolua_function(L, TOLUA_CAST "set_skill", &tolua_unit_setskill);
 
       tolua_function(L, TOLUA_CAST "add_notice", &tolua_unit_addnotice);
 
-      // npc logic:
+      /*  npc logic: */
       tolua_function(L, TOLUA_CAST "add_handler", &tolua_unit_addhandler);
 
       tolua_variable(L, TOLUA_CAST "race_name", &tolua_unit_get_racename,

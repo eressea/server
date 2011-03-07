@@ -21,7 +21,7 @@ extern "C" {
 
   typedef enum {
     TNONE = 0, TINTEGER = 1, TREAL = 2, TSTRING = 3,
-    TUNIT = 10, TFACTION = 11, TREGION = 12, TBUILDING = 13, TSHIP = 14,
+    TUNIT = 10, TFACTION = 11, TREGION = 12, TBUILDING = 13, TSHIP = 14
   } object_type;
 
   extern struct attrib_type at_object;

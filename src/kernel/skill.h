@@ -22,7 +22,7 @@ extern "C" {
 #define SMF_RIDING     (1<<2)   /* Bonus für berittene - an der rasse */
 
   typedef struct skill {
-    skill_t id:8;
+    unsigned int id:8;
     unsigned int level:8;
     unsigned int weeks:8;
     unsigned int old:8;

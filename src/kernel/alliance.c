@@ -96,8 +96,8 @@ typedef struct alliance_transaction {
   struct alliance_transaction *next;
   unit *u;
   order *ord;
-//   alliance * al;
-//   variant userdata;
+/*    alliance * al; */
+/*    variant userdata; */
 } alliance_transaction;
 
 static struct alliance_transaction *transactions[ALLIANCE_MAX];
@@ -321,9 +321,9 @@ void alliance_cmd(void)
   if (stree == NULL) {
     syntaxtree *slang = stree = stree_create();
     while (slang) {
-      // struct tnode * root = calloc(sizeof(tnode), 1);
+      /*  struct tnode * root = calloc(sizeof(tnode), 1); */
       struct tnode *leaf = calloc(sizeof(tnode), 1);
-      // add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
+      /*  add_command(root, leaf, LOC(slang->lang, "alliance"), NULL); */
       add_command(leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
       add_command(leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
       add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);

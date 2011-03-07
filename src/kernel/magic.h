@@ -53,7 +53,7 @@ extern "C" {
     SPP_BUILDING,               /*  -  : atoi() -> int */
     SPP_SHIP,                   /*  -  : atoi() -> int */
     SPP_STRING,                 /* "c" */
-    SPP_INT,                    /* "i" : atoi() -> int */
+    SPP_INT                     /* "i" : atoi() -> int */
   } sppobj_t;
 
   typedef struct spllprm {

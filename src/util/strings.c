@@ -51,7 +51,7 @@ escape_string_inplace(char * buffer, unsigned int len, unsigned int offset)
   }
   d[i] = o;
   if (i<MAXQUOTES) {
-    // more than 32 hits! must go recursive
+    //  more than 32 hits! must go recursive
     char * start = d[i];
     unsigned int nlen = len - (start-buffer) - MAXQUOTES;
     escape_string_inplace(start, nlen, MAXQUOTES);
@@ -121,11 +121,11 @@ INLINE_FUNCTION unsigned int jenkins_hash(unsigned int a)
 
 INLINE_FUNCTION unsigned int wang_hash(unsigned int a)
 {
-  a = ~a + (a << 15);           // a = (a << 15) - a - 1;
+  a = ~a + (a << 15);           /*  a = (a << 15) - a - 1; */
   a = a ^ (a >> 12);
   a = a + (a << 2);
   a = a ^ (a >> 4);
-  a = a * 2057;                 // a = (a + (a << 3)) + (a << 11);
+  a = a * 2057;                 /*  a = (a + (a << 3)) + (a << 11); */
   a = a ^ (a >> 16);
   return a;
 }

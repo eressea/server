@@ -731,7 +731,7 @@ static void
 growing_trees_e3(region * r, const int current_season,
   const int last_weeks_season)
 {
-  const static int transform[4][3] = {
+  static const int transform[4][3] = {
     {-1, -1, 0},
     {TREE_SEED, TREE_SAPLING, 2},
     {TREE_SAPLING, TREE_TREE, 2},

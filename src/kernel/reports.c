@@ -1141,7 +1141,7 @@ void seen_done(seen_region * seehash[])
     reuse = seehash[i];
     seehash[i] = NULL;
   }
-  // free(seehash);
+  /*  free(seehash); */
 }
 
 void free_seen(void)

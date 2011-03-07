@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 
-// kernel includes
+/* kernel includes */
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
@@ -9,10 +9,10 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
-// util includes
+/* util includes */
 #include <util/message.h>
 
-// lua includes
+/* lua includes */
 #include <lua.h>
 #include <tolua.h>
 

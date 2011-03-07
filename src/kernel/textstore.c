@@ -135,7 +135,7 @@ static int txt_open(struct storage *store, const char *filename, int mode)
   FILE *F = fopen(filename, modes[mode]);
   store->userdata = F;
   if (F) {
-    const char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    char utf8_bom[4] = { (char)0xef, (char)0xbb, (char)0xbf };
     if (mode == IO_READ) {
       char token[8];
       /* recognize UTF8 BOM */

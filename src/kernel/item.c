@@ -494,7 +494,9 @@ item *i_change(item ** pi, const item_type * itype, int delta)
     if (i->number < 0) {
       log_error(("serious accounting error. number of items is %d.\n",
           i->number));
+      /* FIXME what's this supposed to mean??
       assert(i >= 0);
+      */
       i->number = 0;
     }
     if (i->number == 0) {

@@ -81,12 +81,12 @@ unicode_latin1_to_utf8(utf8_t * out, size_t * outlen, const char *in,
     if (c > 0xBF) {
       if (op - out >= os - 1)
         break;
-      *op++ = 0xC3;
+      *op++ = (char) 0xC3;
       *op++ = c - 64;
     } else if (c > 0x7F) {
       if (op - out >= os - 1)
         break;
-      *op++ = 0xC2;
+      *op++ = (char) 0xC2;
       *op++ = c;
     } else {
       if (op - out >= os)

@@ -2400,7 +2400,7 @@ report_plaintext(const char *filename, report_context * ctx,
           rnl(F);
           nr_paragraph(F, m, f);
         }
-        //
+        /*  */
       } else {
         if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
           rnl(F);
