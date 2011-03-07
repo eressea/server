@@ -59,12 +59,7 @@ typedef struct ship_type {
   struct construction * construction; /* how to build a ship */
 } ship_type;
 
-typedef struct ship_typelist {
-  struct ship_typelist * next;
-  const ship_type * type;
-} ship_typelist;
-
-extern ship_typelist *shiptypes;
+extern struct quicklist *shiptypes;
 
 /* Alte Schiffstypen: */
 

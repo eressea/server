@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/umlaut.h>
+#include <util/quicklist.h>
 #include <util/storage.h>
 #include <util/xml.h>
 
@@ -45,52 +46,59 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 
-ship_typelist *shiptypes = NULL;
+quicklist *shiptypes = NULL;
 
 static local_names * snames;
 
 const ship_type *
 findshiptype(const char * name, const struct locale * lang)
 {
-	local_names * sn = snames;
-	variant var;
+  local_names * sn = snames;
+  variant var;
 
-	while (sn) {
-		if (sn->lang==lang) break;
-		sn=sn->next;
-	}
-	if (!sn) {
-		struct ship_typelist * stl = shiptypes;
-		sn = calloc(sizeof(local_names), 1);
-		sn->next = snames;
-		sn->lang = lang;
-		while (stl) {
+  while (sn) {
+    if (sn->lang==lang) break;
+    sn=sn->next;
+  }
+  if (!sn) {
+    quicklist * ql;
+    int qi;
+
+    sn = (local_names *)calloc(sizeof(local_names), 1);
+    sn->next = snames;
+    sn->lang = lang;
+
+    for (qi=0,ql=shiptypes;ql;ql_advance(&ql, &qi, 1)) {
+      ship_type * stype = (ship_type *)ql_get(ql, qi);
       variant var;
-			const char * n = locale_string(lang, stl->type->name[0]);
-      var.v = (void*)stl->type;
-			addtoken(&sn->names, n, var);
-			stl = stl->next;
-		}
-		snames = sn;
-	}
-	if (findtoken(&sn->names, name, &var)==E_TOK_NOMATCH) return NULL;
-	return (const ship_type*)var.v;
+      const char * n = locale_string(lang, stype->name[0]);
+      var.v = (void*)stype;
+      addtoken(&sn->names, n, var);
+    }
+    snames = sn;
+  }
+  if (findtoken(&sn->names, name, &var)==E_TOK_NOMATCH) return NULL;
+  return (const ship_type*)var.v;
 }
 
 const ship_type *
 st_find(const char* name)
 {
-	const struct ship_typelist * stl = shiptypes;
-	while (stl && strcmp(stl->type->name[0], name)) stl = stl->next;
-	return stl?stl->type:NULL;
+  quicklist * ql;
+  int qi;
+  
+  for (qi=0,ql=shiptypes;ql;ql_advance(&ql, &qi, 1)) {
+    ship_type * stype = (ship_type *)ql_get(ql, qi);
+    if (strcmp(stype->name[0], name)==0) {
+      return stype;
+    }
+  }
+  return NULL;
 }
 
 void
 st_register(const ship_type * type) {
-	struct ship_typelist * stl = malloc(sizeof(ship_type));
-	stl->type = type;
-	stl->next = shiptypes;
-	shiptypes = stl;
+  ql_push(&shiptypes, (void *)type);
 }
 
 #define SMAXHASH 7919
@@ -98,43 +106,43 @@ ship *shiphash[SMAXHASH];
 void
 shash(ship * s)
 {
-	ship *old = shiphash[s->no % SMAXHASH];
+  ship *old = shiphash[s->no % SMAXHASH];
 
-	shiphash[s->no % SMAXHASH] = s;
-	s->nexthash = old;
+  shiphash[s->no % SMAXHASH] = s;
+  s->nexthash = old;
 }
 
 void
 sunhash(ship * s)
 {
-	ship **show;
+  ship **show;
 
-	for (show = &shiphash[s->no % SMAXHASH]; *show; show = &(*show)->nexthash) {
-		if ((*show)->no == s->no)
-			break;
-	}
-	if (*show) {
-		assert(*show == s);
-		*show = (*show)->nexthash;
-		s->nexthash = 0;
-	}
+  for (show = &shiphash[s->no % SMAXHASH]; *show; show = &(*show)->nexthash) {
+    if ((*show)->no == s->no)
+      break;
+  }
+  if (*show) {
+    assert(*show == s);
+    *show = (*show)->nexthash;
+    s->nexthash = 0;
+  }
 }
 
 static ship *
 sfindhash(int i)
 {
-	ship *old;
+  ship *old;
 
-	for (old = shiphash[i % SMAXHASH]; old; old = old->nexthash)
-		if (old->no == i)
-			return old;
-	return 0;
+  for (old = shiphash[i % SMAXHASH]; old; old = old->nexthash)
+    if (old->no == i)
+      return old;
+  return 0;
 }
 
 struct ship *
 findship(int i)
 {
-	return sfindhash(i);
+  return sfindhash(i);
 }
 
 struct ship *
@@ -154,19 +162,19 @@ findshipr(const region *r, int n)
 void
 damage_ship(ship * sh, double percent)
 {
-	double damage = DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
-	sh->damage = (int)damage;
+  double damage = DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
+  sh->damage = (int)damage;
 }
 
 unit *
 captain(ship *sh)
 {
-	unit *u;
+  unit *u;
 
-	for(u = sh->region->units; u; u = u->next)
-		if(u->ship == sh && fval(u, UFL_OWNER)) return u;
+  for(u = sh->region->units; u; u = u->next)
+    if(u->ship == sh && fval(u, UFL_OWNER)) return u;
 
-	return NULL;
+  return NULL;
 }
 
 /* Alte Schiffstypen: */
@@ -293,29 +301,29 @@ getshipweight(const ship * sh, int *sweight, int *scabins)
 unit *
 shipowner(const ship * sh)
 {
-	unit *u;
-	unit *first = NULL;
+  unit *u;
+  unit *first = NULL;
 
         const region * r = sh->region;
 
         /* Prüfen ob Eigentümer am leben. */
-	for (u = r->units; u; u = u->next) {
-		if (u->ship == sh) {
-			if (!first && u->number > 0)
-				first = u;
-			if (fval(u, UFL_OWNER) && u->number > 0)
-				return u;
-			if (u->number == 0)
-				freset(u, UFL_OWNER);
-		}
-	}
+  for (u = r->units; u; u = u->next) {
+    if (u->ship == sh) {
+      if (!first && u->number > 0)
+        first = u;
+      if (fval(u, UFL_OWNER) && u->number > 0)
+        return u;
+      if (u->number == 0)
+        freset(u, UFL_OWNER);
+    }
+  }
 
-	/* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
-	 * nehmen. */
+  /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+   * nehmen. */
 
-	if (first)
-		fset(first, UFL_OWNER);
-	return first;
+  if (first)
+    fset(first, UFL_OWNER);
+  return first;
 }
 
 void
