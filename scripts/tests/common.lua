@@ -1,7 +1,7 @@
 require "lunit"
 
 local function _test_create_ship(r)
-    local s = ship.create(r, test.shipname)
+    local s = ship.create(r, config.ships[1])
     return s
 end
 
@@ -287,17 +287,17 @@ function test_events()
 end
 
 function test_recruit2()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
-  local u = unit.create(f, r)
-  u.number = 1
-  u:add_item("money", 2000)
-  u:clear_orders()
-  u:add_order("MACHE TEMP 1")
-  u:add_order("REKRUTIERE 1 Elf")
-  u:add_order("REKRUTIERE 1 mensch")
-  u:add_order("REKRUTIERE 1")
-  process_orders()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r)
+    u.number = 1
+    u:add_item("money", 2000)
+    u:clear_orders()
+    u:add_order("MACHE TEMP 1")
+    u:add_order("REKRUTIERE 1 Elf")
+    u:add_order("REKRUTIERE 1 Mensch")
+    u:add_order("REKRUTIERE 1")
+    process_orders()
 end
 
 function test_guard()
@@ -350,13 +350,14 @@ function test_produce()
   local f = faction.create("noreply@eressea.de", "human", "de")
   local u = unit.create(f, r, 1)
   u:clear_orders()
-  u:set_skill("weaponsmithing", 3)
+  local sword = config.get_resource('sword')
+  u:set_skill(sword.build_skill_name, 3)
   u:add_item("iron", 10)
   u:add_item("money", u.number * 10)
   u:add_order("MACHE Schwert")
   process_orders()
-  assert_equal(10-3/test.swordmakeskill*test.swordiron, u:get_item("iron"))
-  assert_equal(3/test.swordmakeskill, u:get_item("sword"))
+  assert_equal(10-3/sword.build_skill_min*sword.materials['iron'], u:get_item("iron"))
+  assert_equal(3/sword.build_skill_min, u:get_item("sword"))
 end
 
 function test_work()
@@ -457,7 +458,8 @@ function test_mallorn()
   
   assert(u1:get_item("log")==2)
   assert(u2:get_item("log")==2)
-  if (has_item("mallorn")) then
+  local mallorn_cfg = config.get_resource("mallorn")
+  if mallorn_cfg then
     assert(u3:get_item("mallorn")==1)
   else
     assert_equal(-1, u3:get_item("mallorn"))
@@ -701,9 +703,9 @@ function test_ride_with_horse()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local pweight = u.weight
     u:add_item("horse", 1)
-    u:add_item("sword", (test.horsecapacity - pweight)/100)
+    local horse_cfg = config.get_resource("horse")
+    u:add_item("sword", (horse_cfg.capacity - u.weight)/100)
     u:set_skill("riding", 2)
 
     u:clear_orders()
@@ -724,36 +726,31 @@ function test_ride_with_horses_and_cart()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    local carts = 0
-    local horses = 0 
-    local pweight = u.weight
-    if (has_item("cart")) then
-      u:add_item("cart", 1)
-      assert_equal(1, u:get_item("cart")) -- every game has a cart, right? right? no! atlantis hasn't!
-      carts = u:get_item("cart")
-    end                       
-    u:add_item("horse", 1)
-    assert_equal(1, u:get_item("horse")) -- every game has a horse, right? right?
-    local horses =  u:get_item("horse")
-    assert(horses+carts>0)
-    local capacity = test.horsecapacity*(horses+1) + test.cartcapacity*carts - pweight
-    capacity = capacity / 100
-    u:add_item("sword", capacity)
-    assert_equal(capacity, u:get_item("sword")) -- every game has a sword, right? and it weighs 1 unit?
-        
+    local horse_cfg = config.get_resource("horse")
+    local cart_cfg = config.get_resource("cart")
+    local sword_cfg = config.get_resource("sword")
+
     u:set_skill("riding", 3)
 
-    if (has_item("cart")) then
-      -- need 2 horses for a cart
-      u:clear_orders()
-      u:add_order("NACH O O")
-      process_orders()
-      assert_equal(0, u.region.x)
+    local capacity = (horse_cfg.capacity-horse_cfg.weight)*2 - u.weight
+    if cart_cfg~=nil then
+        capacity = capacity + cart_cfg.capacity-cart_cfg.weight
     end
+    u:add_item("sword", capacity / sword_cfg.weight)
 
     u:add_item("horse", 1)
+    if (cart_cfg~=nil) then
+        -- we need 2 horses for a cart, so this should fail:
+        u:add_item("cart", 1)
+        u:clear_orders()
+        u:add_order("NACH O O")
+        process_orders()
+        assert_equal(0, u.region.x)
+    end
+
+    -- here is your second horse, milord:
+    u:add_item("horse", 1)
     assert_equal(2, u:get_item("horse"))
-    horses =  u:get_item("horse")
 
     -- ride
     u:clear_orders()
@@ -762,17 +759,14 @@ function test_ride_with_horses_and_cart()
     assert_equal(2, u.region.x)
 
     -- walk
-    u:add_item("sword", 10)
-    r:get_key("eviL")
+    u:add_item("sword", 1000/sword_cfg.weight)
     u:clear_orders()
     u:add_order("NACH W W")
     process_orders()
     assert_equal(1, u.region.x)
     
-    -- too heavy
-
-    u:add_item("sword", 10)
-    r:get_key("eviL")
+    -- make this fellow too heavy
+    u:add_item("sword", 1000/sword_cfg.weight)
     u:clear_orders()
     u:add_order("NACH W W")
     process_orders()
