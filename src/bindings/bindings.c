@@ -848,7 +848,23 @@ tolua_write_spells(lua_State* L)
 }
 
 static int
-tolua_get_locales(lua_State *L)
+config_get_ships(lua_State *L)
+{
+  quicklist * ql;
+  int qi, i=0;
+
+  lua_createtable(L, ql_length(shiptypes), 0);
+
+  for (qi=0,ql=shiptypes;ql;ql_advance(&ql, &qi, 1)) {
+    ship_type * stype = (ship_type *)ql_get(ql, qi);
+    tolua_pushstring(L, TOLUA_CAST stype->name);
+    lua_rawseti(L, -2, ++i);
+  }
+  return 1;
+}
+
+static int
+config_get_locales(lua_State *L)
 {
   const struct locale * lang;
   int i = 0, n = 0;
@@ -861,6 +877,48 @@ tolua_get_locales(lua_State *L)
     lua_rawseti(L, -2, ++i);
   }
   return 1;
+}
+
+static int
+config_get_resource(lua_State *L)
+{
+  const char * name = tolua_tostring(L, 1, 0);
+  if (name) {
+    const struct item_type * itype = it_find(name);
+    if (itype) {
+      lua_newtable(L);
+      lua_pushstring(L, "weight");
+      lua_pushinteger(L, itype->weight);
+      lua_settable(L, -3);
+      if (itype->capacity>0) {
+        lua_pushstring(L, "capacity");
+        lua_pushinteger(L, itype->capacity);
+        lua_settable(L, -3);
+      }
+      if (itype->construction) {
+        int i;
+        lua_pushstring(L, "build_skill_min");
+        lua_pushinteger(L, itype->construction->minskill);
+        lua_settable(L, -3);
+        lua_pushstring(L, "build_skill_name");
+        lua_pushstring(L, skillnames[itype->construction->skill]);
+        lua_settable(L, -3);
+
+        if (itype->construction->materials) {
+          lua_pushstring(L, "materials");
+          lua_newtable(L);
+          for (i=0;itype->construction->materials[i].number;++i) {
+            lua_pushstring(L, itype->construction->materials[i].rtype->_name[0]);
+            lua_pushinteger(L, itype->construction->materials[i].number);
+            lua_settable(L, -3);
+          }
+          lua_settable(L, -3);
+        }
+      }
+      return 1;
+    }
+  }
+  return 0;
 }
 
 static int
@@ -1134,7 +1192,9 @@ tolua_eressea_open(lua_State* L)
     tolua_beginmodule(L, TOLUA_CAST "config");
     {
       parse_inifile(L, global.inifile, "config");
-      tolua_variable(L, TOLUA_CAST "locales", &tolua_get_locales, 0);
+      tolua_variable(L, TOLUA_CAST "locales", &config_get_locales, 0);
+      tolua_function(L, TOLUA_CAST "get_resource", &config_get_resource);
+      tolua_variable(L, TOLUA_CAST "ships", &config_get_ships, 0);
     }
     tolua_endmodule(L);
 
