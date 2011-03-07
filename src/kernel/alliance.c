@@ -85,7 +85,6 @@ alliance *makealliance(int id, const char *name)
 alliance *findalliance(int id)
 {
   alliance *al;
-
   for (al = alliances; al; al = al->next) {
     if (al->id == id)
       return al;
@@ -102,7 +101,6 @@ typedef struct alliance_transaction {
 } alliance_transaction;
 
 static struct alliance_transaction *transactions[ALLIANCE_MAX];
-
 
 faction *alliance_get_leader(alliance * al)
 {
@@ -157,15 +155,12 @@ static void cmd_join(const tnode * tnext, void *data, struct order *ord)
 static void perform_kick(void)
 {
   alliance_transaction **tap = transactions + ALLIANCE_KICK;
-
   while (*tap) {
     alliance_transaction *ta = *tap;
-
     alliance *al = f_get_alliance(ta->u->faction);
 
     if (al && alliance_get_leader(al) == ta->u->faction) {
       faction *f;
-
       init_tokens(ta->ord);
       skip_token();
       skip_token();
@@ -182,14 +177,10 @@ static void perform_kick(void)
 static void perform_new(void)
 {
   alliance_transaction **tap = transactions + ALLIANCE_NEW;
-
   while (*tap) {
     alliance_transaction *ta = *tap;
-
     alliance *al;
-
     int id;
-
     faction *f = ta->u->faction;
 
     init_tokens(ta->ord);
@@ -208,10 +199,8 @@ static void perform_new(void)
 static void perform_leave(void)
 {
   alliance_transaction **tap = transactions + ALLIANCE_LEAVE;
-
   while (*tap) {
     alliance_transaction *ta = *tap;
-
     faction *f = ta->u->faction;
 
     setalliance(f, NULL);
@@ -224,15 +213,12 @@ static void perform_leave(void)
 static void perform_transfer(void)
 {
   alliance_transaction **tap = transactions + ALLIANCE_TRANSFER;
-
   while (*tap) {
     alliance_transaction *ta = *tap;
-
     alliance *al = f_get_alliance(ta->u->faction);
 
     if (al && alliance_get_leader(al) == ta->u->faction) {
       faction *f;
-
       init_tokens(ta->ord);
       skip_token();
       skip_token();
@@ -249,12 +235,9 @@ static void perform_transfer(void)
 static void perform_join(void)
 {
   alliance_transaction **tap = transactions + ALLIANCE_JOIN;
-
   while (*tap) {
     alliance_transaction *ta = *tap;
-
     faction *fj = ta->u->faction;
-
     int aid;
 
     init_tokens(ta->ord);
@@ -263,18 +246,13 @@ static void perform_join(void)
     aid = getid();
     if (aid) {
       alliance *al = findalliance(aid);
-
       if (al && f_get_alliance(fj) != al) {
         alliance_transaction **tip = transactions + ALLIANCE_INVITE;
-
         alliance_transaction *ti = *tip;
-
         while (ti) {
           faction *fi = ti->u->faction;
-
           if (fi && f_get_alliance(fi) == al) {
             int fid;
-
             init_tokens(ti->ord);
             skip_token();
             skip_token();
@@ -305,22 +283,15 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
   int run = 0;
 
   region **rp = &regions;
-
   while (*rp) {
     region *r = *rp;
-
     unit **up = &r->units;
-
     while (*up) {
       unit *u = *up;
-
       if (u->number) {
         const struct locale *lang = u->faction->locale;
-
         tnode *root = stree_find(syntax, lang);
-
         order *ord;
-
         for (ord = u->orders; ord; ord = ord->next) {
           if (get_keyword(ord) == kwd) {
             do_command(root, u, ord);
@@ -347,14 +318,11 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
 void alliance_cmd(void)
 {
   static syntaxtree *stree = NULL;
-
   if (stree == NULL) {
     syntaxtree *slang = stree = stree_create();
-
     while (slang) {
       // struct tnode * root = calloc(sizeof(tnode), 1);
       struct tnode *leaf = calloc(sizeof(tnode), 1);
-
       // add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
       add_command(leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
       add_command(leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
@@ -373,15 +341,11 @@ void alliance_cmd(void)
 void alliancejoin(void)
 {
   static syntaxtree *stree = NULL;
-
   if (stree == NULL) {
     syntaxtree *slang = stree = stree_create();
-
     while (slang) {
       struct tnode *root = calloc(sizeof(tnode), 1);
-
       struct tnode *leaf = calloc(sizeof(tnode), 1);
-
       add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
       add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
       slang = slang->next;
@@ -396,12 +360,10 @@ void setalliance(faction * f, alliance * al)
     return;
   if (f->alliance != NULL) {
     int qi;
-
     quicklist **flistp = &f->alliance->members;
 
     for (qi = 0; *flistp; ql_advance(flistp, &qi, 1)) {
       faction *data = (faction *) ql_get(*flistp, qi);
-
       if (data == f) {
         ql_delete(flistp, qi);
         break;
@@ -429,9 +391,7 @@ void setalliance(faction * f, alliance * al)
 const char *alliancename(const alliance * al)
 {
   typedef char name[OBJECTIDSIZE + 1];
-
   static name idbuf[8];
-
   static int nextbuf = 0;
 
   char *ibuf = idbuf[(++nextbuf) % 8];
@@ -448,20 +408,15 @@ const char *alliancename(const alliance * al)
 void alliancevictory(void)
 {
   const struct building_type *btype = bt_find("stronghold");
-
   region *r = regions;
-
   alliance *al = alliances;
-
   if (btype == NULL)
     return;
   while (r != NULL) {
     building *b = r->buildings;
-
     while (b != NULL) {
       if (b->type == btype) {
         unit *u = building_owner(b);
-
         if (u) {
           fset(u->faction->alliance, FFL_MARK);
         }
@@ -473,12 +428,9 @@ void alliancevictory(void)
   while (al != NULL) {
     if (!fval(al, FFL_MARK)) {
       int qi;
-
       quicklist *flist = al->members;
-
       for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
         faction *f = (faction *) ql_get(flist, qi);
-
         if (f->alliance == al) {
           ADDMSG(&f->msgs, msg_message("alliance::lost", "alliance", al));
           destroyfaction(f);
@@ -501,17 +453,13 @@ int victorycondition(const alliance * al, const char *name)
 
     for (igem = gems; *igem; ++igem) {
       const struct item_type *itype = it_find(*igem);
-
       quicklist *flist = al->members;
-
       int qi;
-
       boolean found = false;
 
       assert(itype != NULL);
       for (qi = 0; flist && !found; ql_advance(&flist, &qi, 1)) {
         faction *f = (faction *) ql_get(flist, 0);
-
         unit *u;
 
         for (u = f->units; u; u = u->nextF) {
@@ -528,12 +476,10 @@ int victorycondition(const alliance * al, const char *name)
 
   } else if (strcmp(name, "phoenix") == 0) {
     quicklist *flist = al->members;
-
     int qi;
 
     for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
       faction *f = (faction *) ql_get(flist, qi);
-
       if (find_key(f->attribs, atoi36("phnx"))) {
         return 1;
       }
@@ -558,12 +504,10 @@ int victorycondition(const alliance * al, const char *name)
      */
 
     quicklist *flist = al->members;
-
     int qi;
 
     for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
       faction *f = (faction *) ql_get(flist, qi);
-
       if (find_key(f->attribs, atoi36("pyra"))) {
         return 1;
       }

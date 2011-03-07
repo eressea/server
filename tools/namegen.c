@@ -233,7 +233,6 @@ int main(void)
 
   for (race = 0; race < 11; race++) {
     int i;
-
     printf("%d:", (int)race);
     for (i = 0; i < 20; i++) {
       printf(" %s", create_random_name(race));

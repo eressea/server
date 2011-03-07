@@ -35,14 +35,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 double normalvariate(double mu, double sigma)
 {
   static const double NV_MAGICCONST = 1.7155277699214135;       /* STATIC_CONST: a constant */
-
   double z;
-
   for (;;) {
     double u1 = rng_double();
-
     double u2 = 1.0 - rng_double();
-
     z = NV_MAGICCONST * (u1 - 0.5) / u2;
     if (z * z / 4.0 <= -log(u2)) {
       break;
@@ -54,7 +50,6 @@ double normalvariate(double mu, double sigma)
 int ntimespprob(int n, double p, double mod)
 {
   int count = 0;
-
   int i;
 
   for (i = 0; i < n && p > 0; i++) {

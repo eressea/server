@@ -242,7 +242,6 @@ extern "C" {
     int time;
   } icastle_data;
 
-
 /* ------------------------------------------------------------- */
 /* Kommentare:
  *
@@ -295,7 +294,6 @@ extern "C" {
    * werden
    */
 
-
 /* Magiepunkte */
   int get_spellpoints(const struct unit *u);
   /*      Gibt die aktuelle Anzahl der Magiepunkte der Einheit zurück */
@@ -315,7 +313,6 @@ extern "C" {
   boolean fumble(struct region *r, struct unit *u, const spell * sp,
     int cast_level);
   /*      true, wenn der Zauber misslingt, bei false gelingt der Zauber */
-
 
   typedef struct spellrank {
     struct castorder *begin;
@@ -362,7 +359,6 @@ extern "C" {
     int resist_bonus);
   /*      gibt false zurück, wenn der Zauber gelingt, true, wenn das Ziel
    *      widersteht */
-
 
 /* Sprüche in der struct region */
   /* (sind in curse) */

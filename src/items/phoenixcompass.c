@@ -43,19 +43,12 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
   int amount, struct order *ord)
 {
   region *r;
-
   unit *closest_phoenix = NULL;
-
   int closest_phoenix_distance = INT_MAX;
-
   boolean confusion = false;
-
   direction_t direction;
-
   unit *u2;
-
   direction_t closest_neighbour_direction = 0;
-
   static race *rc_phoenix = NULL;
 
   if (rc_phoenix == NULL) {
@@ -75,7 +68,6 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
             distance(u->region, closest_phoenix->region);
         } else {
           int dist = distance(u->region, r);
-
           if (dist < closest_phoenix_distance) {
             closest_phoenix = u2;
             closest_phoenix_distance = dist;
@@ -104,13 +96,11 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
 
   for (direction = 0; direction < MAXDIRECTIONS; ++direction) {
     region *neighbour;
-
     int closest_neighbour_distance = INT_MAX;
 
     neighbour = r_connect(u->region, direction);
     if (neighbour != NULL) {
       int dist = distance(neighbour, closest_phoenix->region);
-
       if (dist < closest_neighbour_distance) {
         closest_neighbour_direction = direction;
         closest_neighbour_distance = dist;

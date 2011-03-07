@@ -97,14 +97,11 @@ get_followers(unit * target, region * r, const region_list * route_end,
   follower ** followers)
 {
   unit *uf;
-
   for (uf = r->units; uf; uf = uf->next) {
     if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
       const attrib *a = a_findc(uf->attribs, &at_follow);
-
       if (a && a->data.v == target) {
         follower *fnew = malloc(sizeof(follower));
-
         fnew->uf = uf;
         fnew->ut = target;
         fnew->route_end = route_end;
@@ -147,7 +144,6 @@ static void
 shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 {
   traveldir *t = (traveldir *) (a->data.v);
-
   store->w_int(store, t->no);
   store->w_int(store, t->dir);
   store->w_int(store, t->age);
@@ -195,7 +191,6 @@ static boolean entrance_allowed(const struct unit *u, const struct region *r)
 {
 #ifdef REGIONOWNERS
   faction *owner = region_get_owner(r);
-
   if (owner == NULL || u->faction == owner)
     return true;
   if (alliedfaction(rplane(r), owner, u->faction, HELP_TRAVEL))
@@ -209,7 +204,6 @@ static boolean entrance_allowed(const struct unit *u, const struct region *r)
 int personcapacity(const unit * u)
 {
   int cap = u->race->weight + u->race->capacity;
-
   return cap;
 }
 
@@ -228,12 +222,10 @@ get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
   int *p_vcap)
 {
   int vehicles = 0, vcap = 0;
-
   int animals = 0, acap = 0;
 
   for (; itm != NULL; itm = itm->next) {
     const item_type *itype = itm->type;
-
     if (itype->capacity > 0) {
       if (itype->flags & ITF_ANIMAL) {
         animals += itm->number;
@@ -260,7 +252,6 @@ get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
 static int ridingcapacity(unit * u)
 {
   int vehicles = 0, vcap = 0;
-
   int animals = 0, acap = 0;
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
@@ -282,11 +273,8 @@ static int ridingcapacity(unit * u)
 int walkingcapacity(const struct unit *u)
 {
   int n, tmp, people, pferde_fuer_wagen;
-
   int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
-
   int vehicles = 0, vcap = 0;
-
   int animals = 0, acap = 0;
 
   get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
@@ -326,7 +314,6 @@ int walkingcapacity(const struct unit *u)
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
   if (tmp > 0) {
     int horsecap = olditemtype[I_HORSE]->capacity;
-
     if (tmp > people)
       tmp = people;
     n += tmp * (horsecap - personcapacity(u));
@@ -348,9 +335,7 @@ enum {
 static int canwalk(unit * u)
 {
   int maxwagen, maxpferde;
-
   int vehicles = 0, vcap = 0;
-
   int animals = 0, acap = 0;
 
   /* workaround: monsters are too stupid to drop items, therefore they have
@@ -424,15 +409,10 @@ boolean canswim(unit * u)
 static int canride(unit * u)
 {
   int horses = 0, maxhorses, unicorns = 0, maxunicorns;
-
   int skill = effskill(u, SK_RIDING);
-
   item *itm;
-
   static const item_type *it_horse = 0;
-
   static const item_type *it_elvenhorse = 0;
-
   static const item_type *it_charger = 0;
 
   if (it_horse == 0) {
@@ -478,9 +458,7 @@ static boolean cansail(const region * r, ship * sh)
     return false;
   } else {
     int n = 0, p = 0;
-
     int mweight = shipcapacity(sh);
-
     int mcabins = sh->type->cabins;
 
     getshipweight(sh, &n, &p);
@@ -496,7 +474,6 @@ static boolean cansail(const region * r, ship * sh)
 int enoughsailors(const ship * sh, const region * r)
 {
   int n;
-
   unit *u;
 
   n = 0;
@@ -513,7 +490,6 @@ int enoughsailors(const ship * sh, const region * r)
 static ship *do_maelstrom(region * r, unit * u)
 {
   int damage;
-
   ship *sh = u->ship;
 
   damage = rng_int() % 75 + rng_int() % 75 - eff_skill(u, SK_SAILING, r) * 4;
@@ -564,14 +540,12 @@ static void leave_trail(ship * sh, region * from, region_list * route)
 
   while (route != NULL) {
     region *rn = route->data;
-
     direction_t dir = reldirection(r, rn);
 
     /* TODO: we cannot leave a trail into special directions 
      * if we use this kind of direction-attribute */
     if (dir < MAXDIRECTIONS && dir >= 0) {
       traveldir *td = NULL;
-
       attrib *a = a_find(r->attribs, &at_shiptrail);
 
       while (a != NULL && a->type == &at_shiptrail) {
@@ -609,9 +583,7 @@ mark_travelthru(const unit * u, region * r, const region_list * route,
 ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 {
   unit **iunit = &from->units;
-
   unit **ulist = &to->units;
-
   boolean trail = (route == NULL);
 
   if (from != to) {
@@ -625,7 +597,6 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
 
   while (*iunit != NULL) {
     unit *u = *iunit;
-
     assert(u->region == from);
 
     if (u->ship == sh) {
@@ -660,7 +631,6 @@ static boolean is_freezing(const unit * u)
 static boolean ship_allowed(const struct ship *sh, const region * r)
 {
   int c = 0;
-
   static const building_type *bt_harbour = NULL;
 
   if (bt_harbour == NULL)
@@ -676,7 +646,6 @@ static boolean ship_allowed(const struct ship *sh, const region * r)
 
       if (is_freezing(u)) {
         unit *captain = shipowner(sh);
-
         if (captain) {
           ADDMSG(&captain->faction->msgs, msg_message("detectforbidden",
               "unit region", u, r));
@@ -721,7 +690,6 @@ static void set_coast(ship * sh, region * r, region * rnext)
 static float damage_drift(void)
 {
   static float value = -1.0F;
-
   if (value < 0) {
     value = get_param_flt(global.parameters, "rules.ship.damage_drift", 0.02F);
   }
@@ -734,18 +702,12 @@ static void drifting_ships(region * r)
 
   if (fval(r->terrain, SEA_REGION)) {
     ship **shp = &r->ships;
-
     while (*shp) {
       ship *sh = *shp;
-
       region *rnext = NULL;
-
       region_list *route = NULL;
-
       unit *firstu = NULL, *captain;
-
       int d_offset;
-
       direction_t dir = 0;
 
       if (sh->type->fishing > 0) {
@@ -783,7 +745,6 @@ static void drifting_ships(region * r)
       d_offset = rng_int() % MAXDIRECTIONS;
       for (d = 0; d != MAXDIRECTIONS; ++d) {
         region *rn;
-
         dir = (direction_t) ((d + d_offset) % MAXDIRECTIONS);
         rn = rconnect(r, dir);
         if (rn != NULL && fval(rn->terrain, SAIL_INTO) && ship_allowed(sh, rn)) {
@@ -808,9 +769,7 @@ static void drifting_ships(region * r)
 
       if (firstu != NULL) {
         unit *u, *lastu = NULL;
-
         message *msg = msg_message("ship_drift", "ship dir", sh, dir);
-
         for (u = firstu; u; u = u->next) {
           if (u->ship == sh && !fval(u->faction, FFL_MARK)) {
             fset(u->faction, FFL_MARK);
@@ -871,11 +830,8 @@ static void caught_target(region * r, unit * u)
 static unit *bewegung_blockiert_von(unit * reisender, region * r)
 {
   unit *u;
-
   int perception = 0;
-
   boolean contact = false;
-
   unit *guard = NULL;
 
   if (fval(reisender->race, RCF_ILLUSIONARY))
@@ -883,7 +839,6 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
   for (u = r->units; u && !contact; u = u->next) {
     if (is_guard(u, GUARD_TRAVELTHRU)) {
       int sk = eff_skill(u, SK_PERCEPTION, r);
-
       if (invisible(reisender, u) >= reisender->number)
         continue;
       if (u->faction == reisender->faction)
@@ -900,7 +855,6 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
   }
   if (!contact && guard) {
     double prob = 0.3;          /* 30% base chance */
-
     prob += 0.1 * (perception - eff_stealth(reisender, r));
     prob += 0.1 * MIN(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
 
@@ -937,10 +891,8 @@ static boolean is_guardian_r(const unit * guard)
   /* if region_owners exist then they may be guardians: */
   if (guard->building && rule_region_owners() && fval(guard, UFL_OWNER)) {
     faction *owner = region_get_owner(guard->region);
-
     if (owner == guard->faction) {
       building *bowner = largestbuilding(guard->region, &cmp_taxes, false);
-
       if (bowner == guard->building) {
         return true;
       }
@@ -965,11 +917,8 @@ boolean is_guard(const struct unit * u, int mask)
 unit *is_guarded(region * r, unit * u, unsigned int mask)
 {
   unit *u2 = NULL;
-
   int i, noguards = 1;
-
   static unit *guardcache[MAXGUARDCACHE], *lastguard;   /* STATIC_XCALL: used across calls */
-
   static int gamecookie = -1;
 
   if (!fval(r, RF_GUARDED)) {
@@ -993,7 +942,6 @@ unit *is_guarded(region * r, unit * u, unsigned int mask)
 
   for (i = 0; i != MAXGUARDCACHE; ++i) {
     unit *guard = guardcache[i];
-
     if (guard && guard != lastguard && guard->region == r) {
       noguards = 0;
       if (is_guardian_u(guard, u, mask)) {
@@ -1053,21 +1001,13 @@ static const char *shortdirections[MAXDIRECTIONS] = {
 static void cycle_route(order * ord, unit * u, int gereist)
 {
   int bytes, cm = 0;
-
   char tail[1024], *bufp = tail;
-
   char neworder[2048];
-
   const char *token;
-
   direction_t d = NODIRECTION;
-
   boolean paused = false;
-
   boolean pause;
-
   order *norder;
-
   size_t size = sizeof(tail) - 1;
 
   if (get_keyword(ord) != K_ROUTE)
@@ -1080,7 +1020,6 @@ static void cycle_route(order * ord, unit * u, int gereist)
   neworder[0] = 0;
   for (cm = 0;; ++cm) {
     const struct locale *lang = u->faction->locale;
-
     pause = false;
     token = getstrtoken();
     d = finddirection(token, lang);
@@ -1094,7 +1033,6 @@ static void cycle_route(order * ord, unit * u, int gereist)
       assert(!pause);
       if (!pause) {
         const char *loc = LOC(lang, shortdirections[d]);
-
         if (bufp != tail) {
           bytes = (int)strlcpy(bufp, " ", size);
           if (wrptr(&bufp, &size, bytes) != 0)
@@ -1108,7 +1046,6 @@ static void cycle_route(order * ord, unit * u, int gereist)
       break;
     else if (cm == gereist && !paused && pause) {
       const char *loc = LOC(lang, parameters[P_PAUSE]);
-
       bytes = (int)strlcpy(bufp, " ", size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -1209,7 +1146,6 @@ static void init_transportation(void)
     if (!fval(r->terrain, SEA_REGION)) {
       for (u = r->units; u; u = u->next) {
         order *ord;
-
         int w = 0;
 
         for (ord = u->orders; ord; ord = ord->next) {
@@ -1244,7 +1180,6 @@ static boolean roadto(const region * r, direction_t dir)
   /* wenn es hier genug strassen gibt, und verbunden ist, und es dort
    * genug strassen gibt, dann existiert eine strasse in diese richtung */
   region *r2;
-
   static const curse_type *roads_ct = NULL;
 
   if (dir >= MAXDIRECTIONS || dir < 0)
@@ -1277,14 +1212,10 @@ static const region_list *cap_route(region * r, const region_list * route,
   const region_list * route_end, int speed)
 {
   region *current = r;
-
   int moves = speed;
-
   const region_list *iroute = route;
-
   while (iroute != route_end) {
     region *next = iroute->data;
-
     direction_t reldir = reldirection(current, next);
 
     /* adjust the range of the unit */
@@ -1308,7 +1239,6 @@ static region *next_region(unit * u, region * current, region * next)
   while (b != NULL) {
     if (b->type->move) {
       region *rto = b->type->move(b, u, current, next, true);
-
       if (rto != next) {
         /* the target region was changed (wisps, for example). check the
          * new target region for borders */
@@ -1326,10 +1256,8 @@ static const region_list *reroute(unit * u, const region_list * route,
   const region_list * route_end)
 {
   region *current = u->region;
-
   while (route != route_end) {
     region *next = next_region(u, current, route->data);
-
     if (next != route->data)
       break;
     route = route->next;
@@ -1340,18 +1268,13 @@ static const region_list *reroute(unit * u, const region_list * route,
 static void make_route(unit * u, order * ord, region_list ** routep)
 {
   region_list **iroute = routep;
-
   region *current = u->region;
-
   region *next = NULL;
-
   const char *token = getstrtoken();
-
   int error = movewhere(u, token, current, &next);
 
   if (error != E_MOVE_OK) {
     message *msg = movement_error(u, token, ord, error);
-
     if (msg != NULL) {
       add_message(&u->faction->msgs, msg);
       msg_release(msg);
@@ -1377,7 +1300,6 @@ static void make_route(unit * u, order * ord, region_list ** routep)
     error = movewhere(u, token, current, &next);
     if (error) {
       message *msg = movement_error(u, token, ord, error);
-
       if (msg != NULL) {
         add_message(&u->faction->msgs, msg);
         msg_release(msg);
@@ -1399,11 +1321,8 @@ static void make_route(unit * u, order * ord, region_list ** routep)
 static int movement_speed(unit * u)
 {
   int mp;
-
   static const curse_type *speed_ct;
-
   static boolean init = false;
-
   double dk = u->race->speed;
 
   assert(u->number);
@@ -1423,10 +1342,8 @@ static int movement_speed(unit * u)
   }
   if (speed_ct) {
     curse *c = get_curse(u->attribs, speed_ct);
-
     if (c != NULL) {
       int men = get_cursedmen(u, c);
-
       dk *= 1.0 + (double)men / (double)u->number;
     }
   }
@@ -1460,7 +1377,6 @@ static int movement_speed(unit * u)
       if (mp * dk <= BP_WALKING * u->race->speed && is_astral(u->region)
         && is_mage(u)) {
         sc_mage *mage = get_mage(u);
-
         if (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN) {
           mp *= 2;
         }
@@ -1483,7 +1399,6 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
 
   if (size > 0) {
     int i = 0;
-
     arg_regions *dst =
       (arg_regions *) malloc(sizeof(arg_regions) + sizeof(region *) * size);
     dst->nregions = size;
@@ -1496,33 +1411,25 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
   return NULL;
 }
 
-
 static const region_list *travel_route(unit * u,
   const region_list * route_begin, const region_list * route_end, order * ord,
   int mode)
 {
   region *r = u->region;
-
   region *current = u->region;
-
   const region_list *iroute = route_begin;
-
   int steps = 0;
-
   boolean landing = false;      /* aquarians have landed */
 
   while (iroute && iroute != route_end) {
     region *next = iroute->data;
-
     direction_t reldir = reldirection(current, next);
-
     connection *b = get_borders(current, next);
 
     /* check if we are caught by guarding units */
     if (iroute != route_begin && mode != TRAVEL_RUNNING
       && mode != TRAVEL_TRANSPORTED) {
       unit *wache = bewegung_blockiert_von(u, current);
-
       if (wache != NULL) {
         ADDMSG(&u->faction->msgs, msg_message("moveblockedbyguard",
             "unit region guard", u, current, wache));
@@ -1537,7 +1444,6 @@ static const region_list *travel_route(unit * u,
         /* next region is land */
         if (fval(current->terrain, SEA_REGION)) {
           int moving = u->race->flags & (RCF_SWIM | RCF_WALK | RCF_COASTAL);
-
           /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
           if (moving != (RCF_SWIM | RCF_WALK) && (moving & RCF_COASTAL) == 0) {
             /* can't swim+walk and isn't allowed to enter coast from sea */
@@ -1596,7 +1502,6 @@ static const region_list *travel_route(unit * u,
     /* illusionary units disappear in antimagic zones */
     if (fval(u->race, RCF_ILLUSIONARY)) {
       curse *c = get_curse(next->attribs, ct_find("antimagiczone"));
-
       if (curse_active(c)) {
         curse_changevigour(&next->attribs, c, (float)-u->number);
         ADDMSG(&u->faction->msgs, msg_message("illusionantimagic", "unit", u));
@@ -1657,7 +1562,6 @@ static const region_list *travel_route(unit * u,
 
     if (mode != TRAVEL_TRANSPORTED) {
       arg_regions *ar = var_copy_regions(route_begin, steps - 1);
-
       ADDMSG(&u->faction->msgs, msg_message("travel",
           "unit mode start end regions", u, walkmode, r, current, ar));
     }
@@ -1706,7 +1610,6 @@ static boolean ship_ready(const region * r, unit * u)
 unit *owner_buildingtyp(const region * r, const building_type * bt)
 {
   building *b;
-
   unit *owner;
 
   for (b = rbuildings(r); b; b = b->next) {
@@ -1743,11 +1646,8 @@ static boolean check_takeoff(ship * sh, region * from, region * to)
 {
   if (!fval(from->terrain, SEA_REGION) && sh->coast != NODIRECTION) {
     direction_t coast = sh->coast;
-
     direction_t dir = reldirection(from, to);
-
     direction_t coastr = (direction_t) ((coast + 1) % MAXDIRECTIONS);
-
     direction_t coastl =
       (direction_t) ((coast + MAXDIRECTIONS - 1) % MAXDIRECTIONS);
 
@@ -1764,21 +1664,13 @@ static void
 sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 {
   region *starting_point = u->region;
-
   region *current_point, *last_point;
-
   int k, step = 0;
-
   region_list **iroute = routep;
-
   ship *sh = u->ship;
-
   faction *f = u->faction;
-
   region *next_point = NULL;
-
   int error;
-
   const char *token = getstrtoken();
 
   if (routep)
@@ -1787,7 +1679,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
   error = movewhere(u, token, starting_point, &next_point);
   if (error) {
     message *msg = movement_error(u, token, ord, error);
-
     if (msg != NULL) {
       add_message(&u->faction->msgs, msg);
       msg_release(msg);
@@ -1815,14 +1706,10 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 
   while (next_point && current_point != next_point && step < k) {
     const char *token;
-
     int error;
-
     const terrain_type *tthis = current_point->terrain;
-
     /* these values need to be updated if next_point changes (due to storms): */
     const terrain_type *tnext = next_point->terrain;
-
     direction_t dir = reldirection(current_point, next_point);
 
     assert(sh == u->ship || !"ship has sunk, but we didn't notice it");
@@ -1835,14 +1722,11 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 
     if (!flying_ship(sh)) {
       int stormchance;
-
       static int stormyness;
-
       static int gamecookie = -1;
 
       if (gamecookie != global.cookie) {
         gamedate date;
-
         get_gamedate(turn, &date);
         stormyness = storms[date.month] * 5;
         gamecookie = global.cookie;
@@ -1857,17 +1741,12 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
         && fval(current_point->terrain, SEA_REGION)) {
         if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
           region *rnext = NULL;
-
           boolean storm = true;
-
           int d_offset = rng_int() % MAXDIRECTIONS;
-
           direction_t d;
-
           /* Sturm nur, wenn nächste Region Hochsee ist. */
           for (d = 0; d != MAXDIRECTIONS; ++d) {
             direction_t dnext = (direction_t) ((d + d_offset) % MAXDIRECTIONS);
-
             region *rn = rconnect(current_point, dnext);
 
             if (rn != NULL) {
@@ -1921,7 +1800,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 
           for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rc = rconnect(next_point, d);
-
             if (rc == NULL || !fval(rc->terrain, SEA_REGION))
               break;
           }
@@ -1948,7 +1826,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
         }
         break;
       }
-
 
       if (curse_active(get_curse(next_point->attribs, ct_find("maelstrom")))) {
         if (do_maelstrom(next_point, u) == NULL)
@@ -1983,7 +1860,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
     error = movewhere(u, token, current_point, &next_point);
     if (error || next_point == NULL) {
       message *msg = movement_error(u, token, ord, error);
-
       if (msg != NULL) {
         add_message(&u->faction->msgs, msg);
         msg_release(msg);
@@ -2009,7 +1885,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 
   if (sh != NULL && fval(sh, SF_MOVED)) {
     unit *hafenmeister;
-
     /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
      * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
     cycle_route(ord, u, step);
@@ -2040,22 +1915,17 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
     hafenmeister = owner_buildingtyp(current_point, bt_find("harbour"));
     if (sh && hafenmeister != NULL) {
       item *itm;
-
       unit *u2;
-
       item *trans = NULL;
 
       for (u2 = current_point->units; u2; u2 = u2->next) {
         if (u2->ship == sh && !alliedunit(hafenmeister, u->faction, HELP_GUARD)) {
 
-
           if (effskill(hafenmeister, SK_PERCEPTION) > effskill(u2, SK_STEALTH)) {
             for (itm = u2->items; itm; itm = itm->next) {
               const luxury_type *ltype = resource2luxury(itm->type->rtype);
-
               if (ltype != NULL && itm->number > 0) {
                 int st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
-
                 st = MIN(itm->number, st);
 
                 if (st > 0) {
@@ -2085,7 +1955,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
 unit *get_captain(const ship * sh)
 {
   const region *r = sh->region;
-
   unit *u;
 
   for (u = r->units; u; u = u->next) {
@@ -2111,7 +1980,6 @@ unit *get_captain(const ship * sh)
 void run_to(unit * u, region * to)
 {
   region_list *route = NULL;
-
   add_regionlist(&route, to);
   travel_route(u, route, NULL, NULL, TRAVEL_RUNNING);
   free_regionlist(route);
@@ -2203,9 +2071,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 static void travel(unit * u, region_list ** routep)
 {
   region *r = u->region;
-
   region_list *route_begin = NULL;
-
   follower *followers = NULL;
 
   if (routep)
@@ -2228,7 +2094,6 @@ static void travel(unit * u, region_list ** routep)
     }
     if (sh) {
       unit *guard = is_guarded(r, u, GUARD_LANDING);
-
       if (guard) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "region_guarded", "guard", guard));
@@ -2254,11 +2119,8 @@ static void travel(unit * u, region_list ** routep)
   /* followers */
   while (followers != NULL) {
     follower *fnext = followers->next;
-
     unit *uf = followers->uf;
-
     unit *ut = followers->ut;
-
     const region_list *route_end = followers->route_end;
 
     free(followers);
@@ -2266,7 +2128,6 @@ static void travel(unit * u, region_list ** routep)
 
     if (uf->region == r) {
       order *follow_order;
-
       const struct locale *lang = u->faction->locale;
 
       /* construct an order */
@@ -2330,9 +2191,7 @@ static attrib *mk_piracy(const faction * pirate, const faction * target,
   direction_t target_dir)
 {
   attrib *a = a_new(&at_piracy_direction);
-
   piracy_data *data = a->data.v;
-
   data->pirate = pirate;
   data->target = target;
   data->dir = target_dir;
@@ -2342,22 +2201,15 @@ static attrib *mk_piracy(const faction * pirate, const faction * target,
 static void piracy_cmd(unit * u, struct order *ord)
 {
   region *r = u->region;
-
   ship *sh = u->ship, *sh2;
-
   direction_t dir, target_dir = NODIRECTION;
-
   struct {
     const faction *target;
     int value;
   } aff[MAXDIRECTIONS];
-
   int saff = 0;
-
   int *il = NULL;
-
   const char *s;
-
   attrib *a;
 
   if (!sh) {
@@ -2373,7 +2225,6 @@ static void piracy_cmd(unit * u, struct order *ord)
   /* Feststellen, ob schon ein anderer alliierter Pirat ein
    * Ziel gefunden hat. */
 
-
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
@@ -2388,9 +2239,7 @@ static void piracy_cmd(unit * u, struct order *ord)
   for (a = a_find(r->attribs, &at_piracy_direction);
     a && a->type == &at_piracy_direction; a = a->next) {
     piracy_data *data = a->data.v;
-
     const faction *p = data->pirate;
-
     const faction *t = data->target;
 
     if (alliedunit(u, p, HELP_FIGHT)) {
@@ -2409,7 +2258,6 @@ static void piracy_cmd(unit * u, struct order *ord)
 
     for (dir = 0; dir < MAXDIRECTIONS; dir++) {
       region *rc = rconnect(r, dir);
-
       aff[dir].value = 0;
       aff[dir].target = 0;
       if (rc && fval(rc->terrain, SWIM_INTO)
@@ -2417,10 +2265,8 @@ static void piracy_cmd(unit * u, struct order *ord)
 
         for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
           unit *cap = shipowner(sh2);
-
           if (cap) {
             faction *f = visible_faction(cap->faction, cap);
-
             if (alliedunit(u, f, HELP_FIGHT))
               continue;
             if (il == 0 || intlist_find(il, cap->faction->no)) {
@@ -2479,7 +2325,6 @@ static void age_traveldir(region * r)
 
   while (a && a->type == &at_traveldir) {
     attrib *an = a->next;
-
     a->data.ca[3]--;
     if (a->data.ca[3] <= 0) {
       a_remove(&r->attribs, a);
@@ -2491,12 +2336,10 @@ static void age_traveldir(region * r)
 static direction_t hunted_dir(attrib * at, int id)
 {
   attrib *a = a_find(at, &at_shiptrail);
-
   direction_t d = NODIRECTION;
 
   while (a != NULL && a->type == &at_shiptrail) {
     traveldir *t = (traveldir *) (a->data.v);
-
     if (t->no == id) {
       d = t->dir;
       /* do not break, because we want the last one for this ship */
@@ -2510,13 +2353,9 @@ static direction_t hunted_dir(attrib * at, int id)
 static int hunt(unit * u, order * ord)
 {
   region *rc = u->region;
-
   int bytes, moves, id, speed;
-
   char command[256], *bufp = command;
-
   size_t size = sizeof(command);
-
   direction_t dir;
 
   if (fval(u, UFL_NOTMOVING)) {
@@ -2547,7 +2386,6 @@ static int hunt(unit * u, order * ord)
 
   if (dir == NODIRECTION) {
     ship *sh = findship(id);
-
     if (sh == NULL || sh->region != rc) {
       cmistake(u, ord, 20, MSG_MOVE);
     }
@@ -2569,7 +2407,6 @@ static int hunt(unit * u, order * ord)
     speed = shipspeed(u->ship, u);
   } else {
     int maxspeed = shipspeed(u->ship, u);
-
     if (maxspeed < speed)
       speed = maxspeed;
   }
@@ -2597,7 +2434,6 @@ static int hunt(unit * u, order * ord)
 void destroy_damaged_ships(void)
 {
   region *r;
-
   ship *sh, *shn;
 
   for (r = regions; r; r = r->next) {
@@ -2715,15 +2551,12 @@ void movement(void)
    */
   for (ships = 0; ships <= 1; ++ships) {
     region *r = regions;
-
     while (r != NULL) {
       unit **up = &r->units;
-
       boolean repeat = false;
 
       while (*up) {
         unit *u = *up;
-
         keyword_t kword;
 
         if (u->ship && fval(u->ship, SF_DRIFTED)) {
@@ -2807,9 +2640,7 @@ void movement(void)
 void follow_unit(unit * u)
 {
   region *r = u->region;
-
   attrib *a = NULL;
-
   order *ord;
 
   if (fval(u, UFL_NOTMOVING) || LongHunger(u))
@@ -2830,7 +2661,6 @@ void follow_unit(unit * u)
 
         if (id > 0) {
           unit *uf = findunit(id);
-
           if (!a) {
             a = a_add(&u->attribs, make_follow(uf));
           } else {
@@ -2846,7 +2676,6 @@ void follow_unit(unit * u)
 
   if (a && !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
     unit *u2 = a->data.v;
-
     boolean follow = false;
 
     if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
@@ -2875,10 +2704,8 @@ void follow_unit(unit * u)
     }
     if (!follow) {
       attrib *a2 = a_find(u2->attribs, &at_follow);
-
       if (a2 != NULL) {
         unit *u3 = a2->data.v;
-
         follow = (u3 && u2->region == u2->region);
       }
     }

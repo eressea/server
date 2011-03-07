@@ -57,9 +57,7 @@ static void
 object_write(const attrib * a, const void *owner, struct storage *store)
 {
   const object_data *data = (object_data *) a->data.v;
-
   int type = (int)data->type;
-
   store->w_tok(store, data->name);
   store->w_int(store, type);
   switch (data->type) {
@@ -98,7 +96,6 @@ object_write(const attrib * a, const void *owner, struct storage *store)
 static int object_read(attrib * a, void *owner, struct storage *store)
 {
   object_data *data = (object_data *) a->data.v;
-
   int result;
 
   data->name = store->r_str(store);
@@ -159,7 +156,6 @@ static int object_read(attrib * a, void *owner, struct storage *store)
 static void object_init(attrib * a)
 {
   object_data *data;
-
   a->data.v = malloc(sizeof(object_data));
   data = (object_data *) a->data.v;
   data->type = TNONE;
@@ -168,7 +164,6 @@ static void object_init(attrib * a)
 static void object_done(attrib * a)
 {
   object_data *data = (object_data *) a->data.v;
-
   if (data->type == TSTRING)
     free(data->data.str);
   free(data->name);
@@ -183,16 +178,13 @@ attrib_type at_object = {
 const char *object_name(const attrib * a)
 {
   object_data *data = (object_data *) a->data.v;
-
   return data->name;
 }
 
 struct attrib *object_create(const char *name, object_type type, variant value)
 {
   attrib *a = a_new(&at_object);
-
   object_data *data = (object_data *) a->data.v;
-
   data->name = strdup(name);
 
   object_set(a, type, value);
@@ -242,7 +234,6 @@ void object_set(attrib * a, object_type type, variant value)
 void object_get(const struct attrib *a, object_type * type, variant * value)
 {
   object_data *data = (object_data *) a->data.v;
-
   *type = data->type;
   switch (data->type) {
     case TSTRING:

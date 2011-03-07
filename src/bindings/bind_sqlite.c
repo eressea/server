@@ -22,21 +22,17 @@ without prior permission by the authors of Eressea.
 #define LTYPE_DB TOLUA_CAST "db"
 
 extern int db_update_factions(sqlite3 * db, boolean force);
-
 static int tolua_db_update_factions(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
-
   db_update_factions(db, tolua_toboolean(L, 2, 0));
   return 0;
 }
 
 extern int db_update_scores(sqlite3 * db, boolean force);
-
 static int tolua_db_update_scores(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
-
   db_update_scores(db, tolua_toboolean(L, 2, 0));
   return 0;
 }
@@ -44,7 +40,6 @@ static int tolua_db_update_scores(lua_State * L)
 static int tolua_db_execute(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
-
   const char *sql = tolua_tostring(L, 2, 0);
 
   int res = sqlite3_exec(db, sql, 0, 0, 0);
@@ -56,7 +51,6 @@ static int tolua_db_execute(lua_State * L)
 static int tolua_db_close(lua_State * L)
 {
   sqlite3 *db = (sqlite3 *) tolua_tousertype(L, 1, 0);
-
   sqlite3_close(db);
   return 0;
 }
@@ -64,11 +58,8 @@ static int tolua_db_close(lua_State * L)
 static int tolua_db_create(lua_State * L)
 {
   sqlite3 *db;
-
   const char *dbname = tolua_tostring(L, 1, 0);
-
   int result = sqlite3_open_v2(dbname, &db, SQLITE_OPEN_READWRITE, 0);
-
   if (result == SQLITE_OK) {
     tolua_pushusertype(L, (void *)db, LTYPE_DB);
     return 1;

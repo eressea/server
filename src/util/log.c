@@ -21,7 +21,6 @@ without prior permission by the authors of Eressea.
 
 /* TODO: set from external function */
 int log_flags = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING;
-
 #ifdef STDIO_CP
 static int stdio_codepage = STDIO_CP;
 #else
@@ -48,14 +47,11 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
 {
   /* when console output on MSDOS, convert to codepage */
   const char *input = format;
-
   char *pos = buffer;
 
   while (pos + 1 < buffer + length && *input) {
     size_t length = 0;
-
     int result = 0;
-
     if (codepage == 437) {
       result = unicode_utf8_to_cp437(pos, input, &length);
     } else if (codepage == 1252) {
@@ -75,7 +71,6 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
 void log_printf(const char *format, ...)
 {
   va_list marker;
-
   if (!logfile)
     logfile = stderr;
   va_start(marker, format);
@@ -89,13 +84,11 @@ void log_printf(const char *format, ...)
 void log_stdio(FILE * io, const char *format, ...)
 {
   va_list marker;
-
   if (!logfile)
     logfile = stderr;
   va_start(marker, format);
   if (stdio_codepage) {
     char buffer[MAXLENGTH];
-
     char converted[MAXLENGTH];
 
     vsnprintf(buffer, sizeof(buffer), format, marker);
@@ -124,7 +117,6 @@ void log_open(const char *filename)
   if (logfile) {
     /* Get UNIX-style time and display as number and string. */
     time_t ltime;
-
     time(&ltime);
     log_printf("===\n=== Logfile started at %s===\n", ctime(&ltime));
   }
@@ -137,7 +129,6 @@ void log_close(void)
   if (logfile) {
     /* Get UNIX-style time and display as number and string. */
     time_t ltime;
-
     time(&ltime);
     log_printf("===\n=== Logfile closed at %s===\n\n", ctime(&ltime));
   }
@@ -148,11 +139,8 @@ void log_close(void)
 static int check_dupe(const char *format, const char *type)
 {
   static const char *last_type; /* STATIC_XCALL: used across calls */
-
   static char last_message[32]; /* STATIC_XCALL: used across calls */
-
   static int dupes = 0;         /* STATIC_XCALL: used across calls */
-
   if (strncmp(last_message, format, sizeof(last_message)) == 0) {
     ++dupes;
     return 1;
@@ -179,7 +167,6 @@ void _log_warn(const char *format, ...)
       logfile = stderr;
     if (logfile != stderr) {
       va_list marker;
-
       fputs("WARNING: ", logfile);
       va_start(marker, format);
       vfprintf(logfile, format, marker);
@@ -187,12 +174,10 @@ void _log_warn(const char *format, ...)
     }
     if (!dupe) {
       va_list marker;
-
       fputs("WARNING: ", stderr);
       va_start(marker, format);
       if (stdio_codepage) {
         char buffer[MAXLENGTH];
-
         char converted[MAXLENGTH];
 
         vsnprintf(buffer, sizeof(buffer), format, marker);
@@ -218,14 +203,12 @@ void _log_warn(const char *format, ...)
 void _log_error(const char *format, ...)
 {
   int dupe = check_dupe(format, "ERROR");
-
   fflush(stdout);
   if (!logfile)
     logfile = stderr;
 
   if (logfile != stderr) {
     va_list marker;
-
     fputs("ERROR: ", logfile);
     va_start(marker, format);
     vfprintf(logfile, format, marker);
@@ -240,7 +223,6 @@ void _log_error(const char *format, ...)
         va_start(marker, format);
         if (stdio_codepage) {
           char buffer[MAXLENGTH];
-
           char converted[MAXLENGTH];
 
           vsnprintf(buffer, sizeof(buffer), format, marker);
@@ -263,13 +245,11 @@ void _log_error(const char *format, ...)
 }
 
 static unsigned int logfile_level = 0;
-
 static unsigned int stderr_level = 1;
 
 void _log_info(unsigned int level, const char *format, ...)
 {
   va_list marker;
-
   fflush(stdout);
   if (!logfile)
     logfile = stderr;
@@ -284,7 +264,6 @@ void _log_info(unsigned int level, const char *format, ...)
         va_start(marker, format);
         if (stdio_codepage) {
           char buffer[MAXLENGTH];
-
           char converted[MAXLENGTH];
 
           vsnprintf(buffer, sizeof(buffer), format, marker);

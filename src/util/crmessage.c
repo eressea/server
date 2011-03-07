@@ -36,7 +36,6 @@ static tostring_f tsf_find(const char *name)
 {
   if (name != NULL) {
     tsf_list *tsf;
-
     for (tsf = tostringfs; tsf; tsf = tsf->next) {
       if (!strcmp(tsf->name, name))
         return tsf->fun;
@@ -48,7 +47,6 @@ static tostring_f tsf_find(const char *name)
 void tsf_register(const char *name, tostring_f fun)
 {
   tsf_list *tsf;
-
   for (tsf = tostringfs; tsf; tsf = tsf->next) {
     if (!strcmp(tsf->name, name))
       break;
@@ -75,11 +73,8 @@ static crmessage_type *crtypes[CRMAXHASH];
 static crmessage_type *crt_find(const struct message_type *mtype)
 {
   unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
-
   crmessage_type *found = NULL;
-
   crmessage_type *type = crtypes[hash];
-
   while (type) {
     if (type->mtype == mtype)
       found = type;
@@ -91,15 +86,12 @@ static crmessage_type *crt_find(const struct message_type *mtype)
 void crt_register(const struct message_type *mtype)
 {
   unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
-
   crmessage_type *crt = crtypes[hash];
-
   while (crt && crt->mtype != mtype) {
     crt = crt->next;
   }
   if (!crt) {
     int i;
-
     crt = malloc(sizeof(crmessage_type));
     crt->mtype = mtype;
     crt->next = crtypes[hash];
@@ -120,9 +112,7 @@ void crt_register(const struct message_type *mtype)
 int cr_render(const message * msg, char *buffer, const void *userdata)
 {
   int i;
-
   char *c = buffer;
-
   struct crmessage_type *crt = crt_find(msg->type);
 
   if (crt == NULL)

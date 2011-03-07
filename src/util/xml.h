@@ -13,7 +13,6 @@
 #ifndef H_UTIL_XML
 #define H_UTIL_XML
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

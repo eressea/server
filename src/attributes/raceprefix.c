@@ -34,7 +34,6 @@ attrib_type at_raceprefix = {
 void set_prefix(attrib ** ap, const char *str)
 {
   attrib *a = a_find(*ap, &at_raceprefix);
-
   if (a == NULL) {
     a = a_add(ap, a_new(&at_raceprefix));
   } else {
@@ -47,7 +46,6 @@ void set_prefix(attrib ** ap, const char *str)
 const char *get_prefix(const attrib * a)
 {
   char *str;
-
   a = a_findc(a, &at_raceprefix);
   if (a == NULL)
     return NULL;

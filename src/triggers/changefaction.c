@@ -38,7 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-
 #include <stdio.h>
 /***
  ** restore a mage that was turned into a toad
@@ -65,7 +64,6 @@ static int changefaction_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   changefaction_data *td = (changefaction_data *) t->data.v;
-
   if (td->unit && td->faction) {
     u_setfaction(td->unit, td->faction);
   } else {
@@ -78,7 +76,6 @@ static int changefaction_handle(trigger * t, void *data)
 static void changefaction_write(const trigger * t, struct storage *store)
 {
   changefaction_data *td = (changefaction_data *) t->data.v;
-
   write_unit_reference(td->unit, store);
   write_faction_reference(td->faction, store);
 }
@@ -86,7 +83,6 @@ static void changefaction_write(const trigger * t, struct storage *store)
 static int changefaction_read(trigger * t, struct storage *store)
 {
   changefaction_data *td = (changefaction_data *) t->data.v;
-
   read_reference(&td->unit, store, read_unit_reference, resolve_unit);
   read_reference(&td->faction, store, read_faction_reference, resolve_faction);
   return AT_READ_OK;
@@ -104,9 +100,7 @@ trigger_type tt_changefaction = {
 trigger *trigger_changefaction(unit * u, struct faction * f)
 {
   trigger *t = t_new(&tt_changefaction);
-
   changefaction_data *td = (changefaction_data *) t->data.v;
-
   td->unit = u;
   td->faction = f;
   return t;

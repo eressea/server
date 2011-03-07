@@ -42,7 +42,6 @@ use_speedsail(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   struct plane *p = rplane(u->region);
-
   unused(amount);
   unused(itype);
   if (p != NULL) {
@@ -50,7 +49,6 @@ use_speedsail(struct unit *u, const struct item_type *itype, int amount,
   } else {
     if (u->ship) {
       attrib *a = a_find(u->ship->attribs, &at_speedup);
-
       if (a == NULL) {
         a = a_add(&u->ship->attribs, a_new(&at_speedup));
         a->data.sa[0] = 50;     /* speed */

@@ -45,7 +45,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-
 quicklist *shiptypes = NULL;
 
 static local_names *snames;
@@ -53,7 +52,6 @@ static local_names *snames;
 const ship_type *findshiptype(const char *name, const struct locale *lang)
 {
   local_names *sn = snames;
-
   variant var;
 
   while (sn) {
@@ -63,7 +61,6 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
   }
   if (!sn) {
     quicklist *ql;
-
     int qi;
 
     sn = (local_names *) calloc(sizeof(local_names), 1);
@@ -72,11 +69,8 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
     for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
       ship_type *stype = (ship_type *) ql_get(ql, qi);
-
       variant var;
-
       const char *n = locale_string(lang, stype->name[0]);
-
       var.v = (void *)stype;
       addtoken(&sn->names, n, var);
     }
@@ -90,12 +84,10 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 const ship_type *st_find(const char *name)
 {
   quicklist *ql;
-
   int qi;
 
   for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
     ship_type *stype = (ship_type *) ql_get(ql, qi);
-
     if (strcmp(stype->name[0], name) == 0) {
       return stype;
     }
@@ -110,7 +102,6 @@ void st_register(const ship_type * type)
 
 #define SMAXHASH 7919
 ship *shiphash[SMAXHASH];
-
 void shash(ship * s)
 {
   ship *old = shiphash[s->no % SMAXHASH];
@@ -186,7 +177,6 @@ static ship *deleted_ships;
 ship *new_ship(const ship_type * stype, const struct locale *lang, region * r)
 {
   static char buffer[7 + IDSIZE + 1];
-
   ship *sh = (ship *) calloc(1, sizeof(ship));
 
   assert(stype);
@@ -206,7 +196,6 @@ ship *new_ship(const ship_type * stype, const struct locale *lang, region * r)
 void remove_ship(ship ** slist, ship * sh)
 {
   region *r = sh->region;
-
   unit *u = r->units;
 
   handle_event(sh->attribs, "destroy", sh);
@@ -239,7 +228,6 @@ void free_ships(void)
 {
   while (deleted_ships) {
     ship *s = deleted_ships;
-
     deleted_ships = s->next;
   }
 }
@@ -254,13 +242,9 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 const char *shipname(const ship * sh)
 {
   typedef char name[OBJECTIDSIZE + 1];
-
   static name idbuf[8];
-
   static int nextbuf = 0;
-
   char *ibuf = idbuf[(++nextbuf) % 8];
-
   return write_shipname(sh, ibuf, sizeof(name));
 }
 
@@ -295,7 +279,6 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
       *sweight += weight(u);
       if (sh->type->cabins) {
         int pweight = u->number * u->race->weight;
-
         /* weight goes into number of cabins, not cargo */
         *scabins += pweight;
         *sweight -= pweight;
@@ -307,7 +290,6 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
 unit *shipowner(const ship * sh)
 {
   unit *u;
-
   unit *first = NULL;
 
   const region *r = sh->region;

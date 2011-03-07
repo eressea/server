@@ -43,7 +43,6 @@ static int killunit_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   unit *u = (unit *) t->data.v;
-
   if (u) {
     /* we can't remove_unit() here, because that's what's calling us. */
     set_number(u, 0);
@@ -55,7 +54,6 @@ static int killunit_handle(trigger * t, void *data)
 static void killunit_write(const trigger * t, struct storage *store)
 {
   unit *u = (unit *) t->data.v;
-
   write_unit_reference(u, store);
 }
 
@@ -81,7 +79,6 @@ trigger_type tt_killunit = {
 trigger *trigger_killunit(unit * u)
 {
   trigger *t = t_new(&tt_killunit);
-
   t->data.v = (void *)u;
   return t;
 }

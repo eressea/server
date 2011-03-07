@@ -63,7 +63,6 @@ attrib_type at_hate = {
 attrib *make_hate(struct unit * u)
 {
   attrib *a = a_new(&at_hate);
-
   a->data.v = u;
   return a;
 }

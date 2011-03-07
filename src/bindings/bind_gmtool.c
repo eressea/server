@@ -22,9 +22,7 @@ static int tolua_run_mapper(lua_State * L)
 static int tolua_highlight_region(lua_State * L)
 {
   region *r = tolua_tousertype(L, 1, 0);
-
   int select = tolua_toboolean(L, 2, 0);
-
   highlight_region(r, select);
   return 0;
 }
@@ -37,15 +35,11 @@ static int tolua_current_region(lua_State * L)
   return 1;
 }
 
-
 static int tolua_select_coordinate(lua_State * L)
 {
   int nx = (int)tolua_tonumber(L, 1, 0);
-
   int ny = (int)tolua_tonumber(L, 2, 0);
-
   int select = tolua_toboolean(L, 3, 0);
-
   if (current_state) {
     select_coordinate(current_state->selected, nx, ny, select);
   }
@@ -55,9 +49,7 @@ static int tolua_select_coordinate(lua_State * L)
 static int tolua_select_region(lua_State * L)
 {
   region *r = tolua_tousertype(L, 1, 0);
-
   int select = tolua_toboolean(L, 2, 0);
-
   if (current_state && r) {
     select_coordinate(current_state->selected, r->x, r->y, select);
   }
@@ -112,7 +104,6 @@ void tag_rewind(tag_iterator * iter)
 static int tolua_tags_next(lua_State * L)
 {
   tag_iterator *iter = (tag_iterator *) lua_touserdata(L, lua_upvalueindex(1));
-
   if (iter->node) {
     tolua_pushusertype(L, (void *)iter->r, TOLUA_CAST "region");
     tag_advance(iter);
@@ -154,11 +145,8 @@ static int tolua_state_close(lua_State * L)
 static int tolua_make_island(lua_State * L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
-
   int y = (int)tolua_tonumber(L, 2, 0);
-
   int s = (int)tolua_tonumber(L, 3, 0);
-
   int n = (int)tolua_tonumber(L, 4, s / 3);
 
   n = build_island_e3(x, y, n, s);
@@ -167,48 +155,36 @@ static int tolua_make_island(lua_State * L)
 }
 
 static int paint_handle;
-
 static struct lua_State *paint_state;
 
 static void lua_paint_info(struct window *wnd, const struct state *st)
 {
   struct lua_State *L = paint_state;
-
   int nx = st->cursor.x, ny = st->cursor.y;
-
   pnormalize(&nx, &ny, st->cursor.pl);
   lua_rawgeti(L, LUA_REGISTRYINDEX, paint_handle);
   tolua_pushnumber(L, nx);
   tolua_pushnumber(L, ny);
   if (lua_pcall(L, 2, 1, 0) != 0) {
     const char *error = lua_tostring(L, -1);
-
     log_error(("paint function failed: %s\n", error));
     lua_pop(L, 1);
     tolua_error(L, TOLUA_CAST "event handler call failed", NULL);
   } else {
     const char *result = lua_tostring(L, -1);
-
     WINDOW *win = wnd->handle;
-
     int size = getmaxx(win) - 2;
-
     int line = 0, maxline = getmaxy(win) - 2;
-
     const char *str = result;
-
     wxborder(win);
 
     while (*str && line < maxline) {
       const char *end = strchr(str, '\n');
-
       if (!end)
         break;
       else {
         size_t len = end - str;
-
         int bytes = MIN((int)len, size);
-
         mvwaddnstr(win, line++, 1, str, bytes);
         wclrtoeol(win);
         str = end + 1;
@@ -220,7 +196,6 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
 static int tolua_set_display(lua_State * L)
 {
   int type = lua_type(L, 1);
-
   if (type == LUA_TFUNCTION) {
     lua_pushvalue(L, 1);
     paint_handle = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -236,13 +211,9 @@ static int tolua_set_display(lua_State * L)
 static int tolua_make_block(lua_State * L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
-
   int y = (int)tolua_tonumber(L, 2, 0);
-
   int r = (int)tolua_tonumber(L, 3, 6);
-
   const char *str = tolua_tostring(L, 4, TOLUA_CAST "ocean");
-
   const struct terrain_type *ter = get_terrain(str);
 
   make_block(x, y, r, ter);

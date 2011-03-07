@@ -40,11 +40,8 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n,
   struct order *ord)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   char fname[64];
-
   int result = -1;
-
   const char *iname = itype->rtype->_name[0];
 
   assert(s != NULL);
@@ -60,7 +57,6 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n,
 
     if (lua_pcall(L, 4, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("unit %s calling '%s': %s.\n", unitname(s), fname, error));
       lua_pop(L, 1);
     } else {
@@ -79,9 +75,7 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n,
 static int limit_resource(const region * r, const resource_type * rtype)
 {
   char fname[64];
-
   int result = -1;
-
   lua_State *L = (lua_State *) global.vm_state;
 
   snprintf(fname, sizeof(fname), "%s_limit", rtype->_name[0]);
@@ -93,7 +87,6 @@ static int limit_resource(const region * r, const resource_type * rtype)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("limit(%s) calling '%s': %s.\n",
           regionname(r, NULL), fname, error));
       lua_pop(L, 1);
@@ -114,9 +107,7 @@ static void
 produce_resource(region * r, const resource_type * rtype, int norders)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   char fname[64];
-
   snprintf(fname, sizeof(fname), "%s_produce", rtype->_name[0]);
 
   lua_pushstring(L, fname);
@@ -127,7 +118,6 @@ produce_resource(region * r, const resource_type * rtype, int norders)
 
     if (lua_pcall(L, 2, 0, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("produce(%s) calling '%s': %s.\n",
           regionname(r, NULL), fname, error));
       lua_pop(L, 1);
@@ -139,17 +129,12 @@ produce_resource(region * r, const resource_type * rtype, int norders)
   }
 }
 
-
 static int lc_age(struct attrib *a)
 {
   building_action *data = (building_action *) a->data.v;
-
   const char *fname = data->fname;
-
   const char *fparam = data->param;
-
   building *b = data->b;
-
   int result = -1;
 
   assert(b != NULL);
@@ -166,7 +151,6 @@ static int lc_age(struct attrib *a)
 
       if (lua_pcall(L, fparam ? 2 : 1, 1, 0) != 0) {
         const char *error = lua_tostring(L, -1);
-
         log_error(("lc_age(%s) calling '%s': %s.\n",
             buildingname(b), fname, error));
         lua_pop(L, 1);
@@ -205,20 +189,14 @@ static void push_param(lua_State * L, char c, spllprm * param)
 static int lua_callspell(castorder * co)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   const char *fname = co->sp->sname;
-
   unit *mage = co->familiar ? co->familiar : co->magician.u;
-
   int result = -1;
-
   const char *hashpos = strchr(fname, '#');
-
   char fbuf[64];
 
   if (hashpos != NULL) {
     ptrdiff_t len = hashpos - fname;
-
     assert(len < (ptrdiff_t) sizeof(fbuf));
     strncpy(fbuf, fname, len);
     fbuf[len] = '\0';
@@ -229,23 +207,18 @@ static int lua_callspell(castorder * co)
   lua_rawget(L, LUA_GLOBALSINDEX);
   if (lua_isfunction(L, 1)) {
     int nparam = 4;
-
     tolua_pushusertype(L, co->rt, TOLUA_CAST "region");
     tolua_pushusertype(L, mage, TOLUA_CAST "unit");
     tolua_pushnumber(L, (lua_Number) co->level);
     tolua_pushnumber(L, (lua_Number) co->force);
     if (co->sp->parameter && co->par->length) {
       const char *synp = co->sp->parameter;
-
       int i = 0;
-
       ++nparam;
       lua_newtable(L);
       while (*synp && i < co->par->length) {
         spllprm *param = co->par->param[i];
-
         char c = *synp;
-
         if (c == '+') {
           push_param(L, *(synp - 1), param);
         } else {
@@ -258,7 +231,6 @@ static int lua_callspell(castorder * co)
 
     if (lua_pcall(L, nparam, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("spell(%s) calling '%s': %s.\n",
           unitname(mage), fname, error));
       lua_pop(L, 1);
@@ -279,11 +251,8 @@ static int lua_callspell(castorder * co)
 static void lua_initfamiliar(unit * u)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   char fname[64];
-
   int result = -1;
-
   snprintf(fname, sizeof(fname), "initfamiliar_%s", u->race->_name[0]);
 
   lua_pushstring(L, fname);
@@ -293,7 +262,6 @@ static void lua_initfamiliar(unit * u)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("familiar(%s) calling '%s': %s.\n",
           unitname(u), fname, error));
       lua_pop(L, 1);
@@ -317,11 +285,8 @@ static int
 lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   int result = -1;
-
   char fname[64];
-
   snprintf(fname, sizeof(fname), "%s_changeresource", rtype->_name[0]);
 
   lua_pushstring(L, fname);
@@ -332,7 +297,6 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("change(%s) calling '%s': %s.\n", unitname(u), fname, error));
       lua_pop(L, 1);
     } else {
@@ -351,11 +315,8 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 static int lua_getresource(unit * u, const struct resource_type *rtype)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   int result = -1;
-
   char fname[64];
-
   snprintf(fname, sizeof(fname), "%s_getresource", rtype->_name[0]);
 
   lua_pushstring(L, fname);
@@ -365,7 +326,6 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("get(%s) calling '%s': %s.\n", unitname(u), fname, error));
       lua_pop(L, 1);
     } else {
@@ -383,12 +343,10 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
 static boolean lua_canuse_item(const unit * u, const struct item_type *itype)
 {
   static int function_exists = 1;
-
   boolean result = true;
 
   if (function_exists) {
     lua_State *L = (lua_State *) global.vm_state;
-
     const char *fname = "item_canuse";
 
     lua_pushstring(L, fname);
@@ -399,7 +357,6 @@ static boolean lua_canuse_item(const unit * u, const struct item_type *itype)
 
       if (lua_pcall(L, 2, 1, 0) != 0) {
         const char *error = lua_tostring(L, -1);
-
         log_error(("get(%s) calling '%s': %s.\n", unitname(u), fname, error));
         lua_pop(L, 1);
       } else {
@@ -420,9 +377,7 @@ static int
 lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   const char *fname = "wage";
-
   int result = -1;
 
   lua_pushstring(L, fname);
@@ -435,7 +390,6 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
     if (lua_pcall(L, 3, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("wage(%s) calling '%s': %s.\n",
           regionname(r, NULL), fname, error));
       lua_pop(L, 1);
@@ -455,7 +409,6 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
 static void lua_agebuilding(building * b)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   char fname[64];
 
   snprintf(fname, sizeof(fname), "age_%s", b->type->_name);
@@ -467,7 +420,6 @@ static void lua_agebuilding(building * b)
 
     if (lua_pcall(L, 1, 0, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("agebuilding(%s) calling '%s': %s.\n",
           buildingname(b), fname, error));
       lua_pop(L, 1);
@@ -482,9 +434,7 @@ static void lua_agebuilding(building * b)
 static int lua_building_protection(building * b, unit * u)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   const char *fname = "building_protection";
-
   int result = 0;
 
   lua_pushstring(L, fname);
@@ -495,7 +445,6 @@ static int lua_building_protection(building * b, unit * u)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("building_protection(%s, %s) calling '%s': %s.\n",
           buildingname(b), unitname(u), fname, error));
       lua_pop(L, 1);
@@ -514,11 +463,8 @@ static int lua_building_protection(building * b, unit * u)
 static double lua_building_taxes(building * b, int level)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   const char *fname = "building_taxes";
-
   double result = 0.0F;
-
   int type;
 
   lua_pushstring(L, fname);
@@ -530,7 +476,6 @@ static double lua_building_taxes(building * b, int level)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("building_taxes(%s) calling '%s': %s.\n",
           buildingname(b), fname, error));
       lua_pop(L, 1);
@@ -549,9 +494,7 @@ static double lua_building_taxes(building * b, int level)
 static int lua_maintenance(const unit * u)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   const char *fname = "maintenance";
-
   int result = -1;
 
   lua_pushstring(L, fname);
@@ -561,7 +504,6 @@ static int lua_maintenance(const unit * u)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("maintenance(%s) calling '%s': %s.\n",
           unitname(u), fname, error));
       lua_pop(L, 1);
@@ -581,11 +523,8 @@ static int lua_maintenance(const unit * u)
 static void lua_equipmentcallback(const struct equipment *eq, unit * u)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   char fname[64];
-
   int result = -1;
-
   snprintf(fname, sizeof(fname), "equip_%s", eq->name);
 
   lua_pushstring(L, fname);
@@ -595,7 +534,6 @@ static void lua_equipmentcallback(const struct equipment *eq, unit * u)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("equip(%s) calling '%s': %s.\n", unitname(u), fname, error));
       lua_pop(L, 1);
     } else {
@@ -615,11 +553,8 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   int result = 0;
-
   char fname[64];
-
   snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
 
   lua_pushstring(L, fname);
@@ -630,7 +565,6 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("use(%s) calling '%s': %s.\n", unitname(u), fname, error));
       lua_pop(L, 1);
     } else {
@@ -648,11 +582,8 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
 static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
 {
   lua_State *L = (lua_State *) global.vm_state;
-
   int result = 0;
-
   char fname[64];
-
   snprintf(fname, sizeof(fname), "recruit_%s", arch->name[0]);
 
   lua_pushstring(L, fname);
@@ -663,7 +594,6 @@ static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-
       log_error(("use(%s) calling '%s': %s.\n", unitname(u), fname, error));
       lua_pop(L, 1);
     } else {
@@ -680,14 +610,11 @@ static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
 int tolua_toid(lua_State * L, int idx, int def)
 {
   int no = 0;
-
   int type = lua_type(L, idx);
-
   if (type == LUA_TNUMBER) {
     no = (int)tolua_tonumber(L, idx, def);
   } else {
     const char *str = tolua_tostring(L, idx, NULL);
-
     no = str ? atoi36(str) : def;
   }
   return no;
@@ -720,7 +647,6 @@ void register_tolua_helpers(void)
   register_function((pf_generic) & lua_wage, TOLUA_CAST "lua_wage");
   register_function((pf_generic) & lua_maintenance,
     TOLUA_CAST "lua_maintenance");
-
 
   register_function((pf_generic) produce_resource,
     TOLUA_CAST "lua_produceresource");

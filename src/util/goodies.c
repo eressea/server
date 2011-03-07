@@ -68,13 +68,10 @@ char *set_string(char **s, const char *neu)
   return *s;
 }
 
-
 static int spc_email_isvalid(const char *address)
 {
   int count = 0;
-
   const char *c, *domain;
-
   static const char *rfc822_specials = "()<>@,;:\\\"[]";        /* STATIC_CONST: contains a constant value */
 
   /* first we validate the name portion (name@domain) */

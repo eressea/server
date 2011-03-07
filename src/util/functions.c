@@ -23,8 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-
-
 typedef struct function_list {
   struct function_list *next;
   pf_generic fun;
@@ -36,7 +34,6 @@ static function_list *functionlist;
 pf_generic get_function(const char *name)
 {
   function_list *fl = functionlist;
-
   if (name == NULL)
     return NULL;
   while (fl && strcmp(fl->name, name) != 0)
@@ -49,7 +46,6 @@ pf_generic get_function(const char *name)
 const char *get_functionname(pf_generic fun)
 {
   function_list *fl = functionlist;
-
   while (fl && fl->fun != fun)
     fl = fl->next;
   if (fl)
@@ -60,7 +56,6 @@ const char *get_functionname(pf_generic fun)
 void register_function(pf_generic fun, const char *name)
 {
   function_list *fl = (function_list *) malloc(sizeof(function_list));
-
   fl->next = functionlist;
   fl->fun = fun;
   fl->name = strdup(name);

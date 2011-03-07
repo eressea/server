@@ -89,7 +89,6 @@ static xmlNodePtr
 xml_link(report_context * ctx, const xmlChar * rel, const xmlChar * ref)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "link");
 
   xmlNewNsProp(node, xct->ns_atl, BAD_CAST "rel", rel);
@@ -101,7 +100,6 @@ xml_link(report_context * ctx, const xmlChar * rel, const xmlChar * ref)
 static const xmlChar *xml_ref_unit(const unit * u)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "unit_%d", u->no);
   return (const xmlChar *)idbuf;
 }
@@ -109,7 +107,6 @@ static const xmlChar *xml_ref_unit(const unit * u)
 static const xmlChar *xml_ref_faction(const faction * f)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "fctn_%d", f->no);
   return (const xmlChar *)idbuf;
 }
@@ -117,7 +114,6 @@ static const xmlChar *xml_ref_faction(const faction * f)
 static const xmlChar *xml_ref_group(const group * g)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "grp_%d", g->gid);
   return (const xmlChar *)idbuf;
 }
@@ -125,7 +121,6 @@ static const xmlChar *xml_ref_group(const group * g)
 static const xmlChar *xml_ref_prefix(const char *str)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "pref_%s", str);
   return (const xmlChar *)idbuf;
 }
@@ -133,7 +128,6 @@ static const xmlChar *xml_ref_prefix(const char *str)
 static const xmlChar *xml_ref_building(const building * b)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "bldg_%d", b->no);
   return (const xmlChar *)idbuf;
 }
@@ -141,7 +135,6 @@ static const xmlChar *xml_ref_building(const building * b)
 static const xmlChar *xml_ref_ship(const ship * sh)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "shp_%d", sh->no);
   return (const xmlChar *)idbuf;
 }
@@ -149,7 +142,6 @@ static const xmlChar *xml_ref_ship(const ship * sh)
 static const xmlChar *xml_ref_region(const region * r)
 {
   static char idbuf[20];
-
   snprintf(idbuf, sizeof(idbuf), "rgn_%d", r->uid);
   return (const xmlChar *)idbuf;
 }
@@ -157,16 +149,12 @@ static const xmlChar *xml_ref_region(const region * r)
 static xmlNodePtr xml_inventory(report_context * ctx, item * items, unit * u)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "items");
-
   item *itm;
 
   for (itm = items; itm; itm = itm->next) {
     xmlNodePtr child;
-
     const char *name;
-
     int n;
 
     child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "item"));
@@ -181,11 +169,8 @@ static xmlNodePtr
 xml_spells(report_context * ctx, quicklist * slist, int maxlevel)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "spells");
-
   quicklist *ql;
-
   int qi;
 
   for (ql = slist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
@@ -202,15 +187,12 @@ xml_spells(report_context * ctx, quicklist * slist, int maxlevel)
 static xmlNodePtr xml_skills(report_context * ctx, unit * u)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "skills");
-
   skill *sv;
 
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->level > 0) {
       skill_t sk = sv->id;
-
       int esk = eff_skill(u, sk, u->region);
 
       child =
@@ -226,17 +208,11 @@ static xmlNodePtr xml_skills(report_context * ctx, unit * u)
 static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "unit");
-
   static const curse_type *itemcloak_ct = 0;
-
   static boolean init = false;
-
   xmlNodePtr child;
-
   const char *str, *rcname, *rcillusion;
-
   boolean disclosure = (ctx->f == u->faction || omniscient(ctx->f));
 
   /* TODO: hitpoints, aura, combatspells, curses */
@@ -267,7 +243,6 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
   /* siege */
   if (fval(u, UFL_SIEGE)) {
     building *b = usiege(u);
-
     if (b) {
       xmlAddChild(node, xml_link(ctx, BAD_CAST "siege", xml_ref_building(b)));
     }
@@ -296,16 +271,13 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
   /* group and prefix information. we only write the prefix if we really must */
   if (fval(u, UFL_GROUP)) {
     attrib *a = a_find(u->attribs, &at_group);
-
     if (a != NULL) {
       const group *g = (const group *)a->data.v;
-
       if (disclosure) {
         child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "group"));
         xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_group(g));
       } else {
         const char *prefix = get_prefix(g->attribs);
-
         if (prefix) {
           child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "prefix"));
           xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref",
@@ -346,7 +318,6 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
 
     if (fval(u, UFL_STEALTH)) {
       int i = u_geteffstealth(u);
-
       if (i >= 0) {
         child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "status"));
         xmlSetNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "stealth");
@@ -374,9 +345,7 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
     /* spells */
     if (is_mage(u)) {
       sc_mage *mage = get_mage(u);
-
       quicklist *slist = mage->spells;
-
       if (slist) {
         xmlAddChild(node, xml_spells(ctx, slist, effskill(u, SK_MAGIC)));
       }
@@ -392,14 +361,12 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
 
     if (fval(u, UFL_ANON_FACTION)) {
       const faction *sf = visible_faction(NULL, u);
-
       child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "faction"));
       xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "stealth");
       xmlNewNsProp(child, xct->ns_atl, BAD_CAST "ref", xml_ref_faction(sf));
     }
   } else {
     const faction *sf = visible_faction(ctx->f, u);
-
     if (sf == ctx->f) {
       xmlNewNsProp(child, xct->ns_atl, BAD_CAST "rel", BAD_CAST "stealth");
     }
@@ -409,7 +376,6 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
   /* the inventory */
   if (u->items) {
     item result[MAX_INVENTORY];
-
     item *show = NULL;
 
     if (!init) {
@@ -421,7 +387,6 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
       show = u->items;
     } else {
       boolean see_items = (mode >= see_unit);
-
       if (see_items) {
         if (itemcloak_ct && curse_active(get_curse(u->attribs, itemcloak_ct))) {
           see_items = false;
@@ -431,7 +396,6 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
       }
       if (see_items) {
         int n = report_items(u->items, result, MAX_INVENTORY, u, ctx->f);
-
         assert(n >= 0);
         if (n > 0)
           show = result;
@@ -453,11 +417,8 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
 static xmlNodePtr xml_resources(report_context * ctx, const seen_region * sr)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr node = NULL;
-
   resource_report result[MAX_RAWMATERIALS];
-
   int n, size = report_resources(sr, result, MAX_RAWMATERIALS, ctx->f);
 
   if (size) {
@@ -483,14 +444,11 @@ static xmlNodePtr xml_resources(report_context * ctx, const seen_region * sr)
 static xmlNodePtr xml_diplomacy(report_context * ctx, const struct ally *allies)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "diplomacy");
-
   const struct ally *sf;
 
   for (sf = allies; sf; sf = sf->next) {
     int i, status = sf->status;
-
     for (i = 0; helpmodes[i].name; ++i) {
       if (sf->faction && (status & helpmodes[i].status) == helpmodes[i].status) {
         status -= helpmodes[i].status;
@@ -508,14 +466,11 @@ static xmlNodePtr xml_diplomacy(report_context * ctx, const struct ally *allies)
 static xmlNodePtr xml_groups(report_context * ctx, const group * groups)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "faction");
-
   const group *g;
 
   for (g = groups; g; g = g->next) {
     const char *prefix = get_prefix(g->attribs);
-
     child = xmlAddChild(node, xmlNewNode(xct->ns_atl, BAD_CAST "group"));
     xmlNewNsProp(child, xct->ns_xml, XML_XML_ID, xml_ref_group(g));
     xmlNewTextChild(child, xct->ns_atl, BAD_CAST "name",
@@ -536,7 +491,6 @@ static xmlNodePtr xml_groups(report_context * ctx, const group * groups)
 static xmlNodePtr xml_faction(report_context * ctx, faction * f)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "faction");
 
   /* TODO: alliance, locale */
@@ -575,11 +529,8 @@ xml_building(report_context * ctx, seen_region * sr, const building * b,
   const unit * owner)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "building");
-
   xmlNodePtr child;
-
   const char *bname, *billusion;
 
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_building(b));
@@ -625,7 +576,6 @@ xml_ship(report_context * ctx, const seen_region * sr, const ship * sh,
   const unit * owner)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr child, node = xmlNewNode(xct->ns_atl, BAD_CAST "ship");
 
   xmlNewNsProp(node, xct->ns_xml, XML_XML_ID, xml_ref_ship(sh));
@@ -661,7 +611,6 @@ xml_ship(report_context * ctx, const seen_region * sr, const ship * sh,
 
   if ((owner && owner->faction == ctx->f) || omniscient(ctx->f)) {
     int n = 0, p = 0;
-
     getshipweight(sh, &n, &p);
     xmlNewTextChild(node, xct->ns_atl, BAD_CAST "cargo",
       (const xmlChar *)itoab(n, 10));
@@ -672,23 +621,14 @@ xml_ship(report_context * ctx, const seen_region * sr, const ship * sh,
 static xmlNodePtr xml_region(report_context * ctx, seen_region * sr)
 {
   xml_context *xct = (xml_context *) ctx->userdata;
-
   const region *r = sr->r;
-
   xmlNodePtr node = xmlNewNode(xct->ns_atl, BAD_CAST "region");
-
   xmlNodePtr child;
-
   int stealthmod = stealth_modifier(sr->mode);
-
   unit *u;
-
   ship *sh = r->ships;
-
   building *b = r->buildings;
-
   plane *pl = rplane(r);
-
   int nx = r->x, ny = r->y;
 
   pnormalize(&nx, &ny, pl);
@@ -775,21 +715,13 @@ static xmlNodePtr xml_region(report_context * ctx, seen_region * sr)
 static xmlNodePtr report_root(report_context * ctx)
 {
   int qi;
-
   quicklist *address;
-
   region *r = ctx->first, *rend = ctx->last;
-
   xml_context *xct = (xml_context *) ctx->userdata;
-
   xmlNodePtr node, child, xmlReport = xmlNewNode(NULL, BAD_CAST "atlantis");
-
   const char *mailto = locale_string(ctx->f->locale, "mailto");
-
   const char *mailcmd = locale_string(ctx->f->locale, "mailcmd");
-
   char zText[128];
-
   /* TODO: locale, age, options, messages */
 
   xct->ns_xml = xmlNewNs(xmlReport, XML_XML_NAMESPACE, BAD_CAST "xml");
@@ -813,13 +745,11 @@ static xmlNodePtr report_root(report_context * ctx)
 
   for (qi = 0, address = ctx->addresses; address; ql_advance(&address, &qi, 1)) {
     faction *f = (faction *) ql_get(address, qi);
-
     xmlAddChild(xmlReport, xml_faction(ctx, f));
   }
 
   for (; r != rend; r = r->next) {
     seen_region *sr = find_seen(ctx->seen, r);
-
     if (sr != NULL)
       xmlAddChild(xmlReport, xml_region(ctx, sr));
   }
@@ -831,7 +761,6 @@ static int
 report_xml(const char *filename, report_context * ctx, const char *encoding)
 {
   xml_context xct;
-
   xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
 
   xct.doc = doc;

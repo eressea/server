@@ -50,7 +50,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 void herbsearch(region * r, unit * u, int max)
 {
   int herbsfound;
-
   const item_type *whichherb;
 
   if (eff_skill(u, SK_HERBALISM, r) == 0) {
@@ -92,7 +91,6 @@ void herbsearch(region * r, unit * u, int max)
 static int begin_potion(unit * u, const potion_type * ptype, struct order *ord)
 {
   static int rule_multipotion = -1;
-
   assert(ptype != NULL);
 
   if (rule_multipotion < 0) {
@@ -102,7 +100,6 @@ static int begin_potion(unit * u, const potion_type * ptype, struct order *ord)
   }
   if (!rule_multipotion) {
     const potion_type *use = ugetpotionuse(u);
-
     if (use != NULL && use != ptype) {
       ADDMSG(&u->faction->msgs,
         msg_message("errusingpotion", "unit using command",
@@ -127,16 +124,11 @@ void do_potion(unit * u, const potion_type * ptype, int amount)
 {
   if (ptype == oldpotiontype[P_LIFE]) {
     region *r = u->region;
-
     int holz = 0;
-
     static int tree_type = -1;
-
     static int tree_count = -1;
-
     if (tree_type < 0) {
       tree_type = get_param_int(global.parameters, "rules.magic.wol_type", 1);
-
       tree_count =
         get_param_int(global.parameters, "rules.magic.wol_effect", 10);
     }
@@ -152,7 +144,6 @@ void do_potion(unit * u, const potion_type * ptype, int amount)
       holz = 0;
     if (holz < tree_count * amount) {
       int x = holz / tree_count;
-
       if (holz % tree_count)
         ++x;
       if (x < amount)
@@ -165,17 +156,13 @@ void do_potion(unit * u, const potion_type * ptype, int amount)
     u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
   } else if (ptype == oldpotiontype[P_PEOPLE]) {
     region *r = u->region;
-
     attrib *a = (attrib *) a_find(r->attribs, &at_peasantluck);
-
     if (!a)
       a = a_add(&r->attribs, a_new(&at_peasantluck));
     a->data.i += amount;
   } else if (ptype == oldpotiontype[P_HORSE]) {
     region *r = u->region;
-
     attrib *a = (attrib *) a_find(r->attribs, &at_horseluck);
-
     if (!a)
       a = a_add(&r->attribs, a_new(&at_horseluck));
     a->data.i += amount;
@@ -198,7 +185,6 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
     return EUNUSABLE;
   } else {
     int result = begin_potion(u, ptype, ord);
-
     if (result)
       return result;
     do_potion(u, ptype, amount);
@@ -226,7 +212,6 @@ static void free_potiondelay(attrib * a)
 static int age_potiondelay(attrib * a)
 {
   potiondelay *pd = (potiondelay *) a->data.v;
-
   do_potion(pd->u, pd->ptype, pd->amount);
   return AT_AGE_REMOVE;
 }
@@ -245,9 +230,7 @@ attrib_type at_potiondelay = {
 static attrib *make_potiondelay(unit * u, const potion_type * ptype, int amount)
 {
   attrib *a = a_new(&at_potiondelay);
-
   potiondelay *pd = (potiondelay *) a->data.v;
-
   pd->u = u;
   pd->ptype = ptype;
   pd->amount = amount;
@@ -259,9 +242,7 @@ use_potion_delayed(unit * u, const item_type * itype, int amount,
   struct order *ord)
 {
   const potion_type *ptype = resource2potion(itype->rtype);
-
   int result = begin_potion(u, ptype, ord);
-
   if (result)
     return result;
 
@@ -289,7 +270,6 @@ static void
 a_writeeffect(const attrib * a, const void *owner, struct storage *store)
 {
   effect_data *edata = (effect_data *) a->data.v;
-
   store->w_tok(store, resourcename(edata->type->itype->rtype, 0));
   store->w_int(store, edata->value);
 }
@@ -297,11 +277,8 @@ a_writeeffect(const attrib * a, const void *owner, struct storage *store)
 static int a_readeffect(attrib * a, void *owner, struct storage *store)
 {
   int power;
-
   const item_type *itype;
-
   effect_data *edata = (effect_data *) a->data.v;
-
   char zText[32];
 
   store->r_tok_buf(store, zText, sizeof(zText));
@@ -329,11 +306,9 @@ attrib_type at_effect = {
 int get_effect(const unit * u, const potion_type * effect)
 {
   const attrib *a;
-
   for (a = a_find(u->attribs, &at_effect); a != NULL && a->type == &at_effect;
     a = a->next) {
     const effect_data *data = (const effect_data *)a->data.v;
-
     if (data->type == effect)
       return data->value;
   }
@@ -344,7 +319,6 @@ int change_effect(unit * u, const potion_type * effect, int delta)
 {
   if (delta != 0) {
     attrib *a = a_find(u->attribs, &at_effect);
-
     effect_data *data = NULL;
 
     while (a && a->type == &at_effect) {

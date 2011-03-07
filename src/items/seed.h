@@ -22,7 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-
   extern struct resource_type *rt_seed;
   extern void init_seed(void);
 

@@ -23,7 +23,6 @@ typedef struct locale {
 } locale;
 
 extern locale *default_locale;
-
 extern locale *locales;
 
 #endif

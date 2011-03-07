@@ -13,7 +13,6 @@
 #define CONTINUE_CHAR    '\\'
 #define MAXLINE 4096*16
 static char lbuf[MAXLINE];
-
 static char fbuf[MAXLINE];
 
 static void unicode_warning(const char *bp)
@@ -29,9 +28,7 @@ INLINE_FUNCTION int eatwhite(const char *ptr, size_t * total_size)
 
   while (*ptr) {
     ucs4_t ucs;
-
     size_t size = 0;
-
     ret = unicode_utf8_to_ucs4(&ucs, ptr, &size);
     if (ret != 0)
       break;
@@ -46,13 +43,9 @@ INLINE_FUNCTION int eatwhite(const char *ptr, size_t * total_size)
 static const char *getbuf_latin1(FILE * F)
 {
   boolean cont = false;
-
   char quote = 0;
-
   boolean comment = false;
-
   char *cp = fbuf;
-
   char *tail = lbuf + MAXLINE - 2;
 
   tail[1] = '@';                /* if this gets overwritten by fgets then the line was very long. */
@@ -139,7 +132,6 @@ static const char *getbuf_latin1(FILE * F)
         continue;
       } else if (c == CONTINUE_CHAR) {
         const char *end = ++bp;
-
         while (*end && isxspace(*(unsigned char *)end))
           ++end;                /* eatwhite */
         if (*end == '\0') {
@@ -162,13 +154,9 @@ static const char *getbuf_latin1(FILE * F)
         }
       } else {
         char inbuf = (char)c;
-
         size_t inbytes = 1;
-
         size_t outbytes = MAXLINE - (cp - fbuf);
-
         int ret = unicode_latin1_to_utf8(cp, &outbytes, &inbuf, &inbytes);
-
         if (ret > 0)
           cp += ret;
         else {
@@ -191,21 +179,15 @@ static const char *getbuf_latin1(FILE * F)
 static const char *getbuf_utf8(FILE * F)
 {
   boolean cont = false;
-
   char quote = 0;
-
   boolean comment = false;
-
   char *cp = fbuf;
-
   char *tail = lbuf + MAXLINE - 2;
 
   tail[1] = '@';                /* if this gets overwritten by fgets then the line was very long. */
   do {
     const char *bp = fgets(lbuf, MAXLINE, F);
-
     size_t white;
-
     if (bp == NULL) {
       return NULL;
     }
@@ -241,9 +223,7 @@ static const char *getbuf_utf8(FILE * F)
     cont = false;
     while (*bp && cp < fbuf + MAXLINE) {
       ucs4_t ucs;
-
       size_t size;
-
       int ret;
 
       if (!quote) {
@@ -310,7 +290,6 @@ static const char *getbuf_utf8(FILE * F)
       } else {
         if (*bp == CONTINUE_CHAR) {
           const char *end;
-
           eatwhite(bp + 1, &white);
           end = bp + 1 + white;
           if (*end == '\0') {

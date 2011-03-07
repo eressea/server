@@ -72,7 +72,6 @@ typedef struct summary {
 static char *pcomp(double i, double j)
 {
   static char buf[32];
-
   sprintf(buf, "%.0f (%s%.0f)", i, (i >= j) ? "+" : "", i - j);
   return buf;
 }
@@ -80,13 +79,11 @@ static char *pcomp(double i, double j)
 static char *rcomp(int i, int j)
 {
   static char buf[32];
-
   sprintf(buf, "%d (%s%d,%s%d%%)",
     i, (i >= j) ? "+" : "", i - j, (i >= j) ? "+" : "",
     j ? ((i - j) * 100) / j : 0);
   return buf;
 }
-
 
 static void out_faction(FILE * file, const struct faction *f)
 {
@@ -106,7 +103,6 @@ static void out_faction(FILE * file, const struct faction *f)
 static char *gamedate2(const struct locale *lang)
 {
   static char buf[256];
-
   gamedate gd;
 
   get_gamedate(turn, &gd);
@@ -120,7 +116,6 @@ static char *gamedate2(const struct locale *lang)
 static void writeturn(void)
 {
   char zText[MAX_PATH];
-
   FILE *f;
 
   sprintf(zText, "%s/datum", basepath());
@@ -140,11 +135,8 @@ static void writeturn(void)
 void report_summary(summary * s, summary * o, boolean full)
 {
   FILE *F = NULL;
-
   int i, newplayers = 0;
-
   faction *f;
-
   char zText[MAX_PATH];
 
   if (full) {
@@ -163,7 +155,6 @@ void report_summary(summary * s, summary * o, boolean full)
 #endif
   printf("Schreibe Zusammenfassung (parteien)...\n");
   fprintf(F, "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
-
   fprintf(F, "Auswertung Nr:         %d\n\n", turn);
   fprintf(F, "Parteien:              %s\n", pcomp(s->factions, o->factions));
   fprintf(F, "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));
@@ -184,7 +175,6 @@ void report_summary(summary * s, summary * o, boolean full)
 
   for (i = 0; i < MAXRACES; i++) {
     const race *rc = new_race[i];
-
     if (s->factionrace[i] && rc && playerrace(rc)
       && i != RC_TEMPLATE && i != RC_CLONE) {
       fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)),
@@ -197,12 +187,9 @@ void report_summary(summary * s, summary * o, boolean full)
     fprintf(F, "\n");
     {
       struct language *plang = s->languages;
-
       while (plang != NULL) {
         struct language *olang = o->languages;
-
         int nold = 0;
-
         while (olang && olang->locale != plang->locale)
           olang = olang->next;
         if (olang)
@@ -218,7 +205,6 @@ void report_summary(summary * s, summary * o, boolean full)
   if (full) {
     for (i = 0; i < MAXRACES; i++) {
       const race *rc = new_race[i];
-
       if (s->poprace[i]) {
         fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
           rcomp(s->poprace[i], o->poprace[i]));
@@ -227,7 +213,6 @@ void report_summary(summary * s, summary * o, boolean full)
   } else {
     for (i = 0; i < MAXRACES; i++) {
       const race *rc = new_race[i];
-
       if (s->poprace[i] && playerrace(rc)
         && i != RC_TEMPLATE && i != RC_CLONE) {
         fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
@@ -319,18 +304,13 @@ void report_summary(summary * s, summary * o, boolean full)
 summary *make_summary(void)
 {
   faction *f;
-
   region *r;
-
   unit *u;
-
   summary *s = calloc(1, sizeof(summary));
 
   for (f = factions; f; f = f->next) {
     const struct locale *lang = f->locale;
-
     struct language *plang = s->languages;
-
     while (plang && plang->locale != lang)
       plang = plang->next;
     if (!plang) {
@@ -389,7 +369,6 @@ summary *make_summary(void)
         f = u->faction;
         if (!is_monsters(u->faction)) {
           skill *sv;
-
           item *itm;
 
           s->nunits++;
@@ -413,9 +392,7 @@ summary *make_summary(void)
 
           for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             skill_t sk = sv->id;
-
             int aktskill = eff_skill(u, sk, r);
-
             if (aktskill > s->maxskill)
               s->maxskill = aktskill;
           }

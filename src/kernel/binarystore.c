@@ -82,16 +82,13 @@ static int bin_w_brk(struct storage *store)
 static int bin_w_int_pak(struct storage *store, int arg)
 {
   char buffer[5];
-
   size_t size = pack_int(arg, buffer);
-
   return (int)fwrite(buffer, sizeof(char), size, file(store));
 }
 
 static int bin_r_int_pak(struct storage *store)
 {
   int v = 0;
-
   char ch;
 
   fread(&ch, sizeof(char), 1, file(store));
@@ -115,7 +112,6 @@ static int bin_w_int(struct storage *store, int arg)
 static int bin_r_int(struct storage *store)
 {
   int result;
-
   fread(&result, sizeof(result), 1, file(store));
   return result;
 }
@@ -128,7 +124,6 @@ static int bin_w_flt(struct storage *store, float arg)
 static float bin_r_flt(struct storage *store)
 {
   float result;
-
   fread(&result, sizeof(result), 1, file(store));
   return result;
 }
@@ -136,12 +131,10 @@ static float bin_r_flt(struct storage *store)
 static int bin_w_str(struct storage *store, const char *tok)
 {
   int result;
-
   if (tok == NULL || tok[0] == 0) {
     result = store->w_int(store, 0);
   } else {
     int size = (int)strlen(tok);
-
     result = store->w_int(store, size);
     result += (int)fwrite(tok, size, 1, file(store));
   }
@@ -162,7 +155,6 @@ static char *bin_r_str(struct storage *store)
 #ifdef FIX_INVALID_CHARS
     {
       char *p = strpbrk(result, "\n\r");
-
       while (p) {
         log_error(("Invalid character %d in input string \"%s\".\n", *p,
             result));
@@ -181,7 +173,6 @@ static char *bin_r_str(struct storage *store)
 static void bin_r_str_buf(struct storage *store, char *result, size_t size)
 {
   int i;
-
   size_t rd, len;
 
   i = store->r_int(store);
@@ -201,7 +192,6 @@ static void bin_r_str_buf(struct storage *store, char *result, size_t size)
 #ifdef FIX_INVALID_CHARS
     {
       char *p = strpbrk(result, "\n\r");
-
       while (p) {
         log_error(("Invalid character %d in input string \"%s\".\n", *p,
             result));
@@ -216,7 +206,6 @@ static void bin_r_str_buf(struct storage *store, char *result, size_t size)
 static int bin_w_bin(struct storage *store, void *arg, size_t size)
 {
   int result;
-
   int len = (int)size;
 
   result = store->w_int(store, len);
@@ -229,7 +218,6 @@ static int bin_w_bin(struct storage *store, void *arg, size_t size)
 static void bin_r_bin(struct storage *store, void *result, size_t size)
 {
   int len = store->r_int(store);
-
   if (len > 0) {
     if ((size_t) len > size) {
       log_error(("destination buffer too small %d %u.\n", len, size));
@@ -240,18 +228,15 @@ static void bin_r_bin(struct storage *store, void *result, size_t size)
   }
 }
 
-
 static int bin_open(struct storage *store, const char *filename, int mode)
 {
   const char *modes[] = { 0, "rb", "wb", "ab" };
   FILE *F = fopen(filename, modes[mode]);
-
   store->userdata = F;
   store->encoding = XML_CHAR_ENCODING_UTF8;     /* always utf8 it is */
   if (F) {
     if (mode == IO_READ) {
       int stream_version = 0;
-
       store->version = bin_r_int(store);
       if (store->version >= INTPAK_VERSION) {
         stream_version = bin_r_int(store);

@@ -66,11 +66,8 @@ void addtoken(tnode * root, const char *str, variant id)
     root->flags |= LEAF;
   } else {
     tref *next;
-
     int ret, index, i = 0;
-
     ucs4_t ucs, lcs;
-
     size_t len;
 
     ret = unicode_utf8_to_ucs4(&ucs, str, &len);
@@ -90,7 +87,6 @@ void addtoken(tnode * root, const char *str, variant id)
       next = next->nexthash;
     if (!next) {
       tref *ref;
-
       tnode *node = calloc(1, sizeof(tnode));
 
       if (ucs < 'a' || ucs > 'z') {
@@ -129,7 +125,6 @@ void addtoken(tnode * root, const char *str, variant id)
     while (replace[i].str[0]) {
       if (lcs == replace[i].ucs) {
         char zText[1024];
-
         memcpy(zText, replace[i].str, 3);
         strcpy(zText + 2, (const char *)str + len);
         addtoken(root, zText, id);
@@ -147,13 +142,9 @@ int findtoken(const tnode * tk, const char *str, variant * result)
 
   do {
     int index;
-
     const tref *ref;
-
     ucs4_t ucs;
-
     size_t len;
-
     int ret = unicode_utf8_to_ucs4(&ucs, str, &len);
 
     if (ret != 0) {

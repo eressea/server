@@ -32,7 +32,6 @@ a_writefunction(const struct attrib *a, const void *owner,
   struct storage *store)
 {
   const char *str = get_functionname((pf_generic) a->data.f);
-
   store->w_tok(store, str);
 }
 
@@ -40,7 +39,6 @@ static int a_readfunction(struct attrib *a, void *owner, struct storage *store)
 /* return 1 on success, 0 if attrib needs removal */
 {
   char buf[64];
-
   store->r_tok_buf(store, buf, sizeof(buf));
   a->data.f = get_function(buf);
   return AT_READ_OK;
@@ -58,7 +56,6 @@ attrib_type at_viewrange = {
 attrib *add_viewrange(attrib ** alist, const char *function)
 {
   attrib *a = a_find(*alist, &at_viewrange);
-
   if (a == NULL)
     a = a_add(alist, make_viewrange(function));
   return a;
@@ -67,7 +64,6 @@ attrib *add_viewrange(attrib ** alist, const char *function)
 attrib *make_viewrange(const char *function)
 {
   attrib *a = a_new(&at_viewrange);
-
   a->data.f = get_function(function);
   assert(a->data.f);
   return a;

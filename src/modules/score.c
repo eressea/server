@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 int average_score_of_age(int age, int a)
 {
   faction *f;
-
   int sum = 0, count = 0;
 
   for (f = factions; f; f = f->next) {
@@ -64,13 +63,9 @@ int average_score_of_age(int age, int a)
 void score(void)
 {
   FILE *scoreFP;
-
   region *r;
-
   faction *fc;
-
   int allscores = 0;
-
   char path[MAX_PATH];
 
   for (fc = factions; fc; fc = fc->next)
@@ -78,9 +73,7 @@ void score(void)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-
     building *b;
-
     ship *s;
 
     if (rule_region_owners()) {
@@ -102,7 +95,6 @@ void score(void)
 
     for (s = r->ships; s; s = s->next) {
       unit *cap = shipowner(s);
-
       if (cap && cap->faction) {
         cap->faction->score += s->size * 2;
       }
@@ -110,11 +102,8 @@ void score(void)
 
     for (u = r->units; u; u = u->next) {
       item *itm;
-
       int itemscore = 0;
-
       int i;
-
       faction *f = u->faction;
 
       if (f == NULL || u->race == new_race[RC_SPELL]
@@ -133,7 +122,6 @@ void score(void)
 
       for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
-
         switch (sv->id) {
           case SK_MAGIC:
             f->score += (int)(u->number * pow(sv->level, 4));
@@ -169,7 +157,6 @@ void score(void)
   if (scoreFP) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
     faction *f;
-
     fwrite(utf8_bom, 1, 3, scoreFP);
     for (f = factions; f; f = f->next)
       if (f->num_total != 0) {
@@ -184,7 +171,6 @@ void score(void)
   }
   if (alliances != NULL) {
     alliance *a;
-
     const item_type *token = it_find("conquesttoken");
 
     sprintf(path, "%s/score.alliances", basepath());
@@ -197,9 +183,7 @@ void score(void)
 
       for (a = alliances; a; a = a->next) {
         int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
-
         int grails = 0;
-
         faction *f;
 
         for (f = factions; f; f = f->next) {
@@ -209,10 +193,8 @@ void score(void)
             alliance_number += f->num_total;
             if (token != NULL) {
               unit *u = f->units;
-
               while (u != NULL) {
                 item **iitem = i_find(&u->items, token);
-
                 if (iitem != NULL && *iitem != NULL) {
                   grails += (*iitem)->number;
                 }

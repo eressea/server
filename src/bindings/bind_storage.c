@@ -24,17 +24,12 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 #include <tolua.h>
 
-
 static int tolua_storage_create(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
-
   const char *type = tolua_tostring(L, 2, "rb");
-
   storage *store = 0;
-
   int mode = IO_READ;
-
   if (strchr(type, 't')) {
     store = malloc(sizeof(text_store));
     memcpy(store, &text_store, sizeof(text_store));
@@ -54,9 +49,7 @@ static int tolua_storage_create(lua_State * L)
 static int tolua_storage_read_unit(lua_State * L)
 {
   storage *self = (storage *) tolua_tousertype(L, 1, 0);
-
   struct unit *u = read_unit(self);
-
   tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
   return 1;
 }
@@ -64,22 +57,17 @@ static int tolua_storage_read_unit(lua_State * L)
 static int tolua_storage_write_unit(lua_State * L)
 {
   storage *store = (storage *) tolua_tousertype(L, 1, 0);
-
   struct unit *u = (struct unit *)tolua_tousertype(L, 2, 0);
-
   if (store->version) {
     write_unit(store, u);
   }
   return 0;
 }
 
-
 static int tolua_storage_read_float(lua_State * L)
 {
   storage *self = (storage *) tolua_tousertype(L, 1, 0);
-
   float num = self->r_flt(self);
-
   tolua_pushnumber(L, (lua_Number) num);
   return 1;
 }
@@ -87,9 +75,7 @@ static int tolua_storage_read_float(lua_State * L)
 static int tolua_storage_read_int(lua_State * L)
 {
   storage *self = (storage *) tolua_tousertype(L, 1, 0);
-
   int num = self->r_int(self);
-
   tolua_pushnumber(L, (lua_Number) num);
   return 1;
 }
@@ -97,12 +83,9 @@ static int tolua_storage_read_int(lua_State * L)
 static int tolua_storage_write(lua_State * L)
 {
   storage *self = (storage *) tolua_tousertype(L, 1, 0);
-
   if (self->version && tolua_isnumber(L, 2, 0, 0)) {
     lua_Number num = tolua_tonumber(L, 2, 0);
-
     double n;
-
     if (modf(num, &n) == 0.0) {
       self->w_int(self, (int)num);
     } else {
@@ -115,9 +98,7 @@ static int tolua_storage_write(lua_State * L)
 static int tolua_storage_tostring(lua_State * L)
 {
   storage *self = (storage *) tolua_tousertype(L, 1, 0);
-
   char name[64];
-
   snprintf(name, sizeof(name), "<storage enc=%d ver=%d>", self->encoding,
     self->version);
   lua_pushstring(L, name);
@@ -127,7 +108,6 @@ static int tolua_storage_tostring(lua_State * L)
 static int tolua_storage_close(lua_State * L)
 {
   storage *self = (storage *) tolua_tousertype(L, 1, 0);
-
   self->close(self);
   return 0;
 }

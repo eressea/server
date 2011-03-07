@@ -75,13 +75,9 @@ double distance(int x1, int y1, int x2, int y2)
 void set_weather(void)
 {
   weather_t i;
-
   weather *w;
-
   short x, y;
-
   int d;
-
   region *r;
 
   for (r = regions; r; r = r->next) {
@@ -110,7 +106,6 @@ void set_weather(void)
 void move_weather(void)
 {
   weather *w, *wnext;
-
   region *r;
 
   for (w = weathers; w;) {

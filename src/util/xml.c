@@ -28,7 +28,6 @@
 const xmlChar *xml_i(double number)
 {
   static char buffer[128];
-
   snprintf(buffer, sizeof(buffer), "%.0lf", number);
   return (const xmlChar *)buffer;
 }
@@ -36,9 +35,7 @@ const xmlChar *xml_i(double number)
 int xml_ivalue(xmlNodePtr node, const char *name, int dflt)
 {
   int i = dflt;
-
   xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
-
   if (propValue != NULL) {
     i = atoi((const char *)propValue);
     xmlFree(propValue);
@@ -49,9 +46,7 @@ int xml_ivalue(xmlNodePtr node, const char *name, int dflt)
 boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt)
 {
   boolean result = dflt;
-
   xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
-
   if (propValue != NULL) {
     if (strcmp((const char *)propValue, "no") == 0)
       result = false;
@@ -76,9 +71,7 @@ boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt)
 double xml_fvalue(xmlNodePtr node, const char *name, double dflt)
 {
   double result = dflt;
-
   xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
-
   if (propValue != NULL) {
     result = atof((const char *)propValue);
     xmlFree(propValue);
@@ -102,9 +95,7 @@ static xml_reader *xmlReaders;
 void xml_register_callback(xml_callback callback)
 {
   xml_reader *reader = (xml_reader *) malloc(sizeof(xml_reader));
-
   xml_reader **insert = &xmlReaders;
-
   reader->callback = callback;
   reader->next = NULL;
 
@@ -116,7 +107,6 @@ void xml_register_callback(xml_callback callback)
 int read_xml(const char *filename, const char *catalog)
 {
   xml_reader *reader = xmlReaders;
-
   xmlDocPtr doc;
 
   if (catalog) {
@@ -136,7 +126,6 @@ int read_xml(const char *filename, const char *catalog)
 
   while (reader != NULL) {
     int i = reader->callback(doc);
-
     if (i != 0) {
       return i;
     }

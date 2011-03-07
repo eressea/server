@@ -39,7 +39,6 @@ summon_igjarjuk(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   struct plane *p = rplane(u->region);
-
   unused(amount);
   unused(itype);
   if (p != NULL) {

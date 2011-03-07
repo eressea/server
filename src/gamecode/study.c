@@ -65,9 +65,7 @@ static skill_t getskill(const struct locale *lang)
 magic_t getmagicskill(const struct locale * lang)
 {
   struct tnode *tokens = get_translations(lang, UT_MAGIC);
-
   variant token;
-
   const char *s = getstrtoken();
 
   if (s && s[0]) {
@@ -75,7 +73,6 @@ magic_t getmagicskill(const struct locale * lang)
       return (magic_t) token.i;
     } else {
       char buffer[3];
-
       buffer[0] = s[0];
       buffer[1] = s[1];
       buffer[2] = '\0';
@@ -117,12 +114,10 @@ boolean magic_lowskill(unit * u)
 int study_cost(unit * u, skill_t sk)
 {
   static int cost[MAXSKILLS];
-
   int stufe, k = 50;
 
   if (cost[sk] == 0) {
     char buffer[256];
-
     sprintf(buffer, "skills.cost.%s", skillnames[sk]);
     cost[sk] = get_param_int(global.parameters, buffer, -1);
   }
@@ -168,12 +163,10 @@ const attrib_type at_learning = {
 static int study_days(unit * student, skill_t sk)
 {
   int speed = 30;
-
   if (student->race->study_speed) {
     speed += student->race->study_speed[sk];
     if (speed < 30) {
       skill *sv = get_skill(student, sk);
-
       if (sv == 0) {
         speed = 30;
       }
@@ -187,9 +180,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
   boolean report, int *academy)
 {
   teaching_info *teach = NULL;
-
   attrib *a;
-
   int n;
 
   /* learning sind die Tage, die sie schon durch andere Lehrer zugute
@@ -215,9 +206,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 
   if (n != 0) {
     struct building *b = inside_building(teacher);
-
     const struct building_type *btype = b ? b->type : NULL;
-
     int index = 0;
 
     if (teach == NULL) {
@@ -238,7 +227,6 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     if (btype == bt_find("academy")
       && student->building && student->building->type == bt_find("academy")) {
       int j = study_cost(student, sk);
-
       j = MAX(50, j * 2);
       /* kann Einheit das zahlen? */
       if (get_pooled(student, oldresourcetype[R_SILVER], GET_DEFAULT, j) >= j) {
@@ -289,15 +277,10 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 int teach_cmd(unit * u, struct order *ord)
 {
   static const curse_type *gbdream_ct = NULL;
-
   plane *pl;
-
   region *r = u->region;
-
   int teaching, i, j, count, academy = 0;
-
   unit *u2;
-
   skill_t sk = NOSKILL;
 
   if (gbdream_ct == 0)
@@ -333,7 +316,6 @@ int teach_cmd(unit * u, struct order *ord)
   if (teaching == 0)
     return 0;
 
-
   u2 = 0;
   count = 0;
 
@@ -343,11 +325,8 @@ int teach_cmd(unit * u, struct order *ord)
 #if TEACH_ALL
   if (getparam(u->faction->locale) == P_ANY) {
     unit *student = r->units;
-
     skill_t teachskill[MAXSKILLS];
-
     int i = 0;
-
     do {
       sk = getskill(u->faction->locale);
       teachskill[i++] = sk;
@@ -411,7 +390,6 @@ int teach_cmd(unit * u, struct order *ord)
 #endif
   {
     char zOrder[4096];
-
     order *new_order;
 
     zOrder[0] = '\0';
@@ -420,20 +398,15 @@ int teach_cmd(unit * u, struct order *ord)
 
     while (!parser_end()) {
       unit *u2 = getunit(r, u->faction);
-
       boolean feedback;
-
       ++count;
 
       /* Falls die Unit nicht gefunden wird, Fehler melden */
 
       if (!u2) {
         char tbuf[20];
-
         const char *uid;
-
         const char *token;
-
         /* Finde den string, der den Fehler verursacht hat */
         parser_pushstate();
         init_tokens(ord);
@@ -503,9 +476,7 @@ int teach_cmd(unit * u, struct order *ord)
         /* ist der Magier schon spezialisiert, so versteht er nur noch
          * Lehrer seines Gebietes */
         sc_mage *mage1 = get_mage(u);
-
         sc_mage *mage2 = get_mage(u2);
-
         if (!mage2 || !mage1 || (mage2->magietyp != M_GRAY
             && mage1->magietyp != mage2->magietyp)) {
           if (feedback) {
@@ -535,20 +506,15 @@ static double study_speedup(unit * u)
 #define OFSTURN 2               /* 2 */
   if (turn > MINTURN) {
     static int speed_rule = -1;
-
     if (speed_rule < 0) {
       speed_rule = get_param_int(global.parameters, "study.speedup", 0);
     }
     if (speed_rule == 1) {
       double learn_age = OFSTURN;
-
       int i;
-
       for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
-
         double learn_time = sv->level * (sv->level + 1) / 2.0;
-
         learn_age += learn_time;
       }
       if (learn_age < turn) {
@@ -562,32 +528,19 @@ static double study_speedup(unit * u)
 int learn_cmd(unit * u, order * ord)
 {
   region *r = u->region;
-
   int p;
-
   magic_t mtyp;
-
   int l;
-
   int studycost, days;
-
   double multi = 1.0;
-
   attrib *a = NULL;
-
   teaching_info *teach = NULL;
-
   int money = 0;
-
   skill_t sk;
-
   int maxalchemy = 0;
-
   static int learn_newskills = -1;
-
   if (learn_newskills < 0) {
     const char *str = get_param(global.parameters, "study.newskills");
-
     if (str && strcmp(str, "false") == 0)
       learn_newskills = 0;
     else
@@ -619,7 +572,6 @@ int learn_cmd(unit * u, order * ord)
   }
   if (learn_newskills == 0) {
     skill *sv = get_skill(u, sk);
-
     if (sv == NULL) {
       /* we can only learn skills we already have */
       cmistake(u, ord, 771, MSG_EVENT);
@@ -652,7 +604,6 @@ int learn_cmd(unit * u, order * ord)
   /* Akademie: */
   {
     struct building *b = inside_building(u);
-
     const struct building_type *btype = b ? b->type : NULL;
 
     if (btype && btype == bt_find("academy")) {
@@ -673,7 +624,6 @@ int learn_cmd(unit * u, order * ord)
         create_mage(u, mtyp);
     } else if (!has_skill(u, SK_MAGIC)) {
       int mmax = skill_limit(u->faction, SK_MAGIC);
-
       /* Die Einheit ist noch kein Magier */
       if (count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_magicians",
@@ -731,7 +681,6 @@ int learn_cmd(unit * u, order * ord)
     maxalchemy = eff_skill(u, SK_ALCHEMY, r);
     if (!has_skill(u, SK_ALCHEMY)) {
       int amax = skill_limit(u->faction, SK_ALCHEMY);
-
       if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists",
             "amount", amax));
@@ -741,7 +690,6 @@ int learn_cmd(unit * u, order * ord)
   }
   if (studycost) {
     int cost = studycost * u->number;
-
     money = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, cost);
     money = MIN(money, cost);
   }
@@ -810,7 +758,6 @@ int learn_cmd(unit * u, order * ord)
       days -= u->number * 30;
     } else {
       double chance = (double)days / u->number / 30;
-
       learn_skill(u, sk, chance);
       days = 0;
     }
@@ -818,13 +765,10 @@ int learn_cmd(unit * u, order * ord)
   if (a != NULL) {
     if (teach != NULL) {
       int index = 0;
-
       while (teach->teachers[index] && index != MAXTEACHERS) {
         unit *teacher = teach->teachers[index++];
-
         if (teacher->faction != u->faction) {
           boolean feedback = alliedunit(u, teacher->faction, HELP_GUARD);
-
           if (feedback) {
             ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
                 "teacher student skill level", teacher, u, sk,
@@ -845,16 +789,12 @@ int learn_cmd(unit * u, order * ord)
 
   if (sk == SK_ALCHEMY) {
     const potion_type *ptype;
-
     faction *f = u->faction;
-
     int skill = eff_skill(u, SK_ALCHEMY, r);
-
     if (skill > maxalchemy) {
       for (ptype = potiontypes; ptype; ptype = ptype->next) {
         if (skill == ptype->level * 2) {
           attrib *a = a_find(f->attribs, &at_showitem);
-
           while (a && a->type == &at_showitem && a->data.v != ptype)
             a = a->next;
           if (a == NULL || a->type != &at_showitem) {
@@ -866,7 +806,6 @@ int learn_cmd(unit * u, order * ord)
     }
   } else if (sk == SK_MAGIC) {
     sc_mage *mage = get_mage(u);
-
     if (!mage) {
       mage = create_mage(u, u->faction->magiegebiet);
     }

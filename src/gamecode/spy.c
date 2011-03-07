@@ -64,7 +64,6 @@ void spy_message(int spy, const unit * u, const unit * target)
       target, str));
   if (spy > 20) {
     sc_mage *mage = get_mage(target);
-
     /* bei Magiern Zaubersprüche und Magiegebiet */
     if (mage) {
       ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type",
@@ -73,7 +72,6 @@ void spy_message(int spy, const unit * u, const unit * target)
   }
   if (spy > 6) {
     faction *fv = visible_faction(u->faction, target);
-
     if (fv && fv != target->faction) {
       /* wahre Partei */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
@@ -83,11 +81,8 @@ void spy_message(int spy, const unit * u, const unit * target)
   }
   if (spy > 0) {
     int first = 1;
-
     int found = 0;
-
     skill *sv;
-
     char buf[4096];
 
     buf[0] = 0;
@@ -118,15 +113,11 @@ void spy_message(int spy, const unit * u, const unit * target)
   }
 }
 
-
 int spy_cmd(unit * u, struct order *ord)
 {
   unit *target;
-
   int spy, observe;
-
   double spychance, observechance;
-
   region *r = u->region;
 
   init_tokens(ord);
@@ -184,21 +175,17 @@ int spy_cmd(unit * u, struct order *ord)
 void set_factionstealth(unit * u, faction * f)
 {
   region *lastr = NULL;
-
   /* for all units mu of our faction, check all the units in the region
    * they are in, if their visible faction is f, it's ok. use lastr to
    * avoid testing the same region twice in a row. */
   unit *mu = u->faction->units;
-
   while (mu != NULL) {
     if (mu->number && mu->region != lastr) {
       unit *ru = mu->region->units;
-
       lastr = mu->region;
       while (ru != NULL) {
         if (ru->number) {
           faction *fv = visible_faction(f, ru);
-
           if (fv == f) {
             if (cansee(f, lastr, ru, 0))
               break;
@@ -213,7 +200,6 @@ void set_factionstealth(unit * u, faction * f)
   }
   if (mu != NULL) {
     attrib *a = a_find(u->attribs, &at_otherfaction);
-
     if (!a)
       a = a_add(&u->attribs, make_otherfaction(f));
     else
@@ -224,9 +210,7 @@ void set_factionstealth(unit * u, faction * f)
 int setstealth_cmd(unit * u, struct order *ord)
 {
   const char *s;
-
   int level, rule;
-
   const race *trace;
 
   init_tokens(ord);
@@ -249,7 +233,6 @@ int setstealth_cmd(unit * u, struct order *ord)
         NORACE
       };
       int i;
-
       for (i = 0; allowed[i] != NORACE; ++i)
         if (new_race[allowed[i]] == trace)
           break;
@@ -297,7 +280,6 @@ int setstealth_cmd(unit * u, struct order *ord)
         freset(u, UFL_ANON_FACTION);
       } else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
         const char *s2 = (const char *)getstrtoken();
-
         int nr = -1;
 
         if (s2)
@@ -306,7 +288,6 @@ int setstealth_cmd(unit * u, struct order *ord)
           a_removeall(&u->attribs, &at_otherfaction);
         } else {
           struct faction *f = findfaction(nr);
-
           if (f == NULL) {
             cmistake(u, ord, 66, MSG_EVENT);
           } else {
@@ -342,13 +323,11 @@ int setstealth_cmd(unit * u, struct order *ord)
 static int crew_skill(region * r, faction * f, ship * sh, skill_t sk)
 {
   int value = 0;
-
   unit *u;
 
   for (u = r->units; u; u = u->next) {
     if (u->ship == sh && u->faction == f) {
       int s = eff_skill(u, sk, r);
-
       value = MAX(s, value);
     }
   }
@@ -358,13 +337,9 @@ static int crew_skill(region * r, faction * f, ship * sh, skill_t sk)
 static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
 {
   const char *destruction_success_msg = "destroy_ship_0";
-
   const char *destruction_failed_msg = "destroy_ship_1";
-
   const char *destruction_detected_msg = "destroy_ship_2";
-
   const char *detect_failure_msg = "destroy_ship_3";
-
   const char *object_destroyed_msg = "destroy_ship_4";
 
   if (skilldiff == 0) {
@@ -399,17 +374,11 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
 static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
 {
   unit **ui, *u;
-
   region *safety = r;
-
   int i;
-
   direction_t d;
-
   double probability = 0.0;
-
   message *sink_msg = NULL;
-
   faction *f;
 
   for (f = NULL, u = r->units; u; u = u->next) {
@@ -426,7 +395,6 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
   } else {
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *rn = rconnect(r, d);
-
       if (!fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
         safety = rn;
         probability = OCEAN_SWIMMER_CHANCE;
@@ -448,7 +416,6 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
 
     if (u->ship == sh) {
       int dead = 0;
-
       message *msg;
 
       /* if this fails, I misunderstood something: */
@@ -495,17 +462,11 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
 int sabotage_cmd(unit * u, struct order *ord)
 {
   const char *s;
-
   int i;
-
   ship *sh;
-
   unit *u2;
-
   char buffer[DISPLAYSIZE];
-
   region *r = u->region;
-
   int skdiff;
 
   init_tokens(ord);

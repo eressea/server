@@ -34,14 +34,11 @@ int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
 {
   while (*ip) {
     ucs4_t ucs = *ip;
-
     ucs4_t low;
-
     size_t size = 1;
 
     if (ucs & 0x80) {
       int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-
       if (ret != 0) {
         return ret;
       }
@@ -75,16 +72,12 @@ unicode_latin1_to_utf8(utf8_t * out, size_t * outlen, const char *in,
   size_t * inlen)
 {
   int is = (int)*inlen;
-
   int os = (int)*outlen;
-
   const char *ip = in;
-
   utf8_t *op = out;
 
   while (ip - in < is) {
     unsigned char c = *ip;
-
     if (c > 0xBF) {
       if (op - out >= os - 1)
         break;
@@ -111,9 +104,7 @@ int unicode_utf8_strcasecmp(const utf8_t * a, const char *b)
 {
   while (*a && *b) {
     int ret;
-
     size_t size;
-
     ucs4_t ucsa = *a, ucsb = *b;
 
     if (ucsa & 0x80) {
@@ -207,7 +198,6 @@ unicode_ucs4_to_utf8(utf8_t * utf8_character, size_t * size,
 
   return 0;
 }
-
 
 /* Convert a UTF-8 encoded character to UCS-4. */
 int
@@ -313,7 +303,6 @@ unicode_utf8_to_cp437(char *cp_character, const utf8_t * utf8_string,
   size_t * length)
 {
   ucs4_t ucs4_character;
-
   int result;
 
   result = unicode_utf8_to_ucs4(&ucs4_character, utf8_string, length);
@@ -492,10 +481,8 @@ unicode_utf8_to_cp437(char *cp_character, const utf8_t * utf8_string,
       0x266B, 14}
     };
     int l = 0, r = 160;
-
     while (l != r) {
       int m = (l + r) / 2;
-
       if (xref[m].ucs4 == ucs4_character) {
         *cp_character = (char)xref[m].cp437;
         break;
@@ -517,7 +504,6 @@ unicode_utf8_to_cp1252(char *cp_character, const utf8_t * utf8_string,
   size_t * length)
 {
   ucs4_t ucs4_character;
-
   int result;
 
   result = unicode_utf8_to_ucs4(&ucs4_character, utf8_string, length);
@@ -568,10 +554,8 @@ unicode_utf8_to_cp1252(char *cp_character, const utf8_t * utf8_string,
       0x0178, 0x9f}
     };
     int l = 0, r = sizeof(xref) / sizeof(xref[0]);
-
     while (l != r) {
       int m = (l + r) / 2;
-
       if (xref[m].ucs4 == ucs4_character) {
         *cp_character = (char)xref[m].cp;
         break;

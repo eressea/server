@@ -26,7 +26,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 static FILE *sqlstream = NULL;
-
 static char *sqlfilename = NULL;
 
 void sql_init(const char *filename)
@@ -45,7 +44,6 @@ void _sql_print(const char *format, ...)
   }
   if (sqlstream != NULL) {
     va_list marker;
-
     va_start(marker, format);
     vfprintf(sqlstream, format, marker);
     va_end(marker);
@@ -67,15 +65,10 @@ const char *sqlquote(const char *str)
 #define BUFFERS 4
 #define BUFSIZE 1024
   static char sqlstring[BUFSIZE * BUFFERS];     /* STATIC_RESULT: used for return, not across calls */
-
   static int index = 0;         /* STATIC_XCALL: used across calls */
-
   char *start = sqlstring + index * BUFSIZE;
-
   char *o = start;
-
   const char *i = str;
-
   while (*i && o - start < BUFSIZE - 1) {
     if (*i != '\'' && *i != '\"') {
       *o++ = *i++;

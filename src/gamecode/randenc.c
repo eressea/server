@@ -68,7 +68,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/iceberg.h>
 extern struct attrib_type at_unitdissolve;
-
 extern struct attrib_type at_orcification;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
@@ -77,17 +76,13 @@ extern struct attrib_type at_orcification;
 static void dissolve_units(void)
 {
   region *r;
-
   unit *u;
-
   int n;
-
   int i;
 
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u = u->next) {
       attrib *a = a_find(u->attribs, &at_unitdissolve);
-
       if (a) {
         message *msg;
 
@@ -157,13 +152,11 @@ static void dissolve_units(void)
 static int improve_all(faction * f, skill_t sk, int by_weeks)
 {
   unit *u;
-
   boolean ret = by_weeks;
 
   for (u = f->units; u; u = u->nextF) {
     if (has_skill(u, sk)) {
       int weeks = 0;
-
       for (; weeks != by_weeks; ++weeks) {
         learn_skill(u, sk, 1.0);
         ret = 0;
@@ -177,11 +170,8 @@ static int improve_all(faction * f, skill_t sk, int by_weeks)
 void find_manual(region * r, unit * u)
 {
   char zLocation[32];
-
   char zBook[32];
-
   skill_t skill = NOSKILL;
-
   message *msg;
 
   switch (rng_int() % 36) {
@@ -255,7 +245,6 @@ void find_manual(region * r, unit * u)
 
   if (improve_all(u->faction, skill, 3) == 3) {
     int i;
-
     for (i = 0; i != 9; ++i)
       learn_skill(u, skill, 1.0);
   }
@@ -264,9 +253,7 @@ void find_manual(region * r, unit * u)
 static void get_villagers(region * r, unit * u)
 {
   unit *newunit;
-
   message *msg = msg_message("encounter_villagers", "unit", u);
-
   const char *name = LOC(u->faction->locale, "villagers");
 
   r_addmessage(r, u->faction, msg);
@@ -283,13 +270,9 @@ static void get_villagers(region * r, unit * u)
 static void get_allies(region * r, unit * u)
 {
   unit *newunit = NULL;
-
   const char *name;
-
   const char *equip;
-
   int number;
-
   message *msg;
 
   assert(u->number);
@@ -410,16 +393,13 @@ void encounters(void)
   for (r = regions; r; r = r->next) {
     if (!fval(r->terrain, SEA_REGION) && fval(r, RF_ENCOUNTER)) {
       int c = 0;
-
       unit *u;
-
       for (u = r->units; u; u = u->next) {
         c += u->number;
       }
 
       if (c > 0) {
         int i = 0;
-
         int n = rng_int() % c;
 
         for (u = r->units; u; u = u->next) {
@@ -437,12 +417,10 @@ void encounters(void)
 static const terrain_type *chaosterrain(void)
 {
   static const terrain_type **types;
-
   static int numtypes;
 
   if (numtypes == 0) {
     const terrain_type *terrain;
-
     for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
       if (fval(terrain, LAND_REGION) && terrain->herbs) {
         ++numtypes;
@@ -459,13 +437,10 @@ static const terrain_type *chaosterrain(void)
   return types[rng_int() % numtypes];
 }
 
-
 static unit *random_unit(const region * r)
 {
   int c = 0;
-
   int n;
-
   unit *u;
 
   for (u = r->units; u; u = u->next) {
@@ -498,7 +473,6 @@ void chaos(region * r)
       case 0:                  /* Untote */
         if (!fval(r->terrain, SEA_REGION)) {
           unit *u = random_unit(r);
-
           if (u && playerrace(u->race)) {
             ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
             u_setfaction(u, get_monsters());
@@ -509,9 +483,7 @@ void chaos(region * r)
       case 1:                  /* Drachen */
         if (random_unit(r)) {
           int mfac = 0;
-
           unit *u;
-
           switch (rng_int() % 3) {
             case 0:
               mfac = 100;
@@ -540,21 +512,17 @@ void chaos(region * r)
         if (!fval(r->terrain, FORBIDDEN_REGION)) {
           if (!fval(r->terrain, SEA_REGION)) {
             direction_t dir;
-
             for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
               region *rn = rconnect(r, dir);
-
               if (rn && fval(rn->terrain, SEA_REGION))
                 break;
             }
             if (dir != MAXDIRECTIONS) {
               ship *sh = r->ships;
-
               unit **up;
 
               while (sh) {
                 ship *nsh = sh->next;
-
                 float dmg =
                   get_param_flt(global.parameters, "rules.ship.damage.atlantis",
                   0.50);
@@ -567,7 +535,6 @@ void chaos(region * r)
 
               for (up = &r->units; *up;) {
                 unit *u = *up;
-
                 if (u->race != new_race[RC_SPELL] && u->ship == 0 && !canfly(u)) {
                   ADDMSG(&u->faction->msgs, msg_message("tidalwave_kill",
                       "region unit", r, u));
@@ -585,10 +552,8 @@ void chaos(region * r)
             }
           } else {
             direction_t dir;
-
             for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
               region *rn = rconnect(r, dir);
-
               if (rn && fval(rn->terrain, SEA_REGION))
                 break;
             }
@@ -601,13 +566,10 @@ void chaos(region * r)
   }
 }
 
-
 static int nb_armor(const unit * u, int index)
 {
   const item *itm;
-
   int av = 0;
-
   int s = 0, a = 0;
 
   if (!(u->race->battle_flags & BF_EQUIPMENT))
@@ -617,10 +579,8 @@ static int nb_armor(const unit * u, int index)
 
   for (itm = u->items; itm; itm = itm->next) {
     const armor_type *atype = itm->type->rtype->atype;
-
     if (atype != NULL) {
       int *schutz = &a;
-
       if (atype->flags & ATF_SHIELD)
         schutz = &s;
       if (*schutz <= index) {
@@ -638,11 +598,8 @@ static int
 damage_unit(unit * u, const char *dam, boolean physical, boolean magic)
 {
   int *hp = malloc(u->number * sizeof(int));
-
   int h;
-
   int i, dead = 0, hp_rem = 0, heiltrank;
-
   double magres = magic_resistance(u);
 
   assert(u->number);
@@ -661,7 +618,6 @@ damage_unit(unit * u, const char *dam, boolean physical, boolean magic)
   /* Schaden */
   for (i = 0; i < u->number; i++) {
     int damage = dice_rand(dam);
-
     if (magic)
       damage = (int)(damage * (1.0 - magres));
     if (physical)
@@ -715,12 +671,9 @@ void drown(region * r)
 {
   if (fval(r->terrain, SEA_REGION)) {
     unit **up = up = &r->units;
-
     while (*up) {
       unit *u = *up;
-
       int amphibian_level = 0;
-
       if (u->ship || u->race == new_race[RC_SPELL] || u->number == 0) {
         up = &u->next;
         continue;
@@ -728,7 +681,6 @@ void drown(region * r)
 
       if (amphibian_level) {
         int dead = damage_unit(u, "5d1", false, false);
-
         if (dead) {
           ADDMSG(&u->faction->msgs, msg_message("drown_amphibian_dead",
               "amount unit region", dead, u, r));
@@ -750,9 +702,7 @@ void drown(region * r)
 region *rrandneighbour(region * r)
 {
   direction_t i;
-
   region *rc = NULL;
-
   int rr, c = 0;
 
   /* Nachsehen, wieviele Regionen in Frage kommen */
@@ -782,9 +732,7 @@ volcano_destruction(region * volcano, region * r, region * rn,
   const char *damage)
 {
   attrib *a;
-
   unit **up;
-
   int percent = 25, time = 6 + rng_int() % 12;
 
   rsettrees(r, 2, 0);
@@ -805,10 +753,8 @@ volcano_destruction(region * volcano, region * r, region * rn,
 
   for (up = &r->units; *up;) {
     unit *u = *up;
-
     if (u->number) {
       int dead = damage_unit(u, damage, true, false);
-
       if (dead) {
         ADDMSG(&u->faction->msgs, msg_message("volcano_dead",
             "unit region dead", u, volcano, dead));
@@ -834,9 +780,7 @@ volcano_destruction(region * volcano, region * r, region * rn,
 void volcano_outbreak(region * r)
 {
   region *rn;
-
   unit *u;
-
   faction *f;
 
   for (f = NULL, u = r->units; u; u = u->next) {
@@ -858,7 +802,6 @@ void volcano_outbreak(region * r)
 static void melt_iceberg(region * r)
 {
   attrib *a;
-
   unit *u;
 
   for (u = r->units; u; u = u->next)
@@ -890,9 +833,7 @@ static void melt_iceberg(region * r)
 static void move_iceberg(region * r)
 {
   attrib *a;
-
   direction_t dir;
-
   region *rc;
 
   a = a_find(r->attribs, &at_iceberg);
@@ -913,11 +854,8 @@ static void move_iceberg(region * r)
   if (rc && !fval(rc->terrain, ARCTIC_REGION)) {
     if (fval(rc->terrain, SEA_REGION)) {        /* Eisberg treibt */
       ship *sh, *shn;
-
       unit *u;
-
       int x, y;
-
 
       for (u = r->units; u; u = u->next)
         freset(u->faction, FFL_SELECT);
@@ -972,7 +910,6 @@ static void move_iceberg(region * r)
       }
       while (rc->units) {
         building *b = rc->units->building;
-
         u = rc->units;
         move_unit(rc->units, r, NULL);
         u->building = b;        /* move_unit macht ein leave() */
@@ -1022,7 +959,6 @@ static void move_icebergs(void)
   for (r = regions; r; r = r->next) {
     if (r->terrain == newterrain(T_ICEBERG) && !fval(r, RF_SELECT)) {
       int select = rng_int() % 10;
-
       if (select < 4) {
         /* 4% chance */
         fset(r, RF_SELECT);
@@ -1043,11 +979,8 @@ void create_icebergs(void)
   for (r = regions; r; r = r->next) {
     if (r->terrain == newterrain(T_ICEBERG_SLEEP) && chance(0.05)) {
       boolean has_ocean_neighbour = false;
-
       direction_t dir;
-
       region *rc;
-
       unit *u;
 
       freset(r, RF_SELECT);
@@ -1086,30 +1019,24 @@ static void godcurse(void)
   for (r = regions; r; r = r->next) {
     if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
       unit *u;
-
       for (u = r->units; u; u = u->next) {
         skill *sv = u->skills;
-
         while (sv != u->skills + u->skill_size) {
           int weeks = 1 + rng_int() % 3;
-
           reduce_skill(u, sv, weeks);
           ++sv;
         }
       }
       if (fval(r->terrain, SEA_REGION)) {
         ship *sh;
-
         for (sh = r->ships; sh;) {
           ship *shn = sh->next;
-
           float dmg =
             get_param_flt(global.parameters, "rules.ship.damage.godcurse",
             0.10F);
           damage_ship(sh, dmg);
           if (sh->damage >= sh->size * DAMAGE_SCALE) {
             unit *u = shipowner(sh);
-
             if (u)
               ADDMSG(&u->faction->msgs,
                 msg_message("godcurse_destroy_ship", "ship", sh));
@@ -1130,17 +1057,12 @@ static void godcurse(void)
 static void orc_growth(void)
 {
   region *r;
-
   for (r = regions; r; r = r->next) {
     unit *u;
-
     for (u = r->units; u; u = u->next) {
       static boolean init = false;
-
       static const curse_type *ct_orcish = 0;
-
       curse *c = 0;
-
       if (!init) {
         init = true;
         ct_orcish = ct_find("orcish");
@@ -1151,11 +1073,8 @@ static void orc_growth(void)
       if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)
         && !fval(u, UFL_HERO)) {
         int n;
-
         int increase = 0;
-
         int num = get_cursedmen(u, c);
-
         double prob = curse_geteffect(c);
 
         for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
@@ -1165,7 +1084,6 @@ static void orc_growth(void)
         }
         if (increase) {
           unit *u2 = create_unit(r, u->faction, increase, u->race, 0, NULL, u);
-
           transfermen(u2, u, u2->number);
 
           ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
@@ -1184,19 +1102,15 @@ static void demon_skillchanges(void)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-
     for (u = r->units; u; u = u->next) {
       if (u->race == new_race[RC_DAEMON]) {
         skill *sv = u->skills;
-
         int upchance = 15;
-
         int downchance = 10;
 
         if (fval(u, UFL_HUNGER)) {
           /* hungry demons only go down, never up in skill */
           static int rule_hunger = -1;
-
           if (rule_hunger < 0) {
             rule_hunger =
               get_param_int(global.parameters, "hunger.demon.skill", 0);
@@ -1209,10 +1123,8 @@ static void demon_skillchanges(void)
 
         while (sv != u->skills + u->skill_size) {
           int roll = rng_int() % 100;
-
           if (sv->level > 0 && roll < upchance + downchance) {
             int weeks = 1 + rng_int() % 3;
-
             if (roll < downchance) {
               reduce_skill(u, sv, weeks);
               if (sv->level < 1) {
@@ -1244,7 +1156,6 @@ static void demon_skillchanges(void)
 static void icebergs(void)
 {
   region *r;
-
   create_icebergs();
   move_icebergs();
   for (r = regions; r; r = r->next) {
@@ -1256,7 +1167,6 @@ static void icebergs(void)
 static void rotting_herbs(void)
 {
   static int rule_rot = -1;
-
   region *r;
 
   if (rule_rot < 0) {
@@ -1268,7 +1178,6 @@ static void rotting_herbs(void)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-
     for (u = r->units; u; u = u->next) {
       item **itmp = &u->items, *hbag =
         *i_find(itmp, olditemtype[I_SACK_OF_CONSERVATION]);
@@ -1278,18 +1187,12 @@ static void rotting_herbs(void)
         rot_chance = (rot_chance * 2) / 5;
       while (*itmp) {
         item *itm = *itmp;
-
         int n = itm->number;
-
         double k = n * rot_chance / 100.0;
-
         if (fval(itm->type, ITF_HERB)) {
           double nv = normalvariate(k, k / 4);
-
           int inv = (int)nv;
-
           int delta = MIN(n, inv);
-
           if (i_change(itmp, itm->type, -delta) == NULL) {
             continue;
           }
@@ -1315,12 +1218,9 @@ void randomevents(void)
   for (r = regions; r; r = r->next) {
     if (fval(r, RF_ORCIFIED)) {
       direction_t dir;
-
       double probability = 0.0;
-
       for (dir = 0; dir < MAXDIRECTIONS; dir++) {
         region *rc = rconnect(r, dir);
-
         if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED))
           probability += 0.02;
       }
@@ -1330,10 +1230,8 @@ void randomevents(void)
       }
     } else {
       attrib *a = a_find(r->attribs, &at_orcification);
-
       if (a != NULL) {
         double probability = 0.0;
-
         if (rpeasants(r) <= 0)
           continue;
         probability = a->data.i / (double)rpeasants(r);
@@ -1376,10 +1274,8 @@ void randomevents(void)
 
   for (r = regions; r; r = r->next) {
     building **blist = &r->buildings;
-
     while (*blist) {
       building *b = *blist;
-
       if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
         b->size -= MAX(1, (b->size * 20) / 100);
         if (b->size == 0) {

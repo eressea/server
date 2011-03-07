@@ -44,9 +44,7 @@ without prior permission by the authors of Eressea.
 int tolua_regionlist_next(lua_State * L)
 {
   region **region_ptr = (region **) lua_touserdata(L, lua_upvalueindex(1));
-
   region *r = *region_ptr;
-
   if (r != NULL) {
     tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
     *region_ptr = r->next;
@@ -58,7 +56,6 @@ int tolua_regionlist_next(lua_State * L)
 static int tolua_region_get_id(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushnumber(L, (lua_Number) self->uid);
   return 1;
 }
@@ -66,7 +63,6 @@ static int tolua_region_get_id(lua_State * L)
 static int tolua_region_get_x(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushnumber(L, (lua_Number) self->x);
   return 1;
 }
@@ -74,7 +70,6 @@ static int tolua_region_get_x(lua_State * L)
 static int tolua_region_get_y(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushnumber(L, (lua_Number) self->y);
   return 1;
 }
@@ -82,7 +77,6 @@ static int tolua_region_get_y(lua_State * L)
 static int tolua_region_get_plane(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushusertype(L, rplane(r), TOLUA_CAST "plane");
   return 1;
 }
@@ -90,7 +84,6 @@ static int tolua_region_get_plane(lua_State * L)
 static int tolua_region_get_terrain(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushstring(L, self->terrain->_name);
   return 1;
 }
@@ -98,12 +91,9 @@ static int tolua_region_get_terrain(lua_State * L)
 static int tolua_region_set_terrain(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   const char *tname = tolua_tostring(L, 2, 0);
-
   if (tname) {
     const terrain_type *terrain = get_terrain(tname);
-
     if (terrain) {
       terraform_region(r, terrain);
     }
@@ -114,9 +104,7 @@ static int tolua_region_set_terrain(lua_State * L)
 static int tolua_region_get_terrainname(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   attrib *a = a_find(self->attribs, &at_racename);
-
   if (a) {
     tolua_pushstring(L, get_racename(a));
     return 1;
@@ -127,9 +115,7 @@ static int tolua_region_get_terrainname(lua_State * L)
 static int tolua_region_set_owner(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   struct faction *f = (struct faction *)tolua_tousertype(L, 2, 0);
-
   if (r) {
     region_set_owner(r, f, turn);
   }
@@ -139,10 +125,8 @@ static int tolua_region_set_owner(lua_State * L)
 static int tolua_region_get_owner(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   if (r) {
     struct faction *f = region_get_owner(r);
-
     tolua_pushusertype(L, f, TOLUA_CAST "faction");
     return 1;
   }
@@ -152,9 +136,7 @@ static int tolua_region_get_owner(lua_State * L)
 static int tolua_region_set_terrainname(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   if (name == NULL) {
     a_removeall(&self->attribs, &at_racename);
   } else {
@@ -166,7 +148,6 @@ static int tolua_region_set_terrainname(lua_State * L)
 static int tolua_region_get_info(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushstring(L, region_getinfo(self));
   return 1;
 }
@@ -174,16 +155,13 @@ static int tolua_region_get_info(lua_State * L)
 static int tolua_region_set_info(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   region_setinfo(self, tolua_tostring(L, 2, 0));
   return 0;
 }
 
-
 static int tolua_region_get_name(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushstring(L, region_getname(self));
   return 1;
 }
@@ -191,16 +169,13 @@ static int tolua_region_get_name(lua_State * L)
 static int tolua_region_set_name(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   region_setname(self, tolua_tostring(L, 2, 0));
   return 0;
 }
 
-
 static int tolua_region_get_morale(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushnumber(L, region_get_morale(r));
   return 1;
 }
@@ -208,7 +183,6 @@ static int tolua_region_get_morale(lua_State * L)
 static int tolua_region_set_morale(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   region_set_morale(r, (int)tolua_tonumber(L, 2, 0), turn);
   return 0;
 }
@@ -216,11 +190,8 @@ static int tolua_region_set_morale(lua_State * L)
 static int tolua_region_get_adj(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   region *rn[MAXDIRECTIONS];
-
   int d, idx;
-
   get_neighbours(r, rn);
 
   lua_createtable(L, MAXDIRECTIONS, 0);
@@ -236,13 +207,10 @@ static int tolua_region_get_adj(lua_State * L)
 static int tolua_region_get_luxury(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   if (r->land) {
     const item_type *lux = r_luxury(r);
-
     if (lux) {
       const char *name = lux->rtype->_name[0];
-
       tolua_pushstring(L, name);
       return 1;
     }
@@ -253,14 +221,10 @@ static int tolua_region_get_luxury(lua_State * L)
 static int tolua_region_set_luxury(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   if (r->land && name) {
     const item_type *lux = r_luxury(r);
-
     const item_type *itype = it_find(name);
-
     if (lux && itype && lux != itype) {
       r_setdemand(r, lux->rtype->ltype, 1);
       r_setdemand(r, itype->rtype->ltype, 0);
@@ -272,12 +236,9 @@ static int tolua_region_set_luxury(lua_State * L)
 static int tolua_region_set_herb(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   if (r->land) {
     const char *name = tolua_tostring(L, 2, 0);
-
     const item_type *itype = it_find(name);
-
     if (itype && (itype->flags & ITF_HERB)) {
       r->land->herbtype = itype;
     }
@@ -288,10 +249,8 @@ static int tolua_region_set_herb(lua_State * L)
 static int tolua_region_get_herb(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   if (r->land && r->land->herbtype) {
     const char *name = r->land->herbtype->rtype->_name[0];
-
     tolua_pushstring(L, name);
     return 1;
   }
@@ -301,7 +260,6 @@ static int tolua_region_get_herb(lua_State * L)
 static int tolua_region_get_next(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   direction_t dir = (direction_t) tolua_tonumber(L, 2, 0);
 
   if (dir >= 0 && dir < MAXDIRECTIONS) {
@@ -314,7 +272,6 @@ static int tolua_region_get_next(lua_State * L)
 static int tolua_region_get_flag(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   int bit = (int)tolua_tonumber(L, 2, 0);
 
   lua_pushboolean(L, (self->flags & (1 << bit)));
@@ -324,9 +281,7 @@ static int tolua_region_get_flag(lua_State * L)
 static int tolua_region_set_flag(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   int bit = (int)tolua_tonumber(L, 2, 0);
-
   int set = tolua_toboolean(L, 3, 1);
 
   if (set)
@@ -339,14 +294,10 @@ static int tolua_region_set_flag(lua_State * L)
 static int tolua_region_get_resourcelevel(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   const char *type = tolua_tostring(L, 2, 0);
-
   const resource_type *rtype = rt_find(type);
-
   if (rtype != NULL) {
     const rawmaterial *rm;
-
     for (rm = r->resources; rm; rm = rm->next) {
       if (rm->type->rtype == rtype) {
         tolua_pushnumber(L, (lua_Number) rm->level);
@@ -361,11 +312,8 @@ static int tolua_region_get_resourcelevel(lua_State * L)
 static int tolua_region_get_resource(lua_State * L)
 {
   region *r;
-
   const char *type;
-
   const resource_type *rtype;
-
   int result = 0;
 
   r = (region *) tolua_tousertype(L, 1, 0);
@@ -396,11 +344,8 @@ static int tolua_region_get_resource(lua_State * L)
 static int tolua_region_set_resource(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
-
   const char *type = tolua_tostring(L, 2, 0);
-
   int value = (int)tolua_tonumber(L, 3, 0);
-
   const resource_type *rtype = rt_find(type);
 
   if (rtype != NULL) {
@@ -414,11 +359,9 @@ static int tolua_region_set_resource(lua_State * L)
       rsettrees(r, 2, value);
     } else if (strcmp(type, "grave") == 0) {
       int fallen = value - deathcount(r);
-
       deathcounts(r, fallen);
     } else if (strcmp(type, "chaos") == 0) {
       int fallen = value - chaoscount(r);
-
       chaoscounts(r, fallen);
     }
   }
@@ -428,7 +371,6 @@ static int tolua_region_set_resource(lua_State * L)
 static int tolua_region_get_objects(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   tolua_pushusertype(L, (void *)&self->attribs, TOLUA_CAST "hashtable");
   return 1;
 }
@@ -436,7 +378,6 @@ static int tolua_region_get_objects(lua_State * L)
 static int tolua_region_destroy(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   remove_region(&regions, self);
   return 0;
 }
@@ -444,18 +385,12 @@ static int tolua_region_destroy(lua_State * L)
 static int tolua_region_create(lua_State * L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
-
   int y = (int)tolua_tonumber(L, 2, 0);
-
   const char *tname = tolua_tostring(L, 3, 0);
-
   if (tname) {
     plane *pl = findplane(x, y);
-
     const terrain_type *terrain = get_terrain(tname);
-
     region *r, *result;
-
     if (!terrain) {
       return 0;
     }
@@ -483,7 +418,6 @@ static int tolua_region_create(lua_State * L)
 static int tolua_region_get_units(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   unit **unit_ptr = (unit **) lua_newuserdata(L, sizeof(unit *));
 
   luaL_getmetatable(L, "unit");
@@ -498,7 +432,6 @@ static int tolua_region_get_units(lua_State * L)
 static int tolua_region_get_buildings(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   building **building_ptr =
     (building **) lua_newuserdata(L, sizeof(building *));
 
@@ -514,7 +447,6 @@ static int tolua_region_get_buildings(lua_State * L)
 static int tolua_region_get_ships(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   ship **ship_ptr = (ship **) lua_newuserdata(L, sizeof(ship *));
 
   luaL_getmetatable(L, "ship");
@@ -540,13 +472,10 @@ static int tolua_region_get_age(lua_State * L)
 static int tolua_region_getkey(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
 
   int flag = atoi36(name);
-
   attrib *a = find_key(self->attribs, flag);
-
   lua_pushboolean(L, a != NULL);
 
   return 1;
@@ -555,15 +484,11 @@ static int tolua_region_getkey(lua_State * L)
 static int tolua_region_setkey(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   int value = tolua_toboolean(L, 3, 0);
 
   int flag = atoi36(name);
-
   attrib *a = find_key(self->attribs, flag);
-
   if (a == NULL && value) {
     add_key(&self->attribs, flag);
   } else if (a != NULL && !value) {
@@ -575,7 +500,6 @@ static int tolua_region_setkey(lua_State * L)
 static int tolua_region_tostring(lua_State * L)
 {
   region *self = (region *) tolua_tousertype(L, 1, 0);
-
   lua_pushstring(L, regionname(self, NULL));
   return 1;
 }
@@ -583,7 +507,6 @@ static int tolua_region_tostring(lua_State * L)
 static int tolua_plane_get(lua_State * L)
 {
   int id = (int)tolua_tonumber(L, 1, 0);
-
   plane *pl = getplanebyid(id);
 
   tolua_pushusertype(L, pl, TOLUA_CAST "plane");
@@ -593,17 +516,11 @@ static int tolua_plane_get(lua_State * L)
 static int tolua_plane_create(lua_State * L)
 {
   int id = (int)tolua_tonumber(L, 1, 0);
-
   int x = (int)tolua_tonumber(L, 2, 0);
-
   int y = (int)tolua_tonumber(L, 3, 0);
-
   int width = (int)tolua_tonumber(L, 4, 0);
-
   int height = (int)tolua_tonumber(L, 5, 0);
-
   const char *name = tolua_tostring(L, 6, 0);
-
   plane *pl;
 
   pl = create_new_plane(id, name, x, x + width - 1, y, y + height - 1, 0);
@@ -615,7 +532,6 @@ static int tolua_plane_create(lua_State * L)
 static int tolua_plane_get_name(lua_State * L)
 {
   plane *self = (plane *) tolua_tousertype(L, 1, 0);
-
   tolua_pushstring(L, self->name);
   return 1;
 }
@@ -623,9 +539,7 @@ static int tolua_plane_get_name(lua_State * L)
 static int tolua_plane_set_name(lua_State * L)
 {
   plane *self = (plane *) tolua_tousertype(L, 1, 0);
-
   const char *str = tolua_tostring(L, 2, 0);
-
   free(self->name);
   if (str)
     self->name = strdup(str);
@@ -637,7 +551,6 @@ static int tolua_plane_set_name(lua_State * L)
 static int tolua_plane_get_id(lua_State * L)
 {
   plane *self = (plane *) tolua_tousertype(L, 1, 0);
-
   tolua_pushnumber(L, (lua_Number) self->id);
   return 1;
 }
@@ -645,11 +558,8 @@ static int tolua_plane_get_id(lua_State * L)
 static int tolua_plane_normalize(lua_State * L)
 {
   plane *self = (plane *) tolua_tousertype(L, 1, 0);
-
   int x = (int)tolua_tonumber(L, 2, 0);
-
   int y = (int)tolua_tonumber(L, 3, 0);
-
   pnormalize(&x, &y, self);
   tolua_pushnumber(L, (lua_Number) x);
   tolua_pushnumber(L, (lua_Number) y);
@@ -659,7 +569,6 @@ static int tolua_plane_normalize(lua_State * L)
 static int tolua_plane_tostring(lua_State * L)
 {
   plane *self = (plane *) tolua_tousertype(L, 1, 0);
-
   lua_pushstring(L, self->name);
   return 1;
 }
@@ -667,7 +576,6 @@ static int tolua_plane_tostring(lua_State * L)
 static int tolua_plane_get_size(lua_State * L)
 {
   plane *pl = (plane *) tolua_tousertype(L, 1, 0);
-
   lua_pushnumber(L, plane_width(pl));
   lua_pushnumber(L, plane_height(pl));
   return 2;
@@ -676,15 +584,10 @@ static int tolua_plane_get_size(lua_State * L)
 static int tolua_distance(lua_State * L)
 {
   int x1 = (int)tolua_tonumber(L, 1, 0);
-
   int y1 = (int)tolua_tonumber(L, 2, 0);
-
   int x2 = (int)tolua_tonumber(L, 3, 0);
-
   int y2 = (int)tolua_tonumber(L, 4, 0);
-
   plane *pl = (plane *) tolua_tousertype(L, 5, 0);
-
   int result;
 
   if (!pl)

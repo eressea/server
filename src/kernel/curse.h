@@ -145,7 +145,6 @@ extern "C" {
 /* ------------------------------------------------------------- */
 /* Flags */
 
-
 /* Verhalten von Zaubern auf Units beim Übergeben von Personen */
   typedef enum {
     CURSE_ISNEW = 0x01,         /* wirkt in der zauberrunde nicht (default) */
@@ -225,7 +224,6 @@ extern "C" {
     struct storage *store);
   int curse_read(struct attrib *a, void *owner, struct storage *store);
 
-
 /* ------------------------------------------------------------- */
 /* Kommentare:
  * Bei einigen Typen von Verzauberungen (z.B.Skillmodif.) muss neben
@@ -249,7 +247,6 @@ extern "C" {
 
   extern void destroy_curse(curse * c);
 
-
   boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
   /* ignoriert CURSE_ISNEW */
 
@@ -264,7 +261,6 @@ extern "C" {
    * gespeichert. Wird automatisch beim Anlegen eines neuen curse
    * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
    */
-
 
   extern double curse_changevigour(struct attrib **ap, curse * c, double i);
   /* verändert die Stärke der Verzauberung um i */

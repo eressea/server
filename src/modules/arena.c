@@ -66,23 +66,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-
 /* exports: */
 plane *arena = NULL;
-
 
 /* local vars */
 #define CENTRAL_VOLCANO 1
 
 #ifdef ARENA_CREATION
 static unsigned int arena_id = 0;
-
 static region *arena_center = NULL;
-
 static int newarena = 0;
 #endif
 static region *tower_region[6];
-
 static region *start_region[6];
 
 static region *arena_region(int school)
@@ -127,13 +122,9 @@ static int
 enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 {
   skill_t sk;
-
   region *r = u->region;
-
   unit *u2;
-
   int fee = u->faction->score / 5;
-
   unused(ord);
   unused(amount);
   unused(itype);
@@ -192,11 +183,9 @@ use_wand_of_tears(unit * user, const struct item_type *itype, int amount,
   order * ord)
 {
   int n;
-
   unused(ord);
   for (n = 0; n != amount; ++n) {
     unit *u;
-
     for (u = user->region->units; u; u = u->next) {
       if (u->faction != user->faction) {
         int i;
@@ -220,11 +209,8 @@ use_wand_of_tears(unit * user, const struct item_type *itype, int amount,
 static int age_hurting(attrib * a)
 {
   building *b = (building *) a->data.v;
-
   unit *u;
-
   int active = 0;
-
   if (b == NULL)
     return AT_AGE_REMOVE;
   for (u = b->region->units; u; u = u->next) {
@@ -239,7 +225,6 @@ static int age_hurting(attrib * a)
     for (u = b->region->units; u; u = u->next)
       if (playerrace(u->faction->race)) {
         int i;
-
         if (u->faction->magiegebiet != M_DRAIG) {
           for (i = 0; i != active; ++i)
             u->hp = (u->hp + 1) / 2;    /* make them suffer, but not die */
@@ -253,14 +238,12 @@ static void
 write_hurting(const attrib * a, const void *owner, struct storage *store)
 {
   building *b = a->data.v;
-
   store->w_int(store, b->no);
 }
 
 static int read_hurting(attrib * a, void *owner, struct storage *store)
 {
   int i;
-
   i = store->r_int(store);
   a->data.v = (void *)findbuilding(i);
   if (a->data.v == NULL) {
@@ -278,9 +261,7 @@ static attrib_type at_hurting = {
 static void make_temple(region * r)
 {
   const building_type *btype = bt_find("temple");
-
   building *b;
-
   if (btype == NULL) {
     log_error(("could not find buildingtype 'temple'\n"));
     return;
@@ -309,11 +290,8 @@ static void make_temple(region * r)
 static void tower_init(void)
 {
   int i, first = newarena;
-
   item_type *it_demonseye = it_find("demonseye");
-
   item_type *it_griphonwing = it_find("griphonwing");
-
   assert(it_griphonwing && it_demonseye);
   for (i = 0; i != 6; ++i) {
     region *r = tower_region[i] =
@@ -327,7 +305,6 @@ static void tower_init(void)
         terraform(r, T_DESERT);
       if (!r->buildings) {
         building *b = new_building(bt_find("castle"), r, NULL);
-
         b->size = 10;
         if (i != 0) {
           sprintf(buf, "Turm des %s",
@@ -340,9 +317,7 @@ static void tower_init(void)
   }
   if (first && !arena_center->buildings) {
     building *b = new_building(bt_find("castle"), arena_center, NULL);
-
     attrib *a;
-
     item *items;
 
     i_add(&items, i_new(it_griphonwing, 1));
@@ -359,7 +334,6 @@ static void tower_init(void)
 static void guardian_faction(plane * pl, int id)
 {
   region *r;
-
   faction *f = findfaction(id);
 
   if (!f) {
@@ -389,7 +363,6 @@ static void guardian_faction(plane * pl, int id)
   for (r = regions; r; r = r->next)
     if (getplane(r) == pl && rterrain(r) != T_FIREWALL) {
       unit *u;
-
       freset(r, RF_ENCOUNTER);
       for (u = r->units; u; u = u->next) {
         if (u->faction == f)
@@ -413,11 +386,9 @@ static void guardian_faction(plane * pl, int id)
 static void block_create(int x1, int y1, char terrain)
 {
   int x, y;
-
   for (x = 0; x != BLOCKSIZE; ++x) {
     for (y = 0; y != BLOCKSIZE; ++y) {
       region *r = new_region(x1 + x, y1 + y, 0);
-
       terraform(r, terrain);
     }
   }
@@ -432,23 +403,17 @@ static int caldera_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   building *b = (building *) t->data.v;
-
   if (b != NULL) {
     unit **up = &b->region->units;
-
     while (*up) {
       unit *u = *up;
-
       if (u->building == b) {
         message *msg;
-
         if (u->items) {
           item **ip = &u->items;
-
           msg = msg_message("caldera_handle_1", "unit items", u, u->items);
           while (*ip) {
             item *i = *ip;
-
             i_remove(ip, i);
             if (*ip == i)
               ip = &i->next;
@@ -472,7 +437,6 @@ static int caldera_handle(trigger * t, void *data)
 static void caldera_write(const trigger * t, struct storage *store)
 {
   building *b = (building *) t->data.v;
-
   write_building_reference(b, store);
 }
 
@@ -500,7 +464,6 @@ struct trigger_type tt_caldera = {
 static trigger *trigger_caldera(building * b)
 {
   trigger *t = t_new(&tt_caldera);
-
   t->data.v = b;
   return t;
 }
@@ -510,9 +473,7 @@ static trigger *trigger_caldera(building * b)
 static void init_volcano(void)
 {
   building *b;
-
   region *r = arena_center;
-
   assert(arena_center);
   if (rterrain(r) != T_DESERT)
     return;                     /* been done before */
@@ -533,7 +494,6 @@ static void init_volcano(void)
 void create_arena(void)
 {
   int x;
-
   arena_id = hashstring("arena");
   arena = getplanebyid(arena_id);
   if (arena != NULL)
@@ -551,10 +511,8 @@ void create_arena(void)
     arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
     for (x = 0; x != BLOCKSIZE; ++x) {
       int y;
-
       for (y = 0; y != BLOCKSIZE; ++y) {
         region *r = findregion(arena->minx + x, arena->miny + y);
-
         freset(r, RF_ENCOUNTER);
         r->planep = arena;
         switch (distance(r, arena_center)) {

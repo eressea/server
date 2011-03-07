@@ -20,10 +20,8 @@ static listener *listeners;
 void eventbus_fire(void *sender, const char *event, void *args)
 {
   listener *lst = listeners;
-
   while (lst) {
     int i = strcmp(lst->event, event);
-
     if (i > 0)
       break;
     if (i == 0) {
@@ -40,9 +38,7 @@ eventbus_register(void *sender, const char *event, event_handler cb,
   event_arg_free arg_free, void *args)
 {
   listener *lst;
-
   listener **lstp = &listeners;
-
   while (*lstp) {
     lst = *lstp;
     if (strcmp(lst->event, event) >= 0) {

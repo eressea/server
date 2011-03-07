@@ -8,7 +8,6 @@
 char *strncpy(char *to, const char *from, size_t size)
 {
   char *t = to, *f = (char *)from;
-
   int copied = 0;
 
   while (copied < size) {

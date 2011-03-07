@@ -30,18 +30,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * simple attributes that do not yet have their own file 
  */
 
-
 void write_of(const struct attrib *a, const void *owner, struct storage *store)
 {
   const faction *f = (faction *) a->data.v;
-
   store->w_int(store, f->no);
 }
 
 int read_of(struct attrib *a, void *owner, struct storage *store)
 {                               /* return 1 on success, 0 if attrib needs removal */
   int of = store->r_int(store);
-
   a->data.v = findfaction(of);
   if (a->data.v)
     return AT_READ_OK;
@@ -60,7 +57,6 @@ struct faction *get_otherfaction(const struct attrib *a)
 struct attrib *make_otherfaction(struct faction *f)
 {
   attrib *a = a_new(&at_otherfaction);
-
   a->data.v = (void *)f;
   return a;
 }
@@ -69,10 +65,8 @@ faction *visible_faction(const faction * f, const unit * u)
 {
   if (f == NULL || !alliedunit(u, f, HELP_FSTEALTH)) {
     attrib *a = a_find(u->attribs, &at_otherfaction);
-
     if (a) {
       faction *fv = get_otherfaction(a);
-
       assert(fv != NULL);       /* fv should never be NULL! */
       return fv;
     }

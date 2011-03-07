@@ -40,17 +40,13 @@ static int gate_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   gate_data *gd = (gate_data *) t->data.v;
-
   struct building *b = gd->gate;
-
   struct region *r = gd->target;
 
   if (b && b->region && r) {
     unit **up = &b->region->units;
-
     while (*up) {
       unit *u = *up;
-
       if (u->building == b)
         move_unit(u, r, NULL);
       if (*up == u)
@@ -67,9 +63,7 @@ static int gate_handle(trigger * t, void *data)
 static void gate_write(const trigger * t, struct storage *store)
 {
   gate_data *gd = (gate_data *) t->data.v;
-
   building *b = gd->gate;
-
   region *r = gd->target;
 
   write_building_reference(b, store);
@@ -103,7 +97,6 @@ static void gate_done(trigger * t)
   free(t->data.v);
 }
 
-
 struct trigger_type tt_gate = {
   "gate",
   gate_init,
@@ -116,9 +109,7 @@ struct trigger_type tt_gate = {
 trigger *trigger_gate(building * b, region * target)
 {
   trigger *t = t_new(&tt_gate);
-
   gate_data *td = (gate_data *) t->data.v;
-
   td->gate = b;
   td->target = target;
   return t;

@@ -33,7 +33,6 @@
 # define ORD_LOCALE(ord) locale_array[(ord)->data->_lindex]->lang
 # define ORD_STRING(ord) (ord)->data->_str
 
-
 typedef struct locale_data {
   struct order_data *short_orders[MAXKEYWORDS];
   struct order_data *study_orders[MAXSKILLS];
@@ -41,7 +40,6 @@ typedef struct locale_data {
 } locale_data;
 
 static struct locale_data *locale_array[16];
-
 static int nlocales = 0;
 
 typedef struct order_data {
@@ -66,10 +64,8 @@ void replace_order(order ** dlist, order * orig, const order * src)
 {
   while (*dlist != NULL) {
     order *dst = *dlist;
-
     if (dst->data == orig->data) {
       order *cpy = copy_order(src);
-
       *dlist = cpy;
       cpy->next = dst->next;
       dst->next = 0;
@@ -94,11 +90,8 @@ keyword_t get_keyword(const order * ord)
 static char *get_command(const order * ord, char *sbuffer, size_t size)
 {
   char *bufp = sbuffer;
-
   const char *text = ORD_STRING(ord);
-
   keyword_t kwd = ORD_KEYWORD(ord);
-
   int bytes;
 
   if (ord->_persistent) {
@@ -111,7 +104,6 @@ static char *get_command(const order * ord, char *sbuffer, size_t size)
   }
   if (kwd != NOKEYWORD) {
     const struct locale *lang = ORD_LOCALE(ord);
-
     if (size > 0) {
       if (text)
         --size;
@@ -146,7 +138,6 @@ static char *get_command(const order * ord, char *sbuffer, size_t size)
 char *getcommand(const order * ord)
 {
   char sbuffer[DISPLAYSIZE * 2];
-
   return strdup(get_command(ord, sbuffer, sizeof(sbuffer)));
 }
 
@@ -164,7 +155,6 @@ order *copy_order(const order * src)
 {
   if (src != NULL) {
     order *ord = (order *) malloc(sizeof(order));
-
     ord->next = NULL;
     ord->_persistent = src->_persistent;
     ord->data = src->data;
@@ -186,7 +176,6 @@ void free_orders(order ** olist)
 {
   while (*olist) {
     order *ord = *olist;
-
     *olist = ord->next;
     ord->next = NULL;
     free_order(ord);
@@ -196,9 +185,7 @@ void free_orders(order ** olist)
 static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 {
   const char *s = sptr;
-
   order_data *data;
-
   const struct locale *lang = locale_array[lindex]->lang;
 
   if (kwd != NOKEYWORD)
@@ -207,7 +194,6 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
   /* learning, only one order_data per skill required */
   if (kwd == K_STUDY) {
     skill_t sk = findskill(parse_token(&sptr), lang);
-
     switch (sk) {
       case NOSKILL:            /* fehler */
         break;
@@ -218,14 +204,12 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
         data = locale_array[lindex]->study_orders[sk];
         if (data == NULL) {
           const char *skname = skillname(sk, lang);
-
           data = (order_data *) malloc(sizeof(order_data));
           locale_array[lindex]->study_orders[sk] = data;
           data->_keyword = kwd;
           data->_lindex = lindex;
           if (strchr(skname, ' ') != NULL) {
             size_t len = strlen(skname);
-
             data->_str = malloc(len + 3);
             data->_str[0] = '\"';
             memcpy(data->_str + 1, skname, len);
@@ -267,7 +251,6 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
   const struct locale *lang)
 {
   order *ord = NULL;
-
   int lindex;
 
   /* if this is just nonsense, then we skip it. */
@@ -308,42 +291,33 @@ order *create_order(keyword_t kwd, const struct locale * lang,
   const char *params, ...)
 {
   char zBuffer[DISPLAYSIZE];
-
   if (params) {
     char *bufp = zBuffer;
-
     int bytes;
-
     size_t size = sizeof(zBuffer) - 1;
-
     va_list marker;
 
     va_start(marker, params);
     while (*params) {
       if (*params == '%') {
         int i;
-
         const char *s;
-
         ++params;
         switch (*params) {
           case 's':
             s = va_arg(marker, const char *);
-
             bytes = (int)strlcpy(bufp, s, size);
             if (wrptr(&bufp, &size, bytes) != 0)
               WARN_STATIC_BUFFER();
             break;
           case 'd':
             i = va_arg(marker, int);
-
             bytes = (int)strlcpy(bufp, itoa10(i), size);
             if (wrptr(&bufp, &size, bytes) != 0)
               WARN_STATIC_BUFFER();
             break;
           case 'i':
             i = va_arg(marker, int);
-
             bytes = (int)strlcpy(bufp, itoa36(i), size);
             if (wrptr(&bufp, &size, bytes) != 0)
               WARN_STATIC_BUFFER();
@@ -371,9 +345,7 @@ order *parse_order(const char *s, const struct locale * lang)
     ++s;
   if (*s != 0) {
     keyword_t kwd;
-
     const char *sptr;
-
     int persistent = 0;
 
     while (*s == '@') {
@@ -403,9 +375,7 @@ order *parse_order(const char *s, const struct locale * lang)
 boolean is_repeated(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
-
   const struct locale *lang = ORD_LOCALE(ord);
-
   param_t param;
 
   switch (kwd) {
@@ -473,9 +443,7 @@ boolean is_repeated(const order * ord)
 boolean is_exclusive(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
-
   const struct locale *lang = ORD_LOCALE(ord);
-
   param_t param;
 
   switch (kwd) {
@@ -543,9 +511,7 @@ boolean is_exclusive(const order * ord)
 boolean is_long(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
-
   const struct locale *lang = ORD_LOCALE(ord);
-
   param_t param;
 
   switch (kwd) {
@@ -616,9 +582,7 @@ boolean is_long(const order * ord)
 boolean is_persistent(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
-
   boolean persist = ord->_persistent != 0;
-
   switch (kwd) {
     case K_MOVE:
     case K_WEREWOLF:
@@ -640,10 +604,8 @@ char *write_order(const order * ord, char *buffer, size_t size)
     buffer[0] = 0;
   } else {
     keyword_t kwd = ORD_KEYWORD(ord);
-
     if (kwd == NOKEYWORD) {
       const char *text = ORD_STRING(ord);
-
       strlcpy(buffer, (const char *)text, size);
     } else {
       get_command(ord, buffer, size);

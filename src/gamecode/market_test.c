@@ -6,31 +6,19 @@
 static void market_curse(CuTest * tc)
 {
   region *r;
-
   building *b;
-
   unit *u;
-
   faction *f;
-
   int x, y;
   const char *names[4] = { "herb", "herbs", "balm", "balms" };
   terrain_type *terrain;
-
   resource_type *hres = new_resourcetype(names, 0, RTF_ITEM | RTF_POOLED);
-
   item_type *htype = new_itemtype(hres, ITF_HERB, 0, 0);
-
   resource_type *lres = new_resourcetype(names + 2, 0, RTF_ITEM | RTF_POOLED);
-
   item_type *ltype = new_itemtype(lres, ITF_NONE, 0, 0);
-
   luxury_type *lux = new_luxurytype(ltype, 0);
-
   building_type *btype;
-
   race *rc = rc_add(rc_new("human"));
-
   struct locale *lang = make_locale("en");
 
   free_gamedata();
@@ -74,7 +62,6 @@ static void market_curse(CuTest * tc)
 CuSuite *get_market_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
-
   SUITE_ADD_TEST(suite, market_curse);
   return suite;
 }

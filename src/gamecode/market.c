@@ -33,11 +33,8 @@ without prior permission by the authors of Eressea.
 static unsigned int get_markets(region * r, unit ** results, size_t size)
 {
   unsigned int n = 0;
-
   building *b;
-
   static building_type *btype;
-
   if (!btype)
     btype = bt_find("market");
   if (!btype)
@@ -46,9 +43,7 @@ static unsigned int get_markets(region * r, unit ** results, size_t size)
     if (b->type == btype && (b->flags & BLD_WORKING)
       && b->size >= b->type->maxsize) {
       unit *u = building_owner(b);
-
       unsigned int i;
-
       for (i = 0; u && i != n; ++i) {
         /* only one market per faction */
         if (results[i]->faction == u->faction)
@@ -62,11 +57,9 @@ static unsigned int get_markets(region * r, unit ** results, size_t size)
   return n;
 }
 
-
 static void free_market(attrib * a)
 {
   item *items = (item *) a->data.v;
-
   i_freeall(&items);
   a->data.v = 0;
 }
@@ -99,34 +92,24 @@ static int rc_herb_trade(const struct race *rc)
 void do_markets(void)
 {
   quicklist *traders = 0;
-
   unit *markets[MAX_MARKETS];
-
   region *r;
-
   for (r = regions; r; r = r->next) {
     if (r->land) {
       faction *f = region_get_owner(r);
-
       const struct race *rc = f ? f->race : NULL;
-
       int p = rpeasants(r);
-
       int numlux = rc_luxury_trade(rc), numherbs = rc_herb_trade(rc);
-
       numlux = (p + numlux - MIN_PEASANTS) / numlux;
       numherbs = (p + numherbs - MIN_PEASANTS) / numherbs;
       if (numlux > 0 || numherbs > 0) {
         int d, nmarkets = 0;
-
         const item_type *lux = r_luxury(r);
-
         const item_type *herb = r->land->herbtype;
 
         nmarkets += get_markets(r, markets + nmarkets, MAX_MARKETS - nmarkets);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
           region *r2 = rconnect(r, d);
-
           if (r2 && r2->buildings) {
             nmarkets +=
               get_markets(r2, markets + nmarkets, MAX_MARKETS - nmarkets);
@@ -135,13 +118,9 @@ void do_markets(void)
         if (nmarkets) {
           while (lux && numlux--) {
             int n = rng_int() % nmarkets;
-
             unit *u = markets[n];
-
             item *items;
-
             attrib *a = a_find(u->attribs, &at_market);
-
             if (a == NULL) {
               a = a_add(&u->attribs, a_new(&at_market));
               ql_push(&traders, u);
@@ -153,13 +132,9 @@ void do_markets(void)
           }
           while (herb && numherbs--) {
             int n = rng_int() % nmarkets;
-
             unit *u = markets[n];
-
             item *items;
-
             attrib *a = a_find(u->attribs, &at_market);
-
             if (a == NULL) {
               a = a_add(&u->attribs, a_new(&at_market));
               ql_push(&traders, u);
@@ -176,20 +151,15 @@ void do_markets(void)
 
   if (traders) {
     quicklist *qliter = traders;
-
     int qli = 0;
-
     for (qli = 0; qliter; ql_advance(&qliter, &qli, 1)) {
       unit *u = (unit *) ql_get(qliter, qli);
-
       attrib *a = a_find(u->attribs, &at_market);
-
       item *items = (item *) a->data.v;
 
       a->data.v = NULL;
       while (items) {
         item *itm = items;
-
         items = itm->next;
 
         if (itm->number) {

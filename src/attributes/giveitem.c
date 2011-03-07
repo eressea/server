@@ -46,9 +46,7 @@ static void
 a_writegive(const attrib * a, const void *owner, struct storage *store)
 {
   give_data *gdata = (give_data *) a->data.v;
-
   item *itm;
-
   write_building_reference(gdata->building, store);
   for (itm = gdata->items; itm; itm = itm->next) {
     store->w_tok(store, resourcename(itm->type->rtype, 0));
@@ -60,9 +58,7 @@ a_writegive(const attrib * a, const void *owner, struct storage *store)
 static int a_readgive(attrib * a, void *owner, struct storage *store)
 {
   give_data *gdata = (give_data *) a->data.v;
-
   variant var;
-
   char zText[32];
 
   var.i = store->r_id(store);
@@ -76,7 +72,6 @@ static int a_readgive(attrib * a, void *owner, struct storage *store)
   }
   for (;;) {
     int i;
-
     store->r_tok_buf(store, zText, sizeof(zText));
     if (!strcmp("end", zText))
       break;
@@ -100,11 +95,8 @@ static void a_finalizegive(struct attrib *a)
 static int a_giveitem(attrib * a)
 {
   give_data *gdata = (give_data *) a->data.v;
-
   region *r;
-
   unit *u;
-
   if (gdata->building == NULL || gdata->items == NULL)
     return 0;
   r = gdata->building->region;
@@ -113,7 +105,6 @@ static int a_giveitem(attrib * a)
     return 1;
   while (gdata->items) {
     item *itm = gdata->items;
-
     i_change(&u->items, itm->type, itm->number);
     i_free(i_remove(&gdata->items, itm));
   }
@@ -130,9 +121,7 @@ attrib_type at_giveitem = {
 attrib *make_giveitem(struct building * b, struct item * ip)
 {
   attrib *a = a_new(&at_giveitem);
-
   give_data *gd = (give_data *) a->data.v;
-
   gd->building = b;
   gd->items = ip;
   return a;

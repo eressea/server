@@ -22,17 +22,13 @@ static parser_state *state;
 static int eatwhitespace_c(const char **str_p)
 {
   int ret = 0;
-
   ucs4_t ucs;
-
   size_t len;
-
   const char *str = *str_p;
 
   /* skip over potential whitespace */
   for (;;) {
     unsigned char utf8_character = (unsigned char)*str;
-
     if (~utf8_character & 0x80) {
       if (!iswxspace(utf8_character))
         break;
@@ -65,7 +61,6 @@ void init_tokens_str(const char *initstr, char *cmd)
 void parser_pushstate(void)
 {
   parser_state *new_state = malloc(sizeof(parser_state));
-
   new_state->current_cmd = NULL;
   new_state->current_token = NULL;
   new_state->next = state;
@@ -75,7 +70,6 @@ void parser_pushstate(void)
 void parser_popstate(void)
 {
   parser_state *new_state = state->next;
-
   if (state->current_cmd != NULL)
     free(state->current_cmd);
   free(state);
@@ -91,22 +85,18 @@ boolean parser_end(void)
 void skip_token(void)
 {
   char quotechar = 0;
-
   eatwhitespace_c(&state->current_token);
 
   while (*state->current_token) {
     ucs4_t ucs;
-
     size_t len;
 
     unsigned char utf8_character = (unsigned char)state->current_token[0];
-
     if (~utf8_character & 0x80) {
       ucs = utf8_character;
       ++state->current_token;
     } else {
       int ret = unicode_utf8_to_ucs4(&ucs, state->current_token, &len);
-
       if (ret == 0) {
         state->current_token += len;
       } else {
@@ -135,13 +125,9 @@ void skip_token(void)
 const char *parse_token(const char **str)
 {
   static char lbuf[MAXTOKENSIZE];       /* STATIC_RESULT: used for return, not across calls */
-
   char *cursor = lbuf;
-
   char quotechar = 0;
-
   boolean escape = false;
-
   const char *ctoken = *str;
 
   assert(ctoken);
@@ -149,19 +135,15 @@ const char *parse_token(const char **str)
   eatwhitespace_c(&ctoken);
   while (*ctoken && cursor - lbuf < MAXTOKENSIZE - 1) {
     ucs4_t ucs;
-
     size_t len;
-
     boolean copy = false;
 
     unsigned char utf8_character = *(unsigned char *)ctoken;
-
     if (~utf8_character & 0x80) {
       ucs = utf8_character;
       len = 1;
     } else {
       int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
-
       if (ret != 0) {
         log_warning(("illegal character sequence in UTF8 string: %s\n",
             ctoken));

@@ -68,7 +68,6 @@ void free_faction(faction * f)
     free_messagelist(f->msgs);
   while (f->battles) {
     struct bmsg *bm = f->battles;
-
     f->battles = bm->next;
     if (bm->msgs)
       free_messagelist(bm->msgs);
@@ -77,7 +76,6 @@ void free_faction(faction * f)
 
   while (f->groups) {
     group *g = f->groups;
-
     f->groups = g->next;
     free_group(g);
   }
@@ -101,7 +99,6 @@ void free_faction(faction * f)
 faction *get_monsters(void)
 {
   static faction *monsters;
-
   static int gamecookie = -1;
 
   if (gamecookie != global.cookie) {
@@ -111,7 +108,6 @@ faction *get_monsters(void)
 
   if (!monsters) {
     faction *f;
-
     for (f = factions; f; f = f->next) {
       if (f->flags & FFL_NPC) {
         return monsters = f;
@@ -131,7 +127,6 @@ faction *get_monsters(void)
 const unit *random_unit_in_faction(const faction * f)
 {
   unit *u;
-
   int c = 0, u_nr;
 
   for (u = f->units; u; u = u->next)
@@ -151,9 +146,7 @@ const unit *random_unit_in_faction(const faction * f)
 const char *factionname(const faction * f)
 {
   typedef char name[OBJECTIDSIZE + 1];
-
   static name idbuf[8];
-
   static int nextbuf = 0;
 
   char *ibuf = idbuf[(++nextbuf) % 8];
@@ -170,9 +163,7 @@ const char *factionname(const faction * f)
 int resolve_faction(variant id, void *address)
 {
   int result = 0;
-
   faction *f = NULL;
-
   if (id.i != 0) {
     f = findfaction(id.i);
     if (f == NULL) {
@@ -202,7 +193,6 @@ faction *addfaction(const char *email, const char *password,
   const struct race * frace, const struct locale * loc, int subscription)
 {
   faction *f = calloc(sizeof(faction), 1);
-
   char buf[128];
 
   assert(frace);
@@ -231,7 +221,6 @@ faction *addfaction(const char *email, const char *password,
   f->no = unused_faction_id();
   if (rule_region_owners()) {
     alliance *al = makealliance(f->no, NULL);
-
     setalliance(f, al);
   }
   addlist(&factions, f);
@@ -246,7 +235,6 @@ faction *addfaction(const char *email, const char *password,
 unit *addplayer(region * r, faction * f)
 {
   unit *u;
-
   char buffer[32];
 
   assert(f->units == NULL);
@@ -260,7 +248,6 @@ unit *addplayer(region * r, faction * f)
   fset(u, UFL_ISNEW);
   if (f->race == new_race[RC_DAEMON]) {
     race_t urc;
-
     do {
       urc = (race_t) (rng_int() % MAXRACES);
     } while (new_race[urc] == NULL || urc == RC_DAEMON
@@ -280,11 +267,9 @@ boolean checkpasswd(const faction * f, const char *passwd, boolean shortp)
   return false;
 }
 
-
 variant read_faction_reference(struct storage * store)
 {
   variant id;
-
   id.i = store->r_id(store);
   return id;
 }
@@ -297,7 +282,6 @@ void write_faction_reference(const faction * f, struct storage *store)
 void destroyfaction(faction * f)
 {
   unit *u = f->units;
-
   faction *ff;
 
   if (!f->alive)
@@ -309,7 +293,6 @@ void destroyfaction(faction * f)
 
   while (f->battles) {
     struct bmsg *bm = f->battles;
-
     f->battles = bm->next;
     if (bm->msgs)
       free_messagelist(bm->msgs);
@@ -319,10 +302,8 @@ void destroyfaction(faction * f)
   while (u) {
     /* give away your stuff, make zombies if you cannot (quest items) */
     int result = gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS);
-
     if (result != 0) {
       unit *zombie = u;
-
       u = u->nextF;
       make_zombie(zombie);
     } else {
@@ -330,14 +311,11 @@ void destroyfaction(faction * f)
 
       if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
         const race *rc = u->race;
-
         int m = rmoney(r);
 
         if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
           int p = rpeasants(u->region);
-
           int h = rhorses(u->region);
-
           item *itm;
 
           /* Personen gehen nur an die Bauern, wenn sie auch von dort
@@ -367,7 +345,6 @@ void destroyfaction(faction * f)
   handle_event(f->attribs, "destroy", f);
   for (ff = factions; ff; ff = ff->next) {
     group *g;
-
     ally *sf, *sfn;
 
     /* Alle HELFE für die Partei löschen */
@@ -393,11 +370,9 @@ void destroyfaction(faction * f)
    * have their disguise replaced by ordinary faction hiding. */
   if (rule_stealth_faction()) {
     region *rc;
-
     for (rc = regions; rc; rc = rc->next) {
       for (u = rc->units; u; u = u->next) {
         attrib *a = a_find(u->attribs, &at_otherfaction);
-
         if (!a)
           continue;
         if (get_otherfaction(a) == f) {
@@ -412,7 +387,6 @@ void destroyfaction(faction * f)
 int get_alliance(const faction * a, const faction * b)
 {
   const ally *sf = a->allies;
-
   for (; sf != NULL; sf = sf->next) {
     if (sf->faction == b) {
       return sf->status;
@@ -424,18 +398,15 @@ int get_alliance(const faction * a, const faction * b)
 void set_alliance(faction * a, faction * b, int status)
 {
   ally **sfp;
-
   sfp = &a->allies;
   while (*sfp) {
     ally *sf = *sfp;
-
     if (sf->faction == b)
       break;
     sfp = &sf->next;
   }
   if (*sfp == NULL) {
     ally *sf = *sfp = malloc(sizeof(ally));
-
     sf->next = NULL;
     sf->status = status;
     sf->faction = b;
@@ -521,7 +492,6 @@ boolean valid_race(const struct faction *f, const struct race *rc)
     return true;
   else {
     const char *str = get_param(f->race->parameters, "other_race");
-
     if (str)
       return (boolean) (rc_find(str) == rc);
     return false;

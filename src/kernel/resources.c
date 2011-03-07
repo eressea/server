@@ -30,10 +30,8 @@
 static double ResourceFactor(void)
 {
   static double value = -1.0;
-
   if (value < 0) {
     const char *str = get_param(global.parameters, "resource.factor");
-
     value = str ? atof(str) : 1.0;
   }
   return value;
@@ -42,7 +40,6 @@ static double ResourceFactor(void)
 void update_resources(region * r)
 {
   struct rawmaterial *res = r->resources;
-
   while (res) {
     if (res->type->update)
       res->type->update(res, r);
@@ -55,7 +52,6 @@ extern int dice_rand(const char *s);
 static void update_resource(struct rawmaterial *res, double modifier)
 {
   double amount = 1 + (res->level - res->startlevel) * res->divisor / 100.0;
-
   amount = ResourceFactor() * res->base * amount * modifier;
   if (amount < 1.0)
     res->amount = 1;
@@ -85,16 +81,13 @@ add_resource(region * r, int level, int base, int divisor,
 void terraform_resources(region * r)
 {
   int i;
-
   const terrain_type *terrain = r->terrain;
 
   if (terrain->production == NULL)
     return;
   for (i = 0; terrain->production[i].type; ++i) {
     rawmaterial *rm;
-
     const terrain_production *production = terrain->production + i;
-
     const resource_type *rtype = production->type;
 
     for (rm = r->resources; rm; rm = rm->next) {
@@ -128,7 +121,6 @@ static void terraform_default(struct rawmaterial *res, const region * r)
 static void resource_random_change(int *pvalue, boolean used)
 {
   int split = 5;
-
   int rnd = rng_int() % 100;
 
   if (pvalue == 0 || rnd % 10 >= 10)
@@ -154,7 +146,6 @@ static int visible_default(const rawmaterial * res, int skilllevel)
  * plus current level of difficulty */
 {
   const struct item_type *itype = res->type->rtype->itype;
-
   if (res->level <= 1
     && res->level + itype->construction->minskill <= skilllevel + 1) {
     assert(res->amount > 0);
@@ -189,7 +180,6 @@ static void use_default(rawmaterial * res, const region * r, int amount)
 struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
 {
   struct rawmaterial *rm = r->resources;
-
   while (rm && rm->type->rtype != rtype)
     rm = rm->next;
   return rm;
@@ -200,7 +190,6 @@ struct rawmaterial_type *rawmaterialtypes = 0;
 struct rawmaterial_type *rmt_find(const char *str)
 {
   rawmaterial_type *rmt = rawmaterialtypes;
-
   while (rmt && strcmp(rmt->name, str) != 0)
     rmt = rmt->next;
   return rmt;
@@ -209,7 +198,6 @@ struct rawmaterial_type *rmt_find(const char *str)
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 {
   rawmaterial_type *rmt = rawmaterialtypes;
-
   while (rmt && rmt->rtype != rtype)
     rmt = rmt->next;
   return rmt;
@@ -219,7 +207,6 @@ struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
   const char *name)
 {
   rawmaterial_type *rmtype = malloc(sizeof(rawmaterial_type));
-
   rmtype->name = strdup(name);
   rmtype->rtype = rtype;
   rmtype->terraform = terraform_default;

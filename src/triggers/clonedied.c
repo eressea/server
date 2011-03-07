@@ -49,10 +49,8 @@ static int clonedied_handle(trigger * t, void *data)
 {
   /* destroy the unit */
   unit *u = (unit *) t->data.v;
-
   if (u) {
     attrib *a = a_find(u->attribs, &at_clone);
-
     if (a)
       a_remove(&u->attribs, a);
   } else
@@ -64,7 +62,6 @@ static int clonedied_handle(trigger * t, void *data)
 static void clonedied_write(const trigger * t, struct storage *store)
 {
   unit *u = (unit *) t->data.v;
-
   write_unit_reference(u, store);
 }
 
@@ -90,7 +87,6 @@ trigger_type tt_clonedied = {
 trigger *trigger_clonedied(unit * u)
 {
   trigger *t = t_new(&tt_clonedied);
-
   t->data.v = (void *)u;
   return t;
 }

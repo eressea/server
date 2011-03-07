@@ -29,7 +29,6 @@
 #include <assert.h>
 
 resource_type *rt_seed = 0;
-
 resource_type *rt_mallornseed = 0;
 
 static void produce_seeds(region * r, const resource_type * rtype, int norders)
@@ -49,7 +48,6 @@ static int limit_seeds(const region * r, const resource_type * rtype)
 void init_seed(void)
 {
   attrib *a;
-
   resource_limit *rdata;
 
   rt_seed = rt_find("seed");
@@ -83,7 +81,6 @@ static int limit_mallornseeds(const region * r, const resource_type * rtype)
 void init_mallornseed(void)
 {
   attrib *a;
-
   resource_limit *rdata;
 
   rt_mallornseed = rt_find("mallornseed");

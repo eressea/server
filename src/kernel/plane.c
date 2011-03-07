@@ -58,7 +58,6 @@ plane *get_homeplane(void)
   return getplanebyid(0);
 }
 
-
 plane *getplane(const region * r)
 {
   if (r) {
@@ -105,7 +104,6 @@ int getplaneid(const region * r)
 {
   if (r) {
     plane *pl = getplane(r);
-
     if (pl)
       return pl->id;
 
@@ -123,7 +121,6 @@ static int
 ursprung_x(const faction * f, const plane * pl, const region * rdefault)
 {
   ursprung *ur;
-
   int id = 0;
 
   if (!f)
@@ -147,7 +144,6 @@ static int
 ursprung_y(const faction * f, const plane * pl, const region * rdefault)
 {
   ursprung *ur;
-
   int id = 0;
 
   if (!f)
@@ -188,9 +184,7 @@ adjust_coordinates(const faction * f, int *x, int *y, const plane * pl,
   const region * r)
 {
   int nx = *x;
-
   int ny = *y;
-
   if (f) {
     nx -= ursprung_x(f, pl, r);
     ny -= ursprung_y(f, pl, r);
@@ -202,11 +196,8 @@ adjust_coordinates(const faction * f, int *x, int *y, const plane * pl,
 
   if (pl) {
     int width = plane_width(pl);
-
     int height = plane_height(pl);
-
     int width_2 = width / 2;
-
     int height_2 = height / 2;
 
     if (nx < 0)
@@ -231,7 +222,6 @@ adjust_coordinates(const faction * f, int *x, int *y, const plane * pl,
 void set_ursprung(faction * f, int id, int x, int y)
 {
   ursprung *ur;
-
   assert(f != NULL);
   for (ur = f->ursprung; ur; ur = ur->next) {
     if (ur->id == id) {
@@ -285,13 +275,10 @@ rel_to_abs(const struct plane *pl, const struct faction *f, int rel,
   return (rel + ursprung_y(f, pl, NULL) + plane_center_y(pl));
 }
 
-
 int resolve_plane(variant id, void *addr)
 {
   int result = 0;
-
   plane *pl = NULL;
-
   if (id.i != 0) {
     pl = getplanebyid(id.i);
     if (pl == NULL) {
@@ -310,7 +297,6 @@ void write_plane_reference(const plane * u, struct storage *store)
 int read_plane_reference(plane ** pp, struct storage *store)
 {
   variant id;
-
   id.i = store->r_int(store);
   if (id.i == 0) {
     *pp = NULL;
@@ -325,7 +311,6 @@ int read_plane_reference(plane ** pp, struct storage *store)
 boolean is_watcher(const struct plane * p, const struct faction * f)
 {
   struct watcher *w;
-
   if (!p)
     return false;
   w = p->watchers;

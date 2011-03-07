@@ -33,7 +33,6 @@ attrib_type at_fleechance = {
 attrib *make_fleechance(float fleechance)
 {
   attrib *a = a_new(&at_fleechance);
-
   a->data.flt = fleechance;
   return a;
 }

@@ -39,7 +39,6 @@ attrib_type at_follow = {
 attrib *make_follow(struct unit * u)
 {
   attrib *a = a_new(&at_follow);
-
   a->data.v = u;
   return a;
 }

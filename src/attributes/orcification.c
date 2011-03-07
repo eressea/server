@@ -34,7 +34,6 @@ attrib_type at_orcification = {
 attrib *make_orcification(int orcification)
 {
   attrib *a = a_new(&at_orcification);
-
   a->data.i = orcification;
   return a;
 }

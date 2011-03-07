@@ -67,20 +67,17 @@ attrib_type at_creator = {
 
 #define UMAXHASH MAXUNITS
 static unit *unithash[UMAXHASH];
-
 static unit *delmarker = (unit *) unithash;     /* a funny hack */
 
 #define HASH_STATISTICS 1
 #if HASH_STATISTICS
 static int hash_requests;
-
 static int hash_misses;
 #endif
 
 void uhash(unit * u)
 {
   int key = HASH1(u->no, UMAXHASH), gk = HASH2(u->no, UMAXHASH);
-
   while (unithash[key] != NULL && unithash[key] != delmarker
     && unithash[key] != u) {
     key = (key + gk) % UMAXHASH;
@@ -92,7 +89,6 @@ void uhash(unit * u)
 void uunhash(unit * u)
 {
   int key = HASH1(u->no, UMAXHASH), gk = HASH2(u->no, UMAXHASH);
-
   while (unithash[key] != NULL && unithash[key] != u) {
     key = (key + gk) % UMAXHASH;
   }
@@ -108,7 +104,6 @@ unit *ufindhash(int uid)
 #endif
   if (uid >= 0) {
     int key = HASH1(uid, UMAXHASH), gk = HASH2(uid, UMAXHASH);
-
     while (unithash[key] != NULL && (unithash[key] == delmarker
         || unithash[key]->no != uid)) {
       key = (key + gk) % UMAXHASH;
@@ -133,9 +128,7 @@ static dead *deadhash[DMAXHASH];
 static void dhash(int no, faction * f)
 {
   dead *hash = (dead *) calloc(1, sizeof(dead));
-
   dead *old = deadhash[no % DMAXHASH];
-
   hash->no = no;
   hash->f = f;
   deadhash[no % DMAXHASH] = hash;
@@ -167,19 +160,14 @@ typedef struct buddy {
 static buddy *get_friends(const unit * u, int *numfriends)
 {
   buddy *friends = 0;
-
   faction *f = u->faction;
-
   region *r = u->region;
-
   int number = 0;
-
   unit *u2;
 
   for (u2 = r->units; u2; u2 = u2->next) {
     if (u2->faction != f && u2->number > 0) {
       int allied = 0;
-
       if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
         allied = (f->alliance && f->alliance == u2->faction->alliance);
       } else if (alliedunit(u, u2->faction, HELP_MONEY)
@@ -226,11 +214,8 @@ static buddy *get_friends(const unit * u, int *numfriends)
 int gift_items(unit * u, int flags)
 {
   region *r = u->region;
-
   item **itm_p = &u->items;
-
   int retval = 0;
-
   int rule = rule_give();
 
   assert(u->region);
@@ -252,7 +237,6 @@ int gift_items(unit * u, int flags)
   /* at first, I should try giving my crap to my own units in this region */
   if (u->faction && (u->faction->flags & FFL_QUIT) == 0 && (flags & GIFT_SELF)) {
     unit *u2, *u3 = NULL;
-
     for (u2 = r->units; u2; u2 = u2->next) {
       if (u2 != u && u2->faction == u->faction && u2->number > 0) {
         /* some units won't take stuff: */
@@ -280,23 +264,16 @@ int gift_items(unit * u, int flags)
   /* if I have friends, I'll try to give my stuff to them */
   if (u->faction && (flags & GIFT_FRIENDS)) {
     int number = 0;
-
     buddy *friends = get_friends(u, &number);
 
     while (friends) {
       struct buddy *nf = friends;
-
       unit *u2 = nf->unit;
-
       item *itm = u->items;
-
       while (itm != NULL) {
         const item_type *itype = itm->type;
-
         item *itn = itm->next;
-
         int n = itm->number;
-
         n = n * nf->number / number;
         if (n > 0) {
           i_change(&u->items, itype, -n);
@@ -412,7 +389,6 @@ unit *findnewunit(const region * r, const faction * f, int n)
 
 /* ------------------------------------------------------------- */
 
-
 /*********************/
 /*   at_alias   */
 /*********************/
@@ -428,7 +404,6 @@ attrib_type at_alias = {
 int ualias(const unit * u)
 {
   attrib *a = a_find(u->attribs, &at_alias);
-
   if (!a)
     return 0;
   return a->data.i;
@@ -467,7 +442,6 @@ const char *u_description(const unit * u, const struct locale *lang)
 const char *uprivate(const unit * u)
 {
   attrib *a = a_find(u->attribs, &at_private);
-
   if (!a)
     return NULL;
   return a->data.v;
@@ -505,7 +479,6 @@ attrib_type at_potionuser = {
 void usetpotionuse(unit * u, const potion_type * ptype)
 {
   attrib *a = a_find(u->attribs, &at_potionuser);
-
   if (!a)
     a = a_add(&u->attribs, a_new(&at_potionuser));
   a->data.v = (void *)ptype;
@@ -514,7 +487,6 @@ void usetpotionuse(unit * u, const potion_type * ptype)
 const potion_type *ugetpotionuse(const unit * u)
 {
   attrib *a = a_find(u->attribs, &at_potionuser);
-
   if (!a)
     return NULL;
   return (const potion_type *)a->data.v;
@@ -535,7 +507,6 @@ attrib_type at_target = {
 unit *utarget(const unit * u)
 {
   attrib *a;
-
   if (!fval(u, UFL_TARGET))
     return NULL;
   a = a_find(u->attribs, &at_target);
@@ -546,7 +517,6 @@ unit *utarget(const unit * u)
 void usettarget(unit * u, const unit * t)
 {
   attrib *a = a_find(u->attribs, &at_target);
-
   if (!a && t)
     a = a_add(&u->attribs, a_new(&at_target));
   if (a) {
@@ -567,14 +537,12 @@ void usettarget(unit * u, const unit * t)
 void a_writesiege(const attrib * a, const void *owner, struct storage *store)
 {
   struct building *b = (struct building *)a->data.v;
-
   write_building_reference(b, store);
 }
 
 int a_readsiege(attrib * a, void *owner, struct storage *store)
 {
-  int result =
-    read_reference(&a->data.v, store, read_building_reference,
+  int result = read_reference(&a->data.v, store, read_building_reference,
     resolve_building);
   if (result == 0 && !a->data.v) {
     return AT_READ_FAIL;
@@ -594,7 +562,6 @@ attrib_type at_siege = {
 struct building *usiege(const unit * u)
 {
   attrib *a;
-
   if (!fval(u, UFL_SIEGE))
     return NULL;
   a = a_find(u->attribs, &at_siege);
@@ -605,7 +572,6 @@ struct building *usiege(const unit * u)
 void usetsiege(unit * u, const struct building *t)
 {
   attrib *a = a_find(u->attribs, &at_siege);
-
   if (!a && t)
     a = a_add(&u->attribs, a_new(&at_siege));
   if (a) {
@@ -634,7 +600,6 @@ attrib_type at_contact = {
 void usetcontact(unit * u, const unit * u2)
 {
   attrib *a = a_find(u->attribs, &at_contact);
-
   while (a && a->type == &at_contact && a->data.v != u2)
     a = a->next;
   if (a && a->type == &at_contact)
@@ -646,7 +611,6 @@ boolean ucontact(const unit * u, const unit * u2)
 /* Prüft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
 {
   attrib *ru;
-
   if (u->faction == u2->faction)
     return true;
 
@@ -669,13 +633,11 @@ void free_units(void)
 {
   while (deleted_units) {
     unit *u = deleted_units;
-
     deleted_units = deleted_units->next;
     free_unit(u);
     free(u);
   }
 }
-
 
 void write_unit_reference(const unit * u, struct storage *store)
 {
@@ -685,7 +647,6 @@ void write_unit_reference(const unit * u, struct storage *store)
 int resolve_unit(variant id, void *address)
 {
   unit *u = NULL;
-
   if (id.i != 0) {
     u = findunit(id.i);
     if (u == NULL) {
@@ -700,7 +661,6 @@ int resolve_unit(variant id, void *address)
 variant read_unit_reference(struct storage * store)
 {
   variant var;
-
   var.i = store->r_id(store);
   return var;
 }
@@ -713,7 +673,6 @@ void u_seteffstealth(unit * u, int value)
 {
   if (skill_enabled[SK_STEALTH]) {
     attrib *a = NULL;
-
     if (fval(u, UFL_STEALTH)) {
       a = a_find(u->attribs, &at_stealth);
     }
@@ -737,7 +696,6 @@ int u_geteffstealth(const struct unit *u)
   if (skill_enabled[SK_STEALTH]) {
     if (fval(u, UFL_STEALTH)) {
       attrib *a = a_find(u->attribs, &at_stealth);
-
       if (a != NULL)
         return a->data.i;
     }
@@ -749,7 +707,6 @@ int get_level(const unit * u, skill_t id)
 {
   if (skill_enabled[id]) {
     skill *sv = u->skills;
-
     while (sv != u->skills + u->skill_size) {
       if (sv->id == id) {
         return sv->level;
@@ -795,7 +752,6 @@ static attrib_type at_leftship = {
 static attrib *make_leftship(struct ship *leftship)
 {
   attrib *a = a_new(&at_leftship);
-
   a->data.v = leftship;
   return a;
 }
@@ -821,7 +777,6 @@ ship *leftship(const unit * u)
 void leave_ship(unit * u)
 {
   struct ship *sh = u->ship;
-
   if (sh == NULL)
     return;
   u->ship = NULL;
@@ -829,7 +784,6 @@ void leave_ship(unit * u)
 
   if (fval(u, UFL_OWNER)) {
     unit *u2, *owner = NULL;
-
     freset(u, UFL_OWNER);
 
     for (u2 = u->region->units; u2; u2 = u2->next) {
@@ -849,14 +803,12 @@ void leave_ship(unit * u)
 void leave_building(unit * u)
 {
   struct building *b = u->building;
-
   if (!b)
     return;
   u->building = NULL;
 
   if (fval(u, UFL_OWNER)) {
     unit *u2, *owner = NULL;
-
     freset(u, UFL_OWNER);
 
     for (u2 = u->region->units; u2; u2 = u2->next) {
@@ -932,7 +884,6 @@ boolean can_survive(const unit * u, const region * r)
 void move_unit(unit * u, region * r, unit ** ulist)
 {
   int maxhp = 0;
-
   assert(u && r);
 
   assert(u->faction || !"this unit is dead");
@@ -949,7 +900,6 @@ void move_unit(unit * u, region * r, unit ** ulist)
       /* can_leave must be checked in travel_i */
 #ifndef NDEBUG
       boolean result = leave(u, false);
-
       assert(result);
 #else
       leave(u, false);
@@ -974,9 +924,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 void transfermen(unit * u, unit * u2, int n)
 {
   const attrib *a;
-
   int hp = u->hp;
-
   region *r = u->region;
 
   if (n == 0)
@@ -986,9 +934,7 @@ void transfermen(unit * u, unit * u2, int n)
 
   if (u2) {
     skill *sv, *sn;
-
     skill_t sk;
-
     ship *sh;
 
     assert(u2->number + n > 0);
@@ -1051,7 +997,6 @@ void transfermen(unit * u, unit * u2, int n)
     a = a_find(u->attribs, &at_effect);
     while (a && a->type == &at_effect) {
       effect_data *olde = (effect_data *) a->data.v;
-
       if (olde->value)
         change_effect(u2, olde->type, olde->value);
       a = a->next;
@@ -1060,8 +1005,7 @@ void transfermen(unit * u, unit * u2, int n)
     if (sh != NULL)
       set_leftship(u2, sh);
     u2->flags |=
-      u->
-      flags & (UFL_LONGACTION | UFL_NOTMOVING | UFL_HUNGER | UFL_MOVED |
+      u->flags & (UFL_LONGACTION | UFL_NOTMOVING | UFL_HUNGER | UFL_MOVED |
       UFL_ENTER);
     if (u->attribs) {
       transfer_curse(u, u2, n);
@@ -1076,11 +1020,8 @@ void transfermen(unit * u, unit * u2, int n)
     a = a_find(u2->attribs, &at_effect);
     while (a && a->type == &at_effect) {
       attrib *an = a->next;
-
       effect_data *olde = (effect_data *) a->data.v;
-
       int e = get_effect(u, olde->type);
-
       if (e != 0)
         change_effect(u2, olde->type, -e);
       a = an;
@@ -1088,14 +1029,11 @@ void transfermen(unit * u, unit * u2, int n)
   } else if (r->land) {
     if ((u->race->ec_flags & ECF_REC_ETHEREAL) == 0) {
       const race *rc = u->race;
-
       if (rc->ec_flags & ECF_REC_HORSES) {      /* Zentauren an die Pferde */
         int h = rhorses(r) + n;
-
         rsethorses(r, h);
       } else {
         int p = rpeasants(r);
-
         p += (int)(n * rc->recruit_multi);
         rsetpeasants(r, p);
       }
@@ -1116,9 +1054,7 @@ struct building *inside_building(const struct unit *u)
     return NULL;
   } else {
     int p = 0, cap = buildingcapacity(u->building);
-
     const unit *u2;
-
     for (u2 = u->region->units; u2; u2 = u2->next) {
       if (u2->building == u->building) {
         p += u2->number;
@@ -1203,7 +1139,6 @@ void set_number(unit * u, int count)
 boolean learn_skill(unit * u, skill_t sk, double chance)
 {
   skill *sv = u->skills;
-
   if (chance < 1.0 && rng_int() % 10000 >= chance * 10000)
     return false;
   while (sv != u->skills + u->skill_size) {
@@ -1226,11 +1161,9 @@ boolean learn_skill(unit * u, skill_t sk, double chance)
 void remove_skill(unit * u, skill_t sk)
 {
   skill *sv = u->skills;
-
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->id == sk) {
       skill *sl = u->skills + u->skill_size - 1;
-
       if (sl != sv) {
         *sv = *sl;
       }
@@ -1243,7 +1176,6 @@ void remove_skill(unit * u, skill_t sk)
 skill *add_skill(unit * u, skill_t id)
 {
   skill *sv = u->skills;
-
 #ifndef NDEBUG
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     assert(sv->id != id);
@@ -1262,7 +1194,6 @@ skill *add_skill(unit * u, skill_t id)
 skill *get_skill(const unit * u, skill_t sk)
 {
   skill *sv = u->skills;
-
   while (sv != u->skills + u->skill_size) {
     if (sv->id == sk)
       return sv;
@@ -1274,7 +1205,6 @@ skill *get_skill(const unit * u, skill_t sk)
 boolean has_skill(const unit * u, skill_t sk)
 {
   skill *sv = u->skills;
-
   while (sv != u->skills + u->skill_size) {
     if (sv->id == sk) {
       return (sv->level > 0);
@@ -1313,15 +1243,10 @@ static int item_modification(const unit * u, skill_t sk, int val)
 static int att_modification(const unit * u, skill_t sk)
 {
   double bonus = 0, malus = 0;
-
   attrib *a;
-
   double result = 0;
-
   static boolean init = false;
-
   static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
-
   curse *c;
 
   if (!init) {
@@ -1336,10 +1261,8 @@ static int att_modification(const unit * u, skill_t sk)
     result += curse_geteffect(c);
   if (skillmod_ct) {
     attrib *a = a_find(u->attribs, &at_curse);
-
     while (a && a->type == &at_curse) {
       curse *c = (curse *) a->data.v;
-
       if (c->type == skillmod_ct && c->data.i == sk) {
         result += curse_geteffect(c);
         break;
@@ -1354,12 +1277,9 @@ static int att_modification(const unit * u, skill_t sk)
   a = a_find(u->region->attribs, &at_curse);
   while (a && a->type == &at_curse) {
     curse *c = (curse *) a->data.v;
-
     if (curse_active(c) && c->type == gbdream_ct) {
       double mod = curse_geteffect(c);
-
       unit *mage = c->magician;
-
       /* wir suchen jeweils den größten Bonus und den größten Malus */
       if (mod > bonus) {
         if (mage == NULL || mage->number == 0
@@ -1384,13 +1304,11 @@ get_modifier(const unit * u, skill_t sk, int level, const region * r,
   boolean noitem)
 {
   int bskill = level;
-
   int skill = bskill;
 
   assert(r);
   if (sk == SK_STEALTH) {
     plane *pl = rplane(r);
-
     if (pl && fval(pl, PFL_NOSTEALTH))
       return 0;
   }
@@ -1415,13 +1333,11 @@ int eff_skill(const unit * u, skill_t sk, const region * r)
 {
   if (skill_enabled[sk]) {
     int level = get_level(u, sk);
-
     if (level > 0) {
       int mlevel = level + get_modifier(u, sk, level, r, false);
 
       if (mlevel > 0) {
         int skillcap = SkillCap(sk);
-
         if (skillcap && mlevel > skillcap) {
           return skillcap;
         }
@@ -1435,7 +1351,6 @@ int eff_skill(const unit * u, skill_t sk, const region * r)
 int eff_skill_study(const unit * u, skill_t sk, const region * r)
 {
   int level = get_level(u, sk);
-
   if (level > 0) {
     int mlevel = level + get_modifier(u, sk, level, r, true);
 
@@ -1481,7 +1396,6 @@ void free_unit(unit * u)
     free(u->skills);
   while (u->items) {
     item *it = u->items->next;
-
     u->items->next = NULL;
     i_free(u->items);
     u->items = it;
@@ -1490,7 +1404,6 @@ void free_unit(unit * u)
     a_remove(&u->attribs, u->attribs);
   while (u->reservations) {
     struct reservation *res = u->reservations;
-
     u->reservations = res->next;
     free(res);
   }
@@ -1510,7 +1423,6 @@ void name_unit(unit * u)
 {
   if (u->race->generate_name) {
     const char *gen_name = u->race->generate_name(u);
-
     if (gen_name) {
       unit_setname(u, gen_name);
     } else {
@@ -1518,7 +1430,6 @@ void name_unit(unit * u)
     }
   } else {
     char name[32];
-
     snprintf(name, sizeof(name), "%s %s", LOC(u->faction->locale,
         "unitdefault"), itoa36(u->no));
     unit_setname(u, name);
@@ -1541,7 +1452,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
   if (f->locale) {
     order *deford = default_order(f->locale);
-
     if (deford) {
       set_order(&u->thisorder, NULL);
       addlist(&u->orders, deford);
@@ -1591,10 +1501,8 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     /* Tarnlimit wird vererbt */
     if (fval(creator, UFL_STEALTH)) {
       attrib *a = a_find(creator->attribs, &at_stealth);
-
       if (a) {
         int stealth = a->data.i;
-
         a = a_add(&u->attribs, a_new(&at_stealth));
         a->data.i = stealth;
       }
@@ -1615,7 +1523,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
       a = a_find(creator->attribs, &at_group);
       if (a) {
         group *g = (group *) a->data.v;
-
         set_group(u, g);
       }
     }
@@ -1634,12 +1541,10 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 int maxheroes(const struct faction *f)
 {
   int nsize = count_all(f);
-
   if (nsize == 0)
     return 0;
   else {
     int nmax = (int)(log10(nsize / 50.0) * 20);
-
     return (nmax < 0) ? 0 : nmax;
   }
 }
@@ -1647,7 +1552,6 @@ int maxheroes(const struct faction *f)
 int countheroes(const struct faction *f)
 {
   const unit *u = f->units;
-
   int n = 0;
 
   while (u) {
@@ -1657,7 +1561,6 @@ int countheroes(const struct faction *f)
   }
 #ifdef DEBUG_MAXHEROES
   int m = maxheroes(f);
-
   if (n > m) {
     log_warning(("%s has %d of %d heroes\n", factionname(f), n, m));
   }
@@ -1701,7 +1604,6 @@ int unit_getid(const unit * u)
 void unit_setid(unit * u, int id)
 {
   unit *nu = findunit(id);
-
   if (nu == NULL) {
     uunhash(u);
     u->no = id;
@@ -1742,7 +1644,6 @@ int unit_getcapacity(const unit * u)
 void unit_addorder(unit * u, order * ord)
 {
   order **ordp = &u->orders;
-
   while (*ordp)
     ordp = &(*ordp)->next;
   *ordp = ord;
@@ -1752,11 +1653,8 @@ void unit_addorder(unit * u, order * ord)
 int unit_max_hp(const unit * u)
 {
   static int rules_stamina = -1;
-
   int h;
-
   double p;
-
   static const curse_type *heal_ct = NULL;
 
   if (rules_stamina < 0) {
@@ -1774,7 +1672,6 @@ int unit_max_hp(const unit * u)
   /* der healing curse verändert die maximalen hp */
   if (heal_ct) {
     curse *c = get_curse(u->region->attribs, heal_ct);
-
     if (c) {
       h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
     }
@@ -1786,16 +1683,13 @@ int unit_max_hp(const unit * u)
 void scale_number(unit * u, int n)
 {
   skill_t sk;
-
   const attrib *a;
-
   int remain;
 
   if (n == u->number)
     return;
   if (n && u->number > 0) {
     int full;
-
     remain = ((u->hp % u->number) * (n % u->number)) % u->number;
 
     full = u->hp / u->number;   /* wieviel kriegt jede person mindestens */
@@ -1811,9 +1705,7 @@ void scale_number(unit * u, int n)
     for (a = a_find(u->attribs, &at_effect); a && a->type == &at_effect;
       a = a->next) {
       effect_data *data = (effect_data *) a->data.v;
-
       int snew = data->value / u->number * n;
-
       if (n) {
         remain = data->value - snew / n * u->number;
         snew += remain * n / u->number;

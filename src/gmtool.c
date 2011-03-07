@@ -69,7 +69,6 @@
 #include <locale.h>
 
 static int g_quit;
-
 int force_color = 0;
 
 state *current_state = NULL;
@@ -84,14 +83,11 @@ static WINDOW *hstatus;
 static void init_curses(void)
 {
   short fg, bg;
-
   initscr();
 
   if (has_colors() || force_color) {
     short bcol = COLOR_BLACK;
-
     short hcol = COLOR_MAGENTA;
-
     start_color();
 #ifdef WIN32
     /* looks crap on putty with TERM=linux */
@@ -145,7 +141,6 @@ static window *wnd_first, *wnd_last;
 static window *win_create(WINDOW * hwin)
 {
   window *wnd = calloc(1, sizeof(window));
-
   wnd->handle = hwin;
   if (wnd_first != NULL) {
     wnd->next = wnd_first;
@@ -161,11 +156,8 @@ static window *win_create(WINDOW * hwin)
 static void untag_region(selection * s, int nx, int ny)
 {
   unsigned int key = ((nx << 12) ^ ny);
-
   tag **tp = &s->tags[key & (MAXTHASH - 1)];
-
   tag *t = NULL;
-
   while (*tp) {
     t = *tp;
     if (t->coord.x == nx && t->coord.y == ny)
@@ -182,12 +174,9 @@ static void untag_region(selection * s, int nx, int ny)
 static void tag_region(selection * s, int nx, int ny)
 {
   unsigned int key = ((nx << 12) ^ ny);
-
   tag **tp = &s->tags[key & (MAXTHASH - 1)];
-
   while (*tp) {
     tag *t = *tp;
-
     if (t->coord.x == nx && t->coord.y == ny)
       return;
     tp = &t->nexthash;
@@ -202,12 +191,9 @@ static void tag_region(selection * s, int nx, int ny)
 static int tagged_region(selection * s, int nx, int ny)
 {
   unsigned int key = ((nx << 12) ^ ny);
-
   tag **tp = &s->tags[key & (MAXTHASH - 1)];
-
   while (*tp) {
     tag *t = *tp;
-
     if (t->coord.x == nx && t->coord.y == ny)
       return 1;
     tp = &t->nexthash;
@@ -218,10 +204,8 @@ static int tagged_region(selection * s, int nx, int ny)
 static int mr_tile(const map_region * mr, int highlight)
 {
   int hl = 8 * highlight;
-
   if (mr != NULL && mr->r != NULL) {
     const region *r = mr->r;
-
     switch (r->terrain->_name[0]) {
       case 'o':
         return '.' | COLOR_PAIR(hl + COLOR_CYAN);
@@ -262,29 +246,20 @@ static int mr_tile(const map_region * mr, int highlight)
 static void paint_map(window * wnd, const state * st)
 {
   WINDOW *win = wnd->handle;
-
   int lines = getmaxy(win);
-
   int cols = getmaxx(win);
-
   int vx, vy;
 
   lines = lines / THEIGHT;
   cols = cols / TWIDTH;
   for (vy = 0; vy != lines; ++vy) {
     int yp = (lines - vy - 1) * THEIGHT;
-
     for (vx = 0; vx != cols; ++vx) {
       map_region *mr = mr_get(&st->display, vx, vy);
-
       int attr = 0;
-
       int hl = 0;
-
       int xp = vx * TWIDTH + (vy & 1) * TWIDTH / 2;
-
       int nx, ny;
-
       if (mr) {
         if (st) {
           cnormalize(&mr->coord, &nx, &ny);
@@ -303,7 +278,6 @@ static void paint_map(window * wnd, const state * st)
 map_region *cursor_region(const view * v, const coordinate * c)
 {
   coordinate relpos;
-
   int cx, cy;
 
   if (c) {
@@ -321,15 +295,10 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c,
   int show)
 {
   int lines = getmaxy(win) / THEIGHT;
-
   int xp, yp, nx, ny;
-
   int attr = 0;
-
   map_region *mr = cursor_region(v, c);
-
   coordinate relpos;
-
   int cx, cy;
 
   if (!mr)
@@ -347,7 +316,6 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c,
     attr = A_REVERSE;
   if (mr->r) {
     int hl = 0;
-
     if (mr->r->flags & RF_MAPPER_HIGHLIGHT)
       hl = 1;
     mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
@@ -366,20 +334,13 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c,
   wnoutrefresh(win);
 }
 
-
-
 static void paint_status(window * wnd, const state * st)
 {
   WINDOW *win = wnd->handle;
-
   const char *name = "";
-
   int nx, ny, uid = 0;
-
   const char *terrain = "----";
-
   map_region *mr = cursor_region(&st->display, &st->cursor);
-
   if (mr && mr->r) {
     uid = mr->r->uid;
     if (mr->r->land) {
@@ -403,11 +364,8 @@ static boolean handle_info_region(window * wnd, state * st, int c)
 static void paint_info_region(window * wnd, const state * st)
 {
   WINDOW *win = wnd->handle;
-
   int size = getmaxx(win) - 2;
-
   int line = 0, maxline = getmaxy(win) - 2;
-
   map_region *mr = cursor_region(&st->display, &st->cursor);
 
   unused(st);
@@ -415,7 +373,6 @@ static void paint_info_region(window * wnd, const state * st)
   wxborder(win);
   if (mr && mr->r) {
     const region *r = mr->r;
-
     if (r->land) {
       mvwaddnstr(win, line++, 1, (char *)r->land->name, size);
     } else {
@@ -433,7 +390,6 @@ static void paint_info_region(window * wnd, const state * st)
     line++;
     if (r->ships && (st->info_flags & IFL_SHIPS)) {
       ship *sh;
-
       wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
       mvwaddnstr(win, line++, 1, "* ships:", size - 5);
       wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
@@ -444,7 +400,6 @@ static void paint_info_region(window * wnd, const state * st)
     }
     if (r->units && (st->info_flags & IFL_FACTIONS)) {
       unit *u;
-
       wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
       mvwaddnstr(win, line++, 1, "* factions:", size - 5);
       wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
@@ -461,7 +416,6 @@ static void paint_info_region(window * wnd, const state * st)
     }
     if (r->units && (st->info_flags & IFL_UNITS)) {
       unit *u;
-
       wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
       mvwaddnstr(win, line++, 1, "* units:", size - 5);
       wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
@@ -510,9 +464,7 @@ static void terraform_at(coordinate * c, const terrain_type * terrain)
 {
   if (terrain != NULL) {
     region *r;
-
     int nx = c->x, ny = c->y;
-
     pnormalize(&nx, &ny, c->pl);
     r = findregion(nx, ny);
     if (r == NULL) {
@@ -531,14 +483,10 @@ terraform_selection(selection * selected, const terrain_type * terrain)
     return;
   for (i = 0; i != MAXTHASH; ++i) {
     tag **tp = &selected->tags[i];
-
     while (*tp) {
       region *r;
-
       tag *t = *tp;
-
       int nx = t->coord.x, ny = t->coord.y;
-
       plane *pl = t->coord.pl;
 
       pnormalize(&nx, &ny, pl);
@@ -555,9 +503,7 @@ terraform_selection(selection * selected, const terrain_type * terrain)
 static faction *select_faction(state * st)
 {
   list_selection *prev, *ilist = NULL, **iinsert;
-
   list_selection *selected = NULL;
-
   faction *f = factions;
 
   if (!f)
@@ -567,7 +513,6 @@ static faction *select_faction(state * st)
 
   while (f) {
     char buffer[32];
-
     sprintf(buffer, "%.4s %.26s", itoa36(f->no), f->name);
     insert_selection(iinsert, NULL, buffer, (void *)f);
     f = f->next;
@@ -586,9 +531,7 @@ static const terrain_type *select_terrain(state * st,
   const terrain_type * default_terrain)
 {
   list_selection *prev, *ilist = NULL, **iinsert;
-
   list_selection *selected = NULL;
-
   const terrain_type *terrain = terrains();
 
   if (!terrain)
@@ -653,48 +596,39 @@ enum { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
 static void select_regions(state * st, int selectmode)
 {
   char sbuffer[80];
-
   int findmode;
-
   const char *statustext[] = {
     "mark-", "select-", "unmark-", "deselect-"
   };
   const char *status = statustext[selectmode];
-
   statusline(st->wnd_status->handle, status);
   doupdate();
   findmode = getch();
   if (findmode == 'n') {        /* none */
     int i;
-
     sprintf(sbuffer, "%snone", status);
     statusline(st->wnd_status->handle, sbuffer);
     if (selectmode & MODE_SELECT) {
       for (i = 0; i != MAXTHASH; ++i) {
         tag **tp = &st->selected->tags[i];
-
         while (*tp) {
           tag *t = *tp;
-
           *tp = t->nexthash;
           free(t);
         }
       }
     } else {
       region *r;
-
       for (r = regions; r; r = r->next) {
         r->flags &= ~RF_MAPPER_HIGHLIGHT;
       }
     }
   } else if (findmode == 'm') {
     region *r;
-
     sprintf(sbuffer, "%smonsters", status);
     statusline(st->wnd_status->handle, sbuffer);
     for (r = regions; r; r = r->next) {
       unit *u = r->units;
-
       for (; u; u = u->next) {
         if (fval(u->faction, FFL_NPC) != 0)
           break;
@@ -710,12 +644,10 @@ static void select_regions(state * st, int selectmode)
     }
   } else if (findmode == 'p') {
     region *r;
-
     sprintf(sbuffer, "%splayers", status);
     statusline(st->wnd_status->handle, sbuffer);
     for (r = regions; r; r = r->next) {
       unit *u = r->units;
-
       for (; u; u = u->next) {
         if (fval(u->faction, FFL_NPC) == 0)
           break;
@@ -731,7 +663,6 @@ static void select_regions(state * st, int selectmode)
     }
   } else if (findmode == 'u') {
     region *r;
-
     sprintf(sbuffer, "%sunits", status);
     statusline(st->wnd_status->handle, sbuffer);
     for (r = regions; r; r = r->next) {
@@ -746,7 +677,6 @@ static void select_regions(state * st, int selectmode)
     }
   } else if (findmode == 's') {
     region *r;
-
     sprintf(sbuffer, "%sships", status);
     statusline(st->wnd_status->handle, sbuffer);
     for (r = regions; r; r = r->next) {
@@ -761,7 +691,6 @@ static void select_regions(state * st, int selectmode)
     }
   } else if (findmode == 'f') {
     char fbuffer[12];
-
     sprintf(sbuffer, "%sfaction:", status);
     askstring(st->wnd_status->handle, sbuffer, fbuffer, 12);
     if (fbuffer[0]) {
@@ -774,7 +703,6 @@ static void select_regions(state * st, int selectmode)
         statusline(st->wnd_status->handle, sbuffer);
         for (u = f->units; u; u = u->nextF) {
           region *r = u->region;
-
           if (selectmode & MODE_SELECT) {
             select_coordinate(st->selected, r->x, r->y,
               selectmode == MODE_SELECT);
@@ -790,13 +718,11 @@ static void select_regions(state * st, int selectmode)
     }
   } else if (findmode == 't') {
     const struct terrain_type *terrain;
-
     sprintf(sbuffer, "%sterrain: ", status);
     statusline(st->wnd_status->handle, sbuffer);
     terrain = select_terrain(st, NULL);
     if (terrain != NULL) {
       region *r;
-
       sprintf(sbuffer, "%sterrain: %s", status, terrain->_name);
       statusline(st->wnd_status->handle, sbuffer);
       for (r = regions; r; r = r->next) {
@@ -823,19 +749,12 @@ static void select_regions(state * st, int selectmode)
 static void handlekey(state * st, int c)
 {
   window *wnd;
-
   coordinate *cursor = &st->cursor;
-
   static char locate[80];
-
   static int findmode = 0;
-
   region *r;
-
   char sbuffer[80];
-
   static char kbuffer[80];
-
   int n, nx, ny;
 
   switch (c) {
@@ -917,15 +836,12 @@ static void handlekey(state * st, int c)
     case 0x09:                 /* tab = next selected */
       if (regions != NULL) {
         map_region *mr = cursor_region(&st->display, cursor);
-
         if (mr) {
           region *first = mr->r;
-
           region *cur = (first && first->next) ? first->next : regions;
 
           while (cur != first) {
             coordinate coord;
-
             region2coord(cur, &coord);
             cnormalize(&coord, &nx, &ny);
             if (tagged_region(st->selected, nx, ny)) {
@@ -945,7 +861,6 @@ static void handlekey(state * st, int c)
     case 'p':
       if (planes) {
         plane *pl = planes;
-
         if (cursor->pl) {
           while (pl && pl != cursor->pl) {
             pl = pl->next;
@@ -964,12 +879,9 @@ static void handlekey(state * st, int c)
     case 'a':
       if (regions != NULL) {
         map_region *mr = cursor_region(&st->display, cursor);
-
         if (mr && mr->r) {
           region *cur = mr->r;
-
           plane *pl = rplane(cur);
-
           if (pl == NULL) {
             cur = r_standard_to_astral(cur);
           } else if (is_astral(cur)) {
@@ -1050,7 +962,6 @@ static void handlekey(state * st, int c)
         move(0, 0);
         refresh();
         lua_do((struct lua_State *)global.vm_state);
-
         /* todo: do this from inside the script */
         clear();
         st->wnd_info->update |= 1;
@@ -1120,7 +1031,6 @@ static void handlekey(state * st, int c)
           sizeof(locate));
       } else if (findmode == 'F') {
         faction *f = select_faction(st);
-
         if (f != NULL) {
           strcpy(locate, itoa36(f->no));
           findmode = 'f';
@@ -1138,13 +1048,10 @@ static void handlekey(state * st, int c)
     case 'n':
       if (findmode == 'u') {
         unit *u = findunit(atoi36(locate));
-
         r = u ? u->region : NULL;
       } else if (findmode && regions != NULL) {
         struct faction *f = NULL;
-
         map_region *mr = cursor_region(&st->display, cursor);
-
         region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
         if (findmode == 'f') {
@@ -1163,7 +1070,6 @@ static void handlekey(state * st, int c)
             break;
           } else if (findmode == 'f') {
             unit *u;
-
             for (u = r->units; u; u = u->next) {
               if (u->faction == f) {
                 break;
@@ -1230,11 +1136,9 @@ static void init_view(view * display, WINDOW * win)
 static void update_view(view * vi)
 {
   int i, j;
-
   for (i = 0; i != vi->size.width; ++i) {
     for (j = 0; j != vi->size.height; ++j) {
       map_region *mr = mr_get(vi, i, j);
-
       mr->coord.x = vi->topleft.x + i - j / 2;
       mr->coord.y = vi->topleft.y + j;
       mr->coord.pl = vi->pl;
@@ -1247,7 +1151,6 @@ static void update_view(view * vi)
 state *state_open(void)
 {
   state *st = calloc(sizeof(state), 1);
-
   st->display.pl = get_homeplane();
   st->cursor.pl = get_homeplane();
   st->cursor.x = 0;
@@ -1270,17 +1173,11 @@ void state_close(state * st)
 void run_mapper(void)
 {
   WINDOW *hwinstatus;
-
   WINDOW *hwininfo;
-
   WINDOW *hwinmap;
-
   int width, height, x, y;
-
   int split = 20, old_flags = log_flags;
-
   state *st;
-
   point tl;
 
   log_flags &= ~(LOG_CPERROR | LOG_CPWARNING);
@@ -1317,11 +1214,8 @@ void run_mapper(void)
 
   while (!g_quit) {
     int c;
-
     point p;
-
     window *wnd;
-
     view *vi = &st->display;
 
     getbegyx(hwinmap, x, y);
@@ -1389,17 +1283,13 @@ curses_readline(struct lua_State *L, char *buffer, size_t size,
   return buffer[0] != 0;
 }
 
-
 void seed_players(const char *filename, boolean new_island)
 {
   newfaction *players = read_newfactions(filename);
-
   if (players != NULL) {
     while (players) {
       int n = listlen(players);
-
       int k = (n + ISLANDSIZE - 1) / ISLANDSIZE;
-
       k = n / k;
       n = autoseed(&players, k, new_island ? 0 : TURNS_PER_ISLAND);
       if (n == 0) {
@@ -1412,9 +1302,7 @@ void seed_players(const char *filename, boolean new_island)
 void make_block(int x, int y, int radius, const struct terrain_type *terrain)
 {
   int cx, cy;
-
   region *r;
-
   plane *pl = findplane(x, y);
 
   if (terrain == NULL)
@@ -1423,7 +1311,6 @@ void make_block(int x, int y, int radius, const struct terrain_type *terrain)
   for (cx = x - radius; cx != x + radius; ++cx) {
     for (cy = y - radius; cy != y + radius; ++cy) {
       int nx = cx, ny = cy;
-
       pnormalize(&nx, &ny, pl);
       if (koor_distance(nx, ny, x, y) < radius) {
         if (!findregion(nx, ny)) {

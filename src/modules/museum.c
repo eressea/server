@@ -70,7 +70,6 @@ a_writemuseumgivebackcookie(const attrib * a, const void *owner,
   struct storage *store)
 {
   museumgivebackcookie *gbc = (museumgivebackcookie *) a->data.v;
-
   store->w_int(store, gbc->warden_no);
   store->w_int(store, gbc->cookie);
 }
@@ -79,7 +78,6 @@ static int
 a_readmuseumgivebackcookie(attrib * a, void *owner, struct storage *store)
 {
   museumgivebackcookie *gbc = (museumgivebackcookie *) a->data.v;
-
   gbc->warden_no = store->r_int(store);
   gbc->cookie = store->r_int(store);
   return AT_READ_OK;
@@ -106,7 +104,6 @@ static void a_initmuseumgiveback(attrib * a)
 static void a_finalizemuseumgiveback(attrib * a)
 {
   museumgiveback *gb = (museumgiveback *) a->data.v;
-
   i_freeall(&gb->items);
   free(a->data.v);
 }
@@ -116,7 +113,6 @@ a_writemuseumgiveback(const attrib * a, const void *owner,
   struct storage *store)
 {
   museumgiveback *gb = (museumgiveback *) a->data.v;
-
   store->w_int(store, gb->cookie);
   write_items(store, gb->items);
 }
@@ -124,7 +120,6 @@ a_writemuseumgiveback(const attrib * a, const void *owner,
 static int a_readmuseumgiveback(attrib * a, void *owner, struct storage *store)
 {
   museumgiveback *gb = (museumgiveback *) a->data.v;
-
   gb->cookie = store->r_int(store);
   read_items(store, &gb->items);
   return AT_READ_OK;
@@ -142,11 +137,8 @@ attrib_type at_museumgiveback = {
 void warden_add_give(unit * src, unit * u, const item_type * itype, int n)
 {
   attrib *aw = a_find(u->attribs, &at_warden);
-
   museumgiveback *gb = NULL;
-
   museumgivebackcookie *gbc;
-
   attrib *a;
 
   /* has the giver a cookie corresponding to the warden */
@@ -199,15 +191,10 @@ void create_museum(void)
 {
 #if 0                           /* TODO: move this to LUA. It should be possible. */
   unsigned int museum_id = hashstring("museum");
-
   plane *museum = getplanebyid(museum_id);
-
   region *r;
-
   building *b;
-
   const terrain_type *terrain_hall = get_terrain("hall1");
-
   const terrain_type *terrain_corridor = get_terrain("corridor1");
 
   assert(terrain_corridor && terrain_hall);
@@ -247,7 +234,6 @@ void create_museum(void)
   r = findregion(9526, 9525);
   if (!r->buildings) {
     const building_type *bt_generic = bt_find("generic");
-
     b = new_building(bt_generic, r, NULL);
     set_string(&b->name, "Séparée im dämonischen Stil");
     set_string(&b->display,
@@ -315,11 +301,8 @@ use_museumexitticket(unit * u, const struct item_type *itype, int amount,
   order * ord)
 {
   attrib *a;
-
   region *r;
-
   unit *warden = findunit(atoi36("mwar"));
-
   int unit_cookie;
 
   unused(amount);
@@ -350,7 +333,6 @@ use_museumexitticket(unit * u, const struct item_type *itype, int amount,
     }
     if (a && a->type == &at_museumgiveback) {
       museumgiveback *gb = (museumgiveback *) (a->data.v);
-
       item *it;
 
       for (it = gb->items; it; it = it->next) {
@@ -376,9 +358,7 @@ use_museumticket(unit * u, const struct item_type *itype, int amount,
   order * ord)
 {
   attrib *a;
-
   region *r = u->region;
-
   plane *pl = rplane(r);
 
   unused(amount);

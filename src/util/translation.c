@@ -44,7 +44,6 @@ variant opstack_pop(opstack ** stackp)
 void opstack_push(opstack ** stackp, variant data)
 {
   opstack *stack = *stackp;
-
   if (stack == NULL) {
     stack = (opstack *) malloc(sizeof(opstack));
     stack->size = 1;
@@ -54,7 +53,6 @@ void opstack_push(opstack ** stackp, variant data)
   }
   if (stack->top - stack->begin == stack->size) {
     size_t pos = stack->top - stack->begin;
-
     stack->size += stack->size;
     stack->begin = realloc(stack->begin, sizeof(variant) * stack->size);
     stack->top = stack->begin + pos;
@@ -77,7 +75,6 @@ static struct {
 char *balloc(size_t size)
 {
   static int init = 0;          /* STATIC_XCALL: used across calls */
-
   if (!init) {
     init = 1;
     buffer.current = buffer.begin = malloc(BBUFSIZE);
@@ -105,7 +102,6 @@ void brelease(void)
 {
   buffer.last = buffer.current = buffer.begin;
 }
-
 
 /**
  ** constant values
@@ -138,7 +134,6 @@ static void add_variable(const char *symbol, variant value)
 static variable *find_variable(const char *symbol)
 {
   variable *var = variables;
-
   while (var) {
     if (!strcmp(var->symbol, symbol))
       break;
@@ -163,7 +158,6 @@ static void free_functions(void)
 {
   while (functions) {
     function *fun = functions;
-
     functions = fun->next;
     free(fun);
   }
@@ -183,7 +177,6 @@ void add_function(const char *symbol, evalfun parse)
 static function *find_function(const char *symbol)
 {
   function *fun = functions;
-
   while (fun) {
     if (!strcmp(fun->symbol, symbol))
       break;
@@ -193,7 +186,6 @@ static function *find_function(const char *symbol)
 }
 
 static const char *parse(opstack **, const char *in, const void *);
-
 /* static const char * sample = "\"enno and $bool($if($eq($i,0),\"noone else\",\"$i other people\"))\""; */
 
 static const char *parse_symbol(opstack ** stack, const char *in,
@@ -203,9 +195,7 @@ static const char *parse_symbol(opstack ** stack, const char *in,
  */
 {
   boolean braces = false;
-
   char symbol[32];
-
   char *cp = symbol;            /* current position */
 
   if (*in == '{') {
@@ -219,7 +209,6 @@ static const char *parse_symbol(opstack ** stack, const char *in,
   if (*in == '(') {
     /* it's a function we need to parse, start by reading the parameters */
     function *foo;
-
     while (*in != ')') {
       in = parse(stack, ++in, userdata);        /* will push the result on the stack */
       if (in == NULL)
@@ -234,7 +223,6 @@ static const char *parse_symbol(opstack ** stack, const char *in,
     foo->parse(stack, userdata);        /* will pop parameters from stack (reverse order!) and push the result */
   } else {
     variable *var = find_variable(symbol);
-
     if (braces && *in == '}') {
       ++in;
     }
@@ -253,20 +241,13 @@ static const char *parse_string(opstack ** stack, const char *in,
   const void *userdata)
 {                               /* (char*) -> char* */
   char *c;
-
   char *buffer = balloc(TOKENSIZE);
-
   size_t size = TOKENSIZE - 1;
-
   const char *ic = in;
-
   char *oc = buffer;
-
   /* mode flags */
   boolean f_escape = false;
-
   boolean bDone = false;
-
   variant var;
 
   while (*ic && !bDone) {
@@ -293,7 +274,6 @@ static const char *parse_string(opstack ** stack, const char *in,
       }
     } else {
       int ch = (unsigned char)(*ic);
-
       int bytes;
 
       switch (ch) {
@@ -336,13 +316,9 @@ static const char *parse_string(opstack ** stack, const char *in,
 static const char *parse_int(opstack ** stack, const char *in)
 {
   int k = 0;
-
   int vz = 1;
-
   boolean ok = false;
-
   variant var;
-
   do {
     switch (*in) {
       case '+':
@@ -364,12 +340,10 @@ static const char *parse_int(opstack ** stack, const char *in)
   return in;
 }
 
-
 static const char *parse(opstack ** stack, const char *inn,
   const void *userdata)
 {
   const char *b = inn;
-
   while (*b) {
     switch (*b) {
       case '"':
@@ -393,15 +367,10 @@ const char *translate(const char *format, const void *userdata,
   const char *vars, variant args[])
 {
   int i = 0;
-
   const char *ic = vars;
-
   char symbol[32];
-
   char *oc = symbol;
-
   opstack *stack = NULL;
-
   const char *rv;
 
   brelease();
@@ -413,7 +382,6 @@ const char *translate(const char *format, const void *userdata,
     *oc++ = *ic++;
     if (!isalnum(*ic)) {
       variant x = args[i++];
-
       *oc = '\0';
       oc = symbol;
       add_variable(strcpy(balloc(strlen(symbol) + 1), symbol), x);
@@ -441,11 +409,8 @@ const char *translate(const char *format, const void *userdata,
 static void eval_lt(opstack ** stack, const void *userdata)
 {                               /* (int, int) -> int */
   int a = opop_i(stack);
-
   int b = opop_i(stack);
-
   int rval = (b < a) ? 1 : 0;
-
   opush_i(stack, rval);
   unused(userdata);
 }
@@ -453,11 +418,8 @@ static void eval_lt(opstack ** stack, const void *userdata)
 static void eval_eq(opstack ** stack, const void *userdata)
 {                               /* (int, int) -> int */
   int a = opop_i(stack);
-
   int b = opop_i(stack);
-
   int rval = (a == b) ? 1 : 0;
-
   opush_i(stack, rval);
   unused(userdata);
 }
@@ -465,9 +427,7 @@ static void eval_eq(opstack ** stack, const void *userdata)
 static void eval_add(opstack ** stack, const void *userdata)
 {                               /* (int, int) -> int */
   int a = opop_i(stack);
-
   int b = opop_i(stack);
-
   opush_i(stack, a + b);
   unused(userdata);
 }
@@ -475,7 +435,6 @@ static void eval_add(opstack ** stack, const void *userdata)
 static void eval_isnull(opstack ** stack, const void *userdata)
 {                               /* (int, int) -> int */
   void *a = opop_v(stack);
-
   opush_i(stack, (a == NULL) ? 1 : 0);
   unused(userdata);
 }
@@ -483,11 +442,8 @@ static void eval_isnull(opstack ** stack, const void *userdata)
 static void eval_if(opstack ** stack, const void *userdata)
 {                               /* (int, int) -> int */
   void *a = opop_v(stack);
-
   void *b = opop_v(stack);
-
   int cond = opop_i(stack);
-
   opush_v(stack, cond ? b : a);
   unused(userdata);
 }
@@ -495,7 +451,6 @@ static void eval_if(opstack ** stack, const void *userdata)
 static void eval_strlen(opstack ** stack, const void *userdata)
 {                               /* string -> int */
   const char *c = (const char *)opop_v(stack);
-
   opush_i(stack, c ? (int)strlen(c) : 0);
   unused(userdata);
 }
@@ -504,11 +459,8 @@ static void eval_strlen(opstack ** stack, const void *userdata)
 static void eval_int(opstack ** stack, const void *userdata)
 {
   int i = opop_i(stack);
-
   const char *c = itoa10(i);
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);

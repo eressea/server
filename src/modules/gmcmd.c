@@ -74,7 +74,6 @@ write_permissions(const attrib * a, const void *owner, struct storage *store)
 static int read_permissions(attrib * a, void *owner, struct storage *store)
 {
   attrib *attr = NULL;
-
   a_read(store, &attr, NULL);
   a->data.v = attr;
   return AT_READ_OK;
@@ -100,7 +99,6 @@ static void
 write_gmcreate(const attrib * a, const void *owner, struct storage *store)
 {
   const item_type *itype = (const item_type *)a->data.v;
-
   assert(itype);
   store->w_tok(store, resourcename(itype->rtype, 0));
 }
@@ -108,7 +106,6 @@ write_gmcreate(const attrib * a, const void *owner, struct storage *store)
 static int read_gmcreate(attrib * a, void *owner, struct storage *store)
 {
   char zText[32];
-
   store->r_tok_buf(store, zText, sizeof(zText));
   a->data.v = it_find(zText);
   if (a->data.v == NULL) {
@@ -128,7 +125,6 @@ attrib_type at_gmcreate = {
 attrib *make_atgmcreate(const struct item_type * itype)
 {
   attrib *a = a_new(&at_gmcreate);
-
   a->data.v = (void *)itype;
   return a;
 }
@@ -136,11 +132,8 @@ attrib *make_atgmcreate(const struct item_type * itype)
 static void gm_create(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   int i;
-
   attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
   if (permissions)
     permissions = (attrib *) permissions->data.v;
   if (!permissions)
@@ -149,9 +142,7 @@ static void gm_create(const tnode * tnext, void *data, struct order *ord)
 
   if (i > 0) {
     const char *iname = getstrtoken();
-
     const item_type *itype = finditemtype(iname, u->faction->locale);
-
     if (itype == NULL) {
       mistake(u, ord, "unknown item.");
     } else {
@@ -180,17 +171,11 @@ static boolean has_permission(const attrib * permissions, unsigned int key)
 static void gm_gate(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   const struct plane *pl = rplane(u->region);
-
   int id = getid();
-
   int x = rel_to_abs(pl, u->faction, getint(), 0);
-
   int y = rel_to_abs(pl, u->faction, getint(), 1);
-
   building *b = findbuilding(id);
-
   region *r;
 
   pnormalize(&x, &y, pl);
@@ -201,7 +186,6 @@ static void gm_gate(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (permissions && has_permission(permissions, atoi36("gmgate"))) {
       remove_triggers(&b->attribs, "timer", &tt_gate);
       remove_triggers(&b->attribs, "create", &tt_unguard);
@@ -214,7 +198,6 @@ static void gm_gate(const tnode * tnext, void *data, struct order *ord)
   }
 }
 
-
 /**
  ** GM: TERRAFORM <x> <y> <terrain>
  ** requires: permission-key "gmterf"
@@ -222,21 +205,13 @@ static void gm_gate(const tnode * tnext, void *data, struct order *ord)
 static void gm_terraform(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   const struct plane *p = rplane(u->region);
-
   int x = rel_to_abs(p, u->faction, getint(), 0);
-
   int y = rel_to_abs(p, u->faction, getint(), 1);
-
   const char *c = getstrtoken();
-
   variant token;
-
   tnode *tokens = get_translations(u->faction->locale, UT_TERRAINS);
-
   region *r;
-
   pnormalize(&x, &y, p);
   r = findregion(x, y);
 
@@ -246,14 +221,12 @@ static void gm_terraform(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmterf")))
       return;
   }
 
   if (findtoken(tokens, c, &token) != E_TOK_NOMATCH) {
     const terrain_type *terrain = (const terrain_type *)token.v;
-
     terraform_region(r, terrain);
   }
 }
@@ -265,15 +238,10 @@ static void gm_terraform(const tnode * tnext, void *data, struct order *ord)
 static void gm_teleport(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   const struct plane *p = rplane(u->region);
-
   unit *to = findunit(getid());
-
   int x = rel_to_abs(p, u->faction, getint(), 0);
-
   int y = rel_to_abs(p, u->faction, getint(), 1);
-
   region *r = findregion(x, y);
 
   if (r == NULL || p != rplane(r)) {
@@ -287,7 +255,6 @@ static void gm_teleport(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmtele"))) {
       mistake(u, ord, "permission denied.");
     } else
@@ -302,32 +269,24 @@ static void gm_teleport(const tnode * tnext, void *data, struct order *ord)
 static void gm_messageplane(const tnode * tnext, void *data, struct order *ord)
 {
   unit *gm = (unit *) data;
-
   const struct plane *p = rplane(gm->region);
-
   const char *zmsg = getstrtoken();
-
   if (p == NULL) {
     mistake(gm, ord, "In diese Ebene kann keine Nachricht gesandt werden.");
   } else {
     /* checking permissions */
     attrib *permissions = a_find(gm->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
       mistake(gm, ord, "permission denied.");
     } else {
       message *msg = msg_message("msg_event", "string", zmsg);
-
       faction *f;
-
       region *r;
-
       for (f = factions; f; f = f->next) {
         freset(f, FFL_SELECT);
       }
       for (r = regions; r; r = r->next) {
         unit *u;
-
         if (rplane(r) != p)
           continue;
         for (u = r->units; u; u = u->next)
@@ -346,28 +305,20 @@ static void
 gm_messagefaction(const tnode * tnext, void *data, struct order *ord)
 {
   unit *gm = (unit *) data;
-
   int n = getid();
-
   faction *f = findfaction(n);
-
   const char *msg = getstrtoken();
-
   plane *p = rplane(gm->region);
-
   attrib *permissions = a_find(gm->faction->attribs, &at_permissions);
-
   if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
     mistake(gm, ord, "permission denied.");
     return;
   }
   if (f != NULL) {
     region *r;
-
     for (r = regions; r; r = r->next)
       if (rplane(r) == p) {
         unit *u;
-
         for (u = r->units; u; u = u->next)
           if (u->faction == f) {
             add_message(&f->msgs, msg_message("msg_event", "string", msg));
@@ -385,15 +336,10 @@ gm_messagefaction(const tnode * tnext, void *data, struct order *ord)
 static void gm_messageregion(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   const struct plane *p = rplane(u->region);
-
   int x = rel_to_abs(p, u->faction, getint(), 0);
-
   int y = rel_to_abs(p, u->faction, getint(), 1);
-
   const char *msg = getstrtoken();
-
   region *r = findregion(x, y);
 
   if (r == NULL || p != rplane(r)) {
@@ -401,7 +347,6 @@ static void gm_messageregion(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
       mistake(u, ord, "permission denied.");
     } else {
@@ -417,13 +362,9 @@ static void gm_messageregion(const tnode * tnext, void *data, struct order *ord)
 static void gm_killunit(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   const struct plane *p = rplane(u->region);
-
   unit *target = findunit(getid());
-
   const char *msg = getstrtoken();
-
   region *r = target->region;
 
   if (r == NULL || p != rplane(r)) {
@@ -431,7 +372,6 @@ static void gm_killunit(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
       mistake(u, ord, "permission denied.");
     } else {
@@ -442,7 +382,6 @@ static void gm_killunit(const tnode * tnext, void *data, struct order *ord)
   }
 }
 
-
 /**
  ** GM: KILL FACTION <id> <string>
  ** requires: permission-key "gmmsgr"
@@ -450,28 +389,20 @@ static void gm_killunit(const tnode * tnext, void *data, struct order *ord)
 static void gm_killfaction(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   int n = getid();
-
   faction *f = findfaction(n);
-
   const char *msg = getstrtoken();
-
   plane *p = rplane(u->region);
-
   attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
   if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
     mistake(u, ord, "permission denied.");
     return;
   }
   if (f != NULL) {
     region *r;
-
     for (r = regions; r; r = r->next)
       if (rplane(r) == p) {
         unit *target;
-
         for (target = r->units; target; target = target->next) {
           if (target->faction == f) {
             scale_number(target, 0);
@@ -492,13 +423,9 @@ static void gm_killfaction(const tnode * tnext, void *data, struct order *ord)
 static void gm_messageunit(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   const struct plane *p = rplane(u->region);
-
   unit *target = findunit(getid());
-
   const char *msg = getstrtoken();
-
   region *r;
 
   if (target == NULL) {
@@ -514,7 +441,6 @@ static void gm_messageunit(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmmsgu"))) {
       mistake(u, ord, "permission denied.");
     } else {
@@ -531,11 +457,8 @@ static void gm_messageunit(const tnode * tnext, void *data, struct order *ord)
 static void gm_give(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   unit *to = findunit(getid());
-
   int num = getint();
-
   const item_type *itype = finditemtype(getstrtoken(), u->faction->locale);
 
   if (to == NULL || rplane(to->region) != rplane(u->region)) {
@@ -548,12 +471,10 @@ static void gm_give(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmgive"))) {
       mistake(u, ord, "permission denied.");
     } else {
       int i = i_get(u->items, itype);
-
       if (i < num)
         num = i;
       if (num) {
@@ -571,11 +492,8 @@ static void gm_give(const tnode * tnext, void *data, struct order *ord)
 static void gm_take(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   unit *to = findunit(getid());
-
   int num = getint();
-
   const item_type *itype = finditemtype(getstrtoken(), u->faction->locale);
 
   if (to == NULL || rplane(to->region) != rplane(u->region)) {
@@ -588,12 +506,10 @@ static void gm_take(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmtake"))) {
       mistake(u, ord, "permission denied.");
     } else {
       int i = i_get(to->items, itype);
-
       if (i < num)
         num = i;
       if (num) {
@@ -611,11 +527,8 @@ static void gm_take(const tnode * tnext, void *data, struct order *ord)
 static void gm_skill(const tnode * tnext, void *data, struct order *ord)
 {
   unit *u = (unit *) data;
-
   unit *to = findunit(getid());
-
   skill_t skill = findskill(getstrtoken(), u->faction->locale);
-
   int num = getint();
 
   if (to == NULL || rplane(to->region) != rplane(u->region)) {
@@ -631,7 +544,6 @@ static void gm_skill(const tnode * tnext, void *data, struct order *ord)
   } else {
     /* checking permissions */
     attrib *permissions = a_find(u->faction->attribs, &at_permissions);
-
     if (!permissions || !has_permission(permissions, atoi36("gmskil"))) {
       mistake(u, ord, "permission denied.");
     } else {
@@ -641,11 +553,8 @@ static void gm_skill(const tnode * tnext, void *data, struct order *ord)
 }
 
 static tnode g_keys;
-
 static tnode g_root;
-
 static tnode g_tell;
-
 static tnode g_kill;
 
 void register_gmcmd(void)
@@ -677,17 +586,12 @@ void register_gmcmd(void)
 void gmcommands(void)
 {
   region **rp = &regions;
-
   while (*rp) {
     region *r = *rp;
-
     unit **up = &r->units;
-
     while (*up) {
       unit *u = *up;
-
       struct order *ord;
-
       for (ord = u->orders; ord; ord = ord->next) {
         if (get_keyword(ord) == K_GM) {
           do_command(&g_root, u, ord);
@@ -707,17 +611,11 @@ faction *gm_addquest(const char *email, const char *name, int radius,
   unsigned int flags)
 {
   plane *pl;
-
   watcher *w = calloc(sizeof(watcher), 1);
-
   region *center;
-
   boolean invalid = false;
-
   int minx, miny, maxx, maxy, cx, cy;
-
   int x;
-
   faction *f;
 
   /* GM playfield */
@@ -726,10 +624,8 @@ faction *gm_addquest(const char *email, const char *name, int radius,
     miny = ((rng_int() % (2 * EXTENSION)) - EXTENSION);
     for (x = 0; !invalid && x <= radius * 2; ++x) {
       int y;
-
       for (y = 0; !invalid && y <= radius * 2; ++y) {
         region *r = findregion(minx + x, miny + y);
-
         if (r)
           invalid = true;
       }
@@ -743,10 +639,8 @@ faction *gm_addquest(const char *email, const char *name, int radius,
   center = new_region(cx, cy, pl, 0);
   for (x = 0; x <= 2 * radius; ++x) {
     int y;
-
     for (y = 0; y <= 2 * radius; ++y) {
       region *r = findregion(minx + x, miny + y);
-
       if (!r) {
         r = new_region(minx + x, miny + y, pl, 0);
       }
@@ -774,9 +668,7 @@ faction *gm_addquest(const char *email, const char *name, int radius,
 faction *gm_addfaction(const char *email, plane * p, region * r)
 {
   attrib *a;
-
   unit *u;
-
   faction *f = calloc(1, sizeof(faction));
 
   assert(p != NULL);
@@ -800,9 +692,7 @@ faction *gm_addfaction(const char *email, plane * p, region * r)
     want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN);
   {
     faction *xist;
-
     int id = atoi36("gm00") - 1;
-
     do {
       xist = findfaction(++id);
     } while (xist);
@@ -820,7 +710,6 @@ faction *gm_addfaction(const char *email, plane * p, region * r)
       { "gmterf", "gmtele", "gmgive", "gmskil", "gmtake", "gmmsgr", "gmmsgu",
         "gmgate", 0 };
     const char **key_p = keys;
-
     while (*key_p) {
       add_key(&ap, atoi36(*key_p));
       ++key_p;
@@ -840,13 +729,9 @@ faction *gm_addfaction(const char *email, plane * p, region * r)
 plane *gm_addplane(int radius, unsigned int flags, const char *name)
 {
   region *center;
-
   plane *pl;
-
   boolean invalid = false;
-
   int minx, miny, maxx, maxy, cx, cy;
-
   int x;
 
   /* GM playfield */
@@ -855,10 +740,8 @@ plane *gm_addplane(int radius, unsigned int flags, const char *name)
     miny = (rng_int() % (2 * EXTENSION)) - EXTENSION;
     for (x = 0; !invalid && x <= radius * 2; ++x) {
       int y;
-
       for (y = 0; !invalid && y <= radius * 2; ++y) {
         region *r = findregion(minx + x, miny + y);
-
         if (r)
           invalid = true;
       }
@@ -872,10 +755,8 @@ plane *gm_addplane(int radius, unsigned int flags, const char *name)
   center = new_region(cx, cy, pl, 0);
   for (x = 0; x <= 2 * radius; ++x) {
     int y;
-
     for (y = 0; y <= 2 * radius; ++y) {
       region *r = findregion(minx + x, miny + y);
-
       if (!r)
         r = new_region(minx + x, miny + y, pl, 0);
       freset(r, RF_ENCOUNTER);

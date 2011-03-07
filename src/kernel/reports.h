@@ -100,7 +100,6 @@ extern "C" {
   extern void register_reporttype(const char *extension, report_fun write,
     int flag);
 
-
   extern int bufunit(const struct faction *f, const struct unit *u, int indent,
     int mode, char *buf, size_t size);
 

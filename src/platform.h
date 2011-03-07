@@ -48,7 +48,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #endif /* _MSC_VER_ */
 
-
 #ifdef __cplusplus
 # include <cstdio>
 # include <cstdlib>
@@ -115,7 +114,6 @@ extern "C" {
 # define HAVE_ACCESS
 # define HAVE_STAT
 typedef struct stat stat_type;
-
 # include <string.h>
 # define HAVE_STRDUP
 # define HAVE_SNPRINTF
@@ -141,7 +139,6 @@ typedef struct stat stat_type;
 # define HAVE_ACCESS
 # define HAVE_STAT
 typedef struct stat stat_type;
-
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
 # define HAVE_STRDUP

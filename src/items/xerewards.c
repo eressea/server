@@ -48,13 +48,10 @@ use_skillpotion(struct unit *u, const struct item_type *itype, int amount,
    * from them)
    */
   int n;
-
   for (n = 0; n != amount; ++n) {
     skill *sv = u->skills;
-
     while (sv != u->skills + u->skill_size) {
       int i;
-
       for (i = 0; i != 3; ++i)
         learn_skill(u, sv->id, 1.0);
       ++sv;

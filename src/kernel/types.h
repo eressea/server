@@ -31,75 +31,41 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 
 typedef short terrain_t;
-
 typedef short direction_t;
-
 typedef short race_t;
-
 typedef short magic_t;
-
 typedef short skill_t;
-
 typedef short typ_t;
-
 typedef short item_t;
-
 typedef unsigned int spellid_t;
 
 struct attrib;
-
 struct attrib_type;
-
 struct building;
-
 struct building_type;
-
 struct curse;
-
 struct equipment;
-
 struct faction;
-
 struct fighter;
-
 struct item;
-
 struct item_type;
-
 struct locale;
-
 struct luxury_type;
-
 struct order;
-
 struct plane;
-
 struct potion_type;
-
 struct race;
-
 struct region;
-
 struct region_list;
-
 struct resource_type;
-
 struct ship;
-
 struct ship_type;
-
 struct skill;
-
 struct spell;
-
 struct storage;
-
 struct strlist;
-
 struct terrain_type;
-
 struct unit;
-
 struct weapon_type;
 
 typedef struct ursprung {
@@ -111,7 +77,6 @@ typedef struct ursprung {
 /* ----------------- Befehle ----------------------------------- */
 
 typedef unsigned char keyword_t;
-
 enum {
   K_KOMMENTAR,
   K_BANNER,
@@ -189,7 +154,6 @@ enum {
 /* ------------------ Status von Einheiten --------------------- */
 
 typedef unsigned char status_t;
-
 enum {
   ST_AGGRO,
   ST_FIGHT,
@@ -202,7 +166,6 @@ enum {
 /* ----------------- Parameter --------------------------------- */
 
 typedef unsigned char param_t;
-
 enum {
   P_LOCALE,
   P_ANY,
@@ -430,7 +393,6 @@ enum {
 /* ------------------------------------------------------------- */
 /* Prototypen */
 
-
 #define ALLIED_TAX     1
 #define ALLIED_NOBLOCK 2
 #define ALLIED_HELP    4
@@ -438,6 +400,5 @@ enum {
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)
 #define MAX_CONTAINER_NR (36*36*36*36-1)
-
 
 #endif

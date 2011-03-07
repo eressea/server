@@ -58,18 +58,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /** external variables **/
 race *races;
-
 int num_races = 0;
 
 race_list *get_familiarraces(void)
 {
   static int init = 0;
-
   static race_list *familiarraces;
 
   if (!init) {
     race *rc = races;
-
     for (; rc != NULL; rc = rc->next) {
       if (rc->init_familiar != NULL) {
         racelist_insert(&familiarraces, rc);
@@ -84,7 +81,6 @@ void racelist_clear(struct race_list **rl)
 {
   while (*rl) {
     race_list *rl2 = (*rl)->next;
-
     free(*rl);
     *rl = rl2;
   }
@@ -103,9 +99,7 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 race *rc_new(const char *zName)
 {
   char zBuffer[80];
-
   race *rc = calloc(sizeof(race), 1);
-
   if (strchr(zName, ' ') != NULL) {
     log_error(("race '%s' has an invalid name. remove spaces\n", zName));
     assert(strchr(zName, ' ') == NULL);
@@ -141,9 +135,7 @@ static const char *racealias[][2] = {
 race *rc_find(const char *name)
 {
   const char *rname = name;
-
   race *rc = races;
-
   int i;
 
   for (i = 0; racealias[i][0]; ++i) {
@@ -170,9 +162,7 @@ char **race_prefixes = NULL;
 extern void add_raceprefix(const char *prefix)
 {
   static size_t size = 4;
-
   static unsigned int next = 0;
-
   if (race_prefixes == NULL)
     race_prefixes = malloc(size * sizeof(char *));
   if (next + 1 == size) {
@@ -191,7 +181,6 @@ extern void add_raceprefix(const char *prefix)
 void set_show_item(faction * f, item_t i)
 {
   attrib *a = a_add(&f->attribs, a_new(&at_showitem));
-
   a->data.v = (void *)olditemtype[i];
 }
 
@@ -211,7 +200,6 @@ const char *raceprefix(const unit * u)
 
   if (fval(u, UFL_GROUP)) {
     const attrib *agroup = agroup = a_findc(u->attribs, &at_group);
-
     if (agroup != NULL)
       asource = ((const group *)(agroup->data.v))->attribs;
   }
@@ -224,11 +212,8 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
 
   if (prefix != NULL) {
     static char lbuf[80];
-
     char *bufp = lbuf;
-
     size_t size = sizeof(lbuf) - 1;
-
     int ch, bytes;
 
     bytes = (int)strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
@@ -253,7 +238,6 @@ rc_specialdamage(const race * ar, const race * dr,
   const struct weapon_type *wtype)
 {
   race_t art = old_race(ar);
-
   int m, modifier = 0;
 
   if (wtype != NULL && wtype->modifiers != NULL)
@@ -261,7 +245,6 @@ rc_specialdamage(const race * ar, const race * dr,
       /* weapon damage for this weapon, possibly by race */
       if (wtype->modifiers[m].flags & WMF_DAMAGE) {
         race_list *rlist = wtype->modifiers[m].races;
-
         if (rlist != NULL) {
           while (rlist) {
             if (rlist->data == ar)
@@ -294,9 +277,7 @@ void write_race_reference(const race * rc, struct storage *store)
 variant read_race_reference(struct storage *store)
 {
   variant result;
-
   char zName[20];
-
   store->r_tok_buf(store, zName, sizeof(zName));
 
   if (strcmp(zName, "none") == 0) {

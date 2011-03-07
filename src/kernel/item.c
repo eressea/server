@@ -56,9 +56,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 resource_type *resourcetypes;
-
 luxury_type *luxurytypes;
-
 potion_type *potiontypes;
 
 #define IMAXHASH 127
@@ -102,11 +100,9 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
   int num;
-
   if (rtype == oldresourcetype[R_STONE] && u->race == new_race[RC_STONEGOLEM]
     && delta <= 0) {
     int reduce = delta / GOLEM_STONE;
-
     if (delta % GOLEM_STONE != 0)
       --reduce;
     scale_number(u, u->number + reduce);
@@ -114,16 +110,13 @@ int res_changeitem(unit * u, const resource_type * rtype, int delta)
   } else if (rtype == oldresourcetype[R_IRON]
     && u->race == new_race[RC_IRONGOLEM] && delta <= 0) {
     int reduce = delta / GOLEM_IRON;
-
     if (delta % GOLEM_IRON != 0)
       --reduce;
     scale_number(u, u->number + reduce);
     num = u->number;
   } else {
     const item_type *itype = resource2item(rtype);
-
     item *i;
-
     assert(itype != NULL);
     i = i_change(&u->items, itype, delta);
     if (i == NULL)
@@ -158,7 +151,6 @@ resource_type *new_resourcetype(const char **names, const char **appearances,
 
   if (rtype == NULL) {
     int i;
-
     rtype = calloc(sizeof(resource_type), 1);
 
     for (i = 0; i != 2; ++i) {
@@ -182,11 +174,8 @@ resource_type *new_resourcetype(const char **names, const char **appearances,
 void it_register(item_type * itype)
 {
   int hash = hashstring(itype->rtype->_name[0]);
-
   int key = hash % IMAXHASH;
-
   item_type **p_itype = &itemtypes[key];
-
   while (*p_itype && *p_itype != itype)
     p_itype = &(*p_itype)->next;
   if (*p_itype == NULL) {
@@ -200,7 +189,6 @@ item_type *new_itemtype(resource_type * rtype,
   int iflags, int weight, int capacity)
 {
   item_type *itype;
-
   assert(resource2item(rtype) == NULL);
   assert(rtype->flags & RTF_ITEM);
 
@@ -264,7 +252,6 @@ weapon_type *new_weapontype(item_type * itype,
   return wtype;
 }
 
-
 armor_type *new_armortype(item_type * itype, double penalty, double magres,
   int prot, unsigned int flags)
 {
@@ -305,7 +292,6 @@ potion_type *new_potiontype(item_type * itype, int level)
   return ptype;
 }
 
-
 void rt_register(resource_type * rtype)
 {
   resource_type **prtype = &resourcetypes;
@@ -339,7 +325,6 @@ const luxury_type *resource2luxury(const resource_type * rtype)
 {
 #ifdef AT_LTYPE
   attrib *a = a_find(rtype->attribs, &at_ltype);
-
   if (a)
     return (const luxury_type *)a->data.v;
   return NULL;
@@ -352,7 +337,6 @@ const potion_type *resource2potion(const resource_type * rtype)
 {
 #ifdef AT_PTYPE
   attrib *a = a_find(rtype->attribs, &at_ptype);
-
   if (a)
     return (const potion_type *)a->data.v;
   return NULL;
@@ -364,7 +348,6 @@ const potion_type *resource2potion(const resource_type * rtype)
 resource_type *rt_find(const char *name)
 {
   unsigned int hash = hashstring(name);
-
   resource_type *rtype;
 
   for (rtype = resourcetypes; rtype; rtype = rtype->next) {
@@ -392,7 +375,6 @@ static const char *it_aliases[][2] = {
 static const char *it_alias(const char *zname)
 {
   int i;
-
   for (i = 0; it_aliases[i][0]; ++i) {
     if (strcmp(it_aliases[i][0], zname) == 0)
       return it_aliases[i][1];
@@ -403,11 +385,8 @@ static const char *it_alias(const char *zname)
 item_type *it_find(const char *zname)
 {
   const char *name = it_alias(zname);
-
   unsigned int hash = hashstring(name);
-
   item_type *itype;
-
   unsigned int key = hash % IMAXHASH;
 
   for (itype = itemtypes[key]; itype; itype = itype->next) {
@@ -453,7 +432,6 @@ item *i_add(item ** pi, item * i)
   assert(i && i->type && !i->next);
   while (*pi) {
     int d = strcmp((*pi)->type->rtype->_name[0], i->type->rtype->_name[0]);
-
     if (d >= 0)
       break;
     pi = &(*pi)->next;
@@ -472,13 +450,10 @@ item *i_add(item ** pi, item * i)
 void i_merge(item ** pi, item ** si)
 {
   item *i = *si;
-
   while (i) {
     item *itmp;
-
     while (*pi) {
       int d = strcmp((*pi)->type->rtype->_name[0], i->type->rtype->_name[0]);
-
       if (d >= 0)
         break;
       pi = &(*pi)->next;
@@ -502,14 +477,12 @@ item *i_change(item ** pi, const item_type * itype, int delta)
   assert(itype);
   while (*pi) {
     int d = strcmp((*pi)->type->rtype->_name[0], itype->rtype->_name[0]);
-
     if (d >= 0)
       break;
     pi = &(*pi)->next;
   }
   if (!*pi || (*pi)->type != itype) {
     item *i;
-
     if (delta == 0)
       return NULL;
     i = i_new(itype, delta);
@@ -517,7 +490,6 @@ item *i_change(item ** pi, const item_type * itype, int delta)
     *pi = i;
   } else {
     item *i = *pi;
-
     i->number += delta;
     if (i->number < 0) {
       log_error(("serious accounting error. number of items is %d.\n",
@@ -546,9 +518,7 @@ item *i_remove(item ** pi, item * i)
 }
 
 static item *icache;
-
 static int icache_size;
-
 #define ICACHE_MAX 100
 
 void i_free(item * i)
@@ -573,11 +543,9 @@ void i_freeall(item ** i)
   }
 }
 
-
 item *i_new(const item_type * itype, int size)
 {
   item *i;
-
   if (icache_size > 0) {
     i = icache;
     icache = i->next;
@@ -601,7 +569,6 @@ give_horses(unit * s, unit * d, const item_type * itype, int n,
 {
   if (d == NULL) {
     int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-
     if (use < n)
       use +=
         use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
@@ -618,7 +585,6 @@ give_money(unit * s, unit * d, const item_type * itype, int n,
 {
   if (d == NULL) {
     int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-
     if (use < n)
       use +=
         use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
@@ -643,9 +609,7 @@ give_money(unit * s, unit * d, const item_type * itype, int n,
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
 const item_type *olditemtype[MAXITEMS + 1];
-
 const resource_type *oldresourcetype[MAXRESOURCES + 1];
-
 const potion_type *oldpotiontype[MAXPOTIONS + 1];
 
 /*** alte items ***/
@@ -653,9 +617,7 @@ const potion_type *oldpotiontype[MAXPOTIONS + 1];
 int get_item(const unit * u, item_t it)
 {
   const item_type *type = olditemtype[it];
-
   const item *i = *i_findc(&u->items, type);
-
   if (i)
     assert(i->number >= 0);
   return i ? i->number : 0;
@@ -664,9 +626,7 @@ int get_item(const unit * u, item_t it)
 int set_item(unit * u, item_t it, int value)
 {
   const item_type *type = olditemtype[it];
-
   item *i = *i_find(&u->items, type);
-
   if (!i) {
     i = i_add(&u->items, i_new(type, value));
   } else {
@@ -681,7 +641,6 @@ use_birthdayamulet(unit * u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   direction_t d;
-
   message *msg = msg_message("meow", "");
 
   unused(ord);
@@ -691,14 +650,12 @@ use_birthdayamulet(unit * u, const struct item_type *itype, int amount,
   add_message(&u->region->msgs, msg);
   for (d = 0; d < MAXDIRECTIONS; d++) {
     region *tr = rconnect(u->region, d);
-
     if (tr)
       add_message(&tr->msgs, msg);
   }
   msg_release(msg);
   return 0;
 }
-
 
 /* t_item::flags */
 #define FL_ITEM_CURSED  (1<<0)
@@ -715,15 +672,12 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   int i;
-
   for (i = 0; i != amount; ++i) {
     int duration = 1;           /* wirkt nur eine Runde */
-
     float power = 5;            /* Widerstand gegen Antimagiesprüche, ist in diesem
                                    Fall egal, da der curse für den Kampf gelten soll,
                                    der vor den Antimagiezaubern passiert */
     curse *c;
-
     double effect;
 
     effect = rng_int() % 6 - 1;
@@ -784,12 +738,9 @@ mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 static void init_olditems(void)
 {
   item_t i;
-
 #if 0
   resource_type *rtype;
-
   const struct locale *lang = find_locale("de");
-
   assert(lang);
 #endif
 
@@ -807,7 +758,6 @@ static void init_olditems(void)
 static int heal(unit * user, int effect)
 {
   int req = unit_max_hp(user) * user->number - user->hp;
-
   if (req > 0) {
     req = MIN(req, effect);
     effect -= req;
@@ -842,9 +792,7 @@ use_healingpotion(struct unit *user, const struct item_type *itype, int amount,
   struct order *ord)
 {
   int effect = amount * 400;
-
   unit *u = user->region->units;
-
   effect = heal(user, effect);
   while (effect > 0 && u != NULL) {
     if (u->faction == user->faction) {
@@ -886,7 +834,6 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype,
   int amount, struct order *ord)
 {
   unit *target = findunit(targetno);
-
   if (target == NULL || u->region != target->region) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
         ""));
@@ -912,10 +859,8 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
     change_effect(u, itype->rtype->ptype, 100 * amount);
   } else {
     const race *irace = u_irace(u);
-
     if (irace == u->race) {
       static race *rcfailure;
-
       if (!rcfailure) {
         rcfailure = rc_find("smurf");
         if (!rcfailure)
@@ -923,7 +868,6 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
       }
       if (rcfailure) {
         trigger *trestore = trigger_changerace(u, u->race, irace);
-
         if (trestore) {
           int duration = 2 + rng_int() % 8;
 
@@ -975,7 +919,6 @@ use_magicboost(struct unit *user, const struct item_type *itype, int amount,
     get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
     user->number);
   faction *f = user->faction;
-
   if (user->number > mtoes) {
     ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
         "unit item region command", user, itype->rtype, user->region, ord));
@@ -1014,7 +957,6 @@ static void init_oldpotions(void)
 
   for (p = 0; p != MAXPOTIONS; ++p) {
     item_type *itype = it_find(potionnames[p]);
-
     if (itype != NULL) {
       oldpotiontype[p] = itype->rtype->ptype;
     }
@@ -1022,17 +964,12 @@ static void init_oldpotions(void)
 }
 
 resource_type *r_silver;
-
 resource_type *r_aura;
-
 resource_type *r_permaura;
-
 resource_type *r_unit;
-
 resource_type *r_hp;
 
 resource_type *r_silver;
-
 item_type *i_silver;
 
 static const char *names[] = {
@@ -1048,7 +985,6 @@ static const char *names[] = {
 void init_resources(void)
 {
   static boolean initialized = false;
-
   if (initialized)
     return;
   initialized = true;
@@ -1083,7 +1019,6 @@ void init_resources(void)
 int get_money(const unit * u)
 {
   const item *i = u->items;
-
   while (i && i->type != i_silver)
     i = i->next;
   if (i == NULL)
@@ -1094,7 +1029,6 @@ int get_money(const unit * u)
 int set_money(unit * u, int v)
 {
   item **ip = &u->items;
-
   while (*ip && (*ip)->type != i_silver)
     ip = &(*ip)->next;
   if ((*ip) == NULL && v) {
@@ -1114,7 +1048,6 @@ int set_money(unit * u, int v)
 int change_money(unit * u, int v)
 {
   item **ip = &u->items;
-
   while (*ip && (*ip)->type != i_silver)
     ip = &(*ip)->next;
   if ((*ip) == NULL && v) {
@@ -1123,7 +1056,6 @@ int change_money(unit * u, int v)
   }
   if ((*ip) != NULL) {
     item *i = *ip;
-
     if (i->number + v != 0) {
       i->number += v;
       assert(i->number >= 0);
@@ -1134,14 +1066,12 @@ int change_money(unit * u, int v)
   return 0;
 }
 
-
 static local_names *rnames;
 
 const resource_type *findresourcetype(const char *name,
   const struct locale *lang)
 {
   local_names *rn = rnames;
-
   variant token;
 
   while (rn) {
@@ -1151,7 +1081,6 @@ const resource_type *findresourcetype(const char *name,
   }
   if (!rn) {
     const resource_type *rtl = resourcetypes;
-
     rn = calloc(sizeof(local_names), 1);
     rn->next = rnames;
     rn->lang = lang;
@@ -1178,12 +1107,9 @@ static local_names *inames;
 void init_itemnames(void)
 {
   int i;
-
   for (i = 0; localenames[i]; ++i) {
     const struct locale *lang = find_locale(localenames[i]);
-
     boolean exist = false;
-
     local_names *in = inames;
 
     while (in != NULL) {
@@ -1200,15 +1126,11 @@ void init_itemnames(void)
 
     if (!exist) {
       int key;
-
       for (key = 0; key != IMAXHASH; ++key) {
         const item_type *itl;
-
         for (itl = itemtypes[key]; itl; itl = itl->next) {
           variant var;
-
           const char *iname = locale_string(lang, itl->rtype->_name[0]);
-
           if (findtoken(&in->names, iname, &var) == E_TOK_NOMATCH
             || var.v != itl) {
             var.v = (void *)itl;
@@ -1226,7 +1148,6 @@ void init_itemnames(void)
 const item_type *finditemtype(const char *name, const struct locale *lang)
 {
   local_names *in = inames;
-
   variant var;
 
   while (in != NULL) {
@@ -1265,7 +1186,6 @@ static item *default_spoil(const struct race *rc, int size)
 
   if (rng_int() % 100 < RACESPOILCHANCE) {
     char spoilname[32];
-
     const item_type *itype;
 
     sprintf(spoilname, "%sspoil", rc->_name[0]);

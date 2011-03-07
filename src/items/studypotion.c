@@ -20,7 +20,6 @@ use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 {
   if (get_keyword(u->thisorder) == K_STUDY) {
     skill_t sk;
-
     skill *sv;
 
     init_tokens(u->thisorder);
@@ -34,9 +33,7 @@ use_studypotion(struct unit *u, const struct item_type *itype, int amount,
       /* TODO: message */
     } else {
       attrib *a = a_find(u->attribs, &at_learning);
-
       teaching_info *teach;
-
       if (a == NULL) {
         a = a_add(&u->attribs, a_new(&at_learning));
       }

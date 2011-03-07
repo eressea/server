@@ -51,14 +51,11 @@
 #define RESERVE_DONATIONS       /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE            /* reserve anything that's given from one unit to another? */
 
-
 static int GiveRestriction(void)
 {
   static int value = -1;
-
   if (value < 0) {
     const char *str = get_param(global.parameters, "GiveRestriction");
-
     value = str ? atoi(str) : 0;
   }
   return value;
@@ -106,13 +103,11 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
   if (dst && src && src->faction != dst->faction) {
     if (divisor < 0) {
       divisor = get_param_flt(global.parameters, "rules.items.give_divisor", 1);
-
       assert(divisor == 0 || divisor >= 1);
     }
     if (divisor >= 1) {
       /* predictable > correct: */
       int x = (int)(n / divisor);
-
       return x;
     }
   }
@@ -124,7 +119,6 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
   struct order *ord)
 {
   short error = 0;
-
   int n, r;
 
   assert(itype != NULL);
@@ -140,7 +134,6 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
     return -1;
   } else if (n == 0) {
     int reserve = get_reservation(src, itype->rtype);
-
     if (reserve) {
       msg_feedback(src, ord, "nogive_reserved", "resource reservation",
         itype->rtype, reserve);
@@ -151,7 +144,6 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
     error = 25;
   } else if (itype->give == NULL || itype->give(src, dest, itype, n, ord) != 0) {
     int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
-
     if (use < n)
       use +=
         use_pooled(src, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
@@ -187,9 +179,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
 void give_men(int n, unit * u, unit * u2, struct order *ord)
 {
   ship *sh;
-
   int k = 0;
-
   int error = 0;
 
   if (u2 && u->faction != u2->faction && u->faction->age < GiveRestriction()) {
@@ -299,13 +289,10 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
       if (u2->number != 0 && recruit_archetypes()) {
         /* must have same set of skills */
         boolean okay = false;
-
         if (u->skill_size == u2->skill_size) {
           int i;
-
           for (i = 0; i != u->skill_size; ++i) {
             int j;
-
             for (j = 0; j != u2->skill_size; ++j) {
               if (u->skills[i].id == u2->skills[j].id)
                 break;
@@ -322,7 +309,6 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
         }
       }
 
-
       /* Einheiten von Schiffen können nicht NACH in von
        * Nicht-alliierten bewachten Regionen ausführen */
       sh = leftship(u);
@@ -338,7 +324,6 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
 #ifdef ORCIFICATION
         if (u->race == new_race[RC_SNOTLING] && !fval(u->region, RF_ORCIFIED)) {
           attrib *a = a_find(u->region->attribs, &at_orcification);
-
           if (!a)
             a = a_add(&u->region->attribs, a_new(&at_orcification));
           a->data.i += n;
@@ -357,7 +342,6 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
       msg_message("give_person_peasants", "unit amount", u, n));
   } else if (u2->faction != u->faction) {
     message *msg = msg_message("give_person", "unit target amount", u, u2, n);
-
     add_message(&u->faction->msgs, msg);
     add_message(&u2->faction->msgs, msg);
     msg_release(msg);
@@ -367,7 +351,6 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
 void give_unit(unit * u, unit * u2, order * ord)
 {
   region *r = u->region;
-
   int n = u->number;
 
   if (!rule_transfermen() && u->faction != u2->faction) {
@@ -402,9 +385,7 @@ void give_unit(unit * u, unit * u2, order * ord)
       if (u3) {
         while (u->items) {
           item *iold = i_remove(&u->items, u->items);
-
           item *inew = *i_find(&u3->items, iold->type);
-
           if (inew == NULL)
             i_add(&u3->items, iold);
           else {
@@ -452,7 +433,6 @@ void give_unit(unit * u, unit * u2, order * ord)
   }
   if (has_skill(u, SK_MAGIC)) {
     sc_mage *mage;
-
     if (count_skill(u2->faction, SK_MAGIC) + u->number >
       skill_limit(u2->faction, SK_MAGIC)) {
       cmistake(u, ord, 155, MSG_COMMERCE);

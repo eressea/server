@@ -42,7 +42,6 @@ unsigned int nextborder = 0;
 
 #define BORDER_MAXHASH 8191
 connection *borders[BORDER_MAXHASH];
-
 border_type *bordertypes;
 
 void (*border_convert_cb) (struct connection * con, struct attrib * attr) = 0;
@@ -50,15 +49,12 @@ void (*border_convert_cb) (struct connection * con, struct attrib * attr) = 0;
 void free_borders(void)
 {
   int i;
-
   for (i = 0; i != BORDER_MAXHASH; ++i) {
     while (borders[i]) {
       connection *b = borders[i];
-
       borders[i] = b->nexthash;
       while (b) {
         connection *bf = b;
-
         b = b->next;
         assert(b == NULL || b->nexthash == NULL);
         if (bf->type->destroy) {
@@ -73,13 +69,10 @@ void free_borders(void)
 connection *find_border(unsigned int id)
 {
   int key;
-
   for (key = 0; key != BORDER_MAXHASH; key++) {
     connection *bhash;
-
     for (bhash = borders[key]; bhash != NULL; bhash = bhash->nexthash) {
       connection *b;
-
       for (b = bhash; b; b = b->next) {
         if (b->id == id)
           return b;
@@ -92,9 +85,7 @@ connection *find_border(unsigned int id)
 int resolve_borderid(variant id, void *addr)
 {
   int result = 0;
-
   connection *b = NULL;
-
   if (id.i != 0) {
     b = find_border(id.i);
     if (b == NULL) {
@@ -108,16 +99,13 @@ int resolve_borderid(variant id, void *addr)
 static connection **get_borders_i(const region * r1, const region * r2)
 {
   connection **bp;
-
   int key = reg_hashkey(r1);
-
   int k2 = reg_hashkey(r2);
 
   key = MIN(k2, key) % BORDER_MAXHASH;
   bp = &borders[key];
   while (*bp) {
     connection *b = *bp;
-
     if ((b->from == r1 && b->to == r2) || (b->from == r2 && b->to == r1))
       break;
     bp = &b->nexthash;
@@ -128,7 +116,6 @@ static connection **get_borders_i(const region * r1, const region * r2)
 connection *get_borders(const region * r1, const region * r2)
 {
   connection **bp = get_borders_i(r1, r2);
-
   return *bp;
 }
 
@@ -138,7 +125,6 @@ connection *new_border(border_type * type, region * from, region * to)
 
   if (from && to) {
     connection **bp = get_borders_i(from, to);
-
     while (*bp)
       bp = &(*bp)->next;
     *bp = b;
@@ -157,7 +143,6 @@ void erase_border(connection * b)
 {
   if (b->from && b->to) {
     connection **bp = get_borders_i(b->from, b->to);
-
     assert(*bp != NULL || !"error: connection is not registered");
     if (*bp == b) {
       /* it is the first in the list, so it is in the nexthash list */
@@ -192,7 +177,6 @@ void register_bordertype(border_type * type)
   *btp = type;
 }
 
-
 border_type *find_bordertype(const char *name)
 {
   border_type *bt = bordertypes;
@@ -205,7 +189,6 @@ border_type *find_bordertype(const char *name)
 void b_read(connection * b, storage * store)
 {
   int result = 0;
-
   switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
@@ -330,15 +313,12 @@ attrib_type at_countdown = {
 void age_borders(void)
 {
   quicklist *deleted = NULL, *ql;
-
   int i;
 
   for (i = 0; i != BORDER_MAXHASH; ++i) {
     connection *bhash = borders[i];
-
     for (; bhash; bhash = bhash->nexthash) {
       connection *b = bhash;
-
       for (; b; b = b->next) {
         if (b->type->age) {
           if (b->type->age(b) == AT_AGE_REMOVE) {
@@ -350,7 +330,6 @@ void age_borders(void)
   }
   for (ql = deleted, i = 0; ql; ql_advance(&ql, &i, 1)) {
     connection *b = (connection *) ql_get(ql, i);
-
     erase_border(b);
   }
   ql_free(deleted);
@@ -448,7 +427,6 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
   const struct faction *f, int gflags)
 {
   int fno = b->data.i;
-
   unused(b);
   unused(r);
   if (gflags & GF_PURE)
@@ -491,9 +469,7 @@ static const char *b_namequestportal(const connection * b, const region * r,
   const struct faction *f, int gflags)
 {
   const char *bname;
-
   int lock = b->data.i;
-
   unused(b);
   unused(r);
 
@@ -537,9 +513,7 @@ static const char *b_nameroad(const connection * b, const region * r,
   const struct faction *f, int gflags)
 {
   region *r2 = (r == b->to) ? b->from : b->to;
-
   int local = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
-
   static char buffer[64];
 
   unused(f);
@@ -550,7 +524,6 @@ static const char *b_nameroad(const connection * b, const region * r,
       return LOC(f->locale, mkname("border", "a_road"));
     else if (r->terrain->max_road <= local) {
       int remote = (r2 == b->from) ? b->data.sa[0] : b->data.sa[1];
-
       if (r2->terrain->max_road <= remote) {
         return LOC(f->locale, mkname("border", "a_road"));
       } else {
@@ -558,7 +531,6 @@ static const char *b_nameroad(const connection * b, const region * r,
       }
     } else {
       int percent = MAX(1, 100 * local / r->terrain->max_road);
-
       if (local) {
         snprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
               "a_road_percent")), percent);
@@ -595,7 +567,6 @@ static boolean b_validroad(const connection * b)
 static boolean b_rvisibleroad(const connection * b, const region * r)
 {
   int x = b->data.i;
-
   x = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
   if (x == 0) {
     return false;
@@ -624,13 +595,10 @@ border_type bt_road = {
 void write_borders(struct storage *store)
 {
   int i;
-
   for (i = 0; i != BORDER_MAXHASH; ++i) {
     connection *bhash;
-
     for (bhash = borders[i]; bhash; bhash = bhash->nexthash) {
       connection *b;
-
       for (b = bhash; b != NULL; b = b->next) {
         if (b->type->valid && !b->type->valid(b))
           continue;
@@ -652,13 +620,9 @@ int read_borders(struct storage *store)
 {
   for (;;) {
     unsigned int bid = 0;
-
     char zText[32];
-
     connection *b;
-
     region *from, *to;
-
     border_type *type;
 
     store->r_tok_buf(store, zText, sizeof(zText));
@@ -667,7 +631,6 @@ int read_borders(struct storage *store)
     bid = store->r_int(store);
     if (store->version < UIDHASH_VERSION) {
       short fx, fy, tx, ty;
-
       fx = (short)store->r_int(store);
       fy = (short)store->r_int(store);
       tx = (short)store->r_int(store);
@@ -676,9 +639,7 @@ int read_borders(struct storage *store)
       to = findregion(tx, ty);
     } else {
       unsigned int fid = (unsigned int)store->r_int(store);
-
       unsigned int tid = (unsigned int)store->r_int(store);
-
       from = findregionbyid(fid);
       to = findregionbyid(tid);
     }
@@ -692,9 +653,7 @@ int read_borders(struct storage *store)
 
     if (to == from && type && from) {
       direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
-
       region *r = rconnect(from, dir);
-
       log_error(("[read_borders] invalid %s in %s\n", type->__name,
           regionname(from, NULL)));
       if (r != NULL)
@@ -708,9 +667,7 @@ int read_borders(struct storage *store)
       type->read(b, store);
     if (store->version < NOBORDERATTRIBS_VERSION) {
       attrib *a = NULL;
-
       int result = a_read(store, &a, b);
-
       if (border_convert_cb)
         border_convert_cb(b, a);
       while (a) {

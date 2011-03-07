@@ -24,7 +24,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 INLINE_FUNCTION unsigned int hashstring(const char *s)
 {
   unsigned int key = 0;
-
   while (*s) {
     key = key * 37 + *s++;
   }
@@ -74,14 +73,10 @@ INLINE_FUNCTION const char *escape_string(const char *str, char *buffer,
   unsigned int len)
 {
   const char *start = strchr(str, '\"');
-
   if (start) {
     static char s_buffer[4096]; /* STATIC_RESULT: used for return, not across calls */
-
     const char *p;
-
     char *o;
-
     size_t skip = start - str;
 
     if (buffer == NULL) {

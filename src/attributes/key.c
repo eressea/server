@@ -35,7 +35,6 @@ attrib_type at_key = {
 attrib *add_key(attrib ** alist, int key)
 {
   attrib *a = find_key(*alist, key);
-
   if (a == NULL)
     a = a_add(alist, make_key(key));
   return a;
@@ -44,7 +43,6 @@ attrib *add_key(attrib ** alist, int key)
 attrib *make_key(int key)
 {
   attrib *a = a_new(&at_key);
-
   a->data.i = key;
   return a;
 }
@@ -52,7 +50,6 @@ attrib *make_key(int key)
 attrib *find_key(attrib * alist, int key)
 {
   attrib *a = a_find(alist, &at_key);
-
   while (a && a->type == &at_key && a->data.i != key) {
     a = a->next;
   }

@@ -34,15 +34,12 @@ typedef struct unresolved {
 
 #define BLOCKSIZE 1024
 static unresolved *ur_list;
-
 static unresolved *ur_begin;
-
 static unresolved *ur_current;
 
 variant read_int(struct storage *store)
 {
   variant var;
-
   var.i = store->r_int(store);
   return var;
 }
@@ -52,9 +49,7 @@ read_reference(void *address, storage * store, read_fun reader,
   resolve_fun resolver)
 {
   variant var = reader(store);
-
   int result = resolver(var, address);
-
   if (result != 0) {
     ur_add(var, address, resolver);
   }
@@ -83,7 +78,6 @@ void ur_add(variant data, void *ptrptr, resolve_fun fun)
 void resolve(void)
 {
   unresolved *ur = ur_list;
-
   while (ur) {
     if (ur->resolve == NULL) {
       ur = ur->data.v;

@@ -13,7 +13,6 @@
 #ifndef H_UTIL_EVTBUS
 #define H_UTIL_EVTBUS
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

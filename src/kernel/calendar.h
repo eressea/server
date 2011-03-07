@@ -12,7 +12,6 @@ extern "C" {
     SEASON_AUTUMN
   };
 
-
   extern char *agename;
   extern int first_turn;
   extern int first_month;

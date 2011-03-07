@@ -27,9 +27,7 @@ int atoi36(const char *str)
 {
   /* cannot use strtol, because invalid strings will cause crash */
   const unsigned char *s = (const unsigned char *)str;
-
   int i = 0, sign = 1;
-
   assert(s);
   if (!(*s))
     return 0;
@@ -59,18 +57,13 @@ int atoi36(const char *str)
 const char *itoab(int i, int base)
 {
   static char **as = NULL;      /* STATIC_RETURN: used for return, not across calls */
-
   char *s, *dst;
-
   static int index = 0;         /* STATIC_XCALL: used across calls */
-
   int neg = 0;
 
   if (!as) {
     int j;
-
     char *x = (char *)calloc(sizeof(char), 8 * 4);      /* STATIC_LEAK: malloc in static variable */
-
     as = (char **)calloc(sizeof(char *), 4);
     for (j = 0; j != 4; ++j)
       as[j] = x + j * 8;
@@ -86,7 +79,6 @@ const char *itoab(int i, int base)
     }
     while (i) {
       int x = i % base;
-
       i = i / base;
       if (x < 10)
         *(dst--) = (char)('0' + x);
@@ -118,7 +110,6 @@ const char *itoa10(int i)
 int i10toi36(int i)
 {
   int r = 0;
-
   while (i) {
     r = r * 36 + i % 10;
     i = i / 10;

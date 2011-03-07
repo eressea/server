@@ -45,9 +45,7 @@ static boolean good_region(const region * r)
 static int cmp_age(const void *v1, const void *v2)
 {
   const region *r1 = (const region *)v1;
-
   const region *r2 = (const region *)v2;
-
   if (r1->age < r2->age)
     return -1;
   if (r1->age > r2->age)
@@ -73,17 +71,13 @@ static void wormhole_done(struct attrib *a)
 static int wormhole_age(struct attrib *a)
 {
   wormhole_data *data = (wormhole_data *) a->data.v;
-
   int maxtransport = data->entry->size;
-
   region *r = data->entry->region;
-
   unit *u = r->units;
 
   for (; u != NULL && maxtransport != 0; u = u->next) {
     if (u->building == data->entry) {
       message *m = NULL;
-
       if (u->number > maxtransport || has_limited_skills(u)) {
         m = msg_message("wormhole_requirements", "unit region", u, u->region);
       } else if (data->exit != NULL) {
@@ -110,7 +104,6 @@ static void
 wormhole_write(const struct attrib *a, const void *owner, struct storage *store)
 {
   wormhole_data *data = (wormhole_data *) a->data.v;
-
   write_building_reference(data->entry, store);
   write_region_reference(data->exit, store);
 }
@@ -119,9 +112,7 @@ wormhole_write(const struct attrib *a, const void *owner, struct storage *store)
 static int resolve_exit(variant id, void *address)
 {
   building *b = findbuilding(id.i);
-
   region **rp = address;
-
   if (b) {
     *rp = b->region;
     return 0;
@@ -133,7 +124,6 @@ static int resolve_exit(variant id, void *address)
 static int wormhole_read(struct attrib *a, void *owner, struct storage *store)
 {
   wormhole_data *data = (wormhole_data *) a->data.v;
-
   resolve_fun resolver =
     (store->version < UIDHASH_VERSION) ? resolve_exit : resolve_region_id;
   read_fun reader =
@@ -144,7 +134,6 @@ static int wormhole_read(struct attrib *a, void *owner, struct storage *store)
     read_reference(&data->entry, store, read_building_reference,
     resolve_building);
   int rr = read_reference(&data->exit, store, reader, resolver);
-
   if (rb == 0 && rr == 0) {
     if (!data->exit || !data->entry) {
       return AT_READ_FAIL;
@@ -167,17 +156,11 @@ static void
 make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
 {
   building *b1 = new_building(bt_wormhole, r1, default_locale);
-
   building *b2 = new_building(bt_wormhole, r2, default_locale);
-
   attrib *a1 = a_add(&b1->attribs, a_new(&at_wormhole));
-
   attrib *a2 = a_add(&b2->attribs, a_new(&at_wormhole));
-
   wormhole_data *d1 = (wormhole_data *) a1->data.v;
-
   wormhole_data *d2 = (wormhole_data *) a2->data.v;
-
   d1->entry = b1;
   d2->entry = b2;
   d1->exit = b2->region;
@@ -192,13 +175,9 @@ void create_wormholes(void)
 {
 #define WORMHOLE_CHANCE 10000
   const building_type *bt_wormhole = bt_find("wormhole");
-
   region_list *rptr, *rlist = NULL;
-
   region *r = regions;
-
   int i = 0, count = 0;
-
   region **match;
 
   if (bt_wormhole == NULL)
@@ -208,7 +187,6 @@ void create_wormholes(void)
    */
   while (r != NULL) {
     int next = rng_int() % (2 * WORMHOLE_CHANCE);
-
     while (r != NULL && (next != 0 || !good_region(r))) {
       if (good_region(r)) {
         --next;

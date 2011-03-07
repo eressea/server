@@ -67,10 +67,8 @@ region *regions;
 int get_maxluxuries()
 {
   static int maxluxuries = -1;
-
   if (maxluxuries == -1) {
     const luxury_type *ltype;
-
     maxluxuries = 0;
     for (ltype = luxurytypes; ltype; ltype = ltype->next)
       ++maxluxuries;
@@ -114,16 +112,12 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
   size_t size)
 {
   char *buf = (char *)buffer;
-
   const struct locale *lang = f ? f->locale : 0;
-
   if (r == NULL) {
     strcpy(buf, "(null)");
   } else {
     plane *pl = rplane(r);
-
     int nx = r->x, ny = r->y;
-
     pnormalize(&nx, &ny, pl);
     adjust_coordinates(f, &nx, &ny, pl, r);
     snprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
@@ -135,14 +129,12 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
 const char *regionname(const region * r, const faction * f)
 {
   static char buf[NAMESIZE];
-
   return write_regionname(r, f, buf, sizeof(buf));
 }
 
 int deathcount(const region * r)
 {
   attrib *a = a_find(r->attribs, &at_deathcount);
-
   if (!a)
     return 0;
   return a->data.i;
@@ -151,7 +143,6 @@ int deathcount(const region * r)
 int chaoscount(const region * r)
 {
   attrib *a = a_find(r->attribs, &at_chaoscount);
-
   if (!a)
     return 0;
   return a->data.i;
@@ -160,7 +151,6 @@ int chaoscount(const region * r)
 void deathcounts(region * r, int fallen)
 {
   attrib *a;
-
   static const curse_type *ctype = NULL;
 
   if (fallen == 0)
@@ -195,8 +185,6 @@ void chaoscounts(region * r, int fallen)
     a_remove(&r->attribs, a);
 }
 
-
-
 /********************/
 /*   at_direction   */
 /********************/
@@ -213,7 +201,6 @@ static void a_freedirection(attrib * a)
 static int a_agedirection(attrib * a)
 {
   spec_direction *d = (spec_direction *) (a->data.v);
-
   --d->duration;
   return (d->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -229,12 +216,10 @@ static dir_lookup *dir_name_lookup;
 void register_special_direction(const char *name)
 {
   struct locale *lang;
-
   char *str = strdup(name);
 
   for (lang = locales; lang; lang = nextlocale(lang)) {
     tnode *tokens = get_translations(lang, UT_SPECDIR);
-
     const char *token = LOC(lang, name);
 
     if (token) {
@@ -245,7 +230,6 @@ void register_special_direction(const char *name)
 
       if (lang == default_locale) {
         dir_lookup *dl = malloc(sizeof(dir_lookup));
-
         dl->name = str;
         dl->oldname = token;
         dl->next = dir_name_lookup;
@@ -267,7 +251,6 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
   d->duration = store->r_int(store);
   if (store->version < UNICODE_VERSION) {
     char lbuf[16];
-
     dir_lookup *dl = dir_name_lookup;
 
     store->r_tok_buf(store, NULL, 0);
@@ -319,7 +302,6 @@ region *find_special_direction(const region * r, const char *token,
   const struct locale *lang)
 {
   attrib *a;
-
   spec_direction *d;
 
   if (strlen(token) == 0)
@@ -330,9 +312,7 @@ region *find_special_direction(const region * r, const char *token,
 
     if (d->active) {
       tnode *tokens = get_translations(lang, UT_SPECDIR);
-
       variant var;
-
       if (findtoken(tokens, token, &var) == E_TOK_SUCCESS) {
         if (strcmp((const char *)var.v, d->keyword) == 0) {
           return findregion(d->x, d->y);
@@ -348,7 +328,6 @@ attrib *create_special_direction(region * r, region * rt, int duration,
   const char *desc, const char *keyword)
 {
   attrib *a = a_add(&r->attribs, a_new(&at_direction));
-
   spec_direction *d = (spec_direction *) (a->data.v);
 
   d->active = false;
@@ -376,7 +355,6 @@ void a_initmoveblock(attrib * a)
 int a_readmoveblock(attrib * a, void *owner, struct storage *store)
 {
   moveblock *m = (moveblock *) (a->data.v);
-
   int i;
 
   i = store->r_int(store);
@@ -388,7 +366,6 @@ void
 a_writemoveblock(const attrib * a, const void *owner, struct storage *store)
 {
   moveblock *m = (moveblock *) (a->data.v);
-
   store->w_int(store, (int)m->dir);
 }
 
@@ -399,22 +376,18 @@ attrib_type at_moveblock = {
 #define coor_hashkey(x, y) (unsigned int)((x<<16) + y)
 #define RMAXHASH MAXREGIONS
 static region *regionhash[RMAXHASH];
-
 static int dummy_data;
-
 static region *dummy_ptr = (region *) & dummy_data;     /* a funny hack */
 
 typedef struct uidhashentry {
   unsigned int uid;
   region *r;
 } uidhashentry;
-
 static uidhashentry uidhash[MAXREGIONS];
 
 struct region *findregionbyid(unsigned int uid)
 {
   int key = uid % MAXREGIONS;
-
   while (uidhash[key].uid != 0 && uidhash[key].uid != uid)
     ++key;
   return uidhash[key].r;
@@ -425,7 +398,6 @@ struct region *findregionbyid(unsigned int uid)
 static void unhash_uid(region * r)
 {
   int key = r->uid % MAXREGIONS;
-
   assert(r->uid);
   while (uidhash[key].uid != 0 && uidhash[key].uid != r->uid)
     ++key;
@@ -436,11 +408,9 @@ static void unhash_uid(region * r)
 static void hash_uid(region * r)
 {
   unsigned int uid = r->uid;
-
   for (;;) {
     if (uid != 0) {
       int key = uid % MAXREGIONS;
-
       while (uidhash[key].uid != 0 && uidhash[key].uid != uid)
         ++key;
       if (uidhash[key].uid == 0) {
@@ -457,7 +427,6 @@ static void hash_uid(region * r)
 #define HASH_STATISTICS 1
 #if HASH_STATISTICS
 static int hash_requests;
-
 static int hash_misses;
 #endif
 
@@ -466,17 +435,13 @@ boolean pnormalize(int *x, int *y, const plane * pl)
   if (pl) {
     if (x) {
       int width = pl->maxx - pl->minx + 1;
-
       int nx = *x - pl->minx;
-
       nx = (nx > 0) ? nx : (width - (-nx) % width);
       *x = nx % width + pl->minx;
     }
     if (y) {
       int height = pl->maxy - pl->miny + 1;
-
       int ny = *y - pl->miny;
-
       ny = (ny > 0) ? ny : (height - (-ny) % height);
       *y = ny % height + pl->miny;
     }
@@ -494,7 +459,6 @@ static region *rfindhash(int x, int y)
 #endif
   if (rid >= 0) {
     int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
-
     while (regionhash[key] != NULL && (regionhash[key] == DELMARKER
         || regionhash[key]->x != x || regionhash[key]->y != y)) {
       key = (key + gk) % RMAXHASH;
@@ -510,9 +474,7 @@ static region *rfindhash(int x, int y)
 void rhash(region * r)
 {
   unsigned int rid = coor_hashkey(r->x, r->y);
-
   int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
-
   while (regionhash[key] != NULL && regionhash[key] != DELMARKER
     && regionhash[key] != r) {
     key = (key + gk) % RMAXHASH;
@@ -524,15 +486,12 @@ void rhash(region * r)
 void runhash(region * r)
 {
   unsigned int rid = coor_hashkey(r->x, r->y);
-
   int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
 
 #ifdef FAST_CONNECT
   int d, di;
-
   for (d = 0, di = MAXDIRECTIONS / 2; d != MAXDIRECTIONS; ++d, ++di) {
     region *rc = r->connect[d];
-
     if (rc != NULL) {
       if (di >= MAXDIRECTIONS)
         di -= MAXDIRECTIONS;
@@ -551,12 +510,9 @@ void runhash(region * r)
 region *r_connect(const region * r, direction_t dir)
 {
   region *result;
-
   int x, y;
-
 #ifdef FAST_CONNECT
   region *rmodify = (region *) r;
-
   assert(dir >= 0 && dir < MAXDIRECTIONS);
   if (r->connect[dir])
     return r->connect[dir];
@@ -586,7 +542,6 @@ region *findregion(int x, int y)
 static int koor_distance_orig(int x1, int y1, int x2, int y2)
 {
   int dx = x1 - x2;
-
   int dy = y1 - y2;
 
   /* Bei negativem dy am Ursprung spiegeln, das veraendert
@@ -602,11 +557,9 @@ static int koor_distance_orig(int x1, int y1, int x2, int y2)
    */
   if (dx >= 0) {
     int result = dx + dy;
-
     return result;
   } else if (-dx >= dy) {
     int result = -dx;
-
     return result;
   } else {
     return dy;
@@ -617,11 +570,8 @@ static int
 koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
 {
   int dx = x1 - x2;
-
   int dy = y1 - y2;
-
   int result, dist;
-
   int mindist = MIN(width, height) >> 1;
 
   /* Bei negativem dy am Ursprung spiegeln, das veraendert
@@ -660,16 +610,12 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
 int koor_distance(int x1, int y1, int x2, int y2)
 {
   const plane *p1 = findplane(x1, y1);
-
   const plane *p2 = findplane(x2, y2);
-
   if (p1 != p2)
     return INT_MAX;
   else {
     int width = plane_width(p1);
-
     int height = plane_height(p1);
-
     if (width && height) {
       return koor_distance_wrap_xy(x1, y1, x2, y2, width, height);
     } else {
@@ -687,12 +633,9 @@ static direction_t
 koor_reldirection(int ax, int ay, int bx, int by, const struct plane *pl)
 {
   direction_t dir;
-
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     int x = ax + delta_x[dir];
-
     int y = ay + delta_y[dir];
-
     pnormalize(&x, &y, pl);
     if (bx == x && by == y)
       return dir;
@@ -706,7 +649,6 @@ spec_direction *special_direction(const region * from, const region * to)
 
   while (a != NULL && a->type == &at_direction) {
     spec_direction *sd = (spec_direction *) a->data.v;
-
     if (sd->x == to->x && sd->y == to->y)
       return sd;
     a = a->next;
@@ -717,13 +659,11 @@ spec_direction *special_direction(const region * from, const region * to)
 direction_t reldirection(const region * from, const region * to)
 {
   plane *pl = rplane(from);
-
   if (pl == rplane(to)) {
     direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y, pl);
 
     if (dir == NODIRECTION) {
       spec_direction *sd = special_direction(from, to);
-
       if (sd != NULL && sd->active)
         return D_SPECIAL;
     }
@@ -736,7 +676,6 @@ void free_regionlist(region_list * rl)
 {
   while (rl) {
     region_list *rl2 = rl->next;
-
     free(rl);
     rl = rl2;
   }
@@ -764,7 +703,6 @@ attrib_type at_horseluck = {
   NO_READ,
   ATF_UNIQUE
 };
-
 
 /**********************/
 /*   at_peasantluck   */
@@ -833,7 +771,6 @@ attrib_type at_travelunit = {
 void rsetroad(region * r, direction_t d, short val)
 {
   connection *b;
-
   region *r2 = rconnect(r, d);
 
   if (!r2)
@@ -852,9 +789,7 @@ void rsetroad(region * r, direction_t d, short val)
 short rroad(const region * r, direction_t d)
 {
   int rval;
-
   connection *b;
-
   region *r2 = rconnect(r, d);
 
   if (!r2)
@@ -875,9 +810,7 @@ boolean r_isforest(const region * r)
   if (fval(r->terrain, FOREST_REGION)) {
     /* needs to be covered with at leas 48% trees */
     int mincover = (int)(r->terrain->size * 0.48);
-
     int trees = rtrees(r, 2) + rtrees(r, 1);
-
     return (trees * TREESIZE >= mincover);
   }
   return false;
@@ -886,12 +819,10 @@ boolean r_isforest(const region * r)
 int is_coastregion(region * r)
 {
   direction_t i;
-
   int res = 0;
 
   for (i = 0; i < MAXDIRECTIONS; i++) {
     region *rn = rconnect(r, i);
-
     if (rn && fval(rn->terrain, SEA_REGION))
       res++;
   }
@@ -953,7 +884,6 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
 const item_type *r_luxury(region * r)
 {
   struct demand *dmd;
-
   if (r->land) {
     if (!r->land->demands) {
       fix_demand(r);
@@ -969,7 +899,6 @@ const item_type *r_luxury(region * r)
 int r_demand(const region * r, const luxury_type * ltype)
 {
   struct demand *d = r->land->demands;
-
   while (d && d->type != ltype)
     d = d->next;
   if (!d)
@@ -1044,7 +973,6 @@ void remove_region(region ** rlist, region * r)
 
   while (r->units) {
     unit *u = r->units;
-
     i_freeall(&u->items);
     remove_unit(&r->units, u);
   }
@@ -1063,7 +991,6 @@ static void freeland(land_region * lr)
 {
   while (lr->demands) {
     struct demand *d = lr->demands;
-
     lr->demands = d->next;
     free(d);
   }
@@ -1075,7 +1002,6 @@ static void freeland(land_region * lr)
 void region_setresource(region * r, const resource_type * rtype, int value)
 {
   rawmaterial *rm = r->resources;
-
   while (rm) {
     if (rm->type->rtype == rtype) {
       rm->amount = value;
@@ -1096,7 +1022,6 @@ void region_setresource(region * r, const resource_type * rtype, int value)
 int region_getresource(const region * r, const resource_type * rtype)
 {
   const rawmaterial *rm;
-
   for (rm = r->resources; rm; rm = rm->next) {
     if (rm->type->rtype == rtype) {
       return rm->amount;
@@ -1126,7 +1051,6 @@ void free_region(region * r)
 
   while (r->individual_messages) {
     struct individual_message *msg = r->individual_messages;
-
     r->individual_messages = msg->next;
     if (msg->msgs)
       free_messagelist(msg->msgs);
@@ -1137,21 +1061,18 @@ void free_region(region * r)
     a_remove(&r->attribs, r->attribs);
   while (r->resources) {
     rawmaterial *res = r->resources;
-
     r->resources = res->next;
     free(res);
   }
 
   while (r->donations) {
     donation *don = r->donations;
-
     r->donations = don->next;
     free(don);
   }
 
   while (r->units) {
     unit *u = r->units;
-
     r->units = u->next;
     uunhash(u);
     free_unit(u);
@@ -1160,7 +1081,6 @@ void free_region(region * r)
 
   while (r->buildings) {
     building *b = r->buildings;
-
     assert(b->region == r);
     r->buildings = b->next;
     bunhash(b);                 /* must be done here, because remove_building does it, and wasn't called */
@@ -1169,7 +1089,6 @@ void free_region(region * r)
 
   while (r->ships) {
     ship *s = r->ships;
-
     assert(s->region == r);
     r->ships = s->next;
     sunhash(s);
@@ -1184,13 +1103,11 @@ void free_regions(void)
   memset(uidhash, 0, sizeof(uidhash));
   while (deleted_regions) {
     region *r = deleted_regions;
-
     deleted_regions = r->next;
     free_region(r);
   }
   while (regions) {
     region *r = regions;
-
     regions = r->next;
     runhash(r);
     free_region(r);
@@ -1206,11 +1123,8 @@ void free_regions(void)
 static char *makename(void)
 {
   int s, v, k, e, p = 0, x = 0;
-
   size_t nk, ne, nv, ns;
-
   static char name[16];
-
   const char *kons = "bcdfghklmnprstvwz",
     *start = "bcdgtskpvfr",
     *end = "nlrdst",
@@ -1260,7 +1174,6 @@ void setluxuries(region * r, const luxury_type * sale)
 
   for (ltype = luxurytypes; ltype; ltype = ltype->next) {
     struct demand *dmd = malloc(sizeof(struct demand));
-
     dmd->type = ltype;
     if (ltype != sale)
       dmd->value = 1 + rng_int() % 5;
@@ -1275,19 +1188,16 @@ void terraform_region(region * r, const terrain_type * terrain)
 {
   /* Resourcen, die nicht mehr vorkommen können, löschen */
   const terrain_type *oldterrain = r->terrain;
-
   rawmaterial **lrm = &r->resources;
 
   assert(terrain);
 
   while (*lrm) {
     rawmaterial *rm = *lrm;
-
     const resource_type *rtype = NULL;
 
     if (terrain->production != NULL) {
       int i;
-
       for (i = 0; terrain->production[i].type; ++i) {
         if (rm->type->rtype == terrain->production[i].type) {
           rtype = rm->type->rtype;
@@ -1333,11 +1243,8 @@ void terraform_region(region * r, const terrain_type * terrain)
       const luxury_type *type;
       int value;
     } *trash = NULL, *nb = NULL;
-
     const luxury_type *ltype = NULL;
-
     direction_t d;
-
     int mnr = 0;
 
     r->land = calloc(1, sizeof(land_region));
@@ -1346,15 +1253,12 @@ void terraform_region(region * r, const terrain_type * terrain)
     region_setname(r, makename());
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *nr = rconnect(r, d);
-
       if (nr && nr->land) {
         struct demand *sale = r->land->demands;
-
         while (sale && sale->value != 0)
           sale = sale->next;
         if (sale) {
           struct surround *sr = nb;
-
           while (sr && sr->type != sale->type)
             sr = sr->next;
           if (!sr) {
@@ -1376,7 +1280,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
     if (!nb) {
       int i = get_maxluxuries();
-
       if (i > 0) {
         i = rng_int() % i;
         ltype = luxurytypes;
@@ -1385,9 +1288,7 @@ void terraform_region(region * r, const terrain_type * terrain)
       }
     } else {
       int i = rng_int() % mnr;
-
       struct surround *srd = nb;
-
       while (i > srd->value) {
         i -= srd->value;
         srd = srd->next;
@@ -1404,7 +1305,6 @@ void terraform_region(region * r, const terrain_type * terrain)
 
   if (fval(terrain, LAND_REGION)) {
     const item_type *itype = NULL;
-
     char equip_hash[64];
 
     /* TODO: put the equipment in struct terrain, faster */
@@ -1413,7 +1313,6 @@ void terraform_region(region * r, const terrain_type * terrain)
 
     if (r->terrain->herbs) {
       int len = 0;
-
       while (r->terrain->herbs[len])
         ++len;
       if (len)
@@ -1452,7 +1351,6 @@ void terraform_region(region * r, const terrain_type * terrain)
 
     if (!fval(r, RF_CHAOTIC)) {
       int peasants;
-
       peasants = (maxworkingpeasants(r) * (20 + dice_rand("6d10"))) / 100;
       rsetpeasants(r, MAX(100, peasants));
       rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
@@ -1471,7 +1369,6 @@ int production(const region * r)
 {
   /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
   int p = r->terrain->size / MAXPEASANTS_PER_AREA;
-
   if (curse_active(get_curse(r->attribs, ct_find("drought"))))
     p /= 2;
 
@@ -1481,7 +1378,6 @@ int production(const region * r)
 int resolve_region_coor(variant id, void *address)
 {
   region *r = findregion(id.sa[0], id.sa[1]);
-
   if (r) {
     *(region **) address = r;
     return 0;
@@ -1493,7 +1389,6 @@ int resolve_region_coor(variant id, void *address)
 int resolve_region_id(variant id, void *address)
 {
   region *r = NULL;
-
   if (id.i != 0) {
     r = findregionbyid((unsigned int)id.i);
     if (r == NULL) {
@@ -1508,7 +1403,6 @@ int resolve_region_id(variant id, void *address)
 variant read_region_reference(struct storage * store)
 {
   variant result;
-
   if (store->version < UIDHASH_VERSION) {
     result.sa[0] = (short)store->r_int(store);
     result.sa[1] = (short)store->r_int(store);
@@ -1531,7 +1425,6 @@ struct message_list *r_getmessages(const struct region *r,
   const struct faction *viewer)
 {
   struct individual_message *imsg = r->individual_messages;
-
   while (imsg && (imsg)->viewer != viewer)
     imsg = imsg->next;
   if (imsg)
@@ -1545,7 +1438,6 @@ struct message *r_addmessage(struct region *r, const struct faction *viewer,
   assert(r);
   if (viewer) {
     struct individual_message *imsg;
-
     imsg = r->individual_messages;
     while (imsg && imsg->viewer != viewer)
       imsg = imsg->next;
@@ -1575,7 +1467,6 @@ struct alliance *region_get_alliance(const struct region *r)
   assert(rule_region_owners());
   if (r->land && r->land->ownership) {
     region_owner *own = r->land->ownership;
-
     return own->owner ? own->owner->alliance : own->alliance;
   }
   return NULL;
@@ -1602,22 +1493,17 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
   }
 }
 
-
 faction *update_owners(region * r)
 {
   faction *f = NULL;
-
   assert(rule_region_owners());
   if (r->land) {
     building *bowner = largestbuilding(r, &cmp_current_owner, false);
-
     building *blargest = largestbuilding(r, &cmp_taxes, false);
-
     if (blargest) {
       if (!bowner || bowner->size < blargest->size) {
         /* region owners update? */
         unit *u = building_owner(blargest);
-
         f = region_get_owner(r);
         if (u == NULL) {
           if (f) {
@@ -1631,10 +1517,8 @@ faction *update_owners(region * r)
             region_set_morale(r, MORALE_DEFAULT, turn);
           } else {
             alliance *al = region_get_alliance(r);
-
             if (al && u->faction->alliance == al) {
               int morale = MAX(0, r->land->morale - MORALE_TRANSFER);
-
               region_set_morale(r, morale, turn);
             } else {
               region_set_morale(r, MORALE_TAKEOVER, turn);
@@ -1706,7 +1590,6 @@ void region_set_morale(region * r, int morale, int turn)
 void get_neighbours(const region * r, region ** list)
 {
   direction_t dir;
-
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     list[dir] = rconnect(r, dir);
   }
@@ -1723,7 +1606,6 @@ int owner_change(const region * r)
 boolean is_mourning(const region * r, int in_turn)
 {
   int change = owner_change(r);
-
   return (change == in_turn - 1
     && (r->land->ownership->flags & OWNER_MOURNING));
 }

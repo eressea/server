@@ -87,7 +87,6 @@ void register_terrain(struct terrain_type *terrain)
 const struct terrain_type *get_terrain(const char *name)
 {
   const struct terrain_type *terrain;
-
   for (terrain = registered_terrains; terrain; terrain = terrain->next) {
     if (strcmp(terrain->_name, name) == 0)
       break;
@@ -109,7 +108,6 @@ const struct terrain_type *newterrain(terrain_t t)
 terrain_t oldterrain(const struct terrain_type * terrain)
 {
   terrain_t t;
-
   if (terrain == NULL)
     return NOTERRAIN;
   for (t = 0; t != MAXTERRAINS; ++t) {
@@ -124,10 +122,8 @@ const char *terrain_name(const struct region *r)
 {
   if (r->attribs) {
     attrib *a = a_find(r->attribs, &at_racename);
-
     if (a) {
       const char *str = get_racename(a);
-
       if (str)
         return str;
     }
@@ -146,10 +142,8 @@ const char *terrain_name(const struct region *r)
 void init_terrains(void)
 {
   terrain_t t;
-
   for (t = 0; t != MAXTERRAINS; ++t) {
     const terrain_type *newterrain = newterrains[t];
-
     if (newterrain != NULL)
       continue;
     if (terraindata[t] != NULL) {

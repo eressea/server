@@ -26,7 +26,6 @@ static void test_itoa36(CuTest * tc)
 CuSuite *get_base36_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
-
   SUITE_ADD_TEST(suite, test_itoa36);
   SUITE_ADD_TEST(suite, test_atoi36);
   return suite;

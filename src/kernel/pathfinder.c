@@ -61,7 +61,6 @@ void pathfinder_cleanup(void)
 {
   while (node_garbage) {
     node *n = node_garbage;
-
     node_garbage = n->next;
     free(n);
   }
@@ -70,7 +69,6 @@ void pathfinder_cleanup(void)
 static node *new_node(region * r, int distance, node * prev)
 {
   node *n;
-
   if (node_garbage != NULL) {
     n = node_garbage;
     node_garbage = n->next;
@@ -86,7 +84,6 @@ static node *new_node(region * r, int distance, node * prev)
 static node *free_node(node * n)
 {
   node *s = n->next;
-
   n->next = node_garbage;
   node_garbage = n;
   return s;
@@ -96,7 +93,6 @@ static void free_nodes(node * root)
 {
   while (root != NULL) {
     region *r = root->r;
-
     freset(r, RF_MARK);
     root = free_node(root);
   }
@@ -106,25 +102,19 @@ struct region_list *regions_in_range(struct region *start, int maxdist,
   boolean(*allowed) (const struct region *, const struct region *))
 {
   region_list *rlist = NULL;
-
   node *root = new_node(start, 0, NULL);
-
   node **end = &root->next;
-
   node *n = root;
 
   while (n != NULL) {
     region *r = n->r;
-
     int depth = n->distance + 1;
-
     direction_t d;
 
     if (n->distance >= maxdist)
       break;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *rn = rconnect(r, d);
-
       if (rn == NULL)
         continue;
       if (fval(rn, RF_MARK))
@@ -152,30 +142,21 @@ static region **internal_path_find(region * start, const region * target,
   int maxlen, boolean(*allowed) (const region *, const region *))
 {
   static region *path[MAXDEPTH + 2];    /* STATIC_RETURN: used for return, not across calls */
-
   direction_t d;
-
   node *root = new_node(start, 0, NULL);
-
   node **end = &root->next;
-
   node *n = root;
-
   boolean found = false;
-
   assert(maxlen <= MAXDEPTH);
   fset(start, RF_MARK);
 
   while (n != NULL) {
     region *r = n->r;
-
     int depth = n->distance + 1;
-
     if (n->distance >= maxlen)
       break;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *rn = rconnect(r, d);
-
       if (rn == NULL)
         continue;
       if (fval(rn, RF_MARK))
@@ -184,7 +165,6 @@ static region **internal_path_find(region * start, const region * target,
         continue;               /* can't go there */
       if (rn == target) {
         int i = depth;
-
         path[i + 1] = NULL;
         path[i] = rn;
         while (n) {

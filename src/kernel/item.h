@@ -108,7 +108,6 @@ extern "C" {
     resource_mod *modifiers;
   } resource_limit;
 
-
 /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000
 #define ITF_HERB             0x0001     /* this item is a herb */

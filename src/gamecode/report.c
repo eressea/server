@@ -99,17 +99,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 extern int verbosity;
-
 extern int *storms;
-
 extern int weeks_per_month;
-
 extern int months_per_year;
 
 static char *gamedate_season(const struct locale *lang)
 {
   static char buf[256];
-
   gamedate gd;
 
   get_gamedate(turn, &gd);
@@ -145,7 +141,6 @@ static void centre(FILE * F, const char *s, boolean breaking)
 
   if (breaking && REPORTWIDTH < strlen(s)) {
     strlist *T, *SP = 0;
-
     sparagraph(&SP, s, 0, 0);
     T = SP;
     while (SP) {
@@ -165,15 +160,12 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
   char mark)
 {
   static const char *spaces = "                                ";
-
   size_t length = REPORTWIDTH;
-
   const char *end, *begin;
 
   /* find out if there's a mark + indent already encoded in the string. */
   if (!mark) {
     const char *x = str;
-
     while (*x == ' ')
       ++x;
     indent += x - str;
@@ -225,15 +217,10 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
 static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
 {
   int bytes, k, itemanz, costtyp;
-
   int dh = 0;
-
   char buf[4096];
-
   char *bufp = buf;
-
   size_t size = sizeof(buf) - 1;
-
   const char *params = sp->parameter;
 
   rnl(F);
@@ -273,7 +260,6 @@ static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
   rparagraph(F, LOC(lang, "nr_spell_components"), 0, 0, 0);
   for (k = 0; sp->components[k].type; ++k) {
     const resource_type *rtype = sp->components[k].type;
-
     itemanz = sp->components[k].amount;
     costtyp = sp->components[k].cost;
     if (itemanz > 0) {
@@ -395,7 +381,6 @@ static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
       int flag;
       const char *vars;
     } starget;
-
     starget targets[] = {
       {P_REGION, REGIONSPELL, NULL},
       {P_UNIT, UNITSPELL, "par_unit"},
@@ -404,13 +389,9 @@ static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
       {0, 0, NULL}
     };
     starget *targetp;
-
     char cp = *params++;
-
     int i, maxparam = 0;
-
     const char *locp;
-
     const char *syntaxp = sp->syntax;
 
     if (cp == 'u') {
@@ -507,14 +488,12 @@ static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
       }
     } else if (cp == 'i' || cp == 'c') {
       const char *cstr;
-
       assert(syntaxp);
       cstr = strchr(syntaxp, ':');
       if (!cstr) {
         locp = LOC(lang, mkname("spellpar", syntaxp));
       } else {
         char substr[32];
-
         strncpy(substr, syntaxp, cstr - syntaxp);
         substr[cstr - syntaxp] = 0;
         locp = LOC(lang, mkname("spellpar", substr));
@@ -538,9 +517,7 @@ void sparagraph(strlist ** SP, const char *s, int indent, char mark)
    * Vgl. spunit (). */
 
   int i, j, width;
-
   int firstline;
-
   static char buf[REPORTWIDTH + 1];
 
   width = REPORTWIDTH - indent;
@@ -604,9 +581,7 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
   int indent)
 {
   attrib *a = NULL;
-
   int self = 0;
-
   region *r;
 
   /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
@@ -616,9 +591,7 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
    * bei jedem curse gesondert behandelt. */
   if (typ == TYP_SHIP) {
     ship *sh = (ship *) obj;
-
     unit *owner = shipowner(sh);
-
     a = sh->attribs;
     r = sh->region;
     if (owner) {
@@ -626,7 +599,6 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
         self = 2;
       } else {                  /* steht eine person der Partei auf dem Schiff? */
         unit *u = NULL;
-
         for (u = r->units; u; u = u->next) {
           if (u->ship == sh) {
             self = 1;
@@ -637,9 +609,7 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
     }
   } else if (typ == TYP_BUILDING) {
     building *b = (building *) obj;
-
     unit *owner;
-
     a = b->attribs;
     r = b->region;
     if ((owner = building_owner(b)) != NULL) {
@@ -647,7 +617,6 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
         self = 2;
       } else {                  /* steht eine Person der Partei in der Burg? */
         unit *u = NULL;
-
         for (u = r->units; u; u = u->next) {
           if (u->building == b) {
             self = 1;
@@ -658,7 +627,6 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
     }
   } else if (typ == TYP_UNIT) {
     unit *u = (unit *) obj;
-
     a = u->attribs;
     r = u->region;
     if (u->faction == viewer) {
@@ -676,7 +644,6 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
 
     if (fval(a->type, ATF_CURSE)) {
       curse *c = (curse *) a->data.v;
-
       message *msg;
 
       if (c->type->cansee) {
@@ -692,7 +659,6 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
       }
     } else if (a->type == &at_effect && self) {
       effect_data *data = (effect_data *) a->data.v;
-
       if (data->value > 0) {
         sprintf(buf, "Auf der Einheit lieg%s %d Wirkung%s %s.",
           (data->value == 1 ? "t" : "en"),
@@ -709,7 +675,6 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
 static void rps_nowrap(FILE * F, const char *s)
 {
   const char *x = s;
-
   size_t indent = 0;
 
   while (*x++ == ' ') ;
@@ -731,13 +696,9 @@ static void
 nr_unit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 {
   attrib *a_otherfaction;
-
   char marker;
-
   int dh;
-
   boolean isbattle = (boolean) (mode == see_battle);
-
   char buf[8192];
 
   if (fval(u->race, RCF_INVISIBLE))
@@ -777,14 +738,11 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent,
   boolean categorized)
 {
   nrsection *section;
-
   if (!msgs)
     return;
   for (section = sections; section; section = section->next) {
     int k = 0;
-
     struct mlist *m = msgs->begin;
-
     while (m) {
       /* messagetype * mt = m->type; */
       if (!categorized || strcmp(nr_section(m->msg), section->name) == 0) {
@@ -792,7 +750,6 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent,
 
         if (!k && categorized) {
           const char *section_title;
-
           char cat_identifier[24];
 
           rnl(F);
@@ -816,14 +773,12 @@ static void rp_battles(FILE * F, faction * f)
 {
   if (f->battles != NULL) {
     struct bmsg *bm = f->battles;
-
     rnl(F);
     centre(F, LOC(f->locale, "section_battle"), false);
     rnl(F);
 
     while (bm) {
       char buf[256];
-
       RENDER(f, buf, sizeof(buf), ("battle::header", "region", bm->r));
       rnl(F);
       centre(F, buf, true);
@@ -837,15 +792,10 @@ static void rp_battles(FILE * F, faction * f)
 static void prices(FILE * F, const region * r, const faction * f)
 {
   const luxury_type *sale = NULL;
-
   struct demand *dmd;
-
   message *m;
-
   int bytes, n = 0;
-
   char buf[4096], *bufp = buf;
-
   size_t size = sizeof(buf) - 1;
 
   if (r->land == NULL || r->land->demands == NULL)
@@ -919,12 +869,10 @@ static void prices(FILE * F, const region * r, const faction * f)
 boolean see_border(const connection * b, const faction * f, const region * r)
 {
   boolean cs = b->type->fvisible(b, f, r);
-
   if (!cs) {
     cs = b->type->rvisible(b, r);
     if (!cs) {
       const unit *us = r->units;
-
       while (us && !cs) {
         if (us->faction == f) {
           cs = b->type->uvisible(b, us);
@@ -941,21 +889,13 @@ boolean see_border(const connection * b, const faction * f, const region * r)
 static void describe(FILE * F, const seen_region * sr, faction * f)
 {
   const region *r = sr->r;
-
   int n;
-
   boolean dh;
-
   direction_t d;
-
   int trees;
-
   int saplings;
-
   attrib *a;
-
   const char *tname;
-
   struct edge {
     struct edge *next;
     char *name;
@@ -964,31 +904,22 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     boolean exist[MAXDIRECTIONS];
     direction_t lastd;
   } *edges = NULL, *e;
-
   boolean see[MAXDIRECTIONS];
-
   char buf[8192];
-
   char *bufp = buf;
-
   size_t size = sizeof(buf);
-
   int bytes;
 
   for (d = 0; d != MAXDIRECTIONS; d++) {
     /* Nachbarregionen, die gesehen werden, ermitteln */
     region *r2 = rconnect(r, d);
-
     connection *b;
-
     see[d] = true;
     if (!r2)
       continue;
     for (b = get_borders(r, r2); b;) {
       struct edge *e = edges;
-
       boolean transparent = b->type->transparent(b, f);
-
       const char *name = b->type->name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
       if (!transparent)
@@ -1066,7 +997,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   /* iron & stone */
   if (sr->mode == see_unit && f != (faction *) NULL) {
     resource_report result[MAX_RAWMATERIALS];
-
     int n, numresults = report_resources(sr, result, MAX_RAWMATERIALS, f);
 
     for (n = 0; n < numresults; ++n) {
@@ -1082,7 +1012,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   /* peasants & silver */
   if (rpeasants(r)) {
     int n = rpeasants(r);
-
     bytes = snprintf(bufp, size, ", %d", n);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
@@ -1144,7 +1073,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 
-
   if (r->display && r->display[0]) {
     bytes = (int)strlcpy(bufp, " ", size);
     if (wrptr(&bufp, &size, bytes) != 0)
@@ -1163,7 +1091,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 
   if (rule_region_owners()) {
     const faction *owner = region_get_owner(r);
-
     if (owner != NULL) {
       bytes = snprintf(bufp, size, " Die Region ist im Besitz von %s.",
         factionname(owner));
@@ -1194,13 +1121,11 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     for (d = 0; d != MAXDIRECTIONS; d++)
       if (see[d]) {
         region *r2 = rconnect(r, d);
-
         if (!r2)
           continue;
         nrd--;
         if (dh) {
           char regname[4096];
-
           if (nrd == 0) {
             bytes = (int)strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
@@ -1235,7 +1160,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
       a = a->next) {
       spec_direction *d = (spec_direction *) (a->data.v);
-
       bytes = (int)strlcpy(bufp, " ", size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
@@ -1265,7 +1189,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
     /* Sonderbehandlung Teleport-Ebene */
     region_list *rl = astralregions(r, inhabitable);
-
     region_list *rl2;
 
     if (rl) {
@@ -1306,7 +1229,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
   a = a_find(r->attribs, &at_reduceproduction);
   if (a) {
     const char *str = LOC(f->locale, "nr_reduced_production");
-
     rparagraph(F, str, 0, 0, 0);
   }
 
@@ -1314,7 +1236,6 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
     rnl(F);
   for (e = edges; e; e = e->next) {
     boolean first = true;
-
     bufp = buf;
     size = sizeof(buf) - 1;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
@@ -1364,13 +1285,9 @@ static void describe(FILE * F, const seen_region * sr, faction * f)
 static void statistics(FILE * F, const region * r, const faction * f)
 {
   const unit *u;
-
   int number = 0, p = rpeasants(r);
-
   message *m;
-
   item *itm, *items = NULL;
-
   char buf[4096];
 
   /* count */
@@ -1435,7 +1352,6 @@ static void statistics(FILE * F, const region * r, const faction * f)
       msg_release(m);
     }
 
-
   }
   /* info about units */
 
@@ -1457,15 +1373,10 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
 {
   if (fval(r, RF_TRAVELUNIT)) {
     attrib *abegin = a_find(r->attribs, &at_travelunit), *a;
-
     int counter = 0, maxtravel = 0;
-
     char buf[8192];
-
     char *bufp = buf;
-
     int bytes;
-
     size_t size = sizeof(buf) - 1;
 
     /* How many are we listing? For grammar. */
@@ -1543,13 +1454,9 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
 static int buildingmaintenance(const building * b, const resource_type * rtype)
 {
   const building_type *bt = b->type;
-
   int c, cost = 0;
-
   static boolean init = false;
-
   static const curse_type *nocost_ct;
-
   if (!init) {
     init = true;
     nocost_ct = ct_find("nocostbuilding");
@@ -1559,7 +1466,6 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
   }
   for (c = 0; bt->maintenance && bt->maintenance[c].number; ++c) {
     const maintenance *m = bt->maintenance + c;
-
     if (m->rtype == rtype) {
       if (fval(m, MTF_VARIABLE))
         cost += (b->size * m->number);
@@ -1574,17 +1480,11 @@ static int
 report_template(const char *filename, report_context * ctx, const char *charset)
 {
   faction *f = ctx->f;
-
   region *r;
-
   FILE *F = fopen(filename, "wt");
-
   seen_region *sr = NULL;
-
   char buf[8192], *bufp;
-
   size_t size;
-
   int bytes;
 
   int enc = xmlParseCharEncoding(charset);
@@ -1625,9 +1525,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
 
   for (; sr != NULL; sr = sr->next) {
     region *r = sr->r;
-
     unit *u;
-
     int dh = 0;
 
     if (sr->mode < see_unit)
@@ -1636,10 +1534,8 @@ report_template(const char *filename, report_context * ctx, const char *charset)
     for (u = r->units; u; u = u->next) {
       if (u->faction == f && !fval(u->race, RCF_INVISIBLE)) {
         order *ord;
-
         if (!dh) {
           plane *pl = getplane(r);
-
           int nx = r->x, ny = r->y;
 
           pnormalize(&nx, &ny, pl);
@@ -1672,7 +1568,6 @@ report_template(const char *filename, report_context * ctx, const char *charset)
           WARN_STATIC_BUFFER();
         if (u->building != NULL && fval(u, UFL_OWNER)) {
           building *b = u->building;
-
           int cost = buildingmaintenance(b, r_silver);
 
           if (cost > 0) {
@@ -1744,27 +1639,21 @@ static void
 show_allies(const faction * f, const ally * allies, char *buf, size_t size)
 {
   int allierte = 0;
-
   int i = 0, h, hh = 0;
-
   int bytes, dh = 0;
-
   const ally *sf;
-
   char *bufp = buf;             /* buf already contains data */
 
   --size;                       /* leave room for a null-terminator */
 
   for (sf = allies; sf; sf = sf->next) {
     int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-
     if (mode > 0)
       ++allierte;
   }
 
   for (sf = allies; sf; sf = sf->next) {
     int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-
     if (mode <= 0)
       continue;
     i++;
@@ -1792,7 +1681,6 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
     } else {
       for (h = 1; h < HELP_ALL; h *= 2) {
         int p = MAXPARAMS;
-
         if ((mode & h) == h) {
           switch (h) {
             case HELP_TRAVEL:
@@ -1841,14 +1729,11 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
 static void allies(FILE * F, const faction * f)
 {
   const group *g = f->groups;
-
   char buf[16384];
 
   if (f->allies) {
     int bytes;
-
     size_t size = sizeof(buf);
-
     if (!f->allies->next) {
       bytes = (int)strlcpy(buf, "Wir helfen der Partei ", size);
     } else {
@@ -1863,9 +1748,7 @@ static void allies(FILE * F, const faction * f)
   while (g) {
     if (g->allies) {
       int bytes;
-
       size_t size = sizeof(buf);
-
       if (!g->allies->next) {
         bytes = snprintf(buf, size, "%s hilft der Partei ", g->name);
       } else {
@@ -1890,17 +1773,14 @@ static void guards(FILE * F, const region * r, const faction * see)
   int nextguard = 0;
 
   unit *u;
-
   int i;
 
   boolean tarned = false;
-
   /* Bewachung */
 
   for (u = r->units; u; u = u->next) {
     if (is_guard(u, GUARD_ALL) != 0) {
       faction *f = u->faction;
-
       faction *fv = visible_faction(see, u);
 
       if (fv != f && see != fv) {
@@ -1922,11 +1802,8 @@ static void guards(FILE * F, const region * r, const faction * see)
 
   if (nextguard || tarned) {
     char buf[8192];
-
     char *bufp = buf;
-
     size_t size = sizeof(buf) - 1;
-
     int bytes;
 
     bytes = (int)strlcpy(bufp, "Die Region wird von ", size);
@@ -1963,7 +1840,6 @@ static void guards(FILE * F, const region * r, const faction * see)
 static void rpline(FILE * F)
 {
   static char line[REPORTWIDTH + 1];
-
   if (line[0] != '-') {
     memset(line, '-', sizeof(line));
     line[REPORTWIDTH] = '\n';
@@ -1974,7 +1850,6 @@ static void rpline(FILE * F)
 static void list_address(FILE * F, const faction * uf, quicklist * seenfactions)
 {
   int qi = 0;
-
   quicklist *flist = seenfactions;
 
   centre(F, LOC(uf->locale, "nr_addresses"), false);
@@ -1982,10 +1857,8 @@ static void list_address(FILE * F, const faction * uf, quicklist * seenfactions)
 
   while (flist != NULL) {
     const faction *f = (const faction *)ql_get(flist, qi);
-
     if (!is_monsters(f)) {
       char buf[8192];
-
       char label = '-';
 
       sprintf(buf, "%s: %s; %s", factionname(f), f->email,
@@ -2010,20 +1883,15 @@ nr_ship(FILE * F, const seen_region * sr, const ship * sh, const faction * f,
   const unit * captain)
 {
   const region *r = sr->r;
-
   char buffer[8192], *bufp = buffer;
-
   size_t size = sizeof(buffer) - 1;
-
   int bytes;
-
   char ch;
 
   rnl(F);
 
   if (captain && captain->faction == f) {
     int n = 0, p = 0;
-
     getshipweight(sh, &n, &p);
     n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
@@ -2089,13 +1957,9 @@ nr_building(FILE * F, const seen_region * sr, const building * b,
   const faction * f)
 {
   int i, bytes;
-
   const char *name, *bname, *billusion = NULL;
-
   const struct locale *lang = NULL;
-
   char buffer[8192], *bufp = buffer;
-
   size_t size = sizeof(buffer) - 1;
 
   rnl(F);
@@ -2116,7 +1980,6 @@ nr_building(FILE * F, const seen_region * sr, const building * b,
     WARN_STATIC_BUFFER();
   if (billusion) {
     unit *owner = building_owner(b);
-
     if (owner && owner->faction == f) {
       /* illusion. report real type */
       name = LOC(lang, bname);
@@ -2166,16 +2029,13 @@ nr_building(FILE * F, const seen_region * sr, const building * b,
 
   if (b->type == bt_find("pyramid")) {
     unit *owner = building_owner(b);
-
     scat("Größenstufe ");
     icat(wdw_pyramid_level(b));
     scat(".");
 
     if (owner && owner->faction == f) {
       const construction *ctype = b->type->construction;
-
       int completed = b->size;
-
       int c;
 
       scat(" Baukosten pro Größenpunkt: ");
@@ -2191,7 +2051,6 @@ nr_building(FILE * F, const seen_region * sr, const building * b,
 
       for (c = 0; ctype->materials[c].number; c++) {
         const resource_type *rtype = ctype->materials[c].rtype;
-
         int number = ctype->materials[c].number;
 
         if (c > 0) {
@@ -2230,9 +2089,7 @@ nr_building(FILE * F, const seen_region * sr, const building * b,
 static void nr_paragraph(FILE * F, message * m, faction * f)
 {
   int bytes;
-
   char buf[4096], *bufp = buf;
-
   size_t size = sizeof(buf) - 1;
 
   bytes = (int)nr_render(m, f->locale, bufp, size, f);
@@ -2248,51 +2105,30 @@ report_plaintext(const char *filename, report_context * ctx,
   const char *charset)
 {
   int flag = 0;
-
   char ch;
-
   int anyunits, no_units, no_people;
-
   const struct region *r;
-
   faction *f = ctx->f;
-
   unit *u;
-
   char pzTime[64];
-
   attrib *a;
-
   message *m;
-
   unsigned char op;
-
   int bytes, ix = want(O_STATISTICS);
-
   int wants_stats = (f->options & ix);
-
   FILE *F = fopen(filename, "wt");
-
   seen_region *sr = NULL;
-
   char buf[8192];
-
   char *bufp;
-
   int enc = xmlParseCharEncoding(charset);
-
   size_t size;
 
   /* static variables can cope with writing for different turns */
   static int thisseason = -1;
-
   static int nextseason = -1;
-
   static int gamecookie = -1;
-
   if (gamecookie != global.cookie) {
     gamedate date;
-
     get_gamedate(turn + 1, &date);
     thisseason = date.season;
     get_gamedate(turn + 2, &date);
@@ -2311,7 +2147,6 @@ report_plaintext(const char *filename, report_context * ctx,
 
   strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
   m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
-
   nr_render(m, f->locale, buf, sizeof(buf), f);
   msg_release(m);
   centre(F, buf, true);
@@ -2328,7 +2163,6 @@ report_plaintext(const char *filename, report_context * ctx,
 
   if (f->age <= 2) {
     const char *s;
-
     if (f->age <= 1) {
       ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->passw));
     }
@@ -2388,7 +2222,6 @@ report_plaintext(const char *filename, report_context * ctx,
   centre(F, buf, true);
   if (f->race == new_race[RC_HUMAN]) {
     int maxmig = count_maxmigrants(f);
-
     if (maxmig > 0) {
       m =
         msg_message("nr_migrants", "units maxunits", count_migrants(f), maxmig);
@@ -2408,7 +2241,6 @@ report_plaintext(const char *filename, report_context * ctx,
   }
   {
     int maxh = maxheroes(f);
-
     if (maxh) {
       message *msg =
         msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
@@ -2420,7 +2252,6 @@ report_plaintext(const char *filename, report_context * ctx,
 
   if (f->items != NULL) {
     message *msg = msg_message("nr_claims", "items", f->items);
-
     nr_render(msg, f->locale, buf, sizeof(buf), f);
     msg_release(msg);
     rnl(F);
@@ -2471,7 +2302,6 @@ report_plaintext(const char *filename, report_context * ctx,
     centre(F, LOC(f->locale, "section_newspells"), true);
     while (a && a->type == &at_reportspell) {
       spell *sp = (spell *) a->data.v;
-
       nr_spell(F, sp, f->locale);
       a = a->next;
     }
@@ -2483,7 +2313,6 @@ report_plaintext(const char *filename, report_context * ctx,
     const potion_type *ptype =
       resource2potion(((const item_type *)a->data.v)->rtype);
     const char *description = NULL;
-
     if (ptype != NULL) {
       const char *pname = resourcename(ptype->itype->rtype, 0);
 
@@ -2508,7 +2337,6 @@ report_plaintext(const char *filename, report_context * ctx,
 
       if (ptype->itype->construction) {
         requirement *m = ptype->itype->construction->materials;
-
         while (m->number) {
           bytes =
             (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
@@ -2526,7 +2354,6 @@ report_plaintext(const char *filename, report_context * ctx,
       rnl(F);
       if (description == NULL) {
         const char *potiontext = mkname("potion", pname);
-
         description = LOC(f->locale, potiontext);
       }
       centre(F, description, true);
@@ -2547,11 +2374,8 @@ report_plaintext(const char *filename, report_context * ctx,
   }
   for (; sr != NULL; sr = sr->next) {
     region *r = sr->r;
-
     int stealthmod = stealth_modifier(sr->mode);
-
     building *b = r->buildings;
-
     ship *sh = r->ships;
 
     if (sr->mode < see_lighthouse)
@@ -2563,11 +2387,8 @@ report_plaintext(const char *filename, report_context * ctx,
       describe(F, sr, f);
       if (markets_module() && r->land) {
         const item_type *lux = r_luxury(r);
-
         const item_type *herb = r->land->herbtype;
-
         message *m = 0;
-
         if (herb && lux) {
           m = msg_message("nr_market_info_p", "p1 p2",
             lux ? lux->rtype : 0, herb ? herb->rtype : 0);
@@ -2610,7 +2431,6 @@ report_plaintext(const char *filename, report_context * ctx,
 
     if (sr->mode == see_unit || sr->mode == see_travel) {
       message_list *mlist = r_getmessages(r, f);
-
       rp_messages(F, r->msgs, f, 0, true);
       if (mlist)
         rp_messages(F, mlist, f, 0, true);
@@ -2676,10 +2496,8 @@ report_plaintext(const char *filename, report_context * ctx,
 void base36conversion(void)
 {
   region *r;
-
   for (r = regions; r; r = r->next) {
     unit *u;
-
     for (u = r->units; u; u = u->next) {
       if (forbiddenid(u->no)) {
         uunhash(u);
@@ -2708,15 +2526,11 @@ struct fsee {
 #define REPORT_ZIP (1 << O_COMPRESS)
 #define REPORT_BZIP2 (1 << O_BZIP2)
 
-
 unit *can_find(faction * f, faction * f2)
 {
   int key = f->no % FMAXHASH;
-
   struct fsee *fs = fsee[key];
-
   struct see *ss;
-
   if (f == f2)
     return f->units;
   while (fs && fs->f != f)
@@ -2739,15 +2553,10 @@ static void add_find(faction * f, unit * u, faction * f2)
 {
   /* faction f sees f2 through u */
   int key = f->no % FMAXHASH;
-
   struct fsee **fp = &fsee[key];
-
   struct fsee *fs;
-
   struct see **sp;
-
   struct see *ss;
-
   while (*fp && (*fp)->f != f)
     fp = &(*fp)->nexthash;
   if (!*fp) {
@@ -2770,24 +2579,19 @@ static void add_find(faction * f, unit * u, faction * f2)
 static void update_find(void)
 {
   region *r;
-
   static boolean initial = true;
 
   if (initial)
     for (r = regions; r; r = r->next) {
       unit *u;
-
       for (u = r->units; u; u = u->next) {
         faction *lastf = u->faction;
-
         unit *u2;
-
         for (u2 = r->units; u2; u2 = u2->next) {
           if (u2->faction == lastf || u2->faction == u->faction)
             continue;
           if (seefaction(u->faction, r, u2, 0)) {
             faction *fv = visible_faction(u->faction, u2);
-
             lastf = fv;
             add_find(u->faction, u2, fv);
           }
@@ -2816,11 +2620,9 @@ void register_nr(void)
 void report_cleanup(void)
 {
   int i;
-
   for (i = 0; i != FMAXHASH; ++i) {
     while (fsee[i]) {
       struct fsee *fs = fsee[i]->nexthash;
-
       free(fsee[i]);
       fsee[i] = fs;
     }

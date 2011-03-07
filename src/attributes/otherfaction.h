@@ -30,5 +30,5 @@ extern "C" {
     const struct unit *u);
 
 #ifdef __cplusplus
-}
+  extern "C" {
 #endif

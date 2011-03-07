@@ -56,7 +56,6 @@ boolean get_moved(attrib ** alist)
 void set_moved(attrib ** alist)
 {
   attrib *a = a_find(*alist, &at_moved);
-
   if (a == NULL)
     a = a_add(alist, a_new(&at_moved));
   a->data.i = 2;

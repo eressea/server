@@ -44,7 +44,6 @@ int get_resource(const unit * u, const resource_type * rtype)
   if (rtype->uget) {
     /* this resource is probably special */
     int i = rtype->uget(u, rtype);
-
     if (i >= 0)
       return i;
   }
@@ -55,7 +54,6 @@ int get_resource(const unit * u, const resource_type * rtype)
       return u->number * GOLEM_IRON;
     } else {
       const item *i = *i_findc(&u->items, itype);
-
       if (i)
         return i->number;
       return 0;
@@ -152,13 +150,9 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode,
   int count)
 {
   const faction *f = u->faction;
-
   unit *v;
-
   int use = 0;
-
   region *r = u->region;
-
   int have = get_resource(u, rtype);
 
   if ((u->race->ec_flags & GETITEM) == 0) {
@@ -169,9 +163,7 @@ get_pooled(const unit * u, const resource_type * rtype, unsigned int mode,
     use = have;
   else {
     int reserve = get_reservation(u, rtype);
-
     int slack = MAX(0, have - reserve);
-
     if (mode & GET_RESERVE)
       use = have - slack;
     else if (mode & GET_SLACK)
@@ -203,13 +195,9 @@ int
 use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
 {
   const faction *f = u->faction;
-
   unit *v;
-
   int use = count;
-
   region *r = u->region;
-
   int n = 0, have = get_resource(u, rtype);
 
   if ((u->race->ec_flags & GETITEM) == 0) {
@@ -220,9 +208,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     n = MIN(use, have);
   } else {
     int reserve = get_reservation(u, rtype);
-
     int slack = MAX(0, have - reserve);
-
     if (mode & GET_RESERVE) {
       n = have - slack;
       n = MIN(use, n);
@@ -240,7 +226,6 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     for (v = r->units; use > 0 && v != NULL; v = v->next)
       if (u != v) {
         int mask;
-
         if ((urace(v)->ec_flags & GIVEITEM) == 0)
           continue;
         if (v->items == NULL && rtype->uget == NULL)
@@ -258,14 +243,11 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
   return count - use;
 }
 
-
 int reserve_cmd(unit * u, struct order *ord)
 {
   if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
     int use, count;
-
     const resource_type *rtype;
-
     const char *s;
 
     init_tokens(ord);

@@ -37,7 +37,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-
 #include <stdio.h>
 /***
  ** restore a mage that was turned into a toad
@@ -65,7 +64,6 @@ static int changerace_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   changerace_data *td = (changerace_data *) t->data.v;
-
   if (td->u) {
     if (td->race != NULL)
       td->u->race = td->race;
@@ -81,7 +79,6 @@ static int changerace_handle(trigger * t, void *data)
 static void changerace_write(const trigger * t, struct storage *store)
 {
   changerace_data *td = (changerace_data *) t->data.v;
-
   write_unit_reference(td->u, store);
   write_race_reference(td->race, store);
   write_race_reference(td->irace, store);
@@ -90,7 +87,6 @@ static void changerace_write(const trigger * t, struct storage *store)
 static int changerace_read(trigger * t, struct storage *store)
 {
   changerace_data *td = (changerace_data *) t->data.v;
-
   read_reference(&td->u, store, read_unit_reference, resolve_unit);
   td->race = (const struct race *)read_race_reference(store).v;
   td->irace = (const struct race *)read_race_reference(store).v;
@@ -110,7 +106,6 @@ trigger *trigger_changerace(struct unit * u, const struct race * prace,
   const struct race * irace)
 {
   trigger *t = t_new(&tt_changerace);
-
   changerace_data *td = (changerace_data *) t->data.v;
 
   assert(u->race == u_irace(u) || "!changerace-triggers cannot stack!");

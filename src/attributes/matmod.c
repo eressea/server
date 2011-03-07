@@ -34,7 +34,6 @@ attrib_type at_matmod = {
 attrib *make_matmod(mm_fun function)
 {
   attrib *a = a_new(&at_matmod);
-
   a->data.f = (void (*)(void))function;
   return a;
 }

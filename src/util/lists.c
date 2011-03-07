@@ -33,7 +33,6 @@ void addlist(void *l1, void *p1)
   /* add entry p to the end of list l */
 
   void_list **l;
-
   void_list *p, *q;
 
   l = (void_list **) l1;
@@ -51,7 +50,6 @@ void addlist(void *l1, void *p1)
 static void choplist(void *a, void *b)
 {
   void_list **l = (void_list **) a, *p = (void_list *) b;
-
   /* remove entry p from list l - when called, a pointer to p must be
    * kept in order to use (and free) p; if omitted, this will be a
    * memory leak */
@@ -117,7 +115,6 @@ unsigned int listlen(void *l)
   /* count entries p in list l */
 
   unsigned int i;
-
   void_list *p;
 
   for (p = (void_list *) l, i = 0; p; p = p->next, i++) ;

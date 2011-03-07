@@ -38,7 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-
 #include <stdio.h>
 /***
  ** restore a mage that was turned into a toad
@@ -70,7 +69,6 @@ static int createcurse_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   createcurse_data *td = (createcurse_data *) t->data.v;
-
   if (td->mage && td->target && td->mage->number && td->target->number) {
     create_curse(td->mage, &td->target->attribs,
       td->type, td->vigour, td->duration, td->effect, td->men);
@@ -84,7 +82,6 @@ static int createcurse_handle(trigger * t, void *data)
 static void createcurse_write(const trigger * t, struct storage *store)
 {
   createcurse_data *td = (createcurse_data *) t->data.v;
-
   write_unit_reference(td->mage, store);
   write_unit_reference(td->target, store);
   store->w_tok(store, td->type->cname);
@@ -97,7 +94,6 @@ static void createcurse_write(const trigger * t, struct storage *store)
 static int createcurse_read(trigger * t, struct storage *store)
 {
   createcurse_data *td = (createcurse_data *) t->data.v;
-
   char zText[128];
 
   read_reference(&td->mage, store, read_unit_reference, resolve_unit);
@@ -105,7 +101,6 @@ static int createcurse_read(trigger * t, struct storage *store)
 
   if (store->version < CURSETYPE_VERSION) {
     int id1, id2;
-
     id1 = store->r_int(store);
     id2 = store->r_int(store);
     assert(id2 == 0);
@@ -142,9 +137,7 @@ trigger *trigger_createcurse(struct unit * mage, struct unit * target,
   const curse_type * ct, double vigour, int duration, double effect, int men)
 {
   trigger *t = t_new(&tt_createcurse);
-
   createcurse_data *td = (createcurse_data *) t->data.v;
-
   td->mage = mage;
   td->target = target;
   td->type = ct;

@@ -32,7 +32,6 @@ attrib_type *at_hash[MAXATHASH];
 static unsigned int __at_hashkey(const char *s)
 {
   int key = 0;
-
   size_t i = strlen(s);
 
   while (i > 0) {
@@ -70,12 +69,10 @@ static attrib_type *at_find(unsigned int hk)
     {NULL, NULL}
   };
   attrib_type *find = at_hash[hk % MAXATHASH];
-
   while (find && hk != find->hashkey)
     find = find->nexthash;
   if (!find) {
     int i = 0;
-
     while (translate[i][0]) {
       if (__at_hashkey(translate[i][0]) == hk)
         return at_find(__at_hashkey(translate[i][1]));
@@ -124,7 +121,6 @@ static attrib *a_insert(attrib * head, attrib * a)
 attrib *a_add(attrib ** pa, attrib * a)
 {
   attrib *first = *pa;
-
   assert(a->next == NULL && a->nexttype == NULL);
 
   if (first == NULL)
@@ -134,11 +130,9 @@ attrib *a_add(attrib ** pa, attrib * a)
   }
   for (;;) {
     attrib *next = first->nexttype;
-
     if (next == NULL) {
       /* the type is not in the list, append it behind the last type */
       attrib **insert = &first->next;
-
       first->nexttype = a;
       while (*insert)
         insert = &(*insert)->next;
@@ -156,7 +150,6 @@ attrib *a_add(attrib ** pa, attrib * a)
 void a_free(attrib * a)
 {
   const attrib_type *at = a->type;
-
   if (at->finalize)
     at->finalize(a);
   free(a);
@@ -165,13 +158,11 @@ void a_free(attrib * a)
 static int a_unlink(attrib ** pa, attrib * a)
 {
   attrib **pnexttype = pa;
-
   attrib **pnext = NULL;
 
   assert(a != NULL);
   while (*pnexttype) {
     attrib *next = *pnexttype;
-
     if (next->type == a->type)
       break;
     pnexttype = &next->nexttype;
@@ -204,7 +195,6 @@ static int a_unlink(attrib ** pa, attrib * a)
 int a_remove(attrib ** pa, attrib * a)
 {
   int ok;
-
   assert(a != NULL);
   ok = a_unlink(pa, a);
   if (ok)
@@ -215,12 +205,10 @@ int a_remove(attrib ** pa, attrib * a)
 void a_removeall(attrib ** pa, const attrib_type * at)
 {
   attrib **pnexttype = pa;
-
   attrib **pnext = NULL;
 
   while (*pnexttype) {
     attrib *next = *pnexttype;
-
     if (next->type == at)
       break;
     pnexttype = &next->nexttype;
@@ -237,7 +225,6 @@ void a_removeall(attrib ** pa, const attrib_type * at)
     }
     while (a && a->type == at) {
       attrib *ra = a;
-
       a = a->next;
       a_free(ra);
     }
@@ -247,7 +234,6 @@ void a_removeall(attrib ** pa, const attrib_type * at)
 attrib *a_new(const attrib_type * at)
 {
   attrib *a = (attrib *) calloc(1, sizeof(attrib));
-
   assert(at != NULL);
   a->type = at;
   if (at->initialize)
@@ -258,15 +244,12 @@ attrib *a_new(const attrib_type * at)
 int a_age(attrib ** p)
 {
   attrib **ap = p;
-
   /* Attribute altern, und die Entfernung (age()==0) eines Attributs
    * hat Einfluß auf den Besitzer */
   while (*ap) {
     attrib *a = *ap;
-
     if (a->type->age) {
       int result = a->type->age(a);
-
       assert(result >= 0 || !"age() returned a negative value");
       if (result == 0) {
         a_remove(p, a);
@@ -281,9 +264,7 @@ int a_age(attrib ** p)
 int a_read(struct storage *store, attrib ** attribs, void *owner)
 {
   int key, retval = AT_READ_OK;
-
   char zText[128];
-
   strcpy(zText, "unknown");
 
   key = -1;
@@ -295,16 +276,13 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
 
   while (key != -1) {
     attrib_type *at = at_find(key);
-
     if (!at) {
       fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
       assert(at || !"attribute not registered");
     }
     if (at->read) {
       attrib *na = a_new(at);
-
       int i = at->read(na, owner, store);
-
       switch (i) {
         case AT_READ_OK:
           a_add(attribs, na);

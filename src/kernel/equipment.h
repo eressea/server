@@ -49,7 +49,6 @@ extern "C" {
     void (*callback) (const struct equipment *, struct unit *);
   } equipment;
 
-
   extern struct equipment *create_equipment(const char *eqname);
   extern struct equipment *get_equipment(const char *eqname);
 

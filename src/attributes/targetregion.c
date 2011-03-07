@@ -57,7 +57,6 @@ attrib_type at_targetregion = {
 attrib *make_targetregion(struct region * r)
 {
   attrib *a = a_new(&at_targetregion);
-
   a->data.v = r;
   return a;
 }

@@ -70,7 +70,6 @@ struct trigger_type tt_unguard = {
 trigger *trigger_unguard(building * b)
 {
   trigger *t = t_new(&tt_unguard);
-
   t->data.v = (void *)b;
   return t;
 }

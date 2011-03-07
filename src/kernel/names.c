@@ -52,11 +52,8 @@ static const char *make_names(const char *monster, int *num_postfix,
   int pprefix, int *num_name, int *num_prefix, int ppostfix)
 {
   int uv, uu, un;
-
   static char name[NAMESIZE + 1];
-
   char zText[32];
-
   const char *str;
 
   if (*num_prefix == 0) {
@@ -128,31 +125,26 @@ static const char *make_names(const char *monster, int *num_postfix,
 const char *undead_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
-
   return make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
 }
 
 const char *skeleton_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
-
   return make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
 const char *zombie_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
-
   return make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
 const char *ghoul_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
-
   return make_names("ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
 }
-
 
 /* Drachen */
 
@@ -230,15 +222,10 @@ const char *generic_name(const unit * u)
 const char *dragon_name(const unit * u)
 {
   static char name[NAMESIZE + 1];
-
   int rnd, ter = 0;
-
   int anzahl = 1;
-
   static int num_postfix;
-
   char zText[32];
-
   const char *str;
 
   if (num_postfix == 0) {
@@ -257,7 +244,6 @@ const char *dragon_name(const unit * u)
 
   if (u) {
     region *r = u->region;
-
     anzahl = u->number;
     switch (rterrain(r)) {
       case T_PLAIN:
@@ -288,7 +274,6 @@ const char *dragon_name(const unit * u)
 
   if (anzahl > 1) {
     const char *no_article = strchr((const char *)str, ' ');
-
     assert(no_article);
     /* TODO: GERMAN */
     sprintf(name, "Die %sn von %s", no_article, rname(u->region,
@@ -368,7 +353,6 @@ static const char *drac_suf[DRAC_SUF] = {
 const char *dracoid_name(const unit * u)
 {
   static char name[NAMESIZE + 1];
-
   int mid_syllabels;
 
   u = u;
@@ -393,17 +377,11 @@ const char *dracoid_name(const unit * u)
 const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
 {
   const char *p = s;
-
   char *bufp;
-
   unsigned int c = 0;
-
   size_t bpt, i;
-
   ucs4_t ucs;
-
   size_t size;
-
   int result;
 
   /* Prüfen, ob Kurz genug */

@@ -70,9 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/viewrange.h>
 
 boolean nocr = false;
-
 boolean nonr = false;
-
 boolean noreports = false;
 
 const char *visibility[] = {
@@ -97,13 +95,9 @@ const char *coasts[MAXDIRECTIONS] = {
 static char *groupid(const struct group *g, const struct faction *f)
 {
   typedef char name[OBJECTIDSIZE + 1];
-
   static name idbuf[8];
-
   static int nextbuf = 0;
-
   char *buf = idbuf[(++nextbuf) % 8];
-
   sprintf(buf, "%s (%s)", g->name, factionid(f));
   return buf;
 }
@@ -161,7 +155,6 @@ report_item(const unit * owner, const item * i, const faction * viewer,
       *number = i->number;
   } else if (owner && i->type->rtype == r_silver) {
     int pp = i->number / owner->number;
-
     if (number)
       *number = 1;
     if (pp > 50000 && dragonrace(owner->race)) {
@@ -203,15 +196,12 @@ report_item(const unit * owner, const item * i, const faction * viewer,
   }
 }
 
-
 int *nmrs = NULL;
 
 int update_nmrs(void)
 {
   int i, newplayers = 0;
-
   faction *f;
-
   int turn = global.data_turn;
 
   if (nmrs == NULL)
@@ -225,7 +215,6 @@ int update_nmrs(void)
       ++newplayers;
     } else if (!is_monsters(f) && f->alive) {
       int nmr = turn - f->lastorders + 1;
-
       if (nmr < 0 || nmr > NMRTimeout()) {
         log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
         nmr = MAX(0, nmr);
@@ -241,7 +230,6 @@ int update_nmrs(void)
 static size_t buforder(char *bufp, size_t size, const order * ord, int mode)
 {
   size_t tsize = 0;
-
   int bytes;
 
   bytes = (int)strlcpy(bufp, ", \"", size);
@@ -250,7 +238,6 @@ static size_t buforder(char *bufp, size_t size, const order * ord, int mode)
     WARN_STATIC_BUFFER();
   if (mode < ORDERS_IN_NR) {
     char *cmd = getcommand(ord);
-
     bytes = (int)strlcpy(bufp, cmd, size);
     free(cmd);
   } else {
@@ -282,7 +269,6 @@ report_items(const item * items, item * result, int size, const unit * owner,
   const faction * viewer)
 {
   const item *itm;
-
   int n = 0;                    /* number of results */
 
   assert(owner == NULL || viewer != owner->faction
@@ -291,7 +277,6 @@ report_items(const item * items, item * result, int size, const unit * owner,
 
   for (itm = items; itm; itm = itm->next) {
     item *ishow;
-
     const char *ic;
 
     report_item(owner, itm, viewer, NULL, &ic, NULL, false);
@@ -338,7 +323,6 @@ void report_race(const struct unit *u, const char **name, const char **illusion)
 {
   if (illusion) {
     const race *irace = u_irace(u);
-
     if (irace && irace != u->race) {
       *illusion = irace->_name[0];
     } else {
@@ -349,7 +333,6 @@ void report_race(const struct unit *u, const char **name, const char **illusion)
     *name = u->race->_name[0];
     if (fval(u->race, RCF_SHAPESHIFTANY)) {
       const char *str = get_racename(u->attribs);
-
       if (str)
         *name = str;
     }
@@ -361,7 +344,6 @@ report_building(const struct building *b, const char **name,
   const char **illusion)
 {
   static int init;
-
   static const struct building_type *bt_illusion;
 
   if (name) {
@@ -376,10 +358,8 @@ report_building(const struct building *b, const char **name,
     }
     if (bt_illusion && b->type == bt_illusion) {
       const attrib *a = a_findc(b->attribs, &at_icastle);
-
       if (a != NULL) {
         icastle_data *icastle = (icastle_data *) a->data.v;
-
         *illusion = buildingtype(icastle->type, b, b->size);
       }
     }
@@ -391,20 +371,14 @@ report_resources(const seen_region * sr, resource_report * result, int size,
   const faction * viewer)
 {
   const region *r = sr->r;
-
   int n = 0;
 
   if (r->land) {
     int peasants = rpeasants(r);
-
     int money = rmoney(r);
-
     int horses = rhorses(r);
-
     int trees = rtrees(r, 2);
-
     int saplings = rtrees(r, 1);
-
     boolean mallorn = fval(r, RF_MALLORN) != 0;
 
     if (money) {
@@ -443,26 +417,19 @@ report_resources(const seen_region * sr, resource_report * result, int size,
 
   if (sr->mode >= see_unit) {
     rawmaterial *res = r->resources;
-
     while (res) {
       int maxskill = 0;
-
       const item_type *itype = resource2item(res->type->rtype);
-
       int level = res->level + itype->construction->minskill - 1;
-
       int visible = -1;
-
       if (res->type->visible == NULL) {
         visible = res->amount;
         level = res->level + itype->construction->minskill - 1;
       } else {
         const unit *u;
-
         for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
           if (u->faction == viewer) {
             int s = eff_skill(u, itype->construction->skill, r);
-
             if (s > maxskill) {
               maxskill = s;
               visible = res->type->visible(res, maxskill);
@@ -487,35 +454,20 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   size_t size)
 {
   int i, dh;
-
   int getarnt = fval(u, UFL_ANON_FACTION);
-
   const char *pzTmp, *str;
-
   building *b;
-
   boolean isbattle = (boolean) (mode == see_battle);
-
   int telepath_see = 0;
-
   attrib *a_fshidden = NULL;
-
   item *itm;
-
   item *show;
-
   faction *fv = visible_faction(f, u);
-
   char *bufp = buf;
-
   boolean itemcloak = false;
-
   static const curse_type *itemcloak_ct = 0;
-
   static boolean init = false;
-
   int bytes;
-
   item result[MAX_INVENTORY];
 
   if (!init) {
@@ -532,14 +484,11 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
 
   if (!isbattle) {
     attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
-
     if (u->faction == f) {
       if (fval(u, UFL_GROUP)) {
         attrib *a = a_find(u->attribs, &at_group);
-
         if (a) {
           group *g = (group *) a->data.v;
-
           bytes = (int)strlcpy(bufp, ", ", size);
           if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -557,7 +506,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
           WARN_STATIC_BUFFER();
       } else if (a_otherfaction) {
         faction *otherfaction = get_otherfaction(a_otherfaction);
-
         if (otherfaction) {
           bytes = (int)strlcpy(bufp, ", ", size);
           if (wrptr(&bufp, &size, bytes) != 0)
@@ -578,7 +526,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
       } else {
         if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
           faction *f = get_otherfaction(a_otherfaction);
-
           bytes =
             snprintf(bufp, size, ", %s (%s)", factionname(f),
             factionname(u->faction));
@@ -628,7 +575,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     }
   } else {
     const race *irace = u_irace(u);
-
     bytes = (int)strlcpy(bufp, racename(f->locale, u, irace), size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
@@ -658,7 +604,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
 
   if (u->number && (u->faction == f || telepath_see || isbattle)) {
     const char *c = locale_string(f->locale, hp_status(u));
-
     bytes = (int)strlcpy(bufp, ", ", size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
@@ -709,7 +654,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   dh = 0;
   if (u->faction == f || telepath_see) {
     skill *sv;
-
     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
       bytes = (int)spskill(bufp, size, f->locale, u, sv, &dh, 1);
       if (wrptr(&bufp, &size, bytes) != 0)
@@ -723,7 +667,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   } else if (!itemcloak && mode >= see_unit && !(a_fshidden
       && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
     int n = report_items(u->items, result, MAX_INVENTORY, u, f);
-
     assert(n >= 0);
     if (n > 0)
       show = result;
@@ -734,9 +677,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   }
   for (itm = show; itm; itm = itm->next) {
     const char *ic;
-
     int in, bytes;
-
     report_item(u, itm, f, &ic, NULL, &in, false);
     if (in == 0 || ic == NULL)
       continue;
@@ -764,9 +705,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
 
     if (m != NULL) {
       quicklist *ql = m->spells;
-
       int qi, t = effskill(u, SK_MAGIC);
-
       int bytes =
         snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u),
         max_spellpoints(u->region, u));
@@ -775,7 +714,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
 
       for (dh = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
         spell *sp = (spell *) ql_get(ql, qi);
-
         if (sp->level > t)
           continue;
         if (!dh) {
@@ -804,7 +742,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
         dh = 0;
         for (i = 0; i < MAXCOMBATSPELLS; i++) {
           const spell *sp;
-
           if (!dh) {
             dh = 1;
           } else {
@@ -816,7 +753,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
           sp = get_combatspell(u, i);
           if (sp) {
             int sl = get_combatspelllevel(u, i);
-
             bytes =
               (int)strlcpy(bufp, spell_name(sp, u->faction->locale), size);
             if (bytes && wrptr(&bufp, &size, bytes) != 0) {
@@ -838,7 +774,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     }
     if (!isbattle) {
       boolean printed = 0;
-
       order *ord;;
       for (ord = u->old_orders; ord; ord = ord->next) {
         if (is_repeated(ord)) {
@@ -919,11 +854,8 @@ spskill(char *buffer, size_t size, const struct locale * lang,
   const struct unit * u, struct skill * sv, int *dh, int days)
 {
   char *bufp = buffer;
-
   int i, effsk;
-
   int bytes;
-
   size_t tsize = 0;
 
   if (!u->number)
@@ -964,7 +896,6 @@ spskill(char *buffer, size_t size, const struct locale * lang,
 
   if (sv->id == SK_MAGIC) {
     sc_mage *mage = get_mage(u);
-
     if (mage && mage->magietyp != M_GRAY) {
       bytes =
         (int)strlcpy(bufp, LOC(lang, mkname("school",
@@ -998,7 +929,6 @@ spskill(char *buffer, size_t size, const struct locale * lang,
 
   if (u->faction->options & want(O_SHOWSKCHANGE)) {
     int oldeff = 0;
-
     int diff;
 
     if (sv->old > 0) {
@@ -1042,9 +972,7 @@ spunit(struct strlist **SP, const struct faction *f, const unit * u, int indent,
   int mode)
 {
   char buf[DISPLAYSIZE];
-
   int dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
-
   lparagraph(SP, buf, indent,
     (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
@@ -1057,7 +985,6 @@ struct message *msg_curse(const struct curse *c, const void *obj, typ_t typ,
     return c->type->curseinfo(obj, typ, c, self);
   } else {
     message *msg = cinfo_simple(obj, typ, c, self);
-
     if (msg == NULL) {
       const char *unknown[] =
         { "unit_unknown", "region_unknown", "building_unknown",
@@ -1107,11 +1034,8 @@ static void get_addresses(report_context * ctx)
 {
 /* "TODO: travelthru" */
   seen_region *sr = NULL;
-
   region *r;
-
   const faction *lastf = NULL;
-
   quicklist *flist = 0;
 
   transfer_seen(&flist, &ctx->f->seen_factions);
@@ -1121,9 +1045,7 @@ static void get_addresses(report_context * ctx)
 
   if (f_get_alliance(ctx->f)) {
     quicklist *ql = ctx->f->alliance->members;
-
     int qi;
-
     for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
       ql_set_insert(&flist, ql_get(ql, qi));
     }
@@ -1136,14 +1058,11 @@ static void get_addresses(report_context * ctx)
 
   for (; sr != NULL; sr = sr->next) {
     int stealthmod = stealth_modifier(sr->mode);
-
     r = sr->r;
     if (sr->mode == see_lighthouse) {
       unit *u = r->units;
-
       for (; u; u = u->next) {
         faction *sf = visible_faction(ctx->f, u);
-
         if (lastf != sf) {
           if (u->building || u->ship || (stealthmod > INT_MIN
               && cansee(ctx->f, r, u, stealthmod))) {
@@ -1154,17 +1073,13 @@ static void get_addresses(report_context * ctx)
       }
     } else if (sr->mode == see_travel) {
       unit *u = r->units;
-
       while (u) {
         faction *sf = visible_faction(ctx->f, u);
-
         assert(u->faction != ctx->f);   /* if this is see_travel only, then I shouldn't be here. */
         if (lastf != sf) {
           attrib *a = a_find(r->attribs, &at_travelunit);
-
           while (a && a->type == &at_travelunit) {
             unit *u2 = (unit *) a->data.v;
-
             if (u2->faction == ctx->f) {
               if (cansee_unit(u2, u, stealthmod)) {
                 ql_set_insert(&flist, sf);
@@ -1179,11 +1094,9 @@ static void get_addresses(report_context * ctx)
       }
     } else if (sr->mode > see_travel) {
       const unit *u = r->units;
-
       while (u != NULL) {
         if (u->faction != ctx->f) {
           faction *sf = visible_faction(ctx->f, u);
-
           boolean ballied = sf && sf != ctx->f && sf != lastf
             && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
           if (ballied || ALLIED(ctx->f, sf)) {
@@ -1198,7 +1111,6 @@ static void get_addresses(report_context * ctx)
 
   if (f_get_alliance(ctx->f)) {
     faction *f2;
-
     for (f2 = factions; f2; f2 = f2->next) {
       if (f2->alliance == ctx->f->alliance) {
         ql_set_insert(&flist, f2);
@@ -1219,10 +1131,8 @@ seen_region **seen_init(void)
 void seen_done(seen_region * seehash[])
 {
   int i;
-
   for (i = 0; i != MAXSEEHASH; ++i) {
     seen_region *sd = seehash[i];
-
     if (sd == NULL)
       continue;
     while (sd->nextHash != NULL)
@@ -1238,7 +1148,6 @@ void free_seen(void)
 {
   while (reuse) {
     seen_region *r = reuse;
-
     reuse = reuse->nextHash;
     free(r);
   }
@@ -1248,7 +1157,6 @@ void
 link_seen(seen_region * seehash[], const region * first, const region * last)
 {
   const region *r = first;
-
   seen_region *sr = NULL;
 
   if (first == last)
@@ -1261,7 +1169,6 @@ link_seen(seen_region * seehash[], const region * first, const region * last)
 
   while (r != last) {
     seen_region *sn = find_seen(seehash, r);
-
     if (sn != NULL) {
       sr->next = sn;
       sr = sn;
@@ -1274,9 +1181,7 @@ link_seen(seen_region * seehash[], const region * first, const region * last)
 seen_region *find_seen(struct seen_region *seehash[], const region * r)
 {
   unsigned int index = reg_hashkey(r) & (MAXSEEHASH - 1);
-
   seen_region *find = seehash[index];
-
   while (find) {
     if (find->r == r)
       return find;
@@ -1290,10 +1195,8 @@ static void get_seen_interval(report_context * ctx)
   /* this is required to find the neighbour regions of the ones we are in,
    * which may well be outside of [firstregion, lastregion) */
   int i;
-
   for (i = 0; i != MAXSEEHASH; ++i) {
     seen_region *sr = ctx->seen[i];
-
     while (sr != NULL) {
       if (ctx->first == NULL || sr->r->index < ctx->first->index) {
         ctx->first = sr->r;
@@ -1312,10 +1215,8 @@ add_seen(struct seen_region *seehash[], struct region *r, unsigned char mode,
   boolean dis)
 {
   seen_region *find = find_seen(seehash, r);
-
   if (find == NULL) {
     unsigned int index = reg_hashkey(r) & (MAXSEEHASH - 1);
-
     if (!reuse)
       reuse = (seen_region *) calloc(1, sizeof(struct seen_region));
     find = reuse;
@@ -1343,7 +1244,6 @@ static report_type *report_types;
 void register_reporttype(const char *extension, report_fun write, int flag)
 {
   report_type *type = malloc(sizeof(report_type));
-
   type->extension = extension;
   type->write = write;
   type->flag = flag;
@@ -1354,20 +1254,15 @@ void register_reporttype(const char *extension, report_fun write, int flag)
 static region_list *get_regions_distance(region * root, int radius)
 {
   region_list *rptr, *rlist = NULL;
-
   region_list **rp = &rlist;
-
   add_regionlist(rp, root);
   fset(root, RF_MARK);
   while (*rp) {
     region_list *r = *rp;
-
     direction_t d;
-
     rp = &r->next;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *rn = rconnect(r->data, d);
-
       if (rn != NULL && !fval(rn, RF_MARK) && distance(rn, root) <= radius) {
         add_regionlist(rp, rn);
         fset(rn, RF_MARK);
@@ -1383,13 +1278,10 @@ static region_list *get_regions_distance(region * root, int radius)
 static void view_default(struct seen_region **seen, region * r, faction * f)
 {
   direction_t dir;
-
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     region *r2 = rconnect(r, dir);
-
     if (r2) {
       connection *b = get_borders(r, r2);
-
       while (b) {
         if (!b->type->transparent(b, f))
           break;
@@ -1404,13 +1296,10 @@ static void view_default(struct seen_region **seen, region * r, faction * f)
 static void view_neighbours(struct seen_region **seen, region * r, faction * f)
 {
   direction_t dir;
-
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     region *r2 = rconnect(r, dir);
-
     if (r2) {
       connection *b = get_borders(r, r2);
-
       while (b) {
         if (!b->type->transparent(b, f))
           break;
@@ -1420,13 +1309,10 @@ static void view_neighbours(struct seen_region **seen, region * r, faction * f)
         if (add_seen(seen, r2, see_far, false)) {
           if (!(fval(r2->terrain, FORBIDDEN_REGION))) {
             direction_t dir;
-
             for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
               region *r3 = rconnect(r2, dir);
-
               if (r3) {
                 connection *b = get_borders(r2, r3);
-
                 while (b) {
                   if (!b->type->transparent(b, f))
                     break;
@@ -1448,18 +1334,13 @@ recurse_regatta(struct seen_region **seen, region * center, region * r,
   faction * f, int maxdist)
 {
   direction_t dir;
-
   int dist = distance(center, r);
-
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     region *r2 = rconnect(r, dir);
-
     if (r2) {
       int ndist = distance(center, r2);
-
       if (ndist > dist && fval(r2->terrain, SEA_REGION)) {
         connection *b = get_borders(r, r2);
-
         while (b) {
           if (!b->type->transparent(b, f))
             break;
@@ -1481,13 +1362,10 @@ recurse_regatta(struct seen_region **seen, region * center, region * r,
 static void view_regatta(struct seen_region **seen, region * r, faction * f)
 {
   unit *u;
-
   int skill = 0;
-
   for (u = r->units; u; u = u->next) {
     if (u->faction == f) {
       int es = effskill(u, SK_PERCEPTION);
-
       if (es > skill)
         skill = es;
     }
@@ -1498,11 +1376,8 @@ static void view_regatta(struct seen_region **seen, region * r, faction * f)
 static void prepare_reports(void)
 {
   region *r;
-
   faction *f;
-
   static const struct building_type *bt_lighthouse = NULL;
-
   if (bt_lighthouse == NULL)
     bt_lighthouse = bt_find("lighthouse");
 
@@ -1514,16 +1389,13 @@ static void prepare_reports(void)
 
   for (r = regions; r; r = r->next) {
     attrib *ru;
-
     unit *u;
-
     plane *p = rplane(r);
 
     reorder_units(r);
 
     if (p) {
       watcher *w = p->watchers;
-
       for (; w; w = w->next) {
         add_seen(w->faction->seen, r, w->mode, false);
 #ifdef SMART_INTERVALS
@@ -1536,21 +1408,16 @@ static void prepare_reports(void)
       if (u->building && u->building->type == bt_lighthouse) {
         /* we are in a lighthouse. add the regions we can see from here! */
         int range = lighthouse_range(u->building, u->faction);
-
         region_list *rlist = get_regions_distance(r, range);
-
         region_list *rp = rlist;
 
         while (rp) {
           region *rl = rp->data;
-
           if (fval(rl->terrain, SEA_REGION)) {
             direction_t d;
-
             add_seen(u->faction->seen, rl, see_lighthouse, false);
             for (d = 0; d != MAXDIRECTIONS; ++d) {
               region *rn = rconnect(rl, d);
-
               if (rn != NULL) {
                 add_seen(u->faction->seen, rn, see_neighbour, false);
               }
@@ -1587,9 +1454,7 @@ static void prepare_reports(void)
 static seen_region **prepare_report(faction * f)
 {
   struct seen_region *sr;
-
   region *r = firstregion(f);
-
   region *last = lastregion(f);
 
   link_seen(f->seen, r, last);
@@ -1601,14 +1466,11 @@ static seen_region **prepare_report(faction * f)
   for (; sr != NULL; sr = sr->next) {
     if (sr->mode > see_neighbour) {
       region *r = sr->r;
-
       plane *p = rplane(r);
 
       void (*view) (struct seen_region **, region *, faction *) = view_default;
-
       if (p && fval(p, PFL_SEESPECIAL)) {
         attrib *a = a_find(p->attribs, &at_viewrange);
-
         if (a)
           view =
             (void (*)(struct seen_region **, region *, faction *))a->data.f;
@@ -1622,11 +1484,8 @@ static seen_region **prepare_report(faction * f)
 int write_reports(faction * f, time_t ltime)
 {
   int backup = 1, maxbackup = 128;
-
   boolean gotit = false;
-
   struct report_context ctx;
-
   const char *encoding = "UTF-8";
 
   if (noreports) {
@@ -1652,7 +1511,6 @@ int write_reports(faction * f, time_t ltime)
     for (; rtype != NULL; rtype = rtype->next) {
       if (f->options & rtype->flag) {
         char filename[MAX_PATH];
-
         sprintf(filename, "%s/%d-%s.%s", reportpath(), turn, factionid(f),
           rtype->extension);
         if (rtype->write(filename, &ctx, encoding) == 0) {
@@ -1663,7 +1521,6 @@ int write_reports(faction * f, time_t ltime)
 
     if (errno) {
       char zText[64];
-
       puts(" ERROR");
       sprintf(zText, "Waiting %u seconds before retry", backup);
       perror(zText);
@@ -1686,15 +1543,12 @@ int write_reports(faction * f, time_t ltime)
 static void nmr_warnings(void)
 {
   faction *f, *fa;
-
 #define FRIEND (HELP_GUARD|HELP_MONEY)
   for (f = factions; f; f = f->next) {
     if (!is_monsters(f) && (turn - f->lastorders) >= 2) {
       message *msg = NULL;
-
       for (fa = factions; fa; fa = fa->next) {
         int warn = 0;
-
         if (get_param_int(global.parameters, "rules.alliances", 0) != 0) {
           if (f->alliance && f->alliance == fa->alliance) {
             warn = 1;
@@ -1721,15 +1575,12 @@ static void nmr_warnings(void)
 static void report_donations(void)
 {
   region *r;
-
   for (r = regions; r; r = r->next) {
     while (r->donations) {
       donation *sp = r->donations;
-
       if (sp->amount > 0) {
         struct message *msg = msg_message("donation",
           "from to amount", sp->f1, sp->f2, sp->amount);
-
         r_addmessage(r, sp->f1, msg);
         r_addmessage(r, sp->f2, msg);
         msg_release(msg);
@@ -1743,7 +1594,6 @@ static void report_donations(void)
 static void write_script(FILE * F, const faction * f)
 {
   report_type *rtype;
-
   char buf[1024];
 
   fprintf(F, "faction=%s:email=%s:lang=%s", factionid(f), f->email,
@@ -1772,7 +1622,6 @@ int init_reports(void)
 #ifdef HAVE_STAT
   {
     stat_type st;
-
     if (stat(reportpath(), &st) == 0)
       return 0;
   }
@@ -1789,15 +1638,10 @@ int init_reports(void)
 int reports(void)
 {
   faction *f;
-
   FILE *mailit;
-
   time_t ltime = time(NULL);
-
   const char *str;
-
   int retval = 0;
-
   char path[MAX_PATH];
 
   if (verbosity >= 1) {
@@ -1815,7 +1659,6 @@ int reports(void)
 
   for (f = factions; f; f = f->next) {
     int error = write_reports(f, ltime);
-
     if (error)
       retval = error;
     if (mailit)
@@ -1825,7 +1668,6 @@ int reports(void)
     fclose(mailit);
   free_seen();
   str = get_param(global.parameters, "globalreport");
-
 #ifdef GLOBAL_REPORT
   if (str != NULL) {
     sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
@@ -1860,12 +1702,10 @@ static void var_free_order(variant x)
 static variant var_copy_items(variant x)
 {
   item *isrc;
-
   resource *rdst = NULL, **rptr = &rdst;
 
   for (isrc = (item *) x.v; isrc != NULL; isrc = isrc->next) {
     resource *res = malloc(sizeof(resource));
-
     res->number = isrc->number;
     res->type = isrc->type->rtype;
     *rptr = res;
@@ -1879,10 +1719,8 @@ static variant var_copy_items(variant x)
 static void var_free_resources(variant x)
 {
   resource *rsrc = (resource *) x.v;
-
   while (rsrc) {
     resource *res = rsrc->next;
-
     free(rsrc);
     rsrc = res;
   }
@@ -1897,12 +1735,9 @@ static void var_free_regions(variant x)
 const char *trailinto(const region * r, const struct locale *lang)
 {
   char ref[32];
-
   const char *s;
-
   if (r) {
     const char *tname = terrain_name(r);
-
     strcat(strcpy(ref, tname), "_trail");
     s = locale_string(lang, ref);
     if (s && *s) {
@@ -1920,13 +1755,9 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
     strncpy(buffer, "(Chaos)", size);
   } else {
     plane *pl = rplane(r);
-
     const char *name = pl ? pl->name : 0;
-
     int nx = r->x, ny = r->y;
-
     int named = (name && name[0]);
-
     pnormalize(&nx, &ny, pl);
     adjust_coordinates(f, &nx, &ny, pl, r);
     strncpy(buffer, rname(r, f->locale), size);
@@ -1940,9 +1771,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 static char *f_regionid_s(const region * r, const faction * f)
 {
   static int i = 0;
-
   static char bufs[4][NAMESIZE + 20];
-
   char *buf = bufs[(++i) % 4];
 
   f_regionid(r, f, buf, NAMESIZE + 20);
@@ -1953,11 +1782,8 @@ static char *f_regionid_s(const region * r, const faction * f)
 static void eval_localize(struct opstack **stack, const void *userdata)
 {                               /* (string, locale) -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct locale *lang = f ? f->locale : default_locale;
-
   const char *c = (const char *)opop_v(stack);
-
   c = locale_string(lang, c);
   opush_v(stack, strcpy(balloc(strlen(c) + 1), c));
 }
@@ -1965,19 +1791,12 @@ static void eval_localize(struct opstack **stack, const void *userdata)
 static void eval_trailto(struct opstack **stack, const void *userdata)
 {                               /* (int, int) -> int */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct locale *lang = f ? f->locale : default_locale;
-
   const struct region *r = (const struct region *)opop(stack).v;
-
   const char *trail = trailinto(r, lang);
-
   const char *rn = f_regionid_s(r, f);
-
   variant var;
-
   char *x = var.v = balloc(strlen(trail) + strlen(rn));
-
   sprintf(x, trail, rn);
   opush(stack, var);
 }
@@ -1985,13 +1804,9 @@ static void eval_trailto(struct opstack **stack, const void *userdata)
 static void eval_unit(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct unit *u = (const struct unit *)opop(stack).v;
-
   const char *c = u ? unitname(u) : LOC(f->locale, "an_unknown_unit");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2001,13 +1816,9 @@ static void eval_unit(struct opstack **stack, const void *userdata)
 static void eval_unit_dative(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct unit *u = (const struct unit *)opop(stack).v;
-
   const char *c = u ? unitname(u) : LOC(f->locale, "unknown_unit_dative");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2017,13 +1828,10 @@ static void eval_unit_dative(struct opstack **stack, const void *userdata)
 static void eval_spell(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct spell *sp = (const struct spell *)opop(stack).v;
-
   const char *c =
     sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2033,13 +1841,10 @@ static void eval_spell(struct opstack **stack, const void *userdata)
 static void eval_curse(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct curse_type *sp = (const struct curse_type *)opop(stack).v;
-
   const char *c =
     sp ? curse_name(sp, f->locale) : LOC(f->locale, "an_unknown_curse");
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2049,30 +1854,21 @@ static void eval_curse(struct opstack **stack, const void *userdata)
 static void eval_unitname(struct opstack **stack, const void *userdata)
 {                               /* unit -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct unit *u = (const struct unit *)opop(stack).v;
-
   const char *c = u ? u->name : LOC(f->locale, "an_unknown_unit");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
   opush(stack, var);
 }
 
-
 static void eval_unitid(struct opstack **stack, const void *userdata)
 {                               /* unit -> int */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct unit *u = (const struct unit *)opop(stack).v;
-
   const char *c = u ? u->name : LOC(f->locale, "an_unknown_unit");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2082,7 +1878,6 @@ static void eval_unitid(struct opstack **stack, const void *userdata)
 static void eval_unitsize(struct opstack **stack, const void *userdata)
 {                               /* unit -> int */
   const struct unit *u = (const struct unit *)opop(stack).v;
-
   variant var;
 
   var.i = u->number;
@@ -2092,11 +1887,8 @@ static void eval_unitsize(struct opstack **stack, const void *userdata)
 static void eval_faction(struct opstack **stack, const void *userdata)
 {                               /* faction -> string */
   const struct faction *f = (const struct faction *)opop(stack).v;
-
   const char *c = factionname(f);
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2106,14 +1898,10 @@ static void eval_faction(struct opstack **stack, const void *userdata)
 static void eval_alliance(struct opstack **stack, const void *userdata)
 {                               /* faction -> string */
   const struct alliance *al = (const struct alliance *)opop(stack).v;
-
   const char *c = alliancename(al);
-
   variant var;
-
   if (c != NULL) {
     size_t len = strlen(c);
-
     var.v = strcpy(balloc(len + 1), c);
   } else
     var.v = NULL;
@@ -2123,15 +1911,10 @@ static void eval_alliance(struct opstack **stack, const void *userdata)
 static void eval_region(struct opstack **stack, const void *userdata)
 {                               /* region -> string */
   char name[NAMESIZE + 32];
-
   const struct faction *f = (const struct faction *)userdata;
-
   const struct region *r = (const struct region *)opop(stack).v;
-
   const char *c = write_regionname(r, f, name, sizeof(name));
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2141,13 +1924,9 @@ static void eval_region(struct opstack **stack, const void *userdata)
 static void eval_terrain(struct opstack **stack, const void *userdata)
 {                               /* region -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct region *r = (const struct region *)opop(stack).v;
-
   const char *c = LOC(f->locale, terrain_name(r));
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2157,13 +1936,9 @@ static void eval_terrain(struct opstack **stack, const void *userdata)
 static void eval_ship(struct opstack **stack, const void *userdata)
 {                               /* ship -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct ship *u = (const struct ship *)opop(stack).v;
-
   const char *c = u ? shipname(u) : LOC(f->locale, "an_unknown_ship");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2173,13 +1948,9 @@ static void eval_ship(struct opstack **stack, const void *userdata)
 static void eval_building(struct opstack **stack, const void *userdata)
 {                               /* building -> string */
   const struct faction *f = (const struct faction *)userdata;
-
   const struct building *u = (const struct building *)opop(stack).v;
-
   const char *c = u ? buildingname(u) : LOC(f->locale, "an_unknown_building");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2189,13 +1960,9 @@ static void eval_building(struct opstack **stack, const void *userdata)
 static void eval_weight(struct opstack **stack, const void *userdata)
 {                               /* region -> string */
   char buffer[32];
-
   const struct faction *f = (const struct faction *)userdata;
-
   const struct locale *lang = f->locale;
-
   int weight = opop_i(stack);
-
   variant var;
 
   if (weight % SCALEWEIGHT == 0) {
@@ -2221,17 +1988,11 @@ static void eval_weight(struct opstack **stack, const void *userdata)
 static void eval_resource(struct opstack **stack, const void *userdata)
 {
   const faction *report = (const faction *)userdata;
-
   const struct locale *lang = report ? report->locale : default_locale;
-
   int j = opop(stack).i;
-
   const struct resource_type *res = (const struct resource_type *)opop(stack).v;
-
   const char *c = LOC(lang, resourcename(res, j != 1));
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2241,17 +2002,11 @@ static void eval_resource(struct opstack **stack, const void *userdata)
 static void eval_race(struct opstack **stack, const void *userdata)
 {
   const faction *report = (const faction *)userdata;
-
   const struct locale *lang = report ? report->locale : default_locale;
-
   int j = opop(stack).i;
-
   const race *r = (const race *)opop(stack).v;
-
   const char *c = LOC(lang, rc_name(r, j != 1));
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2261,11 +2016,8 @@ static void eval_race(struct opstack **stack, const void *userdata)
 static void eval_order(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
   const struct order *ord = (const struct order *)opop(stack).v;
-
   static char buf[256];
-
   size_t len;
-
   variant var;
 
   unused(userdata);
@@ -2278,24 +2030,17 @@ static void eval_order(struct opstack **stack, const void *userdata)
 static void eval_resources(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
   const faction *report = (const faction *)userdata;
-
   const struct locale *lang = report ? report->locale : default_locale;
-
   const struct resource *res = (const struct resource *)opop(stack).v;
-
   static char buf[1024];        /* but we only use about half of this */
-
   size_t size = sizeof(buf) - 1;
-
   variant var;
 
   char *bufp = buf;
-
   while (res != NULL && size > 4) {
     const char *rname =
       resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
     int bytes = snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
-
     if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0 || size < sizeof(buf) / 2) {
       WARN_STATIC_BUFFER();
       break;
@@ -2316,19 +2061,12 @@ static void eval_resources(struct opstack **stack, const void *userdata)
 static void eval_regions(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
   const faction *report = (const faction *)userdata;
-
   int i = opop(stack).i;
-
   int end, begin = opop(stack).i;
-
   const arg_regions *regions = (const arg_regions *)opop(stack).v;
-
   static char buf[256];
-
   size_t size = sizeof(buf) - 1;
-
   variant var;
-
   char *bufp = buf;
 
   if (regions == NULL) {
@@ -2341,9 +2079,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
   }
   for (i = begin; i < end; ++i) {
     const char *rname = (const char *)regionname(regions->regions[i], report);
-
     int bytes = (int)strlcpy(bufp, rname, size);
-
     if (bytes && wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
 
@@ -2361,21 +2097,13 @@ static void eval_regions(struct opstack **stack, const void *userdata)
 static void eval_trail(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
   const faction *report = (const faction *)userdata;
-
   const struct locale *lang = report ? report->locale : default_locale;
-
   int i, end = 0, begin = 0;
-
   const arg_regions *regions = (const arg_regions *)opop(stack).v;
-
   static char buf[512];
-
   size_t size = sizeof(buf) - 1;
-
   variant var;
-
   char *bufp = buf;
-
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
   /* stupid MS broke snprintf */
   int eold = errno;
@@ -2385,13 +2113,9 @@ static void eval_trail(struct opstack **stack, const void *userdata)
     end = regions->nregions;
     for (i = begin; i < end; ++i) {
       region *r = regions->regions[i];
-
       const char *trail = trailinto(r, lang);
-
       const char *rn = f_regionid_s(r, report);
-
       int bytes = snprintf(bufp, size, trail, rn);
-
       if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
@@ -2419,15 +2143,10 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 static void eval_direction(struct opstack **stack, const void *userdata)
 {
   const faction *report = (const faction *)userdata;
-
   const struct locale *lang = report ? report->locale : default_locale;
-
   int i = opop(stack).i;
-
   const char *c = LOC(lang, (i >= 0) ? directions[i] : "unknown_direction");
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2437,15 +2156,10 @@ static void eval_direction(struct opstack **stack, const void *userdata)
 static void eval_skill(struct opstack **stack, const void *userdata)
 {
   const faction *report = (const faction *)userdata;
-
   const struct locale *lang = report ? report->locale : default_locale;
-
   skill_t sk = (skill_t) opop(stack).i;
-
   const char *c = skillname(sk, lang);
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2455,11 +2169,8 @@ static void eval_skill(struct opstack **stack, const void *userdata)
 static void eval_int36(struct opstack **stack, const void *userdata)
 {
   int i = opop(stack).i;
-
   const char *c = itoa36(i);
-
   size_t len = strlen(c);
-
   variant var;
 
   var.v = strcpy(balloc(len + 1), c);
@@ -2474,15 +2185,12 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 static void log_orders(const struct message *msg)
 {
   faction *f = get_monsters();
-
   char buffer[4096];
-
   int i;
 
   for (i = 0; i != msg->type->nparameters; ++i) {
     if (msg->type->types[i]->copy == &var_copy_order) {
       const char *section = nr_section(msg);
-
       nr_render(msg, f ? f->locale : default_locale, buffer, sizeof(buffer), f);
       log_printf("MESSAGE [%s]: %s\n", section, buffer);
       break;
@@ -2493,9 +2201,7 @@ static void log_orders(const struct message *msg)
 int report_action(region * r, unit * actor, message * msg, int flags)
 {
   int result = 0;
-
   unit *u;
-
   int view = flags & (ACTION_CANSEE | ACTION_CANNOTSEE);
 
   /* melden, 1x pro Partei */
@@ -2508,7 +2214,6 @@ int report_action(region * r, unit * actor, message * msg, int flags)
     for (u = r->units; u; u = u->next) {
       if (!fval(u->faction, FFL_SELECT)) {
         boolean show = u->faction == actor->faction;
-
         fset(u->faction, FFL_SELECT);
         if (view == ACTION_CANSEE) {
           /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
@@ -2538,7 +2243,6 @@ int report_action(region * r, unit * actor, message * msg, int flags)
   return result;
 }
 
-
 void register_reports(void)
 {
   /* register datatypes for the different message objects */
@@ -2560,7 +2264,6 @@ void register_reports(void)
   register_argtype("resources", var_free_resources, NULL, VAR_VOIDPTR);
   register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
   register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
-
 
   msg_log_create = &log_orders;
 

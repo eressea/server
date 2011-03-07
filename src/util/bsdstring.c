@@ -33,9 +33,7 @@ INLINE_FUNCTION int wrptr(char **ptr, size_t * size, int bytes)
 INLINE_FUNCTION size_t strlcpy(char *dst, const char *src, size_t siz)
 {                               /* copied from OpenBSD source code */
   register char *d = dst;
-
   register const char *s = src;
-
   register size_t n = siz;
 
   /* Copy as many bytes as will fit */
@@ -56,15 +54,11 @@ INLINE_FUNCTION size_t strlcpy(char *dst, const char *src, size_t siz)
   return (s - src - 1);         /* count does not include NUL */
 }
 
-
 INLINE_FUNCTION size_t strlcat(char *dst, const char *src, size_t siz)
 {
   register char *d = dst;
-
   register const char *s = src;
-
   register size_t n = siz;
-
   size_t dlen;
 
   /* Find the end of dst and adjust bytes left but don't go past end */

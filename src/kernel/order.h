@@ -58,7 +58,6 @@ extern "C" {
 
   extern char *write_order(const order * ord, char *buffer, size_t size);
 
-
 #ifdef __cplusplus
 }
 #endif

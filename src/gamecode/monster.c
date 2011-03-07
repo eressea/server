@@ -81,9 +81,7 @@ static void eaten_by_monster(unit * u)
 {
   /* adjustment for smaller worlds */
   static double multi = 0.0;
-
   int n = 0;
-
   int horse = 0;
 
   if (multi == 0.0) {
@@ -148,7 +146,6 @@ static void absorbed_by_monster(unit * u)
 static int scareaway(region * r, int anzahl)
 {
   int n, p, diff = 0, emigrants[MAXDIRECTIONS];
-
   direction_t d;
 
   anzahl = MIN(MAX(1, anzahl), rpeasants(r));
@@ -165,7 +162,6 @@ static int scareaway(region * r, int anzahl)
   assert(p >= 0 && anzahl >= 0);
   for (n = MIN(p, anzahl); n; n--) {
     direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
-
     region *rc = rconnect(r, dir);
 
     if (rc && fval(rc->terrain, LAND_REGION)) {

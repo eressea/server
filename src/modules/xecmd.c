@@ -67,7 +67,6 @@ static void xe_givepotion(unit * u, struct order *ord)
 static void xe_giveballon(unit * u, struct order *ord)
 {
   unit *u2 = getunitg(u->region, u->faction);
-
   ship *sh;
 
   if (!u2) {

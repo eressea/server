@@ -45,7 +45,6 @@ attrib_type at_movement = {
 boolean get_movement(attrib * const *alist, int type)
 {
   const attrib *a = a_findc(*alist, &at_movement);
-
   if (a == NULL)
     return false;
   if (a->data.i & type)
@@ -56,7 +55,6 @@ boolean get_movement(attrib * const *alist, int type)
 void set_movement(attrib ** alist, int type)
 {
   attrib *a = a_find(*alist, &at_movement);
-
   if (a == NULL)
     a = a_add(alist, a_new(&at_movement));
   a->data.i |= type;

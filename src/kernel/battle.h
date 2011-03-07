@@ -212,7 +212,6 @@ extern "C" {
 #endif
   } fighter;
 
-
   /* schilde */
 
   enum {

@@ -46,7 +46,6 @@ static void timeout_init(trigger * t)
 static void timeout_free(trigger * t)
 {
   timeout_data *td = (timeout_data *) t->data.v;
-
   free_triggers(td->triggers);
   free(t->data.v);
 }
@@ -57,7 +56,6 @@ static int timeout_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   timeout_data *td = (timeout_data *) t->data.v;
-
   if (--td->timer == 0) {
     handle_triggers(&td->triggers, NULL);
     return -1;
@@ -69,7 +67,6 @@ static int timeout_handle(trigger * t, void *data)
 static void timeout_write(const trigger * t, struct storage *store)
 {
   timeout_data *td = (timeout_data *) t->data.v;
-
   store->w_int(store, td->timer);
   write_triggers(store, td->triggers);
 }
@@ -77,12 +74,10 @@ static void timeout_write(const trigger * t, struct storage *store)
 static int timeout_read(trigger * t, struct storage *store)
 {
   timeout_data *td = (timeout_data *) t->data.v;
-
   td->timer = store->r_int(store);
   read_triggers(store, &td->triggers);
   if (td->timer > 20) {
     trigger *tr = td->triggers;
-
     log_warning(("there is a timeout lasting for another %d turns\n",
         td->timer));
     while (tr) {
@@ -107,9 +102,7 @@ trigger_type tt_timeout = {
 trigger *trigger_timeout(int time, trigger * callbacks)
 {
   trigger *t = t_new(&tt_timeout);
-
   timeout_data *td = (timeout_data *) t->data.v;
-
   td->triggers = callbacks;
   td->timer = time;
   return t;

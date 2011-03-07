@@ -91,15 +91,10 @@ struct settings global = {
 };
 
 FILE *logfile;
-
 FILE *updatelog;
-
 const struct race *new_race[MAXRACES];
-
 boolean sqlpatch = false;
-
 boolean battledebug = false;
-
 int turn = 0;
 
 #if XECMD_MODULE
@@ -117,12 +112,9 @@ attrib_type at_xontormiaexpress = {
 int NewbieImmunity(void)
 {
   static int value = -1;
-
   static int gamecookie = -1;
-
   if (value < 0 || gamecookie != global.cookie) {
     gamecookie = global.cookie;
-
     value = get_param_int(global.parameters, "NewbieImmunity", 0);
   }
   return value;
@@ -136,12 +128,9 @@ boolean IsImmune(const faction * f)
 static int MaxAge(void)
 {
   static int value = -1;
-
   static int gamecookie = -1;
-
   if (value < 0 || gamecookie != global.cookie) {
     gamecookie = global.cookie;
-
     value = get_param_int(global.parameters, "MaxAge", 0);
   }
   return value;
@@ -167,12 +156,9 @@ static int ally_flag(const char *s, int help_mask)
 boolean ExpensiveMigrants(void)
 {
   static int value = -1;
-
   static int gamecookie = -1;
-
   if (value < 0 || gamecookie != global.cookie) {
     gamecookie = global.cookie;
-
     value = get_param_int(global.parameters, "study.expensivemigrants", 0);
   }
   return value;
@@ -185,20 +171,14 @@ boolean ExpensiveMigrants(void)
 int AllianceAuto(void)
 {
   static int value = -1;
-
   static int gamecookie = -1;
-
   if (value < 0 || gamecookie != global.cookie) {
     const char *str = get_param(global.parameters, "alliance.auto");
-
     gamecookie = global.cookie;
-
     value = 0;
     if (str != NULL) {
       char *sstr = strdup(str);
-
       char *tok = strtok(sstr, " ");
-
       while (tok) {
         value |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
@@ -218,20 +198,14 @@ int AllianceAuto(void)
 int HelpMask(void)
 {
   static int rule = -1;
-
   static int gamecookie = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     const char *str = get_param(global.parameters, "rules.help.mask");
-
     gamecookie = global.cookie;
-
     rule = 0;
     if (str != NULL) {
       char *sstr = strdup(str);
-
       char *tok = strtok(sstr, " ");
-
       while (tok) {
         rule |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
@@ -247,20 +221,14 @@ int HelpMask(void)
 int AllianceRestricted(void)
 {
   static int rule = -1;
-
   static int gamecookie = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     const char *str = get_param(global.parameters, "alliance.restricted");
-
     gamecookie = global.cookie;
-
     rule = 0;
     if (str != NULL) {
       char *sstr = strdup(str);
-
       char *tok = strtok(sstr, " ");
-
       while (tok) {
         rule |= ally_flag(tok, -1);
         tok = strtok(NULL, " ");
@@ -275,9 +243,7 @@ int AllianceRestricted(void)
 int LongHunger(const struct unit *u)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (u != NULL) {
     if (!fval(u, UFL_HUNGER))
       return false;
@@ -288,7 +254,6 @@ int LongHunger(const struct unit *u)
   }
   if (rule < 0 || gamecookie != global.cookie) {
     gamecookie = global.cookie;
-
     rule = get_param_int(global.parameters, "hunger.long", 0);
   }
   return rule;
@@ -297,14 +262,11 @@ int LongHunger(const struct unit *u)
 int SkillCap(skill_t sk)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (sk == SK_MAGIC)
     return 0;                   /* no caps on magic */
   if (rule < 0 || gamecookie != global.cookie) {
     gamecookie = global.cookie;
-
     rule = get_param_int(global.parameters, "skill.maxlevel", 0);
   }
   return rule;
@@ -313,12 +275,9 @@ int SkillCap(skill_t sk)
 int NMRTimeout(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     gamecookie = global.cookie;
-
     rule = get_param_int(global.parameters, "nmr.timeout", 0);
   }
   return rule;
@@ -327,7 +286,6 @@ int NMRTimeout(void)
 race_t old_race(const struct race * rc)
 {
   race_t i;
-
   for (i = 0; i != MAXRACES; ++i) {
     if (new_race[i] == rc)
       return i;
@@ -371,7 +329,6 @@ const char *directions[MAXDIRECTIONS + 2] = {
 const char *dbrace(const struct race *rc)
 {
   static char zText[32];
-
   char *zPtr = zText;
 
   /* the english names are all in ASCII, so we don't need to worry about UTF8 */
@@ -435,7 +392,6 @@ const char *parameters[MAXPARAMS] = {
   "XELAEN",
   "ALLIANZ"
 };
-
 
 const char *keywords[MAXKEYWORDS] = {
   "//",
@@ -550,16 +506,12 @@ const char *options[MAXOPTIONS] = {
 static int allied_skillcount(const faction * f, skill_t sk)
 {
   int num = 0;
-
   alliance *a = f_get_alliance(f);
-
   quicklist *members = a->members;
-
   int qi;
 
   for (qi = 0; members; ql_advance(&members, &qi, 1)) {
     faction *m = (faction *) ql_get(members, qi);
-
     num += count_skill(m, sk);
   }
   return num;
@@ -568,7 +520,6 @@ static int allied_skillcount(const faction * f, skill_t sk)
 static int allied_skilllimit(const faction * f, skill_t sk)
 {
   static int value = -1;
-
   if (value < 0) {
     value = get_param_int(global.parameters, "alliance.skilllimit", 0);
   }
@@ -594,7 +545,6 @@ static void init_npcfaction(struct attrib *a)
 {
   a->data.i = 1;
 }
-
 
 static attrib_type at_npcfaction = {
   "npcfaction",
@@ -623,20 +573,15 @@ int max_magicians(const faction * f)
 int skill_limit(faction * f, skill_t sk)
 {
   int m = INT_MAX;
-
   int al = allied_skilllimit(f, sk);
-
   if (al > 0) {
     if (sk != SK_ALCHEMY && sk != SK_MAGIC)
       return INT_MAX;
     if (f_get_alliance(f)) {
       int ac = listlen(f->alliance->members);   /* number of factions */
-
       int fl = (al + ac - 1) / ac;      /* faction limit, rounded up */
-
       /* the faction limit may not be achievable because it would break the alliance-limit */
       int sc = al - allied_skillcount(f, sk);
-
       if (sc <= 0)
         return 0;
       return fl;
@@ -658,7 +603,6 @@ int skill_limit(faction * f, skill_t sk)
 int count_skill(faction * f, skill_t sk)
 {
   int n = 0;
-
   unit *u;
 
   for (u = f->units; u; u = u->nextF) {
@@ -677,18 +621,14 @@ FILE *debug;
 static int ShipSpeedBonus(const unit * u)
 {
   static int level = -1;
-
   if (level == -1) {
     level =
       get_param_int(global.parameters, "movement.shipspeed.skillbonus", 0);
   }
   if (level > 0) {
     ship *sh = u->ship;
-
     int skl = effskill(u, SK_SAILING);
-
     int minsk = (sh->type->cptskill + 1) / 2;
-
     return (skl - minsk) / level;
   }
   return 0;
@@ -697,13 +637,9 @@ static int ShipSpeedBonus(const unit * u)
 int shipspeed(const ship * sh, const unit * u)
 {
   double k = sh->type->range;
-
   static const curse_type *stormwind_ct, *nodrift_ct;
-
   static boolean init;
-
   attrib *a;
-
   curse *c;
 
   if (!init) {
@@ -763,7 +699,6 @@ faction *factionhash[FMAXHASH];
 void fhash(faction * f)
 {
   int index = f->no % FMAXHASH;
-
   f->nexthash = factionhash[index];
   factionhash[index] = f;
 }
@@ -771,9 +706,7 @@ void fhash(faction * f)
 void funhash(faction * f)
 {
   int index = f->no % FMAXHASH;
-
   faction **fp = factionhash + index;
-
   while (*fp && (*fp) != f)
     fp = &(*fp)->nexthash;
   *fp = f->nexthash;
@@ -782,9 +715,7 @@ void funhash(faction * f)
 static faction *ffindhash(int no)
 {
   int index = no % FMAXHASH;
-
   faction *f = factionhash[index];
-
   while (f && f->no != no)
     f = f->nexthash;
   return f;
@@ -796,11 +727,8 @@ void verify_data(void)
 {
 #ifndef NDEBUG
   int lf = -1;
-
   faction *f;
-
   unit *u;
-
   int mage, alchemist;
 
   if (verbosity >= 1)
@@ -834,9 +762,7 @@ void verify_data(void)
 int distribute(int old, int new_value, int n)
 {
   int i;
-
   int t;
-
   assert(new_value <= old);
 
   if (old == 0)
@@ -885,7 +811,6 @@ region *findunitregion(const unit * su)
   return su->region;
 #else
   region *r;
-
   const unit *u;
 
   for (r = regions; r; r = r->next) {
@@ -918,7 +843,6 @@ int eff_stealth(const unit * u, const region * r)
 
     if (fval(u, UFL_STEALTH)) {
       int es = u_geteffstealth(u);
-
       if (es >= 0 && es < e)
         return es;
     }
@@ -929,7 +853,6 @@ int eff_stealth(const unit * u, const region * r)
 boolean unit_has_cursed_item(unit * u)
 {
   item *itm = u->items;
-
   while (itm) {
     if (fval(itm->type, ITF_CURSED) && itm->number > 0)
       return true;
@@ -954,7 +877,6 @@ static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
   static boolean init = false;
-
   if (!init) {
     init_gms();
     init = true;
@@ -967,7 +889,6 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
 
     while (a) {
       const plane *p = (const plane *)a->data.v;
-
       if (p == pl)
         return HELP_ALL;
       a = a->next;
@@ -1024,7 +945,6 @@ alliedfaction(const struct plane *pl, const struct faction *f,
 int alliedunit(const unit * u, const faction * f2, int mode)
 {
   ally *sf;
-
   int automode;
 
   assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
@@ -1036,7 +956,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     if (mode & HELP_FIGHT) {
       if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
         faction *owner = region_get_owner(u->region);
-
         /* helps the owner of the region */
         if (owner == f2) {
           return HELP_FIGHT;
@@ -1053,7 +972,6 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     sf = u->faction->allies;
     if (fval(u, UFL_GROUP)) {
       const attrib *a = a_findc(u->attribs, &at_group);
-
       if (a != NULL)
         sf = ((group *) a->data.v)->allies;
     }
@@ -1078,11 +996,8 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
    * erblickt wird */
 {
   int stealth, rings;
-
   unit *u2 = r->units;
-
   static const item_type *itype_grail;
-
   static boolean init;
 
   if (!init) {
@@ -1096,7 +1011,6 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
     return false;
   } else if (u->number == 0) {
     attrib *a = a_find(u->attribs, &at_creator);
-
     if (a) {                    /* u is an empty temporary unit. In this special case
                                    we look at the creating unit. */
       u = (unit *) a->data.v;
@@ -1188,7 +1102,6 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
  * erblickt wird */
 {
   int n;
-
   unit *u2;
 
   if (fval(u->race, RCF_INVISIBLE) || u->number == 0)
@@ -1230,7 +1143,6 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
 const char *strcheck(const char *s, size_t maxlen)
 {
   static char buffer[16 * 1024];
-
   if (strlen(s) > maxlen) {
     assert(maxlen < 16 * 1024);
     log_warning(("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n",
@@ -1255,7 +1167,6 @@ static attrib_type at_lighthouse = {
 void update_lighthouse(building * lh)
 {
   static boolean init_lighthouse = false;
-
   static const struct building_type *bt_lighthouse = 0;
 
   if (!init_lighthouse) {
@@ -1267,9 +1178,7 @@ void update_lighthouse(building * lh)
 
   if (lh->type == bt_lighthouse) {
     region *r = lh->region;
-
     int d = (int)log10(lh->size) + 1;
-
     int x;
 
     if (lh->size > 0) {
@@ -1278,14 +1187,10 @@ void update_lighthouse(building * lh)
 
     for (x = -d; x <= d; ++x) {
       int y;
-
       for (y = -d; y <= d; ++y) {
         attrib *a;
-
         region *r2;
-
         int px = r->x + x, py = r->y + y;
-
         pnormalize(&px, &py, rplane(r));
         r2 = findregion(px, py);
         if (r2 == NULL)
@@ -1297,7 +1202,6 @@ void update_lighthouse(building * lh)
         a = a_find(r2->attribs, &at_lighthouse);
         while (a && a->type == &at_lighthouse) {
           building *b = (building *) a->data.v;
-
           if (b == lh)
             break;
           a = a->next;
@@ -1315,9 +1219,7 @@ int count_all(const faction * f)
 {
 #ifndef NDEBUG
   int n = 0;
-
   unit *u;
-
   for (u = f->units; u; u = u->nextF) {
     if (playerrace(u->race)) {
       n += u->number;
@@ -1335,9 +1237,7 @@ int count_all(const faction * f)
 int count_migrants(const faction * f)
 {
   unit *u = f->units;
-
   int n = 0;
-
   while (u) {
     assert(u->faction == f);
     if (u->race != f->race && u->race != new_race[RC_ILLUSION]
@@ -1359,10 +1259,8 @@ int count_maxmigrants(const faction * f)
   }
   if (migrants == INT_MAX) {
     int x = 0;
-
     if (f->race == new_race[RC_HUMAN]) {
       int nsize = count_all(f);
-
       if (nsize > 0) {
         x = (int)(log10(nsize / 50.0) * 20);
         if (x < 0)
@@ -1377,7 +1275,6 @@ int count_maxmigrants(const faction * f)
 void init_tokens(const struct order *ord)
 {
   char *cmd = getcommand(ord);
-
   init_tokens_str(cmd, cmd);
 }
 
@@ -1388,17 +1285,13 @@ parse(keyword_t kword, int (*dofun) (unit *, struct order *), boolean thisorder)
 
   for (r = regions; r; r = r->next) {
     unit **up = &r->units;
-
     while (*up) {
       unit *u = *up;
-
       order **ordp = &u->orders;
-
       if (thisorder)
         ordp = &u->thisorder;
       while (*ordp) {
         order *ord = *ordp;
-
         if (get_keyword(ord) == kword) {
           if (dofun(u, ord) != 0)
             break;
@@ -1438,7 +1331,6 @@ int getint(void)
 const struct race *findrace(const char *s, const struct locale *lang)
 {
   struct tnode *tokens = get_translations(lang, UT_RACES);
-
   variant token;
 
   assert(lang);
@@ -1451,7 +1343,6 @@ const struct race *findrace(const char *s, const struct locale *lang)
 int findoption(const char *s, const struct locale *lang)
 {
   struct tnode *tokens = get_translations(lang, UT_OPTIONS);
-
   variant token;
 
   if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
@@ -1466,7 +1357,6 @@ static struct trie_node *ptries[UT_MAX][4];
 static struct trie_node **get_ptrie(const struct locale *lang, int type)
 {
   int index = (strcmp(locale_name(lang), "de") == 0);
-
   return &(ptries[type][index]);
 }
 
@@ -1494,24 +1384,19 @@ static int umlaut_substitution(const char *ip, char *op, size_t outlen)
     252, "ue"},                 /* uuml */
   };
   int subs = 0;
-
   while (*ip) {
     ucs4_t ucs = *ip;
-
     size_t size = 1;
-
     size_t cpsize = 1;
 
     if (ucs & 0x80) {
       int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-
       if (ret != 0) {
         return ret;
       }
       cpsize = size;
       if (ucs >= replace[0].ucs && ucs <= replace[UMAX - 1].ucs) {
         int i;
-
         for (i = 0; i != UMAX; ++i) {
           if (replace[i].ucs == ucs) {
             cpsize = 0;
@@ -1546,10 +1431,8 @@ static int
 ptrie_find(struct trie_node *ptrie, const char *key, void *data, size_t size)
 {
   trie_node *node = trie_find_prefix(ptrie, key);
-
   if (node) {
     void *result = trie_getdata(node);
-
     memcpy(data, result, size);
     return 0;
   }
@@ -1561,14 +1444,10 @@ ptrie_insert(struct trie_node **ptrie, const char *name, void *data,
   size_t size)
 {
   char converted[256];
-
   char simple[256];
-
   int ret = unicode_utf8_tolower(converted, 256, name);
-
   if (ret == 0) {
     int subs = umlaut_substitution(converted, simple, sizeof(simple));
-
     if (subs > 0) {
       trie_insert(ptrie, simple, data, size);
     }
@@ -1582,23 +1461,17 @@ skill_t findskill(const char *s, const struct locale * lang)
 {
 #if PTRIES
   char lowercase[256];
-
   int res = unicode_utf8_tolower(lowercase, sizeof(lowercase), s);
-
   if (res == 0) {
     trie_node **ptrie = get_ptrie(lang, UT_SKILLS);
-
     skill_t sk;
-
     int result = ptrie_find(*ptrie, lowercase, &sk, sizeof(sk));
-
     if (result == 0)
       return sk;
   }
   return NOSKILL;
 #else
   struct tnode *tokens = get_translations(lang, UT_SKILLS);
-
   variant token;
 
   if (findtoken(tokens, s, &token) == E_TOK_NOMATCH)
@@ -1610,7 +1483,6 @@ skill_t findskill(const char *s, const struct locale * lang)
 keyword_t findkeyword(const char *s, const struct locale * lang)
 {
   struct tnode *tokens = get_translations(lang, UT_KEYWORDS);
-
   variant token;
 
   if (*s == '@')
@@ -1625,12 +1497,10 @@ keyword_t findkeyword(const char *s, const struct locale * lang)
 param_t findparam(const char *s, const struct locale * lang)
 {
   struct tnode *tokens = get_translations(lang, UT_PARAMS);
-
   variant token;
 
   if (findtoken(tokens, s, &token) == E_TOK_NOMATCH) {
     const building_type *btype = findbuildingtype(s, lang);
-
     if (btype != NULL)
       return (param_t) P_GEBAEUDE;
     return NOPARAM;
@@ -1648,7 +1518,6 @@ param_t getparam(const struct locale * lang)
 faction *findfaction(int n)
 {
   faction *f = ffindhash(n);
-
   return f;
 }
 
@@ -1693,7 +1562,6 @@ unit *findunitg(int n, const region * hint)
 unit *getnewunit(const region * r, const faction * f)
 {
   int n;
-
   n = getid();
 
   return findnewunit(r, f, n);
@@ -1702,9 +1570,7 @@ unit *getnewunit(const region * r, const faction * f)
 static int read_newunitid(const faction * f, const region * r)
 {
   int n;
-
   unit *u2;
-
   n = getid();
   if (n == 0)
     return -1;
@@ -1735,7 +1601,6 @@ int read_unitid(const faction * f, const region * r)
 
 /* exported symbol */
 boolean getunitpeasants;
-
 unit *getunitg(const region * r, const faction * f)
 {
   int n = read_unitid(f, r);
@@ -1754,7 +1619,6 @@ unit *getunitg(const region * r, const faction * f)
 unit *getunit(const region * r, const faction * f)
 {
   int n = read_unitid(f, r);
-
   unit *u2;
 
   if (n == 0) {
@@ -1781,7 +1645,6 @@ unit *getunit(const region * r, const faction * f)
 void addstrlist(strlist ** SP, const char *s)
 {
   strlist *slist = malloc(sizeof(strlist));
-
   slist->next = NULL;
   slist->s = strdup(s);
   addlist(SP, slist);
@@ -1790,7 +1653,6 @@ void addstrlist(strlist ** SP, const char *s)
 void freestrlist(strlist * s)
 {
   strlist *q, *p = s;
-
   while (p) {
     q = p->next;
     free(p->s);
@@ -1805,9 +1667,7 @@ boolean lomem = false;
 
 /* - Namen der Strukturen -------------------------------------- */
 typedef char name[OBJECTIDSIZE + 1];
-
 static name idbuf[8];
-
 static int nextbuf = 0;
 
 char *estring_i(char *ibuf)
@@ -1862,7 +1722,6 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
       continue;
     if (!imaginary) {
       const attrib *a = a_find(b->attribs, &at_icastle);
-
       if (a)
         continue;
     }
@@ -1882,7 +1741,6 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
 const char *unitname(const unit * u)
 {
   char *ubuf = idbuf[(++nextbuf) % 8];
-
   return write_unitname(u, ubuf, sizeof(name));
 }
 
@@ -1895,11 +1753,8 @@ static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 int forbiddenid(int id)
 {
   static int *forbid = NULL;
-
   static size_t len;
-
   size_t i;
-
   if (id <= 0)
     return 1;
   if (!forbid) {
@@ -1920,9 +1775,7 @@ int forbiddenid(int id)
 int newunitid(void)
 {
   int random_unit_no;
-
   int start_random_no;
-
   random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
   start_random_no = random_unit_no;
 
@@ -1943,7 +1796,6 @@ int newunitid(void)
 int newcontainerid(void)
 {
   int random_no;
-
   int start_random_no;
 
   random_no = 1 + (rng_int() % MAX_CONTAINER_NR);
@@ -1972,7 +1824,6 @@ boolean idle(faction * f)
   return (boolean) (f ? false : true);
 }
 
-
 int maxworkingpeasants(const struct region *r)
 {
   int i = production(r) * MAXPEASANTS_PER_AREA
@@ -1983,17 +1834,13 @@ int maxworkingpeasants(const struct region *r)
 int lighthouse_range(const building * b, const faction * f)
 {
   int d = 0;
-
   if (fval(b, BLD_WORKING) && b->size >= 10) {
     int maxd = (int)log10(b->size) + 1;
 
     if (skill_enabled[SK_PERCEPTION]) {
       region *r = b->region;
-
       int c = 0;
-
       unit *u;
-
       for (u = r->units; u; u = u->next) {
         if (u->building == b) {
           c += u->number;
@@ -2001,7 +1848,6 @@ int lighthouse_range(const building * b, const faction * f)
             break;
           if (f == NULL || u->faction == f) {
             int sk = eff_skill(u, SK_PERCEPTION, r) / 3;
-
             d = MAX(d, sk);
             d = MIN(maxd, d);
             if (d == maxd)
@@ -2035,11 +1881,8 @@ boolean check_leuchtturm(region * r, faction * f)
 
       if (skill_enabled[SK_PERCEPTION]) {
         region *r2 = b->region;
-
         unit *u;
-
         int c = 0;
-
         int d = 0;
 
         for (u = r2->units; u; u = u->next) {
@@ -2072,7 +1915,6 @@ region *lastregion(faction * f)
 {
 #ifdef SMART_INTERVALS
   unit *u = f->units;
-
   region *r = f->last;
 
   if (u == NULL)
@@ -2096,7 +1938,6 @@ region *lastregion(faction * f)
     /* search the region for travelthru-attributes: */
     if (fval(r, RF_TRAVELUNIT)) {
       attrib *ru = a_find(r->attribs, &at_travelunit);
-
       while (ru && ru->type == &at_travelunit) {
         u = (unit *) ru->data.v;
         if (u->faction == f) {
@@ -2137,15 +1978,12 @@ region *firstregion(faction * f)
 }
 
 void **blk_list[1024];
-
 int list_index;
-
 int blk_index;
 
 static void gc_done(void)
 {
   int i, k;
-
   for (i = 0; i != list_index; ++i) {
     for (k = 0; k != 1024; ++k)
       free(blk_list[i][k]);
@@ -2194,12 +2032,10 @@ static void init_directions(tnode * root, const struct locale *lang)
     NULL, NODIRECTION}
   };
   int i;
-
   struct tnode *tokens = get_translations(lang, UT_DIRECTIONS);
 
   for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
     variant token;
-
     token.i = dirs[i].direction;
     addtoken(tokens, LOC(lang, dirs[i].name), token);
   }
@@ -2208,7 +2044,6 @@ static void init_directions(tnode * root, const struct locale *lang)
 direction_t finddirection(const char *s, const struct locale *lang)
 {
   struct tnode *tokens = get_translations(lang, UT_DIRECTIONS);
-
   variant token;
 
   if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
@@ -2220,15 +2055,10 @@ direction_t finddirection(const char *s, const struct locale *lang)
 static void init_locale(const struct locale *lang)
 {
   variant var;
-
   int i;
-
   const struct race *rc;
-
   struct tnode *tokens;
-
   const terrain_type *terrain;
-
 #if PTRIES
   trie_node **ptrie;
 #endif
@@ -2236,9 +2066,7 @@ static void init_locale(const struct locale *lang)
   tokens = get_translations(lang, UT_MAGIC);
   if (tokens) {
     const char *str = get_param(global.parameters, "rules.magic.playerschools");
-
     char *sstr, *tok;
-
     if (str == NULL) {
       str = "gwyrrd illaun draig cerddor tybied";
     }
@@ -2277,9 +2105,7 @@ static void init_locale(const struct locale *lang)
   ptrie = get_ptrie(lang, UT_SKILLS);
   for (i = 0; i != MAXSKILLS; ++i) {
     skill_t sk = (skill_t) i;
-
     const char *skname = skillname(sk, lang);
-
     if (skname != NULL) {
       ptrie_insert(ptrie, skname, &sk, sizeof(sk));
     }
@@ -2288,7 +2114,6 @@ static void init_locale(const struct locale *lang)
   tokens = get_translations(lang, UT_SKILLS);
   for (i = 0; i != MAXSKILLS; ++i) {
     const char *skname = skillname((skill_t) i, lang);
-
     if (skname != NULL) {
       var.i = i;
       addtoken(tokens, skname, var);
@@ -2326,9 +2151,7 @@ typedef struct param {
 int getid(void)
 {
   const char *str = (const char *)getstrtoken();
-
   int i = atoi36(str);
-
   if (i < 0) {
     return -1;
   }
@@ -2356,11 +2179,9 @@ int get_param_int(const struct param *p, const char *key, int def)
 }
 
 static const char *g_datadir;
-
 const char *datapath(void)
 {
   static char zText[MAX_PATH];
-
   if (g_datadir)
     return g_datadir;
   return strcat(strcpy(zText, basepath()), "/data");
@@ -2371,13 +2192,10 @@ void set_datapath(const char *path)
   g_datadir = path;
 }
 
-
 static const char *g_reportdir;
-
 const char *reportpath(void)
 {
   static char zText[MAX_PATH];
-
   if (g_reportdir)
     return g_reportdir;
   return strcat(strcpy(zText, basepath()), "/reports");
@@ -2389,14 +2207,12 @@ void set_reportpath(const char *path)
 }
 
 static const char *g_basedir;
-
 const char *basepath(void)
 {
   if (g_basedir)
     return g_basedir;
   return ".";
 }
-
 
 void set_basepath(const char *path)
 {
@@ -2416,7 +2232,6 @@ float get_param_flt(const struct param *p, const char *key, float def)
 void set_param(struct param **p, const char *key, const char *data)
 {
   ++global.cookie;
-
   while (*p != NULL) {
     if (strcmp((*p)->name, key) == 0) {
       free((*p)->data);
@@ -2449,10 +2264,8 @@ const char *localenames[] = {
 void init_locales(void)
 {
   int l;
-
   for (l = 0; localenames[l]; ++l) {
     const struct locale *lang = find_locale(localenames[l]);
-
     if (lang)
       init_locale(lang);
   }
@@ -2496,7 +2309,6 @@ void setguard(unit * u, unsigned int flags)
 {
   /* setzt die guard-flags der Einheit */
   attrib *a = NULL;
-
   assert(flags == 0 || !fval(u, UFL_MOVED));
   assert(flags == 0 || u->status < ST_FLEE);
   if (fval(u, UFL_GUARD)) {
@@ -2546,13 +2358,11 @@ void remove_empty_factions(void)
 
   for (fp = &factions; *fp;) {
     faction *f = *fp;
-
     /* monster (0) werden nicht entfernt. alive kann beim readgame
      * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
      * haben. */
     if ((f->units == NULL || f->alive == 0) && !is_monsters(f)) {
       ursprung *ur = f->ursprung;
-
       while (ur && ur->id != 0)
         ur = ur->next;
       if (verbosity >= 2)
@@ -2565,11 +2375,8 @@ void remove_empty_factions(void)
 
       for (f3 = factions; f3; f3 = f3->next) {
         ally *sf;
-
         group *g;
-
         ally **sfp = &f3->allies;
-
         while (*sfp) {
           sf = *sfp;
           if (sf->faction == f || sf->faction == NULL) {
@@ -2613,7 +2420,6 @@ void remove_empty_units_in_region(region * r)
 
     if (u->number) {
       faction *f = u->faction;
-
       if (f == NULL || !f->alive) {
         set_number(u, 0);
       }
@@ -2651,7 +2457,6 @@ int weight(const unit * u)
   int w, n = 0, in_bag = 0;
 
   item *itm;
-
   for (itm = u->items; itm; itm = itm->next) {
     w = itm->type->weight * itm->number;
     n += w;
@@ -2704,7 +2509,6 @@ unsigned int guard_flags(const unit * u)
 void guard(unit * u, unsigned int mask)
 {
   unsigned int flags = guard_flags(u);
-
   setguard(u, flags & mask);
 }
 
@@ -2719,11 +2523,8 @@ int besieged(const unit * u)
 int lifestyle(const unit * u)
 {
   int need;
-
   plane *pl;
-
   static int gamecookie = -1;
-
   if (gamecookie != global.cookie) {
     gamecookie = global.cookie;
   }
@@ -2743,7 +2544,6 @@ int lifestyle(const unit * u)
 boolean has_horses(const struct unit * u)
 {
   item *itm = u->items;
-
   for (; itm; itm = itm->next) {
     if (itm->type->flags & ITF_ANIMAL)
       return true;
@@ -2754,20 +2554,14 @@ boolean has_horses(const struct unit * u)
 boolean hunger(int number, unit * u)
 {
   region *r = u->region;
-
   int dead = 0, hpsub = 0;
-
   int hp = u->hp / u->number;
-
   static const char *damage = 0;
-
   static const char *rcdamage = 0;
-
   static const race *rc = 0;
 
   if (!damage) {
     damage = get_param(global.parameters, "hunger.damage");
-
     if (damage == NULL)
       damage = "1d12+12";
   }
@@ -2778,7 +2572,6 @@ boolean hunger(int number, unit * u)
 
   while (number--) {
     int dam = dice_rand(rcdamage ? rcdamage : damage);
-
     if (dam >= hp) {
       ++dead;
     } else {
@@ -2810,16 +2603,13 @@ boolean hunger(int number, unit * u)
 void plagues(region * r, boolean ismagic)
 {
   int peasants;
-
   int i;
-
   int dead = 0;
 
   /* Seuchenwahrscheinlichkeit in % */
 
   if (!ismagic) {
     double mwp = MAX(maxworkingpeasants(r), 1);
-
     double prob =
       pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
       * PLAGUE_CHANCE;
@@ -2839,7 +2629,6 @@ void plagues(region * r, boolean ismagic)
 
   if (dead > 0) {
     message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-
     msg_release(msg);
     deathcounts(r, dead);
     rsetpeasants(r, peasants - dead);
@@ -2862,7 +2651,6 @@ static const int wagetable[7][4] = {
 int cmp_wage(const struct building *b, const building * a)
 {
   static const struct building_type *bt_castle;
-
   if (!bt_castle)
     bt_castle = bt_find("castle");
   if (b->type == bt_castle) {
@@ -2879,10 +2667,8 @@ int cmp_wage(const struct building *b, const building * a)
 boolean is_owner_building(const struct building * b)
 {
   region *r = b->region;
-
   if (b->type->taxes && r->land && r->land->ownership) {
     unit *u = building_owner(b);
-
     return u && u->faction == r->land->ownership->owner;
   }
   return false;
@@ -2891,19 +2677,14 @@ boolean is_owner_building(const struct building * b)
 int cmp_taxes(const building * b, const building * a)
 {
   faction *f = region_get_owner(b->region);
-
   if (b->type->taxes) {
     unit *u = building_owner(b);
-
     if (!u) {
       return -1;
     } else if (a) {
       int newsize = buildingeffsize(b, false);
-
       double newtaxes = b->type->taxes(b, newsize);
-
       int oldsize = buildingeffsize(a, false);
-
       double oldtaxes = a->type->taxes(a, oldsize);
 
       if (newtaxes < oldtaxes)
@@ -2936,16 +2717,12 @@ int cmp_current_owner(const building * b, const building * a)
   assert(rule_region_owners());
   if (f && b->type->taxes) {
     unit *u = building_owner(b);
-
     if (!u || u->faction != f)
       return -1;
     if (a) {
       int newsize = buildingeffsize(b, false);
-
       double newtaxes = b->type->taxes(b, newsize);
-
       int oldsize = buildingeffsize(a, false);
-
       double oldtaxes = a->type->taxes(a, oldsize);
 
       if (newtaxes != oldtaxes)
@@ -2963,14 +2740,10 @@ int cmp_current_owner(const building * b, const building * a)
 int rule_stealth_faction(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
-
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -2979,14 +2752,10 @@ int rule_stealth_faction(void)
 int rule_region_owners(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule = get_param_int(global.parameters, "rules.region_owners", 0);
-
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -2995,14 +2764,11 @@ int rule_region_owners(void)
 int rule_auto_taxation(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule =
       get_param_int(global.parameters, "rules.economy.taxation", TAX_ORDER);
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -3011,15 +2777,12 @@ int rule_auto_taxation(void)
 int rule_blessed_harvest(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule =
       get_param_int(global.parameters, "rules.magic.blessed_harvest",
       HARVEST_WORK);
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -3028,14 +2791,10 @@ int rule_blessed_harvest(void)
 int rule_alliance_limit(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule = get_param_int(global.parameters, "rules.limit.alliance", 0);
-
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -3044,14 +2803,10 @@ int rule_alliance_limit(void)
 int rule_faction_limit(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule = get_param_int(global.parameters, "rules.limit.faction", 0);
-
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -3060,14 +2815,10 @@ int rule_faction_limit(void)
 int rule_transfermen(void)
 {
   static int gamecookie = -1;
-
   static int rule = -1;
-
   if (rule < 0 || gamecookie != global.cookie) {
     rule = get_param_int(global.parameters, "rules.transfermen", 1);
-
     gamecookie = global.cookie;
-
     assert(rule >= 0);
   }
   return rule;
@@ -3077,19 +2828,12 @@ static int
 default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
   building *b = largestbuilding(r, &cmp_wage, false);
-
   int esize = 0;
-
   curse *c;
-
   double wage;
-
   attrib *a;
-
   const building_type *artsculpture_type = bt_find("artsculpture");
-
   static const curse_type *drought_ct, *blessedharvest_ct;
-
   static boolean init;
 
   if (!init) {
@@ -3105,7 +2849,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
   if (f != NULL) {
     int index = 0;
-
     if (rc == new_race[RC_ORC] || rc == new_race[RC_SNOTLING]) {
       index = 1;
     }
@@ -3171,7 +2914,6 @@ int wage(const region * r, const faction * f, const race * rc, int in_turn)
   return default_wage(r, f, rc, in_turn);
 }
 
-
 #define MAINTENANCE 10
 int maintenance_cost(const struct unit *u)
 {
@@ -3179,7 +2921,6 @@ int maintenance_cost(const struct unit *u)
     return MAINTENANCE;
   if (global.functions.maintenance) {
     int retval = global.functions.maintenance(u);
-
     if (retval >= 0)
       return retval;
   }
@@ -3190,7 +2931,6 @@ message *movement_error(unit * u, const char *token, order * ord,
   int error_code)
 {
   direction_t d;
-
   switch (error_code) {
     case E_MOVE_BLOCKED:
       d = finddirection(token, u->faction->locale);
@@ -3204,7 +2944,6 @@ message *movement_error(unit * u, const char *token, order * ord,
 int movewhere(const unit * u, const char *token, region * r, region ** resultp)
 {
   region *r2;
-
   direction_t d;
 
   if (*token == '\0') {
@@ -3239,9 +2978,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
 boolean move_blocked(const unit * u, const region * r, const region * r2)
 {
   connection *b;
-
   curse *c;
-
   static const curse_type *fogtrap_ct = NULL;
 
   if (r2 == NULL)
@@ -3275,20 +3012,14 @@ void reorder_units(region * r)
 
   if (r->buildings) {
     building *b = r->buildings;
-
     while (*unext && b) {
       unit **ufirst = unext;    /* where the first unit in the building should go */
-
       unit **umove = unext;     /* a unit we consider moving */
-
       unit *owner = NULL;
-
       while (*umove) {
         unit *u = *umove;
-
         if (u->number && u->building == b) {
           unit **uinsert = unext;
-
           if (fval(u, UFL_OWNER)) {
             uinsert = ufirst;
             owner = u;
@@ -3319,13 +3050,10 @@ void reorder_units(region * r)
 
   if (r->ships) {
     ship *sh = r->ships;
-
     /* first, move all units up that are not on ships */
     unit **umove = unext;       /* a unit we consider moving */
-
     while (*umove) {
       unit *u = *umove;
-
       if (u->number && !u->ship) {
         if (umove != unext) {
           *umove = u->next;
@@ -3344,17 +3072,12 @@ void reorder_units(region * r)
 
     while (*unext && sh) {
       unit **ufirst = unext;    /* where the first unit in the building should go */
-
       unit **umove = unext;     /* a unit we consider moving */
-
       unit *owner = NULL;
-
       while (*umove) {
         unit *u = *umove;
-
         if (u->number && u->ship == sh) {
           unit **uinsert = unext;
-
           if (fval(u, UFL_OWNER)) {
             uinsert = ufirst;
             owner = u;
@@ -3397,7 +3120,6 @@ int produceexp(struct unit *u, skill_t sk, int n)
 int lovar(double xpct_x2)
 {
   int n = (int)(xpct_x2 * 500) + 1;
-
   if (n == 0)
     return 0;
   return (rng_int() % n + rng_int() % n) / 1000;
@@ -3471,7 +3193,6 @@ void attrib_init(void)
 void kernel_init(void)
 {
   char zBuffer[MAX_PATH];
-
   attrib_init();
   translation_init();
 
@@ -3506,7 +3227,6 @@ int entertainmoney(const region * r)
 int rule_give(void)
 {
   static int value = -1;
-
   if (value < 0) {
     value = get_param_int(global.parameters, "rules.give", GIVE_DEFAULT);
   }
@@ -3516,7 +3236,6 @@ int rule_give(void)
 int markets_module(void)
 {
   static int value = -1;
-
   if (value < 0) {
     value = get_param_int(global.parameters, "modules.markets", 0);
   }
@@ -3535,13 +3254,11 @@ void free_gamedata(void)
 
   while (alliances) {
     alliance *al = alliances;
-
     alliances = al->next;
     free_alliance(al);
   }
   while (factions) {
     faction *f = factions;
-
     factions = f->next;
     funhash(f);
     free_faction(f);
@@ -3550,7 +3267,6 @@ void free_gamedata(void)
 
   while (planes) {
     plane *pl = planes;
-
     planes = planes->next;
     free(pl->name);
     free(pl);
@@ -3562,15 +3278,11 @@ void free_gamedata(void)
   ++global.cookie;              /* readgame() already does this, but sjust in case */
 }
 
-
 void load_inifile(dictionary * d)
 {
   const char *reportdir = reportpath();
-
   const char *datadir = datapath();
-
   const char *basedir = basepath();
-
   const char *str;
 
   assert(d);

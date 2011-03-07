@@ -34,7 +34,6 @@ attrib_type at_racename = {
 const char *get_racename(attrib * alist)
 {
   attrib *a = a_find(alist, &at_racename);
-
   if (a)
     return (const char *)a->data.v;
   return NULL;
@@ -43,7 +42,6 @@ const char *get_racename(attrib * alist)
 void set_racename(attrib ** palist, const char *name)
 {
   attrib *a = a_find(*palist, &at_racename);
-
   if (!a && name) {
     a = a_add(palist, a_new(&at_racename));
     a->data.v = strdup(name);

@@ -64,7 +64,6 @@ static region *tpregion(const region * r)
 region_list *astralregions(const region * r, boolean(*valid) (const region *))
 {
   region_list *rlist = NULL;
-
   int x, y;
 
   assert(is_astral(r));
@@ -79,9 +78,7 @@ region_list *astralregions(const region * r, boolean(*valid) (const region *))
   for (x = -TP_RADIUS; x <= +TP_RADIUS; ++x) {
     for (y = -TP_RADIUS; y <= +TP_RADIUS; ++y) {
       region *rn;
-
       int dist = koor_distance(0, 0, x, y);
-
       int nx = r->x + x, ny = r->y + y;
 
       if (dist > TP_RADIUS)
@@ -105,7 +102,6 @@ region *r_standard_to_astral(const region * r)
 region *r_astral_to_standard(const region * r)
 {
   int x, y;
-
   region *r2;
 
   assert(is_astral(r));
@@ -123,9 +119,7 @@ region_list *all_in_range(const region * r, int n,
   boolean(*valid) (const region *))
 {
   int x, y;
-
   region_list *rlist = NULL;
-
   plane *pl = rplane(r);
 
   if (r == NULL)
@@ -135,9 +129,7 @@ region_list *all_in_range(const region * r, int n,
     for (y = r->y - n; y <= r->y + n; y++) {
       if (koor_distance(r->x, r->y, x, y) <= n) {
         region *r2;
-
         int nx = x, ny = y;
-
         pnormalize(&nx, &ny, pl);
         r2 = findregion(nx, ny);
         if (r2 != NULL && (valid == NULL || valid(r2)))
@@ -152,9 +144,7 @@ region_list *all_in_range(const region * r, int n,
 void spawn_braineaters(float chance)
 {
   region *r;
-
   faction *f0 = get_monsters();
-
   int next = rng_int() % (int)(chance * 100);
 
   if (f0 == NULL)
@@ -184,18 +174,14 @@ plane *get_normalplane(void)
 boolean is_astral(const region * r)
 {
   plane *pl = get_astralplane();
-
   return (pl && rplane(r) == pl);
 }
 
 plane *get_astralplane(void)
 {
   static plane *astralspace;
-
   static int rule_astralplane = -1;
-
   static int gamecookie = -1;
-
   if (rule_astralplane < 0) {
     rule_astralplane =
       get_param_int(global.parameters, "modules.astralspace", 1);
@@ -219,24 +205,19 @@ plane *get_astralplane(void)
 void create_teleport_plane(void)
 {
   region *r;
-
   plane *hplane = get_homeplane();
-
   plane *aplane = get_astralplane();
 
   const terrain_type *fog = get_terrain("fog");
 
   for (r = regions; r; r = r->next) {
     plane *pl = rplane(r);
-
     if (pl == hplane) {
       region *ra = tpregion(r);
 
       if (ra == NULL) {
         int x = TE_CENTER_X + real2tp(r->x);
-
         int y = TE_CENTER_Y + real2tp(r->y);
-
         pnormalize(&x, &y, aplane);
 
         ra = new_region(x, y, aplane, 0);

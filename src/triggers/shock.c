@@ -71,11 +71,8 @@ static void do_shock(unit * u, const char *reason)
   for (i = 0; i != u->skill_size; ++i)
     if (rng_int() % 5 == 0) {
       skill *sv = u->skills + i;
-
       int weeks = (sv->level * sv->level - sv->level) / 2;
-
       int change = (weeks + 9) / 10;
-
       reduce_skill(u, sv, change);
     }
 
@@ -96,7 +93,6 @@ static int shock_handle(trigger * t, void *data)
 {
   /* destroy the unit */
   unit *u = (unit *) t->data.v;
-
   if (u && u->number) {
     do_shock(u, "trigger");
   }
@@ -107,9 +103,7 @@ static int shock_handle(trigger * t, void *data)
 static void shock_write(const trigger * t, struct storage *store)
 {
   unit *u = (unit *) t->data.v;
-
   trigger *next = t->next;
-
   while (next) {
     /* make sure it is unique! */
     if (next->type == t->type && next->data.v == t->data.v)
@@ -147,7 +141,6 @@ trigger_type tt_shock = {
 trigger *trigger_shock(unit * u)
 {
   trigger *t = t_new(&tt_shock);
-
   t->data.v = (void *)u;
   return t;
 }

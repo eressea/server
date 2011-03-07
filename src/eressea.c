@@ -50,7 +50,6 @@
 #include <items/itemtypes.h>
 #include <attributes/attributes.h>
 
-
 static const struct {
   const char *name;
   int (*func) (lua_State *);
@@ -74,7 +73,6 @@ static const struct {
 static void openlibs(lua_State * L)
 {
   int i;
-
   for (i = 0; lualibs[i].func; ++i) {
     lua_pushcfunction(L, lualibs[i].func);
     lua_pushstring(L, lualibs[i].name);
@@ -168,7 +166,6 @@ static void game_init(void)
 int eressea_init(void)
 {
   global.vm_state = lua_init();
-
   kernel_init();
   game_init();
 
@@ -185,9 +182,7 @@ void eressea_done(void)
 int eressea_run(const char *luafile, const char *entry_point)
 {
   int err;
-
   lua_State *L = (lua_State *) global.vm_state;
-
   /* run the main script */
   if (luafile) {
     lua_getglobal(L, "dofile");

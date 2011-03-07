@@ -83,27 +83,16 @@ region *make_dungeon(const dungeon * data)
     {{1, 0}, {-1, 1}, {0, -1}}
   };
   const struct race *bossrace = data->boss->race;
-
   char name[128];
-
   int size = data->size;
-
   int iterations = size * size;
-
   unsigned int flags = PFL_NORECRUITS;
-
   int n = 0;
-
   struct faction *fmonsters = get_monsters();
-
   plane *p;
-
   region *r, *center;
-
   region *rnext;
-
   region_list *iregion, *rlist = NULL;
-
   const terrain_type *terrain_hell = get_terrain("hell");
 
   assert(terrain_hell != NULL);
@@ -119,12 +108,9 @@ region *make_dungeon(const dungeon * data)
   rnext = r = center;
   while (size > 0 && iterations--) {
     int d, o = rng_int() % 3;
-
     for (d = 0; d != 3; ++d) {
       int index = (d + o) % 3;
-
       region *rn = findregion(r->x + nb[n][index][0], r->y + nb[n][index][1]);
-
       assert(r->terrain == terrain_hell);
       if (rn) {
         if (rn->terrain == terrain_hell) {
@@ -160,20 +146,14 @@ region *make_dungeon(const dungeon * data)
 
   for (iregion = rlist; iregion; iregion = iregion->next) {
     monster *m = data->monsters;
-
     region *r = iregion->data;
-
     while (m) {
       if ((rng_int() % 100) < (m->chance * 100)) {
         /* TODO: check maxunits. */
         treasure *loot = m->treasures;
-
         struct itemtype_list *weapon = m->weapons;
-
         int size = 1 + (rng_int() % m->avgsize) + (rng_int() % m->avgsize);
-
         unit *u = createunit(r, fmonsters, size, m->race);
-
         while (weapon) {
           i_change(&u->items, weapon->type, size);
           weapon = weapon->next;
@@ -213,10 +193,8 @@ void make_dungeongate(region * source, region * target, const struct dungeon *d)
 static int tagbegin(xml_stack * stack)
 {
   xml_tag *tag = stack->tag;
-
   if (strcmp(tag->name, "dungeon") == 0) {
     dungeon *d = (dungeon *) calloc(sizeof(dungeon), 1);
-
     d->maxpeople = xml_ivalue(tag, "maxpeople");
     if (d->maxpeople == 0)
       d->maxpeople = INT_MAX;
@@ -227,13 +205,10 @@ static int tagbegin(xml_stack * stack)
     stack->state = d;
   } else {
     dungeon *d = (dungeon *) stack->state;
-
     if (strcmp(tag->name, "skilllimit") == 0) {
       skill_t sk = sk_find(xml_value(tag, "name"));
-
       if (sk != NOSKILL) {
         skilllimit *skl = calloc(sizeof(skilllimit), 1);
-
         skl->skill = sk;
         if (xml_value(tag, "max") != NULL) {
           skl->maxskill = xml_ivalue(tag, "max");
@@ -248,7 +223,6 @@ static int tagbegin(xml_stack * stack)
       }
     } else if (strcmp(tag->name, "monster") == 0) {
       monster *m = calloc(sizeof(monster), 1);
-
       m->race = rc_find(xml_value(tag, "race"));
       m->chance = xml_fvalue(tag, "chance");
       m->avgsize = MAX(1, xml_ivalue(tag, "size"));
@@ -264,9 +238,7 @@ static int tagbegin(xml_stack * stack)
       }
     } else if (strcmp(tag->name, "weapon") == 0) {
       monster *m = d->monsters;
-
       itemtype_list *w = calloc(sizeof(itemtype_list), 1);
-
       w->type = it_find(xml_value(tag, "type"));
       if (w->type) {
         w->next = m->weapons;
@@ -280,10 +252,8 @@ static int tagbegin(xml_stack * stack)
 static int tagend(xml_stack * stack)
 {
   xml_tag *tag = stack->tag;
-
   if (strcmp(tag->name, "dungeon")) {
     dungeon *d = (dungeon *) stack->state;
-
     stack->state = NULL;
     d->next = dungeonstyles;
     dungeonstyles = d;

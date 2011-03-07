@@ -63,7 +63,6 @@ static int giveitem_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   giveitem_data *td = (giveitem_data *) t->data.v;
-
   if (td->u && td->u->number) {
     i_change(&td->u->items, td->itype, td->number);
   } else {
@@ -76,7 +75,6 @@ static int giveitem_handle(trigger * t, void *data)
 static void giveitem_write(const trigger * t, struct storage *store)
 {
   giveitem_data *td = (giveitem_data *) t->data.v;
-
   write_unit_reference(td->u, store);
   store->w_int(store, td->number);
   store->w_tok(store, td->itype->rtype->_name[0]);
@@ -85,7 +83,6 @@ static void giveitem_write(const trigger * t, struct storage *store)
 static int giveitem_read(trigger * t, struct storage *store)
 {
   giveitem_data *td = (giveitem_data *) t->data.v;
-
   char zText[128];
 
   int result = read_reference(&td->u, store, read_unit_reference, resolve_unit);
@@ -113,9 +110,7 @@ trigger_type tt_giveitem = {
 trigger *trigger_giveitem(unit * u, const item_type * itype, int number)
 {
   trigger *t = t_new(&tt_giveitem);
-
   giveitem_data *td = (giveitem_data *) t->data.v;
-
   td->number = number;
   td->u = u;
   td->itype = itype;

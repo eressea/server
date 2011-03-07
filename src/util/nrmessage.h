@@ -41,7 +41,6 @@ extern "C" {
   extern int nr_level(const struct message *msg);
   extern const char *nr_section(const struct message *msg);
 
-
 /* before:
  * fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.
  * after:

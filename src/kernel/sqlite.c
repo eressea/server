@@ -11,7 +11,6 @@
 faction *get_faction_by_id(int uid)
 {
   faction *f;
-
   for (f = factions; f; f = f->next) {
     if (f->subscription == uid) {
       return f;
@@ -35,7 +34,6 @@ typedef struct stmt_cache {
 
 #define MAX_STMT_CACHE 64
 static stmt_cache cache[MAX_STMT_CACHE];
-
 static int cache_insert;
 
 static sqlite3_stmt *stmt_cache_get(sqlite3 * db, const char *sql)
@@ -64,7 +62,6 @@ static sqlite3_stmt *stmt_cache_get(sqlite3 * db, const char *sql)
   return cache[i].stmt;
 }
 
-
 typedef struct db_faction {
   sqlite3_uint64 id_faction;
   sqlite3_uint64 id_email;
@@ -79,9 +76,7 @@ db_update_email(sqlite3 * db, const faction * f, const db_faction * dbstate,
   boolean force, /* [OUT] */ sqlite3_uint64 * id_email)
 {
   boolean update = force;
-
   int res = SQLITE_OK;
-
   char email_lc[MAX_EMAIL_LENGTH];
 
   if (update) {
@@ -97,19 +92,13 @@ db_update_email(sqlite3 * db, const faction * f, const db_faction * dbstate,
 
   if (update) {
     char email_md5[MD5_LENGTH_0];
-
     int i;
-
     md5_state_t ms;
-
     md5_byte_t digest[16];
-
     const char sql_insert_email[] =
       "INSERT OR FAIL INTO email (email,md5) VALUES (?,?)";
     const char sql_select_email[] = "SELECT id FROM email WHERE md5=?";
-
     sqlite3_stmt *stmt_insert_email = stmt_cache_get(db, sql_insert_email);
-
     sqlite3_stmt *stmt_select_email = stmt_cache_get(db, sql_select_email);
 
     md5_init(&ms);
@@ -143,14 +132,11 @@ db_update_email(sqlite3 * db, const faction * f, const db_faction * dbstate,
 int db_update_factions(sqlite3 * db, boolean force)
 {
   int game_id = 6;
-
   const char sql_select[] =
     "SELECT faction.id, faction.email_id, faction.code, email.email, faction.password_md5, faction.name, faction.lastturn FROM email, faction"
     " WHERE email.id=faction.email_id AND faction.game_id=? AND (lastturn IS NULL OR lastturn>?)";
   sqlite3_stmt *stmt_select = stmt_cache_get(db, sql_select);
-
   faction *f;
-
   int res;
 
   res = sqlite3_bind_int(stmt_select, 1, game_id);
@@ -159,7 +145,6 @@ int db_update_factions(sqlite3 * db, boolean force)
   SQL_EXPECT(res, SQLITE_OK);
   for (;;) {
     sqlite3_uint64 id_faction;
-
     int lastturn;
 
     res = sqlite3_step(stmt_select);
@@ -173,7 +158,6 @@ int db_update_factions(sqlite3 * db, boolean force)
     if (f == NULL || !f->alive) {
       if (lastturn == 0) {
         const char sql_update[] = "UPDATE faction SET lastturn=? WHERE id=?";
-
         sqlite3_stmt *stmt = stmt_cache_get(db, sql_update);
 
         lastturn = f ? f->lastorders : turn - 1;
@@ -184,19 +168,12 @@ int db_update_factions(sqlite3 * db, boolean force)
       }
     } else {
       md5_state_t ms;
-
       md5_byte_t digest[16];
-
       int i;
-
       char passwd_md5[MD5_LENGTH_0];
-
       sqlite3_uint64 id_email;
-
       boolean update = force;
-
       db_faction dbstate;
-
       const char *no_b36;
 
       fset(f, FFL_MARK);
@@ -270,17 +247,13 @@ int db_update_scores(sqlite3 * db, boolean force)
   const char *sql_ins =
     "INSERT OR FAIL INTO score (value,faction_id,turn) VALUES (?,?,?)";
   sqlite3_stmt *stmt_ins = stmt_cache_get(db, sql_ins);
-
   const char *sql_upd =
     "UPDATE score set value=? WHERE faction_id=? AND turn=?";
   sqlite3_stmt *stmt_upd = stmt_cache_get(db, sql_upd);
-
   faction *f;
-
   sqlite3_exec(db, "BEGIN", 0, 0, 0);
   for (f = factions; f; f = f->next) {
     int res;
-
     sqlite3_bind_int(stmt_ins, 1, f->score);
     sqlite3_bind_int64(stmt_ins, 2, f->subscription);
     sqlite3_bind_int(stmt_ins, 3, turn);

@@ -35,13 +35,10 @@ static void write_gm(const attrib * a, const void *owner, struct storage *store)
 static int read_gm(attrib * a, void *owner, struct storage *store)
 {
   plane *pl;
-
   int result = read_plane_reference(&pl, store);
-
   a->data.v = pl;
   return result;
 }
-
 
 attrib_type at_gm = {
   "gm",
@@ -55,7 +52,6 @@ attrib_type at_gm = {
 attrib *make_gm(const struct plane * pl)
 {
   attrib *a = a_new(&at_gm);
-
   a->data.v = (void *)pl;
   return a;
 }

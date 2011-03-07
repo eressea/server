@@ -51,7 +51,6 @@ static void unitmessage_init(trigger * t)
 static void unitmessage_free(trigger * t)
 {
   unitmessage_data *sd = (unitmessage_data *) t->data.v;
-
   free(sd->string);
   free(t->data.v);
 }
@@ -62,10 +61,8 @@ static int unitmessage_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   unitmessage_data *td = (unitmessage_data *) t->data.v;
-
   if (td->target && td->target->no) {
     struct faction *f = td->target->faction;
-
     addmessage(td->target->region, f, LOC(f->locale, td->string), td->type,
       td->level);
   }
@@ -76,7 +73,6 @@ static int unitmessage_handle(trigger * t, void *data)
 static void unitmessage_write(const trigger * t, struct storage *store)
 {
   unitmessage_data *td = (unitmessage_data *) t->data.v;
-
   write_unit_reference(td->target, store);
   store->w_tok(store, td->string);
   store->w_int(store, td->type);
@@ -86,7 +82,6 @@ static void unitmessage_write(const trigger * t, struct storage *store)
 static int unitmessage_read(trigger * t, struct storage *store)
 {
   unitmessage_data *td = (unitmessage_data *) t->data.v;
-
   char zText[256];
 
   int result =
@@ -116,9 +111,7 @@ trigger *trigger_unitmessage(unit * target, const char *string, int type,
   int level)
 {
   trigger *t = t_new(&tt_unitmessage);
-
   unitmessage_data *td = (unitmessage_data *) t->data.v;
-
   td->target = target;
   td->string = strdup(string);
   td->type = type;

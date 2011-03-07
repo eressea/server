@@ -40,11 +40,8 @@ nrmessage_type *nrt_find(const struct locale * lang,
   const struct message_type * mtype)
 {
   nrmessage_type *found = NULL;
-
   unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
-
   nrmessage_type *type = nrtypes[hash];
-
   while (type) {
     if (type->mtype == mtype) {
       if (found == NULL)
@@ -74,12 +71,10 @@ nrsection *sections;
 const nrsection *section_find(const char *name)
 {
   nrsection **mcp = &sections;
-
   if (name == NULL)
     return NULL;
   for (; *mcp; mcp = &(*mcp)->next) {
     nrsection *mc = *mcp;
-
     if (!strcmp(mc->name, name))
       break;
   }
@@ -89,18 +84,15 @@ const nrsection *section_find(const char *name)
 const nrsection *section_add(const char *name)
 {
   nrsection **mcp = &sections;
-
   if (name == NULL)
     return NULL;
   for (; *mcp; mcp = &(*mcp)->next) {
     nrsection *mc = *mcp;
-
     if (!strcmp(mc->name, name))
       break;
   }
   if (!*mcp) {
     nrsection *mc = calloc(sizeof(nrsection), 1);
-
     mc->name = strdup(name);
     *mcp = mc;
   }
@@ -112,9 +104,7 @@ nrt_register(const struct message_type *mtype, const struct locale *lang,
   const char *string, int level, const char *section)
 {
   unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
-
   nrmessage_type *nrt = nrtypes[hash];
-
   while (nrt && (nrt->lang != lang || nrt->mtype != mtype)) {
     nrt = nrt->next;
   }
@@ -123,11 +113,8 @@ nrt_register(const struct message_type *mtype, const struct locale *lang,
     assert(!nrt || !"trying to register same nr-type twice");
   } else {
     int i;
-
     char zNames[256];
-
     char *c = zNames;
-
     nrt = malloc(sizeof(nrmessage_type));
     nrt->lang = lang;
     nrt->mtype = mtype;
@@ -135,7 +122,6 @@ nrt_register(const struct message_type *mtype, const struct locale *lang,
     nrt->level = level;
     if (section) {
       const nrsection *s = section_find(section);
-
       if (s == NULL) {
         s = section_add(section);
       }
@@ -178,14 +164,12 @@ nr_render(const struct message *msg, const struct locale *lang, char *buffer,
 int nr_level(const struct message *msg)
 {
   nrmessage_type *nrt = nrt_find(NULL, msg->type);
-
   return nrt ? nrt->level : 0;
 }
 
 const char *nr_section(const struct message *msg)
 {
   nrmessage_type *nrt = nrt_find(default_locale, msg->type);
-
   return nrt ? nrt->section : NULL;
 }
 

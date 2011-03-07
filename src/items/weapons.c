@@ -43,15 +43,10 @@ attack_firesword(const troop * at, const struct weapon_type *wtype,
   int *casualties)
 {
   fighter *fi = at->fighter;
-
   troop dt;
-
   int killed = 0;
-
   const char *damage = "2d8";
-
   int force = 1 + rng_int() % 10;
-
   int enemies =
     count_enemies(fi->side->battle, fi, 0, 1, SELECT_ADVANCE | SELECT_DISTANCE);
 
@@ -63,12 +58,9 @@ attack_firesword(const troop * at, const struct weapon_type *wtype,
 
   if (fi->catmsg == -1) {
     int i, k = 0;
-
     message *msg;
-
     for (i = 0; i <= at->index; ++i) {
       struct weapon *wp = fi->person[i].melee;
-
       if (wp != NULL && wp->type == wtype)
         ++k;
     }
@@ -96,19 +88,12 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
   int *casualties)
 {
   fighter *af = at->fighter;
-
   unit *au = af->unit;
-
   battle *b = af->side->battle;
-
   troop dt;
-
   int d = 0, enemies;
-
   weapon *wp = af->person[at->index].missile;
-
   static item_type *it_catapultammo = NULL;
-
   if (it_catapultammo == NULL) {
     it_catapultammo = it_find("catapultammo");
   }
@@ -132,7 +117,6 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
 
   if (af->catmsg == -1) {
     int i, k = 0;
-
     message *msg;
 
     for (i = 0; i <= at->index; ++i) {

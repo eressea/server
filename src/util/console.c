@@ -67,7 +67,6 @@ void set_readline(readline foo)
 /* BAD hack, all this action stuff. */
 #define STATESTACK_MAX 16
 static lua_State *state_stack[STATESTACK_MAX];
-
 int state_stack_top = -1;
 
 static const char *progname = "eressea";
@@ -100,7 +99,6 @@ static int report(lua_State * L, int status)
 {
   if (status && !lua_isnil(L, -1)) {
     const char *msg = lua_tostring(L, -1);
-
     if (msg == NULL)
       msg = "(error object is not a string)";
     l_message(progname, msg);
@@ -130,9 +128,7 @@ static int traceback(lua_State * L)
 static int docall(lua_State * L, int narg, int clear)
 {
   int status, pop_state = state_stack_top;
-
   int base = lua_gettop(L) - narg;      /* function index */
-
   lua_pushcfunction(L, traceback);      /* push traceback function */
   lua_insert(L, base);          /* put it under chunk and args */
   if (state_stack_top < 0 || L != state_stack[state_stack_top]) {
@@ -153,7 +149,6 @@ static int docall(lua_State * L, int narg, int clear)
 static const char *get_prompt(lua_State * L, int firstline)
 {
   const char *p = NULL;
-
   lua_pushstring(L, firstline ? "_PROMPT" : "_PROMPT2");
   lua_rawget(L, LUA_GLOBALSINDEX);
   p = lua_tostring(L, -1);
@@ -174,17 +169,12 @@ static int incomplete(lua_State * L, int status)
   return 1;
 }
 
-
 static int pushline(lua_State * L, int firstline)
 {
   char buffer[LUA_MAXINPUT];
-
   char *b = buffer;
-
   size_t l;
-
   const char *prmt = get_prompt(L, firstline);
-
   if (lua_readline(L, b, prmt) == 0)
     return 0;                   /* no input */
   l = strlen(b);
@@ -198,11 +188,9 @@ static int pushline(lua_State * L, int firstline)
   return 1;
 }
 
-
 static int loadline(lua_State * L)
 {
   int status;
-
   lua_settop(L, 0);
   if (!pushline(L, 1))
     return -1;                  /* no input */
@@ -224,9 +212,7 @@ static int loadline(lua_State * L)
 static void dotty(lua_State * L)
 {
   int status;
-
   const char *oldprogname = progname;
-
   progname = NULL;
   while ((status = loadline(L)) != -1) {
     if (status == 0)
@@ -255,7 +241,6 @@ int lua_console(lua_State * L)
 int lua_do(lua_State * L)
 {
   int status = loadline(L);
-
   if (status != -1) {
     if (status == 0)
       status = docall(L, 0, 0);

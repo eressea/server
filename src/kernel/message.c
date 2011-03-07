@@ -62,7 +62,6 @@ arg_set(variant args[], const message_type * mtype, const char *buffer,
   variant v)
 {
   int i;
-
   for (i = 0; i != mtype->nparameters; ++i) {
     if (!strcmp(buffer, mtype->pnames[i]))
       break;
@@ -80,17 +79,11 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
   const char *name, const char *sig, ...)
 {
   va_list marker;
-
   const message_type *mtype = mt_find(name);
-
   char paramname[64];
-
   const char *ic = sig;
-
   variant args[16];
-
   variant var;
-
   memset(args, 0, sizeof(args));
 
   if (ord == NULL)
@@ -114,7 +107,6 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     ic++;
   while (*ic) {
     char *oc = paramname;
-
     int i;
 
     while (isalnum(*ic))
@@ -150,15 +142,10 @@ message *msg_message(const char *name, const char *sig, ...)
         /* msg_message("oops_error", "unit region command", u, r, cmd) */
 {
   va_list marker;
-
   const message_type *mtype = mt_find(name);
-
   char paramname[64];
-
   const char *ic = sig;
-
   variant args[16];
-
   memset(args, 0, sizeof(args));
 
   if (!mtype) {
@@ -174,7 +161,6 @@ message *msg_message(const char *name, const char *sig, ...)
     ic++;
   while (*ic) {
     char *oc = paramname;
-
     int i;
 
     while (isalnum(*ic))
@@ -270,7 +256,6 @@ void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 void cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
   static char msgname[20];
-
   unused(mtype);
 
   if (is_monsters(u->faction))
@@ -284,10 +269,8 @@ extern unsigned int new_hashstring(const char *s);
 void free_messagelist(message_list * msgs)
 {
   struct mlist **mlistptr = &msgs->begin;
-
   while (*mlistptr) {
     struct mlist *ml = *mlistptr;
-
     *mlistptr = ml->next;
     msg_release(ml->msg);
     free(ml);
@@ -299,7 +282,6 @@ message *add_message(message_list ** pm, message * m)
 {
   if (!lomem && m != NULL) {
     struct mlist *mnew = malloc(sizeof(struct mlist));
-
     if (*pm == NULL) {
       *pm = malloc(sizeof(message_list));
       (*pm)->end = &(*pm)->begin;

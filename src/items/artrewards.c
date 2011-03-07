@@ -65,7 +65,6 @@ use_hornofdancing(struct unit *u, const struct item_type *itype,
   int amount, struct order *ord)
 {
   region *r;
-
   int regionsPacified = 0;
 
   for (r = regions; r; r = r->next) {
@@ -103,13 +102,11 @@ use_hornofdancing(struct unit *u, const struct item_type *itype,
 
 #define SPEEDUP 2
 
-
 static int
 useonother_trappedairelemental(struct unit *u, int shipId,
   const struct item_type *itype, int amount, struct order *ord)
 {
   curse *c;
-
   ship *sh;
 
   if (shipId <= 0) {

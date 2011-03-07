@@ -45,9 +45,7 @@ int dice(int count, int value)
 static int term_eval(const char **sptr)
 {
   const char *c = *sptr;
-
   int m = 0, d = 0, k = 0, term = 1, multi = 1;
-
   int state = 1;
 
   for (;;) {
@@ -59,7 +57,6 @@ static int term_eval(const char **sptr)
         m += k * multi;
       else if (state == 2) {    /* dDk */
         int i;
-
         if (k == 0)
           k = 6;                /* 3d == 3d6 */
         for (i = 0; i != d; ++i)

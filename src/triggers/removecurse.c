@@ -37,7 +37,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-
 #include <stdio.h>
 
 typedef struct removecurse_data {
@@ -61,10 +60,8 @@ static int removecurse_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   removecurse_data *td = (removecurse_data *) t->data.v;
-
   if (td->curse && td->target) {
     attrib *a = a_select(td->target->attribs, td->curse, cmp_curse);
-
     if (a) {
       a_remove(&td->target->attribs, a);
     } else
@@ -77,7 +74,6 @@ static int removecurse_handle(trigger * t, void *data)
 static void removecurse_write(const trigger * t, struct storage *store)
 {
   removecurse_data *td = (removecurse_data *) t->data.v;
-
   store->w_tok(store, td->target ? itoa36(td->target->no) : 0);
   store->w_int(store, td->curse ? td->curse->no : 0);
 }
@@ -104,9 +100,7 @@ trigger_type tt_removecurse = {
 trigger *trigger_removecurse(curse * c, unit * target)
 {
   trigger *t = t_new(&tt_removecurse);
-
   removecurse_data *td = (removecurse_data *) t->data.v;
-
   td->curse = c;
   td->target = target;
   return t;

@@ -5,18 +5,12 @@
 int main(int argc, char **argv)
 {
   char key[4];
-
   char code[4];
-
   char result[4];
-
   int a, i, rot;
-
   for (a = 1; a < argc; ++a) {
     const char *str = argv[a];
-
     size_t len = strlen(str);
-
     str = str + len - 6;
     memcpy(key, str, 3);
     memcpy(code, str + 3, 3);

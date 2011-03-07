@@ -26,12 +26,10 @@ insert_selection(list_selection ** p_sel, list_selection * prev,
   const char *str, void *payload)
 {
   list_selection *sel = calloc(sizeof(list_selection), 1);
-
   sel->str = strdup(str);
   sel->data = payload;
   if (*p_sel) {
     list_selection *s;
-
     sel->next = *p_sel;
     sel->prev = sel->next->prev;
     sel->next->prev = sel;
@@ -55,9 +53,7 @@ list_selection **push_selection(list_selection ** p_sel, char *str,
   void *payload)
 {
   list_selection *sel = calloc(sizeof(list_selection), 1);
-
   list_selection *prev = NULL;
-
   sel->str = str;
   sel->data = payload;
   while (*p_sel) {
@@ -79,19 +75,12 @@ list_selection *do_selection(list_selection * sel, const char *title,
   void (*perform) (list_selection *, void *), void *data)
 {
   WINDOW *wn;
-
   boolean update = true;
-
   list_selection *s;
-
   list_selection *top = sel;
-
   list_selection *current = top;
-
   int i;
-
   int height = 0, width = (int)strlen(title) + 8;
-
   for (s = sel; s; s = s->next) {
     if ((int)strlen(s->str) > width)
       width = (int)strlen(s->str);
@@ -114,7 +103,6 @@ list_selection *do_selection(list_selection * sel, const char *title,
 
   for (;;) {
     int input;
-
     if (update) {
       for (s = top; s != NULL && top->index + height != s->index; s = s->next) {
         i = s->index - top->index;

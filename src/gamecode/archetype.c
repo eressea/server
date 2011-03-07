@@ -33,7 +33,6 @@ struct attrib_type at_recruit = {
 const struct archetype *find_archetype(const char *s, const struct locale *lang)
 {
   struct tnode *tokens = get_translations(lang, UT_ARCHETYPES);
-
   variant token;
 
   if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
@@ -51,17 +50,12 @@ void register_archetype(archetype * arch)
 void init_archetypes(void)
 {
   const struct locale *lang = locales;
-
   for (; lang; lang = nextlocale(lang)) {
     variant var;
-
     archetype *arch = archetypes;
-
     struct tnode *tokens = get_translations(lang, UT_ARCHETYPES);
-
     for (; arch; arch = arch->next) {
       const char *s1, *s2;
-
       var.v = arch;
 
       s1 = LOC(lang, arch->name[0]);
@@ -77,25 +71,18 @@ void init_archetypes(void)
 static int parse_archetypes(xmlDocPtr doc)
 {
   char zName[64];
-
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-
   xmlXPathObjectPtr result =
     xmlXPathEvalExpression(BAD_CAST "/eressea/archetypes/archetype", xpath);
   xmlNodeSetPtr nodes = result->nodesetval;
 
   xmlChar *propValue;
-
   if (nodes) {
     int i;
-
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr node = nodes->nodeTab[i];
-
       xmlNodePtr child;
-
       archetype *arch = calloc(1, sizeof(archetype));
-
       xmlXPathObjectPtr sub;
 
       propValue = xmlGetProp(node, BAD_CAST "name");
@@ -124,12 +111,9 @@ static int parse_archetypes(xmlDocPtr doc)
       for (child = node->children; child; child = child->next) {
         if (strcmp((const char *)child->name, "function") == 0) {
           xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
-
           xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
-
           if (strcmp((const char *)propName, "create")) {
             pf_generic foo = get_function((const char *)propValue);
-
             arch->exec = (archetype_function) foo;
           }
           xmlFree(propValue);
@@ -140,11 +124,9 @@ static int parse_archetypes(xmlDocPtr doc)
       sub = xmlXPathEvalExpression(BAD_CAST "allow|deny", xpath);
       if (sub->nodesetval && sub->nodesetval->nodeNr) {
         int k;
-
         arch->rules = calloc(sub->nodesetval->nodeNr + 1, sizeof(rule));
         for (k = 0; k != sub->nodesetval->nodeNr; ++k) {
           xmlNodePtr rule = sub->nodesetval->nodeTab[k];
-
           arch->rules[k].allow = (rule->name[0] == 'a');
 
           propValue = xmlGetProp(rule, BAD_CAST "property");

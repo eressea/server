@@ -30,13 +30,11 @@ static player_hash *players[PMAXHASH];
 player *make_player(const struct faction *f)
 {
   player *p = calloc(sizeof(player), 1);
-
   unsigned int hash;
 
   for (p->id = rng_int();; p->id++) {
     /* if there is a hashing conflict, resolve it */
     player *pi = get_player(p->id);
-
     if (pi)
       p->id++;
     else
@@ -56,7 +54,6 @@ player *next_player(player * p)
     return p->nexthash;
   else {
     unsigned int hash = p->id % PMAXHASH;
-
     p = NULL;
     while (++hash != PMAXHASH) {
       if (players[hash]->entries != NULL) {
@@ -71,7 +68,6 @@ player *next_player(player * p)
 player *get_player(unsigned int id)
 {
   unsigned int hash = id % PMAXHASH;
-
   struct player *p = players[hash]->entries;
 
   while (p && p->id != id)
@@ -82,7 +78,6 @@ player *get_player(unsigned int id)
 player *get_players(void)
 {
   struct player *p = NULL;
-
   unsigned int hash = 0;
 
   while (p != NULL && hash != PMAXHASH) {
@@ -94,10 +89,8 @@ player *get_players(void)
 void players_done(void)
 {
   int i;
-
   for (i = 0; i != PMAXHASH; ++i) {
     player *p = players[i]->entries;
-
     players[i]->entries = p->nexthash;
     free(p->name);
     if (p->email)

@@ -86,7 +86,6 @@ const char *skillname(skill_t sk, const struct locale *lang)
 void enable_skill(const char *skname, boolean value)
 {
   skill_t sk;
-
   for (sk = 0; sk != MAXSKILLS; ++sk) {
     if (strcmp(skillnames[sk], skname) == 0) {
       skill_enabled[sk] = value;
@@ -99,7 +98,6 @@ void enable_skill(const char *skname, boolean value)
 skill_t sk_find(const char *name)
 {
   skill_t i;
-
   if (name == NULL)
     return NOSKILL;
   if (strncmp(name, "sk_", 3) == 0)
@@ -139,7 +137,6 @@ attrib *make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special,
   double multiplier, int bonus)
 {
   attrib *a = a_new(&at_skillmod);
-
   skillmod_data *smd = (skillmod_data *) a->data.v;
 
   smd->skill = sk;
@@ -158,7 +155,6 @@ skillmod(const attrib * a, const unit * u, const region * r, skill_t sk,
   for (a = a_find((attrib *) a, &at_skillmod); a && a->type == &at_skillmod;
     a = a->next) {
     skillmod_data *smd = (skillmod_data *) a->data.v;
-
     if (smd->skill != NOSKILL && smd->skill != sk)
       continue;
     if (flags != SMF_ALWAYS && (smd->flags & flags) == 0)
@@ -209,14 +205,12 @@ static struct skillmods {
 static struct skillmods *init_skills(const race * rc)
 {
   terrain_t t;
-
   struct skillmods *mods =
     (struct skillmods *)calloc(1, sizeof(struct skillmods));
   mods->race = rc;
 
   for (t = 0; t != MAXTERRAINS; ++t) {
     skill_t sk;
-
     for (sk = 0; sk != MAXSKILLS; ++sk) {
       mods->mod[t].value[sk] = skill_mod(rc, sk, newterrain(t));
     }
@@ -233,9 +227,7 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
     return 0;
 #ifdef FASTER_SKILLMOD
   unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
-
   struct skillmods **imods = &modhash[index];
-
   while (*imods && (*imods)->race != rc)
     imods = &(*imods)->next;
   if (*imods == NULL) {
@@ -271,11 +263,8 @@ int level_days(int level)
 int level(int days)
 {
   int i;
-
   static int ldays[64];
-
   static boolean init = false;
-
   if (!init) {
     init = true;
     for (i = 0; i != 64; ++i)
@@ -304,9 +293,7 @@ int skill_weeks(int level)
 {
   if (rule_random_progress()) {
     int coins = 2 * level;
-
     int heads = 1;
-
     while (coins--) {
       heads += rng_int() % 2;
     }
@@ -327,7 +314,6 @@ void reduce_skill(unit * u, skill * sv, unsigned int weeks)
     sv->weeks = (unsigned char)skill_weeks(sv->level);
   }
 }
-
 
 int skill_compare(const skill * sk, const skill * sc)
 {

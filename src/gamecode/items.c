@@ -38,7 +38,6 @@ use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 {
   if (get_keyword(u->thisorder) == K_STUDY) {
     skill_t sk;
-
     skill *sv;
 
     init_tokens(u->thisorder);
@@ -52,9 +51,7 @@ use_studypotion(struct unit *u, const struct item_type *itype, int amount,
       /* TODO: message */
     } else {
       attrib *a = a_find(u->attribs, &at_learning);
-
       teaching_info *teach;
-
       if (a == NULL) {
         a = a_add(&u->attribs, a_new(&at_learning));
       }
@@ -81,11 +78,8 @@ use_speedsail(struct unit *u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   curse *c;
-
   double effect;
-
   ship *sh = u->ship;
-
   if (!sh) {
     cmistake(u, ord, 20, MSG_MOVE);
     return -1;
@@ -114,9 +108,7 @@ use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
   struct order *ord)
 {
   region *r = u->region;
-
   const resource_type *rt_crystal = NULL;
-
   int i;
 
   if (rt_crystal == NULL) {
@@ -125,13 +117,9 @@ use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
   }
   for (i = 0; i != amount; ++i) {
     int effect, duration = 2;
-
     double force;
-
     spell *sp = find_spell(M_NONE, "antimagiczone");
-
     attrib **ap = &r->attribs;
-
     unused(ord);
     assert(sp);
 
@@ -146,9 +134,7 @@ use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
     /* Regionszauber auflösen */
     while (*ap && force > 0) {
       curse *c;
-
       attrib *a = *ap;
-
       if (!fval(a->type, ATF_CURSE)) {
         do {
           ap = &(*ap)->next;
@@ -276,7 +262,6 @@ use_aurapotion50(struct unit *u, const struct item_type *itype,
 
   return 0;
 }
-
 
 void register_itemfunctions(void)
 {

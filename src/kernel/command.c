@@ -45,12 +45,9 @@ tnode *stree_find(const syntaxtree * stree, const struct locale *lang)
 syntaxtree *stree_create(void)
 {
   syntaxtree *sroot = NULL;
-
   const struct locale *lang = locales;
-
   while (lang) {
     syntaxtree *stree = (syntaxtree *) malloc(sizeof(syntaxtree));
-
     stree->lang = lang;
     stree->next = sroot;
     sroot = stree;
@@ -64,7 +61,6 @@ add_command(struct tnode *keys, struct tnode *tnext,
   const char *str, parser fun)
 {
   command *cmd = (command *) malloc(sizeof(command));
-
   variant var;
 
   cmd->fun = fun;
@@ -76,13 +72,11 @@ add_command(struct tnode *keys, struct tnode *tnext,
 static int do_command_i(const struct tnode *keys, void *u, struct order *ord)
 {
   const char *c;
-
   variant var;
 
   c = getstrtoken();
   if (findtoken(keys, c, &var) == E_TOK_SUCCESS) {
     command *cmd = (command *) var.v;
-
     if (cmd->nodes && *c) {
       assert(!cmd->fun);
       return do_command_i(cmd->nodes, u, ord);
@@ -100,7 +94,6 @@ void do_command(const struct tnode *keys, void *u, struct order *ord)
   skip_token();
   if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {
     char *cmd = getcommand(ord);
-
     log_warning(("%s failed command '%s'\n", unitname(u), cmd));
     free(cmd);
   }

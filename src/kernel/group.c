@@ -44,15 +44,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define GMAXHASH 2039
 static group *ghash[GMAXHASH];
-
 static int maxgid;
 
 static group *new_group(faction * f, const char *name, int gid)
 {
   group **gp = &f->groups;
-
   int index = gid % GMAXHASH;
-
   group *g = calloc(sizeof(group), 1);
 
   while (*gp)
@@ -75,7 +72,6 @@ static void init_group(faction * f, group * g)
   for (a = f->allies; a; a = a->next)
     if (a->faction) {
       ally *ga = calloc(sizeof(ally), 1);
-
       *ga = *a;
       *an = ga;
       an = &ga->next;
@@ -92,9 +88,7 @@ static group *find_groupbyname(group * g, const char *name)
 static group *find_group(int gid)
 {
   int index = gid % GMAXHASH;
-
   group *g = ghash[index];
-
   while (g && g->gid != gid)
     g = g->nexthash;
   return g;
@@ -103,9 +97,7 @@ static group *find_group(int gid)
 static int read_group(attrib * a, void *owner, struct storage *store)
 {
   group *g;
-
   int gid = store->r_int(store);
-
   a->data.v = g = find_group(gid);
   if (g != 0) {
     g->members++;
@@ -118,7 +110,6 @@ static void
 write_group(const attrib * a, const void *owner, struct storage *store)
 {
   group *g = (group *) a->data.v;
-
   store->w_int(store, g->gid);
 }
 
@@ -130,9 +121,7 @@ attrib_type at_group = {        /* attribute for units assigned to a group */
 void free_group(group * g)
 {
   int index = g->gid % GMAXHASH;
-
   group **g_ptr = ghash + index;
-
   while (*g_ptr && (*g_ptr)->gid != g->gid)
     g_ptr = &(*g_ptr)->nexthash;
   assert(*g_ptr == g);
@@ -140,7 +129,6 @@ void free_group(group * g)
 
   while (g->allies) {
     ally *a = g->allies;
-
     g->allies = a->next;
     free(a);
   }
@@ -158,7 +146,6 @@ void set_group(struct unit *u, struct group *g)
 
   if (a) {
     group *og = (group *) a->data.v;
-
     if (og == g)
       return;
     --og->members;
@@ -197,7 +184,6 @@ void write_groups(struct storage *store, group * g)
 {
   while (g) {
     ally *a;
-
     store->w_int(store, g->gid);
     store->w_str(store, g->name);
     for (a = g->allies; a; a = a->next) {
@@ -218,11 +204,8 @@ void read_groups(struct storage *store, faction * f)
 {
   for (;;) {
     ally **pa;
-
     group *g;
-
     int gid;
-
     char buf[1024];
 
     gid = store->r_int(store);
@@ -233,9 +216,7 @@ void read_groups(struct storage *store, faction * f)
     pa = &g->allies;
     for (;;) {
       ally *a;
-
       variant fid;
-
       fid.i = store->r_id(store);
       if (fid.i <= 0)
         break;

@@ -31,17 +31,13 @@ without prior permission by the authors of Eressea.
 static int tolua_hashtable_get(lua_State * L)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   attrib *a = a_find(*self, &at_object);
 
   for (; a && a->type == &at_object; a = a->next) {
     const char *obj_name = object_name(a);
-
     if (obj_name && name && strcmp(obj_name, name) == 0) {
       variant val;
-
       object_type type;
 
       object_get(a, &type, &val);
@@ -83,13 +79,9 @@ static int tolua_hashtable_get(lua_State * L)
 static int tolua_hashtable_set_number(lua_State * L)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   lua_Number value = tolua_tonumber(L, 3, 0);
-
   attrib *a = a_find(*self, &at_object);
-
   variant val;
 
   val.f = (float)value;
@@ -108,13 +100,9 @@ static int tolua_hashtable_set_number(lua_State * L)
 static int tolua_hashtable_set_string(lua_State * L)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   const char *value = tolua_tostring(L, 3, 0);
-
   attrib *a = a_find(*self, &at_object);
-
   variant val;
 
   val.v = strdup(value);
@@ -133,13 +121,9 @@ static int tolua_hashtable_set_string(lua_State * L)
 static int tolua_hashtable_set_usertype(lua_State * L, int type)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-
   const char *name = tolua_tostring(L, 2, 0);
-
   unit *value = tolua_tousertype(L, 3, 0);
-
   attrib *a = a_find(*self, &at_object);
-
   variant val;
 
   val.v = value;
@@ -155,11 +139,9 @@ static int tolua_hashtable_set_usertype(lua_State * L, int type)
   return 0;
 }
 
-
 static int tolua_hashtable_set(lua_State * L)
 {
   tolua_Error tolua_err;
-
   if (tolua_isnumber(L, 3, 0, &tolua_err)) {
     return tolua_hashtable_set_number(L);
   } else if (tolua_isusertype(L, 3, TOLUA_CAST "unit", 0, &tolua_err)) {
@@ -175,8 +157,6 @@ static int tolua_hashtable_set(lua_State * L)
   }
   return tolua_hashtable_set_string(L);
 }
-
-
 
 void tolua_hashtable_open(lua_State * L)
 {

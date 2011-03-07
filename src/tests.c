@@ -8,9 +8,7 @@
 #include <util/quicklist_test.c>
 
 CuSuite *get_curse_suite(void);
-
 CuSuite *get_market_suite(void);
-
 CuSuite *get_laws_suite(void);
 
 #include <kernel/region.h>
@@ -26,9 +24,7 @@ CuSuite *get_laws_suite(void);
 int RunAllTests(void)
 {
   CuString *output = CuStringNew();
-
   CuSuite *suite = CuSuiteNew();
-
   int flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
@@ -52,7 +48,6 @@ int RunAllTests(void)
 struct race *test_create_race(const char *name)
 {
   race *rc = rc_add(rc_new("human"));
-
   return rc;
 }
 
@@ -60,7 +55,6 @@ struct region *test_create_region(int x, int y,
   const struct terrain_type *terrain)
 {
   region *r = new_region(x, y, NULL, 0);
-
   terraform_region(r, terrain);
   rsettrees(r, 0, 0);
   rsettrees(r, 1, 0);
@@ -73,23 +67,19 @@ struct region *test_create_region(int x, int y,
 struct faction *test_create_faction(const struct race *rc)
 {
   faction *f = addfaction("nobody@eressea.de", NULL, rc, default_locale, 0);
-
   return f;
 }
 
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
   unit *u = create_unit(r, f, 1, f->race, 0, 0, 0);
-
   return u;
 }
 
 void test_cleanup(void)
 {
   global.functions.maintenance = NULL;
-
   global.functions.wage = NULL;
-
   free_gamedata();
 }
 
@@ -103,15 +93,10 @@ void test_cleanup(void)
 void test_create_world(void)
 {
   terrain_type *t_plain, *t_ocean;
-
   region *island[2];
-
   race *rc_human;
-
   int i;
-
   building_type *btype;
-
   ship_type *stype;
 
   t_plain = calloc(1, sizeof(terrain_type));
@@ -128,12 +113,9 @@ void test_create_world(void)
   island[1] = test_create_region(1, 0, t_plain);
   for (i = 0; i != 2; ++i) {
     direction_t j;
-
     region *r = island[i];
-
     for (j = 0; j != MAXDIRECTIONS; ++j) {
       region *rn = r_connect(r, j);
-
       if (!rn) {
         rn = test_create_region(r->x + delta_x[j], r->y + delta_y[j], t_ocean);
       }

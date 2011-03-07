@@ -40,7 +40,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-
 #include <stdio.h>
 /***
  ** restore a mage that was turned into a toad
@@ -69,7 +68,6 @@ static int createunit_handle(trigger * t, void *data)
    * data.v -> ( variant event, int timer )
    */
   createunit_data *td = (createunit_data *) t->data.v;
-
   if (td->r != NULL && td->f != NULL) {
     create_unit(td->r, td->f, td->number, td->race, 0, NULL, NULL);
   } else {
@@ -82,7 +80,6 @@ static int createunit_handle(trigger * t, void *data)
 static void createunit_write(const trigger * t, struct storage *store)
 {
   createunit_data *td = (createunit_data *) t->data.v;
-
   write_faction_reference(td->f, store);
   write_region_reference(td->r, store);
   write_race_reference(td->race, store);
@@ -122,9 +119,7 @@ trigger *trigger_createunit(region * r, struct faction * f,
   const struct race * rc, int number)
 {
   trigger *t = t_new(&tt_createunit);
-
   createunit_data *td = (createunit_data *) t->data.v;
-
   td->r = r;
   td->f = f;
   td->race = rc;

@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static int age_reduceproduction(attrib * a)
 {
   int reduce = 100 - (5 * --a->data.sa[1]);
-
   if (reduce < 10)
     reduce = 10;
   a->data.sa[0] = (short)reduce;
@@ -45,7 +44,6 @@ attrib_type at_reduceproduction = {
 attrib *make_reduceproduction(int percent, int time)
 {
   attrib *a = a_new(&at_reduceproduction);
-
   a->data.sa[0] = (short)percent;
   a->data.sa[1] = (short)time;
   return a;

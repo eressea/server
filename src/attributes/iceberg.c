@@ -36,7 +36,6 @@ attrib_type at_iceberg = {
 attrib *make_iceberg(direction_t dir)
 {
   attrib *a = a_new(&at_iceberg);
-
   a->data.i = (int)dir;
   return a;
 }

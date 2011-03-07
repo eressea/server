@@ -32,7 +32,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /** importing **/
 
 locale *default_locale;
-
 locale *locales;
 
 unsigned int locale_hashkey(const locale * lang)
@@ -44,9 +43,7 @@ unsigned int locale_hashkey(const locale * lang)
 locale *find_locale(const char *name)
 {
   unsigned int hkey = hashstring(name);
-
   locale *l = locales;
-
   while (l && l->hashkey != hkey)
     l = l->next;
   return l;
@@ -57,9 +54,7 @@ static int nextlocaleindex = 0;
 locale *make_locale(const char *name)
 {
   unsigned int hkey = hashstring(name);
-
   locale *l = (locale *) calloc(sizeof(locale), 1);
-
   locale **lp = &locales;
 
   while (*lp && (*lp)->hashkey != hkey)
@@ -87,10 +82,8 @@ locale *make_locale(const char *name)
 void make_locales(const char *str)
 {
   const char *tok = str;
-
   while (*tok) {
     char zText[32];
-
     while (*tok && *tok != ',')
       ++tok;
     strncpy(zText, str, tok - str);
@@ -103,7 +96,6 @@ void make_locales(const char *str)
 }
 
 static FILE *s_debug = NULL;
-
 static char *s_logfile = NULL;
 
 void debug_language(const char *log)
@@ -114,9 +106,7 @@ void debug_language(const char *log)
 const char *locale_getstring(const locale * lang, const char *key)
 {
   unsigned int hkey = hashstring(key);
-
   unsigned int id = hkey & (SMAXHASH - 1);
-
   const struct locale_str *find;
 
   assert(lang);
@@ -145,9 +135,7 @@ const char *locale_string(const locale * lang, const char *key)
 
   if (key != NULL) {
     unsigned int hkey = hashstring(key);
-
     unsigned int id = hkey & (SMAXHASH - 1);
-
     struct locale_str *find;
 
     if (*key == 0)
@@ -169,7 +157,6 @@ const char *locale_string(const locale * lang, const char *key)
     }
     if (!find) {
       const char *s = key;
-
       log_warning(("missing translation for \"%s\" in locale %s\n", key,
           lang->name));
       if (lang != default_locale) {
@@ -193,11 +180,8 @@ const char *locale_string(const locale * lang, const char *key)
 void locale_setstring(locale * lang, const char *key, const char *value)
 {
   unsigned int hkey = hashstring(key);
-
   unsigned int id = hkey & (SMAXHASH - 1);
-
   struct locale_str *find;
-
   if (lang == NULL)
     lang = default_locale;
   find = lang->strings[id];
@@ -240,7 +224,6 @@ char *mkname_buf(const char *space, const char *name, char *buffer)
 const char *mkname(const char *space, const char *name)
 {
   static char zBuffer[128];     /* STATIC_RESULT: used for return, not across calls */
-
   return mkname_buf(space, name, zBuffer);
 }
 

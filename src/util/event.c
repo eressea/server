@@ -46,7 +46,6 @@ int read_triggers(struct storage *store, trigger ** tp)
 {
   for (;;) {
     trigger_type *ttype;
-
     char zText[128];
 
     store->r_tok_buf(store, zText, sizeof(zText));
@@ -57,7 +56,6 @@ int read_triggers(struct storage *store, trigger ** tp)
     *tp = t_new(ttype);
     if (ttype->read) {
       int i = ttype->read(*tp, store);
-
       switch (i) {
         case AT_READ_OK:
           tp = &(*tp)->next;
@@ -78,7 +76,6 @@ int read_triggers(struct storage *store, trigger ** tp)
 trigger *t_new(trigger_type * ttype)
 {
   trigger *t = calloc(sizeof(trigger), 1);
-
   t->type = ttype;
   if (ttype->initialize)
     ttype->initialize(t);
@@ -95,7 +92,6 @@ void free_triggers(trigger * triggers)
 {
   while (triggers) {
     trigger *t = triggers;
-
     triggers = t->next;
     t_free(t);
   }
@@ -104,10 +100,8 @@ void free_triggers(trigger * triggers)
 int handle_triggers(trigger ** triggers, void *param)
 {
   trigger **tp = triggers;
-
   while (*tp) {
     trigger *t = *tp;
-
     if (t->type->handle(t, param) != 0) {
       *tp = t->next;
       t_free(t);
@@ -134,7 +128,6 @@ static void init_handler(attrib * a)
 static void free_handler(attrib * a)
 {
   handler_info *hi = (handler_info *) a->data.v;
-
   free_triggers(hi->triggers);
   free(hi->event);
   free(hi);
@@ -144,7 +137,6 @@ static void
 write_handler(const attrib * a, const void *owner, struct storage *store)
 {
   handler_info *hi = (handler_info *) a->data.v;
-
   store->w_tok(store, hi->event);
   write_triggers(store, hi->triggers);
 }
@@ -152,7 +144,6 @@ write_handler(const attrib * a, const void *owner, struct storage *store)
 static int read_handler(attrib * a, void *owner, struct storage *store)
 {
   char zText[128];
-
   handler_info *hi = (handler_info *) a->data.v;
 
   store->r_tok_buf(store, zText, sizeof(zText));
@@ -176,9 +167,7 @@ attrib_type at_eventhandler = {
 struct trigger **get_triggers(struct attrib *ap, const char *eventname)
 {
   handler_info *td = NULL;
-
   attrib *a = a_find(ap, &at_eventhandler);
-
   while (a != NULL && a->type == &at_eventhandler) {
     td = (handler_info *) a->data.v;
     if (strcmp(td->event, eventname) == 0) {
@@ -192,11 +181,8 @@ struct trigger **get_triggers(struct attrib *ap, const char *eventname)
 void add_trigger(struct attrib **ap, const char *eventname, struct trigger *t)
 {
   trigger **tp;
-
   handler_info *td = NULL;
-
   attrib *a = a_find(*ap, &at_eventhandler);
-
   assert(t->next == NULL);
   while (a != NULL && a->type == &at_eventhandler) {
     td = (handler_info *) a->data.v;
@@ -225,10 +211,8 @@ void handle_event(attrib * attribs, const char *eventname, void *data)
   }
   while (attribs && attribs->type == &at_eventhandler) {
     handler_info *tl = (handler_info *) attribs->data.v;
-
     if (!strcmp(tl->event, eventname)) {
       handler_info *tl = (handler_info *) attribs->data.v;
-
       handle_triggers(&tl->triggers, data);
       break;
     }
@@ -254,7 +238,6 @@ void tt_register(trigger_type * tt)
 trigger_type *tt_find(const char *name)
 {
   trigger_type *tt = triggertypes;
-
   while (tt && strcmp(tt->name, name))
     tt = tt->next;
   return tt;
@@ -265,13 +248,11 @@ remove_triggers(struct attrib **ap, const char *eventname,
   const trigger_type * tt)
 {
   trigger **tp = get_triggers(*ap, eventname);
-
   if (tp == NULL)
     return;
   while (*tp) {
     /* first, remove all gate-triggers */
     trigger *t = *tp;
-
     if (t->type == tt) {
       *tp = t->next;
       t_free(t);

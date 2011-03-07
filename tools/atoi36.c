@@ -18,7 +18,6 @@
 int main(int argc, char **argv)
 {
   int i = 1, reverse = 0;
-
   if (strstr(argv[0], "itoa36"))
     reverse = 1;
   if (argc > 1) {

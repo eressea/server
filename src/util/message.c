@@ -35,7 +35,6 @@ const char *mt_name(const message_type * mtype)
 message_type *mt_new(const char *name, const char *args[])
 {
   int i, nparameters = 0;
-
   message_type *mtype = (message_type *) malloc(sizeof(message_type));
 
   assert(name != NULL);
@@ -58,15 +57,12 @@ message_type *mt_new(const char *name, const char *args[])
   if (args != NULL)
     for (i = 0; args[i]; ++i) {
       const char *x = args[i];
-
       const char *spos = strchr(x, ':');
-
       if (spos == NULL) {
         mtype->pnames[i] = strdup(x);
         mtype->types[i] = NULL;
       } else {
         char *cp = strncpy((char *)malloc(spos - x + 1), x, spos - x);
-
         cp[spos - x] = '\0';
         mtype->pnames[i] = cp;
         mtype->types[i] = find_argtype(spos + 1);
@@ -83,15 +79,12 @@ message_type *mt_new(const char *name, const char *args[])
 message_type *mt_new_va(const char *name, ...)
 {
   const char *args[16];
-
   int i = 0;
-
   va_list marker;
 
   va_start(marker, name);
   for (;;) {
     const char *c = va_arg(marker, const char *);
-
     args[i++] = c;
     if (c == NULL)
       break;
@@ -107,7 +100,6 @@ register_argtype(const char *name, void (*free_arg) (variant),
   variant(*copy_arg) (variant), variant_type type)
 {
   arg_type *atype = (arg_type *) malloc(sizeof(arg_type));
-
   atype->name = name;
   atype->next = argtypes;
   atype->release = free_arg;
@@ -119,7 +111,6 @@ register_argtype(const char *name, void (*free_arg) (variant),
 const arg_type *find_argtype(const char *name)
 {
   arg_type *atype = argtypes;
-
   while (atype != NULL) {
     if (strcmp(atype->name, name) == 0)
       return atype;
@@ -146,7 +137,6 @@ static void free_arg(const arg_type * atype, variant data)
 message *msg_create(const struct message_type *mtype, variant args[])
 {
   int i;
-
   message *msg = (message *) malloc(sizeof(message));
 
   assert(mtype != NULL);
@@ -171,14 +161,11 @@ static quicklist *messagetypes[MT_MAXHASH];
 const message_type *mt_find(const char *name)
 {
   unsigned int hash = hashstring(name) % MT_MAXHASH;
-
   quicklist *ql = messagetypes[hash];
-
   int qi;
 
   for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     message_type *data = (message_type *) ql_get(ql, qi);
-
     if (strcmp(data->name, name) == 0) {
       return data;
     }
@@ -189,7 +176,6 @@ const message_type *mt_find(const char *name)
 static unsigned int mt_id(const message_type * mtype)
 {
   unsigned int key = 0;
-
   size_t i = strlen(mtype->name);
 
   while (i > 0) {
@@ -198,11 +184,9 @@ static unsigned int mt_id(const message_type * mtype)
   return key % 0x7FFFFFFF;
 }
 
-
 const message_type *mt_register(message_type * type)
 {
   unsigned int hash = hashstring(type->name) % MT_MAXHASH;
-
   quicklist **qlp = messagetypes + hash;
 
   if (ql_set_insert(qlp, type) == 0) {
@@ -214,7 +198,6 @@ const message_type *mt_register(message_type * type)
 void msg_free(message * msg)
 {
   int i;
-
   assert(msg->refcount == 0);
   for (i = 0; i != msg->type->nparameters; ++i) {
     free_arg(msg->type->types[i], msg->parameters[i]);
