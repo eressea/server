@@ -47,7 +47,6 @@ extern "C" {
   struct unit *alp_target(struct unit *alp);
   void alp_findet_opfer(struct unit *alp, struct region *r);
 
-
 #ifdef __cplusplus
 }
 #endif

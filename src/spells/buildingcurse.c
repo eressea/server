@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-
 static message *cinfo_building(const void *obj, typ_t typ, const curse * c,
   int self)
 {
@@ -53,10 +52,8 @@ static message *cinfo_magicrunes(const void *obj, typ_t typ, const curse * c,
   int self)
 {
   message *msg = NULL;
-
   if (typ == TYP_BUILDING) {
     building *b;
-
     b = (building *) obj;
     if (self != 0) {
       msg =
@@ -64,7 +61,6 @@ static message *cinfo_magicrunes(const void *obj, typ_t typ, const curse * c,
     }
   } else if (typ == TYP_SHIP) {
     ship *sh;
-
     sh = (ship *) obj;
     if (self != 0) {
       msg = msg_message("curseinfo::magicrunes_ship", "ship id", sh, c->no);
@@ -92,7 +88,6 @@ static struct curse_type ct_strongwall = { "strongwall",
 static struct curse_type ct_nocostbuilding = { "nocostbuilding",
   CURSETYP_NORM, CURSE_NOAGE | CURSE_ONLYONE, NO_MERGE, cinfo_building
 };
-
 
 void register_buildingcurse(void)
 {

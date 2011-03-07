@@ -47,7 +47,6 @@ static message *cinfo_auraboost(const void *obj, typ_t typ, const curse * c,
   int self)
 {
   struct unit *u = (struct unit *)obj;
-
   unused(typ);
   assert(typ == TYP_UNIT);
 
@@ -81,7 +80,6 @@ static message *cinfo_slave(const void *obj, typ_t typ, const curse * c,
   int self)
 {
   unit *u;
-
   unused(typ);
 
   assert(typ == TYP_UNIT);
@@ -111,12 +109,10 @@ static message *cinfo_calm(const void *obj, typ_t typ, const curse * c,
 
   if (c->magician && c->magician->faction) {
     faction *f = c->magician->faction;
-
     unit *u = (unit *) obj;
 
     if (f == NULL || self == 0) {
       const struct race *rc = u_irace(c->magician);
-
       return msg_message("curseinfo::calm_0", "unit race id", u, rc, c->no);
     }
     return msg_message("curseinfo::calm_1", "unit faction id", u, f, c->no);
@@ -142,7 +138,6 @@ static message *cinfo_speed(const void *obj, typ_t typ, const curse * c,
 
   if (self != 0) {
     unit *u = (unit *) obj;
-
     return msg_message("curseinfo::speed_1", "unit number duration id", u,
       c->data.i, c->duration, c->no);
   }
@@ -166,7 +161,6 @@ message *cinfo_unit(const void *obj, typ_t typ, const curse * c, int self)
 
   if (self != 0) {
     unit *u = (unit *) obj;
-
     return msg_message(mkname("curseinfo", c->type->cname), "unit id", u,
       c->no);
   }
@@ -191,7 +185,6 @@ static message *cinfo_kaelteschutz(const void *obj, typ_t typ, const curse * c,
 
   if (self != 0) {
     unit *u = (unit *) obj;
-
     return msg_message("curseinfo::warmth_1", "unit number id", u,
       get_cursedmen(u, c), c->no);
   }
@@ -238,9 +231,7 @@ static message *cinfo_sparkle(const void *obj, typ_t typ, const curse * c,
     NULL,                       /* end draig */
   };
   int m, begin = 0, end = 0;
-
   unit *u;
-
   unused(typ);
 
   assert(typ == TYP_UNIT);
@@ -262,7 +253,6 @@ static message *cinfo_sparkle(const void *obj, typ_t typ, const curse * c,
     return NULL;
   else {
     int index = begin + curse_geteffect_int(c) % (end - begin);
-
     return msg_message(mkname("curseinfo", effects[index]), "unit id", u,
       c->no);
   }
@@ -306,7 +296,6 @@ static struct curse_type ct_fumble = {
 
 /* ------------------------------------------------------------- */
 
-
 static struct curse_type ct_oldrace = {
   "oldrace", CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE, NULL
 };
@@ -314,7 +303,6 @@ static struct curse_type ct_oldrace = {
 static struct curse_type ct_magicresistance = {
   "magicresistance", CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_simple
 };
-
 
 /* ------------------------------------------------------------- */
 /*
@@ -324,10 +312,8 @@ static struct curse_type ct_magicresistance = {
 static int read_skill(struct storage *store, curse * c, void *target)
 {
   int skill;
-
   if (store->version < CURSETYPE_VERSION) {
     int men;
-
     skill = store->r_int(store);
     men = store->r_int(store);
   } else {
@@ -351,9 +337,7 @@ static message *cinfo_skillmod(const void *obj, typ_t typ, const curse * c,
 
   if (self != 0) {
     unit *u = (unit *) obj;
-
     int sk = c->data.i;
-
     if (c->effect > 0) {
       return msg_message("curseinfo::skill_1", "unit skill id", u, sk, c->no);
     } else if (c->effect < 0) {

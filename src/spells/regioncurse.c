@@ -62,7 +62,6 @@ static struct curse_type ct_godcursezone = {
     cinfo_cursed_by_the_gods,
 };
 
-
 /* --------------------------------------------------------------------- */
 /*
  * C_GBDREAM
@@ -136,9 +135,7 @@ cansee_antimagiczone(const struct faction *viewer, const void *obj, typ_t typ,
   const curse * c, int self)
 {
   region *r;
-
   unit *u = NULL;
-
   unit *mage = c->magician;
 
   unused(typ);
@@ -187,7 +184,6 @@ static struct curse_type ct_farvision = {
   CURSETYP_NORM, 0, (NO_MERGE),
   cinfo_farvision
 };
-
 
 /* --------------------------------------------------------------------- */
 
@@ -282,7 +278,6 @@ static struct curse_type ct_healing = {
   CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
   cinfo_simple
 };
-
 
 void register_regioncurse(void)
 {

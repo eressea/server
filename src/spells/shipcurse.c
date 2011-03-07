@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-
 message *cinfo_ship(const void *obj, typ_t typ, const curse * c, int self)
 {
   message *msg;
@@ -79,7 +78,6 @@ static struct curse_type ct_stormwind = { "stormwind",
 static int flyingship_read(storage * store, curse * c, void *target)
 {
   ship *sh = (ship *) target;
-
   c->data.v = sh;
   if (store->version < FOSS_VERSION) {
     sh->flags |= SF_FLYING;
@@ -93,7 +91,6 @@ static int flyingship_write(storage * store, const curse * c,
   const void *target)
 {
   const ship *sh = (const ship *)target;
-
   assert(sh->flags & SF_FLYING);
   return 0;
 }
@@ -101,7 +98,6 @@ static int flyingship_write(storage * store, const curse * c,
 static int flyingship_age(curse * c)
 {
   ship *sh = (ship *) c->data.v;
-
   if (sh && c->duration == 1) {
     freset(sh, SF_FLYING);
     return 1;
@@ -125,7 +121,6 @@ static struct curse_type ct_shipspeedup = { "shipspeedup",
 curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
 {
   static const curse_type *ct_flyingship = NULL;
-
   if (!ct_flyingship) {
     ct_flyingship = ct_find("flyingship");
     assert(ct_flyingship);
@@ -149,7 +144,6 @@ curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
 int levitate_ship(ship * sh, unit * mage, double power, int duration)
 {
   curse *c = shipcurse_flyingship(sh, mage, power, duration);
-
   if (c) {
     return c->no;
   }

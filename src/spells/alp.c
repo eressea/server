@@ -61,7 +61,6 @@ static void alp_done(attrib * a)
 static int alp_verify(attrib * a)
 {
   alp_data *ad = (alp_data *) a->data.v;
-
   if (ad->mage && ad->target)
     return 1;
   return 0;                     /* remove the attribute */
@@ -71,7 +70,6 @@ static void
 alp_write(const attrib * a, const void *owner, struct storage *store)
 {
   alp_data *ad = (alp_data *) a->data.v;
-
   write_unit_reference(ad->mage, store);
   write_unit_reference(ad->target, store);
 }
@@ -79,9 +77,7 @@ alp_write(const attrib * a, const void *owner, struct storage *store)
 static int alp_read(attrib * a, void *owner, struct storage *store)
 {
   alp_data *ad = (alp_data *) a->data.v;
-
   int rm = read_reference(&ad->mage, store, read_unit_reference, resolve_unit);
-
   int rt =
     read_reference(&ad->target, store, read_unit_reference, resolve_unit);
   if (rt == 0 && rm == 0 && (!ad->target || !ad->mage)) {
@@ -104,19 +100,12 @@ static attrib_type at_alp = {
 int sp_summon_alp(struct castorder *co)
 {
   unit *alp, *opfer;
-
   region *r = co->rt;
-
   unit *mage = co->magician.u;
-
   int cast_level = co->level;
-
   spellparameter *pa = co->par;
-
   const struct race *rc = new_race[RC_ALP];
-
   struct faction *f = get_monsters();
-
   struct message *msg;
 
   opfer = pa->param[0]->data.u;
@@ -131,9 +120,7 @@ int sp_summon_alp(struct castorder *co)
 
   {
     attrib *a = a_add(&alp->attribs, a_new(&at_alp));
-
     alp_data *ad = (alp_data *) a->data.v;
-
     ad->mage = mage;
     ad->target = opfer;
   }
@@ -153,21 +140,14 @@ int sp_summon_alp(struct castorder *co)
   return cast_level;
 }
 
-
 void alp_findet_opfer(unit * alp, region * r)
 {
   curse *c;
-
   attrib *a = a_find(alp->attribs, &at_alp);
-
   alp_data *ad = (alp_data *) a->data.v;
-
   unit *mage = ad->mage;
-
   unit *opfer = ad->target;
-
   double effect;
-
   message *msg;
 
   assert(opfer);
@@ -207,7 +187,6 @@ void register_alp(void)
 unit *alp_target(unit * alp)
 {
   alp_data *ad;
-
   unit *target = NULL;
 
   attrib *a = a_find(alp->attribs, &at_alp);

@@ -1,11 +1,9 @@
-PROJECT = eressea
-
-all: bin/$(PROJECT)
+all: bin/eressea
 
 bin:
 	mkdir bin
 
-bin/$(PROJECT): bin/Makefile
+bin/eressea: bin/Makefile
 	cd bin ; make
 
 bin/Makefile: bin

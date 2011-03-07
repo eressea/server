@@ -36,7 +36,6 @@ typedef struct wallcurse {
 void cw_init(attrib * a)
 {
   curse *c;
-
   curse_init(a);
   c = (curse *) a->data.v;
   c->data.v = calloc(sizeof(wallcurse), 1);
@@ -45,7 +44,6 @@ void cw_init(attrib * a)
 void cw_write(const attrib * a, const void *target, storage * store)
 {
   connection *b = ((wallcurse *) ((curse *) a->data.v)->data.v)->wall;
-
   curse_write(a, target, store);
   store->w_int(store, b->id);
 }
@@ -60,11 +58,8 @@ static int resolve_buddy(variant data, void *addr);
 static int cw_read(attrib * a, void *target, storage * store)
 {
   bresolve *br = calloc(sizeof(bresolve), 1);
-
   curse *c = (curse *) a->data.v;
-
   wallcurse *wc = (wallcurse *) c->data.v;
-
   variant var;
 
   curse_read(a, store, target);
@@ -89,11 +84,9 @@ attrib_type at_cursewall = {
   ATF_CURSE
 };
 
-
 static int resolve_buddy(variant data, void *addr)
 {
   curse *result = NULL;
-
   bresolve *br = (bresolve *) data.v;
 
   if (br->id >= 0) {
@@ -101,12 +94,9 @@ static int resolve_buddy(variant data, void *addr)
 
     if (b && b->from && b->to) {
       attrib *a = a_find(b->from->attribs, &at_cursewall);
-
       while (a && a->data.v != br->self) {
         curse *c = (curse *) a->data.v;
-
         wallcurse *wc = (wallcurse *) c->data.v;
-
         if (wc->wall->id == br->id)
           break;
         a = a->next;
@@ -115,9 +105,7 @@ static int resolve_buddy(variant data, void *addr)
         a = a_find(b->to->attribs, &at_cursewall);
         while (a && a->type == &at_cursewall && a->data.v != br->self) {
           curse *c = (curse *) a->data.v;
-
           wallcurse *wc = (wallcurse *) c->data.v;
-
           if (wc->wall->id == br->id)
             break;
           a = a->next;
@@ -125,7 +113,6 @@ static int resolve_buddy(variant data, void *addr)
       }
       if (a && a->type == &at_cursewall) {
         curse *c = (curse *) a->data.v;
-
         free(br);
         result = c;
       }
@@ -143,7 +130,6 @@ static int resolve_buddy(variant data, void *addr)
 static void wall_init(connection * b)
 {
   wall_data *fd = (wall_data *) calloc(sizeof(wall_data), 1);
-
   fd->countdown = -1;           /* infinite */
   b->data.v = fd;
 }
@@ -156,9 +142,7 @@ static void wall_destroy(connection * b)
 static void wall_read(connection * b, storage * store)
 {
   wall_data *fd = (wall_data *) b->data.v;
-
   variant mno;
-
   assert(fd);
   if (store->version < STORAGE_VERSION) {
     mno.i = store->r_int(store);
@@ -179,7 +163,6 @@ static void wall_read(connection * b, storage * store)
 static void wall_write(const connection * b, storage * store)
 {
   wall_data *fd = (wall_data *) b->data.v;
-
   write_unit_reference(fd->mage, store);
   store->w_int(store, fd->force);
   store->w_int(store, fd->countdown);
@@ -188,7 +171,6 @@ static void wall_write(const connection * b, storage * store)
 static int wall_age(connection * b)
 {
   wall_data *fd = (wall_data *) b->data.v;
-
   --fd->countdown;
   return (fd->countdown > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -197,10 +179,8 @@ static region *wall_move(const connection * b, struct unit *u,
   struct region *from, struct region *to, boolean routing)
 {
   wall_data *fd = (wall_data *) b->data.v;
-
   if (!routing && fd->active) {
     int hp = dice(3, fd->force) * u->number;
-
     hp = MIN(u->hp, hp);
     u->hp -= hp;
     if (u->hp) {
@@ -221,7 +201,6 @@ static const char *b_namefirewall(const connection * b, const region * r,
   const faction * f, int gflags)
 {
   const char *bname;
-
   unused(f);
   unused(r);
   unused(b);
@@ -257,7 +236,6 @@ void convert_firewall_timeouts(connection * b, attrib * a)
   while (a) {
     if (b->type == &bt_firewall && a->type == &at_countdown) {
       wall_data *fd = (wall_data *) b->data.v;
-
       fd->countdown = a->data.i;
     }
   }
@@ -267,7 +245,6 @@ static const char *wisps_name(const connection * b, const region * r,
   const faction * f, int gflags)
 {
   const char *bname;
-
   unused(f);
   unused(r);
   unused(b);
@@ -290,9 +267,7 @@ static region *wisps_move(const connection * b, struct unit *u,
   struct region *from, struct region *next, boolean routing)
 {
   direction_t reldir = reldirection(from, next);
-
   wisps_data *wd = (wisps_data *) b->data.v;
-
   assert(reldir != D_SPECIAL);
 
   if (routing && wd->wall.active) {
@@ -300,7 +275,6 @@ static region *wisps_move(const connection * b, struct unit *u,
       rconnect(from,
       (direction_t) ((reldir + MAXDIRECTIONS - 1) % MAXDIRECTIONS));
     region *rr = rconnect(from, (direction_t) ((reldir + 1) % MAXDIRECTIONS));
-
     /* pick left and right region: */
     if (wd->rnd < 0) {
       wd->rnd = rng_int() % 3;

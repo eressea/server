@@ -28,23 +28,16 @@
 #include <util/rng.h>
 
 void age_firedragon(struct unit *u);
-
 void age_dragon(struct unit *u);
-
 void age_illusion(struct unit *u);
-
 void age_undead(struct unit *u);
-
 void age_skeleton(struct unit *u);
-
 void age_zombie(struct unit *u);
-
 void age_ghoul(struct unit *u);
 
 static void oldfamiliars(unit * u)
 {
   char fname[64];
-
   /* these familiars have no special skills.
    */
   snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
@@ -55,7 +48,6 @@ static void oldfamiliars(unit * u)
 static void set_show_item(faction * f, item_t i)
 {
   attrib *a = a_add(&f->attribs, a_new(&at_showitem));
-
   a->data.v = (void *)olditemtype[i];
 }
 
@@ -74,10 +66,8 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
     case RC_HUMAN:
       if (u->building == NULL) {
         const building_type *btype = bt_find("castle");
-
         if (btype != NULL) {
           building *b = new_building(btype, r, u->faction->locale);
-
           b->size = 10;
           u->building = b;
           fset(u, UFL_OWNER);
@@ -90,7 +80,6 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
     case RC_AQUARIAN:
     {
       ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
-
       sh->size = sh->type->construction->maxsize;
       u->ship = sh;
       fset(u, UFL_OWNER);

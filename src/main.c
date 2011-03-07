@@ -15,17 +15,13 @@
 #include <tests.h>
 
 static const char *luafile = "setup.lua";
-
 static const char *entry_point = NULL;
-
 static const char *inifile = "eressea.ini";
-
 static int memdebug = 0;
 
 static void parse_config(const char *filename)
 {
   dictionary *d = iniparser_new(filename);
-
   if (d) {
     load_inifile(d);
 
@@ -60,7 +56,6 @@ static int usage(const char *prog, const char *arg)
 static int parse_args(int argc, char **argv, int *exitcode)
 {
   int i;
-
   int run_tests = 0;
 
   for (i = 1; i != argc; ++i) {
@@ -125,9 +120,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
 static void report_segfault(int signo, siginfo_t * sinf, void *arg)
 {
   void *btrace[50];
-
   size_t size;
-
   int fd = fileno(stderr);
 
   fflush(stdout);
@@ -160,7 +153,6 @@ void init_crtdbg(void)
 {
 #if (defined(_MSC_VER))
   int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-
   if (memdebug == 1) {
     flags |= _CRTDBG_CHECK_ALWAYS_DF;   /* expensive */
   } else if (memdebug == 2) {
@@ -175,24 +167,17 @@ void init_crtdbg(void)
 }
 #endif
 
-
 static void dump_spells(void)
 {
   struct locale *loc = find_locale("de");
-
   FILE *F = fopen("spells.csv", "w");
-
   quicklist *ql;
-
   int qi;
 
   for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
-
     spell_component *spc = sp->components;
-
     char components[128];
-
     components[0] = 0;
     for (; spc->type; ++spc) {
       strcat(components, LOC(loc, spc->type->_name[0]));
@@ -207,13 +192,9 @@ static void dump_spells(void)
 static void dump_skills(void)
 {
   struct locale *loc = find_locale("de");
-
   FILE *F = fopen("skills.csv", "w");
-
   race *rc;
-
   skill_t sk;
-
   fputs("\"Rasse\",", F);
   for (rc = races; rc; rc = rc->next) {
     if (playerrace(rc)) {
@@ -224,7 +205,6 @@ static void dump_skills(void)
 
   for (sk = 0; sk != MAXSKILLS; ++sk) {
     const char *str = skillname(sk, loc);
-
     if (str) {
       fprintf(F, "\"%s\",", str);
       for (rc = races; rc; rc = rc->next) {
@@ -257,7 +237,6 @@ extern void bind_eressea(struct lua_State *L);
 int main(int argc, char **argv)
 {
   static int write_csv = 0;
-
   int err, result = 0;
 
   setup_signal_handler();
@@ -304,6 +283,5 @@ int main(int argc, char **argv)
   log_close();
   if (global.inifile)
     iniparser_free(global.inifile);
-
   return 0;
 }

@@ -75,9 +75,7 @@
 static void reduce_weight(unit * u)
 {
   int capacity, weight = 0;
-
   item **itmp = &u->items;
-
   int horses = get_resource(u, oldresourcetype[R_HORSE]);
 
   if (horses > 0) {
@@ -88,9 +86,7 @@ static void reduce_weight(unit * u)
   /* 0. ditch any vehicles */
   while (*itmp != NULL) {
     item *itm = *itmp;
-
     const item_type *itype = itm->type;
-
     weight += itm->number * itype->weight;
     if (itype->flags & ITF_VEHICLE) {
       give_item(itm->number, itm->type, u, NULL, NULL);
@@ -104,16 +100,13 @@ static void reduce_weight(unit * u)
   /* 1. get rid of anything that isn't silver or really lightweight or helpful in combat */
   for (itmp = &u->items; *itmp && capacity > 0;) {
     item *itm = *itmp;
-
     const item_type *itype = itm->type;
-
     weight += itm->number * itype->weight;
     if (weight > capacity) {
       if (itype->weight >= 10 && itype->rtype->wtype == 0
         && itype->rtype->atype == 0) {
         if (itype->capacity < itype->weight) {
           int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
-
           give_item(reduce, itm->type, u, NULL, NULL);
           weight -= reduce * itype->weight;
         }
@@ -125,13 +118,10 @@ static void reduce_weight(unit * u)
 
   for (itmp = &u->items; *itmp && weight > capacity;) {
     item *itm = *itmp;
-
     const item_type *itype = itm->type;
-
     weight += itm->number * itype->weight;
     if (itype->capacity < itype->weight) {
       int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
-
       give_item(reduce, itm->type, u, NULL, NULL);
       weight -= reduce * itype->weight;
     }
@@ -154,18 +144,15 @@ static order *monster_attack(unit * u, const unit * target)
   return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
   unit *u2;
-
   int n;
 
   /* attackiere bewachende einheiten */
   for (u2 = r->units; u2; u2 = u2->next) {
     if (u2 != u && is_guard(u2, GUARD_TAX)) {
       order *ord = monster_attack(u, u2);
-
       if (ord)
         addlist(&u->orders, ord);
     }
@@ -184,12 +171,10 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
   for (u2 = r->units; u2; u2 = u2->next) {
     if (u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
       int m = get_money(u2);
-
       if (m == 0 || is_guard(u2, GUARD_TAX))
         continue;
       else {
         order *ord = monster_attack(u, u2);
-
         if (ord) {
           addlist(&u->orders, ord);
           n += m;
@@ -211,7 +196,6 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
 static int all_money(region * r, faction * f)
 {
   unit *u;
-
   int m;
 
   m = rmoney(r);
@@ -229,9 +213,7 @@ static direction_t richest_neighbour(region * r, faction * f, int absolut)
   /* m - maximum an Geld, d - Richtung, i - index, t = Geld hier */
 
   double m;
-
   double t;
-
   direction_t d = NODIRECTION, i;
 
   if (absolut == 1 || rpeasants(r) == 0) {
@@ -244,7 +226,6 @@ static direction_t richest_neighbour(region * r, faction * f, int absolut)
 
   for (i = 0; i != MAXDIRECTIONS; i++) {
     region *rn = rconnect(r, i);
-
     if (rn != NULL && fval(rn->terrain, LAND_REGION)) {
       if (absolut == 1 || rpeasants(rn) == 0) {
         t = (double)all_money(rn, f);
@@ -264,7 +245,6 @@ static direction_t richest_neighbour(region * r, faction * f, int absolut)
 static boolean room_for_race_in_region(region * r, const race * rc)
 {
   unit *u;
-
   int c = 0;
 
   for (u = r->units; u; u = u->next) {
@@ -281,9 +261,7 @@ static boolean room_for_race_in_region(region * r, const race * rc)
 static direction_t random_neighbour(region * r, unit * u)
 {
   direction_t i;
-
   region *rc;
-
   int rr, c = 0, c2 = 0;
 
   /* Nachsehen, wieviele Regionen in Frage kommen */
@@ -334,9 +312,7 @@ static direction_t random_neighbour(region * r, unit * u)
 static direction_t treeman_neighbour(region * r)
 {
   direction_t i;
-
   int rr;
-
   int c = 0;
 
   /* Nachsehen, wieviele Regionen in Frage kommen */
@@ -421,17 +397,13 @@ static int dragon_affinity_value(region * r, unit * u)
 static attrib *set_new_dragon_target(unit * u, region * r, int range)
 {
   int max_affinity = 0;
-
   region *max_region = NULL;
 
 #if 1
   region_list *rptr, *rlist = regions_in_range(r, range, allowed_dragon);
-
   for (rptr = rlist; rptr; rptr = rptr->next) {
     region *r2 = rptr->data;
-
     int affinity = dragon_affinity_value(r2, u);
-
     if (affinity > max_affinity) {
       max_affinity = affinity;
       max_region = r2;
@@ -441,18 +413,14 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
   free_regionlist(rlist);
 #else
   int tx, ty;
-
   for (tx = r->x - range; tx < r->x + range; tx++) {
     for (ty = r->y - range; ty < r->y + range; ty++) {
       region *r2;
-
       int x = tx, y = ty;
-
       pnormalize(&x, &y, r->planep);
       r2 = findregion(x, y);
       if (r2 != NULL) {
         int affinity = dragon_affinity_value(r2, u);
-
         if (affinity > max_affinity) {
           if (koor_distance(r->x, r->y, x, y) <= range
             && path_exists(r, r2, range, allowed_dragon)) {
@@ -466,7 +434,6 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
 #endif
   if (max_region && max_region != r) {
     attrib *a = a_find(u->attribs, &at_targetregion);
-
     if (!a) {
       a = a_add(&u->attribs, make_targetregion(max_region));
     } else {
@@ -481,13 +448,9 @@ static order *make_movement_order(unit * u, const region * target, int moves,
   boolean(*allowed) (const region *, const region *))
 {
   region *r = u->region;
-
   region **plan;
-
   int bytes, position = 0;
-
   char zOrder[128], *bufp = zOrder;
-
   size_t size = sizeof(zOrder) - 1;
 
   if (monster_is_waiting(u))
@@ -505,11 +468,8 @@ static order *make_movement_order(unit * u, const region * target, int moves,
 
   while (position != moves && plan[position + 1]) {
     region *prev = plan[position];
-
     region *next = plan[++position];
-
     direction_t dir = reldirection(prev, next);
-
     assert(dir != NODIRECTION && dir != D_SPECIAL);
     if (size > 1) {
       *bufp++ = ' ';
@@ -530,13 +490,9 @@ static order *make_movement_order(unit * u, const region * target, int moves,
 static order *monster_seeks_target(region * r, unit * u)
 {
   direction_t d;
-
   unit *target = NULL;
-
   int dist, dist2;
-
   direction_t i;
-
   region *nr;
 
   /* Das Monster sucht ein bestimmtes Opfer. Welches, steht
@@ -592,14 +548,12 @@ static order *monster_seeks_target(region * r, unit * u)
 static void monster_attacks(unit * u)
 {
   region *r = u->region;
-
   unit *u2;
 
   for (u2 = r->units; u2; u2 = u2->next) {
     if (cansee(u->faction, r, u2, 0) && u2->faction != u->faction
       && chance(0.75)) {
       order *ord = monster_attack(u, u2);
-
       if (ord)
         addlist(&u->orders, ord);
     }
@@ -628,11 +582,8 @@ extern struct attrib_type at_direction;
 static order *monster_learn(unit * u)
 {
   int c = 0;
-
   int n;
-
   skill *sv;
-
   const struct locale *lang = u->faction->locale;
 
   /* Monster lernt ein zufälliges Talent aus allen, in denen es schon
@@ -662,7 +613,6 @@ static order *monster_learn(unit * u)
 static boolean check_overpopulated(unit * u)
 {
   unit *u2;
-
   int c = 0;
 
   for (u2 = u->region->units; u2; u2 = u2->next) {
@@ -679,13 +629,9 @@ static boolean check_overpopulated(unit * u)
 static void recruit_dracoids(unit * dragon, int size)
 {
   faction *f = dragon->faction;
-
   region *r = dragon->region;
-
   const struct item *weapon = NULL;
-
   order *new_order = NULL;
-
   unit *un = createunit(r, f, size, new_race[RC_DRACOID]);
 
   fset(un, UFL_ISNEW | UFL_MOVED);
@@ -697,7 +643,6 @@ static void recruit_dracoids(unit * dragon, int size)
   setstatus(un, ST_FIGHT);
   for (weapon = un->items; weapon; weapon = weapon->next) {
     const weapon_type *wtype = weapon->type->rtype->wtype;
-
     if (wtype && (wtype->flags & WTF_MISSILE)) {
       setstatus(un, ST_BEHIND);
     }
@@ -713,13 +658,9 @@ static void recruit_dracoids(unit * dragon, int size)
 static order *plan_dragon(unit * u)
 {
   attrib *ta = a_find(u->attribs, &at_targetregion);
-
   region *r = u->region;
-
   region *tr = NULL;
-
   boolean move = false;
-
   order *long_order = NULL;
 
   reduce_weight(u);
@@ -732,7 +673,6 @@ static order *plan_dragon(unit * u)
 
   if (u->race == new_race[RC_WYRM] && !move) {
     unit *u2;
-
     for (u2 = r->units; u2; u2 = u2->next) {
       /* wyrme sind einzelgänger */
       if (u2 == u) {
@@ -774,7 +714,6 @@ static order *plan_dragon(unit * u)
     }
     if (rng_int() % 100 < 15) {
       const struct locale *lang = u->faction->locale;
-
       /* do a growl */
       if (rname(tr, lang)) {
         addlist(&u->orders, create_order(K_MAIL, lang, "%s '%s... %s %s %s'",
@@ -793,7 +732,6 @@ static order *plan_dragon(unit * u)
       /* neue dracoiden! */
       if (r->land && !fval(r->terrain, FORBIDDEN_REGION)) {
         int ra = 20 + rng_int() % 100;
-
         if (get_money(u) > ra * 50 + 100 && rng_int() % 100 < 50) {
           recruit_dracoids(u, ra);
         }
@@ -802,7 +740,6 @@ static order *plan_dragon(unit * u)
   }
   if (long_order == NULL) {
     skill_t sk = SK_PERCEPTION;
-
     /* study perception (or a random useful skill) */
     while (!skill_enabled[sk] || u->race->bonus[sk] < -5) {
       sk = (skill_t) (rng_int() % MAXSKILLS);
@@ -822,14 +759,11 @@ void plan_monsters(faction * f)
 
   for (r = regions; r; r = r->next) {
     unit *u;
-
     double attack_chance = MONSTERATTACK;
-
     boolean attacking = false;
 
     for (u = r->units; u; u = u->next) {
       attrib *ta;
-
       order *long_order = NULL;
 
       /* Ab hier nur noch Befehle für NPC-Einheiten. */
@@ -862,7 +796,6 @@ void plan_monsters(faction * f)
       ta = a_find(u->attribs, &at_hate);
       if (ta && !monster_is_waiting(u)) {
         unit *tu = (unit *) ta->data.v;
-
         if (tu && tu->region == r) {
           addlist(&u->orders, create_order(K_ATTACK, u->faction->locale, "%i",
               tu->no));
@@ -883,7 +816,6 @@ void plan_monsters(faction * f)
       /* Einheiten mit Bewegungsplan kriegen ein NACH: */
       if (long_order == NULL) {
         attrib *ta = a_find(u->attribs, &at_targetregion);
-
         if (ta) {
           if (u->region == (region *) ta->data.v) {
             a_remove(&u->attribs, ta);
@@ -946,7 +878,6 @@ void plan_monsters(faction * f)
 static double chaosfactor(region * r)
 {
   attrib *a = a_find(r->attribs, &at_chaoscount);
-
   if (!a)
     return 0;
   return ((double)a->data.i / 1000.0);
@@ -969,7 +900,6 @@ static int nrand(int start, int sub)
 void spawn_dragons(void)
 {
   region *r;
-
   faction *monsters = get_monsters();
 
   for (r = regions; r; r = r->next) {
@@ -1012,12 +942,10 @@ void spawn_dragons(void)
 void spawn_undead(void)
 {
   region *r;
-
   faction *monsters = get_monsters();
 
   for (r = regions; r; r = r->next) {
     int unburied = deathcount(r);
-
     static const curse_type *ctype = NULL;
 
     if (!ctype)
@@ -1029,16 +957,12 @@ void spawn_undead(void)
     if (r->land && unburied > r->land->peasants / 20
       && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
       unit *u;
-
       /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
        * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
        * dann erst auferstehen. */
       int undead = unburied / (rng_int() % 2 + 1);
-
       const race *rc = NULL;
-
       int i;
-
       if (r->age < 100)
         undead = undead * r->age / 100; /* newbie-regionen kriegen weniger ab */
 
@@ -1082,7 +1006,6 @@ void spawn_undead(void)
 
       {
         message *msg = msg_message("undeadrise", "region", r);
-
         add_message(&r->msgs, msg);
         for (u = r->units; u; u = u->next)
           freset(u->faction, FFL_SELECT);
@@ -1096,7 +1019,6 @@ void spawn_undead(void)
       }
     } else {
       int i = deathcount(r);
-
       if (i) {
         /* Gräber verwittern, 3% der Untoten finden die ewige Ruhe */
         deathcounts(r, (int)(-i * 0.03));

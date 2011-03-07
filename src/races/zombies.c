@@ -35,7 +35,6 @@
 void age_undead(unit * u)
 {
   region *r = u->region;
-
   int n = 0;
 
   /* untote, die einer partei angehoeren, koennen sich
@@ -45,7 +44,6 @@ void age_undead(unit * u)
   if (u->number > UNDEAD_MIN && !is_monsters(u->faction)
     && rng_int() % 100 < UNDEAD_BREAKUP) {
     int m;
-
     unit *u2;
 
     n = 0;
@@ -63,9 +61,7 @@ void age_skeleton(unit * u)
 {
   if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
     int n = MAX(1, u->number / 2);
-
     double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-
     u->race = new_race[RC_SKELETON_LORD];
     u->irace = NULL;
     scale_number(u, n);
@@ -77,9 +73,7 @@ void age_zombie(unit * u)
 {
   if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
     int n = MAX(1, u->number / 2);
-
     double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-
     u->race = new_race[RC_ZOMBIE_LORD];
     u->irace = NULL;
     scale_number(u, n);
@@ -91,9 +85,7 @@ void age_ghoul(unit * u)
 {
   if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
     int n = MAX(1, u->number / 2);
-
     double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
-
     u->race = new_race[RC_GHOUL_LORD];
     u->irace = NULL;
     scale_number(u, n);

@@ -20,7 +20,6 @@ extern "C" {
     int countdown;
   } wall_data;
 
-
 #ifdef __cplusplus
 }
 #endif
