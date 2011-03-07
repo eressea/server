@@ -197,7 +197,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
   }
   else {
     if (strcmp(find->str, value)!=0) {
-      log_error(("Duplicate values '%s' and '%s' for %s\n", value, find->str, key));
+      log_error(("duplicate translation '%s' for key %s\n", value, key));
     }
     assert(!strcmp(find->str, value) || !"duplicate string for key");
   }

@@ -16,29 +16,26 @@
 extern "C" {
 #endif
 
-/* FIXME where is this defined?? */
-extern signed char skill_bonus(struct unit * u, struct region * r);
-
 /* skillmod_data::flags -- wann gilt der modifier? */
 #define SMF_ALWAYS     (1<<0) /* immer */
 #define SMF_PRODUCTION (1<<1) /* für Produktion - am gebäude, an der einheit */
 #define SMF_RIDING     (1<<2) /* Bonus für berittene - an der rasse*/
 
 typedef struct skill {
-	skill_t id;
-	unsigned int level : 8;
-	unsigned int weeks : 8;
-	unsigned int old : 8;
+  skill_t id : 8;
+  unsigned int level : 8;
+  unsigned int weeks : 8;
+  unsigned int old : 8;
 } skill;
 
 typedef int (*skillmod_fun)(const struct unit*, const struct region*, skill_t, int);
 typedef struct skillmod_data {
-	skill_t skill;
-	skillmod_fun special;
-	double multiplier;
-	int number;
-	int bonus;
-	int flags;
+  skill_t skill;
+  skillmod_fun special;
+  double multiplier;
+  int number;
+  int bonus;
+  int flags;
 } skillmod_data;
 extern struct attrib_type at_skillmod;
 extern int rc_skillmod(const struct race * rc, const struct region *r, skill_t sk);
