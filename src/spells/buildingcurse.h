@@ -17,12 +17,12 @@
 extern "C" {
 #endif
 
-struct locale;
-struct curse;
+  struct locale;
+  struct curse;
 
-extern void register_buildingcurse(void);
+  extern void register_buildingcurse(void);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _BCURSE_H */
+#endif                          /* _BCURSE_H */

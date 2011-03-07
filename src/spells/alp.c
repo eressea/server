@@ -44,94 +44,104 @@
 extern const char *directions[];
 
 typedef struct alp_data {
-	unit * mage;
-	unit * target;
+  unit *mage;
+  unit *target;
 } alp_data;
 
+static void alp_init(attrib * a)
+{
+  a->data.v = calloc(sizeof(alp_data), 1);
+}
+
+static void alp_done(attrib * a)
+{
+  free(a->data.v);
+}
+
+static int alp_verify(attrib * a)
+{
+  alp_data *ad = (alp_data *) a->data.v;
+
+  if (ad->mage && ad->target)
+    return 1;
+  return 0;                     /* remove the attribute */
+}
+
 static void
-alp_init(attrib * a)
+alp_write(const attrib * a, const void *owner, struct storage *store)
 {
-	a->data.v = calloc(sizeof(alp_data), 1);
-}
+  alp_data *ad = (alp_data *) a->data.v;
 
-static void 
-alp_done(attrib * a) 
-{
-	free(a->data.v);
-}
-
-static int
-alp_verify(attrib * a)
-{
-  alp_data * ad = (alp_data*)a->data.v;
-  if (ad->mage && ad->target) return 1;
-  return 0; /* remove the attribute */
-}
-
-static void
-alp_write(const attrib * a, const void * owner, struct storage * store)
-{
-  alp_data * ad = (alp_data*)a->data.v;
   write_unit_reference(ad->mage, store);
   write_unit_reference(ad->target, store);
 }
 
-static int
-alp_read(attrib * a, void * owner, struct storage * store)
+static int alp_read(attrib * a, void *owner, struct storage *store)
 {
-  alp_data * ad = (alp_data*)a->data.v;
+  alp_data *ad = (alp_data *) a->data.v;
+
   int rm = read_reference(&ad->mage, store, read_unit_reference, resolve_unit);
-  int rt = read_reference(&ad->target, store, read_unit_reference, resolve_unit);
-  if (rt==0 && rm==0 && (!ad->target || !ad->mage)) {
+
+  int rt =
+    read_reference(&ad->target, store, read_unit_reference, resolve_unit);
+  if (rt == 0 && rm == 0 && (!ad->target || !ad->mage)) {
     /* the target or mage disappeared. */
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
 
-static attrib_type at_alp = { 
-  "alp", 
-  alp_init, 
-  alp_done, 
-  alp_verify, 
-  alp_write, 
+static attrib_type at_alp = {
+  "alp",
+  alp_init,
+  alp_done,
+  alp_verify,
+  alp_write,
   alp_read,
   ATF_UNIQUE
 };
 
-int
-sp_summon_alp(struct castorder *co)
+int sp_summon_alp(struct castorder *co)
 {
   unit *alp, *opfer;
+
   region *r = co->rt;
+
   unit *mage = co->magician.u;
+
   int cast_level = co->level;
+
   spellparameter *pa = co->par;
-  const struct race * rc = new_race[RC_ALP];
-  struct faction * f = get_monsters();
-  struct message * msg;
+
+  const struct race *rc = new_race[RC_ALP];
+
+  struct faction *f = get_monsters();
+
+  struct message *msg;
 
   opfer = pa->param[0]->data.u;
 
   /* Der Alp gehört den Monstern, darum erhält der Magier auch keine
-  * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
-  * sobald der Alp sein Opfer erreicht hat.
-  */
+   * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
+   * sobald der Alp sein Opfer erreicht hat.
+   */
   alp = create_unit(r, f, 1, rc, 0, NULL, NULL);
   set_level(alp, SK_STEALTH, 7);
-  setstatus(alp, ST_FLEE); /* flieht */
+  setstatus(alp, ST_FLEE);      /* flieht */
 
   {
-    attrib * a = a_add(&alp->attribs, a_new(&at_alp));
-    alp_data * ad = (alp_data*) a->data.v;
+    attrib *a = a_add(&alp->attribs, a_new(&at_alp));
+
+    alp_data *ad = (alp_data *) a->data.v;
+
     ad->mage = mage;
     ad->target = opfer;
   }
 
   {
     /* Wenn der Alp stirbt, den Magier nachrichtigen */
-    add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, 
-      "trigger_alp_destroy", MSG_EVENT, ML_INFO));
+    add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage,
+        "trigger_alp_destroy", MSG_EVENT, ML_INFO));
     /* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
     add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
     add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
@@ -144,16 +154,21 @@ sp_summon_alp(struct castorder *co)
 }
 
 
-void
-alp_findet_opfer(unit *alp, region *r)
+void alp_findet_opfer(unit * alp, region * r)
 {
-  curse * c;
-  attrib * a = a_find(alp->attribs, &at_alp);
-  alp_data * ad = (alp_data*)a->data.v;
+  curse *c;
+
+  attrib *a = a_find(alp->attribs, &at_alp);
+
+  alp_data *ad = (alp_data *) a->data.v;
+
   unit *mage = ad->mage;
+
   unit *opfer = ad->target;
+
   double effect;
-  message * msg;
+
+  message *msg;
 
   assert(opfer);
   assert(mage);
@@ -165,41 +180,42 @@ alp_findet_opfer(unit *alp, region *r)
   msg_release(msg);
 
   /* Relations werden in destroy_unit(alp) automatisch gelöscht.
-  * Die Aktionen, die beim Tod des Alps ausgelöst werden sollen,
-  * müssen jetzt aber deaktiviert werden, sonst werden sie gleich
-  * beim destroy_unit(alp) ausgelöst.
-  */
+   * Die Aktionen, die beim Tod des Alps ausgelöst werden sollen,
+   * müssen jetzt aber deaktiviert werden, sonst werden sie gleich
+   * beim destroy_unit(alp) ausgelöst.
+   */
   a_removeall(&alp->attribs, &at_eventhandler);
 
   /* Alp umwandeln in Curse */
   effect = -2;
-  c = create_curse(mage, &opfer->attribs, ct_find("worse"), 2, 2, effect, opfer->number);
+  c =
+    create_curse(mage, &opfer->attribs, ct_find("worse"), 2, 2, effect,
+    opfer->number);
   /* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
-  * auch auf normale */
+   * auch auf normale */
   set_number(alp, 0);
 
   /* wenn der Magier stirbt, wird der Curse wieder vom Opfer genommen */
   add_trigger(&mage->attribs, "destroy", trigger_removecurse(c, opfer));
 }
 
-void
-register_alp(void)
+void register_alp(void)
 {
-	at_register(&at_alp);
+  at_register(&at_alp);
 }
 
-unit *
-alp_target(unit *alp)
+unit *alp_target(unit * alp)
 {
-	alp_data* ad;
-	unit * target = NULL;
+  alp_data *ad;
 
-	attrib * a = a_find(alp->attribs, &at_alp);
-	
-	if (a) {
-		ad = (alp_data*) a->data.v;
-		target = ad->target;
-	}
-	return target;
+  unit *target = NULL;
+
+  attrib *a = a_find(alp->attribs, &at_alp);
+
+  if (a) {
+    ad = (alp_data *) a->data.v;
+    target = ad->target;
+  }
+  return target;
 
 }

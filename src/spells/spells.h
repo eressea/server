@@ -24,7 +24,7 @@ extern "C" {
 
   extern void register_spells(void);
 
-  void set_spelldata(struct spell * sp);
+  void set_spelldata(struct spell *sp);
 
 #ifdef __cplusplus
 }

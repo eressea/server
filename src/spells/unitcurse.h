@@ -17,13 +17,14 @@
 extern "C" {
 #endif
 
-struct curse;
-struct message;
-extern struct message * cinfo_unit(const void * obj, typ_t typ, const struct curse *c, int self);
+  struct curse;
+  struct message;
+  extern struct message *cinfo_unit(const void *obj, typ_t typ,
+    const struct curse *c, int self);
 
-extern void register_unitcurse(void);
+  extern void register_unitcurse(void);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _UCURSE_H */
+#endif                          /* _UCURSE_H */

@@ -10,28 +10,34 @@
 
 #include <tolua.h>
 
-static int
-tolua_levitate_ship(lua_State * L)
+static int tolua_levitate_ship(lua_State * L)
 {
-  ship * sh = (ship *)tolua_tousertype(L, 1, 0);
-  unit * mage = (unit *)tolua_tousertype(L, 2, 0);
+  ship *sh = (ship *) tolua_tousertype(L, 1, 0);
+
+  unit *mage = (unit *) tolua_tousertype(L, 2, 0);
+
   double power = (double)tolua_tonumber(L, 3, 0);
+
   int duration = (int)tolua_tonumber(L, 4, 0);
+
   int cno = levitate_ship(sh, mage, power, duration);
-  tolua_pushnumber(L, (lua_Number)cno);
+
+  tolua_pushnumber(L, (lua_Number) cno);
   return 1;
 }
 
 
 extern void spawn_undead(void);
+
 extern void spawn_dragons(void);
-extern void plan_monsters(struct faction * f);
+
+extern void plan_monsters(struct faction *f);
 
 
-static int
-tolua_planmonsters(lua_State * L)
+static int tolua_planmonsters(lua_State * L)
 {
-  faction * f = (faction *)tolua_tousertype(L, 1, get_monsters());
+  faction *f = (faction *) tolua_tousertype(L, 1, get_monsters());
+
   if (f) {
     plan_monsters(f);
   }
@@ -39,31 +45,32 @@ tolua_planmonsters(lua_State * L)
   return 0;
 }
 
-static int
-tolua_spawn_dragons(lua_State * L)
+static int tolua_spawn_dragons(lua_State * L)
 {
   spawn_dragons();
   return 0;
 }
 
-static int
-tolua_spawn_undead(lua_State * L)
+static int tolua_spawn_undead(lua_State * L)
 {
   spawn_undead();
   return 0;
 }
 
-static int
-fix_familiars(struct lua_State * L)
+static int fix_familiars(struct lua_State *L)
 {
-  faction * f;
-  for (f=factions;f;f=f->next) {
-    unit * u;
-    for (u=f->units;u;u=u->nextF) {
-      struct sc_mage * mage = get_mage(u);
+  faction *f;
+
+  for (f = factions; f; f = f->next) {
+    unit *u;
+
+    for (u = f->units; u; u = u->nextF) {
+      struct sc_mage *mage = get_mage(u);
+
       if (mage && is_familiar(u)) {
-        if (mage->spells && mage->magietyp==M_GRAY) {
-          equipment * eq;
+        if (mage->spells && mage->magietyp == M_GRAY) {
+          equipment *eq;
+
           char buffer[64];
 
           ql_free(mage->spells);
@@ -80,8 +87,7 @@ fix_familiars(struct lua_State * L)
   return 0;
 }
 
-void
-bind_eressea(struct lua_State * L)
+void bind_eressea(struct lua_State *L)
 {
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
@@ -94,4 +100,3 @@ bind_eressea(struct lua_State * L)
   }
   tolua_endmodule(L);
 }
-

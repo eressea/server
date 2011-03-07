@@ -34,41 +34,46 @@
 #include <assert.h>
 
 
-static message *
-cinfo_building(const void * obj, typ_t typ, const curse *c, int self)
+static message *cinfo_building(const void *obj, typ_t typ, const curse * c,
+  int self)
 {
   unused(typ);
   assert(typ == TYP_BUILDING);
 
-  if (self != 0){ /* owner or inside */
+  if (self != 0) {              /* owner or inside */
     return msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-  }  
+  }
   return msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
 }
 
 /* CurseInfo mit Spezialabfragen */
 
 /* C_MAGICWALLS*/
-static message *
-cinfo_magicrunes(const void * obj, typ_t typ, const curse *c, int self)
+static message *cinfo_magicrunes(const void *obj, typ_t typ, const curse * c,
+  int self)
 {
-  message * msg = NULL;
-  if (typ == TYP_BUILDING){
-    building * b;
-    b = (building*)obj;
+  message *msg = NULL;
+
+  if (typ == TYP_BUILDING) {
+    building *b;
+
+    b = (building *) obj;
     if (self != 0) {
-      msg = msg_message("curseinfo::magicrunes_building", "building id", b, c->no);
+      msg =
+        msg_message("curseinfo::magicrunes_building", "building id", b, c->no);
     }
   } else if (typ == TYP_SHIP) {
     ship *sh;
-    sh = (ship*)obj;
-    if (self != 0){
+
+    sh = (ship *) obj;
+    if (self != 0) {
       msg = msg_message("curseinfo::magicrunes_ship", "ship id", sh, c->no);
     }
   }
 
   return msg;
 }
+
 static struct curse_type ct_magicrunes = { "magicrunes",
   CURSETYP_NORM, 0, M_SUMEFFECT, cinfo_magicrunes
 };
@@ -85,12 +90,11 @@ static struct curse_type ct_strongwall = { "strongwall",
 
 /* Ewige Mauern-Zauber */
 static struct curse_type ct_nocostbuilding = { "nocostbuilding",
-  CURSETYP_NORM, CURSE_NOAGE|CURSE_ONLYONE, NO_MERGE, cinfo_building
+  CURSETYP_NORM, CURSE_NOAGE | CURSE_ONLYONE, NO_MERGE, cinfo_building
 };
 
 
-void
-register_buildingcurse(void)
+void register_buildingcurse(void)
 {
   ct_register(&ct_magicwalls);
   ct_register(&ct_strongwall);

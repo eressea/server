@@ -20,36 +20,66 @@ extern "C" {
   struct fighter;
 
   /* Kampfzauber */
-  extern int sp_fumbleshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_shadowknights(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_combatrosthauch(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_kampfzauber(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_healing(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_keeploot(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_reanimate(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_chaosrow(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_flee(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_berserk(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_tiredsoldiers(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_reeling_arrows(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_denyattack(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_sleep(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_windshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_strong_wall(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_petrify(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_hero(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_frighten(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_mindblast(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_mindblast_temp(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_speed(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_wolfhowl(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_dragonodem(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_reduceshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_armorshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_stun(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_undeadhero(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_shadowcall(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_immolation(struct fighter * fi, int level, double power, struct spell * sp);
+  extern int sp_fumbleshield(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_shadowknights(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_combatrosthauch(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_kampfzauber(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_healing(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_keeploot(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_reanimate(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_chaosrow(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_flee(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_berserk(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_tiredsoldiers(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_reeling_arrows(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_denyattack(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_sleep(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_windshield(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_strong_wall(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_petrify(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_hero(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_frighten(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_mindblast(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_mindblast_temp(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_speed(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_wolfhowl(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_dragonodem(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_reduceshield(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_armorshield(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_stun(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_undeadhero(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_shadowcall(struct fighter *fi, int level, double power,
+    struct spell *sp);
+  extern int sp_immolation(struct fighter *fi, int level, double power,
+    struct spell *sp);
 
 #ifdef __cplusplus
 }

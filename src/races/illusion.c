@@ -26,13 +26,11 @@
 
 #define ILLUSIONMAX  6
 
-void
-age_illusion(unit *u)
+void age_illusion(unit * u)
 {
-  if (u->faction->race!=new_race[RC_ILLUSION]) {
+  if (u->faction->race != new_race[RC_ILLUSION]) {
     if (u->age == ILLUSIONMAX) {
-      ADDMSG(&u->faction->msgs, msg_message("warnillusiondissolve", 
-        "unit", u));
+      ADDMSG(&u->faction->msgs, msg_message("warnillusiondissolve", "unit", u));
     } else if (u->age > ILLUSIONMAX) {
       set_number(u, 0);
       ADDMSG(&u->faction->msgs, msg_message("illusiondissolve", "unit", u));

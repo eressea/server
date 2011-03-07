@@ -27,26 +27,25 @@
 #define DRAGONAGE                   27
 #define WYRMAGE                     68
 
-void
-age_firedragon(unit *u)
+void age_firedragon(unit * u)
 {
-  if (u->number>0 && rng_int()%100 < age_chance(u->age, DRAGONAGE, 1)) {
-    double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
+  if (u->number > 0 && rng_int() % 100 < age_chance(u->age, DRAGONAGE, 1)) {
+    double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
+
     u->race = new_race[RC_DRAGON];
     u->irace = NULL;
-    scale_number(u,1);
-    u->hp = (int) (unit_max_hp(u) * u->number * q);
+    scale_number(u, 1);
+    u->hp = (int)(unit_max_hp(u) * u->number * q);
   }
 }
 
-void
-age_dragon(unit *u)
+void age_dragon(unit * u)
 {
-  if (u->number>0 && rng_int()%100 < age_chance(u->age, WYRMAGE, 1)) {
-    double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
+  if (u->number > 0 && rng_int() % 100 < age_chance(u->age, WYRMAGE, 1)) {
+    double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
+
     u->race = new_race[RC_WYRM];
     u->irace = NULL;
-    u->hp = (int) (unit_max_hp(u) * u->number * q);
+    u->hp = (int)(unit_max_hp(u) * u->number * q);
   }
 }
-
