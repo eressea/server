@@ -32,14 +32,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <tests.h>
 
-static const char * luafile = "setup.lua";
-static const char * entry_point = NULL;
-static const char * inifile = "eressea.ini";
+static const char *luafile = "setup.lua";
+
+static const char *entry_point = NULL;
+
+static const char *inifile = "eressea.ini";
+
 static int memdebug = 0;
 
-static void parse_config(const char * filename)
+static void parse_config(const char *filename)
 {
-  dictionary * d = iniparser_new(filename);
+  dictionary *d = iniparser_new(filename);
+
   if (d) {
     load_inifile(d);
 
@@ -53,8 +57,7 @@ static void parse_config(const char * filename)
   global.inifile = d;
 }
 
-static int
-usage(const char * prog, const char * arg)
+static int usage(const char *prog, const char *arg)
 {
   if (arg) {
     fprintf(stderr, "unknown argument: %s\n\n", arg);
@@ -65,62 +68,58 @@ usage(const char * prog, const char * arg)
     "-v <level>       : verbosity level\n"
     "-C               : run in interactive mode\n"
     "--color          : force curses to use colors even when not detected\n"
-    "--tests          : run test suite\n"
-    "--help           : help\n", prog);
+    "--tests          : run test suite\n" "--help           : help\n", prog);
   return -1;
 }
 
-static int
-parse_args(int argc, char **argv, int * exitcode)
+static int parse_args(int argc, char **argv, int *exitcode)
 {
   int i, run_tests = 0;
 
-  for (i=1;i!=argc;++i) {
-    if (argv[i][0]!='-') {
+  for (i = 1; i != argc; ++i) {
+    if (argv[i][0] != '-') {
       return usage(argv[0], argv[i]);
-    } else if (argv[i][1]=='-') { /* long format */
-      if (strcmp(argv[i]+2, "version")==0) {
+    } else if (argv[i][1] == '-') {     /* long format */
+      if (strcmp(argv[i] + 2, "version") == 0) {
         printf("\n%s PBEM host\n"
           "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-          "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
-      }
-      else if (strcmp(argv[i]+2, "color")==0) {
+          "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n",
+          global.gamename, version());
+      } else if (strcmp(argv[i] + 2, "color") == 0) {
         /* force the editor to have colors */
         force_color = 1;
-      }
-      else if (strcmp(argv[i]+2, "help")==0) {
+      } else if (strcmp(argv[i] + 2, "help") == 0) {
         return usage(argv[0], NULL);
-      }
-      else if (strcmp(argv[i]+2, "tests")==0) {
+      } else if (strcmp(argv[i] + 2, "tests") == 0) {
         run_tests = 1;
-      }
-      else {
+      } else {
         return usage(argv[0], argv[i]);
       }
-    } else switch(argv[i][1]) {
-      case 'C':
-        entry_point = NULL;
-        break;
-      case 'e':
-        entry_point = argv[++i];
-        break;
-      case 't':
-        turn = atoi(argv[++i]);
-        break;
-      case 'q':
-        verbosity = 0;
-        break;
-      case 'v':
-        verbosity = atoi(argv[++i]);
-        break;
-      case 'h':
-        usage(argv[0], NULL);
-        return 1;
-      default:
-        *exitcode = -1;
-        usage(argv[0], argv[i]);
-        return 1;
-    }
+    } else
+      switch (argv[i][1]) {
+        case 'C':
+          entry_point = NULL;
+          break;
+        case 'e':
+          entry_point = argv[++i];
+          break;
+        case 't':
+          turn = atoi(argv[++i]);
+          break;
+        case 'q':
+          verbosity = 0;
+          break;
+        case 'v':
+          verbosity = atoi(argv[++i]);
+          break;
+        case 'h':
+          usage(argv[0], NULL);
+          return 1;
+        default:
+          *exitcode = -1;
+          usage(argv[0], argv[i]);
+          return 1;
+      }
   }
 
   if (run_tests) {
@@ -136,10 +135,10 @@ void locale_init(void)
 {
   setlocale(LC_CTYPE, "");
   setlocale(LC_NUMERIC, "C");
-  assert(towlower(0xC4)==0xE4); /* &Auml; => &auml; */
+  assert(towlower(0xC4) == 0xE4);       /* &Auml; => &auml; */
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
   int err, result = 0;
 
