@@ -33,17 +33,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <tests.h>
 
 static const char *luafile = "setup.lua";
-
 static const char *entry_point = NULL;
-
 static const char *inifile = "eressea.ini";
-
 static int memdebug = 0;
 
 static void parse_config(const char *filename)
 {
   dictionary *d = iniparser_new(filename);
-
   if (d) {
     load_inifile(d);
 
@@ -129,7 +125,6 @@ static int parse_args(int argc, char **argv, int *exitcode)
 
   return 0;
 }
-
 
 void locale_init(void)
 {
