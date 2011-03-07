@@ -22,13 +22,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_targetregion;
+  extern struct attrib_type at_targetregion;
 
-struct region;
-extern struct attrib * make_targetregion(struct region *);
+  struct region;
+  extern struct attrib *make_targetregion(struct region *);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

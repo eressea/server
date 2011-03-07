@@ -1,8 +1,11 @@
 #include <cutest/CuTest.h>
 
-static void test_curse(CuTest * tc) {
-  attrib * attrs = NULL;
-  curse * c, * result;
+static void test_curse(CuTest * tc)
+{
+  attrib *attrs = NULL;
+
+  curse *c, *result;
+
   int cid;
 
   curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
@@ -15,9 +18,10 @@ static void test_curse(CuTest * tc) {
   CuAssertPtrEquals(tc, NULL, result);
 }
 
-CuSuite* get_curse_suite(void)
+CuSuite *get_curse_suite(void)
 {
-  CuSuite* suite = CuSuiteNew();
+  CuSuite *suite = CuSuiteNew();
+
   SUITE_ADD_TEST(suite, test_curse);
   return suite;
 }

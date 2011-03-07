@@ -22,14 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_follow;
+  extern struct attrib_type at_follow;
 
-struct unit;
+  struct unit;
 
-extern struct attrib * make_follow(struct unit * u);
+  extern struct attrib *make_follow(struct unit *u);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

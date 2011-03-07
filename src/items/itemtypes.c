@@ -20,8 +20,7 @@
 #include "weapons.h"
 #include "seed.h"
 
-void
-register_itemtypes(void)
+void register_itemtypes(void)
 {
   /* registering misc. functions */
   register_weapons();
@@ -30,8 +29,7 @@ register_itemtypes(void)
   register_phoenixcompass();
 }
 
-void
-init_itemtypes(void)
+void init_itemtypes(void)
 {
   init_seed();
   init_mallornseed();

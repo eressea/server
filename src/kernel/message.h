@@ -24,37 +24,40 @@ extern "C" {
 
 #include <util/message.h>
 
-struct message;
-struct faction;
-struct msglevel;
+  struct message;
+  struct faction;
+  struct msglevel;
 
-struct message_type;
+  struct message_type;
 
-typedef struct message_list {
-  struct mlist {
-    struct mlist * next;
-    struct message *msg;
-  } * begin, **end;
-} message_list;
+  typedef struct message_list {
+    struct mlist {
+      struct mlist *next;
+      struct message *msg;
+    } *begin, **end;
+  } message_list;
 
-extern void free_messagelist(message_list * msgs);
+  extern void free_messagelist(message_list * msgs);
 
-typedef struct msglevel {
-	/* used to set specialized msg-levels */
-	struct msglevel *next;
-	const struct message_type *type;
-	int level;
-} msglevel;
+  typedef struct msglevel {
+    /* used to set specialized msg-levels */
+    struct msglevel *next;
+    const struct message_type *type;
+    int level;
+  } msglevel;
 
-extern struct message * msg_message(const char * name, const char* sig, ...);
-extern struct message * msg_feedback(const struct unit *, struct order *cmd,
-                                  const char * name, const char* sig, ...);
-extern struct message * add_message(struct message_list** pm, struct message * m);
-void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
+  extern struct message *msg_message(const char *name, const char *sig, ...);
+  extern struct message *msg_feedback(const struct unit *, struct order *cmd,
+    const char *name, const char *sig, ...);
+  extern struct message *add_message(struct message_list **pm,
+    struct message *m);
+  void addmessage(struct region *r, struct faction *f, const char *s,
+    msg_t mtype, int level);
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
 
-extern void cmistake(const struct unit * u, struct order *ord, int mno, int mtype);
+  extern void cmistake(const struct unit *u, struct order *ord, int mno,
+    int mtype);
 #ifdef __cplusplus
 }
 #endif

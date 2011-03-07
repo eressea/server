@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-void register_triggers(void);
+  void register_triggers(void);
 
 #ifdef __cplusplus
 }

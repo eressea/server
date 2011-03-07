@@ -22,12 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_raceprefix;
-extern void set_prefix(struct attrib ** ap, const char * str);
-extern const char * get_prefix(const struct attrib * a);
+  extern struct attrib_type at_raceprefix;
+  extern void set_prefix(struct attrib **ap, const char *str);
+  extern const char *get_prefix(const struct attrib *a);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

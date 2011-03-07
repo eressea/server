@@ -16,26 +16,26 @@
 extern "C" {
 #endif
 
-struct faction;
+  struct faction;
 
-typedef struct player {
-	unsigned int id;
-	char * name;
-	char * email;
-	char * address;
-	struct vacation {
-		int weeks;
-		char * email;
-	} * vacation;
-	const struct faction * faction;
+  typedef struct player {
+    unsigned int id;
+    char *name;
+    char *email;
+    char *address;
+    struct vacation {
+      int weeks;
+      char *email;
+    } *vacation;
+    const struct faction *faction;
 
-	struct player * nexthash; /* don't use! */
-} player;
+    struct player *nexthash;    /* don't use! */
+  } player;
 
-extern struct player * get_players(void);
-extern struct player * get_player(unsigned int id);
-extern struct player * make_player(const struct faction * f);
-extern struct player * next_player(struct player * p);
+  extern struct player *get_players(void);
+  extern struct player *get_player(unsigned int id);
+  extern struct player *make_player(const struct faction *f);
+  extern struct player *next_player(struct player *p);
 
 #ifdef __cplusplus
 }

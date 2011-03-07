@@ -19,7 +19,7 @@
 #define GUARD_DISABLES_RECRUIT 1
 #define GUARD_DISABLES_PRODUCTION 1
 #define RESOURCE_QUANTITY 0.5
-#define RECRUITFRACTION 40    /* 100/RECRUITFRACTION% */
+#define RECRUITFRACTION 40      /* 100/RECRUITFRACTION% */
 #define COMBAT_TURNS 5
 #define NEWATSROI 0
 
@@ -29,13 +29,13 @@
 #define BATTLE_KILLS_PEASANTS 20
 #define PEASANTLUCK			10
 
-#define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert
-                                auf die Hälfte */
+#define HUNGER_REDUCES_SKILL    /* Hunger reduziert den Talentwert
+                                   auf die Hälfte */
 
-#define ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
+#define ASTRAL_ITEM_RESTRICTIONS        /* keine grossen dinge im astralraum */
 #define NEW_DAEMONHUNGER_RULE
 #define NEW_COMBATSKILLS_RULE
-#define ROW_FACTOR 3 /* factor for combat row advancement rule */
+#define ROW_FACTOR 3            /* factor for combat row advancement rule */
 
 /* optional game components. TODO: These should either be 
  * configuration variables (XML), script extensions (lua),
@@ -46,8 +46,8 @@
 #define ARENA_MODULE 1
 #define XECMD_MODULE 1
 #define DUNGEON_MODULE 0
-#define CHANGED_CROSSBOWS 0 /* use the WTF_ARMORPIERCING flag */
-#undef GLOBAL_WARMING /* number of turns before global warming sets in */
+#define CHANGED_CROSSBOWS 0     /* use the WTF_ARMORPIERCING flag */
+#undef GLOBAL_WARMING           /* number of turns before global warming sets in */
 
 #define SIMPLE_COMBAT
 #define SIMPLE_ESCAPE
@@ -57,7 +57,7 @@
 #elif defined(BINDINGS_TOLUA)
 # undef BINDINGS_LUABIND
 #else
-# define BINDINGS_TOLUA /* new default */
+# define BINDINGS_TOLUA         /* new default */
 #endif
 
-#undef REGIONOWNERS /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
+#undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */

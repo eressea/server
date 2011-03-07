@@ -43,42 +43,47 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-const char *
-describe_braineater(unit * u, const struct locale * lang)
+const char *describe_braineater(unit * u, const struct locale *lang)
 {
   return LOC(lang, "describe_braineater");
 }
 
-static const char *
-make_names(const char * monster, int * num_postfix, int pprefix, int * num_name, int * num_prefix, int ppostfix)
+static const char *make_names(const char *monster, int *num_postfix,
+  int pprefix, int *num_name, int *num_prefix, int ppostfix)
 {
   int uv, uu, un;
+
   static char name[NAMESIZE + 1];
+
   char zText[32];
-  const char * str;
 
-  if (*num_prefix==0) {
+  const char *str;
 
-    for (*num_prefix=0;;++*num_prefix) {
+  if (*num_prefix == 0) {
+
+    for (*num_prefix = 0;; ++*num_prefix) {
       sprintf(zText, "%s_prefix_%d", monster, *num_prefix);
       str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
+      if (str == NULL)
+        break;
     }
 
-    for (*num_name=0;;++*num_name) {
+    for (*num_name = 0;; ++*num_name) {
       sprintf(zText, "%s_name_%d", monster, *num_name);
       str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
+      if (str == NULL)
+        break;
     }
 
-    for (*num_postfix=0;;++*num_postfix) {
+    for (*num_postfix = 0;; ++*num_postfix) {
       sprintf(zText, "%s_postfix_%d", monster, *num_postfix);
       str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
+      if (str == NULL)
+        break;
     }
   }
 
-  if (*num_name==0) {
+  if (*num_name == 0) {
     return NULL;
   }
 
@@ -88,7 +93,7 @@ make_names(const char * monster, int * num_postfix, int pprefix, int * num_name,
   uu = rng_int() % *num_name;
 
   /* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
-  if (uv>=*num_prefix) {
+  if (uv >= *num_prefix) {
     un = rng_int() % *num_postfix;
   } else {
     un = rng_int() % (*num_postfix * ppostfix);
@@ -106,7 +111,8 @@ make_names(const char * monster, int * num_postfix, int pprefix, int * num_name,
 
   sprintf(zText, "%s_name_%d", monster, uu);
   str = locale_getstring(default_locale, zText);
-  if (str) strcat(name, (const char *)str);
+  if (str)
+    strcat(name, (const char *)str);
 
   if (un < *num_postfix) {
     sprintf(zText, "%s_postfix_%d", monster, un);
@@ -119,31 +125,31 @@ make_names(const char * monster, int * num_postfix, int pprefix, int * num_name,
   return name;
 }
 
-const char *
-undead_name(const unit * u)
+const char *undead_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
+
   return make_names("undead", &num_postfix, 2, &num_name, &num_prefix, 2);
 }
 
-const char *
-skeleton_name(const unit * u)
+const char *skeleton_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
+
   return make_names("skeleton", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
-const char *
-zombie_name(const unit * u)
+const char *zombie_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
+
   return make_names("zombie", &num_postfix, 5, &num_name, &num_prefix, 2);
 }
 
-const char *
-ghoul_name(const unit * u)
+const char *ghoul_name(const unit * u)
 {
   static int num_postfix, num_name, num_prefix;
+
   return make_names("ghoul", &num_postfix, 5, &num_name, &num_prefix, 4);
 }
 
@@ -153,68 +159,67 @@ ghoul_name(const unit * u)
 #define SIL1 15
 
 const char *silbe1[SIL1] = {
-	"Tar",
-	"Ter",
-	"Tor",
-	"Pan",
-	"Par",
-	"Per",
-	"Nim",
-	"Nan",
-	"Nun",
-	"Gor",
-	"For",
-	"Fer",
-	"Kar",
-	"Kur",
-	"Pen",
+  "Tar",
+  "Ter",
+  "Tor",
+  "Pan",
+  "Par",
+  "Per",
+  "Nim",
+  "Nan",
+  "Nun",
+  "Gor",
+  "For",
+  "Fer",
+  "Kar",
+  "Kur",
+  "Pen",
 };
 
 #define SIL2 19
 
 const char *silbe2[SIL2] = {
-	"da",
-	"do",
-	"dil",
-	"di",
-	"dor",
-	"dar",
-	"ra",
-	"ran",
-	"ras",
-	"ro",
-	"rum",
-	"rin",
-	"ten",
-	"tan",
-	"ta",
-	"tor",
-	"gur",
-	"ga",
-	"gas",
+  "da",
+  "do",
+  "dil",
+  "di",
+  "dor",
+  "dar",
+  "ra",
+  "ran",
+  "ras",
+  "ro",
+  "rum",
+  "rin",
+  "ten",
+  "tan",
+  "ta",
+  "tor",
+  "gur",
+  "ga",
+  "gas",
 };
 
 #define SIL3 14
 
 const char *silbe3[SIL3] = {
-	"gul",
-	"gol",
-	"dol",
-	"tan",
-	"tar",
-	"tur",
-	"sur",
-	"sin",
-	"kur",
-	"kor",
-	"kar",
-	"dul",
-	"dol",
-	"bus",
+  "gul",
+  "gol",
+  "dol",
+  "tan",
+  "tar",
+  "tur",
+  "sur",
+  "sin",
+  "kur",
+  "kor",
+  "kar",
+  "dul",
+  "dol",
+  "bus",
 };
 
-const char *
-generic_name(const unit *u)
+const char *generic_name(const unit * u)
 {
   if (u->no == 1) {
     return LOC(u->faction->locale, mkname("race", u->race->_name[0]));
@@ -222,47 +227,54 @@ generic_name(const unit *u)
   return LOC(u->faction->locale, mkname("race", u->race->_name[1]));
 }
 
-const char *
-dragon_name(const unit *u)
+const char *dragon_name(const unit * u)
 {
   static char name[NAMESIZE + 1];
-  int rnd, ter = 0;
-  int anzahl = 1;
-  static int num_postfix;
-  char zText[32];
-  const char * str;
 
-  if (num_postfix==0) {
-    for (num_postfix=0;;++num_postfix) {
+  int rnd, ter = 0;
+
+  int anzahl = 1;
+
+  static int num_postfix;
+
+  char zText[32];
+
+  const char *str;
+
+  if (num_postfix == 0) {
+    for (num_postfix = 0;; ++num_postfix) {
       sprintf(zText, "dragon_postfix_%d", num_postfix);
       str = locale_getstring(default_locale, zText);
-      if (str==NULL) break;
+      if (str == NULL)
+        break;
     }
-    if (num_postfix==0) num_postfix = -1;
+    if (num_postfix == 0)
+      num_postfix = -1;
   }
-  if (num_postfix<=0) {
+  if (num_postfix <= 0) {
     return NULL;
   }
 
   if (u) {
     region *r = u->region;
+
     anzahl = u->number;
     switch (rterrain(r)) {
-        case T_PLAIN:
-          ter = 1;
-          break;
-        case T_MOUNTAIN:
-          ter = 2;
-          break;
-        case T_DESERT:
-          ter = 3;
-          break;
-        case T_SWAMP:
-          ter = 4;
-          break;
-        case T_GLACIER:
-          ter = 5;
-          break;
+      case T_PLAIN:
+        ter = 1;
+        break;
+      case T_MOUNTAIN:
+        ter = 2;
+        break;
+      case T_DESERT:
+        ter = 3;
+        break;
+      case T_SWAMP:
+        ter = 4;
+        break;
+      case T_GLACIER:
+        ter = 5;
+        break;
     }
   }
 
@@ -272,13 +284,15 @@ dragon_name(const unit *u)
   sprintf(zText, "dragon_postfix_%d", rnd);
 
   str = locale_getstring(default_locale, zText);
-  assert(str!=NULL);
+  assert(str != NULL);
 
   if (anzahl > 1) {
-    const char * no_article = strchr((const char *)str, ' ');
+    const char *no_article = strchr((const char *)str, ' ');
+
     assert(no_article);
     /* TODO: GERMAN */
-    sprintf(name, "Die %sn von %s", no_article, rname(u->region, default_locale));
+    sprintf(name, "Die %sn von %s", no_article, rname(u->region,
+        default_locale));
   } else {
     char n[32];
 
@@ -286,9 +300,9 @@ dragon_name(const unit *u)
     strcat(n, silbe2[rng_int() % SIL2]);
     strcat(n, silbe3[rng_int() % SIL3]);
     if (rng_int() % 5 > 2) {
-      sprintf(name, "%s, %s", n, str);	/* "Name, der Titel" */
+      sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
     } else {
-      strcpy(name, (const char *)str);	/* "Der Titel Name" */
+      strcpy(name, (const char *)str);  /* "Der Titel Name" */
       name[0] = (char)toupper(name[0]); /* TODO: UNICODE - should use towupper() */
       strcat(name, " ");
       strcat(name, n);
@@ -306,178 +320,182 @@ dragon_name(const unit *u)
 
 #define DRAC_PRE 13
 static const char *drac_pre[DRAC_PRE] = {
-		"Siss",
-		"Xxaa",
-		"Shht",
-		"X'xixi",
-		"Xar",
-		"X'zish",
-		"X",
-		"Sh",
-		"R",
-		"Z",
-		"Y",
-		"L",
-		"Ck",
+  "Siss",
+  "Xxaa",
+  "Shht",
+  "X'xixi",
+  "Xar",
+  "X'zish",
+  "X",
+  "Sh",
+  "R",
+  "Z",
+  "Y",
+  "L",
+  "Ck",
 };
 
 #define DRAC_MID 12
 static const char *drac_mid[DRAC_MID] = {
-		"siss",
-		"xxaa",
-		"shht",
-		"xxi",
-		"xar",
-		"x'zish",
-		"x",
-		"sh",
-		"r",
-		"z'ck",
-		"y",
-		"rl"
+  "siss",
+  "xxaa",
+  "shht",
+  "xxi",
+  "xar",
+  "x'zish",
+  "x",
+  "sh",
+  "r",
+  "z'ck",
+  "y",
+  "rl"
 };
 
 #define DRAC_SUF 10
 static const char *drac_suf[DRAC_SUF] = {
-		"xil",
-		"shh",
-		"s",
-		"x",
-		"arr",
-		"lll",
-		"lll",
-		"shack",
-		"ck",
-		"k"
+  "xil",
+  "shh",
+  "s",
+  "x",
+  "arr",
+  "lll",
+  "lll",
+  "shack",
+  "ck",
+  "k"
 };
 
-const char *
-dracoid_name(const unit *u)
+const char *dracoid_name(const unit * u)
 {
-	static char name[NAMESIZE + 1];
-	int         mid_syllabels;
+  static char name[NAMESIZE + 1];
 
-	u=u;
-	/* Wieviele Mittelteile? */
+  int mid_syllabels;
 
-	mid_syllabels = rng_int()%4;
+  u = u;
+  /* Wieviele Mittelteile? */
 
-	strcpy(name, drac_pre[rng_int()%DRAC_PRE]);
-	while(mid_syllabels > 0) {
-		mid_syllabels--;
-		if(rng_int()%10 < 4) strcat(name,"'");
-		strcat(name, drac_mid[rng_int()%DRAC_MID]);
-	}
-	strcat(name, drac_suf[rng_int()%DRAC_SUF]);
-	return name;
+  mid_syllabels = rng_int() % 4;
+
+  strcpy(name, drac_pre[rng_int() % DRAC_PRE]);
+  while (mid_syllabels > 0) {
+    mid_syllabels--;
+    if (rng_int() % 10 < 4)
+      strcat(name, "'");
+    strcat(name, drac_mid[rng_int() % DRAC_MID]);
+  }
+  strcat(name, drac_suf[rng_int() % DRAC_SUF]);
+  return name;
 }
 
 /** returns an abbreviation of a string.
  * TODO: buflen is being ignored */
 
-const char *
-abkz(const char *s, char * buf, size_t buflen, size_t maxchars)
+const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
 {
-	const char *p = s;
-  char * bufp;
-	unsigned int c = 0;
-	size_t bpt, i;
+  const char *p = s;
+
+  char *bufp;
+
+  unsigned int c = 0;
+
+  size_t bpt, i;
+
   ucs4_t ucs;
+
   size_t size;
+
   int result;
 
-	/* Prüfen, ob Kurz genug */
+  /* Prüfen, ob Kurz genug */
 
-	if (strlen(s) <= maxchars) {
-		return s;
-	}
-	/* Anzahl der Wörter feststellen */
+  if (strlen(s) <= maxchars) {
+    return s;
+  }
+  /* Anzahl der Wörter feststellen */
 
-	while (*p != 0) {
-    
+  while (*p != 0) {
+
     result = unicode_utf8_to_ucs4(&ucs, p, &size);
-    assert(result==0 || "damnit, we're not handling invalid input here!");
+    assert(result == 0 || "damnit, we're not handling invalid input here!");
 
     /* Leerzeichen überspringen */
-    while (*p != 0 && !iswalnum((wint_t)ucs)) {
-			p += size;
+    while (*p != 0 && !iswalnum((wint_t) ucs)) {
+      p += size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
-      assert(result==0 || "damnit, we're not handling invalid input here!");
+      assert(result == 0 || "damnit, we're not handling invalid input here!");
     }
 
     /* Counter erhöhen */
-    if (*p != 0) ++c;
+    if (*p != 0)
+      ++c;
 
-		/* alnums überspringen */
-    while (*p != 0 && iswalnum((wint_t)ucs)) {
-			p+=size;
+    /* alnums überspringen */
+    while (*p != 0 && iswalnum((wint_t) ucs)) {
+      p += size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
-      assert(result==0 || "damnit, we're not handling invalid input here!");
+      assert(result == 0 || "damnit, we're not handling invalid input here!");
     }
-	}
+  }
 
-	/* Buchstaben pro Teilkürzel = MAX(1,max/AnzWort) */
+  /* Buchstaben pro Teilkürzel = MAX(1,max/AnzWort) */
 
-	bpt = MAX(1, maxchars / c);
+  bpt = MAX(1, maxchars / c);
 
-	/* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
+  /* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
 
-	p = s;
-	c = 0;
+  p = s;
+  c = 0;
   bufp = buf;
 
   result = unicode_utf8_to_ucs4(&ucs, p, &size);
-  assert(result==0 || "damnit, we're not handling invalid input here!");
+  assert(result == 0 || "damnit, we're not handling invalid input here!");
 
-	while (*p != 0 && c < maxchars) {
-		/* Leerzeichen überspringen */
+  while (*p != 0 && c < maxchars) {
+    /* Leerzeichen überspringen */
 
-    while (*p != 0 && !iswalnum((wint_t)ucs)) {
-			p+=size;
+    while (*p != 0 && !iswalnum((wint_t) ucs)) {
+      p += size;
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
-      assert(result==0 || "damnit, we're not handling invalid input here!");
+      assert(result == 0 || "damnit, we're not handling invalid input here!");
     }
 
-		/* alnums übertragen */
+    /* alnums übertragen */
 
-		for (i = 0; i < bpt && *p != 0 && iswalnum((wint_t)ucs); ++i) {
-			memcpy(bufp, p, size);
-			p += size;
+    for (i = 0; i < bpt && *p != 0 && iswalnum((wint_t) ucs); ++i) {
+      memcpy(bufp, p, size);
+      p += size;
       bufp += size;
       ++c;
 
       result = unicode_utf8_to_ucs4(&ucs, p, &size);
-      assert(result==0 || "damnit, we're not handling invalid input here!");
-		}
-
-		/* Bis zum nächsten Leerzeichen */
-
-    while (c < maxchars && *p != 0 && iswalnum((wint_t)ucs)) {
-			p+=size;
-      result = unicode_utf8_to_ucs4(&ucs, p, &size);
-      assert(result==0 || "damnit, we're not handling invalid input here!");
+      assert(result == 0 || "damnit, we're not handling invalid input here!");
     }
-	}
 
-	*bufp = 0;
+    /* Bis zum nächsten Leerzeichen */
 
-	return buf;
+    while (c < maxchars && *p != 0 && iswalnum((wint_t) ucs)) {
+      p += size;
+      result = unicode_utf8_to_ucs4(&ucs, p, &size);
+      assert(result == 0 || "damnit, we're not handling invalid input here!");
+    }
+  }
+
+  *bufp = 0;
+
+  return buf;
 }
 
-void
-register_names(void)
+void register_names(void)
 {
-  register_function((pf_generic)describe_braineater, "describe_braineater");
+  register_function((pf_generic) describe_braineater, "describe_braineater");
   /* function name 
    * generate a name for a nonplayerunit
    * race->generate_name() */
-  register_function((pf_generic)undead_name, "nameundead");
-  register_function((pf_generic)skeleton_name, "nameskeleton");
-  register_function((pf_generic)zombie_name, "namezombie");
-  register_function((pf_generic)ghoul_name, "nameghoul");
-  register_function((pf_generic)dragon_name, "namedragon");
-  register_function((pf_generic)dracoid_name, "namedracoid");
-  register_function((pf_generic)generic_name, "namegeneric");
+  register_function((pf_generic) undead_name, "nameundead");
+  register_function((pf_generic) skeleton_name, "nameskeleton");
+  register_function((pf_generic) zombie_name, "namezombie");
+  register_function((pf_generic) ghoul_name, "nameghoul");
+  register_function((pf_generic) dragon_name, "namedragon");
+  register_function((pf_generic) dracoid_name, "namedracoid");
+  register_function((pf_generic) generic_name, "namegeneric");
 }
-
-

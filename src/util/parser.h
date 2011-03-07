@@ -14,16 +14,15 @@
 extern "C" {
 #endif
 
-extern void init_tokens_str(const char * initstr, char * cmd); /* initialize token parsing, take ownership of cmd */
-extern void skip_token(void);
-extern const char * parse_token(const char ** str);
-extern void parser_pushstate(void);
-extern void parser_popstate(void);
-extern boolean parser_end(void);
-extern const char *getstrtoken(void);
+  extern void init_tokens_str(const char *initstr, char *cmd);  /* initialize token parsing, take ownership of cmd */
+  extern void skip_token(void);
+  extern const char *parse_token(const char **str);
+  extern void parser_pushstate(void);
+  extern void parser_popstate(void);
+  extern boolean parser_end(void);
+  extern const char *getstrtoken(void);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

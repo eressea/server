@@ -20,22 +20,22 @@ extern "C" {
   struct region;
 
   int gmmain(int argc, char *argv[]);
-  int curses_readline(struct lua_State * L, char * buffer, size_t size, const char * prompt);
+  int curses_readline(struct lua_State *L, char *buffer, size_t size,
+    const char *prompt);
 
   void highlight_region(struct region *r, int on);
-  void select_coordinate(struct selection * selected, int x, int y, int on);
+  void select_coordinate(struct selection *selected, int x, int y, int on);
   void run_mapper(void);
 
   extern int force_color;
 
-  struct state * state_open(void);
-  void state_close(struct state * );
+  struct state *state_open(void);
+  void state_close(struct state *);
 
-  void make_block(int x, int y, int radius, const struct terrain_type * terrain);
-  void seed_players(const char * filename, boolean new_island);
+  void make_block(int x, int y, int radius, const struct terrain_type *terrain);
+  void seed_players(const char *filename, boolean new_island);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

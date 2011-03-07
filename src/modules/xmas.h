@@ -16,12 +16,12 @@
 extern "C" {
 #endif
 
-struct region;
-struct unit;
+  struct region;
+  struct unit;
 
-extern struct trigger *trigger_xmasgate(struct building * b);
+  extern struct trigger *trigger_xmasgate(struct building *b);
 
-extern void register_xmas(void);
+  extern void register_xmas(void);
 
 #ifdef __cplusplus
 }

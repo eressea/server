@@ -22,16 +22,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct attrib;
-struct attrib_type;
+  struct attrib;
+  struct attrib_type;
 
-extern boolean get_moved(struct attrib ** alist);
-extern void set_moved(struct attrib ** alist);
+  extern boolean get_moved(struct attrib **alist);
+  extern void set_moved(struct attrib **alist);
 
-extern struct attrib_type at_moved;
+  extern struct attrib_type at_moved;
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

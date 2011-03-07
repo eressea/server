@@ -22,14 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_key;
+  extern struct attrib_type at_key;
 
-extern struct attrib * make_key(int key);
-extern struct attrib * find_key(struct attrib * alist, int key);
-extern struct attrib * add_key(struct attrib ** alist, int key);
+  extern struct attrib *make_key(int key);
+  extern struct attrib *find_key(struct attrib *alist, int key);
+  extern struct attrib *add_key(struct attrib **alist, int key);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

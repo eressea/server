@@ -24,11 +24,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 attrib_type at_alliance = {
-	"alliance",
-	NULL,
-	NULL,
-	NULL,
-	a_writeint,
-	a_readint,
-	ATF_UNIQUE
+  "alliance",
+  NULL,
+  NULL,
+  NULL,
+  a_writeint,
+  a_readint,
+  ATF_UNIQUE
 };

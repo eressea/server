@@ -31,35 +31,39 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /** importing **/
 
-locale * default_locale;
-locale * locales;
+locale *default_locale;
 
-unsigned int
-locale_hashkey(const locale * lang)
+locale *locales;
+
+unsigned int locale_hashkey(const locale * lang)
 {
-	assert(lang);
-	return lang->hashkey;
+  assert(lang);
+  return lang->hashkey;
 }
 
-locale *
-find_locale(const char * name)
+locale *find_locale(const char *name)
 {
-	unsigned int hkey = hashstring(name);
-	locale * l = locales;
-	while (l && l->hashkey!=hkey) l=l->next;
-	return l;
+  unsigned int hkey = hashstring(name);
+
+  locale *l = locales;
+
+  while (l && l->hashkey != hkey)
+    l = l->next;
+  return l;
 }
 
 static int nextlocaleindex = 0;
 
-locale *
-make_locale(const char * name)
+locale *make_locale(const char *name)
 {
   unsigned int hkey = hashstring(name);
-  locale * l = (locale *)calloc(sizeof(locale), 1);
-  locale ** lp = &locales;
 
-  while (*lp && (*lp)->hashkey!=hkey) lp=&(*lp)->next;
+  locale *l = (locale *) calloc(sizeof(locale), 1);
+
+  locale **lp = &locales;
+
+  while (*lp && (*lp)->hashkey != hkey)
+    lp = &(*lp)->next;
   if (*lp) {
     return *lp;
   }
@@ -68,9 +72,10 @@ make_locale(const char * name)
   l->name = strdup(name);
   l->next = NULL;
   l->index = nextlocaleindex++;
-  assert(nextlocaleindex<=MAXLOCALES);
+  assert(nextlocaleindex <= MAXLOCALES);
   *lp = l;
-  if (default_locale==NULL) default_locale = l;
+  if (default_locale == NULL)
+    default_locale = l;
   return l;
 }
 
@@ -79,15 +84,17 @@ make_locale(const char * name)
  * the locales using the make_locale function (useful for ini-files).
  * For maximum performance, locales should be created in order of popularity.
  */
-void
-make_locales(const char * str)
+void make_locales(const char *str)
 {
-  const char * tok = str;
+  const char *tok = str;
+
   while (*tok) {
     char zText[32];
-    while (*tok && *tok !=',') ++tok;
-    strncpy(zText, str, tok-str);
-    zText[tok-str] = 0;
+
+    while (*tok && *tok != ',')
+      ++tok;
+    strncpy(zText, str, tok - str);
+    zText[tok - str] = 0;
     make_locale(zText);
     if (*tok) {
       str = ++tok;
@@ -95,33 +102,35 @@ make_locales(const char * str)
   }
 }
 
-static FILE * s_debug = NULL;
-static char * s_logfile = NULL;
+static FILE *s_debug = NULL;
 
-void
-debug_language(const char * log)
+static char *s_logfile = NULL;
+
+void debug_language(const char *log)
 {
   s_logfile = strdup(log);
 }
 
-const char *
-locale_getstring(const locale * lang, const char * key)
+const char *locale_getstring(const locale * lang, const char *key)
 {
   unsigned int hkey = hashstring(key);
-  unsigned int id = hkey & (SMAXHASH-1);
-  const struct locale_str * find;
+
+  unsigned int id = hkey & (SMAXHASH - 1);
+
+  const struct locale_str *find;
 
   assert(lang);
-  if (key==NULL || *key==0) return NULL;
+  if (key == NULL || *key == 0)
+    return NULL;
   find = lang->strings[id];
   while (find) {
     if (find->hashkey == hkey) {
-      if (find->nexthash==NULL) {
+      if (find->nexthash == NULL) {
         /* if this is the only entry with this hash, fine. */
-        assert(strcmp(key, find->key)==0);
+        assert(strcmp(key, find->key) == 0);
         return find->str;
       }
-      if (strcmp(key, find->key)==0) {
+      if (strcmp(key, find->key) == 0) {
         return find->str;
       }
     }
@@ -130,42 +139,48 @@ locale_getstring(const locale * lang, const char * key)
   return NULL;
 }
 
-const char *
-locale_string(const locale * lang, const char * key)
+const char *locale_string(const locale * lang, const char *key)
 {
-  assert(lang!=0);
+  assert(lang != 0);
 
-  if (key!=NULL) {
+  if (key != NULL) {
     unsigned int hkey = hashstring(key);
-    unsigned int id = hkey & (SMAXHASH-1);
-    struct locale_str * find;
-    
-    if (*key==0) return NULL;
-    if (lang == NULL) return key;
+
+    unsigned int id = hkey & (SMAXHASH - 1);
+
+    struct locale_str *find;
+
+    if (*key == 0)
+      return NULL;
+    if (lang == NULL)
+      return key;
     find = lang->strings[id];
     while (find) {
       if (find->hashkey == hkey) {
-        if (find->nexthash==NULL) {
+        if (find->nexthash == NULL) {
           /* if this is the only entry with this hash, fine. */
-          assert(strcmp(key, find->key)==0);
+          assert(strcmp(key, find->key) == 0);
           break;
         }
-        if (strcmp(key, find->key)==0) break;
+        if (strcmp(key, find->key) == 0)
+          break;
       }
       find = find->nexthash;
     }
     if (!find) {
-      const char * s = key;
-      log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
-      if (lang!=default_locale) {
+      const char *s = key;
+
+      log_warning(("missing translation for \"%s\" in locale %s\n", key,
+          lang->name));
+      if (lang != default_locale) {
         s = locale_string(default_locale, key);
       }
       if (s_logfile) {
-        s_debug = s_debug?s_debug:fopen(s_logfile, "w");
+        s_debug = s_debug ? s_debug : fopen(s_logfile, "w");
         if (s_debug) {
           fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
           fflush(s_debug);
-          locale_setstring((struct locale*)lang, key, s);
+          locale_setstring((struct locale *)lang, key, s);
         }
       }
       return s;
@@ -175,16 +190,20 @@ locale_string(const locale * lang, const char * key)
   return NULL;
 }
 
-void
-locale_setstring(locale * lang, const char * key, const char * value)
+void locale_setstring(locale * lang, const char *key, const char *value)
 {
   unsigned int hkey = hashstring(key);
-  unsigned int id = hkey & (SMAXHASH-1);
-  struct locale_str * find;
-  if (lang==NULL) lang=default_locale;
+
+  unsigned int id = hkey & (SMAXHASH - 1);
+
+  struct locale_str *find;
+
+  if (lang == NULL)
+    lang = default_locale;
   find = lang->strings[id];
   while (find) {
-    if (find->hashkey==hkey && strcmp(key, find->key)==0) break;
+    if (find->hashkey == hkey && strcmp(key, find->key) == 0)
+      break;
     find = find->nexthash;
   }
   if (!find) {
@@ -194,24 +213,21 @@ locale_setstring(locale * lang, const char * key, const char * value)
     find->hashkey = hkey;
     find->key = strdup(key);
     find->str = strdup(value);
-  }
-  else {
-    if (strcmp(find->str, value)!=0) {
+  } else {
+    if (strcmp(find->str, value) != 0) {
       log_error(("duplicate translation '%s' for key %s\n", value, key));
     }
     assert(!strcmp(find->str, value) || !"duplicate string for key");
   }
 }
 
-const char *
-locale_name(const locale * lang)
+const char *locale_name(const locale * lang)
 {
-	assert(lang);
-	return lang->name;
+  assert(lang);
+  return lang->name;
 }
 
-char *
-mkname_buf(const char * space, const char * name, char * buffer)
+char *mkname_buf(const char *space, const char *name, char *buffer)
 {
   if (space && *space) {
     sprintf(buffer, "%s::%s", space, name);
@@ -221,17 +237,16 @@ mkname_buf(const char * space, const char * name, char * buffer)
   return buffer;
 }
 
-const char *
-mkname(const char * space, const char * name)
+const char *mkname(const char *space, const char *name)
 {
-  static char zBuffer[128]; /* STATIC_RESULT: used for return, not across calls */
+  static char zBuffer[128];     /* STATIC_RESULT: used for return, not across calls */
+
   return mkname_buf(space, name, zBuffer);
 }
 
-locale *
-nextlocale(const struct locale * lang)
+locale *nextlocale(const struct locale * lang)
 {
-	return lang->next;
+  return lang->next;
 }
 
 typedef struct lstr {
@@ -240,13 +255,13 @@ typedef struct lstr {
 
 static lstr lstrs[MAXLOCALES];
 
-struct tnode *
-get_translations(const struct locale * lang, int index)
+struct tnode *get_translations(const struct locale *lang, int index)
 {
   assert(lang);
-  assert(lang->index<MAXLOCALES || "you have to increase MAXLOCALES and recompile");
-  if (lang->index<MAXLOCALES) {
-    return lstrs[lang->index].tokens+index;
+  assert(lang->index < MAXLOCALES
+    || "you have to increase MAXLOCALES and recompile");
+  if (lang->index < MAXLOCALES) {
+    return lstrs[lang->index].tokens + index;
   }
-  return lstrs[0].tokens+index;
+  return lstrs[0].tokens + index;
 }

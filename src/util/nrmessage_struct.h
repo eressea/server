@@ -6,15 +6,15 @@
  * do something BAD. */
 
 typedef struct nrmessage_type {
-	const struct message_type * mtype;
-	const struct locale * lang;
-	const char * string;
-	const char * vars;
-	struct nrmessage_type * next;
-	int level;
-	const char * section;
+  const struct message_type *mtype;
+  const struct locale *lang;
+  const char *string;
+  const char *vars;
+  struct nrmessage_type *next;
+  int level;
+  const char *section;
 } nrmessage_type;
 
-extern nrmessage_type * get_nrmessagetypes(void);
+extern nrmessage_type *get_nrmessagetypes(void);
 
 #endif

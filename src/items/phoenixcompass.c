@@ -39,38 +39,48 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 
 static int
-use_phoenixcompass(struct unit * u, const struct item_type * itype,
-                   int amount, struct order * ord)
+use_phoenixcompass(struct unit *u, const struct item_type *itype,
+  int amount, struct order *ord)
 {
-  region      *r;
-  unit        *closest_phoenix = NULL;
-  int          closest_phoenix_distance = INT_MAX;
-  boolean      confusion = false;
-  direction_t  direction;
-  unit        *u2;
-  direction_t  closest_neighbour_direction = 0;
-  static race * rc_phoenix = NULL;
-  
-  if (rc_phoenix==NULL) {
+  region *r;
+
+  unit *closest_phoenix = NULL;
+
+  int closest_phoenix_distance = INT_MAX;
+
+  boolean confusion = false;
+
+  direction_t direction;
+
+  unit *u2;
+
+  direction_t closest_neighbour_direction = 0;
+
+  static race *rc_phoenix = NULL;
+
+  if (rc_phoenix == NULL) {
     rc_phoenix = rc_find("phoenix");
-    if (rc_phoenix==NULL) return 0;
+    if (rc_phoenix == NULL)
+      return 0;
   }
 
   /* find the closest phoenix. */
 
-  for(r=regions; r; r=r->next) {
-    for(u2=r->units; u2; u2=u2->next) {
+  for (r = regions; r; r = r->next) {
+    for (u2 = r->units; u2; u2 = u2->next) {
       if (u2->race == rc_phoenix) {
-        if(closest_phoenix == NULL) {
+        if (closest_phoenix == NULL) {
           closest_phoenix = u2;
-          closest_phoenix_distance = distance(u->region, closest_phoenix->region);
+          closest_phoenix_distance =
+            distance(u->region, closest_phoenix->region);
         } else {
           int dist = distance(u->region, r);
-          if(dist < closest_phoenix_distance) {
+
+          if (dist < closest_phoenix_distance) {
             closest_phoenix = u2;
             closest_phoenix_distance = dist;
             confusion = false;
-          } else if(dist == closest_phoenix_distance) {
+          } else if (dist == closest_phoenix_distance) {
             confusion = true;
           }
         }
@@ -81,9 +91,8 @@ use_phoenixcompass(struct unit * u, const struct item_type * itype,
   /* no phoenix found at all.* if confusion == true more than one phoenix
    * at the same distance was found and the device is confused */
 
-  if(closest_phoenix == NULL
-      || closest_phoenix->region == u->region
-      || confusion == true) {
+  if (closest_phoenix == NULL
+    || closest_phoenix->region == u->region || confusion == true) {
     add_message(&u->faction->msgs, msg_message("phoenixcompass_confusion",
         "unit region command", u, u->region, ord));
     return 0;
@@ -93,17 +102,19 @@ use_phoenixcompass(struct unit * u, const struct item_type * itype,
    * neighbouring region which is closest to the phoenix found. hardcoded
    * for readability. */
 
-  for(direction = 0; direction < MAXDIRECTIONS; ++direction) {
-    region     *neighbour;
-    int         closest_neighbour_distance = INT_MAX;
-    
+  for (direction = 0; direction < MAXDIRECTIONS; ++direction) {
+    region *neighbour;
+
+    int closest_neighbour_distance = INT_MAX;
+
     neighbour = r_connect(u->region, direction);
-    if(neighbour != NULL) {
+    if (neighbour != NULL) {
       int dist = distance(neighbour, closest_phoenix->region);
-      if(dist < closest_neighbour_distance) {
+
+      if (dist < closest_neighbour_distance) {
         closest_neighbour_direction = direction;
         closest_neighbour_distance = dist;
-      } else if(dist == closest_neighbour_distance && rng_int()%100 < 50) {
+      } else if (dist == closest_neighbour_distance && rng_int() % 100 < 50) {
         /* there can never be more than two neighbours with the same
          * distance (except when you are standing in the same region
          * as the phoenix, but that case has already been handled).
@@ -115,15 +126,13 @@ use_phoenixcompass(struct unit * u, const struct item_type * itype,
   }
 
   add_message(&u->faction->msgs, msg_message("phoenixcompass_success",
-        "unit region command dir",
-        u, u->region, ord, closest_neighbour_direction));
+      "unit region command dir",
+      u, u->region, ord, closest_neighbour_direction));
 
   return 0;
 }
 
-void
-register_phoenixcompass(void)
+void register_phoenixcompass(void)
 {
   register_item_use(use_phoenixcompass, "use_phoenixcompass");
 }
-

@@ -40,24 +40,26 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 typedef struct object_data {
   object_type type;
-  char * name;
+  char *name;
   union {
     int i;
-    char * str;
+    char *str;
     double real;
-    struct unit * u;
-    struct region * r;
-    struct building * b;
-    struct ship * sh;
-    struct faction * f;
+    struct unit *u;
+    struct region *r;
+    struct building *b;
+    struct ship *sh;
+    struct faction *f;
   } data;
 } object_data;
 
 static void
-object_write(const attrib * a, const void * owner, struct storage * store)
+object_write(const attrib * a, const void *owner, struct storage *store)
 {
-  const object_data * data = (object_data *)a->data.v;
+  const object_data *data = (object_data *) a->data.v;
+
   int type = (int)data->type;
+
   store->w_tok(store, data->name);
   store->w_int(store, type);
   switch (data->type) {
@@ -71,7 +73,7 @@ object_write(const attrib * a, const void * owner, struct storage * store)
       store->w_str(store, data->data.str);
       break;
     case TUNIT:
-      write_unit_reference(data->data.u, store );
+      write_unit_reference(data->data.u, store);
       break;
     case TFACTION:
       write_faction_reference(data->data.f, store);
@@ -93,14 +95,14 @@ object_write(const attrib * a, const void * owner, struct storage * store)
   }
 }
 
-static int
-object_read(attrib *a, void * owner, struct storage * store)
+static int object_read(attrib * a, void *owner, struct storage *store)
 {
-  object_data * data = (object_data *)a->data.v;
+  object_data *data = (object_data *) a->data.v;
+
   int result;
 
   data->name = store->r_str(store);
-  data->type = (object_type)store->r_int(store);
+  data->type = (object_type) store->r_int(store);
   switch (data->type) {
     case TINTEGER:
       data->data.i = store->r_int(store);
@@ -112,26 +114,33 @@ object_read(attrib *a, void * owner, struct storage * store)
       data->data.str = store->r_str(store);
       break;
     case TBUILDING:
-      result = read_reference(&data->data.b, store, read_building_reference, resolve_building);
-      if (result==0 && !data->data.b) {
+      result =
+        read_reference(&data->data.b, store, read_building_reference,
+        resolve_building);
+      if (result == 0 && !data->data.b) {
         return AT_READ_FAIL;
       }
       break;
     case TUNIT:
-      result = read_reference(&data->data.u, store, read_unit_reference, resolve_unit);
-      if (result==0 && !data->data.u) {
+      result =
+        read_reference(&data->data.u, store, read_unit_reference, resolve_unit);
+      if (result == 0 && !data->data.u) {
         return AT_READ_FAIL;
       }
       break;
     case TFACTION:
-      result = read_reference(&data->data.f, store, read_faction_reference, resolve_faction);
-      if (result==0 && !data->data.f) {
+      result =
+        read_reference(&data->data.f, store, read_faction_reference,
+        resolve_faction);
+      if (result == 0 && !data->data.f) {
         return AT_READ_FAIL;
       }
       break;
     case TREGION:
-      result = read_reference(&data->data.r, store, read_region_reference, RESOLVE_REGION(store->version));
-      if (result==0 && !data->data.r) {
+      result =
+        read_reference(&data->data.r, store, read_region_reference,
+        RESOLVE_REGION(store->version));
+      if (result == 0 && !data->data.r) {
         return AT_READ_FAIL;
       }
       break;
@@ -147,20 +156,21 @@ object_read(attrib *a, void * owner, struct storage * store)
   return AT_READ_OK;
 }
 
-static void
-object_init(attrib * a)
+static void object_init(attrib * a)
 {
-  object_data * data;
+  object_data *data;
+
   a->data.v = malloc(sizeof(object_data));
-  data = (object_data *)a->data.v;
+  data = (object_data *) a->data.v;
   data->type = TNONE;
 }
 
-static void
-object_done(attrib * a)
+static void object_done(attrib * a)
 {
-  object_data * data = (object_data *)a->data.v;
-  if (data->type == TSTRING) free(data->data.str);
+  object_data *data = (object_data *) a->data.v;
+
+  if (data->type == TSTRING)
+    free(data->data.str);
   free(data->name);
   free(a->data.v);
 }
@@ -170,34 +180,35 @@ attrib_type at_object = {
   object_write, object_read
 };
 
-const char *
-object_name(const attrib * a)
+const char *object_name(const attrib * a)
 {
-  object_data * data = (object_data *)a->data.v;
+  object_data *data = (object_data *) a->data.v;
+
   return data->name;
 }
 
-struct attrib *
-object_create(const char * name, object_type type, variant value)
+struct attrib *object_create(const char *name, object_type type, variant value)
 {
-  attrib * a = a_new(&at_object);
-  object_data * data = (object_data *)a->data.v;
+  attrib *a = a_new(&at_object);
+
+  object_data *data = (object_data *) a->data.v;
+
   data->name = strdup(name);
 
   object_set(a, type, value);
   return a;
 }
 
-void
-object_set(attrib * a, object_type type, variant value)
+void object_set(attrib * a, object_type type, variant value)
 {
-  object_data * data = (object_data *)a->data.v;
+  object_data *data = (object_data *) a->data.v;
 
-  if (data->type==TSTRING) free(data->data.str);
+  if (data->type == TSTRING)
+    free(data->data.str);
   data->type = type;
   switch (type) {
     case TSTRING:
-      data->data.str = value.v?strdup(value.v):NULL;
+      data->data.str = value.v ? strdup(value.v) : NULL;
       break;
     case TINTEGER:
       data->data.i = value.i;
@@ -206,19 +217,19 @@ object_set(attrib * a, object_type type, variant value)
       data->data.real = value.f;
       break;
     case TREGION:
-      data->data.r = (region*)value.v;
+      data->data.r = (region *) value.v;
       break;
     case TBUILDING:
-      data->data.b = (building*)value.v;
+      data->data.b = (building *) value.v;
       break;
     case TFACTION:
-      data->data.f = (faction*)value.v;
+      data->data.f = (faction *) value.v;
       break;
     case TUNIT:
-      data->data.u = (unit*)value.v;
+      data->data.u = (unit *) value.v;
       break;
     case TSHIP:
-      data->data.sh = (ship*)value.v;
+      data->data.sh = (ship *) value.v;
       break;
     case TNONE:
       break;
@@ -228,10 +239,10 @@ object_set(attrib * a, object_type type, variant value)
   }
 }
 
-void
-object_get(const struct attrib * a, object_type * type, variant * value)
+void object_get(const struct attrib *a, object_type * type, variant * value)
 {
-  object_data * data = (object_data *)a->data.v;
+  object_data *data = (object_data *) a->data.v;
+
   *type = data->type;
   switch (data->type) {
     case TSTRING:

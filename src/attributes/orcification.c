@@ -28,13 +28,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 attrib_type at_orcification = {
-	"orcification", NULL, NULL, NULL, a_writeint, a_readint, ATF_UNIQUE
+  "orcification", NULL, NULL, NULL, a_writeint, a_readint, ATF_UNIQUE
 };
 
-attrib *
-make_orcification(int orcification)
+attrib *make_orcification(int orcification)
 {
-	attrib * a = a_new(&at_orcification);
-	a->data.i = orcification;
-	return a;
+  attrib *a = a_new(&at_orcification);
+
+  a->data.i = orcification;
+  return a;
 }

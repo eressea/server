@@ -17,14 +17,14 @@ extern "C" {
 #endif
 
 /* all types we use are defined here to reduce dependencies */
-struct trigger_type;
-struct trigger;
-struct region;
-struct building;
+  struct trigger_type;
+  struct trigger;
+  struct region;
+  struct building;
 
-extern struct trigger_type tt_gate;
+  extern struct trigger_type tt_gate;
 
-extern struct trigger * trigger_gate(struct building * b, struct region * r);
+  extern struct trigger *trigger_gate(struct building *b, struct region *r);
 
 #ifdef __cplusplus
 }

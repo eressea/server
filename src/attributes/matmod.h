@@ -23,15 +23,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct resource_type;
-struct unit;
-typedef int (*mm_fun)(const struct unit * u, const struct resource_type * rtype, int value);
+  struct resource_type;
+  struct unit;
+  typedef int (*mm_fun) (const struct unit * u,
+    const struct resource_type * rtype, int value);
 
-extern struct attrib_type at_matmod;
-extern struct attrib * make_matmod(mm_fun function);
+  extern struct attrib_type at_matmod;
+  extern struct attrib *make_matmod(mm_fun function);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

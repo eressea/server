@@ -49,8 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-faction *
-createmonsters(int no)
+faction *createmonsters(int no)
 {
   faction *f = findfaction(no);
 
@@ -61,12 +60,12 @@ createmonsters(int no)
   f = (faction *) calloc(1, sizeof(faction));
   f->no = no;
   /* alles ist auf null gesetzt, ausser dem folgenden. achtung - partei
-  * no 0 muss keine orders einreichen! */
+   * no 0 muss keine orders einreichen! */
 
   f->email = strdup("monsters@eressea.de");
   f->name = strdup("Monster");
   f->alive = 1;
-  f->options = (char)(1<<O_REPORT);
+  f->options = (char)(1 << O_REPORT);
   addlist(&factions, f);
   fhash(f);
   return f;

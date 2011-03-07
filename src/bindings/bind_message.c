@@ -25,32 +25,32 @@
 #define E_INVALID_PARAMETER_VALUE 4
 
 typedef struct lua_message {
-  const message_type * mtype;
-  message * msg;
-  variant * args;
+  const message_type *mtype;
+  message *msg;
+  variant *args;
 } lua_message;
 
-int 
-mtype_get_param(const message_type * mtype, const char * param)
+int mtype_get_param(const message_type * mtype, const char *param)
 {
   int i;
-  for (i=0;i!=mtype->nparameters;++i) {
-    if (strcmp(mtype->pnames[i], param)==0) {
+
+  for (i = 0; i != mtype->nparameters; ++i) {
+    if (strcmp(mtype->pnames[i], param) == 0) {
       return i;
     }
   }
   return mtype->nparameters;
 }
 
-static lua_message *
-msg_create_message(const char *type)
+static lua_message *msg_create_message(const char *type)
 {
-  lua_message * lmsg = malloc(sizeof(lua_message));
+  lua_message *lmsg = malloc(sizeof(lua_message));
+
   lmsg->msg = 0;
   lmsg->args = 0;
   lmsg->mtype = mt_find(type);
   if (lmsg->mtype) {
-    lmsg->args = (variant*)calloc(lmsg->mtype->nparameters, sizeof(variant));
+    lmsg->args = (variant *) calloc(lmsg->mtype->nparameters, sizeof(variant));
   }
   return lmsg;
 }
@@ -70,80 +70,78 @@ msg_destroy_message(lua_message * msg)
   }
 }
 */
-int
-msg_set_resource(lua_message * msg, const char * param, const char * resname) 
+int msg_set_resource(lua_message * msg, const char *param, const char *resname)
 {
   if (msg->mtype) {
     int i = mtype_get_param(msg->mtype, param);
-    if (i==msg->mtype->nparameters) {
+
+    if (i == msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
-    if (strcmp(msg->mtype->types[i]->name, "resource")!=0) {
+    if (strcmp(msg->mtype->types[i]->name, "resource") != 0) {
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    msg->args[i].v = (void*)rt_find(resname);
+    msg->args[i].v = (void *)rt_find(resname);
 
     return E_OK;
   }
   return E_INVALID_MESSAGE;
 }
 
-int
-msg_set_unit(lua_message * msg, const char * param, const unit * u)
+int msg_set_unit(lua_message * msg, const char *param, const unit * u)
 {
   if (msg->mtype) {
     int i = mtype_get_param(msg->mtype, param);
 
-    if (i==msg->mtype->nparameters) {
+    if (i == msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
-    if (strcmp(msg->mtype->types[i]->name, "unit")!=0) {
+    if (strcmp(msg->mtype->types[i]->name, "unit") != 0) {
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    msg->args[i].v = (void*)u;
+    msg->args[i].v = (void *)u;
 
     return E_OK;
   }
   return E_INVALID_MESSAGE;
 }
 
-int
-msg_set_region(lua_message * msg, const char * param, const region * r)
+int msg_set_region(lua_message * msg, const char *param, const region * r)
 {
   if (msg->mtype) {
     int i = mtype_get_param(msg->mtype, param);
 
-    if (i==msg->mtype->nparameters) {
+    if (i == msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
-    if (strcmp(msg->mtype->types[i]->name, "region")!=0) {
+    if (strcmp(msg->mtype->types[i]->name, "region") != 0) {
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    msg->args[i].v = (void*)r;
+    msg->args[i].v = (void *)r;
 
     return E_OK;
   }
   return E_INVALID_MESSAGE;
 }
 
-int
-msg_set_string(lua_message * msg, const char * param, const char * value)
+int msg_set_string(lua_message * msg, const char *param, const char *value)
 {
   if (msg->mtype) {
     int i = mtype_get_param(msg->mtype, param);
+
     variant var;
 
-    if (i==msg->mtype->nparameters) {
+    if (i == msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
-    if (strcmp(msg->mtype->types[i]->name, "string")!=0) {
+    if (strcmp(msg->mtype->types[i]->name, "string") != 0) {
       return E_INVALID_PARAMETER_TYPE;
     }
 
-    var.v = (void*)value;
+    var.v = (void *)value;
     msg->args[i] = msg->mtype->types[i]->copy(var);
 
     return E_OK;
@@ -151,15 +149,15 @@ msg_set_string(lua_message * msg, const char * param, const char * value)
   return E_INVALID_MESSAGE;
 }
 
-int
-msg_set_int(lua_message * msg, const char * param, int value)
+int msg_set_int(lua_message * msg, const char *param, int value)
 {
   if (msg->mtype) {
     int i = mtype_get_param(msg->mtype, param);
-    if (i==msg->mtype->nparameters) {
+
+    if (i == msg->mtype->nparameters) {
       return E_INVALID_PARAMETER_NAME;
     }
-    if (strcmp(msg->mtype->types[i]->name, "int")!=0) {
+    if (strcmp(msg->mtype->types[i]->name, "int") != 0) {
       return E_INVALID_PARAMETER_TYPE;
     }
 
@@ -170,14 +168,13 @@ msg_set_int(lua_message * msg, const char * param, int value)
   return E_INVALID_MESSAGE;
 }
 
-int 
-msg_send_faction(lua_message * msg, faction * f)
+int msg_send_faction(lua_message * msg, faction * f)
 {
   assert(f);
   assert(msg);
 
   if (msg->mtype) {
-    if (msg->msg==NULL) {
+    if (msg->msg == NULL) {
       msg->msg = msg_create(msg->mtype, msg->args);
     }
     add_message(&f->msgs, msg->msg);
@@ -186,11 +183,10 @@ msg_send_faction(lua_message * msg, faction * f)
   return E_INVALID_MESSAGE;
 }
 
-int 
-msg_send_region(lua_message * lmsg, region * r)
+int msg_send_region(lua_message * lmsg, region * r)
 {
   if (lmsg->mtype) {
-    if (lmsg->msg==NULL) {
+    if (lmsg->msg == NULL) {
       lmsg->msg = msg_create(lmsg->mtype, lmsg->args);
     }
     add_message(&r->msgs, lmsg->msg);
@@ -200,73 +196,90 @@ msg_send_region(lua_message * lmsg, region * r)
 }
 
 
-static int
-tolua_msg_create(lua_State * L)
+static int tolua_msg_create(lua_State * L)
 {
-  const char * type = tolua_tostring(L, 1, 0);
-  lua_message * lmsg = msg_create_message(type);
-  tolua_pushusertype(L, (void*)lmsg, TOLUA_CAST "message");
+  const char *type = tolua_tostring(L, 1, 0);
+
+  lua_message *lmsg = msg_create_message(type);
+
+  tolua_pushusertype(L, (void *)lmsg, TOLUA_CAST "message");
   return 1;
 }
-static int
-tolua_msg_set_string(lua_State * L)
+
+static int tolua_msg_set_string(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  const char * param = tolua_tostring(L, 2, 0);
-  const char * value = tolua_tostring(L, 3, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  const char *param = tolua_tostring(L, 2, 0);
+
+  const char *value = tolua_tostring(L, 3, 0);
+
   int result = msg_set_string(lmsg, param, value);
-  tolua_pushnumber(L, (lua_Number)result);
+
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_set_int(lua_State * L)
+static int tolua_msg_set_int(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  const char * param = tolua_tostring(L, 2, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  const char *param = tolua_tostring(L, 2, 0);
+
   int value = (int)tolua_tonumber(L, 3, 0);
+
   int result = msg_set_int(lmsg, param, value);
-  tolua_pushnumber(L, (lua_Number)result);
+
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_set_resource(lua_State * L)
+static int tolua_msg_set_resource(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  const char * param = tolua_tostring(L, 2, 0);
-  const char * value = tolua_tostring(L, 3, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  const char *param = tolua_tostring(L, 2, 0);
+
+  const char *value = tolua_tostring(L, 3, 0);
+
   int result = msg_set_resource(lmsg, param, value);
-  tolua_pushnumber(L, (lua_Number)result);
+
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_set_unit(lua_State * L)
+static int tolua_msg_set_unit(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  const char * param = tolua_tostring(L, 2, 0);
-  unit * value = (unit *)tolua_tousertype(L, 3, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  const char *param = tolua_tostring(L, 2, 0);
+
+  unit *value = (unit *) tolua_tousertype(L, 3, 0);
+
   int result = msg_set_unit(lmsg, param, value);
-  tolua_pushnumber(L, (lua_Number)result);
+
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_set_region(lua_State * L)
+static int tolua_msg_set_region(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  const char * param = tolua_tostring(L, 2, 0);
-  region * value = (region *)tolua_tousertype(L, 3, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  const char *param = tolua_tostring(L, 2, 0);
+
+  region *value = (region *) tolua_tousertype(L, 3, 0);
+
   int result = msg_set_region(lmsg, param, value);
-  tolua_pushnumber(L, (lua_Number)result);
+
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_set(lua_State * L)
+static int tolua_msg_set(lua_State * L)
 {
   tolua_Error err;
+
   if (tolua_isnumber(L, 3, 0, &err)) {
     return tolua_msg_set_int(L);
   } else if (tolua_isusertype(L, 3, TOLUA_CAST "region", 0, &err)) {
@@ -274,50 +287,56 @@ tolua_msg_set(lua_State * L)
   } else if (tolua_isusertype(L, 3, TOLUA_CAST "unit", 0, &err)) {
     return tolua_msg_set_unit(L);
   }
-  tolua_pushnumber(L, (lua_Number)-1);
+  tolua_pushnumber(L, (lua_Number) - 1);
   return 1;
 }
 
-static int
-tolua_msg_send_region(lua_State * L)
+static int tolua_msg_send_region(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  region * r = (region *)tolua_tousertype(L, 2, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  region *r = (region *) tolua_tousertype(L, 2, 0);
+
   int result = msg_send_region(lmsg, r);
-  tolua_pushnumber(L, (lua_Number)result);
+
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_report_action(lua_State * L)
+static int tolua_msg_report_action(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  region * r = (region *)tolua_tousertype(L, 2, 0);
-  unit * u = (unit *)tolua_tousertype(L, 3, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  region *r = (region *) tolua_tousertype(L, 2, 0);
+
+  unit *u = (unit *) tolua_tousertype(L, 3, 0);
+
   int result, flags = (int)tolua_tonumber(L, 4, 0);
-  if (lmsg->msg==NULL) {
+
+  if (lmsg->msg == NULL) {
     lmsg->msg = msg_create(lmsg->mtype, lmsg->args);
   }
   result = report_action(r, u, lmsg->msg, flags);
-  tolua_pushnumber(L, (lua_Number)result);
+  tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int
-tolua_msg_send_faction(lua_State * L)
+static int tolua_msg_send_faction(lua_State * L)
 {
-  lua_message * lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
-  faction * f = (faction *)tolua_tousertype(L, 2, 0);
+  lua_message *lmsg = (lua_message *) tolua_tousertype(L, 1, 0);
+
+  faction *f = (faction *) tolua_tousertype(L, 2, 0);
+
   if (f && lmsg) {
     int result = msg_send_faction(lmsg, f);
-    tolua_pushnumber(L, (lua_Number)result);
+
+    tolua_pushnumber(L, (lua_Number) result);
     return 1;
   }
   return 0;
 }
 
-void
-tolua_message_open(lua_State* L)
+void tolua_message_open(lua_State * L)
 {
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "message");
@@ -327,7 +346,8 @@ tolua_message_open(lua_State* L)
   {
     tolua_function(L, TOLUA_CAST "message", tolua_msg_create);
 
-    tolua_cclass(L, TOLUA_CAST "message", TOLUA_CAST "message", TOLUA_CAST "", NULL);
+    tolua_cclass(L, TOLUA_CAST "message", TOLUA_CAST "message", TOLUA_CAST "",
+      NULL);
     tolua_beginmodule(L, TOLUA_CAST "message");
     {
       tolua_function(L, TOLUA_CAST "set", tolua_msg_set);

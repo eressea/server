@@ -17,32 +17,33 @@ extern "C" {
 #endif
 
 
-struct region_list;
-struct newfaction;
+  struct region_list;
+  struct newfaction;
 
-typedef struct newfaction {
-  struct newfaction * next;
-  char * email;
-  char * password;
-  const struct locale * lang;
-  const struct race * race;
-  int bonus;
-  int subscription;
-  boolean oldregions;
-  struct alliance * allies;
-} newfaction;
+  typedef struct newfaction {
+    struct newfaction *next;
+    char *email;
+    char *password;
+    const struct locale *lang;
+    const struct race *race;
+    int bonus;
+    int subscription;
+    boolean oldregions;
+    struct alliance *allies;
+  } newfaction;
 
 #define ISLANDSIZE 20
 #define TURNS_PER_ISLAND 5
 
-extern int autoseed(newfaction ** players, int nsize, int max_agediff);
-extern newfaction * read_newfactions(const char * filename);
-extern void get_island(struct region * root, struct region_list ** rlist);
-extern int fix_demand(struct region *r);
-extern const struct terrain_type * random_terrain(const struct terrain_type * terrains[], int distribution[], int size);
+  extern int autoseed(newfaction ** players, int nsize, int max_agediff);
+  extern newfaction *read_newfactions(const char *filename);
+  extern void get_island(struct region *root, struct region_list **rlist);
+  extern int fix_demand(struct region *r);
+  extern const struct terrain_type *random_terrain(const struct terrain_type
+    *terrains[], int distribution[], int size);
 
-extern int seed_adamantium(struct region * r, int base);
-extern int build_island_e3(int x, int y, int numfactions, int minsize);
+  extern int seed_adamantium(struct region *r, int base);
+  extern int build_island_e3(int x, int y, int numfactions, int minsize);
 
 #ifdef __cplusplus
 }

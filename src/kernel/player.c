@@ -22,80 +22,88 @@
 #define PMAXHASH 1021
 
 typedef struct player_hash {
-	struct player * entries;
+  struct player *entries;
 } player_hash;
 
-static player_hash * players[PMAXHASH];
+static player_hash *players[PMAXHASH];
 
-player *
-make_player(const struct faction * f)
+player *make_player(const struct faction *f)
 {
-	player * p = calloc(sizeof(player), 1);
-	unsigned int hash;
-	
-	for (p->id = rng_int();;p->id++) {
-		/* if there is a hashing conflict, resolve it */
-		player * pi = get_player(p->id);
-		if (pi) p->id++;
-		else break;
-	}
-	hash = p->id % PMAXHASH;
-	p->faction = f;
-	p->nexthash = players[hash]->entries;
-	players[hash]->entries = p;
+  player *p = calloc(sizeof(player), 1);
 
-	return p;
+  unsigned int hash;
+
+  for (p->id = rng_int();; p->id++) {
+    /* if there is a hashing conflict, resolve it */
+    player *pi = get_player(p->id);
+
+    if (pi)
+      p->id++;
+    else
+      break;
+  }
+  hash = p->id % PMAXHASH;
+  p->faction = f;
+  p->nexthash = players[hash]->entries;
+  players[hash]->entries = p;
+
+  return p;
 }
 
-player *
-next_player(player * p)
+player *next_player(player * p)
 {
-	if (p->nexthash) return p->nexthash;
-	else {
-		unsigned int hash = p->id % PMAXHASH;
-		p = NULL;
-		while (++hash!=PMAXHASH) {
-			if (players[hash]->entries!=NULL) {
-				p = players[hash]->entries;
-				break;
-			}
-		}
-		return p;
-	}
+  if (p->nexthash)
+    return p->nexthash;
+  else {
+    unsigned int hash = p->id % PMAXHASH;
+
+    p = NULL;
+    while (++hash != PMAXHASH) {
+      if (players[hash]->entries != NULL) {
+        p = players[hash]->entries;
+        break;
+      }
+    }
+    return p;
+  }
 }
 
-player *
-get_player(unsigned int id)
+player *get_player(unsigned int id)
 {
-	unsigned int hash = id % PMAXHASH;
-	struct player * p = players[hash]->entries;
+  unsigned int hash = id % PMAXHASH;
 
-	while (p && p->id!=id) p = p->nexthash;
-	return p;
+  struct player *p = players[hash]->entries;
+
+  while (p && p->id != id)
+    p = p->nexthash;
+  return p;
 }
 
-player *
-get_players(void)
+player *get_players(void)
 {
-	struct player * p = NULL;
-	unsigned int hash = 0;
+  struct player *p = NULL;
 
-	while (p!=NULL && hash!=PMAXHASH) {
-		p = players[hash++]->entries;
-	}
-	return p;
+  unsigned int hash = 0;
+
+  while (p != NULL && hash != PMAXHASH) {
+    p = players[hash++]->entries;
+  }
+  return p;
 }
 
-void
-players_done(void)
+void players_done(void)
 {
-	int i;
-	for (i=0;i!=PMAXHASH;++i) {
-		player * p = players[i]->entries;
-		players[i]->entries = p->nexthash;
-		free(p->name);
-		if (p->email) free(p->email);
-		if (p->name) free(p->name);
-		free(p);
-	}
+  int i;
+
+  for (i = 0; i != PMAXHASH; ++i) {
+    player *p = players[i]->entries;
+
+    players[i]->entries = p->nexthash;
+    free(p->name);
+    if (p->email)
+      free(p->email);
+    if (p->name)
+      free(p->name);
+    free(p);
+  }
 }

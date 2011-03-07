@@ -22,13 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct building;
-struct item;
+  struct building;
+  struct item;
 
-extern struct attrib_type at_giveitem;
+  extern struct attrib_type at_giveitem;
 
-extern struct attrib * make_giveitem(struct building * b, struct item * items);
-extern void init_giveitem(void);
+  extern struct attrib *make_giveitem(struct building *b, struct item *items);
+  extern void init_giveitem(void);
 
 #ifdef __cplusplus
 }

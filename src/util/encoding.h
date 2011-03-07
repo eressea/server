@@ -4,14 +4,14 @@
 extern "C" {
 #endif
 
-enum {
-	ENCODING_ERROR = -1,
-	ENCODING_NONE = 0,
-	ENCODING_8859_1 = 1,
-	ENCODING_UTF8 = 10
-};
+  enum {
+    ENCODING_ERROR = -1,
+    ENCODING_NONE = 0,
+    ENCODING_8859_1 = 1,
+    ENCODING_UTF8 = 10
+  };
 
-int get_encoding_by_name(const char * name);
+  int get_encoding_by_name(const char *name);
 
 #ifdef __cplusplus
 }

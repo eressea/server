@@ -22,10 +22,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_alliance;
+  extern struct attrib_type at_alliance;
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

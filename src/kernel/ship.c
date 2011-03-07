@@ -48,63 +48,70 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 quicklist *shiptypes = NULL;
 
-static local_names * snames;
+static local_names *snames;
 
-const ship_type *
-findshiptype(const char * name, const struct locale * lang)
+const ship_type *findshiptype(const char *name, const struct locale *lang)
 {
-  local_names * sn = snames;
+  local_names *sn = snames;
+
   variant var;
 
   while (sn) {
-    if (sn->lang==lang) break;
-    sn=sn->next;
+    if (sn->lang == lang)
+      break;
+    sn = sn->next;
   }
   if (!sn) {
-    quicklist * ql;
+    quicklist *ql;
+
     int qi;
 
-    sn = (local_names *)calloc(sizeof(local_names), 1);
+    sn = (local_names *) calloc(sizeof(local_names), 1);
     sn->next = snames;
     sn->lang = lang;
 
-    for (qi=0,ql=shiptypes;ql;ql_advance(&ql, &qi, 1)) {
-      ship_type * stype = (ship_type *)ql_get(ql, qi);
+    for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
+      ship_type *stype = (ship_type *) ql_get(ql, qi);
+
       variant var;
-      const char * n = locale_string(lang, stype->name[0]);
-      var.v = (void*)stype;
+
+      const char *n = locale_string(lang, stype->name[0]);
+
+      var.v = (void *)stype;
       addtoken(&sn->names, n, var);
     }
     snames = sn;
   }
-  if (findtoken(&sn->names, name, &var)==E_TOK_NOMATCH) return NULL;
-  return (const ship_type*)var.v;
+  if (findtoken(&sn->names, name, &var) == E_TOK_NOMATCH)
+    return NULL;
+  return (const ship_type *)var.v;
 }
 
-const ship_type *
-st_find(const char* name)
+const ship_type *st_find(const char *name)
 {
-  quicklist * ql;
+  quicklist *ql;
+
   int qi;
-  
-  for (qi=0,ql=shiptypes;ql;ql_advance(&ql, &qi, 1)) {
-    ship_type * stype = (ship_type *)ql_get(ql, qi);
-    if (strcmp(stype->name[0], name)==0) {
+
+  for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
+    ship_type *stype = (ship_type *) ql_get(ql, qi);
+
+    if (strcmp(stype->name[0], name) == 0) {
       return stype;
     }
   }
   return NULL;
 }
 
-void
-st_register(const ship_type * type) {
+void st_register(const ship_type * type)
+{
   ql_push(&shiptypes, (void *)type);
 }
 
 #define SMAXHASH 7919
 ship *shiphash[SMAXHASH];
-void
-shash(ship * s)
+
+void shash(ship * s)
 {
   ship *old = shiphash[s->no % SMAXHASH];
 
@@ -112,8 +119,7 @@ shash(ship * s)
   s->nexthash = old;
 }
 
-void
-sunhash(ship * s)
+void sunhash(ship * s)
 {
   ship **show;
 
@@ -128,8 +134,7 @@ sunhash(ship * s)
   }
 }
 
-static ship *
-sfindhash(int i)
+static ship *sfindhash(int i)
 {
   ship *old;
 
@@ -139,16 +144,14 @@ sfindhash(int i)
   return 0;
 }
 
-struct ship *
-findship(int i)
+struct ship *findship(int i)
 {
   return sfindhash(i);
 }
 
-struct ship *
-findshipr(const region *r, int n)
+struct ship *findshipr(const region * r, int n)
 {
-  ship * sh;
+  ship *sh;
 
   for (sh = r->ships; sh; sh = sh->next) {
     if (sh->no == n) {
@@ -159,31 +162,31 @@ findshipr(const region *r, int n)
   return 0;
 }
 
-void
-damage_ship(ship * sh, double percent)
+void damage_ship(ship * sh, double percent)
 {
-  double damage = DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
+  double damage =
+    DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage;
   sh->damage = (int)damage;
 }
 
-unit *
-captain(ship *sh)
+unit *captain(ship * sh)
 {
   unit *u;
 
-  for(u = sh->region->units; u; u = u->next)
-    if(u->ship == sh && fval(u, UFL_OWNER)) return u;
+  for (u = sh->region->units; u; u = u->next)
+    if (u->ship == sh && fval(u, UFL_OWNER))
+      return u;
 
   return NULL;
 }
 
 /* Alte Schiffstypen: */
-static ship * deleted_ships;
+static ship *deleted_ships;
 
-ship *
-new_ship(const ship_type * stype, const struct locale * lang, region * r)
+ship *new_ship(const ship_type * stype, const struct locale *lang, region * r)
 {
   static char buffer[7 + IDSIZE + 1];
+
   ship *sh = (ship *) calloc(1, sizeof(ship));
 
   assert(stype);
@@ -200,11 +203,11 @@ new_ship(const ship_type * stype, const struct locale * lang, region * r)
   return sh;
 }
 
-void
-remove_ship(ship ** slist, ship * sh)
+void remove_ship(ship ** slist, ship * sh)
 {
-  region * r = sh->region;
-  unit * u = r->units;
+  region *r = sh->region;
+
+  unit *u = r->units;
 
   handle_event(sh->attribs, "destroy", sh);
   while (u) {
@@ -214,7 +217,8 @@ remove_ship(ship ** slist, ship * sh)
     u = u->next;
   }
   sunhash(sh);
-  while (*slist && *slist!=sh) slist = &(*slist)->next;
+  while (*slist && *slist != sh)
+    slist = &(*slist)->next;
   assert(*slist);
   *slist = sh->next;
   sh->next = deleted_ships;
@@ -222,51 +226,53 @@ remove_ship(ship ** slist, ship * sh)
   sh->region = NULL;
 }
 
-void
-free_ship(ship * s)
+void free_ship(ship * s)
 {
-  while (s->attribs) a_remove(&s->attribs, s->attribs);
+  while (s->attribs)
+    a_remove(&s->attribs, s->attribs);
   free(s->name);
   free(s->display);
   free(s);
 }
 
-void
-free_ships(void)
+void free_ships(void)
 {
   while (deleted_ships) {
-    ship * s = deleted_ships;
+    ship *s = deleted_ships;
+
     deleted_ships = s->next;
   }
 }
 
-const char *
-write_shipname(const ship * sh, char * ibuf, size_t size)
+const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 {
   snprintf(ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
-  ibuf[size-1] = 0;
+  ibuf[size - 1] = 0;
   return ibuf;
 }
 
-const char *
-shipname(const ship * sh)
+const char *shipname(const ship * sh)
 {
   typedef char name[OBJECTIDSIZE + 1];
+
   static name idbuf[8];
+
   static int nextbuf = 0;
+
   char *ibuf = idbuf[(++nextbuf) % 8];
+
   return write_shipname(sh, ibuf, sizeof(name));
 }
 
-int
-shipcapacity (const ship * sh)
+int shipcapacity(const ship * sh)
 {
   int i = sh->type->cargo;
 
   /* sonst ist construction:: size nicht ship_type::maxsize */
-  assert(!sh->type->construction || sh->type->construction->improvement==NULL);
+  assert(!sh->type->construction
+    || sh->type->construction->improvement == NULL);
 
-  if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
+  if (sh->type->construction && sh->size != sh->type->construction->maxsize)
     return 0;
 
 #ifdef SHIPDAMAGE
@@ -277,10 +283,9 @@ shipcapacity (const ship * sh)
   return i;
 }
 
-void
-getshipweight(const ship * sh, int *sweight, int *scabins)
+void getshipweight(const ship * sh, int *sweight, int *scabins)
 {
-  unit * u;
+  unit *u;
 
   *sweight = 0;
   *scabins = 0;
@@ -290,6 +295,7 @@ getshipweight(const ship * sh, int *sweight, int *scabins)
       *sweight += weight(u);
       if (sh->type->cabins) {
         int pweight = u->number * u->race->weight;
+
         /* weight goes into number of cabins, not cargo */
         *scabins += pweight;
         *sweight -= pweight;
@@ -298,15 +304,15 @@ getshipweight(const ship * sh, int *sweight, int *scabins)
   }
 }
 
-unit *
-shipowner(const ship * sh)
+unit *shipowner(const ship * sh)
 {
   unit *u;
+
   unit *first = NULL;
 
-        const region * r = sh->region;
+  const region *r = sh->region;
 
-        /* Prüfen ob Eigentümer am leben. */
+  /* Prüfen ob Eigentümer am leben. */
   for (u = r->units; u; u = u->next) {
     if (u->ship == sh) {
       if (!first && u->number > 0)
@@ -326,22 +332,21 @@ shipowner(const ship * sh)
   return first;
 }
 
-void
-write_ship_reference(const struct ship * sh, struct storage * store)
+void write_ship_reference(const struct ship *sh, struct storage *store)
 {
-  store->w_id(store, (sh && sh->region)?sh->no:0);
+  store->w_id(store, (sh && sh->region) ? sh->no : 0);
 }
 
-void
-ship_setname(ship * self, const char * name)
+void ship_setname(ship * self, const char *name)
 {
   free(self->name);
-  if (name) self->name = strdup(name);
-  else self->name = NULL;
+  if (name)
+    self->name = strdup(name);
+  else
+    self->name = NULL;
 }
 
-const char *
-ship_getname(const ship * self)
+const char *ship_getname(const ship * self)
 {
   return self->name;
 }

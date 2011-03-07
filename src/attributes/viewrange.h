@@ -22,14 +22,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_viewrange;
+  extern struct attrib_type at_viewrange;
 
-extern struct attrib * make_viewrange(const char *function);
-extern struct attrib * add_viewrange(struct attrib ** alist, const char *function);
-extern void init_viewrange(void);
+  extern struct attrib *make_viewrange(const char *function);
+  extern struct attrib *add_viewrange(struct attrib **alist,
+    const char *function);
+  extern void init_viewrange(void);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

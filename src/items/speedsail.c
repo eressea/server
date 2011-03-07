@@ -38,20 +38,23 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 
 static int
-use_speedsail(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+use_speedsail(struct unit *u, const struct item_type *itype, int amount,
+  struct order *ord)
 {
-  struct plane * p = rplane(u->region);
+  struct plane *p = rplane(u->region);
+
   unused(amount);
   unused(itype);
-  if (p!=NULL) {
+  if (p != NULL) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
   } else {
     if (u->ship) {
-      attrib * a = a_find(u->ship->attribs, &at_speedup);
-      if (a==NULL) {
+      attrib *a = a_find(u->ship->attribs, &at_speedup);
+
+      if (a == NULL) {
         a = a_add(&u->ship->attribs, a_new(&at_speedup));
-        a->data.sa[0] = 50; /* speed */
-        a->data.sa[1] = 50; /* decay */
+        a->data.sa[0] = 50;     /* speed */
+        a->data.sa[1] = 50;     /* decay */
         ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit", u));
         /* Ticket abziehen */
         i_change(&u->items, itype, -1);
@@ -66,8 +69,7 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
   return EUNUSABLE;
 }
 
-void
-register_speedsail(void)
+void register_speedsail(void)
 {
   register_item_use(use_speedsail, "use_speedsail");
 }

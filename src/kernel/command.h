@@ -16,22 +16,24 @@
 extern "C" {
 #endif
 
-struct tnode;
-struct locale;
-struct order;
+  struct tnode;
+  struct locale;
+  struct order;
 
-typedef struct syntaxtree {
-	const struct locale * lang;
-	struct tnode * root;
-	struct syntaxtree * next;
-} syntaxtree;
+  typedef struct syntaxtree {
+    const struct locale *lang;
+    struct tnode *root;
+    struct syntaxtree *next;
+  } syntaxtree;
 
-typedef void (*parser)(const struct tnode *, void *, struct order*);
-extern void add_command(struct tnode * troot, struct tnode * tnext, const char * str, parser fun);
-extern void do_command(const struct tnode * troot, void * u, struct order *);
+  typedef void (*parser) (const struct tnode *, void *, struct order *);
+  extern void add_command(struct tnode *troot, struct tnode *tnext,
+    const char *str, parser fun);
+  extern void do_command(const struct tnode *troot, void *u, struct order *);
 
-extern struct syntaxtree * stree_create(void);
-extern struct tnode * stree_find(const struct syntaxtree * stree, const struct locale * lang);
+  extern struct syntaxtree *stree_create(void);
+  extern struct tnode *stree_find(const struct syntaxtree *stree,
+    const struct locale *lang);
 
 #ifdef __cplusplus
 }

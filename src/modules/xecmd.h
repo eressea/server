@@ -17,11 +17,10 @@ extern "C" {
 #endif
 
 #if XECMD_MODULE
-int xecmd(struct unit * u, struct order * ord);
+  int xecmd(struct unit *u, struct order *ord);
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

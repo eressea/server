@@ -28,17 +28,20 @@ without prior permission by the authors of Eressea.
 
 #include <assert.h>
 
-static int
-tolua_hashtable_get(lua_State* L)
+static int tolua_hashtable_get(lua_State * L)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-  const char * name = tolua_tostring(L, 2, 0);
-  attrib * a = a_find(*self, &at_object);
+
+  const char *name = tolua_tostring(L, 2, 0);
+
+  attrib *a = a_find(*self, &at_object);
 
   for (; a && a->type == &at_object; a = a->next) {
-    const char * obj_name = object_name(a);
+    const char *obj_name = object_name(a);
+
     if (obj_name && name && strcmp(obj_name, name) == 0) {
       variant val;
+
       object_type type;
 
       object_get(a, &type, &val);
@@ -47,10 +50,10 @@ tolua_hashtable_get(lua_State* L)
           lua_pushnil(L);
           break;
         case TINTEGER:
-          lua_pushnumber(L, (lua_Number)val.i);
+          lua_pushnumber(L, (lua_Number) val.i);
           break;
         case TREAL:
-          lua_pushnumber(L, (lua_Number)val.f);
+          lua_pushnumber(L, (lua_Number) val.f);
           break;
         case TREGION:
           tolua_pushusertype(L, val.v, TOLUA_CAST "region");
@@ -65,7 +68,7 @@ tolua_hashtable_get(lua_State* L)
           tolua_pushusertype(L, val.v, TOLUA_CAST "ship");
           break;
         case TSTRING:
-          tolua_pushstring(L, (const char*) val.v);
+          tolua_pushstring(L, (const char *)val.v);
           break;
         default:
           assert(!"not implemented");
@@ -77,15 +80,18 @@ tolua_hashtable_get(lua_State* L)
   return 1;
 }
 
-static int
-tolua_hashtable_set_number(lua_State* L)
+static int tolua_hashtable_set_number(lua_State * L)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-  const char * name = tolua_tostring(L, 2, 0);
+
+  const char *name = tolua_tostring(L, 2, 0);
+
   lua_Number value = tolua_tonumber(L, 3, 0);
-  attrib * a = a_find(*self, &at_object);
+
+  attrib *a = a_find(*self, &at_object);
+
   variant val;
-  
+
   val.f = (float)value;
 
   for (; a && a->type == &at_object; a = a->next) {
@@ -99,13 +105,16 @@ tolua_hashtable_set_number(lua_State* L)
   return 0;
 }
 
-static int
-tolua_hashtable_set_string(lua_State* L)
+static int tolua_hashtable_set_string(lua_State * L)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-  const char * name = tolua_tostring(L, 2, 0);
-  const char * value = tolua_tostring(L, 3, 0);
-  attrib * a = a_find(*self, &at_object);
+
+  const char *name = tolua_tostring(L, 2, 0);
+
+  const char *value = tolua_tostring(L, 3, 0);
+
+  attrib *a = a_find(*self, &at_object);
+
   variant val;
 
   val.v = strdup(value);
@@ -121,13 +130,16 @@ tolua_hashtable_set_string(lua_State* L)
   return 0;
 }
 
-static int
-tolua_hashtable_set_usertype(lua_State* L, int type)
+static int tolua_hashtable_set_usertype(lua_State * L, int type)
 {
   hashtable self = (hashtable) tolua_tousertype(L, 1, 0);
-  const char * name = tolua_tostring(L, 2, 0);
-  unit * value = tolua_tousertype(L, 3, 0);
-  attrib * a = a_find(*self, &at_object);
+
+  const char *name = tolua_tostring(L, 2, 0);
+
+  unit *value = tolua_tousertype(L, 3, 0);
+
+  attrib *a = a_find(*self, &at_object);
+
   variant val;
 
   val.v = value;
@@ -144,10 +156,10 @@ tolua_hashtable_set_usertype(lua_State* L, int type)
 }
 
 
-static int
-tolua_hashtable_set(lua_State* L)
+static int tolua_hashtable_set(lua_State * L)
 {
   tolua_Error tolua_err;
+
   if (tolua_isnumber(L, 3, 0, &tolua_err)) {
     return tolua_hashtable_set_number(L);
   } else if (tolua_isusertype(L, 3, TOLUA_CAST "unit", 0, &tolua_err)) {
@@ -166,8 +178,7 @@ tolua_hashtable_set(lua_State* L)
 
 
 
-void
-tolua_hashtable_open(lua_State* L)
+void tolua_hashtable_open(lua_State * L)
 {
   /* register user types */
   tolua_usertype(L, TOLUA_CAST "hashtable");
@@ -175,7 +186,8 @@ tolua_hashtable_open(lua_State* L)
   tolua_module(L, NULL, 0);
   tolua_beginmodule(L, NULL);
   {
-    tolua_cclass(L, TOLUA_CAST "hashtable", TOLUA_CAST "hashtable", TOLUA_CAST "", NULL);
+    tolua_cclass(L, TOLUA_CAST "hashtable", TOLUA_CAST "hashtable",
+      TOLUA_CAST "", NULL);
     tolua_beginmodule(L, TOLUA_CAST "hashtable");
     {
       tolua_function(L, TOLUA_CAST "get", tolua_hashtable_get);

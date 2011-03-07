@@ -41,74 +41,73 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 
 typedef struct removecurse_data {
-	curse * curse;
-	unit * target;
+  curse *curse;
+  unit *target;
 } removecurse_data;
 
-static void
-removecurse_init(trigger * t)
+static void removecurse_init(trigger * t)
 {
-	t->data.v = calloc(sizeof(removecurse_data), 1);
+  t->data.v = calloc(sizeof(removecurse_data), 1);
 }
 
-static void
-removecurse_free(trigger * t)
+static void removecurse_free(trigger * t)
 {
-	free(t->data.v);
+  free(t->data.v);
 }
 
-static int
-removecurse_handle(trigger * t, void * data)
+static int removecurse_handle(trigger * t, void *data)
 {
   /* call an event handler on removecurse.
-  * data.v -> ( variant event, int timer )
-  */
-  removecurse_data * td = (removecurse_data*)t->data.v;
+   * data.v -> ( variant event, int timer )
+   */
+  removecurse_data *td = (removecurse_data *) t->data.v;
+
   if (td->curse && td->target) {
-    attrib * a = a_select(td->target->attribs, td->curse, cmp_curse);
+    attrib *a = a_select(td->target->attribs, td->curse, cmp_curse);
+
     if (a) {
       a_remove(&td->target->attribs, a);
-    }
-    else log_error(("could not perform removecurse::handle()\n"));
+    } else
+      log_error(("could not perform removecurse::handle()\n"));
   }
   unused(data);
   return 0;
 }
 
-static void
-removecurse_write(const trigger * t, struct storage * store)
+static void removecurse_write(const trigger * t, struct storage *store)
 {
-	removecurse_data * td = (removecurse_data*)t->data.v;
-	store->w_tok(store, td->target?itoa36(td->target->no):0);
-	store->w_int(store, td->curse?td->curse->no:0);
+  removecurse_data *td = (removecurse_data *) t->data.v;
+
+  store->w_tok(store, td->target ? itoa36(td->target->no) : 0);
+  store->w_int(store, td->curse ? td->curse->no : 0);
 }
 
-static int
-removecurse_read(trigger * t, struct storage * store)
+static int removecurse_read(trigger * t, struct storage *store)
 {
-  removecurse_data * td = (removecurse_data*)t->data.v;
+  removecurse_data *td = (removecurse_data *) t->data.v;
 
   read_reference(&td->target, store, read_unit_reference, resolve_unit);
   read_reference(&td->curse, store, read_int, resolve_curse);
-  
+
   return AT_READ_OK;
 }
 
 trigger_type tt_removecurse = {
-	"removecurse",
-	removecurse_init,
-	removecurse_free,
-	removecurse_handle,
-	removecurse_write,
-	removecurse_read
+  "removecurse",
+  removecurse_init,
+  removecurse_free,
+  removecurse_handle,
+  removecurse_write,
+  removecurse_read
 };
 
-trigger *
-trigger_removecurse(curse * c, unit * target)
+trigger *trigger_removecurse(curse * c, unit * target)
 {
-	trigger * t = t_new(&tt_removecurse);
-	removecurse_data * td = (removecurse_data*)t->data.v;
-	td->curse = c;
-	td->target = target;
-	return t;
+  trigger *t = t_new(&tt_removecurse);
+
+  removecurse_data *td = (removecurse_data *) t->data.v;
+
+  td->curse = c;
+  td->target = target;
+  return t;
 }

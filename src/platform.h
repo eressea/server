@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # define WIN32_LEAN_AND_MEAN
 # include <Windows.h>
 # undef MOUSE_MOVED
-# define STDIO_CP 1252 /* log.c, convert to console character set */
+# define STDIO_CP 1252          /* log.c, convert to console character set */
 # pragma warning (disable: 4201 4214 4514 4115 4711)
 # pragma warning(disable: 4056)
 /* warning C4056: overflow in floating point constant arithmetic */
@@ -95,7 +95,7 @@ extern "C" {
 #  define __USE_BSD
 # endif
 /* # include <features.h> */
-# include <strings.h>	/* strncasecmp-Prototyp */
+# include <strings.h>           /* strncasecmp-Prototyp */
 #endif
 
 #ifdef _BSD_SOURCE
@@ -115,10 +115,11 @@ extern "C" {
 # define HAVE_ACCESS
 # define HAVE_STAT
 typedef struct stat stat_type;
+
 # include <string.h>
 # define HAVE_STRDUP
 # define HAVE_SNPRINTF
-#ifdef _POSIX_SOURCE /* MINGW doesn't seem to have these */
+#ifdef _POSIX_SOURCE            /* MINGW doesn't seem to have these */
 # define HAVE_EXECINFO
 # define HAVE_SIGACTION
 # define HAVE_LINK
@@ -129,9 +130,9 @@ typedef struct stat stat_type;
 /* TinyCC */
 #ifdef TINYCC
 # undef HAVE_INLINE
-# define INLINE_FUNCTION  
+# define INLINE_FUNCTION
 #endif
-  
+
 /* lcc-win32 */
 #ifdef __LCC__
 # include <string.h>
@@ -140,6 +141,7 @@ typedef struct stat stat_type;
 # define HAVE_ACCESS
 # define HAVE_STAT
 typedef struct stat stat_type;
+
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
 # define HAVE_STRDUP
@@ -153,7 +155,7 @@ typedef struct stat stat_type;
 
 /* Microsoft Visual C */
 #ifdef _MSC_VER
-# include <string.h> /* must be included here so strdup is not redefined */
+# include <string.h>            /* must be included here so strdup is not redefined */
 # define R_OK 4
 # define HAVE_INLINE
 # define INLINE_FUNCTION __inline
@@ -205,7 +207,7 @@ typedef struct _stat stat_type;
 #endif
 
 #ifndef HAVE_STRDUP
-extern char * strdup(const char *s);
+extern char *strdup(const char *s);
 #endif
 
 #ifndef HAVE_SLEEP
@@ -235,9 +237,9 @@ extern char * strdup(const char *s);
 # define MAX(a,b) ((a) > (b) ? (a) : (b))
 #endif
 #endif
-   
+
 #if defined (__GNUC__)
-# define unused(a) /* unused: a */
+# define unused(a)              /* unused: a */
 #elif defined (ghs) || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
 # define unused(a) do {/* null */} while (&a == 0)
 #else /* ghs || __GNUC__ || ..... */
@@ -250,7 +252,7 @@ extern char * strdup(const char *s);
 #if defined(BOOLEAN)
 # define boolean BOOLEAN
 #else
-  typedef int boolean; /* not bool! wrong size. */
+typedef int boolean;            /* not bool! wrong size. */
 #endif
 #ifndef __cplusplus
 # define false ((boolean)0)
@@ -269,4 +271,3 @@ extern char * strdup(const char *s);
 
 #define TOLUA_CAST (char*)
 #endif
-

@@ -24,14 +24,13 @@ extern "C" {
 
   struct lua_State;
 
-  extern int lua_console(struct lua_State * L);
-  extern int lua_do(struct lua_State * L);
+  extern int lua_console(struct lua_State *L);
+  extern int lua_do(struct lua_State *L);
 
-  typedef int (*readline)(struct lua_State *, char *, size_t, const char *);
+  typedef int (*readline) (struct lua_State *, char *, size_t, const char *);
   extern void set_readline(readline foo);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

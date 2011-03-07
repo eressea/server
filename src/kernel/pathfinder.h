@@ -24,17 +24,25 @@ extern "C" {
 
 #define MAXDEPTH 1024
 
-extern int search[MAXDEPTH][2];
-extern int search_len;
+  extern int search[MAXDEPTH][2];
+  extern int search_len;
 
-extern struct region ** path_find(struct region *start, const struct region *target, int maxlen, boolean (*allowed)(const struct region*, const struct region*));
-extern boolean path_exists(struct region *start, const struct region *target, int maxlen, boolean (*allowed)(const struct region*, const struct region*));
-extern boolean allowed_swim(const struct region * src, const struct region * target);
-extern boolean allowed_fly(const struct region * src, const struct region * target);
-extern boolean allowed_walk(const struct region * src, const struct region * target);
-extern struct region_list * regions_in_range(struct region * src, int maxdist, boolean (*allowed)(const struct region*, const struct region*));
+  extern struct region **path_find(struct region *start,
+    const struct region *target, int maxlen,
+    boolean(*allowed) (const struct region *, const struct region *));
+  extern boolean path_exists(struct region *start, const struct region *target,
+    int maxlen, boolean(*allowed) (const struct region *,
+      const struct region *));
+  extern boolean allowed_swim(const struct region *src,
+    const struct region *target);
+  extern boolean allowed_fly(const struct region *src,
+    const struct region *target);
+  extern boolean allowed_walk(const struct region *src,
+    const struct region *target);
+  extern struct region_list *regions_in_range(struct region *src, int maxdist,
+    boolean(*allowed) (const struct region *, const struct region *));
 
-extern void pathfinder_cleanup(void);
+  extern void pathfinder_cleanup(void);
 
 #ifdef __cplusplus
 }

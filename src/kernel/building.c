@@ -23,7 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "item.h"
-#include "curse.h" /* für C_NOCOST */
+#include "curse.h"              /* für C_NOCOST */
 #include "unit.h"
 #include "faction.h"
 #include "region.h"
@@ -52,111 +52,120 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* attributes includes */
 #include <attributes/matmod.h>
 
-static const char * NULLSTRING = "(null)";
+static const char *NULLSTRING = "(null)";
 
-static void 
-lc_init(struct attrib *a)
+static void lc_init(struct attrib *a)
 {
   a->data.v = calloc(1, sizeof(building_action));
 }
 
-static void 
-lc_done(struct attrib *a)
+static void lc_done(struct attrib *a)
 {
-  building_action * data = (building_action*)a->data.v;
-  if (data->fname) free(data->fname);
-  if (data->param) free(data->param);
+  building_action *data = (building_action *) a->data.v;
+
+  if (data->fname)
+    free(data->fname);
+  if (data->param)
+    free(data->param);
   free(data);
 }
 
-static void 
-lc_write(const struct attrib * a, const void * owner, struct storage * store)
+static void
+lc_write(const struct attrib *a, const void *owner, struct storage *store)
 {
-  building_action * data = (building_action*)a->data.v;
-  const char * fname = data->fname;
-  const char * fparam = data->param;
-  building * b = data->b;
+  building_action *data = (building_action *) a->data.v;
+
+  const char *fname = data->fname;
+
+  const char *fparam = data->param;
+
+  building *b = data->b;
 
   write_building_reference(b, store);
   store->w_tok(store, fname);
-  store->w_tok(store, fparam?fparam:NULLSTRING);
+  store->w_tok(store, fparam ? fparam : NULLSTRING);
 }
 
-static int
-lc_read(struct attrib * a, void * owner, struct storage * store)
+static int lc_read(struct attrib *a, void *owner, struct storage *store)
 {
-  building_action * data = (building_action*)a->data.v;
-  int result = read_reference(&data->b, store, read_building_reference, resolve_building);
-  if (store->version<UNICODE_VERSION) {
+  building_action *data = (building_action *) a->data.v;
+
+  int result =
+    read_reference(&data->b, store, read_building_reference, resolve_building);
+  if (store->version < UNICODE_VERSION) {
     data->fname = store->r_str(store);
   } else {
     data->fname = store->r_tok(store);
   }
-  if (store->version>=BACTION_VERSION) {
+  if (store->version >= BACTION_VERSION) {
     char lbuf[256];
-    if (store->version<UNICODE_VERSION) {
+
+    if (store->version < UNICODE_VERSION) {
       store->r_str_buf(store, lbuf, sizeof(lbuf));
     } else {
       store->r_tok_buf(store, lbuf, sizeof(lbuf));
     }
-    if (strcmp(lbuf, NULLSTRING)==0) data->param = NULL;
-    else data->param = strdup(lbuf);
+    if (strcmp(lbuf, NULLSTRING) == 0)
+      data->param = NULL;
+    else
+      data->param = strdup(lbuf);
   } else {
     data->param = strdup(NULLSTRING);
   }
-  if (result==0 && !data->b) {
+  if (result == 0 && !data->b) {
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
 
 attrib_type at_building_action = {
-  "lcbuilding", 
-  lc_init, lc_done, 
-  NULL, 
+  "lcbuilding",
+  lc_init, lc_done,
+  NULL,
   lc_write, lc_read
 };
 
 typedef struct building_typelist {
-  struct building_typelist * next;
-  building_type * type;
+  struct building_typelist *next;
+  building_type *type;
 } building_typelist;
 
 static building_typelist *buildingtypes;
 
-building_type *
-bt_find(const char* name)
+building_type *bt_find(const char *name)
 {
-  const struct building_typelist * btl = buildingtypes;
+  const struct building_typelist *btl = buildingtypes;
+
   assert(name);
-  while (btl && strcmp(btl->type->_name, name)) btl = btl->next;
-  if (btl==NULL) {
+  while (btl && strcmp(btl->type->_name, name))
+    btl = btl->next;
+  if (btl == NULL) {
     return NULL;
   }
   return btl->type;
 }
 
-void
-bt_register(building_type * type)
+void bt_register(building_type * type)
 {
-	struct building_typelist * btl = malloc(sizeof(building_type));
-	if (type->init) type->init(type);
-	btl->type = type;
-	btl->next = buildingtypes;
-	buildingtypes = btl;
+  struct building_typelist *btl = malloc(sizeof(building_type));
+
+  if (type->init)
+    type->init(type);
+  btl->type = type;
+  btl->next = buildingtypes;
+  buildingtypes = btl;
 }
 
-int
-buildingcapacity(const building * b)
+int buildingcapacity(const building * b)
 {
-  if (b->type->capacity>=0) {
-    if (b->type->maxcapacity>=0) {
+  if (b->type->capacity >= 0) {
+    if (b->type->maxcapacity >= 0) {
       return MIN(b->type->maxcapacity, b->size * b->type->capacity);
     }
     return b->size * b->type->capacity;
   }
-  if (b->size>=b->type->maxsize) {
-    if (b->type->maxcapacity>=0) {
+  if (b->size >= b->type->maxsize) {
+    if (b->type->maxcapacity >= 0) {
       return b->type->maxcapacity;
     }
   }
@@ -164,15 +173,18 @@ buildingcapacity(const building * b)
 }
 
 attrib_type at_building_generic_type = {
-	  "building_generic_type", NULL, NULL, NULL, a_writestring, a_readstring, ATF_UNIQUE
+  "building_generic_type", NULL, NULL, NULL, a_writestring, a_readstring,
+    ATF_UNIQUE
 };
 
-const char *
-buildingtype(const building_type * btype, const building * b, int bsize)
+const char *buildingtype(const building_type * btype, const building * b,
+  int bsize)
 {
-  const char * s = NULL;
+  const char *s = NULL;
+
   static boolean init_generic = false;
-  static const struct building_type * bt_generic;
+
+  static const struct building_type *bt_generic;
 
   if (!init_generic) {
     init_generic = true;
@@ -181,18 +193,22 @@ buildingtype(const building_type * btype, const building * b, int bsize)
 
   if (btype == bt_generic) {
     const attrib *a = a_find(b->attribs, &at_building_generic_type);
-    if (a) s = (const char*)a->data.v;
+
+    if (a)
+      s = (const char *)a->data.v;
   }
 
-  if (btype->name) s = btype->name(btype, b, bsize);
-  if (s==NULL) s = btype->_name;
+  if (btype->name)
+    s = btype->name(btype, b, bsize);
+  if (s == NULL)
+    s = btype->_name;
   return s;
 }
 
 #define BMAXHASH 7919
 static building *buildhash[BMAXHASH];
-void
-bhash(building * b)
+
+void bhash(building * b)
 {
   building *old = buildhash[b->no % BMAXHASH];
 
@@ -200,8 +216,7 @@ bhash(building * b)
   b->nexthash = old;
 }
 
-void
-bunhash(building * b)
+void bunhash(building * b)
 {
   building **show;
 
@@ -216,58 +231,59 @@ bunhash(building * b)
   }
 }
 
-static building *
-bfindhash(int i)
+static building *bfindhash(int i)
 {
-	building *old;
+  building *old;
 
-	for (old = buildhash[i % BMAXHASH]; old; old = old->nexthash)
-		if (old->no == i)
-			return old;
-	return 0;
+  for (old = buildhash[i % BMAXHASH]; old; old = old->nexthash)
+    if (old->no == i)
+      return old;
+  return 0;
 }
 
-building *
-findbuilding(int i)
+building *findbuilding(int i)
 {
-	return bfindhash(i);
+  return bfindhash(i);
 }
+
 /* ** old building types ** */
 
 
-static int
-sm_smithy(const unit * u, const region * r, skill_t sk, int value) /* skillmod */
-{
-	if (sk==SK_WEAPONSMITH || sk==SK_ARMORER) {
-		if (u->region == r) return value + 1;
-	}
-	return value;
-}
-static int
-mm_smithy(const unit * u, const resource_type * rtype, int value) /* material-mod */
-{
-	if (rtype == oldresourcetype[R_IRON]) return value * 2;
-	return value;
-}
-static void
-init_smithy(struct building_type * bt)
-{
-	a_add(&bt->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 1.0, 0));
-	a_add(&bt->attribs, make_matmod(mm_smithy));
+static int sm_smithy(const unit * u, const region * r, skill_t sk, int value)
+{                               /* skillmod */
+  if (sk == SK_WEAPONSMITH || sk == SK_ARMORER) {
+    if (u->region == r)
+      return value + 1;
+  }
+  return value;
 }
 
-static const char *
-castle_name_i(const struct building_type* btype, const struct building * b, int bsize, const char * fname[])
+static int mm_smithy(const unit * u, const resource_type * rtype, int value)
+{                               /* material-mod */
+  if (rtype == oldresourcetype[R_IRON])
+    return value * 2;
+  return value;
+}
+
+static void init_smithy(struct building_type *bt)
+{
+  a_add(&bt->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 1.0,
+      0));
+  a_add(&bt->attribs, make_matmod(mm_smithy));
+}
+
+static const char *castle_name_i(const struct building_type *btype,
+  const struct building *b, int bsize, const char *fname[])
 {
   int i = bt_effsize(btype, b, bsize);
 
   return fname[i];
 }
 
-static const char *
-castle_name_2(const struct building_type* btype, const struct building * b, int bsize)
+static const char *castle_name_2(const struct building_type *btype,
+  const struct building *b, int bsize)
 {
-  const char * fname[] = {
+  const char *fname[] = {
     "site",
     "fortification",
     "tower",
@@ -278,10 +294,10 @@ castle_name_2(const struct building_type* btype, const struct building * b, int 
   return castle_name_i(btype, b, bsize, fname);
 }
 
-static const char *
-castle_name(const struct building_type* btype, const struct building * b, int bsize)
+static const char *castle_name(const struct building_type *btype,
+  const struct building *b, int bsize)
 {
-  const char * fname[] = {
+  const char *fname[] = {
     "site",
     "tradepost",
     "fortification",
@@ -293,10 +309,10 @@ castle_name(const struct building_type* btype, const struct building * b, int bs
   return castle_name_i(btype, b, bsize, fname);
 }
 
-static const char *
-fort_name(const struct building_type* btype, const struct building * b, int bsize)
+static const char *fort_name(const struct building_type *btype,
+  const struct building *b, int bsize)
 {
-  const char * fname[] = {
+  const char *fname[] = {
     "scaffolding",
     "guardhouse",
     "guardtower",
@@ -306,18 +322,19 @@ fort_name(const struct building_type* btype, const struct building * b, int bsiz
 
 #ifdef WDW_PYRAMID
 
-static const char *
-pyramid_name(const struct building_type* btype, int bsize)
+static const char *pyramid_name(const struct building_type *btype, int bsize)
 {
   static char p_name_buf[32];
-  int level=0;
-  const construction * ctype;
+
+  int level = 0;
+
+  const construction *ctype;
 
   ctype = btype->construction;
-  
-	while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
-    bsize-=ctype->maxsize;
-    ctype=ctype->improvement;
+
+  while (ctype && ctype->maxsize != -1 && ctype->maxsize <= bsize) {
+    bsize -= ctype->maxsize;
+    ctype = ctype->improvement;
     ++level;
   }
 
@@ -326,20 +343,19 @@ pyramid_name(const struct building_type* btype, int bsize)
   return p_name_buf;
 }
 
-int
-wdw_pyramid_level(const struct building *b)
+int wdw_pyramid_level(const struct building *b)
 {
   const construction *ctype = b->type->construction;
+
   int completed = b->size;
+
   int level = 0;
 
-  while(ctype->improvement != NULL &&
-      ctype->improvement != ctype &&
-      ctype->maxsize > 0 &&
-      ctype->maxsize <= completed)
-  {
+  while (ctype->improvement != NULL &&
+    ctype->improvement != ctype &&
+    ctype->maxsize > 0 && ctype->maxsize <= completed) {
     ++level;
-    completed-=ctype->maxsize;
+    completed -= ctype->maxsize;
     ctype = ctype->improvement;
   }
 
@@ -349,114 +365,125 @@ wdw_pyramid_level(const struct building *b)
 
 /* for finding out what was meant by a particular building string */
 
-static local_names * bnames;
+static local_names *bnames;
 
-const building_type *
-findbuildingtype(const char * name, const struct locale * lang)
+const building_type *findbuildingtype(const char *name,
+  const struct locale *lang)
 {
   variant type;
-	local_names * bn = bnames;
 
-	while (bn) {
-		if (bn->lang==lang) break;
-		bn=bn->next;
-	}
-	if (!bn) {
-		struct building_typelist * btl = buildingtypes;
-		bn = calloc(sizeof(local_names), 1);
-		bn->next = bnames;
-		bn->lang = lang;
-		while (btl) {
-			const char * n = locale_string(lang, btl->type->_name);
-      type.v = (void*)btl->type;
-			addtoken(&bn->names, n, type);
-			btl=btl->next;
-		}
-		bnames = bn;
-	}
-	if (findtoken(&bn->names, name, &type)==E_TOK_NOMATCH) return NULL;
-	return (const building_type*)type.v;
+  local_names *bn = bnames;
+
+  while (bn) {
+    if (bn->lang == lang)
+      break;
+    bn = bn->next;
+  }
+  if (!bn) {
+    struct building_typelist *btl = buildingtypes;
+
+    bn = calloc(sizeof(local_names), 1);
+    bn->next = bnames;
+    bn->lang = lang;
+    while (btl) {
+      const char *n = locale_string(lang, btl->type->_name);
+
+      type.v = (void *)btl->type;
+      addtoken(&bn->names, n, type);
+      btl = btl->next;
+    }
+    bnames = bn;
+  }
+  if (findtoken(&bn->names, name, &type) == E_TOK_NOMATCH)
+    return NULL;
+  return (const building_type *)type.v;
 }
 
 static int eressea_building_protection(building * b, unit * u)
 {
-  int beff = buildingeffsize(b, false)-1;
+  int beff = buildingeffsize(b, false) - 1;
+
   /* -1 because the tradepost has no protection value */
 
   return beff;
 }
 
-void
-register_buildings(void)
+void register_buildings(void)
 {
-  register_function((pf_generic)&eressea_building_protection, "eressea_building_protection");
-  register_function((pf_generic)&init_smithy, "init_smithy");
-  register_function((pf_generic)&castle_name, "castle_name");
-  register_function((pf_generic)&castle_name_2, "castle_name_2");
-  register_function((pf_generic)&fort_name, "fort_name");
+  register_function((pf_generic) & eressea_building_protection,
+    "eressea_building_protection");
+  register_function((pf_generic) & init_smithy, "init_smithy");
+  register_function((pf_generic) & castle_name, "castle_name");
+  register_function((pf_generic) & castle_name_2, "castle_name_2");
+  register_function((pf_generic) & fort_name, "fort_name");
 #ifdef WDW_PYRAMID
-  register_function((pf_generic)&pyramid_name, "pyramid_name");
+  register_function((pf_generic) & pyramid_name, "pyramid_name");
 #endif
 }
 
-void
-write_building_reference(const struct building * b, struct storage * store)
+void write_building_reference(const struct building *b, struct storage *store)
 {
-  store->w_id(store, (b && b->region)?b->no:0);
+  store->w_id(store, (b && b->region) ? b->no : 0);
 }
 
 
-int
-resolve_building(variant id, void * address)
+int resolve_building(variant id, void *address)
 {
   int result = 0;
-  building * b = NULL;
-  if (id.i!=0) {
+
+  building *b = NULL;
+
+  if (id.i != 0) {
     b = findbuilding(id.i);
-    if (b==NULL) {
+    if (b == NULL) {
       result = -1;
     }
   }
-  *(building**)address = b;
+  *(building **) address = b;
   return result;
 }
 
-variant
-read_building_reference(struct storage * store)
+variant read_building_reference(struct storage * store)
 {
   variant result;
+
   result.i = store->r_id(store);
   return result;
 }
 
-building *
-new_building(const struct building_type * btype, region * r, const struct locale * lang)
+building *new_building(const struct building_type * btype, region * r,
+  const struct locale * lang)
 {
-  building ** bptr = &r->buildings;
+  building **bptr = &r->buildings;
+
   building *b = (building *) calloc(1, sizeof(building));
+
   static boolean init_lighthouse = false;
-  static const struct building_type * bt_lighthouse = 0;
+
+  static const struct building_type *bt_lighthouse = 0;
 
   if (!init_lighthouse) {
     bt_lighthouse = bt_find("lighthouse");
     init_lighthouse = true;
   }
 
-  b->flags = BLD_WORKING|BLD_MAINTAINED;
-  b->no  = newcontainerid();
+  b->flags = BLD_WORKING | BLD_MAINTAINED;
+  b->no = newcontainerid();
   bhash(b);
-  
+
   b->type = btype;
   b->region = r;
-  while (*bptr) bptr=&(*bptr)->next;
+  while (*bptr)
+    bptr = &(*bptr)->next;
   *bptr = b;
-  
-  if (b->type==bt_lighthouse) {
+
+  if (b->type == bt_lighthouse) {
     r->flags |= RF_LIGHTHOUSE;
   }
   {
-    const char * bname;
-    if (b->type->name==NULL) {
+    const char *bname;
+
+    if (b->type->name == NULL) {
       bname = LOC(lang, btype->_name);
     } else {
       bname = LOC(lang, buildingtype(btype, b, 0));
@@ -466,17 +493,19 @@ new_building(const struct building_type * btype, region * r, const struct locale
   return b;
 }
 
-static building * deleted_buildings;
+static building *deleted_buildings;
 
 /** remove a building from the region.
  * remove_building lets units leave the building
  */
-void
-remove_building(building ** blist, building * b)
+void remove_building(building ** blist, building * b)
 {
   unit *u;
+
   direction_t d;
-  static const struct building_type * bt_caravan, * bt_dam, * bt_tunnel;
+
+  static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
+
   static boolean init = false;
 
   if (!init) {
@@ -489,45 +518,49 @@ remove_building(building ** blist, building * b)
   assert(bfindhash(b->no));
 
   handle_event(b->attribs, "destroy", b);
-  for (u=b->region->units; u; u=u->next) {
-    if (u->building == b) leave(u, true);
+  for (u = b->region->units; u; u = u->next) {
+    if (u->building == b)
+      leave(u, true);
   }
-  
+
   b->size = 0;
   update_lighthouse(b);
   bunhash(b);
-  
+
   /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
    * gebaute Straße zur Hälfte vernichtet */
   if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
-    region * r = b->region;
-    for (d=0;d!=MAXDIRECTIONS;++d) if (rroad(r, d) > 0) {
-      rsetroad(r, d, rroad(r, d) / 2);
-    }
+    region *r = b->region;
+
+    for (d = 0; d != MAXDIRECTIONS; ++d)
+      if (rroad(r, d) > 0) {
+        rsetroad(r, d, rroad(r, d) / 2);
+      }
   }
 
   /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
-  while (*blist && *blist!=b) blist = &(*blist)->next;
+  while (*blist && *blist != b)
+    blist = &(*blist)->next;
   *blist = b->next;
   b->region = NULL;
   b->next = deleted_buildings;
   deleted_buildings = b;
 }
 
-void
-free_building(building * b)
+void free_building(building * b)
 {
-  while (b->attribs) a_remove (&b->attribs, b->attribs);
+  while (b->attribs)
+    a_remove(&b->attribs, b->attribs);
   free(b->name);
   free(b->display);
   free(b);
 }
 
-void
-free_buildings(void)
+void free_buildings(void)
 {
   while (deleted_buildings) {
-    building * b = deleted_buildings;
+    building *b = deleted_buildings;
+
     deleted_buildings = b->next;
   }
 }
@@ -537,16 +570,17 @@ extern struct attrib_type at_icastle;
 /** returns the building's build stage (NOT size in people).
  * only makes sense for castles or similar buildings with multiple
  * stages */
-int
-buildingeffsize(const building * b, boolean img)
+int buildingeffsize(const building * b, boolean img)
 {
-  const struct building_type * btype = NULL;
+  const struct building_type *btype = NULL;
 
-  if (b==NULL) return 0;
+  if (b == NULL)
+    return 0;
 
   btype = b->type;
   if (img) {
-    const attrib * a = a_find(b->attribs, &at_icastle);
+    const attrib *a = a_find(b->attribs, &at_icastle);
+
     if (a) {
       btype = (const struct building_type *)a->data.v;
     }
@@ -557,11 +591,14 @@ buildingeffsize(const building * b, boolean img)
 int bt_effsize(const building_type * btype, const building * b, int bsize)
 {
   int i = bsize, n = 0;
-  const construction * cons = btype->construction;
+
+  const construction *cons = btype->construction;
 
   /* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
-  if (b && get_param_int(global.parameters, "rules.dwarf_castles", 1) && strcmp(btype->_name, "castle")==0) {
-    unit * u = building_owner(b);
+  if (b && get_param_int(global.parameters, "rules.dwarf_castles", 1)
+    && strcmp(btype->_name, "castle") == 0) {
+    unit *u = building_owner(b);
+
     if (u && u->faction->race == new_race[RC_HALFLING]) {
       i = bsize * 10 / 8;
     }
@@ -571,7 +608,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
     return 0;
   }
 
-  while (cons && cons->maxsize != -1 && i>=cons->maxsize) {
+  while (cons && cons->maxsize != -1 && i >= cons->maxsize) {
     i -= cons->maxsize;
     cons = cons->improvement;
     ++n;
@@ -580,30 +617,34 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
   return n;
 }
 
-const char *
-write_buildingname(const building * b, char * ibuf, size_t size)
+const char *write_buildingname(const building * b, char *ibuf, size_t size)
 {
-  snprintf((char*)ibuf, size, "%s (%s)", b->name, itoa36(b->no));
-  ibuf[size-1] = 0;
+  snprintf((char *)ibuf, size, "%s (%s)", b->name, itoa36(b->no));
+  ibuf[size - 1] = 0;
   return ibuf;
 }
 
-const char *
-buildingname(const building * b)
+const char *buildingname(const building * b)
 {
   typedef char name[OBJECTIDSIZE + 1];
+
   static name idbuf[8];
+
   static int nextbuf = 0;
+
   char *ibuf = idbuf[(++nextbuf) % 8];
+
   return write_buildingname(b, ibuf, sizeof(name));
 }
 
-unit *
-building_owner(const building * b)
+unit *building_owner(const building * b)
 {
   unit *u = NULL;
+
   unit *first = NULL;
-  region * r = b->region;
+
+  region *r = b->region;
+
   /* Prüfen ob Eigentümer am leben. */
 
   for (u = r->units; u; u = u->next) {
@@ -618,7 +659,7 @@ building_owner(const building * b)
   }
 
   /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
-  * nehmen. */
+   * nehmen. */
 
   if (first) {
     fset(first, UFL_OWNER);
@@ -626,23 +667,26 @@ building_owner(const building * b)
   return first;
 }
 
-const char * building_getname(const building * self)
+const char *building_getname(const building * self)
 {
   return self->name;
 }
 
-void building_setname(building * self, const char * name)
+void building_setname(building * self, const char *name)
 {
   free(self->name);
-  if (name) self->name = strdup(name);
-  else self->name = NULL;
+  if (name)
+    self->name = strdup(name);
+  else
+    self->name = NULL;
 }
 
-void
-building_addaction(building * b, const char * fname, const char * param)
+void building_addaction(building * b, const char *fname, const char *param)
 {
-  attrib * a = a_add(&b->attribs, a_new(&at_building_action));
-  building_action * data = (building_action*)a->data.v;
+  attrib *a = a_add(&b->attribs, a_new(&at_building_action));
+
+  building_action *data = (building_action *) a->data.v;
+
   data->b = b;
   data->fname = strdup(fname);
   if (param) {
@@ -650,26 +694,25 @@ building_addaction(building * b, const char * fname, const char * param)
   }
 }
 
-region *
-building_getregion(const building * b)
+region *building_getregion(const building * b)
 {
   return b->region;
 }
 
-void
-building_setregion(building * b, region * r)
+void building_setregion(building * b, region * r)
 {
-  building ** blist = &b->region->buildings;
-  while (*blist && *blist!=b) {
+  building **blist = &b->region->buildings;
+
+  while (*blist && *blist != b) {
     blist = &(*blist)->next;
   }
   *blist = b->next;
   b->next = NULL;
 
   blist = &r->buildings;
-  while (*blist && *blist!=b) blist = &(*blist)->next;
+  while (*blist && *blist != b)
+    blist = &(*blist)->next;
   *blist = b;
 
   b->region = r;
 }
-

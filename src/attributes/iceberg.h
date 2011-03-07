@@ -22,12 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_iceberg;
+  extern struct attrib_type at_iceberg;
 
-extern struct attrib * make_iceberg(direction_t dir);
+  extern struct attrib *make_iceberg(direction_t dir);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

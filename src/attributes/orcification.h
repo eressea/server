@@ -19,9 +19,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern struct attrib_type at_orcification;
+  extern struct attrib_type at_orcification;
 
-extern struct attrib * make_orcification(int orcification);
+  extern struct attrib *make_orcification(int orcification);
 
 #ifdef __cplusplus
 }

@@ -26,36 +26,39 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <float.h>
 #include <ctype.h>
 
-#define M_PIl   3.1415926535897932384626433832795029L  /* pi */
+#define M_PIl   3.1415926535897932384626433832795029L   /* pi */
 
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
 * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung.
 * http://de.wikipedia.org/wiki/Standardabweichung#Diskrete_Gleichverteilung.2C_W.C3.BCrfel
 */
-double
-normalvariate(double mu, double sigma)
+double normalvariate(double mu, double sigma)
 {
-  static const double NV_MAGICCONST = 1.7155277699214135; /* STATIC_CONST: a constant */
+  static const double NV_MAGICCONST = 1.7155277699214135;       /* STATIC_CONST: a constant */
+
   double z;
+
   for (;;) {
     double u1 = rng_double();
+
     double u2 = 1.0 - rng_double();
-    z = NV_MAGICCONST*(u1-0.5)/u2;
-    if (z*z/4.0 <= -log(u2)) {
+
+    z = NV_MAGICCONST * (u1 - 0.5) / u2;
+    if (z * z / 4.0 <= -log(u2)) {
       break;
     }
   }
-  return mu+z*sigma;
+  return mu + z * sigma;
 }
 
-int
-ntimespprob(int n, double p, double mod)
+int ntimespprob(int n, double p, double mod)
 {
   int count = 0;
+
   int i;
 
-  for(i=0; i<n && p>0; i++) {
-    if(rng_double() < p) {
+  for (i = 0; i < n && p > 0; i++) {
+    if (rng_double() < p) {
       count++;
       p += mod;
     }
@@ -63,10 +66,9 @@ ntimespprob(int n, double p, double mod)
   return count;
 }
 
-boolean
-chance(double x)
+boolean chance(double x)
 {
-  if (x>=1.0) return true;
+  if (x >= 1.0)
+    return true;
   return rng_double() < x;
 }
-

@@ -27,35 +27,35 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/storage.h>
 
-static void
-write_gm(const attrib * a, const void * owner, struct storage * store)
+static void write_gm(const attrib * a, const void *owner, struct storage *store)
 {
-  write_plane_reference((plane*)a->data.v, store);
+  write_plane_reference((plane *) a->data.v, store);
 }
 
-static int
-read_gm(attrib * a, void * owner, struct storage * store)
+static int read_gm(attrib * a, void *owner, struct storage *store)
 {
-  plane * pl;
+  plane *pl;
+
   int result = read_plane_reference(&pl, store);
+
   a->data.v = pl;
   return result;
 }
 
 
 attrib_type at_gm = {
-	"gm",
-	NULL,
-	NULL,
-	NULL,
-	write_gm,
-	read_gm,
+  "gm",
+  NULL,
+  NULL,
+  NULL,
+  write_gm,
+  read_gm,
 };
 
-attrib *
-make_gm(const struct plane * pl)
+attrib *make_gm(const struct plane * pl)
 {
-	attrib * a = a_new(&at_gm);
-	a->data.v = (void*)pl;
-	return a;
+  attrib *a = a_new(&at_gm);
+
+  a->data.v = (void *)pl;
+  return a;
 }

@@ -30,61 +30,65 @@ extern "C" {
  * wichtig
  */
 
-struct xml_tag;
+  struct xml_tag;
 
-typedef struct requirement {
-  const struct resource_type * rtype;
-  int number;
-  double recycle; /* recycling quota */
-} requirement;
+  typedef struct requirement {
+    const struct resource_type *rtype;
+    int number;
+    double recycle;             /* recycling quota */
+  } requirement;
 
-typedef struct construction {
-  skill_t skill; /* skill req'd per point of size */
-  int minskill;  /* skill req'd per point of size */
+  typedef struct construction {
+    skill_t skill;              /* skill req'd per point of size */
+    int minskill;               /* skill req'd per point of size */
 
-  int maxsize;   /* maximum size of this type */
-  int reqsize;   /* size of object using up 1 set of requirement. */
-  requirement * materials; /* material req'd to build one object */
-  const struct building_type * btype;
-  /* building type required to make this thing */
+    int maxsize;                /* maximum size of this type */
+    int reqsize;                /* size of object using up 1 set of requirement. */
+    requirement *materials;     /* material req'd to build one object */
+    const struct building_type *btype;
+    /* building type required to make this thing */
 
-  struct construction * improvement;
-  /* next level, if upgradable. if more than one of these items
-  * can be built (weapons, armour) per turn, must not be NULL,
-  * but point to the same type again:
-  *   const_sword.improvement = &const_sword
-  * last level of a building points to NULL, as do objects of
-  * an unlimited size.
-  */
-  struct attrib * attribs;
-  /* stores skill modifiers and other attributes */
+    struct construction *improvement;
+    /* next level, if upgradable. if more than one of these items
+     * can be built (weapons, armour) per turn, must not be NULL,
+     * but point to the same type again:
+     *   const_sword.improvement = &const_sword
+     * last level of a building points to NULL, as do objects of
+     * an unlimited size.
+     */
+    struct attrib *attribs;
+    /* stores skill modifiers and other attributes */
 
-} construction;
+  } construction;
 
-extern int destroy_cmd(struct unit * u, struct order * ord);
-extern int leave_cmd(struct unit * u, struct order * ord);
+  extern int destroy_cmd(struct unit *u, struct order *ord);
+  extern int leave_cmd(struct unit *u, struct order *ord);
 
-extern boolean can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
+  extern boolean can_contact(const struct region *r, const struct unit *u,
+    const struct unit *u2);
 
-void do_siege(struct region *r);
-void build_road(struct region * r, struct unit * u, int size, direction_t d);
-void create_ship(struct region * r, struct unit * u, const struct ship_type * newtype, int size, struct order * ord);
-void continue_ship(struct region * r, struct unit * u, int size);
+  void do_siege(struct region *r);
+  void build_road(struct region *r, struct unit *u, int size, direction_t d);
+  void create_ship(struct region *r, struct unit *u,
+    const struct ship_type *newtype, int size, struct order *ord);
+  void continue_ship(struct region *r, struct unit *u, int size);
 
-struct building * getbuilding(const struct region * r);
-struct ship *getship(const struct region * r);
+  struct building *getbuilding(const struct region *r);
+  struct ship *getship(const struct region *r);
 
-void do_misc(struct region *r, boolean tries);
+  void do_misc(struct region *r, boolean tries);
 
-void reportevent(struct region * r, char *s);
+  void reportevent(struct region *r, char *s);
 
-void shash(struct ship * sh);
-void sunhash(struct ship * sh);
-extern int roqf_factor(void);
+  void shash(struct ship *sh);
+  void sunhash(struct ship *sh);
+  extern int roqf_factor(void);
 
-extern int build(struct unit * u, const construction * ctype, int completed, int want);
-extern int maxbuild(const struct unit *u, const construction *cons);
-extern struct message * msg_materials_required(struct unit * u, struct order * ord, const struct construction * ctype, int multi);
+  extern int build(struct unit *u, const construction * ctype, int completed,
+    int want);
+  extern int maxbuild(const struct unit *u, const construction * cons);
+  extern struct message *msg_materials_required(struct unit *u,
+    struct order *ord, const struct construction *ctype, int multi);
 /** error messages that build may return: */
 #define ELOWSKILL -1
 #define ENEEDSKILL -2
@@ -96,4 +100,3 @@ extern struct message * msg_materials_required(struct unit * u, struct order * o
 }
 #endif
 #endif
-

@@ -22,8 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-void monster_kills_peasants(struct unit * u);
-boolean monster_is_waiting(const struct unit * u);
+  void monster_kills_peasants(struct unit *u);
+  boolean monster_is_waiting(const struct unit *u);
 
 #ifdef __cplusplus
 }

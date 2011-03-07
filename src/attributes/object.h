@@ -19,20 +19,21 @@
 extern "C" {
 #endif
 
-typedef enum { 
-  TNONE = 0, TINTEGER = 1, TREAL = 2, TSTRING = 3,
-  TUNIT = 10, TFACTION = 11, TREGION = 12, TBUILDING = 13, TSHIP = 14, 
-} object_type;
+  typedef enum {
+    TNONE = 0, TINTEGER = 1, TREAL = 2, TSTRING = 3,
+    TUNIT = 10, TFACTION = 11, TREGION = 12, TBUILDING = 13, TSHIP = 14,
+  } object_type;
 
-extern struct attrib_type at_object;
+  extern struct attrib_type at_object;
 
-extern struct attrib * object_create(const char * name, object_type type, variant value);
-extern void object_get(const struct attrib * a, object_type * type, variant * value);
-extern void object_set(struct attrib * a, object_type type, variant value);
-extern const char * object_name(const struct attrib * a);
+  extern struct attrib *object_create(const char *name, object_type type,
+    variant value);
+  extern void object_get(const struct attrib *a, object_type * type,
+    variant * value);
+  extern void object_set(struct attrib *a, object_type type, variant value);
+  extern const char *object_name(const struct attrib *a);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

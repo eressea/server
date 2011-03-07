@@ -7,25 +7,27 @@
 */
 
 typedef struct listener {
-  struct listener * next;
+  struct listener *next;
   event_handler callback;
   event_arg_free destroy;
-  void * sender;
-  char * event;
-  void * arguments;
+  void *sender;
+  char *event;
+  void *arguments;
 } listener;
 
-static listener * listeners;
+static listener *listeners;
 
-void
-eventbus_fire(void * sender, const char * event, void * args)
+void eventbus_fire(void *sender, const char *event, void *args)
 {
-  listener * lst = listeners;
+  listener *lst = listeners;
+
   while (lst) {
     int i = strcmp(lst->event, event);
-    if (i>0) break;
-    if (i==0) {
-      if (!lst->sender || lst->sender==sender) {
+
+    if (i > 0)
+      break;
+    if (i == 0) {
+      if (!lst->sender || lst->sender == sender) {
         lst->callback(sender, event, args);
       }
     }
@@ -33,17 +35,20 @@ eventbus_fire(void * sender, const char * event, void * args)
   }
 }
 
-void 
-eventbus_register(void * sender, const char * event, event_handler cb, event_arg_free arg_free, void * args)
+void
+eventbus_register(void *sender, const char *event, event_handler cb,
+  event_arg_free arg_free, void *args)
 {
-  listener * lst;
-  listener ** lstp = &listeners;
+  listener *lst;
+
+  listener **lstp = &listeners;
+
   while (*lstp) {
     lst = *lstp;
-    if (strcmp(lst->event, event)>=0) {
+    if (strcmp(lst->event, event) >= 0) {
       break;
     }
-    lstp=&lst->next;
+    lstp = &lst->next;
   }
   lst = malloc(sizeof(listener));
   lst->sender = sender;

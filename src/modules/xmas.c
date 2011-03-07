@@ -34,49 +34,47 @@
 /* libc includes */
 #include <stdlib.h>
 
-static int
-xmasgate_handle(trigger * t, void * data)
+static int xmasgate_handle(trigger * t, void *data)
 {
-	return -1;
+  return -1;
 }
 
-static void
-xmasgate_write(const trigger * t, struct storage * store)
+static void xmasgate_write(const trigger * t, struct storage *store)
 {
-  building *b = (building *)t->data.v;
+  building *b = (building *) t->data.v;
+
   store->w_tok(store, itoa36(b->no));
 }
 
-static int
-xmasgate_read(trigger * t, struct storage * store)
+static int xmasgate_read(trigger * t, struct storage *store)
 {
-  int bc = read_reference(&t->data.v, store, read_building_reference, resolve_building);
-  if (bc==0 && !t->data.v) {
+  int bc =
+    read_reference(&t->data.v, store, read_building_reference,
+    resolve_building);
+  if (bc == 0 && !t->data.v) {
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
 
 struct trigger_type tt_xmasgate = {
-	"xmasgate",
-	NULL,
-	NULL,
-	xmasgate_handle,
-	xmasgate_write,
-	xmasgate_read
+  "xmasgate",
+  NULL,
+  NULL,
+  xmasgate_handle,
+  xmasgate_write,
+  xmasgate_read
 };
 
-trigger *
-trigger_xmasgate(building * b)
+trigger *trigger_xmasgate(building * b)
 {
-	trigger * t = t_new(&tt_xmasgate);
-	t->data.v = b;
-	return t;
+  trigger *t = t_new(&tt_xmasgate);
+
+  t->data.v = b;
+  return t;
 }
 
-void
-register_xmas(void)
+void register_xmas(void)
 {
-	tt_register(&tt_xmasgate);
+  tt_register(&tt_xmasgate);
 }
-

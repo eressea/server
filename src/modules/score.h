@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
 
-extern void score(void);
-extern int average_score_of_age(int age, int a);
+  extern void score(void);
+  extern int average_score_of_age(int age, int a);
 
 #ifdef __cplusplus
 }

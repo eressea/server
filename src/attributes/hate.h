@@ -22,14 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_hate;
+  extern struct attrib_type at_hate;
 
-struct unit;
+  struct unit;
 
-extern struct attrib * make_hate(struct unit * u);
+  extern struct attrib *make_hate(struct unit *u);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

@@ -23,23 +23,22 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern int teach_cmd(struct unit * u, struct order * ord);
-extern int learn_cmd(struct unit * u, struct order * ord);
+  extern int teach_cmd(struct unit *u, struct order *ord);
+  extern int learn_cmd(struct unit *u, struct order *ord);
 
-extern magic_t getmagicskill(const struct locale * lang);
-extern boolean is_migrant(struct unit *u);
-extern int study_cost(struct unit *u, skill_t talent);
+  extern magic_t getmagicskill(const struct locale *lang);
+  extern boolean is_migrant(struct unit *u);
+  extern int study_cost(struct unit *u, skill_t talent);
 
 #define MAXTEACHERS 4
-typedef struct teaching_info {
-  struct unit * teachers[MAXTEACHERS];
-  int value;
-} teaching_info;
+  typedef struct teaching_info {
+    struct unit *teachers[MAXTEACHERS];
+    int value;
+  } teaching_info;
 
-extern const struct attrib_type at_learning;
+  extern const struct attrib_type at_learning;
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

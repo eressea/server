@@ -16,8 +16,9 @@ extern "C" {
 #endif
 
   struct summary;
-  extern void report_summary(struct summary * n, struct summary * o, boolean full);
-  extern struct summary * make_summary(void);
+  extern void report_summary(struct summary *n, struct summary *o,
+    boolean full);
+  extern struct summary *make_summary(void);
 
 #ifdef __cplusplus
 }

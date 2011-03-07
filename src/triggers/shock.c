@@ -52,48 +52,51 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* Vertrauten.               */
 /* ------------------------------------------------------------- */
 
-static void
-do_shock(unit *u, const char *reason)
+static void do_shock(unit * u, const char *reason)
 {
   int i;
 
   if (u->number > 0) {
     /* HP - Verlust */
-    u->hp = (unit_max_hp(u) * u->number)/10;
+    u->hp = (unit_max_hp(u) * u->number) / 10;
     u->hp = MAX(1, u->hp);
   }
 
   /* Aura - Verlust */
   if (is_mage(u)) {
-    set_spellpoints(u, max_spellpoints(u->region,u)/10);
+    set_spellpoints(u, max_spellpoints(u->region, u) / 10);
   }
 
   /* Evt. Talenttageverlust */
-  for (i=0;i!=u->skill_size;++i) if (rng_int()%5==0) {
-    skill * sv = u->skills+i;
-    int weeks = (sv->level * sv->level - sv->level) / 2;
-    int change = (weeks+9) / 10;
-    reduce_skill(u, sv, change);
-  }
+  for (i = 0; i != u->skill_size; ++i)
+    if (rng_int() % 5 == 0) {
+      skill *sv = u->skills + i;
+
+      int weeks = (sv->level * sv->level - sv->level) / 2;
+
+      int change = (weeks + 9) / 10;
+
+      reduce_skill(u, sv, change);
+    }
 
   /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
-  * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine
-  * saubere Implementation nachdenken. */
+   * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine
+   * saubere Implementation nachdenken. */
 
-  if (strcmp(reason, "trigger")==0) {
+  if (strcmp(reason, "trigger") == 0) {
     remove_familiar(u);
   }
-  if (u->faction!=NULL) {
+  if (u->faction != NULL) {
     ADDMSG(&u->faction->msgs, msg_message("shock",
-      "mage reason", u, strdup(reason)));
+        "mage reason", u, strdup(reason)));
   }
 }
 
-static int
-shock_handle(trigger * t, void * data)
+static int shock_handle(trigger * t, void *data)
 {
   /* destroy the unit */
-  unit * u = (unit*)t->data.v;
+  unit *u = (unit *) t->data.v;
+
   if (u && u->number) {
     do_shock(u, "trigger");
   }
@@ -101,48 +104,50 @@ shock_handle(trigger * t, void * data)
   return 0;
 }
 
-static void
-shock_write(const trigger * t, struct storage * store)
+static void shock_write(const trigger * t, struct storage *store)
 {
-  unit * u = (unit*)t->data.v;
-  trigger * next = t->next;
+  unit *u = (unit *) t->data.v;
+
+  trigger *next = t->next;
+
   while (next) {
     /* make sure it is unique! */
-    if (next->type==t->type && next->data.v==t->data.v) break;
-    next=next->next;
+    if (next->type == t->type && next->data.v == t->data.v)
+      break;
+    next = next->next;
   }
   if (next && u) {
     log_error(("more than one shock-attribut for %s on a unit. FIXED.\n",
-               unitid(u)));
+        unitid(u)));
     write_unit_reference(NULL, store);
   } else {
     write_unit_reference(u, store);
   }
 }
 
-static int
-shock_read(trigger * t, struct storage * store)
+static int shock_read(trigger * t, struct storage *store)
 {
-  int result = read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
-  if (result==0 && t->data.v==NULL) {
+  int result =
+    read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+  if (result == 0 && t->data.v == NULL) {
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
 
 trigger_type tt_shock = {
-	"shock",
-	NULL,
-	NULL,
-	shock_handle,
-	shock_write,
-	shock_read
+  "shock",
+  NULL,
+  NULL,
+  shock_handle,
+  shock_write,
+  shock_read
 };
 
-trigger *
-trigger_shock(unit * u)
+trigger *trigger_shock(unit * u)
 {
-	trigger * t = t_new(&tt_shock);
-	t->data.v = (void*)u;
-	return t;
+  trigger *t = t_new(&tt_shock);
+
+  t->data.v = (void *)u;
+  return t;
 }

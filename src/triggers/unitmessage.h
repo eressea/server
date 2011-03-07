@@ -23,12 +23,13 @@ extern "C" {
 #endif
 
 /* all types we use are defined here to reduce dependencies */
-struct trigger_type;
-struct trigger;
-struct unit;
+  struct trigger_type;
+  struct trigger;
+  struct unit;
 
-extern struct trigger_type tt_unitmessage;
-extern struct trigger * trigger_unitmessage(struct unit * target, const char * string, int type, int level);
+  extern struct trigger_type tt_unitmessage;
+  extern struct trigger *trigger_unitmessage(struct unit *target,
+    const char *string, int type, int level);
 
 #ifdef __cplusplus
 }

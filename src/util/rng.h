@@ -15,13 +15,13 @@ extern "C" {
 
 #define RNG_MT
 
-#ifdef RNG_MT  
+#ifdef RNG_MT
   /* initializes mt[N] with a seed */
   extern void init_genrand(unsigned long s);
 
   /* generates a random number on [0,0xffffffff]-interval */
   extern unsigned long genrand_int32(void);
-  
+
   /* generates a random number on [0,1)-real-interval */
   extern double genrand_real2(void);
 

@@ -37,22 +37,24 @@ extern "C" {
 
 #define TRADE_FRACTION          100
 
-extern int income(const struct unit * u);
+  extern int income(const struct unit *u);
 
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
 
-void economics(struct region *r);
-void produce(struct region *r);
-void auto_work(struct region * r);
+  void economics(struct region *r);
+  void produce(struct region *r);
+  void auto_work(struct region *r);
 
-enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC };
-void maintain_buildings(struct region * r, boolean crash);
-extern void add_spende(struct faction * f1, struct faction * f2, int betrag, struct region * r);
-extern int make_cmd(struct unit * u, struct order * ord);
-extern void split_allocations(struct region * r);
-extern int recruit_archetypes(void);
-extern int give_control_cmd(struct unit * u, struct order * ord);
+  enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL,
+      IC_MAGIC };
+  void maintain_buildings(struct region *r, boolean crash);
+  extern void add_spende(struct faction *f1, struct faction *f2, int betrag,
+    struct region *r);
+  extern int make_cmd(struct unit *u, struct order *ord);
+  extern void split_allocations(struct region *r);
+  extern int recruit_archetypes(void);
+  extern int give_control_cmd(struct unit *u, struct order *ord);
 
 #ifdef __cplusplus
 }

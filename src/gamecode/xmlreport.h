@@ -15,13 +15,12 @@ extern "C" {
 
 #include <time.h>
 
-extern void xmlreport_cleanup(void);
-extern void register_xr(void);
+  extern void xmlreport_cleanup(void);
+  extern void register_xr(void);
 
-extern int crwritemap(const char * filename);
+  extern int crwritemap(const char *filename);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

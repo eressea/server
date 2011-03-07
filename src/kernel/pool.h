@@ -28,7 +28,7 @@ extern "C" {
 
 #define GET_POOLED_SLACK    0x08
 #define GET_POOLED_RESERVE  0x10
-#define GET_POOLED_FORCE    0x20 /* ignore f->options pools */
+#define GET_POOLED_FORCE    0x20        /* ignore f->options pools */
 #define GET_ALLIED_SLACK    0x30
 #define GET_ALLIED_RESERVE  0x40
 
@@ -36,21 +36,25 @@ extern "C" {
 #define GET_DEFAULT (GET_RESERVE|GET_SLACK|GET_POOLED_SLACK)
 #define GET_ALL (GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE)
 
-int get_pooled(const struct unit * u, const struct resource_type * res, unsigned int mode, int count);
-int use_pooled(struct unit * u, const struct resource_type * res, unsigned int mode, int count);
-	/** use_pooled
+  int get_pooled(const struct unit *u, const struct resource_type *res,
+    unsigned int mode, int count);
+  int use_pooled(struct unit *u, const struct resource_type *res,
+    unsigned int mode, int count);
+        /** use_pooled
 	 * verbraucht 'count' Objekte der resource 'itm'
 	 * unter zuhilfenahme des Pools der struct region und Aufbrauch des
 	 * von der Einheit reservierten Resourcen
 	 */
 
-int get_resource(const struct unit * u, const struct resource_type * res);
-int change_resource(struct unit * u, const struct resource_type * res, int change);
+  int get_resource(const struct unit *u, const struct resource_type *res);
+  int change_resource(struct unit *u, const struct resource_type *res,
+    int change);
 
-int get_reservation(const struct unit * u, const struct resource_type * res);
-int change_reservation(struct unit * u, const struct resource_type * res, int value);
+  int get_reservation(const struct unit *u, const struct resource_type *res);
+  int change_reservation(struct unit *u, const struct resource_type *res,
+    int value);
 
-int reserve_cmd(struct unit *u, struct order *ord);
+  int reserve_cmd(struct unit *u, struct order *ord);
 
 /** init_pool
  * initialisiert den regionalen Pool.

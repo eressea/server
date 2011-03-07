@@ -16,9 +16,11 @@
 extern "C" {
 #endif
 
-  extern int give_item(int want, const struct item_type * itype, struct unit * src, struct unit * dest, struct order * ord);
-  extern void give_men(int n, struct unit * u, struct unit * u2, struct order * ord);
-  extern void give_unit(struct unit * u, struct unit * u2, struct order * ord);
+  extern int give_item(int want, const struct item_type *itype,
+    struct unit *src, struct unit *dest, struct order *ord);
+  extern void give_men(int n, struct unit *u, struct unit *u2,
+    struct order *ord);
+  extern void give_unit(struct unit *u, struct unit *u2, struct order *ord);
 
 #ifdef __cplusplus
 }

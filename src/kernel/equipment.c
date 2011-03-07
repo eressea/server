@@ -34,16 +34,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <string.h>
 
-static equipment * equipment_sets;
+static equipment *equipment_sets;
 
-equipment *
-create_equipment(const char * eqname)
+equipment *create_equipment(const char *eqname)
 {
-  equipment ** eqp = &equipment_sets;
+  equipment **eqp = &equipment_sets;
+
   for (;;) {
-    struct equipment * eq = *eqp;
-    int i = eq?strcmp(eq->name, eqname):1;
-    if (i>0) {
+    struct equipment *eq = *eqp;
+
+    int i = eq ? strcmp(eq->name, eqname) : 1;
+
+    if (i > 0) {
       eq = malloc(sizeof(equipment));
       eq->name = strdup(eqname);
       eq->next = *eqp;
@@ -54,7 +56,7 @@ create_equipment(const char * eqname)
       memset(eq->skills, 0, sizeof(eq->skills));
       *eqp = eq;
       break;
-    } else if (i==0) {
+    } else if (i == 0) {
       break;
     }
     eqp = &eq->next;
@@ -62,23 +64,25 @@ create_equipment(const char * eqname)
   return *eqp;
 }
 
-equipment *
-get_equipment(const char * eqname)
+equipment *get_equipment(const char *eqname)
 {
-  equipment * eq = equipment_sets;
-  for (;eq;eq=eq->next) {
+  equipment *eq = equipment_sets;
+
+  for (; eq; eq = eq->next) {
     int i = strcmp(eq->name, eqname);
-    if (i==0) return eq;
-    else if (i>0) break;
+
+    if (i == 0)
+      return eq;
+    else if (i > 0)
+      break;
   }
   return NULL;
 }
 
-void
-equipment_setskill(equipment * eq, skill_t sk, const char * value)
+void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
-  if (eq!=NULL) {
-    if (value!=NULL) {
+  if (eq != NULL) {
+    if (value != NULL) {
       eq->skills[sk] = strdup(value);
     } else if (eq->skills[sk]) {
       free(eq->skills[sk]);
@@ -86,25 +90,25 @@ equipment_setskill(equipment * eq, skill_t sk, const char * value)
   }
 }
 
-void
-equipment_addspell(equipment * eq, spell * sp)
+void equipment_addspell(equipment * eq, spell * sp)
 {
-  if (eq!=NULL) {
+  if (eq != NULL) {
     ql_set_insert(&eq->spells, sp);
   }
 }
 
-void 
-equipment_setitem(equipment * eq, const item_type * itype, const char * value)
+void
+equipment_setitem(equipment * eq, const item_type * itype, const char *value)
 {
-  if (eq!=NULL) {
-    if (itype!=NULL) {
-      itemdata * idata = eq->items;
-      while (idata &&idata->itype!=itype) {
+  if (eq != NULL) {
+    if (itype != NULL) {
+      itemdata *idata = eq->items;
+
+      while (idata && idata->itype != itype) {
         idata = idata->next;
       }
-      if (idata==NULL) {
-        idata = (itemdata *)malloc(sizeof(itemdata));
+      if (idata == NULL) {
+        idata = (itemdata *) malloc(sizeof(itemdata));
         idata->itype = itype;
         idata->value = strdup(value);
         idata->next = eq->items;
@@ -115,53 +119,61 @@ equipment_setitem(equipment * eq, const item_type * itype, const char * value)
 }
 
 void
-equipment_setcallback(struct equipment * eq, void (*callback)(const struct equipment *, struct unit *))
+equipment_setcallback(struct equipment *eq,
+  void (*callback) (const struct equipment *, struct unit *))
 {
   eq->callback = callback;
 }
 
-void
-equip_unit(struct unit * u, const struct equipment * eq)
+void equip_unit(struct unit *u, const struct equipment *eq)
 {
   equip_unit_mask(u, eq, EQUIP_ALL);
 }
 
-void
-equip_unit_mask(struct unit * u, const struct equipment * eq, int mask)
+void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
 {
   if (eq) {
 
-    if (mask&EQUIP_SKILLS) {
+    if (mask & EQUIP_SKILLS) {
       skill_t sk;
-      for (sk=0;sk!=MAXSKILLS;++sk) {
-        if (eq->skills[sk]!=NULL) {
+
+      for (sk = 0; sk != MAXSKILLS; ++sk) {
+        if (eq->skills[sk] != NULL) {
           int i = dice_rand(eq->skills[sk]);
-          if (i>0) set_level(u, sk, i);
+
+          if (i > 0)
+            set_level(u, sk, i);
         }
       }
     }
 
-    if (mask&EQUIP_SPELLS) {
-      quicklist * ql = eq->spells;
+    if (mask & EQUIP_SPELLS) {
+      quicklist *ql = eq->spells;
+
       if (ql) {
-        sc_mage * m = get_mage(u);
-        if (m==NULL) {
+        sc_mage *m = get_mage(u);
+
+        if (m == NULL) {
           assert(!"trying to equip spells on a non-mage!");
         } else {
           int qi;
-          for (qi=0;ql;ql_advance(&ql, &qi, 1)) {
-            spell * sp = (spell *)ql_get(ql, qi);
+
+          for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+            spell *sp = (spell *) ql_get(ql, qi);
+
             add_spell(get_spelllist(m, u->faction), sp);
           }
         }
       }
     }
 
-    if (mask&EQUIP_ITEMS) {
-      itemdata * idata;
-      for (idata=eq->items;idata!=NULL;idata=idata->next) {
+    if (mask & EQUIP_ITEMS) {
+      itemdata *idata;
+
+      for (idata = eq->items; idata != NULL; idata = idata->next) {
         int i = u->number * dice_rand(idata->value);
-        if (i>0) {
+
+        if (i > 0) {
           i_add(&u->items, i_new(idata->itype, i));
         }
       }
@@ -169,12 +181,15 @@ equip_unit_mask(struct unit * u, const struct equipment * eq, int mask)
 
     if (eq->subsets) {
       int i;
-      for (i=0;eq->subsets[i].sets;++i) {
+
+      for (i = 0; eq->subsets[i].sets; ++i) {
         if (chance(eq->subsets[i].chance)) {
-          float rnd = (1+rng_int() % 1000) / 1000.0f;
+          float rnd = (1 + rng_int() % 1000) / 1000.0f;
+
           int k;
-          for (k=0;eq->subsets[i].sets[k].set;++k) {
-            if (rnd<=eq->subsets[i].sets[k].chance) {
+
+          for (k = 0; eq->subsets[i].sets[k].set; ++k) {
+            if (rnd <= eq->subsets[i].sets[k].chance) {
               equip_unit_mask(u, eq->subsets[i].sets[k].set, mask);
               break;
             }
@@ -184,32 +199,36 @@ equip_unit_mask(struct unit * u, const struct equipment * eq, int mask)
       }
     }
 
-    if (mask&EQUIP_SPECIAL) {
-      if (eq->callback) eq->callback(eq, u);
+    if (mask & EQUIP_SPECIAL) {
+      if (eq->callback)
+        eq->callback(eq, u);
     }
   }
 }
 
-void
-equip_items(struct item ** items, const struct equipment * eq)
+void equip_items(struct item **items, const struct equipment *eq)
 {
   if (eq) {
-    itemdata * idata;
+    itemdata *idata;
 
-    for (idata=eq->items;idata!=NULL;idata=idata->next) {
+    for (idata = eq->items; idata != NULL; idata = idata->next) {
       int i = dice_rand(idata->value);
-      if (i>0) {
+
+      if (i > 0) {
         i_add(items, i_new(idata->itype, i));
       }
     }
     if (eq->subsets) {
       int i;
-      for (i=0;eq->subsets[i].sets;++i) {
+
+      for (i = 0; eq->subsets[i].sets; ++i) {
         if (chance(eq->subsets[i].chance)) {
-          float rnd = (1+rng_int() % 1000) / 1000.0f;
+          float rnd = (1 + rng_int() % 1000) / 1000.0f;
+
           int k;
-          for (k=0;eq->subsets[i].sets[k].set;++k) {
-            if (rnd<=eq->subsets[i].sets[k].chance) {
+
+          for (k = 0; eq->subsets[i].sets[k].set; ++k) {
+            if (rnd <= eq->subsets[i].sets[k].chance) {
               equip_items(items, eq->subsets[i].sets[k].set);
               break;
             }

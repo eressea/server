@@ -22,20 +22,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern char * set_string(char **s, const char *neu);
-extern int set_email(char** pemail, const char *newmail);
+  extern char *set_string(char **s, const char *neu);
+  extern int set_email(char **pemail, const char *newmail);
 
-extern int *intlist_init(void);
-extern int *intlist_add(int *i_p, int i);
-extern int *intlist_find(int *i_p, int i);
+  extern int *intlist_init(void);
+  extern int *intlist_add(int *i_p, int i);
+  extern int *intlist_find(int *i_p, int i);
 
 #ifdef HAVE_INLINE
 # include "strings.c"
 #else
-extern unsigned int hashstring(const char* s);
-extern const char *escape_string(const char * str, char * buffer, unsigned int len);
-extern unsigned int jenkins_hash(unsigned int a);
-extern unsigned int wang_hash(unsigned int a);
+  extern unsigned int hashstring(const char *s);
+  extern const char *escape_string(const char *str, char *buffer,
+    unsigned int len);
+  extern unsigned int jenkins_hash(unsigned int a);
+  extern unsigned int wang_hash(unsigned int a);
 #endif
 
 /* benchmark for units: 
@@ -60,4 +61,4 @@ extern unsigned int wang_hash(unsigned int a);
 #ifdef __cplusplus
 }
 #endif
-#endif /* GOODIES_H */
+#endif                          /* GOODIES_H */

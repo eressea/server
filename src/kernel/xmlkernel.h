@@ -19,10 +19,10 @@ extern "C" {
 
 #include <libxml/xpath.h>
 
-extern void xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, struct construction ** consPtr);
+  extern void xml_readconstruction(xmlXPathContextPtr xpath,
+    xmlNodeSetPtr nodeSet, struct construction **consPtr);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

@@ -22,10 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_fleechance;
+  extern struct attrib_type at_fleechance;
 
-extern struct attrib * make_fleechance(float fleechance);
-extern void init_fleechance(void);
+  extern struct attrib *make_fleechance(float fleechance);
+  extern void init_fleechance(void);
 
 #ifdef __cplusplus
 }

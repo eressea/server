@@ -23,15 +23,16 @@ extern "C" {
 #endif
 
 /* all types we use are defined here to reduce dependencies */
-struct trigger_type;
-struct trigger;
+  struct trigger_type;
+  struct trigger;
 
-struct unit;
-struct faction;
+  struct unit;
+  struct faction;
 
-extern struct trigger_type tt_changefaction;
+  extern struct trigger_type tt_changefaction;
 
-extern struct trigger * trigger_changefaction(struct unit * u, struct faction * f);
+  extern struct trigger *trigger_changefaction(struct unit *u,
+    struct faction *f);
 
 #ifdef __cplusplus
 }

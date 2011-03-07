@@ -70,11 +70,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * Laen, Mallorn}, UnterSilber, UnterSpezialTyp, UnterSpezial */
 
 
-static boolean
-CheckOverload(void)
+static boolean CheckOverload(void)
 {
   static int value = -1;
-  if (value<0) {
+
+  if (value < 0) {
     value = get_param_int(global.parameters, "rules.check_overload", 0);
   }
   return value;
@@ -84,14 +84,14 @@ CheckOverload(void)
  * returns 0 if siege is successful, or 1 if the building is either
  * not besieged or the unit can slip through the siege due to better stealth.
  */
-static int
-slipthru(const region * r, const unit * u, const building * b)
+static int slipthru(const region * r, const unit * u, const building * b)
 {
   unit *u2;
+
   int n, o;
 
   /* b ist die burg, in die man hinein oder aus der man heraus will. */
-  if (b==NULL || b->besieged < b->size * SIEGEFACTOR) {
+  if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
     return 1;
   }
 
@@ -102,20 +102,20 @@ slipthru(const region * r, const unit * u, const building * b)
   for (u2 = r->units; u2; u2 = u2->next) {
     if (usiege(u2) == b) {
 
-      if (invisible(u, u2) >= u->number) continue;
+      if (invisible(u, u2) >= u->number)
+        continue;
 
       o = eff_skill(u2, SK_PERCEPTION, r);
 
       if (o + 2 >= n) {
-        return 0;   /* entdeckt! */
+        return 0;               /* entdeckt! */
       }
     }
   }
   return 1;
 }
 
-boolean
-can_contact(const region * r, const unit * u, const unit * u2)
+boolean can_contact(const region * r, const unit * u, const unit * u2)
 {
 
   /* hier geht es nur um die belagerung von burgen */
@@ -128,7 +128,7 @@ can_contact(const region * r, const unit * u, const unit * u2)
    * slipthru () == 1. ansonsten ist es nur 1, wenn man die belagerer */
 
   if (slipthru(u->region, u, u->building)
-      && slipthru(u->region, u2, u2->building))
+    && slipthru(u->region, u2, u2->building))
     return true;
 
   if (alliedunit(u, u2->faction, HELP_GIVE))
@@ -138,8 +138,7 @@ can_contact(const region * r, const unit * u, const unit * u2)
 }
 
 
-static void
-contact_cmd(unit * u, order * ord, boolean tries)
+static void contact_cmd(unit * u, order * ord, boolean tries)
 {
   /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
    * ein richtiger toggle ist (noch?) nicht noetig. die region als
@@ -147,58 +146,70 @@ contact_cmd(unit * u, order * ord, boolean tries)
    * weitergegeben wird. dies wird fuer das auffinden von tempunits in
    * getnewunit () verwendet! */
   unit *u2;
-  region * r = u->region;
+
+  region *r = u->region;
 
   init_tokens(ord);
   skip_token();
   u2 = getunitg(r, u->faction);
 
-  if (u2!=NULL) {
+  if (u2 != NULL) {
     if (!can_contact(r, u, u2)) {
-      if (tries) cmistake(u, u->thisorder, 23, MSG_EVENT);
+      if (tries)
+        cmistake(u, u->thisorder, 23, MSG_EVENT);
       return;
     }
     usetcontact(u, u2);
   }
 }
-/* ------------------------------------------------------------- */
 
 /* ------------------------------------------------------------- */
 
+/* ------------------------------------------------------------- */
+
 
 /* ------------------------------------------------------------- */
 
-struct building *
-getbuilding(const struct region * r)
+struct building *getbuilding(const struct region *r)
 {
-  building * b = findbuilding(getid());
-  if (b==NULL || r!=b->region) return NULL;
+  building *b = findbuilding(getid());
+
+  if (b == NULL || r != b->region)
+    return NULL;
   return b;
 }
 
-ship *
-getship(const struct region * r)
+ship *getship(const struct region * r)
 {
   ship *sh, *sx = findship(getshipid());
+
   for (sh = r->ships; sh; sh = sh->next) {
-    if (sh == sx) return sh;
+    if (sh == sx)
+      return sh;
   }
   return NULL;
 }
 
 /* ------------------------------------------------------------- */
 
-static void
-siege_cmd(unit * u, order * ord)
+static void siege_cmd(unit * u, order * ord)
 {
-  region * r = u->region;
+  region *r = u->region;
+
   building *b;
+
   int d, pooled;
+
   int bewaffnete, katapultiere = 0;
+
   static boolean init = false;
-  static const curse_type * magicwalls_ct;
-  static item_type * it_catapultammo = NULL;
-  static item_type * it_catapult = NULL;
+
+  static const curse_type *magicwalls_ct;
+
+  static item_type *it_catapultammo = NULL;
+
+  static item_type *it_catapult = NULL;
+
   if (!init) {
     init = true;
     magicwalls_ct = ct_find("magicwalls");
@@ -243,13 +254,13 @@ siege_cmd(unit * u, order * ord)
 
   if (!is_guard(u, GUARD_TRAVELTHRU)) {
     /* abbruch, wenn die einheit nicht vorher die region bewacht - als
-    * warnung fuer alle anderen! */
+     * warnung fuer alle anderen! */
     cmistake(u, ord, 81, MSG_EVENT);
     return;
   }
   /* einheit und burg markieren - spart zeit beim behandeln der einheiten
-  * in der burg, falls die burg auch markiert ist und nicht alle
-  * einheiten wieder abgesucht werden muessen! */
+   * in der burg, falls die burg auch markiert ist und nicht alle
+   * einheiten wieder abgesucht werden muessen! */
 
   usetsiege(u, b);
   b->besieged += MAX(bewaffnete, katapultiere);
@@ -261,19 +272,18 @@ siege_cmd(unit * u, order * ord)
   /* meldung, schaden anrichten */
   if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
     b->size -= d;
-    use_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
+    use_pooled(u, it_catapultammo->rtype,
+      GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
     /* send message to the entire region */
     ADDMSG(&r->msgs, msg_message("siege_catapults",
-      "unit building destruction", u, b, d));
+        "unit building destruction", u, b, d));
   } else {
     /* send message to the entire region */
-    ADDMSG(&r->msgs, msg_message("siege",
-      "unit building", u, b));
+    ADDMSG(&r->msgs, msg_message("siege", "unit building", u, b));
   }
 }
 
-void
-do_siege(region *r)
+void do_siege(region * r)
 {
   if (fval(r->terrain, LAND_REGION)) {
     unit *u;
@@ -285,21 +295,26 @@ do_siege(region *r)
     }
   }
 }
+
 /* ------------------------------------------------------------- */
 
-static void
-destroy_road(unit *u, int nmax, struct order * ord)
+static void destroy_road(unit * u, int nmax, struct order *ord)
 {
   direction_t d = getdirection(u->faction->locale);
+
   unit *u2;
+
   region *r = u->region;
+
   short n = (short)nmax;
 
-  if (nmax>SHRT_MAX) n = SHRT_MAX;
-  else if (nmax<0) n = 0;
+  if (nmax > SHRT_MAX)
+    n = SHRT_MAX;
+  else if (nmax < 0)
+    n = 0;
 
-  for (u2=r->units;u2;u2=u2->next) {
-    if (u2->faction!=u->faction && is_guard(u2, GUARD_TAX)
+  for (u2 = r->units; u2; u2 = u2->next) {
+    if (u2->faction != u->faction && is_guard(u2, GUARD_TAX)
       && cansee(u2->faction, u->region, u, 0)
       && !alliedunit(u, u2->faction, HELP_GUARD)) {
       cmistake(u, ord, 70, MSG_EVENT);
@@ -307,37 +322,47 @@ destroy_road(unit *u, int nmax, struct order * ord)
     }
   }
 
-  if (d==NODIRECTION) {
+  if (d == NODIRECTION) {
     /* Die Richtung wurde nicht erkannt */
     cmistake(u, ord, 71, MSG_PRODUCE);
   } else {
     short road = rroad(r, d);
+
     n = MIN(n, road);
-    if (n!=0) {
-      region * r2 = rconnect(r,d);
-      int willdo = eff_skill(u, SK_ROAD_BUILDING, r)*u->number;
+    if (n != 0) {
+      region *r2 = rconnect(r, d);
+
+      int willdo = eff_skill(u, SK_ROAD_BUILDING, r) * u->number;
+
       willdo = MIN(willdo, n);
-      if (willdo==0) {
+      if (willdo == 0) {
         /* TODO: error message */
       }
-      if (willdo>SHRT_MAX) road = 0;
-      else road = road - (short)willdo;
+      if (willdo > SHRT_MAX)
+        road = 0;
+      else
+        road = road - (short)willdo;
       rsetroad(r, d, road);
       ADDMSG(&u->faction->msgs, msg_message("destroy_road",
-        "unit from to", u, r, r2));
+          "unit from to", u, r, r2));
     }
   }
 }
 
-int
-destroy_cmd(unit * u, struct order * ord)
+int destroy_cmd(unit * u, struct order *ord)
 {
   ship *sh;
+
   unit *u2;
-  region * r = u->region;
-  const construction * con = NULL;
+
+  region *r = u->region;
+
+  const construction *con = NULL;
+
   int size = 0;
+
   const char *s;
+
   int n = INT_MAX;
 
   if (u->number < 1)
@@ -347,7 +372,7 @@ destroy_cmd(unit * u, struct order * ord)
   skip_token();
   s = getstrtoken();
 
-  if (findparam(s, u->faction->locale)==P_ROAD) {
+  if (findparam(s, u->faction->locale) == P_ROAD) {
     destroy_road(u, INT_MAX, ord);
     return 0;
   }
@@ -376,7 +401,8 @@ destroy_cmd(unit * u, struct order * ord)
     if (fval(b->type, BTF_INDESTRUCTIBLE)) {
       cmistake(u, ord, 138, MSG_PRODUCE);
       return 0;
-    } if (n >= b->size) {
+    }
+    if (n >= b->size) {
       /* destroy completly */
       /* all units leave the building */
       for (u2 = r->units; u2; u2 = u2->next) {
@@ -385,15 +411,14 @@ destroy_cmd(unit * u, struct order * ord)
           freset(u2, UFL_OWNER);
         }
       }
-      ADDMSG(&u->faction->msgs, msg_message("destroy",
-        "building unit", b, u));
+      ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
       con = b->type->construction;
       remove_building(&r->buildings, b);
     } else {
       /* partial destroy */
       b->size -= n;
       ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
-        "building unit", b, u));
+          "building unit", b, u));
     }
   } else if (u->ship) {
     sh = u->ship;
@@ -403,7 +428,7 @@ destroy_cmd(unit * u, struct order * ord)
       return 0;
     }
 
-    if (n >= (sh->size*100)/sh->type->construction->maxsize) {
+    if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
       /* destroy completly */
       /* all units leave the ship */
       for (u2 = r->units; u2; u2 = u2->next) {
@@ -413,26 +438,30 @@ destroy_cmd(unit * u, struct order * ord)
         }
       }
       ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
-        "unit region ship", u, r, sh));
+          "unit region ship", u, r, sh));
       con = sh->type->construction;
       remove_ship(&sh->region->ships, sh);
     } else {
       /* partial destroy */
-      sh->size -= (sh->type->construction->maxsize * n)/100;
+      sh->size -= (sh->type->construction->maxsize * n) / 100;
       ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
-        "unit region ship", u, r, sh));
+          "unit region ship", u, r, sh));
     }
   } else {
-    log_error(("Die Einheit %s von %s war owner eines objects, war aber weder in einer Burg noch in einem Schiff.\n",
-      unitname(u), u->faction->name, u->faction->email));
+    log_error(
+      ("Die Einheit %s von %s war owner eines objects, war aber weder in einer Burg noch in einem Schiff.\n",
+        unitname(u), u->faction->name, u->faction->email));
   }
 
   if (con) {
     /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
     int c;
-    for (c=0;con->materials[c].number;++c) {
-      const requirement * rq = con->materials+c;
-      int recycle = (int)(rq->recycle * rq->number * size/con->reqsize);
+
+    for (c = 0; con->materials[c].number; ++c) {
+      const requirement *rq = con->materials + c;
+
+      int recycle = (int)(rq->recycle * rq->number * size / con->reqsize);
+
       if (recycle) {
         change_resource(u, rq->rtype, recycle);
       }
@@ -440,13 +469,14 @@ destroy_cmd(unit * u, struct order * ord)
   }
   return 0;
 }
+
 /* ------------------------------------------------------------- */
 
-void
-build_road(region * r, unit * u, int size, direction_t d)
+void build_road(region * r, unit * u, int size, direction_t d)
 {
   int n, left;
-  region * rn = rconnect(r,d);
+
+  region *rn = rconnect(r, d);
 
   assert(u->number);
   if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
@@ -458,7 +488,7 @@ build_road(region * r, unit * u, int size, direction_t d)
     return;
   }
 
-  if (rn==NULL || rn->terrain->max_road < 0) {
+  if (rn == NULL || rn->terrain->max_road < 0) {
     cmistake(u, u->thisorder, 94, MSG_PRODUCE);
     return;
   }
@@ -470,16 +500,20 @@ build_road(region * r, unit * u, int size, direction_t d)
 
   if (r->terrain == newterrain(T_SWAMP)) {
     /* wenn kein Damm existiert */
-    static const struct building_type * bt_dam;
-    if (!bt_dam) bt_dam = bt_find("dam");
+    static const struct building_type *bt_dam;
+
+    if (!bt_dam)
+      bt_dam = bt_find("dam");
     assert(bt_dam);
     if (!buildingtype_exists(r, bt_dam, true)) {
       cmistake(u, u->thisorder, 132, MSG_PRODUCE);
       return;
     }
   } else if (r->terrain == newterrain(T_DESERT)) {
-    static const struct building_type * bt_caravan;
-    if (!bt_caravan) bt_caravan = bt_find("caravan");
+    static const struct building_type *bt_caravan;
+
+    if (!bt_caravan)
+      bt_caravan = bt_find("caravan");
     assert(bt_caravan);
     /* wenn keine Karawanserei existiert */
     if (!buildingtype_exists(r, bt_caravan, true)) {
@@ -487,8 +521,10 @@ build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   } else if (r->terrain == newterrain(T_GLACIER)) {
-    static const struct building_type * bt_tunnel;
-    if (!bt_tunnel) bt_tunnel = bt_find("tunnel");
+    static const struct building_type *bt_tunnel;
+
+    if (!bt_tunnel)
+      bt_tunnel = bt_find("tunnel");
     assert(bt_tunnel);
     /* wenn kein Tunnel existiert */
     if (!buildingtype_exists(r, bt_tunnel, true)) {
@@ -502,17 +538,19 @@ build_road(region * r, unit * u, int size, direction_t d)
 
   /* hoffentlich ist r->road <= r->terrain->max_road, n also >= 0 */
   if (left <= 0) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_roads_finished", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+        "error_roads_finished", ""));
     return;
   }
 
-  if (size>0) left = MIN(size, left);
+  if (size > 0)
+    left = MIN(size, left);
   /* baumaximum anhand der rohstoffe */
-  if (u->race == new_race[RC_STONEGOLEM]){
+  if (u->race == new_race[RC_STONEGOLEM]) {
     n = u->number * GOLEM_STONE;
   } else {
     n = get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, left);
-    if (n==0) {
+    if (n == 0) {
       cmistake(u, u->thisorder, 151, MSG_PRODUCE);
       return;
     }
@@ -522,22 +560,27 @@ build_road(region * r, unit * u, int size, direction_t d)
   /* n = maximum by skill. try to maximize it */
   n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
   if (n < left) {
-    item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
-    if (itm!=NULL && itm->number>0) {
+    item *itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
+
+    if (itm != NULL && itm->number > 0) {
       int rings = MIN(u->number, itm->number);
-      n = n * ((roqf_factor()-1)*rings+u->number) / u->number;
+
+      n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
     }
   }
   if (n < left) {
     int dm = get_effect(u, oldpotiontype[P_DOMORE]);
+
     if (dm != 0) {
       int sk = eff_skill(u, SK_ROAD_BUILDING, r);
+
       int todo = (left - n + sk - 1) / sk;
+
       todo = MIN(todo, u->number);
       dm = MIN(dm, todo);
       change_effect(u, oldpotiontype[P_DOMORE], -dm);
       n += dm * sk;
-    }             /* Auswirkung Schaffenstrunk */
+    }                           /* Auswirkung Schaffenstrunk */
   }
 
   /* make minimum of possible and available: */
@@ -550,7 +593,8 @@ build_road(region * r, unit * u, int size, direction_t d)
 
   if (u->race == new_race[RC_STONEGOLEM]) {
     int golemsused = n / GOLEM_STONE;
-    if (n%GOLEM_STONE != 0){
+
+    if (n % GOLEM_STONE != 0) {
       ++golemsused;
     }
     scale_number(u, u->number - golemsused);
@@ -560,16 +604,16 @@ build_road(region * r, unit * u, int size, direction_t d)
     produceexp(u, SK_ROAD_BUILDING, MIN(n, u->number));
   }
   ADDMSG(&u->faction->msgs, msg_message("buildroad",
-    "region unit size", r, u, n));
+      "region unit size", r, u, n));
 }
+
 /* ------------------------------------------------------------- */
 
 /* ** ** ** ** ** ** *
  *  new build rules  *
  * ** ** ** ** ** ** */
 
-static int
-required(int size, int msize, int maxneed)
+static int required(int size, int msize, int maxneed)
   /* um size von msize Punkten zu bauen,
    * braucht man required von maxneed resourcen */
 {
@@ -582,12 +626,16 @@ required(int size, int msize, int maxneed)
 }
 
 static int
-matmod(const attrib * a, const unit * u, const resource_type * material, int value)
+matmod(const attrib * a, const unit * u, const resource_type * material,
+  int value)
 {
-  for (a=a_find((attrib*)a, &at_matmod);a && a->type==&at_matmod;a=a->next) {
-    mm_fun fun = (mm_fun)a->data.f;
+  for (a = a_find((attrib *) a, &at_matmod); a && a->type == &at_matmod;
+    a = a->next) {
+    mm_fun fun = (mm_fun) a->data.f;
+
     value = fun(u, material, value);
-    if (value<0) return value; /* pass errors to caller */
+    if (value < 0)
+      return value;             /* pass errors to caller */
   }
   return value;
 }
@@ -595,7 +643,8 @@ matmod(const attrib * a, const unit * u, const resource_type * material, int val
 int roqf_factor(void)
 {
   int value = -1;
-  if (value<0) {
+
+  if (value < 0) {
     value = get_param_int(global.parameters, "rules.economy.roqf", 10);
   }
   return value;
@@ -606,50 +655,60 @@ int roqf_factor(void)
 * of the first object have already been finished. return the
 * actual size that could be built.
 */
-int
-build(unit * u, const construction * ctype, int completed, int want)
+int build(unit * u, const construction * ctype, int completed, int want)
 {
-  const construction * type = ctype;
-  int skills = INT_MAX; /* number of skill points remainig */
+  const construction *type = ctype;
+
+  int skills = INT_MAX;         /* number of skill points remainig */
+
   int basesk = 0;
+
   int made = 0;
 
-  if (want<=0) return 0;
-  if (type==NULL) return 0;
-  if (type->improvement==NULL && completed==type->maxsize)
+  if (want <= 0)
+    return 0;
+  if (type == NULL)
+    return 0;
+  if (type->improvement == NULL && completed == type->maxsize)
     return ECOMPLETE;
-  if (type->btype!=NULL) {
-    building * b;
-    if (!u->building || u->building->type!=type->btype) {
+  if (type->btype != NULL) {
+    building *b;
+
+    if (!u->building || u->building->type != type->btype) {
       return EBUILDINGREQ;
     }
     b = inside_building(u);
-    if (b==NULL) return EBUILDINGREQ;
+    if (b == NULL)
+      return EBUILDINGREQ;
   }
 
-  if (type->skill!=NOSKILL) {
+  if (type->skill != NOSKILL) {
     int effsk;
+
     int dm = get_effect(u, oldpotiontype[P_DOMORE]);
 
     assert(u->number);
     basesk = effskill(u, type->skill);
-    if (basesk==0) return ENEEDSKILL;
+    if (basesk == 0)
+      return ENEEDSKILL;
 
     effsk = basesk;
     if (inside_building(u)) {
       effsk = skillmod(u->building->type->attribs, u, u->region, type->skill,
-          effsk, SMF_PRODUCTION);
+        effsk, SMF_PRODUCTION);
     }
     effsk = skillmod(type->attribs, u, u->region, type->skill,
-        effsk, SMF_PRODUCTION);
-    if (effsk<0) return effsk; /* pass errors to caller */
-    if (effsk==0) return ENEEDSKILL;
+      effsk, SMF_PRODUCTION);
+    if (effsk < 0)
+      return effsk;             /* pass errors to caller */
+    if (effsk == 0)
+      return ENEEDSKILL;
 
     skills = effsk * u->number;
 
     /* technically, nimblefinge and domore should be in a global set of
-    * "game"-attributes, (as at_skillmod) but for a while, we're leaving
-    * them in here. */
+     * "game"-attributes, (as at_skillmod) but for a while, we're leaving
+     * them in here. */
 
     if (dm != 0) {
       /* Auswirkung Schaffenstrunk */
@@ -658,7 +717,7 @@ build(unit * u, const construction * ctype, int completed, int want)
       skills += dm * effsk;
     }
   }
-  for (;want>0 && skills>0;) {
+  for (; want > 0 && skills > 0;) {
     int c, n;
 
     /* skip over everything that's already been done:
@@ -666,17 +725,16 @@ build(unit * u, const construction * ctype, int completed, int want)
      * type->improvement==type means build another object of the same time
      * while material lasts type->improvement==x means build x when type
      * is finished */
-    while (type->improvement!=NULL &&
-         type->improvement!=type &&
-         type->maxsize>0 &&
-         type->maxsize<=completed)
-    {
+    while (type->improvement != NULL &&
+      type->improvement != type &&
+      type->maxsize > 0 && type->maxsize <= completed) {
       completed -= type->maxsize;
       type = type->improvement;
     }
-    if (type==NULL) {
-      if (made==0) return ECOMPLETE;
-      break; /* completed */
+    if (type == NULL) {
+      if (made == 0)
+        return ECOMPLETE;
+      break;                    /* completed */
     }
 
     /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
@@ -684,15 +742,16 @@ build(unit * u, const construction * ctype, int completed, int want)
      *  (enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
      *  die gleiche wie die vorherige ist. z.b. gegenstände.
      */
-    if (type->maxsize>1) {
+    if (type->maxsize > 1) {
       completed = completed % type->maxsize;
-    }
-    else {
-      completed = 0; assert(type->reqsize>=1);
+    } else {
+      completed = 0;
+      assert(type->reqsize >= 1);
     }
 
     if (basesk < type->minskill) {
-      if (made==0) return ELOWSKILL; /* not good enough to go on */
+      if (made == 0)
+        return ELOWSKILL;       /* not good enough to go on */
     }
 
     /* n = maximum buildable size */
@@ -703,70 +762,96 @@ build(unit * u, const construction * ctype, int completed, int want)
     }
     /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
      * Talente */
-    if (skill_limit(u->faction, type->skill)==INT_MAX) {
+    if (skill_limit(u->faction, type->skill) == INT_MAX) {
       int i = 0;
-      item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
-      if (itm!=NULL) i = itm->number;
-      if (i>0) {
+
+      item *itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
+
+      if (itm != NULL)
+        i = itm->number;
+      if (i > 0) {
         int rings = MIN(u->number, i);
-        n = n * ((roqf_factor()-1)*rings+u->number) / u->number;
+
+        n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
       }
     }
 
-    if (want>0) {
+    if (want > 0) {
       n = MIN(want, n);
     }
 
-    if (type->maxsize>0) {
-      n = MIN(type->maxsize-completed, n);
-      if (type->improvement==NULL) {
+    if (type->maxsize > 0) {
+      n = MIN(type->maxsize - completed, n);
+      if (type->improvement == NULL) {
         want = n;
       }
     }
 
-    if (type->materials) for (c=0;n>0 && type->materials[c].number;c++) {
-      const struct resource_type * rtype = type->materials[c].rtype;
-      int need, prebuilt;
-      int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+    if (type->materials)
+      for (c = 0; n > 0 && type->materials[c].number; c++) {
+        const struct resource_type *rtype = type->materials[c].rtype;
 
-      if (inside_building(u)) {
-        canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-      }
+        int need, prebuilt;
 
-      if (canuse<0) return canuse; /* pass errors to caller */
-      canuse = matmod(type->attribs, u, rtype, canuse);
-      if (type->reqsize>1) {
-        prebuilt = required(completed, type->reqsize, type->materials[c].number);
-        for (;n;) {
-          need = required(completed + n, type->reqsize, type->materials[c].number);
-          if (need-prebuilt<=canuse) break;
-          --n; /* TODO: optimieren? */
+        int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+
+        if (inside_building(u)) {
+          canuse = matmod(u->building->type->attribs, u, rtype, canuse);
         }
-      } else {
-        int maxn = canuse / type->materials[c].number;
-        if (maxn < n) n = maxn;
+
+        if (canuse < 0)
+          return canuse;        /* pass errors to caller */
+        canuse = matmod(type->attribs, u, rtype, canuse);
+        if (type->reqsize > 1) {
+          prebuilt =
+            required(completed, type->reqsize, type->materials[c].number);
+          for (; n;) {
+            need =
+              required(completed + n, type->reqsize, type->materials[c].number);
+            if (need - prebuilt <= canuse)
+              break;
+            --n;                /* TODO: optimieren? */
+          }
+        } else {
+          int maxn = canuse / type->materials[c].number;
+
+          if (maxn < n)
+            n = maxn;
+        }
       }
+    if (n <= 0) {
+      if (made == 0)
+        return ENOMATERIALS;
+      else
+        break;
     }
-    if (n<=0) {
-      if (made==0) return ENOMATERIALS;
-      else break;
-    }
-    if (type->materials) for (c=0;type->materials[c].number;c++) {
-      const struct resource_type * rtype = type->materials[c].rtype;
-      int prebuilt = required(completed, type->reqsize, type->materials[c].number);
-      int need = required(completed + n, type->reqsize, type->materials[c].number);
-      int multi = 1;
-      int canuse = 100; /* normalization */
-      if (inside_building(u)) canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-      if (canuse<0) return canuse; /* pass errors to caller */
-      canuse = matmod(type->attribs, u, rtype, canuse);
+    if (type->materials)
+      for (c = 0; type->materials[c].number; c++) {
+        const struct resource_type *rtype = type->materials[c].rtype;
 
-      assert(canuse % 100 == 0 || !"only constant multipliers are implemented in build()");
-      multi = canuse/100;
-      if (canuse<0) return canuse; /* pass errors to caller */
+        int prebuilt =
+          required(completed, type->reqsize, type->materials[c].number);
+        int need =
+          required(completed + n, type->reqsize, type->materials[c].number);
+        int multi = 1;
 
-      use_pooled(u, rtype, GET_DEFAULT, (need-prebuilt+multi-1)/multi);
-    }
+        int canuse = 100;       /* normalization */
+
+        if (inside_building(u))
+          canuse = matmod(u->building->type->attribs, u, rtype, canuse);
+        if (canuse < 0)
+          return canuse;        /* pass errors to caller */
+        canuse = matmod(type->attribs, u, rtype, canuse);
+
+        assert(canuse % 100 == 0
+          || !"only constant multipliers are implemented in build()");
+        multi = canuse / 100;
+        if (canuse < 0)
+          return canuse;        /* pass errors to caller */
+
+        use_pooled(u, rtype, GET_DEFAULT,
+          (need - prebuilt + multi - 1) / multi);
+      }
     made += n;
     skills -= n * type->minskill;
     want -= n;
@@ -778,16 +863,19 @@ build(unit * u, const construction * ctype, int completed, int want)
   return made;
 }
 
-message *
-msg_materials_required(unit * u, order * ord, const construction * ctype, int multi)
+message *msg_materials_required(unit * u, order * ord,
+  const construction * ctype, int multi)
 {
   int c;
-  /* something missing from the list of materials */
-  resource * reslist = NULL;
 
-  if (multi<=0 || multi==INT_MAX) multi = 1;
-  for (c=0;ctype->materials[c].number; ++c) {
-    resource * res = malloc(sizeof(resource));
+  /* something missing from the list of materials */
+  resource *reslist = NULL;
+
+  if (multi <= 0 || multi == INT_MAX)
+    multi = 1;
+  for (c = 0; ctype->materials[c].number; ++c) {
+    resource *res = malloc(sizeof(resource));
+
     res->number = multi * ctype->materials[c].number / ctype->reqsize;
     res->type = ctype->materials[c].rtype;
     res->next = reslist;
@@ -796,21 +884,25 @@ msg_materials_required(unit * u, order * ord, const construction * ctype, int mu
   return msg_feedback(u, ord, "build_required", "required", reslist);
 }
 
-int
-maxbuild(const unit * u, const construction * cons)
+int maxbuild(const unit * u, const construction * cons)
   /* calculate maximum size that can be built from available material */
-  /* !! ignores maximum objectsize and improvements...*/
+  /* !! ignores maximum objectsize and improvements... */
 {
   int c;
+
   int maximum = INT_MAX;
-  for (c=0;cons->materials[c].number;c++) {
-    const resource_type * rtype = cons->materials[c].rtype;
+
+  for (c = 0; cons->materials[c].number; c++) {
+    const resource_type *rtype = cons->materials[c].rtype;
+
     int have = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+
     int need = required(1, cons->reqsize, cons->materials[c].number);
-    if (have<need) {
+
+    if (have < need) {
       return 0;
-    }
-    else maximum = MIN(maximum, have/need);
+    } else
+      maximum = MIN(maximum, have / need);
   }
   return maximum;
 }
@@ -820,14 +912,21 @@ maxbuild(const unit * u, const construction * cons)
 void
 build_building(unit * u, const building_type * btype, int want, order * ord)
 {
-  region * r = u->region;
+  region *r = u->region;
+
   boolean newbuilding = false;
+
   int n = want, built = 0, id;
-  building * b = NULL;
+
+  building *b = NULL;
+
   /* einmalige Korrektur */
-  const char * btname;
-  order * new_order = NULL;
-  const struct locale * lang = u->faction->locale;
+  const char *btname;
+
+  order *new_order = NULL;
+
+  const struct locale *lang = u->faction->locale;
+
   static int rule_other = -1;
 
   assert(u->number);
@@ -843,11 +942,11 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
   /* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
   id = getid();
-  if (id>0) { /* eine Nummer angegeben, keine neue Burg bauen */
+  if (id > 0) {                 /* eine Nummer angegeben, keine neue Burg bauen */
     b = findbuilding(id);
     if (!b || b->region != u->region) { /* eine Burg mit dieser Nummer gibt es hier nicht */
       /* vieleicht Tippfehler und die eigene Burg ist gemeint? */
-      if (u->building && u->building->type==btype) {
+      if (u->building && u->building->type == btype) {
         b = u->building;
       } else {
         /* keine neue Burg anfangen wenn eine Nummer angegeben war */
@@ -855,11 +954,12 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
         return;
       }
     }
-  } else if (u->building && u->building->type==btype) {
+  } else if (u->building && u->building->type == btype) {
     b = u->building;
   }
 
-  if (b) btype = b->type;
+  if (b)
+    btype = b->type;
 
   if (b && fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
     /* only one of these per region */
@@ -876,35 +976,38 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     cmistake(u, ord, 221, MSG_PRODUCE);
     return;
   }
-  if (r->terrain->max_road<=0) {
+  if (r->terrain->max_road <= 0) {
     /* special terrain, cannot build */
     cmistake(u, ord, 221, MSG_PRODUCE);
     return;
   }
   if (btype->flags & BTF_ONEPERTURN) {
-    if(b && fval(b, BLD_EXPANDED)) {
+    if (b && fval(b, BLD_EXPANDED)) {
       cmistake(u, ord, 318, MSG_PRODUCE);
       return;
     }
     n = 1;
   }
   if (b) {
-    if (rule_other<0) {
-      rule_other = get_param_int(global.parameters, "rules.build.other_buildings", 1);
+    if (rule_other < 0) {
+      rule_other =
+        get_param_int(global.parameters, "rules.build.other_buildings", 1);
     }
     if (!rule_other) {
-      unit * owner = building_owner(b);
-      if (!owner || owner->faction!=u->faction) {
+      unit *owner = building_owner(b);
+
+      if (!owner || owner->faction != u->faction) {
         cmistake(u, ord, 1222, MSG_PRODUCE);
         return;
       }
     }
   }
 
-  if (b) built = b->size;
-  if (n<=0 || n == INT_MAX) {
-    if(b == NULL) {
-      if(btype->maxsize > 0) {
+  if (b)
+    built = b->size;
+  if (n <= 0 || n == INT_MAX) {
+    if (b == NULL) {
+      if (btype->maxsize > 0) {
         n = btype->maxsize - built;
       } else {
         n = INT_MAX;
@@ -920,23 +1023,24 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   built = build(u, btype->construction, built, n);
 
   switch (built) {
-  case ECOMPLETE:
-    /* the building is already complete */
-    cmistake(u, ord, 4, MSG_PRODUCE);
-    return;
-  case ENOMATERIALS:
-    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, btype->construction, want));
-    return;
-  case ELOWSKILL:
-  case ENEEDSKILL:
-    /* no skill, or not enough skill points to build */
-    cmistake(u, ord, 50, MSG_PRODUCE);
-    return;
+    case ECOMPLETE:
+      /* the building is already complete */
+      cmistake(u, ord, 4, MSG_PRODUCE);
+      return;
+    case ENOMATERIALS:
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
+          btype->construction, want));
+      return;
+    case ELOWSKILL:
+    case ENEEDSKILL:
+      /* no skill, or not enough skill points to build */
+      cmistake(u, ord, 50, MSG_PRODUCE);
+      return;
   }
 
 
   /* at this point, the building size is increased. */
-  if (b==NULL) {
+  if (b == NULL) {
     /* build a new building */
     b = new_building(btype, r, lang);
     b->type = btype;
@@ -947,10 +1051,10 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       u->building = b;
       fset(u, UFL_OWNER);
     }
-
 #ifdef WDW_PYRAMID
-    if(b->type == bt_find("pyramid") && f_get_alliance(u->faction) != NULL) {
-      attrib * a = a_add(&b->attribs, a_new(&at_alliance));
+    if (b->type == bt_find("pyramid") && f_get_alliance(u->faction) != NULL) {
+      attrib *a = a_add(&b->attribs, a_new(&at_alliance));
+
       a->data.i = u->faction->alliance->id;
     }
 #endif
@@ -960,20 +1064,24 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
   btname = LOC(lang, btype->_name);
 
-  if (want-built <= 0) {
+  if (want - built <= 0) {
     /* gebäude fertig */
     new_order = default_order(lang);
-  } else if (want!=INT_MAX) {
+  } else if (want != INT_MAX) {
     /* reduzierte restgröße */
-    const char * hasspace = strchr(btname, ' ');
+    const char *hasspace = strchr(btname, ' ');
+
     if (hasspace) {
-      new_order = create_order(K_MAKE, lang, "%d \"%s\" %i", n-built, btname, b->no);
+      new_order =
+        create_order(K_MAKE, lang, "%d \"%s\" %i", n - built, btname, b->no);
     } else {
-      new_order = create_order(K_MAKE, lang, "%d %s %i", n-built, btname, b->no);
+      new_order =
+        create_order(K_MAKE, lang, "%d %s %i", n - built, btname, b->no);
     }
   } else if (btname) {
     /* Neues Haus, Befehl mit Gebäudename */
-    const char * hasspace = strchr(btname, ' ');
+    const char *hasspace = strchr(btname, ' ');
+
     if (hasspace) {
       new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);
     } else {
@@ -993,47 +1101,55 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
 
   ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
-    "building unit size", b, u, built));
+      "building unit size", b, u, built));
 }
 
-static void
-build_ship(unit * u, ship * sh, int want)
+static void build_ship(unit * u, ship * sh, int want)
 {
-  const construction * construction = sh->type->construction;
+  const construction *construction = sh->type->construction;
+
   int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+
   int n;
+
   int can = build(u, construction, size, want);
 
-  if ((n=construction->maxsize - sh->size)>0 && can>0) {
-    if (can>=n) {
-     sh->size += n;
-     can -= n;
-    }
-    else {
-     sh->size += can;
-     n=can;
-     can = 0;
+  if ((n = construction->maxsize - sh->size) > 0 && can > 0) {
+    if (can >= n) {
+      sh->size += n;
+      can -= n;
+    } else {
+      sh->size += can;
+      n = can;
+      can = 0;
     }
   }
 
   if (sh->damage && can) {
     int repair = MIN(sh->damage, can * DAMAGE_SCALE);
+
     n += repair / DAMAGE_SCALE;
-    if (repair % DAMAGE_SCALE) ++n;
+    if (repair % DAMAGE_SCALE)
+      ++n;
     sh->damage = sh->damage - repair;
   }
 
-  if (n) ADDMSG(&u->faction->msgs,
-    msg_message("buildship", "ship unit size", sh, u, n));
+  if (n)
+    ADDMSG(&u->faction->msgs,
+      msg_message("buildship", "ship unit size", sh, u, n));
 }
 
 void
-create_ship(region * r, unit * u, const struct ship_type * newtype, int want, order * ord)
+create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
+  order * ord)
 {
   ship *sh;
+
   int msize;
-  const construction * cons = newtype->construction;
-  order * new_order;
+
+  const construction *cons = newtype->construction;
+
+  order *new_order;
 
   if (!eff_skill(u, SK_SHIPBUILDING, r)) {
     cmistake(u, ord, 100, MSG_PRODUCE);
@@ -1046,18 +1162,21 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
 
   /* check if skill and material for 1 size is available */
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_build_skill_low", "value name", 
-      cons->minskill, newtype->name[1]));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+        "error_build_skill_low", "value name", cons->minskill,
+        newtype->name[1]));
     return;
   }
 
   msize = maxbuild(u, cons);
-  if (msize==0) {
+  if (msize == 0) {
     cmistake(u, ord, 88, MSG_PRODUCE);
     return;
   }
-  if (want>0) want = MIN(want, msize);
-  else want = msize;
+  if (want > 0)
+    want = MIN(want, msize);
+  else
+    want = msize;
 
   sh = new_ship(newtype, u->faction->locale, r);
 
@@ -1067,18 +1186,21 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
       fset(u, UFL_OWNER);
     }
   }
-  new_order = create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale, parameters[P_SHIP]), sh->no);
+  new_order =
+    create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale,
+      parameters[P_SHIP]), sh->no);
   replace_order(&u->orders, ord, new_order);
   free_order(new_order);
 
   build_ship(u, sh, want);
 }
 
-void
-continue_ship(region * r, unit * u, int want)
+void continue_ship(region * r, unit * u, int want)
 {
-  const construction * cons;
+  const construction *cons;
+
   ship *sh;
+
   int msize;
 
   if (!eff_skill(u, SK_SHIPBUILDING, r)) {
@@ -1089,60 +1211,65 @@ continue_ship(region * r, unit * u, int want)
   /* Die Schiffsnummer bzw der Schiffstyp wird eingelesen */
   sh = getship(r);
 
-  if (!sh) sh = u->ship;
+  if (!sh)
+    sh = u->ship;
 
   if (!sh) {
     cmistake(u, u->thisorder, 20, MSG_PRODUCE);
     return;
   }
   cons = sh->type->construction;
-  assert(cons->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-  if (sh->size==cons->maxsize && !sh->damage) {
+  assert(cons->improvement == NULL);    /* sonst ist construction::size nicht ship_type::maxsize */
+  if (sh->size == cons->maxsize && !sh->damage) {
     cmistake(u, u->thisorder, 16, MSG_PRODUCE);
     return;
   }
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_build_skill_low", "value name", 
-      cons->minskill, sh->type->name[1]));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+        "error_build_skill_low", "value name", cons->minskill,
+        sh->type->name[1]));
     return;
   }
   msize = maxbuild(u, cons);
-  if (msize==0) {
+  if (msize == 0) {
     cmistake(u, u->thisorder, 88, MSG_PRODUCE);
     return;
   }
-  if (want > 0) want = MIN(want, msize);
-  else want = msize;
+  if (want > 0)
+    want = MIN(want, msize);
+  else
+    want = msize;
 
   build_ship(u, sh, want);
 }
+
 /* ------------------------------------------------------------- */
 
-static boolean
-mayenter(region * r, unit * u, building * b)
+static boolean mayenter(region * r, unit * u, building * b)
 {
   unit *u2;
-  if (fval(b, BLD_UNGUARDED)) return true;
+
+  if (fval(b, BLD_UNGUARDED))
+    return true;
   u2 = building_owner(b);
 
-  if (u2==NULL || ucontact(u2, u)
-    || alliedunit(u2, u->faction, HELP_GUARD)) return true;
+  if (u2 == NULL || ucontact(u2, u)
+    || alliedunit(u2, u->faction, HELP_GUARD))
+    return true;
 
   return false;
 }
 
-static int
-mayboard(const unit * u, const ship * sh)
+static int mayboard(const unit * u, const ship * sh)
 {
   unit *u2 = shipowner(sh);
 
   return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
 }
 
-int
-leave_cmd(unit * u, struct order * ord)
+int leave_cmd(unit * u, struct order *ord)
 {
-  region * r = u->region;
+  region *r = u->region;
 
   if (fval(u, UFL_ENTER)) {
     /* if we just entered this round, then we don't leave again */
@@ -1150,7 +1277,7 @@ leave_cmd(unit * u, struct order * ord)
   }
 
   if (fval(r->terrain, SEA_REGION) && u->ship) {
-    if(!fval(u->race, RCF_SWIM)) {
+    if (!fval(u->race, RCF_SWIM)) {
       cmistake(u, ord, 11, MSG_MOVE);
       return 0;
     }
@@ -1160,53 +1287,62 @@ leave_cmd(unit * u, struct order * ord)
     }
   }
   if (!slipthru(r, u, u->building)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged", "building", u->building));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged",
+        "building", u->building));
   } else {
     leave(u, true);
   }
   return 0;
 }
 
-static boolean
-enter_ship(unit * u, struct order * ord, int id, boolean report)
+static boolean enter_ship(unit * u, struct order *ord, int id, boolean report)
 {
-  region * r = u->region;
-  ship * sh;
+  region *r = u->region;
+
+  ship *sh;
 
   /* Muß abgefangen werden, sonst könnten Schwimmer an
    * Bord von Schiffen an Land gelangen. */
-  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY))) {
+  if (!fval(u->race, RCF_CANSAIL) || (!fval(u->race, RCF_WALK)
+      && !fval(u->race, RCF_FLY))) {
     cmistake(u, ord, 233, MSG_MOVE);
     return false;
   }
 
   sh = findship(id);
-  if (sh == NULL || sh->region!=r) {
-    if (report) cmistake(u, ord, 20, MSG_MOVE);
+  if (sh == NULL || sh->region != r) {
+    if (report)
+      cmistake(u, ord, 20, MSG_MOVE);
     return false;
   }
-  if (sh==u->ship) return true;
+  if (sh == u->ship)
+    return true;
   if (!mayboard(u, sh)) {
-    if (report) cmistake(u, ord, 34, MSG_MOVE);
+    if (report)
+      cmistake(u, ord, 34, MSG_MOVE);
     return false;
   }
   if (CheckOverload()) {
     int sweight, scabins;
+
     int mweight = shipcapacity(sh);
+
     int mcabins = sh->type->cabins;
-    
-    if (mweight>0) {
+
+    if (mweight > 0) {
       getshipweight(sh, &sweight, &scabins);
       sweight += weight(u);
       if (mcabins) {
         int pweight = u->number * u->race->weight;
+
         /* weight goes into number of cabins, not cargo */
         scabins += pweight;
         sweight -= pweight;
       }
 
       if (sweight > mweight || (mcabins && (scabins > mcabins))) {
-        if (report) cmistake(u, ord, 34, MSG_MOVE);
+        if (report)
+          cmistake(u, ord, 34, MSG_MOVE);
         return false;
       }
     }
@@ -1223,14 +1359,14 @@ enter_ship(unit * u, struct order * ord, int id, boolean report)
   return true;
 }
 
-static boolean
-enter_building(unit * u, order * ord, int id, boolean report)
+static boolean enter_building(unit * u, order * ord, int id, boolean report)
 {
-  region * r = u->region;
-  building * b;
+  region *r = u->region;
+
+  building *b;
 
   /* Schwimmer können keine Gebäude betreten, außer diese sind
-  * auf dem Ozean */
+   * auf dem Ozean */
   if (!fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
     if (!fval(r->terrain, SEA_REGION)) {
       if (report) {
@@ -1241,7 +1377,7 @@ enter_building(unit * u, order * ord, int id, boolean report)
   }
 
   b = findbuilding(id);
-  if (b==NULL || b->region!=r) {
+  if (b == NULL || b->region != r) {
     if (report) {
       cmistake(u, ord, 6, MSG_MOVE);
     }
@@ -1249,13 +1385,15 @@ enter_building(unit * u, order * ord, int id, boolean report)
   }
   if (!mayenter(r, u, b)) {
     if (report) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied", "building", b));
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied",
+          "building", b));
     }
     return false;
   }
   if (!slipthru(r, u, b)) {
     if (report) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged", "building", b));
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged",
+          "building", b));
     }
     return false;
   }
@@ -1271,32 +1409,36 @@ enter_building(unit * u, order * ord, int id, boolean report)
   return false;
 }
 
-void
-do_misc(region * r, boolean lasttry)
+void do_misc(region * r, boolean lasttry)
 {
   unit **uptr, *uc;
 
   for (uc = r->units; uc; uc = uc->next) {
-    order * ord;
+    order *ord;
+
     for (ord = uc->orders; ord; ord = ord->next) {
       switch (get_keyword(ord)) {
-      case K_CONTACT:
-        contact_cmd(uc, ord, lasttry);
-        break;
+        case K_CONTACT:
+          contact_cmd(uc, ord, lasttry);
+          break;
       }
     }
   }
 
   for (uptr = &r->units; *uptr;) {
-    unit * u = *uptr;
-    order ** ordp = &u->orders;
+    unit *u = *uptr;
+
+    order **ordp = &u->orders;
 
     while (*ordp) {
-      order * ord = *ordp;
+      order *ord = *ordp;
+
       if (get_keyword(ord) == K_ENTER) {
         param_t p;
+
         int id;
-        unit * ulast = NULL;
+
+        unit *ulast = NULL;
 
         init_tokens(ord);
         skip_token();
@@ -1304,45 +1446,50 @@ do_misc(region * r, boolean lasttry)
         id = getid();
 
         switch (p) {
-        case P_BUILDING:
-        case P_GEBAEUDE:
-          if (u->building && u->building->no==id) break;
-          if (enter_building(u, ord, id, lasttry)) {
-            unit *ub;
-            for (ub=u;ub;ub=ub->next) {
-              if (ub->building==u->building) {
-                ulast = ub;
+          case P_BUILDING:
+          case P_GEBAEUDE:
+            if (u->building && u->building->no == id)
+              break;
+            if (enter_building(u, ord, id, lasttry)) {
+              unit *ub;
+
+              for (ub = u; ub; ub = ub->next) {
+                if (ub->building == u->building) {
+                  ulast = ub;
+                }
               }
             }
-          }
-          break;
+            break;
 
-        case P_SHIP:
-          if (u->ship && u->ship->no==id) break;
-          if (enter_ship(u, ord, id, lasttry)) {
-            unit *ub;
-            ulast = u;
-            for (ub=u;ub;ub=ub->next) {
-              if (ub->ship==u->ship) {
-                ulast = ub;
+          case P_SHIP:
+            if (u->ship && u->ship->no == id)
+              break;
+            if (enter_ship(u, ord, id, lasttry)) {
+              unit *ub;
+
+              ulast = u;
+              for (ub = u; ub; ub = ub->next) {
+                if (ub->ship == u->ship) {
+                  ulast = ub;
+                }
               }
             }
-          }
-          break;
+            break;
 
-        default:
-          if (lasttry) cmistake(u, ord, 79, MSG_MOVE);
+          default:
+            if (lasttry)
+              cmistake(u, ord, 79, MSG_MOVE);
 
         }
-        if (ulast!=NULL) {
+        if (ulast != NULL) {
           /* Wenn wir hier angekommen sind, war der Befehl
-            * erfolgreich und wir löschen ihn, damit er im
-            * zweiten Versuch nicht nochmal ausgeführt wird. */
+           * erfolgreich und wir löschen ihn, damit er im
+           * zweiten Versuch nicht nochmal ausgeführt wird. */
           *ordp = ord->next;
           ord->next = NULL;
           free_order(ord);
 
-          if (ulast!=u) {
+          if (ulast != u) {
             /* put u behind ulast so it's the last unit in the building */
             *uptr = u->next;
             u->next = ulast->next;
@@ -1351,8 +1498,10 @@ do_misc(region * r, boolean lasttry)
           break;
         }
       }
-      if (*ordp==ord) ordp = &ord->next;
+      if (*ordp == ord)
+        ordp = &ord->next;
     }
-    if (*uptr==u) uptr = &u->next;
+    if (*uptr == u)
+      uptr = &u->next;
   }
 }

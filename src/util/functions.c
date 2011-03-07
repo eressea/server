@@ -26,48 +26,52 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 typedef struct function_list {
-	struct function_list * next;
-	pf_generic fun;
-	const char * name;
+  struct function_list *next;
+  pf_generic fun;
+  const char *name;
 } function_list;
 
-static function_list * functionlist;
+static function_list *functionlist;
 
-pf_generic
-get_function(const char * name)
+pf_generic get_function(const char *name)
 {
-	function_list * fl = functionlist;
-	if (name==NULL) return NULL;
-	while (fl && strcmp(fl->name, name)!=0) fl=fl->next;
-	if (fl) return fl->fun;
-	return NULL;
+  function_list *fl = functionlist;
+
+  if (name == NULL)
+    return NULL;
+  while (fl && strcmp(fl->name, name) != 0)
+    fl = fl->next;
+  if (fl)
+    return fl->fun;
+  return NULL;
 }
 
-const char *
-get_functionname(pf_generic fun)
+const char *get_functionname(pf_generic fun)
 {
-	function_list * fl = functionlist;
-	while (fl && fl->fun!=fun) fl=fl->next;
-	if (fl) return fl->name;
-	return NULL;
+  function_list *fl = functionlist;
+
+  while (fl && fl->fun != fun)
+    fl = fl->next;
+  if (fl)
+    return fl->name;
+  return NULL;
 }
 
-void
-register_function(pf_generic fun, const char * name)
+void register_function(pf_generic fun, const char *name)
 {
-  function_list * fl = (function_list *)malloc(sizeof(function_list));
+  function_list *fl = (function_list *) malloc(sizeof(function_list));
+
   fl->next = functionlist;
   fl->fun = fun;
   fl->name = strdup(name);
   functionlist = fl;
 }
 
-void
-list_registered_functions(void)
+void list_registered_functions(void)
 {
-  function_list * fl = functionlist;
+  function_list *fl = functionlist;
 
-  while(fl) {
+  while (fl) {
     printf("%s\n", fl->name);
     fl = fl->next;
   }

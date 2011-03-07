@@ -22,43 +22,43 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct plane;
-struct attrib;
-struct unit;
-struct faction;
-struct region;
+  struct plane;
+  struct attrib;
+  struct unit;
+  struct faction;
+  struct region;
 
-enum {
-  ALLIANCE_KICK,
-  ALLIANCE_LEAVE,
-  ALLIANCE_TRANSFER,
-  ALLIANCE_NEW,
-  ALLIANCE_INVITE,
-  ALLIANCE_JOIN,
-  ALLIANCE_MAX
-};
+  enum {
+    ALLIANCE_KICK,
+    ALLIANCE_LEAVE,
+    ALLIANCE_TRANSFER,
+    ALLIANCE_NEW,
+    ALLIANCE_INVITE,
+    ALLIANCE_JOIN,
+    ALLIANCE_MAX
+  };
 
-#define ALF_NON_ALLIED (1<<0) /* this alliance is just a default for a non-allied faction */
+#define ALF_NON_ALLIED (1<<0)   /* this alliance is just a default for a non-allied faction */
 
-typedef struct alliance {
-  struct alliance * next;
-  struct faction * _leader;
-  struct quicklist * members;
-  unsigned int flags;
-  int id;
-  char * name;
-} alliance;
+  typedef struct alliance {
+    struct alliance *next;
+    struct faction *_leader;
+    struct quicklist *members;
+    unsigned int flags;
+    int id;
+    char *name;
+  } alliance;
 
-extern alliance * alliances;
-extern alliance * findalliance(int id);
-extern alliance * makealliance(int id, const char * name);
-extern const char * alliancename(const struct alliance * al);
-extern void setalliance(struct faction * f, alliance * al);
-void free_alliance(struct alliance * al);
-extern struct faction * alliance_get_leader(struct alliance * al);
-extern void alliance_cmd(void);
+  extern alliance *alliances;
+  extern alliance *findalliance(int id);
+  extern alliance *makealliance(int id, const char *name);
+  extern const char *alliancename(const struct alliance *al);
+  extern void setalliance(struct faction *f, alliance * al);
+  void free_alliance(struct alliance *al);
+  extern struct faction *alliance_get_leader(struct alliance *al);
+  extern void alliance_cmd(void);
 
-void alliance_setname(alliance * self, const char * name);
+  void alliance_setname(alliance * self, const char *name);
 /* execute commands */
 
 #ifdef __cplusplus

@@ -22,24 +22,23 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 attrib_type at_fleechance = {
-	"fleechance",
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+  "fleechance",
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
 };
 
-attrib *
-make_fleechance(float fleechance)
+attrib *make_fleechance(float fleechance)
 {
-	attrib * a = a_new(&at_fleechance);
-	a->data.flt = fleechance;
-	return a;
+  attrib *a = a_new(&at_fleechance);
+
+  a->data.flt = fleechance;
+  return a;
 }
 
-void
-init_fleechance(void)
+void init_fleechance(void)
 {
-	at_register(&at_fleechance);
+  at_register(&at_fleechance);
 }

@@ -29,33 +29,35 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/storage.h>
 
 static void
-write_targetregion(const attrib * a, const void * owner, struct storage * store)
+write_targetregion(const attrib * a, const void *owner, struct storage *store)
 {
-  write_region_reference((region*)a->data.v, store);
+  write_region_reference((region *) a->data.v, store);
 }
 
-static int
-read_targetregion(attrib * a, void * owner, struct storage * store)
+static int read_targetregion(attrib * a, void *owner, struct storage *store)
 {
-  int result = read_reference(&a->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
-  if (result==0 && !a->data.v) return AT_READ_FAIL;
+  int result =
+    read_reference(&a->data.v, store, read_region_reference,
+    RESOLVE_REGION(store->version));
+  if (result == 0 && !a->data.v)
+    return AT_READ_FAIL;
   return AT_READ_OK;
 }
 
 attrib_type at_targetregion = {
-	"targetregion",
-	NULL,
-	NULL,
-	NULL,
-	write_targetregion,
-	read_targetregion,
-	ATF_UNIQUE
+  "targetregion",
+  NULL,
+  NULL,
+  NULL,
+  write_targetregion,
+  read_targetregion,
+  ATF_UNIQUE
 };
 
-attrib *
-make_targetregion(struct region * r)
+attrib *make_targetregion(struct region * r)
 {
-	attrib * a = a_new(&at_targetregion);
-	a->data.v = r;
-	return a;
+  attrib *a = a_new(&at_targetregion);
+
+  a->data.v = r;
+  return a;
 }

@@ -22,12 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern struct attrib_type at_aggressive;
-extern struct attrib * make_aggressive(double probability);
-extern void init_aggressive(void);
+  extern struct attrib_type at_aggressive;
+  extern struct attrib *make_aggressive(double probability);
+  extern void init_aggressive(void);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

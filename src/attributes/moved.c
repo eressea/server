@@ -23,41 +23,41 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/storage.h>
 
-static int
-age_moved(attrib * a)
+static int age_moved(attrib * a)
 {
-	--a->data.i;
-	return a->data.i > 0;
+  --a->data.i;
+  return a->data.i > 0;
 }
 
 static void
-write_moved(const attrib * a, const void * owner, struct storage * store)
+write_moved(const attrib * a, const void *owner, struct storage *store)
 {
-	store->w_int(store, a->data.i);
+  store->w_int(store, a->data.i);
 }
 
-static int
-read_moved(attrib * a, void * owner, struct storage * store)
+static int read_moved(attrib * a, void *owner, struct storage *store)
 {
-	a->data.i = store->r_int(store);
-	if (a->data.i !=0 ) return AT_READ_OK;
-	else return AT_READ_FAIL;
+  a->data.i = store->r_int(store);
+  if (a->data.i != 0)
+    return AT_READ_OK;
+  else
+    return AT_READ_FAIL;
 }
 
 attrib_type at_moved = {
-	"moved", NULL, NULL, age_moved, write_moved, read_moved
+  "moved", NULL, NULL, age_moved, write_moved, read_moved
 };
 
-boolean
-get_moved(attrib ** alist)
+boolean get_moved(attrib ** alist)
 {
-	return a_find(*alist, &at_moved) ? true : false;
+  return a_find(*alist, &at_moved) ? true : false;
 }
 
-void
-set_moved(attrib ** alist)
+void set_moved(attrib ** alist)
 {
-	attrib * a = a_find(*alist, &at_moved);
-	if (a==NULL) a = a_add(alist, a_new(&at_moved));
-	a->data.i = 2;
+  attrib *a = a_find(*alist, &at_moved);
+
+  if (a == NULL)
+    a = a_add(alist, a_new(&at_moved));
+  a->data.i = 2;
 }

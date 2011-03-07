@@ -44,32 +44,32 @@ without prior permission by the authors of Eressea.
 
 #pragma endregion
 
-alliance * alliances = NULL;
+alliance *alliances = NULL;
 
-void
-free_alliance(alliance * al)
+void free_alliance(alliance * al)
 {
   free(al->name);
-  if (al->members) ql_free(al->members);
+  if (al->members)
+    ql_free(al->members);
   free(al);
 }
 
-alliance *
-makealliance(int id, const char * name)
+alliance *makealliance(int id, const char *name)
 {
-  alliance * al;;
-  
+  alliance *al;;
+
   for (;;) {
-    if (id>0) {
-      for (al=alliances;al;al=al->next) {
-        if (al->id==id) {
+    if (id > 0) {
+      for (al = alliances; al; al = al->next) {
+        if (al->id == id) {
           id = 0;
           break;
         }
       }
-      if (id>0) break;
+      if (id > 0)
+        break;
     }
-    id = id?id:(1 + (rng_int() % MAX_UNIT_NR));
+    id = id ? id : (1 + (rng_int() % MAX_UNIT_NR));
   }
   al = calloc(1, sizeof(alliance));
   al->id = id;
@@ -79,102 +79,98 @@ makealliance(int id, const char * name)
     al->flags |= ALF_NON_ALLIED;
   }
   al->next = alliances;
-  return alliances=al;
+  return alliances = al;
 }
 
-alliance *
-findalliance(int id)
+alliance *findalliance(int id)
 {
-  alliance * al;
-  for (al=alliances;al;al=al->next) {
-    if (al->id==id) return al;
+  alliance *al;
+
+  for (al = alliances; al; al = al->next) {
+    if (al->id == id)
+      return al;
   }
   return NULL;
 }
 
 typedef struct alliance_transaction {
-  struct alliance_transaction * next;
-  unit * u;
-  order * ord;
+  struct alliance_transaction *next;
+  unit *u;
+  order *ord;
 //   alliance * al;
 //   variant userdata;
 } alliance_transaction;
 
-static struct alliance_transaction * transactions[ALLIANCE_MAX];
+static struct alliance_transaction *transactions[ALLIANCE_MAX];
 
 
-faction *
-alliance_get_leader(alliance * al)
+faction *alliance_get_leader(alliance * al)
 {
   if (!al->_leader) {
     if (al->members) {
-      al->_leader = (faction *)ql_get(al->members, 0);
+      al->_leader = (faction *) ql_get(al->members, 0);
     }
   }
   return al->_leader;
 }
 
-static void
-create_transaction(int type, unit * u, order * ord)
+static void create_transaction(int type, unit * u, order * ord)
 {
-  alliance_transaction * tr = (alliance_transaction *)calloc(1, sizeof(alliance_transaction));
+  alliance_transaction *tr =
+    (alliance_transaction *) calloc(1, sizeof(alliance_transaction));
   tr->ord = ord;
   tr->u = u;
   tr->next = transactions[type];
   transactions[type] = tr;
 }
 
-static void
-cmd_kick(const tnode * tnext, void * data, struct order * ord)
+static void cmd_kick(const tnode * tnext, void *data, struct order *ord)
 {
-  create_transaction(ALLIANCE_KICK, (unit*)data, ord);
+  create_transaction(ALLIANCE_KICK, (unit *) data, ord);
 }
 
-static void
-cmd_leave(const tnode * tnext, void * data, struct order * ord)
+static void cmd_leave(const tnode * tnext, void *data, struct order *ord)
 {
-  create_transaction(ALLIANCE_LEAVE, (unit*)data, ord);
+  create_transaction(ALLIANCE_LEAVE, (unit *) data, ord);
 }
 
-static void
-cmd_transfer(const tnode * tnext, void * data, struct order * ord)
+static void cmd_transfer(const tnode * tnext, void *data, struct order *ord)
 {
-  create_transaction(ALLIANCE_TRANSFER, (unit*)data, ord);
+  create_transaction(ALLIANCE_TRANSFER, (unit *) data, ord);
 }
 
-static void
-cmd_new(const tnode * tnext, void * data, struct order * ord)
+static void cmd_new(const tnode * tnext, void *data, struct order *ord)
 {
-  create_transaction(ALLIANCE_NEW, (unit*)data, ord);
+  create_transaction(ALLIANCE_NEW, (unit *) data, ord);
 }
 
-static void
-cmd_invite(const tnode * tnext, void * data, struct order * ord)
+static void cmd_invite(const tnode * tnext, void *data, struct order *ord)
 {
-  create_transaction(ALLIANCE_INVITE, (unit*)data, ord);
+  create_transaction(ALLIANCE_INVITE, (unit *) data, ord);
 }
 
-static void
-cmd_join(const tnode * tnext, void * data, struct order * ord)
+static void cmd_join(const tnode * tnext, void *data, struct order *ord)
 {
-  create_transaction(ALLIANCE_JOIN, (unit*)data, ord);
+  create_transaction(ALLIANCE_JOIN, (unit *) data, ord);
 }
 
-static void
-perform_kick(void)
+static void perform_kick(void)
 {
-  alliance_transaction ** tap = transactions+ALLIANCE_KICK;
+  alliance_transaction **tap = transactions + ALLIANCE_KICK;
+
   while (*tap) {
-    alliance_transaction * ta = *tap;
-    alliance * al = f_get_alliance(ta->u->faction);
+    alliance_transaction *ta = *tap;
 
-    if (al && alliance_get_leader(al)==ta->u->faction) {
-      faction * f;
+    alliance *al = f_get_alliance(ta->u->faction);
+
+    if (al && alliance_get_leader(al) == ta->u->faction) {
+      faction *f;
+
       init_tokens(ta->ord);
       skip_token();
       skip_token();
       f = getfaction();
-      if (f && f_get_alliance(f)==al) {
+      if (f && f_get_alliance(f) == al) {
         setalliance(f, NULL);
       }
     }
@@ -183,15 +179,18 @@ perform_kick(void)
   }
 }
 
-static void
-perform_new(void)
+static void perform_new(void)
 {
-  alliance_transaction ** tap = transactions+ALLIANCE_NEW;
+  alliance_transaction **tap = transactions + ALLIANCE_NEW;
+
   while (*tap) {
-    alliance_transaction * ta = *tap;
-    alliance * al;
+    alliance_transaction *ta = *tap;
+
+    alliance *al;
+
     int id;
-    faction * f = ta->u->faction;
+
+    faction *f = ta->u->faction;
 
     init_tokens(ta->ord);
     skip_token();
@@ -206,13 +205,14 @@ perform_new(void)
   }
 }
 
-static void
-perform_leave(void)
+static void perform_leave(void)
 {
-  alliance_transaction ** tap = transactions+ALLIANCE_LEAVE;
+  alliance_transaction **tap = transactions + ALLIANCE_LEAVE;
+
   while (*tap) {
-    alliance_transaction * ta = *tap;
-    faction * f = ta->u->faction;
+    alliance_transaction *ta = *tap;
+
+    faction *f = ta->u->faction;
 
     setalliance(f, NULL);
 
@@ -221,21 +221,23 @@ perform_leave(void)
   }
 }
 
-static void
-perform_transfer(void)
+static void perform_transfer(void)
 {
-  alliance_transaction ** tap = transactions+ALLIANCE_TRANSFER;
-  while (*tap) {
-    alliance_transaction * ta = *tap;
-    alliance * al = f_get_alliance(ta->u->faction);
+  alliance_transaction **tap = transactions + ALLIANCE_TRANSFER;
 
-    if (al && alliance_get_leader(al)==ta->u->faction) {
-      faction * f;
+  while (*tap) {
+    alliance_transaction *ta = *tap;
+
+    alliance *al = f_get_alliance(ta->u->faction);
+
+    if (al && alliance_get_leader(al) == ta->u->faction) {
+      faction *f;
+
       init_tokens(ta->ord);
       skip_token();
       skip_token();
       f = getfaction();
-      if (f && f_get_alliance(f)==al) {
+      if (f && f_get_alliance(f) == al) {
         al->_leader = f;
       }
     }
@@ -244,13 +246,15 @@ perform_transfer(void)
   }
 }
 
-static void
-perform_join(void)
+static void perform_join(void)
 {
-  alliance_transaction ** tap = transactions+ALLIANCE_JOIN;
+  alliance_transaction **tap = transactions + ALLIANCE_JOIN;
+
   while (*tap) {
-    alliance_transaction * ta = *tap;
-    faction * fj = ta->u->faction;
+    alliance_transaction *ta = *tap;
+
+    faction *fj = ta->u->faction;
+
     int aid;
 
     init_tokens(ta->ord);
@@ -258,19 +262,24 @@ perform_join(void)
     skip_token();
     aid = getid();
     if (aid) {
-      alliance * al = findalliance(aid);
-      if (al && f_get_alliance(fj)!=al) {
-        alliance_transaction ** tip = transactions+ALLIANCE_INVITE;
-        alliance_transaction * ti = *tip;
+      alliance *al = findalliance(aid);
+
+      if (al && f_get_alliance(fj) != al) {
+        alliance_transaction **tip = transactions + ALLIANCE_INVITE;
+
+        alliance_transaction *ti = *tip;
+
         while (ti) {
-          faction * fi = ti->u->faction;
-          if (fi && f_get_alliance(fi)==al) {
+          faction *fi = ti->u->faction;
+
+          if (fi && f_get_alliance(fi) == al) {
             int fid;
+
             init_tokens(ti->ord);
             skip_token();
             skip_token();
             fid = getid();
-            if (fid==fj->no) {
+            if (fid == fj->no) {
               break;
             }
           }
@@ -291,21 +300,27 @@ perform_join(void)
   }
 }
 
-static void
-execute(const struct syntaxtree * syntax, keyword_t kwd)
+static void execute(const struct syntaxtree *syntax, keyword_t kwd)
 {
   int run = 0;
 
-  region ** rp = &regions;
+  region **rp = &regions;
+
   while (*rp) {
-    region * r = *rp;
+    region *r = *rp;
+
     unit **up = &r->units;
+
     while (*up) {
-      unit * u = *up;
+      unit *u = *up;
+
       if (u->number) {
-        const struct locale * lang = u->faction->locale;
-        tnode * root = stree_find(syntax, lang);
-        order * ord;
+        const struct locale *lang = u->faction->locale;
+
+        tnode *root = stree_find(syntax, lang);
+
+        order *ord;
+
         for (ord = u->orders; ord; ord = ord->next) {
           if (get_keyword(ord) == kwd) {
             do_command(root, u, ord);
@@ -313,9 +328,11 @@ execute(const struct syntaxtree * syntax, keyword_t kwd)
           }
         }
       }
-      if (u==*up) up = &u->next;
+      if (u == *up)
+        up = &u->next;
     }
-    if (*rp==r) rp = &r->next;
+    if (*rp == r)
+      rp = &r->next;
   }
 
   if (run) {
@@ -327,15 +344,17 @@ execute(const struct syntaxtree * syntax, keyword_t kwd)
   }
 }
 
-void
-alliance_cmd(void)
+void alliance_cmd(void)
 {
-  static syntaxtree * stree = NULL;
-  if (stree==NULL) {
-    syntaxtree * slang = stree = stree_create();
+  static syntaxtree *stree = NULL;
+
+  if (stree == NULL) {
+    syntaxtree *slang = stree = stree_create();
+
     while (slang) {
       // struct tnode * root = calloc(sizeof(tnode), 1);
-      struct tnode * leaf = calloc(sizeof(tnode), 1);
+      struct tnode *leaf = calloc(sizeof(tnode), 1);
+
       // add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
       add_command(leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
       add_command(leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
@@ -351,15 +370,18 @@ alliance_cmd(void)
   /* some may have been kicked, must remove f->alliance==NULL */
 }
 
-void
-alliancejoin(void)
+void alliancejoin(void)
 {
-  static syntaxtree * stree = NULL;
-  if (stree==NULL) {
-    syntaxtree * slang = stree = stree_create();
+  static syntaxtree *stree = NULL;
+
+  if (stree == NULL) {
+    syntaxtree *slang = stree = stree_create();
+
     while (slang) {
-      struct tnode * root = calloc(sizeof(tnode), 1);
-      struct tnode * leaf = calloc(sizeof(tnode), 1);
+      struct tnode *root = calloc(sizeof(tnode), 1);
+
+      struct tnode *leaf = calloc(sizeof(tnode), 1);
+
       add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
       add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
       slang = slang->next;
@@ -368,25 +390,27 @@ alliancejoin(void)
   execute(stree, K_ALLIANCE);
 }
 
-void 
-setalliance(faction * f, alliance * al)
+void setalliance(faction * f, alliance * al)
 {
-  if (f->alliance==al) return;
-  if (f->alliance!=NULL) {
+  if (f->alliance == al)
+    return;
+  if (f->alliance != NULL) {
     int qi;
-    quicklist ** flistp = &f->alliance->members;
 
-    for (qi=0;*flistp;ql_advance(flistp, &qi, 1)) {
-      faction * data = (faction *)ql_get(*flistp, qi);
-      if (data==f) {
+    quicklist **flistp = &f->alliance->members;
+
+    for (qi = 0; *flistp; ql_advance(flistp, &qi, 1)) {
+      faction *data = (faction *) ql_get(*flistp, qi);
+
+      if (data == f) {
         ql_delete(flistp, qi);
         break;
       }
     }
 
-    if (f->alliance->_leader==f) {
+    if (f->alliance->_leader == f) {
       if (f->alliance->members) {
-        f->alliance->_leader = (faction *)ql_get(f->alliance->members, 0);
+        f->alliance->_leader = (faction *) ql_get(f->alliance->members, 0);
       } else {
         f->alliance->_leader = NULL;
       }
@@ -394,61 +418,69 @@ setalliance(faction * f, alliance * al)
   }
   f->alliance = al;
   f->alliance_joindate = turn;
-  if (al!=NULL) {
+  if (al != NULL) {
     ql_push(&al->members, f);
-    if (al->_leader==NULL) {
+    if (al->_leader == NULL) {
       al->_leader = f;
     }
   }
 }
 
-const char *
-alliancename(const alliance * al)
+const char *alliancename(const alliance * al)
 {
   typedef char name[OBJECTIDSIZE + 1];
+
   static name idbuf[8];
+
   static int nextbuf = 0;
 
   char *ibuf = idbuf[(++nextbuf) % 8];
 
   if (al && al->name) {
     snprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
-    ibuf[sizeof(name)-1] = 0;
+    ibuf[sizeof(name) - 1] = 0;
   } else {
     return NULL;
   }
   return ibuf;
 }
 
-void
-alliancevictory(void)
+void alliancevictory(void)
 {
-  const struct building_type * btype = bt_find("stronghold");
-  region * r = regions;
-  alliance * al = alliances;
-  if (btype==NULL) return;
-  while (r!=NULL) {
-    building * b = r->buildings;
-    while (b!=NULL) {
-      if (b->type==btype) {
-        unit * u = building_owner(b);
+  const struct building_type *btype = bt_find("stronghold");
+
+  region *r = regions;
+
+  alliance *al = alliances;
+
+  if (btype == NULL)
+    return;
+  while (r != NULL) {
+    building *b = r->buildings;
+
+    while (b != NULL) {
+      if (b->type == btype) {
+        unit *u = building_owner(b);
+
         if (u) {
           fset(u->faction->alliance, FFL_MARK);
         }
       }
       b = b->next;
     }
-    r=r->next;
+    r = r->next;
   }
-  while (al!=NULL) {
+  while (al != NULL) {
     if (!fval(al, FFL_MARK)) {
       int qi;
-      quicklist * flist = al->members;
-      for (qi=0;flist;ql_advance(&flist, &qi, 1)) {
-        faction * f = (faction *)ql_get(flist, qi);
-        if (f->alliance==al) {
-          ADDMSG(&f->msgs, msg_message("alliance::lost", 
-            "alliance", al));
+
+      quicklist *flist = al->members;
+
+      for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
+        faction *f = (faction *) ql_get(flist, qi);
+
+        if (f->alliance == al) {
+          ADDMSG(&f->msgs, msg_message("alliance::lost", "alliance", al));
           destroyfaction(f);
         }
       }
@@ -459,69 +491,79 @@ alliancevictory(void)
   }
 }
 
-int
-victorycondition(const alliance * al, const char * name)
+int victorycondition(const alliance * al, const char *name)
 {
-  const char * gems[] = { "opal", "diamond", "zaphire", "topaz", "beryl", "agate", "garnet", "emerald", NULL };
-  if (strcmp(name, "gems")==0) {
-    const char ** igem;
+  const char *gems[] =
+    { "opal", "diamond", "zaphire", "topaz", "beryl", "agate", "garnet",
+      "emerald", NULL };
+  if (strcmp(name, "gems") == 0) {
+    const char **igem;
 
-    for (igem=gems;*igem;++igem) {
-      const struct item_type * itype = it_find(*igem);
-      quicklist * flist = al->members;
+    for (igem = gems; *igem; ++igem) {
+      const struct item_type *itype = it_find(*igem);
+
+      quicklist *flist = al->members;
+
       int qi;
+
       boolean found = false;
 
-      assert(itype!=NULL);
-      for (qi=0;flist && !found;ql_advance(&flist, &qi, 1)) {
-        faction * f = (faction *)ql_get(flist, 0);
-        unit * u;
+      assert(itype != NULL);
+      for (qi = 0; flist && !found; ql_advance(&flist, &qi, 1)) {
+        faction *f = (faction *) ql_get(flist, 0);
 
-        for (u=f->units;u;u=u->nextF) {
-          if (i_get(u->items, itype)>0) {
+        unit *u;
+
+        for (u = f->units; u; u = u->nextF) {
+          if (i_get(u->items, itype) > 0) {
             found = true;
             break;
           }
         }
       }
-      if (!found) return 0;
+      if (!found)
+        return 0;
     }
     return 1;
 
-  } else if (strcmp(name, "phoenix")==0) {
-    quicklist * flist = al->members;
+  } else if (strcmp(name, "phoenix") == 0) {
+    quicklist *flist = al->members;
+
     int qi;
 
-    for (qi=0;flist;ql_advance(&flist, &qi, 1)) {
-      faction * f = (faction *)ql_get(flist, qi);
+    for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
+      faction *f = (faction *) ql_get(flist, qi);
+
       if (find_key(f->attribs, atoi36("phnx"))) {
         return 1;
       }
     }
     return 0;
 
-  } else if (strcmp(name, "pyramid")==0) {
+  } else if (strcmp(name, "pyramid") == 0) {
 
     /* Logik:
-    * - if (pyr > last_passed_size && pyr > all_others) {
-    *     pyr->passed->counter++;
-    *     for(all_other_pyrs) {
-    *       pyr->passed->counter=0;
-    *     }
-    *
-    *     if(pyr->passed->counter >= 3) {
-    *       set(pyr, passed);
-    *       pyr->owner->set_attrib(pyra);
-    *     }
-    *     last_passed_size = pyr->size;
-    *   }
-    */
+     * - if (pyr > last_passed_size && pyr > all_others) {
+     *     pyr->passed->counter++;
+     *     for(all_other_pyrs) {
+     *       pyr->passed->counter=0;
+     *     }
+     *
+     *     if(pyr->passed->counter >= 3) {
+     *       set(pyr, passed);
+     *       pyr->owner->set_attrib(pyra);
+     *     }
+     *     last_passed_size = pyr->size;
+     *   }
+     */
 
-    quicklist * flist = al->members;
+    quicklist *flist = al->members;
+
     int qi;
 
-    for (qi=0;flist;ql_advance(&flist, &qi, 1)) {
-      faction * f = (faction *)ql_get(flist, qi);
+    for (qi = 0; flist; ql_advance(&flist, &qi, 1)) {
+      faction *f = (faction *) ql_get(flist, qi);
+
       if (find_key(f->attribs, atoi36("pyra"))) {
         return 1;
       }
@@ -531,9 +573,11 @@ victorycondition(const alliance * al, const char * name)
   return -1;
 }
 
-void alliance_setname(alliance * self, const char * name)
+void alliance_setname(alliance * self, const char *name)
 {
   free(self->name);
-  if (name) self->name = strdup(name);
-  else self->name = NULL;
+  if (name)
+    self->name = strdup(name);
+  else
+    self->name = NULL;
 }

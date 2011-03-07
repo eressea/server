@@ -33,33 +33,32 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **/
 
 typedef struct timeout_data {
-  trigger * triggers;
+  trigger *triggers;
   int timer;
   variant trigger_data;
 } timeout_data;
 
-static void
-timeout_init(trigger * t)
+static void timeout_init(trigger * t)
 {
   t->data.v = calloc(sizeof(timeout_data), 1);
 }
 
-static void
-timeout_free(trigger * t)
+static void timeout_free(trigger * t)
 {
-  timeout_data * td = (timeout_data*)t->data.v;
+  timeout_data *td = (timeout_data *) t->data.v;
+
   free_triggers(td->triggers);
   free(t->data.v);
 }
 
-static int
-timeout_handle(trigger * t, void * data)
+static int timeout_handle(trigger * t, void *data)
 {
   /* call an event handler on timeout.
    * data.v -> ( variant event, int timer )
    */
-  timeout_data * td = (timeout_data*)t->data.v;
-  if (--td->timer==0) {
+  timeout_data *td = (timeout_data *) t->data.v;
+
+  if (--td->timer == 0) {
     handle_triggers(&td->triggers, NULL);
     return -1;
   }
@@ -67,29 +66,32 @@ timeout_handle(trigger * t, void * data)
   return 0;
 }
 
-static void
-timeout_write(const trigger * t, struct storage * store)
+static void timeout_write(const trigger * t, struct storage *store)
 {
-  timeout_data * td = (timeout_data*)t->data.v;
+  timeout_data *td = (timeout_data *) t->data.v;
+
   store->w_int(store, td->timer);
   write_triggers(store, td->triggers);
 }
 
-static int
-timeout_read(trigger * t, struct storage * store)
+static int timeout_read(trigger * t, struct storage *store)
 {
-  timeout_data * td = (timeout_data*)t->data.v;
+  timeout_data *td = (timeout_data *) t->data.v;
+
   td->timer = store->r_int(store);
   read_triggers(store, &td->triggers);
-  if (td->timer>20) {
-    trigger * tr = td->triggers;
-    log_warning(("there is a timeout lasting for another %d turns\n", td->timer));
+  if (td->timer > 20) {
+    trigger *tr = td->triggers;
+
+    log_warning(("there is a timeout lasting for another %d turns\n",
+        td->timer));
     while (tr) {
       log_warning(("  timeout triggers: %s\n", tr->type->name));
       tr = tr->next;
     }
   }
-  if (td->triggers!=NULL && td->timer>0) return AT_READ_OK;
+  if (td->triggers != NULL && td->timer > 0)
+    return AT_READ_OK;
   return AT_READ_FAIL;
 }
 
@@ -102,11 +104,12 @@ trigger_type tt_timeout = {
   timeout_read
 };
 
-trigger *
-trigger_timeout(int time, trigger * callbacks)
+trigger *trigger_timeout(int time, trigger * callbacks)
 {
-  trigger * t = t_new(&tt_timeout);
-  timeout_data * td = (timeout_data*)t->data.v;
+  trigger *t = t_new(&tt_timeout);
+
+  timeout_data *td = (timeout_data *) t->data.v;
+
   td->triggers = callbacks;
   td->timer = time;
   return t;

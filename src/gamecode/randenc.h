@@ -22,8 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern void encounters(void);
-extern void randomevents(void);
+  extern void encounters(void);
+  extern void randomevents(void);
 
 #ifdef __cplusplus
 }

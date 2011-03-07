@@ -52,43 +52,44 @@
 
 
 static const struct {
-  const char * name;
-  int (*func)(lua_State *);
+  const char *name;
+  int (*func) (lua_State *);
 } lualibs[] = {
-  {"",                luaopen_base},
-  {LUA_TABLIBNAME,    luaopen_table},
-  {LUA_IOLIBNAME,     luaopen_io},
-  {LUA_STRLIBNAME,    luaopen_string},
-  {LUA_MATHLIBNAME,   luaopen_math},
-  {LUA_LOADLIBNAME,   luaopen_package},
-  {LUA_DBLIBNAME,     luaopen_debug},
+  {
+  "", luaopen_base}, {
+  LUA_TABLIBNAME, luaopen_table}, {
+  LUA_IOLIBNAME, luaopen_io}, {
+  LUA_STRLIBNAME, luaopen_string}, {
+  LUA_MATHLIBNAME, luaopen_math}, {
+  LUA_LOADLIBNAME, luaopen_package}, {
+  LUA_DBLIBNAME, luaopen_debug},
 #if LUA_VERSION_NUM>=501
-  {LUA_OSLIBNAME,     luaopen_os},
+  {
+  LUA_OSLIBNAME, luaopen_os},
 #endif
-  { NULL, NULL }
+  {
+  NULL, NULL}
 };
 
-static void
-openlibs(lua_State * L)
+static void openlibs(lua_State * L)
 {
   int i;
-  for (i=0;lualibs[i].func;++i) {
+
+  for (i = 0; lualibs[i].func; ++i) {
     lua_pushcfunction(L, lualibs[i].func);
     lua_pushstring(L, lualibs[i].name);
     lua_call(L, 1, 0);
   }
 }
 
-static void
-lua_done(lua_State * L)
+static void lua_done(lua_State * L)
 {
   lua_close(L);
 }
 
-static lua_State *
-lua_init(void)
+static lua_State *lua_init(void)
 {
-  lua_State * L = lua_open();
+  lua_State *L = lua_open();
 
   openlibs(L);
 #ifdef BINDINGS_TOLUA
@@ -110,14 +111,13 @@ lua_init(void)
   return L;
 }
 
-static void
-game_done(void)
+static void game_done(void)
 {
 #ifdef CLEANUP_CODE
   /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
-  * zum Debugging interessant, wenn man Leak Detection hat, und nach
-  * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
-  * wird (temporäre Hilsstrukturen) */
+   * zum Debugging interessant, wenn man Leak Detection hat, und nach
+   * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
+   * wird (temporäre Hilsstrukturen) */
 
   free_game();
 
@@ -129,8 +129,7 @@ game_done(void)
 #endif
 }
 
-static void
-game_init(void)
+static void game_init(void)
 {
   register_triggers();
   register_xmas();
@@ -169,6 +168,7 @@ game_init(void)
 int eressea_init(void)
 {
   global.vm_state = lua_init();
+
   kernel_init();
   game_init();
 
@@ -179,13 +179,15 @@ void eressea_done(void)
 {
   game_done();
   kernel_done();
-  lua_done((lua_State *)global.vm_state);
+  lua_done((lua_State *) global.vm_state);
 }
 
-int eressea_run(const char * luafile, const char * entry_point)
+int eressea_run(const char *luafile, const char *entry_point)
 {
   int err;
-  lua_State * L = (lua_State *)global.vm_state;
+
+  lua_State *L = (lua_State *) global.vm_state;
+
   /* run the main script */
   if (luafile) {
     lua_getglobal(L, "dofile");

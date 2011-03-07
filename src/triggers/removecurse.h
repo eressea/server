@@ -23,15 +23,16 @@ extern "C" {
 #endif
 
 /* all types we use are defined here to reduce dependencies */
-struct trigger_type;
-struct trigger;
+  struct trigger_type;
+  struct trigger;
 
-struct unit;
-struct curse;
+  struct unit;
+  struct curse;
 
-extern struct trigger_type tt_removecurse;
+  extern struct trigger_type tt_removecurse;
 
-extern struct trigger * trigger_removecurse(struct curse * c, struct unit * target);
+  extern struct trigger *trigger_removecurse(struct curse *c,
+    struct unit *target);
 
 #ifdef __cplusplus
 }

@@ -23,21 +23,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lists.h"
 
 typedef struct void_list {
-  struct void_list * next;
-  void * data;
+  struct void_list *next;
+  void *data;
 } void_list;
 
-void
-addlist(void *l1, void *p1)
+void addlist(void *l1, void *p1)
 {
 
   /* add entry p to the end of list l */
 
   void_list **l;
+
   void_list *p, *q;
 
-  l = (void_list **)l1;
-  p = (void_list *)p1;
+  l = (void_list **) l1;
+  p = (void_list *) p1;
   assert(p->next == 0);
 
   if (*l) {
@@ -48,10 +48,10 @@ addlist(void *l1, void *p1)
     *l = p;
 }
 
-static void
-choplist(void * a, void * b)
+static void choplist(void *a, void *b)
 {
-  void_list **l = (void_list**)a, *p = (void_list*)b;
+  void_list **l = (void_list **) a, *p = (void_list *) b;
+
   /* remove entry p from list l - when called, a pointer to p must be
    * kept in order to use (and free) p; if omitted, this will be a
    * memory leak */
@@ -67,8 +67,7 @@ choplist(void * a, void * b)
   }
 }
 
-void
-translist(void *l1, void *l2, void *p)
+void translist(void *l1, void *l2, void *p)
 {
 
   /* remove entry p from list l1 and add it at the end of list l2 */
@@ -77,8 +76,7 @@ translist(void *l1, void *l2, void *p)
   addlist(l2, p);
 }
 
-void
-insertlist(void_list ** l, void_list * p)
+void insertlist(void_list ** l, void_list * p)
 {
 
   /* insert entry p at the beginning of list l */
@@ -88,8 +86,7 @@ insertlist(void_list ** l, void_list * p)
 
 }
 
-void
-removelist(void *l, void *p)
+void removelist(void *l, void *p)
 {
 
   /* remove entry p from list l; free p */
@@ -98,15 +95,14 @@ removelist(void *l, void *p)
   free(p);
 }
 
-void
-freelist(void *p1)
+void freelist(void *p1)
 {
 
   /* remove all entries following and including entry p from a listlist */
 
   void_list *p, *p2;
 
-  p = (void_list *)p1;
+  p = (void_list *) p1;
 
   while (p) {
     p2 = p->next;
@@ -115,15 +111,15 @@ freelist(void *p1)
   }
 }
 
-unsigned int
-listlen(void *l)
+unsigned int listlen(void *l)
 {
 
   /* count entries p in list l */
 
   unsigned int i;
+
   void_list *p;
 
-  for (p = (void_list *)l, i = 0; p; p = p->next, i++);
+  for (p = (void_list *) l, i = 0; p; p = p->next, i++) ;
   return i;
 }

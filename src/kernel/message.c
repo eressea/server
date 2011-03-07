@@ -47,9 +47,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 
 typedef struct msg_setting {
-	struct msg_setting *next;
-	const struct message_type *type;
-	int level;
+  struct msg_setting *next;
+  const struct message_type *type;
+  int level;
 } msg_setting;
 
 /************ Compatibility function *************/
@@ -58,120 +58,148 @@ typedef struct msg_setting {
 #include <kernel/config.h>
 
 static void
-arg_set(variant args[], const message_type * mtype, const char * buffer, variant v)
+arg_set(variant args[], const message_type * mtype, const char *buffer,
+  variant v)
 {
-	int i;
-	for (i=0;i!=mtype->nparameters;++i) {
-		if (!strcmp(buffer, mtype->pnames[i])) break;
-	}
-  if (i!=mtype->nparameters) {
+  int i;
+
+  for (i = 0; i != mtype->nparameters; ++i) {
+    if (!strcmp(buffer, mtype->pnames[i]))
+      break;
+  }
+  if (i != mtype->nparameters) {
     args[i] = v;
   } else {
-		fprintf(stderr, "invalid parameter %s for message type %s\n", buffer, mtype->name);
-		assert(!"program aborted.");
-	}
+    fprintf(stderr, "invalid parameter %s for message type %s\n", buffer,
+      mtype->name);
+    assert(!"program aborted.");
+  }
 }
 
-struct message * 
-msg_feedback(const struct unit * u, struct order * ord, const char * name, const char* sig, ...)
+struct message *msg_feedback(const struct unit *u, struct order *ord,
+  const char *name, const char *sig, ...)
 {
   va_list marker;
-  const message_type * mtype = mt_find(name);
+
+  const message_type *mtype = mt_find(name);
+
   char paramname[64];
+
   const char *ic = sig;
+
   variant args[16];
+
   variant var;
+
   memset(args, 0, sizeof(args));
 
-  if (ord==NULL) ord = u->thisorder;
+  if (ord == NULL)
+    ord = u->thisorder;
 
   if (!mtype) {
     log_error(("trying to create message of unknown type \"%s\"\n", name));
-    return msg_message("missing_feedback", "unit region command name", u, u->region, ord, name);
+    return msg_message("missing_feedback", "unit region command name", u,
+      u->region, ord, name);
   }
 
-  var.v = (void*)u;
+  var.v = (void *)u;
   arg_set(args, mtype, "unit", var);
-  var.v = (void*)u->region;
+  var.v = (void *)u->region;
   arg_set(args, mtype, "region", var);
-  var.v = (void*)ord;
+  var.v = (void *)ord;
   arg_set(args, mtype, "command", var);
 
   va_start(marker, sig);
-  while (*ic && !isalnum(*ic)) ic++;
+  while (*ic && !isalnum(*ic))
+    ic++;
   while (*ic) {
-    char * oc = paramname;
+    char *oc = paramname;
+
     int i;
 
-    while (isalnum(*ic)) *oc++ = *ic++;
+    while (isalnum(*ic))
+      *oc++ = *ic++;
     *oc = '\0';
 
-    for (i=0;i!=mtype->nparameters;++i) {
-      if (!strcmp(paramname, mtype->pnames[i])) break;
+    for (i = 0; i != mtype->nparameters; ++i) {
+      if (!strcmp(paramname, mtype->pnames[i]))
+        break;
     }
-    if (i!=mtype->nparameters) {
-      if (mtype->types[i]->vtype==VAR_VOIDPTR) {
-        args[i].v = va_arg(marker, void*);
-      } else if (mtype->types[i]->vtype==VAR_INT) {
+    if (i != mtype->nparameters) {
+      if (mtype->types[i]->vtype == VAR_VOIDPTR) {
+        args[i].v = va_arg(marker, void *);
+      } else if (mtype->types[i]->vtype == VAR_INT) {
         args[i].i = va_arg(marker, int);
       } else {
         assert(!"unknown variant type");
       }
     } else {
-      log_error(("invalid parameter %s for message type %s\n", paramname, mtype->name));
+      log_error(("invalid parameter %s for message type %s\n", paramname,
+          mtype->name));
       assert(!"program aborted.");
     }
-    while (*ic && !isalnum(*ic)) ic++;
+    while (*ic && !isalnum(*ic))
+      ic++;
   }
   va_end(marker);
 
   return msg_create(mtype, args);
 }
 
-message * 
-msg_message(const char * name, const char* sig, ...)
-	/* msg_message("oops_error", "unit region command", u, r, cmd) */
+message *msg_message(const char *name, const char *sig, ...)
+        /* msg_message("oops_error", "unit region command", u, r, cmd) */
 {
   va_list marker;
-  const message_type * mtype = mt_find(name);
+
+  const message_type *mtype = mt_find(name);
+
   char paramname[64];
+
   const char *ic = sig;
+
   variant args[16];
+
   memset(args, 0, sizeof(args));
-  
+
   if (!mtype) {
     log_warning(("trying to create message of unknown type \"%s\"\n", name));
-    if (strcmp(name, "missing_message")!=0) {
+    if (strcmp(name, "missing_message") != 0) {
       return msg_message("missing_message", "name", name);
     }
     return NULL;
   }
-  
+
   va_start(marker, sig);
-  while (*ic && !isalnum(*ic)) ic++;
+  while (*ic && !isalnum(*ic))
+    ic++;
   while (*ic) {
-    char * oc = paramname;
+    char *oc = paramname;
+
     int i;
-    
-    while (isalnum(*ic)) *oc++ = *ic++;
+
+    while (isalnum(*ic))
+      *oc++ = *ic++;
     *oc = '\0';
-    
-    for (i=0;i!=mtype->nparameters;++i) {
-      if (!strcmp(paramname, mtype->pnames[i])) break;
+
+    for (i = 0; i != mtype->nparameters; ++i) {
+      if (!strcmp(paramname, mtype->pnames[i]))
+        break;
     }
-    if (i!=mtype->nparameters) {
-      if (mtype->types[i]->vtype==VAR_VOIDPTR) {
-        args[i].v = va_arg(marker, void*);
-      } else if (mtype->types[i]->vtype==VAR_INT) {
+    if (i != mtype->nparameters) {
+      if (mtype->types[i]->vtype == VAR_VOIDPTR) {
+        args[i].v = va_arg(marker, void *);
+      } else if (mtype->types[i]->vtype == VAR_INT) {
         args[i].i = va_arg(marker, int);
       } else {
         assert(!"unknown variant type");
       }
     } else {
-      log_error(("invalid parameter %s for message type %s\n", paramname, mtype->name));
+      log_error(("invalid parameter %s for message type %s\n", paramname,
+          mtype->name));
       assert(!"program aborted.");
     }
-    while (*ic && !isalnum(*ic)) ic++;
+    while (*ic && !isalnum(*ic))
+      ic++;
   }
   va_end(marker);
 
@@ -181,11 +209,11 @@ msg_message(const char * name, const char* sig, ...)
 static void
 caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-  message * m = NULL;
+  message *m = NULL;
 
 #define LOG_ENGLISH
 #ifdef LOG_ENGLISH
-  if (f && f->locale!=default_locale) {
+  if (f && f->locale != default_locale) {
     log_warning(("message for locale \"%s\": %s\n", locale_name(f->locale), s));
   }
 #endif
@@ -221,41 +249,45 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
         assert(f);
         m = add_message(&f->msgs, m);
       } else {
-        if (f==NULL) add_message(&r->msgs, m);
-        else r_addmessage(r, f, m);
+        if (f == NULL)
+          add_message(&r->msgs, m);
+        else
+          r_addmessage(r, f, m);
       }
       break;
     default:
       assert(!"Ungültige Msg-Klasse!");
   }
-  if (m) msg_release(m);
+  if (m)
+    msg_release(m);
 }
 
-void
-addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
   caddmessage(r, f, s, mtype, level);
 }
 
-void
-cmistake(const unit * u, struct order *ord, int mno, int mtype)
+void cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
   static char msgname[20];
+
   unused(mtype);
 
-  if (is_monsters(u->faction)) return;
+  if (is_monsters(u->faction))
+    return;
   sprintf(msgname, "error%d", mno);
   ADDMSG(&u->faction->msgs, msg_feedback(u, ord, msgname, ""));
 }
 
-extern unsigned int new_hashstring(const char* s);
+extern unsigned int new_hashstring(const char *s);
 
-void
-free_messagelist(message_list * msgs)
+void free_messagelist(message_list * msgs)
 {
-  struct mlist ** mlistptr = &msgs->begin;
+  struct mlist **mlistptr = &msgs->begin;
+
   while (*mlistptr) {
-    struct mlist * ml = *mlistptr;
+    struct mlist *ml = *mlistptr;
+
     *mlistptr = ml->next;
     msg_release(ml->msg);
     free(ml);
@@ -263,21 +295,19 @@ free_messagelist(message_list * msgs)
   free(msgs);
 }
 
-message * 
-add_message(message_list** pm, message * m)
+message *add_message(message_list ** pm, message * m)
 {
-	if (!lomem && m!=NULL) {
-		struct mlist * mnew = malloc(sizeof(struct mlist));
-		if (*pm==NULL) {
-			*pm = malloc(sizeof(message_list));
-			(*pm)->end=&(*pm)->begin;
-		}
-		mnew->msg = msg_addref(m);
-		mnew->next = NULL;
-		*((*pm)->end) = mnew;
-		(*pm)->end=&mnew->next;
-	}
-	return m;
+  if (!lomem && m != NULL) {
+    struct mlist *mnew = malloc(sizeof(struct mlist));
+
+    if (*pm == NULL) {
+      *pm = malloc(sizeof(message_list));
+      (*pm)->end = &(*pm)->begin;
+    }
+    mnew->msg = msg_addref(m);
+    mnew->next = NULL;
+    *((*pm)->end) = mnew;
+    (*pm)->end = &mnew->next;
+  }
+  return m;
 }
-
-

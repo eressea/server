@@ -22,19 +22,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-enum {
-  TYP_UNIT,
-  TYP_REGION,
-  TYP_BUILDING,
-  TYP_SHIP,
-  TYP_FACTION,
-  TYP_ACTION,
-  TYP_TRIGGER,
-  TYP_TIMEOUT
-};
+  enum {
+    TYP_UNIT,
+    TYP_REGION,
+    TYP_BUILDING,
+    TYP_SHIP,
+    TYP_FACTION,
+    TYP_ACTION,
+    TYP_TRIGGER,
+    TYP_TIMEOUT
+  };
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

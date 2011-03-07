@@ -88,7 +88,7 @@ enum {
   SPL_SPEED2,
   SPL_FIREDRAGONODEM,
   SPL_DRAGONODEM,
-  SPL_WYRMODEM, /* 83 */
+  SPL_WYRMODEM,                 /* 83 */
   SPL_MAGICSTREET,
   SPL_REANIMATE,
   SPL_RECRUIT,
@@ -162,7 +162,7 @@ enum {
   SPL_MALLORNTREEGROW = 177,
   SPL_BIGRECRUIT = 179,
   SPL_IMMOLATION,
-  SPL_FIREODEM, /* 181 */
+  SPL_FIREODEM,                 /* 181 */
   SPL_ICEODEM,
   SPL_ACIDODEM,
   /* no longer used, but kept for reference: */

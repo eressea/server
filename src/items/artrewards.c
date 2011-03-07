@@ -47,30 +47,30 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define HORNDURATION 3
 #define HORNIMMUNITY 30
 
-static int
-age_peaceimmune(attrib * a)
+static int age_peaceimmune(attrib * a)
 {
-  return (--a->data.i>0)?AT_AGE_KEEP:AT_AGE_REMOVE;
+  return (--a->data.i > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 static attrib_type at_peaceimmune = {
   "peaceimmune",
-    NULL, NULL,
-    age_peaceimmune,
-    a_writeint,
-    a_readint
+  NULL, NULL,
+  age_peaceimmune,
+  a_writeint,
+  a_readint
 };
 
 static int
-use_hornofdancing(struct unit * u, const struct item_type * itype,
-                  int amount, struct order * ord)
+use_hornofdancing(struct unit *u, const struct item_type *itype,
+  int amount, struct order *ord)
 {
   region *r;
-  int    regionsPacified = 0;
 
-  for(r=regions; r; r=r->next) {
-    if(distance(u->region, r) < HORNRANGE) {
-      if(a_find(r->attribs, &at_peaceimmune) == NULL) {
+  int regionsPacified = 0;
+
+  for (r = regions; r; r = r->next) {
+    if (distance(u->region, r) < HORNRANGE) {
+      if (a_find(r->attribs, &at_peaceimmune) == NULL) {
         attrib *a;
 
         create_curse(u, &r->attribs, ct_find("peacezone"),
@@ -80,21 +80,22 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
         a->data.i = HORNIMMUNITY;
 
         ADDMSG(&r->msgs, msg_message("hornofpeace_r_success",
-          "unit region", u, u->region));
+            "unit region", u, u->region));
 
         regionsPacified++;
       } else {
         ADDMSG(&r->msgs, msg_message("hornofpeace_r_nosuccess",
-          "unit region", u, u->region));
+            "unit region", u, u->region));
       }
     }
   }
 
-  if(regionsPacified > 0) {
+  if (regionsPacified > 0) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "hornofpeace_u_success",
-      "pacified", regionsPacified));
+        "pacified", regionsPacified));
   } else {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "hornofpeace_u_nosuccess", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "hornofpeace_u_nosuccess",
+        ""));
   }
 
   return 0;
@@ -104,12 +105,12 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
 
 
 static int
-useonother_trappedairelemental(struct unit * u, int shipId,
-                        const struct item_type * itype,
-                        int amount, struct order * ord)
+useonother_trappedairelemental(struct unit *u, int shipId,
+  const struct item_type *itype, int amount, struct order *ord)
 {
-  curse  *c;
-  ship   *sh;
+  curse *c;
+
+  ship *sh;
 
   if (shipId <= 0) {
     cmistake(u, ord, 20, MSG_MOVE);
@@ -117,16 +118,18 @@ useonother_trappedairelemental(struct unit * u, int shipId,
   }
 
   sh = findshipr(u->region, shipId);
-  if(!sh) {
+  if (!sh) {
     cmistake(u, ord, 20, MSG_MOVE);
     return -1;
   }
 
-  c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, SPEEDUP, 0);
+  c =
+    create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, SPEEDUP,
+    0);
   c_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",
-    "unit region command ship", u, u->region, ord, sh));
+      "unit region command ship", u, u->region, ord, sh));
 
   use_pooled(u, itype->rtype, GET_DEFAULT, 1);
 
@@ -134,24 +137,23 @@ useonother_trappedairelemental(struct unit * u, int shipId,
 }
 
 static int
-use_trappedairelemental(struct unit * u,
-    const struct item_type * itype,
-    int amount, struct order * ord)
+use_trappedairelemental(struct unit *u,
+  const struct item_type *itype, int amount, struct order *ord)
 {
   ship *sh = u->ship;
 
-  if(sh == NULL) {
+  if (sh == NULL) {
     cmistake(u, ord, 20, MSG_MOVE);
     return -1;
   }
-  return useonother_trappedairelemental(u, sh->no, itype, amount,ord);
+  return useonother_trappedairelemental(u, sh->no, itype, amount, ord);
 }
 
-void
-register_artrewards(void)
+void register_artrewards(void)
 {
   at_register(&at_peaceimmune);
   register_item_use(use_hornofdancing, "use_hornofdancing");
   register_item_use(use_trappedairelemental, "use_trappedairelemental");
-  register_item_useonother(useonother_trappedairelemental, "useonother_trappedairelemental");
+  register_item_useonother(useonother_trappedairelemental,
+    "useonother_trappedairelemental");
 }

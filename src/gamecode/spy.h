@@ -22,14 +22,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct unit;
-struct region;
-struct strlist;
+  struct unit;
+  struct region;
+  struct strlist;
 
-extern int setstealth_cmd(struct unit * u, struct order * ord);
-extern int spy_cmd(struct unit * u, struct order * ord);
-extern int sabotage_cmd(struct unit * u, struct order * ord);
-extern void spy_message(int spy, const struct unit *u, const struct unit *target);
+  extern int setstealth_cmd(struct unit *u, struct order *ord);
+  extern int spy_cmd(struct unit *u, struct order *ord);
+  extern int sabotage_cmd(struct unit *u, struct order *ord);
+  extern void spy_message(int spy, const struct unit *u,
+    const struct unit *target);
 
 #define OCEAN_SWIMMER_CHANCE 0.1
 #define CANAL_SWIMMER_CHANCE 0.9

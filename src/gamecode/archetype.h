@@ -19,27 +19,29 @@ extern "C" {
 
   typedef struct rule {
     boolean allow;
-    char * property;
-    char * value;
+    char *property;
+    char *value;
   } rule;
 
   struct archetype;
-  typedef int (*archetype_function)(struct unit * u, const struct archetype *, int);
+  typedef int (*archetype_function) (struct unit * u, const struct archetype *,
+    int);
 
   typedef struct archetype {
-    struct archetype * next;
-    char * name[2];
+    struct archetype *next;
+    char *name[2];
     int size;
-    struct building_type * btype;
-    struct equipment * equip;
-    struct construction * ctype;
-    struct rule * rules;
+    struct building_type *btype;
+    struct equipment *equip;
+    struct construction *ctype;
+    struct rule *rules;
     archetype_function exec;
   } archetype;
 
-  extern const struct archetype * find_archetype(const char * s, const struct locale * lang);
+  extern const struct archetype *find_archetype(const char *s,
+    const struct locale *lang);
   extern void init_archetypes(void);
-  extern void register_archetype(struct archetype * arch);
+  extern void register_archetype(struct archetype *arch);
   extern void register_archetypes(void);
 
   extern struct attrib_type at_recruit;
@@ -47,5 +49,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 #endif

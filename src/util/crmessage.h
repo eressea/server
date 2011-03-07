@@ -18,20 +18,21 @@
 extern "C" {
 #endif
 
-struct locale;
-struct message;
-struct message_type;
+  struct locale;
+  struct message;
+  struct message_type;
 
-typedef int (*tostring_f)(variant data, char * buffer, const void * userdata);
-extern void tsf_register(const char * name, tostring_f fun);
-	/* registers a new type->string-function */
+  typedef int (*tostring_f) (variant data, char *buffer, const void *userdata);
+  extern void tsf_register(const char *name, tostring_f fun);
+  /* registers a new type->string-function */
 
-extern int cr_string(variant v, char * buffer, const void * userdata);
-extern int cr_int(variant v, char * buffer, const void * userdata);
-extern int cr_ignore(variant v, char * buffer, const void * userdata);
+  extern int cr_string(variant v, char *buffer, const void *userdata);
+  extern int cr_int(variant v, char *buffer, const void *userdata);
+  extern int cr_ignore(variant v, char *buffer, const void *userdata);
 
-extern void crt_register(const struct message_type * mtype);
-extern int cr_render(const struct message * msg, char * buffer, const void * userdata);
+  extern void crt_register(const struct message_type *mtype);
+  extern int cr_render(const struct message *msg, char *buffer,
+    const void *userdata);
 
 #ifdef __cplusplus
 }

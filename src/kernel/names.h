@@ -21,15 +21,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern void register_names(void);
-const char *undead_name(const struct unit * u);
-const char *skeleton_name(const struct unit * u);
-const char *zombie_name(const struct unit * u);
-const char *ghoul_name(const struct unit * u);
-const char *dragon_name(const struct unit *u);
-const char *dracoid_name(const struct unit *u);
-const char *generic_name(const struct unit *u);
-const char *abkz(const char *s, char * buf, size_t size, size_t maxchars);
+  extern void register_names(void);
+  const char *undead_name(const struct unit *u);
+  const char *skeleton_name(const struct unit *u);
+  const char *zombie_name(const struct unit *u);
+  const char *ghoul_name(const struct unit *u);
+  const char *dragon_name(const struct unit *u);
+  const char *dracoid_name(const struct unit *u);
+  const char *generic_name(const struct unit *u);
+  const char *abkz(const char *s, char *buf, size_t size, size_t maxchars);
 
 #ifdef __cplusplus
 }

@@ -25,41 +25,46 @@
 #include <string.h>
 #include <ctype.h>
 
-const xmlChar *
-xml_i(double number)
+const xmlChar *xml_i(double number)
 {
   static char buffer[128];
+
   snprintf(buffer, sizeof(buffer), "%.0lf", number);
   return (const xmlChar *)buffer;
 }
 
-int
-xml_ivalue(xmlNodePtr node, const char * name, int dflt)
+int xml_ivalue(xmlNodePtr node, const char *name, int dflt)
 {
   int i = dflt;
-  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
-  if (propValue!=NULL) {
-    i = atoi((const char*)propValue);
+
+  xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
+
+  if (propValue != NULL) {
+    i = atoi((const char *)propValue);
     xmlFree(propValue);
   }
   return i;
 }
 
-boolean
-xml_bvalue(xmlNodePtr node, const char * name, boolean dflt)
+boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt)
 {
   boolean result = dflt;
-  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
-  if (propValue!=NULL) {
-    if (strcmp((const char*)propValue, "no")==0) result = false;
-    else if (strcmp((const char*)propValue, "yes")==0) result = true;
-    else if (strcmp((const char*)propValue, "false")==0) result = false;
-    else if (strcmp((const char*)propValue, "true")==0) result = true;
-    else if (strcmp((const char*)propValue, "1")==0) {
+
+  xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
+
+  if (propValue != NULL) {
+    if (strcmp((const char *)propValue, "no") == 0)
+      result = false;
+    else if (strcmp((const char *)propValue, "yes") == 0)
+      result = true;
+    else if (strcmp((const char *)propValue, "false") == 0)
+      result = false;
+    else if (strcmp((const char *)propValue, "true") == 0)
+      result = true;
+    else if (strcmp((const char *)propValue, "1") == 0) {
       log_warning(("boolean value is '1': %s::%s\n", node->name, name));
       result = true;
-    }
-    else if (strcmp((const char*)propValue, "0")==0) {
+    } else if (strcmp((const char *)propValue, "0") == 0) {
       log_warning(("boolean value is '0': %s::%s\n", node->name, name));
       result = false;
     }
@@ -68,13 +73,14 @@ xml_bvalue(xmlNodePtr node, const char * name, boolean dflt)
   return result;
 }
 
-double
-xml_fvalue(xmlNodePtr node, const char * name, double dflt)
+double xml_fvalue(xmlNodePtr node, const char *name, double dflt)
 {
   double result = dflt;
-  xmlChar * propValue = xmlGetProp(node, BAD_CAST name);
-  if (propValue!=NULL) {
-    result = atof((const char*)propValue);
+
+  xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
+
+  if (propValue != NULL) {
+    result = atof((const char *)propValue);
     xmlFree(propValue);
   }
   return result;
@@ -87,28 +93,30 @@ xml_fvalue(xmlNodePtr node, const char * name, double dflt)
 #include <libxml/xinclude.h>
 
 typedef struct xml_reader {
-  struct xml_reader * next;
+  struct xml_reader *next;
   xml_callback callback;
 } xml_reader;
 
-static xml_reader * xmlReaders;
+static xml_reader *xmlReaders;
 
-void
-xml_register_callback(xml_callback callback)
+void xml_register_callback(xml_callback callback)
 {
-  xml_reader * reader = (xml_reader *)malloc(sizeof(xml_reader));
-  xml_reader ** insert = &xmlReaders;
+  xml_reader *reader = (xml_reader *) malloc(sizeof(xml_reader));
+
+  xml_reader **insert = &xmlReaders;
+
   reader->callback = callback;
   reader->next = NULL;
 
-  while (*insert) insert = &(*insert)->next;
+  while (*insert)
+    insert = &(*insert)->next;
   *insert = reader;
 }
 
-int
-read_xml(const char * filename, const char * catalog)
+int read_xml(const char *filename, const char *catalog)
 {
-  xml_reader * reader = xmlReaders;
+  xml_reader *reader = xmlReaders;
+
   xmlDocPtr doc;
 
   if (catalog) {
@@ -119,16 +127,17 @@ read_xml(const char * filename, const char * catalog)
 #else
   doc = xmlParseFile(filename);
 #endif
-  if (doc==NULL) {
+  if (doc == NULL) {
     log_error(("could not open %s\n", filename));
     return -1;
   }
 
   xmlXIncludeProcess(doc);
 
-  while (reader!=NULL) {
+  while (reader != NULL) {
     int i = reader->callback(doc);
-    if (i!=0) {
+
+    if (i != 0) {
       return i;
     }
     reader = reader->next;
@@ -136,4 +145,3 @@ read_xml(const char * filename, const char * catalog)
   xmlFreeDoc(doc);
   return 0;
 }
-

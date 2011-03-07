@@ -16,7 +16,7 @@ extern "C" {
 
   struct attrib;
   void tolua_attrib_open(struct lua_State *L);
-  struct attrib * tolua_get_lua_ext(struct attrib * alist);
+  struct attrib *tolua_get_lua_ext(struct attrib *alist);
   int tolua_attriblist_next(struct lua_State *L);
 
 #ifdef __cplusplus

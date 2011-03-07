@@ -24,13 +24,12 @@ extern "C" {
 
 /* this is an attribute used by the kernel (isallied) */
 
-struct plane;
-extern struct attrib_type at_gm;
+  struct plane;
+  extern struct attrib_type at_gm;
 
-extern struct attrib * make_gm(const struct plane *pl);
+  extern struct attrib *make_gm(const struct plane *pl);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

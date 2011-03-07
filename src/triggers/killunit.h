@@ -22,13 +22,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct trigger_type;
-struct trigger;
+  struct trigger_type;
+  struct trigger;
 
-struct unit;
+  struct unit;
 
-extern struct trigger_type tt_killunit;
-extern struct trigger * trigger_killunit(struct unit * u);
+  extern struct trigger_type tt_killunit;
+  extern struct trigger *trigger_killunit(struct unit *u);
 
 #ifdef __cplusplus
 }

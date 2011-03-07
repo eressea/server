@@ -20,15 +20,16 @@ extern "C" {
 #error "must define DUNGEON_MODULE to use this module"
 #endif
 
-struct region;
-struct plane;
-struct building;
-struct dungeon;
+  struct region;
+  struct plane;
+  struct building;
+  struct dungeon;
 
-extern struct dungeon * dungeonstyles;
-extern struct region * make_dungeon(const struct dungeon*);
-extern void make_dungeongate(struct region * source, struct region * target, const struct dungeon *);
-extern void register_dungeon(void);
+  extern struct dungeon *dungeonstyles;
+  extern struct region *make_dungeon(const struct dungeon *);
+  extern void make_dungeongate(struct region *source, struct region *target,
+    const struct dungeon *);
+  extern void register_dungeon(void);
 
 #ifdef __cplusplus
 }

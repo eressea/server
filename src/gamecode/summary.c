@@ -35,7 +35,7 @@
 
 #include <string.h>
 
-#undef SUMMARY_BOM /* write a BOM in the summary file */
+#undef SUMMARY_BOM              /* write a BOM in the summary file */
 
 typedef struct summary {
   int waffen;
@@ -63,36 +63,36 @@ typedef struct summary {
   int spielerpferde;
   int pferde;
   struct language {
-    struct language * next;
+    struct language *next;
     int number;
-    const struct locale * locale;
-  } * languages;
+    const struct locale *locale;
+  } *languages;
 } summary;
 
-static char *
-pcomp(double i, double j)
+static char *pcomp(double i, double j)
 {
   static char buf[32];
-  sprintf(buf, "%.0f (%s%.0f)", i, (i>=j)?"+":"", i-j);
+
+  sprintf(buf, "%.0f (%s%.0f)", i, (i >= j) ? "+" : "", i - j);
   return buf;
 }
 
-static char *
-rcomp(int i, int j)
+static char *rcomp(int i, int j)
 {
   static char buf[32];
+
   sprintf(buf, "%d (%s%d,%s%d%%)",
-    i, (i>=j)?"+":"", i-j, (i>=j)?"+":"",j?((i-j)*100)/j:0);
+    i, (i >= j) ? "+" : "", i - j, (i >= j) ? "+" : "",
+    j ? ((i - j) * 100) / j : 0);
   return buf;
 }
 
 
-static void
-out_faction(FILE *file, const struct faction *f)
+static void out_faction(FILE * file, const struct faction *f)
 {
-  if (alliances!=NULL) {
+  if (alliances != NULL) {
     fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
-      f->name, itoa36(f->no), f_get_alliance(f)?f->alliance->id:0,
+      f->name, itoa36(f->no), f_get_alliance(f) ? f->alliance->id : 0,
       LOC(default_locale, rc_name(f->race, 0)), magic_school[f->magiegebiet],
       f->no_units, f->num_total, f->money, turn - f->lastorders);
   } else {
@@ -103,45 +103,48 @@ out_faction(FILE *file, const struct faction *f)
   }
 }
 
-static char *
-gamedate2(const struct locale * lang)
+static char *gamedate2(const struct locale *lang)
 {
   static char buf[256];
+
   gamedate gd;
 
   get_gamedate(turn, &gd);
   sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
     LOC(lang, weeknames2[gd.week]),
     LOC(lang, monthnames[gd.month]),
-    gd.year,
-    agename?LOC(lang, agename):"");
+    gd.year, agename ? LOC(lang, agename) : "");
   return buf;
 }
 
-static void
-writeturn(void)
+static void writeturn(void)
 {
   char zText[MAX_PATH];
+
   FILE *f;
 
   sprintf(zText, "%s/datum", basepath());
   f = cfopen(zText, "w");
-  if (!f) return;
+  if (!f)
+    return;
   fputs(gamedate2(default_locale), f);
   fclose(f);
   sprintf(zText, "%s/turn", basepath());
   f = cfopen(zText, "w");
-  if (!f) return;
+  if (!f)
+    return;
   fprintf(f, "%d\n", turn);
   fclose(f);
 }
 
-void
-report_summary(summary * s, summary * o, boolean full)
+void report_summary(summary * s, summary * o, boolean full)
 {
-  FILE * F = NULL;
+  FILE *F = NULL;
+
   int i, newplayers = 0;
-  faction * f;
+
+  faction *f;
+
   char zText[MAX_PATH];
 
   if (full) {
@@ -150,7 +153,8 @@ report_summary(summary * s, summary * o, boolean full)
     sprintf(zText, "%s/parteien", basepath());
   }
   F = cfopen(zText, "w");
-  if (!F) return;
+  if (!F)
+    return;
 #ifdef SUMMARY_BOM
   else {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
@@ -158,15 +162,14 @@ report_summary(summary * s, summary * o, boolean full)
   }
 #endif
   printf("Schreibe Zusammenfassung (parteien)...\n");
-  fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
-  fprintf(F,   "Auswertung Nr:         %d\n\n", turn);
-  fprintf(F,   "Parteien:              %s\n", pcomp(s->factions, o->factions));
-  fprintf(F,   "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));
-  fprintf(F,   "Spielerpopulation:     %s\n",
-    pcomp(s->playerpop, o->playerpop));
-  fprintf(F,   " davon bewaffnet:      %s\n",
-    pcomp(s->armed_men, o->armed_men));
-  fprintf(F,   " Helden:               %s\n", pcomp(s->heroes, o->heroes));
+  fprintf(F, "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
+
+  fprintf(F, "Auswertung Nr:         %d\n\n", turn);
+  fprintf(F, "Parteien:              %s\n", pcomp(s->factions, o->factions));
+  fprintf(F, "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));
+  fprintf(F, "Spielerpopulation:     %s\n", pcomp(s->playerpop, o->playerpop));
+  fprintf(F, " davon bewaffnet:      %s\n", pcomp(s->armed_men, o->armed_men));
+  fprintf(F, " Helden:               %s\n", pcomp(s->heroes, o->heroes));
 
   if (full) {
     fprintf(F, "Regionen:              %d\n", listlen(regions));
@@ -180,26 +183,33 @@ report_summary(summary * s, summary * o, boolean full)
   }
 
   for (i = 0; i < MAXRACES; i++) {
-    const race * rc = new_race[i];
+    const race *rc = new_race[i];
+
     if (s->factionrace[i] && rc && playerrace(rc)
       && i != RC_TEMPLATE && i != RC_CLONE) {
-        fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)), LOC(default_locale, "stat_tribe_p"),
-          pcomp(s->factionrace[i], o->factionrace[i]));
+      fprintf(F, "%13s%s: %s\n", LOC(default_locale, rc_name(rc, 3)),
+        LOC(default_locale, "stat_tribe_p"), pcomp(s->factionrace[i],
+          o->factionrace[i]));
     }
   }
 
-  if(full) {
+  if (full) {
     fprintf(F, "\n");
     {
-      struct language * plang = s->languages;
-      while (plang!=NULL) {
-        struct language * olang = o->languages;
+      struct language *plang = s->languages;
+
+      while (plang != NULL) {
+        struct language *olang = o->languages;
+
         int nold = 0;
-        while (olang && olang->locale!=plang->locale) olang=olang->next;
-        if (olang) nold = olang->number;
+
+        while (olang && olang->locale != plang->locale)
+          olang = olang->next;
+        if (olang)
+          nold = olang->number;
         fprintf(F, "Sprache %12s: %s\n", locale_name(plang->locale),
           rcomp(plang->number, nold));
-        plang=plang->next;
+        plang = plang->next;
       }
     }
   }
@@ -207,7 +217,8 @@ report_summary(summary * s, summary * o, boolean full)
   fprintf(F, "\n");
   if (full) {
     for (i = 0; i < MAXRACES; i++) {
-      const race * rc = new_race[i];
+      const race *rc = new_race[i];
+
       if (s->poprace[i]) {
         fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
           rcomp(s->poprace[i], o->poprace[i]));
@@ -215,35 +226,37 @@ report_summary(summary * s, summary * o, boolean full)
     }
   } else {
     for (i = 0; i < MAXRACES; i++) {
-      const race * rc = new_race[i];
+      const race *rc = new_race[i];
+
       if (s->poprace[i] && playerrace(rc)
         && i != RC_TEMPLATE && i != RC_CLONE) {
-          fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
-            rcomp(s->poprace[i], o->poprace[i]));
+        fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(rc, 1)),
+          rcomp(s->poprace[i], o->poprace[i]));
       }
     }
   }
 
   if (full) {
-    fprintf(F, "\nWaffen:               %s\n", pcomp(s->waffen,o->waffen));
+    fprintf(F, "\nWaffen:               %s\n", pcomp(s->waffen, o->waffen));
     fprintf(F, "Ruestungen:           %s\n",
-      pcomp(s->ruestungen,o->ruestungen));
+      pcomp(s->ruestungen, o->ruestungen));
     fprintf(F, "ungezaehmte Pferde:   %s\n", pcomp(s->pferde, o->pferde));
     fprintf(F, "gezaehmte Pferde:     %s\n",
-      pcomp(s->spielerpferde,o->spielerpferde));
+      pcomp(s->spielerpferde, o->spielerpferde));
     fprintf(F, "Schiffe:              %s\n", pcomp(s->schiffe, o->schiffe));
     fprintf(F, "Gebaeude:             %s\n", pcomp(s->gebaeude, o->gebaeude));
 
-    fprintf(F, "\nBauernpopulation:     %s\n", pcomp(s->peasants,o->peasants));
+    fprintf(F, "\nBauernpopulation:     %s\n", pcomp(s->peasants, o->peasants));
 
-    fprintf(F, "Population gesamt:    %d\n\n", s->playerpop+s->peasants);
+    fprintf(F, "Population gesamt:    %d\n\n", s->playerpop + s->peasants);
 
     fprintf(F, "Reichtum Spieler:     %s Silber\n",
-      pcomp(s->playermoney,o->playermoney));
+      pcomp(s->playermoney, o->playermoney));
     fprintf(F, "Reichtum Bauern:      %s Silber\n",
       pcomp(s->peasantmoney, o->peasantmoney));
     fprintf(F, "Reichtum gesamt:      %s Silber\n\n",
-      pcomp(s->playermoney+s->peasantmoney, o->playermoney+o->peasantmoney));
+      pcomp(s->playermoney + s->peasantmoney,
+        o->playermoney + o->peasantmoney));
   }
 
   fprintf(F, "\n\n");
@@ -278,13 +291,13 @@ report_summary(summary * s, summary * o, boolean full)
     if (NMRTimeout() && full) {
       fprintf(F, "\n\nFactions with NMRs:\n");
       for (i = NMRTimeout(); i > 0; --i) {
-        for(f=factions; f; f=f->next) {
-          if(i == NMRTimeout()) {
-            if(turn - f->lastorders >= i) {
+        for (f = factions; f; f = f->next) {
+          if (i == NMRTimeout()) {
+            if (turn - f->lastorders >= i) {
               out_faction(F, f);
             }
           } else {
-            if(turn - f->lastorders == i) {
+            if (turn - f->lastorders == i) {
               out_faction(F, f);
             }
           }
@@ -303,18 +316,23 @@ report_summary(summary * s, summary * o, boolean full)
   nmrs = NULL;
 }
 
-summary *
-make_summary(void)
+summary *make_summary(void)
 {
   faction *f;
+
   region *r;
+
   unit *u;
-  summary * s = calloc(1, sizeof(summary));
+
+  summary *s = calloc(1, sizeof(summary));
 
   for (f = factions; f; f = f->next) {
-    const struct locale * lang = f->locale;
-    struct language * plang = s->languages;
-    while (plang && plang->locale != lang) plang=plang->next;
+    const struct locale *lang = f->locale;
+
+    struct language *plang = s->languages;
+
+    while (plang && plang->locale != lang)
+      plang = plang->next;
     if (!plang) {
       plang = calloc(sizeof(struct language), 1);
       plang->next = s->languages;
@@ -363,14 +381,16 @@ make_summary(void)
       s->peasantmoney += rmoney(r);
 
       /* Einheiten Info. nregions darf nur einmal pro Partei
-      * incrementiert werden. */
+       * incrementiert werden. */
 
-      for (u = r->units; u; u = u->next) freset(u->faction, FFL_SELECT);
+      for (u = r->units; u; u = u->next)
+        freset(u->faction, FFL_SELECT);
       for (u = r->units; u; u = u->next) {
         f = u->faction;
         if (!is_monsters(u->faction)) {
-          skill * sv;
-          item * itm;
+          skill *sv;
+
+          item *itm;
 
           s->nunits++;
           s->playerpop += u->number;
@@ -380,7 +400,7 @@ make_summary(void)
           s->spielerpferde += get_item(u, I_HORSE);
           s->playermoney += get_money(u);
           s->armed_men += armedmen(u, true);
-          for (itm=u->items;itm;itm=itm->next) {
+          for (itm = u->items; itm; itm = itm->next) {
             if (itm->type->rtype->wtype) {
               s->waffen += itm->number;
             }
@@ -393,8 +413,11 @@ make_summary(void)
 
           for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             skill_t sk = sv->id;
+
             int aktskill = eff_skill(u, sk, r);
-            if (aktskill > s->maxskill) s->maxskill = aktskill;
+
+            if (aktskill > s->maxskill)
+              s->maxskill = aktskill;
           }
           if (!fval(f, FFL_SELECT)) {
             f->nregions++;

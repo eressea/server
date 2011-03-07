@@ -24,48 +24,52 @@ extern "C" {
   struct spell;
 
   typedef struct itemdata {
-    const struct item_type * itype;
-    char * value;
-    struct itemdata * next;
+    const struct item_type *itype;
+    char *value;
+    struct itemdata *next;
   } itemdata;
 
   typedef struct subsetitem {
-    struct equipment * set;
+    struct equipment *set;
     float chance;
   } subsetitem;
 
   typedef struct subset {
     float chance;
-    subsetitem * sets;
+    subsetitem *sets;
   } subset;
 
   typedef struct equipment {
-    char * name;
-    struct itemdata * items;
-    char * skills[MAXSKILLS];
-    struct quicklist * spells;
-    struct subset * subsets;
-    struct equipment * next;
-    void (*callback)(const struct equipment *, struct unit *);
+    char *name;
+    struct itemdata *items;
+    char *skills[MAXSKILLS];
+    struct quicklist *spells;
+    struct subset *subsets;
+    struct equipment *next;
+    void (*callback) (const struct equipment *, struct unit *);
   } equipment;
 
 
-  extern struct equipment * create_equipment(const char * eqname);
-  extern struct equipment * get_equipment(const char * eqname);
+  extern struct equipment *create_equipment(const char *eqname);
+  extern struct equipment *get_equipment(const char *eqname);
 
-  extern void equipment_setitem(struct equipment * eq, const struct item_type * itype, const char * value);
-  extern void equipment_setskill(struct equipment * eq, skill_t sk, const char * value);
-  extern void equipment_addspell(struct equipment * eq, struct spell * sp);
-  extern void equipment_setcallback(struct equipment * eq, void (*callback)(const struct equipment *, struct unit *));
+  extern void equipment_setitem(struct equipment *eq,
+    const struct item_type *itype, const char *value);
+  extern void equipment_setskill(struct equipment *eq, skill_t sk,
+    const char *value);
+  extern void equipment_addspell(struct equipment *eq, struct spell *sp);
+  extern void equipment_setcallback(struct equipment *eq,
+    void (*callback) (const struct equipment *, struct unit *));
 
-  extern void equip_unit(struct unit * u, const struct equipment * eq);
+  extern void equip_unit(struct unit *u, const struct equipment *eq);
 #define EQUIP_SKILLS  (1<<1)
 #define EQUIP_SPELLS  (1<<2)
 #define EQUIP_ITEMS   (1<<3)
 #define EQUIP_SPECIAL (1<<4)
 #define EQUIP_ALL     (0xFF)
-  extern void equip_unit_mask(struct unit * u, const struct equipment * eq, int mask);
-  extern void equip_items(struct item ** items, const struct equipment * eq);
+  extern void equip_unit_mask(struct unit *u, const struct equipment *eq,
+    int mask);
+  extern void equip_items(struct item **items, const struct equipment *eq);
 
 #ifdef __cplusplus
 }

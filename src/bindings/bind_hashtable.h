@@ -17,7 +17,7 @@ extern "C" {
   struct lua_State;
   void tolua_hashtable_open(struct lua_State *L);
 
-  typedef struct attrib ** hashtable;
+  typedef struct attrib **hashtable;
 
 #ifdef __cplusplus
 }

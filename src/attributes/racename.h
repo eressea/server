@@ -22,16 +22,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct attrib_type;
-struct attrib;
+  struct attrib_type;
+  struct attrib;
 
-extern void set_racename(struct attrib ** palist, const char * name);
-extern const char * get_racename(struct attrib * alist);
+  extern void set_racename(struct attrib **palist, const char *name);
+  extern const char *get_racename(struct attrib *alist);
 
-extern struct attrib_type at_racename;
+  extern struct attrib_type at_racename;
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

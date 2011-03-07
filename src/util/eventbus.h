@@ -18,10 +18,11 @@
 extern "C" {
 #endif
 
-  typedef void (*event_handler)(void *, const char *, void *);
-  typedef void (*event_arg_free)(void *);
-  void eventbus_fire(void * sender, const char * event, void * args);
-  void eventbus_register(void * sender, const char * event, event_handler callback, event_arg_free arg_free, void * args);
+  typedef void (*event_handler) (void *, const char *, void *);
+  typedef void (*event_arg_free) (void *);
+  void eventbus_fire(void *sender, const char *event, void *args);
+  void eventbus_register(void *sender, const char *event,
+    event_handler callback, event_arg_free arg_free, void *args);
 
 #ifdef __cplusplus
 }

@@ -25,37 +25,38 @@ extern "C" {
  * implemented yet) saving approx. 50% of all string-related memory.
  */
 
-struct order_data;
+  struct order_data;
 
-typedef struct order {
-  struct order * next;
-  /* do not access this data: */
-  struct order_data * data;
-  int _persistent : 1;
-} order;
+  typedef struct order {
+    struct order *next;
+    /* do not access this data: */
+    struct order_data *data;
+    int _persistent:1;
+  } order;
 
 /* constructor */
-extern order * create_order(keyword_t kwd, const struct locale * lang, const char * params, ...);
-extern order * parse_order(const char * s, const struct locale * lang);
-extern void replace_order(order ** dst, order * orig, const order * src);
+  extern order *create_order(keyword_t kwd, const struct locale *lang,
+    const char *params, ...);
+  extern order *parse_order(const char *s, const struct locale *lang);
+  extern void replace_order(order ** dst, order * orig, const order * src);
 
 /* reference counted copies of orders: */
-extern order * copy_order(const order * ord);
-extern void free_order(order * ord);
-extern void free_orders(order ** olist);
+  extern order *copy_order(const order * ord);
+  extern void free_order(order * ord);
+  extern void free_orders(order ** olist);
 
-extern void push_order(struct order ** olist, struct order * ord);
+  extern void push_order(struct order **olist, struct order *ord);
 
 /* access functions for orders */
-extern keyword_t get_keyword(const order * ord);
-extern void set_order(order ** destp, order * src);
-extern char * getcommand(const order * ord);
-extern boolean is_persistent(const order *ord);
-extern boolean is_exclusive(const order *ord);
-extern boolean is_repeated(const order * ord);
-extern boolean is_long(const order *ord);
+  extern keyword_t get_keyword(const order * ord);
+  extern void set_order(order ** destp, order * src);
+  extern char *getcommand(const order * ord);
+  extern boolean is_persistent(const order * ord);
+  extern boolean is_exclusive(const order * ord);
+  extern boolean is_repeated(const order * ord);
+  extern boolean is_long(const order * ord);
 
-extern char * write_order(const order * ord, char * buffer, size_t size);
+  extern char *write_order(const order * ord, char *buffer, size_t size);
 
 
 #ifdef __cplusplus

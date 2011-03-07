@@ -80,24 +80,27 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #pragma endregion
 
 typedef struct request {
-  struct request * next;
-  struct unit * unit;
-  struct order * ord;
+  struct request *next;
+  struct unit *unit;
+  struct order *ord;
   int qty;
   int no;
   union {
-    boolean goblin; /* stealing */
-    const struct luxury_type * ltype; /* trading */
+    boolean goblin;             /* stealing */
+    const struct luxury_type *ltype;    /* trading */
   } type;
 } request;
 
 static int working;
 
 static request entertainers[1024];
+
 static request *nextentertainer;
+
 static int entertaining;
 
 static int norders;
+
 static request *oa;
 
 #define RECRUIT_MERGE 1
@@ -107,7 +110,7 @@ static int rules_recruit = -1;
 
 static void recruit_init(void)
 {
-  if (rules_recruit<0) {
+  if (rules_recruit < 0) {
     rules_recruit = 0;
     if (get_param_int(global.parameters, "recruit.allow_merge", 1)) {
       rules_recruit |= RECRUIT_MERGE;
@@ -121,115 +124,127 @@ static void recruit_init(void)
   }
 }
 
-int
-income(const unit * u)
+int income(const unit * u)
 {
-	switch(old_race(u->race)) {
-	case RC_FIREDRAGON:
-		return 150 * u->number;
-	case RC_DRAGON:
-		return 1000 * u->number;
-	case RC_WYRM:
-		return 5000 * u->number;
-	}
-	return 20 * u->number;
+  switch (old_race(u->race)) {
+    case RC_FIREDRAGON:
+      return 150 * u->number;
+    case RC_DRAGON:
+      return 1000 * u->number;
+    case RC_WYRM:
+      return 5000 * u->number;
+  }
+  return 20 * u->number;
 }
 
-static void
-scramble(void *data, int n, size_t width)
+static void scramble(void *data, int n, size_t width)
 {
   int j;
+
   char temp[64];
-  assert(width<=sizeof(temp));
-  for (j=0;j!=n;++j) {
+
+  assert(width <= sizeof(temp));
+  for (j = 0; j != n; ++j) {
     int k = rng_int() % n;
-	if (k==j) continue;
-    memcpy(temp, (char*)data+j*width, width);
-    memcpy((char*)data+j*width, (char*)data+k*width, width);
-    memcpy((char*)data+k*width, temp, width);
+
+    if (k == j)
+      continue;
+    memcpy(temp, (char *)data + j * width, width);
+    memcpy((char *)data + j * width, (char *)data + k * width, width);
+    memcpy((char *)data + k * width, temp, width);
   }
 }
 
-static void
-expandorders(region * r, request * requests)
+static void expandorders(region * r, request * requests)
 {
-	unit *u;
-	request *o;
+  unit *u;
 
-	/* Alle Units ohne request haben ein -1, alle units mit orders haben ein
-	* 0 hier stehen */
+  request *o;
 
-	for (u = r->units; u; u = u->next)
-		u->n = -1;
+  /* Alle Units ohne request haben ein -1, alle units mit orders haben ein
+   * 0 hier stehen */
 
-	norders = 0;
+  for (u = r->units; u; u = u->next)
+    u->n = -1;
+
+  norders = 0;
 
   for (o = requests; o; o = o->next) {
     if (o->qty > 0) {
       norders += o->qty;
     }
-	}
+  }
 
-	if (norders > 0) {
+  if (norders > 0) {
     int i = 0;
-		oa = (request *) calloc(norders, sizeof(request));
-		for (o = requests; o; o = o->next) {
-			if (o->qty > 0) {
+
+    oa = (request *) calloc(norders, sizeof(request));
+    for (o = requests; o; o = o->next) {
+      if (o->qty > 0) {
         int j;
-				for (j = o->qty; j; j--) {
-					oa[i] = *o;
-					oa[i].unit->n = 0;
-					i++;
-				}
-			}
-		}
-		scramble(oa, norders, sizeof(request));
-	} else {
-		oa = NULL;
-	}
-	while (requests) {
-		request * o = requests->next;
+
+        for (j = o->qty; j; j--) {
+          oa[i] = *o;
+          oa[i].unit->n = 0;
+          i++;
+        }
+      }
+    }
+    scramble(oa, norders, sizeof(request));
+  } else {
+    oa = NULL;
+  }
+  while (requests) {
+    request *o = requests->next;
+
     free_order(requests->ord);
-		free(requests);
-		requests = o;
-	}
+    free(requests);
+    requests = o;
+  }
 }
+
 /* ------------------------------------------------------------- */
 
-static void
-change_level(unit * u, skill_t sk, int bylevel)
+static void change_level(unit * u, skill_t sk, int bylevel)
 {
-	skill * sv = get_skill(u, sk);
-	assert(bylevel>0);
-	if (sv==0) sv = add_skill(u, sk);
-	sk_set(sv, sv->level+bylevel);
+  skill *sv = get_skill(u, sk);
+
+  assert(bylevel > 0);
+  if (sv == 0)
+    sv = add_skill(u, sk);
+  sk_set(sv, sv->level + bylevel);
 }
 
 typedef struct recruitment {
-  struct recruitment * next;
-  faction * f;
-  request * requests;
+  struct recruitment *next;
+  faction *f;
+  request *requests;
   int total, assigned;
 } recruitment;
 
-static recruitment *
-select_recruitment(request ** rop, int (*quantify)(const struct race*, int), int * total)
+static recruitment *select_recruitment(request ** rop,
+  int (*quantify) (const struct race *, int), int *total)
 {
-  recruitment * recruits = NULL;
+  recruitment *recruits = NULL;
 
   while (*rop) {
-    recruitment * rec = recruits;
-    request * ro = *rop;
-    unit * u = ro->unit;
-    const race * rc = u->race;
+    recruitment *rec = recruits;
+
+    request *ro = *rop;
+
+    unit *u = ro->unit;
+
+    const race *rc = u->race;
+
     int qty = quantify(rc, ro->qty);
 
-    if (qty<0) {
-      rop = &ro->next; /* skip this one */
+    if (qty < 0) {
+      rop = &ro->next;          /* skip this one */
     } else {
-      *rop = ro->next; /* remove this one */
-      while (rec && rec->f!=u->faction) rec = rec->next;
-      if (rec==NULL) {
+      *rop = ro->next;          /* remove this one */
+      while (rec && rec->f != u->faction)
+        rec = rec->next;
+      if (rec == NULL) {
         rec = malloc(sizeof(recruitment));
         rec->f = u->faction;
         rec->total = 0;
@@ -247,16 +262,17 @@ select_recruitment(request ** rop, int (*quantify)(const struct race*, int), int
   return recruits;
 }
 
-static void
-add_recruits(unit * u, int number, int wanted)
+static void add_recruits(unit * u, int number, int wanted)
 {
-  region * r = u->region;
-  assert(number<=wanted);
+  region *r = u->region;
+
+  assert(number <= wanted);
   if (number > 0) {
-    unit * unew;
+    unit *unew;
+
     char equipment[64];
 
-    if (u->number==0) {
+    if (u->number == 0) {
       set_number(u, number);
       u->hp = number * unit_max_hp(u);
       unew = u;
@@ -272,102 +288,116 @@ add_recruits(unit * u, int number, int wanted)
       change_level(unew, SK_RIDING, 1);
     }
 
-    if (unew!=u) {
+    if (unew != u) {
       transfermen(unew, u, unew->number);
       remove_unit(&r->units, unew);
     }
   }
   if (number < wanted) {
     ADDMSG(&u->faction->msgs, msg_message("recruit",
-      "unit region amount want", u, r, number, wanted));
+        "unit region amount want", u, r, number, wanted));
   }
 }
 
-static int
-any_recruiters(const struct race * rc, int qty)
+static int any_recruiters(const struct race *rc, int qty)
 {
   return (int)(qty * 2 * rc->recruit_multi);
 }
 
-static int
-peasant_recruiters(const struct race * rc, int qty)
+static int peasant_recruiters(const struct race *rc, int qty)
 {
-  if (rc->ec_flags & ECF_REC_ETHEREAL) return -1;
-  if (rc->ec_flags & ECF_REC_HORSES) return -1;
+  if (rc->ec_flags & ECF_REC_ETHEREAL)
+    return -1;
+  if (rc->ec_flags & ECF_REC_HORSES)
+    return -1;
   return (int)(qty * 2 * rc->recruit_multi);
 }
 
-static int
-horse_recruiters(const struct race * rc, int qty)
+static int horse_recruiters(const struct race *rc, int qty)
 {
-  if (rc->ec_flags & ECF_REC_ETHEREAL) return -1;
-  if (rc->ec_flags & ECF_REC_HORSES) return (int)(qty * 2 * rc->recruit_multi);
+  if (rc->ec_flags & ECF_REC_ETHEREAL)
+    return -1;
+  if (rc->ec_flags & ECF_REC_HORSES)
+    return (int)(qty * 2 * rc->recruit_multi);
   return -1;
 }
 
-static int
-do_recruiting(recruitment * recruits, int available)
+static int do_recruiting(recruitment * recruits, int available)
 {
-  recruitment * rec;
+  recruitment *rec;
+
   int recruited = 0;
 
-  while (available>0) {
+  while (available > 0) {
     int n = 0;
+
     int rest, mintotal = INT_MAX;
 
-    for (rec=recruits;rec!=NULL;rec=rec->next) {
+    for (rec = recruits; rec != NULL; rec = rec->next) {
       int want = rec->total - rec->assigned;
-      if (want>0) {
-        if (mintotal>want) mintotal = want;
+
+      if (want > 0) {
+        if (mintotal > want)
+          mintotal = want;
         ++n;
       }
     }
-    if (n==0) break;
-    if (mintotal*n>available) {
-      mintotal = available/n;
+    if (n == 0)
+      break;
+    if (mintotal * n > available) {
+      mintotal = available / n;
     }
-    rest = available - mintotal*n;
+    rest = available - mintotal * n;
 
-    for (rec=recruits;rec!=NULL;rec=rec->next) {
+    for (rec = recruits; rec != NULL; rec = rec->next) {
       int want = rec->total - rec->assigned;
 
-      if (want>0) {
+      if (want > 0) {
         int get = mintotal;
-        if (want>mintotal && rest<n && (rng_int() % n) < rest) {
+
+        if (want > mintotal && rest < n && (rng_int() % n) < rest) {
           --rest;
           ++get;
         }
-        assert(get<=want);
+        assert(get <= want);
         available -= get;
         rec->assigned += get;
       }
     }
   }
 
-  for (rec=recruits;rec!=NULL;rec=rec->next) {
-    request * req;
+  for (rec = recruits; rec != NULL; rec = rec->next) {
+    request *req;
+
     int get = rec->assigned;
 
-    for (req=rec->requests;req;req=req->next) {
-      unit * u = req->unit;
-      const race * rc = u->race; /* race is set in recruit() */
+    for (req = rec->requests; req; req = req->next) {
+      unit *u = req->unit;
+
+      const race *rc = u->race; /* race is set in recruit() */
+
       int number, dec;
+
       float multi = 2.0F * rc->recruit_multi;
 
       number = MIN(req->qty, (int)(get / multi));
       if (rc->recruitcost) {
-        int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, number*rc->recruitcost) / rc->recruitcost;
+        int afford =
+          get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+          number * rc->recruitcost) / rc->recruitcost;
         number = MIN(number, afford);
-        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, rc->recruitcost*number);
+        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+          rc->recruitcost * number);
       }
-      if (u->number+number>UNIT_MAXSIZE) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size", "maxsize", UNIT_MAXSIZE));
-        number = UNIT_MAXSIZE-u->number;
-        assert(number>=0);
+      if (u->number + number > UNIT_MAXSIZE) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
+            "maxsize", UNIT_MAXSIZE));
+        number = UNIT_MAXSIZE - u->number;
+        assert(number >= 0);
       }
       add_recruits(u, number, req->qty);
       dec = (int)(number * multi);
-      if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
+      if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
         recruited += dec;
       }
 
@@ -377,40 +407,47 @@ do_recruiting(recruitment * recruits, int available)
   return recruited;
 }
 
-static void
-feedback_give_not_allowed(unit * u, order * ord)
+static void feedback_give_not_allowed(unit * u, order * ord)
 {
-  ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden", ""));
+  ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_give_forbidden",
+      ""));
 }
 
-static boolean check_give(unit * u, unit * u2, const item_type * itype, int mask)
+static boolean check_give(unit * u, unit * u2, const item_type * itype,
+  int mask)
 {
   if (u2) {
-    if (u->faction!=u2->faction) {
+    if (u->faction != u2->faction) {
       int rule = rule_give();
+
       if (itype) {
-        assert(mask==0);
-        if (itype->rtype->ltype) mask |= GIVE_LUXURIES;
-        else if (fval(itype, ITF_HERB)) mask |= GIVE_HERBS;
-        else mask |= GIVE_GOODS;
+        assert(mask == 0);
+        if (itype->rtype->ltype)
+          mask |= GIVE_LUXURIES;
+        else if (fval(itype, ITF_HERB))
+          mask |= GIVE_HERBS;
+        else
+          mask |= GIVE_GOODS;
       }
-      return (rule&mask)!=0;
+      return (rule & mask) != 0;
     }
   } else {
     int rule = rule_give();
-    return (rule & GIVE_PEASANTS)!=0;
+
+    return (rule & GIVE_PEASANTS) != 0;
   }
   return true;
 }
 
-void
-free_recruitments(recruitment * recruits)
+void free_recruitments(recruitment * recruits)
 {
   while (recruits) {
-    recruitment * rec = recruits;
+    recruitment *rec = recruits;
+
     recruits = rec->next;
     while (rec->requests) {
-      request * req = rec->requests;
+      request *req = rec->requests;
+
       rec->requests = req->next;
       free(req);
     }
@@ -419,10 +456,9 @@ free_recruitments(recruitment * recruits)
 }
 
 /* Rekrutierung */
-static void
-expandrecruit(region * r, request * recruitorders)
+static void expandrecruit(region * r, request * recruitorders)
 {
-  recruitment * recruits = NULL;
+  recruitment *recruits = NULL;
 
   int orc_total = 0;
 
@@ -430,7 +466,9 @@ expandrecruit(region * r, request * recruitorders)
   recruits = select_recruitment(&recruitorders, horse_recruiters, &orc_total);
   if (recruits) {
     int recruited, horses = rhorses(r) * 2;
-    if (orc_total<horses) horses = orc_total;
+
+    if (orc_total < horses)
+      horses = orc_total;
     recruited = do_recruiting(recruits, horses);
     rsethorses(r, (horses - recruited) / 2);
     free_recruitments(recruits);
@@ -440,11 +478,14 @@ expandrecruit(region * r, request * recruitorders)
   recruits = select_recruitment(&recruitorders, peasant_recruiters, &orc_total);
   if (recruits) {
     int orc_recruited, orc_peasants = rpeasants(r) * 2;
-    int orc_frac = orc_peasants / RECRUITFRACTION; /* anzahl orks. 2 ork = 1 bauer */
-    if (orc_total<orc_frac) orc_frac = orc_total;
+
+    int orc_frac = orc_peasants / RECRUITFRACTION;      /* anzahl orks. 2 ork = 1 bauer */
+
+    if (orc_total < orc_frac)
+      orc_frac = orc_total;
     orc_recruited = do_recruiting(recruits, orc_frac);
-    assert(orc_recruited<=orc_frac);
-    rsetpeasants(r, (orc_peasants - orc_recruited)/2);
+    assert(orc_recruited <= orc_frac);
+    rsetpeasants(r, (orc_peasants - orc_recruited) / 2);
     free_recruitments(recruits);
   }
 
@@ -452,20 +493,20 @@ expandrecruit(region * r, request * recruitorders)
   recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
     int recruited, peasants = rpeasants(r);
+
     recruited = do_recruiting(recruits, INT_MAX);
-    if (recruited>0)  {
-      rsetpeasants(r, peasants - recruited/2);
+    if (recruited > 0) {
+      rsetpeasants(r, peasants - recruited / 2);
     }
     free_recruitments(recruits);
   }
 
-  assert(recruitorders==NULL);
+  assert(recruitorders == NULL);
 }
 
-static int
-recruit_cost(const faction * f, const race * rc)
+static int recruit_cost(const faction * f, const race * rc)
 {
-  if (is_monsters(f) || f->race==rc) {
+  if (is_monsters(f) || f->race == rc) {
     return rc->recruitcost;
   } else if (valid_race(f, rc)) {
     return rc->recruitcost;
@@ -474,44 +515,50 @@ recruit_cost(const faction * f, const race * rc)
   return -1;
 }
 
-static void
-recruit(unit * u, struct order * ord, request ** recruitorders)
+static void recruit(unit * u, struct order *ord, request ** recruitorders)
 {
   int n;
-  region * r = u->region;
-  plane * pl;
+
+  region *r = u->region;
+
+  plane *pl;
+
   request *o;
+
   int recruitcost = -1;
-  const faction * f = u->faction;
-  const struct race * rc = u->race;
-  const char * str;
+
+  const faction *f = u->faction;
+
+  const struct race *rc = u->race;
+
+  const char *str;
 
   init_tokens(ord);
   skip_token();
   n = getuint();
 
-  if (u->number==0) {
+  if (u->number == 0) {
     str = getstrtoken();
     if (str && str[0]) {
       /* Monster dürfen REKRUTIERE 15 dracoid machen
        * also: secondary race */
       rc = findrace(str, f->locale);
-      if (rc!=NULL) {
+      if (rc != NULL) {
         recruitcost = recruit_cost(f, rc);
       }
     }
   }
-  if (recruitcost<0) {
+  if (recruitcost < 0) {
     rc = u->race;
     recruitcost = recruit_cost(f, rc);
   }
   u->race = rc;
-  assert(rc && recruitcost>=0);
+  assert(rc && recruitcost >= 0);
 
 #if GUARD_DISABLES_RECRUIT
   /* this is a very special case because the recruiting unit may be empty
-  * at this point and we have to look at the creating unit instead. This
-  * is done in cansee, which is called indirectly by is_guarded(). */
+   * at this point and we have to look at the creating unit instead. This
+   * is done in cansee, which is called indirectly by is_guarded(). */
   if (is_guarded(r, u, GUARD_RECRUIT)) {
     cmistake(u, ord, 70, MSG_EVENT);
     return;
@@ -520,10 +567,12 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 
   if (rc == new_race[RC_INSECT]) {
     gamedate date;
+
     get_gamedate(turn, &date);
     if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
 #ifdef INSECT_POTION
       boolean usepotion = false;
+
       unit *u2;
 
       for (u2 = r->units; u2; u2 = u2->next)
@@ -531,12 +580,12 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
           usepotion = true;
           break;
         }
-        if (!usepotion)
+      if (!usepotion)
 #endif
-        {
-          cmistake(u, ord, 98, MSG_EVENT);
-          return;
-        }
+      {
+        cmistake(u, ord, 98, MSG_EVENT);
+        return;
+      }
     }
     /* in Gletschern, Eisbergen gar nicht rekrutieren */
     if (r_insectstalled(r)) {
@@ -551,8 +600,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   }
 
   if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
-    if (rc != new_race[RC_ORC])
-    {
+    if (rc != new_race[RC_ORC]) {
       cmistake(u, ord, 238, MSG_EVENT);
       return;
     }
@@ -561,12 +609,12 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   if (recruitcost) {
     pl = getplane(r);
     if (pl && fval(pl, PFL_NORECRUITS)) {
-      ADDMSG(&u->faction->msgs,
-        msg_feedback(u, ord, "error_pflnorecruit", ""));
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_pflnorecruit", ""));
       return;
     }
 
-    if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost) < recruitcost) {
+    if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+        recruitcost) < recruitcost) {
       cmistake(u, ord, 142, MSG_EVENT);
       return;
     }
@@ -578,19 +626,19 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 
   if (has_skill(u, SK_MAGIC)) {
     /* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
-    * grundsätzlich nur alleine! */
+     * grundsätzlich nur alleine! */
     cmistake(u, ord, 158, MSG_EVENT);
     return;
   }
   if (has_skill(u, SK_ALCHEMY)
     && count_skill(u->faction, SK_ALCHEMY) + n >
-    skill_limit(u->faction, SK_ALCHEMY))
-  {
+    skill_limit(u->faction, SK_ALCHEMY)) {
     cmistake(u, ord, 156, MSG_EVENT);
     return;
   }
-  if (recruitcost>0) {
-    int pooled = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost * n);
+  if (recruitcost > 0) {
+    int pooled =
+      get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, recruitcost * n);
     n = MIN(n, pooled / recruitcost);
   }
 
@@ -608,26 +656,28 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
   addlist(recruitorders, o);
 }
 
-static void
-friendly_takeover(region * r, faction * f)
+static void friendly_takeover(region * r, faction * f)
 {
   int morale = region_get_morale(r);
+
   region_set_owner(r, f, turn);
-  if (morale>0) {
-    morale = MAX(0, morale-MORALE_TRANSFER);
+  if (morale > 0) {
+    morale = MAX(0, morale - MORALE_TRANSFER);
     region_set_morale(r, morale, turn);
   }
 }
 
-static void
-give_control(unit * u, unit * u2)
+static void give_control(unit * u, unit * u2)
 {
-  if (u->building && u->faction!=u2->faction && rule_region_owners()) {
-    region * r = u->region;
-    faction * f = region_get_owner(r);
-    if (f==u->faction) {
-      building * b = largestbuilding(r, &cmp_current_owner, false);
-      if (b==u->building) {
+  if (u->building && u->faction != u2->faction && rule_region_owners()) {
+    region *r = u->region;
+
+    faction *f = region_get_owner(r);
+
+    if (f == u->faction) {
+      building *b = largestbuilding(r, &cmp_current_owner, false);
+
+      if (b == u->building) {
         friendly_takeover(r, u2->faction);
       }
     }
@@ -636,12 +686,14 @@ give_control(unit * u, unit * u2)
   fset(u2, UFL_OWNER);
 }
 
-int
-give_control_cmd(unit * u, order * ord)
+int give_control_cmd(unit * u, order * ord)
 {
-  region * r = u->region;
+  region *r = u->region;
+
   unit *u2;
-  const char * s;
+
+  const char *s;
+
   param_t p;
 
   init_tokens(ord);
@@ -652,24 +704,20 @@ give_control_cmd(unit * u, order * ord)
 
   /* first, do all the ones that do not require HELP_GIVE or CONTACT */
   if (p == P_CONTROL) {
-    message * msg;
+    message *msg;
 
-    if (!u2 || u2->number==0) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-    }
-    else if (!u->building && !u->ship) {
+    if (!u2 || u2->number == 0) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+          ""));
+    } else if (!u->building && !u->ship) {
       cmistake(u, ord, 140, MSG_EVENT);
-    }
-    else if (u->building && u2->building != u->building) {
+    } else if (u->building && u2->building != u->building) {
       cmistake(u, ord, 33, MSG_EVENT);
-    }
-    else if (u->ship && u2->ship != u->ship) {
+    } else if (u->ship && u2->ship != u->ship) {
       cmistake(u, ord, 32, MSG_EVENT);
-    }
-    else if (!fval(u, UFL_OWNER)) {
+    } else if (!fval(u, UFL_OWNER)) {
       cmistake(u, ord, 49, MSG_EVENT);
-    } 
-    else {
+    } else {
       give_control(u, u2);
 
       msg = msg_message("givecommand", "unit recipient", u, u2);
@@ -683,16 +731,21 @@ give_control_cmd(unit * u, order * ord)
   return 0;
 }
 
-static void
-give_cmd(unit * u, order * ord)
+static void give_cmd(unit * u, order * ord)
 {
-  region * r = u->region;
+  region *r = u->region;
+
   unit *u2;
+
   const char *s;
+
   int i, n;
-  const item_type * itype;
+
+  const item_type *itype;
+
   param_t p;
-  plane * pl;
+
+  plane *pl;
 
   init_tokens(ord);
   skip_token();
@@ -707,7 +760,8 @@ give_cmd(unit * u, order * ord)
   }
 
   if (!u2 && !getunitpeasants) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
     return;
   }
 
@@ -717,8 +771,11 @@ give_cmd(unit * u, order * ord)
   }
 
   /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
-  if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+  if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
+    && !cansee(u->faction, r, u2, 0) && !ucontact(u2, u)
+    && !fval(u2, UFL_TAKEALL)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
     return;
   }
   if (u == u2) {
@@ -727,7 +784,7 @@ give_cmd(unit * u, order * ord)
   }
 
   /* UFL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
-  * wirklich einfach. */
+   * wirklich einfach. */
   pl = rplane(r);
   if (pl && fval(pl, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
     cmistake(u, ord, 268, MSG_COMMERCE);
@@ -735,7 +792,8 @@ give_cmd(unit * u, order * ord)
   }
 
   if (u2 && u2->race == new_race[RC_SPELL]) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
     return;
   }
 
@@ -746,7 +804,8 @@ give_cmd(unit * u, order * ord)
 
   else if (p == P_HERBS) {
     boolean given = false;
-    if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+
+    if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "race_nogive", "race", u->race));
       return;
@@ -762,28 +821,34 @@ give_cmd(unit * u, order * ord)
     }
     if (!u2) {
       if (!getunitpeasants) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "feedback_unit_not_found", ""));
         return;
       }
     }
     if (u->items) {
-      item **itmp=&u->items;
+      item **itmp = &u->items;
+
       while (*itmp) {
-        item * itm = *itmp;
-        const item_type * itype = itm->type;
-        if (fval(itype, ITF_HERB) && itm->number>0) {
+        item *itm = *itmp;
+
+        const item_type *itype = itm->type;
+
+        if (fval(itype, ITF_HERB) && itm->number > 0) {
           /* give_item ändert im fall,das man alles übergibt, die
-          * item-liste der unit, darum continue vor pointerumsetzten */
-          if (give_item(itm->number, itm->type, u, u2, ord)==0) {
+           * item-liste der unit, darum continue vor pointerumsetzten */
+          if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
             given = true;
-            if (*itmp!=itm) continue;
+            if (*itmp != itm)
+              continue;
             continue;
           }
         }
         itmp = &itm->next;
       }
     }
-    if (!given) cmistake(u, ord, 38, MSG_COMMERCE);
+    if (!given)
+      cmistake(u, ord, 38, MSG_COMMERCE);
     return;
   }
 
@@ -793,7 +858,7 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  else if (p == P_UNIT) {	/* Einheiten uebergeben */
+  else if (p == P_UNIT) {       /* Einheiten uebergeben */
     if (!(u->race->ec_flags & GIVEUNIT)) {
       cmistake(u, ord, 167, MSG_COMMERCE);
       return;
@@ -803,17 +868,17 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  else if (p==P_ANY) {
-    const char * s = getstrtoken();
+  else if (p == P_ANY) {
+    const char *s = getstrtoken();
 
     if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
-    if (*s == 0) { /* Alle Gegenstände übergeben */
+    if (*s == 0) {              /* Alle Gegenstände übergeben */
 
       /* do these checks once, not for each item we have: */
-      if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+      if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
         ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "race_nogive", "race", u->race));
         return;
@@ -827,22 +892,26 @@ give_cmd(unit * u, order * ord)
       /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
        * reserviert ist besitzen und diesen Teil dann übergeben */
       if (u->items) {
-        item **itmp=&u->items;
+        item **itmp = &u->items;
+
         while (*itmp) {
-          item * itm = *itmp;
-          const item_type * itype = itm->type;
-          if (itm->number > 0 && itm->number - get_reservation(u, itype->rtype) > 0) {
+          item *itm = *itmp;
+
+          const item_type *itype = itm->type;
+
+          if (itm->number > 0
+            && itm->number - get_reservation(u, itype->rtype) > 0) {
             n = itm->number - get_reservation(u, itype->rtype);
-            if (give_item(n, itype, u, u2, ord)==0) {
-              if (*itmp!=itm) continue;
+            if (give_item(n, itype, u, u2, ord) == 0) {
+              if (*itmp != itm)
+                continue;
             }
           }
           itmp = &itm->next;
         }
       }
       return;
-    }
-    else {
+    } else {
       param_t p2 = findparam(s, u->faction->locale);
 
       if (p2 == P_PERSON) {
@@ -856,7 +925,7 @@ give_cmd(unit * u, order * ord)
         return;
       }
 
-      if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+      if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
         ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "race_nogive", "race", u->race));
         return;
@@ -868,9 +937,10 @@ give_cmd(unit * u, order * ord)
       }
 
       itype = finditemtype(s, u->faction->locale);
-      if (itype!=NULL) {
-        item * i = *i_find(&u->items, itype);
-        if (i!=NULL) {
+      if (itype != NULL) {
+        item *i = *i_find(&u->items, itype);
+
+        if (i != NULL) {
           if (check_give(u, u2, itype, 0)) {
             n = i->number - get_reservation(u, itype->rtype);
             give_item(n, itype, u, u2, ord);
@@ -881,17 +951,17 @@ give_cmd(unit * u, order * ord)
         }
       }
     }
-  } else if (p==P_EACH) {
-    if (u2==NULL) {
+  } else if (p == P_EACH) {
+    if (u2 == NULL) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "peasants_give_invalid", ""));
       return;
     }
-    s = getstrtoken(); /* skip one ahead to get the amount. */
+    s = getstrtoken();          /* skip one ahead to get the amount. */
   }
 
-  n = atoip((const char *)s);		/* n: Anzahl */
-  if (p==P_EACH) {
+  n = atoip((const char *)s);   /* n: Anzahl */
+  if (p == P_EACH) {
     n *= u2->number;
   }
   s = getstrtoken();
@@ -912,8 +982,8 @@ give_cmd(unit * u, order * ord)
     return;
   }
 
-  if (u2!=NULL) {
-    if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+  if (u2 != NULL) {
+    if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "race_nogive", "race", u->race));
       return;
@@ -926,7 +996,7 @@ give_cmd(unit * u, order * ord)
   }
 
   itype = finditemtype(s, u->faction->locale);
-  if (itype!=NULL) {
+  if (itype != NULL) {
     if (check_give(u, u2, itype, 0)) {
       give_item(n, itype, u, u2, ord);
     } else {
@@ -937,10 +1007,10 @@ give_cmd(unit * u, order * ord)
   cmistake(u, ord, 123, MSG_COMMERCE);
 }
 
-static int
-forget_cmd(unit * u, order * ord)
+static int forget_cmd(unit * u, order * ord)
 {
   skill_t sk;
+
   const char *s;
 
   if (is_cursed(u->attribs, C_SLAVE, 0)) {
@@ -953,45 +1023,47 @@ forget_cmd(unit * u, order * ord)
   s = getstrtoken();
 
   if ((sk = findskill(s, u->faction->locale)) != NOSKILL) {
-    ADDMSG(&u->faction->msgs,
-      msg_message("forget", "unit skill", u, sk));
+    ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
     set_level(u, sk, 0);
   }
   return 0;
 }
 
-void
-add_spende(faction * f1, faction * f2, int amount, region * r)
+void add_spende(faction * f1, faction * f2, int amount, region * r)
 {
-	donation *sp;
+  donation *sp;
 
-	sp = r->donations;
+  sp = r->donations;
 
-	while (sp) {
-		if (sp->f1 == f1 && sp->f2 == f2) {
-			sp->amount += amount;
-			return;
-		}
-		sp = sp->next;
-	}
+  while (sp) {
+    if (sp->f1 == f1 && sp->f2 == f2) {
+      sp->amount += amount;
+      return;
+    }
+    sp = sp->next;
+  }
 
-	sp = calloc(1, sizeof(donation));
-	sp->f1 = f1;
-	sp->f2 = f2;
-	sp->amount = amount;
-	sp->next = r->donations;
-	r->donations = sp;
+  sp = calloc(1, sizeof(donation));
+  sp->f1 = f1;
+  sp->f2 = f2;
+  sp->amount = amount;
+  sp->next = r->donations;
+  r->donations = sp;
 }
 
-static boolean
-maintain(building * b, boolean first)
+static boolean maintain(building * b, boolean first)
 /* first==false -> take money from wherever you can */
 {
   int c;
-  region * r = b->region;
+
+  region *r = b->region;
+
   boolean paid = true, work = first;
-  unit * u;
-  if (fval(b, BLD_MAINTAINED) || b->type==NULL || b->type->maintenance==NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
+
+  unit *u;
+
+  if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL
+    || is_cursed(b->attribs, C_NOCOST, 0)) {
     fset(b, BLD_MAINTAINED);
     fset(b, BLD_WORKING);
     return true;
@@ -1000,32 +1072,42 @@ maintain(building * b, boolean first)
     return false;
   }
   u = building_owner(b);
-  if (u==NULL) return false;
-  for (c=0;b->type->maintenance[c].number;++c) {
-    const maintenance * m = b->type->maintenance+c;
+  if (u == NULL)
+    return false;
+  for (c = 0; b->type->maintenance[c].number; ++c) {
+    const maintenance *m = b->type->maintenance + c;
+
     int need = m->number;
 
-    if (fval(m, MTF_VARIABLE)) need = need * b->size;
+    if (fval(m, MTF_VARIABLE))
+      need = need * b->size;
     if (u) {
       /* first ist im ersten versuch true, im zweiten aber false! Das
-      * bedeutet, das in der Runde in die Region geschafften Resourcen
-      * nicht genutzt werden können, weil die reserviert sind! */
-      if (!first) need -= get_pooled(u, m->rtype, GET_ALL, need);
-      else need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
+       * bedeutet, das in der Runde in die Region geschafften Resourcen
+       * nicht genutzt werden können, weil die reserviert sind! */
+      if (!first)
+        need -= get_pooled(u, m->rtype, GET_ALL, need);
+      else
+        need -= get_pooled(u, m->rtype, GET_DEFAULT, need);
       if (!first && need > 0) {
-        unit * ua;
-        for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FFL_SELECT);
-        fset(u->faction, FFL_SELECT); /* hat schon */
-        for (ua=r->units;ua;ua=ua->next) {
-          if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
+        unit *ua;
+
+        for (ua = r->units; ua; ua = ua->next)
+          freset(ua->faction, FFL_SELECT);
+        fset(u->faction, FFL_SELECT);   /* hat schon */
+        for (ua = r->units; ua; ua = ua->next) {
+          if (!fval(ua->faction, FFL_SELECT) && (ua->faction == u->faction
+              || alliedunit(ua, u->faction, HELP_MONEY))) {
             need -= get_pooled(ua, m->rtype, GET_ALL, need);
             fset(ua->faction, FFL_SELECT);
-            if (need<=0) break;
+            if (need <= 0)
+              break;
           }
         }
       }
       if (need > 0) {
-        if (!fval(m, MTF_VITAL)) work = false;
+        if (!fval(m, MTF_VITAL))
+          work = false;
         else {
           paid = false;
           break;
@@ -1033,10 +1115,11 @@ maintain(building * b, boolean first)
       }
     }
   }
-  if (paid && c>0) {
+  if (paid && c > 0) {
     /* TODO: wieviel von was wurde bezahlt */
     if (first) {
-      ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
+      ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u,
+          b));
     } else {
       ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
     }
@@ -1044,31 +1127,45 @@ maintain(building * b, boolean first)
     if (work) {
       fset(b, BLD_WORKING);
     }
-    for (c=0;b->type->maintenance[c].number;++c) {
-      const maintenance * m = b->type->maintenance+c;
+    for (c = 0; b->type->maintenance[c].number; ++c) {
+      const maintenance *m = b->type->maintenance + c;
+
       int cost = m->number;
 
-      if (!fval(m, MTF_VITAL) && !work) continue;
-      if (fval(m, MTF_VARIABLE)) cost = cost * b->size;
+      if (!fval(m, MTF_VITAL) && !work)
+        continue;
+      if (fval(m, MTF_VARIABLE))
+        cost = cost * b->size;
 
-      if (!first) cost -= use_pooled(u, m->rtype, GET_ALL, cost);
-      else cost -= use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
+      if (!first)
+        cost -= use_pooled(u, m->rtype, GET_ALL, cost);
+      else
+        cost -=
+          use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+          cost);
       if (!first && cost > 0) {
-        unit * ua;
-        for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FFL_SELECT);
-        fset(u->faction, FFL_SELECT); /* hat schon */
-        for (ua=r->units;ua;ua=ua->next) {
-          if (!fval(ua->faction, FFL_SELECT) && alliedunit(ua, u->faction, HELP_MONEY)) {
+        unit *ua;
+
+        for (ua = r->units; ua; ua = ua->next)
+          freset(ua->faction, FFL_SELECT);
+        fset(u->faction, FFL_SELECT);   /* hat schon */
+        for (ua = r->units; ua; ua = ua->next) {
+          if (!fval(ua->faction, FFL_SELECT)
+            && alliedunit(ua, u->faction, HELP_MONEY)) {
             int give = use_pooled(ua, m->rtype, GET_ALL, cost);
-            if (!give) continue;
+
+            if (!give)
+              continue;
             cost -= give;
             fset(ua->faction, FFL_SELECT);
-            if (m->rtype==r_silver) add_spende(ua->faction, u->faction, give, r);
-            if (cost<=0) break;
+            if (m->rtype == r_silver)
+              add_spende(ua->faction, u->faction, give, r);
+            if (cost <= 0)
+              break;
           }
         }
       }
-      assert(cost==0);
+      assert(cost == 0);
     }
   } else {
     ADDMSG(&u->faction->msgs,
@@ -1079,14 +1176,17 @@ maintain(building * b, boolean first)
 }
 
 #ifdef COLLAPSE_CHANCE
-static void
-gebaeude_stuerzt_ein(region * r, building * b)
+static void gebaeude_stuerzt_ein(region * r, building * b)
 {
   unit *u;
+
   int n, i;
+
   int opfer = 0;
+
   int road = 0;
-  struct message * msg;
+
+  struct message *msg;
 
   for (u = r->units; u; u = u->next) {
     if (u->building == b) {
@@ -1094,7 +1194,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 
       fset(u->faction, FFL_MARK);
       freset(u, UFL_OWNER);
-      leave(r,u);
+      leave(r, u);
       n = u->number;
 #ifdef COLLAPSE_SURVIVAL
       for (i = 0; i < n; i++) {
@@ -1108,10 +1208,13 @@ gebaeude_stuerzt_ein(region * r, building * b)
     }
   }
 
-  msg = msg_message("buildingcrash", "region building opfer road", r, b, opfer, road);
+  msg =
+    msg_message("buildingcrash", "region building opfer road", r, b, opfer,
+    road);
   add_message(&r->msgs, msg);
-  for (u=r->units; u; u=u->next) {
-    faction * f = u->faction;
+  for (u = r->units; u; u = u->next) {
+    faction *f = u->faction;
+
     if (fval(f, FFL_MARK)) {
       freset(u->faction, FFL_MARK);
       add_message(&f->msgs, msg);
@@ -1122,12 +1225,13 @@ gebaeude_stuerzt_ein(region * r, building * b)
 }
 #endif
 
-void
-maintain_buildings(region * r, boolean crash)
+void maintain_buildings(region * r, boolean crash)
 {
   building **bp = &r->buildings;
+
   while (*bp) {
-    building * b = *bp;
+    building *b = *bp;
+
     boolean maintained = maintain(b, !crash);
 
     /* the second time, send a message */
@@ -1139,9 +1243,11 @@ maintain_buildings(region * r, boolean crash)
       }
 #endif
       if (!fval(b, BLD_WORKING)) {
-        unit * u = building_owner(b);
-        const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
-        struct message * msg = msg_message(msgtype, "building", b);
+        unit *u = building_owner(b);
+
+        const char *msgtype =
+          maintained ? "maintenance_nowork" : "maintenance_none";
+        struct message *msg = msg_message(msgtype, "building", b);
 
         if (u) {
           add_message(&u->faction->msgs, msg);
@@ -1152,36 +1258,41 @@ maintain_buildings(region * r, boolean crash)
         msg_release(msg);
       }
     }
-    bp=&b->next;
+    bp = &b->next;
   }
 }
 
-static int
-recruit_archetype(unit * u, order * ord)
+static int recruit_archetype(unit * u, order * ord)
 {
-  boolean merge = (u->number>0);
-  int want;
-  const char * s;
+  boolean merge = (u->number > 0);
 
-  if (rules_recruit<0) recruit_init();
+  int want;
+
+  const char *s;
+
+  if (rules_recruit < 0)
+    recruit_init();
 
   init_tokens(ord);
   skip_token();
   want = getuint();
   s = getstrtoken();
-  if (want>0 && s && s[0]) {
+  if (want > 0 && s && s[0]) {
     int n = want;
-    const archetype * arch = find_archetype(s, u->faction->locale);
-    attrib * a = NULL;
 
-    if ((rules_recruit&RECRUIT_MERGE)==0 && merge) {
+    const archetype *arch = find_archetype(s, u->faction->locale);
+
+    attrib *a = NULL;
+
+    if ((rules_recruit & RECRUIT_MERGE) == 0 && merge) {
       ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_new", ""));
       /* TODO: error message */
       return 0;
     }
 
-    if (arch==NULL) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unknown_archetype", "name", s));
+    if (arch == NULL) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unknown_archetype",
+          "name", s));
       /* TODO: error message */
       return 0;
     }
@@ -1193,23 +1304,32 @@ recruit_archetype(unit * u, order * ord)
        * for each failed rule.
        */
       int k;
-      for (k=0;arch->rules[k].property;++k) {
+
+      for (k = 0; arch->rules[k].property; ++k) {
         boolean match = false;
-        if (arch->rules[k].value[0]=='*') match = true;
-        else if (strcmp(arch->rules[k].property, "race")==0) {
-          const race * rc = rc_find(arch->rules[k].value);
+
+        if (arch->rules[k].value[0] == '*')
+          match = true;
+        else if (strcmp(arch->rules[k].property, "race") == 0) {
+          const race *rc = rc_find(arch->rules[k].value);
+
           assert(rc);
-          if (rc==u->race) match = true;
-        } else if (strcmp(arch->rules[k].property, "building")==0) {
-          const building_type * btype = bt_find(arch->rules[k].value);
+          if (rc == u->race)
+            match = true;
+        } else if (strcmp(arch->rules[k].property, "building") == 0) {
+          const building_type *btype = bt_find(arch->rules[k].value);
+
           assert(btype);
-          if (u->building && u->building->type==btype) match = true;
+          if (u->building && u->building->type == btype)
+            match = true;
         }
         if (match) {
-          if (arch->rules[k].allow) break;
+          if (arch->rules[k].allow)
+            break;
           else {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "recruit_rule_fail",
-              "property value", arch->rules[k].property, arch->rules[k].value));
+                "property value", arch->rules[k].property,
+                arch->rules[k].value));
             /* TODO: error message */
             return 0;
           }
@@ -1217,20 +1337,24 @@ recruit_archetype(unit * u, order * ord)
       }
     }
     if (arch->btype) {
-      if (u->building==NULL || u->building->type!=arch->btype) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_must_be_in_building", "type", arch->btype));
+      if (u->building == NULL || u->building->type != arch->btype) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "unit_must_be_in_building", "type", arch->btype));
         /* TODO: error message */
         return 0;
       }
       if (arch->size) {
         int maxsize = u->building->size;
-        attrib * a = a_find(u->building->attribs, &at_recruit);
-        if (a!=NULL) {
+
+        attrib *a = a_find(u->building->attribs, &at_recruit);
+
+        if (a != NULL) {
           maxsize -= a->data.i;
         }
-        n = MIN(maxsize/arch->size, n);
-        if (n<=0) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "recruit_capacity_exhausted", "building", u->building));
+        n = MIN(maxsize / arch->size, n);
+        if (n <= 0) {
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+              "recruit_capacity_exhausted", "building", u->building));
           /* TODO: error message */
           return 0;
         }
@@ -1238,8 +1362,9 @@ recruit_archetype(unit * u, order * ord)
     }
 
     n = build(u, arch->ctype, 0, n);
-    if (n>0) {
-      unit * u2;
+    if (n > 0) {
+      unit *u2;
+
       if (merge) {
         u2 = create_unit(u->region, u->faction, 0, u->race, 0, 0, u);
       } else {
@@ -1247,38 +1372,41 @@ recruit_archetype(unit * u, order * ord)
       }
       if (arch->exec) {
         n = arch->exec(u2, arch, n);
-      }
-      else {
+      } else {
         set_number(u2, n);
         equip_unit(u2, arch->equip);
         u2->hp = n * unit_max_hp(u2);
         if (arch->size) {
-          if (a==NULL) a = a_add(&u->building->attribs, a_new(&at_recruit));
-          a->data.i += n*arch->size;
+          if (a == NULL)
+            a = a_add(&u->building->attribs, a_new(&at_recruit));
+          a->data.i += n * arch->size;
         }
       }
-      ADDMSG(&u->faction->msgs, msg_message("recruit_archetype", 
-        "unit amount archetype", u, n, arch->name[n==1]));
-      if (u!=u2 && u->race==u2->race) {
+      ADDMSG(&u->faction->msgs, msg_message("recruit_archetype",
+          "unit amount archetype", u, n, arch->name[n == 1]));
+      if (u != u2 && u->race == u2->race) {
         transfermen(u2, u, u2->number);
       }
       return n;
-    } else switch(n) {
-      case ENOMATERIALS:
-        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype, want));
-        break;
-      case ELOWSKILL:
-      case ENEEDSKILL:
-        /* no skill, or not enough skill points to build */
-        cmistake(u, ord, 50, MSG_PRODUCE);
-        break;
-      case EBUILDINGREQ:
-        ADDMSG(&u->faction->msgs,
-          msg_feedback(u, u->thisorder, "building_needed", "building", arch->ctype->btype->_name));
-        break;
-      default:
-        assert(!"unhandled return value from build() in recruit_archetype");
-    }
+    } else
+      switch (n) {
+        case ENOMATERIALS:
+          ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype,
+              want));
+          break;
+        case ELOWSKILL:
+        case ENEEDSKILL:
+          /* no skill, or not enough skill points to build */
+          cmistake(u, ord, 50, MSG_PRODUCE);
+          break;
+        case EBUILDINGREQ:
+          ADDMSG(&u->faction->msgs,
+            msg_feedback(u, u->thisorder, "building_needed", "building",
+              arch->ctype->btype->_name));
+          break;
+        default:
+          assert(!"unhandled return value from build() in recruit_archetype");
+      }
     return 0;
   }
   return -1;
@@ -1286,14 +1414,15 @@ recruit_archetype(unit * u, order * ord)
 
 int recruit_archetypes(void)
 {
-  if (rules_recruit<0) recruit_init();
-  return (rules_recruit&RECRUIT_ARCHETYPES)!=0;
+  if (rules_recruit < 0)
+    recruit_init();
+  return (rules_recruit & RECRUIT_ARCHETYPES) != 0;
 }
 
-void
-economics(region *r)
+void economics(region * r)
 {
   unit *u;
+
   request *recruitorders = NULL;
 
   /* Geben vor Selbstmord (doquit)! Hier alle unmittelbaren Befehle.
@@ -1301,47 +1430,52 @@ economics(region *r)
    * eintreiben. */
 
   for (u = r->units; u; u = u->next) {
-    order * ord;
+    order *ord;
+
     boolean destroyed = false;
-    if (u->number>0) {
+
+    if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
         switch (get_keyword(ord)) {
-        case K_DESTROY:
-          if (!destroyed) {
-            if (destroy_cmd(u, ord)!=0) ord = NULL;
-            destroyed = true;
-          }
-          break;
+          case K_DESTROY:
+            if (!destroyed) {
+              if (destroy_cmd(u, ord) != 0)
+                ord = NULL;
+              destroyed = true;
+            }
+            break;
 
-        case K_GIVE:
-        case K_LIEFERE:
-          give_cmd(u, ord);
-          break;
+          case K_GIVE:
+          case K_LIEFERE:
+            give_cmd(u, ord);
+            break;
 
-        case K_FORGET:
-          forget_cmd(u, ord);
-          break;
+          case K_FORGET:
+            forget_cmd(u, ord);
+            break;
 
         }
-        if (u->orders==NULL) break;
+        if (u->orders == NULL)
+          break;
       }
     }
   }
   /* RECRUIT orders */
 
-  if (rules_recruit<0) recruit_init();
+  if (rules_recruit < 0)
+    recruit_init();
   for (u = r->units; u; u = u->next) {
-    order * ord;
+    order *ord;
 
-    if ((rules_recruit&RECRUIT_MERGE) || u->number==0) {
+    if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
       for (ord = u->orders; ord; ord = ord->next) {
         if (get_keyword(ord) == K_RECRUIT) {
-          if (rules_recruit&RECRUIT_ARCHETYPES) {
-            if (recruit_archetype(u, ord)>=0) {
+          if (rules_recruit & RECRUIT_ARCHETYPES) {
+            if (recruit_archetype(u, ord) >= 0) {
               continue;
             }
           }
-          if (rules_recruit&RECRUIT_CLASSIC) {
+          if (rules_recruit & RECRUIT_CLASSIC) {
             recruit(u, ord, &recruitorders);
           }
           break;
@@ -1350,31 +1484,37 @@ economics(region *r)
     }
   }
 
-  if (recruitorders) expandrecruit(r, recruitorders);
+  if (recruitorders)
+    expandrecruit(r, recruitorders);
   remove_empty_units_in_region(r);
 }
+
 /* ------------------------------------------------------------- */
 
 
-static void
-manufacture(unit * u, const item_type * itype, int want)
+static void manufacture(unit * u, const item_type * itype, int want)
 {
   int n;
+
   int skill;
+
   int minskill = itype->construction->minskill;
+
   skill_t sk = itype->construction->skill;
 
   skill = effskill(u, sk);
-  skill = skillmod(itype->rtype->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
+  skill =
+    skillmod(itype->rtype->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
 
   if (skill < 0) {
     /* an error occured */
     int err = -skill;
+
     cmistake(u, u->thisorder, err, MSG_PRODUCE);
     return;
   }
 
-  if (want==0) {
+  if (want == 0) {
     want = maxbuild(u, itype->construction);
   }
   n = build(u, itype->construction, 0, want);
@@ -1385,81 +1525,99 @@ manufacture(unit * u, const item_type * itype, int want)
       return;
     case EBUILDINGREQ:
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "building_needed", "building", itype->construction->btype->_name));
+        msg_feedback(u, u->thisorder, "building_needed", "building",
+          itype->construction->btype->_name));
       return;
     case ELOWSKILL:
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "manufacture_skills", "skill minskill product",
-        sk, minskill, itype->rtype, 1));
+        msg_feedback(u, u->thisorder, "manufacture_skills",
+          "skill minskill product", sk, minskill, itype->rtype, 1));
       return;
     case ENOMATERIALS:
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, itype->construction, want));
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
+          itype->construction, want));
       return;
   }
-  if (n>0) {
+  if (n > 0) {
     i_change(&u->items, itype, n);
-    if (want==INT_MAX) want = n;
+    if (want == INT_MAX)
+      want = n;
     ADDMSG(&u->faction->msgs, msg_message("manufacture",
-      "unit region amount wanted resource", u, u->region, n, want, itype->rtype));
+        "unit region amount wanted resource", u, u->region, n, want,
+        itype->rtype));
   } else {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_cannotmake", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_cannotmake",
+        ""));
   }
 }
 
 typedef struct allocation {
-	struct allocation * next;
-	int want, get;
-	double save;
-	unsigned int flags;
-	unit * unit;
+  struct allocation *next;
+  int want, get;
+  double save;
+  unsigned int flags;
+  unit *unit;
 } allocation;
+
 #define new_allocation() calloc(sizeof(allocation), 1)
 #define free_allocation(a) free(a)
 
 typedef struct allocation_list {
-	struct allocation_list * next;
-	allocation * data;
-	const resource_type * type;
+  struct allocation_list *next;
+  allocation *data;
+  const resource_type *type;
 } allocation_list;
 
-static allocation_list * allocations;
+static allocation_list *allocations;
 
-static boolean
-can_guard(const unit * guard, const unit * u)
+static boolean can_guard(const unit * guard, const unit * u)
 {
-  if (fval(guard, UFL_ISNEW)) return false;
-  if (guard->number<=0 || !cansee(guard->faction, guard->region, u, 0)) return false;
-  if (besieged(guard) || !(fval(guard->race, RCF_UNARMEDGUARD) || armedmen(guard, true))) return false;
+  if (fval(guard, UFL_ISNEW))
+    return false;
+  if (guard->number <= 0 || !cansee(guard->faction, guard->region, u, 0))
+    return false;
+  if (besieged(guard) || !(fval(guard->race, RCF_UNARMEDGUARD)
+      || armedmen(guard, true)))
+    return false;
 
   return !alliedunit(guard, u->faction, HELP_GUARD);
 }
 
 enum {
-  AFL_DONE = 1<<0,
-  AFL_LOWSKILL = 1<<1
+  AFL_DONE = 1 << 0,
+  AFL_LOWSKILL = 1 << 1
 };
 
-static void
-allocate_resource(unit * u, const resource_type * rtype, int want)
+static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
-  const item_type * itype = resource2item(rtype);
-  region * r = u->region;
+  const item_type *itype = resource2item(rtype);
+
+  region *r = u->region;
+
   int busy = u->number;
+
   int dm = 0;
-  allocation_list * alist;
-  allocation * al;
-  attrib * a = a_find(rtype->attribs, &at_resourcelimit);
-  resource_limit * rdata = (resource_limit*)a->data.v;
+
+  allocation_list *alist;
+
+  allocation *al;
+
+  attrib *a = a_find(rtype->attribs, &at_resourcelimit);
+
+  resource_limit *rdata = (resource_limit *) a->data.v;
+
   int amount, skill;
 
   /* momentan kann man keine ressourcen abbauen, wenn man dafür
    * Materialverbrauch hat: */
-  assert(itype!=NULL && (itype->construction==NULL || itype->construction->materials==NULL));
-  assert(rdata!=NULL);
-  
-  if (rdata->limit!=NULL) {
+  assert(itype != NULL && (itype->construction == NULL
+      || itype->construction->materials == NULL));
+  assert(rdata != NULL);
+
+  if (rdata->limit != NULL) {
     int avail = rdata->limit(r, rtype);
-    if (avail<=0) {
+
+    if (avail <= 0) {
       cmistake(u, u->thisorder, 121, MSG_PRODUCE);
       return;
     }
@@ -1469,75 +1627,84 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
     cmistake(u, u->thisorder, 60, MSG_PRODUCE);
     return;
   }
-  
+
   if (rdata->modifiers) {
-    resource_mod * mod = rdata->modifiers;
-    for (;mod->flags!=0;++mod) {
+    resource_mod *mod = rdata->modifiers;
+
+    for (; mod->flags != 0; ++mod) {
       if (mod->flags & RMF_REQUIREDBUILDING) {
-        struct building * b = inside_building(u);
-        const struct building_type * btype = b?b->type:NULL;
-        if (mod->btype && mod->btype!=btype) {
+        struct building *b = inside_building(u);
+
+        const struct building_type *btype = b ? b->type : NULL;
+
+        if (mod->btype && mod->btype != btype) {
           cmistake(u, u->thisorder, 104, MSG_PRODUCE);
           return;
         }
       }
     }
   }
-  
-  if (rdata->guard!=0) {
-    unit * u2;
+
+  if (rdata->guard != 0) {
+    unit *u2;
+
     for (u2 = r->units; u2; u2 = u2->next) {
-      if (is_guard(u2, rdata->guard)!=0 && can_guard(u2, u)) {
+      if (is_guard(u2, rdata->guard) != 0 && can_guard(u2, u)) {
         ADDMSG(&u->faction->msgs,
-               msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
+          msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
         return;
       }
     }
   }
-  
+
   /* Bergwächter können Abbau von Eisen/Laen durch Bewachen verhindern.
    * Als magische Wesen 'sehen' Bergwächter alles und werden durch
    * Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
    */
   if (itype == olditemtype[I_IRON] || itype == olditemtype[I_LAEN]) {
-    unit * u2;
-    for (u2 = r->units; u2; u2 = u2->next ) {
+    unit *u2;
+
+    for (u2 = r->units; u2; u2 = u2->next) {
       if (is_guard(u, GUARD_MINING)
-          && !fval(u2, UFL_ISNEW)
-          && u2->number
-          && !alliedunit(u2, u->faction, HELP_GUARD))
-      {
+        && !fval(u2, UFL_ISNEW)
+        && u2->number && !alliedunit(u2, u->faction, HELP_GUARD)) {
         ADDMSG(&u->faction->msgs,
-               msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
+          msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
         return;
       }
     }
   }
-  
-  assert(itype->construction->skill!=0 || "limited resource needs a required skill for making it");
+
+  assert(itype->construction->skill != 0
+    || "limited resource needs a required skill for making it");
   skill = eff_skill(u, itype->construction->skill, u->region);
   if (skill == 0) {
     skill_t sk = itype->construction->skill;
+
     add_message(&u->faction->msgs,
-                msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
+      msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
     return;
   }
   if (skill < itype->construction->minskill) {
     skill_t sk = itype->construction->skill;
+
     add_message(&u->faction->msgs,
-                msg_feedback(u, u->thisorder, "manufacture_skills", "skill minskill product",
-                             sk, itype->construction->minskill, itype->rtype));
+      msg_feedback(u, u->thisorder, "manufacture_skills",
+        "skill minskill product", sk, itype->construction->minskill,
+        itype->rtype));
     return;
   } else {
-    struct building * b = inside_building(u);
-    const struct building_type * btype = b?b->type:NULL;
-    
+    struct building *b = inside_building(u);
+
+    const struct building_type *btype = b ? b->type : NULL;
+
     if (rdata->modifiers) {
-      resource_mod * mod = rdata->modifiers;
-      for (;mod->flags!=0;++mod) {
+      resource_mod *mod = rdata->modifiers;
+
+      for (; mod->flags != 0; ++mod) {
         if (mod->flags & RMF_SKILL) {
-          if (mod->btype==NULL || mod->btype==btype) {
-            if (mod->race==NULL || mod->race==u->race) {
+          if (mod->btype == NULL || mod->btype == btype) {
+            if (mod->race == NULL || mod->race == u->race) {
               skill += mod->value.i;
             }
           }
@@ -1547,26 +1714,30 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
   }
   amount = skill * u->number;
   /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
-  
+
   /* mit Flinkfingerring verzehnfacht sich die Produktion */
-  amount += skill * MIN(u->number, get_item(u, I_RING_OF_NIMBLEFINGER)) * (roqf_factor()-1);
-  
+  amount +=
+    skill * MIN(u->number, get_item(u,
+      I_RING_OF_NIMBLEFINGER)) * (roqf_factor() - 1);
+
   /* Schaffenstrunk: */
   if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
     dm = MIN(dm, u->number);
     change_effect(u, oldpotiontype[P_DOMORE], -dm);
-    amount += dm * skill;	/* dm Personen produzieren doppelt */
+    amount += dm * skill;       /* dm Personen produzieren doppelt */
   }
-  
+
   amount /= itype->construction->minskill;
-  
+
   /* Limitierung durch Parameter m. */
-  if (want > 0 && want < amount) amount = want;
-  
-  busy = (amount + skill - 1) / skill; /* wieviel leute tun etwas? */
-  
+  if (want > 0 && want < amount)
+    amount = want;
+
+  busy = (amount + skill - 1) / skill;  /* wieviel leute tun etwas? */
+
   alist = allocations;
-  while (alist && alist->type!=rtype) alist = alist->next;
+  while (alist && alist->type != rtype)
+    alist = alist->next;
   if (!alist) {
     alist = calloc(sizeof(struct allocation_list), 1);
     alist->next = allocations;
@@ -1579,16 +1750,18 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
   al->next = alist->data;
   al->unit = u;
   alist->data = al;
-  
+
   if (rdata->modifiers) {
-    struct building * b = inside_building(u);
-    const struct building_type * btype = b?b->type:NULL;
-    
-    resource_mod * mod = rdata->modifiers;
-    for (;mod->flags!=0;++mod) {
+    struct building *b = inside_building(u);
+
+    const struct building_type *btype = b ? b->type : NULL;
+
+    resource_mod *mod = rdata->modifiers;
+
+    for (; mod->flags != 0; ++mod) {
       if (mod->flags & RMF_SAVEMATERIAL) {
-        if (mod->btype==NULL || mod->btype==btype) {
-          if (mod->race==NULL || mod->race==u->race) {
+        if (mod->btype == NULL || mod->btype == btype) {
+          if (mod->race == NULL || mod->race == u->race) {
             al->save *= mod->value.f;
           }
         }
@@ -1597,42 +1770,50 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
   }
 }
 
-static int
-required(int want, double save)
+static int required(int want, double save)
 {
   int norders = (int)(want * save);
-  if (norders < want*save) ++norders;
+
+  if (norders < want * save)
+    ++norders;
   return norders;
 }
 
 static void
 leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
-  const item_type * itype = resource2item(rtype);
-  rawmaterial * rm = rm_get(r, rtype);
+  const item_type *itype = resource2item(rtype);
+
+  rawmaterial *rm = rm_get(r, rtype);
+
   int need;
+
   boolean first = true;
 
-  if (rm!=NULL) {
+  if (rm != NULL) {
     do {
       int avail = rm->amount;
-      int norders = 0;
-      allocation * al;
 
-      if(avail <= 0) {
-        for (al=alist;al;al=al->next) {
+      int norders = 0;
+
+      allocation *al;
+
+      if (avail <= 0) {
+        for (al = alist; al; al = al->next) {
           al->get = 0;
         }
         break;
       }
 
-      assert(avail>0);
+      assert(avail > 0);
 
-      for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
-        int req = required(al->want-al->get, al->save);
-        assert(al->get<=al->want && al->get >= 0);
-        if (eff_skill(al->unit, itype->construction->skill, r)
-          >= rm->level+itype->construction->minskill-1) {
+      for (al = alist; al; al = al->next)
+        if (!fval(al, AFL_DONE)) {
+          int req = required(al->want - al->get, al->save);
+
+          assert(al->get <= al->want && al->get >= 0);
+          if (eff_skill(al->unit, itype->construction->skill, r)
+            >= rm->level + itype->construction->minskill - 1) {
             if (req) {
               norders += req;
             } else {
@@ -1640,87 +1821,102 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
             }
           } else {
             fset(al, AFL_DONE);
-            if (first) fset(al, AFL_LOWSKILL);
+            if (first)
+              fset(al, AFL_LOWSKILL);
           }
-      }
+        }
       need = norders;
 
       avail = MIN(avail, norders);
-      if (need>0) {
+      if (need > 0) {
         int use = 0;
-        for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
-          if (avail > 0) {
-            int want = required(al->want-al->get, al->save);
-            int x = avail*want/norders;
-            /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-            if (rng_int() % norders < (avail*want) % norders)
-              ++x;
-            avail -= x;
-            use += x;
-            norders -= want;
-            need -= x;
-            al->get = MIN(al->want, al->get+(int)(x/al->save));
+
+        for (al = alist; al; al = al->next)
+          if (!fval(al, AFL_DONE)) {
+            if (avail > 0) {
+              int want = required(al->want - al->get, al->save);
+
+              int x = avail * want / norders;
+
+              /* Wenn Rest, dann würfeln, ob ich was bekomme: */
+              if (rng_int() % norders < (avail * want) % norders)
+                ++x;
+              avail -= x;
+              use += x;
+              norders -= want;
+              need -= x;
+              al->get = MIN(al->want, al->get + (int)(x / al->save));
+            }
           }
-        }
         if (use) {
-          assert(use<=rm->amount);
+          assert(use <= rm->amount);
           rm->type->use(rm, r, use);
         }
-        assert(avail==0 || norders==0);
+        assert(avail == 0 || norders == 0);
       }
       first = false;
-    } while (need>0);
+    } while (need > 0);
   }
 }
 
 static void
 attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
-  allocation * al;
+  allocation *al;
+
   int norders = 0;
-  attrib * a = a_find(rtype->attribs, &at_resourcelimit);
-  resource_limit * rdata = (resource_limit*)a->data.v;
+
+  attrib *a = a_find(rtype->attribs, &at_resourcelimit);
+
+  resource_limit *rdata = (resource_limit *) a->data.v;
+
   int avail = rdata->value;
 
-  for (al=alist;al;al=al->next) {
+  for (al = alist; al; al = al->next) {
     norders += required(al->want, al->save);
   }
 
   if (rdata->limit) {
     avail = rdata->limit(r, rtype);
-    if (avail < 0) avail = 0;
+    if (avail < 0)
+      avail = 0;
   }
 
   avail = MIN(avail, norders);
-  for (al=alist;al;al=al->next) {
+  for (al = alist; al; al = al->next) {
     if (avail > 0) {
       int want = required(al->want, al->save);
-      int x = avail*want/norders;
+
+      int x = avail * want / norders;
+
       /* Wenn Rest, dann würfeln, ob ich was bekomme: */
-      if (rng_int() % norders < (avail*want) % norders)
+      if (rng_int() % norders < (avail * want) % norders)
         ++x;
       avail -= x;
       norders -= want;
-      al->get = MIN(al->want, (int)(x/al->save));
+      al->get = MIN(al->want, (int)(x / al->save));
       if (rdata->produce) {
         int use = required(al->get, al->save);
-        if (use) rdata->produce(r, rtype, use);
+
+        if (use)
+          rdata->produce(r, rtype, use);
       }
     }
   }
-  assert(avail==0 || norders==0);
+  assert(avail == 0 || norders == 0);
 }
 
-typedef void (*allocate_function)(const resource_type *, struct region *, struct allocation *);
+typedef void (*allocate_function) (const resource_type *, struct region *,
+  struct allocation *);
 
-static allocate_function
-get_allocator(const struct resource_type * rtype)
+static allocate_function get_allocator(const struct resource_type *rtype)
 {
-  attrib * a = a_find(rtype->attribs, &at_resourcelimit);
+  attrib *a = a_find(rtype->attribs, &at_resourcelimit);
 
-  if (a!=NULL) {
-    resource_limit * rdata = (resource_limit*)a->data.v;
-    if (rdata->value>0 || rdata->limit!=NULL) {
+  if (a != NULL) {
+    resource_limit *rdata = (resource_limit *) a->data.v;
+
+    if (rdata->value > 0 || rdata->limit != NULL) {
       return attrib_allocation;
     }
     return leveled_allocation;
@@ -1728,48 +1924,53 @@ get_allocator(const struct resource_type * rtype)
   return NULL;
 }
 
-void
-split_allocations(region * r)
+void split_allocations(region * r)
 {
-  allocation_list ** p_alist=&allocations;
+  allocation_list **p_alist = &allocations;
+
   freset(r, RF_SELECT);
   while (*p_alist) {
-    allocation_list * alist = *p_alist;
-    const resource_type * rtype = alist->type;
+    allocation_list *alist = *p_alist;
+
+    const resource_type *rtype = alist->type;
+
     allocate_function alloc = get_allocator(rtype);
-    const item_type * itype = resource2item(rtype);
-    allocation ** p_al = &alist->data;
+
+    const item_type *itype = resource2item(rtype);
+
+    allocation **p_al = &alist->data;
 
     freset(r, RF_SELECT);
     alloc(rtype, r, alist->data);
 
     while (*p_al) {
-      allocation * al = *p_al;
+      allocation *al = *p_al;
+
       if (al->get) {
         assert(itype || !"not implemented for non-items");
         i_change(&al->unit->items, itype, al->get);
         produceexp(al->unit, itype->construction->skill, al->unit->number);
         fset(r, RF_SELECT);
       }
-      if (al->want==INT_MAX) al->want = al->get;
-      ADDMSG(&al->unit->faction->msgs, msg_message("produce", 
-        "unit region amount wanted resource",
-        al->unit, al->unit->region, al->get, al->want, rtype));
-      *p_al=al->next;
+      if (al->want == INT_MAX)
+        al->want = al->get;
+      ADDMSG(&al->unit->faction->msgs, msg_message("produce",
+          "unit region amount wanted resource",
+          al->unit, al->unit->region, al->get, al->want, rtype));
+      *p_al = al->next;
       free_allocation(al);
     }
-    *p_alist=alist->next;
+    *p_alist = alist->next;
     free(alist);
   }
   allocations = NULL;
 }
 
-static void
-create_potion(unit * u, const potion_type * ptype, int want)
+static void create_potion(unit * u, const potion_type * ptype, int want)
 {
   int built;
 
-  if (want==0) {
+  if (want == 0) {
     want = maxbuild(u, ptype->itype->construction);
   }
   built = build(u, ptype->itype->construction, 0, want);
@@ -1781,27 +1982,30 @@ create_potion(unit * u, const potion_type * ptype, int want)
       break;
     case EBUILDINGREQ:
       ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "building_needed", "building", ptype->itype->construction->btype->_name));
+        msg_feedback(u, u->thisorder, "building_needed", "building",
+          ptype->itype->construction->btype->_name));
       break;
     case ECOMPLETE:
       assert(0);
       break;
     case ENOMATERIALS:
       /* something missing from the list of materials */
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder, ptype->itype->construction, want));
+      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
+          ptype->itype->construction, want));
       return;
       break;
     default:
       i_change(&u->items, ptype->itype, built);
-      if (want==INT_MAX) want = built;
+      if (want == INT_MAX)
+        want = built;
       ADDMSG(&u->faction->msgs, msg_message("manufacture",
-        "unit region amount wanted resource", u, u->region, built, want, ptype->itype->rtype));
+          "unit region amount wanted resource", u, u->region, built, want,
+          ptype->itype->rtype));
       break;
   }
 }
 
-static void
-create_item(unit * u, const item_type * itype, int want)
+static void create_item(unit * u, const item_type * itype, int want)
 {
   if (itype->construction && fval(itype->rtype, RTF_LIMITED)) {
 #if GUARD_DISABLES_PRODUCTION == 1
@@ -1812,26 +2016,37 @@ create_item(unit * u, const item_type * itype, int want)
 #endif
     allocate_resource(u, itype->rtype, want);
   } else {
-    const potion_type * ptype = resource2potion(itype->rtype);
-    if (ptype!=NULL) create_potion(u, ptype, want);
-    else if (itype->construction && itype->construction->materials) manufacture(u, itype, want);
+    const potion_type *ptype = resource2potion(itype->rtype);
+
+    if (ptype != NULL)
+      create_potion(u, ptype, want);
+    else if (itype->construction && itype->construction->materials)
+      manufacture(u, itype, want);
     else {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_cannotmake", ""));
+      ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+          "error_cannotmake", ""));
     }
   }
 }
 
-int
-make_cmd(unit * u, struct order * ord)
+int make_cmd(unit * u, struct order *ord)
 {
-  region * r = u->region;
-  const building_type * btype;
-  const ship_type * stype;
+  region *r = u->region;
+
+  const building_type *btype;
+
+  const ship_type *stype;
+
   param_t p;
+
   int m;
-  const item_type * itype;
+
+  const item_type *itype;
+
   const char *s;
-  const struct locale * lang = u->faction->locale;
+
+  const struct locale *lang = u->faction->locale;
+
   char ibuf[16];
 
   init_tokens(ord);
@@ -1850,16 +2065,18 @@ make_cmd(unit * u, struct order * ord)
   p = findparam(s, u->faction->locale);
 
   /* MACHE TEMP kann hier schon gar nicht auftauchen, weil diese nicht in
-  * thisorder abgespeichert werden - und auf den ist getstrtoken() beim
-  * aufruf von make geeicht */
+   * thisorder abgespeichert werden - und auf den ist getstrtoken() beim
+   * aufruf von make geeicht */
 
   if (p == P_ROAD) {
-    plane * pl = rplane(r);
+    plane *pl = rplane(r);
+
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 275, MSG_PRODUCE);
     } else {
       direction_t d = finddirection(getstrtoken(), u->faction->locale);
-      if (d!=NODIRECTION) {
+
+      if (d != NODIRECTION) {
         build_road(r, u, m, d);
       } else {
         /* Die Richtung wurde nicht erkannt */
@@ -1868,7 +2085,8 @@ make_cmd(unit * u, struct order * ord)
     }
     return 0;
   } else if (p == P_SHIP) {
-    plane * pl = rplane(r);
+    plane *pl = rplane(r);
+
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 276, MSG_PRODUCE);
     } else {
@@ -1881,53 +2099,66 @@ make_cmd(unit * u, struct order * ord)
   }
 
   /* since the string can match several objects, like in 'academy' and
-  * 'academy of arts', we need to figure out what the player meant.
-  * This is not 100% safe.
-  */
+   * 'academy of arts', we need to figure out what the player meant.
+   * This is not 100% safe.
+   */
   stype = findshiptype(s, lang);
   btype = findbuildingtype(s, lang);
   itype = finditemtype(s, lang);
 
-  if (itype!=NULL && (btype!=NULL || stype!=NULL)) {
-    if (itype->construction==NULL) {
+  if (itype != NULL && (btype != NULL || stype != NULL)) {
+    if (itype->construction == NULL) {
       /* if the item cannot be made, we probably didn't mean to make it */
       itype = NULL;
-    } else if (stype!=NULL) {
-      const char * sname = LOC(lang, stype->name[0]);
-      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (strlen(iname)<strlen(sname)) stype = NULL;
-      else itype = NULL;
+    } else if (stype != NULL) {
+      const char *sname = LOC(lang, stype->name[0]);
+
+      const char *iname = LOC(lang, resourcename(itype->rtype, 0));
+
+      if (strlen(iname) < strlen(sname))
+        stype = NULL;
+      else
+        itype = NULL;
     } else {
-      const char * bname = LOC(lang, btype->_name);
-      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
-      if (strlen(iname)<strlen(bname)) btype = NULL;
-      else itype = NULL;
+      const char *bname = LOC(lang, btype->_name);
+
+      const char *iname = LOC(lang, resourcename(itype->rtype, 0));
+
+      if (strlen(iname) < strlen(bname))
+        btype = NULL;
+      else
+        itype = NULL;
     }
   }
 
-  if (btype!=NULL && stype!=NULL) {
-    const char * bname = LOC(lang, btype->_name);
-    const char * sname = LOC(lang, stype->name[0]);
-    if (strlen(sname)<strlen(bname)) btype = NULL;
-    else stype = NULL;
+  if (btype != NULL && stype != NULL) {
+    const char *bname = LOC(lang, btype->_name);
+
+    const char *sname = LOC(lang, stype->name[0]);
+
+    if (strlen(sname) < strlen(bname))
+      btype = NULL;
+    else
+      stype = NULL;
   }
 
   if (stype != NOSHIP) {
-    plane * pl = rplane(r);
+    plane *pl = rplane(r);
+
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 276, MSG_PRODUCE);
     } else {
       create_ship(r, u, stype, m, ord);
     }
   } else if (btype != NOBUILDING) {
-    plane * pl = rplane(r);
+    plane *pl = rplane(r);
+
     if (pl && fval(pl, PFL_NOBUILD)) {
       cmistake(u, ord, 94, MSG_PRODUCE);
     } else {
       build_building(u, btype, m, ord);
     }
-  }
-  else if (itype!=NULL) {
+  } else if (itype != NULL) {
     create_item(u, itype, m);
   } else {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
@@ -1935,12 +2166,13 @@ make_cmd(unit * u, struct order * ord)
 
   return 0;
 }
+
 /* ------------------------------------------------------------- */
 
-static void 
-free_luxuries(struct attrib * a)
+static void free_luxuries(struct attrib *a)
 {
-  item * itm = (item*)a->data.v;
+  item *itm = (item *) a->data.v;
+
   a->data.v = NULL;
   i_freeall(&itm);
 }
@@ -1949,67 +2181,79 @@ const attrib_type at_luxuries = {
   "luxuries", NULL, free_luxuries, NULL, NULL, NULL
 };
 
-static void
-expandbuying(region * r, request * buyorders)
+static void expandbuying(region * r, request * buyorders)
 {
   int max_products;
+
   unit *u;
+
   static struct trade {
-    const luxury_type * type;
+    const luxury_type *type;
     int number;
     int multi;
   } *trades, *trade;
-  static int ntrades=0;
+
+  static int ntrades = 0;
+
   int i, j;
-  const luxury_type * ltype;
-  
-  if (ntrades==0) {
-    for (ltype=luxurytypes;ltype;ltype=ltype->next)
-        ++ntrades;
+
+  const luxury_type *ltype;
+
+  if (ntrades == 0) {
+    for (ltype = luxurytypes; ltype; ltype = ltype->next)
+      ++ntrades;
     trades = gc_add(calloc(sizeof(struct trade), ntrades));
-    for (i=0, ltype=luxurytypes;i!=ntrades;++i, ltype=ltype->next)
-        trades[i].type = ltype;
+    for (i = 0, ltype = luxurytypes; i != ntrades; ++i, ltype = ltype->next)
+      trades[i].type = ltype;
   }
-  for (i=0;i!=ntrades;++i) {
+  for (i = 0; i != ntrades; ++i) {
     trades[i].number = 0;
     trades[i].multi = 1;
   }
 
-  if (!buyorders) return;
-  
+  if (!buyorders)
+    return;
+
   /* Initialisation. multiplier ist der Multiplikator auf den
    * Verkaufspreis. Für max_products Produkte kauft man das Produkt zum
    * einfachen Verkaufspreis, danach erhöht sich der Multiplikator um 1.
    * counter ist ein Zähler, der die gekauften Produkte zählt. money
    * wird für die debug message gebraucht. */
-  
+
   max_products = rpeasants(r) / TRADE_FRACTION;
-  
+
   /* Kauf - auch so programmiert, daß er leicht erweiterbar auf mehrere
    * Güter pro Monat ist. j sind die Befehle, i der Index des
    * gehandelten Produktes. */
-  if (max_products>0) {
+  if (max_products > 0) {
     expandorders(r, buyorders);
-    if (!norders) return;
-    
+    if (!norders)
+      return;
+
     for (j = 0; j != norders; j++) {
       int price, multi;
+
       ltype = oa[j].type.ltype;
       trade = trades;
-      while (trade->type!=ltype) ++trade;
+      while (trade->type != ltype)
+        ++trade;
       multi = trade->multi;
       price = ltype->price * multi;
-      
-      if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT, price) >= price) {
-        unit * u = oa[j].unit;
-        item * items;
-        
+
+      if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT,
+          price) >= price) {
+        unit *u = oa[j].unit;
+
+        item *items;
+
         /* litems zählt die Güter, die verkauft wurden, u->n das Geld, das
          * verdient wurde. Dies muß gemacht werden, weil der Preis ständig sinkt,
          * man sich also das verdiente Geld und die verkauften Produkte separat
          * merken muß. */
-        attrib * a = a_find(u->attribs, &at_luxuries);
-        if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
+        attrib *a = a_find(u->attribs, &at_luxuries);
+
+        if (a == NULL)
+          a = a_add(&u->attribs, a_new(&at_luxuries));
 
         items = a->data.v;
         i_change(&items, ltype->itype, 1);
@@ -2017,34 +2261,37 @@ expandbuying(region * r, request * buyorders)
         i_change(&oa[j].unit->items, ltype->itype, 1);
         use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
         if (u->n < 0)
-            u->n = 0;
+          u->n = 0;
         u->n += price;
-        
+
         rsetmoney(r, rmoney(r) + price);
-        
+
         /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
          * der Preis Multiplikator für das Produkt um den Faktor 1. Der Zähler
          * wird wieder auf 0 gesetzt. */
         if (++trade->number == max_products) {
           trade->number = 0;
           ++trade->multi;
-			  }
-        fset(u, UFL_LONGACTION|UFL_NOTMOVING);
+        }
+        fset(u, UFL_LONGACTION | UFL_NOTMOVING);
       }
     }
     free(oa);
-    
+
     /* Ausgabe an Einheiten */
-    
+
     for (u = r->units; u; u = u->next) {
-      attrib * a = a_find(u->attribs, &at_luxuries);
-      item * itm;
-      if (a==NULL) continue;
+      attrib *a = a_find(u->attribs, &at_luxuries);
+
+      item *itm;
+
+      if (a == NULL)
+        continue;
       ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
-      for (itm=(item*)a->data.v; itm; itm=itm->next) {
+      for (itm = (item *) a->data.v; itm; itm = itm->next) {
         if (itm->number) {
           ADDMSG(&u->faction->msgs, msg_message("buyamount",
-                                                "unit amount resource", u, itm->number, itm->type->rtype));
+              "unit amount resource", u, itm->number, itm->type->rtype));
         }
       }
       a_remove(&u->attribs, a);
@@ -2053,23 +2300,28 @@ expandbuying(region * r, request * buyorders)
 }
 
 attrib_type at_trades = {
-	"trades",
-		DEFAULT_INIT,
-		DEFAULT_FINALIZE,
-		DEFAULT_AGE,
-		NO_WRITE,
-		NO_READ
+  "trades",
+  DEFAULT_INIT,
+  DEFAULT_FINALIZE,
+  DEFAULT_AGE,
+  NO_WRITE,
+  NO_READ
 };
 
-static void
-buy(unit * u, request ** buyorders, struct order * ord)
+static void buy(unit * u, request ** buyorders, struct order *ord)
 {
-  region * r = u->region;
+  region *r = u->region;
+
   int n, k;
+
   request *o;
-  attrib * a;
-  const item_type * itype = NULL;
-  const luxury_type * ltype = NULL;
+
+  attrib *a;
+
+  const item_type *itype = NULL;
+
+  const luxury_type *ltype = NULL;
+
   if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
     cmistake(u, ord, 69, MSG_INCOME);
     return;
@@ -2079,7 +2331,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
     return;
   }
   /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
-  * schon dafür ausgerüstet, mehrere Produkte zu kaufen. */
+   * schon dafür ausgerüstet, mehrere Produkte zu kaufen. */
 
   init_tokens(ord);
   skip_token();
@@ -2096,19 +2348,24 @@ buy(unit * u, request ** buyorders, struct order * ord)
 
   if (u->race == new_race[RC_INSECT]) {
     /* entweder man ist insekt, oder... */
-    if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT) && !rbuildings(r)) {
+    if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
+      && !rbuildings(r)) {
       cmistake(u, ord, 119, MSG_COMMERCE);
       return;
     }
   } else {
     /* ...oder in der Region muß es eine Burg geben. */
-    building * b;
-    static const struct building_type * bt_castle;
-    if (!bt_castle) bt_castle = bt_find("castle");
-    for (b=r->buildings;b;b=b->next) {
-      if (b->type==bt_castle && b->size>=2) break;
+    building *b;
+
+    static const struct building_type *bt_castle;
+
+    if (!bt_castle)
+      bt_castle = bt_find("castle");
+    for (b = r->buildings; b; b = b->next) {
+      if (b->type == bt_castle && b->size >= 2)
+        break;
     }
-    if (b==NULL) {
+    if (b == NULL) {
       cmistake(u, ord, 119, MSG_COMMERCE);
       return;
     }
@@ -2118,7 +2375,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
   k = u->number * 10 * eff_skill(u, SK_TRADE, r);
 
   /* hat der Händler bereits gehandelt, muss die Menge der bereits
-  * verkauften/gekauften Güter abgezogen werden */
+   * verkauften/gekauften Güter abgezogen werden */
   a = a_find(u->attribs, &at_trades);
   if (!a) {
     a = a_add(&u->attribs, a_new(&at_trades));
@@ -2133,69 +2390,79 @@ buy(unit * u, request ** buyorders, struct order * ord)
     return;
   }
 
-  assert(n>=0);
+  assert(n >= 0);
   /* die Menge der verkauften Güter merken */
   a->data.i += n;
 
   itype = finditemtype(getstrtoken(), u->faction->locale);
-  if (itype!=NULL) {
+  if (itype != NULL) {
     ltype = resource2luxury(itype->rtype);
-    if (ltype==NULL) {
+    if (ltype == NULL) {
       cmistake(u, ord, 124, MSG_COMMERCE);
       return;
     }
   }
   if (r_demand(r, ltype)) {
-    ADDMSG(&u->faction->msgs,
-      msg_feedback(u, ord, "luxury_notsold", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "luxury_notsold", ""));
     return;
   }
   o = (request *) calloc(1, sizeof(request));
-  o->type.ltype = ltype; /* sollte immer gleich sein */
+  o->type.ltype = ltype;        /* sollte immer gleich sein */
 
   o->unit = u;
   o->qty = n;
   addlist(buyorders, o);
 }
+
 /* ------------------------------------------------------------- */
 
 /* Steuersätze in % bei Burggröße */
-static int tax_per_size[7] =
-{0, 6, 12, 18, 24, 30, 36};
+static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
 
-static void
-expandselling(region * r, request * sellorders, int limit)
+static void expandselling(region * r, request * sellorders, int limit)
 {
   int money, price, j, max_products;
+
   /* int m, n = 0; */
   int maxsize = 0, maxeffsize = 0;
+
   int taxcollected = 0;
+
   int hafencollected = 0;
+
   unit *maxowner = (unit *) NULL;
+
   building *maxb = (building *) NULL;
+
   building *b;
+
   unit *u;
+
   unit *hafenowner;
+
   static int *counter;
+
   static int ncounter = 0;
 
-  if (ncounter==0) {
-    const luxury_type * ltype;
-    for (ltype=luxurytypes;ltype;ltype=ltype->next) ++ncounter;
-    counter=(int*)gc_add(calloc(sizeof(int), ncounter));
+  if (ncounter == 0) {
+    const luxury_type *ltype;
+
+    for (ltype = luxurytypes; ltype; ltype = ltype->next)
+      ++ncounter;
+    counter = (int *)gc_add(calloc(sizeof(int), ncounter));
   } else {
-    memset(counter, 0, sizeof(int)*ncounter);
+    memset(counter, 0, sizeof(int) * ncounter);
   }
-  
-  if (!sellorders) { /* NEIN, denn Insekten können in	|| !r->buildings) */
-    return;        /* Sümpfen und Wüsten auch so handeln */
+
+  if (!sellorders) {            /* NEIN, denn Insekten können in   || !r->buildings) */
+    return;                     /* Sümpfen und Wüsten auch so handeln */
   }
   /* Stelle Eigentümer der größten Burg fest. Bekommt Steuern aus jedem
    * Verkauf. Wenn zwei Burgen gleicher Größe bekommt gar keiner etwas. */
-  
+
   for (b = rbuildings(r); b; b = b->next) {
     if (b->size > maxsize && building_owner(b) != NULL
-        && b->type == bt_find("castle")) {
+      && b->type == bt_find("castle")) {
       maxb = b;
       maxsize = b->size;
       maxowner = building_owner(b);
@@ -2204,9 +2471,9 @@ expandselling(region * r, request * sellorders, int limit)
       maxowner = (unit *) NULL;
     }
   }
-  
+
   hafenowner = owner_buildingtyp(r, bt_find("harbour"));
-  
+
   if (maxb != (building *) NULL && maxowner != (unit *) NULL) {
     maxeffsize = buildingeffsize(maxb, false);
     if (maxeffsize == 0) {
@@ -2215,53 +2482,70 @@ expandselling(region * r, request * sellorders, int limit)
     }
   }
   /* Die Region muss genug Geld haben, um die Produkte kaufen zu können. */
-  
+
   money = rmoney(r);
-  
+
   /* max_products sind 1/100 der Bevölkerung, falls soviele Produkte
    * verkauft werden - counter[] - sinkt die Nachfrage um 1 Punkt.
    * multiplier speichert r->demand für die debug message ab. */
-  
+
   max_products = rpeasants(r) / TRADE_FRACTION;
-  if (max_products <= 0) return;
-  
-  if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan"), true)) {
+  if (max_products <= 0)
+    return;
+
+  if (r->terrain == newterrain(T_DESERT)
+    && buildingtype_exists(r, bt_find("caravan"), true)) {
     max_products = rpeasants(r) * 2 / TRADE_FRACTION;
   }
   /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
    * Runde erweitert werden kann. */
-  
+
   expandorders(r, sellorders);
-  if (!norders) return;
-  
+  if (!norders)
+    return;
+
   for (j = 0; j != norders; j++) {
-    static const luxury_type * search=NULL;
-    const luxury_type * ltype = oa[j].type.ltype;
+    static const luxury_type *search = NULL;
+
+    const luxury_type *ltype = oa[j].type.ltype;
+
     int multi = r_demand(r, ltype);
-    static int i=-1;
+
+    static int i = -1;
+
     int use = 0;
-    if (search!=ltype) {
-      i=0;
-      for (search=luxurytypes;search!=ltype;search=search->next) ++i;
+
+    if (search != ltype) {
+      i = 0;
+      for (search = luxurytypes; search != ltype; search = search->next)
+        ++i;
     }
-    if (counter[i]>=limit) continue;
-    if (counter[i]+1 > max_products && multi > 1) --multi;
+    if (counter[i] >= limit)
+      continue;
+    if (counter[i] + 1 > max_products && multi > 1)
+      --multi;
     price = ltype->price * multi;
-    
+
     if (money >= price) {
       int abgezogenhafen = 0;
+
       int abgezogensteuer = 0;
-      unit * u = oa[j].unit;
-      item * itm;
-      attrib * a = a_find(u->attribs, &at_luxuries);
-      if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
-      itm = (item *)a->data.v;
+
+      unit *u = oa[j].unit;
+
+      item *itm;
+
+      attrib *a = a_find(u->attribs, &at_luxuries);
+
+      if (a == NULL)
+        a = a_add(&u->attribs, a_new(&at_luxuries));
+      itm = (item *) a->data.v;
       i_change(&itm, ltype->itype, 1);
       a->data.v = itm;
       ++use;
       if (u->n < 0)
-          u->n = 0;
-      
+        u->n = 0;
+
       if (hafenowner != NULL) {
         if (hafenowner->faction != u->faction) {
           abgezogenhafen = price / 10;
@@ -2280,39 +2564,41 @@ expandselling(region * r, request * sellorders, int limit)
       }
       u->n += price;
       change_money(u, price);
-      fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-      
+      fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+
       /* r->money -= price; --- dies wird eben nicht ausgeführt, denn die
        * Produkte können auch als Steuern eingetrieben werden. In der Region
        * wurden Silberstücke gegen Luxusgüter des selben Wertes eingetauscht!
        * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
        * die Nachfrage für das Produkt um 1. Der Zähler wird wieder auf 0
        * gesetzt. */
-      
+
       if (++counter[i] > max_products) {
         int d = r_demand(r, ltype);
+
         if (d > 1) {
-          r_setdemand(r, ltype, d-1);
+          r_setdemand(r, ltype, d - 1);
         }
         counter[i] = 0;
       }
     }
-    if (use>0) {
+    if (use > 0) {
 #ifdef NDEBUG
       use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
 #else
-      /* int i = */ use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
+      /* int i = */ use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT,
+        use);
       /* assert(i==use); */
 #endif
     }
   }
   free(oa);
-  
+
   /* Steuern. Hier werden die Steuern dem Besitzer der größten Burg gegeben. */
-  
+
   if (maxowner) {
     if (taxcollected > 0) {
-      change_money(maxowner, (int) taxcollected);
+      change_money(maxowner, (int)taxcollected);
       add_income(maxowner, IC_TRADETAX, taxcollected, taxcollected);
       /* TODO: Meldung
        * "%s verdient %d Silber durch den Handel in %s.",
@@ -2321,21 +2607,24 @@ expandselling(region * r, request * sellorders, int limit)
   }
   if (hafenowner) {
     if (hafencollected > 0) {
-      change_money(hafenowner, (int) hafencollected);
+      change_money(hafenowner, (int)hafencollected);
       add_income(hafenowner, IC_TRADETAX, hafencollected, hafencollected);
     }
   }
   /* Berichte an die Einheiten */
-  
+
   for (u = r->units; u; u = u->next) {
-    
-    attrib * a = a_find(u->attribs, &at_luxuries);
-    item * itm;
-    if (a==NULL) continue;
-    for (itm=(item*)a->data.v; itm; itm=itm->next) {
+
+    attrib *a = a_find(u->attribs, &at_luxuries);
+
+    item *itm;
+
+    if (a == NULL)
+      continue;
+    for (itm = (item *) a->data.v; itm; itm = itm->next) {
       if (itm->number) {
-        ADDMSG(&u->faction->msgs, msg_message("sellamount", 
-                                              "unit amount resource", u, itm->number, itm->type->rtype));
+        ADDMSG(&u->faction->msgs, msg_message("sellamount",
+            "unit amount resource", u, itm->number, itm->type->rtype));
       }
     }
     a_remove(&u->attribs, a);
@@ -2343,91 +2632,102 @@ expandselling(region * r, request * sellorders, int limit)
   }
 }
 
-static boolean
-    sell(unit * u, request ** sellorders, struct order * ord)
+static boolean sell(unit * u, request ** sellorders, struct order *ord)
 {
   boolean unlimited = true;
-  const item_type * itype;
-  const luxury_type * ltype=NULL;
+
+  const item_type *itype;
+
+  const luxury_type *ltype = NULL;
+
   int n;
-  region * r = u->region;
+
+  region *r = u->region;
+
   const char *s;
-  
+
   if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-		cmistake(u, ord, 69, MSG_INCOME);
-		return false;
-	}
-	/* sellorders sind KEIN array, weil für alle items DIE SELBE resource
-	* (das geld der region) aufgebraucht wird. */
+    cmistake(u, ord, 69, MSG_INCOME);
+    return false;
+  }
+  /* sellorders sind KEIN array, weil für alle items DIE SELBE resource
+   * (das geld der region) aufgebraucht wird. */
 
   init_tokens(ord);
   skip_token();
-	s = getstrtoken();
+  s = getstrtoken();
 
   if (findparam(s, u->faction->locale) == P_ANY) {
     unlimited = false;
-		n = rpeasants(r) / TRADE_FRACTION;
-		if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan"), true))
-			n *= 2;
-		if (n==0) {
-			cmistake(u, ord, 303, MSG_COMMERCE);
-			return false;
-		}
-	} else {
-		n = atoi((const char *)s);
-		if (n==0) {
-			cmistake(u, ord, 27, MSG_COMMERCE);
-			return false;
-		}
-	}
-	/* Belagerte Einheiten können nichts verkaufen. */
-
-	if (besieged(u)) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, ord, "error60", ""));
-		return false;
-	}
-	/* In der Region muß es eine Burg geben. */
-
-	if (u->race == new_race[RC_INSECT]) {
-		if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT) && !rbuildings(r)) {
-			cmistake(u, ord, 119, MSG_COMMERCE);
-			return false;
-		}
-	} else {
-    /* ...oder in der Region muß es eine Burg geben. */
-    building * b;
-    static const struct building_type * bt_castle;
-    if (!bt_castle) bt_castle = bt_find("castle");
-          for (b=r->buildings;b;b=b->next) {
-            if (b->type==bt_castle && b->size>=2) break;
+    n = rpeasants(r) / TRADE_FRACTION;
+    if (r->terrain == newterrain(T_DESERT)
+      && buildingtype_exists(r, bt_find("caravan"), true))
+      n *= 2;
+    if (n == 0) {
+      cmistake(u, ord, 303, MSG_COMMERCE);
+      return false;
     }
-          if (b==NULL) {
-            cmistake(u, ord, 119, MSG_COMMERCE);
-            return false;
-          }
-	}
+  } else {
+    n = atoi((const char *)s);
+    if (n == 0) {
+      cmistake(u, ord, 27, MSG_COMMERCE);
+      return false;
+    }
+  }
+  /* Belagerte Einheiten können nichts verkaufen. */
 
-	/* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */
+  if (besieged(u)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
+    return false;
+  }
+  /* In der Region muß es eine Burg geben. */
 
-	n = MIN(n, u->number * 10 * eff_skill(u, SK_TRADE, r));
+  if (u->race == new_race[RC_INSECT]) {
+    if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
+      && !rbuildings(r)) {
+      cmistake(u, ord, 119, MSG_COMMERCE);
+      return false;
+    }
+  } else {
+    /* ...oder in der Region muß es eine Burg geben. */
+    building *b;
 
-	if (!n) {
-		cmistake(u, ord, 54, MSG_COMMERCE);
-		return false;
-	}
-	s=getstrtoken();
-	itype = finditemtype(s, u->faction->locale);
-	if (itype!=NULL) ltype = resource2luxury(itype->rtype);
-	if (ltype==NULL) {
-		cmistake(u, ord, 126, MSG_COMMERCE);
-		return false;
-	}
-  else {
-    attrib * a;
+    static const struct building_type *bt_castle;
+
+    if (!bt_castle)
+      bt_castle = bt_find("castle");
+    for (b = r->buildings; b; b = b->next) {
+      if (b->type == bt_castle && b->size >= 2)
+        break;
+    }
+    if (b == NULL) {
+      cmistake(u, ord, 119, MSG_COMMERCE);
+      return false;
+    }
+  }
+
+  /* Ein Händler kann nur 10 Güter pro Talentpunkt verkaufen. */
+
+  n = MIN(n, u->number * 10 * eff_skill(u, SK_TRADE, r));
+
+  if (!n) {
+    cmistake(u, ord, 54, MSG_COMMERCE);
+    return false;
+  }
+  s = getstrtoken();
+  itype = finditemtype(s, u->faction->locale);
+  if (itype != NULL)
+    ltype = resource2luxury(itype->rtype);
+  if (ltype == NULL) {
+    cmistake(u, ord, 126, MSG_COMMERCE);
+    return false;
+  } else {
+    attrib *a;
+
     request *o;
+
     int k, available;
-    
+
     if (!r_demand(r, ltype)) {
       cmistake(u, ord, 263, MSG_COMMERCE);
       return false;
@@ -2436,77 +2736,84 @@ static boolean
 
     /* Wenn andere Einheiten das selbe verkaufen, muß ihr Zeug abgezogen
      * werden damit es nicht zweimal verkauft wird: */
-    for (o=*sellorders;o;o=o->next) {
-      if (o->type.ltype==ltype && o->unit->faction == u->faction) {
-        int fpool = o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
+    for (o = *sellorders; o; o = o->next) {
+      if (o->type.ltype == ltype && o->unit->faction == u->faction) {
+        int fpool =
+          o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
         available -= MAX(0, fpool);
       }
     }
-    
+
     n = MIN(n, available);
 
-		if (n <= 0) {
-			cmistake(u, ord, 264, MSG_COMMERCE);
-			return false;
-		}
-		/* Hier wird request->type verwendet, weil die obere limit durch
-		* das silber gegeben wird (region->money), welches für alle
-		* (!) produkte als summe gilt, als nicht wie bei der
-		* produktion, wo für jedes produkt einzeln eine obere limite
-		* existiert, so dass man arrays von orders machen kann. */
+    if (n <= 0) {
+      cmistake(u, ord, 264, MSG_COMMERCE);
+      return false;
+    }
+    /* Hier wird request->type verwendet, weil die obere limit durch
+     * das silber gegeben wird (region->money), welches für alle
+     * (!) produkte als summe gilt, als nicht wie bei der
+     * produktion, wo für jedes produkt einzeln eine obere limite
+     * existiert, so dass man arrays von orders machen kann. */
 
-		/* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
-		k = u->number * 10 * eff_skill(u, SK_TRADE, r);
+    /* Ein Händler kann nur 10 Güter pro Talentpunkt handeln. */
+    k = u->number * 10 * eff_skill(u, SK_TRADE, r);
 
-		/* hat der Händler bereits gehandelt, muss die Menge der bereits
-		* verkauften/gekauften Güter abgezogen werden */
-		a = a_find(u->attribs, &at_trades);
-		if (!a) {
-			a = a_add(&u->attribs, a_new(&at_trades));
-		} else {
-			k -= a->data.i;
-		}
+    /* hat der Händler bereits gehandelt, muss die Menge der bereits
+     * verkauften/gekauften Güter abgezogen werden */
+    a = a_find(u->attribs, &at_trades);
+    if (!a) {
+      a = a_add(&u->attribs, a_new(&at_trades));
+    } else {
+      k -= a->data.i;
+    }
 
-		n = MIN(n, k);
-		assert(n>=0);
-		/* die Menge der verkauften Güter merken */
-		a->data.i += n;
-		o = (request *) calloc(1, sizeof(request));
-		o->unit = u;
-		o->qty = n;
-		o->type.ltype = ltype;
-		addlist(sellorders, o);
+    n = MIN(n, k);
+    assert(n >= 0);
+    /* die Menge der verkauften Güter merken */
+    a->data.i += n;
+    o = (request *) calloc(1, sizeof(request));
+    o->unit = u;
+    o->qty = n;
+    o->type.ltype = ltype;
+    addlist(sellorders, o);
 
     return unlimited;
-	}
+  }
 }
+
 /* ------------------------------------------------------------- */
 
-static void
-expandstealing(region * r, request * stealorders)
+static void expandstealing(region * r, request * stealorders)
 {
-	int i;
+  int i;
 
-	expandorders(r, stealorders);
-	if (!norders) return;
+  expandorders(r, stealorders);
+  if (!norders)
+    return;
 
-	/* Für jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
-	* Beklauen-Orders ist. Jedes Opfer muß einzeln behandelt werden.
-	*
-	* u ist die beklaute unit. oa.unit ist die klauende unit.
-	*/
+  /* Für jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
+   * Beklauen-Orders ist. Jedes Opfer muß einzeln behandelt werden.
+   *
+   * u ist die beklaute unit. oa.unit ist die klauende unit.
+   */
 
   for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
     unit *u = findunitg(oa[i].no, r);
+
     int n = 0;
-    if (u && u->region==r) {
+
+    if (u && u->region == r) {
       n = get_pooled(u, r_silver, GET_ALL, INT_MAX);
     }
 #ifndef GOBLINKILL
-    if (oa[i].type.goblin) { /* Goblin-Spezialklau */
+    if (oa[i].type.goblin) {    /* Goblin-Spezialklau */
       int uct = 0;
+
       unit *u2;
-      assert(effskill(oa[i].unit, SK_STEALTH)>=4 || !"this goblin\'s skill is too low");
+
+      assert(effskill(oa[i].unit, SK_STEALTH) >= 4
+        || !"this goblin\'s skill is too low");
       for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == u->faction) {
           uct += maintenance_cost(u2);
@@ -2515,7 +2822,7 @@ expandstealing(region * r, request * stealorders)
       n -= uct * 2;
     }
 #endif
-    if (n>10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
+    if (n > 10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
       /* In Questen nur reduziertes Klauen */
       n = 10;
     }
@@ -2524,24 +2831,28 @@ expandstealing(region * r, request * stealorders)
       use_pooled(u, r_silver, GET_ALL, n);
       oa[i].unit->n = n;
       change_money(oa[i].unit, n);
-      ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
+      ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount",
+          u, u->region, n));
     }
     add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
-    fset(oa[i].unit, UFL_LONGACTION|UFL_NOTMOVING);
+    fset(oa[i].unit, UFL_LONGACTION | UFL_NOTMOVING);
   }
   free(oa);
 }
 
 /* ------------------------------------------------------------- */
-static void
-plant(region *r, unit *u, int raw)
+static void plant(region * r, unit * u, int raw)
 {
   int n, i, skill, planted = 0;
-  const item_type * itype;
-  static const resource_type * rt_water = NULL;
-  if (rt_water==NULL) rt_water = rt_find("p2");
-  
-  assert(rt_water!=NULL);
+
+  const item_type *itype;
+
+  static const resource_type *rt_water = NULL;
+
+  if (rt_water == NULL)
+    rt_water = rt_find("p2");
+
+  assert(rt_water != NULL);
   if (!fval(r->terrain, LAND_REGION)) {
     return;
   }
@@ -2549,178 +2860,186 @@ plant(region *r, unit *u, int raw)
     cmistake(u, u->thisorder, 108, MSG_PRODUCE);
     return;
   }
-  
+
   /* Skill prüfen */
   skill = eff_skill(u, SK_HERBALISM, r);
   itype = rherbtype(r);
   if (skill < 6) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "plant_skills",
-			"skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
+      msg_feedback(u, u->thisorder, "plant_skills",
+        "skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
     return;
   }
   /* Wasser des Lebens prüfen */
   if (get_pooled(u, rt_water, GET_DEFAULT, 1) == 0) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
+      msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
     return;
   }
-  n = get_pooled(u, itype->rtype, GET_DEFAULT, skill*u->number);
+  n = get_pooled(u, itype->rtype, GET_DEFAULT, skill * u->number);
   /* Kräuter prüfen */
-  if (n==0) {
+  if (n == 0) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "resource_missing", "missing",
-			itype->rtype));
+      msg_feedback(u, u->thisorder, "resource_missing", "missing",
+        itype->rtype));
     return;
   }
 
-  n = MIN(skill*u->number, n);
+  n = MIN(skill * u->number, n);
   n = MIN(raw, n);
   /* Für jedes Kraut Talent*10% Erfolgschance. */
-  for(i = n; i>0; i--) {
-    if (rng_int()%10 < skill) planted++;
+  for (i = n; i > 0; i--) {
+    if (rng_int() % 10 < skill)
+      planted++;
   }
   produceexp(u, SK_HERBALISM, u->number);
-  
+
   /* Alles ok. Abziehen. */
   use_pooled(u, rt_water, GET_DEFAULT, 1);
   use_pooled(u, itype->rtype, GET_DEFAULT, n);
-  rsetherbs(r, rherbs(r)+planted);
-  ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb", 
-                                        u, r, planted, itype->rtype));
+  rsetherbs(r, rherbs(r) + planted);
+  ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
+      u, r, planted, itype->rtype));
 }
 
-static void
-planttrees(region *r, unit *u, int raw)
+static void planttrees(region * r, unit * u, int raw)
 {
   int n, i, skill, planted = 0;
-  const resource_type * rtype;
-  
+
+  const resource_type *rtype;
+
   if (!fval(r->terrain, LAND_REGION)) {
     return;
   }
-  
+
   /* Mallornbäume kann man nur in Mallornregionen züchten */
   if (fval(r, RF_MALLORN)) {
     rtype = rt_mallornseed;
   } else {
     rtype = rt_seed;
   }
-  
+
   /* Skill prüfen */
   skill = eff_skill(u, SK_HERBALISM, r);
   if (skill < 6) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "plant_skills",
-			"skill minskill product", SK_HERBALISM, 6, rtype, 1));
+      msg_feedback(u, u->thisorder, "plant_skills",
+        "skill minskill product", SK_HERBALISM, 6, rtype, 1));
     return;
   }
-  if (fval(r, RF_MALLORN) && skill < 7 ) {
+  if (fval(r, RF_MALLORN) && skill < 7) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "plant_skills",
-			"skill minskill product", SK_HERBALISM, 7, rtype, 1));
+      msg_feedback(u, u->thisorder, "plant_skills",
+        "skill minskill product", SK_HERBALISM, 7, rtype, 1));
     return;
   }
-  
+
   /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-  raw = MIN(raw, skill*u->number);
+  raw = MIN(raw, skill * u->number);
   n = get_pooled(u, rtype, GET_DEFAULT, raw);
-  if (n==0) {
+  if (n == 0) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
+      msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
     return;
   }
   n = MIN(raw, n);
-  
+
   /* Für jeden Samen Talent*10% Erfolgschance. */
-  for(i = n; i>0; i--) {
-    if (rng_int()%10 < skill) planted++;
+  for (i = n; i > 0; i--) {
+    if (rng_int() % 10 < skill)
+      planted++;
   }
-  rsettrees(r, 0, rtrees(r, 0)+planted);
-  
+  rsettrees(r, 0, rtrees(r, 0) + planted);
+
   /* Alles ok. Abziehen. */
   produceexp(u, SK_HERBALISM, u->number);
   use_pooled(u, rtype, GET_DEFAULT, n);
-  
+
   ADDMSG(&u->faction->msgs, msg_message("plant",
-                                        "unit region amount herb", u, r, planted, rtype));
+      "unit region amount herb", u, r, planted, rtype));
 }
 
 /* züchte bäume */
-static void
-breedtrees(region *r, unit *u, int raw)
+static void breedtrees(region * r, unit * u, int raw)
 {
   int n, i, skill, planted = 0;
-  const resource_type * rtype;
+
+  const resource_type *rtype;
+
   static int gamecookie = -1;
+
   static int current_season;
-  
-  if (gamecookie!=global.cookie) {
+
+  if (gamecookie != global.cookie) {
     gamedate date;
+
     get_gamedate(turn, &date);
     current_season = date.season;
     gamecookie = global.cookie;
   }
-  
+
   /* Bäume züchten geht nur im Frühling */
-  if (current_season != SEASON_SPRING){
+  if (current_season != SEASON_SPRING) {
     planttrees(r, u, raw);
     return;
   }
-  
+
   if (!fval(r->terrain, LAND_REGION)) {
     return;
   }
-  
+
   /* Mallornbäume kann man nur in Mallornregionen züchten */
   if (fval(r, RF_MALLORN)) {
     rtype = rt_mallornseed;
   } else {
     rtype = rt_seed;
   }
-  
+
   /* Skill prüfen */
   skill = eff_skill(u, SK_HERBALISM, r);
   if (skill < 12) {
     planttrees(r, u, raw);
     return;
   }
-  
+
   /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-  raw = MIN(skill*u->number, raw);
+  raw = MIN(skill * u->number, raw);
   n = get_pooled(u, rtype, GET_DEFAULT, raw);
   /* Samen prüfen */
-  if (n==0) {
+  if (n == 0) {
     ADDMSG(&u->faction->msgs,
-           msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
+      msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
     return;
   }
   n = MIN(raw, n);
-  
+
   /* Für jeden Samen Talent*5% Erfolgschance. */
-  for(i = n; i>0; i--) {
-    if (rng_int()%100 < skill*5) planted++;
+  for (i = n; i > 0; i--) {
+    if (rng_int() % 100 < skill * 5)
+      planted++;
   }
-  rsettrees(r, 1, rtrees(r, 1)+planted);
-  
+  rsettrees(r, 1, rtrees(r, 1) + planted);
+
   /* Alles ok. Abziehen. */
   produceexp(u, SK_HERBALISM, u->number);
   use_pooled(u, rtype, GET_DEFAULT, n);
-  
+
   ADDMSG(&u->faction->msgs, msg_message("plant",
-    "unit region amount herb", u, r, planted, rtype));
+      "unit region amount herb", u, r, planted, rtype));
 }
 
 /* züchte pferde */
-static void
-breedhorses(region *r, unit *u)
+static void breedhorses(region * r, unit * u)
 {
   int n, c;
+
   int gezuechtet = 0;
-  struct building * b = inside_building(u);
-  const struct building_type * btype = b?b->type:NULL;
-  
-  if (btype!=bt_find("stables")) {
+
+  struct building *b = inside_building(u);
+
+  const struct building_type *btype = b ? b->type : NULL;
+
+  if (btype != bt_find("stables")) {
     cmistake(u, u->thisorder, 122, MSG_PRODUCE);
     return;
   }
@@ -2736,23 +3055,26 @@ breedhorses(region *r, unit *u)
       gezuechtet++;
     }
   }
-  
+
   produceexp(u, SK_HORSE_TRAINING, u->number);
 
-  ADDMSG(&u->faction->msgs, msg_message("raised", 
-    "unit amount", u, gezuechtet));
+  ADDMSG(&u->faction->msgs, msg_message("raised",
+      "unit amount", u, gezuechtet));
 }
 
-static void
-breed_cmd(unit *u, struct order * ord)
+static void breed_cmd(unit * u, struct order *ord)
 {
   int m;
-  const char *s;
-  param_t p;
-  region *r = u->region;
-  const resource_type * rtype = NULL;
 
-  if (r->land==NULL) {
+  const char *s;
+
+  param_t p;
+
+  region *r = u->region;
+
+  const resource_type *rtype = NULL;
+
+  if (r->land == NULL) {
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
     return;
   }
@@ -2763,71 +3085,69 @@ breed_cmd(unit *u, struct order * ord)
   s = getstrtoken();
 
   m = atoi((const char *)s);
-  if (m!=0) {
+  if (m != 0) {
     /* first came a want-paramter */
     s = getstrtoken();
   } else {
     m = INT_MAX;
   }
-  
+
   if (!s[0]) {
     p = P_ANY;
   } else {
     p = findparam(s, u->faction->locale);
   }
-  
+
   switch (p) {
-  case P_HERBS:
-    plant(r, u, m);
-    break;
-  case P_TREES:
-    breedtrees(r, u, m);
-    break;
-  default:
-    if (p!=P_ANY) {
-      rtype = findresourcetype(s, u->faction->locale);
-      if (rtype==rt_mallornseed || rtype==rt_seed) {
-        breedtrees(r, u, m);
-        break;
-      } else if (rtype!=oldresourcetype[R_HORSE]) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
-        break;
+    case P_HERBS:
+      plant(r, u, m);
+      break;
+    case P_TREES:
+      breedtrees(r, u, m);
+      break;
+    default:
+      if (p != P_ANY) {
+        rtype = findresourcetype(s, u->faction->locale);
+        if (rtype == rt_mallornseed || rtype == rt_seed) {
+          breedtrees(r, u, m);
+          break;
+        } else if (rtype != oldresourcetype[R_HORSE]) {
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake",
+              ""));
+          break;
+        }
       }
-    }
-    breedhorses(r, u);
-    break;
+      breedhorses(r, u);
+      break;
   }
 }
 
-static const char *
-rough_amount(int a, int m)
-
+static const char *rough_amount(int a, int m)
 {
-	int p = (a * 100)/m;
+  int p = (a * 100) / m;
 
-	if (p < 10) {
-		return "sehr wenige";
-	} else if (p < 30) {
-		return "wenige";
-	} else if (p < 60) {
-		return "relativ viele";
-	} else if (p < 90) {
-		return "viele";
-	}
-	return "sehr viele";
+  if (p < 10) {
+    return "sehr wenige";
+  } else if (p < 30) {
+    return "wenige";
+  } else if (p < 60) {
+    return "relativ viele";
+  } else if (p < 90) {
+    return "viele";
+  }
+  return "sehr viele";
 }
 
-static void
-research_cmd(unit *u, struct order * ord)
+static void research_cmd(unit * u, struct order *ord)
 {
   region *r = u->region;
 
   init_tokens(ord);
   skip_token();
   /*
-  const char *s = getstrtoken();
+     const char *s = getstrtoken();
 
-  if (findparam(s, u->faction->locale) == P_HERBS) { */
+     if (findparam(s, u->faction->locale) == P_HERBS) { */
 
   if (eff_skill(u, SK_HERBALISM, r) < 7) {
     cmistake(u, ord, 227, MSG_EVENT);
@@ -2840,23 +3160,23 @@ research_cmd(unit *u, struct order * ord)
     const item_type *itype = rherbtype(r);
 
     if (itype != NULL) {
-      ADDMSG(&u->faction->msgs, msg_message("researchherb", 
-        "unit region amount herb", 
-        u, r, rough_amount(rherbs(r), 100), itype->rtype));
+      ADDMSG(&u->faction->msgs, msg_message("researchherb",
+          "unit region amount herb",
+          u, r, rough_amount(rherbs(r), 100), itype->rtype));
     } else {
-      ADDMSG(&u->faction->msgs, msg_message("researchherb_none", 
-        "unit region", u, r));
+      ADDMSG(&u->faction->msgs, msg_message("researchherb_none",
+          "unit region", u, r));
     }
   } else {
     ADDMSG(&u->faction->msgs, msg_message("researchherb_none",
-      "unit region", u, r));
+        "unit region", u, r));
   }
 }
 
-static int
-max_skill(region * r, faction * f, skill_t sk)
+static int max_skill(region * r, faction * f, skill_t sk)
 {
   unit *u;
+
   int w = 0;
 
   for (u = r->units; u; u = u->next) {
@@ -2870,21 +3190,27 @@ max_skill(region * r, faction * f, skill_t sk)
   return w;
 }
 
-static void
-steal_cmd(unit * u, struct order * ord, request ** stealorders)
+static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
 {
   int n, i, id;
+
   boolean goblin = false;
-  request * o;
-  unit * u2 = NULL;
-  region * r = u->region;
-  faction * f = NULL;
-  plane * pl;
+
+  request *o;
+
+  unit *u2 = NULL;
+
+  region *r = u->region;
+
+  faction *f = NULL;
+
+  plane *pl;
 
   assert(skill_enabled[SK_PERCEPTION] && skill_enabled[SK_STEALTH]);
 
   if (!fval(u->race, RCF_CANSTEAL)) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race", u->race));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "race_nosteal", "race",
+        u->race));
     return;
   }
 
@@ -2902,129 +3228,141 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
   init_tokens(ord);
   skip_token();
   id = read_unitid(u->faction, r);
-	u2 = findunitr(r, id);
+  u2 = findunitr(r, id);
 
-	if (u2 && u2->region==u->region) {
-		f = u2->faction;
-	} else {
-		f = dfindhash(id);
-	}
+  if (u2 && u2->region == u->region) {
+    f = u2->faction;
+  } else {
+    f = dfindhash(id);
+  }
 
-	for (u2=r->units;u2;u2=u2->next) {
-		if (u2->faction == f && cansee(u->faction, r, u2, 0)) break;
-	}
+  for (u2 = r->units; u2; u2 = u2->next) {
+    if (u2->faction == f && cansee(u->faction, r, u2, 0))
+      break;
+  }
 
-	if (!u2) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-		return;
-	}
+  if (!u2) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
+    return;
+  }
 
-	if (IsImmune(u2->faction)) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, ord, "newbie_immunity_error",
-			"turns", NewbieImmunity()));
-		return;
-	}
+  if (IsImmune(u2->faction)) {
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "newbie_immunity_error", "turns", NewbieImmunity()));
+    return;
+  }
 
-	if (u->faction->alliance && u->faction->alliance == u2->faction->alliance) {
-		cmistake(u, ord, 47, MSG_INCOME);
-		return;
-	}
+  if (u->faction->alliance && u->faction->alliance == u2->faction->alliance) {
+    cmistake(u, ord, 47, MSG_INCOME);
+    return;
+  }
 
-	assert(u->region==u2->region);
-	if (!can_contact(r, u, u2)) {
-		ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
-		return;
-	}
+  assert(u->region == u2->region);
+  if (!can_contact(r, u, u2)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
+    return;
+  }
 
-	n = eff_skill(u, SK_STEALTH, r) - max_skill(r, f, SK_PERCEPTION);
+  n = eff_skill(u, SK_STEALTH, r) - max_skill(r, f, SK_PERCEPTION);
 
-	if (n <= 0) {
-		/* Wahrnehmung == Tarnung */
-		if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
+  if (n <= 0) {
+    /* Wahrnehmung == Tarnung */
+    if (u->race != new_race[RC_GOBLIN] || eff_skill(u, SK_STEALTH, r) <= 3) {
       ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
-      if (n==0) {
+      if (n == 0) {
         ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
       } else {
-        ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
+        ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target",
+            u, u2));
       }
       return;
-		} else {
-      ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u, u2));
-      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u, u2));
+    } else {
+      ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
+          u2));
+      ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
+          u2));
       n = 1;
-			goblin = true;
-		}
-	}
+      goblin = true;
+    }
+  }
 
-	i = MIN(u->number, get_item(u, I_RING_OF_NIMBLEFINGER));
-	if (i > 0) {
-		n *= STEALINCOME * (u->number + i * (roqf_factor()-1));
-	} else {
-		n *= u->number * STEALINCOME;
-	}
+  i = MIN(u->number, get_item(u, I_RING_OF_NIMBLEFINGER));
+  if (i > 0) {
+    n *= STEALINCOME * (u->number + i * (roqf_factor() - 1));
+  } else {
+    n *= u->number * STEALINCOME;
+  }
 
-	u->wants = n;
+  u->wants = n;
 
-	/* wer dank unsichtbarkeitsringen klauen kann, muss nicht unbedingt ein
-	* guter dieb sein, schliesslich macht man immer noch sehr viel laerm */
+  /* wer dank unsichtbarkeitsringen klauen kann, muss nicht unbedingt ein
+   * guter dieb sein, schliesslich macht man immer noch sehr viel laerm */
 
-	o = (request *) calloc(1, sizeof(request));
-	o->unit = u;
-	o->qty = 1; /* Betrag steht in u->wants */
-	o->no = u2->no;
-	o->type.goblin = goblin; /* Merken, wenn Goblin-Spezialklau */
-	addlist(stealorders, o);
+  o = (request *) calloc(1, sizeof(request));
+  o->unit = u;
+  o->qty = 1;                   /* Betrag steht in u->wants */
+  o->no = u2->no;
+  o->type.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
+  addlist(stealorders, o);
 
-	/* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
+  /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
 
-	produceexp(u, SK_STEALTH, MIN(n, u->number));
+  produceexp(u, SK_STEALTH, MIN(n, u->number));
 }
+
 /* ------------------------------------------------------------- */
 
 
-static void
-expandentertainment(region * r)
+static void expandentertainment(region * r)
 {
-	unit *u;
-	int m = entertainmoney(r);
-	request *o;
+  unit *u;
 
-	for (o = &entertainers[0]; o != nextentertainer; ++o) {
-		double part = m / (double) entertaining;
-		u = o->unit;
-		if (entertaining <= m)
-			u->n = o->qty;
-		else
-			u->n = (int) (o->qty * part);
-		change_money(u, u->n);
-		rsetmoney(r, rmoney(r) - u->n);
-		m -= u->n;
-		entertaining -= o->qty;
+  int m = entertainmoney(r);
 
-		/* Nur soviel PRODUCEEXP wie auch tatsächlich gemacht wurde */
-		produceexp(u, SK_ENTERTAINMENT, MIN(u->n, u->number));
-		add_income(u, IC_ENTERTAIN, o->qty, u->n);
-    fset(u, UFL_LONGACTION|UFL_NOTMOVING);
-	}
+  request *o;
+
+  for (o = &entertainers[0]; o != nextentertainer; ++o) {
+    double part = m / (double)entertaining;
+
+    u = o->unit;
+    if (entertaining <= m)
+      u->n = o->qty;
+    else
+      u->n = (int)(o->qty * part);
+    change_money(u, u->n);
+    rsetmoney(r, rmoney(r) - u->n);
+    m -= u->n;
+    entertaining -= o->qty;
+
+    /* Nur soviel PRODUCEEXP wie auch tatsächlich gemacht wurde */
+    produceexp(u, SK_ENTERTAINMENT, MIN(u->n, u->number));
+    add_income(u, IC_ENTERTAIN, o->qty, u->n);
+    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+  }
 }
 
-void
-entertain_cmd(unit * u, struct order * ord)
+void entertain_cmd(unit * u, struct order *ord)
 {
-  region * r = u->region;
+  region *r = u->region;
+
   int max_e;
+
   request *o;
+
   static int entertainbase = 0;
+
   static int entertainperlevel = 0;
 
   if (!entertainbase) {
-    const char * str = get_param(global.parameters, "entertain.base");
-    entertainbase = str?atoi(str):0;
+    const char *str = get_param(global.parameters, "entertain.base");
+
+    entertainbase = str ? atoi(str) : 0;
   }
   if (!entertainperlevel) {
-    const char * str = get_param(global.parameters, "entertain.perlevel");
-    entertainperlevel = str?atoi(str):0;
+    const char *str = get_param(global.parameters, "entertain.perlevel");
+
+    entertainperlevel = str ? atoi(str) : 0;
   }
   if (fval(u, UFL_WERE)) {
     cmistake(u, ord, 58, MSG_INCOME);
@@ -3048,13 +3386,13 @@ entertain_cmd(unit * u, struct order * ord)
   }
 
   u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT)
-                            * entertainperlevel);
+    * entertainperlevel);
 
   init_tokens(ord);
   skip_token();
   max_e = getuint();
   if (max_e != 0) {
-    u->wants = MIN(u->wants,max_e);
+    u->wants = MIN(u->wants, max_e);
   }
   o = nextentertainer++;
   o->unit = u;
@@ -3069,50 +3407,60 @@ static void
 expandwork(region * r, request * work_begin, request * work_end, int maxwork)
 {
   int earnings;
+
   /* n: verbleibende Einnahmen */
   /* fishes: maximale Arbeiter */
   int jobs = maxwork;
+
   int p_wage = wage(r, NULL, NULL, turn);
+
   int money = rmoney(r);
+
   request *o;
 
   for (o = work_begin; o != work_end; ++o) {
-    unit * u = o->unit;
+    unit *u = o->unit;
+
     int workers;
 
-    if (u->number == 0) continue;
+    if (u->number == 0)
+      continue;
 
-    if (jobs>=working) workers = u->number;
+    if (jobs >= working)
+      workers = u->number;
     else {
       workers = u->number * jobs / working;
-      if (rng_int() % working < (u->number * jobs) % working) workers++;
+      if (rng_int() % working < (u->number * jobs) % working)
+        workers++;
     }
 
-    assert(workers>=0);
+    assert(workers >= 0);
 
     u->n = workers * wage(u->region, u->faction, u->race, turn);
 
     jobs -= workers;
-    assert(jobs>=0);
+    assert(jobs >= 0);
 
     change_money(u, u->n);
     working -= o->unit->number;
     add_income(u, IC_WORK, o->qty, u->n);
-    fset(u, UFL_LONGACTION|UFL_NOTMOVING);
+    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
   }
 
-  if (jobs>rpeasants(r)) {
+  if (jobs > rpeasants(r)) {
     jobs = rpeasants(r);
   }
   earnings = jobs * p_wage;
-  if (rule_blessed_harvest()==HARVEST_TAXES) {
+  if (rule_blessed_harvest() == HARVEST_TAXES) {
     /* E3 rules */
-    static const curse_type * blessedharvest_ct;
+    static const curse_type *blessedharvest_ct;
+
     if (!blessedharvest_ct) {
       blessedharvest_ct = ct_find("blessedharvest");
     }
     if (blessedharvest_ct && r->attribs) {
-      int happy = (int)curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+      int happy =
+        (int)curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
       happy = MIN(happy, jobs);
       earnings += happy;
     }
@@ -3120,23 +3468,26 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
   rsetmoney(r, money + earnings);
 }
 
-static int
-do_work(unit * u, order * ord, request * o)
+static int do_work(unit * u, order * ord, request * o)
 {
   if (playerrace(u->race)) {
-    region * r = u->region;
+    region *r = u->region;
+
     int w;
 
     if (fval(u, UFL_WERE)) {
-      if (ord) cmistake(u, ord, 313, MSG_INCOME);
+      if (ord)
+        cmistake(u, ord, 313, MSG_INCOME);
       return -1;
     }
     if (besieged(u)) {
-      if (ord) cmistake(u, ord, 60, MSG_INCOME);
+      if (ord)
+        cmistake(u, ord, 60, MSG_INCOME);
       return -1;
     }
     if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-      if (ord) cmistake(u, ord, 69, MSG_INCOME);
+      if (ord)
+        cmistake(u, ord, 69, MSG_INCOME);
       return -1;
     }
     w = wage(r, u->faction, u->race, turn);
@@ -3145,46 +3496,49 @@ do_work(unit * u, order * ord, request * o)
     o->qty = u->number * w;
     working += u->number;
     return 0;
-  }
-  else if (ord && !is_monsters(u->faction)) {
+  } else if (ord && !is_monsters(u->faction)) {
     ADDMSG(&u->faction->msgs,
       msg_feedback(u, ord, "race_cantwork", "race", u->race));
   }
   return -1;
 }
 
-static void
-expandtax(region * r, request * taxorders)
+static void expandtax(region * r, request * taxorders)
 {
   unit *u;
+
   int i;
 
   expandorders(r, taxorders);
-  if (!norders) return;
+  if (!norders)
+    return;
 
   for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
     change_money(oa[i].unit, TAXFRACTION);
     oa[i].unit->n += TAXFRACTION;
-    rsetmoney(r, rmoney(r) -TAXFRACTION);
+    rsetmoney(r, rmoney(r) - TAXFRACTION);
   }
   free(oa);
 
   for (u = r->units; u; u = u->next) {
     if (u->n >= 0) {
       add_income(u, IC_TAX, u->wants, u->n);
-      fset(u, UFL_LONGACTION|UFL_NOTMOVING);
+      fset(u, UFL_LONGACTION | UFL_NOTMOVING);
     }
   }
 }
 
-void
-tax_cmd(unit * u, struct order * ord, request ** taxorders)
+void tax_cmd(unit * u, struct order *ord, request ** taxorders)
 {
   /* Steuern werden noch vor der Forschung eingetrieben */
-  region * r = u->region;
+  region *r = u->region;
+
   unit *u2;
+
   int n;
+
   request *o;
+
   int max;
 
   if (!humanoidrace(u->race) && !is_monsters(u->faction)) {
@@ -3212,115 +3566,133 @@ tax_cmd(unit * u, struct order * ord, request ** taxorders)
   skip_token();
   max = getuint();
 
-  if (max == 0) max = INT_MAX;
-	if (!playerrace(u->race)) {
-		u->wants = MIN(income(u), max);
-	} else {
-		u->wants = MIN(n * eff_skill(u, SK_TAXING, r) * 20, max);
-	}
+  if (max == 0)
+    max = INT_MAX;
+  if (!playerrace(u->race)) {
+    u->wants = MIN(income(u), max);
+  } else {
+    u->wants = MIN(n * eff_skill(u, SK_TAXING, r) * 20, max);
+  }
 
-	u2 = is_guarded(r, u, GUARD_TAX);
-	if (u2) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, ord, "region_guarded", "guard", u2));
-		return;
-	}
+  u2 = is_guarded(r, u, GUARD_TAX);
+  if (u2) {
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "region_guarded", "guard", u2));
+    return;
+  }
 
-	/* die einnahmen werden in fraktionen von 10 silber eingeteilt: diese
-	* fraktionen werden dann bei eintreiben unter allen eintreibenden
-	* einheiten aufgeteilt. */
+  /* die einnahmen werden in fraktionen von 10 silber eingeteilt: diese
+   * fraktionen werden dann bei eintreiben unter allen eintreibenden
+   * einheiten aufgeteilt. */
 
-	o = (request *) calloc(1, sizeof(request));
-	o->qty = u->wants / TAXFRACTION;
-	o->unit = u;
-	addlist(taxorders, o);
-	return;
+  o = (request *) calloc(1, sizeof(request));
+  o->qty = u->wants / TAXFRACTION;
+  o->unit = u;
+  addlist(taxorders, o);
+  return;
 }
 
 #define MAX_WORKERS 2048
-void
-auto_work(region * r)
+void auto_work(region * r)
 {
   request workers[MAX_WORKERS];
-  request * nextworker = workers;
-  unit * u;
 
-  for (u=r->units;u;u=u->next) {
+  request *nextworker = workers;
+
+  unit *u;
+
+  for (u = r->units; u; u = u->next) {
     if (!(u->flags & UFL_LONGACTION) && !is_monsters(u->faction)) {
-      if (do_work(u, NULL, nextworker)==0) {
-        assert(nextworker-workers<MAX_WORKERS);
+      if (do_work(u, NULL, nextworker) == 0) {
+        assert(nextworker - workers < MAX_WORKERS);
         ++nextworker;
       }
     }
   }
-  if (nextworker!=workers) {
+  if (nextworker != workers) {
     expandwork(r, workers, nextworker, maxworkingpeasants(r));
   }
 }
 
-static void
-peasant_taxes(region * r)
+static void peasant_taxes(region * r)
 {
-  faction * f;
-  unit * u;
-  building * b;
+  faction *f;
+
+  unit *u;
+
+  building *b;
+
   int money;
+
   int maxsize;
 
   f = region_get_owner(r);
-  if (f==NULL || is_mourning(r, turn)) {
+  if (f == NULL || is_mourning(r, turn)) {
     return;
   }
   money = rmoney(r);
-  if (money<=0) return;
+  if (money <= 0)
+    return;
 
   b = largestbuilding(r, cmp_taxes, false);
-  if (b==NULL) return;
+  if (b == NULL)
+    return;
 
   u = building_owner(b);
-  if (u==NULL || u->faction!=f) return;
+  if (u == NULL || u->faction != f)
+    return;
 
   maxsize = buildingeffsize(b, false);
-  if (maxsize>0) {
+  if (maxsize > 0) {
     double taxfactor = money * b->type->taxes(b, maxsize);
+
     double morale = money * region_get_morale(r) * MORALE_TAX_FACTOR;
-    if (taxfactor>morale) taxfactor = morale;
-    if (taxfactor>0) {
+
+    if (taxfactor > morale)
+      taxfactor = morale;
+    if (taxfactor > 0) {
       int taxmoney = (int)taxfactor;
+
       change_money(u, taxmoney);
       rsetmoney(r, money - taxmoney);
-      ADDMSG(&u->faction->msgs, msg_message("income_tax", 
-        "unit region amount", u, r, taxmoney));
+      ADDMSG(&u->faction->msgs, msg_message("income_tax",
+          "unit region amount", u, r, taxmoney));
     }
   }
 }
 
-void
-produce(struct region *r)
+void produce(struct region *r)
 {
   request workers[MAX_WORKERS];
+
   request *taxorders, *sellorders, *stealorders, *buyorders;
+
   unit *u;
+
   int todo;
+
   static int rule_autowork = -1;
+
   boolean limited = true;
-  request * nextworker = workers;
+
+  request *nextworker = workers;
+
   assert(r);
 
   /* das sind alles befehle, die 30 tage brauchen, und die in thisorder
-  * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
-  * (dosetdefaults).
-  *
-  * kaufen vor einnahmequellen. da man in einer region dasselbe produkt
-  * nicht kaufen und verkaufen kann, ist die reihenfolge wegen der
-  * produkte egal. nicht so wegen dem geld.
-  *
-  * lehren vor lernen. */
+   * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
+   * (dosetdefaults).
+   *
+   * kaufen vor einnahmequellen. da man in einer region dasselbe produkt
+   * nicht kaufen und verkaufen kann, ist die reihenfolge wegen der
+   * produkte egal. nicht so wegen dem geld.
+   *
+   * lehren vor lernen. */
 
-  if (rule_autowork<0) {
+  if (rule_autowork < 0) {
     rule_autowork = get_param_int(global.parameters, "work.auto", 0);
   }
-  
+
   assert(rmoney(r) >= 0);
   assert(rpeasants(r) >= 0);
 
@@ -3338,51 +3710,54 @@ produce(struct region *r)
   stealorders = 0;
 
   for (u = r->units; u; u = u->next) {
-    order * ord;
+    order *ord;
+
     boolean trader = false;
 
     if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
       continue;
 
     if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
-      !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
+      !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
       continue;
 
-    if (fval(u, UFL_LONGACTION) && u->thisorder==NULL) {
+    if (fval(u, UFL_LONGACTION) && u->thisorder == NULL) {
       /* this message was already given in laws.setdefaults
-      cmistake(u, u->thisorder, 52, MSG_PRODUCE);
-      */
+         cmistake(u, u->thisorder, 52, MSG_PRODUCE);
+       */
       continue;
     }
 
-    for (ord = u->orders;ord;ord=ord->next) {
+    for (ord = u->orders; ord; ord = ord->next) {
       switch (get_keyword(ord)) {
-      case K_BUY:
-        buy(u, &buyorders, ord);
-        trader = true;
-        break;
-      case K_SELL:
-        /* sell returns true if the sale is not limited
-         * by the region limit */
-        limited &= !sell(u, &sellorders, ord);
-        trader = true;
-        break;
+        case K_BUY:
+          buy(u, &buyorders, ord);
+          trader = true;
+          break;
+        case K_SELL:
+          /* sell returns true if the sale is not limited
+           * by the region limit */
+          limited &= !sell(u, &sellorders, ord);
+          trader = true;
+          break;
       }
     }
     if (trader) {
-      attrib * a = a_find(u->attribs, &at_trades);
+      attrib *a = a_find(u->attribs, &at_trades);
+
       if (a && a->data.i) {
         produceexp(u, SK_TRADE, u->number);
       }
-      fset(u, UFL_LONGACTION|UFL_NOTMOVING);
+      fset(u, UFL_LONGACTION | UFL_NOTMOVING);
       continue;
     }
 
     todo = get_keyword(u->thisorder);
-    if (todo == NOKEYWORD) continue;
+    if (todo == NOKEYWORD)
+      continue;
 
     if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]
-    && !(u->race->flags & RCF_SWIM)
+      && !(u->race->flags & RCF_SWIM)
       && todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
       continue;
 
@@ -3393,8 +3768,8 @@ produce(struct region *r)
         break;
 
       case K_WORK:
-        if (!rule_autowork && do_work(u, u->thisorder, nextworker)==0) {
-          assert(nextworker-workers<MAX_WORKERS);
+        if (!rule_autowork && do_work(u, u->thisorder, nextworker) == 0) {
+          assert(nextworker - workers < MAX_WORKERS);
           ++nextworker;
         }
         break;
@@ -3427,32 +3802,38 @@ produce(struct region *r)
   }
 
   /* Entertainment (expandentertainment) und Besteuerung (expandtax) vor den
-  * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
-  * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
-  * auszugeben bereit sind. */
-  if (entertaining) expandentertainment(r);
+   * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
+   * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
+   * auszugeben bereit sind. */
+  if (entertaining)
+    expandentertainment(r);
   if (!rule_autowork) {
     expandwork(r, workers, nextworker, maxworkingpeasants(r));
   }
-  if (taxorders) expandtax(r, taxorders);
+  if (taxorders)
+    expandtax(r, taxorders);
 
   /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
-  * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
-  * können. */
+   * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
+   * können. */
 
-  if (buyorders) expandbuying(r, buyorders);
+  if (buyorders)
+    expandbuying(r, buyorders);
 
   if (sellorders) {
     int limit = rpeasants(r) / TRADE_FRACTION;
-    if (r->terrain == newterrain(T_DESERT) && buildingtype_exists(r, bt_find("caravan"), true))
+
+    if (r->terrain == newterrain(T_DESERT)
+      && buildingtype_exists(r, bt_find("caravan"), true))
       limit *= 2;
-    expandselling(r, sellorders, limited?limit:INT_MAX);
+    expandselling(r, sellorders, limited ? limit : INT_MAX);
   }
 
   /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
-  * (expandstealing). */
+   * (expandstealing). */
 
-  if (stealorders) expandstealing(r, stealorders);
+  if (stealorders)
+    expandstealing(r, stealorders);
 
   assert(rmoney(r) >= 0);
   assert(rpeasants(r) >= 0);

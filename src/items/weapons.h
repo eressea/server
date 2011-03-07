@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-extern void register_weapons(void);
+  extern void register_weapons(void);
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct faction * createmonsters(int no);
+  struct faction *createmonsters(int no);
 
 #ifdef __cplusplus
 }

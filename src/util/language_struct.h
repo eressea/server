@@ -9,20 +9,21 @@
 #define SMAXHASH 2048
 typedef struct locale_str {
   unsigned int hashkey;
-  struct locale_str * nexthash;
-  char * str;
-  char * key;
+  struct locale_str *nexthash;
+  char *str;
+  char *key;
 } locale_str;
 
 typedef struct locale {
   int index;
-	struct locale * next;
-	unsigned int hashkey;
-	const char * name;
-	struct locale_str * strings[SMAXHASH];
+  struct locale *next;
+  unsigned int hashkey;
+  const char *name;
+  struct locale_str *strings[SMAXHASH];
 } locale;
 
-extern locale * default_locale;
-extern locale * locales;
+extern locale *default_locale;
+
+extern locale *locales;
 
 #endif

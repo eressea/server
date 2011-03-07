@@ -45,51 +45,52 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   It simply removes the clone-attribute from the mage.
  */
 
-static int
-clonedied_handle(trigger * t, void * data)
+static int clonedied_handle(trigger * t, void *data)
 {
-	/* destroy the unit */
-	unit * u = (unit*)t->data.v;
-	if (u) {
-		attrib *a = a_find(u->attribs, &at_clone);
-		if(a) a_remove(&u->attribs, a);
-	} else
-		log_error(("could not perform clonedied::handle()\n"));
-	unused(data);
-	return 0;
+  /* destroy the unit */
+  unit *u = (unit *) t->data.v;
+
+  if (u) {
+    attrib *a = a_find(u->attribs, &at_clone);
+
+    if (a)
+      a_remove(&u->attribs, a);
+  } else
+    log_error(("could not perform clonedied::handle()\n"));
+  unused(data);
+  return 0;
 }
 
-static void
-clonedied_write(const trigger * t, struct storage * store)
+static void clonedied_write(const trigger * t, struct storage *store)
 {
-  unit * u = (unit*)t->data.v;
+  unit *u = (unit *) t->data.v;
+
   write_unit_reference(u, store);
 }
 
-static int
-clonedied_read(trigger * t, struct storage * store)
+static int clonedied_read(trigger * t, struct storage *store)
 {
-  int result = read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
-  if (result==0 && t->data.v==NULL) {
+  int result =
+    read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+  if (result == 0 && t->data.v == NULL) {
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
 
 trigger_type tt_clonedied = {
-	"clonedied",
-	NULL,
-	NULL,
-	clonedied_handle,
-	clonedied_write,
-	clonedied_read
+  "clonedied",
+  NULL,
+  NULL,
+  clonedied_handle,
+  clonedied_write,
+  clonedied_read
 };
 
-trigger *
-trigger_clonedied(unit * u)
+trigger *trigger_clonedied(unit * u)
 {
-	trigger * t = t_new(&tt_clonedied);
-	t->data.v = (void*)u;
-	return t;
-}
+  trigger *t = t_new(&tt_clonedied);
 
+  t->data.v = (void *)u;
+  return t;
+}

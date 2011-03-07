@@ -24,36 +24,40 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/storage.h>
 
 static void
-write_movement(const attrib * a, const void * owner, struct storage * store)
+write_movement(const attrib * a, const void *owner, struct storage *store)
 {
-	store->w_int(store, a->data.i);
+  store->w_int(store, a->data.i);
 }
 
-static int
-read_movement(attrib * a, void * owner, struct storage * store)
+static int read_movement(attrib * a, void *owner, struct storage *store)
 {
   a->data.i = store->r_int(store);
-  if (a->data.i !=0 ) return AT_READ_OK;
-  else return AT_READ_FAIL;
+  if (a->data.i != 0)
+    return AT_READ_OK;
+  else
+    return AT_READ_FAIL;
 }
 
 attrib_type at_movement = {
-	"movement", NULL, NULL, NULL, write_movement, read_movement
+  "movement", NULL, NULL, NULL, write_movement, read_movement
 };
 
-boolean
-get_movement(attrib * const * alist, int type)
+boolean get_movement(attrib * const *alist, int type)
 {
-	const attrib * a = a_findc(*alist, &at_movement);
-	if (a==NULL) return false;
-	if (a->data.i & type) return true;
-	return false;
+  const attrib *a = a_findc(*alist, &at_movement);
+
+  if (a == NULL)
+    return false;
+  if (a->data.i & type)
+    return true;
+  return false;
 }
 
-void
-set_movement(attrib ** alist, int type)
+void set_movement(attrib ** alist, int type)
 {
-	attrib * a = a_find(*alist, &at_movement);
-	if (a==NULL) a = a_add(alist, a_new(&at_movement));
-	a->data.i |= type;
+  attrib *a = a_find(*alist, &at_movement);
+
+  if (a == NULL)
+    a = a_add(alist, a_new(&at_movement));
+  a->data.i |= type;
 }

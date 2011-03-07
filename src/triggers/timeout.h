@@ -22,12 +22,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-struct trigger_type;
-struct trigger;
+  struct trigger_type;
+  struct trigger;
 
-extern struct trigger_type tt_timeout;
+  extern struct trigger_type tt_timeout;
 
-extern struct trigger * trigger_timeout(int time, struct trigger * callbacks);
+  extern struct trigger *trigger_timeout(int time, struct trigger *callbacks);
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern void register_demonseye(void);
+  extern void register_demonseye(void);
 
 #ifdef __cplusplus
 }

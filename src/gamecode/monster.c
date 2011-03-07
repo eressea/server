@@ -66,44 +66,45 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <assert.h>
 
-#define MOVECHANCE                  25	/* chance fuer bewegung */
+#define MOVECHANCE                  25  /* chance fuer bewegung */
 
 #define MAXILLUSION_TEXTS   3
 
-boolean
-monster_is_waiting(const unit * u)
+boolean monster_is_waiting(const unit * u)
 {
-  if (fval(u, UFL_ISNEW|UFL_MOVED)) return true;
+  if (fval(u, UFL_ISNEW | UFL_MOVED))
+    return true;
   return false;
 }
 
-static void
-eaten_by_monster(unit * u)
+static void eaten_by_monster(unit * u)
 {
   /* adjustment for smaller worlds */
   static double multi = 0.0;
+
   int n = 0;
+
   int horse = 0;
 
-  if (multi==0.0) {
+  if (multi == 0.0) {
     multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
   }
 
   switch (old_race(u->race)) {
     case RC_FIREDRAGON:
-      n = rng_int()%80 * u->number;
+      n = rng_int() % 80 * u->number;
       horse = get_item(u, I_HORSE);
       break;
     case RC_DRAGON:
-      n = rng_int()%200 * u->number;
+      n = rng_int() % 200 * u->number;
       horse = get_item(u, I_HORSE);
       break;
     case RC_WYRM:
-      n = rng_int()%500 * u->number;
+      n = rng_int() % 500 * u->number;
       horse = get_item(u, I_HORSE);
       break;
     default:
-      n = rng_int()%(u->number/20+1);
+      n = rng_int() % (u->number / 20 + 1);
   }
 
   n = (int)(n * multi);
@@ -123,40 +124,39 @@ eaten_by_monster(unit * u)
   }
 }
 
-static void
-absorbed_by_monster(unit * u)
+static void absorbed_by_monster(unit * u)
 {
   int n;
 
   switch (old_race(u->race)) {
     default:
-      n = rng_int()%(u->number/20+1);
+      n = rng_int() % (u->number / 20 + 1);
   }
 
-  if(n > 0) {
+  if (n > 0) {
     n = lovar(n);
     n = MIN(rpeasants(u->region), n);
-    if (n > 0){
+    if (n > 0) {
       rsetpeasants(u->region, rpeasants(u->region) - n);
       scale_number(u, u->number + n);
-      ADDMSG(&u->region->msgs, msg_message("absorbpeasants", 
-        "unit race amount", u, u->race, n));
+      ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
+          "unit race amount", u, u->race, n));
     }
   }
 }
 
-static int
-scareaway(region * r, int anzahl)
+static int scareaway(region * r, int anzahl)
 {
   int n, p, diff = 0, emigrants[MAXDIRECTIONS];
+
   direction_t d;
 
-  anzahl = MIN(MAX(1, anzahl),rpeasants(r));
+  anzahl = MIN(MAX(1, anzahl), rpeasants(r));
 
   /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
-  * Wanderung wird erst am Ende von demographics () ausgefuehrt.
-  * emigrants[] ist local, weil r->newpeasants durch die Monster
-  * vielleicht schon hochgezaehlt worden ist. */
+   * Wanderung wird erst am Ende von demographics () ausgefuehrt.
+   * emigrants[] ist local, weil r->newpeasants durch die Monster
+   * vielleicht schon hochgezaehlt worden ist. */
 
   for (d = 0; d != MAXDIRECTIONS; d++)
     emigrants[d] = 0;
@@ -164,8 +164,9 @@ scareaway(region * r, int anzahl)
   p = rpeasants(r);
   assert(p >= 0 && anzahl >= 0);
   for (n = MIN(p, anzahl); n; n--) {
-    direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
-    region * rc = rconnect(r, dir);
+    direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
+
+    region *rc = rconnect(r, dir);
 
     if (rc && fval(rc->terrain, LAND_REGION)) {
       ++diff;
@@ -173,45 +174,43 @@ scareaway(region * r, int anzahl)
       emigrants[dir]++;
     }
   }
-  rsetpeasants(r, p-diff);
+  rsetpeasants(r, p - diff);
   assert(p >= diff);
   return diff;
 }
 
-static void
-scared_by_monster(unit * u)
+static void scared_by_monster(unit * u)
 {
   int n;
 
   switch (old_race(u->race)) {
     case RC_FIREDRAGON:
-      n = rng_int()%160 * u->number;
+      n = rng_int() % 160 * u->number;
       break;
     case RC_DRAGON:
-      n = rng_int()%400 * u->number;
+      n = rng_int() % 400 * u->number;
       break;
     case RC_WYRM:
-      n = rng_int()%1000 * u->number;
+      n = rng_int() % 1000 * u->number;
       break;
     default:
-      n = rng_int()%(u->number/4+1);
+      n = rng_int() % (u->number / 4 + 1);
   }
 
-  if(n > 0) {
+  if (n > 0) {
     n = lovar(n);
     n = MIN(rpeasants(u->region), n);
-    if(n > 0) {
+    if (n > 0) {
       n = scareaway(u->region, n);
-      if(n > 0) {
-        ADDMSG(&u->region->msgs, msg_message("fleescared", 
-          "amount unit", n, u));
+      if (n > 0) {
+        ADDMSG(&u->region->msgs, msg_message("fleescared",
+            "amount unit", n, u));
       }
     }
   }
 }
 
-void
-monster_kills_peasants(unit * u)
+void monster_kills_peasants(unit * u)
 {
   if (!monster_is_waiting(u)) {
     if (u->race->flags & RCF_SCAREPEASANTS) {

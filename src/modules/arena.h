@@ -26,11 +26,11 @@ extern "C" {
 #error "must define ARENA_MODULE to use this module"
 #endif
 /* exports: */
-extern struct plane * arena;
+  extern struct plane *arena;
 
-extern void register_arena(void);
+  extern void register_arena(void);
 #ifdef ARENA_CREATION
-extern void create_arena(void);
+  extern void create_arena(void);
 #endif
 
 #ifdef __cplusplus

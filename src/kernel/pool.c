@@ -37,24 +37,27 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define TODO_POOL
 #undef TODO_RESOURCES
 
-int
-get_resource(const unit * u, const resource_type * rtype)
+int get_resource(const unit * u, const resource_type * rtype)
 {
-  const item_type * itype = resource2item(rtype);
+  const item_type *itype = resource2item(rtype);
 
   if (rtype->uget) {
     /* this resource is probably special */
     int i = rtype->uget(u, rtype);
-    if (i>=0) return i;
+
+    if (i >= 0)
+      return i;
   }
-  if (itype!=NULL) {
-    if (itype == olditemtype[R_STONE] && (u->race->flags&RCF_STONEGOLEM)) {
-      return u->number*GOLEM_STONE;
-    } else if (itype==olditemtype[R_IRON] && (u->race->flags&RCF_IRONGOLEM)) {
-      return u->number*GOLEM_IRON;
+  if (itype != NULL) {
+    if (itype == olditemtype[R_STONE] && (u->race->flags & RCF_STONEGOLEM)) {
+      return u->number * GOLEM_STONE;
+    } else if (itype == olditemtype[R_IRON] && (u->race->flags & RCF_IRONGOLEM)) {
+      return u->number * GOLEM_IRON;
     } else {
-      const item * i = *i_findc(&u->items, itype);
-      if (i) return i->number;
+      const item *i = *i_findc(&u->items, itype);
+
+      if (i)
+        return i->number;
       return 0;
     }
   }
@@ -66,8 +69,7 @@ get_resource(const unit * u, const resource_type * rtype)
   return 0;
 }
 
-int
-change_resource(unit * u, const resource_type * rtype, int change)
+int change_resource(unit * u, const resource_type * rtype, int change)
 {
   int i = 0;
 
@@ -79,38 +81,40 @@ change_resource(unit * u, const resource_type * rtype, int change)
     i = change_maxspellpoints(u, change);
   else
     assert(!"undefined resource detected. rtype->uchange not initialized.");
-  assert(i >= 0 && (i < 100000000));  /* soft test to catch mischief */
+  assert(i >= 0 && (i < 100000000));    /* soft test to catch mischief */
   return i;
 }
 
-int
-get_reservation(const unit * u, const resource_type * rtype)
+int get_reservation(const unit * u, const resource_type * rtype)
 {
-  struct reservation * res = u->reservations;
+  struct reservation *res = u->reservations;
 
-  if (rtype==oldresourcetype[R_STONE] && (u->race->flags&RCF_STONEGOLEM))
+  if (rtype == oldresourcetype[R_STONE] && (u->race->flags & RCF_STONEGOLEM))
     return (u->number * GOLEM_STONE);
-  if (rtype==oldresourcetype[R_IRON] && (u->race->flags&RCF_IRONGOLEM))
+  if (rtype == oldresourcetype[R_IRON] && (u->race->flags & RCF_IRONGOLEM))
     return (u->number * GOLEM_IRON);
-  while (res && res->type!=rtype) res=res->next;
-  if (res) return res->value;
+  while (res && res->type != rtype)
+    res = res->next;
+  if (res)
+    return res->value;
   return 0;
 }
 
-int
-change_reservation(unit * u, const resource_type * rtype, int value)
+int change_reservation(unit * u, const resource_type * rtype, int value)
 {
-  struct reservation *res, ** rp = &u->reservations;
+  struct reservation *res, **rp = &u->reservations;
 
-  if (!value) return 0;
+  if (!value)
+    return 0;
 
-  while (*rp && (*rp)->type!=rtype) rp=&(*rp)->next;
+  while (*rp && (*rp)->type != rtype)
+    rp = &(*rp)->next;
   res = *rp;
   if (!res) {
     *rp = res = calloc(sizeof(struct reservation), 1);
     res->type = rtype;
     res->value = value;
-  } else if (res && res->value+value<=0) {
+  } else if (res && res->value + value <= 0) {
     *rp = res->next;
     free(res);
     return 0;
@@ -120,19 +124,20 @@ change_reservation(unit * u, const resource_type * rtype, int value)
   return res->value;
 }
 
-static int
-new_set_resvalue(unit * u, const resource_type * rtype, int value)
+static int new_set_resvalue(unit * u, const resource_type * rtype, int value)
 {
-  struct reservation *res, ** rp = &u->reservations;
+  struct reservation *res, **rp = &u->reservations;
 
-  while (*rp && (*rp)->type!=rtype) rp=&(*rp)->next;
+  while (*rp && (*rp)->type != rtype)
+    rp = &(*rp)->next;
   res = *rp;
   if (!res) {
-    if (!value) return 0;
+    if (!value)
+      return 0;
     *rp = res = calloc(sizeof(struct reservation), 1);
     res->type = rtype;
     res->value = value;
-  } else if (res && value<=0) {
+  } else if (res && value <= 0) {
     *rp = res->next;
     free(res);
     return 0;
@@ -143,39 +148,53 @@ new_set_resvalue(unit * u, const resource_type * rtype, int value)
 }
 
 int
-get_pooled(const unit * u, const resource_type * rtype, unsigned int mode, int count)
+get_pooled(const unit * u, const resource_type * rtype, unsigned int mode,
+  int count)
 {
-  const faction * f = u->faction;
+  const faction *f = u->faction;
+
   unit *v;
+
   int use = 0;
-  region * r = u->region;
+
+  region *r = u->region;
+
   int have = get_resource(u, rtype);
 
   if ((u->race->ec_flags & GETITEM) == 0) {
-    mode &= (GET_SLACK|GET_RESERVE);
+    mode &= (GET_SLACK | GET_RESERVE);
   }
 
-  if ((mode & GET_SLACK) && (mode & GET_RESERVE)) use = have;
+  if ((mode & GET_SLACK) && (mode & GET_RESERVE))
+    use = have;
   else {
     int reserve = get_reservation(u, rtype);
-    int slack = MAX(0, have-reserve);
-    if (mode & GET_RESERVE) use = have-slack;
-    else if (mode & GET_SLACK) use = slack;
+
+    int slack = MAX(0, have - reserve);
+
+    if (mode & GET_RESERVE)
+      use = have - slack;
+    else if (mode & GET_SLACK)
+      use = slack;
   }
-  if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK|GET_RESERVE)) {
-    for (v = r->units; v && use<count; v = v->next) if (u!=v) {
-      int mask;
+  if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
+    for (v = r->units; v && use < count; v = v->next)
+      if (u != v) {
+        int mask;
 
-      if (v->items==NULL && rtype->uget==NULL) continue;
-      if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
+        if (v->items == NULL && rtype->uget == NULL)
+          continue;
+        if ((urace(v)->ec_flags & GIVEITEM) == 0)
+          continue;
 
-      if (v->faction == f) {
-        mask = (mode >> 3) & (GET_SLACK|GET_RESERVE);
+        if (v->faction == f) {
+          mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
+        } else if (alliedunit(v, f, HELP_MONEY))
+          mask = (mode >> 6) & (GET_SLACK | GET_RESERVE);
+        else
+          continue;
+        use += get_pooled(v, rtype, mask, count - use);
       }
-      else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
-      else continue;
-      use += get_pooled(v, rtype, mask, count-use);
-    }
   }
   return use;
 }
@@ -184,73 +203,85 @@ int
 use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
 {
   const faction *f = u->faction;
+
   unit *v;
+
   int use = count;
-  region * r = u->region;
+
+  region *r = u->region;
+
   int n = 0, have = get_resource(u, rtype);
 
   if ((u->race->ec_flags & GETITEM) == 0) {
-    mode &= (GET_SLACK|GET_RESERVE);
+    mode &= (GET_SLACK | GET_RESERVE);
   }
 
   if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
     n = MIN(use, have);
   } else {
     int reserve = get_reservation(u, rtype);
-    int slack = MAX(0, have-reserve);
+
+    int slack = MAX(0, have - reserve);
+
     if (mode & GET_RESERVE) {
-      n = have-slack;
+      n = have - slack;
       n = MIN(use, n);
       change_reservation(u, rtype, -n);
-    }
-    else if (mode & GET_SLACK) {
+    } else if (mode & GET_SLACK) {
       n = MIN(use, slack);
     }
   }
-  if (n>0) {
+  if (n > 0) {
     change_resource(u, rtype, -n);
     use -= n;
   }
 
-  if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK|GET_RESERVE)) {
-    for (v = r->units; use>0 && v!=NULL; v = v->next) if (u!=v) {
-      int mask;
-      if ((urace(v)->ec_flags & GIVEITEM) == 0) continue;
-      if (v->items==NULL && rtype->uget==NULL) continue;
+  if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
+    for (v = r->units; use > 0 && v != NULL; v = v->next)
+      if (u != v) {
+        int mask;
 
-      if (v->faction == f) {
-        mask = (mode >> 3) & (GET_SLACK|GET_RESERVE);
+        if ((urace(v)->ec_flags & GIVEITEM) == 0)
+          continue;
+        if (v->items == NULL && rtype->uget == NULL)
+          continue;
+
+        if (v->faction == f) {
+          mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
+        } else if (alliedunit(v, f, HELP_MONEY))
+          mask = (mode >> 6) & (GET_SLACK | GET_RESERVE);
+        else
+          continue;
+        use -= use_pooled(v, rtype, mask, use);
       }
-      else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
-      else continue;
-      use -= use_pooled(v, rtype, mask, use);
-    }
   }
-  return count-use;
+  return count - use;
 }
 
 
-int
-reserve_cmd(unit * u, struct order *ord)
+int reserve_cmd(unit * u, struct order *ord)
 {
   if (u->number > 0 && (urace(u)->ec_flags & GETITEM)) {
     int use, count;
-    const resource_type * rtype;
-    const char * s;
+
+    const resource_type *rtype;
+
+    const char *s;
 
     init_tokens(ord);
     skip_token();
     s = getstrtoken();
     count = atoip((const char *)s);
 
-    if (count == 0 && findparam(s, u->faction->locale)==P_EACH) {
+    if (count == 0 && findparam(s, u->faction->locale) == P_EACH) {
       count = getint() * u->number;
     }
 
     rtype = findresourcetype(getstrtoken(), u->faction->locale);
-    if (rtype == NULL) return 0;
+    if (rtype == NULL)
+      return 0;
 
-    new_set_resvalue(u, rtype, 0);  /* make sure the pool is empty */
+    new_set_resvalue(u, rtype, 0);      /* make sure the pool is empty */
     use = use_pooled(u, rtype, GET_DEFAULT, count);
     if (use) {
       new_set_resvalue(u, rtype, use);
@@ -259,4 +290,3 @@ reserve_cmd(unit * u, struct order *ord)
   }
   return 0;
 }
-

@@ -37,13 +37,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ** killunit
  **/
 
-static int
-killunit_handle(trigger * t, void * data)
+static int killunit_handle(trigger * t, void *data)
 {
   /* call an event handler on killunit.
-  * data.v -> ( variant event, int timer )
-  */
-  unit * u = (unit*)t->data.v;
+   * data.v -> ( variant event, int timer )
+   */
+  unit *u = (unit *) t->data.v;
+
   if (u) {
     /* we can't remove_unit() here, because that's what's calling us. */
     set_number(u, 0);
@@ -52,36 +52,36 @@ killunit_handle(trigger * t, void * data)
   return 0;
 }
 
-static void
-killunit_write(const trigger * t, struct storage * store)
+static void killunit_write(const trigger * t, struct storage *store)
 {
-  unit * u = (unit*)t->data.v;
+  unit *u = (unit *) t->data.v;
+
   write_unit_reference(u, store);
 }
 
-static int
-killunit_read(trigger * t, struct storage * store)
+static int killunit_read(trigger * t, struct storage *store)
 {
-  int result = read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
-  if (result==0 && t->data.v==NULL) {
+  int result =
+    read_reference(&t->data.v, store, read_unit_reference, resolve_unit);
+  if (result == 0 && t->data.v == NULL) {
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
 }
 
 trigger_type tt_killunit = {
-	"killunit",
-	NULL,
-	NULL,
-	killunit_handle,
-	killunit_write,
-	killunit_read
+  "killunit",
+  NULL,
+  NULL,
+  killunit_handle,
+  killunit_write,
+  killunit_read
 };
 
-trigger * 
-trigger_killunit(unit * u)
+trigger *trigger_killunit(unit * u)
 {
-	trigger * t = t_new(&tt_killunit);
-	t->data.v = (void*)u;
-	return t;
+  trigger *t = t_new(&tt_killunit);
+
+  t->data.v = (void *)u;
+  return t;
 }

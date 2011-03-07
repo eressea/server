@@ -24,19 +24,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 attrib_type at_iceberg = {
-	"iceberg_drift",
-	NULL,
-	NULL,
-	NULL,
-	a_writeint,
-	a_readint,
-	ATF_UNIQUE
+  "iceberg_drift",
+  NULL,
+  NULL,
+  NULL,
+  a_writeint,
+  a_readint,
+  ATF_UNIQUE
 };
 
-attrib *
-make_iceberg(direction_t dir)
+attrib *make_iceberg(direction_t dir)
 {
-	attrib * a = a_new(&at_iceberg);
-	a->data.i = (int)dir;
-	return a;
+  attrib *a = a_new(&at_iceberg);
+
+  a->data.i = (int)dir;
+  return a;
 }

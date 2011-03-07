@@ -22,22 +22,22 @@ extern "C" {
 #endif
 
 /* see http://en.wikipedia.org/wiki/Unrolled_linked_list */
-typedef struct quicklist quicklist;
-void * ql_get(const struct quicklist * ql, int index);
-int ql_length(const struct quicklist * ql);
-int ql_empty(const struct quicklist * ql);
-void ql_push(struct quicklist ** qlp, void * data);
-int ql_delete(struct quicklist ** qlp, int index);
-int ql_insert(struct quicklist ** qlp, int index, void * data);
-void ql_foreach(struct quicklist * ql, void (*cb)(void *));
-int ql_advance(struct quicklist ** iterator, int * index, int stride);
-void ql_free(struct quicklist * ql);
-void * ql_replace(struct quicklist * ql, int index, void * data);
+  typedef struct quicklist quicklist;
+  void *ql_get(const struct quicklist *ql, int index);
+  int ql_length(const struct quicklist *ql);
+  int ql_empty(const struct quicklist *ql);
+  void ql_push(struct quicklist **qlp, void *data);
+  int ql_delete(struct quicklist **qlp, int index);
+  int ql_insert(struct quicklist **qlp, int index, void *data);
+  void ql_foreach(struct quicklist *ql, void (*cb) (void *));
+  int ql_advance(struct quicklist **iterator, int *index, int stride);
+  void ql_free(struct quicklist *ql);
+  void *ql_replace(struct quicklist *ql, int index, void *data);
 
 /* you can use it as a set (sorted pointers)*/
-int ql_set_insert(struct quicklist ** qlp, void * data);
-int ql_set_find(struct quicklist ** qlp, int * qip, const void * data);
-int ql_set_remove(struct quicklist ** qlp, void * data);
+  int ql_set_insert(struct quicklist **qlp, void *data);
+  int ql_set_find(struct quicklist **qlp, int *qip, const void *data);
+  int ql_set_remove(struct quicklist **qlp, void *data);
 
 #ifdef __cplusplus
 }

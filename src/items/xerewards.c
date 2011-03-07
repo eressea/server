@@ -39,7 +39,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 
 static int
-use_skillpotion(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+use_skillpotion(struct unit *u, const struct item_type *itype, int amount,
+  struct order *ord)
 {
   /* the problem with making this a lua function is that there's no way
    * to get the list of skills for a unit. and with the way skills are 
@@ -47,11 +48,15 @@ use_skillpotion(struct unit * u, const struct item_type * itype, int amount, str
    * from them)
    */
   int n;
-  for (n=0;n!=amount;++n) {
-    skill * sv = u->skills;
-    while (sv!=u->skills+u->skill_size) {
+
+  for (n = 0; n != amount; ++n) {
+    skill *sv = u->skills;
+
+    while (sv != u->skills + u->skill_size) {
       int i;
-      for (i=0;i!=3;++i) learn_skill(u, sv->id, 1.0);
+
+      for (i = 0; i != 3; ++i)
+        learn_skill(u, sv->id, 1.0);
       ++sv;
     }
   }
@@ -62,30 +67,29 @@ use_skillpotion(struct unit * u, const struct item_type * itype, int amount, str
 }
 
 static int
-use_manacrystal(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
+  struct order *ord)
 {
-	int i, sp = 0;
+  int i, sp = 0;
 
-	if(!is_mage(u)) {
-		cmistake(u, u->thisorder, 295, MSG_EVENT);
-		return -1;
-	}
+  if (!is_mage(u)) {
+    cmistake(u, u->thisorder, 295, MSG_EVENT);
+    return -1;
+  }
 
-	for (i=0;i!=amount;++i) {
-		sp += MAX(25, max_spellpoints(u->region, u)/2);
-		change_spellpoints(u, sp);
-	}
+  for (i = 0; i != amount; ++i) {
+    sp += MAX(25, max_spellpoints(u->region, u) / 2);
+    change_spellpoints(u, sp);
+  }
 
   ADDMSG(&u->faction->msgs, msg_message("manacrystal_use", "unit aura", u, sp));
 
-	res_changeitem(u, itype->rtype, -amount);
-	return 0;
+  res_changeitem(u, itype->rtype, -amount);
+  return 0;
 }
 
-void
-register_xerewards(void)
+void register_xerewards(void)
 {
   register_item_use(use_skillpotion, "use_skillpotion");
   register_item_use(use_manacrystal, "use_manacrystal");
 }
-

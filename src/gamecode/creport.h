@@ -17,13 +17,12 @@ extern "C" {
 
 #include <time.h>
 
-extern void creport_cleanup(void);
-extern void register_cr(void);
+  extern void creport_cleanup(void);
+  extern void register_cr(void);
 
-extern int crwritemap(const char * filename);
+  extern int crwritemap(const char *filename);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-

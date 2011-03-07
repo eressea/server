@@ -32,8 +32,8 @@ extern "C" {
 
   /* Prototypen */
 
-  int use_item_power(struct region * r, struct unit * u);
-  int use_item_regeneration(struct region * r, struct unit * u);
+  int use_item_power(struct region *r, struct unit *u);
+  int use_item_regeneration(struct region *r, struct unit *u);
   void showspells(struct region *r, struct unit *u);
   int sp_antimagiczone(struct castorder *co);
 
@@ -42,19 +42,18 @@ extern "C" {
   extern struct attrib_type at_unitdissolve;
   extern struct attrib_type at_wdwpyramid;
 
-  extern struct quicklist * spells;
-  extern void register_spell(struct spell * sp);
-  extern struct spell * find_spell(magic_t mtype, const char * name);
-  extern struct spell * find_spellbyid(magic_t mtype, spellid_t i);
-  extern struct spell *get_spellfromtoken(struct unit *u, const char *s, const struct locale * lang);
+  extern struct quicklist *spells;
+  extern void register_spell(struct spell *sp);
+  extern struct spell *find_spell(magic_t mtype, const char *name);
+  extern struct spell *find_spellbyid(magic_t mtype, spellid_t i);
+  extern struct spell *get_spellfromtoken(struct unit *u, const char *s,
+    const struct locale *lang);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-
-/* ------------------------------------------------------------- */
-/* Erläuterungen zu den Spruchdefinitionen
+/* ------------------------------------------------------------- *//* Erläuterungen zu den Spruchdefinitionen
  *
  * Spruchstukturdefinition:
  * spell{
@@ -154,6 +153,4 @@ extern "C" {
  * Ist eins von mehreren Zielobjekten nicht gefunden worden, so ist
  * pa->param[n]->flag == TARGET_NOTFOUND
  *
- */
-/* ------------------------------------------------------------- */
-
+ *//* ------------------------------------------------------------- */

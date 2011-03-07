@@ -22,11 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-extern int atoi36(const char * s);
-extern const char* itoab(int i, int base);
-extern const char* itoa36(int i);
-extern const char* itoa10(int i);
-extern int i10toi36(int i);
+  extern int atoi36(const char *s);
+  extern const char *itoab(int i, int base);
+  extern const char *itoa36(int i);
+  extern const char *itoa10(int i);
+  extern int i10toi36(int i);
 
 #ifdef __cplusplus
 }

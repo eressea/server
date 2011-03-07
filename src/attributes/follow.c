@@ -26,10 +26,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/storage.h>
 #include <util/variant.h>
 
-static int
-read_follow(attrib * a, void * owner, struct storage * store)
+static int read_follow(attrib * a, void *owner, struct storage *store)
 {
-  read_unit_reference(store); /* skip it */
+  read_unit_reference(store);   /* skip it */
   return AT_READ_FAIL;
 }
 
@@ -37,10 +36,10 @@ attrib_type at_follow = {
   "follow", NULL, NULL, NULL, NULL, read_follow
 };
 
-attrib *
-make_follow(struct unit * u)
+attrib *make_follow(struct unit * u)
 {
-  attrib * a = a_new(&at_follow);
+  attrib *a = a_new(&at_follow);
+
   a->data.v = u;
   return a;
 }

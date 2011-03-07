@@ -29,39 +29,42 @@
 
 typedef struct command {
   parser fun;
-  struct tnode * nodes;
+  struct tnode *nodes;
 } command;
 
-tnode *
-stree_find(const syntaxtree * stree, const struct locale * lang)
+tnode *stree_find(const syntaxtree * stree, const struct locale *lang)
 {
   while (stree) {
-    if (stree->lang==lang) return stree->root;
+    if (stree->lang == lang)
+      return stree->root;
     stree = stree->next;
   }
   return NULL;
 }
 
-syntaxtree *
-stree_create(void)
+syntaxtree *stree_create(void)
 {
-  syntaxtree * sroot = NULL;
-  const struct locale * lang = locales;
+  syntaxtree *sroot = NULL;
+
+  const struct locale *lang = locales;
+
   while (lang) {
-    syntaxtree * stree = (syntaxtree *)malloc(sizeof(syntaxtree));
+    syntaxtree *stree = (syntaxtree *) malloc(sizeof(syntaxtree));
+
     stree->lang = lang;
     stree->next = sroot;
-    sroot=stree;
-    lang=nextlocale(lang);
+    sroot = stree;
+    lang = nextlocale(lang);
   }
   return sroot;
 }
 
 void
-add_command(struct tnode * keys, struct tnode * tnext, 
-            const char * str, parser fun)
+add_command(struct tnode *keys, struct tnode *tnext,
+  const char *str, parser fun)
 {
-  command * cmd = (command *)malloc(sizeof(command));
+  command *cmd = (command *) malloc(sizeof(command));
+
   variant var;
 
   cmd->fun = fun;
@@ -70,15 +73,16 @@ add_command(struct tnode * keys, struct tnode * tnext,
   addtoken(keys, str, var);
 }
 
-static int
-do_command_i(const struct tnode * keys, void * u, struct order * ord)
+static int do_command_i(const struct tnode *keys, void *u, struct order *ord)
 {
-  const char * c;
+  const char *c;
+
   variant var;
 
   c = getstrtoken();
-  if (findtoken(keys, c, &var)==E_TOK_SUCCESS) {
-    command * cmd = (command *)var.v;
+  if (findtoken(keys, c, &var) == E_TOK_SUCCESS) {
+    command *cmd = (command *) var.v;
+
     if (cmd->nodes && *c) {
       assert(!cmd->fun);
       return do_command_i(cmd->nodes, u, ord);
@@ -90,13 +94,13 @@ do_command_i(const struct tnode * keys, void * u, struct order * ord)
   return E_TOK_NOMATCH;
 }
 
-void
-do_command(const struct tnode * keys, void * u, struct order * ord)
+void do_command(const struct tnode *keys, void *u, struct order *ord)
 {
   init_tokens(ord);
   skip_token();
-  if (do_command_i(keys, u, ord)!=E_TOK_SUCCESS) {
-    char * cmd = getcommand(ord);
+  if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {
+    char *cmd = getcommand(ord);
+
     log_warning(("%s failed command '%s'\n", unitname(u), cmd));
     free(cmd);
   }

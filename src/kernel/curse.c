@@ -59,35 +59,33 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define MAXENTITYHASH 7919
 curse *cursehash[MAXENTITYHASH];
 
-void
-c_setflag(curse *c, unsigned int flags)
+void c_setflag(curse * c, unsigned int flags)
 {
   assert(c);
   c->flags = (c->flags & ~flags) | (flags & (c->type->flags ^ flags));
 }
+
 /* -------------------------------------------------------------------------- */
-void
-c_clearflag(curse *c, unsigned int flags)
+void c_clearflag(curse * c, unsigned int flags)
 {
   assert(c);
   c->flags = (c->flags & ~flags) | (c->type->flags & flags);
 }
 
-void
-chash(curse *c)
+void chash(curse * c)
 {
-  curse *old = cursehash[c->no %MAXENTITYHASH];
+  curse *old = cursehash[c->no % MAXENTITYHASH];
 
-  cursehash[c->no %MAXENTITYHASH] = c;
+  cursehash[c->no % MAXENTITYHASH] = c;
   c->nexthash = old;
 }
 
-static void
-cunhash(curse *c)
+static void cunhash(curse * c)
 {
   curse **show;
 
-  for (show = &cursehash[c->no % MAXENTITYHASH]; *show; show = &(*show)->nexthash) {
+  for (show = &cursehash[c->no % MAXENTITYHASH]; *show;
+    show = &(*show)->nexthash) {
     if ((*show)->no == c->no)
       break;
   }
@@ -98,8 +96,7 @@ cunhash(curse *c)
   }
 }
 
-curse *
-cfindhash(int i)
+curse *cfindhash(int i)
 {
   curse *old;
 
@@ -111,15 +108,15 @@ cfindhash(int i)
 
 /* ------------------------------------------------------------- */
 /* at_curse */
-void
-curse_init(attrib * a) {
+void curse_init(attrib * a)
+{
   a->data.v = calloc(1, sizeof(curse));
 }
 
-int
-curse_age(attrib * a)
+int curse_age(attrib * a)
 {
-  curse * c = (curse*)a->data.v;
+  curse *c = (curse *) a->data.v;
+
   int result = 0;
 
   if (c_flags(c) & CURSE_NOAGE) {
@@ -128,44 +125,56 @@ curse_age(attrib * a)
   if (c->type->age) {
     result = c->type->age(c);
   }
-  if (result!=0) {
+  if (result != 0) {
     c->duration = 0;
-  } else if (c->duration!=INT_MAX) {
-    c->duration = MAX(0, c->duration-1);
+  } else if (c->duration != INT_MAX) {
+    c->duration = MAX(0, c->duration - 1);
   }
   return c->duration;
 }
 
-void
-destroy_curse(curse * c)
+void destroy_curse(curse * c)
 {
   cunhash(c);
   free(c);
 }
 
-void
-curse_done(attrib * a) {
-  destroy_curse((curse *)a->data.v);
+void curse_done(attrib * a)
+{
+  destroy_curse((curse *) a->data.v);
 }
 
 /** reads curses that have been removed from the code */
-static int
-read_ccompat(const char * cursename, struct storage * store)
+static int read_ccompat(const char *cursename, struct storage *store)
 {
   struct compat {
-    const char * name;
-    const char * tokens;
-  } * seek, old_curses[] = { {"disorientationzone", ""}, {"shipdisorientation", ""}, { NULL, NULL } } ;
-  for (seek=old_curses;seek->name;++seek) {
-    if (strcmp(seek->tokens, cursename)==0) {
-      const char * p;
-      for (p=seek->name;p;++p) {
+    const char *name;
+    const char *tokens;
+  } *seek, old_curses[] = { {
+  "disorientationzone", ""}, {
+  "shipdisorientation", ""}, {
+  NULL, NULL}};
+  for (seek = old_curses; seek->name; ++seek) {
+    if (strcmp(seek->tokens, cursename) == 0) {
+      const char *p;
+
+      for (p = seek->name; p; ++p) {
         switch (*p) {
-          case 'd': store->r_int(store); break;
-          case 's': store->r_str(store); break;
-          case 't': store->r_tok(store); break;
-          case 'i': store->r_id(store); break;
-          case 'f': store->r_flt(store); break;
+          case 'd':
+            store->r_int(store);
+            break;
+          case 's':
+            store->r_str(store);
+            break;
+          case 't':
+            store->r_tok(store);
+            break;
+          case 'i':
+            store->r_id(store);
+            break;
+          case 'f':
+            store->r_flt(store);
+            break;
         }
       }
       return 0;
@@ -174,12 +183,14 @@ read_ccompat(const char * cursename, struct storage * store)
   return -1;
 }
 
-int
-curse_read(attrib * a, void * owner, struct storage * store)
+int curse_read(attrib * a, void *owner, struct storage *store)
 {
-  curse * c = (curse*)a->data.v;
+  curse *c = (curse *) a->data.v;
+
   int ur;
+
   char cursename[64];
+
   unsigned int flags;
 
   c->no = store->r_int(store);
@@ -191,25 +202,28 @@ curse_read(attrib * a, void * owner, struct storage * store)
     c->vigour = store->r_flt(store);
   } else {
     int vigour = store->r_int(store);
+
     c->vigour = vigour;
   }
-  if (store->version<INTPAK_VERSION) {
+  if (store->version < INTPAK_VERSION) {
     ur = read_reference(&c->magician, store, read_int, resolve_unit);
   } else {
     ur = read_reference(&c->magician, store, read_unit_reference, resolve_unit);
   }
-  if (store->version<CURSEFLOAT_VERSION) {
+  if (store->version < CURSEFLOAT_VERSION) {
     c->effect = (double)store->r_int(store);
   } else {
     c->effect = store->r_flt(store);
   }
   c->type = ct_find(cursename);
-  if (c->type==NULL) {
+  if (c->type == NULL) {
     int result = read_ccompat(cursename, store);
-    if (result!=0) {
-      log_error(("missing curse %s, no compatibility code either.\n", cursename));
+
+    if (result != 0) {
+      log_error(("missing curse %s, no compatibility code either.\n",
+          cursename));
     }
-    assert(result==0);
+    assert(result == 0);
     return AT_READ_FAIL;
   }
   if (store->version < CURSEFLAGS_VERSION) {
@@ -218,14 +232,17 @@ curse_read(attrib * a, void * owner, struct storage * store)
     c->flags = flags;
   }
   c_clearflag(c, CURSE_ISNEW);
-  
-  if (c->type->read) c->type->read(store, c, owner);
-  else if (c->type->typ==CURSETYP_UNIT) {
+
+  if (c->type->read)
+    c->type->read(store, c, owner);
+  else if (c->type->typ == CURSETYP_UNIT) {
     c->data.i = store->r_int(store);
   }
   if (c->type->typ == CURSETYP_REGION) {
-    int rr = read_reference(&c->data.v, store, read_region_reference, RESOLVE_REGION(store->version));
-    if (ur==0 && rr==0 && !c->data.v) {
+    int rr =
+      read_reference(&c->data.v, store, read_region_reference,
+      RESOLVE_REGION(store->version));
+    if (ur == 0 && rr == 0 && !c->data.v) {
       return AT_READ_FAIL;
     }
   }
@@ -233,13 +250,15 @@ curse_read(attrib * a, void * owner, struct storage * store)
   return AT_READ_OK;
 }
 
-void
-curse_write(const attrib * a, const void * owner, struct storage * store)
+void curse_write(const attrib * a, const void *owner, struct storage *store)
 {
   unsigned int flags;
-  curse * c = (curse*)a->data.v;
-  const curse_type * ct = c->type;
-  unit * mage = (c->magician && c->magician->number)?c->magician:NULL;
+
+  curse *c = (curse *) a->data.v;
+
+  const curse_type *ct = c->type;
+
+  unit *mage = (c->magician && c->magician->number) ? c->magician : NULL;
 
   /* copied from c_clearflag */
   flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
@@ -252,17 +271,17 @@ curse_write(const attrib * a, const void * owner, struct storage * store)
   write_unit_reference(mage, store);
   store->w_flt(store, (float)c->effect);
 
-  if (c->type->write) c->type->write(store, c, owner);
+  if (c->type->write)
+    c->type->write(store, c, owner);
   else if (c->type->typ == CURSETYP_UNIT) {
     store->w_int(store, c->data.i);
   }
   if (c->type->typ == CURSETYP_REGION) {
-    write_region_reference((region*)c->data.v, store);
+    write_region_reference((region *) c->data.v, store);
   }
 }
 
-attrib_type at_curse =
-{
+attrib_type at_curse = {
   "curse",
   curse_init,
   curse_done,
@@ -271,37 +290,40 @@ attrib_type at_curse =
   curse_read,
   ATF_CURSE
 };
+
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
 #include <util/umlaut.h>
 #include <util/quicklist.h>
 
-static quicklist * cursetypes[256];
+static quicklist *cursetypes[256];
 
-void
-ct_register(const curse_type * ct)
+void ct_register(const curse_type * ct)
 {
   unsigned int hash = tolower(ct->cname[0]);
-  quicklist ** ctlp = cursetypes+hash;
+
+  quicklist **ctlp = cursetypes + hash;
 
   ql_set_insert(ctlp, (void *)ct);
 }
 
-const curse_type *
-ct_find(const char *c)
+const curse_type *ct_find(const char *c)
 {
   unsigned int hash = tolower(c[0]);
-  quicklist * ctl = cursetypes[hash];
+
+  quicklist *ctl = cursetypes[hash];
+
   int qi;
 
-  for (qi=0;ctl;ql_advance(&ctl, &qi, 1)) {
-    curse_type * type = (curse_type*)ql_get(ctl, qi);
+  for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
+    curse_type *type = (curse_type *) ql_get(ctl, qi);
 
-    if (strcmp(c, type->cname)==0) {
+    if (strcmp(c, type->cname) == 0) {
       return type;
     } else {
       size_t k = MIN(strlen(c), strlen(type->cname));
+
       if (!strncasecmp(c, type->cname, k)) {
         return type;
       }
@@ -315,47 +337,56 @@ ct_find(const char *c)
  * einen pointer auf die struct zurück.
  */
 
-boolean
-cmp_curse(const attrib * a, const void * data) {
-  const curse * c = (const curse*)data;
+boolean cmp_curse(const attrib * a, const void *data)
+{
+  const curse *c = (const curse *)data;
+
   if (a->type->flags & ATF_CURSE) {
-    if (!data || c == (curse*)a->data.v) return true;
+    if (!data || c == (curse *) a->data.v)
+      return true;
   }
   return false;
 }
 
-boolean
-cmp_cursetype(const attrib * a, const void * data)
+boolean cmp_cursetype(const attrib * a, const void *data)
 {
-  const curse_type * ct = (const curse_type *)data;
+  const curse_type *ct = (const curse_type *)data;
+
   if (a->type->flags & ATF_CURSE) {
-    if (!data || ct == ((curse*)a->data.v)->type) return true;
+    if (!data || ct == ((curse *) a->data.v)->type)
+      return true;
   }
   return false;
 }
 
-curse *
-get_cursex(attrib *ap, const curse_type * ctype, variant data, boolean(*compare)(const curse *, variant))
+curse *get_cursex(attrib * ap, const curse_type * ctype, variant data,
+  boolean(*compare) (const curse *, variant))
 {
-  attrib * a = a_select(ap, ctype, cmp_cursetype);
+  attrib *a = a_select(ap, ctype, cmp_cursetype);
+
   while (a) {
-    curse * c = (curse*)a->data.v;
-    if (compare(c, data)) return c;
+    curse *c = (curse *) a->data.v;
+
+    if (compare(c, data))
+      return c;
     a = a_select(a->next, ctype, cmp_cursetype);
   }
   return NULL;
 }
 
-curse *
-get_curse(attrib *ap, const curse_type * ctype)
+curse *get_curse(attrib * ap, const curse_type * ctype)
 {
-  attrib * a = ap;
+  attrib *a = ap;
+
   while (a) {
     if (a->type->flags & ATF_CURSE) {
-      const attrib_type * at = a->type;
-      while (a && a->type==at) {
-        curse* c = (curse *)a->data.v;
-        if (c->type==ctype) return c;
+      const attrib_type *at = a->type;
+
+      while (a && a->type == at) {
+        curse *c = (curse *) a->data.v;
+
+        if (c->type == ctype)
+          return c;
         a = a->next;
       }
     } else {
@@ -368,33 +399,32 @@ get_curse(attrib *ap, const curse_type * ctype)
 /* ------------------------------------------------------------- */
 /* findet einen curse global anhand seiner 'curse-Einheitnummer' */
 
-curse *
-findcurse(int cid)
+curse *findcurse(int cid)
 {
   return cfindhash(cid);
 }
 
 /* ------------------------------------------------------------- */
-void
-remove_curse(attrib **ap, const curse *c)
+void remove_curse(attrib ** ap, const curse * c)
 {
   attrib *a = a_select(*ap, c, cmp_curse);
-  if (a) a_remove(ap, a);
+
+  if (a)
+    a_remove(ap, a);
 }
 
 /* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie
  * oben benutzt. Dies ist nicht die Wirkung, sondern die Kraft und
  * damit der gegen Antimagie wirkende Widerstand einer Verzauberung */
-static double
-get_cursevigour(const curse *c)
+static double get_cursevigour(const curse * c)
 {
-  if (c) return c->vigour;
+  if (c)
+    return c->vigour;
   return 0;
 }
 
 /* setzt die Stärke der Verzauberung auf i */
-static void
-set_cursevigour(curse *c, double vigour)
+static void set_cursevigour(curse * c, double vigour)
 {
   assert(c && vigour > 0);
   c->vigour = vigour;
@@ -404,8 +434,7 @@ set_cursevigour(curse *c, double vigour)
  * Stärke zurück. Sollte die Zauberstärke unter Null sinken, löst er
  * sich auf.
  */
-double
-curse_changevigour(attrib **ap, curse *c, double vigour)
+double curse_changevigour(attrib ** ap, curse * c, double vigour)
 {
   vigour += get_cursevigour(c);
 
@@ -420,27 +449,30 @@ curse_changevigour(attrib **ap, curse *c, double vigour)
 
 /* ------------------------------------------------------------- */
 
-double
-curse_geteffect(const curse *c)
+double curse_geteffect(const curse * c)
 {
-  if (c==NULL) return 0;
-  if (c_flags(c) & CURSE_ISNEW) return 0;
+  if (c == NULL)
+    return 0;
+  if (c_flags(c) & CURSE_ISNEW)
+    return 0;
   return c->effect;
 }
 
-int
-curse_geteffect_int(const curse *c)
+int curse_geteffect_int(const curse * c)
 {
   double effect = curse_geteffect(c);
-  assert(effect-(int)effect == 0);
+
+  assert(effect - (int)effect == 0);
   return (int)effect;
 }
 
 /* ------------------------------------------------------------- */
 static void
-set_curseingmagician(struct unit *magician, struct attrib *ap_target, const curse_type *ct)
+set_curseingmagician(struct unit *magician, struct attrib *ap_target,
+  const curse_type * ct)
 {
-  curse * c = get_curse(ap_target, ct);
+  curse *c = get_curse(ap_target, ct);
+
   if (c) {
     c->magician = magician;
   }
@@ -449,12 +481,12 @@ set_curseingmagician(struct unit *magician, struct attrib *ap_target, const curs
 /* ------------------------------------------------------------- */
 /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
  * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
-int
-get_cursedmen(unit *u, const curse *c)
+int get_cursedmen(unit * u, const curse * c)
 {
   int cursedmen = u->number;
 
-  if (!c) return 0;
+  if (!c)
+    return 0;
 
   /* je nach curse_type andere data struct */
   if (c->type->typ == CURSETYP_UNIT) {
@@ -465,10 +497,10 @@ get_cursedmen(unit *u, const curse *c)
 }
 
 /* setzt die Anzahl der betroffenen Personen auf cursedmen */
-static void
-set_cursedmen(curse *c, int cursedmen)
+static void set_cursedmen(curse * c, int cursedmen)
 {
-  if (!c) return;
+  if (!c)
+    return;
 
   /* je nach curse_type andere data struct */
   if (c->type->typ == CURSETYP_UNIT) {
@@ -480,16 +512,16 @@ set_cursedmen(curse *c, int cursedmen)
 /* Legt eine neue Verzauberung an. Sollte es schon einen Zauber
  * dieses Typs geben, gibt es den bestehenden zurück.
  */
-static curse *
-make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
-    int duration, double effect, int men)
+static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
+  double vigour, int duration, double effect, int men)
 {
   curse *c;
-  attrib * a;
+
+  attrib *a;
 
   a = a_new(&at_curse);
   a_add(ap, a);
-  c = (curse*)a->data.v;
+  c = (curse *) a->data.v;
 
   c->type = ct;
   c->flags = 0;
@@ -519,43 +551,42 @@ make_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
 /* Mapperfunktion für das Anlegen neuer curse. Automatisch wird zum
  * passenden Typ verzweigt und die relevanten Variablen weitergegeben.
  */
-curse *
-create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
-    int duration, double effect, int men)
+curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
+  double vigour, int duration, double effect, int men)
 {
   curse *c;
 
-  /* die Kraft eines Spruchs darf nicht 0 sein*/
+  /* die Kraft eines Spruchs darf nicht 0 sein */
   assert(vigour > 0);
 
   c = get_curse(*ap, ct);
 
-  if (c && (c_flags(c) & CURSE_ONLYONE)){
+  if (c && (c_flags(c) & CURSE_ONLYONE)) {
     return NULL;
   }
-  assert(c==NULL || ct==c->type);
+  assert(c == NULL || ct == c->type);
 
   /* es gibt schon eins diese Typs */
   if (c && ct->mergeflags != NO_MERGE) {
-    if(ct->mergeflags & M_DURATION){
+    if (ct->mergeflags & M_DURATION) {
       c->duration = MAX(c->duration, duration);
     }
-    if(ct->mergeflags & M_SUMDURATION){
+    if (ct->mergeflags & M_SUMDURATION) {
       c->duration += duration;
     }
-    if(ct->mergeflags & M_SUMEFFECT){
+    if (ct->mergeflags & M_SUMEFFECT) {
       c->effect += effect;
     }
-    if(ct->mergeflags & M_MAXEFFECT){
+    if (ct->mergeflags & M_MAXEFFECT) {
       c->effect = MAX(c->effect, effect);
     }
-    if(ct->mergeflags & M_VIGOUR){
+    if (ct->mergeflags & M_VIGOUR) {
       c->vigour = MAX(vigour, c->vigour);
     }
-    if(ct->mergeflags & M_VIGOUR_ADD){
+    if (ct->mergeflags & M_VIGOUR_ADD) {
       c->vigour = vigour + c->vigour;
     }
-    if(ct->mergeflags & M_MEN){
+    if (ct->mergeflags & M_MEN) {
       switch (ct->typ) {
         case CURSETYP_UNIT:
         {
@@ -574,12 +605,14 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
 /* hier müssen alle c-typen, die auf Einheiten gezaubert werden können,
  * berücksichtigt werden */
 
-static void
-do_transfer_curse(curse *c, unit * u, unit * u2, int n)
+static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
 {
   int cursedmen = 0;
+
   int men = get_cursedmen(u, c);
+
   boolean dogive = false;
+
   const curse_type *ct = c->type;
 
   switch ((ct->flags | c->flags) & CURSE_SPREADMASK) {
@@ -591,9 +624,11 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
     case CURSE_SPREADMODULO:
     {
       int i;
+
       int u_number = u->number;
-      for (i=0;i<n+1 && u_number>0;i++){
-        if (rng_int()%u_number < cursedmen){
+
+      for (i = 0; i < n + 1 && u_number > 0; i++) {
+        if (rng_int() % u_number < cursedmen) {
           ++men;
           --cursedmen;
           dogive = true;
@@ -603,7 +638,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
       break;
     }
     case CURSE_SPREADCHANCE:
-      if (chance(u2->number/(double)(u2->number + n))) {
+      if (chance(u2->number / (double)(u2->number + n))) {
         men = u2->number + n;
         dogive = true;
       }
@@ -613,22 +648,24 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
   }
 
   if (dogive == true) {
-    curse * cnew = make_curse(c->magician, &u2->attribs, c->type, c->vigour,
+    curse *cnew = make_curse(c->magician, &u2->attribs, c->type, c->vigour,
       c->duration, c->effect, men);
+
     cnew->flags = c->flags;
 
-    if (ct->typ == CURSETYP_UNIT) set_cursedmen(cnew, men);
+    if (ct->typ == CURSETYP_UNIT)
+      set_cursedmen(cnew, men);
   }
 }
 
-void
-transfer_curse(unit * u, unit * u2, int n)
+void transfer_curse(unit * u, unit * u2, int n)
 {
-  attrib * a;
+  attrib *a;
 
   a = a_find(u->attribs, &at_curse);
-  while (a && a->type==&at_curse) {
-    curse *c = (curse*)a->data.v;
+  while (a && a->type == &at_curse) {
+    curse *c = (curse *) a->data.v;
+
     do_transfer_curse(c, u, u2, n);
     a = a->next;
   }
@@ -636,18 +673,19 @@ transfer_curse(unit * u, unit * u2, int n)
 
 /* ------------------------------------------------------------- */
 
-boolean
-curse_active(const curse *c)
+boolean curse_active(const curse * c)
 {
-  if (!c) return false;
-  if (c_flags(c) & CURSE_ISNEW) return false;
-  if (c->vigour <= 0) return false;
+  if (!c)
+    return false;
+  if (c_flags(c) & CURSE_ISNEW)
+    return false;
+  if (c->vigour <= 0)
+    return false;
 
   return true;
 }
 
-boolean
-is_cursed_internal(attrib *ap, const curse_type *ct)
+boolean is_cursed_internal(attrib * ap, const curse_type * ct)
 {
   curse *c = get_curse(ap, ct);
 
@@ -658,8 +696,7 @@ is_cursed_internal(attrib *ap, const curse_type *ct)
 }
 
 
-boolean
-is_cursed_with(const attrib *ap, const curse *c)
+boolean is_cursed_with(const attrib * ap, const curse * c)
 {
   const attrib *a = ap;
 
@@ -672,6 +709,7 @@ is_cursed_with(const attrib *ap, const curse *c)
 
   return false;
 }
+
 /* ------------------------------------------------------------- */
 /* cursedata */
 /* ------------------------------------------------------------- */
@@ -688,22 +726,23 @@ is_cursed_with(const attrib *ap, const curse *c)
  * } curse_type;
  */
 
-int
-resolve_curse(variant id, void * address)
+int resolve_curse(variant id, void *address)
 {
   int result = 0;
-  curse * c = NULL;
-  if (id.i!=0) {
+
+  curse *c = NULL;
+
+  if (id.i != 0) {
     c = cfindhash(id.i);
-    if (c==NULL) {
+    if (c == NULL) {
       result = -1;
     }
   }
-  *(curse**)address = c;
+  *(curse **) address = c;
   return result;
 }
 
-static const char * oldnames[MAXCURSE] = {
+static const char *oldnames[MAXCURSE] = {
   /* OBS: when removing curses, remember to update read_ccompat() */
   "fogtrap",
   "antimagiczone",
@@ -746,24 +785,23 @@ static const char * oldnames[MAXCURSE] = {
   "skillmod"
 };
 
-const char *
-oldcursename(int id)
+const char *oldcursename(int id)
 {
   return oldnames[id];
 }
 
 /* ------------------------------------------------------------- */
-message *
-cinfo_simple(const void * obj, typ_t typ, const struct curse *c, int self)
+message *cinfo_simple(const void *obj, typ_t typ, const struct curse * c,
+  int self)
 {
-  struct message * msg;
+  struct message *msg;
 
   unused(typ);
   unused(self);
   unused(obj);
 
   msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-  if (msg==NULL) {
+  if (msg == NULL) {
     log_error(("There is no curseinfo for %s.\n", c->type->cname));
   }
   return msg;
@@ -781,22 +819,22 @@ cinfo_simple(const void * obj, typ_t typ, const struct curse *c, int self)
 * die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
 * Zurückgegeben wird der noch unverbrauchte Rest von force.
 */
-double
-destr_curse(curse* c, int cast_level, double force)
+double destr_curse(curse * c, int cast_level, double force)
 {
   if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-    double probability = 0.1 + (cast_level - c->vigour)*0.2;
+    double probability = 0.1 + (cast_level - c->vigour) * 0.2;
+
     /* pro Stufe Unterschied -20% */
     if (chance(probability)) {
       force -= c->vigour;
       if (c->type->change_vigour) {
-        c->type->change_vigour(c, -(cast_level+1/2));
+        c->type->change_vigour(c, -(cast_level + 1 / 2));
       } else {
-        c->vigour -= cast_level+1/2;
+        c->vigour -= cast_level + 1 / 2;
       }
     }
-  } else { /* Zauber ist stärker als curse */
-    if (force >= c->vigour) { /* reicht die Kraft noch aus? */
+  } else {                      /* Zauber ist stärker als curse */
+    if (force >= c->vigour) {   /* reicht die Kraft noch aus? */
       force -= c->vigour;
       if (c->type->change_vigour) {
         c->type->change_vigour(c, -c->vigour);

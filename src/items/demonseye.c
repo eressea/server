@@ -35,29 +35,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 
 static int
-summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+summon_igjarjuk(struct unit *u, const struct item_type *itype, int amount,
+  struct order *ord)
 {
-	struct plane * p = rplane(u->region);
-	unused(amount);
-	unused(itype);
-	if (p!=NULL) {
-		ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
-		return EUNUSABLE;
-	} else {
-		assert(!"not implemented");
-		return EUNUSABLE;
-	}
+  struct plane *p = rplane(u->region);
+
+  unused(amount);
+  unused(itype);
+  if (p != NULL) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
+    return EUNUSABLE;
+  } else {
+    assert(!"not implemented");
+    return EUNUSABLE;
+  }
 }
 
 static int
-give_igjarjuk(struct unit * src, struct unit * d, const struct item_type * itype, int n, struct order * ord)
+give_igjarjuk(struct unit *src, struct unit *d, const struct item_type *itype,
+  int n, struct order *ord)
 {
   ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "error_giveeye", ""));
   return 0;
 }
 
-void
-register_demonseye(void)
+void register_demonseye(void)
 {
   register_item_use(summon_igjarjuk, "useigjarjuk");
   register_item_give(give_igjarjuk, "giveigjarjuk");

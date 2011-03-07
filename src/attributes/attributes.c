@@ -55,8 +55,7 @@ attrib_type at_unitdissolve = {
   "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
-void
-register_attributes(void)
+void register_attributes(void)
 {
   at_register(&at_object);
   at_register(&at_unitdissolve);

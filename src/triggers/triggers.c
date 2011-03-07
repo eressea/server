@@ -40,21 +40,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <stdio.h>
 
-void
-register_triggers(void)
+void register_triggers(void)
 {
-  if (verbosity>=2) printf("- registering triggers\n");
-	tt_register(&tt_changefaction);
-	tt_register(&tt_changerace);
-	tt_register(&tt_createcurse);
-	tt_register(&tt_createunit);
-	tt_register(&tt_gate);
-	tt_register(&tt_unguard);
-	tt_register(&tt_giveitem);
-	tt_register(&tt_killunit);
-	tt_register(&tt_removecurse);
-	tt_register(&tt_shock);
-	tt_register(&tt_unitmessage);
-	tt_register(&tt_timeout);
-	tt_register(&tt_clonedied);
+  if (verbosity >= 2)
+    printf("- registering triggers\n");
+  tt_register(&tt_changefaction);
+  tt_register(&tt_changerace);
+  tt_register(&tt_createcurse);
+  tt_register(&tt_createunit);
+  tt_register(&tt_gate);
+  tt_register(&tt_unguard);
+  tt_register(&tt_giveitem);
+  tt_register(&tt_killunit);
+  tt_register(&tt_removecurse);
+  tt_register(&tt_shock);
+  tt_register(&tt_unitmessage);
+  tt_register(&tt_timeout);
+  tt_register(&tt_clonedied);
 }

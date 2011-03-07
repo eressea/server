@@ -38,7 +38,7 @@
 #define WATCHERS_VERSION 310
 */
 #define OVERRIDE_VERSION 311
-#define CURSETYPE_VERSION 312 /* turn 287 */
+#define CURSETYPE_VERSION 312   /* turn 287 */
 #define ALLIANCES_VERSION 313
 #define DBLINK_VERSION 314
 #define CURSEVIGOURISFLOAT_VERSION 315
@@ -46,27 +46,27 @@
 #define SAVEALLIANCE_VERSION 317
 #define CLAIM_VERSION 318
 /* 319 is the HSE4 data version */
-#define BACTION_VERSION 319 /* building action gets a param string */
+#define BACTION_VERSION 319     /* building action gets a param string */
 #define NOLASTORDER_VERSION 320 /* do not use lastorder */
-#define SPELLNAME_VERSION 321 /* reference spells by name */
-#define TERRAIN_VERSION 322 /* terrains are a full type and saved by name */
+#define SPELLNAME_VERSION 321   /* reference spells by name */
+#define TERRAIN_VERSION 322     /* terrains are a full type and saved by name */
 #define REGIONITEMS_VERSION 323 /* regions have items */
-#define ATTRIBREAD_VERSION 324 /* remove a_readint */
-#define CURSEFLAGS_VERSION 325 /* remove a_readint */
-#define UNICODE_VERSION 326 /* 2007-06-27 everything is stored as UTF8 */
-#define UID_VERSION 327 /* regions have a unique id */
-#define STORAGE_VERSION 328 /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
-#define INTPAK_VERSION 329 /* in binary, ints can get packed */
-#define NOZEROIDS_VERSION 330 /* 2008-05-16 zero is not a valid ID for anything (including factions) */
-#define NOBORDERATTRIBS_VERSION 331 /* 2008-05-17 connection::attribs has been moved to userdata */
-#define UIDHASH_VERSION 332 /* 2008-05-22 borders use the region.uid to store */
+#define ATTRIBREAD_VERSION 324  /* remove a_readint */
+#define CURSEFLAGS_VERSION 325  /* remove a_readint */
+#define UNICODE_VERSION 326     /* 2007-06-27 everything is stored as UTF8 */
+#define UID_VERSION 327         /* regions have a unique id */
+#define STORAGE_VERSION 328     /* with storage.h, some things are stored smarter (ids as base36, fractions as float) */
+#define INTPAK_VERSION 329      /* in binary, ints can get packed */
+#define NOZEROIDS_VERSION 330   /* 2008-05-16 zero is not a valid ID for anything (including factions) */
+#define NOBORDERATTRIBS_VERSION 331     /* 2008-05-17 connection::attribs has been moved to userdata */
+#define UIDHASH_VERSION 332     /* 2008-05-22 borders use the region.uid to store */
 #define REGIONOWNER_VERSION 333 /* 2009-05-14 regions have owners and morale */
-#define ALLIANCELEADER_VERSION 333 /* alliances have a leader */
-#define CURSEFLOAT_VERSION 334 /* all curse-effects are float */
-#define MOURNING_VERSION 335 /* mourning peasants */
-#define FOSS_VERSION 336 /* the open source release */
-#define OWNER_2_VERSION 337 /* region owners contain an alliance */
-#define FIX_WATCHERS_VERSION 338 /* fixed storage of watchers */
+#define ALLIANCELEADER_VERSION 333      /* alliances have a leader */
+#define CURSEFLOAT_VERSION 334  /* all curse-effects are float */
+#define MOURNING_VERSION 335    /* mourning peasants */
+#define FOSS_VERSION 336        /* the open source release */
+#define OWNER_2_VERSION 337     /* region owners contain an alliance */
+#define FIX_WATCHERS_VERSION 338        /* fixed storage of watchers */
 
-#define MIN_VERSION CURSETYPE_VERSION /* minimal datafile we support */
-#define RELEASE_VERSION FIX_WATCHERS_VERSION /* current datafile */
+#define MIN_VERSION CURSETYPE_VERSION   /* minimal datafile we support */
+#define RELEASE_VERSION FIX_WATCHERS_VERSION    /* current datafile */

@@ -41,14 +41,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <math.h>
 
-int
-average_score_of_age(int age, int a)
+int average_score_of_age(int age, int a)
 {
   faction *f;
+
   int sum = 0, count = 0;
 
   for (f = factions; f; f = f->next) {
-    if (!is_monsters(f) && f->race != new_race[RC_TEMPLATE] && f->age <= age + a && f->age >= age - a) {
+    if (!is_monsters(f) && f->race != new_race[RC_TEMPLATE] && f->age <= age + a
+      && f->age >= age - a) {
       sum += f->score;
       count++;
     }
@@ -60,31 +61,38 @@ average_score_of_age(int age, int a)
   return sum / count;
 }
 
-void
-score(void)
+void score(void)
 {
   FILE *scoreFP;
+
   region *r;
+
   faction *fc;
+
   int allscores = 0;
+
   char path[MAX_PATH];
 
-  for (fc = factions; fc; fc = fc->next) fc->score = 0;
+  for (fc = factions; fc; fc = fc->next)
+    fc->score = 0;
 
   for (r = regions; r; r = r->next) {
-    unit * u;
-    building * b;
-    ship * s;
+    unit *u;
+
+    building *b;
+
+    ship *s;
 
     if (rule_region_owners()) {
       fc = region_get_owner(r);
-      if (fc) fc->score += 10;
+      if (fc)
+        fc->score += 10;
     }
 
     for (b = r->buildings; b; b = b->next) {
       u = building_owner(b);
-      if (u!=NULL) {
-        faction * fbo = u->faction;
+      if (u != NULL) {
+        faction *fbo = u->faction;
 
         if (fbo) {
           fbo->score += b->size * 5;
@@ -93,19 +101,24 @@ score(void)
     }
 
     for (s = r->ships; s; s = s->next) {
-      unit * cap = shipowner(s);
+      unit *cap = shipowner(s);
+
       if (cap && cap->faction) {
         cap->faction->score += s->size * 2;
       }
     }
-    
-    for (u = r->units; u; u = u->next) {
-      item * itm;
-      int itemscore = 0;
-      int i;
-      faction * f = u->faction;
 
-      if (f==NULL || u->race == new_race[RC_SPELL] || u->race == new_race[RC_BIRTHDAYDRAGON]) {
+    for (u = r->units; u; u = u->next) {
+      item *itm;
+
+      int itemscore = 0;
+
+      int i;
+
+      faction *f = u->faction;
+
+      if (f == NULL || u->race == new_race[RC_SPELL]
+        || u->race == new_race[RC_BIRTHDAYDRAGON]) {
         continue;
       }
 
@@ -113,28 +126,29 @@ score(void)
         f->score += (u->race->recruitcost * u->number) / 50;
       }
       f->score += get_money(u) / 50;
-      for (itm=u->items; itm; itm=itm->next) {
+      for (itm = u->items; itm; itm = itm->next) {
         itemscore += itm->number * itm->type->score;
       }
       f->score += itemscore / 10;
 
-      for (i=0;i!=u->skill_size;++i) {
-        skill * sv = u->skills+i;
+      for (i = 0; i != u->skill_size; ++i) {
+        skill *sv = u->skills + i;
+
         switch (sv->id) {
-        case SK_MAGIC:
-          f->score += (int)(u->number * pow(sv->level, 4));
-          break;
-        case SK_TACTICS:
-          f->score += (int)(u->number * pow(sv->level, 3));
-          break;
-        case SK_SPY:
-        case SK_ALCHEMY:
-        case SK_HERBALISM:
-          f->score += (int)(u->number * pow(sv->level, 2.5));
-          break;
-        default:
-          f->score += (int)(u->number * pow(sv->level, 2.5) / 10);
-          break;
+          case SK_MAGIC:
+            f->score += (int)(u->number * pow(sv->level, 4));
+            break;
+          case SK_TACTICS:
+            f->score += (int)(u->number * pow(sv->level, 3));
+            break;
+          case SK_SPY:
+          case SK_ALCHEMY:
+          case SK_HERBALISM:
+            f->score += (int)(u->number * pow(sv->level, 2.5));
+            break;
+          default:
+            f->score += (int)(u->number * pow(sv->level, 2.5) / 10);
+            break;
         }
       }
     }
@@ -154,20 +168,24 @@ score(void)
   scoreFP = fopen(path, "w");
   if (scoreFP) {
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
-    faction * f;
+    faction *f;
+
     fwrite(utf8_bom, 1, 3, scoreFP);
-    for (f = factions; f; f = f->next) if (f->num_total != 0) {
-      fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
-        f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
-        ((float) f->score / (float) allscores) * 100.0,
-        (float) f->score / f->num_total,
-        f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f), f->age);
-    }
+    for (f = factions; f; f = f->next)
+      if (f->num_total != 0) {
+        fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
+          f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
+          ((float)f->score / (float)allscores) * 100.0,
+          (float)f->score / f->num_total,
+          f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f),
+          f->age);
+      }
     fclose(scoreFP);
   }
-  if (alliances!=NULL) {
+  if (alliances != NULL) {
     alliance *a;
-    const item_type * token = it_find("conquesttoken");
+
+    const item_type *token = it_find("conquesttoken");
 
     sprintf(path, "%s/score.alliances", basepath());
     scoreFP = fopen(path, "w");
@@ -179,29 +197,35 @@ score(void)
 
       for (a = alliances; a; a = a->next) {
         int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
+
         int grails = 0;
-        faction * f;
+
+        faction *f;
 
         for (f = factions; f; f = f->next) {
           if (f->alliance && f->alliance == a) {
             alliance_factions++;
-            alliance_score  += f->score;
+            alliance_score += f->score;
             alliance_number += f->num_total;
-            if (token!=NULL) {
-              unit * u = f->units;
-              while (u!=NULL) {
-                item ** iitem = i_find(&u->items, token);
-                if (iitem!=NULL && *iitem!=NULL) {
+            if (token != NULL) {
+              unit *u = f->units;
+
+              while (u != NULL) {
+                item **iitem = i_find(&u->items, token);
+
+                if (iitem != NULL && *iitem != NULL) {
                   grails += (*iitem)->number;
                 }
-                u=u->nextF;
+                u = u->nextF;
               }
             }
           }
         }
 
-        fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions, alliance_number, alliance_score);
-        if (token!=NULL) fprintf(scoreFP, ":%d", grails);
+        fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions,
+          alliance_number, alliance_score);
+        if (token != NULL)
+          fprintf(scoreFP, ":%d", grails);
         fputc('\n', scoreFP);
       }
       fclose(scoreFP);

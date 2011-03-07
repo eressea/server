@@ -40,38 +40,39 @@
 #include <string.h>
 #include <assert.h>
 
-static void
-xe_givelaen(unit *u, struct order * ord)
-{
-	unit *u2 =getunitg(u->region, u->faction);
-
-	if(!u2) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-		return;
-	}
-	i_change(&u2->items, olditemtype[I_LAEN], 5);
-}
-
-static void
-xe_givepotion(unit *u, struct order *ord)
-{
-	unit *u2 =getunitg(u->region, u->faction);
-
-	if(!u2) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
-		return;
-	}
-	i_change(&u2->items, it_find("skillpotion"), 1);
-}
-
-static void
-xe_giveballon(unit *u, struct order *ord)
+static void xe_givelaen(unit * u, struct order *ord)
 {
   unit *u2 = getunitg(u->region, u->faction);
+
+  if (!u2) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
+    return;
+  }
+  i_change(&u2->items, olditemtype[I_LAEN], 5);
+}
+
+static void xe_givepotion(unit * u, struct order *ord)
+{
+  unit *u2 = getunitg(u->region, u->faction);
+
+  if (!u2) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
+    return;
+  }
+  i_change(&u2->items, it_find("skillpotion"), 1);
+}
+
+static void xe_giveballon(unit * u, struct order *ord)
+{
+  unit *u2 = getunitg(u->region, u->faction);
+
   ship *sh;
 
   if (!u2) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found", ""));
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+        ""));
     return;
   }
 
@@ -83,8 +84,7 @@ xe_giveballon(unit *u, struct order *ord)
   fset(u2, UFL_OWNER);
 }
 
-int
-xecmd(unit * u, order * ord)
+int xecmd(unit * u, order * ord)
 {
   faction *f = u->faction;
 
@@ -92,7 +92,7 @@ xecmd(unit * u, order * ord)
     if (get_keyword(ord) == K_XE) {
       init_tokens(ord);
       skip_token();
-      switch(findparam(getstrtoken(),f->locale)) {
+      switch (findparam(getstrtoken(), f->locale)) {
         case P_XEPOTION:
           xe_givepotion(u, ord);
           break;

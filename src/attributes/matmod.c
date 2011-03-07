@@ -22,19 +22,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 
 attrib_type at_matmod = {
-	"matmod",
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	ATF_PRESERVE
+  "matmod",
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  ATF_PRESERVE
 };
 
-attrib *
-make_matmod(mm_fun function)
+attrib *make_matmod(mm_fun function)
 {
-	attrib * a = a_new(&at_matmod);
-	a->data.f = (void(*)(void))function;
-	return a;
+  attrib *a = a_new(&at_matmod);
+
+  a->data.f = (void (*)(void))function;
+  return a;
 }

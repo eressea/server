@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern int os_mkdir(const char * path, int mode);
+  extern int os_mkdir(const char *path, int mode);
 #ifdef __cplusplus
 }
 #endif

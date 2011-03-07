@@ -15,7 +15,7 @@ extern "C" {
 
 #include <util/storage.h>
 
-extern const storage binary_store;
+  extern const storage binary_store;
 
 #ifdef __cplusplus
 }

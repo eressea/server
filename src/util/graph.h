@@ -16,21 +16,21 @@
 extern "C" {
 #endif
 
-typedef struct node {
-	int  marker;
-	void *object;
-} node;
+  typedef struct node {
+    int marker;
+    void *object;
+  } node;
 
-typedef struct edge {
-	int  marker;
-	node *node1;
-	node *node2;
-} edge;
+  typedef struct edge {
+    int marker;
+    node *node1;
+    node *node2;
+  } edge;
 
-typedef struct graph {
-	vset nodes;
-	vset edges;
-} graph;
+  typedef struct graph {
+    vset nodes;
+    vset edges;
+  } graph;
 
 #ifdef __cplusplus
 }
