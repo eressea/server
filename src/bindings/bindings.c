@@ -967,35 +967,60 @@ static int config_get_resource(lua_State * L)
     if (itype) {
       lua_newtable(L);
       lua_pushstring(L, "weight");
-      lua_pushinteger(L, itype->weight);
-      lua_settable(L, -3);
-      if (itype->capacity > 0) {
+      
+lua_pushinteger(L, itype->weight);
+      
+lua_settable(L, -3);
+      
+if (itype->capacity > 0) {
         lua_pushstring(L, "capacity");
-        lua_pushinteger(L, itype->capacity);
-        lua_settable(L, -3);
-      }
-      if (itype->construction) {
+        
+lua_pushinteger(L, itype->capacity);
+        
+lua_settable(L, -3);
+      
+}
+      
+if (itype->construction) {
         int i;
 
         lua_pushstring(L, "build_skill_min");
-        lua_pushinteger(L, itype->construction->minskill);
-        lua_settable(L, -3);
-        lua_pushstring(L, "build_skill_name");
-        lua_pushstring(L, skillnames[itype->construction->skill]);
-        lua_settable(L, -3);
-        if (itype->construction->materials) {
-          lua_pushstring(L, "materials");
-          lua_newtable(L);
-          for (i = 0; itype->construction->materials[i].number; ++i) {
-            lua_pushstring(L,
+        
+lua_pushinteger(L, itype->construction->minskill);
+        
+lua_settable(L, -3);
+        
+lua_pushstring(L, "build_skill_name");
+        
+lua_pushstring(L, skillnames[itype->construction->skill]);
+        
+lua_settable(L, -3);
+        
+
+if (itype->construction->materials) {
+          
+lua_pushstring(L, "materials");
+          
+lua_newtable(L);
+          
+for (i = 0; itype->construction->materials[i].number; ++i) {
+            
+lua_pushstring(L,
               itype->construction->materials[i].rtype->_name[0]);
-            lua_pushinteger(L, itype->construction->materials[i].number);
-            lua_settable(L, -3);
-          }
-          lua_settable(L, -3);
-        }
-      }
-      return 1;
+            
+lua_pushinteger(L, itype->construction->materials[i].number);
+            
+lua_settable(L, -3);
+          
+}
+          
+lua_settable(L, -3);
+        
+}
+      
+}
+      
+return 1;
     }
   }
   return 0;
