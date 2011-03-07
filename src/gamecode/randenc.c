@@ -855,7 +855,7 @@ move_iceberg(region *r)
 
 			for (sh = r->ships; sh; sh = sh->next) {
 				/* Meldung an Kapitän */
-			    float dmg = get_param_flt(global.parameters, "rules.ship.damage.intoiceberg", 0.10);
+			    float dmg = get_param_flt(global.parameters, "rules.ship.damage.intoiceberg", 0.10F);
 			    damage_ship(sh, dmg);
 				fset(sh, SF_SELECT);
 			}
@@ -866,8 +866,8 @@ move_iceberg(region *r)
 				translist(&rc->buildings, &r->buildings, rc->buildings);
 			}
 			while (rc->ships) {
+				float dmg = get_param_flt(global.parameters, "rules.ship.damage.withiceberg", 0.10F);
 				fset(rc->ships, SF_SELECT);
-				float dmg = get_param_flt(global.parameters, "rules.ship.damage.withiceberg", 0.10);
 				damage_ship(rc->ships, dmg);
 				move_ship(rc->ships, rc, r, NULL);
 			}
@@ -994,7 +994,7 @@ godcurse(void)
         ship *sh;
         for (sh = r->ships; sh;) {
           ship *shn = sh->next;
-          float dmg = get_param_flt(global.parameters, "rules.ship.damage.godcurse", 0.10);
+          float dmg = get_param_flt(global.parameters, "rules.ship.damage.godcurse", 0.10F);
           damage_ship(sh, dmg);
           if (sh->damage>=sh->size * DAMAGE_SCALE) {
             unit * u = shipowner(sh);

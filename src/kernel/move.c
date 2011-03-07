@@ -1765,8 +1765,8 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
         if (check_leuchtturm(current_point, NULL)) {
           ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
         } else {
+          float dmg = get_param_flt(global.parameters, "rules.ship.damage.nolanding", 0.10F);
           ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh, next_point));
-          float dmg = get_param_flt(global.parameters, "rules.ship.damage.nolanding", 0.10);
           damage_ship(sh, dmg);
           /* we handle destruction at the end */
         }
