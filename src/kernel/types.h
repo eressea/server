@@ -31,10 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 
 typedef short terrain_t;
-typedef short direction_t;
-typedef short race_t;
 typedef short magic_t;
-typedef short skill_t;
 typedef short typ_t;
 typedef short item_t;
 typedef unsigned int spellid_t;
@@ -76,8 +73,7 @@ typedef struct ursprung {
 
 /* ----------------- Befehle ----------------------------------- */
 
-typedef unsigned char keyword_t;
-enum {
+typedef enum {
   K_KOMMENTAR,
   K_BANNER,
   K_WORK,
@@ -148,8 +144,8 @@ enum {
   K_PROMOTION,
   K_PAY,
   MAXKEYWORDS,
-  NOKEYWORD = (keyword_t) - 1
-};
+  NOKEYWORD = -1
+} keyword_t;
 
 /* ------------------ Status von Einheiten --------------------- */
 
@@ -165,8 +161,7 @@ enum {
 
 /* ----------------- Parameter --------------------------------- */
 
-typedef unsigned char param_t;
-enum {
+typedef enum {
   P_LOCALE,
   P_ANY,
   P_EACH,
@@ -218,8 +213,8 @@ enum {
   P_XELAEN,
   P_ALLIANCE,
   MAXPARAMS,
-  NOPARAM = (param_t) - 1
-};
+  NOPARAM = -1
+} param_t;
 
 typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_BATTLE,
@@ -268,7 +263,7 @@ enum {
 
 /* ------------------ Talente ---------------------------------- */
 
-enum {
+typedef enum {
   SK_ALCHEMY,
   SK_CROSSBOW,
   SK_MINING,
@@ -299,12 +294,12 @@ enum {
   SK_STAMINA,
   SK_WEAPONLESS,
   MAXSKILLS,
-  NOSKILL = (skill_t) - 1
-};
+  NOSKILL = -1
+} skill_t;
 
 /* ------------- Typ von Einheiten ----------------------------- */
 
-enum {
+typedef enum {
   RC_DWARF,                     /* 0 - Zwerg */
   RC_ELF,
   RC_GOBLIN = 3,
@@ -363,11 +358,11 @@ enum {
   RC_CLONE,
 
   MAXRACES,
-  NORACE = (race_t) - 1
-};
+  NORACE = -1
+} race_t;
 
 /* Richtungen */
-enum {
+typedef enum {
   D_NORTHWEST,
   D_NORTHEAST,
   D_EAST,
@@ -377,8 +372,8 @@ enum {
   MAXDIRECTIONS,
   D_PAUSE,
   D_SPECIAL,
-  NODIRECTION = (direction_t) - 1
-};
+  NODIRECTION = -1
+} direction_t;
 
 #define DONT_HELP      0
 #define HELP_MONEY     1        /* Mitversorgen von Einheiten */

@@ -1495,7 +1495,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
   }
 
   if (enc == XML_CHAR_ENCODING_UTF8) {
-    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }
 
@@ -2141,7 +2141,7 @@ report_plaintext(const char *filename, report_context * ctx,
     return -1;
   }
   if (enc == XML_CHAR_ENCODING_UTF8) {
-    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }
 

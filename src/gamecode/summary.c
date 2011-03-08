@@ -149,7 +149,7 @@ void report_summary(summary * s, summary * o, boolean full)
     return;
 #ifdef SUMMARY_BOM
   else {
-    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     fwrite(utf8_bom, 1, 3, F);
   }
 #endif

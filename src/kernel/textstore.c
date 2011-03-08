@@ -60,7 +60,7 @@ static int txt_w_flt(struct storage *store, float arg)
 static float txt_r_flt(struct storage *store)
 {
   double result;
-  fscanf((FILE *) store->userdata, "%lf", &result);
+  fscanf((FILE *) store->userdata, "%f", &result);
   return (float)result;
 }
 
@@ -135,7 +135,7 @@ static int txt_open(struct storage *store, const char *filename, int mode)
   FILE *F = fopen(filename, modes[mode]);
   store->userdata = F;
   if (F) {
-    char utf8_bom[4] = { (char)0xef, (char)0xbb, (char)0xbf };
+    const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
     if (mode == IO_READ) {
       char token[8];
       /* recognize UTF8 BOM */
@@ -154,7 +154,7 @@ static int txt_open(struct storage *store, const char *filename, int mode)
         store->version = atoi(token);
       }
     } else if (store->encoding == XML_CHAR_ENCODING_UTF8) {
-      fputs(utf8_bom, F);
+      fputs((const char*)utf8_bom, F);
       fprintf(F, "%d\n", RELEASE_VERSION);
     }
   }

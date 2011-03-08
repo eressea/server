@@ -68,25 +68,25 @@ int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
 }
 
 int
-unicode_latin1_to_utf8(utf8_t * out, size_t * outlen, const char *in,
+unicode_latin1_to_utf8(utf8_t * dst, size_t * outlen, const char *in,
   size_t * inlen)
 {
   int is = (int)*inlen;
   int os = (int)*outlen;
   const char *ip = in;
-  utf8_t *op = out;
+  unsigned char *out = (unsigned char *)dst, *op = out;
 
   while (ip - in < is) {
     unsigned char c = *ip;
     if (c > 0xBF) {
       if (op - out >= os - 1)
         break;
-      *op++ = (char) 0xC3;
+      *op++ = 0xC3;
       *op++ = c - 64;
     } else if (c > 0x7F) {
       if (op - out >= os - 1)
         break;
-      *op++ = (char) 0xC2;
+      *op++ = 0xC2;
       *op++ = c;
     } else {
       if (op - out >= os)

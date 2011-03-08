@@ -3673,7 +3673,7 @@ static battle *make_battle(region * r)
     if (!bdebug)
       log_error(("battles cannot be debugged\n"));
     else {
-      const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf };
+      const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
       fwrite(utf8_bom, 1, 3, bdebug);
       fprintf(bdebug, "In %s findet ein Kampf stattactics:\n", rname(r,
           default_locale));

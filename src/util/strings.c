@@ -30,45 +30,6 @@ INLINE_FUNCTION unsigned int hashstring(const char *s)
   return key & 0x7FFFFFFF;
 }
 
-/*
-static const char *
-escape_string_inplace(char * buffer, unsigned int len, unsigned int offset)
-{
-#define MAXQUOTES 32
-  char * o;
-  char * d[MAXQUOTES+1];
-  int i = 0;
-
-  o = strchr(buffer, '"');
-  if (!o) {
-    return buffer;
-  }
-
-  while (*o && i<MAXQUOTES) {
-    char * next = strchr(o, '"');
-    d[i++] = o;
-    o = next?next:(o+strlen(o));
-  }
-  d[i] = o;
-  if (i<MAXQUOTES) {
-    //  more than 32 hits! must go recursive
-    char * start = d[i];
-    unsigned int nlen = len - (start-buffer) - MAXQUOTES;
-    escape_string_inplace(start, nlen, MAXQUOTES);
-  }
-
-  o[i] = '\0';
-  while (--i>0) {
-    const char * src = d[i];
-    char * dst = d[i] + i + offset;
-    size_t mlen = d[i+1] - d[i];
-    memmove(dst--, src, mlen);
-    *dst = '\\';
-  }
-  return buffer;
-}
-*/
-
 INLINE_FUNCTION const char *escape_string(const char *str, char *buffer,
   unsigned int len)
 {
