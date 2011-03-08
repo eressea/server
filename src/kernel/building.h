@@ -71,6 +71,8 @@ extern "C" {
     struct attrib *attribs;
   } building_type;
 
+  extern struct quicklist *buildingtypes;
+
   extern building_type *bt_find(const char *name);
   extern void register_buildings(void);
   extern void bt_register(struct building_type *type);

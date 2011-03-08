@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 
 #include <kernel/alliance.h>
+#include <kernel/building.h>
 #include <kernel/skill.h>
 #include <kernel/equipment.h>
 #include <kernel/calendar.h>
@@ -768,6 +769,19 @@ static int config_get_ships(lua_State * L)
   return 1;
 }
 
+static int config_get_buildings(lua_State * L)
+{
+  quicklist *ql;
+  int qi, i = 0;
+  lua_createtable(L, ql_length(buildingtypes), 0);
+  for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
+    building_type *btype = (building_type *) ql_get(ql, qi);
+    tolua_pushstring(L, TOLUA_CAST btype->_name);
+    lua_rawseti(L, -2, ++i);
+  }
+  return 1;
+}
+
 static int config_get_locales(lua_State * L)
 {
   const struct locale *lang;
@@ -812,6 +826,136 @@ static int config_get_resource(lua_State * L)
             lua_pushstring(L,
               itype->construction->materials[i].rtype->_name[0]);
             lua_pushinteger(L, itype->construction->materials[i].number);
+            lua_settable(L, -3);
+          }
+          lua_settable(L, -3);
+        }
+      }
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int config_get_btype(lua_State * L)
+{
+  const char *name = tolua_tostring(L, 1, 0);
+
+  if (name) {
+    const struct building_type *btype = bt_find(name);
+    if (btype) {
+      lua_newtable(L);
+      lua_pushstring(L, "flags");
+      lua_pushinteger(L, btype->flags);
+      lua_settable(L, -3);
+      if (btype->capacity > 0) {
+        lua_pushstring(L, "capacity");
+        lua_pushinteger(L, btype->capacity);
+        lua_settable(L, -3);
+      }
+      if (btype->maxcapacity > 0) {
+        lua_pushstring(L, "maxcapacity");
+        lua_pushinteger(L, btype->maxcapacity);
+        lua_settable(L, -3);
+      }
+      if (btype->maxsize > 0) {
+        lua_pushstring(L, "maxsize");
+        lua_pushinteger(L, btype->maxsize);
+        lua_settable(L, -3);
+      }
+      if (btype->maintenance) {
+        int i;
+        lua_pushstring(L, "maintenance");
+        lua_newtable(L);
+        for (i = 0; btype->maintenance[i].number; ++i) {
+          lua_pushstring(L,
+              btype->maintenance[i].rtype->_name[0]);
+          lua_pushinteger(L, btype->maintenance[i].number);
+          lua_settable(L, -3);
+        }
+        lua_settable(L, -3);
+      }
+      if (btype->construction) {
+        int i;
+        lua_pushstring(L, "build_skill_min");
+        lua_pushinteger(L, btype->construction->minskill);
+        lua_settable(L, -3);
+        lua_pushstring(L, "build_skill_name");
+        lua_pushstring(L, skillnames[btype->construction->skill]);
+        lua_settable(L, -3);
+        if (btype->construction->materials) {
+          lua_pushstring(L, "materials");
+          lua_newtable(L);
+          for (i = 0; btype->construction->materials[i].number; ++i) {
+            lua_pushstring(L,
+              btype->construction->materials[i].rtype->_name[0]);
+            lua_pushinteger(L, btype->construction->materials[i].number);
+            lua_settable(L, -3);
+          }
+          lua_settable(L, -3);
+        }
+      }
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int config_get_stype(lua_State * L)
+{
+  const char *name = tolua_tostring(L, 1, 0);
+
+  if (name) {
+    const struct ship_type *stype = st_find(name);
+    if (stype) {
+      lua_newtable(L);
+      lua_pushstring(L, "range");
+      lua_pushinteger(L, stype->range);
+      lua_settable(L, -3);
+      lua_pushstring(L, "cabins");
+      lua_pushinteger(L, stype->cabins);
+      lua_settable(L, -3);
+      lua_pushstring(L, "cargo");
+      lua_pushinteger(L, stype->cargo);
+      lua_settable(L, -3);
+      lua_pushstring(L, "cptskill");
+      lua_pushinteger(L, stype->cptskill);
+      lua_settable(L, -3);
+      lua_pushstring(L, "minskill");
+      lua_pushinteger(L, stype->minskill);
+      lua_settable(L, -3);
+      lua_pushstring(L, "sumskill");
+      lua_pushinteger(L, stype->sumskill);
+      lua_settable(L, -3);
+      lua_pushstring(L, "fishing");
+      lua_pushinteger(L, stype->fishing);
+      lua_settable(L, -3);
+      if (stype->coasts) {
+        const terrain_type *coast = *stype->coasts;
+        lua_pushstring(L, "coasts");
+        lua_newtable(L);
+        while(coast) {
+          lua_pushstring(L, coast->_name);
+          lua_pushinteger(L, 1);
+          lua_settable(L, -3);
+          coast = coast->next;
+        }
+      }
+      if (stype->construction) {
+        int i;
+        lua_pushstring(L, "build_skill_min");
+        lua_pushinteger(L, stype->construction->minskill);
+        lua_settable(L, -3);
+        lua_pushstring(L, "build_skill_name");
+        lua_pushstring(L, skillnames[stype->construction->skill]);
+        lua_settable(L, -3);
+        if (stype->construction->materials) {
+          lua_pushstring(L, "materials");
+          lua_newtable(L);
+          for (i = 0; stype->construction->materials[i].number; ++i) {
+            lua_pushstring(L,
+              stype->construction->materials[i].rtype->_name[0]);
+            lua_pushinteger(L, stype->construction->materials[i].number);
             lua_settable(L, -3);
           }
           lua_settable(L, -3);
@@ -1060,7 +1204,10 @@ int tolua_eressea_open(lua_State * L)
       parse_inifile(L, global.inifile, "config");
       tolua_variable(L, TOLUA_CAST "locales", &config_get_locales, 0);
       tolua_function(L, TOLUA_CAST "get_resource", &config_get_resource);
+      tolua_variable(L, TOLUA_CAST "buildings", &config_get_buildings, 0);
+      tolua_function(L, TOLUA_CAST "get_building", &config_get_btype);
       tolua_variable(L, TOLUA_CAST "ships", &config_get_ships, 0);
+      tolua_function(L, TOLUA_CAST "get_ship", &config_get_stype);
     } tolua_endmodule(L);
     tolua_function(L, TOLUA_CAST "get_region_by_id", tolua_get_region_byid);
     tolua_function(L, TOLUA_CAST "get_faction", tolua_get_faction);

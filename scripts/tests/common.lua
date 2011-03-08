@@ -5,6 +5,19 @@ local function _test_create_ship(r)
     return s
 end
 
+local function _test_unique_btype()
+  local utype = nil
+  for i = 1, #config.buildings do
+    bt = config.buildings[i]
+    if (((config.get_building(bt).flags / 4) % 2) ~= 0) then -- #define BTF_UNIQUE         0x04
+      if (((config.get_building(bt).flags / 2) % 2) == 0) then -- #define BTF_NOBUILD        0x02
+        utype = bt
+      end
+    end
+  end
+  return utype
+end
+
 local function one_unit(r, f)
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
@@ -942,4 +955,98 @@ function test_bson_with_multiple_attribs()
         total = total + a.data.a;
     end
     assert_equal(6, total)
+end
+
+function test_building_unique0()
+  local r = region.create(0, 0, "mountain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r, 20)
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local u2 = unit.create(f2, r, 20)
+  local utype = _test_unique_btype()
+  
+  if (utype ~= nil) then
+    assert_equal("harbour", utype)
+    u:set_skill("building", 20)
+    u:add_item("log", 10000)
+    u:add_item("iron", 10000)
+    u:add_item("stone", 10000)
+    u:add_item("money", 10000)
+    u2:set_skill("building", 20)
+    u2:add_item("log", 10000)
+    u2:add_item("iron", 10000)
+    u2:add_item("stone", 10000)
+    u2:add_item("money", 10000)
+    
+    -- build two harbours in one go
+    u:clear_orders()
+    u:add_order("MACHEN ".. translate(utype))
+    u2:clear_orders()
+    u2:add_order("MACHEN ".. translate(utype))
+    process_orders()
+    assert_not_nil(r.buildings)
+    bcount = 0
+    for bs in r.buildings do
+      assert_equal(1, string.find(bs.name, translate(utype)))
+      if (bs.size >= config.get_building(utype).maxsize) then
+        bcount = bcount + 1
+      end
+    end
+    assert_equal(1, bcount) -- only one should be completed
+  else
+    -- fail() -- no unique  building in rules
+  end
+end
+
+function test_building_unique()
+  local r = region.create(0, 0, "mountain")
+  local f = faction.create("noreply@eressea.de", "human", "de")
+  local u = unit.create(f, r, 20)
+  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local u2 = unit.create(f2, r, 20)
+  local utype = _test_unique_btype()
+  
+  if (utype ~= nil) then
+    u:set_skill("building", 20)
+    u:add_item("log", 10000)
+    u:add_item("iron", 10000)
+    u:add_item("stone", 10000)
+    u:add_item("money", 10000)
+    u2:set_skill("building", 20)
+    u2:add_item("log", 10000)
+    u2:add_item("iron", 10000)
+    u2:add_item("stone", 10000)
+    u2:add_item("money", 10000)
+    
+    -- start building two harbours
+    u:clear_orders()
+    u:add_order("MACHEN 1 Hafen")
+    u2:clear_orders()
+    u2:add_order("MACHEN 1 Hafen")
+    process_orders()
+    -- finish building partial harbours
+    u:clear_orders()
+    u:add_order("MACHEN ".. translate("harbour"))
+    u2:clear_orders()
+    u2:add_order("MACHEN Hafen")
+    process_orders()
+    if (r.buildings() == nil) then
+    process_orders()
+    end
+    assert_not_nil(r.buildings)
+    bcount = 0
+    local h1 = nil
+    for bs in r.buildings do
+      if (h1 == nil) then 
+        h1 = bs.name 
+      else
+        assert_equal(h1, bs.name)
+      end
+      assert_equal(1, string.find(bs.name, "Hafen"))
+      if (bs.size >= 25) then
+        bcount = bcount + 1
+      end
+    end
+    assert_equal(1, bcount) -- only one should be completed
+   end
 end

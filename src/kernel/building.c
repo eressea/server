@@ -124,28 +124,28 @@ typedef struct building_typelist {
   building_type *type;
 } building_typelist;
 
-static building_typelist *buildingtypes;
+quicklist *buildingtypes = NULL;
 
 building_type *bt_find(const char *name)
 {
-  const struct building_typelist *btl = buildingtypes;
+  quicklist *ql;
+  int qi;
+
   assert(name);
-  while (btl && strcmp(btl->type->_name, name))
-    btl = btl->next;
-  if (btl == NULL) {
-    return NULL;
+
+  for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
+    building_type *btype = (building_type *) ql_get(ql, qi);
+    if (strcmp(btype->_name, name) == 0)
+      return btype;
   }
-  return btl->type;
+  return NULL;
 }
 
 void bt_register(building_type * type)
 {
-  struct building_typelist *btl = malloc(sizeof(building_type));
   if (type->init)
     type->init(type);
-  btl->type = type;
-  btl->next = buildingtypes;
-  buildingtypes = btl;
+  ql_push(&buildingtypes, (void *)type);
 }
 
 int buildingcapacity(const building * b)
@@ -362,15 +362,19 @@ const building_type *findbuildingtype(const char *name,
     bn = bn->next;
   }
   if (!bn) {
-    struct building_typelist *btl = buildingtypes;
+    quicklist *ql = buildingtypes;
+    int qi;
+
     bn = calloc(sizeof(local_names), 1);
     bn->next = bnames;
     bn->lang = lang;
-    while (btl) {
-      const char *n = locale_string(lang, btl->type->_name);
-      type.v = (void *)btl->type;
+
+    for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
+      building_type *btype = (building_type *) ql_get(ql, qi);
+
+      const char *n = locale_string(lang, btype->_name);
+      type.v = (void *)btype;
       addtoken(&bn->names, n, type);
-      btl = btl->next;
     }
     bnames = bn;
   }

@@ -9,6 +9,7 @@
 
 CuSuite *get_curse_suite(void);
 CuSuite *get_market_suite(void);
+CuSuite *get_move_suite(void);
 CuSuite *get_laws_suite(void);
 
 #include <kernel/region.h>
@@ -34,6 +35,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_quicklist_suite());
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
+  CuSuiteAddSuite(suite, get_move_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
 
   CuSuiteRun(suite);

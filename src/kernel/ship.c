@@ -69,10 +69,10 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
     for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
       ship_type *stype = (ship_type *) ql_get(ql, qi);
-      variant var;
+      variant var2;
       const char *n = locale_string(lang, stype->name[0]);
-      var.v = (void *)stype;
-      addtoken(&sn->names, n, var);
+      var2.v = (void *)stype;
+      addtoken(&sn->names, n, var2);
     }
     snames = sn;
   }

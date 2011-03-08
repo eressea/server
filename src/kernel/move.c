@@ -2715,3 +2715,7 @@ void follow_unit(unit * u)
     }
   }
 }
+
+#ifndef DISABLE_TESTS
+#include "move_test.c"
+#endif

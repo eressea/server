@@ -890,7 +890,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   if (b)
     btype = b->type;
 
-  if (b && fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
+  if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
     /* only one of these per region */
     cmistake(u, ord, 93, MSG_PRODUCE);
     return;
