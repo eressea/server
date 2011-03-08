@@ -56,38 +56,40 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
   struct region *r = u->region;
 
   switch (old_race(u->race)) {
-    case RC_ELF:
-      set_show_item(u->faction, I_FEENSTIEFEL);
-      break;
-    case RC_GOBLIN:
-      set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-      set_number(u, 10);
-      break;
-    case RC_HUMAN:
-      if (u->building == NULL) {
-        const building_type *btype = bt_find("castle");
-        if (btype != NULL) {
-          building *b = new_building(btype, r, u->faction->locale);
-          b->size = 10;
-          u->building = b;
-          fset(u, UFL_OWNER);
-        }
+  case RC_ELF:
+    set_show_item(u->faction, I_FEENSTIEFEL);
+    break;
+  case RC_GOBLIN:
+    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
+    set_number(u, 10);
+    break;
+  case RC_HUMAN:
+    if (u->building == NULL) {
+      const building_type *btype = bt_find("castle");
+      if (btype != NULL) {
+        building *b = new_building(btype, r, u->faction->locale);
+        b->size = 10;
+        u->building = b;
+        fset(u, UFL_OWNER);
       }
-      break;
-    case RC_CAT:
-      set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-      break;
-    case RC_AQUARIAN:
-    {
-      ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
-      sh->size = sh->type->construction->maxsize;
-      u->ship = sh;
-      fset(u, UFL_OWNER);
     }
-      break;
-    case RC_CENTAUR:
-      rsethorses(r, 250 + rng_int() % 51 + rng_int() % 51);
-      break;
+    break;
+  case RC_CAT:
+    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
+    break;
+  case RC_AQUARIAN:
+  {
+    ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
+    sh->size = sh->type->construction->maxsize;
+    u->ship = sh;
+    fset(u, UFL_OWNER);
+  }
+    break;
+  case RC_CENTAUR:
+    rsethorses(r, 250 + rng_int() % 51 + rng_int() % 51);
+    break;
+  default:
+    break;
   }
 }
 

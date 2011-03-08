@@ -359,17 +359,17 @@ static order *monster_move(region * r, unit * u)
   if (monster_is_waiting(u))
     return NULL;
   switch (old_race(u->race)) {
-    case RC_FIREDRAGON:
-    case RC_DRAGON:
-    case RC_WYRM:
-      d = richest_neighbour(r, u->faction, 1);
-      break;
-    case RC_TREEMAN:
-      d = treeman_neighbour(r);
-      break;
-    default:
-      d = random_neighbour(r, u);
-      break;
+  case RC_FIREDRAGON:
+  case RC_DRAGON:
+  case RC_WYRM:
+    d = richest_neighbour(r, u->faction, 1);
+    break;
+  case RC_TREEMAN:
+    d = treeman_neighbour(r);
+    break;
+  default:
+    d = random_neighbour(r, u);
+    break;
   }
 
   /* falls kein geld gefunden wird, zufaellig verreisen, aber nicht in
@@ -379,8 +379,8 @@ static order *monster_move(region * r, unit * u)
     return NULL;
 
   reduce_weight(u);
-  return create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale,
-      directions[d]));
+  return create_order(K_MOVE, u->faction->locale, "%s",
+    LOC(u->faction->locale, directions[d]));
 }
 
 static int dragon_affinity_value(region * r, unit * u)
@@ -461,8 +461,8 @@ static order *make_movement_order(unit * u, const region * target, int moves,
     return NULL;
 
   bytes =
-    (int)strlcpy(bufp, (const char *)LOC(u->faction->locale, keywords[K_MOVE]),
-    size);
+    (int)strlcpy(bufp,
+    (const char *)LOC(u->faction->locale, keywords[K_MOVE]), size);
   if (wrptr(&bufp, &size, bytes) != 0)
     WARN_STATIC_BUFFER();
 
@@ -476,8 +476,8 @@ static order *make_movement_order(unit * u, const region * target, int moves,
       --size;
     }
     bytes =
-      (int)strlcpy(bufp, (const char *)LOC(u->faction->locale, directions[dir]),
-      size);
+      (int)strlcpy(bufp,
+      (const char *)LOC(u->faction->locale, directions[dir]), size);
     if (wrptr(&bufp, &size, bytes) != 0)
       WARN_STATIC_BUFFER();
   }
@@ -501,11 +501,11 @@ static order *monster_seeks_target(region * r, unit * u)
    */
 
   switch (old_race(u->race)) {
-    case RC_ALP:
-      target = alp_target(u);
-      break;
-    default:
-      assert(!"Seeker-Monster gibt kein Ziel an");
+  case RC_ALP:
+    target = alp_target(u);
+    break;
+  default:
+    assert(!"Seeker-Monster gibt kein Ziel an");
   }
 
   /* TODO: prüfen, ob target überhaupt noch existiert... */
@@ -540,8 +540,8 @@ static order *monster_seeks_target(region * r, unit * u)
   }
   assert(d != NODIRECTION);
 
-  return create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale,
-      directions[d]));
+  return create_order(K_MOVE, u->faction->locale, "%s",
+    LOC(u->faction->locale, directions[d]));
 }
 #endif
 
@@ -563,16 +563,16 @@ static void monster_attacks(unit * u)
 static const char *random_growl(void)
 {
   switch (rng_int() % 5) {
-    case 0:
-      return "Groammm";
-    case 1:
-      return "Roaaarrrr";
-    case 2:
-      return "Chhhhhhhhhh";
-    case 3:
-      return "Tschrrrkk";
-    case 4:
-      return "Schhhh";
+  case 0:
+    return "Groammm";
+  case 1:
+    return "Roaaarrrr";
+  case 2:
+    return "Chhhhhhhhhh";
+  case 3:
+    return "Tschrrrkk";
+  case 4:
+    return "Schhhh";
   }
   return "";
 }
@@ -702,23 +702,28 @@ static order *plan_dragon(unit * u)
   if (tr != NULL) {
     assert(long_order == NULL);
     switch (old_race(u->race)) {
-      case RC_FIREDRAGON:
-        long_order = make_movement_order(u, tr, 4, allowed_dragon);
-        break;
-      case RC_DRAGON:
-        long_order = make_movement_order(u, tr, 3, allowed_dragon);
-        break;
-      case RC_WYRM:
-        long_order = make_movement_order(u, tr, 1, allowed_dragon);
-        break;
+    case RC_FIREDRAGON:
+      long_order = make_movement_order(u, tr, 4, allowed_dragon);
+      break;
+    case RC_DRAGON:
+      long_order = make_movement_order(u, tr, 3, allowed_dragon);
+      break;
+    case RC_WYRM:
+      long_order = make_movement_order(u, tr, 1, allowed_dragon);
+      break;
+    default:
+      break;
     }
     if (rng_int() % 100 < 15) {
       const struct locale *lang = u->faction->locale;
       /* do a growl */
       if (rname(tr, lang)) {
-        addlist(&u->orders, create_order(K_MAIL, lang, "%s '%s... %s %s %s'",
-            LOC(lang, parameters[P_REGION]), random_growl(),
-            u->number == 1 ? "Ich rieche" : "Wir riechen",
+        addlist(&u->orders,
+          create_order(K_MAIL, lang, "%s '%s... %s %s %s'",
+            LOC(lang, parameters[P_REGION]),
+            random_growl(),
+            u->number ==
+            1 ? "Ich rieche" : "Wir riechen",
             "etwas in", rname(tr, u->faction->locale)));
       }
     }
@@ -797,8 +802,8 @@ void plan_monsters(faction * f)
       if (ta && !monster_is_waiting(u)) {
         unit *tu = (unit *) ta->data.v;
         if (tu && tu->region == r) {
-          addlist(&u->orders, create_order(K_ATTACK, u->faction->locale, "%i",
-              tu->no));
+          addlist(&u->orders,
+            create_order(K_ATTACK, u->faction->locale, "%i", tu->no));
         } else if (tu) {
           tu = findunitg(ta->data.i, NULL);
           if (tu != NULL) {
@@ -833,8 +838,8 @@ void plan_monsters(faction * f)
         if (u->race->bonus[SK_WEAPONLESS] != -99) {
           if (eff_skill(u, SK_WEAPONLESS, u->region) < 1) {
             long_order =
-              create_order(K_STUDY, f->locale, "'%s'", skillname(SK_WEAPONLESS,
-                f->locale));
+              create_order(K_STUDY, f->locale, "'%s'",
+              skillname(SK_WEAPONLESS, f->locale));
           }
         }
       }
@@ -847,24 +852,24 @@ void plan_monsters(faction * f)
         }
 
         switch (old_race(u->race)) {
-          case RC_SEASERPENT:
-            long_order = create_order(K_PIRACY, f->locale, NULL);
-            break;
+        case RC_SEASERPENT:
+          long_order = create_order(K_PIRACY, f->locale, NULL);
+          break;
 #ifdef TODO_ALP
-          case RC_ALP:
-            long_order = monster_seeks_target(r, u);
-            break;
+        case RC_ALP:
+          long_order = monster_seeks_target(r, u);
+          break;
 #endif
-          case RC_FIREDRAGON:
-          case RC_DRAGON:
-          case RC_WYRM:
-            long_order = plan_dragon(u);
-            break;
-          default:
-            if (u->race->flags & RCF_LEARN) {
-              long_order = monster_learn(u);
-            }
-            break;
+        case RC_FIREDRAGON:
+        case RC_DRAGON:
+        case RC_WYRM:
+          long_order = plan_dragon(u);
+          break;
+        default:
+          if (u->race->flags & RCF_LEARN) {
+            long_order = monster_learn(u);
+          }
+          break;
         }
       }
       if (long_order) {
@@ -891,7 +896,8 @@ static int nrand(int start, int sub)
     if (rng_int() % 100 < start)
       res++;
     start -= sub;
-  } while (start > 0);
+  }
+  while (start > 0);
 
   return res;
 }
@@ -925,8 +931,8 @@ void spawn_dragons(void)
 
       if (verbosity >= 2) {
         log_printf("%d %s in %s.\n", u->number,
-          LOC(default_locale, rc_name(u->race, u->number != 1)), regionname(r,
-            NULL));
+          LOC(default_locale,
+            rc_name(u->race, u->number != 1)), regionname(r, NULL));
       }
 
       name_unit(u);
@@ -970,15 +976,15 @@ void spawn_undead(void)
         continue;
 
       switch (rng_int() % 3) {
-        case 0:
-          rc = new_race[RC_SKELETON];
-          break;
-        case 1:
-          rc = new_race[RC_ZOMBIE];
-          break;
-        default:
-          rc = new_race[RC_GHOUL];
-          break;
+      case 0:
+        rc = new_race[RC_SKELETON];
+        break;
+      case 1:
+        rc = new_race[RC_ZOMBIE];
+        break;
+      default:
+        rc = new_race[RC_GHOUL];
+        break;
       }
 
       u = createunit(r, monsters, undead, rc);
@@ -1000,8 +1006,8 @@ void spawn_undead(void)
 
       if (verbosity >= 2) {
         log_printf("%d %s in %s.\n", u->number,
-          LOC(default_locale, rc_name(u->race, u->number != 1)), regionname(r,
-            NULL));
+          LOC(default_locale,
+            rc_name(u->race, u->number != 1)), regionname(r, NULL));
       }
 
       {
