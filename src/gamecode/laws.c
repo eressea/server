@@ -135,8 +135,8 @@ static int RemoveNMRNewbie(void)
 static void restart_race(unit * u, const race * rc)
 {
   faction *oldf = u->faction;
-  faction *f =
-    addfaction(oldf->email, oldf->passw, rc, oldf->locale, oldf->subscription);
+  faction *f = addfaction(oldf->email, oldf->passw, rc, oldf->locale,
+    oldf->subscription);
   unit *nu = addplayer(u->region, f);
   order **ordp = &u->orders;
   f->subscription = u->faction->subscription;
@@ -306,7 +306,8 @@ static void get_food(region * r)
         }
       }
       for (v = r->units; need && v; v = v->next) {
-        if (v->faction != f && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
+        if (v->faction != f && alliedunit(v, f, HELP_MONEY)
+          && help_money(v)) {
           help_feed(v, u, &need);
         }
       }
@@ -419,8 +420,8 @@ static void age_unit(region * r, unit * u)
       if ((itm->type->flags & ITF_NOTLOST) == 0) {
         if (itm->type->flags & (ITF_BIG | ITF_ANIMAL | ITF_CURSED)) {
           ADDMSG(&u->faction->msgs, msg_message("itemcrumble",
-              "unit region item amount", u, u->region, itm->type->rtype,
-              itm->number));
+              "unit region item amount",
+              u, u->region, itm->type->rtype, itm->number));
           i_free(i_remove(itemp, itm));
           continue;
         }
@@ -1056,8 +1057,7 @@ static void transfer_faction(faction * f, faction * f2)
   for (u = f->units; u;) {
     un = u->nextF;
     if (!unit_has_cursed_item(u)
-      && !has_skill(u, SK_MAGIC)
-      && !has_skill(u, SK_ALCHEMY)) {
+      && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
       u_setfaction(u, f2);
     }
     u = un;
@@ -1358,62 +1358,62 @@ static int ally_cmd(unit * u, struct order *ord)
     }
   }
   switch (keyword) {
-    case P_NOT:
+  case P_NOT:
+    sf->status = 0;
+    break;
+
+  case NOPARAM:
+    cmistake(u, ord, 137, MSG_EVENT);
+    return 0;
+
+  case P_ANY:
+    if (not_kw == P_NOT)
       sf->status = 0;
-      break;
+    else
+      sf->status = HELP_ALL;
+    break;
 
-    case NOPARAM:
-      cmistake(u, ord, 137, MSG_EVENT);
-      return 0;
+  case P_TRAVEL:
+    if (not_kw == P_NOT)
+      sf->status = sf->status & (HELP_ALL - HELP_TRAVEL);
+    else
+      sf->status = sf->status | HELP_TRAVEL;
+    break;
 
-    case P_ANY:
-      if (not_kw == P_NOT)
-        sf->status = 0;
-      else
-        sf->status = HELP_ALL;
-      break;
+  case P_GIVE:
+    if (not_kw == P_NOT)
+      sf->status = sf->status & (HELP_ALL - HELP_GIVE);
+    else
+      sf->status = sf->status | HELP_GIVE;
+    break;
 
-    case P_TRAVEL:
-      if (not_kw == P_NOT)
-        sf->status = sf->status & (HELP_ALL - HELP_TRAVEL);
-      else
-        sf->status = sf->status | HELP_TRAVEL;
-      break;
+  case P_MONEY:
+    if (not_kw == P_NOT)
+      sf->status = sf->status & (HELP_ALL - HELP_MONEY);
+    else
+      sf->status = sf->status | HELP_MONEY;
+    break;
 
-    case P_GIVE:
-      if (not_kw == P_NOT)
-        sf->status = sf->status & (HELP_ALL - HELP_GIVE);
-      else
-        sf->status = sf->status | HELP_GIVE;
-      break;
+  case P_FIGHT:
+    if (not_kw == P_NOT)
+      sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
+    else
+      sf->status = sf->status | HELP_FIGHT;
+    break;
 
-    case P_MONEY:
-      if (not_kw == P_NOT)
-        sf->status = sf->status & (HELP_ALL - HELP_MONEY);
-      else
-        sf->status = sf->status | HELP_MONEY;
-      break;
+  case P_FACTIONSTEALTH:
+    if (not_kw == P_NOT)
+      sf->status = sf->status & (HELP_ALL - HELP_FSTEALTH);
+    else
+      sf->status = sf->status | HELP_FSTEALTH;
+    break;
 
-    case P_FIGHT:
-      if (not_kw == P_NOT)
-        sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
-      else
-        sf->status = sf->status | HELP_FIGHT;
-      break;
-
-    case P_FACTIONSTEALTH:
-      if (not_kw == P_NOT)
-        sf->status = sf->status & (HELP_ALL - HELP_FSTEALTH);
-      else
-        sf->status = sf->status | HELP_FSTEALTH;
-      break;
-
-    case P_GUARD:
-      if (not_kw == P_NOT)
-        sf->status = sf->status & (HELP_ALL - HELP_GUARD);
-      else
-        sf->status = sf->status | HELP_GUARD;
-      break;
+  case P_GUARD:
+    if (not_kw == P_NOT)
+      sf->status = sf->status & (HELP_ALL - HELP_GUARD);
+    else
+      sf->status = sf->status | HELP_GUARD;
+    break;
   }
 
   sf->status &= HelpMask();
@@ -1536,69 +1536,69 @@ static int display_cmd(unit * u, struct order *ord)
   skip_token();
 
   switch (getparam(u->faction->locale)) {
-    case P_BUILDING:
-    case P_GEBAEUDE:
-      if (!b) {
-        cmistake(u, ord, 145, MSG_PRODUCE);
-        break;
-      }
-      if (!fval(u, UFL_OWNER)) {
-        cmistake(u, ord, 5, MSG_PRODUCE);
-        break;
-      }
-      if (!fval(b->type, BTF_NAMECHANGE) && b->display && b->display[0] != 0) {
-        cmistake(u, ord, 278, MSG_EVENT);
-        break;
-      }
-      s = &b->display;
+  case P_BUILDING:
+  case P_GEBAEUDE:
+    if (!b) {
+      cmistake(u, ord, 145, MSG_PRODUCE);
       break;
-
-    case P_SHIP:
-      if (!u->ship) {
-        cmistake(u, ord, 144, MSG_PRODUCE);
-        break;
-      }
-      if (!fval(u, UFL_OWNER)) {
-        cmistake(u, ord, 12, MSG_PRODUCE);
-        break;
-      }
-      s = &u->ship->display;
-      break;
-
-    case P_UNIT:
-      s = &u->display;
-      break;
-
-    case P_PRIVAT:
-    {
-      const char *d = getstrtoken();
-      if (d == NULL || *d == 0) {
-        usetprivate(u, NULL);
-      } else {
-        usetprivate(u, d);
-      }
     }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 5, MSG_PRODUCE);
       break;
+    }
+    if (!fval(b->type, BTF_NAMECHANGE) && b->display && b->display[0] != 0) {
+      cmistake(u, ord, 278, MSG_EVENT);
+      break;
+    }
+    s = &b->display;
+    break;
 
-    case P_REGION:
-      if (!b) {
-        cmistake(u, ord, 145, MSG_EVENT);
-        break;
-      }
-      if (!fval(u, UFL_OWNER)) {
-        cmistake(u, ord, 148, MSG_EVENT);
-        break;
-      }
-      if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
-        cmistake(u, ord, 147, MSG_EVENT);
-        break;
-      }
-      s = &r->display;
+  case P_SHIP:
+    if (!u->ship) {
+      cmistake(u, ord, 144, MSG_PRODUCE);
       break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 12, MSG_PRODUCE);
+      break;
+    }
+    s = &u->ship->display;
+    break;
 
-    default:
-      cmistake(u, ord, 110, MSG_EVENT);
+  case P_UNIT:
+    s = &u->display;
+    break;
+
+  case P_PRIVAT:
+  {
+    const char *d = getstrtoken();
+    if (d == NULL || *d == 0) {
+      usetprivate(u, NULL);
+    } else {
+      usetprivate(u, d);
+    }
+  }
+    break;
+
+  case P_REGION:
+    if (!b) {
+      cmistake(u, ord, 145, MSG_EVENT);
       break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 148, MSG_EVENT);
+      break;
+    }
+    if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
+      cmistake(u, ord, 147, MSG_EVENT);
+      break;
+    }
+    s = &r->display;
+    break;
+
+  default:
+    cmistake(u, ord, 110, MSG_EVENT);
+    break;
   }
 
   if (s != NULL) {
@@ -1669,10 +1669,12 @@ rename_building(unit * u, order * ord, building * b, const char *name)
 
     if (owner) {
       if (cansee(owner->faction, u->region, u, 0)) {
-        ADDMSG(&owner->faction->msgs, msg_message("renamed_building_seen",
+        ADDMSG(&owner->faction->msgs,
+          msg_message("renamed_building_seen",
             "building renamer region", b, u, u->region));
       } else {
-        ADDMSG(&owner->faction->msgs, msg_message("renamed_building_notseen",
+        ADDMSG(&owner->faction->msgs,
+          msg_message("renamed_building_notseen",
             "building region", b, u->region));
       }
     }
@@ -1704,182 +1706,181 @@ static int name_cmd(unit * u, struct order *ord)
   }
 
   switch (p) {
-    case P_ALLIANCE:
-      if (foreign == false && f_get_alliance(u->faction)) {
-        alliance *al = u->faction->alliance;
-        faction *lead = alliance_get_leader(al);
-        if (lead == u->faction) {
-          s = &al->name;
-        }
+  case P_ALLIANCE:
+    if (foreign == false && f_get_alliance(u->faction)) {
+      alliance *al = u->faction->alliance;
+      faction *lead = alliance_get_leader(al);
+      if (lead == u->faction) {
+        s = &al->name;
       }
-      break;
-    case P_BUILDING:
-    case P_GEBAEUDE:
-      if (foreign) {
-        b = getbuilding(u->region);
+    }
+    break;
+  case P_BUILDING:
+  case P_GEBAEUDE:
+    if (foreign) {
+      b = getbuilding(u->region);
+    }
+
+    return rename_building(u, ord, b, getstrtoken());
+
+  case P_FACTION:
+    if (foreign == true) {
+      faction *f;
+
+      f = getfaction();
+      if (!f) {
+        cmistake(u, ord, 66, MSG_EVENT);
+        break;
       }
-
-      return rename_building(u, ord, b, getstrtoken());
-
-    case P_FACTION:
-      if (foreign == true) {
-        faction *f;
-
-        f = getfaction();
-        if (!f) {
-          cmistake(u, ord, 66, MSG_EVENT);
-          break;
-        }
-        if (f->age < 10) {
-          cmistake(u, ord, 248, MSG_EVENT);
-          break;
-        } else {
-          const struct locale *lang = locales;
-          for (; lang; lang = nextlocale(lang)) {
-            const char *fdname = LOC(lang, "factiondefault");
-            size_t fdlen = strlen(fdname);
-            if (strlen(f->name) >= fdlen
-              && strncmp(f->name, fdname, fdlen) == 0) {
-              break;
-            }
-          }
-          if (lang == NULL) {
-            cmistake(u, ord, 247, MSG_EVENT);
+      if (f->age < 10) {
+        cmistake(u, ord, 248, MSG_EVENT);
+        break;
+      } else {
+        const struct locale *lang = locales;
+        for (; lang; lang = nextlocale(lang)) {
+          const char *fdname = LOC(lang, "factiondefault");
+          size_t fdlen = strlen(fdname);
+          if (strlen(f->name) >= fdlen && strncmp(f->name, fdname, fdlen) == 0) {
             break;
           }
         }
-        if (cansee(f, r, u, 0)) {
-          ADDMSG(&f->msgs, msg_message("renamed_faction_seen", "unit region", u,
-              r));
-        } else {
-          ADDMSG(&f->msgs, msg_message("renamed_faction_notseen", "", r));
-        }
-        s = &f->name;
-      } else {
-        s = &u->faction->name;
-      }
-      break;
-
-    case P_SHIP:
-      if (foreign == true) {
-        ship *sh = getship(r);
-        unit *uo;
-
-        if (!sh) {
-          cmistake(u, ord, 20, MSG_EVENT);
+        if (lang == NULL) {
+          cmistake(u, ord, 247, MSG_EVENT);
           break;
-        } else {
-          const struct locale *lang = locales;
-          for (; lang; lang = nextlocale(lang)) {
-            const char *sdname = LOC(lang, sh->type->name[0]);
-            size_t sdlen = strlen(sdname);
-            if (strlen(sh->name) >= sdlen
-              && strncmp(sh->name, sdname, sdlen) == 0) {
-              break;
-            }
+        }
+      }
+      if (cansee(f, r, u, 0)) {
+        ADDMSG(&f->msgs,
+          msg_message("renamed_faction_seen", "unit region", u, r));
+      } else {
+        ADDMSG(&f->msgs, msg_message("renamed_faction_notseen", "", r));
+      }
+      s = &f->name;
+    } else {
+      s = &u->faction->name;
+    }
+    break;
 
-            sdname = LOC(lang, parameters[P_SHIP]);
-            sdlen = strlen(sdname);
-            if (strlen(sh->name) >= sdlen
-              && strncmp(sh->name, sdname, sdlen) == 0) {
-              break;
-            }
+  case P_SHIP:
+    if (foreign == true) {
+      ship *sh = getship(r);
+      unit *uo;
 
-          }
-          if (lang == NULL) {
-            cmistake(u, ord, 245, MSG_EVENT);
+      if (!sh) {
+        cmistake(u, ord, 20, MSG_EVENT);
+        break;
+      } else {
+        const struct locale *lang = locales;
+        for (; lang; lang = nextlocale(lang)) {
+          const char *sdname = LOC(lang, sh->type->name[0]);
+          size_t sdlen = strlen(sdname);
+          if (strlen(sh->name) >= sdlen
+            && strncmp(sh->name, sdname, sdlen) == 0) {
             break;
           }
-        }
-        uo = shipowner(sh);
-        if (uo) {
-          if (cansee(uo->faction, r, u, 0)) {
-            ADDMSG(&uo->faction->msgs, msg_message("renamed_ship_seen",
-                "ship renamer region", sh, u, r));
-          } else {
-            ADDMSG(&uo->faction->msgs, msg_message("renamed_ship_notseen",
-                "ship region", sh, r));
-          }
-        }
-        s = &sh->name;
-      } else {
-        if (!u->ship) {
-          cmistake(u, ord, 144, MSG_PRODUCE);
-          break;
-        }
-        if (!fval(u, UFL_OWNER)) {
-          cmistake(u, ord, 12, MSG_PRODUCE);
-          break;
-        }
-        s = &u->ship->name;
-      }
-      break;
 
-    case P_UNIT:
-      if (foreign == true) {
-        unit *u2 = getunit(r, u->faction);
-
-        if (!u2 || !cansee(u->faction, r, u2, 0)) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-              "feedback_unit_not_found", ""));
-          break;
-        } else {
-          const char *udefault = LOC(u2->faction->locale, "unitdefault");
-          size_t udlen = strlen(udefault);
-          size_t unlen = strlen(u2->name);
-          if (unlen >= udlen && strncmp(u2->name, udefault, udlen) != 0) {
-            cmistake(u2, ord, 244, MSG_EVENT);
+          sdname = LOC(lang, parameters[P_SHIP]);
+          sdlen = strlen(sdname);
+          if (strlen(sh->name) >= sdlen
+            && strncmp(sh->name, sdname, sdlen) == 0) {
             break;
           }
-        }
-        if (cansee(u2->faction, r, u, 0)) {
-          ADDMSG(&u2->faction->msgs, msg_message("renamed_seen",
-              "renamer renamed region", u, u2, r));
-        } else {
-          ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen",
-              "renamed region", u2, r));
-        }
-        s = &u2->name;
-      } else {
-        s = &u->name;
-      }
-      break;
 
-    case P_REGION:
-      if (!b) {
-        cmistake(u, ord, 145, MSG_EVENT);
+        }
+        if (lang == NULL) {
+          cmistake(u, ord, 245, MSG_EVENT);
+          break;
+        }
+      }
+      uo = shipowner(sh);
+      if (uo) {
+        if (cansee(uo->faction, r, u, 0)) {
+          ADDMSG(&uo->faction->msgs,
+            msg_message("renamed_ship_seen", "ship renamer region", sh, u, r));
+        } else {
+          ADDMSG(&uo->faction->msgs,
+            msg_message("renamed_ship_notseen", "ship region", sh, r));
+        }
+      }
+      s = &sh->name;
+    } else {
+      if (!u->ship) {
+        cmistake(u, ord, 144, MSG_PRODUCE);
         break;
       }
       if (!fval(u, UFL_OWNER)) {
-        cmistake(u, ord, 148, MSG_EVENT);
+        cmistake(u, ord, 12, MSG_PRODUCE);
         break;
       }
+      s = &u->ship->name;
+    }
+    break;
 
-      if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
-        cmistake(u, ord, 147, MSG_EVENT);
-        break;
-      }
-      s = &r->land->name;
-      break;
+  case P_UNIT:
+    if (foreign == true) {
+      unit *u2 = getunit(r, u->faction);
 
-    case P_GROUP:
-    {
-      attrib *a = NULL;
-      if (fval(u, UFL_GROUP))
-        a = a_find(u->attribs, &at_group);
-      if (a) {
-        group *g = (group *) a->data.v;
-        s = &g->name;
+      if (!u2 || !cansee(u->faction, r, u2, 0)) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "feedback_unit_not_found", ""));
         break;
       } else {
-        cmistake(u, ord, 109, MSG_EVENT);
-        break;
+        const char *udefault = LOC(u2->faction->locale, "unitdefault");
+        size_t udlen = strlen(udefault);
+        size_t unlen = strlen(u2->name);
+        if (unlen >= udlen && strncmp(u2->name, udefault, udlen) != 0) {
+          cmistake(u2, ord, 244, MSG_EVENT);
+          break;
+        }
       }
+      if (cansee(u2->faction, r, u, 0)) {
+        ADDMSG(&u2->faction->msgs, msg_message("renamed_seen",
+            "renamer renamed region", u, u2, r));
+      } else {
+        ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen",
+            "renamed region", u2, r));
+      }
+      s = &u2->name;
+    } else {
+      s = &u->name;
     }
+    break;
+
+  case P_REGION:
+    if (!b) {
+      cmistake(u, ord, 145, MSG_EVENT);
       break;
-    default:
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 148, MSG_EVENT);
+      break;
+    }
+
+    if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
+      cmistake(u, ord, 147, MSG_EVENT);
+      break;
+    }
+    s = &r->land->name;
+    break;
+
+  case P_GROUP:
+  {
+    attrib *a = NULL;
+    if (fval(u, UFL_GROUP))
+      a = a_find(u->attribs, &at_group);
+    if (a) {
+      group *g = (group *) a->data.v;
+      s = &g->name;
+      break;
+    } else {
       cmistake(u, ord, 109, MSG_EVENT);
       break;
+    }
+  }
+    break;
+  default:
+    cmistake(u, ord, 109, MSG_EVENT);
+    break;
   }
 
   if (s != NULL) {
@@ -1898,10 +1899,11 @@ deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
     u = NULL;
   }
   if (!receiver) {              /* BOTSCHAFT an PARTEI */
-    ADDMSG(&f->msgs, msg_message("regionmessage", "region sender string", r, u,
-        s));
+    ADDMSG(&f->msgs,
+      msg_message("regionmessage", "region sender string", r, u, s));
   } else {                      /* BOTSCHAFT an EINHEIT */
-    ADDMSG(&f->msgs, msg_message("unitmessage", "region unit sender string", r,
+    ADDMSG(&f->msgs,
+      msg_message("unitmessage", "region unit sender string", r,
         receiver, u, s));
   }
 }
@@ -1917,8 +1919,8 @@ mailunit(region * r, unit * u, int n, struct order *ord, const char *s)
   } else {
     /* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
      * keine Meldung -> EH hier. */
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-        ""));
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "feedback_unit_not_found", ""));
   }
 }
 
@@ -1950,150 +1952,151 @@ static int mail_cmd(unit * u, struct order *ord)
   do {
     cont = 0;
     switch (findparam(s, u->faction->locale)) {
-      case P_REGION:
-        /* können alle Einheiten in der Region sehen */
-        s = getstrtoken();
-        if (!s[0]) {
-          cmistake(u, ord, 30, MSG_MESSAGE);
-          break;
-        } else {
-          ADDMSG(&r->msgs, msg_message("mail_result", "unit message", u, s));
-          return 0;
-        }
-
-      case P_FACTION:
-      {
-        boolean see = false;
-
-        n = getfactionid();
-
-        for (u2 = r->units; u2; u2 = u2->next) {
-          if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
-            see = true;
-            break;
-          }
-        }
-
-        if (see == false) {
-          cmistake(u, ord, 66, MSG_MESSAGE);
-          break;
-        }
-
-        s = getstrtoken();
-        if (!s[0]) {
-          cmistake(u, ord, 30, MSG_MESSAGE);
-          break;
-        }
-        mailfaction(u, n, ord, s);
-        return 0;
-      }
-
-      case P_UNIT:
-      {
-        boolean see = false;
-        n = getid();
-
-        for (u2 = r->units; u2; u2 = u2->next) {
-          if (u2->no == n && cansee(u->faction, r, u2, 0)) {
-            see = true;
-            break;
-          }
-        }
-
-        if (see == false) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-              "feedback_unit_not_found", ""));
-          return 0;
-        }
-
-        s = getstrtoken();
-        if (!s[0]) {
-          cmistake(u, ord, 30, MSG_MESSAGE);
-          break;
-        } else {
-          attrib *a = a_find(u2->attribs, &at_eventhandler);
-          if (a != NULL) {
-            event_arg args[3];
-            args[0].data.v = (void *)s;
-            args[0].type = "string";
-            args[1].data.v = (void *)u;
-            args[1].type = "unit";
-            args[2].type = NULL;
-            handle_event(a, "message", args);
-          }
-
-          mailunit(r, u, n, ord, s);
-        }
-        return 0;
-      }
-
-      case P_BUILDING:
-      case P_GEBAEUDE:
-      {
-        building *b = getbuilding(r);
-
-        if (!b) {
-          cmistake(u, ord, 6, MSG_MESSAGE);
-          break;
-        }
-
-        s = getstrtoken();
-
-        if (!s[0]) {
-          cmistake(u, ord, 30, MSG_MESSAGE);
-          break;
-        }
-
-        for (u2 = r->units; u2; u2 = u2->next)
-          freset(u2->faction, FFL_SELECT);
-
-        for (u2 = r->units; u2; u2 = u2->next) {
-          if (u2->building == b && !fval(u2->faction, FFL_SELECT)
-            && cansee(u->faction, r, u2, 0)) {
-            mailunit(r, u, u2->no, ord, s);
-            fset(u2->faction, FFL_SELECT);
-          }
-        }
-        return 0;
-      }
-
-      case P_SHIP:
-      {
-        ship *sh = getship(r);
-
-        if (!sh) {
-          cmistake(u, ord, 20, MSG_MESSAGE);
-          break;
-        }
-
-        s = getstrtoken();
-
-        if (!s[0]) {
-          cmistake(u, ord, 30, MSG_MESSAGE);
-          break;
-        }
-
-        for (u2 = r->units; u2; u2 = u2->next)
-          freset(u2->faction, FFL_SELECT);
-
-        for (u2 = r->units; u2; u2 = u2->next) {
-          if (u2->ship == sh && !fval(u2->faction, FFL_SELECT)
-            && cansee(u->faction, r, u2, 0)) {
-            mailunit(r, u, u2->no, ord, s);
-            fset(u2->faction, FFL_SELECT);
-          }
-        }
-        return 0;
-      }
-
-      default:
-        /* possibly filler token? */
-        s = getstrtoken();
-        if (s && *s)
-          cont = 1;
+    case P_REGION:
+      /* können alle Einheiten in der Region sehen */
+      s = getstrtoken();
+      if (!s[0]) {
+        cmistake(u, ord, 30, MSG_MESSAGE);
         break;
+      } else {
+        ADDMSG(&r->msgs, msg_message("mail_result", "unit message", u, s));
+        return 0;
+      }
+
+    case P_FACTION:
+    {
+      boolean see = false;
+
+      n = getfactionid();
+
+      for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
+          see = true;
+          break;
+        }
+      }
+
+      if (see == false) {
+        cmistake(u, ord, 66, MSG_MESSAGE);
+        break;
+      }
+
+      s = getstrtoken();
+      if (!s[0]) {
+        cmistake(u, ord, 30, MSG_MESSAGE);
+        break;
+      }
+      mailfaction(u, n, ord, s);
+      return 0;
     }
-  } while (cont);
+
+    case P_UNIT:
+    {
+      boolean see = false;
+      n = getid();
+
+      for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->no == n && cansee(u->faction, r, u2, 0)) {
+          see = true;
+          break;
+        }
+      }
+
+      if (see == false) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "feedback_unit_not_found", ""));
+        return 0;
+      }
+
+      s = getstrtoken();
+      if (!s[0]) {
+        cmistake(u, ord, 30, MSG_MESSAGE);
+        break;
+      } else {
+        attrib *a = a_find(u2->attribs, &at_eventhandler);
+        if (a != NULL) {
+          event_arg args[3];
+          args[0].data.v = (void *)s;
+          args[0].type = "string";
+          args[1].data.v = (void *)u;
+          args[1].type = "unit";
+          args[2].type = NULL;
+          handle_event(a, "message", args);
+        }
+
+        mailunit(r, u, n, ord, s);
+      }
+      return 0;
+    }
+
+    case P_BUILDING:
+    case P_GEBAEUDE:
+    {
+      building *b = getbuilding(r);
+
+      if (!b) {
+        cmistake(u, ord, 6, MSG_MESSAGE);
+        break;
+      }
+
+      s = getstrtoken();
+
+      if (!s[0]) {
+        cmistake(u, ord, 30, MSG_MESSAGE);
+        break;
+      }
+
+      for (u2 = r->units; u2; u2 = u2->next)
+        freset(u2->faction, FFL_SELECT);
+
+      for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->building == b && !fval(u2->faction, FFL_SELECT)
+          && cansee(u->faction, r, u2, 0)) {
+          mailunit(r, u, u2->no, ord, s);
+          fset(u2->faction, FFL_SELECT);
+        }
+      }
+      return 0;
+    }
+
+    case P_SHIP:
+    {
+      ship *sh = getship(r);
+
+      if (!sh) {
+        cmistake(u, ord, 20, MSG_MESSAGE);
+        break;
+      }
+
+      s = getstrtoken();
+
+      if (!s[0]) {
+        cmistake(u, ord, 30, MSG_MESSAGE);
+        break;
+      }
+
+      for (u2 = r->units; u2; u2 = u2->next)
+        freset(u2->faction, FFL_SELECT);
+
+      for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->ship == sh && !fval(u2->faction, FFL_SELECT)
+          && cansee(u->faction, r, u2, 0)) {
+          mailunit(r, u, u2->no, ord, s);
+          fset(u2->faction, FFL_SELECT);
+        }
+      }
+      return 0;
+    }
+
+    default:
+      /* possibly filler token? */
+      s = getstrtoken();
+      if (s && *s)
+        cont = 1;
+      break;
+    }
+  }
+  while (cont);
   cmistake(u, ord, 149, MSG_MESSAGE);
   return 0;
 }
@@ -2126,8 +2129,8 @@ static int email_cmd(unit * u, struct order *ord)
   } else {
     faction *f = u->faction;
     if (set_email(&f->email, (const char *)s) != 0) {
-      log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no),
-          s));
+      log_error(("Invalid email address for faction %s: %s\n",
+          itoa36(f->no), s));
       ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", s));
     } else {
       ADDMSG(&f->msgs, msg_message("changemail", "value", f->email));
@@ -2370,29 +2373,29 @@ static boolean display_race(faction * f, unit * u, const race * rc)
         WARN_STATIC_BUFFER();
 
       switch (rc->attack[a].type) {
-        case AT_STANDARD:
-          bytes =
-            snprintf(bufp, size, "%s (%s)", LOC(f->locale, "attack_standard"),
-            rc->def_damage);
-          break;
-        case AT_NATURAL:
-          bytes =
-            snprintf(bufp, size, "%s (%s)", LOC(f->locale, "attack_natural"),
-            rc->attack[a].data.dice);
-          break;
-        case AT_SPELL:
-        case AT_COMBATSPELL:
-        case AT_DRAIN_ST:
-        case AT_DAZZLE:
-          bytes = snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
-          break;
-        case AT_STRUCTURAL:
-          bytes =
-            snprintf(bufp, size, "%s (%s)", LOC(f->locale, "attack_structural"),
-            rc->attack[a].data.dice);
-          break;
-        default:
-          bytes = 0;
+      case AT_STANDARD:
+        bytes =
+          snprintf(bufp, size, "%s (%s)",
+          LOC(f->locale, "attack_standard"), rc->def_damage);
+        break;
+      case AT_NATURAL:
+        bytes =
+          snprintf(bufp, size, "%s (%s)",
+          LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
+        break;
+      case AT_SPELL:
+      case AT_COMBATSPELL:
+      case AT_DRAIN_ST:
+      case AT_DAZZLE:
+        bytes = snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
+        break;
+      case AT_STRUCTURAL:
+        bytes =
+          snprintf(bufp, size, "%s (%s)",
+          LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
+        break;
+      default:
+        bytes = 0;
       }
 
       if (bytes && wrptr(&bufp, &size, bytes) != 0)
@@ -2421,54 +2424,54 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
   const race *rc;
 
   switch (p) {
-    case P_ZAUBER:
-      a_removeall(&u->faction->attribs, &at_seenspell);
-      break;
-    case P_POTIONS:
-      skill = effskill(u, SK_ALCHEMY);
-      c = 0;
-      for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
-        if (ptype->level * 2 <= skill) {
-          c += display_potion(u->faction, u, ptype);
-        }
+  case P_ZAUBER:
+    a_removeall(&u->faction->attribs, &at_seenspell);
+    break;
+  case P_POTIONS:
+    skill = effskill(u, SK_ALCHEMY);
+    c = 0;
+    for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
+      if (ptype->level * 2 <= skill) {
+        c += display_potion(u->faction, u, ptype);
       }
-      if (c == 0)
-        cmistake(u, ord, 285, MSG_EVENT);
-      break;
-    case NOPARAM:
-      /* check if it's an item */
-      itype = finditemtype(s, u->faction->locale);
-      if (itype != NULL) {
-        ptype = resource2potion(item2resource(itype));
-        if (ptype != NULL) {
-          if (display_potion(u->faction, u, ptype))
-            break;
-        } else {
-          if (display_item(u->faction, u, itype))
-            break;
-        }
-      }
-      /* try for a spell */
-      sp = get_spellfromtoken(u, s, u->faction->locale);
-      if (sp != NULL && u_hasspell(u, sp)) {
-        attrib *a = a_find(u->faction->attribs, &at_seenspell);
-        while (a != NULL && a->type == &at_seenspell && a->data.v != sp)
-          a = a->next;
-        if (a != NULL)
-          a_remove(&u->faction->attribs, a);
-        break;
-      }
-      /* last, check if it's a race. */
-      rc = findrace(s, u->faction->locale);
-      if (rc != NULL) {
-        if (display_race(u->faction, u, rc))
+    }
+    if (c == 0)
+      cmistake(u, ord, 285, MSG_EVENT);
+    break;
+  case NOPARAM:
+    /* check if it's an item */
+    itype = finditemtype(s, u->faction->locale);
+    if (itype != NULL) {
+      ptype = resource2potion(item2resource(itype));
+      if (ptype != NULL) {
+        if (display_potion(u->faction, u, ptype))
+          break;
+      } else {
+        if (display_item(u->faction, u, itype))
           break;
       }
-      cmistake(u, ord, 21, MSG_EVENT);
+    }
+    /* try for a spell */
+    sp = get_spellfromtoken(u, s, u->faction->locale);
+    if (sp != NULL && u_hasspell(u, sp)) {
+      attrib *a = a_find(u->faction->attribs, &at_seenspell);
+      while (a != NULL && a->type == &at_seenspell && a->data.v != sp)
+        a = a->next;
+      if (a != NULL)
+        a_remove(&u->faction->attribs, a);
       break;
-    default:
-      cmistake(u, ord, 222, MSG_EVENT);
-      break;
+    }
+    /* last, check if it's a race. */
+    rc = findrace(s, u->faction->locale);
+    if (rc != NULL) {
+      if (display_race(u->faction, u, rc))
+        break;
+    }
+    cmistake(u, ord, 21, MSG_EVENT);
+    break;
+  default:
+    cmistake(u, ord, 222, MSG_EVENT);
+    break;
   }
 }
 
@@ -2482,7 +2485,8 @@ static int promotion_cmd(unit * u, struct order *ord)
   }
 
   if (maxheroes(u->faction) < countheroes(u->faction) + u->number) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_maxed", "max count",
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "heroes_maxed", "max count",
         maxheroes(u->faction), countheroes(u->faction)));
     return 0;
   }
@@ -2495,8 +2499,8 @@ static int promotion_cmd(unit * u, struct order *ord)
   money = get_pooled(u, i_silver->rtype, GET_ALL, people);
 
   if (people > money) {
-    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_cost", "cost have",
-        people, money));
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "heroes_cost", "cost have", people, money));
     return 0;
   }
   use_pooled(u, i_silver->rtype, GET_ALL, people);
@@ -2571,38 +2575,38 @@ static int status_cmd(unit * u, struct order *ord)
 
   param = getstrtoken();
   switch (findparam(param, u->faction->locale)) {
-    case P_NOT:
-      setstatus(u, ST_AVOID);
-      break;
-    case P_BEHIND:
-      setstatus(u, ST_BEHIND);
-      break;
-    case P_FLEE:
-      setstatus(u, ST_FLEE);
-      break;
-    case P_CHICKEN:
-      setstatus(u, ST_CHICKEN);
-      break;
-    case P_AGGRO:
-      setstatus(u, ST_AGGRO);
-      break;
-    case P_VORNE:
+  case P_NOT:
+    setstatus(u, ST_AVOID);
+    break;
+  case P_BEHIND:
+    setstatus(u, ST_BEHIND);
+    break;
+  case P_FLEE:
+    setstatus(u, ST_FLEE);
+    break;
+  case P_CHICKEN:
+    setstatus(u, ST_CHICKEN);
+    break;
+  case P_AGGRO:
+    setstatus(u, ST_AGGRO);
+    break;
+  case P_VORNE:
+    setstatus(u, ST_FIGHT);
+    break;
+  case P_HELP:
+    if (getparam(u->faction->locale) == P_NOT) {
+      fset(u, UFL_NOAID);
+    } else {
+      freset(u, UFL_NOAID);
+    }
+    break;
+  default:
+    if (param[0]) {
+      add_message(&u->faction->msgs,
+        msg_feedback(u, ord, "unknown_status", ""));
+    } else {
       setstatus(u, ST_FIGHT);
-      break;
-    case P_HELP:
-      if (getparam(u->faction->locale) == P_NOT) {
-        fset(u, UFL_NOAID);
-      } else {
-        freset(u, UFL_NOAID);
-      }
-      break;
-    default:
-      if (param[0]) {
-        add_message(&u->faction->msgs,
-          msg_feedback(u, ord, "unknown_status", ""));
-      } else {
-        setstatus(u, ST_FIGHT);
-      }
+    }
   }
   return 0;
 }
@@ -2710,7 +2714,8 @@ static int guard_on_cmd(unit * u, struct order *ord)
   } else {
     if (fval(u, UFL_MOVED)) {
       cmistake(u, ord, 187, MSG_EVENT);
-    } else if (fval(u->race, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
+    } else if (fval(u->race, RCF_ILLUSIONARY)
+      || u->race == new_race[RC_SPELL]) {
       cmistake(u, ord, 95, MSG_EVENT);
     } else {
       /* Monster der Monsterpartei dürfen immer bewachen */
@@ -2744,14 +2749,14 @@ static void sinkships(region * r)
       if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r)
           || get_captain(sh) == NULL)) {
         /* Schiff nicht seetüchtig */
-        float dmg =
-          get_param_flt(global.parameters, "rules.ship.damage.nocrewocean",
+        float dmg = get_param_flt(global.parameters,
+          "rules.ship.damage.nocrewocean",
           0.30F);
         damage_ship(sh, dmg);
       }
       if (shipowner(sh) == NULL) {
-        float dmg =
-          get_param_flt(global.parameters, "rules.ship.damage.nocrew", 0.05F);
+        float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew",
+          0.05F);
         damage_ship(sh, dmg);
       }
     }
@@ -2868,26 +2873,31 @@ static void reorder(void)
               cmistake(u, ord, 10, MSG_EVENT);
             } else {
               switch (p) {
-                case P_AFTER:
+              case P_AFTER:
+                *up = u->next;
+                u->next = v->next;
+                v->next = u;
+                fset(u, UFL_MARK);
+                sorted = true;
+                break;
+              case P_BEFORE:
+                if (fval(v, UFL_OWNER)) {
+                  cmistake(v, ord, 261, MSG_EVENT);
+                } else {
+                  unit **vp = &r->units;
+                  while (*vp != v)
+                    vp = &(*vp)->next;
+                  *vp = u;
                   *up = u->next;
-                  u->next = v->next;
-                  v->next = u;
-                  break;
-                case P_BEFORE:
-                  if (fval(v, UFL_OWNER)) {
-                    cmistake(v, ord, 261, MSG_EVENT);
-                  } else {
-                    unit **vp = &r->units;
-                    while (*vp != v)
-                      vp = &(*vp)->next;
-                    *vp = u;
-                    *up = u->next;
-                    u->next = v;
-                  }
-                  break;
+                  u->next = v;
+                }
+                fset(u, UFL_MARK);
+                sorted = true;
+                break;
+              default:
+                /* TODO: syntax error message? */
+                break;
               }
-              fset(u, UFL_MARK);
-              sorted = true;
             }
             break;
           }
@@ -2898,8 +2908,9 @@ static void reorder(void)
     }
     if (sorted) {
       unit *u;
-      for (u = r->units; u; u = u->next)
+      for (u = r->units; u; u = u->next) {
         freset(u, UFL_MARK);
+      }
     }
   }
 }
@@ -2973,109 +2984,109 @@ static int renumber_cmd(unit * u, order * ord)
   s = getstrtoken();
   switch (findparam(s, u->faction->locale)) {
 
-    case P_FACTION:
-      s = getstrtoken();
-      if (s && *s) {
-        int id = atoi36((const char *)s);
-        attrib *a = a_find(f->attribs, &at_number);
-        if (!a)
-          a = a_add(&f->attribs, a_new(&at_number));
-        a->data.i = id;
-      }
-      break;
+  case P_FACTION:
+    s = getstrtoken();
+    if (s && *s) {
+      int id = atoi36((const char *)s);
+      attrib *a = a_find(f->attribs, &at_number);
+      if (!a)
+        a = a_add(&f->attribs, a_new(&at_number));
+      a->data.i = id;
+    }
+    break;
 
-    case P_UNIT:
-      s = getstrtoken();
-      if (s == NULL || *s == 0) {
-        i = newunitid();
-      } else {
-        i = atoi36((const char *)s);
-        if (i <= 0 || i > MAX_UNIT_NR) {
-          cmistake(u, ord, 114, MSG_EVENT);
-          break;
-        }
-
-        if (forbiddenid(i)) {
-          cmistake(u, ord, 116, MSG_EVENT);
-          break;
-        }
-
-        if (findunitg(i, u->region)) {
-          cmistake(u, ord, 115, MSG_EVENT);
-          break;
-        }
-      }
-      uunhash(u);
-      if (!ualias(u)) {
-        attrib *a = a_add(&u->attribs, a_new(&at_alias));
-        a->data.i = -u->no;
-      }
-      u->no = i;
-      uhash(u);
-      break;
-
-    case P_SHIP:
-      if (!u->ship) {
-        cmistake(u, ord, 144, MSG_EVENT);
+  case P_UNIT:
+    s = getstrtoken();
+    if (s == NULL || *s == 0) {
+      i = newunitid();
+    } else {
+      i = atoi36((const char *)s);
+      if (i <= 0 || i > MAX_UNIT_NR) {
+        cmistake(u, ord, 114, MSG_EVENT);
         break;
       }
-      if (u->ship->coast != NODIRECTION) {
+
+      if (forbiddenid(i)) {
         cmistake(u, ord, 116, MSG_EVENT);
         break;
       }
-      if (!fval(u, UFL_OWNER)) {
-        cmistake(u, ord, 146, MSG_EVENT);
-        break;
-      }
-      s = getstrtoken();
-      if (s == NULL || *s == 0) {
-        i = newcontainerid();
-      } else {
-        i = atoi36((const char *)s);
-        if (i <= 0 || i > MAX_CONTAINER_NR) {
-          cmistake(u, ord, 114, MSG_EVENT);
-          break;
-        }
-        if (findship(i) || findbuilding(i)) {
-          cmistake(u, ord, 115, MSG_EVENT);
-          break;
-        }
-      }
-      sunhash(u->ship);
-      u->ship->no = i;
-      shash(u->ship);
-      break;
-    case P_BUILDING:
-    case P_GEBAEUDE:
-      if (!u->building) {
-        cmistake(u, ord, 145, MSG_EVENT);
-        break;
-      }
-      if (!fval(u, UFL_OWNER)) {
-        cmistake(u, ord, 148, MSG_EVENT);
-        break;
-      }
-      s = getstrtoken();
-      if (*s == 0) {
-        i = newcontainerid();
-      } else {
-        i = atoi36((const char *)s);
-        if (i <= 0 || i > MAX_CONTAINER_NR) {
-          cmistake(u, ord, 114, MSG_EVENT);
-          break;
-        }
-        if (findship(i) || findbuilding(i)) {
-          cmistake(u, ord, 115, MSG_EVENT);
-          break;
-        }
-      }
-      bunhash(u->building);
-      u->building->no = i;
-      bhash(u->building);
-      break;
 
-    default:
-      cmistake(u, ord, 239, MSG_EVENT);
+      if (findunitg(i, u->region)) {
+        cmistake(u, ord, 115, MSG_EVENT);
+        break;
+      }
+    }
+    uunhash(u);
+    if (!ualias(u)) {
+      attrib *a = a_add(&u->attribs, a_new(&at_alias));
+      a->data.i = -u->no;
+    }
+    u->no = i;
+    uhash(u);
+    break;
+
+  case P_SHIP:
+    if (!u->ship) {
+      cmistake(u, ord, 144, MSG_EVENT);
+      break;
+    }
+    if (u->ship->coast != NODIRECTION) {
+      cmistake(u, ord, 116, MSG_EVENT);
+      break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 146, MSG_EVENT);
+      break;
+    }
+    s = getstrtoken();
+    if (s == NULL || *s == 0) {
+      i = newcontainerid();
+    } else {
+      i = atoi36((const char *)s);
+      if (i <= 0 || i > MAX_CONTAINER_NR) {
+        cmistake(u, ord, 114, MSG_EVENT);
+        break;
+      }
+      if (findship(i) || findbuilding(i)) {
+        cmistake(u, ord, 115, MSG_EVENT);
+        break;
+      }
+    }
+    sunhash(u->ship);
+    u->ship->no = i;
+    shash(u->ship);
+    break;
+  case P_BUILDING:
+  case P_GEBAEUDE:
+    if (!u->building) {
+      cmistake(u, ord, 145, MSG_EVENT);
+      break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 148, MSG_EVENT);
+      break;
+    }
+    s = getstrtoken();
+    if (*s == 0) {
+      i = newcontainerid();
+    } else {
+      i = atoi36((const char *)s);
+      if (i <= 0 || i > MAX_CONTAINER_NR) {
+        cmistake(u, ord, 114, MSG_EVENT);
+        break;
+      }
+      if (findship(i) || findbuilding(i)) {
+        cmistake(u, ord, 115, MSG_EVENT);
+        break;
+      }
+    }
+    bunhash(u->building);
+    u->building->no = i;
+    bhash(u->building);
+    break;
+
+  default:
+    cmistake(u, ord, 239, MSG_EVENT);
   }
   return 0;
 }
@@ -3118,8 +3129,8 @@ static building *age_building(building * b)
             }
             if (unicorns) {
               ADDMSG(&u->faction->msgs, msg_message("scunicorn",
-                  "unit amount rtype", u, unicorns,
-                  olditemtype[I_ELVENHORSE]->rtype));
+                  "unit amount rtype",
+                  u, unicorns, olditemtype[I_ELVENHORSE]->rtype));
             }
           }
         }
@@ -3141,8 +3152,8 @@ static building *age_building(building * b)
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
             (float)MAX(1, sk), MAX(1, sk / 2), effect, 0);
-          ADDMSG(&r->msgs, msg_message("astralshield_activate",
-              "region unit", r, mage));
+          ADDMSG(&r->msgs,
+            msg_message("astralshield_activate", "region unit", r, mage));
         }
       } else if (mage != NULL) {
         int sk = effskill(mage, SK_MAGIC);
@@ -3364,13 +3375,15 @@ static void new_units(void)
 
             if (err) {
               if (err == 1) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, makeord,
-                    "too_many_units_in_alliance", "allowed",
-                    maxunits(u->faction)));
+                ADDMSG(&u->faction->msgs,
+                  msg_feedback(u, makeord,
+                    "too_many_units_in_alliance",
+                    "allowed", maxunits(u->faction)));
               } else {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, makeord,
-                    "too_many_units_in_faction", "allowed",
-                    maxunits(u->faction)));
+                ADDMSG(&u->faction->msgs,
+                  msg_feedback(u, makeord,
+                    "too_many_units_in_faction",
+                    "allowed", maxunits(u->faction)));
               }
               ordp = &makeord->next;
 
@@ -3436,27 +3449,27 @@ void check_long_orders(unit * u)
       keyword_t longorder = get_keyword(ord);
       if (otherorder != MAXKEYWORDS) {
         switch (longorder) {
-          case K_CAST:
-            if (otherorder != longorder) {
-              cmistake(u, ord, 52, MSG_EVENT);
-            }
-            break;
-          case K_BUY:
-            if (otherorder == K_SELL) {
-              otherorder = K_BUY;
-            } else {
-              cmistake(u, ord, 52, MSG_EVENT);
-            }
-            break;
-          case K_SELL:
-            if (otherorder != K_SELL && otherorder != K_BUY) {
-              cmistake(u, ord, 52, MSG_EVENT);
-            }
-            break;
-          case K_WEREWOLF:
-            /* don't know what WEREWOLF does... */
-          default:
+        case K_CAST:
+          if (otherorder != longorder) {
             cmistake(u, ord, 52, MSG_EVENT);
+          }
+          break;
+        case K_BUY:
+          if (otherorder == K_SELL) {
+            otherorder = K_BUY;
+          } else {
+            cmistake(u, ord, 52, MSG_EVENT);
+          }
+          break;
+        case K_SELL:
+          if (otherorder != K_SELL && otherorder != K_BUY) {
+            cmistake(u, ord, 52, MSG_EVENT);
+          }
+          break;
+        case K_WEREWOLF:
+          /* don't know what WEREWOLF does... */
+        default:
+          cmistake(u, ord, 52, MSG_EVENT);
         }
       } else {
         otherorder = longorder;
@@ -3503,37 +3516,39 @@ static void setdefaults(unit * u)
     } else {
       keyword_t keyword = get_keyword(ord);
       switch (keyword) {
-          /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-           * werden. Da Handel erst nach anderen langen Befehlen kommt,
-           * muß das vorher abgefangen werden. Wir merken uns also
-           * hier, ob die Einheit handelt. */
-        case K_BUY:
-        case K_SELL:
-          /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-           * werden. */
-          trade = true;
-          break;
+        /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+         * werden. Da Handel erst nach anderen langen Befehlen kommt,
+         * muß das vorher abgefangen werden. Wir merken uns also
+         * hier, ob die Einheit handelt. */
+      case K_BUY:
+      case K_SELL:
+        /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+         * werden. */
+        trade = true;
+        break;
 
-        case K_CAST:
-          /* dient dazu, das neben Zaubern kein weiterer Befehl
-           * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-          set_order(&u->thisorder, NULL);
-          break;
+      case K_CAST:
+        /* dient dazu, das neben Zaubern kein weiterer Befehl
+         * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+        set_order(&u->thisorder, NULL);
+        break;
 
-        case K_WEREWOLF:
-          set_order(&u->thisorder, copy_order(ord));
-          break;
+      case K_WEREWOLF:
+        set_order(&u->thisorder, copy_order(ord));
+        break;
 
-          /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-           * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-           * nicht moeglich ist, Schulden zu machen. */
+        /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+         * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+         * nicht moeglich ist, Schulden zu machen. */
+      default:
+        break;
       }
     }
   }
 
-  if (hunger)
+  if (hunger) {
     return;
-
+  }
   /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
    * werden. */
 
@@ -3578,18 +3593,20 @@ static double heal_factor(const unit * u)
 {
   static float elf_regen = -1;
   switch (old_race(u->race)) {
-    case RC_TROLL:
-    case RC_DAEMON:
-      return 1.5;
-    case RC_GOBLIN:
-      return 2.0;
-    case RC_ELF:
-      if (elf_regen < 0)
-        elf_regen = get_param_flt(u->race->parameters, "regen.forest", 1.0F);
-      if (elf_regen != 1.0 && r_isforest(u->region)) {
-        return elf_regen;
-      }
-      return 1.0;
+  case RC_TROLL:
+  case RC_DAEMON:
+    return 1.5;
+  case RC_GOBLIN:
+    return 2.0;
+  case RC_ELF:
+    if (elf_regen < 0)
+      elf_regen = get_param_flt(u->race->parameters, "regen.forest", 1.0F);
+    if (elf_regen != 1.0 && r_isforest(u->region)) {
+      return elf_regen;
+    }
+    return 1.0;
+  default:
+    return 1.0;
   }
   return 1.0;
 }
@@ -3630,8 +3647,8 @@ static void monthly_healing(void)
       if (fval(u, UFL_HUNGER))
         continue;
 
-      if (fval(r->terrain, SEA_REGION) && u->ship == NULL && !(canswim(u)
-          || canfly(u))) {
+      if (fval(r->terrain, SEA_REGION) && u->ship == NULL
+        && !(canswim(u) || canfly(u))) {
         continue;
       }
 

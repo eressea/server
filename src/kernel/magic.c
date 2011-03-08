@@ -985,13 +985,13 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
       /* sind die Kosten stufenabhängig, so muss itemanz noch mit dem
        * level multipliziert werden */
       switch (sp->components[k].cost) {
-        case SPC_LEVEL:
-        case SPC_LINEAR:
-          itemanz *= level;
-          break;
-        case SPC_FIX:
-        default:
-          break;
+      case SPC_LEVEL:
+      case SPC_LINEAR:
+        itemanz *= level;
+        break;
+      case SPC_FIX:
+      default:
+        break;
       }
 
       itemhave = get_pooled(u, rtype, GET_DEFAULT, itemanz);
@@ -1206,48 +1206,48 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
     return true;
 
   switch (objtyp) {
-    case TYP_UNIT:
-    {
-      int at, pa = 0;
-      skill *sv;
-      unit *u = (unit *) obj;
+  case TYP_UNIT:
+  {
+    int at, pa = 0;
+    skill *sv;
+    unit *u = (unit *) obj;
 
-      at = effskill(magician, SK_MAGIC);
+    at = effskill(magician, SK_MAGIC);
 
-      for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-        int sk = effskill(u, sv->id);
-        if (pa < sk)
-          pa = sk;
-      }
-
-      /* Contest */
-      probability = 0.05 * (10 + pa - at);
-
-      probability += magic_resistance((unit *) obj);
-      break;
+    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+      int sk = effskill(u, sv->id);
+      if (pa < sk)
+        pa = sk;
     }
 
-    case TYP_REGION:
-      /* Bonus durch Zauber */
-      probability +=
-        0.01 * get_curseeffect(((region *) obj)->attribs, C_RESIST_MAGIC, 0);
-      break;
+    /* Contest */
+    probability = 0.05 * (10 + pa - at);
 
-    case TYP_BUILDING:
-      /* Bonus durch Zauber */
-      probability +=
-        0.01 * get_curseeffect(((building *) obj)->attribs, C_RESIST_MAGIC, 0);
+    probability += magic_resistance((unit *) obj);
+    break;
+  }
 
-      /* Bonus durch Typ */
-      probability += 0.01 * ((building *) obj)->type->magres;
+  case TYP_REGION:
+    /* Bonus durch Zauber */
+    probability +=
+      0.01 * get_curseeffect(((region *) obj)->attribs, C_RESIST_MAGIC, 0);
+    break;
 
-      break;
+  case TYP_BUILDING:
+    /* Bonus durch Zauber */
+    probability +=
+      0.01 * get_curseeffect(((building *) obj)->attribs, C_RESIST_MAGIC, 0);
 
-    case TYP_SHIP:
-      /* Bonus durch Zauber */
-      probability +=
-        0.01 * get_curseeffect(((ship *) obj)->attribs, C_RESIST_MAGIC, 0);
-      break;
+    /* Bonus durch Typ */
+    probability += 0.01 * ((building *) obj)->type->magres;
+
+    break;
+
+  case TYP_SHIP:
+    /* Bonus durch Zauber */
+    probability +=
+      0.01 * get_curseeffect(((ship *) obj)->attribs, C_RESIST_MAGIC, 0);
+    break;
   }
 
   probability = MAX(0.02, probability + t_bonus * 0.01);
@@ -1348,86 +1348,86 @@ static void do_fumble(castorder * co)
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
       u, r, sp));
   switch (rng_int() % 10) {
-    case 0:
-      /* wenn vorhanden spezieller Patzer, ansonsten nix */
-      if (sp->patzer)
-        sp->patzer(co);
-      else
-        patzer(co);
-      break;
+  case 0:
+    /* wenn vorhanden spezieller Patzer, ansonsten nix */
+    if (sp->patzer)
+      sp->patzer(co);
+    else
+      patzer(co);
+    break;
 
-    case 1:
-      /* Kröte */
-    {
-      /* one or two things will happen: the toad changes her race back,
-       * and may or may not get toadslime.
-       * The list of things to happen are attached to a timeout
-       * trigger and that's added to the triggerlit of the mage gone toad.
-       */
-      trigger *trestore = trigger_changerace(u, u->race, u->irace);
+  case 1:
+    /* Kröte */
+  {
+    /* one or two things will happen: the toad changes her race back,
+     * and may or may not get toadslime.
+     * The list of things to happen are attached to a timeout
+     * trigger and that's added to the triggerlit of the mage gone toad.
+     */
+    trigger *trestore = trigger_changerace(u, u->race, u->irace);
 
-      if (chance(0.7)) {
-        const item_type *it_toadslime = it_find("toadslime");
-        if (it_toadslime != NULL) {
-          t_add(&trestore, trigger_giveitem(u, it_toadslime, 1));
-        }
+    if (chance(0.7)) {
+      const item_type *it_toadslime = it_find("toadslime");
+      if (it_toadslime != NULL) {
+        t_add(&trestore, trigger_giveitem(u, it_toadslime, 1));
       }
-
-      duration = rng_int() % level / 2;
-      if (duration < 2)
-        duration = 2;
-      add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-      u->race = new_race[RC_TOAD];
-      u->irace = NULL;
-      ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
-      break;
     }
-      /* fall-through is intentional! */
 
-    case 2:
-      /* temporärer Stufenverlust */
-      duration = MAX(rng_int() % level / 2, 2);
-      effect = -0.5 * level;
-      c =
-        create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
-        duration, effect, 1);
-      c->data.i = SK_MAGIC;
-      ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
-      break;
-    case 3:
-    case 4:
-      /* Spruch schlägt fehl, alle Magiepunkte weg */
-      set_spellpoints(u, 0);
-      ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region spell",
-          u, r, sp));
-      break;
+    duration = rng_int() % level / 2;
+    if (duration < 2)
+      duration = 2;
+    add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+    u->race = new_race[RC_TOAD];
+    u->irace = NULL;
+    ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", u, r, sp));
+    break;
+  }
+    /* fall-through is intentional! */
 
-    case 5:
-    case 6:
-      /* Spruch gelingt, aber alle Magiepunkte weg */
-      if (sp->sp_function == NULL) {
-        log_error(("spell '%s' has no function.\n", sp->sname));
-      } else {
-        ((nspell_f) sp->sp_function) (co);
-      }
-      set_spellpoints(u, 0);
-      ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
-          u, r, sp));
-      break;
+  case 2:
+    /* temporärer Stufenverlust */
+    duration = MAX(rng_int() % level / 2, 2);
+    effect = -0.5 * level;
+    c =
+      create_curse(u, &u->attribs, ct_find("skillmod"), (float)level,
+      duration, effect, 1);
+    c->data.i = SK_MAGIC;
+    ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
+    break;
+  case 3:
+  case 4:
+    /* Spruch schlägt fehl, alle Magiepunkte weg */
+    set_spellpoints(u, 0);
+    ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region spell",
+        u, r, sp));
+    break;
 
-    case 7:
-    case 8:
-    case 9:
-    default:
-      /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-      if (sp->sp_function == NULL) {
-        log_error(("spell '%s' has no function.\n", sp->sname));
-      } else {
-        ((nspell_f) sp->sp_function) (co);
-      }
-      ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
-          u, r, sp));
-      countspells(u, 3);
+  case 5:
+  case 6:
+    /* Spruch gelingt, aber alle Magiepunkte weg */
+    if (sp->sp_function == NULL) {
+      log_error(("spell '%s' has no function.\n", sp->sname));
+    } else {
+      ((nspell_f) sp->sp_function) (co);
+    }
+    set_spellpoints(u, 0);
+    ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
+        u, r, sp));
+    break;
+
+  case 7:
+  case 8:
+  case 9:
+  default:
+    /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
+    if (sp->sp_function == NULL) {
+      log_error(("spell '%s' has no function.\n", sp->sname));
+    } else {
+      ((nspell_f) sp->sp_function) (co);
+    }
+    ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
+        u, r, sp));
+    countspells(u, 3);
   }
 
   return;
@@ -1588,16 +1588,16 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj,
 {
   unit *u = NULL;
   switch (spobj->typ) {
-    case SPP_UNIT:
-      u = findunit(spobj->data.i);
-      break;
-    case SPP_TEMP:
-      u = findnewunit(r, mage->faction, spobj->data.i);
-      if (u == NULL)
-        u = findnewunit(mage->region, mage->faction, spobj->data.i);
-      break;
-    default:
-      assert(!"shouldn't happen, this");
+  case SPP_UNIT:
+    u = findunit(spobj->data.i);
+    break;
+  case SPP_TEMP:
+    u = findnewunit(r, mage->faction, spobj->data.i);
+    if (u == NULL)
+      u = findnewunit(mage->region, mage->faction, spobj->data.i);
+    break;
+  default:
+    assert(!"shouldn't happen, this");
   }
   if (u != NULL && (sp->sptyp & SEARCHLOCAL)) {
     if (u->region != r)
@@ -1654,21 +1654,21 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
       spllprm *spobj = sa->param[i];
 
       switch (spobj->typ) {
-        case SPP_TEMP:
-        case SPP_UNIT:
-          if (!verify_unit(target_r, mage, sp, spobj, co->order))
-            ++ * invalid;
-          break;
-        case SPP_BUILDING:
-          if (!verify_building(target_r, mage, sp, spobj, co->order))
-            ++ * invalid;
-          break;
-        case SPP_SHIP:
-          if (!verify_ship(target_r, mage, sp, spobj, co->order))
-            ++ * invalid;
-          break;
-        default:
-          break;
+      case SPP_TEMP:
+      case SPP_UNIT:
+        if (!verify_unit(target_r, mage, sp, spobj, co->order))
+          ++ * invalid;
+        break;
+      case SPP_BUILDING:
+        if (!verify_building(target_r, mage, sp, spobj, co->order))
+          ++ * invalid;
+        break;
+      case SPP_SHIP:
+        if (!verify_ship(target_r, mage, sp, spobj, co->order))
+          ++ * invalid;
+        break;
+      default:
+        break;
       }
     }
 
@@ -1683,77 +1683,76 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
       if (spobj->flag == TARGET_NOTFOUND)
         continue;
       switch (spobj->typ) {
-        case SPP_TEMP:
-        case SPP_UNIT:
-          u = spobj->data.u;
+      case SPP_TEMP:
+      case SPP_UNIT:
+        u = spobj->data.u;
 
-          if ((sp->sptyp & TESTRESISTANCE)
-            && target_resists_magic(mage, u, TYP_UNIT, 0)) {
-            /* Fehlermeldung */
-            spobj->data.i = u->no;
-            spobj->flag = TARGET_RESISTS;
-            ++*resist;
-            ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
-                "unit region command target",
-                mage, mage->region, co->order, u));
-            break;
-          }
-
-          /* TODO: Test auf Parteieigenschaft Magieresistsenz */
-          ++*success;
+        if ((sp->sptyp & TESTRESISTANCE)
+          && target_resists_magic(mage, u, TYP_UNIT, 0)) {
+          /* Fehlermeldung */
+          spobj->data.i = u->no;
+          spobj->flag = TARGET_RESISTS;
+          ++*resist;
+          ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
+              "unit region command target", mage, mage->region, co->order, u));
           break;
-        case SPP_BUILDING:
-          b = spobj->data.b;
+        }
 
-          if ((sp->sptyp & TESTRESISTANCE)
-            && target_resists_magic(mage, b, TYP_BUILDING, 0)) {        /* Fehlermeldung */
-            spobj->data.i = b->no;
-            spobj->flag = TARGET_RESISTS;
-            ++*resist;
-            ADDMSG(&mage->faction->msgs, msg_message("spellbuildingresists",
-                "unit region command id",
-                mage, mage->region, co->order, spobj->data.i));
-            break;
-          }
-          ++*success;
-          break;
-        case SPP_SHIP:
-          sh = spobj->data.sh;
+        /* TODO: Test auf Parteieigenschaft Magieresistsenz */
+        ++*success;
+        break;
+      case SPP_BUILDING:
+        b = spobj->data.b;
 
-          if ((sp->sptyp & TESTRESISTANCE)
-            && target_resists_magic(mage, sh, TYP_SHIP, 0)) {   /* Fehlermeldung */
-            spobj->data.i = sh->no;
-            spobj->flag = TARGET_RESISTS;
-            ++*resist;
-            ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-                "spellshipresists", "ship", sh));
-            break;
-          }
-          ++*success;
+        if ((sp->sptyp & TESTRESISTANCE)
+          && target_resists_magic(mage, b, TYP_BUILDING, 0)) {  /* Fehlermeldung */
+          spobj->data.i = b->no;
+          spobj->flag = TARGET_RESISTS;
+          ++*resist;
+          ADDMSG(&mage->faction->msgs, msg_message("spellbuildingresists",
+              "unit region command id",
+              mage, mage->region, co->order, spobj->data.i));
           break;
+        }
+        ++*success;
+        break;
+      case SPP_SHIP:
+        sh = spobj->data.sh;
 
-        case SPP_REGION:
-          /* haben wir ein Regionsobjekt, dann wird auch dieses und
-             nicht target_r überprüft. */
-          tr = spobj->data.r;
+        if ((sp->sptyp & TESTRESISTANCE)
+          && target_resists_magic(mage, sh, TYP_SHIP, 0)) {     /* Fehlermeldung */
+          spobj->data.i = sh->no;
+          spobj->flag = TARGET_RESISTS;
+          ++*resist;
+          ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+              "spellshipresists", "ship", sh));
+          break;
+        }
+        ++*success;
+        break;
 
-          if ((sp->sptyp & TESTRESISTANCE)
-            && target_resists_magic(mage, tr, TYP_REGION, 0)) { /* Fehlermeldung */
-            spobj->flag = TARGET_RESISTS;
-            ++*resist;
-            ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
-                "unit region command", mage, mage->region, co->order));
-            break;
-          }
-          ++*success;
-          break;
-        case SPP_INT:
-        case SPP_STRING:
-          ++*success;
-          break;
+      case SPP_REGION:
+        /* haben wir ein Regionsobjekt, dann wird auch dieses und
+           nicht target_r überprüft. */
+        tr = spobj->data.r;
 
-        default:
+        if ((sp->sptyp & TESTRESISTANCE)
+          && target_resists_magic(mage, tr, TYP_REGION, 0)) {   /* Fehlermeldung */
+          spobj->flag = TARGET_RESISTS;
+          ++*resist;
+          ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
+              "unit region command", mage, mage->region, co->order));
           break;
+        }
+        ++*success;
+        break;
+      case SPP_INT:
+      case SPP_STRING:
+        ++*success;
+        break;
+
+      default:
+        break;
       }
     }
   } else {
@@ -1804,11 +1803,11 @@ static void free_spellparameter(spellparameter * pa)
   for (i = 0; i < pa->length; i++) {
 
     switch (pa->param[i]->typ) {
-      case SPP_STRING:
-        free(pa->param[i]->data.s);
-        break;
-      default:
-        break;
+    case SPP_STRING:
+      free(pa->param[i]->data.s);
+      break;
+    default:
+      break;
     }
     free(pa->param[i]);
   }
@@ -1967,87 +1966,87 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
     param_t pword;
     int j = -1;
     switch (*c) {
-      case '?':
-        /* tja. das sollte moeglichst nur am Ende passieren, 
-         * weil sonst die kacke dampft. */
+    case '?':
+      /* tja. das sollte moeglichst nur am Ende passieren, 
+       * weil sonst die kacke dampft. */
+      j = 0;
+      ++c;
+      assert(*c == 0);
+      break;
+    case '+':
+      /* das vorhergehende Element kommt ein oder mehrmals vor, wir
+       * springen zum key zurück */
+      j = 0;
+      --c;
+      break;
+    case 'u':
+      /* Parameter ist eine Einheit, evtl. TEMP */
+      j = addparam_unit(param + i, &spobj, u, ord);
+      ++c;
+      break;
+    case 'r':
+      /* Parameter sind zwei Regionskoordinaten */
+      /* this silly thing only works in the normal plane! */
+      j = addparam_region(param + i, &spobj, u, ord, get_normalplane());
+      ++c;
+      break;
+    case 'b':
+      /* Parameter ist eine Burgnummer */
+      j = addparam_building(param + i, &spobj);
+      ++c;
+      break;
+    case 's':
+      j = addparam_ship(param + i, &spobj);
+      ++c;
+      break;
+    case 'c':
+      /* Text, wird im Spruch ausgewertet */
+      j = addparam_string(param + i, &spobj);
+      ++c;
+      break;
+    case 'i':                  /* Zahl */
+      j = addparam_int(param + i, &spobj);
+      ++c;
+      break;
+    case 'k':
+      ++c;
+      pword = findparam(param[i++], u->faction->locale);
+      switch (pword) {
+      case P_REGION:
+        spobj = malloc(sizeof(spllprm));
+        spobj->flag = 0;
+        spobj->typ = SPP_REGION;
+        spobj->data.r = u->region;
         j = 0;
         ++c;
-        assert(*c == 0);
         break;
-      case '+':
-        /* das vorhergehende Element kommt ein oder mehrmals vor, wir
-         * springen zum key zurück */
-        j = 0;
-        --c;
+      case P_UNIT:
+        if (i < size) {
+          j = addparam_unit(param + i, &spobj, u, ord);
+          ++c;
+        }
         break;
-      case 'u':
-        /* Parameter ist eine Einheit, evtl. TEMP */
-        j = addparam_unit(param + i, &spobj, u, ord);
-        ++c;
+      case P_BUILDING:
+      case P_GEBAEUDE:
+        if (i < size) {
+          j = addparam_building(param + i, &spobj);
+          ++c;
+        }
         break;
-      case 'r':
-        /* Parameter sind zwei Regionskoordinaten */
-        /* this silly thing only works in the normal plane! */
-        j = addparam_region(param + i, &spobj, u, ord, get_normalplane());
-        ++c;
-        break;
-      case 'b':
-        /* Parameter ist eine Burgnummer */
-        j = addparam_building(param + i, &spobj);
-        ++c;
-        break;
-      case 's':
-        j = addparam_ship(param + i, &spobj);
-        ++c;
-        break;
-      case 'c':
-        /* Text, wird im Spruch ausgewertet */
-        j = addparam_string(param + i, &spobj);
-        ++c;
-        break;
-      case 'i':                /* Zahl */
-        j = addparam_int(param + i, &spobj);
-        ++c;
-        break;
-      case 'k':
-        ++c;
-        pword = findparam(param[i++], u->faction->locale);
-        switch (pword) {
-          case P_REGION:
-            spobj = malloc(sizeof(spllprm));
-            spobj->flag = 0;
-            spobj->typ = SPP_REGION;
-            spobj->data.r = u->region;
-            j = 0;
-            ++c;
-            break;
-          case P_UNIT:
-            if (i < size) {
-              j = addparam_unit(param + i, &spobj, u, ord);
-              ++c;
-            }
-            break;
-          case P_BUILDING:
-          case P_GEBAEUDE:
-            if (i < size) {
-              j = addparam_building(param + i, &spobj);
-              ++c;
-            }
-            break;
-          case P_SHIP:
-            if (i < size) {
-              j = addparam_ship(param + i, &spobj);
-              ++c;
-            }
-            break;
-          default:
-            j = -1;
-            break;
+      case P_SHIP:
+        if (i < size) {
+          j = addparam_ship(param + i, &spobj);
+          ++c;
         }
         break;
       default:
         j = -1;
         break;
+      }
+      break;
+    default:
+      j = -1;
+      break;
     }
     if (j < 0)
       fail = true;
@@ -2481,10 +2480,12 @@ static boolean is_moving_ship(const region * r, const ship * sh)
 
   if (u)
     switch (get_keyword(u->thisorder)) {
-      case K_ROUTE:
-      case K_MOVE:
-      case K_FOLLOW:
-        return true;
+    case K_ROUTE:
+    case K_MOVE:
+    case K_FOLLOW:
+      return true;
+    default:
+      return false;
     }
   return false;
 }

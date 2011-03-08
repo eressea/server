@@ -951,19 +951,19 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   built = build(u, btype->construction, built, n);
 
   switch (built) {
-    case ECOMPLETE:
-      /* the building is already complete */
-      cmistake(u, ord, 4, MSG_PRODUCE);
-      return;
-    case ENOMATERIALS:
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
-          btype->construction, want));
-      return;
-    case ELOWSKILL:
-    case ENEEDSKILL:
-      /* no skill, or not enough skill points to build */
-      cmistake(u, ord, 50, MSG_PRODUCE);
-      return;
+  case ECOMPLETE:
+    /* the building is already complete */
+    cmistake(u, ord, 4, MSG_PRODUCE);
+    return;
+  case ENOMATERIALS:
+    ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
+        btype->construction, want));
+    return;
+  case ELOWSKILL:
+  case ENEEDSKILL:
+    /* no skill, or not enough skill points to build */
+    cmistake(u, ord, 50, MSG_PRODUCE);
+    return;
   }
 
   /* at this point, the building size is increased. */
@@ -1324,10 +1324,9 @@ void do_misc(region * r, boolean lasttry)
   for (uc = r->units; uc; uc = uc->next) {
     order *ord;
     for (ord = uc->orders; ord; ord = ord->next) {
-      switch (get_keyword(ord)) {
-        case K_CONTACT:
-          contact_cmd(uc, ord, lasttry);
-          break;
+      keyword_t kwd = get_keyword(ord);
+      if (kwd == K_CONTACT) {
+        contact_cmd(uc, ord, lasttry);
       }
     }
   }
@@ -1349,37 +1348,37 @@ void do_misc(region * r, boolean lasttry)
         id = getid();
 
         switch (p) {
-          case P_BUILDING:
-          case P_GEBAEUDE:
-            if (u->building && u->building->no == id)
-              break;
-            if (enter_building(u, ord, id, lasttry)) {
-              unit *ub;
-              for (ub = u; ub; ub = ub->next) {
-                if (ub->building == u->building) {
-                  ulast = ub;
-                }
+        case P_BUILDING:
+        case P_GEBAEUDE:
+          if (u->building && u->building->no == id)
+            break;
+          if (enter_building(u, ord, id, lasttry)) {
+            unit *ub;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->building == u->building) {
+                ulast = ub;
               }
             }
-            break;
+          }
+          break;
 
-          case P_SHIP:
-            if (u->ship && u->ship->no == id)
-              break;
-            if (enter_ship(u, ord, id, lasttry)) {
-              unit *ub;
-              ulast = u;
-              for (ub = u; ub; ub = ub->next) {
-                if (ub->ship == u->ship) {
-                  ulast = ub;
-                }
+        case P_SHIP:
+          if (u->ship && u->ship->no == id)
+            break;
+          if (enter_ship(u, ord, id, lasttry)) {
+            unit *ub;
+            ulast = u;
+            for (ub = u; ub; ub = ub->next) {
+              if (ub->ship == u->ship) {
+                ulast = ub;
               }
             }
-            break;
+          }
+          break;
 
-          default:
-            if (lasttry)
-              cmistake(u, ord, 79, MSG_MOVE);
+        default:
+          if (lasttry)
+            cmistake(u, ord, 79, MSG_MOVE);
 
         }
         if (ulast != NULL) {

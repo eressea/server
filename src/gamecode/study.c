@@ -104,9 +104,7 @@ boolean is_migrant(unit * u)
 /* ------------------------------------------------------------- */
 boolean magic_lowskill(unit * u)
 {
-  if (u->race == new_race[RC_TOAD])
-    return true;
-  return false;
+  return (u->race == new_race[RC_TOAD]) ? true : false;
 }
 
 /* ------------------------------------------------------------- */
@@ -121,23 +119,22 @@ int study_cost(unit * u, skill_t sk)
     sprintf(buffer, "skills.cost.%s", skillnames[sk]);
     cost[sk] = get_param_int(global.parameters, buffer, -1);
   }
-  if (cost[sk] >= 0)
+  if (cost[sk] >= 0) {
     return cost[sk];
-
+  }
   switch (sk) {
-    case SK_SPY:
-      return 100;
-      break;
-    case SK_TACTICS:
-    case SK_HERBALISM:
-    case SK_ALCHEMY:
-      return 200;
-      break;
-    case SK_MAGIC:             /* Die Magiekosten betragen 50+Summe(50*Stufe) */
-      /* 'Stufe' ist dabei die nächste zu erreichende Stufe */
-      stufe = 1 + get_level(u, SK_MAGIC);
-      return k * (1 + ((stufe + 1) * stufe / 2));
-      break;
+  case SK_SPY:
+    return 100;
+  case SK_TACTICS:
+  case SK_HERBALISM:
+  case SK_ALCHEMY:
+    return 200;
+  case SK_MAGIC:               /* Die Magiekosten betragen 50+Summe(50*Stufe) */
+    /* 'Stufe' ist dabei die nächste zu erreichende Stufe */
+    stufe = 1 + get_level(u, SK_MAGIC);
+    return k * (1 + ((stufe + 1) * stufe / 2));
+  default:
+    return 0;
   }
   return 0;
 }

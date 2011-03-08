@@ -223,13 +223,15 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 {
   int mods;
 
-  if (!skill_enabled[sk])
+  if (!skill_enabled[sk]) {
     return 0;
+  }
 #ifdef FASTER_SKILLMOD
   unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
   struct skillmods **imods = &modhash[index];
-  while (*imods && (*imods)->race != rc)
+  while (*imods && (*imods)->race != rc) {
     imods = &(*imods)->next;
+  }
   if (*imods == NULL) {
     *imods = init_skills(rc);
   }
@@ -237,21 +239,19 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 #else
   mods = skill_mod(rc, sk, r->terrain);
 #endif
-  if (rc == new_race[RC_ELF] && r_isforest(r))
-    switch (sk) {
-      case SK_PERCEPTION:
+  if (rc == new_race[RC_ELF] && r_isforest(r)) {
+    if (sk == SK_PERCEPTION) {
+      ++mods;
+    } else if (sk == SK_STEALTH) {
+      if (r_isforest(r)) {
         ++mods;
-        break;
-      case SK_STEALTH:
-        if (r_isforest(r))
-          ++mods;
-        break;
-      case SK_TACTICS:
-        if (r_isforest(r))
-          mods += 2;
-        break;
+      }
+    } else if (sk == SK_TACTICS) {
+      if (r_isforest(r)) {
+        mods += 2;
+      }
     }
-
+  }
   return mods;
 }
 

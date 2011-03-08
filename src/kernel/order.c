@@ -195,33 +195,33 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
   if (kwd == K_STUDY) {
     skill_t sk = findskill(parse_token(&sptr), lang);
     switch (sk) {
-      case NOSKILL:            /* fehler */
+    case NOSKILL:              /* fehler */
+      break;
+    case SK_MAGIC:             /* kann parameter haben */
+      if (*sptr != 0)
         break;
-      case SK_MAGIC:           /* kann parameter haben */
-        if (*sptr != 0)
-          break;
-      default:                 /* nur skill als Parameter, keine extras */
-        data = locale_array[lindex]->study_orders[sk];
-        if (data == NULL) {
-          const char *skname = skillname(sk, lang);
-          data = (order_data *) malloc(sizeof(order_data));
-          locale_array[lindex]->study_orders[sk] = data;
-          data->_keyword = kwd;
-          data->_lindex = lindex;
-          if (strchr(skname, ' ') != NULL) {
-            size_t len = strlen(skname);
-            data->_str = malloc(len + 3);
-            data->_str[0] = '\"';
-            memcpy(data->_str + 1, skname, len);
-            data->_str[len + 1] = '\"';
-            data->_str[len + 2] = '\0';
-          } else {
-            data->_str = strdup(skname);
-          }
-          data->_refcount = 1;
+    default:                   /* nur skill als Parameter, keine extras */
+      data = locale_array[lindex]->study_orders[sk];
+      if (data == NULL) {
+        const char *skname = skillname(sk, lang);
+        data = (order_data *) malloc(sizeof(order_data));
+        locale_array[lindex]->study_orders[sk] = data;
+        data->_keyword = kwd;
+        data->_lindex = lindex;
+        if (strchr(skname, ' ') != NULL) {
+          size_t len = strlen(skname);
+          data->_str = malloc(len + 3);
+          data->_str[0] = '\"';
+          memcpy(data->_str + 1, skname, len);
+          data->_str[len + 1] = '\"';
+          data->_str[len + 2] = '\0';
+        } else {
+          data->_str = strdup(skname);
         }
-        ++data->_refcount;
-        return data;
+        data->_refcount = 1;
+      }
+      ++data->_refcount;
+      return data;
     }
   }
 
@@ -256,15 +256,15 @@ static order *create_order_i(keyword_t kwd, const char *sptr, int persistent,
   /* if this is just nonsense, then we skip it. */
   if (lomem) {
     switch (kwd) {
-      case K_KOMMENTAR:
-      case NOKEYWORD:
-        return NULL;
-      case K_LIEFERE:
-        kwd = K_GIVE;
-        persistent = 1;
-        break;
-      default:
-        break;
+    case K_KOMMENTAR:
+    case NOKEYWORD:
+      return NULL;
+    case K_LIEFERE:
+      kwd = K_GIVE;
+      persistent = 1;
+      break;
+    default:
+      break;
     }
   }
 
@@ -304,26 +304,26 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         const char *s;
         ++params;
         switch (*params) {
-          case 's':
-            s = va_arg(marker, const char *);
-            bytes = (int)strlcpy(bufp, s, size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-              WARN_STATIC_BUFFER();
-            break;
-          case 'd':
-            i = va_arg(marker, int);
-            bytes = (int)strlcpy(bufp, itoa10(i), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-              WARN_STATIC_BUFFER();
-            break;
-          case 'i':
-            i = va_arg(marker, int);
-            bytes = (int)strlcpy(bufp, itoa36(i), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-              WARN_STATIC_BUFFER();
-            break;
-          default:
-            assert(!"unknown format-character in create_order");
+        case 's':
+          s = va_arg(marker, const char *);
+          bytes = (int)strlcpy(bufp, s, size);
+          if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+          break;
+        case 'd':
+          i = va_arg(marker, int);
+          bytes = (int)strlcpy(bufp, itoa10(i), size);
+          if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+          break;
+        case 'i':
+          i = va_arg(marker, int);
+          bytes = (int)strlcpy(bufp, itoa36(i), size);
+          if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+          break;
+        default:
+          assert(!"unknown format-character in create_order");
         }
       } else if (size > 0) {
         *bufp++ = *params;
@@ -379,55 +379,55 @@ boolean is_repeated(const order * ord)
   param_t param;
 
   switch (kwd) {
-    case K_CAST:
-    case K_BUY:
-    case K_SELL:
-    case K_ROUTE:
-    case K_DRIVE:
-    case K_WORK:
-    case K_BESIEGE:
-    case K_ENTERTAIN:
-    case K_TAX:
-    case K_RESEARCH:
-    case K_SPY:
-    case K_STEAL:
-    case K_SABOTAGE:
-    case K_STUDY:
-    case K_TEACH:
-    case K_BREED:
-    case K_PIRACY:
+  case K_CAST:
+  case K_BUY:
+  case K_SELL:
+  case K_ROUTE:
+  case K_DRIVE:
+  case K_WORK:
+  case K_BESIEGE:
+  case K_ENTERTAIN:
+  case K_TAX:
+  case K_RESEARCH:
+  case K_SPY:
+  case K_STEAL:
+  case K_SABOTAGE:
+  case K_STUDY:
+  case K_TEACH:
+  case K_BREED:
+  case K_PIRACY:
+  case K_PLANT:
+    return true;
+
+  case K_FOLLOW:
+    /* FOLLOW is only a long order if we are following a ship. */
+    parser_pushstate();
+    init_tokens(ord);
+    skip_token();
+    param = getparam(lang);
+    parser_popstate();
+
+    if (param == P_SHIP)
       return true;
+    break;
 
-    case K_PLANT:
+  case K_MAKE:
+    /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+     * Arten von MACHE zaehlen aber als neue defaults und werden
+     * behandelt wie die anderen (deswegen kein break nach case
+     * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+     * abgespeichert). */
+    parser_pushstate();
+    init_tokens(ord);           /* initialize token-parser */
+    skip_token();
+    param = getparam(lang);
+    parser_popstate();
+
+    if (param != P_TEMP)
       return true;
-
-    case K_FOLLOW:
-      /* FOLLOW is only a long order if we are following a ship. */
-      parser_pushstate();
-      init_tokens(ord);
-      skip_token();
-      param = getparam(lang);
-      parser_popstate();
-
-      if (param == P_SHIP)
-        return true;
-      break;
-
-    case K_MAKE:
-      /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-       * Arten von MACHE zaehlen aber als neue defaults und werden
-       * behandelt wie die anderen (deswegen kein break nach case
-       * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-       * abgespeichert). */
-      parser_pushstate();
-      init_tokens(ord);         /* initialize token-parser */
-      skip_token();
-      param = getparam(lang);
-      parser_popstate();
-
-      if (param != P_TEMP)
-        return true;
-      break;
+    break;
+  default:
+    return false;
   }
   return false;
 }
@@ -447,55 +447,55 @@ boolean is_exclusive(const order * ord)
   param_t param;
 
   switch (kwd) {
-    case K_MOVE:
-    case K_WEREWOLF:
-      /* these should not become persistent */
-    case K_ROUTE:
-    case K_DRIVE:
-    case K_WORK:
-    case K_BESIEGE:
-    case K_ENTERTAIN:
-    case K_TAX:
-    case K_RESEARCH:
-    case K_SPY:
-    case K_STEAL:
-    case K_SABOTAGE:
-    case K_STUDY:
-    case K_TEACH:
-    case K_BREED:
-    case K_PIRACY:
+  case K_MOVE:
+  case K_WEREWOLF:
+    /* these should not become persistent */
+  case K_ROUTE:
+  case K_DRIVE:
+  case K_WORK:
+  case K_BESIEGE:
+  case K_ENTERTAIN:
+  case K_TAX:
+  case K_RESEARCH:
+  case K_SPY:
+  case K_STEAL:
+  case K_SABOTAGE:
+  case K_STUDY:
+  case K_TEACH:
+  case K_BREED:
+  case K_PIRACY:
+  case K_PLANT:
+    return true;
+
+  case K_FOLLOW:
+    /* FOLLOW is only a long order if we are following a ship. */
+    parser_pushstate();
+    init_tokens(ord);
+    skip_token();
+    param = getparam(lang);
+    parser_popstate();
+
+    if (param == P_SHIP)
       return true;
+    break;
 
-    case K_PLANT:
+  case K_MAKE:
+    /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+     * Arten von MACHE zaehlen aber als neue defaults und werden
+     * behandelt wie die anderen (deswegen kein break nach case
+     * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+     * abgespeichert). */
+    parser_pushstate();
+    init_tokens(ord);           /* initialize token-parser */
+    skip_token();
+    param = getparam(lang);
+    parser_popstate();
+
+    if (param != P_TEMP)
       return true;
-
-    case K_FOLLOW:
-      /* FOLLOW is only a long order if we are following a ship. */
-      parser_pushstate();
-      init_tokens(ord);
-      skip_token();
-      param = getparam(lang);
-      parser_popstate();
-
-      if (param == P_SHIP)
-        return true;
-      break;
-
-    case K_MAKE:
-      /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-       * Arten von MACHE zaehlen aber als neue defaults und werden
-       * behandelt wie die anderen (deswegen kein break nach case
-       * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-       * abgespeichert). */
-      parser_pushstate();
-      init_tokens(ord);         /* initialize token-parser */
-      skip_token();
-      param = getparam(lang);
-      parser_popstate();
-
-      if (param != P_TEMP)
-        return true;
-      break;
+    break;
+  default:
+    return false;
   }
   return false;
 }
@@ -515,57 +515,57 @@ boolean is_long(const order * ord)
   param_t param;
 
   switch (kwd) {
-    case K_CAST:
-    case K_BUY:
-    case K_SELL:
-    case K_MOVE:
-    case K_WEREWOLF:
-    case K_ROUTE:
-    case K_DRIVE:
-    case K_WORK:
-    case K_BESIEGE:
-    case K_ENTERTAIN:
-    case K_TAX:
-    case K_RESEARCH:
-    case K_SPY:
-    case K_STEAL:
-    case K_SABOTAGE:
-    case K_STUDY:
-    case K_TEACH:
-    case K_BREED:
-    case K_PIRACY:
+  case K_CAST:
+  case K_BUY:
+  case K_SELL:
+  case K_MOVE:
+  case K_WEREWOLF:
+  case K_ROUTE:
+  case K_DRIVE:
+  case K_WORK:
+  case K_BESIEGE:
+  case K_ENTERTAIN:
+  case K_TAX:
+  case K_RESEARCH:
+  case K_SPY:
+  case K_STEAL:
+  case K_SABOTAGE:
+  case K_STUDY:
+  case K_TEACH:
+  case K_BREED:
+  case K_PIRACY:
+  case K_PLANT:
+    return true;
+
+  case K_FOLLOW:
+    /* FOLLOW is only a long order if we are following a ship. */
+    parser_pushstate();
+    init_tokens(ord);
+    skip_token();
+    param = getparam(lang);
+    parser_popstate();
+
+    if (param == P_SHIP)
       return true;
+    break;
 
-    case K_PLANT:
+  case K_MAKE:
+    /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+     * Arten von MACHE zaehlen aber als neue defaults und werden
+     * behandelt wie die anderen (deswegen kein break nach case
+     * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+     * abgespeichert). */
+    parser_pushstate();
+    init_tokens(ord);           /* initialize token-parser */
+    skip_token();
+    param = getparam(lang);
+    parser_popstate();
+
+    if (param != P_TEMP)
       return true;
-
-    case K_FOLLOW:
-      /* FOLLOW is only a long order if we are following a ship. */
-      parser_pushstate();
-      init_tokens(ord);
-      skip_token();
-      param = getparam(lang);
-      parser_popstate();
-
-      if (param == P_SHIP)
-        return true;
-      break;
-
-    case K_MAKE:
-      /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-       * Arten von MACHE zaehlen aber als neue defaults und werden
-       * behandelt wie die anderen (deswegen kein break nach case
-       * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-       * abgespeichert). */
-      parser_pushstate();
-      init_tokens(ord);         /* initialize token-parser */
-      skip_token();
-      param = getparam(lang);
-      parser_popstate();
-
-      if (param != P_TEMP)
-        return true;
-      break;
+    break;
+  default:
+    return false;
   }
   return false;
 }
@@ -584,18 +584,20 @@ boolean is_persistent(const order * ord)
   keyword_t kwd = ORD_KEYWORD(ord);
   boolean persist = ord->_persistent != 0;
   switch (kwd) {
-    case K_MOVE:
-    case K_WEREWOLF:
-    case NOKEYWORD:
-      /* lang, aber niemals persistent! */
-      return false;
+  case K_MOVE:
+  case K_WEREWOLF:
+  case NOKEYWORD:
+    /* lang, aber niemals persistent! */
+    return false;
 
-    case K_KOMMENTAR:
-    case K_LIEFERE:
-      return true;
+  case K_KOMMENTAR:
+  case K_LIEFERE:
+    return true;
+
+  default:
+    return persist || is_repeated(ord);
   }
 
-  return persist || is_repeated(ord);
 }
 
 char *write_order(const order * ord, char *buffer, size_t size)

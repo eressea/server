@@ -587,15 +587,11 @@ int skill_limit(faction * f, skill_t sk)
       return fl;
     }
   }
-  switch (sk) {
-    case SK_MAGIC:
-      m = max_magicians(f);
-      break;
-    case SK_ALCHEMY:
-      m =
-        get_param_int(global.parameters, "rules.maxskills.alchemy",
-        MAXALCHEMISTS);
-      break;
+  if (sk == SK_MAGIC) {
+    m = max_magicians(f);
+  } else if (sk == SK_ALCHEMY) {
+    m = get_param_int(global.parameters, "rules.maxskills.alchemy",
+      MAXALCHEMISTS);
   }
   return m;
 }
@@ -607,8 +603,9 @@ int count_skill(faction * f, skill_t sk)
 
   for (u = f->units; u; u = u->nextF) {
     if (has_skill(u, sk)) {
-      if (!is_familiar(u))
+      if (!is_familiar(u)) {
         n += u->number;
+      }
     }
   }
   return n;
@@ -1585,14 +1582,15 @@ static int read_newunitid(const faction * f, const region * r)
 int read_unitid(const faction * f, const region * r)
 {
   const char *s = getstrtoken();
+  param_t param;
 
   /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-  switch (findparam(s, f->locale)) {
-    case P_TEMP:
-      return read_newunitid(f, r);
+  param = findparam(s, f->locale);
+  if (param == P_TEMP) {
+    return read_newunitid(f, r);
   }
   if (!s || *s == 0)
     return -1;
@@ -2492,16 +2490,19 @@ unsigned int guard_flags(const unit * u)
   flags |= GUARD_RECRUIT;
 #endif
   switch (old_race(u->race)) {
-    case RC_ELF:
-      if (u->faction->race != u->race)
-        break;
-      /* else fallthrough */
-    case RC_TREEMAN:
-      flags |= GUARD_TREES;
+  case RC_ELF:
+    if (u->faction->race != u->race)
       break;
-    case RC_IRONKEEPER:
-      flags = GUARD_MINING;
-      break;
+    /* else fallthrough */
+  case RC_TREEMAN:
+    flags |= GUARD_TREES;
+    break;
+  case RC_IRONKEEPER:
+    flags = GUARD_MINING;
+    break;
+  default:
+    /* TODO: This should be configuration variables, all of it */
+    break;
   }
   return flags;
 }
@@ -2932,11 +2933,11 @@ message *movement_error(unit * u, const char *token, order * ord,
 {
   direction_t d;
   switch (error_code) {
-    case E_MOVE_BLOCKED:
-      d = finddirection(token, u->faction->locale);
-      return msg_message("moveblocked", "unit direction", u, d);
-    case E_MOVE_NOREGION:
-      return msg_feedback(u, ord, "unknowndirection", "dirname", token);
+  case E_MOVE_BLOCKED:
+    d = finddirection(token, u->faction->locale);
+    return msg_message("moveblocked", "unit direction", u, d);
+  case E_MOVE_NOREGION:
+    return msg_feedback(u, ord, "unknowndirection", "dirname", token);
   }
   return NULL;
 }
@@ -2953,24 +2954,24 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
 
   d = finddirection(token, u->faction->locale);
   switch (d) {
-    case D_PAUSE:
-      *resultp = r;
-      break;
+  case D_PAUSE:
+    *resultp = r;
+    break;
 
-    case NODIRECTION:
-      r2 = find_special_direction(r, token, u->faction->locale);
-      if (r2 == NULL) {
-        return E_MOVE_NOREGION;
-      }
-      *resultp = r2;
-      break;
+  case NODIRECTION:
+    r2 = find_special_direction(r, token, u->faction->locale);
+    if (r2 == NULL) {
+      return E_MOVE_NOREGION;
+    }
+    *resultp = r2;
+    break;
 
-    default:
-      r2 = rconnect(r, d);
-      if (r2 == NULL || move_blocked(u, r, r2)) {
-        return E_MOVE_BLOCKED;
-      }
-      *resultp = r2;
+  default:
+    r2 = rconnect(r, d);
+    if (r2 == NULL || move_blocked(u, r, r2)) {
+      return E_MOVE_BLOCKED;
+    }
+    *resultp = r2;
   }
   return E_MOVE_OK;
 }

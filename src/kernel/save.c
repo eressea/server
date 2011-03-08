@@ -144,51 +144,29 @@ int freadstr(FILE * F, int encoding, char *start, size_t size)
       }
     }
     switch (c) {
+    case EOF:
+      return EOF;
+    case '"':
+      if (!quote && str != start) {
+        log_error(
+          ("datafile contains a \" that isn't at the start of a string.\n"));
+        assert
+          (!"datafile contains a \" that isn't at the start of a string.\n");
+      }
+      if (quote) {
+        *str = 0;
+        return (int)(str - start);
+      }
+      quote = true;
+      break;
+    case '\\':
+      c = fgetc(F);
+      switch (c) {
       case EOF:
         return EOF;
-      case '"':
-        if (!quote && str != start) {
-          log_error(
-            ("datafile contains a \" that isn't at the start of a string.\n"));
-          assert
-            (!"datafile contains a \" that isn't at the start of a string.\n");
-        }
-        if (quote) {
-          *str = 0;
-          return (int)(str - start);
-        }
-        quote = true;
-        break;
-      case '\\':
-        c = fgetc(F);
-        switch (c) {
-          case EOF:
-            return EOF;
-          case 'n':
-            if ((size_t) (str - start + 1) < size) {
-              *str++ = '\n';
-            }
-            break;
-          default:
-            if ((size_t) (str - start + 1) < size) {
-              if (encoding == XML_CHAR_ENCODING_8859_1 && c & 0x80) {
-                char inbuf = (char)c;
-                size_t inbytes = 1;
-                size_t outbytes = size - (str - start);
-                int ret =
-                  unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
-                if (ret > 0)
-                  str += ret;
-                else {
-                  log_error(
-                    ("input data was not iso-8859-1! assuming utf-8\n"));
-                  encoding = XML_CHAR_ENCODING_ERROR;
-                  *str++ = (char)c;
-                }
-              } else {
-                *str++ = (char)c;
-              }
-            }
+      case 'n':
+        if ((size_t) (str - start + 1) < size) {
+          *str++ = '\n';
         }
         break;
       default:
@@ -209,6 +187,26 @@ int freadstr(FILE * F, int encoding, char *start, size_t size)
             *str++ = (char)c;
           }
         }
+      }
+      break;
+    default:
+      if ((size_t) (str - start + 1) < size) {
+        if (encoding == XML_CHAR_ENCODING_8859_1 && c & 0x80) {
+          char inbuf = (char)c;
+          size_t inbytes = 1;
+          size_t outbytes = size - (str - start);
+          int ret = unicode_latin1_to_utf8(str, &outbytes, &inbuf, &inbytes);
+          if (ret > 0)
+            str += ret;
+          else {
+            log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+            encoding = XML_CHAR_ENCODING_ERROR;
+            *str++ = (char)c;
+          }
+        } else {
+          *str++ = (char)c;
+        }
+      }
     }
   }
 }
@@ -224,20 +222,20 @@ int fwritestr(FILE * F, const char *str)
     while (*str) {
       int c = (int)(unsigned char)*str++;
       switch (c) {
-        case '"':
-        case '\\':
-          fputc('\\', F);
-          fputc(c, F);
-          nwrite += 2;
-          break;
-        case '\n':
-          fputc('\\', F);
-          fputc('n', F);
-          nwrite += 2;
-          break;
-        default:
-          fputc(c, F);
-          ++nwrite;
+      case '"':
+      case '\\':
+        fputc('\\', F);
+        fputc(c, F);
+        nwrite += 2;
+        break;
+      case '\n':
+        fputc('\\', F);
+        fputc('n', F);
+        nwrite += 2;
+        break;
+      default:
+        fputc(c, F);
+        ++nwrite;
       }
     }
   fputc('\"', F);
@@ -300,23 +298,28 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
           boolean quit = false;
           param_t param = findparam(stok, u->faction->locale);
           switch (param) {
-            case P_UNIT:
-            case P_REGION:
+          case P_UNIT:
+          case P_REGION:
+            quit = true;
+            break;
+          case P_FACTION:
+          case P_NEXT:
+          case P_GAMENAME:
+            /* these terminate the orders, so we apply extra checking */
+            if (strlen(stok) >= 3) {
               quit = true;
               break;
-            case P_FACTION:
-            case P_NEXT:
-            case P_GAMENAME:
-              /* these terminate the orders, so we apply extra checking */
-              if (strlen(stok) >= 3) {
-                quit = true;
-                break;
-              } else {
-                quit = false;
-              }
-          }
-          if (quit)
+            } else {
+              quit = false;
+            }
             break;
+          default:
+            /* TODO: syntax error message */
+            break;
+          }
+          if (quit) {
+            break;
+          }
         }
         /* Nun wird der Befehl erzeut und eingehängt */
         *ordp = parse_order(s, u->faction->locale);
@@ -400,58 +403,58 @@ int readorders(const char *filename)
     const char *s;
 
     switch (igetparam(b, lang)) {
-      case P_LOCALE:
-        s = getstrtoken();
+    case P_LOCALE:
+      s = getstrtoken();
 #undef LOCALE_CHANGE
 #ifdef LOCALE_CHANGE
-        if (f && find_locale(s)) {
-          f->locale = find_locale(s);
-        }
+      if (f && find_locale(s)) {
+        f->locale = find_locale(s);
+      }
 #endif
 
-        b = getbuf(F, enc_gamedata);
-        break;
-      case P_GAMENAME:
-      case P_FACTION:
-        f = factionorders();
-        if (f) {
-          ++nfactions;
-        }
+      b = getbuf(F, enc_gamedata);
+      break;
+    case P_GAMENAME:
+    case P_FACTION:
+      f = factionorders();
+      if (f) {
+        ++nfactions;
+      }
 
-        b = getbuf(F, enc_gamedata);
-        break;
+      b = getbuf(F, enc_gamedata);
+      break;
 
-        /* in factionorders wird nur eine zeile gelesen:
-         * diejenige mit dem passwort. Die befehle der units
-         * werden geloescht, und die Partei wird als aktiv
-         * vermerkt. */
+      /* in factionorders wird nur eine zeile gelesen:
+       * diejenige mit dem passwort. Die befehle der units
+       * werden geloescht, und die Partei wird als aktiv
+       * vermerkt. */
 
-      case P_UNIT:
-        if (!f || !unitorders(F, enc_gamedata, f))
-          do {
-            b = getbuf(F, enc_gamedata);
-            if (!b)
-              break;
-            p = igetparam(b, lang);
-          } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
-            && p != P_GAMENAME);
-        break;
+    case P_UNIT:
+      if (!f || !unitorders(F, enc_gamedata, f))
+        do {
+          b = getbuf(F, enc_gamedata);
+          if (!b)
+            break;
+          p = igetparam(b, lang);
+        } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
+          && p != P_GAMENAME);
+      break;
 
-        /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
-         * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
-         * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-         * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-         * muß buf erneut gefüllt werden, da die betreffende Information in nur
-         * einer Zeile steht, und nun die nächste gelesen werden muß. */
+      /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
+       * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
+       * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
+       * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
+       * muß buf erneut gefüllt werden, da die betreffende Information in nur
+       * einer Zeile steht, und nun die nächste gelesen werden muß. */
 
-      case P_NEXT:
-        f = NULL;
-        b = getbuf(F, enc_gamedata);
-        break;
+    case P_NEXT:
+      f = NULL;
+      b = getbuf(F, enc_gamedata);
+      break;
 
-      default:
-        b = getbuf(F, enc_gamedata);
-        break;
+    default:
+      b = getbuf(F, enc_gamedata);
+      break;
     }
   }
 

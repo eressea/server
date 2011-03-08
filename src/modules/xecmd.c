@@ -89,18 +89,17 @@ int xecmd(unit * u, order * ord)
 
   if (a_find(f->attribs, &at_xontormiaexpress)) {
     if (get_keyword(ord) == K_XE) {
+      param_t param;
+
       init_tokens(ord);
       skip_token();
-      switch (findparam(getstrtoken(), f->locale)) {
-        case P_XEPOTION:
-          xe_givepotion(u, ord);
-          break;
-        case P_XEBALLOON:
-          xe_giveballon(u, ord);
-          break;
-        case P_XELAEN:
-          xe_givelaen(u, ord);
-          break;
+      param = findparam(getstrtoken(), f->locale);
+      if (param == P_XEPOTION) {
+        xe_givepotion(u, ord);
+      } else if (param == P_XEBALLOON) {
+        xe_giveballon(u, ord);
+      } else if (param == P_XELAEN) {
+        xe_givelaen(u, ord);
       }
     }
   }

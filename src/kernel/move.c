@@ -1328,12 +1328,14 @@ static int movement_speed(unit * u)
   assert(u->number);
   /* dragons have a fixed speed, and no other effects work on them: */
   switch (old_race(u->race)) {
-    case RC_DRAGON:
-    case RC_WYRM:
-    case RC_FIREDRAGON:
-    case RC_BIRTHDAYDRAGON:
-    case RC_SONGDRAGON:
-      return BP_DRAGON;
+  case RC_DRAGON:
+  case RC_WYRM:
+  case RC_FIREDRAGON:
+  case RC_BIRTHDAYDRAGON:
+  case RC_SONGDRAGON:
+    return BP_DRAGON;
+  default:
+    break;
   }
 
   if (!init) {
@@ -1350,38 +1352,38 @@ static int movement_speed(unit * u)
 
   switch (canride(u)) {
 
-    case 1:                    /* Pferd */
-      mp = BP_RIDING;
-      break;
+  case 1:                      /* Pferd */
+    mp = BP_RIDING;
+    break;
 
-    case 2:                    /* Einhorn */
-      mp = BP_UNICORN;
-      break;
+  case 2:                      /* Einhorn */
+    mp = BP_UNICORN;
+    break;
 
-    default:
-      mp = BP_WALKING;
+  default:
+    mp = BP_WALKING;
 
-      /* Siebenmeilentee */
-      if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+    /* Siebenmeilentee */
+    if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+      mp *= 2;
+      change_effect(u, oldpotiontype[P_FAST], -u->number);
+    }
+
+    /* unicorn in inventory */
+    if (u->number <= get_item(u, I_FEENSTIEFEL)) {
+      mp *= 2;
+    }
+
+    /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
+     * Nicht kumulativ mit anderen Beschleunigungen! */
+    if (mp * dk <= BP_WALKING * u->race->speed && is_astral(u->region)
+      && is_mage(u)) {
+      sc_mage *mage = get_mage(u);
+      if (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN) {
         mp *= 2;
-        change_effect(u, oldpotiontype[P_FAST], -u->number);
       }
-
-      /* unicorn in inventory */
-      if (u->number <= get_item(u, I_FEENSTIEFEL)) {
-        mp *= 2;
-      }
-
-      /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
-       * Nicht kumulativ mit anderen Beschleunigungen! */
-      if (mp * dk <= BP_WALKING * u->race->speed && is_astral(u->region)
-        && is_mage(u)) {
-        sc_mage *mage = get_mage(u);
-        if (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN) {
-          mp *= 2;
-        }
-      }
-      break;
+    }
+    break;
   }
   return (int)(dk * mp);
 }
@@ -1996,15 +1998,15 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
     return route_begin;
   }
   switch (canwalk(u)) {
-    case E_CANWALK_TOOHEAVY:
-      cmistake(u, ord, 57, MSG_MOVE);
-      return route_begin;
-    case E_CANWALK_TOOMANYHORSES:
-      cmistake(u, ord, 56, MSG_MOVE);
-      return route_begin;
-    case E_CANWALK_TOOMANYCARTS:
-      cmistake(u, ord, 42, MSG_MOVE);
-      return route_begin;
+  case E_CANWALK_TOOHEAVY:
+    cmistake(u, ord, 57, MSG_MOVE);
+    return route_begin;
+  case E_CANWALK_TOOMANYHORSES:
+    cmistake(u, ord, 56, MSG_MOVE);
+    return route_begin;
+  case E_CANWALK_TOOMANYCARTS:
+    cmistake(u, ord, 42, MSG_MOVE);
+    return route_begin;
   }
   route_end = cap_route(r, route_begin, route_end, movement_speed(u));
 
@@ -2565,44 +2567,41 @@ void movement(void)
         }
         kword = get_keyword(u->thisorder);
 
-        switch (kword) {
-          case K_ROUTE:
-          case K_MOVE:
-            /* after moving, the unit has no thisorder. this prevents
-             * it from moving twice (or getting error messages twice).
-             * UFL_NOTMOVING is set in combat if the unit is not allowed
-             * to move because it was involved in a battle.
-             */
-            if (fval(u, UFL_NOTMOVING)) {
-              if (fval(u, UFL_LONGACTION)) {
-                cmistake(u, u->thisorder, 52, MSG_MOVE);
-                set_order(&u->thisorder, NULL);
-              } else {
-                cmistake(u, u->thisorder, 319, MSG_MOVE);
-                set_order(&u->thisorder, NULL);
-              }
-            } else if (fval(u, UFL_MOVED)) {
-              cmistake(u, u->thisorder, 187, MSG_MOVE);
-              set_order(&u->thisorder, NULL);
-            } else if (!can_move(u)) {
-              cmistake(u, u->thisorder, 55, MSG_MOVE);
+        if (kword == K_ROUTE || kword == K_MOVE) {
+          /* after moving, the unit has no thisorder. this prevents
+           * it from moving twice (or getting error messages twice).
+           * UFL_NOTMOVING is set in combat if the unit is not allowed
+           * to move because it was involved in a battle.
+           */
+          if (fval(u, UFL_NOTMOVING)) {
+            if (fval(u, UFL_LONGACTION)) {
+              cmistake(u, u->thisorder, 52, MSG_MOVE);
               set_order(&u->thisorder, NULL);
             } else {
-              if (ships) {
-                if (u->ship && fval(u, UFL_OWNER)) {
-                  init_tokens(u->thisorder);
-                  skip_token();
-                  move(u, false);
-                }
-              } else {
-                if (u->ship == NULL || !fval(u, UFL_OWNER)) {
-                  init_tokens(u->thisorder);
-                  skip_token();
-                  move(u, false);
-                }
+              cmistake(u, u->thisorder, 319, MSG_MOVE);
+              set_order(&u->thisorder, NULL);
+            }
+          } else if (fval(u, UFL_MOVED)) {
+            cmistake(u, u->thisorder, 187, MSG_MOVE);
+            set_order(&u->thisorder, NULL);
+          } else if (!can_move(u)) {
+            cmistake(u, u->thisorder, 55, MSG_MOVE);
+            set_order(&u->thisorder, NULL);
+          } else {
+            if (ships) {
+              if (u->ship && fval(u, UFL_OWNER)) {
+                init_tokens(u->thisorder);
+                skip_token();
+                move(u, false);
+              }
+            } else {
+              if (u->ship == NULL || !fval(u, UFL_OWNER)) {
+                init_tokens(u->thisorder);
+                skip_token();
+                move(u, false);
               }
             }
-            break;
+          }
         }
         if (u->region == r) {
           /* not moved, use next unit */
@@ -2683,24 +2682,24 @@ void follow_unit(unit * u)
     }
 
     switch (get_keyword(u2->thisorder)) {
-      case K_MOVE:
-      case K_ROUTE:
-      case K_DRIVE:
-        follow = true;
-        break;
-      default:
-        for (ord = u2->orders; ord; ord = ord->next) {
-          switch (get_keyword(ord)) {
-            case K_FOLLOW:
-            case K_PIRACY:
-              follow = true;
-              break;
-            default:
-              continue;
-          }
+    case K_MOVE:
+    case K_ROUTE:
+    case K_DRIVE:
+      follow = true;
+      break;
+    default:
+      for (ord = u2->orders; ord; ord = ord->next) {
+        switch (get_keyword(ord)) {
+        case K_FOLLOW:
+        case K_PIRACY:
+          follow = true;
           break;
+        default:
+          continue;
         }
         break;
+      }
+      break;
     }
     if (!follow) {
       attrib *a2 = a_find(u2->attribs, &at_follow);

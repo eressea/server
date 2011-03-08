@@ -124,14 +124,15 @@ static void recruit_init(void)
 int income(const unit * u)
 {
   switch (old_race(u->race)) {
-    case RC_FIREDRAGON:
-      return 150 * u->number;
-    case RC_DRAGON:
-      return 1000 * u->number;
-    case RC_WYRM:
-      return 5000 * u->number;
+  case RC_FIREDRAGON:
+    return 150 * u->number;
+  case RC_DRAGON:
+    return 1000 * u->number;
+  case RC_WYRM:
+    return 5000 * u->number;
+  default:
+    return 20 * u->number;
   }
-  return 20 * u->number;
 }
 
 static void scramble(void *data, int n, size_t width)
@@ -356,8 +357,7 @@ static int do_recruiting(recruitment * recruits, int available)
 
       number = MIN(req->qty, (int)(get / multi));
       if (rc->recruitcost) {
-        int afford =
-          get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
+        int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
           number * rc->recruitcost) / rc->recruitcost;
         number = MIN(number, afford);
         use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT,
@@ -1297,22 +1297,22 @@ static int recruit_archetype(unit * u, order * ord)
       return n;
     } else
       switch (n) {
-        case ENOMATERIALS:
-          ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype,
-              want));
-          break;
-        case ELOWSKILL:
-        case ENEEDSKILL:
-          /* no skill, or not enough skill points to build */
-          cmistake(u, ord, 50, MSG_PRODUCE);
-          break;
-        case EBUILDINGREQ:
-          ADDMSG(&u->faction->msgs,
-            msg_feedback(u, u->thisorder, "building_needed", "building",
-              arch->ctype->btype->_name));
-          break;
-        default:
-          assert(!"unhandled return value from build() in recruit_archetype");
+      case ENOMATERIALS:
+        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord, arch->ctype,
+            want));
+        break;
+      case ELOWSKILL:
+      case ENEEDSKILL:
+        /* no skill, or not enough skill points to build */
+        cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+      case EBUILDINGREQ:
+        ADDMSG(&u->faction->msgs,
+          msg_feedback(u, u->thisorder, "building_needed", "building",
+            arch->ctype->btype->_name));
+        break;
+      default:
+        assert(!"unhandled return value from build() in recruit_archetype");
       }
     return 0;
   }
@@ -1340,27 +1340,21 @@ void economics(region * r)
     boolean destroyed = false;
     if (u->number > 0) {
       for (ord = u->orders; ord; ord = ord->next) {
-        switch (get_keyword(ord)) {
-          case K_DESTROY:
-            if (!destroyed) {
-              if (destroy_cmd(u, ord) != 0)
-                ord = NULL;
-              destroyed = true;
-            }
-            break;
-
-          case K_GIVE:
-          case K_LIEFERE:
-            give_cmd(u, ord);
-            break;
-
-          case K_FORGET:
-            forget_cmd(u, ord);
-            break;
-
+        keyword_t kwd = get_keyword(ord);
+        if (kwd == K_DESTROY) {
+          if (!destroyed) {
+            if (destroy_cmd(u, ord) != 0)
+              ord = NULL;
+            destroyed = true;
+          }
+        } else if (kwd == K_GIVE || kwd == K_LIEFERE) {
+          give_cmd(u, ord);
+        } else if (kwd == K_FORGET) {
+          forget_cmd(u, ord);
         }
-        if (u->orders == NULL)
+        if (u->orders == NULL) {
           break;
+        }
       }
     }
   }
@@ -1418,24 +1412,24 @@ static void manufacture(unit * u, const item_type * itype, int want)
   }
   n = build(u, itype->construction, 0, want);
   switch (n) {
-    case ENEEDSKILL:
-      ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
-      return;
-    case EBUILDINGREQ:
-      ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "building_needed", "building",
-          itype->construction->btype->_name));
-      return;
-    case ELOWSKILL:
-      ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "manufacture_skills",
-          "skill minskill product", sk, minskill, itype->rtype, 1));
-      return;
-    case ENOMATERIALS:
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
-          itype->construction, want));
-      return;
+  case ENEEDSKILL:
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
+    return;
+  case EBUILDINGREQ:
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, u->thisorder, "building_needed", "building",
+        itype->construction->btype->_name));
+    return;
+  case ELOWSKILL:
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, u->thisorder, "manufacture_skills",
+        "skill minskill product", sk, minskill, itype->rtype, 1));
+    return;
+  case ENOMATERIALS:
+    ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
+        itype->construction, want));
+    return;
   }
   if (n > 0) {
     i_change(&u->items, itype, n);
@@ -1829,33 +1823,33 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
   }
   built = build(u, ptype->itype->construction, 0, want);
   switch (built) {
-    case ELOWSKILL:
-    case ENEEDSKILL:
-      /* no skill, or not enough skill points to build */
-      cmistake(u, u->thisorder, 50, MSG_PRODUCE);
-      break;
-    case EBUILDINGREQ:
-      ADDMSG(&u->faction->msgs,
-        msg_feedback(u, u->thisorder, "building_needed", "building",
-          ptype->itype->construction->btype->_name));
-      break;
-    case ECOMPLETE:
-      assert(0);
-      break;
-    case ENOMATERIALS:
-      /* something missing from the list of materials */
-      ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
-          ptype->itype->construction, want));
-      return;
-      break;
-    default:
-      i_change(&u->items, ptype->itype, built);
-      if (want == INT_MAX)
-        want = built;
-      ADDMSG(&u->faction->msgs, msg_message("manufacture",
-          "unit region amount wanted resource", u, u->region, built, want,
-          ptype->itype->rtype));
-      break;
+  case ELOWSKILL:
+  case ENEEDSKILL:
+    /* no skill, or not enough skill points to build */
+    cmistake(u, u->thisorder, 50, MSG_PRODUCE);
+    break;
+  case EBUILDINGREQ:
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, u->thisorder, "building_needed", "building",
+        ptype->itype->construction->btype->_name));
+    break;
+  case ECOMPLETE:
+    assert(0);
+    break;
+  case ENOMATERIALS:
+    /* something missing from the list of materials */
+    ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
+        ptype->itype->construction, want));
+    return;
+    break;
+  default:
+    i_change(&u->items, ptype->itype, built);
+    if (want == INT_MAX)
+      want = built;
+    ADDMSG(&u->faction->msgs, msg_message("manufacture",
+        "unit region amount wanted resource", u, u->region, built, want,
+        ptype->itype->rtype));
+    break;
   }
 }
 
@@ -2862,26 +2856,25 @@ static void breed_cmd(unit * u, struct order *ord)
   }
 
   switch (p) {
-    case P_HERBS:
-      plant(r, u, m);
-      break;
-    case P_TREES:
-      breedtrees(r, u, m);
-      break;
-    default:
-      if (p != P_ANY) {
-        rtype = findresourcetype(s, u->faction->locale);
-        if (rtype == rt_mallornseed || rtype == rt_seed) {
-          breedtrees(r, u, m);
-          break;
-        } else if (rtype != oldresourcetype[R_HORSE]) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake",
-              ""));
-          break;
-        }
+  case P_HERBS:
+    plant(r, u, m);
+    break;
+  case P_TREES:
+    breedtrees(r, u, m);
+    break;
+  default:
+    if (p != P_ANY) {
+      rtype = findresourcetype(s, u->faction->locale);
+      if (rtype == rt_mallornseed || rtype == rt_seed) {
+        breedtrees(r, u, m);
+        break;
+      } else if (rtype != oldresourcetype[R_HORSE]) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
+        break;
       }
-      breedhorses(r, u);
-      break;
+    }
+    breedhorses(r, u);
+    break;
   }
 }
 
@@ -3446,17 +3439,15 @@ void produce(struct region *r)
     }
 
     for (ord = u->orders; ord; ord = ord->next) {
-      switch (get_keyword(ord)) {
-        case K_BUY:
-          buy(u, &buyorders, ord);
-          trader = true;
-          break;
-        case K_SELL:
-          /* sell returns true if the sale is not limited
-           * by the region limit */
-          limited &= !sell(u, &sellorders, ord);
-          trader = true;
-          break;
+      keyword_t kwd = get_keyword(ord);
+      if (kwd == K_BUY) {
+        buy(u, &buyorders, ord);
+        trader = true;
+      } else if (kwd == K_SELL) {
+        /* sell returns true if the sale is not limited
+         * by the region limit */
+        limited &= !sell(u, &sellorders, ord);
+        trader = true;
       }
     }
     if (trader) {
@@ -3479,41 +3470,41 @@ void produce(struct region *r)
 
     switch (todo) {
 
-      case K_ENTERTAIN:
-        entertain_cmd(u, u->thisorder);
-        break;
+    case K_ENTERTAIN:
+      entertain_cmd(u, u->thisorder);
+      break;
 
-      case K_WORK:
-        if (!rule_autowork && do_work(u, u->thisorder, nextworker) == 0) {
-          assert(nextworker - workers < MAX_WORKERS);
-          ++nextworker;
-        }
-        break;
+    case K_WORK:
+      if (!rule_autowork && do_work(u, u->thisorder, nextworker) == 0) {
+        assert(nextworker - workers < MAX_WORKERS);
+        ++nextworker;
+      }
+      break;
 
-      case K_TAX:
-        tax_cmd(u, u->thisorder, &taxorders);
-        break;
+    case K_TAX:
+      tax_cmd(u, u->thisorder, &taxorders);
+      break;
 
-      case K_STEAL:
-        steal_cmd(u, u->thisorder, &stealorders);
-        break;
+    case K_STEAL:
+      steal_cmd(u, u->thisorder, &stealorders);
+      break;
 
-      case K_SPY:
-        spy_cmd(u, u->thisorder);
-        break;
+    case K_SPY:
+      spy_cmd(u, u->thisorder);
+      break;
 
-      case K_SABOTAGE:
-        sabotage_cmd(u, u->thisorder);
-        break;
+    case K_SABOTAGE:
+      sabotage_cmd(u, u->thisorder);
+      break;
 
-      case K_PLANT:
-      case K_BREED:
-        breed_cmd(u, u->thisorder);
-        break;
+    case K_PLANT:
+    case K_BREED:
+      breed_cmd(u, u->thisorder);
+      break;
 
-      case K_RESEARCH:
-        research_cmd(u, u->thisorder);
-        break;
+    case K_RESEARCH:
+      research_cmd(u, u->thisorder);
+      break;
     }
   }
 

@@ -8,17 +8,17 @@
 
 This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
-*/  
-  
+*/
+
 #include <platform.h>
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_faction.h"
 #include "bind_region.h"
 #include "helpers.h"
-  
+
 #include <kernel/config.h>
-  
+
 #include <kernel/alliance.h>
 #include <kernel/skill.h>
 #include <kernel/equipment.h>
@@ -37,18 +37,18 @@ without prior permission by the authors of Eressea.
 #include <kernel/teleport.h>
 #include <kernel/faction.h>
 #include <kernel/save.h>
-  
+
 #include <gamecode/creport.h>
 #include <gamecode/economy.h>
 #include <gamecode/summary.h>
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
 #include <gamecode/market.h>
-  
+
 #include <modules/autoseed.h>
 #include <modules/score.h>
 #include <attributes/key.h>
-  
+
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/eventbus.h>
@@ -59,15 +59,15 @@ without prior permission by the authors of Eressea.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/storage.h>
-  
+
 #include <iniparser/iniparser.h>
 #include <tolua.h>
 #include <lua.h>
-  
+
 #include <time.h>
 #include <assert.h>
 
-int log_lua_error(lua_State * L) 
+int log_lua_error(lua_State * L)
 {
   const char *error = lua_tostring(L, -1);
   log_error(("LUA call failed.\n%s\n", error));
@@ -75,10 +75,10 @@ int log_lua_error(lua_State * L)
   return 1;
 }
 
-int tolua_orderlist_next(lua_State * L) 
+int tolua_orderlist_next(lua_State * L)
 {
-  order ** order_ptr = (order **) lua_touserdata(L, lua_upvalueindex(1));
-  order * ord = *order_ptr;
+  order **order_ptr = (order **) lua_touserdata(L, lua_upvalueindex(1));
+  order *ord = *order_ptr;
   if (ord != NULL) {
     char cmd[8192];
     write_order(ord, cmd, sizeof(cmd));
@@ -89,10 +89,10 @@ int tolua_orderlist_next(lua_State * L)
   return 0;
 }
 
-static int tolua_quicklist_iter(lua_State * L) 
+static int tolua_quicklist_iter(lua_State * L)
 {
-  quicklist ** qlp = (quicklist **) lua_touserdata(L, lua_upvalueindex(1));
-  quicklist * ql = *qlp;
+  quicklist **qlp = (quicklist **) lua_touserdata(L, lua_upvalueindex(1));
+  quicklist *ql = *qlp;
   if (ql != NULL) {
     int index = lua_tointeger(L, lua_upvalueindex(2));
     const char *type = lua_tostring(L, lua_upvalueindex(3));
@@ -107,27 +107,27 @@ static int tolua_quicklist_iter(lua_State * L)
 }
 
 int tolua_quicklist_push(struct lua_State *L, const char *list_type,
-  const char *elem_type, struct quicklist *list) 
+  const char *elem_type, struct quicklist *list)
 {
   if (list) {
-    quicklist ** qlist_ptr = 
+    quicklist **qlist_ptr =
       (quicklist **) lua_newuserdata(L, sizeof(quicklist *));
     *qlist_ptr = list;
     luaL_getmetatable(L, list_type);
     lua_setmetatable(L, -2);
     lua_pushnumber(L, 0);
     lua_pushstring(L, elem_type);
-    lua_pushcclosure(L, tolua_quicklist_iter, 3);      /* OBS: this closure has multiple upvalues (list, index, type_name) */
+    lua_pushcclosure(L, tolua_quicklist_iter, 3);       /* OBS: this closure has multiple upvalues (list, index, type_name) */
   } else {
     lua_pushnil(L);
   }
   return 1;
 }
 
-int tolua_itemlist_next(lua_State * L) 
+int tolua_itemlist_next(lua_State * L)
 {
-  item ** item_ptr = (item **) lua_touserdata(L, lua_upvalueindex(1));
-  item * itm = *item_ptr;
+  item **item_ptr = (item **) lua_touserdata(L, lua_upvalueindex(1));
+  item *itm = *item_ptr;
   if (itm != NULL) {
     tolua_pushstring(L, itm->type->rtype->_name[0]);
     *item_ptr = itm->next;
@@ -136,11 +136,11 @@ int tolua_itemlist_next(lua_State * L)
   return 0;
 }
 
-static int tolua_autoseed(lua_State * L) 
+static int tolua_autoseed(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   int new_island = tolua_toboolean(L, 2, 0);
-  newfaction * players = read_newfactions(filename);
+  newfaction *players = read_newfactions(filename);
   if (players != NULL) {
     while (players) {
       int n = listlen(players);
@@ -155,16 +155,16 @@ static int tolua_autoseed(lua_State * L)
   return 0;
 }
 
-static int tolua_getkey(lua_State * L) 
+static int tolua_getkey(lua_State * L)
 {
   const char *name = tolua_tostring(L, 1, 0);
   int flag = atoi36(name);
-  attrib * a = find_key(global.attribs, flag);
+  attrib *a = find_key(global.attribs, flag);
   lua_pushboolean(L, a != NULL);
   return 1;
 }
 
-static int tolua_translate(lua_State * L) 
+static int tolua_translate(lua_State * L)
 {
   const char *str = tolua_tostring(L, 1, 0);
   const char *lang = tolua_tostring(L, 2, 0);
@@ -177,12 +177,12 @@ static int tolua_translate(lua_State * L)
   return 0;
 }
 
-static int tolua_setkey(lua_State * L) 
+static int tolua_setkey(lua_State * L)
 {
   const char *name = tolua_tostring(L, 1, 0);
   int value = tolua_toboolean(L, 2, 0);
   int flag = atoi36(name);
-  attrib * a = find_key(global.attribs, flag);
+  attrib *a = find_key(global.attribs, flag);
   if (a == NULL && value) {
     add_key(&global.attribs, flag);
   } else if (a != NULL && !value) {
@@ -191,13 +191,13 @@ static int tolua_setkey(lua_State * L)
   return 0;
 }
 
-static int tolua_rng_int(lua_State * L) 
+static int tolua_rng_int(lua_State * L)
 {
   lua_pushnumber(L, (lua_Number) rng_int());
   return 1;
 }
 
-static int tolua_read_orders(lua_State * L) 
+static int tolua_read_orders(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   int result = readorders(filename);
@@ -205,10 +205,10 @@ static int tolua_read_orders(lua_State * L)
   return 1;
 }
 
-static int tolua_message_unit(lua_State * L) 
+static int tolua_message_unit(lua_State * L)
 {
-  unit * sender = (unit *) tolua_tousertype(L, 1, 0);
-  unit * target = (unit *) tolua_tousertype(L, 2, 0);
+  unit *sender = (unit *) tolua_tousertype(L, 1, 0);
+  unit *target = (unit *) tolua_tousertype(L, 2, 0);
   const char *str = tolua_tostring(L, 3, 0);
   if (!target)
     tolua_error(L, TOLUA_CAST "target is nil", NULL);
@@ -218,10 +218,10 @@ static int tolua_message_unit(lua_State * L)
   return 0;
 }
 
-static int tolua_message_faction(lua_State * L) 
+static int tolua_message_faction(lua_State * L)
 {
-  unit * sender = (unit *) tolua_tousertype(L, 1, 0);
-  faction * target = (faction *) tolua_tousertype(L, 2, 0);
+  unit *sender = (unit *) tolua_tousertype(L, 1, 0);
+  faction *target = (faction *) tolua_tousertype(L, 2, 0);
   const char *str = tolua_tostring(L, 3, 0);
   if (!target)
     tolua_error(L, TOLUA_CAST "target is nil", NULL);
@@ -231,9 +231,9 @@ static int tolua_message_faction(lua_State * L)
   return 0;
 }
 
-static int tolua_message_region(lua_State * L) 
+static int tolua_message_region(lua_State * L)
 {
-  unit * sender = (unit *) tolua_tousertype(L, 1, 0);
+  unit *sender = (unit *) tolua_tousertype(L, 1, 0);
   const char *str = tolua_tostring(L, 2, 0);
   if (!sender)
     tolua_error(L, TOLUA_CAST "sender is nil", NULL);
@@ -242,46 +242,46 @@ static int tolua_message_region(lua_State * L)
   return 0;
 }
 
-static int tolua_update_guards(lua_State * L) 
+static int tolua_update_guards(lua_State * L)
 {
   update_guards();
   return 0;
 }
 
-static int tolua_set_turn(lua_State * L) 
+static int tolua_set_turn(lua_State * L)
 {
   turn = (int)tolua_tonumber(L, 1, 0);
   return 0;
 }
 
-static int tolua_get_turn(lua_State * L) 
+static int tolua_get_turn(lua_State * L)
 {
   tolua_pushnumber(L, (lua_Number) turn);
   return 1;
 }
 
-static int tolua_atoi36(lua_State * L) 
+static int tolua_atoi36(lua_State * L)
 {
   const char *s = tolua_tostring(L, 1, 0);
   tolua_pushnumber(L, (lua_Number) atoi36(s));
   return 1;
 }
 
-static int tolua_itoa36(lua_State * L) 
+static int tolua_itoa36(lua_State * L)
 {
   int i = (int)tolua_tonumber(L, 1, 0);
   tolua_pushstring(L, itoa36(i));
   return 1;
 }
 
-static int tolua_dice_rand(lua_State * L) 
+static int tolua_dice_rand(lua_State * L)
 {
   const char *s = tolua_tostring(L, 1, 0);
   tolua_pushnumber(L, dice_rand(s));
   return 1;
 }
 
-static int tolua_addequipment(lua_State * L) 
+static int tolua_addequipment(lua_State * L)
 {
   const char *eqname = tolua_tostring(L, 1, 0);
   const char *iname = tolua_tostring(L, 2, 0);
@@ -298,7 +298,7 @@ static int tolua_addequipment(lua_State * L)
   return 1;
 }
 
-static int tolua_get_season(lua_State * L) 
+static int tolua_get_season(lua_State * L)
 {
   int turnno = (int)tolua_tonumber(L, 1, 0);
   gamedate gd;
@@ -307,25 +307,25 @@ static int tolua_get_season(lua_State * L)
   return 1;
 }
 
-static int tolua_create_curse(lua_State * L) 
+static int tolua_create_curse(lua_State * L)
 {
-  unit * u = (unit *) tolua_tousertype(L, 1, 0);
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
   tolua_Error tolua_err;
-  attrib ** ap = NULL;
+  attrib **ap = NULL;
   if (tolua_isusertype(L, 2, TOLUA_CAST "unit", 0, &tolua_err)) {
-    unit * target = (unit *) tolua_tousertype(L, 2, 0);
+    unit *target = (unit *) tolua_tousertype(L, 2, 0);
     if (target)
       ap = &target->attribs;
   } else if (tolua_isusertype(L, 2, TOLUA_CAST "region", 0, &tolua_err)) {
-    region * target = (region *) tolua_tousertype(L, 2, 0);
+    region *target = (region *) tolua_tousertype(L, 2, 0);
     if (target)
       ap = &target->attribs;
   } else if (tolua_isusertype(L, 2, TOLUA_CAST "ship", 0, &tolua_err)) {
-    ship * target = (ship *) tolua_tousertype(L, 2, 0);
+    ship *target = (ship *) tolua_tousertype(L, 2, 0);
     if (target)
       ap = &target->attribs;
   } else if (tolua_isusertype(L, 2, TOLUA_CAST "building", 0, &tolua_err)) {
-    building * target = (building *) tolua_tousertype(L, 2, 0);
+    building *target = (building *) tolua_tousertype(L, 2, 0);
     if (target)
       ap = &target->attribs;
   }
@@ -336,8 +336,8 @@ static int tolua_create_curse(lua_State * L)
       double vigour = tolua_tonumber(L, 4, 0);
       int duration = (int)tolua_tonumber(L, 5, 0);
       double effect = tolua_tonumber(L, 6, 0);
-      int men = (int)tolua_tonumber(L, 7, 0);  /* optional */
-      curse * c = create_curse(u, ap, ctype, vigour, duration, effect, men);
+      int men = (int)tolua_tonumber(L, 7, 0);   /* optional */
+      curse *c = create_curse(u, ap, ctype, vigour, duration, effect, men);
       if (c) {
         tolua_pushboolean(L, true);
         return 1;
@@ -348,9 +348,9 @@ static int tolua_create_curse(lua_State * L)
   return 1;
 }
 
-static int tolua_learn_skill(lua_State * L) 
+static int tolua_learn_skill(lua_State * L)
 {
-  unit * u = (unit *) tolua_tousertype(L, 1, 0);
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
   const char *skname = tolua_tostring(L, 2, 0);
   float chances = (float)tolua_tonumber(L, 3, 0);
   skill_t sk = sk_find(skname);
@@ -360,34 +360,34 @@ static int tolua_learn_skill(lua_State * L)
   return 0;
 }
 
-static int tolua_update_scores(lua_State * L) 
+static int tolua_update_scores(lua_State * L)
 {
   score();
   return 0;
 }
 
-static int tolua_update_owners(lua_State * L) 
+static int tolua_update_owners(lua_State * L)
 {
-  region * r;
+  region *r;
   for (r = regions; r; r = r->next) {
     update_owners(r);
   }
   return 0;
 }
 
-static int tolua_update_subscriptions(lua_State * L) 
+static int tolua_update_subscriptions(lua_State * L)
 {
   update_subscriptions();
   return 0;
 }
 
-static int tolua_remove_empty_units(lua_State * L) 
+static int tolua_remove_empty_units(lua_State * L)
 {
   remove_empty_units();
   return 0;
 }
 
-static int tolua_get_nmrs(lua_State * L) 
+static int tolua_get_nmrs(lua_State * L)
 {
   int result = -1;
   int n = (int)tolua_tonumber(L, 1, 0);
@@ -401,15 +401,15 @@ static int tolua_get_nmrs(lua_State * L)
   return 1;
 }
 
-static int tolua_equipunit(lua_State * L) 
+static int tolua_equipunit(lua_State * L)
 {
-  unit * u = (unit *) tolua_tousertype(L, 1, 0);
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
   const char *eqname = tolua_tostring(L, 2, 0);
   equip_unit(u, get_equipment(eqname));
   return 0;
 }
 
-static int tolua_equipment_setitem(lua_State * L) 
+static int tolua_equipment_setitem(lua_State * L)
 {
   int result = -1;
   const char *eqname = tolua_tostring(L, 1, 0);
@@ -426,30 +426,30 @@ static int tolua_equipment_setitem(lua_State * L)
   return 1;
 }
 
-static int tolua_spawn_braineaters(lua_State * L) 
+static int tolua_spawn_braineaters(lua_State * L)
 {
   float chance = (float)tolua_tonumber(L, 1, 0);
   spawn_braineaters(chance);
   return 0;
 }
 
-static int tolua_init_reports(lua_State * L) 
+static int tolua_init_reports(lua_State * L)
 {
   int result = init_reports();
   tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int tolua_write_report(lua_State * L) 
+static int tolua_write_report(lua_State * L)
 {
-  faction * f = (faction *) tolua_tousertype(L, 1, 0);
+  faction *f = (faction *) tolua_tousertype(L, 1, 0);
   time_t ltime = time(0);
   int result = write_reports(f, ltime);
   tolua_pushnumber(L, (lua_Number) result);
   return 1;
 }
 
-static int tolua_write_reports(lua_State * L) 
+static int tolua_write_reports(lua_State * L)
 {
   int result;
   init_reports();
@@ -458,13 +458,13 @@ static int tolua_write_reports(lua_State * L)
   return 1;
 }
 
-static void reset_game(void) 
+static void reset_game(void)
 {
-  region * r;
-  faction * f;
+  region *r;
+  faction *f;
   for (r = regions; r; r = r->next) {
-    unit * u;
-    building * b;
+    unit *u;
+    building *b;
     r->flags &= RF_SAVEMASK;
     for (u = r->units; u; u = u->next) {
       u->flags &= UFL_SAVEMASK;
@@ -473,10 +473,10 @@ static void reset_game(void)
       b->flags &= BLD_SAVEMASK;
     }
     if (r->land && r->land->ownership && r->land->ownership->owner) {
-      faction * owner = r->land->ownership->owner;
+      faction *owner = r->land->ownership->owner;
       if (owner == get_monsters()) {
-          /* some compat-fix, i believe. */ 
-          owner = update_owners(r);
+        /* some compat-fix, i believe. */
+        owner = update_owners(r);
       }
       if (owner) {
         fset(r, RF_GUARDED);
@@ -488,7 +488,7 @@ static void reset_game(void)
   }
 }
 
-static int tolua_process_orders(lua_State * L) 
+static int tolua_process_orders(lua_State * L)
 {
   ++turn;
   reset_game();
@@ -496,7 +496,7 @@ static int tolua_process_orders(lua_State * L)
   return 0;
 }
 
-static int tolua_write_passwords(lua_State * L) 
+static int tolua_write_passwords(lua_State * L)
 {
   int result = writepasswd();
   lua_pushnumber(L, (lua_Number) result);
@@ -504,13 +504,13 @@ static int tolua_write_passwords(lua_State * L)
 }
 
 static struct summary *sum_begin = 0;
-static int tolua_init_summary(lua_State * L) 
+static int tolua_init_summary(lua_State * L)
 {
   sum_begin = make_summary();
   return 0;
 }
 
-static int tolua_write_summary(lua_State * L) 
+static int tolua_write_summary(lua_State * L)
 {
   if (sum_begin) {
     struct summary *sum_end = make_summary();
@@ -521,13 +521,13 @@ static int tolua_write_summary(lua_State * L)
   return 0;
 }
 
-static int tolua_free_game(lua_State * L) 
+static int tolua_free_game(lua_State * L)
 {
   free_gamedata();
   return 0;
 }
 
-static int tolua_write_map(lua_State * L) 
+static int tolua_write_map(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   if (filename) {
@@ -536,7 +536,7 @@ static int tolua_write_map(lua_State * L)
   return 0;
 }
 
-static int tolua_write_game(lua_State * L) 
+static int tolua_write_game(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   const char *mode = tolua_tostring(L, 2, 0);
@@ -549,7 +549,7 @@ static int tolua_write_game(lua_State * L)
   return 1;
 }
 
-static int tolua_read_game(lua_State * L) 
+static int tolua_read_game(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   const char *mode = tolua_tostring(L, 2, 0);
@@ -561,84 +561,84 @@ static int tolua_read_game(lua_State * L)
   return 1;
 }
 
-static int tolua_read_turn(lua_State * L) 
+static int tolua_read_turn(lua_State * L)
 {
   int cturn = current_turn();
   tolua_pushnumber(L, (lua_Number) cturn);
   return 1;
 }
 
-static int tolua_get_faction(lua_State * L) 
+static int tolua_get_faction(lua_State * L)
 {
   int no = tolua_toid(L, 1, 0);
-  faction * f = findfaction(no);
+  faction *f = findfaction(no);
   tolua_pushusertype(L, f, TOLUA_CAST "faction");
   return 1;
 }
 
-static int tolua_get_region(lua_State * L) 
+static int tolua_get_region(lua_State * L)
 {
   int x = (int)tolua_tonumber(L, 1, 0);
   int y = (int)tolua_tonumber(L, 2, 0);
-  region * r;
+  region *r;
   assert(!pnormalize(&x, &y, findplane(x, y)));
   r = findregion(x, y);
   tolua_pushusertype(L, r, TOLUA_CAST "region");
   return 1;
 }
 
-static int tolua_get_region_byid(lua_State * L) 
+static int tolua_get_region_byid(lua_State * L)
 {
   int uid = (int)tolua_tonumber(L, 1, 0);
-  region * r = findregionbyid(uid);
+  region *r = findregionbyid(uid);
   tolua_pushusertype(L, r, TOLUA_CAST "region");
   return 1;
 }
 
-static int tolua_get_building(lua_State * L) 
+static int tolua_get_building(lua_State * L)
 {
   int no = tolua_toid(L, 1, 0);
-  building * b = findbuilding(no);
+  building *b = findbuilding(no);
   tolua_pushusertype(L, b, TOLUA_CAST "building");
   return 1;
 }
 
-static int tolua_get_ship(lua_State * L) 
+static int tolua_get_ship(lua_State * L)
 {
   int no = tolua_toid(L, 1, 0);
-  ship * sh = findship(no);
+  ship *sh = findship(no);
   tolua_pushusertype(L, sh, TOLUA_CAST "ship");
   return 1;
 }
 
-static int tolua_get_alliance(lua_State * L) 
+static int tolua_get_alliance(lua_State * L)
 {
   int no = tolua_toid(L, 1, 0);
-  alliance * f = findalliance(no);
+  alliance *f = findalliance(no);
   tolua_pushusertype(L, f, TOLUA_CAST "alliance");
   return 1;
 }
 
-static int tolua_get_unit(lua_State * L) 
+static int tolua_get_unit(lua_State * L)
 {
   int no = tolua_toid(L, 1, 0);
-  unit * u = findunit(no);
+  unit *u = findunit(no);
   tolua_pushusertype(L, u, TOLUA_CAST "unit");
   return 1;
 }
 
-static int tolua_alliance_create(lua_State * L) 
+static int tolua_alliance_create(lua_State * L)
 {
   int id = (int)tolua_tonumber(L, 1, 0);
   const char *name = tolua_tostring(L, 2, 0);
-  alliance * alli = makealliance(id, name);
+  alliance *alli = makealliance(id, name);
   tolua_pushusertype(L, alli, TOLUA_CAST "alliance");
   return 1;
 }
 
-static int tolua_get_regions(lua_State * L) 
+static int tolua_get_regions(lua_State * L)
 {
-  region ** region_ptr = (region **) lua_newuserdata(L, sizeof(region *));
+  region **region_ptr = (region **) lua_newuserdata(L, sizeof(region *));
   luaL_getmetatable(L, "region");
   lua_setmetatable(L, -2);
   *region_ptr = regions;
@@ -646,9 +646,9 @@ static int tolua_get_regions(lua_State * L)
   return 1;
 }
 
-static int tolua_get_factions(lua_State * L) 
+static int tolua_get_factions(lua_State * L)
 {
-  faction ** faction_ptr = (faction **) lua_newuserdata(L, sizeof(faction *));
+  faction **faction_ptr = (faction **) lua_newuserdata(L, sizeof(faction *));
   luaL_getmetatable(L, "faction");
   lua_setmetatable(L, -2);
   *faction_ptr = factions;
@@ -656,48 +656,47 @@ static int tolua_get_factions(lua_State * L)
   return 1;
 }
 
-static int tolua_get_alliance_factions(lua_State * L) 
+static int tolua_get_alliance_factions(lua_State * L)
 {
-  alliance * self = (alliance *) tolua_tousertype(L, 1, 0);
+  alliance *self = (alliance *) tolua_tousertype(L, 1, 0);
   return tolua_quicklist_push(L, "faction_list", "faction", self->members);
 }
 
-static int tolua_get_alliance_id(lua_State * L) 
+static int tolua_get_alliance_id(lua_State * L)
 {
-  alliance * self = (alliance *) tolua_tousertype(L, 1, 0);
+  alliance *self = (alliance *) tolua_tousertype(L, 1, 0);
   tolua_pushnumber(L, (lua_Number) self->id);
   return 1;
 }
 
-static int tolua_get_alliance_name(lua_State * L) 
+static int tolua_get_alliance_name(lua_State * L)
 {
-  alliance * self = (alliance *) tolua_tousertype(L, 1, 0);
+  alliance *self = (alliance *) tolua_tousertype(L, 1, 0);
   tolua_pushstring(L, self->name);
   return 1;
 }
 
-static int tolua_set_alliance_name(lua_State * L) 
+static int tolua_set_alliance_name(lua_State * L)
 {
-  alliance * self = (alliance *) tolua_tousertype(L, 1, 0);
+  alliance *self = (alliance *) tolua_tousertype(L, 1, 0);
   alliance_setname(self, tolua_tostring(L, 2, 0));
   return 0;
 }
-
 
 #include <libxml/tree.h>
 #include <util/functions.h>
 #include <util/xml.h>
 #include <kernel/spell.h>
-static int tolua_write_spells(lua_State * L) 
+static int tolua_write_spells(lua_State * L)
 {
   spell_f fun = (spell_f) get_function("lua_castspell");
   const char *filename = "magic.xml";
   xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
   xmlNodePtr root = xmlNewNode(NULL, BAD_CAST "spells");
-  quicklist * ql;
+  quicklist *ql;
   int qi;
   for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-    spell * sp = (spell *) ql_get(ql, qi);
+    spell *sp = (spell *) ql_get(ql, qi);
     if (sp->sp_function != fun) {
       int combat = 0;
       xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
@@ -711,7 +710,7 @@ static int tolua_write_spells(lua_State * L)
       if (sp->parameter)
         xmlNewProp(node, BAD_CAST "parameters", BAD_CAST sp->parameter);
       if (sp->components) {
-        spell_component * comp = sp->components;
+        spell_component *comp = sp->components;
         for (; comp->type != 0; ++comp) {
           static const char *costs[] = { "fixed", "level", "linear" };
           xmlNodePtr cnode = xmlNewNode(NULL, BAD_CAST "resource");
@@ -737,10 +736,10 @@ static int tolua_write_spells(lua_State * L)
       }
       if (sp->sptyp & POSTCOMBATSPELL)
         combat = 3;
-      
+
       else if (sp->sptyp & COMBATSPELL)
         combat = 2;
-      
+
       else if (sp->sptyp & PRECOMBATSPELL)
         combat = 1;
       if (combat) {
@@ -756,20 +755,20 @@ static int tolua_write_spells(lua_State * L)
   return 0;
 }
 
-static int config_get_ships(lua_State * L) 
+static int config_get_ships(lua_State * L)
 {
-  quicklist * ql;
+  quicklist *ql;
   int qi, i = 0;
   lua_createtable(L, ql_length(shiptypes), 0);
   for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
-    ship_type * stype = (ship_type *) ql_get(ql, qi);
+    ship_type *stype = (ship_type *) ql_get(ql, qi);
     tolua_pushstring(L, TOLUA_CAST stype->name[0]);
     lua_rawseti(L, -2, ++i);
   }
   return 1;
 }
 
-static int config_get_locales(lua_State * L) 
+static int config_get_locales(lua_State * L)
 {
   const struct locale *lang;
   int i = 0, n = 0;
@@ -783,7 +782,7 @@ static int config_get_locales(lua_State * L)
   return 1;
 }
 
-static int config_get_resource(lua_State * L) 
+static int config_get_resource(lua_State * L)
 {
   const char *name = tolua_tostring(L, 1, 0);
   if (name) {
@@ -824,42 +823,42 @@ static int config_get_resource(lua_State * L)
   return 0;
 }
 
-static int tolua_get_spell_text(lua_State * L) 
+static int tolua_get_spell_text(lua_State * L)
 {
   const struct locale *loc = default_locale;
-  spell * self = (spell *) tolua_tousertype(L, 1, 0);
+  spell *self = (spell *) tolua_tousertype(L, 1, 0);
   lua_pushstring(L, spell_info(self, loc));
   return 1;
 }
 
-static int tolua_get_spell_school(lua_State * L) 
+static int tolua_get_spell_school(lua_State * L)
 {
-  spell * self = (spell *) tolua_tousertype(L, 1, 0);
+  spell *self = (spell *) tolua_tousertype(L, 1, 0);
   lua_pushstring(L, magic_school[self->magietyp]);
   return 1;
 }
 
-static int tolua_get_spell_level(lua_State * L) 
+static int tolua_get_spell_level(lua_State * L)
 {
-  spell * self = (spell *) tolua_tousertype(L, 1, 0);
+  spell *self = (spell *) tolua_tousertype(L, 1, 0);
   lua_pushnumber(L, self->level);
   return 1;
 }
 
-static int tolua_get_spell_name(lua_State * L) 
+static int tolua_get_spell_name(lua_State * L)
 {
   const struct locale *lang = default_locale;
-  spell * self = (spell *) tolua_tousertype(L, 1, 0);
+  spell *self = (spell *) tolua_tousertype(L, 1, 0);
   lua_pushstring(L, spell_name(self, lang));
   return 1;
 }
 
-static int tolua_get_spells(lua_State * L) 
+static int tolua_get_spells(lua_State * L)
 {
   return tolua_quicklist_push(L, "spell_list", "spell", spells);
 }
 
-int tolua_read_xml(lua_State * L) 
+int tolua_read_xml(lua_State * L)
 {
   const char *filename = tolua_tostring(L, 1, 0);
   const char *catalog = tolua_tostring(L, 2, 0);
@@ -867,15 +866,15 @@ int tolua_read_xml(lua_State * L)
   return 0;
 }
 
-int tolua_process_markets(lua_State * L) 
+int tolua_process_markets(lua_State * L)
 {
   do_markets();
   return 0;
 }
 
-int tolua_process_produce(lua_State * L) 
+int tolua_process_produce(lua_State * L)
 {
-  region * r;
+  region *r;
   for (r = regions; r; r = r->next) {
     produce(r);
   }
@@ -884,19 +883,19 @@ int tolua_process_produce(lua_State * L)
 
 typedef struct event_args {
   int hfunction;
-   int hargs;
-   const char *sendertype;
+  int hargs;
+  const char *sendertype;
 } event_args;
 
-static void args_free(void *udata) 
+static void args_free(void *udata)
 {
   free(udata);
 }
 
-static void event_cb(void *sender, const char *event, void *udata) 
+static void event_cb(void *sender, const char *event, void *udata)
 {
-  lua_State * L = (lua_State *) global.vm_state;
-  event_args * args = (event_args *) udata;
+  lua_State *L = (lua_State *) global.vm_state;
+  event_args *args = (event_args *) udata;
   int nargs = 2;
   lua_rawgeti(L, LUA_REGISTRYINDEX, args->hfunction);
   if (sender && args->sendertype) {
@@ -917,12 +916,12 @@ static void event_cb(void *sender, const char *event, void *udata)
  *  2: event (string)
  *  3: handler (function)
  *  4: arguments (any, *optional*)
-**/ 
-static int tolua_eventbus_register(lua_State * L) 
+**/
+static int tolua_eventbus_register(lua_State * L)
 {
   void *sender = tolua_tousertype(L, 1, 0);
   const char *event = tolua_tostring(L, 2, 0);
-  event_args * args = malloc(sizeof(event_args));
+  event_args *args = malloc(sizeof(event_args));
   args->sendertype = sender ? tolua_typename(L, 1) : NULL;
   lua_pushvalue(L, 3);
   args->hfunction = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -936,7 +935,7 @@ static int tolua_eventbus_register(lua_State * L)
   return 0;
 }
 
-static int tolua_eventbus_fire(lua_State * L) 
+static int tolua_eventbus_fire(lua_State * L)
 {
   void *sender = tolua_tousertype(L, 1, 0);
   const char *event = tolua_tostring(L, 2, 0);
@@ -945,24 +944,24 @@ static int tolua_eventbus_fire(lua_State * L)
   return 0;
 }
 
-static int tolua_report_unit(lua_State * L) 
+static int tolua_report_unit(lua_State * L)
 {
   char buffer[512];
-  unit * u = (unit *) tolua_tousertype(L, 1, 0);
-  faction * f = (faction *) tolua_tousertype(L, 2, 0);
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
+  faction *f = (faction *) tolua_tousertype(L, 2, 0);
   bufunit(f, u, 0, see_unit, buffer, sizeof(buffer));
   tolua_pushstring(L, buffer);
   return 1;
 }
 
-static int tolua_settings_get(lua_State * L) 
+static int tolua_settings_get(lua_State * L)
 {
   const char *name = tolua_tostring(L, 1, 0);
   tolua_pushstring(L, get_param(global.parameters, name));
   return 1;
 }
 
-static int tolua_settings_set(lua_State * L) 
+static int tolua_settings_set(lua_State * L)
 {
   const char *name = tolua_tostring(L, 1, 0);
   const char *value = tolua_tostring(L, 2, 0);
@@ -970,8 +969,7 @@ static int tolua_settings_set(lua_State * L)
   return 0;
 }
 
-static void 
-parse_inifile(lua_State * L, dictionary * d, const char *section) 
+static void parse_inifile(lua_State * L, dictionary * d, const char *section)
 {
   int i;
   size_t len = strlen(section);
@@ -990,18 +988,18 @@ parse_inifile(lua_State * L, dictionary * d, const char *section)
       lua_rawset(L, -3);
     }
   }
-  
-    /* special case */ 
-    lua_pushstring(L, "basepath");
+
+  /* special case */
+  lua_pushstring(L, "basepath");
   lua_pushstring(L, basepath());
   lua_rawset(L, -3);
 }
 
-int tolua_eressea_open(lua_State * L) 
+int tolua_eressea_open(lua_State * L)
 {
   tolua_open(L);
-  
-  /* register user types */ 
+
+  /* register user types */
   tolua_usertype(L, TOLUA_CAST "spell");
   tolua_usertype(L, TOLUA_CAST "spell_list");
   tolua_usertype(L, TOLUA_CAST "order");
@@ -1029,7 +1027,8 @@ int tolua_eressea_open(lua_State * L)
         NULL);
       tolua_function(L, TOLUA_CAST "create", tolua_alliance_create);
     } tolua_endmodule(L);
-    tolua_cclass(L, TOLUA_CAST "spell", TOLUA_CAST "spell", TOLUA_CAST "", NULL);
+    tolua_cclass(L, TOLUA_CAST "spell", TOLUA_CAST "spell", TOLUA_CAST "",
+      NULL);
     tolua_beginmodule(L, TOLUA_CAST "spell");
     {
       tolua_function(L, TOLUA_CAST "__tostring", tolua_get_spell_name);
@@ -1088,11 +1087,10 @@ int tolua_eressea_open(lua_State * L)
     tolua_function(L, TOLUA_CAST "message_unit", tolua_message_unit);
     tolua_function(L, TOLUA_CAST "message_faction", tolua_message_faction);
     tolua_function(L, TOLUA_CAST "message_region", tolua_message_region);
-    
-    /* scripted monsters */ 
-    tolua_function(L, TOLUA_CAST "spawn_braineaters",
-    tolua_spawn_braineaters);
-    
+
+    /* scripted monsters */
+    tolua_function(L, TOLUA_CAST "spawn_braineaters", tolua_spawn_braineaters);
+
     tolua_function(L, TOLUA_CAST "update_guards", tolua_update_guards);
     tolua_function(L, TOLUA_CAST "set_turn", &tolua_set_turn);
     tolua_function(L, TOLUA_CAST "get_turn", &tolua_get_turn);
@@ -1104,8 +1102,10 @@ int tolua_eressea_open(lua_State * L)
     tolua_function(L, TOLUA_CAST "itoa36", tolua_itoa36);
     tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
     tolua_function(L, TOLUA_CAST "get_nmrs", tolua_get_nmrs);
-    tolua_function(L, TOLUA_CAST "remove_empty_units", tolua_remove_empty_units);
-    tolua_function(L, TOLUA_CAST "update_subscriptions", tolua_update_subscriptions);
+    tolua_function(L, TOLUA_CAST "remove_empty_units",
+      tolua_remove_empty_units);
+    tolua_function(L, TOLUA_CAST "update_subscriptions",
+      tolua_update_subscriptions);
     tolua_function(L, TOLUA_CAST "update_scores", tolua_update_scores);
     tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
     tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);

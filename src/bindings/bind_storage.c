@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/binarystore.h>
 
 #include <math.h>
+#include <stdio.h>
 
 #include <lua.h>
 #include <tolua.h>
