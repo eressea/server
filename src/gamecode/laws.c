@@ -3608,7 +3608,6 @@ static double heal_factor(const unit * u)
   default:
     return 1.0;
   }
-  return 1.0;
 }
 
 static void monthly_healing(void)

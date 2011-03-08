@@ -136,7 +136,6 @@ int study_cost(unit * u, skill_t sk)
   default:
     return 0;
   }
-  return 0;
 }
 
 /* ------------------------------------------------------------- */
