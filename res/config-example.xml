@@ -14,7 +14,8 @@
   <xi:include href="items.xml" />
   <xi:include href="races.xml"/>
   <xi:include href="ships.xml"/>
-  <xi:include href="buildings.xml"/>
+  <xi:include href="buildings.xml"/>  
+  <xi:include href="eressea:///core/common/buildings.xml"/>
   <xi:include href="spells.xml"/>
   <xi:include href="terrains.xml"/>
 
