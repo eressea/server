@@ -7,7 +7,7 @@ if (${CMAKE_C_COMPILER} MATCHES ".*tcc")
 endif(${CMAKE_C_COMPILER} MATCHES ".*tcc")
 
 if (${CMAKE_C_COMPILER} MATCHES ".*gcc")
-  set(CMAKE_C_FLAGS "-g -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts")
+  set(CMAKE_C_FLAGS "-g -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -ansi -pedantic")
 endif(${CMAKE_C_COMPILER} MATCHES ".*gcc")
 
 if (WIN32)
