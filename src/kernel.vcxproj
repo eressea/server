@@ -105,6 +105,7 @@
     <ClCompile Include="kernel\magic.c" />
     <ClCompile Include="kernel\message.c" />
     <ClCompile Include="kernel\move.c" />
+    <ClCompile Include="kernel\move_test.c" />
     <ClCompile Include="kernel\names.c" />
     <ClCompile Include="kernel\order.c" />
     <ClCompile Include="kernel\pathfinder.c" />
@@ -178,10 +179,7 @@
     <ClCompile Include="attributes\reduceproduction.c" />
     <ClCompile Include="attributes\targetregion.c" />
     <ClCompile Include="attributes\viewrange.c" />
-    <ClCompile Include="kernel\curse_test.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="kernel\curse_test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\alchemy.h" />

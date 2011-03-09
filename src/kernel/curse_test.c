@@ -1,3 +1,9 @@
+#include <platform.h>
+#include "types.h"
+#include "curse.h"
+
+#include <util/attrib.h>
+
 #include <cutest/CuTest.h>
 
 static void test_curse(CuTest * tc)

@@ -656,18 +656,8 @@ void tolua_region_open(lua_State * L)
 
       tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
       tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);
-#if 0
-      .def("add_notice", &region_addnotice)
-        .def("add_direction", &region_adddirection)
-        .def("move", &region_move)
-        .def("get_road", &region_getroad)
-        .def("set_road", &region_setroad)
-        .def("next", &region_next)
-        .def("add_item", &region_additem)
-        .property("items", &region_items, return_stl_iterator)
-        .property("plane_id", &region_plane)
-#endif
-        tolua_variable(L, TOLUA_CAST "objects", tolua_region_get_objects, 0);
+
+      tolua_variable(L, TOLUA_CAST "objects", tolua_region_get_objects, 0);
     }
     tolua_endmodule(L);
 

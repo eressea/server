@@ -6,10 +6,11 @@
 
 #include <util/base36_test.c>
 #include <util/quicklist_test.c>
+#include <kernel/move_test.c>
+#include <kernel/curse_test.c>
 
 CuSuite *get_curse_suite(void);
 CuSuite *get_market_suite(void);
-CuSuite *get_move_suite(void);
 CuSuite *get_laws_suite(void);
 
 #include <kernel/region.h>

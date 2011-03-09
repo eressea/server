@@ -808,7 +808,3 @@ double destr_curse(curse * c, int cast_level, double force)
   }
   return force;
 }
-
-#ifndef DISABLE_TESTS
-#include "curse_test.c"
-#endif

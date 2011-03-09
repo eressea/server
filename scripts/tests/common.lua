@@ -9,8 +9,8 @@ local function _test_unique_btype()
   local utype = nil
   for i = 1, #config.buildings do
     bt = config.buildings[i]
-    if (((config.get_building(bt).flags / 4) % 2) ~= 0) then -- #define BTF_UNIQUE         0x04
-      if (((config.get_building(bt).flags / 2) % 2) == 0) then -- #define BTF_NOBUILD        0x02
+    if ((config.get_building(bt).flags / 4) % 2) ~= 0 then -- #define BTF_UNIQUE         0x04
+      if ((config.get_building(bt).flags / 2) % 2) == 0 then -- #define BTF_NOBUILD        0x02
         utype = bt
       end
     end
@@ -89,7 +89,7 @@ function test_plane()
   local r, x, y
   for x = -3, 3 do for y = -3, 3 do
     r = region.create(x, y, "plain")
-    if (x==y) then
+    if x==y then
       local u = unit.create(f, r, 1)
     end
   end end
@@ -752,7 +752,7 @@ function test_ride_with_horses_and_cart()
     u:add_item("sword", capacity / sword_cfg.weight)
 
     u:add_item("horse", 1)
-    if (cart_cfg~=nil) then
+    if cart_cfg~=nil then
         -- we need 2 horses for a cart, so this should fail:
         u:add_item("cart", 1)
         u:clear_orders()
@@ -965,7 +965,7 @@ function test_building_unique0()
   local u2 = unit.create(f2, r, 20)
   local utype = _test_unique_btype()
   
-  if (utype ~= nil) then
+  if utype ~= nil then
     assert_equal("harbour", utype)
     u:set_skill("building", 20)
     u:add_item("log", 10000)
@@ -988,7 +988,7 @@ function test_building_unique0()
     bcount = 0
     for bs in r.buildings do
       assert_equal(1, string.find(bs.name, translate(utype)))
-      if (bs.size >= config.get_building(utype).maxsize) then
+      if bs.size >= config.get_building(utype).maxsize then
         bcount = bcount + 1
       end
     end
@@ -1006,7 +1006,7 @@ function test_building_unique()
   local u2 = unit.create(f2, r, 20)
   local utype = _test_unique_btype()
   
-  if (utype ~= nil) then
+  if utype ~= nil then
     u:set_skill("building", 20)
     u:add_item("log", 10000)
     u:add_item("iron", 10000)
@@ -1030,20 +1030,20 @@ function test_building_unique()
     u2:clear_orders()
     u2:add_order("MACHEN Hafen")
     process_orders()
-    if (r.buildings() == nil) then
-    process_orders()
+    if r.buildings == nil then
+        process_orders()
     end
     assert_not_nil(r.buildings)
     bcount = 0
     local h1 = nil
     for bs in r.buildings do
-      if (h1 == nil) then 
+      if h1 == nil then 
         h1 = bs.name 
       else
         assert_equal(h1, bs.name)
       end
       assert_equal(1, string.find(bs.name, "Hafen"))
-      if (bs.size >= 25) then
+      if bs.size >= 25 then
         bcount = bcount + 1
       end
     end
