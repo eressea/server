@@ -8,10 +8,9 @@
 #include <util/quicklist_test.c>
 #include <kernel/move_test.c>
 #include <kernel/curse_test.c>
+#include <gamecode/laws_test.c>
 
-CuSuite *get_curse_suite(void);
 CuSuite *get_market_suite(void);
-CuSuite *get_laws_suite(void);
 
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -102,12 +101,12 @@ void test_create_world(void)
   building_type *btype;
   ship_type *stype;
 
-  t_plain = calloc(1, sizeof(terrain_type));
+  t_plain = (terrain_type*)calloc(1, sizeof(terrain_type));
   t_plain->_name = strdup("plain");
   t_plain->flags = LAND_REGION | FOREST_REGION | WALK_INTO;
   register_terrain(t_plain);
 
-  t_ocean = calloc(1, sizeof(terrain_type));
+  t_ocean = (terrain_type*)calloc(1, sizeof(terrain_type));
   t_ocean->_name = strdup("ocean");
   t_ocean->flags = SEA_REGION | SAIL_INTO | SWIM_INTO;
   register_terrain(t_ocean);
@@ -115,10 +114,10 @@ void test_create_world(void)
   island[0] = test_create_region(0, 0, t_plain);
   island[1] = test_create_region(1, 0, t_plain);
   for (i = 0; i != 2; ++i) {
-    direction_t j;
+    int j;
     region *r = island[i];
     for (j = 0; j != MAXDIRECTIONS; ++j) {
-      region *rn = r_connect(r, j);
+      region *rn = r_connect(r, (direction_t)j);
       if (!rn) {
         rn = test_create_region(r->x + delta_x[j], r->y + delta_y[j], t_ocean);
       }

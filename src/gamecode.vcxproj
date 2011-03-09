@@ -97,10 +97,7 @@
     <ClCompile Include="gmtool.c" />
     <ClCompile Include="gamecode\items.c" />
     <ClCompile Include="gamecode\laws.c" />
-    <ClCompile Include="gamecode\laws_test.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="gamecode\laws_test.c" />
     <ClCompile Include="gamecode\market.c" />
     <ClCompile Include="gamecode\market_test.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

@@ -1,7 +1,24 @@
 /* this file should only be included by laws.c, never compiled on its own
  * (it does not even include all the headers needed to do so).
 **/
+#include <platform.h>
+#include <kernel/types.h>
+#include "laws.h"
+
+#include <kernel/config.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
+
+#include <util/language.h>
+
 #include <cutest/CuTest.h>
+#include <tests.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
 {

@@ -205,7 +205,7 @@ enum {
   FOOD_IS_FREE = 4
 };
 
-static void get_food(region * r)
+void get_food(region * r)
 {
   plane *pl = rplane(r);
   unit *u;
@@ -1614,7 +1614,7 @@ static int display_cmd(unit * u, struct order *ord)
   return 0;
 }
 
-static boolean renamed_building(const building * b)
+boolean renamed_building(const building * b)
 {
   const struct locale *lang = locales;
   for (; lang; lang = nextlocale(lang)) {
@@ -1645,7 +1645,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
   return 0;
 }
 
-static int
+int
 rename_building(unit * u, order * ord, building * b, const char *name)
 {
   unit *owner = b ? building_owner(b) : 0;
@@ -4410,7 +4410,3 @@ int init_data(const char *filename, const char *catalog)
   }
   return 0;
 }
-
-#ifndef DISABLE_TESTS
-#include "laws_test.c"
-#endif
