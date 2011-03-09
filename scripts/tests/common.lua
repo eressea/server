@@ -42,6 +42,7 @@ function setup()
     write_game("free.dat")
     settings.set("nmr.removenewbie", "0")
     settings.set("nmr.timeout", "0")
+    settings.set("NewbieImmunity", "0")
     settings.set("rules.economy.food", "4")
 end
 
@@ -67,6 +68,7 @@ function test_fleeing_units_can_be_transported()
   u1:add_order("ATTACKIEREN " .. itoa36(u2.id))
   u2.number = 100
   u2:add_order("FAHREN " .. itoa36(u3.id))
+  u2:add_order("KAEMPFE FLIEHE")
   u3.number = 100
   u3:add_order("KAEMPFE FLIEHE")
   u3:add_order("TRANSPORT " .. itoa36(u2.id))
@@ -1043,7 +1045,7 @@ function test_building_unique()
         assert_equal(h1, bs.name)
       end
       assert_equal(1, string.find(bs.name, "Hafen"))
-      if bs.size >= 25 then
+      if bs.size >= config.get_building(utype).maxsize then
         bcount = bcount + 1
       end
     end

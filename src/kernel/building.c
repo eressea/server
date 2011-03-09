@@ -126,6 +126,7 @@ typedef struct building_typelist {
 
 quicklist *buildingtypes = NULL;
 
+/* Returns a building type for the (internal) name */
 building_type *bt_find(const char *name)
 {
   quicklist *ql;
@@ -169,6 +170,9 @@ attrib_type at_building_generic_type = {
     ATF_UNIQUE
 };
 
+/* Returns the (internal) name for a building of given size and type. Especially, returns the correct
+ * name if it depends on the size (as for Eressea castles).
+ */
 const char *buildingtype(const building_type * btype, const building * b,
   int bsize)
 {
@@ -350,6 +354,8 @@ int wdw_pyramid_level(const struct building *b)
 
 static local_names *bnames;
 
+/* Find the building type for a given localized name (as seen by the user). Useful for parsing
+ * orders. The inverse of locale_string(lang, btype->_name), sort of. */
 const building_type *findbuildingtype(const char *name,
   const struct locale *lang)
 {
@@ -391,10 +397,17 @@ static int eressea_building_protection(building * b, unit * u)
   return beff;
 }
 
+static int meropis_building_protection(building * b, unit * u)
+{
+  return 2;
+}
+
 void register_buildings(void)
 {
   register_function((pf_generic) & eressea_building_protection,
     "eressea_building_protection");
+  register_function((pf_generic) & meropis_building_protection,
+    "meropis_building_protection");
   register_function((pf_generic) & init_smithy, "init_smithy");
   register_function((pf_generic) & castle_name, "castle_name");
   register_function((pf_generic) & castle_name_2, "castle_name_2");
