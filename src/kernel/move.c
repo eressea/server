@@ -628,7 +628,12 @@ static boolean is_freezing(const unit * u)
   return true;
 }
 
-static boolean ship_allowed(const struct ship *sh, const region * r)
+#define SA_HARBOUR 1
+#define SA_COAST 1
+#define SA_NO_INSECT -1
+#define SA_NO_COAST -2
+
+static int ship_allowed(const struct ship *sh, const region * r)
 {
   int c = 0;
   static const building_type *bt_harbour = NULL;
@@ -651,19 +656,19 @@ static boolean ship_allowed(const struct ship *sh, const region * r)
               "unit region", u, r));
         }
 
-        return false;
+        return SA_NO_INSECT;
       }
     }
   }
 
   if (buildingtype_exists(r, bt_harbour, true))
-    return true;
+    return SA_HARBOUR;
   for (c = 0; sh->type->coasts[c] != NULL; ++c) {
     if (sh->type->coasts[c] == r->terrain)
-      return true;
+      return SA_COAST;
   }
 
-  return false;
+  return SA_NO_COAST;
 }
 
 static boolean flying_ship(const ship * sh)
@@ -747,7 +752,7 @@ static void drifting_ships(region * r)
         region *rn;
         dir = (direction_t) ((d + d_offset) % MAXDIRECTIONS);
         rn = rconnect(r, dir);
-        if (rn != NULL && fval(rn->terrain, SAIL_INTO) && ship_allowed(sh, rn)) {
+        if (rn != NULL && fval(rn->terrain, SAIL_INTO) && ship_allowed(sh, rn) > 0) {
           rnext = rn;
           if (!fval(rnext->terrain, SEA_REGION))
             break;
@@ -1726,6 +1731,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
       int stormchance;
       static int stormyness;
       static int gamecookie = -1;
+      int reason;
 
       if (gamecookie != global.cookie) {
         gamedate date;
@@ -1813,9 +1819,10 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
         }
       }
 
-      if (!ship_allowed(sh, next_point)) {
+      reason = ship_allowed(sh, next_point);
+      if (reason<0) {
         /* for some reason or another, we aren't allowed in there.. */
-        if (check_leuchtturm(current_point, NULL)) {
+        if (check_leuchtturm(current_point, NULL) || reason == SA_NO_INSECT) {
           ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
         } else {
           float dmg =
