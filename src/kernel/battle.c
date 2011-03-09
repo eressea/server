@@ -3352,9 +3352,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, boolean attack)
   if (attack) {
     set_attacker(fig);
   } else {
-    building *b = u->building;
-    if (b && b->sizeleft >= u->number && playerrace(u->race)) {
-      fig->building = b;
+    building *bld = u->building;
+    if (bld && bld->sizeleft >= u->number && playerrace(u->race)) {
+      fig->building = bld;
       fig->building->sizeleft -= u->number;
     }
   }
@@ -4062,6 +4062,11 @@ static boolean init_battle(region * r, battle ** bp)
   battle *b = NULL;
   unit *u;
   boolean fighting = false;
+  building *bu;
+
+  /* Alle Mann raus aus der Burg! */
+  for (bu = r->buildings; bu != NULL; bu = bu->next)
+    bu->sizeleft = bu->size;
 
   /* list_foreach geht nicht, wegen flucht */
   for (u = r->units; u != NULL; u = u->next) {
@@ -4428,7 +4433,6 @@ void do_battle(region * r)
   battle *b = NULL;
   boolean fighting = false;
   ship *sh;
-  building *bu;
   static int init_rules = 0;
 
   if (!init_rules) {
@@ -4459,10 +4463,6 @@ void do_battle(region * r)
   }
   join_allies(b);
   make_heroes(b);
-
-  /* Alle Mann raus aus der Burg! */
-  for (bu = r->buildings; bu != NULL; bu = bu->next)
-    bu->sizeleft = bu->size;
 
   /* make sure no ships are damaged initially */
   for (sh = r->ships; sh; sh = sh->next)
