@@ -78,64 +78,66 @@ function test_morale_alliance()
 end
 
 function test_morale_change()
-  local r = region.create(0, 0, "plain")
-  assert_equal(1, r.morale)
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local u1 = unit.create(f1, r, 1)
-  u1:add_item("money", 10000)
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
-  local u2 = unit.create(f2, r, 1)
-  u2:add_item("money", 10000)
+    local r = region.create(0, 0, "plain")
+    assert_equal(1, r.morale)
+    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local u1 = unit.create(f1, r, 1)
+    u1:add_item("money", 10000)
+    local f2 = faction.create("noreply@eressea.de", "human", "de")
+    local u2 = unit.create(f2, r, 1)
+    u2:add_item("money", 10000)
+    
+    local AVG_STEP = 6
+    local b = building.create(r, "castle")
+    b.size = 10
+    u1.building = b
 
-  local AVG_STEP = 6
-  local b = building.create(r, "castle")
-  b.size = 10
-  u1.building = b
-
-  local function run_a_turn()
-    process_orders()
-    f1.lastturn=get_turn()
-    f2.lastturn=get_turn()
-  end
+    local function run_a_turn()
+        process_orders()
+        f1.lastturn=get_turn()
+        f2.lastturn=get_turn()
+    end
   
-  -- reinhardt-regel: nach 2*AVG_STEP ist moral mindestens einmal gestiegen.
-  for i=1,AVG_STEP*2 do
-    run_a_turn()
+    -- reinhardt-regel: nach 2*AVG_STEP ist moral mindestens einmal gestiegen.
+    update_owners()
     assert_not_equal(r.owner, nil)
-  end
-  assert_not_equal(1, r.morale)
+    for i=1,AVG_STEP*2 do
+        run_a_turn()
+        assert_not_equal(r.owner, nil)
+    end
+    assert_not_equal(1, r.morale)
 
-  -- regel: moral ist nie hoeher als 2 punkte ueber burgen-max.
-  for i=1,AVG_STEP*4 do
+    -- regel: moral ist nie hoeher als 2 punkte ueber burgen-max.
+    for i=1,AVG_STEP*4 do
+        run_a_turn()
+    end
+    assert_equal(4, r.morale)
+  
+    -- auch mit herrscher faellt moral um 1 pro woche, wenn moral > burgstufe
+    r.morale = 6
     run_a_turn()
-  end
-  assert_equal(4, r.morale)
-  
-  -- auch mit herrscher faellt moral um 1 pro woche, wenn moral > burgstufe
-  r.morale = 6
-  run_a_turn()
-  assert_equal(5, r.morale)
-  run_a_turn()
-  assert_equal(4, r.morale)
-  run_a_turn()
-  assert_equal(4, r.morale)
-  
-  -- regel: ohne herrscher fällt die moral jede woche um 1 punkt, bis sie 1 erreicht
-  u1.building = nil
-  update_owners()
-  run_a_turn()
-  assert_equal(3, r.morale)
-  run_a_turn()
-  assert_equal(2, r.morale)
-  run_a_turn()
-  assert_equal(1, r.morale)
-  run_a_turn()
-  assert_equal(1, r.morale)
-  
-  -- ohne herrscher ändert sich auch beschissene Moral nicht:
-  r.morale = 0
-  run_a_turn()
-  assert_equal(0, r.morale)
+    assert_equal(5, r.morale)
+    run_a_turn()
+    assert_equal(4, r.morale)
+    run_a_turn()
+    assert_equal(4, r.morale)
+    
+    -- regel: ohne herrscher fällt die moral jede woche um 1 punkt, bis sie 1 erreicht
+    u1.building = nil
+    update_owners()
+    run_a_turn()
+    assert_equal(3, r.morale)
+    run_a_turn()
+    assert_equal(2, r.morale)
+    run_a_turn()
+    assert_equal(1, r.morale)
+    run_a_turn()
+    assert_equal(1, r.morale)
+    
+    -- ohne herrscher ändert sich auch beschissene Moral nicht:
+    r.morale = 0
+    run_a_turn()
+    assert_equal(0, r.morale)
 end
 
 function test_morale_old()
