@@ -66,7 +66,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     sc_mage *mage = get_mage(target);
     /* bei Magiern Zaubersprüche und Magiegebiet */
     if (mage) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type",
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type", u,
           target, magic_school[mage->magietyp]));
     }
   }
@@ -75,7 +75,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     if (fv && fv != target->faction) {
       /* wahre Partei */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
-          "target faction", target, target->faction));
+          "target faction", u, target, target->faction));
       ql_set_insert(&u->faction->seen_factions, target->faction);
     }
   }
@@ -102,12 +102,12 @@ void spy_message(int spy, const unit * u, const unit * target)
       }
     }
     if (found) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "target skills",
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "target skills", u,
           target, buf));
     }
 
     if (target->items) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items",
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items", u,
           target, target->items));
     }
   }
