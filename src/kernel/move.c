@@ -1637,11 +1637,8 @@ buildingtype_exists(const region * r, const building_type * bt, boolean working)
   building *b;
 
   for (b = rbuildings(r); b; b = b->next) {
-    if (b->type == bt) {
-      if (b->size >= bt->maxsize) {
-        return true;
-      }
-    }
+    if (b->type == bt && b->size >= bt->maxsize && (!working || fval(b, BLD_WORKING)))
+      return true;
   }
 
   return false;
