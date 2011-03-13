@@ -214,13 +214,13 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
 CuSuite *get_laws_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, &test_new_building_can_be_renamed);
-  SUITE_ADD_TEST(suite, &test_rename_building);
-  SUITE_ADD_TEST(suite, &test_rename_building_twice);
-  SUITE_ADD_TEST(suite, &test_fishing_feeds_2_people);
-  SUITE_ADD_TEST(suite, &test_fishing_does_not_give_goblins_money);
-  SUITE_ADD_TEST(suite, &test_fishing_gets_reset);
-  SUITE_ADD_TEST(suite, &test_unit_limit);
-  SUITE_ADD_TEST(suite, &test_cannot_create_unit_above_limit);
+  SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
+  SUITE_ADD_TEST(suite, test_rename_building);
+  SUITE_ADD_TEST(suite, test_rename_building_twice);
+  SUITE_ADD_TEST(suite, test_fishing_feeds_2_people);
+  SUITE_ADD_TEST(suite, test_fishing_does_not_give_goblins_money);
+  SUITE_ADD_TEST(suite, test_fishing_gets_reset);
+  SUITE_ADD_TEST(suite, test_unit_limit);
+  SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
   return suite;
 }
