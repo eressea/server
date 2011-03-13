@@ -261,13 +261,19 @@ extern "C" {
   extern struct region *fleeregion(const struct unit *u);
 #endif
   extern struct fighter *select_corpse(struct battle *b, struct fighter *af);
-  extern fighter *make_fighter(struct battle *b, struct unit *u, side * s,
-    boolean attack);
   extern int statusrow(int status);
   extern void drain_exp(struct unit *u, int d);
   extern void kill_troop(troop dt);
   extern void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
   extern boolean is_attacker(const fighter * fig);
+
+  extern struct battle *make_battle(struct region * r);
+  extern fighter *make_fighter(struct battle *b, struct unit *u, side * s,
+    boolean attack);
+  extern struct side *make_side(struct battle * b, const struct faction * f,
+    const struct group * g, unsigned int flags, 
+    const struct faction * stealthfaction);
+  extern int skilldiff(troop at, troop dt, int dist);
 
 #ifdef __cplusplus
 }

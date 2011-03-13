@@ -8,6 +8,7 @@
 #include <util/quicklist_test.c>
 #include <kernel/move_test.c>
 #include <kernel/curse_test.c>
+#include <kernel/battle_test.c>
 #include <gamecode/laws_test.c>
 
 CuSuite *get_market_suite(void);
@@ -20,6 +21,8 @@ CuSuite *get_market_suite(void);
 #include <kernel/faction.h>
 #include <kernel/building.h>
 #include <kernel/ship.h>
+#include <kernel/terrain.h>
+#include <util/functions.h>
 #include <util/language.h>
 
 int RunAllTests(void)
@@ -37,6 +40,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_move_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
+  CuSuiteAddSuite(suite, get_battle_suite());
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);
@@ -49,12 +53,13 @@ int RunAllTests(void)
 
 struct race *test_create_race(const char *name)
 {
-  race *rc = rc_add(rc_new("human"));
+  race *rc = rc_add(rc_new(name));
+  rc->flags |= RCF_PLAYERRACE;
+  rc->maintenance = 10;
   return rc;
 }
 
-struct region *test_create_region(int x, int y,
-  const struct terrain_type *terrain)
+struct region *test_create_region(int x, int y, const terrain_type *terrain)
 {
   region *r = new_region(x, y, NULL, 0);
   terraform_region(r, terrain);
@@ -80,11 +85,31 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 
 void test_cleanup(void)
 {
+  test_clear_terrains();
   global.functions.maintenance = NULL;
   global.functions.wage = NULL;
   free_gamedata();
 }
 
+terrain_type *
+test_create_terrain(const char * name, unsigned int flags)
+{
+  terrain_type * t;
+
+  assert(!get_terrain(name));
+  t = (terrain_type*)calloc(1, sizeof(terrain_type));
+  t->_name = strdup(name);
+  t->flags = flags;
+  register_terrain(t);
+  return t;
+}
+
+building * test_create_building(region * r, const building_type * btype)
+{
+  building * b = new_building(btype, r, default_locale);
+  b->size = btype->maxsize>0?btype->maxsize:1;
+  return b;
+}
 /** creates a small world and some stuff in it.
  * two terrains: 'plain' and 'ocean'
  * one race: 'human'
@@ -101,15 +126,8 @@ void test_create_world(void)
   building_type *btype;
   ship_type *stype;
 
-  t_plain = (terrain_type*)calloc(1, sizeof(terrain_type));
-  t_plain->_name = strdup("plain");
-  t_plain->flags = LAND_REGION | FOREST_REGION | WALK_INTO;
-  register_terrain(t_plain);
-
-  t_ocean = (terrain_type*)calloc(1, sizeof(terrain_type));
-  t_ocean->_name = strdup("ocean");
-  t_ocean->flags = SEA_REGION | SAIL_INTO | SWIM_INTO;
-  register_terrain(t_ocean);
+  t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO);
+  t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO);
 
   island[0] = test_create_region(0, 0, t_plain);
   island[1] = test_create_region(1, 0, t_plain);
@@ -124,17 +142,15 @@ void test_create_world(void)
     }
   }
 
-  rc_human = rc_add(rc_new("human"));
-  rc_human->maintenance = 10;
+  rc_human = test_create_race("human");
 
-  btype = calloc(sizeof(building_type), 1);
+  btype = (building_type*)calloc(sizeof(building_type), 1);
   btype->flags = BTF_NAMECHANGE;
   btype->_name = strdup("castle");
   bt_register(btype);
 
-  stype = calloc(sizeof(ship_type), 1);
+  stype = (ship_type*)calloc(sizeof(ship_type), 1);
   stype->name[0] = strdup("boat");
   stype->name[1] = strdup("boat_p");
   st_register(stype);
-
 }

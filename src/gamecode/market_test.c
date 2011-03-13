@@ -29,10 +29,7 @@ static void market_curse(CuTest * tc)
   btype->_name = "market";
   bt_register(btype);
 
-  terrain = calloc(1, sizeof(terrain_type));
-  terrain->_name = strdup("plain");
-  register_terrain(terrain);
-  terrain->flags = LAND_REGION | WALK_INTO;
+  terrain = test_create_terrain("plain", LAND_REGION | WALK_INTO);
 
   for (x = 0; x != 3; ++x) {
     for (y = 0; y != 3; ++y) {

@@ -90,6 +90,7 @@
     <ClCompile Include="kernel\alchemy.c" />
     <ClCompile Include="kernel\alliance.c" />
     <ClCompile Include="kernel\battle.c" />
+    <ClCompile Include="kernel\battle_test.c" />
     <ClCompile Include="kernel\binarystore.c" />
     <ClCompile Include="kernel\build.c" />
     <ClCompile Include="kernel\building.c" />

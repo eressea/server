@@ -1892,7 +1892,7 @@ static void do_extra_spell(troop at, const att * a)
   }
 }
 
-static int skilldiff(troop at, troop dt, int dist)
+int skilldiff(troop at, troop dt, int dist)
 {
   fighter *af = at.fighter, *df = dt.fighter;
   unit *au = af->unit, *du = df->unit;
@@ -2442,7 +2442,7 @@ double fleechance(unit * u)
 /** add a new army to the conflict
  * beware: armies need to be added _at the beginning_ of the list because 
  * otherwise join_allies() will get into trouble */
-static side *make_side(battle * b, const faction * f, const group * g,
+side *make_side(battle * b, const faction * f, const group * g,
   unsigned int flags, const faction * stealthfaction)
 {
   side *s1 = b->sides + b->nsides;
@@ -3656,12 +3656,17 @@ static const char *simplename(region * r)
   return name;
 }
 
-static battle *make_battle(region * r)
+battle *make_battle(region * r)
 {
-  battle *b = calloc(1, sizeof(struct battle));
+  battle *b = (battle *)calloc(1, sizeof(battle));
   unit *u;
   bfaction *bf;
+  building * bld;
   static int max_fac_no = 0;    /* need this only once */
+
+  /* Alle Mann raus aus der Burg! */
+  for (bld = r->buildings; bld != NULL; bld = bld->next)
+    bld->sizeleft = bld->size;
 
   if (battledebug) {
     char zText[MAX_PATH];
@@ -3693,7 +3698,7 @@ static battle *make_battle(region * r)
             break;
         }
         if (!bf) {
-          bf = calloc(sizeof(bfaction), 1);
+          bf = (bfaction *)calloc(sizeof(bfaction), 1);
           ++b->nfactions;
           bf->faction = u->faction;
           bf->next = b->factions;
@@ -4062,11 +4067,6 @@ static boolean init_battle(region * r, battle ** bp)
   battle *b = NULL;
   unit *u;
   boolean fighting = false;
-  building *bu;
-
-  /* Alle Mann raus aus der Burg! */
-  for (bu = r->buildings; bu != NULL; bu = bu->next)
-    bu->sizeleft = bu->size;
 
   /* list_foreach geht nicht, wegen flucht */
   for (u = r->units; u != NULL; u = u->next) {
