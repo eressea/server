@@ -99,7 +99,9 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 race *rc_new(const char *zName)
 {
   char zBuffer[80];
-  race *rc = calloc(sizeof(race), 1);
+  race *rc = (race *)calloc(sizeof(race), 1);
+
+  rc->hitpoints = 1;
   if (strchr(zName, ' ') != NULL) {
     log_error(("race '%s' has an invalid name. remove spaces\n", zName));
     assert(strchr(zName, ' ') == NULL);
