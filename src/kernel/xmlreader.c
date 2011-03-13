@@ -192,7 +192,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
 
     assert(*consPtr == NULL);
 
-    *consPtr = con = calloc(sizeof(construction), 1);
+    *consPtr = con = (construction *)calloc(sizeof(construction), 1);
     consPtr = &con->improvement;
 
     con->skill = sk;
@@ -349,7 +349,7 @@ static int parse_buildings(xmlDocPtr doc)
         maintenance *mt;
 
         if (btype->maintenance == NULL) {
-          btype->maintenance =
+          btype->maintenance = (struct maintenance *)
             calloc(sizeof(struct maintenance), result->nodesetval->nodeNr + 1);
         }
         mt = btype->maintenance + k;
