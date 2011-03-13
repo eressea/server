@@ -67,7 +67,7 @@ extern "C" {
     struct terrain_production *production;
     const struct item_type **herbs;     /* zero-terminated array of herbs */
     const char *(*name) (const struct region * r);
-    const struct terrain_type *next;
+    struct terrain_type *next;
   } terrain_type;
 
   extern const terrain_type *terrains(void);
@@ -76,6 +76,10 @@ extern "C" {
   extern const char *terrain_name(const struct region *r);
 
   extern void init_terrains(void);
+
+#ifndef DISABLE_TESTS
+  void test_clear_terrains(void);
+#endif
 
 #ifdef __cplusplus
 }
