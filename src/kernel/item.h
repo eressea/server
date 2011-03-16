@@ -273,7 +273,6 @@ extern "C" {
   extern resource_type *r_aura;
   extern resource_type *r_permaura;
   extern resource_type *r_unit;
-  extern resource_type *r_hp;
 
   enum {
     I_IRON,                     /* 0 */
@@ -362,6 +361,10 @@ extern "C" {
       const struct item_type *, int, struct order *), const char *name);
 
   extern struct item_type *i_silver;
+
+#ifndef DISABLE_TESTS
+  void test_clear_resources(void);
+#endif
 
 #ifdef __cplusplus
 }

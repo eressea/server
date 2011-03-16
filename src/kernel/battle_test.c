@@ -3,11 +3,53 @@
 #include "battle.h"
 #include "building.h"
 #include "faction.h"
+#include "item.h"
 #include "race.h"
 #include "region.h"
+#include "skill.h"
 #include "unit.h"
 #include "tests.h"
 #include <cutest/CuTest.h>
+
+static void test_make_fighter(CuTest * tc)
+{
+  unit *au;
+  region *r;
+  fighter *af;
+  battle *b;
+  side *as;
+  faction * f;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(rc_find("human"));
+  au = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+  skill_enabled[SK_RIDING] = 1;
+  set_level(au, SK_MAGIC, 3);
+  set_level(au, SK_RIDING, 3);
+  au->status = ST_BEHIND;
+  set_item(au, I_HORSE, 1);
+
+  b = make_battle(r);
+  as = make_side(b, au->faction, 0, 0, 0);
+  af = make_fighter(b, au, as, false);
+
+  CuAssertIntEquals(tc, 1, b->nfighters);
+  CuAssertPtrEquals(tc, 0, af->building);
+  CuAssertPtrEquals(tc, as, af->side);
+  CuAssertIntEquals(tc, 0, af->run.hp);
+  CuAssertIntEquals(tc, ST_BEHIND, af->status);
+  CuAssertIntEquals(tc, 0, af->run.number);
+  CuAssertIntEquals(tc, au->hp, af->person[0].hp);
+  CuAssertIntEquals(tc, 1, af->person[0].speed);
+  CuAssertIntEquals(tc, au->number, af->alive);
+  CuAssertIntEquals(tc, 0, af->removed);
+  CuAssertIntEquals(tc, 3, af->magic);
+  CuAssertIntEquals(tc, 1, af->horses);
+  CuAssertIntEquals(tc, 0, af->elvenhorses);
+}
 
 static int add_two(building * b, unit * u) {
   return 2;
@@ -87,10 +129,48 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
   CuAssertPtrEquals(tc, 0, af->building);
 }
 
+static void test_building_bonus_respects_size(CuTest * tc)
+{
+  unit *au, *du;
+  region *r;
+  building * bld;
+  fighter *af, *df;
+  battle *b;
+  side *as;
+  building_type * btype;
+  faction * f;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  btype = bt_find("castle");
+  btype->protection = &add_two;
+  bld = test_create_building(r, btype);
+  bld->size = 10;
+
+  f = test_create_faction(rc_find("human"));
+  au = test_create_unit(f, r);
+  scale_number(au, 9);
+  au->building = bld;
+  du = test_create_unit(f, r);
+  du->building = bld;
+  scale_number(du, 2);
+
+  b = make_battle(r);
+  as = make_side(b, au->faction, 0, 0, 0);
+  af = make_fighter(b, au, as, false);
+  df = make_fighter(b, du, as, false);
+
+  CuAssertPtrEquals(tc, bld, af->building);
+  CuAssertPtrEquals(tc, 0, df->building);
+}
+
 CuSuite *get_battle_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
+  SUITE_ADD_TEST(suite, test_make_fighter);
   SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
   SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
+  SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
   return suite;
 }

@@ -85,6 +85,7 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 void test_cleanup(void)
 {
   test_clear_terrains();
+  test_clear_resources();
   global.functions.maintenance = NULL;
   global.functions.wage = NULL;
   free_gamedata();
@@ -109,6 +110,17 @@ building * test_create_building(region * r, const building_type * btype)
   b->size = btype->maxsize>0?btype->maxsize:1;
   return b;
 }
+
+item_type * test_create_itemtype(const char ** names) {
+  resource_type * rtype;
+  item_type * itype;
+
+  rtype = new_resourcetype(names, NULL, RTF_ITEM);
+  itype = new_itemtype(rtype, ITF_ANIMAL|ITF_BIG, 5000, 7000);
+
+  return itype;
+}
+
 /** creates a small world and some stuff in it.
  * two terrains: 'plain' and 'ocean'
  * one race: 'human'
@@ -124,9 +136,16 @@ void test_create_world(void)
   int i;
   building_type *btype;
   ship_type *stype;
+  item_type * itype;
+  const char * names[2] = { "horse", "horse_p" };
 
-  t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO);
+  itype = test_create_itemtype(names);
+  olditemtype[I_HORSE] = itype;
+
+  t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
+  t_plain->size = 1000;
   t_ocean = test_create_terrain("ocean", SEA_REGION | SAIL_INTO | SWIM_INTO);
+  t_ocean->size = 0;
 
   island[0] = test_create_region(0, 0, t_plain);
   island[1] = test_create_region(1, 0, t_plain);

@@ -151,7 +151,7 @@ resource_type *new_resourcetype(const char **names, const char **appearances,
 
   if (rtype == NULL) {
     int i;
-    rtype = calloc(sizeof(resource_type), 1);
+    rtype = (resource_type *)calloc(sizeof(resource_type), 1);
 
     for (i = 0; i != 2; ++i) {
       rtype->_name[i] = strdup(names[i]);
@@ -284,7 +284,7 @@ potion_type *new_potiontype(item_type * itype, int level)
 
   assert(resource2potion(itype->rtype) == NULL);
 
-  ptype = calloc(sizeof(potion_type), 1);
+  ptype = (potion_type *)calloc(sizeof(potion_type), 1);
   ptype->itype = itype;
   ptype->level = level;
   pt_register(ptype);
@@ -628,7 +628,10 @@ int get_item(const unit * u, item_t it)
 int set_item(unit * u, item_t it, int value)
 {
   const item_type *type = olditemtype[it];
-  item *i = *i_find(&u->items, type);
+  item *i;
+
+  assert(type);
+  i = *i_find(&u->items, type);
   if (!i) {
     i = i_add(&u->items, i_new(type, value));
   } else {
@@ -740,11 +743,6 @@ mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 static void init_olditems(void)
 {
   item_t i;
-#if 0
-  resource_type *rtype;
-  const struct locale *lang = find_locale("de");
-  assert(lang);
-#endif
 
   for (i = 0; i != MAXITEMS; ++i) {
     /* item is defined in XML file, but IT_XYZ enum still in use */
@@ -969,9 +967,8 @@ resource_type *r_silver;
 resource_type *r_aura;
 resource_type *r_permaura;
 resource_type *r_unit;
-resource_type *r_hp;
+static resource_type *r_hp;
 
-resource_type *r_silver;
 item_type *i_silver;
 
 static const char *names[] = {
@@ -986,10 +983,9 @@ static const char *names[] = {
 
 void init_resources(void)
 {
-  static boolean initialized = false;
-  if (initialized)
+  if (r_hp) {
     return;
-  initialized = true;
+  }
 
   /* silver was never an item: */
   r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM | RTF_POOLED);
@@ -1198,6 +1194,35 @@ static item *default_spoil(const struct race *rc, int size)
   }
   return itm;
 }
+
+#ifndef DISABLE_TESTS
+void test_clear_resources(void)
+{
+  int i;
+
+  for (i=0;i!=IMAXHASH;++i) {
+    item_type * itype = itemtypes[i];
+    if (itype) {
+      itemtypes[i] = 0;
+      free(itype->construction);
+      free(itype);
+    }
+  }
+
+  while (resourcetypes) {
+    resource_type * rtype = resourcetypes;
+    resourcetypes = rtype->next;
+    free(rtype->_name[0]);
+    free(rtype->_name[1]);
+    free(rtype->_appearance[0]);
+    free(rtype->_appearance[1]);
+    free(rtype);
+  }
+  resourcetypes = 0;
+  r_hp = 0;
+  init_resources();
+}
+#endif
 
 void register_resources(void)
 {

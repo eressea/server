@@ -28,7 +28,7 @@ extern "C" {
 #define SEA_REGION       (1<<1) /* hier braucht man ein Boot */
 #define FOREST_REGION    (1<<2) /* Elfen- und Kampfvorteil durch Bäume */
 #define ARCTIC_REGION    (1<<3) /* Gletscher & co = Keine Insekten! */
-#define CAVALRY_REGION   (1<<4) /* Gletscher & co = Keine Insekten! */
+#define CAVALRY_REGION   (1<<4) /* riding in combat is possible */
 /* Achtung: SEA_REGION ist nicht das Gegenteil von LAND_REGION. Die zwei schliessen sich nichtmal aus! */
 #define FORBIDDEN_REGION (1<<5) /* unpassierbare Blockade-struct region */
 #define SAIL_INTO		     (1<<6)     /* man darf hierhin segeln */
