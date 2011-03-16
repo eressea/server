@@ -1,7 +1,21 @@
 #include <cutest/CuTest.h>
 
-#include <util/language.h>
+#include "platform.h"
+#include "market.h"
+#include "tests.h"
+
+#include <kernel/building.h>
+#include <kernel/config.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
 #include <kernel/terrain.h>
+#include <kernel/unit.h>
+
+#include <util/language.h>
+
+#include <stdlib.h>
 
 static void market_curse(CuTest * tc)
 {

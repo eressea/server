@@ -99,10 +99,7 @@
     <ClCompile Include="gamecode\laws.c" />
     <ClCompile Include="gamecode\laws_test.c" />
     <ClCompile Include="gamecode\market.c" />
-    <ClCompile Include="gamecode\market_test.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="gamecode\market_test.c" />
     <ClCompile Include="gamecode\monster.c" />
     <ClCompile Include="gamecode\randenc.c" />
     <ClCompile Include="gamecode\report.c" />

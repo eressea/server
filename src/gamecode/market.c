@@ -177,7 +177,3 @@ void do_markets(void)
     ql_free(traders);
   }
 }
-
-#ifndef DISABLE_TESTS
-#include "market_test.c"
-#endif

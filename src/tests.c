@@ -10,8 +10,7 @@
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
 #include <gamecode/laws_test.c>
-
-CuSuite *get_market_suite(void);
+#include <gamecode/market_test.c>
 
 #include <kernel/region.h>
 #include <kernel/terrain.h>
