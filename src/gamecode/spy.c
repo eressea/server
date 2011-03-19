@@ -66,7 +66,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     sc_mage *mage = get_mage(target);
     /* bei Magiern Zaubersprüche und Magiegebiet */
     if (mage) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type", u,
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "target type",
           target, magic_school[mage->magietyp]));
     }
   }
@@ -102,12 +102,12 @@ void spy_message(int spy, const unit * u, const unit * target)
       }
     }
     if (found) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "target skills", u,
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_skills", "target skills",
           target, buf));
     }
 
     if (target->items) {
-      ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items", u,
+      ADDMSG(&u->faction->msgs, msg_message("spyreport_items", "target items",
           target, target->items));
     }
   }
