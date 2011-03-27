@@ -79,7 +79,10 @@ int change_resource(unit * u, const resource_type * rtype, int change)
     i = change_maxspellpoints(u, change);
   else
     assert(!"undefined resource detected. rtype->uchange not initialized.");
-  assert(i >= 0 && (i < 100000000));    /* soft test to catch mischief */
+  assert(i >= 0);
+  if (i >= 100000000) {
+    log_warning(("%s has %d %s\n", unitname(u), i, rtype->_name[0]));
+  }
   return i;
 }
 
