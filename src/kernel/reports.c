@@ -1373,14 +1373,37 @@ static void view_regatta(struct seen_region **seen, region * r, faction * f)
   recurse_regatta(seen, r, r, f, skill / 2);
 }
 
+static void prepare_lighthouse(building * b, faction * f)
+{
+  int range = lighthouse_range(b, f);
+  region_list *rlist = get_regions_distance(b->region, range);
+  region_list *rp = rlist;
+
+  while (rp) {
+    region *rl = rp->data;
+    if (!fval(rl->terrain, FORBIDDEN_REGION)) {
+      int d;
+      add_seen(f->seen, rl, see_lighthouse, false);
+      for (d = 0; d != MAXDIRECTIONS; ++d) {
+        region *rn = rconnect(rl, d);
+        if (rn != NULL) {
+          add_seen(f->seen, rn, see_neighbour, false);
+        }
+      }
+    }
+    rp = rp->next;
+  }
+  free_regionlist(rlist);
+}
+
 static void prepare_reports(void)
 {
   region *r;
   faction *f;
   static const struct building_type *bt_lighthouse = NULL;
-  if (bt_lighthouse == NULL)
+  if (bt_lighthouse == NULL) {
     bt_lighthouse = bt_find("lighthouse");
-
+  }
   for (f = factions; f; f = f->next) {
     if (f->seen)
       seen_done(f->seen);
@@ -1407,25 +1430,7 @@ static void prepare_reports(void)
     for (u = r->units; u; u = u->next) {
       if (u->building && u->building->type == bt_lighthouse) {
         /* we are in a lighthouse. add the regions we can see from here! */
-        int range = lighthouse_range(u->building, u->faction);
-        region_list *rlist = get_regions_distance(r, range);
-        region_list *rp = rlist;
-
-        while (rp) {
-          region *rl = rp->data;
-          if (fval(rl->terrain, SEA_REGION)) {
-            direction_t d;
-            add_seen(u->faction->seen, rl, see_lighthouse, false);
-            for (d = 0; d != MAXDIRECTIONS; ++d) {
-              region *rn = rconnect(rl, d);
-              if (rn != NULL) {
-                add_seen(u->faction->seen, rn, see_neighbour, false);
-              }
-            }
-          }
-          rp = rp->next;
-        }
-        free_regionlist(rlist);
+        prepare_lighthouse(u->building, u->faction);
       }
 
       if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {

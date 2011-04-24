@@ -864,6 +864,33 @@ function test_coordinates_noname_plane()
     assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
 end
 
+function test_lighthouse()
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    region.create(1, 0, "mountain")
+    region.create(2, 0, "ocean")
+    region.create(0, 1, "firewall")
+    region.create(3, 0, "mountain")
+    region.create(4, 0, "plain")
+    local u = unit.create(f, r, 1)
+    local b = building.create(r, "lighthouse")
+    b.size = 100
+    u.building = b
+    u:set_skill("perception", 9)
+    u:add_item("money", 1000)
+    assert_not_nil(b)
+
+    init_reports()
+    write_report(f)
+    assert_true(find_in_report(f, " %(1,0%) %(vom Turm erblickt%)"))
+    assert_true(find_in_report(f, " %(2,0%) %(vom Turm erblickt%)"))
+    assert_true(find_in_report(f, " %(3,0%) %(vom Turm erblickt%)"))
+
+    assert_false(find_in_report(f, " %(0,0%) %(vom Turm erblickt%)"))
+    assert_false(find_in_report(f, " %(0,1%) %(vom Turm erblickt%)"))
+    assert_false(find_in_report(f, " %(4,0%) %(vom Turm erblickt%)"))
+end
+
 module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
