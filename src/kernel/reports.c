@@ -1243,7 +1243,7 @@ static report_type *report_types;
 
 void register_reporttype(const char *extension, report_fun write, int flag)
 {
-  report_type *type = malloc(sizeof(report_type));
+  report_type *type = (report_type *)malloc(sizeof(report_type));
   type->extension = extension;
   type->write = write;
   type->flag = flag;
@@ -1259,7 +1259,8 @@ static region_list *get_regions_distance(region * root, int radius)
   fset(root, RF_MARK);
   while (*rp) {
     region_list *r = *rp;
-    direction_t d;
+    int d;
+
     rp = &r->next;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *rn = rconnect(r->data, d);
@@ -1277,7 +1278,7 @@ static region_list *get_regions_distance(region * root, int radius)
 
 static void view_default(struct seen_region **seen, region * r, faction * f)
 {
-  direction_t dir;
+  int dir;
   for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
     region *r2 = rconnect(r, dir);
     if (r2) {
@@ -1295,9 +1296,12 @@ static void view_default(struct seen_region **seen, region * r, faction * f)
 
 static void view_neighbours(struct seen_region **seen, region * r, faction * f)
 {
-  direction_t dir;
-  for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-    region *r2 = rconnect(r, dir);
+  int d;
+  region * nb[MAXDIRECTIONS];
+
+  get_neighbours(r, nb);
+  for (d = 0; d != MAXDIRECTIONS; ++d) {
+    region *r2 = nb[d];
     if (r2) {
       connection *b = get_borders(r, r2);
       while (b) {
@@ -1308,7 +1312,7 @@ static void view_neighbours(struct seen_region **seen, region * r, faction * f)
       if (!b) {
         if (add_seen(seen, r2, see_far, false)) {
           if (!(fval(r2->terrain, FORBIDDEN_REGION))) {
-            direction_t dir;
+            int dir;
             for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
               region *r3 = rconnect(r2, dir);
               if (r3) {
@@ -1333,10 +1337,13 @@ static void
 recurse_regatta(struct seen_region **seen, region * center, region * r,
   faction * f, int maxdist)
 {
-  direction_t dir;
+  int d;
   int dist = distance(center, r);
-  for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-    region *r2 = rconnect(r, dir);
+  region * nb[MAXDIRECTIONS];
+
+  get_neighbours(r, nb);
+  for (d = 0; d != MAXDIRECTIONS; ++d) {
+    region *r2 = nb[d];
     if (r2) {
       int ndist = distance(center, r2);
       if (ndist > dist && fval(r2->terrain, SEA_REGION)) {
