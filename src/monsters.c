@@ -260,14 +260,16 @@ static boolean room_for_race_in_region(region * r, const race * rc)
 
 static direction_t random_neighbour(region * r, unit * u)
 {
-  direction_t i;
+  int i;
   region *rc;
+  region * next[MAXDIRECTIONS];
   int rr, c = 0, c2 = 0;
 
+  get_neighbours(r, next);
   /* Nachsehen, wieviele Regionen in Frage kommen */
 
   for (i = 0; i != MAXDIRECTIONS; i++) {
-    rc = rconnect(r, i);
+    rc = next[i];
     if (rc && can_survive(u, rc)) {
       if (room_for_race_in_region(rc, u->race)) {
         c++;
@@ -293,7 +295,7 @@ static direction_t random_neighbour(region * r, unit * u)
 
   c = -1;
   for (i = 0; i != MAXDIRECTIONS; i++) {
-    rc = rconnect(r, i);
+    rc = next[i];
     if (rc && can_survive(u, rc)) {
       if (c2 == 0) {
         c++;
@@ -301,7 +303,7 @@ static direction_t random_neighbour(region * r, unit * u)
         c++;
       }
       if (c == rr)
-        return i;
+        return (direction_t)i;
     }
   }
 
@@ -311,18 +313,18 @@ static direction_t random_neighbour(region * r, unit * u)
 
 static direction_t treeman_neighbour(region * r)
 {
-  direction_t i;
+  int i;
   int rr;
   int c = 0;
+  region * next[MAXDIRECTIONS];
 
+  get_neighbours(r, next);
   /* Nachsehen, wieviele Regionen in Frage kommen */
 
   for (i = 0; i != MAXDIRECTIONS; i++) {
-    if (rconnect(r, i)
-      && rterrain(rconnect(r, i)) != T_OCEAN
-      && rterrain(rconnect(r, i)) != T_GLACIER
-      && rterrain(rconnect(r, i)) != T_DESERT) {
-      c++;
+    if (next[i] && rterrain(next[i]) != T_OCEAN
+      && rterrain(next[i]) != T_GLACIER && rterrain(next[i]) != T_DESERT) {
+      ++c;
     }
   }
 
@@ -337,18 +339,15 @@ static direction_t treeman_neighbour(region * r)
 
   c = -1;
   for (i = 0; i != MAXDIRECTIONS; i++) {
-    if (rconnect(r, i)
-      && rterrain(rconnect(r, i)) != T_OCEAN
-      && rterrain(rconnect(r, i)) != T_GLACIER
-      && rterrain(rconnect(r, i)) != T_DESERT) {
-      c++;
-      if (c == rr) {
-        return i;
+    if (next[i] && rterrain(next[i]) != T_OCEAN
+      && rterrain(next[i]) != T_GLACIER && rterrain(next[i]) != T_DESERT) {
+      if (++c == rr) {
+        return (direction_t)i;
       }
     }
   }
 
-  assert(1 == 0);               /* Bis hierhin sollte er niemals kommen. */
+  assert(!"this should never happen");               /* Bis hierhin sollte er niemals kommen. */
   return NODIRECTION;
 }
 
@@ -356,8 +355,9 @@ static order *monster_move(region * r, unit * u)
 {
   direction_t d = NODIRECTION;
 
-  if (monster_is_waiting(u))
+  if (monster_is_waiting(u)) {
     return NULL;
+  }
   switch (old_race(u->race)) {
   case RC_FIREDRAGON:
   case RC_DRAGON:
