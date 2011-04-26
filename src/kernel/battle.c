@@ -1761,7 +1761,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
         if (power <= 0) {       /* Effekt von Antimagie */
           report_failed_spell(b, mage, sp);
           pay_spell(mage, sp, level, 1);
-        } else if (fumble(r, mage, sp, sp->level) == true) {
+        } else if (fumble(r, mage, sp, sp->level)) {
           report_failed_spell(b, mage, sp);
           pay_spell(mage, sp, level, 1);
         } else {

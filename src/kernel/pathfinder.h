@@ -39,7 +39,7 @@ extern "C" {
     const struct region *target);
   extern boolean allowed_walk(const struct region *src,
     const struct region *target);
-  extern struct region_list *regions_in_range(struct region *src, int maxdist,
+  extern struct quicklist *regions_in_range(struct region *src, int maxdist,
     boolean(*allowed) (const struct region *, const struct region *));
 
   extern void pathfinder_cleanup(void);

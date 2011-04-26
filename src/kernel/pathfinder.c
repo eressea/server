@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
+#include <util/quicklist.h>
 #include "pathfinder.h"
 
 #include "region.h"
@@ -98,10 +99,10 @@ static void free_nodes(node * root)
   }
 }
 
-struct region_list *regions_in_range(struct region *start, int maxdist,
+struct quicklist *regions_in_range(struct region *start, int maxdist,
   boolean(*allowed) (const struct region *, const struct region *))
 {
-  region_list *rlist = NULL;
+  quicklist * rlist = NULL;
   node *root = new_node(start, 0, NULL);
   node **end = &root->next;
   node *n = root;
@@ -109,7 +110,7 @@ struct region_list *regions_in_range(struct region *start, int maxdist,
   while (n != NULL) {
     region *r = n->r;
     int depth = n->distance + 1;
-    direction_t d;
+    int d;
 
     if (n->distance >= maxdist)
       break;
@@ -123,7 +124,7 @@ struct region_list *regions_in_range(struct region *start, int maxdist,
         continue;               /* can't go there */
 
       /* add the region to the list of available ones. */
-      add_regionlist(&rlist, rn);
+      ql_push(&rlist, rn);
 
       /* make sure we don't go here again, and put the region into the set for
          further BFS'ing */
