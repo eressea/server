@@ -398,11 +398,11 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
 {
   int max_affinity = 0;
   region *max_region = NULL;
+  quicklist *ql, *rlist = regions_in_range(r, range, allowed_dragon);
+  int qi;
 
-#if 1
-  region_list *rptr, *rlist = regions_in_range(r, range, allowed_dragon);
-  for (rptr = rlist; rptr; rptr = rptr->next) {
-    region *r2 = rptr->data;
+  for (qi=0, ql = rlist; ql; ql_advance(&ql, &qi, 1)) {
+    region *r2 = (region *)ql_get(ql, qi);
     int affinity = dragon_affinity_value(r2, u);
     if (affinity > max_affinity) {
       max_affinity = affinity;
@@ -410,28 +410,8 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
     }
   }
 
-  free_regionlist(rlist);
-#else
-  int tx, ty;
-  for (tx = r->x - range; tx < r->x + range; tx++) {
-    for (ty = r->y - range; ty < r->y + range; ty++) {
-      region *r2;
-      int x = tx, y = ty;
-      pnormalize(&x, &y, r->planep);
-      r2 = findregion(x, y);
-      if (r2 != NULL) {
-        int affinity = dragon_affinity_value(r2, u);
-        if (affinity > max_affinity) {
-          if (koor_distance(r->x, r->y, x, y) <= range
-            && path_exists(r, r2, range, allowed_dragon)) {
-            max_affinity = affinity;
-            max_region = r2;
-          }
-        }
-      }
-    }
-  }
-#endif
+  ql_free(rlist);
+
   if (max_region && max_region != r) {
     attrib *a = a_find(u->attribs, &at_targetregion);
     if (!a) {
