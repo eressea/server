@@ -1251,27 +1251,32 @@ void register_reporttype(const char *extension, report_fun write, int flag)
   report_types = type;
 }
 
-static region_list *get_regions_distance(region * root, int radius)
+static quicklist *get_regions_distance(region * root, int radius)
 {
-  region_list *rptr, *rlist = NULL;
-  region_list **rp = &rlist;
-  add_regionlist(rp, root);
-  fset(root, RF_MARK);
-  while (*rp) {
-    region_list *r = *rp;
-    int d;
+  quicklist *ql, *rlist = NULL;
+  int qi = 0;
 
-    rp = &r->next;
+  ql_push(&rlist, root);
+  fset(root, RF_MARK);
+  ql = rlist;
+
+  while (ql) {
+    region *r = (region *)ql_get(ql, qi);
+    region * next[MAXDIRECTIONS];
+    int d;
+    get_neighbours(r, next);
+
     for (d = 0; d != MAXDIRECTIONS; ++d) {
-      region *rn = rconnect(r->data, d);
-      if (rn != NULL && !fval(rn, RF_MARK) && distance(rn, root) <= radius) {
-        add_regionlist(rp, rn);
-        fset(rn, RF_MARK);
+      if (next[d] && !fval(next[d], RF_MARK) && distance(next[d], root) <= radius) {
+        ql_push(&rlist, next[d]);
+        fset(next[d], RF_MARK);
       }
     }
+    ql_advance(&ql, &qi, 1);
   }
-  for (rptr = rlist; rptr; rptr = rptr->next) {
-    freset(rptr->data, RF_MARK);
+  for (ql=rlist,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+    region *r = (region *)ql_get(ql, qi);
+    freset(r, RF_MARK);
   }
   return rlist;
 }
@@ -1383,24 +1388,25 @@ static void view_regatta(struct seen_region **seen, region * r, faction * f)
 static void prepare_lighthouse(building * b, faction * f)
 {
   int range = lighthouse_range(b, f);
-  region_list *rlist = get_regions_distance(b->region, range);
-  region_list *rp = rlist;
+  quicklist *ql, *rlist = get_regions_distance(b->region, range);
+  int qi;
 
-  while (rp) {
-    region *rl = rp->data;
+  for (ql=rlist,qi=0;ql;ql_advance(&ql, &qi,1)) {
+    region *rl = (region *)ql_get(ql, qi);
     if (!fval(rl->terrain, FORBIDDEN_REGION)) {
+      region * next[MAXDIRECTIONS];
       int d;
+
+      get_neighbours(rl, next);
       add_seen(f->seen, rl, see_lighthouse, false);
       for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region *rn = rconnect(rl, d);
-        if (rn != NULL) {
-          add_seen(f->seen, rn, see_neighbour, false);
+        if (next[d]) {
+          add_seen(f->seen, next[d], see_neighbour, false);
         }
       }
     }
-    rp = rp->next;
   }
-  free_regionlist(rlist);
+  ql_free(rlist);
 }
 
 static void prepare_reports(void)
