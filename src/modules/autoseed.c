@@ -399,15 +399,15 @@ static quicklist * get_island(region * root)
 static void
 get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
 {
-  int size = 0, maxage = 0, inhabited = 0;
-  region_list *rlist = NULL;
-  region_list *island = NULL;
-  add_regionlist(&rlist, root);
-  island = rlist;
+  int qi, size = 0, maxage = 0, inhabited = 0;
+  quicklist *ql, *island = NULL;
+  
+  ql_push(&island, root);
   fset(root, RF_MARK);
-  while (rlist) {
+
+  for (ql=island,qi=0; ql; ql_advance(&ql, &qi, 1)) {
     int d;
-    region *r = rlist->data;
+    region *r = (region *)ql_get(ql, qi);
     if (r->units) {
       unit *u;
       for (u = r->units; u; u = u->next) {
@@ -421,19 +421,16 @@ get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       region *rn = rconnect(r, d);
       if (rn && !fval(rn, RF_MARK) && rn->land) {
-        region_list *rnew = malloc(sizeof(region_list));
-        rnew->data = rn;
-        rnew->next = rlist->next;
-        rlist->next = rnew;
+        ql_push(&island, rn);
         fset(rn, RF_MARK);
       }
     }
-    rlist = rlist->next;
   }
-  for (rlist = island; rlist; rlist = rlist->next) {
-    freset(rlist->data, RF_MARK);
+  for (ql=island,qi=0; ql; ql_advance(&ql, &qi, 1)) {
+    region *r = (region *)ql_get(ql, qi);
+    freset(r, RF_MARK);
   }
-  free_regionlist(island);
+  ql_free(island);
   if (size_p)
     *size_p = size;
   if (inhabited_p)
