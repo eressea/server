@@ -289,7 +289,7 @@
   </set>
 
   <set name="random_sword">
-    <skill name="sword" level="d3"/>
+    <skill name="melee" level="d3"/>
     <item name="sword" amount="1"/>
   </set>
 
