@@ -35,6 +35,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 #include <util/rng.h>
 #include <util/sql.h>
 #include <util/unicode.h>
@@ -364,35 +365,35 @@ static boolean virgin_region(const region * r)
   return true;
 }
 
-void get_island(region * root, region_list ** rlist)
+static quicklist * get_island(region * root)
 {
-  region_list **rnext = rlist;
-  while (*rnext)
-    rnext = &(*rnext)->next;
+  quicklist * ql, * result = 0;
+  int qi = 0;
 
   fset(root, RF_MARK);
-  add_regionlist(rnext, root);
+  ql_push(&result, root);
 
-  while (*rnext) {
-    direction_t dir;
+  for (ql=result,qi=0; ql; ql_advance(&ql, &qi, 1)) {
+    int dir;
+    region *r = (region *)ql_get(ql, qi);
+    region * next[MAXDIRECTIONS];
 
-    region *rcurrent = (*rnext)->data;
-    rnext = &(*rnext)->next;
+    get_neighbours(r, next);
 
     for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
-      region *r = rconnect(rcurrent, dir);
-      if (r != NULL && r->land && !fval(r, RF_MARK)) {
-        fset(r, RF_MARK);
-        add_regionlist(rnext, r);
+      region *rn = next[dir];
+      if (rn != NULL && rn->land && !fval(rn, RF_MARK)) {
+        fset(rn, RF_MARK);
+        ql_push(&result, rn);
       }
     }
   }
-  rnext = rlist;
-  while (*rnext) {
-    region_list *rptr = *rnext;
-    freset(rptr->data, RF_MARK);
-    rnext = &rptr->next;
+
+  for (ql=result,qi=0; ql; ql_advance(&ql, &qi, 1)) {
+    region *r = (region *)ql_get(ql, qi);
+    freset(r, RF_MARK);
   }
+  return result;
 }
 
 static void
@@ -405,7 +406,7 @@ get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
   island = rlist;
   fset(root, RF_MARK);
   while (rlist) {
-    direction_t d;
+    int d;
     region *r = rlist->data;
     if (r->units) {
       unit *u;
@@ -572,11 +573,12 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
       }
     }
     if (rmin != NULL) {
-      region_list *rlist = NULL, *rptr;
       faction *f;
-      get_island(rmin, &rlist);
-      for (rptr = rlist; rptr; rptr = rptr->next) {
-        region *r = rlist->data;
+      quicklist *ql, *rlist = get_island(rmin);
+      int qi;
+
+      for (ql=rlist,qi=0;ql;ql_advance(&ql, &qi, 1)) {
+        region *r = (region *)ql_get(ql, qi);
         unit *u;
         for (u = r->units; u; u = u->next) {
           f = u->faction;
@@ -586,10 +588,12 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
           }
         }
       }
-      free_regionlist(rlist);
-      if (psize > 0)
-        for (f = factions; f; f = f->next)
+      ql_free(rlist);
+      if (psize > 0) {
+        for (f = factions; f; f = f->next) {
           freset(f, FFL_MARK);
+        }
+      }
       if (psize < PLAYERS_PER_ISLAND) {
         r = rmin;
       }
