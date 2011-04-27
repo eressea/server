@@ -16,7 +16,6 @@
 extern "C" {
 #endif
 
-  struct region_list;
   struct newfaction;
 
   typedef struct newfaction {

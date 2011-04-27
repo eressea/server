@@ -27,9 +27,10 @@
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/rng.h>
-#include <util/resolve.h>
 #include <util/language.h>
+#include <util/resolve.h>
+#include <util/rng.h>
+#include <util/quicklist.h>
 #include <util/storage.h>
 
 /* libc includes */
@@ -175,9 +176,9 @@ void create_wormholes(void)
 {
 #define WORMHOLE_CHANCE 10000
   const building_type *bt_wormhole = bt_find("wormhole");
-  region_list *rptr, *rlist = NULL;
+  quicklist *ql, *rlist = 0;
   region *r = regions;
-  int i = 0, count = 0;
+  int qi, i = 0, count = 0;
   region **match;
 
   if (bt_wormhole == NULL)
@@ -195,7 +196,7 @@ void create_wormholes(void)
     }
     if (r == NULL)
       break;
-    add_regionlist(&rlist, r);
+    ql_push(&rlist, r);
     ++count;
     r = r->next;
   }
@@ -204,18 +205,18 @@ void create_wormholes(void)
     return;
 
   match = (region **) malloc(sizeof(region *) * count);
-  rptr = rlist;
-  while (i != count) {
-    match[i++] = rptr->data;
-    rptr = rptr->next;
+  
+  for (ql = rlist,qi = 0; i != count; ql_advance(&ql, &qi, 1)) {
+    match[i++] = (region *)ql_get(ql, qi);
   }
   qsort(match, count, sizeof(region *), cmp_age);
-  free_regionlist(rlist);
+  ql_free(rlist);
 
   count /= 2;
   for (i = 0; i != count; ++i) {
     make_wormhole(bt_wormhole, match[i], match[i + count]);
   }
+  free(match);
 }
 
 void register_wormholes(void)
