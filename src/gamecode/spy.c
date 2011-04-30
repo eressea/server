@@ -75,7 +75,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     if (fv && fv != target->faction) {
       /* wahre Partei */
       ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
-          "target faction", u, target, target->faction));
+          "target faction", target, target->faction));
       ql_set_insert(&u->faction->seen_factions, target->faction);
     }
   }
@@ -94,10 +94,10 @@ void spy_message(int spy, const unit * u, const unit * target)
         } else {
           strncat(buf, ", ", sizeof(buf));
         }
-        strncat(buf, (const char *)skillname(sv->id, u->faction->locale),
+        strncat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
           sizeof(buf));
         strncat(buf, " ", sizeof(buf));
-        strncat(buf, itoa10(eff_skill(target, sv->id, target->region)),
+        strncat(buf, itoa10(eff_skill(target, (skill_t)sv->id, target->region)),
           sizeof(buf));
       }
     }
