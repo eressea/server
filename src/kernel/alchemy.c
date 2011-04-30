@@ -120,7 +120,7 @@ static void end_potion(unit * u, const potion_type * ptype, int amount)
       "unit potion", u, ptype->itype->rtype));
 }
 
-void do_potion(unit * u, const potion_type * ptype, int amount)
+static int do_potion(unit * u, const potion_type * ptype, int amount)
 {
   if (ptype == oldpotiontype[P_LIFE]) {
     region *r = u->region;
@@ -175,6 +175,7 @@ void do_potion(unit * u, const potion_type * ptype, int amount)
   } else {
     change_effect(u, ptype, 10 * amount);
   }
+  return amount;
 }
 
 int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
@@ -187,7 +188,7 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
     int result = begin_potion(u, ptype, ord);
     if (result)
       return result;
-    do_potion(u, ptype, amount);
+    amount = do_potion(u, ptype, amount);
     end_potion(u, ptype, amount);
   }
   return 0;
@@ -212,7 +213,7 @@ static void free_potiondelay(attrib * a)
 static int age_potiondelay(attrib * a)
 {
   potiondelay *pd = (potiondelay *) a->data.v;
-  do_potion(pd->u, pd->ptype, pd->amount);
+  pd->amount = do_potion(pd->u, pd->ptype, pd->amount);
   return AT_AGE_REMOVE;
 }
 
