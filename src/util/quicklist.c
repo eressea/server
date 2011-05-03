@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <errno.h>
 
 #define QL_MAXSIZE 14           /* total struct is 64 bytes */
-#define QL_LIMIT 8
+#define QL_LIMIT 7
 
 struct quicklist {
   struct quicklist *next;
@@ -89,7 +89,7 @@ int ql_delete(quicklist ** qlp, int index)
     if (ql->num_elements == 0) {
       *qlp = ql->next;
       free(ql);
-    } else if (ql->next && ql->num_elements < QL_LIMIT) {
+    } else if (ql->next && ql->num_elements <= QL_LIMIT) {
       quicklist *qn = ql->next;
       if (ql->num_elements + qn->num_elements > QL_MAXSIZE) {
         memcpy(ql->elements + ql->num_elements, qn->elements, sizeof(void *));
@@ -124,10 +124,10 @@ int ql_insert(quicklist ** qlp, int index, void *data)
       quicklist *qn = (quicklist *) malloc(sizeof(quicklist));
       qn->next = ql->next;
       ql->next = qn;
-      qn->num_elements = QL_LIMIT;
-      ql->num_elements -= QL_LIMIT;
+      qn->num_elements = ql->num_elements-QL_LIMIT;
+      ql->num_elements = QL_LIMIT;
       memcpy(qn->elements, ql->elements + ql->num_elements,
-        QL_LIMIT * sizeof(void *));
+        qn->num_elements * sizeof(void *));
       if (index <= ql->num_elements) {
         return ql_insert(qlp, index, data);
       } else {

@@ -142,15 +142,13 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
     if (mask & EQUIP_SPELLS) {
       quicklist *ql = eq->spells;
       if (ql) {
+        int qi;
         sc_mage *m = get_mage(u);
-        if (m == NULL) {
-          assert(!"trying to equip spells on a non-mage!");
-        } else {
-          int qi;
-          for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spell *sp = (spell *) ql_get(ql, qi);
-            add_spell(get_spelllist(m, u->faction), sp);
-          }
+
+        assert(m || !"trying to equip spells on a non-mage!");
+        for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+          spell *sp = (spell *) ql_get(ql, qi);
+          add_spell(&m->spells, sp);
         }
       }
     }
