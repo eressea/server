@@ -2949,10 +2949,11 @@
   <message name="sailnolandingstorm" section="movement">
     <type>
       <arg name="ship" type="ship"/>
+      <arg name="region" type="region"/>
     </type>
-    <text locale="de">"Die Mannschaft der $ship($ship) kann in letzter Sekunde verhindern, dass das Schiff auf Land aufläuft."</text>
-    <text locale="fr">"In the very last moment, the crew of the $ship($ship) saved the ship from grounding."</text>
-    <text locale="en">"In the very last moment, the crew of the $ship($ship) saved the ship from grounding."</text>
+    <text locale="de">"Die Mannschaft der $ship($ship) kann in letzter Sekunde verhindern, dass das Schiff in $region($region) auf Land aufläuft."</text>
+    <text locale="fr">"In the very last moment, the crew of the $ship($ship) saved the ship from grounding in $region($region)."</text>
+    <text locale="en">"In the very last moment, the crew of the $ship($ship) saved the ship from grounding in $region($region)."</text>
   </message>
   <message name="sailnolanding" section="movement">
     <type>

@@ -1820,7 +1820,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
       if (reason<0) {
         /* for some reason or another, we aren't allowed in there.. */
         if (check_leuchtturm(current_point, NULL) || reason == SA_NO_INSECT) {
-          ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
+          ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
         } else {
           float dmg =
             get_param_flt(global.parameters, "rules.ship.damage.nolanding",
