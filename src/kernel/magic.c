@@ -1128,6 +1128,7 @@ double magic_resistance(unit * target)
   attrib *a;
   curse *c;
   int n;
+  const curse_type * ct_goodresist = 0, * ct_badresist = 0;
 
   /* Bonus durch Rassenmagieresistenz */
   double probability = target->race->magres;
@@ -1149,21 +1150,24 @@ double magic_resistance(unit * target)
 
   /* Auswirkungen von Zaubern auf der Region */
   a = a_find(target->region->attribs, &at_curse);
+  if (a) {
+    ct_badresist = ct_find("badmagicresistancezone");
+    ct_goodresist = ct_find("goodmagicresistancezone");
+  }
   while (a && a->type == &at_curse) {
     curse *c = (curse *) a->data.v;
     unit *mage = c->magician;
 
     if (mage != NULL) {
-      if (c->type == ct_find("goodmagicresistancezone")) {
+      if (ct_goodresist && c->type == ct_goodresist) {
         if (alliedunit(mage, target->faction, HELP_GUARD)) {
           probability += curse_geteffect(c) * 0.01;
-          break;
+          ct_goodresist = 0; /* only one effect per region */
         }
-      } else if (c->type == ct_find("badmagicresistancezone")) {
+      } else if (ct_badresist && c->type == ct_badresist) {
         if (alliedunit(mage, target->faction, HELP_GUARD)) {
-          /* TODO: hier sollte doch sicher was passieren? */
-          a = a->next;
-          continue;
+          probability -= curse_geteffect(c) * 0.01;
+          ct_badresist = 0; /* only one effect per region */
         }
       }
     }
