@@ -120,10 +120,9 @@ static void end_potion(unit * u, const potion_type * ptype, int amount)
       "unit potion", u, ptype->itype->rtype));
 }
 
-static int do_potion(unit * u, const potion_type * ptype, int amount)
+static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
 {
   if (ptype == oldpotiontype[P_LIFE]) {
-    region *r = u->region;
     int holz = 0;
     static int tree_type = -1;
     static int tree_count = -1;
@@ -155,13 +154,11 @@ static int do_potion(unit * u, const potion_type * ptype, int amount)
   } else if (ptype == oldpotiontype[P_HEILWASSER]) {
     u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
   } else if (ptype == oldpotiontype[P_PEOPLE]) {
-    region *r = u->region;
     attrib *a = (attrib *) a_find(r->attribs, &at_peasantluck);
     if (!a)
       a = a_add(&r->attribs, a_new(&at_peasantluck));
     a->data.i += amount;
   } else if (ptype == oldpotiontype[P_HORSE]) {
-    region *r = u->region;
     attrib *a = (attrib *) a_find(r->attribs, &at_horseluck);
     if (!a)
       a = a_add(&r->attribs, a_new(&at_horseluck));
@@ -188,7 +185,7 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
     int result = begin_potion(u, ptype, ord);
     if (result)
       return result;
-    amount = do_potion(u, ptype, amount);
+    amount = do_potion(u, u->region, ptype, amount);
     end_potion(u, ptype, amount);
   }
   return 0;
@@ -196,6 +193,7 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 
 typedef struct potiondelay {
   unit *u;
+  region *r;
   const potion_type *ptype;
   int amount;
 } potiondelay;
@@ -213,7 +211,7 @@ static void free_potiondelay(attrib * a)
 static int age_potiondelay(attrib * a)
 {
   potiondelay *pd = (potiondelay *) a->data.v;
-  pd->amount = do_potion(pd->u, pd->ptype, pd->amount);
+  pd->amount = do_potion(pd->u, pd->r, pd->ptype, pd->amount);
   return AT_AGE_REMOVE;
 }
 
@@ -233,6 +231,7 @@ static attrib *make_potiondelay(unit * u, const potion_type * ptype, int amount)
   attrib *a = a_new(&at_potiondelay);
   potiondelay *pd = (potiondelay *) a->data.v;
   pd->u = u;
+  pd->r = u->region;
   pd->ptype = ptype;
   pd->amount = amount;
   return a;
