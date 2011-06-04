@@ -1113,7 +1113,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f,
         if (!b->type->transparent(b, f))
           fputs("1;opaque\n", F);
         /* hack: */
-        if (b->type == &bt_road) {
+        if (b->type == &bt_road && r->terrain->max_road) {
           int p = rroad(r, d) * 100 / r->terrain->max_road;
           fprintf(F, "%d;prozent\n", p);
         }

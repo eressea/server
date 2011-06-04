@@ -773,17 +773,22 @@ void rsetroad(region * r, direction_t d, short val)
   connection *b;
   region *r2 = rconnect(r, d);
 
-  if (!r2)
+  if (!r2) {
     return;
+  }
   b = get_borders(r, r2);
-  while (b && b->type != &bt_road)
+  while (b && b->type != &bt_road) {
     b = b->next;
-  if (!b)
+  }
+  if (!b) {
+    if (!val) return;
     b = new_border(&bt_road, r, r2);
-  if (r == b->from)
+  }
+  if (r == b->from) {
     b->data.sa[0] = val;
-  else
+  } else {
     b->data.sa[1] = val;
+  }
 }
 
 short rroad(const region * r, direction_t d)
@@ -1236,6 +1241,10 @@ void terraform_region(region * r, const terrain_type * terrain)
   }
 
   if (r->land) {
+    int d;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      rsetroad(r, d, 0);
+    }
     i_freeall(&r->land->items);
   } else {
     static struct surround {
