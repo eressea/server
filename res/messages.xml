@@ -2354,7 +2354,7 @@
       <arg name="spell" type="spell"/>
     </type>
     <text locale="de">"$unit($unit) schafft es nicht, genug Kraft aufzubringen, um $spell($spell) auf Stufe $int($level) zu zaubern."</text>
-    <text locale="en">"$unit($unit) cannot muster enough energy to cast $spell($spell) on level $level($level)."</text>
+    <text locale="en">"$unit($unit) cannot muster enough energy to cast $spell($spell) on level $int($level)."</text>
   </message>
   <message name="missing_components_list" section="errors">
     <type>
