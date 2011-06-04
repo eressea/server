@@ -60,6 +60,7 @@ static int fix_familiars(struct lua_State *L)
           char buffer[64];
 
           ql_free(mage->spells);
+          mage->spells = 0;
 
           snprintf(buffer, sizeof(buffer), "%s_familiar", u->race->_name[0]);
           eq = get_equipment(buffer);

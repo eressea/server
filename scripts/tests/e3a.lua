@@ -662,3 +662,33 @@ function test_cannot_walk_into_ocean()
     assert_equal(1, u.region.x)
 end
 
+function test_p2()
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local r = region.create(0, 0, "plain")
+    local u = unit.create(f, r, 1)
+    r:set_resource("tree", 0)
+    u:clear_orders()
+    u:add_order("BENUTZE 'Wasser des Lebens'")
+    u:add_item("p2", 1)
+    u:add_item("log", 20)
+    process_orders()
+    assert_equal(5, r:get_resource("tree"))
+end
+
+function test_p2_move()
+    -- http://bugs.eressea.de/view.php?id=1855
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local r = region.create(0, 0, "plain")
+    region.create(1, 0, "plain")
+    local u = unit.create(f, r, 1)
+    r:set_resource("tree", 0)
+    u:clear_orders()
+    u:add_order("BENUTZE 'Wasser des Lebens'")
+    u:add_order("NACH OST")
+    u:add_item("horse", 1)
+    u:add_item("p2", 1)
+    u:add_item("log", 1)
+    process_orders()
+    assert_equal(1, u.region.x)
+    assert_equal(1, r:get_resource("tree"))
+end
