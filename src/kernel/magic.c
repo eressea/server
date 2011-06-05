@@ -1165,7 +1165,7 @@ double magic_resistance(unit * target)
           ct_goodresist = 0; /* only one effect per region */
         }
       } else if (ct_badresist && c->type == ct_badresist) {
-        if (alliedunit(mage, target->faction, HELP_GUARD)) {
+        if (!alliedunit(mage, target->faction, HELP_GUARD)) {
           probability -= curse_geteffect(c) * 0.01;
           ct_badresist = 0; /* only one effect per region */
         }
