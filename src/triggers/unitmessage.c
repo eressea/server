@@ -63,8 +63,12 @@ static int unitmessage_handle(trigger * t, void *data)
   unitmessage_data *td = (unitmessage_data *) t->data.v;
   if (td->target && td->target->no) {
     struct faction *f = td->target->faction;
-    addmessage(td->target->region, f, LOC(f->locale, td->string), td->type,
-      td->level);
+    const char * str = LOC(f->locale, td->string);
+    /* bug found in turn 733: sometimes, alps have f*cked up messages */
+    if (td->string && td->string[0]) {
+      addmessage(td->target->region, f, str, td->type,
+        td->level);
+    }
   }
   unused(data);
   return 0;
