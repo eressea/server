@@ -125,7 +125,7 @@ static char *get_command(const order * ord, char *sbuffer, size_t size)
           ++size;
           --bufp;
         }
-        memcpy(bufp + 1, "[...]", 6);   /* TODO: make sure this only happens in eval_command */
+        memcpy(bufp, "[...]", 6);   /* TODO: make sure this only happens in eval_command */
         bufp += 6;
       }
     }
