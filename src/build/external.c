@@ -3,6 +3,7 @@
 #include "stdafx.h"
 
 #pragma warning(push)
+#pragma warning(disable: 4706)
 #pragma warning(disable: 4244)
 #pragma warning(disable: 4127)
 #include <sqlite3.c>
