@@ -6463,6 +6463,7 @@ int sp_break_curse(castorder * co)
   if (pa->length < 2) {
     /* Das Zielobjekt wurde vergessen */
     cmistake(mage, co->order, 203, MSG_MAGIC);
+    return 0;
   }
 
   obj = pa->param[0]->typ;
