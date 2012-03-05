@@ -4171,12 +4171,13 @@ static int sp_seduce(castorder * co)
       itmp = &itm->next;
   }
 
-  ADDMSG(&mage->faction->msgs, msg_message("seduce_effect_0", "mage unit items",
-      mage, target, items));
-  i_freeall(&items);
-  ADDMSG(&target->faction->msgs, msg_message("seduce_effect_1", "unit",
-      target));
-
+  if (items) {
+      ADDMSG(&mage->faction->msgs, msg_message("seduce_effect_0", "mage unit items",
+          mage, target, items));
+      i_freeall(&items);
+      ADDMSG(&target->faction->msgs, msg_message("seduce_effect_1", "unit",
+          target));
+  }
   return cast_level;
 }
 
