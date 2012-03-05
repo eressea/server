@@ -2743,7 +2743,7 @@ int rule_stealth_faction(void)
   static int gamecookie = -1;
   static int rule = -1;
   if (rule < 0 || gamecookie != global.cookie) {
-    rule = get_param_int(global.parameters, "rules.stealth.faction", 1);
+    rule = get_param_int(global.parameters, "rules.stealth.faction", 0xFF);
     gamecookie = global.cookie;
     assert(rule >= 0);
   }

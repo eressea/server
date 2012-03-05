@@ -271,32 +271,44 @@ int setstealth_cmd(unit * u, struct order *ord)
     case P_FACTION:
       /* TARNE PARTEI [NICHT|NUMMER abcd] */
       rule = rule_stealth_faction();
-      if (!rule)
+      if (!rule) {
+        /* TARNE PARTEI is disabled */
         break;
+      }
       s = getstrtoken();
-      if (!s || *s == 0) {
-        fset(u, UFL_ANON_FACTION);
-      } else if (findparam(s, u->faction->locale) == P_NOT) {
-        freset(u, UFL_ANON_FACTION);
-      } else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
-        const char *s2 = (const char *)getstrtoken();
-        int nr = -1;
+      if (rule&1) {
+        if (!s || *s == 0) {
+          fset(u, UFL_ANON_FACTION);
+          break;
+        } else if (findparam(s, u->faction->locale) == P_NOT) {
+          freset(u, UFL_ANON_FACTION);
+          break;
+        }
+      }
+      if (rule&2) {
+        if (findkeyword(s, u->faction->locale) == K_NUMBER) {
+          const char *s2 = (const char *)getstrtoken();
+          int nr = -1;
 
-        if (s2)
-          nr = atoi36(s2);
-        if (!s2 || *s2 == 0 || nr == u->faction->no) {
-          a_removeall(&u->attribs, &at_otherfaction);
-        } else {
-          struct faction *f = findfaction(nr);
-          if (f == NULL) {
-            cmistake(u, ord, 66, MSG_EVENT);
+          if (s2) {
+            nr = atoi36(s2);
+          }
+          if (!s2 || *s2 == 0 || nr == u->faction->no) {
+            a_removeall(&u->attribs, &at_otherfaction);
+            break;
           } else {
-            set_factionstealth(u, f);
+            struct faction *f = findfaction(nr);
+            if (f == NULL) {
+              cmistake(u, ord, 66, MSG_EVENT);
+              break;
+            } else {
+              set_factionstealth(u, f);
+              break;
+            }
           }
         }
-      } else {
-        cmistake(u, ord, 289, MSG_EVENT);
       }
+      cmistake(u, ord, 289, MSG_EVENT);
       break;
     case P_ANY:
     case P_NOT:
