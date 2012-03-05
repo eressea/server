@@ -276,7 +276,7 @@ const char *dragon_name(const unit * u)
     const char *no_article = strchr((const char *)str, ' ');
     assert(no_article);
     /* TODO: GERMAN */
-    sprintf(name, "Die %sn von %s", no_article, rname(u->region,
+    sprintf(name, "Die %sn von %s", no_article+1, rname(u->region,
         default_locale));
   } else {
     char n[32];
