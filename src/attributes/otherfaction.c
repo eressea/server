@@ -38,10 +38,19 @@ void write_of(const struct attrib *a, const void *owner, struct storage *store)
 
 int read_of(struct attrib *a, void *owner, struct storage *store)
 {                               /* return 1 on success, 0 if attrib needs removal */
-  int of = store->r_int(store);
-  a->data.v = findfaction(of);
-  if (a->data.v)
-    return AT_READ_OK;
+  int of;
+  static int rule = -1;
+  if (rule<0) {
+    rule = rule_stealth_faction();
+  }
+
+  of = store->r_int(store);
+  if (rule&2) {
+    a->data.v = findfaction(of);
+    if (a->data.v) {
+      return AT_READ_OK;
+    }
+  }
   return AT_READ_FAIL;
 }
 
