@@ -265,8 +265,8 @@ int a_read(struct storage *store, attrib ** attribs, void *owner)
 {
   int key, retval = AT_READ_OK;
   char zText[128];
-  strcpy(zText, "unknown");
-
+  
+  zText[0] = 0;
   key = -1;
   store->r_tok_buf(store, zText, sizeof(zText));
   if (strcmp(zText, "end") == 0)
