@@ -510,9 +510,12 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
   if (recruitcost < 0) {
     rc = u->race;
     recruitcost = recruit_cost(f, rc);
+    if (recruitcost < 0) {
+      recruitcost = INT_MAX;
+    }
   }
+  assert(rc);
   u->race = rc;
-  assert(rc && recruitcost >= 0);
 
 #if GUARD_DISABLES_RECRUIT
   /* this is a very special case because the recruiting unit may be empty
