@@ -795,30 +795,32 @@ int sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   attrib *a;
   message *msg;
   int force = (int)(get_force(power, 3) / 2);
-  unit *u =
-    create_unit(r, mage->faction, force, new_race[RC_WOLF], 0, NULL, mage);
-  unused(sp);
+  const race * rc = new_race[RC_WOLF];
+  if (force>0) {
+    unit *u =
+      create_unit(r, mage->faction, force, rc, 0, NULL, mage);
+    unused(sp);
 
-  leave(u, true);
-  setstatus(u, ST_FIGHT);
+    leave(u, true);
+    setstatus(u, ST_FIGHT);
 
-  set_level(u, SK_WEAPONLESS, (int)(power / 3));
-  set_level(u, SK_STAMINA, (int)(power / 3));
-  u->hp = u->number * unit_max_hp(u);
+    set_level(u, SK_WEAPONLESS, (int)(power / 3));
+    set_level(u, SK_STAMINA, (int)(power / 3));
+    u->hp = u->number * unit_max_hp(u);
+    
+    if (fval(mage, UFL_ANON_FACTION)) {
+      fset(u, UFL_ANON_FACTION);
+    }
 
-  if (fval(mage, UFL_ANON_FACTION)) {
-    fset(u, UFL_ANON_FACTION);
+    a = a_new(&at_unitdissolve);
+    a->data.ca[0] = 0;
+    a->data.ca[1] = 100;
+    a_add(&u->attribs, a);
+
+    make_fighter(b, u, fi->side, is_attacker(fi));
   }
-
-  a = a_new(&at_unitdissolve);
-  a->data.ca[0] = 0;
-  a->data.ca[1] = 100;
-  a_add(&u->attribs, a);
-
-  make_fighter(b, u, fi->side, is_attacker(fi));
   msg =
-    msg_message("sp_wolfhowl_effect", "mage amount race", mage, u->number,
-    u->race);
+    msg_message("sp_wolfhowl_effect", "mage amount race", mage, force, rc);
   message_all(b, msg);
   msg_release(msg);
 
