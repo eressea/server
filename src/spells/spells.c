@@ -449,11 +449,17 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
 
 static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 {
-  const race *retval = NULL;
+  const race *retval = 0;
   int rnd = rng_int() % 100;
 
   assert(magerace->familiars[0]);
-  if (rnd < 3) {
+  if (rnd >= 70) {
+    retval = magerace->familiars[magiegebiet];
+  } else {
+    retval = magerace->familiars[0];
+  }
+
+  if (!retval || rnd < 3) {
     race_list *familiarraces = get_familiarraces();
     unsigned int maxlen = listlen(familiarraces);
     if (maxlen > 0) {
@@ -464,12 +470,14 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
       }
       retval = rclist->data;
     }
-  } else if (rnd < 70) {
-    retval = magerace->familiars[0];
-  } else {
-    retval = magerace->familiars[magiegebiet];
   }
 
+  if (!retval) {
+    retval = magerace->familiars[0];
+  }
+  if (!retval) {
+    log_error(("select_familiar: No familiar (not even a default) defined for %s.\n", magerace->_name[0]));
+  }
   return retval;
 }
 
@@ -502,7 +510,7 @@ static int sp_summon_familiar(castorder * co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   const race *rc;
-  skill_t sk;
+  int sk;
   int dh, dh1, bytes;
   direction_t d;
   message *msg;
@@ -552,7 +560,7 @@ static int sp_summon_familiar(castorder * co)
 
   dh = 0;
   dh1 = 0;
-  for (sk = 0; sk < MAXSKILLS; sk++) {
+  for (sk = 0; sk < MAXSKILLS; ++sk) {
     if (skill_enabled[sk] && rc->bonus[sk] > -5)
       dh++;
   }
@@ -574,7 +582,7 @@ static int sp_summon_familiar(castorder * co)
           WARN_STATIC_BUFFER();
       }
       bytes =
-        (int)strlcpy(bufp, (const char *)skillname(sk, mage->faction->locale),
+        (int)strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
         size);
       if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
