@@ -6590,7 +6590,7 @@ static int sp_wdwpyramid(castorder * co)
 }
 
 typedef struct spelldata {
-  spellid_t id;
+  unsigned int id;
   const char *sname;
   spell_f sp_function;
   void (*patzer) (castorder *);
