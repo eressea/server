@@ -2522,11 +2522,13 @@ static castorder *cast_cmd(unit * u, order * ord)
   region *r = u->region;
   region *target_r = r;
   int level, range;
-  unit *familiar = NULL, *mage = u;
+  unit *familiar = NULL;
   const char *s;
-  spell *sp;
+  spell *sp = 0;
   plane *pl;
   spellparameter *args = NULL;
+  unit * caster = u;
+  sc_mage * mage;
 
   if (LongHunger(u)) {
     cmistake(u, ord, 224, MSG_MAGIC);
@@ -2563,8 +2565,8 @@ static castorder *cast_cmd(unit * u, order * ord)
     target_r = findregion(t_x, t_y);
     if (!target_r) {
       /* Fehler "Die Region konnte nicht verzaubert werden" */
-      ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
-          "unit region command", mage, mage->region, ord));
+      ADDMSG(&u->faction->msgs, msg_message("spellregionresists",
+          "unit region command", u, u->region, ord));
       return 0;
     }
     s = getstrtoken();
@@ -2586,16 +2588,26 @@ static castorder *cast_cmd(unit * u, order * ord)
     cmistake(u, ord, 172, MSG_MAGIC);
     return 0;
   }
-  sp = get_spellfromtoken(u, s, u->faction->locale);
+
+  mage = get_mage(u);
+  if (mage) {
+    sp = get_spellfromtoken(mage, s, u->faction->locale);
+  }
 
   /* Vertraute können auch Zauber sprechen, die sie selbst nicht
    * können. get_spellfromtoken findet aber nur jene Sprüche, die
    * die Einheit beherrscht. */
   if (!sp && is_familiar(u)) {
-    familiar = u;
-    mage = get_familiar_mage(u);
-    if (mage != NULL)
-      sp = get_spellfromtoken(mage, s, mage->faction->locale);
+    caster = get_familiar_mage(u);
+    if (caster) {
+      mage = get_mage(caster);
+      familiar = u;
+      sp = get_spellfromtoken(mage, s, caster->faction->locale);
+    } else {
+      /* somehow, this familiar has no mage! */
+      log_error(("cast_cmd: familiar %s is without a mage?\n", unitname(u)));
+      caster = u;
+    }
   }
 
   if (!sp) {
@@ -2674,36 +2686,34 @@ static castorder *cast_cmd(unit * u, order * ord)
    * die des Vertrauten!
    * Der Spruch wirkt dann auf die Region des Vertrauten und
    * gilt nicht als Farcasting. */
-  if (familiar || is_familiar(u)) {
+  if (familiar) {
     if ((sp->sptyp & NOTFAMILIARCAST)) {
       /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
       cmistake(u, ord, 177, MSG_MAGIC);
       return 0;
     }
-    if (!knowsspell(r, u, sp)) {        /* Magier zaubert durch Vertrauten */
-      mage = get_familiar_mage(u);
+    if (caster != familiar) {        /* Magier zaubert durch Vertrauten */
       if (range > 1) {          /* Fehler! Versucht zu Farcasten */
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast",
             "mage", mage));
         return 0;
       }
-      if (distance(mage->region, r) > eff_skill(mage, SK_MAGIC, mage->region)) {
+      if (distance(caster->region, r) > eff_skill(caster, SK_MAGIC, caster->region)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_toofar",
-            "mage", mage));
+            "mage", caster));
         return 0;
       }
       /* mage auf magier setzen, level anpassen, range für Erhöhung
        * der Spruchkosten nutzen, langen Befehl des Magiers
        * löschen, zaubern kann er noch */
       range *= 2;
-      set_order(&mage->thisorder, NULL);
-      level = MIN(level, eff_skill(mage, SK_MAGIC, mage->region) / 2);
-      familiar = u;
+      set_order(&caster->thisorder, NULL);
+      level = MIN(level, eff_skill(caster, SK_MAGIC, caster->region) / 2);
     }
   }
   /* Weitere Argumente zusammenbasteln */
   if (sp->parameter) {
-    char **params = malloc(2 * sizeof(char *));
+    char **params = (char**)malloc(2 * sizeof(char *));
     int p = 0, size = 2;
     for (;;) {
       s = getstrtoken();
@@ -2711,13 +2721,13 @@ static castorder *cast_cmd(unit * u, order * ord)
         break;
       if (p + 1 >= size) {
         size *= 2;
-        params = realloc(params, sizeof(char *) * size);
+        params = (char**)realloc(params, sizeof(char *) * size);
       }
       params[p++] = strdup(s);
     }
     params[p] = 0;
     args =
-      add_spellparameter(target_r, mage, sp->parameter,
+      add_spellparameter(target_r, caster, sp->parameter,
       (const char *const *)params, p, ord);
     for (p = 0; params[p]; ++p)
       free(params[p]);
@@ -2727,7 +2737,7 @@ static castorder *cast_cmd(unit * u, order * ord)
       return 0;
     }
   }
-  return new_castorder(mage, familiar, sp, target_r, level, 0, range, ord,
+  return new_castorder(caster, familiar, sp, target_r, level, 0, range, ord,
     args);
 }
 
