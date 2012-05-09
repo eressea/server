@@ -1870,10 +1870,7 @@ static int parse_races(xmlDocPtr doc)
       propValue = xmlGetProp(node, BAD_CAST "race");
       assert(propValue != NULL);
       frc = rc_find((const char *)propValue);
-      if (frc == NULL) {
-/*          log_error(("%s not registered, is familiar for %s\n", */
-/*            (const char*)propValue, rc->_name[0])); */
-/*          assert(frc!=NULL); */
+      if (!frc) {
         frc = rc_add(rc_new((const char *)propValue));
       }
       if (xml_bvalue(node, "default", false)) {
