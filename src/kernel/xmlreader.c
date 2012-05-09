@@ -90,7 +90,7 @@ static const spell *xml_spell(xmlNode * node, const char *name)
   const spell *sp = NULL;
   xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
   if (propValue != NULL) {
-    sp = find_spell(M_NONE, (const char *)propValue);
+    sp = find_spell((const char *)propValue);
     assert(sp);
     xmlFree(propValue);
   }
@@ -1322,12 +1322,14 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      sp = find_spell(mtype, (const char *)propValue);
-      assert(sp);
-      xmlFree(propValue);
-      if (sp != NULL) {
+      sp = find_spell((const char *)propValue);
+      if (!sp) {
+        log_error(("no spell '%s' in school '%s' for equipment-set '%s'\n",
+          (const char *)propValue, magic_school[mtype], eq->name));
+      } else {
         equipment_addspell(eq, sp);
       }
+      xmlFree(propValue);
     }
   }
 }
@@ -1492,13 +1494,13 @@ static int parse_spells(xmlDocPtr doc)
       xmlChar *propValue;
       int k;
       spell_component *component;
-      spell *sp = (spell *) calloc(1, sizeof(spell));
+      spell *sp;
       static int modes[] = { 0, PRECOMBATSPELL, COMBATSPELL, POSTCOMBATSPELL };
 
       /* spellname */
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
-      sp->sname = strdup((const char *)propValue);
+      sp = create_spell((const char *)propValue);
       xmlFree(propValue);
 
       propValue = xmlGetProp(node, BAD_CAST "parameters");

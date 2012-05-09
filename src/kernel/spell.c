@@ -35,11 +35,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/quicklist.h>
 
- /* Bitte die Sprüche nach Gebieten und Stufe ordnen, denn in derselben
-  * Reihenfolge wie in Spelldaten tauchen sie auch im Report auf
-  */
-
 quicklist *spells = NULL;
+
+spell * create_spell(const char * name)
+{
+  spell * sp = (spell *) calloc(1, sizeof(spell));
+  sp->sname = strdup(name);
+  return sp;
+}
 
 void register_spell(spell * sp)
 {
@@ -49,120 +52,56 @@ void register_spell(spell * sp)
   add_spell(&spells, sp);
 }
 
-/** versucht einen Spruch über gebiet + name zu identifizieren.
- * gibt ansonsten NULL zurück */
-spell *find_spell(magic_t mtype, const char *name)
+spell *find_spell(const char *name)
 {
   quicklist *ql = spells;
   int qi;
-  spell *spx = NULL;
 
   for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
     if (strcmp(name, sp->sname) == 0) {
-      if (mtype == M_NONE || sp->magietyp == mtype)
-        return sp;
-      spx = sp;
+      return sp;
     }
   }
-  if (spx == NULL) {
-    log_error(("cannot find spell by name: %s\n", name));
-  }
-  return spx;
+  log_warning(("find_spell: could not find spell '%s'\n", name));
+  return 0;
 }
 
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
-typedef struct spell_names {
-  struct spell_names *next;
-  const struct locale *lang;
-  magic_t mtype;
-  struct tnode names;
-} spell_names;
-
-static spell_names *spellnames;
-
-static spell_names *init_spellnames(const struct locale *lang, magic_t mtype)
-{
-  quicklist *ql;
-  int qi;
-  spell_names *sn = (spell_names *) calloc(sizeof(spell_names), 1);
-  sn->next = spellnames;
-  sn->lang = lang;
-  sn->mtype = mtype;
-  for (qi = 0, ql = spells; ql; ql_advance(&ql, &qi, 1)) {
-    spell *sp = (spell *) ql_get(ql, qi);
-    if (sp->magietyp == mtype) {
-      const char *n = spell_name(sp, lang);
-      variant token;
-      token.v = sp;
-      addtoken(&sn->names, n, token);
-    }
-  }
-  return spellnames = sn;
-}
-
-static spell_names *get_spellnames(const struct locale *lang, magic_t mtype)
-{
-  spell_names *sn = spellnames;
-  while (sn) {
-    if (sn->mtype == mtype && sn->lang == lang)
-      break;
-    sn = sn->next;
-  }
-  if (!sn)
-    return init_spellnames(lang, mtype);
-  return sn;
-}
-
-static spell *get_spellfromtoken_i(const char *name, const struct locale *lang,
-  magic_t mtype)
-{
-  variant token = { 0 };
-  spell_names *sn;
-
-  sn = get_spellnames(lang, mtype);
-  if (findtoken(&sn->names, name, &token) == E_TOK_NOMATCH) {
-    magic_t mt;
-    /* if we could not find it in the main magic type, we look through all the others */
-    for (mt = 0; mt != MAXMAGIETYP; ++mt) {
-      if (mt != mtype) {
-        sn = get_spellnames(lang, mt);
-        if (findtoken(&sn->names, name, &token) != E_TOK_NOMATCH)
-          break;
-      }
-    }
-  }
-
-  if (token.v != NULL)
-    return (spell *) token.v;
-  if (lang == default_locale)
-    return NULL;
-  return get_spellfromtoken_i(name, default_locale, mtype);
-}
-
 spell *get_spellfromtoken(unit * u, const char *name,
   const struct locale * lang)
 {
+  variant token;
   sc_mage *m = get_mage(u);
-  spell *sp;
-
-  if (m == NULL)
-    return NULL;
-  sp = get_spellfromtoken_i(name, lang, m->magietyp);
-  if (sp != NULL) {
+  struct spell_names * names = m->spellnames;
+  for (;names;names=names->next) {
+    if (names->lang==lang) break;
+  }
+  if (!names) {
     quicklist *ql = m->spells;
     int qi;
-
-    if (ql_set_find(&ql, &qi, sp)) {
-      return sp;
+    names = (spell_names *)calloc(1, sizeof(spell_names));
+    names->next = m->spellnames;
+    names->lang = lang;
+    names->tokens = (tnode *)calloc(1, sizeof(tnode));
+    for (qi = 0, ql = m->spells; ql; ql_advance(&ql, &qi, 1)) {
+      spell *sp = (spell *) ql_get(ql, qi);
+      const char *n = spell_name(sp, lang);
+      token.v = sp;
+      addtoken(names->tokens, n, token);
     }
+    m->spellnames = names;
   }
-  return NULL;
+
+  if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
+    return (spell *) token.v;
+  }
+  return 0;
 }
 
-spell *find_spellbyid(magic_t mtype, spellid_t id)
+spell *find_spellbyid(unsigned int id)
 {
   quicklist *ql;
   int qi;
@@ -180,9 +119,7 @@ spell *find_spellbyid(magic_t mtype, spellid_t id)
     spell *sp = (spell *) ql_get(ql, qi);
     unsigned int hashid = hashstring(sp->sname);
     if (hashid == id) {
-      if (sp->magietyp == mtype || mtype == M_NONE) {
-        return sp;
-      }
+      return sp;
     }
   }
 

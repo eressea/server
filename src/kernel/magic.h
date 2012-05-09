@@ -86,19 +86,6 @@ extern "C" {
 /* ------------------------------------------------------------- */
 /* Magierichtungen */
 
-/* typedef unsigned char magic_t; */
-  enum {
-    M_GRAY = 0,                 /* Gray */
-    M_ILLAUN = 1,               /* Illaun */
-    M_TYBIED = 2,               /* Tybied */
-    M_CERDDOR = 3,              /* Cerddor */
-    M_GWYRRD = 4,               /* Gwyrrd */
-    M_DRAIG = 5,                /* Draig */
-    M_COMMON = 6,               /* common spells */
-    MAXMAGIETYP,
-    /* this enum is stored in the datafile, so do not change the numbers around */
-    M_NONE = (magic_t) - 1
-  };
   extern const char *magic_school[MAXMAGIETYP];
 
 /* ------------------------------------------------------------- */
@@ -113,19 +100,26 @@ extern "C" {
  * - Spruchliste
  */
 
-  typedef struct combatspell {
-    int level;
-    const struct spell *sp;
-  } combatspell;
+typedef struct combatspell {
+  int level;
+  const struct spell *sp;
+} combatspell;
 
-  typedef struct sc_mage {
-    magic_t magietyp;
-    int spellpoints;
-    int spchange;
-    int spellcount;
-    combatspell combatspells[MAXCOMBATSPELLS];
-    struct quicklist *spells;
-  } sc_mage;
+typedef struct spell_names {
+  struct spell_names *next;
+  const struct locale *lang;
+  struct tnode * tokens;
+} spell_names;
+
+typedef struct sc_mage {
+  magic_t magietyp;
+  int spellpoints;
+  int spchange;
+  int spellcount;
+  combatspell combatspells[MAXCOMBATSPELLS];
+  struct quicklist *spells;
+  struct spell_names * spellnames;
+} sc_mage;
 
 /* ------------------------------------------------------------- */
 /* Zauberliste */
@@ -164,7 +158,7 @@ extern "C" {
   } spell_component;
 
   typedef struct spell {
-    spellid_t id;
+    unsigned int id;
     char *sname;
     char *syntax;
     char *parameter;
@@ -278,6 +272,7 @@ extern "C" {
   void unset_combatspell(struct unit *u, spell * sp);
   /*      löscht Kampfzauber */
   void add_spell(struct quicklist **slistp, spell * sp);
+  void add_spellname(sc_mage * mage, const spell * sp);
   /* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
   boolean u_hasspell(const struct unit *u, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */

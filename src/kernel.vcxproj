@@ -121,6 +121,7 @@
     <ClCompile Include="kernel\ship.c" />
     <ClCompile Include="kernel\skill.c" />
     <ClCompile Include="kernel\spell.c" />
+    <ClCompile Include="kernel\spell_test.c" />
     <ClCompile Include="kernel\sqlite.c" />
     <ClCompile Include="kernel\teleport.c" />
     <ClCompile Include="kernel\terrain.c" />

@@ -29,6 +29,8 @@ extern "C" {
   struct curse_type;
   struct castorder;
   struct curse;
+  struct region;
+  struct unit;
 
   /* Prototypen */
 
@@ -43,9 +45,11 @@ extern "C" {
   extern struct attrib_type at_wdwpyramid;
 
   extern struct quicklist *spells;
+
+  extern struct spell * create_spell(const char * name);
   extern void register_spell(struct spell *sp);
-  extern struct spell *find_spell(magic_t mtype, const char *name);
-  extern struct spell *find_spellbyid(magic_t mtype, spellid_t i);
+  extern struct spell *find_spell(const char *name);
+  extern struct spell *find_spellbyid(unsigned int i);
   extern struct spell *get_spellfromtoken(struct unit *u, const char *s,
     const struct locale *lang);
 

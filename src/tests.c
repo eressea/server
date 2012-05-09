@@ -7,6 +7,7 @@
 #include <util/base36_test.c>
 #include <util/quicklist_test.c>
 #include <kernel/move_test.c>
+#include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
 #include <gamecode/laws_test.c>
@@ -38,6 +39,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_move_suite());
+  CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
   CuSuiteAddSuite(suite, get_battle_suite());
 

@@ -31,10 +31,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 
 typedef short terrain_t;
-typedef short magic_t;
 typedef short typ_t;
 typedef short item_t;
-typedef unsigned int spellid_t;
 
 struct attrib;
 struct attrib_type;
@@ -374,6 +372,19 @@ typedef enum {
   D_SPECIAL,
   NODIRECTION = -1
 } direction_t;
+
+typedef enum {
+  M_GRAY = 0,                 /* Gray */
+  M_ILLAUN = 1,               /* Illaun */
+  M_TYBIED = 2,               /* Tybied */
+  M_CERDDOR = 3,              /* Cerddor */
+  M_GWYRRD = 4,               /* Gwyrrd */
+  M_DRAIG = 5,                /* Draig */
+  M_COMMON = 6,               /* common spells */
+  MAXMAGIETYP,
+  /* this enum is stored in the datafile, so do not change the numbers around */
+  M_NONE = -1
+} magic_t;
 
 #define DONT_HELP      0
 #define HELP_MONEY     1        /* Mitversorgen von Einheiten */

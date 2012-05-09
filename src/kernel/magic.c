@@ -58,6 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/storage.h>
+#include <util/umlaut.h>
 #include <util/base36.h>
 #include <util/event.h>
 
@@ -213,14 +214,17 @@ void read_spells(struct quicklist **slistp, magic_t mtype,
       int i = store->r_int(store);
       if (i < 0)
         break;
-      sp = find_spellbyid(M_NONE, (spellid_t) i);
+      sp = find_spellbyid((unsigned int) i);
     } else {
       store->r_tok_buf(store, spname, sizeof(spname));
       if (strcmp(spname, "end") == 0)
         break;
-      sp = find_spell(mtype, spname);
+      sp = find_spell(spname);
+      if (!sp) {
+        log_error(("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]));
+      }
     }
-    if (sp != NULL) {
+    if (sp) {
       add_spell(slistp, sp);
     }
   }
@@ -244,14 +248,17 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
       spid = store->r_int(store);
       level = store->r_int(store);
       if (spid >= 0) {
-        sp = find_spellbyid(mage->magietyp, (spellid_t) spid);
+        sp = find_spellbyid((unsigned int) spid);
       }
     } else {
       store->r_tok_buf(store, spname, sizeof(spname));
       level = store->r_int(store);
 
       if (strcmp("none", spname) != 0) {
-        sp = find_spell(mage->magietyp, spname);
+        sp = find_spell(spname);
+        if (!sp) {
+          log_error(("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]));
+        }
       }
     }
     if (sp && level >= 0) {
@@ -343,14 +350,16 @@ static int read_seenspell(attrib * a, void *owner, struct storage *store)
   store->r_tok_buf(store, token, sizeof(token));
   i = atoi(token);
   if (i != 0) {
-    sp = find_spellbyid(M_NONE, (spellid_t) i);
+    sp = find_spellbyid((unsigned int) i);
   } else {
     int mtype;
     mtype = store->r_int(store);
-    sp = find_spell((magic_t) mtype, token);
+    sp = find_spell(token);
+    if (!sp) {
+      log_error(("read_seenspell: could not find spell '%s' in school '%s'\n", token, magic_school[mtype]));
+    }
   }
-  if (sp == NULL) {
-    /* log_error(("could not find seenspell '%s'\n", buf)); */
+  if (!sp) {
     return AT_READ_FAIL;
   }
   a->data.v = sp;
@@ -488,8 +497,10 @@ void updatespelllist(unit * u)
         || know_school(u->faction, sp->magietyp)) {
         faction *f = u->faction;
 
-        if (!know)
+        if (!know) {
           add_spell(dst, sp);
+          add_spellname(mage, sp);
+        }
         if (!ismonster && !already_seen(u->faction, sp)) {
           a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
           a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
@@ -520,6 +531,18 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
 
 /* ------------------------------------------------------------- */
 /* Funktionen für die Bearbeitung der List-of-known-spells */
+
+void add_spellname(sc_mage * mage, const spell * sp)
+{
+  spell_names * names = mage->spellnames;
+  while (names) {
+    variant token;
+    const char *n = spell_name(sp, names->lang);
+    token.v = (void *)sp;
+    addtoken(names->tokens, n, token);
+    names = names->next;
+  }
+}
 
 void add_spell(struct quicklist **slistp, spell * sp)
 {
@@ -2568,14 +2591,14 @@ static castorder *cast_cmd(unit * u, order * ord)
   /* Vertraute können auch Zauber sprechen, die sie selbst nicht
    * können. get_spellfromtoken findet aber nur jene Sprüche, die
    * die Einheit beherrscht. */
-  if (sp == NULL && is_familiar(u)) {
+  if (!sp && is_familiar(u)) {
     familiar = u;
     mage = get_familiar_mage(u);
     if (mage != NULL)
       sp = get_spellfromtoken(mage, s, mage->faction->locale);
   }
 
-  if (sp == NULL) {
+  if (!sp) {
     /* Fehler 'Spell not found' */
     cmistake(u, ord, 173, MSG_MAGIC);
     return 0;

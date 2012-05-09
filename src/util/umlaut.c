@@ -61,6 +61,7 @@ void addtoken(tnode * root, const char *str, variant id)
     0, ""}
   };
 
+  assert(root);
   if (!*str) {
     root->id = id;
     root->flags |= LEAF;
@@ -135,8 +136,18 @@ void addtoken(tnode * root, const char *str, variant id)
   }
 }
 
+void freetokens(struct tnode *root)
+{
+  int i;
+  for (i=0;root && i!=NODEHASHSIZE;++i) {
+    freetokens(root->next[i]->node);
+    free(root->next[i]);
+  }
+}
+
 int findtoken(const tnode * tk, const char *str, variant * result)
 {
+  assert(tk);
   if (!str || *str == 0)
     return E_TOK_NOMATCH;
 

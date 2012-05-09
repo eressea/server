@@ -32,9 +32,9 @@
   <set name="songdragon_familiar">
     <skill name="magic" level="1"/>
     <!-- spells -->
-    <spell name="flee" school="gray"/>
-    <spell name="sleep" school="gray"/>
-    <spell name="frighten" school="gray"/>
+    <spell name="flee"/>
+    <spell name="sleep"/>
+    <spell name="frighten"/>
   </set>
 
   <set name="nymph_familiar">
@@ -48,10 +48,10 @@
     <skill name="entertainment" level="1"/>
     <skill name="perception" level="1"/>
     <!-- spells -->
-    <spell name="seduction" school="gray"/>
-    <spell name="calm_monster" school="gray"/>
-    <spell name="song_of_confusion" school="gray"/>
-    <spell name="appeasement" school="gray"/>
+    <spell name="seduction"/>
+    <spell name="calm_monster"/>
+    <spell name="song_of_confusion"/>
+    <spell name="appeasement"/>
   </set>
 
   <set name="unicorn_familiar">
@@ -59,12 +59,12 @@
     <skill name="stealth" level="1"/>
     <skill name="perception" level="1"/>
     <!-- spells -->
-    <spell name="resist_magic" school="gray"/>
-    <spell name="song_of_peace" school="gray"/>
-    <spell name="calm_monster" school="gray"/>
-    <spell name="heroic_song" school="gray"/>
-    <spell name="song_of_healing" school="gray"/>
-    <spell name="appeasement" school="gray"/>
+    <spell name="resist_magic"/>
+    <spell name="song_of_peace"/>
+    <spell name="calm_monster"/>
+    <spell name="heroic_song"/>
+    <spell name="song_of_healing"/>
+    <spell name="appeasement"/>
   </set>
 
   <set name="direwolf_familiar">
@@ -75,9 +75,9 @@
   <set name="ghost_familiar">
     <skill name="magic" level="1"/>
     <!-- spells -->
-    <spell name="steal_aura" school="gray"/>
-    <spell name="frighten" school="gray"/>
-    <spell name="summonundead" school="gray"/>
+    <spell name="steal_aura"/>
+    <spell name="frighten"/>
+    <spell name="summonundead"/>
   </set>
 
   <set name="imp_familiar">
@@ -87,9 +87,9 @@
     <skill name="perception" level="1"/>
     <skill name="taxation" level="1"/>
     <!-- spells -->
-    <spell name="steal_aura" school="gray"/>
-    <spell name="shapeshift" school="gray"/>
-    <spell name="seduction" school="gray"/>
+    <spell name="steal_aura"/>
+    <spell name="shapeshift"/>
+    <spell name="seduction"/>
   </set>
 
   <set name="dreamcat_familiar">
@@ -99,16 +99,16 @@
     <skill name="perception" level="1"/>
     <skill name="taxation" level="1"/>
     <!-- spells -->
-    <spell name="shapeshift" school="gray"/>
-    <spell name="transferauratraum" school="gray"/>
+    <spell name="shapeshift"/>
+    <spell name="transferauratraum"/>
   </set>
 
   <set name="fairy_familiar">
     <skill name="magic" level="1"/>
     <!-- spells -->
-    <spell name="appeasement" school="gray"/>
-    <spell name="calm_monster" school="gray"/>
-    <spell name="seduction" school="gray"/>
+    <spell name="appeasement"/>
+    <spell name="calm_monster"/>
+    <spell name="seduction"/>
   </set>
 
   <set name="owl_familiar">

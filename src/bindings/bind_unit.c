@@ -493,7 +493,7 @@ static int tolua_unit_castspell(lua_State * L)
 static int unit_addspell(unit * u, const char *name)
 {
   sc_mage *m = get_mage(u);
-  spell *spadd = find_spell(m->magietyp, name);
+  spell *spadd = find_spell(name);
 
   if (!spadd) {
     log_error(("spell %s could not be found\n", name));
@@ -501,6 +501,7 @@ static int unit_addspell(unit * u, const char *name)
   } else {
     quicklist **starget = get_spelllist(m, u->faction);
     add_spell(starget, spadd);
+    add_spellname(m, spadd);
   }
   return 0;
 }

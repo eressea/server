@@ -38,6 +38,7 @@ extern "C" {
 
   int findtoken(const struct tnode *tk, const char *str, variant * result);
   void addtoken(struct tnode *root, const char *str, variant id);
+  void freetokens(struct tnode *root);
 
   typedef struct local_names {
     struct local_names *next;
