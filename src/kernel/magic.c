@@ -2102,7 +2102,7 @@ castorder *new_castorder(void *u, unit * u2, const spell * sp, region * r,
 {
   castorder *corder;
 
-  corder = calloc(1, sizeof(castorder));
+  corder = (castorder*)calloc(1, sizeof(castorder));
   corder->magician.u = u;
   corder->familiar = u2;
   corder->sp = sp;
@@ -2114,6 +2114,29 @@ castorder *new_castorder(void *u, unit * u2, const spell * sp, region * r,
   corder->par = p;
 
   return corder;
+}
+
+castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
+  int lev, double force, int range, struct order * ord, spellparameter * p)
+{
+  if (!co) co = (castorder*)calloc(1, sizeof(castorder));
+
+  co->magician.u = caster;
+  co->familiar = familiar;
+  co->sp = sp;
+  co->level = lev;
+  co->force = force;
+  co->rt = r;
+  co->distance = range;
+  co->order = copy_order(ord);
+  co->par = p;
+
+  return co;
+}
+
+void free_castorder(struct castorder *co)
+{
+  free_order(co->order);
 }
 
 /* Hänge c-order co an die letze c-order von cll an */

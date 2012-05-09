@@ -314,9 +314,13 @@ typedef struct sc_mage {
     struct castorder **end;
   } spellrank;
 
-  castorder *new_castorder(void *u, struct unit *familiar, const spell * sp,
+  struct castorder *new_castorder(void *u, struct unit *familiar, const spell * sp,
     struct region *r, int lev, double force, int distance, struct order *ord,
     spellparameter * p);
+  struct castorder *create_castorder(struct castorder * co, struct unit *caster, 
+    struct unit * familiar, const struct spell * sp, struct region * r,
+    int lev, double force, int range, struct order * ord, struct spellparameter * p);
+  void free_castorder(struct castorder *co);
   /* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
   void add_castorder(struct spellrank *cll, struct castorder *co);
   /* Hänge c-order co an die letze c-order von cll an */

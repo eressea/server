@@ -464,9 +464,10 @@ static void unit_castspell(unit * u, const char *name)
       if (sp->sp_function == NULL) {
         log_error(("spell '%s' has no function.\n", sp->sname));
       } else {
-        castorder *co = new_castorder(u, 0, sp, u->region, sp->level, sp->level, 0, 0, 0);
-        sp->sp_function(co);
-        free(co);
+        castorder co;
+        create_castorder(&co, u, 0, sp, u->region, sp->level, sp->level, 0, 0, 0);
+        sp->sp_function(&co);
+        free_castorder(&co);
       }
     }
   }
