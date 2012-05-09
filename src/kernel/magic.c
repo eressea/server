@@ -1365,7 +1365,7 @@ static void patzer(castorder * co)
 static void do_fumble(castorder * co)
 {
   curse *c;
-  region *r = co->rt;
+  region *r = co_get_region(co);
   unit *u = co->magician.u;
   const spell *sp = co->sp;
   int level = co->level;
@@ -1664,7 +1664,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
 {
   unit *mage = co->magician.u;
   const spell *sp = co->sp;
-  region *target_r = co->rt;
+  region *target_r = co_get_region(co);
   spellparameter *sa = co->par;
   int i;
 
@@ -2040,7 +2040,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
       pword = findparam(param[i++], u->faction->locale);
       switch (pword) {
       case P_REGION:
-        spobj = malloc(sizeof(spllprm));
+        spobj = (spllprm *)malloc(sizeof(spllprm));
         spobj->flag = 0;
         spobj->typ = SPP_REGION;
         spobj->data.r = u->region;
@@ -2095,20 +2095,26 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
   return par;
 }
 
-/* ------------------------------------------------------------- */
+struct unit * co_get_caster(struct castorder * co) {
+  return co->_familiar ? co->_familiar : co->magician.u;
+}
 
-castorder *new_castorder(void *u, unit * u2, const spell * sp, region * r,
+struct region * co_get_region(struct castorder * co) {
+  return co->_rtarget;
+}
+
+castorder *new_castorder(void *caster, unit * familiar, const spell * sp, region * r,
   int lev, double force, int range, struct order * ord, spellparameter * p)
 {
-  castorder *corder;
+  castorder *corder = (castorder*)calloc(1, sizeof(castorder));
+  unit * u = (unit *)caster;
 
-  corder = (castorder*)calloc(1, sizeof(castorder));
   corder->magician.u = u;
-  corder->familiar = u2;
+  corder->_familiar = familiar;
   corder->sp = sp;
   corder->level = lev;
   corder->force = force;
-  corder->rt = r;
+  corder->_rtarget = r ? r : (familiar ? familiar->region : (u ? u->region : 0));
   corder->distance = range;
   corder->order = copy_order(ord);
   corder->par = p;
@@ -2122,11 +2128,11 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
   if (!co) co = (castorder*)calloc(1, sizeof(castorder));
 
   co->magician.u = caster;
-  co->familiar = familiar;
+  co->_familiar = familiar;
   co->sp = sp;
   co->level = lev;
   co->force = force;
-  co->rt = r;
+  co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : 0));
   co->distance = range;
   co->order = copy_order(ord);
   co->par = p;
@@ -2834,7 +2840,7 @@ void magic(void)
       boolean fumbled = false;
       unit *u = co->magician.u;
       const spell *sp = co->sp;
-      region *target_r = co->rt;
+      region *target_r = co_get_region(co);
 
       /* reichen die Komponenten nicht, wird der Level reduziert. */
       co->level = eff_spelllevel(u, sp, cast_level, co->distance);

@@ -130,16 +130,19 @@ typedef struct sc_mage {
       struct unit *u;
       struct fighter *fig;
     } magician;                 /* Magier (kann vom Typ struct unit oder fighter sein) */
-    struct unit *familiar;      /* Vertrauter, gesetzt, wenn der Spruch durch
+    struct unit *_familiar;     /* Vertrauter, gesetzt, wenn der Spruch durch
                                    den Vertrauten gezaubert wird */
     const struct spell *sp;     /* Spruch */
     int level;                  /* gewünschte Stufe oder Stufe des Magiers */
     double force;               /* Stärke des Zaubers */
-    struct region *rt;          /* Zielregion des Spruchs */
+    struct region *_rtarget;     /* Zielregion des Spruchs */
     int distance;               /* Entfernung zur Zielregion */
     struct order *order;        /* Befehl */
     struct spellparameter *par; /* für weitere Parameter */
   } castorder;
+
+  struct unit * co_get_caster(struct castorder * co);
+  struct region * co_get_region(struct castorder * co);
 
 /* irgendwelche zauber: */
   typedef void (*spell_f) (void *);

@@ -190,7 +190,8 @@ static int lua_callspell(castorder * co)
 {
   lua_State *L = (lua_State *) global.vm_state;
   const char *fname = co->sp->sname;
-  unit *mage = co->familiar ? co->familiar : co->magician.u;
+  unit *caster = co_get_caster(co);
+  region * r = co_get_region(co);
   int result = -1;
   const char *hashpos = strchr(fname, '#');
   char fbuf[64];
@@ -207,8 +208,8 @@ static int lua_callspell(castorder * co)
   lua_rawget(L, LUA_GLOBALSINDEX);
   if (lua_isfunction(L, 1)) {
     int nparam = 4;
-    tolua_pushusertype(L, co->rt, TOLUA_CAST "region");
-    tolua_pushusertype(L, mage, TOLUA_CAST "unit");
+    tolua_pushusertype(L, r, TOLUA_CAST "region");
+    tolua_pushusertype(L, caster, TOLUA_CAST "unit");
     tolua_pushnumber(L, (lua_Number) co->level);
     tolua_pushnumber(L, (lua_Number) co->force);
     if (co->sp->parameter && co->par->length) {
@@ -232,7 +233,7 @@ static int lua_callspell(castorder * co)
     if (lua_pcall(L, nparam, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
       log_error(("spell(%s) calling '%s': %s.\n",
-          unitname(mage), fname, error));
+          unitname(caster), fname, error));
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
@@ -240,7 +241,7 @@ static int lua_callspell(castorder * co)
     }
   } else {
     log_error(("spell(%s) calling '%s': not a function.\n",
-        unitname(mage), fname));
+        unitname(caster), fname));
     lua_pop(L, 1);
   }
 
