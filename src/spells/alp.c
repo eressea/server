@@ -100,7 +100,7 @@ static attrib_type at_alp = {
 int sp_summon_alp(struct castorder *co)
 {
   unit *alp, *opfer;
-  region *r = co->rt;
+  region *r = co_get_region(co);
   unit *mage = co->magician.u;
   int cast_level = co->level;
   spellparameter *pa = co->par;
