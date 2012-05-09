@@ -2420,8 +2420,9 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
   int skill, c;
   const potion_type *ptype;
   const item_type *itype;
-  const spell *sp;
+  const spell *sp = 0;
   const race *rc;
+  sc_mage * mage;
 
   switch (p) {
   case P_ZAUBER:
@@ -2452,13 +2453,18 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
       }
     }
     /* try for a spell */
-    sp = get_spellfromtoken(u, s, u->faction->locale);
-    if (sp != NULL && u_hasspell(u, sp)) {
+    mage = get_mage(u);
+    if (mage) {
+      sp = get_spellfromtoken(mage, s, u->faction->locale);
+    }
+    if (sp) {
       attrib *a = a_find(u->faction->attribs, &at_seenspell);
-      while (a != NULL && a->type == &at_seenspell && a->data.v != sp)
+      while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
         a = a->next;
-      if (a != NULL)
+      }
+      if (a != NULL) {
         a_remove(&u->faction->attribs, a);
+      }
       break;
     }
     /* last, check if it's a race. */
@@ -2615,7 +2621,8 @@ static int combatspell_cmd(unit * u, struct order *ord)
 {
   const char *s;
   int level = 0;
-  spell *spell;
+  spell *sp = 0;
+  sc_mage * mage;
 
   init_tokens(ord);
   skip_token();
@@ -2635,9 +2642,11 @@ static int combatspell_cmd(unit * u, struct order *ord)
     s = getstrtoken();
   }
 
-  spell = get_spellfromtoken(u, s, u->faction->locale);
-
-  if (!spell) {
+  mage = get_mage(u);
+  if (mage) {
+    sp = get_spellfromtoken(mage, s, u->faction->locale);
+  }
+  if (!sp) {
     cmistake(u, ord, 173, MSG_MAGIC);
     return 0;
   }
@@ -2647,11 +2656,11 @@ static int combatspell_cmd(unit * u, struct order *ord)
   if (findparam(s, u->faction->locale) == P_NOT) {
     /* KAMPFZAUBER "<Spruchname>" NICHT  löscht diesen speziellen
      * Kampfzauber */
-    unset_combatspell(u, spell);
+    unset_combatspell(u, sp);
     return 0;
   } else {
     /* KAMPFZAUBER "<Spruchname>"  setzt diesen Kampfzauber */
-    set_combatspell(u, spell, ord, level);
+    set_combatspell(u, sp, ord, level);
   }
 
   return 0;

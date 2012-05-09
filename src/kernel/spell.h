@@ -50,7 +50,7 @@ extern "C" {
   extern void register_spell(struct spell *sp);
   extern struct spell *find_spell(const char *name);
   extern struct spell *find_spellbyid(unsigned int i);
-  extern struct spell *get_spellfromtoken(struct unit *u, const char *s,
+  extern struct spell *get_spellfromtoken(struct sc_mage *mage, const char *s,
     const struct locale *lang);
 
 #ifdef __cplusplus

@@ -461,23 +461,13 @@ static void unit_castspell(unit * u, const char *name)
   for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
     if (strcmp(name, sp->sname) == 0) {
-      castorder *co = (castorder *) malloc(sizeof(castorder));
-      co->distance = 0;
-      co->familiar = NULL;
-      co->force = sp->level;
-      co->level = sp->level;
-      co->magician.u = u;
-      co->order = NULL;
-      co->par = NULL;
-      co->rt = u->region;
-      co->sp = sp;
       if (sp->sp_function == NULL) {
         log_error(("spell '%s' has no function.\n", sp->sname));
-        co->level = 0;
       } else {
+        castorder *co = new_castorder(u, 0, sp, u->region, sp->level, sp->level, 0, 0, 0);
         sp->sp_function(co);
+        free(co);
       }
-      free(co);
     }
   }
 }

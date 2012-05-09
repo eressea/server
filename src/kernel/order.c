@@ -112,8 +112,9 @@ static char *get_command(const order * ord, char *sbuffer, size_t size)
         WARN_STATIC_BUFFER();
       if (text)
         *bufp++ = ' ';
-    } else
+    } else {
       WARN_STATIC_BUFFER();
+    }
   }
   if (text) {
     bytes = (int)strlcpy(bufp, (const char *)text, size);

@@ -70,29 +70,28 @@ spell *find_spell(const char *name)
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
-spell *get_spellfromtoken(unit * u, const char *name,
+spell *get_spellfromtoken(sc_mage *mage, const char *name,
   const struct locale * lang)
 {
   variant token;
-  sc_mage *m = get_mage(u);
-  struct spell_names * names = m->spellnames;
+  struct spell_names * names = mage->spellnames;
   for (;names;names=names->next) {
     if (names->lang==lang) break;
   }
   if (!names) {
-    quicklist *ql = m->spells;
+    quicklist *ql = mage->spells;
     int qi;
     names = (spell_names *)calloc(1, sizeof(spell_names));
-    names->next = m->spellnames;
+    names->next = mage->spellnames;
     names->lang = lang;
     names->tokens = (tnode *)calloc(1, sizeof(tnode));
-    for (qi = 0, ql = m->spells; ql; ql_advance(&ql, &qi, 1)) {
+    for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
       spell *sp = (spell *) ql_get(ql, qi);
       const char *n = spell_name(sp, lang);
       token.v = sp;
       addtoken(names->tokens, n, token);
     }
-    m->spellnames = names;
+    mage->spellnames = names;
   }
 
   if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
