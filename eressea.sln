@@ -22,6 +22,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Debug|Win32.Build.0 = Debug|Win32
+		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Release|Win32.ActiveCfg = Release|Win32
+		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Release|Win32.Build.0 = Release|Win32
+		{52764450-41CA-11E0-B2EC-3136E0D72085}.Debug|Win32.ActiveCfg = Debug|Win32
+		{52764450-41CA-11E0-B2EC-3136E0D72085}.Release|Win32.ActiveCfg = Release|Win32
+		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Release|Win32.ActiveCfg = Release|Win32
 		{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}.Release|Win32.ActiveCfg = Release|Win32
 		{6F104C0A-DDF5-A34B-A89C-0DC278DCEF6D}.Release|Win32.Build.0 = Release|Win32
@@ -37,17 +45,6 @@ Global
 		{F9AE4586-8F65-486B-9666-744839E40A54}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F9AE4586-8F65-486B-9666-744839E40A54}.Release|Win32.ActiveCfg = Release|Win32
 		{F9AE4586-8F65-486B-9666-744839E40A54}.Release|Win32.Build.0 = Release|Win32
-		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Debug|Win32.Build.0 = Debug|Win32
-		{AD80EB0B-7CB4-42F2-9C95-8CCEF68DB387}.Release|Win32.ActiveCfg = Release|Win32
-		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Debug|Win32.Build.0 = Debug|Win32
-		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Release|Win32.ActiveCfg = Release|Win32
-		{4A17DAEE-2261-4E2C-96F6-BA4132A09551}.Release|Win32.Build.0 = Release|Win32
-		{52764450-41CA-11E0-B2EC-3136E0D72085}.Debug|Win32.ActiveCfg = Debug|Win32
-		{52764450-41CA-11E0-B2EC-3136E0D72085}.Debug|Win32.Build.0 = Debug|Win32
-		{52764450-41CA-11E0-B2EC-3136E0D72085}.Release|Win32.ActiveCfg = Release|Win32
-		{52764450-41CA-11E0-B2EC-3136E0D72085}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
