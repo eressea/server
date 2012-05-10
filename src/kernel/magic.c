@@ -491,7 +491,7 @@ void updatespelllist(unit * u)
   for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
     if (sp->level <= sk) {
-      boolean know = u_hasspell(u, sp);
+      boolean know = u_hasspell(mage, sp);
 
       if (know || sp->magietyp == M_COMMON
         || know_school(u->faction, sp->magietyp)) {
@@ -552,11 +552,9 @@ void add_spell(struct quicklist **slistp, spell * sp)
   }
 }
 
-boolean u_hasspell(const struct unit *u, const struct spell *sp)
+int u_hasspell(const sc_mage *mage, const struct spell *sp)
 {
-  sc_mage *mage = get_mage(u);
-
-  return (mage) ? has_spell(mage->spells, sp) : false;
+  return mage ? has_spell(mage->spells, sp) : 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -594,10 +592,11 @@ const spell *get_combatspell(const unit * u, int nr)
 
 void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 {
-  sc_mage *m = get_mage(u);
+  sc_mage *mage = get_mage(u);
   int i = -1;
-  if (!m)
+  if (!mage) {
     return;
+  }
 
   /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
   if (knowsspell(u->region, u, sp) == false) {
@@ -605,7 +604,7 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
     cmistake(u, ord, 173, MSG_MAGIC);
     return;
   }
-  if (!u_hasspell(u, sp)) {
+  if (!u_hasspell(mage, sp)) {
     /* Diesen Zauber kennt die Einheit nicht */
     cmistake(u, ord, 169, MSG_MAGIC);
     return;
@@ -623,8 +622,8 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
   else if (sp->sptyp & POSTCOMBATSPELL)
     i = 2;
   assert(i >= 0);
-  m->combatspells[i].sp = sp;
-  m->combatspells[i].level = level;
+  mage->combatspells[i].sp = sp;
+  mage->combatspells[i].level = level;
   return;
 }
 
@@ -944,13 +943,13 @@ boolean knowsspell(const region * r, const unit * u, const spell * sp)
   }
   /* Magier? */
   mage = get_mage(u);
-  if (mage == NULL) {
+  if (!mage) {
     log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n",
         unitname(u)));
     return false;
   }
   /* steht der Spruch in der Spruchliste? */
-  if (!u_hasspell(u, sp)) {
+  if (!u_hasspell(mage, sp)) {
     /* ist der Spruch aus einem anderen Magiegebiet? */
     if (know_school(u->faction, sp->magietyp)) {
       return false;

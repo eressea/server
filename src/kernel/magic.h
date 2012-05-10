@@ -270,7 +270,7 @@ typedef struct sc_mage {
   void add_spell(struct quicklist **slistp, spell * sp);
   void add_spellname(sc_mage * mage, const spell * sp);
   /* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-  boolean u_hasspell(const struct unit *u, const struct spell *sp);
+  int u_hasspell(const sc_mage *mage, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
   void update_spellbook(struct faction *f, int level);
   void updatespelllist(struct unit *u);
