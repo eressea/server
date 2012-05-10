@@ -106,8 +106,12 @@ static double get_force(double power, int formel)
 }
 
 /* Generischer Kampfzauber */
-int sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
+int sp_kampfzauber(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   troop at, dt;
   message *m;
@@ -165,8 +169,12 @@ int sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
 }
 
 /* Versteinern */
-int sp_petrify(fighter * fi, int level, double power, spell * sp)
+int sp_petrify(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   /* Wirkt auf erste und zweite Reihe */
@@ -205,8 +213,12 @@ int sp_petrify(fighter * fi, int level, double power, spell * sp)
 }
 
 /* Benommenheit: eine Runde kein Angriff */
-int sp_stun(fighter * fi, int level, double power, spell * sp)
+int sp_stun(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   message *m;
@@ -273,8 +285,12 @@ static void scramble_fighters(quicklist * ql)
 }
 
 /* Rosthauch */
-int sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
+int sp_combatrosthauch(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   quicklist *ql, *fgs;
   int force = lovar(power * 15);
@@ -360,8 +376,12 @@ int sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_sleep(fighter * fi, int level, double power, spell * sp)
+int sp_sleep(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   unit *du;
@@ -398,8 +418,11 @@ int sp_sleep(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_speed(fighter * fi, int level, double power, spell * sp)
+int sp_speed(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   int force;
   int allies;
@@ -476,8 +499,12 @@ static skill_t random_skill(unit * u, boolean weighted)
 /** The mind blast spell for regular folks.
 * This spell temporarily reduces the skill of the victims 
 */
-int sp_mindblast_temp(fighter * fi, int level, double power, spell * sp)
+int sp_mindblast_temp(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int k = 0, reset = 0, maxloss = (level + 2) / 3;
@@ -538,8 +565,12 @@ int sp_mindblast_temp(fighter * fi, int level, double power, spell * sp)
  * This spell PERMANENTLY reduces the skill of the victims or kills them
  * when they have no skills left. Not currently in use.
  */
-int sp_mindblast(fighter * fi, int level, double power, spell * sp)
+int sp_mindblast(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int killed = 0, k = 0, reset = 0;
@@ -605,8 +636,12 @@ int sp_mindblast(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_dragonodem(fighter * fi, int level, double power, spell * sp)
+int sp_dragonodem(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   troop dt;
   troop at;
@@ -651,8 +686,11 @@ int sp_dragonodem(fighter * fi, int level, double power, spell * sp)
 
 /* Feuersturm: Betrifft sehr viele Gegner (in der Regel alle),
  * macht nur vergleichsweise geringen Schaden */
-int sp_immolation(fighter * fi, int level, double power, spell * sp)
+int sp_immolation(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   troop at;
   int force, qi, killed = 0;
@@ -752,8 +790,12 @@ int sp_drainodem(fighter * fi, int level, double power, spell * sp)
 /* ------------------------------------------------------------- */
 /* PRECOMBAT */
 
-int sp_shadowcall(fighter * fi, int level, double power, spell * sp)
+int sp_shadowcall(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   region *r = b->region;
   unit *mage = fi->unit;
@@ -787,8 +829,12 @@ int sp_shadowcall(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
+int sp_wolfhowl(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   region *r = b->region;
   unit *mage = fi->unit;
@@ -827,8 +873,12 @@ int sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_shadowknights(fighter * fi, int level, double power, spell * sp)
+int sp_shadowknights(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   unit *u;
   battle *b = fi->side->battle;
   region *r = b->region;
@@ -864,8 +914,12 @@ int sp_shadowknights(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_strong_wall(fighter * fi, int level, double power, spell * sp)
+int sp_strong_wall(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   building *burg;
@@ -899,8 +953,12 @@ int sp_strong_wall(fighter * fi, int level, double power, spell * sp)
 /** Spells: chaosrow / song of confusion.
  * German Title: 'Gesang der Verwirrung'
  */
-int sp_chaosrow(fighter * fi, int level, double power, spell * sp)
+int sp_chaosrow(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   quicklist *fgs, *ql;
@@ -984,8 +1042,12 @@ int sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 /* Gesang der Furcht (Kampfzauber) */
 /* Panik (Präkampfzauber) */
 
-int sp_flee(fighter * fi, int level, double power, spell * sp)
+int sp_flee(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   quicklist *fgs, *ql;
@@ -1048,8 +1110,12 @@ int sp_flee(fighter * fi, int level, double power, spell * sp)
 }
 
 /* Heldenmut */
-int sp_hero(fighter * fi, int level, double power, spell * sp)
+int sp_hero(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   int df_bonus = 0;
   int force = 0;
@@ -1097,8 +1163,12 @@ int sp_hero(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_berserk(fighter * fi, int level, double power, spell * sp)
+int sp_berserk(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   int at_bonus = 0;
   int df_malus = 0;
@@ -1151,8 +1221,12 @@ int sp_berserk(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_frighten(fighter * fi, int level, double power, spell * sp)
+int sp_frighten(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int at_malus = 0;
@@ -1204,8 +1278,12 @@ int sp_frighten(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
+int sp_tiredsoldiers(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int n = 0;
@@ -1245,8 +1323,12 @@ int sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_windshield(fighter * fi, int level, double power, spell * sp)
+int sp_windshield(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   int force, at_malus;
   int enemies;
@@ -1292,8 +1374,12 @@ int sp_windshield(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_reeling_arrows(fighter * fi, int level, double power, spell * sp)
+int sp_reeling_arrows(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   message *m;
 
@@ -1306,11 +1392,15 @@ int sp_reeling_arrows(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_denyattack(fighter * fi, int level, double power, spell * sp)
-{
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
  * eine Nachbarregion, wobei ein NACH berücksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
+int sp_denyattack(struct castorder * co)
+{
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   region *r = b->region;
@@ -1352,8 +1442,12 @@ static void do_meffect(fighter * af, int typ, int effect, int duration)
   me->duration = duration;
 }
 
-int sp_armorshield(fighter * fi, int level, double power, spell * sp)
+int sp_armorshield(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   int effect;
   int duration;
   battle *b = fi->side->battle;
@@ -1378,8 +1472,12 @@ int sp_armorshield(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_reduceshield(fighter * fi, int level, double power, spell * sp)
+int sp_reduceshield(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   int effect;
   int duration;
   battle *b = fi->side->battle;
@@ -1404,8 +1502,11 @@ int sp_reduceshield(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_fumbleshield(fighter * fi, int level, double power, spell * sp)
+int sp_fumbleshield(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  const spell * sp = co->sp;
   int effect;
   int duration;
   battle *b = fi->side->battle;
@@ -1450,8 +1551,11 @@ static int count_healable(battle * b, fighter * df)
 }
 
 /* wiederbeleben */
-int sp_reanimate(fighter * fi, int level, double power, spell * sp)
+int sp_reanimate(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int healable, j = 0;
@@ -1506,8 +1610,12 @@ int sp_reanimate(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_keeploot(fighter * fi, int level, double power, spell * sp)
+int sp_keeploot(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
+  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   message *m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
 
@@ -1561,8 +1669,11 @@ static int heal_fighters(quicklist * fgs, int *power, boolean heal_monsters)
   return healed;
 }
 
-int sp_healing(fighter * fi, int level, double power, spell * sp)
+int sp_healing(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   int j = 0;
@@ -1603,8 +1714,11 @@ int sp_healing(fighter * fi, int level, double power, spell * sp)
   return level;
 }
 
-int sp_undeadhero(fighter * fi, int level, double power, spell * sp)
+int sp_undeadhero(struct castorder * co)
 {
+  fighter * fi = co->magician.fig;
+  int level = co->level;
+  double power = co->force;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   region *r = b->region;
