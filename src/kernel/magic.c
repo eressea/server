@@ -2095,25 +2095,6 @@ struct region * co_get_region(struct castorder * co) {
   return co->_rtarget;
 }
 
-castorder *new_castorder(void *caster, unit * familiar, const spell * sp, region * r,
-  int lev, double force, int range, struct order * ord, spellparameter * p)
-{
-  castorder *corder = (castorder*)calloc(1, sizeof(castorder));
-  unit * u = (unit *)caster;
-
-  corder->magician.u = u;
-  corder->_familiar = familiar;
-  corder->sp = sp;
-  corder->level = lev;
-  corder->force = force;
-  corder->_rtarget = r ? r : (familiar ? familiar->region : (u ? u->region : 0));
-  corder->distance = range;
-  corder->order = copy_order(ord);
-  corder->par = p;
-
-  return corder;
-}
-
 castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
   int lev, double force, int range, struct order * ord, spellparameter * p)
 {
@@ -2134,7 +2115,8 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
 
 void free_castorder(struct castorder *co)
 {
-  free_order(co->order);
+  if (co->par) free_spellparameter(co->par);
+  if (co->order) free_order(co->order);
 }
 
 /* Hänge c-order co an die letze c-order von cll an */
@@ -2157,11 +2139,7 @@ void free_castorders(castorder * co)
   while (co) {
     co2 = co;
     co = co->next;
-    if (co2->par) {
-      free_spellparameter(co2->par);
-    }
-    if (co2->order)
-      free_order(co2->order);
+    free_castorder(co2);
     free(co2);
   }
   return;
@@ -2758,7 +2736,7 @@ static castorder *cast_cmd(unit * u, order * ord)
       return 0;
     }
   }
-  return new_castorder(caster, familiar, sp, target_r, level, 0, range, ord,
+  return create_castorder(0, caster, familiar, sp, target_r, level, 0, range, ord,
     args);
 }
 

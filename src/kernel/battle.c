@@ -1765,7 +1765,8 @@ void do_combatmagic(battle * b, combatmagic_t was)
           report_failed_spell(b, mage, sp);
           pay_spell(mage, sp, level, 1);
         } else {
-          co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
+          co = create_castorder(0, fig->unit, 0, sp, r, level, power, 0, 0, 0);
+          co->magician.fig = fig;
           add_castorder(&spellranks[sp->rank], co);
         }
       }

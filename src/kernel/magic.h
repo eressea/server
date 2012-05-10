@@ -310,9 +310,6 @@ typedef struct sc_mage {
     struct castorder **end;
   } spellrank;
 
-  struct castorder *new_castorder(void *u, struct unit *familiar, const spell * sp,
-    struct region *r, int lev, double force, int distance, struct order *ord,
-    spellparameter * p);
   struct castorder *create_castorder(struct castorder * co, struct unit *caster, 
     struct unit * familiar, const struct spell * sp, struct region * r,
     int lev, double force, int range, struct order * ord, struct spellparameter * p);
