@@ -295,9 +295,6 @@ int sp_combatrosthauch(struct castorder * co)
   int force = lovar(power * 15);
   int qi, k = 0;
 
-  /* Immer aus der ersten Reihe nehmen */
-  unused(sp);
-
   if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1,
       SELECT_ADVANCE | SELECT_FIND)) {
     message *msg = msg_message("rust_effect_0", "mage", fi->unit);
@@ -803,8 +800,6 @@ int sp_shadowcall(struct castorder * co)
   const race *rc = rc_find(races[rng_int() % 3]);
   message *msg;
 
-  unused(sp);
-
   u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);
   setstatus(u, ST_FIGHT);
 
@@ -841,8 +836,6 @@ int sp_wolfhowl(struct castorder * co)
   if (force>0) {
     unit *u =
       create_unit(r, mage->faction, force, rc, 0, NULL, mage);
-    unused(sp);
-
     leave(u, true);
     setstatus(u, ST_FIGHT);
 
@@ -881,8 +874,6 @@ int sp_shadowknights(struct castorder * co)
   attrib *a;
   int force = MAX(1, (int)get_force(power, 3));
   message *msg;
-
-  unused(sp);
 
   u =
     create_unit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT], 0, NULL,
@@ -925,8 +916,6 @@ int sp_strong_wall(struct castorder * co)
     init = true;
     strongwall_ct = ct_find("strongwall");
   }
-
-  unused(sp);
 
   if (!mage->building) {
     return 0;
@@ -1376,8 +1365,6 @@ int sp_reeling_arrows(struct castorder * co)
   battle *b = fi->side->battle;
   message *m;
 
-  unused(power);
-
   b->reelarrow = true;
   m = msg_message("cast_spell_effect", "mage spell", fi->unit, sp);
   message_all(b, m);
@@ -1398,8 +1385,6 @@ int sp_denyattack(struct castorder * co)
   unit *mage = fi->unit;
   region *r = b->region;
   message *m;
-
-  unused(power);
 
   /* Fliehende Einheiten verlassen auf jeden Fall Gebäude und Schiffe. */
   if (!fval(r->terrain, SEA_REGION)) {
