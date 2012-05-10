@@ -2035,7 +2035,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
         spobj = (spllprm *)malloc(sizeof(spllprm));
         spobj->flag = 0;
         spobj->typ = SPP_REGION;
-        spobj->data.r = u->region;
+        spobj->data.r = target_r;
         j = 0;
         ++c;
         break;
