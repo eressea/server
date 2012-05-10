@@ -290,7 +290,6 @@ int sp_combatrosthauch(struct castorder * co)
   fighter * fi = co->magician.fig;
   int level = co->level;
   double power = co->force;
-  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   quicklist *ql, *fgs;
   int force = lovar(power * 15);
@@ -380,7 +379,6 @@ int sp_sleep(struct castorder * co)
 {
   fighter * fi = co->magician.fig;
   int level = co->level;
-  double power = co->force;
   const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
@@ -391,7 +389,7 @@ int sp_sleep(struct castorder * co)
   message *m;
   /* Immer aus der ersten Reihe nehmen */
 
-  force = lovar(power * 25);
+  force = lovar(co->force * 25);
   enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
   if (!enemies) {
@@ -795,7 +793,6 @@ int sp_shadowcall(struct castorder * co)
   fighter * fi = co->magician.fig;
   int level = co->level;
   double power = co->force;
-  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   region *r = b->region;
   unit *mage = fi->unit;
@@ -834,7 +831,6 @@ int sp_wolfhowl(struct castorder * co)
   fighter * fi = co->magician.fig;
   int level = co->level;
   double power = co->force;
-  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   region *r = b->region;
   unit *mage = fi->unit;
@@ -878,7 +874,6 @@ int sp_shadowknights(struct castorder * co)
   fighter * fi = co->magician.fig;
   int level = co->level;
   double power = co->force;
-  const spell * sp = co->sp;
   unit *u;
   battle *b = fi->side->battle;
   region *r = b->region;
@@ -919,7 +914,6 @@ int sp_strong_wall(struct castorder * co)
   fighter * fi = co->magician.fig;
   int level = co->level;
   double power = co->force;
-  const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   building *burg;
@@ -1378,7 +1372,6 @@ int sp_reeling_arrows(struct castorder * co)
 {
   fighter * fi = co->magician.fig;
   int level = co->level;
-  double power = co->force;
   const spell * sp = co->sp;
   battle *b = fi->side->battle;
   message *m;
@@ -1399,7 +1392,7 @@ int sp_denyattack(struct castorder * co)
 {
   fighter * fi = co->magician.fig;
   int level = co->level;
-  double power = co->force;
+
   const spell * sp = co->sp;
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
