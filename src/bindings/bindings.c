@@ -698,7 +698,7 @@ static int tolua_write_spells(lua_State * L)
   int qi;
   for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
-    if (sp->sp_function != fun) {
+    if (sp->cast != fun) {
       int combat = 0;
       xmlNodePtr node = xmlNewNode(NULL, BAD_CAST "spell");
       xmlNewProp(node, BAD_CAST "name", BAD_CAST sp->sname);

@@ -144,21 +144,14 @@ typedef struct sc_mage {
   struct unit * co_get_caster(struct castorder * co);
   struct region * co_get_region(struct castorder * co);
 
-/* irgendwelche zauber: */
-  typedef void (*spell_f) (void *);
-/* normale zauber: */
-  typedef int (*nspell_f) (castorder *);
-/* kampfzauber: */
-  typedef int (*cspell_f) (struct fighter *, int, double,
-    const struct spell * sp);
-/* zauber-patzer: */
-  typedef void (*pspell_f) (castorder *);
-
   typedef struct spell_component {
     const struct resource_type *type;
     int amount;
     int cost;
   } spell_component;
+
+  typedef int (*spell_f)(castorder * co);
+  typedef void(*fumble_f)(castorder * co);
 
   typedef struct spell {
     unsigned int id;
@@ -170,8 +163,8 @@ typedef struct sc_mage {
     int rank;                   /* Reihenfolge der Zauber */
     int level;                  /* Stufe des Zaubers */
     struct spell_component *components;
-    spell_f sp_function;
-    void (*patzer) (castorder *);
+    spell_f cast;
+    fumble_f patzer;
   } spell;
 
 /* ------------------------------------------------------------- */

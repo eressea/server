@@ -1776,12 +1776,11 @@ void do_combatmagic(battle * b, combatmagic_t was)
       fighter *fig = co->magician.fig;
       const spell *sp = co->sp;
       int level = co->level;
-      double power = co->force;
 
-      if (sp->sp_function == NULL) {
+      if (!sp->cast) {
         log_error(("spell '%s' has no function.\n", sp->sname));
       } else {
-        level = ((cspell_f) sp->sp_function) (fig, level, power, sp);
+        level = sp->cast(co);
         if (level > 0) {
           pay_spell(fig->unit, sp, level, 1);
         }
@@ -1793,19 +1792,34 @@ void do_combatmagic(battle * b, combatmagic_t was)
   }
 }
 
-static void combat_action(fighter * af, int turn)
+static void combat_action(fighter * af)
 {
 #ifndef SIMPLE_COMBAT
   af->action_counter++;
-  af->side->bf->lastturn = turn;
+  af->side->bf->lastturn = af->side->battle->turn;
 #endif
+}
+
+static int cast_combatspell(troop at, const spell * sp, int level, double force)
+{
+  castorder co;
+
+  create_castorder(&co, at.fighter->unit, 0, sp, at.fighter->unit->region, level, force, 0, 0, 0);
+  co.magician.fig = at.fighter;
+  level = sp->cast(&co);
+  free_castorder(&co);
+  if (level > 0) {
+    pay_spell(at.fighter->unit, sp, level, 1);
+    combat_action(at.fighter);
+  }
+  return level;
 }
 
 static void do_combatspell(troop at)
 {
   const spell *sp;
   fighter *fi = at.fighter;
-  unit *mage = fi->unit;
+  unit *caster = fi->unit;
   battle *b = fi->side->battle;
   region *r = b->region;
   quicklist *ql;
@@ -1814,26 +1828,26 @@ static void do_combatspell(troop at)
   int fumblechance = 0;
   order *ord;
   int sl;
-  const struct locale *lang = mage->faction->locale;
+  const struct locale *lang = caster->faction->locale;
 
-  sp = get_combatspell(mage, 1);
+  sp = get_combatspell(caster, 1);
   if (sp == NULL) {
     fi->magic = 0;              /* Hat keinen Kampfzauber, kämpft nichtmagisch weiter */
     return;
   }
   ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
-  if (cancast(mage, sp, 1, 1, ord) == false) {
+  if (cancast(caster, sp, 1, 1, ord) == false) {
     fi->magic = 0;              /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
     return;
   }
 
-  level = eff_spelllevel(mage, sp, fi->magic, 1);
-  if ((sl = get_combatspelllevel(mage, 1)) > 0)
+  level = eff_spelllevel(caster, sp, fi->magic, 1);
+  if ((sl = get_combatspelllevel(caster, 1)) > 0)
     level = MIN(level, sl);
 
-  if (fumble(r, mage, sp, sp->level) == true) {
-    report_failed_spell(b, mage, sp);
-    pay_spell(mage, sp, level, 1);
+  if (fumble(r, caster, sp, sp->level) == true) {
+    report_failed_spell(b, caster, sp);
+    pay_spell(caster, sp, level, 1);
     return;
   }
 
@@ -1849,27 +1863,23 @@ static void do_combatspell(troop at)
 
   /* Antimagie die Fehlschlag erhöht */
   if (rng_int() % 100 < fumblechance) {
-    report_failed_spell(b, mage, sp);
-    pay_spell(mage, sp, level, 1);
+    report_failed_spell(b, caster, sp);
+    pay_spell(caster, sp, level, 1);
     free_order(ord);
     return;
   }
-  power = spellpower(r, mage, sp, level, ord);
+  power = spellpower(r, caster, sp, level, ord);
   free_order(ord);
   if (power <= 0) {             /* Effekt von Antimagie */
-    report_failed_spell(b, mage, sp);
-    pay_spell(mage, sp, level, 1);
+    report_failed_spell(b, caster, sp);
+    pay_spell(caster, sp, level, 1);
     return;
   }
 
-  if (sp->sp_function == NULL) {
+  if (!sp->cast) {
     log_error(("spell '%s' has no function.\n", sp->sname));
   } else {
-    level = ((cspell_f) sp->sp_function) (fi, level, power, sp);
-    if (level > 0) {
-      pay_spell(mage, sp, level, 1);
-      combat_action(at.fighter, b->turn);
-    }
+    level = cast_combatspell(at, sp, level, power);
   }
 }
 
@@ -1881,14 +1891,11 @@ static void do_combatspell(troop at)
 static void do_extra_spell(troop at, const att * a)
 {
   const spell *sp = a->data.sp;
-  fighter *fi = at.fighter;
-  double power;
 
-  power = sp->level * MagicPower();
-  if (sp->sp_function == NULL) {
+  if (sp->cast == NULL) {
     log_error(("spell '%s' has no function.\n", sp->sname));
   } else {
-    ((cspell_f) sp->sp_function) (fi, sp->level, power, sp);
+    cast_combatspell(at, sp, sp->level, sp->level * MagicPower());
   }
 }
 
@@ -2181,7 +2188,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             af->catmsg += dead;
             if (!standard_attack && af->person[ta.index].last_action < b->turn) {
               af->person[ta.index].last_action = b->turn;
-              combat_action(af, b->turn);
+              combat_action(af);
             }
           }
           if (standard_attack) {
@@ -2197,7 +2204,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
               return;
             if (ta.fighter->person[ta.index].last_action < b->turn) {
               ta.fighter->person[ta.index].last_action = b->turn;
-              combat_action(ta.fighter, b->turn);
+              combat_action(ta.fighter);
             }
             reload = true;
             if (hits(ta, td, wp)) {
@@ -2230,7 +2237,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         return;
       if (ta.fighter->person[ta.index].last_action < b->turn) {
         ta.fighter->person[ta.index].last_action = b->turn;
-        combat_action(ta.fighter, b->turn);
+        combat_action(ta.fighter);
       }
       if (hits(ta, td, NULL)) {
         terminate(td, ta, a->type, a->data.dice, false);
@@ -2242,7 +2249,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         return;
       if (ta.fighter->person[ta.index].last_action < b->turn) {
         ta.fighter->person[ta.index].last_action = b->turn;
-        combat_action(ta.fighter, b->turn);
+        combat_action(ta.fighter);
       }
       if (hits(ta, td, NULL)) {
         int c = dice_rand(a->data.dice);
@@ -2262,7 +2269,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         return;
       if (ta.fighter->person[ta.index].last_action < b->turn) {
         ta.fighter->person[ta.index].last_action = b->turn;
-        combat_action(ta.fighter, b->turn);
+        combat_action(ta.fighter);
       }
       if (hits(ta, td, NULL)) {
         drain_exp(td.fighter->unit, dice_rand(a->data.dice));
@@ -2274,7 +2281,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         return;
       if (ta.fighter->person[ta.index].last_action < b->turn) {
         ta.fighter->person[ta.index].last_action = b->turn;
-        combat_action(ta.fighter, b->turn);
+        combat_action(ta.fighter);
       }
       if (hits(ta, td, NULL)) {
         dazzle(b, &td);
@@ -2286,7 +2293,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         return;
       if (ta.fighter->person[ta.index].last_action < b->turn) {
         ta.fighter->person[ta.index].last_action = b->turn;
-        combat_action(ta.fighter, b->turn);
+        combat_action(ta.fighter);
       }
       if (td.fighter->unit->ship) {
         /* FIXME should use damage_ship here? */

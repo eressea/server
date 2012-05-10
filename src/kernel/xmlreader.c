@@ -1568,9 +1568,9 @@ static int parse_spells(xmlDocPtr doc)
             }
             assert(propValue != NULL);
             if (strcmp((const char *)propValue, "cast") == 0) {
-              sp->sp_function = (spell_f) fun;
+              sp->cast = (spell_f) fun;
             } else if (strcmp((const char *)propValue, "fumble") == 0) {
-              sp->patzer = (pspell_f) fun;
+              sp->patzer = (fumble_f) fun;
             } else {
               log_error(("unknown function type '%s' for spell %s\n",
                   (const char *)propValue, sp->sname));

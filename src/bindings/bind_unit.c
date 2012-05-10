@@ -461,12 +461,12 @@ static void unit_castspell(unit * u, const char *name)
   for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
     spell *sp = (spell *) ql_get(ql, qi);
     if (strcmp(name, sp->sname) == 0) {
-      if (sp->sp_function == NULL) {
+      if (!sp->cast) {
         log_error(("spell '%s' has no function.\n", sp->sname));
       } else {
         castorder co;
-        create_castorder(&co, u, 0, sp, u->region, sp->level, sp->level, 0, 0, 0);
-        sp->sp_function(&co);
+        create_castorder(&co, u, 0, sp, u->region, sp->level, sp->level * MagicPower(), 0, 0, 0);
+        sp->cast(&co);
         free_castorder(&co);
       }
     }

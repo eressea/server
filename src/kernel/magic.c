@@ -1432,11 +1432,7 @@ static void do_fumble(castorder * co)
   case 5:
   case 6:
     /* Spruch gelingt, aber alle Magiepunkte weg */
-    if (sp->sp_function == NULL) {
-      log_error(("spell '%s' has no function.\n", sp->sname));
-    } else {
-      ((nspell_f) sp->sp_function) (co);
-    }
+    sp->cast(co);
     set_spellpoints(u, 0);
     ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
         u, r, sp));
@@ -1447,11 +1443,7 @@ static void do_fumble(castorder * co)
   case 9:
   default:
     /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-    if (sp->sp_function == NULL) {
-      log_error(("spell '%s' has no function.\n", sp->sname));
-    } else {
-      ((nspell_f) sp->sp_function) (co);
-    }
+    sp->cast(co);
     ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
         u, r, sp));
     countspells(u, 3);
@@ -1788,7 +1780,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
      * Magieresistenz der Region prüfen. */
     if ((sp->sptyp & REGIONSPELL)) {
       /* Zielobjekt Region anlegen */
-      spllprm *spobj = malloc(sizeof(spllprm));
+      spllprm *spobj = (spllprm *)malloc(sizeof(spllprm));
       spobj->flag = 0;
       spobj->typ = SPP_REGION;
       spobj->data.r = target_r;
@@ -1908,7 +1900,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
     rt = findregion(x, y);
 
     if (rt != NULL) {
-      spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
+      spllprm *spobj = *spobjp = (spllprm *)malloc(sizeof(spllprm));
 
       spobj->flag = 0;
       spobj->typ = SPP_REGION;
@@ -2903,12 +2895,7 @@ void magic(void)
           /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
           fumbled = true;
         } else {
-          if (sp->sp_function == NULL) {
-            log_error(("spell '%s' has no function.\n", sp->sname));
-            co->level = 0;
-          } else {
-            co->level = ((nspell_f) sp->sp_function) (co);
-          }
+          co->level = sp->cast(co);
           if (co->level <= 0) {
             /* Kosten nur für real benötige Stufe berechnen */
             continue;
