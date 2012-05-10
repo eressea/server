@@ -100,6 +100,7 @@
   </spell>
   <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true" combat="2">
     <!-- Feuerball -->
+    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="magicboost" type="draig" rank="3" level="3" index="17" ship="true">
@@ -301,6 +302,7 @@
   </spell>
   <spell name="hail" type="gwyrrd" rank="5" level="3" index="5" variable="true" combat="2">
     <!-- Hagel -->
+    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="goodwinds" type="common" rank="5" level="4" index="56" parameters="s" ship="true" variable="true">
@@ -655,6 +657,7 @@
     <resource name="aura" amount="3" cost="fixed"/>
   </spell>
   <spell name="meteor_rain" type="gray" rank="5" level="3" index="108" variable="true" combat="2">
+    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="wyrm_transformation" type="gray" rank="5" level="1" index="166">

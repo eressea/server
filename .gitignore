@@ -9,3 +9,4 @@ bin/
 *.opensdf
 ipch/
 *.log
+src/Release/

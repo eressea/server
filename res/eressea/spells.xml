@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <spells>
   <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true" combat="2">
+    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="hail" type="gwyrrd" rank="5" level="3" index="5" variable="true" combat="2">
+    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="rustweapon" type="gwyrrd" rank="5" level="3" index="6" parameters="u+" los="true" far="true" variable="true">
@@ -311,6 +313,7 @@
     <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="meteor_rain" type="gray" rank="5" level="3" index="108" variable="true" combat="2">
+    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="fish_shield" type="tybied" rank="2" level="8" index="109" variable="true" combat="1">
