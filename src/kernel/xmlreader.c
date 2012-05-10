@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/bsdstring.h>
 #include <util/crmessage.h>
 #include <util/functions.h>
 #include <util/language.h>
@@ -51,7 +52,6 @@ without prior permission by the authors of Eressea.
 
 static boolean gamecode_enabled = false;
 
-void (*set_spelldata_cb) (struct spell * sp) = 0;
 static building_type *bt_get_or_create(const char *name)
 {
   if (name != NULL) {
@@ -1481,6 +1481,8 @@ static int parse_spells(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr spells;
+  char zText[32];
+  strcpy(zText, "fumble_");
 
   /* reading eressea/spells/spell */
   spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
@@ -1547,13 +1549,19 @@ static int parse_spells(xmlDocPtr doc)
 
       if (gamecode_enabled) {
         /* reading eressea/spells/spell/function */
+        pf_generic cast = 0;
+        pf_generic fumble = 0;
+
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
 
         if (result->nodesetval->nodeNr == 0) {
-          /* deprecated style: this spell gets its' function from a callback */
-          if (set_spelldata_cb)
-            set_spelldata_cb(sp);
+          cast = get_function(sp->sname);
+          if (!cast) {
+            log_error(("no spell cast function registered for '%s'\n", sp->sname));
+          }
+          strlcpy(zText+7, sp->sname, sizeof(zText)-7);
+          fumble = get_function(zText);
         } else {
           for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
@@ -1568,9 +1576,9 @@ static int parse_spells(xmlDocPtr doc)
             }
             assert(propValue != NULL);
             if (strcmp((const char *)propValue, "cast") == 0) {
-              sp->cast = (spell_f) fun;
+              cast = fun;
             } else if (strcmp((const char *)propValue, "fumble") == 0) {
-              sp->patzer = (fumble_f) fun;
+              fumble = fun;
             } else {
               log_error(("unknown function type '%s' for spell %s\n",
                   (const char *)propValue, sp->sname));
@@ -1578,6 +1586,8 @@ static int parse_spells(xmlDocPtr doc)
             xmlFree(propValue);
           }
         }
+        sp->cast = (spell_f)cast;
+        sp->patzer = (fumble_f)fumble;
         xmlXPathFreeObject(result);
       }
 
