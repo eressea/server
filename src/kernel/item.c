@@ -354,7 +354,9 @@ resource_type *rt_find(const char *name)
     if (rtype->hashkey == hash && !strcmp(rtype->_name[0], name))
       break;
   }
-
+  if (!rtype) {
+    log_error(("rt_find: unknown resource '%s'\n", name));
+  }
   return rtype;
 }
 
