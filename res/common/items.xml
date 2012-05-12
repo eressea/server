@@ -13,6 +13,10 @@
     <item weight="0" score="6000"/>
   </resource>
 
+  <resource name="ror" appearance="">
+    <item weight="0" score="6000"/>
+  </resource>
+
   <resource name="rop" appearance="">
     <item weight="0" score="6000"/>
   </resource>
