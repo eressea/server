@@ -2689,47 +2689,6 @@ static int sp_firewall(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-
-static int sp_wisps(castorder * co)
-{
-  connection *b;
-  wall_data *fd;
-  region *r2;
-  direction_t dir;
-  region *r = co_get_region(co);
-  unit *mage = co->magician.u;
-  int cast_level = co->level;
-  double force = co->force;
-  spellparameter *pa = co->par;
-
-  dir = finddirection(pa->param[0]->data.xs, mage->faction->locale);
-  r2 = rconnect(r, dir);
-
-  if (!r2) {
-    report_failure(mage, co->order);
-    return 0;
-  }
-
-  b = new_border(&bt_wisps, r, r2);
-  fd = (wall_data *) b->data.v;
-  fd->force = (int)(force / 2 + 0.5);
-  fd->mage = mage;
-  fd->active = false;
-  fd->countdown = cast_level + 1;
-
-  /* melden, 1x pro Partei */
-  {
-    message *seen = msg_message("wisps_effect", "mage region", mage, r);
-    message *unseen = msg_message("wisps_effect", "mage region", NULL, r);
-    report_effect(r, mage, seen, unseen);
-    msg_release(seen);
-    msg_release(unseen);
-  }
-
-  return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:       Unheilige Kraft
  * Stufe:      10
  * Gebiet:     Draig
@@ -6587,7 +6546,7 @@ static spelldata spell_functions[] = {
   { "analysedream", sp_analysedream, 0},
   { "disturbingdreams", sp_disturbingdreams, 0},
   { "sleep", sp_sleep, 0},
-  { "wisps", sp_wisps, 0},
+  { "wisps", 0, 0}, /* this spell is gone */
   { "gooddreams", sp_gooddreams, 0},
   { "illaundestroymagic", sp_destroy_magic, 0},
   { "illaunfamiliar", sp_summon_familiar, 0},
@@ -6718,7 +6677,7 @@ static void register_spelldata(void)
   int i;
   char zText[32];
   strcpy(zText, "fumble_");
-  for (i = 0; spell_functions[i].cast; ++i) {
+  for (i = 0; spell_functions[i].sname; ++i) {
     spelldata *data = spell_functions + i;
     if (data->cast) {
       register_function((pf_generic)data->cast, data->sname);
