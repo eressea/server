@@ -1497,6 +1497,7 @@ static int parse_spells(xmlDocPtr doc)
       int k;
       spell_component *component;
       spell *sp;
+      int valid = 1;
       static int modes[] = { 0, PRECOMBATSPELL, COMBATSPELL, POSTCOMBATSPELL };
 
       /* spellname */
@@ -1559,6 +1560,7 @@ static int parse_spells(xmlDocPtr doc)
           cast = get_function(sp->sname);
           if (!cast) {
             log_error(("no spell cast function registered for '%s'\n", sp->sname));
+            valid = 0;
           }
           strlcpy(zText+7, sp->sname, sizeof(zText)-7);
           fumble = get_function(zText);
@@ -1568,19 +1570,20 @@ static int parse_spells(xmlDocPtr doc)
             pf_generic fun;
 
             parse_function(node, &fun, &propValue);
-            if (fun == NULL) {
-              log_error(("unknown function name '%s' for spell '%s'\n",
-                  (const char *)propValue, sp->sname));
-              xmlFree(propValue);
-              continue;
-            }
             assert(propValue != NULL);
             if (strcmp((const char *)propValue, "cast") == 0) {
-              cast = fun;
-            } else if (strcmp((const char *)propValue, "fumble") == 0) {
+              if (fun) {
+                cast = fun;
+                valid = 1;
+              } else {
+                log_error(("unknown function name '%s' for spell '%s'\n",
+                    (const char *)propValue, sp->sname));
+                valid = 0;
+              }
+            } else if (fun && strcmp((const char *)propValue, "fumble") == 0) {
               fumble = fun;
             } else {
-              log_error(("unknown function type '%s' for spell %s\n",
+              log_error(("unknown function type '%s' for spell '%s'\n",
                   (const char *)propValue, sp->sname));
             }
             xmlFree(propValue);
@@ -1591,45 +1594,50 @@ static int parse_spells(xmlDocPtr doc)
         xmlXPathFreeObject(result);
       }
 
-      /* reading eressea/spells/spell/resource */
-      xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
-      if (result->nodesetval->nodeNr) {
-        sp->components =
-          (spell_component *) malloc(sizeof(spell_component) *
-          (result->nodesetval->nodeNr + 1));
-        sp->components[result->nodesetval->nodeNr].type = 0;
-      }
-      for (component = sp->components, k = 0; k != result->nodesetval->nodeNr;
-        ++k) {
-        const resource_type *rtype;
-        xmlNodePtr node = result->nodesetval->nodeTab[k];
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        assert(propValue);
-        rtype = rt_find((const char *)propValue);
-        if (!rtype) {
-          log_error(("spell %s uses unknown component %s.\n", sp->sname,
-              (const char *)propValue));
-          xmlFree(propValue);
-          continue;
+      if (valid) {
+        /* reading eressea/spells/spell/resource */
+        xpath->node = node;
+        result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
+        if (result->nodesetval->nodeNr) {
+          sp->components =
+            (spell_component *) malloc(sizeof(spell_component) *
+            (result->nodesetval->nodeNr + 1));
+          sp->components[result->nodesetval->nodeNr].type = 0;
         }
-        component->type = rtype;
-        xmlFree(propValue);
-        component->amount = xml_ivalue(node, "amount", 1);
-        component->cost = SPC_FIX;
-        propValue = xmlGetProp(node, BAD_CAST "cost");
-        if (propValue != NULL) {
-          if (strcmp((const char *)propValue, "linear") == 0) {
-            component->cost = SPC_LINEAR;
-          } else if (strcmp((const char *)propValue, "level") == 0) {
-            component->cost = SPC_LEVEL;
+        for (component = sp->components, k = 0; k != result->nodesetval->nodeNr;
+          ++k) {
+          const resource_type *rtype;
+          xmlNodePtr node = result->nodesetval->nodeTab[k];
+          propValue = xmlGetProp(node, BAD_CAST "name");
+          assert(propValue);
+          rtype = rt_find((const char *)propValue);
+          if (!rtype) {
+            log_error(("spell %s uses unknown component %s.\n", sp->sname,
+                (const char *)propValue));
+            xmlFree(propValue);
+            continue;
           }
+          component->type = rtype;
           xmlFree(propValue);
+          component->amount = xml_ivalue(node, "amount", 1);
+          component->cost = SPC_FIX;
+          propValue = xmlGetProp(node, BAD_CAST "cost");
+          if (propValue != NULL) {
+            if (strcmp((const char *)propValue, "linear") == 0) {
+              component->cost = SPC_LINEAR;
+            } else if (strcmp((const char *)propValue, "level") == 0) {
+              component->cost = SPC_LEVEL;
+            }
+            xmlFree(propValue);
+          }
+          component++;
         }
-        component++;
+        xmlXPathFreeObject(result);
       }
-      xmlXPathFreeObject(result);
-      register_spell(sp);
+
+      if (valid) {
+        register_spell(sp);
+      }
     }
   }
 
