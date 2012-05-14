@@ -24,7 +24,6 @@ extern "C" {
 
   typedef void (*pf_generic) (void);
 
-  extern const char *get_functionname(pf_generic fun);
   extern pf_generic get_function(const char *name);
   extern void register_function(pf_generic fun, const char *name);
 
