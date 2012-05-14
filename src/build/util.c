@@ -8,6 +8,7 @@
 #include <util/console.c>
 #include <util/attrib.c>
 #include <util/base36.c>
+#include <util/critbit.c>
 #include <util/crmessage.c>
 #include <util/dice.c>
 #include <util/event.c>

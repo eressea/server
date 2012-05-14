@@ -104,6 +104,9 @@
     <ClInclude Include="util\os.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="util\critbit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="util\attrib.c">
@@ -194,6 +197,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util\os.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util\critbit.c">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util\functions_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

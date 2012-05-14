@@ -180,7 +180,6 @@
     <ClCompile Include="attributes\raceprefix.c" />
     <ClCompile Include="attributes\reduceproduction.c" />
     <ClCompile Include="attributes\targetregion.c" />
-    <ClCompile Include="attributes\viewrange.c" />
     <ClCompile Include="kernel\curse_test.c" />
   </ItemGroup>
   <ItemGroup>
@@ -281,7 +280,6 @@
     <ClInclude Include="attributes\raceprefix.h" />
     <ClInclude Include="attributes\reduceproduction.h" />
     <ClInclude Include="attributes\targetregion.h" />
-    <ClInclude Include="attributes\viewrange.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

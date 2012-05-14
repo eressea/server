@@ -288,9 +288,6 @@
     <ClCompile Include="attributes\targetregion.c">
       <Filter>attributes</Filter>
     </ClCompile>
-    <ClCompile Include="attributes\viewrange.c">
-      <Filter>attributes</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\curse_test.c" />
     <ClCompile Include="kernel\move_test.c">
       <Filter>kernel</Filter>
@@ -592,9 +589,6 @@
       <Filter>attributes</Filter>
     </ClInclude>
     <ClInclude Include="attributes\targetregion.h">
-      <Filter>attributes</Filter>
-    </ClInclude>
-    <ClInclude Include="attributes\viewrange.h">
       <Filter>attributes</Filter>
     </ClInclude>
   </ItemGroup>

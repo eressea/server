@@ -26,7 +26,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
-#include <attributes/viewrange.h>
 #include <attributes/otherfaction.h>
 #include <attributes/alliance.h>
 #include <attributes/reduceproduction.h>

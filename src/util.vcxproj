@@ -91,6 +91,7 @@
     <ClInclude Include="util\base36.h" />
     <ClInclude Include="util\bsdstring.h" />
     <ClInclude Include="util\console.h" />
+    <ClInclude Include="util\critbit.h" />
     <ClInclude Include="util\crmessage.h" />
     <ClInclude Include="util\event.h" />
     <ClInclude Include="util\eventbus.h" />
@@ -125,12 +126,14 @@
     <ClCompile Include="util\base36_test.c" />
     <ClCompile Include="util\bsdstring.c" />
     <ClCompile Include="util\console.c" />
+    <ClCompile Include="util\critbit.c" />
     <ClCompile Include="util\crmessage.c" />
     <ClCompile Include="util\dice.c" />
     <ClCompile Include="util\event.c" />
     <ClCompile Include="util\eventbus.c" />
     <ClCompile Include="util\filereader.c" />
     <ClCompile Include="util\functions.c" />
+    <ClCompile Include="util\functions_test.c" />
     <ClCompile Include="util\goodies.c" />
     <ClCompile Include="util\language.c" />
     <ClCompile Include="util\listbox.c" />

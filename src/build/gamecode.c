@@ -1,4 +1,3 @@
-#include <settings.h>
 #include <platform.h>
 #include "stdafx.h"
 
@@ -54,8 +53,6 @@
 #include <attributes/raceprefix.c>
 #include <attributes/reduceproduction.c>
 #include <attributes/targetregion.c>
-#include <attributes/viewrange.c>
-
 #include <items/artrewards.c>
 #include <items/demonseye.c>
 #include <items/itemtypes.c>

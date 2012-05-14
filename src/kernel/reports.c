@@ -67,7 +67,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
-#include <attributes/viewrange.h>
 
 boolean nocr = false;
 boolean nonr = false;
@@ -1485,13 +1484,11 @@ static seen_region **prepare_report(faction * f)
     if (sr->mode > see_neighbour) {
       region *r = sr->r;
       plane *p = rplane(r);
-
       void (*view) (struct seen_region **, region *, faction *) = view_default;
+
       if (p && fval(p, PFL_SEESPECIAL)) {
-        attrib *a = a_find(p->attribs, &at_viewrange);
-        if (a)
-          view =
-            (void (*)(struct seen_region **, region *, faction *))a->data.f;
+        /* TODO: this is not very customizable */
+        view = (strcmp(p->name, "Regatta")==0) ? view_regatta : view_neighbours;
       }
       view(f->seen, r, f);
     }
