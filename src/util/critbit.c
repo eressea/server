@@ -127,7 +127,7 @@ int cb_insert(critbit_tree * cb, const void * key, size_t keylen)
         }
 
         if (byte==keylen && byte==len) {
-          return CB_ENOMORE; /* duplicate entry */
+          return 0; /* duplicate entry */
         }
         node->byte = byte;
         mask = *ikey ^ *iptr; /* these are all the bits that differ */
@@ -166,7 +166,7 @@ int cb_insert(critbit_tree * cb, const void * key, size_t keylen)
   }
 }
 
-static int cb_find_prefix_i(void * ptr, const void * key, size_t keylen, const char ** results, int numresults, int * offset, int next)
+static int cb_find_prefix_i(void * ptr, const void * key, size_t keylen, const void ** results, int numresults, int * offset, int next)
 {
   assert(next<=numresults);
   if (next==numresults) {
@@ -194,7 +194,7 @@ static int cb_find_prefix_i(void * ptr, const void * key, size_t keylen, const c
   return next;
 }
 
-int cb_find_prefix(critbit_tree * cb, const void * key, size_t keylen, const char ** results, int numresults, int offset)
+int cb_find_prefix(critbit_tree * cb, const void * key, size_t keylen, const void ** results, int numresults, int offset)
 {
   void *ptr, *top = 0;
   assert(key);
@@ -228,7 +228,7 @@ int cb_find_prefix(critbit_tree * cb, const void * key, size_t keylen, const cha
   return 0;
 }
 
-int cb_find(critbit_tree * cb, const void * key, size_t keylen)
+const void * cb_find(critbit_tree * cb, const void * key, size_t keylen)
 {
   void * str;
   size_t len;
@@ -237,14 +237,17 @@ int cb_find(critbit_tree * cb, const void * key, size_t keylen)
 
   assert(cb);
   assert(key);
-  if (!cb->root) return CB_ENOMORE;
+  if (!cb->root) return 0;
   for (ptr=cb->root;decode_pointer(&ptr)==INTERNAL_NODE;) {
     struct critbit_node * node = (struct critbit_node *)ptr;
     int branch = (keylen<=node->byte) ? 0 : ((1+((bytes[node->byte]|node->mask)&0xFF))>>8);
     ptr = node->child[branch];
   }
   from_external_node(ptr, &str, &len);
-  return len==keylen && memcmp(key, str, keylen)==0;
+  if (len==keylen && memcmp(key, str, keylen)==0) {
+    return str;
+  }
+  return 0;
 }
 
 int cb_erase(critbit_tree * cb, const void * key, size_t keylen)
@@ -283,4 +286,20 @@ int cb_erase(critbit_tree * cb, const void * key, size_t keylen)
       return 0;
     }
   }
+}
+
+void cb_new_kv(const char *key, void * value, size_t len, void * dst)
+{
+  size_t keylen = strlen(key)+1;
+  if (dst!=key) {
+    memcpy(dst, key, keylen);
+  }
+  memcpy((char*)dst+keylen, value, len);
+}
+
+void cb_get_kv(const void *kv, void * value, size_t len)
+{
+  const char * key = (const char *)kv;
+  size_t keylen = strlen(key)+1;
+  memcpy(value, key+keylen, len);
 }

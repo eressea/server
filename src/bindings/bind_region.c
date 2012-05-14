@@ -33,6 +33,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/critbit.h>
 #include <util/language.h>
 #include <util/log.h>
 
@@ -309,32 +310,58 @@ static int tolua_region_get_resourcelevel(lua_State * L)
 }
 
 #define LUA_ASSERT(c, s) if (!(c)) { log_error(("%s(%d): %s\n", __FILE__, __LINE__, (s))); return 0; }
+
+static critbit_tree * special_resources(void)
+{
+  static critbit_tree cb = CRITBIT_TREE();
+  if (!cb.root) {
+    const char * special[] = { "seed", "sapling", "tree", "grave", "chaos", 0 };
+    char buffer[32];
+    int i;
+    for (i=0;special[i];++i) {
+      cb_new_kv(special[i], &i, sizeof(int), buffer);
+      cb_insert(&cb, buffer, strlen(special[i])+1+sizeof(int));
+    }
+  }
+  return &cb;
+}
+
 static int tolua_region_get_resource(lua_State * L)
 {
   region *r;
   const char *type;
   const resource_type *rtype;
   int result = 0;
+  const void * matches;
+  critbit_tree * cb = special_resources();
 
   r = (region *) tolua_tousertype(L, 1, 0);
   LUA_ASSERT(r != NULL, "invalid parameter");
   type = tolua_tostring(L, 2, 0);
   LUA_ASSERT(type != NULL, "invalid parameter");
-  rtype = rt_find(type);
 
-  if (!rtype) {
-    if (strcmp(type, "seed") == 0)
-      result = rtrees(r, 0);
-    if (strcmp(type, "sapling") == 0)
-      result = rtrees(r, 1);
-    if (strcmp(type, "tree") == 0)
-      result = rtrees(r, 2);
-    if (strcmp(type, "grave") == 0)
+  if (cb_find_prefix(cb, type, strlen(type)+1, &matches, 1, 0)) {
+    cb_get_kv(matches, &result, sizeof(result));
+    switch (result) {
+    case 0:
+    case 1:
+    case 2:
+      result = rtrees(r, result);
+      break;
+    case 3:
       result = deathcount(r);
-    if (strcmp(type, "chaos") == 0)
+      break;
+    case 4:
       result = chaoscount(r);
+      break;
+    }
   } else {
-    result = region_getresource(r, rtype);
+    rtype = rt_find(type);
+    if (rtype) {
+      result = region_getresource(r, rtype);
+    } else {
+      result = -1;
+    }
   }
 
   tolua_pushnumber(L, (lua_Number) result);
@@ -345,24 +372,29 @@ static int tolua_region_set_resource(lua_State * L)
 {
   region *r = (region *) tolua_tousertype(L, 1, 0);
   const char *type = tolua_tostring(L, 2, 0);
-  int value = (int)tolua_tonumber(L, 3, 0);
-  const resource_type *rtype = rt_find(type);
+  int result, value = (int)tolua_tonumber(L, 3, 0);
+  critbit_tree * cb = special_resources();
+  const void * matches;
 
-  if (rtype != NULL) {
-    region_setresource(r, rtype, value);
+  if (cb_find_prefix(cb, type, strlen(type)+1, &matches, 1, 0)) {
+    cb_get_kv(matches, &result, sizeof(result));
+    switch (result) {
+    case 0:
+    case 1:
+    case 2:
+      rsettrees(r, result, value);
+      break;
+    case 3:
+      deathcounts(r, value - deathcount(r));
+      break;
+    case 4:
+      chaoscounts(r, value - chaoscount(r));
+      break;
+    }
   } else {
-    if (strcmp(type, "seed") == 0) {
-      rsettrees(r, 0, value);
-    } else if (strcmp(type, "sapling") == 0) {
-      rsettrees(r, 1, value);
-    } else if (strcmp(type, "tree") == 0) {
-      rsettrees(r, 2, value);
-    } else if (strcmp(type, "grave") == 0) {
-      int fallen = value - deathcount(r);
-      deathcounts(r, fallen);
-    } else if (strcmp(type, "chaos") == 0) {
-      int fallen = value - chaoscount(r);
-      chaoscounts(r, fallen);
+    const resource_type *rtype = rt_find(type);
+    if (rtype != NULL) {
+      region_setresource(r, rtype, value);
     }
   }
   return 0;
