@@ -61,13 +61,3 @@ void register_function(pf_generic fun, const char *name)
   fl->name = strdup(name);
   functionlist = fl;
 }
-
-void list_registered_functions(void)
-{
-  function_list *fl = functionlist;
-
-  while (fl) {
-    printf("%s\n", fl->name);
-    fl = fl->next;
-  }
-}

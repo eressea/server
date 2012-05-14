@@ -6,6 +6,7 @@
 
 #include <util/base36_test.c>
 #include <util/quicklist_test.c>
+#include <util/functions_test.c>
 #include <kernel/move_test.c>
 #include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
@@ -36,6 +37,7 @@ int RunAllTests(void)
 
   CuSuiteAddSuite(suite, get_base36_suite());
   CuSuiteAddSuite(suite, get_quicklist_suite());
+  CuSuiteAddSuite(suite, get_functions_suite());
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_move_suite());
