@@ -205,5 +205,8 @@
     <ClCompile Include="util\functions_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="util\umlaut_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

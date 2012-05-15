@@ -151,6 +151,7 @@
     <ClCompile Include="util\strings.c" />
     <ClCompile Include="util\translation.c" />
     <ClCompile Include="util\umlaut.c" />
+    <ClCompile Include="util\umlaut_test.c" />
     <ClCompile Include="util\unicode.c" />
     <ClCompile Include="util\xml.c" />
   </ItemGroup>

@@ -88,7 +88,7 @@ void addtoken(tnode * root, const char *str, variant id)
       next = next->nexthash;
     if (!next) {
       tref *ref;
-      tnode *node = calloc(1, sizeof(tnode));
+      tnode *node = (tnode *)calloc(1, sizeof(tnode));
 
       if (ucs < 'a' || ucs > 'z') {
         lcs = towlower((wint_t) ucs);
@@ -97,7 +97,7 @@ void addtoken(tnode * root, const char *str, variant id)
         ucs = towupper((wint_t) ucs);
       }
 
-      ref = malloc(sizeof(tref));
+      ref = (tref *)malloc(sizeof(tref));
       ref->ucs = ucs;
       ref->node = node;
       ref->nexthash = root->next[index];
