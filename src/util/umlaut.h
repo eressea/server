@@ -40,6 +40,8 @@ extern "C" {
   void addtoken(struct tnode *root, const char *str, variant id);
   void freetokens(struct tnode *root);
 
+  char * transliterate(char * out, size_t size, const char * in);
+
   typedef struct local_names {
     struct local_names *next;
     const struct locale *lang;

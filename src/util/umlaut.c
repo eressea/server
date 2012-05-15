@@ -22,10 +22,68 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "log.h"
 #include "unicode.h"
 
+#include <ctype.h>
 #include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+char * transliterate(char * out, size_t size, const char * in)
+{
+  const char *src = in;
+  char *dst = out;
+
+  --size; /* need space for a final 0-byte */
+  while (*src && size) {
+    size_t len;
+    const char * p = src;
+    while ((p+size>src) && *src && (~*src & 0x80)) {
+      *dst++ = (char)tolower(*src++);
+    }
+    len = src-p;
+    size -= len;
+    while (size>=2 && *src && (*src & 0x80)) {
+      int advance = 2;
+      if (src[0]=='\xc3') {
+        if (src[1]=='\xa4' || src[1]=='\x84') {
+          memcpy(dst, "ae", 2);
+        } else if (src[1]=='\xb6' || src[1]=='\x96') {
+          memcpy(dst, "oe", 2);
+        } else if (src[1]=='\xbc' || src[1]=='\x9c') {
+          memcpy(dst, "ue", 2);
+        } else if (src[1]=='\x9f') {
+          memcpy(dst, "ss", 2);
+        } else {
+          *dst++='?';
+          advance = 0;
+        }
+      } else if (src[0]=='\xe1') {
+        if (src[1]=='\xba' && src[2]=='\x9e') {
+          memcpy(dst, "ss", 2);
+          ++src;
+        } else {
+          advance = 0;
+        }
+      } else {
+        advance = 0;
+      }
+
+      if (advance) {
+        src+=advance;
+        dst+=advance;
+        size-=advance;
+      } else {
+        ucs4_t ucs;
+        unicode_utf8_to_ucs4(&ucs, src, &len);
+        src+=len;
+        *dst++='?';
+        --size;
+      }
+    }
+  }
+  *dst = 0;
+  return *src ? 0 : out;
+}
 
 typedef struct tref {
   struct tref *nexthash;
@@ -110,7 +168,7 @@ void addtoken(tnode * root, const char *str, variant id)
 #else
         index = lcs % NODEHASHSIZE;
 #endif
-        ref = malloc(sizeof(tref));
+        ref = (tref *)malloc(sizeof(tref));
         ref->ucs = lcs;
         ref->node = node;
         ref->nexthash = root->next[index];

@@ -1,28 +1,48 @@
 #include <cutest/CuTest.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include "umlaut.h"
 
+static void test_transliterate(CuTest * tc)
+{
+  char buffer[32];
+
+  CuAssertStrEquals(tc, "", transliterate(buffer, sizeof(buffer), ""));
+  CuAssertStrEquals(tc, "herpderp", transliterate(buffer, sizeof(buffer), "herpderp"));
+  CuAssertStrEquals(tc, "herpderp", buffer);
+
+  CuAssertStrEquals(tc, "herpderp", transliterate(buffer, sizeof(buffer), "HERPDERP"));
+  CuAssertStrEquals(tc, "haerpdaerp", transliterate(buffer, sizeof(buffer), "h\xc3\xa4rpd\xc3\xa4rp"));
+  CuAssertStrEquals(tc, "aeoeuess", transliterate(buffer, sizeof(buffer), "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"));
+  CuAssertStrEquals(tc, "aeoeuess", transliterate(buffer, sizeof(buffer), "\xc3\x84\xc3\x96\xc3\x9c\xe1\xba\x9e"));
+  CuAssertStrEquals(tc, 0, transliterate(buffer, 4, "herpderp"));
+}
 
 static void test_umlaut(CuTest * tc)
 {
-  char umlauts[] = { 0xc3, 0xa4, 0xc3, 0xb6, 0xc3, 0xbc, 0xc3, 0x9f, 0 }; /* auml ouml uuml szlig nul */
+  const char * umlauts = "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig nul */
   tnode tokens = { 0 };
   variant id;
   int result;
 
+  /* don't crash on an empty set */
+  result = findtoken(&tokens, "herpderp", &id);
+  CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
+
   id.i = 1;
-  addtoken(&tokens, "herp", id);
+  addtoken(&tokens, "herpderp", id);
   id.i = 2;
   addtoken(&tokens, "derp", id);
   id.i = 3;
   addtoken(&tokens, umlauts, id);
 
+  /* we can find substrings if they are significant */
   result = findtoken(&tokens, "herp", &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 1, id.i);
 
-  result = findtoken(&tokens, "derp", &id);
+  result = findtoken(&tokens, "DERP", &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 2, id.i);
 
@@ -30,11 +50,12 @@ static void test_umlaut(CuTest * tc)
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 3, id.i);
 
+  /* transliteration is the real magic */
   result = findtoken(&tokens, "AEoeUEss", &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 3, id.i);
 
-  result = findtoken(&tokens, "herpderp", &id);
+  result = findtoken(&tokens, "herp-a-derp", &id);
   CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
 }
 
@@ -42,5 +63,6 @@ CuSuite *get_umlaut_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_umlaut);
+  SUITE_ADD_TEST(suite, test_transliterate);
   return suite;
 }
