@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 # define VC_EXTRALEAN
 # define WIN32_LEAN_AND_MEAN
-# include <Windows.h>
+# include <windows.h>
 # undef MOUSE_MOVED
 # define STDIO_CP 1252          /* log.c, convert to console character set */
 # pragma warning (disable: 4201 4214 4514 4115 4711)
@@ -35,6 +35,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # pragma warning(disable: 4100)
 /* warning C4100: <name> : unreferenced formal parameter */
 # pragma warning(disable: 4996)
+/* <name> is not defined as a preprocessor macro, replacing with '0' for '#if/#elif' */
+# pragma warning(disable: 4668)
 
 /* warning C4100: <name> was declared deprecated */
 #ifndef _CRT_SECURE_NO_DEPRECATE

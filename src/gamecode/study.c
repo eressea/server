@@ -64,19 +64,19 @@ static skill_t getskill(const struct locale *lang)
 
 magic_t getmagicskill(const struct locale * lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_MAGIC);
+  void **tokens = get_translations(lang, UT_MAGIC);
   variant token;
   const char *s = getstrtoken();
 
-  if (s && s[0]) {
-    if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
+  if (tokens && s && s[0]) {
+    if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
       return (magic_t) token.i;
     } else {
       char buffer[3];
       buffer[0] = s[0];
       buffer[1] = s[1];
       buffer[2] = '\0';
-      if (findtoken(tokens, buffer, &token) == E_TOK_SUCCESS) {
+      if (findtoken(*tokens, buffer, &token) == E_TOK_SUCCESS) {
         return (magic_t) token.i;
       }
     }

@@ -1093,7 +1093,7 @@ const resource_type *findresourcetype(const char *name,
     rnames = rn;
   }
 
-  if (findtoken(&rn->names, name, &token) == E_TOK_NOMATCH)
+  if (findtoken(rn->names, name, &token) == E_TOK_NOMATCH)
     return NULL;
   return (const resource_type *)token.v;
 }
@@ -1131,7 +1131,7 @@ void init_itemnames(void)
         for (itl = itemtypes[key]; itl; itl = itl->next) {
           variant var;
           const char *iname = locale_string(lang, itl->rtype->_name[0]);
-          if (findtoken(&in->names, iname, &var) == E_TOK_NOMATCH
+          if (findtoken(in->names, iname, &var) == E_TOK_NOMATCH
             || var.v != itl) {
             var.v = (void *)itl;
             addtoken(&in->names, iname, var);
@@ -1159,7 +1159,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     init_itemnames();
     for (in = inames; in->lang != lang; in = in->next) ;
   }
-  if (findtoken(&in->names, name, &var) == E_TOK_NOMATCH)
+  if (findtoken(in->names, name, &var) == E_TOK_NOMATCH)
     return NULL;
   return (const item_type *)var.v;
 }

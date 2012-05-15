@@ -29,10 +29,10 @@
 
 typedef struct command {
   parser fun;
-  struct tnode *nodes;
+  void *nodes;
 } command;
 
-tnode *stree_find(const syntaxtree * stree, const struct locale *lang)
+void *stree_find(const syntaxtree * stree, const struct locale *lang)
 {
   while (stree) {
     if (stree->lang == lang)
@@ -50,6 +50,7 @@ syntaxtree *stree_create(void)
     syntaxtree *stree = (syntaxtree *) malloc(sizeof(syntaxtree));
     stree->lang = lang;
     stree->next = sroot;
+    stree->root = 0;
     sroot = stree;
     lang = nextlocale(lang);
   }
@@ -57,7 +58,7 @@ syntaxtree *stree_create(void)
 }
 
 void
-add_command(struct tnode *keys, struct tnode *tnext,
+add_command(void **keys, void *tnext,
   const char *str, parser fun)
 {
   command *cmd = (command *) malloc(sizeof(command));
@@ -69,7 +70,7 @@ add_command(struct tnode *keys, struct tnode *tnext,
   addtoken(keys, str, var);
 }
 
-static int do_command_i(const struct tnode *keys, void *u, struct order *ord)
+static int do_command_i(const void *keys, struct unit *u, struct order *ord)
 {
   const char *c;
   variant var;
@@ -88,7 +89,7 @@ static int do_command_i(const struct tnode *keys, void *u, struct order *ord)
   return E_TOK_NOMATCH;
 }
 
-void do_command(const struct tnode *keys, void *u, struct order *ord)
+void do_command(const void *keys, struct unit *u, struct order *ord)
 {
   init_tokens(ord);
   skip_token();

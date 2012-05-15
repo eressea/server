@@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/quicklist.h>
 #include <util/resolve.h>
 #include <util/storage.h>
 #include <util/umlaut.h>
@@ -384,7 +385,7 @@ const building_type *findbuildingtype(const char *name,
     }
     bnames = bn;
   }
-  if (findtoken(&bn->names, name, &type) == E_TOK_NOMATCH)
+  if (findtoken(bn->names, name, &type) == E_TOK_NOMATCH)
     return NULL;
   return (const building_type *)type.v;
 }

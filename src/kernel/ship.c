@@ -76,7 +76,7 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
     }
     snames = sn;
   }
-  if (findtoken(&sn->names, name, &var) == E_TOK_NOMATCH)
+  if (findtoken(sn->names, name, &var) == E_TOK_NOMATCH)
     return NULL;
   return (const ship_type *)var.v;
 }

@@ -64,7 +64,7 @@ extern int dice_rand(const char *s);
 
 region *regions;
 
-int get_maxluxuries()
+int get_maxluxuries(void)
 {
   static int maxluxuries = -1;
   if (maxluxuries == -1) {
@@ -219,7 +219,7 @@ void register_special_direction(const char *name)
   char *str = strdup(name);
 
   for (lang = locales; lang; lang = nextlocale(lang)) {
-    tnode *tokens = get_translations(lang, UT_SPECDIR);
+    void **tokens = get_translations(lang, UT_SPECDIR);
     const char *token = LOC(lang, name);
 
     if (token) {
@@ -311,9 +311,9 @@ region *find_special_direction(const region * r, const char *token,
     d = (spec_direction *) (a->data.v);
 
     if (d->active) {
-      tnode *tokens = get_translations(lang, UT_SPECDIR);
+      void **tokens = get_translations(lang, UT_SPECDIR);
       variant var;
-      if (findtoken(tokens, token, &var) == E_TOK_SUCCESS) {
+      if (findtoken(*tokens, token, &var) == E_TOK_SUCCESS) {
         if (strcmp((const char *)var.v, d->keyword) == 0) {
           return findregion(d->x, d->y);
         }
@@ -451,24 +451,19 @@ boolean pnormalize(int *x, int *y, const plane * pl)
 
 static region *rfindhash(int x, int y)
 {
-  unsigned int rid;
-
-  rid = coor_hashkey(x, y);
+  unsigned int rid = coor_hashkey(x, y);
+  int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
 #if HASH_STATISTICS
   ++hash_requests;
 #endif
-  if (rid >= 0) {
-    int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
-    while (regionhash[key] != NULL && (regionhash[key] == DELMARKER
-        || regionhash[key]->x != x || regionhash[key]->y != y)) {
-      key = (key + gk) % RMAXHASH;
+  while (regionhash[key] != NULL && (regionhash[key] == DELMARKER
+      || regionhash[key]->x != x || regionhash[key]->y != y)) {
+    key = (key + gk) % RMAXHASH;
 #if HASH_STATISTICS
-      ++hash_misses;
+    ++hash_misses;
 #endif
-    }
-    return regionhash[key];
   }
-  return NULL;
+  return regionhash[key];
 }
 
 void rhash(region * r)

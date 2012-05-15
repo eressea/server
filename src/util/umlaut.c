@@ -28,6 +28,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <assert.h>
 
+typedef struct tref {
+  struct tref *nexthash;
+  ucs4_t ucs;
+  struct tnode *node;
+} tref;
+
+#define LEAF 1                  /* leaf node for a word. always matches */
+#define SHARED 2                /* at least two words share the node */
+
+typedef struct tnode {
+  struct tref *next[NODEHASHSIZE];
+  unsigned char flags;
+  variant id;
+} tnode;
+
 char * transliterate(char * out, size_t size, const char * in)
 {
   const char *src = in;
@@ -85,17 +100,9 @@ char * transliterate(char * out, size_t size, const char * in)
   return *src ? 0 : out;
 }
 
-typedef struct tref {
-  struct tref *nexthash;
-  ucs4_t ucs;
-  struct tnode *node;
-} tref;
-
-#define LEAF 1                  /* leaf node for a word. always matches */
-#define SHARED 2                /* at least two words share the node */
-
-void addtoken(tnode * root, const char *str, variant id)
+void addtoken(void ** root, const char *str, variant id)
 {
+  tnode * tk;
   static const struct replace { /* STATIC_CONST: constant value */
     ucs4_t ucs;
     const char str[3];
@@ -120,9 +127,15 @@ void addtoken(tnode * root, const char *str, variant id)
   };
 
   assert(root);
+  if (!*root) {
+    tk = *root = calloc(1, sizeof(tnode));
+  } else {
+    tk = *root;
+  }
+  assert(tk && tk==*root);
   if (!*str) {
-    root->id = id;
-    root->flags |= LEAF;
+    tk->id = id;
+    tk->flags |= LEAF;
   } else {
     tref *next;
     int ret, index, i = 0;
@@ -139,9 +152,9 @@ void addtoken(tnode * root, const char *str, variant id)
     index = ucs % NODEHASHSIZE;
 #endif
     assert(index >= 0);
-    next = root->next[index];
-    if (!(root->flags & LEAF))
-      root->id = id;
+    next = tk->next[index];
+    if (!(tk->flags & LEAF))
+      tk->id = id;
     while (next && next->ucs != ucs)
       next = next->nexthash;
     if (!next) {
@@ -158,8 +171,8 @@ void addtoken(tnode * root, const char *str, variant id)
       ref = (tref *)malloc(sizeof(tref));
       ref->ucs = ucs;
       ref->node = node;
-      ref->nexthash = root->next[index];
-      root->next[index] = ref;
+      ref->nexthash = tk->next[index];
+      tk->next[index] = ref;
 
       /* try lower/upper casing the character, and try again */
       if (ucs != lcs) {
@@ -171,8 +184,8 @@ void addtoken(tnode * root, const char *str, variant id)
         ref = (tref *)malloc(sizeof(tref));
         ref->ucs = lcs;
         ref->node = node;
-        ref->nexthash = root->next[index];
-        root->next[index] = ref;
+        ref->nexthash = tk->next[index];
+        tk->next[index] = ref;
       }
       next = ref;
     } else {
@@ -180,7 +193,7 @@ void addtoken(tnode * root, const char *str, variant id)
       if ((next->node->flags & LEAF) == 0)
         next->node->id.v = NULL;        /* why? */
     }
-    addtoken(next->node, str + len, id);
+    addtoken(&next->node, str + len, id);
     while (replace[i].str[0]) {
       if (lcs == replace[i].ucs) {
         char zText[1024];
@@ -203,10 +216,11 @@ void freetokens(struct tnode *root)
   }
 }
 
-int findtoken(const tnode * tk, const char *str, variant * result)
+int findtoken(void * root, const char *str, variant * result)
 {
-  assert(tk);
-  if (!str || *str == 0)
+  const tnode * tk = (const tnode *)root;
+
+  if (!tk || !str || *str == 0)
     return E_TOK_NOMATCH;
 
   do {

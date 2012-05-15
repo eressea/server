@@ -539,7 +539,7 @@ void add_spellname(sc_mage * mage, const spell * sp)
     variant token;
     const char *n = spell_name(sp, names->lang);
     token.v = (void *)sp;
-    addtoken(names->tokens, n, token);
+    addtoken(&names->tokens, n, token);
     names = names->next;
   }
 }
