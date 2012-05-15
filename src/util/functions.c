@@ -19,35 +19,32 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "functions.h"
 
+#include <util/critbit.h>
+
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct function_list {
-  struct function_list *next;
-  pf_generic fun;
-  const char *name;
-} function_list;
-
-static function_list *functionlist;
+static critbit_tree cb_functions;
 
 pf_generic get_function(const char *name)
 {
-  function_list *fl = functionlist;
-  if (name == NULL)
-    return NULL;
-  while (fl && strcmp(fl->name, name) != 0)
-    fl = fl->next;
-  if (fl)
-    return fl->fun;
+  const void * matches;
+  pf_generic result;
+  if (cb_find_prefix(&cb_functions, name, strlen(name)+1, &matches, 1, 0)) {
+    cb_get_kv(matches, &result, sizeof(result));
+    return result;
+  }
   return NULL;
 }
 
 void register_function(pf_generic fun, const char *name)
 {
-  function_list *fl = (function_list *) malloc(sizeof(function_list));
-  fl->next = functionlist;
-  fl->fun = fun;
-  fl->name = strdup(name);
-  functionlist = fl;
+  char buffer[64];
+  size_t len = strlen(name);
+
+  assert(len<sizeof(buffer)-sizeof(fun));
+  cb_new_kv(name, &fun, sizeof(fun), buffer);
+  cb_insert(&cb_functions, buffer, len+1+sizeof(fun));
 }
