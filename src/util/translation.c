@@ -12,8 +12,10 @@
 #include <platform.h>
 
 #include "translation.h"
-#include "log.h"
+
 #include "bsdstring.h"
+#include "critbit.h"
+#include "log.h"
 
 /* libc includes */
 #include <assert.h>
@@ -146,43 +148,33 @@ static variable *find_variable(const char *symbol)
  ** constant values
  **/
 
-typedef struct function {
-  struct function *next;
-  const char *symbol;
-  evalfun parse;
-} function;
-
-static function *functions;
+static struct critbit_tree functions = { 0 };
 
 static void free_functions(void)
 {
-  while (functions) {
-    function *fun = functions;
-    functions = fun->next;
-    free(fun);
-  }
+  cb_clear(&functions);
+  functions.root = 0;
 }
 
 void add_function(const char *symbol, evalfun parse)
 {
-  function *fun = (function *) malloc(sizeof(function));
-
-  fun->parse = parse;
-  fun->symbol = symbol;
-
-  fun->next = functions;
-  functions = fun;
+  char buffer[64];
+  size_t len = strlen(symbol);
+  
+  assert(len+1+sizeof(parse)<=sizeof(buffer));
+  cb_new_kv(symbol, &parse, sizeof(parse), buffer);
+  cb_insert(&functions, buffer, len+1+sizeof(parse));
 }
 
-static function *find_function(const char *symbol)
+static evalfun find_function(const char *symbol)
 {
-  function *fun = functions;
-  while (fun) {
-    if (!strcmp(fun->symbol, symbol))
-      break;
-    fun = fun->next;
+  void * matches;
+  if (cb_find_prefix(&functions, symbol, strlen(symbol)+1, &matches, 1, 0)) {
+    evalfun result;
+    cb_get_kv(matches, &result, sizeof(result));
+    return result;
   }
-  return fun;
+  return 0;
 }
 
 static const char *parse(opstack **, const char *in, const void *);
@@ -208,7 +200,8 @@ static const char *parse_symbol(opstack ** stack, const char *in,
   /* symbol will now contain the symbol name */
   if (*in == '(') {
     /* it's a function we need to parse, start by reading the parameters */
-    function *foo;
+    evalfun foo;
+
     while (*in != ')') {
       in = parse(stack, ++in, userdata);        /* will push the result on the stack */
       if (in == NULL)
@@ -220,7 +213,7 @@ static const char *parse_symbol(opstack ** stack, const char *in,
       log_error(("parser does not know about \"%s\" function.\n", symbol));
       return NULL;
     }
-    foo->parse(stack, userdata);        /* will pop parameters from stack (reverse order!) and push the result */
+    foo(stack, userdata);        /* will pop parameters from stack (reverse order!) and push the result */
   } else {
     variable *var = find_variable(symbol);
     if (braces && *in == '}') {
