@@ -48,7 +48,7 @@ void cw_write(const attrib * a, const void *target, storage * store)
   store->w_int(store, b->id);
 }
 
-typedef struct bresvole {
+typedef struct bresolve {
   unsigned int id;
   curse *self;
 } bresolve;
@@ -88,40 +88,40 @@ static int resolve_buddy(variant data, void *addr)
 {
   curse *result = NULL;
   bresolve *br = (bresolve *) data.v;
+  connection *b;
 
-  if (br->id >= 0) {
-    connection *b = find_border(br->id);
+  assert(br->id > 0);
+  b = find_border(br->id);
 
-    if (b && b->from && b->to) {
-      attrib *a = a_find(b->from->attribs, &at_cursewall);
-      while (a && a->data.v != br->self) {
+  if (b && b->from && b->to) {
+    attrib *a = a_find(b->from->attribs, &at_cursewall);
+    while (a && a->data.v != br->self) {
+      curse *c = (curse *) a->data.v;
+      wallcurse *wc = (wallcurse *) c->data.v;
+      if (wc->wall->id == br->id)
+        break;
+      a = a->next;
+    }
+    if (!a || a->type != &at_cursewall) {
+      a = a_find(b->to->attribs, &at_cursewall);
+      while (a && a->type == &at_cursewall && a->data.v != br->self) {
         curse *c = (curse *) a->data.v;
         wallcurse *wc = (wallcurse *) c->data.v;
         if (wc->wall->id == br->id)
           break;
         a = a->next;
       }
-      if (!a || a->type != &at_cursewall) {
-        a = a_find(b->to->attribs, &at_cursewall);
-        while (a && a->type == &at_cursewall && a->data.v != br->self) {
-          curse *c = (curse *) a->data.v;
-          wallcurse *wc = (wallcurse *) c->data.v;
-          if (wc->wall->id == br->id)
-            break;
-          a = a->next;
-        }
-      }
-      if (a && a->type == &at_cursewall) {
-        curse *c = (curse *) a->data.v;
-        free(br);
-        result = c;
-      }
-    } else {
-      /* fail, object does not exist (but if you're still loading then 
-       * you may want to try again later) */
-      *(curse **) addr = NULL;
-      return -1;
     }
+    if (a && a->type == &at_cursewall) {
+      curse *c = (curse *) a->data.v;
+      free(br);
+      result = c;
+    }
+  } else {
+    /* fail, object does not exist (but if you're still loading then 
+      * you may want to try again later) */
+    *(curse **) addr = NULL;
+    return -1;
   }
   *(curse **) addr = result;
   return 0;
