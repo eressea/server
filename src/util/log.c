@@ -20,7 +20,7 @@ without prior permission by the authors of Eressea.
 #include <time.h>
 
 /* TODO: set from external function */
-int log_flags = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING;
+int log_flags = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG;
 #ifdef STDIO_CP
 static int stdio_codepage = STDIO_CP;
 #else
@@ -155,6 +155,49 @@ static int check_dupe(const char *format, const char *type)
   strncpy(last_message, format, sizeof(last_message));
   last_type = type;
   return 0;
+}
+
+void _log_debug(const char *format, ...)
+{
+  if (log_flags & LOG_CPDEBUG) {
+    int dupe = check_dupe(format, "DEBUG");
+
+    fflush(stdout);
+    if (!logfile)
+      logfile = stderr;
+    if (logfile != stderr) {
+      va_list marker;
+      fputs("DEBUG: ", logfile);
+      va_start(marker, format);
+      vfprintf(logfile, format, marker);
+      va_end(marker);
+    }
+    if (!dupe) {
+      va_list marker;
+      fputs("DEBUG: ", stderr);
+      va_start(marker, format);
+      if (stdio_codepage) {
+        char buffer[MAXLENGTH];
+        char converted[MAXLENGTH];
+
+        vsnprintf(buffer, sizeof(buffer), format, marker);
+        if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage) == 0) {
+          fputs(converted, stderr);
+        } else {
+          /* fall back to non-converted output */
+          va_end(marker);
+          va_start(marker, format);
+          vfprintf(stderr, format, marker);
+        }
+      } else {
+        vfprintf(stderr, format, marker);
+      }
+      va_end(marker);
+    }
+    if (log_flags & LOG_FLUSH) {
+      log_flush();
+    }
+  }
 }
 
 void _log_warn(const char *format, ...)

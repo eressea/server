@@ -25,18 +25,19 @@ extern "C" {
 #define log_warning(x) _log_warn x
 #define log_error(x) _log_error x
 #define log_info(x) _log_info x
+#define log_debug _log_debug
 
   /* use macros above instead of these: */
   extern void _log_warn(const char *format, ...);
   extern void _log_error(const char *format, ...);
+  extern void _log_debug(const char *format, ...);
   extern void _log_info(unsigned int flag, const char *format, ...);
 
 #define LOG_FLUSH      0x01
 #define LOG_CPWARNING  0x02
 #define LOG_CPERROR    0x04
-#define LOG_INFO1      0x08
-#define LOG_INFO2      0x10
-#define LOG_INFO3      0x20
+#define LOG_CPDEBUG    0x08
+#define LOG_CPINFO     0x10
 
   extern int log_flags;
 #ifdef __cplusplus

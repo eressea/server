@@ -22,10 +22,11 @@ static void test_transliterate(CuTest * tc)
 static void test_umlaut(CuTest * tc)
 {
   const char * umlauts = "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig nul */
-  tnode tokens = { 0 };
+  tnode tokens;
   variant id;
   int result;
 
+  memset(&tokens, 0, sizeof(tokens));
   /* don't crash on an empty set */
   result = findtoken(&tokens, "herpderp", &id);
   CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
