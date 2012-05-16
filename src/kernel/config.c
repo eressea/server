@@ -54,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/critbit.h>
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/functions.h>
@@ -1494,17 +1495,22 @@ keyword_t findkeyword(const char *s, const struct locale * lang)
 param_t findparam(const char *s, const struct locale * lang)
 {
   void **tokens = get_translations(lang, UT_PARAMS);
-  variant token;
+  int i;
+  param_t result = NOPARAM;
+  void * match;
+  char buffer[64];
+  char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
+  critbit_tree *cb = (critbit_tree *)*tokens;
 
-  if (findtoken(*tokens, s, &token) == E_TOK_NOMATCH) {
+  if (str && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+    cb_get_kv(match, &i, sizeof(int));
+    result = (param_t)i;
+  } else {
     const building_type *btype = findbuildingtype(s, lang);
     if (btype != NULL)
       return (param_t) P_GEBAEUDE;
-    return NOPARAM;
   }
-  if (token.i == P_BUILDING)
-    return P_GEBAEUDE;
-  return (param_t) token.i;
+  return (result == P_BUILDING) ? P_GEBAEUDE : result;
 }
 
 param_t getparam(const struct locale * lang)
@@ -2057,6 +2063,7 @@ static void init_locale(const struct locale *lang)
   const struct race *rc;
   void **tokens;
   const terrain_type *terrain;
+  char buffer[256];
 #ifdef PTRIES
   trie_node **ptrie;
 #endif
@@ -2096,8 +2103,18 @@ static void init_locale(const struct locale *lang)
 
   tokens = get_translations(lang, UT_PARAMS);
   for (i = 0; i != MAXPARAMS; ++i) {
-    var.i = i;
-    addtoken(tokens, LOC(lang, parameters[i]), var);
+    const char * key = LOC(lang, parameters[i]);
+    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
+    if (str) {
+      critbit_tree * cb = (critbit_tree *)*tokens;
+      if (!cb) {
+        *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
+      }
+      cb_new_kv(str, &i, sizeof(int), buffer);
+      cb_insert(cb, buffer, strlen(str)+1+sizeof(int));
+    } else {
+      log_error(("could not transliterate param '%s'\n", key));
+    }
   }
 #ifdef PTRIES
   ptrie = get_ptrie(lang, UT_SKILLS);

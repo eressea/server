@@ -164,6 +164,7 @@ typedef struct stat stat_type;
 
 /* MSVC has _access, not access */
 #ifndef access
+#include <io.h>
 # define access(f, m) _access(f, m)
 #endif
 #define HAVE_ACCESS
