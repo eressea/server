@@ -149,13 +149,13 @@ int main(int argc, char **argv)
 
   err = eressea_init();
   if (err) {
-    log_error(("initialization failed with code %d\n", err));
+    log_error("initialization failed with code %d\n", err);
     return err;
   }
 
   err = eressea_run(luafile, entry_point);
   if (err) {
-    log_error(("server execution failed with code %d\n", err));
+    log_error("server execution failed with code %d\n", err);
     return err;
   }
 
