@@ -1327,11 +1327,11 @@ int getint(void)
 
 const struct race *findrace(const char *s, const struct locale *lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_RACES);
+  void **tokens = get_translations(lang, UT_RACES);
   variant token;
 
   assert(lang);
-  if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
+  if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
     return (const struct race *)token.v;
   }
   return NULL;
@@ -1339,16 +1339,16 @@ const struct race *findrace(const char *s, const struct locale *lang)
 
 int findoption(const char *s, const struct locale *lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_OPTIONS);
+  void **tokens = get_translations(lang, UT_OPTIONS);
   variant token;
 
-  if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
+  if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
     return (direction_t) token.i;
   }
   return NODIRECTION;
 }
 
-#if PTRIES
+#ifdef PTRIES
 static struct trie_node *ptries[UT_MAX][4];
 
 static struct trie_node **get_ptrie(const struct locale *lang, int type)
@@ -1456,7 +1456,7 @@ ptrie_insert(struct trie_node **ptrie, const char *name, void *data,
 
 skill_t findskill(const char *s, const struct locale * lang)
 {
-#if PTRIES
+#ifdef PTRIES
   char lowercase[256];
   int res = unicode_utf8_tolower(lowercase, sizeof(lowercase), s);
   if (res == 0) {
@@ -1468,10 +1468,10 @@ skill_t findskill(const char *s, const struct locale * lang)
   }
   return NOSKILL;
 #else
-  struct tnode *tokens = get_translations(lang, UT_SKILLS);
+  void **tokens = get_translations(lang, UT_SKILLS);
   variant token;
 
-  if (findtoken(tokens, s, &token) == E_TOK_NOMATCH)
+  if (findtoken(*tokens, s, &token) == E_TOK_NOMATCH)
     return NOSKILL;
   return (skill_t) token.i;
 #endif
@@ -1479,12 +1479,12 @@ skill_t findskill(const char *s, const struct locale * lang)
 
 keyword_t findkeyword(const char *s, const struct locale * lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_KEYWORDS);
+  void **tokens = get_translations(lang, UT_KEYWORDS);
   variant token;
 
   if (*s == '@')
     s++;
-  if (findtoken(tokens, s, &token) == E_TOK_NOMATCH)
+  if (findtoken(*tokens, s, &token) == E_TOK_NOMATCH)
     return NOKEYWORD;
   if (global.disabled[token.i])
     return NOKEYWORD;
@@ -1493,10 +1493,10 @@ keyword_t findkeyword(const char *s, const struct locale * lang)
 
 param_t findparam(const char *s, const struct locale * lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_PARAMS);
+  void **tokens = get_translations(lang, UT_PARAMS);
   variant token;
 
-  if (findtoken(tokens, s, &token) == E_TOK_NOMATCH) {
+  if (findtoken(*tokens, s, &token) == E_TOK_NOMATCH) {
     const building_type *btype = findbuildingtype(s, lang);
     if (btype != NULL)
       return (param_t) P_GEBAEUDE;
@@ -2005,7 +2005,7 @@ void *gc_add(void *p)
   return p;
 }
 
-static void init_directions(tnode * root, const struct locale *lang)
+static void init_directions(void ** root, const struct locale *lang)
 {
   /* mit dieser routine kann man mehrere namen für eine direction geben,
    * das ist für die hexes ideal. */
@@ -2030,7 +2030,7 @@ static void init_directions(tnode * root, const struct locale *lang)
     NULL, NODIRECTION}
   };
   int i;
-  struct tnode *tokens = get_translations(lang, UT_DIRECTIONS);
+  void **tokens = get_translations(lang, UT_DIRECTIONS);
 
   for (i = 0; dirs[i].direction != NODIRECTION; ++i) {
     variant token;
@@ -2041,10 +2041,10 @@ static void init_directions(tnode * root, const struct locale *lang)
 
 direction_t finddirection(const char *s, const struct locale *lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_DIRECTIONS);
+  void **tokens = get_translations(lang, UT_DIRECTIONS);
   variant token;
 
-  if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
+  if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
     return (direction_t) token.i;
   }
   return NODIRECTION;
@@ -2055,9 +2055,9 @@ static void init_locale(const struct locale *lang)
   variant var;
   int i;
   const struct race *rc;
-  struct tnode *tokens;
+  void **tokens;
   const terrain_type *terrain;
-#if PTRIES
+#ifdef PTRIES
   trie_node **ptrie;
 #endif
 
@@ -2099,7 +2099,7 @@ static void init_locale(const struct locale *lang)
     var.i = i;
     addtoken(tokens, LOC(lang, parameters[i]), var);
   }
-#if PTRIES
+#ifdef PTRIES
   ptrie = get_ptrie(lang, UT_SKILLS);
   for (i = 0; i != MAXSKILLS; ++i) {
     skill_t sk = (skill_t) i;

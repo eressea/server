@@ -1027,10 +1027,14 @@ static void cycle_route(order * ord, unit * u, int gereist)
     const struct locale *lang = u->faction->locale;
     pause = false;
     token = getstrtoken();
-    d = finddirection(token, lang);
-    if (d == D_PAUSE) {
-      pause = true;
-    } else if (d == NODIRECTION) {
+    if (token && *token) {
+      d = finddirection(token, lang);
+      if (d == D_PAUSE) {
+        pause = true;
+      } else if (d == NODIRECTION) {
+        break;
+      }
+    } else {
       break;
     }
     if (cm < gereist) {

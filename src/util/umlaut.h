@@ -28,24 +28,17 @@ extern "C" {
 #define E_TOK_NOMATCH (-1)
 #define E_TOK_SUCCESS 0
 #define NODEHASHSIZE 8
-  struct tref;
 
-  typedef struct tnode {
-    struct tref *next[NODEHASHSIZE];
-    unsigned char flags;
-    variant id;
-  } tnode;
-
-  int findtoken(const struct tnode *tk, const char *str, variant * result);
-  void addtoken(struct tnode *root, const char *str, variant id);
-  void freetokens(struct tnode *root);
+  int findtoken(const void *tk, const char *str, variant * result);
+  void addtoken(void **root, const char *str, variant id);
+  void freetokens(void *root);
 
   char * transliterate(char * out, size_t size, const char * in);
 
   typedef struct local_names {
     struct local_names *next;
     const struct locale *lang;
-    struct tnode names;
+    void * names;
   } local_names;
 
 #ifdef __cplusplus

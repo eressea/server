@@ -108,7 +108,7 @@ typedef struct combatspell {
 typedef struct spell_names {
   struct spell_names *next;
   const struct locale *lang;
-  struct tnode * tokens;
+  void * tokens;
 } spell_names;
 
 typedef struct sc_mage {

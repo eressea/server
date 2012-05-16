@@ -190,15 +190,15 @@ adjust_coordinates(const faction * f, int *x, int *y, const plane * pl,
     ny -= ursprung_y(f, pl, r);
   }
   if (pl) {
-    nx -= plane_center_x(pl);
-    ny -= plane_center_y(pl);
-  }
-
-  if (pl) {
+    int plx = plane_center_x(pl);
+    int ply = plane_center_y(pl);
     int width = plane_width(pl);
     int height = plane_height(pl);
     int width_2 = width / 2;
     int height_2 = height / 2;
+
+    nx -= plx;
+    ny -= ply;
 
     if (nx < 0)
       nx = (width - (-nx) % width);
@@ -208,12 +208,13 @@ adjust_coordinates(const faction * f, int *x, int *y, const plane * pl,
       ny = (height - (-ny) % height);
     if (ny > height_2)
       ny -= height;
-  }
 
-  assert(!pl || nx <= pl->maxx - plane_center_x(pl));
-  assert(!pl || nx >= pl->minx - plane_center_x(pl));
-  assert(!pl || ny <= pl->maxy - plane_center_y(pl));
-  assert(!pl || ny >= pl->miny - plane_center_y(pl));
+    assert(nx <= pl->maxx - plx);
+    assert(nx >= pl->minx - plx);
+    assert(ny <= pl->maxy - ply);
+    assert(ny >= pl->miny - ply);
+
+  }
 
   *x = nx;
   *y = ny;

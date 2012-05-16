@@ -84,12 +84,12 @@ spell *get_spellfromtoken(sc_mage *mage, const char *name,
     names = (spell_names *)calloc(1, sizeof(spell_names));
     names->next = mage->spellnames;
     names->lang = lang;
-    names->tokens = (tnode *)calloc(1, sizeof(tnode));
+    names->tokens = 0;
     for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
       spell *sp = (spell *) ql_get(ql, qi);
       const char *n = spell_name(sp, lang);
       token.v = sp;
-      addtoken(names->tokens, n, token);
+      addtoken(&names->tokens, n, token);
     }
     mage->spellnames = names;
   }
@@ -105,7 +105,6 @@ spell *find_spellbyid(unsigned int id)
   quicklist *ql;
   int qi;
 
-  assert(id >= 0);
   if (id == 0)
     return NULL;
   for (qi = 0, ql = spells; ql; ql_advance(&ql, &qi, 1)) {

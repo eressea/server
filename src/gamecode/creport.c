@@ -512,7 +512,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
 #ifdef RENDER_CRMESSAGES
     char nrbuffer[1024 * 32];
     nrbuffer[0] = '\0';
-    if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f) >= 0) {
+    if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f) > 0) {
       fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
       fprintf(F, "%d;type\n", hash);
       fwritestr(F, nrbuffer);

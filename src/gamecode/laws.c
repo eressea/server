@@ -1452,7 +1452,7 @@ static void init_prefixnames(void)
         variant var;
         const char *pname =
           locale_string(lang, mkname("prefix", race_prefixes[key]));
-        if (findtoken(&in->names, pname, &var) == E_TOK_NOMATCH || var.i != key) {
+        if (findtoken(in->names, pname, &var) == E_TOK_NOMATCH || var.i != key) {
           var.i = key;
           addtoken(&in->names, pname, var);
           addtoken(&in->names, locale_string(lang, mkname("prefix",
@@ -1500,7 +1500,7 @@ static int prefix_cmd(unit * u, struct order *ord)
     return 0;
   }
 
-  if (findtoken(&in->names, s, &var) == E_TOK_NOMATCH) {
+  if (findtoken(in->names, s, &var) == E_TOK_NOMATCH) {
     return 0;
   } else if (race_prefixes[var.i] == NULL) {
     cmistake(u, ord, 299, MSG_EVENT);

@@ -22,13 +22,13 @@ static void test_transliterate(CuTest * tc)
 static void test_umlaut(CuTest * tc)
 {
   const char * umlauts = "\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig nul */
-  tnode tokens;
+  void * tokens = 0;
   variant id;
   int result;
 
   memset(&tokens, 0, sizeof(tokens));
   /* don't crash on an empty set */
-  result = findtoken(&tokens, "herpderp", &id);
+  result = findtoken(tokens, "herpderp", &id);
   CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
 
   id.i = 1;
@@ -39,24 +39,24 @@ static void test_umlaut(CuTest * tc)
   addtoken(&tokens, umlauts, id);
 
   /* we can find substrings if they are significant */
-  result = findtoken(&tokens, "herp", &id);
+  result = findtoken(tokens, "herp", &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 1, id.i);
 
-  result = findtoken(&tokens, "DERP", &id);
+  result = findtoken(tokens, "DERP", &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 2, id.i);
 
-  result = findtoken(&tokens, umlauts, &id);
+  result = findtoken(tokens, umlauts, &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 3, id.i);
 
   /* transliteration is the real magic */
-  result = findtoken(&tokens, "AEoeUEss", &id);
+  result = findtoken(tokens, "AEoeUEss", &id);
   CuAssertIntEquals(tc, E_TOK_SUCCESS, result);
   CuAssertIntEquals(tc, 3, id.i);
 
-  result = findtoken(&tokens, "herp-a-derp", &id);
+  result = findtoken(tokens, "herp-a-derp", &id);
   CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
 }
 

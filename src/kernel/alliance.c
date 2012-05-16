@@ -122,34 +122,34 @@ static void create_transaction(int type, unit * u, order * ord)
   transactions[type] = tr;
 }
 
-static void cmd_kick(const tnode * tnext, void *data, struct order *ord)
+static void cmd_kick(const void *tnext, struct unit *u, struct order *ord)
 {
-  create_transaction(ALLIANCE_KICK, (unit *) data, ord);
+  create_transaction(ALLIANCE_KICK, u, ord);
 }
 
-static void cmd_leave(const tnode * tnext, void *data, struct order *ord)
+static void cmd_leave(const void *tnext, struct unit *u, struct order *ord)
 {
-  create_transaction(ALLIANCE_LEAVE, (unit *) data, ord);
+  create_transaction(ALLIANCE_LEAVE, u, ord);
 }
 
-static void cmd_transfer(const tnode * tnext, void *data, struct order *ord)
+static void cmd_transfer(const void *tnext, struct unit *u, struct order *ord)
 {
-  create_transaction(ALLIANCE_TRANSFER, (unit *) data, ord);
+  create_transaction(ALLIANCE_TRANSFER, u, ord);
 }
 
-static void cmd_new(const tnode * tnext, void *data, struct order *ord)
+static void cmd_new(const void *tnext, struct unit *u, struct order *ord)
 {
-  create_transaction(ALLIANCE_NEW, (unit *) data, ord);
+  create_transaction(ALLIANCE_NEW, u, ord);
 }
 
-static void cmd_invite(const tnode * tnext, void *data, struct order *ord)
+static void cmd_invite(const void *tnext, struct unit *u, struct order *ord)
 {
-  create_transaction(ALLIANCE_INVITE, (unit *) data, ord);
+  create_transaction(ALLIANCE_INVITE, u, ord);
 }
 
-static void cmd_join(const tnode * tnext, void *data, struct order *ord)
+static void cmd_join(const void *tnext, struct unit *u, struct order *ord)
 {
-  create_transaction(ALLIANCE_JOIN, (unit *) data, ord);
+  create_transaction(ALLIANCE_JOIN, u, ord);
 }
 
 static void perform_kick(void)
@@ -290,7 +290,7 @@ static void execute(const struct syntaxtree *syntax, keyword_t kwd)
       unit *u = *up;
       if (u->number) {
         const struct locale *lang = u->faction->locale;
-        tnode *root = stree_find(syntax, lang);
+        void *root = stree_find(syntax, lang);
         order *ord;
         for (ord = u->orders; ord; ord = ord->next) {
           if (get_keyword(ord) == kwd) {
@@ -321,15 +321,13 @@ void alliance_cmd(void)
   if (stree == NULL) {
     syntaxtree *slang = stree = stree_create();
     while (slang) {
-      /*  struct tnode * root = calloc(sizeof(tnode), 1); */
-      struct tnode *leaf = calloc(sizeof(tnode), 1);
-      /*  add_command(root, leaf, LOC(slang->lang, "alliance"), NULL); */
-      add_command(leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
-      add_command(leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
-      add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
-      add_command(leaf, NULL, LOC(slang->lang, "kick"), &cmd_kick);
-      add_command(leaf, NULL, LOC(slang->lang, "leave"), &cmd_leave);
-      add_command(leaf, NULL, LOC(slang->lang, "command"), &cmd_transfer);
+      void *leaf = 0;
+      add_command(&leaf, NULL, LOC(slang->lang, "new"), &cmd_new);
+      add_command(&leaf, NULL, LOC(slang->lang, "invite"), &cmd_invite);
+      add_command(&leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
+      add_command(&leaf, NULL, LOC(slang->lang, "kick"), &cmd_kick);
+      add_command(&leaf, NULL, LOC(slang->lang, "leave"), &cmd_leave);
+      add_command(&leaf, NULL, LOC(slang->lang, "command"), &cmd_transfer);
       slang->root = leaf;
       slang = slang->next;
     }
@@ -344,10 +342,9 @@ void alliancejoin(void)
   if (stree == NULL) {
     syntaxtree *slang = stree = stree_create();
     while (slang) {
-      struct tnode *root = calloc(sizeof(tnode), 1);
-      struct tnode *leaf = calloc(sizeof(tnode), 1);
-      add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
-      add_command(leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
+      void *leaf = 0;
+      add_command(&leaf, NULL, LOC(slang->lang, "join"), &cmd_join);
+      add_command(&slang->root, leaf, LOC(slang->lang, "alliance"), NULL);
       slang = slang->next;
     }
   }

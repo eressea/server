@@ -129,9 +129,8 @@ attrib *make_atgmcreate(const struct item_type * itype)
   return a;
 }
 
-static void gm_create(const tnode * tnext, void *data, struct order *ord)
+static void gm_create(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   int i;
   attrib *permissions = a_find(u->faction->attribs, &at_permissions);
   if (permissions)
@@ -168,9 +167,8 @@ static boolean has_permission(const attrib * permissions, unsigned int key)
  ** GM: GATE <id> <x> <y>
  ** requires: permission-key "gmgate"
  **/
-static void gm_gate(const tnode * tnext, void *data, struct order *ord)
+static void gm_gate(const void *tnext, struct unit * u, struct order *ord)
 {
-  unit *u = (unit *) data;
   const struct plane *pl = rplane(u->region);
   int id = getid();
   int x = rel_to_abs(pl, u->faction, getint(), 0);
@@ -202,15 +200,14 @@ static void gm_gate(const tnode * tnext, void *data, struct order *ord)
  ** GM: TERRAFORM <x> <y> <terrain>
  ** requires: permission-key "gmterf"
  **/
-static void gm_terraform(const tnode * tnext, void *data, struct order *ord)
+static void gm_terraform(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   const struct plane *p = rplane(u->region);
   int x = rel_to_abs(p, u->faction, getint(), 0);
   int y = rel_to_abs(p, u->faction, getint(), 1);
   const char *c = getstrtoken();
   variant token;
-  tnode *tokens = get_translations(u->faction->locale, UT_TERRAINS);
+  void **tokens = get_translations(u->faction->locale, UT_TERRAINS);
   region *r;
   pnormalize(&x, &y, p);
   r = findregion(x, y);
@@ -225,7 +222,7 @@ static void gm_terraform(const tnode * tnext, void *data, struct order *ord)
       return;
   }
 
-  if (findtoken(tokens, c, &token) != E_TOK_NOMATCH) {
+  if (findtoken(*tokens, c, &token) != E_TOK_NOMATCH) {
     const terrain_type *terrain = (const terrain_type *)token.v;
     terraform_region(r, terrain);
   }
@@ -235,9 +232,8 @@ static void gm_terraform(const tnode * tnext, void *data, struct order *ord)
  ** GM: TELEPORT <unit> <x> <y>
  ** requires: permission-key "gmtele"
  **/
-static void gm_teleport(const tnode * tnext, void *data, struct order *ord)
+static void gm_teleport(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   const struct plane *p = rplane(u->region);
   unit *to = findunit(getid());
   int x = rel_to_abs(p, u->faction, getint(), 0);
@@ -266,9 +262,8 @@ static void gm_teleport(const tnode * tnext, void *data, struct order *ord)
  ** GM: TELL PLANE <string>
  ** requires: permission-key "gmmsgr"
  **/
-static void gm_messageplane(const tnode * tnext, void *data, struct order *ord)
+static void gm_messageplane(const void *tnext, struct unit *gm, struct order *ord)
 {
-  unit *gm = (unit *) data;
   const struct plane *p = rplane(gm->region);
   const char *zmsg = getstrtoken();
   if (p == NULL) {
@@ -302,9 +297,8 @@ static void gm_messageplane(const tnode * tnext, void *data, struct order *ord)
 }
 
 static void
-gm_messagefaction(const tnode * tnext, void *data, struct order *ord)
+gm_messagefaction(const void *tnext, struct unit *gm, struct order *ord)
 {
-  unit *gm = (unit *) data;
   int n = getid();
   faction *f = findfaction(n);
   const char *msg = getstrtoken();
@@ -333,9 +327,8 @@ gm_messagefaction(const tnode * tnext, void *data, struct order *ord)
  ** GM: TELL REGION <x> <y> <string>
  ** requires: permission-key "gmmsgr"
  **/
-static void gm_messageregion(const tnode * tnext, void *data, struct order *ord)
+static void gm_messageregion(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   const struct plane *p = rplane(u->region);
   int x = rel_to_abs(p, u->faction, getint(), 0);
   int y = rel_to_abs(p, u->faction, getint(), 1);
@@ -359,9 +352,8 @@ static void gm_messageregion(const tnode * tnext, void *data, struct order *ord)
  ** GM: KILL UNIT <id> <string>
  ** requires: permission-key "gmkill"
  **/
-static void gm_killunit(const tnode * tnext, void *data, struct order *ord)
+static void gm_killunit(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   const struct plane *p = rplane(u->region);
   unit *target = findunit(getid());
   const char *msg = getstrtoken();
@@ -386,9 +378,8 @@ static void gm_killunit(const tnode * tnext, void *data, struct order *ord)
  ** GM: KILL FACTION <id> <string>
  ** requires: permission-key "gmmsgr"
  **/
-static void gm_killfaction(const tnode * tnext, void *data, struct order *ord)
+static void gm_killfaction(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   int n = getid();
   faction *f = findfaction(n);
   const char *msg = getstrtoken();
@@ -420,9 +411,8 @@ static void gm_killfaction(const tnode * tnext, void *data, struct order *ord)
  ** GM: TELL <unit> <string>
  ** requires: permission-key "gmmsgr"
  **/
-static void gm_messageunit(const tnode * tnext, void *data, struct order *ord)
+static void gm_messageunit(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   const struct plane *p = rplane(u->region);
   unit *target = findunit(getid());
   const char *msg = getstrtoken();
@@ -454,9 +444,8 @@ static void gm_messageunit(const tnode * tnext, void *data, struct order *ord)
  ** GM: GIVE <unit> <int> <itemtype>
  ** requires: permission-key "gmgive"
  **/
-static void gm_give(const tnode * tnext, void *data, struct order *ord)
+static void gm_give(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   unit *to = findunit(getid());
   int num = getint();
   const item_type *itype = finditemtype(getstrtoken(), u->faction->locale);
@@ -489,9 +478,8 @@ static void gm_give(const tnode * tnext, void *data, struct order *ord)
  ** GM: TAKE <unit> <int> <itemtype>
  ** requires: permission-key "gmtake"
  **/
-static void gm_take(const tnode * tnext, void *data, struct order *ord)
+static void gm_take(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   unit *to = findunit(getid());
   int num = getint();
   const item_type *itype = finditemtype(getstrtoken(), u->faction->locale);
@@ -524,9 +512,8 @@ static void gm_take(const tnode * tnext, void *data, struct order *ord)
  ** GM: SKILL <unit> <skill> <tage>
  ** requires: permission-key "gmskil"
  **/
-static void gm_skill(const tnode * tnext, void *data, struct order *ord)
+static void gm_skill(const void *tnext, struct unit *u, struct order *ord)
 {
-  unit *u = (unit *) data;
   unit *to = findunit(getid());
   skill_t skill = findskill(getstrtoken(), u->faction->locale);
   int num = getint();
@@ -552,10 +539,10 @@ static void gm_skill(const tnode * tnext, void *data, struct order *ord)
   }
 }
 
-static tnode g_keys;
-static tnode g_root;
-static tnode g_tell;
-static tnode g_kill;
+static void * g_keys;
+static void * g_root;
+static void * g_tell;
+static void * g_kill;
 
 void register_gmcmd(void)
 {

@@ -233,12 +233,12 @@ locale *nextlocale(const struct locale * lang)
 }
 
 typedef struct lstr {
-  tnode tokens[UT_MAX];
+  void * tokens[UT_MAX];
 } lstr;
 
 static lstr lstrs[MAXLOCALES];
 
-struct tnode *get_translations(const struct locale *lang, int index)
+void ** get_translations(const struct locale *lang, int index)
 {
   assert(lang);
   assert(lang->index < MAXLOCALES

@@ -32,10 +32,10 @@ struct attrib_type at_recruit = {
 
 const struct archetype *find_archetype(const char *s, const struct locale *lang)
 {
-  struct tnode *tokens = get_translations(lang, UT_ARCHETYPES);
+  void **tokens = get_translations(lang, UT_ARCHETYPES);
   variant token;
 
-  if (findtoken(tokens, s, &token) == E_TOK_SUCCESS) {
+  if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
     return (const struct archetype *)token.v;
   }
   return NULL;
@@ -53,7 +53,7 @@ void init_archetypes(void)
   for (; lang; lang = nextlocale(lang)) {
     variant var;
     archetype *arch = archetypes;
-    struct tnode *tokens = get_translations(lang, UT_ARCHETYPES);
+    void *tokens = get_translations(lang, UT_ARCHETYPES);
     for (; arch; arch = arch->next) {
       const char *s1, *s2;
       var.v = arch;
