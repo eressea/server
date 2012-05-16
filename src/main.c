@@ -105,6 +105,23 @@ static int parse_args(int argc, char **argv, int *exitcode)
       }
   }
 
+  switch (verbosity) {
+  case 0:
+    log_stderr = 0;
+    break;
+  case 1:
+    log_stderr = LOG_CPERROR;
+    break;
+  case 2:
+    log_stderr = LOG_CPERROR|LOG_CPWARNING;
+    break;
+  case 3:
+    log_stderr = LOG_CPERROR|LOG_CPWARNING|LOG_CPDEBUG;
+    break;
+  default:
+    log_stderr = LOG_CPERROR|LOG_CPWARNING|LOG_CPDEBUG|LOG_CPINFO;
+    break;
+  }
   if (run_tests) {
     *exitcode = RunAllTests();
     return 1;

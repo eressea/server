@@ -910,7 +910,7 @@ void spawn_dragons(void)
       equip_unit(u, get_equipment("monster_dragon"));
 
       if (verbosity >= 2) {
-        log_printf("%d %s in %s.\n", u->number,
+        log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
             rc_name(u->race, u->number != 1)), regionname(r, NULL));
       }
@@ -985,7 +985,7 @@ void spawn_undead(void)
       name_unit(u);
 
       if (verbosity >= 2) {
-        log_printf("%d %s in %s.\n", u->number,
+        log_printf(stdout, "%d %s in %s.\n", u->number,
           LOC(default_locale,
             rc_name(u->race, u->number != 1)), regionname(r, NULL));
       }
