@@ -377,6 +377,7 @@ boolean is_repeated(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
+  const char * s;
   param_t param;
 
   switch (kwd) {
@@ -405,11 +406,14 @@ boolean is_repeated(const order * ord)
     parser_pushstate();
     init_tokens(ord);
     skip_token();
-    param = getparam(lang);
-    parser_popstate();
-
-    if (param == P_SHIP)
-      return true;
+    s = getstrtoken();
+    if (s[0]>'9') {
+      param = findparam(s, lang);
+      parser_popstate();
+      if (param == P_SHIP) {
+        return true;
+      }
+    }
     break;
 
   case K_MAKE:
@@ -421,11 +425,12 @@ boolean is_repeated(const order * ord)
     parser_pushstate();
     init_tokens(ord);           /* initialize token-parser */
     skip_token();
-    param = getparam(lang);
-    parser_popstate();
-
-    if (param != P_TEMP)
-      return true;
+    s = getstrtoken();
+    if (s[0]>'9') {
+      param = findparam(s, lang);
+      parser_popstate();
+      return param != P_TEMP;
+    }
     break;
   default:
     return false;
