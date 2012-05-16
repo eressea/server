@@ -688,7 +688,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
       f = u->faction;
       fset(f, FFL_ISNEW);
       f->alliance = nextf->allies;
-      log_printf("New faction (%s), %s at %s\n", itoa36(f->no),
+      log_printf(stdout, "New faction (%s), %s at %s\n", itoa36(f->no),
         f->email, regionname(r, NULL));
       if (f->subscription) {
         sql_print(

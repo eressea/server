@@ -21,6 +21,8 @@ without prior permission by the authors of Eressea.
 
 /* TODO: set from external function */
 int log_flags = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING | LOG_CPDEBUG;
+int log_stderr = LOG_FLUSH | LOG_CPERROR | LOG_CPWARNING;
+
 #ifdef STDIO_CP
 static int stdio_codepage = STDIO_CP;
 #else
@@ -37,9 +39,9 @@ void log_flush(void)
 void log_puts(const char *str)
 {
   fflush(stdout);
-  if (!logfile)
-    logfile = stderr;
-  fputs(str, logfile);
+  if (logfile) {
+    fputs(str, logfile);
+  }
 }
 
 static int
@@ -68,47 +70,6 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
   return 0;
 }
 
-void log_printf(const char *format, ...)
-{
-  va_list marker;
-  if (!logfile)
-    logfile = stderr;
-  va_start(marker, format);
-  vfprintf(logfile, format, marker);
-  va_end(marker);
-  if (log_flags & LOG_FLUSH) {
-    log_flush();
-  }
-}
-
-void log_stdio(FILE * io, const char *format, ...)
-{
-  va_list marker;
-  if (!logfile)
-    logfile = stderr;
-  va_start(marker, format);
-  if (stdio_codepage) {
-    char buffer[MAXLENGTH];
-    char converted[MAXLENGTH];
-
-    vsnprintf(buffer, sizeof(buffer), format, marker);
-    if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage) == 0) {
-      fputs(converted, stderr);
-    } else {
-      /* fall back to non-converted output */
-      va_end(marker);
-      va_start(marker, format);
-      vfprintf(io, format, marker);
-    }
-  } else {
-    vfprintf(io, format, marker);
-  }
-  va_end(marker);
-  if (log_flags & LOG_FLUSH) {
-    log_flush();
-  }
-}
-
 void log_open(const char *filename)
 {
   if (logfile)
@@ -118,7 +79,7 @@ void log_open(const char *filename)
     /* Get UNIX-style time and display as number and string. */
     time_t ltime;
     time(&ltime);
-    log_printf("===\n=== Logfile started at %s===\n", ctime(&ltime));
+    fprintf(logfile, "===\n=== Logfile started at %s===\n", ctime(&ltime));
   }
 }
 
@@ -130,9 +91,9 @@ void log_close(void)
     /* Get UNIX-style time and display as number and string. */
     time_t ltime;
     time(&ltime);
-    log_printf("===\n=== Logfile closed at %s===\n\n", ctime(&ltime));
+    fprintf(logfile, "===\n=== Logfile closed at %s===\n\n", ctime(&ltime));
+    fclose(logfile);
   }
-  fclose(logfile);
   logfile = 0;
 }
 
@@ -157,175 +118,165 @@ static int check_dupe(const char *format, const char *type)
   return 0;
 }
 
+static void _log_write(FILE * stream, int codepage, const char * prefix, const char *format, va_list args)
+{
+  if (stream) {
+    fprintf(stream, "%s: ", prefix);
+    if (codepage) {
+      char buffer[MAXLENGTH];
+      char converted[MAXLENGTH];
+      
+      vsnprintf(buffer, sizeof(buffer), format, args);
+      if (cp_convert(buffer, converted, MAXLENGTH, codepage) == 0) {
+        fputs(converted, stream);
+      } else {
+        /* fall back to non-converted output */
+        vfprintf(stream, format, args);
+      }
+    } else {
+      vfprintf(stream, format, args);
+    }
+  }
+}
+
 void _log_debug(const char *format, ...)
 {
-  if (log_flags & LOG_CPDEBUG) {
-    int dupe = check_dupe(format, "DEBUG");
+  const char * prefix = "DEBUG";
+  const int mask = LOG_CPDEBUG;
 
-    fflush(stdout);
-    if (!logfile)
-      logfile = stderr;
-    if (logfile != stderr) {
-      va_list marker;
-      fputs("DEBUG: ", logfile);
-      va_start(marker, format);
-      vfprintf(logfile, format, marker);
-      va_end(marker);
-    }
+  /* write to the logfile, always */
+  if (logfile && (log_flags & mask)) {
+    va_list args;
+    va_start(args, format);
+    _log_write(logfile, 0, prefix, format, args);
+    va_end(args);
+  }
+
+  /* write to stderr, if that's not the logfile already */
+  if (logfile!=stderr && (log_stderr & mask)) {
+    int dupe = check_dupe(format, prefix);
     if (!dupe) {
-      va_list marker;
-      fputs("DEBUG: ", stderr);
-      va_start(marker, format);
-      if (stdio_codepage) {
-        char buffer[MAXLENGTH];
-        char converted[MAXLENGTH];
-
-        vsnprintf(buffer, sizeof(buffer), format, marker);
-        if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage) == 0) {
-          fputs(converted, stderr);
-        } else {
-          /* fall back to non-converted output */
-          va_end(marker);
-          va_start(marker, format);
-          vfprintf(stderr, format, marker);
-        }
-      } else {
-        vfprintf(stderr, format, marker);
-      }
-      va_end(marker);
+      va_list args;
+      va_start(args, format);
+      _log_write(stderr, stdio_codepage, prefix, format, args);
+      va_end(args);
     }
-    if (log_flags & LOG_FLUSH) {
-      log_flush();
-    }
+  }
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
   }
 }
 
 void _log_warn(const char *format, ...)
 {
-  if (log_flags & LOG_CPWARNING) {
-    int dupe = check_dupe(format, "WARNING");
+  const char * prefix = "WARNING";
+  const int mask = LOG_CPWARNING;
 
-    fflush(stdout);
-    if (!logfile)
-      logfile = stderr;
-    if (logfile != stderr) {
-      va_list marker;
-      fputs("WARNING: ", logfile);
-      va_start(marker, format);
-      vfprintf(logfile, format, marker);
-      va_end(marker);
-    }
+  /* write to the logfile, always */
+  if (logfile && (log_flags & mask)) {
+    va_list args;
+    va_start(args, format);
+    _log_write(logfile, 0, prefix, format, args);
+    va_end(args);
+  }
+
+  /* write to stderr, if that's not the logfile already */
+  if (logfile!=stderr && (log_stderr & mask)) {
+    int dupe = check_dupe(format, prefix);
     if (!dupe) {
-      va_list marker;
-      fputs("WARNING: ", stderr);
-      va_start(marker, format);
-      if (stdio_codepage) {
-        char buffer[MAXLENGTH];
-        char converted[MAXLENGTH];
-
-        vsnprintf(buffer, sizeof(buffer), format, marker);
-        if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage) == 0) {
-          fputs(converted, stderr);
-        } else {
-          /* fall back to non-converted output */
-          va_end(marker);
-          va_start(marker, format);
-          vfprintf(stderr, format, marker);
-        }
-      } else {
-        vfprintf(stderr, format, marker);
-      }
-      va_end(marker);
+      va_list args;
+      va_start(args, format);
+      _log_write(stderr, stdio_codepage, prefix, format, args);
+      va_end(args);
     }
-    if (log_flags & LOG_FLUSH) {
-      log_flush();
-    }
+  }
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
   }
 }
 
 void _log_error(const char *format, ...)
 {
-  int dupe = check_dupe(format, "ERROR");
-  fflush(stdout);
-  if (!logfile)
-    logfile = stderr;
+  const char * prefix = "ERROR";
+  const int mask = LOG_CPERROR;
 
-  if (logfile != stderr) {
-    va_list marker;
-    fputs("ERROR: ", logfile);
-    va_start(marker, format);
-    vfprintf(logfile, format, marker);
-    va_end(marker);
+  /* write to the logfile, always */
+  if (logfile && (log_flags & mask)) {
+    va_list args;
+    va_start(args, format);
+    _log_write(logfile, 0, prefix, format, args);
+    va_end(args);
   }
-  if (!dupe) {
-    if (logfile != stderr) {
-      if (log_flags & LOG_CPERROR) {
-        va_list marker;
 
-        fputs("ERROR: ", stderr);
-        va_start(marker, format);
-        if (stdio_codepage) {
-          char buffer[MAXLENGTH];
-          char converted[MAXLENGTH];
-
-          vsnprintf(buffer, sizeof(buffer), format, marker);
-          if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage) == 0) {
-            fputs(converted, stderr);
-          } else {
-            /* fall back to non-converted output */
-            va_end(marker);
-            va_start(marker, format);
-            vfprintf(stderr, format, marker);
-          }
-        } else {
-          vfprintf(stderr, format, marker);
-        }
-        va_end(marker);
-      }
-      log_flush();
+  /* write to stderr, if that's not the logfile already */
+  if (logfile!=stderr && (log_stderr & mask)) {
+    int dupe = check_dupe(format, prefix);
+    if (!dupe) {
+      va_list args;
+      va_start(args, format);
+      _log_write(stderr, stdio_codepage, prefix, format, args);
+      va_end(args);
     }
+  }
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
   }
 }
 
-static unsigned int logfile_level = 0;
-static unsigned int stderr_level = 1;
-
-void _log_info(unsigned int level, const char *format, ...)
+void _log_info(const char *format, ...)
 {
-  va_list marker;
-  fflush(stdout);
-  if (!logfile)
-    logfile = stderr;
-  if (logfile_level >= level) {
-    fprintf(logfile, "INFO[%u]: ", level);
-    va_start(marker, format);
-    vfprintf(logfile, format, marker);
-    va_end(marker);
-    if (logfile != stderr) {
-      if (stderr_level >= level) {
-        fprintf(stderr, "INFO[%u]: ", level);
-        va_start(marker, format);
-        if (stdio_codepage) {
-          char buffer[MAXLENGTH];
-          char converted[MAXLENGTH];
+  const char * prefix = "INFO";
+  const int mask = LOG_CPINFO;
 
-          vsnprintf(buffer, sizeof(buffer), format, marker);
-          if (cp_convert(buffer, converted, MAXLENGTH, stdio_codepage) == 0) {
-            fputs(converted, stderr);
-          } else {
-            /* fall back to non-converted output */
-            va_end(marker);
-            va_start(marker, format);
-            vfprintf(stderr, format, marker);
-          }
-        } else {
-          vfprintf(stderr, format, marker);
-        }
-        va_end(marker);
-      }
-      if (log_flags & LOG_FLUSH) {
-        log_flush();
-      }
+  /* write to the logfile, always */
+  if (logfile && (log_flags & mask)) {
+    va_list args;
+    va_start(args, format);
+    _log_write(logfile, 0, prefix, format, args);
+    va_end(args);
+  }
+
+  /* write to stderr, if that's not the logfile already */
+  if (logfile!=stderr && (log_stderr & mask)) {
+    int dupe = check_dupe(format, prefix);
+    if (!dupe) {
+      va_list args;
+      va_start(args, format);
+      _log_write(stderr, stdio_codepage, prefix, format, args);
+      va_end(args);
     }
   }
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
+  }
 }
+
+void log_printf(FILE * io, const char *format, ...)
+{
+  const char * prefix = "INFO";
+  const int mask = LOG_CPINFO;
+
+  /* write to the logfile, always */
+  if (logfile && (log_flags & mask)) {
+    int codepage = (logfile==stderr || logfile==stdout) ? stdio_codepage : 0;
+    va_list args;
+    va_start(args, format);
+    _log_write(logfile, codepage, prefix, format, args);
+    va_end(args);
+  }
+
+  /* write to io, if that's not the logfile already */
+  if (logfile!=io && (log_stderr & mask)) {
+    int dupe = check_dupe(format, prefix);
+    if (!dupe) {
+      va_list args;
+      va_start(args, format);
+      _log_write(io, stdio_codepage, prefix, format, args);
+      va_end(args);
+    }
+  }
+  if (log_flags & LOG_FLUSH) {
+    log_flush();
+  }
+}
+

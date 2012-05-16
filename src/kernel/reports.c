@@ -1521,7 +1521,7 @@ int write_reports(faction * f, time_t ltime)
 
     errno = 0;
     if (verbosity >= 2) {
-      log_stdio(stdout, "Reports for %s:", factionname(f));
+      log_printf(stdout, "Reports for %s:", factionname(f));
     }
     for (; rtype != NULL; rtype = rtype->next) {
       if (f->options & rtype->flag) {
@@ -1660,7 +1660,7 @@ int reports(void)
   char path[MAX_PATH];
 
   if (verbosity >= 1) {
-    log_stdio(stdout, "Writing reports for turn %d:", turn);
+    log_printf(stdout, "Writing reports for turn %d:", turn);
   }
   nmr_warnings();
   report_donations();
@@ -2207,7 +2207,7 @@ static void log_orders(const struct message *msg)
     if (msg->type->types[i]->copy == &var_copy_order) {
       const char *section = nr_section(msg);
       nr_render(msg, f ? f->locale : default_locale, buffer, sizeof(buffer), f);
-      log_printf("MESSAGE [%s]: %s\n", section, buffer);
+      log_debug("MESSAGE [%s]: %s\n", section, buffer);
       break;
     }
   }

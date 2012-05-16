@@ -611,7 +611,7 @@ int count_skill(faction * f, skill_t sk)
   return n;
 }
 
-int verbosity = 0;
+int verbosity = 1;
 
 FILE *debug;
 
@@ -743,7 +743,7 @@ void verify_data(void)
       if (u->number > UNIT_MAXSIZE) {
         if (lf != f->no) {
           lf = f->no;
-          log_stdio(stdout, "Partei %s:\n", factionid(f));
+          log_printf(stdout, "Partei %s:\n", factionid(f));
         }
         log_warning(("Einheit %s hat %d Personen\n", unitid(u), u->number));
       }
@@ -2364,7 +2364,7 @@ void remove_empty_factions(void)
       while (ur && ur->id != 0)
         ur = ur->next;
       if (verbosity >= 2)
-        log_stdio(stdout, "\t%s\n", factionname(f));
+        log_printf(stdout, "\t%s\n", factionname(f));
 
       /* Einfach in eine Datei schreiben und später vermailen */
 

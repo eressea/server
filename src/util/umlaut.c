@@ -203,12 +203,13 @@ void freetokens(struct tnode *root)
   }
 }
 
-int findtoken(const tnode * tk, const char *str, variant * result)
+int findtoken(const tnode * tk, const char *key, variant * result)
 {
+  const char * str = key;
   assert(tk);
-  if (!str || *str == 0)
+  if (!str || *str == 0) {
     return E_TOK_NOMATCH;
-
+  }
   do {
     int index;
     const tref *ref;
@@ -218,6 +219,7 @@ int findtoken(const tnode * tk, const char *str, variant * result)
 
     if (ret != 0) {
       /* encoding is broken. youch */
+      log_debug("findtoken | encoding error in '%s'\n", key);
       return E_TOK_NOMATCH;
     }
 #if NODEHASHSIZE == 8
@@ -229,13 +231,16 @@ int findtoken(const tnode * tk, const char *str, variant * result)
     while (ref && ref->ucs != ucs)
       ref = ref->nexthash;
     str += len;
-    if (!ref)
+    if (!ref) {
+      log_debug("findtoken | token not found '%s'\n", key);
       return E_TOK_NOMATCH;
+    }
     tk = ref->node;
   } while (*str);
   if (tk) {
     *result = tk->id;
     return E_TOK_SUCCESS;
   }
+  log_debug("findtoken | token not found '%s'\n", key);
   return E_TOK_NOMATCH;
 }

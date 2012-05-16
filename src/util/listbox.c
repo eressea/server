@@ -82,21 +82,23 @@ list_selection *do_selection(list_selection * sel, const char *title,
   int i;
   int height = 0, width = (int)strlen(title) + 8;
   for (s = sel; s; s = s->next) {
-    if ((int)strlen(s->str) > width)
+    if ((int)strlen(s->str) > width) {
       width = (int)strlen(s->str);
+    }
     ++height;
-    if (verbosity >= 5)
-      log_info((1, "s %s w %d h %d\n", s->str, width, height));
+    if (verbosity >= 5) {
+      log_printf(stdout, "s %s w %d h %d\n", s->str, width, height);
+    }
   }
   if (height == 0 || width == 0)
-    return NULL;
+    return 0;
   if (width + 3 > SX)
     width = SX - 4;
   if (height + 2 > SY)
     height = SY - 2;
 
   if (verbosity >= 5)
-    log_info((1, "w %d h %d\n", width, height));
+    log_printf(stdout, "w %d h %d\n", width, height);
 
   wn =
     newwin(height + 2, width + 4, (SY - height - 2) / 2, (SX - width - 4) / 2);

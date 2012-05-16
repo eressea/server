@@ -3998,7 +3998,7 @@ void process(void)
       printf("- Step %u\n", prio);
     while (proc && proc->priority == prio) {
       if (proc->name && verbosity >= 1)
-        log_stdio(stdout, " - %s\n", proc->name);
+        log_printf(stdout, " - %s\n", proc->name);
       proc = proc->next;
     }
 

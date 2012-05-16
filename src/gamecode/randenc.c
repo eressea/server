@@ -1137,7 +1137,7 @@ static void demon_skillchanges(void)
             }
             if (sv->old > sv->level) {
               if (verbosity >= 3) {
-                log_printf("%s dropped from %u to %u:%u in %s\n",
+                log_printf(stdout, "%s dropped from %u to %u:%u in %s\n",
                   unitname(u), sv->old, sv->level, sv->weeks, skillname(sv->id,
                     NULL));
               }
