@@ -137,7 +137,6 @@ static void game_init(void)
   register_cr();
   register_xr();
 
-  debug_language("locales.log");
   register_names();
   register_resources();
   register_buildings();

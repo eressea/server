@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+#define MAXLOCALES 3
+
   struct locale;
 
 /** managing multiple locales: **/
@@ -34,13 +36,12 @@ extern "C" {
   extern const char *locale_getstring(const struct locale *lang,
     const char *key);
   extern const char *locale_string(const struct locale *lang, const char *key); /* does fallback */
-  extern unsigned int locale_hashkey(const struct locale *lang);
+  extern unsigned int locale_index(const struct locale *lang);
   extern const char *locale_name(const struct locale *lang);
 
   extern const char *mkname(const char *namespc, const char *key);
   extern char *mkname_buf(const char *namespc, const char *key, char *buffer);
 
-  extern void debug_language(const char *log);
   extern void make_locales(const char *str);
 
 #define LOC(lang, s) (lang?locale_string(lang, s):s)

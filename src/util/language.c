@@ -34,10 +34,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 locale *default_locale;
 locale *locales;
 
-unsigned int locale_hashkey(const locale * lang)
+unsigned int locale_index(const locale * lang)
 {
   assert(lang);
-  return lang->hashkey;
+  return lang->index;
 }
 
 locale *find_locale(const char *name)
@@ -49,7 +49,7 @@ locale *find_locale(const char *name)
   return l;
 }
 
-static int nextlocaleindex = 0;
+static unsigned int nextlocaleindex = 0;
 
 locale *make_locale(const char *name)
 {
@@ -93,14 +93,6 @@ void make_locales(const char *str)
       str = ++tok;
     }
   }
-}
-
-static FILE *s_debug = NULL;
-static char *s_logfile = NULL;
-
-void debug_language(const char *log)
-{
-  s_logfile = strdup(log);
 }
 
 const char *locale_getstring(const locale * lang, const char *key)
@@ -156,21 +148,12 @@ const char *locale_string(const locale * lang, const char *key)
       find = find->nexthash;
     }
     if (!find) {
-      const char *s = key;
       log_warning(("missing translation for \"%s\" in locale %s\n", key,
           lang->name));
       if (lang != default_locale) {
-        s = locale_string(default_locale, key);
+        return locale_string(default_locale, key);
       }
-      if (s_logfile) {
-        s_debug = s_debug ? s_debug : fopen(s_logfile, "w");
-        if (s_debug) {
-          fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
-          fflush(s_debug);
-          locale_setstring((struct locale *)lang, key, s);
-        }
-      }
-      return s;
+      return 0;
     }
     return find->str;
   }

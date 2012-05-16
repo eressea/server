@@ -3238,9 +3238,21 @@ void kernel_init(void)
   }
 }
 
+static order * defaults[MAXLOCALES];
+
 order *default_order(const struct locale *lang)
 {
-  return parse_order(locale_string(lang, "defaultorder"), lang);
+  int i = locale_index(lang);
+  order *result = 0;
+  assert(i<MAXLOCALES);
+  result = defaults[i];
+  if (!result) {
+    const char * str = locale_string(lang, "defaultorder");
+    if (str) {
+      result = defaults[i] = parse_order(str, lang);
+    }
+  }
+  return result ? copy_order(result) : 0;
 }
 
 int entertainmoney(const region * r)
@@ -3284,10 +3296,17 @@ int markets_module(void)
  */
 void free_gamedata(void)
 {
+  int i;
   free_units();
   free_regions();
   free_borders();
 
+  for (i=0;i!=MAXLOCALES;++i) {
+    if (defaults[i]) {
+      free_order(defaults[i]);
+      defaults[i] = 0;
+    }
+  }
   while (alliances) {
     alliance *al = alliances;
     alliances = al->next;
