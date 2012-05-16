@@ -48,7 +48,7 @@ message *cinfo_ship(const void *obj, typ_t typ, const curse * c, int self)
     msg = msg_message("curseinfo::ship_unknown", "id", c->no);
   }
   if (msg == NULL) {
-    log_error(("There is no curseinfo for %s.\n", c->type->cname));
+    log_error("There is no curseinfo for %s.\n", c->type->cname);
   }
   return msg;
 }

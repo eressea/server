@@ -490,7 +490,7 @@ static order *monster_seeks_target(region * r, unit * u)
 
   /* TODO: prüfen, ob target überhaupt noch existiert... */
   if (!target) {
-    log_error(("Monster '%s' hat kein Ziel!\n", unitname(u)));
+    log_error("Monster '%s' hat kein Ziel!\n", unitname(u));
     return NULL;                /* this is a bug workaround! remove!! */
   }
 

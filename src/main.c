@@ -243,9 +243,8 @@ void locale_init(void)
   setlocale(LC_CTYPE, "");
   setlocale(LC_NUMERIC, "C");
   if (towlower(0xC4) != 0xE4) { /* &Auml; => &auml; */
-    log_error(
-      ("Umlaut conversion is not working properly. Wrong locale? LANG=%s\n",
-        getenv("LANG")));
+    log_error("Umlaut conversion is not working properly. Wrong locale? LANG=%s\n",
+        getenv("LANG"));
   }
 }
 
@@ -274,7 +273,7 @@ int main(int argc, char **argv)
 
   err = eressea_init();
   if (err) {
-    log_error(("initialization failed with code %d\n", err));
+    log_error("initialization failed with code %d\n", err);
     return err;
   }
   register_races();
@@ -289,7 +288,7 @@ int main(int argc, char **argv)
 
   err = eressea_run(luafile, entry_point);
   if (err) {
-    log_error(("server execution failed with code %d\n", err));
+    log_error("server execution failed with code %d\n", err);
     return err;
   }
 #ifdef MSPACES
