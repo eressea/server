@@ -1497,7 +1497,7 @@ param_t findparam(const char *s, const struct locale * lang)
   void **tokens = get_translations(lang, UT_PARAMS);
   int i;
   param_t result = NOPARAM;
-  void * match;
+  const void * match;
   char buffer[64];
   char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
   critbit_tree *cb = (critbit_tree *)*tokens;
