@@ -168,7 +168,7 @@ static void _log_write(FILE * stream, int codepage, const char * prefix, const c
   }
 }
 
-void _log_debug(const char *format, ...)
+void log_debug(const char *format, ...)
 {
   const char * prefix = "DEBUG";
   const int mask = LOG_CPDEBUG;
