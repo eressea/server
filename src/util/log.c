@@ -31,6 +31,7 @@ static int stdio_codepage = 0;
 static FILE *logfile;
 
 #define MAXLENGTH 4096          /* because I am lazy, CP437 output is limited to this many chars */
+#define LOG_MAXBACKUPS 5
 void log_flush(void)
 {
   fflush(logfile);
@@ -70,10 +71,38 @@ cp_convert(const char *format, char *buffer, size_t length, int codepage)
   return 0;
 }
 
+void log_rotate(const char *filename, int maxindex)
+{
+  int n;
+  if (access(filename, R_OK)==0) {
+    char buffer[2][MAX_PATH];
+    int src = 1;
+    assert(strlen(filename)<sizeof(buffer[0])-4);
+    for(n=0;n<maxindex;++n) {
+      sprintf(buffer[0], "%s.%d", filename, n);
+      if (access(filename, R_OK)!=0) {
+        break;
+      }
+    }
+    if (access(buffer[0], R_OK)==0) {
+      unlink(buffer[0]);
+    }
+    while(n--) {
+      int dst = 1-src;
+      sprintf(buffer[src], "%s.%d", filename, n);
+      rename(buffer[src], buffer[dst]);
+      src=dst;
+    }
+    rename(filename, buffer[1-src]);
+  }
+}
+
 void log_open(const char *filename)
 {
-  if (logfile)
+  if (logfile) {
     log_close();
+  }
+  log_rotate(filename, LOG_MAXBACKUPS);
   logfile = fopen(filename, "a");
   if (logfile) {
     /* Get UNIX-style time and display as number and string. */
