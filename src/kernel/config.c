@@ -750,9 +750,9 @@ void verify_data(void)
       }
     }
     if (f->no != 0 && ((mage > 3 && f->race != new_race[RC_ELF]) || mage > 4))
-      log_error(("Partei %s hat %d Magier.\n", factionid(f), mage));
+      log_error("Partei %s hat %d Magier.\n", factionid(f), mage);
     if (alchemist > 3)
-      log_error(("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist));
+      log_error("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist);
   }
 #endif
 }
@@ -1224,8 +1224,7 @@ int count_all(const faction * f)
     }
   }
   if (f->num_people != n) {
-    log_error(("# of people in %s is != num_people: %d should be %d.\n",
-        factionid(f), f->num_people, n));
+    log_error("# of people in %s is != num_people: %d should be %d.\n", factionid(f), f->num_people, n);
   }
 #endif
   return f->num_people;
@@ -2130,7 +2129,7 @@ static void init_locale(const struct locale *lang)
       cb_new_kv(str, &i, sizeof(int), buffer);
       cb_insert(cb, buffer, strlen(str)+1+sizeof(int));
     } else {
-      log_error(("could not transliterate param '%s'\n", key));
+      log_error("could not transliterate param '%s'\n", key);
     }
   }
 #ifdef PTRIES

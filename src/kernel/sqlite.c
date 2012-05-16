@@ -233,8 +233,7 @@ int db_update_factions(sqlite3 * db, boolean force)
 
   for (f = factions; f; f = f->next) {
     if (!fval(f, FFL_MARK)) {
-      log_error(("%s (sub=%d, email=%s) has no entry in the database\n",
-          factionname(f), f->subscription, f->email));
+      log_error("%s (sub=%d, email=%s) has no entry in the database\n", factionname(f), f->subscription, f->email);
     } else {
       freset(f, FFL_MARK);
     }

@@ -394,7 +394,7 @@ int fctr_handle(struct trigger *tp, void *data)
   tolua_pushusertype(L, &evt, TOLUA_CAST "event");
   if (lua_pcall(L, 2, 0, 0) != 0) {
     const char *error = lua_tostring(L, -1);
-    log_error(("event (%s): %s\n", unitname(u), error));
+    log_error("event (%s): %s\n", unitname(u), error);
     lua_pop(L, 1);
     tolua_error(L, TOLUA_CAST "event handler call failed", NULL);
   }
@@ -462,7 +462,7 @@ static void unit_castspell(unit * u, const char *name)
     spell *sp = (spell *) ql_get(ql, qi);
     if (strcmp(name, sp->sname) == 0) {
       if (!sp->cast) {
-        log_error(("spell '%s' has no function.\n", sp->sname));
+        log_error("spell '%s' has no function.\n", sp->sname);
       } else {
         castorder co;
         create_castorder(&co, u, 0, sp, u->region, sp->level, sp->level * MagicPower(), 0, 0, 0);
@@ -487,7 +487,7 @@ static int unit_addspell(unit * u, const char *name)
   spell *spadd = find_spell(name);
 
   if (!spadd) {
-    log_error(("spell %s could not be found\n", name));
+    log_error("spell %s could not be found\n", name);
     return EINVAL;
   } else {
     quicklist **starget = get_spelllist(m, u->faction);

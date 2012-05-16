@@ -63,7 +63,7 @@ int get_resource(const unit * u, const resource_type * rtype)
     return get_spellpoints(u);
   if (rtype == oldresourcetype[R_PERMAURA])
     return max_spellpoints(u->region, u);
-  log_error(("trying to get unknown resource '%s'.\n", rtype->_name[0]));
+  log_error("trying to get unknown resource '%s'.\n", rtype->_name[0]);
   return 0;
 }
 

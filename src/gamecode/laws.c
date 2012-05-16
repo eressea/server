@@ -2132,8 +2132,7 @@ static int email_cmd(unit * u, struct order *ord)
   } else {
     faction *f = u->faction;
     if (set_email(&f->email, (const char *)s) != 0) {
-      log_error(("Invalid email address for faction %s: %s\n",
-          itoa36(f->no), s));
+      log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), s);
       ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", s));
     } else {
       ADDMSG(&f->msgs, msg_message("changemail", "value", f->email));
@@ -3826,8 +3825,7 @@ static int use_cmd(unit * u, struct order *ord)
     int i = use_item(u, itype, n, ord);
     assert(i <= 0 || !"use_item should not return positive values.");
     if (i > 0) {
-      log_error(("use_item returned a value>0 for %s\n",
-          resourcename(itype->rtype, 0)));
+      log_error("use_item returned a value>0 for %s\n", resourcename(itype->rtype, 0));
     }
   } else {
     cmistake(u, ord, 43, MSG_PRODUCE);

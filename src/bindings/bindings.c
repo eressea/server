@@ -71,7 +71,7 @@ without prior permission by the authors of Eressea.
 int log_lua_error(lua_State * L)
 {
   const char *error = lua_tostring(L, -1);
-  log_error(("LUA call failed.\n%s\n", error));
+  log_error("LUA call failed.\n%s\n", error);
   lua_pop(L, 1);
   return 1;
 }

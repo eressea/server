@@ -160,7 +160,7 @@ static const char *getbuf_latin1(FILE * F)
         if (ret > 0)
           cp += ret;
         else {
-          log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+          log_error("input data was not iso-8859-1! assuming utf-8\n");
           return NULL;
         }
 

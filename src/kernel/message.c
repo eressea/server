@@ -90,7 +90,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     ord = u->thisorder;
 
   if (!mtype) {
-    log_error(("trying to create message of unknown type \"%s\"\n", name));
+    log_error("trying to create message of unknown type \"%s\"\n", name);
     return msg_message("missing_feedback", "unit region command name", u,
       u->region, ord, name);
   }
@@ -126,8 +126,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         assert(!"unknown variant type");
       }
     } else {
-      log_error(("invalid parameter %s for message type %s\n", paramname,
-          mtype->name));
+      log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
       assert(!"program aborted.");
     }
     while (*ic && !isalnum(*ic))
@@ -180,8 +179,7 @@ message *msg_message(const char *name, const char *sig, ...)
         assert(!"unknown variant type");
       }
     } else {
-      log_error(("invalid parameter %s for message type %s\n", paramname,
-          mtype->name));
+      log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
       assert(!"program aborted.");
     }
     while (*ic && !isalnum(*ic))

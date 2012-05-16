@@ -236,8 +236,7 @@ void register_special_direction(const char *name)
         dir_name_lookup = dl;
       }
     } else {
-      log_error(("no translation for spec_direction '%s' in locale '%s'\n",
-          name, locale_name(lang)));
+      log_error("no translation for spec_direction '%s' in locale '%s'\n", name, locale_name(lang));
     }
   }
 }
@@ -266,7 +265,7 @@ static int a_readdirection(attrib * a, void *owner, struct storage *store)
       }
     }
     if (dl == NULL) {
-      log_error(("unknown spec_direction '%s'\n", lbuf));
+      log_error("unknown spec_direction '%s'\n", lbuf);
       assert(!"not implemented");
     }
   } else {
@@ -942,10 +941,9 @@ region *new_region(int x, int y, struct plane *pl, unsigned int uid)
   r = rfindhash(x, y);
 
   if (r) {
-    log_error(("duplicate region discovered: %s(%d,%d)\n", regionname(r, NULL),
-        x, y));
+    log_error("duplicate region discovered: %s(%d,%d)\n", regionname(r, NULL), x, y);
     if (r->units)
-      log_error(("duplicate region contains units\n"));
+      log_error("duplicate region contains units\n");
     return r;
   }
   r = calloc(1, sizeof(region));

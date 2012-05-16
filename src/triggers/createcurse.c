@@ -73,7 +73,7 @@ static int createcurse_handle(trigger * t, void *data)
     create_curse(td->mage, &td->target->attribs,
       td->type, td->vigour, td->duration, td->effect, td->men);
   } else {
-    log_error(("could not perform createcurse::handle()\n"));
+    log_error("could not perform createcurse::handle()\n");
   }
   unused(data);
   return 0;

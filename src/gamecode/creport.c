@@ -527,8 +527,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
       if (crbuffer[0])
         fputs(crbuffer, F);
     } else {
-      log_error(("could not render cr-message %p: %s\n", m->msg,
-          m->msg->type->name));
+      log_error("could not render cr-message %p: %s\n", m->msg, m->msg->type->name);
     }
     if (printed) {
       unsigned int ihash = hash % MTMAXHASH;

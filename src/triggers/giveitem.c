@@ -66,7 +66,7 @@ static int giveitem_handle(trigger * t, void *data)
   if (td->u && td->u->number) {
     i_change(&td->u->items, td->itype, td->number);
   } else {
-    log_error(("could not perform giveitem::handle()\n"));
+    log_error("could not perform giveitem::handle()\n");
   }
   unused(data);
   return 0;

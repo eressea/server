@@ -107,7 +107,7 @@ nrt_register(const struct message_type *mtype, const struct locale *lang,
     nrt = nrt->next;
   }
   if (nrt) {
-    log_error(("duplicate message-type %s\n", mtype->name));
+    log_error("duplicate message-type %s\n", mtype->name);
     assert(!nrt || !"trying to register same nr-type twice");
   } else {
     int i;
@@ -151,7 +151,7 @@ nr_render(const struct message *msg, const struct locale *lang, char *buffer,
     if (m) {
       return strlcpy((char *)buffer, m, size);
     } else {
-      log_error(("Couldn't render message %s\n", nrt->mtype->name));
+      log_error("Couldn't render message %s\n", nrt->mtype->name);
     }
   }
   if (size > 0 && buffer)

@@ -67,7 +67,7 @@ static int changefaction_handle(trigger * t, void *data)
   if (td->unit && td->faction) {
     u_setfaction(td->unit, td->faction);
   } else {
-    log_error(("could not perform changefaction::handle()\n"));
+    log_error("could not perform changefaction::handle()\n");
   }
   unused(data);
   return 0;

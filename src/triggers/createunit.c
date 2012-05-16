@@ -71,7 +71,7 @@ static int createunit_handle(trigger * t, void *data)
   if (td->r != NULL && td->f != NULL) {
     create_unit(td->r, td->f, td->number, td->race, 0, NULL, NULL);
   } else {
-    log_error(("could not perform createunit::handle()\n"));
+    log_error("could not perform createunit::handle()\n");
   }
   unused(data);
   return 0;

@@ -247,7 +247,7 @@ static int read_hurting(attrib * a, void *owner, struct storage *store)
   i = store->r_int(store);
   a->data.v = (void *)findbuilding(i);
   if (a->data.v == NULL) {
-    log_error(("temple of pain is broken\n"));
+    log_error("temple of pain is broken\n");
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
@@ -263,7 +263,7 @@ static void make_temple(region * r)
   const building_type *btype = bt_find("temple");
   building *b;
   if (btype == NULL) {
-    log_error(("could not find buildingtype 'temple'\n"));
+    log_error("could not find buildingtype 'temple'\n");
     return;
   }
 
@@ -428,7 +428,7 @@ static int caldera_handle(trigger * t, void *data)
         up = &u->next;
     }
   } else {
-    log_error(("could not perform caldera::handle()\n"));
+    log_error("could not perform caldera::handle()\n");
   }
   unused(data);
   return 0;

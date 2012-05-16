@@ -109,7 +109,7 @@ static int read_gmcreate(attrib * a, void *owner, struct storage *store)
   store->r_tok_buf(store, zText, sizeof(zText));
   a->data.v = it_find(zText);
   if (a->data.v == NULL) {
-    log_error(("unknown itemtype %s in gmcreate attribute\n", zText));
+    log_error("unknown itemtype %s in gmcreate attribute\n", zText);
     return AT_READ_FAIL;
   }
   return AT_READ_OK;
@@ -667,8 +667,7 @@ faction *gm_addfaction(const char *email, plane * p, region * r)
   f->passw = strdup(itoa36(rng_int()));
   f->override = strdup(itoa36(rng_int()));
   if (set_email(&f->email, email) != 0) {
-    log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no),
-        email));
+    log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
   }
   f->race = new_race[RC_TEMPLATE];
   f->age = 0;

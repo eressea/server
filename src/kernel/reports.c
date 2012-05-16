@@ -215,7 +215,7 @@ int update_nmrs(void)
     } else if (!is_monsters(f) && f->alive) {
       int nmr = turn - f->lastorders + 1;
       if (nmr < 0 || nmr > NMRTimeout()) {
-        log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
+        log_error("faction %s has %d NMRS\n", factionid(f), nmr);
         nmr = MAX(0, nmr);
         nmr = MIN(nmr, NMRTimeout());
       }
@@ -294,7 +294,7 @@ report_items(const item * items, item * result, int size, const unit * owner,
       }
       if (ishow == result + n) {
         if (n == size) {
-          log_error(("too many items to report, increase buffer size.\n"));
+          log_error("too many items to report, increase buffer size.\n");
           return -1;
         }
         result[n].number = itm->number;
@@ -988,11 +988,9 @@ struct message *msg_curse(const struct curse *c, const void *obj, typ_t typ,
         { "unit_unknown", "region_unknown", "building_unknown",
           "ship_unknown" };
       msg = msg_message(mkname("curseinfo", unknown[typ]), "id", c->no);
-      log_error(("no curseinfo function for %s and no fallback either.\n",
-          c->type->cname));
+      log_error("no curseinfo function for %s and no fallback either.\n", c->type->cname);
     } else {
-      log_error(("no curseinfo function for %s, using cinfo_simple fallback.\n",
-          c->type->cname));
+      log_error("no curseinfo function for %s, using cinfo_simple fallback.\n", c->type->cname);
     }
     return msg;
   }
@@ -1668,7 +1666,7 @@ int reports(void)
   sprintf(path, "%s/reports.txt", reportpath());
   mailit = fopen(path, "w");
   if (mailit == NULL) {
-    log_error(("%s could not be opened!\n", path));
+    log_error("%s could not be opened!\n", path);
   }
 
   for (f = factions; f; f = f->next) {

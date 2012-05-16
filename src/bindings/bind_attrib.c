@@ -44,7 +44,7 @@ static void init_ext(attrib * a)
       lua_rawgeti(L, LUA_REGISTRYINDEX, a->data.i);
       if (lua_pcall(L, 1, 0, 0) != 0) {
         const char *error = lua_tostring(L, -1);
-        log_error(("attrib_init '%d': %s.\n", a->data.i, error));
+        log_error("attrib_init '%d': %s.\n", a->data.i, error);
       }
     }
   }
@@ -140,7 +140,7 @@ static void write_ext_i(lua_State * L, const char *name, bson_buffer * bb)
         oid.ints[1] = b->no;
         bson_append_oid(bb, name, &oid);
       } else {
-        log_error(("unsuported type.\n"));
+        log_error("unsuported type.\n");
         bson_append_null(bb, name);
       }
     }
@@ -253,8 +253,7 @@ static int read_ext_i(lua_State * L, bson_iterator * it, bson_type type)
         else
           lua_pushnil(L);
       } else {
-        log_error(("unknown oid %d %d %d\n", oid->ints[0], oid->ints[1],
-            oid->ints[2]));
+        log_error("unknown oid %d %d %d\n", oid->ints[0], oid->ints[1], oid->ints[2]);
         lua_pushnil(L);
       }
     }

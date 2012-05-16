@@ -210,7 +210,7 @@ static const char *parse_symbol(opstack ** stack, const char *in,
     ++in;
     foo = find_function(symbol);
     if (foo == NULL) {
-      log_error(("parser does not know about \"%s\" function.\n", symbol));
+      log_error("parser does not know about \"%s\" function.\n", symbol);
       return NULL;
     }
     foo(stack, userdata);        /* will pop parameters from stack (reverse order!) and push the result */
@@ -221,7 +221,7 @@ static const char *parse_symbol(opstack ** stack, const char *in,
     }
     /* it's a constant (variable is a misnomer, but heck, const was taken;)) */
     if (var == NULL) {
-      log_error(("parser does not know about \"%s\" variable.\n", symbol));
+      log_error("parser does not know about \"%s\" variable.\n", symbol);
       return NULL;
     }
     opush(stack, var->value);
@@ -352,7 +352,7 @@ static const char *parse(opstack ** stack, const char *inn,
           ++b;
     }
   }
-  log_error(("could not parse \"%s\". Probably invalid message syntax.", inn));
+  log_error("could not parse \"%s\". Probably invalid message syntax.", inn);
   return NULL;
 }
 
@@ -390,7 +390,7 @@ const char *translate(const char *format, const void *userdata,
   }
   if (rv != NULL) {
     if (rv[0]) {
-      log_error(("residual data after parsing: %s\n", rv));
+      log_error("residual data after parsing: %s\n", rv);
     }
     rv = (const char *)opop(&stack).v;
     free(stack->begin);

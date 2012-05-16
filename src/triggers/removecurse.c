@@ -65,7 +65,7 @@ static int removecurse_handle(trigger * t, void *data)
     if (a) {
       a_remove(&td->target->attribs, a);
     } else
-      log_error(("could not perform removecurse::handle()\n"));
+      log_error("could not perform removecurse::handle()\n");
   }
   unused(data);
   return 0;

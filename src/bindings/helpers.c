@@ -57,15 +57,14 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n,
 
     if (lua_pcall(L, 4, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("unit %s calling '%s': %s.\n", unitname(s), fname, error));
+      log_error("unit %s calling '%s': %s.\n", unitname(s), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("unit %s trying to call '%s' : not a function.\n",
-        unitname(s), fname));
+    log_error("unit %s trying to call '%s' : not a function.\n", unitname(s), fname);
     lua_pop(L, 1);
   }
 
@@ -87,16 +86,14 @@ static int limit_resource(const region * r, const resource_type * rtype)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("limit(%s) calling '%s': %s.\n",
-          regionname(r, NULL), fname, error));
+      log_error("limit(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("limit(%s) calling '%s': not a function.\n",
-        regionname(r, NULL), fname));
+    log_error("limit(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
     lua_pop(L, 1);
   }
 
@@ -118,13 +115,11 @@ produce_resource(region * r, const resource_type * rtype, int norders)
 
     if (lua_pcall(L, 2, 0, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("produce(%s) calling '%s': %s.\n",
-          regionname(r, NULL), fname, error));
+      log_error("produce(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("produce(%s) calling '%s': not a function.\n",
-        regionname(r, NULL), fname));
+    log_error("produce(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
     lua_pop(L, 1);
   }
 }
@@ -151,16 +146,14 @@ static int lc_age(struct attrib *a)
 
       if (lua_pcall(L, fparam ? 2 : 1, 1, 0) != 0) {
         const char *error = lua_tostring(L, -1);
-        log_error(("lc_age(%s) calling '%s': %s.\n",
-            buildingname(b), fname, error));
+        log_error("lc_age(%s) calling '%s': %s.\n", buildingname(b), fname, error);
         lua_pop(L, 1);
       } else {
         result = (int)lua_tonumber(L, -1);
         lua_pop(L, 1);
       }
     } else {
-      log_error(("lc_age(%s) calling '%s': not a function.\n",
-          buildingname(b), fname));
+      log_error("lc_age(%s) calling '%s': not a function.\n", buildingname(b), fname);
       lua_pop(L, 1);
     }
   }
@@ -180,7 +173,7 @@ static void push_param(lua_State * L, char c, spllprm * param)
   else if (c == 'c')
     tolua_pushstring(L, param->data.s);
   else {
-    log_error(("unsupported syntax %c.\n", c));
+    log_error("unsupported syntax %c.\n", c);
     lua_pushnil(L);
   }
 }
@@ -232,16 +225,14 @@ static int lua_callspell(castorder * co)
 
     if (lua_pcall(L, nparam, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("spell(%s) calling '%s': %s.\n",
-          unitname(caster), fname, error));
+      log_error("spell(%s) calling '%s': %s.\n", unitname(caster), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("spell(%s) calling '%s': not a function.\n",
-        unitname(caster), fname));
+    log_error("spell(%s) calling '%s': not a function.\n", unitname(caster), fname);
     lua_pop(L, 1);
   }
 
@@ -263,8 +254,7 @@ static void lua_initfamiliar(unit * u)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("familiar(%s) calling '%s': %s.\n",
-          unitname(u), fname, error));
+      log_error("familiar(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
@@ -297,15 +287,14 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("change(%s) calling '%s': %s.\n", unitname(u), fname, error));
+      log_error("change(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("change(%s) calling '%s': not a function.\n",
-        unitname(u), fname));
+    log_error("change(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
 
@@ -326,14 +315,14 @@ static int lua_getresource(unit * u, const struct resource_type *rtype)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("get(%s) calling '%s': %s.\n", unitname(u), fname, error));
+      log_error("get(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("get(%s) calling '%s': not a function.\n", unitname(u), fname));
+    log_error("get(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
 
@@ -357,7 +346,7 @@ static boolean lua_canuse_item(const unit * u, const struct item_type *itype)
 
       if (lua_pcall(L, 2, 1, 0) != 0) {
         const char *error = lua_tostring(L, -1);
-        log_error(("get(%s) calling '%s': %s.\n", unitname(u), fname, error));
+        log_error("get(%s) calling '%s': %s.\n", unitname(u), fname, error);
         lua_pop(L, 1);
       } else {
         result = lua_toboolean(L, -1);
@@ -365,8 +354,7 @@ static boolean lua_canuse_item(const unit * u, const struct item_type *itype)
       }
     } else {
       function_exists = 0;
-      log_error(("get(%s) calling '%s': not a function.\n",
-          unitname(u), fname));
+      log_error("get(%s) calling '%s': not a function.\n", unitname(u), fname);
       lua_pop(L, 1);
     }
   }
@@ -390,16 +378,14 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
     if (lua_pcall(L, 3, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("wage(%s) calling '%s': %s.\n",
-          regionname(r, NULL), fname, error));
+      log_error("wage(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("wage(%s) calling '%s': not a function.\n",
-        regionname(r, NULL), fname));
+    log_error("wage(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
     lua_pop(L, 1);
   }
 
@@ -420,13 +406,11 @@ static void lua_agebuilding(building * b)
 
     if (lua_pcall(L, 1, 0, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("agebuilding(%s) calling '%s': %s.\n",
-          buildingname(b), fname, error));
+      log_error("agebuilding(%s) calling '%s': %s.\n", buildingname(b), fname, error);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("agebuilding(%s) calling '%s': not a function.\n",
-        buildingname(b), fname));
+    log_error("agebuilding(%s) calling '%s': not a function.\n", buildingname(b), fname);
     lua_pop(L, 1);
   }
 }
@@ -445,16 +429,14 @@ static int lua_building_protection(building * b, unit * u)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("building_protection(%s, %s) calling '%s': %s.\n",
-          buildingname(b), unitname(u), fname, error));
+      log_error("building_protection(%s, %s) calling '%s': %s.\n", buildingname(b), unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("building_protection(%s, %s) calling '%s': not a function.\n",
-        buildingname(b), unitname(u), fname));
+    log_error("building_protection(%s, %s) calling '%s': not a function.\n", buildingname(b), unitname(u), fname);
     lua_pop(L, 1);
   }
   return result;
@@ -476,16 +458,14 @@ static double lua_building_taxes(building * b, int level)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("building_taxes(%s) calling '%s': %s.\n",
-          buildingname(b), fname, error));
+      log_error("building_taxes(%s) calling '%s': %s.\n", buildingname(b), fname, error);
       lua_pop(L, 1);
     } else {
       result = (double)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("building_taxes(%s) calling '%s': not a function.\n",
-        buildingname(b), fname));
+    log_error("building_taxes(%s) calling '%s': not a function.\n", buildingname(b), fname);
     lua_pop(L, 1);
   }
   return result;
@@ -504,16 +484,14 @@ static int lua_maintenance(const unit * u)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("maintenance(%s) calling '%s': %s.\n",
-          unitname(u), fname, error));
+      log_error("maintenance(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("maintenance(%s) calling '%s': not a function.\n",
-        unitname(u), fname));
+    log_error("maintenance(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
 
@@ -534,15 +512,14 @@ static void lua_equipmentcallback(const struct equipment *eq, unit * u)
 
     if (lua_pcall(L, 1, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("equip(%s) calling '%s': %s.\n", unitname(u), fname, error));
+      log_error("equip(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("equip(%s) calling '%s': not a function.\n",
-        unitname(u), fname));
+    log_error("equip(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
 }
@@ -565,14 +542,14 @@ lua_useitem(struct unit *u, const struct item_type *itype, int amount,
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("use(%s) calling '%s': %s.\n", unitname(u), fname, error));
+      log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("use(%s) calling '%s': not a function.\n", unitname(u), fname));
+    log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
 
@@ -594,14 +571,14 @@ static int lua_recruit(struct unit *u, const struct archetype *arch, int amount)
 
     if (lua_pcall(L, 2, 1, 0) != 0) {
       const char *error = lua_tostring(L, -1);
-      log_error(("use(%s) calling '%s': %s.\n", unitname(u), fname, error));
+      log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
       lua_pop(L, 1);
     } else {
       result = (int)lua_tonumber(L, -1);
       lua_pop(L, 1);
     }
   } else {
-    log_error(("use(%s) calling '%s': not a function.\n", unitname(u), fname));
+    log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
   return result;

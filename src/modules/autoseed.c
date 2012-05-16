@@ -266,8 +266,7 @@ newfaction *read_newfactions(const char *filename)
       continue;
     nf = calloc(sizeof(newfaction), 1);
     if (set_email(&nf->email, email) != 0) {
-      log_error(("Invalid email address for subscription %s: %s\n",
-          itoa36(subscription), email));
+      log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
       continue;
     }
     nf->password = strdup(password);
@@ -296,7 +295,7 @@ newfaction *read_newfactions(const char *filename)
         buffer[outbytes] = 0;
         nf->race = findrace(buffer, default_locale);
         if (nf->race == NULL) {
-          log_error(("new faction has unknown race '%s'.\n", race));
+          log_error("new faction has unknown race '%s'.\n", race);
           free(nf);
           continue;
         }

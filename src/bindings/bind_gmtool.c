@@ -167,7 +167,7 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
   tolua_pushnumber(L, ny);
   if (lua_pcall(L, 2, 1, 0) != 0) {
     const char *error = lua_tostring(L, -1);
-    log_error(("paint function failed: %s\n", error));
+    log_error("paint function failed: %s\n", error);
     lua_pop(L, 1);
     tolua_error(L, TOLUA_CAST "event handler call failed", NULL);
   } else {

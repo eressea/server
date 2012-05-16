@@ -180,7 +180,7 @@ int freadstr(FILE * F, int encoding, char *start, size_t size)
             if (ret > 0)
               str += ret;
             else {
-              log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+              log_error("input data was not iso-8859-1! assuming utf-8\n");
               encoding = XML_CHAR_ENCODING_ERROR;
               *str++ = (char)c;
             }
@@ -200,7 +200,7 @@ int freadstr(FILE * F, int encoding, char *start, size_t size)
           if (ret > 0)
             str += ret;
           else {
-            log_error(("input data was not iso-8859-1! assuming utf-8\n"));
+            log_error("input data was not iso-8859-1! assuming utf-8\n");
             encoding = XML_CHAR_ENCODING_ERROR;
             *str++ = (char)c;
           }
@@ -538,8 +538,7 @@ void read_items(struct storage *store, item ** ilist)
     itype = it_find(ibuf);
     i = store->r_int(store);
     if (i <= 0) {
-      log_error(("data contains an entry with %d %s\n", i,
-          itype->rtype->_name[1]));
+      log_error("data contains an entry with %d %s\n", i, itype->rtype->_name[1]);
     } else {
       assert(itype != NULL);
       if (itype != NULL) {
@@ -621,7 +620,7 @@ static int resolve_owner(variant id, void *address)
   if (id.i != 0) {
     f = findfaction(id.i);
     if (f == NULL) {
-      log_error(("region has an invalid owner (%s)\n", itoa36(id.i)));
+      log_error("region has an invalid owner (%s)\n", itoa36(id.i));
       f = get_monsters();
     }
   }
@@ -782,7 +781,7 @@ unit *read_unit(struct storage *store)
     }
   }
   if (u->faction == NULL) {
-    log_error(("unit %s has faction == NULL\n", unitname(u)));
+    log_error("unit %s has faction == NULL\n", unitname(u));
     u_setfaction(u, get_monsters());
     set_number(u, 0);
   }
@@ -857,8 +856,7 @@ unit *read_unit(struct storage *store)
   read_items(store, &u->items);
   u->hp = store->r_int(store);
   if (u->hp < u->number) {
-    log_error(("Einheit %s hat %u Personen, und %u Trefferpunkte\n",
-        itoa36(u->no), u->number, u->hp));
+    log_error("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no), u->number, u->hp);
     u->hp = u->number;
   }
 
@@ -888,8 +886,7 @@ void write_unit(struct storage *store, const unit * u)
     if (++p < MAXPERSISTENT) {
       writeorder(store, ord, u->faction->locale);
     } else {
-      log_error(("%s had %d or more persistent orders\n", unitname(u),
-          MAXPERSISTENT));
+      log_error("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
       break;
     }
   }
@@ -900,8 +897,7 @@ void write_unit(struct storage *store, const unit * u)
       if (++p < MAXPERSISTENT) {
         writeorder(store, ord, u->faction->locale);
       } else {
-        log_error(("%s had %d or more persistent orders\n", unitname(u),
-            MAXPERSISTENT));
+        log_error("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
         break;
       }
     }
@@ -926,7 +922,7 @@ void write_unit(struct storage *store, const unit * u)
   write_items(store, u->items);
   store->w_brk(store);
   if (u->hp == 0) {
-    log_error(("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no)));
+    log_error("unit %s has 0 hitpoints, adjusting.\n", itoa36(u->no));
     ((unit *) u)->hp = u->number;
   }
   store->w_int(store, u->hp);
@@ -977,9 +973,7 @@ static region *readregion(struct storage *store, int x, int y)
     int ter = store->r_int(store);
     terrain = newterrain((terrain_t) ter);
     if (terrain == NULL) {
-      log_error(
-        ("while reading datafile from pre-TERRAIN_VERSION, could not find terrain #%d.\n",
-          ter));
+      log_error("while reading datafile from pre-TERRAIN_VERSION, could not find terrain #%d.\n", ter);
       terrain = newterrain(T_PLAIN);
     }
   } else {
@@ -987,7 +981,7 @@ static region *readregion(struct storage *store, int x, int y)
     store->r_str_buf(store, name, sizeof(name));
     terrain = get_terrain(name);
     if (terrain == NULL) {
-      log_error(("Unknown terrain '%s'\n", name));
+      log_error("Unknown terrain '%s'\n", name);
       assert(!"unknown terrain");
     }
   }
@@ -1006,20 +1000,19 @@ static region *readregion(struct storage *store, int x, int y)
 
     i = store->r_int(store);
     if (i < 0) {
-      log_error(("number of trees in %s is %d.\n", regionname(r, NULL), i));
+      log_error("number of trees in %s is %d.\n", regionname(r, NULL), i);
       i = 0;
     }
     rsettrees(r, 0, i);
     i = store->r_int(store);
     if (i < 0) {
-      log_error(("number of young trees in %s is %d.\n",
-          regionname(r, NULL), i));
+      log_error("number of young trees in %s is %d.\n", regionname(r, NULL), i);
       i = 0;
     }
     rsettrees(r, 1, i);
     i = store->r_int(store);
     if (i < 0) {
-      log_error(("number of seeds in %s is %d.\n", regionname(r, NULL), i));
+      log_error("number of seeds in %s is %d.\n", regionname(r, NULL), i);
       i = 0;
     }
     rsettrees(r, 2, i);
@@ -1035,7 +1028,7 @@ static region *readregion(struct storage *store, int x, int y)
       res = malloc(sizeof(rawmaterial));
       res->type = rmt_find(token);
       if (res->type == NULL) {
-        log_error(("invalid resourcetype %s in data.\n", token));
+        log_error("invalid resourcetype %s in data.\n", token);
       }
       assert(res->type != NULL);
       res->level = store->r_int(store);
@@ -1650,8 +1643,7 @@ int readgame(const char *filename, int mode, int backup)
         faction *f = u->faction;
         int skl = effskill(u, SK_MAGIC);
         if (!is_monsters(f) && f->magiegebiet == M_GRAY) {
-          log_error(("faction %s had magic=gray, fixing (%s)\n",
-              factionname(f), magic_school[mage->magietyp]));
+          log_error("faction %s had magic=gray, fixing (%s)\n", factionname(f), magic_school[mage->magietyp]);
           f->magiegebiet = mage->magietyp;
         }
         if (f->max_spelllevel < skl) {

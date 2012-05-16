@@ -213,8 +213,7 @@ int curse_read(attrib * a, void *owner, struct storage *store)
   if (c->type == NULL) {
     int result = read_ccompat(cursename, store);
     if (result != 0) {
-      log_error(("missing curse %s, no compatibility code either.\n",
-          cursename));
+      log_error("missing curse %s, no compatibility code either.\n", cursename);
     }
     assert(result == 0);
     return AT_READ_FAIL;
@@ -766,7 +765,7 @@ message *cinfo_simple(const void *obj, typ_t typ, const struct curse * c,
 
   msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
   if (msg == NULL) {
-    log_error(("There is no curseinfo for %s.\n", c->type->cname));
+    log_error("There is no curseinfo for %s.\n", c->type->cname);
   }
   return msg;
 }

@@ -54,7 +54,7 @@ static int clonedied_handle(trigger * t, void *data)
     if (a)
       a_remove(&u->attribs, a);
   } else
-    log_error(("could not perform clonedied::handle()\n"));
+    log_error("could not perform clonedied::handle()\n");
   unused(data);
   return 0;
 }

@@ -224,7 +224,7 @@ void log_warning(const char *format, ...)
   }
 }
 
-void _log_error(const char *format, ...)
+void log_error(const char *format, ...)
 {
   const char * prefix = "ERROR";
   const int mask = LOG_CPERROR;

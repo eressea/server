@@ -118,7 +118,7 @@ int read_xml(const char *filename, const char *catalog)
   doc = xmlParseFile(filename);
 #endif
   if (doc == NULL) {
-    log_error(("could not open %s\n", filename));
+    log_error("could not open %s\n", filename);
     return -1;
   }
 

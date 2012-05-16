@@ -341,6 +341,6 @@ int change_effect(unit * u, const potion_type * effect, int delta)
     data->value = delta;
     return data->value;
   }
-  log_error(("change effect with delta==0 for unit %s\n", itoa36(u->no)));
+  log_error("change effect with delta==0 for unit %s\n", itoa36(u->no));
   return 0;
 }

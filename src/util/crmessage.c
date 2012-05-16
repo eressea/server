@@ -119,8 +119,7 @@ int cr_render(const message * msg, char *buffer, const void *userdata)
     return -1;
   for (i = 0; i != msg->type->nparameters; ++i) {
     if (crt->renderers[i] == NULL) {
-      log_error(("No renderer for argument %s:%s of \"%s\"\n",
-          msg->type->pnames[i], msg->type->types[i]->name, msg->type->name));
+      log_error("No renderer for argument %s:%s of \"%s\"\n", msg->type->pnames[i], msg->type->types[i]->name, msg->type->name);
       continue;                 /* strcpy(c, (const char*)msg->locale_string(u->faction->locale, parameters[i])); */
     } else {
       if (crt->renderers[i] (msg->parameters[i], c, userdata) != 0)

@@ -221,7 +221,7 @@ void read_spells(struct quicklist **slistp, magic_t mtype,
         break;
       sp = find_spell(spname);
       if (!sp) {
-        log_error(("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]));
+        log_error("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]);
       }
     }
     if (sp) {
@@ -257,7 +257,7 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
       if (strcmp("none", spname) != 0) {
         sp = find_spell(spname);
         if (!sp) {
-          log_error(("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]));
+          log_error("read_mage: could not find combat spell '%s' in school '%s'\n", spname, magic_school[mage->magietyp]);
         }
       }
     }
@@ -356,7 +356,7 @@ static int read_seenspell(attrib * a, void *owner, struct storage *store)
     mtype = store->r_int(store);
     sp = find_spell(token);
     if (!sp) {
-      log_error(("read_seenspell: could not find spell '%s' in school '%s'\n", token, magic_school[mtype]));
+      log_error("read_seenspell: could not find spell '%s' in school '%s'\n", token, magic_school[mtype]);
     }
   }
   if (!sp) {
@@ -547,8 +547,7 @@ void add_spellname(sc_mage * mage, const spell * sp)
 void add_spell(struct quicklist **slistp, spell * sp)
 {
   if (ql_set_insert(slistp, sp) != 0) {
-    log_error(("add_spell: the list already contains the spell '%s'.\n",
-        sp->sname));
+    log_error("add_spell: the list already contains the spell '%s'.\n", sp->sname);
   }
 }
 
@@ -2599,7 +2598,7 @@ static castorder *cast_cmd(unit * u, order * ord)
       sp = get_spellfromtoken(mage, s, caster->faction->locale);
     } else {
       /* somehow, this familiar has no mage! */
-      log_error(("cast_cmd: familiar %s is without a mage?\n", unitname(u)));
+      log_error("cast_cmd: familiar %s is without a mage?\n", unitname(u));
       caster = u;
     }
   }

@@ -19,12 +19,11 @@ extern "C" {
   extern void log_close(void);
   extern void log_flush(void);
 
-#define log_error(x) _log_error x
 #define log_debug _log_debug
 
   /* use macros above instead of these: */
   extern void log_warning(const char *format, ...);
-  extern void _log_error(const char *format, ...);
+  extern void log_error(const char *format, ...);
   extern void _log_debug(const char *format, ...);
   extern void log_info(const char *format, ...);
   extern void log_printf(FILE * ios, const char *format, ...);

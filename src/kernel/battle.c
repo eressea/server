@@ -1585,7 +1585,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     }
   }
   if (enemies != 0) {
-    log_error(("select_enemies has a bug.\n"));
+    log_error("select_enemies has a bug.\n");
   }
 #ifdef DEBUG_SELECT
   return result;
@@ -1779,7 +1779,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
       int level = co->level;
 
       if (!sp->cast) {
-        log_error(("spell '%s' has no function.\n", sp->sname));
+        log_error("spell '%s' has no function.\n", sp->sname);
       } else {
         level = sp->cast(co);
         if (level > 0) {
@@ -1878,7 +1878,7 @@ static void do_combatspell(troop at)
   }
 
   if (!sp->cast) {
-    log_error(("spell '%s' has no function.\n", sp->sname));
+    log_error("spell '%s' has no function.\n", sp->sname);
   } else {
     level = cast_combatspell(at, sp, level, power);
   }
@@ -1894,7 +1894,7 @@ static void do_extra_spell(troop at, const att * a)
   const spell *sp = a->data.sp;
 
   if (sp->cast == NULL) {
-    log_error(("spell '%s' has no function.\n", sp->sname));
+    log_error("spell '%s' has no function.\n", sp->sname);
   } else {
     cast_combatspell(at, sp, sp->level, sp->level * MagicPower());
   }
@@ -2133,7 +2133,7 @@ static void make_heroes(battle * b)
       if (fval(u, UFL_HERO)) {
         int i;
         if (!playerrace(u->race)) {
-          log_error(("Hero %s is a %s.\n", unitname(u), u->race->_name[0]));
+          log_error("Hero %s is a %s.\n", unitname(u), u->race->_name[0]);
         }
         for (i = 0; i != u->number; ++i) {
           fig->person[i].speed += (hero_speed - 1);
@@ -2915,8 +2915,7 @@ static void aftermath(battle * b)
         dead_players += dead;
       }
       if (du->hp < du->number) {
-        log_error(("%s has less hitpoints (%u) than people (%u)\n",
-            itoa36(du->no), du->hp, du->number));
+        log_error("%s has less hitpoints (%u) than people (%u)\n", itoa36(du->no), du->hp, du->number);
         du->hp = du->number;
       }
     }
@@ -3684,7 +3683,7 @@ battle *make_battle(region * r)
     sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
     bdebug = fopen(zFilename, "w");
     if (!bdebug)
-      log_error(("battles cannot be debugged\n"));
+      log_error("battles cannot be debugged\n");
     else {
       const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
       fwrite(utf8_bom, 1, 3, bdebug);

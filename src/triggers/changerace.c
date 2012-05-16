@@ -70,7 +70,7 @@ static int changerace_handle(trigger * t, void *data)
     if (td->irace != NULL)
       td->u->irace = td->irace;
   } else {
-    log_error(("could not perform changerace::handle()\n"));
+    log_error("could not perform changerace::handle()\n");
   }
   unused(data);
   return 0;

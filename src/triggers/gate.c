@@ -53,7 +53,7 @@ static int gate_handle(trigger * t, void *data)
         up = &u->next;
     }
   } else {
-    log_error(("could not perform gate::handle()\n"));
+    log_error("could not perform gate::handle()\n");
     return -1;
   }
   unused(data);

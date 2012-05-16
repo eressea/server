@@ -156,8 +156,7 @@ static char *bin_r_str(struct storage *store)
     {
       char *p = strpbrk(result, "\n\r");
       while (p) {
-        log_error(("Invalid character %d in input string \"%s\".\n", *p,
-            result));
+        log_error("Invalid character %d in input string \"%s\".\n", *p, result);
         strcpy(p, p + 1);
         p = strpbrk(p, "\n\r");
       }
@@ -165,7 +164,7 @@ static char *bin_r_str(struct storage *store)
 #endif
     return result;
   } else if (len < 0) {
-    log_error(("invalid string-length %d in input.\n", len));
+    log_error("invalid string-length %d in input.\n", len);
   }
   return NULL;
 }
@@ -193,8 +192,7 @@ static void bin_r_str_buf(struct storage *store, char *result, size_t size)
     {
       char *p = strpbrk(result, "\n\r");
       while (p) {
-        log_error(("Invalid character %d in input string \"%s\".\n", *p,
-            result));
+        log_error("Invalid character %d in input string \"%s\".\n", *p, result);
         strcpy(p, p + 1);
         p = strpbrk(p, "\n\r");
       }
@@ -220,7 +218,7 @@ static void bin_r_bin(struct storage *store, void *result, size_t size)
   int len = store->r_int(store);
   if (len > 0) {
     if ((size_t) len > size) {
-      log_error(("destination buffer too small %d %u.\n", len, size));
+      log_error("destination buffer too small %d %u.\n", len, size);
       fseek(file(store), len, SEEK_CUR);
     } else {
       fread(result, len, 1, file(store));

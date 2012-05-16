@@ -39,7 +39,7 @@ message_type *mt_new(const char *name, const char *args[])
 
   assert(name != NULL);
   if (name == NULL) {
-    log_error(("Trying to create message_type with name=0x0\n"));
+    log_error("Trying to create message_type with name=0x0\n");
     return NULL;
   }
   if (args != NULL)
@@ -67,8 +67,7 @@ message_type *mt_new(const char *name, const char *args[])
         mtype->pnames[i] = cp;
         mtype->types[i] = find_argtype(spos + 1);
         if (mtype->types[i] == NULL) {
-          log_error(("unknown argument type %s for message type %s\n",
-              spos + 1, mtype->name));
+          log_error("unknown argument type %s for message type %s\n", spos + 1, mtype->name);
         }
         assert(mtype->types[i]);
       }
@@ -141,7 +140,7 @@ message *msg_create(const struct message_type *mtype, variant args[])
 
   assert(mtype != NULL);
   if (mtype == NULL) {
-    log_error(("Trying to create message with type=0x0\n"));
+    log_error("Trying to create message with type=0x0\n");
     return NULL;
   }
   msg->type = mtype;

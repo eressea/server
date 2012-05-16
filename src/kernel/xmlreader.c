@@ -182,8 +182,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
     if (propValue != NULL) {
       sk = sk_find((const char *)propValue);
       if (sk == NOSKILL) {
-        log_error(("construction requires skill '%s' that does not exist.\n",
-            (const char *)propValue));
+        log_error("construction requires skill '%s' that does not exist.\n", (const char *)propValue);
         xmlFree(propValue);
         continue;
       }
@@ -313,8 +312,7 @@ static int parse_buildings(xmlDocPtr doc)
           parse_function(node, &fun, &propValue);
 
           if (fun == NULL) {
-            log_error(("unknown function name '%s' for building %s\n",
-                (const char *)propValue, btype->_name));
+            log_error("unknown function name '%s' for building %s\n", (const char *)propValue, btype->_name);
             xmlFree(propValue);
             continue;
           }
@@ -334,8 +332,7 @@ static int parse_buildings(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "age") == 0) {
             btype->age = (void (*)(struct building *))fun;
           } else {
-            log_error(("unknown function type '%s' for building %s\n",
-                (const char *)propValue, btype->_name));
+            log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
           }
           xmlFree(propValue);
         }
@@ -818,8 +815,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
       parse_function(node, &fun, &propValue);
       if (fun == NULL) {
-        log_error(("unknown function name '%s' for item '%s'\n",
-            (const char *)propValue, itype->rtype->_name[0]));
+        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
         xmlFree(propValue);
         continue;
       }
@@ -829,8 +825,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
           (boolean(*)(const struct troop *, const struct weapon_type *,
             int *))fun;
       } else {
-        log_error(("unknown function type '%s' for item '%s'\n",
-            (const char *)propValue, itype->rtype->_name[0]));
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name[0]);
       }
       xmlFree(propValue);
     }
@@ -926,8 +921,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
       parse_function(node, &fun, &propValue);
       if (fun == NULL) {
-        log_error(("unknown function name '%s' for item '%s'\n",
-            (const char *)propValue, rtype->_name[0]));
+        log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
         xmlFree(propValue);
         continue;
       }
@@ -948,8 +942,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
           (int (*)(struct unit *, int, const struct item_type *, int,
             struct order *))fun;
       } else {
-        log_error(("unknown function type '%s' for item '%s'\n",
-            (const char *)propValue, rtype->_name[0]));
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name[0]);
       }
       xmlFree(propValue);
     }
@@ -977,8 +970,7 @@ static int parse_rules(xmlDocPtr doc)
     parse_function(node, &fun, &propValue);
 
     if (fun == NULL) {
-      log_error(("unknown function for rule '%s' %s\n",
-          (const char *)propValue));
+      log_error("unknown function for rule '%s' %s\n", (const char *)propValue);
       xmlFree(propValue);
       continue;
     }
@@ -990,7 +982,7 @@ static int parse_rules(xmlDocPtr doc)
     } else if (strcmp((const char *)propValue, "maintenance") == 0) {
       global.functions.maintenance = (int (*)(const struct unit *))fun;
     } else {
-      log_error(("unknown function for rule '%s'\n", (const char *)propValue));
+      log_error("unknown function for rule '%s'\n", (const char *)propValue);
     }
     xmlFree(propValue);
   }
@@ -1085,8 +1077,7 @@ static int parse_resources(xmlDocPtr doc)
 
           parse_function(node, &fun, &propValue);
           if (fun == NULL) {
-            log_error(("unknown function name '%s' for resource %s\n",
-                (const char *)propValue, rtype->_name[0]));
+            log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
             xmlFree(propValue);
             continue;
           }
@@ -1099,8 +1090,7 @@ static int parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "name") == 0) {
             rtype->name = (rtype_name) fun;
           } else {
-            log_error(("unknown function type '%s' for resource %s\n",
-                (const char *)propValue, rtype->_name[0]));
+            log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
           }
           xmlFree(propValue);
         }
@@ -1168,8 +1158,7 @@ static int parse_resources(xmlDocPtr doc)
               xmlFree(propBldg);
             }
           } else {
-            log_error(("unknown type '%s' for resourcelimit-modifier '%s'\n",
-                (const char *)propValue, rtype->_name[0]));
+            log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name[0]);
           }
           xmlFree(propValue);
         }
@@ -1204,8 +1193,7 @@ static int parse_resources(xmlDocPtr doc)
           assert(propValue != NULL);
           fun = get_function((const char *)propValue);
           if (fun == NULL) {
-            log_error(("unknown limit '%s' for resource %s\n",
-                (const char *)propValue, rtype->_name[0]));
+            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
             xmlFree(propValue);
             continue;
           }
@@ -1218,8 +1206,7 @@ static int parse_resources(xmlDocPtr doc)
           } else if (strcmp((const char *)propValue, "limit") == 0) {
             rdata->limit = (rlimit_limit) fun;
           } else {
-            log_error(("unknown limit '%s' for resource %s\n",
-                (const char *)propValue, rtype->_name[0]));
+            log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name[0]);
           }
           xmlFree(propValue);
         }
@@ -1323,8 +1310,7 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
       assert(propValue != NULL);
       sp = find_spell((const char *)propValue);
       if (!sp) {
-        log_error(("no spell '%s' in school '%s' for equipment-set '%s'\n",
-          (const char *)propValue, magic_school[mtype], eq->name));
+        log_error("no spell '%s' in school '%s' for equipment-set '%s'\n", (const char *)propValue, magic_school[mtype], eq->name);
       } else {
         equipment_addspell(eq, sp);
       }
@@ -1346,8 +1332,7 @@ static void add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
       assert(propValue != NULL);
       sk = sk_find((const char *)propValue);
       if (sk == NOSKILL) {
-        log_error(("unknown skill '%s' in equipment-set %s\n",
-            (const char *)propValue, eq->name));
+        log_error("unknown skill '%s' in equipment-set %s\n", (const char *)propValue, eq->name);
         xmlFree(propValue);
       } else {
         xmlFree(propValue);
@@ -1410,8 +1395,7 @@ add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSubsets)
           }
         }
         if (totalChance > 1.0f) {
-          log_error(("total chance exceeds 1.0: %f in equipment set %s.\n",
-              totalChance, eq->name));
+          log_error("total chance exceeds 1.0: %f in equipment set %s.\n", totalChance, eq->name);
         }
       }
       xmlXPathFreeObject(xpathResult);
@@ -1558,7 +1542,7 @@ static int parse_spells(xmlDocPtr doc)
         if (result->nodesetval->nodeNr == 0) {
           cast = get_function(sp->sname);
           if (!cast) {
-            log_error(("no spell cast function registered for '%s'\n", sp->sname));
+            log_error("no spell cast function registered for '%s'\n", sp->sname);
             valid = 0;
           }
           strlcpy(zText+7, sp->sname, sizeof(zText)-7);
@@ -1575,15 +1559,13 @@ static int parse_spells(xmlDocPtr doc)
                 cast = fun;
                 valid = 1;
               } else {
-                log_error(("unknown function name '%s' for spell '%s'\n",
-                    (const char *)propValue, sp->sname));
+                log_error("unknown function name '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
                 valid = 0;
               }
             } else if (fun && strcmp((const char *)propValue, "fumble") == 0) {
               fumble = fun;
             } else {
-              log_error(("unknown function type '%s' for spell '%s'\n",
-                  (const char *)propValue, sp->sname));
+              log_error("unknown function type '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
             }
             xmlFree(propValue);
           }
@@ -1611,8 +1593,7 @@ static int parse_spells(xmlDocPtr doc)
           assert(propValue);
           rtype = rt_find((const char *)propValue);
           if (!rtype) {
-            log_error(("spell %s uses unknown component %s.\n", sp->sname,
-                (const char *)propValue));
+            log_error("spell %s uses unknown component %s.\n", sp->sname, (const char *)propValue);
             xmlFree(propValue);
             continue;
           }
@@ -1831,8 +1812,7 @@ static int parse_races(xmlDocPtr doc)
           rc->study_speed[sk] = (char)speed;
         }
       } else {
-        log_error(("unknown skill '%s' in race '%s'\n",
-            (const char *)propValue, rc->_name[0]));
+        log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name[0]);
       }
       xmlFree(propValue);
     }
@@ -1848,8 +1828,7 @@ static int parse_races(xmlDocPtr doc)
 
         parse_function(node, &fun, &propValue);
         if (fun == NULL) {
-          log_error(("unknown function name '%s' for race %s\n",
-              (const char *)propValue, rc->_name[0]));
+          log_error("unknown function name '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
           xmlFree(propValue);
           continue;
         }
@@ -1869,8 +1848,7 @@ static int parse_races(xmlDocPtr doc)
         } else if (strcmp((const char *)propValue, "initfamiliar") == 0) {
           rc->init_familiar = (void (*)(struct unit *))fun;
         } else {
-          log_error(("unknown function type '%s' for race %s\n",
-              (const char *)propValue, rc->_name[0]));
+          log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name[0]);
         }
         xmlFree(propValue);
       }
@@ -2320,8 +2298,7 @@ static int parse_main(xmlDocPtr doc)
           }
         }
         if (k == MAXKEYWORDS) {
-          log_error(("trying to disable unknown comand %s\n",
-              (const char *)propName));
+          log_error("trying to disable unknown comand %s\n", (const char *)propName);
         }
       }
       xmlFree(propName);

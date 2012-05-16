@@ -92,7 +92,7 @@ void enable_skill(const char *skname, boolean value)
       return;
     }
   }
-  log_error(("Trying to set unknown skill %s to %u", skname, value));
+  log_error("Trying to set unknown skill %s to %u", skname, value);
 }
 
 skill_t sk_find(const char *name)

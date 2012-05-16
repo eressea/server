@@ -68,7 +68,7 @@ region_list *astralregions(const region * r, boolean(*valid) (const region *))
 
   assert(is_astral(r));
   if (!is_astral(r)) {
-    log_error(("astralregions was called with a non-astral region.\n"));
+    log_error("astralregions was called with a non-astral region.\n");
     return NULL;
   }
   r = r_astral_to_standard(r);

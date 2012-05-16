@@ -309,7 +309,7 @@ static int tolua_region_get_resourcelevel(lua_State * L)
   return 0;
 }
 
-#define LUA_ASSERT(c, s) if (!(c)) { log_error(("%s(%d): %s\n", __FILE__, __LINE__, (s))); return 0; }
+#define LUA_ASSERT(c, s) if (!(c)) { log_error("%s(%d): %s\n", __FILE__, __LINE__, (s)); return 0; }
 
 static critbit_tree * special_resources(void)
 {

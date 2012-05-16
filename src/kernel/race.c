@@ -103,7 +103,7 @@ race *rc_new(const char *zName)
 
   rc->hitpoints = 1;
   if (strchr(zName, ' ') != NULL) {
-    log_error(("race '%s' has an invalid name. remove spaces\n", zName));
+    log_error("race '%s' has an invalid name. remove spaces\n", zName);
     assert(strchr(zName, ' ') == NULL);
   }
   strcpy(zBuffer, zName);

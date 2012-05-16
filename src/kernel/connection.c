@@ -646,16 +646,14 @@ int read_borders(struct storage *store)
 
     type = find_bordertype(zText);
     if (type == NULL) {
-      log_error(("[read_borders] unknown connection type %s in %s\n", zText,
-          regionname(from, NULL)));
+      log_error("[read_borders] unknown connection type %s in %s\n", zText, regionname(from, NULL));
       assert(type || !"connection type not registered");
     }
 
     if (to == from && type && from) {
       direction_t dir = (direction_t) (rng_int() % MAXDIRECTIONS);
       region *r = rconnect(from, dir);
-      log_error(("[read_borders] invalid %s in %s\n", type->__name,
-          regionname(from, NULL)));
+      log_error("[read_borders] invalid %s in %s\n", type->__name, regionname(from, NULL));
       if (r != NULL)
         to = r;
     }

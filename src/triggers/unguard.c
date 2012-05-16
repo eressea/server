@@ -35,7 +35,7 @@ static int unguard_handle(trigger * t, void *data)
   if (b) {
     fset(b, BLD_UNGUARDED);
   } else {
-    log_error(("could not perform unguard::handle()\n"));
+    log_error("could not perform unguard::handle()\n");
     return -1;
   }
   unused(data);
