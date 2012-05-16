@@ -1530,12 +1530,14 @@ static int display_cmd(unit * u, struct order *ord)
 {
   building *b = u->building;
   char **s = NULL;
+  const char *str;
   region *r = u->region;
 
   init_tokens(ord);
   skip_token();
 
-  switch (getparam(u->faction->locale)) {
+  str = getstrtoken();
+  switch (findparam_ex(str, u->faction->locale)) {
   case P_BUILDING:
   case P_GEBAEUDE:
     if (!b) {
@@ -1695,14 +1697,17 @@ static int name_cmd(unit * u, struct order *ord)
   char **s = NULL;
   param_t p;
   boolean foreign = false;
+  const char *str;
 
   init_tokens(ord);
   skip_token();
-  p = getparam(u->faction->locale);
+  str = getstrtoken();
+  p = findparam_ex(str, u->faction->locale);
 
   if (p == P_FOREIGN) {
+    str = getstrtoken();
     foreign = true;
-    p = getparam(u->faction->locale);
+    p = findparam_ex(str, u->faction->locale);
   }
 
   switch (p) {
@@ -1951,7 +1956,7 @@ static int mail_cmd(unit * u, struct order *ord)
 
   do {
     cont = 0;
-    switch (findparam(s, u->faction->locale)) {
+    switch (findparam_ex(s, u->faction->locale)) {
     case P_REGION:
       /* können alle Einheiten in der Region sehen */
       s = getstrtoken();
@@ -2991,7 +2996,7 @@ static int renumber_cmd(unit * u, order * ord)
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
-  switch (findparam(s, u->faction->locale)) {
+  switch (findparam_ex(s, u->faction->locale)) {
 
   case P_FACTION:
     s = getstrtoken();
@@ -3374,7 +3379,7 @@ static void new_units(void)
         if (get_keyword(makeord) == K_MAKE) {
           init_tokens(makeord);
           skip_token();
-          if (getparam(u->faction->locale) == P_TEMP) {
+          if (isparam(getstrtoken(), u->faction->locale, P_TEMP)) {
             const char *token;
             char *name = NULL;
             int alias;

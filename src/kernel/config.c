@@ -1494,23 +1494,42 @@ keyword_t findkeyword(const char *s, const struct locale * lang)
 
 param_t findparam(const char *s, const struct locale * lang)
 {
-  void **tokens = get_translations(lang, UT_PARAMS);
-  int i;
   param_t result = NOPARAM;
-  const void * match;
   char buffer[64];
   char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
-  critbit_tree *cb = (critbit_tree *)*tokens;
 
-  if (str && cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-    cb_get_kv(match, &i, sizeof(int));
-    result = (param_t)i;
-  } else {
+  if (str) {
+    int i;
+    const void * match;
+    void **tokens = get_translations(lang, UT_PARAMS);
+    critbit_tree *cb = (critbit_tree *)*tokens;
+    if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+      cb_get_kv(match, &i, sizeof(int));
+      result = (param_t)i;
+    }
+  }
+  return result;
+}
+
+param_t findparam_ex(const char *s, const struct locale * lang)
+{
+  param_t result = findparam(s, lang);
+
+  if (result==NOPARAM) {
     const building_type *btype = findbuildingtype(s, lang);
     if (btype != NULL)
-      return (param_t) P_GEBAEUDE;
+      return P_GEBAEUDE;
   }
   return (result == P_BUILDING) ? P_GEBAEUDE : result;
+}
+
+int isparam(const char *s, const struct locale * lang, param_t param)
+{
+  if (s[0]>'@') {
+    param_t p = (param==P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
+    return p==param;
+  }
+  return 0;
 }
 
 param_t getparam(const struct locale * lang)
@@ -1588,18 +1607,17 @@ static int read_newunitid(const faction * f, const region * r)
 int read_unitid(const faction * f, const region * r)
 {
   const char *s = getstrtoken();
-  param_t param;
 
   /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-  param = findparam(s, f->locale);
-  if (param == P_TEMP) {
+  if (!s || *s == 0) {
+    return -1;
+  }
+  if (isparam(s, f->locale, P_TEMP)) {
     return read_newunitid(f, r);
   }
-  if (!s || *s == 0)
-    return -1;
   return atoi36((const char *)s);
 }
 

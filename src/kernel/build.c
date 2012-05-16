@@ -1341,10 +1341,12 @@ void do_misc(region * r, boolean lasttry)
         param_t p;
         int id;
         unit *ulast = NULL;
+        const char * s;
 
         init_tokens(ord);
         skip_token();
-        p = getparam(u->faction->locale);
+        s = getstrtoken();
+        p = findparam_ex(s, u->faction->locale);
         id = getid();
 
         switch (p) {

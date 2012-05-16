@@ -373,12 +373,12 @@ order *parse_order(const char *s, const struct locale * lang)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-boolean is_repeated(const order * ord)
+int is_repeated(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
   const char * s;
-  param_t param;
+  int result = 0;
 
   switch (kwd) {
   case K_CAST:
@@ -399,7 +399,8 @@ boolean is_repeated(const order * ord)
   case K_BREED:
   case K_PIRACY:
   case K_PLANT:
-    return true;
+    result = 1;
+    break;
 
   case K_FOLLOW:
     /* FOLLOW is only a long order if we are following a ship. */
@@ -407,13 +408,8 @@ boolean is_repeated(const order * ord)
     init_tokens(ord);
     skip_token();
     s = getstrtoken();
-    if (s[0]>'9') {
-      param = findparam(s, lang);
-      parser_popstate();
-      if (param == P_SHIP) {
-        return true;
-      }
-    }
+    result = isparam(s, lang, P_SHIP);
+    parser_popstate();
     break;
 
   case K_MAKE:
@@ -426,16 +422,13 @@ boolean is_repeated(const order * ord)
     init_tokens(ord);           /* initialize token-parser */
     skip_token();
     s = getstrtoken();
-    if (s[0]>'9') {
-      param = findparam(s, lang);
-      parser_popstate();
-      return param != P_TEMP;
-    }
+    result = !isparam(s, lang, P_TEMP);
+    parser_popstate();
     break;
   default:
-    return false;
+    result = 0;
   }
-  return false;
+  return result;
 }
 
 /**
@@ -446,11 +439,11 @@ boolean is_repeated(const order * ord)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-boolean is_exclusive(const order * ord)
+int is_exclusive(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
-  param_t param;
+  int result = 0;
 
   switch (kwd) {
   case K_MOVE:
@@ -471,18 +464,16 @@ boolean is_exclusive(const order * ord)
   case K_BREED:
   case K_PIRACY:
   case K_PLANT:
-    return true;
+    result = 1;
+    break;
 
   case K_FOLLOW:
     /* FOLLOW is only a long order if we are following a ship. */
     parser_pushstate();
     init_tokens(ord);
     skip_token();
-    param = getparam(lang);
+    result = isparam(getstrtoken(), lang, P_SHIP);
     parser_popstate();
-
-    if (param == P_SHIP)
-      return true;
     break;
 
   case K_MAKE:
@@ -494,16 +485,13 @@ boolean is_exclusive(const order * ord)
     parser_pushstate();
     init_tokens(ord);           /* initialize token-parser */
     skip_token();
-    param = getparam(lang);
+    result = !isparam(getstrtoken(), lang, P_TEMP);
     parser_popstate();
-
-    if (param != P_TEMP)
-      return true;
     break;
   default:
-    return false;
+    result = 0;
   }
-  return false;
+  return result;
 }
 
 /**
@@ -514,11 +502,11 @@ boolean is_exclusive(const order * ord)
  * \return true if the order is long
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-boolean is_long(const order * ord)
+int is_long(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
   const struct locale *lang = ORD_LOCALE(ord);
-  param_t param;
+  int result = 0;
 
   switch (kwd) {
   case K_CAST:
@@ -548,11 +536,8 @@ boolean is_long(const order * ord)
     parser_pushstate();
     init_tokens(ord);
     skip_token();
-    param = getparam(lang);
+    result = isparam(getstrtoken(), lang, P_SHIP);
     parser_popstate();
-
-    if (param == P_SHIP)
-      return true;
     break;
 
   case K_MAKE:
@@ -564,16 +549,13 @@ boolean is_long(const order * ord)
     parser_pushstate();
     init_tokens(ord);           /* initialize token-parser */
     skip_token();
-    param = getparam(lang);
+    result = !isparam(getstrtoken(), lang, P_TEMP);
     parser_popstate();
-
-    if (param != P_TEMP)
-      return true;
     break;
   default:
-    return false;
+    result = 0;
   }
-  return false;
+  return result;
 }
 
 /**
@@ -585,10 +567,10 @@ boolean is_long(const order * ord)
  * \return true if the order is persistent
  * \sa is_exclusive(), is_repeated(), is_persistent()
  */
-boolean is_persistent(const order * ord)
+int is_persistent(const order * ord)
 {
   keyword_t kwd = ORD_KEYWORD(ord);
-  boolean persist = ord->_persistent != 0;
+  int persist = ord->_persistent != 0;
   switch (kwd) {
   case K_MOVE:
   case K_WEREWOLF:

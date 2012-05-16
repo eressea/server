@@ -1922,7 +1922,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
   sppobj_t otype = SPP_UNIT;
 
   *spobjp = NULL;
-  if (findparam(param[0], u->faction->locale) == P_TEMP) {
+  if (isparam(param[0], u->faction->locale, P_TEMP)) {
     if (param[1] == NULL) {
       /* Fehler: Ziel vergessen */
       cmistake(u, ord, 203, MSG_MAGIC);
@@ -1981,7 +1981,6 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
 
   while (!fail && *c && i < size && param[i] != NULL) {
     spllprm *spobj = NULL;
-    param_t pword;
     int j = -1;
     switch (*c) {
     case '?':
@@ -2028,8 +2027,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
       break;
     case 'k':
       ++c;
-      pword = findparam(param[i++], u->faction->locale);
-      switch (pword) {
+      switch (findparam_ex(param[i++], u->faction->locale)) {
       case P_REGION:
         spobj = (spllprm *)malloc(sizeof(spllprm));
         spobj->flag = 0;

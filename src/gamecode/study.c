@@ -416,13 +416,13 @@ int teach_cmd(unit * u, struct order *ord)
         token = getstrtoken();
 
         /* Beginne die Fehlermeldung */
-        if (findparam(token, u->faction->locale) != P_TEMP) {
-          uid = token;
-        } else {
+        if (isparam(token, u->faction->locale, P_TEMP)) {
           token = getstrtoken();
           sprintf(tbuf, "%s %s", LOC(u->faction->locale,
               parameters[P_TEMP]), token);
           uid = tbuf;
+        } else {
+          uid = token;
         }
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unitnotfound_id",
             "id", uid));

@@ -291,7 +291,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
       if (s == NULL)
         break;
 
-      if (s[0]) {
+      if (s[0] && s[0]!='@') {
         const char *stok = s;
         stok = parse_token(&stok);
 
@@ -436,7 +436,7 @@ int readorders(const char *filename)
           b = getbuf(F, enc_gamedata);
           if (!b)
             break;
-          p = igetparam(b, lang);
+          p = (b[0]=='@') ? NOPARAM : igetparam(b, lang);
         } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
           && p != P_GAMENAME);
       break;
