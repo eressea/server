@@ -149,7 +149,7 @@ message *msg_message(const char *name, const char *sig, ...)
   memset(args, 0, sizeof(args));
 
   if (!mtype) {
-    log_warning(("trying to create message of unknown type \"%s\"\n", name));
+    log_warning("trying to create message of unknown type \"%s\"\n", name);
     if (strcmp(name, "missing_message") != 0) {
       return msg_message("missing_message", "name", name);
     }
@@ -200,7 +200,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 #define LOG_ENGLISH
 #ifdef LOG_ENGLISH
   if (f && f->locale != default_locale) {
-    log_warning(("message for locale \"%s\": %s\n", locale_name(f->locale), s));
+    log_warning("message for locale \"%s\": %s\n", locale_name(f->locale), s);
   }
 #endif
   unused(level);

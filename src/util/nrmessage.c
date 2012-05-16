@@ -56,12 +56,10 @@ nrmessage_type *nrt_find(const struct locale * lang,
     type = type->next;
   }
   if (!found) {
-    log_warning(("could not find nr-type %s for locale %s\n",
-        mtype->name, locale_name(lang)));
+    log_warning("could not find nr-type %s for locale %s\n", mtype->name, locale_name(lang));
   }
   if (lang && found && found->lang != lang) {
-    log_warning(("could not find nr-type %s for locale %s, using %s\n",
-        mtype->name, locale_name(lang), locale_name(found->lang)));
+    log_warning("could not find nr-type %s for locale %s, using %s\n", mtype->name, locale_name(lang), locale_name(found->lang));
   }
   return found;
 }

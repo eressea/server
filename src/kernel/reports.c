@@ -837,8 +837,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
     }
   }
   if (size <= 1) {
-    log_warning(("bufunit ran out of space after writing %u bytes.\n",
-        (bufp - buf)));
+    log_warning("bufunit ran out of space after writing %u bytes.\n", (bufp - buf));
   }
   return dh;
 }
@@ -1548,7 +1547,7 @@ int write_reports(faction * f, time_t ltime)
     }
   } while (errno);
   if (!gotit) {
-    log_warning(("No report for faction %s!\n", factionid(f)));
+    log_warning("No report for faction %s!\n", factionid(f));
   }
   ql_free(ctx.addresses);
   seen_done(ctx.seen);

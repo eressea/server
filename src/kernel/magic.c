@@ -944,8 +944,7 @@ boolean knowsspell(const region * r, const unit * u, const spell * sp)
   /* Magier? */
   mage = get_mage(u);
   if (!mage) {
-    log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n",
-        unitname(u)));
+    log_warning("%s ist kein Magier, versucht aber zu zaubern.\n", unitname(u));
     return false;
   }
   /* steht der Spruch in der Spruchliste? */
@@ -955,8 +954,7 @@ boolean knowsspell(const region * r, const unit * u, const spell * sp)
       return false;
     }
     if (eff_skill(u, SK_MAGIC, u->region) >= sp->level) {
-      log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n",
-          unitname(u), spell_name(sp, default_locale)));
+      log_warning("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n", unitname(u), spell_name(sp, default_locale));
     }
     return false;
   }

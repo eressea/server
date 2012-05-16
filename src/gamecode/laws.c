@@ -1099,8 +1099,7 @@ static int restart_cmd(unit * u, struct order *ord)
 
     if (!checkpasswd(u->faction, (const char *)s_pass, false)) {
       cmistake(u, ord, 86, MSG_EVENT);
-      log_warning(("RESTART with wrong password, faction %s, pass %s\n",
-          factionid(u->faction), s_pass));
+      log_warning("RESTART with wrong password, faction %s, pass %s\n", factionid(u->faction), s_pass);
       return 0;
     }
     restart_race(u, frace);
@@ -1156,8 +1155,7 @@ static int quit_cmd(unit * u, struct order *ord)
     char buffer[64];
     write_order(ord, buffer, sizeof(buffer));
     cmistake(u, ord, 86, MSG_EVENT);
-    log_warning(("QUIT with illegal password for faction %s: %s\n",
-        factionid(f), buffer));
+    log_warning("QUIT with illegal password for faction %s: %s\n", factionid(f), buffer);
   }
   return 0;
 }
@@ -4382,7 +4380,7 @@ void update_subscriptions(void)
   strcat(strcpy(zText, basepath()), "/subscriptions");
   F = fopen(zText, "r");
   if (F == NULL) {
-    log_warning((0, "could not open %s.\n", zText));
+    log_warning(0, "could not open %s.\n", zText);
     return;
   }
   for (;;) {

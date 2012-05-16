@@ -196,7 +196,7 @@ void _log_debug(const char *format, ...)
   }
 }
 
-void _log_warn(const char *format, ...)
+void log_warning(const char *format, ...)
 {
   const char * prefix = "WARNING";
   const int mask = LOG_CPWARNING;

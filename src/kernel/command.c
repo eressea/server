@@ -95,7 +95,7 @@ void do_command(const void *keys, struct unit *u, struct order *ord)
   skip_token();
   if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {
     char *cmd = getcommand(ord);
-    log_warning(("%s failed command '%s'\n", unitname(u), cmd));
+    log_warning("%s failed command '%s'\n", unitname(u), cmd);
     free(cmd);
   }
 }

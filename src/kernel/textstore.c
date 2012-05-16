@@ -142,14 +142,14 @@ static int txt_open(struct storage *store, const char *filename, int mode)
       store->r_tok_buf(store, token, sizeof(token));
       if (memcmp(token, utf8_bom, 3) == 0) {
         if (enc_gamedata != XML_CHAR_ENCODING_UTF8) {
-          log_warning(("Found UTF-8 BOM, assuming unicode game data.\n"));
+          log_warning("Found UTF-8 BOM, assuming unicode game data.\n");
           store->encoding = XML_CHAR_ENCODING_UTF8;
         }
         store->version = atoi(token + 3);
       } else {
         if (store->encoding == XML_CHAR_ENCODING_NONE) {
           store->encoding = XML_CHAR_ENCODING_8859_1;
-          log_warning(("No BOM, assuming 8859-1 game data.\n"));
+          log_warning("No BOM, assuming 8859-1 game data.\n");
         }
         store->version = atoi(token);
       }

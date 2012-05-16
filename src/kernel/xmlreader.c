@@ -604,8 +604,7 @@ static int parse_ships(xmlDocPtr doc)
         if (st->coasts[c] != NULL)
           ++c;
         else {
-          log_warning(("ship %s mentions a non-existing terrain %s.\n",
-              st->name[0], propValue));
+          log_warning("ship %s mentions a non-existing terrain %s.\n", st->name[0], propValue);
         }
         xmlFree(propValue);
       }
@@ -2210,8 +2209,7 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
         }
         xmlFree(propText);
       } else {
-        log_warning(("string %s has no text in locale %s\n",
-            zName, locale_name(lang)));
+        log_warning("string %s has no text in locale %s\n", zName, locale_name(lang));
       }
     }
     xmlXPathFreeObject(result);

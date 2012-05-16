@@ -63,7 +63,7 @@ spell *find_spell(const char *name)
       return sp;
     }
   }
-  log_warning(("find_spell: could not find spell '%s'\n", name));
+  log_warning("find_spell: could not find spell '%s'\n", name);
   return 0;
 }
 
@@ -121,6 +121,6 @@ spell *find_spellbyid(unsigned int id)
     }
   }
 
-  log_warning(("cannot find spell by id: %u\n", id));
+  log_warning("cannot find spell by id: %u\n", id);
   return NULL;
 }

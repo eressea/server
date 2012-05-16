@@ -45,14 +45,14 @@ void at_register(attrib_type * at)
   attrib_type *find;
 
   if (at->read == NULL) {
-    log_warning(("registering non-persistent attribute %s.\n", at->name));
+    log_warning("registering non-persistent attribute %s.\n", at->name);
   }
   at->hashkey = __at_hashkey(at->name);
   find = at_hash[at->hashkey % MAXATHASH];
   while (find && at->hashkey != find->hashkey)
     find = find->nexthash;
   if (find && find == at) {
-    log_warning(("attribute '%s' was registered more than once\n", at->name));
+    log_warning("attribute '%s' was registered more than once\n", at->name);
     return;
   } else {
     assert(!find || !"hashkey is already in use");

@@ -355,7 +355,7 @@ resource_type *rt_find(const char *name)
       break;
   }
   if (!rtype) {
-    log_warning(("rt_find: unknown resource '%s'\n", name));
+    log_warning("rt_find: unknown resource '%s'\n", name);
   }
   return rtype;
 }

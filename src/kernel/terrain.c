@@ -127,7 +127,7 @@ terrain_t oldterrain(const struct terrain_type * terrain)
     if (newterrains[t] == terrain)
       return t;
   }
-  log_warning(("%s is not a classic terrain.\n", terrain->_name));
+  log_warning("%s is not a classic terrain.\n", terrain->_name);
   return NOTERRAIN;
 }
 

@@ -78,10 +78,9 @@ static int timeout_read(trigger * t, struct storage *store)
   read_triggers(store, &td->triggers);
   if (td->timer > 20) {
     trigger *tr = td->triggers;
-    log_warning(("there is a timeout lasting for another %d turns\n",
-        td->timer));
+    log_warning("there is a timeout lasting for another %d turns\n", td->timer);
     while (tr) {
-      log_warning(("  timeout triggers: %s\n", tr->type->name));
+      log_warning("  timeout triggers: %s\n", tr->type->name);
       tr = tr->next;
     }
   }

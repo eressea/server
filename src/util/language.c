@@ -148,8 +148,7 @@ const char *locale_string(const locale * lang, const char *key)
       find = find->nexthash;
     }
     if (!find) {
-      log_warning(("missing translation for \"%s\" in locale %s\n", key,
-          lang->name));
+      log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
       if (lang != default_locale) {
         return locale_string(default_locale, key);
       }

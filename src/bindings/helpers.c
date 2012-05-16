@@ -271,8 +271,7 @@ static void lua_initfamiliar(unit * u)
       lua_pop(L, 1);
     }
   } else {
-    log_warning(("familiar(%s) calling '%s': not a function.\n",
-        unitname(u), fname));
+    log_warning("familiar(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
 

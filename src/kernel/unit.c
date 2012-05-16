@@ -1562,7 +1562,7 @@ int countheroes(const struct faction *f)
 #ifdef DEBUG_MAXHEROES
   int m = maxheroes(f);
   if (n > m) {
-    log_warning(("%s has %d of %d heroes\n", factionname(f), n, m));
+    log_warning("%s has %d of %d heroes\n", factionname(f), n, m);
   }
 #endif
   return n;

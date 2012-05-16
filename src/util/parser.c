@@ -36,7 +36,7 @@ static int eatwhitespace_c(const char **str_p)
     } else {
       ret = unicode_utf8_to_ucs4(&ucs, str, &len);
       if (ret != 0) {
-        log_warning(("illegal character sequence in UTF8 string: %s\n", str));
+        log_warning("illegal character sequence in UTF8 string: %s\n", str);
         break;
       }
       if (!iswxspace((wint_t) ucs))
@@ -100,8 +100,7 @@ void skip_token(void)
       if (ret == 0) {
         state->current_token += len;
       } else {
-        log_warning(("illegal character sequence in UTF8 string: %s\n",
-            state->current_token));
+        log_warning("illegal character sequence in UTF8 string: %s\n", state->current_token);
       }
     }
     if (iswxspace((wint_t) ucs) && quotechar == 0) {
@@ -145,8 +144,7 @@ const char *parse_token(const char **str)
     } else {
       int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
       if (ret != 0) {
-        log_warning(("illegal character sequence in UTF8 string: %s\n",
-            ctoken));
+        log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
         break;
       }
     }

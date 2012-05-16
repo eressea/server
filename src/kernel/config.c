@@ -746,7 +746,7 @@ void verify_data(void)
           lf = f->no;
           log_printf(stdout, "Partei %s:\n", factionid(f));
         }
-        log_warning(("Einheit %s hat %d Personen\n", unitid(u), u->number));
+        log_warning("Einheit %s hat %d Personen\n", unitid(u), u->number);
       }
     }
     if (f->no != 0 && ((mage > 3 && f->race != new_race[RC_ELF]) || mage > 4))
@@ -1143,8 +1143,7 @@ const char *strcheck(const char *s, size_t maxlen)
   static char buffer[16 * 1024];
   if (strlen(s) > maxlen) {
     assert(maxlen < 16 * 1024);
-    log_warning(("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n",
-        (int)maxlen, s));
+    log_warning("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n", (int)maxlen, s);
     strlcpy(buffer, s, maxlen);
     return buffer;
   }

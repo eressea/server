@@ -57,10 +57,10 @@ boolean xml_bvalue(xmlNodePtr node, const char *name, boolean dflt)
     else if (strcmp((const char *)propValue, "true") == 0)
       result = true;
     else if (strcmp((const char *)propValue, "1") == 0) {
-      log_warning(("boolean value is '1': %s::%s\n", node->name, name));
+      log_warning("boolean value is '1': %s::%s\n", node->name, name);
       result = true;
     } else if (strcmp((const char *)propValue, "0") == 0) {
-      log_warning(("boolean value is '0': %s::%s\n", node->name, name));
+      log_warning("boolean value is '0': %s::%s\n", node->name, name);
       result = false;
     }
     xmlFree(propValue);

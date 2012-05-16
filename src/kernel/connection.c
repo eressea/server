@@ -677,7 +677,7 @@ int read_borders(struct storage *store)
         return result;
     }
     if (!type->name || !to || !from) {
-      log_warning(("erase invalid border '%s' between '%s' and '%s'\n", type->__name, regionname(from, 0), regionname(to, 0)));
+      log_warning("erase invalid border '%s' between '%s' and '%s'\n", type->__name, regionname(from, 0), regionname(to, 0));
       erase_border(b);
     }
   }

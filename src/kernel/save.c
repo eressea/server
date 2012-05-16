@@ -347,7 +347,7 @@ static faction *factionorders(void)
     const char *pass = getstrtoken();
 
     if (!checkpasswd(f, (const char *)pass, true)) {
-      log_warning(("Invalid password for faction %s\n", itoa36(fid)));
+      log_warning("Invalid password for faction %s\n", itoa36(fid));
       ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
           f->no, pass));
       return 0;
@@ -360,7 +360,7 @@ static faction *factionorders(void)
     f->lastorders = global.data_turn + 1;
 
   } else {
-    log_warning(("orders for invalid faction %s\n", itoa36(fid)));
+    log_warning("orders for invalid faction %s\n", itoa36(fid));
   }
   return f;
 }
@@ -806,7 +806,7 @@ unit *read_unit(struct storage *store)
   if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_faction()) {
     /* if this rule is broken, then fix broken units */
     u->flags -= UFL_ANON_FACTION;
-    log_warning(("%s was anonymous.\n", unitname(u)));
+    log_warning("%s was anonymous.\n", unitname(u));
   }
   /* Persistente Befehle einlesen */
   free_orders(&u->orders);
@@ -823,11 +823,10 @@ unit *read_unit(struct storage *store)
             orderp = &ord->next;
             ord = NULL;
           } else if (p == MAXPERSISTENT) {
-            log_warning(("%s had %d or more persistent orders\n", unitname(u),
-                MAXPERSISTENT));
+            log_warning("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT);
           }
         } else if (n == MAXORDERS) {
-          log_warning(("%s had %d or more orders\n", unitname(u), MAXORDERS));
+          log_warning("%s had %d or more orders\n", unitname(u), MAXORDERS);
         }
         if (ord != NULL)
           free_order(ord);
@@ -1238,8 +1237,7 @@ faction *readfaction(struct storage * store)
 
   store->r_str_buf(store, email, sizeof(email));
   if (set_email(&f->email, email) != 0) {
-    log_warning(("Invalid email address for faction %s: %s\n", itoa36(f->no),
-        email));
+    log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
     set_email(&f->email, "");
   }
 
@@ -1412,7 +1410,7 @@ static void repair_unit(unit * u) {
     }
     if (!found) {
       u->race = u->faction->race;
-      log_warning(("This toad did not have a changerace trigger: %s\n", unitname(u)));
+      log_warning("This toad did not have a changerace trigger: %s\n", unitname(u));
     }
   }
 }
@@ -1454,8 +1452,7 @@ int readgame(const char *filename, int mode, int backup)
       char buffer[64];
       snprintf(buffer, sizeof(buffer), "%s.xml", game_name);
       if (strcmp(basefile, buffer) != 0) {
-        log_warning(("game mismatch: datafile contains %s, game is %s\n",
-            basefile, game_name));
+        log_warning("game mismatch: datafile contains %s, game is %s\n", basefile, game_name);
         printf("WARNING: any key to continue, Ctrl-C to stop\n");
         getchar();
       }
@@ -1480,7 +1477,7 @@ int readgame(const char *filename, int mode, int backup)
     if (pl == NULL) {
       pl = calloc(1, sizeof(plane));
     } else {
-      log_warning(("the plane with id=%d already exists.\n", id));
+      log_warning("the plane with id=%d already exists.\n", id);
     }
     pl->id = id;
     pl->name = store->r_str(store);
@@ -1692,7 +1689,7 @@ int readgame(const char *filename, int mode, int backup)
         int no = 666;
         while (findfaction(no))
           ++no;
-        log_warning(("renum(monsters, %d)\n", no));
+        log_warning("renum(monsters, %d)\n", no);
         renumber_faction(f, no);
       }
     } else {
