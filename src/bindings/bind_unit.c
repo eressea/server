@@ -614,20 +614,20 @@ static int tolua_unit_get_building(lua_State * L)
   return 1;
 }
 
-static void unit_setbuilding(unit * u, building * b)
-{
-  leave(u, true);
-  if (b && u->region != b->region) {
-    move_unit(u, b->region, NULL);
-  }
-  u->building = b;
-}
-
 static int tolua_unit_set_building(lua_State * L)
 {
-  unit *self = (unit *) tolua_tousertype(L, 1, 0);
-  if (self->faction) {
-    unit_setbuilding(self, (building *) tolua_tousertype(L, 2, 0));
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
+  if (u->faction) {
+    building * b = (building *) tolua_tousertype(L, 2, 0);
+    if (b!=u->building) {
+      leave(u, true);
+      if (b) {
+        if (u->region != b->region) {
+          move_unit(u, b->region, NULL);
+        }
+        u_set_building(u, b);
+      }
+    }
   }
   return 0;
 }

@@ -94,6 +94,7 @@
     <ClCompile Include="kernel\binarystore.c" />
     <ClCompile Include="kernel\build.c" />
     <ClCompile Include="kernel\building.c" />
+    <ClCompile Include="kernel\building_test.c" />
     <ClCompile Include="kernel\calendar.c" />
     <ClCompile Include="kernel\command.c" />
     <ClCompile Include="kernel\config.c" />

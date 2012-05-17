@@ -145,8 +145,9 @@ building_type *bt_find(const char *name)
 
 void bt_register(building_type * type)
 {
-  if (type->init)
+  if (type->init) {
     type->init(type);
+  }
   ql_push(&buildingtypes, (void *)type);
 }
 
@@ -616,43 +617,44 @@ const char *buildingname(const building * b)
 
 void building_set_owner(struct building *b, struct unit * owner)
 {
-  unit * u;
-
   assert(b && owner && owner->building==b);
-
-  for (u = b->region->units; u; u = u->next) {
-    if (u->building == b) {
-      freset(owner, UFL_OWNER);
-    }
+  if (b->_owner && b->_owner!=owner) {
+    freset(b->_owner, UFL_OWNER);
   }
+  b->_owner = owner;
   fset(owner, UFL_OWNER);
 }
 
-unit *building_owner(const building * b)
+unit *building_owner(const building * bld)
 {
-  unit *u = NULL;
-  unit *first = NULL;
-  region *r = b->region;
-  /* Prüfen ob Eigentümer am leben. */
+  unit *owner = bld->_owner;
+  if (owner && (owner->building!=bld || owner->number<=0)) {
+    unit *u, *heir = 0;
 
-  for (u = r->units; u; u = u->next) {
-    if (u->building == b) {
-      if (!first && u->number > 0)
-        first = u;
-      if (fval(u, UFL_OWNER) && u->number > 0)
-        return u;
-      if (u->number == 0)
+    /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+     * nehmen. */
+    for (u = bld->region->units; u; u = u->next) {
+      if (u->building == bld) {
+        if (u->number > 0) {
+          if (u->faction==owner->faction) {
+            heir = u;
+            break;
+          }
+          else if (!heir) {
+            heir = u; /* you'll do in an emergency */
+          }
+        }
         freset(u, UFL_OWNER);
+      }
+    }
+    freset(owner, UFL_OWNER);
+    owner->building = 0;
+    owner = heir;
+    if (owner) {
+      fset(owner, UFL_OWNER);
     }
   }
-
-  /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
-   * nehmen. */
-
-  if (first) {
-    fset(first, UFL_OWNER);
-  }
-  return first;
+  return owner;
 }
 
 const char *building_getname(const building * self)

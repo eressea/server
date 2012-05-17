@@ -1,5 +1,6 @@
 #include <platform.h>
 
+#include <kernel/config.h>
 #include <kernel/types.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -43,8 +44,10 @@ static void test_ship_set_owner(CuTest * tc)
 
   sh = test_create_ship(r, stype);
   u1 = test_create_unit(f, r);
-  u2 = test_create_unit(f, r);
   u_set_ship(u1, sh);
+  CuAssertPtrEquals(tc, u1, ship_owner(sh));
+
+  u2 = test_create_unit(f, r);
   u_set_ship(u2, sh);
   CuAssertPtrEquals(tc, u1, ship_owner(sh));
   ship_set_owner(sh, u2);

@@ -778,17 +778,17 @@ void u_set_building(unit * u, building * b)
 {
   assert(b && !u->building); /* you must leave first */
   u->building = b;
+  if (b && !b->_owner) {
+    building_set_owner(b, u);
+  }
 }
 
 void u_set_ship(unit * u, ship * sh)
 {
   assert(!u->ship); /* you must leave_ship */
-  if (sh) {
-    u->ship = sh;
-    if (!sh->owner) {
-      sh->owner = u;
-      fset(u, UFL_OWNER);
-    }
+  u->ship = sh;
+  if (sh && !sh->_owner) {
+    ship_set_owner(sh, u);
   }
 }
 
@@ -798,37 +798,14 @@ void leave_ship(unit * u)
   if (!sh) return;
   u->ship = 0;
   set_leftship(u, sh);
-
-  if (fval(u, UFL_OWNER)) {
-    unit *u2, *owner = NULL;
-    freset(u, UFL_OWNER);
-
-    for (u2 = u->region->units; u2; u2 = u2->next) {
-      if (u2->ship == sh) {
-        if (u2->faction == u->faction) {
-          owner = u2;
-          break;
-        } else if (!owner) {
-          owner = u2;
-        }
-      }
-    }
-    sh->owner = owner;
-    if (owner) {
-      fset(owner, UFL_OWNER);
-    }
-  }
-  assert(sh->owner!=u);
 }
 
 void leave_building(unit * u)
 {
   struct building *b = u->building;
-  if (!b)
-    return;
-  u->building = NULL;
 
-  if (fval(u, UFL_OWNER)) {
+  u->building = NULL;
+  if (b && fval(u, UFL_OWNER)) {
     unit *u2, *owner = NULL;
     freset(u, UFL_OWNER);
 
@@ -1521,7 +1498,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
     /* erbt Gebäude/Schiff */
     if (creator->region == r) {
-      u->building = creator->building;
+      if (creator->building) {
+        u_set_building(u, creator->building);
+      }
       if (creator->ship && fval(u->race, RCF_CANSAIL)) {
         u_set_ship(u, creator->ship);
       }

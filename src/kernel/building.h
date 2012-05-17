@@ -104,6 +104,7 @@ extern "C" {
 
     const struct building_type *type;
     struct region *region;
+    struct unit *_owner; /* you should always use building_owner(), never this naked pointer */
     char *name;
     char *display;
     struct attrib *attribs;

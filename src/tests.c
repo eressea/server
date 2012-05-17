@@ -10,6 +10,7 @@
 #include <util/umlaut_test.c>
 #include <kernel/move_test.c>
 #include <kernel/ship_test.c>
+#include <kernel/building_test.c>
 #include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
@@ -47,6 +48,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_move_suite());
   CuSuiteAddSuite(suite, get_reports_suite());
   CuSuiteAddSuite(suite, get_ship_suite());
+  CuSuiteAddSuite(suite, get_building_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
   CuSuiteAddSuite(suite, get_battle_suite());

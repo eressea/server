@@ -53,7 +53,7 @@ static void test_rename_building(CuTest * tc)
   b = new_building(btype, r, default_locale);
   f = test_create_faction(rc_find("human"));
   u = test_create_unit(f, r);
-  u->building = b;
+  u_set_building(u, b);
   fset(u, UFL_OWNER);
 
   rename_building(u, NULL, b, "Villa Nagel");
@@ -77,8 +77,7 @@ static void test_rename_building_twice(CuTest * tc)
   b = new_building(btype, r, default_locale);
   f = test_create_faction(rc_find("human"));
   u = test_create_unit(f, r);
-  u->building = b;
-  fset(u, UFL_OWNER);
+  u_set_building(u, b);
 
   rename_building(u, NULL, b, "Villa Nagel");
   CuAssertStrEquals(tc, "Villa Nagel", b->name);

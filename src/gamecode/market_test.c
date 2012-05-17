@@ -61,8 +61,7 @@ static void market_curse(CuTest * tc)
 
   f = addfaction("nobody@eressea.de", NULL, rc, default_locale, 0);
   u = create_unit(r, f, 1, f->race, 0, 0, 0);
-  u->building = b;
-  u->flags |= UFL_OWNER;
+  u_set_building(u, b);
 
   do_markets();
 

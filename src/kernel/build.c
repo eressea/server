@@ -360,14 +360,13 @@ int destroy_cmd(unit * u, struct order *ord)
     return 0;
   }
 
-  if (!fval(u, UFL_OWNER)) {
-    cmistake(u, ord, 138, MSG_PRODUCE);
-    return 0;
-  }
-
   if (u->building) {
     building *b = u->building;
 
+    if (u!=building_owner(b)) {
+      cmistake(u, ord, 138, MSG_PRODUCE);
+      return 0;
+    }
     if (fval(b->type, BTF_INDESTRUCTIBLE)) {
       cmistake(u, ord, 138, MSG_PRODUCE);
       return 0;
@@ -377,8 +376,8 @@ int destroy_cmd(unit * u, struct order *ord)
       /* all units leave the building */
       for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->building == b) {
-          u2->building = 0;
           freset(u2, UFL_OWNER);
+          leave_building(u2);
         }
       }
       ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
@@ -393,6 +392,10 @@ int destroy_cmd(unit * u, struct order *ord)
   } else if (u->ship) {
     sh = u->ship;
 
+    if (u!=ship_owner(sh)) {
+      cmistake(u, ord, 138, MSG_PRODUCE);
+      return 0;
+    }
     if (fval(r->terrain, SEA_REGION)) {
       cmistake(u, ord, 14, MSG_EVENT);
       return 0;
@@ -970,8 +973,8 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
     /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
     if (leave(u, false)) {
-      u->building = b;
-      fset(u, UFL_OWNER);
+      u_set_building(u, b);
+      assert(building_owner(b)==u);
     }
 #ifdef WDW_PYRAMID
     if (b->type == bt_find("pyramid") && f_get_alliance(u->faction) != NULL) {
@@ -1297,11 +1300,8 @@ static boolean enter_building(unit * u, order * ord, int id, boolean report)
   }
 
   if (leave(u, false)) {
-    if (building_owner(b) == 0) {
-      fset(u, UFL_OWNER);
-    }
     fset(u, UFL_ENTER);
-    u->building = b;
+    u_set_building(u, b);
     return true;
   }
   return false;

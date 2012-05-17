@@ -81,7 +81,7 @@ extern "C" {
   typedef struct ship {
     struct ship *next;
     struct ship *nexthash;
-    struct unit * owner;
+    struct unit * _owner; /* never use directly, always use ship_owner() */
     int no;
     struct region *region;
     char *name;
@@ -96,7 +96,7 @@ extern "C" {
 
   extern void damage_ship(struct ship * sh, double percent);
   extern void ship_set_owner(struct ship * sh, struct unit * u);
-  extern struct unit *ship_owner(struct ship *sh);
+  extern struct unit *ship_owner(const struct ship *sh);
   extern const char *shipname(const struct ship *self);
   extern int shipcapacity(const struct ship *sh);
   extern void getshipweight(const struct ship *sh, int *weight, int *cabins);

@@ -77,7 +77,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
 
   du = test_create_unit(test_create_faction(rc_find("human")), r);
   au = test_create_unit(test_create_faction(rc_find("human")), r);
-  du->building = bld;
+  u_set_building(du, bld);
 
   b = make_battle(r);
   ds = make_side(b, du->faction, 0, 0, 0);
@@ -119,8 +119,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
   bld->size = 10;
 
   au = test_create_unit(test_create_faction(rc_find("human")), r);
-  au->building = bld;
-
+  u_set_building(au, bld);
 
   b = make_battle(r);
   as = make_side(b, au->faction, 0, 0, 0);
@@ -151,9 +150,9 @@ static void test_building_bonus_respects_size(CuTest * tc)
   f = test_create_faction(rc_find("human"));
   au = test_create_unit(f, r);
   scale_number(au, 9);
-  au->building = bld;
+  u_set_building(au, bld);
   du = test_create_unit(f, r);
-  du->building = bld;
+  u_set_building(du, bld);
   scale_number(du, 2);
 
   b = make_battle(r);

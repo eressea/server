@@ -911,8 +911,9 @@ static void move_iceberg(region * r)
       while (rc->units) {
         building *b = rc->units->building;
         u = rc->units;
+        u->building = 0; /* prevent leaving in move_unit */
         move_unit(rc->units, r, NULL);
-        u->building = b;        /* move_unit macht ein leave() */
+        u_set_building(u, b); /* undo leave-prevention */
       }
 
       /* Beschädigte Schiffe können sinken */
