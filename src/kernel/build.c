@@ -420,7 +420,8 @@ int destroy_cmd(unit * u, struct order *ord)
           "unit region ship", u, r, sh));
     }
   } else {
-    log_error("Die Einheit %s von %s war owner eines objects, war aber weder in einer Burg noch in einem Schiff.\n", unitname(u), u->faction->name, u->faction->email);
+    cmistake(u, ord, 138, MSG_PRODUCE);
+    return 0;
   }
 
   if (con) {
