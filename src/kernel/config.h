@@ -68,13 +68,6 @@ extern "C" {
 /* Chance of a monster attack */
 #define MONSTERATTACK  0.4F
 
-/** Chance of an unmaintained building crashing */
-/* #define COLLAPSE_CHANCE 0.4F */
-#undef COLLAPSE_CHANCE
-/** chance to survive the crash of a building */
-/* #define COLLAPSE_SURVIVAL 0.5F */
-#undef COLLAPSE_SURVIVAL
-
 /* Bewegungsweiten: */
 #define BP_WALKING 4
 #define BP_RIDING  6

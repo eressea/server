@@ -376,7 +376,6 @@ int destroy_cmd(unit * u, struct order *ord)
       /* all units leave the building */
       for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->building == b) {
-          freset(u2, UFL_OWNER);
           leave_building(u2);
         }
       }

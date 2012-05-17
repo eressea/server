@@ -795,32 +795,21 @@ void u_set_ship(unit * u, ship * sh)
 void leave_ship(unit * u)
 {
   struct ship *sh = u->ship;
-  if (!sh) return;
+
   u->ship = 0;
+  if (sh->_owner==u) {
+    sh->_owner = ship_owner(sh);
+  }
   set_leftship(u, sh);
 }
 
 void leave_building(unit * u)
 {
-  struct building *b = u->building;
+  building * b = u->building;
 
-  u->building = NULL;
-  if (b && fval(u, UFL_OWNER)) {
-    unit *u2, *owner = NULL;
-    freset(u, UFL_OWNER);
-
-    for (u2 = u->region->units; u2; u2 = u2->next) {
-      if (u2->building == b) {
-        if (u2->faction == u->faction) {
-          owner = u2;
-          break;
-        } else if (owner == NULL)
-          owner = u2;
-      }
-    }
-    if (owner != NULL) {
-      fset(owner, UFL_OWNER);
-    }
+  u->building = 0;
+  if (b->_owner==u) {
+    b->_owner = building_owner(b);
   }
 }
 

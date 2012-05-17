@@ -1351,24 +1351,26 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
         ru && ru->type == &at_travelunit; ru = ru->next) {
         unit *u = (unit *) ru->data.v;
         if (cansee_durchgezogen(f, r, u, 0) && r != u->region) {
-          if (!u->ship || !fval(u, UFL_OWNER))
-            continue;
-          if (!seeships)
-            fprintf(F, "DURCHSCHIFFUNG\n");
-          seeships = true;
-          fprintf(F, "\"%s\"\n", shipname(u->ship));
+          if (u->ship && ship_owner(u->ship)==u) {
+            if (!seeships) {
+              fprintf(F, "DURCHSCHIFFUNG\n");
+            }
+            seeships = true;
+            fprintf(F, "\"%s\"\n", shipname(u->ship));
+          }
         }
       }
       for (ru = a_find(r->attribs, &at_travelunit);
         ru && ru->type == &at_travelunit; ru = ru->next) {
         unit *u = (unit *) ru->data.v;
         if (cansee_durchgezogen(f, r, u, 0) && r != u->region) {
-          if (u->ship)
-            continue;
-          if (!seeunits)
-            fprintf(F, "DURCHREISE\n");
-          seeunits = true;
-          fprintf(F, "\"%s\"\n", unitname(u));
+          if (!u->ship) {
+            if (!seeunits) {
+              fprintf(F, "DURCHREISE\n");
+            }
+            seeunits = true;
+            fprintf(F, "\"%s\"\n", unitname(u));
+          }
         }
       }
     }

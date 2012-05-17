@@ -1105,51 +1105,6 @@ static boolean maintain(building * b, boolean first)
   return true;
 }
 
-#ifdef COLLAPSE_CHANCE
-static void gebaeude_stuerzt_ein(region * r, building * b)
-{
-  unit *u;
-  int n, i;
-  int opfer = 0;
-  int road = 0;
-  struct message *msg;
-
-  for (u = r->units; u; u = u->next) {
-    if (u->building == b) {
-      int loss = 0;
-
-      fset(u->faction, FFL_MARK);
-      freset(u, UFL_OWNER);
-      leave(r, u);
-      n = u->number;
-#ifdef COLLAPSE_SURVIVAL
-      for (i = 0; i < n; i++) {
-        if (rng_double() >= COLLAPSE_SURVIVAL) {
-          ++loss;
-        }
-      }
-#endif
-      scale_number(u, u->number - loss);
-      opfer += loss;
-    }
-  }
-
-  msg =
-    msg_message("buildingcrash", "region building opfer road", r, b, opfer,
-    road);
-  add_message(&r->msgs, msg);
-  for (u = r->units; u; u = u->next) {
-    faction *f = u->faction;
-    if (fval(f, FFL_MARK)) {
-      freset(u->faction, FFL_MARK);
-      add_message(&f->msgs, msg);
-    }
-  }
-  msg_release(msg);
-  remove_building(&r->buildings, b);
-}
-#endif
-
 void maintain_buildings(region * r, boolean crash)
 {
   building **bp = &r->buildings;
@@ -1159,12 +1114,6 @@ void maintain_buildings(region * r, boolean crash)
 
     /* the second time, send a message */
     if (crash) {
-#ifdef COLLAPSE_CHANCE
-      if (!maintained && (rng_double() < COLLAPSE_CHANCE)) {
-        gebaeude_stuerzt_ein(r, b);
-        continue;
-      }
-#endif
       if (!fval(b, BLD_WORKING)) {
         unit *u = building_owner(b);
         const char *msgtype =

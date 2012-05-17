@@ -170,13 +170,7 @@ static int tolua_building_set_owner(lua_State * L)
 {
   building *b = (building *) tolua_tousertype(L, 1, 0);
   unit *u = (unit *) tolua_tousertype(L, 2, 0);
-  unit *o = b ? building_owner(b) : NULL;
-  if (o && o != u) {
-    freset(o, UFL_OWNER);
-  }
-  if (u) {
-    fset(u, UFL_OWNER);
-  }
+  building_set_owner(b, u);
   return 0;
 }
 

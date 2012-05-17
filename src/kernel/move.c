@@ -2597,13 +2597,13 @@ void movement(void)
             set_order(&u->thisorder, NULL);
           } else {
             if (ships) {
-              if (u->ship && fval(u, UFL_OWNER)) {
+              if (u->ship && ship_owner(u->ship)==u) {
                 init_tokens(u->thisorder);
                 skip_token();
                 move(u, false);
               }
             } else {
-              if (u->ship == NULL || !fval(u, UFL_OWNER)) {
+              if (!u->ship || ship_owner(u->ship)!=u) {
                 init_tokens(u->thisorder);
                 skip_token();
                 move(u, false);

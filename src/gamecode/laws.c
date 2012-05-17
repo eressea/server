@@ -1203,7 +1203,7 @@ static void nmr_death(faction * f)
   if (rule) {
     unit *u;
     for (u = f->units; u; u = u->nextF) {
-      if (u->building && fval(u, UFL_OWNER)) {
+      if (u->building && building_owner(u->building)==u) {
         remove_building(&u->region->buildings, u->building);
       }
     }
@@ -1526,7 +1526,6 @@ static cmp_building_cb get_cmp_region_owner(void)
 
 static int display_cmd(unit * u, struct order *ord)
 {
-  building *b = u->building;
   char **s = NULL;
   const char *str;
   region *r = u->region;
@@ -1538,19 +1537,19 @@ static int display_cmd(unit * u, struct order *ord)
   switch (findparam_ex(str, u->faction->locale)) {
   case P_BUILDING:
   case P_GEBAEUDE:
-    if (!b) {
+    if (!u->building) {
       cmistake(u, ord, 145, MSG_PRODUCE);
       break;
     }
-    if (!fval(u, UFL_OWNER)) {
+    if (building_owner(u->building)!=u) {
       cmistake(u, ord, 5, MSG_PRODUCE);
       break;
     }
-    if (!fval(b->type, BTF_NAMECHANGE) && b->display && b->display[0] != 0) {
+    if (!fval(u->building->type, BTF_NAMECHANGE) && u->building->display && u->building->display[0]) {
       cmistake(u, ord, 278, MSG_EVENT);
       break;
     }
-    s = &b->display;
+    s = &u->building->display;
     break;
 
   case P_SHIP:
@@ -1558,7 +1557,7 @@ static int display_cmd(unit * u, struct order *ord)
       cmistake(u, ord, 144, MSG_PRODUCE);
       break;
     }
-    if (!fval(u, UFL_OWNER)) {
+    if (ship_owner(u->ship)!=u) {
       cmistake(u, ord, 12, MSG_PRODUCE);
       break;
     }
@@ -1581,15 +1580,15 @@ static int display_cmd(unit * u, struct order *ord)
     break;
 
   case P_REGION:
-    if (!b) {
+    if (!u->building) {
       cmistake(u, ord, 145, MSG_EVENT);
       break;
     }
-    if (!fval(u, UFL_OWNER)) {
+    if (building_owner(u->building)!=u) {
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
+    if (u->building != largestbuilding(r, get_cmp_region_owner(), false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -1682,7 +1681,7 @@ rename_building(unit * u, order * ord, building * b, const char *name)
       }
     }
   } else {
-    if (!fval(u, UFL_OWNER)) {
+    if (owner!=u) {
       cmistake(u, ord, 148, MSG_PRODUCE);
       return -1;
     }
@@ -1814,7 +1813,7 @@ static int name_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 144, MSG_PRODUCE);
         break;
       }
-      if (!fval(u, UFL_OWNER)) {
+      if (ship_owner(u->ship)!=u) {
         cmistake(u, ord, 12, MSG_PRODUCE);
         break;
       }
@@ -1857,7 +1856,7 @@ static int name_cmd(unit * u, struct order *ord)
       cmistake(u, ord, 145, MSG_EVENT);
       break;
     }
-    if (!fval(u, UFL_OWNER)) {
+    if (building_owner(b)!=u) {
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
@@ -2881,7 +2880,9 @@ static void reorder(void)
               cmistake(u, ord, 258, MSG_EVENT);
             } else if (v->building != u->building || v->ship != u->ship) {
               cmistake(u, ord, 259, MSG_EVENT);
-            } else if (fval(u, UFL_OWNER)) {
+            } else if (u->building && building_owner(u->building)==u) {
+              cmistake(u, ord, 260, MSG_EVENT);
+            } else if (u->ship && ship_owner(u->ship)==u) {
               cmistake(u, ord, 260, MSG_EVENT);
             } else if (v == u) {
               cmistake(u, ord, 10, MSG_EVENT);
@@ -2895,7 +2896,9 @@ static void reorder(void)
                 sorted = true;
                 break;
               case P_BEFORE:
-                if (fval(v, UFL_OWNER)) {
+                if (v->ship && ship_owner(v->ship)==v) {
+                  cmistake(v, ord, 261, MSG_EVENT);
+                } else if (v->building && building_owner(v->building)==v) {
                   cmistake(v, ord, 261, MSG_EVENT);
                 } else {
                   unit **vp = &r->units;
@@ -2990,7 +2993,7 @@ static int renumber_cmd(unit * u, order * ord)
       cmistake(u, ord, 116, MSG_EVENT);
       break;
     }
-    if (!fval(u, UFL_OWNER)) {
+    if (ship_owner(u->ship)!=u) {
       cmistake(u, ord, 146, MSG_EVENT);
       break;
     }
@@ -3018,7 +3021,7 @@ static int renumber_cmd(unit * u, order * ord)
       cmistake(u, ord, 145, MSG_EVENT);
       break;
     }
-    if (!fval(u, UFL_OWNER)) {
+    if (building_owner(u->building)!=u) {
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
@@ -4068,12 +4071,6 @@ static void maintain_buildings_1(region * r)
   maintain_buildings(r, false);
 }
 
-#ifdef COLLAPSE_CHANCE
-static void maintain_buildings_2(region * r)
-{
-  maintain_buildings(r, true);
-}
-#endif
 static void reset_moved(unit * u)
 {
   freset(u, UFL_MOVED);
@@ -4245,11 +4242,6 @@ void init_processor(void)
     add_proc_global(p, &defaultorders, "Defaults setzen");
   }
   add_proc_global(p, &demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
-
-#ifdef COLLAPSE_CHANCE
-  p += 10;
-  add_proc_region(p, &maintain_buildings_2, "Gebaeudeunterhalt (2. Versuch)");
-#endif
 
   if (!global.disabled[K_SORT]) {
     p += 10;

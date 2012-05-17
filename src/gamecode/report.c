@@ -1382,7 +1382,7 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
     for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
       unit *u = (unit *) a->data.v;
 
-      if (r != u->region && (u->ship == NULL || fval(u, UFL_OWNER))) {
+      if (r != u->region && (!u->ship || ship_owner(u->ship)==u)) {
         if (cansee_durchgezogen(f, r, u, 0)) {
           ++maxtravel;
         }
@@ -1399,7 +1399,7 @@ static void durchreisende(FILE * F, const region * r, const faction * f)
     for (a = abegin; a && a->type == &at_travelunit; a = a->next) {
       unit *u = (unit *) a->data.v;
 
-      if (r != u->region && (u->ship == NULL || fval(u, UFL_OWNER))) {
+      if (r != u->region && (!u->ship || ship_owner(u->ship)==u)) {
         if (cansee_durchgezogen(f, r, u, 0)) {
           ++counter;
           if (u->ship != NULL) {
@@ -1565,7 +1565,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
           unitid(u), u->name, u->number, get_money(u));
         if (wrptr(&bufp, &size, bytes) != 0)
           WARN_STATIC_BUFFER();
-        if (u->building != NULL && fval(u, UFL_OWNER)) {
+        if (u->building && building_owner(u->building)==u) {
           building *b = u->building;
           int cost = buildingmaintenance(b, r_silver);
 
@@ -1578,7 +1578,7 @@ report_template(const char *filename, report_context * ctx, const char *charset)
               WARN_STATIC_BUFFER();
           }
         } else if (u->ship) {
-          if (fval(u, UFL_OWNER)) {
+          if (ship_owner(u->ship)==u) {
             bytes = (int)strlcpy(bufp, ",S", size);
           } else {
             bytes = (int)strlcpy(bufp, ",s", size);

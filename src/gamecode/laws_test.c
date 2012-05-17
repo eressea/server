@@ -54,7 +54,6 @@ static void test_rename_building(CuTest * tc)
   f = test_create_faction(rc_find("human"));
   u = test_create_unit(f, r);
   u_set_building(u, b);
-  fset(u, UFL_OWNER);
 
   rename_building(u, NULL, b, "Villa Nagel");
   CuAssertStrEquals(tc, "Villa Nagel", b->name);
