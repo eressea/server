@@ -160,17 +160,6 @@ void damage_ship(ship * sh, double percent)
   sh->damage = (int)damage;
 }
 
-unit *captain(ship * sh)
-{
-  unit *u;
-
-  for (u = sh->region->units; u; u = u->next)
-    if (u->ship == sh && fval(u, UFL_OWNER))
-      return u;
-
-  return NULL;
-}
-
 /* Alte Schiffstypen: */
 static ship *deleted_ships;
 
@@ -287,7 +276,16 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
   }
 }
 
-unit *shipowner(ship * sh)
+void ship_set_owner(ship * sh, unit * u) {
+  assert(u->ship==sh);
+  if (sh->owner && sh->owner!=u) {
+    freset(sh->owner, UFL_OWNER);
+  }
+  sh->owner = u;
+  fset(u, UFL_OWNER);
+}
+
+unit *ship_owner(ship * sh)
 {
   unit *owner = sh->owner;
   if (owner && owner->number<=0) {

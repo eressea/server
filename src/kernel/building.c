@@ -614,6 +614,20 @@ const char *buildingname(const building * b)
   return write_buildingname(b, ibuf, sizeof(name));
 }
 
+void building_set_owner(struct building *b, struct unit * owner)
+{
+  unit * u;
+
+  assert(b && owner && owner->building==b);
+
+  for (u = b->region->units; u; u = u->next) {
+    if (u->building == b) {
+      freset(owner, UFL_OWNER);
+    }
+  }
+  fset(owner, UFL_OWNER);
+}
+
 unit *building_owner(const building * b)
 {
   unit *u = NULL;

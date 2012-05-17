@@ -590,7 +590,7 @@ nr_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ,
    * bei jedem curse gesondert behandelt. */
   if (typ == TYP_SHIP) {
     ship *sh = (ship *) obj;
-    unit *owner = shipowner(sh);
+    unit *owner = ship_owner(sh);
     a = sh->attribs;
     r = sh->region;
     if (owner) {

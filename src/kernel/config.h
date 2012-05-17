@@ -388,8 +388,6 @@ extern "C" {
   extern void kernel_init(void);
   extern void kernel_done(void);
 
-  extern void reorder_units(struct region *r);
-
   extern const char *localenames[];
 
 /** compatibility: **/

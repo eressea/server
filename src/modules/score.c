@@ -94,7 +94,7 @@ void score(void)
     }
 
     for (s = r->ships; s; s = s->next) {
-      unit *cap = shipowner(s);
+      unit *cap = ship_owner(s);
       if (cap && cap->faction) {
         cap->faction->score += s->size * 2;
       }

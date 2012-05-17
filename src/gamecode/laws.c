@@ -1798,7 +1798,7 @@ static int name_cmd(unit * u, struct order *ord)
           break;
         }
       }
-      uo = shipowner(sh);
+      uo = ship_owner(sh);
       if (uo) {
         if (cansee(uo->faction, r, u, 0)) {
           ADDMSG(&uo->faction->msgs,
@@ -2768,7 +2768,7 @@ static void sinkships(region * r)
           0.30F);
         damage_ship(sh, dmg);
       }
-      if (shipowner(sh) == NULL) {
+      if (ship_owner(sh) == NULL) {
         float dmg = get_param_flt(global.parameters, "rules.ship.damage.nocrew",
           0.05F);
         damage_ship(sh, dmg);

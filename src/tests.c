@@ -13,6 +13,7 @@
 #include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
+#include <kernel/reports_test.c>
 #include <gamecode/laws_test.c>
 #include <gamecode/market_test.c>
 
@@ -44,6 +45,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_move_suite());
+  CuSuiteAddSuite(suite, get_reports_suite());
   CuSuiteAddSuite(suite, get_ship_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
@@ -80,7 +82,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
 
 struct faction *test_create_faction(const struct race *rc)
 {
-  faction *f = addfaction("nobody@eressea.de", NULL, rc, default_locale, 0);
+  faction *f = addfaction("nobody@eressea.de", NULL, rc?rc:rc_find("human"), default_locale, 0);
   return f;
 }
 

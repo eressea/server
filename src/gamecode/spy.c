@@ -493,7 +493,7 @@ int sabotage_cmd(unit * u, struct order *ord)
         cmistake(u, u->thisorder, 144, MSG_EVENT);
         return 0;
       }
-      u2 = shipowner(sh);
+      u2 = ship_owner(sh);
       skdiff =
         eff_skill(u, SK_SPY, r) - crew_skill(r, u2->faction, sh, SK_PERCEPTION);
       if (try_destruction(u, u2, sh, skdiff)) {

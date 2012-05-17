@@ -94,9 +94,9 @@ extern "C" {
     direction_t coast;
   } ship;
 
-  extern void damage_ship(ship * sh, double percent);
-  extern struct unit *captain(ship * sh);
-  extern struct unit *shipowner(struct ship *sh);
+  extern void damage_ship(struct ship * sh, double percent);
+  extern void ship_set_owner(struct ship * sh, struct unit * u);
+  extern struct unit *ship_owner(struct ship *sh);
   extern const char *shipname(const struct ship *self);
   extern int shipcapacity(const struct ship *sh);
   extern void getshipweight(const struct ship *sh, int *weight, int *cabins);

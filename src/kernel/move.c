@@ -650,7 +650,7 @@ static int is_ship_allowed(struct ship *sh, const region * r)
         continue;
 
       if (is_freezing(u)) {
-        unit *captain = shipowner(sh);
+        unit *captain = ship_owner(sh);
         if (captain) {
           ADDMSG(&captain->faction->msgs, msg_message("detectforbidden",
               "unit region", u, r));
@@ -2274,7 +2274,7 @@ static void piracy_cmd(unit * u, struct order *ord)
         && check_takeoff(sh, r, rc) == true) {
 
         for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
-          unit *cap = shipowner(sh2);
+          unit *cap = ship_owner(sh2);
           if (cap) {
             faction *f = visible_faction(cap->faction, cap);
             if (alliedunit(u, f, HELP_FIGHT))

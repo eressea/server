@@ -920,7 +920,7 @@ static void move_iceberg(region * r)
       for (sh = r->ships; sh;) {
         shn = sh->next;
         if (fval(sh, SF_SELECT)) {
-          u = captain(sh);
+          u = ship_owner(sh);
           if (sh->damage >= sh->size * DAMAGE_SCALE) {
             if (u != NULL) {
               ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg_des",
@@ -1036,7 +1036,7 @@ static void godcurse(void)
             0.10F);
           damage_ship(sh, dmg);
           if (sh->damage >= sh->size * DAMAGE_SCALE) {
-            unit *u = shipowner(sh);
+            unit *u = ship_owner(sh);
             if (u)
               ADDMSG(&u->faction->msgs,
                 msg_message("godcurse_destroy_ship", "ship", sh));

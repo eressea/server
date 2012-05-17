@@ -182,6 +182,7 @@ extern "C" {
   extern boolean leave(struct unit *u, boolean force);
   extern boolean can_leave(struct unit *u);
 
+  extern void u_set_building(struct unit * u, struct building * b);
   extern void u_set_ship(struct unit * u, struct ship * sh);
   extern void leave_ship(struct unit * u);
   extern void leave_building(struct unit * u);

@@ -24,6 +24,33 @@ static void test_register_ship(CuTest * tc)
   CuAssertPtrNotNull(tc, st_find("herp"));
 }
 
+static void test_ship_set_owner(CuTest * tc)
+{
+  struct region *r;
+  struct ship *sh;
+  struct unit *u1, *u2;
+  struct faction *f;
+  const struct ship_type *stype;
+  const struct race *human;
+
+  test_cleanup();
+  test_create_world();
+
+  human = rc_find("human");
+  stype = st_find("boat");
+  f = test_create_faction(human);
+  r = findregion(0, 0);
+
+  sh = test_create_ship(r, stype);
+  u1 = test_create_unit(f, r);
+  u2 = test_create_unit(f, r);
+  u_set_ship(u1, sh);
+  u_set_ship(u2, sh);
+  CuAssertPtrEquals(tc, u1, ship_owner(sh));
+  ship_set_owner(sh, u2);
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
+}
+
 static void test_shipowner_goes_to_next_after_death(CuTest * tc)
 {
   struct region *r;
@@ -53,9 +80,9 @@ static void test_shipowner_goes_to_next_after_death(CuTest * tc)
   CuAssertPtrNotNull(tc, u);
   u_set_ship(u, sh);
   u_set_ship(u2, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   u->number = 0;
-  CuAssertPtrEquals(tc, u2, shipowner(sh));
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
 }
 
 static void test_shipowner_goes_to_other_after_death(CuTest * tc)
@@ -87,9 +114,9 @@ static void test_shipowner_goes_to_other_after_death(CuTest * tc)
   CuAssertPtrNotNull(tc, u);
   u_set_ship(u, sh);
   u_set_ship(u2, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   u->number = 0;
-  CuAssertPtrEquals(tc, u2, shipowner(sh));
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
 }
 
 static void test_shipowner_goes_to_same_faction_after_death(CuTest * tc)
@@ -124,14 +151,14 @@ static void test_shipowner_goes_to_same_faction_after_death(CuTest * tc)
   u_set_ship(u, sh);
   u_set_ship(u2, sh);
   u_set_ship(u3, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   CuAssertTrue(tc, fval(u, UFL_OWNER));
   u->number = 0;
-  CuAssertPtrEquals(tc, u3, shipowner(sh));
+  CuAssertPtrEquals(tc, u3, ship_owner(sh));
   CuAssertTrue(tc, !fval(u, UFL_OWNER));
   CuAssertTrue(tc, fval(u3, UFL_OWNER));
   u3->number = 0;
-  CuAssertPtrEquals(tc, u2, shipowner(sh));
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
   CuAssertTrue(tc, !fval(u3, UFL_OWNER));
   CuAssertTrue(tc, fval(u2, UFL_OWNER));
 }
@@ -165,9 +192,9 @@ static void test_shipowner_goes_to_next_after_leave(CuTest * tc)
   CuAssertPtrNotNull(tc, u);
   u_set_ship(u, sh);
   u_set_ship(u2, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   leave_ship(u);
-  CuAssertPtrEquals(tc, u2, shipowner(sh));
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
 }
 
 static void test_shipowner_goes_to_other_after_leave(CuTest * tc)
@@ -199,9 +226,9 @@ static void test_shipowner_goes_to_other_after_leave(CuTest * tc)
   CuAssertPtrNotNull(tc, u);
   u_set_ship(u, sh);
   u_set_ship(u2, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   leave_ship(u);
-  CuAssertPtrEquals(tc, u2, shipowner(sh));
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
 }
 
 static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
@@ -236,13 +263,13 @@ static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
   u_set_ship(u, sh);
   u_set_ship(u2, sh);
   u_set_ship(u3, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   leave_ship(u);
-  CuAssertPtrEquals(tc, u3, shipowner(sh));
+  CuAssertPtrEquals(tc, u3, ship_owner(sh));
   leave_ship(u3);
-  CuAssertPtrEquals(tc, u2, shipowner(sh));
+  CuAssertPtrEquals(tc, u2, ship_owner(sh));
   leave_ship(u2);
-  CuAssertPtrEquals(tc, 0, shipowner(sh));
+  CuAssertPtrEquals(tc, 0, ship_owner(sh));
 }
 
 static void test_shipowner_resets_when_dead(CuTest * tc)
@@ -272,15 +299,16 @@ static void test_shipowner_resets_when_dead(CuTest * tc)
   u = test_create_unit(f, r);
   CuAssertPtrNotNull(tc, u);
   u_set_ship(u, sh);
-  CuAssertPtrEquals(tc, u, shipowner(sh));
+  CuAssertPtrEquals(tc, u, ship_owner(sh));
   u->number = 0;
-  CuAssertPtrEquals(tc, 0, shipowner(sh));
+  CuAssertPtrEquals(tc, 0, ship_owner(sh));
 }
 
 CuSuite *get_ship_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_register_ship);
+  SUITE_ADD_TEST(suite, test_ship_set_owner);
   SUITE_ADD_TEST(suite, test_shipowner_resets_when_dead);
   SUITE_ADD_TEST(suite, test_shipowner_goes_to_next_after_death);
   SUITE_ADD_TEST(suite, test_shipowner_goes_to_other_after_death);

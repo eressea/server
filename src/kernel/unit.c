@@ -774,6 +774,12 @@ ship *leftship(const unit * u)
   return NULL;
 }
 
+void u_set_building(unit * u, building * b)
+{
+  assert(b && !u->building); /* you must leave first */
+  u->building = b;
+}
+
 void u_set_ship(unit * u, ship * sh)
 {
   assert(!u->ship); /* you must leave_ship */
@@ -1446,8 +1452,15 @@ void name_unit(unit * u)
     }
   } else {
     char name[32];
-    snprintf(name, sizeof(name), "%s %s", LOC(u->faction->locale,
-        "unitdefault"), itoa36(u->no));
+    static const char * prefix[MAXLOCALES];
+    int i = locale_index(u->faction->locale);
+    if (!prefix[i]) {
+      prefix[i] = LOC(u->faction->locale, "unitdefault");
+      if (!prefix[i]) {
+        prefix[i] = parameters[P_UNIT];
+      }
+    }
+    snprintf(name, sizeof(name), "%s %s", prefix[i], itoa36(u->no));
     unit_setname(u, name);
   }
 }

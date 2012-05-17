@@ -116,6 +116,7 @@
     <ClCompile Include="kernel\race.c" />
     <ClCompile Include="kernel\region.c" />
     <ClCompile Include="kernel\reports.c" />
+    <ClCompile Include="kernel\reports_test.c" />
     <ClCompile Include="kernel\resources.c" />
     <ClCompile Include="kernel\save.c" />
     <ClCompile Include="kernel\ship.c" />

@@ -10,7 +10,7 @@
 #include <cutest/CuTest.h>
 #include <tests.h>
 
-static void building_type_exists(CuTest * tc)
+static void test_building_type_exists(CuTest * tc)
 {
   region *r;
   building *b;
@@ -33,6 +33,6 @@ static void building_type_exists(CuTest * tc)
 CuSuite *get_move_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, building_type_exists);
+  SUITE_ADD_TEST(suite, test_building_type_exists);
   return suite;
 }

@@ -187,7 +187,7 @@ cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t ty
    * bei jedem curse gesondert behandelt. */
   if (typ == TYP_SHIP) {
     ship *sh = (ship *) obj;
-    unit *owner = shipowner(sh);
+    unit *owner = ship_owner(sh);
     a = sh->attribs;
     r = sh->region;
     if (owner != NULL) {
@@ -1392,7 +1392,7 @@ static void cr_output_region(FILE * F, report_context * ctx, seen_region * sr)
     /* ships */
     for (sh = r->ships; sh; sh = sh->next) {
       int fno = -1;
-      u = shipowner(sh);
+      u = ship_owner(sh);
       if (u && !fval(u, UFL_ANON_FACTION)) {
         const faction *sf = visible_faction(f, u);
         fno = sf->no;

@@ -2496,7 +2496,7 @@ unit *get_clone_mage(const unit * u)
 
 static boolean is_moving_ship(const region * r, ship * sh)
 {
-  const unit *u = shipowner(sh);
+  const unit *u = ship_owner(sh);
 
   if (u)
     switch (get_keyword(u->thisorder)) {

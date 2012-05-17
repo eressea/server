@@ -52,6 +52,7 @@ extern "C" {
   extern int reports(void);
   extern int write_reports(struct faction *f, time_t ltime);
   extern int init_reports(void);
+  extern void reorder_units(struct region * r);
 
   extern const struct unit *ucansee(const struct faction *f,
     const struct unit *u, const struct unit *x);

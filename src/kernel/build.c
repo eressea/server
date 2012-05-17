@@ -1169,7 +1169,7 @@ static boolean mayenter(region * r, unit * u, building * b)
 
 static int mayboard(const unit * u, ship * sh)
 {
-  unit *u2 = shipowner(sh);
+  unit *u2 = ship_owner(sh);
 
   return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
 }

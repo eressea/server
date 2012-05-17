@@ -792,16 +792,25 @@ unit *read_unit(struct storage *store)
   set_number(u, number);
 
   n = store->r_id(store);
-  if (n > 0)
-    u->building = findbuilding(n);
+  if (n > 0) {
+    building * b = findbuilding(n);
+    if (b) {
+      u_set_building(u, b);
+    } else {
+      log_error("read_unit: unit in unkown building '%s'\n", itoa36(n));
+    }
+  }
 
   n = store->r_id(store);
   if (n > 0) {
     ship * sh = findship(n);
     if (sh) {
       u_set_ship(u, sh);
+    } else {
+      log_error("read_unit: unit in unkown ship '%s'\n", itoa36(n));
     }
   }
+
   setstatus(u, store->r_int(store));
   u->flags = store->r_int(store);
   u->flags &= UFL_SAVEMASK;
