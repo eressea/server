@@ -4438,7 +4438,7 @@ int sp_icastle(castorder * co)
 
   if (mage->region == r) {
     if (leave(mage, false)) {
-      mage->building = b;
+      u_set_building(mage, b);
     }
   }
 
