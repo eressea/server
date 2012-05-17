@@ -24,12 +24,46 @@ static void test_register_ship(CuTest * tc)
   CuAssertPtrNotNull(tc, st_find("herp"));
 }
 
-static void test_shipowner(CuTest * tc)
+static void test_shipowner_goes_to_next(CuTest * tc)
 {
   struct region *r;
-  struct ship * sh;
-  struct unit * u;
-  struct faction * f;
+  struct ship *sh;
+  struct unit *u, *u2;
+  struct faction *f;
+  const struct ship_type *stype;
+  const struct race *human;
+
+  test_cleanup();
+  test_create_world();
+
+  human = rc_find("human");
+  CuAssertPtrNotNull(tc, human);
+
+  stype = st_find("boat");
+  CuAssertPtrNotNull(tc, stype);
+
+  f = test_create_faction(human);
+  r = findregion(0, 0);
+
+  sh = test_create_ship(r, stype);
+  CuAssertPtrNotNull(tc, sh);
+
+  u = test_create_unit(f, r);
+  u2 = test_create_unit(f, r);
+  CuAssertPtrNotNull(tc, u);
+  u_set_ship(u, sh);
+  u_set_ship(u2, sh);
+  CuAssertPtrEquals(tc, u, shipowner(sh));
+  u->number = 0;
+  CuAssertPtrEquals(tc, u2, shipowner(sh));
+}
+
+static void test_shipowner_resets_when_dead(CuTest * tc)
+{
+  struct region *r;
+  struct ship *sh;
+  struct unit *u;
+  struct faction *f;
   const struct ship_type *stype;
   const struct race *human;
 
@@ -52,12 +86,15 @@ static void test_shipowner(CuTest * tc)
   CuAssertPtrNotNull(tc, u);
   u_set_ship(u, sh);
   CuAssertPtrEquals(tc, u, shipowner(sh));
+  u->number = 0;
+  CuAssertPtrEquals(tc, 0, shipowner(sh));
 }
 
 CuSuite *get_ship_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_register_ship);
-  SUITE_ADD_TEST(suite, test_shipowner);
+  SUITE_ADD_TEST(suite, test_shipowner_resets_when_dead);
+  SUITE_ADD_TEST(suite, test_shipowner_goes_to_next);
   return suite;
 }

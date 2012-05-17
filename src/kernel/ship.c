@@ -289,7 +289,6 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
 
 unit *shipowner(const ship * sh)
 {
-#ifndef NDEBUG
   unit *u;
   unit *first = NULL;
 
@@ -301,7 +300,7 @@ unit *shipowner(const ship * sh)
       if (!first && u->number > 0)
         first = u;
       if (fval(u, UFL_OWNER) && u->number > 0)
-        break;
+        return u;
       if (u->number == 0)
         freset(u, UFL_OWNER);
     }
@@ -310,13 +309,9 @@ unit *shipowner(const ship * sh)
   /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
    * nehmen. */
 
-  if (first && !u) {
-    u = first;
-    fset(u, UFL_OWNER);
-  }
-  assert(u==sh->owner);
-#endif
-  return sh->owner;
+  if (first)
+    fset(first, UFL_OWNER);
+  return first;
 }
 
 void write_ship_reference(const struct ship *sh, struct storage *store)
