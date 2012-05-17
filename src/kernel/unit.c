@@ -807,8 +807,8 @@ void leave_ship(unit * u)
         }
       }
     }
+    sh->owner = owner;
     if (owner) {
-      sh->owner = owner;
       fset(owner, UFL_OWNER);
     }
   }

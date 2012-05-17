@@ -96,7 +96,7 @@ extern "C" {
 
   extern void damage_ship(ship * sh, double percent);
   extern struct unit *captain(ship * sh);
-  extern struct unit *shipowner(const struct ship *sh);
+  extern struct unit *shipowner(struct ship *sh);
   extern const char *shipname(const struct ship *self);
   extern int shipcapacity(const struct ship *sh);
   extern void getshipweight(const struct ship *sh, int *weight, int *cabins);

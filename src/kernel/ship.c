@@ -287,31 +287,37 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
   }
 }
 
-unit *shipowner(const ship * sh)
+unit *shipowner(ship * sh)
 {
-  unit *u;
-  unit *first = NULL;
+  unit *owner = sh->owner;
+  if (owner && owner->number<=0) {
+    unit *u, *first = NULL;
 
-  const region *r = sh->region;
-
-  /* Prüfen ob Eigentümer am leben. */
-  for (u = r->units; u; u = u->next) {
-    if (u->ship == sh) {
-      if (!first && u->number > 0)
-        first = u;
-      if (fval(u, UFL_OWNER) && u->number > 0)
-        return u;
-      if (u->number == 0)
-        freset(u, UFL_OWNER);
+    owner->ship = 0;
+    freset(owner, UFL_OWNER);
+    /* Prüfen ob Eigentümer am leben. */
+    for (u = sh->region->units; u; u = u->next) {
+      if (u->ship == sh) {
+        if (u->number > 0) {
+          if (u->faction==owner->faction) {
+            first = u;
+            break;
+          }
+          else if (!first) {
+            first = u; /* you'll do in an emergency */
+          }
+        }
+      }
+    }
+    owner = first;
+    if (owner) {
+      fset(owner, UFL_OWNER);
+      sh->owner = owner;
     }
   }
-
   /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
    * nehmen. */
-
-  if (first)
-    fset(first, UFL_OWNER);
-  return first;
+  return owner;
 }
 
 void write_ship_reference(const struct ship *sh, struct storage *store)

@@ -2494,7 +2494,7 @@ unit *get_clone_mage(const unit * u)
   return NULL;
 }
 
-static boolean is_moving_ship(const region * r, const ship * sh)
+static boolean is_moving_ship(const region * r, ship * sh)
 {
   const unit *u = shipowner(sh);
 

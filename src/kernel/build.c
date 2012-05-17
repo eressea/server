@@ -1167,7 +1167,7 @@ static boolean mayenter(region * r, unit * u, building * b)
   return false;
 }
 
-static int mayboard(const unit * u, const ship * sh)
+static int mayboard(const unit * u, ship * sh)
 {
   unit *u2 = shipowner(sh);
 
