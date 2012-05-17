@@ -19,7 +19,7 @@ extern "C" {
 
   struct curse;
   struct message;
-  extern struct message *cinfo_unit(const void *obj, typ_t typ,
+  extern struct message *cinfo_unit(const void *obj, objtype_t typ,
     const struct curse *c, int self);
 
   extern void register_unitcurse(void);

@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static message *cinfo_building(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_building(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);
@@ -48,7 +48,7 @@ static message *cinfo_building(const void *obj, typ_t typ, const curse * c,
 /* CurseInfo mit Spezialabfragen */
 
 /* C_MAGICWALLS*/
-static message *cinfo_magicrunes(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_magicrunes(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   message *msg = NULL;

@@ -41,7 +41,7 @@
 /*
  * godcursezone
  */
-static message *cinfo_cursed_by_the_gods(const void *obj, typ_t typ,
+static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
   const curse * c, int self)
 {
   region *r = (region *) obj;
@@ -66,7 +66,7 @@ static struct curse_type ct_godcursezone = {
 /*
  * C_GBDREAM
  */
-static message *cinfo_dreamcurse(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(self);
@@ -90,7 +90,7 @@ static struct curse_type ct_gbdream = {
  * C_MAGICSTREET
  *  erzeugt Straßennetz
  */
-static message *cinfo_magicstreet(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);
@@ -113,7 +113,7 @@ static struct curse_type ct_magicstreet = {
 
 /* --------------------------------------------------------------------- */
 
-static message *cinfo_antimagiczone(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_antimagiczone(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);
@@ -131,7 +131,7 @@ static message *cinfo_antimagiczone(const void *obj, typ_t typ, const curse * c,
 
 /* alle Magier können eine Antimagiezone wahrnehmen */
 static int
-cansee_antimagiczone(const struct faction *viewer, const void *obj, typ_t typ,
+cansee_antimagiczone(const struct faction *viewer, const void *obj, objtype_t typ,
   const curse * c, int self)
 {
   region *r;
@@ -163,7 +163,7 @@ static struct curse_type ct_antimagiczone = {
 };
 
 /* --------------------------------------------------------------------- */
-static message *cinfo_farvision(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_farvision(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);

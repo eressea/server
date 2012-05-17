@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-message *cinfo_ship(const void *obj, typ_t typ, const curse * c, int self)
+message *cinfo_ship(const void *obj, objtype_t typ, const curse * c, int self)
 {
   message *msg;
 
@@ -56,7 +56,7 @@ message *cinfo_ship(const void *obj, typ_t typ, const curse * c, int self)
 /* CurseInfo mit Spezialabfragen */
 
 /* C_SHIP_NODRIFT */
-static message *cinfo_shipnodrift(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_shipnodrift(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   ship *sh = (ship *) obj;

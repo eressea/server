@@ -43,7 +43,7 @@
  * C_AURA
  */
 /* erhöht/senkt regeneration und maxaura um effect% */
-static message *cinfo_auraboost(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_auraboost(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   struct unit *u = (struct unit *)obj;
@@ -76,7 +76,7 @@ static struct curse_type ct_magicboost = {
 /*
  * C_SLAVE
  */
-static message *cinfo_slave(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_slave(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unit *u;
@@ -101,7 +101,7 @@ static struct curse_type ct_slavery = { "slavery",
 /*
  * C_CALM
  */
-static message *cinfo_calm(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_calm(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);
@@ -130,7 +130,7 @@ static struct curse_type ct_calmmonster = {
 /*
  * C_SPEED
  */
-static message *cinfo_speed(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_speed(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);
@@ -154,7 +154,7 @@ static struct curse_type ct_speed = {
 /*
  * C_ORC
  */
-message *cinfo_unit(const void *obj, typ_t typ, const curse * c, int self)
+message *cinfo_unit(const void *obj, objtype_t typ, const curse * c, int self)
 {
   unused(typ);
   assert(typ == TYP_UNIT);
@@ -177,7 +177,7 @@ static struct curse_type ct_orcish = {
 /*
  * C_KAELTESCHUTZ
  */
-static message *cinfo_kaelteschutz(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_kaelteschutz(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);
@@ -201,7 +201,7 @@ static struct curse_type ct_insectfur = {
 /*
  * C_SPARKLE
  */
-static message *cinfo_sparkle(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_sparkle(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   const char *effects[] = {
@@ -330,7 +330,7 @@ write_skill(struct storage *store, const curse * c, const void *target)
   return 0;
 }
 
-static message *cinfo_skillmod(const void *obj, typ_t typ, const curse * c,
+static message *cinfo_skillmod(const void *obj, objtype_t typ, const curse * c,
   int self)
 {
   unused(typ);

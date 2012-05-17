@@ -79,10 +79,9 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
     break;
   case RC_AQUARIAN:
   {
-    ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
+    ship *sh = new_ship(st_find("boat"), r, u->faction->locale);
     sh->size = sh->type->construction->maxsize;
-    u->ship = sh;
-    fset(u, UFL_OWNER);
+    u_set_ship(u, sh);
   }
     break;
   case RC_CENTAUR:
