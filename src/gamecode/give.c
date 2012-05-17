@@ -311,9 +311,9 @@ void give_men(int n, unit * u, unit * u2, struct order *ord)
       /* Einheiten von Schiffen können nicht NACH in von
        * Nicht-alliierten bewachten Regionen ausführen */
       sh = leftship(u);
-      if (sh)
+      if (sh) {
         set_leftship(u2, sh);
-
+      }
       transfermen(u, u2, n);
       if (u->faction != u2->faction) {
         u2->faction->newbies += n;

@@ -81,6 +81,7 @@ extern "C" {
   typedef struct ship {
     struct ship *next;
     struct ship *nexthash;
+    struct unit * owner;
     int no;
     struct region *region;
     char *name;
@@ -100,8 +101,8 @@ extern "C" {
   extern int shipcapacity(const struct ship *sh);
   extern void getshipweight(const struct ship *sh, int *weight, int *cabins);
 
-  extern ship *new_ship(const struct ship_type *stype,
-    const struct locale *lang, struct region *r);
+  extern ship *new_ship(const struct ship_type *stype, struct region *r,
+    const struct locale *lang);
   extern const char *write_shipname(const struct ship *sh, char *buffer,
     size_t size);
   extern struct ship *findship(int n);

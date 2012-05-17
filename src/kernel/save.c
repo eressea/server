@@ -796,9 +796,12 @@ unit *read_unit(struct storage *store)
     u->building = findbuilding(n);
 
   n = store->r_id(store);
-  if (n > 0)
-    u->ship = findship(n);
-
+  if (n > 0) {
+    ship * sh = findship(n);
+    if (sh) {
+      u_set_ship(u, sh);
+    }
+  }
   setstatus(u, store->r_int(store));
   u->flags = store->r_int(store);
   u->flags &= UFL_SAVEMASK;

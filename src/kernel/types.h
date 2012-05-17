@@ -31,7 +31,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 
 typedef short terrain_t;
-typedef short typ_t;
 typedef short item_t;
 
 struct attrib;

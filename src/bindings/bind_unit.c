@@ -645,7 +645,7 @@ static void unit_setship(unit * u, ship * s)
   if (s && u->region != s->region) {
     move_unit(u, s->region, NULL);
   }
-  u->ship = s;
+  u_set_ship(u, s);
 }
 
 static int tolua_unit_set_ship(lua_State * L)

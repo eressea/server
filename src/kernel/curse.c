@@ -754,7 +754,7 @@ const char *oldcursename(int id)
 }
 
 /* ------------------------------------------------------------- */
-message *cinfo_simple(const void *obj, typ_t typ, const struct curse * c,
+message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
   int self)
 {
   struct message *msg;

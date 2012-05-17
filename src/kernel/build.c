@@ -112,29 +112,27 @@ static int slipthru(const region * r, const unit * u, const building * b)
   return 1;
 }
 
-boolean can_contact(const region * r, const unit * u, const unit * u2)
+int can_contact(const region * r, const unit * u, const unit * u2)
 {
 
   /* hier geht es nur um die belagerung von burgen */
 
-  if (u->building == u2->building)
-    return true;
+  if (u->building == u2->building) {
+    return 1;
+  }
 
   /* unit u is trying to contact u2 - unasked for contact. wenn u oder u2
    * nicht in einer burg ist, oder die burg nicht belagert ist, ist
    * slipthru () == 1. ansonsten ist es nur 1, wenn man die belagerer */
 
-  if (slipthru(u->region, u, u->building)
-    && slipthru(u->region, u2, u2->building))
-    return true;
+  if (slipthru(u->region, u, u->building) && slipthru(u->region, u2, u2->building)) {
+    return 1;
+  }
 
-  if (alliedunit(u, u2->faction, HELP_GIVE))
-    return true;
-
-  return false;
+  return (alliedunit(u, u2->faction, HELP_GIVE));
 }
 
-static void contact_cmd(unit * u, order * ord, boolean tries)
+static void contact_cmd(unit * u, order * ord, int final)
 {
   /* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
    * ein richtiger toggle ist (noch?) nicht noetig. die region als
@@ -150,7 +148,7 @@ static void contact_cmd(unit * u, order * ord, boolean tries)
 
   if (u2 != NULL) {
     if (!can_contact(r, u, u2)) {
-      if (tries)
+      if (final)
         cmistake(u, u->thisorder, 23, MSG_EVENT);
       return;
     }
@@ -405,8 +403,7 @@ int destroy_cmd(unit * u, struct order *ord)
       /* all units leave the ship */
       for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->ship == sh) {
-          u2->ship = 0;
-          freset(u2, UFL_OWNER);
+          leave_ship(u2);
         }
       }
       ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
@@ -1092,12 +1089,11 @@ create_ship(region * r, unit * u, const struct ship_type *newtype, int want,
   else
     want = msize;
 
-  sh = new_ship(newtype, u->faction->locale, r);
+  sh = new_ship(newtype, r, u->faction->locale);
 
   if (leave(u, false)) {
     if (fval(u->race, RCF_CANSAIL)) {
-      u->ship = sh;
-      fset(u, UFL_OWNER);
+      u_set_ship(u, sh);
     }
   }
   new_order =
@@ -1256,11 +1252,7 @@ static boolean enter_ship(unit * u, struct order *ord, int id, boolean report)
   }
 
   if (leave(u, false)) {
-    u->ship = sh;
-
-    if (shipowner(sh) == NULL) {
-      fset(u, UFL_OWNER);
-    }
+    u_set_ship(u, sh);
     fset(u, UFL_ENTER);
   }
   return true;
@@ -1315,7 +1307,7 @@ static boolean enter_building(unit * u, order * ord, int id, boolean report)
   return false;
 }
 
-void do_misc(region * r, boolean lasttry)
+void do_misc(region * r, int is_final_attempt)
 {
   unit **uptr, *uc;
 
@@ -1324,7 +1316,7 @@ void do_misc(region * r, boolean lasttry)
     for (ord = uc->orders; ord; ord = ord->next) {
       keyword_t kwd = get_keyword(ord);
       if (kwd == K_CONTACT) {
-        contact_cmd(uc, ord, lasttry);
+        contact_cmd(uc, ord, is_final_attempt);
       }
     }
   }
@@ -1352,7 +1344,7 @@ void do_misc(region * r, boolean lasttry)
         case P_GEBAEUDE:
           if (u->building && u->building->no == id)
             break;
-          if (enter_building(u, ord, id, lasttry)) {
+          if (enter_building(u, ord, id, is_final_attempt)) {
             unit *ub;
             for (ub = u; ub; ub = ub->next) {
               if (ub->building == u->building) {
@@ -1365,7 +1357,7 @@ void do_misc(region * r, boolean lasttry)
         case P_SHIP:
           if (u->ship && u->ship->no == id)
             break;
-          if (enter_ship(u, ord, id, lasttry)) {
+          if (enter_ship(u, ord, id, is_final_attempt)) {
             unit *ub;
             ulast = u;
             for (ub = u; ub; ub = ub->next) {
@@ -1377,9 +1369,9 @@ void do_misc(region * r, boolean lasttry)
           break;
 
         default:
-          if (lasttry)
+          if (is_final_attempt) {
             cmistake(u, ord, 79, MSG_MOVE);
-
+          }
         }
         if (ulast != NULL) {
           /* Wenn wir hier angekommen sind, war der Befehl

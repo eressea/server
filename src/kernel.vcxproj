@@ -119,6 +119,7 @@
     <ClCompile Include="kernel\resources.c" />
     <ClCompile Include="kernel\save.c" />
     <ClCompile Include="kernel\ship.c" />
+    <ClCompile Include="kernel\ship_test.c" />
     <ClCompile Include="kernel\skill.c" />
     <ClCompile Include="kernel\spell.c" />
     <ClCompile Include="kernel\spell_test.c" />

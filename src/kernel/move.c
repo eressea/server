@@ -603,10 +603,10 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
       if (route != NULL)
         mark_travelthru(u, from, route, NULL);
       if (from != to) {
-        u->ship = NULL;         /* damit move_unit() kein leave() macht */
+        u->ship = 0;  /* temporary trick -- do not use u_set_ship here */
         move_unit(u, to, ulist);
         ulist = &u->next;
-        u->ship = sh;
+        u->ship = sh; /* undo the trick -- do not use u_set_ship here */
       }
       if (route && eff_skill(u, SK_SAILING, from) >= 1) {
         produceexp(u, SK_SAILING, u->number);

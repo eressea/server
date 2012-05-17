@@ -9,6 +9,7 @@
 #include <util/quicklist_test.c>
 #include <util/umlaut_test.c>
 #include <kernel/move_test.c>
+#include <kernel/ship_test.c>
 #include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
@@ -43,6 +44,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_move_suite());
+  CuSuiteAddSuite(suite, get_ship_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_laws_suite());
   CuSuiteAddSuite(suite, get_battle_suite());
@@ -117,6 +119,13 @@ building * test_create_building(region * r, const building_type * btype)
   return b;
 }
 
+ship * test_create_ship(region * r, const ship_type * stype)
+{
+  ship * s = new_ship(stype, r, default_locale);
+  s->size = stype->construction?stype->construction->maxsize:1;
+  return s;
+}
+
 item_type * test_create_itemtype(const char ** names) {
   resource_type * rtype;
   item_type * itype;
@@ -171,10 +180,12 @@ void test_create_world(void)
   btype = (building_type*)calloc(sizeof(building_type), 1);
   btype->flags = BTF_NAMECHANGE;
   btype->_name = strdup("castle");
+  locale_setstring(default_locale, "castle", "castle");
   bt_register(btype);
 
   stype = (ship_type*)calloc(sizeof(ship_type), 1);
   stype->name[0] = strdup("boat");
   stype->name[1] = strdup("boat_p");
+  locale_setstring(default_locale, "boat", "boat");
   st_register(stype);
 }

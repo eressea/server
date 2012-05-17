@@ -75,12 +75,11 @@ static void xe_giveballon(unit * u, struct order *ord)
     return;
   }
 
-  sh = new_ship(st_find("balloon"), u2->faction->locale, u2->region);
+  sh = new_ship(st_find("balloon"), u2->region, u2->faction->locale);
   sh->size = 5;
   ship_setname(sh, "Xontormia-Ballon");
-  leave(u2, false);
-  u2->ship = sh;
-  fset(u2, UFL_OWNER);
+  leave(u2, true);
+  u_set_ship(u2, sh);
 }
 
 int xecmd(unit * u, order * ord)

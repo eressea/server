@@ -443,8 +443,7 @@ static void sink_ship(region * r, ship * sh, const char *name, unit * saboteur)
         } else {
           msg = msg_message("sink_saved_msg", "region unit", safety, u);
         }
-        set_leftship(u, u->ship);
-        u->ship = 0;
+        leave_ship(u);
         if (r != safety) {
           setguard(u, GUARD_NONE);
         }

@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_REPORTS
 
 #include <time.h>
+#include "objtypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,7 +118,7 @@ extern "C" {
   extern int *nmrs;
 
   extern struct message *msg_curse(const struct curse *c, const void *obj,
-    typ_t typ, int slef);
+    objtype_t typ, int slef);
 
   typedef struct arg_regions {
     int nregions;

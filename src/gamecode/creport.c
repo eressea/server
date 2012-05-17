@@ -173,7 +173,7 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
 }
 
 static void
-cr_output_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ)
+cr_output_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ)
 {
   boolean header = false;
   attrib *a = NULL;

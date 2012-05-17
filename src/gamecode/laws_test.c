@@ -100,8 +100,8 @@ static void test_fishing_feeds_2_people(CuTest * tc)
   CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
   f = test_create_faction(rc_find("human"));
   u = test_create_unit(f, r);
-  sh = new_ship(st_find("boat"), NULL, r);
-  u->ship = sh;
+  sh = new_ship(st_find("boat"), r, 0);
+  u_set_ship(u, sh);
   i_change(&u->items, it_find("money"), 42);
 
   scale_number(u, 1);
@@ -140,8 +140,8 @@ static void test_fishing_does_not_give_goblins_money(CuTest * tc)
   CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
   f = test_create_faction(rc_find("human"));
   u = test_create_unit(f, r);
-  sh = new_ship(st_find("boat"), NULL, r);
-  u->ship = sh;
+  sh = new_ship(st_find("boat"), r, 0);
+  u_set_ship(u, sh);
   i_change(&u->items, it_find("money"), 42);
 
   global.functions.maintenance = not_so_hungry;
@@ -165,8 +165,8 @@ static void test_fishing_gets_reset(CuTest * tc)
   CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
   f = test_create_faction(rc_find("human"));
   u = test_create_unit(f, r);
-  sh = new_ship(st_find("boat"), NULL, r);
-  u->ship = sh;
+  sh = new_ship(st_find("boat"), r, 0);
+  u_set_ship(u, sh);
   i_change(&u->items, it_find("money"), 42);
 
   scale_number(u, 1);

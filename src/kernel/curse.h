@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define CURSE_H
 
 #include <util/variant.h>
+#include "objtypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -208,13 +209,13 @@ extern "C" {
     int typ;
     unsigned int flags;
     unsigned int mergeflags;
-    struct message *(*curseinfo) (const void *, typ_t, const struct curse *,
+    struct message *(*curseinfo) (const void *, objtype_t, const struct curse *,
       int);
     void (*change_vigour) (curse *, double);
     int (*read) (struct storage * store, curse * c, void *target);
     int (*write) (struct storage * store, const struct curse * c,
       const void *target);
-    int (*cansee) (const struct faction *, const void *, typ_t,
+    int (*cansee) (const struct faction *, const void *, objtype_t,
       const struct curse *, int);
     int (*age) (curse *);
   } curse_type;
@@ -315,7 +316,7 @@ extern "C" {
 
 /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
   extern const char *oldcursename(int id);
-  extern struct message *cinfo_simple(const void *obj, typ_t typ,
+  extern struct message *cinfo_simple(const void *obj, objtype_t typ,
     const struct curse *c, int self);
 
 #define is_cursed(a, id, id2) \

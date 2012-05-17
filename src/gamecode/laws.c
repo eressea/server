@@ -1617,11 +1617,14 @@ static int display_cmd(unit * u, struct order *ord)
 boolean renamed_building(const building * b)
 {
   const struct locale *lang = locales;
+  size_t len = strlen(b->name);
   for (; lang; lang = nextlocale(lang)) {
     const char *bdname = LOC(lang, b->type->_name);
-    size_t bdlen = strlen(bdname);
-    if (strlen(b->name) >= bdlen && strncmp(b->name, bdname, bdlen) == 0) {
-      return false;
+    if (bdname) {
+      size_t bdlen = strlen(bdname);
+      if (len >= bdlen && strncmp(b->name, bdname, bdlen) == 0) {
+        return false;
+      }
     }
   }
   return true;
@@ -2926,64 +2929,6 @@ static void reorder(void)
   }
 }
 
-#if 0
-/* Aus Gebäude weisen, VERBANNE */
-static void evict(void)
-{
-  region *r;
-  strlist *S;
-  unit *u;
-
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u = u->next) {
-      for (S = u->orders; S; S = S->next)
-        if (get_keyword(ord) == K_EVICT) {
-          int id;
-          unit *u2;
-          /* Nur der Kapitän bzw Burgherr kann jemanden rausschmeißen */
-          if (!fval(u, UFL_OWNER)) {
-            /* Die Einheit ist nicht der Eigentümer */
-            cmistake(u, ord, 49, MSG_EVENT);
-            continue;
-          }
-          init_tokens(ord);
-          skip_token();
-          id = getid();
-          u2 = findunit(id);
-
-          if (u2 == NULL) {
-            /* Einheit nicht gefunden */
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                "feedback_unit_not_found", ""));
-            continue;
-          }
-
-          if (u->building) {
-            /* in der selben Burg? */
-            if (u->building != u2->building) {
-              /* nicht in Burg */
-              cmistake(u, ord, 33, MSG_EVENT);
-              continue;
-            }
-            leave_building(u2);
-            /* meldung an beide */
-          }
-
-          if (u->ship) {
-            if (u->ship != u2->ship) {
-              /* nicht an Bord */
-              cmistake(u, ord, 32, MSG_EVENT);
-              continue;
-            }
-            leave_ship(u2);
-            /* meldung an beide */
-          }
-        }
-    }
-  }
-}
-#endif
-
 static int renumber_cmd(unit * u, order * ord)
 {
   const char *s;
@@ -3422,8 +3367,9 @@ static void new_units(void)
 
             a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
             sh = leftship(u);
-            if (sh)
+            if (sh) {
               set_leftship(u2, sh);
+            }
             setstatus(u2, u->status);
 
             ordp = &makeord->next;
@@ -4109,12 +4055,12 @@ void process(void)
 
 static void enter_1(region * r)
 {
-  do_misc(r, false);
+  do_misc(r, 0);
 }
 
 static void enter_2(region * r)
 {
-  do_misc(r, true);
+  do_misc(r, 1);
 }
 
 static void maintain_buildings_1(region * r)

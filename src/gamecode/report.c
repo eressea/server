@@ -576,7 +576,7 @@ int hat_in_region(item_t it, region * r, faction * f)
 }
 
 static void
-nr_curses(FILE * F, const faction * viewer, const void *obj, typ_t typ,
+nr_curses(FILE * F, const faction * viewer, const void *obj, objtype_t typ,
   int indent)
 {
   attrib *a = NULL;

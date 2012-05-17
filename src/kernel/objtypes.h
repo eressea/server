@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  enum {
+  typedef enum {
     TYP_UNIT,
     TYP_REGION,
     TYP_BUILDING,
@@ -31,7 +31,7 @@ extern "C" {
     TYP_ACTION,
     TYP_TRIGGER,
     TYP_TIMEOUT
-  };
+  } objtype_t;
 
 #ifdef __cplusplus
 }

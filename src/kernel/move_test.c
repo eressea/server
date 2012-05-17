@@ -1,3 +1,6 @@
+#include <platform.h>
+#include <stdlib.h>
+
 #include <kernel/building.h>
 #include <kernel/move.h>
 #include <kernel/region.h>
@@ -12,7 +15,7 @@ static void building_type_exists(CuTest * tc)
   region *r;
   building *b;
   building_type *btype;
-  building_type *btype2 = calloc(1, sizeof(building_type));
+  building_type *btype2 = (building_type *)calloc(1, sizeof(building_type));
 
   test_cleanup();
   test_create_world();

@@ -534,7 +534,7 @@ static int parse_ships(xmlDocPtr doc)
     for (i = 0; i != nodes->nodeNr; ++i) {
       xmlNodePtr child, node = nodes->nodeTab[i];
       xmlChar *propValue;
-      ship_type *st = calloc(sizeof(ship_type), 1);
+      ship_type *st = (ship_type *)calloc(sizeof(ship_type), 1);
       xmlXPathObjectPtr result;
       int k, c;
 

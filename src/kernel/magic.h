@@ -45,7 +45,7 @@ extern "C" {
  * erst in verify_targets wird dann global gesucht, da in den meisten
  * Fällen das Zielobjekt lokal sein dürfte */
 
-/* siehe auch typ_t in objtypes.h */
+/* siehe auch objtype_t in objtypes.h */
   typedef enum {
     SPP_REGION,                 /* "r" : findregion(x,y) -> *region */
     SPP_UNIT,                   /*  -  : atoi36() -> int */

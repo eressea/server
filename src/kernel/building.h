@@ -128,7 +128,7 @@ extern "C" {
 /* Alte Gebäudetypen: */
 
 /* old functions, still in build.c: */
-  int buildingeffsize(const building * b, boolean img);
+  int buildingeffsize(const building * b, int imaginary);
   void bhash(struct building *b);
   void bunhash(struct building *b);
   int buildingcapacity(const struct building *b);

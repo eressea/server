@@ -554,7 +554,7 @@ extern struct attrib_type at_icastle;
 /** returns the building's build stage (NOT size in people).
  * only makes sense for castles or similar buildings with multiple
  * stages */
-int buildingeffsize(const building * b, boolean img)
+int buildingeffsize(const building * b, int img)
 {
   const struct building_type *btype = NULL;
 

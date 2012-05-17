@@ -64,7 +64,7 @@ extern "C" {
   extern int destroy_cmd(struct unit *u, struct order *ord);
   extern int leave_cmd(struct unit *u, struct order *ord);
 
-  extern boolean can_contact(const struct region *r, const struct unit *u,
+  extern int can_contact(const struct region *r, const struct unit *u,
     const struct unit *u2);
 
   void do_siege(struct region *r);
@@ -76,7 +76,7 @@ extern "C" {
   struct building *getbuilding(const struct region *r);
   struct ship *getship(const struct region *r);
 
-  void do_misc(struct region *r, boolean tries);
+  void do_misc(struct region *r, int is_final_attempt);
 
   void reportevent(struct region *r, char *s);
 

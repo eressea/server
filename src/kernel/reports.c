@@ -975,7 +975,7 @@ spunit(struct strlist **SP, const struct faction *f, const unit * u, int indent,
     (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 
-struct message *msg_curse(const struct curse *c, const void *obj, typ_t typ,
+struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,
   int self)
 {
   if (c->type->curseinfo) {

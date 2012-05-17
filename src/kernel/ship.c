@@ -174,7 +174,7 @@ unit *captain(ship * sh)
 /* Alte Schiffstypen: */
 static ship *deleted_ships;
 
-ship *new_ship(const ship_type * stype, const struct locale *lang, region * r)
+ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 {
   static char buffer[7 + IDSIZE + 1];
   ship *sh = (ship *) calloc(1, sizeof(ship));
@@ -289,6 +289,7 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
 
 unit *shipowner(const ship * sh)
 {
+#ifndef NDEBUG
   unit *u;
   unit *first = NULL;
 
@@ -300,7 +301,7 @@ unit *shipowner(const ship * sh)
       if (!first && u->number > 0)
         first = u;
       if (fval(u, UFL_OWNER) && u->number > 0)
-        return u;
+        break;
       if (u->number == 0)
         freset(u, UFL_OWNER);
     }
@@ -309,9 +310,13 @@ unit *shipowner(const ship * sh)
   /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
    * nehmen. */
 
-  if (first)
-    fset(first, UFL_OWNER);
-  return first;
+  if (first && !u) {
+    u = first;
+    fset(u, UFL_OWNER);
+  }
+  assert(u==sh->owner);
+#endif
+  return sh->owner;
 }
 
 void write_ship_reference(const struct ship *sh, struct storage *store)
