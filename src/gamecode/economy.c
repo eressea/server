@@ -638,6 +638,9 @@ static void give_control(unit * u, unit * u2)
       }
     }
   }
+  if (u->ship) {
+    u->ship->owner = u2;
+  }
   freset(u, UFL_OWNER);
   fset(u2, UFL_OWNER);
 }

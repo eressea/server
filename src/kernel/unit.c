@@ -812,6 +812,7 @@ void leave_ship(unit * u)
       fset(owner, UFL_OWNER);
     }
   }
+  assert(sh->owner!=u);
 }
 
 void leave_building(unit * u)
