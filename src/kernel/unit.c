@@ -776,7 +776,7 @@ ship *leftship(const unit * u)
 
 void u_set_building(unit * u, building * b)
 {
-  assert(b && !u->building); /* you must leave first */
+  assert(!u->building); /* you must leave first */
   u->building = b;
   if (b && !b->_owner) {
     building_set_owner(b, u);
