@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/language.h>
@@ -452,6 +453,8 @@ building *new_building(const struct building_type * btype, region * r,
   building *b = (building *) calloc(1, sizeof(building));
   static boolean init_lighthouse = false;
   static const struct building_type *bt_lighthouse = 0;
+  const char *bname = 0;
+  char buffer[32];
 
   if (!init_lighthouse) {
     bt_lighthouse = bt_find("lighthouse");
@@ -471,15 +474,21 @@ building *new_building(const struct building_type * btype, region * r,
   if (b->type == bt_lighthouse) {
     r->flags |= RF_LIGHTHOUSE;
   }
-  {
-    const char *bname;
-    if (b->type->name == NULL) {
-      bname = LOC(lang, btype->_name);
-    } else {
-      bname = LOC(lang, buildingtype(btype, b, 0));
-    }
-    b->name = strdup(bname);
+  if (b->type->name) {
+    bname = LOC(lang, buildingtype(btype, b, 0));
   }
+  if (!bname) {
+    bname = LOC(lang, btype->_name);
+  }
+  if (!bname) {
+    bname = LOC(lang, parameters[P_GEBAEUDE]);
+  }
+  if (!bname) {
+    bname = parameters[P_GEBAEUDE];
+  }
+  assert(bname);
+  slprintf(buffer, sizeof(buffer), "%s %s", bname, buildingid(b));
+  b->name = strdup(bname);
   return b;
 }
 

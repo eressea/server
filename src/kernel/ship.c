@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -165,8 +166,9 @@ static ship *deleted_ships;
 
 ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 {
-  static char buffer[7 + IDSIZE + 1];
+  static char buffer[32];
   ship *sh = (ship *) calloc(1, sizeof(ship));
+  const char *sname = 0;
 
   assert(stype);
   assert(r);
@@ -175,7 +177,15 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
   sh->type = stype;
   sh->region = r;
 
-  sprintf(buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
+  sname = LOC(lang, stype->name[0]);
+  if (!sname) {
+    sname = LOC(lang, parameters[P_SHIP]);
+    if (!sname) {
+      sname = parameters[P_SHIP];
+    }
+  }
+  assert(sname);
+  slprintf(buffer, sizeof(buffer), "%s %s", sname, shipid(sh));
   sh->name = strdup(buffer);
   shash(sh);
   addlist(&r->ships, sh);

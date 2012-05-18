@@ -1,5 +1,3 @@
-#include <cutest/CuTest.h>
-
 #include "platform.h"
 #include "market.h"
 #include "tests.h"
@@ -14,6 +12,9 @@
 #include <kernel/unit.h>
 
 #include <util/language.h>
+
+#include <cutest/CuTest.h>
+#include <tests.h>
 
 #include <stdlib.h>
 
@@ -33,7 +34,6 @@ static void market_curse(CuTest * tc)
   luxury_type *lux = new_luxurytype(ltype, 0);
   building_type *btype;
   race *rc = rc_add(rc_new("human"));
-  struct locale *lang = make_locale("en");
 
   free_gamedata();
 
@@ -55,7 +55,7 @@ static void market_curse(CuTest * tc)
     }
   }
   r = findregion(1, 1);
-  b = new_building(btype, r, lang);
+  b = test_create_building(r, btype);
   b->flags |= BLD_WORKING;
   b->size = b->type->maxsize;
 
