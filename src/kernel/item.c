@@ -159,7 +159,6 @@ resource_type *new_resourcetype(const char **names, const char **appearances,
       else
         rtype->_appearance[i] = NULL;
     }
-    rt_register(rtype);
   }
 #ifndef NDEBUG
   else {
@@ -193,6 +192,7 @@ item_type *new_itemtype(resource_type * rtype,
   itype = calloc(sizeof(item_type), 1);
 
   itype->rtype = rtype;
+  rtype->itype = itype;
   itype->weight = weight;
   itype->capacity = capacity;
   itype->flags |= iflags;
@@ -974,22 +974,25 @@ void init_resources(void)
   i_silver = new_itemtype(r_silver, ITF_NONE, 1 /*weight */ , 0);
   r_silver->uchange = res_changeitem;
   i_silver->give = give_money;
+  oldresourcetype[R_SILVER] = r_silver;
 
   r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
   r_permaura->uchange = res_changepermaura;
+  rt_register(r_permaura);
+  oldresourcetype[R_PERMAURA] = r_permaura;
 
   r_hp = new_resourcetype(&names[6], NULL, RTF_NONE);
   r_hp->uchange = res_changehp;
+  rt_register(r_hp);
 
   r_aura = new_resourcetype(&names[10], NULL, RTF_NONE);
   r_aura->uchange = res_changeaura;
+  rt_register(r_aura);
+  oldresourcetype[R_AURA] = r_aura;
 
   r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
   r_unit->uchange = res_changeperson;
-
-  oldresourcetype[R_SILVER] = r_silver;
-  oldresourcetype[R_AURA] = r_aura;
-  oldresourcetype[R_PERMAURA] = r_permaura;
+  rt_register(r_unit);
 
   /* alte typen registrieren: */
   init_olditems();
