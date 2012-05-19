@@ -30,11 +30,13 @@ extern "C" {
 
   struct message_type;
 
+  typedef struct mlist {
+    struct mlist *next;
+    struct message *msg;
+  };
+
   typedef struct message_list {
-    struct mlist {
-      struct mlist *next;
-      struct message *msg;
-    } *begin, **end;
+    struct mlist *begin, **end;
   } message_list;
 
   extern void free_messagelist(message_list * msgs);
