@@ -1414,14 +1414,13 @@ void reorder_units(region * r)
     while (*unext && b) {
       unit **ufirst = unext;    /* where the first unit in the building should go */
       unit **umove = unext;     /* a unit we consider moving */
-      unit *owner = NULL;
-      while (*umove) {
+      unit *owner = building_owner(b);
+      while (owner && *umove) {
         unit *u = *umove;
-        if (u->number && u->building == b) {
+        if (u->building == b) {
           unit **uinsert = unext;
-          if (fval(u, UFL_OWNER)) {
+          if (u==owner) {
             uinsert = ufirst;
-            owner = u;
           }
           if (umove != uinsert) {
             *umove = u->next;
@@ -1438,10 +1437,6 @@ void reorder_units(region * r)
         } else {
           umove = &u->next;
         }
-      }
-      if (!owner && ufirst != unext) {
-        owner = *ufirst;
-        fset(owner, UFL_OWNER);
       }
       b = b->next;
     }
@@ -1472,12 +1467,12 @@ void reorder_units(region * r)
     while (*unext && sh) {
       unit **ufirst = unext;    /* where the first unit in the building should go */
       unit **umove = unext;     /* a unit we consider moving */
-      unit *owner = NULL;
-      while (*umove) {
+      unit *owner = ship_owner(sh);
+      while (owner && *umove) {
         unit *u = *umove;
         if (u->number && u->ship == sh) {
           unit **uinsert = unext;
-          if (fval(u, UFL_OWNER)) {
+          if (u==owner) {
             uinsert = ufirst;
             owner = u;
           }
@@ -1496,10 +1491,6 @@ void reorder_units(region * r)
         } else {
           umove = &u->next;
         }
-      }
-      if (!owner && ufirst != unext) {
-        owner = *ufirst;
-        fset(owner, UFL_OWNER);
       }
       sh = sh->next;
     }

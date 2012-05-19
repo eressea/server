@@ -156,7 +156,6 @@ static void test_buildingowner_goes_to_same_faction_when_empty(CuTest * tc)
   u_set_building(u2, bld);
   u_set_building(u3, bld);
   CuAssertPtrEquals(tc, u, building_owner(bld));
-  CuAssertTrue(tc, fval(u, UFL_OWNER));
   u->number = 0;
   CuAssertPtrEquals(tc, u3, building_owner(bld));
   u3->number = 0;

@@ -155,15 +155,10 @@ static void test_shipowner_goes_to_same_faction_after_death(CuTest * tc)
   u_set_ship(u2, sh);
   u_set_ship(u3, sh);
   CuAssertPtrEquals(tc, u, ship_owner(sh));
-  CuAssertTrue(tc, fval(u, UFL_OWNER));
   u->number = 0;
   CuAssertPtrEquals(tc, u3, ship_owner(sh));
-  CuAssertTrue(tc, !fval(u, UFL_OWNER));
-  CuAssertTrue(tc, fval(u3, UFL_OWNER));
   u3->number = 0;
   CuAssertPtrEquals(tc, u2, ship_owner(sh));
-  CuAssertTrue(tc, !fval(u3, UFL_OWNER));
-  CuAssertTrue(tc, fval(u2, UFL_OWNER));
 }
 
 static void test_shipowner_goes_to_next_after_leave(CuTest * tc)

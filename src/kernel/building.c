@@ -627,11 +627,7 @@ const char *buildingname(const building * b)
 void building_set_owner(struct building *b, struct unit * owner)
 {
   assert(b && owner && owner->building==b);
-  if (b->_owner && b->_owner!=owner) {
-    freset(b->_owner, UFL_OWNER);
-  }
   b->_owner = owner;
-  fset(owner, UFL_OWNER);
 }
 
 static unit *building_owner_ex(const building * bld, const faction * last_owner)
@@ -651,7 +647,6 @@ static unit *building_owner_ex(const building * bld, const faction * last_owner)
           heir = u; /* you'll do in an emergency */
         }
       }
-      freset(u, UFL_OWNER);
     }
   }
   return heir;

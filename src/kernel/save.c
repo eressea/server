@@ -796,6 +796,9 @@ unit *read_unit(struct storage *store)
     building * b = findbuilding(n);
     if (b) {
       u_set_building(u, b);
+      if (fval(u, UFL_OWNER)) {
+        building_set_owner(b, u);
+      }
     } else {
       log_error("read_unit: unit in unkown building '%s'\n", itoa36(n));
     }
@@ -806,6 +809,9 @@ unit *read_unit(struct storage *store)
     ship * sh = findship(n);
     if (sh) {
       u_set_ship(u, sh);
+      if (fval(u, UFL_OWNER)) {
+        ship_set_owner(sh, u);
+      }
     } else {
       log_error("read_unit: unit in unkown ship '%s'\n", itoa36(n));
     }
@@ -880,7 +886,9 @@ void write_unit(struct storage *store, const unit * u)
 {
   order *ord;
   int i, p = 0;
+  unsigned int flags = u->flags & UFL_SAVEMASK;
   const race *irace = u_irace(u);
+
   write_unit_reference(u, store);
   write_faction_reference(u->faction, store);
   store->w_str(store, (const char *)u->name);
@@ -892,7 +900,9 @@ void write_unit(struct storage *store, const unit * u)
   write_building_reference(u->building, store);
   write_ship_reference(u->ship, store);
   store->w_int(store, u->status);
-  store->w_int(store, u->flags & UFL_SAVEMASK);
+  if (u->building && u==building_owner(u->building)) flags |= UFL_OWNER;
+  if (u->ship && u==ship_owner(u->ship)) flags |= UFL_OWNER;
+  store->w_int(store, flags);
   store->w_brk(store);
   for (ord = u->old_orders; ord; ord = ord->next) {
     if (++p < MAXPERSISTENT) {

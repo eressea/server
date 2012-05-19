@@ -2367,7 +2367,7 @@ unsigned int getguard(const unit * u)
 {
   attrib *a;
 
-  assert((u->building && fval(u, UFL_OWNER)) || fval(u, UFL_GUARD)
+  assert(fval(u, UFL_GUARD) || (u->building && u==building_owner(u->building))
     || !"you're doing it wrong! check is_guard first");
   a = a_find(u->attribs, &at_guard);
   if (a) {

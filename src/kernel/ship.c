@@ -288,11 +288,7 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
 
 void ship_set_owner(ship * sh, unit * u) {
   assert(u->ship==sh);
-  if (sh->_owner && sh->_owner!=u) {
-    freset(sh->_owner, UFL_OWNER);
-  }
   sh->_owner = u;
-  fset(u, UFL_OWNER);
 }
 
 unit *ship_owner(const ship * sh)
@@ -314,14 +310,9 @@ unit *ship_owner(const ship * sh)
             heir = u; /* you'll do in an emergency */
           }
         }
-        freset(u, UFL_OWNER);
       }
     }
-    freset(owner, UFL_OWNER);
     owner = heir;
-    if (owner) {
-      fset(owner, UFL_OWNER);
-    }
   }
   /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
    * nehmen. */

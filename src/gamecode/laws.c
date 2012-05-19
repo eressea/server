@@ -2876,7 +2876,7 @@ static void reorder(void)
             id = getid();
             v = findunit(id);
 
-            if (v == NULL || v->faction != u->faction || v->region != r) {
+            if (!v || v->faction != u->faction || v->region != r) {
               cmistake(u, ord, 258, MSG_EVENT);
             } else if (v->building != u->building || v->ship != u->ship) {
               cmistake(u, ord, 259, MSG_EVENT);

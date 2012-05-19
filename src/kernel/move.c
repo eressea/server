@@ -894,7 +894,7 @@ static boolean is_guardian_r(const unit * guard)
     return false;
 
   /* if region_owners exist then they may be guardians: */
-  if (guard->building && rule_region_owners() && fval(guard, UFL_OWNER)) {
+  if (guard->building && rule_region_owners() && guard==building_owner(guard->building)) {
     faction *owner = region_get_owner(guard->region);
     if (owner == guard->faction) {
       building *bowner = largestbuilding(guard->region, &cmp_taxes, false);
@@ -1590,7 +1590,7 @@ static const region_list *travel_route(unit * u,
 
 static boolean ship_ready(const region * r, unit * u)
 {
-  if (!fval(u, UFL_OWNER)) {
+  if (!u->ship || u!=ship_owner(u->ship)) {
     cmistake(u, u->thisorder, 146, MSG_MOVE);
     return false;
   }
@@ -2159,7 +2159,7 @@ static void move(unit * u, boolean move_on_land)
   region_list *route = NULL;
 
   assert(u->number);
-  if (u->ship && fval(u, UFL_OWNER)) {
+  if (u->ship && u==ship_owner(u->ship)) {
     sail(u, u->thisorder, move_on_land, &route);
   } else {
     travel(u, &route);
@@ -2227,7 +2227,7 @@ static void piracy_cmd(unit * u, struct order *ord)
     return;
   }
 
-  if (!fval(u, UFL_OWNER)) {
+  if (!u->ship || u!=ship_owner(u->ship)) {
     cmistake(u, ord, 146, MSG_MOVE);
     return;
   }
@@ -2370,11 +2370,11 @@ static int hunt(unit * u, order * ord)
 
   if (fval(u, UFL_NOTMOVING)) {
     return 0;
-  } else if (u->ship == NULL) {
+  } else if (!u->ship) {
     cmistake(u, ord, 144, MSG_MOVE);
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;
-  } else if (!fval(u, UFL_OWNER)) {
+  } else if (u!=ship_owner(u->ship)) {
     cmistake(u, ord, 146, MSG_MOVE);
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);    /* FOLGE SCHIFF ist immer lang */
     return 0;

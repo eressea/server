@@ -658,22 +658,28 @@ int give_control_cmd(unit * u, order * ord)
 
   /* first, do all the ones that do not require HELP_GIVE or CONTACT */
   if (p == P_CONTROL) {
-    message *msg;
+    message *msg = 0;
 
     if (!u2 || u2->number == 0) {
-      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-          ""));
+      msg = msg_feedback(u, ord, "feedback_unit_not_found", "");
+      ADDMSG(&u->faction->msgs, msg);
     } else if (!u->building && !u->ship) {
-      cmistake(u, ord, 140, MSG_EVENT);
-    } else if (u->building && u2->building != u->building) {
-      cmistake(u, ord, 33, MSG_EVENT);
-    } else if (u->ship && u2->ship != u->ship) {
-      cmistake(u, ord, 32, MSG_EVENT);
-    } else if (!fval(u, UFL_OWNER)) {
-      cmistake(u, ord, 49, MSG_EVENT);
-    } else {
+      msg = cmistake(u, ord, 140, MSG_EVENT);
+    } else if (u->building) {
+      if (u!=building_owner(u->building)) {
+        msg = cmistake(u, ord, 49, MSG_EVENT);
+      } else if (u2->building != u->building) {
+        msg = cmistake(u, ord, 33, MSG_EVENT);
+      }
+    } else if (u->ship) {
+      if (u!=ship_owner(u->ship)) {
+        msg = cmistake(u, ord, 49, MSG_EVENT);
+      } else if (u2->ship != u->ship) {
+        msg = cmistake(u, ord, 32, MSG_EVENT);
+      }
+    }
+    if (!msg) {
       give_control(u, u2);
-
       msg = msg_message("givecommand", "unit recipient", u, u2);
       add_message(&u->faction->msgs, msg);
       if (u->faction != u2->faction) {
