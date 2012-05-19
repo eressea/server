@@ -291,41 +291,44 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
       if (s == NULL)
         break;
 
-      if (s[0] && s[0]!='@') {
-        const char *stok = s;
-        stok = parse_token(&stok);
+      if (s[0]) {
+        if (s[0]!='@') {
+          const char *stok = s;
+          stok = parse_token(&stok);
 
-        if (stok) {
-          boolean quit = false;
-          param_t param = findparam(stok, u->faction->locale);
-          switch (param) {
-          case P_UNIT:
-          case P_REGION:
-            quit = true;
-            break;
-          case P_FACTION:
-          case P_NEXT:
-          case P_GAMENAME:
-            /* these terminate the orders, so we apply extra checking */
-            if (strlen(stok) >= 3) {
+          if (stok) {
+            boolean quit = false;
+            param_t param = findparam(stok, u->faction->locale);
+            switch (param) {
+            case P_UNIT:
+            case P_REGION:
               quit = true;
               break;
-            } else {
-              quit = false;
+            case P_FACTION:
+            case P_NEXT:
+            case P_GAMENAME:
+              /* these terminate the orders, so we apply extra checking */
+              if (strlen(stok) >= 3) {
+                quit = true;
+                break;
+              } else {
+                quit = false;
+              }
+              break;
+            default:
+              /* TODO: syntax error message */
+              break;
             }
-            break;
-          default:
-            /* TODO: syntax error message */
-            break;
-          }
-          if (quit) {
-            break;
+            if (quit) {
+              break;
+            }
           }
         }
         /* Nun wird der Befehl erzeut und eingehängt */
         *ordp = parse_order(s, u->faction->locale);
-        if (*ordp)
+        if (*ordp) {
           ordp = &(*ordp)->next;
+        }
       }
     }
 
