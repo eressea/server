@@ -100,6 +100,8 @@ void test_cleanup(void)
   test_clear_resources();
   global.functions.maintenance = NULL;
   global.functions.wage = NULL;
+  default_locale = 0;
+  locales = 0; /* TODO: this is evil and leaky */
   free_gamedata();
 }
 
@@ -155,9 +157,13 @@ void test_create_world(void)
   building_type *btype;
   ship_type *stype;
   item_type * itype;
-  const char * names[2] = { "horse", "horse_p" };
+  const char * horses[2] = { "horse", "horse_p" };
 
-  itype = test_create_itemtype(names);
+  make_locale("de");
+  init_resources();
+  assert(!olditemtype[I_HORSE]);
+
+  itype = test_create_itemtype(horses);
   olditemtype[I_HORSE] = itype;
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);
