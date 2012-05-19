@@ -798,6 +798,7 @@ void leave_ship(unit * u)
 
   u->ship = 0;
   if (sh->_owner==u) {
+    ship_update_owner(sh);
     sh->_owner = ship_owner(sh);
   }
   set_leftship(u, sh);

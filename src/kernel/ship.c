@@ -291,31 +291,40 @@ void ship_set_owner(ship * sh, unit * u) {
   sh->_owner = u;
 }
 
-unit *ship_owner(const ship * sh)
+static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
-  unit *owner = sh->_owner;
-  if (owner && (owner->ship!=sh || owner->number<=0)) {
-    unit *u, *heir = 0;
+  unit *u, *heir = 0;
 
-    owner->ship = 0;
-    /* Prüfen ob Eigentümer am leben. */
-    for (u = sh->region->units; u; u = u->next) {
-      if (u->ship == sh) {
-        if (u->number > 0) {
-          if (u->faction==owner->faction) {
-            heir = u;
-            break;
-          }
-          else if (!heir) {
-            heir = u; /* you'll do in an emergency */
-          }
+  /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+    * nehmen. */
+  for (u = sh->region->units; u; u = u->next) {
+    if (u->ship == sh) {
+      if (u->number > 0) {
+        if (heir && last_owner && heir->faction!=last_owner && u->faction==last_owner) {
+          heir = u;
+          break; /* we found someone from the same faction who is not dead. let's take this guy */
+        }
+        else if (!heir) {
+          heir = u; /* you'll do in an emergency */
         }
       }
     }
-    owner = heir;
   }
-  /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
-   * nehmen. */
+  return heir;
+}
+
+void ship_update_owner(ship * sh) {
+  unit * owner = sh->_owner;
+  sh->_owner = ship_owner_ex(sh, owner?owner->faction:0);
+}
+
+unit *ship_owner(const ship * sh)
+{
+  unit *owner = sh->_owner;
+  if (!owner || (owner->ship!=sh || owner->number<=0)) {
+    unit * heir = ship_owner_ex(sh, owner?owner->faction:0);
+    return (heir && heir->number>0) ? heir : 0;
+  }
   return owner;
 }
 

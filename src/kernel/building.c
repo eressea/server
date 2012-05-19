@@ -500,7 +500,6 @@ static building *deleted_buildings;
 void remove_building(building ** blist, building * b)
 {
   unit *u;
-  direction_t d;
   static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
   static boolean init = false;
 
@@ -527,15 +526,19 @@ void remove_building(building ** blist, building * b)
    * gebaute Straße zur Hälfte vernichtet */
   if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
     region *r = b->region;
-    for (d = 0; d != MAXDIRECTIONS; ++d)
-      if (rroad(r, d) > 0) {
-        rsetroad(r, d, rroad(r, d) / 2);
+    int d;
+    for (d = 0; d != MAXDIRECTIONS; ++d) {
+      direction_t dir = (direction_t)d;
+      if (rroad(r, dir) > 0) {
+        rsetroad(r, dir, rroad(r, dir) / 2);
       }
+    }
   }
 
   /* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */
-  while (*blist && *blist != b)
+  while (*blist && *blist != b) {
     blist = &(*blist)->next;
+  }
   *blist = b->next;
   b->region = NULL;
   b->next = deleted_buildings;
@@ -630,7 +633,7 @@ void building_set_owner(struct building *b, struct unit * owner)
   b->_owner = owner;
 }
 
-static unit *building_owner_ex(const building * bld, const faction * last_owner)
+static unit *building_owner_ex(const building * bld, const struct faction * last_owner)
 {
   unit *u, *heir = 0;
 
