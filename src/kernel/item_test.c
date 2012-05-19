@@ -12,11 +12,11 @@ void test_resource_type(CuTest * tc)
 
   CuAssertPtrEquals(tc, 0, rt_find("herpderp"));
 
-  names[0] = "herpderp";
+  names[0] = names[1] = "herpderp";
   new_resourcetype(names, NULL, RTF_NONE);
-  names[0] = "herp";
+  names[0] = names[1] = "herp";
   rtype = new_resourcetype(names, NULL, RTF_NONE);
-  names[0] = "herpes";
+  names[0] = names[1] = "herpes";
   new_resourcetype(names, NULL, RTF_NONE);
 
   CuAssertPtrEquals(tc, rtype, rt_find("herp"));

@@ -107,6 +107,8 @@ void test_cleanup(void)
   test_clear_resources();
   global.functions.maintenance = NULL;
   global.functions.wage = NULL;
+  default_locale = 0;
+  locales = 0; /* TODO: this is evil and leaky */
   free_gamedata();
 }
 
@@ -164,6 +166,7 @@ void test_create_world(void)
   item_type * itype;
   const char * horses[2] = { "horse", "horse_p" };
 
+  make_locale("de");
   init_resources();
   assert(!olditemtype[I_HORSE]);
 

@@ -57,6 +57,10 @@ locale *make_locale(const char *name)
   locale *l = (locale *) calloc(sizeof(locale), 1);
   locale **lp = &locales;
 
+  if (!locales) {
+    nextlocaleindex = 0;
+  }
+
   while (*lp && (*lp)->hashkey != hkey)
     lp = &(*lp)->next;
   if (*lp) {
@@ -164,8 +168,10 @@ void locale_setstring(locale * lang, const char *key, const char *value)
   unsigned int hkey = hashstring(key);
   unsigned int id = hkey & (SMAXHASH - 1);
   struct locale_str *find;
-  if (lang == NULL)
+  if (!lang) {
     lang = default_locale;
+  }
+  assert(lang);
   find = lang->strings[id];
   while (find) {
     if (find->hashkey == hkey && strcmp(key, find->key) == 0)
