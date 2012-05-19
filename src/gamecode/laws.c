@@ -2989,12 +2989,12 @@ static int renumber_cmd(unit * u, order * ord)
       cmistake(u, ord, 144, MSG_EVENT);
       break;
     }
-    if (u->ship->coast != NODIRECTION) {
-      cmistake(u, ord, 116, MSG_EVENT);
-      break;
-    }
     if (ship_owner(u->ship)!=u) {
       cmistake(u, ord, 146, MSG_EVENT);
+      break;
+    }
+    if (u->ship->coast != NODIRECTION) {
+      cmistake(u, ord, 116, MSG_EVENT);
       break;
     }
     s = getstrtoken();
