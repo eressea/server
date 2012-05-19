@@ -308,6 +308,10 @@ static void test_buildingowner_resets_when_dead(CuTest * tc)
   CuAssertPtrEquals(tc, 0, building_owner(bld));
 }
 
+void test_buildingowner_goes_to_empty_unit_if_no_other(CuTest * tc)
+{
+}
+
 CuSuite *get_building_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
@@ -320,5 +324,6 @@ CuSuite *get_building_suite(void)
   SUITE_ADD_TEST(suite, test_buildingowner_goes_to_next_after_leave);
   SUITE_ADD_TEST(suite, test_buildingowner_goes_to_other_after_leave);
   SUITE_ADD_TEST(suite, test_buildingowner_goes_to_same_faction_after_leave);
+  SUITE_ADD_TEST(suite, test_buildingowner_goes_to_empty_unit_if_no_other);
   return suite;
 }

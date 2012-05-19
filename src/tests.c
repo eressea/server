@@ -151,7 +151,6 @@ void test_create_world(void)
 {
   terrain_type *t_plain, *t_ocean;
   region *island[2];
-  race *rc_human;
   int i;
   building_type *btype;
   ship_type *stype;
@@ -179,7 +178,7 @@ void test_create_world(void)
     }
   }
 
-  rc_human = test_create_race("human");
+  test_create_race("human");
 
   btype = (building_type*)calloc(sizeof(building_type), 1);
   btype->flags = BTF_NAMECHANGE;
