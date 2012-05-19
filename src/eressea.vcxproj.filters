@@ -83,6 +83,9 @@
     <ClCompile Include="..\..\shared\src\build\util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\shared\src\tests_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="spells\alp.h">
