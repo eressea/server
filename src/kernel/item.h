@@ -69,15 +69,13 @@ extern "C" {
     rtype_name name;
     /* --- pointers --- */
     struct attrib *attribs;
-    struct resource_type *next;
-    unsigned int hashkey;
     struct item_type *itype;
     struct potion_type *ptype;
     struct luxury_type *ltype;
     struct weapon_type *wtype;
     struct armor_type *atype;
   } resource_type;
-  extern resource_type *resourcetypes;
+
   extern const char *resourcename(const resource_type * rtype, int flags);
   extern const resource_type *findresourcetype(const char *name,
     const struct locale *lang);
@@ -142,12 +140,9 @@ extern "C" {
 #if SCORE_MODULE
     int score;
 #endif
-    struct item_type *next;
   } item_type;
 
-  extern const item_type *finditemtype(const char *name,
-    const struct locale *lang);
-  extern void init_itemnames(void);
+  extern const item_type *finditemtype(const char *name, const struct locale *lang);
 
   typedef struct luxury_type {
     struct luxury_type *next;

@@ -1,6 +1,3 @@
-/* this file should only be included by laws.c, never compiled on its own
- * (it does not even include all the headers needed to do so).
-**/
 #include <platform.h>
 #include <kernel/types.h>
 #include "laws.h"

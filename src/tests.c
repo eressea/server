@@ -4,6 +4,7 @@
 #include <platform.h>
 #include "tests.h"
 
+#include "tests_test.c"
 #include <util/base36_test.c>
 #include <util/functions_test.c>
 #include <util/quicklist_test.c>
@@ -38,22 +39,26 @@ int RunAllTests(void)
   int flags = log_flags;
 
   log_flags = LOG_FLUSH | LOG_CPERROR;
-  init_resources();
 
+  /* self-test */
+  CuSuiteAddSuite(suite, get_tests_suite());
+  /* util */
   CuSuiteAddSuite(suite, get_base36_suite());
   CuSuiteAddSuite(suite, get_quicklist_suite());
   CuSuiteAddSuite(suite, get_functions_suite());
   CuSuiteAddSuite(suite, get_umlaut_suite());
+  /* kernel */
   CuSuiteAddSuite(suite, get_curse_suite());
-  CuSuiteAddSuite(suite, get_market_suite());
   CuSuiteAddSuite(suite, get_item_suite());
   CuSuiteAddSuite(suite, get_move_suite());
   CuSuiteAddSuite(suite, get_reports_suite());
   CuSuiteAddSuite(suite, get_ship_suite());
   CuSuiteAddSuite(suite, get_building_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
-  CuSuiteAddSuite(suite, get_laws_suite());
   CuSuiteAddSuite(suite, get_battle_suite());
+  /* gamecode */
+  CuSuiteAddSuite(suite, get_market_suite());
+  CuSuiteAddSuite(suite, get_laws_suite());
 
   CuSuiteRun(suite);
   CuSuiteSummary(suite, output);
@@ -157,9 +162,12 @@ void test_create_world(void)
   building_type *btype;
   ship_type *stype;
   item_type * itype;
-  const char * names[2] = { "horse", "horse_p" };
+  const char * horses[2] = { "horse", "horse_p" };
 
-  itype = test_create_itemtype(names);
+  init_resources();
+  assert(!olditemtype[I_HORSE]);
+
+  itype = test_create_itemtype(horses);
   olditemtype[I_HORSE] = itype;
 
   t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);

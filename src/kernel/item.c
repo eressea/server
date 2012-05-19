@@ -41,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/critbit.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
@@ -55,12 +56,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-resource_type *resourcetypes;
+static critbit_tree cb_resources;
+static critbit_tree cb_items;
 luxury_type *luxurytypes;
 potion_type *potiontypes;
-
-#define IMAXHASH 127
-static item_type *itemtypes[IMAXHASH];
 
 static int res_changeaura(unit * u, const resource_type * rtype, int delta)
 {
@@ -173,14 +172,13 @@ resource_type *new_resourcetype(const char **names, const char **appearances,
 
 void it_register(item_type * itype)
 {
-  int hash = hashstring(itype->rtype->_name[0]);
-  int key = hash % IMAXHASH;
-  item_type **p_itype = &itemtypes[key];
-  while (*p_itype && *p_itype != itype)
-    p_itype = &(*p_itype)->next;
-  if (*p_itype == NULL) {
-    itype->rtype->itype = itype;
-    *p_itype = itype;
+  char buffer[64];
+  const char * name = itype->rtype->_name[0];
+  size_t len = strlen(name);
+
+  assert(len<sizeof(buffer)-sizeof(itype));
+  cb_new_kv(name, &itype, sizeof(itype), buffer);
+  if (cb_insert(&cb_items, buffer, len+1+sizeof(itype))) {
     rt_register(itype->rtype);
   }
 }
@@ -294,16 +292,13 @@ potion_type *new_potiontype(item_type * itype, int level)
 
 void rt_register(resource_type * rtype)
 {
-  resource_type **prtype = &resourcetypes;
+  char buffer[64];
+  const char * name = rtype->_name[0];
+  size_t len = strlen(name);
 
-  if (!rtype->hashkey) {
-    rtype->hashkey = hashstring(rtype->_name[0]);
-  }
-  while (*prtype && *prtype != rtype)
-    prtype = &(*prtype)->next;
-  if (*prtype == NULL) {
-    *prtype = rtype;
-  }
+  assert(len<sizeof(buffer)-sizeof(rtype));
+  cb_new_kv(name, &rtype, sizeof(rtype), buffer);
+  cb_insert(&cb_resources, buffer, len+1+sizeof(rtype));
 }
 
 const resource_type *item2resource(const item_type * itype)
@@ -347,17 +342,13 @@ const potion_type *resource2potion(const resource_type * rtype)
 
 resource_type *rt_find(const char *name)
 {
-  unsigned int hash = hashstring(name);
-  resource_type *rtype;
+  const void * matches;
+  resource_type *result = 0;
 
-  for (rtype = resourcetypes; rtype; rtype = rtype->next) {
-    if (rtype->hashkey == hash && !strcmp(rtype->_name[0], name))
-      break;
+  if (cb_find_prefix(&cb_resources, name, strlen(name)+1, &matches, 1, 0)) {
+    cb_get_kv(matches, &result, sizeof(result));
   }
-  if (!rtype) {
-    log_warning("rt_find: unknown resource '%s'\n", name);
-  }
-  return rtype;
+  return result;
 }
 
 static const char *it_aliases[][2] = {
@@ -387,23 +378,13 @@ static const char *it_alias(const char *zname)
 item_type *it_find(const char *zname)
 {
   const char *name = it_alias(zname);
-  unsigned int hash = hashstring(name);
-  item_type *itype;
-  unsigned int key = hash % IMAXHASH;
+  const void * matches;
+  item_type *result = 0;
 
-  for (itype = itemtypes[key]; itype; itype = itype->next) {
-    if (itype->rtype->hashkey == hash
-      && strcmp(itype->rtype->_name[0], name) == 0) {
-      break;
-    }
+  if (cb_find_prefix(&cb_items, name, strlen(name)+1, &matches, 1, 0)) {
+    cb_get_kv(matches, &result, sizeof(result));
   }
-  if (itype == NULL) {
-    for (itype = itemtypes[key]; itype; itype = itype->next) {
-      if (strcmp(itype->rtype->_name[1], name) == 0)
-        break;
-    }
-  }
-  return itype;
+  return result;
 }
 
 item **i_find(item ** i, const item_type * it)
@@ -1066,10 +1047,11 @@ int change_money(unit * u, int v)
 }
 
 static local_names *rnames;
-
+#define CB_BATCHSIZE 16
 const resource_type *findresourcetype(const char *name,
   const struct locale *lang)
 {
+  const void * matches[CB_BATCHSIZE];
   local_names *rn = rnames;
   variant token;
 
@@ -1079,21 +1061,30 @@ const resource_type *findresourcetype(const char *name,
     rn = rn->next;
   }
   if (!rn) {
-    const resource_type *rtl = resourcetypes;
-    rn = calloc(sizeof(local_names), 1);
+    int m, offset = 0;
+    rn = (local_names *)calloc(1, sizeof(local_names));
     rn->next = rnames;
     rn->lang = lang;
-    while (rtl) {
-      token.v = (void *)rtl;
-      addtoken(&rn->names, locale_string(lang, rtl->_name[0]), token);
-      addtoken(&rn->names, locale_string(lang, rtl->_name[1]), token);
-      rtl = rtl->next;
-    }
+    do {
+      m = cb_find_prefix(&cb_resources, "", 1, matches, CB_BATCHSIZE, offset);
+      if (m) {
+        int i;
+        offset += m;
+        for (i=0;i!=m;++i) {
+          resource_type *rtype;
+          cb_get_kv(matches[i], &rtype, sizeof(rtype));
+          token.v = (void *)rtype;
+          addtoken(&rn->names, locale_string(lang, rtype->_name[0]), token);
+          addtoken(&rn->names, locale_string(lang, rtype->_name[1]), token);
+        }
+      }
+    } while (m==CB_BATCHSIZE);
     rnames = rn;
   }
 
-  if (findtoken(rn->names, name, &token) == E_TOK_NOMATCH)
-    return NULL;
+  if (findtoken(rn->names, name, &token) == E_TOK_NOMATCH) {
+    return 0;
+  }
   return (const resource_type *)token.v;
 }
 
@@ -1103,64 +1094,43 @@ attrib_type at_showitem = {
 
 static local_names *inames;
 
-void init_itemnames(void)
-{
-  int i;
-  for (i = 0; localenames[i]; ++i) {
-    const struct locale *lang = find_locale(localenames[i]);
-    boolean exist = false;
-    local_names *in = inames;
-
-    while (in != NULL) {
-      if (in->lang == lang) {
-        exist = true;
-        break;
-      }
-      in = in->next;
-    }
-    if (in == NULL)
-      in = calloc(sizeof(local_names), 1);
-    in->next = inames;
-    in->lang = lang;
-
-    if (!exist) {
-      int key;
-      for (key = 0; key != IMAXHASH; ++key) {
-        const item_type *itl;
-        for (itl = itemtypes[key]; itl; itl = itl->next) {
-          variant var;
-          const char *iname = locale_string(lang, itl->rtype->_name[0]);
-          if (findtoken(in->names, iname, &var) == E_TOK_NOMATCH
-            || var.v != itl) {
-            var.v = (void *)itl;
-            addtoken(&in->names, iname, var);
-            addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]),
-              var);
-          }
-        }
-      }
-    }
-    inames = in;
-  }
-}
-
 const item_type *finditemtype(const char *name, const struct locale *lang)
 {
+  const void * matches[CB_BATCHSIZE];
   local_names *in = inames;
-  variant var;
+  variant token;
 
-  while (in != NULL) {
+  while (in) {
     if (in->lang == lang)
       break;
     in = in->next;
   }
-  if (in == NULL) {
-    init_itemnames();
-    for (in = inames; in->lang != lang; in = in->next) ;
+  if (!in) {
+    int m, offset = 0;
+    in = (local_names *)calloc(1, sizeof(local_names));
+    in->next = inames;
+    in->lang = lang;
+    do {
+      m = cb_find_prefix(&cb_items, "", 1, matches, CB_BATCHSIZE, offset);
+      if (m) {
+        int i;
+        offset += m;
+        for (i=0;i!=m;++i) {
+          item_type *itype;
+          cb_get_kv(matches[i], &itype, sizeof(itype));
+          token.v = (void *)itype;
+          addtoken(&in->names, locale_string(lang, itype->rtype->_name[0]), token);
+          addtoken(&in->names, locale_string(lang, itype->rtype->_name[1]), token);
+        }
+      }
+    } while (m==CB_BATCHSIZE);
+    inames = in;
   }
-  if (findtoken(in->names, name, &var) == E_TOK_NOMATCH)
-    return NULL;
-  return (const item_type *)var.v;
+
+  if (findtoken(in->names, name, &token) == E_TOK_NOMATCH) {
+    return 0;
+  }
+  return (const item_type *)token.v;
 }
 
 static void init_resourcelimit(attrib * a)
@@ -1197,31 +1167,38 @@ static item *default_spoil(const struct race *rc, int size)
 }
 
 #ifndef DISABLE_TESTS
+int free_itype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+  item_type *itype;
+  cb_get_kv(match, &itype, sizeof(itype));
+  free(itype->construction);
+  free(itype);
+  return 0;
+}
+
+int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+  resource_type *rtype;
+  cb_get_kv(match, &rtype, sizeof(rtype));
+  free(rtype->_name[0]);
+  free(rtype->_name[1]);
+  free(rtype->_appearance[0]);
+  free(rtype->_appearance[1]);
+  free(rtype);
+  return 0;
+}
+
 void test_clear_resources(void)
 {
-  int i;
+  memset((void *)olditemtype, 0, sizeof(olditemtype));
+  memset((void *)oldresourcetype, 0, sizeof(oldresourcetype));
+  memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
 
-  for (i=0;i!=IMAXHASH;++i) {
-    item_type * itype = itemtypes[i];
-    if (itype) {
-      itemtypes[i] = 0;
-      free(itype->construction);
-      free(itype);
-    }
-  }
+  cb_foreach(&cb_items, "", 0, free_itype_cb, 0);
+  cb_clear(&cb_items);
+  cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
+  cb_clear(&cb_resources);
 
-  while (resourcetypes) {
-    resource_type * rtype = resourcetypes;
-    resourcetypes = rtype->next;
-    free(rtype->_name[0]);
-    free(rtype->_name[1]);
-    free(rtype->_appearance[0]);
-    free(rtype->_appearance[1]);
-    free(rtype);
-  }
-  resourcetypes = 0;
-  r_hp = 0;
-  init_resources();
+  r_hp = r_silver = r_aura = r_permaura = r_unit = 0;
+  i_silver = 0;
 }
 #endif
 
