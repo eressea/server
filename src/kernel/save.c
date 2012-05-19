@@ -387,10 +387,12 @@ int readorders(const char *filename)
   int nfactions = 0;
   struct faction *f = NULL;
 
-  if (filename)
+  if (filename) {
     F = cfopen(filename, "rb");
-  if (F == NULL)
-    return 0;
+  }
+  if (!F) {
+    return -1;
+  }
 
   if (verbosity >= 1)
     puts(" - lese Befehlsdatei...\n");
