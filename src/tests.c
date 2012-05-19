@@ -9,6 +9,7 @@
 #include <util/quicklist_test.c>
 #include <util/umlaut_test.c>
 #include <kernel/move_test.c>
+#include <kernel/item_test.c>
 #include <kernel/ship_test.c>
 #include <kernel/building_test.c>
 #include <kernel/spell_test.c>
@@ -45,6 +46,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_umlaut_suite());
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_market_suite());
+  CuSuiteAddSuite(suite, get_item_suite());
   CuSuiteAddSuite(suite, get_move_suite());
   CuSuiteAddSuite(suite, get_reports_suite());
   CuSuiteAddSuite(suite, get_ship_suite());

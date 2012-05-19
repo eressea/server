@@ -307,6 +307,9 @@
     <ClCompile Include="kernel\building_test.c">
       <Filter>kernel</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\item_test.c">
+      <Filter>kernel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\alchemy.h">

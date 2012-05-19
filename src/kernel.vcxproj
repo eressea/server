@@ -104,6 +104,7 @@
     <ClCompile Include="kernel\faction.c" />
     <ClCompile Include="kernel\group.c" />
     <ClCompile Include="kernel\item.c" />
+    <ClCompile Include="kernel\item_test.c" />
     <ClCompile Include="kernel\magic.c" />
     <ClCompile Include="kernel\message.c" />
     <ClCompile Include="kernel\move.c" />
