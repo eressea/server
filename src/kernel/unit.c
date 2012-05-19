@@ -809,7 +809,8 @@ void leave_building(unit * u)
 
   u->building = 0;
   if (b->_owner==u) {
-    b->_owner = building_owner(b);
+    building_update_owner(b);
+    assert(b->_owner!=u);
   }
 }
 

@@ -634,36 +634,42 @@ void building_set_owner(struct building *b, struct unit * owner)
   fset(owner, UFL_OWNER);
 }
 
+static unit *building_owner_ex(const building * bld, const faction * last_owner)
+{
+  unit *u, *heir = 0;
+
+  /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+    * nehmen. */
+  for (u = bld->region->units; u; u = u->next) {
+    if (u->building == bld) {
+      if (u->number > 0) {
+        if (heir && last_owner && heir->faction!=last_owner && u->faction==last_owner) {
+          heir = u;
+          break; /* we found someone from the same faction who is not dead. let's take this guy */
+        }
+        else if (!heir) {
+          heir = u; /* you'll do in an emergency */
+        }
+      }
+      freset(u, UFL_OWNER);
+    }
+  }
+  return heir;
+}
+
 unit *building_owner(const building * bld)
 {
   unit *owner = bld->_owner;
-  if (owner && (owner->building!=bld || owner->number<=0)) {
-    unit *u, *heir = 0;
-
-    /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
-     * nehmen. */
-    for (u = bld->region->units; u; u = u->next) {
-      if (u->building == bld) {
-        if (u->number > 0) {
-          if (u->faction==owner->faction) {
-            heir = u;
-            break;
-          }
-          else if (!heir) {
-            heir = u; /* you'll do in an emergency */
-          }
-        }
-        freset(u, UFL_OWNER);
-      }
-    }
-    freset(owner, UFL_OWNER);
-    owner->building = 0;
-    owner = heir;
-    if (owner) {
-      fset(owner, UFL_OWNER);
-    }
+  if (!owner || (owner->building!=bld || owner->number<=0)) {
+    unit * heir = building_owner_ex(bld, owner?owner->faction:0);
+    return (heir && heir->number>0) ? heir : 0;
   }
   return owner;
+}
+
+void building_update_owner(building * bld) {
+  unit * owner = bld->_owner;
+  bld->_owner = building_owner_ex(bld, owner?owner->faction:0);
 }
 
 const char *building_getname(const building * self)

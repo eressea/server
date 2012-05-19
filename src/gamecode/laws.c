@@ -3362,8 +3362,7 @@ static void new_units(void)
             if (token && token[0]) {
               name = strdup(token);
             }
-            u2 =
-              create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
+            u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
             if (name != NULL)
               free(name);
             fset(u2, UFL_ISNEW);

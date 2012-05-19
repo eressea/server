@@ -153,6 +153,7 @@ extern "C" {
 
   extern struct unit *building_owner(const struct building *b);
   extern void building_set_owner(struct building *b, struct unit * u);
+  extern void building_update_owner(struct building * bld);
 
   extern struct attrib_type at_building_action;
   void building_addaction(struct building *b, const char *fname,
