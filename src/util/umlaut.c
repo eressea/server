@@ -57,8 +57,8 @@ char * transliterate(char * out, size_t size, const char * in)
     }
     len = src-p;
     size -= len;
-    while (size>=2 && *src && (*src & 0x80)) {
-      int advance = 2;
+    while (size>0 && *src && (*src & 0x80)) {
+      unsigned int advance = 2;
       if (src[0]=='\xc3') {
         if (src[1]=='\xa4' || src[1]=='\x84') {
           memcpy(dst, "ae", 2);
@@ -69,7 +69,6 @@ char * transliterate(char * out, size_t size, const char * in)
         } else if (src[1]=='\x9f') {
           memcpy(dst, "ss", 2);
         } else {
-          *dst++='?';
           advance = 0;
         }
       } else if (src[0]=='\xe1') {
@@ -83,7 +82,7 @@ char * transliterate(char * out, size_t size, const char * in)
         advance = 0;
       }
 
-      if (advance) {
+      if (advance && advance<=size) {
         src+=advance;
         dst+=advance;
         size-=advance;
