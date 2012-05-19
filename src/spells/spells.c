@@ -981,12 +981,10 @@ static int sp_maelstrom(castorder * co)
   /* Attribut auf Region.
    * Existiert schon ein curse, so wird dieser verstaerkt
    * (Max(Dauer), Max(Staerke))*/
-  c =
-    create_curse(mage, &r->attribs, ct_find("maelstrom"), power, duration,
-    effect, 0);
+  c = create_curse(mage, &r->attribs, ct_find("maelstrom"), power, duration, effect, 0);
 
   /* melden, 1x pro Partei */
-  {
+  if (c) {
     message *seen = msg_message("maelstrom_effect", "mage", mage);
     message *unseen = msg_message("maelstrom_effect", "mage", NULL);
     report_effect(r, mage, seen, unseen);
@@ -1185,13 +1183,15 @@ void patzer_ents(castorder * co)
   ents = (int)(force * 10);
   u = create_unit(r, get_monsters(), ents, new_race[RC_TREEMAN], 0, NULL, NULL);
 
-  /* 'Erfolg' melden */
-  ADDMSG(&mage->faction->msgs, msg_message("regionmagic_patzer",
-      "unit region command", mage, mage->region, co->order));
+  if (u) {
+    message *unseen;
 
-  /* melden, 1x pro Partei */
-  {
-    message *unseen = msg_message("entrise", "region", r);
+    /* 'Erfolg' melden */
+    ADDMSG(&mage->faction->msgs, msg_message("regionmagic_patzer",
+        "unit region command", mage, mage->region, co->order));
+
+    /* melden, 1x pro Partei */
+    unseen = msg_message("entrise", "region", r);
     report_effect(r, mage, unseen, unseen);
     msg_release(unseen);
   }
@@ -1966,14 +1966,14 @@ static int sp_holyground(castorder * co)
   unit *mage = co->magician.u;
   int cast_level = co->level;
   double power = co->force;
-  curse *c;
   message *msg = msg_message("sp_holyground_effect", "mage region", mage, r);
   report_spell(mage, r, msg);
   msg_release(msg);
 
-  if (!ctype)
+  if (!ctype) {
     ctype = ct_find("holyground");
-  c = create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
+  }
+  create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
 
   a_removeall(&r->attribs, &at_deathcount);
 
@@ -3152,7 +3152,7 @@ static int sp_magicboost(castorder * co)
   add_trigger(&mage->attribs, "timer", trigger_timeout(5, tsummon));
 
   ADDMSG(&mage->faction->msgs, msg_message("magicboost_effect",
-      "unit region command", mage, mage->region, co->order));
+    "unit region command", c->magician, mage->region, co->order));
 
   return cast_level;
 }
@@ -3538,8 +3538,7 @@ static int sp_charmingsong(castorder * co)
     add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
   }
   /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
-  create_curse(mage, &target->attribs, ct_find("slavery"), force, duration,
-    zero_effect, 0);
+  create_curse(mage, &target->attribs, ct_find("slavery"), force, duration, zero_effect, 0);
 
   /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
   u_setfaction(target, mage->faction);
@@ -4596,13 +4595,11 @@ int sp_baddreams(castorder * co)
 
   /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
   effect = -1;
-  c =
-    create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect,
-    0);
+  c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
 
   /* Erfolg melden */
   ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
-      "unit region command", mage, mage->region, co->order));
+      "unit region command", c->magician, mage->region, co->order));
 
   return cast_level;
 }
@@ -4634,13 +4631,11 @@ int sp_gooddreams(castorder * co)
   duration = (int)MAX(1, power / 2);    /* Stufe 1 macht sonst mist */
   duration = 2 + rng_int() % duration;
   effect = 1;
-  c =
-    create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect,
-    0);
+  c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, effect, 0);
 
   /* Erfolg melden */
   ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
-      "unit region command", mage, mage->region, co->order));
+    "unit region command", c->magician, mage->region, co->order));
 
   return cast_level;
 }
@@ -4779,11 +4774,9 @@ int sp_sweetdreams(castorder * co)
 
     /* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
     effect = 0.05;
-    c =
-      create_curse(mage, &u->attribs, ct_find("orcish"), power, duration,
-      effect, men);
+    c = create_curse(mage, &u->attribs, ct_find("orcish"), power, duration, effect, men);
 
-    msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
+    msg = msg_message("sp_sweetdreams_effect", "mage unit region", c->magician, u, r);
     r_addmessage(r, mage->faction, msg);
     if (u->faction != mage->faction) {
       r_addmessage(r, u->faction, msg);
@@ -4805,12 +4798,10 @@ int sp_disturbingdreams(castorder * co)
   curse *c;
 
   effect = 10;
-  c =
-    create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration,
-    effect, 0);
+  c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, effect, 0);
 
   ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect",
-      "mage region", mage, r));
+    "mage region", c->magician, r));
   return cast_level;
 }
 
@@ -5905,15 +5896,12 @@ int sp_movecastle(castorder * co)
 
   if ((b->type == bt_find("caravan") || b->type == bt_find("dam")
       || b->type == bt_find("tunnel"))) {
-    boolean damage = false;
     direction_t d;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
       if (rroad(r, d)) {
         rsetroad(r, d, rroad(r, d) / 2);
-        damage = true;
       }
     }
-/*    if (damage) strcat(buf, " Die Straﬂen der Region wurden beschaedigt."); */
   }
 
   msg = msg_message("sp_movecastle_effect", "building direction", b, dir);

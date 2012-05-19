@@ -222,15 +222,12 @@ int sp_stun(struct castorder * co)
   battle *b = fi->side->battle;
   unit *mage = fi->unit;
   message *m;
-  troop at;
   /* Aus beiden Reihen nehmen */
   int force = 0, enemies;
   int stunned;
 
   if (power <= 0)
     return 0;
-  at.fighter = fi;
-  at.index = 0;
 
   switch (sp->id) {
     case SPL_SHOCKWAVE:
@@ -262,8 +259,7 @@ int sp_stun(struct castorder * co)
     }
   }
 
-  m =
-    msg_message("cast_stun_effect", "mage spell amount", fi->unit, sp, stunned);
+  m = msg_message("cast_stun_effect", "mage spell amount", fi->unit, sp, stunned);
   message_all(b, m);
   msg_release(m);
   return level;

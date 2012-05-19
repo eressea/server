@@ -313,9 +313,8 @@ static int read_skill(struct storage *store, curse * c, void *target)
 {
   int skill;
   if (store->version < CURSETYPE_VERSION) {
-    int men;
     skill = store->r_int(store);
-    men = store->r_int(store);
+    store->r_int(store); /* men, deprecated */
   } else {
     skill = store->r_int(store);
   }
