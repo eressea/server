@@ -1201,6 +1201,10 @@ void test_clear_resources(void)
 {
   int i;
 
+  memset((void *)olditemtype, 0, sizeof(olditemtype));
+  memset((void *)oldresourcetype, 0, sizeof(oldresourcetype));
+  memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
+
   for (i=0;i!=IMAXHASH;++i) {
     item_type * itype = itemtypes[i];
     if (itype) {
