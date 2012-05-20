@@ -119,10 +119,10 @@ extern "C" {
 #define ITF_VEHICLE          0x0100     /* a vehicle, drawn by two animals */
 
 /* error codes for item_type::use */
-#define ECUSTOM   -1;
-#define ENOITEM   -2;
-#define ENOSKILL  -3;
-#define EUNUSABLE -4;
+#define ECUSTOM   -1
+#define ENOITEM   -2
+#define ENOSKILL  -3
+#define EUNUSABLE -4
 
   typedef struct item_type {
     resource_type *rtype;

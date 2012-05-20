@@ -2473,9 +2473,8 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
     }
     /* last, check if it's a race. */
     rc = findrace(s, u->faction->locale);
-    if (rc != NULL) {
-      if (display_race(u->faction, u, rc))
-        break;
+    if (rc != NULL && display_race(u->faction, u, rc)) {
+      break;
     }
     cmistake(u, ord, 21, MSG_EVENT);
     break;
@@ -3529,19 +3528,16 @@ use_item(unit * u, const item_type * itype, int amount, struct order *ord)
     amount = i;
   }
   if (amount == 0) {
-    cmistake(u, ord, 43, MSG_PRODUCE);
     return ENOITEM;
   }
 
   if (target == -1) {
     if (itype->use == NULL) {
-      cmistake(u, ord, 76, MSG_PRODUCE);
       return EUNUSABLE;
     }
     return itype->use(u, itype, amount, ord);
   } else {
     if (itype->useonother == NULL) {
-      cmistake(u, ord, 76, MSG_PRODUCE);
       return EUNUSABLE;
     }
     return itype->useonother(u, target, itype, amount, ord);
@@ -3746,7 +3742,7 @@ static void age_factions(void)
 static int use_cmd(unit * u, struct order *ord)
 {
   const char *t;
-  int n;
+  int n, err = ENOITEM;
   const item_type *itype;
 
   init_tokens(ord);
@@ -3770,15 +3766,24 @@ static int use_cmd(unit * u, struct order *ord)
   itype = finditemtype(t, u->faction->locale);
 
   if (itype != NULL) {
-    int i = use_item(u, itype, n, ord);
-    assert(i <= 0 || !"use_item should not return positive values.");
-    if (i > 0) {
+    err = use_item(u, itype, n, ord);
+    assert(err <= 0 || !"use_item should not return positive values.");
+    if (err > 0) {
       log_error("use_item returned a value>0 for %s\n", resourcename(itype->rtype, 0));
     }
-  } else {
-    cmistake(u, ord, 43, MSG_PRODUCE);
   }
-  return 0;
+  switch (err) {
+  case ENOITEM:
+    cmistake(u, ord, 43, MSG_PRODUCE);
+    break;
+  case EUNUSABLE:
+    cmistake(u, ord, 76, MSG_PRODUCE);
+    break;
+  case ENOSKILL:
+    cmistake(u, ord, 50, MSG_PRODUCE);
+    break;
+  }
+  return err;
 }
 
 static int pay_cmd(unit * u, struct order *ord)
