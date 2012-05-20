@@ -18,7 +18,7 @@ endif (WIN32)
 include_directories (../external ../shared/src)
 
 set (LIB_SRCS
- ../external/sqlite3.c
+# ../external/sqlite3.c
  ../external/md5.c
  ../external/bson/bson.c
  ../external/bson/numbers.c
@@ -37,7 +37,7 @@ set (ERESSEA_SRCS
 add_executable (eressea ${LIB_SRCS} ${ERESSEA_SRCS})
 if (WIN32)
 else (WIN32)
-  target_link_libraries (eressea tolua xml2 ncurses lua5.1 pthread)
+  target_link_libraries (eressea tolua xml2 ncurses lua5.1 pthread sqlite3)
 endif (WIN32)
 
 add_definitions(-DUNITY_BUILD)
