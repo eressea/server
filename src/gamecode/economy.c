@@ -819,13 +819,14 @@ static void give_cmd(unit * u, order * ord)
   }
 
   else if (p == P_ANY) {
-    const char *s = getstrtoken();
+    const char *s;
 
     if (!check_give(u, u2, NULL, GIVE_ALLITEMS)) {
       feedback_give_not_allowed(u, ord);
       return;
     }
-    if (*s == 0) {              /* Alle Gegenstände übergeben */
+    s = getstrtoken();
+    if (*s == 0) {              /* GIVE ALL items that you have */
 
       /* do these checks once, not for each item we have: */
       if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
@@ -859,9 +860,7 @@ static void give_cmd(unit * u, order * ord)
       }
       return;
     } else {
-      param_t p2 = findparam(s, u->faction->locale);
-
-      if (p2 == P_PERSON) {
+      if (isparam(s, u->faction->locale, P_PERSON)) {
         if (!(u->race->ec_flags & GIVEPERSON)) {
           ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "race_noregroup", "race", u->race));
