@@ -276,7 +276,6 @@ int teach_cmd(unit * u, struct order *ord)
   plane *pl;
   region *r = u->region;
   int teaching, i, j, count, academy = 0;
-  unit *u2;
   skill_t sk = NOSKILL;
 
   if (gbdream_ct == 0)
@@ -312,7 +311,6 @@ int teach_cmd(unit * u, struct order *ord)
   if (teaching == 0)
     return 0;
 
-  u2 = 0;
   count = 0;
 
   init_tokens(ord);

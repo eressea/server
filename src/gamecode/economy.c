@@ -1432,7 +1432,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
   const item_type *itype = resource2item(rtype);
   region *r = u->region;
-  int busy = u->number;
   int dm = 0;
   allocation_list *alist;
   allocation *al;
@@ -1554,8 +1553,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
   /* Limitierung durch Parameter m. */
   if (want > 0 && want < amount)
     amount = want;
-
-  busy = (amount + skill - 1) / skill;  /* wieviel leute tun etwas? */
 
   alist = allocations;
   while (alist && alist->type != rtype)

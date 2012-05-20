@@ -1744,7 +1744,6 @@ int reports(void)
   faction *f;
   FILE *mailit;
   time_t ltime = time(NULL);
-  const char *str;
   int retval = 0;
   char path[MAX_PATH];
 
@@ -1771,11 +1770,13 @@ int reports(void)
   if (mailit)
     fclose(mailit);
   free_seen();
-  str = get_param(global.parameters, "globalreport");
 #ifdef GLOBAL_REPORT
-  if (str != NULL) {
-    sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
-    global_report(path);
+  {
+    const char *str = get_param(global.parameters, "globalreport");
+    if (str != NULL) {
+      sprintf(path, "%s/%s.%u.cr", reportpath(), str, turn);
+      global_report(path);
+    }
   }
 #endif
   return retval;

@@ -38,12 +38,12 @@ static int cache_insert;
 
 static sqlite3_stmt *stmt_cache_get(sqlite3 * db, const char *sql)
 {
-  int i, res;
+  int i;
 
   for (i = 0; i != MAX_STMT_CACHE && cache[i].db; ++i) {
     if (cache[i].sql == sql && cache[i].db == db) {
       cache[i].inuse = 1;
-      res = sqlite3_reset(cache[i].stmt);
+      sqlite3_reset(cache[i].stmt);
       return cache[i].stmt;
     }
   }
@@ -53,12 +53,12 @@ static sqlite3_stmt *stmt_cache_get(sqlite3 * db, const char *sql)
       cache_insert = (cache_insert + 1) & (MAX_STMT_CACHE - 1);
     }
     i = cache_insert;
-    res = sqlite3_finalize(cache[i].stmt);
+    sqlite3_finalize(cache[i].stmt);
   }
   cache[i].inuse = 1;
   cache[i].db = db;
   cache[i].sql = sql;
-  res = sqlite3_prepare_v2(db, sql, -1, &cache[i].stmt, NULL);
+  sqlite3_prepare_v2(db, sql, -1, &cache[i].stmt, NULL);
   return cache[i].stmt;
 }
 

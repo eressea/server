@@ -787,21 +787,21 @@ void rsetroad(region * r, direction_t d, short val)
 
 short rroad(const region * r, direction_t d)
 {
-  int rval;
   connection *b;
   region *r2 = rconnect(r, d);
 
-  if (!r2)
+  if (!r2) {
     return 0;
+  }
   b = get_borders(r, r2);
-  while (b && b->type != &bt_road)
+  while (b && b->type != &bt_road) {
     b = b->next;
-  if (!b)
+  }
+  if (!b) {
     return 0;
-  rval = b->data.i;
-  if (r == b->from)
-    return b->data.sa[0];
-  return b->data.sa[1];
+  }
+  
+  return (r == b->from) ? b->data.sa[0] : b->data.sa[1];
 }
 
 boolean r_isforest(const region * r)

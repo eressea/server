@@ -502,14 +502,13 @@ terraform_selection(selection * selected, const terrain_type * terrain)
 
 static faction *select_faction(state * st)
 {
-  list_selection *prev, *ilist = NULL, **iinsert;
+  list_selection *ilist = NULL, **iinsert;
   list_selection *selected = NULL;
   faction *f = factions;
 
   if (!f)
     return NULL;
   iinsert = &ilist;
-  prev = ilist;
 
   while (f) {
     char buffer[32];
@@ -530,14 +529,13 @@ static faction *select_faction(state * st)
 static const terrain_type *select_terrain(state * st,
   const terrain_type * default_terrain)
 {
-  list_selection *prev, *ilist = NULL, **iinsert;
+  list_selection *ilist = NULL, **iinsert;
   list_selection *selected = NULL;
   const terrain_type *terrain = terrains();
 
   if (!terrain)
     return NULL;
   iinsert = &ilist;
-  prev = ilist;
 
   while (terrain) {
     insert_selection(iinsert, NULL, terrain->_name, (void *)terrain);

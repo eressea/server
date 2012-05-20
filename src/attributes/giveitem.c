@@ -95,11 +95,10 @@ static void a_finalizegive(struct attrib *a)
 static int a_giveitem(attrib * a)
 {
   give_data *gdata = (give_data *) a->data.v;
-  region *r;
   unit *u;
+
   if (gdata->building == NULL || gdata->items == NULL)
     return 0;
-  r = gdata->building->region;
   u = building_owner(gdata->building);
   if (u == NULL)
     return 1;

@@ -968,7 +968,6 @@ static void smooth_island(region_list * island)
 
 static void starting_region(region * r, region * rn[])
 {
-  unit *u;
   int n;
 
   oceans_around(r, rn);
@@ -978,8 +977,7 @@ static void starting_region(region * r, region * rn[])
   }
   terraform_region(r, newterrain(T_PLAIN));
   prepare_starting_region(r);
-  u = addplayer(r, addfaction("enno@eressea.de", itoa36(rng_int()), races,
-      default_locale, 0));
+  addplayer(r, addfaction("enno@eressea.de", itoa36(rng_int()), races, default_locale, 0));
 }
 
 /* E3A island generation */

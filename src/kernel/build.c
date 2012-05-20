@@ -847,7 +847,6 @@ void
 build_building(unit * u, const building_type * btype, int want, order * ord)
 {
   region *r = u->region;
-  boolean newbuilding = false;
   int n = want, built = 0, id;
   building *b = NULL;
   /* einmalige Korrektur */
@@ -983,7 +982,6 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     }
 #endif
 
-    newbuilding = true;
   }
 
   btname = LOC(lang, btype->_name);

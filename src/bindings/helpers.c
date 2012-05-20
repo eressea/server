@@ -240,7 +240,7 @@ static int lua_callspell(castorder * co)
 }
 
 /** callback to initialize a familiar from lua. */
-static void lua_initfamiliar(unit * u)
+static int lua_initfamiliar(unit * u)
 {
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
@@ -269,6 +269,7 @@ static void lua_initfamiliar(unit * u)
 
   snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
   equip_unit(u, get_equipment(fname));
+  return result;
 }
 
 static int
@@ -447,11 +448,9 @@ static double lua_building_taxes(building * b, int level)
   lua_State *L = (lua_State *) global.vm_state;
   const char *fname = "building_taxes";
   double result = 0.0F;
-  int type;
 
   lua_pushstring(L, fname);
   lua_rawget(L, LUA_GLOBALSINDEX);
-  type = lua_type(L, 1);
   if (lua_isfunction(L, 1)) {
     tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
     tolua_pushnumber(L, level);
@@ -498,7 +497,7 @@ static int lua_maintenance(const unit * u)
   return result;
 }
 
-static void lua_equipmentcallback(const struct equipment *eq, unit * u)
+static int lua_equipmentcallback(const struct equipment *eq, unit * u)
 {
   lua_State *L = (lua_State *) global.vm_state;
   char fname[64];
@@ -522,6 +521,7 @@ static void lua_equipmentcallback(const struct equipment *eq, unit * u)
     log_error("equip(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
   }
+  return result;
 }
 
 /** callback for an item-use function written in lua. */

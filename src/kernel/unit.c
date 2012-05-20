@@ -873,14 +873,11 @@ boolean can_survive(const unit * u, const region * r)
 
 void move_unit(unit * u, region * r, unit ** ulist)
 {
-  int maxhp = 0;
   assert(u && r);
 
   assert(u->faction || !"this unit is dead");
   if (u->region == r)
     return;
-  if (u->region != NULL)
-    maxhp = unit_max_hp(u);
   if (!ulist)
     ulist = (&r->units);
   if (u->region) {
@@ -904,8 +901,6 @@ void move_unit(unit * u, region * r, unit ** ulist)
   update_interval(u->faction, r);
 #endif
   u->region = r;
-  /* keine automatische hp reduzierung bei bewegung */
-  /* if (maxhp>0) u->hp = u->hp * unit_max_hp(u) / maxhp; */
 }
 
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */

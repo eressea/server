@@ -406,20 +406,19 @@ int readorders(const char *filename)
   while (b) {
     const struct locale *lang = f ? f->locale : default_locale;
     int p;
-    const char *s;
-
     switch (igetparam(b, lang)) {
-    case P_LOCALE:
-      s = getstrtoken();
 #undef LOCALE_CHANGE
 #ifdef LOCALE_CHANGE
-      if (f && find_locale(s)) {
-        f->locale = find_locale(s);
+    case P_LOCALE:
+      {
+        const char *s = getstrtoken();
+        if (f && find_locale(s)) {
+          f->locale = find_locale(s);
+        }
       }
-#endif
-
       b = getbuf(F, enc_gamedata);
       break;
+#endif
     case P_GAMENAME:
     case P_FACTION:
       f = factionorders();
@@ -1292,11 +1291,10 @@ faction *readfaction(struct storage * store)
     read_items(store, &f->items);
   }
   for (;;) {
-    int level;
     store->r_tok_buf(store, token, sizeof(token));
     if (strcmp("end", token) == 0)
       break;
-    level = store->r_int(store);
+    store->r_int(store); /* there used to be a level here, which is now ignored */
   }
   planes = store->r_int(store);
   while (--planes >= 0) {

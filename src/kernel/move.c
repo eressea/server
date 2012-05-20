@@ -1292,14 +1292,11 @@ static void make_route(unit * u, order * ord, region_list ** routep)
   }
 
   while (next != NULL) {
-    direction_t reldir;
-
     if (current == next) {
       /* PAUSE */
       break;
     }
     next = next_region(u, current, next);
-    reldir = reldirection(current, next);
 
     add_regionlist(iroute, next);
     iroute = &(*iroute)->next;
@@ -1718,7 +1715,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
     const terrain_type *tthis = current_point->terrain;
     /* these values need to be updated if next_point changes (due to storms): */
     const terrain_type *tnext = next_point->terrain;
-    direction_t dir = reldirection(current_point, next_point);
 
     assert(sh == u->ship || !"ship has sunk, but we didn't notice it");
 
@@ -1781,7 +1777,6 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
             next_point = rnext;
             /* these values need to be updated if next_point changes (due to storms): */
             tnext = next_point->terrain;
-            dir = reldirection(current_point, next_point);
           }
         }
       }
