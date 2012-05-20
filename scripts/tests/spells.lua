@@ -4,6 +4,7 @@ module("tests.spells", package.seeall, lunit.testcase)
 
 function setup()
     free_game()
+    settings.set("magic.fumble.enable", "0")
 end
 
 function test_roi()

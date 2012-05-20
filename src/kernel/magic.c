@@ -1314,7 +1314,11 @@ boolean fumble(region * r, unit * u, const spell * sp, int cast_grade)
   int patzer = (int)(((double)x * 40.0) - 20.0);
   struct building *b = inside_building(u);
   const struct building_type *btype = b ? b->type : NULL;
+  int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
 
+  if (!fumble_enabled) {
+    return false;
+  }
   if (btype)
     patzer -= btype->fumblebonus;
   /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */

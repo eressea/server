@@ -1119,7 +1119,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     in->next = inames;
     in->lang = lang;
     do {
-      m = cb_find_prefix(&cb_items, "", 1, matches, CB_BATCHSIZE, offset);
+      m = cb_find_prefix(&cb_items, "", 0, matches, CB_BATCHSIZE, offset);
       if (m) {
         int i;
         offset += m;
@@ -1207,6 +1207,8 @@ void test_clear_resources(void)
 
   r_hp = r_silver = r_aura = r_permaura = r_unit = 0;
   i_silver = 0;
+
+  inames = 0; /* TODO: this is a terrible hack, the whole inames global state must die */
 }
 #endif
 
