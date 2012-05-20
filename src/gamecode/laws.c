@@ -3755,7 +3755,7 @@ static int use_cmd(unit * u, struct order *ord)
   t = getstrtoken();
   n = atoi((const char *)t);
   if (n == 0) {
-    if (findparam(t, u->faction->locale) == P_ANY) {
+    if (isparam(t, u->faction->locale, P_ANY)) {
       /* BENUTZE ALLES Yanxspirit */
       n = INT_MAX;
       t = getstrtoken();
