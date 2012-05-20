@@ -27,7 +27,6 @@ static void test_market_curse(CuTest * tc)
   int x, y;
   const char *names[4] = { "herb", "herbs", "balm", "balms" };
   const terrain_type *terrain;
-  resource_type *hres, *lres;
   item_type *htype, *ltype;
   luxury_type *lux;
   building_type *btype;
@@ -36,15 +35,17 @@ static void test_market_curse(CuTest * tc)
   test_cleanup();
   test_create_world();
 
-  hres = new_resourcetype(names, 0, RTF_ITEM | RTF_POOLED);
-  htype = new_itemtype(hres, ITF_HERB, 0, 0);
-  lres = new_resourcetype(names + 2, 0, RTF_ITEM | RTF_POOLED);
-  ltype = new_itemtype(lres, ITF_NONE, 0, 0);
+  htype = test_create_itemtype(names);
+  htype->flags |= ITF_HERB;
+  htype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
+
+  ltype = test_create_itemtype(names + 2);
+  ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
   lux = new_luxurytype(ltype, 0);
 
   set_param(&global.parameters, "rules.region_owners", "1");
 
-  btype = calloc(sizeof(building_type), 1);
+  btype = (building_type *)calloc(1, sizeof(building_type));
   btype->_name = "market";
   bt_register(btype);
 

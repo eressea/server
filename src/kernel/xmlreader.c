@@ -132,6 +132,7 @@ static const resource_type *rt_findorcreate(const char *name)
     names[0] = name;
     names[1] = namep;
     rtype = new_resourcetype(names, NULL, RTF_NONE);
+    rt_register(rtype);
     free(namep);
   }
   return rtype;
@@ -1045,12 +1046,12 @@ static int parse_resources(xmlDocPtr doc)
       if (appearance) {
         appearances[0] = (const char *)appearance;
         appearances[1] = appearancep;
-        rtype =
-          new_resourcetype((const char **)names, (const char **)appearances,
-          flags);
+        rtype = new_resourcetype((const char **)names, (const char **)appearances, flags);
+        rt_register(rtype);
         free(appearancep);
       } else {
         rtype = new_resourcetype(names, NULL, flags);
+        rt_register(rtype);
       }
       free(namep);
     }

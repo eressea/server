@@ -965,9 +965,14 @@ static const char *names[] = {
 
 void init_resources(void)
 {
+  resource_type *rtype;
   if (r_hp) {
     return;
   }
+
+  rtype = new_resourcetype(names + 8, NULL, RTF_NONE);
+  rtype->uchange = res_changepeasants;
+  rt_register(rtype);
 
   /* silver was never an item: */
   r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM | RTF_POOLED);

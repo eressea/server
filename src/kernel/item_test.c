@@ -1,5 +1,6 @@
 #include <platform.h>
 
+#include <kernel/types.h>
 #include <kernel/item.h>
 
 #include <cutest/CuTest.h>
@@ -7,19 +8,22 @@
 
 void test_resource_type(CuTest * tc)
 {
-  resource_type *rtype;
+  struct item_type *itype;
   const char *names[2] = { 0 , 0 };
 
   CuAssertPtrEquals(tc, 0, rt_find("herpderp"));
 
   names[0] = names[1] = "herpderp";
-  new_resourcetype(names, NULL, RTF_NONE);
-  names[0] = names[1] = "herp";
-  rtype = new_resourcetype(names, NULL, RTF_NONE);
-  names[0] = names[1] = "herpes";
-  new_resourcetype(names, NULL, RTF_NONE);
+  test_create_itemtype(names);
 
-  CuAssertPtrEquals(tc, rtype, rt_find("herp"));
+  names[0] = names[1] = "herp";
+  itype = test_create_itemtype(names);
+
+  names[0] = names[1] = "herpes";
+  test_create_itemtype(names);
+
+  CuAssertPtrEquals(tc, itype, it_find("herp"));
+  CuAssertPtrEquals(tc, itype->rtype, rt_find("herp"));
 }
 
 CuSuite *get_item_suite(void)
