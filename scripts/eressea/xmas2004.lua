@@ -1,4 +1,5 @@
 function use_snowman(u, amount)
+  print(u .. "using snowman in " .. u.region)
   if u.region.terrain == "glacier" then
     local man = unit.create(u.faction, u.region)
     man.race = "snowman"
