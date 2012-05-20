@@ -471,11 +471,11 @@ function test_mallorn()
   
   process_orders()
   
-  assert(u1:get_item("log")==2)
-  assert(u2:get_item("log")==2)
+  assert_equal(2, u1:get_item("log"))
+  assert_equal(2, u2:get_item("log"))
   local mallorn_cfg = config.get_resource("mallorn")
   if mallorn_cfg then
-    assert(u3:get_item("mallorn")==1)
+    assert_equal(1, u3:get_item("mallorn"))
   else
     assert_equal(-1, u3:get_item("mallorn"))
     assert_equal(0, u3:get_item("log"))

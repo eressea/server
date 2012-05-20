@@ -33,7 +33,7 @@ extern "C" {
   typedef struct mlist {
     struct mlist *next;
     struct message *msg;
-  };
+  } mlist;
 
   typedef struct message_list {
     struct mlist *begin, **end;

@@ -162,6 +162,7 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
   size_t length = REPORTWIDTH;
   const char *end, *begin;
 
+  if (!str) return;
   /* find out if there's a mark + indent already encoded in the string. */
   if (!mark) {
     const char *x = str;
