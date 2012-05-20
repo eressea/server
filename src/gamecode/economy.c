@@ -696,7 +696,7 @@ static void give_cmd(unit * u, order * ord)
   region *r = u->region;
   unit *u2;
   const char *s;
-  int i, n;
+  int n;
   const item_type *itype;
   param_t p;
   plane *pl;
@@ -705,7 +705,8 @@ static void give_cmd(unit * u, order * ord)
   skip_token();
   u2 = getunit(r, u->faction);
   s = getstrtoken();
-  p = findparam(s, u->faction->locale);
+  n = atoip(s);
+  p = (n>0) ? NOPARAM : findparam(s, u->faction->locale);
 
   /* first, do all the ones that do not require HELP_GIVE or CONTACT */
   if (p == P_CONTROL) {
@@ -858,44 +859,37 @@ static void give_cmd(unit * u, order * ord)
           itmp = &itm->next;
         }
       }
-      return;
     } else {
       if (isparam(s, u->faction->locale, P_PERSON)) {
         if (!(u->race->ec_flags & GIVEPERSON)) {
           ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "race_noregroup", "race", u->race));
-          return;
+        } else {
+          n = u->number;
+          give_men(n, u, u2, ord);
         }
-        n = u->number;
-        give_men(n, u, u2, ord);
-        return;
-      }
-
-      if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
+      } else if (!(u->race->ec_flags & GIVEITEM) && u2 != NULL) {
         ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "race_nogive", "race", u->race));
-        return;
-      }
-      if (u2 && !(u2->race->ec_flags & GETITEM)) {
+      } else if (u2 && !(u2->race->ec_flags & GETITEM)) {
         ADDMSG(&u->faction->msgs,
           msg_feedback(u, ord, "race_notake", "race", u2->race));
-        return;
-      }
-
-      itype = finditemtype(s, u->faction->locale);
-      if (itype != NULL) {
-        item *i = *i_find(&u->items, itype);
-        if (i != NULL) {
-          if (check_give(u, u2, itype, 0)) {
-            n = i->number - get_reservation(u, itype->rtype);
-            give_item(n, itype, u, u2, ord);
-          } else {
-            feedback_give_not_allowed(u, ord);
+      } else {
+        itype = finditemtype(s, u->faction->locale);
+        if (itype != NULL) {
+          item *i = *i_find(&u->items, itype);
+          if (i != NULL) {
+            if (check_give(u, u2, itype, 0)) {
+              n = i->number - get_reservation(u, itype->rtype);
+              give_item(n, itype, u, u2, ord);
+            } else {
+              feedback_give_not_allowed(u, ord);
+            }
           }
-          return;
         }
       }
     }
+    return;
   } else if (p == P_EACH) {
     if (u2 == NULL) {
       ADDMSG(&u->faction->msgs,
@@ -903,10 +897,7 @@ static void give_cmd(unit * u, order * ord)
       return;
     }
     s = getstrtoken();          /* skip one ahead to get the amount. */
-  }
-
-  n = atoip((const char *)s);   /* n: Anzahl */
-  if (p == P_EACH) {
+    n = atoip(s);   /* n: Anzahl */
     n *= u2->number;
   }
   s = getstrtoken();
@@ -916,8 +907,7 @@ static void give_cmd(unit * u, order * ord)
     return;
   }
 
-  i = findparam(s, u->faction->locale);
-  if (i == P_PERSON) {
+  if (isparam(s, u->faction->locale, P_PERSON)) {
     if (!(u->race->ec_flags & GIVEPERSON)) {
       ADDMSG(&u->faction->msgs,
         msg_feedback(u, ord, "race_noregroup", "race", u->race));
