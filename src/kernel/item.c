@@ -1100,10 +1100,11 @@ attrib_type at_showitem = {
   "showitem"
 };
 
-static local_names *inames;
+/* static local_names *inames; */
 
 const item_type *finditemtype(const char *name, const struct locale *lang)
 {
+  local_names *inames = 0;
   const void * matches[CB_BATCHSIZE];
   local_names *in = inames;
   variant token;
@@ -1208,7 +1209,7 @@ void test_clear_resources(void)
   r_hp = r_silver = r_aura = r_permaura = r_unit = 0;
   i_silver = 0;
 
-  inames = 0; /* TODO: this is a terrible hack, the whole inames global state must die */
+  /* inames = 0;  TODO: this is a terrible hack, the whole inames global state must die */
 }
 #endif
 
