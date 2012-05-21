@@ -125,7 +125,7 @@ void addtoken(void ** root, const char *str, variant id)
     0, ""}
   };
 
-  assert(root);
+  assert(root && str);
   if (!*root) {
     tk = *root = calloc(1, sizeof(tnode));
   } else {

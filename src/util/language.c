@@ -127,7 +127,7 @@ const char *locale_getstring(const locale * lang, const char *key)
 
 const char *locale_string(const locale * lang, const char *key)
 {
-  assert(lang != 0);
+  assert(lang);
 
   if (key != NULL) {
     unsigned int hkey = hashstring(key);
@@ -136,8 +136,6 @@ const char *locale_string(const locale * lang, const char *key)
 
     if (*key == 0)
       return NULL;
-    if (lang == NULL)
-      return key;
     find = lang->strings[id];
     while (find) {
       if (find->hashkey == hkey) {
@@ -153,8 +151,8 @@ const char *locale_string(const locale * lang, const char *key)
     }
     if (!find) {
       log_warning("missing translation for \"%s\" in locale %s\n", key, lang->name);
-      if (lang != default_locale) {
-        return locale_string(default_locale, key);
+      if (lang->fallback) {
+        return locale_string(lang->fallback, key);
       }
       return 0;
     }

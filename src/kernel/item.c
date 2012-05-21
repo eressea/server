@@ -56,6 +56,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
+static critbit_tree inames[MAXLOCALES];
 static critbit_tree cb_resources;
 static critbit_tree cb_items;
 luxury_type *luxurytypes;
@@ -1100,46 +1101,49 @@ attrib_type at_showitem = {
   "showitem"
 };
 
-/* static local_names *inames; */
+static int add_itemname_cb(const void * match, const void * key, size_t keylen, void *data)
+{
+  struct locale * lang = (struct locale *)data;
+  int i = locale_index(lang);
+  critbit_tree * cb = inames+i;
+  item_type *itype;
+
+  cb_get_kv(match, &itype, sizeof(itype));
+  for (i = 0; i!=2;++i) {
+    char buffer[64];
+    const char * name = locale_string(lang, itype->rtype->_name[i]);
+    
+    if (name && transliterate(buffer, sizeof(buffer), name)) {
+      size_t len = strlen(buffer);
+      assert(len+sizeof(itype)<sizeof(buffer));
+      cb_new_kv(buffer, &itype, sizeof(itype), buffer);
+      cb_insert(cb, buffer, len+1+sizeof(itype));
+    }
+  }
+  return 0;
+}
 
 const item_type *finditemtype(const char *name, const struct locale *lang)
 {
-  local_names *inames = 0;
-  const void * matches[CB_BATCHSIZE];
-  local_names *in = inames;
-  variant token;
+  int i = locale_index(lang);
+  critbit_tree * cb = inames+i;
+  char buffer[64];
 
-  while (in) {
-    if (in->lang == lang)
-      break;
-    in = in->next;
+  if (transliterate(buffer, sizeof(buffer), name)) {
+    const void * match;
+    if (!cb->root) {
+      /* first-time initialization  of item names for this locale */
+      cb_foreach(&cb_items, "", 0, add_itemname_cb, (void *)lang);
+    }
+    if (cb_find_prefix(cb, buffer, strlen(buffer), &match, 1, 0)) {
+      const item_type * itype = 0;
+      cb_get_kv(match, (void*)&itype, sizeof(itype));
+      return itype;
+    }
+  } else {
+    log_debug("finditemtype: transliterate failed for '%s'\n", name);
   }
-  if (!in) {
-    int m, offset = 0;
-    in = (local_names *)calloc(1, sizeof(local_names));
-    in->next = inames;
-    in->lang = lang;
-    do {
-      m = cb_find_prefix(&cb_items, "", 0, matches, CB_BATCHSIZE, offset);
-      if (m) {
-        int i;
-        offset += m;
-        for (i=0;i!=m;++i) {
-          item_type *itype;
-          cb_get_kv(matches[i], &itype, sizeof(itype));
-          token.v = (void *)itype;
-          addtoken(&in->names, locale_string(lang, itype->rtype->_name[0]), token);
-          addtoken(&in->names, locale_string(lang, itype->rtype->_name[1]), token);
-        }
-      }
-    } while (m==CB_BATCHSIZE);
-    inames = in;
-  }
-
-  if (findtoken(in->names, name, &token) == E_TOK_NOMATCH) {
-    return 0;
-  }
-  return (const item_type *)token.v;
+  return 0;
 }
 
 static void init_resourcelimit(attrib * a)
@@ -1197,6 +1201,8 @@ int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbd
 
 void test_clear_resources(void)
 {
+  int i;
+
   memset((void *)olditemtype, 0, sizeof(olditemtype));
   memset((void *)oldresourcetype, 0, sizeof(oldresourcetype));
   memset((void *)oldpotiontype, 0, sizeof(oldpotiontype));
@@ -1209,7 +1215,9 @@ void test_clear_resources(void)
   r_hp = r_silver = r_aura = r_permaura = r_unit = 0;
   i_silver = 0;
 
-  /* inames = 0;  TODO: this is a terrible hack, the whole inames global state must die */
+  for (i=0; i!=MAXLOCALES; ++i) {
+    cb_clear(inames+i);
+  }
 }
 #endif
 

@@ -330,13 +330,14 @@ int cb_erase(critbit_tree * cb, const void * key, size_t keylen)
   }
 }
 
-void cb_new_kv(const char *key, void * value, size_t len, void * dst)
+size_t cb_new_kv(const char *key, void * value, size_t len, void * dst)
 {
   size_t keylen = strlen(key)+1;
   if (dst!=key) {
     memcpy(dst, key, keylen);
   }
   memcpy((char*)dst+keylen, value, len);
+  return len+keylen;
 }
 
 void cb_get_kv(const void *kv, void * value, size_t len)

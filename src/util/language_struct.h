@@ -19,6 +19,7 @@ typedef struct locale {
   unsigned int hashkey;
   const char *name;
   struct locale_str *strings[SMAXHASH];
+  struct locale *fallback;
 } locale;
 
 extern locale *default_locale;
