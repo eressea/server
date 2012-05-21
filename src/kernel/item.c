@@ -1110,7 +1110,7 @@ static int add_itemname_cb(const void * match, const void * key, size_t keylen, 
 
   cb_get_kv(match, &itype, sizeof(itype));
   for (i = 0; i!=2;++i) {
-    char buffer[64];
+    char buffer[128];
     const char * name = locale_string(lang, itype->rtype->_name[i]);
     
     if (name && transliterate(buffer, sizeof(buffer), name)) {
@@ -1127,7 +1127,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
 {
   int i = locale_index(lang);
   critbit_tree * cb = inames+i;
-  char buffer[64];
+  char buffer[128];
 
   if (transliterate(buffer, sizeof(buffer), name)) {
     const void * match;
