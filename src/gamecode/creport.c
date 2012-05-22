@@ -522,8 +522,10 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
 #endif
     crbuffer[0] = '\0';
     if (cr_render(m->msg, crbuffer, (const void *)f) == 0) {
-      if (crbuffer[0] && !printed) {
-        fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
+      if (crbuffer[0]) {
+        if (!printed) {
+          fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
+        }
         fputs(crbuffer, F);
       }
     } else {
