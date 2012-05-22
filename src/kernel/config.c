@@ -1368,16 +1368,27 @@ skill_t findskill(const char *s, const struct locale * lang)
 
 keyword_t findkeyword(const char *s, const struct locale * lang)
 {
-  void **tokens = get_translations(lang, UT_KEYWORDS);
-  variant token;
+  keyword_t result = NOKEYWORD;
+  char buffer[64];
 
-  if (*s == '@')
-    s++;
-  if (findtoken(*tokens, s, &token) == E_TOK_NOMATCH)
-    return NOKEYWORD;
-  if (global.disabled[token.i])
-    return NOKEYWORD;
-  return (keyword_t) token.i;
+  while (*s == '@') ++s;
+
+  if (*s) {
+    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
+
+    if (str) {
+      int i;
+      const void * match;
+      void **tokens = get_translations(lang, UT_KEYWORDS);
+      critbit_tree *cb = (critbit_tree *)*tokens;
+      if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+        cb_get_kv(match, &i, sizeof(int));
+        result = (keyword_t)i;
+        return global.disabled[result] ? NOKEYWORD : result;
+      }
+    }
+  }
+  return NOKEYWORD;
 }
 
 param_t findparam(const char *s, const struct locale * lang)
@@ -1990,6 +2001,12 @@ static void init_translations(const struct locale *lang, int ut, const char * (*
   }
 }
 
+static const char * keyword_key(int i)
+{
+  assert(i<MAXKEYWORDS&& i>=0);
+  return keywords[i];
+}
+
 static const char * parameter_key(int i)
 {
   assert(i<MAXPARAMS && i>=0);
@@ -2045,13 +2062,7 @@ static void init_locale(const struct locale *lang)
 
   init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
   init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
-
-  tokens = get_translations(lang, UT_KEYWORDS);
-  for (i = 0; i != MAXKEYWORDS; ++i) {
-    var.i = i;
-    if (keywords[i])
-      addtoken(tokens, LOC(lang, keywords[i]), var);
-  }
+  init_translations(lang, UT_KEYWORDS, keyword_key, MAXKEYWORDS);
 
   tokens = get_translations(lang, UT_OPTIONS);
   for (i = 0; i != MAXOPTIONS; ++i) {
