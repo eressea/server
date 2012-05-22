@@ -17,7 +17,7 @@ function dbupdate()
     edb:update_factions()
     edb:update_scores()
   else
-    print("could no open "..config.basepath.."/eressea.db")
+    print("could not open "..config.basepath.."/eressea.db")
   end
 end
 
