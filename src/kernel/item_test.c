@@ -32,38 +32,40 @@ void test_resource_type(CuTest * tc)
 void test_finditemtype(CuTest * tc)
 {
   const item_type *itype, *iresult;
-  const char *names[] = { "herp" , "herp_p" };
-  struct locale * lang = make_locale("de");
+  struct locale * lang;
 
   test_cleanup();
+  test_create_world();
 
-  locale_setstring(lang, names[0], "Foo");
-  itype = test_create_itemtype(names);
-  CuAssertPtrNotNull(tc, itype);
-  iresult = finditemtype("Foo", lang);
+  lang = find_locale("de");
+  locale_setstring(lang, "horse", "Pferd");
+  itype = it_find("horse");
+  iresult = finditemtype("Pferd", lang);
+  CuAssertPtrNotNull(tc, iresult);
   CuAssertPtrEquals(tc, (void*)itype, (void*)iresult);
 }
 
-#if 0
-  locale_setstring(lang, names[1], "Foos");
-  CuAssertPtrEquals(tc, (void*)itype, (void*)finditemtype("Foo", lang));
-  CuAssertPtrEquals(tc, (void*)itype, (void*)finditemtype("Foos", lang));
+void test_findresourcetype(CuTest * tc)
+{
+  const resource_type *rtype, *rresult;
+  struct locale * lang;
 
   test_cleanup();
-  itype = test_create_itemtype(names+2);
-  CuAssertPtrNotNull(tc, itype);
-  locale_setstring(lang, names[2], "Bar");
-  locale_setstring(lang, names[3], "Bars");
+  test_create_world();
 
-  CuAssertPtrEquals(tc, (void*)0, (void*)finditemtype("Foo", lang));
-  CuAssertPtrEquals(tc, (void*)itype, (void*)finditemtype("Bar", lang));
+  lang = find_locale("de");
+  locale_setstring(lang, "horse", "Pferd");
+  rtype = rt_find("horse");
+  rresult = findresourcetype("Pferd", lang);
+  CuAssertPtrNotNull(tc, rresult);
+  CuAssertPtrEquals(tc, (void*)rtype, (void*)rresult);
 }
-#endif
 
 CuSuite *get_item_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_resource_type);
   SUITE_ADD_TEST(suite, test_finditemtype);
+  SUITE_ADD_TEST(suite, test_findresourcetype);
   return suite;
 }
