@@ -224,6 +224,17 @@ int setstealth_cmd(unit * u, struct order *ord)
     return 0;
   }
 
+  if (isdigit(s[0])) {
+    /* Tarnungslevel setzen */
+    level = atoi((const char *)s);
+    if (level > effskill(u, SK_STEALTH)) {
+      ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth", ""));
+      return 0;
+    }
+    u_seteffstealth(u, level);
+    return 0;
+  }
+
   trace = findrace(s, u->faction->locale);
   if (trace) {
     /* Dämonen können sich nur als andere Spielerrassen tarnen */
@@ -316,17 +327,10 @@ int setstealth_cmd(unit * u, struct order *ord)
       u_seteffstealth(u, -1);
       break;
     default:
-      if (isdigit(s[0])) {
-        /* Tarnungslevel setzen */
-        level = atoi((const char *)s);
-        if (level > effskill(u, SK_STEALTH)) {
-          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth",
-              ""));
-          return 0;
-        }
-        u_seteffstealth(u, level);
-      } else if (u->race->flags & RCF_SHAPESHIFTANY) {
+      if (u->race->flags & RCF_SHAPESHIFTANY) {
         set_racename(&u->attribs, s);
+      } else {
+        cmistake(u, ord, 289, MSG_EVENT);
       }
   }
   return 0;
