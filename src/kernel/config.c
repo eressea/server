@@ -1347,133 +1347,23 @@ int findoption(const char *s, const struct locale *lang)
   return NODIRECTION;
 }
 
-#ifdef PTRIES
-static struct trie_node *ptries[UT_MAX][4];
-
-static struct trie_node **get_ptrie(const struct locale *lang, int type)
-{
-  int index = (strcmp(locale_name(lang), "de") == 0);
-  return &(ptries[type][index]);
-}
-
-static int umlaut_substitution(const char *ip, char *op, size_t outlen)
-{
-#define UMAX 7
-  static struct replace {
-    ucs4_t ucs;
-    const char str[3];
-  } replace[UMAX] = {
-    /* match lower-case (!) umlauts and others to transcriptions */
-    {
-    223, "ss"},                 /* szlig */
-    {
-    228, "ae"},                 /* auml */
-    {
-    229, "aa"},                 /* norsk */
-    {
-    230, "ae"},                 /* norsk */
-    {
-    246, "oe"},                 /* ouml */
-    {
-    248, "oe"},                 /* norsk */
-    {
-    252, "ue"},                 /* uuml */
-  };
-  int subs = 0;
-  while (*ip) {
-    ucs4_t ucs = *ip;
-    size_t size = 1;
-    size_t cpsize = 1;
-
-    if (ucs & 0x80) {
-      int ret = unicode_utf8_to_ucs4(&ucs, ip, &size);
-      if (ret != 0) {
-        return ret;
-      }
-      cpsize = size;
-      if (ucs >= replace[0].ucs && ucs <= replace[UMAX - 1].ucs) {
-        int i;
-        for (i = 0; i != UMAX; ++i) {
-          if (replace[i].ucs == ucs) {
-            cpsize = 0;
-            memcpy(op, replace[i].str, 2);
-            op += 2;
-            ++subs;
-            break;
-          }
-        }
-      }
-    }
-    if (cpsize) {
-      if (cpsize > outlen) {
-        return -1;
-      }
-      memcpy(op, ip, cpsize);
-    }
-
-    ip += size;
-    op += cpsize;
-    outlen -= cpsize;
-  }
-
-  if (outlen <= 0) {
-    return -1;
-  }
-  *op = 0;
-  return subs;
-}
-
-static int
-ptrie_find(struct trie_node *ptrie, const char *key, void *data, size_t size)
-{
-  trie_node *node = trie_find_prefix(ptrie, key);
-  if (node) {
-    void *result = trie_getdata(node);
-    memcpy(data, result, size);
-    return 0;
-  }
-  return -1;
-}
-
-static int
-ptrie_insert(struct trie_node **ptrie, const char *name, void *data,
-  size_t size)
-{
-  char converted[256];
-  char simple[256];
-  int ret = unicode_utf8_tolower(converted, 256, name);
-  if (ret == 0) {
-    int subs = umlaut_substitution(converted, simple, sizeof(simple));
-    if (subs > 0) {
-      trie_insert(ptrie, simple, data, size);
-    }
-    trie_insert(ptrie, converted, data, size);
-  }
-  return ret;
-}
-#endif
-
 skill_t findskill(const char *s, const struct locale * lang)
 {
-#ifdef PTRIES
-  char lowercase[256];
-  int res = unicode_utf8_tolower(lowercase, sizeof(lowercase), s);
-  if (res == 0) {
-    trie_node **ptrie = get_ptrie(lang, UT_SKILLS);
-    skill_t sk;
-    int result = ptrie_find(*ptrie, lowercase, &sk, sizeof(sk));
-    if (result == 0)
-      return sk;
-  }
-  return NOSKILL;
-#else
-  void **tokens = get_translations(lang, UT_SKILLS);
-  variant token;
+  param_t result = NOSKILL;
+  char buffer[64];
+  char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), s);
 
-  if (findtoken(*tokens, s, &token) == E_TOK_NOMATCH)
-    return NOSKILL;
-  return (skill_t) token.i;
-#endif
+  if (str) {
+    int i;
+    const void * match;
+    void **tokens = get_translations(lang, UT_SKILLS);
+    critbit_tree *cb = (critbit_tree *)*tokens;
+    if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
+      cb_get_kv(match, &i, sizeof(int));
+      result = (skill_t)i;
+    }
+  }
+  return result;
 }
 
 keyword_t findkeyword(const char *s, const struct locale * lang)
@@ -2072,17 +1962,53 @@ direction_t finddirection(const char *s, const struct locale *lang)
   return NODIRECTION;
 }
 
+static void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings)
+{
+  char buffer[256];
+  void **tokens;
+  int i;
+
+  assert(string_cb);
+  assert(maxstrings>0);
+  tokens = get_translations(lang, ut);
+  for (i = 0; i != maxstrings; ++i) {
+    const char * s = string_cb(i);
+    const char * key = s ? locale_string(lang, s) : 0;
+    if (key) {
+      char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
+      if (str) {
+        critbit_tree * cb = (critbit_tree *)*tokens;
+        if (!cb) {
+          *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
+        }
+        cb_new_kv(str, &i, sizeof(int), buffer);
+        cb_insert(cb, buffer, strlen(str)+1+sizeof(int));
+      } else {
+        log_error("could not transliterate '%s'\n", key);
+      }
+    }
+  }
+}
+
+static const char * parameter_key(int i)
+{
+  assert(i<MAXPARAMS && i>=0);
+  return parameters[i];
+}
+
+static const char * skill_key(int sk)
+{
+  assert(sk<MAXPARAMS && sk>=0);
+  return skill_enabled[sk] ? mkname("skill", skillnames[sk]) : 0;
+}
+
 static void init_locale(const struct locale *lang)
 {
   variant var;
   int i;
   const struct race *rc;
-  void **tokens;
   const terrain_type *terrain;
-  char buffer[256];
-#ifdef PTRIES
-  trie_node **ptrie;
-#endif
+  void **tokens;
 
   tokens = get_translations(lang, UT_MAGIC);
   if (tokens) {
@@ -2117,40 +2043,8 @@ static void init_locale(const struct locale *lang)
     addtoken(tokens, LOC(lang, rc_name(rc, 0)), var);
   }
 
-  tokens = get_translations(lang, UT_PARAMS);
-  for (i = 0; i != MAXPARAMS; ++i) {
-    const char * key = LOC(lang, parameters[i]);
-    char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
-    if (str) {
-      critbit_tree * cb = (critbit_tree *)*tokens;
-      if (!cb) {
-        *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
-      }
-      cb_new_kv(str, &i, sizeof(int), buffer);
-      cb_insert(cb, buffer, strlen(str)+1+sizeof(int));
-    } else {
-      log_error("could not transliterate param '%s'\n", key);
-    }
-  }
-#ifdef PTRIES
-  ptrie = get_ptrie(lang, UT_SKILLS);
-  for (i = 0; i != MAXSKILLS; ++i) {
-    skill_t sk = (skill_t) i;
-    const char *skname = skillname(sk, lang);
-    if (skname != NULL) {
-      ptrie_insert(ptrie, skname, &sk, sizeof(sk));
-    }
-  }
-#else
-  tokens = get_translations(lang, UT_SKILLS);
-  for (i = 0; i != MAXSKILLS; ++i) {
-    const char *skname = skillname((skill_t) i, lang);
-    if (skname != NULL) {
-      var.i = i;
-      addtoken(tokens, skname, var);
-    }
-  }
-#endif
+  init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
+  init_translations(lang, UT_SKILLS, skill_key, MAXSKILLS);
 
   tokens = get_translations(lang, UT_KEYWORDS);
   for (i = 0; i != MAXKEYWORDS; ++i) {
