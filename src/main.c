@@ -84,16 +84,16 @@ static int parse_args(int argc, char **argv, int *exitcode)
           entry_point = NULL;
           break;
         case 'e':
-          entry_point = argv[++i];
+          entry_point = argv[i][2] ? argv[i]+2 : argv[++i];
           break;
         case 't':
-          turn = atoi(argv[++i]);
+          turn = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
           break;
         case 'q':
           verbosity = 0;
           break;
         case 'v':
-          verbosity = atoi(argv[++i]);
+          verbosity = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
           break;
         case 'h':
           usage(argv[0], NULL);
