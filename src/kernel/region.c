@@ -128,8 +128,10 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
 
 const char *regionname(const region * r, const faction * f)
 {
-  static char buf[NAMESIZE];
-  return write_regionname(r, f, buf, sizeof(buf));
+  static int index = 0;
+  static char buf[2][NAMESIZE];
+  index = 1-index;
+  return write_regionname(r, f, buf[index], sizeof(buf[index]));
 }
 
 int deathcount(const region * r)
