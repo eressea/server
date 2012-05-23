@@ -91,22 +91,22 @@ static int parse_args(int argc, char **argv, int *exitcode)
       } else {
         return usage(argv[0], argv[i]);
       }
-    } else
+    } else {
       switch (argv[i][1]) {
         case 'C':
           entry_point = NULL;
           break;
         case 'e':
-          entry_point = argv[++i];
+          entry_point = argv[i][2] ? argv[i]+2 : argv[++i];
           break;
         case 't':
-          turn = atoi(argv[++i]);
+          turn = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
           break;
         case 'q':
           verbosity = 0;
           break;
         case 'v':
-          verbosity = atoi(argv[++i]);
+          verbosity = atoi(argv[i][2] ? argv[i]+2 : argv[++i]);
           break;
         case 'h':
           usage(argv[0], NULL);
@@ -116,8 +116,26 @@ static int parse_args(int argc, char **argv, int *exitcode)
           usage(argv[0], argv[i]);
           return 1;
       }
+	}
   }
 
+  switch (verbosity) {
+  case 0:
+    log_stderr = 0;
+    break;
+  case 1:
+    log_stderr = LOG_CPERROR;
+    break;
+  case 2:
+    log_stderr = LOG_CPERROR|LOG_CPWARNING;
+    break;
+  case 3:
+    log_stderr = LOG_CPERROR|LOG_CPWARNING|LOG_CPDEBUG;
+    break;
+  default:
+    log_stderr = LOG_CPERROR|LOG_CPWARNING|LOG_CPDEBUG|LOG_CPINFO;
+    break;
+  }
   if (run_tests) {
     *exitcode = RunAllTests();
     return 1;
