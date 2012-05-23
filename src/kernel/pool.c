@@ -271,6 +271,7 @@ int reserve_cmd(unit * u, struct order *ord)
     if (use) {
       new_set_resvalue(u, rtype, use);
       change_resource(u, rtype, use);
+      return use;
     }
   }
   return 0;

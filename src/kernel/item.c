@@ -57,6 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 static critbit_tree inames[MAXLOCALES];
+static critbit_tree rnames[MAXLOCALES];
 static critbit_tree cb_resources;
 static critbit_tree cb_items;
 luxury_type *luxurytypes;
@@ -1055,46 +1056,49 @@ int change_money(unit * u, int v)
   return 0;
 }
 
-static local_names *rnames;
-#define CB_BATCHSIZE 16
-const resource_type *findresourcetype(const char *name,
-  const struct locale *lang)
+static int add_resourcename_cb(const void * match, const void * key, size_t keylen, void *data)
 {
-  const void * matches[CB_BATCHSIZE];
-  local_names *rn = rnames;
-  variant token;
+  struct locale * lang = (struct locale *)data;
+  int i = locale_index(lang);
+  critbit_tree * cb = rnames+i;
+  resource_type *rtype;
 
-  while (rn) {
-    if (rn->lang == lang)
-      break;
-    rn = rn->next;
+  cb_get_kv(match, &rtype, sizeof(rtype));
+  for (i = 0; i!=2;++i) {
+    char buffer[128];
+    const char * name = locale_string(lang, rtype->_name[i]);
+    
+    if (name && transliterate(buffer, sizeof(buffer), name)) {
+      size_t len = strlen(buffer);
+      assert(len+sizeof(rtype)<sizeof(buffer));
+      cb_new_kv(buffer, &rtype, sizeof(rtype), buffer);
+      cb_insert(cb, buffer, len+1+sizeof(rtype));
+    }
   }
-  if (!rn) {
-    int m, offset = 0;
-    rn = (local_names *)calloc(1, sizeof(local_names));
-    rn->next = rnames;
-    rn->lang = lang;
-    do {
-      m = cb_find_prefix(&cb_resources, "", 1, matches, CB_BATCHSIZE, offset);
-      if (m) {
-        int i;
-        offset += m;
-        for (i=0;i!=m;++i) {
-          resource_type *rtype;
-          cb_get_kv(matches[i], &rtype, sizeof(rtype));
-          token.v = (void *)rtype;
-          addtoken(&rn->names, locale_string(lang, rtype->_name[0]), token);
-          addtoken(&rn->names, locale_string(lang, rtype->_name[1]), token);
-        }
-      }
-    } while (m==CB_BATCHSIZE);
-    rnames = rn;
-  }
+  return 0;
+}
 
-  if (findtoken(rn->names, name, &token) == E_TOK_NOMATCH) {
-    return 0;
+const resource_type *findresourcetype(const char *name, const struct locale *lang)
+{
+  int i = locale_index(lang);
+  critbit_tree * cb = rnames+i;
+  char buffer[128];
+
+  if (transliterate(buffer, sizeof(buffer), name)) {
+    const void * match;
+    if (!cb->root) {
+      /* first-time initialization  of resource names for this locale */
+      cb_foreach(&cb_resources, "", 0, add_resourcename_cb, (void *)lang);
+    }
+    if (cb_find_prefix(cb, buffer, strlen(buffer), &match, 1, 0)) {
+      const resource_type * rtype = 0;
+      cb_get_kv(match, (void*)&rtype, sizeof(rtype));
+      return rtype;
+    }
+  } else {
+    log_debug("findresourcetype: transliterate failed for '%s'\n", name);
   }
-  return (const resource_type *)token.v;
+  return 0;
 }
 
 attrib_type at_showitem = {

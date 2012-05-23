@@ -55,10 +55,14 @@ void test_findresourcetype(CuTest * tc)
 
   lang = find_locale("de");
   locale_setstring(lang, "horse", "Pferd");
+  locale_setstring(lang, "peasant", "Bauer");
+
   rtype = rt_find("horse");
   rresult = findresourcetype("Pferd", lang);
   CuAssertPtrNotNull(tc, rresult);
   CuAssertPtrEquals(tc, (void*)rtype, (void*)rresult);
+
+  CuAssertPtrNotNull(tc, findresourcetype("Bauer", lang));
 }
 
 CuSuite *get_item_suite(void)
