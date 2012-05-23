@@ -45,6 +45,6 @@ void register_function(pf_generic fun, const char *name)
   size_t len = strlen(name);
 
   assert(len<sizeof(buffer)-sizeof(fun));
-  cb_new_kv(name, &fun, sizeof(fun), buffer);
-  cb_insert(&cb_functions, buffer, len+1+sizeof(fun));
+  len = cb_new_kv(name, len, &fun, sizeof(fun), buffer);
+  cb_insert(&cb_functions, buffer, len);
 }

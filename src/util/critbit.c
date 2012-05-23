@@ -46,6 +46,7 @@ void * make_external_node(const void * key, size_t keylen)
   ptrdiff_t numvalue = (char *)data - (char*)0;
   assert((numvalue&1)==0);
 #endif
+  assert(keylen);
   memcpy(data, &keylen, sizeof(size_t));
   memcpy(data+sizeof(size_t), key, keylen);
   return (void*)(data+1);
@@ -286,7 +287,7 @@ const void * cb_find(critbit_tree * cb, const void * key, size_t keylen)
     ptr = node->child[branch];
   }
   from_external_node(ptr, &str, &len);
-  if (len==keylen && memcmp(key, str, keylen)==0) {
+  if (len>=keylen && memcmp(key, str, keylen)==0) {
     return str;
   }
   return 0;
@@ -330,14 +331,15 @@ int cb_erase(critbit_tree * cb, const void * key, size_t keylen)
   }
 }
 
-size_t cb_new_kv(const char *key, void * value, size_t len, void * dst)
+size_t cb_new_kv(const char *key, size_t keylen, void * value, size_t len, void * out)
 {
-  size_t keylen = strlen(key)+1;
+  char * dst = (char*)out;
   if (dst!=key) {
     memcpy(dst, key, keylen);
   }
-  memcpy((char*)dst+keylen, value, len);
-  return len+keylen;
+  dst[keylen] = 0;
+  memcpy(dst+keylen+1, value, len);
+  return len+keylen+1;
 }
 
 void cb_get_kv(const void *kv, void * value, size_t len)

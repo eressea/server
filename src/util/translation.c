@@ -162,8 +162,8 @@ void add_function(const char *symbol, evalfun parse)
   size_t len = strlen(symbol);
   
   assert(len+1+sizeof(parse)<=sizeof(buffer));
-  cb_new_kv(symbol, &parse, sizeof(parse), buffer);
-  cb_insert(&functions, buffer, len+1+sizeof(parse));
+  len = cb_new_kv(symbol, len, &parse, sizeof(parse), buffer);
+  cb_insert(&functions, buffer, len);
 }
 
 static evalfun find_function(const char *symbol)
