@@ -22,16 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  struct fighter;
-  struct spell;
-  struct border_type;
-  struct attrib_type;
-  struct curse_type;
-  struct castorder;
-  struct curse;
-  struct region;
-  struct unit;
-
   /* Prototypen */
 
   int use_item_power(struct region *r, struct unit *u);
@@ -44,15 +34,14 @@ extern "C" {
   extern struct attrib_type at_unitdissolve;
   extern struct attrib_type at_wdwpyramid;
 
-  extern struct quicklist *spells;
-
-  extern struct spell * create_spell(const char * name);
-  extern void register_spell(struct spell *sp);
-  extern struct spell *find_spell(const char *name);
-  extern struct spell *find_spellbyid(unsigned int i);
-  extern struct spell *get_spellfromtoken(struct sc_mage *mage, const char *s,
+  extern struct spell * create_spell(const char * name, unsigned int id);
+  extern struct spell * find_spell(const char *name);
+  extern struct spell * find_spellbyid(unsigned int i);
+  extern struct spell * get_spellfromtoken(struct sc_mage *mage, const char *s,
     const struct locale *lang);
+  extern void free_spells(void);
 
+  extern struct quicklist * spells;
 #ifdef __cplusplus
 }
 #endif

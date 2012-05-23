@@ -177,8 +177,8 @@ void it_register(item_type * itype)
   size_t len = strlen(name);
 
   assert(len<sizeof(buffer)-sizeof(itype));
-  cb_new_kv(name, &itype, sizeof(itype), buffer);
-  if (cb_insert(&cb_items, buffer, len+1+sizeof(itype))) {
+  len = cb_new_kv(name, len, &itype, sizeof(itype), buffer);
+  if (cb_insert(&cb_items, buffer, len)) {
     rt_register(itype->rtype);
   }
 }
@@ -298,8 +298,8 @@ void rt_register(resource_type * rtype)
   size_t len = strlen(name);
 
   assert(len<sizeof(buffer)-sizeof(rtype));
-  cb_new_kv(name, &rtype, sizeof(rtype), buffer);
-  cb_insert(&cb_resources, buffer, len+1+sizeof(rtype));
+  len = cb_new_kv(name, len, &rtype, sizeof(rtype), buffer);
+  cb_insert(&cb_resources, buffer, len);
 }
 
 const resource_type *item2resource(const item_type * itype)
@@ -1116,8 +1116,8 @@ static int add_itemname_cb(const void * match, const void * key, size_t keylen, 
     if (name && transliterate(buffer, sizeof(buffer), name)) {
       size_t len = strlen(buffer);
       assert(len+sizeof(itype)<sizeof(buffer));
-      cb_new_kv(buffer, &itype, sizeof(itype), buffer);
-      cb_insert(cb, buffer, len+1+sizeof(itype));
+      len = cb_new_kv(buffer, len, &itype, sizeof(itype), buffer);
+      cb_insert(cb, buffer, len);
     }
   }
   return 0;

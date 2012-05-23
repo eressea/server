@@ -319,8 +319,9 @@ static critbit_tree * special_resources(void)
     char buffer[32];
     int i;
     for (i=0;special[i];++i) {
-      cb_new_kv(special[i], &i, sizeof(int), buffer);
-      cb_insert(&cb, buffer, strlen(special[i])+1+sizeof(int));
+      size_t len = strlen(special[i]);
+      len = cb_new_kv(special[i], len, &i, sizeof(int), buffer);
+      cb_insert(&cb, buffer, len);
     }
   }
   return &cb;

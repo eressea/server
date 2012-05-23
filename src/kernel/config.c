@@ -1989,11 +1989,12 @@ static void init_translations(const struct locale *lang, int ut, const char * (*
       char * str = transliterate(buffer, sizeof(buffer)-sizeof(int), key);
       if (str) {
         critbit_tree * cb = (critbit_tree *)*tokens;
-        if (!cb) {
+		size_t len = strlen(str);
+		if (!cb) {
           *tokens = cb = (critbit_tree *)calloc(1, sizeof(critbit_tree *));
         }
-        cb_new_kv(str, &i, sizeof(int), buffer);
-        cb_insert(cb, buffer, strlen(str)+1+sizeof(int));
+        len = cb_new_kv(str, len, &i, sizeof(int), buffer);
+        cb_insert(cb, buffer, len);
       } else {
         log_error("could not transliterate '%s'\n", key);
       }

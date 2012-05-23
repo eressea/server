@@ -24,47 +24,62 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "magic.h"
 #include "unit.h"
 
-/* libc includes */
-#include <assert.h>
-#include <string.h>
-
 /* util includes */
+#include <util/critbit.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/umlaut.h>
 #include <util/quicklist.h>
 
-quicklist *spells = NULL;
+/* libc includes */
+#include <assert.h>
+#include <string.h>
 
-spell * create_spell(const char * name)
-{
-  spell * sp = (spell *) calloc(1, sizeof(spell));
-  sp->sname = strdup(name);
-  return sp;
+static critbit_tree cb_spells;
+quicklist * spells;
+
+void free_spells(void) {
+  cb_clear(&cb_spells);
+  ql_free(spells);
+  spells = 0;
 }
 
-void register_spell(spell * sp)
+spell * create_spell(const char * name, unsigned int id)
 {
-  if (sp->id == 0) {
-    sp->id = hashstring(sp->sname);
+  spell * sp;
+  char buffer[64];
+  size_t len = strlen(name);
+
+  assert(len+sizeof(sp)<sizeof(buffer));
+  if (find_spell(name)) {
+    log_error("create_spell: duplicate name '%s'\n", name);
+    return 0;
   }
-  add_spell(&spells, sp);
+  sp = (spell *) calloc(1, sizeof(spell));
+  len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
+  if (cb_insert(&cb_spells, buffer, len)) {
+    sp->id = id ? id : hashstring(name);
+    sp->sname = strdup(name);
+    add_spell(&spells, sp);
+    return sp;
+  }
+  free(sp);
+  return 0;
 }
 
 spell *find_spell(const char *name)
 {
-  quicklist *ql = spells;
-  int qi;
+  const char * match;
+  spell * sp = 0;
 
-  for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-    spell *sp = (spell *) ql_get(ql, qi);
-    if (strcmp(name, sp->sname) == 0) {
-      return sp;
-    }
+  match = cb_find_str(&cb_spells, name);
+  if (match) {
+    cb_get_kv(match, &sp, sizeof(sp));
+  } else {
+    log_warning("find_spell: could not find spell '%s'\n", name);
   }
-  log_warning("find_spell: could not find spell '%s'\n", name);
-  return 0;
+  return sp;
 }
 
 /* ------------------------------------------------------------- */
