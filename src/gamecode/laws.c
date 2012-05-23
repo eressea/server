@@ -1712,7 +1712,7 @@ static int name_cmd(unit * u, struct order *ord)
 
   switch (p) {
   case P_ALLIANCE:
-    if (foreign == false && f_get_alliance(u->faction)) {
+    if (!foreign && f_get_alliance(u->faction)) {
       alliance *al = u->faction->alliance;
       faction *lead = alliance_get_leader(al);
       if (lead == u->faction) {
@@ -1729,7 +1729,7 @@ static int name_cmd(unit * u, struct order *ord)
     return rename_building(u, ord, b, getstrtoken());
 
   case P_FACTION:
-    if (foreign == true) {
+    if (foreign) {
       faction *f;
 
       f = getfaction();
@@ -1767,7 +1767,7 @@ static int name_cmd(unit * u, struct order *ord)
     break;
 
   case P_SHIP:
-    if (foreign == true) {
+    if (foreign) {
       ship *sh = getship(r);
       unit *uo;
 
@@ -1822,7 +1822,7 @@ static int name_cmd(unit * u, struct order *ord)
     break;
 
   case P_UNIT:
-    if (foreign == true) {
+    if (foreign) {
       unit *u2 = getunit(r, u->faction);
 
       if (!u2 || !cansee(u->faction, r, u2, 0)) {
@@ -1981,7 +1981,7 @@ static int mail_cmd(unit * u, struct order *ord)
         }
       }
 
-      if (see == false) {
+      if (!see) {
         cmistake(u, ord, 66, MSG_MESSAGE);
         break;
       }
@@ -2007,7 +2007,7 @@ static int mail_cmd(unit * u, struct order *ord)
         }
       }
 
-      if (see == false) {
+      if (!see) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
             "feedback_unit_not_found", ""));
         return 0;
@@ -2171,7 +2171,7 @@ static int password_cmd(unit * u, struct order *ord)
     }
   }
   free(u->faction->passw);
-  if (pwok == false) {
+  if (!pwok) {
     cmistake(u, ord, 283, MSG_EVENT);
     u->faction->passw = strdup(itoa36(rng_int()));
   } else {
@@ -3510,7 +3510,7 @@ static void setdefaults(unit * u)
   /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
    * werden. */
 
-  if (trade == true) {
+  if (trade) {
     /* fset(u, UFL_LONGACTION|UFL_NOTMOVING); */
     set_order(&u->thisorder, NULL);
   }

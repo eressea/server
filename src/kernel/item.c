@@ -1071,8 +1071,8 @@ static int add_resourcename_cb(const void * match, const void * key, size_t keyl
     if (name && transliterate(buffer, sizeof(buffer), name)) {
       size_t len = strlen(buffer);
       assert(len+sizeof(rtype)<sizeof(buffer));
-      cb_new_kv(buffer, &rtype, sizeof(rtype), buffer);
-      cb_insert(cb, buffer, len+1+sizeof(rtype));
+      len = cb_new_kv(buffer, len, &rtype, sizeof(rtype), buffer);
+      cb_insert(cb, buffer, len);
     }
   }
   return 0;

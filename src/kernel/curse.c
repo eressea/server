@@ -615,7 +615,7 @@ static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
       break;
   }
 
-  if (dogive == true) {
+  if (dogive) {
     curse *cnew = make_curse(c->magician, &u2->attribs, c->type, c->vigour,
       c->duration, c->effect, men);
     cnew->flags = c->flags;

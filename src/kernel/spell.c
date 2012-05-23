@@ -52,7 +52,8 @@ spell * create_spell(const char * name, unsigned int id)
   size_t len = strlen(name);
 
   assert(len+sizeof(sp)<sizeof(buffer));
-  if (find_spell(name)) {
+
+  if (cb_find_str(&cb_spells, name)) {
     log_error("create_spell: duplicate name '%s'\n", name);
     return 0;
   }

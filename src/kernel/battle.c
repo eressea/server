@@ -1742,7 +1742,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
           continue;
 
         ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
-        if (cancast(mage, sp, 1, 1, ord) == false) {
+        if (!cancast(mage, sp, 1, 1, ord)) {
           free_order(ord);
           continue;
         }
@@ -1761,7 +1761,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
         if (power <= 0) {       /* Effekt von Antimagie */
           report_failed_spell(b, mage, sp);
           pay_spell(mage, sp, level, 1);
-        } else if (fumble(r, mage, sp, sp->level)) {
+        } else if (fumble(r, mage, sp, level)) {
           report_failed_spell(b, mage, sp);
           pay_spell(mage, sp, level, 1);
         } else {
@@ -1837,7 +1837,7 @@ static void do_combatspell(troop at)
     return;
   }
   ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
-  if (cancast(caster, sp, 1, 1, ord) == false) {
+  if (!cancast(caster, sp, 1, 1, ord)) {
     fi->magic = 0;              /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
     return;
   }
@@ -1846,7 +1846,7 @@ static void do_combatspell(troop at)
   if ((sl = get_combatspelllevel(caster, 1)) > 0)
     level = MIN(level, sl);
 
-  if (fumble(r, caster, sp, sp->level) == true) {
+  if (fumble(r, caster, sp, level)) {
     report_failed_spell(b, caster, sp);
     pay_spell(caster, sp, level, 1);
     return;
@@ -3100,7 +3100,7 @@ static void print_header(battle * b)
               WARN_STATIC_BUFFER();
             first = true;
           }
-          if (seematrix(f, s) == true)
+          if (seematrix(f, s))
             lastf = sidename(s);
           else
             lastf = LOC(f->locale, "unknown_faction_dative");

@@ -598,7 +598,7 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
   }
 
   /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
-  if (knowsspell(u->region, u, sp) == false) {
+  if (!knowsspell(u->region, u, sp)) {
     /* Fehler 'Spell not found' */
     cmistake(u, ord, 173, MSG_MAGIC);
     return;
@@ -976,7 +976,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
   int itemanz;
   resource *reslist = NULL;
 
-  if (knowsspell(u->region, u, sp) == false) {
+  if (!knowsspell(u->region, u, sp)) {
     /* Diesen Zauber kennt die Einheit nicht */
     cmistake(u, ord, 173, MSG_MAGIC);
     return false;
@@ -1325,10 +1325,10 @@ boolean fumble(region * r, unit * u, const spell * sp, int cast_grade)
   if (sp->magietyp == M_DRAIG) {
     patzer += CHAOSPATZERCHANCE;
   }
-  if (is_cursed(u->attribs, C_MBOOST, 0) == true) {
+  if (is_cursed(u->attribs, C_MBOOST, 0)) {
     patzer += CHAOSPATZERCHANCE;
   }
-  if (is_cursed(u->attribs, C_FUMBLE, 0) == true) {
+  if (is_cursed(u->attribs, C_FUMBLE, 0)) {
     patzer += CHAOSPATZERCHANCE;
   }
 
@@ -2830,7 +2830,7 @@ void magic(void)
 
       /* Prüfen, ob die realen Kosten für die gewünschten Stufe bezahlt
        * werden können */
-      if (cancast(u, sp, co->level, co->distance, ord) == false) {
+      if (!cancast(u, sp, co->level, co->distance, ord)) {
         /* die Fehlermeldung wird in cancast generiert */
         continue;
       }

@@ -26,9 +26,9 @@ static void test_building_type_exists(CuTest * tc)
   b = new_building(btype, r, default_locale);
 
   CuAssertPtrNotNull(tc, b);
-  CuAssertTrue(tc, buildingtype_exists(r, NULL, true) == false);
-  CuAssertTrue(tc, buildingtype_exists(r, btype, true) == true);
-  CuAssertTrue(tc, buildingtype_exists(r, btype2, true) == false);
+  CuAssertTrue(tc, !buildingtype_exists(r, NULL, true));
+  CuAssertTrue(tc, buildingtype_exists(r, btype, true));
+  CuAssertTrue(tc, !buildingtype_exists(r, btype2, true));
 }
 
 CuSuite *get_move_suite(void)

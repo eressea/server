@@ -1790,7 +1790,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list ** routep)
             break;
           }
         } else {
-          if (check_takeoff(sh, current_point, next_point) == false) {
+          if (!check_takeoff(sh, current_point, next_point)) {
             /* Schiff kann nicht ablegen */
             cmistake(u, ord, 182, MSG_MOVE);
             break;
@@ -2265,8 +2265,7 @@ static void piracy_cmd(unit * u, struct order *ord)
       region *rc = rconnect(r, dir);
       aff[dir].value = 0;
       aff[dir].target = 0;
-      if (rc && fval(rc->terrain, SWIM_INTO)
-        && check_takeoff(sh, r, rc) == true) {
+      if (rc && fval(rc->terrain, SWIM_INTO) && check_takeoff(sh, r, rc)) {
 
         for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
           unit *cap = ship_owner(sh2);

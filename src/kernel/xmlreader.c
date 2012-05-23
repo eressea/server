@@ -1490,6 +1490,9 @@ static int parse_spells(xmlDocPtr doc)
       assert(propValue != NULL);
       sp = create_spell((const char *)propValue, index);
       xmlFree(propValue);
+      if (!sp) {
+        continue;
+      }
 
       propValue = xmlGetProp(node, BAD_CAST "parameters");
       if (propValue) {

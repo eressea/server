@@ -84,7 +84,7 @@ use_phoenixcompass(struct unit *u, const struct item_type *itype,
    * at the same distance was found and the device is confused */
 
   if (closest_phoenix == NULL
-    || closest_phoenix->region == u->region || confusion == true) {
+    || closest_phoenix->region == u->region || confusion) {
     add_message(&u->faction->msgs, msg_message("phoenixcompass_confusion",
         "unit region command", u, u->region, ord));
     return 0;

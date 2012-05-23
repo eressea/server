@@ -913,7 +913,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
   pr = 0;
   if (f == u->faction || omniscient(f)) {
     show = u->items;
-  } else if (itemcloak == false && mode >= see_unit && !(a_fshidden
+  } else if (!itemcloak && mode >= see_unit && !(a_fshidden
       && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
     int n = report_items(u->items, result, MAX_INVENTORY, u, f);
     assert(n >= 0);
