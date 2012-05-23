@@ -310,6 +310,15 @@
     <ClCompile Include="kernel\item_test.c">
       <Filter>kernel</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\magic_test.c">
+      <Filter>kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\spellbook.c">
+      <Filter>kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\spellbook_test.c">
+      <Filter>kernel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\alchemy.h">
@@ -602,6 +611,9 @@
     </ClInclude>
     <ClInclude Include="attributes\targetregion.h">
       <Filter>attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\spellbook.h">
+      <Filter>kernel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

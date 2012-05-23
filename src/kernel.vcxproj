@@ -106,6 +106,7 @@
     <ClCompile Include="kernel\item.c" />
     <ClCompile Include="kernel\item_test.c" />
     <ClCompile Include="kernel\magic.c" />
+    <ClCompile Include="kernel\magic_test.c" />
     <ClCompile Include="kernel\message.c" />
     <ClCompile Include="kernel\move.c" />
     <ClCompile Include="kernel\move_test.c" />
@@ -125,6 +126,8 @@
     <ClCompile Include="kernel\ship_test.c" />
     <ClCompile Include="kernel\skill.c" />
     <ClCompile Include="kernel\spell.c" />
+    <ClCompile Include="kernel\spellbook.c" />
+    <ClCompile Include="kernel\spellbook_test.c" />
     <ClCompile Include="kernel\spell_test.c" />
     <ClCompile Include="kernel\sqlite.c" />
     <ClCompile Include="kernel\teleport.c" />
@@ -221,6 +224,7 @@
     <ClInclude Include="kernel\ship.h" />
     <ClInclude Include="kernel\skill.h" />
     <ClInclude Include="kernel\spell.h" />
+    <ClInclude Include="kernel\spellbook.h" />
     <ClInclude Include="kernel\spellid.h" />
     <ClInclude Include="kernel\teleport.h" />
     <ClInclude Include="kernel\terrain.h" />

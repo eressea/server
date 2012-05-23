@@ -9,6 +9,7 @@
 #include <util/functions_test.c>
 #include <util/quicklist_test.c>
 #include <util/umlaut_test.c>
+#include <kernel/magic_test.c>
 #include <kernel/move_test.c>
 #include <kernel/item_test.c>
 #include <kernel/ship_test.c>
@@ -17,6 +18,7 @@
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
 #include <kernel/reports_test.c>
+#include <kernel/spellbook_test.c>
 #include <gamecode/laws_test.c>
 #include <gamecode/market_test.c>
 
@@ -50,9 +52,11 @@ int RunAllTests(void)
   /* kernel */
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_item_suite());
+  CuSuiteAddSuite(suite, get_magic_suite());
   CuSuiteAddSuite(suite, get_move_suite());
   CuSuiteAddSuite(suite, get_reports_suite());
   CuSuiteAddSuite(suite, get_ship_suite());
+  CuSuiteAddSuite(suite, get_spellbook_suite());
   CuSuiteAddSuite(suite, get_building_suite());
   CuSuiteAddSuite(suite, get_spell_suite());
   CuSuiteAddSuite(suite, get_battle_suite());
