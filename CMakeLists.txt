@@ -35,6 +35,8 @@ set (LIB_SRCS
  ../shared/src/build/util.c
 )
 
+set (LINK_LIBS tolua xml2 ncurses lua5.1 pthread)
+
 if (NEED_SQLITE)
  set(LIB_SRCS
    ${LIB_SRCS}
