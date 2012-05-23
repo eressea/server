@@ -344,7 +344,7 @@ sc_mage *get_mage(const unit * u)
 static int read_seenspell(attrib * a, void *owner, struct storage *store)
 {
   int i;
-  spell *sp = NULL;
+  spell *sp = 0;
   char token[32];
 
   store->r_tok_buf(store, token, sizeof(token));
@@ -352,11 +352,12 @@ static int read_seenspell(attrib * a, void *owner, struct storage *store)
   if (i != 0) {
     sp = find_spellbyid((unsigned int) i);
   } else {
-    int mtype;
-    mtype = store->r_int(store);
+    if (store->version<UNIQUE_SPELLS_VERSION) {
+      store->r_int(store); /* ignore mtype */
+    }
     sp = find_spell(token);
     if (!sp) {
-      log_error("read_seenspell: could not find spell '%s' in school '%s'\n", token, magic_school[mtype]);
+      log_error("read_seenspell: could not find spell '%s'\n", token);
     }
   }
   if (!sp) {
@@ -371,7 +372,6 @@ write_seenspell(const attrib * a, const void *owner, struct storage *store)
 {
   const spell *sp = (const spell *)a->data.v;
   store->w_tok(store, sp->sname);
-  store->w_int(store, sp->magietyp);
 }
 
 attrib_type at_seenspell = {
@@ -423,7 +423,7 @@ static boolean has_spell(quicklist * ql, const spell * sp)
 }
 
 /** update the spellbook with a new level
-* Written for Eressea 1.1
+* Written for E3
 */
 void update_spellbook(faction * f, int level)
 {

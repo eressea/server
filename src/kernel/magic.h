@@ -158,13 +158,15 @@ typedef struct sc_mage {
     char *sname;
     char *syntax;
     char *parameter;
-    magic_t magietyp;
     int sptyp;
     int rank;                   /* Reihenfolge der Zauber */
-    int level;                  /* Stufe des Zaubers */
     struct spell_component *components;
     spell_f cast;
     fumble_f patzer;
+
+    /* this is not so much the spell's data, but the school's studying data */
+    magic_t magietyp;
+    int level;                  /* Stufe des Zaubers */
   } spell;
 
 /* ------------------------------------------------------------- */
