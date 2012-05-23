@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.4)
 project (example C)
 
+## CMake configuration ##
+# You can pass these to cmake with -DNEED_OPTION=1
+#
+# if your system does not have libsqlite3-dev installed:
+# set(NEED_SQLITE 1)
+
 if (${CMAKE_C_COMPILER} MATCHES ".*tcc")
   set(CMAKE_C_FLAGS "-Wall -g")
   add_definitions(-DTINYCC)
@@ -18,7 +24,6 @@ endif (WIN32)
 include_directories (../external ../shared/src)
 
 set (LIB_SRCS
- ../external/sqlite3.c
  ../external/md5.c
  ../external/bson/bson.c
  ../external/bson/numbers.c
@@ -30,6 +35,15 @@ set (LIB_SRCS
  ../shared/src/build/util.c
 )
 
+if (NEED_SQLITE)
+ set(LIB_SRCS
+   ${LIB_SRCS}
+   ../external/sqlite3.c
+ )
+else (NEED_SQLITE)
+ set (LINK_LIBS ${LINK_LIBS} sqlite3)
+endif (NEED_SQLITE)
+ 
 set (EXE_SRCS
   src/server.c
 )
@@ -37,5 +51,5 @@ set (EXE_SRCS
 add_executable (example ${LIB_SRCS} ${EXE_SRCS})
 if (WIN32)
 else (WIN32)
-  target_link_libraries (example tolua xml2 ncurses lua5.1 pthread)
+  target_link_libraries (example ${LINK_LIBS})
 endif (WIN32)
