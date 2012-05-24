@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="illaun">
+  <entry spell="bad_dreams" level="10" />
+  <entry spell="gooddreams" level="8" />
+  <entry spell="dreamreading" level="4" />
+  <entry spell="tiredsoldiers" level="4" />
+  <entry spell="flee" level="2" />
+  <entry spell="transferauratraum" level="3" />
+  <entry spell="disturbingdreams" level="6" />
+  <entry spell="sleep" level="7" />
+  <entry spell="summon_alp" level="15" />
+  <entry spell="mindblast" level="11" />
+  <entry spell="reanimate" level="5" />
+  <entry spell="shapeshift" level="3" />
+  <entry spell="analysedream" level="5" />
+  <entry spell="orkdream" level="12" />
+  <entry spell="illaunfamiliar" level="9" />
+  <entry spell="icastle" level="3" />
+  <entry spell="illaundestroymagic" level="8" />
+  <entry spell="shadowknights" level="1" />
+  <entry spell="wisps" level="7" />
+  <entry spell="sparkledream" level="1" />
+  <entry spell="puttorest" level="2" />
+  <entry spell="clone" level="9" />
+  <entry spell="create_roi" level="6" />
+  <entry spell="earn_silver#illaun" level="1" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="create_dreameye" level="14" />
+  <entry spell="create_invisibility_sphere" level="13" />
+  <entry spell="readmind" level="7" />
+</spellbook>
+

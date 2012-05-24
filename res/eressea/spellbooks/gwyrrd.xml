@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="gwyrrd">
+  <entry spell="hail" level="3" />
+  <entry spell="rustweapon" level="3" />
+  <entry spell="treegrow" level="2" />
+  <entry spell="healing" level="5" />
+  <entry spell="maelstrom" level="15" />
+  <entry spell="transferauradruide" level="6" />
+  <entry spell="stonegolem" level="1" />
+  <entry spell="irongolem" level="2" />
+  <entry spell="reelingarrows" level="5" />
+  <entry spell="cold_protection" level="3" />
+  <entry spell="great_drought" level="17" />
+  <entry spell="strongwall" level="8" />
+  <entry spell="homestone" level="7" />
+  <entry spell="summonfireelemental" level="13" />
+  <entry spell="summonent" level="10" />
+  <entry spell="earthquake" level="6" />
+  <entry spell="ironkeeper" level="3" />
+  <entry spell="stormwinds" level="6" />
+  <entry spell="goodwinds" level="4" />
+  <entry spell="windshield" level="4" />
+  <entry spell="versteinern" level="8" />
+  <entry spell="treewalkenter" level="9" />
+  <entry spell="treewalkexit" level="9" />
+  <entry spell="magicstreet" level="4" />
+  <entry spell="wolfhowl" level="7" />
+  <entry spell="blessstonecircle" level="11" />
+  <entry spell="gwyrrdfamiliar" level="10" />
+  <entry spell="gwyrrddestroymagic" level="8" />
+  <entry spell="barkskin" level="12" />
+  <entry spell="gwyrrdfumbleshield" level="5" />
+  <entry spell="holyground" level="9" />
+  <entry spell="magic_roots" level="16" />
+  <entry spell="mallorntreegrow" level="4" />
+  <entry spell="blessedharvest" level="1" />
+  <entry spell="create_roi" level="6" />
+  <entry spell="earn_silver#gwyrrd" level="1" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="create_magicherbbag" level="5" />
+</spellbook>

@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<spells>
-<!-- new illaun -->
+<spells xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="spellbooks/common.xml"/>
+  <xi:include href="spellbooks/gray.xml"/>
+  <xi:include href="spellbooks/gwyrrd.xml"/>
+  <xi:include href="spellbooks/draig.xml"/>
+  <xi:include href="spellbooks/illaun.xml"/>
+  <xi:include href="spellbooks/cerddor.xml"/>
+  <xi:include href="spellbooks/tybied.xml"/>
+
+    <!-- new illaun -->
   <spell name="shadowknights" type="illaun" rank="4" level="1" index="147" variable="true" combat="1">
     <!-- Schattenritter -->
     <resource name="aura" amount="1" cost="level"/>
@@ -601,24 +610,8 @@
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="laen" amount="5" cost="fixed"/>
   </spell>
-  <spell name="commonfamiliar" type="common" rank="5" level="9" index="118">
+  <spell name="summon_familiar" type="common" rank="5" level="9" index="118">
     <function name="cast" value="cast_familiar"/>
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="gwyrrdfamiliar" type="common" rank="5" level="10" index="119">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="draigfamiliar" type="common" rank="5" level="13" index="120">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="summon_familiar" type="cerddor" rank="5" level="9" index="121">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="summon_familiar" type="common" rank="5" level="12" index="122">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>

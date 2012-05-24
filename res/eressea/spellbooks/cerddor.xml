@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="cerddor">
+  <entry spell="song_of_healing" level="2" />
+  <entry spell="song_of_confusion" level="4" />
+  <entry spell="song_of_fear" level="3" />
+  <entry spell="bloodthirst" level="7" />
+  <entry spell="transfer_aura_song" level="5" />
+  <entry spell="appeasement" level="1" />
+  <entry spell="raise_mob" level="10" />
+  <entry spell="melancholy" level="11" />
+  <entry spell="headache" level="7" />
+  <entry spell="seduction" level="6" />
+  <entry spell="sound_out" level="7" />
+  <entry spell="calm_monster" level="6" />
+  <entry spell="heroic_song" level="5" />
+  <entry spell="frighten" level="8" />
+  <entry spell="courting" level="4" />
+  <entry spell="generous" level="2" />
+  <entry spell="song_of_peace" level="12" />
+  <entry spell="migration" level="9" />
+  <entry spell="calm_riot" level="15" />
+  <entry spell="incite_riot" level="16" />
+  <entry spell="song_resist_magic" level="10" />
+  <entry spell="song_suscept_magic" level="12" />
+  <entry spell="analysesong_unit" level="5" />
+  <entry spell="analyse_object" level="8" />
+  <entry spell="summon_familiar" level="9" />
+  <entry spell="song_of_slavery" level="13" />
+  <entry spell="cerddor_destroymagic" level="8" />
+  <entry spell="cerrdorfumbleshield" level="5" />
+  <entry spell="big_recruit" level="14" />
+  <entry spell="raindance" level="3" />
+  <entry spell="create_roi" level="6" />
+  <entry spell="earn_silver#cerddor" level="1" />
+  <entry spell="create_aots" level="6" />
+  <entry spell="create_roqf" level="11" />
+  <entry spell="blabbermouth" level="4" />
+</spellbook>

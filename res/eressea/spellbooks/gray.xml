@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="gray">
+  <entry spell="fiery_dragonbreath" level="3" />
+  <entry spell="icy_dragonbreath" level="6" />
+  <entry spell="powerful_dragonbreath" level="12" />
+  <entry spell="meteor_rain" level="3" />
+  <entry spell="wyrm_transformation" level="1" />
+  <entry spell="drain_skills" level="12" />
+  <entry spell="aura_of_fear" level="12" />
+  <entry spell="shadowcall" level="12" />
+  <entry spell="immolation" level="12" />
+  <entry spell="firestorm" level="8" />
+  <entry spell="coldfront" level="8" />
+  <entry spell="acidrain" level="8" />
+  <entry spell="create_runesword" level="6" />
+  <entry spell="create_chastitybelt" level="7" />
+  <entry spell="create_focus" level="9" />
+  <entry spell="create_ror" level="9" />
+</spellbook>
+

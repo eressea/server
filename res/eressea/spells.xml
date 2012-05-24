@@ -1,5 +1,13 @@
 <?xml version="1.0"?>
-<spells>
+<spells xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="spellbooks/gray.xml"/>
+  <xi:include href="spellbooks/gwyrrd.xml"/>
+  <xi:include href="spellbooks/draig.xml"/>
+  <xi:include href="spellbooks/illaun.xml"/>
+  <xi:include href="spellbooks/cerddor.xml"/>
+  <xi:include href="spellbooks/tybied.xml"/>
+
   <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true" combat="2">
     <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
