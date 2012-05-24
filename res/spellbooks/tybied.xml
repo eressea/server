@@ -1,6 +1,9 @@
-<entry spell="create_roi" level="6" index="133">
-<entry spell="earn_silver#tybied" level="1" index="159">
-<entry spell="create_aots" level="6" index="128">
-<entry spell="create_antimagic" level="7" index="38">
-<entry spell="create_rop" level="9" index="1">
-<entry spell="create_bagofholding" level="10" index="155">
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<spellbook name="cerddor">
+    <entry spell="create_roi" level="6" />
+    <entry spell="earn_silver#tybied" level="1" />
+    <entry spell="create_aots" level="6" />
+    <entry spell="create_antimagic" level="7" />
+    <entry spell="create_rop" level="9" />
+    <entry spell="create_bagofholding" level="10" />
+</spellbook>

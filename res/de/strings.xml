@@ -4318,10 +4318,6 @@
       <text locale="de">Erwecke Ents</text>
       <text locale="en">Awakening Of The Ents</text>
     </string>
-    <string name="gwyrrdfamiliar">
-      <text locale="de">Vertrauten binden</text>
-      <text locale="en">Bind Familiar</text>
-    </string>
     <string name="blessstonecircle">
       <text locale="de">Segne Steinkreis</text>
       <text locale="en">Bless Stone Circle</text>
@@ -5735,15 +5731,6 @@
         cause, but after a while they will sink back
         into their slumber.</text>
     </string>
-    <string name="gwyrrdfamiliar">
-      <text locale="de">Einem erfahrenen Druidem wird
-        irgendwann auf seinen Wanderungen ein
-        ungewöhnliches Exemplar einer Gattung begegnen,
-        welches sich dem Druiden anschließen wird.</text>
-      <text locale="en">Once during his travels, the seasoned
-        druid will meet an extraordinary creature of its
-        species that will join him.</text>
-    </string>
     <string name="blessstonecircle">
       <text locale="de">Dieses Ritual segnet einen Steinkreis,
         der zuvor aus Steinen und etwas Holz gebaut
@@ -6403,15 +6390,6 @@
       in all the population. All the taverns and theaters will
       be packed to the brim and even the beggars will not go
       hungry.</text>
-    </string>
-    <string name="illaunfamiliar">
-      <text locale="de">Einem erfahrenen Magier wird
-      irgendwann auf seinen Wanderungen ein ungewöhnliches
-      Exemplar einer Gattung begegnen, welches sich dem Magier
-      anschließen wird. </text>
-      <text locale="en">Once during his travels, the seasoned
-      magician will meet an extraordinary creature of its species
-      that will join him. </text>
     </string>
     <string name="mindblast">
       <text locale="de">Mit diesem Zauber greift der Magier
