@@ -234,3 +234,23 @@ void ** get_translations(const struct locale *lang, int index)
   }
   return lstrs[0].tokens + index;
 }
+
+void free_locales(void)
+{
+  while (locales) {
+    int i;
+    locale * next = locales->next;
+
+    for (i=0; i!=SMAXHASH; ++i) {
+      while (locales->strings[i]) {
+        struct locale_str * strings = locales->strings[i];
+        free(strings->key);
+        free(strings->str);
+        locales->strings[i] = strings->nexthash;
+        free(strings);
+      }
+    }
+    free(locales);
+    locales = next;
+  }
+}

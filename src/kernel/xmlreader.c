@@ -26,6 +26,7 @@ without prior permission by the authors of Eressea.
 #include "terrain.h"
 #include "skill.h"
 #include "spell.h"
+#include "spellbook.h"
 #include "calendar.h"
 
 /* util includes */
@@ -1461,6 +1462,58 @@ static int parse_equipment(xmlDocPtr doc)
   return 0;
 }
 
+static int parse_spellbooks(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathObjectPtr spellbooks;
+
+  /* reading eressea/spells/spell */
+  spellbooks = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spellbook", xpath);
+
+  if (spellbooks->nodesetval != NULL) {
+    xmlNodeSetPtr nodes = spellbooks->nodesetval;
+    int i, k;
+
+    for (i = 0; i != nodes->nodeNr; ++i) {
+      xmlXPathObjectPtr result;
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar *propValue;
+      spellbook * sb;
+      
+      propValue = xmlGetProp(node, BAD_CAST "name");
+      assert(propValue != NULL);
+      sb = get_spellbook((const char *)propValue);
+      xmlFree(propValue);
+
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "entry", xpath);
+
+      if (result->nodesetval->nodeNr > 0) {
+        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+          xmlNodePtr node = result->nodesetval->nodeTab[k];
+          spell * sp = 0;
+          int level = xml_ivalue(node, "level", -1);
+
+          propValue = xmlGetProp(node, BAD_CAST "name");
+          if (propValue) {
+            sp = find_spell((const char *)propValue);
+            xmlFree(propValue);
+          }
+          if (sp && level>0) {
+            spellbook_add(sb, sp, level);
+          } else {
+            log_error("invalid entry at index '%d' in spellbook '%s'\n", k, sb->name);
+          }
+        }
+      }
+      xmlXPathFreeObject(result);
+    }
+  }
+  xmlXPathFreeObject(spellbooks);
+  xmlXPathFreeContext(xpath);
+  return 0;
+}
+
 static int parse_spells(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1505,7 +1558,7 @@ static int parse_spells(xmlDocPtr doc)
         sp->syntax = strdup((const char *)propValue);
         xmlFree(propValue);
       }
-
+#ifdef TODO /* no longer need it, spellbooks! */
       /* magic type */
       propValue = xmlGetProp(node, BAD_CAST "type");
       assert(propValue != NULL);
@@ -1515,7 +1568,7 @@ static int parse_spells(xmlDocPtr doc)
       }
       assert(sp->magietyp != MAXMAGIETYP);
       xmlFree(propValue);
-
+#endif
       /* level, rank and flags */
       sp->level = xml_ivalue(node, "level", -1);
       sp->rank = (char)xml_ivalue(node, "rank", -1);
@@ -2332,6 +2385,7 @@ void register_xmlreader(void)
   xml_register_callback(parse_buildings);       /* requires resources */
   xml_register_callback(parse_ships);   /* requires terrains */
   xml_register_callback(parse_spells);  /* requires resources */
+  xml_register_callback(parse_spellbooks);  /* requires spells */
   xml_register_callback(parse_equipment);       /* requires spells */
   xml_register_callback(parse_races);   /* requires spells */
   xml_register_callback(parse_calendar);

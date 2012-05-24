@@ -112,8 +112,9 @@ void test_cleanup(void)
   global.functions.maintenance = NULL;
   global.functions.wage = NULL;
   default_locale = 0;
-  locales = 0; /* TODO: this is evil and leaky */
-  free_spells(); /* TODO: this is just as bad! */
+  free_locales(); /* TODO: this is evil and leaky */
+  free_spells();
+  free_spellbooks();
   free_gamedata();
 }
 

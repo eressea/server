@@ -25,7 +25,7 @@ extern "C" {
 #include "curse.h"
   struct fighter;
   struct building;
-  struct quicklist;
+  struct spellbook;
 
 /* ------------------------------------------------------------- */
 
@@ -385,6 +385,8 @@ typedef struct sc_mage {
     struct storage *store);
   extern double MagicPower(void);
 
+  extern struct spellbook * get_spellbook(const char * name);
+  extern void free_spellbooks(void);
 #ifdef __cplusplus
 }
 #endif

@@ -38,6 +38,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/teleport.h>
 #include <kernel/faction.h>
 #include <kernel/save.h>
+#include <kernel/spell.h>
 
 #include <gamecode/creport.h>
 #include <gamecode/economy.h>
@@ -684,6 +685,7 @@ static int tolua_set_alliance_name(lua_State * L)
   return 0;
 }
 
+#ifdef WRITE_SPELLS
 #include <libxml/tree.h>
 #include <util/functions.h>
 #include <util/xml.h>
@@ -755,6 +757,7 @@ static int tolua_write_spells(lua_State * L)
   xmlFreeDoc(doc);
   return 0;
 }
+#endif
 
 static int config_get_ships(lua_State * L)
 {
@@ -975,6 +978,7 @@ static int tolua_get_spell_text(lua_State * L)
   return 1;
 }
 
+#ifdef TODO
 static int tolua_get_spell_school(lua_State * L)
 {
   spell *self = (spell *) tolua_tousertype(L, 1, 0);
@@ -988,6 +992,7 @@ static int tolua_get_spell_level(lua_State * L)
   lua_pushnumber(L, self->level);
   return 1;
 }
+#endif
 
 static int tolua_get_spell_name(lua_State * L)
 {
@@ -1177,8 +1182,10 @@ int tolua_eressea_open(lua_State * L)
     {
       tolua_function(L, TOLUA_CAST "__tostring", tolua_get_spell_name);
       tolua_variable(L, TOLUA_CAST "name", tolua_get_spell_name, 0);
+#ifdef TODO
       tolua_variable(L, TOLUA_CAST "school", tolua_get_spell_school, 0);
       tolua_variable(L, TOLUA_CAST "level", tolua_get_spell_level, 0);
+#endif
       tolua_variable(L, TOLUA_CAST "text", tolua_get_spell_text, 0);
     } tolua_endmodule(L);
     tolua_module(L, TOLUA_CAST "eventbus", 1);
@@ -1263,7 +1270,9 @@ int tolua_eressea_open(lua_State * L)
     tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
     tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
     tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
+#ifdef WRITE_SPELLS
     tolua_function(L, TOLUA_CAST "write_spells", tolua_write_spells);
+#endif
     tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
   } tolua_endmodule(L);
   return 1;

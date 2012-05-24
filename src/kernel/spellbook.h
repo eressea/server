@@ -24,19 +24,25 @@ extern "C" {
 #endif
 
 struct spell;
+struct quicklist;
 
 typedef struct spellbook_entry {
   struct spell * sp;
   int level;
 } spellbook_entry;
 
-typedef struct quicklist spellbook;
+typedef struct spellbook
+{
+  char * name;
+  struct quicklist * spells;
+} spellbook;
 
-spellbook * school_books[MAXMAGIETYP];
+spellbook * create_spellbook(const char * name);
 
-void spellbook_add(spellbook **sbp, struct spell * sp, int level);
+void spellbook_add(spellbook *sbp, struct spell * sp, int level);
 int spellbook_foreach(spellbook *sb, int (*callback)(spellbook_entry *, void *), void * data);
 void spellbook_free(spellbook *sb);
+spellbook_entry * spellbook_get(spellbook *sb, const char * name);
 
 #ifdef __cplusplus
 }

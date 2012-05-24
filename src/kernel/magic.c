@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/types.h>
 #include "magic.h"
 
 #include "building.h"
@@ -35,6 +36,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
+#include "spellbook.h"
 #include "teleport.h"
 #include "terrain.h"
 #include "unit.h"
@@ -49,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/critbit.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -2923,4 +2926,29 @@ struct quicklist **get_spelllist(struct sc_mage *mage, struct faction *f)
     return &mage->spells;
   }
   return NULL;
+}
+
+static critbit_tree cb_spellbooks;
+
+spellbook * get_spellbook(const char * name)
+{
+  char buffer[64];
+  spellbook * result;
+  const void * match;
+
+  if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0)) {
+    cb_get_kv(match, &result, sizeof(result));
+  } else {
+    size_t len = strlen(name);
+    result = create_spellbook(name);
+    assert(strlen(name)+sizeof(result)<sizeof(buffer));
+    len = cb_new_kv(name, len, &result, sizeof(result), buffer);
+    cb_insert(&cb_spellbooks, buffer, len);
+  }
+  return result;
+}
+
+void free_spellbooks(void)
+{
+  cb_clear(&cb_spellbooks);
 }

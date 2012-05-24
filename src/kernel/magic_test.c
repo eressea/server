@@ -14,21 +14,55 @@ void test_updatespells(CuTest * tc)
 {
   struct faction * f;
   spell * sp;
-  spellbook * book = 0;
+  spellbook *book = 0;
 
   test_cleanup();
   
   f = test_create_faction(0);
   sp = create_spell("testspell", 0);
   CuAssertPtrNotNull(tc, sp);
-  spellbook_add(&book, sp, 1);
+
+  book = create_spellbook("spells");
+  CuAssertPtrNotNull(tc, book);
+  spellbook_add(book, sp, 1);
 
   update_spellbook(f, 1);
+}
+
+void test_spellbooks(CuTest * tc)
+{
+  spell *sp;
+  spellbook *herp, *derp;
+  spellbook_entry *entry;
+  const char * sname = "herpderp";
+  test_cleanup();
+
+  herp = get_spellbook("herp");
+  derp = get_spellbook("derp");
+  CuAssertPtrNotNull(tc, herp);
+  CuAssertPtrNotNull(tc, derp);
+  CuAssertTrue(tc, derp!=herp);
+  CuAssertStrEquals(tc, "herp", herp->name);
+  CuAssertStrEquals(tc, "derp", derp->name);
+
+  sp = create_spell(sname, 0);
+  spellbook_add(herp, sp, 1);
+  CuAssertPtrNotNull(tc, sp);
+  entry = spellbook_get(herp, sname);
+  CuAssertPtrNotNull(tc, entry);
+  CuAssertPtrEquals(tc, sp, entry->sp);
+  CuAssertPtrEquals(tc, 0, spellbook_get(derp, sname));
+
+  test_cleanup();
+  herp = get_spellbook("herp");
+  CuAssertPtrNotNull(tc, herp);
+  CuAssertPtrEquals(tc, 0, spellbook_get(herp, sname));
 }
 
 CuSuite *get_magic_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
   SUITE_ADD_TEST(suite, test_updatespells);
+  SUITE_ADD_TEST(suite, test_spellbooks);
   return suite;
 }

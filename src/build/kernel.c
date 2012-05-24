@@ -34,6 +34,7 @@
 #include <kernel/ship.c>
 #include <kernel/skill.c>
 #include <kernel/spell.c>
+#include <kernel/spellbook.c>
 #include <kernel/teleport.c>
 #include <kernel/terrain.c>
 #include <kernel/textstore.c>
