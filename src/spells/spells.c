@@ -3135,7 +3135,7 @@ static int sp_magicboost(castorder * co)
     assert(ct_magicboost != NULL);
   }
   /* fehler, wenn schon ein boost */
-  if (is_cursed(mage->attribs, C_MBOOST, 0) == true) {
+  if (is_cursed(mage->attribs, C_MBOOST, 0)) {
     report_failure(mage, co->order);
     return 0;
   }
@@ -4047,13 +4047,13 @@ static int sp_pump(castorder * co)
       see = true;
   }
 
-  if (see == false) {
+  if (see) {
+    ADDMSG(&mage->faction->msgs, msg_message("pump_effect", "mage unit tregion",
+        mage, target, rt));
+  } else {
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "spellfail_pump",
         "target tregion", target, rt));
     return cast_level / 2;
-  } else {
-    ADDMSG(&mage->faction->msgs, msg_message("pump_effect", "mage unit tregion",
-        mage, target, rt));
   }
 
   u =
@@ -6487,7 +6487,6 @@ static spelldata spell_functions[] = {
   { "treewalkexit", sp_treewalkexit, 0},
   { "holyground", sp_holyground, 0},
   { "summonent", sp_summonent, 0},
-  { "gwyrrdfamiliar", sp_summon_familiar, 0},
   { "blessstonecircle", sp_blessstonecircle, 0},
   { "barkskin", sp_armorshield, 0},
   { "summonfireelemental", sp_drought, 0},
@@ -6516,7 +6515,6 @@ static spelldata spell_functions[] = {
   { "deathcloud", sp_deathcloud, patzer_peasantmob},
   { "summondragon", sp_summondragon, patzer_peasantmob},
   { "summonshadowlords", sp_summonshadowlords, patzer_peasantmob},
-  { "draigfamiliar", sp_summon_familiar, 0},
   { "chaossuction", sp_chaossuction, patzer_peasantmob},
   /* M_ILLAUN */
   { "sparkledream", sp_sparkle, 0},
@@ -6535,7 +6533,6 @@ static spelldata spell_functions[] = {
   { "wisps", 0, 0}, /* this spell is gone */
   { "gooddreams", sp_gooddreams, 0},
   { "illaundestroymagic", sp_destroy_magic, 0},
-  { "illaunfamiliar", sp_summon_familiar, 0},
   { "clone", sp_clonecopy, 0},
   { "bad_dreams", sp_baddreams, 0},
   { "mindblast", sp_mindblast_temp, 0},
@@ -6598,7 +6595,6 @@ static spelldata spell_functions[] = {
   { "view_reality", sp_viewreality, 0},
   { "double_time", sp_speed2, 0},
   { "armor_shield", sp_armorshield, 0},
-  { "summon_familiar", sp_summon_familiar, 0},
   { "living_rock", sp_movecastle, 0},
   { "astral_disruption", sp_disruptastral, 0},
   { "sacrifice_strength", sp_permtransfer, 0},

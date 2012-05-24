@@ -184,60 +184,6 @@ void init_crtdbg(void)
 }
 #endif
 
-static void dump_spells(void)
-{
-  struct locale *loc = find_locale("de");
-  FILE *F = fopen("spells.csv", "w");
-  quicklist *ql;
-  int qi;
-
-  for (ql = spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-    spell *sp = (spell *) ql_get(ql, qi);
-    spell_component *spc = sp->components;
-    char components[128];
-    components[0] = 0;
-    for (; spc->type; ++spc) {
-      strcat(components, LOC(loc, spc->type->_name[0]));
-      strcat(components, ",");
-    }
-    fprintf(F, "%s;%d;%s;%s\n", LOC(loc, mkname("spell", sp->sname)), sp->level,
-      LOC(loc, mkname("school", magic_school[sp->magietyp])), components);
-  }
-  fclose(F);
-}
-
-static void dump_skills(void)
-{
-  struct locale *loc = find_locale("de");
-  FILE *F = fopen("skills.csv", "w");
-  race *rc;
-  skill_t sk;
-  fputs("\"Rasse\",", F);
-  for (rc = races; rc; rc = rc->next) {
-    if (playerrace(rc)) {
-      fprintf(F, "\"%s\",", LOC(loc, mkname("race", rc->_name[0])));
-    }
-  }
-  fputc('\n', F);
-
-  for (sk = 0; sk != MAXSKILLS; ++sk) {
-    const char *str = skillname(sk, loc);
-    if (str) {
-      fprintf(F, "\"%s\",", str);
-      for (rc = races; rc; rc = rc->next) {
-        if (playerrace(rc)) {
-          if (rc->bonus[sk])
-            fprintf(F, "%d,", rc->bonus[sk]);
-          else
-            fputc(',', F);
-        }
-      }
-      fputc('\n', F);
-    }
-  }
-  fclose(F);
-}
-
 void locale_init(void)
 {
   setlocale(LC_CTYPE, "");
@@ -252,7 +198,6 @@ extern void bind_eressea(struct lua_State *L);
 
 int main(int argc, char **argv)
 {
-  static int write_csv = 0;
   int err, result = 0;
 
   setup_signal_handler();
@@ -280,11 +225,6 @@ int main(int argc, char **argv)
   register_curses();
   register_spells();
   bind_eressea((struct lua_State *)global.vm_state);
-
-  if (write_csv) {
-    dump_skills();
-    dump_spells();
-  }
 
   err = eressea_run(luafile, entry_point);
   if (err) {

@@ -196,7 +196,7 @@ int sp_petrify(struct castorder * co)
   while (force && stoned < enemies) {
     troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     unit *du = dt.fighter->unit;
-    if (is_magic_resistant(mage, du, 0) == false) {
+    if (!is_magic_resistant(mage, du, 0)) {
       /* person ans ende hinter die lebenden schieben */
       remove_troop(dt);
       ++stoned;
@@ -253,7 +253,7 @@ int sp_stun(struct castorder * co)
     unit *du = df->unit;
 
     --force;
-    if (is_magic_resistant(mage, du, 0) == false) {
+    if (!is_magic_resistant(mage, du, 0)) {
       df->person[dt.index].flags |= FL_STUNNED;
       ++stunned;
     }
@@ -1071,7 +1071,7 @@ int sp_flee(struct castorder * co)
         ++panik;
       } else if (!(df->person[n].flags & FL_COURAGE)
         || !fval(df->unit->race, RCF_UNDEAD)) {
-        if (is_magic_resistant(mage, df->unit, 0) == false) {
+        if (!is_magic_resistant(mage, df->unit, 0)) {
           df->person[n].flags |= FL_PANICED;
           ++panik;
         }
@@ -1241,7 +1241,7 @@ int sp_frighten(struct castorder * co)
     if (df->person[dt.index].flags & FL_COURAGE) {
       df->person[dt.index].flags &= ~(FL_COURAGE);
     }
-    if (is_magic_resistant(mage, df->unit, 0) == false) {
+    if (!is_magic_resistant(mage, df->unit, 0)) {
       df->person[dt.index].attack -= at_malus;
       df->person[dt.index].defence -= df_malus;
       targets++;
@@ -1287,7 +1287,7 @@ int sp_tiredsoldiers(struct castorder * co)
 
     assert(!helping(fi->side, df->side));
     if (!(df->person[t.index].flags & FL_TIRED)) {
-      if (is_magic_resistant(mage, df->unit, 0) == false) {
+      if (!is_magic_resistant(mage, df->unit, 0)) {
         df->person[t.index].flags = df->person[t.index].flags | FL_TIRED;
         df->person[t.index].defence -= 2;
         ++n;
