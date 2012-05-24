@@ -46,6 +46,7 @@ extern "C" {
       const struct spell *sp;
     } data;
     int flags;
+    int level;
   } att;
 
   struct param;

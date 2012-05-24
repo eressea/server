@@ -453,7 +453,7 @@ static int tolua_unit_addnotice(lua_State * L)
   return 0;
 }
 
-static void unit_castspell(unit * u, const char *name)
+static void unit_castspell(unit * u, const char *name, int level)
 {
   quicklist *ql = spells;
   int qi;
@@ -465,7 +465,7 @@ static void unit_castspell(unit * u, const char *name)
         log_error("spell '%s' has no function.\n", sp->sname);
       } else {
         castorder co;
-        create_castorder(&co, u, 0, sp, u->region, sp->level, sp->level * MagicPower(), 0, 0, 0);
+        create_castorder(&co, u, 0, sp, u->region, level, level * MagicPower(), 0, 0, 0);
         sp->cast(&co);
         free_castorder(&co);
       }
@@ -477,7 +477,9 @@ static int tolua_unit_castspell(lua_State * L)
 {
   unit *self = (unit *) tolua_tousertype(L, 1, 0);
   const char *str = tolua_tostring(L, 2, 0);
-  unit_castspell(self, str);
+  int level = (int)tolua_tonumber(L, 3, 1);
+
+  unit_castspell(self, str, level);
   return 0;
 }
 

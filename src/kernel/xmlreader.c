@@ -1956,6 +1956,10 @@ static int parse_races(xmlDocPtr doc)
         xmlFree(propValue);
       } else {
         attack->data.sp = xml_spell(node, "spell");
+        if (attack->data.sp) {
+          attack->level = xml_ivalue(node, "level", 0);
+          assert(attack->level > 0 || attack->data.sp->level > 0); /* magical attacks need a level */
+        }
       }
       attack->type = xml_ivalue(node, "type", 0);
       attack->flags = xml_ivalue(node, "flags", 0);

@@ -165,7 +165,6 @@ typedef struct sc_mage {
     fumble_f patzer;
 
     /* this is not so much the spell's data, but the school's studying data */
-    magic_t __magietyp;
     int level;                  /* Stufe des Zaubers */
   } spell;
 
