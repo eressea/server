@@ -9,6 +9,6 @@
   <attack type="4" damage="2d20"/>
   <attack type="4" damage="2d20"/>
   <attack type="4" damage="3d30"/>
-  <attack type="6" spell="icy_dragonbreath"/>
+  <attack type="6" spell="icy_dragonbreath" level="6" />
 </race>
 

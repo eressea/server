@@ -7,5 +7,5 @@
   <attack type="4" damage="3d20"/>
   <attack type="4" damage="3d20"/>
   <attack type="4" damage="5d30"/>
-  <attack type="6" spell="powerful_dragonbreath"/>
+  <attack type="6" spell="powerful_dragonbreath" level="12" />
 </race>

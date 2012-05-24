@@ -8,6 +8,6 @@
   <attack type="4" damage="1d30"/>
   <attack type="4" damage="1d30"/>
   <attack type="4" damage="1d30"/>
-  <attack type="6" spell="fiery_dragonbreath"/>
+  <attack type="6" spell="fiery_dragonbreath" level="3" />
 </race>
 

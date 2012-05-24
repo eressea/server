@@ -383,7 +383,7 @@
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
     <attack type="1" damage="1d4"/>
-    <attack type="6" spell="fiery_dragonbreath"/>
+    <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
   <race name="ghost" magres="0.800000" maxaura="0.500000" regaura="0.100000" weight="500" capacity="540" speed="1.0" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes" invinciblenonmagic="yes">
     <ai splitsize="5000"/>
@@ -508,7 +508,7 @@
     <attack type="4" damage="2d4"/>
     <attack type="4" damage="2d4"/>
     <attack type="4" damage="2d4"/>
-    <attack type="6" spell="fiery_dragonbreath"/>
+    <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
 
   <race name="rat" magres="0.000000" maxaura="0.000000" regaura="0.000000" weight="100" capacity="540" speed="1.0" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes">
@@ -889,7 +889,7 @@
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
-    <attack type="6" spell="fiery_dragonbreath"/>
+    <attack type="6" spell="fiery_dragonbreath" level="3" />
     <attack type="8" damage="1d10"/>
   </race>
 
