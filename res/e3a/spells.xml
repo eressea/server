@@ -9,7 +9,27 @@
   <xi:include href="spellbooks/cerddor.xml"/>
   <xi:include href="spellbooks/tybied.xml"/>
 
-    <!-- new illaun -->
+  <!-- shared spells -->
+  <spell name="create_roi" ship="true" rank="5" index="130">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_aots" ship="true" rank="5" index="125">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="disturbingdreams" rank="5" index="50" far="true">
+    <!-- Schlechter Schlaf -->
+    <resource name="aura" amount="18" cost="fixed"/>
+  </spell>
+
+  <!-- new illaun -->
   <spell name="shadowknights" type="illaun" rank="4" level="1" index="147" variable="true" combat="1">
     <!-- Schattenritter -->
     <resource name="aura" amount="1" cost="level"/>
@@ -51,10 +71,6 @@
   <spell name="reanimate" type="illaun" rank="4" level="5" index="85" variable="true" combat="3">
     <!-- Wiederbelebung -->
     <resource name="aura" amount="1" cost="level"/>
-  </spell>
-  <spell name="disturbingdreams" type="illaun" rank="5" level="6" index="50" far="true">
-    <!-- Schlechter Schlaf -->
-    <resource name="aura" amount="18" cost="fixed"/>
   </spell>
   <spell name="sleep" type="illaun" rank="5" level="7" index="52" variable="true" combat="2">
     <!-- Schlaf -->
@@ -449,20 +465,6 @@
     <resource name="dragonblood" amount="1" cost="fixed"/><!-- Drachenblut -->
   </spell>
 
-  <spell name="create_roi" type="tybied" ship="true" rank="5" level="7" index="130">
-    <!-- Erschaffe einen Ring der Unsichtbarkeit -->
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
-  <spell name="create_aots" type="tybied" ship="true" rank="5" level="6" index="125">
-    <!-- Erschaffe ein Amulett des wahren Sehens -->
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
   <spell name="auratransfer" type="tybied" rank="1" level="5" index="31" syntax="aura" parameters="ui" ship="true">
     <!-- Auratransfer -->
     <resource name="aura" amount="1" cost="fixed"/>
@@ -550,9 +552,6 @@
   <spell name="forestfire" type="common" rank="5" level="10" index="47" far="true">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="oil" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="disturbingdreams" type="common" rank="5" level="6" index="50" far="true">
-    <resource name="aura" amount="18" cost="fixed"/>
   </spell>
   <spell name="appeasement" type="common" rank="5" level="1" index="51" variable="true" combat="1">
     <resource name="aura" amount="2" cost="fixed"/>

@@ -8,6 +8,21 @@
   <xi:include href="spellbooks/cerddor.xml"/>
   <xi:include href="spellbooks/tybied.xml"/>
 
+  <!-- shared spells -->
+  <spell name="create_roi" ship="true" rank="5" index="130">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_aots" ship="true" rank="5" index="125">
+    <function name="cast" value="lua_castspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
   <spell name="fireball" type="draig" rank="5" level="2" index="4" variable="true" combat="2">
     <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
@@ -350,23 +365,8 @@
     <resource name="aura" amount="350" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
-  <spell name="illaunfamiliar" type="illaun" rank="5" level="9" index="118">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="gwyrrdfamiliar" type="gwyrrd" rank="5" level="10" index="119">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="draigfamiliar" type="draig" rank="5" level="13" index="120">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="summon_familiar" type="cerddor" rank="5" level="9" index="121">
-    <resource name="aura" amount="100" cost="fixed"/>
-    <resource name="permaura" amount="5" cost="fixed"/>
-  </spell>
-  <spell name="summon_familiar" type="tybied" rank="5" level="12" index="122">
+  <spell name="summon_familiar" rank="5" index="122">
+    <function name="cast" value="cast_familiar"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
@@ -501,23 +501,9 @@
   </spell>
 
   <!-- draig spells -->
-  <spell name="create_roi" type="draig" ship="true" rank="5" level="6" index="130">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
-
   <spell name="earn_silver#draig" type="draig" ship="true" variable="true" rank="5" level="1" index="159">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
-  </spell>
-
-  <spell name="create_aots" type="draig" ship="true" rank="5" level="6" index="125">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_firesword" type="draig" ship="true" rank="5" level="12" index="148">
@@ -541,23 +527,9 @@
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
-  <spell name="create_roi" type="gwyrrd" ship="true" rank="5" level="6" index="129">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
-
   <spell name="earn_silver#gwyrrd" type="gwyrrd" ship="true" variable="true" rank="5" level="1" index="159">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
-  </spell>
-
-  <spell name="create_aots" type="gwyrrd" ship="true" rank="5" level="6" index="124">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_magicherbbag" type="gwyrrd" ship="true" rank="5" level="5" index="165">
@@ -568,23 +540,9 @@
   </spell>
 
   <!-- illaun spells -->
-  <spell name="create_roi" type="illaun" ship="true" rank="5" level="6" index="131">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
-
   <spell name="earn_silver#illaun" type="illaun" ship="true" variable="true" rank="5" level="1" index="159">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
-  </spell>
-
-  <spell name="create_aots" type="illaun" ship="true" rank="5" level="6" index="126">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_dreameye" type="illaun" ship="true" rank="5" level="14" index="149">
@@ -606,23 +564,10 @@
     <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="create_roi" type="cerddor" ship="true" rank="5" level="6" index="132">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
 
   <spell name="earn_silver#cerddor" type="cerddor" ship="true" variable="true" rank="5" level="1" index="159">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
-  </spell>
-
-  <spell name="create_aots" type="cerddor" ship="true" rank="5" level="6" index="127">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_roqf" type="cerddor" ship="true" rank="5" level="11" index="63">
@@ -645,23 +590,9 @@
   </spell>
 
   <!-- tybied spells -->
-  <spell name="create_roi" type="tybied" ship="true" rank="5" level="6" index="133">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
-  </spell>
-
   <spell name="earn_silver#tybied" type="tybied" ship="true" variable="true" rank="5" level="1" index="159">
     <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
-  </spell>
-
-  <spell name="create_aots" type="tybied" ship="true" rank="5" level="6" index="128">
-    <function name="cast" value="lua_castspell"/>
-    <resource name="aura" amount="50" cost="fixed"/>
-    <resource name="money" amount="3000" cost="fixed"/>
-    <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_antimagic" type="tybied" ship="true" rank="5" level="7" index="38">
