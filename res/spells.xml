@@ -1,5 +1,13 @@
 <?xml version="1.0"?>
-<spells>
+<spells xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="spellbooks/gray.xml"/>
+  <xi:include href="spellbooks/gwyrrd.xml"/>
+  <xi:include href="spellbooks/draig.xml"/>
+  <xi:include href="spellbooks/illaun.xml"/>
+  <xi:include href="spellbooks/cerddor.xml"/>
+  <xi:include href="spellbooks/tybied.xml"/>
+
   <!-- draig spells -->
   <spell name="create_roi" type="draig" ship="true" rank="5" level="6" index="130">
     <function name="cast" value="lua_castspell"/>

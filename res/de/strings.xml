@@ -3978,10 +3978,6 @@
       <text locale="de">Zeitdehnung</text>
       <text locale="en">Double Time</text>
     </string>
-    <string name="summon_familiar">
-      <text locale="de">Vertrauten rufen</text>
-      <text locale="en">Summon Familiar</text>
-    </string>
     <string name="armor_shield">
       <text locale="de">Rüstschild</text>
       <text locale="en">Shield Shine</text>
@@ -4440,9 +4436,9 @@
       <text locale="de">Erschaffe ein Flammenschwert</text>
       <text locale="en">Create A Flamesword</text>
     </string>
-    <string name="draigfamiliar">
+    <string name="summon_familiar">
       <text locale="de">Vertrauten rufen</text>
-      <text locale="en">Call Familiar</text>
+      <text locale="en">Summon Familiar</text>
     </string>
     <string name="chaossuction">
       <text locale="de">Chaossog</text>
@@ -4527,10 +4523,6 @@
     <string name="illaundestroymagic">
       <text locale="de">Traumbilder entwirren</text>
       <text locale="en">Remove Dreams</text>
-    </string>
-    <string name="illaunfamiliar">
-      <text locale="de">Vertrauten rufen</text>
-      <text locale="en">Call Familiar</text>
     </string>
     <string name="mindblast">
       <text locale="de">Tod des Geistes</text>
@@ -4711,13 +4703,6 @@
       werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder 
       zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der 
       Kraft seines Gesangs ab.
-      </text>
-    </string>
-    <string name="summon_familiar">
-      <text locale="de">
-      Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein 
-      ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem 
-      Magier anschließen wird.
       </text>
     </string>
     <string name="migration">
@@ -4904,13 +4889,6 @@
         Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die
         materielle Ebene blicken und die Regionen und Einheiten genau
         erkennen.
-      </text>
-    </string>
-    <string name="summon_familiar">
-      <text locale="de">
-        Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein 
-        ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem 
-        Magier anschließen wird.
       </text>
     </string>
     <string name="living_rock">
@@ -6127,7 +6105,7 @@
         minor one of their kind to fulfill the sword
         with his power.'</text>
     </string>
-    <string name="draigfamiliar">
+    <string name="summon_familiar">
       <text locale="de">Einem erfahrenen Magier wird
         irgendwann auf seinen Wanderungen ein
         ungewöhnliches Exemplar einer Gattung begegnen,
