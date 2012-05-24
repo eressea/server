@@ -1481,9 +1481,13 @@ static int parse_spellbooks(xmlDocPtr doc)
       spellbook * sb;
       
       propValue = xmlGetProp(node, BAD_CAST "name");
-      assert(propValue != NULL);
-      sb = get_spellbook((const char *)propValue);
-      xmlFree(propValue);
+      if (propValue) {
+        sb = get_spellbook((const char *)propValue);
+        xmlFree(propValue);
+      } else {
+        log_error("spellbook at index '%d' has n name\n", i);
+        continue;
+      }
 
       xpath->node = node;
       result = xmlXPathEvalExpression(BAD_CAST "entry", xpath);
@@ -1494,7 +1498,7 @@ static int parse_spellbooks(xmlDocPtr doc)
           spell * sp = 0;
           int level = xml_ivalue(node, "level", -1);
 
-          propValue = xmlGetProp(node, BAD_CAST "name");
+          propValue = xmlGetProp(node, BAD_CAST "spell");
           if (propValue) {
             sp = find_spell((const char *)propValue);
             xmlFree(propValue);
