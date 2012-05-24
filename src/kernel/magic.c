@@ -393,30 +393,6 @@ static boolean already_seen(const faction * f, const spell * sp)
   return false;
 }
 
-static boolean know_school(const faction * f, magic_t school)
-{
-  static int common = MAXMAGIETYP;
-  if (f->magiegebiet == school)
-    return true;
-  if (common == MAXMAGIETYP) {
-    const char *common_school =
-      get_param(global.parameters, "rules.magic.common");
-    if (common_school) {
-      for (common = 0; common != MAXMAGIETYP; ++common) {
-        if (strcmp(common_school, magic_school[common]) == 0)
-          break;
-      }
-      if (common == MAXMAGIETYP) {
-        common = M_NONE;
-      }
-    } else {
-      return false;
-    }
-  }
-  return school == common;
-}
-
-#define COMMONSPELLS 1          /* number of new common spells per level */
 #define MAXSPELLS 256
 
 static boolean has_spell(quicklist * ql, const spell * sp)
@@ -425,93 +401,100 @@ static boolean has_spell(quicklist * ql, const spell * sp)
   return ql_set_find(&ql, &qi, sp) != 0;
 }
 
-/** update the spellbook with a new level
-* Written for E3
-*/
-void update_spellbook(faction * f, int level)
+static void update_spells(faction * f, sc_mage * mage, int level, const spellbook *book)
 {
-  spell *commonspells[MAXSPELLS];
-  int qi, numspells = 0;
-  quicklist *ql;
+  boolean ismonster = is_monsters(f);
+  quicklist **dst, *ql = book->spells;
+  int qi;
 
-  for (qi = 0, ql = spells; ql; ql_advance(&ql, &qi, 1)) {
-    spell *sp = (spell *) ql_get(ql, qi);
-    if (sp->magietyp == M_COMMON && level > f->max_spelllevel
-      && sp->level <= level) {
-      commonspells[numspells++] = sp;
-    } else {
-      if (know_school(f, sp->magietyp) && sp->level <= level) {
-        ql_set_insert(&f->spellbook, sp);
+  dst = get_spelllist(mage, f);
+  for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+    spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
+    if (sbe->level <= level) {
+      spell * sp = sbe->sp;
+
+      if (!u_hasspell(mage, sp)) {
+        add_spell(dst, sp);
+        add_spellname(mage, sp);
+      }
+      if (!ismonster && !already_seen(f, sp)) {
+        a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
+        a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
       }
     }
-  }
-  while (numspells > 0 && level > f->max_spelllevel) {
-    int i;
-    for (i = 0; i != COMMONSPELLS; ++i) {
-      int maxspell = numspells;
-      int spellno = -1;
-      spell *sp;
-      do {
-        if (spellno == maxspell) {
-          --maxspell;
-        }
-        spellno = rng_int() % maxspell;
-        sp = commonspells[spellno];
-      }
-      while (maxspell > 0 && sp && sp->level <= f->max_spelllevel
-        && !has_spell(f->spellbook, sp));
-
-      if (sp) {
-        ql_set_insert(&f->spellbook, sp);
-        commonspells[spellno] = 0;
-      }
-    }
-    ++f->max_spelllevel;
   }
 }
 
 void updatespelllist(unit * u)
 {
   int sk = eff_skill(u, SK_MAGIC, u->region);
-  quicklist *ql = spells;
-  int qi;
   struct sc_mage *mage = get_mage(u);
-  boolean ismonster = is_monsters(u->faction);
-  quicklist **dst;
 
-  if (mage->magietyp == M_GRAY) {
-    /* Magier mit M_GRAY bekommen weder Sprüche angezeigt noch
-     * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
-     * Drachen, die noch den Skill Magie haben, und alle familiars */
+  /* Magier mit M_GRAY bekommen weder Sprüche angezeigt noch
+    * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
+    * Drachen, die noch den Skill Magie haben, und alle familiars */
+  if (mage->magietyp != M_GRAY) {
+    spellbook * book;
+    book = get_spellbook(magic_school[mage->magietyp]);
+    update_spells(u->faction, mage, sk, book);
+
+    if (FactionSpells()) {
+      update_spells(u->faction, mage, sk, u->faction->spellbook);
+    }
+  }
+}
+
+/** update the spellbook with a new level
+* Written for E3
+*/
+void pick_random_spells(faction * f, int level, spellbook * book, int num_spells)
+{
+  spell *commonspells[MAXSPELLS];
+  int qi, numspells = 0;
+  quicklist *ql;
+
+  if (level <= f->max_spelllevel) {
     return;
   }
 
-  if (FactionSpells()) {
-    ql = u->faction->spellbook;
-  }
-  dst = get_spelllist(mage, u->faction);
-
-  for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-    spell *sp = (spell *) ql_get(ql, qi);
-    if (sp->level <= sk) {
-      boolean know = u_hasspell(mage, sp);
-
-      if (know || sp->magietyp == M_COMMON
-        || know_school(u->faction, sp->magietyp)) {
-        faction *f = u->faction;
-
-        if (!know) {
-          add_spell(dst, sp);
-          add_spellname(mage, sp);
-        }
-        if (!ismonster && !already_seen(u->faction, sp)) {
-          a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
-          a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
-        }
-      }
+  for (qi = 0, ql = book->spells; ql; ql_advance(&ql, &qi, 1)) {
+    spellbook_entry * sbe = (spellbook_entry *) ql_get(ql, qi);
+    spell * sp = sbe->sp;
+    if (sbe->level <= level) {
+      commonspells[numspells++] = sp;
     }
   }
 
+  while (numspells > 0 && level > f->max_spelllevel) {
+    int i;
+
+    ++f->max_spelllevel;
+    for (i = 0; i < num_spells; ++i) {
+      int maxspell = numspells;
+      int spellno = -1;
+      spell *sp = 0;
+      while (!sp && maxspell>0) {
+        spellno = rng_int() % maxspell;
+        sp = commonspells[spellno];
+        if (sp->level>f->max_spelllevel) {
+          commonspells[spellno] = commonspells[maxspell];
+          commonspells[maxspell--] = sp;
+          sp = 0;
+        } else if (spellbook_get(f->spellbook, sp)) {
+          commonspells[spellno] = commonspells[numspells--];
+          if (maxspell>numspells) {
+            maxspell = numspells;
+          }
+          sp = 0;
+        }
+      }
+
+      if (spellno<maxspell) {
+        spellbook_add(f->spellbook, sp, f->max_spelllevel);
+        commonspells[spellno] = commonspells[numspells--];
+      }
+    }
+  }
 }
 
 /* ------------------------------------------------------------- */
@@ -950,19 +933,7 @@ boolean knowsspell(const region * r, const unit * u, const spell * sp)
     return false;
   }
   /* steht der Spruch in der Spruchliste? */
-  if (!u_hasspell(mage, sp)) {
-    /* ist der Spruch aus einem anderen Magiegebiet? */
-    if (know_school(u->faction, sp->magietyp)) {
-      return false;
-    }
-    if (eff_skill(u, SK_MAGIC, u->region) >= sp->level) {
-      log_warning("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n", unitname(u), spell_name(sp, default_locale));
-    }
-    return false;
-  }
-
-  /* hier sollten alle potentiellen Fehler abgefangen sein */
-  return true;
+  return u_hasspell(mage, sp)!=0;
 }
 
 /* Um einen Spruch zu beherrschen, muss der Magier die Stufe des
@@ -1318,14 +1289,17 @@ boolean fumble(region * r, unit * u, const spell * sp, int cast_grade)
   struct building *b = inside_building(u);
   const struct building_type *btype = b ? b->type : NULL;
   int fumble_enabled = get_param_int(global.parameters, "magic.fumble.enable", 1);
+  sc_mage * mage;
 
   if (!fumble_enabled) {
     return false;
   }
   if (btype)
     patzer -= btype->fumblebonus;
+
   /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
-  if (sp->magietyp == M_DRAIG) {
+  mage = get_mage(u);
+  if (mage->magietyp == M_DRAIG) {
     patzer += CHAOSPATZERCHANCE;
   }
   if (is_cursed(u->attribs, C_MBOOST, 0)) {

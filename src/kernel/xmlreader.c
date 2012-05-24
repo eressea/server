@@ -1572,8 +1572,8 @@ static int parse_spells(xmlDocPtr doc)
       }
       assert(sp->magietyp != MAXMAGIETYP);
       xmlFree(propValue);
-#endif
       /* level, rank and flags */
+#endif
       sp->level = xml_ivalue(node, "level", -1);
       sp->rank = (char)xml_ivalue(node, "rank", -1);
       if (xml_bvalue(node, "los", false))

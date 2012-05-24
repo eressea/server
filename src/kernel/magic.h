@@ -165,7 +165,7 @@ typedef struct sc_mage {
     fumble_f patzer;
 
     /* this is not so much the spell's data, but the school's studying data */
-    magic_t magietyp;
+    magic_t __magietyp;
     int level;                  /* Stufe des Zaubers */
   } spell;
 
@@ -274,7 +274,7 @@ typedef struct sc_mage {
   /* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
   int u_hasspell(const sc_mage *mage, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
-  void update_spellbook(struct faction *f, int level);
+  void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
   void updatespelllist(struct unit *u);
   /* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner
    * als das aktuelle Magietalent ist, in die Spruchliste der Einheit

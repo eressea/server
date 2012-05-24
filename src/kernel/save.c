@@ -40,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
+#include "spellbook.h"
 #include "terrain.h"
 #include "terrainid.h"          /* only for conversion code */
 #include "unit.h"
@@ -1203,6 +1204,56 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
   return &sf->next;
 }
 
+static struct spellbook *read_spellbook(struct storage *store)
+{
+  spellbook * book = 0;
+  int level;
+  for (level=0;;++level) {
+    spell *sp;
+    char spname[64];
+
+    if (store->version < SPELLNAME_VERSION) {
+      int i = store->r_int(store);
+      if (i < 0)
+        break;
+      sp = find_spellbyid((unsigned int) i);
+    } else {
+      store->r_tok_buf(store, spname, sizeof(spname));
+      if (strcmp(spname, "end") == 0)
+        break;
+      sp = find_spell(spname);
+      if (!sp) {
+        log_error("read_spells: could not find spell '%s'\n", spname);
+      }
+    }
+    if (store->version >= SPELLBOOK_VERSION) {
+      level = store->r_int(store);
+    }
+    if (sp) {
+      if (!book) {
+        book = create_spellbook(0);
+      }
+      spellbook_add(book, sp, level);
+    }
+  }
+  return book;
+}
+
+static void write_spellbook(const struct spellbook *book, struct storage *store)
+{
+  quicklist *ql;
+  int qi;
+
+  if (book) {
+    for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+      spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
+      store->w_tok(store, sbe->sp->sname);
+      store->w_int(store, sbe->level);
+    }
+  }
+  store->w_tok(store, "end");
+}
+
 /** Reads a faction from a file.
  * This function requires no context, can be called in any state. The
  * faction may not already exist, however.
@@ -1340,9 +1391,9 @@ faction *readfaction(struct storage * store)
     }
   }
   read_groups(store, f);
-  f->spellbook = NULL;
+  f->spellbook = 0;
   if (store->version >= REGIONOWNER_VERSION) {
-    read_spells(&f->spellbook, f->magiegebiet, store);
+    f->spellbook = read_spellbook(store);
   }
   return f;
 }
@@ -1405,7 +1456,7 @@ void writefaction(struct storage *store, const faction * f)
   store->w_id(store, 0);
   store->w_brk(store);
   write_groups(store, f->groups);
-  write_spells(f->spellbook, store);
+  write_spellbook(f->spellbook, store);
 }
 
 static void repair_unit(unit * u) {

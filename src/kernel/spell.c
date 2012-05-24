@@ -69,12 +69,30 @@ spell * create_spell(const char * name, unsigned int id)
   return 0;
 }
 
+static const char *sp_aliases[][2] = {
+  {"gwyrrdfamiliar", "summon_familiar"},
+  {"illaunfamiliar", "summon_familiar"},
+  {"draigfamiliar", "summon_familiar"},
+  {NULL, NULL},
+};
+
+static const char *sp_alias(const char *zname)
+{
+  int i;
+  for (i = 0; sp_aliases[i][0]; ++i) {
+    if (strcmp(sp_aliases[i][0], zname) == 0)
+      return sp_aliases[i][1];
+  }
+  return zname;
+}
+
 spell *find_spell(const char *name)
 {
   const char * match;
   spell * sp = 0;
+  const char * alias = sp_alias(name);
 
-  match = cb_find_str(&cb_spells, name);
+  match = cb_find_str(&cb_spells, alias);
   if (match) {
     cb_get_kv(match, &sp, sizeof(sp));
   } else {

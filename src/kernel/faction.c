@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "race.h"
 #include "region.h"
+#include "spellbook.h"
 #include "terrain.h"
 #include "unit.h"
 #include "version.h"
@@ -287,8 +288,8 @@ void destroyfaction(faction * f)
     return;
   fset(f, FFL_QUIT);
 
-  ql_free(f->spellbook);
-  f->spellbook = NULL;
+  spellbook_free(f->spellbook);
+  f->spellbook = 0;
 
   while (f->battles) {
     struct bmsg *bm = f->battles;

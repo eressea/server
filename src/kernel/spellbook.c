@@ -9,7 +9,7 @@
 spellbook * create_spellbook(const char * name)
 {
   spellbook *result = (spellbook *)malloc(sizeof(spellbook));
-  result->name = strdup(name);
+  result->name = name ? strdup(name) : 0;
   result->spells = 0;
   return result;
 }
@@ -52,14 +52,14 @@ int spellbook_foreach(spellbook *sb, int (*callback)(spellbook_entry *, void *),
   return 0;
 }
 
-spellbook_entry * spellbook_get(spellbook *sb, const char * name)
+spellbook_entry * spellbook_get(spellbook *sb, struct spell * sp)
 {
   quicklist *ql;
   int qi;
 
   for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
     spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
-    if (strcmp(name, sbe->sp->sname)==0) {
+    if (sp==sbe->sp) {
       return sbe;
     }
   }

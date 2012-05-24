@@ -20,10 +20,15 @@ int count_spell_cb(spellbook_entry * sbe, void * ptr)
 
 void test_named_spellbooks(CuTest * tc)
 {
-  spell * sp;
-  spellbook * sb;
+  spell *sp;
+  spellbook *sb;
+  spellbook_entry *sbe;
   int counter = 0;
   
+  sb = create_spellbook(0);
+  CuAssertPtrNotNull(tc, sb);
+  CuAssertPtrEquals(tc, 0, sb->name);
+
   sb = create_spellbook("spells");
   CuAssertPtrNotNull(tc, sb);
   CuAssertStrEquals(tc, "spells", sb->name);
@@ -31,6 +36,11 @@ void test_named_spellbooks(CuTest * tc)
   sp = create_spell("testspell", 0);
   spellbook_add(sb, sp, 1);
   CuAssertPtrNotNull(tc, sb->spells);
+
+  sbe = spellbook_get(sb, sp);
+  CuAssertPtrNotNull(tc, sbe);
+  CuAssertIntEquals(tc, 1, sbe->level);
+  CuAssertPtrEquals(tc, sp, sbe->sp);
 
   spellbook_foreach(sb, count_spell_cb, &counter);
   CuAssertIntEquals(tc, 1, counter);

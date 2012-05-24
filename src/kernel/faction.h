@@ -73,7 +73,7 @@ extern "C" {
     char *passw;
     char *override;
     int max_spelllevel;
-    struct quicklist *spellbook;
+    struct spellbook *spellbook;
     const struct locale *locale;
     int lastorders;
     int age;

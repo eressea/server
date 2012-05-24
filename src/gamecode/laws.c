@@ -57,6 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
+#include <kernel/spellbook.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>   /* for volcanoes in emigration (needs a flag) */
@@ -3692,6 +3693,7 @@ static void defaultorders(void)
 /* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
 /* GANZ WICHTIG! FÜGT AUCH NEUE ZAUBER IN DIE LISTE DER BEKANNTEN EIN */
 /* ************************************************************ */
+#define COMMONSPELLS 1          /* number of new common spells per level */
 #define MAXMAGES 128            /* should be enough */
 static void update_spells(void)
 {
@@ -3717,7 +3719,14 @@ static void update_spells(void)
       }
 
       if (FactionSpells() && maxlevel > f->max_spelllevel) {
-        update_spellbook(f, maxlevel);
+        static spellbook * common_spells;
+        if (!common_spells) {
+          const char *common_school = get_param(global.parameters, "rules.magic.common");
+          common_spells = get_spellbook(common_school ? common_school : "common");
+        }
+        if (common_spells) {
+          pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
+        }
       }
       for (i = 0; i != n; ++i) {
         updatespelllist(mages[i]);
