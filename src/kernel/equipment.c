@@ -23,7 +23,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include "item.h"
 #include "unit.h"
+#include "faction.h"
 #include "race.h"
+#include "spellbook.h"
 
 /* util includes */
 #include <util/quicklist.h>
@@ -43,13 +45,9 @@ equipment *create_equipment(const char *eqname)
     struct equipment *eq = *eqp;
     int i = eq ? strcmp(eq->name, eqname) : 1;
     if (i > 0) {
-      eq = malloc(sizeof(equipment));
+      eq = (equipment *)calloc(1, sizeof(equipment));
       eq->name = strdup(eqname);
       eq->next = *eqp;
-      eq->items = NULL;
-      eq->spells = NULL;
-      eq->subsets = NULL;
-      eq->callback = NULL;
       memset(eq->skills, 0, sizeof(eq->skills));
       *eqp = eq;
       break;
@@ -85,10 +83,13 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
   }
 }
 
-void equipment_addspell(equipment * eq, spell * sp)
+void equipment_addspell(equipment * eq, spell * sp, int level)
 {
-  if (eq != NULL) {
-    ql_set_insert(&eq->spells, sp);
+  if (eq) {
+    if (!eq->spellbook) {
+      eq->spellbook = create_spellbook(0);
+    }
+    spellbook_add(eq->spellbook, sp, level);
   }
 }
 
@@ -140,16 +141,18 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
     }
 
     if (mask & EQUIP_SPELLS) {
-      quicklist *ql = eq->spells;
-      if (ql) {
-        int qi;
+      if (eq->spellbook) {
         sc_mage *m = get_mage(u);
+        quicklist * ql = eq->spellbook->spells;
+        int qi;
 
-        assert(m || !"trying to equip spells on a non-mage!");
+        if (!m) {
+          m = create_mage(u, u->faction?u->faction->magiegebiet:M_GRAY);
+        }
         for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-          spell *sp = (spell *) ql_get(ql, qi);
-          add_spell(&m->spells, sp);
-          add_spellname(m, sp);
+          spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
+          add_spell(&m->spells, sbe->sp);
+          add_spellname(m, sbe->sp);
         }
       }
     }

@@ -17,6 +17,7 @@
 #include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
+#include <kernel/equipment_test.c>
 #include <kernel/reports_test.c>
 #include <kernel/spellbook_test.c>
 #include <gamecode/laws_test.c>
@@ -51,6 +52,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_umlaut_suite());
   /* kernel */
   CuSuiteAddSuite(suite, get_curse_suite());
+  CuSuiteAddSuite(suite, get_equipment_suite());
   CuSuiteAddSuite(suite, get_item_suite());
   CuSuiteAddSuite(suite, get_magic_suite());
   CuSuiteAddSuite(suite, get_move_suite());
@@ -101,7 +103,7 @@ struct faction *test_create_faction(const struct race *rc)
 
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
-  unit *u = create_unit(r, f, 1, f->race, 0, 0, 0);
+  unit *u = create_unit(r, f, 1, f?f->race:rc_find("human"), 0, 0, 0);
   return u;
 }
 

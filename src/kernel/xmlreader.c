@@ -1314,7 +1314,8 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
       if (!sp) {
         log_error("no spell '%s' in school '%s' for equipment-set '%s'\n", (const char *)propValue, magic_school[mtype], eq->name);
       } else {
-        equipment_addspell(eq, sp);
+        int level = xml_ivalue(node, "level", sp->level);
+        equipment_addspell(eq, sp, level);
       }
       xmlFree(propValue);
     }
@@ -1438,7 +1439,7 @@ static int parse_equipment(xmlDocPtr doc)
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "spell", xpath);
-        assert(!eq->spells);
+        assert(!eq->spellbook);
         add_spells(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 

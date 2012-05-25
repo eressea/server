@@ -101,6 +101,7 @@
     <ClCompile Include="kernel\connection.c" />
     <ClCompile Include="kernel\curse.c" />
     <ClCompile Include="kernel\equipment.c" />
+    <ClCompile Include="kernel\equipment_test.c" />
     <ClCompile Include="kernel\faction.c" />
     <ClCompile Include="kernel\group.c" />
     <ClCompile Include="kernel\item.c" />

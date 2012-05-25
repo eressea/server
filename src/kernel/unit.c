@@ -1103,22 +1103,13 @@ void set_number(unit * u, int count)
   assert(count >= 0);
   assert(count <= UNIT_MAXSIZE);
 
-#ifndef NDEBUG
-  assert(u->faction || count == 0);
-#endif
-
   if (count == 0) {
     u->flags &= ~(UFL_HERO);
   }
-  if (u->faction) {
-    if (playerrace(u->race)) {
-      u->faction->num_people += count - u->number;
-    }
-    u->number = (unsigned short)count;
-  } else if (u->number > 0) {
-    assert
-      (!"why doesn't this unit have a faction? this will fuck up num_people");
+  if (u->faction && playerrace(u->race)) {
+    u->faction->num_people += count - u->number;
   }
+  u->number = (unsigned short)count;
 }
 
 boolean learn_skill(unit * u, skill_t sk, double chance)
@@ -1415,15 +1406,22 @@ void name_unit(unit * u)
     }
   } else {
     char name[32];
-    static const char * prefix[MAXLOCALES];
-    int i = locale_index(u->faction->locale);
-    if (!prefix[i]) {
-      prefix[i] = LOC(u->faction->locale, "unitdefault");
+    const char * result;
+    const struct locale * lang = u->faction ? u->faction->locale : default_locale;
+    if (lang) {
+      static const char * prefix[MAXLOCALES];
+      int i = locale_index(lang);
       if (!prefix[i]) {
-        prefix[i] = parameters[P_UNIT];
+        prefix[i] = LOC(lang, "unitdefault");
+        if (!prefix[i]) {
+          prefix[i] = parameters[P_UNIT];
+        }
       }
+      result = prefix[i];
+    } else {
+      result = parameters[P_UNIT];
     }
-    snprintf(name, sizeof(name), "%s %s", prefix[i], itoa36(u->no));
+    snprintf(name, sizeof(name), "%s %s", result, itoa36(u->no));
     unit_setname(u, name);
   }
 }
@@ -1436,17 +1434,19 @@ void name_unit(unit * u)
 unit *create_unit(region * r, faction * f, int number, const struct race *urace,
   int id, const char *dname, unit * creator)
 {
-  unit *u = calloc(1, sizeof(unit));
+  unit *u = (unit *)calloc(1, sizeof(unit));
 
   assert(urace);
-  assert(f->alive);
-  u_setfaction(u, f);
+  if (f) {
+    assert(f->alive);
+    u_setfaction(u, f);
 
-  if (f->locale) {
-    order *deford = default_order(f->locale);
-    if (deford) {
-      set_order(&u->thisorder, NULL);
-      addlist(&u->orders, deford);
+    if (f->locale) {
+      order *deford = default_order(f->locale);
+      if (deford) {
+        set_order(&u->thisorder, NULL);
+        addlist(&u->orders, deford);
+      }
     }
   }
   u_seteffstealth(u, -1);
@@ -1473,8 +1473,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
   } else {
     u->name = strdup(dname);
   }
-  if (count_unit(u))
-    f->no_units++;
 
   if (creator) {
     attrib *a;

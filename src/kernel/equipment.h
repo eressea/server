@@ -43,7 +43,7 @@ extern "C" {
     char *name;
     struct itemdata *items;
     char *skills[MAXSKILLS];
-    struct quicklist *spells;
+    struct spellbook *spellbook;
     struct subset *subsets;
     struct equipment *next;
     void (*callback) (const struct equipment *, struct unit *);
@@ -56,7 +56,7 @@ extern "C" {
     const struct item_type *itype, const char *value);
   extern void equipment_setskill(struct equipment *eq, skill_t sk,
     const char *value);
-  extern void equipment_addspell(struct equipment *eq, struct spell *sp);
+  extern void equipment_addspell(struct equipment *eq, struct spell *sp, int level);
   extern void equipment_setcallback(struct equipment *eq,
     void (*callback) (const struct equipment *, struct unit *));
 
