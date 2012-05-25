@@ -68,22 +68,10 @@ void test_spellbooks(CuTest * tc)
   /* CuAssertPtrEquals(tc, 0, spellbook_get(herp, sname)); */
 }
 
-void test_pay_spell(CuTest * tc)
+static spell * test_magic_create_spell(void)
 {
   spell *sp;
-  unit * u;
-  faction * f;
-  region * r;
-
-  test_cleanup();
-  test_create_world();
-  r = findregion(0, 0);
-  f = test_create_faction(0);
-  u = test_create_unit(f, r);
-  CuAssertPtrNotNull(tc, u);
-
   sp = create_spell("testspell", 0);
-  CuAssertPtrNotNull(tc, sp);
 
   sp->components = (spell_component *) calloc(4, sizeof(spell_component));
   sp->components[0].amount = 1;
@@ -95,18 +83,87 @@ void test_pay_spell(CuTest * tc)
   sp->components[2].amount = 1;
   sp->components[2].type = rt_find("horse");
   sp->components[2].cost = SPC_LINEAR;
+  return sp;
+}
+
+void test_pay_spell(CuTest * tc)
+{
+  spell *sp;
+  unit * u;
+  faction * f;
+  region * r;
+  int level;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  u = test_create_unit(f, r);
+  CuAssertPtrNotNull(tc, u);
+
+  sp = test_magic_create_spell();
+  CuAssertPtrNotNull(tc, sp);
 
   set_level(u, SK_MAGIC, 5);
   unit_add_spell(u, 0, sp);
 
-  change_resource(u, rt_find("money"), 1); /* fix costs of 1 money */
-  change_resource(u, rt_find("aura"), 3); /* leveled costs of 3 money */
-  change_resource(u, rt_find("horse"), 3); /* leveled costs of 3 money */
+  change_resource(u, rt_find("money"), 1);
+  change_resource(u, rt_find("aura"), 3);
+  change_resource(u, rt_find("horse"), 3);
 
-  pay_spell(u, sp, 3, 1);
+  level = eff_spelllevel(u, sp, 3, 1);
+  CuAssertIntEquals(tc, 3, level);
+  pay_spell(u, sp, level, 1);
   CuAssertIntEquals(tc, 0, get_resource(u, rt_find("money")));
   CuAssertIntEquals(tc, 0, get_resource(u, rt_find("aura")));
   CuAssertIntEquals(tc, 0, get_resource(u, rt_find("horse")));
+}
+
+void test_pay_spell_failure(CuTest * tc)
+{
+  spell *sp;
+  unit * u;
+  faction * f;
+  region * r;
+  int level;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  u = test_create_unit(f, r);
+  CuAssertPtrNotNull(tc, u);
+
+  sp = test_magic_create_spell();
+  CuAssertPtrNotNull(tc, sp);
+
+  set_level(u, SK_MAGIC, 5);
+  unit_add_spell(u, 0, sp);
+
+  CuAssertIntEquals(tc, 1, change_resource(u, rt_find("money"), 1));
+  CuAssertIntEquals(tc, 2, change_resource(u, rt_find("aura"), 2));
+  CuAssertIntEquals(tc, 3, change_resource(u, rt_find("horse"), 3));
+
+  level = eff_spelllevel(u, sp, 3, 1);
+  CuAssertIntEquals(tc, 2, level);
+  pay_spell(u, sp, level, 1);
+  CuAssertIntEquals(tc, 1, change_resource(u, rt_find("money"), 1));
+  CuAssertIntEquals(tc, 3, change_resource(u, rt_find("aura"), 3));
+  CuAssertIntEquals(tc, 2, change_resource(u, rt_find("horse"), 1));
+
+  level = eff_spelllevel(u, sp, 3, 1);
+  CuAssertIntEquals(tc, 0, level);
+  pay_spell(u, sp, level, 1);
+  CuAssertIntEquals(tc, 0, get_resource(u, rt_find("money"))); /* seems we even pay this at level 0 */
+  CuAssertIntEquals(tc, 3, get_resource(u, rt_find("aura")));
+  CuAssertIntEquals(tc, 2, get_resource(u, rt_find("horse")));
+
+  level = eff_spelllevel(u, sp, 2, 1);
+  CuAssertIntEquals(tc, 0, level);
+  pay_spell(u, sp, level, 1);
+  CuAssertIntEquals(tc, 0, get_resource(u, rt_find("money")));
+  CuAssertIntEquals(tc, 3, get_resource(u, rt_find("aura")));
+  CuAssertIntEquals(tc, 2, get_resource(u, rt_find("horse")));
 }
 
 CuSuite *get_magic_suite(void)
@@ -115,5 +172,6 @@ CuSuite *get_magic_suite(void)
   SUITE_ADD_TEST(suite, test_updatespells);
   SUITE_ADD_TEST(suite, test_spellbooks);
   SUITE_ADD_TEST(suite, test_pay_spell);
+  SUITE_ADD_TEST(suite, test_pay_spell_failure);
   return suite;
 }
