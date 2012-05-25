@@ -41,9 +41,16 @@ int get_resource(const unit * u, const resource_type * rtype)
 {
   const item_type *itype = resource2item(rtype);
 
+  assert(rtype);
   if (rtype->uget) {
     /* this resource is probably special */
     int i = rtype->uget(u, rtype);
+    if (i >= 0)
+      return i;
+  }
+  else if (rtype->uchange) {
+    /* this resource is probably special */
+    int i = rtype->uchange((unit *)u, rtype, 0);
     if (i >= 0)
       return i;
   }

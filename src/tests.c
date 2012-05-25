@@ -17,6 +17,7 @@
 #include <kernel/spell_test.c>
 #include <kernel/curse_test.c>
 #include <kernel/battle_test.c>
+#include <kernel/pool_test.c>
 #include <kernel/equipment_test.c>
 #include <kernel/reports_test.c>
 #include <kernel/spellbook_test.c>
@@ -51,6 +52,7 @@ int RunAllTests(void)
   CuSuiteAddSuite(suite, get_functions_suite());
   CuSuiteAddSuite(suite, get_umlaut_suite());
   /* kernel */
+  CuSuiteAddSuite(suite, get_pool_suite());
   CuSuiteAddSuite(suite, get_curse_suite());
   CuSuiteAddSuite(suite, get_equipment_suite());
   CuSuiteAddSuite(suite, get_item_suite());

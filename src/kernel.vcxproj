@@ -117,6 +117,7 @@
     <ClCompile Include="kernel\plane.c" />
     <ClCompile Include="kernel\player.c" />
     <ClCompile Include="kernel\pool.c" />
+    <ClCompile Include="kernel\pool_test.c" />
     <ClCompile Include="kernel\race.c" />
     <ClCompile Include="kernel\region.c" />
     <ClCompile Include="kernel\reports.c" />

@@ -96,7 +96,7 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
   return u->region->land->peasants;
 }
 
-int res_changeitem(unit * u, const resource_type * rtype, int delta)
+static int res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
   int num;
   if (rtype == oldresourcetype[R_STONE] && u->race == new_race[RC_STONEGOLEM]

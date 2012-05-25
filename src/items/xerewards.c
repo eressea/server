@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/curse.h>
 #include <kernel/message.h>
 #include <kernel/magic.h>
+#include <kernel/pool.h>
 
 /* util includes */
 #include <util/functions.h>
@@ -59,7 +60,7 @@ use_skillpotion(struct unit *u, const struct item_type *itype, int amount,
   }
   ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));
 
-  res_changeitem(u, itype->rtype, -amount);
+  change_resource(u, itype->rtype, -amount);
   return 0;
 }
 
@@ -81,7 +82,7 @@ use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
 
   ADDMSG(&u->faction->msgs, msg_message("manacrystal_use", "unit aura", u, sp));
 
-  res_changeitem(u, itype->rtype, -amount);
+  change_resource(u, itype->rtype, -amount);
   return 0;
 }
 

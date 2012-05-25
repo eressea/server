@@ -343,7 +343,6 @@ extern "C" {
   int get_money(const struct unit *);
   int set_money(struct unit *, int);
   int change_money(struct unit *, int);
-  int res_changeitem(struct unit *u, const resource_type * rtype, int delta);
 
   extern struct attrib_type at_showitem;        /* show this potion's description */
 

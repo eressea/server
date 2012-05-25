@@ -693,8 +693,9 @@ int change_spellpoints(unit * u, int mp)
   int sp;
 
   m = get_mage(u);
-  if (!m)
+  if (!m) {
     return 0;
+  }
 
   /* verhindere negative Magiepunkte */
   sp = MAX(m->spellpoints + mp, 0);
