@@ -27,7 +27,7 @@ void test_updatespells(CuTest * tc)
   CuAssertPtrNotNull(tc, book);
   spellbook_add(book, sp, 1);
 
-  CuAssertIntEquals(tc, 0, ql_length(f->spellbook->spells));
+  CuAssertPtrEquals(tc, 0, f->spellbook);
   pick_random_spells(f, 1, book, 1);
   CuAssertPtrNotNull(tc, f->spellbook);
   CuAssertIntEquals(tc, 1, ql_length(f->spellbook->spells));

@@ -480,7 +480,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
           commonspells[spellno] = commonspells[maxspell];
           commonspells[maxspell--] = sp;
           sp = 0;
-        } else if (spellbook_get(f->spellbook, sp)) {
+        } else if (f->spellbook && spellbook_get(f->spellbook, sp)) {
           commonspells[spellno] = commonspells[numspells--];
           if (maxspell>numspells) {
             maxspell = numspells;
@@ -490,6 +490,9 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
       }
 
       if (spellno<maxspell) {
+        if (!f->spellbook) {
+          f->spellbook = create_spellbook(0);
+        }
         spellbook_add(f->spellbook, sp, f->max_spelllevel);
         commonspells[spellno] = commonspells[numspells--];
       }
