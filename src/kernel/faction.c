@@ -288,7 +288,8 @@ void destroyfaction(faction * f)
     return;
   fset(f, FFL_QUIT);
 
-  spellbook_free(f->spellbook);
+  spellbook_clear(f->spellbook);
+  free(f->spellbook);
   f->spellbook = 0;
 
   while (f->battles) {

@@ -6,6 +6,8 @@
 
 #include "spellbook.h"
 
+#include <assert.h>
+
 spellbook * create_spellbook(const char * name)
 {
   spellbook *result = (spellbook *)malloc(sizeof(spellbook));
@@ -24,7 +26,7 @@ void spellbook_add(spellbook *sb, struct spell * sp, int level)
   ql_push(&sb->spells, sbe);
 }
 
-void spellbook_free(spellbook *sb)
+void spellbook_clear(spellbook *sb)
 {
   quicklist *ql;
   int qi;

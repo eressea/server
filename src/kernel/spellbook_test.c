@@ -51,7 +51,8 @@ void test_named_spellbooks(CuTest * tc)
   spellbook_foreach(sb, count_spell_cb, &counter);
   CuAssertIntEquals(tc, 1, counter);
 #endif
-  spellbook_free(sb);
+  spellbook_clear(sb);
+  free(sb);
 }
 
 CuSuite *get_spellbook_suite(void)
