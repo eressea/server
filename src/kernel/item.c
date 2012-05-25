@@ -66,36 +66,34 @@ potion_type *potiontypes;
 static int res_changeaura(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL);
-  change_spellpoints(u, delta);
-  return 0;
+  return change_spellpoints(u, delta);
 }
 
 static int res_changeperson(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL || !"not implemented");
   scale_number(u, u->number + delta);
-  return 0;
+  return u->number;
 }
 
 static int res_changepermaura(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL);
-  change_maxspellpoints(u, delta);
-  return 0;
+  return change_maxspellpoints(u, delta);
 }
 
 static int res_changehp(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL);
   u->hp += delta;
-  return 0;
+  return u->hp;
 }
 
 static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
   assert(rtype != NULL && u->region->land);
   u->region->land->peasants += delta;
-  return 0;
+  return u->region->land->peasants;
 }
 
 int res_changeitem(unit * u, const resource_type * rtype, int delta)
