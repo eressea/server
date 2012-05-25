@@ -1204,7 +1204,7 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
   return &sf->next;
 }
 
-static struct spellbook *read_spellbook(struct storage *store)
+struct spellbook *read_spellbook(struct storage *store)
 {
   spellbook * book = 0;
   int level;
@@ -1239,7 +1239,7 @@ static struct spellbook *read_spellbook(struct storage *store)
   return book;
 }
 
-static void write_spellbook(const struct spellbook *book, struct storage *store)
+void write_spellbook(const struct spellbook *book, struct storage *store)
 {
   quicklist *ql;
   int qi;
