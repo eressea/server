@@ -49,6 +49,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spellbook.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
@@ -1012,7 +1013,7 @@ static void cr_find_address(FILE * F, const faction * uf, quicklist * addresses)
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
-static void cr_reportspell(FILE * F, spell * sp, const struct locale *lang)
+static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale *lang)
 {
   int k;
   const char *name =
@@ -1020,7 +1021,7 @@ static void cr_reportspell(FILE * F, spell * sp, const struct locale *lang)
 
   fprintf(F, "ZAUBER %d\n", hashstring(sp->sname));
   fprintf(F, "\"%s\";name\n", name);
-  fprintf(F, "%d;level\n", sp->level);
+  fprintf(F, "%d;level\n", level);
   fprintf(F, "%d;rank\n", sp->rank);
   fprintf(F, "\"%s\";info\n", spell_info(sp, lang));
   if (sp->parameter)
@@ -1567,8 +1568,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
   cr_find_address(F, f, ctx->addresses);
   a = a_find(f->attribs, &at_reportspell);
   while (a && a->type == &at_reportspell) {
-    spell *sp = (spell *) a->data.v;
-    cr_reportspell(F, sp, f->locale);
+    spellbook_entry *sbe = (spellbook_entry *) a->data.v;
+    cr_reportspell(F, sbe->sp, sbe->level, f->locale);
     a = a->next;
   }
   for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;

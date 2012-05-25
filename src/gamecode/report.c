@@ -59,6 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spellbook.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -214,13 +215,14 @@ rparagraph(FILE * F, const char *str, ptrdiff_t indent, int hanging_indent,
   } while (*begin);
 }
 
-static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
+static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
 {
   int bytes, k, itemanz, costtyp;
   int dh = 0;
   char buf[4096];
   char *bufp = buf;
   size_t size = sizeof(buf) - 1;
+  spell * sp = sbe->sp;
   const char *params = sp->parameter;
 
   rnl(F);
@@ -251,7 +253,7 @@ static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
   *bufp = 0;
   rparagraph(F, buf, 0, 0, 0);
 
-  sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sp->level);
+  sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sbe->level);
   rparagraph(F, buf, 0, 0, 0);
 
   sprintf(buf, "%s %d", LOC(lang, "nr_spell_rank"), sp->rank);
@@ -278,7 +280,7 @@ static void nr_spell(FILE * F, spell * sp, const struct locale *lang)
         }
       } else {
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
-          itemanz *= sp->level;
+          itemanz *= sbe->level;
         }
         bytes =
           snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype,
@@ -2301,8 +2303,8 @@ report_plaintext(const char *filename, report_context * ctx,
     rnl(F);
     centre(F, LOC(f->locale, "section_newspells"), true);
     while (a && a->type == &at_reportspell) {
-      spell *sp = (spell *) a->data.v;
-      nr_spell(F, sp, f->locale);
+      spellbook_entry *sbe = (spellbook_entry *) a->data.v;
+      nr_spell(F, sbe, f->locale);
       a = a->next;
     }
   }

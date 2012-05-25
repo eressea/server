@@ -86,10 +86,20 @@ const char *magic_school[MAXMAGIETYP] = {
   "common"
 };
 
-attrib_type at_reportspell = {
-  "reportspell", NULL, NULL, NULL, NO_WRITE, NO_READ
-};
+static void a_init_reportspell(struct attrib *a) {
+  a->data.v = calloc(1, sizeof(spellbook_entry));
+}
 
+static void a_finalize_reportspell(struct attrib *a) {
+  free(a->data.v);
+}
+
+attrib_type at_reportspell = {
+  "reportspell", 
+  a_init_reportspell,
+  a_finalize_reportspell,
+  0, NO_WRITE, NO_READ
+};
 /**
  ** at_icastle
  ** TODO: separate castle-appearance from illusion-effects
