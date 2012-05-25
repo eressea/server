@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "race.h"
 #include "region.h"
+#include "spell.h"
 #include "save.h"
 #include "ship.h"
 #include "skill.h"
@@ -1723,4 +1724,16 @@ const struct race *u_irace(const struct unit *u)
     return u->irace;
   }
   return u->race;
+}
+
+void unit_add_spell(unit * u, sc_mage * m, struct spell * sp)
+{
+  sc_mage *mage = m ? m : get_mage(u);
+
+  if (!mage) {
+    log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
+    mage = create_mage(u, u->faction?u->faction->magiegebiet:M_GRAY);
+  }
+  add_spell(&mage->spells, sp);
+  add_spellname(mage, sp);
 }

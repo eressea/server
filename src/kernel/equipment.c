@@ -130,29 +130,25 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
   if (eq) {
 
     if (mask & EQUIP_SKILLS) {
-      skill_t sk;
+      int sk;
       for (sk = 0; sk != MAXSKILLS; ++sk) {
         if (eq->skills[sk] != NULL) {
           int i = dice_rand(eq->skills[sk]);
           if (i > 0)
-            set_level(u, sk, i);
+            set_level(u, (skill_t)sk, i);
         }
       }
     }
 
     if (mask & EQUIP_SPELLS) {
       if (eq->spellbook) {
-        sc_mage *m = get_mage(u);
         quicklist * ql = eq->spellbook->spells;
         int qi;
+        sc_mage * mage = get_mage(u);
 
-        if (!m) {
-          m = create_mage(u, u->faction?u->faction->magiegebiet:M_GRAY);
-        }
         for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
           spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
-          add_spell(&m->spells, sbe->sp);
-          add_spellname(m, sbe->sp);
+          unit_add_spell(u, mage, sbe->sp);
         }
       }
     }

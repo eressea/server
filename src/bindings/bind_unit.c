@@ -483,27 +483,20 @@ static int tolua_unit_castspell(lua_State * L)
   return 0;
 }
 
-static int unit_addspell(unit * u, const char *name)
-{
-  sc_mage *m = get_mage(u);
-  spell *spadd = find_spell(name);
-
-  if (!spadd) {
-    log_error("spell %s could not be found\n", name);
-    return EINVAL;
-  } else {
-    quicklist **starget = get_spelllist(m, u->faction);
-    add_spell(starget, spadd);
-    add_spellname(m, spadd);
-  }
-  return 0;
-}
-
 static int tolua_unit_addspell(lua_State * L)
 {
-  unit *self = (unit *) tolua_tousertype(L, 1, 0);
+  unit *u = (unit *) tolua_tousertype(L, 1, 0);
   const char *str = tolua_tostring(L, 2, 0);
-  int err = unit_addspell(self, str);
+  int err = 0;
+  spell *sp = find_spell(str);
+
+  if (!sp) {
+    log_error("spell %s could not be found\n", str);
+    return EINVAL;
+  } else {
+    unit_add_spell(u, 0, sp);
+  }
+
   lua_pushinteger(L, err);
   return 1;
 }

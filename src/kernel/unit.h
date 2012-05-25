@@ -231,6 +231,8 @@ extern "C" {
   int unit_max_hp(const struct unit *u);
   void scale_number(struct unit *u, int n);
 
+  void unit_add_spell(struct unit * u, struct sc_mage * m, struct spell * sp);
+
   extern struct attrib_type at_creator;
 #ifdef __cplusplus
 }
