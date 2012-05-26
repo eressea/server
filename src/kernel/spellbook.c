@@ -18,9 +18,12 @@ spellbook * create_spellbook(const char * name)
 
 void spellbook_add(spellbook *sb, struct spell * sp, int level)
 {
-  spellbook_entry * sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
+  spellbook_entry * sbe;
 
-  assert(sb && level>0);
+  assert(sb && sp && level>0);
+  assert(!spellbook_get(sb, sp));
+  
+  sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
   sbe->sp = sp;
   sbe->level = level;
   ql_push(&sb->spells, sbe);

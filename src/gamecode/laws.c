@@ -3725,7 +3725,9 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
     for (qi = 0, ql = src->spells; ql; ql_advance(&ql, &qi, 1)) {
       spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
       if (sbe->level<=maxlevel) {
-        spellbook_add(dst, sbe->sp, sbe->level);
+        if (!spellbook_get(dst, sbe->sp)) {
+          spellbook_add(dst, sbe->sp, sbe->level);
+        }
       }
     }
   }

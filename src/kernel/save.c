@@ -1257,13 +1257,17 @@ void read_spellbook(spellbook **bookp, struct storage *store, int (*get_level)(c
       level = store->r_int(store);
     }
     if (sp) {
+      spellbook * sb = *bookp;
       if (level<=0 && get_level) {
         level = get_level(sp, cbdata);
       }
-      if (!*bookp) {
+      if (!sb) {
         *bookp = create_spellbook(0);
+        sb = *bookp;
       }
-      spellbook_add(*bookp, sp, level);
+      if (store->version>=SPELLBOOK_VERSION || !spellbook_get(sb, sp)) {
+        spellbook_add(sb, sp, level);
+      }
     }
   }
 }
