@@ -14,11 +14,12 @@ function test_roi()
     u.race = "elf"
     u:set_skill("magic", 10)
     u:add_item("money", 3010)
+    f.magic = "tybied"
     u.magic = "tybied"
     u.aura = 200
     u.ship = s1
-    local err = u:add_spell("create_roi")
-    assert_equal(0, err)
+--    local err = u:add_spell("create_roi")
+--    assert_equal(0, err)
     u:clear_orders()
     u:add_order("ZAUBERE 'Erschaffe einen Ring der Unsichtbarkeit' ")
     process_orders()

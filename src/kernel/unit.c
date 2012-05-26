@@ -1745,6 +1745,7 @@ struct spellbook * unit_get_spellbook(struct unit * u)
     if (u->faction->spellbook) {
       return u->faction->spellbook;
     }
+    return get_spellbook(magic_school[u->faction->magiegebiet]);
   }
   return 0;
 }

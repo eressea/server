@@ -117,6 +117,28 @@ static int tolua_faction_set_id(lua_State * L)
   return 1;
 }
 
+static int tolua_faction_get_magic(lua_State * L)
+{
+  faction *self = (faction *) tolua_tousertype(L, 1, 0);
+  lua_pushstring(L, magic_school[self->magiegebiet]);
+  return 1;
+}
+
+static int tolua_faction_set_magic(lua_State * L)
+{
+  faction *self = (faction *) tolua_tousertype(L, 1, 0);
+  const char *type = tolua_tostring(L, 2, 0);
+  magic_t mtype;
+
+  for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
+    if (strcmp(magic_school[mtype], type) == 0) {
+      self->magiegebiet = mtype;
+      break;
+    }
+  }
+  return 0;
+}
+
 static int tolua_faction_get_age(lua_State * L)
 {
   faction *self = (faction *) tolua_tousertype(L, 1, 0);
@@ -498,6 +520,8 @@ void tolua_faction_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliance,
         tolua_faction_set_alliance);
       tolua_variable(L, TOLUA_CAST "score", tolua_faction_get_score, NULL);
+      tolua_variable(L, TOLUA_CAST "magic", &tolua_faction_get_magic,
+        tolua_faction_set_magic);
       tolua_variable(L, TOLUA_CAST "age", tolua_faction_get_age,
         tolua_faction_set_age);
       tolua_variable(L, TOLUA_CAST "options", tolua_faction_get_options,
