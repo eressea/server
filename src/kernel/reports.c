@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
-#include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/move.h>
 #include <kernel/order.h>
@@ -38,6 +37,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -700,32 +701,33 @@ bufunit(const faction * f, const unit * u, int indent, int mode, char *buf,
   }
 
   if (u->faction == f || telepath_see) {
-    sc_mage *m = get_mage(u);
+    spellbook *book = unit_get_spellbook(u);
 
-    if (m != NULL) {
-      quicklist *ql = m->spells;
-      int qi, t = effskill(u, SK_MAGIC);
-      int bytes =
-        snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u),
-        max_spellpoints(u->region, u));
-      if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
+    if (book) {
+      quicklist *ql = book->spells;
+      int qi, header, maxlevel = effskill(u, SK_MAGIC);
+      int bytes = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+      if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
         WARN_STATIC_BUFFER();
+      }
 
-      for (dh = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *) ql_get(ql, qi);
-        if (sp->level > t)
-          continue;
-        if (!dh) {
-          bytes = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
-          dh = 1;
-        } else {
-          bytes = (int)strlcpy(bufp, ", ", size);
+      for (header = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+        spellbook_entry * sbe = (spellbook_entry *) ql_get(ql, qi);
+        if (sbe->level <= maxlevel) {
+          if (!header) {
+            bytes = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+            header = 1;
+          } else {
+            bytes = (int)strlcpy(bufp, ", ", size);
+          }
+          if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+            WARN_STATIC_BUFFER();
+          }
+          bytes = (int)strlcpy(bufp, spell_name(sbe->sp, f->locale), size);
+          if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0) {
+            WARN_STATIC_BUFFER();
+          }
         }
-        if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
-          WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, spell_name(sp, f->locale), size);
-        if (bytes < 0 || wrptr(&bufp, &size, bytes) != 0)
-          WARN_STATIC_BUFFER();
       }
 
       for (i = 0; i != MAXCOMBATSPELLS; ++i) {
