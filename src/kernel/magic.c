@@ -245,6 +245,14 @@ void read_spells(struct quicklist **slistp, magic_t mtype,
   }
 }
 
+int get_spell_level_mage(const spell * sp, void * cbdata)
+{
+  sc_mage *mage = (sc_mage *)cbdata;
+  spellbook *book = get_spellbook(magic_school[mage->magietyp]);
+  spellbook_entry *sbe = spellbook_get(book, sp);
+  return sbe ? sbe->level : 0;
+}
+
 static int read_mage(attrib * a, void *owner, struct storage *store)
 {
   int i, mtype;
@@ -291,9 +299,9 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
     }
   }
   if (mage->magietyp==M_GRAY) {
-    read_spellbook(&mage->spellbook, store);
+    read_spellbook(&mage->spellbook, store, get_spell_level_mage, mage);
   } else {
-    read_spellbook(0, store);
+    read_spellbook(0, store, 0, mage);
   }
   return AT_READ_OK;
 }
@@ -420,15 +428,14 @@ void show_new_spells(faction * f, int level, const spellbook *book)
     for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
       spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
       if (sbe->level <= level) {
-        spell * sp = sbe->sp;
 
-        if (!already_seen(f, sp)) {
+        if (!already_seen(f, sbe->sp)) {
           attrib * a = a_new(&at_reportspell);
           spellbook_entry * entry = (spellbook_entry *)a->data.v;
-          entry->level = level;
-          entry->sp = sp;
+          entry->level = sbe->level;
+          entry->sp = sbe->sp;
           a_add(&f->attribs, a);
-          a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
+          a_add(&f->attribs, a_new(&at_seenspell))->data.v = sbe->sp;
         }
       }
     }

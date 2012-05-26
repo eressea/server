@@ -20,7 +20,7 @@ void spellbook_add(spellbook *sb, struct spell * sp, int level)
 {
   spellbook_entry * sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
 
-  assert(sb);
+  assert(sb && level>0);
   sbe->sp = sp;
   sbe->level = level;
   ql_push(&sb->spells, sbe);

@@ -3730,6 +3730,7 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
     }
   }
 }
+
 static void update_spells(void)
 {
   faction *f;
@@ -3747,15 +3748,7 @@ static void update_spells(void)
         }
         copy_spells(book, f->spellbook, maxlevel);
         if (maxlevel > f->max_spelllevel) {
-          static spellbook * common_spells;
-          if (!common_spells) {
-            const char *common_school = get_param(global.parameters, "rules.magic.common");
-            if (!common_school) common_school = "common";
-            common_spells = get_spellbook(common_school);
-            if (!common_spells) {
-              log_error("could not find a book of common spells: '%s'\n", common_school);
-            }
-          }
+          spellbook * common_spells = get_spellbook(magic_school[M_COMMON]);
           pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
         }
       }

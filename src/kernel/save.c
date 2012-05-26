@@ -1204,12 +1204,36 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
   return &sf->next;
 }
 
-void read_spellbook(spellbook **bookp, struct storage *store)
+int get_spell_level_faction(const spell * sp, void * cbdata)
 {
-  int level;
-  for (level=0;;++level) {
+  static spellbook * common = 0;
+  spellbook * book;
+  faction * f = (faction *)cbdata;
+  spellbook_entry * sbe;
+
+  book = get_spellbook(magic_school[f->magiegebiet]);
+  if (book) {
+    sbe = spellbook_get(book, sp);
+    if (sbe) return sbe->level;
+  }
+  if (!common) {
+    common = get_spellbook(magic_school[M_COMMON]);
+  }
+  sbe = spellbook_get(common, sp);
+  if (sbe) {
+    return sbe->level;
+  } else {
+    log_error("read_spellbook: faction '%s' has a spell with unknown level: '%s'", factionname(f), sp->sname);
+  }
+  return 0;
+}
+
+void read_spellbook(spellbook **bookp, struct storage *store, int (*get_level)(const spell * sp, void *), void * cbdata)
+{
+  for (;;) {
     spell *sp = 0;
     char spname[64];
+    int level = 0;
 
     if (store->version < SPELLNAME_VERSION) {
       int i = store->r_int(store);
@@ -1233,6 +1257,9 @@ void read_spellbook(spellbook **bookp, struct storage *store)
       level = store->r_int(store);
     }
     if (sp) {
+      if (level<=0 && get_level) {
+        level = get_level(sp, cbdata);
+      }
       if (!*bookp) {
         *bookp = create_spellbook(0);
       }
@@ -1395,7 +1422,7 @@ faction *readfaction(struct storage * store)
   read_groups(store, f);
   f->spellbook = 0;
   if (store->version >= REGIONOWNER_VERSION) {
-    read_spellbook(FactionSpells() ? &f->spellbook : 0, store);
+    read_spellbook(FactionSpells() ? &f->spellbook : 0, store, get_spell_level_faction, (void *)f);
   }
   return f;
 }

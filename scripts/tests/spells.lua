@@ -14,8 +14,8 @@ function test_roi()
     u.race = "elf"
     u:set_skill("magic", 10)
     u:add_item("money", 3010)
-    f.magic = "tybied"
-    u.magic = "tybied"
+    f.magic = "gwyrrd"
+    u.magic = "gwyrrd"
     u.aura = 200
     u.ship = s1
 
