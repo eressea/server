@@ -627,10 +627,10 @@ const char *buildingname(const building * b)
   return write_buildingname(b, ibuf, sizeof(name));
 }
 
-void building_set_owner(struct building *b, struct unit * owner)
+void building_set_owner(struct unit * owner)
 {
-  assert(b && owner && owner->building==b);
-  b->_owner = owner;
+  assert(owner && owner->building);
+  owner->building->_owner = owner;
 }
 
 static unit *building_owner_ex(const building * bld, const struct faction * last_owner)

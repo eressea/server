@@ -631,15 +631,19 @@ static void give_control(unit * u, unit * u2)
   if (u->building && u->faction != u2->faction && rule_region_owners()) {
     region *r = u->region;
     faction *f = region_get_owner(r);
+
+    assert(u->building==u2->building);
     if (f == u->faction) {
       building *b = largestbuilding(r, &cmp_current_owner, false);
       if (b == u->building) {
         friendly_takeover(r, u2->faction);
       }
     }
+    building_set_owner(u2);
   }
   if (u->ship) {
-    ship_set_owner(u->ship, u2);
+    assert(u->ship==u2->ship);
+    ship_set_owner(u2);
   }
 }
 

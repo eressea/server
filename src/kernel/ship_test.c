@@ -50,7 +50,7 @@ static void test_ship_set_owner(CuTest * tc)
   u2 = test_create_unit(f, r);
   u_set_ship(u2, sh);
   CuAssertPtrEquals(tc, u1, ship_owner(sh));
-  ship_set_owner(sh, u2);
+  ship_set_owner(u2);
   CuAssertPtrEquals(tc, u2, ship_owner(sh));
 }
 

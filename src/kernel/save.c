@@ -802,7 +802,7 @@ unit *read_unit(struct storage *store)
     if (b) {
       u_set_building(u, b);
       if (fval(u, UFL_OWNER)) {
-        building_set_owner(b, u);
+        building_set_owner(u);
       }
     } else {
       log_error("read_unit: unit in unkown building '%s'\n", itoa36(n));
@@ -815,7 +815,7 @@ unit *read_unit(struct storage *store)
     if (sh) {
       u_set_ship(u, sh);
       if (fval(u, UFL_OWNER)) {
-        ship_set_owner(sh, u);
+        ship_set_owner(u);
       }
     } else {
       log_error("read_unit: unit in unkown ship '%s'\n", itoa36(n));

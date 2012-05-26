@@ -781,7 +781,7 @@ void u_set_building(unit * u, building * b)
   assert(!u->building); /* you must leave first */
   u->building = b;
   if (b && !b->_owner) {
-    building_set_owner(b, u);
+    building_set_owner(u);
   }
 }
 
@@ -790,7 +790,7 @@ void u_set_ship(unit * u, ship * sh)
   assert(!u->ship); /* you must leave_ship */
   u->ship = sh;
   if (sh && !sh->_owner) {
-    ship_set_owner(sh, u);
+    ship_set_owner(u);
   }
 }
 

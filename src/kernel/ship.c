@@ -286,9 +286,9 @@ void getshipweight(const ship * sh, int *sweight, int *scabins)
   }
 }
 
-void ship_set_owner(ship * sh, unit * u) {
-  assert(u->ship==sh);
-  sh->_owner = u;
+void ship_set_owner(unit * u) {
+  assert(u && u->ship);
+  u->ship->_owner = u;
 }
 
 static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)

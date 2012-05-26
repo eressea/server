@@ -50,7 +50,7 @@ static void test_building_set_owner(CuTest * tc)
   u2 = test_create_unit(f, r);
   u_set_building(u2, bld);
   CuAssertPtrEquals(tc, u1, building_owner(bld));
-  building_set_owner(bld, u2);
+  building_set_owner(u2);
   CuAssertPtrEquals(tc, u2, building_owner(bld));
 }
 

@@ -34,13 +34,13 @@ static void test_reorder_units(CuTest * tc)
   u_set_ship(u0, s);
   u1 = test_create_unit(f, r);
   u_set_ship(u1, s);
-  ship_set_owner(s, u1);
+  ship_set_owner(u1);
   u2 = test_create_unit(f, r);
   u3 = test_create_unit(f, r);
   u_set_building(u3, b);
   u4 = test_create_unit(f, r);
   u_set_building(u4, b);
-  building_set_owner(b, u4);
+  building_set_owner(u4);
 
   reorder_units(r);
 
