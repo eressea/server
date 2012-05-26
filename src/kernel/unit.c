@@ -1749,7 +1749,9 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
     if (mage->spellbook) {
       return mage->spellbook;
     }
-    return faction_get_spellbook(u->faction);
+    if (mage->magietyp!=M_GRAY) {
+      return faction_get_spellbook(u->faction);
+    }
   }
   return 0;
 }
