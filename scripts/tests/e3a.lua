@@ -382,7 +382,7 @@ function test_spells()
       nums = nums - 1
     end
     assert(nums==0)
-  else
+  elseif u.spells~=nil then
     for sp in u.spells do
       nums = nums + 1
     end
