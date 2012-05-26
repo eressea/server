@@ -389,6 +389,14 @@ attrib_type at_seenspell = {
   "seenspell", NULL, NULL, NULL, write_seenspell, read_seenspell
 };
 
+#define MAXSPELLS 256
+
+static boolean has_spell(quicklist * ql, const spell * sp)
+{
+  int qi;
+  return ql_set_find(&ql, &qi, sp) != 0;
+}
+
 static boolean already_seen(const faction * f, const spell * sp)
 {
   attrib *a;
@@ -399,14 +407,6 @@ static boolean already_seen(const faction * f, const spell * sp)
       return true;
   }
   return false;
-}
-
-#define MAXSPELLS 256
-
-static boolean has_spell(quicklist * ql, const spell * sp)
-{
-  int qi;
-  return ql_set_find(&ql, &qi, sp) != 0;
 }
 
 static void update_spells(faction * f, sc_mage * mage, int level, const spellbook *book)
@@ -448,6 +448,7 @@ void updatespelllist(unit * u)
   if (mage->magietyp != M_GRAY) {
     spellbook * book;
     book = get_spellbook(magic_school[mage->magietyp]);
+
     update_spells(u->faction, mage, sk, book);
 
     if (FactionSpells()) {
@@ -489,11 +490,11 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
         spellno = rng_int() % maxspell;
         sp = commonspells[spellno];
         if (sp->level>f->max_spelllevel) {
-          commonspells[spellno] = commonspells[maxspell];
-          commonspells[maxspell--] = sp;
+          commonspells[spellno] = commonspells[--maxspell];
+          commonspells[maxspell] = sp;
           sp = 0;
         } else if (f->spellbook && spellbook_get(f->spellbook, sp)) {
-          commonspells[spellno] = commonspells[numspells--];
+          commonspells[spellno] = commonspells[--numspells];
           if (maxspell>numspells) {
             maxspell = numspells;
           }
@@ -506,7 +507,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
           f->spellbook = create_spellbook(0);
         }
         spellbook_add(f->spellbook, sp, f->max_spelllevel);
-        commonspells[spellno] = commonspells[numspells--];
+        commonspells[spellno] = commonspells[--numspells];
       }
     }
   }
