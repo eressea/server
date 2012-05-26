@@ -2445,34 +2445,36 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
       cmistake(u, ord, 285, MSG_EVENT);
     break;
   case NOPARAM:
-    /* check if it's an item */
-    itype = finditemtype(s, u->faction->locale);
-    if (itype != NULL) {
-      ptype = resource2potion(item2resource(itype));
-      if (ptype != NULL) {
-        if (display_potion(u->faction, u, ptype))
-          break;
-      } else {
-        if (display_item(u->faction, u, itype))
-          break;
+    if (s) {
+      /* check if it's an item */
+      itype = finditemtype(s, u->faction->locale);
+      if (itype != NULL) {
+        ptype = resource2potion(item2resource(itype));
+        if (ptype != NULL) {
+          if (display_potion(u->faction, u, ptype))
+            break;
+        } else {
+          if (display_item(u->faction, u, itype))
+            break;
+        }
       }
-    }
-    /* try for a spell */
-    sp = unit_getspell(u, s, u->faction->locale);
-    if (sp) {
-      attrib *a = a_find(u->faction->attribs, &at_seenspell);
-      while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
-        a = a->next;
+      /* try for a spell */
+      sp = unit_getspell(u, s, u->faction->locale);
+      if (sp) {
+        attrib *a = a_find(u->faction->attribs, &at_seenspell);
+        while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
+          a = a->next;
+        }
+        if (a != NULL) {
+          a_remove(&u->faction->attribs, a);
+        }
+        break;
       }
-      if (a != NULL) {
-        a_remove(&u->faction->attribs, a);
+      /* last, check if it's a race. */
+      rc = findrace(s, u->faction->locale);
+      if (rc != NULL && display_race(u->faction, u, rc)) {
+        break;
       }
-      break;
-    }
-    /* last, check if it's a race. */
-    rc = findrace(s, u->faction->locale);
-    if (rc != NULL && display_race(u->faction, u, rc)) {
-      break;
     }
     cmistake(u, ord, 21, MSG_EVENT);
     break;
