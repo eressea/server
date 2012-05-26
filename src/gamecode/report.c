@@ -59,6 +59,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
