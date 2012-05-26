@@ -7,7 +7,6 @@
   <xi:include href="spellbooks/draig.xml"/>
   <xi:include href="spellbooks/illaun.xml"/>
   <xi:include href="spellbooks/cerddor.xml"/>
-  <xi:include href="spellbooks/tybied.xml"/>
 
   <!-- shared spells -->
   <spell name="create_roi" ship="true" rank="5" index="130">
