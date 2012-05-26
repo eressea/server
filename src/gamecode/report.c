@@ -280,14 +280,10 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
             WARN_STATIC_BUFFER();
         }
       } else {
-        if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
-          itemanz *= sp->level;
-        }
-        bytes =
-          snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype,
-              itemanz != 1)));
-        if (wrptr(&bufp, &size, bytes) != 0)
+        bytes = snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype, itemanz != 1)));
+        if (wrptr(&bufp, &size, bytes) != 0) {
           WARN_STATIC_BUFFER();
+        }
       }
       *bufp = 0;
       rparagraph(F, buf, 2, 2, '-');

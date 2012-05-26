@@ -165,6 +165,7 @@ static xmlNodePtr xml_inventory(report_context * ctx, item * items, unit * u)
   return node;
 }
 
+#ifdef TODO /*spellbooks */
 static xmlNodePtr
 xml_spells(report_context * ctx, quicklist * slist, int maxlevel)
 {
@@ -183,6 +184,7 @@ xml_spells(report_context * ctx, quicklist * slist, int maxlevel)
   }
   return node;
 }
+#endif
 
 static xmlNodePtr xml_skills(report_context * ctx, unit * u)
 {
@@ -342,6 +344,7 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
       xmlAddChild(node, xml_skills(ctx, u));
     }
 
+#ifdef TODO /*spellbooks */
     /* spells */
     if (is_mage(u)) {
       sc_mage *mage = get_mage(u);
@@ -350,6 +353,7 @@ static xmlNodePtr xml_unit(report_context * ctx, unit * u, int mode)
         xmlAddChild(node, xml_spells(ctx, slist, effskill(u, SK_MAGIC)));
       }
     }
+#endif
   }
 
   /* faction information w/ visibiility */

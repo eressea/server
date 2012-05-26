@@ -124,12 +124,12 @@ use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
     assert(sp);
 
     /* Reduziert die Stärke jedes Spruchs um effect */
-    effect = sp->level;
+    effect = 5;
 
     /* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
      * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
      * um seine Stufe */
-    force = sp->level * 20;     /* Stufe 5 =~ 100 */
+    force = effect * 20;     /* Stufe 5 =~ 100 */
 
     /* Regionszauber auflösen */
     while (*ap && force > 0) {

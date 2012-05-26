@@ -438,7 +438,7 @@ void show_new_spells(faction * f, int level, const spellbook *book)
 */
 void pick_random_spells(faction * f, int level, spellbook * book, int num_spells)
 {
-  spell *commonspells[MAXSPELLS];
+  spellbook_entry *commonspells[MAXSPELLS];
   int qi, numspells = 0;
   quicklist *ql;
 
@@ -448,9 +448,8 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
 
   for (qi = 0, ql = book->spells; ql; ql_advance(&ql, &qi, 1)) {
     spellbook_entry * sbe = (spellbook_entry *) ql_get(ql, qi);
-    spell * sp = sbe->sp;
     if (sbe->level <= level) {
-      commonspells[numspells++] = sp;
+      commonspells[numspells++] = sbe;
     }
   }
 
@@ -461,20 +460,20 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
     for (i = 0; i < num_spells; ++i) {
       int maxspell = numspells;
       int spellno = -1;
-      spell *sp = 0;
-      while (!sp && maxspell>0) {
+      spellbook_entry *sbe = 0;
+      while (!sbe && maxspell>0) {
         spellno = rng_int() % maxspell;
-        sp = commonspells[spellno];
-        if (sp->level>f->max_spelllevel) {
+        sbe = commonspells[spellno];
+        if (sbe->level>f->max_spelllevel) {
           commonspells[spellno] = commonspells[--maxspell];
-          commonspells[maxspell] = sp;
-          sp = 0;
-        } else if (f->spellbook && spellbook_get(f->spellbook, sp)) {
+          commonspells[maxspell] = sbe;
+          sbe = 0;
+        } else if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
           commonspells[spellno] = commonspells[--numspells];
           if (maxspell>numspells) {
             maxspell = numspells;
           }
-          sp = 0;
+          sbe = 0;
         }
       }
 
@@ -482,7 +481,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
         if (!f->spellbook) {
           f->spellbook = create_spellbook(0);
         }
-        spellbook_add(f->spellbook, sp, f->max_spelllevel);
+        spellbook_add(f->spellbook, sbe->sp, sbe->level);
         commonspells[spellno] = commonspells[--numspells];
       }
     }
@@ -948,7 +947,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
     return false;
   }
   /* reicht die Stufe aus? */
-  if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
+  if (eff_skill(u, SK_MAGIC, u->region) < level) {
     /* die Einheit ist nicht erfahren genug für diesen Zauber */
     cmistake(u, ord, 169, MSG_MAGIC);
     return false;

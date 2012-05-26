@@ -36,9 +36,6 @@ extern "C" {
     struct spell_component *components;
     spell_f cast;
     fumble_f patzer;
-
-    /* this is not so much the spell's data, but the school's studying data */
-    int level;                  /* Stufe des Zaubers */
   } spell;
 
   int use_item_power(struct region *r, struct unit *u);
