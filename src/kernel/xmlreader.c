@@ -1295,27 +1295,20 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
     for (i = 0; i != nsetItems->nodeNr; ++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
       xmlChar *propValue;
-      magic_t mtype = M_NONE;
       struct spell *sp;
-
-      propValue = xmlGetProp(node, BAD_CAST "school");
-      if (propValue != NULL) {
-        for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
-          if (strcmp((const char *)propValue, magic_school[mtype]) == 0)
-            break;
-        }
-        assert(mtype != MAXMAGIETYP);
-        xmlFree(propValue);
-      }
 
       propValue = xmlGetProp(node, BAD_CAST "name");
       assert(propValue != NULL);
       sp = find_spell((const char *)propValue);
       if (!sp) {
-        log_error("no spell '%s' in school '%s' for equipment-set '%s'\n", (const char *)propValue, magic_school[mtype], eq->name);
+        log_error("no spell '%s' for equipment-set '%s'\n", (const char *)propValue, eq->name);
       } else {
-        int level = xml_ivalue(node, "level", sp->level);
-        equipment_addspell(eq, sp, level);
+        int level = xml_ivalue(node, "level", 0);
+        if (level>0) {
+          equipment_addspell(eq, sp, level);
+        } else {
+          log_error("spell '%s' for equipment-set '%s' has no level\n", sp->sname, eq->name);
+        }
       }
       xmlFree(propValue);
     }
@@ -1964,7 +1957,9 @@ static int parse_races(xmlDocPtr doc)
         attack->data.sp = xml_spell(node, "spell");
         if (attack->data.sp) {
           attack->level = xml_ivalue(node, "level", 0);
-          assert(attack->level > 0 || attack->data.sp->level > 0); /* magical attacks need a level */
+          if (attack->level > 0) {
+            log_error("magical attack '%s' needs a level: %d\n", attack->data.sp->sname, attack->level);
+          }
         }
       }
       attack->type = xml_ivalue(node, "type", 0);
