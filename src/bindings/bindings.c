@@ -1142,6 +1142,9 @@ static void parse_inifile(lua_State * L, dictionary * d, const char *section)
   lua_pushstring(L, "basepath");
   lua_pushstring(L, basepath());
   lua_rawset(L, -3);
+  lua_pushstring(L, "reportpath");
+  lua_pushstring(L, reportpath());
+  lua_rawset(L, -3);
 }
 
 int tolua_eressea_open(lua_State * L)

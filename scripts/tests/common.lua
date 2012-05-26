@@ -814,7 +814,7 @@ end
 
 local function find_in_report(f, pattern, extension)
     extension = extension or "nr"
-    local filename = config.basepath .. "/reports/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
+    local filename = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
     local report = io.open(filename, 'rt');
     assert_not_nil(report)
     t = report:read("*all")
