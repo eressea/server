@@ -78,6 +78,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/sql.h>
@@ -3713,6 +3714,20 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
   return maxlevel;
 }
 
+static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
+{
+  assert(dst);
+  if (src && src->spells) {
+    quicklist *ql;
+    int qi;
+    for (qi = 0, ql = src->spells; ql; ql_advance(&ql, &qi, 1)) {
+      spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+      if (sbe->level<=maxlevel) {
+        spellbook_add(dst, sbe->sp, sbe->level);
+      }
+    }
+  }
+}
 static void update_spells(void)
 {
   faction *f;
@@ -3723,17 +3738,24 @@ static void update_spells(void)
       int i;
       int maxlevel = faction_getmages(f, mages, MAXMAGES);
 
-      if (FactionSpells() && maxlevel > f->max_spelllevel) {
-        static spellbook * common_spells;
-        if (!common_spells) {
-          const char *common_school = get_param(global.parameters, "rules.magic.common");
-          if (!common_school) common_school = "common";
-          common_spells = get_spellbook(common_school);
-          if (!common_spells) {
-            log_error("could not find a book of common spells: '%s'\n", common_school);
-          }
+      if (maxlevel && FactionSpells()) {
+        spellbook * book = get_spellbook(magic_school[f->magiegebiet]);
+        if (!f->spellbook) {
+          f->spellbook = create_spellbook(0);
         }
-        pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
+        copy_spells(book, f->spellbook, maxlevel);
+        if (maxlevel > f->max_spelllevel) {
+          static spellbook * common_spells;
+          if (!common_spells) {
+            const char *common_school = get_param(global.parameters, "rules.magic.common");
+            if (!common_school) common_school = "common";
+            common_spells = get_spellbook(common_school);
+            if (!common_spells) {
+              log_error("could not find a book of common spells: '%s'\n", common_school);
+            }
+          }
+          pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
+        }
       }
       show_new_spells(f, maxlevel, faction_get_spellbook(f));
       for (i=0; i!=MAXMAGES && mages[i]; ++i) {

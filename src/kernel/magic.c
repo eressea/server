@@ -2477,6 +2477,7 @@ static castorder *cast_cmd(unit * u, order * ord)
   plane *pl;
   spellparameter *args = NULL;
   unit * caster = u;
+  param_t param;
 
   if (LongHunger(u)) {
     cmistake(u, ord, 224, MSG_MAGIC);
@@ -2492,8 +2493,9 @@ static castorder *cast_cmd(unit * u, order * ord)
   init_tokens(ord);
   skip_token();
   s = getstrtoken();
+  param = findparam(s, u->faction->locale);
   /* für Syntax ' STUFE x REGION y z ' */
-  if (findparam(s, u->faction->locale) == P_LEVEL) {
+  if (param == P_LEVEL) {
     int p = getint();
     level = MIN(p, level);
     if (level < 1) {
@@ -2502,8 +2504,9 @@ static castorder *cast_cmd(unit * u, order * ord)
       return 0;
     }
     s = getstrtoken();
+    param = findparam(s, u->faction->locale);
   }
-  if (findparam(s, u->faction->locale) == P_REGION) {
+  if (param == P_REGION) {
     int t_x = getint();
     int t_y = getint();
     plane *pl = getplane(u->region);
@@ -2518,10 +2521,11 @@ static castorder *cast_cmd(unit * u, order * ord)
       return 0;
     }
     s = getstrtoken();
+    param = findparam(s, u->faction->locale);
   }
   /* für Syntax ' REGION x y STUFE z '
    * hier nach REGION nochmal auf STUFE prüfen */
-  if (findparam(s, u->faction->locale) == P_LEVEL) {
+  if (param == P_LEVEL) {
     int p = getint();
     level = MIN(p, level);
     if (level < 1) {

@@ -18,6 +18,7 @@ function test_roi()
     u.magic = "tybied"
     u.aura = 200
     u.ship = s1
+
 --    local err = u:add_spell("create_roi")
 --    assert_equal(0, err)
     u:clear_orders()
