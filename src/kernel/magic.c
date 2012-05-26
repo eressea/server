@@ -33,6 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "pool.h"
 #include "race.h"
 #include "region.h"
+#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
@@ -200,7 +201,10 @@ static void init_mage(attrib * a)
 static void free_mage(attrib * a)
 {
   sc_mage *mage = (sc_mage *) a->data.v;
-  freelist(mage->spells);
+  if (mage->spellbook) {
+    spellbook_clear(mage->spellbook);
+    free(mage->spellbook);
+  }
   free(mage);
 }
 
@@ -286,7 +290,7 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
       }
     }
   }
-  read_spells(&mage->spells, mage->magietyp, store);
+  mage->spellbook = read_spellbook(store);
   return AT_READ_OK;
 }
 
@@ -316,7 +320,7 @@ write_mage(const attrib * a, const void *owner, struct storage *store)
       mage->combatspells[i].sp ? mage->combatspells[i].sp->sname : "none");
     store->w_int(store, mage->combatspells[i].level);
   }
-  write_spells(mage->spells, store);
+  write_spellbook(mage->spellbook, store);
 }
 
 attrib_type at_mage = {
@@ -390,12 +394,6 @@ attrib_type at_seenspell = {
 };
 
 #define MAXSPELLS 256
-
-static boolean has_spell(quicklist * ql, const spell * sp)
-{
-  int qi;
-  return ql_set_find(&ql, &qi, sp) != 0;
-}
 
 static boolean already_seen(const faction * f, const spell * sp)
 {
@@ -521,9 +519,14 @@ void add_spellname(sc_mage * mage, const spell * sp)
   }
 }
 
-int u_hasspell(const sc_mage *mage, const struct spell *sp)
+int u_hasspell(const unit *u, const struct spell *sp)
 {
-  return mage ? has_spell(mage->spells, sp) : 0;
+  spellbook * book = unit_get_spellbook(u);
+  spellbook_entry * sbe = book ? spellbook_get(book, sp) : 0;
+  if (sbe) {
+    return sbe->level<=effskill(u, SK_MAGIC);
+  }
+  return 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -572,7 +575,7 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
     cmistake(u, ord, 173, MSG_MAGIC);
     return;
   }
-  if (!u_hasspell(mage, sp)) {
+  if (!u_hasspell(u, sp)) {
     /* Diesen Zauber kennt die Einheit nicht */
     cmistake(u, ord, 169, MSG_MAGIC);
     return;
@@ -911,19 +914,12 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
  */
 boolean knowsspell(const region * r, const unit * u, const spell * sp)
 {
-  sc_mage *mage;
   /* Ist überhaupt ein gültiger Spruch angegeben? */
   if (!sp || sp->id == 0) {
     return false;
   }
-  /* Magier? */
-  mage = get_mage(u);
-  if (!mage) {
-    log_warning("%s ist kein Magier, versucht aber zu zaubern.\n", unitname(u));
-    return false;
-  }
   /* steht der Spruch in der Spruchliste? */
-  return u_hasspell(mage, sp)!=0;
+  return u_hasspell(u, sp)!=0;
 }
 
 /* Um einen Spruch zu beherrschen, muss der Magier die Stufe des
@@ -2876,8 +2872,7 @@ const char *curse_name(const curse_type * ctype, const struct locale *lang)
   return LOC(lang, mkname("spell", ctype->cname));
 }
 
-spell *unit_getspell(struct unit *u, const char *name,
-  const struct locale * lang)
+spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
 {
   sc_mage * mage = get_mage(u);
   if (mage) {
@@ -2887,38 +2882,35 @@ spell *unit_getspell(struct unit *u, const char *name,
       if (names->lang==lang) break;
     }
     if (!names) {
-      quicklist *ql = mage->spells;
-      int qi;
-      names = (spell_names *)calloc(1, sizeof(spell_names));
-      names->next = mage->spellnames;
-      names->lang = lang;
-      names->tokens = 0;
-      for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *) ql_get(ql, qi);
-        const char *n = spell_name(sp, lang);
-        if (!n) {
-          log_error("no translation in locae %s for spell $s\n", locale_name(lang), sp->sname);
-        } else {
-          token.v = sp;
-          addtoken(&names->tokens, n, token);
+      spellbook *sb = unit_get_spellbook(u);
+      if (sb) {
+        quicklist * ql;
+        int qi;
+        names = (spell_names *)calloc(1, sizeof(spell_names));
+        names->next = mage->spellnames;
+        names->lang = lang;
+        names->tokens = 0;
+
+        for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
+          spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+          spell *sp = sbe->sp;
+          const char *n = spell_name(sp, lang);
+          if (!n) {
+            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
+          } else {
+            token.v = sp;
+            addtoken(&names->tokens, n, token);
+          }
         }
+        mage->spellnames = names;
       }
-      mage->spellnames = names;
     }
 
-    if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
+    if (names && findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
       return (spell *) token.v;
     }
   }
   return 0;
-}
-
-struct quicklist **get_spelllist(struct sc_mage *mage, struct faction *f)
-{
-  if (mage) {
-    return &mage->spells;
-  }
-  return NULL;
 }
 
 static critbit_tree cb_spellbooks;

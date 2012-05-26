@@ -44,8 +44,8 @@ void test_equipment(CuTest * tc)
 
   mage = get_mage(u);
   CuAssertPtrNotNull(tc, mage);
-  CuAssertPtrNotNull(tc, mage->spells);
-  CuAssertTrue(tc, u_hasspell(mage, sp));
+  CuAssertPtrNotNull(tc, mage->spellbook);
+  CuAssertTrue(tc, u_hasspell(u, sp));
 }
 
 CuSuite *get_equipment_suite(void)

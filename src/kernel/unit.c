@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "race.h"
 #include "region.h"
 #include "spell.h"
+#include "spellbook.h"
 #include "save.h"
 #include "ship.h"
 #include "skill.h"
@@ -1219,8 +1220,6 @@ static int item_modification(const unit * u, skill_t sk, int val)
 
 static int att_modification(const unit * u, skill_t sk)
 {
-  double bonus = 0, malus = 0;
-  attrib *a;
   double result = 0;
   static boolean init = false;
   static const curse_type *skillmod_ct, *gbdream_ct, *worse_ct;
@@ -1251,27 +1250,30 @@ static int att_modification(const unit * u, skill_t sk)
   /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
    * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
    * durchsuchen und aufaddieren müssen */
-  a = a_find(u->region->attribs, &at_curse);
-  while (a && a->type == &at_curse) {
-    curse *c = (curse *) a->data.v;
-    if (curse_active(c) && c->type == gbdream_ct) {
-      double mod = curse_geteffect(c);
-      unit *mage = c->magician;
-      /* wir suchen jeweils den größten Bonus und den größten Malus */
-      if (mod > bonus) {
-        if (mage == NULL || mage->number == 0
-          || alliedunit(mage, u->faction, HELP_GUARD)) {
-          bonus = mod;
-        }
-      } else if (mod < malus) {
-        if (mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)) {
-          malus = mod;
+  if (u->region) {
+    double bonus = 0, malus = 0;
+    attrib *a = a_find(u->region->attribs, &at_curse);
+    while (a && a->type == &at_curse) {
+      curse *c = (curse *) a->data.v;
+      if (curse_active(c) && c->type == gbdream_ct) {
+        double mod = curse_geteffect(c);
+        unit *mage = c->magician;
+        /* wir suchen jeweils den größten Bonus und den größten Malus */
+        if (mod > bonus) {
+          if (mage == NULL || mage->number == 0
+            || alliedunit(mage, u->faction, HELP_GUARD)) {
+            bonus = mod;
+          }
+        } else if (mod < malus) {
+          if (mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)) {
+            malus = mod;
+          }
         }
       }
+      a = a->next;
     }
-    a = a->next;
+    result = result + bonus + malus;
   }
-  result = result + bonus + malus;
 
   return (int)result;
 }
@@ -1283,11 +1285,11 @@ get_modifier(const unit * u, skill_t sk, int level, const region * r,
   int bskill = level;
   int skill = bskill;
 
-  assert(r);
-  if (sk == SK_STEALTH) {
+  if (r && sk == SK_STEALTH) {
     plane *pl = rplane(r);
-    if (pl && fval(pl, PFL_NOSTEALTH))
+    if (pl && fval(pl, PFL_NOSTEALTH)) {
       return 0;
+    }
   }
 
   skill += rc_skillmod(u->race, r, sk);
@@ -1734,7 +1736,10 @@ void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
     log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
     mage = create_mage(u, u->faction?u->faction->magiegebiet:M_GRAY);
   }
-  add_spell(&mage->spells, sp);
+  if (!mage->spellbook) {
+    mage->spellbook = create_spellbook(0);
+  }
+  spellbook_add(mage->spellbook, sp, level);
   add_spellname(mage, sp);
 }
 
@@ -1742,10 +1747,8 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
 {
   sc_mage * mage = get_mage(u);
   if (mage) {
-    if (mage->spells) {
-#ifdef TODO
+    if (mage->spellbook) {
       return mage->spellbook;
-#endif
     }
     return faction_get_spellbook(u->faction);
   }

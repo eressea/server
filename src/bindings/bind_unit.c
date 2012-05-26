@@ -502,22 +502,6 @@ static int tolua_unit_addspell(lua_State * L)
   return 1;
 }
 
-static void unit_removespell(unit * u, spell * sp)
-{
-  quicklist **isptr;
-
-  isptr = get_spelllist(get_mage(u), u->faction);
-  ql_set_remove(isptr, sp);
-}
-
-static int tolua_unit_removespell(lua_State * L)
-{
-  unit *self = (unit *) tolua_tousertype(L, 1, 0);
-  spell *sp = (spell *) tolua_tousertype(L, 2, 0);
-  unit_removespell(self, sp);
-  return 0;
-}
-
 static int tolua_unit_set_racename(lua_State * L)
 {
   unit *self = (unit *) tolua_tousertype(L, 1, 0);
@@ -704,6 +688,7 @@ static int tolua_unit_get_items(lua_State * L)
   return 1;
 }
 
+#ifdef TODO /* spellbooks */
 static int tolua_unit_get_spells(lua_State * L)
 {
   unit *self = (unit *) tolua_tousertype(L, 1, 0);
@@ -719,6 +704,24 @@ static int tolua_unit_get_spells(lua_State * L)
 
   return tolua_quicklist_push(L, "spell_list", "spell", slist);
 }
+
+static void unit_removespell(unit * u, spell * sp)
+{
+  quicklist **isptr;
+
+  isptr = get_spelllist(get_mage(u), u->faction);
+  ql_set_remove(isptr, sp);
+}
+
+static int tolua_unit_removespell(lua_State * L)
+{
+  unit *self = (unit *) tolua_tousertype(L, 1, 0);
+  spell *sp = (spell *) tolua_tousertype(L, 2, 0);
+  unit_removespell(self, sp);
+  return 0;
+}
+
+#endif
 
 static int tolua_unit_get_orders(lua_State * L)
 {
@@ -953,7 +956,10 @@ void tolua_unit_open(lua_State * L)
       tolua_variable(L, TOLUA_CAST "race_name", &tolua_unit_get_racename,
         &tolua_unit_set_racename);
       tolua_function(L, TOLUA_CAST "add_spell", &tolua_unit_addspell);
+#ifdef TODO /* spellbooks */
       tolua_function(L, TOLUA_CAST "remove_spell", &tolua_unit_removespell);
+      tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
+#endif
       tolua_function(L, TOLUA_CAST "cast_spell", &tolua_unit_castspell);
 
       tolua_variable(L, TOLUA_CAST "magic", &tolua_unit_get_magic,
@@ -966,7 +972,6 @@ void tolua_unit_open(lua_State * L)
         tolua_unit_set_ship);
       tolua_variable(L, TOLUA_CAST "region", &tolua_unit_get_region,
         tolua_unit_set_region);
-      tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
       tolua_variable(L, TOLUA_CAST "number", &tolua_unit_get_number,
         tolua_unit_set_number);
       tolua_variable(L, TOLUA_CAST "race", &tolua_unit_get_race,

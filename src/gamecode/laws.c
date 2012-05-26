@@ -3737,12 +3737,11 @@ static void update_spells(void)
       }
       show_new_spells(f, maxlevel, faction_get_spellbook(f));
       for (i=0; i!=MAXMAGES && mages[i]; ++i) {
-        sc_mage *mage = get_mage(mages[i]);
-        if (mage && mage->spells) {
-#ifdef TODO
-          int level = effskill(mages[i], SK_MAGIC);
+        unit * u = mages[i];
+        sc_mage *mage = get_mage(u);
+        if (mage && mage->spellbook) {
+          int level = effskill(u, SK_MAGIC);
           show_new_spells(f, level, mage->spellbook);
-#endif
         }
       }
     }

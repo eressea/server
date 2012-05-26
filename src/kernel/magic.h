@@ -117,7 +117,7 @@ typedef struct sc_mage {
   int spchange;
   int spellcount;
   combatspell combatspells[MAXCOMBATSPELLS];
-  struct quicklist *spells;
+  struct spellbook *spellbook;
   struct spell_names * spellnames;
 } sc_mage;
 
@@ -252,7 +252,7 @@ typedef struct sc_mage {
   /*      löscht Kampfzauber */
   void add_spellname(sc_mage * mage, const struct spell * sp);
   /* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-  int u_hasspell(const sc_mage *mage, const struct spell *sp);
+  int u_hasspell(const struct unit *u, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
   void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
   void show_new_spells(struct faction * f, int level, const struct spellbook *book);
@@ -360,8 +360,6 @@ typedef struct sc_mage {
   extern struct message *msg_unitnotfound(const struct unit *mage,
     struct order *ord, const struct spllprm *spobj);
   extern int FactionSpells(void);
-  extern struct quicklist **get_spelllist(struct sc_mage *mage,
-    struct faction *f);
 
   extern void write_spells(struct quicklist *slist, struct storage *store);
   extern void read_spells(struct quicklist **slistp, magic_t mtype,

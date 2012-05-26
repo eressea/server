@@ -348,6 +348,35 @@ void test_set_post_combatspell(CuTest * tc)
   CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
 }
 
+void test_hasspell(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  f->magiegebiet = M_TYBIED;
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+  sp = create_spell("testspell", 0);
+  sp->sptyp |= POSTCOMBATSPELL;
+
+  unit_add_spell(u, 0, sp, 2);
+
+  set_level(u, SK_MAGIC, 1);
+  CuAssertTrue(tc, !u_hasspell(u, sp));
+
+  set_level(u, SK_MAGIC, 2);
+  CuAssertTrue(tc, u_hasspell(u, sp));
+
+  set_level(u, SK_MAGIC, 1);
+  CuAssertTrue(tc, !u_hasspell(u, sp));
+}
+
 CuSuite *get_magic_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
@@ -361,5 +390,6 @@ CuSuite *get_magic_suite(void)
   SUITE_ADD_TEST(suite, test_set_pre_combatspell);
   SUITE_ADD_TEST(suite, test_set_main_combatspell);
   SUITE_ADD_TEST(suite, test_set_post_combatspell);
+  SUITE_ADD_TEST(suite, test_hasspell);
   return suite;
 }

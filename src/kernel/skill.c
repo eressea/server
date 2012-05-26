@@ -221,7 +221,7 @@ static struct skillmods *init_skills(const race * rc)
 
 int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 {
-  int mods;
+  int mods = 0;
 
   if (!skill_enabled[sk]) {
     return 0;
@@ -237,19 +237,15 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
   }
   mods = (*imods)->mod[rterrain(r)].value[sk];
 #else
-  mods = skill_mod(rc, sk, r->terrain);
+  if (r) {
+    mods = skill_mod(rc, sk, r->terrain);
+  }
 #endif
-  if (rc == new_race[RC_ELF] && r_isforest(r)) {
-    if (sk == SK_PERCEPTION) {
+  if (rc == new_race[RC_ELF] && r && r_isforest(r)) {
+    if (sk == SK_PERCEPTION || sk == SK_STEALTH) {
       ++mods;
-    } else if (sk == SK_STEALTH) {
-      if (r_isforest(r)) {
-        ++mods;
-      }
     } else if (sk == SK_TACTICS) {
-      if (r_isforest(r)) {
-        mods += 2;
-      }
+      mods += 2;
     }
   }
   return mods;
