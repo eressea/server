@@ -33,7 +33,6 @@ static void test_umlaut(CuTest * tc)
   variant id;
   int result;
 
-  memset(&tokens, 0, sizeof(tokens));
   /* don't crash on an empty set */
   result = findtoken(tokens, "herpderp", &id);
   CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
@@ -65,6 +64,8 @@ static void test_umlaut(CuTest * tc)
 
   result = findtoken(tokens, "herp-a-derp", &id);
   CuAssertIntEquals(tc, E_TOK_NOMATCH, result);
+
+  freetokens(tokens);
 }
 
 CuSuite *get_umlaut_suite(void)

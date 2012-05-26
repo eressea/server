@@ -118,7 +118,6 @@ typedef struct sc_mage {
   int spellcount;
   combatspell combatspells[MAXCOMBATSPELLS];
   struct spellbook *spellbook;
-  struct spell_names * spellnames;
 } sc_mage;
 
 /* ------------------------------------------------------------- */
@@ -250,7 +249,6 @@ typedef struct sc_mage {
   /*      setzt Kampfzauber */
   void unset_combatspell(struct unit *u, struct spell * sp);
   /*      löscht Kampfzauber */
-  void add_spellname(sc_mage * mage, const struct spell * sp);
   /* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
   int u_hasspell(const struct unit *u, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */

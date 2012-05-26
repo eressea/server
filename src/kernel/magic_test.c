@@ -180,6 +180,7 @@ void test_getspell_unit(CuTest * tc)
   r = findregion(0, 0);
   f = test_create_faction(0);
   u = test_create_unit(f, r);
+  create_mage(u, M_GRAY);
   skill_enabled[SK_MAGIC] = 1;
 
   set_level(u, SK_MAGIC, 1);
@@ -206,7 +207,9 @@ void test_getspell_faction(CuTest * tc)
   test_create_world();
   r = findregion(0, 0);
   f = test_create_faction(0);
+  f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
+  create_mage(u, f->magiegebiet);
   skill_enabled[SK_MAGIC] = 1;
 
   set_level(u, SK_MAGIC, 1);
@@ -237,6 +240,7 @@ void test_getspell_school(CuTest * tc)
   f = test_create_faction(0);
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
+  create_mage(u, f->magiegebiet);
   skill_enabled[SK_MAGIC] = 1;
   set_level(u, SK_MAGIC, 1);
 

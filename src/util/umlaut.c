@@ -212,7 +212,9 @@ void freetokens(void * root)
   tnode * node = (tnode *)root;
   int i;
   for (i=0;node && i!=NODEHASHSIZE;++i) {
-    freetokens(node->next[i]->node);
+    if (node->next[i]) {
+      freetokens(node->next[i]->node);
+    }
   }
   free(node);
 }

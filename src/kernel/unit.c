@@ -1740,7 +1740,6 @@ void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
     mage->spellbook = create_spellbook(0);
   }
   spellbook_add(mage->spellbook, sp, level);
-  add_spellname(mage, sp);
 }
 
 struct spellbook * unit_get_spellbook(const struct unit * u)

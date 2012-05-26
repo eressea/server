@@ -507,18 +507,6 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
 /* ------------------------------------------------------------- */
 /* Funktionen für die Bearbeitung der List-of-known-spells */
 
-void add_spellname(sc_mage * mage, const spell * sp)
-{
-  spell_names * names = mage->spellnames;
-  while (names) {
-    variant token;
-    const char *n = spell_name(sp, names->lang);
-    token.v = (void *)sp;
-    addtoken(&names->tokens, n, token);
-    names = names->next;
-  }
-}
-
 int u_hasspell(const unit *u, const struct spell *sp)
 {
   spellbook * book = unit_get_spellbook(u);
@@ -2877,37 +2865,32 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
   sc_mage * mage = get_mage(u);
   if (mage) {
     variant token;
-    struct spell_names * names = mage->spellnames;
-    for (;names;names=names->next) {
-      if (names->lang==lang) break;
-    }
-    if (!names) {
-      spellbook *sb = unit_get_spellbook(u);
-      if (sb) {
-        quicklist * ql;
-        int qi;
-        names = (spell_names *)calloc(1, sizeof(spell_names));
-        names->next = mage->spellnames;
-        names->lang = lang;
-        names->tokens = 0;
+    void * tokens = 0;
+    spellbook *sb = unit_get_spellbook(u);
 
-        for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-          spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-          spell *sp = sbe->sp;
-          const char *n = spell_name(sp, lang);
-          if (!n) {
-            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
-          } else {
-            token.v = sp;
-            addtoken(&names->tokens, n, token);
-          }
+    if (sb) {
+      quicklist * ql;
+      int qi;
+
+      for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
+        spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+        spell *sp = sbe->sp;
+        const char *n = spell_name(sp, lang);
+        if (!n) {
+          log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
+        } else {
+          token.v = sp;
+          addtoken(&tokens, n, token);
         }
-        mage->spellnames = names;
       }
     }
 
-    if (names && findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
-      return (spell *) token.v;
+    if (tokens) {
+      if (findtoken(tokens, name, &token) != E_TOK_NOMATCH) {
+        freetokens(tokens);
+        return (spell *) token.v;
+      }
+      freetokens(tokens);
     }
   }
   return 0;
