@@ -219,7 +219,37 @@ void test_get_spellfromtoken_faction(CuTest * tc)
 
   f->spellbook = create_spellbook(0);
   spellbook_add(f->spellbook, sp, 1);
-  CuAssertPtrNotNull(tc, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrEquals(tc, sp, get_spellfromtoken(u, "Herp-a-derp", lang));
+}
+
+void test_get_spellfromtoken_school(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+  struct locale * lang;
+  struct spellbook * book;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  f->magiegebiet = M_TYBIED;
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+
+  set_level(u, SK_MAGIC, 1);
+
+  lang = find_locale("de");
+  sp = create_spell("testspell", 0);
+  locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
+
+  CuAssertPtrEquals(tc, 0, get_spellfromtoken(u, "Herp-a-derp", lang));
+
+  book = get_spellbook(magic_school[f->magiegebiet]);
+  spellbook_add(book, sp, 1);
+  CuAssertPtrEquals(tc, sp, get_spellfromtoken(u, "Herp-a-derp", lang));
 }
 
 CuSuite *get_magic_suite(void)
@@ -231,5 +261,6 @@ CuSuite *get_magic_suite(void)
   SUITE_ADD_TEST(suite, test_pay_spell_failure);
   SUITE_ADD_TEST(suite, test_get_spellfromtoken_unit);
   SUITE_ADD_TEST(suite, test_get_spellfromtoken_faction);
+  SUITE_ADD_TEST(suite, test_get_spellfromtoken_school);
   return suite;
 }
