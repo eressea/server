@@ -1,5 +1,64 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <strings>
+  <namespace name="spellinfo">
+    <string name="headache">
+      <text locale="de">
+      Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: 
+      'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen 
+      entstanden, doch es kann genausogut in jedem andern verrufenen 
+      Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass 
+      schlechtesten Weines, je billiger und ungesunder, desto 
+      wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure 
+      Essenz zu destillieren, die weitaus anspruchsvoller als das einfache 
+      Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden 
+      und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie 
+      es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des
+      Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit 
+      einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht 
+      ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist 
+      die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht 
+      verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränk 
+      des Opfers geträufelt werden. Ihr Meister der Betöhrung und 
+      Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis 
+      stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu 
+      kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr 
+      lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht 
+      die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier 
+      innewohnt, sondern das der Trunkenheit so sicher ein gar 
+      fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die 
+      Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit 
+      einige Tage bis hin zu den Studien zweier Wochen vergessen haben. 
+      Noch ein Wort der Warnung: Dieses ist sehr aufwendig, und so Ihr 
+      noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch 
+      schwerer fallen.'
+      </text>
+    </string>
+    <string name="analysedream">
+      <text locale="de">Mit diesem Spruch kann der Traumweber
+        versuchen, die Verzauberungen einer einzelnen
+        Einheit zu erkennen. Von allen Sprüchen, die
+        seine eigenen Fähigkeiten nicht überschreiten,
+        wird er einen Eindruck ihres Wirkens erhalten
+        können. Bei stärkeren Sprüchen benötigt er ein
+        wenig Glück für eine gelungene Analyse.</text>
+      <text locale="en">With this spell the mentalist can
+        attempt to detect enchantments on a target unit.
+        He will get an idea of the effect of all spells
+        that don't exceed his own abilities. If a spell
+        is stronger, it takes a little luck for a
+        successful analysis.</text>
+    </string>
+  </namespace>
+  <namespace name="spell">
+    <string name="analysedream">
+      <text locale="de">Traumbilder analysieren</text>
+      <text locale="en">Analyse Dreams</text>
+    </string>
+    <string name="headache">
+      <text locale="de">Schaler Wein</text>
+      <text locale="en">Hangover</text>
+    </string>
+  </namespace>
   <namespace name="race">
     <string name="snowman">
       <text locale="de">Schneemann</text>

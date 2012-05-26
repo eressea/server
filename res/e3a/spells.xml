@@ -58,7 +58,7 @@
   </spell>
   <spell name="icastle" rank="5" level="3" index="137" syntax="buildingtype" parameters="c">
     <!-- Traumschlößchen -->
-    <resource name="aura" amount="1" cost="level"/>
+    <resource name="aura" amount="3" cost="fixed"/>
   </spell>
   <spell name="dreamreading" rank="5" level="4" index="13" parameters="u" far="true">
     <!-- Traumlesen -->
@@ -130,11 +130,11 @@
   </spell>
   <spell name="magicboost" rank="3" level="3" index="17" ship="true">
     <!-- Gabe des Chaos -->
-    <resource name="aura" amount="2" cost="linear"/>
+    <resource name="aura" amount="6" cost="fixed"/>
   </spell>
   <spell name="bloodsacrifice" rank="1" level="4" index="171" ship="true">
     <!-- Kleines Blutopfer -->
-    <resource name="hp" amount="4" cost="level"/>
+    <resource name="hp" amount="16" cost="fixed"/>
   </spell>
   <spell name="berserk" rank="4" level="5" index="22" variable="true" combat="1">
     <!-- Blutrausch -->
@@ -664,13 +664,13 @@
     <resource name="aura" amount="4" cost="fixed"/>
   </spell>
   <spell name="aura_of_fear" rank="5" index="175" combat="2">
-    <resource name="aura" amount="1" cost="level"/>
+    <resource name="aura" amount="12" cost="fixed"/>
   </spell>
   <spell name="shadowcall" rank="5" level="12" index="176" combat="1">
-    <resource name="aura" amount="2" cost="level"/>
+    <resource name="aura" amount="24" cost="fixed"/>
   </spell>
   <spell name="immolation" rank="5" level="12" index="180" combat="2">
-    <resource name="aura" amount="2" cost="level"/>
+    <resource name="aura" amount="24" cost="fixed"/>
   </spell>
   <spell name="firestorm" rank="5" level="8" index="181" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>

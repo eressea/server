@@ -65,7 +65,7 @@
     <resource name="peasant" amount="50" cost="fixed"/>
   </spell>
   <spell name="magicboost" rank="3" level="3" index="17" ship="true">
-    <resource name="aura" amount="2" cost="linear"/>
+    <resource name="aura" amount="6" cost="fixed"/>
   </spell>
   <spell name="chaosrow" rank="5" level="8" index="18" variable="true" combat="1">
     <resource name="aura" amount="3" cost="level"/>
@@ -203,7 +203,7 @@
     <resource name="aura" amount="40" cost="fixed"/>
   </spell>
   <spell name="headache" rank="5" level="7" index="62" parameters="u" los="true">
-    <resource name="aura" amount="4" cost="linear"/>
+    <resource name="aura" amount="28" cost="fixed"/>
     <resource name="h7" amount="3" cost="fixed"/>
     <resource name="money" amount="50" cost="fixed"/>
   </spell>
@@ -321,7 +321,7 @@
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="analysedream" rank="5" level="5" index="103" parameters="u" los="true" ship="true">
-    <resource name="aura" amount="5" cost="level"/>
+    <resource name="aura" amount="25" cost="fixed"/>
   </spell>
   <spell name="analysesong_unit" rank="5" level="5" index="104" parameters="u" los="true" ship="true">
     <resource name="aura" amount="10" cost="fixed"/>
@@ -377,7 +377,7 @@
     <resource name="aura" amount="4" cost="level"/>
   </spell>
   <spell name="icastle" rank="5" level="3" index="137" syntax="buildingtype" parameters="c">
-    <resource name="aura" amount="1" cost="level"/>
+    <resource name="aura" amount="3" cost="fixed"/>
   </spell>
   <spell name="gwyrrddestroymagic" rank="2" level="8" index="138" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="6" cost="level"/>
@@ -457,7 +457,7 @@
     <resource name="permaura" amount="3" cost="fixed"/>
   </spell>
   <spell name="bloodsacrifice" rank="1" level="4" index="171" ship="true">
-    <resource name="hp" amount="4" cost="level"/>
+    <resource name="hp" amount="16" cost="fixed"/>
   </spell>
   <spell name="magic_roots" rank="5" level="16" index="172" far="true">
     <resource name="aura" amount="250" cost="fixed"/>
@@ -474,10 +474,10 @@
     <resource name="aura" amount="4" cost="fixed"/>
   </spell>
   <spell name="aura_of_fear" rank="5" index="175" combat="2">
-    <resource name="aura" amount="1" cost="level"/>
+    <resource name="aura" amount="12" cost="fixed"/>
   </spell>
   <spell name="shadowcall" rank="5" level="12" index="176" combat="1">
-    <resource name="aura" amount="2" cost="level"/>
+    <resource name="aura" amount="24" cost="fixed"/>
   </spell>
   <spell name="mallorntreegrow" rank="5" level="4" index="177" far="true" variable="true">
     <resource name="aura" amount="6" cost="level"/>
@@ -488,7 +488,7 @@
     <resource name="aura" amount="20" cost="level"/>
   </spell>
   <spell name="immolation" rank="5" level="12" index="180" combat="2">
-    <resource name="aura" amount="2" cost="level"/>
+    <resource name="aura" amount="24" cost="fixed"/>
   </spell>
   <spell name="firestorm" rank="5" level="8" index="181" combat="2">
     <resource name="aura" amount="2" cost="fixed"/>
