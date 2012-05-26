@@ -1575,7 +1575,6 @@ static int parse_spells(xmlDocPtr doc)
       xmlFree(propValue);
       /* level, rank and flags */
 #endif
-      sp->level = xml_ivalue(node, "level", -1);
       sp->rank = (char)xml_ivalue(node, "rank", -1);
       if (xml_bvalue(node, "los", false))
         sp->sptyp |= TESTCANSEE;        /* must see or have contact */

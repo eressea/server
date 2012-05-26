@@ -49,6 +49,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
@@ -651,20 +652,24 @@ fwriteorder(FILE * F, const struct order *ord, const struct locale *lang,
   fputc('"', F);
 }
 
-static void cr_output_spells(FILE * F, quicklist * slist, const faction * f,
-  int maxlevel)
+static void cr_output_spells(FILE * F, const unit * u, int maxlevel)
 {
-  if (slist) {
-    quicklist *ql;
-    int qi;
-    fprintf(F, "SPRUECHE\n");
+  spellbook * book = unit_get_spellbook(u);
 
-    for (ql = slist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-      spell *sp = (spell *) ql_get(ql, qi);
-      if (sp->level <= maxlevel) {
-        const char *name =
-          add_translation(mkname("spell", sp->sname), spell_name(sp,
-            f->locale));
+  if (book) {
+    const faction * f = u->faction;
+    quicklist *ql;
+    int qi, header = 0;
+
+    for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+      spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+      if (sbe->level <= maxlevel) {
+        spell * sp = sbe->sp;
+        const char *name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+        if (!header) {
+          fputs("SPRUECHE\n", F);
+          header = 1;
+        }
         fprintf(F, "\"%s\"\n", name);
       }
     }
@@ -818,6 +823,7 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
     const char *xc;
     const char *c;
     int i;
+    sc_mage *mage;
 
     i = ualias(u);
     if (i > 0)
@@ -889,13 +895,12 @@ static void cr_output_unit(FILE * F, const region * r, const faction * f,       
               f->locale)));
       }
     }
-    /* spells */
-    if (is_mage(u)) {
-      sc_mage *mage = get_mage(u);
-      quicklist **slistp = get_spelllist(mage, u->faction);
-      int i, maxlevel = effskill(u, SK_MAGIC);
 
-      cr_output_spells(F, *slistp, f, maxlevel);
+    /* spells that this unit can cast */
+    mage = get_mage(u);
+    if (mage) {
+      int i, maxlevel = effskill(u, SK_MAGIC);
+      cr_output_spells(F, u, maxlevel);
 
       for (i = 0; i != MAXCOMBATSPELLS; ++i) {
         const spell *sp = mage->combatspells[i].sp;

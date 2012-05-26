@@ -1738,7 +1738,7 @@ void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
   add_spellname(mage, sp);
 }
 
-struct spellbook * unit_get_spellbook(struct unit * u)
+struct spellbook * unit_get_spellbook(const struct unit * u)
 {
   sc_mage * mage = get_mage(u);
   if (mage) {
