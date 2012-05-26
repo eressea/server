@@ -563,9 +563,8 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 {
   sc_mage *mage = get_mage(u);
   int i = -1;
-  if (!mage) {
-    return;
-  }
+
+  assert(mage || !"trying to set a combat spell for non-mage");
 
   /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
   if (!knowsspell(u->region, u, sp)) {

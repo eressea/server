@@ -238,7 +238,6 @@ void test_getspell_school(CuTest * tc)
   f->magiegebiet = M_TYBIED;
   u = test_create_unit(f, r);
   skill_enabled[SK_MAGIC] = 1;
-
   set_level(u, SK_MAGIC, 1);
 
   lang = find_locale("de");
@@ -253,6 +252,102 @@ void test_getspell_school(CuTest * tc)
   CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
 }
 
+void test_set_pre_combatspell(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+  const int index = 0;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  f->magiegebiet = M_TYBIED;
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+  set_level(u, SK_MAGIC, 1);
+  sp = create_spell("testspell", 0);
+  sp->sptyp |= PRECOMBATSPELL;
+
+  unit_add_spell(u, 0, sp, 1);
+
+  set_combatspell(u, sp, 0, 2);
+  CuAssertPtrEquals(tc, sp, (spell *)get_combatspell(u, index));
+  set_level(u, SK_MAGIC, 2);
+  CuAssertIntEquals(tc, 2, get_combatspelllevel(u, index));
+  set_level(u, SK_MAGIC, 1);
+  CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
+  unset_combatspell(u, sp);
+  CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
+  CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+}
+
+void test_set_main_combatspell(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+  const int index = 1;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  f->magiegebiet = M_TYBIED;
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+  set_level(u, SK_MAGIC, 1);
+  sp = create_spell("testspell", 0);
+  sp->sptyp |= COMBATSPELL;
+
+  unit_add_spell(u, 0, sp, 1);
+
+  set_combatspell(u, sp, 0, 2);
+  CuAssertPtrEquals(tc, sp, (spell *)get_combatspell(u, index));
+  set_level(u, SK_MAGIC, 2);
+  CuAssertIntEquals(tc, 2, get_combatspelllevel(u, index));
+  set_level(u, SK_MAGIC, 1);
+  CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
+  unset_combatspell(u, sp);
+  CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
+  CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+}
+
+void test_set_post_combatspell(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+  const int index = 2;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  f->magiegebiet = M_TYBIED;
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+  set_level(u, SK_MAGIC, 1);
+  sp = create_spell("testspell", 0);
+  sp->sptyp |= POSTCOMBATSPELL;
+
+  unit_add_spell(u, 0, sp, 1);
+
+  set_combatspell(u, sp, 0, 2);
+  CuAssertPtrEquals(tc, sp, (spell *)get_combatspell(u, index));
+  set_level(u, SK_MAGIC, 2);
+  CuAssertIntEquals(tc, 2, get_combatspelllevel(u, index));
+  set_level(u, SK_MAGIC, 1);
+  CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
+  unset_combatspell(u, sp);
+  CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
+  CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+}
+
 CuSuite *get_magic_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
@@ -263,5 +358,8 @@ CuSuite *get_magic_suite(void)
   SUITE_ADD_TEST(suite, test_getspell_unit);
   SUITE_ADD_TEST(suite, test_getspell_faction);
   SUITE_ADD_TEST(suite, test_getspell_school);
+  SUITE_ADD_TEST(suite, test_set_pre_combatspell);
+  SUITE_ADD_TEST(suite, test_set_main_combatspell);
+  SUITE_ADD_TEST(suite, test_set_post_combatspell);
   return suite;
 }
