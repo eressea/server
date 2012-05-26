@@ -152,6 +152,7 @@ extern "C" {
   void faction_setpassword(struct faction *self, const char *password);
   boolean valid_race(const struct faction *f, const struct race *rc);
 
+  struct spellbook * faction_get_spellbook(struct faction *f);
 #ifdef __cplusplus
 }
 #endif

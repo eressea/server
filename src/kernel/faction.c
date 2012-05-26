@@ -511,3 +511,14 @@ struct alliance *f_get_alliance(const struct faction *f)
   }
   return NULL;
 }
+
+struct spellbook * faction_get_spellbook(struct faction *f)
+{
+  if (f->spellbook) {
+    return f->spellbook;
+  }
+  if (f->magiegebiet!=M_GRAY) {
+    return get_spellbook(magic_school[f->magiegebiet]);
+  }
+  return 0;
+}

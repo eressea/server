@@ -1615,8 +1615,9 @@ int readgame(const char *filename, int mode, int backup)
 
   n = store->r_int(store);
   assert(n < MAXREGIONS);
-  if (rmax < 0)
+  if (rmax < 0) {
     rmax = n;
+  }
   log_printf(stdout, " - Einzulesende Regionen: %d/%d\r", rmax, n);
   while (--n >= 0) {
     unit **up;
@@ -1727,7 +1728,6 @@ int readgame(const char *filename, int mode, int backup)
         }
         if (mage->spellcount < 0) {
           mage->spellcount = 0;
-          updatespelllist(u);
         }
       }
     }

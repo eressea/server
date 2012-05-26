@@ -3687,6 +3687,32 @@ static void defaultorders(void)
 /* ************************************************************ */
 #define COMMONSPELLS 1          /* number of new common spells per level */
 #define MAXMAGES 128            /* should be enough */
+
+static int faction_getmages(faction * f, unit ** results, int numresults)
+{
+  unit *u;
+  int maxlevel = 0, n = 0;
+
+  for (u = f->units; u; u = u->nextF) {
+    if (u->number > 0) {
+      sc_mage *mage = get_mage(u);
+      if (mage) {
+        int level = eff_skill(u, SK_MAGIC, u->region);
+        if (level > maxlevel) {
+          maxlevel = level;
+        }
+        if (n<numresults) {
+          results[n++] = u;
+        }
+      }
+    }
+  }
+  if (n<numresults) {
+    results[n] = 0;
+  }
+  return maxlevel;
+}
+
 static void update_spells(void)
 {
   faction *f;
@@ -3694,34 +3720,30 @@ static void update_spells(void)
   for (f = factions; f; f = f->next) {
     if (f->magiegebiet != M_NONE && !is_monsters(f)) {
       unit *mages[MAXMAGES];
-      unit *u;
-      int maxlevel = 0, n = 0, i;
-
-      for (u = f->units; u; u = u->nextF) {
-        if (u->number > 0) {
-          sc_mage *mage = get_mage(u);
-          if (mage) {
-            int level = eff_skill(u, SK_MAGIC, u->region);
-            if (level > maxlevel)
-              maxlevel = level;
-            assert(n < MAXMAGES);
-            mages[n++] = u;
-          }
-        }
-      }
+      int i;
+      int maxlevel = faction_getmages(f, mages, MAXMAGES);
 
       if (FactionSpells() && maxlevel > f->max_spelllevel) {
         static spellbook * common_spells;
         if (!common_spells) {
           const char *common_school = get_param(global.parameters, "rules.magic.common");
-          common_spells = get_spellbook(common_school ? common_school : "common");
+          if (!common_school) common_school = "common";
+          common_spells = get_spellbook(common_school);
+          if (!common_spells) {
+            log_error("could not find a book of common spells: '%s'\n", common_school);
+          }
         }
-        if (common_spells) {
-          pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
-        }
+        pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
       }
-      for (i = 0; i != n; ++i) {
-        updatespelllist(mages[i]);
+      show_new_spells(f, maxlevel, faction_get_spellbook(f));
+      for (i=0; i!=MAXMAGES && mages[i]; ++i) {
+        sc_mage *mage = get_mage(mages[i]);
+        if (mage && mage->spells) {
+#ifdef TODO
+          int level = effskill(mages[i], SK_MAGIC);
+          show_new_spells(f, level, mage->spellbook);
+#endif
+        }
       }
     }
   }

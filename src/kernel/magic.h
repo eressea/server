@@ -255,6 +255,7 @@ typedef struct sc_mage {
   int u_hasspell(const sc_mage *mage, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
   void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
+  void show_new_spells(struct faction * f, int level, const struct spellbook *book);
   void updatespelllist(struct unit *u);
   /* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner
    * als das aktuelle Magietalent ist, in die Spruchliste der Einheit

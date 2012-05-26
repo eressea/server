@@ -247,7 +247,8 @@ void test_getspell_school(CuTest * tc)
 
   CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
 
-  book = get_spellbook(magic_school[f->magiegebiet]);
+  book = faction_get_spellbook(f);
+  CuAssertPtrNotNull(tc, book);
   spellbook_add(book, sp, 1);
   CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
 }

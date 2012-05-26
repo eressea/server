@@ -409,50 +409,26 @@ static boolean already_seen(const faction * f, const spell * sp)
   return false;
 }
 
-static void update_spells(faction * f, sc_mage * mage, int level, const spellbook *book)
+void show_new_spells(faction * f, int level, const spellbook *book)
 {
-  boolean ismonster = is_monsters(f);
-  quicklist **dst, *ql = book->spells;
-  int qi;
+  if (book) {
+    quicklist *ql = book->spells;
+    int qi;
 
-  dst = get_spelllist(mage, f);
-  for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-    spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
-    if (sbe->level <= level) {
-      spell * sp = sbe->sp;
+    for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
+      spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
+      if (sbe->level <= level) {
+        spell * sp = sbe->sp;
 
-      if (!u_hasspell(mage, sp)) {
-        add_spell(dst, sp);
-        add_spellname(mage, sp);
+        if (!already_seen(f, sp)) {
+          attrib * a = a_new(&at_reportspell);
+          spellbook_entry * entry = (spellbook_entry *)a->data.v;
+          entry->level = level;
+          entry->sp = sp;
+          a_add(&f->attribs, a);
+          a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
+        }
       }
-      if (!ismonster && !already_seen(f, sp)) {
-        attrib * a = a_new(&at_reportspell);
-        spellbook_entry * entry = (spellbook_entry *)a->data.v;
-        entry->level = level;
-        entry->sp = sp;
-        a_add(&f->attribs, a);
-        a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
-      }
-    }
-  }
-}
-
-void updatespelllist(unit * u)
-{
-  int sk = eff_skill(u, SK_MAGIC, u->region);
-  struct sc_mage *mage = get_mage(u);
-
-  /* Magier mit M_GRAY bekommen weder Sprüche angezeigt noch
-    * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
-    * Drachen, die noch den Skill Magie haben, und alle familiars */
-  if (mage->magietyp != M_GRAY) {
-    spellbook * book;
-    book = get_spellbook(magic_school[mage->magietyp]);
-
-    update_spells(u->faction, mage, sk, book);
-
-    if (FactionSpells()) {
-      update_spells(u->faction, mage, sk, u->faction->spellbook);
     }
   }
 }
@@ -1522,9 +1498,6 @@ void regeneration_magiepunkte(void)
               "unit region amount", u, r, regen));
         }
         set_spellpoints(u, MIN(aura, auramax));
-
-        /* Zum letzten Mal Spruchliste aktualisieren */
-        /*updatespelllist(u); */
       }
     }
   }

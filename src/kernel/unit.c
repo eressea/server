@@ -1742,10 +1742,12 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
 {
   sc_mage * mage = get_mage(u);
   if (mage) {
-    if (u->faction->spellbook) {
-      return u->faction->spellbook;
+    if (mage->spells) {
+#ifdef TODO
+      return mage->spellbook;
+#endif
     }
-    return get_spellbook(magic_school[u->faction->magiegebiet]);
+    return faction_get_spellbook(u->faction);
   }
   return 0;
 }
