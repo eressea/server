@@ -1662,8 +1662,14 @@ static int parse_spells(xmlDocPtr doc)
         propValue = xmlGetProp(node, BAD_CAST "cost");
         if (propValue != NULL) {
           if (strcmp((const char *)propValue, "linear") == 0) {
+            if ((sp->sptyp&SPELLLEVEL)==0) {
+              log_error("spell '%s' has linear cost but fixed level\n", sp->sname);
+            }
             component->cost = SPC_LINEAR;
           } else if (strcmp((const char *)propValue, "level") == 0) {
+            if ((sp->sptyp&SPELLLEVEL)==0) {
+              log_error("spell '%s' has levelled cost but fixed level\n", sp->sname);
+            }
             component->cost = SPC_LEVEL;
           }
           xmlFree(propValue);

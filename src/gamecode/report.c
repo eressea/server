@@ -280,7 +280,7 @@ static void nr_spell(FILE * F, spellbook_entry * sbe, const struct locale *lang)
         }
       } else {
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
-          itemanz *= sbe->level;
+          itemanz *= sp->level;
         }
         bytes =
           snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype,

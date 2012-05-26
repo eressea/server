@@ -428,7 +428,11 @@ static void update_spells(faction * f, sc_mage * mage, int level, const spellboo
         add_spellname(mage, sp);
       }
       if (!ismonster && !already_seen(f, sp)) {
-        a_add(&f->attribs, a_new(&at_reportspell))->data.v = sp;
+        attrib * a = a_new(&at_reportspell);
+        spellbook_entry * entry = (spellbook_entry *)a->data.v;
+        entry->level = level;
+        entry->sp = sp;
+        a_add(&f->attribs, a);
         a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
       }
     }
