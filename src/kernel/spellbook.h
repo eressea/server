@@ -42,7 +42,7 @@ spellbook * create_spellbook(const char * name);
 void spellbook_add(spellbook *sbp, struct spell * sp, int level);
 int spellbook_foreach(spellbook *sb, int (*callback)(spellbook_entry *, void *), void * data);
 void spellbook_clear(spellbook *sb);
-spellbook_entry * spellbook_get(spellbook *sb, struct spell * sp);
+spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp);
 
 #ifdef __cplusplus
 }

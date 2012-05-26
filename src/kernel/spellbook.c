@@ -54,7 +54,7 @@ int spellbook_foreach(spellbook *sb, int (*callback)(spellbook_entry *, void *),
   return 0;
 }
 
-spellbook_entry * spellbook_get(spellbook *sb, struct spell * sp)
+spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp)
 {
   quicklist *ql;
   int qi;

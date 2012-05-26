@@ -897,9 +897,15 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
   /* Ein Spruch mit Fixkosten wird immer mit der Stufe des Spruchs und
    * nicht auf der Stufe des Magiers gezaubert */
   if (costtyp == SPC_FIX) {
-    cast_level = MIN(cast_level, sp->level);
+    spellbook * spells = unit_get_spellbook(u);
+    if (spells) {
+      spellbook_entry * sbe = spellbook_get(spells, sp); 
+      if (sbe) {
+        return MIN(cast_level, sbe->level);
+      }
+    }
+    log_error("spell %s is not in the spellbook for %s\n", sp->sname, unitname(u));
   }
-
   return cast_level;
 }
 
