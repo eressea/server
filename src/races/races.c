@@ -70,7 +70,7 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
         building *b = new_building(btype, r, u->faction->locale);
         b->size = 10;
         u_set_building(u, b);
-        building_set_owner(b, u);
+        building_set_owner(u);
       }
     }
     break;

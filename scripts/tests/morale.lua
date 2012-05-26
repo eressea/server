@@ -143,9 +143,9 @@ end
 function test_morale_old()
   local r = region.create(0, 0, "plain")
   assert_equal(1, r.morale)
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
+  local f1 = faction.create("first@eressea.de", "human", "de")
   local u1 = unit.create(f1, r, 1)
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local f2 = faction.create("second@eressea.de", "human", "de")
   local u2 = unit.create(f2, r, 1)
 
   local b = building.create(r, "castle")
