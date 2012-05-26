@@ -3,6 +3,7 @@
 #include "spells/shipcurse.h"
 
 #include <kernel/ship.h>
+#include <kernel/spellbook.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 
@@ -55,12 +56,13 @@ static int fix_familiars(struct lua_State *L)
     for (u = f->units; u; u = u->nextF) {
       struct sc_mage *mage = get_mage(u);
       if (mage && is_familiar(u)) {
-        if (mage->spells && mage->magietyp == M_GRAY) {
+        if (mage->spellbook && mage->magietyp == M_GRAY) {
           equipment *eq;
           char buffer[64];
 
-          ql_free(mage->spells);
-          mage->spells = 0;
+          spellbook_clear(mage->spellbook);
+          free(mage->spellbook);
+          mage->spellbook = 0;
 
           snprintf(buffer, sizeof(buffer), "%s_familiar", u->race->_name[0]);
           eq = get_equipment(buffer);
