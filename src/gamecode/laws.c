@@ -2427,7 +2427,6 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
   const item_type *itype;
   const spell *sp = 0;
   const race *rc;
-  sc_mage * mage;
 
   switch (p) {
   case P_ZAUBER:
@@ -2458,10 +2457,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
       }
     }
     /* try for a spell */
-    mage = get_mage(u);
-    if (mage) {
-      sp = get_spellfromtoken(mage, s, u->faction->locale);
-    }
+    sp = get_spellfromtoken(u, s, u->faction->locale);
     if (sp) {
       attrib *a = a_find(u->faction->attribs, &at_seenspell);
       while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
@@ -2626,7 +2622,6 @@ static int combatspell_cmd(unit * u, struct order *ord)
   const char *s;
   int level = 0;
   spell *sp = 0;
-  sc_mage * mage;
 
   init_tokens(ord);
   skip_token();
@@ -2646,10 +2641,7 @@ static int combatspell_cmd(unit * u, struct order *ord)
     s = getstrtoken();
   }
 
-  mage = get_mage(u);
-  if (mage) {
-    sp = get_spellfromtoken(mage, s, u->faction->locale);
-  }
+  sp = get_spellfromtoken(u, s, u->faction->locale);
   if (!sp) {
     cmistake(u, ord, 173, MSG_MAGIC);
     return 0;

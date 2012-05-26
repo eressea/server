@@ -2526,7 +2526,6 @@ static castorder *cast_cmd(unit * u, order * ord)
   plane *pl;
   spellparameter *args = NULL;
   unit * caster = u;
-  sc_mage * mage;
 
   if (LongHunger(u)) {
     cmistake(u, ord, 224, MSG_MAGIC);
@@ -2587,10 +2586,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     return 0;
   }
 
-  mage = get_mage(u);
-  if (mage) {
-    sp = get_spellfromtoken(mage, s, u->faction->locale);
-  }
+  sp = get_spellfromtoken(u, s, u->faction->locale);
 
   /* Vertraute können auch Zauber sprechen, die sie selbst nicht
    * können. get_spellfromtoken findet aber nur jene Sprüche, die
@@ -2598,9 +2594,8 @@ static castorder *cast_cmd(unit * u, order * ord)
   if (!sp && is_familiar(u)) {
     caster = get_familiar_mage(u);
     if (caster) {
-      mage = get_mage(caster);
       familiar = u;
-      sp = get_spellfromtoken(mage, s, caster->faction->locale);
+      sp = get_spellfromtoken(caster, s, caster->faction->locale);
     } else {
       /* somehow, this familiar has no mage! */
       log_error("cast_cmd: familiar %s is without a mage?\n", unitname(u));
@@ -2693,7 +2688,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     if (caster != familiar) {        /* Magier zaubert durch Vertrauten */
       if (range > 1) {          /* Fehler! Versucht zu Farcasten */
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast",
-            "mage", mage));
+            "mage", caster));
         return 0;
       }
       if (distance(caster->region, r) > eff_skill(caster, SK_MAGIC, caster->region)) {

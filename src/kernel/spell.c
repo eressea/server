@@ -104,32 +104,39 @@ spell *find_spell(const char *name)
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
-spell *get_spellfromtoken(sc_mage *mage, const char *name,
+spell *get_spellfromtoken(struct unit *u, const char *name,
   const struct locale * lang)
 {
-  variant token;
-  struct spell_names * names = mage->spellnames;
-  for (;names;names=names->next) {
-    if (names->lang==lang) break;
-  }
-  if (!names) {
-    quicklist *ql = mage->spells;
-    int qi;
-    names = (spell_names *)calloc(1, sizeof(spell_names));
-    names->next = mage->spellnames;
-    names->lang = lang;
-    names->tokens = 0;
-    for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
-      spell *sp = (spell *) ql_get(ql, qi);
-      const char *n = spell_name(sp, lang);
-      token.v = sp;
-      addtoken(&names->tokens, n, token);
+  sc_mage * mage = get_mage(u);
+  if (mage) {
+    variant token;
+    struct spell_names * names = mage->spellnames;
+    for (;names;names=names->next) {
+      if (names->lang==lang) break;
     }
-    mage->spellnames = names;
-  }
+    if (!names) {
+      quicklist *ql = mage->spells;
+      int qi;
+      names = (spell_names *)calloc(1, sizeof(spell_names));
+      names->next = mage->spellnames;
+      names->lang = lang;
+      names->tokens = 0;
+      for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
+        spell *sp = (spell *) ql_get(ql, qi);
+        const char *n = spell_name(sp, lang);
+        if (!n) {
+          log_error("no translation in locae %s for spell $s\n", locale_name(lang), sp->sname);
+        } else {
+          token.v = sp;
+          addtoken(&names->tokens, n, token);
+        }
+      }
+      mage->spellnames = names;
+    }
 
-  if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
-    return (spell *) token.v;
+    if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
+      return (spell *) token.v;
+    }
   }
   return 0;
 }

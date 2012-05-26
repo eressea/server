@@ -148,7 +148,7 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
 
         for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
           spellbook_entry *sbe = (spellbook_entry *) ql_get(ql, qi);
-          unit_add_spell(u, mage, sbe->sp);
+          unit_add_spell(u, mage, sbe->sp, sbe->level);
         }
       }
     }

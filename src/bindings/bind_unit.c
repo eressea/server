@@ -487,6 +487,7 @@ static int tolua_unit_addspell(lua_State * L)
 {
   unit *u = (unit *) tolua_tousertype(L, 1, 0);
   const char *str = tolua_tostring(L, 2, 0);
+  int level = (int)tolua_tonumber(L, 3, 1);
   int err = 0;
   spell *sp = find_spell(str);
 
@@ -494,7 +495,7 @@ static int tolua_unit_addspell(lua_State * L)
     log_error("spell %s could not be found\n", str);
     return EINVAL;
   } else {
-    unit_add_spell(u, 0, sp);
+    unit_add_spell(u, 0, sp, level);
   }
 
   lua_pushinteger(L, err);

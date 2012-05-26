@@ -37,7 +37,7 @@ extern "C" {
   extern struct spell * create_spell(const char * name, unsigned int id);
   extern struct spell * find_spell(const char *name);
   extern struct spell * find_spellbyid(unsigned int i);
-  extern struct spell * get_spellfromtoken(struct sc_mage *mage, const char *s,
+  extern struct spell * get_spellfromtoken(struct unit *u, const char *s,
     const struct locale *lang);
   extern void free_spells(void);
 

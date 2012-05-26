@@ -5,6 +5,7 @@
 #include <kernel/item.h>
 #include <kernel/magic.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
@@ -105,7 +106,7 @@ void test_pay_spell(CuTest * tc)
   CuAssertPtrNotNull(tc, sp);
 
   set_level(u, SK_MAGIC, 5);
-  unit_add_spell(u, 0, sp);
+  unit_add_spell(u, 0, sp, 1);
 
   change_resource(u, rt_find("money"), 1);
   change_resource(u, rt_find("aura"), 3);
@@ -122,9 +123,9 @@ void test_pay_spell(CuTest * tc)
 void test_pay_spell_failure(CuTest * tc)
 {
   spell *sp;
-  unit * u;
-  faction * f;
-  region * r;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
   int level;
 
   test_cleanup();
@@ -138,7 +139,7 @@ void test_pay_spell_failure(CuTest * tc)
   CuAssertPtrNotNull(tc, sp);
 
   set_level(u, SK_MAGIC, 5);
-  unit_add_spell(u, 0, sp);
+  unit_add_spell(u, 0, sp, 1);
 
   CuAssertIntEquals(tc, 1, change_resource(u, rt_find("money"), 1));
   CuAssertIntEquals(tc, 2, change_resource(u, rt_find("aura"), 2));
@@ -166,6 +167,61 @@ void test_pay_spell_failure(CuTest * tc)
   CuAssertIntEquals(tc, 2, get_resource(u, rt_find("horse")));
 }
 
+void test_get_spellfromtoken_unit(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+  struct locale * lang;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+
+  set_level(u, SK_MAGIC, 1);
+
+  lang = find_locale("de");
+  sp = create_spell("testspell", 0);
+  locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
+
+  CuAssertPtrEquals(tc, 0, get_spellfromtoken(u, "Herp-a-derp", lang));
+
+  unit_add_spell(u, 0, sp, 1);
+  CuAssertPtrNotNull(tc, get_spellfromtoken(u, "Herp-a-derp", lang));
+}
+
+void test_get_spellfromtoken_faction(CuTest * tc)
+{
+  spell *sp;
+  struct unit * u;
+  struct faction * f;
+  struct region * r;
+  struct locale * lang;
+
+  test_cleanup();
+  test_create_world();
+  r = findregion(0, 0);
+  f = test_create_faction(0);
+  u = test_create_unit(f, r);
+  skill_enabled[SK_MAGIC] = 1;
+
+  set_level(u, SK_MAGIC, 1);
+
+  lang = find_locale("de");
+  sp = create_spell("testspell", 0);
+  locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
+
+  CuAssertPtrEquals(tc, 0, get_spellfromtoken(u, "Herp-a-derp", lang));
+
+  f->spellbook = create_spellbook(0);
+  spellbook_add(f->spellbook, sp, 1);
+  CuAssertPtrNotNull(tc, get_spellfromtoken(u, "Herp-a-derp", lang));
+}
+
 CuSuite *get_magic_suite(void)
 {
   CuSuite *suite = CuSuiteNew();
@@ -173,5 +229,7 @@ CuSuite *get_magic_suite(void)
   SUITE_ADD_TEST(suite, test_spellbooks);
   SUITE_ADD_TEST(suite, test_pay_spell);
   SUITE_ADD_TEST(suite, test_pay_spell_failure);
+  SUITE_ADD_TEST(suite, test_get_spellfromtoken_unit);
+  SUITE_ADD_TEST(suite, test_get_spellfromtoken_faction);
   return suite;
 }

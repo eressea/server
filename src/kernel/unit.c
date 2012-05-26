@@ -1726,7 +1726,7 @@ const struct race *u_irace(const struct unit *u)
   return u->race;
 }
 
-void unit_add_spell(unit * u, sc_mage * m, struct spell * sp)
+void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 {
   sc_mage *mage = m ? m : get_mage(u);
 

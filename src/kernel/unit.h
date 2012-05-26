@@ -234,7 +234,7 @@ extern "C" {
   void scale_number(struct unit *u, int n);
 
   struct spellbook * unit_get_spellbook(struct unit * u);
-  void unit_add_spell(struct unit * u, struct sc_mage * m, struct spell * sp);
+  void unit_add_spell(struct unit * u, struct sc_mage * m, struct spell * sp, int level);
 
   extern struct attrib_type at_creator;
 #ifdef __cplusplus
