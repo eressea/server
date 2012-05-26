@@ -47,7 +47,7 @@ extern "C" {
   extern void read_items(struct storage *store, struct item **it);
   extern void write_items(struct storage *store, struct item *it);
 
-  extern struct spellbook *read_spellbook(struct storage *store);
+  extern void read_spellbook(struct spellbook **bookp, struct storage *store);
   extern void write_spellbook(const struct spellbook *book, struct storage *store);
 
   extern void write_unit(struct storage *store, const struct unit *u);

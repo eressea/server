@@ -1957,8 +1957,8 @@ static int parse_races(xmlDocPtr doc)
         attack->data.sp = xml_spell(node, "spell");
         if (attack->data.sp) {
           attack->level = xml_ivalue(node, "level", 0);
-          if (attack->level > 0) {
-            log_error("magical attack '%s' needs a level: %d\n", attack->data.sp->sname, attack->level);
+          if (attack->level <= 0) {
+            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->sname, rc->_name[0], attack->level);
           }
         }
       }

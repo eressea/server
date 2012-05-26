@@ -1204,39 +1204,41 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
   return &sf->next;
 }
 
-struct spellbook *read_spellbook(struct storage *store)
+void read_spellbook(spellbook **bookp, struct storage *store)
 {
-  spellbook * book = 0;
   int level;
   for (level=0;;++level) {
-    spell *sp;
+    spell *sp = 0;
     char spname[64];
 
     if (store->version < SPELLNAME_VERSION) {
       int i = store->r_int(store);
       if (i < 0)
         break;
-      sp = find_spellbyid((unsigned int) i);
+      if (bookp) {
+        sp = find_spellbyid((unsigned int) i);
+      }
     } else {
       store->r_tok_buf(store, spname, sizeof(spname));
       if (strcmp(spname, "end") == 0)
         break;
-      sp = find_spell(spname);
-      if (!sp) {
-        log_error("read_spells: could not find spell '%s'\n", spname);
+      if (bookp) {
+        sp = find_spell(spname);
+        if (!sp) {
+          log_error("read_spells: could not find spell '%s'\n", spname);
+        }
       }
     }
     if (store->version >= SPELLBOOK_VERSION) {
       level = store->r_int(store);
     }
     if (sp) {
-      if (!book) {
-        book = create_spellbook(0);
+      if (!*bookp) {
+        *bookp = create_spellbook(0);
       }
-      spellbook_add(book, sp, level);
+      spellbook_add(*bookp, sp, level);
     }
   }
-  return book;
 }
 
 void write_spellbook(const struct spellbook *book, struct storage *store)
@@ -1393,7 +1395,7 @@ faction *readfaction(struct storage * store)
   read_groups(store, f);
   f->spellbook = 0;
   if (store->version >= REGIONOWNER_VERSION) {
-    f->spellbook = read_spellbook(store);
+    read_spellbook(FactionSpells() ? &f->spellbook : 0, store);
   }
   return f;
 }

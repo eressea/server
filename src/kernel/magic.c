@@ -290,7 +290,11 @@ static int read_mage(attrib * a, void *owner, struct storage *store)
       }
     }
   }
-  mage->spellbook = read_spellbook(store);
+  if (mage->magietyp==M_GRAY) {
+    read_spellbook(&mage->spellbook, store);
+  } else {
+    read_spellbook(0, store);
+  }
   return AT_READ_OK;
 }
 
