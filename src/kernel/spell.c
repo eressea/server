@@ -20,10 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "spell.h"
 
-/* kernel includes */
-#include "magic.h"
-#include "unit.h"
-
 /* util includes */
 #include <util/critbit.h>
 #include <util/goodies.h>
@@ -43,6 +39,13 @@ void free_spells(void) {
   cb_clear(&cb_spells);
   ql_free(spells);
   spells = 0;
+}
+
+void add_spell(struct quicklist **slistp, spell * sp)
+{
+  if (ql_set_insert(slistp, sp) != 0) {
+    log_error("add_spell: the list already contains the spell '%s'.\n", sp->sname);
+  }
 }
 
 spell * create_spell(const char * name, unsigned int id)
@@ -99,46 +102,6 @@ spell *find_spell(const char *name)
     log_warning("find_spell: could not find spell '%s'\n", name);
   }
   return sp;
-}
-
-/* ------------------------------------------------------------- */
-/* Spruch identifizieren */
-
-spell *get_spellfromtoken(struct unit *u, const char *name,
-  const struct locale * lang)
-{
-  sc_mage * mage = get_mage(u);
-  if (mage) {
-    variant token;
-    struct spell_names * names = mage->spellnames;
-    for (;names;names=names->next) {
-      if (names->lang==lang) break;
-    }
-    if (!names) {
-      quicklist *ql = mage->spells;
-      int qi;
-      names = (spell_names *)calloc(1, sizeof(spell_names));
-      names->next = mage->spellnames;
-      names->lang = lang;
-      names->tokens = 0;
-      for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *) ql_get(ql, qi);
-        const char *n = spell_name(sp, lang);
-        if (!n) {
-          log_error("no translation in locae %s for spell $s\n", locale_name(lang), sp->sname);
-        } else {
-          token.v = sp;
-          addtoken(&names->tokens, n, token);
-        }
-      }
-      mage->spellnames = names;
-    }
-
-    if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
-      return (spell *) token.v;
-    }
-  }
-  return 0;
 }
 
 spell *find_spellbyid(unsigned int id)

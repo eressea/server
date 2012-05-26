@@ -74,8 +74,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <math.h>
 
-/* ------------------------------------------------------------- */
-
 const char *magic_school[MAXMAGIETYP] = {
   "gray",
   "illaun",
@@ -544,13 +542,6 @@ void add_spellname(sc_mage * mage, const spell * sp)
     token.v = (void *)sp;
     addtoken(&names->tokens, n, token);
     names = names->next;
-  }
-}
-
-void add_spell(struct quicklist **slistp, spell * sp)
-{
-  if (ql_set_insert(slistp, sp) != 0) {
-    log_error("add_spell: the list already contains the spell '%s'.\n", sp->sname);
   }
 }
 
@@ -2586,16 +2577,16 @@ static castorder *cast_cmd(unit * u, order * ord)
     return 0;
   }
 
-  sp = get_spellfromtoken(u, s, u->faction->locale);
+  sp = unit_getspell(u, s, u->faction->locale);
 
   /* Vertraute können auch Zauber sprechen, die sie selbst nicht
-   * können. get_spellfromtoken findet aber nur jene Sprüche, die
+   * können. unit_getspell findet aber nur jene Sprüche, die
    * die Einheit beherrscht. */
   if (!sp && is_familiar(u)) {
     caster = get_familiar_mage(u);
     if (caster) {
       familiar = u;
-      sp = get_spellfromtoken(caster, s, caster->faction->locale);
+      sp = unit_getspell(caster, s, caster->faction->locale);
     } else {
       /* somehow, this familiar has no mage! */
       log_error("cast_cmd: familiar %s is without a mage?\n", unitname(u));
@@ -2911,6 +2902,43 @@ const char *spell_name(const spell * sp, const struct locale *lang)
 const char *curse_name(const curse_type * ctype, const struct locale *lang)
 {
   return LOC(lang, mkname("spell", ctype->cname));
+}
+
+spell *unit_getspell(struct unit *u, const char *name,
+  const struct locale * lang)
+{
+  sc_mage * mage = get_mage(u);
+  if (mage) {
+    variant token;
+    struct spell_names * names = mage->spellnames;
+    for (;names;names=names->next) {
+      if (names->lang==lang) break;
+    }
+    if (!names) {
+      quicklist *ql = mage->spells;
+      int qi;
+      names = (spell_names *)calloc(1, sizeof(spell_names));
+      names->next = mage->spellnames;
+      names->lang = lang;
+      names->tokens = 0;
+      for (qi = 0, ql = mage->spells; ql; ql_advance(&ql, &qi, 1)) {
+        spell *sp = (spell *) ql_get(ql, qi);
+        const char *n = spell_name(sp, lang);
+        if (!n) {
+          log_error("no translation in locae %s for spell $s\n", locale_name(lang), sp->sname);
+        } else {
+          token.v = sp;
+          addtoken(&names->tokens, n, token);
+        }
+      }
+      mage->spellnames = names;
+    }
+
+    if (findtoken(names->tokens, name, &token) != E_TOK_NOMATCH) {
+      return (spell *) token.v;
+    }
+  }
+  return 0;
 }
 
 struct quicklist **get_spelllist(struct sc_mage *mage, struct faction *f)

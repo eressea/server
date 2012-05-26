@@ -167,7 +167,7 @@ void test_pay_spell_failure(CuTest * tc)
   CuAssertIntEquals(tc, 2, get_resource(u, rt_find("horse")));
 }
 
-void test_get_spellfromtoken_unit(CuTest * tc)
+void test_getspell_unit(CuTest * tc)
 {
   spell *sp;
   struct unit * u;
@@ -188,13 +188,13 @@ void test_get_spellfromtoken_unit(CuTest * tc)
   sp = create_spell("testspell", 0);
   locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-  CuAssertPtrEquals(tc, 0, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
 
   unit_add_spell(u, 0, sp, 1);
-  CuAssertPtrNotNull(tc, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrNotNull(tc, unit_getspell(u, "Herp-a-derp", lang));
 }
 
-void test_get_spellfromtoken_faction(CuTest * tc)
+void test_getspell_faction(CuTest * tc)
 {
   spell *sp;
   struct unit * u;
@@ -215,14 +215,14 @@ void test_get_spellfromtoken_faction(CuTest * tc)
   sp = create_spell("testspell", 0);
   locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-  CuAssertPtrEquals(tc, 0, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
 
   f->spellbook = create_spellbook(0);
   spellbook_add(f->spellbook, sp, 1);
-  CuAssertPtrEquals(tc, sp, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
 }
 
-void test_get_spellfromtoken_school(CuTest * tc)
+void test_getspell_school(CuTest * tc)
 {
   spell *sp;
   struct unit * u;
@@ -245,11 +245,11 @@ void test_get_spellfromtoken_school(CuTest * tc)
   sp = create_spell("testspell", 0);
   locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-  CuAssertPtrEquals(tc, 0, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
 
   book = get_spellbook(magic_school[f->magiegebiet]);
   spellbook_add(book, sp, 1);
-  CuAssertPtrEquals(tc, sp, get_spellfromtoken(u, "Herp-a-derp", lang));
+  CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
 }
 
 CuSuite *get_magic_suite(void)
@@ -259,8 +259,8 @@ CuSuite *get_magic_suite(void)
   SUITE_ADD_TEST(suite, test_spellbooks);
   SUITE_ADD_TEST(suite, test_pay_spell);
   SUITE_ADD_TEST(suite, test_pay_spell_failure);
-  SUITE_ADD_TEST(suite, test_get_spellfromtoken_unit);
-  SUITE_ADD_TEST(suite, test_get_spellfromtoken_faction);
-  SUITE_ADD_TEST(suite, test_get_spellfromtoken_school);
+  SUITE_ADD_TEST(suite, test_getspell_unit);
+  SUITE_ADD_TEST(suite, test_getspell_faction);
+  SUITE_ADD_TEST(suite, test_getspell_school);
   return suite;
 }

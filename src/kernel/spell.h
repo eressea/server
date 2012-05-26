@@ -22,25 +22,39 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  /* Prototypen */
+  struct castorder;
+  typedef int (*spell_f)(struct castorder * co);
+  typedef void(*fumble_f)(struct castorder * co);
+
+  typedef struct spell {
+    unsigned int id;
+    char *sname;
+    char *syntax;
+    char *parameter;
+    int sptyp;
+    int rank;                   /* Reihenfolge der Zauber */
+    struct spell_component *components;
+    spell_f cast;
+    fumble_f patzer;
+
+    /* this is not so much the spell's data, but the school's studying data */
+    int level;                  /* Stufe des Zaubers */
+  } spell;
 
   int use_item_power(struct region *r, struct unit *u);
   int use_item_regeneration(struct region *r, struct unit *u);
   void showspells(struct region *r, struct unit *u);
   int sp_antimagiczone(struct castorder *co);
 
-  /* ------------------------------------------------------------- */
-
-  extern struct attrib_type at_unitdissolve;
-  extern struct attrib_type at_wdwpyramid;
-
   extern struct spell * create_spell(const char * name, unsigned int id);
   extern struct spell * find_spell(const char *name);
   extern struct spell * find_spellbyid(unsigned int i);
-  extern struct spell * get_spellfromtoken(struct unit *u, const char *s,
-    const struct locale *lang);
+  extern void add_spell(struct quicklist **slistp, spell * sp);
   extern void free_spells(void);
 
+  /** globals **/
+  extern struct attrib_type at_unitdissolve;
+  extern struct attrib_type at_wdwpyramid;
   extern struct quicklist * spells;
 #ifdef __cplusplus
 }

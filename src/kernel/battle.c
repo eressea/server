@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 #include "ship.h"
 #include "skill.h"
+#include "spell.h"
 #include "terrain.h"
 #include "unit.h"
 

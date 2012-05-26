@@ -39,6 +39,9 @@ extern "C" {
 
 #define RACESPOILCHANCE 5       /* Chance auf rassentypische Beute */
 
+  struct param;
+  struct spell;
+
   typedef struct att {
     int type;
     union {
@@ -48,8 +51,6 @@ extern "C" {
     int flags;
     int level;
   } att;
-
-  struct param;
 
   extern int num_races;
 
@@ -75,7 +76,7 @@ extern "C" {
     int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
     int at_bonus;               /* Verändert den Angriffsskill (default: 0) */
     int df_bonus;               /* Verändert den Verteidigungskill (default: 0) */
-    const spell *precombatspell;
+    const struct spell *precombatspell;
     struct att attack[10];
     char bonus[MAXSKILLS];
     signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */

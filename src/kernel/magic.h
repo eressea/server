@@ -150,24 +150,6 @@ typedef struct sc_mage {
     int cost;
   } spell_component;
 
-  typedef int (*spell_f)(castorder * co);
-  typedef void(*fumble_f)(castorder * co);
-
-  typedef struct spell {
-    unsigned int id;
-    char *sname;
-    char *syntax;
-    char *parameter;
-    int sptyp;
-    int rank;                   /* Reihenfolge der Zauber */
-    struct spell_component *components;
-    spell_f cast;
-    fumble_f patzer;
-
-    /* this is not so much the spell's data, but the school's studying data */
-    int level;                  /* Stufe des Zaubers */
-  } spell;
-
 /* ------------------------------------------------------------- */
 
 /* besondere Spruchtypen */
@@ -261,15 +243,14 @@ typedef struct sc_mage {
   int get_combatspelllevel(const struct unit *u, int nr);
   /*  versucht, eine eingestellte maximale Kampfzauberstufe
    *  zurückzugeben. 0 = Maximum, -1 u ist kein Magier. */
-  const spell *get_combatspell(const struct unit *u, int nr);
+  const struct spell *get_combatspell(const struct unit *u, int nr);
   /*      gibt den Kampfzauber nr [pre/kampf/post] oder NULL zurück */
-  void set_combatspell(struct unit *u, spell * sp, struct order *ord,
+  void set_combatspell(struct unit *u, struct spell * sp, struct order *ord,
     int level);
   /*      setzt Kampfzauber */
-  void unset_combatspell(struct unit *u, spell * sp);
+  void unset_combatspell(struct unit *u, struct spell * sp);
   /*      löscht Kampfzauber */
-  void add_spell(struct quicklist **slistp, spell * sp);
-  void add_spellname(sc_mage * mage, const spell * sp);
+  void add_spellname(sc_mage * mage, const struct spell * sp);
   /* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
   int u_hasspell(const sc_mage *mage, const struct spell *sp);
   /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
@@ -279,7 +260,7 @@ typedef struct sc_mage {
    * als das aktuelle Magietalent ist, in die Spruchliste der Einheit
    * ein */
   boolean knowsspell(const struct region *r, const struct unit *u,
-    const spell * sp);
+    const struct spell * sp);
   /* prüft, ob die Einheit diesen Spruch gerade beherrscht, dh
    * mindestens die erforderliche Stufe hat. Hier können auch Abfragen
    * auf spezielle Antimagiezauber auf Regionen oder Einheiten eingefügt
@@ -299,10 +280,10 @@ typedef struct sc_mage {
   /* verändert die maximalen Magiepunkte einer Einheit */
 
 /* Zaubern */
-  extern double spellpower(struct region *r, struct unit *u, const spell * sp,
+  extern double spellpower(struct region *r, struct unit *u, const struct spell * sp,
     int cast_level, struct order *ord);
   /*      ermittelt die Stärke eines Spruchs */
-  boolean fumble(struct region *r, struct unit *u, const spell * sp,
+  boolean fumble(struct region *r, struct unit *u, const struct spell * sp,
     int cast_level);
   /*      true, wenn der Zauber misslingt, bei false gelingt der Zauber */
 
@@ -325,19 +306,19 @@ typedef struct sc_mage {
   int countspells(struct unit *u, int step);
   /*      erhöht den Counter für Zaubersprüche um 'step' und gibt die neue
    *      Anzahl der gezauberten Sprüche zurück. */
-  int spellcost(struct unit *u, const spell * sp);
+  int spellcost(struct unit *u, const struct spell * sp);
   /*      gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
    *      geringstmöglichen Stufe zurück, schon um den Faktor der bereits
    *      zuvor gezauberten Sprüche erhöht */
-  boolean cancast(struct unit *u, const spell * spruch, int eff_stufe,
+  boolean cancast(struct unit *u, const struct spell * spruch, int eff_stufe,
     int distance, struct order *ord);
   /*      true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
    *      geringstmögliche Stufe hat und den Spruch beherrscht */
-  void pay_spell(struct unit *u, const spell * sp, int eff_stufe, int distance);
+  void pay_spell(struct unit *u, const struct spell * sp, int eff_stufe, int distance);
   /*      zieht die Komponenten des Zaubers aus dem Inventory der Einheit
    *      ab. Die effektive Stufe des gezauberten Spruchs ist wichtig für
    *      die korrekte Bestimmung der Magiepunktkosten */
-  int eff_spelllevel(struct unit *u, const spell * sp, int cast_level,
+  int eff_spelllevel(struct unit *u, const struct spell * sp, int cast_level,
     int distance);
   /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
    *      die gewünschte maximale Stufe (im Normalfall Stufe des Magiers,
@@ -352,8 +333,10 @@ typedef struct sc_mage {
     int resist_bonus);
   /*      gibt false zurück, wenn der Zauber gelingt, true, wenn das Ziel
    *      widersteht */
+  extern struct spell * unit_getspell(struct unit *u, const char *s,
+    const struct locale *lang);
 
-/* Sprüche in der struct region */
+  /* Sprüche in der struct region */
   /* (sind in curse) */
   extern struct unit *get_familiar(const struct unit *u);
   extern struct unit *get_familiar_mage(const struct unit *u);

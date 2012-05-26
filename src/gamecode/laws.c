@@ -2457,7 +2457,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
       }
     }
     /* try for a spell */
-    sp = get_spellfromtoken(u, s, u->faction->locale);
+    sp = unit_getspell(u, s, u->faction->locale);
     if (sp) {
       attrib *a = a_find(u->faction->attribs, &at_seenspell);
       while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
@@ -2641,7 +2641,7 @@ static int combatspell_cmd(unit * u, struct order *ord)
     s = getstrtoken();
   }
 
-  sp = get_spellfromtoken(u, s, u->faction->locale);
+  sp = unit_getspell(u, s, u->faction->locale);
   if (!sp) {
     cmistake(u, ord, 173, MSG_MAGIC);
     return 0;
