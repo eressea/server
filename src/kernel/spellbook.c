@@ -3,6 +3,7 @@
 #include <kernel/spell.h>
 #include <kernel/magic.h>
 #include <util/quicklist.h>
+#include <util/log.h>
 
 #include "spellbook.h"
 
@@ -21,8 +22,11 @@ void spellbook_add(spellbook *sb, struct spell * sp, int level)
   spellbook_entry * sbe;
 
   assert(sb && sp && level>0);
-  assert(!spellbook_get(sb, sp));
-  
+#ifndef NDEBUG
+  if (spellbook_get(sb, sp)) {
+    log_error("duplicate spell in spellbook '%s': '%s'\n", sb->name, sp->sname);
+  }
+#endif  
   sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
   sbe->sp = sp;
   sbe->level = level;
